@@ -15,6 +15,7 @@ project ("SteamRot")
 # set the cmake module path (for import libraries and other cmake files)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/FetchContentModules")
 include(AddSFML)
+include(AddCatch2)
 
 # Include sub-projects.
 add_subdirectory("src")
