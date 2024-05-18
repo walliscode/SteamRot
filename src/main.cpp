@@ -1,7 +1,7 @@
 ﻿// src.cpp : Defines the entry point for the application.
 //
 
-#include "src.h"
+#include "main.h"
 
 using namespace std;
 
