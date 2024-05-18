@@ -1,12 +1,14 @@
-﻿// src.cpp : Defines the entry point for the application.
-//
+﻿
+#include "systems/game/GameEngine.h"
 
-#include "main.h"
+int main() {
+    GameEngine engine;
+    // NORM //
+    //engine.run();
 
-using namespace std;
+    // TEST //
+    engine.runSimulation(10000);
+    //e.g. run the game for 10000 updates/steps
 
-int main()
-{
-	cout << "Hello CMake." << endl;
-	return 0;
+    return 0;
 }
