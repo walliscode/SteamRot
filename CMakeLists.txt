@@ -9,7 +9,17 @@ if (POLICY CMP0141)
   set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
 endif()
 
-project ("SteamRot")
+project(SteamRot VERSION 1.0 LANGUAGES CXX)
+
+
+
+
+
+# Include external dependencies.
+# set the cmake module path (for import libraries and other cmake files)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/FetchContentModules")
+include(AddSFML)
+include(AddCatch2)
 
 # Include external dependencies.
 # set the cmake module path (for import libraries and other cmake files)
