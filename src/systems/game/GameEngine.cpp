@@ -1,69 +1,118 @@
 #include "GameEngine.h"
-#include <iostream> // For std::cerr
+#include <iostream>
 #include <cstdlib> // For std::exit
 
 GameEngine::GameEngine()
     : window(sf::VideoMode(1600, 900), "SteamRot"),
-    backgroundColor(sf::Color::Green),
+    backgroundColor(sf::Color(35, 135, 35)),
     timeSinceLastUpdate(sf::Time::Zero),
     frames(0),
     updates(0),
     fpsUpdateTime(sf::Time::Zero) {
 
-    // Use the defined macro to get the full path to the font
+    //get full path to the font
     std::string fontPath = std::string(ASSETS_PATH) + "/fonts/AmaticSC-Bold.ttf";
 
-    // Load a font from the assets folder using the defined path
+    //Load font from assets folder using the path
     if (!font.loadFromFile(fontPath)) {
         // Handle error
         std::cerr << "Failed to load font from " << fontPath << std::endl;
-        std::exit(8008); // Exit with code 8008
+        std::exit(8008);
     }
 
-    // Set up FPS text
+    //FPS text
     fpsText.setFont(font);
-    fpsText.setCharacterSize(20);
+    fpsText.setCharacterSize(30);
     fpsText.setFillColor(sf::Color::White);
-    fpsText.setPosition(window.getSize().x - 100, 10);
+    fpsText.setPosition(window.getSize().x - 80, 10);
 
-    // Set up UPS text
+    //UPS text
     upsText.setFont(font);
-    upsText.setCharacterSize(20);
+    upsText.setCharacterSize(30);
     upsText.setFillColor(sf::Color::White);
-    upsText.setPosition(window.getSize().x - 100, 30);
+    upsText.setPosition(window.getSize().x - 80, 40);
 }
 
+//Normal Game Running
 void GameEngine::run() {
-    while (window.isOpen()) {
-        processEvents();
+    sf::Clock clock;
+    sf::Time timeSinceLastRender = sf::Time::Zero;
 
-        // Measure elapsed time since last frame
-        sf::Time elapsedTime = frameClock.restart();
+    while (window.isOpen()) {
+        sf::Time elapsedTime = clock.restart();
         timeSinceLastUpdate += elapsedTime;
+        timeSinceLastRender += elapsedTime;
         fpsUpdateTime += elapsedTime;
 
-        // Update as many times as necessary to catch up
+        processEvents();
+
+        //Update to catch up
         while (timeSinceLastUpdate >= TimePerUpdate) {
             timeSinceLastUpdate -= TimePerUpdate;
             update(TimePerUpdate);
             updates++;
         }
 
-        render();
-        frames++;
+        //Render at limited frame rate
+        if (timeSinceLastRender >= TimePerFrame) {
+            render();
+            frames++;
+            timeSinceLastRender -= TimePerFrame;
+        }
 
-        // Update FPS and UPS every second
+        //Update FPS and UPS values every second
         if (fpsUpdateTime >= sf::seconds(1.0f)) {
             updateFPSandUPS(fpsUpdateTime);
             fpsUpdateTime -= sf::seconds(1.0f);
         }
+
+        //Ensure frame rate is limited
+        sf::Time sleepTime = TimePerFrame - clock.getElapsedTime();
+        if (sleepTime > sf::Time::Zero) {
+            sf::sleep(sleepTime);
+        }
     }
 }
 
+//Simulation Game Running
 void GameEngine::runSimulation(int steps) {
+    sf::Clock clock;
+    sf::Time timeSinceLastRender = sf::Time::Zero;
+
     for (int i = 0; i < steps; ++i) {
-        update(TimePerUpdate);
-        logState(i); // Logging the state for debugging/testing
+        sf::Time elapsedTime = clock.restart();
+        timeSinceLastUpdate += elapsedTime;
+        timeSinceLastRender += elapsedTime;
+        fpsUpdateTime += elapsedTime;
+
+        processEvents();
+
+        //Update to catch up
+        while (timeSinceLastUpdate >= TimePerUpdate) {
+            timeSinceLastUpdate -= TimePerUpdate;
+            update(TimePerUpdate);
+            updates++;
+            logUpdate(i); // Log the update
+        }
+
+        //Render at a limited frame rate
+        if (timeSinceLastRender >= TimePerFrame) {
+            render();
+            frames++;
+            timeSinceLastRender -= TimePerFrame;
+        }
+
+        //Update FPS and UPS values every second
+        if (fpsUpdateTime >= sf::seconds(1.0f)) {
+            updateFPSandUPS(fpsUpdateTime);
+            fpsUpdateTime -= sf::seconds(1.0f);
+        }
+
+        //Ensure frame rate is limited
+        sf::Time sleepTime = TimePerFrame - clock.getElapsedTime();
+        if (sleepTime > sf::Time::Zero) {
+            sf::sleep(sleepTime);
+        }
     }
 }
 
@@ -76,21 +125,18 @@ void GameEngine::processEvents() {
 }
 
 void GameEngine::update(sf::Time deltaTime) {
-    // Update game state (e.g., handle logic, physics, etc.)
-    // For now, we don't have much to update, but this is where it would go
+    // Update game (handle logic, physics, etc.)
+    
 }
 
 void GameEngine::render() {
     window.clear(backgroundColor);
 
-    // Draw the FPS and UPS text
+    // Draw FPS and UPS text
     window.draw(fpsText);
     window.draw(upsText);
 
     window.display();
-
-    // Ensure we limit the frame rate
-    sf::sleep(TimePerFrame - frameClock.getElapsedTime());
 }
 
 void GameEngine::updateFPSandUPS(sf::Time elapsedTime) {
@@ -98,17 +144,16 @@ void GameEngine::updateFPSandUPS(sf::Time elapsedTime) {
     float fps = static_cast<float>(frames) / elapsedTime.asSeconds();
     float ups = static_cast<float>(updates) / elapsedTime.asSeconds();
 
-    // Update the text objects
+    // Update FPS and UPS text objects
     fpsText.setString("FPS: " + std::to_string(static_cast<int>(fps)));
     upsText.setString("UPS: " + std::to_string(static_cast<int>(ups)));
 
-    // Reset the counters
+    // Reset counters
     frames = 0;
     updates = 0;
 }
 
-void GameEngine::logState(int step) {
-    // Example of logging internal state for testing
-    std::cout << "Cheeky Game Update" << step << std::endl;
-    // Log any relevant state information here
+void GameEngine::logUpdate(int step) {
+    // Log update info:
+    std::cout << "Cheeky Game Update: " << step << std::endl;
 }

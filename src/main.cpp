@@ -4,11 +4,11 @@
 int main() {
     GameEngine engine;
     // NORM //
-    engine.run();
+    //engine.run();
 
     // TEST //
-    //engine.runSimulation(10000);
-    //e.g. run the game for 10000 updates/steps
+    engine.runSimulation(1000);
+    //e.g. run the game for 1000 updates/steps
 
     return 0;
 }
