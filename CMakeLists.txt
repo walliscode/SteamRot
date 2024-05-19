@@ -18,7 +18,10 @@ include(AddCatch2)
 # Add the executable
 add_executable(SteamRot "src/main.cpp")
 
-# Include sub-projects
+# Define the assets path
+add_definitions(-DASSETS_PATH=\"${CMAKE_SOURCE_DIR}/assets\")
+
+# Include sub-directories
 add_subdirectory("src")
 
 # Link SFML library
@@ -35,12 +38,29 @@ set_property(TARGET SteamRot PROPERTY CXX_STANDARD 20)
 # Set the directory for DLLs
 set(DLL_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 
-# Copy DLLs for debug build
+# Define SFML DLL paths
 if (WIN32)
-  
-   file(COPY ${CMAKE_BINARY_DIR}/_deps/sfml-build/lib/sfml-graphics-d-2.dll DESTINATION ${DLL_OUTPUT_DIRECTORY})
-   file(COPY ${CMAKE_BINARY_DIR}/_deps/sfml-build/lib/sfml-window-d-2.dll DESTINATION ${DLL_OUTPUT_DIRECTORY})
-   file(COPY ${CMAKE_BINARY_DIR}/_deps/sfml-build/lib/sfml-system-d-2.dll DESTINATION ${DLL_OUTPUT_DIRECTORY})
-   file(COPY ${CMAKE_BINARY_DIR}/_deps/sfml-src/extlibs/bin/x64/openal32.dll DESTINATION ${DLL_OUTPUT_DIRECTORY})
+  set(SFML_GRAPHICS_DLL "${CMAKE_BINARY_DIR}/_deps/sfml-build/lib/sfml-graphics-d-2.dll")
+  set(SFML_WINDOW_DLL "${CMAKE_BINARY_DIR}/_deps/sfml-build/lib/sfml-window-d-2.dll")
+  set(SFML_SYSTEM_DLL "${CMAKE_BINARY_DIR}/_deps/sfml-build/lib/sfml-system-d-2.dll")
+  set(OPENAL_DLL "${CMAKE_BINARY_DIR}/_deps/sfml-src/extlibs/bin/x64/openal32.dll")
 
+  # Ensure the output directory exists
+  file(MAKE_DIRECTORY "${DLL_OUTPUT_DIRECTORY}")
+
+  # Add custom commands to copy each DLL after build
+  add_custom_command(TARGET SteamRot POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      "${SFML_GRAPHICS_DLL}"
+      "${DLL_OUTPUT_DIRECTORY}"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      "${SFML_WINDOW_DLL}"
+      "${DLL_OUTPUT_DIRECTORY}"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      "${SFML_SYSTEM_DLL}"
+      "${DLL_OUTPUT_DIRECTORY}"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      "${OPENAL_DLL}"
+      "${DLL_OUTPUT_DIRECTORY}"
+  )
 endif()
