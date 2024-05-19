@@ -1,4 +1,4 @@
-﻿
+
 #include "systems/game/GameEngine.h"
 
 int main() {
