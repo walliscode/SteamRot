@@ -2,12 +2,12 @@
 
 
 # Add source to this project's executable.
-add_executable(SteamRot "src.cpp" "src.h")
+add_executable(SteamRot main.cpp main.h)
 
-if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET SteamRot PROPERTY CXX_STANDARD 20)
-endif()
+target_link_libraries(SteamRot PRIVATE sfml-graphics)
 
+
+# this dll file is needed for the audio module, so currently not needed but will be left in for now to prevent us searching for it when time comes for audio
 if(WIN32)
     add_custom_command(
         TARGET SteamRot
@@ -16,4 +16,4 @@ if(WIN32)
         VERBATIM)
 endif()
 
-# TODO: Add tests and install targets if needed.
+
