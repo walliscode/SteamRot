@@ -7,14 +7,19 @@ assignees: ''
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+**Feature:**
+add 1-2 bullet points of feature you want to add.Keep scope small.
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+**Labelling:**
+To work with Githubs auto generation of branches from issues we will structure the issue title as follows:
+`[feature/documentation]/[issue number]: [very short description]`
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+**Context:** 
+if this issue is part of a cascade of issues to solve a larger problem, then make sure this is part of a project and
+manage the issue dependencies from there
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+**Solution:**
+add initial approach to solving this problem
+
+**Tests:**
+add behaviours you are going to test
