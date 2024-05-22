@@ -1,10 +1,9 @@
-﻿
 
 
-# Add source to this project's executable.
 add_executable(SteamRot main.cpp main.h)
 
 target_link_libraries(SteamRot PRIVATE sfml-graphics)
+
 
 
 # this dll file is needed for the audio module, so currently not needed but will be left in for now to prevent us searching for it when time comes for audio

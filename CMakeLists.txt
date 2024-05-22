@@ -20,6 +20,7 @@ endif()
 # Always enforce the language constraint
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+
 # We don't need compiler extensions, but let a parent ask for them
 if(NOT DEFINED CMAKE_CXX_EXTENSIONS)
   set(CMAKE_CXX_EXTENSIONS OFF)
@@ -32,8 +33,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/FetchContentModules")
 include(AddSFML)
 include(AddCatch2)
 
-
-# Include sub-projects.
 add_subdirectory(src)
 add_subdirectory(tests)
 
