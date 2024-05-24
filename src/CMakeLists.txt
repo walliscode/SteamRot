@@ -1,10 +1,11 @@
 
+add_subdirectory(systems)
 
-add_executable(SteamRot main.cpp main.h)
+add_executable(SteamRot main.cpp)
 
-target_link_libraries(SteamRot PRIVATE sfml-graphics)
-
-
+target_link_libraries(SteamRot PRIVATE
+    GameEngine
+)
 
 # this dll file is needed for the audio module, so currently not needed but will be left in for now to prevent us searching for it when time comes for audio
 if(WIN32)
@@ -14,5 +15,6 @@ if(WIN32)
         PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll $<TARGET_FILE_DIR:SteamRot>
         VERBATIM)
 endif()
+
 
 
