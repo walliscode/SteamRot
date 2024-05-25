@@ -7,6 +7,8 @@ project(SteamRot
 
 enable_testing()
 
+
+
 # This next bit of code comes from Professional CMake: A Practical Guide, pg 205 (in documentation/textbooks) as a safe way to add CXX standards
 # Require C++20, but let a parent project ask for something higher
 if(DEFINED CMAKE_CXX_STANDARD)
@@ -26,6 +28,13 @@ if(NOT DEFINED CMAKE_CXX_EXTENSIONS)
   set(CMAKE_CXX_EXTENSIONS OFF)
 endif()
 
+
+
+# ensures that the default libraries are statically linked
+option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
+message("Build shared libs: ${BUILD_SHARED_LIBS}")
+
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin) # necessary for puting the executable and dlls in the same folder
 # Include external dependencies.
 # set the cmake module path (for import libraries and other cmake files)
@@ -38,3 +47,21 @@ add_subdirectory(tests)
 
 
 install(TARGETS SteamRot) # creates an install folder under installDir (in CMakePresets.json)
+
+# useful function and variables
+function(check_targets target_list) # this function can be called in any cmakelists.txt file to check if targets are being propagated
+    foreach(target ${${target_list}})
+        if(TARGET ${target})
+            message(STATUS "In directory ${CMAKE_CURRENT_SOURCE_DIR}, target '${target}' has been defined.")
+        else()
+            message(WARNING "In directory ${CMAKE_CURRENT_SOURCE_DIR}, target '${target}' has not been defined.")
+        endif()
+    endforeach()
+endfunction()
+
+
+set(MY_TARGET_LIST 
+    SteamRot
+    GameEngine
+    sfml-graphics)
+check_targets(MY_TARGET_LIST)
