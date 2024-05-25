@@ -13,9 +13,10 @@ class Entity
 	ComponentTuple		m_components;         // tuple of components that the entity has
 
 
-	Entity(const size_t& id); // private constructor, only entity manager can create entities
 	Entity(const size_t& id, const ComponentTuple& entityConfig);
 public:
+
+	Entity(const size_t& id);
 
 	// private member access functions
 	bool                  isActive() const;
