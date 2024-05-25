@@ -1,7 +1,7 @@
 
 add_subdirectory(systems)
 
-add_executable(SteamRot main.cpp)
+add_executable(SteamRot main.cpp "systems/systems_001/include/Scene.h")
 
 target_link_libraries(SteamRot PRIVATE
     GameEngine

@@ -10,5 +10,4 @@ TEST_CASE("GameEngine creates an sfml window", "[GameEngine]") {
 	
 	REQUIRE(window != nullptr);  // Check that the window is created
 	REQUIRE(window->isOpen());   // Check that the window is open
-
 }
