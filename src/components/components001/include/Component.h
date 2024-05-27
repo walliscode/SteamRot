@@ -1,10 +1,6 @@
 #pragma once
-#include <tuple>
 
 class Component {
 public:
-	bool has = false; // if the entity has this component
+	bool has = false; // if the entity has this component, required for all components
 };
-
- // dummy tuple to allow for unit testing of entities
-typedef std::tuple <Component, Component> ComponentTuple;

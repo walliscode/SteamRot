@@ -63,5 +63,10 @@ endfunction()
 set(MY_TARGET_LIST 
     SteamRot
     GameEngine
-    sfml-graphics)
+    sfml-graphics
+    Component
+    Component001
+    Entity
+    EntityManager
+    EntityMemoryPool)
 check_targets(MY_TARGET_LIST)
