@@ -1,14 +1,19 @@
 #pragma once
 #include "EntityManager.h"
-#include "EntityMemoryPool.h"
 
-class EntityManager
+
+EntityManager::EntityManager(int poolSize)
 {
-public:
-	Entity addEntity()
-	{
-		//TODO add entity
+}
 
-		return;
-	}
-};
+int EntityManager::addEntity()
+{
+	//TODO add entity
+
+	return 0;
+}
+
+void EntityManager::removeEntity(int entityID)
+{
+	//TODO remove entity from pool
+}

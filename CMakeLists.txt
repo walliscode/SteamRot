@@ -66,7 +66,5 @@ set(MY_TARGET_LIST
     sfml-graphics
     Component
     Component001
-    Entity
-    EntityManager
-    EntityMemoryPool)
+    EntityManager)
 check_targets(MY_TARGET_LIST)

@@ -2,6 +2,7 @@
 
 Entity::Entity(const std::string& tag, const size_t& id) : m_id(id), m_tag(tag)
 {
+	m_active = true; //set enity to active
 }
 
 bool Entity::isActive() const

@@ -1,27 +1,15 @@
 #pragma once
-#include <vector>
-
 
 #include "EntityMemoryPool.h"
-#include "CTransform.h"
-#include "Entity.h"
 
-class EntityMemoryPool
+
+void EntityMemoryPool::setPoolSize(int poolSize)
 {
-public:
-	Entity addEntity()
-	{
-		size_t index = getNextEntityIndex(); //get the next free index
+	//set the size of the component arrays for the pool
+}
 
-		//reset all the componet data for the free index
-		std::get<std::vector<CTransform>>(m_data)[index] = CTransform();
-
-		//set all vectors[index] = 0
-		//set active[index] = default
-		return Entity(index);
-	}
-
-	int getNextEntityIndex() {
-		return 0;
-	}
-};
+int EntityMemoryPool::getNextEntityIndex()
+{
+	//return the index for the next free entity index
+	return 0;
+}
