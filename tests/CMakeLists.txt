@@ -8,7 +8,6 @@ target_link_libraries(steamrot_tests
 	PRIVATE
 		Catch2::Catch2WithMain
 		GameEngine
-		Entity
 )
 include(CTest)
 add_test(NAME steamrot_tests COMMAND steamrot_tests)	

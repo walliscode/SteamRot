@@ -3,9 +3,9 @@
 #include "EntityMemoryPool.h"
 
 
-void EntityMemoryPool::setPoolSize(int poolSize)
+EntityMemoryPool::EntityMemoryPool(int poolSize)
 {
-	//set the size of the component arrays for the pool
+	m_data = malloc(sizeof(EntityComponentVectorTuple) * poolSize); //Not how this works, needs sorting
 }
 
 int EntityMemoryPool::getNextEntityIndex()

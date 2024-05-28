@@ -14,12 +14,12 @@ class EntityMemoryPool
 	size_t						m_numEntities; //total number of entitys
 	EntityComponentVectorTuple  m_data; //store of component vectors (all component data for this pool)
 	std::vector<bool>			m_active; //is this column of the component vectors referencing a live entity
+	EntityMemoryPool(int poolSize); //constructor for setting pool size
 
 public:
 
 	//Entity pool functions
 	int getNextEntityIndex(); //return the next free index for a new entity
-	void setPoolSize(int poolSize); //set the pool size for the entity manager
 
 	//Entity pool templates
 

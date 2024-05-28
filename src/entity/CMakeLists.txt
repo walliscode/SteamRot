@@ -1,6 +1,5 @@
 
 add_library(EntityManager
-	Entity.cpp
 	EntityManager.cpp 
 	EntityMemoryPool.cpp
 )
