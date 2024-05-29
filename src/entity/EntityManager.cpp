@@ -2,19 +2,19 @@
 #include "EntityManager.h"
 
 
-EntityManager::EntityManager(int poolSize)
+EntityManager::EntityManager(int poolSize) : m_pool(new EntityMemoryPool(poolSize))
 {
 }
 
 int EntityManager::addEntity()
 {
-	//TODO add entity - get the next free index in the memory pool, set to active and return the index
-	//reset the components for the new index
-
-	return 0;
+	int newEntityID = (*m_pool).getNextEntityIndex(); //get the next free index in the memory pool, set to active and return the index
+	std::get<0>(*(*m_pool).getData())[newEntityID] = true; //set the active vector to true at the new entity index
+	(*m_pool).refreshEntity(*(*m_pool).getData(), newEntityID); //call the refresh entity function on the new ID to clear it
+	return newEntityID; //return the index of the new entity
 }
 
 void EntityManager::removeEntity(int entityID)
 {
-	//TODO remove entity - set the index in the memory pool to be free
+	std::get<0>(*(*m_pool).getData())[entityID] = false; //set the active vector to false at the passed entity index
 }

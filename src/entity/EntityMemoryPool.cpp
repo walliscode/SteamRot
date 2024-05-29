@@ -5,11 +5,23 @@
 
 EntityMemoryPool::EntityMemoryPool(int poolSize)
 {
-	m_data = malloc(sizeof(EntityComponentVectorTuple) * poolSize); //Not how this works, needs sorting
+	defineFreshTuple(*m_data, poolSize); //call the fresh tuple temple to define all teh vectors in teh tuple
 }
 
 int EntityMemoryPool::getNextEntityIndex()
 {
 	//return the index for the next free entity index
-	return 0;
+	for (int i = 0; i != std::get<0>(*m_data).size(); ++i) //loop through the size of the active array
+	{
+		if (!std::get<0>(*m_data)[i])
+		{
+			return i; //if an index is found to be false, then the position is free and return the index
+		}
+	}
+	return 0; //if no free position was found then return 0 to indicate this
+}
+
+std::shared_ptr<EntityComponentVectorTuple> EntityMemoryPool::getData()
+{
+	return m_data;
 }
