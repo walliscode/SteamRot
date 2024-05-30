@@ -27,7 +27,7 @@ public:
 
 	template <typename T>
 	void defineElem(const T& x, const int size) { //for a passed vector and size, initialise the vector to the specified size
-		x = new T[size];
+		x = new std::vector<T>[size];
 	};
 
 	template <typename TupleT, std::size_t... Is>
