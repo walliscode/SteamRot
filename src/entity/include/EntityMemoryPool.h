@@ -27,25 +27,23 @@ public:
 
 	//Entity pool templates
 	template <typename T>
-	void defineElem(T x, int size) //for a passed vector and size, initialise the vector to the specified size
+	void defineElem(T& x, int size) //for a passed vector and size, initialise the vector to the specified size
 	{ 
-		std::cout << "Resize to " << size << "\n";
 		x.resize(size); //Resize the vector
-		std::cout << "Actual size: " << x.size() << "\n";
 		using vecType = typename T::value_type; //Get the variable type to populate the vector with
 		std::fill(x.begin(), x.end(), vecType()); //Populate the vector with empty components
-		std::cout << "-> Empty vector of type: '" << typeid(vecType).name() << "' defined\n";
+		std::cout << "-> Empty vector of type: '" << typeid(vecType).name() << "' defined, resized to: " << x.size() << " items\n";
 	};
 
 	template <typename TupleT, std::size_t... Is>
-	void defineTupleElements(TupleT tp, std::index_sequence<Is...>, int size)   //unfold function to call define element for each tuple element
+	void defineTupleElements(TupleT& tp, std::index_sequence<Is...>, int size)   //unfold function to call define element for each tuple element
 	{
 		std::cout << "Memory pool tuple split...\n";
 		(defineElem(std::get<Is>(tp), size), ...);
 	}
 
 	template <typename TupleT, std::size_t TupSize = std::tuple_size_v<TupleT>> 
-	void defineFreshTuple(TupleT tp, const int size) {
+	void defineFreshTuple(TupleT& tp, const int size) {
 		defineTupleElements(tp, std::make_index_sequence<TupSize>{}, size); //call the define tuple elements function with the size of the tuple being passed
 		std::cout << "Tuple definition complete\n\n";
 	}
