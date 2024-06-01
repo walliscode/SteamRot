@@ -3,7 +3,7 @@
 #include "EntityMemoryPool.h"
 
 
-EntityMemoryPool::EntityMemoryPool(int poolSize)
+EntityMemoryPool::EntityMemoryPool(int poolSize) : m_numEntities(poolSize), m_data(std::make_shared<EntityComponentVectorTuple>())
 {
 	defineFreshTuple(*m_data, poolSize); //call the fresh tuple temple to define all teh vectors in teh tuple
 }
