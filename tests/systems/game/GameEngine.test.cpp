@@ -72,12 +72,26 @@ TEST_CASE("Entity Manager tests", "[EntityManager]") {
 	REQUIRE(addedEntity == 0); // Check that a new entity is added at the start of the list
 	std::cout << "Pool position " << addedEntity << " has active set as: " << (*testManager).getComponent<sf::Uint16>(addedEntity) << "\n";
 	REQUIRE((*testManager).getComponent<sf::Uint16>(addedEntity) == 1); // Check that the changed state of active for an added entity occurs correctly
+	std::cout << "Entities in active list: " << (*testManager).getEntities().size() << "\n";
+	REQUIRE((*testManager).getEntities().size() == 0); // Check that the active entities list is empty
+	(*testManager).updateWaitingRooms();
+	std::cout << "Waiting rooms updated\n";
+	std::cout << "Entities in active list: " << (*testManager).getEntities().size() << "\n";
+	REQUIRE((*testManager).getEntities().size() == 1); // Check that the active entities list is not empty now
+
 
 	(*testManager).removeEntity(0);
 	std::cout << "Entity removed from position: " << 0 << "\n";
 	std::cout << "Pool position 0 has active set as: " << (*testManager).getComponent<sf::Uint16>(0) << "\n";
-	REQUIRE((*testManager).getComponent<sf::Uint16>(addedEntity) == 0); // Check that the changed state of active for a removed entity occurs correctly
-
+	REQUIRE((*testManager).getComponent<sf::Uint16>(addedEntity) == 1); // Check that the changed state of active for a removed entity has not happened yet
+	std::cout << "Entities in active list: " << (*testManager).getEntities().size() << "\n";
+	REQUIRE((*testManager).getEntities().size() == 1); // Check that the active entities list is not empty now
+	(*testManager).updateWaitingRooms();
+	std::cout << "Waiting rooms updated\n";
+	std::cout << "Entities in active list: " << (*testManager).getEntities().size() << "\n";
+	REQUIRE((*testManager).getEntities().size() == 0); // Check that the active entities list is not empty now
+	std::cout << "Pool position 0 has active set as: " << (*testManager).getComponent<sf::Uint16>(0) << "\n";
+	REQUIRE((*testManager).getComponent<sf::Uint16>(addedEntity) == 0); // Check that the changed state of active for a removed entity has now updated
 }
 
 

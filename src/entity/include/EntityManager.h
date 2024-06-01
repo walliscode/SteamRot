@@ -12,9 +12,12 @@ class EntityManager
 	std::shared_ptr<EntityMemoryPool>  m_pool; //pool of all entity data
 public:
 	EntityManager(int poolSize);  //constructor to create a new manager with a size of pool to manage
+	std::vector<size_t> getEntities(); //return the index list of current active entities
 
 	size_t	addEntity(); //add a new entity (assign new values into pool at next index)
 	void removeEntity(size_t id); //remove the entity with the supplied id
+
+	void updateWaitingRooms();
 
 	//Entity manager templates: get components and check for has component
 
