@@ -1,7 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
+#include <iostream>
+
 #include "GameEngine.h"
 #include "EntityManager.h"
-#include <iostream>
 
 
 
@@ -48,6 +49,7 @@ TEST_CASE("Entity Pool tests", "[EntityPool]") {
 	REQUIRE(nextFreeIndex == 0);   // Check that the new next free position is identified correctly
 }
 
+
 TEST_CASE("Entity Manager tests", "[EntityManager]") {
 	std::cout << "\n";
 	std::cout << "**********************Entity Manager Tests*********************" << "\n";
@@ -68,7 +70,7 @@ TEST_CASE("Entity Manager tests", "[EntityManager]") {
 	size_t addedEntity = (*testManager).addEntity();
 	std::cout << "Entity added at position: " << addedEntity << "\n";
 	REQUIRE(addedEntity == 0); // Check that a new entity is added at the start of the list
-	std::cout << "Pool position " << addedEntity <<" has active set as: " << (*testManager).getComponent<sf::Uint16>(addedEntity) << "\n";
+	std::cout << "Pool position " << addedEntity << " has active set as: " << (*testManager).getComponent<sf::Uint16>(addedEntity) << "\n";
 	REQUIRE((*testManager).getComponent<sf::Uint16>(addedEntity) == 1); // Check that the changed state of active for an added entity occurs correctly
 
 	(*testManager).removeEntity(0);
@@ -77,3 +79,5 @@ TEST_CASE("Entity Manager tests", "[EntityManager]") {
 	REQUIRE((*testManager).getComponent<sf::Uint16>(addedEntity) == 0); // Check that the changed state of active for a removed entity occurs correctly
 
 }
+
+
