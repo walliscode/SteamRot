@@ -22,6 +22,10 @@ TEST_CASE("Entity Manager tests", "[EntityManager]") {
 	std::cout << "**********************Entity Manager Tests*********************" << "\n";
 	std::cout << "\n";
 	std::shared_ptr<EntityMemoryPool> testPool(new EntityMemoryPool(100));
-	std::cout << "testPool size: " << std::get<0>(*(*testPool).getData()).size() << "\n";
+	std::cout << "Pool created of size: " << std::get<0>(*(*testPool).getData()).size() << "\n";
+	int nextFreeIndex = (*testPool).getNextEntityIndex();
+	std::cout << "Next free index: " << nextFreeIndex << "\n";
+	std::get<0>(*(*testPool).getData())[nextFreeIndex] = true;
+	std::cout << "Data set as added at " << nextFreeIndex << "\n";
 	std::cout << "Next free index: " << (*testPool).getNextEntityIndex() << "\n";
 }
