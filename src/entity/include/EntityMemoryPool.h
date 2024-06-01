@@ -38,7 +38,7 @@ public:
 	template <typename TupleT, std::size_t... Is>
 	void defineTupleElements(TupleT& tp, std::index_sequence<Is...>, int size)   //unfold function to call define element for each tuple element
 	{
-		std::cout << "Memory pool tuple split...\n";
+		std::cout << "\nMemory pool tuple split...\n";
 		(defineElem(std::get<Is>(tp), size), ...);
 	}
 
@@ -59,13 +59,13 @@ public:
 	template <typename TupleT, std::size_t... Is>
 	void resetTupleElements(TupleT& tp, std::index_sequence<Is...>, const int index)  //unfold function to call reset value for each tuple element
 	{
-		std::cout << "Indexed tuple split...\n";
+		std::cout << "\nIndexed tuple split...\n";
 		(resetVal(std::get<Is>(tp), index), ...);
 	}
 
 	template <typename TupleT, std::size_t TupSize = std::tuple_size_v<TupleT>>
 	void refreshEntity(TupleT& tp, const int index) {
-		resetTupleElements(tp, std::make_index_sequence<TupSize-1>{}, index); //call the reset tuple elements function with the size of the tuple being passed
+		resetTupleElements(tp, std::make_index_sequence<TupSize>{}, index); //call the reset tuple elements function with the size of the tuple being passed
 		std::cout << "Tuple index reset complete\n\n";
 	}
 };
