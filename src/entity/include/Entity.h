@@ -6,7 +6,8 @@
 
 
 class Entity
-{
+{	
+
 
 	bool				m_active = true;      // is the entity active or not, helps with entity destruction. NOT a component
 	const size_t        m_id = 0;     // unique id for the entity  
