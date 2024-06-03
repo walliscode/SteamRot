@@ -24,12 +24,5 @@ TEST_CASE("Entity Pool tests", "[EntityPool]") {
 	std::cout << "Next free index: " << nextFreeIndex << "\n";
 	REQUIRE(nextFreeIndex == 1);   // Check that the new next free position is identified correctly
 
-	(*testPool).refreshEntity(*(*testPool).getData(), 0);
-	std::cout << "Data reset at index 0\n";
-	std::cout << "Data active at index?: " << std::get<0>(*(*testPool).getData())[nextFreeIndex] << "\n";
-	REQUIRE(std::get<0>(*(*testPool).getData())[0] == 0);   // Check that the data at the free position has been updated 
-
-	nextFreeIndex = (*testPool).getNextEntityIndex();
-	std::cout << "Next free index: " << nextFreeIndex << "\n";
-	REQUIRE(nextFreeIndex == 0);   // Check that the new next free position is identified correctly
+	
 }

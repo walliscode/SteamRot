@@ -48,24 +48,5 @@ public:
 		std::cout << "Tuple definition complete\n\n";
 	}
 
-	template <typename T>
-	void resetVal(T& x, const size_t index)  //for a passed vector and index, reset the component at the index to a default value
-	{
-		using vecType = typename T::value_type; //Get the variable type to populate the vector with
-		x[index] = vecType(); //Set the index to a default constructed value
-		std::cout << "-> Index of type: '" << typeid(vecType).name() << "' reset\n";
-	};
-
-	template <typename TupleT, std::size_t... Is>
-	void resetTupleElements(TupleT& tp, std::index_sequence<Is...>, const size_t index)  //unfold function to call reset value for each tuple element
-	{
-		std::cout << "\nIndexed tuple split...\n";
-		(resetVal(std::get<Is>(tp), index), ...);
-	}
-
-	template <typename TupleT, std::size_t TupSize = std::tuple_size_v<TupleT>>
-	void refreshEntity(TupleT& tp, const size_t index) {
-		resetTupleElements(tp, std::make_index_sequence<TupSize>{}, index); //call the reset tuple elements function with the size of the tuple being passed
-		std::cout << "Tuple index reset complete\n\n";
-	}
+	
 };
