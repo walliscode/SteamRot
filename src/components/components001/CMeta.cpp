@@ -7,7 +7,7 @@ const bool CMeta::getActive() const {
 	return m_active;
 }
 
-void CMeta::setAlive() {
+void CMeta::activate() {
 
 	m_active = true;
 }
