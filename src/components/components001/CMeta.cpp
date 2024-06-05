@@ -12,7 +12,7 @@ void CMeta::activate() {
 	m_active = true;
 }
 
-void CMeta::setDead() {
+void CMeta::deactivate() {
 
 	m_active = false;
 }
