@@ -6,9 +6,10 @@
 #include <algorithm>
 
 #include "CTransform.h"
+#include "CMeta.h"
 
 typedef std::tuple<
-	std::vector<sf::Uint16>,	//bool to track if pool position is active
+	std::vector<CMeta>,	//bool to track if pool position is active
 	std::vector<CTransform> //CTransform vector list
 > EntityComponentVectorTuple;
 
