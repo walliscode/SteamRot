@@ -1,28 +1,24 @@
-#ifndef ARCHETYPE_H
-#define ARCHETYPE_H
+#pragma once
 
 #include <vector>
 
 class Archetype {
 private:
     std::vector<int> entityIDs;
-        unsigned int id;
+    unsigned int id;
 
-        public:
-            Archetype(unsigned int archetypeId) : id(archetypeId) {}
+public:
+    Archetype(unsigned int archetypeId) : id(archetypeId) {}
 
-                unsigned int getId() const {
-                        return id;
-                            }
+    unsigned int getId() const {
+        return id;
+    }
 
-                                const std::vector<int>& getEntityIDs() const {
-                                        return entityIDs;
-                                            }
+    const std::vector<int>& getEntityIDs() const {
+        return entityIDs;
+    }
 
-                                                void setEntityIDs(const std::vector<int>& newEntityIDs) {
-                                                        entityIDs = newEntityIDs;
-                 
-                                                            }
-                                                            };
-
-                                                            #endif // ARCHETYPE_H
+    void setEntityIDs(const std::vector<int>& newEntityIDs) {
+        entityIDs = newEntityIDs;
+    }
+};
