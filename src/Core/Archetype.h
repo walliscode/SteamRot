@@ -21,6 +21,7 @@ private:
 
                                                 void setEntityIDs(const std::vector<int>& newEntityIDs) {
                                                         entityIDs = newEntityIDs;
+                 
                                                             }
                                                             };
 
