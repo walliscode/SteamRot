@@ -38,14 +38,15 @@ message("Build shared libs: ${BUILD_SHARED_LIBS}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin) # necessary for puting the executable and dlls in the same folder
 set(CMAKE_PROGRAM_PATH ${CMAKE_BINARY_DIR}/bin) # points other CMake searches to the binary directory
 # Include external dependencies.
+
+
 # set the cmake module path (for import libraries and other cmake files)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/FetchContentModules")
 include(AddSFML)
 include(AddCatch2)
-include(Addflatbuffers)
-
 
 add_subdirectory(src)
+include(Addflatbuffers)
 add_subdirectory(tests)
 
 
@@ -68,7 +69,9 @@ set(MY_TARGET_LIST
     SteamRot
     GameEngine
     sfml-graphics
-    flatbuffers)
+    flatbuffers
+    my_binary_data
+    )
 check_targets(MY_TARGET_LIST)
 
 # for if you need to print out all available cmake variables into the cmake terminal

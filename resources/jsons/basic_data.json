@@ -1,7 +1,5 @@
 {
-  "PullData": {
-    "variable_1": "value_1",
-    "variable_2": "value_2",
-    "variable_3": "value_4"
-  }
+  "variable_1": "value_1",
+  "variable_2": "value_2",
+  "variable_3": "value_4"
 }
