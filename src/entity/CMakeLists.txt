@@ -9,5 +9,6 @@ target_include_directories(EntityManager PUBLIC
 )
 
 target_link_libraries(EntityManager PUBLIC
+	Component # nessary for using Component.cpp file for getHas()
 	Component001
 )

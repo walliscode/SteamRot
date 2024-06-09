@@ -58,9 +58,9 @@ public:
 	}
 
 	template <typename T>
-	bool& hasComponent(size_t entityID) {
+	bool hasComponent(size_t entityID) {
 		auto& components = std::get<std::vector<T>>(*(*m_pool).getData());
-		return components[entityID].has; //return the component of the passed component type for the requested entityID
+		return components[entityID].getHas(); //return the component of the passed component type for the requested entityID
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
