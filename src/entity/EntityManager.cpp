@@ -1,7 +1,7 @@
 #include "EntityManager.h"
 
 
-EntityManager::EntityManager(int poolSize) : m_pool(new EntityMemoryPool(poolSize))
+EntityManager::EntityManager(size_t poolSize) : m_pool(new EntityMemoryPool(poolSize))
 {
 }
 
