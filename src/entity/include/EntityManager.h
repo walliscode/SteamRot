@@ -12,7 +12,7 @@ private:
 	std::shared_ptr<EntityMemoryPool>  m_pool; //pool of all entity data
 
 public:
-	EntityManager(int poolSize);  //constructor to create a new manager with a size of pool to manage
+	EntityManager(size_t poolSize);  //constructor to create a new manager with a size of pool to manage
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// all functions related to entity management (not getting component data)
