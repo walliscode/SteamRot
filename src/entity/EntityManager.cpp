@@ -24,7 +24,7 @@ void EntityManager::updateWaitingRooms()
 	for (const size_t& entityIndex : m_entitiesToRemove) //for all items in the to add list ...
 	{
 		std::get<std::vector<CMeta>>(*(*m_pool).getData())[entityIndex].deactivate(); //set the active vector to false at the passed entity index
-		auto deadEntity = std::find(m_entities.begin(), m_entities.end(), entityIndex);
+		auto toRemove = std::find(m_entities.begin(), m_entities.end(), entityIndex);
 		m_entities.erase(deadEntity); //remove the entity from the current active entities list
 	}
 	m_entitiesToRemove.clear(); //clear the to remove waiting room
