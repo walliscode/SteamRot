@@ -9,6 +9,7 @@ target_include_directories(Component PUBLIC
 
 add_library(Component001
 	CTransform.cpp 
+	CMeta.cpp
 )
 target_include_directories(Component001 PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}/include
