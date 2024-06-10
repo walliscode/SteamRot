@@ -63,5 +63,6 @@ endfunction()
 set(MY_TARGET_LIST 
     SteamRot
     GameEngine
-    sfml-graphics)
+    sfml-graphics
+    Assets)
 check_targets(MY_TARGET_LIST)
