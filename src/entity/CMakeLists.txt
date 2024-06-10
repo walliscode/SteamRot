@@ -1,6 +1,7 @@
 
 add_library(EntityMemoryPool
 	EntityMemoryPool.cpp
+	Archetype.cpp
 )
 
 target_include_directories(EntityMemoryPool PUBLIC
