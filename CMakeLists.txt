@@ -69,9 +69,11 @@ set(MY_TARGET_LIST
     SteamRot
     GameEngine
     sfml-graphics
+    Assets
     flatbuffers
     my_binary_data
     )
+
 check_targets(MY_TARGET_LIST)
 
 # for if you need to print out all available cmake variables into the cmake terminal
