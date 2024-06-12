@@ -2,7 +2,7 @@
 add_library(EntityManager
 	EntityManager.cpp
 	EntityMemoryPool.cpp
-	Archetype.cpp
+	Archetype.cpp)
 
 
 target_include_directories(EntityManager PUBLIC
