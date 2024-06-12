@@ -7,5 +7,6 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(Catch2)
+message("Catch2_SOURCE_DIR: ${Catch2_SOURCE_DIR}")
 list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)	
 
