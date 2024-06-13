@@ -2,15 +2,16 @@
 
 add_executable(steamrot_tests 
 	"systems/game/GameEngine.test.cpp"
-	"systems/entity/EntityMemoryPool.test.cpp" 
-	"systems/entity/EntityManager.test.cpp"
-)
+	"entity/EntityMemoryPool.test.cpp" 
+	"entity/EntityManager.test.cpp"
+ "systems/scenes/Scene.test.cpp")
 
 target_link_libraries(steamrot_tests
 	PRIVATE
 		Catch2::Catch2WithMain
 		GameEngine
 		EntityManager
+		Scene
 )
 include(CTest)
 include(Catch)
