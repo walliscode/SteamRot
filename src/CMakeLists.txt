@@ -3,7 +3,7 @@ add_subdirectory(systems)
 add_subdirectory(components)
 add_subdirectory(entity)
 
-add_executable(SteamRot main.cpp "components/assets/Assets.cpp" "components/assets/include/Assets.h")
+add_executable(SteamRot main.cpp)
 
 target_link_libraries(SteamRot PRIVATE
     GameEngine

@@ -1,2 +1,2 @@
 add_subdirectory(game)
-add_subdirectory(systems_001)
+add_subdirectory(scenes)

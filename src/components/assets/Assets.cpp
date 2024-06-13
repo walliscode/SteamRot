@@ -1,4 +1,4 @@
-#include "include/Assets.h" // for some reason, the CMake file won't link assets.h without the include
+#include "Assets.h" // for some reason, the CMake file won't link assets.h without the include
 #include <iostream>
 
 

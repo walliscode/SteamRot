@@ -71,7 +71,7 @@ set(MY_TARGET_LIST
     sfml-graphics
     Assets
     flatbuffers
-    my_binary_data
+    Scene
     )
 
 check_targets(MY_TARGET_LIST)
