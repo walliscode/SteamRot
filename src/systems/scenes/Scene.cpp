@@ -12,3 +12,7 @@ void Scene::update() {
 bool Scene::getActive() const {
 	return m_active;
 }
+
+void Scene::setActive(bool active) {
+	m_active = active;
+}
