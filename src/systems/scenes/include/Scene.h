@@ -1,3 +1,4 @@
+#pragma once
 #include "EntityManager.h"
 
 
@@ -16,4 +17,5 @@ public:
 	virtual void update() = 0; //this will be the public call to the Scene which call its relevant systems
 	
 	bool getActive() const; // returning by value here as it's just as efficient when getting a bool and safer. but may need to change if getter function gets more complex
+	void setActive(bool active);
 };

@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include "GameEngine.h"
-
-
+#include "TestScene.h"
+#include <iostream>
 
 
 TEST_CASE("GameEngine creates an sfml window", "[GameEngine]") {
@@ -13,3 +13,46 @@ TEST_CASE("GameEngine creates an sfml window", "[GameEngine]") {
 	REQUIRE(window->isOpen());   // Check that the window is open
 }
 
+TEST_CASE("GameEngine creates an assets object", "[GameEngine]") {
+	GameEngine game;
+
+	Assets* assets = game.getAssets();
+
+	REQUIRE(assets != nullptr);  // Check that the assets object is created
+}
+
+TEST_CASE("GameEngine performs Scene Management", "[GameEngine]") {
+
+	std::cout << "\n";
+	std::cout << "**********************Game Engine Scene Management Tests*********************" << "\n";
+
+
+	std::cout << "Creating Game Engine\n";
+	GameEngine game;
+	const SceneList& testScenes = game.getScenes();
+
+	std::cout << "Checking that the scene list is empty\n";
+	REQUIRE(testScenes.size() == 0);  // Check that the scene list is empty
+
+	std::cout << "Creating a Test Scene\n";
+	std::shared_ptr<TestScene> testScene = std::make_shared<TestScene>(10);
+	std::cout << "Adding the Test Scene to the Game Engine\n";
+	game.addScene("TestScene", testScene);
+	std::cout << "Checking that the scene list has one scene\n";
+	REQUIRE(testScenes.size() == 1);  // Check that the scene list has one scene
+
+	std::cout << "Checking that the Test Scene is active\n";
+	REQUIRE(testScene->getActive() == true);  // Check that the Test Scene is active
+
+	std::cout << "Deactivating the Test Scene\n";
+	game.deactivateScene(testScene);
+	std::cout << "Checking that the Test Scene is not active\n";
+	REQUIRE(testScene->getActive() == false);  // Check that the Test Scene is not active
+
+	std::cout << "Activating the Test Scene\n";
+	game.activateScene(testScene);
+	std::cout << "Checking that the Test Scene is active\n";
+	REQUIRE(testScene->getActive() == true);  // Check that the Test Scene is active
+
+	std::cout << "**********************Game Engine Scene Management Test END*********************" << "\n";
+}
