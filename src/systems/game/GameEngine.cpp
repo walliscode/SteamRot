@@ -35,11 +35,12 @@ void GameEngine::run()
 	}
 }
 
-void GameEngine::update(SceneList* scenes)
+void GameEngine::update(SceneList& scenes)
 {
-	// Loop through all the scenes and update them
-	for (auto scene : *scenes)
+	// Loop through all the scenes and update them only if m_active is true
+	for (auto& pair : scenes)
 	{
+		auto& scene = pair.second;
 		if (scene->getActive()) {
 			scene->update();
 		}
@@ -59,16 +60,18 @@ Assets* GameEngine::getAssets()
 
 
 
-void GameEngine::addScene(std::shared_ptr<Scene> scene)
-{
-	m_scenes.push_back(scene);
+void GameEngine::addScene(std::string tag, std::shared_ptr<Scene> scene)
+{	
+	m_scenes.insert({ tag, scene });
+
 }
 
-void GameEngine::removeScene(std::shared_ptr<Scene> scene)
+void GameEngine::removeScene(std::string tag)
 {
-	// Remove the scene from the list
-	m_scenes.erase(std::remove(m_scenes.begin(), m_scenes.end(), scene), m_scenes.end());
+	// Remove the scene
+	m_scenes.erase(tag);
 }
+
 
 void GameEngine::activateScene(std::shared_ptr<Scene> scene)
 {
@@ -80,4 +83,9 @@ void GameEngine::deactivateScene(std::shared_ptr<Scene> scene)
 {
 	// Deactivate the scene
 	scene->setActive(false);
+}
+
+const SceneList& GameEngine::getScenes()
+{
+	return m_scenes;
 }

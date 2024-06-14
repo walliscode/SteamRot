@@ -40,6 +40,7 @@
 - generate magic 
 - move items
 - process resources
+- attack enemies?
 
 ### General Approach
 - Machines need to meet certain attribute requirements before they are fit for a purpose
