@@ -1,4 +1,8 @@
 #include "EntityManager.h"
+#include "component_generated.h"
+#include "general_util.h"
+#include <fstream>
+
 
 
 EntityManager::EntityManager(size_t poolSize) : m_pool(new EntityMemoryPool(poolSize))
@@ -31,6 +35,18 @@ void EntityManager::updateWaitingRooms()
 
 	m_entities.insert(m_entities.end(), m_entitiesToAdd.begin(), m_entitiesToAdd.end()); //add the entities to add to the current entity list
 	m_entitiesToAdd.clear(); //clear the to add waiting room
+}
+
+void EntityManager::intialiseEntities(std::string sceneName)
+{
+	std::string fileName = sceneName + ".bin";
+	// check binary file exists
+	
+	std::vector<std::byte> buffer = utils::readBinaryFile(fileName);
+
+	const SteamRot::rawData::EntityList* entityList = SteamRot::rawData::GetEntityList(buffer.data());
+
+
 }
 
 std::vector<size_t> EntityManager::getEntities()

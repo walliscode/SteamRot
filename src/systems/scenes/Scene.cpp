@@ -1,8 +1,10 @@
 #include "Scene.h"
 
-Scene::Scene(int poolSize): m_entityManager(poolSize)
-{
+Scene::Scene(const std::string& name, int poolSize) 
+    : m_name(name), m_entityManager(poolSize) {
+
 }
+
 
 void Scene::update() {
 

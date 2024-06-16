@@ -35,7 +35,7 @@ TEST_CASE("GameEngine performs Scene Management", "[GameEngine]") {
 	REQUIRE(testScenes.size() == 0);  // Check that the scene list is empty
 
 	std::cout << "Creating a Test Scene\n";
-	std::shared_ptr<TestScene> testScene = std::make_shared<TestScene>(10);
+	std::shared_ptr<TestScene> testScene = std::make_shared<TestScene>("testScene", 10);
 	std::cout << "Adding the Test Scene to the Game Engine\n";
 	game.addScene("TestScene", testScene);
 	std::cout << "Checking that the scene list has one scene\n";

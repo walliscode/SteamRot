@@ -9,10 +9,11 @@ protected:
 	bool    m_paused = false; // If the scene is paused
 	bool    m_active = true; // if the scene is active, should the Scene manager call the updated function
 	size_t  m_current_frame = 0; // The current frame of the scene, used for animations and systems logic
+	std::string m_name; // The name of the scene
 
 
 public:
-	Scene(int poolSize);
+	Scene(const std::string& name, int poolSize);
 
 	virtual void update() = 0; //this will be the public call to the Scene which call its relevant systems
 	

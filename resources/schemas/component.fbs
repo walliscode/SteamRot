@@ -1,0 +1,26 @@
+namespace SteamRot.rawData;
+
+table MetaComponent {
+	active:string;
+}
+
+table Vector2 {
+	x: float;
+	y: float;
+}
+
+table TransformComponent {
+	position: Vector2;
+	velocity: Vector2;
+}
+
+table Entity{
+	meta: MetaComponent;
+	transform: TransformComponent;
+}
+
+table EntityList{
+	entities: [Entity];
+}
+
+root_type EntityList;

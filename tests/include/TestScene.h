@@ -3,7 +3,7 @@
 class TestScene : public Scene {
 
 public:
-	TestScene(int poolSize) : Scene(poolSize) {};
+	TestScene(const std::string& name, int poolSize) : Scene(name, poolSize) {};
 	void update() {
 		// put systems here
 	}

@@ -72,6 +72,7 @@ set(MY_TARGET_LIST
     Assets
     flatbuffers
     Scene
+    utils
     )
 
 check_targets(MY_TARGET_LIST)

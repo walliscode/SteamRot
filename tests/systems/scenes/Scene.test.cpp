@@ -2,7 +2,7 @@
 #include "TestScene.h"
 
 TEST_CASE("Scene is created with an entity manager", "[Scene]") {
-	TestScene TestScene(10);
+	TestScene TestScene("testScene", 10);
 
 	REQUIRE(TestScene.getActive() == true); // check that it intialises with active scene
 }
