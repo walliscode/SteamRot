@@ -46,6 +46,20 @@ void EntityManager::intialiseEntities(std::string sceneName)
 
 	const SteamRot::rawData::EntityList* entityList = SteamRot::rawData::GetEntityList(buffer.data());
 
+	for (const auto entity : *entityList->entities())
+	{
+		size_t entityID = addEntity();
+		if (entity->transform()) {
+			auto transform = entity->transform();
+			auto& cTransform = getComponent<CTransform>(entityID); //get the transform component at the new entity index
+			cTransform.position.x = transform->position()->x();
+			cTransform.position.y = transform->position()->y();
+			cTransform.velocity.x = transform->velocity()->x();
+			cTransform.velocity.y = transform->velocity()->y();
+			
+		}
+	}
+
 
 }
 
