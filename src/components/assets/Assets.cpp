@@ -56,6 +56,11 @@ const sf::Font& Assets::getFont(const std::string& name) const {
 	return m_fonts.at(name);
 }
 
+const std::map<std::string, sf::Font>& Assets::getFonts() const
+{
+	return m_fonts;
+}
+
 bool Assets::fileExists(const std::string& filename) const
 {
 	std::ifstream file(filename);

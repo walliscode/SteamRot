@@ -4,7 +4,8 @@ add_executable(steamrot_tests
 	"systems/game/GameEngine.test.cpp"
 	"entity/EntityMemoryPool.test.cpp" 
 	"entity/EntityManager.test.cpp"
-    "systems/scenes/Scene.test.cpp")
+    "systems/scenes/Scene.test.cpp" 
+	"components/assets/Assets.test.cpp")
 
 target_include_directories(steamrot_tests PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}/include
