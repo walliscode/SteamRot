@@ -49,6 +49,13 @@ add_subdirectory(src)
 include(Addflatbuffers)
 add_subdirectory(tests)
 
+# declaring some variables and shit
+
+set(RESOURCES_PATH "${CMAKE_SOURCE_DIR}/resources/")
+
+# After the target is defined
+target_compile_definitions(Assets PRIVATE RESOURCES_PATH="${RESOURCES_PATH}")
+
 
 install(TARGETS SteamRot) # creates an install folder under installDir (in CMakePresets.json)
 
