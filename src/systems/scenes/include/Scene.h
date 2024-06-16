@@ -13,7 +13,7 @@ protected:
 
 
 public:
-	Scene(const std::string& name, int poolSize);
+	Scene(const std::string& name, size_t poolSize);
 
 	virtual void update() = 0; //this will be the public call to the Scene which call its relevant systems
 	

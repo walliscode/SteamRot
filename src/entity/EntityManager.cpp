@@ -5,8 +5,9 @@
 
 
 
-EntityManager::EntityManager(size_t poolSize) : m_pool(new EntityMemoryPool(poolSize))
+EntityManager::EntityManager(std::string sceneName, size_t poolSize) : m_pool(new EntityMemoryPool(poolSize))
 {
+	void intialiseEntities(std::string sceneName);
 }
 
 size_t EntityManager::addEntity()

@@ -1,7 +1,7 @@
 #include "Scene.h"
 
-Scene::Scene(const std::string& name, int poolSize) 
-    : m_name(name), m_entityManager(poolSize) {
+Scene::Scene(const std::string& name, size_t poolSize) 
+    : m_name(name), m_entityManager(name, poolSize) {
 
 }
 

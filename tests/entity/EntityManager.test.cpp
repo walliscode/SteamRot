@@ -7,7 +7,7 @@ TEST_CASE("Entity Manager tests", "[EntityManager]") {
 	std::cout << "**********************Entity Manager Tests*********************" << "\n";
 	std::cout << "\n";
 
-	std::shared_ptr<EntityManager> testManager(new EntityManager(100));
+	std::shared_ptr<EntityManager> testManager(new EntityManager("testPool",100));
 	std::cout << "Pool position 59 has active set as: " << (*testManager).getComponent<CMeta>(59).getActive() << "\n";
 	REQUIRE((*testManager).getComponent<CMeta>(59).getActive() == false); // Check that the default state of active for a component slot is false
 
