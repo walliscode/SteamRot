@@ -54,6 +54,32 @@ if(EXISTS ${FBS_FILE})
     endif()
 endforeach()
 
+######### Scene Entity Configurations with shared schema #########
+
+set(SCENE_CONFIG
+    "SceneTest"
+)
+foreach(NAME ${SCENE_CONFIG})
+set(FBS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/resources/schemas/component.fbs")
+set(JSON_FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources/jsons/${NAME}.json)
+set(BINARY_FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources/binaries/${NAME}.bin)
+
+if(EXISTS ${FBS_FILE} AND EXISTS ${JSON_FILE})
+    # output success message if they exist
+    message(STATUS "Found FlatBuffers schema and JSON file for ${NAME}")
+    # Generate the binary file
+    add_custom_command(
+    OUTPUT ${BINARY_FILE}
+    COMMAND ${FLATBUFFERS_FLATC_EXECUTABLE} -o ${CMAKE_CURRENT_SOURCE_DIR}/resources/binaries -b ${FBS_FILE} ${JSON_FILE}
+    DEPENDS ${JSON_FILE}
+    COMMENT "Generating binary FlatBuffers file from ${JSON_FILE}"
+    )
+    list(APPEND GENERATED_FILES ${BINARY_FILE})
+    
+endif()
+endforeach()
+
+
 ######### Curated List of Data Files #########
 set(DATA_FILES 
     "basic_data"

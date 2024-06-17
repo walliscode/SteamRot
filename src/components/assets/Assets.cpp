@@ -11,4 +11,6 @@ void Assets::init() {
 
 	std::cout << "####### Loading assets... ########" << std::endl;
 	// Load assets here
+
+	std::string(RESOURCES_PATH) + "test.png";
 }

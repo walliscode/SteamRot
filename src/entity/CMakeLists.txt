@@ -16,3 +16,4 @@ target_link_libraries(EntityManager PUBLIC
 	flatbuffers
 	utils
 )
+

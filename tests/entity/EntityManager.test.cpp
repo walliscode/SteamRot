@@ -2,12 +2,13 @@
 #include "EntityManager.h"
 
 
-TEST_CASE("Entity Manager tests", "[EntityManager]") {
-	std::cout << "\n";
-	std::cout << "**********************Entity Manager Tests*********************" << "\n";
-	std::cout << "\n";
 
-	std::shared_ptr<EntityManager> testManager(new EntityManager("testPool",100));
+
+TEST_CASE("Entity Manager tests", "[EntityManager]") {
+
+	std::cout << "**********************Entity Manager Tests*********************" << std::endl;
+
+	std::shared_ptr<EntityManager> testManager(new EntityManager("SceneTest",100));
 	std::cout << "Pool position 59 has active set as: " << (*testManager).getComponent<CMeta>(59).getActive() << "\n";
 	REQUIRE((*testManager).getComponent<CMeta>(59).getActive() == false); // Check that the default state of active for a component slot is false
 
@@ -44,4 +45,9 @@ TEST_CASE("Entity Manager tests", "[EntityManager]") {
 	REQUIRE((*testManager).getEntities().size() == 0); // Check that the active entities list is not empty now
 	std::cout << "Pool position 0 has active set as: " << (*testManager).getComponent<CMeta>(0).getActive() << "\n";
 	REQUIRE((*testManager).getComponent<CMeta>(addedEntity).getActive() == false); // Check that the changed state of active for a removed entity has now updated
+}
+
+TEST_CASE("EntityManager intialises Entity data", "[EntityManager]") {
+
+	std::shared_ptr<EntityManager> testManager(new EntityManager("SceneTest", 100));
 }

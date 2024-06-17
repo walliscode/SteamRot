@@ -7,7 +7,8 @@
 
 EntityManager::EntityManager(std::string sceneName, size_t poolSize) : m_pool(new EntityMemoryPool(poolSize))
 {
-	void intialiseEntities(std::string sceneName);
+	std::cout << "Initialising entities" << std::endl;
+	intialiseEntities(sceneName);
 }
 
 size_t EntityManager::addEntity()
@@ -40,9 +41,12 @@ void EntityManager::updateWaitingRooms()
 
 void EntityManager::intialiseEntities(std::string sceneName)
 {
-	std::string fileName = sceneName + ".bin";
-	// check binary file exists
 	
+	std::string fileName = (std::string(FB_BINARIES_PATH) + sceneName + ".bin");
+	// check binary file exists
+
+	std::cout << "Reading binary file: " << fileName << std::endl;
+
 	std::vector<std::byte> buffer = utils::readBinaryFile(fileName);
 
 	const SteamRot::rawData::EntityList* entityList = SteamRot::rawData::GetEntityList(buffer.data());
