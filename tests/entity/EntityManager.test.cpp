@@ -8,10 +8,21 @@ TEST_CASE("Entity Manager tests", "[EntityManager]") {
 
 	std::cout << "**********************Entity Manager Tests*********************" << std::endl;
 
+	// check that json/binary of entity configurations is added to the entityManager/scene
+	std::cout << "Checking Entity Initialisation" << std::endl;
 	std::shared_ptr<EntityManager> testManager(new EntityManager("SceneTest",100));
+	std::cout <<"Pool position 0 has active aset as :" << (*testManager).getComponent<CMeta>(0).getActive() << std::endl;
+	REQUIRE((*testManager).getComponent<CMeta>(0).getActive() == true); // Check that the default state of active for a component slot is false
+	REQUIRE((*testManager).hasComponent<CTransform>(0) == true); // Check that the default state of a component in an entity is that it does not have one
+
+	// check that the entity manager can add and remove entities
+	// first check that position 59 is inactive as has no components
+	std::cout << "Checking Entity Activation" << std::endl;
 	std::cout << "Pool position 59 has active set as: " << (*testManager).getComponent<CMeta>(59).getActive() << "\n";
 	REQUIRE((*testManager).getComponent<CMeta>(59).getActive() == false); // Check that the default state of active for a component slot is false
+	REQUIRE((*testManager).hasComponent<CTransform>(59) == false); // Check that the default state of a component in an entity is that it does not have one
 
+	// now activate position 59 and check that it is now active
 	(*testManager).getComponent<CMeta>(59).activate();
 	std::cout << "m_active at position 59 set to true\n";
 	std::cout << "Pool position 59 has active set as: " << (*testManager).getComponent<CMeta>(59).getActive() << "\n";
@@ -20,17 +31,20 @@ TEST_CASE("Entity Manager tests", "[EntityManager]") {
 	std::cout << "Does pool position 59 have a CTransform component?: " << (*testManager).hasComponent<CTransform>(59) << "\n";
 	REQUIRE((*testManager).hasComponent<CTransform>(59) == false); // Check that the default state of a component in an entity is that it does not have one
 
+	// now check that the addEntity function returns the next inactive position (as is then activated)
 	size_t addedEntity = (*testManager).addEntity();
 	std::cout << "Entity added at position: " << addedEntity << "\n";
-	REQUIRE(addedEntity == 0); // Check that a new entity is added at the start of the list
+	REQUIRE(addedEntity == 4); // Check that a new entity is added after the initliased entities
+
 	std::cout << "Pool position " << addedEntity << " has active set as: " << (*testManager).getComponent<CMeta>(addedEntity).getActive() << "\n";
 	REQUIRE((*testManager).getComponent<CMeta>(addedEntity).getActive() == true); // Check that the changed state of active for an added entity occurs correctly
+
 	std::cout << "Entities in active list: " << (*testManager).getEntities().size() << "\n";
-	REQUIRE((*testManager).getEntities().size() == 0); // Check that the active entities list is empty
+	REQUIRE((*testManager).getEntities().size() == 4); // Check that the active entities list is empty
 	(*testManager).updateWaitingRooms();
 	std::cout << "Waiting rooms updated\n";
 	std::cout << "Entities in active list: " << (*testManager).getEntities().size() << "\n";
-	REQUIRE((*testManager).getEntities().size() == 1); // Check that the active entities list is not empty now
+	REQUIRE((*testManager).getEntities().size() == 5); // Check that the active entities list is not empty now
 
 
 	(*testManager).removeEntity(0);
@@ -38,16 +52,12 @@ TEST_CASE("Entity Manager tests", "[EntityManager]") {
 	std::cout << "Pool position 0 has active set as: " << (*testManager).getComponent<CMeta>(0).getActive() << "\n";
 	REQUIRE((*testManager).getComponent<CMeta>(addedEntity).getActive() == true); // Check that the changed state of active for a removed entity has not happened yet
 	std::cout << "Entities in active list: " << (*testManager).getEntities().size() << "\n";
-	REQUIRE((*testManager).getEntities().size() == 1); // Check that the active entities list is not empty now
+	REQUIRE((*testManager).getEntities().size() == 5); // Check that the active entities list is not empty now
 	(*testManager).updateWaitingRooms();
 	std::cout << "Waiting rooms updated\n";
 	std::cout << "Entities in active list: " << (*testManager).getEntities().size() << "\n";
-	REQUIRE((*testManager).getEntities().size() == 0); // Check that the active entities list is not empty now
+	REQUIRE((*testManager).getEntities().size() == 4); // Check that the active entities list is not empty now
 	std::cout << "Pool position 0 has active set as: " << (*testManager).getComponent<CMeta>(0).getActive() << "\n";
-	REQUIRE((*testManager).getComponent<CMeta>(addedEntity).getActive() == false); // Check that the changed state of active for a removed entity has now updated
+	REQUIRE((*testManager).getComponent<CMeta>(0).getActive() == false); // Check that the changed state of active for a removed entity has now updated
 }
 
-TEST_CASE("EntityManager intialises Entity data", "[EntityManager]") {
-
-	std::shared_ptr<EntityManager> testManager(new EntityManager("SceneTest", 100));
-}

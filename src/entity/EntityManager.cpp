@@ -49,6 +49,12 @@ void EntityManager::intialiseEntities(std::string sceneName)
 
 	std::vector<std::byte> buffer = utils::readBinaryFile(fileName);
 
+	//if buffer is empty exit intialiseEntities
+	if (buffer.empty()) {
+		std::cout << "No Entities to intialise" << std::endl;
+		return;
+	}
+
 	const SteamRot::rawData::EntityList* entityList = SteamRot::rawData::GetEntityList(buffer.data());
 
 	for (const auto entity : *entityList->entities())
@@ -57,6 +63,7 @@ void EntityManager::intialiseEntities(std::string sceneName)
 		if (entity->transform()) {
 			auto transform = entity->transform();
 			auto& cTransform = getComponent<CTransform>(entityID); //get the transform component at the new entity index
+			cTransform.setHas(true); //set the has value to true (has a transform component
 			cTransform.position.x = transform->position()->x();
 			cTransform.position.y = transform->position()->y();
 			cTransform.velocity.x = transform->velocity()->x();
@@ -64,6 +71,8 @@ void EntityManager::intialiseEntities(std::string sceneName)
 			
 		}
 	}
+
+	updateWaitingRooms(); // update the active entities list, addEntity() adds the entiy to m_entitiesToAdd, updateWaitingRooms() adds the entities to m_entities
 
 
 }
