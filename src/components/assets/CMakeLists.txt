@@ -10,3 +10,5 @@ target_link_libraries(Assets PRIVATE
 	flatbuffers
 	sfml-graphics)
 
+target_compile_definitions(Assets PRIVATE 
+    RESOURCES_PATH="${RESOURCES_PATH}")

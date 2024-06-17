@@ -14,6 +14,7 @@ void Assets::init() {
 
 	std::cout << "####### Loading assets... ########" << std::endl;
 	// Load assets here
+
 	loadFonts((std::string(RESOURCES_PATH) +   "binaries/load_fonts.bin")); // pass the binary that contains the json configurations
 }
 

@@ -8,6 +8,7 @@ protected:
 
 public:
 	bool getHas() const; // return if the entity has this component
+	void setHas(bool has); // set if the entity has this component
 	
 };
 

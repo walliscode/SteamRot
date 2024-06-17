@@ -13,7 +13,7 @@ private:
 	std::shared_ptr<EntityMemoryPool>  m_pool; //pool of all entity data
 
 public:
-	EntityManager(size_t poolSize);  //constructor to create a new manager with a size of pool to manage
+	EntityManager(std::string sceneName, size_t poolSize);  //constructor to create a new manager with a size of pool to manage
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// all functions related to entity management (not getting component data)
@@ -23,6 +23,8 @@ public:
 	size_t	addEntity(); //add a new entity (assign new values into pool at next index)
 	void removeEntity(size_t id); //remove the entity with the supplied id
 	void updateWaitingRooms(); //update the entity list with the entities to add and remove
+
+	void intialiseEntities(std::string sceneName); //initialise the entities for the scene
 
 	
 	template <typename T>
