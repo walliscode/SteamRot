@@ -2,7 +2,13 @@ add_library(Assets
 	Assets.cpp)
 
 target_include_directories(Assets PUBLIC
-${CMAKE_CURRENT_SOURCE_DIR}/include)
+${CMAKE_CURRENT_SOURCE_DIR}/include
+${CMAKE_SOURCE_DIR}/resources/generated_headers
+)
+
+target_link_libraries(Assets PRIVATE
+	flatbuffers
+	sfml-graphics)
 
 target_compile_definitions(Assets PRIVATE 
     RESOURCES_PATH="${RESOURCES_PATH}")

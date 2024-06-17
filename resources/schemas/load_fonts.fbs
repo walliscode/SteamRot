@@ -1,0 +1,13 @@
+namespace SteamRot.rawData;
+
+table Font{
+	tag:string;
+	fileName:string;
+
+}
+
+table FontList{
+	fonts:[Font];
+}
+
+root_type FontList;

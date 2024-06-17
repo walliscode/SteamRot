@@ -56,6 +56,9 @@ set(FB_BINARIES_PATH "${RESOURCES_PATH}/binaries/")
 
 target_compile_definitions(EntityManager PRIVATE
     FB_BINARIES_PATH="${FB_BINARIES_PATH}")
+    
+target_compile_definitions(Assets PRIVATE RESOURCES_PATH="${RESOURCES_PATH}")
+
 
 
 install(TARGETS SteamRot) # creates an install folder under installDir (in CMakePresets.json)

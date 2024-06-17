@@ -14,11 +14,19 @@ TEST_CASE("GameEngine creates an sfml window", "[GameEngine]") {
 }
 
 TEST_CASE("GameEngine creates an assets object", "[GameEngine]") {
+
+	std::cout << "######################Game Engine Assets Tests######################" << "\n";
+
 	GameEngine game;
 
 	Assets* assets = game.getAssets();
 
 	REQUIRE(assets != nullptr);  // Check that the assets object is created
+
+	const std::map<std::string, sf::Font>& fonts = assets->getFonts();
+	REQUIRE(fonts.size() > 0);  // Check that the assets object has fonts
+	REQUIRE(fonts.find("SourceCodePro-Regular") != fonts.end());  // Check that the assets object has the SourceCodePro-Regular font
+
 }
 
 TEST_CASE("GameEngine performs Scene Management", "[GameEngine]") {
