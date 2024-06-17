@@ -34,6 +34,7 @@ message("###### Generating Data Files ######")
 ######### Curated List of Data Files #########
 set(DATA_FILES 
     "basic_data"
+    "load_fonts"
 )
 #############################################
 
