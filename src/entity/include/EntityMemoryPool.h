@@ -7,10 +7,12 @@
 
 #include "CTransform.h"
 #include "CMeta.h"
+#include "CText.h"
 
 typedef std::tuple<
 	std::vector<CMeta>,	//bool to track if pool position is active
-	std::vector<CTransform> //CTransform vector list
+	std::vector<CTransform>, //CTransform vector list
+	std::vector<CText> //CText vector list
 > EntityComponentVectorTuple;
 
 class EntityMemoryPool
