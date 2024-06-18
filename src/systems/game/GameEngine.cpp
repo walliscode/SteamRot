@@ -1,4 +1,5 @@
 #include "GameEngine.h"
+#include "SceneMainMenu.h"
 
 
 GameEngine::GameEngine(): m_assets()
@@ -10,6 +11,9 @@ void GameEngine::init()
 {
 	// Create a new SFML window
 	m_window.create(sf::VideoMode(800, 600), "SFML window");
+
+	// kick off initial scene
+	addScene("mainMenu", std::make_shared<SceneMainMenu>("mainMenu", 10, *this));
 
 }
 
@@ -29,6 +33,9 @@ void GameEngine::run()
 
 		// Clear the window with green color
 		m_window.clear(sf::Color::Green);
+
+		// Update all the scenes
+		GameEngine::update(m_scenes);
 
 		// End the current frame and display its contents on screen
 		m_window.display();

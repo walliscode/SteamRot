@@ -27,9 +27,13 @@ void Scene::sRender() {
 	}
 
 	// Draw the mouse position, mainly just for checking rendering at the moment
-	sf::CircleShape mouseCircle(5.0f);
+	sf::CircleShape mouseCircle(25.0f);
 	sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
 	mouseCircle.setPosition(mousePos.x, mousePos.y);
+
+	// Set the fill color of the circle
+	mouseCircle.setFillColor(sf::Color::Red); // Coloring the circle red
+
 	window->draw(mouseCircle);
 
 }
