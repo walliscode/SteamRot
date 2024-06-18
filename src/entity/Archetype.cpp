@@ -1,3 +1,4 @@
+#pragma once
 #include "Archetype.h"
 
 Archetype::Archetype(unsigned int archetypeID) : m_id(archetypeID) {}

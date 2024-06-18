@@ -77,6 +77,11 @@ void EntityManager::intialiseEntities(std::string sceneName)
 
 }
 
+EntityMemoryPool& EntityManager::getPool()
+{
+	return *m_pool;
+}
+
 std::vector<size_t> EntityManager::getEntities()
 {
 	return m_entities;
