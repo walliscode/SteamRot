@@ -2,7 +2,7 @@
 #include <vector>
 #include "EntityMemoryPool.h"
 
-
+class Scene; //forward declaration of scene class to avoid circular dependency
 
 class EntityManager {
 
@@ -11,9 +11,10 @@ private:
 	std::vector<size_t> m_entitiesToAdd;  //list of entities to add next update
 	std::vector<size_t> m_entitiesToRemove;  //list of entities to remove next update
 	std::shared_ptr<EntityMemoryPool>  m_pool; //pool of all entity data
+	Scene& m_scene; //scene the manager is attached to
 
 public:
-	EntityManager(std::string sceneName, size_t poolSize);  //constructor to create a new manager with a size of pool to manage
+	EntityManager(size_t poolSize,Scene& scene );  //constructor to create a new manager with a size of pool to manage
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// all functions related to entity management (not getting component data)
@@ -54,6 +55,11 @@ public:
 	EntityMemoryPool& getPool(); //return the memory pool for the manager
 
 
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// all functions related to getting Scene information
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// all functions related to getting component data
@@ -70,6 +76,8 @@ public:
 		auto& components = std::get<std::vector<T>>(*(*m_pool).getData());
 		return components[entityID].getHas(); //return the component of the passed component type for the requested entityID
 	}
+
+	
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// all functions related to archetype management

@@ -23,4 +23,6 @@ public:
 
 	bool getActive() const; // returning by value here as it's just as efficient when getting a bool and safer. but may need to change if getter function gets more complex
 	void setActive(bool active);
+
+	GameEngine& getEngine(); // Get the game engine
 };

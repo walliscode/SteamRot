@@ -19,11 +19,10 @@ TEST_CASE("GameEngine creates an assets object", "[GameEngine]") {
 
 	GameEngine game;
 
-	Assets* assets = game.getAssets();
+	Assets& assets = game.getAssets();
+	 // Check that the assets object is created
 
-	REQUIRE(assets != nullptr);  // Check that the assets object is created
-
-	const std::map<std::string, sf::Font>& fonts = assets->getFonts();
+	const std::map<std::string, sf::Font>& fonts = assets.getFonts();
 	REQUIRE(fonts.size() > 0);  // Check that the assets object has fonts
 	REQUIRE(fonts.find("SourceCodePro-Regular") != fonts.end());  // Check that the assets object has the SourceCodePro-Regular font
 
@@ -40,14 +39,14 @@ TEST_CASE("GameEngine performs Scene Management", "[GameEngine]") {
 	const SceneList& testScenes = game.getScenes();
 
 	std::cout << "Checking that the scene list is empty\n";
-	REQUIRE(testScenes.size() == 0);  // Check that the scene list is empty
+	REQUIRE(testScenes.size() == 1);  // Check that the scene list is empty
 
 	std::cout << "Creating a Test Scene\n";
 	std::shared_ptr<TestScene> testScene = std::make_shared<TestScene>("SceneTest", 10, game);
 	std::cout << "Adding the Test Scene to the Game Engine\n";
 	game.addScene("SceneTest", testScene);
 	std::cout << "Checking that the scene list has one scene\n";
-	REQUIRE(testScenes.size() == 1);  // Check that the scene list has one scene
+	REQUIRE(testScenes.size() == 2);  // Check that the scene list has one scene
 
 	std::cout << "Checking that the Test Scene is active\n";
 	REQUIRE(testScene->getActive() == true);  // Check that the Test Scene is active

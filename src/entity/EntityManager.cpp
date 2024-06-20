@@ -1,14 +1,18 @@
 #include "EntityManager.h"
 #include "component_generated.h"
+#include "flatbuffers/flatbuffers.h"
 #include "general_util.h"
 #include <fstream>
+#include "Scene.h"
+#include "GameEngine.h"
+#include "Assets.h"
 
 
 
-EntityManager::EntityManager(std::string sceneName, size_t poolSize) : m_pool(new EntityMemoryPool(poolSize))
+EntityManager::EntityManager(size_t poolSize, Scene& scene)
+	: m_pool(new EntityMemoryPool(poolSize)), m_scene(scene)
 {
-	std::cout << "Initialising entities" << std::endl;
-	intialiseEntities(sceneName);
+
 }
 
 size_t EntityManager::addEntity()
@@ -41,6 +45,7 @@ void EntityManager::updateWaitingRooms()
 
 void EntityManager::intialiseEntities(std::string sceneName)
 {
+
 	
 	std::string fileName = (std::string(FB_BINARIES_PATH) + sceneName + ".bin");
 	// check binary file exists
@@ -55,8 +60,10 @@ void EntityManager::intialiseEntities(std::string sceneName)
 		return;
 	}
 
+	std::cout << "Getting flatbuufer entity list" << std::endl;
 	const SteamRot::rawData::EntityList* entityList = SteamRot::rawData::GetEntityList(buffer.data());
 
+	std::cout << "Iterating through entity list" << std::endl;
 	for (const auto entity : *entityList->entities())
 	{
 		size_t entityID = addEntity();
@@ -70,8 +77,27 @@ void EntityManager::intialiseEntities(std::string sceneName)
 			cTransform.velocity.y = transform->velocity()->y();
 			
 		}
-	}
 
+		if (entity->text_display()) {
+	
+			const auto& textConfig = entity->text_display();
+
+			auto& font_list = m_scene.getEngine().getAssets().getFonts();
+			size_t fontListSize = font_list.size(); // Get the size of the font list
+			const auto& font = m_scene.getEngine().getAssets().getFont(textConfig->font()->str());
+			const auto& text = textConfig->text()->str();
+			const auto& size = textConfig->size();	
+
+			auto& cText = getComponent<CText>(entityID); //get the text component at the new entity index
+			cText.setHas(true); //set the has value to true (has a text component
+			std::cout << "Setting Text" << std::endl;
+			cText.setText(font, text, size);
+		}
+		std::cout << "Entity added" << std::endl;
+	}
+	std::cout << "Entities intialised" << std::endl;
+
+	std::cout << "Updating waiting rooms" << std::endl;
 	updateWaitingRooms(); // update the active entities list, addEntity() adds the entiy to m_entitiesToAdd, updateWaitingRooms() adds the entities to m_entities
 
 
