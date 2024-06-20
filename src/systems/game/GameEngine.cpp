@@ -12,6 +12,10 @@ void GameEngine::init()
 	// Create a new SFML window
 	m_window.create(sf::VideoMode(800, 600), "SFML window");
 
+	// get size of asssets fonts
+	size_t size = m_assets.getFonts().size();
+	std::cout << "Size of fonts: " << size << std::endl;
+
 	// kick off initial scene
 	addScene("mainMenu", std::make_shared<SceneMainMenu>("mainMenu", 10, *this));
 
@@ -19,6 +23,9 @@ void GameEngine::init()
 
 void GameEngine::run()
 {
+	// get size of asssets fonts
+	size_t size = m_assets.getFonts().size();
+	std::cout << "Size of fonts in GameEngine run: " << size << std::endl;
 	// Run the program as long as the window is open
 	while (m_window.isOpen())
 	{
@@ -60,9 +67,9 @@ sf::RenderWindow* GameEngine::getWindow()
 	return & m_window;
 }
 
-Assets* GameEngine::getAssets()
+Assets& GameEngine::getAssets()
 {
-	return &m_assets;
+	return m_assets;
 }
 
 

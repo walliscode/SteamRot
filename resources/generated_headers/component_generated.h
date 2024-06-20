@@ -25,6 +25,9 @@ struct Vector2Builder;
 struct TransformComponent;
 struct TransformComponentBuilder;
 
+struct TextComponent;
+struct TextComponentBuilder;
+
 struct Entity;
 struct EntityBuilder;
 
@@ -186,11 +189,89 @@ inline ::flatbuffers::Offset<TransformComponent> CreateTransformComponent(
   return builder_.Finish();
 }
 
+struct TextComponent FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef TextComponentBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_TEXT = 4,
+    VT_FONT = 6,
+    VT_SIZE = 8
+  };
+  const ::flatbuffers::String *text() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_TEXT);
+  }
+  const ::flatbuffers::String *font() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_FONT);
+  }
+  int32_t size() const {
+    return GetField<int32_t>(VT_SIZE, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_TEXT) &&
+           verifier.VerifyString(text()) &&
+           VerifyOffset(verifier, VT_FONT) &&
+           verifier.VerifyString(font()) &&
+           VerifyField<int32_t>(verifier, VT_SIZE, 4) &&
+           verifier.EndTable();
+  }
+};
+
+struct TextComponentBuilder {
+  typedef TextComponent Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_text(::flatbuffers::Offset<::flatbuffers::String> text) {
+    fbb_.AddOffset(TextComponent::VT_TEXT, text);
+  }
+  void add_font(::flatbuffers::Offset<::flatbuffers::String> font) {
+    fbb_.AddOffset(TextComponent::VT_FONT, font);
+  }
+  void add_size(int32_t size) {
+    fbb_.AddElement<int32_t>(TextComponent::VT_SIZE, size, 0);
+  }
+  explicit TextComponentBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<TextComponent> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<TextComponent>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<TextComponent> CreateTextComponent(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::String> text = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> font = 0,
+    int32_t size = 0) {
+  TextComponentBuilder builder_(_fbb);
+  builder_.add_size(size);
+  builder_.add_font(font);
+  builder_.add_text(text);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<TextComponent> CreateTextComponentDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const char *text = nullptr,
+    const char *font = nullptr,
+    int32_t size = 0) {
+  auto text__ = text ? _fbb.CreateString(text) : 0;
+  auto font__ = font ? _fbb.CreateString(font) : 0;
+  return SteamRot::rawData::CreateTextComponent(
+      _fbb,
+      text__,
+      font__,
+      size);
+}
+
 struct Entity FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef EntityBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_META = 4,
-    VT_TRANSFORM = 6
+    VT_TRANSFORM = 6,
+    VT_TEXT_DISPLAY = 8
   };
   const SteamRot::rawData::MetaComponent *meta() const {
     return GetPointer<const SteamRot::rawData::MetaComponent *>(VT_META);
@@ -198,12 +279,17 @@ struct Entity FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const SteamRot::rawData::TransformComponent *transform() const {
     return GetPointer<const SteamRot::rawData::TransformComponent *>(VT_TRANSFORM);
   }
+  const SteamRot::rawData::TextComponent *text_display() const {
+    return GetPointer<const SteamRot::rawData::TextComponent *>(VT_TEXT_DISPLAY);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_META) &&
            verifier.VerifyTable(meta()) &&
            VerifyOffset(verifier, VT_TRANSFORM) &&
            verifier.VerifyTable(transform()) &&
+           VerifyOffset(verifier, VT_TEXT_DISPLAY) &&
+           verifier.VerifyTable(text_display()) &&
            verifier.EndTable();
   }
 };
@@ -217,6 +303,9 @@ struct EntityBuilder {
   }
   void add_transform(::flatbuffers::Offset<SteamRot::rawData::TransformComponent> transform) {
     fbb_.AddOffset(Entity::VT_TRANSFORM, transform);
+  }
+  void add_text_display(::flatbuffers::Offset<SteamRot::rawData::TextComponent> text_display) {
+    fbb_.AddOffset(Entity::VT_TEXT_DISPLAY, text_display);
   }
   explicit EntityBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -232,8 +321,10 @@ struct EntityBuilder {
 inline ::flatbuffers::Offset<Entity> CreateEntity(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<SteamRot::rawData::MetaComponent> meta = 0,
-    ::flatbuffers::Offset<SteamRot::rawData::TransformComponent> transform = 0) {
+    ::flatbuffers::Offset<SteamRot::rawData::TransformComponent> transform = 0,
+    ::flatbuffers::Offset<SteamRot::rawData::TextComponent> text_display = 0) {
   EntityBuilder builder_(_fbb);
+  builder_.add_text_display(text_display);
   builder_.add_transform(transform);
   builder_.add_meta(meta);
   return builder_.Finish();

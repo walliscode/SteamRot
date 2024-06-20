@@ -14,9 +14,16 @@ table TransformComponent {
 	velocity: Vector2;
 }
 
+table TextComponent {
+	text: string;
+	font: string;
+	size: int;
+}
+
 table Entity{
 	meta: MetaComponent;
 	transform: TransformComponent;
+	text_display: TextComponent;
 }
 
 table EntityList{

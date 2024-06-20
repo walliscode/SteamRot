@@ -52,12 +52,15 @@ add_subdirectory(tests)
 # declaring some variables and shit
 
 set(RESOURCES_PATH "${CMAKE_SOURCE_DIR}/resources/")
-set(FB_BINARIES_PATH "${RESOURCES_PATH}/binaries/")
+set(FB_BINARIES_PATH "${RESOURCES_PATH}binaries/")
 
 target_compile_definitions(EntityManager PRIVATE
     FB_BINARIES_PATH="${FB_BINARIES_PATH}")
     
 target_compile_definitions(Assets PRIVATE RESOURCES_PATH="${RESOURCES_PATH}")
+target_compile_definitions(Assets PRIVATE
+    FB_BINARIES_PATH="${FB_BINARIES_PATH}")
+    
 
 
 

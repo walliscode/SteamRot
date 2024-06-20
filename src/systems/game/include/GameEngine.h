@@ -23,7 +23,7 @@ class GameEngine
 		sf::RenderWindow* getWindow(); // Get the window
 
 		//######### Asset Functions #########
-		Assets* getAssets(); // Get the assets
+		Assets& getAssets(); // Get the assets
 
 		// ######### Scene Functions #########
 		

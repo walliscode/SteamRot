@@ -58,6 +58,7 @@ endforeach()
 
 set(SCENE_CONFIG
     "SceneTest"
+    "mainMenu"
 )
 foreach(NAME ${SCENE_CONFIG})
 set(FBS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/resources/schemas/component.fbs")
