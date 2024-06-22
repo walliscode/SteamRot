@@ -44,9 +44,10 @@ set(CMAKE_PROGRAM_PATH ${CMAKE_BINARY_DIR}/bin) # points other CMake searches to
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/FetchContentModules")
 include(AddSFML)
 include(AddCatch2)
+include(Addflatbuffers)
 
 add_subdirectory(src)
-include(Addflatbuffers)
+
 add_subdirectory(tests)
 
 # declaring some variables and shit

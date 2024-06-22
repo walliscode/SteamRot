@@ -6,6 +6,11 @@ add_subdirectory(utils)
 
 add_executable(SteamRot main.cpp )
 
+
+# Ensure SteamRot depends on my_binary_data
+add_dependencies(SteamRot my_binary_data)
+
+
 target_link_libraries(SteamRot PRIVATE
     GameEngine
 )

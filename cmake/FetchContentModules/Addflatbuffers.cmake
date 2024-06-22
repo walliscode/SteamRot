@@ -27,8 +27,6 @@ message(STATUS "FLATBUFFERS_FOUND: ${FLATBUFFERS_FOUND}")
 # This next bit loops through a curated list (DATA_FILES) of data files that we want to generate binary and header files)
 
 
-if(FLATBUFFERS_FOUND) # only runs if flatbuffers has been built
-
 message("###### Generating Data Files ######")
 
 ######### Straight to headers (no binary)#########
@@ -121,6 +119,6 @@ endforeach()
 
 # by generating a custom target, we can ensure that the generated files are built. (https://cmake.org/cmake/help/book/mastering-cmake/chapter/Custom%20Commands.html#:~:text=add_custom_command%20has%20two%20main%20signatures,to%20add%20the%20custom%20command.)
 add_custom_target(my_binary_data ALL 
-    DEPENDS ${GENERATED_FILES})
-
-endif()
+    DEPENDS 
+    ${GENERATED_FILES}
+    )
