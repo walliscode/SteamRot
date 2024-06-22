@@ -4,15 +4,16 @@ add_subdirectory(components)
 add_subdirectory(entity)
 add_subdirectory(utils)
 
-add_executable(SteamRot main.cpp )
+add_executable(SteamRot main.cpp)
 
-
-# Ensure SteamRot depends on my_binary_data
-add_dependencies(SteamRot my_binary_data)
+add_dependencies(SteamRot
+    flatc
+    my_binary_data)
 
 
 target_link_libraries(SteamRot PRIVATE
     GameEngine
+    flatbuffers
 )
 
 # this dll file is needed for the audio module, so currently not needed but will be left in for now to prevent us searching for it when time comes for audio
