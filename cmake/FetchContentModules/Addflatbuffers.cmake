@@ -1,7 +1,5 @@
-# Attempt to find the flatc compiler executable
-find_program(FLATBUFFERS_FLATC_EXECUTABLE flatc)
-
-
+# as flatc.exe is in bin folder, flatbuffers cmakefile needs to be pointed at it
+set(FLATBUFFERS_FLATC_EXECUTABLE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/flatc.exe)
 message("FLATBUFFERS_FLATC_EXECUTABLE: ${FLATBUFFERS_FLATC_EXECUTABLE}")
 
 
