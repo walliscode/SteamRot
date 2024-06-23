@@ -1,7 +1,6 @@
 # as flatc.exe is in bin folder, flatbuffers cmakefile needs to be pointed at it
-set(FLATBUFFERS_FLATC_EXECUTABLE ${CMAKE_BINARY_DIR}/flatbuffers-build/flatc.exe)
+set(FLATBUFFERS_FLATC_EXECUTABLE "${CMAKE_BINARY_DIR}/flatbuffers-build/flatc.exe")
 message("FLATBUFFERS_FLATC_EXECUTABLE: ${FLATBUFFERS_FLATC_EXECUTABLE}")
-
 
 ########## Generating Data Files ##########
 # This next bit loops through a curated list (DATA_FILES) of data files that we want to generate binary and header files)
