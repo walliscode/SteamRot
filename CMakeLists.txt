@@ -50,7 +50,9 @@ include(AddSFML)
 include(AddCatch2)
 
 
-add_subdirectory(external/flatbuffers)
+add_subdirectory(external/flatbuffers
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} # specifies the binary directory to use
+)
 include(Addflatbuffers)
 add_subdirectory(src)
 

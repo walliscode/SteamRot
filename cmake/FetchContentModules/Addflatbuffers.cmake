@@ -1,9 +1,6 @@
 # Attempt to find the flatc compiler executable
 find_program(FLATBUFFERS_FLATC_EXECUTABLE flatc)
 
-if(NOT FLATBUFFERS_FLATC_EXECUTABLE)
-  message(FATAL_ERROR "flatc executable not found!")
-endif()
 
 message("FLATBUFFERS_FLATC_EXECUTABLE: ${FLATBUFFERS_FLATC_EXECUTABLE}")
 
