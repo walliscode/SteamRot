@@ -1,14 +1,16 @@
-set(FLATBUFFERS_FLATC_EXECUTABLE_LOCAL ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/flatc.exe)
-# Convert to native path format
-file(TO_NATIVE_PATH "${FLATBUFFERS_FLATC_EXECUTABLE_LOCAL}" FLATBUFFERS_FLATC_EXECUTABLE)
+# Attempt to find the flatc compiler executable
+find_program(FLATBUFFERS_FLATC_EXECUTABLE flatc)
 
+if(NOT FLATBUFFERS_FLATC_EXECUTABLE)
+  message(FATAL_ERROR "flatc executable not found!")
+endif()
+
+message("FLATBUFFERS_FLATC_EXECUTABLE: ${FLATBUFFERS_FLATC_EXECUTABLE}")
 
 
 ########## Generating Data Files ##########
 # This next bit loops through a curated list (DATA_FILES) of data files that we want to generate binary and header files)
 
-#set(FLATBUFFERS_FLATC_EXECUTABLE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/flatc.exe)
-message("FLATBUFFERS_FLATC_EXECUTABLE: ${FLATBUFFERS_FLATC_EXECUTABLE}")
 
 message("###### Generating Data Files ######")
 

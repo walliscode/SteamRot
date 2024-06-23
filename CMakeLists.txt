@@ -37,15 +37,19 @@ message("Build shared libs: ${BUILD_SHARED_LIBS}")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin) # necessary for puting the executable and dlls in the same folder
 set(CMAKE_PROGRAM_PATH ${CMAKE_BINARY_DIR}/bin) # points other CMake searches to the binary directory
-# Include external dependencies.
 
+# messages for posterity
+message("CMake runtime output directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+message("CMake program path: ${CMAKE_PROGRAM_PATH}")
+message("Cmake source dir: ${CMAKE_SOURCE_DIR}")
+message("Cmake binary dir: ${CMAKE_BINARY_DIR}")
 
 # set the cmake module path (for import libraries and other cmake files)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/FetchContentModules")
 include(AddSFML)
 include(AddCatch2)
 
-message("CMAKE current BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
+
 add_subdirectory(external/flatbuffers)
 include(Addflatbuffers)
 add_subdirectory(src)
