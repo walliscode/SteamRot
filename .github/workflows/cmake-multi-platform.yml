@@ -15,10 +15,13 @@ jobs:
       fail-fast: false
 
       matrix:
+        os: [windows-latest]
+        c_compiler: [gcc, clang, cl]
         include:
           - os: windows-latest
             preset: x64-release
-            # Add other matrix entries as needed
+            c_compiler: cl
+            cpp_compiler: cl
 
     steps:
     - uses: actions/checkout@v4
@@ -37,10 +40,6 @@ jobs:
       if: matrix.os == 'windows-latest'
       run: |
         choco install ninja
-
-    - name: Setup Visual Studio Environment
-      if: matrix.os == 'windows-latest'
-      uses: egor-tensin/setup-msvc@v1
 
     - name: Configure CMake with Preset
       run: cmake --preset ${{ matrix.preset }}
