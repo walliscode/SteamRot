@@ -33,6 +33,11 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
+    - name: Install Ninja (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        choco install ninja
+
     - name: Configure CMake with Preset
       run: cmake --preset ${{ matrix.preset }}
 
