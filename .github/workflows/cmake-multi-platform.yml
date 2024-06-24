@@ -38,6 +38,10 @@ jobs:
       run: |
         choco install ninja
 
+    - name: Setup Visual Studio Environment
+      if: matrix.os == 'windows-latest'
+      uses: egor-tensin/setup-msvc@v1
+
     - name: Configure CMake with Preset
       run: cmake --preset ${{ matrix.preset }}
 
