@@ -2,6 +2,13 @@
 set(FLATBUFFERS_FLATC_EXECUTABLE "${CMAKE_BINARY_DIR}/flatbuffers-build/flatc.exe")
 message("FLATBUFFERS_FLATC_EXECUTABLE: ${FLATBUFFERS_FLATC_EXECUTABLE}")
 
+message("CMake runtime output directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+message("CMake program path: ${CMAKE_PROGRAM_PATH}")
+message("Cmake source dir: ${CMAKE_SOURCE_DIR}")
+message("Cmake binary dir: ${CMAKE_BINARY_DIR}")
+message("Cmake CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
+
+
 ########## Generating Data Files ##########
 # This next bit loops through a curated list (DATA_FILES) of data files that we want to generate binary and header files)
 

@@ -43,6 +43,7 @@ message("CMake runtime output directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 message("CMake program path: ${CMAKE_PROGRAM_PATH}")
 message("Cmake source dir: ${CMAKE_SOURCE_DIR}")
 message("Cmake binary dir: ${CMAKE_BINARY_DIR}")
+message("Cmake CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 
 # set the cmake module path (for import libraries and other cmake files)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/FetchContentModules")
