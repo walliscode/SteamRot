@@ -17,9 +17,12 @@ jobs:
       matrix:
         os: [windows-latest]
         c_compiler: [cl]
+        
         include:
           - os: windows-latest
             preset: x64-release
+            c_compiler: cl
+            cpp_compiler: cl
 
     steps:
     - uses: actions/checkout@v4
