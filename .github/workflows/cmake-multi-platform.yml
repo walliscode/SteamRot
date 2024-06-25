@@ -16,10 +16,10 @@ jobs:
 
       matrix:
         os: [windows-latest]
-        c_compiler: [gcc, clang, cl]
+        c_compiler: [cl]
         include:
           - os: windows-latest
-            preset: github-actions
+            preset: x64-release
 
     steps:
     - uses: actions/checkout@v4
@@ -43,7 +43,7 @@ jobs:
       run: cmake --preset ${{ matrix.preset }}
 
     - name: Build with CMake Preset
-      run: cmake --build
+      run: cmake --build . --config Release
 
     - name: Test with CMake Preset
       run: ctest --preset default-test
