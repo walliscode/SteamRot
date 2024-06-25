@@ -43,7 +43,7 @@ jobs:
       run: cmake --preset ${{ matrix.preset }}
 
     - name: Build with CMake Preset
-      run: cmake --build --preset
+      run: cmake --build
 
     - name: Test with CMake Preset
       run: ctest --preset default-test
