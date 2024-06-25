@@ -42,13 +42,13 @@ jobs:
       run: |
         choco install ninja
 
-    - name: Setup MSVC
-      if: matrix.os == 'windows-latest'
-      uses: microsoft/setup-msbuild@v1.1
-
-
     - name: Configure CMake with Preset
-      run: cmake --preset ${{ matrix.preset }}
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+        -DCMAKE_BUILD_TYPE="Release"
+        -S ${{ github.workspace }}
 
     - name: Build with CMake Preset
       run: cmake --build . --config Release
