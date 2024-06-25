@@ -19,9 +19,7 @@ jobs:
         c_compiler: [gcc, clang, cl]
         include:
           - os: windows-latest
-            preset: x64-release
-            c_compiler: cl
-            cpp_compiler: cl
+            preset: github-actions
 
     steps:
     - uses: actions/checkout@v4

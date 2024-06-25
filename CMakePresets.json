@@ -56,6 +56,19 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
       }
+    },
+    {
+      "name": "github-actions",
+      "inherits": "x64-debug",
+      "description": "Special preset for GitHub Actions",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++"
+      },
+      "environment": {
+        "CC": "gcc",
+        "CXX": "g++"
+      }
     }
   ],
   "testPresets": [
@@ -67,6 +80,7 @@
         "noTestsAction": "error",
         "stopOnFailure": true
       }
+
     }
   ]
 }
