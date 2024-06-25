@@ -42,6 +42,11 @@ jobs:
       run: |
         choco install ninja
 
+    - name: Setup MSVC
+      if: matrix.os == 'windows-latest'
+      uses: microsoft/setup-msbuild@v1.1
+
+
     - name: Configure CMake with Preset
       run: cmake --preset ${{ matrix.preset }}
 
