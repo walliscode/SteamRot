@@ -2,7 +2,7 @@ namespace SteamRot.rawData;
 
 table Font{
 	tag:string;
-	fileName:string;
+	file_name:string;
 
 }
 

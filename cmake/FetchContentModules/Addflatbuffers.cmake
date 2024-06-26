@@ -1,33 +1,17 @@
-##### N.B. ######
-# if you are building flatbufffers for the first time, then FLATBUFFERS_FOUND will be false.
-# run the build and then run the cmake again. FLATBUFFERS_FOUND should be true.
-# This should trigger it to convert .fbs files to .h files and json files to binar
+# as flatc.exe is in bin folder, flatbuffers cmakefile needs to be pointed at it
+set(FLATBUFFERS_FLATC_EXECUTABLE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/flatc.exe")
+message("FLATBUFFERS_FLATC_EXECUTABLE: ${FLATBUFFERS_FLATC_EXECUTABLE}")
 
-Include(FetchContent)
+message("CMake runtime output directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+message("CMake program path: ${CMAKE_PROGRAM_PATH}")
+message("Cmake source dir: ${CMAKE_SOURCE_DIR}")
+message("Cmake binary dir: ${CMAKE_BINARY_DIR}")
+message("Cmake CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 
-FetchContent_Declare(
-  flatbuffers
-  GIT_REPOSITORY https://github.com/google/flatbuffers
-  GIT_TAG        v24.3.25 # or a later release
-)
-
-FetchContent_MakeAvailable(flatbuffers)
-
-# these variables are necessary as we are using fetch content to get flatbuffers.
-
-list(APPEND CMAKE_MODULE_PATH ${flatbuffers_SOURCE_DIR}/CMake)
-set(FLATBUFFERS_INCLUDE_DIR ${flatbuffers_SOURCE_DIR}/include) # allows find_path() in FindFlatBuffers.cmake to find the flatbuffers headers
-
-
-find_package(FlatBuffers) # needs to be FlatBuffers, not flatbuffers as FindFlatBuffers.cmake is calling FlatBuffers
-
-message(STATUS "FLATBUFFERS_FOUND: ${FLATBUFFERS_FOUND}")
 
 ########## Generating Data Files ##########
 # This next bit loops through a curated list (DATA_FILES) of data files that we want to generate binary and header files)
 
-
-if(FLATBUFFERS_FOUND) # only runs if flatbuffers has been built
 
 message("###### Generating Data Files ######")
 
@@ -121,6 +105,7 @@ endforeach()
 
 # by generating a custom target, we can ensure that the generated files are built. (https://cmake.org/cmake/help/book/mastering-cmake/chapter/Custom%20Commands.html#:~:text=add_custom_command%20has%20two%20main%20signatures,to%20add%20the%20custom%20command.)
 add_custom_target(my_binary_data ALL 
-    DEPENDS ${GENERATED_FILES})
-
-endif()
+    DEPENDS 
+    ${GENERATED_FILES}
+    flatc
+    )

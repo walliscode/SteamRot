@@ -26,20 +26,20 @@ struct Font FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef FontBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TAG = 4,
-    VT_FILENAME = 6
+    VT_FILE_NAME = 6
   };
   const ::flatbuffers::String *tag() const {
     return GetPointer<const ::flatbuffers::String *>(VT_TAG);
   }
-  const ::flatbuffers::String *fileName() const {
-    return GetPointer<const ::flatbuffers::String *>(VT_FILENAME);
+  const ::flatbuffers::String *file_name() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_FILE_NAME);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_TAG) &&
            verifier.VerifyString(tag()) &&
-           VerifyOffset(verifier, VT_FILENAME) &&
-           verifier.VerifyString(fileName()) &&
+           VerifyOffset(verifier, VT_FILE_NAME) &&
+           verifier.VerifyString(file_name()) &&
            verifier.EndTable();
   }
 };
@@ -51,8 +51,8 @@ struct FontBuilder {
   void add_tag(::flatbuffers::Offset<::flatbuffers::String> tag) {
     fbb_.AddOffset(Font::VT_TAG, tag);
   }
-  void add_fileName(::flatbuffers::Offset<::flatbuffers::String> fileName) {
-    fbb_.AddOffset(Font::VT_FILENAME, fileName);
+  void add_file_name(::flatbuffers::Offset<::flatbuffers::String> file_name) {
+    fbb_.AddOffset(Font::VT_FILE_NAME, file_name);
   }
   explicit FontBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -68,9 +68,9 @@ struct FontBuilder {
 inline ::flatbuffers::Offset<Font> CreateFont(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::String> tag = 0,
-    ::flatbuffers::Offset<::flatbuffers::String> fileName = 0) {
+    ::flatbuffers::Offset<::flatbuffers::String> file_name = 0) {
   FontBuilder builder_(_fbb);
-  builder_.add_fileName(fileName);
+  builder_.add_file_name(file_name);
   builder_.add_tag(tag);
   return builder_.Finish();
 }
@@ -78,13 +78,13 @@ inline ::flatbuffers::Offset<Font> CreateFont(
 inline ::flatbuffers::Offset<Font> CreateFontDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const char *tag = nullptr,
-    const char *fileName = nullptr) {
+    const char *file_name = nullptr) {
   auto tag__ = tag ? _fbb.CreateString(tag) : 0;
-  auto fileName__ = fileName ? _fbb.CreateString(fileName) : 0;
+  auto file_name__ = file_name ? _fbb.CreateString(file_name) : 0;
   return SteamRot::rawData::CreateFont(
       _fbb,
       tag__,
-      fileName__);
+      file_name__);
 }
 
 struct FontList FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {

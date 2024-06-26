@@ -4,6 +4,7 @@
 #include <iostream>
 #include <iterator>
 #include <algorithm>
+#include <memory>
 
 #include "CTransform.h"
 #include "CMeta.h"

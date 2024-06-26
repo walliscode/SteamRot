@@ -38,7 +38,7 @@ void Assets::loadFonts(const std::string& filename)
 	const SteamRot::rawData::FontList* font_list = SteamRot::rawData::GetFontList(data);
 
 	for (const auto font : *font_list->fonts()) {
-		addFont(font->tag()->str(), font->fileName()->str());
+		addFont(font->tag()->str(), font->file_name()->str());
 		getFont(font->tag()->str());
 
 	}
