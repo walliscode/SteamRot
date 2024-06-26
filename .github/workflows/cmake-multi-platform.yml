@@ -52,7 +52,7 @@ jobs:
       id: strings
       shell: bash
       run: |
-        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        echo "build-output-dir=${{ github.workspace }}/out/build" >> "$GITHUB_OUTPUT"
 
     - name: Install dependencies (Ubuntu)
       if: runner.os == 'Linux'
@@ -70,8 +70,9 @@ jobs:
 
     - name: List directories (Windows)
       if: matrix.os == 'windows-latest'
-      run: Get-ChildItem -Path ${{ github.workspace }}/build -Directory | ForEach-Object { Write-Output $_.FullName }
+      run: Get-ChildItem -Path ${{ github.workspace }}/build -Directory -Recurse | ForEach-Object { Write-Output $_.FullName }
       shell: pwsh
+
 
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
