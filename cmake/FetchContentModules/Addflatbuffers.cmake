@@ -1,5 +1,5 @@
 # as flatc.exe is in bin folder, flatbuffers cmakefile needs to be pointed at it
-set(FLATBUFFERS_FLATC_EXECUTABLE "${CMAKE_BINARY_DIR}/flatbuffers-build/flatc.exe")
+set(FLATBUFFERS_FLATC_EXECUTABLE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/flatc.exe")
 message("FLATBUFFERS_FLATC_EXECUTABLE: ${FLATBUFFERS_FLATC_EXECUTABLE}")
 
 message("CMake runtime output directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
