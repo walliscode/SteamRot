@@ -4,19 +4,19 @@
 Archetype::Archetype(std::vector<size_t> idSet) : m_idSet(idSet) {}
 
 const std::vector<size_t>& Archetype::getIDSet() const {
-	return m_idSet;
+	return m_idSet; //get the ID set for this archetype (may be redundant with the code generation)
 }
 
 const std::vector<size_t>& Archetype::getEntities() const {
-	return m_entities;
+	return m_entities; //return the list of IDs
 }
 
 void Archetype::addEntity(size_t newEntity) {
-	m_entities.push_back(newEntity);
+	m_entities.push_back(newEntity); //add the new identity ID to the list
 }
 
 void Archetype::removeEntity(size_t remEntity) {
-	m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), remEntity), m_entities.end());
+	m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), remEntity), m_entities.end()); //remove the target entity ID
 }
 
 const size_t& Archetype::getCode() const {
