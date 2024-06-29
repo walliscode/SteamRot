@@ -4,41 +4,29 @@
 #include <iostream>
 
 
-TEST_CASE("GameEngine creates an sfml window", "[GameEngine]") {
+TEST_CASE("Game is Run", "[GameEngine]") {
 	GameEngine game;
 
 	sf::RenderWindow* window = game.getWindow();
 	
 	REQUIRE(window != nullptr);  // Check that the window is created
 	REQUIRE(window->isOpen());   // Check that the window is open
-}
 
-TEST_CASE("GameEngine creates an assets object", "[GameEngine]") {
 
-	std::cout << "######################Game Engine Assets Tests######################" << "\n";
-
-	GameEngine game;
-
+	std::cout << "********************** Assets Tests *********************" << std::endl;
+	// Add all assets tests here
 	Assets& assets = game.getAssets();
-	 // Check that the assets object is created
 
 	const std::map<std::string, sf::Font>& fonts = assets.getFonts();
 	REQUIRE(fonts.size() > 0);  // Check that the assets object has fonts
 	REQUIRE(fonts.find("SourceCodePro-Regular") != fonts.end());  // Check that the assets object has the SourceCodePro-Regular font
 
-}
 
-TEST_CASE("GameEngine performs Scene Management", "[GameEngine]") {
+	std::cout << "********************** Scene Management Tests *********************" << std::endl;
 
-	std::cout << "\n";
-	std::cout << "**********************Game Engine Scene Management Tests*********************" << "\n";
-
-
-	std::cout << "Creating Game Engine\n";
-	GameEngine game;
 	const SceneList& testScenes = game.getScenes();
 
-	std::cout << "Checking that the scene list is empty\n";
+	std::cout << "Checking that the scene list is empty" << std::endl;
 	REQUIRE(testScenes.size() == 1);  // Check that the scene list is empty
 
 	std::cout << "Creating a Test Scene\n";
