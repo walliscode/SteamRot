@@ -1,6 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include "Archetype.h"
 #include <iostream>
+#include <memory>
+
 
 
 
