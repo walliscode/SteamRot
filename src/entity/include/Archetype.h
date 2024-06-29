@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+using std::size_t;
 
 class Archetype {
 private:
