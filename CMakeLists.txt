@@ -97,6 +97,7 @@ set(MY_TARGET_LIST
     flatbuffers
     Scene
     utils
+    Actions
     )
 
 check_targets(MY_TARGET_LIST)

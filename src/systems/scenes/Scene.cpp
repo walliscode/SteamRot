@@ -1,6 +1,10 @@
-#pragma once
+
 #include "Scene.h"
 #include "GameEngine.h"
+#include "actions_generated.h"
+#include "flatbuffers/flatbuffers.h"
+#include "general_util.h"
+#include <fstream>
 
 
 Scene::Scene(const std::string& name, size_t poolSize, GameEngine& game)
@@ -10,6 +14,7 @@ Scene::Scene(const std::string& name, size_t poolSize, GameEngine& game)
 	std::cout << "Size of fonts at Scene Constructor: " << size << std::endl;
 
 	this->m_entityManager.intialiseEntities(this->m_name);
+	this->registerActions(this->m_name);
 }
 
 
@@ -56,4 +61,35 @@ void Scene::setActive(bool active) {
 
 GameEngine& Scene::getEngine() {
 	return m_engine;
+}
+
+// ####### Actions Functions #######
+void Scene::registerActions(const std::string& sceneName) {
+
+
+	
+	// load the actions from the binary file
+	std::string fileName = std::string(FB_BINARIES_PATH) + sceneName + "_actions.bin";
+
+	std::cout << "Reading binary file: " << fileName << std::endl;
+
+	std::vector<std::byte> buffer = utils::readBinaryFile(fileName);
+
+	//if buffer is empty exit intialiseEntities
+	if (buffer.empty()) {
+		std::cout << "No Entities to intialise" << std::endl;
+		return;
+	}
+
+	const SteamRot::rawData::ActionList* action_list = SteamRot::rawData::GetActionList(buffer.data());
+
+	for (const auto action : *action_list->actions()) {
+		int key = action->sfml_id();
+		std::string actionName = action->action_name()->str();
+		m_actionMap[key] = actionName;
+	}
+}
+
+ActionMap& Scene::getActionMap() {
+	return m_actionMap;
 }

@@ -8,4 +8,9 @@ target_include_directories(Scene PUBLIC
 target_link_libraries(Scene PUBLIC
 	EntityManager
 	GameEngine
+	Actions
+	utils
 	)
+
+target_compile_definitions(Scene PRIVATE
+    FB_BINARIES_PATH="${FB_BINARIES_PATH}")

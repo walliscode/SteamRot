@@ -1,11 +1,10 @@
 #include "EntityManager.h"
 #include "component_generated.h"
 #include "flatbuffers/flatbuffers.h"
-#include "general_util.h"
 #include <fstream>
 #include "Scene.h"
 #include "GameEngine.h"
-#include "Assets.h"
+
 
 
 
@@ -60,7 +59,7 @@ void EntityManager::intialiseEntities(std::string sceneName)
 		return;
 	}
 
-	std::cout << "Getting flatbuufer entity list" << std::endl;
+	std::cout << "Getting flatbuffer entity list" << std::endl;
 	const SteamRot::rawData::EntityList* entityList = SteamRot::rawData::GetEntityList(buffer.data());
 
 	std::cout << "Iterating through entity list" << std::endl;
