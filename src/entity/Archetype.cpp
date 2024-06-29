@@ -1,6 +1,7 @@
 #pragma once
 #include "Archetype.h"
 #include <algorithm>
+#include <memory>
 
 Archetype::Archetype(std::vector<size_t> idSet) : m_idSet(idSet) {}
 
