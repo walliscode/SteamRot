@@ -1,6 +1,8 @@
 #pragma once
 #include "Archetype.h"
 
+using std::size_t;
+
 Archetype::Archetype(std::vector<size_t> idSet) : m_idSet(idSet) {}
 
 const std::vector<size_t>& Archetype::getIDSet() const {
