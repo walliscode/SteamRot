@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <cstdlib>
+#include <memory>
 
 class Archetype {
 private:
@@ -16,5 +17,5 @@ public:
     void addEntity(size_t newEntity); //add an entity ID to this archetype
     void removeEntity(size_t remEntity); //remove an entity ID from this archetype
 
-    const size_t& getCode() const; //generate and return the binary code from the component ID sets
+    const std::unique_ptr<size_t> getCode() const; //generate and return the binary code from the component ID sets
 };
