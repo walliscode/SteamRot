@@ -12,5 +12,7 @@ target_link_libraries(Scene PUBLIC
 	utils
 	)
 
+message("FB_BINARIES_PATH  = ${FB_BINARIES_PATH}")
+
 target_compile_definitions(Scene PRIVATE
     FB_BINARIES_PATH="${FB_BINARIES_PATH}")

@@ -34,9 +34,13 @@ endif()
 option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
 message("Build shared libs: ${BUILD_SHARED_LIBS}")
 
+# set paths
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin) # necessary for puting the executable and dlls in the same folder
 set(CMAKE_PROGRAM_PATH ${CMAKE_BINARY_DIR}/bin) # points other CMake searches to the binary directory
+set(RESOURCES_PATH "${CMAKE_SOURCE_DIR}/resources/")
+set(FB_BINARIES_PATH "${RESOURCES_PATH}binaries/")
+
 
 # messages for posterity
 message("CMake runtime output directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
@@ -59,10 +63,6 @@ add_subdirectory(src)
 
 add_subdirectory(tests)
 
-# declaring some variables and shit
-
-set(RESOURCES_PATH "${CMAKE_SOURCE_DIR}/resources/")
-set(FB_BINARIES_PATH "${RESOURCES_PATH}binaries/")
 
 target_compile_definitions(EntityManager PRIVATE
     FB_BINARIES_PATH="${FB_BINARIES_PATH}")

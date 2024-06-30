@@ -18,6 +18,9 @@ protected:
 	size_t  m_current_frame = 0; // The current frame of the scene, used for animations and systems logic
 	std::string m_name; // The name of the scene
 
+	void registerActions(const std::string& sceneName); // Register an action, sfml provides the action type as an int
+	virtual void sDoAction(const Action& action) = 0; // pure virtual function that passes an action to the scene
+
 	Scene(const std::string& name, size_t poolSize, GameEngine& game);
 
 public:
@@ -32,6 +35,6 @@ public:
 	GameEngine& getEngine(); // Get the game engine
 
 	// ####### Actions Functions #######
-	void registerActions(const std::string& sceneName); // Register an action, sfml provides the action type as an int
 	ActionMap& getActionMap(); // Get the action map
+	void doAction(const Action& action); // Do an action
 };

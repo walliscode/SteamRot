@@ -9,9 +9,7 @@
 
 Scene::Scene(const std::string& name, size_t poolSize, GameEngine& game)
     : m_name(name), m_entityManager(poolSize, *this), m_engine(game) {
-	// get size of asssets fonts
-	size_t size = m_engine.getAssets().getFonts().size();
-	std::cout << "Size of fonts at Scene Constructor: " << size << std::endl;
+	
 
 	this->m_entityManager.intialiseEntities(this->m_name);
 	this->registerActions(this->m_name);
@@ -71,13 +69,18 @@ void Scene::registerActions(const std::string& sceneName) {
 	// load the actions from the binary file
 	std::string fileName = std::string(FB_BINARIES_PATH) + sceneName + "_actions.bin";
 
-	std::cout << "Reading binary file: " << fileName << std::endl;
+	if (!utils::fileExists(fileName)) {
+		std::cout << "File does not exist: " << fileName << std::endl;
+		return;
+	}
+
+	std::cout << "Reading binary file for Scene Actions: " << fileName << std::endl;
 
 	std::vector<std::byte> buffer = utils::readBinaryFile(fileName);
 
 	//if buffer is empty exit intialiseEntities
 	if (buffer.empty()) {
-		std::cout << "No Entities to intialise" << std::endl;
+		std::cout << "No Actions to intialise" << std::endl;
 		return;
 	}
 
@@ -93,3 +96,12 @@ void Scene::registerActions(const std::string& sceneName) {
 ActionMap& Scene::getActionMap() {
 	return m_actionMap;
 }
+
+void Scene::doAction(const Action& action) {
+	if (action.getType() == "NONE") {
+		std::cout << "Action type is NONE" << std::endl;
+		return;
+	}
+	sDoAction(action);
+}
+

@@ -30,14 +30,8 @@ void GameEngine::run()
 	// Run the program as long as the window is open
 	while (m_window.isOpen())
 	{
-		// Check all the window's events that were triggered since the last iteration of the loop
-		sf::Event event;
-		while (m_window.pollEvent(event))
-		{
-			// "close requested" event: we close the window
-			if (event.type == sf::Event::Closed)
-				m_window.close();
-		}
+		// handle user input
+		sUserInput();
 
 		// Clear the window with green color
 		m_window.clear(sf::Color::Green);
@@ -103,4 +97,43 @@ void GameEngine::deactivateScene(std::shared_ptr<Scene> scene)
 const SceneList& GameEngine::getScenes()
 {
 	return m_scenes;
+}
+
+void GameEngine::sUserInput()
+{
+	// Check all the window's events that were triggered since the last iteration of the loop
+	sf::Event event;
+	while (m_window.pollEvent(event))
+	{
+		// "close requested" event: we close the window
+		if (event.type == sf::Event::Closed)
+			m_window.close();
+
+		// Check for key use 
+		if (event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased)
+		{
+			for (auto& pair : m_scenes)
+			{
+				auto& scene = pair.second;
+
+				// add in guard clauses
+
+				// check if scene is currently active
+				if (!scene->getActive()) {
+					continue;
+				}
+				// check if the key is in the action map
+				if (scene->getActionMap().find(event.key.code) == scene->getActionMap().end())
+				{
+					continue;
+				}
+
+				// determine if the event is a key press or key release
+				const std::string actionType = (event.type == sf::Event::KeyPressed) ? "START" : "END";
+				
+				scene->doAction(Action(scene->getActionMap().at(event.key.code), actionType));
+			}
+
+		}
+	}
 }

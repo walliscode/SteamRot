@@ -14,6 +14,8 @@ class GameEngine
 		sf::RenderWindow  m_window; // SFML window
 		Assets            m_assets;       // Assets object
 		SceneList		  m_scenes;       // A map of scenes with a custom key
+
+		void sUserInput(); // System: User input
 	
 	public:
 		GameEngine(); // Constructor

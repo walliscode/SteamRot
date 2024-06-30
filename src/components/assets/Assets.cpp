@@ -25,7 +25,7 @@ void Assets::loadFonts(const std::string& filename)
 		std::cout << "File does not exist: " << filename << std::endl;
 		return;
 	}
-	std::cout << "#########  Loading fonts from " << filename << std::endl;
+	std::cout << "######  Loading fonts ###### " << std::endl;
 
 	std::ifstream infile;
 	infile.open(filename, std::ios::binary | std::ios::in);
