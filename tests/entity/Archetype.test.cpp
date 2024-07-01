@@ -12,7 +12,7 @@ TEST_CASE("Archetpe tests", "[Archetype]") {
 	std::cout << "\n";
 
 	std::vector<size_t> testIDs = { 1, 5, 3, 8 };
-	std::shared_ptr<Archetype> testArchetype(new Archetype(testIDs));
+	auto testArchetype = std::make_shared<Archetype>(testIDs);
 	std::cout << "Archetype created with test binary code: " << (*testArchetype).getCode() << "\n";
 	REQUIRE(*(*testArchetype).getCode() == 149);   // Check that an archetype has been made with the correct code
 
