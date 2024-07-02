@@ -11,7 +11,7 @@ assignees: ''
 add 1-2 bullet points of feature you want to add.Keep scope small.
 
 **Labelling:**
-Use githubs branch generation feature to auto label branches
+Use githubs branch generation feature to auto label branches, title issue "<Feature/Documentation>: <Short descriptor>"
 
 **Context:** 
 if this issue is part of a cascade of issues to solve a larger problem, then make sure this is part of a project and
