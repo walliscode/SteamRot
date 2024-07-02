@@ -1,10 +1,10 @@
 #pragma once
 #include <tuple> 
 #include <vector>
-#include <iostream>
 #include <iterator>
 #include <algorithm>
 #include <memory>
+#include <iostream>
 
 #include "CTransform.h"
 #include "CMeta.h"
