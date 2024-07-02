@@ -4,6 +4,7 @@ add_executable(steamrot_tests
 	"systems/game/GameEngine.test.cpp"
 	"entity/EntityMemoryPool.test.cpp" 
 	"entity/EntityManager.test.cpp"
+	"entity/Archetype.test.cpp"
     "systems/scenes/Scene.test.cpp" 
 	"components/assets/Assets.test.cpp")
 

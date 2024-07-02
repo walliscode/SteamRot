@@ -1,16 +1,21 @@
 #pragma once
 
 #include <vector>
+#include <cstdlib>
+#include <memory>
 
 class Archetype {
 private:
-    std::vector<int> m_entityIDs;
-    unsigned int m_id;
+    std::vector<size_t> m_entities;
+    std::vector<size_t> m_idSet;
 
 public:
-    Archetype(unsigned int archetypeID);
+    Archetype(std::vector<size_t> archetypeID);
 
-    const unsigned int getID() const;
-    const std::vector<int>& getEntityIDs() const;
+    const std::vector<size_t>& getIDSet() const; //get the archetype key set
+    const std::vector<size_t>& getEntities() const; //get the set of entity ids in this archetype
+    void addEntity(size_t newEntity); //add an entity ID to this archetype
+    void removeEntity(size_t remEntity); //remove an entity ID from this archetype
 
+    const std::unique_ptr<size_t> getCode() const; //generate and return the binary code from the component ID sets
 };
