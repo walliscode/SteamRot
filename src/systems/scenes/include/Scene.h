@@ -1,6 +1,7 @@
 #pragma once
 #include "EntityManager.h"
 #include "Action.h"
+#include <map>
 
 class GameEngine; // forward declaration. DO NOT INCLUDE "GameEngine.h" here, as it will cause a circular dependency error
 

@@ -24,7 +24,8 @@ TEST_CASE("Game is Run", "[GameEngine]") {
 
 	std::cout << "********************** Scene Management Tests *********************" << std::endl;
 
-	const SceneList& testScenes = game.getScenes();
+	SceneManager& sceneManager = game.getSceneManager();
+	SceneList& testScenes = sceneManager.getScenes();
 
 	std::cout << "Checking that the scene list is empty" << std::endl;
 	REQUIRE(testScenes.size() == 1);  // Check that the scene list is empty
@@ -32,7 +33,7 @@ TEST_CASE("Game is Run", "[GameEngine]") {
 	std::cout << "Creating a Test Scene\n";
 	std::shared_ptr<TestScene> testScene = std::make_shared<TestScene>("SceneTest", 10, game);
 	std::cout << "Adding the Test Scene to the Game Engine\n";
-	game.addScene("SceneTest", testScene);
+	sceneManager.addScene("SceneTest", testScene);
 	std::cout << "Checking that the scene list has one scene\n";
 	REQUIRE(testScenes.size() == 2);  // Check that the scene list has one scene
 
@@ -40,12 +41,12 @@ TEST_CASE("Game is Run", "[GameEngine]") {
 	REQUIRE(testScene->getActive() == true);  // Check that the Test Scene is active
 
 	std::cout << "Deactivating the Test Scene\n";
-	game.deactivateScene(testScene);
+	sceneManager.deactivateScene(testScene);
 	std::cout << "Checking that the Test Scene is not active\n";
 	REQUIRE(testScene->getActive() == false);  // Check that the Test Scene is not active
 
 	std::cout << "Activating the Test Scene\n";
-	game.activateScene(testScene);
+	sceneManager.activateScene(testScene);
 	std::cout << "Checking that the Test Scene is active\n";
 	REQUIRE(testScene->getActive() == true);  // Check that the Test Scene is active
 
