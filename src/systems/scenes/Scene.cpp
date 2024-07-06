@@ -1,4 +1,4 @@
-
+#pragma once
 #include "Scene.h"
 #include "GameEngine.h"
 #include "actions_generated.h"

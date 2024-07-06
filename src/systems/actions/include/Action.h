@@ -13,7 +13,4 @@ public:
 	const std::string& getName() const; //getter for name
 	const std::string& getType() const; //getter for type
 
-	void setName(const std::string& name); //setter for name
-	void setType(const std::string& type); //setter for type
-	
 };

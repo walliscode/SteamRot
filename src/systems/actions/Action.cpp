@@ -10,10 +10,3 @@ const std::string& Action::getType() const {
 	return m_type;
 }
 
-void Action::setName(const std::string& name) {
-	m_name = name;
-}
-
-void Action::setType(const std::string& type) {
-	m_type = type;
-}
