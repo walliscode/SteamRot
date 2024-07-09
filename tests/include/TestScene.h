@@ -6,7 +6,7 @@ private:
 		// do action
 	}
 public:
-	TestScene(const std::string& name, int poolSize, GameEngine& game) : Scene(name, poolSize, game) {};
+	TestScene(const std::string& name, int poolSize, GameEngine& game, SceneManager& sceneManager) : Scene(name, poolSize, game, sceneManager) {};
 	void update() {
 		// put systems here
 	}

@@ -3,6 +3,7 @@
 #include "Scene.h"
 #include <map>
 #include <SFML/Graphics.hpp>
+#include "AssetManager.h"
 
 
 
@@ -14,6 +15,7 @@ class SceneManager
 private:
 	SceneList m_scenes;
 	GameEngine& m_game;
+	AssetManager m_assetManager;
 	
 public:
 	SceneManager(GameEngine& game);
@@ -25,4 +27,6 @@ public:
 
 	void update();
 	void passEvent(sf::Event& event); // pass event from game engine to scene manager to scenes
+
+	AssetManager& getAssetManager();
 };

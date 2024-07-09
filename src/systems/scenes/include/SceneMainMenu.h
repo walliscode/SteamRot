@@ -5,7 +5,7 @@ private:
 	void sDoAction(const Action& action); //do action
 
 public:
-	SceneMainMenu(const std::string& name, size_t poolSize, GameEngine& game);
+	SceneMainMenu(const std::string& name, size_t poolSize, GameEngine& game, SceneManager& sceneManager);
 
 	void update();
 	

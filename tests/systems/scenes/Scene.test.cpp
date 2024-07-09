@@ -5,7 +5,7 @@
 TEST_CASE("Scene is created with an entity manager", "[Scene]") {
 
 	GameEngine game;
-	TestScene TestScene("SceneTest", 10, game);
+	TestScene TestScene("SceneTest", 10, game, game.getSceneManager());
 
 	REQUIRE(TestScene.getActive() == true); // check that it intialises with active scene
 	REQUIRE(TestScene.getActionMap().size() == 1); // check that it intialises with the scene with included actions from json

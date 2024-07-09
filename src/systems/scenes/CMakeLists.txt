@@ -25,4 +25,5 @@ target_include_directories(SceneManager PUBLIC
 target_link_libraries(SceneManager PUBLIC
 	Scene
 	sfml-graphics	
+	AssetManager
 	)
