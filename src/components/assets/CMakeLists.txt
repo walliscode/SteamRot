@@ -11,7 +11,8 @@ add_dependencies(Assets
 
 target_link_libraries(Assets PRIVATE
 	flatbuffers
-	sfml-graphics)
+	sfml-graphics
+	utils)
 
 target_compile_definitions(Assets PRIVATE 
     RESOURCES_PATH="${RESOURCES_PATH}")

@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-
+#include "general_util.h"
 
 class Assets {
 
@@ -17,9 +17,5 @@ public:
 	void addFont(const std::string& tag, const std::string& fileName); // add a font
 	const sf::Font& getFont(const std::string& name) const; // get a font
 	const std::map<std::string, sf::Font>& getFonts() const; // get all fonts
-
-
-	//###### Helper functions ######
-	bool fileExists(const std::string& filename) const; // check if a file exists
 	
 };

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 
+
 #include "load_fonts_generated.h"
 
 
@@ -20,11 +21,11 @@ void Assets::init() {
 
 void Assets::loadFonts(const std::string& filename)
 {
-	if (!fileExists(filename)) {
+	if (!utils::fileExists(filename)) {
 		std::cout << "File does not exist: " << filename << std::endl;
 		return;
 	}
-	std::cout << "#########  Loading fonts from  #########" << filename << std::endl;
+	std::cout << "######  Loading fonts ###### " << std::endl;
 
 	std::ifstream infile;
 	infile.open(filename, std::ios::binary | std::ios::in);
@@ -72,8 +73,3 @@ const std::map<std::string, sf::Font>& Assets::getFonts() const
 	return m_fonts;
 }
 
-bool Assets::fileExists(const std::string& filename) const
-{
-	std::ifstream file(filename);
-	return file.good();
-}

@@ -19,8 +19,6 @@ target_link_libraries(EntityManager PUBLIC
 	Component # nessary for using Component.cpp file for getHas()
 	Component001
 	flatbuffers
-	utils
 	Scene
-	Assets
 )
 
