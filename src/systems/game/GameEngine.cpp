@@ -1,5 +1,7 @@
 #include "GameEngine.h"
 #include "SceneMainMenu.h"
+#include <iostream>
+#include <stdexcept>
 
 
 GameEngine::GameEngine(): m_assets()
@@ -22,7 +24,7 @@ void GameEngine::init()
 
 }
 
-void GameEngine::run()
+void GameEngine::run(size_t numLoops)
 {
 	// get size of asssets fonts
 	size_t size = m_assets.getFonts().size();
@@ -30,6 +32,8 @@ void GameEngine::run()
 	// Run the program as long as the window is open
 	while (m_window.isOpen())
 	{
+		// increment the loop number by 1, the tick number is defined at the beginning of the loop
+		m_loopNumber++;
 		// handle user input
 		sUserInput();
 
@@ -41,6 +45,12 @@ void GameEngine::run()
 
 		// End the current frame and display its contents on screen
 		m_window.display();
+
+		// statement to test whether to break the loop, must be called at end
+		if (numLoops > 0 && m_loopNumber >= numLoops)
+		{
+			break;
+		}
 	}
 }
 
@@ -136,4 +146,22 @@ void GameEngine::sUserInput()
 
 		}
 	}
+}
+
+size_t GameEngine::getLoopNumber()
+{
+	return m_loopNumber;
+}
+
+void GameEngine::runSimulation(int loops)
+{
+	// prevent undefined behaviour of simulation loop
+	if (loops <= 0)
+	{
+		throw std::invalid_argument("The number of loops must be greater than 0");
+	}
+	else {
+		GameEngine::run(loops);
+	}
+	
 }
