@@ -2,7 +2,9 @@
 #include "Assets.h"
 #include "Scene.h"
 #include <map>
+#include <nlohmann/json.hpp>
 
+using json = nlohmann::json;
 
 typedef std::map<std::string, std::shared_ptr<Scene>> SceneList;
 
@@ -27,6 +29,7 @@ class GameEngine
 		//######### Simulation Functions #########
 		size_t getLoopNumber(); // Get the loop number
 		void runSimulation(int loops); // Run the game for a given number of loops
+		json toJSON(std::string containerName); // convert parts of the GameEngine object to JSON, take a string as a container name for the json
 
 		//######### Asset Functions #########
 		Assets& getAssets(); // Get the assets

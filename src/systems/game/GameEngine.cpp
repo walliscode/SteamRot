@@ -4,6 +4,7 @@
 #include <stdexcept>
 
 
+
 GameEngine::GameEngine(): m_assets()
 {
 	init(); // kick off the game, loading assets, calling run function e.t.c
@@ -164,4 +165,12 @@ void GameEngine::runSimulation(int loops)
 		GameEngine::run(loops);
 	}
 	
+}
+
+json GameEngine::toJSON(std::string containerName)
+{
+	json j; // create a json object
+	j[containerName] = {}; // create a json object with the container name as key
+	j[containerName]["loopNumber"] = m_loopNumber;
+	return j;
 }

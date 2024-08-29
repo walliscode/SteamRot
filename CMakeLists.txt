@@ -53,6 +53,7 @@ message("Cmake CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/FetchContentModules")
 include(AddSFML)
 include(AddCatch2)
+include(AddJson)
 
 
 add_subdirectory(external/flatbuffers
@@ -60,9 +61,10 @@ add_subdirectory(external/flatbuffers
 )
 include(Addflatbuffers)
 add_subdirectory(src)
-
 add_subdirectory(tests)
 
+# add external libraries
+include_directories(${CMAKE_SOURCE_DIR}/external)
 
 target_compile_definitions(EntityManager PRIVATE
     FB_BINARIES_PATH="${FB_BINARIES_PATH}")
@@ -98,6 +100,7 @@ set(MY_TARGET_LIST
     Scene
     utils
     Actions
+    nlohmann_json
     )
 
 check_targets(MY_TARGET_LIST)
