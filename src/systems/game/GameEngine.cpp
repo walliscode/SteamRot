@@ -2,6 +2,10 @@
 #include "SceneMainMenu.h"
 #include <iostream>
 #include <stdexcept>
+#include <fstream>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 
 
@@ -50,6 +54,8 @@ void GameEngine::run(size_t numLoops)
 		// statement to test whether to break the loop, must be called at end
 		if (numLoops > 0 && m_loopNumber >= numLoops)
 		{
+			// export data to json, first variable is the directory name, second is the file name
+			createJSON("simulations", "test_data");
 			break;
 		}
 	}
@@ -173,4 +179,38 @@ json GameEngine::toJSON(std::string containerName)
 	j[containerName] = {}; // create a json object with the container name as key
 	j[containerName]["loopNumber"] = m_loopNumber;
 	return j;
+}
+
+void GameEngine::createJSON(const std::string& directoryName, const std::string& fileName)
+{
+	std::string fullFileName = fileName + ".json";
+	// define the path to the directory
+	fs::path filePath = fs::path(DATA_OUT_DIR)/ directoryName / fullFileName;
+
+	// create the directory if it does not exist
+	fs::create_directories(filePath.parent_path());
+
+	// create ofstream object
+	std::ofstream jsonFile(filePath);
+
+	// check if the file is open
+	if (jsonFile.is_open())
+	{
+		// create a json object which is an empty array
+		
+		json jsonList = json::array();
+
+		// here we call various toJSON functions from each class to create a json object
+		jsonList.push_back(toJSON("GameEngine"));
+
+	
+
+		// write the json object to the file
+		jsonFile << jsonList.dump(4);
+		// close the file
+		jsonFile.close();
+	}
+	else {
+		throw std::runtime_error("Could not open file");
+	}
 }

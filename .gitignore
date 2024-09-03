@@ -364,3 +364,6 @@ FodyWeavers.xsd
 
 # Cmake user presets, CMakePresets.json exists for collaboration but USer presets should not be version controlled
 CMakeUserPresets.json
+
+# data output files 
+.data_out/

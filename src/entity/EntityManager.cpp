@@ -11,7 +11,7 @@
 EntityManager::EntityManager(size_t poolSize, Scene& scene)
 	: m_pool(new EntityMemoryPool(poolSize)), m_scene(scene)
 {
-
+	
 }
 
 size_t EntityManager::addEntity()

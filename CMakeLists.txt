@@ -40,14 +40,20 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin) # necessary for puti
 set(CMAKE_PROGRAM_PATH ${CMAKE_BINARY_DIR}/bin) # points other CMake searches to the binary directory
 set(RESOURCES_PATH "${CMAKE_SOURCE_DIR}/resources/")
 set(FB_BINARIES_PATH "${RESOURCES_PATH}binaries/")
+set(DATA_OUT_DIR "${CMAKE_SOURCE_DIR}/data_out/") # for outputting data files from places such as somultations
 
 
+# make sure the data output directory exists
+if (NOT EXISTS ${DATA_OUT_DIR})
+	file(MAKE_DIRECTORY ${DATA_OUT_DIR})
+endif()
 # messages for posterity
 message("CMake runtime output directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 message("CMake program path: ${CMAKE_PROGRAM_PATH}")
 message("Cmake source dir: ${CMAKE_SOURCE_DIR}")
 message("Cmake binary dir: ${CMAKE_BINARY_DIR}")
 message("Cmake CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
+message("CMake DATA_OUT_DIR: ${DATA_OUT_DIR}")
 
 # set the cmake module path (for import libraries and other cmake files)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/FetchContentModules")
@@ -66,13 +72,18 @@ add_subdirectory(tests)
 # add external libraries
 include_directories(${CMAKE_SOURCE_DIR}/external)
 
+# add different defintions for different targets
+target_compile_definitions(GameEngine PRIVATE
+	DATA_OUT_DIR="${DATA_OUT_DIR}")
+
 target_compile_definitions(EntityManager PRIVATE
     FB_BINARIES_PATH="${FB_BINARIES_PATH}")
-    
-target_compile_definitions(Assets PRIVATE RESOURCES_PATH="${RESOURCES_PATH}")
+
+target_compile_definitions(Assets PRIVATE 
+    RESOURCES_PATH="${RESOURCES_PATH}")
 target_compile_definitions(Assets PRIVATE
     FB_BINARIES_PATH="${FB_BINARIES_PATH}")
-    
+
 
 
 
