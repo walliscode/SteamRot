@@ -10,11 +10,11 @@ const std::vector<size_t>& Archetype::getIDSet() const {
 }
 
 const std::vector<size_t>& Archetype::getEntities() const {
-	return m_entities; //return the list of IDs
+	return m_entities; //return the list of entity IDs
 }
 
 void Archetype::addEntity(size_t newEntity) {
-	m_entities.push_back(newEntity); //add the new identity ID to the list
+	m_entities.push_back(newEntity); //add the new entity ID to the list
 }
 
 void Archetype::removeEntity(size_t remEntity) {
