@@ -173,11 +173,10 @@ void GameEngine::runSimulation(int loops)
 	
 }
 
-json GameEngine::toJSON(std::string containerName)
+json GameEngine::toJSON()
 {
 	json j; // create a json object
-	j[containerName] = {}; // create a json object with the container name as key
-	j[containerName]["loopNumber"] = m_loopNumber;
+	j["loopNumber"] = m_loopNumber;
 	return j;
 }
 
@@ -186,7 +185,8 @@ void GameEngine::createJSON(const std::string& directoryName, const std::string&
 	std::string fullFileName = fileName + ".json";
 	// define the path to the directory
 	fs::path filePath = fs::path(DATA_OUT_DIR)/ directoryName / fullFileName;
-
+	
+	std::cout << "Creating JSON file: " << filePath << std::endl;
 	// create the directory if it does not exist
 	fs::create_directories(filePath.parent_path());
 
@@ -196,19 +196,50 @@ void GameEngine::createJSON(const std::string& directoryName, const std::string&
 	// check if the file is open
 	if (jsonFile.is_open())
 	{
-		// create a json object which is an empty array
+		//create json object to add other json objects to
 		
-		json jsonList = json::array();
-
-		// here we call various toJSON functions from each class to create a json object
-		jsonList.push_back(toJSON("GameEngine"));
+		json mainJson;
+		
+		// add the json object to the main json object
+		mainJson["GameEngine"] = GameEngine::toJSON();
 
 	
 
 		// write the json object to the file
-		jsonFile << jsonList.dump(4);
+		jsonFile << mainJson.dump(4);
 		// close the file
 		jsonFile.close();
+
+		std::cout << "JSON file created successfully" << std::endl;
+	}
+	else {
+		throw std::runtime_error("Could not open file");
+	}
+}
+
+json GameEngine::extractJSON(const std::string& directoryName, const std::string& fileName)
+{
+	// define the full file name, adding the json extension
+	std::string fullFileName = fileName + ".json";
+	// define the path to the directory
+	fs::path filePath = fs::path(DATA_OUT_DIR) / directoryName / fullFileName;
+
+	std::cout << "File Path: " << filePath << std::endl;
+	// create ifstream object
+	std::ifstream jsonFile(filePath);
+
+	// check if file exists	
+	if (!fs::exists(filePath))
+	{
+		throw std::runtime_error("File does not exist");
+	}
+	// check if the file is open
+	if (jsonFile.is_open())
+	{
+		//
+		json j;
+		jsonFile >> j;
+		return j;
 	}
 	else {
 		throw std::runtime_error("Could not open file");

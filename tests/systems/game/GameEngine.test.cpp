@@ -69,6 +69,11 @@ TEST_CASE("Simulation is run","[GameEngine]"){
 	game.runSimulation(10);
 	REQUIRE(game.getLoopNumber() == 10); // Check that the simulation runs for 10 loops
 
+	std::cout << "Creating a JSON file and checking contents\n";
+	game.runSimulation(24);
+	json sim_json = game.extractJSON("simulations","test_data");
+	REQUIRE(sim_json["GameEngine"]["loopNumber"] == 24); // Check that the loop number is 24
+
 
 	std::cout << "********************** Simulation Tests END *********************" << std::endl;
 	

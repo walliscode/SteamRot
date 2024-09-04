@@ -1,7 +1,5 @@
-[
-    {
-        "GameEngine": {
-            "loopNumber": 10
-        }
+{
+    "GameEngine": {
+        "loopNumber": 24
     }
-]
+}
