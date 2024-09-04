@@ -12,4 +12,8 @@ target_link_libraries(GameEngine PUBLIC
 	sfml-graphics
 	Assets
 	SceneManager
+	Scene
+	nlohmann_json
+
 )
+

@@ -3,7 +3,10 @@
 #include "Scene.h"
 #include <map>
 #include "SceneManager.h"
+#include <nlohmann/json.hpp>
 
+
+using json = nlohmann::json;
 
 typedef std::map<std::string, std::shared_ptr<Scene>> SceneList;
 
@@ -15,16 +18,24 @@ class GameEngine
 		sf::RenderWindow  m_window; // SFML window
 		Assets            m_assets;       // Assets object
 		SceneManager      m_sceneManager; // Scene manager object
+		SceneList		  m_scenes;       // A map of scenes with a custom key
+		size_t 			  m_loopNumber = 0;   // Number of loops the game has run
 
 		void sUserInput(); // System: User input
 	
 	public:
 		GameEngine(); // Constructor
 		void init(); // Initialize the game
-		void run(); // Run the game
-		void update(); // Update the game, update the scenes
+		void run(size_t numLoops = 0); // Run the game, numLoops is used specifically for the simulation function
+		void update(SceneList& scenes); // Update the game, update the scenes
 		sf::RenderWindow* getWindow(); // Get the window
 
+		//######### Simulation Functions #########
+		size_t getLoopNumber(); // Get the loop number
+		void runSimulation(int loops); // Run the game for a given number of loops
+		json toJSON(); // convert parts of the GameEngine object to JSON, take a string as a container name for the json
+		void createJSON(const std::string& directoryName, const std::string& fileName); // Create a JSON file from parts specificed by toJSON functions from each class. This enables multiple jsons to be created with different structures
+		json extractJSON(const std::string& directoryName, const std::string& fileName); // given a json file location, turn file into json object 
 		//######### Asset Functions #########
 		Assets& getAssets(); // Get the assets
 
