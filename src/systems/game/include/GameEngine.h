@@ -2,7 +2,9 @@
 #include "Assets.h"
 #include "Scene.h"
 #include <map>
+#include <nlohmann/json.hpp>
 
+using json = nlohmann::json;
 
 typedef std::map<std::string, std::shared_ptr<Scene>> SceneList;
 
@@ -27,7 +29,9 @@ class GameEngine
 		//######### Simulation Functions #########
 		size_t getLoopNumber(); // Get the loop number
 		void runSimulation(int loops); // Run the game for a given number of loops
-
+		json toJSON(); // convert parts of the GameEngine object to JSON, take a string as a container name for the json
+		void createJSON(const std::string& directoryName, const std::string& fileName); // Create a JSON file from parts specificed by toJSON functions from each class. This enables multiple jsons to be created with different structures
+		json extractJSON(const std::string& directoryName, const std::string& fileName); // given a json file location, turn file into json object 
 		//######### Asset Functions #########
 		Assets& getAssets(); // Get the assets
 
