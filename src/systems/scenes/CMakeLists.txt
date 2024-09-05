@@ -10,6 +10,7 @@ target_link_libraries(Scene PUBLIC
 	GameEngine
 	Actions
 	utils
+	
 	)
 
 message("FB_BINARIES_PATH  = ${FB_BINARIES_PATH}")
@@ -24,5 +25,6 @@ target_include_directories(SceneManager PUBLIC
 
 target_link_libraries(SceneManager PUBLIC
 	Scene
-	sfml-graphics	
+	sfml-graphics
+	nlohmann_json
 	)

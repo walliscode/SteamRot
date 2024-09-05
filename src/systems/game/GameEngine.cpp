@@ -144,7 +144,7 @@ void GameEngine::createJSON(const std::string& directoryName, const std::string&
 		
 		// add the json object to the main json object
 		mainJson["GameEngine"] = GameEngine::toJSON();
-
+		mainJson["SceneManager"] = m_sceneManager.toJSON();
 	
 
 		// write the json object to the file

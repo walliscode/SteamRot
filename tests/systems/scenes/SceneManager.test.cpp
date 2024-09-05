@@ -6,5 +6,5 @@ TEST_CASE("SceneManager is created", "[SceneManager]") {
 	GameEngine game;
 	SceneManager& sceneManager = game.getSceneManager();
 
-	REQUIRE(sceneManager.getScenes().size() == 1); // Check that the scene list is empty
+	REQUIRE(sceneManager.getScenes().size() == 1); // Check that the scene list is not empty
 }

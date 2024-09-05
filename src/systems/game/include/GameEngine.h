@@ -3,10 +3,7 @@
 #include "Scene.h"
 #include <map>
 #include "SceneManager.h"
-#include <nlohmann/json.hpp>
 
-
-using json = nlohmann::json;
 
 typedef std::map<std::string, std::shared_ptr<Scene>> SceneList;
 
@@ -27,7 +24,7 @@ class GameEngine
 		GameEngine(); // Constructor
 		void init(); // Initialize the game
 		void run(size_t numLoops = 0); // Run the game, numLoops is used specifically for the simulation function
-		void update(SceneList& scenes); // Update the game, update the scenes
+		void update(); // calls the SceneManager update function. This may be uncessary separation but will leave for no
 		sf::RenderWindow* getWindow(); // Get the window
 
 		//######### Simulation Functions #########

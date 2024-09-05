@@ -26,7 +26,7 @@ TEST_CASE("Game is Run", "[GameEngine]") {
 	std::cout << "********************** Scene Management Tests *********************" << std::endl;
 
 	SceneManager& sceneManager = game.getSceneManager();
-	SceneList& testScenes = sceneManager.getScenes();
+	SceneList& testScenes = sceneManager.getAllScenes();
 
 	std::cout << "Checking that the scene list is empty" << std::endl;
 	REQUIRE(testScenes.size() == 1);  // Check that the scene list is empty
@@ -42,12 +42,12 @@ TEST_CASE("Game is Run", "[GameEngine]") {
 	REQUIRE(testScene->getActive() == true);  // Check that the Test Scene is active
 
 	std::cout << "Deactivating the Test Scene\n";
-	sceneManager.deactivateScene(testScene);
+	sceneManager.deactivateScene("SceneTest");
 	std::cout << "Checking that the Test Scene is not active\n";
 	REQUIRE(testScene->getActive() == false);  // Check that the Test Scene is not active
 
 	std::cout << "Activating the Test Scene\n";
-	sceneManager.activateScene(testScene);
+	sceneManager.activateScene("SceneTest");
 	std::cout << "Checking that the Test Scene is active\n";
 	REQUIRE(testScene->getActive() == true);  // Check that the Test Scene is active
 
