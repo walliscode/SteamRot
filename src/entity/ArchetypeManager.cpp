@@ -1,25 +1,109 @@
 #pragma once
+
 #include "ArchetypeManager.h"
 
 ArchetypeManager::ArchetypeManager() {}
 
-const Archetype& ArchetypeManager::getArchetype() const {
-	//TODO return the archetype for the given component set
-	return m_archetypes[0]; 
+const Archetype& ArchetypeManager::getExactArchetype(const std::vector<std::string> requirments) const {
+	
+	//Gen the target archetype code
+	std::unique_ptr<size_t> tagCode =  genTagCode(requirments);
+
+	//Loop through all archetypes until the exact matching code is found
+	for (auto& arch : m_archetypes) {
+		if (*tagCode == *arch.getCode()) {
+			//return the matching archetype
+			return arch;
+			break;
+		}
+	}
 }
 
-const std::vector<size_t>& ArchetypeManager::getArchetypeEntities() const {
-	return getArchetype().getEntities(); //return the entities for the given component set
+const std::shared_ptr<std::vector<Archetype>> ArchetypeManager::getInclusiveArchetype(const std::vector<std::string> requirments) const {
+	std::vector<Archetype> returnSet;
+
+	//Gen the target archetype code
+	std::unique_ptr<size_t> tagCode = genTagCode(requirments);
+
+	//Loop through all archetypes adding each code that contains at least the tag code
+	for (auto& arch : m_archetypes) {
+		if (*tagCode && *arch.getCode() == *tagCode) {
+			returnSet.push_back(arch);
+		}
+	}
+	return std::make_shared <std::vector<Archetype>>(returnSet);
 }
 
-void ArchetypeManager::assignArchetype(size_t assEntity) {
-	//TODO add the entity ID to the correct archetype based on the componets
+
+
+const std::vector<size_t>& ArchetypeManager::getExactArchetypeEntities(const std::vector<std::string> requirments) const {
+	return getExactArchetype(requirments).getEntities(); //return the entities for the given component set
 }
 
-void ArchetypeManager::clearEntity(size_t clrEntity) {
-	//TODO remove the entity ID from it's archtype list
+const std::vector<std::vector<size_t>>& ArchetypeManager::getInclusiveArchetypeEntities(const std::vector<std::string> requirments) const {
+	
+	//create a vector to store all entities for all matching archetypes' entities
+	std::vector<std::vector<size_t>>  entitiesSet;
+	for (auto& arch : *getInclusiveArchetype(requirments)) {
+		entitiesSet.push_back(arch.getEntities());
+	}
+
+	return entitiesSet; //return the entities for the given component set
 }
 
-void ArchetypeManager::reassessEntity(size_t reAssEntity) {
-	//TODO Re-assess the entity ID and move it to the correct archetype if it's in the wrong one
+
+const std::unique_ptr<size_t> ArchetypeManager::genTagCode(std::vector<std::string> tags) const{
+	size_t archCode = 0;
+	for (auto& tag : tags) {
+		archCode = archCode | (1 << (compTagMap[tag] - 1)); //for each ID, OR the current code with 1, bitshifted by the ID - 1 (add a 1 to the code at the binary position set by the ID)
+	};
+	return std::make_unique<size_t>(archCode);
+}
+
+
+void ArchetypeManager::assignArchetype(size_t assEntity, std::vector<std::string> compTags) {
+	//Gen the archcode for the given entity
+	std::unique_ptr<size_t> entCode = genTagCode(compTags);
+
+	//loop through the arch lists and add this entity to the correct list
+	for (auto& arch : m_archetypes) {
+		if (*arch.getCode() == *entCode) {
+			arch.addEntity(assEntity);
+			break;
+		}
+	}
+
+	//if no archetype existed with the correct code, create a new archetype
+	std::vector<size_t> newIDSet;
+	for (auto& tag : compTags) {
+		newIDSet.push_back(compTagMap[tag]);
+	}
+	m_archetypes.push_back(*new Archetype(newIDSet));
+	m_archetypes[-1].addEntity(assEntity);
+}
+
+void ArchetypeManager::clearEntity(size_t clrEntity, std::vector<std::string> compTags) {
+	//Gen the archcode for the given entity
+	std::unique_ptr<size_t> entCode = genTagCode(compTags);
+
+	//loop through the arch lists and remove this entity from the correct list
+	for (auto& arch : m_archetypes) {
+		if (*arch.getCode() == *entCode) {
+			arch.removeEntity(clrEntity);
+			break;
+		}
+	}
+}
+
+void ArchetypeManager::reassessEntity(size_t reAssEntity, std::vector<std::string> compTags) {
+	//find the old archetype and remove this entity
+	for (auto& arch : m_archetypes) {
+		if (arch.contains(reAssEntity)) {
+			arch.removeEntity(reAssEntity);
+			break;
+		}
+	}
+
+	//add the entity to the correct list
+	assignArchetype(reAssEntity, compTags);
 }

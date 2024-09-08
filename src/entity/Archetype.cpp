@@ -21,10 +21,15 @@ void Archetype::removeEntity(size_t remEntity) {
 	m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), remEntity), m_entities.end()); //remove the target entity ID
 }
 
+
 const std::unique_ptr<size_t> Archetype::getCode() const {
 	size_t archCode = 0;
 	for (auto& compID : m_idSet) {
 		archCode = archCode | (1 << (compID - 1)); //for each ID, OR the current code with 1, bitshifted by the ID - 1 (add a 1 to the code at the binary position set by the ID)
 	};
 	return std::make_unique<size_t>(archCode);
+}
+
+const bool Archetype::contains(size_t entity) const {
+	return std::find(m_entities.begin(), m_entities.end(), entity) != m_entities.end();
 }
