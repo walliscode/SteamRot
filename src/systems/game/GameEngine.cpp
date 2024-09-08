@@ -11,7 +11,7 @@ namespace fs = std::filesystem;
 
 GameEngine::GameEngine() : m_assets(), m_sceneManager(*this)
 {
-	init(); // kick off the game, loading assets, calling run function e.t.c
+	init(); // kick off the game, loading assets de.t.c
 }
 
 void GameEngine::init()

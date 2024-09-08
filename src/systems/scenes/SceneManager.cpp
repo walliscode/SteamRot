@@ -106,6 +106,16 @@ void SceneManager::passEvent(sf::Event& event)
 	}
 }
 
+void SceneManager::makeInteractive()
+{
+	// pass through mouse location from eventual dashboard and copy active scene to interactive scene
+}
+ 
+void SceneManager::makeNonInteractive()
+{
+	// remove active scene from interactive scenes
+
+}
 
 json SceneManager::toJSON()
 {

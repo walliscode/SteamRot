@@ -27,8 +27,8 @@ public:
 	void activateScene(std::string tag);
 	void deactivateScene(std::string tag);
 
-	void makeInteractive(std::string tag); // make a scene interactive so that events can be passed
-	void makeNonInteractive(std::string tag); // make a scene non-interactive so that events are not passed
+	void makeInteractive(); // make a scene interactive so that events can be passed
+	void makeNonInteractive(); // make a scene non-interactive so that events are not passed
 
 	SceneList& getAllScenes();
 	SceneList& getActiveScenes();
