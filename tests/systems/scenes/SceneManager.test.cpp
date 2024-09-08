@@ -30,4 +30,6 @@ TEST_CASE("SceneManager is created", "[SceneManager]") {
 	REQUIRE(sceneManager.getInactiveScenes().size() == 1); // Check that the inactive scene list has increased by 1
 	REQUIRE(sceneManager.getInteractiveScenes().size() == 0); // Check that the interactive scene list has not changed
 
+
+
 }
