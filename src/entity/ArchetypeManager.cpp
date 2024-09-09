@@ -1,15 +1,15 @@
 #pragma once
 
 #include "ArchetypeManager.h"
-#include "ComponentMeta.h"
+#include "Config.h"
 #include <iostream>
 
 ArchetypeManager::ArchetypeManager() {}
 
-const Archetype& ArchetypeManager::getExactArchetype(const std::vector<std::string> requirments) const {
+const Archetype& ArchetypeManager::getExactArchetype(const std::vector<std::string> requirements) const {
 	
 	//Gen the target archetype code
-	std::unique_ptr<size_t> tagCode =  genTagCode(requirments);
+	std::unique_ptr<size_t> tagCode =  generateTagCode(requirements);
 
 	//Loop through all archetypes until the exact matching code is found
 
@@ -22,11 +22,11 @@ const Archetype& ArchetypeManager::getExactArchetype(const std::vector<std::stri
 	}
 }
 
-const std::shared_ptr<std::vector<Archetype>> ArchetypeManager::getInclusiveArchetype(const std::vector<std::string> requirments) const {
+const std::shared_ptr<std::vector<Archetype>> ArchetypeManager::getInclusiveArchetype(const std::vector<std::string> requirements) const {
 	std::vector<Archetype> returnSet;
 
 	//Gen the target archetype code
-	std::unique_ptr<size_t> tagCode = genTagCode(requirments);
+	std::unique_ptr<size_t> tagCode = generateTagCode(requirements);
 
 	//Loop through all archetypes adding each code that contains at least the tag code
 
@@ -41,15 +41,15 @@ const std::shared_ptr<std::vector<Archetype>> ArchetypeManager::getInclusiveArch
 
 
 
-const std::vector<size_t>& ArchetypeManager::getExactArchetypeEntities(const std::vector<std::string> requirments) const {
-	return getExactArchetype(requirments).getEntities(); //return the entities for the given component set
+const std::vector<size_t>& ArchetypeManager::getExactArchetypeEntities(const std::vector<std::string> requirements) const {
+	return getExactArchetype(requirements).getEntities(); //return the entities for the given component set
 }
 
-const std::shared_ptr<std::vector<size_t>> ArchetypeManager::getInclusiveArchetypeEntities(const std::vector<std::string> requirments) const {
+const std::shared_ptr<std::vector<size_t>> ArchetypeManager::getInclusiveArchetypeEntities(const std::vector<std::string> requirements) const {
 	
 	//create a vector to store all entities for all matching archetypes' entities
 	std::vector<size_t>  entitiesSet;
-	std::vector<Archetype> archSet = *getInclusiveArchetype(requirments);
+	std::vector<Archetype> archSet = *getInclusiveArchetype(requirements);
 	for (auto& arch : archSet) {
 		entitiesSet.insert(entitiesSet.end(), arch.getEntities().begin(), arch.getEntities().end());
 	}
@@ -57,7 +57,7 @@ const std::shared_ptr<std::vector<size_t>> ArchetypeManager::getInclusiveArchety
 }
 
 
-const std::unique_ptr<size_t> ArchetypeManager::genTagCode(std::vector<std::string> tags) const{
+const std::unique_ptr<size_t> ArchetypeManager::generateTagCode(std::vector<std::string> tags) const{
 	size_t archCode = 0;
 	for (auto& tag : tags) {
 		archCode = archCode | (1 << (compTagMap[tag] - 1)); //for each ID, OR the current code with 1, bitshifted by the ID - 1 (add a 1 to the code at the binary position set by the ID)
@@ -68,7 +68,7 @@ const std::unique_ptr<size_t> ArchetypeManager::genTagCode(std::vector<std::stri
 
 void ArchetypeManager::assignArchetype(size_t assEntity, std::vector<std::string> compTags) {
 	//Gen the archcode for the given entity
-	std::unique_ptr<size_t> entCode = genTagCode(compTags);
+	std::unique_ptr<size_t> entCode = generateTagCode(compTags);
 	//loop through the arch lists and add this entity to the correct list
 
 	for (auto& arch : m_archetypes) {
@@ -90,7 +90,7 @@ void ArchetypeManager::assignArchetype(size_t assEntity, std::vector<std::string
 
 void ArchetypeManager::clearEntity(size_t clrEntity, std::vector<std::string> compTags) {
 	//Gen the archcode for the given entity
-	std::unique_ptr<size_t> entCode = genTagCode(compTags);
+	std::unique_ptr<size_t> entCode = generateTagCode(compTags);
 
 	//loop through the arch lists and remove this entity from the correct list
 	for (auto& arch : m_archetypes) {
