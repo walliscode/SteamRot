@@ -7,7 +7,10 @@ add_executable(steamrot_tests
 	"entity/Archetype.test.cpp"
 	"entity/ArchetypeManager.test.cpp"
     "systems/scenes/Scene.test.cpp" 
-	"components/assets/Assets.test.cpp")
+	"systems/scenes/SceneManager.test.cpp"
+	"components/assets/Assets.test.cpp"
+	"simulations/simulations.test.cpp"
+)
 
 target_include_directories(steamrot_tests PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}/include

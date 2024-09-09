@@ -1,6 +1,7 @@
 #pragma once
 #include "EntityManager.h"
 #include "Action.h"
+#include <map>
 
 class GameEngine; // forward declaration. DO NOT INCLUDE "GameEngine.h" here, as it will cause a circular dependency error
 
@@ -15,6 +16,7 @@ protected:
 
 	bool    m_paused = false; // If the scene is paused
 	bool    m_active = true; // if the scene is active, should the Scene manager call the updated function
+	bool    m_interactable = false; // only if the scene is being interacted with should events be passed to it
 	size_t  m_current_frame = 0; // The current frame of the scene, used for animations and systems logic
 	std::string m_name; // The name of the scene
 

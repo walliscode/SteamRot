@@ -11,7 +11,9 @@ target_include_directories(GameEngine PUBLIC # Public is necessary for main to h
 target_link_libraries(GameEngine PUBLIC
 	sfml-graphics
 	Assets
+	SceneManager
 	Scene
 	nlohmann_json
+
 )
 
