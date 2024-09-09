@@ -1,5 +1,8 @@
 {
     "GameEngine": {
-        "loopNumber": 24
+        "loopNumber": 14
+    },
+    "SceneManager": {
+        "mainMenu": true
     }
 }

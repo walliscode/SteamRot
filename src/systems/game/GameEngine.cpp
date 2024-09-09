@@ -9,9 +9,9 @@ namespace fs = std::filesystem;
 
 
 
-GameEngine::GameEngine(): m_assets()
+GameEngine::GameEngine() : m_assets(), m_sceneManager(*this)
 {
-	init(); // kick off the game, loading assets, calling run function e.t.c
+	init(); // kick off the game, loading assets de.t.c
 }
 
 void GameEngine::init()
@@ -19,21 +19,12 @@ void GameEngine::init()
 	// Create a new SFML window
 	m_window.create(sf::VideoMode(800, 600), "SFML window");
 
-	// get size of asssets fonts
-	size_t size = m_assets.getFonts().size();
-	std::cout << "Size of fonts: " << size << std::endl;
-
-	// kick off initial scene
-	addScene("mainMenu", std::make_shared<SceneMainMenu>("mainMenu", 10, *this));
-
 
 }
 
 void GameEngine::run(size_t numLoops)
 {
-	// get size of asssets fonts
-	size_t size = m_assets.getFonts().size();
-	std::cout << "Size of fonts in GameEngine run: " << size << std::endl;
+	
 	// Run the program as long as the window is open
 	while (m_window.isOpen())
 	{
@@ -46,7 +37,7 @@ void GameEngine::run(size_t numLoops)
 		m_window.clear(sf::Color::Green);
 
 		// Update all the scenes
-		GameEngine::update(m_scenes);
+		GameEngine::update();
 
 		// End the current frame and display its contents on screen
 		m_window.display();
@@ -61,17 +52,10 @@ void GameEngine::run(size_t numLoops)
 	}
 }
 
-void GameEngine::update(SceneList& scenes)
+void GameEngine::update()
 {
-	// Loop through all the scenes and update them only if m_active is true
-	for (auto& pair : scenes)
-	{
-		auto& scene = pair.second;
-		if (scene->getActive()) {
-			scene->update();
-		}
-		
-	}
+	// call the update function of the scene manager
+	m_sceneManager.update();
 }
 
 sf::RenderWindow* GameEngine::getWindow()
@@ -86,36 +70,6 @@ Assets& GameEngine::getAssets()
 
 
 
-void GameEngine::addScene(std::string tag, std::shared_ptr<Scene> scene)
-{	
-	m_scenes.insert({ tag, scene });
-
-}
-
-void GameEngine::removeScene(std::string tag)
-{
-	// Remove the scene
-	m_scenes.erase(tag);
-}
-
-
-void GameEngine::activateScene(std::shared_ptr<Scene> scene)
-{
-	// Activate the scene
-	scene->setActive(true);
-}
-
-void GameEngine::deactivateScene(std::shared_ptr<Scene> scene)
-{
-	// Deactivate the scene
-	scene->setActive(false);
-}
-
-const SceneList& GameEngine::getScenes()
-{
-	return m_scenes;
-}
-
 void GameEngine::sUserInput()
 {
 	// Check all the window's events that were triggered since the last iteration of the loop
@@ -129,30 +83,18 @@ void GameEngine::sUserInput()
 		// Check for key use 
 		if (event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased)
 		{
-			for (auto& pair : m_scenes)
-			{
-				auto& scene = pair.second;
+			// pass the event to the scene manager if it is a key press or key release
+			m_sceneManager.passEvent(event);
 
-				// add in guard clauses
-
-				// check if scene is currently active
-				if (!scene->getActive()) {
-					continue;
-				}
-				// check if the key is in the action map
-				if (scene->getActionMap().find(event.key.code) == scene->getActionMap().end())
-				{
-					continue;
-				}
-
-				// determine if the event is a key press or key release
-				const std::string actionType = (event.type == sf::Event::KeyPressed) ? "START" : "END";
-				
-				scene->doAction(Action(scene->getActionMap().at(event.key.code), actionType));
-			}
 
 		}
 	}
+}
+
+SceneManager& GameEngine::getSceneManager()
+{
+	return m_sceneManager;
+
 }
 
 size_t GameEngine::getLoopNumber()
@@ -202,7 +144,7 @@ void GameEngine::createJSON(const std::string& directoryName, const std::string&
 		
 		// add the json object to the main json object
 		mainJson["GameEngine"] = GameEngine::toJSON();
-
+		mainJson["SceneManager"] = m_sceneManager.toJSON();
 	
 
 		// write the json object to the file
@@ -245,3 +187,4 @@ json GameEngine::extractJSON(const std::string& directoryName, const std::string
 		throw std::runtime_error("Could not open file");
 	}
 }
+
