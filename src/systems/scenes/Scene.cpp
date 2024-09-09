@@ -1,5 +1,6 @@
 #pragma once
 #include "Scene.h"
+#include "SceneManager.h"
 #include "GameEngine.h"
 #include "actions_generated.h"
 #include "flatbuffers/flatbuffers.h"
@@ -7,8 +8,9 @@
 #include <fstream>
 
 
-Scene::Scene(const std::string& name, size_t poolSize, GameEngine& game)
-    : m_name(name), m_entityManager(poolSize, *this), m_engine(game) {
+
+Scene::Scene(const std::string& name, size_t poolSize, GameEngine& game, SceneManager& sceneManager)
+    : m_name(name), m_entityManager(poolSize, *this), m_engine(game), m_sceneManager(sceneManager) {
 	
 
 	this->m_entityManager.intialiseEntities(this->m_name);
@@ -61,6 +63,10 @@ GameEngine& Scene::getEngine() {
 	return m_engine;
 }
 
+SceneManager& Scene::getSceneManager() {
+	return m_sceneManager;
+}
+
 // ####### Actions Functions #######
 void Scene::registerActions(const std::string& sceneName) {
 
@@ -104,4 +110,6 @@ void Scene::doAction(const Action& action) {
 	}
 	sDoAction(action);
 }
+
+
 

@@ -4,6 +4,7 @@
 #include <fstream>
 #include "Scene.h"
 #include "GameEngine.h"
+#include "general_util.h"
 
 
 
@@ -80,15 +81,12 @@ void EntityManager::intialiseEntities(std::string sceneName)
 		if (entity->text_display()) {
 	
 			const auto& textConfig = entity->text_display();
-
-			auto& font_list = m_scene.getEngine().getAssets().getFonts();
-			size_t fontListSize = font_list.size(); // Get the size of the font list
-			const auto& font = m_scene.getEngine().getAssets().getFont(textConfig->font()->str());
+			const auto& font = m_scene.getSceneManager().getAssetManager().getFont(textConfig->font()->str());
 			const auto& text = textConfig->text()->str();
 			const auto& size = textConfig->size();	
 
 			auto& cText = getComponent<CText>(entityID); //get the text component at the new entity index
-			cText.setHas(true); //set the has value to true (has a text component
+			cText.setHas(true); //set the has value to true (has a text component)
 			std::cout << "Setting Text" << std::endl;
 			cText.setText(font, text, size);
 		}

@@ -1,5 +1,4 @@
 #include <SFML/Graphics.hpp>
-#include "Assets.h"
 #include "Scene.h"
 #include <map>
 #include "SceneManager.h"
@@ -13,7 +12,6 @@ class GameEngine
 	private:
 
 		sf::RenderWindow  m_window; // SFML window
-		Assets            m_assets;       // Assets object
 		SceneManager      m_sceneManager; // Scene manager object
 		SceneList		  m_scenes;       // A map of scenes with a custom key
 		size_t 			  m_loopNumber = 0;   // Number of loops the game has run
@@ -26,6 +24,7 @@ class GameEngine
 		void run(size_t numLoops = 0); // Run the game, numLoops is used specifically for the simulation function
 		void update(); // calls the SceneManager update function. This may be uncessary separation but will leave for no
 		sf::RenderWindow* getWindow(); // Get the window
+
 
 		//######### Simulation Functions #########
 		size_t getLoopNumber(); // Get the loop number

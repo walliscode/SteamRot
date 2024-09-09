@@ -79,9 +79,11 @@ target_compile_definitions(GameEngine PRIVATE
 target_compile_definitions(EntityManager PRIVATE
     FB_BINARIES_PATH="${FB_BINARIES_PATH}")
 
+
 target_compile_definitions(Assets PRIVATE 
     RESOURCES_PATH="${RESOURCES_PATH}")
 target_compile_definitions(Assets PRIVATE
+target_compile_definitions(AssetManager PRIVATE
     FB_BINARIES_PATH="${FB_BINARIES_PATH}")
 
 
@@ -106,7 +108,7 @@ set(MY_TARGET_LIST
     SteamRot
     GameEngine
     sfml-graphics
-    Assets
+    AssetManager
     flatbuffers
     Scene
     utils

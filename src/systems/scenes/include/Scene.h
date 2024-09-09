@@ -2,8 +2,10 @@
 #include "EntityManager.h"
 #include "Action.h"
 #include <map>
+#include <string>
 
 class GameEngine; // forward declaration. DO NOT INCLUDE "GameEngine.h" here, as it will cause a circular dependency error
+class SceneManager; // forward declaration. DO NOT INCLUDE "SceneManager.h" here, as it will cause a circular dependency error
 
 typedef std::map<int, std::string> ActionMap;
 
@@ -13,6 +15,7 @@ protected:
 	EntityManager m_entityManager; // The entity manager of the scene
 	GameEngine& m_engine; // The game engine, reference is used here because currently the GameEngine object will outlive any scene object
 	ActionMap m_actionMap; // The actions of the scene
+	SceneManager& m_sceneManager; // The scene manager of the scene
 
 	bool    m_paused = false; // If the scene is paused
 	bool    m_active = true; // if the scene is active, should the Scene manager call the updated function
@@ -23,7 +26,7 @@ protected:
 	void registerActions(const std::string& sceneName); // Register an action, sfml provides the action type as an int
 	virtual void sDoAction(const Action& action) = 0; // pure virtual function that passes an action to the scene
 
-	Scene(const std::string& name, size_t poolSize, GameEngine& game);
+	Scene(const std::string& name, size_t poolSize, GameEngine& game, SceneManager& sceneManager);
 
 public:
 	
@@ -35,6 +38,7 @@ public:
 	void setActive(bool active);
 
 	GameEngine& getEngine(); // Get the game engine
+	SceneManager& getSceneManager(); // Get the scene manager
 
 	// ####### Actions Functions #######
 	ActionMap& getActionMap(); // Get the action map

@@ -2,11 +2,12 @@
 #include "SceneMainMenu.h"
 
 
-SceneManager::SceneManager(GameEngine& game) : m_allScenes(), m_activeScenes(), m_inactiveScenes(), m_game(game)
+SceneManager::SceneManager(GameEngine& game) : m_allScenes(), m_activeScenes(), m_inactiveScenes(), m_game(game), m_assetManager()
+
 {
 
 	// kick off initial scene(s)
-		addScene("mainMenu", std::make_shared<SceneMainMenu>("mainMenu", 10, game));
+		addScene("mainMenu", std::make_shared<SceneMainMenu>("mainMenu", 10, game, *this));
 }
 
 
@@ -17,6 +18,9 @@ void SceneManager::addScene(std::string tag, std::shared_ptr<Scene> scene)
 
 	// as default behaviour, add to inactive scenes
 	m_inactiveScenes[tag] = scene;
+
+	m_assetManager.loadSceneAssets(tag);
+
 }
 
 void SceneManager::removeScene(std::string tag)
@@ -106,6 +110,7 @@ void SceneManager::passEvent(sf::Event& event)
 	}
 }
 
+
 void SceneManager::makeInteractive()
 {
 	// pass through mouse location from eventual dashboard and copy active scene to interactive scene
@@ -131,3 +136,9 @@ json SceneManager::toJSON()
 
 	return j;
 }
+
+AssetManager& SceneManager::getAssetManager()
+{
+	return m_assetManager;
+}
+

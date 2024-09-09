@@ -4,6 +4,8 @@
 #include <map>
 #include <SFML/Graphics.hpp>
 #include <nlohmann/json.hpp>
+#include "AssetManager.h"
+
 
 using json = nlohmann::json;
 
@@ -19,6 +21,7 @@ private:
 	// the wording is very similar to inactive, so we need to be careful
 	SceneList m_interactiveScenes; // all scenes that are interactive
 	GameEngine& m_game;
+	AssetManager m_assetManager;
 	
 public:
 	SceneManager(GameEngine& game);
@@ -38,6 +41,7 @@ public:
 	void update();
 	void passEvent(sf::Event& event); // pass event from game engine to scene manager to scenes
 
+
 	/// Testing and simulation functions
 	json toJSON(); // convert parts of the SceneManager class to json
-};
+	AssetManager& getAssetManager();

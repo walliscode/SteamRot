@@ -9,7 +9,7 @@ namespace fs = std::filesystem;
 
 
 
-GameEngine::GameEngine() : m_assets(), m_sceneManager(*this)
+GameEngine::GameEngine() :m_sceneManager(*this)
 {
 	init(); // kick off the game, loading assets de.t.c
 }
@@ -54,18 +54,13 @@ void GameEngine::run(size_t numLoops)
 
 void GameEngine::update()
 {
-	// call the update function of the scene manager
-	m_sceneManager.update();
+	// call the update function of the scene manager. SceneManager name space is used to avoid ambiguity
+	m_sceneManager.SceneManager::update();
 }
 
 sf::RenderWindow* GameEngine::getWindow()
 {
 	return & m_window;
-}
-
-Assets& GameEngine::getAssets()
-{
-	return m_assets;
 }
 
 

@@ -11,6 +11,8 @@ add_executable(steamrot_tests
 	"simulations/simulations.test.cpp"
 )
 
+	"components/assets/AssetManager.test.cpp")
+
 target_include_directories(steamrot_tests PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}/include
 )
