@@ -27,4 +27,5 @@ target_link_libraries(SceneManager PUBLIC
 	Scene
 	sfml-graphics
 	nlohmann_json
+	AssetManager
 	)

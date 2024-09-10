@@ -44,6 +44,10 @@ TEST_CASE("Game is Run", "[GameEngine]") {
 	REQUIRE(testScene->getActive() == true);  // Check that the Test Scene is active
 
 	std::cout << "**********************Game Engine Scene Management Test END*********************" << "\n";
+
+	std::cout << "**********************Asset Manager Tests*********************" << std::endl;
+
+	
 }
 
 TEST_CASE("Simulation is run","[GameEngine]"){

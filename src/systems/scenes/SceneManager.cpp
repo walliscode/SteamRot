@@ -2,7 +2,12 @@
 #include "SceneMainMenu.h"
 
 
-SceneManager::SceneManager(GameEngine& game) : m_allScenes(), m_activeScenes(), m_inactiveScenes(), m_game(game)
+SceneManager::SceneManager(GameEngine& game) : 
+	m_allScenes(), 
+	m_activeScenes(), 
+	m_inactiveScenes(), 
+	m_game(game),
+	m_assetManager()
 {
 
 	// kick off initial scene(s)
@@ -130,4 +135,9 @@ json SceneManager::toJSON()
 	}
 
 	return j;
+}
+
+AssetManager& SceneManager::getAssetManager()
+{
+	return m_assetManager;
 }
