@@ -18,4 +18,5 @@ public:
     void removeEntity(size_t remEntity); //remove an entity ID from this archetype
 
     const std::unique_ptr<size_t> getCode() const; //generate and return the binary code from the component ID sets
+    const bool contains(size_t entity) const; // check if the entity ID is in this archetype
 };
