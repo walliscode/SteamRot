@@ -21,5 +21,6 @@ target_link_libraries(EntityManager PUBLIC
 	Component001
 	flatbuffers
 	Scene
+	utils
 )
 
