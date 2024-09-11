@@ -1,7 +1,7 @@
 #include "AssetManager.h"
 #include "general_util.h"
 #include <iostream>
-#include "load_fonts_generated.h"
+#include "fonts_generated.h"
 
 
 AssetManager::AssetManager() : m_fonts()
@@ -18,7 +18,7 @@ void AssetManager::loadSceneAssets(const std::string& sceneType)
 void AssetManager::loadFonts(const std::string& sceneType)
 {
 	// create the file name. check naming convention carefully
-	const std::string fileName = std::string(FB_BINARIES_PATH) + "load_fonts_" + sceneType + ".bin";
+	const std::string fileName = std::string(FB_BINARIES_PATH) + sceneType + "_fonts" + ".bin";
 
 	// using utils function, check file exists. if it doesn't this should exit the function
 	if (!utils::fileExists(fileName)) {
@@ -70,4 +70,22 @@ const sf::Font& AssetManager::getFont(const std::string& name) const {
 		return m_fonts.begin()->second;
 
 	}
+
+}
+
+json AssetManager::toJSON() {
+
+	// create json object
+	json j;
+
+	// return all font information
+	j["fonts"] = {};
+	for (auto& pair : m_fonts)
+	{
+		std::string fontTag = pair.first;
+		std::string fontFamily = pair.second.getInfo().family;
+		j["fonts"][fontTag] = fontFamily;
+	}
+
+	return j;
 }

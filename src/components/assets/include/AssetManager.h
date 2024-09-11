@@ -2,6 +2,9 @@
 #include <map>
 #include <string>
 #include <SFML/Graphics.hpp>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
 
 
 class AssetManager
@@ -25,4 +28,8 @@ public:
 
 	//###### Fonts ######
 	const sf::Font& getFont(const std::string& name) const; // get a font
+
+
+	// export data to json for testing
+	json toJSON();
 };

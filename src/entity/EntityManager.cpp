@@ -1,5 +1,5 @@
 #include "EntityManager.h"
-#include "component_generated.h"
+#include "entities_generated.h"
 #include "flatbuffers/flatbuffers.h"
 #include <fstream>
 #include "Scene.h"
@@ -47,14 +47,14 @@ void EntityManager::updateWaitingRooms()
 //{
 //
 //	
-//	std::string fileName = (std::string(FB_BINARIES_PATH) + sceneName + ".bin");
-//	// check binary file exists
+//	std::string fileName = (std::string(FB_BINARIES_PATH) + sceneName + "_entities" + ".bin");
+//	 check binary file exists
 //
 //	std::cout << "Reading binary file: " << fileName << std::endl;
 //
 //	std::vector<std::byte> buffer = utils::readBinaryFile(fileName);
 //
-//	//if buffer is empty exit intialiseEntities
+//	if buffer is empty exit intialiseEntities
 //	if (buffer.empty()) {
 //		std::cout << "No Entities to intialise" << std::endl;
 //		return;

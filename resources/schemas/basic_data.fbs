@@ -1,9 +1,0 @@
-namespace MyGame;
-
-table PullData {
-  variable_1: string;
-  variable_2: string;
-  variable_3: string;
-}
-
-root_type PullData;

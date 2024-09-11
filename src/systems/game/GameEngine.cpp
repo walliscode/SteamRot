@@ -19,6 +19,9 @@ void GameEngine::init()
 	// Create a new SFML window
 	m_window.create(sf::VideoMode(800, 600), "SFML window");
 
+	// create initial scenes
+	m_sceneManager.addScene("mainMenu", std::make_shared<SceneMainMenu>("mainMenu", 10, *this));
+
 
 }
 
@@ -140,6 +143,7 @@ void GameEngine::createJSON(const std::string& directoryName, const std::string&
 		// add the json object to the main json object
 		mainJson["GameEngine"] = GameEngine::toJSON();
 		mainJson["SceneManager"] = m_sceneManager.toJSON();
+		mainJson["AssetManager"] = m_sceneManager.getAssetManager().toJSON();
 	
 
 		// write the json object to the file

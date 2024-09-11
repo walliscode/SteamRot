@@ -1,4 +1,9 @@
 {
+    "AssetManager": {
+        "fonts": {
+            "SourceCodePro-Regular": "Source Code Pro"
+        }
+    },
     "GameEngine": {
         "loopNumber": 14
     },

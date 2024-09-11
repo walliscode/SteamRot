@@ -12,7 +12,8 @@ add_dependencies(AssetManager
 target_link_libraries(AssetManager PRIVATE
 	flatbuffers
 	sfml-graphics
-	utils)
+	utils
+	nlohmann_json)
 
 target_compile_definitions(AssetManager PRIVATE 
     RESOURCES_PATH="${RESOURCES_PATH}")

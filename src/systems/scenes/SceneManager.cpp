@@ -11,7 +11,7 @@ SceneManager::SceneManager(GameEngine& game) :
 {
 
 	// kick off initial scene(s)
-		addScene("mainMenu", std::make_shared<SceneMainMenu>("mainMenu", 10, game));
+		
 }
 
 
@@ -22,6 +22,9 @@ void SceneManager::addScene(std::string tag, std::shared_ptr<Scene> scene)
 
 	// as default behaviour, add to inactive scenes
 	m_inactiveScenes[tag] = scene;
+
+	// load the assets for the scene
+	m_assetManager.loadSceneAssets(tag);
 }
 
 void SceneManager::removeScene(std::string tag)
