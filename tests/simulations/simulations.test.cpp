@@ -27,5 +27,13 @@ TEST_CASE("Simulation 1 is run", "[Simulations]") {
 		REQUIRE(simulationResults["SceneManager"].contains(scene));
 	}
 
+	// test for required fonts
+	std::vector<std::string> fonts = { "SourceCodePro-Regular" };
+
+	REQUIRE(simulationResults["AssetManager"]["fonts"].size() == fonts.size());
+	for (auto font : fonts) {
+		REQUIRE(simulationResults["AssetManager"]["fonts"].contains(font));
+	}
+
 
 }

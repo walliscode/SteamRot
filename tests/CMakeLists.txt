@@ -8,7 +8,7 @@ add_executable(steamrot_tests
 	"entity/ArchetypeManager.test.cpp"
     "systems/scenes/Scene.test.cpp" 
 	"systems/scenes/SceneManager.test.cpp"
-	"components/assets/Assets.test.cpp"
+	"components/assets/AssetManager.test.cpp"
 	"simulations/simulations.test.cpp"
 )
 

@@ -14,14 +14,6 @@ TEST_CASE("Game is Run", "[GameEngine]") {
 	REQUIRE(window->isOpen());   // Check that the window is open
 
 
-	std::cout << "********************** Assets Tests *********************" << std::endl;
-	// Add all assets tests here
-	Assets& assets = game.getAssets();
-
-	const std::map<std::string, sf::Font>& fonts = assets.getFonts();
-	REQUIRE(fonts.size() > 0);  // Check that the assets object has fonts
-	REQUIRE(fonts.find("SourceCodePro-Regular") != fonts.end());  // Check that the assets object has the SourceCodePro-Regular font
-
 
 	std::cout << "********************** Scene Management Tests *********************" << std::endl;
 
@@ -52,6 +44,10 @@ TEST_CASE("Game is Run", "[GameEngine]") {
 	REQUIRE(testScene->getActive() == true);  // Check that the Test Scene is active
 
 	std::cout << "**********************Game Engine Scene Management Test END*********************" << "\n";
+
+	std::cout << "**********************Asset Manager Tests*********************" << std::endl;
+
+	
 }
 
 TEST_CASE("Simulation is run","[GameEngine]"){

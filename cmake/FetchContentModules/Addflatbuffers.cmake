@@ -18,8 +18,9 @@ message("###### Generating Data Files ######")
 ######### Straight to headers (no binary)#########
 
 set(HEADERS
-    "component"
+    "entities"
     "actions"
+    "fonts"
 )
 
 foreach(NAME ${HEADERS})
@@ -39,18 +40,19 @@ if(EXISTS ${FBS_FILE})
     endif()
 endforeach()
 
-######### Scene Entity Configurations with shared schema #########
+######### Scene Configurations with shared schema #########
 
-set(SCENE_CONFIG
-    "SceneTest"
+set(SCENE_TYPE
+    "sceneTest"
     "mainMenu"
 )
 
-### for adding entity configurations
-foreach(NAME ${SCENE_CONFIG})
-set(FBS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/resources/schemas/component.fbs")
-set(JSON_FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources/jsons/${NAME}.json)
-set(BINARY_FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources/binaries/${NAME}.bin)
+
+### SCENE ENTITIES
+foreach(NAME ${SCENE_TYPE})
+set(FBS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/resources/schemas/entities.fbs")
+set(JSON_FILE "${CMAKE_CURRENT_SOURCE_DIR}/resources/jsons/${NAME}_entities.json")
+set(BINARY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/resources/binaries/${NAME}_entities.bin")
 
 if(EXISTS ${FBS_FILE} AND EXISTS ${JSON_FILE})
     # output success message if they exist
@@ -67,8 +69,8 @@ if(EXISTS ${FBS_FILE} AND EXISTS ${JSON_FILE})
 endif()
 endforeach()
 
-### for adding scene actions
-foreach(NAME ${SCENE_CONFIG})
+### SCENE ACTIONS
+foreach(NAME ${SCENE_TYPE})
 set(FBS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/resources/schemas/actions.fbs")
 set(JSON_FILE "${CMAKE_CURRENT_SOURCE_DIR}/resources/jsons/${NAME}_actions.json")
 set(BINARY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/resources/binaries/${NAME}_actions.bin")
@@ -88,41 +90,24 @@ if(EXISTS ${FBS_FILE} AND EXISTS ${JSON_FILE})
 endif()
 endforeach()
 
-######### Curated List of Data Files #########
-set(DATA_FILES 
-    "basic_data"
-    "load_fonts"
-)
-#############################################
-
-foreach(NAME ${DATA_FILES})
-set(FBS_FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources/schemas/${NAME}.fbs)
-set(JSON_FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources/jsons/${NAME}.json)
-set(BINARY_FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources/binaries/${NAME}.bin)
-set(HEADER_FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources/generated_headers/${NAME}_generated.h)
+### SCENE FONTS
+foreach(NAME ${SCENE_TYPE})
+set(FBS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/resources/schemas/fonts.fbs")
+set(JSON_FILE "${CMAKE_CURRENT_SOURCE_DIR}/resources/jsons/${NAME}_fonts.json")
+set(BINARY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/resources/binaries/${NAME}_fonts.bin")
 
 if(EXISTS ${FBS_FILE} AND EXISTS ${JSON_FILE})
-    # output success message if they exist
-    message(STATUS "Found FlatBuffers schema and JSON file for ${NAME}")
-    # Generate the binary file
-    add_custom_command(
-    OUTPUT ${BINARY_FILE}
-    COMMAND ${FLATBUFFERS_FLATC_EXECUTABLE} -o ${CMAKE_CURRENT_SOURCE_DIR}/resources/binaries -b ${FBS_FILE} ${JSON_FILE}
-    DEPENDS ${JSON_FILE}
-    COMMENT "Generating binary FlatBuffers file from ${JSON_FILE}"
-    )
-    list(APPEND GENERATED_FILES ${BINARY_FILE})
+	# output success message if they exist
+	message(STATUS "Found FlatBuffers schema and JSON file for fonts for ${NAME}")
+	# Generate the binary file
+	add_custom_command(
+	OUTPUT ${BINARY_FILE}
+	COMMAND ${FLATBUFFERS_FLATC_EXECUTABLE} -o ${CMAKE_CURRENT_SOURCE_DIR}/resources/binaries -b ${FBS_FILE} ${JSON_FILE}
+	DEPENDS ${JSON_FILE}
+	COMMENT "Generating binary FlatBuffers file from ${JSON_FILE}"
+	)
+	list(APPEND GENERATED_FILES ${BINARY_FILE})
 
-    # Generate the header file
-    add_custom_command(
-    OUTPUT ${HEADER_FILE}
-    COMMAND ${FLATBUFFERS_FLATC_EXECUTABLE} -o ${CMAKE_CURRENT_SOURCE_DIR}/resources/generated_headers -c ${FBS_FILE}
-    DEPENDS ${FBS_FILE}
-    COMMENT "Generating FlatBuffers header file from ${FBS_FILE}"
-    )
-
-    list(APPEND GENERATED_FILES ${HEADER_FILE})
-    
 endif()
 endforeach()
 

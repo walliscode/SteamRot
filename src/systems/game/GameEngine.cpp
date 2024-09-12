@@ -9,7 +9,7 @@ namespace fs = std::filesystem;
 
 
 
-GameEngine::GameEngine() : m_assets(), m_sceneManager(*this)
+GameEngine::GameEngine() : m_sceneManager(*this)
 {
 	init(); // kick off the game, loading assets de.t.c
 }
@@ -18,6 +18,9 @@ void GameEngine::init()
 {
 	// Create a new SFML window
 	m_window.create(sf::VideoMode(800, 600), "SFML window");
+
+	// create initial scenes
+	m_sceneManager.addScene("mainMenu", std::make_shared<SceneMainMenu>("mainMenu", 10, *this));
 
 
 }
@@ -61,11 +64,6 @@ void GameEngine::update()
 sf::RenderWindow* GameEngine::getWindow()
 {
 	return & m_window;
-}
-
-Assets& GameEngine::getAssets()
-{
-	return m_assets;
 }
 
 
@@ -145,6 +143,7 @@ void GameEngine::createJSON(const std::string& directoryName, const std::string&
 		// add the json object to the main json object
 		mainJson["GameEngine"] = GameEngine::toJSON();
 		mainJson["SceneManager"] = m_sceneManager.toJSON();
+		mainJson["AssetManager"] = m_sceneManager.getAssetManager().toJSON();
 	
 
 		// write the json object to the file

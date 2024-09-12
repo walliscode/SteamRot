@@ -1,5 +1,5 @@
 #include <SFML/Graphics.hpp>
-#include "Assets.h"
+
 #include "Scene.h"
 #include <map>
 #include "SceneManager.h"
@@ -13,7 +13,7 @@ class GameEngine
 	private:
 
 		sf::RenderWindow  m_window; // SFML window
-		Assets            m_assets;       // Assets object
+		
 		SceneManager      m_sceneManager; // Scene manager object
 		SceneList		  m_scenes;       // A map of scenes with a custom key
 		size_t 			  m_loopNumber = 0;   // Number of loops the game has run
@@ -33,8 +33,7 @@ class GameEngine
 		json toJSON(); // convert parts of the GameEngine object to JSON, take a string as a container name for the json
 		void createJSON(const std::string& directoryName, const std::string& fileName); // Create a JSON file from parts specificed by toJSON functions from each class. This enables multiple jsons to be created with different structures
 		json extractJSON(const std::string& directoryName, const std::string& fileName); // given a json file location, turn file into json object 
-		//######### Asset Functions #########
-		Assets& getAssets(); // Get the assets
+		
 
 		//######### Scene Management Functions #########
 		SceneManager& getSceneManager(); // Get the scene manager
