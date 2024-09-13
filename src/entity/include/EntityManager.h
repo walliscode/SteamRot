@@ -25,7 +25,7 @@ public:
 	void removeEntity(size_t id); //remove the entity with the supplied id
 	void updateWaitingRooms(); //update the entity list with the entities to add and remove
 
-	//void intialiseEntities(std::string sceneName); //initialise the entities for the scene
+	void intialiseEntities(std::string sceneName); //initialise the entities for the scene
 
 	
 	template <typename T>

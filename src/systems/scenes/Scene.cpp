@@ -7,8 +7,8 @@
 #include <fstream>
 
 
-Scene::Scene(const std::string& name, size_t poolSize, GameEngine& game)
-    : m_name(name), m_entityManager(poolSize, *this), m_engine(game) {
+Scene::Scene(const std::string& name, size_t poolSize, GameEngine& game, SceneManager& sceneManager)
+    : m_name(name), m_entityManager(poolSize, *this), m_engine(game), m_sceneManager(sceneManager) {
 	
 
 	/*this->m_entityManager.intialiseEntities(this->m_name);*/
@@ -59,6 +59,10 @@ void Scene::setActive(bool active) {
 
 GameEngine& Scene::getEngine() {
 	return m_engine;
+}
+
+SceneManager& Scene::getSceneManager() {
+	return m_sceneManager;
 }
 
 // ####### Actions Functions #######

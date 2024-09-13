@@ -1,7 +1,7 @@
 #include "SceneMainMenu.h"
 
-SceneMainMenu::SceneMainMenu(const std::string& name, size_t poolSize, GameEngine& game)
-	: Scene(name, poolSize, game) {
+SceneMainMenu::SceneMainMenu(const std::string& name, size_t poolSize, GameEngine& game, SceneManager& sceneManager)
+	: Scene(name, poolSize, game, sceneManager) {
 }
 
 void SceneMainMenu::update() {

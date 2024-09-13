@@ -2,6 +2,8 @@
 #include <SFML/Graphics.hpp>
 
 #include "Component.h"
+#include "flatbuffers/flatbuffers.h"
+#include "entities_generated.h"
 
 class CTransform : public Component   //Inherit component base class
 {
@@ -17,4 +19,7 @@ public:
 	{
 
 	}
+
+	void fromFlatbuffers(const SteamRot::rawData::TransformComponent* transform); //Function to assign a CTransform from a flatbuffer transform
+	
 };

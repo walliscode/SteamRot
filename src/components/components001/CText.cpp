@@ -16,3 +16,8 @@ sf::Text& CText::getText()
 {
 	return text;
 }
+
+void CText::fromFlatbuffers(const SteamRot::rawData::TextComponent* text, const sf::Font& font)
+{
+	setText(font, text->text()->str(), text->text()->size());
+}
