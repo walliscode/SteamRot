@@ -11,7 +11,7 @@ Scene::Scene(const std::string& name, size_t poolSize, GameEngine& game, SceneMa
     : m_name(name), m_entityManager(poolSize, *this), m_engine(game), m_sceneManager(sceneManager) {
 	
 
-	/*this->m_entityManager.intialiseEntities(this->m_name);*/
+	this->m_entityManager.intialiseEntities(this->m_name);
 	this->registerActions(this->m_name);
 }
 
@@ -63,6 +63,10 @@ GameEngine& Scene::getEngine() {
 
 SceneManager& Scene::getSceneManager() {
 	return m_sceneManager;
+}
+
+EntityManager& Scene::getEntityManager() {
+	return m_entityManager;
 }
 
 // ####### Actions Functions #######

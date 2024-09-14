@@ -38,6 +38,7 @@ public:
 
 	GameEngine& getEngine(); // Get the game engine
 	SceneManager& getSceneManager(); // Get the scene manager
+	EntityManager& getEntityManager(); // Get the entity manager
 
 	// ####### Actions Functions #######
 	ActionMap& getActionMap(); // Get the action map

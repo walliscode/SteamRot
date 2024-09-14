@@ -66,22 +66,30 @@ void EntityManager::intialiseEntities(std::string sceneName)
 	std::cout << "Iterating through entity list" << std::endl;
 	for (const auto entity : *entityList->entities())
 	{
+		// create a new entity (this will create all the new components
 		size_t entityID = addEntity();
 
+		// if the flatbuffers buffer has the data then add to that entity
 		if (entity->transform()) {
 			auto& cTransform = getComponent<CTransform>(entityID); //get the transform component at the new entity index
 			cTransform.fromFlatbuffers(entity->transform()); //populate the transform component with the flatbuffer transform data
+			std::cout << "Transform added for entity: " << entityID << std::endl;
 		}
 
 		if (entity->text_display()) {
-
 			
 			auto& cText = getComponent<CText>(entityID); //get the text component at the new entity index
 			const auto& font = m_scene.getSceneManager().getAssetManager().getFont(entity->text_display()->font()->str()); //get the font from the asset manager
 			cText.fromFlatbuffers(entity->text_display(), font); //populate the text component with the flatbuffer text data
+			std::cout << "Text added for entity: " << entityID << std::endl;
 	
 		}
-		std::cout << "Entity added" << std::endl;
+
+		if(entity->meta()){
+			auto& cMeta = getComponent<CMeta>(entityID); //get the meta component at the new entity index
+			cMeta.fromFlatbuffers(entity->meta()); //populate the meta component with the flatbuffer meta data
+			std::cout << "Meta added for entity: " << entityID << std::endl;
+		}
 	}
 	std::cout << "Entities intialised" << std::endl;
 
@@ -99,4 +107,22 @@ EntityMemoryPool& EntityManager::getPool()
 std::vector<size_t> EntityManager::getEntities()
 {
 	return m_entities;
+}
+
+json EntityManager::toJSON()
+{
+	json j;
+
+	// add data for each entity under "entityData" key
+	for (auto& entity : m_entities)
+	{
+		json entityData;
+		entityData["entityID"] = entity;
+		entityData["CTransform"] = getComponent<CTransform>(entity).toJSON();
+		entityData["CText"] = getComponent<CText>(entity).toJSON();
+		entityData["CMeta"] = getComponent<CMeta>(entity).toJSON();
+		j["entityData"].push_back(entityData);
+	}
+	
+	return j;
 }

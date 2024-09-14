@@ -8,3 +8,11 @@ void CTransform::fromFlatbuffers(const SteamRot::rawData::TransformComponent* tr
 	velocity.y = transform->velocity()->y();
 
 }
+
+json CTransform::toJSON()
+{
+	json j;
+	j["position"] = { position.x, position.y };
+	j["velocity"] = { velocity.x, velocity.y };
+	return j;
+}

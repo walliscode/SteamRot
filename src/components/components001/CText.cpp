@@ -17,7 +17,16 @@ sf::Text& CText::getText()
 	return text;
 }
 
-void CText::fromFlatbuffers(const SteamRot::rawData::TextComponent* text, const sf::Font& font)
+void CText::fromFlatbuffers(const SteamRot::rawData::TextComponent* text_component, const sf::Font& font)
 {
-	setText(font, text->text()->str(), text->text()->size());
+	setText(font, text_component->text()->str(), text_component->font_size());
+}
+
+json CText::toJSON()
+{
+	json j;
+	j["text"] = text.getString();
+	j["font_size"] = text.getCharacterSize();
+	j["font"] = text.getFont()->getInfo().family;
+	return j;
 }

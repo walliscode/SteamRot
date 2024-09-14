@@ -4,6 +4,9 @@
 #include "Component.h"
 #include "flatbuffers/flatbuffers.h"
 #include "entities_generated.h"
+#include "nlohmann/json.hpp"
+
+using json = nlohmann::json;
 
 class CTransform : public Component   //Inherit component base class
 {
@@ -22,4 +25,5 @@ public:
 
 	void fromFlatbuffers(const SteamRot::rawData::TransformComponent* transform); //Function to assign a CTransform from a flatbuffer transform
 	
+	json toJSON(); // return the component data as json object
 };

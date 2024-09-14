@@ -3,6 +3,9 @@
 #include "Component.h"
 #include "flatbuffers/flatbuffers.h"
 #include "entities_generated.h"
+#include "nlohmann/json.hpp"
+
+using json = nlohmann::json;
 
 class CText : public Component
 {
@@ -16,5 +19,7 @@ public:
 	sf::Text& getText();
 
 	void fromFlatbuffers(const SteamRot::rawData::TextComponent* text, const sf::Font& font);
+
+	json toJSON();
 	
 };

@@ -20,12 +20,16 @@ TEST_CASE("Simulation 1 is run", "[Simulations]") {
 	std::vector<std::string> scenes = {"mainMenu"};
 	
 	// check that the SceneManager has the required scenes and not any extra or less
-	REQUIRE(simulationResults["SceneManager"].size() == scenes.size());
+	REQUIRE(simulationResults["SceneManager"]["scenes"].size() == scenes.size());
 
 	// test for specific scenes
 	for (auto scene : scenes) {
-		REQUIRE(simulationResults["SceneManager"].contains(scene));
+		REQUIRE(simulationResults["SceneManager"]["scenes"].contains(scene));
 	}
+
+	// test for entities/entity data in specific scenes
+
+	REQUIRE(simulationResults["SceneManager"]["scenes"]["mainMenu"]["entities"].size() == 1);
 
 	// test for required fonts
 	std::vector<std::string> fonts = { "SourceCodePro-Regular" };

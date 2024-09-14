@@ -15,16 +15,19 @@ SceneManager::SceneManager(GameEngine& game) :
 }
 
 
-void SceneManager::addScene(std::string tag, std::shared_ptr<Scene> scene)
+void SceneManager::addScene(std::string tag, const size_t poolSize)
 {
+	// load the assets for the scene, this needs to come before the scene is created as the assets are needed
+	m_assetManager.loadSceneAssets(tag);
+
+	auto scene = std::make_shared<SceneMainMenu>(tag, poolSize, m_game, *this);
 	// add to all scenes
 	m_allScenes[tag] = scene;
 
 	// as default behaviour, add to inactive scenes
 	m_inactiveScenes[tag] = scene;
 
-	// load the assets for the scene
-	m_assetManager.loadSceneAssets(tag);
+	
 }
 
 void SceneManager::removeScene(std::string tag)
@@ -130,11 +133,12 @@ json SceneManager::toJSON()
 	// create json object
 	json j;
 
-	// for Scene in m_Scenes, return the tag name and whether the ptr is null or not
+	// for Scene in m_Scenes, return information about the scene (including entity info e.t.c.
 	for (auto& pair : m_allScenes)
 	{
+		j["scenes"][pair.first]["entities"] = pair.second->getEntityManager().toJSON();
 		bool isNotNull = pair.second != nullptr; // shared ptrs have a bool operator that returns true if the ptr is not null
-		j[pair.first] = isNotNull;
+		j["scenes"][pair.first]["notNull"] = isNotNull;
 	}
 
 	return j;

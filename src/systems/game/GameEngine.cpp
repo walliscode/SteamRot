@@ -20,7 +20,7 @@ void GameEngine::init()
 	m_window.create(sf::VideoMode(800, 600), "SFML window");
 
 	// create initial scenes
-	m_sceneManager.addScene("mainMenu", std::make_shared<SceneMainMenu>("mainMenu", 10, *this, m_sceneManager));
+	m_sceneManager.addScene("mainMenu", 10);
 
 
 }

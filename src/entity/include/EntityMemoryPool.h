@@ -52,5 +52,8 @@ public:
 		std::cout << "Tuple definition complete\n\n";
 	}
 
+	// data extraction methods
+
+	json toJSON(); // get component data and any relevant class data and return as json
 	
 };

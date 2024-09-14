@@ -5,9 +5,13 @@ add_library(Component
 
 target_include_directories(Component PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}/include
+	
 )
 
+
+
 add_library(Component001
+	Component.cpp
 	CTransform.cpp 
 	CMeta.cpp
 	CText.cpp
@@ -15,9 +19,11 @@ add_library(Component001
 target_include_directories(Component001 PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}/include
 	${CMAKE_SOURCE_DIR}/resources/generated_headers
+	
 )
 
 target_link_libraries(Component001 PUBLIC
 	sfml-graphics
 	flatbuffers
+	nlohmann_json
 )
