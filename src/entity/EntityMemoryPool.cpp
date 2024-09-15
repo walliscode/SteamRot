@@ -26,10 +26,3 @@ std::shared_ptr<EntityComponentVectorTuple> EntityMemoryPool::getData()
 {
 	return m_data;
 }
-
-json EntityMemoryPool::toJSON()
-{
-	json j;
-	
-	return j;
-}

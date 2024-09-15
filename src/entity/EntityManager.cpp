@@ -109,6 +109,7 @@ std::vector<size_t> EntityManager::getEntities()
 	return m_entities;
 }
 
+// convert the component data to json and other entity data
 json EntityManager::toJSON()
 {
 	json j;

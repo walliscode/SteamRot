@@ -1,6 +1,6 @@
 #include "CText.h"
 
-
+// set the text object, taking in the font, the string, and the character size
 void CText::setText(const sf::Font& f, const std::string& words, const size_t chr_size)
 {
 	text.setFont(f);
@@ -12,6 +12,7 @@ void CText::setText(const sf::Font& f, const std::string& words, const size_t ch
 	text.setOrigin(textRect.width / 2.0f, textRect.height / 2.0f);
 }
 
+// get the text object by reference
 sf::Text& CText::getText()
 {
 	return text;
