@@ -136,7 +136,7 @@ json SceneManager::toJSON()
 	// for Scene in m_Scenes, return information about the scene (including entity info e.t.c.
 	for (auto& pair : m_allScenes)
 	{
-		j["scenes"][pair.first]["entities"] = pair.second->getEntityManager().toJSON();
+		j["scenes"][pair.first] = pair.second->toJSON();
 		bool isNotNull = pair.second != nullptr; // shared ptrs have a bool operator that returns true if the ptr is not null
 		j["scenes"][pair.first]["notNull"] = isNotNull;
 	}

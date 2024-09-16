@@ -65,9 +65,7 @@ SceneManager& Scene::getSceneManager() {
 	return m_sceneManager;
 }
 
-EntityManager& Scene::getEntityManager() {
-	return m_entityManager;
-}
+
 
 // ####### Actions Functions #######
 void Scene::registerActions(const std::string& sceneName) {
@@ -111,5 +109,11 @@ void Scene::doAction(const Action& action) {
 		return;
 	}
 	sDoAction(action);
+}
+
+json Scene::toJSON() {
+	json j;
+	j["entities"] = m_entityManager.toJSON();
+	return j;
 }
 
