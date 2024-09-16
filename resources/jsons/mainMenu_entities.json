@@ -6,8 +6,8 @@
       },
       "transform": {
         "position": {
-          "x": 100.0,
-          "y": 100.0
+          "x": 200.0,
+          "y": 200.0
         },
         "velocity": {
           "x": 0.0,
@@ -17,7 +17,7 @@
       "text_display": {
         "text": "SteamRot",
         "font": "SourceCodePro-Regular",
-        "size": 24
+        "font_size": 60
       }
     }
   ]

@@ -35,7 +35,7 @@ void AssetManager::loadFonts(const std::string& sceneType)
 
 	// iterate hrough the list of fonts and add them to the asset manager
 	for (const auto font : *font_list->fonts()) {
-		// ssearch the map to see if key already exists
+		// search the map to see if key already exists
 		auto it = m_fonts.find(font->tag()->str());
 		if (it != m_fonts.end())
 		{

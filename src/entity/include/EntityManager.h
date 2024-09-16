@@ -1,6 +1,9 @@
 #pragma once
 #include <vector>
 #include "EntityMemoryPool.h"
+#include "nlohmann/json.hpp"
+
+using json = nlohmann::json;
 
 class Scene; //forward declaration of scene class to avoid circular dependency
 
@@ -25,7 +28,7 @@ public:
 	void removeEntity(size_t id); //remove the entity with the supplied id
 	void updateWaitingRooms(); //update the entity list with the entities to add and remove
 
-	//void intialiseEntities(std::string sceneName); //initialise the entities for the scene
+	void intialiseEntities(std::string sceneName); //initialise the entities for the scene
 
 	
 	template <typename T>
@@ -75,5 +78,10 @@ public:
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// all functions related to archetype management
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// extracting data to json
+
+	json toJSON(); //extract data to a json object
+	
 };
 

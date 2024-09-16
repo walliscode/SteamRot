@@ -1,5 +1,10 @@
 #pragma once
 #include "Component.h"
+#include "flatbuffers/flatbuffers.h"
+#include "entities_generated.h"
+#include "nlohmann/json.hpp"
+
+using json = nlohmann::json;
 
 
 class CMeta : public Component {
@@ -17,5 +22,7 @@ public:
 
 	CMeta() = default; // default constructor for memory allocation
 	
+	void fromFlatbuffers(const SteamRot::rawData::MetaComponent* meta); // used to set the component from flatbuffers data
 
+	json toJSON(); // used to convert the component to json data
 };

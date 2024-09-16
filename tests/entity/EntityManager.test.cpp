@@ -1,7 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 #include "EntityManager.h"
-#include "TestScene.h"
-#include "Scene.h"
+#include "SceneTest.h"
 #include "GameEngine.h"
 
 
@@ -16,7 +15,7 @@ TEST_CASE("Entity Manager tests", "[EntityManager]") {
 	std::cout << "Creating GameEngine to pass to TestScene" << std::endl;
 	GameEngine gameEngine;
 	std::cout << "creating Test Scene to pass to EntityManager" << std::endl;
-	std::shared_ptr<TestScene> testScene(new TestScene("TestScene", 100, gameEngine));
+	std::shared_ptr<SceneTest> testScene(std::make_shared<SceneTest>("TestScene", 100, gameEngine, gameEngine.getSceneManager()));
 
 	std::cout << "Creating EntityManager to test" << std::endl;
 	std::shared_ptr<EntityManager> testManager(new EntityManager(100, *testScene));

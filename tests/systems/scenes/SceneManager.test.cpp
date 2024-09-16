@@ -1,5 +1,4 @@
 #include <catch2/catch_test_macros.hpp>
-#include "TestScene.h"
 #include "GameEngine.h"
 
 TEST_CASE("SceneManager is created", "[SceneManager]") {
@@ -11,7 +10,7 @@ TEST_CASE("SceneManager is created", "[SceneManager]") {
 	REQUIRE(sceneManager.getInactiveScenes().size() == 1); // Check that the inactive scene list is not empty
 	REQUIRE(sceneManager.getInteractiveScenes().size() == 0); // Check that the interactive scene list is empty
 	// check functions of SceneManager
-	sceneManager.addScene("testScene", std::make_shared<TestScene>("testScene", 10, game));
+	sceneManager.addScene("testScene", 10);
 	REQUIRE(sceneManager.getAllScenes().size() == 2); // Check that the scene list has increased by 1
 
 	sceneManager.removeScene("testScene");

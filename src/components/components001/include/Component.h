@@ -1,6 +1,7 @@
 #pragma once
 #include <tuple>
 
+
 class Component {
 protected:
 	bool has = false; // if the entity has this 

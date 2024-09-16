@@ -24,7 +24,7 @@ private:
 	
 public:
 	SceneManager(GameEngine& game);
-	void addScene(std::string tag, std::shared_ptr<Scene> scene);
+	void addScene(std::string tag, size_t poolSize);
 	void removeScene(std::string tag);
 	void activateScene(std::string tag);
 	void deactivateScene(std::string tag);

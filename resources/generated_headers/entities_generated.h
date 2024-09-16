@@ -194,7 +194,7 @@ struct TextComponent FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TEXT = 4,
     VT_FONT = 6,
-    VT_SIZE = 8
+    VT_FONT_SIZE = 8
   };
   const ::flatbuffers::String *text() const {
     return GetPointer<const ::flatbuffers::String *>(VT_TEXT);
@@ -202,8 +202,8 @@ struct TextComponent FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ::flatbuffers::String *font() const {
     return GetPointer<const ::flatbuffers::String *>(VT_FONT);
   }
-  int32_t size() const {
-    return GetField<int32_t>(VT_SIZE, 0);
+  int32_t font_size() const {
+    return GetField<int32_t>(VT_FONT_SIZE, 0);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -211,7 +211,7 @@ struct TextComponent FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyString(text()) &&
            VerifyOffset(verifier, VT_FONT) &&
            verifier.VerifyString(font()) &&
-           VerifyField<int32_t>(verifier, VT_SIZE, 4) &&
+           VerifyField<int32_t>(verifier, VT_FONT_SIZE, 4) &&
            verifier.EndTable();
   }
 };
@@ -226,8 +226,8 @@ struct TextComponentBuilder {
   void add_font(::flatbuffers::Offset<::flatbuffers::String> font) {
     fbb_.AddOffset(TextComponent::VT_FONT, font);
   }
-  void add_size(int32_t size) {
-    fbb_.AddElement<int32_t>(TextComponent::VT_SIZE, size, 0);
+  void add_font_size(int32_t font_size) {
+    fbb_.AddElement<int32_t>(TextComponent::VT_FONT_SIZE, font_size, 0);
   }
   explicit TextComponentBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -244,9 +244,9 @@ inline ::flatbuffers::Offset<TextComponent> CreateTextComponent(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::String> text = 0,
     ::flatbuffers::Offset<::flatbuffers::String> font = 0,
-    int32_t size = 0) {
+    int32_t font_size = 0) {
   TextComponentBuilder builder_(_fbb);
-  builder_.add_size(size);
+  builder_.add_font_size(font_size);
   builder_.add_font(font);
   builder_.add_text(text);
   return builder_.Finish();
@@ -256,14 +256,14 @@ inline ::flatbuffers::Offset<TextComponent> CreateTextComponentDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const char *text = nullptr,
     const char *font = nullptr,
-    int32_t size = 0) {
+    int32_t font_size = 0) {
   auto text__ = text ? _fbb.CreateString(text) : 0;
   auto font__ = font ? _fbb.CreateString(font) : 0;
   return SteamRot::rawData::CreateTextComponent(
       _fbb,
       text__,
       font__,
-      size);
+      font_size);
 }
 
 struct Entity FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {

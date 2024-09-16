@@ -1,6 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
 #include "GameEngine.h"
-#include "TestScene.h"
 #include <iostream>
 
 
@@ -13,41 +12,6 @@ TEST_CASE("Game is Run", "[GameEngine]") {
 	REQUIRE(window != nullptr);  // Check that the window is created
 	REQUIRE(window->isOpen());   // Check that the window is open
 
-
-
-	std::cout << "********************** Scene Management Tests *********************" << std::endl;
-
-	SceneManager& sceneManager = game.getSceneManager();
-	SceneList& testScenes = sceneManager.getAllScenes();
-
-	std::cout << "Checking that the scene list is empty" << std::endl;
-	REQUIRE(testScenes.size() == 1);  // Check that the scene list is empty
-
-	std::cout << "Creating a Test Scene\n";
-	std::shared_ptr<TestScene> testScene = std::make_shared<TestScene>("SceneTest", 10, game);
-	std::cout << "Adding the Test Scene to the Game Engine\n";
-	sceneManager.addScene("SceneTest", testScene);
-	std::cout << "Checking that the scene list has one scene\n";
-	REQUIRE(testScenes.size() == 2);  // Check that the scene list has one scene
-
-	std::cout << "Checking that the Test Scene is active\n";
-	REQUIRE(testScene->getActive() == true);  // Check that the Test Scene is active
-
-	std::cout << "Deactivating the Test Scene\n";
-	sceneManager.deactivateScene("SceneTest");
-	std::cout << "Checking that the Test Scene is not active\n";
-	REQUIRE(testScene->getActive() == false);  // Check that the Test Scene is not active
-
-	std::cout << "Activating the Test Scene\n";
-	sceneManager.activateScene("SceneTest");
-	std::cout << "Checking that the Test Scene is active\n";
-	REQUIRE(testScene->getActive() == true);  // Check that the Test Scene is active
-
-	std::cout << "**********************Game Engine Scene Management Test END*********************" << "\n";
-
-	std::cout << "**********************Asset Manager Tests*********************" << std::endl;
-
-	
 }
 
 TEST_CASE("Simulation is run","[GameEngine]"){

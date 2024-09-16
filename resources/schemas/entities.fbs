@@ -17,7 +17,7 @@ table TransformComponent {
 table TextComponent {
 	text: string;
 	font: string;
-	size: int;
+	font_size: int;
 }
 
 table Entity{
