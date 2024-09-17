@@ -37,7 +37,7 @@ void EntityManager::updateWaitingRooms()
 		std::get<std::vector<CMeta>>(*(*m_pool).getData())[entityIndex].deactivate(); //set the active vector to false at the passed entity index
 		auto toRemove = std::find(m_entities.begin(), m_entities.end(), entityIndex);
 
-		m_archetypeManager.clearEntity(entityIndex); //remove the entity from the archetype manager
+		m_archetypeManager.clearEntity(entityIndex, {}); //remove the entity from the archetype manager
 		m_entities.erase(toRemove); //remove the entity from the current active entities list
 	}
 	m_entitiesToRemove.clear(); //clear the to remove waiting room
@@ -134,6 +134,11 @@ json EntityManager::toJSON()
 	}
 	
 	return j;
+}
+
+const ArchetypeManager& EntityManager::getArchetypeManager() const
+{
+	return m_archetypeManager;
 }
 
 //Pass through functions for handling archetypes

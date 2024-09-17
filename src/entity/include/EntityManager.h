@@ -82,6 +82,8 @@ public:
 	// all functions related to archetype management
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	const ArchetypeManager& getArchetypeManager() const; //function for returning archtype manager for testing and if required
+
 	const Archetype& getExactArchetype(std::vector<std::string> requirements) const; //pass through for getting exact archetype
 	const std::vector<size_t>& getExactArchetypeEntities(std::vector<std::string> requirements) const; //pass through for getting exact archetype entities
 
