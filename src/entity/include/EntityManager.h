@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "EntityMemoryPool.h"
+#include "ArchetypeManager.h"
 #include "nlohmann/json.hpp"
 
 using json = nlohmann::json;
@@ -15,6 +16,8 @@ private:
 	std::vector<size_t> m_entitiesToRemove;  //list of entities to remove next update
 	std::shared_ptr<EntityMemoryPool>  m_pool; //pool of all entity data
 	Scene& m_scene; //scene the manager is attached to
+
+	ArchetypeManager m_archetypeManager; //archetype manager to handle entity set searching
 
 public:
 	EntityManager(size_t poolSize,Scene& scene );  //constructor to create a new manager with a size of pool to manage
@@ -78,6 +81,14 @@ public:
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// all functions related to archetype management
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	const ArchetypeManager& getArchetypeManager() const; //function for returning archtype manager for testing and if required
+
+	const Archetype& getExactArchetype(std::vector<std::string> requirements) const; //pass through for getting exact archetype
+	const std::vector<size_t>& getExactArchetypeEntities(std::vector<std::string> requirements) const; //pass through for getting exact archetype entities
+
+	const std::shared_ptr<std::vector<Archetype>> getInclusiveArchetype(std::vector<std::string> requirements) const; //pass through for getting archetypes of inclusive component sets
+	const std::shared_ptr <std::vector<size_t>> getInclusiveArchetypeEntities(std::vector<std::string> requirements) const; //pass through for getting entities for inclusive component sets
 
 	// extracting data to json
 

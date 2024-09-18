@@ -46,10 +46,12 @@ TEST_CASE("Entity Manager tests", "[EntityManager]") {
 
 	std::cout << "Entities in active list: " << (*testManager).getEntities().size() << "\n";
 	REQUIRE((*testManager).getEntities().size() == 0); // Check that the active entities list is empty
+	REQUIRE((*testManager).getArchetypeManager().getArchetypes().size() == 0); // Check that no archetypes are present in the entity manager
 	(*testManager).updateWaitingRooms();
 	std::cout << "Waiting rooms updated\n";
 	std::cout << "Entities in active list: " << (*testManager).getEntities().size() << "\n";
 	REQUIRE((*testManager).getEntities().size() == 1); // Check that the active entities list is not empty now
+	REQUIRE((*testManager).getArchetypeManager().getArchetypes().size() == 1); // Check that an archetype has been created for the entity
 
 
 	(*testManager).removeEntity(0);
