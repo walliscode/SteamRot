@@ -1,5 +1,3 @@
-#pragma once
-
 #include "ArchetypeManager.h"
 #include "Config.h"
 #include <iostream>
