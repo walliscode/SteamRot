@@ -1,4 +1,3 @@
-#pragma once
 #include "Archetype.h"
 #include <algorithm>
 #include <memory>

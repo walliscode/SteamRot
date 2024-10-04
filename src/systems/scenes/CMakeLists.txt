@@ -1,5 +1,6 @@
 add_library(Scene
 Scene.cpp
+Container.cpp
 SceneMainMenu.cpp)
 
 target_include_directories(Scene PUBLIC
