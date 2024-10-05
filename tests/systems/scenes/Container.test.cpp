@@ -14,7 +14,7 @@ TEST_CASE("Container") {
 	REQUIRE(container.getEntityIndexes()[0] == 1);
 
 
-	sf::Vector2f size(2.0f, 2.0f);
+	sf::Vector2f size(0.5f, 0.5f);
 	container.setProportionalSize(size);
 	REQUIRE(container.getProportionalSize() == size);
 

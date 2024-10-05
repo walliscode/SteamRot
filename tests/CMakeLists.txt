@@ -9,6 +9,7 @@ add_executable(steamrot_tests
     "systems/scenes/Scene.test.cpp" 
 	"systems/scenes/SceneManager.test.cpp"
 	"systems/scenes/Container.test.cpp"
+	"systems/scenes/ContainerManager.test.cpp"
 	"components/assets/AssetManager.test.cpp"
 	"simulations/simulations.test.cpp"
 )
