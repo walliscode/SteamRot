@@ -1,9 +1,9 @@
 ﻿
-cmake_minimum_required (VERSION 3.28)
+cmake_minimum_required (VERSION 3.30)
 
 project(SteamRot
-	VERSION 0.1.0.0
-	LANGUAGES CXX)
+     VERSION 0.1.0.0
+ LANGUAGES CXX)
 
 enable_testing()
 
@@ -13,7 +13,7 @@ enable_testing()
 # Require C++20, but let a parent project ask for something higher
 if(DEFINED CMAKE_CXX_STANDARD)
   if(CMAKE_CXX_STANDARD MATCHES "^(90|99)$" OR CMAKE_CXX_STANDARD LESS 20)
-  message(FATAL_ERROR "This project requires at least C++20")
+    message(FATAL_ERROR "This project requires at least C++20")
   endif()
 else()
   set(CMAKE_CXX_STANDARD 20)
@@ -45,7 +45,7 @@ set(DATA_OUT_DIR "${CMAKE_SOURCE_DIR}/data_out/") # for outputting data files fr
 
 # make sure the data output directory exists
 if (NOT EXISTS ${DATA_OUT_DIR})
-	file(MAKE_DIRECTORY ${DATA_OUT_DIR})
+  file(MAKE_DIRECTORY ${DATA_OUT_DIR})
 endif()
 # messages for posterity
 message("CMake runtime output directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
@@ -74,12 +74,12 @@ include_directories(${CMAKE_SOURCE_DIR}/external)
 
 # add different defintions for different targets
 target_compile_definitions(GameEngine PRIVATE
-	DATA_OUT_DIR="${DATA_OUT_DIR}")
+ DATA_OUT_DIR="${DATA_OUT_DIR}")
 
 target_compile_definitions(EntityManager PRIVATE
     FB_BINARIES_PATH="${FB_BINARIES_PATH}")
 
-target_compile_definitions(AssetManager PRIVATE 
+target_compile_definitions(AssetManager PRIVATE
     RESOURCES_PATH="${RESOURCES_PATH}")
 target_compile_definitions(AssetManager PRIVATE
     FB_BINARIES_PATH="${FB_BINARIES_PATH}")
@@ -91,18 +91,18 @@ install(TARGETS SteamRot) # creates an install folder under installDir (in CMake
 
 # useful function and variables
 function(check_targets target_list) # this function can be called in any cmakelists.txt file to check if targets are being propagated
-    foreach(target ${${target_list}})
-        if(TARGET ${target})
-            message(STATUS "In directory ${CMAKE_CURRENT_SOURCE_DIR}, target '${target}' has been defined.")
-        else()
-            message(WARNING "In directory ${CMAKE_CURRENT_SOURCE_DIR}, target '${target}' has not been defined.")
-        endif()
-    endforeach()
+  foreach(target ${${target_list}})
+    if(TARGET ${target})
+      message(STATUS "In directory ${CMAKE_CURRENT_SOURCE_DIR}, target '${target}' has been defined.")
+    else()
+      message(WARNING "In directory ${CMAKE_CURRENT_SOURCE_DIR}, target '${target}' has not been defined.")
+    endif()
+  endforeach()
 endfunction()
 
 
 
-set(MY_TARGET_LIST 
+set(MY_TARGET_LIST
     SteamRot
     GameEngine
     sfml-graphics
@@ -119,6 +119,6 @@ check_targets(MY_TARGET_LIST)
 # for if you need to print out all available cmake variables into the cmake terminal
 #get_cmake_property(_variableNames VARIABLES)
 #foreach (_variableName ${_variableNames})
- #  message(STATUS "${_variableName}=${${_variableName}}")
+#  message(STATUS "${_variableName}=${${_variableName}}")
 #endforeach()
 
