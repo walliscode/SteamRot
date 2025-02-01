@@ -1,4 +1,4 @@
-﻿
+
 cmake_minimum_required (VERSION 3.31)
 
 project(SteamRot
@@ -24,11 +24,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(RESOURCES_PATH "${CMAKE_SOURCE_DIR}/resources")
 set(DATA_OUT_DIR "${CMAKE_SOURCE_DIR}/data_out") # for outputting data files from places such as somultations
-
-
-# add definitions for the project
-add_definitions(-DRESOURCES_PATH="${RESOURCES_PATH}")
-add_definitions(-DDATA_OUT_DIR="${DATA_OUT_DIR}")
 
 # make sure the data output directory exists
 if (NOT EXISTS ${DATA_OUT_DIR})

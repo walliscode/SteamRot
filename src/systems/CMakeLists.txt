@@ -13,7 +13,8 @@ add_library(systems
 message(STATUS "Data out dir: ${DATA_OUT_DIR}")
 target_compile_definitions(systems
   PUBLIC
-  DATA_OUT_DIR="${DATA_OUT_DIR}")
+  DATA_OUT_DIR="${DATA_OUT_DIR}"
+  RESOURCE_DIR="${RESOURCE_DIR}")
 
 
 target_include_directories(systems
