@@ -8,36 +8,29 @@
 
 namespace fs = std::filesystem;
 
-GameEngine::GameEngine() : m_sceneManager(*this) {
+GameEngine::GameEngine() : m_displayManager() {
   init(); // kick off the game, loading assets de.t.c
 }
 
 void GameEngine::init() {
-  // Create a new SFML window
-  m_window.create(sf::VideoMode({1280, 720}), "SFML window");
-
   // create initial scenes
-  m_sceneManager.addScene("mainMenu", 10);
+  // m_sceneManager.addScene("mainMenu", 10);
 }
 
 void GameEngine::run(size_t numLoops) {
 
   // Run the program as long as the window is open
-  while (m_window.isOpen()) {
+  while (m_displayManager.GetWindow().isOpen()) {
     // increment the loop number by 1, the tick number is defined at the
     // beginning of the loop
     m_loopNumber++;
     // handle user input
     sUserInput();
-
-    // Clear the window with green color
-    m_window.clear(sf::Color::Green);
-
     // Update all the scenes
     GameEngine::update();
 
     // End the current frame and display its contents on screen
-    m_window.display();
+    m_displayManager.Cycle();
 
     // statement to test whether to break the loop, must be called at end
     if (numLoops > 0 && m_loopNumber >= numLoops) {
@@ -51,29 +44,20 @@ void GameEngine::run(size_t numLoops) {
 
 void GameEngine::update() {
   // call the update function of the scene manager
-  m_sceneManager.update();
+  // m_sceneManager.update();
 }
-
-sf::RenderWindow *GameEngine::getWindow() { return &m_window; }
 
 void GameEngine::sUserInput() {
   // Check all the window's events that were triggered since the last iteration
   // of the loop
-  while (const std::optional event = m_window.pollEvent()) {
+  while (const std::optional event = m_displayManager.GetWindow().pollEvent()) {
     // "close requested" event: we close the window
     if (event->is<sf::Event::Closed>())
-      m_window.close();
-
-    // Check for key use
-    if (event->is<sf::Event::KeyPressed>() ||
-        event->is<sf::Event::KeyReleased>()) {
-      // pass the event to the scene manager if it is a key press or key release
-      // m_sceneManager.passEvent(event);
-    }
+      m_displayManager.GetWindow().close();
   }
 }
 
-SceneManager &GameEngine::getSceneManager() { return m_sceneManager; }
+// SceneManager &GameEngine::getSceneManager() { return m_sceneManager; }
 
 size_t GameEngine::getLoopNumber() { return m_loopNumber; }
 
@@ -112,10 +96,10 @@ void GameEngine::createJSON(const std::string &directoryName,
     json mainJson;
 
     // add the json object to the main json object
-    mainJson["GameEngine"] = GameEngine::toJSON();
-    mainJson["SceneManager"] = m_sceneManager.toJSON();
-    mainJson["AssetManager"] = m_sceneManager.getAssetManager().toJSON();
-
+    // mainJson["GameEngine"] = GameEngine::toJSON();
+    // mainJson["SceneManager"] = m_sceneManager.toJSON();
+    // mainJson["AssetManager"] = m_sceneManager.getAssetManager().ToJSON();
+    //
     // write the json object to the file
     jsonFile << mainJson.dump(4);
     // close the file

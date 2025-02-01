@@ -26,7 +26,7 @@ void Scene::sRender() {
   as that will come from the archetype "masking"
   */
   for (const auto &entity : entities) {
-    auto &text = m_entityManager.getComponent<CText>(entity).getText();
+    auto &text = m_entityManager.getComponent<CText>(entity).GetText();
     text.setPosition(m_entityManager.getComponent<CTransform>(entity).position);
     window->draw(text);
     // render code here
@@ -57,31 +57,22 @@ void Scene::registerActions(const std::string &sceneName) {
 
   // load the actions from the binary file
   std::string fileName =
-      std::string(FB_BINARIES_PATH) + sceneName + "_actions.bin";
+      std::string(RESOURCE_DIR) + sceneName + "_actions.json";
 
   if (!utils::fileExists(fileName)) {
     std::cout << "File does not exist: " << fileName << std::endl;
     return;
   }
 
-  std::cout << "Reading binary file for Scene Actions: " << fileName
-            << std::endl;
+  std::cout << "Loading JSON file for Scene Actions: " << fileName << std::endl;
 
-  std::vector<std::byte> buffer = utils::readBinaryFile(fileName);
+  std::ifstream f(fileName);
+  json scene_actions = json::parse(f);
 
-  // if buffer is empty exit intialiseEntities
-  if (buffer.empty()) {
-    std::cout << "No Actions to intialise" << std::endl;
-    return;
-  }
-
-  const SteamRot::rawData::ActionList *action_list =
-      SteamRot::rawData::GetActionList(buffer.data());
-
-  for (const auto action : *action_list->actions()) {
-    int key = action->sfml_id();
-    std::string actionName = action->action_name()->str();
-    m_actionMap[key] = actionName;
+  for (const auto action : scene_actions) {
+    int key = action["sfml_id"];
+    std::string action_name = action["action_name"];
+    m_actionMap.insert({key, action_name});
   }
 }
 

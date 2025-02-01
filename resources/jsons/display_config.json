@@ -1,0 +1,12 @@
+{
+  "width": 1280,
+  "height": 720,
+  "title": "SteamRot",
+  "framerate_limit": 60,
+  "background_color": {
+    "r": 49,
+    "g": 50,
+    "b": 68,
+    "a": 255
+  }
+}
