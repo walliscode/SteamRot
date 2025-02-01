@@ -2,7 +2,9 @@
 #include "Action.h"
 #include "EntityManager.h"
 #include <map>
+#include <nlohmann/json.hpp>
 #include <string>
+
 
 class GameEngine; // forward declaration. DO NOT INCLUDE "GameEngine.h" here, as
                   // it will cause a circular dependency error

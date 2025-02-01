@@ -22,13 +22,20 @@ endif()
 # Always enforce the language constraint
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(RESOURCES_PATH "${CMAKE_SOURCE_DIR}/resources")
-set(DATA_OUT_DIR "${CMAKE_SOURCE_DIR}/data_out") # for outputting data files from places such as somultations
+# add compiler definitions
+add_compile_definitions(
+  RESOURCES_DIR="${CMAKE_SOURCE_DIR}/resources"
+  DATA_OUT_DIR="${CMAKE_SOURCE_DIR}/data"
+)
 
 # make sure the data output directory exists
 if (NOT EXISTS ${DATA_OUT_DIR})
   file(MAKE_DIRECTORY ${DATA_OUT_DIR})
 endif()
+
+# cmake helper for file checking
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+include(file_check)
 
 # set the cmake module path (for import libraries and other cmake files)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/FetchContentModules")

@@ -2,6 +2,7 @@
 #include "AssetManager.h"
 #include "Scene.h"
 #include <SFML/Graphics.hpp>
+#include <SFML/Window/Event.hpp>
 #include <map>
 #include <nlohmann/json.hpp>
 
@@ -43,8 +44,7 @@ public:
   AssetManager &getAssetManager();
 
   void update();
-  void passEvent(sf::Event &event); // pass event from game engine to scene
-                                    // manager to scenes
+  void passEvent(const std::optional<sf::Event>);
 
   /// Testing and simulation functions
   json toJSON(); // convert parts of the SceneManager class to json

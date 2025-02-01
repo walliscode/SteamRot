@@ -68,26 +68,27 @@ void SceneManager::update() {
   }
 }
 
-void SceneManager::passEvent(sf::Event &event) {
-  // events should only be passed to interactive scenes (e.g. with a mouse
-  // hovering over it)
-  for (auto &pair : m_interactiveScenes) {
-    auto &scene = pair.second;
-
-    // some collision clause will be probably need to be added at some point
-    // check if the key is in the action map
-    if (scene->getActionMap().find(event.key.code) ==
-        scene->getActionMap().end()) {
-      continue;
-    }
-
-    // determine if the event is a key press or key release
-    const std::string actionType =
-        (event.type == sf::Event::KeyPressed) ? "START" : "END";
-
-    scene->doAction(
-        Action(scene->getActionMap().at(event.key.code), actionType));
-  }
+void SceneManager::passEvent(const std::optional<sf::Event> event) {
+  // // events should only be passed to interactive scenes (e.g. with a mouse
+  // // hovering over it)
+  // for (auto &pair : m_interactiveScenes) {
+  //   auto &scene = pair.second;
+  //
+  //   // some collision clause will be probably need to be added at some point
+  //   // check if the key is in the action map
+  //   std::string key_code = event->getIf<sf::Event::KeyPressed>()->;
+  //   if (scene->getActionMap().find(event.key.code) ==
+  //       scene->getActionMap().end()) {
+  //     continue;
+  //   }
+  //
+  //   // determine if the event is a key press or key release
+  //   const std::string actionType =
+  //       (event.type == sf::Event::KeyPressed) ? "START" : "END";
+  //
+  //   scene->doAction(
+  //       Action(scene->getActionMap().at(event.key.code), actionType));
+  // }
 }
 
 void SceneManager::makeInteractive() {
