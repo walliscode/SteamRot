@@ -1,26 +1,14 @@
-
-add_library(EntityManager
-	EntityManager.cpp
-	EntityMemoryPool.cpp
-	Archetype.cpp
-	ArchetypeManager.cpp)
-
-
-target_include_directories(EntityManager PUBLIC
-	${CMAKE_CURRENT_SOURCE_DIR}/include
-	${CMAKE_SOURCE_DIR}/resources/generated_headers
+add_library(entity
+    EntityManager.cpp
+    EntityMemoryPool.cpp
+    ArchetypeManager.cpp
+    Archetype.cpp
 )
 
-add_dependencies(EntityManager
-	my_binary_data  # the flatc exectuable and any required flatbuffers headers need to be created first
+target_include_directories(entity PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
+target_link_libraries(entity
+  PUBLIC
+  nlohmann_json::nlohmann_json
+  SFML::Graphics
 )
-
-target_link_libraries(EntityManager PUBLIC
-	Component # nessary for using Component.cpp file for getHas()
-	Component001
-	flatbuffers
-	Scene
-	utils
-)
-
