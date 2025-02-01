@@ -1,17 +1,9 @@
 add_library(display
     DisplayManager.cpp
+    Tile.cpp
+    Session.cpp
 
 )
-
-# check if set definitions exist
-set(definition_list RESOURCES_DIR)
-
-# foreach(definition_name IN LISTS definition_list)
-#   if(NOT DEFINED ${definition_name})
-#     message(FATAL_ERROR "Definition ${definition_name} does not exist")
-#   endif()
-# endforeach()
-#
 
 target_include_directories(display
   PUBLIC
