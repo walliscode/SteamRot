@@ -1,10 +1,7 @@
 #include "EntityManager.h"
 #include "GameEngine.h"
 #include "Scene.h"
-#include "entities_generated.h"
-#include "flatbuffers/flatbuffers.h"
 #include "general_util.h"
-#include <fstream>
 
 EntityManager::EntityManager(size_t poolSize, Scene &scene)
     : m_pool(new EntityMemoryPool(poolSize)), m_scene(scene) {}
