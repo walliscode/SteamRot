@@ -1,24 +1,22 @@
 #pragma once
 #include "Component.h"
 #include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Text.hpp>
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
 class CText : public Component {
 private:
-  sf::Text text; // the text object for the component
+  sf::Text text;
 
 public:
-  CText() = default;
-  void setText(const sf::Font &f, const std::string &str,
-               const size_t chr_size); // set the text object
-  sf::Text &getText();                 // get the text object by reference
+  CText(const sf::Font &font, const std::string &str);
 
-  // void fromFlatbuffers(const SteamRot::rawData::TextComponent *text,
-  //                      const sf::Font &font); // calls the setText function
-  //                      with
-  //                                             // the flatbuffers data
+  void SetText(const sf::Font &font, const std::string &str,
+               const size_t chr_size);
 
-  json toJSON(); // convert the component to json data for simulations
+  sf::Text &GetText();
+
+  json ToJSON(); // convert the component to json data for simulations
 };

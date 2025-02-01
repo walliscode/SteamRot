@@ -1,91 +1,84 @@
 #include "AssetManager.h"
 #include "general_util.h"
 #include <iostream>
-#include "fonts_generated.h"
 
+AssetManager::AssetManager() : m_fonts() {}
 
-AssetManager::AssetManager() : m_fonts()
-{
+void AssetManager::LoadSceneAssets(const std::string &scene_type) {
+  // load the fonts for the scene
+  LoadFonts(scene_type);
 }
 
-void AssetManager::loadSceneAssets(const std::string& sceneType)
-{
-	// load the fonts for the scene
-	loadFonts(sceneType);
+void AssetManager::LoadFonts(const std::string &scene_type) {
+
+  // create the file name. check naming convention carefully
+  const std::string file_name =
+      std::string(RESOURCE_DIR) + "/jsons/" + scene_type + "_fonts.json";
+
+  if (!utils::fileExists(file_name)) {
+    std::cout << "File does not exist: " << file_name << std::endl;
+    return;
+  }
+  std::cout << "######  Loading fonts ###### " << std::endl;
+
+  // load the json file
+  std::ifstream f(file_name);
+  json font_data = json::parse(f);
+
+  // iterate through the json object and add the fonts to the asset manager
+  for (auto &font : font_data) {
+    std::string font_tag = font["tag"];
+    std::string font_file = font["file"];
+
+    // check to see if font already exists
+    auto it = m_fonts.find(font_tag);
+    if (it != m_fonts.end()) {
+      std::cout << "Font already loaded: " << font_tag << std::endl;
+      continue; // skip this font
+    }
+    AddFont(font_tag, font_file);
+  };
+};
+
+void AssetManager::AddFont(const std::string &tag,
+                           const std::string &file_name) {
+  // provide path to font file
+  std::string path = std::string(RESOURCE_DIR) + "/fonts/" + file_name;
+
+  // create font object with path to constructor
+  std::cout << "Loading font: " << path << std::endl;
+  sf::Font font{file_name};
+
+  // add font to map
+  m_fonts.insert({tag, font});
+
+  std::cout << "Loaded font: " << tag << std::endl;
 }
 
-
-void AssetManager::loadFonts(const std::string& sceneType)
-{
-	// create the file name. check naming convention carefully
-	const std::string fileName = std::string(FB_BINARIES_PATH) + sceneType + "_fonts" + ".bin";
-
-	// using utils function, check file exists. if it doesn't this should exit the function
-	if (!utils::fileExists(fileName)) {
-		std::cout << "File does not exist: " << fileName << std::endl;
-		return;
-	}
-	std::cout << "######  Loading fonts ###### " << std::endl;
-
-	// util function that reads the fileinto a vector of bytes. This function should set the size
-	std::vector<std::byte> buffer = utils::readBinaryFile(fileName);
-
-	// flatbuffers interprets the buffer as a FontList object
-	const SteamRot::rawData::FontList* font_list = SteamRot::rawData::GetFontList(buffer.data());
-
-	// iterate hrough the list of fonts and add them to the asset manager
-	for (const auto font : *font_list->fonts()) {
-		// search the map to see if key already exists
-		auto it = m_fonts.find(font->tag()->str());
-		if (it != m_fonts.end())
-		{
-			std::cout << "Font already loaded: " << font->tag()->str() << std::endl;
-			continue; // skip this font
-		}
-		// add the font to the asset manager
-		addFont(font->tag()->str(), font->file_name()->str());
-	}
+const sf::Font &AssetManager::GetFont(const std::string &name) const {
+  // search the map for the font and if it exists return it
+  auto it = m_fonts.find(name);
+  if (it != m_fonts.end()) {
+    std::cout << "Success: Font '" << name << "' found." << std::endl;
+    return it->second;
+  } else {
+    std::cout << "Error: Font '" << name << "' not found." << std::endl;
+    return m_fonts.begin()->second;
+  }
 }
 
-void AssetManager::addFont(const std::string& tag, const std::string& fileName)
-{
-	// create a font object and load the font from the file
-	sf::Font font;
-	std::string path = std::string(RESOURCES_PATH) + "fonts/" + fileName;
-	std::cout << "Loading font: " << path << std::endl;
-	font.loadFromFile(path);
-	m_fonts[tag] = font;
-	std::cout << "Loaded font: " << tag << std::endl;
-}
+json AssetManager::ToJSON() {
 
-const sf::Font& AssetManager::getFont(const std::string& name) const {
-	// search the map for the font and if it exists return it
-	auto it = m_fonts.find(name);
-	if (it != m_fonts.end()) {
-		std::cout << "Success: Font '" << name << "' found." << std::endl;
-		return it->second;
-	}
-	else {
-		std::cout << "Error: Font '" << name << "' not found." << std::endl;
-		return m_fonts.begin()->second;
+  // create json object
+  json j;
 
-	}
+  // return all font information
+  j["fonts"] = {};
+  for (auto &pair : m_fonts) {
+    std::string fontTag = pair.first;
+    std::string fontFamily = pair.second.getInfo().family;
+    j["fonts"][fontTag] = fontFamily;
+  }
 
-}
-
-json AssetManager::toJSON() {
-
-	// create json object
-	json j;
-
-	// return all font information
-	j["fonts"] = {};
-	for (auto& pair : m_fonts)
-	{
-		std::string fontTag = pair.first;
-		std::string fontFamily = pair.second.getInfo().family;
-		j["fonts"][fontTag] = fontFamily;
-	}
-
-	return j;
+  return j;
 }

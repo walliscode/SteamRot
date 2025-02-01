@@ -1,8 +1,4 @@
 {
-  "fonts": [
-    {
-      "tag": "SourceCodePro-Regular",
-      "file_name": "SourceCodePro-Regular.ttf"
-    }
-  ]
+  "tag": "SourceCodePro-Regular",
+  "file_name": "SourceCodePro-Regular.ttf"
 }

@@ -4,7 +4,6 @@
 #include <nlohmann/json.hpp>
 #include <string>
 
-
 using json = nlohmann::json;
 
 class AssetManager {
@@ -13,21 +12,20 @@ private:
   std::map<std::string, sf::Font> m_fonts;
 
   // ###### Fonts ######
-  void loadFonts(
-      const std::string &sceneType); // load assets from a FlatBuffers file
-  void addFont(const std::string &tag,
-               const std::string &fileName); // add a font
+  void LoadFonts(const std::string &scene_type);
+  void AddFont(const std::string &tag, const std::string &file_name);
 
 public:
-  AssetManager(); // for now, created once in scene manager
+  // will be created in the SceneManager class. It will load assets as needed
+  AssetManager();
 
-  void loadSceneAssets(
+  void LoadSceneAssets(
       const std::string
-          &sceneType); // load all assets for this particular scene type
+          &scene_type); // load all assets for this particular scene type
 
   // ###### Fonts ######
-  const sf::Font &getFont(const std::string &name) const; // get a font
+  const sf::Font &GetFont(const std::string &name) const; // get a font
 
   // export data to json for testing
-  json toJSON();
+  json ToJSON();
 };

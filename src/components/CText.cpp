@@ -1,7 +1,10 @@
 #include "CText.h"
+#include <SFML/Graphics/Text.hpp>
+
+CText::CText(const sf::Font &font, const std::string &str) : text(font, str) {};
 
 // set the text object, taking in the font, the string, and the character size
-void CText::setText(const sf::Font &f, const std::string &words,
+void CText::SetText(const sf::Font &f, const std::string &words,
                     const size_t chr_size) {
   text.setFont(f);
   text.setString(words);
@@ -13,15 +16,9 @@ void CText::setText(const sf::Font &f, const std::string &words,
 }
 
 // get the text object by reference
-sf::Text &CText::getText() { return text; }
+sf::Text &CText::GetText() { return text; }
 
-// void CText::fromFlatbuffers(
-//     const SteamRot::rawData::TextComponent *text_component,
-//     const sf::Font &font) {
-//   setText(font, text_component->text()->str(), text_component->font_size());
-// }
-
-json CText::toJSON() {
+json CText::ToJSON() {
   json j;
   j["text"] = text.getString();
   j["font_size"] = text.getCharacterSize();
