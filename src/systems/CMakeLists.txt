@@ -5,7 +5,7 @@ add_library(systems
     # SceneManager.cpp
     # SceneMainMenu.cpp
     # AssetManager.cpp
-    # Action.cpp
+    Action.cpp
     # DataLogger.cpp
 
 )
@@ -26,7 +26,8 @@ DATA_OUT_DIR
 target_include_directories(systems
   PUBLIC
   ${CMAKE_SOURCE_DIR}/include
-  ${CMAKE_SOURCE_DIR}/include/utils)
+  ${CMAKE_SOURCE_DIR}/include/utils
+  ${CMAKE_SOURCE_DIR}/include/constants)
 
 # check if targets exist
 set(target_list display)
