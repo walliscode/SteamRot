@@ -11,6 +11,8 @@ class Action {
 
 public:
   Action(std::string container_name);
+  std::vector<std::string>
+  GenerateActions(std::bitset<SteamRot::kUserInputCount> action_generator);
 
 private:
   std::string m_container_name;
@@ -22,7 +24,4 @@ private:
   static std::map<std::string, sf::Mouse::Button> m_mouse_map;
 
   void RegisterActions(std::string container_name);
-
-  std::vector<std::string>
-  GenerateActions(std::bitset<SteamRot::kUserInputCount> action_generator);
 };

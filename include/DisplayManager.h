@@ -1,6 +1,7 @@
 #pragma once
 #include "Action.h"
 #include "Session.h"
+#include "global_constants.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <nlohmann/json.hpp>
@@ -15,6 +16,10 @@ public:
   sf::RenderWindow &GetWindow();
   std::shared_ptr<Session> GetActiveSession();
   const json &GetTileConfig();
+
+  void Update();
+  void
+  PopulateActions(const std::bitset<SteamRot::kUserInputCount> &user_input);
   void Cycle();
 
 private:
@@ -33,4 +38,5 @@ private:
 
   // action related items
   Action m_action{"display_manager"};
+  std::vector<std::string> m_actions;
 };

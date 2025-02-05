@@ -28,8 +28,8 @@ void GameEngine::run(size_t numLoops) {
     // beginning of the loop
     m_loopNumber++;
     // handle user input
-    sUserInput();
-    // Update all the scenes
+    GameEngine::sUserInput();
+    // Update all the necessary components of the game
     GameEngine::update();
 
     // End the current frame and display its contents on screen
@@ -46,6 +46,14 @@ void GameEngine::run(size_t numLoops) {
 }
 
 void GameEngine::update() {
+
+  // only populate the actions if the bitset is not all zeros
+  if (m_userInput.any()) {
+    std::cout << "Populating Actions" << std::endl;
+    m_displayManager.PopulateActions(m_userInput);
+  }
+
+  m_displayManager.Update();
   // call the update function of the scene manager
   // m_sceneManager.update();
 }
