@@ -1,6 +1,8 @@
 #include "GameEngine.h"
 #include "SceneMainMenu.h"
 #include <SFML/Window/Event.hpp>
+#include <SFML/Window/Keyboard.hpp>
+#include <cstddef>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -55,8 +57,49 @@ void GameEngine::sUserInput() {
     // "close requested" event: we close the window
     if (event->is<sf::Event::Closed>())
       m_displayManager.GetWindow().close();
+
+    // handle key pressed events
+    else if (const auto *keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+      // set position on the user input bitset
+      size_t key_code{static_cast<size_t>(keyPressed->scancode)};
+      m_userInput.set(key_code);
+      std::cout << "Key Pressed: " << key_code << std::endl;
+      std::cout << "User Input: " << m_userInput << std::endl;
+    }
+
+    // handle key released events
+    else if (const auto *keyReleased = event->getIf<sf::Event::KeyReleased>()) {
+      // set position on the user input bitset
+      size_t key_code{static_cast<size_t>(keyReleased->scancode)};
+      m_userInput.reset(key_code);
+      std::cout << "Key Released: " << key_code << std::endl;
+      std::cout << "User Input: " << m_userInput << std::endl;
+    }
+
+    // handle mouse button pressed events
+    else if (const auto *mouseButtonPressed =
+                 event->getIf<sf::Event::MouseButtonPressed>()) {
+      // set position on the user input bitset, shift by number of keys
+      size_t mouse_button{static_cast<size_t>(mouseButtonPressed->button) +
+                          static_cast<size_t>(sf::Keyboard::KeyCount)};
+      m_userInput.set(mouse_button);
+      std::cout << "Mouse Button Pressed: " << mouse_button << std::endl;
+      std::cout << "User Input: " << m_userInput << std::endl;
+    }
+
+    // handle mouse button released events
+    else if (const auto *mouseButtonReleased =
+                 event->getIf<sf::Event::MouseButtonReleased>()) {
+      // set position on the user input bitset, shift by number of keys
+      size_t mouse_button{static_cast<size_t>(mouseButtonReleased->button) +
+                          static_cast<size_t>(sf::Keyboard::KeyCount)};
+
+      m_userInput.reset(mouse_button);
+      std::cout << "Mouse Button Released: " << mouse_button << std::endl;
+      std::cout << "User Input: " << m_userInput << std::endl;
+    }
   }
-}
+};
 
 // SceneManager &GameEngine::getSceneManager() { return m_sceneManager; }
 

@@ -13,7 +13,10 @@ private:
   // SceneManager m_sceneManager;
   // SceneList m_scenes;
   size_t m_loopNumber = 0;
+
+  // event management
   void sUserInput();
+  std::bitset<SteamRot::kUserInputCount> m_userInput;
 
 public:
   GameEngine();
