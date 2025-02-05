@@ -67,6 +67,10 @@ std::shared_ptr<Session> DisplayManager::GetActiveSession() {
 
 const json &DisplayManager::GetTileConfig() { return m_tile_config; };
 
+void DisplayManager::Update() {
+  // update all necessary window logic functions
+};
+
 void DisplayManager::Cycle() {
   m_window.clear(m_background_color);
 
@@ -88,4 +92,14 @@ void DisplayManager::Cycle() {
     }
   }
   m_window.display();
+};
+
+void DisplayManager::PopulateActions(
+    const std::bitset<SteamRot::kUserInputCount> &user_input) {
+  // clear the actions vector
+  m_actions.clear();
+
+  // Action class looks for registered actions and passes through vector of
+  // action (strings)
+  m_actions = m_action.GenerateActions(user_input);
 };

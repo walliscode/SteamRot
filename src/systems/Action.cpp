@@ -115,10 +115,14 @@ void Action::RegisterActions(std::string container_name) {
 
 std::vector<std::string> Action::GenerateActions(
     std::bitset<SteamRot::kUserInputCount> action_generator) {
+
   std::vector<std::string> actions;
 
-  std::string action = m_action_map.at(action_generator);
+  // only add actions that are in the action map
+  auto it = m_action_map.find(action_generator);
+  if (it != m_action_map.end()) {
+    actions.push_back(it->second);
+  }
 
-  actions.push_back(action);
   return actions;
 }
