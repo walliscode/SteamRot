@@ -2,6 +2,7 @@
 #include "global_constants.h"
 #include <SFML/Graphics.hpp>
 #include <bitset>
+#include <map>
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
@@ -9,7 +10,7 @@ using json = nlohmann::json;
 class Action {
 
 public:
-  Action(const json &action_setup, std::string container_name);
+  Action(std::string container_name);
 
 private:
   std::string m_container_name;
@@ -20,9 +21,7 @@ private:
   static std::map<std::string, sf::Keyboard::Key> m_key_map;
   static std::map<std::string, sf::Mouse::Button> m_mouse_map;
 
-  void MapStringToKeys();
-  void MapStringToMouse();
-  void RegisterActions(const json &action_setup, std::string container_name);
+  void RegisterActions(std::string container_name);
 
   std::vector<std::string>
   GenerateActions(std::bitset<SteamRot::kUserInputCount> action_generator);

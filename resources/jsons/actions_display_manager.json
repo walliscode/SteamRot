@@ -1,0 +1,11 @@
+[
+  {
+    "name": "ACTION_TEST",
+    "inputs": [
+      {
+        "type": "key",
+        "code": "A"
+      }
+    ]
+  }
+]
