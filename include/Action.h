@@ -1,15 +1,29 @@
 #pragma once
-#include <string>
+#include "global_constants.h"
+#include <SFML/Graphics.hpp>
+#include <bitset>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
 
 class Action {
-private:
-  std::string m_name = "NONE";
-  std::string m_type = "NONE";
 
 public:
-  Action(std::string name,
-         std::string type); // overloaded constructor with parameters
+  Action(const json &action_setup, std::string container_name);
 
-  const std::string &getName() const; // getter for name
-  const std::string &getType() const; // getter for type
+private:
+  std::string m_container_name;
+  // bitset that combines global events to produce object specific actions
+  std::unordered_map<std::bitset<SteamRot::kUserInputCount>, std::string>
+      m_action_map;
+
+  static std::map<std::string, sf::Keyboard::Key> m_key_map;
+  static std::map<std::string, sf::Mouse::Button> m_mouse_map;
+
+  void MapStringToKeys();
+  void MapStringToMouse();
+  void RegisterActions(const json &action_setup, std::string container_name);
+
+  std::vector<std::string>
+  GenerateActions(std::bitset<SteamRot::kUserInputCount> action_generator);
 };
