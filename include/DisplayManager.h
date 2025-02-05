@@ -1,4 +1,5 @@
 #pragma once
+#include "Action.h"
 #include "Session.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
@@ -29,4 +30,7 @@ private:
   // store Tile and Session config here as well, as there will only be one
   // DisplayManager
   json m_tile_config;
+
+  // action related items
+  Action m_action{"display_manager"};
 };

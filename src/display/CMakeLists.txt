@@ -8,7 +8,8 @@ add_library(display
 target_include_directories(display
   PUBLIC
   ${CMAKE_SOURCE_DIR}/include
-  ${CMAKE_SOURCE_DIR}/include/utils)
+  ${CMAKE_SOURCE_DIR}/include/utils
+  ${CMAKE_SOURCE_DIR}/include/constants)
 
 target_link_libraries(display PUBLIC
     SFML::Graphics
