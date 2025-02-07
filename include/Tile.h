@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <nlohmann/json.hpp>
 
@@ -10,24 +11,29 @@ class Tile {
 
 public:
   Tile(const json &tile_config, const sf::FloatRect &viewport_ratio,
-       const sf::Vector2f &window_size);
+       sf::RenderWindow &window);
 
+  // Set the static properties of the tile, values taken from json file
   void SetTileStaticProperties(const json &config);
-  void SetViewProperties(const sf::FloatRect &viewport_ratio,
-                         const sf::Vector2f &window_size);
-  void SetBorder(const sf::Vector2f &window_size);
+
+  // Function dealing with Views (not Viewports)
+  void SetViewProperties();
+  sf::View &GetView();
+
+  // Functions dealing with the Viewport
+  void SetViewPort(const sf::FloatRect &viewport);
+
+  // Functions dealing with the border UI
+  void SetBorder();
   void SetBorderColourActive();
   void SetBorderColourInactive();
-
-  sf::View GetView();
+  ;
   const std::array<sf::RectangleShape, 4> &GetBorderStraights();
   const std::array<sf::VertexArray, 4> &GetBorderCorners();
 
 private:
-  // pass view to sf::RenderWindow::setView() to change the view
+  sf::RenderWindow &m_window;
   sf::View m_view;
-  // use view port to draw the tile
-  sf::FloatRect m_viewport;
 
   std::array<sf::RectangleShape, 4> m_border_straight;
   std::array<sf::VertexArray, 4> m_border_corners;

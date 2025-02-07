@@ -1,5 +1,7 @@
 #include "DisplayManager.h"
+#include "Session.h"
 #include "general_util.h"
+#include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <fstream>
 #include <iostream>
@@ -29,18 +31,10 @@ DisplayManager::DisplayManager() {
   // set initial Sesssions
   m_sessions.fill(nullptr);
   // set the first session as active
-  m_sessions[0] = std::make_shared<Session>();
+  m_sessions[0] = std::make_shared<Session>(m_window);
   m_active_session = m_sessions[0];
 
-  // print out current wndow size
-  std::cout << "Window size: " << m_window.getSize().x << "x"
-            << m_window.getSize().y << std::endl;
-
-  // add a tile to the active session
-  const sf::Vector2f window_size =
-      static_cast<sf::Vector2f>(m_window.getSize());
-
-  m_active_session->AddTile(m_tile_config, window_size);
+  m_active_session->AddTile(m_tile_config, m_window);
 };
 
 void DisplayManager::SetWindowConfig(const json &config) {
@@ -77,52 +71,38 @@ void DisplayManager::Update() {
     if (action->m_name == "ACTION_ADD_TILE") {
       std::cout << "adding Tile" << std::endl;
       // add a tile to the active session
-      const sf::Vector2f window_size =
-          static_cast<sf::Vector2f>(m_window.getSize());
 
-      m_active_session->AddTile(m_tile_config, window_size);
+      m_active_session->AddTile(m_tile_config, m_window);
     }
   }
 };
 
 void DisplayManager::Cycle() {
+  // get active Session render texture and draw tile borders to it
+  sf::RenderTexture &tile_overlay = m_active_session->GetTileOverlay();
+
+  // go through clear, draw, display cycle for sf::RenderTexture
+  tile_overlay.clear(m_background_color);
+  for (auto tile : m_active_session->GetTiles()) {
+    // draw tile borders to the render texture
+    for (auto border_straight : tile->GetBorderStraights()) {
+
+      tile_overlay.draw(border_straight);
+    }
+    // for (auto border_corner : tile->GetBorderCorners()) {
+    //   tile_overlay.draw(border_corner);
+    // }
+  }
+
+  tile_overlay.display();
+
+  // now the sf::RenderWindow cycle
   m_window.clear(m_background_color);
 
-  // get the active session, cycle through the tiles, set their view and draw
-  // their borders
-  auto active_session = GetActiveSession();
-  auto tiles = active_session->GetTiles();
+  // draw tile overlay to window
+  sf::Sprite tile_overlay_sprite(tile_overlay.getTexture());
+  m_window.draw(tile_overlay_sprite);
 
-  for (size_t i = 0; i < tiles.size(); ++i) {
-    // print out tile view size
-    std::shared_ptr<Tile> tile = tiles[i];
-    std::cout << "Tile " << i << " View Size: " << tile->GetView().getSize().x
-              << "x " << tile->GetView().getSize().y << "y" << std::endl;
-
-    std::cout << "Tile " << i
-              << " View Position: " << tile->GetView().getCenter().x << "x"
-              << tile->GetView().getCenter().y << std::endl;
-
-    // get viewport size and position and print
-    std::cout << "Tile " << i
-              << " Viewport Size: " << tile->GetView().getViewport().size.x
-              << "x" << tile->GetView().getViewport().size.y << "y"
-              << std::endl;
-
-    std::cout << "Tile " << i << " Viewport Position: "
-              << tile->GetView().getViewport().position.x << "x"
-              << tile->GetView().getViewport().position.y << "y" << std::endl;
-
-    m_window.setView(tile->GetView());
-    const auto &border_straights = tile->GetBorderStraights();
-    for (const auto &border_straight : border_straights) {
-      m_window.draw(border_straight);
-    }
-    const auto &border_corners = tile->GetBorderCorners();
-    for (const auto &border_corner : border_corners) {
-      m_window.draw(border_corner);
-    }
-  }
   m_window.display();
 };
 
