@@ -1,5 +1,4 @@
 #include "GameEngine.h"
-#include "SceneMainMenu.h"
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <cstddef>
@@ -27,7 +26,8 @@ void GameEngine::run(size_t numLoops) {
     // increment the loop number by 1, the tick number is defined at the
     // beginning of the loop
     m_loopNumber++;
-    // handle user input
+    // handle user input, this just effects the bitset, doesn't handle any
+    // action
     GameEngine::sUserInput();
     // Update all the necessary components of the game
     GameEngine::update();
@@ -47,13 +47,10 @@ void GameEngine::run(size_t numLoops) {
 
 void GameEngine::update() {
 
-  // only populate the actions if the bitset is not all zeros
-  if (m_userInput.any()) {
-    std::cout << "Populating Actions" << std::endl;
-    m_displayManager.PopulateActions(m_userInput);
-  }
-
+  // update display manager actions and call any logic systems
+  m_displayManager.PopulateActions(m_userInput);
   m_displayManager.Update();
+
   // call the update function of the scene manager
   // m_sceneManager.update();
 }
@@ -71,8 +68,8 @@ void GameEngine::sUserInput() {
       // set position on the user input bitset
       size_t key_code{static_cast<size_t>(keyPressed->scancode)};
       m_userInput.set(key_code);
-      std::cout << "Key Pressed: " << key_code << std::endl;
-      std::cout << "User Input: " << m_userInput << std::endl;
+      // std::cout << "Key Pressed: " << key_code << std::endl;
+      // std::cout << "User Input: " << m_userInput << std::endl;
     }
 
     // handle key released events
@@ -80,8 +77,8 @@ void GameEngine::sUserInput() {
       // set position on the user input bitset
       size_t key_code{static_cast<size_t>(keyReleased->scancode)};
       m_userInput.reset(key_code);
-      std::cout << "Key Released: " << key_code << std::endl;
-      std::cout << "User Input: " << m_userInput << std::endl;
+      // std::cout << "Key Released: " << key_code << std::endl;
+      // std::cout << "User Input: " << m_userInput << std::endl;
     }
 
     // handle mouse button pressed events
@@ -91,8 +88,8 @@ void GameEngine::sUserInput() {
       size_t mouse_button{static_cast<size_t>(mouseButtonPressed->button) +
                           static_cast<size_t>(sf::Keyboard::KeyCount)};
       m_userInput.set(mouse_button);
-      std::cout << "Mouse Button Pressed: " << mouse_button << std::endl;
-      std::cout << "User Input: " << m_userInput << std::endl;
+      // std::cout << "Mouse Button Pressed: " << mouse_button << std::endl;
+      // std::cout << "User Input: " << m_userInput << std::endl;
     }
 
     // handle mouse button released events
@@ -103,12 +100,11 @@ void GameEngine::sUserInput() {
                           static_cast<size_t>(sf::Keyboard::KeyCount)};
 
       m_userInput.reset(mouse_button);
-      std::cout << "Mouse Button Released: " << mouse_button << std::endl;
-      std::cout << "User Input: " << m_userInput << std::endl;
+      // std::cout << "Mouse Button Released: " << mouse_button << std::endl;
+      // std::cout << "User Input: " << m_userInput << std::endl;
     }
   }
 };
-
 // SceneManager &GameEngine::getSceneManager() { return m_sceneManager; }
 
 size_t GameEngine::getLoopNumber() { return m_loopNumber; }

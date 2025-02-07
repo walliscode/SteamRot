@@ -1,5 +1,5 @@
 #pragma once
-#include "Action.h"
+#include "ActionManager.h"
 #include "Session.h"
 #include "global_constants.h"
 #include <SFML/Graphics.hpp>
@@ -37,6 +37,6 @@ private:
   json m_tile_config;
 
   // action related items
-  Action m_action{"display_manager"};
-  std::vector<std::string> m_actions;
+  ActionManager m_action{"display_manager"};
+  std::vector<std::shared_ptr<Action>> m_action_waiting_room;
 };

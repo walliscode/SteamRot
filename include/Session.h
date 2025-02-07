@@ -7,12 +7,12 @@ class Session {
 public:
   Session();
 
-  void AddTile(const json &tile_config, const sf::FloatRect &viewport_ratio,
-               const sf::Vector2f &window_size);
+  void AddTile(const json &tile_config, const sf::Vector2f &window_size);
 
   std::vector<std::shared_ptr<Tile>> &GetTiles();
   std::shared_ptr<Tile> GetActiveTile();
   void SetActiveTile(std::shared_ptr<Tile> tile);
+  void SetInactiveTiles(std::shared_ptr<Tile> tile);
 
   void SplitTile();
 

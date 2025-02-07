@@ -1,9 +1,11 @@
-#include "Action.h"
+#include "ActionManager.h"
 #include "general_util.h"
 #include <cstddef>
 #include <iostream>
+#include <memory>
 
-Action::Action(std::string container_name) : m_container_name(container_name) {
+ActionManager::ActionManager(std::string container_name)
+    : m_container_name(container_name) {
 
   // pull in json config for user defied actions
   RegisterActions(container_name);
@@ -11,7 +13,7 @@ Action::Action(std::string container_name) : m_container_name(container_name) {
 
 // insert all keys for the sf keyboard into the map
 
-std::map<std::string, sf::Keyboard::Key> Action::m_key_map = {
+std::map<std::string, sf::Keyboard::Key> ActionManager::m_key_map = {
     {"A", sf::Keyboard::Key::A},
     {"B", sf::Keyboard::Key::B},
     {"C", sf::Keyboard::Key::C},
@@ -54,13 +56,13 @@ std::map<std::string, sf::Keyboard::Key> Action::m_key_map = {
     {"LAlt", sf::Keyboard::Key::LAlt},
 };
 
-std::map<std::string, sf::Mouse::Button> Action::m_mouse_map = {
+std::map<std::string, sf::Mouse::Button> ActionManager::m_mouse_map = {
     {"LeftClick", sf::Mouse::Button::Left},
     {"RightClick", sf::Mouse::Button::Right},
     {"MiddleClick", sf::Mouse::Button::Middle},
 };
 
-void Action::RegisterActions(std::string container_name) {
+void ActionManager::RegisterActions(std::string container_name) {
   // check json file exists and load in
   std::string file_path =
       std::string(RESOURCES_DIR) + "/jsons/actions_" + container_name + ".json";
@@ -79,24 +81,30 @@ void Action::RegisterActions(std::string container_name) {
     // logic
     std::string action_name = action["name"];
     std::cout << "Registering action: " << action_name << std::endl;
+
     // generate a bitset that represents the action
     std::bitset<SteamRot::kUserInputCount> action_generator;
     for (auto &input : action["inputs"]) {
+
       if (input["type"] == "key") {
         // get the key number from the m_key_map
         // throw error if key does not exist
         auto it = m_key_map.find(input["code"]);
+
         if (it == m_key_map.end()) {
           // we need the program to terminate if the key does not exist
           throw std::runtime_error("Key does not exist in m_key_map");
         };
+
         size_t key_code = static_cast<size_t>(it->second);
         action_generator.set(key_code);
 
       } else if (input["type"] == "mouse") {
+
         // get the mouse number from the m_mouse_map
         // throw error if mouse does not exist
         auto it = m_mouse_map.find(input["code"]);
+
         if (it == m_mouse_map.end()) {
           // we need the program to terminate if the mouse does not exist
           throw std::runtime_error("Mouse does not exist in m_mouse_map");
@@ -108,21 +116,43 @@ void Action::RegisterActions(std::string container_name) {
         action_generator.set(mouse_code);
       }
     }
+    // is the action repeatable
+    bool repeatable = action["repeatable"];
+    // add the action to the action map
+    m_action_list.push_back(Action(action_name, action_generator, repeatable));
+
     std::cout << "Action: " << action_name << " has been registered"
               << std::endl;
   }
 };
 
-std::vector<std::string> Action::GenerateActions(
+std::vector<std::shared_ptr<Action>> ActionManager::GenerateActions(
     std::bitset<SteamRot::kUserInputCount> action_generator) {
 
-  std::vector<std::string> actions;
+  std::vector<std::shared_ptr<Action>> actionables;
 
-  // only add actions that are in the action map
-  auto it = m_action_map.find(action_generator);
-  if (it != m_action_map.end()) {
-    actions.push_back(it->second);
+  // exclusion logic
+  for (auto &action : m_action_list) {
+
+    // check if the bitset matches the action bitset
+    if (action_generator == action.m_action_bitset) {
+
+      // if latch is on and action is not reatable then skip
+      if (action.m_repeatable == false && action.m_latch == true) {
+
+        continue;
+
+      } else {
+        // set the latch to true
+        action.m_latch = true;
+        actionables.push_back(std::make_shared<Action>(action));
+      }
+
+      // if the action is not in the bitset then turn the latch off
+    } else {
+
+      action.m_latch = false;
+    }
   }
-
-  return actions;
-}
+  return actionables;
+};

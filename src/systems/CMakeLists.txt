@@ -1,12 +1,9 @@
 
 add_library(systems
     GameEngine.cpp
-    # Scene.cpp
-    # SceneManager.cpp
-    # SceneMainMenu.cpp
-    # AssetManager.cpp
-    Action.cpp
-    # DataLogger.cpp
+
+    ActionManager.cpp
+
 
 )
 
