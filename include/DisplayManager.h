@@ -26,7 +26,9 @@ private:
   // add some defaults to the window otherwise it doens't behave itself
   // may have initialise DisplayManager with a json object so i can pass
   // constructors into the window
-  sf::RenderWindow m_window{sf::VideoMode({1280, 900}), "SFML window"};
+  sf::RenderWindow m_window{sf::VideoMode(SteamRot::kWindowSize),
+                            "SFML window"};
+
   sf::Color m_background_color;
 
   std::array<std::shared_ptr<Session>, 5> m_sessions;

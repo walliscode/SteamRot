@@ -1,14 +1,18 @@
 #define _USE_MATH_DEFINES
+#include "global_constants.h"
+
 #include "Tile.h"
 #include <SFML/Graphics/VertexArray.hpp>
-
+#include <iostream>
 Tile::Tile(const json &tile_config, const sf::FloatRect &viewport_ratio,
-           const sf::Vector2f &window_size) {
+           sf::RenderWindow &window)
+    : m_window(window) {
 
   //
   SetTileStaticProperties(tile_config);
-  SetViewProperties(viewport_ratio, window_size);
-  SetBorder(window_size);
+  SetViewPort(viewport_ratio);
+  // SetViewProperties();
+  SetBorder();
 };
 
 void Tile::SetTileStaticProperties(const json &config) {
@@ -29,25 +33,33 @@ void Tile::SetTileStaticProperties(const json &config) {
   m_radius_resolution = config["radius_resolution"];
 }
 
-void Tile::SetViewProperties(const sf::FloatRect &viewport_ratio,
-                             const sf::Vector2f &window_size) {
-
-  m_view.setViewport(viewport_ratio);
-
-  sf::Vector2f size = {window_size.x * viewport_ratio.size.x,
-                       window_size.y * viewport_ratio.size.y};
-
-  sf::Vector2f center = {viewport_ratio.position.x + size.x / 2,
-                         viewport_ratio.position.y + size.y / 2};
-
-  m_view.setSize(size);
-  m_view.setCenter(center);
+void Tile::SetViewPort(const sf::FloatRect &viewport) {
+  m_view.setViewport(viewport);
 };
 
+void Tile::SetViewProperties() {
+
+  sf::FloatRect viewport = m_view.getViewport();
+
+  // this sets the view size of the Scene to the same size as the proportion of
+  // the window, so i'm assuming this a default zoom of 1
+  sf::Vector2f window_size{static_cast<sf::Vector2f>(SteamRot::kWindowSize)};
+  sf::Vector2f size = {window_size.x * viewport.size.x,
+                       window_size.y * viewport.size.y};
+
+  m_view.setSize(size);
+};
+
+sf::View &Tile::GetView() { return m_view; };
 // The tile border is composed up of 4 rectangle boxes and 4 radius corners
 // drawn with sf::TriangleFan These are then stored in a sf::VertexArray
 
-void Tile::SetBorder(const sf::Vector2f &window_size) {
+void Tile::SetBorder() {
+  // provide the current window size, the borders will be drawn off the tile
+  // Viewport
+  sf::Vector2f window_size{static_cast<sf::Vector2f>(SteamRot::kWindowSize)};
+  std::cout << "Window size: " << window_size.x << "x" << window_size.y
+            << std::endl;
   // get the origin point of the tile
   sf::Vector2f origin_point = {window_size.x * m_view.getViewport().position.x,
                                window_size.y * m_view.getViewport().position.y};
@@ -159,8 +171,6 @@ void Tile::SetBorderColourInactive() {
     }
   }
 };
-
-sf::View Tile::GetView() { return m_view; };
 
 const std::array<sf::RectangleShape, 4> &Tile::GetBorderStraights() {
   return m_border_straight;
