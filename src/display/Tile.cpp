@@ -1,7 +1,6 @@
 #define _USE_MATH_DEFINES
 #include "Tile.h"
 #include <SFML/Graphics/VertexArray.hpp>
-#include <iostream>
 
 Tile::Tile(const json &tile_config, const sf::FloatRect &viewport_ratio,
            const sf::Vector2f &window_size) {
@@ -53,21 +52,16 @@ void Tile::SetBorder(const sf::Vector2f &window_size) {
   sf::Vector2f origin_point = {window_size.x * m_view.getViewport().position.x,
                                window_size.y * m_view.getViewport().position.y};
 
-  std::cout << "origin_point.x: " << origin_point.x << std::endl;
-  std::cout << "origin_point.y: " << origin_point.y << std::endl;
-
   // get the absolute size of the view using the ratio of the viewport of the
   // window
   sf::Vector2f size = {window_size.x * m_view.getViewport().size.x,
                        window_size.y * m_view.getViewport().size.y};
 
   // draw reactangle borders
-  std::cout << "size.x: " << size.x << std::endl;
+
   float straight_width = size.x - (2 * m_border_thickness.x) - (2 * m_margin.x);
-  std::cout << "straight_width: " << straight_width << std::endl;
   float straight_height =
       size.y - (2 * m_border_thickness.y) - (2 * m_margin.y);
-  std::cout << "straight_height: " << straight_height << std::endl;
   // create rectangles
   m_border_straight[0].setSize({straight_width, m_border_thickness.y});
   m_border_straight[0].setFillColor(m_inactive_border_colour);
@@ -121,8 +115,6 @@ void Tile::SetBorder(const sf::Vector2f &window_size) {
                            straight_height};
       break;
     }
-    std::cout << "corner_origin.x: " << corner_origin.x << std::endl;
-    std::cout << "corner_origin.y: " << corner_origin.y << std::endl;
     m_border_corners[i][0].position = corner_origin;
     for (size_t j = 1; j < m_radius_resolution + 2; j++) {
       m_border_corners[i][j].position = {
@@ -141,10 +133,6 @@ void Tile::SetBorder(const sf::Vector2f &window_size) {
       //       (sin(radian_angle_increment * (j - 1)) * corner_radius *
       //        ((i == 0 || i == 1) ? -1 : 1))};
 
-      std::cout << "m_border_corners[i][j].position.x: "
-                << m_border_corners[i][j].position.x << std::endl;
-      std::cout << "m_border_corners[i][j].position.y: "
-                << m_border_corners[i][j].position.y << std::endl;
       m_border_corners[i][j].color = m_inactive_border_colour;
     }
   }

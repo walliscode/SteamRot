@@ -32,15 +32,15 @@ DisplayManager::DisplayManager() {
   m_sessions[0] = std::make_shared<Session>();
   m_active_session = m_sessions[0];
 
-  // print ou current wndow size
+  // print out current wndow size
   std::cout << "Window size: " << m_window.getSize().x << "x"
             << m_window.getSize().y << std::endl;
 
   // add a tile to the active session
-  sf::FloatRect viewport_ratio({0.0f, 0.0f}, {1.0f, 1.0f});
-  sf::Vector2f window_size = static_cast<sf::Vector2f>(m_window.getSize());
+  const sf::Vector2f window_size =
+      static_cast<sf::Vector2f>(m_window.getSize());
 
-  m_active_session->AddTile(m_tile_config, viewport_ratio, window_size);
+  m_active_session->AddTile(m_tile_config, window_size);
 };
 
 void DisplayManager::SetWindowConfig(const json &config) {
@@ -69,6 +69,20 @@ const json &DisplayManager::GetTileConfig() { return m_tile_config; };
 
 void DisplayManager::Update() {
   // update all necessary window logic functions
+
+  // cycle through generated actions
+  for (auto action : m_action_waiting_room) {
+    // std::cout << "Action: " << action << std::endl;
+
+    if (action->m_name == "ACTION_ADD_TILE") {
+      std::cout << "adding Tile" << std::endl;
+      // add a tile to the active session
+      const sf::Vector2f window_size =
+          static_cast<sf::Vector2f>(m_window.getSize());
+
+      m_active_session->AddTile(m_tile_config, window_size);
+    }
+  }
 };
 
 void DisplayManager::Cycle() {
@@ -79,7 +93,25 @@ void DisplayManager::Cycle() {
   auto active_session = GetActiveSession();
   auto tiles = active_session->GetTiles();
 
-  for (auto &tile : tiles) {
+  for (size_t i = 0; i < tiles.size(); ++i) {
+    // print out tile view size
+    std::shared_ptr<Tile> tile = tiles[i];
+    std::cout << "Tile " << i << " View Size: " << tile->GetView().getSize().x
+              << "x " << tile->GetView().getSize().y << "y" << std::endl;
+
+    std::cout << "Tile " << i
+              << " View Position: " << tile->GetView().getCenter().x << "x"
+              << tile->GetView().getCenter().y << std::endl;
+
+    // get viewport size and position and print
+    std::cout << "Tile " << i
+              << " Viewport Size: " << tile->GetView().getViewport().size.x
+              << "x" << tile->GetView().getViewport().size.y << "y"
+              << std::endl;
+
+    std::cout << "Tile " << i << " Viewport Position: "
+              << tile->GetView().getViewport().position.x << "x"
+              << tile->GetView().getViewport().position.y << "y" << std::endl;
 
     m_window.setView(tile->GetView());
     const auto &border_straights = tile->GetBorderStraights();
@@ -96,10 +128,8 @@ void DisplayManager::Cycle() {
 
 void DisplayManager::PopulateActions(
     const std::bitset<SteamRot::kUserInputCount> &user_input) {
-  // clear the actions vector
-  m_actions.clear();
 
-  // Action class looks for registered actions and passes through vector of
+  // Action class looks for registered actions and passes back vector of
   // action (strings)
-  m_actions = m_action.GenerateActions(user_input);
+  m_action_waiting_room = m_action.GenerateActions(user_input);
 };

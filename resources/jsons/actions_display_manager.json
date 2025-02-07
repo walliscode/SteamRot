@@ -1,11 +1,16 @@
 [
   {
-    "name": "ACTION_TEST",
+    "name": "ACTION_ADD_TILE",
     "inputs": [
       {
         "type": "key",
         "code": "A"
+      },
+      {
+        "type": "key",
+        "code": "T"
       }
-    ]
+    ],
+    "repeatable": false
   }
 ]

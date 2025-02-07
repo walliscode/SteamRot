@@ -1,11 +1,10 @@
 #include "DisplayManager.h"
-#include "Scene.h"
-#include "SceneManager.h"
 #include <SFML/Graphics.hpp>
-#include <map>
+
+// #include <map>
 #include <nlohmann/json.hpp>
 
-typedef std::map<std::string, std::shared_ptr<Scene>> SceneList;
+// typedef std::map<std::string, std::shared_ptr<Scene>> SceneList;
 
 class GameEngine {
 private:
