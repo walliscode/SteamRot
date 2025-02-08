@@ -106,10 +106,9 @@ void DisplayManager::Cycle() {
   m_window.display();
 };
 
-void DisplayManager::PopulateActions(
-    const std::bitset<SteamRot::kUserInputCount> &user_input) {
+void DisplayManager::PopulateActions(const EventFlags &event_flags) {
 
   // Action class looks for registered actions and passes back vector of
   // action (strings)
-  m_action_waiting_room = m_action.GenerateActions(user_input);
+  m_action_waiting_room = m_action.GenerateActions(event_flags);
 };

@@ -1,4 +1,5 @@
 #include "DisplayManager.h"
+#include "EventFlags.h"
 #include <SFML/Graphics.hpp>
 
 // #include <map>
@@ -15,7 +16,7 @@ private:
 
   // event management
   void sUserInput();
-  std::bitset<SteamRot::kUserInputCount> m_userInput;
+  EventFlags m_event_flags{0};
 
 public:
   GameEngine();

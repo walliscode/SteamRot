@@ -4,11 +4,11 @@
     "inputs": [
       {
         "type": "key",
-        "code": "A"
+        "code": "ALT"
       },
       {
         "type": "key",
-        "code": "T"
+        "code": "A"
       }
     ],
     "repeatable": false
