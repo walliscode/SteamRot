@@ -58,8 +58,7 @@ void Tile::SetBorder() {
   // provide the current window size, the borders will be drawn off the tile
   // Viewport
   sf::Vector2f window_size{static_cast<sf::Vector2f>(SteamRot::kWindowSize)};
-  std::cout << "Window size: " << window_size.x << "x" << window_size.y
-            << std::endl;
+
   // get the origin point of the tile
   sf::Vector2f origin_point = {window_size.x * m_view.getViewport().position.x,
                                window_size.y * m_view.getViewport().position.y};

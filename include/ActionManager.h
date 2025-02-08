@@ -2,7 +2,7 @@
 #include "EventFlags.h"
 
 #include <SFML/Graphics.hpp>
-
+#include <magic_enum/magic_enum.hpp>
 #include <map>
 #include <memory>
 #include <nlohmann/json.hpp>

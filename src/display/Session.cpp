@@ -1,5 +1,6 @@
 #include "Session.h"
 #include <SFML/Graphics/Rect.hpp>
+#include <array>
 #include <iostream>
 #include <memory>
 
@@ -91,6 +92,8 @@ void Session::SetActiveTile(std::shared_ptr<Tile> tile) {
   // set newly made Tile as active
   m_active_tile = tile;
   tile->SetBorderColourActive();
+
+  SetInactiveTiles(tile);
 };
 
 void Session::SetInactiveTiles(std::shared_ptr<Tile> tile) {
@@ -99,4 +102,63 @@ void Session::SetInactiveTiles(std::shared_ptr<Tile> tile) {
       t->SetBorderColourInactive();
     }
   }
+};
+
+std::array<std::shared_ptr<Tile>, 4> Session::GetTileNeighbours() {
+
+  // the position of the array will correspond to a direction
+  // 0 - up, 1 - right, 2 - down, 3 - left
+  std::array<std::shared_ptr<Tile>, 4> neighbours;
+  neighbours.fill(nullptr);
+
+  // get the active tile
+  std::shared_ptr<Tile> active_tile = GetActiveTile();
+  // get the active tile viewport
+  sf::FloatRect active_tile_viewport = active_tile->GetView().getViewport();
+
+  // up position
+  if (active_tile_viewport.position.y != 0) {
+    for (auto &tile : m_tiles) {
+      sf::FloatRect tile_viewport = tile->GetView().getViewport();
+      if (tile_viewport.position.y + tile_viewport.size.y ==
+          active_tile_viewport.position.y) {
+        neighbours[0] = tile;
+      }
+    }
+  }
+
+  // right position
+  if (active_tile_viewport.position.x + active_tile_viewport.size.x != 1) {
+    for (auto &tile : m_tiles) {
+      sf::FloatRect tile_viewport = tile->GetView().getViewport();
+      if (tile_viewport.position.x ==
+          active_tile_viewport.position.x + active_tile_viewport.size.x) {
+        neighbours[1] = tile;
+      }
+    }
+  }
+
+  // down position
+  if (active_tile_viewport.position.y + active_tile_viewport.size.y != 1) {
+    for (auto &tile : m_tiles) {
+      sf::FloatRect tile_viewport = tile->GetView().getViewport();
+      if (tile_viewport.position.y ==
+          active_tile_viewport.position.y + active_tile_viewport.size.y) {
+        neighbours[2] = tile;
+      }
+    }
+  }
+
+  // left position
+  if (active_tile_viewport.position.x != 0) {
+    for (auto &tile : m_tiles) {
+      sf::FloatRect tile_viewport = tile->GetView().getViewport();
+      if (tile_viewport.position.x + tile_viewport.size.x ==
+          active_tile_viewport.position.x) {
+        neighbours[3] = tile;
+      }
+    }
+  }
+
+  return neighbours;
 };
