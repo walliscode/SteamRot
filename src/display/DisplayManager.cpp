@@ -1,10 +1,12 @@
 #include "DisplayManager.h"
 #include "Session.h"
 #include "general_util.h"
+#include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <fstream>
 #include <iostream>
+#include <memory>
 
 DisplayManager::DisplayManager() {
 
@@ -66,13 +68,79 @@ void DisplayManager::Update() {
 
   // cycle through generated actions
   for (auto action : m_action_waiting_room) {
-    // std::cout << "Action: " << action << std::endl;
+    // print out action as long as waiting room is >
+    if (m_action_waiting_room.size() > 0) {
+      std::cout << "Action: " << action->m_name << std::endl;
+    }
 
     if (action->m_name == "ACTION_ADD_TILE") {
       std::cout << "adding Tile" << std::endl;
       // add a tile to the active session
 
       m_active_session->AddTile(m_tile_config, m_window);
+    }
+
+    else if (action->m_name == "ACTION_ACTIVE_TILE_UP") {
+      std::array<std::shared_ptr<Tile>, 4> neighbours =
+          m_active_session->GetTileNeighbours();
+      if (neighbours[0] != nullptr) {
+        m_active_session->SetActiveTile(neighbours[0]);
+      }
+      action->m_latch = false;
+    }
+
+    else if (action->m_name == "ACTION_ACTIVE_TILE_DOWN") {
+      std::array<std::shared_ptr<Tile>, 4> neighbours =
+          m_active_session->GetTileNeighbours();
+      if (neighbours[2] != nullptr) {
+        m_active_session->SetActiveTile(neighbours[2]);
+      }
+      action->m_latch = false;
+    }
+
+    else if (action->m_name == "ACTION_ACTIVE_TILE_RIGHT") {
+      std::array<std::shared_ptr<Tile>, 4> neighbours =
+          m_active_session->GetTileNeighbours();
+      if (neighbours[1] != nullptr) {
+        m_active_session->SetActiveTile(neighbours[1]);
+      }
+      action->m_latch = false;
+    }
+
+    else if (action->m_name == "ACTION_ACTIVE_TILE_LEFT") {
+
+      std::array<std::shared_ptr<Tile>, 4> neighbours =
+          m_active_session->GetTileNeighbours();
+
+      if (neighbours[3] != nullptr) {
+        m_active_session->SetActiveTile(neighbours[3]);
+      }
+      action->m_latch = false;
+    }
+
+    else if (action->m_name == "PRINT_ACTIVE_TILE") {
+      std::shared_ptr<Tile> active_tile = m_active_session->GetActiveTile();
+      // print out the active tile's viewport: poisition and size
+      sf::FloatRect viewport = active_tile->GetView().getViewport();
+      std::cout << "Active Tile Viewport, position: " << viewport.position.x
+                << ", " << viewport.position.y << " size: " << viewport.size.x
+                << ", " << viewport.size.y << std::endl;
+      action->m_latch = false;
+    }
+
+    else if (action->m_name == "PRINT_NEIGHBORS") {
+      std::array<std::shared_ptr<Tile>, 4> neighbours =
+          m_active_session->GetTileNeighbours();
+      for (auto neighbour : neighbours) {
+        if (neighbour != nullptr) {
+          sf::FloatRect viewport = neighbour->GetView().getViewport();
+          std::cout << "Neighbour Tile Viewport, position: "
+                    << viewport.position.x << ", " << viewport.position.y
+                    << " size: " << viewport.size.x << ", " << viewport.size.y
+                    << std::endl;
+        }
+      }
+      action->m_latch = false;
     }
   }
 };

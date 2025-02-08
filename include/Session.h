@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
+#include <array>
 #include <memory>
 class Session {
 public:
@@ -16,6 +17,7 @@ public:
   void SetInactiveTiles(std::shared_ptr<Tile> tile);
 
   sf::RenderTexture &GetTileOverlay();
+  std::array<std::shared_ptr<Tile>, 4> GetTileNeighbours();
 
 private:
   // each Session will have a sf::RenderTexture to draw to, implemnet listeners
