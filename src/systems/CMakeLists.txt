@@ -24,10 +24,14 @@ target_include_directories(systems
   PUBLIC
   ${CMAKE_SOURCE_DIR}/include
   ${CMAKE_SOURCE_DIR}/include/utils
-  ${CMAKE_SOURCE_DIR}/include/constants)
+  ${CMAKE_SOURCE_DIR}/include/constants
+  ${CMAKE_SOURCE_DIR}/include/enums
+)
 
 # check if targets exist
-set(target_list display)
+set(target_list
+display
+magic_enum)
 foreach(target_name IN LISTS target_list)
   if(NOT TARGET ${target_name})
     message(FATAL_ERROR "Target ${target_name} does not exist")
@@ -39,4 +43,5 @@ target_link_libraries(systems PUBLIC
 SFML::Graphics
 nlohmann_json::nlohmann_json
 display
+magic_enum
 )

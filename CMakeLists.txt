@@ -42,7 +42,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/FetchContentModules")
 include(AddSFML)
 include(AddCatch2)
 include(AddJson)
-
+include(AddMagicEnum)
 
 add_subdirectory(steamrot)
 add_subdirectory(src)

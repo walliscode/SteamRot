@@ -19,7 +19,8 @@ public:
 
   void Update();
   void
-  PopulateActions(const std::bitset<SteamRot::kUserInputCount> &user_input);
+  PopulateActions(const EventFlags &event_flags); // populate the action waiting
+                                                  // room with actions
   void Cycle();
 
 private:
