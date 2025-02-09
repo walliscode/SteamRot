@@ -19,12 +19,13 @@ private:
 
   // the wording is very similar to inactive, so we need to be careful
   SceneList m_interactiveScenes; // all scenes that are interactive
-  GameEngine &m_game;
-  AssetManager m_assetManager; // responsible for loading all assets of the game
-                               // (scene by scene)
+
+  // AssetManager m_assetManager; // responsible for loading all assets of the
+  // game
+  //  (scene by scene)
 
 public:
-  SceneManager(GameEngine &game);
+  SceneManager();
   void addScene(std::string tag, size_t poolSize);
   void removeScene(std::string tag);
   void activateScene(std::string tag);

@@ -1,7 +1,8 @@
 
 add_library(systems
     GameEngine.cpp
-
+    SceneManager.cpp
+    Scene.cpp
     ActionManager.cpp
 
 
