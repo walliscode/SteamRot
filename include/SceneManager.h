@@ -20,7 +20,7 @@ private:
   // the wording is very similar to inactive, so we need to be careful
   SceneList m_interactiveScenes; // all scenes that are interactive
 
-  // AssetManager m_assetManager; // responsible for loading all assets of the
+  AssetManager m_asset_manager; // responsible for loading all assets of the
   // game
   //  (scene by scene)
 

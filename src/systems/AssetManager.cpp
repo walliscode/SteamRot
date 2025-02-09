@@ -13,7 +13,7 @@ void AssetManager::LoadFonts(const std::string &scene_type) {
 
   // create the file name. check naming convention carefully
   const std::string file_name =
-      std::string(RESOURCE_DIR) + "/jsons/" + scene_type + "_fonts.json";
+      std::string(RESOURCES_DIR) + "/jsons/fonts_scene_" + scene_type + ".json";
 
   if (!utils::fileExists(file_name)) {
     std::cout << "File does not exist: " << file_name << std::endl;
@@ -43,7 +43,7 @@ void AssetManager::LoadFonts(const std::string &scene_type) {
 void AssetManager::AddFont(const std::string &tag,
                            const std::string &file_name) {
   // provide path to font file
-  std::string path = std::string(RESOURCE_DIR) + "/fonts/" + file_name;
+  std::string path = std::string(RESOURCES_DIR) + "/fonts/" + file_name;
 
   // create font object with path to constructor
   std::cout << "Loading font: " << path << std::endl;
