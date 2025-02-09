@@ -1,7 +1,7 @@
 #include "SceneManager.h"
 
 SceneManager::SceneManager()
-    : m_allScenes(), m_activeScenes(), m_inactiveScenes() {
+    : m_allScenes(), m_activeScenes(), m_inactiveScenes(), m_asset_manager() {
 
   // kick off initial scene(s)
 }
@@ -9,7 +9,7 @@ SceneManager::SceneManager()
 void SceneManager::addScene(std::string tag, const size_t poolSize) {
   // load the assets for the scene, this needs to come before the scene is
   // created as the assets are needed
-  // m_assetManager.LoadSceneAssets(tag);
+  m_asset_manager.LoadSceneAssets(tag);
 
   // auto scene = std::make_shared<SceneMainMenu>(tag, poolSize, m_game, *this);
   // // add to all scenes
