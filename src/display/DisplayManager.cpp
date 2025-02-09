@@ -78,6 +78,9 @@ void DisplayManager::Update() {
       // add a tile to the active session
 
       m_active_session->AddTile(m_tile_config, m_window);
+    } else if (action->m_name == "ACTION_REMOVE_TILE") {
+      m_active_session->RemoveTile();
+      action->m_latch = false;
     }
 
     else if (action->m_name == "ACTION_ACTIVE_TILE_UP") {

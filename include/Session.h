@@ -10,6 +10,7 @@ public:
   Session(sf::RenderWindow &window);
 
   void AddTile(const json &tile_config, sf::RenderWindow &window);
+  void RemoveTile();
 
   std::vector<std::shared_ptr<Tile>> &GetTiles();
   std::shared_ptr<Tile> GetActiveTile();
