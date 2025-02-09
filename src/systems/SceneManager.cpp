@@ -1,9 +1,7 @@
 #include "SceneManager.h"
-#include "SceneMainMenu.h"
 
-SceneManager::SceneManager(GameEngine &game)
-    : m_allScenes(), m_activeScenes(), m_inactiveScenes(), m_game(game),
-      m_assetManager() {
+SceneManager::SceneManager()
+    : m_allScenes(), m_activeScenes(), m_inactiveScenes() {
 
   // kick off initial scene(s)
 }
@@ -11,14 +9,14 @@ SceneManager::SceneManager(GameEngine &game)
 void SceneManager::addScene(std::string tag, const size_t poolSize) {
   // load the assets for the scene, this needs to come before the scene is
   // created as the assets are needed
-  m_assetManager.LoadSceneAssets(tag);
+  // m_assetManager.LoadSceneAssets(tag);
 
-  auto scene = std::make_shared<SceneMainMenu>(tag, poolSize, m_game, *this);
-  // add to all scenes
-  m_allScenes[tag] = scene;
-
-  // as default behaviour, add to inactive scenes
-  m_inactiveScenes[tag] = scene;
+  // auto scene = std::make_shared<SceneMainMenu>(tag, poolSize, m_game, *this);
+  // // add to all scenes
+  // m_allScenes[tag] = scene;
+  //
+  // // as default behaviour, add to inactive scenes
+  // m_inactiveScenes[tag] = scene;
 }
 
 void SceneManager::removeScene(std::string tag) {
@@ -117,4 +115,4 @@ json SceneManager::toJSON() {
   return j;
 }
 
-AssetManager &SceneManager::getAssetManager() { return m_assetManager; }
+// AssetManager &SceneManager::getAssetManager() { return m_assetManager; }

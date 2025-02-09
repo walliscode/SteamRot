@@ -1,5 +1,6 @@
 #include "DisplayManager.h"
 #include "EventFlags.h"
+#include "SceneManager.h"
 #include <SFML/Graphics.hpp>
 
 // #include <map>
@@ -10,8 +11,8 @@
 class GameEngine {
 private:
   DisplayManager m_displayManager;
-  // SceneManager m_sceneManager;
-  // SceneList m_scenes;
+  SceneManager m_sceneManager;
+
   size_t m_loopNumber = 0;
 
   // event management

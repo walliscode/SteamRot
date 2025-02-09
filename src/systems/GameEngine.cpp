@@ -14,7 +14,7 @@ namespace fs = std::filesystem;
 
 using namespace magic_enum::bitwise_operators;
 
-GameEngine::GameEngine() : m_displayManager() {
+GameEngine::GameEngine() : m_displayManager(), m_sceneManager() {
   init(); // kick off the game, loading assets de.t.c
 }
 
