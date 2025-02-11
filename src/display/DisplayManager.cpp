@@ -17,7 +17,7 @@ DisplayManager::DisplayManager() {
       std::string(RESOURCES_DIR) + "/jsons/display_config.json";
   // check file exists
   //
-  if (!utils::fileExists(file_name)) {
+  if (!utils::CheckFileExists(file_name)) {
     std::cout << "File does not exist: " << file_name << std::endl;
     return;
   }

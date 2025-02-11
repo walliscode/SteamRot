@@ -1,26 +1,32 @@
 #include "EntityManager.h"
+#include "general_util.h"
+#include <nlohmann/json.hpp>
+#include <vector>
+
+using json = nlohmann::json;
 
 EntityManager::EntityManager(const size_t &poolSize) {
 
   m_pool = std::make_shared<EntityMemoryPool>(poolSize);
 }
-//
-// size_t EntityManager::addEntity() {
-//   size_t newEntityID =
-//       (*m_pool)
-//           .getNextEntityIndex(); // get the next free index in the memory
-//           pool,
-//                                  // set to active and return the index
-//   refreshEntity(*(*m_pool).getData(),
-//                 newEntityID); // call the refresh entity function on the new
-//                 ID
-//                               // to clear it
-//   std::get<std::vector<CMeta>>(*(*m_pool).getData())[newEntityID]
-//       .activate(); // set the active vector to true at the new entity index
-//   m_entitiesToAdd.push_back(newEntityID);
-//
-//   return newEntityID; // return the index of the new entity
-// }
+
+// find next inactive entity index
+// refresh all components at that index
+// turn "on" by switching CMeta.active to true
+size_t EntityManager::AddEntity() {
+
+  size_t new_entity_id = (*m_pool).getNextEntityIndex();
+
+  RefreshEntity(*(*m_pool).getData(), new_entity_id);
+
+  std::vector<CMeta> meta_data =
+      std::get<std::vector<CMeta>>(*(m_pool->getData()));
+
+  meta_data[new_entity_id].activate();
+  m_entities_to_add.push_back(new_entity_id);
+
+  return new_entity_id;
+}
 
 // void EntityManager::removeEntity(size_t entityID) {
 //   m_entitiesToRemove.push_back(
@@ -56,25 +62,26 @@ EntityManager::EntityManager(const size_t &poolSize) {
 //   m_entitiesToAdd.clear(); // clear the to add waiting room
 // }
 
-// load "entities" from a json file
-// an entity is actually a collection of components at an index
-// void EntityManager::intialiseEntities(std::string sceneName) {
-//
-//   std::string fileName =
-//       (std::string(RESOURCES_DIR) + "/jsons/entities_" + sceneName +
-//       ".json");
-//   // check binary file exists
-//
-//   std::cout << "Reading binary file: " << fileName << std::endl;
-//
-//   std::vector<std::byte> buffer = utils::readBinaryFile(fileName);
-//
-//   // if buffer is empty exit intialiseEntities
-//   if (buffer.empty()) {
-//     std::cout << "No Entities to intialise" << std::endl;
-//     return;
-//   }
-// }
+// preload entities from json file, essentially adding Component data at each
+// index
+void EntityManager::IntialiseEntities(std::string scene_name) {
+
+  std::string file_name =
+      (std::string(RESOURCES_DIR) + "/jsons/entities_" + scene_name + ".json");
+  // check binary file exists
+
+  bool file_exists = utils::CheckFileExists(file_name);
+
+  if (!file_exists) {
+    return;
+  };
+
+  // load entity configuration
+  std::ifstream f(file_name);
+  json entity_config = json::parse(f);
+
+  // add a template function to load config from json
+}
 
 // std::vector<size_t> EntityManager::getEntities() { return m_entities; }
 
