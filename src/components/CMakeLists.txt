@@ -1,5 +1,5 @@
 add_library(components
-Component.cpp
+
 CMeta.cpp
 )
 
