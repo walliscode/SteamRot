@@ -11,8 +11,10 @@ using json = nlohmann::json;
 class EntityManager {
 
 private:
+  // the EntityManager will be responsible for adding and removing entities
+  // most of its members will relove around managing this (waiting rooms)
   std::vector<size_t> m_entities;
-  std::vector<size_t> m_entitiesToAdd; // list of entities to add next update
+  std::vector<size_t> m_entities_to_add;
   std::vector<size_t>
       m_entitiesToRemove; // list of entities to remove next update
   std::shared_ptr<EntityMemoryPool> m_pool; // pool of all entity
@@ -22,62 +24,61 @@ private:
 
 public:
   EntityManager(const size_t &poolSize);
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // all functions related to entity management (not getting component data)
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  // std::vector<size_t> getEntities();
-  // size_t addEntity();
+  std::vector<size_t> GetEntities();
+  size_t AddEntity();
   // void removeEntity(size_t id);
   // void updateWaitingRooms();
   //
-  // void intialiseEntities(std::string sceneName);
-  //
-  // template <typename T> void resetVal(T &componentVector, const size_t index)
-  // {
-  //
-  //   // Get the type of the vector to populate the vector with
-  //   using vecType = typename T::value_type;
-  //
-  //   // Set the index to a default constructed value
-  //   componentVector[index] = vecType();
-  //   std::cout << "-> Index of type: '" << typeid(vecType).name() << "'
-  //   reset\n";
-  // };
-  //
-  // template <typename TupleT, std::size_t... Indices>
-  // void resetTupleElements(TupleT &tp, std::index_sequence<Indices...>,
-  //                         const size_t index) {
-  //
-  //   std::cout << "\nIndexed tuple split...\n";
-  //   (resetVal(std::get<Indices>(tp), index), ...);
-  // }
-  //
-  // template <typename TupleT, std::size_t TupSize = std::tuple_size_v<TupleT>>
-  // void refreshEntity(TupleT &tp, const size_t index) {
-  //
-  //   resetTupleElements(tp, std::make_index_sequence<TupSize>{}, index);
-  //   std::cout << "Tuple index reset complete\n\n";
-  // }
+  void IntialiseEntities(std::string scene_name);
+
+  // these template functions are designed to act upon the
+  // ComponentCollectionTuple so they will (working from smallest to largest)
+  // act upon each type of each vector (the vector will contain classes
+  // inherited from Component) of the tuple
+
+  // reset indivudual components
+  template <typename T>
+  void ResetValues(T &component_vector, const size_t index) {
+
+    // Get the type of the Component the vector holds
+    using ComponentType = typename T::value_type;
+
+    // Set the index to a default constructed Component type
+    component_vector[index] = ComponentType();
+  };
+
+  // go through each component at that index and reset
+  template <typename TupleT, std::size_t... tuple_index_sequence>
+  void ResetTupleElements(TupleT &component_tuple,
+                          std::index_sequence<tuple_index_sequence...>,
+                          const size_t index) {
+
+    (ResetValues(std::get<tuple_index_sequence>(component_tuple), index), ...);
+  }
+
+  // wrapper function for resetting tuple elements. Can add other sequences here
+  template <typename TupleT, std::size_t TupleSize = std::tuple_size_v<TupleT>>
+  void RefreshEntity(TupleT &component_tuple, const size_t index) {
+
+    ResetTupleElements(component_tuple, std::make_index_sequence<TupleSize>{},
+                       index);
+  }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // all functions related to getting component data
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // template <typename T> T &getComponent(size_t entityID) {
-  //   auto &components = std::get<std::vector<T>>(*(*m_pool).getData());
-  //   return components[entityID]; // return the component of the passed
-  //   component
-  //                                // type for the requested entityID
-  // }
-  //
-  // template <typename T> bool hasComponent(size_t entityID) {
-  //   auto &components = std::get<std::vector<T>>(*(*m_pool).getData());
-  //   return components[entityID]
-  //       .getHas(); // return the component of the passed component type for
-  //       the
-  //                  // requested entityID
-  // }
+
+  template <typename T> T &GetComponent(size_t entity_id) {
+    auto &components = std::get<std::vector<T>>(m_pool->getData());
+    return components[entity_id];
+  }
+
+  template <typename T> bool hasComponent(size_t entityID) {
+    auto &components = std::get<std::vector<T>>(m_pool->getData());
+
+    return components[entityID].getHas();
+  }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // all functions related to archetype management

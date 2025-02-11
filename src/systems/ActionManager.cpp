@@ -27,7 +27,7 @@ void ActionManager::RegisterActions(std::string container_name) {
   std::string file_path =
       std::string(RESOURCES_DIR) + "/jsons/actions_" + container_name + ".json";
 
-  if (!utils::fileExists(file_path)) {
+  if (!utils::CheckFileExists(file_path)) {
     std::cout << "File does not exist: " << file_path << std::endl;
     return;
   };

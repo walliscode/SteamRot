@@ -15,7 +15,7 @@ void AssetManager::LoadFonts(const std::string &scene_type) {
   const std::string file_name =
       std::string(RESOURCES_DIR) + "/jsons/fonts_scene_" + scene_type + ".json";
 
-  if (!utils::fileExists(file_name)) {
+  if (!utils::CheckFileExists(file_name)) {
     std::cout << "File does not exist: " << file_name << std::endl;
     return;
   }

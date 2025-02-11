@@ -4,11 +4,10 @@
 #include <string>
 #include <vector>
 
-
 namespace utils {
 
 // Check if a file exists by taking in its path as a string
-inline bool fileExists(const std::string &name) {
+inline bool CheckFileExists(const std::string &name) {
   std::ifstream f(name.c_str());
   return f.good();
 }
