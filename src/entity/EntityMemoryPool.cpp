@@ -1,29 +1,33 @@
 #include "EntityMemoryPool.h"
+#include <memory>
+#include <vector>
 
-EntityMemoryPool::EntityMemoryPool(int poolSize)
-    : m_numEntities(poolSize),
-      m_data(std::make_shared<EntityComponentVectorTuple>()) {
-  defineFreshTuple(*m_data, poolSize); // call the fresh tuple temple to define
-                                       // all teh vectors in teh tuple
+EntityMemoryPool::EntityMemoryPool(const size_t &pool_size)
+    : m_num_entities(pool_size),
+      m_data(std::make_shared<ComponentCollectionTuple>()) {
+  DefineFreshTuple(*m_data, pool_size);
 }
 
-int EntityMemoryPool::getNextEntityIndex() {
-  // return the index for the next free entity index
-  for (int i = 0; i != std::get<0>(*m_data).size();
-       ++i) // loop through the size of the active array
-  {
-    const bool active =
-        std::get<std::vector<CMeta>>(*m_data)[i]
-            .getActive(); // get the active bool at the current index.
-                          // std::get<type>(tuple)[index].member
-    if (!active) {
-      return i; // if an index is found to be false, then the position is free
-                // and return the index
+const size_t EntityMemoryPool::getNextEntityIndex() {
+
+  // 0 will be used as no free positions (possible collisions with index 0?)
+  size_t index = 0;
+  // the CMeta component contains meta data about the entity
+  // in this scenario, is the entity active or not?
+  // if not then we can use it as another entity
+  std::vector<CMeta> cmeta_vector = std::get<std::vector<CMeta>>(*m_data);
+
+  // return the index for the next free entity index using CMeta active member
+  for (int i = 0; i != cmeta_vector.size(); ++i) {
+
+    if (!cmeta_vector[i].getActive()) {
+      index = i;
+      break;
     }
   }
-  return 0; // if no free position was found then return 0 to indicate this
+  return index;
 }
 
-std::shared_ptr<EntityComponentVectorTuple> EntityMemoryPool::getData() {
+std::shared_ptr<ComponentCollectionTuple> EntityMemoryPool::getData() {
   return m_data;
 }

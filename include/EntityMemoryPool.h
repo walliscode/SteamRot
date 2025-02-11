@@ -1,63 +1,73 @@
 #pragma once
 #include <algorithm>
-#include <iostream>
+#include <cstddef>
 #include <memory>
 #include <tuple>
 #include <vector>
 
 #include "CMeta.h"
-#include "CText.h"
-#include "CTransform.h"
 
-typedef std::tuple<std::vector<CMeta>,      // bool to track if pool position is
-                                            // active
-                   std::vector<CTransform>, // CTransform vector list
-                   std::vector<CText>       // CText vector list
-                   >
-    EntityComponentVectorTuple;
+// all available components will be referenced in this tuple. This allows us to
+// use template functions
+
+typedef std::tuple<std::vector<CMeta>> ComponentCollectionTuple;
 
 class EntityMemoryPool {
-  size_t m_numEntities; // total number of entitys
-  std::shared_ptr<EntityComponentVectorTuple>
-      m_data; // store of component vectors (all component data for this pool)
+
+private:
+  // the number of "entities" is the length of the component vectors
+  // these NEED to be the same for each vector
+  size_t m_num_entities;
+
+  // this is where all the component data is stored
+  std::shared_ptr<ComponentCollectionTuple> m_data;
 
 public:
-  EntityMemoryPool(int poolSize); // constructor for setting pool size
+  EntityMemoryPool(
+      const size_t &pool_size); // constructor for setting pool size
 
   // Entity pool functions
-  int getNextEntityIndex(); // return the next free index for a new entity
+  // return the next "free" entity index. this will still have Components but
+  // they will all be reset
+  const size_t getNextEntityIndex();
 
-  std::shared_ptr<EntityComponentVectorTuple>
-  getData(); // return the data pool for quering
-
+  std::shared_ptr<ComponentCollectionTuple> getData();
   // Entity pool templates
-  template <typename T>
-  void defineElem(T &x, int size) // for a passed vector and size, initialise
-                                  // the vector to the specified size
-  {
-    x.resize(size);                         // Resize the vector
-    using vecType = typename T::value_type; // Get the variable type to populate
-                                            // the vector with
-    std::fill(x.begin(), x.end(),
-              vecType()); // Populate the vector with empty components
-    std::cout << "-> Empty vector of type: '" << typeid(vecType).name()
-              << "' defined, resized to: " << x.size() << " items\n";
-  };
 
-  template <typename TupleT, std::size_t... Is>
-  void defineTupleElements(TupleT &tp, std::index_sequence<Is...>,
-                           size_t size) // unfold function to call define
-                                        // element for each tuple element
-  {
-    std::cout << "\nMemory pool tuple split...\n";
-    (defineElem(std::get<Is>(tp), size), ...);
+  // This is designed to work with the ComponentCollectionTuple
+  // it takes in each std::vector<T> and resizes it to the size passed in
+  template <typename T>
+  void DefineComponentVectorSize(T &component_vector,
+                                 const size_t &vector_size) {
+
+    component_vector.resize(vector_size);
+
+    // fill the vector with default constructed values for the components
+    std::fill(component_vector.begin(), component_vector.end(),
+              typename T::value_type());
   }
 
-  template <typename TupleT, std::size_t TupSize = std::tuple_size_v<TupleT>>
-  void defineFreshTuple(TupleT &tp, const size_t size) {
-    defineTupleElements(tp, std::make_index_sequence<TupSize>{},
-                        size); // call the define tuple elements function with
-                               // the size of the tuple being passed
-    std::cout << "Tuple definition complete\n\n";
+  // take in a tuple (again, designed to work with the ComponentCollectionTuple)
+  // create an index sequence from the size of the tuple (essentially a for
+  // loop) vector size is also passed in to pass to define each
+  // std::vector<Component>
+  template <typename TupleT, std::size_t... tuple_index_sequence>
+  void DefineTupleElements(TupleT &tuple,
+                           std::index_sequence<tuple_index_sequence...>,
+                           size_t vector_size)
+
+  {
+    (DefineComponentVectorSize(std::get<tuple_index_sequence>(tuple),
+                               vector_size),
+     ...);
+  }
+
+  // this is essentially the init function for the memory pool
+  // other setup functions can be added here
+  template <typename TupleT, std::size_t TupleSize = std::tuple_size_v<TupleT>>
+  void DefineFreshTuple(TupleT &tuple, const size_t vector_size) {
+
+    DefineTupleElements(tuple, std::make_index_sequence<TupleSize>{},
+                        vector_size);
   }
 };

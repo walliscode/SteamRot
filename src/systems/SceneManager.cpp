@@ -6,18 +6,7 @@ SceneManager::SceneManager()
   // kick off initial scene(s)
 }
 
-void SceneManager::addScene(std::string tag, const size_t poolSize) {
-  // load the assets for the scene, this needs to come before the scene is
-  // created as the assets are needed
-  m_asset_manager.LoadSceneAssets(tag);
-
-  // auto scene = std::make_shared<SceneMainMenu>(tag, poolSize, m_game, *this);
-  // // add to all scenes
-  // m_allScenes[tag] = scene;
-  //
-  // // as default behaviour, add to inactive scenes
-  // m_inactiveScenes[tag] = scene;
-}
+void SceneManager::addScene(std::string tag, const size_t poolSize) {}
 
 void SceneManager::removeScene(std::string tag) {
   m_allScenes.erase(tag);

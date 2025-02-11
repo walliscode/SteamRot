@@ -5,10 +5,15 @@ add_library(entity
     Archetype.cpp
 )
 
-target_include_directories(entity PUBLIC ${CMAKE_SOURCE_DIR}/include)
+target_include_directories(entity
+  PUBLIC
+  ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_SOURCE_DIR}/include/utils
+)
 
 target_link_libraries(entity
   PUBLIC
   nlohmann_json::nlohmann_json
   SFML::Graphics
+  components
 )

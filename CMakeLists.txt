@@ -48,12 +48,3 @@ add_subdirectory(steamrot)
 add_subdirectory(src)
 
 
-# add external libraries
-include_directories(${CMAKE_SOURCE_DIR}/external)
-
-# create interface library for header only targets
-add_library(MyENUMs INTERFACE)
-target_link_libraries(MyENUMs INTERFACE magic_enum)
-target_include_directories(MyENUMs INTERFACE ${CMAKE_SOURCE_DIR}/include/enums)
-
-

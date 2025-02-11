@@ -8,7 +8,7 @@
 class Scene {
 protected:
   // objects live within the Scene
-  // EntityManager m_entity_manager;
+  EntityManager m_entity_manager;
   ActionManager m_action_manager;
 
   // Scene properties
@@ -20,7 +20,7 @@ protected:
 
   virtual void sDoAction(const ActionManager &action) = 0;
 
-  Scene(const std::string &name, size_t poolSize);
+  Scene(const std::string &name, const size_t &pool_size);
 
 public:
   virtual void update() = 0;
