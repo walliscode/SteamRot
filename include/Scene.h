@@ -18,8 +18,6 @@ protected:
   bool m_interactable = false;
   size_t m_current_frame = 0;
 
-  virtual void sDoAction(const ActionManager &action) = 0;
-
   Scene(const std::string &name, const size_t &pool_size);
 
 public:
@@ -27,10 +25,6 @@ public:
 
   bool getActive() const;
   void setActive(bool active);
-
-  // ####### Actions Functions #######
-
-  void doAction(const ActionManager &action); // Do an action
 
   // data extraction
   json toJSON(); // Convert the scene to a json object

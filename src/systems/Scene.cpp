@@ -1,11 +1,6 @@
 #include "Scene.h"
 Scene::Scene(const std::string &name, const size_t &pool_size)
-    : m_name(name), m_action_manager(name), m_entity_manager(pool_size) {}
-
-void Scene::update() {
-
-  // put systems here
-}
+    : m_name(name), m_action_manager(name), m_entity_manager(pool_size, name) {}
 
 bool Scene::getActive() const { return m_active; }
 

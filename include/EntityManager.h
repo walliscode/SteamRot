@@ -15,22 +15,20 @@ private:
   // most of its members will relove around managing this (waiting rooms)
   std::vector<size_t> m_entities;
   std::vector<size_t> m_entities_to_add;
-  std::vector<size_t>
-      m_entitiesToRemove; // list of entities to remove next update
-  std::shared_ptr<EntityMemoryPool> m_pool; // pool of all entity
-  // data
+  std::vector<size_t> m_entities_to_remove;
+  std::shared_ptr<EntityMemoryPool> m_pool;
+
+  void IntialiseEntities(std::string scene_name);
 
   // ArchetypeManager m_archetypeManager;
 
 public:
-  EntityManager(const size_t &poolSize);
+  EntityManager(const size_t &pool_size, const std::string &scene_name);
 
   std::vector<size_t> GetEntities();
   size_t AddEntity();
-  // void removeEntity(size_t id);
-  // void updateWaitingRooms();
-  //
-  void IntialiseEntities(std::string scene_name);
+  void RemoveEntity(size_t entity_index);
+  void UpdateWaitingRooms();
 
   // these template functions are designed to act upon the
   // ComponentCollectionTuple so they will (working from smallest to largest)
