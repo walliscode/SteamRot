@@ -9,11 +9,11 @@ void CMeta::activate() { m_active = true; }
 // sets the entity as inactive
 void CMeta::deactivate() { m_active = false; }
 
-// // sets the component from flatbuffers data
-// void CMeta::fromFlatbuffers(const SteamRot::rawData::MetaComponent* meta) {
-//
-// 	m_active = meta->active();
-// }
+// set component data from json
+void CMeta::LoadJSONData(const json &component_config) {
+
+  m_active = component_config["active"];
+}
 
 // converts the component to json data
 json CMeta::toJSON() {

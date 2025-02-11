@@ -18,5 +18,6 @@ public:
 
   CMeta() = default; // default constructor for memory allocation
 
+  void LoadJSONData(const json &component_config) override;
   json toJSON(); // used to convert the component to json data
 };
