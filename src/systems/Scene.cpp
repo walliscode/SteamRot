@@ -1,9 +1,6 @@
 #include "Scene.h"
-Scene::Scene(const std::string &name, size_t poolSize)
-    : m_name(name), m_action_manager(name) {
-
-  // this->m_entity_manager.intialiseEntities(this->m_name);
-}
+Scene::Scene(const std::string &name, const size_t &pool_size)
+    : m_name(name), m_action_manager(name), m_entity_manager(pool_size) {}
 
 void Scene::update() {
 
@@ -13,10 +10,6 @@ void Scene::update() {
 bool Scene::getActive() const { return m_active; }
 
 void Scene::setActive(bool active) { m_active = active; }
-
-// GameEngine &Scene::getEngine() { return m_engine; }
-
-// SceneManager &Scene::getSceneManager() { return m_sceneManager; }
 
 json Scene::toJSON() {
   json j;

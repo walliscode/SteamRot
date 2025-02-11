@@ -23,8 +23,6 @@ void GameEngine::init() {
   // print out the initial state of the m_event_flags enum
   using magic_enum::iostream_operators::operator<<;
   std::cout << "Initial Event flags: " << m_event_flags << std::endl;
-  // create initial scenes
-  // m_sceneManager.addScene("mainMenu", 10);
 }
 
 void GameEngine::run(size_t numLoops) {

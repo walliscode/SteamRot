@@ -33,7 +33,8 @@ target_include_directories(systems
 # check if targets exist
 set(target_list
 display
-magic_enum)
+magic_enum
+entity)
 foreach(target_name IN LISTS target_list)
   if(NOT TARGET ${target_name})
     message(FATAL_ERROR "Target ${target_name} does not exist")
@@ -46,4 +47,5 @@ SFML::Graphics
 nlohmann_json::nlohmann_json
 display
 magic_enum
+entity
 )
