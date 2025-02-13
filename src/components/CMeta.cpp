@@ -9,6 +9,10 @@ void CMeta::activate() { m_active = true; }
 // sets the entity as inactive
 void CMeta::deactivate() { m_active = false; }
 
+const SteamRot::ComponentFlags &CMeta::getComponentFlags() const {
+  return m_component_flags;
+}
+
 // set component data from json
 void CMeta::LoadJSONData(const json &component_config) {
 

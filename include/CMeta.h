@@ -1,23 +1,28 @@
 #pragma once
 #include "Component.h"
+#include "ComponentFlags.h"
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 class CMeta : public Component {
 
 private:
-  bool m_active = false; // used to determine if the entity is active and will
-                         // be considered in systems
+  bool m_active = false;
+
+  // designed to be able to quickly inform of what components are active
+  // default value is 1, as CMeta should always be active
+  SteamRot::ComponentFlags m_component_flags{1};
 
 public:
-  const bool getActive() const; // used to determine if the entity is active and
-                                // will be considered in systems
+  CMeta() = default;
+  // determines whether the entity is active or not
+  const bool getActive() const;
+  void activate();
+  void deactivate();
 
-  void activate();   // used to set the entity as active
-  void deactivate(); // used to set the entity as inactive
-
-  CMeta() = default; // default constructor for memory allocation
+  // Component Flag functions
+  const SteamRot::ComponentFlags &getComponentFlags() const;
 
   void LoadJSONData(const json &component_config) override;
-  json toJSON(); // used to convert the component to json data
+  json toJSON();
 };

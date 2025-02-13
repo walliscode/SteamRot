@@ -1,11 +1,10 @@
 #include "Archetype.h"
-#include "ComponentCollections.h"
 #include <algorithm>
 
-Archetype::Archetype(const ComponentFlags &archetype_components)
+Archetype::Archetype(const SteamRot::ComponentFlags &archetype_components)
     : m_id(archetype_components) {};
 
-const ComponentFlags &Archetype::getID() const { return m_id; }
+const SteamRot::ComponentFlags &Archetype::getID() const { return m_id; }
 
 const std::vector<size_t> &Archetype::getEntities() const { return m_entities; }
 

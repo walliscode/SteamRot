@@ -1,15 +1,16 @@
 #include "ArchetypeManager.h"
-#include "ComponentCollections.h"
-
 #include <cstddef>
+#include <magic_enum/magic_enum.hpp>
+#include <stdexcept>
 #include <vector>
+
 
 ArchetypeManager::ArchetypeManager() {}
 
 // exact archetype is one that contains exactly the required components
 // no more, no less
 const Archetype &ArchetypeManager::getExactArchetype(
-    const ComponentFlags &archetype_finder) const {
+    const SteamRot::ComponentFlags &archetype_finder) const {
 
   // here we can use the == operator to compare the component flags
   // this is because we want the exact combination of components
@@ -24,7 +25,7 @@ const Archetype &ArchetypeManager::getExactArchetype(
 };
 
 const std::vector<size_t> &ArchetypeManager::getExactArchetypeEntities(
-    const ComponentFlags &archetype_finder) const {
+    const SteamRot::ComponentFlags &archetype_finder) const {
 
   return getExactArchetype(archetype_finder).getEntities();
 };
@@ -32,7 +33,7 @@ const std::vector<size_t> &ArchetypeManager::getExactArchetypeEntities(
 // Inclusive archetypes are those that contain at least the required components
 const std::shared_ptr<std::vector<Archetype>>
 ArchetypeManager::getInclusiveArchetype(
-    const ComponentFlags &archetype_requirements) const {
+    const SteamRot::ComponentFlags &archetype_requirements) const {
   std::vector<Archetype> return_set;
 
   // Loop through all archetypes adding each code that contains at least the tag
@@ -53,7 +54,7 @@ ArchetypeManager::getInclusiveArchetype(
 
 const std::shared_ptr<std::vector<size_t>>
 ArchetypeManager::getInclusiveArchetypeEntities(
-    const ComponentFlags &archetype_requirements) const {
+    const SteamRot::ComponentFlags &archetype_requirements) const {
 
   // create a vector to store all entities for all matching archetypes' entities
   std::vector<size_t> entities_set;
