@@ -3,14 +3,10 @@
 #include <cstddef>
 #include <memory>
 #include <tuple>
-#include <vector>
 
-#include "CMeta.h"
-
-// all available components will be referenced in this tuple. This allows us to
-// use template functions
-
-typedef std::tuple<std::vector<CMeta>> ComponentCollectionTuple;
+// global definition for the ComponentCollectionTuple in the header file
+// do not add extra componets anywhere else
+#include "ComponentCollections.h"
 
 class EntityMemoryPool {
 
@@ -20,7 +16,7 @@ private:
   size_t m_num_entities;
 
   // this is where all the component data is stored
-  std::shared_ptr<ComponentCollectionTuple> m_data;
+  std::shared_ptr<ComponentCollection> m_data;
 
 public:
   EntityMemoryPool(
@@ -31,7 +27,7 @@ public:
   // they will all be reset
   const size_t getNextEntityIndex();
 
-  std::shared_ptr<ComponentCollectionTuple> getData();
+  std::shared_ptr<ComponentCollection> getData();
   // Entity pool templates
 
   // This is designed to work with the ComponentCollectionTuple

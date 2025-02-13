@@ -16,5 +16,6 @@ target_link_libraries(components
   PUBLIC
   nlohmann_json::nlohmann_json
   SFML::Graphics
-  )
+  magic_enum::magic_enum
+)
 

@@ -1,128 +1,123 @@
 #include "ArchetypeManager.h"
-#include "Config.h"
+#include "ComponentCollections.h"
+
+#include <cstddef>
+#include <vector>
 
 ArchetypeManager::ArchetypeManager() {}
 
+// exact archetype is one that contains exactly the required components
+// no more, no less
 const Archetype &ArchetypeManager::getExactArchetype(
-    const std::vector<std::string> requirements) const {
+    const ComponentFlags &archetype_finder) const {
 
-  // Gen the target archetype code
-  std::unique_ptr<size_t> tagCode = generateTagCode(requirements);
-
-  // Loop through all archetypes until the exact matching code is found
-
+  // here we can use the == operator to compare the component flags
+  // this is because we want the exact combination of components
+  // this will produce a unique size_t value for each combination of components
   for (auto &arch : m_archetypes) {
-    if (*tagCode == *arch.getCode()) {
-      // return the matching archetype
+    if (arch.getID() == archetype_finder) {
       return arch;
-      break;
     }
   }
-}
 
+  throw std::runtime_error("Archetype not found");
+};
+
+const std::vector<size_t> &ArchetypeManager::getExactArchetypeEntities(
+    const ComponentFlags &archetype_finder) const {
+
+  return getExactArchetype(archetype_finder).getEntities();
+};
+
+// Inclusive archetypes are those that contain at least the required components
 const std::shared_ptr<std::vector<Archetype>>
 ArchetypeManager::getInclusiveArchetype(
-    const std::vector<std::string> requirements) const {
-  std::vector<Archetype> returnSet;
-
-  // Gen the target archetype code
-  std::unique_ptr<size_t> tagCode = generateTagCode(requirements);
+    const ComponentFlags &archetype_requirements) const {
+  std::vector<Archetype> return_set;
 
   // Loop through all archetypes adding each code that contains at least the tag
   // code
 
   for (auto &arch : m_archetypes) {
-    size_t tagAnd = *tagCode & *arch.getCode();
-    if (tagAnd == *tagCode) {
-      returnSet.push_back(arch);
+    // use & bit wise operator from magic enum to get inclusive archetypes
+    // this will return a non-zero value if the archetype contains the required
+    // components
+    using namespace magic_enum::bitwise_operators;
+    int flag_check = static_cast<int>(arch.getID() & archetype_requirements);
+    if (flag_check != 0) {
+      return_set.push_back(arch);
     }
   }
-  return std::make_shared<std::vector<Archetype>>(returnSet);
-}
-
-const std::vector<size_t> &ArchetypeManager::getExactArchetypeEntities(
-    const std::vector<std::string> requirements) const {
-  return getExactArchetype(requirements)
-      .getEntities(); // return the entities for the given component set
+  return std::make_shared<std::vector<Archetype>>(return_set);
 }
 
 const std::shared_ptr<std::vector<size_t>>
 ArchetypeManager::getInclusiveArchetypeEntities(
-    const std::vector<std::string> requirements) const {
+    const ComponentFlags &archetype_requirements) const {
 
   // create a vector to store all entities for all matching archetypes' entities
-  std::vector<size_t> entitiesSet;
-  std::vector<Archetype> archSet = *getInclusiveArchetype(requirements);
-  for (auto &arch : archSet) {
-    entitiesSet.insert(entitiesSet.end(), arch.getEntities().begin(),
-                       arch.getEntities().end());
+  std::vector<size_t> entities_set;
+  std::vector<Archetype> archetype_set =
+      *getInclusiveArchetype(archetype_requirements);
+
+  // loop through all archetypes and add all entities to the set
+  // this currently does not care about duplicates
+  for (auto &arch : archetype_set) {
+    entities_set.insert(entities_set.end(), arch.getEntities().begin(),
+                        arch.getEntities().end());
   }
-  return std::make_shared<std::vector<size_t>>(
-      entitiesSet); // return the entities for the given component set
+  return std::make_shared<std::vector<size_t>>(entities_set);
 }
 
-const std::unique_ptr<size_t>
-ArchetypeManager::generateTagCode(std::vector<std::string> tags) const {
-  size_t archCode = 0;
-  for (auto &tag : tags) {
-    archCode =
-        archCode | (1 << (compTagMap[tag] -
-                          1)); // for each ID, OR the current code with 1,
-                               // bitshifted by the ID - 1 (add a 1 to the code
-                               // at the binary position set by the ID)
-  };
-  return std::make_unique<size_t>(archCode);
-}
-
-void ArchetypeManager::assignArchetype(size_t assEntity,
-                                       std::vector<std::string> compTags) {
-  // Gen the archcode for the given entity
-  std::unique_ptr<size_t> entCode = generateTagCode(compTags);
-  // loop through the arch lists and add this entity to the correct list
-
-  for (auto &arch : m_archetypes) {
-    if (*arch.getCode() == *entCode) {
-      arch.addEntity(assEntity);
-      return;
-    }
-  }
-
-  // if no archetype existed with the correct code, create a new archetype
-  std::vector<size_t> newIDSet;
-  for (auto &tag : compTags) {
-    newIDSet.push_back(compTagMap[tag]);
-  }
-  m_archetypes.push_back(*new Archetype(newIDSet));
-  m_archetypes.back().addEntity(assEntity);
-}
-
-void ArchetypeManager::clearEntity(size_t clrEntity,
-                                   std::vector<std::string> compTags) {
-  // Gen the archcode for the given entity
-  std::unique_ptr<size_t> entCode = generateTagCode(compTags);
-
-  // loop through the arch lists and remove this entity from the correct list
-  for (auto &arch : m_archetypes) {
-    if (*arch.getCode() == *entCode) {
-      arch.removeEntity(clrEntity);
-      break;
-    }
-  }
-}
-
-void ArchetypeManager::reassessEntity(size_t reAssEntity,
-                                      std::vector<std::string> compTags) {
-  // find the old archetype and remove this entity
-  for (auto &arch : m_archetypes) {
-    if (arch.contains(reAssEntity)) {
-      arch.removeEntity(reAssEntity);
-      break;
-    }
-  }
-
-  // add the entity to the correct list
-  assignArchetype(reAssEntity, compTags);
-}
+// void ArchetypeManager::AssignEntityToArchetype(
+//     size_t assEntity, std::vector<std::string> compTags) {
+//   // Gen the archcode for the given entity
+//   std::unique_ptr<size_t> entCode = generateTagCode(compTags);
+//   // loop through the arch lists and add this entity to the correct list
+//
+//   for (auto &arch : m_archetypes) {
+//     if (*arch.getCode() == *entCode) {
+//       arch.addEntity(assEntity);
+//       return;
+//     }
+//   }
+//
+//   // if no archetype existed with the correct code, create a new archetype
+//   std::vector<size_t> newIDSet;
+//   for (auto &tag : compTags) {
+//     newIDSet.push_back(compTagMap[tag]);
+//   }
+//   m_archetypes.push_back(*new Archetype(newIDSet));
+//   m_archetypes.back().addEntity(assEntity);
+// }
+//
+// void ArchetypeManager::clearEntity(size_t clrEntity,
+//                                    std::vector<std::string> compTags) {
+//   // Gen the archcode for the given entity
+//   std::unique_ptr<size_t> entCode = generateTagCode(compTags);
+//
+//   // loop through the arch lists and remove this entity from the correct list
+//   for (auto &arch : m_archetypes) {
+//     if (*arch.getCode() == *entCode) {
+//       arch.removeEntity(clrEntity);
+//       break;
+//     }
+//   }
+// }
+//
+// void ArchetypeManager::reassessEntity(size_t reAssEntity,
+//                                       std::vector<std::string> compTags) {
+//   // find the old archetype and remove this entity
+//   for (auto &arch : m_archetypes) {
+//     if (arch.contains(reAssEntity)) {
+//       arch.removeEntity(reAssEntity);
+//       break;
+//     }
+//   }
+//
+//   // add the entity to the correct list
+//   assignArchetype(reAssEntity, compTags);
+// }
 
 const std::vector<Archetype> ArchetypeManager::getArchetypes() const {
   return m_archetypes;
