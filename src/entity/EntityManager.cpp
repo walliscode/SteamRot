@@ -117,30 +117,3 @@ json EntityManager::toJSON() {
 
   return j;
 }
-//
-// const ArchetypeManager &EntityManager::getArchetypeManager() const {
-//   return m_archetypeManager;
-// }
-//
-// // Pass through functions for handling archetypes
-//
-// const Archetype &
-// EntityManager::getExactArchetype(std::vector<std::string> requirements) const
-// {
-//   return m_archetypeManager.getExactArchetype(requirements);
-// }
-// const std::vector<size_t> &EntityManager::getExactArchetypeEntities(
-//     std::vector<std::string> requirements) const {
-//   return m_archetypeManager.getExactArchetypeEntities(requirements);
-// }
-//
-// const std::shared_ptr<std::vector<Archetype>>
-// EntityManager::getInclusiveArchetype(
-//     std::vector<std::string> requirements) const {
-//   return m_archetypeManager.getInclusiveArchetype(requirements);
-// }
-// const std::shared_ptr<std::vector<size_t>>
-// EntityManager::getInclusiveArchetypeEntities(
-//     std::vector<std::string> requirements) const {
-//   return m_archetypeManager.getInclusiveArchetypeEntities(requirements);
-// }

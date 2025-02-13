@@ -1,5 +1,5 @@
 #pragma once
-// #include "ArchetypeManager.h"
+#include "ArchetypeManager.h"
 #include "EntityMemoryPool.h"
 #include <cstddef>
 
@@ -20,7 +20,7 @@ private:
 
   void IntialiseEntities(std::string scene_name);
 
-  // ArchetypeManager m_archetypeManager;
+  ArchetypeManager m_archetype_manager;
 
 public:
   EntityManager(const size_t &pool_size, const std::string &scene_name);
@@ -78,29 +78,6 @@ public:
     return components[entityID].getHas();
   }
 
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // all functions related to archetype management
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // const ArchetypeManager &
-  // getArchetypeManager() const; // function for returning archtype manager for
-  //                              // testing and if required
-  //
-  // const Archetype &getExactArchetype(std::vector<std::string> requirements)
-  //     const; // pass through for getting exact archetype
-  // const std::vector<size_t> &
-  // getExactArchetypeEntities(std::vector<std::string> requirements)
-  //     const; // pass through for getting exact archetype entities
-  //
-  // const std::shared_ptr<std::vector<Archetype>>
-  // getInclusiveArchetype(std::vector<std::string> requirements)
-  //     const; // pass through for getting archetypes of inclusive component
-  //     sets
-  // const std::shared_ptr<std::vector<size_t>>
-  // getInclusiveArchetypeEntities(std::vector<std::string> requirements)
-  //     const; // pass through for getting entities for inclusive component
-  //     sets
-  //
   // extracting data to json
 
   json toJSON(); // extract data to a json object
