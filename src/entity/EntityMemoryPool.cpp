@@ -4,7 +4,7 @@
 
 EntityMemoryPool::EntityMemoryPool(const size_t &pool_size)
     : m_num_entities(pool_size),
-      m_data(std::make_shared<ComponentCollectionTuple>()) {
+      m_data(std::make_shared<ComponentCollection>()) {
   DefineFreshTuple(*m_data, pool_size);
 }
 
@@ -28,6 +28,6 @@ const size_t EntityMemoryPool::getNextEntityIndex() {
   return index;
 }
 
-std::shared_ptr<ComponentCollectionTuple> EntityMemoryPool::getData() {
+std::shared_ptr<ComponentCollection> EntityMemoryPool::getData() {
   return m_data;
 }

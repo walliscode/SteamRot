@@ -1,27 +1,21 @@
 #pragma once
 
+#include "ComponentCollections.h"
 #include <cstdlib>
-#include <memory>
 #include <vector>
-
 
 class Archetype {
 private:
   std::vector<size_t> m_entities;
-  std::vector<size_t> m_idSet;
+  ComponentFlags m_id;
 
 public:
-  Archetype(std::vector<size_t> archetypeID);
+  Archetype(const ComponentFlags &archetype_components);
 
-  const std::vector<size_t> &getIDSet() const; // get the archetype key set
-  const std::vector<size_t> &
-  getEntities() const; // get the set of entity ids in this archetype
-  void addEntity(size_t newEntity);    // add an entity ID to this archetype
-  void removeEntity(size_t remEntity); // remove an entity ID from this
-                                       // archetype
+  const ComponentFlags &getID() const;
+  const std::vector<size_t> &getEntities() const;
+  void AddEntityToArchetype(size_t entity_id);
+  void RemoveEntityFromArchetype(size_t entity_id);
 
-  const std::unique_ptr<size_t> getCode()
-      const; // generate and return the binary code from the component ID sets
-  const bool
-  contains(size_t entity) const; // check if the entity ID is in this archetype
+  const bool ContainsEntity(size_t entity) const;
 };
