@@ -6,7 +6,6 @@ CMeta.cpp
 target_include_directories(components
   PUBLIC
   ${CMAKE_SOURCE_DIR}/include
-
 )
 
 
@@ -17,5 +16,6 @@ target_link_libraries(components
   nlohmann_json::nlohmann_json
   SFML::Graphics
   magic_enum::magic_enum
+  steamrot_enums
 )
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "ArchetypeManager.h"
+#include "ComponentFlags.h"
 #include "EntityMemoryPool.h"
 #include <cstddef>
 
@@ -29,6 +30,14 @@ public:
   size_t AddEntity();
   void RemoveEntity(size_t entity_index);
   void UpdateWaitingRooms();
+
+  std::vector<int> getVector() {
+    std::vector<int> vec = {1, 2, 3, 4};
+    return vec;
+  }
+  // i envisage getting the CMeta Component Flags often enough that is worth a
+  // convenience function
+  const SteamRot::ComponentFlags &GetComponentFlags(size_t entity_id);
 
   // these template functions are designed to act upon the
   // ComponentCollectionTuple so they will (working from smallest to largest)

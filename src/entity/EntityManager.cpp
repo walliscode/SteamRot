@@ -1,4 +1,5 @@
 #include "EntityManager.h"
+#include "ComponentFlags.h"
 #include "general_util.h"
 #include <nlohmann/json.hpp>
 #include <vector>
@@ -97,6 +98,15 @@ void EntityManager::IntialiseEntities(std::string scene_name) {
     // CMeta activation handled by AddEntity
     size_t entity_id = AddEntity();
   }
+}
+
+const SteamRot::ComponentFlags &
+EntityManager::GetComponentFlags(size_t entity_id) {
+
+  CMeta meta_data =
+      std::get<std::vector<CMeta>>(*(m_pool->getData()))[entity_id];
+
+  return meta_data.getComponentFlags();
 }
 
 // std::vector<size_t> EntityManager::getEntities() { return m_entities; }

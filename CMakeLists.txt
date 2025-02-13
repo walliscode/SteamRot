@@ -44,6 +44,7 @@ include(AddCatch2)
 include(AddJson)
 include(AddMagicEnum)
 
+add_subdirectory(include)
 add_subdirectory(steamrot)
 add_subdirectory(src)
 

@@ -1,9 +1,8 @@
 #pragma once
 
 #include "Archetype.h"
-#include "ComponentCollections.h"
 #include <cstdlib>
-
+#include <memory>
 #include <vector>
 
 class ArchetypeManager {
@@ -19,18 +18,18 @@ public:
   //
   //
   // returns the archetype will contains all and only the provided Components
-  const Archetype &
-  getExactArchetype(const ComponentFlags &archetype_requirements) const;
+  const Archetype &getExactArchetype(
+      const SteamRot::ComponentFlags &archetype_requirements) const;
 
-  const std::vector<size_t> &
-  getExactArchetypeEntities(const ComponentFlags &archetype_requirements) const;
+  const std::vector<size_t> &getExactArchetypeEntities(
+      const SteamRot::ComponentFlags &archetype_requirements) const;
 
   // get all archetypes that contain the provided Components
-  const std::shared_ptr<std::vector<Archetype>>
-  getInclusiveArchetype(const ComponentFlags &archetype_requirements) const;
+  const std::shared_ptr<std::vector<Archetype>> getInclusiveArchetype(
+      const SteamRot::ComponentFlags &archetype_requirements) const;
 
   const std::shared_ptr<std::vector<size_t>> getInclusiveArchetypeEntities(
-      const ComponentFlags &archetype_requirements) const;
+      const SteamRot::ComponentFlags &archetype_requirements) const;
 
   // void AssignEntityToArchetype(size_t entity_id,
   //                              std::vector<std::string> compTags);
