@@ -42,6 +42,8 @@ public:
   SceneList &getInactiveScenes();
   SceneList &getInteractiveScenes();
 
+  std::map<std::string, SceneDrawableMap> ProvideSceneDrawables();
+
   // Asset manager functions
   AssetManager &getAssetManager();
 

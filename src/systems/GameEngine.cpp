@@ -38,6 +38,11 @@ void GameEngine::run(size_t numLoops) {
     // Update all the necessary components of the game
     GameEngine::update();
 
+    // call all the necessary drawables. in the future this will be passed to
+    // the display manager for rendering
+    std::map<std::string, SceneDrawableMap> game_drawables =
+        m_sceneManager.ProvideSceneDrawables();
+
     // End the current frame and display its contents on screen
     m_displayManager.Cycle();
 
@@ -58,7 +63,7 @@ void GameEngine::update() {
   m_displayManager.Update();
 
   // call the update function of the scene manager
-  // m_sceneManager.update();
+  m_sceneManager.update();
 }
 
 void GameEngine::sUserInput() {

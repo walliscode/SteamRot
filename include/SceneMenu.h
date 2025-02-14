@@ -5,5 +5,5 @@ private:
 public:
   SceneMenu(const std::string &name, size_t poolSize);
   void sUpdate() override;
-  std::vector<std::shared_ptr<sf::Drawable>> sProvideDrawables() override;
+  SceneDrawableMap sProvideDrawables() override;
 };
