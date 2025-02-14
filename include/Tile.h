@@ -31,9 +31,15 @@ public:
   const std::array<sf::RectangleShape, 4> &GetBorderStraights();
   const std::array<sf::VertexArray, 4> &GetBorderCorners();
 
+  const std::string &GetLinkedDrawables();
+
 private:
   sf::RenderWindow &m_window;
   sf::View m_view;
+
+  // this is for providing specific drawables too, e.g. a specific Scene.
+  // this active tiles will search provided drawables for linked drawables
+  std::string m_linked_drawables{"NULL"};
 
   std::array<sf::RectangleShape, 4> m_border_straight;
   std::array<sf::VertexArray, 4> m_border_corners;
