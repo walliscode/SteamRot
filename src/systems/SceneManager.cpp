@@ -1,55 +1,81 @@
 #include "SceneManager.h"
+#include "SceneMenu.h"
+#include <iostream>
+#include <memory>
 
 SceneManager::SceneManager()
-    : m_allScenes(), m_activeScenes(), m_inactiveScenes(), m_asset_manager() {
+    : m_all_scenes(), m_active_scenes(), m_inactive_scenes(),
+      m_asset_manager() {
 
   // kick off initial scene(s)
+  AddScene("main_menu", "menu", 100);
+  std::cout << "main menu added" << std::endl;
 }
 
-void SceneManager::addScene(std::string tag, const size_t poolSize) {}
+// add an object from types derived from the Scene type
+// for now this will just use string tags to identify the scene type
+void SceneManager::AddScene(std::string name, std::string scene_type,
+                            const size_t pool_size) {
 
-void SceneManager::removeScene(std::string tag) {
-  m_allScenes.erase(tag);
-  m_activeScenes.erase(tag);
-  m_inactiveScenes.erase(tag);
-  m_interactiveScenes.erase(tag);
+  // create a new scene object, if scene type does not exist throw a runtime
+  // error and exit early
+  std::shared_ptr<Scene> new_scene = nullptr;
+  if (scene_type == "menu") {
+    new_scene = std::make_shared<SceneMenu>(name, pool_size);
+  }
+
+  else {
+
+    throw std::runtime_error("Scene type not found");
+  }
+
+  // add to relevant maps
+  m_all_scenes.insert({name, new_scene});
+  m_active_scenes.insert({name, new_scene});
+};
+
+void SceneManager::RemoveScene(std::string tag) {
+  m_all_scenes.erase(tag);
+  m_active_scenes.erase(tag);
+  m_inactive_scenes.erase(tag);
+  m_interactive_scenes.erase(tag);
 }
 
-void SceneManager::activateScene(std::string tag) {
+void SceneManager::ActivateScene(std::string tag) {
   // find scene in m_allScenes
-  std::shared_ptr<Scene> scene = m_allScenes[tag];
+  std::shared_ptr<Scene> scene = m_all_scenes[tag];
   // activate scene
   scene->setActive(true);
   // add to active scenes
-  m_activeScenes[tag] = scene;
+  m_active_scenes[tag] = scene;
   // remove from inactive scenes
-  m_inactiveScenes.erase(tag);
+  m_inactive_scenes.erase(tag);
 }
 
-void SceneManager::deactivateScene(std::string tag) {
+void SceneManager::DeactivateScene(std::string tag) {
   // find scene in m_allScenes
-  std::shared_ptr<Scene> scene = m_allScenes[tag];
+  std::shared_ptr<Scene> scene = m_all_scenes[tag];
   // inactivate scene
   scene->setActive(false);
   // add to inactive scenes
-  m_inactiveScenes[tag] = scene;
+  m_inactive_scenes[tag] = scene;
   // remove from active scenes and interactive scenes
-  m_activeScenes.erase(tag);
-  m_interactiveScenes.erase(tag);
+  m_active_scenes.erase(tag);
+  m_interactive_scenes.erase(tag);
 }
 
-SceneList &SceneManager::getAllScenes() { return m_allScenes; }
+SceneList &SceneManager::getAllScenes() { return m_all_scenes; }
 
-SceneList &SceneManager::getActiveScenes() { return m_activeScenes; }
+SceneList &SceneManager::getActiveScenes() { return m_active_scenes; }
 
-SceneList &SceneManager::getInactiveScenes() { return m_inactiveScenes; }
+SceneList &SceneManager::getInactiveScenes() { return m_inactive_scenes; }
 
-SceneList &SceneManager::getInteractiveScenes() { return m_interactiveScenes; }
+SceneList &SceneManager::getInteractiveScenes() { return m_interactive_scenes; }
 
 void SceneManager::update() {
   // Loop through all the scenes and update them
   // updating does not mean rendering, it means updating the state of the scene
-  for (auto &pair : m_allScenes) {
+  for (auto &pair : m_all_scenes) {
     auto &scene = pair.second;
     scene->sUpdate();
   }
@@ -78,12 +104,12 @@ void SceneManager::passEvent(const std::optional<sf::Event> event) {
   // }
 }
 
-void SceneManager::makeInteractive() {
+void SceneManager::MakeInteractive() {
   // pass through mouse location from eventual dashboard and copy active scene
   // to interactive scene
 }
 
-void SceneManager::makeNonInteractive() {
+void SceneManager::MakeNonInteractive() {
   // remove active scene from interactive scenes
 }
 
@@ -93,7 +119,7 @@ json SceneManager::toJSON() {
 
   // for Scene in m_Scenes, return information about the scene (including entity
   // info e.t.c.
-  for (auto &pair : m_allScenes) {
+  for (auto &pair : m_all_scenes) {
     j["scenes"][pair.first] = pair.second->toJSON();
     bool isNotNull =
         pair.second != nullptr; // shared ptrs have a bool operator that returns
