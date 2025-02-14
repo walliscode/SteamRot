@@ -5,7 +5,7 @@ add_library(systems
     AssetManager.cpp
     Scene.cpp
     ActionManager.cpp
-
+    SceneMenu.cpp
 
 )
 

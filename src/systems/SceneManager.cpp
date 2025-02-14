@@ -51,7 +51,7 @@ void SceneManager::update() {
   // updating does not mean rendering, it means updating the state of the scene
   for (auto &pair : m_allScenes) {
     auto &scene = pair.second;
-    scene->update();
+    scene->sUpdate();
   }
 }
 

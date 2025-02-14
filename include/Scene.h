@@ -2,6 +2,7 @@
 #include "ActionManager.h"
 #include "EntityManager.h"
 
+#include <SFML/Graphics/Drawable.hpp>
 #include <nlohmann/json.hpp>
 #include <string>
 
@@ -21,7 +22,9 @@ protected:
   Scene(const std::string &name, const size_t &pool_size);
 
 public:
-  virtual void update() = 0;
+  // common systems between Scenes
+  virtual void sUpdate() = 0;
+  virtual std::vector<std::shared_ptr<sf::Drawable>> sProvideDrawables() = 0;
 
   bool getActive() const;
   void setActive(bool active);
