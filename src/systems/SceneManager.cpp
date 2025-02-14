@@ -72,6 +72,16 @@ SceneList &SceneManager::getInactiveScenes() { return m_inactive_scenes; }
 
 SceneList &SceneManager::getInteractiveScenes() { return m_interactive_scenes; }
 
+// get the scene name and the drawables that are associated with it
+// this makes a fresh map each time
+std::map<std::string, SceneDrawableMap> SceneManager::ProvideSceneDrawables() {
+  std::map<std::string, SceneDrawableMap> drawables;
+  for (auto &pair : m_active_scenes) {
+    drawables[pair.first] = pair.second->sProvideDrawables();
+  }
+  return drawables;
+}
+
 void SceneManager::update() {
   // Loop through all the scenes and update them
   // updating does not mean rendering, it means updating the state of the scene
