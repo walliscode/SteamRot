@@ -12,29 +12,30 @@ typedef std::map<std::string, std::shared_ptr<Scene>> SceneList;
 
 class SceneManager {
 private:
-  SceneList m_allScenes;    // all scenes that exist and are being updated
-  SceneList m_activeScenes; // all scenes that are currently being rendered
-  SceneList
-      m_inactiveScenes; // all scenes that are not currently being rendered
+  SceneList m_all_scenes;
 
-  // the wording is very similar to inactive, so we need to be careful
-  SceneList m_interactiveScenes; // all scenes that are interactive
+  // scenes that continue to calculate, theses may or may not be rendered
+  SceneList m_active_scenes;
+  SceneList m_inactive_scenes;
 
-  AssetManager m_asset_manager; // responsible for loading all assets of the
-  // game
-  //  (scene by scene)
+  // scenes that can take user events
+  SceneList m_interactive_scenes;
+  AssetManager m_asset_manager;
 
 public:
   SceneManager();
-  void addScene(std::string tag, size_t poolSize);
-  void removeScene(std::string tag);
-  void activateScene(std::string tag);
-  void deactivateScene(std::string tag);
+  void AddScene(std::string tag, std::string scene_type, size_t pool_size);
+  void RemoveScene(std::string tag);
 
-  void
-  makeInteractive(); // make a scene interactive so that events can be passed
-  void makeNonInteractive(); // make a scene non-interactive so that events are
-                             // not passed
+  // activation and deactivation of scenes refers to whetehre they should
+  // continue calculations
+  void ActivateScene(std::string tag);
+  void DeactivateScene(std::string tag);
+
+  // interactive scenes are those that can take user events. this will probably
+  // be done with mouse hovering or with tiling window manager
+  void MakeInteractive();
+  void MakeNonInteractive();
 
   SceneList &getAllScenes();
   SceneList &getActiveScenes();
