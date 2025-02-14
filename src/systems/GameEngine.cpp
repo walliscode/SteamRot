@@ -38,13 +38,12 @@ void GameEngine::run(size_t numLoops) {
     // Update all the necessary components of the game
     GameEngine::update();
 
-    // call all the necessary drawables. in the future this will be passed to
-    // the display manager for rendering
+    // call all the necessary drawables and pass to display manager
     std::map<std::string, SceneDrawableMap> game_drawables =
         m_sceneManager.ProvideSceneDrawables();
 
     // End the current frame and display its contents on screen
-    m_displayManager.Cycle();
+    m_displayManager.Cycle(game_drawables);
 
     // statement to test whether to break the loop, must be called at end
     if (numLoops > 0 && m_loopNumber >= numLoops) {

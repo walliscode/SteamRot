@@ -147,8 +147,36 @@ void DisplayManager::Update() {
     }
   }
 };
+void DisplayManager::DrawProvidedDrawables(
+    std::map<std::string, std::shared_ptr<sf::Drawable>> &drawables) {
 
-void DisplayManager::Cycle() {
+  // go through active tiles, if any have linked drawables, draw them to
+  // that Tile sf::View
+
+  for (auto tile : m_active_session->GetTiles()) {
+
+    std::string linked_drawables = tile->GetLinkedDrawables();
+
+    if (linked_drawables != "NULL") {
+
+      // check if linked drawable is in the drawables map
+      auto drawables_iter = drawables.find(linked_drawables);
+      if (drawables_iter == drawables.end()) {
+
+        std::cout << "Linked drawable not found in drawables map" << std::endl;
+        continue;
+      }
+
+      // set window view to the tile view
+
+      m_window.setView(tile->GetView());
+
+      m_window.draw(*drawables_iter->second);
+    }
+  }
+};
+
+sf::RenderTexture &DisplayManager::DrawTileOverlay() {
   // get active Session render texture and draw tile borders to it
   sf::RenderTexture &tile_overlay = m_active_session->GetTileOverlay();
 
@@ -166,9 +194,19 @@ void DisplayManager::Cycle() {
   }
 
   tile_overlay.display();
+  return tile_overlay;
+};
+void DisplayManager::Cycle(
+    std::map<std::string, std::shared_ptr<sf::Drawable>> &drawables) {
+
+  // clear/draw/display cycle done to any sf::RenderTextures
+  sf::RenderTexture &tile_overlay = DrawTileOverlay();
 
   // now the sf::RenderWindow cycle
   m_window.clear(m_background_color);
+
+  // draw provided drawables to window
+  DrawProvidedDrawables(drawables);
 
   // draw tile overlay to window
   sf::Sprite tile_overlay_sprite(tile_overlay.getTexture());

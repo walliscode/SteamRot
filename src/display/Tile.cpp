@@ -3,7 +3,7 @@
 
 #include "Tile.h"
 #include <SFML/Graphics/VertexArray.hpp>
-#include <iostream>
+
 Tile::Tile(const json &tile_config, const sf::FloatRect &viewport_ratio,
            sf::RenderWindow &window)
     : m_window(window) {
@@ -178,3 +178,5 @@ const std::array<sf::RectangleShape, 4> &Tile::GetBorderStraights() {
 const std::array<sf::VertexArray, 4> &Tile::GetBorderCorners() {
   return m_border_corners;
 };
+
+const std::string &Tile::GetLinkedDrawables() { return m_linked_drawables; };

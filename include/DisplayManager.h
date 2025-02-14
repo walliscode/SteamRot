@@ -3,6 +3,7 @@
 #include "Session.h"
 #include "global_constants.h"
 #include <SFML/Graphics.hpp>
+
 #include <memory>
 #include <nlohmann/json.hpp>
 
@@ -17,11 +18,17 @@ public:
   std::shared_ptr<Session> GetActiveSession();
   const json &GetTileConfig();
 
+  // takes in map of scene drawables
   void Update();
-  void
-  PopulateActions(const EventFlags &event_flags); // populate the action waiting
-                                                  // room with actions
-  void Cycle();
+  void PopulateActions(const EventFlags &event_flags);
+
+  // if drawable name matches tile linked_drawables, draw to that tile
+  void DrawProvidedDrawables(
+      std::map<std::string, std::shared_ptr<sf::Drawable>> &drawables);
+
+  sf::RenderTexture &DrawTileOverlay();
+  // cycle through drawing/rendering events
+  void Cycle(std::map<std::string, std::shared_ptr<sf::Drawable>> &drawables);
 
 private:
   // add some defaults to the window otherwise it doens't behave itself
