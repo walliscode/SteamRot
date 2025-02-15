@@ -1,5 +1,6 @@
 #pragma once
 #include "CMeta.h"
+#include "CShape.h"
 
 #include <magic_enum/magic_enum.hpp>
 #include <vector>
@@ -9,7 +10,7 @@
 // ComponentFlags enum
 
 // add all component containers here.
-typedef std::tuple<CMeta> ComponentTuple;
+typedef std::tuple<CMeta, CShape> ComponentTuple;
 
 // primary template for handling containers of types
 // currently this can handle any parameter pack, we need to add specializations

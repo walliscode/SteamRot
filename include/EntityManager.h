@@ -19,7 +19,7 @@ private:
   std::vector<size_t> m_entities_to_remove;
   std::shared_ptr<EntityMemoryPool> m_pool;
 
-  void IntialiseEntities(std::string scene_name);
+  void InitialiseEntities(std::string scene_name);
 
   ArchetypeManager m_archetype_manager;
 
@@ -77,7 +77,7 @@ public:
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   template <typename T> T &GetComponent(size_t entity_id) {
-    auto &components = std::get<std::vector<T>>(m_pool->getData());
+    auto &components = std::get<std::vector<T>>(*(m_pool->getData()));
     return components[entity_id];
   }
 

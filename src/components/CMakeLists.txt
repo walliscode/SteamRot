@@ -1,6 +1,8 @@
 add_library(components
 
 CMeta.cpp
+CShape.cpp
+
 )
 
 target_include_directories(components

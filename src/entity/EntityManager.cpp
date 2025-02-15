@@ -12,7 +12,7 @@ EntityManager::EntityManager(const size_t &pool_size,
   m_pool = std::make_shared<EntityMemoryPool>(pool_size);
 
   // add all entites in json file
-  IntialiseEntities(scene_name);
+  InitialiseEntities(scene_name);
 }
 
 // find next inactive entity index
@@ -73,7 +73,7 @@ void EntityManager::UpdateWaitingRooms() {
 
 // preload entities from json file, essentially adding Component data at each
 // index
-void EntityManager::IntialiseEntities(std::string scene_name) {
+void EntityManager::InitialiseEntities(std::string scene_name) {
 
   std::string file_name =
       (std::string(RESOURCES_DIR) + "/jsons/entities_" + scene_name + ".json");
@@ -97,6 +97,9 @@ void EntityManager::IntialiseEntities(std::string scene_name) {
 
     // CMeta activation handled by AddEntity
     size_t entity_id = AddEntity();
+
+    for (auto &component : entity) {
+    }
   }
 }
 
@@ -127,3 +130,5 @@ json EntityManager::toJSON() {
 
   return j;
 }
+
+std::vector<size_t> EntityManager::GetEntities() { return m_entities; }
