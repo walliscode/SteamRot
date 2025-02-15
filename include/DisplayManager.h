@@ -24,11 +24,13 @@ public:
 
   // if drawable name matches tile linked_drawables, draw to that tile
   void DrawProvidedDrawables(
-      std::map<std::string, std::shared_ptr<sf::Drawable>> &drawables);
+      std::map<std::string, std::vector<std::shared_ptr<sf::Drawable>>>
+          &drawables);
 
   sf::RenderTexture &DrawTileOverlay();
   // cycle through drawing/rendering events
-  void Cycle(std::map<std::string, std::shared_ptr<sf::Drawable>> &drawables);
+  void Cycle(std::map<std::string, std::vector<std::shared_ptr<sf::Drawable>>>
+                 &drawables);
 
 private:
   // add some defaults to the window otherwise it doens't behave itself

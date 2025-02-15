@@ -19,11 +19,18 @@ private:
   void sUserInput();
   EventFlags m_event_flags{0};
 
+  // test window, for sepearating out the display manager from the scene
+  // drawables will probably be removed but this allows for separation of
+  // concerns
+  sf::RenderWindow m_test_window;
+
 public:
   GameEngine();
   void init();
-  void run(size_t numLoops = 0);
+  void run(size_t numLoops = 0, bool use_test_window = false);
   void update();
+
+  void test_render(std::map<std::string, SceneDrawables> &test_drawables);
 
   // ######### Simulation Functions #########
   size_t getLoopNumber();

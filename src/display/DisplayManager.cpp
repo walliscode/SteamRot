@@ -148,7 +148,8 @@ void DisplayManager::Update() {
   }
 };
 void DisplayManager::DrawProvidedDrawables(
-    std::map<std::string, std::shared_ptr<sf::Drawable>> &drawables) {
+    std::map<std::string, std::vector<std::shared_ptr<sf::Drawable>>>
+        &drawables) {
 
   // go through active tiles, if any have linked drawables, draw them to
   // that Tile sf::View
@@ -171,7 +172,9 @@ void DisplayManager::DrawProvidedDrawables(
 
       m_window.setView(tile->GetView());
 
-      m_window.draw(*drawables_iter->second);
+      for (auto drawable : drawables_iter->second) {
+        m_window.draw(*drawable);
+      }
     }
   }
 };
@@ -197,7 +200,8 @@ sf::RenderTexture &DisplayManager::DrawTileOverlay() {
   return tile_overlay;
 };
 void DisplayManager::Cycle(
-    std::map<std::string, std::shared_ptr<sf::Drawable>> &drawables) {
+    std::map<std::string, std::vector<std::shared_ptr<sf::Drawable>>>
+        &drawables) {
 
   // clear/draw/display cycle done to any sf::RenderTextures
   sf::RenderTexture &tile_overlay = DrawTileOverlay();
