@@ -6,7 +6,7 @@
 #include <nlohmann/json.hpp>
 #include <string>
 
-typedef std::shared_ptr<sf::Drawable> SceneDrawableMap;
+typedef std::vector<std::shared_ptr<sf::Drawable>> SceneDrawables;
 class Scene {
 protected:
   // objects live within the Scene
@@ -25,7 +25,7 @@ protected:
 public:
   // common systems between Scenes
   virtual void sUpdate() = 0;
-  virtual SceneDrawableMap sProvideDrawables() = 0;
+  virtual SceneDrawables sProvideDrawables() = 0;
 
   bool getActive() const;
   void setActive(bool active);

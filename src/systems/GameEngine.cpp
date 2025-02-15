@@ -1,7 +1,9 @@
 #include "GameEngine.h"
+#include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
 
+#include <SFML/Window/VideoMode.hpp>
 #include <cstddef>
 #include <filesystem>
 #include <fstream>
@@ -25,7 +27,11 @@ void GameEngine::init() {
   std::cout << "Initial Event flags: " << m_event_flags << std::endl;
 }
 
-void GameEngine::run(size_t numLoops) {
+void GameEngine::run(size_t numLoops, bool use_test_window) {
+
+  if (use_test_window) {
+    m_test_window = sf::RenderWindow(sf::VideoMode({800, 600}), "Test Window");
+  }
 
   // Run the program as long as the window is open
   while (m_displayManager.GetWindow().isOpen()) {
@@ -39,12 +45,15 @@ void GameEngine::run(size_t numLoops) {
     GameEngine::update();
 
     // call all the necessary drawables and pass to display manager
-    std::map<std::string, SceneDrawableMap> game_drawables =
+    std::map<std::string, SceneDrawables> game_drawables =
         m_sceneManager.ProvideSceneDrawables();
 
-    // End the current frame and display its contents on screen
-    m_displayManager.Cycle(game_drawables);
-
+    if (use_test_window) {
+      test_render(game_drawables);
+    } else {
+      // End the current frame and display its contents on screen
+      m_displayManager.Cycle(game_drawables);
+    }
     // statement to test whether to break the loop, must be called at end
     if (numLoops > 0 && m_loopNumber >= numLoops) {
       // export data to json, first variable is the directory name, second is
@@ -72,6 +81,7 @@ void GameEngine::sUserInput() {
     // "close requested" event: we close the window
     if (event->is<sf::Event::Closed>()) {
       m_displayManager.GetWindow().close();
+      m_test_window.close();
     }
 
     // handle key pressed events
@@ -231,4 +241,19 @@ json GameEngine::extractJSON(const std::string &directoryName,
   } else {
     throw std::runtime_error("Could not open file");
   }
+}
+
+void GameEngine::test_render(
+    std::map<std::string, SceneDrawables> &test_drawables) {
+  // clear the test window
+  m_test_window.clear(sf::Color::Red);
+  // cycle through and draw to test window
+  //
+  // for (auto &scene_drawables : test_drawables) {
+  //   for (auto &drawable_iter : scene_drawables.second) {
+  //     m_test_window.draw(*drawable_iter);
+  //   }
+  // }
+  //
+  m_test_window.display();
 }

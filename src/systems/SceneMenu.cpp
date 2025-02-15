@@ -6,7 +6,7 @@ SceneMenu::SceneMenu(const std::string &name, size_t poolSize)
 
 void SceneMenu::sUpdate() {};
 
-SceneDrawableMap SceneMenu::sProvideDrawables() {
-  SceneDrawableMap drawables;
+SceneDrawables SceneMenu::sProvideDrawables() {
+  SceneDrawables drawables;
   return drawables;
 }
