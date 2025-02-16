@@ -20,7 +20,7 @@ const size_t EntityMemoryPool::getNextEntityIndex() {
   // return the index for the next free entity index using CMeta active member
   for (int i = 0; i != cmeta_vector.size(); ++i) {
 
-    if (!cmeta_vector[i].getActive()) {
+    if (!cmeta_vector[i].m_entity_active) {
       index = i;
       break;
     }

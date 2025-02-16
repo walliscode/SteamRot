@@ -1,8 +1,10 @@
 #pragma once
 #include "CMeta.h"
 #include "CShape.h"
-
+#include "type_name.h"
+#include <cassert>
 #include <magic_enum/magic_enum.hpp>
+
 #include <vector>
 
 //// instructions ////
@@ -13,7 +15,8 @@
 typedef std::tuple<CMeta, CShape> ComponentTuple;
 
 // primary template for handling containers of types
-// currently this can handle any parameter pack, we need to add specializations
+// currently this can handle any parameter pack, we need to add
+// specializations
 template <typename... Types> struct ComponentContainers;
 
 // specialization for a tuple of types

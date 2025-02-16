@@ -5,7 +5,7 @@
 #include <vector>
 
 using json = nlohmann::json;
-
+using namespace magic_enum::bitwise_operators;
 EntityManager::EntityManager(const size_t &pool_size,
                              const std::string &scene_name) {
 
@@ -27,7 +27,8 @@ size_t EntityManager::AddEntity() {
   std::vector<CMeta> meta_data =
       std::get<std::vector<CMeta>>(*(m_pool->getData()));
 
-  meta_data[new_entity_id].activate();
+  // switch on the entity
+  meta_data[new_entity_id].m_entity_active = true;
   m_entities_to_add.push_back(new_entity_id);
 
   return new_entity_id;
@@ -44,7 +45,7 @@ void EntityManager::UpdateWaitingRooms() {
   for (const size_t &entity_index : m_entities_to_remove) {
 
     std::get<std::vector<CMeta>>(*(m_pool->getData()))[entity_index]
-        .deactivate();
+        .m_entity_active = false;
 
     // get iterator to entity to remove
     auto to_remove =
@@ -98,7 +99,33 @@ void EntityManager::InitialiseEntities(std::string scene_name) {
     // CMeta activation handled by AddEntity
     size_t entity_id = AddEntity();
 
+    // pull out ComponentFlag for use
+    SteamRot::ComponentFlags &component_flags =
+        GetComponent<CMeta>(entity_id).m_component_flags;
+    // each component will need to be added here manually
+    // hopefully at some point i will figure out how to represent a string map
+    // with types
+    //
+    // json.template get<> calls the from_json function from the component
+    // vector component is the actual compnent in the pool
+    // overwriting the default constructed component
+    // component_flags is turned on for that component
     for (auto &component : entity) {
+      if (component["type"] == "CMeta") {
+
+        CMeta json_created_component = component.template get<CMeta>();
+        CMeta &vector_component = GetComponent<CMeta>(entity_id);
+        vector_component = json_created_component;
+
+        component_flags = component_flags | SteamRot::ComponentFlags::CMeta;
+
+      } else if (component["type"] == "CShape") {
+        CShape json_created_component = component.template get<CShape>();
+        CShape &vector_component = GetComponent<CShape>(entity_id);
+        vector_component = json_created_component;
+
+        component_flags = component_flags | SteamRot::ComponentFlags::CShape;
+      }
     }
   }
 }
@@ -106,10 +133,10 @@ void EntityManager::InitialiseEntities(std::string scene_name) {
 const SteamRot::ComponentFlags &
 EntityManager::GetComponentFlags(size_t entity_id) {
 
-  CMeta meta_data =
+  CMeta &meta_data =
       std::get<std::vector<CMeta>>(*(m_pool->getData()))[entity_id];
 
-  return meta_data.getComponentFlags();
+  return meta_data.m_component_flags;
 }
 
 // std::vector<size_t> EntityManager::getEntities() { return m_entities; }
