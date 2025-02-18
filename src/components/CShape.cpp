@@ -1,6 +1,19 @@
 #include "CShape.h"
 
-void to_json(json &j, const CShape &p) {}
+void to_json(json &j, const CShape &shape) {
+  j = json{
+      {"m_shape",
+       {{"size",
+         {{"x", shape.m_shape.getSize().x}, {"y", shape.m_shape.getSize().y}}},
+        {"position",
+         {{"x", shape.m_shape.getPosition().x},
+          {"y", shape.m_shape.getPosition().y}}},
+        {"fill_color",
+         {{"r", shape.m_shape.getFillColor().r},
+          {"g", shape.m_shape.getFillColor().g},
+          {"b", shape.m_shape.getFillColor().b},
+          {"a", shape.m_shape.getFillColor().a}}}}}};
+}
 
 void from_json(const json &j, CShape &p) {
   sf::Vector2f size;
