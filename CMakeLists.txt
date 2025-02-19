@@ -5,8 +5,6 @@ project(SteamRot
      VERSION 0.1.0.0
  LANGUAGES CXX)
 
-enable_testing()
-
 
 
 # This next bit of code comes from Professional CMake: A Practical Guide, pg 205 (in documentation/textbooks) as a safe way to add CXX standards
@@ -47,5 +45,6 @@ include(AddMagicEnum)
 add_subdirectory(include)
 add_subdirectory(steamrot)
 add_subdirectory(src)
+add_subdirectory(tests)
 
 
