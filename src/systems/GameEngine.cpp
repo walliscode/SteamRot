@@ -37,7 +37,7 @@ void GameEngine::run(size_t numLoops, bool use_test_window) {
   while (m_displayManager.GetWindow().isOpen()) {
     // increment the loop number by 1, the tick number is defined at the
     // beginning of the loop
-    m_loopNumber++;
+    m_loop_number++;
     // handle user input, this just effects the bitset, doesn't handle any
     // action
     GameEngine::sUserInput();
@@ -55,10 +55,10 @@ void GameEngine::run(size_t numLoops, bool use_test_window) {
       m_displayManager.Cycle(game_drawables);
     }
     // statement to test whether to break the loop, must be called at end
-    if (numLoops > 0 && m_loopNumber >= numLoops) {
+    if (numLoops > 0 && m_loop_number >= numLoops) {
       // export data to json, first variable is the directory name, second is
       // the file name
-      createJSON("simulations", "test_data");
+      ExportJSON("test");
       break;
     }
   }
@@ -165,7 +165,7 @@ void GameEngine::sUserInput() {
 };
 // SceneManager &GameEngine::getSceneManager() { return m_sceneManager; }
 
-size_t GameEngine::getLoopNumber() { return m_loopNumber; }
+size_t GameEngine::getLoopNumber() { return m_loop_number; }
 
 void GameEngine::runSimulation(int loops) {
   // prevent undefined behaviour of simulation loop
@@ -176,68 +176,39 @@ void GameEngine::runSimulation(int loops) {
   }
 }
 
-json GameEngine::toJSON() {
-  json j; // create a json object
-  j["loopNumber"] = m_loopNumber;
-  return j;
+void to_json(json &j, const GameEngine &ge) {
+  j = json{{"GameEngine", {"m_loop_number", ge.m_loop_number}}};
 }
 
-void GameEngine::createJSON(const std::string &directoryName,
-                            const std::string &fileName) {
-  std::string fullFileName = fileName + ".json";
-  // define the path to the directory
-  fs::path filePath = fs::path(DATA_OUT_DIR) / directoryName / fullFileName;
+void GameEngine::ExportJSON(const std::string &file_name) {
 
-  std::cout << "Creating JSON file: " << filePath << std::endl;
-  // create the directory if it does not exist
-  fs::create_directories(filePath.parent_path());
+  // create directory if it does not exist
+  fs::create_directories(DATA_OUT_DIR);
 
-  // create ofstream object
-  std::ofstream jsonFile(filePath);
+  // create file name with json extension
+  std::string full_file_name = file_name + ".json";
 
-  // check if the file is open
-  if (jsonFile.is_open()) {
-    // create json object to add other json objects to
+  // create path to file
+  fs::path json_file_path = fs::path(DATA_OUT_DIR) / full_file_name;
 
-    json mainJson;
-
-    // add the json object to the main json object
-    // mainJson["GameEngine"] = GameEngine::toJSON();
-    // mainJson["SceneManager"] = m_sceneManager.toJSON();
-    // mainJson["AssetManager"] = m_sceneManager.getAssetManager().ToJSON();
-    //
-    // write the json object to the file
-    jsonFile << mainJson.dump(4);
-    // close the file
-    jsonFile.close();
-
-    std::cout << "JSON file created successfully" << std::endl;
-  } else {
-    throw std::runtime_error("Could not open file");
-  }
-}
-
-json GameEngine::extractJSON(const std::string &directoryName,
-                             const std::string &fileName) {
-  // define the full file name, adding the json extension
-  std::string fullFileName = fileName + ".json";
-  // define the path to the directory
-  fs::path filePath = fs::path(DATA_OUT_DIR) / directoryName / fullFileName;
-
-  std::cout << "File Path: " << filePath << std::endl;
   // create ifstream object
-  std::ifstream jsonFile(filePath);
+  std::ofstream json_file(json_file_path);
 
   // check if file exists
-  if (!fs::exists(filePath)) {
+  if (!fs::exists(json_file_path)) {
     throw std::runtime_error("File does not exist");
   }
-  // check if the file is open
-  if (jsonFile.is_open()) {
-    //
-    json j;
-    jsonFile >> j;
-    return j;
+
+  // add to open file
+  if (json_file.is_open()) {
+
+    // create json object
+    json j = *this;
+
+    // write json object to file
+    json_file << j;
+    // close file
+    json_file.close();
   } else {
     throw std::runtime_error("Could not open file");
   }
