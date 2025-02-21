@@ -5,7 +5,7 @@ project(SteamRot
      VERSION 0.1.0.0
  LANGUAGES CXX)
 
-
+enable_testing()
 
 # This next bit of code comes from Professional CMake: A Practical Guide, pg 205 (in documentation/textbooks) as a safe way to add CXX standards
 # Require C++20, but let a parent project ask for something higher
