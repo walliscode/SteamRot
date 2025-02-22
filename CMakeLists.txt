@@ -7,8 +7,6 @@ project(SteamRot
 
 enable_testing()
 
-
-
 # This next bit of code comes from Professional CMake: A Practical Guide, pg 205 (in documentation/textbooks) as a safe way to add CXX standards
 # Require C++20, but let a parent project ask for something higher
 if(DEFINED CMAKE_CXX_STANDARD)
@@ -47,5 +45,6 @@ include(AddMagicEnum)
 add_subdirectory(include)
 add_subdirectory(steamrot)
 add_subdirectory(src)
+add_subdirectory(tests)
 
 
