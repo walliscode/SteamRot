@@ -1,11 +1,14 @@
 
 add_executable(steamrot_tests
-"unit_tests/GameEngine.test.cpp")
+unit_tests/test_json_structure.test.cpp)
 target_link_libraries(steamrot_tests
   PRIVATE
   Catch2::Catch2WithMain
   systems)
 
+target_include_directories(steamrot_tests
+  PRIVATE
+  ${CMAKE_CURRENT_SOURCE_DIR}/test_utils)
 message (STATUS "Tests enabled")
 
 

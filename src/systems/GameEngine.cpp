@@ -17,17 +17,17 @@ namespace fs = std::filesystem;
 using namespace magic_enum::bitwise_operators;
 
 GameEngine::GameEngine() : m_displayManager(), m_sceneManager() {
-  init(); // kick off the game, loading assets de.t.c
+  Init(); // kick off the game, loading assets de.t.c
 }
 
-void GameEngine::init() {
+void GameEngine::Init() {
 
   // print out the initial state of the m_event_flags enum
   using magic_enum::iostream_operators::operator<<;
   std::cout << "Initial Event flags: " << m_event_flags << std::endl;
 }
 
-void GameEngine::run(size_t numLoops, bool use_test_window) {
+void GameEngine::Run(size_t numLoops, bool use_test_window) {
 
   if (use_test_window) {
     m_test_window = sf::RenderWindow(sf::VideoMode({800, 600}), "Test Window");
@@ -42,7 +42,7 @@ void GameEngine::run(size_t numLoops, bool use_test_window) {
     // action
     GameEngine::sUserInput();
     // Update all the necessary components of the game
-    GameEngine::update();
+    GameEngine::Update();
 
     // call all the necessary drawables and pass to display manager
     std::map<std::string, SceneDrawables> game_drawables =
@@ -64,7 +64,7 @@ void GameEngine::run(size_t numLoops, bool use_test_window) {
   }
 }
 
-void GameEngine::update() {
+void GameEngine::Update() {
 
   // update display manager actions and call any logic systems
   m_displayManager.PopulateActions(m_event_flags);
@@ -172,12 +172,12 @@ void GameEngine::runSimulation(int loops) {
   if (loops <= 0) {
     throw std::invalid_argument("The number of loops must be greater than 0");
   } else {
-    GameEngine::run(loops);
+    GameEngine::Run(loops);
   }
 }
 
 void to_json(json &j, const GameEngine &ge) {
-  j = json{{"m_loop_number", ge.m_loop_number}};
+  j = json{{"GameEngine", {{"m_loop_number", ge.m_loop_number}}}};
 }
 
 void GameEngine::ExportJSON(const std::string &file_name) {
