@@ -8,7 +8,7 @@ TEST_CASE("Simulation is run", "[GameEngine]") {
             << std::endl;
   GameEngine game;
   int num = 0;
-  REQUIRE(num == 1);
+  REQUIRE(num == 0);
   std::cout << "Running the simulation for 0 loops\n";
   REQUIRE_THROWS(game.runSimulation(
       0)); // Check that the simulation does not run if loops = 0

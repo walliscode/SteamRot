@@ -8,7 +8,7 @@ target_link_libraries(steamrot_tests
 
 message (STATUS "Tests enabled")
 
-add_test(NAME steamrot_tests COMMAND steamrot_tests)
+
 list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 include(CTest)
 include(Catch)

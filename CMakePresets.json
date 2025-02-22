@@ -25,7 +25,7 @@
   ],
   "testPresets": [
     {
-      "name": "default-test",
+      "name": "debug",
       "configurePreset": "debug",
       "output": {
         "outputOnFailure": true
@@ -34,6 +34,25 @@
         "noTestsAction": "error",
         "stopOnFailure": true
       }
+    }
+  ],
+  "workflowPresets": [
+    {
+      "name": "debug",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "debug"
+        },
+        {
+          "type": "build",
+          "name": "debug"
+        },
+        {
+          "type": "test",
+          "name": "debug"
+        }
+      ]
     }
   ]
 }
