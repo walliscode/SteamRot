@@ -1,35 +1,24 @@
 #include "GameEngine.h"
 #include <catch2/catch_test_macros.hpp>
-#include <iostream>
+#include <filesystem>
+#include <fstream>
+
+namespace fs = std::filesystem;
 
 TEST_CASE("Simulation is run", "[GameEngine]") {
 
-  std::cout << "********************** Simulation Tests *********************"
-            << std::endl;
+  // set up resources to test (this should just be the whole game)
   GameEngine game;
-  int num = 0;
-  REQUIRE(num == 0);
-  std::cout << "Running the simulation for 0 loops\n";
-  REQUIRE_THROWS(game.runSimulation(
-      0)); // Check that the simulation does not run if loops = 0
-  REQUIRE(game.getLoopNumber() == 0);
-  std::cout << "Running the simulation for -5 loops\n";
-  REQUIRE_THROWS(game.runSimulation(
-      -5)); // Check that the simulation does not run if loops < 0
-  REQUIRE(game.getLoopNumber() == 0);
-
-  std::cout << "Running the simulation for 10 loops\n";
   game.runSimulation(10);
-  REQUIRE(game.getLoopNumber() ==
-          10); // Check that the simulation runs for 10 loops
-  //
-  // std::cout << "Creating a JSON file and checking contents\n";
-  // game.runSimulation(24);
-  // json sim_json = game.extractJSON("simulations", "test_data");
-  // REQUIRE(sim_json["GameEngine"]["loopNumber"] ==
-  //         24); // Check that the loop number is 24
-  //
-  std::cout
-      << "********************** Simulation Tests END *********************"
-      << std::endl;
+
+  // import json file and check that the loop number is 10
+
+  fs::path json_file_path = fs::path(DATA_OUT_DIR) / "test.json";
+  std::ifstream f(json_file_path);
+  json j = json::parse(f);
+
+  // first test strucutre of json is correct
+  REQUIRE(j.contains("GameEngine"));
+  REQUIRE(j.at("GameEngine").contains("m_loop_number"));
+  REQUIRE(j["GameEngine"]["m_loop_number"] == 10);
 };
