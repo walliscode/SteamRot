@@ -18,7 +18,8 @@ TEST_CASE("test json structure", "[data_out]") {
   game.runSimulation(10);
 
   // define json structure to test against
-  json defined_structure = {{"GameEngine", {{"m_loop_number", nullptr}}}};
+  json defined_structure = {
+      {"GameEngine", {{"m_loop_number", nullptr}, {"m_event_flags", nullptr}}}};
 
   // import the test json file
   fs::path json_file_path = fs::path(DATA_OUT_DIR) / "test.json";
@@ -26,5 +27,6 @@ TEST_CASE("test json structure", "[data_out]") {
   json test_structure = json::parse(f);
 
   // check the structure using a recurvisve function
+  // The REQUIRE marco is built into the function
   TestUtility::check_structure(defined_structure, test_structure);
 };

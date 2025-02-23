@@ -177,7 +177,9 @@ void GameEngine::runSimulation(int loops) {
 }
 
 void to_json(json &j, const GameEngine &ge) {
-  j = json{{"GameEngine", {{"m_loop_number", ge.m_loop_number}}}};
+  j = json{{"GameEngine",
+            {{"m_loop_number", ge.m_loop_number},
+             {"m_event_flags", ge.m_event_flags}}}};
 }
 
 void GameEngine::ExportJSON(const std::string &file_name) {
