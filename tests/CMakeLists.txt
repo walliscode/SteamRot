@@ -1,6 +1,7 @@
 
 add_executable(steamrot_tests
-unit_tests/test_json_structure.test.cpp)
+unit_tests/test_json_structure.test.cpp
+simulation_tests/simulation_one.test.cpp)
 target_link_libraries(steamrot_tests
   PRIVATE
   Catch2::Catch2WithMain
