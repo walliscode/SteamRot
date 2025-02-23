@@ -16,7 +16,7 @@ namespace fs = std::filesystem;
 
 using namespace magic_enum::bitwise_operators;
 
-GameEngine::GameEngine() : m_displayManager(), m_sceneManager() {
+GameEngine::GameEngine() : m_displayManager(), m_scene_manager() {
   Init(); // kick off the game, loading assets de.t.c
 }
 
@@ -46,7 +46,7 @@ void GameEngine::Run(size_t numLoops, bool use_test_window) {
 
     // call all the necessary drawables and pass to display manager
     std::map<std::string, SceneDrawables> game_drawables =
-        m_sceneManager.ProvideSceneDrawables();
+        m_scene_manager.ProvideSceneDrawables();
 
     if (use_test_window) {
       test_render(game_drawables);
@@ -71,7 +71,7 @@ void GameEngine::Update() {
   m_displayManager.Update();
 
   // call the update function of the scene manager
-  m_sceneManager.update();
+  m_scene_manager.update();
 }
 
 void GameEngine::sUserInput() {
@@ -179,8 +179,11 @@ void GameEngine::runSimulation(int loops) {
 void to_json(json &j, const GameEngine &ge) {
   j = json{{"GameEngine",
             {{"m_loop_number", ge.m_loop_number},
-             {"m_event_flags", ge.m_event_flags}}}};
-}
+             {"m_event_flags", ge.m_event_flags},
+             {"m_scene_manager", ge.m_scene_manager}}}
+
+  };
+};
 
 void GameEngine::ExportJSON(const std::string &file_name) {
 

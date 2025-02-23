@@ -9,7 +9,7 @@ using json = nlohmann::json;
 class GameEngine {
 private:
   DisplayManager m_displayManager;
-  SceneManager m_sceneManager;
+  SceneManager m_scene_manager;
 
   size_t m_loop_number = 0;
 

@@ -22,6 +22,9 @@ private:
   SceneList m_interactive_scenes;
   AssetManager m_asset_manager;
 
+  // to_json needs access to private members
+  friend void to_json(json &j, const SceneManager &scene_manager);
+
 public:
   SceneManager();
   void AddScene(std::string tag, std::string scene_type, size_t pool_size);
@@ -49,7 +52,6 @@ public:
 
   void update();
   void passEvent(const std::optional<sf::Event>);
-
-  /// Testing and simulation functions
-  json toJSON(); // convert parts of the SceneManager class to json
 };
+
+void to_json(json &j, const SceneManager &scene_manager);

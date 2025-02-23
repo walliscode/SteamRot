@@ -15,7 +15,11 @@ inline void check_structure(json defined_structure, json test_structure) {
     // structure
     INFO("checking that the test structure is not longer than the defined "
          "structure");
-    REQUIRE(test_structure.size() == defined_structure.size());
+
+    // rather than using == we want the test structure to be able to be shorter.
+    // This allows for TDD we add the structure we want first (the defined
+    // strucutre) and test for that. then we add the actual structure
+    REQUIRE(test_structure.size() <= defined_structure.size());
 
     // third check that the key is a dictionary, if yes then recursively check
     if (value.is_object()) {
