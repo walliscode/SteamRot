@@ -21,4 +21,12 @@ TEST_CASE("simple simulation test", "[simulation]") {
   json game_engine_data = simulation_data["GameEngine"];
   REQUIRE(game_engine_data["m_loop_number"] == 10);
   REQUIRE(game_engine_data["m_event_flags"] == 0);
+
+  // check SceneManager data
+  json scene_manager_data = game_engine_data["m_scene_manager"];
+  REQUIRE(scene_manager_data["type"] == "SceneManager");
+  REQUIRE(scene_manager_data["m_all_scenes"]["size"] == 1);
+  REQUIRE(scene_manager_data["m_active_scenes"]["size"] == 1);
+  REQUIRE(scene_manager_data["m_inactive_scenes"]["size"] == 0);
+  REQUIRE(scene_manager_data["m_interactive_scenes"]["size"] == 0);
 };

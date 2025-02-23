@@ -19,7 +19,15 @@ TEST_CASE("test json structure", "[data_out]") {
 
   // define json structure to test against
   json defined_structure = {
-      {"GameEngine", {{"m_loop_number", nullptr}, {"m_event_flags", nullptr}}}};
+      {"GameEngine",
+       {{"m_loop_number", nullptr},
+        {"m_event_flags", nullptr},
+        {"m_scene_manager",
+         {{"type", nullptr},
+          {"m_all_scenes", {{"size", nullptr}}},
+          {"m_active_scenes", {{"size", nullptr}}},
+          {"m_inactive_scenes", {{"size", nullptr}}},
+          {"m_interactive_scenes", {{"size", nullptr}}}}}}}};
 
   // import the test json file
   fs::path json_file_path = fs::path(DATA_OUT_DIR) / "test.json";

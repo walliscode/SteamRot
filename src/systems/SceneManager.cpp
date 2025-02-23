@@ -123,21 +123,13 @@ void SceneManager::MakeNonInteractive() {
   // remove active scene from interactive scenes
 }
 
-json SceneManager::toJSON() {
-  // create json object
-  json j;
-
-  // for Scene in m_Scenes, return information about the scene (including entity
-  // info e.t.c.
-  for (auto &pair : m_all_scenes) {
-    j["scenes"][pair.first] = pair.second->toJSON();
-    bool isNotNull =
-        pair.second != nullptr; // shared ptrs have a bool operator that returns
-                                // true if the ptr is not null
-    j["scenes"][pair.first]["notNull"] = isNotNull;
-  }
-
-  return j;
-}
-
-// AssetManager &SceneManager::getAssetManager() { return m_assetManager; }
+// json functions that nlohmann needs to convert the class to json
+void to_json(json &j, const SceneManager &scene_manager) {
+  j = json{
+      {"type", "SceneManager"},
+      {"m_all_scenes", {{"size", scene_manager.m_all_scenes.size()}}},
+      {"m_active_scenes", {{"size", scene_manager.m_active_scenes.size()}}},
+      {"m_inactive_scenes", {{"size", scene_manager.m_inactive_scenes.size()}}},
+      {"m_interactive_scenes",
+       {{"size", scene_manager.m_interactive_scenes.size()}}}};
+};
