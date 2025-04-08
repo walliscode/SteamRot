@@ -10,18 +10,21 @@
 
 ## Game Running
 
-The Game Engine (and thus the SteamRot game) is initiated by creating a GameEngine object and calling the [RunGame](#rungame)
+The Game Engine (and thus the SteamRot game) is initiated
+by creating a GameEngine object and calling the [RunGame](#rungame)
 method.
 
 ### RunGame
 
-Still within the GameEngine object, the RunGame method creates a while loop (the game loop) that will run until a simulation limit is reached or the user quits the game.
+Still within the GameEngine object, the RunGame method creates
+a while loop (the game loop) that will run until a simulation
+limit is reached or the user quits the game.
 
 The game loop calls a series of methods that will update the game state:
 
 1. sUserInput: handles external user input (such as with a mouse or keyboard).
 1. UpdateSystems: updates all internal logic that affect the game state.
-1. Render: draws the game state to the screen.
+1. sRender: draws the game state to the screen (handled by the display manager).
 
 ## Style Guide
 
