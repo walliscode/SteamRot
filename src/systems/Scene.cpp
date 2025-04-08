@@ -6,8 +6,13 @@ bool Scene::getActive() const { return m_active; }
 
 void Scene::setActive(bool active) { m_active = active; }
 
-json Scene::toJSON() {
-  json j;
-  // j["entities"] = m_entity_manager.toJSON();
-  return j;
+void to_json(nlohmann::json &j, const Scene &scene) {
+  j = nlohmann::json{
+      {"type", "Scene"},
+      {"m_name", scene.m_name},
+      {"m_paused", scene.m_paused},
+      {"m_active", scene.m_active},
+      {"m_interactable", scene.m_interactable},
+      {"m_current_frame", scene.m_current_frame},
+  };
 }

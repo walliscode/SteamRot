@@ -24,7 +24,8 @@ TEST_CASE("test json structure", "[data_out]") {
         {"m_event_flags", nullptr},
         {"m_scene_manager",
          {{"type", nullptr},
-          {"m_all_scenes", {{"size", nullptr}}},
+          {"m_all_scenes",
+           {{"size", nullptr}, {"scenes", json::array({"name", nullptr})}}},
           {"m_active_scenes", {{"size", nullptr}}},
           {"m_inactive_scenes", {{"size", nullptr}}},
           {"m_interactive_scenes", {{"size", nullptr}}}}}}}};

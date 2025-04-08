@@ -23,8 +23,18 @@ inline void check_structure(json defined_structure, json test_structure) {
 
     // third check that the key is a dictionary, if yes then recursively check
     if (value.is_object()) {
-
+      INFO("checking that " << key << " is a dictionary");
+      REQUIRE(test_structure[key].is_object());
       check_structure(value, test_structure[key]);
+    }
+    // check if the key is an array
+    else if (value.is_array()) {
+      INFO("checking that " << key << " is an array");
+      REQUIRE(test_structure[key].is_array());
+
+      // check that the test array is not longer that the are defined array
+      INFO("checking that the test array is not longer than the defined array");
+      REQUIRE(test_structure[key].size() <= value.size());
     }
   }
 }

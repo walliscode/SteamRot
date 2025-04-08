@@ -127,9 +127,16 @@ void SceneManager::MakeNonInteractive() {
 void to_json(json &j, const SceneManager &scene_manager) {
   j = json{
       {"type", "SceneManager"},
-      {"m_all_scenes", {{"size", scene_manager.m_all_scenes.size()}}},
+      {"m_all_scenes",
+       {{"size", scene_manager.m_all_scenes.size()},
+        {"scenes", json::array()}}},
       {"m_active_scenes", {{"size", scene_manager.m_active_scenes.size()}}},
       {"m_inactive_scenes", {{"size", scene_manager.m_inactive_scenes.size()}}},
       {"m_interactive_scenes",
        {{"size", scene_manager.m_interactive_scenes.size()}}}};
+
+  // for (auto &pair : scene_manager.m_all_scenes) {
+  //
+  //   j["m_all_scenes"]["scenes"].push_back(pair.first);
+  // }
 };

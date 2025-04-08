@@ -22,6 +22,8 @@ protected:
 
   Scene(const std::string &name, const size_t &pool_size);
 
+  friend void to_json(nlohmann::json &j, const Scene &scene);
+
 public:
   // common systems between Scenes
   virtual void sUpdate() = 0;
@@ -29,7 +31,6 @@ public:
 
   bool getActive() const;
   void setActive(bool active);
-
-  // data extraction
-  json toJSON(); // Convert the scene to a json object
 };
+
+void to_json(nlohmann::json &j, const Scene &scene);
