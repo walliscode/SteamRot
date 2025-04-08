@@ -25,11 +25,6 @@ GameEngine::GameEngine() : m_displayManager(), m_scene_manager() {}
 ////////////////////////////////////////////////////////////
 void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
 
-  // create test window if use_test_window is true
-  if (use_test_window) {
-    m_test_window = sf::RenderWindow(sf::VideoMode({800, 600}), "Test Window");
-  }
-
   // Run the program as long as the window is open
   while (m_displayManager.GetWindow().isOpen()) {
 
@@ -37,41 +32,23 @@ void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
     m_loop_number++;
 
     // Handle external input
-    GameEngine::sUserInput();
+    sUserInput();
 
     // Handle all system updates
-    GameEngine::UpdateSystems();
+    UpdateSystems();
 
-    // call all the necessary drawables and pass to display manager
-    std::map<std::string, SceneDrawables> game_drawables =
-        m_scene_manager.ProvideSceneDrawables();
+    // Render all game drawables
+    sRender();
 
-    if (use_test_window) {
-      TestRender(game_drawables);
-    } else {
-      // End the current frame and display its contents on screen
-      m_displayManager.Cycle(game_drawables);
-    }
     // statement to test whether to break the loop, must be called at end
     if (numLoops > 0 && m_loop_number >= numLoops) {
       // export data to json, first variable is the directory name, second is
       // the file name
       ExportSimulationData("test");
       break;
-    }
+    };
   }
-}
-
-////////////////////////////////////////////////////////////
-void GameEngine::UpdateSystems() {
-
-  // update display manager actions and call any logic systems
-  m_displayManager.PopulateActions(m_event_flags);
-  m_displayManager.Update();
-
-  // call the update function of the scene manager
-  m_scene_manager.update();
-}
+};
 
 ////////////////////////////////////////////////////////////
 void GameEngine::sUserInput() {
@@ -83,7 +60,7 @@ void GameEngine::sUserInput() {
     // "close requested" event: we close the window
     if (event->is<sf::Event::Closed>()) {
       m_displayManager.GetWindow().close();
-      m_test_window.close();
+
     }
 
     // handle key pressed events
@@ -165,7 +142,27 @@ void GameEngine::sUserInput() {
     // }
   }
 };
-// SceneManager &GameEngine::getSceneManager() { return m_sceneManager; }
+////////////////////////////////////////////////////////////
+void GameEngine::UpdateSystems() {
+
+  // update display manager actions and call any logic systems
+  m_displayManager.PopulateActions(m_event_flags);
+  m_displayManager.Update();
+
+  // call the update function of the scene manager
+  m_scene_manager.update();
+}
+
+////////////////////////////////////////////////////////////
+void GameEngine::sRender() {
+
+  // call all the necessary drawables and pass to display manager
+  std::map<std::string, SceneDrawables> game_drawables =
+      m_scene_manager.ProvideSceneDrawables();
+
+  // End the current frame and display its contents on screen
+  m_displayManager.Cycle(game_drawables);
+};
 
 ////////////////////////////////////////////////////////////
 size_t GameEngine::getLoopNumber() { return m_loop_number; }
@@ -223,19 +220,4 @@ void GameEngine::ExportSimulationData(const std::string &file_name) {
   } else {
     throw std::runtime_error("Could not open file");
   }
-}
-
-void GameEngine::TestRender(
-    std::map<std::string, SceneDrawables> &test_drawables) {
-  // clear the test window
-  m_test_window.clear(sf::Color::Red);
-  // cycle through and draw to test window
-  //
-  // for (auto &scene_drawables : test_drawables) {
-  //   for (auto &drawable_iter : scene_drawables.second) {
-  //     m_test_window.draw(*drawable_iter);
-  //   }
-  // }
-  //
-  m_test_window.display();
 }
