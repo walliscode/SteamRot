@@ -7,7 +7,6 @@
 #include <cstddef>
 #include <filesystem>
 #include <fstream>
-#include <iostream>
 #include <magic_enum/magic_enum.hpp>
 #include <magic_enum/magic_enum_iostream.hpp>
 #include <stdexcept>
@@ -16,18 +15,9 @@ namespace fs = std::filesystem;
 
 using namespace magic_enum::bitwise_operators;
 
-GameEngine::GameEngine() : m_displayManager(), m_scene_manager() {
-  Init(); // kick off the game, loading assets de.t.c
-}
+GameEngine::GameEngine() : m_displayManager(), m_scene_manager() {}
 
-void GameEngine::Init() {
-
-  // print out the initial state of the m_event_flags enum
-  using magic_enum::iostream_operators::operator<<;
-  std::cout << "Initial Event flags: " << m_event_flags << std::endl;
-}
-
-void GameEngine::Run(size_t numLoops, bool use_test_window) {
+void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
 
   if (use_test_window) {
     m_test_window = sf::RenderWindow(sf::VideoMode({800, 600}), "Test Window");
@@ -172,7 +162,7 @@ void GameEngine::runSimulation(int loops) {
   if (loops <= 0) {
     throw std::invalid_argument("The number of loops must be greater than 0");
   } else {
-    GameEngine::Run(loops);
+    GameEngine::RunGame(loops);
   }
 }
 

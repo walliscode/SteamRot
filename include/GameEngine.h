@@ -26,8 +26,8 @@ private:
 
 public:
   GameEngine();
-  void Init();
-  void Run(size_t numLoops = 0, bool use_test_window = false);
+
+  void RunGame(size_t numLoops = 0, bool use_test_window = false);
   void Update();
 
   void test_render(std::map<std::string, SceneDrawables> &test_drawables);

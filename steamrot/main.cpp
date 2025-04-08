@@ -1,7 +1,7 @@
 #include "GameEngine.h"
 int main() {
-  GameEngine game;
-  game.Run();
+  GameEngine steam_rot;
+  steam_rot.RunGame();
 
   return 0;
 }
