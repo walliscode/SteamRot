@@ -1,3 +1,7 @@
+////////////////////////////////////////////////////////////
+// Headers
+////////////////////////////////////////////////////////////
+
 #include "GameEngine.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
@@ -15,31 +19,35 @@ namespace fs = std::filesystem;
 
 using namespace magic_enum::bitwise_operators;
 
+////////////////////////////////////////////////////////////
 GameEngine::GameEngine() : m_displayManager(), m_scene_manager() {}
 
+////////////////////////////////////////////////////////////
 void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
 
+  // create test window if use_test_window is true
   if (use_test_window) {
     m_test_window = sf::RenderWindow(sf::VideoMode({800, 600}), "Test Window");
   }
 
   // Run the program as long as the window is open
   while (m_displayManager.GetWindow().isOpen()) {
-    // increment the loop number by 1, the tick number is defined at the
-    // beginning of the loop
+
+    // handle loop number increase at beginning of loop
     m_loop_number++;
-    // handle user input, this just effects the bitset, doesn't handle any
-    // action
+
+    // Handle external input
     GameEngine::sUserInput();
-    // Update all the necessary components of the game
-    GameEngine::Update();
+
+    // Handle all system updates
+    GameEngine::UpdateSystems();
 
     // call all the necessary drawables and pass to display manager
     std::map<std::string, SceneDrawables> game_drawables =
         m_scene_manager.ProvideSceneDrawables();
 
     if (use_test_window) {
-      test_render(game_drawables);
+      TestRender(game_drawables);
     } else {
       // End the current frame and display its contents on screen
       m_displayManager.Cycle(game_drawables);
@@ -48,13 +56,14 @@ void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
     if (numLoops > 0 && m_loop_number >= numLoops) {
       // export data to json, first variable is the directory name, second is
       // the file name
-      ExportJSON("test");
+      ExportSimulationData("test");
       break;
     }
   }
 }
 
-void GameEngine::Update() {
+////////////////////////////////////////////////////////////
+void GameEngine::UpdateSystems() {
 
   // update display manager actions and call any logic systems
   m_displayManager.PopulateActions(m_event_flags);
@@ -64,10 +73,13 @@ void GameEngine::Update() {
   m_scene_manager.update();
 }
 
+////////////////////////////////////////////////////////////
 void GameEngine::sUserInput() {
+
   // Check all the window's events that were triggered since the last iteration
   // of the loop
   while (const std::optional event = m_displayManager.GetWindow().pollEvent()) {
+
     // "close requested" event: we close the window
     if (event->is<sf::Event::Closed>()) {
       m_displayManager.GetWindow().close();
@@ -155,9 +167,11 @@ void GameEngine::sUserInput() {
 };
 // SceneManager &GameEngine::getSceneManager() { return m_sceneManager; }
 
+////////////////////////////////////////////////////////////
 size_t GameEngine::getLoopNumber() { return m_loop_number; }
 
-void GameEngine::runSimulation(int loops) {
+////////////////////////////////////////////////////////////
+void GameEngine::RunSimulation(int loops) {
   // prevent undefined behaviour of simulation loop
   if (loops <= 0) {
     throw std::invalid_argument("The number of loops must be greater than 0");
@@ -166,6 +180,7 @@ void GameEngine::runSimulation(int loops) {
   }
 }
 
+////////////////////////////////////////////////////////////
 void to_json(json &j, const GameEngine &ge) {
   j = json{{"GameEngine",
             {{"m_loop_number", ge.m_loop_number},
@@ -175,7 +190,8 @@ void to_json(json &j, const GameEngine &ge) {
   };
 };
 
-void GameEngine::ExportJSON(const std::string &file_name) {
+////////////////////////////////////////////////////////////
+void GameEngine::ExportSimulationData(const std::string &file_name) {
 
   // create directory if it does not exist
   fs::create_directories(DATA_OUT_DIR);
@@ -209,7 +225,7 @@ void GameEngine::ExportJSON(const std::string &file_name) {
   }
 }
 
-void GameEngine::test_render(
+void GameEngine::TestRender(
     std::map<std::string, SceneDrawables> &test_drawables) {
   // clear the test window
   m_test_window.clear(sf::Color::Red);
