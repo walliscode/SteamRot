@@ -10,7 +10,7 @@ namespace fs = std::filesystem;
 TEST_CASE("simple simulation test", "[simulation]") {
   // set up resources to test
   GameEngine game;
-  game.runSimulation(10);
+  game.RunSimulation(10);
 
   // import the test json file
   fs::path json_file_path = fs::path(DATA_OUT_DIR) / "test.json";

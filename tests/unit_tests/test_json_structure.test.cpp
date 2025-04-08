@@ -15,7 +15,7 @@ TEST_CASE("test json structure", "[data_out]") {
 
   // set up resources to test (this should just be the whole game)
   GameEngine game;
-  game.runSimulation(10);
+  game.RunSimulation(10);
 
   // define json structure to test against
   json defined_structure = {
