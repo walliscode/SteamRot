@@ -12,13 +12,12 @@ typedef std::map<std::string, std::shared_ptr<Scene>> SceneList;
 
 class SceneManager {
 private:
+  ////////////////////////////////////////////////////////////
+  // Member data
+  ////////////////////////////////////////////////////////////
   SceneList m_all_scenes;
-
-  // scenes that continue to calculate, theses may or may not be rendered
   SceneList m_active_scenes;
   SceneList m_inactive_scenes;
-
-  // scenes that can take user events
   SceneList m_interactive_scenes;
   AssetManager m_asset_manager;
 
@@ -26,32 +25,64 @@ private:
   friend void to_json(json &j, const SceneManager &scene_manager);
 
 public:
+  ////////////////////////////////////////////////////////////
+  /// \brief Default constructor
+  ///
+  ////////////////////////////////////////////////////////////
+
   SceneManager();
+  ////////////////////////////////////////////////////////////
+  /// \brief Update all Scenes
+  ///
+  ////////////////////////////////////////////////////////////
+  void UpdateScenes();
+
+  ////////////////////////////////////////////////////////////
+  /// \brief Add a new scene
+  ///
+  ////////////////////////////////////////////////////////////
   void AddScene(std::string tag, std::string scene_type, size_t pool_size);
+
+  ////////////////////////////////////////////////////////////
+  /// \brief Remove a Scene
+  ///
+  ////////////////////////////////////////////////////////////
   void RemoveScene(std::string tag);
 
-  // activation and deactivation of scenes refers to whetehre they should
-  // continue calculations
+  ////////////////////////////////////////////////////////////
+  /// \brief Activate a Scene for continued calculations
+  ///
+  ////////////////////////////////////////////////////////////
   void ActivateScene(std::string tag);
+
+  ////////////////////////////////////////////////////////////
+  /// \brief Deactivate a Scene to stop calculations
+  ///
+  ////////////////////////////////////////////////////////////
   void DeactivateScene(std::string tag);
 
-  // interactive scenes are those that can take user events. this will probably
-  // be done with mouse hovering or with tiling window manager
+  ////////////////////////////////////////////////////////////
+  /// \brief Allow Scene to respond to user input
+  ///
+  ////////////////////////////////////////////////////////////
   void MakeInteractive();
+
+  ////////////////////////////////////////////////////////////
+  /// \brief Stop Scene from responding to user input
+  ///
+  ////////////////////////////////////////////////////////////
   void MakeNonInteractive();
 
-  SceneList &getAllScenes();
-  SceneList &getActiveScenes();
-  SceneList &getInactiveScenes();
-  SceneList &getInteractiveScenes();
-
+  ////////////////////////////////////////////////////////////
+  /// \brief Provide a map of drawables from the relevant scenes along with an
+  /// identifier
+  ///
+  ////////////////////////////////////////////////////////////
   std::map<std::string, SceneDrawables> ProvideSceneDrawables();
-
-  // Asset manager functions
-  AssetManager &getAssetManager();
-
-  void update();
-  void passEvent(const std::optional<sf::Event>);
 };
 
+////////////////////////////////////////////////////////////
+/// \brief to_json functionality provided by nlohmann/json
+///
+////////////////////////////////////////////////////////////
 void to_json(json &j, const SceneManager &scene_manager);
