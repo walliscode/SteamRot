@@ -150,7 +150,7 @@ void GameEngine::UpdateSystems() {
   m_displayManager.Update();
 
   // call the update function of the scene manager
-  m_scene_manager.update();
+  m_scene_manager.UpdateScenes();
 }
 
 ////////////////////////////////////////////////////////////

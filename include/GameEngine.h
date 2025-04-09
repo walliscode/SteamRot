@@ -78,7 +78,7 @@ public:
 };
 
 ////////////////////////////////////////////////////////////
-/// \brief to json functionality provided by nlohmann/json
+/// \brief to_json functionality provided by nlohmann/json
 ///
 ////////////////////////////////////////////////////////////
 void to_json(json &j, const GameEngine &ge);
