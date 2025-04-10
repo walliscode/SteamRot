@@ -1,33 +1,24 @@
 #include "SceneManager.h"
-#include "SceneMenu.h"
-#include <iostream>
 #include <memory>
 
 ///////////////////////////////////////////////////////////
 SceneManager::SceneManager()
-    : m_all_scenes(), m_active_scenes(), m_inactive_scenes(),
-      m_asset_manager() {
+    : m_scene_factory(), m_all_scenes(), m_active_scenes(), m_inactive_scenes(),
+      m_asset_manager() {}
 
-  // kick off initial scene(s)
+///////////////////////////////////////////////////////////
+void SceneManager::StartUp() {
+
+  // create initial scene
   AddScene("main_menu", "menu", 100);
-  std::cout << "main menu added" << std::endl;
 }
-
 ///////////////////////////////////////////////////////////
 void SceneManager::AddScene(std::string name, std::string scene_type,
                             const size_t pool_size) {
 
-  // create a new scene object, if scene type does not exist throw a runtime
-  // error and exit early
-  std::shared_ptr<Scene> new_scene = nullptr;
-  if (scene_type == "menu") {
-    new_scene = std::make_shared<SceneMenu>(name, pool_size);
-  }
-
-  else {
-
-    throw std::runtime_error("Scene type not found");
-  }
+  // shared pointer is used as Scene can be in multiple maps
+  std::shared_ptr<Scene> new_scene =
+      m_scene_factory.CreateScene(name, scene_type);
 
   // add to relevant maps
   m_all_scenes.insert({name, new_scene});
