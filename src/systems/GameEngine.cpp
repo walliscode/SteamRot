@@ -24,6 +24,8 @@ GameEngine::GameEngine() : m_displayManager(), m_scene_manager() {}
 
 ////////////////////////////////////////////////////////////
 void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
+  // set up resources
+  m_scene_manager.StartUp();
 
   // Run the program as long as the window is open
   while (m_displayManager.GetWindow().isOpen()) {
