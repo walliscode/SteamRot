@@ -36,6 +36,10 @@ This currently just calls the UpdateScenes method from the SceneManager class.
 I'm predicting that this will be expanded to include other systems in the future,
 but if not this could be collapsed down to just a call to the SceneManager.
 
+The UpdateScenes function will also be responsible for the logic deciding which vector of scenes to update
+
+1. [sMovement](#smovement): handles the movement of all entities in the scene.
+
 ## Style Guide
 
 In general we follow the [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html).

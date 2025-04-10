@@ -5,6 +5,6 @@ class SceneMenu : public Scene {
 private:
 public:
   SceneMenu(const std::string &name, size_t poolSize);
-  void sUpdate() override;
+  void sMovement() override;
   SceneDrawables sProvideDrawables() override;
 };

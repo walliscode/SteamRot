@@ -26,7 +26,7 @@ protected:
 
 public:
   // common systems between Scenes
-  virtual void sUpdate() = 0;
+  virtual void sMovement() = 0;
   virtual SceneDrawables sProvideDrawables() = 0;
 
   bool getActive() const;
