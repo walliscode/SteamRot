@@ -2,10 +2,13 @@
 
 <!--toc:start-->
 - [SteamRot game structure](#steamrot-game-structure)
+  - [Game Running](#game-running)
+    - [RunGame](#rungame)
+    - [UpdateSystems](#updatesystems)
   - [Style Guide](#style-guide)
     - [Formatting](#formatting)
       - [Spacing between functions](#spacing-between-functions)
-      - [funtionality brief](#funtionality-brief)
+      - [Funtionality brief](#funtionality-brief)
 <!--toc:end-->
 
 ## Game Running
@@ -23,8 +26,15 @@ limit is reached or the user quits the game.
 The game loop calls a series of methods that will update the game state:
 
 1. sUserInput: handles external user input (such as with a mouse or keyboard).
-1. UpdateSystems: updates all internal logic that affect the game state.
+1. [UpdateSystems](#updatesystems): updates all internal logic that affect the game state.
 1. sRender: draws the game state to the screen (handled by the display manager).
+
+### UpdateSystems
+
+The is a GameEngine method that calls the general systems for updating the game state.
+This currently just calls the UpdateScenes method from the SceneManager class.
+I'm predicting that this will be expanded to include other systems in the future,
+but if not this could be collapsed down to just a call to the SceneManager.
 
 ## Style Guide
 
