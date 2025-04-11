@@ -1,0 +1,21 @@
+#pragma once
+
+#include "EntityMemoryPool.h"
+#include "TypeDefs.h"
+#include <memory>
+
+class Logic {
+public:
+  ////////////////////////////////////////////////////////////
+  /// \brief default constructor
+  ///
+  ////////////////////////////////////////////////////////////
+  Logic() = default;
+
+  ////////////////////////////////////////////////////////////
+  /// \brief Carries out Logic for the game
+  ///
+  ////////////////////////////////////////////////////////////
+  virtual void ProcessLogic(std::unique_ptr<EntityMemoryPool> entities,
+                            const EntityIndicies &entity_indicies) = 0;
+};
