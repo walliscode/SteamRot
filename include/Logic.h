@@ -10,12 +10,26 @@ public:
   /// \brief default constructor
   ///
   ////////////////////////////////////////////////////////////
-  Logic() = default;
+  Logic(size_t update_frequency);
+
+  ////////////////////////////////////////////////////////////
+  /// \brief guard function for update frequency
+  ///
+  ////////////////////////////////////////////////////////////
+  void RunLogic(size_t cycle, std::unique_ptr<EntityMemoryPool> &entities,
+                const EntityIndicies &entity_indicies);
+
+private:
+  ////////////////////////////////////////////////////////////
+  /// \brief Members
+  ///
+  ////////////////////////////////////////////////////////////
+  size_t m_update_frequency; // how often to update the logic
 
   ////////////////////////////////////////////////////////////
   /// \brief Carries out Logic for the game
   ///
   ////////////////////////////////////////////////////////////
-  virtual void ProcessLogic(std::unique_ptr<EntityMemoryPool> entities,
+  virtual void ProcessLogic(std::unique_ptr<EntityMemoryPool> &entities,
                             const EntityIndicies &entity_indicies) = 0;
 };

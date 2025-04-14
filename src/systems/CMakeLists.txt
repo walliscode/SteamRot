@@ -7,7 +7,7 @@ add_library(systems
     Scene.cpp
     ActionManager.cpp
     SceneMenu.cpp
-
+    Logic.cpp
 )
 
 # check if set definitions exist
