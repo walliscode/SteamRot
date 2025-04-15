@@ -16,7 +16,7 @@ public:
   /// \brief guard function for update frequency
   ///
   ////////////////////////////////////////////////////////////
-  void RunLogic(size_t cycle, std::unique_ptr<EntityMemoryPool> &entities,
+  void RunLogic(std::unique_ptr<EntityMemoryPool> &entities,
                 const EntityIndicies &entity_indicies);
 
 private:
@@ -25,6 +25,7 @@ private:
   ///
   ////////////////////////////////////////////////////////////
   size_t m_update_frequency; // how often to update the logic
+  size_t m_cycle_count{0};   // how many cycles have passed
 
   ////////////////////////////////////////////////////////////
   /// \brief Carries out Logic for the game
