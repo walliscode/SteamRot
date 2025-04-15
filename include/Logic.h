@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ComponentFlags.h"
 #include "EntityMemoryPool.h"
 #include "TypeDefs.h"
 #include <memory>
@@ -18,6 +19,12 @@ public:
   ////////////////////////////////////////////////////////////
   void RunLogic(std::unique_ptr<EntityMemoryPool> &entities,
                 const EntityIndicies &entity_indicies);
+
+  ////////////////////////////////////////////////////////////
+  /// \brief returns the Archetype for the derived logic class
+  ///
+  ////////////////////////////////////////////////////////////
+  virtual const SteamRot::ComponentFlags &GetArchetype() const = 0;
 
 private:
   ////////////////////////////////////////////////////////////
