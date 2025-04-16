@@ -1,5 +1,11 @@
+////////////////////////////////////////////////////////////
+// Preprocessor directives
+////////////////////////////////////////////////////////////
 #pragma once
 
+////////////////////////////////////////////////////////////
+// Headers
+////////////////////////////////////////////////////////////
 #include "Archetype.h"
 #include <cstdlib>
 #include <memory>
@@ -7,38 +13,46 @@
 
 class ArchetypeManager {
 private:
+  ////////////////////////////////////////////////////////////
+  // Member data
+  ////////////////////////////////////////////////////////////
   std::vector<Archetype> m_archetypes;
 
 public:
+  ////////////////////////////////////////////////////////////
+  /// \brief Default constructor
+  ///
+  ////////////////////////////////////////////////////////////
   ArchetypeManager();
 
-  // archetypes are a unique collection of Components. this is to aid in
-  // filtering entities functions are provided to get arcehtypes based on and/or
-  // type filtering
-  //
-  //
-  // returns the archetype will contains all and only the provided Components
-  const Archetype &getExactArchetype(
+  ////////////////////////////////////////////////////////////
+  /// \brief returns Archetype that matches the provided Components
+  ///
+  ////////////////////////////////////////////////////////////
+  const Archetype &GetExactArchetype(
       const SteamRot::ComponentFlags &archetype_requirements) const;
 
-  const std::vector<size_t> &getExactArchetypeEntities(
+  ////////////////////////////////////////////////////////////
+  /// \brief returns Entites from Archetype that matches provided Components
+  /// An "and" approach
+  ////////////////////////////////////////////////////////////
+  const std::vector<size_t> &GetExactArchetypeEntities(
       const SteamRot::ComponentFlags &archetype_requirements) const;
 
-  // get all archetypes that contain the provided Components
-  const std::shared_ptr<std::vector<Archetype>> getInclusiveArchetype(
+  ////////////////////////////////////////////////////////////
+  /// \brief returns a pointer to a vector that contains any combination of
+  /// Archetypes that match the provided Components. an "or" approach
+  ///
+  ////////////////////////////////////////////////////////////
+  const std::shared_ptr<std::vector<Archetype>> GetInclusiveArchetype(
       const SteamRot::ComponentFlags &archetype_requirements) const;
 
-  const std::shared_ptr<std::vector<size_t>> getInclusiveArchetypeEntities(
+  ////////////////////////////////////////////////////////////
+  /// \brief returns entities contained by GetInclusiveArchetype
+  ///
+  ///
+  ////////////////////////////////////////////////////////////
+
+  const std::shared_ptr<std::vector<size_t>> GetInclusiveArchetypeEntities(
       const SteamRot::ComponentFlags &archetype_requirements) const;
-
-  // void AssignEntityToArchetype(size_t entity_id,
-  //                              std::vector<std::string> compTags);
-  //
-  // void ClearEntityFromArchetype(size_t entity_id,
-  //                               std::vector<std::string> compTags);
-  // void ReassessEntityArchetype(size_t entity_id,
-  //                              std::vector<std::string> compTags);
-
-  const std::vector<Archetype>
-  getArchetypes() const; // return all the archetpes from the manager
 };
