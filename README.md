@@ -26,7 +26,8 @@ limit is reached or the user quits the game.
 The game loop calls a series of methods that will update the game state:
 
 1. sUserInput: handles external user input (such as with a mouse or keyboard).
-1. [UpdateSystems](#updatesystems): updates all internal logic that affect the game state.
+1. [UpdateSystems](#updatesystems): updates all internal logic that affect the
+game state.
 1. sRender: draws the game state to the screen (handled by the display manager).
 
 ### UpdateSystems
@@ -36,7 +37,8 @@ This currently just calls the UpdateScenes method from the SceneManager class.
 I'm predicting that this will be expanded to include other systems in the future,
 but if not this could be collapsed down to just a call to the SceneManager.
 
-The UpdateScenes function will also be responsible for the logic deciding which vector of scenes to update
+The UpdateScenes function will also be responsible for the logic deciding which
+vector of scenes to update
 
 1. [sMovement](#smovement): handles the movement of all entities in the scene.
 
