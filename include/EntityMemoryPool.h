@@ -1,18 +1,21 @@
+////////////////////////////////////////////////////////////
+// Preprocessor directives
+////////////////////////////////////////////////////////////
 #pragma once
+
+////////////////////////////////////////////////////////////
+// Headers
+////////////////////////////////////////////////////////////
 #include <algorithm>
 #include <cstddef>
 #include <memory>
 #include <tuple>
 
-// global definition for the ComponentCollectionTuple in the header file
-// do not add extra componets anywhere else
 #include "ComponentCollections.h"
 
 class EntityMemoryPool {
 
 private:
-  // the number of "entities" is the length of the component vectors
-  // these NEED to be the same for each vector
   size_t m_num_entities;
 
   // this is where all the component data is stored
