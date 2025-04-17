@@ -38,7 +38,7 @@ void SceneManager::ActivateScene(std::string tag) {
   // find scene in m_allScenes
   std::shared_ptr<Scene> scene = m_all_scenes[tag];
   // activate scene
-  scene->setActive(true);
+  scene->SetActive(true);
   // add to active scenes
   m_active_scenes[tag] = scene;
   // remove from inactive scenes
@@ -50,7 +50,7 @@ void SceneManager::DeactivateScene(std::string tag) {
   // find scene in m_allScenes
   std::shared_ptr<Scene> scene = m_all_scenes[tag];
   // inactivate scene
-  scene->setActive(false);
+  scene->SetActive(false);
   // add to inactive scenes
   m_inactive_scenes[tag] = scene;
   // remove from active scenes and interactive scenes
