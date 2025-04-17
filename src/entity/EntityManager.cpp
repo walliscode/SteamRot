@@ -1,11 +1,14 @@
+////////////////////////////////////////////////////////////
+// Headers
+////////////////////////////////////////////////////////////
+
 #include "EntityManager.h"
-#include "ComponentFlags.h"
 #include "general_util.h"
-#include <nlohmann/json.hpp>
-#include <vector>
 
 using json = nlohmann::json;
 using namespace magic_enum::bitwise_operators;
+
+////////////////////////////////////////////////////////////
 EntityManager::EntityManager(const size_t &pool_size,
                              const std::string &scene_name) {
 
@@ -15,9 +18,7 @@ EntityManager::EntityManager(const size_t &pool_size,
   InitialiseEntities(scene_name);
 }
 
-// find next inactive entity index
-// refresh all components at that index
-// turn "on" by switching CMeta.active to true
+////////////////////////////////////////////////////////////
 size_t EntityManager::AddEntity() {
 
   size_t new_entity_id = (*m_pool).getNextEntityIndex();
@@ -34,11 +35,13 @@ size_t EntityManager::AddEntity() {
   return new_entity_id;
 }
 
+////////////////////////////////////////////////////////////
 void EntityManager::RemoveEntity(size_t entity_index) {
 
   m_entities_to_remove.push_back(entity_index);
 }
 
+////////////////////////////////////////////////////////////
 void EntityManager::UpdateWaitingRooms() {
   // Entity removal/deleteion
   // for each entity to remove, deactivate the CMeta component
@@ -72,8 +75,7 @@ void EntityManager::UpdateWaitingRooms() {
   m_entities_to_add.clear(); // clear the to add waiting room
 }
 
-// preload entities from json file, essentially adding Component data at each
-// index
+////////////////////////////////////////////////////////////
 void EntityManager::InitialiseEntities(std::string scene_name) {
 
   std::string file_name =
@@ -130,6 +132,7 @@ void EntityManager::InitialiseEntities(std::string scene_name) {
   }
 }
 
+////////////////////////////////////////////////////////////
 const SteamRot::ComponentFlags &
 EntityManager::GetComponentFlags(size_t entity_id) {
 
@@ -138,24 +141,3 @@ EntityManager::GetComponentFlags(size_t entity_id) {
 
   return meta_data.m_component_flags;
 }
-
-// std::vector<size_t> EntityManager::getEntities() { return m_entities; }
-
-// convert the component data to json and other entity data
-json EntityManager::toJSON() {
-  json j;
-
-  // // add data for each entity under "entityData" key
-  // for (auto &entity : m_entities) {
-  //   json entityData;
-  //   entityData["entityID"] = entity;
-  //   entityData["CTransform"] = getComponent<CTransform>(entity).toJSON();
-  //   entityData["CText"] = getComponent<CText>(entity).toJSON();
-  //   entityData["CMeta"] = getComponent<CMeta>(entity).toJSON();
-  //   j["entityData"].push_back(entityData);
-  // }
-
-  return j;
-}
-
-std::vector<size_t> EntityManager::GetEntities() { return m_entities; }
