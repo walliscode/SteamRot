@@ -3,7 +3,9 @@
 ////////////////////////////////////////////////////////////
 
 #include "EntityManager.h"
-#include "general_util.h"
+#include "EntityMemoryPool.h"
+
+#include <memory>
 
 using json = nlohmann::json;
 using namespace magic_enum::bitwise_operators;
@@ -11,12 +13,15 @@ using namespace magic_enum::bitwise_operators;
 ////////////////////////////////////////////////////////////
 EntityManager::EntityManager(const size_t &pool_size,
                              const std::string &scene_name)
-    : m_entity_configuration_factory(scene_name) {
+    : m_entity_configuration_factory(scene_name),
+      m_pool(std::make_unique<EntityMemoryPool>(pool_size)) {
 
-  m_pool = std::make_shared<EntityMemoryPool>(pool_size);
+      };
 
-  // add all entites in json file
-  InitialiseEntities(scene_name);
+////////////////////////////////////////////////////////////
+void EntityManager::ConfigureEntities(const std::string &config_method) {
+
+  m_entity_configuration_factory.ConfigureEntities(config_method, m_pool);
 }
 
 ////////////////////////////////////////////////////////////
@@ -74,63 +79,6 @@ void EntityManager::UpdateWaitingRooms() {
   // }
 
   m_entities_to_add.clear(); // clear the to add waiting room
-}
-
-////////////////////////////////////////////////////////////
-void EntityManager::InitialiseEntities(std::string scene_name) {
-
-  std::string file_name =
-      (std::string(RESOURCES_DIR) + "/jsons/entities_" + scene_name + ".json");
-  // check binary file exists
-
-  bool file_exists = utils::CheckFileExists(file_name);
-
-  if (!file_exists) {
-    return;
-  };
-
-  // load entity configuration
-  std::ifstream f(file_name);
-  json entity_config = json::parse(f);
-
-  // the components will need to be added one by one here
-  // if we find we are initiliasing them else from string then pull out into a
-  // function
-
-  for (auto entity : entity_config) {
-
-    // CMeta activation handled by AddEntity
-    size_t entity_id = AddEntity();
-
-    // pull out ComponentFlag for use
-    SteamRot::ComponentFlags &component_flags =
-        GetComponent<CMeta>(entity_id).m_component_flags;
-    // each component will need to be added here manually
-    // hopefully at some point i will figure out how to represent a string map
-    // with types
-    //
-    // json.template get<> calls the from_json function from the component
-    // vector component is the actual compnent in the pool
-    // overwriting the default constructed component
-    // component_flags is turned on for that component
-    for (auto &component : entity) {
-      if (component["type"] == "CMeta") {
-
-        CMeta json_created_component = component.template get<CMeta>();
-        CMeta &vector_component = GetComponent<CMeta>(entity_id);
-        vector_component = json_created_component;
-
-        component_flags = component_flags | SteamRot::ComponentFlags::CMeta;
-
-      } else if (component["type"] == "CShape") {
-        CShape json_created_component = component.template get<CShape>();
-        CShape &vector_component = GetComponent<CShape>(entity_id);
-        vector_component = json_created_component;
-
-        component_flags = component_flags | SteamRot::ComponentFlags::CShape;
-      }
-    }
-  }
 }
 
 ////////////////////////////////////////////////////////////

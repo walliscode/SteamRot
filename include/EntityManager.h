@@ -13,6 +13,7 @@
 #include "EntityMemoryPool.h"
 #include <cstddef>
 
+#include <memory>
 #include <nlohmann/json.hpp>
 #include <vector>
 
@@ -28,15 +29,9 @@ private:
   std::vector<size_t> m_entities;
   std::vector<size_t> m_entities_to_add;
   std::vector<size_t> m_entities_to_remove;
-  std::shared_ptr<EntityMemoryPool> m_pool;
+  std::unique_ptr<EntityMemoryPool> m_pool;
   ArchetypeManager m_archetype_manager;
   EntityConfigurationFactory m_entity_configuration_factory;
-
-  ////////////////////////////////////////////////////////////
-  /// \brief Intialise all entities by scene name
-  ///
-  ////////////////////////////////////////////////////////////
-  void InitialiseEntities(std::string scene_name);
 
 public:
   ////////////////////////////////////////////////////////////
@@ -44,6 +39,12 @@ public:
   ///
   ////////////////////////////////////////////////////////////
   EntityManager(const size_t &pool_size, const std::string &scene_name);
+
+  ////////////////////////////////////////////////////////////
+  /// \brief Configure Entities
+  ///
+  ////////////////////////////////////////////////////////////
+  void ConfigureEntities(const std::string &config_method);
 
   ////////////////////////////////////////////////////////////
   /// \brief "activate" an entity by finding the next inactive entity index
