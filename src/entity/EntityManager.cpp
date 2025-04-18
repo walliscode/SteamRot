@@ -10,7 +10,8 @@ using namespace magic_enum::bitwise_operators;
 
 ////////////////////////////////////////////////////////////
 EntityManager::EntityManager(const size_t &pool_size,
-                             const std::string &scene_name) {
+                             const std::string &scene_name)
+    : m_entity_configuration_factory(scene_name) {
 
   m_pool = std::make_shared<EntityMemoryPool>(pool_size);
 

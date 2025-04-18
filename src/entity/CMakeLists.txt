@@ -1,5 +1,6 @@
 add_library(entity
     EntityManager.cpp
+    EntityConfigurationFactory.cpp
     EntityMemoryPool.cpp
     ArchetypeManager.cpp
     Archetype.cpp
