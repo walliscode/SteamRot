@@ -9,6 +9,7 @@
 ////////////////////////////////////////////////////////////
 #include "ArchetypeManager.h"
 #include "ComponentFlags.h"
+#include "EntityConfigurationFactory.h"
 #include "EntityMemoryPool.h"
 #include <cstddef>
 
@@ -29,6 +30,7 @@ private:
   std::vector<size_t> m_entities_to_remove;
   std::shared_ptr<EntityMemoryPool> m_pool;
   ArchetypeManager m_archetype_manager;
+  EntityConfigurationFactory m_entity_configuration_factory;
 
   ////////////////////////////////////////////////////////////
   /// \brief Intialise all entities by scene name
