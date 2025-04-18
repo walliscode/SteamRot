@@ -7,6 +7,8 @@
 // Headers
 ////////////////////////////////////////////////////////////
 
+#include "EntityMemoryPool.h"
+#include <memory>
 #include <string>
 class EntityConfigurationFactory {
 private:
@@ -33,5 +35,6 @@ public:
   /// function
   ///
   ////////////////////////////////////////////////////////////
-  void ConfigureEntities(const std::string &config_method);
+  void ConfigureEntities(const std::string &config_method,
+                         std::unique_ptr<EntityMemoryPool> &entity_memory_pool);
 };
