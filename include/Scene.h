@@ -18,7 +18,8 @@ typedef std::vector<std::shared_ptr<sf::Drawable>> SceneDrawables;
 class Scene {
 protected:
   ////////////////////////////////////////////////////////////
-  // Member data
+  // Member dats responsible for passing data objects from file storage to the
+  // game engine and back.a
   ////////////////////////////////////////////////////////////
   EntityManager m_entity_manager;
   ActionManager m_action_manager;
