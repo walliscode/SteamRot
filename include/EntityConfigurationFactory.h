@@ -8,8 +8,11 @@
 ////////////////////////////////////////////////////////////
 
 #include "EntityMemoryPool.h"
+#include "nlohmann/json_fwd.hpp"
+#include <iostream>
 #include <memory>
 #include <string>
+
 class EntityConfigurationFactory {
 private:
   ////////////////////////////////////////////////////////////
@@ -31,10 +34,27 @@ public:
   EntityConfigurationFactory(const std::string &scene_id);
 
   ////////////////////////////////////////////////////////////
-  /// |brief Configure entities based on provided key and scene, calls private
-  /// function
+  /// |brief Template Function for configuring Entites based on data type
   ///
   ////////////////////////////////////////////////////////////
-  void ConfigureEntities(const std::string &config_method,
-                         std::unique_ptr<EntityMemoryPool> &entity_memory_pool);
+  template <typename T>
+  void
+  ConfigureEntities(const T &configuration_data,
+                    std::unique_ptr<EntityMemoryPool> &entity_memory_pool) {
+    // Default implementation does nothing
+    std::cout << "No entities will be configured using this data type"
+              << std::endl;
+  };
+
+  ////////////////////////////////////////////////////////////
+  /// |brief Specialization for configuring entities from JSON data
+  ///
+  ////////////////////////////////////////////////////////////
+  template <>
+  void
+  ConfigureEntities(const nlohmann::json &configuration_data,
+                    std::unique_ptr<EntityMemoryPool> &entity_memory_pool) {
+
+    ConfigureFromJSON();
+  }
 };
