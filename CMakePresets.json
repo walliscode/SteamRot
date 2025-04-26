@@ -6,27 +6,48 @@
   },
   "configurePresets": [
     {
-      "name": "debug",
+      "name": "default",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "clang.exe",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "Debug",
+      "inherits": "default",
       "displayName": "Debug",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/${presetName}",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_CXX_COMPILER": "clang.exe",
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "Release",
+      "inherits": "default",
+      "displayName": "Release",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
       }
     }
   ],
   "buildPresets": [
     {
-      "configurePreset": "debug",
-      "name": "debug"
+      "configurePreset": "Debug",
+      "name": "Debug"
+    },
+    {
+      "configurePreset": "Release",
+      "name": "Release"
     }
   ],
   "testPresets": [
     {
-      "name": "debug",
-      "configurePreset": "debug",
+      "name": "Debug",
+      "configurePreset": "Debug",
       "output": {
         "outputOnFailure": true
       },
@@ -38,19 +59,32 @@
   ],
   "workflowPresets": [
     {
-      "name": "debug",
+      "name": "Debug",
       "steps": [
         {
           "type": "configure",
-          "name": "debug"
+          "name": "Debug"
         },
         {
           "type": "build",
-          "name": "debug"
+          "name": "Debug"
         },
         {
           "type": "test",
-          "name": "debug"
+          "name": "Debug"
+        }
+      ]
+    },
+    {
+      "name": "Release",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "Release"
+        },
+        {
+          "type": "build",
+          "name": "Release"
         }
       ]
     }
