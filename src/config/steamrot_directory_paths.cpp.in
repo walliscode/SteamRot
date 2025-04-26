@@ -1,0 +1,7 @@
+#include "steamrot_directory_paths.h"
+
+////////////////////////////////////////////////////////////
+std::string getConfigurationFolder() { return "@resource_path@"; }
+
+////////////////////////////////////////////////////////////
+std::string getEntityConfigurationFolder() { return "null"; }
