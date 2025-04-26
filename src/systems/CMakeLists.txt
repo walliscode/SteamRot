@@ -49,4 +49,5 @@ nlohmann_json::nlohmann_json
 display
 magic_enum
 entity
+steamrot_directory_paths
 )
