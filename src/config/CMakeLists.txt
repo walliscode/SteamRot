@@ -12,5 +12,5 @@ add_library(steamrot_directory_paths STATIC
   ${CMAKE_CURRENT_BINARY_DIR}/steamrot_directory_paths.cpp)
 
 target_include_directories(steamrot_directory_paths PUBLIC
-  ${CMAKE_SOURCE_DIR}/include/config
+  ${CMAKE_CURRENT_SOURCE_DIR}
 )
