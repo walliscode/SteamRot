@@ -7,7 +7,7 @@ CShape.cpp
 
 target_include_directories(components
   PUBLIC
-  ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 

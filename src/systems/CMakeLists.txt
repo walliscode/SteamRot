@@ -25,7 +25,8 @@ DATA_OUT_DIR
 
 target_include_directories(systems
   PUBLIC
-  ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_CURRENT_SOURCE_DIR}
+   ${CMAKE_SOURCE_DIR}/include/
   ${CMAKE_SOURCE_DIR}/include/utils
   ${CMAKE_SOURCE_DIR}/include/constants
   ${CMAKE_SOURCE_DIR}/include/enums
