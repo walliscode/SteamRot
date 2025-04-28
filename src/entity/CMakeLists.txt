@@ -8,7 +8,7 @@ add_library(entity
 
 target_include_directories(entity
   PUBLIC
-  ${CMAKE_SOURCE_DIR}/include
+${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_SOURCE_DIR}/include/utils
 )
 
