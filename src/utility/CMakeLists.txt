@@ -1,6 +1,7 @@
 
 add_library(utilities
    DataManager.cpp
+   SchemaChecker.cpp
 )
 
 # check if set definitions exist
@@ -24,15 +25,7 @@ target_include_directories(utilities
   ${CMAKE_SOURCE_DIR}/include/enums
 )
 
-# check if targets exist
-set(target_list
-display
-magic_enum
-entity)
-foreach(target_name IN LISTS target_list)
-  if(NOT TARGET ${target_name})
-    message(FATAL_ERROR "Target ${target_name} does not exist")
-  endif()
-endforeach()
+target_link_libraries(utilities PUBLIC
+nlohmann_json::nlohmann_json)
 
 
