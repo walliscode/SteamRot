@@ -1,5 +1,6 @@
 # set paths to resource directories
 cmake_path(SET resource_path ${CMAKE_SOURCE_DIR}/resources)
+cmake_path(SET data_path ${CMAKE_SOURCE_DIR}/data)
 
 message("resource_path: ${resource_path}")
 # configure config files to take in cmake definitions

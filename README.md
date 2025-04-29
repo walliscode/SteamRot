@@ -14,6 +14,15 @@
       - [Spacing between functions](#spacing-between-functions)
       - [Funtionality brief](#funtionality-brief)
 <!--toc:end-->
+## Directory structure
+
+Structure of the project is derived and heavily influenced by the [Pitchfork](https://github.com/vector-of-bool/pitchfork) repo and more specifically the
+information laid out in the [spec.bs](https://github.com/vector-of-bool/pitchfork/blob/develop/data/spec.bs).
+
+### Data
+
+All non-code data is stored here e.g. images, json files e.t.c.
+Subsequent folders will be names after purpose as opposed to data type e.g prefer `scene/` over `json/`.
 
 ## Game Running
 
