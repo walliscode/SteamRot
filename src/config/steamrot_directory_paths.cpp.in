@@ -1,5 +1,6 @@
 #include "steamrot_directory_paths.h"
 #include <filesystem>
+#include <steamrot_directory_paths.h>
 
 ////////////////////////////////////////////////////////////
 std::filesystem::path getDataFolder() { return "@data_path@"; };
