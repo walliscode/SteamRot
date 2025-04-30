@@ -82,7 +82,7 @@ void EntityManager::UpdateWaitingRooms() {
 }
 
 ////////////////////////////////////////////////////////////
-const SteamRot::ComponentFlags &
+const steamrot::ComponentFlags &
 EntityManager::GetComponentFlags(size_t entity_id) {
 
   CMeta &meta_data =

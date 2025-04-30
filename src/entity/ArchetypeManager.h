@@ -30,14 +30,14 @@ public:
   ///
   ////////////////////////////////////////////////////////////
   const Archetype &GetExactArchetype(
-      const SteamRot::ComponentFlags &archetype_requirements) const;
+      const steamrot::ComponentFlags &archetype_requirements) const;
 
   ////////////////////////////////////////////////////////////
   /// \brief returns Entites from Archetype that matches provided Components
   /// An "and" approach
   ////////////////////////////////////////////////////////////
   const std::vector<size_t> &GetExactArchetypeEntities(
-      const SteamRot::ComponentFlags &archetype_requirements) const;
+      const steamrot::ComponentFlags &archetype_requirements) const;
 
   ////////////////////////////////////////////////////////////
   /// \brief returns a pointer to a vector that contains any combination of
@@ -45,7 +45,7 @@ public:
   ///
   ////////////////////////////////////////////////////////////
   const std::shared_ptr<std::vector<Archetype>> GetInclusiveArchetype(
-      const SteamRot::ComponentFlags &archetype_requirements) const;
+      const steamrot::ComponentFlags &archetype_requirements) const;
 
   ////////////////////////////////////////////////////////////
   /// \brief returns entities contained by GetInclusiveArchetype
@@ -54,5 +54,5 @@ public:
   ////////////////////////////////////////////////////////////
 
   const std::shared_ptr<std::vector<size_t>> GetInclusiveArchetypeEntities(
-      const SteamRot::ComponentFlags &archetype_requirements) const;
+      const steamrot::ComponentFlags &archetype_requirements) const;
 };

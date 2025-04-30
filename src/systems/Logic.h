@@ -24,7 +24,7 @@ public:
   /// \brief returns the Archetype for the derived logic class
   ///
   ////////////////////////////////////////////////////////////
-  virtual const SteamRot::ComponentFlags &GetArchetype() const = 0;
+  virtual const steamrot::ComponentFlags &GetArchetype() const = 0;
 
 private:
   ////////////////////////////////////////////////////////////

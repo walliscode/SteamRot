@@ -36,7 +36,7 @@ private:
   // add some defaults to the window otherwise it doens't behave itself
   // may have initialise DisplayManager with a json object so i can pass
   // constructors into the window
-  sf::RenderWindow m_window{sf::VideoMode(SteamRot::kWindowSize),
+  sf::RenderWindow m_window{sf::VideoMode(steamrot::kWindowSize),
                             "SFML window"};
 
   sf::Color m_background_color;

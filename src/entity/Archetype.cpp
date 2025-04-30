@@ -2,11 +2,11 @@
 #include <algorithm>
 
 ////////////////////////////////////////////////////////////
-Archetype::Archetype(const SteamRot::ComponentFlags &archetype_components)
+Archetype::Archetype(const steamrot::ComponentFlags &archetype_components)
     : m_id(archetype_components) {};
 
 ////////////////////////////////////////////////////////////
-const SteamRot::ComponentFlags &Archetype::GetID() const { return m_id; }
+const steamrot::ComponentFlags &Archetype::GetID() const { return m_id; }
 
 ////////////////////////////////////////////////////////////
 const std::vector<size_t> &Archetype::GetEntities() const { return m_entities; }

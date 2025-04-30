@@ -9,7 +9,7 @@ ArchetypeManager::ArchetypeManager() {}
 
 ////////////////////////////////////////////////////////////
 const Archetype &ArchetypeManager::GetExactArchetype(
-    const SteamRot::ComponentFlags &archetype_finder) const {
+    const steamrot::ComponentFlags &archetype_finder) const {
 
   for (auto &arch : m_archetypes) {
     if (arch.GetID() == archetype_finder) {
@@ -22,7 +22,7 @@ const Archetype &ArchetypeManager::GetExactArchetype(
 
 ////////////////////////////////////////////////////////////
 const std::vector<size_t> &ArchetypeManager::GetExactArchetypeEntities(
-    const SteamRot::ComponentFlags &archetype_finder) const {
+    const steamrot::ComponentFlags &archetype_finder) const {
 
   return GetExactArchetype(archetype_finder).GetEntities();
 };
@@ -30,7 +30,7 @@ const std::vector<size_t> &ArchetypeManager::GetExactArchetypeEntities(
 ////////////////////////////////////////////////////////////
 const std::shared_ptr<std::vector<Archetype>>
 ArchetypeManager::GetInclusiveArchetype(
-    const SteamRot::ComponentFlags &archetype_requirements) const {
+    const steamrot::ComponentFlags &archetype_requirements) const {
   std::vector<Archetype> return_set;
 
   // Loop through all archetypes adding each code that contains at least the tag
@@ -52,7 +52,7 @@ ArchetypeManager::GetInclusiveArchetype(
 ////////////////////////////////////////////////////////////
 const std::shared_ptr<std::vector<size_t>>
 ArchetypeManager::GetInclusiveArchetypeEntities(
-    const SteamRot::ComponentFlags &archetype_requirements) const {
+    const steamrot::ComponentFlags &archetype_requirements) const {
 
   // create a vector to store all entities for all matching archetypes' entities
   std::vector<size_t> entities_set;

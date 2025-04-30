@@ -17,20 +17,20 @@ private:
   ////////////////////////////////////////////////////////////
 
   std::vector<size_t> m_entities;
-  SteamRot::ComponentFlags m_id;
+  steamrot::ComponentFlags m_id;
 
 public:
   ////////////////////////////////////////////////////////////
   /// \brief Default constructor
   ///
   ////////////////////////////////////////////////////////////
-  Archetype(const SteamRot::ComponentFlags &archetype_components);
+  Archetype(const steamrot::ComponentFlags &archetype_components);
 
   ////////////////////////////////////////////////////////////
   /// \brief returns the ID of the archetype
   ///
   ////////////////////////////////////////////////////////////
-  const SteamRot::ComponentFlags &GetID() const;
+  const steamrot::ComponentFlags &GetID() const;
 
   ////////////////////////////////////////////////////////////
   /// \brief returns the entities in the archetype (as indexes of a vector)
