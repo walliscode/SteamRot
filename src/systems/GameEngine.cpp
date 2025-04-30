@@ -20,7 +20,8 @@ namespace fs = std::filesystem;
 using namespace magic_enum::bitwise_operators;
 
 ////////////////////////////////////////////////////////////
-GameEngine::GameEngine() : m_displayManager(), m_scene_manager() {}
+GameEngine::GameEngine()
+    : m_displayManager(), m_scene_manager(), m_data_manager() {}
 
 ////////////////////////////////////////////////////////////
 void GameEngine::RunGame(size_t numLoops, bool use_test_window) {

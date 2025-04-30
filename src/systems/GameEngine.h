@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
+#include "DataManager.h"
 #include "DisplayManager.h"
 #include "EventFlags.h"
 #include "SceneManager.h"
@@ -16,6 +17,7 @@ private:
   ////////////////////////////////////////////////////////////
   DisplayManager m_displayManager;
   SceneManager m_scene_manager;
+  DataManager m_data_manager;
 
   size_t m_loop_number = 0;
   EventFlags m_event_flags{0};
