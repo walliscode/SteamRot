@@ -10,11 +10,11 @@ enable_testing()
 # This next bit of code comes from Professional CMake: A Practical Guide, pg 205 (in documentation/textbooks) as a safe way to add CXX standards
 # Require C++20, but let a parent project ask for something higher
 if(DEFINED CMAKE_CXX_STANDARD)
-  if(CMAKE_CXX_STANDARD MATCHES "^(90|99)$" OR CMAKE_CXX_STANDARD LESS 20)
-    message(FATAL_ERROR "This project requires at least C++20")
+  if(CMAKE_CXX_STANDARD MATCHES "^(90|99)$" OR CMAKE_CXX_STANDARD LESS 23)
+    message(FATAL_ERROR "This project requires at least C++23")
   endif()
 else()
-  set(CMAKE_CXX_STANDARD 20)
+  set(CMAKE_CXX_STANDARD 23)
 endif()
 
 # Always enforce the language constraint
