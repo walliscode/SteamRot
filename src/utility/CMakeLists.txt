@@ -2,6 +2,7 @@
 add_library(utilities
    DataManager.cpp
    SchemaChecker.cpp
+
 )
 
 # check if set definitions exist
