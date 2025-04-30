@@ -68,7 +68,7 @@ public:
   /// |brief get the active components for an entity
   ///
   ////////////////////////////////////////////////////////////
-  const SteamRot::ComponentFlags &GetComponentFlags(size_t entity_id);
+  const steamrot::ComponentFlags &GetComponentFlags(size_t entity_id);
 
   ////////////////////////////////////////////////////////////
   /// |brief reset a component at a given index to default values

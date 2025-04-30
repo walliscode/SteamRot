@@ -10,7 +10,7 @@ struct CMeta : public Component {
   bool m_entity_active = false;
 
   // designed to be able to quickly inform of what components are active
-  SteamRot::ComponentFlags m_component_flags{0};
+  steamrot::ComponentFlags m_component_flags{0};
 };
 
 void to_json(json &j, const CMeta &meta);

@@ -43,7 +43,7 @@ void Tile::SetViewProperties() {
 
   // this sets the view size of the Scene to the same size as the proportion of
   // the window, so i'm assuming this a default zoom of 1
-  sf::Vector2f window_size{static_cast<sf::Vector2f>(SteamRot::kWindowSize)};
+  sf::Vector2f window_size{static_cast<sf::Vector2f>(steamrot::kWindowSize)};
   sf::Vector2f size = {window_size.x * viewport.size.x,
                        window_size.y * viewport.size.y};
 
@@ -57,7 +57,7 @@ sf::View &Tile::GetView() { return m_view; };
 void Tile::SetBorder() {
   // provide the current window size, the borders will be drawn off the tile
   // Viewport
-  sf::Vector2f window_size{static_cast<sf::Vector2f>(SteamRot::kWindowSize)};
+  sf::Vector2f window_size{static_cast<sf::Vector2f>(steamrot::kWindowSize)};
 
   // get the origin point of the tile
   sf::Vector2f origin_point = {window_size.x * m_view.getViewport().position.x,

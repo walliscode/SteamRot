@@ -97,10 +97,10 @@ void Session::RemoveTile() {
 
   // get the width and height of current active tile viewport
   const float active_tile_width =
-      active_tile_viewport.size.x * SteamRot::kWindowSize.x;
+      active_tile_viewport.size.x * steamrot::kWindowSize.x;
 
   const float active_tile_height =
-      active_tile_viewport.size.y * SteamRot::kWindowSize.y;
+      active_tile_viewport.size.y * steamrot::kWindowSize.y;
 
   // for all of these, once we've identified direction of neighoour, we need to
   // check there is only 1 direct neighbour in that direction, otherwise we
@@ -443,7 +443,7 @@ std::array<std::shared_ptr<Tile>, 4> Session::GetTileNeighbours() {
 
   // right position
   if (active_tile_viewport.position.x + active_tile_viewport.size.x !=
-      SteamRot::kWindowSize.x) {
+      steamrot::kWindowSize.x) {
     for (auto &tile : m_tiles) {
       sf::FloatRect tile_viewport = tile->GetView().getViewport();
       // the x position must be equal (by offset)
@@ -481,7 +481,7 @@ std::array<std::shared_ptr<Tile>, 4> Session::GetTileNeighbours() {
 
   // down position
   if (active_tile_viewport.position.y + active_tile_viewport.size.y !=
-      SteamRot::kWindowSize.y) {
+      steamrot::kWindowSize.y) {
     for (auto &tile : m_tiles) {
       sf::FloatRect tile_viewport = tile->GetView().getViewport();
       // the y position must be equal (by offset)
