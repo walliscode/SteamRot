@@ -31,16 +31,13 @@ if (NOT EXISTS ${DATA_OUT_DIR})
   file(MAKE_DIRECTORY ${DATA_OUT_DIR})
 endif()
 
-# cmake helper for file checking
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-include(file_check)
 
 # set the cmake module path (for import libraries and other cmake files)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/FetchContentModules")
-include(AddSFML)
-include(AddCatch2)
-include(AddJson)
-include(AddMagicEnum)
+
+# fetch_content_modules.cmake contains a menu list of all fetch content
+# scripts to include. to keep top level cmake tidier
+include(fetch_content_modules)
 
 add_subdirectory(include)
 add_subdirectory(steamrot)

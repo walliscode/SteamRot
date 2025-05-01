@@ -5,23 +5,22 @@
 /// this should be used for other paths
 ///
 ////////////////////////////////////////////////////////////
-std::filesystem::path getDataFolder();
+const std::filesystem::path getDataFolder();
 
 ////////////////////////////////////////////////////////////
 /// \brief return path for Scene folder
 ///
 ////////////////////////////////////////////////////////////
-std::filesystem::path getSceneFolder();
+const std::filesystem::path getSceneFolder();
 
 ////////////////////////////////////////////////////////////
 /// \brief return folder path for configuration files
 ///
 ////////////////////////////////////////////////////////////
-std::filesystem::path getConfigurationFolder();
+const std::filesystem::path getConfigurationFolder();
 
 ////////////////////////////////////////////////////////////
-/// \brief return folder path for entity configurations
+/// \brief return folder path for storing log files
 ///
 ////////////////////////////////////////////////////////////
-
-std::filesystem::path getEntityConfigurationFolder();
+const std::filesystem::path getLogsFolder();
