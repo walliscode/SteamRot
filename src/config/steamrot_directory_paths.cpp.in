@@ -3,13 +3,17 @@
 #include <steamrot_directory_paths.h>
 
 ////////////////////////////////////////////////////////////
-std::filesystem::path getDataFolder() { return "@data_path@"; };
+const std::filesystem::path getDataFolder() { return "@data_path@"; };
 
 ////////////////////////////////////////////////////////////
-std::filesystem::path getSceneFolder() { return getDataFolder() / "scene"; };
+const std::filesystem::path getSceneFolder() {
+  return getDataFolder() / "scene";
+};
 
 ////////////////////////////////////////////////////////////
-std::filesystem::path getConfigurationFolder() { return "@resource_path@"; }
+const std::filesystem::path getConfigurationFolder() {
+  return "@resource_path@";
+}
 
 ////////////////////////////////////////////////////////////
-std::filesystem::path getEntityConfigurationFolder() { return "null"; }
+const std::filesystem::path getLogsFolder() { return getDataFolder() / "logs"; }

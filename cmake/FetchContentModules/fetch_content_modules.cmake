@@ -1,0 +1,5 @@
+include(SFML)
+include(Catch2)
+include(Json)
+include(MagicEnum)
+include(spdlog)
