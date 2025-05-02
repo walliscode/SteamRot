@@ -52,4 +52,5 @@ magic_enum
 entity
 steamrot_directory_paths
 utilities
+logger
 )

@@ -16,7 +16,7 @@ Logger::Logger() {
 
   // add sinks to vector, along with custom file for each sink
 
-  std::string error_log_path = getLogsFolder().string() + "error.json";
+  std::string error_log_path = getLogsFolder().string() + "/" + "error.txt";
   sinks.push_back(
       std::make_shared<spdlog::sinks::basic_file_sink_st>(error_log_path));
 
