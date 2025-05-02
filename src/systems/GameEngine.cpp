@@ -22,10 +22,10 @@ using namespace magic_enum::bitwise_operators;
 
 ////////////////////////////////////////////////////////////
 GameEngine::GameEngine()
-    : m_displayManager(), m_scene_manager(), m_data_manager(), m_logger() {
+    : m_displayManager(), m_scene_manager(), m_data_manager(),
+      m_logger("global_logger") {
 
   auto logger = spdlog::get("global_logger");
-  logger->info("game started");
 }
 
 ////////////////////////////////////////////////////////////
@@ -56,6 +56,8 @@ void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
       break;
     };
   }
+  // Shut down the game engine
+  ShutDown();
 };
 
 ////////////////////////////////////////////////////////////
@@ -228,4 +230,10 @@ void GameEngine::ExportSimulationData(const std::string &file_name) {
   } else {
     throw std::runtime_error("Could not open file");
   }
+}
+
+void GameEngine::ShutDown() {
+
+  // shut down global logger
+  m_logger.CloseLogger();
 }
