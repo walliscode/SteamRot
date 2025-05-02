@@ -3,6 +3,7 @@
 ////////////////////////////////////////////////////////////
 
 #include "GameEngine.h"
+#include "spdlog/spdlog.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
@@ -21,7 +22,11 @@ using namespace magic_enum::bitwise_operators;
 
 ////////////////////////////////////////////////////////////
 GameEngine::GameEngine()
-    : m_displayManager(), m_scene_manager(), m_data_manager() {}
+    : m_displayManager(), m_scene_manager(), m_data_manager(), m_logger() {
+
+  auto logger = spdlog::get("global_logger");
+  logger->info("game started");
+}
 
 ////////////////////////////////////////////////////////////
 void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
