@@ -23,12 +23,16 @@ Logger::Logger(const std::string &logger_name) {
   ;
   spdlog::register_logger(m_logger);
 
+  std::string json_start_pattern = {
+      "{\n \"log\": [{\"time\": \"%Y-%m-%dT%H:%M:%S.%f%z\", \"name\": \"%n\", "
+      "\"level\": "
+      "\"%^%l%$\", \"process\": %P, \"thread\": %t, \"message\": \"%v\"},"};
+
   // set up logger for json output and formatting
-  m_logger->set_pattern("{\n \"log\": [");
+  m_logger->set_pattern(json_start_pattern);
 
   // intialise log files
-  m_logger->info("");
-  m_logger->error("");
+  m_logger->error("Start.");
 
   std::string jsonpattern = {
       "{\"time\": \"%Y-%m-%dT%H:%M:%S.%f%z\", \"name\": \"%n\", \"level\": "
@@ -43,20 +47,11 @@ void Logger::CloseLogger() {
   // the end
   std::string jsonlastlogpattern = {
       "{\"time\": \"%Y-%m-%dT%H:%M:%S.%f%z\", \"name\": \"%n\", \"level\": "
-      "\"%^%l%$\", \"process\": %P, \"thread\": %t, \"message\": \"%v\"}"};
+      "\"%^%l%$\", \"process\": %P, \"thread\": %t, \"message\": \"%v\"}]\n}"};
   spdlog::set_pattern(jsonlastlogpattern);
 
   // below is our last log entry
-  m_logger->info("Finished.");
   m_logger->error("Finished.");
-
-  // set the last pattern to close out the "log" json array and the closing
-  // brace
-  spdlog::set_pattern("]\n}");
-
-  // this writes out the closed array to the file
-  m_logger->info("");
-  m_logger->error("");
 
   spdlog::drop("global_logger");
 }

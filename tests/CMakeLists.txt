@@ -3,6 +3,8 @@ add_executable(steamrot_tests
   unit_tests/test_json_structure.test.cpp
   unit_tests/directory_paths.test.cpp
   simulation_tests/simulation_one.test.cpp
+  unit_tests/error_log.test.cpp
+  unit_tests/info_log.test.cpp
   )
 
 target_link_libraries(steamrot_tests
