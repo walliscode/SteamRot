@@ -1,5 +1,6 @@
 add_library(logger
-  Logger.cpp)
+  Logger.cpp
+  log_handler.cpp)
 
 target_include_directories(logger
   PUBLIC
