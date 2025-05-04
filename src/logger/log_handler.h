@@ -20,6 +20,7 @@ namespace log_handler {
 enum class LogCode : int {
 
   kNoCode = 0,
+  kFileNotFound = 1,
 };
 
 ////////////////////////////////////////////////////////////
