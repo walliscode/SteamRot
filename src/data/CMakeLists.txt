@@ -1,7 +1,7 @@
 add_library(data
-DateTimeLogger.cpp
+
   EntityConfigData.cpp
-  Error.cpp
+
 )
 
 target_include_directories(data
