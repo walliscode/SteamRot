@@ -3,8 +3,7 @@ add_library(entity
     EntityConfigurationFactory.cpp
     EntityMemoryPool.cpp
     ArchetypeManager.cpp
-    Archetype.cpp
-)
+   )
 
 target_include_directories(entity
   PUBLIC
@@ -17,6 +16,5 @@ target_link_libraries(entity
   nlohmann_json::nlohmann_json
   SFML::Graphics
   components
-  component_register
   steamrot_enums
 )
