@@ -11,7 +11,7 @@
 #include <memory>
 #include <tuple>
 
-#include "ComponentCollections.h"
+#include "containers.h"
 
 class EntityMemoryPool {
 
@@ -19,7 +19,7 @@ private:
   size_t m_num_entities;
 
   // this is where all the component data is stored
-  std::shared_ptr<ComponentCollection> m_data;
+  std::shared_ptr<steamrot::components::containers::ComponentCollection> m_data;
 
 public:
   EntityMemoryPool(
@@ -30,7 +30,8 @@ public:
   // they will all be reset
   const size_t getNextEntityIndex();
 
-  std::shared_ptr<ComponentCollection> getData();
+  std::shared_ptr<steamrot::components::containers::ComponentCollection>
+  getData();
   // Entity pool templates
 
   // This is designed to work with the ComponentCollectionTuple

@@ -1,12 +1,17 @@
 #include "Archetype.h"
+#include "containers.h"
 #include <algorithm>
 
 ////////////////////////////////////////////////////////////
-Archetype::Archetype(const steamrot::ComponentFlags &archetype_components)
+Archetype::Archetype(const steamrot::components::containers::ComponentRegister
+                         &archetype_components)
     : m_id(archetype_components) {};
 
 ////////////////////////////////////////////////////////////
-const steamrot::ComponentFlags &Archetype::GetID() const { return m_id; }
+const steamrot::components::containers::ComponentRegister &
+Archetype::GetID() const {
+  return m_id;
+}
 
 ////////////////////////////////////////////////////////////
 const std::vector<size_t> &Archetype::GetEntities() const { return m_entities; }
