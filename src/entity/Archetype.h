@@ -6,7 +6,7 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include "ComponentFlags.h"
+#include "containers.h"
 #include <cstdlib>
 #include <vector>
 
@@ -17,20 +17,21 @@ private:
   ////////////////////////////////////////////////////////////
 
   std::vector<size_t> m_entities;
-  steamrot::ComponentFlags m_id;
+  steamrot::components::containers::ComponentRegister m_id;
 
 public:
   ////////////////////////////////////////////////////////////
   /// \brief Default constructor
   ///
   ////////////////////////////////////////////////////////////
-  Archetype(const steamrot::ComponentFlags &archetype_components);
+  Archetype(const steamrot::components::containers::ComponentRegister
+                &archetype_components);
 
   ////////////////////////////////////////////////////////////
   /// \brief returns the ID of the archetype
   ///
   ////////////////////////////////////////////////////////////
-  const steamrot::ComponentFlags &GetID() const;
+  const steamrot::components::containers::ComponentRegister &GetID() const;
 
   ////////////////////////////////////////////////////////////
   /// \brief returns the entities in the archetype (as indexes of a vector)

@@ -7,6 +7,7 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "Archetype.h"
+#include "containers.h"
 #include <cstdlib>
 #include <memory>
 #include <vector>
@@ -29,15 +30,17 @@ public:
   /// \brief returns Archetype that matches the provided Components
   ///
   ////////////////////////////////////////////////////////////
-  const Archetype &GetExactArchetype(
-      const steamrot::ComponentFlags &archetype_requirements) const;
+  const Archetype &
+  GetExactArchetype(const steamrot::components::containers::ComponentRegister
+                        &archetype_requirements) const;
 
   ////////////////////////////////////////////////////////////
   /// \brief returns Entites from Archetype that matches provided Components
   /// An "and" approach
   ////////////////////////////////////////////////////////////
   const std::vector<size_t> &GetExactArchetypeEntities(
-      const steamrot::ComponentFlags &archetype_requirements) const;
+      const steamrot::components::containers::ComponentRegister
+          &archetype_requirements) const;
 
   ////////////////////////////////////////////////////////////
   /// \brief returns a pointer to a vector that contains any combination of
@@ -45,7 +48,8 @@ public:
   ///
   ////////////////////////////////////////////////////////////
   const std::shared_ptr<std::vector<Archetype>> GetInclusiveArchetype(
-      const steamrot::ComponentFlags &archetype_requirements) const;
+      const steamrot::components::containers::ComponentRegister
+          &archetype_requirements) const;
 
   ////////////////////////////////////////////////////////////
   /// \brief returns entities contained by GetInclusiveArchetype
@@ -54,5 +58,6 @@ public:
   ////////////////////////////////////////////////////////////
 
   const std::shared_ptr<std::vector<size_t>> GetInclusiveArchetypeEntities(
-      const steamrot::ComponentFlags &archetype_requirements) const;
+      const steamrot::components::containers::ComponentRegister
+          &archetype_requirements) const;
 };

@@ -1,10 +1,12 @@
 #include "EntityMemoryPool.h"
+#include "containers.h"
 #include <memory>
 #include <vector>
 
 EntityMemoryPool::EntityMemoryPool(const size_t &pool_size)
     : m_num_entities(pool_size),
-      m_data(std::make_shared<ComponentCollection>()) {
+      m_data(std::make_shared<
+             steamrot::components::containers::ComponentCollection>()) {
   DefineFreshTuple(*m_data, pool_size);
 }
 
@@ -28,6 +30,7 @@ const size_t EntityMemoryPool::getNextEntityIndex() {
   return index;
 }
 
-std::shared_ptr<ComponentCollection> EntityMemoryPool::getData() {
+std::shared_ptr<steamrot::components::containers::ComponentCollection>
+EntityMemoryPool::getData() {
   return m_data;
 }

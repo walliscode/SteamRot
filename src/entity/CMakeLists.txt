@@ -17,5 +17,6 @@ target_link_libraries(entity
   nlohmann_json::nlohmann_json
   SFML::Graphics
   components
+  component_register
   steamrot_enums
 )

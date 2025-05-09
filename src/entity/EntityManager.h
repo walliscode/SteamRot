@@ -8,9 +8,9 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "ArchetypeManager.h"
-#include "ComponentFlags.h"
 #include "EntityConfigurationFactory.h"
 #include "EntityMemoryPool.h"
+#include "containers.h"
 #include <cstddef>
 
 #include <memory>
@@ -68,7 +68,8 @@ public:
   /// |brief get the active components for an entity
   ///
   ////////////////////////////////////////////////////////////
-  const steamrot::ComponentFlags &GetComponentFlags(size_t entity_id);
+  const steamrot::components::containers::ComponentRegister &
+  GetComponentFlags(size_t entity_id);
 
   ////////////////////////////////////////////////////////////
   /// |brief reset a component at a given index to default values

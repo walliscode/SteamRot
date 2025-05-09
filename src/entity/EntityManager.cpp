@@ -4,6 +4,7 @@
 
 #include "EntityManager.h"
 #include "EntityMemoryPool.h"
+#include "containers.h"
 
 #include <memory>
 
@@ -79,14 +80,4 @@ void EntityManager::UpdateWaitingRooms() {
   // }
 
   m_entities_to_add.clear(); // clear the to add waiting room
-}
-
-////////////////////////////////////////////////////////////
-const steamrot::ComponentFlags &
-EntityManager::GetComponentFlags(size_t entity_id) {
-
-  CMeta &meta_data =
-      std::get<std::vector<CMeta>>(*(m_pool->getData()))[entity_id];
-
-  return meta_data.m_component_flags;
 }
