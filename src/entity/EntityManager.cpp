@@ -3,7 +3,6 @@
 ////////////////////////////////////////////////////////////
 
 #include "EntityManager.h"
-
 #include <memory>
 
 using json = nlohmann::json;
@@ -13,9 +12,22 @@ EntityManager::EntityManager(const size_t &pool_size,
                              const std::string &scene_name)
     : m_entity_configuration_factory(scene_name) {
 
-        // create the memory pool with the given size
-      };
+  // create the memory pool with the given size
+  m_pool =
+      std::make_unique<steamrot::components::containers::EntityMemoryPool>();
+  ResizePool(pool_size);
+};
 
+////////////////////////////////////////////////////////////
+void EntityManager::ResizePool(const size_t &pool_size) {
+
+  // use std::apply to resize the memory pool with lambda function
+  std::apply(
+      [pool_size](auto &...component_vector) {
+        (component_vector.resize(pool_size), ...);
+      },
+      *m_pool);
+}
 ////////////////////////////////////////////////////////////
 void EntityManager::ConfigureEntities(const std::string &config_method) {
 
