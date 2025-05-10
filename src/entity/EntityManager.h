@@ -9,7 +9,7 @@
 ////////////////////////////////////////////////////////////
 #include "ArchetypeManager.h"
 #include "EntityConfigurationFactory.h"
-#include "EntityMemoryPool.h"
+
 #include "containers.h"
 #include <cstddef>
 
@@ -29,7 +29,7 @@ private:
   std::vector<size_t> m_entities;
   std::vector<size_t> m_entities_to_add;
   std::vector<size_t> m_entities_to_remove;
-  std::unique_ptr<EntityMemoryPool> m_pool;
+  std::unique_ptr<steamrot::components::containers::EntityMemoryPool> m_pool;
   ArchetypeManager m_archetype_manager;
   EntityConfigurationFactory m_entity_configuration_factory;
 
@@ -45,6 +45,12 @@ public:
   ///
   ////////////////////////////////////////////////////////////
   void ConfigureEntities(const std::string &config_method);
+
+  ////////////////////////////////////////////////////////////
+  /// \brief return index of next "free" entity
+  ///
+  ////////////////////////////////////////////////////////////
+  size_t GetNextFreeEntityIndex();
 
   ////////////////////////////////////////////////////////////
   /// \brief "activate" an entity by finding the next inactive entity index
@@ -63,13 +69,6 @@ public:
   ///
   ////////////////////////////////////////////////////////////
   void UpdateWaitingRooms();
-
-  ////////////////////////////////////////////////////////////
-  /// |brief get the active components for an entity
-  ///
-  ////////////////////////////////////////////////////////////
-  const steamrot::components::containers::ComponentRegister &
-  GetComponentFlags(size_t entity_id);
 
   ////////////////////////////////////////////////////////////
   /// |brief reset a component at a given index to default values
@@ -107,14 +106,23 @@ public:
     ResetTupleElements(component_tuple, std::make_index_sequence<TupleSize>{},
                        index);
   }
+  ////////////////////////////////////////////////////////////
+  /// |brief template to get vector of given component type
+  ///
+  ////////////////////////////////////////////////////////////
+  template <typename T> std::vector<T> &GetComponentVector() {
 
+    auto &component_vector = std::get<std::vector<T>>(*m_pool);
+
+    return component_vector;
+  }
   ////////////////////////////////////////////////////////////
   /// |brief get the a component at a given index
   ///
   ////////////////////////////////////////////////////////////
   template <typename T> T &GetComponent(size_t entity_id) {
-    auto &components = std::get<std::vector<T>>(*(m_pool->getData()));
-    return components[entity_id];
+
+    return GetComponentVector<T>()[entity_id];
   }
 
   ////////////////////////////////////////////////////////////
@@ -122,8 +130,6 @@ public:
   ///
   ////////////////////////////////////////////////////////////
   template <typename T> bool HasComponent(size_t entityID) {
-    auto &components = std::get<std::vector<T>>(m_pool->getData());
-
-    return components[entityID].getHas();
+    return GetComponent<T>(entityID).getHas();
   }
 };

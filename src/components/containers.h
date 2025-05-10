@@ -16,6 +16,19 @@ namespace components {
 namespace containers {
 
 ////////////////////////////////////////////////////////////
+// |brief: template helper struct
+////////////////////////////////////////////////////////////
+template <typename... Components> struct ComponentContainer;
+
+////////////////////////////////////////////////////////////
+// |brief: template specialistion for ComponentContainer. Tuples
+////////////////////////////////////////////////////////////
+template <typename... Components>
+struct ComponentContainer<std::tuple<Components...>> {
+
+  using ComponentVectorTuple = std::tuple<std::vector<Components>...>;
+};
+////////////////////////////////////////////////////////////
 // |brief: ComponentRegister is a tuple of all the components for the game
 //  "One source of truth"
 ////////////////////////////////////////////////////////////
@@ -28,17 +41,10 @@ constexpr size_t kComponentRegisterSize =
     std::tuple_size<ComponentRegister>::value;
 
 ////////////////////////////////////////////////////////////
-// |brief: template function to produce a tuple of vectors of components
-////////////////////////////////////////////////////////////
-template <typename... Components>
-using ComponentVectorTuple =
-
-    std::tuple<std::vector<Components>...>;
-
-////////////////////////////////////////////////////////////
 // |brief: typedef for EntityMemoryPool
 ////////////////////////////////////////////////////////////
-using ComponentCollection = ComponentVectorTuple<ComponentRegister>;
+using EntityMemoryPool =
+    ComponentContainer<ComponentRegister>::ComponentVectorTuple;
 
 }; // namespace containers
 }; // namespace components

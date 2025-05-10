@@ -7,7 +7,7 @@
 // Headers
 ////////////////////////////////////////////////////////////
 
-#include "EntityMemoryPool.h"
+#include "containers.h"
 #include "nlohmann/json_fwd.hpp"
 #include <iostream>
 #include <memory>
@@ -38,9 +38,10 @@ public:
   ///
   ////////////////////////////////////////////////////////////
   template <typename T>
-  void
-  ConfigureEntities(const T &configuration_data,
-                    std::unique_ptr<EntityMemoryPool> &entity_memory_pool) {
+  void ConfigureEntities(
+      const T &configuration_data,
+      std::unique_ptr<steamrot::components::containers::EntityMemoryPool>
+          &entity_memory_pool) {
     // Default implementation does nothing
     std::cout << "No entities will be configured using this data type"
               << std::endl;
@@ -51,9 +52,10 @@ public:
   ///
   ////////////////////////////////////////////////////////////
   template <>
-  void
-  ConfigureEntities(const nlohmann::json &configuration_data,
-                    std::unique_ptr<EntityMemoryPool> &entity_memory_pool) {
+  void ConfigureEntities(
+      const nlohmann::json &configuration_data,
+      std::unique_ptr<steamrot::components::containers::EntityMemoryPool>
+          &entity_memory_pool) {
 
     ConfigureFromJSON();
   }
