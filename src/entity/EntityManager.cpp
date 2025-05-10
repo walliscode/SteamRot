@@ -3,20 +3,17 @@
 ////////////////////////////////////////////////////////////
 
 #include "EntityManager.h"
-#include "EntityMemoryPool.h"
-#include "containers.h"
 
 #include <memory>
 
 using json = nlohmann::json;
-using namespace magic_enum::bitwise_operators;
 
 ////////////////////////////////////////////////////////////
 EntityManager::EntityManager(const size_t &pool_size,
                              const std::string &scene_name)
-    : m_entity_configuration_factory(scene_name),
-      m_pool(std::make_unique<EntityMemoryPool>(pool_size)) {
+    : m_entity_configuration_factory(scene_name) {
 
+        // create the memory pool with the given size
       };
 
 ////////////////////////////////////////////////////////////
@@ -26,14 +23,32 @@ void EntityManager::ConfigureEntities(const std::string &config_method) {
 }
 
 ////////////////////////////////////////////////////////////
+size_t EntityManager::GetNextFreeEntityIndex() {
+
+  // get CMeta vector from the pool
+  std::vector<CMeta> meta_data = GetComponentVector<CMeta>();
+
+  // find next inactive entity index
+  for (size_t i = 0; i < meta_data.size(); ++i) {
+    if (!meta_data[i].m_entity_active) {
+      return i;
+    }
+  }
+  // if no inactive entity found, return the size of the vector
+  return meta_data.size();
+};
+
+////////////////////////////////////////////////////////////
 size_t EntityManager::AddEntity() {
 
-  size_t new_entity_id = (*m_pool).getNextEntityIndex();
+  // find next inactive entity index
+  size_t new_entity_id = GetNextFreeEntityIndex();
 
-  RefreshEntity(*(*m_pool).getData(), new_entity_id);
+  // reset all components for the new entity
+  RefreshEntity(*m_pool, new_entity_id);
 
-  std::vector<CMeta> meta_data =
-      std::get<std::vector<CMeta>>(*(m_pool->getData()));
+  // get CMeta vector from the pool
+  std::vector<CMeta> &meta_data = GetComponentVector<CMeta>();
 
   // switch on the entity
   meta_data[new_entity_id].m_entity_active = true;
@@ -54,8 +69,7 @@ void EntityManager::UpdateWaitingRooms() {
   // for each entity to remove, deactivate the CMeta component
   for (const size_t &entity_index : m_entities_to_remove) {
 
-    std::get<std::vector<CMeta>>(*(m_pool->getData()))[entity_index]
-        .m_entity_active = false;
+    std::get<std::vector<CMeta>>(*m_pool)[entity_index].m_entity_active = false;
 
     // get iterator to entity to remove
     auto to_remove =
