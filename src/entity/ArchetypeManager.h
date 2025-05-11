@@ -6,18 +6,30 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include "Archetype.h"
+
 #include "containers.h"
+#include <bitset>
+#include <cstddef>
 #include <cstdlib>
-#include <memory>
+#include <unordered_map>
 #include <vector>
 
+////////////////////////////////////////////////////////////
+// typedefs
+////////////////////////////////////////////////////////////
+using Archetype = std::vector<size_t>;
+
+using ArchetypeID =
+    std::bitset<steamrot::components::containers::kComponentRegisterSize>;
+////////////////////////////////////////////////////////////
+// class ArchetypeManager
+////////////////////////////////////////////////////////////
 class ArchetypeManager {
 private:
   ////////////////////////////////////////////////////////////
   // Member data
   ////////////////////////////////////////////////////////////
-  std::vector<Archetype> m_archetypes;
+  std::unordered_map<ArchetypeID, Archetype> m_archetypes;
 
 public:
   ////////////////////////////////////////////////////////////
@@ -27,37 +39,9 @@ public:
   ArchetypeManager();
 
   ////////////////////////////////////////////////////////////
-  /// \brief returns Archetype that matches the provided Components
+  /// \brief returns an all entity indexes from provided ArchetypeIDs
   ///
   ////////////////////////////////////////////////////////////
-  const Archetype &
-  GetExactArchetype(const steamrot::components::containers::ComponentRegister
-                        &archetype_requirements) const;
-
-  ////////////////////////////////////////////////////////////
-  /// \brief returns Entites from Archetype that matches provided Components
-  /// An "and" approach
-  ////////////////////////////////////////////////////////////
-  const std::vector<size_t> &GetExactArchetypeEntities(
-      const steamrot::components::containers::ComponentRegister
-          &archetype_requirements) const;
-
-  ////////////////////////////////////////////////////////////
-  /// \brief returns a pointer to a vector that contains any combination of
-  /// Archetypes that match the provided Components. an "or" approach
-  ///
-  ////////////////////////////////////////////////////////////
-  const std::shared_ptr<std::vector<Archetype>> GetInclusiveArchetype(
-      const steamrot::components::containers::ComponentRegister
-          &archetype_requirements) const;
-
-  ////////////////////////////////////////////////////////////
-  /// \brief returns entities contained by GetInclusiveArchetype
-  ///
-  ///
-  ////////////////////////////////////////////////////////////
-
-  const std::shared_ptr<std::vector<size_t>> GetInclusiveArchetypeEntities(
-      const steamrot::components::containers::ComponentRegister
-          &archetype_requirements) const;
+  std::vector<size_t>
+  GetEntityIndexes(const std::vector<ArchetypeID> &archtype_IDs) const;
 };
