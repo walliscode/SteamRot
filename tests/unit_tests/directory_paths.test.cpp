@@ -12,4 +12,10 @@ TEST_CASE("Check directory paths") {
 
   // check the data/logs folder exists
   REQUIRE(std::filesystem::exists(getLogsFolder()));
+
+  // check the tests folder exists
+  REQUIRE(std::filesystem::exists(getTestFolder()));
+
+  // check the tests/data folder exists
+  REQUIRE(std::filesystem::exists(getTestDataFolder()));
 }

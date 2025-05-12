@@ -22,7 +22,8 @@ enum class LogCode : int {
   kNoCode = 0,
   kFileNotFound = 1,
   kInvalidJSONStructure = 2,
-  kInvalidJSONValue = 3,
+  kInvalidJSONKey = 3,
+  kInvalidJSONValue = 4,
 };
 
 ////////////////////////////////////////////////////////////

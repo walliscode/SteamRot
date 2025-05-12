@@ -7,6 +7,7 @@
 // headers
 ////////////////////////////////////////////////////////////
 #include <nlohmann/json.hpp>
+#include <unordered_set>
 
 namespace steamrot {
 
@@ -19,6 +20,8 @@ private:
   // member data
   ////////////////////////////////////////////////////////////
   nlohmann::json m_jsonSchema;
+  std::unordered_set<std::string> valid_schema_types{
+      "string", "int", "float", "bool", "array", "object"};
 
   ////////////////////////////////////////////////////////////
   // |brief recursively check json schema itself
@@ -30,6 +33,13 @@ private:
   ////////////////////////////////////////////////////////////
   void CreateJSONSchema(const nlohmann::json &schema);
 
+  ////////////////////////////////////////////////////////////
+  // |brief recursively check json file against schema
+  ////////////////////////////////////////////////////////////
+  void ValidateJSON(const nlohmann::json &game_data,
+                    const nlohmann::json &schema,
+                    const std::string &current_path = "$");
+
 public:
   ////////////////////////////////////////////////////////////
   // |brief constructor taking in a json object
@@ -37,9 +47,9 @@ public:
   SchemaChecker(nlohmann::json schema);
 
   ////////////////////////////////////////////////////////////
-  // |brief checks provided json file based on stored enum value
+  // |brief checks provided json file based on stored schema
   ////////////////////////////////////////////////////////////
-  bool CheckJSON(nlohmann::json j);
+  void CheckJSON(nlohmann::json game_data);
 };
 
 } // namespace steamrot
