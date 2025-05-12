@@ -37,6 +37,7 @@ private:
   // |brief recursively check json file against schema
   ////////////////////////////////////////////////////////////
   void ValidateJSON(const nlohmann::json &game_data,
+                    const nlohmann::json &schema,
                     const std::string &current_path = "$");
 
 public:
