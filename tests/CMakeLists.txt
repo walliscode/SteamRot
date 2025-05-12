@@ -5,6 +5,7 @@ add_executable(steamrot_tests
   simulation_tests/simulation_one.test.cpp
   unit_tests/error_log.test.cpp
   unit_tests/info_log.test.cpp
+  unit_tests/SchemaChecker.test.cpp
   )
 
 target_link_libraries(steamrot_tests
