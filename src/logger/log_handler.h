@@ -21,25 +21,24 @@ enum class LogCode : int {
 
   kNoCode = 0,
   kFileNotFound = 1,
+  kInvalidJSONStructure = 2,
+  kInvalidJSONValue = 3,
 };
 
 ////////////////////////////////////////////////////////////
 // |brief handle incoming messages and create logs
 ////////////////////////////////////////////////////////////
 void ProcessLog(const spdlog::level::level_enum &log_level,
-                const steamrot::log_handler::LogCode &log_code,
-                const std::string &message);
+                const LogCode &log_code, const std::string &message);
 
 ////////////////////////////////////////////////////////////
 // |brief process info level logs
 ////////////////////////////////////////////////////////////
-void ProcessInfoLog(const steamrot::log_handler::LogCode &log_code,
-                    const std::string &message);
+void ProcessInfoLog(const LogCode &log_code, const std::string &message);
 
 ////////////////////////////////////////////////////////////
 // |brief process error level logs
 ////////////////////////////////////////////////////////////
-void ProcessErrorLog(const steamrot::log_handler::LogCode &log_code,
-                     const std::string &message);
+void ProcessErrorLog(const LogCode &log_code, const std::string &message);
 } // namespace log_handler
 } // namespace steamrot
