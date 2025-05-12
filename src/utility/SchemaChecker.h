@@ -20,10 +20,8 @@ private:
   // member data
   ////////////////////////////////////////////////////////////
   nlohmann::json m_jsonSchema;
-  std::unordered_set<std::string> valid_schema_keys{"fieldname", "type",
-                                                    "children", "child"};
-  std::unordered_set<std::string> valid_schema_types{"string", "number", "bool",
-                                                     "array", "object"};
+  std::unordered_set<std::string> valid_schema_types{
+      "string", "int", "float", "bool", "array", "object"};
 
   ////////////////////////////////////////////////////////////
   // |brief recursively check json schema itself
@@ -38,7 +36,8 @@ private:
   ////////////////////////////////////////////////////////////
   // |brief recursively check json file against schema
   ////////////////////////////////////////////////////////////
-  void ValidateJSON(const nlohmann::json &game_data);
+  void ValidateJSON(const nlohmann::json &game_data,
+                    const std::string &current_path = "$");
 
 public:
   ////////////////////////////////////////////////////////////

@@ -15,7 +15,7 @@ TEST_CASE("Schema is not an array", "[data_check]") {
   REQUIRE_THROWS(SchemaChecker(test_json));
 }
 
-TEST_CASE("Schema errors on incorrrect field names", "[data_check]") {
+TEST_CASE("Schema errors on incorrrect type", "[data_check]") {
 
   // register global logger for testing
 
@@ -23,8 +23,8 @@ TEST_CASE("Schema errors on incorrrect field names", "[data_check]") {
 
   // test first object having incorrect fieldname
 
-  json test_json = json::object();
-  test_json["incorrect_field"] = "value";
+  json test_json;
+  test_json["some_field"] = "bad_value";
   REQUIRE_THROWS(SchemaChecker(test_json));
 }
 
@@ -36,8 +36,8 @@ TEST_CASE("Schema has correct field names", "[data_check]") {
 
   // test first object having correct fieldname
   json test_json = json::object();
-  test_json["fieldname"] = "value";
-  test_json["type"] = "int";
+  test_json["health"] = "float";
+  test_json["alive"] = "bool";
 
   REQUIRE_NOTHROW(SchemaChecker(test_json));
 }

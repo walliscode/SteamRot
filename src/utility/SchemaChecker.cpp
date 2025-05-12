@@ -19,59 +19,35 @@ void SchemaChecker::ValidateJSONSchema(const nlohmann::json &schema) {
   if (!schema.is_object()) {
 
     log_handler::ProcessErrorLog(log_handler::LogCode::kInvalidJSONStructure,
-
                                  "Schema must be a JSON object.");
   }
 
   // create types to check against
   // check all keys are valid
   for (const auto &item : schema.items()) {
-    // check if key is valid
-    if (valid_schema_keys.find(item.key()) == valid_schema_keys.end()) {
-      log_handler::ProcessErrorLog(log_handler::LogCode::kInvalidJSONValue,
-                                   "Invalid key in schema: " + item.key());
-    }
-  }
 
-  // check schema contains fieldname
-  if (!schema.contains("fieldname")) {
-    log_handler::ProcessErrorLog(log_handler::LogCode::kInvalidJSONValue,
-                                 "Schema must contain fieldname.");
-  }
-  // check schema contains type
-  if (!schema.contains("type")) {
-    log_handler::ProcessErrorLog(log_handler::LogCode::kInvalidJSONValue,
-                                 "Schema must contain type.");
-  }
+    // set values
+    std::string type = item.value();
+    std::string key = item.key();
 
-  // if type is array, check it contains children and this is an array
-  if (schema["type"] == "array") {
-    if (!schema.contains("children")) {
+    // check if value is valid type
+    if (valid_schema_types.find(type) == valid_schema_types.end()) {
+
       log_handler::ProcessErrorLog(log_handler::LogCode::kInvalidJSONValue,
-                                   "Array type must contain children.");
-    } else if (!schema["children"].is_array()) {
-      log_handler::ProcessErrorLog(log_handler::LogCode::kInvalidJSONValue,
-                                   "Children must be an array.");
+                                   "Invalid type in schema: " + type);
     }
 
-    // recursively check children
-    for (const auto &child : schema["children"]) {
-      ValidateJSONSchema(child);
-    }
-  }
-
-  // if type is object, check it contains child and this is an object
-  if (schema["type"] == "object") {
-    if (!schema.contains("child")) {
-      log_handler::ProcessErrorLog(log_handler::LogCode::kInvalidJSONValue,
-                                   "Object type must contain child.");
-    } else if (!schema["child"].is_object()) {
-      log_handler::ProcessErrorLog(log_handler::LogCode::kInvalidJSONValue,
-                                   "Child must be an object.");
+    // if type is array, iterate with a recursive call to check each item
+    if (type == "array") {
+      for (const auto &object : item.value()) {
+        ValidateJSONSchema(object);
+      }
     }
 
-    // recursively check child
-    ValidateJSONSchema(schema["child"]);
+    // if type is object, iterate with a recursive call to check each item
+    if (type == "object") {
+      ValidateJSONSchema(item.value());
+    }
   }
 }
 ////////////////////////////////////////////////////////////
@@ -84,13 +60,16 @@ void SchemaChecker::CreateJSONSchema(const nlohmann::json &schema) {
   m_jsonSchema = schema;
 }
 ////////////////////////////////////////////////////////////
-void SchemaChecker::ValidateJSON(const nlohmann::json &game_data) {
-
-  // check if game_data is not an object, handle as error
-
+void SchemaChecker::ValidateJSON(const nlohmann::json &game_data,
+                                 const std::string &current_path) {
+  // Check if game_data is an object
   if (!game_data.is_object()) {
+    log_handler::ProcessErrorLog(log_handler::LogCode::kInvalidJSONStructure,
+                                 "Game data must be a JSON object. Path: " +
+                                     current_path);
   }
 }
+
 ////////////////////////////////////////////////////////////
 void SchemaChecker::CheckJSON(nlohmann::json game_data) {}
 
