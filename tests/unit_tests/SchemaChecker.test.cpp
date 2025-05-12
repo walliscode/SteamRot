@@ -41,4 +41,5 @@ TEST_CASE("Schema has correct field names", "[data_check]") {
 
   REQUIRE_NOTHROW(SchemaChecker(test_json));
 }
+
 } // namespace steamrot
