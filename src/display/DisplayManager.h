@@ -1,4 +1,11 @@
+////////////////////////////////////////////////////////////
+// Preprocessor directives
+////////////////////////////////////////////////////////////
 #pragma once
+
+////////////////////////////////////////////////////////////
+// headers
+////////////////////////////////////////////////////////////
 #include "ActionManager.h"
 #include "Session.h"
 #include "global_constants.h"
@@ -9,46 +16,70 @@
 
 using json = nlohmann::json;
 class DisplayManager {
+private:
+  ////////////////////////////////////////////////////////////
+  // members
+  ////////////////////////////////////////////////////////////
+  sf::RenderWindow m_window{sf::VideoMode(steamrot::kWindowSize),
+                            "SFML window"};
+  sf::Color m_background_color;
+  std::array<std::shared_ptr<Session>, 5> m_sessions;
+  std::shared_ptr<Session> m_active_session;
+  json m_tile_config;
+  ActionManager m_action{"display_manager"};
+  std::vector<std::shared_ptr<Action>> m_action_waiting_room;
 
 public:
+  ////////////////////////////////////////////////////////////
+  // |brief default constructor
+  ////////////////////////////////////////////////////////////
   DisplayManager();
+
+  ////////////////////////////////////////////////////////////
+  // |brief set window configuration from json object
+  ////////////////////////////////////////////////////////////
   void SetWindowConfig(const json &config);
 
+  ////////////////////////////////////////////////////////////
+  // |brief get the RenderWindow object
+  ////////////////////////////////////////////////////////////
   sf::RenderWindow &GetWindow();
+
+  ////////////////////////////////////////////////////////////
+  // |brief return a pointer to the session currently being used
+  ////////////////////////////////////////////////////////////
   std::shared_ptr<Session> GetActiveSession();
+
+  ////////////////////////////////////////////////////////////
+  // |brief get a json object describing the tile configuration
+  ////////////////////////////////////////////////////////////
   const json &GetTileConfig();
 
-  // takes in map of scene drawables
+  ////////////////////////////////////////////////////////////
+  // |brief update all display logic
+  ////////////////////////////////////////////////////////////
   void Update();
+
+  ////////////////////////////////////////////////////////////
+  // |brief create actions from event flags
+  ////////////////////////////////////////////////////////////
   void PopulateActions(const EventFlags &event_flags);
 
-  // if drawable name matches tile linked_drawables, draw to that tile
+  ////////////////////////////////////////////////////////////
+  // |brief take in drawables and draw them to the window
+  ////////////////////////////////////////////////////////////
   void DrawProvidedDrawables(
       std::map<std::string, std::vector<std::shared_ptr<sf::Drawable>>>
           &drawables);
 
+  ////////////////////////////////////////////////////////////
+  // |brief draw the tile borders over top of game textures
+  ////////////////////////////////////////////////////////////
   sf::RenderTexture &DrawTileOverlay();
-  // cycle through drawing/rendering events
+
+  ////////////////////////////////////////////////////////////
+  // |brief draw everything
+  ////////////////////////////////////////////////////////////
   void Cycle(std::map<std::string, std::vector<std::shared_ptr<sf::Drawable>>>
                  &drawables);
-
-private:
-  // add some defaults to the window otherwise it doens't behave itself
-  // may have initialise DisplayManager with a json object so i can pass
-  // constructors into the window
-  sf::RenderWindow m_window{sf::VideoMode(steamrot::kWindowSize),
-                            "SFML window"};
-
-  sf::Color m_background_color;
-
-  std::array<std::shared_ptr<Session>, 5> m_sessions;
-  std::shared_ptr<Session> m_active_session;
-
-  // store Tile and Session config here as well, as there will only be one
-  // DisplayManager
-  json m_tile_config;
-
-  // action related items
-  ActionManager m_action{"display_manager"};
-  std::vector<std::shared_ptr<Action>> m_action_waiting_room;
 };
