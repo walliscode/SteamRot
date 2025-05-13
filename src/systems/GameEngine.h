@@ -11,6 +11,7 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
+namespace steamrot {
 class GameEngine {
 private:
   ////////////////////////////////////////////////////////////
@@ -91,3 +92,5 @@ public:
 ///
 ////////////////////////////////////////////////////////////
 void to_json(json &j, const GameEngine &ge);
+
+} // namespace steamrot

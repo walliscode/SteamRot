@@ -9,7 +9,7 @@ namespace fs = std::filesystem;
 
 TEST_CASE("simple simulation test", "[simulation]") {
   // set up resources to test
-  GameEngine game;
+  steamrot::GameEngine game;
   game.RunSimulation(10);
 
   // import the test json file

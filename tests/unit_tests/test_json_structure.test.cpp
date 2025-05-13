@@ -14,7 +14,7 @@ namespace fs = std::filesystem;
 TEST_CASE("test json structure", "[data_out]") {
 
   // set up resources to test (this should just be the whole game)
-  GameEngine game;
+  steamrot::GameEngine game;
   game.RunSimulation(10);
 
   // define json structure to test against

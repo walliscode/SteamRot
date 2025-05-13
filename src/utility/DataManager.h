@@ -9,8 +9,12 @@
 ////////////////////////////////////////////////////////////
 #include "EntityConfigData.h"
 
+#include <filesystem>
 #include <nlohmann/json.hpp>
 
+using json = nlohmann::json;
+
+namespace steamrot {
 class DataManager {
 
 private:
@@ -18,13 +22,13 @@ private:
   /// \brief check file exists, if not throw error
   ///
   ////////////////////////////////////////////////////////////
-  void CheckFileExists(const std::string &file_path);
+  void CheckFileExists(const std::filesystem::path &file_path);
 
   ////////////////////////////////////////////////////////////
   /// \brief load JSON data from file and return json object
   ///
   ////////////////////////////////////////////////////////////
-  nlohmann::json LoadJsonData(const std::string &file_path);
+  json LoadJsonData(const std::filesystem::path &file_path);
 
 public:
   ////////////////////////////////////////////////////////////
@@ -43,5 +47,7 @@ public:
   /// \brief Load scene data from json
   ///
   ////////////////////////////////////////////////////////////
-  EntityConfigData LoadSceneDataFromJson(nlohmann::json scene_data);
+  EntityConfigData LoadSceneDataFromJson(std::string scene_identifier);
 };
+
+} // namespace steamrot

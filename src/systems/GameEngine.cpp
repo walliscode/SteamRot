@@ -20,6 +20,8 @@ namespace fs = std::filesystem;
 
 using namespace magic_enum::bitwise_operators;
 
+namespace steamrot {
+
 ////////////////////////////////////////////////////////////
 GameEngine::GameEngine()
     : m_displayManager(), m_scene_manager(), m_data_manager(),
@@ -237,3 +239,5 @@ void GameEngine::ShutDown() {
   // shut down global logger
   m_logger.CloseLogger();
 }
+
+} // namespace steamrot

@@ -4,11 +4,7 @@
 #include "EntityConfigData.h"
 
 ////////////////////////////////////////////////////////////
-EntityConfigData::EntityConfigData(nlohmann::json json_data) {
-
-  // create CMeta object
-  cmeta = json_data["cmeta"].template get<CMeta>();
-}
+EntityConfigData::EntityConfigData(nlohmann::json json_data) {}
 
 ////////////////////////////////////////////////////////////
 CMeta &EntityConfigData::getCMeta() { return cmeta; }

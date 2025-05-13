@@ -1,6 +1,6 @@
 #include "GameEngine.h"
 int main() {
-  GameEngine steam_rot;
+  steamrot::GameEngine steam_rot;
   steam_rot.RunGame();
 
   return 0;
