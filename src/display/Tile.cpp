@@ -5,15 +5,13 @@
 
 namespace steamrot {
 ////////////////////////////////////////////////////////////
-Tile::Tile(std::shared_ptr<size_t> scene_id) : m_scene_id(scene_id) {}
+Tile::Tile(size_t scene_id) : m_scene_id(scene_id) {}
 
 ////////////////////////////////////////////////////////////
-void Tile::SetSceneId(std::shared_ptr<size_t> scene_id) {
-  m_scene_id = scene_id;
-}
+void Tile::SetSceneId(size_t scene_id) { m_scene_id = scene_id; }
 
 ////////////////////////////////////////////////////////////
-const std::shared_ptr<size_t> Tile::GetSceneId() const { return m_scene_id; }
+const size_t Tile::GetSceneId() const { return m_scene_id; }
 
 ////////////////////////////////////////////////////////////
 sf::View &Tile::GetView() { return m_view; }

@@ -1,6 +1,7 @@
 add_library(data
 
   EntityConfigData.cpp
+  TexturesPackage.cpp
 
 )
 
@@ -11,5 +12,6 @@ target_include_directories(data
 
 target_link_libraries(data PUBLIC
 nlohmann_json::nlohmann_json
-components)
+components
+logger)
 
