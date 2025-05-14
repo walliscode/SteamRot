@@ -1,7 +1,15 @@
+////////////////////////////////////////////////////////////
+// preprocessor directives
+////////////////////////////////////////////////////////////
 #pragma once
+
+////////////////////////////////////////////////////////////
+// headers
+////////////////////////////////////////////////////////////
 #include "AssetManager.h"
 #include "Scene.h"
 #include "SceneFactory.h"
+#include "TexturesPackage.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Event.hpp>
 #include <map>
@@ -11,6 +19,7 @@ using json = nlohmann::json;
 
 typedef std::map<std::string, std::shared_ptr<Scene>> SceneList;
 
+namespace steamrot {
 class SceneManager {
 private:
   ////////////////////////////////////////////////////////////
@@ -83,11 +92,9 @@ public:
   void MakeNonInteractive();
 
   ////////////////////////////////////////////////////////////
-  /// \brief Provide a map of drawables from the relevant scenes along with an
-  /// identifier
-  ///
+  /// \brief collate textures from relevant scenes and provide as package
   ////////////////////////////////////////////////////////////
-  std::map<std::string, SceneDrawables> ProvideSceneDrawables();
+  TexturesPackage ProvideTexturesPackage();
 };
 
 ////////////////////////////////////////////////////////////
@@ -95,3 +102,5 @@ public:
 ///
 ////////////////////////////////////////////////////////////
 void to_json(json &j, const SceneManager &scene_manager);
+
+} // namespace steamrot

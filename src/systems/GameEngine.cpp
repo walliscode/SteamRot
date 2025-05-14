@@ -168,10 +168,10 @@ void GameEngine::UpdateSystems() {
 ////////////////////////////////////////////////////////////
 void GameEngine::sRender() {
 
-  // TODO: fetch TexturesPackage from SceneManager
-
-  // TODO: pass textures package to display manager
-  ;
+  // textures package should only live for the duration of the render call so
+  // called by value
+  TexturesPackage textures_package = m_scene_manager.ProvideTexturesPackage();
+  m_displayManager.Render(textures_package);
 };
 
 ////////////////////////////////////////////////////////////
