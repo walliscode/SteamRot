@@ -158,7 +158,7 @@ void GameEngine::sUserInput() {
 void GameEngine::UpdateSystems() {
 
   // update display manager actions and call any logic systems
-  m_displayManager.PopulateActions(m_event_flags);
+
   m_displayManager.Update();
 
   // call the update function of the scene manager
@@ -168,12 +168,10 @@ void GameEngine::UpdateSystems() {
 ////////////////////////////////////////////////////////////
 void GameEngine::sRender() {
 
-  // call all the necessary drawables and pass to display manager
-  std::map<std::string, SceneDrawables> game_drawables =
-      m_scene_manager.ProvideSceneDrawables();
+  // TODO: fetch TexturesPackage from SceneManager
 
-  // End the current frame and display its contents on screen
-  m_displayManager.Cycle(game_drawables);
+  // TODO: pass textures package to display manager
+  ;
 };
 
 ////////////////////////////////////////////////////////////

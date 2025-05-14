@@ -65,4 +65,9 @@ void DisplayManager::Render(TexturesPackage &textures_package) {
   // display the contents of the window to the screen
   m_window.display();
 };
+
+///////////////////////////////////////////////////////////
+void DisplayManager::Update() {
+
+};
 } // namespace steamrot
