@@ -1,6 +1,7 @@
 #include "SceneManager.h"
 #include <memory>
 
+namespace steamrot {
 ///////////////////////////////////////////////////////////
 SceneManager::SceneManager()
     : m_scene_factory(), m_all_scenes(), m_active_scenes(), m_inactive_scenes(),
@@ -57,14 +58,12 @@ void SceneManager::DeactivateScene(std::string tag) {
   m_active_scenes.erase(tag);
   m_interactive_scenes.erase(tag);
 }
-// get the scene name and the drawables that are associated with it
-// this makes a fresh map each time
-std::map<std::string, SceneDrawables> SceneManager::ProvideSceneDrawables() {
-  std::map<std::string, SceneDrawables> drawables;
-  for (auto &pair : m_active_scenes) {
-    drawables[pair.first] = pair.second->sProvideDrawables();
-  }
-  return drawables;
+
+///////////////////////////////////////////////////////////
+TexturesPackage SceneManager::ProvideTexturesPackage() {
+
+  TexturesPackage textures_package;
+  return textures_package;
 }
 
 ///////////////////////////////////////////////////////////
@@ -107,3 +106,4 @@ void to_json(json &j, const SceneManager &scene_manager) {
   //   j["m_all_scenes"]["scenes"].push_back(pair.first);
   // }
 };
+} // namespace steamrot
