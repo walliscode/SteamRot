@@ -9,6 +9,7 @@
 ////////////////////////////////////////////////////////////
 #include "EntityConfigData.h"
 
+#include <expected>
 #include <filesystem>
 #include <nlohmann/json.hpp>
 
@@ -30,6 +31,12 @@ private:
   ////////////////////////////////////////////////////////////
   json LoadJsonData(const std::filesystem::path &file_path);
 
+  ////////////////////////////////////////////////////////////
+  /// \brief Load scene data from json
+  ///
+  ////////////////////////////////////////////////////////////
+  EntityConfigData LoadSceneDataFromJson(std::string scene_identifier);
+
 public:
   ////////////////////////////////////////////////////////////
   /// \brief Default constructor
@@ -44,10 +51,10 @@ public:
   void LoadData();
 
   ////////////////////////////////////////////////////////////
-  /// \brief Load scene data from json
-  ///
+  /// \brief factory function for loading scene data
   ////////////////////////////////////////////////////////////
-  EntityConfigData LoadSceneDataFromJson(std::string scene_identifier);
+  std::expected<EntityConfigData, std::string>
+  PassSceneData(std::string scene_identifier, std::string data_type);
 };
 
 } // namespace steamrot

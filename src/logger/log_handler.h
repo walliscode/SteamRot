@@ -25,6 +25,7 @@ enum class LogCode : int {
   kInvalidJSONKey = 3,
   kInvalidJSONValue = 4,
   kDuplicateMapKey = 5,
+  kInvalidStringParamter = 6,
 };
 
 ////////////////////////////////////////////////////////////

@@ -3,6 +3,7 @@
 ////////////////////////////////////////////////////////////
 
 #include "GameEngine.h"
+#include "DataManager.h"
 #include "spdlog/spdlog.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
@@ -14,6 +15,7 @@
 #include <fstream>
 #include <magic_enum/magic_enum.hpp>
 #include <magic_enum/magic_enum_iostream.hpp>
+#include <memory>
 #include <stdexcept>
 
 namespace fs = std::filesystem;
@@ -23,20 +25,23 @@ using namespace magic_enum::bitwise_operators;
 namespace steamrot {
 
 ////////////////////////////////////////////////////////////
-GameEngine::GameEngine()
-    : m_displayManager(), m_scene_manager(), m_data_manager(),
-      m_logger("global_logger") {
+GameEngine::GameEngine() : m_display_manager(), m_logger("global_logger") {
 
+  // set up data manager so it can be passed to scene manager
+  m_data_manager = std::make_shared<DataManager>();
+  m_scene_manager = std::make_unique<SceneManager>(m_data_manager);
+
+  // convenience variable for the global logger
   auto logger = spdlog::get("global_logger");
 }
 
 ////////////////////////////////////////////////////////////
 void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
   // set up resources
-  m_scene_manager.StartUp();
+  m_scene_manager->StartUp();
 
   // Run the program as long as the window is open
-  while (m_displayManager.GetWindow().isOpen()) {
+  while (m_display_manager.GetWindow().isOpen()) {
 
     // handle loop number increase at beginning of loop
     m_loop_number++;
@@ -67,11 +72,12 @@ void GameEngine::sUserInput() {
 
   // Check all the window's events that were triggered since the last iteration
   // of the loop
-  while (const std::optional event = m_displayManager.GetWindow().pollEvent()) {
+  while (const std::optional event =
+             m_display_manager.GetWindow().pollEvent()) {
 
     // "close requested" event: we close the window
     if (event->is<sf::Event::Closed>()) {
-      m_displayManager.GetWindow().close();
+      m_display_manager.GetWindow().close();
 
     }
 
@@ -159,10 +165,10 @@ void GameEngine::UpdateSystems() {
 
   // update display manager actions and call any logic systems
 
-  m_displayManager.Update();
+  m_display_manager.Update();
 
   // call the update function of the scene manager
-  m_scene_manager.UpdateScenes();
+  m_scene_manager->UpdateScenes();
 }
 
 ////////////////////////////////////////////////////////////
@@ -170,8 +176,8 @@ void GameEngine::sRender() {
 
   // textures package should only live for the duration of the render call so
   // called by value
-  TexturesPackage textures_package = m_scene_manager.ProvideTexturesPackage();
-  m_displayManager.Render(textures_package);
+  TexturesPackage textures_package = m_scene_manager->ProvideTexturesPackage();
+  m_display_manager.Render(textures_package);
 };
 
 ////////////////////////////////////////////////////////////
@@ -192,7 +198,7 @@ void to_json(json &j, const GameEngine &ge) {
   j = json{{"GameEngine",
             {{"m_loop_number", ge.m_loop_number},
              {"m_event_flags", ge.m_event_flags},
-             {"m_scene_manager", ge.m_scene_manager}}}
+             {"m_scene_manager", *ge.m_scene_manager}}}
 
   };
 };

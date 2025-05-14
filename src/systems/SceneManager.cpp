@@ -3,9 +3,9 @@
 
 namespace steamrot {
 ///////////////////////////////////////////////////////////
-SceneManager::SceneManager()
-    : m_scene_factory(), m_all_scenes(), m_active_scenes(), m_inactive_scenes(),
-      m_asset_manager() {}
+SceneManager::SceneManager(std::shared_ptr<DataManager> data_manager)
+    : m_scene_factory(data_manager), m_all_scenes(), m_active_scenes(),
+      m_inactive_scenes(), m_asset_manager(), m_data_manager(data_manager) {}
 
 ///////////////////////////////////////////////////////////
 void SceneManager::StartUp() {

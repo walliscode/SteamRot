@@ -8,6 +8,7 @@
 #include "SceneManager.h"
 #include <SFML/Graphics.hpp>
 
+#include <memory>
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
@@ -17,9 +18,9 @@ private:
   ////////////////////////////////////////////////////////////
   // Member data
   ////////////////////////////////////////////////////////////
-  DisplayManager m_displayManager;
-  SceneManager m_scene_manager;
-  DataManager m_data_manager;
+  DisplayManager m_display_manager;
+  std::unique_ptr<SceneManager> m_scene_manager;
+  std::shared_ptr<DataManager> m_data_manager;
   Logger m_logger;
 
   size_t m_loop_number = 0;
