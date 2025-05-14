@@ -7,12 +7,14 @@
 // headers
 ////////////////////////////////////////////////////////////
 #include "AssetManager.h"
+#include "DataManager.h"
 #include "Scene.h"
 #include "SceneFactory.h"
 #include "TexturesPackage.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Event.hpp>
 #include <map>
+#include <memory>
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
@@ -33,6 +35,7 @@ private:
   SceneList m_interactive_scenes;
   AssetManager m_asset_manager;
 
+  std::shared_ptr<DataManager> m_data_manager;
   // to_json needs access to private members
   friend void to_json(json &j, const SceneManager &scene_manager);
 
@@ -41,8 +44,8 @@ public:
   /// \brief Default constructor
   ///
   ////////////////////////////////////////////////////////////
+  SceneManager(std::shared_ptr<DataManager> data_manager);
 
-  SceneManager();
   ////////////////////////////////////////////////////////////
   /// \brief start up the SceneManager for the game
   ///

@@ -1,3 +1,4 @@
+#include "GameEngine.h"
 #include "steamrot_directory_paths.h"
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
@@ -7,6 +8,8 @@
 
 TEST_CASE("check error logs", "[error_log]") {
 
+  steamrot::GameEngine game_engine;
+  game_engine.RunSimulation(10);
   // get the path to the error log file
   std::filesystem::path error_log_path = getLogsFolder() / "error.json";
 
