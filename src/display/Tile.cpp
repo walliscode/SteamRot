@@ -4,6 +4,8 @@
 #include "Tile.h"
 
 namespace steamrot {
+////////////////////////////////////////////////////////////
+Tile::Tile(std::shared_ptr<size_t> scene_id) : m_scene_id(scene_id) {}
 
 ////////////////////////////////////////////////////////////
 void Tile::SetSceneId(std::shared_ptr<size_t> scene_id) {
