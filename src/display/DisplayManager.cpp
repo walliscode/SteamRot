@@ -34,13 +34,29 @@ void DisplayManager::SetWindowConfig(const json &config) {
 sf::RenderWindow &DisplayManager::GetWindow() { return m_window; };
 
 ///////////////////////////////////////////////////////////
-void DisplayManager::Render() {
+void DisplayManager::Render(TexturesPackage &textures_package) {
 
   // clear the window with the background color, this always be at the start
   m_window.clear();
 
-  // TODO: pass through RenderTextures from the Scenes and draw
+  // get tiles from active session
+  auto tiles = m_active_session->GetTiles();
 
+  // get the tile overlay texture from the textures package
+  for (auto &tile : tiles) {
+
+    // check if id is in the textures package
+    auto tile_texture = textures_package.GetTextures().find(tile->GetSceneId());
+
+    if (tile_texture != textures_package.GetTextures().end()) {
+
+      // create sprite from tile texture
+      sf::Sprite tile_sprite{tile_texture->second->getTexture()};
+
+      // draw the sprite to the window
+      m_window.draw(tile_sprite);
+    }
+  }
   // tile overlay should come last
   // create sprite from tile overlay texture
   sf::Sprite tile_overlay_sprite{m_tile_overlay.getTexture()};
@@ -48,5 +64,10 @@ void DisplayManager::Render() {
 
   // display the contents of the window to the screen
   m_window.display();
+};
+
+///////////////////////////////////////////////////////////
+void DisplayManager::Update() {
+
 };
 } // namespace steamrot
