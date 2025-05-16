@@ -7,6 +7,8 @@
 
 using json = nlohmann::json;
 
+namespace steamrot {
+
 ////////////////////////////////////////////////////////////
 EntityManager::EntityManager(const size_t &pool_size,
                              const std::string &scene_name)
@@ -27,11 +29,6 @@ void EntityManager::ResizePool(const size_t &pool_size) {
         (component_vector.resize(pool_size), ...);
       },
       *m_pool);
-}
-////////////////////////////////////////////////////////////
-void EntityManager::ConfigureEntities(const std::string &config_method) {
-
-  m_entity_configuration_factory.ConfigureEntities(config_method, m_pool);
 }
 
 ////////////////////////////////////////////////////////////
@@ -107,3 +104,4 @@ void EntityManager::UpdateWaitingRooms() {
 
   m_entities_to_add.clear(); // clear the to add waiting room
 }
+} // namespace steamrot

@@ -16,4 +16,5 @@ target_link_libraries(entity
   SFML::Graphics
   components
   steamrot_enums
+  logger
 )
