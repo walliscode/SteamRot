@@ -1,6 +1,8 @@
 #pragma once
 #include "Scene.h"
 
+namespace steamrot {
+
 class SceneMenu : public Scene {
 private:
 public:
@@ -9,3 +11,4 @@ public:
   void sMovement() override;
   SceneDrawables sProvideDrawables() override;
 };
+} // namespace steamrot

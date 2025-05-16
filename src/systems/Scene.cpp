@@ -1,5 +1,7 @@
 #include "Scene.h"
 
+namespace steamrot {
+
 ////////////////////////////////////////////////////////////
 Scene::Scene(const std::string &name, const size_t &pool_size,
              const EntityConfigData &config_data)
@@ -29,3 +31,5 @@ void to_json(nlohmann::json &j, const Scene &scene) {
       {"m_current_frame", scene.m_current_frame},
   };
 }
+
+} // namespace steamrot

@@ -19,6 +19,8 @@
 
 using json = nlohmann::json;
 
+namespace steamrot {
+
 class EntityManager {
 
 private:
@@ -29,7 +31,7 @@ private:
   std::vector<size_t> m_entities;
   std::vector<size_t> m_entities_to_add;
   std::vector<size_t> m_entities_to_remove;
-  std::unique_ptr<steamrot::components::containers::EntityMemoryPool> m_pool;
+  std::unique_ptr<components::containers::EntityMemoryPool> m_pool;
   ArchetypeManager m_archetype_manager;
   EntityConfigurationFactory m_entity_configuration_factory;
 
@@ -45,12 +47,6 @@ public:
   ///
   ////////////////////////////////////////////////////////////
   void ResizePool(const size_t &pool_size);
-
-  ////////////////////////////////////////////////////////////
-  /// \brief Configure Entities
-  ///
-  ////////////////////////////////////////////////////////////
-  void ConfigureEntities(const std::string &config_method);
 
   ////////////////////////////////////////////////////////////
   /// \brief return index of next "free" entity
@@ -139,3 +135,4 @@ public:
     return GetComponent<T>(entityID).getHas();
   }
 };
+} // namespace steamrot

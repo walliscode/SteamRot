@@ -2,6 +2,8 @@
 #include "Scene.h"
 #include <cstddef>
 
+namespace steamrot {
+
 SceneMenu::SceneMenu(const std::string &name, size_t pool_size,
                      const EntityConfigData &config_data)
     : Scene(name, pool_size, config_data) {}
@@ -13,3 +15,4 @@ SceneDrawables SceneMenu::sProvideDrawables() {
 
   return drawables;
 }
+} // namespace steamrot

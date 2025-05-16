@@ -6,12 +6,14 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-
 #include "containers.h"
-#include "nlohmann/json_fwd.hpp"
-#include <iostream>
+
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <string>
+
+using json = nlohmann::json;
+namespace steamrot {
 
 class EntityConfigurationFactory {
 private:
@@ -19,12 +21,6 @@ private:
   // Member data
   ////////////////////////////////////////////////////////////
   std::string m_scene_id;
-
-  ////////////////////////////////////////////////////////////
-  /// |brief Configure entities from JSON file
-  ///
-  ////////////////////////////////////////////////////////////
-  void ConfigureFromJSON();
 
 public:
   ////////////////////////////////////////////////////////////
@@ -34,29 +30,12 @@ public:
   EntityConfigurationFactory(const std::string &scene_id);
 
   ////////////////////////////////////////////////////////////
-  /// |brief Template Function for configuring Entites based on data type
+  /// |brief Configure entities (overload this function per data type)
   ///
   ////////////////////////////////////////////////////////////
-  template <typename T>
-  void ConfigureEntities(
-      const T &configuration_data,
-      std::unique_ptr<steamrot::components::containers::EntityMemoryPool>
-          &entity_memory_pool) {
-    // Default implementation does nothing
-    std::cout << "No entities will be configured using this data type"
-              << std::endl;
-  };
-
-  ////////////////////////////////////////////////////////////
-  /// |brief Specialization for configuring entities from JSON data
-  ///
-  ////////////////////////////////////////////////////////////
-  template <>
-  void ConfigureEntities(
-      const nlohmann::json &configuration_data,
-      std::unique_ptr<steamrot::components::containers::EntityMemoryPool>
-          &entity_memory_pool) {
-
-    ConfigureFromJSON();
-  }
+  void
+  ConfigureEntities(std::unique_ptr<components::containers::EntityMemoryPool>,
+                    json &data);
 };
+
+} // namespace steamrot

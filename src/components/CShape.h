@@ -7,8 +7,7 @@ public:
   CShape() = default;
 
   sf::RectangleShape m_shape;
+
+  const std::string &Name() override;
+  void Configure(const json &data) override;
 };
-
-void to_json(json &j, const CShape &p);
-
-void from_json(const json &j, CShape &p);

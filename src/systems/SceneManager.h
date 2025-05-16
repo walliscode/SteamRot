@@ -8,20 +8,20 @@
 ////////////////////////////////////////////////////////////
 #include "AssetManager.h"
 #include "DataManager.h"
-#include "Scene.h"
+
 #include "SceneFactory.h"
 #include "TexturesPackage.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Event.hpp>
-#include <map>
+
 #include <memory>
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
-typedef std::map<std::string, std::shared_ptr<Scene>> SceneList;
-
 namespace steamrot {
+
+typedef std::map<std::string, std::shared_ptr<Scene>> SceneList;
 class SceneManager {
 private:
   ////////////////////////////////////////////////////////////

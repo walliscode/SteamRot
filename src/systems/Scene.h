@@ -16,6 +16,8 @@
 
 typedef std::vector<std::shared_ptr<sf::Drawable>> SceneDrawables;
 
+namespace steamrot {
+
 class Scene {
 protected:
   ////////////////////////////////////////////////////////////
@@ -92,3 +94,5 @@ public:
 ///
 ////////////////////////////////////////////////////////////
 void to_json(nlohmann::json &j, const Scene &scene);
+
+} // namespace steamrot
