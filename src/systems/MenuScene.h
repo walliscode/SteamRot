@@ -3,10 +3,10 @@
 
 namespace steamrot {
 
-class SceneMenu : public Scene {
+class MenuScene : public Scene {
 private:
 public:
-  SceneMenu(const std::string &name, size_t pool_size, const json &config_data);
+  MenuScene(const std::string &name, size_t pool_size, const json &config_data);
   void sMovement() override;
   SceneDrawables sProvideDrawables() override;
 };

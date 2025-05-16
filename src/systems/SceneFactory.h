@@ -7,8 +7,8 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "DataManager.h"
+#include "MenuScene.h"
 #include "Scene.h"
-#include "SceneMenu.h"
 #include <memory>
 
 namespace steamrot {
@@ -25,7 +25,7 @@ private:
   /// \brief Create a new Menu Scene
   ///
   ////////////////////////////////////////////////////////////
-  std::shared_ptr<SceneMenu> CreateMenuScene(std::string name);
+  std::shared_ptr<MenuScene> CreateMenuScene(std::string name);
 
 public:
   ////////////////////////////////////////////////////////////

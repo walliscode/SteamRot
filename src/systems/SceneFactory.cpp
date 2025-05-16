@@ -32,12 +32,12 @@ std::shared_ptr<Scene> SceneFactory::CreateScene(std::string name,
   return new_scene;
 }
 
-std::shared_ptr<SceneMenu> SceneFactory::CreateMenuScene(std::string name) {
+std::shared_ptr<MenuScene> SceneFactory::CreateMenuScene(std::string name) {
   // get the entity config data from the data manager
   json config_data;
 
   // create a new menu scene object
-  return std::make_shared<SceneMenu>(name, 100, config_data);
+  return std::make_shared<MenuScene>(name, 100, config_data);
 }
 
 } // namespace steamrot
