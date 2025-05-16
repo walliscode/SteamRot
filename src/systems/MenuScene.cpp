@@ -1,16 +1,16 @@
-#include "SceneMenu.h"
+#include "MenuScene.h"
 #include "Scene.h"
 #include <cstddef>
 
 namespace steamrot {
 
-SceneMenu::SceneMenu(const std::string &name, size_t pool_size,
+MenuScene::MenuScene(const std::string &name, size_t pool_size,
                      const json &config_data)
     : Scene(name, pool_size, config_data) {}
 
-void SceneMenu::sMovement() {};
+void MenuScene::sMovement() {};
 
-SceneDrawables SceneMenu::sProvideDrawables() {
+SceneDrawables MenuScene::sProvideDrawables() {
   SceneDrawables drawables;
 
   return drawables;
