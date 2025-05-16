@@ -43,8 +43,7 @@ protected:
   size_t m_current_frame = 0;
 
   ////////////////////////////////////////////////////////////
-  /// \brief Default constructor (only accessible to derived classes)
-  ///
+  /// \brief default constructor (only accessible to derived classes)
   ////////////////////////////////////////////////////////////
   Scene(const std::string &name, const size_t &pool_size,
         const json &config_data);
