@@ -4,7 +4,7 @@ namespace steamrot {
 
 ////////////////////////////////////////////////////////////
 Scene::Scene(const std::string &name, const size_t &pool_size,
-             const EntityConfigData &config_data)
+             const json &config_data)
     : m_name(name), m_action_manager(name), m_entity_manager(pool_size, name),
       m_id(id_counter++) {}
 

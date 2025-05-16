@@ -7,9 +7,7 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "ActionManager.h"
-#include "EntityConfigData.h"
 #include "EntityManager.h"
-
 #include <SFML/Graphics/Drawable.hpp>
 #include <nlohmann/json.hpp>
 #include <string>
@@ -49,7 +47,7 @@ protected:
   ///
   ////////////////////////////////////////////////////////////
   Scene(const std::string &name, const size_t &pool_size,
-        const EntityConfigData &config_data);
+        const json &config_data);
 
   ////////////////////////////////////////////////////////////
   /// \brief friend function for outputting the Scene to JSON

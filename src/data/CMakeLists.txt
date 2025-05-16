@@ -1,6 +1,6 @@
 add_library(data
 
-  EntityConfigData.cpp
+
   TexturesPackage.cpp
 
 )

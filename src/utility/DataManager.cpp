@@ -1,9 +1,9 @@
 #include "DataManager.h"
-#include "EntityConfigData.h"
+
 #include "SchemaChecker.h"
 #include "log_handler.h"
 #include "steamrot_directory_paths.h"
-#include <expected>
+
 #include <fstream>
 
 using json = nlohmann::json;
@@ -40,8 +40,7 @@ json DataManager::LoadJsonData(const std::filesystem::path &file_path) {
 }
 
 ////////////////////////////////////////////////////////////
-EntityConfigData
-DataManager::LoadSceneDataFromJson(std::string scene_identifier) {
+json DataManager::LoadSceneDataFromJson(std::string scene_identifier) {
 
   // load schema data for scene from file
   json scene_schema = LoadJsonData(getSceneFolder() / "scene.schema.json");
@@ -56,27 +55,7 @@ DataManager::LoadSceneDataFromJson(std::string scene_identifier) {
   // check scene data against schema (error checking in function)
   schema_checker.CheckJSON(scene_data);
 
-  return EntityConfigData(scene_data);
+  return scene_data;
 }
 
-////////////////////////////////////////////////////////////
-std::expected<EntityConfigData, std::string>
-DataManager::PassSceneData(std::string scene_identifier,
-                           std::string data_type) {
-
-  // use data type to determine which strategy to use
-  if (data_type == "json") {
-    return LoadSceneDataFromJson(scene_identifier);
-  }
-
-  else {
-    ProcessLog(spdlog::level::err,
-               steamrot::log_handler::LogCode::kInvalidStringParamter,
-               "Invalid data type: " + data_type);
-
-    // return error message
-    std::string error_message = "Invalid data type: " + data_type;
-    return std::unexpected<std::string>(error_message);
-  }
-}
 } // namespace steamrot

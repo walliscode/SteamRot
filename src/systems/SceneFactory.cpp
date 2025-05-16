@@ -2,7 +2,6 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "SceneFactory.h"
-#include "EntityConfigData.h"
 #include "log_handler.h"
 #include "spdlog/common.h"
 #include <memory>
@@ -35,7 +34,7 @@ std::shared_ptr<Scene> SceneFactory::CreateScene(std::string name,
 
 std::shared_ptr<SceneMenu> SceneFactory::CreateMenuScene(std::string name) {
   // get the entity config data from the data manager
-  EntityConfigData config_data = *m_data_manager->PassSceneData("menu", "json");
+  json config_data;
 
   // create a new menu scene object
   return std::make_shared<SceneMenu>(name, 100, config_data);
