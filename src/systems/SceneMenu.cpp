@@ -5,7 +5,7 @@
 namespace steamrot {
 
 SceneMenu::SceneMenu(const std::string &name, size_t pool_size,
-                     const EntityConfigData &config_data)
+                     const json &config_data)
     : Scene(name, pool_size, config_data) {}
 
 void SceneMenu::sMovement() {};
