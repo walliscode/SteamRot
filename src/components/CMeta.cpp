@@ -11,4 +11,7 @@ const std::string &CMeta::Name() {
 }
 
 ////////////////////////////////////////////////////////////
-void CMeta::Configure(const json &data) {}
+void CMeta::Configure(const json &data) {
+  // configure variables
+  m_entity_active = data["m_entity_active"];
+}
