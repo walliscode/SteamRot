@@ -1,4 +1,6 @@
 #include "SceneManager.h"
+
+#include <map>
 #include <memory>
 
 namespace steamrot {
@@ -62,7 +64,19 @@ void SceneManager::DeactivateScene(std::string tag) {
 ///////////////////////////////////////////////////////////
 TexturesPackage SceneManager::ProvideTexturesPackage() {
 
+  // create textures package object
   TexturesPackage textures_package;
+
+  // cycle through desired scenes
+  // TODO: pass along required IDs from display manager for picking Scenes
+  for (auto &pair : m_active_scenes) {
+
+    // get scene
+    auto scene = pair.second;
+
+    // add created scene texture to texture map
+    textures_package.AddTexture(scene->GetSceneID(), scene->sDrawToTexture());
+  }
   return textures_package;
 }
 

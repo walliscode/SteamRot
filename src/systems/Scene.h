@@ -9,6 +9,8 @@
 #include "ActionManager.h"
 #include "EntityManager.h"
 #include <SFML/Graphics/Drawable.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
+#include <memory>
 #include <nlohmann/json.hpp>
 #include <string>
 
@@ -62,10 +64,11 @@ public:
   virtual void sMovement() = 0;
 
   ////////////////////////////////////////////////////////////
-  /// \brief exports all drawables to be rendered elsewhere
+  /// \brief exports a ptr to a RenderTexture, this just needs to be drawn to
+  /// the window
   ///
   ////////////////////////////////////////////////////////////
-  virtual SceneDrawables sProvideDrawables() = 0;
+  virtual std::unique_ptr<sf::RenderTexture> sDrawToTexture() = 0;
 
   ////////////////////////////////////////////////////////////
   /// \brief Inidcicates if the Scenes is active or not
