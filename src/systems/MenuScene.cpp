@@ -3,7 +3,9 @@
 ////////////////////////////////////////////////////////////
 #include "MenuScene.h"
 #include "Scene.h"
+#include <SFML/Graphics/RenderTexture.hpp>
 #include <cstddef>
+#include <memory>
 
 namespace steamrot {
 ////////////////////////////////////////////////////////////
@@ -15,9 +17,10 @@ MenuScene::MenuScene(const std::string &name, size_t pool_size,
 void MenuScene::sMovement() {};
 
 ////////////////////////////////////////////////////////////
-SceneDrawables MenuScene::sProvideDrawables() {
-  SceneDrawables drawables;
+std::unique_ptr<sf::RenderTexture> MenuScene::sDrawToTexture() {
 
-  return drawables;
+  // a place holder as this needs to be drawn to
+  return std::make_unique<sf::RenderTexture>();
 }
+
 } // namespace steamrot

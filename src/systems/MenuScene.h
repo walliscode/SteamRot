@@ -7,6 +7,8 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "Scene.h"
+#include <SFML/Graphics/RenderTexture.hpp>
+#include <memory>
 
 namespace steamrot {
 
@@ -26,6 +28,6 @@ public:
   ////////////////////////////////////////////////////////////
   /// \brief get all drawables from MenuScene
   ////////////////////////////////////////////////////////////
-  SceneDrawables sProvideDrawables() override;
+  std::unique_ptr<sf::RenderTexture> sDrawToTexture() override;
 };
 } // namespace steamrot
