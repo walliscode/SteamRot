@@ -6,14 +6,17 @@
 #include "magic_enum/magic_enum.hpp"
 #include "spdlog/common.h"
 #include <SFML/Window/Keyboard.hpp>
+#include <SFML/Window/Mouse.hpp>
 
+using namespace magic_enum::bitwise_operators;
 namespace steamrot {
+
 ////////////////////////////////////////////////////////////
 ActionManager::ActionManager(json &config) {}
 
 ////////////////////////////////////////////////////////////
 const std::map<std::string, sf::Keyboard::Key>
-ActionManager::getStringKeyBoardMap() {
+ActionManager::getStringToKeyboardMap() {
 
   // map of string to sf::Keyboard enum
 
@@ -29,9 +32,25 @@ ActionManager::getStringKeyBoardMap() {
       {"S", sf::Keyboard::Key::S}, {"T", sf::Keyboard::Key::T},
       {"U", sf::Keyboard::Key::U}, {"V", sf::Keyboard::Key::V},
       {"W", sf::Keyboard::Key::W}, {"X", sf::Keyboard::Key::X},
-      {"Y", sf::Keyboard::Key::Y}, {"Z", sf::Keyboard::Key::Z}};
+      {"Y", sf::Keyboard::Key::Y}, {"Z", sf::Keyboard::Key::Z},
+  };
   return string_to_key_map;
-};
+}; // namespace steamrot
+////////////////////////////////////////////////////////////
+const std::map<std::string, sf::Mouse::Button>
+ActionManager::getStringToMouseMap() {
+
+  // map of string to sf::Mouse enum
+
+  static const std::map<std::string, sf::Mouse::Button> string_to_mouse_map = {
+
+      {"Left", sf::Mouse::Button::Left},
+      {"Right", sf::Mouse::Button::Right},
+      {"Middle", sf::Mouse::Button::Middle},
+
+  };
+  return string_to_mouse_map;
+}
 
 ////////////////////////////////////////////////////////////
 void ActionManager::RegisterActions(json &config) {
@@ -47,28 +66,53 @@ void ActionManager::RegisterActions(json &config) {
   for (auto &action : config["actions"]) {
 
     // create new bitset for this action
-    std::bitset<sf::Keyboard::KeyCount> key_bitset;
+    std::bitset<sf::Keyboard::KeyCount + sf::Mouse::ButtonCount> key_bitset;
 
     // cycle though keys
-    for (auto &key : action["keys"]) {
-      // check if key is in the map, if not error out
-      auto it = getStringKeyBoardMap().find(key.get<std::string>());
+    for (auto &input : action["inputs"]) {
 
-      if (it == getStringKeyBoardMap().end()) {
+      // check if input is a keyboard or mouse input, if not error out
+      if (input["type"] == "keyboard") {
+        // check if key is in the map, if not error out
+        auto it = getStringToKeyboardMap().find(input["value"]);
+
+        if (it == getStringToKeyboardMap().end()) {
+          log_handler::ProcessLog(spdlog::level::level_enum::err,
+                                  log_handler::LogCode::kInvalidJSONKey,
+                                  "key " + input["value"].get<std::string>() +
+                                      " is not a valid key enum value");
+        } else {
+          // set the bit in the bitset for this key
+          key_bitset.set(static_cast<size_t>(it->second));
+        }
+
+      } else if (input["type"] == "mouse") {
+        // check if mouse button is in the map, if not error out
+        auto it = getStringToMouseMap().find(input["value"]);
+        if (it == getStringToMouseMap().end()) {
+          log_handler::ProcessLog(spdlog::level::level_enum::err,
+                                  log_handler::LogCode::kInvalidJSONKey,
+                                  "mouse button " +
+                                      input["value"].get<std::string>() +
+                                      " is not a valid mouse enum value");
+        } else {
+
+          // set the bit in the bitset for this mouse button
+          key_bitset.set(static_cast<size_t>(it->second) +
+                         sf::Keyboard::KeyCount);
+        }
+      } else {
         log_handler::ProcessLog(spdlog::level::level_enum::err,
                                 log_handler::LogCode::kInvalidJSONKey,
-                                "key " + key.get<std::string>() +
-                                    " is not a valid key enum value");
-      } else {
-
-        // set the bitset for this key
-        key_bitset.set(static_cast<size_t>(it->second));
+                                "input type " +
+                                    input["type"].get<std::string>() +
+                                    " is not a valid input type");
       }
     }
 
     // check if string action in json is a valid action in the action enum
     std::string action_name = action["name"];
-    auto action_enum = magic_enum::enum_cast<actions>(action_name);
+    auto action_enum = magic_enum::enum_cast<Actions>(action_name);
 
     // check if action enum is valid, if not error out
     if (!action_enum.has_value()) {
@@ -81,5 +125,22 @@ void ActionManager::RegisterActions(json &config) {
     }
   }
 }
+////////////////////////////////////////////////////////////
+const Actions ActionManager::GenerateActions(
+    std::bitset<sf::Keyboard::KeyCount + sf::Mouse::ButtonCount> key_bitset) {
 
+  // create an actions bitset
+  Actions actions;
+
+  // cycle through the key to action map and check to see if any of the keys
+  // match
+  for (auto &[key, value] : m_key_to_action_map) {
+    if ((key_bitset & key) == key) {
+
+      // add to current actions
+      actions |= value;
+    }
+  }
+  return actions;
+}
 } // namespace steamrot

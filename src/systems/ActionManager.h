@@ -6,13 +6,12 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include "EventFlags.h"
 #include "actions.h"
 #include <SFML/Window/Keyboard.hpp>
+#include <SFML/Window/Mouse.hpp>
 #include <bitset>
 #include <map>
 #include <nlohmann/json.hpp>
-#include <string>
 
 using json = nlohmann::json;
 
@@ -23,12 +22,20 @@ private:
   ////////////////////////////////////////////////////////////
   // |Member: stores key mappings to actions for this scene
   ////////////////////////////////////////////////////////////
-  std::map<std::bitset<sf::Keyboard::KeyCount>, actions> m_key_to_action_map;
+  std::map<std::bitset<sf::Keyboard::KeyCount + sf::Mouse::ButtonCount>,
+           Actions>
+      m_key_to_action_map;
 
   ////////////////////////////////////////////////////////////
   // |brief: returns map of string letters to sf::Keyboard enum
   ////////////////////////////////////////////////////////////
-  static const std::map<std::string, sf::Keyboard::Key> getStringKeyBoardMap();
+  static const std::map<std::string, sf::Keyboard::Key>
+  getStringToKeyboardMap();
+
+  ////////////////////////////////////////////////////////////
+  // |brief: returns map of string letters to sf::Mouse enum
+  ////////////////////////////////////////////////////////////
+  static const std::map<std::string, sf::Mouse::Button> getStringToMouseMap();
 
   ////////////////////////////////////////////////////////////
   // |brief register actions for object instance from json
@@ -44,6 +51,7 @@ public:
   ////////////////////////////////////////////////////////////
   // |brief Generate any possible actions for this scene as bitflag enum
   ////////////////////////////////////////////////////////////
-  actions GenerateActions(const EventFlags &event_flags);
+  const Actions GenerateActions(
+      std::bitset<sf::Keyboard::KeyCount + sf::Mouse::ButtonCount>);
 };
 } // namespace steamrot
