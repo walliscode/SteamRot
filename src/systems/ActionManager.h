@@ -1,46 +1,49 @@
+////////////////////////////////////////////////////////////
+// Preprocessor directives
+////////////////////////////////////////////////////////////
 #pragma once
-#include "EventFlags.h"
 
-#include <SFML/Graphics.hpp>
-#include <magic_enum/magic_enum.hpp>
+////////////////////////////////////////////////////////////
+// Headers
+////////////////////////////////////////////////////////////
+#include "EventFlags.h"
+#include "actions.h"
+#include <SFML/Window/Keyboard.hpp>
+#include <bitset>
 #include <map>
-#include <memory>
 #include <nlohmann/json.hpp>
-#include <vector>
+#include <string>
 
 using json = nlohmann::json;
 
-struct Action {
-  Action(std::string name, EventFlags action_flags, bool repeatable)
-      : m_name(name), m_action_flags(action_flags), m_repeatable(repeatable) {};
-
-  std::string m_name;
-  const EventFlags m_action_flags;
-  // can an action be repeated if the key is held down
-  bool m_repeatable{false};
-  // latch the action so that it can only be triggered once, until the key is
-  // released
-  bool m_latch{false};
-};
+namespace steamrot {
 
 class ActionManager {
+private:
+  ////////////////////////////////////////////////////////////
+  // |Member: stores key mappings to actions for this scene
+  ////////////////////////////////////////////////////////////
+  std::map<std::bitset<sf::Keyboard::KeyCount>, actions> m_key_to_action_map;
+
+  ////////////////////////////////////////////////////////////
+  // |brief: returns map of string letters to sf::Keyboard enum
+  ////////////////////////////////////////////////////////////
+  static const std::map<std::string, sf::Keyboard::Key> getStringKeyBoardMap();
+
+  ////////////////////////////////////////////////////////////
+  // |brief register actions for object instance from json
+  ////////////////////////////////////////////////////////////
+  void RegisterActions(json &congig);
 
 public:
-  ActionManager(std::string container_name);
+  ////////////////////////////////////////////////////////////
+  // |brief constructor using json as configuration object
+  ////////////////////////////////////////////////////////////
+  ActionManager(json &config);
 
-  // return a vector of Actions, readied to be used. Any exclustio logic should
-  // happen in GenerateActions
-  std::vector<std::shared_ptr<Action>>
-  GenerateActions(const EventFlags &event_flags);
-
-private:
-  //
-  std::string m_container_name;
-  // list of actions, generated once at run time
-  std::vector<Action> m_action_list;
-
-  static std::map<std::string, sf::Keyboard::Key> m_key_map;
-  static std::map<std::string, sf::Mouse::Button> m_mouse_map;
-
-  void RegisterActions(std::string container_name);
+  ////////////////////////////////////////////////////////////
+  // |brief Generate any possible actions for this scene as bitflag enum
+  ////////////////////////////////////////////////////////////
+  actions GenerateActions(const EventFlags &event_flags);
 };
+} // namespace steamrot
