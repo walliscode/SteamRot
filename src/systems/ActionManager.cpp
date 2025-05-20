@@ -1,106 +1,149 @@
+////////////////////////////////////////////////////////////
+// Headers
+////////////////////////////////////////////////////////////
 #include "ActionManager.h"
-#include "general_util.h"
-
-#include <iostream>
-#include <magic_enum/magic_enum.hpp>
-#include <magic_enum/magic_enum_iostream.hpp>
-#include <memory>
+#include "log_handler.h"
+#include "magic_enum/magic_enum.hpp"
+#include "spdlog/common.h"
+#include <SFML/Window/Keyboard.hpp>
+#include <SFML/Window/Mouse.hpp>
 
 using namespace magic_enum::bitwise_operators;
+namespace steamrot {
 
-bool compareFlags(EventFlags flag1, EventFlags flag2) {
-  // Example: check if both flags have at least one common bit set
-  return (flag1 & flag2) != static_cast<EventFlags>(0);
+////////////////////////////////////////////////////////////
+ActionManager::ActionManager(const json &config) {
+  // register actions from json config object
+  RegisterActions(config);
 }
 
-ActionManager::ActionManager(std::string container_name)
-    : m_container_name(container_name) {
+////////////////////////////////////////////////////////////
+const std::map<std::string, sf::Keyboard::Key>
+ActionManager::getStringToKeyboardMap() {
 
-  // pull in json config for user defied actions
-  RegisterActions(container_name);
-}
+  // map of string to sf::Keyboard enum
 
-// insert all keys for the sf keyboard into the map
-
-void ActionManager::RegisterActions(std::string container_name) {
-  // check json file exists and load in
-  std::string file_path =
-      std::string(RESOURCES_DIR) + "/jsons/actions_" + container_name + ".json";
-
-  if (!utils::CheckFileExists(file_path)) {
-    std::cout << "File does not exist: " << file_path << std::endl;
-    return;
+  static const std::map<std::string, sf::Keyboard::Key> string_to_key_map = {
+      {"A", sf::Keyboard::Key::A}, {"B", sf::Keyboard::Key::B},
+      {"C", sf::Keyboard::Key::C}, {"D", sf::Keyboard::Key::D},
+      {"E", sf::Keyboard::Key::E}, {"F", sf::Keyboard::Key::F},
+      {"G", sf::Keyboard::Key::G}, {"H", sf::Keyboard::Key::H},
+      {"K", sf::Keyboard::Key::K}, {"L", sf::Keyboard::Key::L},
+      {"M", sf::Keyboard::Key::M}, {"N", sf::Keyboard::Key::N},
+      {"O", sf::Keyboard::Key::O}, {"P", sf::Keyboard::Key::P},
+      {"Q", sf::Keyboard::Key::Q}, {"R", sf::Keyboard::Key::R},
+      {"S", sf::Keyboard::Key::S}, {"T", sf::Keyboard::Key::T},
+      {"U", sf::Keyboard::Key::U}, {"V", sf::Keyboard::Key::V},
+      {"W", sf::Keyboard::Key::W}, {"X", sf::Keyboard::Key::X},
+      {"Y", sf::Keyboard::Key::Y}, {"Z", sf::Keyboard::Key::Z},
   };
+  return string_to_key_map;
+}; // namespace steamrot
+////////////////////////////////////////////////////////////
+const std::map<std::string, sf::Mouse::Button>
+ActionManager::getStringToMouseMap() {
 
-  std::ifstream f(file_path);
-  json actions = json::parse(f);
+  // map of string to sf::Mouse enum
 
-  for (auto &action : actions) {
+  static const std::map<std::string, sf::Mouse::Button> string_to_mouse_map = {
 
-    // get string name that we will use to reference the action in the game
-    // logic
-    std::string action_name = action["name"];
-    std::cout << "Registering action: " << action_name << std::endl;
+      {"Left", sf::Mouse::Button::Left},
+      {"Right", sf::Mouse::Button::Right},
+      {"Middle", sf::Mouse::Button::Middle},
 
-    // create enum to store the action flags
-    EventFlags action_generator{0};
+  };
+  return string_to_mouse_map;
+}
 
+////////////////////////////////////////////////////////////
+void ActionManager::RegisterActions(const json &config) {
+
+  // check config object, error out if incorrect
+  if (!config.contains("actions")) {
+    log_handler::ProcessLog(spdlog::level::level_enum::err,
+                            log_handler::LogCode::kInvalidJSONKey,
+                            "Action Config should contain action key");
+  }
+
+  // cycle through the json objects and check and register
+  for (auto &action : config["actions"]) {
+
+    // create new bitset for this action
+    std::bitset<sf::Keyboard::KeyCount + sf::Mouse::ButtonCount> key_bitset;
+
+    // cycle though keys
     for (auto &input : action["inputs"]) {
 
-      if (input["type"] == "key") {
-        std::string key_string = input["code"];
-        auto key_check = magic_enum::enum_cast<EventFlags>(key_string);
+      // check if input is a keyboard or mouse input, if not error out
+      if (input["type"] == "keyboard") {
+        // check if key is in the map, if not error out
+        auto it = getStringToKeyboardMap().find(input["value"]);
 
-        if (key_check.has_value()) {
-          action_generator |= key_check.value();
+        if (it == getStringToKeyboardMap().end()) {
+          log_handler::ProcessLog(spdlog::level::level_enum::err,
+                                  log_handler::LogCode::kInvalidJSONKey,
+                                  "key " + input["value"].get<std::string>() +
+                                      " is not a valid key enum value");
         } else {
-          // we need the program to terminate if the key does not exist
-          throw std::runtime_error("Key does not exist in the EventFlags enum");
+          // set the bit in the bitset for this key
+          key_bitset.set(static_cast<size_t>(it->second));
         }
 
       } else if (input["type"] == "mouse") {
-      }
-    }
-    // is the action repeatable
-    bool repeatable = action["repeatable"];
-    // add the action to the action map
-    m_action_list.push_back(Action(action_name, action_generator, repeatable));
+        // check if mouse button is in the map, if not error out
+        auto it = getStringToMouseMap().find(input["value"]);
+        if (it == getStringToMouseMap().end()) {
+          log_handler::ProcessLog(spdlog::level::level_enum::err,
+                                  log_handler::LogCode::kInvalidJSONKey,
+                                  "mouse button " +
+                                      input["value"].get<std::string>() +
+                                      " is not a valid mouse enum value");
+        } else {
 
-    std::cout << "Action: " << action_name << " has been registered"
-              << std::endl;
-  }
-};
-
-std::vector<std::shared_ptr<Action>>
-ActionManager::GenerateActions(const EventFlags &event_flags) {
-
-  std::vector<std::shared_ptr<Action>> actionables;
-
-  // exclusion logic
-  for (auto &action : m_action_list) {
-
-    // cast the enums to their underlying type and see if they are equal
-    bool check_flags = static_cast<std::uint64_t>(action.m_action_flags) ==
-                       static_cast<std::uint64_t>(event_flags);
-
-    if (check_flags) {
-
-      // if latch is on and action is not reatable then skip
-      if (action.m_repeatable == false && action.m_latch == true) {
-
-        continue;
-
+          // set the bit in the bitset for this mouse button
+          key_bitset.set(static_cast<size_t>(it->second) +
+                         sf::Keyboard::KeyCount);
+        }
       } else {
-        // set the latch to true
-        action.m_latch = true;
-        actionables.push_back(std::make_shared<Action>(action));
+        log_handler::ProcessLog(spdlog::level::level_enum::err,
+                                log_handler::LogCode::kInvalidJSONKey,
+                                "input type " +
+                                    input["type"].get<std::string>() +
+                                    " is not a valid input type");
       }
+    }
 
-      // if the action is not in the bitset then turn the latch off
+    // check if string action in json is a valid action in the action enum
+    std::string action_name = action["name"];
+    auto action_enum = magic_enum::enum_cast<Actions>(action_name);
+
+    // check if action enum is valid, if not error out
+    if (!action_enum.has_value()) {
+      log_handler::ProcessLog(
+          spdlog::level::level_enum::err, log_handler::LogCode::kInvalidJSONKey,
+          "action name" + action_name + " is not a valid action enum value");
     } else {
-
-      action.m_latch = false;
+      // register the action in the map
+      m_key_to_action_map[key_bitset] = action_enum.value();
     }
   }
-  return actionables;
-};
+}
+////////////////////////////////////////////////////////////
+const Actions ActionManager::GenerateActions(
+    std::bitset<sf::Keyboard::KeyCount + sf::Mouse::ButtonCount> key_bitset) {
+
+  // create an actions bitset
+  Actions actions;
+
+  // cycle through the key to action map and check to see if any of the keys
+  // match
+  for (auto &[key, value] : m_key_to_action_map) {
+    if ((key_bitset & key) == key) {
+
+      // add to current actions
+      actions |= value;
+    }
+  }
+  return actions;
+}
+} // namespace steamrot
