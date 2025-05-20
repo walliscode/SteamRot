@@ -12,7 +12,10 @@ using namespace magic_enum::bitwise_operators;
 namespace steamrot {
 
 ////////////////////////////////////////////////////////////
-ActionManager::ActionManager(json &config) {}
+ActionManager::ActionManager(const json &config) {
+  // register actions from json config object
+  RegisterActions(config);
+}
 
 ////////////////////////////////////////////////////////////
 const std::map<std::string, sf::Keyboard::Key>
@@ -53,7 +56,7 @@ ActionManager::getStringToMouseMap() {
 }
 
 ////////////////////////////////////////////////////////////
-void ActionManager::RegisterActions(json &config) {
+void ActionManager::RegisterActions(const json &config) {
 
   // check config object, error out if incorrect
   if (!config.contains("actions")) {

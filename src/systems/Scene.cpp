@@ -8,8 +8,8 @@ namespace steamrot {
 ////////////////////////////////////////////////////////////
 Scene::Scene(const std::string &name, const size_t &pool_size,
              const json &config_data)
-    : m_name(name), m_action_manager(name), m_entity_manager(pool_size, name),
-      m_id(id_counter++) {}
+    : m_name(name), m_action_manager(config_data["actions"]),
+      m_entity_manager(pool_size, name), m_id(id_counter++) {}
 
 ////////////////////////////////////////////////////////////
 size_t Scene::id_counter = 0;
