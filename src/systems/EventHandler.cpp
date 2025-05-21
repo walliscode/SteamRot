@@ -28,12 +28,12 @@ UserEvents EventHandler::HandleEvents(sf::RenderWindow &window) {
     // handle keyboard events
     else if (event->is<sf::Event::KeyPressed>() ||
              event->is<sf::Event::KeyReleased>()) {
-      HandleKeyboardEvents(event, event_bitsets);
+      HandleKeyboardEvents(event.value(), event_bitsets);
     }
     // handle mouse events
     else if (event->is<sf::Event::MouseButtonPressed>() ||
              event->is<sf::Event::MouseButtonReleased>()) {
-      HandleMouseEvents(event, event_bitsets);
+      HandleMouseEvents(event.value(), event_bitsets);
     }
   }
   return event_bitsets;

@@ -39,7 +39,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/FetchContentModules")
 # scripts to include. to keep top level cmake tidier
 include(fetch_content_modules)
 
-add_subdirectory(include)
+
 add_subdirectory(steamrot)
 add_subdirectory(src)
 add_subdirectory(tests)
