@@ -18,6 +18,6 @@ target_link_libraries(components
   nlohmann_json::nlohmann_json
   SFML::Graphics
   magic_enum::magic_enum
-  steamrot_enums
+  
 )
 

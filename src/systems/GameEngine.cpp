@@ -3,16 +3,15 @@
 ////////////////////////////////////////////////////////////
 
 #include "GameEngine.h"
-#include "DataManager.h"
-#include "spdlog/spdlog.h"
-#include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/Window/Event.hpp>
-#include <SFML/Window/Keyboard.hpp>
 
-#include <SFML/Window/VideoMode.hpp>
+#include "log_handler.h"
+#include "spdlog/common.h"
+
+#include <SFML/Graphics.hpp>
 #include <cstddef>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <magic_enum/magic_enum.hpp>
 #include <magic_enum/magic_enum_iostream.hpp>
 #include <memory>
@@ -24,15 +23,18 @@ using namespace magic_enum::bitwise_operators;
 
 namespace steamrot {
 
-////////////////////////////////////////////////////////////
-GameEngine::GameEngine() : m_display_manager(), m_logger("global_logger") {
+///////////////////////////////////////////////////////////
+GameEngine::GameEngine()
+    : m_display_manager(), m_logger("global_logger"), m_event_handler() {
 
+  std::cout << "GameEngine constructor called" << std::endl;
   // set up data manager so it can be passed to scene manager
   m_data_manager = std::make_shared<DataManager>();
   m_scene_manager = std::make_unique<SceneManager>(m_data_manager);
 
-  // convenience variable for the global logger
-  auto logger = spdlog::get("global_logger");
+  log_handler::ProcessLog(spdlog::level::level_enum::info,
+                          log_handler::LogCode::kNoCode,
+                          "GameEngine constructor called");
 }
 
 ////////////////////////////////////////////////////////////
@@ -46,8 +48,8 @@ void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
     // handle loop number increase at beginning of loop
     m_loop_number++;
 
-    // Handle external input
-    sUserInput();
+    // Handle events
+    m_event_handler.HandleEvents(m_display_manager.GetWindow());
 
     // Handle all system updates
     UpdateSystems();
@@ -67,99 +69,6 @@ void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
   ShutDown();
 };
 
-////////////////////////////////////////////////////////////
-void GameEngine::sUserInput() {
-
-  // Check all the window's events that were triggered since the last iteration
-  // of the loop
-  while (const std::optional event =
-             m_display_manager.GetWindow().pollEvent()) {
-
-    // "close requested" event: we close the window
-    if (event->is<sf::Event::Closed>()) {
-      m_display_manager.GetWindow().close();
-
-    }
-
-    // handle key pressed events
-    else if (const auto *keyPressed = event->getIf<sf::Event::KeyPressed>()) {
-
-      // get the description of the key pressed
-      std::string key_name = sf::Keyboard::getDescription(keyPressed->scancode);
-
-      // check if this string matches any of the event flags
-      auto event_flag = magic_enum::enum_cast<EventFlags>(key_name);
-
-      // if the event_flag has a value (i.e. the key pressed has a match in the
-      // enum), flip flag to on
-      if (event_flag.has_value()) {
-        m_event_flags |= event_flag.value();
-      }
-
-      // some keys need to be handled separately as the physical key pressed and
-      // system interpretation are different check if alt key is pressed
-      if (keyPressed->alt) {
-
-        m_event_flags |= EventFlags::ALT;
-      }
-
-      // check if control key is pressed
-      if (keyPressed->control) {
-
-        m_event_flags |= EventFlags::CONTROL;
-      }
-
-    }
-
-    // handle key released events
-    else if (const auto *keyReleased = event->getIf<sf::Event::KeyReleased>()) {
-      // get the description of the key released
-      std::string key_name =
-          sf::Keyboard::getDescription(keyReleased->scancode);
-
-      // check if this string matches any of the event flags
-      auto event_flag = magic_enum::enum_cast<EventFlags>(key_name);
-
-      // if it matches, then flip flag to off (0)
-      if (event_flag.has_value()) {
-        m_event_flags &= ~event_flag.value();
-      }
-
-      // add in special handling for alt and control keys
-      if (keyReleased->alt) {
-        m_event_flags &= ~EventFlags::ALT;
-      }
-
-      if (keyReleased->control) {
-
-        m_event_flags &= ~EventFlags::CONTROL;
-      }
-    }
-
-    // // handle mouse button pressed events
-    // else if (const auto *mouseButtonPressed =
-    //              event->getIf<sf::Event::MouseButtonPressed>()) {
-    //   // set position on the user input bitset, shift by number of keys
-    //   size_t mouse_button{static_cast<size_t>(mouseButtonPressed->button) +
-    //                       static_cast<size_t>(sf::Keyboard::KeyCount)};
-    //   m_userInput.set(mouse_button);
-    //   // std::cout << "Mouse Button Pressed: " << mouse_button << std::endl;
-    //   // std::cout << "User Input: " << m_userInput << std::endl;
-    // }
-    //
-    // // handle mouse button released events
-    // else if (const auto *mouseButtonReleased =
-    //              event->getIf<sf::Event::MouseButtonReleased>()) {
-    //   // set position on the user input bitset, shift by number of keys
-    //   size_t mouse_button{static_cast<size_t>(mouseButtonReleased->button) +
-    //                       static_cast<size_t>(sf::Keyboard::KeyCount)};
-    //
-    //   m_userInput.reset(mouse_button);
-    //   // std::cout << "Mouse Button Released: " << mouse_button << std::endl;
-    //   // std::cout << "User Input: " << m_userInput << std::endl;
-    // }
-  }
-};
 ////////////////////////////////////////////////////////////
 void GameEngine::UpdateSystems() {
 
@@ -197,7 +106,7 @@ void GameEngine::RunSimulation(int loops) {
 void to_json(json &j, const GameEngine &ge) {
   j = json{{"GameEngine",
             {{"m_loop_number", ge.m_loop_number},
-             {"m_event_flags", ge.m_event_flags},
+
              {"m_scene_manager", *ge.m_scene_manager}}}
 
   };

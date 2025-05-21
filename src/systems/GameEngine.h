@@ -3,7 +3,7 @@
 ////////////////////////////////////////////////////////////
 #include "DataManager.h"
 #include "DisplayManager.h"
-#include "EventFlags.h"
+#include "EventHandler.h"
 #include "Logger.h"
 #include "SceneManager.h"
 #include <SFML/Graphics.hpp>
@@ -22,16 +22,9 @@ private:
   std::unique_ptr<SceneManager> m_scene_manager;
   std::shared_ptr<DataManager> m_data_manager;
   Logger m_logger;
+  EventHandler m_event_handler;
 
   size_t m_loop_number = 0;
-  EventFlags m_event_flags{0};
-
-  ////////////////////////////////////////////////////////////
-  /// \brief Handle external user input
-  ///
-  ////////////////////////////////////////////////////////////
-  void sUserInput();
-
   ////////////////////////////////////////////////////////////
   /// \brief Update all Systems
   ///
