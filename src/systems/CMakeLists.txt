@@ -8,6 +8,7 @@ add_library(systems
     ActionManager.cpp
     MenuScene.cpp
     Logic.cpp
+    EventHandler.cpp
 )
 
 # check if set definitions exist
