@@ -7,6 +7,7 @@
 // Headers
 ////////////////////////////////////////////////////////////
 
+#include "DataManager.h"
 #include "MenuScene.h"
 #include "Scene.h"
 #include "uuid.h"
@@ -14,19 +15,30 @@
 
 namespace steamrot {
 
+enum class SceneType : size_t {
+  menu = 0,
+};
+
 class SceneFactory {
 private:
+  ////////////////////////////////////////////////////////////
+  /// \brief instance of DataManager, keep this here as long as DataManager is
+  /// stateless
+  ///
+  ////////////////////////////////////////////////////////////
+  DataManager m_data_manager;
   ////////////////////////////////////////////////////////////
   /// \brief Create a new Menu Scene
   ///
   ////////////////////////////////////////////////////////////
-  std::shared_ptr<MenuScene> CreateMenuScene(std::string name);
+  std::unique_ptr<MenuScene> CreateMenuScene(json scene_data,
+                                             const uuids::uuid &id);
 
   ////////////////////////////////////////////////////////////
   /// \brief create a uuid if none is in provided json data
   ///
   ////////////////////////////////////////////////////////////
-  const uuids::uuid CreateUUID(json scene_data);
+  const uuids::uuid CreateUUID();
 
 public:
   ////////////////////////////////////////////////////////////
@@ -39,6 +51,6 @@ public:
   /// \brief gathers all scene creation methods
   ///
   ////////////////////////////////////////////////////////////
-  std::shared_ptr<Scene> CreateScene(std::string scene_type, json scene_data);
+  std::unique_ptr<Scene> CreateScene(const SceneType &scene_type);
 };
 } // namespace steamrot

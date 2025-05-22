@@ -7,10 +7,10 @@
 // headers
 ////////////////////////////////////////////////////////////
 #include <SFML/Graphics/RenderTexture.hpp>
-#include <cstddef>
-#include <map>
-#include <memory>
 
+#include <map>
+
+#include <uuid.h>
 namespace steamrot {
 
 class TexturesPackage {
@@ -18,7 +18,7 @@ private:
   ////////////////////////////////////////////////////////////
   // map of scene id to texture
   ////////////////////////////////////////////////////////////
-  std::map<size_t, std::unique_ptr<sf::RenderTexture>> m_texture_map;
+  std::map<uuids::uuid, std::unique_ptr<sf::RenderTexture>> m_texture_map;
 
 public:
   ////////////////////////////////////////////////////////////
@@ -29,12 +29,14 @@ public:
   ////////////////////////////////////////////////////////////
   // |brief get textures
   ////////////////////////////////////////////////////////////
-  const std::map<size_t, std::unique_ptr<sf::RenderTexture>> &GetTextures();
+  const std::map<uuids::uuid, std::unique_ptr<sf::RenderTexture>> &
+  GetTextures();
 
   ////////////////////////////////////////////////////////////
   // |brief add texture
   ////////////////////////////////////////////////////////////
-  void AddTexture(size_t id, std::unique_ptr<sf::RenderTexture>);
+  void AddTexture(const uuids::uuid &scene_id,
+                  std::unique_ptr<sf::RenderTexture>);
 };
 
 } // namespace steamrot

@@ -10,9 +10,8 @@ using json = nlohmann::json;
 namespace steamrot {
 
 ////////////////////////////////////////////////////////////
-EntityManager::EntityManager(const size_t &pool_size,
-                             const std::string &scene_name)
-    : m_entity_configuration_factory(scene_name) {
+EntityManager::EntityManager(const size_t &pool_size)
+    : m_entity_configuration_factory() {
 
   // create the memory pool with the given size
   m_pool =

@@ -13,5 +13,6 @@ target_include_directories(data
 target_link_libraries(data PUBLIC
 nlohmann_json::nlohmann_json
 components
-logger)
+logger
+stduuid)
 

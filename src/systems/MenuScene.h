@@ -18,7 +18,7 @@ public:
   ////////////////////////////////////////////////////////////
   /// \brief default constructor
   ////////////////////////////////////////////////////////////
-  MenuScene(const std::string &name, size_t pool_size, const json &config_data);
+  MenuScene(size_t pool_size, const json &config_data, const uuids::uuid &id);
 
   ////////////////////////////////////////////////////////////
   /// \brief call movement Logic for MenuScene

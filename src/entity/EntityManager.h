@@ -40,7 +40,7 @@ public:
   /// \brief Default constructor
   ///
   ////////////////////////////////////////////////////////////
-  EntityManager(const size_t &pool_size, const std::string &scene_name);
+  EntityManager(const size_t &pool_size);
 
   ////////////////////////////////////////////////////////////
   /// \brief Resuze the memory pool
