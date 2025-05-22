@@ -11,7 +11,6 @@
 #include <cstddef>
 #include <filesystem>
 #include <fstream>
-#include <iostream>
 #include <magic_enum/magic_enum.hpp>
 #include <magic_enum/magic_enum_iostream.hpp>
 #include <memory>
@@ -27,7 +26,6 @@ namespace steamrot {
 GameEngine::GameEngine()
     : m_display_manager(), m_logger("global_logger"), m_event_handler() {
 
-  std::cout << "GameEngine constructor called" << std::endl;
   // set up data manager so it can be passed to scene manager
   m_data_manager = std::make_shared<DataManager>();
   m_scene_manager = std::make_unique<SceneManager>(m_data_manager);

@@ -4,24 +4,50 @@
 #include "SceneFactory.h"
 #include "log_handler.h"
 #include "spdlog/common.h"
+#include "uuid.h"
 #include <memory>
 #include <string>
 
 namespace steamrot {
 ////////////////////////////////////////////////////////////
-SceneFactory::SceneFactory(std::shared_ptr<DataManager> data_manager)
-    : m_data_manager(data_manager) {}
+SceneFactory::SceneFactory() {}
 
 ////////////////////////////////////////////////////////////
-std::shared_ptr<Scene> SceneFactory::CreateScene(std::string name,
-                                                 std::string scene_type) {
+const uuids::uuid SceneFactory::CreateUUID(json scene_data) {
 
-  // create place holder Scene object
-  std::shared_ptr<Scene> new_scene = nullptr;
+  // check if the scene_data has a uuid
+  if (scene_data.contains("uuid")) {
+
+    // get from json
+    std::string uuid_string = scene_data["uuid"].get<std::string>();
+
+    // check if the uuid is valid
+    if (uuids::uuid::is_valid_uuid(uuid_string)) {
+
+      // return uuid and exit function
+      return uuids::uuid::from_string(uuid_string).value();
+    }
+  }
+
+  // taken straight from the uuid library example
+  std::random_device rd;
+  auto seed_data = std::array<int, std::mt19937::state_size>{};
+  std::generate(std::begin(seed_data), std::end(seed_data), std::ref(rd));
+  std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
+  std::mt19937 generator(seq);
+  uuids::uuid_random_generator gen{generator};
+
+  uuids::uuid const id = gen();
+
+  return id;
+}
+////////////////////////////////////////////////////////////
+std::shared_ptr<Scene> SceneFactory::CreateScene(std::string scene_type,
+                                                 json scene_data) {
 
   // use string scene_type to determine which scene to create
   if (scene_type == "menu") {
-    new_scene = CreateMenuScene(name);
+    return CreateMenuScene(name);
   } else {
 
     // this will throw an error if the scene type is not valid
@@ -29,7 +55,6 @@ std::shared_ptr<Scene> SceneFactory::CreateScene(std::string name,
                             log_handler::LogCode::kInvalidStringParamter,
                             "Invalid scene type: " + scene_type);
   }
-  return new_scene;
 }
 
 std::shared_ptr<MenuScene> SceneFactory::CreateMenuScene(std::string name) {

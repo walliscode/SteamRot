@@ -13,7 +13,7 @@
 #include <memory>
 #include <nlohmann/json.hpp>
 #include <string>
-
+#include <uuid.h>
 typedef std::vector<std::shared_ptr<sf::Drawable>> SceneDrawables;
 
 namespace steamrot {
@@ -37,7 +37,8 @@ protected:
   ////////////////////////////////////////////////////////////
   // Member: unique id generated for each Scene instance
   ////////////////////////////////////////////////////////////
-  size_t m_id;
+  uuids::uuid m_id;
+
   bool m_paused = false;
   bool m_active = true;
   std::string m_name;
@@ -48,7 +49,7 @@ protected:
   /// \brief default constructor (only accessible to derived classes)
   ////////////////////////////////////////////////////////////
   Scene(const std::string &name, const size_t &pool_size,
-        const json &config_data);
+        const json &config_data, const uuids::uuid &id);
 
   ////////////////////////////////////////////////////////////
   /// \brief friend function for outputting the Scene to JSON
@@ -85,7 +86,7 @@ public:
   ////////////////////////////////////////////////////////////
   /// \brief return Scene id
   ////////////////////////////////////////////////////////////
-  const size_t GetSceneID();
+  const uuids::uuid GetSceneID();
 };
 
 ////////////////////////////////////////////////////////////
