@@ -5,13 +5,13 @@
 
 namespace steamrot {
 ////////////////////////////////////////////////////////////
-Tile::Tile(size_t scene_id) : m_scene_id(scene_id) {}
+Tile::Tile() {}
 
 ////////////////////////////////////////////////////////////
-void Tile::SetSceneId(size_t scene_id) { m_scene_id = scene_id; }
+void Tile::SetSceneId(const uuids::uuid &scene_id) { m_scene_id = scene_id; }
 
 ////////////////////////////////////////////////////////////
-const size_t Tile::GetSceneId() const { return m_scene_id; }
+const uuids::uuid Tile::GetSceneId() const { return m_scene_id; }
 
 ////////////////////////////////////////////////////////////
 sf::View &Tile::GetView() { return m_view; }

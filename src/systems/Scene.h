@@ -12,8 +12,8 @@
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <memory>
 #include <nlohmann/json.hpp>
-#include <string>
 
+#include <uuid.h>
 typedef std::vector<std::shared_ptr<sf::Drawable>> SceneDrawables;
 
 namespace steamrot {
@@ -37,18 +37,19 @@ protected:
   ////////////////////////////////////////////////////////////
   // Member: unique id generated for each Scene instance
   ////////////////////////////////////////////////////////////
-  size_t m_id;
+  uuids::uuid m_id;
+
   bool m_paused = false;
   bool m_active = true;
-  std::string m_name;
+
   bool m_interactable = false;
   size_t m_current_frame = 0;
 
   ////////////////////////////////////////////////////////////
   /// \brief default constructor (only accessible to derived classes)
   ////////////////////////////////////////////////////////////
-  Scene(const std::string &name, const size_t &pool_size,
-        const json &config_data);
+  Scene(const size_t &pool_size, const json &config_data,
+        const uuids::uuid &id);
 
   ////////////////////////////////////////////////////////////
   /// \brief friend function for outputting the Scene to JSON
@@ -57,6 +58,7 @@ protected:
   friend void to_json(nlohmann::json &j, const Scene &scene);
 
 public:
+  virtual ~Scene() = default;
   ////////////////////////////////////////////////////////////
   /// \brief function container for all movement related logic
   ///
@@ -85,7 +87,7 @@ public:
   ////////////////////////////////////////////////////////////
   /// \brief return Scene id
   ////////////////////////////////////////////////////////////
-  const size_t GetSceneID();
+  const uuids::uuid GetSceneID();
 };
 
 ////////////////////////////////////////////////////////////

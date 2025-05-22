@@ -9,9 +9,9 @@
 
 namespace steamrot {
 ////////////////////////////////////////////////////////////
-MenuScene::MenuScene(const std::string &name, size_t pool_size,
-                     const json &config_data)
-    : Scene(name, pool_size, config_data) {}
+MenuScene::MenuScene(size_t pool_size, const json &config_data,
+                     const uuids::uuid &id)
+    : Scene(pool_size, config_data, id) {}
 
 ////////////////////////////////////////////////////////////
 void MenuScene::sMovement() {};

@@ -10,24 +10,18 @@
 
 #include <memory>
 #include <nlohmann/json.hpp>
-#include <string>
 
 using json = nlohmann::json;
 namespace steamrot {
 
 class EntityConfigurationFactory {
 private:
-  ////////////////////////////////////////////////////////////
-  // Member data
-  ////////////////////////////////////////////////////////////
-  std::string m_scene_id;
-
 public:
   ////////////////////////////////////////////////////////////
   /// |brief Default constructor
   ///
   ////////////////////////////////////////////////////////////
-  EntityConfigurationFactory(const std::string &scene_id);
+  EntityConfigurationFactory();
 
   ////////////////////////////////////////////////////////////
   /// |brief Configure entities (overload this function per data type)

@@ -11,17 +11,18 @@
 
 #include "SceneFactory.h"
 #include "TexturesPackage.h"
+#include "uuid.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Event.hpp>
 
 #include <memory>
 #include <nlohmann/json.hpp>
+#include <unordered_map>
 
 using json = nlohmann::json;
 
 namespace steamrot {
 
-typedef std::map<std::string, std::shared_ptr<Scene>> SceneList;
 class SceneManager {
 private:
   ////////////////////////////////////////////////////////////
@@ -29,22 +30,20 @@ private:
   ////////////////////////////////////////////////////////////
   SceneFactory m_scene_factory;
 
-  SceneList m_all_scenes;
-  SceneList m_active_scenes;
-  SceneList m_inactive_scenes;
-  SceneList m_interactive_scenes;
+  ////////////////////////////////////////////////////////////
+  // |brief map of uuid to Scene
+  ////////////////////////////////////////////////////////////
+  std::unordered_map<uuids::uuid, std::unique_ptr<Scene>> m_scenes;
   AssetManager m_asset_manager;
 
-  std::shared_ptr<DataManager> m_data_manager;
-  // to_json needs access to private members
-  friend void to_json(json &j, const SceneManager &scene_manager);
+  DataManager m_data_manager;
 
 public:
   ////////////////////////////////////////////////////////////
   /// \brief Default constructor
   ///
   ////////////////////////////////////////////////////////////
-  SceneManager(std::shared_ptr<DataManager> data_manager);
+  SceneManager();
 
   ////////////////////////////////////////////////////////////
   /// \brief start up the SceneManager for the game
@@ -59,51 +58,15 @@ public:
   void UpdateScenes();
 
   ////////////////////////////////////////////////////////////
-  /// \brief Add a new scene
+  /// \brief Add a new scene from default data
   ///
   ////////////////////////////////////////////////////////////
-  void AddScene(std::string tag, std::string scene_type, size_t pool_size);
-
-  ////////////////////////////////////////////////////////////
-  /// \brief Remove a Scene
-  ///
-  ////////////////////////////////////////////////////////////
-  void RemoveScene(std::string tag);
-
-  ////////////////////////////////////////////////////////////
-  /// \brief Activate a Scene for continued calculations
-  ///
-  ////////////////////////////////////////////////////////////
-  void ActivateScene(std::string tag);
-
-  ////////////////////////////////////////////////////////////
-  /// \brief Deactivate a Scene to stop calculations
-  ///
-  ////////////////////////////////////////////////////////////
-  void DeactivateScene(std::string tag);
-
-  ////////////////////////////////////////////////////////////
-  /// \brief Allow Scene to respond to user input
-  ///
-  ////////////////////////////////////////////////////////////
-  void MakeInteractive();
-
-  ////////////////////////////////////////////////////////////
-  /// \brief Stop Scene from responding to user input
-  ///
-  ////////////////////////////////////////////////////////////
-  void MakeNonInteractive();
+  void AddSceneFromDefault(const SceneType &scene_type, size_t pool_size);
 
   ////////////////////////////////////////////////////////////
   /// \brief collate textures from relevant scenes and provide as package
   ////////////////////////////////////////////////////////////
   TexturesPackage ProvideTexturesPackage();
 };
-
-////////////////////////////////////////////////////////////
-/// \brief to_json functionality provided by nlohmann/json
-///
-////////////////////////////////////////////////////////////
-void to_json(json &j, const SceneManager &scene_manager);
 
 } // namespace steamrot

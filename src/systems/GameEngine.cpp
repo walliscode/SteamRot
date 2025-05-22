@@ -9,15 +9,11 @@
 
 #include <SFML/Graphics.hpp>
 #include <cstddef>
-#include <filesystem>
-#include <fstream>
-#include <iostream>
+
 #include <magic_enum/magic_enum.hpp>
 #include <magic_enum/magic_enum_iostream.hpp>
 #include <memory>
 #include <stdexcept>
-
-namespace fs = std::filesystem;
 
 using namespace magic_enum::bitwise_operators;
 
@@ -25,12 +21,10 @@ namespace steamrot {
 
 ///////////////////////////////////////////////////////////
 GameEngine::GameEngine()
-    : m_display_manager(), m_logger("global_logger"), m_event_handler() {
+    : m_display_manager(), m_data_manager(), m_logger("global_logger"),
+      m_event_handler() {
 
-  std::cout << "GameEngine constructor called" << std::endl;
-  // set up data manager so it can be passed to scene manager
-  m_data_manager = std::make_shared<DataManager>();
-  m_scene_manager = std::make_unique<SceneManager>(m_data_manager);
+  m_scene_manager = std::make_unique<SceneManager>();
 
   log_handler::ProcessLog(spdlog::level::level_enum::info,
                           log_handler::LogCode::kNoCode,
@@ -103,49 +97,7 @@ void GameEngine::RunSimulation(int loops) {
 }
 
 ////////////////////////////////////////////////////////////
-void to_json(json &j, const GameEngine &ge) {
-  j = json{{"GameEngine",
-            {{"m_loop_number", ge.m_loop_number},
-
-             {"m_scene_manager", *ge.m_scene_manager}}}
-
-  };
-};
-
-////////////////////////////////////////////////////////////
-void GameEngine::ExportSimulationData(const std::string &file_name) {
-
-  // create directory if it does not exist
-  fs::create_directories(DATA_OUT_DIR);
-
-  // create file name with json extension
-  std::string full_file_name = file_name + ".json";
-
-  // create path to file
-  fs::path json_file_path = fs::path(DATA_OUT_DIR) / full_file_name;
-
-  // create ifstream object
-  std::ofstream json_file(json_file_path);
-
-  // check if file exists
-  if (!fs::exists(json_file_path)) {
-    throw std::runtime_error("File does not exist");
-  }
-
-  // add to open file
-  if (json_file.is_open()) {
-
-    // create json object
-    json j = *this;
-
-    // write json object to file
-    json_file << j;
-    // close file
-    json_file.close();
-  } else {
-    throw std::runtime_error("Could not open file");
-  }
-}
+void GameEngine::ExportSimulationData(const std::string &file_name) {}
 
 void GameEngine::ShutDown() {
 

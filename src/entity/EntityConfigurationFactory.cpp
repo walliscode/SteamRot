@@ -8,9 +8,7 @@
 #include <tuple>
 namespace steamrot {
 ////////////////////////////////////////////////////////////
-EntityConfigurationFactory::EntityConfigurationFactory(
-    const std::string &scene_id)
-    : m_scene_id(scene_id) {}
+EntityConfigurationFactory::EntityConfigurationFactory() {};
 
 ////////////////////////////////////////////////////////////
 void EntityConfigurationFactory::ConfigureEntities(

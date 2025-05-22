@@ -6,38 +6,51 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
+
 #include "DataManager.h"
 #include "MenuScene.h"
 #include "Scene.h"
+#include "uuid.h"
 #include <memory>
 
 namespace steamrot {
 
+enum class SceneType : size_t {
+  menu = 0,
+};
+
 class SceneFactory {
 private:
   ////////////////////////////////////////////////////////////
-  /// \brief pointer to data manager in Game Engine
+  /// \brief instance of DataManager, keep this here as long as DataManager is
+  /// stateless
   ///
   ////////////////////////////////////////////////////////////
-  std::shared_ptr<DataManager> m_data_manager;
-
+  DataManager m_data_manager;
   ////////////////////////////////////////////////////////////
   /// \brief Create a new Menu Scene
   ///
   ////////////////////////////////////////////////////////////
-  std::shared_ptr<MenuScene> CreateMenuScene(std::string name);
+  std::unique_ptr<MenuScene> CreateMenuScene(json scene_data,
+                                             const uuids::uuid &id);
+
+  ////////////////////////////////////////////////////////////
+  /// \brief create a uuid if none is in provided json data
+  ///
+  ////////////////////////////////////////////////////////////
+  const uuids::uuid CreateUUID();
 
 public:
   ////////////////////////////////////////////////////////////
   /// \brief Default constructor
   ///
   ////////////////////////////////////////////////////////////
-  SceneFactory(std::shared_ptr<DataManager> data_manager);
+  SceneFactory();
   ;
   ////////////////////////////////////////////////////////////
   /// \brief gathers all scene creation methods
   ///
   ////////////////////////////////////////////////////////////
-  std::shared_ptr<Scene> CreateScene(std::string name, std::string scene_type);
+  std::unique_ptr<Scene> CreateScene(const SceneType &scene_type);
 };
 } // namespace steamrot

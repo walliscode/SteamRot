@@ -2,42 +2,53 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "SceneFactory.h"
-#include "log_handler.h"
-#include "spdlog/common.h"
+#include "MenuScene.h"
+#include "magic_enum/magic_enum.hpp"
+#include "uuid.h"
 #include <memory>
 #include <string>
 
 namespace steamrot {
 ////////////////////////////////////////////////////////////
-SceneFactory::SceneFactory(std::shared_ptr<DataManager> data_manager)
-    : m_data_manager(data_manager) {}
+SceneFactory::SceneFactory() : m_data_manager() {}
 
 ////////////////////////////////////////////////////////////
-std::shared_ptr<Scene> SceneFactory::CreateScene(std::string name,
-                                                 std::string scene_type) {
+const uuids::uuid SceneFactory::CreateUUID() {
 
-  // create place holder Scene object
-  std::shared_ptr<Scene> new_scene = nullptr;
+  // taken straight from the uuid library example
+  std::random_device rd;
+  auto seed_data = std::array<int, std::mt19937::state_size>{};
+  std::generate(std::begin(seed_data), std::end(seed_data), std::ref(rd));
+  std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
+  std::mt19937 generator(seq);
+  uuids::uuid_random_generator gen{generator};
 
-  // use string scene_type to determine which scene to create
-  if (scene_type == "menu") {
-    new_scene = CreateMenuScene(name);
-  } else {
+  uuids::uuid const id = gen();
 
-    // this will throw an error if the scene type is not valid
-    log_handler::ProcessLog(spdlog::level::level_enum::err,
-                            log_handler::LogCode::kInvalidStringParamter,
-                            "Invalid scene type: " + scene_type);
+  return id;
+}
+////////////////////////////////////////////////////////////
+std::unique_ptr<Scene> SceneFactory::CreateScene(const SceneType &scene_type) {
+
+  // generate UUID for the scene
+  uuids::uuid scene_uuid = CreateUUID();
+
+  // load scene data
+  json scene_data = m_data_manager.LoadSceneDataFromJson(
+      magic_enum::enum_name(scene_type).data());
+
+  if (scene_type == SceneType::menu) {
+    return CreateMenuScene(scene_data, scene_uuid);
   }
-  return new_scene;
+  // not sure how it would be possible to get here, maybe some kind of cast from
+  // size_t
+  return nullptr;
 }
 
-std::shared_ptr<MenuScene> SceneFactory::CreateMenuScene(std::string name) {
-  // get the entity config data from the data manager
-  json config_data;
-
+std::unique_ptr<MenuScene>
+SceneFactory::CreateMenuScene(json scene_data, const uuids::uuid &scene_uuid) {
   // create a new menu scene object
-  return std::make_shared<MenuScene>(name, 100, config_data);
+  return std::make_unique<MenuScene>(100, scene_data, scene_uuid);
 }
 
 } // namespace steamrot

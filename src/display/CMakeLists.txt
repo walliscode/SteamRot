@@ -17,5 +17,6 @@ target_link_libraries(display PUBLIC
     nlohmann_json::nlohmann_json
     magic_enum
     systems
+    stduuid
 
 )
