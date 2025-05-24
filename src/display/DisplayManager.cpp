@@ -2,6 +2,7 @@
 // headers
 ////////////////////////////////////////////////////////////
 #include "DisplayManager.h"
+#include "Session.h"
 
 ////////////////////////////////////////////////////////////
 // namespaces/using
@@ -9,9 +10,8 @@
 namespace steamrot {
 
 ///////////////////////////////////////////////////////////
-DisplayManager::DisplayManager() {
-
-};
+DisplayManager::DisplayManager()
+    : m_active_session(std::make_shared<Session>()) {};
 
 ///////////////////////////////////////////////////////////
 void DisplayManager::SetWindowConfig(const json &config) {
@@ -37,11 +37,14 @@ sf::RenderWindow &DisplayManager::GetWindow() { return m_window; };
 void DisplayManager::Render(TexturesPackage &textures_package) {
 
   // clear the window with the background color, this always be at the start
-  m_window.clear();
+  m_window.clear(sf::Color::Magenta);
 
   // get tiles from active session
+  if (!m_active_session) {
+    throw std::runtime_error("No active session set for DisplayManager");
+  }
   auto tiles = m_active_session->GetTiles();
-
+  //
   // get the tile overlay texture from the textures package
   for (auto &tile : tiles) {
 

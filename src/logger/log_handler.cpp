@@ -3,6 +3,7 @@
 ////////////////////////////////////////////////////////////
 #include "log_handler.h"
 #include "spdlog/spdlog.h"
+#include <iostream>
 
 namespace steamrot {
 namespace log_handler {
@@ -14,6 +15,7 @@ void ProcessLog(const spdlog::level::level_enum &log_level,
     ProcessInfoLog(log_code, message);
     break;
   case spdlog::level::err:
+    std::cout << " logging error" << std::endl;
     ProcessErrorLog(log_code, message);
     break;
   default:
@@ -42,7 +44,7 @@ void ProcessErrorLog(const LogCode &log_level, const std::string &message) {
   spdlog::get("global_logger")->error("Finished.");
 
   spdlog::drop("global_logger");
-
+  std::cout << "error being thrown" << std::endl;
   // throw exception to cause call back on stack
   throw std::runtime_error(message);
 };

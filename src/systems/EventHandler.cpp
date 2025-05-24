@@ -23,7 +23,8 @@ UserEvents EventHandler::HandleEvents(sf::RenderWindow &window) {
 
     // if the event is a close event, set the close window flag to true
     if (event->is<sf::Event::Closed>()) {
-      m_close_window = true;
+      window.close();
+
     }
     // handle keyboard events
     else if (event->is<sf::Event::KeyPressed>() ||
