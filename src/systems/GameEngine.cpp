@@ -113,7 +113,6 @@ void GameEngine::RunSimulation(int loops) {
 }
 
 ////////////////////////////////////////////////////////////
-void GameEngine::ExportSimulationData(const std::string &file_name) {}
 
 void GameEngine::ShutDown() {
 

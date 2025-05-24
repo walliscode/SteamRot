@@ -20,12 +20,6 @@ endif()
 # Always enforce the language constraint
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# add compiler definitions
-add_compile_definitions(
-  RESOURCES_DIR="${CMAKE_SOURCE_DIR}/resources"
-  DATA_OUT_DIR="${CMAKE_SOURCE_DIR}/data"
-)
-
 # make sure the data output directory exists
 if (NOT EXISTS ${DATA_OUT_DIR})
   file(MAKE_DIRECTORY ${DATA_OUT_DIR})
