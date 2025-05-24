@@ -19,6 +19,8 @@ typedef std::vector<std::shared_ptr<sf::Drawable>> SceneDrawables;
 namespace steamrot {
 
 class Scene {
+  friend class SceneFactory;
+
 protected:
   ////////////////////////////////////////////////////////////
   // Member: Entity Manager instance
