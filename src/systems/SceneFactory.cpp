@@ -2,7 +2,7 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "SceneFactory.h"
-#include "MenuScene.h"
+
 #include "magic_enum/magic_enum.hpp"
 #include "uuid.h"
 #include <memory>
@@ -47,8 +47,11 @@ std::unique_ptr<Scene> SceneFactory::CreateScene(const SceneType &scene_type) {
 
 std::unique_ptr<MenuScene>
 SceneFactory::CreateMenuScene(json scene_data, const uuids::uuid &scene_uuid) {
-  // create a new menu scene object
-  return std::make_unique<MenuScene>(100, scene_data, scene_uuid);
+  // create a new menu scene object, we are creating a raw pointer here due to
+  // MenuScene having a private constuctor
+  std::unique_ptr<MenuScene> menu_scene(
+      new MenuScene(100, scene_data, scene_uuid));
+  return menu_scene;
 }
 
 } // namespace steamrot
