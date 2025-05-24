@@ -1,10 +1,12 @@
 #pragma once
 
 #include "ArchetypeManager.h"
-#include "TypeDefs.h"
+
 #include "containers.h"
 #include <bitset>
 #include <memory>
+
+using EntityIndicies = std::vector<size_t>;
 
 template <typename... AllComponentTypes> class Logic {
 public:
