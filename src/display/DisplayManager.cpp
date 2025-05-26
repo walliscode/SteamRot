@@ -11,7 +11,12 @@ namespace steamrot {
 
 ///////////////////////////////////////////////////////////
 DisplayManager::DisplayManager()
-    : m_active_session(std::make_shared<Session>()) {};
+    : m_active_session(std::make_shared<Session>()), m_data_manager(),
+      m_ui_engine() {
+
+        // load theme data for to intilialize the UI engine
+        // m_ui_engine = UIEngine(m_data_manager.LoadThemeData("default"));
+      };
 
 ///////////////////////////////////////////////////////////
 void DisplayManager::SetWindowConfig(const json &config) {
@@ -48,13 +53,15 @@ void DisplayManager::Render(TexturesPackage &textures_package) {
   // get the tile overlay texture from the textures package
   for (auto &tile : tiles) {
 
-    // check if id is in the textures package
-    auto tile_texture = textures_package.GetTextures().find(tile->GetSceneId());
+    // check if held scene id is in the textures package
+    auto scene_texture =
+        textures_package.GetTextures().find(tile->GetSceneId());
 
-    if (tile_texture != textures_package.GetTextures().end()) {
+    // if yes, then draw the scene texture to that tile
+    if (scene_texture != textures_package.GetTextures().end()) {
 
       // create sprite from tile texture
-      sf::Sprite tile_sprite{tile_texture->second->getTexture()};
+      sf::Sprite tile_sprite{scene_texture->second->getTexture()};
 
       // draw the sprite to the window
       m_window.draw(tile_sprite);

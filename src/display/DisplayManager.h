@@ -7,9 +7,10 @@
 // headers
 ////////////////////////////////////////////////////////////
 #include "ActionManager.h"
+#include "DataManager.h"
 #include "Session.h"
 #include "TexturesPackage.h"
-
+#include "UIEngine.h"
 #include "global_constants.h"
 #include <SFML/Graphics.hpp>
 
@@ -34,6 +35,16 @@ private:
   std::shared_ptr<Session> m_active_session;
   json m_tile_config;
   sf::RenderTexture m_tile_overlay;
+
+  ////////////////////////////////////////////////////////////
+  // Member: DataManager for loading and saving data
+  ////////////////////////////////////////////////////////////
+  DataManager m_data_manager;
+
+  ////////////////////////////////////////////////////////////
+  // Member: UIengine (for handling UI elements for tiles)
+  ////////////////////////////////////////////////////////////
+  UIEngine m_ui_engine;
 
 public:
   ////////////////////////////////////////////////////////////

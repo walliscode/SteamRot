@@ -43,7 +43,7 @@ json DataManager::LoadJsonData(const std::filesystem::path &file_path) {
 json DataManager::LoadSceneDataFromJson(std::string scene_identifier) {
 
   // load schema data for scene from file
-  json scene_schema = LoadJsonData(getSceneFolder() / "scene.schema.json");
+  json scene_schema = LoadJsonData(getSchemaFolder() / "scene.schema.json");
 
   // create SchemaChecker object
   SchemaChecker schema_checker(scene_schema);
@@ -57,5 +57,17 @@ json DataManager::LoadSceneDataFromJson(std::string scene_identifier) {
 
   return scene_data;
 }
-
+////////////////////////////////////////////////////////////
+json DataManager::LoadThemeData(const std::string &theme_name) {
+  // load schema data for theme from file
+  json theme_schema = LoadJsonData(getSchemaFolder() / "theme.schema.json");
+  // create SchemaChecker object
+  SchemaChecker schema_checker(theme_schema);
+  // load theme data from file
+  json theme_data =
+      LoadJsonData(getThemesFolder() / (theme_name + ".data.json"));
+  // check theme data against schema (error checking in function)
+  schema_checker.CheckJSON(theme_data);
+  return theme_data;
+}
 } // namespace steamrot
