@@ -2,6 +2,7 @@ add_library(components
 
 CMeta.cpp
 CShape.cpp
+CUserInterface.cpp
 
 )
 
@@ -18,6 +19,6 @@ target_link_libraries(components
   nlohmann_json::nlohmann_json
   SFML::Graphics
   magic_enum::magic_enum
-  
+
 )
 
