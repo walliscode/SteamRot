@@ -17,6 +17,8 @@ SchemaChecker::SchemaChecker(nlohmann::json schema) {
 
 ////////////////////////////////////////////////////////////
 void SchemaChecker::ValidateJSONSchema(const nlohmann::json &schema) {
+  log_handler::ProcessInfoLog(log_handler::LogCode::kNoCode,
+                              "Validating JSON schema...");
   // check if schema is not an object, handle as error
   if (!schema.is_object()) {
 
@@ -28,28 +30,33 @@ void SchemaChecker::ValidateJSONSchema(const nlohmann::json &schema) {
   // check all keys are valid
   for (const auto &item : schema.items()) {
 
-    // set values
-    std::string type = item.value();
-    std::string key = item.key();
+    // check types of the values
+    auto &type = item.value();
 
-    // check if value is valid type
-    if (valid_schema_types.find(type) == valid_schema_types.end()) {
+    // if type is string then it indicates raw data type, so we check it is
+    // allowed
+    if (type.is_string()) {
 
-      log_handler::ProcessErrorLog(log_handler::LogCode::kInvalidJSONValue,
-                                   "Invalid type in schema: " + type);
+      if (valid_schema_types.find(type) == valid_schema_types.end()) {
+
+        log_handler::ProcessErrorLog(log_handler::LogCode::kInvalidJSONValue,
+                                     &"Invalid type in schema: "[type]);
+      }
     }
-
     // if type is array, iterate with a recursive call to check each item
-    if (type == "array") {
+    if (type.is_array()) {
       for (const auto &object : item.value()) {
         ValidateJSONSchema(object);
       }
 
       // if type is object, iterate with a recursive call to check each item
-    } else if (type == "object") {
+    } else if (type.is_object()) {
       ValidateJSONSchema(item.value());
     }
   }
+  // log info message that schema is valid
+  log_handler::ProcessInfoLog(log_handler::LogCode::kNoCode,
+                              "JSON schema is valid.");
 }
 ////////////////////////////////////////////////////////////
 void SchemaChecker::CreateJSONSchema(const nlohmann::json &schema) {

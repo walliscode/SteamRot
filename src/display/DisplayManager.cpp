@@ -3,6 +3,7 @@
 ////////////////////////////////////////////////////////////
 #include "DisplayManager.h"
 #include "Session.h"
+#include <iostream>
 
 ////////////////////////////////////////////////////////////
 // namespaces/using
@@ -14,9 +15,13 @@ DisplayManager::DisplayManager()
     : m_active_session(std::make_shared<Session>()), m_data_manager(),
       m_ui_engine() {
 
-        // load theme data for to intilialize the UI engine
-        // m_ui_engine = UIEngine(m_data_manager.LoadThemeData("default"));
-      };
+  // load theme data for to intilialize the UI engine
+  std::cout << "Loading theme data for UI engine..." << std::endl;
+
+  json theme_data = m_data_manager.LoadThemeData("default");
+  std::cout << "Theme data loaded successfully." << std::endl;
+  m_ui_engine = UIEngine(theme_data);
+};
 
 ///////////////////////////////////////////////////////////
 void DisplayManager::SetWindowConfig(const json &config) {

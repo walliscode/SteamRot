@@ -15,7 +15,7 @@ void ProcessLog(const spdlog::level::level_enum &log_level,
     ProcessInfoLog(log_code, message);
     break;
   case spdlog::level::err:
-    std::cout << " logging error" << std::endl;
+    std::cout << " logging error: " << message << std::endl;
     ProcessErrorLog(log_code, message);
     break;
   default:
