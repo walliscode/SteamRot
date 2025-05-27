@@ -3,11 +3,8 @@
 ////////////////////////////////////////////////////////////
 
 #include "GameEngine.h"
-
 #include "EventHandler.h"
 #include "log_handler.h"
-
-#include "spdlog/spdlog.h"
 
 #include <SFML/Graphics.hpp>
 #include <cstddef>
@@ -23,8 +20,7 @@ namespace steamrot {
 
 ///////////////////////////////////////////////////////////
 GameEngine::GameEngine()
-    : m_display_manager(), m_data_manager(), m_logger("global_logger"),
-      m_event_handler() {
+    : m_display_manager(), m_data_manager(), m_event_handler() {
 
   m_scene_manager = std::make_unique<SceneManager>();
 
@@ -38,43 +34,36 @@ void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
   // this should be the only try/catch block in the program. for now it will
   // just log the error and exit the program, but in the future it could be used
   // to handle errors more gracefully
-  try {
-    // set up resources
-    m_scene_manager->StartUp();
 
-    // Run the program as long as the window is open
-    while (m_display_manager.GetWindow().isOpen()) {
+  // set up resources
+  m_scene_manager->StartUp();
 
-      // // handle loop number increase at beginning of loop
-      // m_loop_number++;
-      //
-      // Handle events and return map of user events
-      UserEvents user_events =
-          m_event_handler.HandleEvents(m_display_manager.GetWindow());
-      //
-      // // Handle all system updates
-      // UpdateSystems();
-      //
-      // Render all game drawables
-      sRender();
+  // Run the program as long as the window is open
+  while (m_display_manager.GetWindow().isOpen()) {
 
-      // statement to test whether to break the loop, must be called at end
-      // if (numLoops > 0 && m_loop_number >= numLoops) {
-      //   // export data to json, first variable is the directory name, second
-      //   is
-      //   // the file name
-      //   ExportSimulationData("test");
-      //   break;
-      // };
-    }
-  } catch (const std::exception &e) {
+    // // handle loop number increase at beginning of loop
+    // m_loop_number++;
+    //
+    // Handle events and return map of user events
+    UserEvents user_events =
+        m_event_handler.HandleEvents(m_display_manager.GetWindow());
+    //
+    // // Handle all system updates
+    // UpdateSystems();
+    //
+    // Render all game drawables
+    sRender();
 
-    spdlog::get("global_logger")->error("Exception: {}", e.what());
-
-  } catch (...) {
-
-    spdlog::get("global_logger")->error("Unknown exception occurred");
+    // statement to test whether to break the loop, must be called at end
+    // if (numLoops > 0 && m_loop_number >= numLoops) {
+    //   // export data to json, first variable is the directory name, second
+    //   is
+    //   // the file name
+    //   ExportSimulationData("test");
+    //   break;
+    // };
   }
+
   // Shut down the game engine
   ShutDown();
 };
@@ -114,10 +103,6 @@ void GameEngine::RunSimulation(int loops) {
 
 ////////////////////////////////////////////////////////////
 
-void GameEngine::ShutDown() {
-
-  // shut down global logger
-  m_logger.CloseLogger();
-}
+void GameEngine::ShutDown() {}
 
 } // namespace steamrot

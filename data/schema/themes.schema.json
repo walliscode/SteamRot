@@ -1,0 +1,79 @@
+{
+  "UIObjects": {
+    "dropDownMenu": {
+      "inactive": {
+        "backgroundColor": {
+          "r": "int",
+          "g": "int",
+          "b": "int"
+        },
+        "textColor": {
+          "r": "int",
+          "g": "int",
+          "b": "int"
+        },
+        "borderColor": {
+          "r": "int",
+          "g": "int",
+          "b": "int"
+        }
+      },
+      "active": {
+        "backgroundColor": {
+          "r": "int",
+          "g": "int",
+          "b": "int"
+        },
+        "textColor": {
+          "r": "int",
+          "g": "int",
+          "b": "int"
+        },
+        "borderColor": {
+          "r": "int",
+          "g": "int",
+          "b": "int"
+        }
+      }
+    }
+  },
+  "buttons": {
+    "add": {
+      "backgroundColor": {
+        "r": "int",
+        "g": "int",
+        "b": "int"
+      },
+      "textColor": {
+        "r": "int",
+        "g": "int",
+        "b": "int"
+      },
+      "borderColor": {
+        "r": "int",
+        "g": "int",
+        "b": "int"
+      }
+    },
+    "remove": {
+      "backgroundColor": {
+        "r": "int",
+        "g": "int",
+        "b": "int"
+      },
+      "textColor": {
+        "r": "int",
+        "g": "int",
+        "b": "int"
+      },
+      "borderColor": {
+        "r": "int",
+        "g": "int",
+        "b": "int"
+      }
+    }
+  },
+  "font": {
+    "name": "string"
+  }
+}

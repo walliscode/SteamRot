@@ -1,0 +1,40 @@
+{
+  "UIObjects": {
+    "buttons": {
+      "add": {
+        "backgroundColor": {
+          "r": 0,
+          "g": 128,
+          "b": 0
+        },
+        "textColor": {
+          "r": 255,
+          "g": 255,
+          "b": 255
+        },
+        "borderColor": {
+          "r": 0,
+          "g": 100,
+          "b": 0
+        }
+      },
+      "remove": {
+        "backgroundColor": {
+          "r": 255,
+          "g": 0,
+          "b": 0
+        },
+        "textColor": {
+          "r": 255,
+          "g": 255,
+          "b": 255
+        },
+        "borderColor": {
+          "r": 200,
+          "g": 0,
+          "b": 0
+        }
+      }
+    }
+  }
+}

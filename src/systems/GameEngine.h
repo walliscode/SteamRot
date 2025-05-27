@@ -4,7 +4,7 @@
 #include "DataManager.h"
 #include "DisplayManager.h"
 #include "EventHandler.h"
-#include "Logger.h"
+
 #include "SceneManager.h"
 #include <SFML/Graphics.hpp>
 
@@ -21,7 +21,6 @@ private:
   DisplayManager m_display_manager;
   std::unique_ptr<SceneManager> m_scene_manager;
   DataManager m_data_manager;
-  Logger m_logger;
   EventHandler m_event_handler;
 
   size_t m_loop_number = 0;
