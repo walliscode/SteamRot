@@ -10,4 +10,6 @@ target_link_libraries(UIEngine
     PUBLIC
         SFML::Graphics
         nlohmann_json::nlohmann_json
-components)
+components
+flatbuffers_headers
+)

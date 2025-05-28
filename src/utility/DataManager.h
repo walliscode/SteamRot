@@ -23,6 +23,11 @@ private:
   void CheckFileExists(const std::filesystem::path &file_path);
 
   ////////////////////////////////////////////////////////////
+  /// \brief load binary data from file and return as vector of chars
+  ////////////////////////////////////////////////////////////
+  std::vector<uint8_t> LoadBinaryData(const std::filesystem::path &file_path);
+
+  ////////////////////////////////////////////////////////////
   /// \brief load JSON data from file and return json object
   ///
   ////////////////////////////////////////////////////////////
@@ -48,7 +53,7 @@ public:
   json LoadSceneDataFromJson(std::string scene_identifier);
 
   ////////////////////////////////////////////////////////////
-  /// \brief Load theme data for UI engine
+  /// \brief Load theme data for UI engine as json
   ////////////////////////////////////////////////////////////
   json LoadThemeData(const std::string &theme_name);
 };
