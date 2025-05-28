@@ -9,7 +9,7 @@ target_include_directories(SteamRot PUBLIC
 
 target_link_libraries(SteamRot PUBLIC
     systems
-
+    flatbuffers
 )
 
 
