@@ -1,5 +1,5 @@
 
-cmake_minimum_required (VERSION 3.31)
+cmake_minimum_required (VERSION 3.31 FATAL_ERROR)
 
 project(SteamRot
      VERSION 0.1.0.0
@@ -29,6 +29,8 @@ endif()
 # set the cmake module path (for import libraries and other cmake files)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/FetchContentModules")
 
+# set project wide locations
+set(DATA_DIR "${CMAKE_SOURCE_DIR}/data")
 # fetch_content_modules.cmake contains a menu list of all fetch content
 # scripts to include. to keep top level cmake tidier
 include(fetch_content_modules)

@@ -1,0 +1,20 @@
+namespace steamrot.themes; 
+
+struct Color {
+    r:ubyte;
+    g:ubyte;
+    b:ubyte;
+    a:ubyte;
+  }
+
+
+table Button {
+  background_color: Color;
+  text_color: Color;
+  border_color: Color;
+  }
+
+table UIObjects {
+    button: Button;
+  }
+root_type UIObjects;

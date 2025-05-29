@@ -29,6 +29,9 @@ target_include_directories(utilities
 target_link_libraries(utilities PUBLIC
 nlohmann_json::nlohmann_json
 data
-logger)
+logger
+flatbuffers_headers
+flatbuffers
+)
 
 

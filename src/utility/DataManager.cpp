@@ -4,7 +4,9 @@
 #include "log_handler.h"
 #include "spdlog/common.h"
 #include "steamrot_directory_paths.h"
+#include "themes_generated.h"
 
+#include <cstdint>
 #include <fstream>
 
 using json = nlohmann::json;
@@ -32,6 +34,22 @@ void DataManager::CheckFileExists(const std::filesystem::path &file_path) {
   }
 };
 
+////////////////////////////////////////////////////////////
+std::vector<uint8_t>
+DataManager::LoadBinaryData(const std::filesystem::path &file_path) {
+  // check file exists, this is a go/no go checkpoint
+  CheckFileExists(file_path);
+  // open file in binary mode
+  std::ifstream file(file_path, std::ios::binary | std::ios::ate);
+  // read file into vector of chars
+  std::vector<uint8_t> data((std::istreambuf_iterator<char>(file)),
+                            std::istreambuf_iterator<char>());
+  // log info message
+  steamrot::log_handler::ProcessLog(
+      spdlog::level::info, steamrot::log_handler::LogCode::kNoCode,
+      "Loaded binary data from file: " + file_path.string());
+  return data;
+}
 ////////////////////////////////////////////////////////////
 json DataManager::LoadJsonData(const std::filesystem::path &file_path) {
 
@@ -79,5 +97,16 @@ json DataManager::LoadThemeData(const std::string &theme_name) {
   // check theme data against schema (error checking in function)
   schema_checker.CheckJSON(theme_data);
   return theme_data;
+}
+
+////////////////////////////////////////////////////////////
+const themes::UIObjects *
+DataManager::ProvideThemeData(const std::string &theme_name) {
+  // load theme data from binary into buffer
+  std::vector<uint8_t> theme_data =
+      LoadBinaryData(getThemesFolder() / (theme_name + ".themes.bin"));
+
+  // return flatbuffers data from binary buffer
+  return themes::GetUIObjects(theme_data.data());
 }
 } // namespace steamrot
