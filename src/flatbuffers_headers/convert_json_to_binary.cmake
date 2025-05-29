@@ -1,38 +1,33 @@
-set(schema_files
-    "${CMAKE_CURRENT_SOURCE_DIR}/themes.fbs"
-    # Add more schemas here
-)
+# -- FlatBuffers generation for themes.fbs --
 
-set(all_generated_binaries)
+set(themes_schema "${CMAKE_CURRENT_SOURCE_DIR}/themes.fbs")
+set(THEMES_DIR "${DATA_DIR}/themes")
 
-foreach(schema_file ${schema_files})
-  get_filename_component(schema_name ${schema_file} NAME_WE)
-  file(GLOB schema_jsons "${CMAKE_CURRENT_SOURCE_DIR}/*.${schema_name}.json")
+# All JSON files for themes.fbs
+file(GLOB themes_jsons "${THEMES_DIR}/*.themes.json")
 
-  foreach(json_file ${schema_jsons})
-    get_filename_component(json_we ${json_file} NAME_WE) # strips .json
-    set(bin_file
-      "${CMAKE_CURRENT_SOURCE_DIR}/${json_we}.bin"
-    ) # keeps .themes, replaces .json
-    list(APPEND all_generated_binaries "${bin_file}")
+set(themes_generated_binaries)
 
-    add_custom_command(
-            OUTPUT "${bin_file}"
-            COMMAND flatc
-            ARGS --binary
-            ARGS -o
-              "${CMAKE_CURRENT_SOURCE_DIR}"
-              "${CMAKE_CURRENT_SOURCE_DIR}/${schema_file}"
-              "${json_file}"
-            DEPENDS "${schema_file}" "${json_file}"
-            COMMAND ${CMAKE_COMMAND}
-            ARGS -E echo "Generating binary FlatBuffer ${bin_file}
-            from ${json_file} using ${schema_file}"
-            VERBATIM
-        )
-  endforeach()
+foreach(json_file ${themes_jsons})
+  get_filename_component(json_we ${json_file} NAME_WE) # strips .json
+  set(bin_file "${THEMES_DIR}/${json_we}.bin")
+  list(APPEND themes_generated_binaries "${bin_file}")
+
+  add_custom_command(
+    OUTPUT "${bin_file}"
+    COMMAND flatc
+      --binary
+      -o "${THEMES_DIR}"
+      "${themes_schema}"
+      "${json_file}"
+    DEPENDS "${themes_schema}" "${json_file}"
+    COMMAND ${CMAKE_COMMAND}
+      -E echo "Generating binary FlatBuffer ${bin_file}
+      from ${json_file} using ${themes_schema}"
+    VERBATIM
+  )
 endforeach()
 
-add_custom_target(flatbuffers_generate_binaries ALL
-    DEPENDS ${all_generated_binaries}
+add_custom_target(flatbuffers_generate_themes_binaries ALL
+  DEPENDS ${themes_generated_binaries}
 )

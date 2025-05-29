@@ -7,9 +7,9 @@
 ////////////////////////////////////////////////////////////
 // headers
 ////////////////////////////////////////////////////////////
+#include "themes_generated.h"
 #include <filesystem>
 #include <nlohmann/json.hpp>
-
 using json = nlohmann::json;
 
 namespace steamrot {
@@ -56,6 +56,11 @@ public:
   /// \brief Load theme data for UI engine as json
   ////////////////////////////////////////////////////////////
   json LoadThemeData(const std::string &theme_name);
+
+  ////////////////////////////////////////////////////////////
+  /// \brief provide theme data as flatbuffers data
+  ////////////////////////////////////////////////////////////
+  const themes::UIObjects *ProvideThemeData(const std::string &theme_name);
 };
 
 } // namespace steamrot

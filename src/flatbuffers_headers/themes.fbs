@@ -1,4 +1,4 @@
-namespace steamrot.UIObjects; 
+namespace steamrot.themes; 
 
 struct Color {
     r:ubyte;

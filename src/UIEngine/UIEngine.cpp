@@ -11,10 +11,20 @@ UIEngine::UIEngine(const json &config) {
   // This could include setting up styles, themes, and other UI elements
   AddStyles(config);
 }
+
+/////////////////////////////////////////////////////////////
+UIEngine::UIEngine(const themes::UIObjects *config) {
+  // Initialize the UI engine with the provided flatbuffer configuration
+  // This could include setting up styles, themes, and other UI elements
+  AddStyles(config);
+}
 ////////////////////////////////////////////////////////////
 void UIEngine::AddStyles(const json &config) {
   // Implementation for adding styles from the JSON config can be added here
 }
+
+////////////////////////////////////////////////////////////
+void UIEngine::AddStyles(const themes::UIObjects *config) {}
 ////////////////////////////////////////////////////////////
 void UIEngine::DrawUILayer(sf::RenderTexture &render_texture,
                            std::vector<CUserInterface> &ui_elements) {

@@ -4,6 +4,7 @@
 #include "log_handler.h"
 #include "spdlog/common.h"
 #include "steamrot_directory_paths.h"
+#include "themes_generated.h"
 
 #include <cstdint>
 #include <fstream>
@@ -96,5 +97,16 @@ json DataManager::LoadThemeData(const std::string &theme_name) {
   // check theme data against schema (error checking in function)
   schema_checker.CheckJSON(theme_data);
   return theme_data;
+}
+
+////////////////////////////////////////////////////////////
+const themes::UIObjects *
+DataManager::ProvideThemeData(const std::string &theme_name) {
+  // load theme data from binary into buffer
+  std::vector<uint8_t> theme_data =
+      LoadBinaryData(getThemesFolder() / (theme_name + ".themes.bin"));
+
+  // return flatbuffers data from binary buffer
+  return themes::GetUIObjects(theme_data.data());
 }
 } // namespace steamrot

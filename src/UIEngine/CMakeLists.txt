@@ -12,4 +12,5 @@ target_link_libraries(UIEngine
         nlohmann_json::nlohmann_json
 components
 flatbuffers_headers
+flatbuffers
 )
