@@ -14,6 +14,16 @@
 using json = nlohmann::json;
 namespace steamrot {
 
+/**
+ * @class ButtonStyle
+ * @brief Contains the style properties for a button in the UI.
+ *
+ */
+struct ButtonStyle {
+  sf::Color background_color;
+  sf::Color text_color;
+  sf::Color border_color;
+};
 class UIEngine {
 private:
   ////////////////////////////////////////////////////////////
@@ -30,6 +40,11 @@ private:
   // |brief add in styles from flatbuffer config
   ////////////////////////////////////////////////////////////
   void AddStyles(const themes::UIObjects *config);
+
+  /**
+   * @brief Member variable to hold the style for buttons in the UI.
+   */
+  ButtonStyle m_button_style; // Style for buttons
 
 public:
   ////////////////////////////////////////////////////////////

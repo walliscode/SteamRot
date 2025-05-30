@@ -13,4 +13,4 @@ target_link_libraries(UIEngine
 components
 flatbuffers_headers
 flatbuffers
-)
+logger)

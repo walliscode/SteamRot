@@ -25,7 +25,7 @@ private:
   ////////////////////////////////////////////////////////////
   /// \brief load binary data from file and return as vector of chars
   ////////////////////////////////////////////////////////////
-  std::vector<uint8_t> LoadBinaryData(const std::filesystem::path &file_path);
+  char *LoadBinaryData(const std::filesystem::path &file_path);
 
   ////////////////////////////////////////////////////////////
   /// \brief load JSON data from file and return json object
