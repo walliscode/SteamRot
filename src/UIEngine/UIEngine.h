@@ -9,6 +9,7 @@
 #include "CUserInterface.h"
 #include "themes_generated.h"
 #include <SFML/Graphics.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
 #include <nlohmann/json.hpp>
 #include <vector>
 using json = nlohmann::json;
@@ -67,5 +68,14 @@ public:
   ////////////////////////////////////////////////////////////
   void DrawUILayer(sf::RenderTexture &render_texture,
                    std::vector<CUserInterface> &ui_elements);
+
+  /**
+   * @brief Draw a test button on the UI layer.
+   *
+   * @param ui_layer: The render texture where the button will be drawn.
+   */
+  void DrawTestButton(sf::RenderTexture &ui_layer);
+
+  void Draw(sf::RenderTexture &ui_layer);
 }; // namespace UIEngine
 } // namespace steamrot

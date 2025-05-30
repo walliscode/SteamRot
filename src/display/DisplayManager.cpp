@@ -3,6 +3,9 @@
 ////////////////////////////////////////////////////////////
 #include "DisplayManager.h"
 #include "Session.h"
+#include "TexturesPackage.h"
+#include <SFML/Graphics/RenderTexture.hpp>
+#include <SFML/System/Vector2.hpp>
 
 ////////////////////////////////////////////////////////////
 // namespaces/using
@@ -14,9 +17,19 @@ DisplayManager::DisplayManager()
     : m_active_session(std::make_shared<Session>()), m_data_manager(),
       m_ui_engine() {
 
-  const themes::UIObjects *theme_data = m_data_manager.ProvideThemeData(
-      "default"); // Get theme data from DataManager
+  // Initialize the RenderTexture for the UI layer wihth the same size as the
+  // window
+  bool resize_succesful = m_ui_layer.resize(m_window.getSize());
+  // guard against resize failure
+  if (!resize_succesful) {
+    throw std::runtime_error("Failed to resize UI layer RenderTexture");
+  }
 
+  // Load in the desired theme data for the UI engine
+  const themes::UIObjects *theme_data =
+      m_data_manager.ProvideThemeData("default");
+
+  // create the UI engine with the theme data
   m_ui_engine = UIEngine(theme_data);
 };
 
@@ -44,7 +57,7 @@ sf::RenderWindow &DisplayManager::GetWindow() { return m_window; };
 void DisplayManager::Render(TexturesPackage &textures_package) {
 
   // clear the window with the background color, this always be at the start
-  m_window.clear(sf::Color::Magenta);
+  m_window.clear();
 
   // get tiles from active session
   if (!m_active_session) {
@@ -69,10 +82,15 @@ void DisplayManager::Render(TexturesPackage &textures_package) {
       m_window.draw(tile_sprite);
     }
   }
-  // tile overlay should come last
+
   // create sprite from tile overlay texture
   sf::Sprite tile_overlay_sprite{m_tile_overlay.getTexture()};
   m_window.draw(tile_overlay_sprite);
+
+  // draw the UI layer to the window
+  m_ui_engine.Draw(m_ui_layer);
+  sf::Sprite ui_layer_sprite{m_ui_layer.getTexture()};
+  m_window.draw(ui_layer_sprite);
 
   // display the contents of the window to the screen
   m_window.display();

@@ -5,6 +5,7 @@
 #include "log_handler.h"
 #include "spdlog/common.h"
 #include <SFML/Graphics/RenderTexture.hpp>
+
 namespace steamrot {
 ////////////////////////////////////////////////////////////
 UIEngine::UIEngine(const json &config) {
@@ -61,4 +62,30 @@ void UIEngine::DrawUILayer(sf::RenderTexture &render_texture,
 }
 ////////////////////////////////////////////////////////////
 void UIEngine::DrawDropDownMenu(sf::RenderTexture &render_texture) {};
+
+////////////////////////////////////////////////////////////
+void UIEngine::DrawTestButton(sf::RenderTexture &ui_layer) {
+
+  // Crea  // Create a button shape
+  sf::RectangleShape button(sf::Vector2f(200, 50));
+
+  button.setFillColor(m_button_style.background_color);
+  button.setOutlineColor(m_button_style.border_color);
+  button.setOutlineThickness(2);
+  button.setPosition({100.f, 100.f}); // Position the button
+
+  // Draw the button and text to the UI layer
+  ui_layer.draw(button);
+}
+
+void UIEngine::Draw(sf::RenderTexture &ui_layer) {
+  // clear the UI layer before drawing
+  ui_layer.clear();
+
+  // Draw the test button to the UI layer
+  DrawTestButton(ui_layer);
+
+  // Finish drawing to the UI layer with display
+  ui_layer.display();
+}
 } // namespace steamrot
