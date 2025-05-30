@@ -5,7 +5,7 @@
 int main() {
   // start the logger
   Logger logger("global_logger");
-
+  std::cout << "Starting SteamRot Game Engine..." << std::endl;
   // wrap the whole game engine in a try-catch block to catch any exceptions
   try {
     steamrot::GameEngine steam_rot;
