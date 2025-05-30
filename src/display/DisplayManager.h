@@ -14,6 +14,7 @@
 #include "global_constants.h"
 #include <SFML/Graphics.hpp>
 
+#include <SFML/Graphics/RenderTexture.hpp>
 #include <memory>
 #include <nlohmann/json.hpp>
 
@@ -35,7 +36,10 @@ private:
   std::shared_ptr<Session> m_active_session;
   json m_tile_config;
   sf::RenderTexture m_tile_overlay;
-
+  /**
+   * @brief Member: RenderTexture for UI layer
+   */
+  sf::RenderTexture m_ui_layer;
   ////////////////////////////////////////////////////////////
   // Member: DataManager for loading and saving data
   ////////////////////////////////////////////////////////////
