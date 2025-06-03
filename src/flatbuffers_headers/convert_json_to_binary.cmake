@@ -28,6 +28,36 @@ foreach(json_file ${themes_jsons})
   )
 endforeach()
 
+# generate all scene binaries
+set(scenes_schema "${CMAKE_CURRENT_SOURCE_DIR}/scenes.fbs")
+set(SCENES_DIR "${DATA_DIR}/scenes")
+
+# All JSON files for scenes.fbs
+file(GLOB scenes_jsons "${SCENES_DIR}/*.scenes.json")
+
+set(scenes_generated_binaries)
+
+foreach(json_file ${scenes_jsons})
+  get_filename_component(json_we ${json_file} NAME_WE) # strips .json
+  set(bin_file "${SCENES_DIR}/${json_we}.bin")
+  list(APPEND scenes_generated_binaries "${bin_file}")
+  add_custom_command(
+    OUTPUT "${bin_file}"
+    COMMAND flatc
+      --binary
+      -o "${SCENES_DIR}"
+      "${scenes_schema}"
+      "${json_file}"
+    DEPENDS "${scenes_schema}" "${json_file}"
+    COMMAND ${CMAKE_COMMAND}
+      -E echo "Generating binary FlatBuffer ${bin_file}
+      from ${json_file} using ${scenes_schema}"
+    VERBATIM
+  )
+endforeach()
+
 add_custom_target(flatbuffers_generate_themes_binaries ALL
-  DEPENDS ${themes_generated_binaries}
+  DEPENDS
+  ${themes_generated_binaries}
+  ${scenes_generated_binaries}
 )

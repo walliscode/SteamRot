@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////
 // headers
 ////////////////////////////////////////////////////////////
+#include "scenes_generated.h"
 #include "themes_generated.h"
 #include <filesystem>
 #include <nlohmann/json.hpp>
@@ -61,6 +62,14 @@ public:
   /// \brief provide theme data as flatbuffers data
   ////////////////////////////////////////////////////////////
   const themes::UIObjects *ProvideThemeData(const std::string &theme_name);
+
+  /**
+   * @brief Provides Scene configuration data as a flatbuffer object.
+   *
+   * @param scene_identifier String scene identifier
+   * @return Raw Pointer to SceneData flatbuffer object
+   */
+  const SceneData *ProvideSceneData(const std::string &scene_identifier);
 };
 
 } // namespace steamrot

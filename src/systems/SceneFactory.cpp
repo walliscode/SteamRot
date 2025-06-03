@@ -40,6 +40,7 @@ std::unique_ptr<Scene> SceneFactory::CreateScene(const SceneType &scene_type) {
   if (scene_type == SceneType::menu) {
     return CreateMenuScene(scene_data, scene_uuid);
   }
+
   // not sure how it would be possible to get here, maybe some kind of cast from
   // size_t
   return nullptr;

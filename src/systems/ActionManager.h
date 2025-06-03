@@ -7,6 +7,7 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "actions.h"
+#include "actions_generated.h"
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <bitset>
@@ -42,12 +43,25 @@ private:
   ////////////////////////////////////////////////////////////
   void RegisterActions(const json &congig);
 
+  /**
+   * @brief Register actions for object instance from flatbuffers ActionsData
+   *
+   * @param actions_data ActionsData object containing action definitions
+   */
+  void RegisterActions(const ActionsData *actions_data);
+
 public:
   ////////////////////////////////////////////////////////////
   // |brief constructor using json as configuration object
   ////////////////////////////////////////////////////////////
   ActionManager(const json &config);
 
+  /**
+   * @brief Constructor using flatbuffers ActionsData object
+   *
+   * @param actions_data Raw pointer to ActionsData object
+   */
+  ActionManager(const ActionsData *actions_data);
   ////////////////////////////////////////////////////////////
   // |brief Generate any possible actions for this scene as bitflag enum
   ////////////////////////////////////////////////////////////

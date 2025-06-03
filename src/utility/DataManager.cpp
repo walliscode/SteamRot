@@ -81,7 +81,7 @@ json DataManager::LoadSceneDataFromJson(std::string scene_identifier) {
 
   // load scene data from file
   json scene_data =
-      LoadJsonData(getSceneFolder() / (scene_identifier + ".data.json"));
+      LoadJsonData(getScenesFolder() / (scene_identifier + ".data.json"));
 
   // check scene data against schema (error checking in function)
   schema_checker.CheckJSON(scene_data);
@@ -112,4 +112,15 @@ DataManager::ProvideThemeData(const std::string &theme_name) {
   // return flatbuffers data from binary buffer
   return themes::GetUIObjects(theme_data);
 }
+
+////////////////////////////////////////////////////////////
+const SceneData *
+DataManager::ProvideSceneData(const std::string &scene_identifier) {
+  // load scene data from binary into buffer
+  char *scene_data =
+      LoadBinaryData(getScenesFolder() / (scene_identifier + ".scene.bin"));
+  // return flatbuffers data from binary buffer
+  return GetSceneData(scene_data);
+}
+
 } // namespace steamrot

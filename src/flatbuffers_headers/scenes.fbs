@@ -1,0 +1,11 @@
+include "actions.fbs";
+
+namespace steamrot; 
+
+
+
+table SceneData{
+    actions: ActionsData;
+  }
+
+root_type SceneData;

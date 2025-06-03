@@ -11,7 +11,7 @@ const std::filesystem::path getDataFolder();
 /// \brief return path for Scene folder
 ///
 ////////////////////////////////////////////////////////////
-const std::filesystem::path getSceneFolder();
+const std::filesystem::path getScenesFolder();
 
 ////////////////////////////////////////////////////////////
 /// \brief return folder path for schema files

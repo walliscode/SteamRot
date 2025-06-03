@@ -6,7 +6,7 @@
 #pragma once
 
 #include "Scene.h"
-
+#include "scenes_generated.h"
 namespace steamrot {
 
 /**
@@ -25,6 +25,7 @@ private:
    * @param config_data JSON configuration data for the scene
    * @param id Unique identifier for the scene
    */
-  TitleScreen(size_t pool_size, const json &config_data, const uuids::uuid &id);
+  TitleScreen(size_t pool_size, const SceneData *scene_data,
+              const uuids::uuid &id);
 };
 } // namespace steamrot
