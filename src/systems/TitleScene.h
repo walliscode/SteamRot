@@ -14,7 +14,7 @@ namespace steamrot {
  * @brief Contains information and logic for the title screen of the game.
  *
  */
-class TitleScreen : public Scene {
+class TitleScene : public Scene {
   friend class SceneFactory;
 
 private:
@@ -25,7 +25,17 @@ private:
    * @param config_data JSON configuration data for the scene
    * @param id Unique identifier for the scene
    */
-  TitleScreen(size_t pool_size, const SceneData *scene_data,
-              const uuids::uuid &id);
+  TitleScene(size_t pool_size, const SceneData *scene_data,
+             const uuids::uuid &id);
+
+  ////////////////////////////////////////////////////////////
+  /// \brief call movement Logic for TitleScene
+  ////////////////////////////////////////////////////////////
+  void sMovement() override;
+
+  ////////////////////////////////////////////////////////////
+  /// \brief get all drawables from TitleScene
+  ////////////////////////////////////////////////////////////
+  std::unique_ptr<sf::RenderTexture> sDrawToTexture() override;
 };
 } // namespace steamrot

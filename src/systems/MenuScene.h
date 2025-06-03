@@ -21,6 +21,9 @@ private:
   ////////////////////////////////////////////////////////////
   MenuScene(size_t pool_size, const json &config_data, const uuids::uuid &id);
 
+  MenuScene(size_t pool_size, const SceneData *scene_data,
+            const uuids::uuid &id);
+
 public:
   ////////////////////////////////////////////////////////////
   /// \brief call movement Logic for MenuScene

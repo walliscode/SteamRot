@@ -61,6 +61,10 @@ protected:
         const uuids::uuid &id);
 
 public:
+  /**
+   * @brief Virtual destructor for the Scene class, needed for proper cleanup
+   */
+  virtual ~Scene() = default;
   ////////////////////////////////////////////////////////////
   /// \brief function container for all movement related logic
   ///

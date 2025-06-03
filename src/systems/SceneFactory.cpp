@@ -3,7 +3,8 @@
 ////////////////////////////////////////////////////////////
 #include "SceneFactory.h"
 
-#include "magic_enum/magic_enum.hpp"
+#include "SceneType.h"
+
 #include "uuid.h"
 #include <memory>
 #include <string>
@@ -34,20 +35,35 @@ std::unique_ptr<Scene> SceneFactory::CreateScene(const SceneType &scene_type) {
   uuids::uuid scene_uuid = CreateUUID();
 
   // load scene data
-  json scene_data = m_data_manager.LoadSceneDataFromJson(
-      magic_enum::enum_name(scene_type).data());
+  const SceneData *scene_data = m_data_manager.ProvideSceneData(scene_type);
 
-  if (scene_type == SceneType::menu) {
+  switch (scene_type) {
+  case SceneType::title:
+    return CreateTitleScene(scene_data, scene_uuid);
+  case SceneType::menu:
     return CreateMenuScene(scene_data, scene_uuid);
-  }
 
-  // not sure how it would be possible to get here, maybe some kind of cast from
-  // size_t
-  return nullptr;
+  default:
+    // not sure how it would be possible to get here, maybe some kind of cast
+    // from size_t
+    return nullptr;
+  }
+}
+////////////////////////////////////////////////////////////
+std::unique_ptr<TitleScene>
+SceneFactory::CreateTitleScene(const SceneData *scene_data,
+                               const uuids::uuid &scene_uuid) {
+  // create a new title scene object, we are creating a raw pointer here due to
+  // TitleScene having a private constuctor
+  std::unique_ptr<TitleScene> title_scene(
+      new TitleScene(100, scene_data, scene_uuid));
+  return title_scene;
 }
 
+////////////////////////////////////////////////////////////
 std::unique_ptr<MenuScene>
-SceneFactory::CreateMenuScene(json scene_data, const uuids::uuid &scene_uuid) {
+SceneFactory::CreateMenuScene(const SceneData *scene_data,
+                              const uuids::uuid &scene_uuid) {
   // create a new menu scene object, we are creating a raw pointer here due to
   // MenuScene having a private constuctor
   std::unique_ptr<MenuScene> menu_scene(

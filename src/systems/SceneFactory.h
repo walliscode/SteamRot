@@ -6,21 +6,16 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-
 #include "DataManager.h"
 #include "MenuScene.h"
 #include "Scene.h"
+#include "SceneType.h"
 #include "TitleScene.h"
 #include "scenes_generated.h"
 #include "uuid.h"
 #include <memory>
 
 namespace steamrot {
-
-enum class SceneType : size_t {
-  title = 0,
-  menu = 1,
-};
 
 class SceneFactory {
 private:
@@ -34,7 +29,7 @@ private:
   /// \brief Create a new Menu Scene
   ///
   ////////////////////////////////////////////////////////////
-  std::unique_ptr<MenuScene> CreateMenuScene(json scene_data,
+  std::unique_ptr<MenuScene> CreateMenuScene(const SceneData *scene_data,
                                              const uuids::uuid &id);
 
   /**
@@ -44,8 +39,8 @@ private:
    * e.t.c.
    * @param id A uniue ID generated and provided by the SceneFactory
    */
-  std::unique_ptr<TitleScreen> CreateTitleScene(const SceneData *scene_data,
-                                                const uuids::uuid &id);
+  std::unique_ptr<TitleScene> CreateTitleScene(const SceneData *scene_data,
+                                               const uuids::uuid &id);
   ////////////////////////////////////////////////////////////
   /// \brief create a uuid if none is in provided json data
   ///

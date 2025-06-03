@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////
 // headers
 ////////////////////////////////////////////////////////////
+#include "SceneType.h"
 #include "scenes_generated.h"
 #include "themes_generated.h"
 #include <filesystem>
@@ -69,7 +70,7 @@ public:
    * @param scene_identifier String scene identifier
    * @return Raw Pointer to SceneData flatbuffer object
    */
-  const SceneData *ProvideSceneData(const std::string &scene_identifier);
+  const SceneData *ProvideSceneData(const SceneType &scene_type);
 };
 
 } // namespace steamrot
