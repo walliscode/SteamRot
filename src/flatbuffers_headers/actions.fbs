@@ -1,0 +1,38 @@
+namespace steamrot;
+
+// enum describing the type of input
+enum InputType: byte {
+    Keyboard = 0,
+    Mouse = 1
+  }
+
+table Key {
+    name: string; 
+  }
+
+table MouseButton{
+    name: string; 
+  }
+// the input can either be a keyboard input or a mouse input
+union Input {
+  Key,
+  MouseButton
+  }
+
+table ActionPart{
+        type: InputType;
+    input: Input;
+
+  }
+// an action is componsed of 1 or more inputs 
+table Action{
+  parts: [ActionPart];
+  name: string;
+  }
+
+  // all actions for this scene or display manager
+table ActionsData{
+actions: [Action]; 
+  }
+
+root_type ActionsData;

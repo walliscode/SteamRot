@@ -8,6 +8,7 @@
 ////////////////////////////////////////////////////////////
 #include "ActionManager.h"
 #include "EntityManager.h"
+#include "scenes_generated.h"
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <memory>
@@ -43,12 +44,26 @@ protected:
   size_t m_current_frame = 0;
 
   ////////////////////////////////////////////////////////////
-  /// \brief default constructor (only accessible to derived classes)
+  /// \brief constructor taking in json config data (only accessible to derived
+  /// classes)
   ////////////////////////////////////////////////////////////
   Scene(const size_t &pool_size, const json &config_data,
         const uuids::uuid &id);
 
+  /**
+   * @brief Scene constructor that initilizes the Scene with  flatbuffers data
+   *
+   * @param pool_size Size of the EntityMemoryPool for the Scene
+   * @param scene_data Any config/data needed to initialize the Scene
+   * @param id Unique identifier for the Scene
+   */
+  Scene(const size_t &pool_size, const SceneData *scene_data,
+        const uuids::uuid &id);
+
 public:
+  /**
+   * @brief Virtual destructor for the Scene class, needed for proper cleanup
+   */
   virtual ~Scene() = default;
   ////////////////////////////////////////////////////////////
   /// \brief function container for all movement related logic

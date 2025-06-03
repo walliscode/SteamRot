@@ -7,6 +7,7 @@ add_library(systems
     Scene.cpp
     ActionManager.cpp
     MenuScene.cpp
+    TitleScene.cpp
     Logic.cpp
     EventHandler.cpp
 )
@@ -17,12 +18,6 @@ RESOURCES_DIR
 DATA_OUT_DIR
 )
 
-# foreach(definition_name IN LISTS definition_list)
-#   if(NOT DEFINED ${definition_name})
-#     message(FATAL_ERROR "Definition ${definition_name} does not exist")
-#   endif()
-# endforeach()
-#
 
 target_include_directories(systems
   PUBLIC

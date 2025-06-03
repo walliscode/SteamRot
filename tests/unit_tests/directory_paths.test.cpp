@@ -8,7 +8,7 @@ TEST_CASE("Check directory paths") {
   REQUIRE(std::filesystem::exists(getDataFolder()));
 
   // check the data/scene folder exists
-  REQUIRE(std::filesystem::exists(getSceneFolder()));
+  REQUIRE(std::filesystem::exists(getScenesFolder()));
 
   // check the data/logs folder exists
   REQUIRE(std::filesystem::exists(getLogsFolder()));

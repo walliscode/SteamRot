@@ -1,12 +1,11 @@
 #include "DataManager.h"
-
 #include "SchemaChecker.h"
 #include "log_handler.h"
 #include "spdlog/common.h"
 #include "steamrot_directory_paths.h"
 #include "themes_generated.h"
-
 #include <fstream>
+#include <magic_enum/magic_enum.hpp>
 
 using json = nlohmann::json;
 
@@ -81,7 +80,7 @@ json DataManager::LoadSceneDataFromJson(std::string scene_identifier) {
 
   // load scene data from file
   json scene_data =
-      LoadJsonData(getSceneFolder() / (scene_identifier + ".data.json"));
+      LoadJsonData(getScenesFolder() / (scene_identifier + ".data.json"));
 
   // check scene data against schema (error checking in function)
   schema_checker.CheckJSON(scene_data);
@@ -112,4 +111,16 @@ DataManager::ProvideThemeData(const std::string &theme_name) {
   // return flatbuffers data from binary buffer
   return themes::GetUIObjects(theme_data);
 }
+
+////////////////////////////////////////////////////////////
+const SceneData *DataManager::ProvideSceneData(const SceneType &scene_type) {
+  // get string identifier for scene type
+  std::string scene_identifier = magic_enum::enum_name(scene_type).data();
+  // load scene data from binary into buffer
+  char *scene_data =
+      LoadBinaryData(getScenesFolder() / (scene_identifier + ".scene.bin"));
+  // return flatbuffers data from binary buffer
+  return GetSceneData(scene_data);
+}
+
 } // namespace steamrot

@@ -6,8 +6,8 @@
 const std::filesystem::path getDataFolder() { return "@data_path@"; };
 
 ////////////////////////////////////////////////////////////
-const std::filesystem::path getSceneFolder() {
-  return getDataFolder() / "scene";
+const std::filesystem::path getScenesFolder() {
+  return getDataFolder() / "scenes";
 };
 ////////////////////////////////////////////////////////////
 const std::filesystem::path getSchemaFolder() {
