@@ -1,8 +1,9 @@
 # List your schema files
 set(schema_files
-    "${CMAKE_CURRENT_SOURCE_DIR}/themes.fbs"
-    "${CMAKE_CURRENT_SOURCE_DIR}/scenes.fbs"
+    ${CMAKE_CURRENT_SOURCE_DIR}/themes.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/scenes.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/actions.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/entities.fbs
 )
 
 set(generated_headers)

@@ -118,7 +118,7 @@ const SceneData *DataManager::ProvideSceneData(const SceneType &scene_type) {
   std::string scene_identifier = magic_enum::enum_name(scene_type).data();
   // load scene data from binary into buffer
   char *scene_data =
-      LoadBinaryData(getScenesFolder() / (scene_identifier + ".scene.bin"));
+      LoadBinaryData(getScenesFolder() / (scene_identifier + ".scenes.bin"));
   // return flatbuffers data from binary buffer
   return GetSceneData(scene_data);
 }

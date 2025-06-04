@@ -7,7 +7,7 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "containers.h"
-
+#include "entities_generated.h"
 #include <memory>
 #include <nlohmann/json.hpp>
 
@@ -30,6 +30,10 @@ public:
   void
   ConfigureEntities(std::unique_ptr<components::containers::EntityMemoryPool>,
                     json &data);
+
+  void ConfigureEntitiesFromDefaultData(
+      components::containers::EntityMemoryPool &entity_memory_pool,
+      const EntitiesData *entities_data);
 };
 
 } // namespace steamrot

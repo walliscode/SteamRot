@@ -14,6 +14,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
              "Non-compatible flatbuffers version included");
 
 #include "actions_generated.h"
+#include "entities_generated.h"
 
 namespace steamrot {
 
@@ -23,15 +24,21 @@ struct SceneDataBuilder;
 struct SceneData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef SceneDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_ACTIONS = 4
+    VT_ACTIONS = 4,
+    VT_ENTITIES = 6
   };
   const steamrot::ActionsData *actions() const {
     return GetPointer<const steamrot::ActionsData *>(VT_ACTIONS);
+  }
+  const steamrot::EntitiesData *entities() const {
+    return GetPointer<const steamrot::EntitiesData *>(VT_ENTITIES);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_ACTIONS) &&
            verifier.VerifyTable(actions()) &&
+           VerifyOffset(verifier, VT_ENTITIES) &&
+           verifier.VerifyTable(entities()) &&
            verifier.EndTable();
   }
 };
@@ -42,6 +49,9 @@ struct SceneDataBuilder {
   ::flatbuffers::uoffset_t start_;
   void add_actions(::flatbuffers::Offset<steamrot::ActionsData> actions) {
     fbb_.AddOffset(SceneData::VT_ACTIONS, actions);
+  }
+  void add_entities(::flatbuffers::Offset<steamrot::EntitiesData> entities) {
+    fbb_.AddOffset(SceneData::VT_ENTITIES, entities);
   }
   explicit SceneDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -56,8 +66,10 @@ struct SceneDataBuilder {
 
 inline ::flatbuffers::Offset<SceneData> CreateSceneData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<steamrot::ActionsData> actions = 0) {
+    ::flatbuffers::Offset<steamrot::ActionsData> actions = 0,
+    ::flatbuffers::Offset<steamrot::EntitiesData> entities = 0) {
   SceneDataBuilder builder_(_fbb);
+  builder_.add_entities(entities);
   builder_.add_actions(actions);
   return builder_.Finish();
 }
