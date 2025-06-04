@@ -5,8 +5,21 @@
 #include <memory>
 
 namespace steamrot {
+Session::Session() : m_tiles() {
+  // Add the first tile to the session
+  AddTile();
+};
 ////////////////////////////////////////////////////////////
-void Session::AddTile() { m_tiles.push_back(std::make_shared<Tile>()); };
+void Session::AddTile() {
+  // create a new tile
+  std::shared_ptr<Tile> new_tile = std::make_shared<Tile>();
+
+  // and add it to the session's tile vector
+  m_tiles.push_back(std::make_shared<Tile>());
+
+  // default the active tile to the last added tile
+  m_active_tile = new_tile;
+};
 
 ////////////////////////////////////////////////////////////
 void Session::RemoveTile(std::shared_ptr<Tile> tile) {

@@ -5,6 +5,7 @@
 #include "GameEngine.h"
 #include "EventHandler.h"
 #include "log_handler.h"
+#include "uuid.h"
 
 #include <SFML/Graphics.hpp>
 #include <cstddef>
@@ -31,12 +32,12 @@ GameEngine::GameEngine()
 
 ////////////////////////////////////////////////////////////
 void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
-  // this should be the only try/catch block in the program. for now it will
-  // just log the error and exit the program, but in the future it could be used
-  // to handle errors more gracefully
 
   // set up resources
   m_scene_manager->StartUp();
+
+  // start up title scene
+  ShowTitleScene();
 
   // Run the program as long as the window is open
   while (m_display_manager.GetWindow().isOpen()) {
@@ -101,6 +102,15 @@ void GameEngine::RunSimulation(int loops) {
   }
 }
 
+////////////////////////////////////////////////////////////
+void GameEngine::ShowTitleScene() {
+
+  // Load the title scene in the scene manager and get unique id
+  uuids::uuid title_scene_id = m_scene_manager->LoadTitleScene();
+
+  // pass the id to the display manager
+  m_display_manager.LoadTitleSceneTiles(title_scene_id);
+}
 ////////////////////////////////////////////////////////////
 
 void GameEngine::ShutDown() {}

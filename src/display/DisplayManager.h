@@ -40,6 +40,12 @@ private:
    * @brief Member: RenderTexture for UI layer
    */
   sf::RenderTexture m_ui_layer;
+
+  /**
+   * @brief Member: describes whether the title scene is active, turns off
+   * tiling controls
+   */
+  bool m_title_scene_active{false};
   ////////////////////////////////////////////////////////////
   // Member: DataManager for loading and saving data
   ////////////////////////////////////////////////////////////
@@ -75,5 +81,10 @@ public:
   // |brief update all display logic
   ////////////////////////////////////////////////////////////
   void Update();
+
+  /**
+   * @brief Load tile (and session) configuration for just a title scene.
+   */
+  void LoadTitleSceneTiles(const uuids::uuid &title_scene_id);
 };
 } // namespace steamrot
