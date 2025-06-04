@@ -42,6 +42,12 @@ private:
   ////////////////////////////////////////////////////////////
   void ShutDown();
 
+  /**
+   * @brief Pulls on the scene manager and display manager to display the title
+   * scene.
+   */
+  void ShowTitleScene();
+
 public:
   ////////////////////////////////////////////////////////////
   /// \brief Default constructor

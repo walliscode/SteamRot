@@ -1,19 +1,42 @@
-#include "SceneManager.h"
+/**
+ * @file SceneManager.cpp
+ * @brief Implements the SceneManager class and scene management functions.
+ */
 
+/**
+ * ======================= Headers =======================
+ */
+#include "SceneManager.h"
+#include "SceneType.h"
+#include "uuid.h"
 #include <memory>
 
 namespace steamrot {
-///////////////////////////////////////////////////////////
+
+/**
+ * ======================= Constructor =======================
+ */
+
+/**
+ * -------------------------------------------------------
+ */
 SceneManager::SceneManager()
     : m_scene_factory(), m_scenes(), m_asset_manager(), m_data_manager() {}
 
-///////////////////////////////////////////////////////////
+/**
+ * ======================= Public Methods =======================
+ */
+
+/**
+ * -------------------------------------------------------
+ */
 void SceneManager::StartUp() {}
 
-///////////////////////////////////////////////////////////
+/**
+ * -------------------------------------------------------
+ */
 void SceneManager::AddSceneFromDefault(const SceneType &scene_type,
                                        const size_t pool_size) {
-
   // shared pointer is used as Scene can be in multiple maps
   std::unique_ptr<Scene> new_scene = m_scene_factory.CreateScene(scene_type);
 
@@ -21,16 +44,29 @@ void SceneManager::AddSceneFromDefault(const SceneType &scene_type,
   m_scenes[new_scene->GetSceneID()] = std::move(new_scene);
 };
 
-///////////////////////////////////////////////////////////
-TexturesPackage SceneManager::ProvideTexturesPackage() {
+/**
+ * -------------------------------------------------------
+ */
+uuids::uuid SceneManager::LoadTitleScene() {
+  // clear existing scenes
+  m_scenes.clear();
+  // create title scene
+  AddSceneFromDefault(SceneType::title, 100);
 
+  // return the ID of the title scene
+  return m_scenes.begin()->first;
+}
+
+/**
+ * -------------------------------------------------------
+ */
+TexturesPackage SceneManager::ProvideTexturesPackage() {
   // create textures package object
   TexturesPackage textures_package;
 
   // cycle through desired scenes
   // TODO: pass along required IDs from display manager for picking Scenes
   for (auto &pair : m_scenes) {
-
     // get scene
     auto &scene = pair.second;
 
@@ -40,7 +76,9 @@ TexturesPackage SceneManager::ProvideTexturesPackage() {
   return textures_package;
 }
 
-///////////////////////////////////////////////////////////
+/**
+ * -------------------------------------------------------
+ */
 void SceneManager::UpdateScenes() {
   // Loop through all the scenes and update them
   // updating does not mean rendering, it means updating the state of the scene
@@ -51,5 +89,9 @@ void SceneManager::UpdateScenes() {
     // add further systems here
   }
 }
+
+/**
+ * ======================= End of SceneManager =======================
+ */
 
 } // namespace steamrot

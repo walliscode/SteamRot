@@ -97,7 +97,20 @@ void DisplayManager::Render(TexturesPackage &textures_package) {
 };
 
 ///////////////////////////////////////////////////////////
-void DisplayManager::Update() {
+void DisplayManager::Update() {}
 
+void DisplayManager::LoadTitleSceneTiles(const uuids::uuid &title_scene_id) {
+  // reset m_sessions array with fresh Session objects
+  for (auto &session : m_sessions) {
+    session = std::make_shared<Session>();
+  }
+  // set the active session to the first session in the array
+  m_active_session = m_sessions[0];
+
+  // pass the title scene ID to the active tile in the active session
+  m_active_session->GetActiveTile()->SetSceneId(title_scene_id);
+
+  // set the title scene active flag to true
+  m_title_scene_active = true;
 };
 } // namespace steamrot
