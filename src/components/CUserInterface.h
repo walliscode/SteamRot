@@ -58,5 +58,11 @@ struct CUserInterface : public Component {
   const std::string &Name() override;
   void Configure(const nlohmann::json &data);
   void Configure(const UserInterface *user_interface_data);
+
+  /**
+   * @brief Returns the index of the component in the component register
+   * @return size_t index of the component in the component register
+   */
+  const size_t GetComponentRegisterIndex() const override;
 };
 } // namespace steamrot

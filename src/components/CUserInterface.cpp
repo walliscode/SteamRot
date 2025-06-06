@@ -2,6 +2,7 @@
 // headers
 ////////////////////////////////////////////////////////////
 #include "CUserInterface.h"
+#include "containers.h"
 #include "log_handler.h"
 #include "spdlog/common.h"
 #include "user_interface_generated.h"
@@ -44,5 +45,13 @@ void CUserInterface::Configure(const UserInterface *user_interface_data) {
   // start building from the root element
   root_element = build_ui_element(user_interface_data->root_ui_element());
 };
+
+const size_t CUserInterface::GetComponentRegisterIndex() const {
+
+  // Get the index of this component in the component register
+  static constexpr size_t index = components::containers::TupleTypeIndex<
+      CUserInterface, components::containers::ComponentRegister>;
+  return index;
+}
 
 } // namespace steamrot

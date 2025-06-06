@@ -6,16 +6,10 @@
 namespace steamrot {
 
 ////////////////////////////////////////////////////////////
-Scene::Scene(const size_t &pool_size, const json &config_data,
-             const uuids::uuid &id)
-    : m_action_manager(config_data["actions"]), m_entity_manager(pool_size),
-      m_id(id) {}
-
-////////////////////////////////////////////////////////////
 Scene::Scene(const size_t &pool_size, const SceneData *scene_data,
              const uuids::uuid &id)
-    : m_action_manager(scene_data->actions()), m_entity_manager(pool_size),
-      m_id(id) {}
+    : m_action_manager(scene_data->actions()),
+      m_entity_manager(pool_size, scene_data->entities()), m_id(id) {}
 
 ////////////////////////////////////////////////////////////
 bool Scene::GetActive() const { return m_active; }

@@ -1,4 +1,5 @@
 #include "Logic.h"
+namespace steamrot {
 
 ////////////////////////////////////////////////////////////
 template <typename... AllComponentTypes>
@@ -28,3 +29,4 @@ void Logic<AllComponentTypes...>::RunLogic(
     m_cycle_count++;
   }
 }
+} // namespace steamrot

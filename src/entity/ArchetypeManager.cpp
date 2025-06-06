@@ -1,8 +1,10 @@
 #include "ArchetypeManager.h"
+#include "EntityHelpers.h"
 #include <cstddef>
 #include <magic_enum/magic_enum.hpp>
 #include <vector>
 
+namespace steamrot {
 ////////////////////////////////////////////////////////////
 ArchetypeManager::ArchetypeManager() {}
 
@@ -32,3 +34,51 @@ std::vector<size_t> ArchetypeManager::GetEntityIndexes(
 
   return entityIndexes;
 }
+const ArchetypeID ArchetypeManager::GenerateArchetypeID(
+    const components::containers::EntityMemoryPool &entity_memory_pool,
+    size_t entityIndex) {
+
+  // create blank archetypeID
+  ArchetypeID archetypeID{0};
+
+  // iterate over all the vectors in the entity memory pool
+  std::apply(
+      [&](const auto &...component_vector) {
+        // for each component vector, check if the entity has that component
+
+        ((archetypeID.set(
+             component_vector[entityIndex].GetComponentRegisterIndex(),
+             component_vector[entityIndex].m_active)),
+         ...);
+      },
+      entity_memory_pool);
+
+  return archetypeID;
+};
+
+void ArchetypeManager::GenerateAllArchetypes(
+    const components::containers::EntityMemoryPool &entity_memory_pool) {
+  // clear existing archetypes
+  m_archetypes.clear();
+
+  // get current pool size
+  size_t pool_size = GetMemoryPoolSize(entity_memory_pool);
+
+  // iterate over all entities in the memory pool
+  for (size_t entityIndex = 0; entityIndex < pool_size; ++entityIndex) {
+
+    // get the component mask for the current entity
+    ArchetypeID archetypeID =
+        GenerateArchetypeID(entity_memory_pool, entityIndex);
+
+    // if the archetype already exists, add the entity index to it
+    if (m_archetypes.find(archetypeID) != m_archetypes.end()) {
+      m_archetypes[archetypeID].push_back(entityIndex);
+    } else {
+
+      // otherwise, create a new archetype with this entity index
+      m_archetypes[archetypeID] = {entityIndex};
+    }
+  }
+}
+} // namespace steamrot

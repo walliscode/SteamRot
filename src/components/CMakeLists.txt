@@ -1,7 +1,6 @@
 add_library(components
 
 CMeta.cpp
-CShape.cpp
 CUserInterface.cpp
 
 )

@@ -25,7 +25,7 @@ private:
    * @param config_data JSON configuration data for the scene
    * @param id Unique identifier for the scene
    */
-  TitleScene(size_t pool_size, const SceneData *scene_data,
+  TitleScene(const size_t pool_size, const SceneData *scene_data,
              const uuids::uuid &id);
 
   ////////////////////////////////////////////////////////////

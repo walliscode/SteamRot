@@ -8,11 +8,6 @@
 #include <memory>
 
 namespace steamrot {
-////////////////////////////////////////////////////////////
-MenuScene::MenuScene(size_t pool_size, const json &config_data,
-                     const uuids::uuid &id)
-    : Scene(pool_size, config_data, id) {}
-
 MenuScene::MenuScene(size_t pool_size, const SceneData *scene_data,
                      const uuids::uuid &id)
     : Scene(pool_size, scene_data, id) {}
