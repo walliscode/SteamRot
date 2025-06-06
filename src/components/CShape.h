@@ -7,5 +7,5 @@ public:
   CShape() = default;
 
   const std::string &Name() override;
-  void Configure(const json &data) override;
+  void Configure(const json &data);
 };

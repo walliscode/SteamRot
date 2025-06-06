@@ -15,4 +15,6 @@ const std::string &CUserInterface::Name() {
 void CUserInterface::Configure(const json &data) {
   // configure variables
 }
+
+void CUserInterface::Configure(const UserInterface *user_interface_data) {}
 } // namespace steamrot

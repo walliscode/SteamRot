@@ -10,7 +10,7 @@ set(themes_generated_binaries)
 
 foreach(json_file ${themes_jsons})
   get_filename_component(json_we ${json_file} NAME_WE) # strips .json
-  set(bin_file "${THEMES_DIR}/${json_we}.bin")
+  set(bin_file "${THEMES_DIR}/${json_we}.themes..bin")
   list(APPEND themes_generated_binaries "${bin_file}")
 
   add_custom_command(
@@ -23,7 +23,7 @@ foreach(json_file ${themes_jsons})
     DEPENDS "${themes_schema}" "${json_file}"
     COMMAND ${CMAKE_COMMAND}
       -E echo "Generating binary FlatBuffer ${bin_file}
-      from ${json_file} using ${themes_schema}"
+       from ${json_file} using ${themes_schema}"
     VERBATIM
   )
 endforeach()
@@ -39,7 +39,7 @@ set(scenes_generated_binaries)
 
 foreach(json_file ${scenes_jsons})
   get_filename_component(json_we ${json_file} NAME_WE) # strips .json
-  set(bin_file "${SCENES_DIR}/${json_we}.bin")
+  set(bin_file "${SCENES_DIR}/${json_we}.scenes.bin")
   list(APPEND scenes_generated_binaries "${bin_file}")
   add_custom_command(
     OUTPUT "${bin_file}"
@@ -51,7 +51,7 @@ foreach(json_file ${scenes_jsons})
     DEPENDS "${scenes_schema}" "${json_file}"
     COMMAND ${CMAKE_COMMAND}
       -E echo "Generating binary FlatBuffer ${bin_file}
-      from ${json_file} using ${scenes_schema}"
+       from ${json_file} using ${scenes_schema}"
     VERBATIM
   )
 endforeach()

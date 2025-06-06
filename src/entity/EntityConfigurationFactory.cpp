@@ -2,6 +2,8 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "EntityConfigurationFactory.h"
+#include "CUserInterface.h"
+#include "EntityHelpers.h"
 #include "containers.h"
 #include "log_handler.h"
 #include <memory>
@@ -57,5 +59,30 @@ void EntityConfigurationFactory::ConfigureEntities(
         *pool);
   }
 };
+////////////////////////////////////////////////////////////
+void EntityConfigurationFactory::ConfigureEntitiesFromDefaultData(
+    components::containers::EntityMemoryPool &entity_memory_pool,
+    const EntitiesData *entities_data) {
 
+  // check if entity_data is not null
+  if (entities_data == nullptr) {
+    log_handler::ProcessLog(spdlog::level::level_enum::err,
+                            log_handler::LogCode::kNoCode,
+                            "Entity data is null.");
+    return;
+  }
+
+  for (size_t i{0}; i < entities_data->entities()->size(); ++i) {
+
+    // get the entity data from the entities_data
+    const steamrot::Entity *entity_data = entities_data->entities()->Get(i);
+
+    // manually check each component type
+    if (entity_data->c_user_interface()) {
+      // pass the data through the CUserInterface component
+      GetComponent<CUserInterface>(i, entity_memory_pool)
+          .Configure(entity_data->c_user_interface());
+    }
+  }
+};
 } // namespace steamrot

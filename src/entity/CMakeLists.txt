@@ -16,4 +16,6 @@ target_link_libraries(entity
   SFML::Graphics
   components
   logger
+  flatbuffers
+  flatbuffers_headers
 )

@@ -8,6 +8,7 @@
 // headers
 ////////////////////////////////////////////////////////////
 #include "Component.h"
+#include "entities_generated.h"
 #include <cstddef>
 
 #include <vector>
@@ -37,6 +38,7 @@ struct CUserInterface : public Component {
   ////////////////////////////////////////////////////////////
 
   const std::string &Name() override;
-  void Configure(const json &data) override;
+  void Configure(const nlohmann::json &data);
+  void Configure(const UserInterface *user_interface_data);
 };
 } // namespace steamrot

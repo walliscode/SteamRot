@@ -3,6 +3,7 @@
 ////////////////////////////////////////////////////////////
 
 #include "EntityManager.h"
+#include "EntityHelpers.h"
 #include <memory>
 
 using json = nlohmann::json;
@@ -34,7 +35,7 @@ void EntityManager::ResizePool(const size_t &pool_size) {
 size_t EntityManager::GetNextFreeEntityIndex() {
 
   // get CMeta vector from the pool
-  std::vector<CMeta> meta_data = GetComponentVector<CMeta>();
+  std::vector<CMeta> meta_data = GetComponentVector<CMeta>(*m_pool);
 
   // find next inactive entity index
   for (size_t i = 0; i < meta_data.size(); ++i) {
@@ -56,7 +57,7 @@ size_t EntityManager::AddEntity() {
   RefreshEntity(*m_pool, new_entity_id);
 
   // get CMeta vector from the pool
-  std::vector<CMeta> &meta_data = GetComponentVector<CMeta>();
+  std::vector<CMeta> &meta_data = GetComponentVector<CMeta>(*m_pool);
 
   // switch on the entity
   meta_data[new_entity_id].m_entity_active = true;

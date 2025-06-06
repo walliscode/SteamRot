@@ -16,5 +16,5 @@ struct CMeta : public Component {
   bool m_entity_active = false;
 
   const std::string &Name() override;
-  void Configure(const json &data) override;
+  void Configure(const json &data);
 };
