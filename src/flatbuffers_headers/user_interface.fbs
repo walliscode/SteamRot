@@ -1,0 +1,16 @@
+namespace steamrot;
+
+enum UIElementType: byte{
+    None = 0,
+    DropDownMenu = 1,
+  }
+
+table UIElementData{
+    type: UIElementType;
+    children: [UIElementData];
+    column_layout: bool;
+  }
+
+table UserInterface{
+    root_ui_element: UIElementData;
+  }
