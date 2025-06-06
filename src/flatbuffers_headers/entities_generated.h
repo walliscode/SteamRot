@@ -13,45 +13,15 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
-namespace steamrot {
+#include "user_interface_generated.h"
 
-struct UserInterface;
-struct UserInterfaceBuilder;
+namespace steamrot {
 
 struct Entity;
 struct EntityBuilder;
 
 struct EntitiesData;
 struct EntitiesDataBuilder;
-
-struct UserInterface FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef UserInterfaceBuilder Builder;
-  bool Verify(::flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           verifier.EndTable();
-  }
-};
-
-struct UserInterfaceBuilder {
-  typedef UserInterface Table;
-  ::flatbuffers::FlatBufferBuilder &fbb_;
-  ::flatbuffers::uoffset_t start_;
-  explicit UserInterfaceBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  ::flatbuffers::Offset<UserInterface> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<UserInterface>(end);
-    return o;
-  }
-};
-
-inline ::flatbuffers::Offset<UserInterface> CreateUserInterface(
-    ::flatbuffers::FlatBufferBuilder &_fbb) {
-  UserInterfaceBuilder builder_(_fbb);
-  return builder_.Finish();
-}
 
 struct Entity FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef EntityBuilder Builder;

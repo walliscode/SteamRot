@@ -1,10 +1,6 @@
+include "user_interface.fbs";
 namespace steamrot;
 
-
-
-
-
-table UserInterface{}
 
 table Entity{
   index: uint32;

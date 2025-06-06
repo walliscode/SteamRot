@@ -8,13 +8,35 @@
 // headers
 ////////////////////////////////////////////////////////////
 #include "Component.h"
-#include "entities_generated.h"
-#include <cstddef>
+#include "user_interface_generated.h"
 
 #include <vector>
 
 namespace steamrot {
-enum class ContainerType : size_t { None = 0, DropDownMenu };
+
+/**
+ * @class UIElement
+ * @brief Base struct for all UI elements
+ *
+ */
+struct UIElement {
+  /**
+   * @brief UIElementType type for the UI element, allows for the UI engine to
+   * select correct function
+   */
+  UIElementType element_type{};
+
+  /**
+   * @brief All child element indices for this UI element
+   */
+  std::vector<UIElement> child_elements;
+
+  /**
+   * @brief Are child elements in a column or row layout? if true then vertical
+   * alignment
+   */
+  bool column_layout{true};
+};
 
 struct CUserInterface : public Component {
 
@@ -23,20 +45,16 @@ struct CUserInterface : public Component {
   ////////////////////////////////////////////////////////////
   CUserInterface() = default;
 
-  ////////////////////////////////////////////////////////////
-  // \brief Variable to store parent index (Entity ID)
-  ////////////////////////////////////////////////////////////
-  std::optional<size_t> m_parent_index;
+  /**
+   * @brief Start of the UI element tree, every interface will have to have some
+   * kind of base container
+   */
+  UIElement root_element;
 
-  ////////////////////////////////////////////////////////////
-  // \brief Variable to store children indices
-  ////////////////////////////////////////////////////////////
-  std::vector<size_t> m_child_indicies;
-
-  ////////////////////////////////////////////////////////////
-  // \brief: Default constructor
-  ////////////////////////////////////////////////////////////
-
+  /**
+   * @brief String representation of the component name, this will return a
+   * static value so it is constant across all instances
+   */
   const std::string &Name() override;
   void Configure(const nlohmann::json &data);
   void Configure(const UserInterface *user_interface_data);
