@@ -7,7 +7,6 @@
 // headers
 ////////////////////////////////////////////////////////////
 #include "CMeta.h"
-#include "CShape.h"
 #include "CUserInterface.h"
 #include <magic_enum/magic_enum.hpp>
 
@@ -33,7 +32,7 @@ struct ComponentContainer<std::tuple<Components...>> {
 // |brief: ComponentRegister is a tuple of all the components for the game
 //  "One source of truth"
 ////////////////////////////////////////////////////////////
-typedef std::tuple<CMeta, CShape, CUserInterface> ComponentRegister;
+typedef std::tuple<CMeta, CUserInterface> ComponentRegister;
 
 ////////////////////////////////////////////////////////////
 // |brief: size of the component register

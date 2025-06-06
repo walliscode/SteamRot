@@ -6,6 +6,7 @@
 #include <bitset>
 #include <memory>
 
+namespace steamrot {
 using EntityIndicies = std::vector<size_t>;
 
 template <typename... AllComponentTypes> class Logic {
@@ -73,3 +74,4 @@ protected:
     return id;
   }
 };
+}; // namespace steamrot

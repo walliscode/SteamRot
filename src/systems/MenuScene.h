@@ -16,11 +16,6 @@ class MenuScene : public Scene {
   friend class SceneFactory;
 
 private:
-  ////////////////////////////////////////////////////////////
-  /// \brief default constructor
-  ////////////////////////////////////////////////////////////
-  MenuScene(size_t pool_size, const json &config_data, const uuids::uuid &id);
-
   MenuScene(size_t pool_size, const SceneData *scene_data,
             const uuids::uuid &id);
 

@@ -11,6 +11,7 @@
 #include "EntityConfigurationFactory.h"
 
 #include "containers.h"
+#include "entities_generated.h"
 #include <cstddef>
 
 #include <memory>
@@ -40,7 +41,7 @@ public:
   /// \brief Default constructor
   ///
   ////////////////////////////////////////////////////////////
-  EntityManager(const size_t &pool_size);
+  EntityManager(const size_t &pool_size, const EntitiesData *entities_data);
 
   ////////////////////////////////////////////////////////////
   /// \brief Resuze the memory pool

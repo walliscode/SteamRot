@@ -43,13 +43,6 @@ protected:
   bool m_interactable = false;
   size_t m_current_frame = 0;
 
-  ////////////////////////////////////////////////////////////
-  /// \brief constructor taking in json config data (only accessible to derived
-  /// classes)
-  ////////////////////////////////////////////////////////////
-  Scene(const size_t &pool_size, const json &config_data,
-        const uuids::uuid &id);
-
   /**
    * @brief Scene constructor that initilizes the Scene with  flatbuffers data
    *

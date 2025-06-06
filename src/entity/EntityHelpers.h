@@ -51,6 +51,14 @@ std::vector<T> &GetComponentVector(
 
   return component_vector;
 }
+
+template <typename T>
+std::vector<T> &GetComponentVector(
+    const components::containers::EntityMemoryPool &entity_memory_pool) {
+  auto &component_vector = std::get<std::vector<T>>(entity_memory_pool);
+  return component_vector;
+}
+
 ////////////////////////////////////////////////////////////
 /// |brief get the a component at a given index
 ///
@@ -62,6 +70,12 @@ T &GetComponent(size_t entity_id,
   return GetComponentVector<T>(entity_memory_pool)[entity_id];
 }
 
+template <typename T>
+const T &GetComponent(
+    size_t entity_id,
+    const components::containers::EntityMemoryPool &entity_memory_pool) {
+  return GetComponentVector<T>(entity_memory_pool)[entity_id];
+}
 ////////////////////////////////////////////////////////////
 /// |brief check if a component is active for a given entity
 ///
@@ -69,4 +83,14 @@ T &GetComponent(size_t entity_id,
 template <typename T> bool HasComponent(size_t entityID) {
   return GetComponent<T>(entityID).getHas();
 }
+
+/**
+ * @brief Gets the current size of the entity memory pool.
+ *
+ * @param entity_memory_pool Takes in specific instance of the EntityMemoryPool
+ * @return The size of the CMeta component vector, which is the number of
+ * entities
+ */
+size_t GetMemoryPoolSize(
+    const components::containers::EntityMemoryPool &entity_memory_pool);
 } // namespace steamrot

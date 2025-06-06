@@ -11,10 +11,20 @@
 
 using json = nlohmann::json;
 
+namespace steamrot {
 struct CMeta : public Component {
   CMeta() = default;
   bool m_entity_active = false;
 
   const std::string &Name() override;
   void Configure(const json &data);
+
+  /**
+   * @brief Generates a unique index for the CMeta component based on its
+   * position in the Component register.
+   *
+   * @return Index of the CMeta component in the component register.
+   */
+  const size_t GetComponentRegisterIndex() const override;
 };
+} // namespace steamrot
