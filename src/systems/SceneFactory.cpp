@@ -6,6 +6,7 @@
 #include "SceneType.h"
 
 #include "uuid.h"
+#include <iostream>
 #include <memory>
 #include <string>
 
@@ -33,12 +34,14 @@ std::unique_ptr<Scene> SceneFactory::CreateScene(const SceneType &scene_type) {
 
   // generate UUID for the scene
   uuids::uuid scene_uuid = CreateUUID();
-
+  std::cout << "Creating scene with UUID: " << scene_uuid << std::endl;
   // load scene data
   const SceneData *scene_data = m_data_manager.ProvideSceneData(scene_type);
-
+  std::cout << "Loaded scene data for scene type: "
+            << magic_enum::enum_name(scene_type) << std::endl;
   switch (scene_type) {
   case SceneType::title:
+    std::cout << "Title scene type detected." << std::endl;
     return CreateTitleScene(scene_data, scene_uuid);
   case SceneType::menu:
     return CreateMenuScene(scene_data, scene_uuid);
@@ -57,6 +60,7 @@ SceneFactory::CreateTitleScene(const SceneData *scene_data,
   // TitleScene having a private constuctor
   std::unique_ptr<TitleScene> title_scene(
       new TitleScene(100, scene_data, scene_uuid));
+  std::cout << "Created TitleScene with UUID: " << scene_uuid << std::endl;
   return title_scene;
 }
 

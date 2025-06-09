@@ -4,6 +4,7 @@
 
 #include "EntityManager.h"
 #include "EntityHelpers.h"
+#include <iostream>
 #include <memory>
 
 using json = nlohmann::json;
@@ -14,16 +15,23 @@ namespace steamrot {
 EntityManager::EntityManager(const size_t &pool_size,
                              const EntitiesData *entities_data)
     : m_entity_configuration_factory() {
-
+  std::cout << "Creating EntityManager with pool size: " << pool_size
+            << std::endl;
   // create the memory pool with the given size
   m_pool =
       std::make_unique<steamrot::components::containers::EntityMemoryPool>();
   ResizePool(pool_size);
 
-  // configure the entities in the memory pool
-  m_entity_configuration_factory.ConfigureEntitiesFromDefaultData(
-      *m_pool, entities_data);
+  std::cout << "Attempting to configure entities from default data..."
+            << std::endl;
+  // configure the entities in the memory pool only if entities_data is not null
+  if (entities_data != nullptr) {
+    m_entity_configuration_factory.ConfigureEntitiesFromDefaultData(
+        *m_pool, entities_data);
+    std::cout << "Entities configured from default data." << std::endl;
+  }
 
+  std::cout << "Generating archetypes..." << std::endl;
   // map out current archetypes
   m_archetype_manager.GenerateAllArchetypes(*m_pool);
 };

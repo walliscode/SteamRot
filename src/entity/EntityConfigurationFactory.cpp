@@ -65,10 +65,10 @@ void EntityConfigurationFactory::ConfigureEntitiesFromDefaultData(
     const EntitiesData *entities_data) {
 
   // check if entity_data is not null
-  if (entities_data == nullptr) {
-    log_handler::ProcessLog(spdlog::level::level_enum::err,
+  if (entities_data->entities() == nullptr) {
+    log_handler::ProcessLog(spdlog::level::level_enum::info,
                             log_handler::LogCode::kNoCode,
-                            "Entity data is null.");
+                            "Entity data is empty, please add Entitiy Data.");
     return;
   }
 

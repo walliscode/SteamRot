@@ -30,13 +30,13 @@ private:
   ////////////////////////////////////////////////////////////
   // |brief: returns map of string letters to sf::Keyboard enum
   ////////////////////////////////////////////////////////////
-  static const std::map<std::string, sf::Keyboard::Key>
+  static const std::map<std::string, sf::Keyboard::Key> &
   getStringToKeyboardMap();
 
   ////////////////////////////////////////////////////////////
   // |brief: returns map of string letters to sf::Mouse enum
   ////////////////////////////////////////////////////////////
-  static const std::map<std::string, sf::Mouse::Button> getStringToMouseMap();
+  static const std::map<std::string, sf::Mouse::Button> &getStringToMouseMap();
 
   ////////////////////////////////////////////////////////////
   // |brief register actions for object instance from json
@@ -51,10 +51,7 @@ private:
   void RegisterActions(const ActionsData *actions_data);
 
 public:
-  ////////////////////////////////////////////////////////////
-  // |brief constructor using json as configuration object
-  ////////////////////////////////////////////////////////////
-  ActionManager(const json &config);
+  ActionManager() = default;
 
   /**
    * @brief Constructor using flatbuffers ActionsData object

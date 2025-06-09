@@ -10,6 +10,7 @@
 #include <SFML/Graphics.hpp>
 #include <cstddef>
 
+#include <iostream>
 #include <magic_enum/magic_enum.hpp>
 #include <magic_enum/magic_enum_iostream.hpp>
 #include <memory>
@@ -24,7 +25,7 @@ GameEngine::GameEngine()
     : m_display_manager(), m_data_manager(), m_event_handler() {
 
   m_scene_manager = std::make_unique<SceneManager>();
-
+  std::cout << "GameEngine constructor called" << std::endl;
   log_handler::ProcessLog(spdlog::level::level_enum::info,
                           log_handler::LogCode::kNoCode,
                           "GameEngine constructor called");
@@ -32,13 +33,13 @@ GameEngine::GameEngine()
 
 ////////////////////////////////////////////////////////////
 void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
-
+  std::cout << "Running GameEngine..." << std::endl;
   // set up resources
   m_scene_manager->StartUp();
-
+  std::cout << "SceneManager started up" << std::endl;
   // start up title scene
   ShowTitleScene();
-
+  std::cout << "Title scene loaded" << std::endl;
   // Run the program as long as the window is open
   while (m_display_manager.GetWindow().isOpen()) {
 
@@ -104,12 +105,13 @@ void GameEngine::RunSimulation(int loops) {
 
 ////////////////////////////////////////////////////////////
 void GameEngine::ShowTitleScene() {
-
+  std::cout << "Loading title scene..." << std::endl;
   // Load the title scene in the scene manager and get unique id
   uuids::uuid title_scene_id = m_scene_manager->LoadTitleScene();
-
+  std::cout << "Title scene loaded with ID: " << title_scene_id << std::endl;
   // pass the id to the display manager
   m_display_manager.LoadTitleSceneTiles(title_scene_id);
+  std::cout << "Title scene tiles loaded" << std::endl;
 }
 ////////////////////////////////////////////////////////////
 

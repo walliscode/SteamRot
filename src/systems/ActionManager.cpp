@@ -7,22 +7,20 @@
 #include "spdlog/common.h"
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
+#include <iostream>
 
 using namespace magic_enum::bitwise_operators;
 namespace steamrot {
 
 ////////////////////////////////////////////////////////////
-ActionManager::ActionManager(const json &config) {
-  // register actions from json config object
-  RegisterActions(config);
-}
-////////////////////////////////////////////////////////////
 ActionManager::ActionManager(const ActionsData *actions_data) {
   // register actions from ActionsData object
+  std::cout << "Registering actions from ActionsData object..." << std::endl;
   RegisterActions(actions_data);
+  std::cout << "Actions registered from ActionsData object." << std::endl;
 }
 ////////////////////////////////////////////////////////////
-const std::map<std::string, sf::Keyboard::Key>
+const std::map<std::string, sf::Keyboard::Key> &
 ActionManager::getStringToKeyboardMap() {
 
   // map of string to sf::Keyboard enum
@@ -44,7 +42,7 @@ ActionManager::getStringToKeyboardMap() {
   return string_to_key_map;
 }; // namespace steamrot
 ////////////////////////////////////////////////////////////
-const std::map<std::string, sf::Mouse::Button>
+const std::map<std::string, sf::Mouse::Button> &
 ActionManager::getStringToMouseMap() {
 
   // map of string to sf::Mouse enum
@@ -136,10 +134,13 @@ void ActionManager::RegisterActions(const json &config) {
 ////////////////////////////////////////////////////////////
 void ActionManager::RegisterActions(const ActionsData *actions_data) {
   // check if actions_data is null
-  if (actions_data == nullptr) {
+
+  if (actions_data->actions() == nullptr) {
     log_handler::ProcessLog(spdlog::level::level_enum::info,
                             log_handler::LogCode::kNoCode,
                             "ActionsData object is null");
+    std::cout << "ActionsData object is null, skipping registration"
+              << std::endl;
     return;
   }
   // cycle through the actions in the ActionsData object

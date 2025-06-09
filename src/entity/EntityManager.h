@@ -37,6 +37,7 @@ private:
   EntityConfigurationFactory m_entity_configuration_factory;
 
 public:
+  EntityManager() = default;
   ////////////////////////////////////////////////////////////
   /// \brief Default constructor
   ///

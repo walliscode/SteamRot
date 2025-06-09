@@ -9,6 +9,7 @@
 #include "SceneManager.h"
 #include "SceneType.h"
 #include "uuid.h"
+#include <iostream>
 #include <memory>
 
 namespace steamrot {
@@ -37,11 +38,13 @@ void SceneManager::StartUp() {}
  */
 void SceneManager::AddSceneFromDefault(const SceneType &scene_type,
                                        const size_t pool_size) {
-  // shared pointer is used as Scene can be in multiple maps
-  std::unique_ptr<Scene> new_scene = m_scene_factory.CreateScene(scene_type);
 
+  std::unique_ptr<Scene> new_scene = m_scene_factory.CreateScene(scene_type);
+  std::cout << "Created new scene of type: "
+            << magic_enum::enum_name(scene_type) << std::endl;
   // add to m_scenes maps
   m_scenes[new_scene->GetSceneID()] = std::move(new_scene);
+  std::cout << "Added scene to m_scenes map." << std::endl;
 };
 
 /**
@@ -50,8 +53,10 @@ void SceneManager::AddSceneFromDefault(const SceneType &scene_type,
 uuids::uuid SceneManager::LoadTitleScene() {
   // clear existing scenes
   m_scenes.clear();
+  std::cout << "Cleared existing scenes." << std::endl;
   // create title scene
   AddSceneFromDefault(SceneType::title, 100);
+  std::cout << "Added title scene." << std::endl;
 
   // return the ID of the title scene
   return m_scenes.begin()->first;
