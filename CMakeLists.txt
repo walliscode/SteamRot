@@ -2,8 +2,8 @@
 cmake_minimum_required (VERSION 3.31 FATAL_ERROR)
 
 project(SteamRot
-     VERSION 0.1.0.0
- LANGUAGES CXX)
+  VERSION 0.1.0.0
+  LANGUAGES CXX)
 
 enable_testing()
 
@@ -39,5 +39,6 @@ include(fetch_content_modules)
 add_subdirectory(steamrot)
 add_subdirectory(src)
 add_subdirectory(tests)
+add_subdirectory(docs)
 
 
