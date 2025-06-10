@@ -7,13 +7,17 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "ActionManager.h"
+#include "BaseLogic.h"
 #include "EntityManager.h"
+#include "LogicFactory.h"
+#include "logics_generated.h"
 #include "scenes_generated.h"
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <memory>
 #include <nlohmann/json.hpp>
 
+#include <unordered_map>
 #include <uuid.h>
 typedef std::vector<std::shared_ptr<sf::Drawable>> SceneDrawables;
 
@@ -32,6 +36,16 @@ protected:
   ////////////////////////////////////////////////////////////
   ActionManager m_action_manager;
 
+  /**
+   * @brief Instace of LogicFactory used to provide logic for the Scene
+   */
+  LogicFactory m_logic_factory;
+
+  /**
+   * @brief Map containing all the logic types relevant to the Scene.
+   */
+  std::unordered_map<LogicType, std::vector<std::unique_ptr<BaseLogic>>>
+      m_logics;
   ////////////////////////////////////////////////////////////
   // Member: unique id generated for each Scene instance
   ////////////////////////////////////////////////////////////

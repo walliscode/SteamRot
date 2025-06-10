@@ -6,19 +6,19 @@
 
 namespace steamrot {
 
-std::unordered_map<const LogicType, std::vector<std::unique_ptr<BaseLogic>>>
-LogicFactory::CreateLogicMap(const std::vector<LogicType> &logic_types) {
+std::unordered_map<LogicType, std::vector<std::unique_ptr<BaseLogic>>>
+LogicFactory::CreateLogicMap(const LogicData &logic_data) {
 
   // create return object
-  std::unordered_map<const LogicType, std::vector<std::unique_ptr<BaseLogic>>>
+  std::unordered_map<LogicType, std::vector<std::unique_ptr<BaseLogic>>>
       logic_map;
 
   // Iterate through the provided logic types and create the corresponding
   // logics
-  for (const auto &logic_type : logic_types) {
+  for (const auto &logic_type : *logic_data.types()) {
     switch (logic_type) {
     case LogicType::LogicType_Render: {
-      logic_map[logic_type] = CreateRenderLogics();
+      logic_map[LogicType::LogicType_Render] = CreateRenderLogics();
       break;
     }
     // Add cases for other logic types as needed

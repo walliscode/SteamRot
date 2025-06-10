@@ -53,13 +53,13 @@ struct LogicData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TYPES = 4
   };
-  const ::flatbuffers::Vector<uint8_t> *Types() const {
+  const ::flatbuffers::Vector<uint8_t> *types() const {
     return GetPointer<const ::flatbuffers::Vector<uint8_t> *>(VT_TYPES);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_TYPES) &&
-           verifier.VerifyVector(Types()) &&
+           verifier.VerifyVector(types()) &&
            verifier.EndTable();
   }
 };
@@ -68,8 +68,8 @@ struct LogicDataBuilder {
   typedef LogicData Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_Types(::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> Types) {
-    fbb_.AddOffset(LogicData::VT_TYPES, Types);
+  void add_types(::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> types) {
+    fbb_.AddOffset(LogicData::VT_TYPES, types);
   }
   explicit LogicDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -84,19 +84,19 @@ struct LogicDataBuilder {
 
 inline ::flatbuffers::Offset<LogicData> CreateLogicData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> Types = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> types = 0) {
   LogicDataBuilder builder_(_fbb);
-  builder_.add_Types(Types);
+  builder_.add_types(types);
   return builder_.Finish();
 }
 
 inline ::flatbuffers::Offset<LogicData> CreateLogicDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<uint8_t> *Types = nullptr) {
-  auto Types__ = Types ? _fbb.CreateVector<uint8_t>(*Types) : 0;
+    const std::vector<uint8_t> *types = nullptr) {
+  auto types__ = types ? _fbb.CreateVector<uint8_t>(*types) : 0;
   return steamrot::CreateLogicData(
       _fbb,
-      Types__);
+      types__);
 }
 
 }  // namespace steamrot

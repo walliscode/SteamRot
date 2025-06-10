@@ -1,4 +1,5 @@
 add_library(logic
+LogicFactory.cpp
   UIRenderLogic.cpp
 )
 

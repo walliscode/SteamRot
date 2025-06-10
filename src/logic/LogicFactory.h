@@ -2,36 +2,36 @@
  * @file
  * @brief LogicFactory class declaration along with any helper classes.
  */
-#pragma once
+
 #include "BaseLogic.h"
 #include "logics_generated.h"
 #include <memory>
 #include <unordered_map>
-#include <vector>
 namespace steamrot {
 
 /**
  * @class LogicFactory
- * @brief Provide a map of containers for logic objects.
+ * @brief Provides vectors of logic objects for the game.
  *
  */
 class LogicFactory {
 private:
   /**
-   * @brief Default constructor.
-   */
-  LogicFactory() = default;
-
-  /**
-   * @brief Return a vector of Logic objects for Rendering.
+   * @brief Create a vector of logic objects specifically for rendering.
    */
   std::vector<std::unique_ptr<BaseLogic>> CreateRenderLogics();
 
 public:
   /**
-   * @brief Returns a map of logic objects for the Scene to use.
+   * @brief Default constructor
    */
-  std::unordered_map<const LogicType, std::vector<std::unique_ptr<BaseLogic>>>
-  CreateLogicMap(const std::vector<LogicType> &logic_types);
+  LogicFactory() = default;
+
+  /**
+   * @brief Return a map of different logic types to their corresponding logic
+   * objects.
+   */
+  std::unordered_map<LogicType, std::vector<std::unique_ptr<BaseLogic>>>
+  CreateLogicMap(const LogicData &logic_data);
 };
 } // namespace steamrot

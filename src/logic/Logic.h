@@ -6,7 +6,7 @@
 #include <bitset>
 namespace steamrot {
 
-template <typename... AllComponentTypes> class Logic : BaseLogic {
+template <typename... AllComponentTypes> class Logic : public BaseLogic {
 public:
   ////////////////////////////////////////////////////////////
   /// \brief default constructor
