@@ -7,6 +7,7 @@
 // headers
 ////////////////////////////////////////////////////////////
 #include "CUserInterface.h"
+#include "Logic.h"
 #include "themes_generated.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
@@ -25,17 +26,13 @@ struct ButtonStyle {
   sf::Color text_color;
   sf::Color border_color;
 };
-class UIEngine {
+
+class UIRenderLogic : public Logic<CUserInterface> {
 private:
   ////////////////////////////////////////////////////////////
   // |brief draw drop down menu
   ////////////////////////////////////////////////////////////
   void DrawDropDownMenu(sf::RenderTexture &render_texture);
-
-  ////////////////////////////////////////////////////////////
-  // |brief add in styles from json config
-  ////////////////////////////////////////////////////////////
-  void AddStyles(const json &config);
 
   ////////////////////////////////////////////////////////////
   // |brief add in styles from flatbuffer config
@@ -47,21 +44,27 @@ private:
    */
   ButtonStyle m_button_style; // Style for buttons
 
+  /**
+   * @brief Gather all logic here, to be called by the Logic.RunLogic() function
+   *
+   * @param entities A reference to the EntityMemoryPool containing all
+   * entities.
+   * @param entity_indicies A mask of entity indiced to process the
+   * EnittyMemoryPool.
+   */
+  void ProcessLogic(components::containers::EntityMemoryPool &entities,
+                    const EntityIndicies &entity_indicies) override;
+
 public:
   ////////////////////////////////////////////////////////////
   // |brief Default constructor
   ////////////////////////////////////////////////////////////
-  UIEngine() = default;
-
-  ////////////////////////////////////////////////////////////
-  // |brief Constructor taking in json config
-  ////////////////////////////////////////////////////////////
-  UIEngine(const json &config);
+  UIRenderLogic();
 
   ////////////////////////////////////////////////////////////
   // |brief Constructor taking in flatbuffer config
   ////////////////////////////////////////////////////////////
-  UIEngine(const themes::UIObjects *config);
+  UIRenderLogic(const themes::UIObjects *config);
 
   ////////////////////////////////////////////////////////////
   // |brief Draw the UI elements to the render texture

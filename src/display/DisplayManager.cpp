@@ -30,24 +30,7 @@ DisplayManager::DisplayManager()
       m_data_manager.ProvideThemeData("default");
 
   // create the UI engine with the theme data
-  m_ui_engine = UIEngine(theme_data);
-};
-
-///////////////////////////////////////////////////////////
-void DisplayManager::SetWindowConfig(const json &config) {
-  // cast json values to to the correct types, to show intent
-  sf::Vector2u size{config["width"], config["height"]};
-  m_window.setSize(size);
-
-  const std::string title = config["title"];
-  m_window.setTitle(title);
-
-  unsigned int frame_rate_limit = config["framerate_limit"];
-  m_window.setFramerateLimit(frame_rate_limit);
-
-  m_background_color.r = config["background_color"]["r"];
-  m_background_color.g = config["background_color"]["g"];
-  m_background_color.b = config["background_color"]["b"];
+  m_ui_engine = UIRenderLogic(theme_data);
 };
 
 ///////////////////////////////////////////////////////////

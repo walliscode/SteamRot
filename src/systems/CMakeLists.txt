@@ -8,7 +8,6 @@ add_library(systems
     ActionManager.cpp
     MenuScene.cpp
     TitleScene.cpp
-    Logic.cpp
     EventHandler.cpp
 )
 
