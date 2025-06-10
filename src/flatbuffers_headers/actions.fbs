@@ -1,7 +1,7 @@
 namespace steamrot;
 
 // enum describing the type of input
-enum InputType: byte {
+enum InputType: ubyte {
     Keyboard = 0,
     Mouse = 1
   }

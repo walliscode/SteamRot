@@ -1,12 +1,13 @@
 include "actions.fbs";
 include "entities.fbs";
+include "logics.fbs";
+
 namespace steamrot; 
-
-
 
 table SceneData{
     actions: ActionsData;
     entities: EntitiesData;
+    logics: LogicData;
   }
 
 root_type SceneData;

@@ -15,6 +15,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 #include "actions_generated.h"
 #include "entities_generated.h"
+#include "logics_generated.h"
 
 namespace steamrot {
 
@@ -25,7 +26,8 @@ struct SceneData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef SceneDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ACTIONS = 4,
-    VT_ENTITIES = 6
+    VT_ENTITIES = 6,
+    VT_LOGICS = 8
   };
   const steamrot::ActionsData *actions() const {
     return GetPointer<const steamrot::ActionsData *>(VT_ACTIONS);
@@ -33,12 +35,17 @@ struct SceneData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::EntitiesData *entities() const {
     return GetPointer<const steamrot::EntitiesData *>(VT_ENTITIES);
   }
+  const steamrot::LogicData *logics() const {
+    return GetPointer<const steamrot::LogicData *>(VT_LOGICS);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_ACTIONS) &&
            verifier.VerifyTable(actions()) &&
            VerifyOffset(verifier, VT_ENTITIES) &&
            verifier.VerifyTable(entities()) &&
+           VerifyOffset(verifier, VT_LOGICS) &&
+           verifier.VerifyTable(logics()) &&
            verifier.EndTable();
   }
 };
@@ -52,6 +59,9 @@ struct SceneDataBuilder {
   }
   void add_entities(::flatbuffers::Offset<steamrot::EntitiesData> entities) {
     fbb_.AddOffset(SceneData::VT_ENTITIES, entities);
+  }
+  void add_logics(::flatbuffers::Offset<steamrot::LogicData> logics) {
+    fbb_.AddOffset(SceneData::VT_LOGICS, logics);
   }
   explicit SceneDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -67,8 +77,10 @@ struct SceneDataBuilder {
 inline ::flatbuffers::Offset<SceneData> CreateSceneData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::ActionsData> actions = 0,
-    ::flatbuffers::Offset<steamrot::EntitiesData> entities = 0) {
+    ::flatbuffers::Offset<steamrot::EntitiesData> entities = 0,
+    ::flatbuffers::Offset<steamrot::LogicData> logics = 0) {
   SceneDataBuilder builder_(_fbb);
+  builder_.add_logics(logics);
   builder_.add_entities(entities);
   builder_.add_actions(actions);
   return builder_.Finish();

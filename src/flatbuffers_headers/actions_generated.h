@@ -30,7 +30,7 @@ struct ActionBuilder;
 struct ActionsData;
 struct ActionsDataBuilder;
 
-enum InputType : int8_t {
+enum InputType : uint8_t {
   InputType_Keyboard = 0,
   InputType_Mouse = 1,
   InputType_MIN = InputType_Keyboard,
@@ -218,7 +218,7 @@ struct ActionPart FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_INPUT = 8
   };
   steamrot::InputType type() const {
-    return static_cast<steamrot::InputType>(GetField<int8_t>(VT_TYPE, 0));
+    return static_cast<steamrot::InputType>(GetField<uint8_t>(VT_TYPE, 0));
   }
   steamrot::Input input_type() const {
     return static_cast<steamrot::Input>(GetField<uint8_t>(VT_INPUT_TYPE, 0));
@@ -235,7 +235,7 @@ struct ActionPart FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int8_t>(verifier, VT_TYPE, 1) &&
+           VerifyField<uint8_t>(verifier, VT_TYPE, 1) &&
            VerifyField<uint8_t>(verifier, VT_INPUT_TYPE, 1) &&
            VerifyOffset(verifier, VT_INPUT) &&
            VerifyInput(verifier, input(), input_type()) &&
@@ -256,7 +256,7 @@ struct ActionPartBuilder {
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_type(steamrot::InputType type) {
-    fbb_.AddElement<int8_t>(ActionPart::VT_TYPE, static_cast<int8_t>(type), 0);
+    fbb_.AddElement<uint8_t>(ActionPart::VT_TYPE, static_cast<uint8_t>(type), 0);
   }
   void add_input_type(steamrot::Input input_type) {
     fbb_.AddElement<uint8_t>(ActionPart::VT_INPUT_TYPE, static_cast<uint8_t>(input_type), 0);
