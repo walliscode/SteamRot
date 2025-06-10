@@ -1,0 +1,10 @@
+namespace steamrot;
+
+enum LogicType: ubyte{
+None = 0,
+Render = 1,
+}
+
+table LogicData{
+Types: [LogicType];
+  }
