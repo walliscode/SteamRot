@@ -1,11 +1,9 @@
 #pragma once
 
 #include "ArchetypeManager.h"
-
 #include "containers.h"
 #include <bitset>
 #include <memory>
-
 namespace steamrot {
 using EntityIndicies = std::vector<size_t>;
 
@@ -15,7 +13,12 @@ public:
   /// \brief default constructor
   ///
   ////////////////////////////////////////////////////////////
-  Logic(size_t update_frequency);
+
+  Logic<AllComponentTypes...>() {
+
+    // create the archetype ID for this logic class
+    ArchetypeIDFactory<AllComponentTypes...>();
+  };
 
   ////////////////////////////////////////////////////////////
   /// \brief guard function for update frequency
@@ -31,7 +34,7 @@ protected:
   /// \brief Members
   ///
   ////////////////////////////////////////////////////////////
-  size_t m_update_frequency;
+  size_t m_update_frequency{2};
   size_t m_cycle_count{0};
   std::vector<ArchetypeID> m_archetype_IDs;
 
@@ -39,10 +42,8 @@ protected:
   /// \brief Carries out Logic for the game
   ///
   ////////////////////////////////////////////////////////////
-  virtual void ProcessLogic(
-      std::unique_ptr<steamrot::components::containers::EntityMemoryPool>
-          &entities,
-      const EntityIndicies &entity_indicies) = 0;
+  virtual void ProcessLogic(components::containers::EntityMemoryPool &entities,
+                            const EntityIndicies &entity_indicies) = 0;
 
   ////////////////////////////////////////////////////////////
   /// \brief template factory function for ArcetypeId creation. Contains logic
@@ -74,4 +75,21 @@ protected:
     return id;
   }
 };
+template <typename... AllComponentTypes>
+void Logic<AllComponentTypes...>::RunLogic(
+    std::unique_ptr<steamrot::components::containers::EntityMemoryPool>
+        &entities,
+    const EntityIndicies &entity_indicies) {
+
+  if (m_cycle_count == m_update_frequency) {
+    ProcessLogic(entities, entity_indicies);
+
+    // reset the cycle count to 1, make sure this comes at the end of the if
+    // block
+    m_cycle_count = 1;
+  } else {
+    // increment the cycle count only if we are not at the update frequency
+    m_cycle_count++;
+  }
+}
 }; // namespace steamrot

@@ -1,33 +1,40 @@
 ////////////////////////////////////////////////////////////
 // headers
 ////////////////////////////////////////////////////////////
-#include "UIEngine.h"
+#include "UIRenderLogic.h"
 #include "log_handler.h"
 #include "spdlog/common.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 
 namespace steamrot {
-////////////////////////////////////////////////////////////
-UIEngine::UIEngine(const json &config) {
-
-  // Initialize the UI engine with the provided JSON configuration
-  // This could include setting up styles, themes, and other UI elements
-  AddStyles(config);
+UIRenderLogic::UIRenderLogic() : Logic<CUserInterface>() {
+  // Default constructor initializes the UI engine with default styles
+  // This could be extended to load styles from a configuration file or theme
+  log_handler::ProcessLog(spdlog::level::level_enum::info,
+                          log_handler::LogCode::kNoCode,
+                          "UIEngine: Default constructor called");
 }
 
 /////////////////////////////////////////////////////////////
-UIEngine::UIEngine(const themes::UIObjects *config) {
+UIRenderLogic::UIRenderLogic(const themes::UIObjects *config)
+    : Logic<CUserInterface>() {
   // Initialize the UI engine with the provided flatbuffer configuration
   // This could include setting up styles, themes, and other UI elements
   AddStyles(config);
 }
-////////////////////////////////////////////////////////////
-void UIEngine::AddStyles(const json &config) {
-  // Implementation for adding styles from the JSON config can be added here
+void UIRenderLogic::ProcessLogic(
+    components::containers::EntityMemoryPool &entities,
+    const EntityIndicies &entity_indicies) {
+  // Process the logic for the UI elements
+  // This could include updating button states, handling input, etc.
+  // For now, we will just log that the logic is being processed
+  log_handler::ProcessLog(spdlog::level::level_enum::info,
+                          log_handler::LogCode::kNoCode,
+                          "UIEngine: Processing UI Logic");
 }
 
 ////////////////////////////////////////////////////////////
-void UIEngine::AddStyles(const themes::UIObjects *config) {
+void UIRenderLogic::AddStyles(const themes::UIObjects *config) {
   // add guard to check if config is not null
   if (!config) {
     log_handler::ProcessLog(
@@ -54,17 +61,17 @@ void UIEngine::AddStyles(const themes::UIObjects *config) {
       "UIEngine: Button styles added from flatbuffer config");
 }
 ////////////////////////////////////////////////////////////
-void UIEngine::DrawUILayer(sf::RenderTexture &render_texture,
-                           std::vector<CUserInterface> &ui_elements) {
+void UIRenderLogic::DrawUILayer(sf::RenderTexture &render_texture,
+                                std::vector<CUserInterface> &ui_elements) {
   // Implementation for drawing the UI layer to the render texture can be
   // added here This could include drawing buttons, text fields, and other UI
   // components
 }
 ////////////////////////////////////////////////////////////
-void UIEngine::DrawDropDownMenu(sf::RenderTexture &render_texture) {};
+void UIRenderLogic::DrawDropDownMenu(sf::RenderTexture &render_texture) {};
 
 ////////////////////////////////////////////////////////////
-void UIEngine::DrawTestButton(sf::RenderTexture &ui_layer) {
+void UIRenderLogic::DrawTestButton(sf::RenderTexture &ui_layer) {
 
   // Crea  // Create a button shape
   sf::RectangleShape button(sf::Vector2f(200, 50));
@@ -78,7 +85,7 @@ void UIEngine::DrawTestButton(sf::RenderTexture &ui_layer) {
   ui_layer.draw(button);
 }
 
-void UIEngine::Draw(sf::RenderTexture &ui_layer) {
+void UIRenderLogic::Draw(sf::RenderTexture &ui_layer) {
   // clear the UI layer before drawing
   ui_layer.clear();
 

@@ -22,7 +22,7 @@
 ## Directory structure
 
 Structure of the project is derived and heavily influenced by the [Pitchfork](https://github.com/vector-of-bool/pitchfork) repo and more specifically the
-information laid out in the [spec.bs](https://github.com/vector-of-bool/pitchfork/blob/develop/data/spec.bs).
+information laid out in the [spec.bs](https://github.com/vector-of-bool/pitchfork/blob/develop/data/spec.bs)
 
 ### Data
 
@@ -119,7 +119,7 @@ So the steps an operator would take to add an action are:
 
 ## Classes
 
-### DatManager
+### DataManager
 
 The DataManager class will live in the GameEngine class. Its current
 responsibilities include:

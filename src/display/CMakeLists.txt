@@ -18,7 +18,7 @@ target_link_libraries(display PUBLIC
     magic_enum
     systems
     stduuid
-    UIEngine
+    logic
     utilities
 
 )
