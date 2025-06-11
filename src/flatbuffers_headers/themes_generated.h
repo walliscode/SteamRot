@@ -18,8 +18,11 @@ namespace themes {
 
 struct Color;
 
-struct Button;
-struct ButtonBuilder;
+struct PanelStyle;
+struct PanelStyleBuilder;
+
+struct ButtonStyle;
+struct ButtonStyleBuilder;
 
 struct UIObjects;
 struct UIObjectsBuilder;
@@ -59,8 +62,69 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(1) Color FLATBUFFERS_FINAL_CLASS {
 };
 FLATBUFFERS_STRUCT_END(Color, 4);
 
-struct Button FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef ButtonBuilder Builder;
+struct PanelStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef PanelStyleBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_BACKGROUND_COLOR = 4,
+    VT_BORDER_COLOR = 6,
+    VT_BORDER_THICKNESS = 8
+  };
+  const steamrot::themes::Color *background_color() const {
+    return GetStruct<const steamrot::themes::Color *>(VT_BACKGROUND_COLOR);
+  }
+  const steamrot::themes::Color *border_color() const {
+    return GetStruct<const steamrot::themes::Color *>(VT_BORDER_COLOR);
+  }
+  float border_thickness() const {
+    return GetField<float>(VT_BORDER_THICKNESS, 0.0f);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<steamrot::themes::Color>(verifier, VT_BACKGROUND_COLOR, 1) &&
+           VerifyField<steamrot::themes::Color>(verifier, VT_BORDER_COLOR, 1) &&
+           VerifyField<float>(verifier, VT_BORDER_THICKNESS, 4) &&
+           verifier.EndTable();
+  }
+};
+
+struct PanelStyleBuilder {
+  typedef PanelStyle Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_background_color(const steamrot::themes::Color *background_color) {
+    fbb_.AddStruct(PanelStyle::VT_BACKGROUND_COLOR, background_color);
+  }
+  void add_border_color(const steamrot::themes::Color *border_color) {
+    fbb_.AddStruct(PanelStyle::VT_BORDER_COLOR, border_color);
+  }
+  void add_border_thickness(float border_thickness) {
+    fbb_.AddElement<float>(PanelStyle::VT_BORDER_THICKNESS, border_thickness, 0.0f);
+  }
+  explicit PanelStyleBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<PanelStyle> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<PanelStyle>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<PanelStyle> CreatePanelStyle(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const steamrot::themes::Color *background_color = nullptr,
+    const steamrot::themes::Color *border_color = nullptr,
+    float border_thickness = 0.0f) {
+  PanelStyleBuilder builder_(_fbb);
+  builder_.add_border_thickness(border_thickness);
+  builder_.add_border_color(border_color);
+  builder_.add_background_color(background_color);
+  return builder_.Finish();
+}
+
+struct ButtonStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef ButtonStyleBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_BACKGROUND_COLOR = 4,
     VT_TEXT_COLOR = 6,
@@ -84,36 +148,36 @@ struct Button FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct ButtonBuilder {
-  typedef Button Table;
+struct ButtonStyleBuilder {
+  typedef ButtonStyle Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_background_color(const steamrot::themes::Color *background_color) {
-    fbb_.AddStruct(Button::VT_BACKGROUND_COLOR, background_color);
+    fbb_.AddStruct(ButtonStyle::VT_BACKGROUND_COLOR, background_color);
   }
   void add_text_color(const steamrot::themes::Color *text_color) {
-    fbb_.AddStruct(Button::VT_TEXT_COLOR, text_color);
+    fbb_.AddStruct(ButtonStyle::VT_TEXT_COLOR, text_color);
   }
   void add_border_color(const steamrot::themes::Color *border_color) {
-    fbb_.AddStruct(Button::VT_BORDER_COLOR, border_color);
+    fbb_.AddStruct(ButtonStyle::VT_BORDER_COLOR, border_color);
   }
-  explicit ButtonBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit ButtonStyleBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<Button> Finish() {
+  ::flatbuffers::Offset<ButtonStyle> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<Button>(end);
+    auto o = ::flatbuffers::Offset<ButtonStyle>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<Button> CreateButton(
+inline ::flatbuffers::Offset<ButtonStyle> CreateButtonStyle(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const steamrot::themes::Color *background_color = nullptr,
     const steamrot::themes::Color *text_color = nullptr,
     const steamrot::themes::Color *border_color = nullptr) {
-  ButtonBuilder builder_(_fbb);
+  ButtonStyleBuilder builder_(_fbb);
   builder_.add_border_color(border_color);
   builder_.add_text_color(text_color);
   builder_.add_background_color(background_color);
@@ -123,15 +187,21 @@ inline ::flatbuffers::Offset<Button> CreateButton(
 struct UIObjects FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef UIObjectsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_BUTTON = 4
+    VT_PANEL_STYLE = 4,
+    VT_BUTTON_STYLE = 6
   };
-  const steamrot::themes::Button *button() const {
-    return GetPointer<const steamrot::themes::Button *>(VT_BUTTON);
+  const steamrot::themes::PanelStyle *panel_style() const {
+    return GetPointer<const steamrot::themes::PanelStyle *>(VT_PANEL_STYLE);
+  }
+  const steamrot::themes::ButtonStyle *button_style() const {
+    return GetPointer<const steamrot::themes::ButtonStyle *>(VT_BUTTON_STYLE);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_BUTTON) &&
-           verifier.VerifyTable(button()) &&
+           VerifyOffset(verifier, VT_PANEL_STYLE) &&
+           verifier.VerifyTable(panel_style()) &&
+           VerifyOffset(verifier, VT_BUTTON_STYLE) &&
+           verifier.VerifyTable(button_style()) &&
            verifier.EndTable();
   }
 };
@@ -140,8 +210,11 @@ struct UIObjectsBuilder {
   typedef UIObjects Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_button(::flatbuffers::Offset<steamrot::themes::Button> button) {
-    fbb_.AddOffset(UIObjects::VT_BUTTON, button);
+  void add_panel_style(::flatbuffers::Offset<steamrot::themes::PanelStyle> panel_style) {
+    fbb_.AddOffset(UIObjects::VT_PANEL_STYLE, panel_style);
+  }
+  void add_button_style(::flatbuffers::Offset<steamrot::themes::ButtonStyle> button_style) {
+    fbb_.AddOffset(UIObjects::VT_BUTTON_STYLE, button_style);
   }
   explicit UIObjectsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -156,9 +229,11 @@ struct UIObjectsBuilder {
 
 inline ::flatbuffers::Offset<UIObjects> CreateUIObjects(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<steamrot::themes::Button> button = 0) {
+    ::flatbuffers::Offset<steamrot::themes::PanelStyle> panel_style = 0,
+    ::flatbuffers::Offset<steamrot::themes::ButtonStyle> button_style = 0) {
   UIObjectsBuilder builder_(_fbb);
-  builder_.add_button(button);
+  builder_.add_button_style(button_style);
+  builder_.add_panel_style(panel_style);
   return builder_.Finish();
 }
 

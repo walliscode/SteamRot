@@ -6,15 +6,21 @@ struct Color {
     b:ubyte;
     a:ubyte;
   }
+table PanelStyle {
+    background_color: Color;
+    border_color: Color;
+    border_thickness: float;
+  }
 
-
-table Button {
+table ButtonStyle {
   background_color: Color;
   text_color: Color;
   border_color: Color;
   }
 
 table UIObjects {
-    button: Button;
+    panel_style: PanelStyle;
+    button_style: ButtonStyle;
+
   }
 root_type UIObjects;
