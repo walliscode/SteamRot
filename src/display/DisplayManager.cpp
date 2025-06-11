@@ -71,7 +71,7 @@ void DisplayManager::Render(TexturesPackage &textures_package) {
   m_window.draw(tile_overlay_sprite);
 
   // draw the UI layer to the window
-  m_ui_engine.Draw(m_ui_layer);
+  m_ui_engine.DrawUILayer(m_ui_layer);
   sf::Sprite ui_layer_sprite{m_ui_layer.getTexture()};
   m_window.draw(ui_layer_sprite);
 

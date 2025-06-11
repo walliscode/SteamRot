@@ -42,31 +42,56 @@ void UIRenderLogic::AddStyles(const themes::UIObjects *config) {
         "UIEngine: Null config provided, cannot add styles");
     return;
   }
+  // add panel styles from flatbuffer config
+  m_panel_style.background_color.r =
+      config->panel_style()->background_color()->r();
+  m_panel_style.background_color.g =
+      config->panel_style()->background_color()->g();
+  m_panel_style.background_color.b =
+      config->panel_style()->background_color()->b();
+  m_panel_style.background_color.a =
+      config->panel_style()->background_color()->a();
+  m_panel_style.border_color.r = config->panel_style()->border_color()->r();
+  m_panel_style.border_color.g = config->panel_style()->border_color()->g();
+  m_panel_style.border_color.b = config->panel_style()->border_color()->b();
+  m_panel_style.border_color.a = config->panel_style()->border_color()->a();
+  m_panel_style.border_thickness = config->panel_style()->border_thickness();
+
   // add button styles from flatbuffer config
-  m_button_style.border_color.r = config->button()->border_color()->r();
-  m_button_style.border_color.g = config->button()->border_color()->g();
-  m_button_style.border_color.b = config->button()->border_color()->b();
-  m_button_style.border_color.a = config->button()->border_color()->a();
-  m_button_style.background_color.r = config->button()->background_color()->r();
-  m_button_style.background_color.g = config->button()->background_color()->g();
-  m_button_style.background_color.b = config->button()->background_color()->b();
-  m_button_style.background_color.a = config->button()->background_color()->a();
-  m_button_style.text_color.r = config->button()->text_color()->r();
-  m_button_style.text_color.g = config->button()->text_color()->g();
-  m_button_style.text_color.b = config->button()->text_color()->b();
-  m_button_style.text_color.a = config->button()->text_color()->a();
+  m_button_style.border_color.r = config->button_style()->border_color()->r();
+  m_button_style.border_color.g = config->button_style()->border_color()->g();
+  m_button_style.border_color.b = config->button_style()->border_color()->b();
+  m_button_style.border_color.a = config->button_style()->border_color()->a();
+  m_button_style.background_color.r =
+      config->button_style()->background_color()->r();
+  m_button_style.background_color.g =
+      config->button_style()->background_color()->g();
+  m_button_style.background_color.b =
+      config->button_style()->background_color()->b();
+  m_button_style.background_color.a =
+      config->button_style()->background_color()->a();
+  m_button_style.text_color.r = config->button_style()->text_color()->r();
+  m_button_style.text_color.g = config->button_style()->text_color()->g();
+  m_button_style.text_color.b = config->button_style()->text_color()->b();
+  m_button_style.text_color.a = config->button_style()->text_color()->a();
 
   log_handler::ProcessLog(
       spdlog::level::level_enum::info, log_handler::LogCode::kNoCode,
       "UIEngine: Button styles added from flatbuffer config");
 }
-////////////////////////////////////////////////////////////
-void UIRenderLogic::DrawUILayer(sf::RenderTexture &render_texture,
-                                std::vector<CUserInterface> &ui_elements) {
-  // Implementation for drawing the UI layer to the render texture can be
-  // added here This could include drawing buttons, text fields, and other UI
-  // components
+
+void UIRenderLogic::DrawPanel(sf::RenderTexture &render_texture) {
+  // Create a panel shape
+  sf::RectangleShape panel(sf::Vector2f(400, 300));
+  // Set the panel style
+  panel.setFillColor(m_panel_style.background_color);
+  panel.setOutlineColor(m_panel_style.border_color);
+  panel.setOutlineThickness(m_panel_style.border_thickness);
+  panel.setPosition({50.f, 50.f}); // Position the panel
+  // Draw the panel to the render texture
+  render_texture.draw(panel);
 }
+
 ////////////////////////////////////////////////////////////
 void UIRenderLogic::DrawDropDownMenu(sf::RenderTexture &render_texture) {};
 
@@ -85,7 +110,7 @@ void UIRenderLogic::DrawTestButton(sf::RenderTexture &ui_layer) {
   ui_layer.draw(button);
 }
 
-void UIRenderLogic::Draw(sf::RenderTexture &ui_layer) {
+void UIRenderLogic::DrawUILayer(sf::RenderTexture &ui_layer) {
   // clear the UI layer before drawing
   ui_layer.clear();
 
