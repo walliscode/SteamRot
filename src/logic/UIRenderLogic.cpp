@@ -2,29 +2,28 @@
 // headers
 ////////////////////////////////////////////////////////////
 #include "UIRenderLogic.h"
+#include "BaseLogic.h"
 #include "log_handler.h"
 #include "spdlog/common.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 
 namespace steamrot {
-UIRenderLogic::UIRenderLogic() : Logic<CUserInterface>() {
-  // Default constructor initializes the UI engine with default styles
-  // This could be extended to load styles from a configuration file or theme
-  log_handler::ProcessLog(spdlog::level::level_enum::info,
-                          log_handler::LogCode::kNoCode,
-                          "UIEngine: Default constructor called");
-}
 
 /////////////////////////////////////////////////////////////
-UIRenderLogic::UIRenderLogic(const themes::UIObjects *config)
-    : Logic<CUserInterface>() {
+UIRenderLogic::UIRenderLogic(const LogicContext &logic_context)
+    : Logic<CUserInterface>(logic_context) {
   // Initialize the UI engine with the provided flatbuffer configuration
   // This could include setting up styles, themes, and other UI elements
-  AddStyles(config);
+  if (!logic_context.ui_config) {
+    log_handler::ProcessLog(spdlog::level::level_enum::err,
+                            log_handler::LogCode::kNoCode,
+                            "UIEngine: Null UI configuration provided, cannot "
+                            "initialize UI styles");
+    return;
+  }
+  AddStyles(logic_context.ui_config);
 }
-void UIRenderLogic::ProcessLogic(
-    components::containers::EntityMemoryPool &entities,
-    const EntityIndicies &entity_indicies) {
+void UIRenderLogic::ProcessLogic() {
   // Process the logic for the UI elements
   // This could include updating button states, handling input, etc.
   // For now, we will just log that the logic is being processed

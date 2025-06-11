@@ -66,5 +66,14 @@ public:
    */
   void GenerateAllArchetypes(
       const components::containers::EntityMemoryPool &entity_memory_pool);
+
+  /**
+   * @brief Returns a reference to the map of Archetypes. This should not modify
+   * the data
+   *
+   * @return archetype map
+   */
+  std::unordered_map<ArchetypeID, Archetype> &GetArchetypes();
 };
+
 } // namespace steamrot

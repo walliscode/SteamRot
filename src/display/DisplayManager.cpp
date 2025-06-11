@@ -14,8 +14,7 @@ namespace steamrot {
 
 ///////////////////////////////////////////////////////////
 DisplayManager::DisplayManager()
-    : m_active_session(std::make_shared<Session>()), m_data_manager(),
-      m_ui_engine() {
+    : m_active_session(std::make_shared<Session>()), m_data_manager() {
 
   // Initialize the RenderTexture for the UI layer wihth the same size as the
   // window
@@ -30,7 +29,7 @@ DisplayManager::DisplayManager()
       m_data_manager.ProvideThemeData("default");
 
   // create the UI engine with the theme data
-  m_ui_engine = UIRenderLogic(theme_data);
+  // m_ui_engine = UIRenderLogic(theme_data);
 };
 
 ///////////////////////////////////////////////////////////
@@ -71,9 +70,9 @@ void DisplayManager::Render(TexturesPackage &textures_package) {
   m_window.draw(tile_overlay_sprite);
 
   // draw the UI layer to the window
-  m_ui_engine.DrawUILayer(m_ui_layer);
-  sf::Sprite ui_layer_sprite{m_ui_layer.getTexture()};
-  m_window.draw(ui_layer_sprite);
+  // m_ui_engine.DrawUILayer(m_ui_layer);
+  // sf::Sprite ui_layer_sprite{m_ui_layer.getTexture()};
+  // m_window.draw(ui_layer_sprite);
 
   // display the contents of the window to the screen
   m_window.display();

@@ -36,6 +36,16 @@ EntityManager::EntityManager(const size_t &pool_size,
   m_archetype_manager.GenerateAllArchetypes(*m_pool);
 };
 
+components::containers::EntityMemoryPool &EntityManager::GetEntityMemoryPool() {
+  // return a reference to the memory pool
+  return *m_pool;
+}
+
+ArchetypeManager &EntityManager::GetArchetypeManager() {
+  // return a const reference to the archetype manager
+  return m_archetype_manager;
+}
+
 ////////////////////////////////////////////////////////////
 void EntityManager::ResizePool(const size_t &pool_size) {
 

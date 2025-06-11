@@ -2,12 +2,14 @@
 #include "BaseLogic.h"
 
 namespace steamrot {
-void BaseLogic::RunLogic(
-    steamrot::components::containers::EntityMemoryPool &entities,
-    const EntityIndicies &entity_indicies) {
+
+BaseLogic::BaseLogic(const LogicContext &logic_context)
+    : m_logic_context(logic_context) {}
+
+void BaseLogic::RunLogic() {
 
   if (m_cycle_count == m_update_frequency) {
-    ProcessLogic(entities, entity_indicies);
+    ProcessLogic();
 
     // reset the cycle count to 1, make sure this comes at the end of the if
     // block
