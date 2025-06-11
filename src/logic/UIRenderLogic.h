@@ -6,6 +6,7 @@
 ////////////////////////////////////////////////////////////
 // headers
 ////////////////////////////////////////////////////////////
+#include "BaseLogic.h"
 #include "CUserInterface.h"
 #include "Logic.h"
 #include "themes_generated.h"
@@ -67,14 +68,9 @@ private:
 
 public:
   ////////////////////////////////////////////////////////////
-  // |brief Default constructor
-  ////////////////////////////////////////////////////////////
-  UIRenderLogic();
-
-  ////////////////////////////////////////////////////////////
   // |brief Constructor taking in flatbuffer config
   ////////////////////////////////////////////////////////////
-  UIRenderLogic(const themes::UIObjects *config);
+  UIRenderLogic(const LogicContext &logic_context);
 
   /**
    * @brief Gather all logic here, to be called by the Logic.RunLogic() function
@@ -84,8 +80,7 @@ public:
    * @param entity_indicies A mask of entity indiced to process the
    * EnittyMemoryPool.
    */
-  void ProcessLogic(components::containers::EntityMemoryPool &entities,
-                    const EntityIndicies &entity_indicies) override;
+  void ProcessLogic() override;
   /**
    * @brief Draw a test button on the UI layer.
    *

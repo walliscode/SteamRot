@@ -81,4 +81,8 @@ void ArchetypeManager::GenerateAllArchetypes(
     }
   }
 }
+
+std::unordered_map<ArchetypeID, Archetype> &ArchetypeManager::GetArchetypes() {
+  return m_archetypes;
+}
 } // namespace steamrot

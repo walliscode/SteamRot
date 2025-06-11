@@ -2,6 +2,7 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "Scene.h"
+#include "BaseLogic.h"
 #include "EntityManager.h"
 #include <iostream>
 
@@ -17,7 +18,14 @@ Scene::Scene(const size_t &pool_size, const SceneData *scene_data,
 
   // update map of Logic classes
   if (scene_data->logics() != nullptr) {
-    m_logics = m_logic_factory.CreateLogicMap(*scene_data->logics());
+    // Create the logic context with the current scene data
+    LogicContext logic_context{
+        m_entity_manager.GetEntityMemoryPool(),
+        m_entity_manager.GetArchetypeManager().GetArchetypes(),
+        this->m_render_texture};
+
+    m_logics =
+        m_logic_factory.CreateLogicMap(*scene_data->logics(), logic_context);
   }
 }
 

@@ -44,6 +44,18 @@ public:
   ////////////////////////////////////////////////////////////
   EntityManager(const size_t &pool_size, const EntitiesData *entities_data);
 
+  /**
+   * @brief Return a reference to the EntityMemoryPool that can be modified.
+   */
+  components::containers::EntityMemoryPool &GetEntityMemoryPool();
+
+  /**
+   * @brief Return a const reference to the ArchetypeManager.
+   *
+   * @return ArchetypeManager const&
+   */
+  ArchetypeManager &GetArchetypeManager();
+
   ////////////////////////////////////////////////////////////
   /// \brief Resuze the memory pool
   ///

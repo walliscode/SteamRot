@@ -51,6 +51,11 @@ protected:
   ////////////////////////////////////////////////////////////
   uuids::uuid m_id;
 
+  /**
+   * @brief Member that contains the RenderTexture for the Scene.
+   */
+  sf::RenderTexture m_render_texture;
+
   bool m_paused = false;
   bool m_active = true;
 

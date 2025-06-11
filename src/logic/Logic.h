@@ -13,15 +13,15 @@ public:
   ///
   ////////////////////////////////////////////////////////////
 
-  Logic<AllComponentTypes...>() {
+  Logic<AllComponentTypes...>(const LogicContext &scene_context)
+      : BaseLogic(scene_context) {
 
     // create the archetype ID for this logic class
     ArchetypeIDFactory<AllComponentTypes...>();
   };
 
 protected:
-  virtual void ProcessLogic(components::containers::EntityMemoryPool &entities,
-                            const EntityIndicies &entity_indicies) = 0;
+  virtual void ProcessLogic() = 0;
 
   std::vector<ArchetypeID> m_archetype_IDs;
 

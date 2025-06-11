@@ -5,9 +5,41 @@
  */
 #pragma once
 
+#include "ArchetypeManager.h"
 #include "containers.h"
+#include "themes_generated.h"
+#include <SFML/Graphics/RenderTexture.hpp>
 namespace steamrot {
 using EntityIndicies = std::vector<size_t>;
+
+/**
+* @class LogicContext
+ * @brief Provides all the specific Scene data required for logic processing.
+
+ */
+struct LogicContext {
+  /**
+   * @brief Struct memmber that contains a reference to the EntityMemoryPool for
+   * this Scene.
+   */
+  components::containers::EntityMemoryPool &scene_entities;
+
+  /**
+   * @brief Struct member that contains a reference to the archetypes in the
+   * Scene.
+   */
+  std::unordered_map<ArchetypeID, Archetype> &archetypes;
+
+  /**
+   * @brief Struct member that contains a reference to Scenes RenderTexture.
+   */
+  sf::RenderTexture &scene_texture;
+
+  /**
+   * @brief Stuct member that contains UI thematic configuration.
+   */
+  const themes::UIObjects *ui_config{nullptr};
+};
 
 /**
  * @class BaseLogic
@@ -22,8 +54,7 @@ protected:
    * @param entities Data structure containing all component data.
    * @param entity_indicies Entity mask for required entities.
    */
-  virtual void ProcessLogic(components::containers::EntityMemoryPool &entities,
-                            const EntityIndicies &entity_indicies) = 0;
+  virtual void ProcessLogic() = 0;
 
   /**
    * @brief How often the logic should be updated.
@@ -35,11 +66,17 @@ protected:
    */
   size_t m_cycle_count{0};
 
+  /**
+   * @brief Member variable that contains the context of the scene the logic
+   * resides in.
+   */
+  LogicContext m_logic_context;
+
 public:
   /**
    * @brief Default constructor
    */
-  BaseLogic() = default;
+  BaseLogic(const LogicContext &logic_context);
 
   /**
    * @brief Default destructor
@@ -51,7 +88,6 @@ public:
    * @param entities Data structure containing all component data.
    * @param entity_indicies Entity mask for required entities.
    */
-  void RunLogic(components::containers::EntityMemoryPool &entities,
-                const EntityIndicies &entity_indicies);
+  void RunLogic();
 };
 } // namespace steamrot

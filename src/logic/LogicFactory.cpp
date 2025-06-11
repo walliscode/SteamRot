@@ -7,7 +7,8 @@
 namespace steamrot {
 
 std::unordered_map<LogicType, std::vector<std::unique_ptr<BaseLogic>>>
-LogicFactory::CreateLogicMap(const LogicData &logic_data) {
+LogicFactory::CreateLogicMap(const LogicData &logic_data,
+                             const LogicContext &logic_context) {
 
   // create return object
   std::unordered_map<LogicType, std::vector<std::unique_ptr<BaseLogic>>>
@@ -18,7 +19,8 @@ LogicFactory::CreateLogicMap(const LogicData &logic_data) {
   for (const auto &logic_type : *logic_data.types()) {
     switch (logic_type) {
     case LogicType::LogicType_Render: {
-      logic_map[LogicType::LogicType_Render] = CreateRenderLogics();
+      logic_map[LogicType::LogicType_Render] =
+          CreateRenderLogics(logic_context);
       break;
     }
     // Add cases for other logic types as needed
@@ -31,12 +33,13 @@ LogicFactory::CreateLogicMap(const LogicData &logic_data) {
   return logic_map;
 }
 
-std::vector<std::unique_ptr<BaseLogic>> LogicFactory::CreateRenderLogics() {
+std::vector<std::unique_ptr<BaseLogic>>
+LogicFactory::CreateRenderLogics(const LogicContext &logic_context) {
   // Create a vector of unique pointers to BaseLogic for rendering
   std::vector<std::unique_ptr<BaseLogic>> render_logics;
 
   // compile time defined order of logic types
-  render_logics.push_back(std::make_unique<UIRenderLogic>());
+  render_logics.push_back(std::make_unique<UIRenderLogic>(logic_context));
 
   return render_logics;
 }
