@@ -20,7 +20,7 @@ private:
    * @brief Create a vector of logic objects specifically for rendering.
    */
   std::vector<std::unique_ptr<BaseLogic>>
-  CreateRenderLogics(const LogicContext &logic_context);
+  CreateRenderLogics(const LogicContext logic_context);
 
 public:
   /**
@@ -34,6 +34,6 @@ public:
    */
   std::unordered_map<LogicType, std::vector<std::unique_ptr<BaseLogic>>>
   CreateLogicMap(const LogicCollection &logic_collection,
-                 const LogicContext &logic_context);
+                 const LogicContext logic_context);
 };
 } // namespace steamrot

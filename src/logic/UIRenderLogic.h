@@ -75,7 +75,7 @@ public:
   ////////////////////////////////////////////////////////////
   // |brief Constructor taking in flatbuffer config
   ////////////////////////////////////////////////////////////
-  UIRenderLogic(const LogicContext &logic_context);
+  UIRenderLogic(const LogicContext logic_context);
 
   /**
    * @brief Gather all logic here, to be called by the Logic.RunLogic() function

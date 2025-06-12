@@ -19,19 +19,26 @@ Scene::Scene(const size_t &pool_size, const SceneData *scene_data,
 
   // update map of Logic classes
   if (scene_data->logic_collection() != nullptr) {
-
+    std::cout << "Logic collection found, creating logic context." << std::endl;
     // prepare variables for logic context
     const themes::UIObjects *ui_objects =
         m_data_manager.ProvideThemeData(scene_data->ui_theme()->str());
+    std::cout << "UI Objects provided." << std::endl;
     // Create the logic context with the current scene data
     LogicContext logic_context{
         m_entity_manager.GetEntityMemoryPool(),
         m_entity_manager.GetArchetypeManager().GetArchetypes(),
         this->m_render_texture, ui_objects};
 
+    std::cout << "Logic context created." << std::endl;
     m_logics = m_logic_factory.CreateLogicMap(*scene_data->logic_collection(),
                                               logic_context);
+    std::cout << "Logic map created with " << m_logics.size() << " logics."
+              << std::endl;
+  } else {
+    std::cout << "No logic found" << std::endl;
   }
+  std::cout << "Scene fully defined" << std::endl;
 }
 
 sf::RenderTexture &Scene::GetRenderTexture() { return m_render_texture; }

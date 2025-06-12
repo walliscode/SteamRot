@@ -40,6 +40,7 @@ void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
   // start up title scene
   ShowTitleScene();
   std::cout << "Title scene loaded" << std::endl;
+
   // Run the program as long as the window is open
   while (m_display_manager.GetWindow().isOpen()) {
 
@@ -72,10 +73,6 @@ void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
 
 ////////////////////////////////////////////////////////////
 void GameEngine::UpdateSystems() {
-
-  // update display manager actions and call any logic systems
-
-  m_display_manager.Update();
 
   // call the update function of the scene manager
   m_scene_manager->UpdateScenes();

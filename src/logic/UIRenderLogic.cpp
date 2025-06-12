@@ -6,13 +6,15 @@
 #include "CUserInterface.h"
 #include "EntityHelpers.h"
 #include "log_handler.h"
-#include "spdlog/common.h"
+
+#include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
+#include <iostream>
 
 namespace steamrot {
 
 /////////////////////////////////////////////////////////////
-UIRenderLogic::UIRenderLogic(const LogicContext &logic_context)
+UIRenderLogic::UIRenderLogic(const LogicContext logic_context)
     : Logic<CUserInterface>(logic_context) {
   // Initialize the UI engine with the provided flatbuffer configuration
   // This could include setting up styles, themes, and other UI elements
@@ -23,11 +25,14 @@ UIRenderLogic::UIRenderLogic(const LogicContext &logic_context)
                             "initialize UI styles");
     return;
   }
+  std::cout << "UIEngine: Initializing with provided flatbuffer config"
+            << std::endl;
   AddStyles(logic_context.ui_config);
+  std::cout << "UIEngine: Styles added from flatbuffer config" << std::endl;
 }
 void UIRenderLogic::ProcessLogic() {
   // clear the render texture before drawing
-  m_logic_context.scene_texture.clear();
+  m_logic_context.scene_texture.clear(sf::Color::Magenta);
 
   // Draw all UI elements to the render texture
   DrawUIElements();
@@ -45,6 +50,7 @@ void UIRenderLogic::AddStyles(const themes::UIObjects *config) {
         "UIEngine: Null config provided, cannot add styles");
     return;
   }
+  std::cout << "UIEngine: Adding Panel config" << std::endl;
   // add panel styles from flatbuffer config
   m_panel_style.background_color.r =
       config->panel_style()->background_color()->r();
@@ -60,6 +66,8 @@ void UIRenderLogic::AddStyles(const themes::UIObjects *config) {
   m_panel_style.border_color.a = config->panel_style()->border_color()->a();
   m_panel_style.border_thickness = config->panel_style()->border_thickness();
 
+  std::cout << "UIEngine: Panel config added" << std::endl;
+  std::cout << "UIEngine: Adding Button config" << std::endl;
   // add button styles from flatbuffer config
   m_button_style.border_color.r = config->button_style()->border_color()->r();
   m_button_style.border_color.g = config->button_style()->border_color()->g();

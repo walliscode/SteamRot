@@ -1,4 +1,19 @@
 {
+  "panel_style": {
+    "background_color": {
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 255
+    },
+    "border_color": {
+      "r": 200,
+      "g": 200,
+      "b": 200,
+      "a": 255
+    },
+    "border_thickness": 10
+  },
   "button_style": {
     "background_color": {
       "r": 0,

@@ -6,6 +6,7 @@
 #include "TexturesPackage.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <iostream>
 
 ////////////////////////////////////////////////////////////
 // namespaces/using
@@ -37,7 +38,6 @@ sf::RenderWindow &DisplayManager::GetWindow() { return m_window; };
 
 ///////////////////////////////////////////////////////////
 void DisplayManager::Render(TexturesPackage &textures_package) {
-
   // clear the window with the background color, this always be at the start
   m_window.clear();
 
@@ -46,10 +46,12 @@ void DisplayManager::Render(TexturesPackage &textures_package) {
     throw std::runtime_error("No active session set for DisplayManager");
   }
   auto tiles = m_active_session->GetTiles();
-  //
+
   // get the tile overlay texture from the textures package
   for (auto &tile : tiles) {
 
+    // // print tile scene ID for debugging
+    // std::cout << "Tile scene ID: " << tile->GetSceneId() << std::endl;
     // check if held scene id is in the textures package
     auto scene_texture =
         textures_package.GetTextures().find(tile->GetSceneId());
@@ -79,11 +81,9 @@ void DisplayManager::Render(TexturesPackage &textures_package) {
   m_window.display();
 };
 
-///////////////////////////////////////////////////////////
-void DisplayManager::Update() {}
-
 void DisplayManager::LoadTitleSceneTiles(const uuids::uuid &title_scene_id) {
-  // reset m_sessions array with fresh Session objects
+  std::cout << "DisplayManager: Loading title scene tiles with ID: "
+            << title_scene_id << std::endl;
   for (auto &session : m_sessions) {
     session = std::make_shared<Session>();
   }
@@ -92,8 +92,8 @@ void DisplayManager::LoadTitleSceneTiles(const uuids::uuid &title_scene_id) {
 
   // pass the title scene ID to the active tile in the active session
   m_active_session->GetActiveTile()->SetSceneId(title_scene_id);
-
   // set the title scene active flag to true
   m_title_scene_active = true;
 };
+
 } // namespace steamrot

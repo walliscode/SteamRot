@@ -2,13 +2,17 @@
 // headers
 ////////////////////////////////////////////////////////////
 #include "Tile.h"
+#include <iostream>
 
 namespace steamrot {
 ////////////////////////////////////////////////////////////
 Tile::Tile() {}
 
 ////////////////////////////////////////////////////////////
-void Tile::SetSceneId(const uuids::uuid &scene_id) { m_scene_id = scene_id; }
+void Tile::SetSceneId(const uuids::uuid &scene_id) {
+  m_scene_id = scene_id;
+  std::cout << "Tile: Scene ID set to " << m_scene_id << std::endl;
+}
 
 ////////////////////////////////////////////////////////////
 const uuids::uuid Tile::GetSceneId() const { return m_scene_id; }

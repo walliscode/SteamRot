@@ -28,6 +28,8 @@ void CUserInterface::Configure(const UserInterface *user_interface_data) {
                             "Configuration data is null for CUserInterface");
     return;
   }
+  // set the component to active
+  m_active = true;
 
   // lambda to recursively build UI elements
   std::function<UIElement(const UIElementData *)> build_ui_element =

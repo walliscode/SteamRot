@@ -7,59 +7,12 @@
 #include "containers.h"
 #include "entities_generated.h"
 #include "log_handler.h"
-#include <memory>
-#include <tuple>
+#include <iostream>
 namespace steamrot {
 ////////////////////////////////////////////////////////////
 EntityConfigurationFactory::EntityConfigurationFactory() {};
 
 ////////////////////////////////////////////////////////////
-void EntityConfigurationFactory::ConfigureEntities(
-    std::unique_ptr<components::containers::EntityMemoryPool> pool,
-    json &data) {
-
-  // check if data contains "entities" key
-  if (!data.contains("entities")) {
-    log_handler::ProcessLog(spdlog::level::level_enum::err,
-                            log_handler::LogCode::kInvalidJSONKey,
-                            "entities key not found in JSON data.");
-  }
-
-  json entities{data["entities"]};
-
-  for (size_t i{0}; i < entities.size(); ++i) {
-
-    json entity_data{entities[i]};
-    // iterate over the EntityMemoryPool
-    std::apply(
-        [i, entity_data](auto &...vecs) {
-          (
-              [&] {
-                // get the component data from the given index
-                auto component = vecs[i];
-
-                // get the component name
-                std::string component_name = component.Name();
-
-                // check if the component name exists in the entity data
-                if (!entity_data.contains(component_name)) {
-                  log_handler::ProcessLog(
-                      spdlog::level::level_enum::err,
-                      log_handler::LogCode::kInvalidJSONKey,
-                      fmt::format("Component {} not found in entity data.",
-                                  component_name));
-                }
-                // get the component name from the component type
-                json component_data = entity_data[component_name];
-
-                // configure the component with the data
-                component.Configure(component_data);
-              }(),
-              ...);
-        },
-        *pool);
-  }
-};
 ////////////////////////////////////////////////////////////
 void EntityConfigurationFactory::ConfigureEntitiesFromDefaultData(
     components::containers::EntityMemoryPool &entity_memory_pool,
@@ -73,7 +26,8 @@ void EntityConfigurationFactory::ConfigureEntitiesFromDefaultData(
                             "Entity data is empty, please add Entitiy Data.");
     return;
   }
-
+  std::cout << "Configuring " << entity_collection->entities()->size()
+            << " entities from default data..." << std::endl;
   for (size_t i{0}; i < entity_collection->entities()->size(); ++i) {
 
     // get the entity data from the entities_data
