@@ -17,14 +17,14 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
-struct Entity;
-struct EntityBuilder;
+struct EntityData;
+struct EntityDataBuilder;
 
-struct EntitiesData;
-struct EntitiesDataBuilder;
+struct EntityCollection;
+struct EntityCollectionBuilder;
 
-struct Entity FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef EntityBuilder Builder;
+struct EntityData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef EntityDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_INDEX = 4,
     VT_C_USER_INTERFACE = 6
@@ -44,44 +44,44 @@ struct Entity FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct EntityBuilder {
-  typedef Entity Table;
+struct EntityDataBuilder {
+  typedef EntityData Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_index(uint32_t index) {
-    fbb_.AddElement<uint32_t>(Entity::VT_INDEX, index, 0);
+    fbb_.AddElement<uint32_t>(EntityData::VT_INDEX, index, 0);
   }
   void add_c_user_interface(::flatbuffers::Offset<steamrot::UserInterface> c_user_interface) {
-    fbb_.AddOffset(Entity::VT_C_USER_INTERFACE, c_user_interface);
+    fbb_.AddOffset(EntityData::VT_C_USER_INTERFACE, c_user_interface);
   }
-  explicit EntityBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit EntityDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<Entity> Finish() {
+  ::flatbuffers::Offset<EntityData> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<Entity>(end);
+    auto o = ::flatbuffers::Offset<EntityData>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<Entity> CreateEntity(
+inline ::flatbuffers::Offset<EntityData> CreateEntityData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t index = 0,
     ::flatbuffers::Offset<steamrot::UserInterface> c_user_interface = 0) {
-  EntityBuilder builder_(_fbb);
+  EntityDataBuilder builder_(_fbb);
   builder_.add_c_user_interface(c_user_interface);
   builder_.add_index(index);
   return builder_.Finish();
 }
 
-struct EntitiesData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef EntitiesDataBuilder Builder;
+struct EntityCollection FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef EntityCollectionBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ENTITIES = 4
   };
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Entity>> *entities() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Entity>> *>(VT_ENTITIES);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EntityData>> *entities() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EntityData>> *>(VT_ENTITIES);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -92,69 +92,39 @@ struct EntitiesData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct EntitiesDataBuilder {
-  typedef EntitiesData Table;
+struct EntityCollectionBuilder {
+  typedef EntityCollection Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_entities(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Entity>>> entities) {
-    fbb_.AddOffset(EntitiesData::VT_ENTITIES, entities);
+  void add_entities(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EntityData>>> entities) {
+    fbb_.AddOffset(EntityCollection::VT_ENTITIES, entities);
   }
-  explicit EntitiesDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit EntityCollectionBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<EntitiesData> Finish() {
+  ::flatbuffers::Offset<EntityCollection> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<EntitiesData>(end);
+    auto o = ::flatbuffers::Offset<EntityCollection>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<EntitiesData> CreateEntitiesData(
+inline ::flatbuffers::Offset<EntityCollection> CreateEntityCollection(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Entity>>> entities = 0) {
-  EntitiesDataBuilder builder_(_fbb);
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EntityData>>> entities = 0) {
+  EntityCollectionBuilder builder_(_fbb);
   builder_.add_entities(entities);
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<EntitiesData> CreateEntitiesDataDirect(
+inline ::flatbuffers::Offset<EntityCollection> CreateEntityCollectionDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<steamrot::Entity>> *entities = nullptr) {
-  auto entities__ = entities ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::Entity>>(*entities) : 0;
-  return steamrot::CreateEntitiesData(
+    const std::vector<::flatbuffers::Offset<steamrot::EntityData>> *entities = nullptr) {
+  auto entities__ = entities ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::EntityData>>(*entities) : 0;
+  return steamrot::CreateEntityCollection(
       _fbb,
       entities__);
-}
-
-inline const steamrot::EntitiesData *GetEntitiesData(const void *buf) {
-  return ::flatbuffers::GetRoot<steamrot::EntitiesData>(buf);
-}
-
-inline const steamrot::EntitiesData *GetSizePrefixedEntitiesData(const void *buf) {
-  return ::flatbuffers::GetSizePrefixedRoot<steamrot::EntitiesData>(buf);
-}
-
-inline bool VerifyEntitiesDataBuffer(
-    ::flatbuffers::Verifier &verifier) {
-  return verifier.VerifyBuffer<steamrot::EntitiesData>(nullptr);
-}
-
-inline bool VerifySizePrefixedEntitiesDataBuffer(
-    ::flatbuffers::Verifier &verifier) {
-  return verifier.VerifySizePrefixedBuffer<steamrot::EntitiesData>(nullptr);
-}
-
-inline void FinishEntitiesDataBuffer(
-    ::flatbuffers::FlatBufferBuilder &fbb,
-    ::flatbuffers::Offset<steamrot::EntitiesData> root) {
-  fbb.Finish(root);
-}
-
-inline void FinishSizePrefixedEntitiesDataBuffer(
-    ::flatbuffers::FlatBufferBuilder &fbb,
-    ::flatbuffers::Offset<steamrot::EntitiesData> root) {
-  fbb.FinishSizePrefixed(root);
 }
 
 }  // namespace steamrot

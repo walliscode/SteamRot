@@ -1,6 +1,7 @@
 #include "ArchetypeManager.h"
 #include "EntityHelpers.h"
 #include <cstddef>
+#include <iostream>
 #include <magic_enum/magic_enum.hpp>
 #include <vector>
 
@@ -63,7 +64,8 @@ void ArchetypeManager::GenerateAllArchetypes(
 
   // get current pool size
   size_t pool_size = GetMemoryPoolSize(entity_memory_pool);
-
+  std::cout << "Generating archetypes for pool size: " << pool_size
+            << std::endl;
   // iterate over all entities in the memory pool
   for (size_t entityIndex = 0; entityIndex < pool_size; ++entityIndex) {
 

@@ -8,10 +8,8 @@
 ////////////////////////////////////////////////////////////
 #include "containers.h"
 #include "entities_generated.h"
-#include <memory>
 #include <nlohmann/json.hpp>
 
-using json = nlohmann::json;
 namespace steamrot {
 
 class EntityConfigurationFactory {
@@ -27,13 +25,10 @@ public:
   /// |brief Configure entities (overload this function per data type)
   ///
   ////////////////////////////////////////////////////////////
-  void
-  ConfigureEntities(std::unique_ptr<components::containers::EntityMemoryPool>,
-                    json &data);
 
   void ConfigureEntitiesFromDefaultData(
       components::containers::EntityMemoryPool &entity_memory_pool,
-      const EntitiesData *entities_data);
+      const EntityCollection *entities_collection);
 };
 
 } // namespace steamrot

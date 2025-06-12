@@ -26,26 +26,32 @@ struct SceneData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef SceneDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ACTIONS = 4,
-    VT_ENTITIES = 6,
-    VT_LOGICS = 8
+    VT_ENTITY_COLLECTION = 6,
+    VT_LOGIC_COLLECTION = 8,
+    VT_UI_THEME = 10
   };
   const steamrot::ActionsData *actions() const {
     return GetPointer<const steamrot::ActionsData *>(VT_ACTIONS);
   }
-  const steamrot::EntitiesData *entities() const {
-    return GetPointer<const steamrot::EntitiesData *>(VT_ENTITIES);
+  const steamrot::EntityCollection *entity_collection() const {
+    return GetPointer<const steamrot::EntityCollection *>(VT_ENTITY_COLLECTION);
   }
-  const steamrot::LogicData *logics() const {
-    return GetPointer<const steamrot::LogicData *>(VT_LOGICS);
+  const steamrot::LogicCollection *logic_collection() const {
+    return GetPointer<const steamrot::LogicCollection *>(VT_LOGIC_COLLECTION);
+  }
+  const ::flatbuffers::String *ui_theme() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_UI_THEME);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_ACTIONS) &&
            verifier.VerifyTable(actions()) &&
-           VerifyOffset(verifier, VT_ENTITIES) &&
-           verifier.VerifyTable(entities()) &&
-           VerifyOffset(verifier, VT_LOGICS) &&
-           verifier.VerifyTable(logics()) &&
+           VerifyOffset(verifier, VT_ENTITY_COLLECTION) &&
+           verifier.VerifyTable(entity_collection()) &&
+           VerifyOffset(verifier, VT_LOGIC_COLLECTION) &&
+           verifier.VerifyTable(logic_collection()) &&
+           VerifyOffsetRequired(verifier, VT_UI_THEME) &&
+           verifier.VerifyString(ui_theme()) &&
            verifier.EndTable();
   }
 };
@@ -57,11 +63,14 @@ struct SceneDataBuilder {
   void add_actions(::flatbuffers::Offset<steamrot::ActionsData> actions) {
     fbb_.AddOffset(SceneData::VT_ACTIONS, actions);
   }
-  void add_entities(::flatbuffers::Offset<steamrot::EntitiesData> entities) {
-    fbb_.AddOffset(SceneData::VT_ENTITIES, entities);
+  void add_entity_collection(::flatbuffers::Offset<steamrot::EntityCollection> entity_collection) {
+    fbb_.AddOffset(SceneData::VT_ENTITY_COLLECTION, entity_collection);
   }
-  void add_logics(::flatbuffers::Offset<steamrot::LogicData> logics) {
-    fbb_.AddOffset(SceneData::VT_LOGICS, logics);
+  void add_logic_collection(::flatbuffers::Offset<steamrot::LogicCollection> logic_collection) {
+    fbb_.AddOffset(SceneData::VT_LOGIC_COLLECTION, logic_collection);
+  }
+  void add_ui_theme(::flatbuffers::Offset<::flatbuffers::String> ui_theme) {
+    fbb_.AddOffset(SceneData::VT_UI_THEME, ui_theme);
   }
   explicit SceneDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -70,6 +79,7 @@ struct SceneDataBuilder {
   ::flatbuffers::Offset<SceneData> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = ::flatbuffers::Offset<SceneData>(end);
+    fbb_.Required(o, SceneData::VT_UI_THEME);
     return o;
   }
 };
@@ -77,13 +87,30 @@ struct SceneDataBuilder {
 inline ::flatbuffers::Offset<SceneData> CreateSceneData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::ActionsData> actions = 0,
-    ::flatbuffers::Offset<steamrot::EntitiesData> entities = 0,
-    ::flatbuffers::Offset<steamrot::LogicData> logics = 0) {
+    ::flatbuffers::Offset<steamrot::EntityCollection> entity_collection = 0,
+    ::flatbuffers::Offset<steamrot::LogicCollection> logic_collection = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> ui_theme = 0) {
   SceneDataBuilder builder_(_fbb);
-  builder_.add_logics(logics);
-  builder_.add_entities(entities);
+  builder_.add_ui_theme(ui_theme);
+  builder_.add_logic_collection(logic_collection);
+  builder_.add_entity_collection(entity_collection);
   builder_.add_actions(actions);
   return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<SceneData> CreateSceneDataDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<steamrot::ActionsData> actions = 0,
+    ::flatbuffers::Offset<steamrot::EntityCollection> entity_collection = 0,
+    ::flatbuffers::Offset<steamrot::LogicCollection> logic_collection = 0,
+    const char *ui_theme = nullptr) {
+  auto ui_theme__ = ui_theme ? _fbb.CreateString(ui_theme) : 0;
+  return steamrot::CreateSceneData(
+      _fbb,
+      actions,
+      entity_collection,
+      logic_collection,
+      ui_theme__);
 }
 
 inline const steamrot::SceneData *GetSceneData(const void *buf) {

@@ -40,6 +40,7 @@ void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
   // start up title scene
   ShowTitleScene();
   std::cout << "Title scene loaded" << std::endl;
+
   // Run the program as long as the window is open
   while (m_display_manager.GetWindow().isOpen()) {
 
@@ -49,12 +50,12 @@ void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
     // Handle events and return map of user events
     UserEvents user_events =
         m_event_handler.HandleEvents(m_display_manager.GetWindow());
-    //
-    // // Handle all system updates
-    // UpdateSystems();
-    //
-    // Render all game drawables
-    sRender();
+
+    // Handle all system updates
+    UpdateSystems();
+
+    // Pass render textures to the display manager
+    PassRenderPackage();
 
     // statement to test whether to break the loop, must be called at end
     // if (numLoops > 0 && m_loop_number >= numLoops) {
@@ -73,16 +74,12 @@ void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
 ////////////////////////////////////////////////////////////
 void GameEngine::UpdateSystems() {
 
-  // update display manager actions and call any logic systems
-
-  m_display_manager.Update();
-
   // call the update function of the scene manager
   m_scene_manager->UpdateScenes();
 }
 
 ////////////////////////////////////////////////////////////
-void GameEngine::sRender() {
+void GameEngine::PassRenderPackage() {
 
   // textures package should only live for the duration of the render call so
   // called by value

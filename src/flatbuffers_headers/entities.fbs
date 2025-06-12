@@ -2,12 +2,13 @@ include "user_interface.fbs";
 namespace steamrot;
 
 
-table Entity{
+table EntityData{
   index: uint32;
     c_user_interface: UserInterface;
   }
 
-table EntitiesData {
-  entities: [Entity];
+// wrapper table to allow for metadata in the future
+table EntityCollection {
+  entities: [EntityData];
 }
-root_type EntitiesData;
+

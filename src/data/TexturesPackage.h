@@ -8,6 +8,7 @@
 ////////////////////////////////////////////////////////////
 #include <SFML/Graphics/RenderTexture.hpp>
 
+#include <functional>
 #include <map>
 
 #include <uuid.h>
@@ -15,10 +16,12 @@ namespace steamrot {
 
 class TexturesPackage {
 private:
-  ////////////////////////////////////////////////////////////
-  // map of scene id to texture
-  ////////////////////////////////////////////////////////////
-  std::map<uuids::uuid, std::unique_ptr<sf::RenderTexture>> m_texture_map;
+  /**
+   * @brief Passes the RenderTexture of each scene, mapped by ID. No ownership
+   * wanted, just carrying data so reference_wrapper is used.
+   */
+  std::map<uuids::uuid, std::reference_wrapper<sf::RenderTexture>>
+      m_texture_map;
 
 public:
   ////////////////////////////////////////////////////////////
@@ -29,14 +32,12 @@ public:
   ////////////////////////////////////////////////////////////
   // |brief get textures
   ////////////////////////////////////////////////////////////
-  const std::map<uuids::uuid, std::unique_ptr<sf::RenderTexture>> &
+  const std::map<uuids::uuid, std::reference_wrapper<sf::RenderTexture>> &
   GetTextures();
 
   ////////////////////////////////////////////////////////////
   // |brief add texture
   ////////////////////////////////////////////////////////////
-  void AddTexture(const uuids::uuid &scene_id,
-                  std::unique_ptr<sf::RenderTexture>);
+  void AddTexture(const uuids::uuid &scene_id, sf::RenderTexture &texture);
 };
-
 } // namespace steamrot

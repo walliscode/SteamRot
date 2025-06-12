@@ -13,6 +13,8 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
+#include "types_generated.h"
+
 namespace steamrot {
 
 struct UIElementData;
@@ -23,22 +25,25 @@ struct UserInterfaceBuilder;
 
 enum UIElementType : int8_t {
   UIElementType_None = 0,
-  UIElementType_DropDownMenu = 1,
+  UIElementType_Panel = 1,
+  UIElementType_DropDownMenu = 2,
   UIElementType_MIN = UIElementType_None,
   UIElementType_MAX = UIElementType_DropDownMenu
 };
 
-inline const UIElementType (&EnumValuesUIElementType())[2] {
+inline const UIElementType (&EnumValuesUIElementType())[3] {
   static const UIElementType values[] = {
     UIElementType_None,
+    UIElementType_Panel,
     UIElementType_DropDownMenu
   };
   return values;
 }
 
 inline const char * const *EnumNamesUIElementType() {
-  static const char * const names[3] = {
+  static const char * const names[4] = {
     "None",
+    "Panel",
     "DropDownMenu",
     nullptr
   };
@@ -56,7 +61,9 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TYPE = 4,
     VT_CHILDREN = 6,
-    VT_COLUMN_LAYOUT = 8
+    VT_COLUMN_LAYOUT = 8,
+    VT_POSITION = 10,
+    VT_SIZE = 12
   };
   steamrot::UIElementType type() const {
     return static_cast<steamrot::UIElementType>(GetField<int8_t>(VT_TYPE, 0));
@@ -67,6 +74,12 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   bool column_layout() const {
     return GetField<uint8_t>(VT_COLUMN_LAYOUT, 0) != 0;
   }
+  const Vector2f *position() const {
+    return GetPointer<const Vector2f *>(VT_POSITION);
+  }
+  const Vector2f *size() const {
+    return GetPointer<const Vector2f *>(VT_SIZE);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int8_t>(verifier, VT_TYPE, 1) &&
@@ -74,6 +87,10 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyVector(children()) &&
            verifier.VerifyVectorOfTables(children()) &&
            VerifyField<uint8_t>(verifier, VT_COLUMN_LAYOUT, 1) &&
+           VerifyOffset(verifier, VT_POSITION) &&
+           verifier.VerifyTable(position()) &&
+           VerifyOffset(verifier, VT_SIZE) &&
+           verifier.VerifyTable(size()) &&
            verifier.EndTable();
   }
 };
@@ -91,6 +108,12 @@ struct UIElementDataBuilder {
   void add_column_layout(bool column_layout) {
     fbb_.AddElement<uint8_t>(UIElementData::VT_COLUMN_LAYOUT, static_cast<uint8_t>(column_layout), 0);
   }
+  void add_position(::flatbuffers::Offset<Vector2f> position) {
+    fbb_.AddOffset(UIElementData::VT_POSITION, position);
+  }
+  void add_size(::flatbuffers::Offset<Vector2f> size) {
+    fbb_.AddOffset(UIElementData::VT_SIZE, size);
+  }
   explicit UIElementDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -106,8 +129,12 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     steamrot::UIElementType type = steamrot::UIElementType_None,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::UIElementData>>> children = 0,
-    bool column_layout = false) {
+    bool column_layout = false,
+    ::flatbuffers::Offset<Vector2f> position = 0,
+    ::flatbuffers::Offset<Vector2f> size = 0) {
   UIElementDataBuilder builder_(_fbb);
+  builder_.add_size(size);
+  builder_.add_position(position);
   builder_.add_children(children);
   builder_.add_column_layout(column_layout);
   builder_.add_type(type);
@@ -118,13 +145,17 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     steamrot::UIElementType type = steamrot::UIElementType_None,
     const std::vector<::flatbuffers::Offset<steamrot::UIElementData>> *children = nullptr,
-    bool column_layout = false) {
+    bool column_layout = false,
+    ::flatbuffers::Offset<Vector2f> position = 0,
+    ::flatbuffers::Offset<Vector2f> size = 0) {
   auto children__ = children ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::UIElementData>>(*children) : 0;
   return steamrot::CreateUIElementData(
       _fbb,
       type,
       children__,
-      column_layout);
+      column_layout,
+      position,
+      size);
 }
 
 struct UserInterface FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {

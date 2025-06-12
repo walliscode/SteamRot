@@ -76,7 +76,7 @@ public:
   /**
    * @brief Default constructor
    */
-  BaseLogic(const LogicContext &logic_context);
+  BaseLogic(const LogicContext logic_context);
 
   /**
    * @brief Default destructor

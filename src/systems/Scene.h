@@ -8,6 +8,7 @@
 ////////////////////////////////////////////////////////////
 #include "ActionManager.h"
 #include "BaseLogic.h"
+#include "DataManager.h"
 #include "EntityManager.h"
 #include "LogicFactory.h"
 #include "logics_generated.h"
@@ -41,6 +42,10 @@ protected:
    */
   LogicFactory m_logic_factory;
 
+  /**
+   * @brief DataManager for providing data to the Scene.
+   */
+  DataManager m_data_manager;
   /**
    * @brief Map containing all the logic types relevant to the Scene.
    */
@@ -83,12 +88,14 @@ public:
   ////////////////////////////////////////////////////////////
   virtual void sMovement() = 0;
 
-  ////////////////////////////////////////////////////////////
-  /// \brief exports a ptr to a RenderTexture, this just needs to be drawn to
-  /// the window
-  ///
-  ////////////////////////////////////////////////////////////
-  virtual std::unique_ptr<sf::RenderTexture> sDrawToTexture() = 0;
+  /**
+   * @brief Function container for all rendering related logic.
+   */
+  virtual void sRender() = 0;
+  /**
+   * @brief Return the RenderTexture for the Scene instance.
+   */
+  sf::RenderTexture &GetRenderTexture();
 
   ////////////////////////////////////////////////////////////
   /// \brief Inidcicates if the Scenes is active or not

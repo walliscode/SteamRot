@@ -4,6 +4,7 @@
 #include "BaseLogic.h"
 #include "containers.h"
 #include <bitset>
+#include <iostream>
 namespace steamrot {
 
 template <typename... AllComponentTypes> class Logic : public BaseLogic {
@@ -13,11 +14,15 @@ public:
   ///
   ////////////////////////////////////////////////////////////
 
-  Logic<AllComponentTypes...>(const LogicContext &scene_context)
+  Logic<AllComponentTypes...>(const LogicContext scene_context)
       : BaseLogic(scene_context) {
 
     // create the archetype ID for this logic class
     ArchetypeIDFactory<AllComponentTypes...>();
+    std::cout << "Logic constructor called for components: "
+              << steamrot::components::containers::TupleTypeIndex<
+                     AllComponentTypes..., steamrot::components::containers::
+                                               ComponentRegister> << std::endl;
   };
 
 protected:

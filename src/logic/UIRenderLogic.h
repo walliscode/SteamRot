@@ -44,12 +44,12 @@ private:
    *
    * @param render_texture from sources such as the Scene or Display
    */
-  void DrawPanel(sf::RenderTexture &render_texture);
+  void DrawPanel(const UIElement &element);
 
   ////////////////////////////////////////////////////////////
   // |brief draw drop down menu
   ////////////////////////////////////////////////////////////
-  void DrawDropDownMenu(sf::RenderTexture &render_texture);
+  void DrawDropDownMenu();
 
   ////////////////////////////////////////////////////////////
   // |brief add in styles from flatbuffer config
@@ -66,11 +66,16 @@ private:
    */
   PanelStyle m_panel_style;
 
+  /**
+   * @brief Draws all UIElements containted in the CUserInterface components.
+   */
+  void DrawUIElements();
+
 public:
   ////////////////////////////////////////////////////////////
   // |brief Constructor taking in flatbuffer config
   ////////////////////////////////////////////////////////////
-  UIRenderLogic(const LogicContext &logic_context);
+  UIRenderLogic(const LogicContext logic_context);
 
   /**
    * @brief Gather all logic here, to be called by the Logic.RunLogic() function
@@ -81,13 +86,6 @@ public:
    * EnittyMemoryPool.
    */
   void ProcessLogic() override;
-  /**
-   * @brief Draw a test button on the UI layer.
-   *
-   * @param ui_layer: The render texture where the button will be drawn.
-   */
-  void DrawTestButton(sf::RenderTexture &ui_layer);
 
-  void DrawUILayer(sf::RenderTexture &ui_layer);
 }; // namespace UIEngine
 } // namespace steamrot

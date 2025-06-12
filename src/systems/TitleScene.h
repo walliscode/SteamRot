@@ -17,6 +17,9 @@ namespace steamrot {
 class TitleScene : public Scene {
   friend class SceneFactory;
 
+public:
+  void sRender() override;
+
 private:
   /**
    * @brief Constructor for TitleScreen
@@ -32,10 +35,5 @@ private:
   /// \brief call movement Logic for TitleScene
   ////////////////////////////////////////////////////////////
   void sMovement() override;
-
-  ////////////////////////////////////////////////////////////
-  /// \brief get all drawables from TitleScene
-  ////////////////////////////////////////////////////////////
-  std::unique_ptr<sf::RenderTexture> sDrawToTexture() override;
 };
 } // namespace steamrot

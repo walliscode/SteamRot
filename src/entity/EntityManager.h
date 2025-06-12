@@ -42,7 +42,8 @@ public:
   /// \brief Default constructor
   ///
   ////////////////////////////////////////////////////////////
-  EntityManager(const size_t &pool_size, const EntitiesData *entities_data);
+  EntityManager(const size_t &pool_size,
+                const EntityCollection *entity_collection);
 
   /**
    * @brief Return a reference to the EntityMemoryPool that can be modified.

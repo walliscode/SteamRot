@@ -1,26 +1,38 @@
 
 #include "LogicFactory.h"
 #include "UIRenderLogic.h"
+#include "log_handler.h"
 #include "logics_generated.h"
+#include "spdlog/common.h"
+#include <iostream>
 #include <unordered_map>
 
 namespace steamrot {
 
 std::unordered_map<LogicType, std::vector<std::unique_ptr<BaseLogic>>>
-LogicFactory::CreateLogicMap(const LogicData &logic_data,
-                             const LogicContext &logic_context) {
+LogicFactory::CreateLogicMap(const LogicCollection &logic_collection,
+                             const LogicContext logic_context) {
 
   // create return object
   std::unordered_map<LogicType, std::vector<std::unique_ptr<BaseLogic>>>
       logic_map;
 
+  // guard against empty logic collection
+  if (logic_collection.types()->empty()) {
+    log_handler::ProcessLog(spdlog::level::err, log_handler::LogCode::kNoCode,
+                            "Logic collection is empty, no logics to create.");
+  }
   // Iterate through the provided logic types and create the corresponding
   // logics
-  for (const auto &logic_type : *logic_data.types()) {
+  std::cout << "Creating logic map with " << logic_collection.types()->size()
+            << " logic types." << std::endl;
+  for (const auto &logic_type : *logic_collection.types()) {
     switch (logic_type) {
     case LogicType::LogicType_Render: {
+      std::cout << "Creating Render logics." << std::endl;
       logic_map[LogicType::LogicType_Render] =
           CreateRenderLogics(logic_context);
+      std::cout << "Render logics created." << std::endl;
       break;
     }
     // Add cases for other logic types as needed
@@ -29,18 +41,20 @@ LogicFactory::CreateLogicMap(const LogicData &logic_data,
       break;
     }
   }
-  // Add other logic types as needed
+  std::cout << "Logic map created with " << logic_map.size() << " logic types."
+            << std::endl;
   return logic_map;
 }
 
 std::vector<std::unique_ptr<BaseLogic>>
-LogicFactory::CreateRenderLogics(const LogicContext &logic_context) {
+LogicFactory::CreateRenderLogics(const LogicContext logic_context) {
   // Create a vector of unique pointers to BaseLogic for rendering
   std::vector<std::unique_ptr<BaseLogic>> render_logics;
-
+  std::cout << "Creating a vector of render logics." << std::endl;
   // compile time defined order of logic types
   render_logics.push_back(std::make_unique<UIRenderLogic>(logic_context));
-
+  std::cout << "Render logics created with size: " << render_logics.size()
+            << std::endl;
   return render_logics;
 }
 } // namespace steamrot

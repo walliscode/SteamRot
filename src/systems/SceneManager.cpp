@@ -76,7 +76,7 @@ TexturesPackage SceneManager::ProvideTexturesPackage() {
     auto &scene = pair.second;
 
     // add created scene texture to texture map
-    textures_package.AddTexture(scene->GetSceneID(), scene->sDrawToTexture());
+    textures_package.AddTexture(scene->GetSceneID(), scene->GetRenderTexture());
   }
   return textures_package;
 }
@@ -90,6 +90,7 @@ void SceneManager::UpdateScenes() {
   for (auto &pair : m_scenes) {
     auto &scene = pair.second;
     scene->sMovement();
+    scene->sRender();
 
     // add further systems here
   }
