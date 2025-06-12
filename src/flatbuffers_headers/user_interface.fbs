@@ -2,7 +2,9 @@ namespace steamrot;
 
 enum UIElementType: byte{
     None = 0,
-    DropDownMenu = 1,
+   Panel = 1, 
+  DropDownMenu = 2,
+
   }
 
 table UIElementData{

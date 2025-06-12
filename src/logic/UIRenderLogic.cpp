@@ -3,6 +3,8 @@
 ////////////////////////////////////////////////////////////
 #include "UIRenderLogic.h"
 #include "BaseLogic.h"
+#include "CUserInterface.h"
+#include "EntityHelpers.h"
 #include "log_handler.h"
 #include "spdlog/common.h"
 #include <SFML/Graphics/RenderTexture.hpp>
@@ -24,12 +26,9 @@ UIRenderLogic::UIRenderLogic(const LogicContext &logic_context)
   AddStyles(logic_context.ui_config);
 }
 void UIRenderLogic::ProcessLogic() {
-  // Process the logic for the UI elements
-  // This could include updating button states, handling input, etc.
-  // For now, we will just log that the logic is being processed
-  log_handler::ProcessLog(spdlog::level::level_enum::info,
-                          log_handler::LogCode::kNoCode,
-                          "UIEngine: Processing UI Logic");
+
+  // Draw all UI elements to the render texture
+  DrawUIElements();
 }
 
 ////////////////////////////////////////////////////////////
@@ -79,44 +78,58 @@ void UIRenderLogic::AddStyles(const themes::UIObjects *config) {
       "UIEngine: Button styles added from flatbuffer config");
 }
 
-void UIRenderLogic::DrawPanel(sf::RenderTexture &render_texture) {
-  // Create a panel shape
-  sf::RectangleShape panel(sf::Vector2f(400, 300));
-  // Set the panel style
-  panel.setFillColor(m_panel_style.background_color);
-  panel.setOutlineColor(m_panel_style.border_color);
-  panel.setOutlineThickness(m_panel_style.border_thickness);
-  panel.setPosition({50.f, 50.f}); // Position the panel
-  // Draw the panel to the render texture
-  render_texture.draw(panel);
+void UIRenderLogic::DrawUIElements() {
+
+  // define lambda function for recursively drawing UI elements
+  std::function<void(const UIElement &)> draw_ui_element =
+      [&](const UIElement &element) {
+        // Draw the element based on its type
+        switch (element.element_type) {
+        case UIElementType::UIElementType_Panel:
+          DrawPanel();
+          break;
+        case UIElementType::UIElementType_DropDownMenu:
+          DrawDropDownMenu();
+          break;
+        // Add more cases for other UI element types as needed
+        default:
+          log_handler::ProcessLog(
+              spdlog::level::level_enum::warn, log_handler::LogCode::kNoCode,
+              "UIEngine: Unknown UI element type encountered");
+          break;
+        }
+        // Recursively draw child elements if they exist
+        for (const auto &child : element.child_elements) {
+          draw_ui_element(child);
+        }
+      };
+  // cycle through all the Archetype IDs associated with this logic class
+  for (const ArchetypeID &archetype_id : m_archetype_IDs) {
+
+    // if it is not in the archetyps map, then skip
+    if (!m_logic_context.archetypes.contains(archetype_id)) {
+      continue;
+    } else {
+      // get the archetype from the map
+      Archetype &archetype = m_logic_context.archetypes[archetype_id];
+
+      // cycle through all the entity indexs in the archetype
+      for (size_t entity_id : archetype) {
+
+        // get the CUserInterface component
+        CUserInterface ui_component = GetComponent<CUserInterface>(
+            entity_id, m_logic_context.scene_entities);
+
+        // recursively draw the UI elements starting from the root element
+        draw_ui_element(ui_component.root_element);
+      }
+    }
+  }
 }
+
+void UIRenderLogic::DrawPanel() {}
 
 ////////////////////////////////////////////////////////////
-void UIRenderLogic::DrawDropDownMenu(sf::RenderTexture &render_texture) {};
+void UIRenderLogic::DrawDropDownMenu() {};
 
-////////////////////////////////////////////////////////////
-void UIRenderLogic::DrawTestButton(sf::RenderTexture &ui_layer) {
-
-  // Crea  // Create a button shape
-  sf::RectangleShape button(sf::Vector2f(200, 50));
-
-  button.setFillColor(m_button_style.background_color);
-  button.setOutlineColor(m_button_style.border_color);
-  button.setOutlineThickness(2);
-  button.setPosition({100.f, 100.f}); // Position the button
-
-  // Draw the button and text to the UI layer
-  ui_layer.draw(button);
-}
-
-void UIRenderLogic::DrawUILayer(sf::RenderTexture &ui_layer) {
-  // clear the UI layer before drawing
-  ui_layer.clear();
-
-  // Draw the test button to the UI layer
-  DrawTestButton(ui_layer);
-
-  // Finish drawing to the UI layer with display
-  ui_layer.display();
-}
 } // namespace steamrot

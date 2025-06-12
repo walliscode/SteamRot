@@ -23,22 +23,25 @@ struct UserInterfaceBuilder;
 
 enum UIElementType : int8_t {
   UIElementType_None = 0,
-  UIElementType_DropDownMenu = 1,
+  UIElementType_Panel = 1,
+  UIElementType_DropDownMenu = 2,
   UIElementType_MIN = UIElementType_None,
   UIElementType_MAX = UIElementType_DropDownMenu
 };
 
-inline const UIElementType (&EnumValuesUIElementType())[2] {
+inline const UIElementType (&EnumValuesUIElementType())[3] {
   static const UIElementType values[] = {
     UIElementType_None,
+    UIElementType_Panel,
     UIElementType_DropDownMenu
   };
   return values;
 }
 
 inline const char * const *EnumNamesUIElementType() {
-  static const char * const names[3] = {
+  static const char * const names[4] = {
     "None",
+    "Panel",
     "DropDownMenu",
     nullptr
   };
