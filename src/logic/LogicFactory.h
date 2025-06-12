@@ -33,7 +33,7 @@ public:
    * objects.
    */
   std::unordered_map<LogicType, std::vector<std::unique_ptr<BaseLogic>>>
-  CreateLogicMap(const LogicData &logic_data,
+  CreateLogicMap(const LogicCollection &logic_collection,
                  const LogicContext &logic_context);
 };
 } // namespace steamrot

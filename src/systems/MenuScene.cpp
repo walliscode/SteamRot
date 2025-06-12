@@ -13,4 +13,5 @@ MenuScene::MenuScene(size_t pool_size, const SceneData *scene_data,
 ////////////////////////////////////////////////////////////
 void MenuScene::sMovement() {};
 
+void MenuScene::sRender() {};
 } // namespace steamrot

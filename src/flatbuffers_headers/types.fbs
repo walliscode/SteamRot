@@ -1,0 +1,6 @@
+// general types to use in other schemas
+
+table Vector2f{
+    x: float;
+    y: float;
+  }

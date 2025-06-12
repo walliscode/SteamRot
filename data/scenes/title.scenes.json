@@ -1,4 +1,30 @@
 {
   "actions": {},
-  "entities": {}
+  "entity_collection": {
+    "entities": [
+      {
+        "c_user_interface": {
+          "root_ui_element": {
+            "type": "Panel",
+            "column_layout": true,
+            "children": [],
+            "position": {
+              "x": 100,
+              "y": 100
+            },
+            "size": {
+              "x": 250,
+              "y": 100
+            }
+          }
+        }
+      }
+    ]
+  },
+  "logic_collection": {
+    "types": [
+      "Render"
+    ]
+  },
+  "ui_theme": "default"
 }

@@ -6,8 +6,9 @@ namespace steamrot;
 
 table SceneData{
     actions: ActionsData;
-    entities: EntitiesData;
-    logics: LogicData;
+    entity_collection: EntityCollection;
+    logic_collection: LogicCollection;
+    ui_theme: string (required);
   }
 
 root_type SceneData;

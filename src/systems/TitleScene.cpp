@@ -1,4 +1,5 @@
 #include "TitleScene.h"
+#include "logics_generated.h"
 #include <iostream>
 
 namespace steamrot {
@@ -12,4 +13,10 @@ TitleScene::TitleScene(const size_t pool_size, const SceneData *scene_data,
 ////////////////////////////////////////////////////////////
 void TitleScene::sMovement() {};
 
+void TitleScene::sRender() {
+
+  for (auto &render_logic : m_logics[LogicType::LogicType_Render]) {
+    render_logic->RunLogic();
+  }
+}
 } // namespace steamrot

@@ -33,7 +33,7 @@ public:
 
   void ConfigureEntitiesFromDefaultData(
       components::containers::EntityMemoryPool &entity_memory_pool,
-      const EntitiesData *entities_data);
+      const EntityCollection *entities_collection);
 };
 
 } // namespace steamrot

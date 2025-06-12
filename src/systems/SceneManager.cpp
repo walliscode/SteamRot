@@ -90,6 +90,7 @@ void SceneManager::UpdateScenes() {
   for (auto &pair : m_scenes) {
     auto &scene = pair.second;
     scene->sMovement();
+    scene->sRender();
 
     // add further systems here
   }

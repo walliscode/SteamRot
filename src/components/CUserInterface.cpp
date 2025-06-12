@@ -35,6 +35,16 @@ void CUserInterface::Configure(const UserInterface *user_interface_data) {
     UIElement ui_element;
     ui_element.element_type = element->type();
     ui_element.column_layout = element->column_layout();
+    if (element->position()) {
+
+      ui_element.position =
+          sf::Vector2f(element->position()->x(), element->position()->y());
+    };
+
+    if (element->size()) {
+      ui_element.size =
+          sf::Vector2f(element->size()->x(), element->size()->y());
+    };
 
     // iterate through child elements
     for (const auto *child : *element->children()) {

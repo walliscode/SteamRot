@@ -26,9 +26,14 @@ UIRenderLogic::UIRenderLogic(const LogicContext &logic_context)
   AddStyles(logic_context.ui_config);
 }
 void UIRenderLogic::ProcessLogic() {
+  // clear the render texture before drawing
+  m_logic_context.scene_texture.clear();
 
   // Draw all UI elements to the render texture
   DrawUIElements();
+
+  // display the render texture after drawing
+  m_logic_context.scene_texture.display();
 }
 
 ////////////////////////////////////////////////////////////
@@ -86,7 +91,7 @@ void UIRenderLogic::DrawUIElements() {
         // Draw the element based on its type
         switch (element.element_type) {
         case UIElementType::UIElementType_Panel:
-          DrawPanel();
+          DrawPanel(element);
           break;
         case UIElementType::UIElementType_DropDownMenu:
           DrawDropDownMenu();
@@ -127,7 +132,23 @@ void UIRenderLogic::DrawUIElements() {
   }
 }
 
-void UIRenderLogic::DrawPanel() {}
+void UIRenderLogic::DrawPanel(const UIElement &element) {
+  // Create a panel shape with the specified style
+  sf::RectangleShape panel_shape;
+
+  // using the elements position and size
+  if (element.position) {
+    panel_shape.setPosition({element.position->x, element.position->y});
+  }
+  if (element.size) {
+    panel_shape.setSize({element.size->x, element.size->y});
+  }
+  panel_shape.setFillColor(m_panel_style.background_color);
+  panel_shape.setOutlineColor(m_panel_style.border_color);
+  panel_shape.setOutlineThickness(m_panel_style.border_thickness);
+  // Draw the panel to the render texture
+  m_logic_context.scene_texture.draw(panel_shape);
+}
 
 ////////////////////////////////////////////////////////////
 void UIRenderLogic::DrawDropDownMenu() {};

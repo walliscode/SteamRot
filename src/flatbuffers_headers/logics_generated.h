@@ -15,8 +15,8 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
-struct LogicData;
-struct LogicDataBuilder;
+struct LogicCollection;
+struct LogicCollectionBuilder;
 
 enum LogicType : uint8_t {
   LogicType_None = 0,
@@ -48,8 +48,8 @@ inline const char *EnumNameLogicType(LogicType e) {
   return EnumNamesLogicType()[index];
 }
 
-struct LogicData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef LogicDataBuilder Builder;
+struct LogicCollection FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef LogicCollectionBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TYPES = 4
   };
@@ -64,37 +64,37 @@ struct LogicData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct LogicDataBuilder {
-  typedef LogicData Table;
+struct LogicCollectionBuilder {
+  typedef LogicCollection Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_types(::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> types) {
-    fbb_.AddOffset(LogicData::VT_TYPES, types);
+    fbb_.AddOffset(LogicCollection::VT_TYPES, types);
   }
-  explicit LogicDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit LogicCollectionBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<LogicData> Finish() {
+  ::flatbuffers::Offset<LogicCollection> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<LogicData>(end);
+    auto o = ::flatbuffers::Offset<LogicCollection>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<LogicData> CreateLogicData(
+inline ::flatbuffers::Offset<LogicCollection> CreateLogicCollection(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> types = 0) {
-  LogicDataBuilder builder_(_fbb);
+  LogicCollectionBuilder builder_(_fbb);
   builder_.add_types(types);
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<LogicData> CreateLogicDataDirect(
+inline ::flatbuffers::Offset<LogicCollection> CreateLogicCollectionDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<uint8_t> *types = nullptr) {
   auto types__ = types ? _fbb.CreateVector<uint8_t>(*types) : 0;
-  return steamrot::CreateLogicData(
+  return steamrot::CreateLogicCollection(
       _fbb,
       types__);
 }

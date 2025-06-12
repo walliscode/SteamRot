@@ -87,19 +87,6 @@ json DataManager::LoadSceneDataFromJson(std::string scene_identifier) {
 
   return scene_data;
 }
-////////////////////////////////////////////////////////////
-json DataManager::LoadThemeData(const std::string &theme_name) {
-  // load schema data for theme from file
-  json theme_schema = LoadJsonData(getSchemaFolder() / "themes.schema.json");
-  // create SchemaChecker object
-  SchemaChecker schema_checker(theme_schema);
-  // load theme data from file
-  json theme_data =
-      LoadJsonData(getThemesFolder() / (theme_name + ".data.json"));
-  // check theme data against schema (error checking in function)
-  schema_checker.CheckJSON(theme_data);
-  return theme_data;
-}
 
 ////////////////////////////////////////////////////////////
 const themes::UIObjects *

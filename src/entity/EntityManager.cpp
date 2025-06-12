@@ -4,6 +4,7 @@
 
 #include "EntityManager.h"
 #include "EntityHelpers.h"
+#include "entities_generated.h"
 #include <iostream>
 #include <memory>
 
@@ -13,7 +14,7 @@ namespace steamrot {
 
 ////////////////////////////////////////////////////////////
 EntityManager::EntityManager(const size_t &pool_size,
-                             const EntitiesData *entities_data)
+                             const EntityCollection *entity_collection)
     : m_entity_configuration_factory() {
   std::cout << "Creating EntityManager with pool size: " << pool_size
             << std::endl;
@@ -25,9 +26,9 @@ EntityManager::EntityManager(const size_t &pool_size,
   std::cout << "Attempting to configure entities from default data..."
             << std::endl;
   // configure the entities in the memory pool only if entities_data is not null
-  if (entities_data != nullptr) {
+  if (entity_collection != nullptr) {
     m_entity_configuration_factory.ConfigureEntitiesFromDefaultData(
-        *m_pool, entities_data);
+        *m_pool, entity_collection);
     std::cout << "Entities configured from default data." << std::endl;
   }
 

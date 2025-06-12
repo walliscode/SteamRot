@@ -49,12 +49,12 @@ void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
     // Handle events and return map of user events
     UserEvents user_events =
         m_event_handler.HandleEvents(m_display_manager.GetWindow());
-    //
-    // // Handle all system updates
-    // UpdateSystems();
-    //
-    // Render all game drawables
-    sRender();
+
+    // Handle all system updates
+    UpdateSystems();
+
+    // Pass render textures to the display manager
+    PassRenderPackage();
 
     // statement to test whether to break the loop, must be called at end
     // if (numLoops > 0 && m_loop_number >= numLoops) {
@@ -82,7 +82,7 @@ void GameEngine::UpdateSystems() {
 }
 
 ////////////////////////////////////////////////////////////
-void GameEngine::sRender() {
+void GameEngine::PassRenderPackage() {
 
   // textures package should only live for the duration of the render call so
   // called by value

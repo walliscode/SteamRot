@@ -17,6 +17,9 @@ namespace steamrot {
 class TitleScene : public Scene {
   friend class SceneFactory;
 
+public:
+  void sRender() override;
+
 private:
   /**
    * @brief Constructor for TitleScreen

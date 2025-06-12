@@ -44,7 +44,7 @@ private:
    *
    * @param render_texture from sources such as the Scene or Display
    */
-  void DrawPanel();
+  void DrawPanel(const UIElement &element);
 
   ////////////////////////////////////////////////////////////
   // |brief draw drop down menu

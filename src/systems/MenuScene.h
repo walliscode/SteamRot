@@ -23,5 +23,7 @@ public:
   /// \brief call movement Logic for MenuScene
   ////////////////////////////////////////////////////////////
   void sMovement() override;
+
+  void sRender() override;
 };
 } // namespace steamrot

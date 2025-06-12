@@ -5,6 +5,6 @@ None = 0,
 Render = 1,
 }
 
-table LogicData{
+table LogicCollection{
 types: [LogicType];
   }

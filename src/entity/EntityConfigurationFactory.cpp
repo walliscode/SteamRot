@@ -5,6 +5,7 @@
 #include "CUserInterface.h"
 #include "EntityHelpers.h"
 #include "containers.h"
+#include "entities_generated.h"
 #include "log_handler.h"
 #include <memory>
 #include <tuple>
@@ -62,20 +63,22 @@ void EntityConfigurationFactory::ConfigureEntities(
 ////////////////////////////////////////////////////////////
 void EntityConfigurationFactory::ConfigureEntitiesFromDefaultData(
     components::containers::EntityMemoryPool &entity_memory_pool,
-    const EntitiesData *entities_data) {
+    const EntityCollection *entity_collection) {
 
   // check if entity_data is not null
-  if (entities_data->entities() == nullptr) {
+  if (entity_collection->entities() == nullptr) {
+
     log_handler::ProcessLog(spdlog::level::level_enum::info,
                             log_handler::LogCode::kNoCode,
                             "Entity data is empty, please add Entitiy Data.");
     return;
   }
 
-  for (size_t i{0}; i < entities_data->entities()->size(); ++i) {
+  for (size_t i{0}; i < entity_collection->entities()->size(); ++i) {
 
     // get the entity data from the entities_data
-    const steamrot::Entity *entity_data = entities_data->entities()->Get(i);
+    const steamrot::EntityData *entity_data =
+        entity_collection->entities()->Get(i);
 
     // manually check each component type
     if (entity_data->c_user_interface()) {

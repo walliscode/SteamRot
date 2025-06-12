@@ -10,6 +10,8 @@
 #include "Component.h"
 #include "user_interface_generated.h"
 
+#include <SFML/System/Vector2.hpp>
+#include <optional>
 #include <vector>
 
 namespace steamrot {
@@ -25,6 +27,17 @@ struct UIElement {
    * select correct function
    */
   UIElementType element_type{};
+
+  /**
+   * @brief Position of the UI element, if not set then the UIRenderLogic will
+   * use margins and padding to draw
+   */
+  std::optional<sf::Vector2f> position{std::nullopt};
+
+  /**
+   * @brief Size of the UI element
+   */
+  std::optional<sf::Vector2f> size{std::nullopt};
 
   /**
    * @brief All child element indices for this UI element

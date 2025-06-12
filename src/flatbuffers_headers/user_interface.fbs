@@ -1,3 +1,5 @@
+include "types.fbs";
+
 namespace steamrot;
 
 enum UIElementType: byte{
@@ -11,6 +13,8 @@ table UIElementData{
     type: UIElementType;
     children: [UIElementData];
     column_layout: bool;
+    position: Vector2f;
+    size: Vector2f;
   }
 
 table UserInterface{
