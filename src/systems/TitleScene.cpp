@@ -12,10 +12,4 @@ TitleScene::TitleScene(const size_t pool_size, const SceneData *scene_data,
 ////////////////////////////////////////////////////////////
 void TitleScene::sMovement() {};
 
-////////////////////////////////////////////////////////////
-std::unique_ptr<sf::RenderTexture> TitleScene::sDrawToTexture() {
-
-  // a place holder as this needs to be drawn to
-  return std::make_unique<sf::RenderTexture>();
-}
 } // namespace steamrot

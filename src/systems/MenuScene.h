@@ -8,7 +8,6 @@
 ////////////////////////////////////////////////////////////
 #include "Scene.h"
 #include <SFML/Graphics/RenderTexture.hpp>
-#include <memory>
 
 namespace steamrot {
 
@@ -24,10 +23,5 @@ public:
   /// \brief call movement Logic for MenuScene
   ////////////////////////////////////////////////////////////
   void sMovement() override;
-
-  ////////////////////////////////////////////////////////////
-  /// \brief get all drawables from MenuScene
-  ////////////////////////////////////////////////////////////
-  std::unique_ptr<sf::RenderTexture> sDrawToTexture() override;
 };
 } // namespace steamrot

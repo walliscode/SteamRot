@@ -57,8 +57,9 @@ void DisplayManager::Render(TexturesPackage &textures_package) {
     // if yes, then draw the scene texture to that tile
     if (scene_texture != textures_package.GetTextures().end()) {
 
-      // create sprite from tile texture
-      sf::Sprite tile_sprite{scene_texture->second->getTexture()};
+      // create sprite from tile texture, this is a reference wrapper so .get()
+      // method is necessary
+      sf::Sprite tile_sprite{scene_texture->second.get().getTexture()};
 
       // draw the sprite to the window
       m_window.draw(tile_sprite);

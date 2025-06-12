@@ -76,7 +76,7 @@ TexturesPackage SceneManager::ProvideTexturesPackage() {
     auto &scene = pair.second;
 
     // add created scene texture to texture map
-    textures_package.AddTexture(scene->GetSceneID(), scene->sDrawToTexture());
+    textures_package.AddTexture(scene->GetSceneID(), scene->GetRenderTexture());
   }
   return textures_package;
 }

@@ -29,6 +29,8 @@ Scene::Scene(const size_t &pool_size, const SceneData *scene_data,
   }
 }
 
+sf::RenderTexture &Scene::GetRenderTexture() { return m_render_texture; }
+
 ////////////////////////////////////////////////////////////
 bool Scene::GetActive() const { return m_active; }
 

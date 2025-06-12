@@ -83,12 +83,10 @@ public:
   ////////////////////////////////////////////////////////////
   virtual void sMovement() = 0;
 
-  ////////////////////////////////////////////////////////////
-  /// \brief exports a ptr to a RenderTexture, this just needs to be drawn to
-  /// the window
-  ///
-  ////////////////////////////////////////////////////////////
-  virtual std::unique_ptr<sf::RenderTexture> sDrawToTexture() = 0;
+  /**
+   * @brief Return the RenderTexture for the Scene instance.
+   */
+  sf::RenderTexture &GetRenderTexture();
 
   ////////////////////////////////////////////////////////////
   /// \brief Inidcicates if the Scenes is active or not
