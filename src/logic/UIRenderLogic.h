@@ -12,6 +12,7 @@
 #include "themes_generated.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
+#include <cstddef>
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 namespace steamrot {
@@ -25,6 +26,7 @@ struct PanelStyle {
   sf::Color background_color;
   sf::Color border_color;
   float border_thickness;
+  size_t radius_resolution;
 };
 /**
  * @class ButtonStyle
@@ -81,7 +83,8 @@ private:
   /////////////////////////////////////////////////
   void DrawBoxWithRadiusCorners(const UIElement &element,
                                 const sf::Vector2f &origin,
-                                const sf::Vector2f &size);
+                                const sf::Vector2f &size,
+                                const size_t &resolution);
 
 public:
   ////////////////////////////////////////////////////////////

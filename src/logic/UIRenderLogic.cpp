@@ -8,6 +8,7 @@
 #include "log_handler.h"
 
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/ConvexShape.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <iostream>
@@ -66,6 +67,7 @@ void UIRenderLogic::AddStyles(const themes::UIObjects *config) {
   m_panel_style.border_color.b = config->panel_style()->border_color()->b();
   m_panel_style.border_color.a = config->panel_style()->border_color()->a();
   m_panel_style.border_thickness = config->panel_style()->border_thickness();
+  m_panel_style.radius_resolution = config->panel_style()->radius_resolution();
 
   std::cout << "UIEngine: Panel config added" << std::endl;
   std::cout << "UIEngine: Adding Button config" << std::endl;
@@ -142,23 +144,9 @@ void UIRenderLogic::DrawUIElements() {
 }
 
 void UIRenderLogic::DrawPanel(const UIElement &element) {
-  // // Create a panel shape with the specified style
-  // sf::RectangleShape panel_shape;
-  //
-  // // using the elements position and size
-  // if (element.position) {
-  //   panel_shape.setPosition({element.position->x, element.position->y});
-  // }
-  // if (element.size) {
-  //   panel_shape.setSize({element.size->x, element.size->y});
-  // }
-  // panel_shape.setFillColor(m_panel_style.background_color);
-  // panel_shape.setOutlineColor(m_panel_style.border_color);
-  // panel_shape.setOutlineThickness(m_panel_style.border_thickness);
-  // // Draw the panel to the render texture
-  // m_logic_context.scene_texture.draw(panel_shape);
 
-  DrawBoxWithRadiusCorners(element, {100, 100}, {200, 200});
+  DrawBoxWithRadiusCorners(element, {100.f, 100.f}, {500.f, 300.f},
+                           m_panel_style.radius_resolution);
 }
 
 ////////////////////////////////////////////////////////////
@@ -167,32 +155,87 @@ void UIRenderLogic::DrawDropDownMenu() {};
 /////////////////////////////////////////////////
 void UIRenderLogic::DrawBoxWithRadiusCorners(const UIElement &ui_element,
                                              const sf::Vector2f &origin,
-                                             const sf::Vector2f &size) {
+                                             const sf::Vector2f &size,
+                                             const size_t &resolution) {
 
-  // lambda function to draw a quarter circle using sf::ConvexShape
-  auto draw_quarter_circle = [&](float radius, float angle_start,
-                                 float angle_end) {
-    int segments = 90; // number of segments for the quarter circle
-    sf::ConvexShape quarter_circle;
-    quarter_circle.setPointCount(segments + 2); // center + arc points
+  // get thickness/radius from the UIElement
+  float radius;
+  if (ui_element.element_type == UIElementType::UIElementType_Panel) {
+    radius = m_panel_style.border_thickness;
+  } else {
+    radius = 10.0f; // default radius for other types
+  }
+  // lambda function to draw one side (quarter circle and box) based off
+  // centre
+  auto draw_corner = [&](const sf::Vector2f &centre, const int x_sign,
+                         const int y_sign) {
+    // create a triangle fan for the rounded corner
+    sf::VertexArray corner(sf::PrimitiveType::TriangleFan);
 
-    // First point is the center
-    quarter_circle.setPoint(0, origin);
+    // calculate x offset
+    float x_offset = (x_sign * (size.x / 2)) - (x_sign * radius);
+    // calculate y offset
+    float y_offset = (y_sign * (size.y / 2)) - (y_sign * radius);
+    // combine for offset
+    sf::Vector2f offset(x_offset, y_offset);
 
-    for (int i = 0; i <= segments; ++i) {
-      float angle = M_PI_2 * i / segments;
-      float x = origin.x + radius * std::cos(angle);
-      float y = origin.y + radius * std::sin(angle);
-      quarter_circle.setPoint(i + 1, sf::Vector2f(x, y));
+    // set the origin of the corner
+    corner.append(sf::Vertex(centre + offset, m_panel_style.border_color));
+
+    // add points to the corner for the rounded part
+    for (size_t i = 0; i <= resolution; ++i) {
+
+      // define the segmented angle
+      float angle = (i * M_PI_2) / resolution;
+
+      // calculate the x and y coefficients based on the angle
+      float x = radius * cos(angle) * x_sign;
+      float y = radius * sin(angle) * y_sign;
+
+      sf::Vector2f segmented_point{centre.x + offset.x + x,
+                                   centre.y + offset.y + y};
+
+      // append the vertex to the corner array
+      corner.append(sf::Vertex(segmented_point, m_panel_style.border_color));
     }
 
-    quarter_circle.setFillColor(sf::Color::Transparent);
-    quarter_circle.setOutlineColor(sf::Color::Red);
-    quarter_circle.setOutlineThickness(m_panel_style.border_thickness);
-    m_logic_context.scene_texture.draw(quarter_circle);
+    // draw the corner to the render texture
+    m_logic_context.scene_texture.draw(corner);
   };
-  // draw one quarter
-  draw_quarter_circle(100, 0, 90);
+
+  // calculate the center of the box
+  sf::Vector2f center = origin + sf::Vector2f(size.x / 2, size.y / 2);
+  // draw the four sides of the box
+  draw_corner(center, 1, 1);   // top right
+  draw_corner(center, -1, 1);  // top left
+  draw_corner(center, -1, -1); // bottom left
+  draw_corner(center, 1, -1);  // bottom right
+
+  // draw the four sides of the box
+  sf::RectangleShape top_side(sf::Vector2f(size.x - 2 * radius, radius));
+  top_side.setPosition({origin.x + radius, origin.y});
+  top_side.setFillColor(m_panel_style.border_color);
+  m_logic_context.scene_texture.draw(top_side);
+
+  sf::RectangleShape bottom_side(sf::Vector2f(size.x - 2 * radius, radius));
+  bottom_side.setPosition({origin.x + radius, origin.y + size.y - radius});
+  bottom_side.setFillColor(m_panel_style.border_color);
+  m_logic_context.scene_texture.draw(bottom_side);
+  sf::RectangleShape left_side(sf::Vector2f(radius, size.y - 2 * radius));
+  left_side.setPosition({origin.x, origin.y + radius});
+  left_side.setFillColor(m_panel_style.border_color);
+  m_logic_context.scene_texture.draw(left_side);
+  sf::RectangleShape right_side(sf::Vector2f(radius, size.y - 2 * radius));
+  right_side.setPosition({origin.x + size.x - radius, origin.y + radius});
+  right_side.setFillColor(m_panel_style.border_color);
+  m_logic_context.scene_texture.draw(right_side);
+
+  // draw the background of the box taking into account the radius
+  sf::RectangleShape background(
+      sf::Vector2f(size.x - 2 * radius, size.y - 2 * radius));
+  background.setPosition({origin.x + radius, origin.y + radius});
+  background.setFillColor(m_panel_style.background_color);
+  m_logic_context.scene_texture.draw(background);
 }
 
 } // namespace steamrot
