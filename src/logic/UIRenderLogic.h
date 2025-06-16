@@ -71,6 +71,18 @@ private:
    */
   void DrawUIElements();
 
+  /////////////////////////////////////////////////
+  /// @brief Draws a box with rounded corners.
+  ///
+  /// Draws 4 boxes on the borders and then triangle fans for the corners.
+  ///
+  /// @param element Uses the UIElement to determine the styling
+  /// @param origin top left corner of the box in the render texture
+  /////////////////////////////////////////////////
+  void DrawBoxWithRadiusCorners(const UIElement &element,
+                                const sf::Vector2f &origin,
+                                const sf::Vector2f &size);
+
 public:
   ////////////////////////////////////////////////////////////
   // |brief Constructor taking in flatbuffer config

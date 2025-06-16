@@ -9,6 +9,7 @@
 
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <iostream>
 
 namespace steamrot {
@@ -141,24 +142,57 @@ void UIRenderLogic::DrawUIElements() {
 }
 
 void UIRenderLogic::DrawPanel(const UIElement &element) {
-  // Create a panel shape with the specified style
-  sf::RectangleShape panel_shape;
+  // // Create a panel shape with the specified style
+  // sf::RectangleShape panel_shape;
+  //
+  // // using the elements position and size
+  // if (element.position) {
+  //   panel_shape.setPosition({element.position->x, element.position->y});
+  // }
+  // if (element.size) {
+  //   panel_shape.setSize({element.size->x, element.size->y});
+  // }
+  // panel_shape.setFillColor(m_panel_style.background_color);
+  // panel_shape.setOutlineColor(m_panel_style.border_color);
+  // panel_shape.setOutlineThickness(m_panel_style.border_thickness);
+  // // Draw the panel to the render texture
+  // m_logic_context.scene_texture.draw(panel_shape);
 
-  // using the elements position and size
-  if (element.position) {
-    panel_shape.setPosition({element.position->x, element.position->y});
-  }
-  if (element.size) {
-    panel_shape.setSize({element.size->x, element.size->y});
-  }
-  panel_shape.setFillColor(m_panel_style.background_color);
-  panel_shape.setOutlineColor(m_panel_style.border_color);
-  panel_shape.setOutlineThickness(m_panel_style.border_thickness);
-  // Draw the panel to the render texture
-  m_logic_context.scene_texture.draw(panel_shape);
+  DrawBoxWithRadiusCorners(element, {100, 100}, {200, 200});
 }
 
 ////////////////////////////////////////////////////////////
 void UIRenderLogic::DrawDropDownMenu() {};
+
+/////////////////////////////////////////////////
+void UIRenderLogic::DrawBoxWithRadiusCorners(const UIElement &ui_element,
+                                             const sf::Vector2f &origin,
+                                             const sf::Vector2f &size) {
+
+  // lambda function to draw a quarter circle using sf::ConvexShape
+  auto draw_quarter_circle = [&](float radius, float angle_start,
+                                 float angle_end) {
+    int segments = 90; // number of segments for the quarter circle
+    sf::ConvexShape quarter_circle;
+    quarter_circle.setPointCount(segments + 2); // center + arc points
+
+    // First point is the center
+    quarter_circle.setPoint(0, origin);
+
+    for (int i = 0; i <= segments; ++i) {
+      float angle = M_PI_2 * i / segments;
+      float x = origin.x + radius * std::cos(angle);
+      float y = origin.y + radius * std::sin(angle);
+      quarter_circle.setPoint(i + 1, sf::Vector2f(x, y));
+    }
+
+    quarter_circle.setFillColor(sf::Color::Transparent);
+    quarter_circle.setOutlineColor(sf::Color::Red);
+    quarter_circle.setOutlineThickness(m_panel_style.border_thickness);
+    m_logic_context.scene_texture.draw(quarter_circle);
+  };
+  // draw one quarter
+  draw_quarter_circle(100, 0, 90);
+}
 
 } // namespace steamrot
