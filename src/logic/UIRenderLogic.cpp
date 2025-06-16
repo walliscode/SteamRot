@@ -32,7 +32,7 @@ UIRenderLogic::UIRenderLogic(const LogicContext logic_context)
 }
 void UIRenderLogic::ProcessLogic() {
   // clear the render texture before drawing
-  m_logic_context.scene_texture.clear(sf::Color::Magenta);
+  m_logic_context.scene_texture.clear();
 
   // Draw all UI elements to the render texture
   DrawUIElements();
