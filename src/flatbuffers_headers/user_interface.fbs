@@ -9,10 +9,17 @@ enum UIElementType: byte{
 
   }
 
+enum LayoutType: byte{ 
+  None = 0,
+  Horizontal = 1,
+  Vertical = 2,
+  Grid = 3,
+  }
+
 table UIElementData{
     type: UIElementType;
     children: [UIElementData];
-    column_layout: bool;
+  layout: LayoutType;
     position: Vector2f;
     size: Vector2f;
   }

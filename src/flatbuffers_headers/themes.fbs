@@ -1,23 +1,31 @@
+include "types.fbs";
+
 namespace steamrot.themes; 
 
+
 struct Color {
-    r:ubyte;
-    g:ubyte;
-    b:ubyte;
-    a:ubyte;
+    r:uint8;
+    g:uint8;
+    b:uint8;
+    a:uint8;
   }
+
+table Style {
+  background_color: Color; 
+  border_color: Color ;
+  border_thickness: float ;
+  radius_resolution: int ;
+  inner_margin: Vector2f;
+}
+
 table PanelStyle {
-    background_color: Color;
-    border_color: Color;
-    border_thickness: float;
-    radius_resolution : int;
+  style: Style;
   }
 
 table ButtonStyle {
-  background_color: Color;
-  text_color: Color;
-  border_color: Color;
+  style: Style;
   }
+
 
 table UIObjects {
     panel_style: PanelStyle;

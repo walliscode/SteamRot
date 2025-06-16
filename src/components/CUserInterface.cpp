@@ -35,8 +35,9 @@ void CUserInterface::Configure(const UserInterface *user_interface_data) {
   std::function<UIElement(const UIElementData *)> build_ui_element =
       [&](const UIElementData *element) -> UIElement {
     UIElement ui_element;
+
     ui_element.element_type = element->type();
-    ui_element.column_layout = element->column_layout();
+    ui_element.layout = element->layout();
     if (element->position()) {
 
       ui_element.position =

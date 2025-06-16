@@ -6,15 +6,31 @@
         "c_user_interface": {
           "root_ui_element": {
             "type": "Panel",
-            "column_layout": true,
-            "children": [],
+            "layout": "Vertical",
+            "children": [
+              {
+                "type": "Panel",
+                "layout": "Horizontal",
+                "children": []
+              },
+              {
+                "type": "Panel",
+                "layout": "Horizontal",
+                "children": []
+              },
+              {
+                "type": "Panel",
+                "layout": "Horizontal",
+                "children": []
+              }
+            ],
             "position": {
               "x": 100,
               "y": 100
             },
             "size": {
               "x": 250,
-              "y": 100
+              "y": 500
             }
           }
         }

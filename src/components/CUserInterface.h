@@ -11,7 +11,6 @@
 #include "user_interface_generated.h"
 
 #include <SFML/System/Vector2.hpp>
-#include <optional>
 #include <vector>
 
 namespace steamrot {
@@ -32,12 +31,12 @@ struct UIElement {
    * @brief Position of the UI element, if not set then the UIRenderLogic will
    * use margins and padding to draw
    */
-  std::optional<sf::Vector2f> position{std::nullopt};
+  sf::Vector2f position{0.f, 0.f};
 
   /**
    * @brief Size of the UI element
    */
-  std::optional<sf::Vector2f> size{std::nullopt};
+  sf::Vector2f size{0.f, 0.f};
 
   /**
    * @brief All child element indices for this UI element
@@ -48,7 +47,7 @@ struct UIElement {
    * @brief Are child elements in a column or row layout? if true then vertical
    * alignment
    */
-  bool column_layout{true};
+  LayoutType layout{0};
 };
 
 struct CUserInterface : public Component {
