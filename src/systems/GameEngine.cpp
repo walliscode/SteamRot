@@ -33,13 +33,24 @@ GameEngine::GameEngine()
 
 ////////////////////////////////////////////////////////////
 void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
-  std::cout << "Running GameEngine..." << std::endl;
-  // set up resources
-  m_scene_manager->StartUp();
-  std::cout << "SceneManager started up" << std::endl;
-  // start up title scene
+
+  // set up resources for the game engine
+  StartUp();
+
+  // Start the game loop
+  RunGameLoop();
+  // Shut down the game engine
+  ShutDown();
+};
+
+/////////////////////////////////////////////////
+void GameEngine::StartUp() {
+
+  // Start Title Scene
   ShowTitleScene();
-  std::cout << "Title scene loaded" << std::endl;
+}
+
+void GameEngine::RunGameLoop() {
 
   // Run the program as long as the window is open
   while (m_display_manager.GetWindow().isOpen()) {
@@ -66,11 +77,7 @@ void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
     //   break;
     // };
   }
-
-  // Shut down the game engine
-  ShutDown();
-};
-
+}
 ////////////////////////////////////////////////////////////
 void GameEngine::UpdateSystems() {
 
@@ -110,8 +117,8 @@ void GameEngine::ShowTitleScene() {
   m_display_manager.LoadTitleSceneTiles(title_scene_id);
   std::cout << "Title scene tiles loaded" << std::endl;
 }
-////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////
 void GameEngine::ShutDown() {}
 
 } // namespace steamrot

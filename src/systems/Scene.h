@@ -11,10 +11,12 @@
 #include "DataManager.h"
 #include "EntityManager.h"
 #include "LogicFactory.h"
+#include "global_constants.h"
 #include "logics_generated.h"
 #include "scenes_generated.h"
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <memory>
 #include <nlohmann/json.hpp>
 
@@ -59,7 +61,7 @@ protected:
   /**
    * @brief Member that contains the RenderTexture for the Scene.
    */
-  sf::RenderTexture m_render_texture;
+  sf::RenderTexture m_render_texture{kWindowSize};
 
   bool m_paused = false;
   bool m_active = true;
