@@ -6,6 +6,7 @@
 #include "CUserInterface.h"
 #include "EntityHelpers.h"
 #include "log_handler.h"
+#include "user_interface_generated.h"
 
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/ConvexShape.hpp>
@@ -52,42 +53,48 @@ void UIRenderLogic::AddStyles(const themes::UIObjects *config) {
         "UIEngine: Null config provided, cannot add styles");
     return;
   }
-  std::cout << "UIEngine: Adding Panel config" << std::endl;
-  // add panel styles from flatbuffer config
-  m_panel_style.background_color.r =
-      config->panel_style()->background_color()->r();
-  m_panel_style.background_color.g =
-      config->panel_style()->background_color()->g();
-  m_panel_style.background_color.b =
-      config->panel_style()->background_color()->b();
-  m_panel_style.background_color.a =
-      config->panel_style()->background_color()->a();
-  m_panel_style.border_color.r = config->panel_style()->border_color()->r();
-  m_panel_style.border_color.g = config->panel_style()->border_color()->g();
-  m_panel_style.border_color.b = config->panel_style()->border_color()->b();
-  m_panel_style.border_color.a = config->panel_style()->border_color()->a();
-  m_panel_style.border_thickness = config->panel_style()->border_thickness();
-  m_panel_style.radius_resolution = config->panel_style()->radius_resolution();
 
-  std::cout << "UIEngine: Panel config added" << std::endl;
-  std::cout << "UIEngine: Adding Button config" << std::endl;
-  // add button styles from flatbuffer config
-  m_button_style.border_color.r = config->button_style()->border_color()->r();
-  m_button_style.border_color.g = config->button_style()->border_color()->g();
-  m_button_style.border_color.b = config->button_style()->border_color()->b();
-  m_button_style.border_color.a = config->button_style()->border_color()->a();
-  m_button_style.background_color.r =
-      config->button_style()->background_color()->r();
-  m_button_style.background_color.g =
-      config->button_style()->background_color()->g();
-  m_button_style.background_color.b =
-      config->button_style()->background_color()->b();
-  m_button_style.background_color.a =
-      config->button_style()->background_color()->a();
-  m_button_style.text_color.r = config->button_style()->text_color()->r();
-  m_button_style.text_color.g = config->button_style()->text_color()->g();
-  m_button_style.text_color.b = config->button_style()->text_color()->b();
-  m_button_style.text_color.a = config->button_style()->text_color()->a();
+  // set the panel style from the flatbuffer config
+  m_panel_style.background_color =
+      sf::Color(config->panel_style()->style()->background_color()->r(),
+                config->panel_style()->style()->background_color()->g(),
+                config->panel_style()->style()->background_color()->b(),
+                config->panel_style()->style()->background_color()->a());
+  m_panel_style.border_color =
+      sf::Color(config->panel_style()->style()->border_color()->r(),
+                config->panel_style()->style()->border_color()->g(),
+                config->panel_style()->style()->border_color()->b(),
+                config->panel_style()->style()->border_color()->a());
+  m_panel_style.border_thickness =
+      config->panel_style()->style()->border_thickness();
+  m_panel_style.radius_resolution =
+      config->panel_style()->style()->radius_resolution();
+  m_panel_style.inner_margin =
+      sf::Vector2f(config->panel_style()->style()->inner_margin()->x(),
+                   config->panel_style()->style()->inner_margin()->y());
+
+  // set the button style from the flatbuffer config
+  m_button_style.background_color =
+      sf::Color(config->button_style()->style()->background_color()->r(),
+                config->button_style()->style()->background_color()->g(),
+                config->button_style()->style()->background_color()->b(),
+                config->button_style()->style()->background_color()->a());
+
+  m_button_style.border_color =
+      sf::Color(config->button_style()->style()->border_color()->r(),
+                config->button_style()->style()->border_color()->g(),
+                config->button_style()->style()->border_color()->b(),
+                config->button_style()->style()->border_color()->a());
+
+  m_button_style.border_thickness =
+      config->button_style()->style()->border_thickness();
+
+  m_button_style.radius_resolution =
+      config->button_style()->style()->radius_resolution();
+
+  m_button_style.inner_margin =
+      sf::Vector2f(config->button_style()->style()->inner_margin()->x(),
+                   config->button_style()->style()->inner_margin()->y());
 
   log_handler::ProcessLog(
       spdlog::level::level_enum::info, log_handler::LogCode::kNoCode,
@@ -97,12 +104,23 @@ void UIRenderLogic::AddStyles(const themes::UIObjects *config) {
 void UIRenderLogic::DrawUIElements() {
 
   // define lambda function for recursively drawing UI elements
-  std::function<void(const UIElement &)> draw_ui_element =
-      [&](const UIElement &element) {
+  std::function<void(const UIElement &, const sf::Vector2f &,
+                     const sf::Vector2f &)>
+      draw_ui_element = [&](const UIElement &element,
+                            const sf::Vector2f &origin,
+                            const sf::Vector2f &size) {
+        // provide placement elements for the children
+        float border_thickness;
+        sf::Vector2f inner_margin;
+
         // Draw the element based on its type
         switch (element.element_type) {
         case UIElementType::UIElementType_Panel:
-          DrawPanel(element);
+          DrawPanel(element, origin, size);
+
+          border_thickness = m_panel_style.border_thickness;
+          inner_margin = m_panel_style.inner_margin;
+
           break;
         case UIElementType::UIElementType_DropDownMenu:
           DrawDropDownMenu();
@@ -114,12 +132,73 @@ void UIRenderLogic::DrawUIElements() {
               "UIEngine: Unknown UI element type encountered");
           break;
         }
+
+        // pull out number of children for convenience
+        size_t number_of_children = element.child_elements.size();
+
+        // create child origin and size variables
+        sf::Vector2f child_origin;
+        sf::Vector2f child_size;
         // Recursively draw child elements if they exist
-        for (const auto &child : element.child_elements) {
-          draw_ui_element(child);
+        for (size_t i = 0; i < number_of_children; ++i) {
+
+          switch (element.layout) {
+
+          case LayoutType::LayoutType_Vertical: {
+
+            // calculate size of the child element in a vertical layout
+            float child_width =
+                size.x - (2 * border_thickness) - (2 * inner_margin.x);
+
+            float child_height = (size.y - (2 * border_thickness) -
+                                  ((number_of_children + 1) * inner_margin.y)) /
+                                 element.child_elements.size();
+
+            child_size = sf::Vector2f(child_width, child_height);
+
+            // calculate the position for the child element in a vertical
+            // layout
+            float child_origin_x = origin.x + border_thickness + inner_margin.x;
+
+            float child_origin_y = origin.y + border_thickness +
+                                   inner_margin.y +
+                                   (i * (child_height + inner_margin.y));
+
+            child_origin = sf::Vector2f(child_origin_x, child_origin_y);
+            break;
+          }
+          case LayoutType::LayoutType_Horizontal: {
+
+            // calculate size of the child element in a horizontal layout
+            float child_width = (size.x - (2 * border_thickness) -
+                                 ((number_of_children + 1) * inner_margin.x)) /
+                                element.child_elements.size();
+            float child_height =
+                size.y - (2 * border_thickness) - (2 * inner_margin.y);
+
+            child_size = sf::Vector2f(child_width, child_height);
+
+            // calculate the position for the child element in a horizontal
+            // layout
+            float child_origin_x = origin.x + border_thickness +
+                                   inner_margin.x +
+                                   (i * (child_width + inner_margin.x));
+            float child_origin_y = origin.y + border_thickness + inner_margin.y;
+            child_origin = sf::Vector2f(child_origin_x, child_origin_y);
+            break;
+          }
+          case LayoutType::LayoutType_Grid: {
+            break;
+          }
+          default:
+            break;
+          }
+          // finally, draw the child element recursivelye
+          draw_ui_element(element.child_elements[i], child_origin, child_size);
         }
       };
-  // cycle through all the Archetype IDs associated with this logic class
+  // cycle through all the Archetype IDs associated with this logic
+  // class
   for (const ArchetypeID &archetype_id : m_archetype_IDs) {
 
     // if it is not in the archetyps map, then skip
@@ -136,16 +215,21 @@ void UIRenderLogic::DrawUIElements() {
         CUserInterface ui_component = GetComponent<CUserInterface>(
             entity_id, m_logic_context.scene_entities);
 
-        // recursively draw the UI elements starting from the root element
-        draw_ui_element(ui_component.root_element);
+        // recursively draw the UI elements starting from the root
+        // element
+        draw_ui_element(ui_component.root_element,
+                        ui_component.root_element.position,
+                        ui_component.root_element.size);
       }
     }
   }
 }
 
-void UIRenderLogic::DrawPanel(const UIElement &element) {
+void UIRenderLogic::DrawPanel(const UIElement &element,
+                              const sf::Vector2f &origin,
+                              const sf::Vector2f &size) {
 
-  DrawBoxWithRadiusCorners(element, {100.f, 100.f}, {500.f, 300.f},
+  DrawBoxWithRadiusCorners(element, origin, size,
                            m_panel_style.radius_resolution);
 }
 

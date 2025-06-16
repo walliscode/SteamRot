@@ -12,41 +12,37 @@
 #include "themes_generated.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <cstddef>
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 namespace steamrot {
 
+struct Style {
+  sf::Color background_color;
+  sf::Color border_color;
+  float border_thickness;
+  size_t radius_resolution;
+  sf::Vector2f inner_margin;
+};
 /**
  * @class PanelStyle
  * @brief Contains the style properties for a panel in the UI.
  *
  */
-struct PanelStyle {
-  sf::Color background_color;
-  sf::Color border_color;
-  float border_thickness;
-  size_t radius_resolution;
-};
+struct PanelStyle : public Style {};
+
 /**
  * @class ButtonStyle
  * @brief Contains the style properties for a button in the UI.
  *
  */
-struct ButtonStyle {
-  sf::Color background_color;
-  sf::Color text_color;
-  sf::Color border_color;
-};
+struct ButtonStyle : public Style {};
 
 class UIRenderLogic : public Logic<CUserInterface> {
 private:
-  /**
-   * @brief Draw a panel to the UI render texture.
-   *
-   * @param render_texture from sources such as the Scene or Display
-   */
-  void DrawPanel(const UIElement &element);
+  void DrawPanel(const UIElement &element, const sf::Vector2f &origin,
+                 const sf::Vector2f &size);
 
   ////////////////////////////////////////////////////////////
   // |brief draw drop down menu
@@ -62,7 +58,6 @@ private:
    * @brief Member variable to hold the style for buttons in the UI.
    */
   ButtonStyle m_button_style;
-
   /**
    * @brief Member variable to hold the style for panels in the UI.
    */

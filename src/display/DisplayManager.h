@@ -29,8 +29,7 @@ private:
   ////////////////////////////////////////////////////////////
   // members
   ////////////////////////////////////////////////////////////
-  sf::RenderWindow m_window{sf::VideoMode(steamrot::kWindowSize),
-                            "SFML window"};
+  sf::RenderWindow m_window{sf::VideoMode(steamrot::kWindowSize), "SteamRot"};
   sf::Color m_background_color;
   std::array<std::shared_ptr<Session>, 5> m_sessions;
   std::shared_ptr<Session> m_active_session;
