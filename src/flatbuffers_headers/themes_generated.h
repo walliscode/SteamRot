@@ -67,7 +67,8 @@ struct PanelStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_BACKGROUND_COLOR = 4,
     VT_BORDER_COLOR = 6,
-    VT_BORDER_THICKNESS = 8
+    VT_BORDER_THICKNESS = 8,
+    VT_RADIUS_RESOLUTION = 10
   };
   const steamrot::themes::Color *background_color() const {
     return GetStruct<const steamrot::themes::Color *>(VT_BACKGROUND_COLOR);
@@ -78,11 +79,15 @@ struct PanelStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   float border_thickness() const {
     return GetField<float>(VT_BORDER_THICKNESS, 0.0f);
   }
+  int32_t radius_resolution() const {
+    return GetField<int32_t>(VT_RADIUS_RESOLUTION, 0);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<steamrot::themes::Color>(verifier, VT_BACKGROUND_COLOR, 1) &&
            VerifyField<steamrot::themes::Color>(verifier, VT_BORDER_COLOR, 1) &&
            VerifyField<float>(verifier, VT_BORDER_THICKNESS, 4) &&
+           VerifyField<int32_t>(verifier, VT_RADIUS_RESOLUTION, 4) &&
            verifier.EndTable();
   }
 };
@@ -100,6 +105,9 @@ struct PanelStyleBuilder {
   void add_border_thickness(float border_thickness) {
     fbb_.AddElement<float>(PanelStyle::VT_BORDER_THICKNESS, border_thickness, 0.0f);
   }
+  void add_radius_resolution(int32_t radius_resolution) {
+    fbb_.AddElement<int32_t>(PanelStyle::VT_RADIUS_RESOLUTION, radius_resolution, 0);
+  }
   explicit PanelStyleBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -115,8 +123,10 @@ inline ::flatbuffers::Offset<PanelStyle> CreatePanelStyle(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const steamrot::themes::Color *background_color = nullptr,
     const steamrot::themes::Color *border_color = nullptr,
-    float border_thickness = 0.0f) {
+    float border_thickness = 0.0f,
+    int32_t radius_resolution = 0) {
   PanelStyleBuilder builder_(_fbb);
+  builder_.add_radius_resolution(radius_resolution);
   builder_.add_border_thickness(border_thickness);
   builder_.add_border_color(border_color);
   builder_.add_background_color(background_color);

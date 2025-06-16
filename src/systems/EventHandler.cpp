@@ -20,22 +20,24 @@ UserEvents EventHandler::HandleEvents(sf::RenderWindow &window) {
 
   // poll events from the window
   while (const std::optional<sf::Event> event = window.pollEvent()) {
-
-    // if the event is a close event, set the close window flag to true
+    // add in ctrl + c to close the window
+    if (const auto *keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+      if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
+        window.close();
+    } // if the event is a close event, set the close window flag to true
     if (event->is<sf::Event::Closed>()) {
       window.close();
-
     }
-    // handle keyboard events
-    else if (event->is<sf::Event::KeyPressed>() ||
-             event->is<sf::Event::KeyReleased>()) {
-      HandleKeyboardEvents(event.value(), event_bitsets);
-    }
-    // handle mouse events
-    else if (event->is<sf::Event::MouseButtonPressed>() ||
-             event->is<sf::Event::MouseButtonReleased>()) {
-      HandleMouseEvents(event.value(), event_bitsets);
-    }
+    // // handle keyboard events
+    // else if (event->is<sf::Event::KeyPressed>() ||
+    //          event->is<sf::Event::KeyReleased>()) {
+    //   HandleKeyboardEvents(event.value(), event_bitsets);
+    // }
+    // // handle mouse events
+    // else if (event->is<sf::Event::MouseButtonPressed>() ||
+    //          event->is<sf::Event::MouseButtonReleased>()) {
+    //   HandleMouseEvents(event.value(), event_bitsets);
+    // }
   }
   return event_bitsets;
 }

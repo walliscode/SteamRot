@@ -10,6 +10,7 @@ table PanelStyle {
     background_color: Color;
     border_color: Color;
     border_thickness: float;
+    radius_resolution : int;
   }
 
 table ButtonStyle {

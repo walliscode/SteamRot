@@ -1,18 +1,19 @@
 {
   "panel_style": {
     "background_color": {
-      "r": 255,
-      "g": 255,
-      "b": 255,
+      "r": 129,
+      "g": 133,
+      "b": 137,
       "a": 255
     },
     "border_color": {
-      "r": 200,
-      "g": 200,
-      "b": 200,
+      "r": 249,
+      "g": 246,
+      "b": 238,
       "a": 255
     },
-    "border_thickness": 10
+    "border_thickness": 5,
+    "radius_resolution": 100
   },
   "button_style": {
     "background_color": {
