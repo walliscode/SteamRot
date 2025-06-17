@@ -96,6 +96,18 @@ void UIRenderLogic::AddStyles(const themes::UIObjects *config) {
       sf::Vector2f(config->button_style()->style()->inner_margin()->x(),
                    config->button_style()->style()->inner_margin()->y());
 
+  m_button_style.text_color =
+      sf::Color(config->button_style()->text_color()->r(),
+                config->button_style()->text_color()->g(),
+                config->button_style()->text_color()->b(),
+                config->button_style()->text_color()->a());
+
+  m_button_style.hover_color =
+      sf::Color(config->button_style()->hover_color()->r(),
+                config->button_style()->hover_color()->g(),
+                config->button_style()->hover_color()->b(),
+                config->button_style()->hover_color()->a());
+
   log_handler::ProcessLog(
       spdlog::level::level_enum::info, log_handler::LogCode::kNoCode,
       "UIEngine: Button styles added from flatbuffer config");
@@ -115,6 +127,8 @@ void UIRenderLogic::DrawUIElements() {
 
         // Draw the element based on its type
         switch (element.element_type) {
+
+        // Panel
         case UIElementType::UIElementType_Panel:
           DrawPanel(element, origin, size);
 
@@ -122,9 +136,21 @@ void UIRenderLogic::DrawUIElements() {
           inner_margin = m_panel_style.inner_margin;
 
           break;
+
+          // DropDownMenu
         case UIElementType::UIElementType_DropDownMenu:
           DrawDropDownMenu();
           break;
+
+          // Button
+        case UIElementType::UIElementType_Button: {
+
+          DrawButton(element, origin, size);
+          border_thickness = m_button_style.border_thickness;
+          inner_margin = m_button_style.inner_margin;
+
+          break;
+        }
         // Add more cases for other UI element types as needed
         default:
           log_handler::ProcessLog(
@@ -237,17 +263,48 @@ void UIRenderLogic::DrawPanel(const UIElement &element,
 void UIRenderLogic::DrawDropDownMenu() {};
 
 /////////////////////////////////////////////////
+void UIRenderLogic::DrawButton(const UIElement &element,
+                               const sf::Vector2f &origin,
+                               const sf::Vector2f &size) {
+
+  // Draw the box first
+  DrawBoxWithRadiusCorners(element, origin, size,
+                           m_button_style.radius_resolution);
+}
+/////////////////////////////////////////////////
 void UIRenderLogic::DrawBoxWithRadiusCorners(const UIElement &ui_element,
                                              const sf::Vector2f &origin,
                                              const sf::Vector2f &size,
                                              const size_t &resolution) {
 
-  // get thickness/radius from the UIElement
+  // set element specific variables
   float radius;
-  if (ui_element.element_type == UIElementType::UIElementType_Panel) {
+  sf::Color border_color;
+  sf::Color background_color;
+
+  switch (ui_element.element_type) {
+
+  // Panel
+  case UIElementType::UIElementType_Panel: {
     radius = m_panel_style.border_thickness;
-  } else {
-    radius = 10.0f; // default radius for other types
+    border_color = m_panel_style.border_color;
+    background_color = m_panel_style.background_color;
+    break;
+  }
+    // Button
+  case UIElementType::UIElementType_Button: {
+    radius = m_button_style.border_thickness;
+    border_color = m_button_style.border_color;
+    background_color = m_button_style.background_color;
+    break;
+  }
+
+  default: {
+    radius = 0.f;
+    border_color = sf::Color::Green;
+    background_color = sf::Color::Transparent;
+    break;
+  }
   }
   // lambda function to draw one side (quarter circle and box) based off
   // centre
@@ -264,7 +321,7 @@ void UIRenderLogic::DrawBoxWithRadiusCorners(const UIElement &ui_element,
     sf::Vector2f offset(x_offset, y_offset);
 
     // set the origin of the corner
-    corner.append(sf::Vertex(centre + offset, m_panel_style.border_color));
+    corner.append(sf::Vertex(centre + offset, border_color));
 
     // add points to the corner for the rounded part
     for (size_t i = 0; i <= resolution; ++i) {
@@ -280,7 +337,7 @@ void UIRenderLogic::DrawBoxWithRadiusCorners(const UIElement &ui_element,
                                    centre.y + offset.y + y};
 
       // append the vertex to the corner array
-      corner.append(sf::Vertex(segmented_point, m_panel_style.border_color));
+      corner.append(sf::Vertex(segmented_point, border_color));
     }
 
     // draw the corner to the render texture
@@ -298,27 +355,27 @@ void UIRenderLogic::DrawBoxWithRadiusCorners(const UIElement &ui_element,
   // draw the four sides of the box
   sf::RectangleShape top_side(sf::Vector2f(size.x - 2 * radius, radius));
   top_side.setPosition({origin.x + radius, origin.y});
-  top_side.setFillColor(m_panel_style.border_color);
+  top_side.setFillColor(border_color);
   m_logic_context.scene_texture.draw(top_side);
 
   sf::RectangleShape bottom_side(sf::Vector2f(size.x - 2 * radius, radius));
   bottom_side.setPosition({origin.x + radius, origin.y + size.y - radius});
-  bottom_side.setFillColor(m_panel_style.border_color);
+  bottom_side.setFillColor(border_color);
   m_logic_context.scene_texture.draw(bottom_side);
   sf::RectangleShape left_side(sf::Vector2f(radius, size.y - 2 * radius));
   left_side.setPosition({origin.x, origin.y + radius});
-  left_side.setFillColor(m_panel_style.border_color);
+  left_side.setFillColor(border_color);
   m_logic_context.scene_texture.draw(left_side);
   sf::RectangleShape right_side(sf::Vector2f(radius, size.y - 2 * radius));
   right_side.setPosition({origin.x + size.x - radius, origin.y + radius});
-  right_side.setFillColor(m_panel_style.border_color);
+  right_side.setFillColor(border_color);
   m_logic_context.scene_texture.draw(right_side);
 
   // draw the background of the box taking into account the radius
   sf::RectangleShape background(
       sf::Vector2f(size.x - 2 * radius, size.y - 2 * radius));
   background.setPosition({origin.x + radius, origin.y + radius});
-  background.setFillColor(m_panel_style.background_color);
+  background.setFillColor(background_color);
   m_logic_context.scene_texture.draw(background);
 }
 

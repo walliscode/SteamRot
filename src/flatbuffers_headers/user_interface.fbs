@@ -6,7 +6,7 @@ enum UIElementType: byte{
     None = 0,
    Panel = 1, 
   DropDownMenu = 2,
-
+Button = 3,
   }
 
 enum LayoutType: byte{ 

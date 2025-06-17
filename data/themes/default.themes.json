@@ -13,8 +13,8 @@
         "b": 238,
         "a": 255
       },
-      "border_thickness": 5,
-      "radius_resolution": 100,
+      "border_thickness": 3,
+      "radius_resolution": 10,
       "inner_margin": {
         "x": 10,
         "y": 10
@@ -24,23 +24,35 @@
   "button_style": {
     "style": {
       "background_color": {
-        "r": 0,
-        "g": 255,
-        "b": 0,
+        "r": 197,
+        "g": 34,
+        "b": 51,
         "a": 255
       },
       "border_color": {
-        "r": 0,
-        "g": 100,
-        "b": 0,
+        "r": 249,
+        "g": 246,
+        "b": 238,
         "a": 255
       },
-      "border_thickness": 5,
+      "border_thickness": 1,
       "radius_resolution": 100,
       "inner_margin": {
         "x": 5,
         "y": 5
       }
+    },
+    "text_color": {
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 255
+    },
+    "hover_color": {
+      "r": 0,
+      "g": 200,
+      "b": 0,
+      "a": 255
     }
   }
 }
