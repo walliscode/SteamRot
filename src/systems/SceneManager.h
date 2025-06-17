@@ -40,7 +40,7 @@ private:
   /**
    * @brief Asset manager for handling game assets.
    */
-  AssetManager m_asset_manager;
+  AssetManager &m_asset_manager;
 
   /**
    * @brief Data manager for managing game data.
@@ -51,7 +51,7 @@ public:
   /**
    * @brief Default constructor.
    */
-  SceneManager();
+  SceneManager(AssetManager &asset_manager);
 
   /**
    * @brief Start up the SceneManager for the game.

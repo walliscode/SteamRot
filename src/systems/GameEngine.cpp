@@ -25,7 +25,7 @@ GameEngine::GameEngine()
     : m_display_manager(), m_data_manager(), m_event_handler(),
       m_asset_manager() {
 
-  m_scene_manager = std::make_unique<SceneManager>();
+  m_scene_manager = std::make_unique<SceneManager>(m_asset_manager);
   std::cout << "GameEngine constructor called" << std::endl;
   log_handler::ProcessLog(spdlog::level::level_enum::info,
                           log_handler::LogCode::kNoCode,

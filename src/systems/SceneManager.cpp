@@ -21,8 +21,9 @@ namespace steamrot {
 /**
  * -------------------------------------------------------
  */
-SceneManager::SceneManager()
-    : m_scene_factory(), m_scenes(), m_asset_manager(), m_data_manager() {}
+SceneManager::SceneManager(AssetManager &asset_manager)
+    : m_scene_factory(), m_scenes(), m_asset_manager(asset_manager),
+      m_data_manager() {}
 
 /**
  * ======================= Public Methods =======================
@@ -45,6 +46,11 @@ void SceneManager::AddSceneFromDefault(const SceneType &scene_type,
   // add to m_scenes maps
   m_scenes[new_scene->GetSceneID()] = std::move(new_scene);
   std::cout << "Added scene to m_scenes map." << std::endl;
+
+  // load default scene assets
+  m_asset_manager.LoadSceneAssets(scene_type);
+  std::cout << "Loaded default assets for scene type: "
+            << magic_enum::enum_name(scene_type) << std::endl;
 };
 
 /**

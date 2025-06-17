@@ -93,10 +93,10 @@ DataManager::ProvideFonts(const SceneType &scene_type) {
     // create a new font object
     sf::Font new_font;
 
+    // full font name
+    std::string font_file_name = font->name()->str() + ".ttf";
     // load the font from file
-    if (new_font.openFromFile(getFontsFolder() / font->name()->str() /
-                              ".ttf")) {
-
+    if (new_font.openFromFile(getFontsFolder() / font_file_name)) {
       // add the font to the vector with its tag
       fonts.emplace_back(font->name()->str(), new_font);
 
