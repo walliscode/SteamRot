@@ -1,7 +1,7 @@
 
 add_library(utilities
    DataManager.cpp
-   SchemaChecker.cpp
+
 
 )
 
