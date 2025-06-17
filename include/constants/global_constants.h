@@ -7,5 +7,5 @@ namespace steamrot {
 size_t const kUserInputCount{sf::Keyboard::ScancodeCount +
                              sf::Mouse::ButtonCount};
 
-sf::Vector2u const kWindowSize{800, 800};
+sf::Vector2u const kWindowSize{900, 600};
 } // namespace steamrot

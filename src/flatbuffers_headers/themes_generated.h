@@ -194,15 +194,31 @@ inline ::flatbuffers::Offset<PanelStyle> CreatePanelStyle(
 struct ButtonStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef ButtonStyleBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_STYLE = 4
+    VT_STYLE = 4,
+    VT_TEXT_COLOR = 6,
+    VT_HOVER_COLOR = 8,
+    VT_FONT = 10
   };
   const steamrot::themes::Style *style() const {
     return GetPointer<const steamrot::themes::Style *>(VT_STYLE);
+  }
+  const steamrot::themes::Color *text_color() const {
+    return GetStruct<const steamrot::themes::Color *>(VT_TEXT_COLOR);
+  }
+  const steamrot::themes::Color *hover_color() const {
+    return GetStruct<const steamrot::themes::Color *>(VT_HOVER_COLOR);
+  }
+  const ::flatbuffers::String *font() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_FONT);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_STYLE) &&
            verifier.VerifyTable(style()) &&
+           VerifyField<steamrot::themes::Color>(verifier, VT_TEXT_COLOR, 1) &&
+           VerifyField<steamrot::themes::Color>(verifier, VT_HOVER_COLOR, 1) &&
+           VerifyOffset(verifier, VT_FONT) &&
+           verifier.VerifyString(font()) &&
            verifier.EndTable();
   }
 };
@@ -213,6 +229,15 @@ struct ButtonStyleBuilder {
   ::flatbuffers::uoffset_t start_;
   void add_style(::flatbuffers::Offset<steamrot::themes::Style> style) {
     fbb_.AddOffset(ButtonStyle::VT_STYLE, style);
+  }
+  void add_text_color(const steamrot::themes::Color *text_color) {
+    fbb_.AddStruct(ButtonStyle::VT_TEXT_COLOR, text_color);
+  }
+  void add_hover_color(const steamrot::themes::Color *hover_color) {
+    fbb_.AddStruct(ButtonStyle::VT_HOVER_COLOR, hover_color);
+  }
+  void add_font(::flatbuffers::Offset<::flatbuffers::String> font) {
+    fbb_.AddOffset(ButtonStyle::VT_FONT, font);
   }
   explicit ButtonStyleBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -227,10 +252,31 @@ struct ButtonStyleBuilder {
 
 inline ::flatbuffers::Offset<ButtonStyle> CreateButtonStyle(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<steamrot::themes::Style> style = 0) {
+    ::flatbuffers::Offset<steamrot::themes::Style> style = 0,
+    const steamrot::themes::Color *text_color = nullptr,
+    const steamrot::themes::Color *hover_color = nullptr,
+    ::flatbuffers::Offset<::flatbuffers::String> font = 0) {
   ButtonStyleBuilder builder_(_fbb);
+  builder_.add_font(font);
+  builder_.add_hover_color(hover_color);
+  builder_.add_text_color(text_color);
   builder_.add_style(style);
   return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<ButtonStyle> CreateButtonStyleDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<steamrot::themes::Style> style = 0,
+    const steamrot::themes::Color *text_color = nullptr,
+    const steamrot::themes::Color *hover_color = nullptr,
+    const char *font = nullptr) {
+  auto font__ = font ? _fbb.CreateString(font) : 0;
+  return steamrot::themes::CreateButtonStyle(
+      _fbb,
+      style,
+      text_color,
+      hover_color,
+      font__);
 }
 
 struct UIObjects FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {

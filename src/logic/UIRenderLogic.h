@@ -11,6 +11,7 @@
 #include "Logic.h"
 #include "themes_generated.h"
 #include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <cstddef>
@@ -37,7 +38,11 @@ struct PanelStyle : public Style {};
  * @brief Contains the style properties for a button in the UI.
  *
  */
-struct ButtonStyle : public Style {};
+struct ButtonStyle : public Style {
+  sf::Color text_color;
+  sf::Color hover_color;
+  std::string font;
+};
 
 class UIRenderLogic : public Logic<CUserInterface> {
 private:
@@ -48,6 +53,17 @@ private:
   // |brief draw drop down menu
   ////////////////////////////////////////////////////////////
   void DrawDropDownMenu();
+
+  /////////////////////////////////////////////////
+  /// @brief Draw a button element to the render texture.
+  ///
+  /// @param element Struct provided by the CUserInterface component that stores
+  /// element specific data.
+  /// @param origin Top left corner of the button in the render texture
+  /// @param size Total size of the button including borders.
+  /////////////////////////////////////////////////
+  void DrawButton(const UIElement &element, const sf::Vector2f &origin,
+                  const sf::Vector2f &size);
 
   ////////////////////////////////////////////////////////////
   // |brief add in styles from flatbuffer config

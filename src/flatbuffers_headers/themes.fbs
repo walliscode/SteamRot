@@ -24,6 +24,9 @@ table PanelStyle {
 
 table ButtonStyle {
   style: Style;
+  text_color: Color;
+  hover_color: Color;
+  font: string;
   }
 
 

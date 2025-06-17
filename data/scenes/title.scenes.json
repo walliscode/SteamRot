@@ -9,24 +9,34 @@
             "layout": "Vertical",
             "children": [
               {
-                "type": "Panel",
+                "type": "Button",
                 "layout": "Horizontal",
                 "children": []
               },
               {
-                "type": "Panel",
+                "type": "Button",
                 "layout": "Horizontal",
                 "children": []
               },
               {
-                "type": "Panel",
+                "type": "Button",
+                "layout": "Horizontal",
+                "children": []
+              },
+              {
+                "type": "Button",
+                "layout": "Horizontal",
+                "children": []
+              },
+              {
+                "type": "Button",
                 "layout": "Horizontal",
                 "children": []
               }
             ],
             "position": {
-              "x": 100,
-              "y": 100
+              "x": 325,
+              "y": 50
             },
             "size": {
               "x": 250,

@@ -27,31 +27,34 @@ enum UIElementType : int8_t {
   UIElementType_None = 0,
   UIElementType_Panel = 1,
   UIElementType_DropDownMenu = 2,
+  UIElementType_Button = 3,
   UIElementType_MIN = UIElementType_None,
-  UIElementType_MAX = UIElementType_DropDownMenu
+  UIElementType_MAX = UIElementType_Button
 };
 
-inline const UIElementType (&EnumValuesUIElementType())[3] {
+inline const UIElementType (&EnumValuesUIElementType())[4] {
   static const UIElementType values[] = {
     UIElementType_None,
     UIElementType_Panel,
-    UIElementType_DropDownMenu
+    UIElementType_DropDownMenu,
+    UIElementType_Button
   };
   return values;
 }
 
 inline const char * const *EnumNamesUIElementType() {
-  static const char * const names[4] = {
+  static const char * const names[5] = {
     "None",
     "Panel",
     "DropDownMenu",
+    "Button",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameUIElementType(UIElementType e) {
-  if (::flatbuffers::IsOutRange(e, UIElementType_None, UIElementType_DropDownMenu)) return "";
+  if (::flatbuffers::IsOutRange(e, UIElementType_None, UIElementType_Button)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesUIElementType()[index];
 }
