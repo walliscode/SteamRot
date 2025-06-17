@@ -52,5 +52,12 @@
       "Render"
     ]
   },
-  "ui_theme": "default"
+  "ui_theme": "default",
+  "assets": {
+    "fonts": [
+      {
+        "name": "DaddyTimeMonoNerdFont-Regular"
+      }
+    ]
+  }
 }
