@@ -7,7 +7,6 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "DataManager.h"
-#include "MenuScene.h"
 #include "Scene.h"
 #include "SceneType.h"
 #include "TitleScene.h"
@@ -25,12 +24,6 @@ private:
   ///
   ////////////////////////////////////////////////////////////
   DataManager m_data_manager;
-  ////////////////////////////////////////////////////////////
-  /// \brief Create a new Menu Scene
-  ///
-  ////////////////////////////////////////////////////////////
-  std::unique_ptr<MenuScene> CreateMenuScene(const SceneData *scene_data,
-                                             const uuids::uuid &id);
 
   /**
    * @brief Creates a TitleScreen object with provided values
@@ -39,8 +32,10 @@ private:
    * e.t.c.
    * @param id A uniue ID generated and provided by the SceneFactory
    */
-  std::unique_ptr<TitleScene> CreateTitleScene(const SceneData *scene_data,
-                                               const uuids::uuid &id);
+  std::unique_ptr<TitleScene>
+  CreateTitleScene(const SceneData *scene_data, const uuids::uuid &id,
+                   const AssetManager &asset_manager);
+
   ////////////////////////////////////////////////////////////
   /// \brief create a uuid if none is in provided json data
   ///
@@ -58,6 +53,7 @@ public:
   /// \brief gathers all scene creation methods
   ///
   ////////////////////////////////////////////////////////////
-  std::unique_ptr<Scene> CreateScene(const SceneType &scene_type);
+  std::unique_ptr<Scene> CreateScene(const SceneType &scene_type,
+                                     const AssetManager &asset_manager);
 };
 } // namespace steamrot

@@ -30,21 +30,23 @@ const uuids::uuid SceneFactory::CreateUUID() {
   return id;
 }
 ////////////////////////////////////////////////////////////
-std::unique_ptr<Scene> SceneFactory::CreateScene(const SceneType &scene_type) {
+std::unique_ptr<Scene>
+SceneFactory::CreateScene(const SceneType &scene_type,
+                          const AssetManager &asset_manager) {
 
   // generate UUID for the scene
   uuids::uuid scene_uuid = CreateUUID();
   std::cout << "Creating scene with UUID: " << scene_uuid << std::endl;
+
   // load scene data
   const SceneData *scene_data = m_data_manager.ProvideSceneData(scene_type);
-  std::cout << "Loaded scene data for scene type: "
-            << magic_enum::enum_name(scene_type) << std::endl;
+
   switch (scene_type) {
+
+    // TitleScene
   case SceneType::title:
     std::cout << "Title scene type detected." << std::endl;
-    return CreateTitleScene(scene_data, scene_uuid);
-  case SceneType::menu:
-    return CreateMenuScene(scene_data, scene_uuid);
+    return CreateTitleScene(scene_data, scene_uuid, asset_manager);
 
   default:
     // not sure how it would be possible to get here, maybe some kind of cast
@@ -55,24 +57,14 @@ std::unique_ptr<Scene> SceneFactory::CreateScene(const SceneType &scene_type) {
 ////////////////////////////////////////////////////////////
 std::unique_ptr<TitleScene>
 SceneFactory::CreateTitleScene(const SceneData *scene_data,
-                               const uuids::uuid &scene_uuid) {
+                               const uuids::uuid &scene_uuid,
+                               const AssetManager &asset_manager) {
   // create a new title scene object, we are creating a raw pointer here due to
   // TitleScene having a private constuctor
   std::unique_ptr<TitleScene> title_scene(
-      new TitleScene(100, scene_data, scene_uuid));
+      new TitleScene(100, scene_data, scene_uuid, asset_manager));
   std::cout << "Created TitleScene with UUID: " << scene_uuid << std::endl;
   return title_scene;
-}
-
-////////////////////////////////////////////////////////////
-std::unique_ptr<MenuScene>
-SceneFactory::CreateMenuScene(const SceneData *scene_data,
-                              const uuids::uuid &scene_uuid) {
-  // create a new menu scene object, we are creating a raw pointer here due to
-  // MenuScene having a private constuctor
-  std::unique_ptr<MenuScene> menu_scene(
-      new MenuScene(100, scene_data, scene_uuid));
-  return menu_scene;
 }
 
 } // namespace steamrot

@@ -62,7 +62,7 @@ private:
   /// @param origin Top left corner of the button in the render texture
   /// @param size Total size of the button including borders.
   /////////////////////////////////////////////////
-  void DrawButton(const UIElement &element, const sf::Vector2f &origin,
+  void DrawButton(const Button &element, const sf::Vector2f &origin,
                   const sf::Vector2f &size);
 
   ////////////////////////////////////////////////////////////
@@ -84,6 +84,8 @@ private:
    */
   void DrawUIElements();
 
+  void RecursiveDrawUIElement(UIElement &element, const sf::Vector2f &origin,
+                              const sf::Vector2f &size);
   /////////////////////////////////////////////////
   /// @brief Draws a box with rounded corners.
   ///

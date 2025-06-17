@@ -29,7 +29,7 @@ private:
    * @param id Unique identifier for the scene
    */
   TitleScene(const size_t pool_size, const SceneData *scene_data,
-             const uuids::uuid &id);
+             const uuids::uuid &id, const AssetManager &asset_manager);
 
   ////////////////////////////////////////////////////////////
   /// \brief call movement Logic for TitleScene
