@@ -3,10 +3,10 @@ include "types.fbs";
 namespace steamrot;
 
 enum UIElementType: byte{
-    None = 0,
-   Panel = 1, 
-  DropDownMenu = 2,
-Button = 3,
+
+  None= 0, 
+  Panel = 1,
+  Button = 2,   
   }
 
 enum LayoutType: byte{ 
@@ -22,6 +22,7 @@ table UIElementData{
   layout: LayoutType;
     position: Vector2f;
     size: Vector2f;
+    label: string;
   }
 
 table UserInterface{

@@ -40,6 +40,7 @@ void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
 
   // Start the game loop
   RunGameLoop();
+
   // Shut down the game engine
   ShutDown();
 };

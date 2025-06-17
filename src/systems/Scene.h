@@ -39,6 +39,10 @@ protected:
   ////////////////////////////////////////////////////////////
   ActionManager m_action_manager;
 
+  /////////////////////////////////////////////////
+  /// @brief Reference to the AssetManager instance on the GameEngine
+  /////////////////////////////////////////////////
+  const AssetManager &m_asset_manager;
   /**
    * @brief Instace of LogicFactory used to provide logic for the Scene
    */
@@ -77,7 +81,7 @@ protected:
    * @param id Unique identifier for the Scene
    */
   Scene(const size_t &pool_size, const SceneData *scene_data,
-        const uuids::uuid &id);
+        const uuids::uuid &id, const AssetManager &asset_manager);
 
 public:
   /**

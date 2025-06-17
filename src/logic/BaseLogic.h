@@ -6,6 +6,7 @@
 #pragma once
 
 #include "ArchetypeManager.h"
+#include "AssetManager.h"
 #include "containers.h"
 #include "themes_generated.h"
 #include <SFML/Graphics/RenderTexture.hpp>
@@ -39,6 +40,8 @@ struct LogicContext {
    * @brief Stuct member that contains UI thematic configuration.
    */
   const themes::UIObjects *ui_config{nullptr};
+
+  const AssetManager &asset_manager;
 };
 
 /**

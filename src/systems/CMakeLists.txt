@@ -6,7 +6,6 @@ add_library(systems
     AssetManager.cpp
     Scene.cpp
     ActionManager.cpp
-    MenuScene.cpp
     TitleScene.cpp
     EventHandler.cpp
 )

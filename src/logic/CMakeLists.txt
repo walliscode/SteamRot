@@ -14,4 +14,5 @@ target_link_libraries(logic PUBLIC
   entity
   flatbuffers
   flatbuffers_headers
+  systems
 )

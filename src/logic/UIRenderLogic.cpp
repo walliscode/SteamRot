@@ -10,9 +10,12 @@
 
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/ConvexShape.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
+#include <SFML/Graphics/Text.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <iostream>
+#include <memory>
 
 namespace steamrot {
 
@@ -115,114 +118,6 @@ void UIRenderLogic::AddStyles(const themes::UIObjects *config) {
 
 void UIRenderLogic::DrawUIElements() {
 
-  // define lambda function for recursively drawing UI elements
-  std::function<void(const UIElement &, const sf::Vector2f &,
-                     const sf::Vector2f &)>
-      draw_ui_element = [&](const UIElement &element,
-                            const sf::Vector2f &origin,
-                            const sf::Vector2f &size) {
-        // provide placement elements for the children
-        float border_thickness;
-        sf::Vector2f inner_margin;
-
-        // Draw the element based on its type
-        switch (element.element_type) {
-
-        // Panel
-        case UIElementType::UIElementType_Panel:
-          DrawPanel(element, origin, size);
-
-          border_thickness = m_panel_style.border_thickness;
-          inner_margin = m_panel_style.inner_margin;
-
-          break;
-
-          // DropDownMenu
-        case UIElementType::UIElementType_DropDownMenu:
-          DrawDropDownMenu();
-          break;
-
-          // Button
-        case UIElementType::UIElementType_Button: {
-
-          DrawButton(element, origin, size);
-          border_thickness = m_button_style.border_thickness;
-          inner_margin = m_button_style.inner_margin;
-
-          break;
-        }
-        // Add more cases for other UI element types as needed
-        default:
-          log_handler::ProcessLog(
-              spdlog::level::level_enum::warn, log_handler::LogCode::kNoCode,
-              "UIEngine: Unknown UI element type encountered");
-          break;
-        }
-
-        // pull out number of children for convenience
-        size_t number_of_children = element.child_elements.size();
-
-        // create child origin and size variables
-        sf::Vector2f child_origin;
-        sf::Vector2f child_size;
-        // Recursively draw child elements if they exist
-        for (size_t i = 0; i < number_of_children; ++i) {
-
-          switch (element.layout) {
-
-          case LayoutType::LayoutType_Vertical: {
-
-            // calculate size of the child element in a vertical layout
-            float child_width =
-                size.x - (2 * border_thickness) - (2 * inner_margin.x);
-
-            float child_height = (size.y - (2 * border_thickness) -
-                                  ((number_of_children + 1) * inner_margin.y)) /
-                                 element.child_elements.size();
-
-            child_size = sf::Vector2f(child_width, child_height);
-
-            // calculate the position for the child element in a vertical
-            // layout
-            float child_origin_x = origin.x + border_thickness + inner_margin.x;
-
-            float child_origin_y = origin.y + border_thickness +
-                                   inner_margin.y +
-                                   (i * (child_height + inner_margin.y));
-
-            child_origin = sf::Vector2f(child_origin_x, child_origin_y);
-            break;
-          }
-          case LayoutType::LayoutType_Horizontal: {
-
-            // calculate size of the child element in a horizontal layout
-            float child_width = (size.x - (2 * border_thickness) -
-                                 ((number_of_children + 1) * inner_margin.x)) /
-                                element.child_elements.size();
-            float child_height =
-                size.y - (2 * border_thickness) - (2 * inner_margin.y);
-
-            child_size = sf::Vector2f(child_width, child_height);
-
-            // calculate the position for the child element in a horizontal
-            // layout
-            float child_origin_x = origin.x + border_thickness +
-                                   inner_margin.x +
-                                   (i * (child_width + inner_margin.x));
-            float child_origin_y = origin.y + border_thickness + inner_margin.y;
-            child_origin = sf::Vector2f(child_origin_x, child_origin_y);
-            break;
-          }
-          case LayoutType::LayoutType_Grid: {
-            break;
-          }
-          default:
-            break;
-          }
-          // finally, draw the child element recursivelye
-          draw_ui_element(element.child_elements[i], child_origin, child_size);
-        }
-      };
   // cycle through all the Archetype IDs associated with this logic
   // class
   for (const ArchetypeID &archetype_id : m_archetype_IDs) {
@@ -238,19 +133,131 @@ void UIRenderLogic::DrawUIElements() {
       for (size_t entity_id : archetype) {
 
         // get the CUserInterface component
-        CUserInterface ui_component = GetComponent<CUserInterface>(
+        CUserInterface &ui_component = GetComponent<CUserInterface>(
             entity_id, m_logic_context.scene_entities);
 
         // recursively draw the UI elements starting from the root
         // element
-        draw_ui_element(ui_component.root_element,
-                        ui_component.root_element.position,
-                        ui_component.root_element.size);
+        if (ui_component.m_root_element == nullptr) {
+          continue;
+        }
+        RecursiveDrawUIElement(*ui_component.m_root_element,
+                               ui_component.m_root_element->position,
+                               ui_component.m_root_element->size);
       }
     }
   }
 }
 
+void UIRenderLogic::RecursiveDrawUIElement(UIElement &element,
+                                           const sf::Vector2f &origin,
+                                           const sf::Vector2f &size) {
+
+  // provide placement elements for the children
+  float border_thickness;
+  sf::Vector2f inner_margin;
+
+  // Draw the element based on its type
+  switch (element.element_type) {
+
+  // Panel
+  case UIElementType::UIElementType_Panel:
+
+    DrawPanel(element, origin, size);
+
+    border_thickness = m_panel_style.border_thickness;
+    inner_margin = m_panel_style.inner_margin;
+
+    break;
+
+    // Button
+  case UIElementType::UIElementType_Button: {
+    Button &button_element =
+        static_cast<Button &>(element); // Cast to Button type
+    DrawButton(button_element, origin, size);
+
+    border_thickness = m_button_style.border_thickness;
+    inner_margin = m_button_style.inner_margin;
+
+    break;
+  }
+  // Add more cases for other UI element types as needed
+  default:
+
+    log_handler::ProcessLog(spdlog::level::level_enum::warn,
+                            log_handler::LogCode::kNoCode,
+                            "UIEngine: Unknown UI element type encountered");
+    break;
+  }
+
+  // pull out number of children for convenience
+  size_t number_of_children = element.child_elements.size();
+
+  // create child origin and size variables
+  sf::Vector2f child_origin;
+  sf::Vector2f child_size;
+
+  // Recursively draw child elements if they exist
+
+  for (size_t i = 0; i < number_of_children; ++i) {
+
+    switch (element.layout) {
+
+    case LayoutType::LayoutType_Vertical: {
+
+      // calculate size of the child element in a vertical layout
+      float child_width =
+          size.x - (2 * border_thickness) - (2 * inner_margin.x);
+
+      float child_height = (size.y - (2 * border_thickness) -
+                            ((number_of_children + 1) * inner_margin.y)) /
+                           element.child_elements.size();
+
+      child_size = sf::Vector2f(child_width, child_height);
+
+      // calculate the position for the child element in a vertical
+      // layout
+      float child_origin_x = origin.x + border_thickness + inner_margin.x;
+
+      float child_origin_y = origin.y + border_thickness + inner_margin.y +
+                             (i * (child_height + inner_margin.y));
+
+      child_origin = sf::Vector2f(child_origin_x, child_origin_y);
+      break;
+    }
+    case LayoutType::LayoutType_Horizontal: {
+
+      // calculate size of the child element in a horizontal layout
+      float child_width = (size.x - (2 * border_thickness) -
+                           ((number_of_children + 1) * inner_margin.x)) /
+                          element.child_elements.size();
+      float child_height =
+          size.y - (2 * border_thickness) - (2 * inner_margin.y);
+
+      child_size = sf::Vector2f(child_width, child_height);
+
+      // calculate the position for the child element in a horizontal
+      // layout
+      float child_origin_x = origin.x + border_thickness + inner_margin.x +
+                             (i * (child_width + inner_margin.x));
+      float child_origin_y = origin.y + border_thickness + inner_margin.y;
+      child_origin = sf::Vector2f(child_origin_x, child_origin_y);
+      break;
+    }
+    case LayoutType::LayoutType_Grid: {
+      break;
+    }
+    default:
+      break;
+    }
+    // check if child is null
+    if (!element.child_elements[i]) {
+      continue;
+    }
+    RecursiveDrawUIElement(*element.child_elements[i], child_origin,
+                           child_size);
+  }
+}
 void UIRenderLogic::DrawPanel(const UIElement &element,
                               const sf::Vector2f &origin,
                               const sf::Vector2f &size) {
@@ -263,13 +270,35 @@ void UIRenderLogic::DrawPanel(const UIElement &element,
 void UIRenderLogic::DrawDropDownMenu() {};
 
 /////////////////////////////////////////////////
-void UIRenderLogic::DrawButton(const UIElement &element,
+void UIRenderLogic::DrawButton(const Button &element,
                                const sf::Vector2f &origin,
                                const sf::Vector2f &size) {
 
   // Draw the box first
   DrawBoxWithRadiusCorners(element, origin, size,
                            m_button_style.radius_resolution);
+
+  // Create a text object for the button label
+  sf::Text button_text(
+      m_logic_context.asset_manager.GetFont(m_button_style.font),
+      element.label);
+
+  std::cout << "UIEngine: Drawing button with label: " << element.label
+            << std::endl;
+
+  button_text.setCharacterSize(24); // Set the character size
+  button_text.setFillColor(m_button_style.text_color);
+
+  // Center the text within the button
+  button_text.setPosition(
+      {origin.x + (size.x - button_text.getLocalBounds().size.x) / 2,
+
+       // Text is aligned so that the bottom of the text is the bottom of the y
+       // bounds so we need to adjust the y position to account for that
+       origin.y + (size.y / 2 - button_text.getLocalBounds().size.y)});
+
+  // Draw the button text to the render texture
+  m_logic_context.scene_texture.draw(button_text);
 }
 /////////////////////////////////////////////////
 void UIRenderLogic::DrawBoxWithRadiusCorners(const UIElement &ui_element,

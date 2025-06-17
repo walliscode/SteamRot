@@ -26,27 +26,24 @@ struct UserInterfaceBuilder;
 enum UIElementType : int8_t {
   UIElementType_None = 0,
   UIElementType_Panel = 1,
-  UIElementType_DropDownMenu = 2,
-  UIElementType_Button = 3,
+  UIElementType_Button = 2,
   UIElementType_MIN = UIElementType_None,
   UIElementType_MAX = UIElementType_Button
 };
 
-inline const UIElementType (&EnumValuesUIElementType())[4] {
+inline const UIElementType (&EnumValuesUIElementType())[3] {
   static const UIElementType values[] = {
     UIElementType_None,
     UIElementType_Panel,
-    UIElementType_DropDownMenu,
     UIElementType_Button
   };
   return values;
 }
 
 inline const char * const *EnumNamesUIElementType() {
-  static const char * const names[5] = {
+  static const char * const names[4] = {
     "None",
     "Panel",
-    "DropDownMenu",
     "Button",
     nullptr
   };
@@ -102,7 +99,8 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_CHILDREN = 6,
     VT_LAYOUT = 8,
     VT_POSITION = 10,
-    VT_SIZE = 12
+    VT_SIZE = 12,
+    VT_LABEL = 14
   };
   steamrot::UIElementType type() const {
     return static_cast<steamrot::UIElementType>(GetField<int8_t>(VT_TYPE, 0));
@@ -119,6 +117,9 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const Vector2f *size() const {
     return GetPointer<const Vector2f *>(VT_SIZE);
   }
+  const ::flatbuffers::String *label() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_LABEL);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int8_t>(verifier, VT_TYPE, 1) &&
@@ -130,6 +131,8 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyTable(position()) &&
            VerifyOffset(verifier, VT_SIZE) &&
            verifier.VerifyTable(size()) &&
+           VerifyOffset(verifier, VT_LABEL) &&
+           verifier.VerifyString(label()) &&
            verifier.EndTable();
   }
 };
@@ -153,6 +156,9 @@ struct UIElementDataBuilder {
   void add_size(::flatbuffers::Offset<Vector2f> size) {
     fbb_.AddOffset(UIElementData::VT_SIZE, size);
   }
+  void add_label(::flatbuffers::Offset<::flatbuffers::String> label) {
+    fbb_.AddOffset(UIElementData::VT_LABEL, label);
+  }
   explicit UIElementDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -170,8 +176,10 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementData(
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::UIElementData>>> children = 0,
     steamrot::LayoutType layout = steamrot::LayoutType_None,
     ::flatbuffers::Offset<Vector2f> position = 0,
-    ::flatbuffers::Offset<Vector2f> size = 0) {
+    ::flatbuffers::Offset<Vector2f> size = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> label = 0) {
   UIElementDataBuilder builder_(_fbb);
+  builder_.add_label(label);
   builder_.add_size(size);
   builder_.add_position(position);
   builder_.add_children(children);
@@ -186,15 +194,18 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
     const std::vector<::flatbuffers::Offset<steamrot::UIElementData>> *children = nullptr,
     steamrot::LayoutType layout = steamrot::LayoutType_None,
     ::flatbuffers::Offset<Vector2f> position = 0,
-    ::flatbuffers::Offset<Vector2f> size = 0) {
+    ::flatbuffers::Offset<Vector2f> size = 0,
+    const char *label = nullptr) {
   auto children__ = children ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::UIElementData>>(*children) : 0;
+  auto label__ = label ? _fbb.CreateString(label) : 0;
   return steamrot::CreateUIElementData(
       _fbb,
       type,
       children__,
       layout,
       position,
-      size);
+      size,
+      label__);
 }
 
 struct UserInterface FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
