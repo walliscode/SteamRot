@@ -19,6 +19,16 @@ const std::filesystem::path getThemesFolder() {
   return getDataFolder() / "themes";
 }
 
+/////////////////////////////////////////////////
+const std::filesystem::path getAssetsFolder() {
+  return getDataFolder() / "assets";
+}
+
+/////////////////////////////////////////////////
+const std::filesystem::path getFontsFolder() {
+  return getAssetsFolder() / "fonts";
+}
+
 ////////////////////////////////////////////////////////////
 const std::filesystem::path getConfigurationFolder() {
   return "@resource_path@";

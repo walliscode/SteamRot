@@ -1,0 +1,14 @@
+
+
+namespace steamrot;
+
+
+
+table FontData {
+    name: string ;
+}
+
+
+table AssetCollection {
+    fonts:[FontData];
+  }

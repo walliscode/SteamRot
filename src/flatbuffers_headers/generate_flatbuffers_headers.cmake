@@ -7,6 +7,7 @@ set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/logics.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/types.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/user_interface.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets.fbs
 )
 
 set(generated_headers)

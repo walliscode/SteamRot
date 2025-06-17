@@ -10,9 +10,9 @@
 #include "SceneType.h"
 #include "scenes_generated.h"
 #include "themes_generated.h"
+#include <SFML/Graphics/Font.hpp>
 #include <filesystem>
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
 namespace steamrot {
 class DataManager {
@@ -29,30 +29,12 @@ private:
   ////////////////////////////////////////////////////////////
   char *LoadBinaryData(const std::filesystem::path &file_path);
 
-  ////////////////////////////////////////////////////////////
-  /// \brief load JSON data from file and return json object
-  ///
-  ////////////////////////////////////////////////////////////
-  json LoadJsonData(const std::filesystem::path &file_path);
-
 public:
   ////////////////////////////////////////////////////////////
   /// \brief Default constructor
   ///
   ////////////////////////////////////////////////////////////
   DataManager() = default;
-
-  ////////////////////////////////////////////////////////////
-  /// \brief load any relevent data from file storage
-  ///
-  ////////////////////////////////////////////////////////////
-  void LoadData();
-
-  ////////////////////////////////////////////////////////////
-  /// \brief Load scene data from json
-  ///
-  ////////////////////////////////////////////////////////////
-  json LoadSceneDataFromJson(std::string scene_identifier);
 
   ////////////////////////////////////////////////////////////
   /// \brief provide theme data as flatbuffers data
@@ -66,6 +48,9 @@ public:
    * @return Raw Pointer to SceneData flatbuffer object
    */
   const SceneData *ProvideSceneData(const SceneType &scene_type);
+
+  std::vector<std::pair<std::string, sf::Font>>
+  ProvideFonts(const SceneType &scene_type);
 };
 
 } // namespace steamrot

@@ -1,5 +1,4 @@
 #include "DataManager.h"
-#include "SchemaChecker.h"
 #include "log_handler.h"
 #include "spdlog/common.h"
 #include "steamrot_directory_paths.h"
@@ -10,8 +9,6 @@
 using json = nlohmann::json;
 
 namespace steamrot {
-////////////////////////////////////////////////////////////
-void DataManager::LoadData() {};
 
 ////////////////////////////////////////////////////////////
 void DataManager::CheckFileExists(const std::filesystem::path &file_path) {
@@ -52,41 +49,6 @@ char *DataManager::LoadBinaryData(const std::filesystem::path &file_path) {
       "Loaded binary data from file: " + file_path.string());
   return data;
 }
-////////////////////////////////////////////////////////////
-json DataManager::LoadJsonData(const std::filesystem::path &file_path) {
-
-  // check file exists, this is a go/no go checkpoint
-  CheckFileExists(file_path);
-  // load json data from file
-  std::ifstream file(file_path);
-
-  // return json object
-  json data = json::parse(file);
-  // log info message
-  steamrot::log_handler::ProcessLog(
-      spdlog::level::info, steamrot::log_handler::LogCode::kNoCode,
-      "Loaded JSON data from file: " + file_path.string());
-  return data;
-}
-
-////////////////////////////////////////////////////////////
-json DataManager::LoadSceneDataFromJson(std::string scene_identifier) {
-
-  // load schema data for scene from file
-  json scene_schema = LoadJsonData(getSchemaFolder() / "scene.schema.json");
-
-  // create SchemaChecker object
-  SchemaChecker schema_checker(scene_schema);
-
-  // load scene data from file
-  json scene_data =
-      LoadJsonData(getScenesFolder() / (scene_identifier + ".data.json"));
-
-  // check scene data against schema (error checking in function)
-  schema_checker.CheckJSON(scene_data);
-
-  return scene_data;
-}
 
 ////////////////////////////////////////////////////////////
 const themes::UIObjects *
@@ -110,4 +72,42 @@ const SceneData *DataManager::ProvideSceneData(const SceneType &scene_type) {
   return GetSceneData(scene_data);
 }
 
+/////////////////////////////////////////////////
+std::vector<std::pair<std::string, sf::Font>>
+DataManager::ProvideFonts(const SceneType &scene_type) {
+
+  // create vector to hold fonts
+  std::vector<std::pair<std::string, sf::Font>> fonts;
+
+  // get SceneData for the given scene type
+  const SceneData *scene_data = ProvideSceneData(scene_type);
+
+  // check if fonts are defined in the scene data
+  if (scene_data->assets()->fonts()->empty()) {
+    return fonts;
+  }
+
+  // iterate over each font in the scene data
+  for (const auto *font : *scene_data->assets()->fonts()) {
+
+    // create a new font object
+    sf::Font new_font;
+
+    // load the font from file
+    if (new_font.openFromFile(getFontsFolder() / font->name()->str() /
+                              ".ttf")) {
+
+      // add the font to the vector with its tag
+      fonts.emplace_back(font->name()->str(), new_font);
+
+    } else {
+      // log error if font fails to load
+      steamrot::log_handler::ProcessLog(
+          spdlog::level::err, steamrot::log_handler::LogCode::kFileNotFound,
+          "Failed to load font: " + font->name()->str());
+    }
+  }
+
+  return fonts;
+}
 } // namespace steamrot
