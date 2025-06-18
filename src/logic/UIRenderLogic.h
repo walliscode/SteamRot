@@ -46,24 +46,9 @@ struct ButtonStyle : public Style {
 
 class UIRenderLogic : public Logic<CUserInterface> {
 private:
-  void DrawPanel(const UIElement &element, const sf::Vector2f &origin,
-                 const sf::Vector2f &size);
+  void DrawPanel(UIElement &element);
 
-  ////////////////////////////////////////////////////////////
-  // |brief draw drop down menu
-  ////////////////////////////////////////////////////////////
-  void DrawDropDownMenu();
-
-  /////////////////////////////////////////////////
-  /// @brief Draw a button element to the render texture.
-  ///
-  /// @param element Struct provided by the CUserInterface component that stores
-  /// element specific data.
-  /// @param origin Top left corner of the button in the render texture
-  /// @param size Total size of the button including borders.
-  /////////////////////////////////////////////////
-  void DrawButton(const Button &element, const sf::Vector2f &origin,
-                  const sf::Vector2f &size);
+  void DrawButton(UIElement &element);
 
   ////////////////////////////////////////////////////////////
   // |brief add in styles from flatbuffer config
@@ -84,8 +69,8 @@ private:
    */
   void DrawUIElements();
 
-  void RecursiveDrawUIElement(UIElement &element, const sf::Vector2f &origin,
-                              const sf::Vector2f &size);
+  void RecursiveDrawUIElement(UIElement &element);
+
   /////////////////////////////////////////////////
   /// @brief Draws a box with rounded corners.
   ///
@@ -94,10 +79,7 @@ private:
   /// @param element Uses the UIElement to determine the styling
   /// @param origin top left corner of the box in the render texture
   /////////////////////////////////////////////////
-  void DrawBoxWithRadiusCorners(const UIElement &element,
-                                const sf::Vector2f &origin,
-                                const sf::Vector2f &size,
-                                const size_t &resolution);
+  void DrawBoxWithRadiusCorners(UIElement &element);
 
 public:
   ////////////////////////////////////////////////////////////

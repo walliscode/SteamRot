@@ -7,33 +7,26 @@
           "root_ui_element": {
             "type": "Panel",
             "layout": "Vertical",
+            "element_type": "PanelData",
+            "element": {},
             "children": [
               {
                 "type": "Button",
                 "layout": "Horizontal",
                 "children": [],
-                "label": "Start Game"
-              },
-              {
-                "type": "Button",
-                "layout": "Horizontal",
-                "children": []
-              },
-              {
-                "type": "Button",
-                "layout": "Horizontal",
-                "children": []
-              },
-              {
-                "type": "Button",
-                "layout": "Horizontal",
-                "children": []
+                "element_type": "ButtonData",
+                "element": {
+                  "label": "Start Game"
+                }
               },
               {
                 "type": "Button",
                 "layout": "Horizontal",
                 "children": [],
-                "label": "Quit Game"
+                "element_type": "ButtonData",
+                "element": {
+                  "label": "Quit Game"
+                }
               }
             ],
             "position": {

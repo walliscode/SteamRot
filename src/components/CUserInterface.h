@@ -11,53 +11,48 @@
 #include "user_interface_generated.h"
 
 #include <SFML/System/Vector2.hpp>
-#include <memory>
+#include <variant>
 #include <vector>
 
 namespace steamrot {
 
-/**
- * @class UIElement
- * @brief Base struct for all UI elements
- *
- */
-struct UIElement {
-  virtual ~UIElement() = default;
-  /**
-   * @brief UIElementType type for the UI element, allows for the UI engine to
-   * select correct function
-   */
-  UIElementType element_type{};
+struct Panel {};
 
-  /**
-   * @brief Position of the UI element, if not set then the UIRenderLogic will
-   * use margins and padding to draw
-   */
-  sf::Vector2f position{0.f, 0.f};
-
-  /**
-   * @brief Size of the UI element
-   */
-  sf::Vector2f size{0.f, 0.f};
-
-  /**
-   * @brief All child element indices for this UI element
-   */
-  std::vector<std::unique_ptr<UIElement>> child_elements;
-
-  /**
-   * @brief Are child elements in a column or row layout? if true then vertical
-   * alignment
-   */
-  LayoutType layout{0};
-};
-
-struct Panel : public UIElement {};
-
-struct Button : public UIElement {
+struct Button {
 
   // Additional properties specific to Button can be added here
-  std::string label;
+  std::string label{"Fill me in!"};
+};
+
+using ElementType = std::variant<Panel, Button>;
+
+struct UIElement {
+
+  /////////////////////////////////////////////////
+  /// @brief UIELement type, contains extra data for the element, can only be
+  /// one of the options.
+  /////////////////////////////////////////////////
+  ElementType element_type;
+
+  /////////////////////////////////////////////////
+  /// @brief Container for all child elements. Can be empty
+  /////////////////////////////////////////////////
+  std::vector<UIElement> child_elements;
+
+  /////////////////////////////////////////////////
+  /// @brief Position of the UI element in the window
+  /////////////////////////////////////////////////
+  sf::Vector2f position{0.f, 0.f};
+
+  /////////////////////////////////////////////////
+  /// @brief Size of the UI element.
+  /////////////////////////////////////////////////
+  sf::Vector2f size{0.f, 0.f};
+
+  /////////////////////////////////////////////////
+  /// @brief Layout type of the children elements
+  /////////////////////////////////////////////////
+  LayoutType layout{0};
 };
 
 struct CUserInterface : public Component {
@@ -67,11 +62,10 @@ struct CUserInterface : public Component {
   ////////////////////////////////////////////////////////////
   CUserInterface() = default;
 
-  /**
-   * @brief Start of the UI element tree, every interface will have to have some
-   * kind of base container
-   */
-  std::unique_ptr<UIElement> m_root_element;
+  /////////////////////////////////////////////////
+  /// @brief Root UI element of the user interface component
+  /////////////////////////////////////////////////
+  UIElement m_root_element;
 
   /**
    * @brief String representation of the component name, this will return a
@@ -86,7 +80,14 @@ struct CUserInterface : public Component {
   /////////////////////////////////////////////////
   void Configure(const UserInterface *user_interface_data);
 
-  std::unique_ptr<UIElement> UIElementFactory(const UIElementData &element);
+  /////////////////////////////////////////////////
+  /// @brief  Configures a UI element from flatbuffer data
+  ///
+  /// @param element Flatbuffer data for the UI element
+  /// @return UIElement with one of the element types
+  /////////////////////////////////////////////////
+  UIElement UIElementFactory(const UIElementData &element);
+
   /**
    * @brief Returns the index of the component in the component register
    * @return size_t index of the component in the component register
