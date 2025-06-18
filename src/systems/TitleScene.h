@@ -29,11 +29,17 @@ private:
    * @param id Unique identifier for the scene
    */
   TitleScene(const size_t pool_size, const SceneData *scene_data,
-             const uuids::uuid &id, const AssetManager &asset_manager);
+             const uuids::uuid &id, const AssetManager &asset_manager,
+             sf::RenderWindow &window);
 
   ////////////////////////////////////////////////////////////
   /// \brief call movement Logic for TitleScene
   ////////////////////////////////////////////////////////////
   void sMovement() override;
+
+  /////////////////////////////////////////////////
+  /// @brief Call collision Logic for TitleScene
+  /////////////////////////////////////////////////
+  void sCollision() override;
 };
 } // namespace steamrot

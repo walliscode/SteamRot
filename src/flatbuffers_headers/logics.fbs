@@ -3,6 +3,7 @@ namespace steamrot;
 enum LogicType: ubyte{
 None = 0,
 Render = 1,
+Collision = 2
 }
 
 table LogicCollection{

@@ -16,6 +16,14 @@ namespace steamrot {
  */
 class LogicFactory {
 private:
+  /////////////////////////////////////////////////
+  /// @brief Create a vector of logic objects specifically for collision
+  ///
+  /// @param logic_context  LogicContext containing references to the scene
+  /////////////////////////////////////////////////
+  std::vector<std::unique_ptr<BaseLogic>>
+  CreateCollisionLogics(const LogicContext logic_context);
+
   /**
    * @brief Create a vector of logic objects specifically for rendering.
    */

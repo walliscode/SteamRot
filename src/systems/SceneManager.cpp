@@ -21,9 +21,10 @@ namespace steamrot {
 /**
  * -------------------------------------------------------
  */
-SceneManager::SceneManager(AssetManager &asset_manager)
+SceneManager::SceneManager(AssetManager &asset_manager,
+                           sf::RenderWindow &window)
     : m_scene_factory(), m_scenes(), m_asset_manager(asset_manager),
-      m_data_manager() {}
+      m_data_manager(), m_window(window) {}
 
 /**
  * ======================= Public Methods =======================
@@ -41,7 +42,7 @@ void SceneManager::AddSceneFromDefault(const SceneType &scene_type,
                                        const size_t pool_size) {
 
   std::unique_ptr<Scene> new_scene =
-      m_scene_factory.CreateScene(scene_type, m_asset_manager);
+      m_scene_factory.CreateScene(scene_type, m_asset_manager, m_window);
   std::cout << "Created new scene of type: "
             << magic_enum::enum_name(scene_type) << std::endl;
   // add to m_scenes maps
@@ -97,6 +98,7 @@ void SceneManager::UpdateScenes() {
   for (auto &pair : m_scenes) {
     auto &scene = pair.second;
     scene->sMovement();
+    scene->sCollision();
     scene->sRender();
 
     // add further systems here

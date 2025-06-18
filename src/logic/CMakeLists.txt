@@ -1,6 +1,7 @@
 add_library(logic
 LogicFactory.cpp
   UIRenderLogic.cpp
+  UICollisionLogic.cpp
   BaseLogic.cpp
 )
 

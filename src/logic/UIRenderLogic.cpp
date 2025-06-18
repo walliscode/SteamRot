@@ -33,6 +33,7 @@ UIRenderLogic::UIRenderLogic(const LogicContext logic_context)
   AddStyles(logic_context.ui_config);
 }
 void UIRenderLogic::ProcessLogic() {
+
   // clear the render texture before drawing
   m_logic_context.scene_texture.clear();
 
@@ -298,7 +299,14 @@ void UIRenderLogic::DrawBoxWithRadiusCorners(UIElement &ui_element) {
       radius = m_button_style.border_thickness;
       resolution = m_button_style.radius_resolution;
       border_color = m_button_style.border_color;
-      background_color = m_button_style.background_color;
+
+      // background color based on mouse over state
+      if (ui_element.mouse_over) {
+        background_color = m_button_style.hover_color;
+      } else {
+        background_color = m_button_style.background_color;
+      }
+
     } else {
       std::cout << "Unknown style type selected" << std::endl;
     }

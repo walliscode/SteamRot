@@ -32,7 +32,8 @@ const uuids::uuid SceneFactory::CreateUUID() {
 ////////////////////////////////////////////////////////////
 std::unique_ptr<Scene>
 SceneFactory::CreateScene(const SceneType &scene_type,
-                          const AssetManager &asset_manager) {
+                          const AssetManager &asset_manager,
+                          sf::RenderWindow &window) {
 
   // generate UUID for the scene
   uuids::uuid scene_uuid = CreateUUID();
@@ -46,7 +47,7 @@ SceneFactory::CreateScene(const SceneType &scene_type,
     // TitleScene
   case SceneType::title:
     std::cout << "Title scene type detected." << std::endl;
-    return CreateTitleScene(scene_data, scene_uuid, asset_manager);
+    return CreateTitleScene(scene_data, scene_uuid, asset_manager, window);
 
   default:
     // not sure how it would be possible to get here, maybe some kind of cast
@@ -55,14 +56,13 @@ SceneFactory::CreateScene(const SceneType &scene_type,
   }
 }
 ////////////////////////////////////////////////////////////
-std::unique_ptr<TitleScene>
-SceneFactory::CreateTitleScene(const SceneData *scene_data,
-                               const uuids::uuid &scene_uuid,
-                               const AssetManager &asset_manager) {
+std::unique_ptr<TitleScene> SceneFactory::CreateTitleScene(
+    const SceneData *scene_data, const uuids::uuid &scene_uuid,
+    const AssetManager &asset_manager, sf::RenderWindow &window) {
   // create a new title scene object, we are creating a raw pointer here due to
   // TitleScene having a private constuctor
   std::unique_ptr<TitleScene> title_scene(
-      new TitleScene(100, scene_data, scene_uuid, asset_manager));
+      new TitleScene(100, scene_data, scene_uuid, asset_manager, window));
   std::cout << "Created TitleScene with UUID: " << scene_uuid << std::endl;
   return title_scene;
 }
