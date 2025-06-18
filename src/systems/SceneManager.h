@@ -47,11 +47,16 @@ private:
    */
   DataManager m_data_manager;
 
+  /////////////////////////////////////////////////
+  /// @brief Reference to Game window
+  /////////////////////////////////////////////////
+  sf::RenderWindow &m_window;
+
 public:
   /**
    * @brief Default constructor.
    */
-  SceneManager(AssetManager &asset_manager);
+  SceneManager(AssetManager &asset_manager, sf::RenderWindow &window);
 
   /**
    * @brief Start up the SceneManager for the game.

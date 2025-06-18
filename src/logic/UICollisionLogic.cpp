@@ -1,5 +1,6 @@
 #include "UICollisionLogic.h"
 #include "EntityHelpers.h"
+#include <SFML/Window/Mouse.hpp>
 
 namespace steamrot {
 /////////////////////////////////////////////////
@@ -8,8 +9,6 @@ UICollisionLogic::UICollisionLogic(const LogicContext logic_context)
 
 /////////////////////////////////////////////////
 void UICollisionLogic::ProcessLogic() {
-
-  std::cout << "Processing UI Collision Logic" << std::endl;
 
   // cycle through all the Archetype IDs  associated with this logic class
   for (const ArchetypeID &archetype_id : m_archetype_IDs) {
@@ -38,17 +37,24 @@ void UICollisionLogic::ProcessLogic() {
 /////////////////////////////////////////////////
 void UICollisionLogic::CheckMouseCollision(CUserInterface &ui_component) {
 
+  // get mouse position relative to the game window
+  sf::Vector2i mouse_position =
+      sf::Mouse::getPosition(m_logic_context.game_window);
   // recursively check the root element for mouse collision
-  RecursiveCheckMouseCollision(ui_component.m_root_element);
+  RecursiveCheckMouseCollision(ui_component.m_root_element, mouse_position);
 }
 
 /////////////////////////////////////////////////
-bool UICollisionLogic::RecursiveCheckMouseCollision(UIElement &element) {
+bool UICollisionLogic::RecursiveCheckMouseCollision(
+    UIElement &element, sf::Vector2i mouse_position) {
+
+  // reset mouse_over and mouse_over_child for the element
+  element.mouse_over = false;
+  element.mouse_over_child = false;
 
   // lamda function to check if mouse is within bounds of the element
   bool is_mouse_over = [&]() -> bool {
     // Assuming we have a way to get the mouse position
-    sf::Vector2i mouse_position = sf::Mouse::getPosition();
     return (mouse_position.x >= element.position.x &&
             mouse_position.x <= element.position.x + element.size.x &&
             mouse_position.y >= element.position.y &&
@@ -67,28 +73,30 @@ bool UICollisionLogic::RecursiveCheckMouseCollision(UIElement &element) {
 
       // if mouse is over a child element, we set the mouse_over_child to
       // true and mouse_over to false
-      if (RecursiveCheckMouseCollision(child)) {
+      if (RecursiveCheckMouseCollision(child, mouse_position)) {
         element.mouse_over_child = true;
         element.mouse_over = false;
       }
     }
     return true;
 
-    // check is mouse moves aways from child element
+    // adding in mouse_over_child prevents recursive calls every tick
 
   } else if (!is_mouse_over && element.mouse_over_child) {
-    // if mouse is not over the element, we set mouse_over to false
-    element.mouse_over = false;
-    element.mouse_over_child = false;
-    // reset child elements mouse_over state
-    for (auto &child : element.child_elements) {
-      child.mouse_over = false;
-      child.mouse_over_child = false;
-    }
-    return false;
+    // if mouse is not over the element and it was previously over a child,
+    RecursiveResetMouseOver(element);
   }
 
   return false;
 }
 
+void UICollisionLogic::RecursiveResetMouseOver(UIElement &element) {
+  // reset mouse_over state for the element
+  element.mouse_over = false;
+  element.mouse_over_child = false;
+  // recursively reset child elements
+  for (auto &child : element.child_elements) {
+    RecursiveResetMouseOver(child);
+  }
+}
 } // namespace steamrot

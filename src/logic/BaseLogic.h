@@ -36,11 +36,19 @@ struct LogicContext {
    */
   sf::RenderTexture &scene_texture;
 
+  /////////////////////////////////////////////////
+  /// @brief Reference to the game window.
+  /////////////////////////////////////////////////
+  sf::RenderWindow &game_window;
+
   /**
    * @brief Stuct member that contains UI thematic configuration.
    */
   const themes::UIObjects *ui_config{nullptr};
 
+  /////////////////////////////////////////////////
+  /// @brief Reference to the AssetManager for the game.
+  /////////////////////////////////////////////////
   const AssetManager &asset_manager;
 };
 

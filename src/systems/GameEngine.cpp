@@ -22,10 +22,11 @@ namespace steamrot {
 
 ///////////////////////////////////////////////////////////
 GameEngine::GameEngine()
-    : m_display_manager(), m_data_manager(), m_event_handler(),
-      m_asset_manager() {
+    : m_window({sf::VideoMode(steamrot::kWindowSize), "SteamRot"}),
+      m_data_manager(), m_event_handler(), m_asset_manager(),
+      m_display_manager(m_window) {
 
-  m_scene_manager = std::make_unique<SceneManager>(m_asset_manager);
+  m_scene_manager = std::make_unique<SceneManager>(m_asset_manager, m_window);
   std::cout << "GameEngine constructor called" << std::endl;
   log_handler::ProcessLog(spdlog::level::level_enum::info,
                           log_handler::LogCode::kNoCode,
@@ -98,6 +99,9 @@ void GameEngine::PassRenderPackage() {
 
 ////////////////////////////////////////////////////////////
 size_t GameEngine::getLoopNumber() { return m_loop_number; }
+
+/////////////////////////////////////////////////
+sf::RenderWindow &GameEngine::GetWindow() { return m_window; }
 
 ////////////////////////////////////////////////////////////
 void GameEngine::RunSimulation(int loops) {

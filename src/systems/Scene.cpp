@@ -11,11 +11,12 @@ namespace steamrot {
 
 ////////////////////////////////////////////////////////////
 Scene::Scene(const size_t &pool_size, const SceneData *scene_data,
-             const uuids::uuid &id, const AssetManager &asset_manager)
+             const uuids::uuid &id, const AssetManager &asset_manager,
+             sf::RenderWindow &window)
     : m_action_manager(scene_data->actions()),
       m_entity_manager(pool_size, scene_data->entity_collection()),
-      m_asset_manager(asset_manager), m_logic_factory(), m_data_manager(),
-      m_id(id) {
+      m_asset_manager(asset_manager), m_window(window), m_logic_factory(),
+      m_data_manager(), m_id(id) {
   std::cout << "Scene constructor called with ID: " << id << std::endl;
 
   // update map of Logic classes
@@ -30,7 +31,10 @@ Scene::Scene(const size_t &pool_size, const SceneData *scene_data,
     LogicContext logic_context{
         m_entity_manager.GetEntityMemoryPool(),
         m_entity_manager.GetArchetypeManager().GetArchetypes(),
-        this->m_render_texture, ui_objects, m_asset_manager};
+        this->m_render_texture,
+        m_window,
+        ui_objects,
+        m_asset_manager};
 
     std::cout << "Logic context created." << std::endl;
     m_logics = m_logic_factory.CreateLogicMap(*scene_data->logic_collection(),

@@ -4,8 +4,9 @@
 
 namespace steamrot {
 TitleScene::TitleScene(const size_t pool_size, const SceneData *scene_data,
-                       const uuids::uuid &id, const AssetManager &asset_manager)
-    : Scene(pool_size, scene_data, id, asset_manager) {
+                       const uuids::uuid &id, const AssetManager &asset_manager,
+                       sf::RenderWindow &window)
+    : Scene(pool_size, scene_data, id, asset_manager, window) {
   std::cout << "TitleScene constructor called with ID: " << id << std::endl;
   // Initialization code specific to TitleScreen can go here
 }
@@ -13,14 +14,19 @@ TitleScene::TitleScene(const size_t pool_size, const SceneData *scene_data,
 ////////////////////////////////////////////////////////////
 void TitleScene::sMovement() {};
 
+/////////////////////////////////////////////////
 void TitleScene::sRender() {
 
-  // process collsion logic
-  for (auto &collision_logic : m_logics[LogicType::LogicType_Collision]) {
-    collision_logic->RunLogic();
-  }
   for (auto &render_logic : m_logics[LogicType::LogicType_Render]) {
     render_logic->RunLogic();
+  }
+}
+
+/////////////////////////////////////////////////
+void TitleScene::sCollision() {
+  // process collision logic
+  for (auto &collision_logic : m_logics[LogicType::LogicType_Collision]) {
+    collision_logic->RunLogic();
   }
 }
 } // namespace steamrot

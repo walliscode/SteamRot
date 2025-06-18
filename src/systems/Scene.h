@@ -62,6 +62,11 @@ protected:
   ////////////////////////////////////////////////////////////
   uuids::uuid m_id;
 
+  /////////////////////////////////////////////////
+  /// @brief Reference to the Game window.
+  /////////////////////////////////////////////////
+  sf::RenderWindow &m_window;
+
   /**
    * @brief Member that contains the RenderTexture for the Scene.
    */
@@ -81,7 +86,8 @@ protected:
    * @param id Unique identifier for the Scene
    */
   Scene(const size_t &pool_size, const SceneData *scene_data,
-        const uuids::uuid &id, const AssetManager &asset_manager);
+        const uuids::uuid &id, const AssetManager &asset_manager,
+        sf::RenderWindow &window);
 
 public:
   /**
@@ -93,6 +99,11 @@ public:
   ///
   ////////////////////////////////////////////////////////////
   virtual void sMovement() = 0;
+
+  /////////////////////////////////////////////////
+  /// @brief Function container for all collision related logic.
+  /////////////////////////////////////////////////
+  virtual void sCollision() = 0;
 
   /**
    * @brief Function container for all rendering related logic.

@@ -12,6 +12,7 @@
 #include "TitleScene.h"
 #include "scenes_generated.h"
 #include "uuid.h"
+#include <SFML/Graphics/RenderWindow.hpp>
 #include <memory>
 
 namespace steamrot {
@@ -34,7 +35,7 @@ private:
    */
   std::unique_ptr<TitleScene>
   CreateTitleScene(const SceneData *scene_data, const uuids::uuid &id,
-                   const AssetManager &asset_manager);
+                   const AssetManager &asset_manager, sf::RenderWindow &window);
 
   ////////////////////////////////////////////////////////////
   /// \brief create a uuid if none is in provided json data
@@ -54,6 +55,7 @@ public:
   ///
   ////////////////////////////////////////////////////////////
   std::unique_ptr<Scene> CreateScene(const SceneType &scene_type,
-                                     const AssetManager &asset_manager);
+                                     const AssetManager &asset_manager,
+                                     sf::RenderWindow &window);
 };
 } // namespace steamrot

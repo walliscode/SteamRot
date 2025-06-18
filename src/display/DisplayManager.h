@@ -6,12 +6,11 @@
 ////////////////////////////////////////////////////////////
 // headers
 ////////////////////////////////////////////////////////////
-#include "ActionManager.h"
+
 #include "DataManager.h"
 #include "Session.h"
 #include "TexturesPackage.h"
-#include "UIRenderLogic.h"
-#include "global_constants.h"
+
 #include <SFML/Graphics.hpp>
 
 #include <SFML/Graphics/RenderTexture.hpp>
@@ -21,7 +20,6 @@
 ////////////////////////////////////////////////////////////
 // namespaces/using
 ////////////////////////////////////////////////////////////
-using json = nlohmann::json;
 
 namespace steamrot {
 class DisplayManager {
@@ -29,11 +27,11 @@ private:
   ////////////////////////////////////////////////////////////
   // members
   ////////////////////////////////////////////////////////////
-  sf::RenderWindow m_window{sf::VideoMode(steamrot::kWindowSize), "SteamRot"};
+  sf::RenderWindow &m_window;
   sf::Color m_background_color;
   std::array<std::shared_ptr<Session>, 5> m_sessions;
   std::shared_ptr<Session> m_active_session;
-  json m_tile_config;
+
   sf::RenderTexture m_tile_overlay;
   /**
    * @brief Member: RenderTexture for UI layer
@@ -60,6 +58,13 @@ public:
   // |brief default constructor
   ////////////////////////////////////////////////////////////
   DisplayManager();
+
+  /////////////////////////////////////////////////
+  /// @brief Constructor taking a reference to a RenderWindow
+  ///
+  /// @param window RenderWindow reference
+  /////////////////////////////////////////////////
+  DisplayManager(sf::RenderWindow &window);
 
   ////////////////////////////////////////////////////////////
   // |brief get render window object

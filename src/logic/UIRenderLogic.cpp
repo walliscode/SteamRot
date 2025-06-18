@@ -34,7 +34,6 @@ UIRenderLogic::UIRenderLogic(const LogicContext logic_context)
 }
 void UIRenderLogic::ProcessLogic() {
 
-  std::cout << "Processing UI Render Logic" << std::endl;
   // clear the render texture before drawing
   m_logic_context.scene_texture.clear();
 
