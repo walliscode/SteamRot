@@ -7,7 +7,7 @@
 #include "spdlog/common.h"
 #include "user_interface_generated.h"
 #include <iostream>
-#include <memory>
+
 namespace steamrot {
 ////////////////////////////////////////////////////////////
 const std::string &CUserInterface::Name() {
@@ -16,6 +16,7 @@ const std::string &CUserInterface::Name() {
   return name;
 }
 
+/////////////////////////////////////////////////
 void CUserInterface::Configure(const UserInterface *user_interface_data) {
 
   // guard statement to ensure data is not null
@@ -28,72 +29,84 @@ void CUserInterface::Configure(const UserInterface *user_interface_data) {
   // set the component to active
   m_active = true;
 
-  std::cout << "Configuring CUserInterface with data" << std::endl;
+  std::cout << "Configuring CUserInterface with data: " << std::endl;
+
   // lambda to recursively build UI elements
-  std::function<std::unique_ptr<UIElement>(const UIElementData *)>
-      build_ui_element =
-          [&](const UIElementData *element) -> std::unique_ptr<UIElement> {
+  std::function<UIElement(const UIElementData *)> build_ui_element =
+      [&](const UIElementData *element) -> UIElement {
     // create required UIElement using the factory method
-    std::unique_ptr<UIElement> ui_element = UIElementFactory(*element);
+    UIElement ui_element = UIElementFactory(*element);
 
     // iterate through child elements and recursively build them
     for (const auto *child : *element->children()) {
-      ui_element->child_elements.push_back(build_ui_element(child));
+      ui_element.child_elements.push_back(build_ui_element(child));
     }
     return ui_element;
   };
+
   // start building from the root element
   m_root_element = build_ui_element(user_interface_data->root_ui_element());
+  std::cout << "CUserInterface configured successfully." << std::endl;
 };
 
-std::unique_ptr<UIElement>
-CUserInterface::UIElementFactory(const UIElementData &element) {
-  // Create a UIElement based on the type
+/////////////////////////////////////////////////
+UIElement CUserInterface::UIElementFactory(const UIElementData &element) {
+  // create UIElement
+  UIElement ui_element;
+
+  // general configuration for the UIElement (only variables specificied in the
+  // UIElement struct)
+  ui_element.layout = element.layout();
+  if (element.position()) {
+    ui_element.position =
+        sf::Vector2f(element.position()->x(), element.position()->y());
+  }
+  if (element.size()) {
+    ui_element.size = sf::Vector2f(element.size()->x(), element.size()->y());
+  }
+  std::cout << "Configued general UIElement properotes" << std::endl;
+
+  std::cout << "Element type: " << static_cast<int>(element.type())
+            << std::endl;
+  // Configure the UIElement based on its type
   switch (element.type()) {
+
     // Panel
   case UIElementType::UIElementType_Panel: {
-    std::unique_ptr<Panel> panel_element = std::make_unique<Panel>();
-    panel_element->element_type = element.type();
-    panel_element->layout = element.layout();
-    if (element.position()) {
-      panel_element->position =
-          sf::Vector2f(element.position()->x(), element.position()->y());
-    }
-    if (element.size()) {
-      panel_element->size =
-          sf::Vector2f(element.size()->x(), element.size()->y());
-    }
+    std::cout << "Configuring Panel UIElement" << std::endl;
+    Panel panel_element;
 
-    return panel_element;
+    // configure the panel element
+
+    // add to the UIElement
+    ui_element.element_type = panel_element;
+
+    break;
   }
     // Button
   case UIElementType::UIElementType_Button: {
-    std::unique_ptr<Button> button_element = std::make_unique<Button>();
-    button_element->element_type = element.type();
-    button_element->layout = element.layout();
-    if (element.position()) {
-      button_element->position =
-          sf::Vector2f(element.position()->x(), element.position()->y());
-    }
-    if (element.size()) {
-      button_element->size =
-          sf::Vector2f(element.size()->x(), element.size()->y());
-    }
-    if (element.label()) {
-      button_element->label = element.label()->str();
-    } else {
-      button_element->label = "Button"; // Default label if none provided
-    }
-    return button_element;
-  }
+    std::cout << "Configuring Button UIElement" << std::endl;
+    Button button_element;
 
-    // Default case for unknown types
-  default: {
-    std::cout << "Unknown UIElement type, returning nullptr" << std::endl;
-    return nullptr;
+    // configure the button element
+    button_element.label = element.element_as_ButtonData()->label()->str();
+
+    // add to the UIElement
+    ui_element.element_type = button_element;
+
+    break;
+  }
+  case UIElementType::UIElementType_None: {
+    // add an empty Panel element to the UIElement for the None type
+    ui_element.element_type = Panel{};
+
+    break;
   }
   }
+  std::cout << "UIElement configured successfully." << std::endl;
+  return ui_element;
 }
+
 /////////////////////////////////////////////////
 const size_t CUserInterface::GetComponentRegisterIndex() const {
 

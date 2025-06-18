@@ -16,13 +16,24 @@ enum LayoutType: byte{
   Grid = 3,
   }
 
+table PanelData{}
+
+table ButtonData {
+  label: string (required);
+}
+
+union UIElementDataUnion {
+  PanelData,
+  ButtonData 
+}
+
 table UIElementData{
     type: UIElementType;
     children: [UIElementData];
-  layout: LayoutType;
+    layout: LayoutType;
     position: Vector2f;
     size: Vector2f;
-    label: string;
+    element: UIElementDataUnion (required);
   }
 
 table UserInterface{

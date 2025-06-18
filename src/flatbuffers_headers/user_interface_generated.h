@@ -17,6 +17,12 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
+struct PanelData;
+struct PanelDataBuilder;
+
+struct ButtonData;
+struct ButtonDataBuilder;
+
 struct UIElementData;
 struct UIElementDataBuilder;
 
@@ -92,6 +98,135 @@ inline const char *EnumNameLayoutType(LayoutType e) {
   return EnumNamesLayoutType()[index];
 }
 
+enum UIElementDataUnion : uint8_t {
+  UIElementDataUnion_NONE = 0,
+  UIElementDataUnion_PanelData = 1,
+  UIElementDataUnion_ButtonData = 2,
+  UIElementDataUnion_MIN = UIElementDataUnion_NONE,
+  UIElementDataUnion_MAX = UIElementDataUnion_ButtonData
+};
+
+inline const UIElementDataUnion (&EnumValuesUIElementDataUnion())[3] {
+  static const UIElementDataUnion values[] = {
+    UIElementDataUnion_NONE,
+    UIElementDataUnion_PanelData,
+    UIElementDataUnion_ButtonData
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesUIElementDataUnion() {
+  static const char * const names[4] = {
+    "NONE",
+    "PanelData",
+    "ButtonData",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameUIElementDataUnion(UIElementDataUnion e) {
+  if (::flatbuffers::IsOutRange(e, UIElementDataUnion_NONE, UIElementDataUnion_ButtonData)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesUIElementDataUnion()[index];
+}
+
+template<typename T> struct UIElementDataUnionTraits {
+  static const UIElementDataUnion enum_value = UIElementDataUnion_NONE;
+};
+
+template<> struct UIElementDataUnionTraits<steamrot::PanelData> {
+  static const UIElementDataUnion enum_value = UIElementDataUnion_PanelData;
+};
+
+template<> struct UIElementDataUnionTraits<steamrot::ButtonData> {
+  static const UIElementDataUnion enum_value = UIElementDataUnion_ButtonData;
+};
+
+bool VerifyUIElementDataUnion(::flatbuffers::Verifier &verifier, const void *obj, UIElementDataUnion type);
+bool VerifyUIElementDataUnionVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types);
+
+struct PanelData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef PanelDataBuilder Builder;
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct PanelDataBuilder {
+  typedef PanelData Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  explicit PanelDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<PanelData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<PanelData>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<PanelData> CreatePanelData(
+    ::flatbuffers::FlatBufferBuilder &_fbb) {
+  PanelDataBuilder builder_(_fbb);
+  return builder_.Finish();
+}
+
+struct ButtonData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef ButtonDataBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_LABEL = 4
+  };
+  const ::flatbuffers::String *label() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_LABEL);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_LABEL) &&
+           verifier.VerifyString(label()) &&
+           verifier.EndTable();
+  }
+};
+
+struct ButtonDataBuilder {
+  typedef ButtonData Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_label(::flatbuffers::Offset<::flatbuffers::String> label) {
+    fbb_.AddOffset(ButtonData::VT_LABEL, label);
+  }
+  explicit ButtonDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<ButtonData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<ButtonData>(end);
+    fbb_.Required(o, ButtonData::VT_LABEL);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<ButtonData> CreateButtonData(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::String> label = 0) {
+  ButtonDataBuilder builder_(_fbb);
+  builder_.add_label(label);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<ButtonData> CreateButtonDataDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const char *label = nullptr) {
+  auto label__ = label ? _fbb.CreateString(label) : 0;
+  return steamrot::CreateButtonData(
+      _fbb,
+      label__);
+}
+
 struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef UIElementDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -100,7 +235,8 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_LAYOUT = 8,
     VT_POSITION = 10,
     VT_SIZE = 12,
-    VT_LABEL = 14
+    VT_ELEMENT_TYPE = 14,
+    VT_ELEMENT = 16
   };
   steamrot::UIElementType type() const {
     return static_cast<steamrot::UIElementType>(GetField<int8_t>(VT_TYPE, 0));
@@ -117,8 +253,18 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const Vector2f *size() const {
     return GetPointer<const Vector2f *>(VT_SIZE);
   }
-  const ::flatbuffers::String *label() const {
-    return GetPointer<const ::flatbuffers::String *>(VT_LABEL);
+  steamrot::UIElementDataUnion element_type() const {
+    return static_cast<steamrot::UIElementDataUnion>(GetField<uint8_t>(VT_ELEMENT_TYPE, 0));
+  }
+  const void *element() const {
+    return GetPointer<const void *>(VT_ELEMENT);
+  }
+  template<typename T> const T *element_as() const;
+  const steamrot::PanelData *element_as_PanelData() const {
+    return element_type() == steamrot::UIElementDataUnion_PanelData ? static_cast<const steamrot::PanelData *>(element()) : nullptr;
+  }
+  const steamrot::ButtonData *element_as_ButtonData() const {
+    return element_type() == steamrot::UIElementDataUnion_ButtonData ? static_cast<const steamrot::ButtonData *>(element()) : nullptr;
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -131,11 +277,20 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyTable(position()) &&
            VerifyOffset(verifier, VT_SIZE) &&
            verifier.VerifyTable(size()) &&
-           VerifyOffset(verifier, VT_LABEL) &&
-           verifier.VerifyString(label()) &&
+           VerifyField<uint8_t>(verifier, VT_ELEMENT_TYPE, 1) &&
+           VerifyOffsetRequired(verifier, VT_ELEMENT) &&
+           VerifyUIElementDataUnion(verifier, element(), element_type()) &&
            verifier.EndTable();
   }
 };
+
+template<> inline const steamrot::PanelData *UIElementData::element_as<steamrot::PanelData>() const {
+  return element_as_PanelData();
+}
+
+template<> inline const steamrot::ButtonData *UIElementData::element_as<steamrot::ButtonData>() const {
+  return element_as_ButtonData();
+}
 
 struct UIElementDataBuilder {
   typedef UIElementData Table;
@@ -156,8 +311,11 @@ struct UIElementDataBuilder {
   void add_size(::flatbuffers::Offset<Vector2f> size) {
     fbb_.AddOffset(UIElementData::VT_SIZE, size);
   }
-  void add_label(::flatbuffers::Offset<::flatbuffers::String> label) {
-    fbb_.AddOffset(UIElementData::VT_LABEL, label);
+  void add_element_type(steamrot::UIElementDataUnion element_type) {
+    fbb_.AddElement<uint8_t>(UIElementData::VT_ELEMENT_TYPE, static_cast<uint8_t>(element_type), 0);
+  }
+  void add_element(::flatbuffers::Offset<void> element) {
+    fbb_.AddOffset(UIElementData::VT_ELEMENT, element);
   }
   explicit UIElementDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -166,6 +324,7 @@ struct UIElementDataBuilder {
   ::flatbuffers::Offset<UIElementData> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = ::flatbuffers::Offset<UIElementData>(end);
+    fbb_.Required(o, UIElementData::VT_ELEMENT);
     return o;
   }
 };
@@ -177,12 +336,14 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementData(
     steamrot::LayoutType layout = steamrot::LayoutType_None,
     ::flatbuffers::Offset<Vector2f> position = 0,
     ::flatbuffers::Offset<Vector2f> size = 0,
-    ::flatbuffers::Offset<::flatbuffers::String> label = 0) {
+    steamrot::UIElementDataUnion element_type = steamrot::UIElementDataUnion_NONE,
+    ::flatbuffers::Offset<void> element = 0) {
   UIElementDataBuilder builder_(_fbb);
-  builder_.add_label(label);
+  builder_.add_element(element);
   builder_.add_size(size);
   builder_.add_position(position);
   builder_.add_children(children);
+  builder_.add_element_type(element_type);
   builder_.add_layout(layout);
   builder_.add_type(type);
   return builder_.Finish();
@@ -195,9 +356,9 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
     steamrot::LayoutType layout = steamrot::LayoutType_None,
     ::flatbuffers::Offset<Vector2f> position = 0,
     ::flatbuffers::Offset<Vector2f> size = 0,
-    const char *label = nullptr) {
+    steamrot::UIElementDataUnion element_type = steamrot::UIElementDataUnion_NONE,
+    ::flatbuffers::Offset<void> element = 0) {
   auto children__ = children ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::UIElementData>>(*children) : 0;
-  auto label__ = label ? _fbb.CreateString(label) : 0;
   return steamrot::CreateUIElementData(
       _fbb,
       type,
@@ -205,7 +366,8 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
       layout,
       position,
       size,
-      label__);
+      element_type,
+      element);
 }
 
 struct UserInterface FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -248,6 +410,35 @@ inline ::flatbuffers::Offset<UserInterface> CreateUserInterface(
   UserInterfaceBuilder builder_(_fbb);
   builder_.add_root_ui_element(root_ui_element);
   return builder_.Finish();
+}
+
+inline bool VerifyUIElementDataUnion(::flatbuffers::Verifier &verifier, const void *obj, UIElementDataUnion type) {
+  switch (type) {
+    case UIElementDataUnion_NONE: {
+      return true;
+    }
+    case UIElementDataUnion_PanelData: {
+      auto ptr = reinterpret_cast<const steamrot::PanelData *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case UIElementDataUnion_ButtonData: {
+      auto ptr = reinterpret_cast<const steamrot::ButtonData *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    default: return true;
+  }
+}
+
+inline bool VerifyUIElementDataUnionVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types) {
+  if (!values || !types) return !values && !types;
+  if (values->size() != types->size()) return false;
+  for (::flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
+    if (!VerifyUIElementDataUnion(
+        verifier,  values->Get(i), types->GetEnum<UIElementDataUnion>(i))) {
+      return false;
+    }
+  }
+  return true;
 }
 
 }  // namespace steamrot

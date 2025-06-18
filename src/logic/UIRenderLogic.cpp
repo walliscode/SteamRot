@@ -15,7 +15,6 @@
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <iostream>
-#include <memory>
 
 namespace steamrot {
 
@@ -31,10 +30,7 @@ UIRenderLogic::UIRenderLogic(const LogicContext logic_context)
                             "initialize UI styles");
     return;
   }
-  std::cout << "UIEngine: Initializing with provided flatbuffer config"
-            << std::endl;
   AddStyles(logic_context.ui_config);
-  std::cout << "UIEngine: Styles added from flatbuffer config" << std::endl;
 }
 void UIRenderLogic::ProcessLogic() {
   // clear the render texture before drawing
@@ -138,57 +134,37 @@ void UIRenderLogic::DrawUIElements() {
 
         // recursively draw the UI elements starting from the root
         // element
-        if (ui_component.m_root_element == nullptr) {
-          continue;
-        }
-        RecursiveDrawUIElement(*ui_component.m_root_element,
-                               ui_component.m_root_element->position,
-                               ui_component.m_root_element->size);
+        RecursiveDrawUIElement(ui_component.m_root_element);
       }
     }
   }
 }
 
-void UIRenderLogic::RecursiveDrawUIElement(UIElement &element,
-                                           const sf::Vector2f &origin,
-                                           const sf::Vector2f &size) {
-
+/////////////////////////////////////////////////
+void UIRenderLogic::RecursiveDrawUIElement(UIElement &element) {
   // provide placement elements for the children
   float border_thickness;
   sf::Vector2f inner_margin;
 
-  // Draw the element based on its type
-  switch (element.element_type) {
+  // define visitor function to set the styles based on the element type
+  auto UIVisitor = [&](auto &element_type) -> void {
+    if constexpr (std::is_same_v<std::decay_t<decltype(element_type)>, Panel>) {
 
-  // Panel
-  case UIElementType::UIElementType_Panel:
+      DrawPanel(element);
+      border_thickness = m_panel_style.border_thickness;
+      inner_margin = m_panel_style.inner_margin;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(element_type)>,
+                                        Button>) {
 
-    DrawPanel(element, origin, size);
-
-    border_thickness = m_panel_style.border_thickness;
-    inner_margin = m_panel_style.inner_margin;
-
-    break;
-
-    // Button
-  case UIElementType::UIElementType_Button: {
-    Button &button_element =
-        static_cast<Button &>(element); // Cast to Button type
-    DrawButton(button_element, origin, size);
-
-    border_thickness = m_button_style.border_thickness;
-    inner_margin = m_button_style.inner_margin;
-
-    break;
-  }
-  // Add more cases for other UI element types as needed
-  default:
-
-    log_handler::ProcessLog(spdlog::level::level_enum::warn,
-                            log_handler::LogCode::kNoCode,
-                            "UIEngine: Unknown UI element type encountered");
-    break;
-  }
+      DrawButton(element);
+      border_thickness = m_button_style.border_thickness;
+      inner_margin = m_button_style.inner_margin;
+    } else {
+      std::cout << "Unknown element type for drawing" << std::endl;
+    }
+  };
+  // call the visitor function with the element type
+  std::visit(UIVisitor, element.element_type);
 
   // pull out number of children for convenience
   size_t number_of_children = element.child_elements.size();
@@ -207,9 +183,9 @@ void UIRenderLogic::RecursiveDrawUIElement(UIElement &element,
 
       // calculate size of the child element in a vertical layout
       float child_width =
-          size.x - (2 * border_thickness) - (2 * inner_margin.x);
+          element.size.x - (2 * border_thickness) - (2 * inner_margin.x);
 
-      float child_height = (size.y - (2 * border_thickness) -
+      float child_height = (element.size.y - (2 * border_thickness) -
                             ((number_of_children + 1) * inner_margin.y)) /
                            element.child_elements.size();
 
@@ -217,9 +193,11 @@ void UIRenderLogic::RecursiveDrawUIElement(UIElement &element,
 
       // calculate the position for the child element in a vertical
       // layout
-      float child_origin_x = origin.x + border_thickness + inner_margin.x;
+      float child_origin_x =
+          element.position.x + border_thickness + inner_margin.x;
 
-      float child_origin_y = origin.y + border_thickness + inner_margin.y +
+      float child_origin_y = element.position.y + border_thickness +
+                             inner_margin.y +
                              (i * (child_height + inner_margin.y));
 
       child_origin = sf::Vector2f(child_origin_x, child_origin_y);
@@ -228,19 +206,21 @@ void UIRenderLogic::RecursiveDrawUIElement(UIElement &element,
     case LayoutType::LayoutType_Horizontal: {
 
       // calculate size of the child element in a horizontal layout
-      float child_width = (size.x - (2 * border_thickness) -
+      float child_width = (element.size.x - (2 * border_thickness) -
                            ((number_of_children + 1) * inner_margin.x)) /
                           element.child_elements.size();
       float child_height =
-          size.y - (2 * border_thickness) - (2 * inner_margin.y);
+          element.size.y - (2 * border_thickness) - (2 * inner_margin.y);
 
       child_size = sf::Vector2f(child_width, child_height);
 
       // calculate the position for the child element in a horizontal
       // layout
-      float child_origin_x = origin.x + border_thickness + inner_margin.x +
+      float child_origin_x = element.position.x + border_thickness +
+                             inner_margin.x +
                              (i * (child_width + inner_margin.x));
-      float child_origin_y = origin.y + border_thickness + inner_margin.y;
+      float child_origin_y =
+          element.position.y + border_thickness + inner_margin.y;
       child_origin = sf::Vector2f(child_origin_x, child_origin_y);
       break;
     }
@@ -250,91 +230,82 @@ void UIRenderLogic::RecursiveDrawUIElement(UIElement &element,
     default:
       break;
     }
-    // check if child is null
-    if (!element.child_elements[i]) {
-      continue;
-    }
-    RecursiveDrawUIElement(*element.child_elements[i], child_origin,
-                           child_size);
+    // set the child element's position and size
+    element.child_elements[i].position = child_origin;
+    element.child_elements[i].size = child_size;
+
+    // recursively draw the child element
+    RecursiveDrawUIElement(element.child_elements[i]);
   }
 }
-void UIRenderLogic::DrawPanel(const UIElement &element,
-                              const sf::Vector2f &origin,
-                              const sf::Vector2f &size) {
-
-  DrawBoxWithRadiusCorners(element, origin, size,
-                           m_panel_style.radius_resolution);
-}
-
-////////////////////////////////////////////////////////////
-void UIRenderLogic::DrawDropDownMenu() {};
 
 /////////////////////////////////////////////////
-void UIRenderLogic::DrawButton(const Button &element,
-                               const sf::Vector2f &origin,
-                               const sf::Vector2f &size) {
+void UIRenderLogic::DrawPanel(UIElement &element) {
+  DrawBoxWithRadiusCorners(element);
+}
+
+/////////////////////////////////////////////////
+void UIRenderLogic::DrawButton(UIElement &element) {
 
   // Draw the box first
-  DrawBoxWithRadiusCorners(element, origin, size,
-                           m_button_style.radius_resolution);
+  DrawBoxWithRadiusCorners(element);
+
+  // get tht button details from the variant
+  Button button_element = std::get<Button>(element.element_type);
 
   // Create a text object for the button label
   sf::Text button_text(
       m_logic_context.asset_manager.GetFont(m_button_style.font),
-      element.label);
-
-  std::cout << "UIEngine: Drawing button with label: " << element.label
-            << std::endl;
+      button_element.label);
 
   button_text.setCharacterSize(24); // Set the character size
   button_text.setFillColor(m_button_style.text_color);
 
   // Center the text within the button
   button_text.setPosition(
-      {origin.x + (size.x - button_text.getLocalBounds().size.x) / 2,
+      {element.position.x +
+           (element.size.x - button_text.getLocalBounds().size.x) / 2,
 
-       // Text is aligned so that the bottom of the text is the bottom of the y
-       // bounds so we need to adjust the y position to account for that
-       origin.y + (size.y / 2 - button_text.getLocalBounds().size.y)});
+       // Text is aligned so that the bottom of the text is the bottom of the
+       // y bounds so we need to adjust the y position to account for that
+       element.position.y +
+           (element.size.y / 2 - button_text.getLocalBounds().size.y)});
 
   // Draw the button text to the render texture
   m_logic_context.scene_texture.draw(button_text);
 }
 /////////////////////////////////////////////////
-void UIRenderLogic::DrawBoxWithRadiusCorners(const UIElement &ui_element,
-                                             const sf::Vector2f &origin,
-                                             const sf::Vector2f &size,
-                                             const size_t &resolution) {
-
+void UIRenderLogic::DrawBoxWithRadiusCorners(UIElement &ui_element) {
   // set element specific variables
   float radius;
+  size_t resolution;
   sf::Color border_color;
   sf::Color background_color;
+  sf::Vector2f size = ui_element.size;
+  sf::Vector2f origin = ui_element.position;
 
-  switch (ui_element.element_type) {
+  // define visitor function to set the styles based on the element type
+  auto UIVisitor = [&](auto &element_type) -> void {
+    if constexpr (std::is_same_v<std::decay_t<decltype(element_type)>, Panel>) {
 
-  // Panel
-  case UIElementType::UIElementType_Panel: {
-    radius = m_panel_style.border_thickness;
-    border_color = m_panel_style.border_color;
-    background_color = m_panel_style.background_color;
-    break;
-  }
-    // Button
-  case UIElementType::UIElementType_Button: {
-    radius = m_button_style.border_thickness;
-    border_color = m_button_style.border_color;
-    background_color = m_button_style.background_color;
-    break;
-  }
+      radius = m_panel_style.border_thickness;
+      resolution = m_panel_style.radius_resolution;
+      border_color = m_panel_style.border_color;
+      background_color = m_panel_style.background_color;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(element_type)>,
+                                        Button>) {
 
-  default: {
-    radius = 0.f;
-    border_color = sf::Color::Green;
-    background_color = sf::Color::Transparent;
-    break;
-  }
-  }
+      radius = m_button_style.border_thickness;
+      resolution = m_button_style.radius_resolution;
+      border_color = m_button_style.border_color;
+      background_color = m_button_style.background_color;
+    } else {
+      std::cout << "Unknown style type selected" << std::endl;
+    }
+  };
+  // call the visitor function with the element type
+  std::visit(UIVisitor, ui_element.element_type);
+
   // lambda function to draw one side (quarter circle and box) based off
   // centre
   auto draw_corner = [&](const sf::Vector2f &centre, const int x_sign,
