@@ -81,12 +81,6 @@ private:
   /////////////////////////////////////////////////
   void DrawBoxWithRadiusCorners(UIElement &element);
 
-public:
-  ////////////////////////////////////////////////////////////
-  // |brief Constructor taking in flatbuffer config
-  ////////////////////////////////////////////////////////////
-  UIRenderLogic(const LogicContext logic_context);
-
   /**
    * @brief Gather all logic here, to be called by the Logic.RunLogic() function
    *
@@ -96,6 +90,12 @@ public:
    * EnittyMemoryPool.
    */
   void ProcessLogic() override;
+
+public:
+  ////////////////////////////////////////////////////////////
+  // |brief Constructor taking in flatbuffer config
+  ////////////////////////////////////////////////////////////
+  UIRenderLogic(const LogicContext logic_context);
 
 }; // namespace UIEngine
 } // namespace steamrot

@@ -21,29 +21,32 @@ struct LogicCollectionBuilder;
 enum LogicType : uint8_t {
   LogicType_None = 0,
   LogicType_Render = 1,
+  LogicType_Collision = 2,
   LogicType_MIN = LogicType_None,
-  LogicType_MAX = LogicType_Render
+  LogicType_MAX = LogicType_Collision
 };
 
-inline const LogicType (&EnumValuesLogicType())[2] {
+inline const LogicType (&EnumValuesLogicType())[3] {
   static const LogicType values[] = {
     LogicType_None,
-    LogicType_Render
+    LogicType_Render,
+    LogicType_Collision
   };
   return values;
 }
 
 inline const char * const *EnumNamesLogicType() {
-  static const char * const names[3] = {
+  static const char * const names[4] = {
     "None",
     "Render",
+    "Collision",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameLogicType(LogicType e) {
-  if (::flatbuffers::IsOutRange(e, LogicType_None, LogicType_Render)) return "";
+  if (::flatbuffers::IsOutRange(e, LogicType_None, LogicType_Collision)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesLogicType()[index];
 }

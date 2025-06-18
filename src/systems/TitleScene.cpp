@@ -15,6 +15,10 @@ void TitleScene::sMovement() {};
 
 void TitleScene::sRender() {
 
+  // process collsion logic
+  for (auto &collision_logic : m_logics[LogicType::LogicType_Collision]) {
+    collision_logic->RunLogic();
+  }
   for (auto &render_logic : m_logics[LogicType::LogicType_Render]) {
     render_logic->RunLogic();
   }

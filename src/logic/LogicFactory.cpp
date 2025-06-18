@@ -1,5 +1,6 @@
 
 #include "LogicFactory.h"
+#include "UICollisionLogic.h"
 #include "UIRenderLogic.h"
 #include "log_handler.h"
 #include "logics_generated.h"
@@ -28,6 +29,8 @@ LogicFactory::CreateLogicMap(const LogicCollection &logic_collection,
             << " logic types." << std::endl;
   for (const auto &logic_type : *logic_collection.types()) {
     switch (logic_type) {
+
+    // Render Logic
     case LogicType::LogicType_Render: {
       std::cout << "Creating Render logics." << std::endl;
       logic_map[LogicType::LogicType_Render] =
@@ -35,6 +38,16 @@ LogicFactory::CreateLogicMap(const LogicCollection &logic_collection,
       std::cout << "Render logics created." << std::endl;
       break;
     }
+
+    // Collision Logic
+    case LogicType::LogicType_Collision: {
+      std::cout << "Creating Collision logics." << std::endl;
+      logic_map[LogicType::LogicType_Collision] =
+          CreateCollisionLogics(logic_context);
+      std::cout << "Collision logics created." << std::endl;
+      break;
+    }
+
     // Add cases for other logic types as needed
     default:
       // Handle unknown logic type if necessary
@@ -56,5 +69,21 @@ LogicFactory::CreateRenderLogics(const LogicContext logic_context) {
   std::cout << "Render logics created with size: " << render_logics.size()
             << std::endl;
   return render_logics;
+}
+
+/////////////////////////////////////////////////
+std::vector<std::unique_ptr<BaseLogic>>
+LogicFactory::CreateCollisionLogics(const LogicContext logic_context) {
+
+  // Create a vector of unique pointers to BaseLogic for collision
+  std::vector<std::unique_ptr<BaseLogic>> collision_logics;
+  std::cout << "Creating a vector of collision logics." << std::endl;
+
+  // compile time defined order of logic types
+  collision_logics.push_back(std::make_unique<UICollisionLogic>(logic_context));
+  std::cout << "Collision logics created with size: " << collision_logics.size()
+            << std::endl;
+
+  return collision_logics;
 }
 } // namespace steamrot

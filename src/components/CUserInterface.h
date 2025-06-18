@@ -53,6 +53,16 @@ struct UIElement {
   /// @brief Layout type of the children elements
   /////////////////////////////////////////////////
   LayoutType layout{0};
+
+  /////////////////////////////////////////////////
+  /// @brief Is mouse over this element, false if it over a child element
+  /////////////////////////////////////////////////
+  bool mouse_over{false};
+
+  /////////////////////////////////////////////////
+  /// @brief Helper variable to check if the mouse is over a child element
+  /////////////////////////////////////////////////
+  bool mouse_over_child{false};
 };
 
 struct CUserInterface : public Component {

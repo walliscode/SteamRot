@@ -44,7 +44,8 @@
   },
   "logic_collection": {
     "types": [
-      "Render"
+      "Render",
+      "Collision"
     ]
   },
   "ui_theme": "default",
