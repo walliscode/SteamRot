@@ -26,6 +26,7 @@ void EventHandler::HandleEvents(sf::RenderWindow &window) {
     // handle keyboard events
     else if (event->is<sf::Event::KeyPressed>() ||
              event->is<sf::Event::KeyReleased>()) {
+
       HandleKeyboardEvents(event.value());
     }
     // handle mouse events
@@ -44,17 +45,18 @@ void EventHandler::HandleKeyboardEvents(const sf::Event &event) {
 
     std::cout << "Key pressed: " << magic_enum::enum_name(keyPressed->scancode)
               << std::endl;
-
+    std::cout << "Key code: " << static_cast<int>(keyPressed->code)
+              << std::endl;
     // modify relevant bitset
-    m_events.set(static_cast<size_t>(keyPressed->scancode));
+    m_events.set(static_cast<size_t>(keyPressed->code));
 
   } else if (const auto *keyReleased = event.getIf<sf::Event::KeyReleased>()) {
 
-    std::cout << "Key released: "
-              << magic_enum::enum_name(keyReleased->scancode) << std::endl;
+    std::cout << "Key released: " << magic_enum::enum_name(keyReleased->code)
+              << std::endl;
 
     // if key released, then remember add the key count
-    m_events.set(static_cast<size_t>(keyReleased->scancode) +
+    m_events.set(static_cast<size_t>(keyReleased->code) +
                  sf::Keyboard::KeyCount);
   }
 }
