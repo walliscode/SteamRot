@@ -10,7 +10,6 @@
 #include "DataManager.h"
 #include "DisplayManager.h"
 #include "EventHandler.h"
-#include "GameContext.h"
 #include "SceneManager.h"
 #include <SFML/Graphics.hpp>
 
@@ -98,14 +97,6 @@ private:
   /// Title Scene loading
   /////////////////////////////////////////////////
   void ShowTitleScene();
-
-  /////////////////////////////////////////////////
-  /// @brief Create a GameContext object that contains all the necessary
-  /// references
-  ///
-  /// @return GameContext object
-  /////////////////////////////////////////////////
-  GameContext CreateGameContext();
 
   sf::Vector2i m_mouse_position;
 

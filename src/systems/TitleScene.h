@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "GameContext.h"
 #include "Scene.h"
 #include "scenes_generated.h"
 namespace steamrot {
@@ -29,8 +30,7 @@ private:
    * @param id Unique identifier for the scene
    */
   TitleScene(const size_t pool_size, const SceneData *scene_data,
-             const uuids::uuid &id, const AssetManager &asset_manager,
-             sf::RenderWindow &window);
+             const uuids::uuid &id, const GameContext game_context);
 
   ////////////////////////////////////////////////////////////
   /// \brief call movement Logic for TitleScene

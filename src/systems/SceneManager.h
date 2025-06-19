@@ -6,8 +6,7 @@
 #pragma once
 
 // Headers
-#include "AssetManager.h"
-#include "DataManager.h"
+#include "GameContext.h"
 #include "SceneFactory.h"
 #include "TexturesPackage.h"
 #include "uuid.h"
@@ -32,31 +31,19 @@ private:
    */
   SceneFactory m_scene_factory;
 
+  const GameContext m_game_context;
   /**
    * @brief Map of uuid to Scene.
    */
   std::unordered_map<uuids::uuid, std::unique_ptr<Scene>> m_scenes;
 
-  /**
-   * @brief Asset manager for handling game assets.
-   */
-  AssetManager &m_asset_manager;
-
-  /**
-   * @brief Data manager for managing game data.
-   */
-  DataManager m_data_manager;
-
-  /////////////////////////////////////////////////
-  /// @brief Reference to Game window
-  /////////////////////////////////////////////////
-  sf::RenderWindow &m_window;
-
 public:
-  /**
-   * @brief Default constructor.
-   */
-  SceneManager(AssetManager &asset_manager, sf::RenderWindow &window);
+  /////////////////////////////////////////////////
+  /// @brief Constructor taking a GameContext object.
+  ///
+  /// @param game_context GameContext object
+  /////////////////////////////////////////////////
+  SceneManager(const GameContext game_context);
 
   /**
    * @brief Start up the SceneManager for the game.
