@@ -26,8 +26,21 @@ void CUserInterface::Configure(const UserInterface *user_interface_data) {
                             "Configuration data is null for CUserInterface");
     return;
   }
-  // set the component to active
+  // set component level data
+  // set the component to active, will be picked up by the archetype manager
   m_active = true;
+
+  // set the UI name
+  if (user_interface_data->ui_name()) {
+    UIName = user_interface_data->ui_name()->str();
+  }
+
+  // set the UI visibility
+  if (user_interface_data->start_visible()) {
+    m_UI_visible = user_interface_data->start_visible();
+  } else {
+    m_UI_visible = false; // default to false if not specified
+  }
 
   std::cout << "Configuring CUserInterface with data: " << std::endl;
 
