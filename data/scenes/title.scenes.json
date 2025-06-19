@@ -4,6 +4,8 @@
     "entities": [
       {
         "c_user_interface": {
+          "ui_name": "title_screen_menu",
+          "start_visible": true,
           "root_ui_element": {
             "type": "Panel",
             "layout": "Vertical",

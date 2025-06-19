@@ -38,4 +38,6 @@ table UIElementData{
 
 table UserInterface{
     root_ui_element: UIElementData;
+    ui_name: string; 
+    start_visible: bool;
   }

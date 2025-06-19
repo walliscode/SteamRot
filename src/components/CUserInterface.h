@@ -73,9 +73,21 @@ struct CUserInterface : public Component {
   CUserInterface() = default;
 
   /////////////////////////////////////////////////
+  /// @brief String tag for the user interface component
+  ///
+  /// UI components should be few enough that manual unique naming is viable.
+  /////////////////////////////////////////////////
+  std::string UIName{"Default UI"};
+
+  /////////////////////////////////////////////////
   /// @brief Root UI element of the user interface component
   /////////////////////////////////////////////////
   UIElement m_root_element;
+
+  /////////////////////////////////////////////////
+  /// @brief Is the this element of the user interface visible to Users.
+  /////////////////////////////////////////////////
+  bool m_UI_visible{false};
 
   /**
    * @brief String representation of the component name, this will return a
