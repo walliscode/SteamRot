@@ -13,8 +13,7 @@ namespace steamrot {
 struct GameContext {
   GameContext() = delete;
 
-  GameContext(sf::RenderWindow &window, const EventBitset &pressed_events,
-              const EventBitset &released_events,
+  GameContext(sf::RenderWindow &window, const EventBitset &events,
               const sf::Vector2i &mouse_position, const size_t &loop_number,
               AssetManager &asset_manager, DataManager &data_manager);
 
@@ -29,12 +28,7 @@ struct GameContext {
   /// @brief Reference to bitset which globally captures all pressed events.
   ///
   /////////////////////////////////////////////////
-  const EventBitset &pressed_events;
-
-  /////////////////////////////////////////////////
-  /// @brief  Reference to bitset which globally captures all released events.
-  /////////////////////////////////////////////////
-  const EventBitset &released_events;
+  const EventBitset &user_events;
 
   /////////////////////////////////////////////////
   /// @brief Reference to mouse position in the game window. (local).
