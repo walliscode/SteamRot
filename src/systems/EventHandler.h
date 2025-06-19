@@ -14,8 +14,11 @@
 #include <bitset>
 #include <unordered_map>
 
+// double of each needed for pressed and released events
 using EventBitset =
-    std::bitset<sf::Keyboard::KeyCount + sf::Mouse::ButtonCount>;
+    std::bitset<sf::Keyboard::KeyCount + sf::Keyboard::KeyCount +
+                sf::Mouse::ButtonCount + sf::Mouse::ButtonCount>;
+
 using UserEvents = std::unordered_map<std::string, EventBitset>;
 namespace steamrot {
 

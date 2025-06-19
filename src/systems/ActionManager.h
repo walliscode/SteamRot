@@ -6,15 +6,10 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include "actions.h"
+#include "EventHandler.h"
 #include "actions_generated.h"
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
-#include <bitset>
-#include <map>
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
 
 namespace steamrot {
 
@@ -23,25 +18,19 @@ private:
   ////////////////////////////////////////////////////////////
   // |Member: stores key mappings to actions for this scene
   ////////////////////////////////////////////////////////////
-  std::unordered_map<
-      std::bitset<sf::Keyboard::KeyCount + sf::Mouse::ButtonCount>, Actions>
-      m_key_to_action_map;
+  std::unordered_map<EventBitset, ActionNames> m_key_to_action_map;
 
   ////////////////////////////////////////////////////////////
   // |brief: returns map of string letters to sf::Keyboard enum
   ////////////////////////////////////////////////////////////
-  static const std::map<std::string, sf::Keyboard::Key> &
-  getStringToKeyboardMap();
+  static const std::unordered_map<KeyboardInput, sf::Keyboard::Key> &
+  getFlatbuffersToSFMLKeyboardMap();
 
   ////////////////////////////////////////////////////////////
   // |brief: returns map of string letters to sf::Mouse enum
   ////////////////////////////////////////////////////////////
-  static const std::map<std::string, sf::Mouse::Button> &getStringToMouseMap();
-
-  ////////////////////////////////////////////////////////////
-  // |brief register actions for object instance from json
-  ////////////////////////////////////////////////////////////
-  void RegisterActions(const json &congig);
+  static const std::unordered_map<MouseInput, sf::Mouse::Button> &
+  getStringToMouseMap();
 
   /**
    * @brief Register actions for object instance from flatbuffers ActionsData
@@ -51,18 +40,16 @@ private:
   void RegisterActions(const ActionsData *actions_data);
 
 public:
-  ActionManager() = default;
-
   /**
    * @brief Constructor using flatbuffers ActionsData object
    *
    * @param actions_data Raw pointer to ActionsData object
    */
   ActionManager(const ActionsData *actions_data);
+
   ////////////////////////////////////////////////////////////
   // |brief Generate any possible actions for this scene as bitflag enum
   ////////////////////////////////////////////////////////////
-  const Actions GenerateActions(
-      std::bitset<sf::Keyboard::KeyCount + sf::Mouse::ButtonCount>);
+  const ActionNames GenerateActions(const EventBitset &input_event);
 };
 } // namespace steamrot
