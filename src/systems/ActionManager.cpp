@@ -2,9 +2,12 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "ActionManager.h"
+#include "EventHandler.h"
+#include "actions_generated.h"
 #include "log_handler.h"
 #include "magic_enum/magic_enum.hpp"
 #include "spdlog/common.h"
+#include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <iostream>
@@ -20,115 +23,55 @@ ActionManager::ActionManager(const ActionsData *actions_data) {
   std::cout << "Actions registered from ActionsData object." << std::endl;
 }
 ////////////////////////////////////////////////////////////
-const std::map<std::string, sf::Keyboard::Key> &
-ActionManager::getStringToKeyboardMap() {
+const std::unordered_map<KeyboardInput, sf::Keyboard::Key> &
+ActionManager::getFlatbuffersToSFMLKeyboardMap() {
 
   // map of string to sf::Keyboard enum
 
-  static const std::map<std::string, sf::Keyboard::Key> string_to_key_map = {
-      {"A", sf::Keyboard::Key::A}, {"B", sf::Keyboard::Key::B},
-      {"C", sf::Keyboard::Key::C}, {"D", sf::Keyboard::Key::D},
-      {"E", sf::Keyboard::Key::E}, {"F", sf::Keyboard::Key::F},
-      {"G", sf::Keyboard::Key::G}, {"H", sf::Keyboard::Key::H},
-      {"K", sf::Keyboard::Key::K}, {"L", sf::Keyboard::Key::L},
-      {"M", sf::Keyboard::Key::M}, {"N", sf::Keyboard::Key::N},
-      {"O", sf::Keyboard::Key::O}, {"P", sf::Keyboard::Key::P},
-      {"Q", sf::Keyboard::Key::Q}, {"R", sf::Keyboard::Key::R},
-      {"S", sf::Keyboard::Key::S}, {"T", sf::Keyboard::Key::T},
-      {"U", sf::Keyboard::Key::U}, {"V", sf::Keyboard::Key::V},
-      {"W", sf::Keyboard::Key::W}, {"X", sf::Keyboard::Key::X},
-      {"Y", sf::Keyboard::Key::Y}, {"Z", sf::Keyboard::Key::Z},
-  };
+  static const std::unordered_map<KeyboardInput, sf::Keyboard::Key>
+      string_to_key_map = {
+          {KeyboardInput_A, sf::Keyboard::Key::A},
+          {KeyboardInput_B, sf::Keyboard::Key::B},
+          {KeyboardInput_C, sf::Keyboard::Key::C},
+          {KeyboardInput_D, sf::Keyboard::Key::D},
+          {KeyboardInput_E, sf::Keyboard::Key::E},
+          {KeyboardInput_F, sf::Keyboard::Key::F},
+          {KeyboardInput_G, sf::Keyboard::Key::G},
+          {KeyboardInput_H, sf::Keyboard::Key::H},
+          {KeyboardInput_K, sf::Keyboard::Key::K},
+          {KeyboardInput_L, sf::Keyboard::Key::L},
+          {KeyboardInput_M, sf::Keyboard::Key::M},
+          {KeyboardInput_N, sf::Keyboard::Key::N},
+          {KeyboardInput_O, sf::Keyboard::Key::O},
+          {KeyboardInput_P, sf::Keyboard::Key::P},
+          {KeyboardInput_Q, sf::Keyboard::Key::Q},
+          {KeyboardInput_R, sf::Keyboard::Key::R},
+          {KeyboardInput_S, sf::Keyboard::Key::S},
+          {KeyboardInput_T, sf::Keyboard::Key::T},
+          {KeyboardInput_U, sf::Keyboard::Key::U},
+          {KeyboardInput_V, sf::Keyboard::Key::V},
+          {KeyboardInput_W, sf::Keyboard::Key::W},
+          {KeyboardInput_X, sf::Keyboard::Key::X},
+          {KeyboardInput_Y, sf::Keyboard::Key::Y},
+          {KeyboardInput_Z, sf::Keyboard::Key::Z},
+      };
   return string_to_key_map;
 }; // namespace steamrot
 ////////////////////////////////////////////////////////////
-const std::map<std::string, sf::Mouse::Button> &
+const std::unordered_map<MouseInput, sf::Mouse::Button> &
 ActionManager::getStringToMouseMap() {
 
   // map of string to sf::Mouse enum
 
-  static const std::map<std::string, sf::Mouse::Button> string_to_mouse_map = {
+  static const std::unordered_map<MouseInput, sf::Mouse::Button>
+      string_to_mouse_map = {
 
-      {"Left", sf::Mouse::Button::Left},
-      {"Right", sf::Mouse::Button::Right},
-      {"Middle", sf::Mouse::Button::Middle},
+          {MouseInput_LEFT_CLICK, sf::Mouse::Button::Left},
+          {MouseInput_RIGHT_CLICK, sf::Mouse::Button::Right},
+          {MouseInput_MIDDLE_CLICK, sf::Mouse::Button::Middle},
 
-  };
+      };
   return string_to_mouse_map;
-}
-
-////////////////////////////////////////////////////////////
-void ActionManager::RegisterActions(const json &config) {
-
-  // check config object, error out if incorrect
-  if (!config.contains("actions")) {
-    log_handler::ProcessLog(spdlog::level::level_enum::err,
-                            log_handler::LogCode::kInvalidJSONKey,
-                            "Action Config should contain action key");
-  }
-
-  // cycle through the json objects and check and register
-  for (auto &action : config["actions"]) {
-
-    // create new bitset for this action
-    std::bitset<sf::Keyboard::KeyCount + sf::Mouse::ButtonCount> key_bitset;
-
-    // cycle though keys
-    for (auto &input : action["inputs"]) {
-
-      // check if input is a keyboard or mouse input, if not error out
-      if (input["type"] == "keyboard") {
-        // check if key is in the map, if not error out
-        auto it = getStringToKeyboardMap().find(input["value"]);
-
-        if (it == getStringToKeyboardMap().end()) {
-          log_handler::ProcessLog(spdlog::level::level_enum::err,
-                                  log_handler::LogCode::kInvalidJSONKey,
-                                  "key " + input["value"].get<std::string>() +
-                                      " is not a valid key enum value");
-        } else {
-          // set the bit in the bitset for this key
-          key_bitset.set(static_cast<size_t>(it->second));
-        }
-
-      } else if (input["type"] == "mouse") {
-        // check if mouse button is in the map, if not error out
-        auto it = getStringToMouseMap().find(input["value"]);
-        if (it == getStringToMouseMap().end()) {
-          log_handler::ProcessLog(spdlog::level::level_enum::err,
-                                  log_handler::LogCode::kInvalidJSONKey,
-                                  "mouse button " +
-                                      input["value"].get<std::string>() +
-                                      " is not a valid mouse enum value");
-        } else {
-
-          // set the bit in the bitset for this mouse button
-          key_bitset.set(static_cast<size_t>(it->second) +
-                         sf::Keyboard::KeyCount);
-        }
-      } else {
-        log_handler::ProcessLog(spdlog::level::level_enum::err,
-                                log_handler::LogCode::kInvalidJSONKey,
-                                "input type " +
-                                    input["type"].get<std::string>() +
-                                    " is not a valid input type");
-      }
-    }
-
-    // check if string action in json is a valid action in the action enum
-    std::string action_name = action["name"];
-    auto action_enum = magic_enum::enum_cast<Actions>(action_name);
-
-    // check if action enum is valid, if not error out
-    if (!action_enum.has_value()) {
-      log_handler::ProcessLog(
-          spdlog::level::level_enum::err, log_handler::LogCode::kInvalidJSONKey,
-          "action name" + action_name + " is not a valid action enum value");
-    } else {
-      // register the action in the map
-      m_key_to_action_map[key_bitset] = action_enum.value();
-    }
-  }
 }
 
 ////////////////////////////////////////////////////////////
@@ -147,76 +90,64 @@ void ActionManager::RegisterActions(const ActionsData *actions_data) {
   for (const auto &action : *actions_data->actions()) {
 
     // create new bitset for this action
-    std::bitset<sf::Keyboard::KeyCount + sf::Mouse::ButtonCount> key_bitset;
+    EventBitset key_bitset;
 
-    // cycle throught the actions parts to compose the full action
-    for (const auto &part : *action->parts()) {
-
-      // check if input is a keyboard or mouse input
-      if (part->type() == InputType::InputType_Keyboard) {
-
-        // get the sf::Keyboard key from the getStringToKeyboardMap
-        auto it =
-            getStringToKeyboardMap().find(part->input_as_Key()->name()->str());
-
-        // check if key is in the map, if not log as warning but move on
-        if (it == getStringToKeyboardMap().end()) {
-          log_handler::ProcessLog(
-              spdlog::level::level_enum::warn, log_handler::LogCode::kNoCode,
-              "key " + part->input_as_Key()->name()->str() +
-                  " is not a valid key enum value, skipping");
-        } else {
-          // set the bit in the bitset for this key
-          key_bitset.set(static_cast<size_t>(it->second));
-        }
-      } else if (part->type() == InputType::InputType_Mouse) {
-
-        // get the sf::Mouse button from the getStringToMouseMap
-        auto it = getStringToMouseMap().find(
-            part->input_as_MouseButton()->name()->str());
-
-        // check if mouse button is in the map, if not log as warning but move
-        // on
-        if (it == getStringToMouseMap().end()) {
-          log_handler::ProcessLog(
-              spdlog::level::level_enum::warn, log_handler::LogCode::kNoCode,
-              "mouse button " + part->input_as_MouseButton()->name()->str() +
-                  " is not a valid mouse enum value, skipping");
-        } else {
-          // set the bit in the bitset for this mouse button
-          key_bitset.set(static_cast<size_t>(it->second) +
-                         sf::Keyboard::KeyCount);
-        }
+    if (action->keyboard_pressed()) {
+      for (const auto &key : *action->keyboard_pressed()) {
+        // needs casting back to its enum type (not sure why it has not
+        // maintained its original type)
+        KeyboardInput keyboard_press = static_cast<KeyboardInput>(key);
+        key_bitset.set(static_cast<size_t>(keyboard_press));
       }
     }
-    // once all parts are processed, add the action to the map
-    // check if string action in json is a valid action in the action enum
-    std::string action_name = action->name()->str();
-    auto action_enum = magic_enum::enum_cast<Actions>(action_name);
-
-    // check if action enum is valid, if not error out
-    if (!action_enum.has_value()) {
-      log_handler::ProcessLog(
-          spdlog::level::level_enum::err, log_handler::LogCode::kInvalidJSONKey,
-          "action name" + action_name + " is not a valid action enum value");
-    } else {
-      // register the action in the map
-      m_key_to_action_map[key_bitset] = action_enum.value();
+    if (action->keyboard_released()) {
+      for (const auto &key : *action->keyboard_released()) {
+        // needs casting back to its enum type (not sure why it has not
+        // maintained its original type)
+        KeyboardInput keyboard_release = static_cast<KeyboardInput>(key);
+        // make sure it has been shifted by the number of keys
+        key_bitset.set(
+            static_cast<size_t>(keyboard_release + sf::Keyboard::KeyCount));
+      }
     }
+
+    if (action->mouse_pressed()) {
+      for (const auto &button : *action->mouse_pressed()) {
+        MouseInput mouse_press = static_cast<MouseInput>(button);
+
+        // make sure it has been shifted by the number of keys * 2
+        key_bitset.set(static_cast<size_t>(mouse_press) +
+                       (sf::Keyboard::KeyCount * 2));
+      }
+    }
+    if (action->mouse_released()) {
+      for (const auto &button : *action->mouse_released()) {
+        MouseInput mouse_release = static_cast<MouseInput>(button);
+
+        // make sure it has been shifted by the number of keys * 2 and the
+        // number of mouse buttons
+        key_bitset.set(static_cast<size_t>(mouse_release) +
+                       (sf::Keyboard::KeyCount * 2) +
+                       static_cast<size_t>(sf::Mouse::ButtonCount));
+      }
+    }
+
+    // add to the action map
+    m_key_to_action_map.at(key_bitset) = ActionNames(action->action_name());
   }
 }
-////////////////////////////////////////////////////////////
-const Actions ActionManager::GenerateActions(
-    std::bitset<sf::Keyboard::KeyCount + sf::Mouse::ButtonCount> key_bitset) {
 
-  // create an actions bitset
-  Actions actions;
+////////////////////////////////////////////////////////////
+const ActionNames
+ActionManager::GenerateActions(const EventBitset &input_event) {
+
+  // create an actions bitflag
+  ActionNames actions;
 
   // cycle through the key to action map and check to see if any of the keys
   // match
   for (auto &[key, value] : m_key_to_action_map) {
-    if ((key_bitset & key) == key) {
-
+    if ((input_event & key) == key) {
       // add to current actions
       actions |= value;
     }

@@ -15,297 +15,218 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
-struct Key;
-struct KeyBuilder;
-
-struct MouseButton;
-struct MouseButtonBuilder;
-
-struct ActionPart;
-struct ActionPartBuilder;
-
 struct Action;
 struct ActionBuilder;
 
 struct ActionsData;
 struct ActionsDataBuilder;
 
-enum InputType : uint8_t {
-  InputType_Keyboard = 0,
-  InputType_Mouse = 1,
-  InputType_MIN = InputType_Keyboard,
-  InputType_MAX = InputType_Mouse
+enum KeyboardInput : uint8_t {
+  KeyboardInput_A = 0,
+  KeyboardInput_B = 1,
+  KeyboardInput_C = 2,
+  KeyboardInput_D = 3,
+  KeyboardInput_E = 4,
+  KeyboardInput_F = 5,
+  KeyboardInput_G = 6,
+  KeyboardInput_H = 7,
+  KeyboardInput_I = 8,
+  KeyboardInput_J = 9,
+  KeyboardInput_K = 10,
+  KeyboardInput_L = 11,
+  KeyboardInput_M = 12,
+  KeyboardInput_N = 13,
+  KeyboardInput_O = 14,
+  KeyboardInput_P = 15,
+  KeyboardInput_Q = 16,
+  KeyboardInput_R = 17,
+  KeyboardInput_S = 18,
+  KeyboardInput_T = 19,
+  KeyboardInput_U = 20,
+  KeyboardInput_V = 21,
+  KeyboardInput_W = 22,
+  KeyboardInput_X = 23,
+  KeyboardInput_Y = 24,
+  KeyboardInput_Z = 25,
+  KeyboardInput_MIN = KeyboardInput_A,
+  KeyboardInput_MAX = KeyboardInput_Z
 };
 
-inline const InputType (&EnumValuesInputType())[2] {
-  static const InputType values[] = {
-    InputType_Keyboard,
-    InputType_Mouse
+inline const KeyboardInput (&EnumValuesKeyboardInput())[26] {
+  static const KeyboardInput values[] = {
+    KeyboardInput_A,
+    KeyboardInput_B,
+    KeyboardInput_C,
+    KeyboardInput_D,
+    KeyboardInput_E,
+    KeyboardInput_F,
+    KeyboardInput_G,
+    KeyboardInput_H,
+    KeyboardInput_I,
+    KeyboardInput_J,
+    KeyboardInput_K,
+    KeyboardInput_L,
+    KeyboardInput_M,
+    KeyboardInput_N,
+    KeyboardInput_O,
+    KeyboardInput_P,
+    KeyboardInput_Q,
+    KeyboardInput_R,
+    KeyboardInput_S,
+    KeyboardInput_T,
+    KeyboardInput_U,
+    KeyboardInput_V,
+    KeyboardInput_W,
+    KeyboardInput_X,
+    KeyboardInput_Y,
+    KeyboardInput_Z
   };
   return values;
 }
 
-inline const char * const *EnumNamesInputType() {
+inline const char * const *EnumNamesKeyboardInput() {
+  static const char * const names[27] = {
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "Q",
+    "R",
+    "S",
+    "T",
+    "U",
+    "V",
+    "W",
+    "X",
+    "Y",
+    "Z",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameKeyboardInput(KeyboardInput e) {
+  if (::flatbuffers::IsOutRange(e, KeyboardInput_A, KeyboardInput_Z)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesKeyboardInput()[index];
+}
+
+enum MouseInput : uint8_t {
+  MouseInput_LEFT_CLICK = 0,
+  MouseInput_RIGHT_CLICK = 1,
+  MouseInput_MIDDLE_CLICK = 2,
+  MouseInput_SCROLL_UP = 3,
+  MouseInput_SCROLL_DOWN = 4,
+  MouseInput_MIN = MouseInput_LEFT_CLICK,
+  MouseInput_MAX = MouseInput_SCROLL_DOWN
+};
+
+inline const MouseInput (&EnumValuesMouseInput())[5] {
+  static const MouseInput values[] = {
+    MouseInput_LEFT_CLICK,
+    MouseInput_RIGHT_CLICK,
+    MouseInput_MIDDLE_CLICK,
+    MouseInput_SCROLL_UP,
+    MouseInput_SCROLL_DOWN
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesMouseInput() {
+  static const char * const names[6] = {
+    "LEFT_CLICK",
+    "RIGHT_CLICK",
+    "MIDDLE_CLICK",
+    "SCROLL_UP",
+    "SCROLL_DOWN",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameMouseInput(MouseInput e) {
+  if (::flatbuffers::IsOutRange(e, MouseInput_LEFT_CLICK, MouseInput_SCROLL_DOWN)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesMouseInput()[index];
+}
+
+enum ActionNames : uint64_t {
+  ActionNames_ACTION_NONE = 1ULL,
+  ActionNames_ACTION_CHANGE_SCENE = 2ULL,
+  ActionNames_NONE = 0,
+  ActionNames_ANY = 3ULL
+};
+
+inline const ActionNames (&EnumValuesActionNames())[2] {
+  static const ActionNames values[] = {
+    ActionNames_ACTION_NONE,
+    ActionNames_ACTION_CHANGE_SCENE
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesActionNames() {
   static const char * const names[3] = {
-    "Keyboard",
-    "Mouse",
+    "ACTION_NONE",
+    "ACTION_CHANGE_SCENE",
     nullptr
   };
   return names;
 }
 
-inline const char *EnumNameInputType(InputType e) {
-  if (::flatbuffers::IsOutRange(e, InputType_Keyboard, InputType_Mouse)) return "";
-  const size_t index = static_cast<size_t>(e);
-  return EnumNamesInputType()[index];
-}
-
-enum Input : uint8_t {
-  Input_NONE = 0,
-  Input_Key = 1,
-  Input_MouseButton = 2,
-  Input_MIN = Input_NONE,
-  Input_MAX = Input_MouseButton
-};
-
-inline const Input (&EnumValuesInput())[3] {
-  static const Input values[] = {
-    Input_NONE,
-    Input_Key,
-    Input_MouseButton
-  };
-  return values;
-}
-
-inline const char * const *EnumNamesInput() {
-  static const char * const names[4] = {
-    "NONE",
-    "Key",
-    "MouseButton",
-    nullptr
-  };
-  return names;
-}
-
-inline const char *EnumNameInput(Input e) {
-  if (::flatbuffers::IsOutRange(e, Input_NONE, Input_MouseButton)) return "";
-  const size_t index = static_cast<size_t>(e);
-  return EnumNamesInput()[index];
-}
-
-template<typename T> struct InputTraits {
-  static const Input enum_value = Input_NONE;
-};
-
-template<> struct InputTraits<steamrot::Key> {
-  static const Input enum_value = Input_Key;
-};
-
-template<> struct InputTraits<steamrot::MouseButton> {
-  static const Input enum_value = Input_MouseButton;
-};
-
-bool VerifyInput(::flatbuffers::Verifier &verifier, const void *obj, Input type);
-bool VerifyInputVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types);
-
-struct Key FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef KeyBuilder Builder;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_NAME = 4
-  };
-  const ::flatbuffers::String *name() const {
-    return GetPointer<const ::flatbuffers::String *>(VT_NAME);
-  }
-  bool Verify(::flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_NAME) &&
-           verifier.VerifyString(name()) &&
-           verifier.EndTable();
-  }
-};
-
-struct KeyBuilder {
-  typedef Key Table;
-  ::flatbuffers::FlatBufferBuilder &fbb_;
-  ::flatbuffers::uoffset_t start_;
-  void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
-    fbb_.AddOffset(Key::VT_NAME, name);
-  }
-  explicit KeyBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  ::flatbuffers::Offset<Key> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<Key>(end);
-    return o;
-  }
-};
-
-inline ::flatbuffers::Offset<Key> CreateKey(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::String> name = 0) {
-  KeyBuilder builder_(_fbb);
-  builder_.add_name(name);
-  return builder_.Finish();
-}
-
-inline ::flatbuffers::Offset<Key> CreateKeyDirect(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    const char *name = nullptr) {
-  auto name__ = name ? _fbb.CreateString(name) : 0;
-  return steamrot::CreateKey(
-      _fbb,
-      name__);
-}
-
-struct MouseButton FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef MouseButtonBuilder Builder;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_NAME = 4
-  };
-  const ::flatbuffers::String *name() const {
-    return GetPointer<const ::flatbuffers::String *>(VT_NAME);
-  }
-  bool Verify(::flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_NAME) &&
-           verifier.VerifyString(name()) &&
-           verifier.EndTable();
-  }
-};
-
-struct MouseButtonBuilder {
-  typedef MouseButton Table;
-  ::flatbuffers::FlatBufferBuilder &fbb_;
-  ::flatbuffers::uoffset_t start_;
-  void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
-    fbb_.AddOffset(MouseButton::VT_NAME, name);
-  }
-  explicit MouseButtonBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  ::flatbuffers::Offset<MouseButton> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<MouseButton>(end);
-    return o;
-  }
-};
-
-inline ::flatbuffers::Offset<MouseButton> CreateMouseButton(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::String> name = 0) {
-  MouseButtonBuilder builder_(_fbb);
-  builder_.add_name(name);
-  return builder_.Finish();
-}
-
-inline ::flatbuffers::Offset<MouseButton> CreateMouseButtonDirect(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    const char *name = nullptr) {
-  auto name__ = name ? _fbb.CreateString(name) : 0;
-  return steamrot::CreateMouseButton(
-      _fbb,
-      name__);
-}
-
-struct ActionPart FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef ActionPartBuilder Builder;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_TYPE = 4,
-    VT_INPUT_TYPE = 6,
-    VT_INPUT = 8
-  };
-  steamrot::InputType type() const {
-    return static_cast<steamrot::InputType>(GetField<uint8_t>(VT_TYPE, 0));
-  }
-  steamrot::Input input_type() const {
-    return static_cast<steamrot::Input>(GetField<uint8_t>(VT_INPUT_TYPE, 0));
-  }
-  const void *input() const {
-    return GetPointer<const void *>(VT_INPUT);
-  }
-  template<typename T> const T *input_as() const;
-  const steamrot::Key *input_as_Key() const {
-    return input_type() == steamrot::Input_Key ? static_cast<const steamrot::Key *>(input()) : nullptr;
-  }
-  const steamrot::MouseButton *input_as_MouseButton() const {
-    return input_type() == steamrot::Input_MouseButton ? static_cast<const steamrot::MouseButton *>(input()) : nullptr;
-  }
-  bool Verify(::flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<uint8_t>(verifier, VT_TYPE, 1) &&
-           VerifyField<uint8_t>(verifier, VT_INPUT_TYPE, 1) &&
-           VerifyOffset(verifier, VT_INPUT) &&
-           VerifyInput(verifier, input(), input_type()) &&
-           verifier.EndTable();
-  }
-};
-
-template<> inline const steamrot::Key *ActionPart::input_as<steamrot::Key>() const {
-  return input_as_Key();
-}
-
-template<> inline const steamrot::MouseButton *ActionPart::input_as<steamrot::MouseButton>() const {
-  return input_as_MouseButton();
-}
-
-struct ActionPartBuilder {
-  typedef ActionPart Table;
-  ::flatbuffers::FlatBufferBuilder &fbb_;
-  ::flatbuffers::uoffset_t start_;
-  void add_type(steamrot::InputType type) {
-    fbb_.AddElement<uint8_t>(ActionPart::VT_TYPE, static_cast<uint8_t>(type), 0);
-  }
-  void add_input_type(steamrot::Input input_type) {
-    fbb_.AddElement<uint8_t>(ActionPart::VT_INPUT_TYPE, static_cast<uint8_t>(input_type), 0);
-  }
-  void add_input(::flatbuffers::Offset<void> input) {
-    fbb_.AddOffset(ActionPart::VT_INPUT, input);
-  }
-  explicit ActionPartBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  ::flatbuffers::Offset<ActionPart> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<ActionPart>(end);
-    return o;
-  }
-};
-
-inline ::flatbuffers::Offset<ActionPart> CreateActionPart(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    steamrot::InputType type = steamrot::InputType_Keyboard,
-    steamrot::Input input_type = steamrot::Input_NONE,
-    ::flatbuffers::Offset<void> input = 0) {
-  ActionPartBuilder builder_(_fbb);
-  builder_.add_input(input);
-  builder_.add_input_type(input_type);
-  builder_.add_type(type);
-  return builder_.Finish();
+inline const char *EnumNameActionNames(ActionNames e) {
+  if (::flatbuffers::IsOutRange(e, ActionNames_ACTION_NONE, ActionNames_ACTION_CHANGE_SCENE)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(ActionNames_ACTION_NONE);
+  return EnumNamesActionNames()[index];
 }
 
 struct Action FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef ActionBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_PARTS = 4,
-    VT_NAME = 6
+    VT_KEYBOARD_PRESSED = 4,
+    VT_KEYBOARD_RELEASED = 6,
+    VT_MOUSE_PRESSED = 8,
+    VT_MOUSE_RELEASED = 10,
+    VT_ACTION_NAME = 12
   };
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::ActionPart>> *parts() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::ActionPart>> *>(VT_PARTS);
+  const ::flatbuffers::Vector<uint8_t> *keyboard_pressed() const {
+    return GetPointer<const ::flatbuffers::Vector<uint8_t> *>(VT_KEYBOARD_PRESSED);
   }
-  const ::flatbuffers::String *name() const {
-    return GetPointer<const ::flatbuffers::String *>(VT_NAME);
+  const ::flatbuffers::Vector<uint8_t> *keyboard_released() const {
+    return GetPointer<const ::flatbuffers::Vector<uint8_t> *>(VT_KEYBOARD_RELEASED);
+  }
+  const ::flatbuffers::Vector<uint8_t> *mouse_pressed() const {
+    return GetPointer<const ::flatbuffers::Vector<uint8_t> *>(VT_MOUSE_PRESSED);
+  }
+  const ::flatbuffers::Vector<uint8_t> *mouse_released() const {
+    return GetPointer<const ::flatbuffers::Vector<uint8_t> *>(VT_MOUSE_RELEASED);
+  }
+  steamrot::ActionNames action_name() const {
+    return static_cast<steamrot::ActionNames>(GetField<uint64_t>(VT_ACTION_NAME, 0));
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_PARTS) &&
-           verifier.VerifyVector(parts()) &&
-           verifier.VerifyVectorOfTables(parts()) &&
-           VerifyOffset(verifier, VT_NAME) &&
-           verifier.VerifyString(name()) &&
+           VerifyOffset(verifier, VT_KEYBOARD_PRESSED) &&
+           verifier.VerifyVector(keyboard_pressed()) &&
+           VerifyOffset(verifier, VT_KEYBOARD_RELEASED) &&
+           verifier.VerifyVector(keyboard_released()) &&
+           VerifyOffset(verifier, VT_MOUSE_PRESSED) &&
+           verifier.VerifyVector(mouse_pressed()) &&
+           VerifyOffset(verifier, VT_MOUSE_RELEASED) &&
+           verifier.VerifyVector(mouse_released()) &&
+           VerifyField<uint64_t>(verifier, VT_ACTION_NAME, 8) &&
            verifier.EndTable();
   }
 };
@@ -314,11 +235,20 @@ struct ActionBuilder {
   typedef Action Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_parts(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::ActionPart>>> parts) {
-    fbb_.AddOffset(Action::VT_PARTS, parts);
+  void add_keyboard_pressed(::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> keyboard_pressed) {
+    fbb_.AddOffset(Action::VT_KEYBOARD_PRESSED, keyboard_pressed);
   }
-  void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
-    fbb_.AddOffset(Action::VT_NAME, name);
+  void add_keyboard_released(::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> keyboard_released) {
+    fbb_.AddOffset(Action::VT_KEYBOARD_RELEASED, keyboard_released);
+  }
+  void add_mouse_pressed(::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> mouse_pressed) {
+    fbb_.AddOffset(Action::VT_MOUSE_PRESSED, mouse_pressed);
+  }
+  void add_mouse_released(::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> mouse_released) {
+    fbb_.AddOffset(Action::VT_MOUSE_RELEASED, mouse_released);
+  }
+  void add_action_name(steamrot::ActionNames action_name) {
+    fbb_.AddElement<uint64_t>(Action::VT_ACTION_NAME, static_cast<uint64_t>(action_name), 0);
   }
   explicit ActionBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -333,24 +263,38 @@ struct ActionBuilder {
 
 inline ::flatbuffers::Offset<Action> CreateAction(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::ActionPart>>> parts = 0,
-    ::flatbuffers::Offset<::flatbuffers::String> name = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> keyboard_pressed = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> keyboard_released = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> mouse_pressed = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> mouse_released = 0,
+    steamrot::ActionNames action_name = static_cast<steamrot::ActionNames>(0)) {
   ActionBuilder builder_(_fbb);
-  builder_.add_name(name);
-  builder_.add_parts(parts);
+  builder_.add_action_name(action_name);
+  builder_.add_mouse_released(mouse_released);
+  builder_.add_mouse_pressed(mouse_pressed);
+  builder_.add_keyboard_released(keyboard_released);
+  builder_.add_keyboard_pressed(keyboard_pressed);
   return builder_.Finish();
 }
 
 inline ::flatbuffers::Offset<Action> CreateActionDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<steamrot::ActionPart>> *parts = nullptr,
-    const char *name = nullptr) {
-  auto parts__ = parts ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::ActionPart>>(*parts) : 0;
-  auto name__ = name ? _fbb.CreateString(name) : 0;
+    const std::vector<uint8_t> *keyboard_pressed = nullptr,
+    const std::vector<uint8_t> *keyboard_released = nullptr,
+    const std::vector<uint8_t> *mouse_pressed = nullptr,
+    const std::vector<uint8_t> *mouse_released = nullptr,
+    steamrot::ActionNames action_name = static_cast<steamrot::ActionNames>(0)) {
+  auto keyboard_pressed__ = keyboard_pressed ? _fbb.CreateVector<uint8_t>(*keyboard_pressed) : 0;
+  auto keyboard_released__ = keyboard_released ? _fbb.CreateVector<uint8_t>(*keyboard_released) : 0;
+  auto mouse_pressed__ = mouse_pressed ? _fbb.CreateVector<uint8_t>(*mouse_pressed) : 0;
+  auto mouse_released__ = mouse_released ? _fbb.CreateVector<uint8_t>(*mouse_released) : 0;
   return steamrot::CreateAction(
       _fbb,
-      parts__,
-      name__);
+      keyboard_pressed__,
+      keyboard_released__,
+      mouse_pressed__,
+      mouse_released__,
+      action_name);
 }
 
 struct ActionsData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -403,35 +347,6 @@ inline ::flatbuffers::Offset<ActionsData> CreateActionsDataDirect(
   return steamrot::CreateActionsData(
       _fbb,
       actions__);
-}
-
-inline bool VerifyInput(::flatbuffers::Verifier &verifier, const void *obj, Input type) {
-  switch (type) {
-    case Input_NONE: {
-      return true;
-    }
-    case Input_Key: {
-      auto ptr = reinterpret_cast<const steamrot::Key *>(obj);
-      return verifier.VerifyTable(ptr);
-    }
-    case Input_MouseButton: {
-      auto ptr = reinterpret_cast<const steamrot::MouseButton *>(obj);
-      return verifier.VerifyTable(ptr);
-    }
-    default: return true;
-  }
-}
-
-inline bool VerifyInputVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types) {
-  if (!values || !types) return !values && !types;
-  if (values->size() != types->size()) return false;
-  for (::flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
-    if (!VerifyInput(
-        verifier,  values->Get(i), types->GetEnum<Input>(i))) {
-      return false;
-    }
-  }
-  return true;
 }
 
 inline const steamrot::ActionsData *GetActionsData(const void *buf) {

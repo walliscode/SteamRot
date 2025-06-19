@@ -1,33 +1,53 @@
 namespace steamrot;
 
-// enum describing the type of input
-enum InputType: ubyte {
-    Keyboard = 0,
-    Mouse = 1
+enum KeyboardInput : ubyte {
+    A = 0,
+    B = 1,
+    C = 2,
+    D = 3,
+    E = 4,
+    F = 5,
+    G = 6,
+    H = 7,
+    I = 8,
+    J = 9,
+    K = 10,
+    L = 11,
+    M = 12,
+    N = 13,
+    O = 14,
+    P = 15,
+    Q = 16,
+    R = 17,
+    S = 18,
+    T = 19,
+    U = 20,
+    V = 21,
+    W = 22,
+    X = 23,
+    Y = 24,
+    Z = 25
+}
+enum MouseInput: ubyte {
+    LEFT_CLICK = 0,
+    RIGHT_CLICK = 1,
+    MIDDLE_CLICK = 2,
+    SCROLL_UP = 3,
+    SCROLL_DOWN = 4,
   }
 
-table Key {
-    name: string; 
+enum ActionNames: ulong (bit_flags) {
+  ACTION_NONE = 0,
+  ACTION_CHANGE_SCENE = 1,
   }
 
-table MouseButton{
-    name: string; 
-  }
-// the input can either be a keyboard input or a mouse input
-union Input {
-  Key,
-  MouseButton
-  }
-
-table ActionPart{
-        type: InputType;
-    input: Input;
-
-  }
-// an action is componsed of 1 or more inputs 
+// an action is composed of 1 or more inputs 
 table Action{
-  parts: [ActionPart];
-  name: string;
+  keyboard_pressed: [KeyboardInput];
+  keyboard_released: [KeyboardInput];
+  mouse_pressed: [MouseInput];
+  mouse_released: [MouseInput];
+  action_name: ActionNames;
   }
 
   // all actions for this scene or display manager

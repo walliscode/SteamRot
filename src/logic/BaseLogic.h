@@ -5,6 +5,7 @@
  */
 #pragma once
 
+#include "ActionManager.h"
 #include "ArchetypeManager.h"
 #include "AssetManager.h"
 #include "containers.h"
@@ -50,6 +51,11 @@ struct LogicContext {
   /// @brief Reference to the AssetManager for the game.
   /////////////////////////////////////////////////
   const AssetManager &asset_manager;
+
+  /////////////////////////////////////////////////
+  /// @brief Reference to the Scene level instance of the ActionManager.
+  /////////////////////////////////////////////////
+  ActionManager &action_manager;
 };
 
 /**
