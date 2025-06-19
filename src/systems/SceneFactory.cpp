@@ -12,7 +12,8 @@
 
 namespace steamrot {
 ////////////////////////////////////////////////////////////
-SceneFactory::SceneFactory() : m_data_manager() {}
+SceneFactory::SceneFactory(const GameContext game_context)
+    : m_game_context(game_context) {}
 
 ////////////////////////////////////////////////////////////
 const uuids::uuid SceneFactory::CreateUUID() {
@@ -30,24 +31,22 @@ const uuids::uuid SceneFactory::CreateUUID() {
   return id;
 }
 ////////////////////////////////////////////////////////////
-std::unique_ptr<Scene>
-SceneFactory::CreateScene(const SceneType &scene_type,
-                          const AssetManager &asset_manager,
-                          sf::RenderWindow &window) {
+std::unique_ptr<Scene> SceneFactory::CreateScene(const SceneType &scene_type) {
 
   // generate UUID for the scene
   uuids::uuid scene_uuid = CreateUUID();
   std::cout << "Creating scene with UUID: " << scene_uuid << std::endl;
 
   // load scene data
-  const SceneData *scene_data = m_data_manager.ProvideSceneData(scene_type);
+  const SceneData *scene_data =
+      m_game_context.data_manager.ProvideSceneData(scene_type);
 
   switch (scene_type) {
 
     // TitleScene
   case SceneType::title:
     std::cout << "Title scene type detected." << std::endl;
-    return CreateTitleScene(scene_data, scene_uuid, asset_manager, window);
+    return CreateTitleScene(scene_data, scene_uuid);
 
   default:
     // not sure how it would be possible to get here, maybe some kind of cast
@@ -56,13 +55,14 @@ SceneFactory::CreateScene(const SceneType &scene_type,
   }
 }
 ////////////////////////////////////////////////////////////
-std::unique_ptr<TitleScene> SceneFactory::CreateTitleScene(
-    const SceneData *scene_data, const uuids::uuid &scene_uuid,
-    const AssetManager &asset_manager, sf::RenderWindow &window) {
+std::unique_ptr<TitleScene>
+SceneFactory::CreateTitleScene(const SceneData *scene_data,
+                               const uuids::uuid &scene_uuid) {
+
   // create a new title scene object, we are creating a raw pointer here due to
   // TitleScene having a private constuctor
   std::unique_ptr<TitleScene> title_scene(
-      new TitleScene(100, scene_data, scene_uuid, asset_manager, window));
+      new TitleScene(100, scene_data, scene_uuid, m_game_context));
   std::cout << "Created TitleScene with UUID: " << scene_uuid << std::endl;
   return title_scene;
 }

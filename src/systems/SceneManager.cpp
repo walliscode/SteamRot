@@ -1,11 +1,3 @@
-/**
- * @file SceneManager.cpp
- * @brief Implements the SceneManager class and scene management functions.
- */
-
-/**
- * ======================= Headers =======================
- */
 #include "SceneManager.h"
 #include "SceneType.h"
 #include "uuid.h"
@@ -14,35 +6,18 @@
 
 namespace steamrot {
 
-/**
- * ======================= Constructor =======================
- */
+/////////////////////////////////////////////////
+SceneManager::SceneManager(const GameContext game_contest)
+    : m_scene_factory(game_contest), m_scenes(), m_game_context(game_contest) {}
 
-/**
- * -------------------------------------------------------
- */
-SceneManager::SceneManager(AssetManager &asset_manager,
-                           sf::RenderWindow &window)
-    : m_scene_factory(), m_scenes(), m_asset_manager(asset_manager),
-      m_data_manager(), m_window(window) {}
-
-/**
- * ======================= Public Methods =======================
- */
-
-/**
- * -------------------------------------------------------
- */
+/////////////////////////////////////////////////
 void SceneManager::StartUp() {}
 
-/**
- * -------------------------------------------------------
- */
+/////////////////////////////////////////////////
 void SceneManager::AddSceneFromDefault(const SceneType &scene_type,
                                        const size_t pool_size) {
 
-  std::unique_ptr<Scene> new_scene =
-      m_scene_factory.CreateScene(scene_type, m_asset_manager, m_window);
+  std::unique_ptr<Scene> new_scene = m_scene_factory.CreateScene(scene_type);
   std::cout << "Created new scene of type: "
             << magic_enum::enum_name(scene_type) << std::endl;
   // add to m_scenes maps
@@ -50,14 +25,12 @@ void SceneManager::AddSceneFromDefault(const SceneType &scene_type,
   std::cout << "Added scene to m_scenes map." << std::endl;
 
   // load default scene assets
-  m_asset_manager.LoadSceneAssets(scene_type);
+  m_game_context.asset_manager.LoadSceneAssets(scene_type);
   std::cout << "Loaded default assets for scene type: "
             << magic_enum::enum_name(scene_type) << std::endl;
 };
 
-/**
- * -------------------------------------------------------
- */
+/////////////////////////////////////////////////
 uuids::uuid SceneManager::LoadTitleScene() {
   // clear existing scenes
   m_scenes.clear();
@@ -94,7 +67,8 @@ TexturesPackage SceneManager::ProvideTexturesPackage() {
  */
 void SceneManager::UpdateScenes() {
   // Loop through all the scenes and update them
-  // updating does not mean rendering, it means updating the state of the scene
+  // updating does not mean rendering, it means updating the state of the
+  // scene
   for (auto &pair : m_scenes) {
     auto &scene = pair.second;
     scene->sMovement();

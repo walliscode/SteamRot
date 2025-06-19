@@ -4,9 +4,8 @@
 
 namespace steamrot {
 TitleScene::TitleScene(const size_t pool_size, const SceneData *scene_data,
-                       const uuids::uuid &id, const AssetManager &asset_manager,
-                       sf::RenderWindow &window)
-    : Scene(pool_size, scene_data, id, asset_manager, window) {
+                       const uuids::uuid &id, const GameContext game_context)
+    : Scene(pool_size, scene_data, id, game_context) {
   std::cout << "TitleScene constructor called with ID: " << id << std::endl;
   // Initialization code specific to TitleScreen can go here
 }

@@ -10,13 +10,11 @@
 #include "DataManager.h"
 #include "DisplayManager.h"
 #include "EventHandler.h"
-
 #include "SceneManager.h"
 #include <SFML/Graphics.hpp>
 
 #include <memory>
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
 namespace steamrot {
 /////////////////////////////////////////////////
@@ -99,6 +97,10 @@ private:
   /// Title Scene loading
   /////////////////////////////////////////////////
   void ShowTitleScene();
+
+  sf::Vector2i m_mouse_position;
+
+  void UpdateLocalMousePosition();
 
 public:
   ////////////////////////////////////////////////////////////

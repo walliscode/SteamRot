@@ -6,7 +6,7 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include "DataManager.h"
+#include "GameContext.h"
 #include "Scene.h"
 #include "SceneType.h"
 #include "TitleScene.h"
@@ -19,13 +19,7 @@ namespace steamrot {
 
 class SceneFactory {
 private:
-  ////////////////////////////////////////////////////////////
-  /// \brief instance of DataManager, keep this here as long as DataManager is
-  /// stateless
-  ///
-  ////////////////////////////////////////////////////////////
-  DataManager m_data_manager;
-
+  const GameContext m_game_context;
   /**
    * @brief Creates a TitleScreen object with provided values
    *
@@ -33,9 +27,8 @@ private:
    * e.t.c.
    * @param id A uniue ID generated and provided by the SceneFactory
    */
-  std::unique_ptr<TitleScene>
-  CreateTitleScene(const SceneData *scene_data, const uuids::uuid &id,
-                   const AssetManager &asset_manager, sf::RenderWindow &window);
+  std::unique_ptr<TitleScene> CreateTitleScene(const SceneData *scene_data,
+                                               const uuids::uuid &id);
 
   ////////////////////////////////////////////////////////////
   /// \brief create a uuid if none is in provided json data
@@ -48,14 +41,12 @@ public:
   /// \brief Default constructor
   ///
   ////////////////////////////////////////////////////////////
-  SceneFactory();
-  ;
+  SceneFactory(const GameContext game_context);
+
   ////////////////////////////////////////////////////////////
   /// \brief gathers all scene creation methods
   ///
   ////////////////////////////////////////////////////////////
-  std::unique_ptr<Scene> CreateScene(const SceneType &scene_type,
-                                     const AssetManager &asset_manager,
-                                     sf::RenderWindow &window);
+  std::unique_ptr<Scene> CreateScene(const SceneType &scene_type);
 };
 } // namespace steamrot

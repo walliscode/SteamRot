@@ -8,8 +8,8 @@
 ////////////////////////////////////////////////////////////
 #include "ActionManager.h"
 #include "BaseLogic.h"
-#include "DataManager.h"
 #include "EntityManager.h"
+#include "GameContext.h"
 #include "LogicFactory.h"
 #include "global_constants.h"
 #include "logics_generated.h"
@@ -40,36 +40,30 @@ protected:
   ActionManager m_action_manager;
 
   /////////////////////////////////////////////////
-  /// @brief Reference to the AssetManager instance on the GameEngine
+  /// @brief Instance of LogicFactory class. Create Logic objects for Scene to
+  /// store.
   /////////////////////////////////////////////////
-  const AssetManager &m_asset_manager;
-  /**
-   * @brief Instace of LogicFactory used to provide logic for the Scene
-   */
   LogicFactory m_logic_factory;
 
-  /**
-   * @brief DataManager for providing data to the Scene.
-   */
-  DataManager m_data_manager;
-  /**
-   * @brief Map containing all the logic types relevant to the Scene.
-   */
+  /////////////////////////////////////////////////
+  /// @brief GameContext object passed down from the GameEngine.
+  /////////////////////////////////////////////////
+  const GameContext m_game_context;
+
+  /////////////////////////////////////////////////
+  /// @brief Map of all logic objects needed by the Scene.
+  /////////////////////////////////////////////////
   std::unordered_map<LogicType, std::vector<std::unique_ptr<BaseLogic>>>
       m_logics;
+
   ////////////////////////////////////////////////////////////
   // Member: unique id generated for each Scene instance
   ////////////////////////////////////////////////////////////
   uuids::uuid m_id;
 
   /////////////////////////////////////////////////
-  /// @brief Reference to the Game window.
+  /// @brief RenderTexture for the Scene instance.
   /////////////////////////////////////////////////
-  sf::RenderWindow &m_window;
-
-  /**
-   * @brief Member that contains the RenderTexture for the Scene.
-   */
   sf::RenderTexture m_render_texture{kWindowSize};
 
   bool m_paused = false;
@@ -86,8 +80,7 @@ protected:
    * @param id Unique identifier for the Scene
    */
   Scene(const size_t &pool_size, const SceneData *scene_data,
-        const uuids::uuid &id, const AssetManager &asset_manager,
-        sf::RenderWindow &window);
+        const uuids::uuid &id, const GameContext game_context);
 
 public:
   /**
@@ -131,12 +124,5 @@ public:
   ////////////////////////////////////////////////////////////
   const uuids::uuid GetSceneID();
 };
-
-////////////////////////////////////////////////////////////
-/// \brief to_json function for the Scene class (functionality from
-/// nlohmann::json)
-///
-////////////////////////////////////////////////////////////
-void to_json(nlohmann::json &j, const Scene &scene);
 
 } // namespace steamrot

@@ -14,8 +14,9 @@
 #include <bitset>
 #include <unordered_map>
 
-using UserEvents = std::unordered_map<
-    std::string, std::bitset<sf::Keyboard::KeyCount + sf::Mouse::ButtonCount>>;
+using EventBitset =
+    std::bitset<sf::Keyboard::KeyCount + sf::Mouse::ButtonCount>;
+using UserEvents = std::unordered_map<std::string, EventBitset>;
 namespace steamrot {
 
 class EventHandler {
@@ -30,6 +31,9 @@ private:
   // |brief process mouse events: pressed and released
   ////////////////////////////////////////////////////////////
   void HandleMouseEvents(const sf::Event &event, UserEvents &events);
+
+  EventBitset m_pressed_events;
+  EventBitset m_released_events;
 
 public:
   ////////////////////////////////////////////////////////////
@@ -47,5 +51,9 @@ public:
   // not
   ////////////////////////////////////////////////////////////
   bool m_close_window{false};
+
+  const EventBitset &GetPressedEvents() const;
+
+  const EventBitset &GetReleasedEvents() const;
 };
 } // namespace steamrot

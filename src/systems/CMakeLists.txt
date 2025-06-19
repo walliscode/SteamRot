@@ -48,4 +48,5 @@ steamrot_directory_paths
 utilities
 logger
 stduuid
+context
 logic)

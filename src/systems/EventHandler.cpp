@@ -12,10 +12,10 @@ UserEvents EventHandler::HandleEvents(sf::RenderWindow &window) {
   UserEvents event_bitsets;
 
   // create a bitset for pressed events and add to the map
-  std::bitset<sf::Keyboard::KeyCount + sf::Mouse::ButtonCount> pressed_events;
+  EventBitset pressed_events;
   event_bitsets["pressed"] = pressed_events;
   // create a bitset for released events and add to the map
-  std::bitset<sf::Keyboard::KeyCount + sf::Mouse::ButtonCount> released_events;
+  EventBitset released_events;
   event_bitsets["released"] = released_events;
 
   // poll events from the window
@@ -85,5 +85,15 @@ void EventHandler::HandleMouseEvents(const sf::Event &event,
     released_bitset.set(static_cast<size_t>(mouseButtonReleased->button) +
                         static_cast<size_t>(sf::Keyboard::KeyCount));
   }
+}
+
+/////////////////////////////////////////////////
+const EventBitset &EventHandler::GetPressedEvents() const {
+  return m_pressed_events;
+}
+
+/////////////////////////////////////////////////
+const EventBitset &EventHandler::GetReleasedEvents() const {
+  return m_released_events;
 }
 } // namespace steamrot
