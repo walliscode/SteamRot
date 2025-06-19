@@ -28,13 +28,9 @@ GameEngine::GameEngine()
 
   // create the GameContext object and pass by value so that it does not have to
   // stay alive
-  GameContext game_context{m_window,
-                           m_event_handler.GetPressedEvents(),
-                           m_event_handler.GetReleasedEvents(),
-                           m_mouse_position,
-                           m_loop_number,
-                           m_asset_manager,
-                           m_data_manager};
+  GameContext game_context{m_window,         m_event_handler.GetEvents(),
+                           m_mouse_position, m_loop_number,
+                           m_asset_manager,  m_data_manager};
 
   // initialise all objects that need the GameContext
   m_scene_manager = std::make_unique<SceneManager>(game_context);
@@ -68,14 +64,13 @@ void GameEngine::StartUp() {
 void GameEngine::RunGameLoop() {
 
   // Run the program as long as the window is open
-  while (m_display_manager.GetWindow().isOpen()) {
+  while (m_window.isOpen()) {
 
-    // // handle loop number increase at beginning of loop
-    // m_loop_number++;
-    //
+    // handle loop number increase at beginning of loop
+    m_loop_number++;
+
     // Handle events and return map of user events
-    UserEvents user_events =
-        m_event_handler.HandleEvents(m_display_manager.GetWindow());
+    m_event_handler.HandleEvents(m_window);
 
     // Handle all system updates
     UpdateSystems();

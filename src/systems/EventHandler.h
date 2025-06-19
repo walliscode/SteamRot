@@ -12,14 +12,12 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <bitset>
-#include <unordered_map>
 
 // double of each needed for pressed and released events
 using EventBitset =
     std::bitset<sf::Keyboard::KeyCount + sf::Keyboard::KeyCount +
                 sf::Mouse::ButtonCount + sf::Mouse::ButtonCount>;
 
-using UserEvents = std::unordered_map<std::string, EventBitset>;
 namespace steamrot {
 
 class EventHandler {
@@ -28,15 +26,14 @@ private:
   ////////////////////////////////////////////////////////////
   // |brief process keyboard events: pressed and released
   ////////////////////////////////////////////////////////////
-  void HandleKeyboardEvents(const sf::Event &event, UserEvents &events);
+  void HandleKeyboardEvents(const sf::Event &event);
 
   ////////////////////////////////////////////////////////////
   // |brief process mouse events: pressed and released
   ////////////////////////////////////////////////////////////
-  void HandleMouseEvents(const sf::Event &event, UserEvents &events);
+  void HandleMouseEvents(const sf::Event &event);
 
-  EventBitset m_pressed_events;
-  EventBitset m_released_events;
+  EventBitset m_events;
 
 public:
   ////////////////////////////////////////////////////////////
@@ -47,7 +44,7 @@ public:
   ////////////////////////////////////////////////////////////
   // |brief process events from the window
   ////////////////////////////////////////////////////////////
-  UserEvents HandleEvents(sf::RenderWindow &window);
+  void HandleEvents(sf::RenderWindow &window);
 
   ////////////////////////////////////////////////////////////
   // |member: bool queried by GameEngine about whether to close the window or
@@ -55,8 +52,6 @@ public:
   ////////////////////////////////////////////////////////////
   bool m_close_window{false};
 
-  const EventBitset &GetPressedEvents() const;
-
-  const EventBitset &GetReleasedEvents() const;
+  const EventBitset &GetEvents() const;
 };
 } // namespace steamrot
