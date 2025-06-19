@@ -124,6 +124,19 @@ void GameEngine::ShowTitleScene() {
   std::cout << "Title scene tiles loaded" << std::endl;
 }
 
+/////////////////////////////////////////////////
+GameContext GameEngine::CreateGameContext() {
+  // create a GameContext object that contains all the necessary references
+  GameContext game_context{m_window,
+                           m_event_handler.GetPressedEvents(),
+                           m_event_handler.GetReleasedEvents(),
+                           m_mouse_position,
+                           m_loop_number,
+                           m_asset_manager,
+                           m_data_manager};
+  return game_context;
+}
+
 ////////////////////////////////////////////////////////////
 void GameEngine::ShutDown() {}
 
