@@ -77,10 +77,12 @@ UIElement CUserInterface::UIElementFactory(const UIElementData &element) {
   if (element.size()) {
     ui_element.size = sf::Vector2f(element.size()->x(), element.size()->y());
   }
-  std::cout << "Configued general UIElement properotes" << std::endl;
+  if (element.action()) {
+    ui_element.action = element.action();
+  }
 
-  std::cout << "Element type: " << static_cast<int>(element.type())
-            << std::endl;
+  std::cout << "Configued general UIElement properties" << std::endl;
+
   // Configure the UIElement based on its type
   switch (element.type()) {
 

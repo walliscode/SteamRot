@@ -28,7 +28,8 @@
                 "element_type": "ButtonData",
                 "element": {
                   "label": "Quit Game"
-                }
+                },
+                "action": "M_QUIT_GAME"
               }
             ],
             "position": {

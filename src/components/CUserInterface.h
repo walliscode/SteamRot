@@ -8,6 +8,8 @@
 // headers
 ////////////////////////////////////////////////////////////
 #include "Component.h"
+#include "EventHandler.h"
+#include "actions_generated.h"
 #include "user_interface_generated.h"
 
 #include <SFML/System/Vector2.hpp>
@@ -63,6 +65,20 @@ struct UIElement {
   /// @brief Helper variable to check if the mouse is over a child element
   /////////////////////////////////////////////////
   bool mouse_over_child{false};
+
+  /////////////////////////////////////////////////
+  /// @brief Trigger event for the UI element
+  ///
+  /// This is designed to be used in conjuction with the ActionNames. If
+  /// trigger_event is true then signal the action
+  /////////////////////////////////////////////////
+  EventBitset trigger_event{0};
+
+  /////////////////////////////////////////////////
+  /// @brief Action that should be performed when the UI Element is interacted
+  /// with
+  /////////////////////////////////////////////////
+  ActionNames action{0};
 };
 
 struct CUserInterface : public Component {

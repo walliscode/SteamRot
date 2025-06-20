@@ -13,6 +13,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
+#include "actions_generated.h"
 #include "types_generated.h"
 
 namespace steamrot {
@@ -236,7 +237,8 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_POSITION = 10,
     VT_SIZE = 12,
     VT_ELEMENT_TYPE = 14,
-    VT_ELEMENT = 16
+    VT_ELEMENT = 16,
+    VT_ACTION = 18
   };
   steamrot::UIElementType type() const {
     return static_cast<steamrot::UIElementType>(GetField<int8_t>(VT_TYPE, 0));
@@ -266,6 +268,9 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::ButtonData *element_as_ButtonData() const {
     return element_type() == steamrot::UIElementDataUnion_ButtonData ? static_cast<const steamrot::ButtonData *>(element()) : nullptr;
   }
+  steamrot::ActionNames action() const {
+    return static_cast<steamrot::ActionNames>(GetField<uint64_t>(VT_ACTION, 0));
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int8_t>(verifier, VT_TYPE, 1) &&
@@ -280,6 +285,7 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_ELEMENT_TYPE, 1) &&
            VerifyOffsetRequired(verifier, VT_ELEMENT) &&
            VerifyUIElementDataUnion(verifier, element(), element_type()) &&
+           VerifyField<uint64_t>(verifier, VT_ACTION, 8) &&
            verifier.EndTable();
   }
 };
@@ -317,6 +323,9 @@ struct UIElementDataBuilder {
   void add_element(::flatbuffers::Offset<void> element) {
     fbb_.AddOffset(UIElementData::VT_ELEMENT, element);
   }
+  void add_action(steamrot::ActionNames action) {
+    fbb_.AddElement<uint64_t>(UIElementData::VT_ACTION, static_cast<uint64_t>(action), 0);
+  }
   explicit UIElementDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -337,8 +346,10 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementData(
     ::flatbuffers::Offset<Vector2f> position = 0,
     ::flatbuffers::Offset<Vector2f> size = 0,
     steamrot::UIElementDataUnion element_type = steamrot::UIElementDataUnion_NONE,
-    ::flatbuffers::Offset<void> element = 0) {
+    ::flatbuffers::Offset<void> element = 0,
+    steamrot::ActionNames action = static_cast<steamrot::ActionNames>(0)) {
   UIElementDataBuilder builder_(_fbb);
+  builder_.add_action(action);
   builder_.add_element(element);
   builder_.add_size(size);
   builder_.add_position(position);
@@ -357,7 +368,8 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
     ::flatbuffers::Offset<Vector2f> position = 0,
     ::flatbuffers::Offset<Vector2f> size = 0,
     steamrot::UIElementDataUnion element_type = steamrot::UIElementDataUnion_NONE,
-    ::flatbuffers::Offset<void> element = 0) {
+    ::flatbuffers::Offset<void> element = 0,
+    steamrot::ActionNames action = static_cast<steamrot::ActionNames>(0)) {
   auto children__ = children ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::UIElementData>>(*children) : 0;
   return steamrot::CreateUIElementData(
       _fbb,
@@ -367,7 +379,8 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
       position,
       size,
       element_type,
-      element);
+      element,
+      action);
 }
 
 struct UserInterface FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {

@@ -33,7 +33,7 @@ Scene::Scene(const size_t &pool_size, const SceneData *scene_data,
         m_game_context.game_window,
         ui_objects,
         m_game_context.asset_manager,
-        m_action_manager};
+        m_game_context.user_events};
 
     m_logics = m_logic_factory.CreateLogicMap(*scene_data->logic_collection(),
                                               logic_context);
