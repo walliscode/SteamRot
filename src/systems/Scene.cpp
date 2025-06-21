@@ -54,4 +54,27 @@ void Scene::SetActive(bool active) { m_active = active; }
 ////////////////////////////////////////////////////////////
 const uuids::uuid Scene::GetSceneID() { return m_id; }
 
+/////////////////////////////////////////////////
+const ActionNames Scene::ScrapeLogicForActions() const {
+  ActionNames action{0};
+
+  // get the first vector of logics from the map
+  for (const auto &logic_pair : m_logics) {
+    const auto &logic = logic_pair.second;
+
+    // see if any of the logic instances have an action. if so return early
+    for (const auto &logic_instance : logic) {
+
+      ActionNames logic_action = logic_instance->GetLogicAction();
+
+      // 0 should be registered as no action
+      if (logic_action != 0) {
+        action = logic_action;
+        return action; // early return if any logic has an action
+      }
+    }
+  }
+  return action;
+}
+
 } // namespace steamrot

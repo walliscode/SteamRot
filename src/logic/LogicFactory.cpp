@@ -49,10 +49,11 @@ LogicFactory::CreateLogicMap(const LogicCollection &logic_collection,
       break;
     }
 
-    // Event Logic
-    case LogicType::LogicType_Event: {
+      // Event Logic
+    case LogicType::LogicType_Action: {
       std::cout << "Creating Event logics." << std::endl;
-      logic_map[LogicType::LogicType_Event] = CreateEventLogics(logic_context);
+      logic_map[LogicType::LogicType_Action] =
+          CreateActionLogics(logic_context);
       std::cout << "Event logics created." << std::endl;
       break;
     }
@@ -98,7 +99,7 @@ LogicFactory::CreateCollisionLogics(const LogicContext logic_context) {
 
 /////////////////////////////////////////////////
 std::vector<std::unique_ptr<BaseLogic>>
-LogicFactory::CreateEventLogics(const LogicContext logic_context) {
+LogicFactory::CreateActionLogics(const LogicContext logic_context) {
 
   // Create a vector of unique pointers to BaseLogic for events
   std::vector<std::unique_ptr<BaseLogic>> event_logics;

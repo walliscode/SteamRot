@@ -7,7 +7,6 @@
 
 #include "ArchetypeManager.h"
 #include "AssetManager.h"
-#include "EventHandler.h"
 #include "containers.h"
 #include "themes_generated.h"
 #include <SFML/Graphics/RenderTexture.hpp>

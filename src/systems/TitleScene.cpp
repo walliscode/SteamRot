@@ -1,4 +1,5 @@
 #include "TitleScene.h"
+#include "actions_generated.h"
 #include "logics_generated.h"
 #include <iostream>
 
@@ -31,8 +32,20 @@ void TitleScene::sCollision() {
 
 void TitleScene::sAction() {
   // process action logic
-  for (auto &action_logic : m_logics[LogicType::LogicType_Event]) {
+  for (auto &action_logic : m_logics[LogicType::LogicType_Action]) {
     action_logic->RunLogic();
+  }
+  // process actions after all action logic has been run
+  ProcessActions();
+}
+
+void TitleScene::ProcessActions() {
+  // process actions
+  ActionNames action = ScrapeLogicForActions();
+
+  if (action == ActionNames_ACTION_QUIT_GAME) {
+    std::cout << "Quitting game from TitleScene." << std::endl;
+    m_game_context.game_window.close();
   }
 }
 } // namespace steamrot

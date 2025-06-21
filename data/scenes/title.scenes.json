@@ -54,7 +54,7 @@
     "types": [
       "Render",
       "Collision",
-      "Event"
+      "Action"
     ]
   },
   "ui_theme": "default",

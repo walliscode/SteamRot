@@ -11,6 +11,7 @@
 #include "EntityManager.h"
 #include "GameContext.h"
 #include "LogicFactory.h"
+#include "actions_generated.h"
 #include "global_constants.h"
 #include "logics_generated.h"
 #include "scenes_generated.h"
@@ -66,11 +67,20 @@ protected:
   /////////////////////////////////////////////////
   sf::RenderTexture m_render_texture{kWindowSize};
 
+  /////////////////////////////////////////////////
+  /// @brief Is the Scene paused? Should not update logic or render texture
+  /////////////////////////////////////////////////
   bool m_paused = false;
+
+  /////////////////////////////////////////////////
+  /// @brief Is the Scene active? Should update logic and render texture
+  /////////////////////////////////////////////////
   bool m_active = true;
 
+  /////////////////////////////////////////////////
+  /// @brief Is the Scene interactable? Should allow user input
+  /////////////////////////////////////////////////
   bool m_interactable = false;
-  size_t m_current_frame = 0;
 
   /**
    * @brief Scene constructor that initilizes the Scene with  flatbuffers data
@@ -81,6 +91,21 @@ protected:
    */
   Scene(const size_t &pool_size, const SceneData *scene_data,
         const uuids::uuid &id, const GameContext game_context);
+
+  /////////////////////////////////////////////////
+  /// @brief Finds if any the of the Logics have Actions to process
+  ///
+  /// This is on a first come first serve basis, so Logic order is important
+  /// here.
+  /// @return Returns an ActionNames enums containing the action to process.
+  /////////////////////////////////////////////////
+  const ActionNames ScrapeLogicForActions() const;
+
+  /////////////////////////////////////////////////
+  /// @brief This function defines actions for the Scene to take. Should call
+  /// ScrapeLogicForActions()
+  /////////////////////////////////////////////////
+  virtual void ProcessActions() = 0;
 
 public:
   /**

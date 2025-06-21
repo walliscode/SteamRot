@@ -22,9 +22,9 @@ enum LogicType : uint8_t {
   LogicType_None = 0,
   LogicType_Render = 1,
   LogicType_Collision = 2,
-  LogicType_Event = 3,
+  LogicType_Action = 3,
   LogicType_MIN = LogicType_None,
-  LogicType_MAX = LogicType_Event
+  LogicType_MAX = LogicType_Action
 };
 
 inline const LogicType (&EnumValuesLogicType())[4] {
@@ -32,7 +32,7 @@ inline const LogicType (&EnumValuesLogicType())[4] {
     LogicType_None,
     LogicType_Render,
     LogicType_Collision,
-    LogicType_Event
+    LogicType_Action
   };
   return values;
 }
@@ -42,14 +42,14 @@ inline const char * const *EnumNamesLogicType() {
     "None",
     "Render",
     "Collision",
-    "Event",
+    "Action",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameLogicType(LogicType e) {
-  if (::flatbuffers::IsOutRange(e, LogicType_None, LogicType_Event)) return "";
+  if (::flatbuffers::IsOutRange(e, LogicType_None, LogicType_Action)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesLogicType()[index];
 }
