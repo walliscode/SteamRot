@@ -16,8 +16,6 @@
 #include <nlohmann/json.hpp>
 #include <unordered_map>
 
-using json = nlohmann::json;
-
 namespace steamrot {
 
 /**

@@ -8,7 +8,7 @@
 #include "Logic.h"
 namespace steamrot {
 
-class UIEventLogic : public Logic<CUserInterface> {
+class UIActionLogic : public Logic<CUserInterface> {
 
 private:
   /////////////////////////////////////////////////
@@ -36,6 +36,6 @@ public:
   /// @param logic_context LogicContext object containing the context for the
   /// logic.
   /////////////////////////////////////////////////
-  UIEventLogic(const LogicContext logic_context);
+  UIActionLogic(const LogicContext logic_context);
 };
 } // namespace steamrot

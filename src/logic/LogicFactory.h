@@ -30,6 +30,9 @@ private:
   std::vector<std::unique_ptr<BaseLogic>>
   CreateRenderLogics(const LogicContext logic_context);
 
+  std::vector<std::unique_ptr<BaseLogic>>
+  CreateEventLogics(const LogicContext logic_context);
+
 public:
   /**
    * @brief Default constructor

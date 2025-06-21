@@ -3,11 +3,11 @@
 ////////////////////////////////////////////////////////////
 #include "CUserInterface.h"
 #include "containers.h"
+#include "event_helpers.h"
 #include "log_handler.h"
 #include "spdlog/common.h"
 #include "user_interface_generated.h"
 #include <iostream>
-
 namespace steamrot {
 ////////////////////////////////////////////////////////////
 const std::string &CUserInterface::Name() {
@@ -77,8 +77,14 @@ UIElement CUserInterface::UIElementFactory(const UIElementData &element) {
   if (element.size()) {
     ui_element.size = sf::Vector2f(element.size()->x(), element.size()->y());
   }
+
   if (element.action()) {
-    ui_element.action = element.action();
+    ui_element.action = element.action()->action_name();
+
+    std::cout << "Configuring UIElement with action: " << ui_element.action
+              << std::endl;
+    // convert action keys to EventBitset
+    ui_element.trigger_event = ConvertActionKeysToEvent(*element.action());
   }
 
   std::cout << "Configued general UIElement properties" << std::endl;

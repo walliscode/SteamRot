@@ -268,8 +268,8 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::ButtonData *element_as_ButtonData() const {
     return element_type() == steamrot::UIElementDataUnion_ButtonData ? static_cast<const steamrot::ButtonData *>(element()) : nullptr;
   }
-  steamrot::ActionNames action() const {
-    return static_cast<steamrot::ActionNames>(GetField<uint64_t>(VT_ACTION, 0));
+  const steamrot::Action *action() const {
+    return GetPointer<const steamrot::Action *>(VT_ACTION);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -285,7 +285,8 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_ELEMENT_TYPE, 1) &&
            VerifyOffsetRequired(verifier, VT_ELEMENT) &&
            VerifyUIElementDataUnion(verifier, element(), element_type()) &&
-           VerifyField<uint64_t>(verifier, VT_ACTION, 8) &&
+           VerifyOffset(verifier, VT_ACTION) &&
+           verifier.VerifyTable(action()) &&
            verifier.EndTable();
   }
 };
@@ -323,8 +324,8 @@ struct UIElementDataBuilder {
   void add_element(::flatbuffers::Offset<void> element) {
     fbb_.AddOffset(UIElementData::VT_ELEMENT, element);
   }
-  void add_action(steamrot::ActionNames action) {
-    fbb_.AddElement<uint64_t>(UIElementData::VT_ACTION, static_cast<uint64_t>(action), 0);
+  void add_action(::flatbuffers::Offset<steamrot::Action> action) {
+    fbb_.AddOffset(UIElementData::VT_ACTION, action);
   }
   explicit UIElementDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -347,7 +348,7 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementData(
     ::flatbuffers::Offset<Vector2f> size = 0,
     steamrot::UIElementDataUnion element_type = steamrot::UIElementDataUnion_NONE,
     ::flatbuffers::Offset<void> element = 0,
-    steamrot::ActionNames action = static_cast<steamrot::ActionNames>(0)) {
+    ::flatbuffers::Offset<steamrot::Action> action = 0) {
   UIElementDataBuilder builder_(_fbb);
   builder_.add_action(action);
   builder_.add_element(element);
@@ -369,7 +370,7 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
     ::flatbuffers::Offset<Vector2f> size = 0,
     steamrot::UIElementDataUnion element_type = steamrot::UIElementDataUnion_NONE,
     ::flatbuffers::Offset<void> element = 0,
-    steamrot::ActionNames action = static_cast<steamrot::ActionNames>(0)) {
+    ::flatbuffers::Offset<steamrot::Action> action = 0) {
   auto children__ = children ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::UIElementData>>(*children) : 0;
   return steamrot::CreateUIElementData(
       _fbb,

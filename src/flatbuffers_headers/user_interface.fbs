@@ -35,7 +35,7 @@ table UIElementData{
     position: Vector2f;
     size: Vector2f;
     element: UIElementDataUnion (required);
-    action: ActionNames;
+    action: Action;
   }
 
 table UserInterface{

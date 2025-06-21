@@ -98,6 +98,7 @@ public:
   /////////////////////////////////////////////////
   virtual void sCollision() = 0;
 
+  virtual void sAction() = 0;
   /**
    * @brief Function container for all rendering related logic.
    */

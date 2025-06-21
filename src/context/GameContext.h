@@ -5,7 +5,7 @@
 
 #pragma once
 #include "AssetManager.h"
-#include "EventHandler.h"
+#include "event_helpers.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Vector2.hpp>
 

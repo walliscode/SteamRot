@@ -1,0 +1,106 @@
+#include "event_helpers.h"
+#include <cstddef>
+#include <iostream>
+
+namespace steamrot {
+
+/////////////////////////////////////////////////
+static const std::unordered_map<KeyboardInput, sf::Keyboard::Key> &
+GetFlatbuffersToSFMLKeyboardMap() {
+  static const std::unordered_map<KeyboardInput, sf::Keyboard::Key>
+      string_to_key_map = {
+          {KeyboardInput_A, sf::Keyboard::Key::A},
+          {KeyboardInput_B, sf::Keyboard::Key::B},
+          {KeyboardInput_C, sf::Keyboard::Key::C},
+          {KeyboardInput_D, sf::Keyboard::Key::D},
+          {KeyboardInput_E, sf::Keyboard::Key::E},
+          {KeyboardInput_F, sf::Keyboard::Key::F},
+          {KeyboardInput_G, sf::Keyboard::Key::G},
+          {KeyboardInput_H, sf::Keyboard::Key::H},
+          {KeyboardInput_K, sf::Keyboard::Key::K},
+          {KeyboardInput_L, sf::Keyboard::Key::L},
+          {KeyboardInput_M, sf::Keyboard::Key::M},
+          {KeyboardInput_N, sf::Keyboard::Key::N},
+          {KeyboardInput_O, sf::Keyboard::Key::O},
+          {KeyboardInput_P, sf::Keyboard::Key::P},
+          {KeyboardInput_Q, sf::Keyboard::Key::Q},
+          {KeyboardInput_R, sf::Keyboard::Key::R},
+          {KeyboardInput_S, sf::Keyboard::Key::S},
+          {KeyboardInput_T, sf::Keyboard::Key::T},
+          {KeyboardInput_U, sf::Keyboard::Key::U},
+          {KeyboardInput_V, sf::Keyboard::Key::V},
+          {KeyboardInput_W, sf::Keyboard::Key::W},
+          {KeyboardInput_X, sf::Keyboard::Key::X},
+          {KeyboardInput_Y, sf::Keyboard::Key::Y},
+          {KeyboardInput_Z, sf::Keyboard::Key::Z},
+      };
+  return string_to_key_map;
+}
+
+/////////////////////////////////////////////////
+static const std::unordered_map<MouseInput, sf::Mouse::Button> &
+GetFlatbuffersToSFMLMouseMap() {
+  static const std::unordered_map<MouseInput, sf::Mouse::Button>
+      string_to_mouse_map = {
+
+          {MouseInput_LEFT_CLICK, sf::Mouse::Button::Left},
+          {MouseInput_RIGHT_CLICK, sf::Mouse::Button::Right},
+          {MouseInput_MIDDLE_CLICK, sf::Mouse::Button::Middle},
+
+      };
+  return string_to_mouse_map;
+};
+
+/////////////////////////////////////////////////
+const EventBitset ConvertActionKeysToEvent(const Action &action) {
+
+  // create EventBitset that represents the keys for this action
+  EventBitset event_bitset{0};
+  if (action.keyboard_pressed()) {
+    for (const auto &key_pressed : *action.keyboard_pressed()) {
+      // not sure how to pull the enum straight out so just recasting it
+      KeyboardInput key_pressed_cast = KeyboardInput(key_pressed);
+      size_t bit_position = static_cast<size_t>(
+          GetFlatbuffersToSFMLKeyboardMap().at(key_pressed_cast));
+
+      // add to bitset (not replace)
+      event_bitset.set(bit_position, true);
+    }
+  }
+  if (action.keyboard_released()) {
+    for (const auto &key_released : *action.keyboard_released()) {
+      // not sure how to pull the enum straight out so just recasting it
+      KeyboardInput key_released_cast = KeyboardInput(key_released);
+      size_t bit_position = static_cast<size_t>(
+          GetFlatbuffersToSFMLKeyboardMap().at(key_released_cast));
+      // add to bitset (not replace)
+      event_bitset.set(bit_position + sf::Keyboard::KeyCount, true);
+    }
+  }
+  if (action.mouse_pressed()) {
+    for (const auto &mouse_pressed : *action.mouse_pressed()) {
+      // not sure how to pull the enum straight out so just recasting it
+      MouseInput mouse_pressed_cast = MouseInput(mouse_pressed);
+      size_t bit_position = static_cast<size_t>(
+          GetFlatbuffersToSFMLMouseMap().at(mouse_pressed_cast));
+      // add to bitset (not replace)
+      event_bitset.set(bit_position + sf::Keyboard::KeyCount * 2, true);
+    }
+  }
+  if (action.mouse_released()) {
+    for (const auto &mouse_released : *action.mouse_released()) {
+      // not sure how to pull the enum straight out so just recasting it
+      MouseInput mouse_released_cast = MouseInput(mouse_released);
+      size_t bit_position = static_cast<size_t>(
+          GetFlatbuffersToSFMLMouseMap().at(mouse_released_cast));
+      // add to bitset (not replace)
+      event_bitset.set(bit_position + sf::Keyboard::KeyCount * 2 +
+                           sf::Mouse::ButtonCount,
+                       true);
+    }
+  }
+  std::cout << "EventBitset: " << event_bitset << std::endl;
+
+  return event_bitset;
+};
+} // namespace steamrot
