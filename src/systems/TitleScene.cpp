@@ -28,4 +28,11 @@ void TitleScene::sCollision() {
     collision_logic->RunLogic();
   }
 }
+
+void TitleScene::sAction() {
+  // process action logic
+  for (auto &action_logic : m_logics[LogicType::LogicType_Event]) {
+    action_logic->RunLogic();
+  }
+}
 } // namespace steamrot

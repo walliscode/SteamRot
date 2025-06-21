@@ -39,6 +39,7 @@ enum MouseInput: ubyte {
 enum ActionNames: ulong (bit_flags) {
   ACTION_NONE = 0,
   ACTION_CHANGE_SCENE = 1,
+  ACTION_QUIT_GAME = 2,
   }
 
 // an action is composed of 1 or more inputs 

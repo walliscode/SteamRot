@@ -165,29 +165,33 @@ inline const char *EnumNameMouseInput(MouseInput e) {
 enum ActionNames : uint64_t {
   ActionNames_ACTION_NONE = 1ULL,
   ActionNames_ACTION_CHANGE_SCENE = 2ULL,
+  ActionNames_ACTION_QUIT_GAME = 4ULL,
   ActionNames_NONE = 0,
-  ActionNames_ANY = 3ULL
+  ActionNames_ANY = 7ULL
 };
 
-inline const ActionNames (&EnumValuesActionNames())[2] {
+inline const ActionNames (&EnumValuesActionNames())[3] {
   static const ActionNames values[] = {
     ActionNames_ACTION_NONE,
-    ActionNames_ACTION_CHANGE_SCENE
+    ActionNames_ACTION_CHANGE_SCENE,
+    ActionNames_ACTION_QUIT_GAME
   };
   return values;
 }
 
 inline const char * const *EnumNamesActionNames() {
-  static const char * const names[3] = {
+  static const char * const names[5] = {
     "ACTION_NONE",
     "ACTION_CHANGE_SCENE",
+    "",
+    "ACTION_QUIT_GAME",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameActionNames(ActionNames e) {
-  if (::flatbuffers::IsOutRange(e, ActionNames_ACTION_NONE, ActionNames_ACTION_CHANGE_SCENE)) return "";
+  if (::flatbuffers::IsOutRange(e, ActionNames_ACTION_NONE, ActionNames_ACTION_QUIT_GAME)) return "";
   const size_t index = static_cast<size_t>(e) - static_cast<size_t>(ActionNames_ACTION_NONE);
   return EnumNamesActionNames()[index];
 }

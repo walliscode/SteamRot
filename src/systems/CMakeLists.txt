@@ -8,6 +8,7 @@ add_library(systems
     ActionManager.cpp
     TitleScene.cpp
     EventHandler.cpp
+    event_helpers.cpp
 )
 
 # check if set definitions exist

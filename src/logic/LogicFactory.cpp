@@ -1,5 +1,6 @@
 
 #include "LogicFactory.h"
+#include "UIActionLogic.h"
 #include "UICollisionLogic.h"
 #include "UIRenderLogic.h"
 #include "log_handler.h"
@@ -48,6 +49,14 @@ LogicFactory::CreateLogicMap(const LogicCollection &logic_collection,
       break;
     }
 
+    // Event Logic
+    case LogicType::LogicType_Event: {
+      std::cout << "Creating Event logics." << std::endl;
+      logic_map[LogicType::LogicType_Event] = CreateEventLogics(logic_context);
+      std::cout << "Event logics created." << std::endl;
+      break;
+    }
+
     // Add cases for other logic types as needed
     default:
       // Handle unknown logic type if necessary
@@ -85,5 +94,20 @@ LogicFactory::CreateCollisionLogics(const LogicContext logic_context) {
             << std::endl;
 
   return collision_logics;
+}
+
+/////////////////////////////////////////////////
+std::vector<std::unique_ptr<BaseLogic>>
+LogicFactory::CreateEventLogics(const LogicContext logic_context) {
+
+  // Create a vector of unique pointers to BaseLogic for events
+  std::vector<std::unique_ptr<BaseLogic>> event_logics;
+  std::cout << "Creating a vector of event logics." << std::endl;
+
+  // compile time defined order of logic types
+  event_logics.push_back(std::make_unique<UIActionLogic>(logic_context));
+  std::cout << "Event logics created with size: " << event_logics.size()
+            << std::endl;
+  return event_logics;
 }
 } // namespace steamrot

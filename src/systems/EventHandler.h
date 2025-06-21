@@ -7,16 +7,11 @@
 // headers
 ////////////////////////////////////////////////////////////
 
+#include "event_helpers.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
-#include <bitset>
-
-// double of each needed for pressed and released events
-using EventBitset =
-    std::bitset<sf::Keyboard::KeyCount + sf::Keyboard::KeyCount +
-                sf::Mouse::ButtonCount + sf::Mouse::ButtonCount>;
 
 namespace steamrot {
 

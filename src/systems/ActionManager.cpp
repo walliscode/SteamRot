@@ -5,14 +5,13 @@
 #include "EventHandler.h"
 #include "actions_generated.h"
 #include "log_handler.h"
-#include "magic_enum/magic_enum.hpp"
+
 #include "spdlog/common.h"
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <iostream>
 
-using namespace magic_enum::bitwise_operators;
 namespace steamrot {
 
 ////////////////////////////////////////////////////////////
@@ -133,25 +132,18 @@ void ActionManager::RegisterActions(const ActionsData *actions_data) {
     }
 
     // add to the action map
-    m_key_to_action_map.at(key_bitset) = ActionNames(action->action_name());
+    m_scene_event_to_action_map.at(key_bitset) =
+        ActionNames(action->action_name());
   }
 }
 
 ////////////////////////////////////////////////////////////
-const ActionNames
-ActionManager::GenerateActions(const EventBitset &input_event) {
+void ActionManager::ProcessSceneLevelActions(const EventBitset &input_event) {
+  m_scene_level_actions = m_scene_event_to_action_map[input_event];
+}
 
-  // create an actions bitflag
-  ActionNames actions;
-
-  // cycle through the key to action map and check to see if any of the keys
-  // match
-  for (auto &[key, value] : m_key_to_action_map) {
-    if ((input_event & key) == key) {
-      // add to current actions
-      actions |= value;
-    }
-  }
-  return actions;
+/////////////////////////////////////////////////
+void ActionManager::ClearActions() {
+  m_scene_level_actions = static_cast<ActionNames>(0);
 }
 } // namespace steamrot

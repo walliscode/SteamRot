@@ -28,6 +28,12 @@
                 "element_type": "ButtonData",
                 "element": {
                   "label": "Quit Game"
+                },
+                "action": {
+                  "action_name": "ACTION_QUIT_GAME",
+                  "mouse_released": [
+                    "LEFT_CLICK"
+                  ]
                 }
               }
             ],
@@ -47,7 +53,8 @@
   "logic_collection": {
     "types": [
       "Render",
-      "Collision"
+      "Collision",
+      "Event"
     ]
   },
   "ui_theme": "default",

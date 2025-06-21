@@ -41,5 +41,7 @@ private:
   /// @brief Call collision Logic for TitleScene
   /////////////////////////////////////////////////
   void sCollision() override;
+
+  void sAction() override;
 };
 } // namespace steamrot

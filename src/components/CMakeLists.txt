@@ -21,5 +21,6 @@ target_link_libraries(components
   flatbuffers
   flatbuffers_headers
   logger
+  systems
 )
 
