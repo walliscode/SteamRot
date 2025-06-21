@@ -31,7 +31,7 @@ private:
   CreateRenderLogics(const LogicContext logic_context);
 
   std::vector<std::unique_ptr<BaseLogic>>
-  CreateEventLogics(const LogicContext logic_context);
+  CreateActionLogics(const LogicContext logic_context);
 
 public:
   /**
