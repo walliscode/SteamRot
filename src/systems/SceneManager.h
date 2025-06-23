@@ -54,6 +54,13 @@ public:
    */
   uuids::uuid LoadTitleScene();
 
+  /////////////////////////////////////////////////
+  /// @brief Clear all scenes and load the crafting scene.
+  /// @return The UUID of the loaded crafting scene.
+  ///
+  /////////////////////////////////////////////////
+  uuids::uuid LoadCraftingScene();
+
   /**
    * @brief Update all Scenes.
    */

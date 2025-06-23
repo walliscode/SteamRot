@@ -130,7 +130,17 @@ void GameEngine::ShowTitleScene() {
   m_display_manager.LoadTitleSceneTiles(title_scene_id);
   std::cout << "Title scene tiles loaded" << std::endl;
 }
-
+/////////////////////////////////////////////////
+void GameEngine::ShowCraftingScene() {
+  std::cout << "Loading crafting scene..." << std::endl;
+  // Load the crafting scene in the scene manager and get unique id
+  uuids::uuid crafting_scene_id = m_scene_manager->LoadCraftingScene();
+  std::cout << "Crafting scene loaded with ID: " << crafting_scene_id
+            << std::endl;
+  // pass the id to the display manager
+  m_display_manager.LoadCraftingSceneTiles(crafting_scene_id);
+  std::cout << "Crafting scene tiles loaded" << std::endl;
+}
 ////////////////////////////////////////////////////////////
 void GameEngine::ShutDown() {}
 

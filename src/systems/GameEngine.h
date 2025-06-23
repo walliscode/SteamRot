@@ -98,6 +98,15 @@ private:
   /////////////////////////////////////////////////
   void ShowTitleScene();
 
+  /////////////////////////////////////////////////
+  /// @brief Container function, calling on SceneManager and DisplayManager for
+  /// Crafting Scene loading
+  ///
+  /// This approach will eventually be replaced as we develop the display
+  /// manager, but for now this allows us to quickly test the crafting scene.
+  /////////////////////////////////////////////////
+  void ShowCraftingScene();
+
   sf::Vector2i m_mouse_position;
 
   void UpdateLocalMousePosition();

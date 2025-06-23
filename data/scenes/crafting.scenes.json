@@ -4,7 +4,7 @@
     "entities": [
       {
         "c_user_interface": {
-          "ui_name": "title_screen_menu",
+          "ui_name": "navigation_menu",
           "start_visible": true,
           "root_ui_element": {
             "type": "Panel",
@@ -18,16 +18,7 @@
                 "children": [],
                 "element_type": "ButtonData",
                 "element": {
-                  "label": "Start Game"
-                }
-              },
-              {
-                "type": "Button",
-                "layout": "Horizontal",
-                "children": [],
-                "element_type": "ButtonData",
-                "element": {
-                  "label": "Crafting Table"
+                  "label": "Return"
                 },
                 "action": {
                   "action_name": "ACTION_CHANGE_SCENE",
@@ -35,30 +26,15 @@
                     "LEFT_CLICK"
                   ]
                 }
-              },
-              {
-                "type": "Button",
-                "layout": "Horizontal",
-                "children": [],
-                "element_type": "ButtonData",
-                "element": {
-                  "label": "Quit Game"
-                },
-                "action": {
-                  "action_name": "ACTION_QUIT_GAME",
-                  "mouse_released": [
-                    "LEFT_CLICK"
-                  ]
-                }
               }
             ],
             "position": {
-              "x": 325,
-              "y": 50
+              "x": 0,
+              "y": 0
             },
             "size": {
-              "x": 250,
-              "y": 500
+              "x": 200,
+              "y": 600
             }
           }
         }

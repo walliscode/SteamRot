@@ -101,4 +101,18 @@ void DisplayManager::LoadTitleSceneTiles(const uuids::uuid &title_scene_id) {
   m_title_scene_active = true;
 };
 
+void DisplayManager::LoadCraftingSceneTiles(
+    const uuids::uuid &crafting_scene_id) {
+  std::cout << "DisplayManager: Loading crafting scene tiles with ID: "
+            << crafting_scene_id << std::endl;
+  // create a new session for the crafting scene
+  auto crafting_session = std::make_shared<Session>();
+  // set the active session to the crafting session
+  m_active_session = crafting_session;
+  // pass the crafting scene ID to the active tile in the active session
+  m_active_session->GetActiveTile()->SetSceneId(crafting_scene_id);
+  // set the title scene active flag to false
+  m_title_scene_active = false;
+};
+
 } // namespace steamrot

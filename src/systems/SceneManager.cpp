@@ -43,6 +43,17 @@ uuids::uuid SceneManager::LoadTitleScene() {
   return m_scenes.begin()->first;
 }
 
+/////////////////////////////////////////////////
+uuids::uuid SceneManager::LoadCraftingScene() {
+  // clear existing scenes
+  m_scenes.clear();
+  std::cout << "Cleared existing scenes." << std::endl;
+  // create crafting scene
+  AddSceneFromDefault(SceneType::crafting, 100);
+  std::cout << "Added crafting scene." << std::endl;
+  // return the ID of the crafting scene
+  return m_scenes.begin()->first;
+}
 /**
  * -------------------------------------------------------
  */
