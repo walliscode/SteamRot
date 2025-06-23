@@ -87,6 +87,25 @@ UIElement CUserInterface::UIElementFactory(const UIElementData &element) {
     ui_element.trigger_event = ConvertActionKeysToEvent(*element.action());
   }
 
+  if (element.data()) {
+    std::cout << "data detected for UI Element" << std::endl;
+    // give it a scene type enum based on string (this needs to be switched to a
+    // fbs enum at some point)
+    if (element.data()->scene_type()) {
+
+      std::cout << "Scene type data detected"
+                << element.data()->scene_type()->str() << std::endl;
+      // Title scene type
+      if (element.data()->scene_type()->str() == "TITLE") {
+        ui_element.ui_data_package.scene_type = SceneType::title;
+
+        // Crafting scene type
+      } else if (element.data()->scene_type()->str() == "CRAFTING") {
+        ui_element.ui_data_package.scene_type = SceneType::crafting;
+      }
+    }
+  }
+
   std::cout << "Configued general UIElement properties" << std::endl;
 
   // Configure the UIElement based on its type

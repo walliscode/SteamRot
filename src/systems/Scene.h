@@ -11,6 +11,7 @@
 #include "EntityManager.h"
 #include "GameContext.h"
 #include "LogicFactory.h"
+#include "SceneType.h"
 #include "actions_generated.h"
 #include "global_constants.h"
 #include "logics_generated.h"
@@ -21,12 +22,27 @@
 #include <memory>
 #include <nlohmann/json.hpp>
 
+#include <optional>
 #include <unordered_map>
+#include <utility>
 #include <uuid.h>
 typedef std::vector<std::shared_ptr<sf::Drawable>> SceneDrawables;
 
 namespace steamrot {
 
+/////////////////////////////////////////////////
+/// @class SceneDataPackage
+/// @brief Data struct to be accessed by the SceneManager. Provides data to any
+/// relevenat actions
+///
+/////////////////////////////////////////////////
+struct SceneDataPackage {
+
+  /////////////////////////////////////////////////
+  /// @brief For when a new Scene needs to be created/added
+  /////////////////////////////////////////////////
+  std::optional<SceneType> new_scene_type{std::nullopt};
+};
 class Scene {
   friend class SceneFactory;
 
@@ -99,13 +115,25 @@ protected:
   /// here.
   /// @return Returns an ActionNames enums containing the action to process.
   /////////////////////////////////////////////////
-  const ActionNames ScrapeLogicForActions() const;
+  const std::pair<ActionNames, LogicData> ScrapeLogicForActions() const;
 
   /////////////////////////////////////////////////
   /// @brief This function defines actions for the Scene to take. Should call
   /// ScrapeLogicForActions()
   /////////////////////////////////////////////////
   virtual void ProcessActions() = 0;
+
+  /////////////////////////////////////////////////
+  /// @brief A scene action prompted by a Logic Action (and potentially other
+  /// sources)
+  /////////////////////////////////////////////////
+  ActionNames m_scene_action{0};
+
+  /////////////////////////////////////////////////
+  /// @brief Contains information from Logic classes to be access and used by
+  /// the Scene and SceneManager.
+  /////////////////////////////////////////////////
+  SceneDataPackage m_scene_data_package{};
 
 public:
   /**
@@ -149,6 +177,20 @@ public:
   /// \brief return Scene id
   ////////////////////////////////////////////////////////////
   const uuids::uuid GetSceneID();
+
+  /////////////////////////////////////////////////
+  /// @brief Getter for the Scene's generated action
+  ///
+  /// @return Return enum value for the Scene's action.
+  /////////////////////////////////////////////////
+  const ActionNames &GetSceneAction() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Getter for the Scene's data package
+  ///
+  /// @return Returns a reference to the SceneDataPackage object.
+  /////////////////////////////////////////////////
+  const SceneDataPackage &GetSceneDataPackage() const;
 };
 
 } // namespace steamrot

@@ -15,7 +15,7 @@ CraftingScene::CraftingScene(const size_t pool_size,
 /////////////////////////////////////////////////
 void CraftingScene::ProcessActions() {
   // process actions
-  ActionNames action = ScrapeLogicForActions();
+  ActionNames action = ScrapeLogicForActions().first;
 }
 
 /////////////////////////////////////////////////

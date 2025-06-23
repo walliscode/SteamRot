@@ -6,6 +6,7 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
+#include "CraftingScene.h"
 #include "GameContext.h"
 #include "Scene.h"
 #include "SceneType.h"
@@ -30,6 +31,8 @@ private:
   std::unique_ptr<TitleScene> CreateTitleScene(const SceneData *scene_data,
                                                const uuids::uuid &id);
 
+  std::unique_ptr<CraftingScene>
+  CreateCraftingScene(const SceneData *scene_data, const uuids::uuid &id);
   ////////////////////////////////////////////////////////////
   /// \brief create a uuid if none is in provided json data
   ///

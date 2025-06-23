@@ -13,6 +13,18 @@
 namespace steamrot {
 using EntityIndicies = std::vector<size_t>;
 
+/////////////////////////////////////////////////
+/// @class LogicData
+/// @brief General container for all logic data, such as other structs e.t.c
+///
+/////////////////////////////////////////////////
+struct LogicData {
+
+  /////////////////////////////////////////////////
+  /// @brief Data copied over from any UI Elements
+  /////////////////////////////////////////////////
+  UIElementDataPackage ui_data_package;
+};
 /**
 * @class LogicContext
  * @brief Provides all the specific Scene data required for logic processing.
@@ -90,6 +102,11 @@ protected:
 
   ActionNames m_logic_action{0};
 
+  /////////////////////////////////////////////////
+  /// @brief Updated by Logic functions, will then be scraped by the Scene
+  /////////////////////////////////////////////////
+  LogicData m_logic_data;
+
 public:
   /**
    * @brief Default constructor
@@ -114,6 +131,8 @@ public:
   /// @return [TODO:return]
   /////////////////////////////////////////////////
   const ActionNames &GetLogicAction();
+
+  const LogicData &GetLogicData() const;
 
   /////////////////////////////////////////////////
   /// @brief Reset the Logic level action to 0 value

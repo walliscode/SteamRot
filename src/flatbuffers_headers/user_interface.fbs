@@ -17,6 +17,10 @@ enum LayoutType: byte{
   Grid = 3,
   }
 
+table UIElementDataPackageData {
+    scene_type: string;
+  }
+
 table PanelData{}
 
 table ButtonData {
@@ -36,6 +40,7 @@ table UIElementData{
     size: Vector2f;
     element: UIElementDataUnion (required);
     action: Action;
+    data: UIElementDataPackageData;
   }
 
 table UserInterface{

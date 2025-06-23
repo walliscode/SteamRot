@@ -63,6 +63,8 @@ void UIActionLogic::RecursiveProcessMouseEvents(UIElement &element) {
       m_logic_action = element.action;
       std::cout << "Mouse event triggered for element: "
                 << magic_enum::enum_name(element.action) << std::endl;
+
+      m_logic_data.ui_data_package = element.ui_data_package;
     }
   }
   // Recursively process child elements

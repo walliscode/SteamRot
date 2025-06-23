@@ -25,6 +25,9 @@
                   "mouse_released": [
                     "LEFT_CLICK"
                   ]
+                },
+                "data": {
+                  "scene_type": "TITLE"
                 }
               }
             ],
