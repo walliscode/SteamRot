@@ -35,6 +35,8 @@ set(SCENES_DIR "${DATA_DIR}/scenes")
 # All JSON files for scenes.fbs
 file(GLOB scenes_jsons "${SCENES_DIR}/*.scenes.json")
 
+# message out detected scene_jsons
+
 set(scenes_generated_binaries)
 
 foreach(json_file ${scenes_jsons})

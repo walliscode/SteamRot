@@ -40,12 +40,30 @@ void TitleScene::sAction() {
 }
 
 void TitleScene::ProcessActions() {
+  // reset actions and data
+  m_scene_action = ActionNames{0};
+  m_scene_data_package = SceneDataPackage{};
   // process actions
-  ActionNames action = ScrapeLogicForActions();
+  ActionNames action = ScrapeLogicForActions().first;
+  LogicData logic_data = ScrapeLogicForActions().second;
 
-  if (action == ActionNames_ACTION_QUIT_GAME) {
+  switch (action) {
+
+  case ActionNames_ACTION_QUIT_GAME: {
     std::cout << "Quitting game from TitleScene." << std::endl;
     m_game_context.game_window.close();
+  }
+
+  case ActionNames_ACTION_CHANGE_SCENE: {
+    // Change Scene is handled by the SceneManager, so set Scene variables
+    m_scene_action = action;
+    m_scene_data_package.new_scene_type = logic_data.ui_data_package.scene_type;
+  }
+
+  default: {
+    // do nothing
+    break;
+  }
   }
 }
 } // namespace steamrot

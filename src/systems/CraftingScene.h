@@ -1,0 +1,57 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Implementation of the CraftingScene class
+/////////////////////////////////////////////////
+
+#pragma once
+
+#include "Scene.h"
+namespace steamrot {
+
+/////////////////////////////////////////////////
+/// @class CraftingScene
+/// @brief Allows user to craft monsters and machines from "parts"
+///
+/////////////////////////////////////////////////
+class CraftingScene : public Scene {
+  friend class SceneFactory;
+
+private:
+  /////////////////////////////////////////////////
+  /// @brief Constructor for CraftingScene to be called by SceneFactory
+  ///
+  /// @param pool_size EntityMemoryPool size for the scene
+  /// @param scene_data Flatbuffers data for the scene
+  /// @param id Unique identifier for the scene instance
+  /// @param game_context GameContext containing game-wide data for the scene
+  /////////////////////////////////////////////////
+  CraftingScene(const size_t pool_size, const SceneData *scene_data,
+                const uuids::uuid &id, const GameContext game_context);
+
+  /////////////////////////////////////////////////
+  /// @brief Actions taken by the CraftingScene
+  /////////////////////////////////////////////////
+  void ProcessActions() override;
+
+public:
+  /////////////////////////////////////////////////
+  /// @brief Systems for dealing with events and actions in the CraftingScene
+  /////////////////////////////////////////////////
+  void sAction() override;
+
+  /////////////////////////////////////////////////
+  /// @brief Systems for dealing with movement in the CraftingScene
+  /////////////////////////////////////////////////
+  void sMovement() override;
+
+  /////////////////////////////////////////////////
+  /// @brief Systems for dealing with collision in the CraftingScene
+  /////////////////////////////////////////////////
+  void sCollision() override;
+
+  /////////////////////////////////////////////////
+  /// @brief Systems for dealing with rendering in the CraftingScene
+  /////////////////////////////////////////////////
+  void sRender() override;
+};
+} // namespace steamrot

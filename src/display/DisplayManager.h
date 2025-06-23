@@ -80,5 +80,7 @@ public:
    * @brief Load tile (and session) configuration for just a title scene.
    */
   void LoadTitleSceneTiles(const uuids::uuid &title_scene_id);
+
+  void LoadCraftingSceneTiles(const uuids::uuid &crafting_scene_id);
 };
 } // namespace steamrot

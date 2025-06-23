@@ -8,21 +8,40 @@
 // headers
 ////////////////////////////////////////////////////////////
 #include "Component.h"
-#include "EventHandler.h"
+#include "SceneType.h"
 #include "actions_generated.h"
+#include "event_helpers.h"
 #include "user_interface_generated.h"
 
 #include <SFML/System/Vector2.hpp>
+#include <optional>
 #include <variant>
 #include <vector>
 
 namespace steamrot {
 
+/////////////////////////////////////////////////
+/// @class UIElementDataPackage
+/// @brief A bit of a catch all for the UI element data.
+///
+/// As the game develops, this can be split out, but we'll see how much data we
+/// need to store
+/////////////////////////////////////////////////
+struct UIElementDataPackage {
+
+  /////////////////////////////////////////////////
+  /// @brief Contains scene_type information, for when we want to switch to a
+  /// fresh scene.
+  /////////////////////////////////////////////////
+  std::optional<SceneType> scene_type{std::nullopt};
+};
 struct Panel {};
 
 struct Button {
 
-  // Additional properties specific to Button can be added here
+  /////////////////////////////////////////////////
+  /// @brief Button label, this is the text that will be displayed on the button
+  /////////////////////////////////////////////////
   std::string label{"Fill me in!"};
 };
 
@@ -79,6 +98,12 @@ struct UIElement {
   /// with
   /////////////////////////////////////////////////
   ActionNames action{0};
+
+  /////////////////////////////////////////////////
+  /// @brief Data package for the UI element, all members should be optional so
+  /// test with if statements
+  /////////////////////////////////////////////////
+  UIElementDataPackage ui_data_package{};
 };
 
 struct CUserInterface : public Component {

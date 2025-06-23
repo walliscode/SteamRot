@@ -6,6 +6,7 @@ add_library(systems
     AssetManager.cpp
     Scene.cpp
     ActionManager.cpp
+    CraftingScene.cpp
     TitleScene.cpp
     EventHandler.cpp
     event_helpers.cpp

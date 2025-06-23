@@ -48,10 +48,12 @@ std::unique_ptr<Scene> SceneFactory::CreateScene(const SceneType &scene_type) {
     std::cout << "Title scene type detected." << std::endl;
     return CreateTitleScene(scene_data, scene_uuid);
 
-  default:
-    // not sure how it would be possible to get here, maybe some kind of cast
-    // from size_t
-    return nullptr;
+  case SceneType::crafting:
+    std::cout << "Crafting scene type detected." << std::endl;
+    // create a new crafting scene object, we are creating a raw pointer here
+    // due to CraftingScene having a private constuctor
+
+    return CreateCraftingScene(scene_data, scene_uuid);
   }
 }
 ////////////////////////////////////////////////////////////
@@ -67,4 +69,15 @@ SceneFactory::CreateTitleScene(const SceneData *scene_data,
   return title_scene;
 }
 
+/////////////////////////////////////////////////
+std::unique_ptr<CraftingScene>
+SceneFactory::CreateCraftingScene(const SceneData *scene_data,
+                                  const uuids::uuid &scene_uuid) {
+  // create a new crafting scene object, we are creating a raw pointer here due
+  // to CraftingScene having a private constuctor
+  std::unique_ptr<CraftingScene> crafting_scene(
+      new CraftingScene(100, scene_data, scene_uuid, m_game_context));
+  std::cout << "Created CraftingScene with UUID: " << scene_uuid << std::endl;
+  return crafting_scene;
+}
 } // namespace steamrot

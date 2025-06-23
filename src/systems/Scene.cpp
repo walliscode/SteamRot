@@ -4,8 +4,10 @@
 #include "Scene.h"
 #include "BaseLogic.h"
 #include "EntityManager.h"
+#include "actions_generated.h"
 #include "themes_generated.h"
 #include <iostream>
+#include <utility>
 
 namespace steamrot {
 
@@ -55,8 +57,11 @@ void Scene::SetActive(bool active) { m_active = active; }
 const uuids::uuid Scene::GetSceneID() { return m_id; }
 
 /////////////////////////////////////////////////
-const ActionNames Scene::ScrapeLogicForActions() const {
-  ActionNames action{0};
+const std::pair<ActionNames, LogicData> Scene::ScrapeLogicForActions() const {
+
+  // create a default action and data pair to return
+  std::pair<ActionNames, LogicData> action_and_data =
+      std::make_pair(ActionNames{0}, LogicData{});
 
   // get the first vector of logics from the map
   for (const auto &logic_pair : m_logics) {
@@ -69,12 +74,25 @@ const ActionNames Scene::ScrapeLogicForActions() const {
 
       // 0 should be registered as no action
       if (logic_action != 0) {
-        action = logic_action;
-        return action; // early return if any logic has an action
+
+        // fill in data
+        action_and_data.first = logic_action;
+        action_and_data.second = logic_instance->GetLogicData();
+
+        // early return the action and data pair
+        return action_and_data;
       }
     }
   }
-  return action;
+  return action_and_data;
+}
+
+/////////////////////////////////////////////////
+const ActionNames &Scene::GetSceneAction() const { return m_scene_action; }
+
+/////////////////////////////////////////////////
+const SceneDataPackage &Scene::GetSceneDataPackage() const {
+  return m_scene_data_package;
 }
 
 } // namespace steamrot

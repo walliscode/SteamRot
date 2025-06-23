@@ -18,6 +18,9 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
+struct UIElementDataPackageData;
+struct UIElementDataPackageDataBuilder;
+
 struct PanelData;
 struct PanelDataBuilder;
 
@@ -147,6 +150,57 @@ template<> struct UIElementDataUnionTraits<steamrot::ButtonData> {
 bool VerifyUIElementDataUnion(::flatbuffers::Verifier &verifier, const void *obj, UIElementDataUnion type);
 bool VerifyUIElementDataUnionVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types);
 
+struct UIElementDataPackageData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UIElementDataPackageDataBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_SCENE_TYPE = 4
+  };
+  const ::flatbuffers::String *scene_type() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_SCENE_TYPE);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_SCENE_TYPE) &&
+           verifier.VerifyString(scene_type()) &&
+           verifier.EndTable();
+  }
+};
+
+struct UIElementDataPackageDataBuilder {
+  typedef UIElementDataPackageData Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_scene_type(::flatbuffers::Offset<::flatbuffers::String> scene_type) {
+    fbb_.AddOffset(UIElementDataPackageData::VT_SCENE_TYPE, scene_type);
+  }
+  explicit UIElementDataPackageDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<UIElementDataPackageData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<UIElementDataPackageData>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<UIElementDataPackageData> CreateUIElementDataPackageData(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::String> scene_type = 0) {
+  UIElementDataPackageDataBuilder builder_(_fbb);
+  builder_.add_scene_type(scene_type);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<UIElementDataPackageData> CreateUIElementDataPackageDataDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const char *scene_type = nullptr) {
+  auto scene_type__ = scene_type ? _fbb.CreateString(scene_type) : 0;
+  return steamrot::CreateUIElementDataPackageData(
+      _fbb,
+      scene_type__);
+}
+
 struct PanelData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef PanelDataBuilder Builder;
   bool Verify(::flatbuffers::Verifier &verifier) const {
@@ -238,7 +292,8 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_SIZE = 12,
     VT_ELEMENT_TYPE = 14,
     VT_ELEMENT = 16,
-    VT_ACTION = 18
+    VT_ACTION = 18,
+    VT_DATA = 20
   };
   steamrot::UIElementType type() const {
     return static_cast<steamrot::UIElementType>(GetField<int8_t>(VT_TYPE, 0));
@@ -271,6 +326,9 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::Action *action() const {
     return GetPointer<const steamrot::Action *>(VT_ACTION);
   }
+  const steamrot::UIElementDataPackageData *data() const {
+    return GetPointer<const steamrot::UIElementDataPackageData *>(VT_DATA);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int8_t>(verifier, VT_TYPE, 1) &&
@@ -287,6 +345,8 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyUIElementDataUnion(verifier, element(), element_type()) &&
            VerifyOffset(verifier, VT_ACTION) &&
            verifier.VerifyTable(action()) &&
+           VerifyOffset(verifier, VT_DATA) &&
+           verifier.VerifyTable(data()) &&
            verifier.EndTable();
   }
 };
@@ -327,6 +387,9 @@ struct UIElementDataBuilder {
   void add_action(::flatbuffers::Offset<steamrot::Action> action) {
     fbb_.AddOffset(UIElementData::VT_ACTION, action);
   }
+  void add_data(::flatbuffers::Offset<steamrot::UIElementDataPackageData> data) {
+    fbb_.AddOffset(UIElementData::VT_DATA, data);
+  }
   explicit UIElementDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -348,8 +411,10 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementData(
     ::flatbuffers::Offset<Vector2f> size = 0,
     steamrot::UIElementDataUnion element_type = steamrot::UIElementDataUnion_NONE,
     ::flatbuffers::Offset<void> element = 0,
-    ::flatbuffers::Offset<steamrot::Action> action = 0) {
+    ::flatbuffers::Offset<steamrot::Action> action = 0,
+    ::flatbuffers::Offset<steamrot::UIElementDataPackageData> data = 0) {
   UIElementDataBuilder builder_(_fbb);
+  builder_.add_data(data);
   builder_.add_action(action);
   builder_.add_element(element);
   builder_.add_size(size);
@@ -370,7 +435,8 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
     ::flatbuffers::Offset<Vector2f> size = 0,
     steamrot::UIElementDataUnion element_type = steamrot::UIElementDataUnion_NONE,
     ::flatbuffers::Offset<void> element = 0,
-    ::flatbuffers::Offset<steamrot::Action> action = 0) {
+    ::flatbuffers::Offset<steamrot::Action> action = 0,
+    ::flatbuffers::Offset<steamrot::UIElementDataPackageData> data = 0) {
   auto children__ = children ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::UIElementData>>(*children) : 0;
   return steamrot::CreateUIElementData(
       _fbb,
@@ -381,7 +447,8 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
       size,
       element_type,
       element,
-      action);
+      action,
+      data);
 }
 
 struct UserInterface FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
