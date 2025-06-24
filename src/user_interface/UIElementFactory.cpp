@@ -1,0 +1,137 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Implementation of the UIElementFactory class
+/////////////////////////////////////////////////
+#include "UIElementFactory.h"
+#include "DropDown.h"
+#include "user_interface_generated.h"
+#include <iostream>
+
+namespace steamrot {
+
+/////////////////////////////////////////////////
+UIElement
+UIElementFactory::CreateUIStructure(const UIElementData &element_data) {
+  std::cout << "Creating UIElement structure from data" << std::endl;
+  // Recursively build the UIElement structure
+  UIElement ui_element = RecursivlyBuildUIElement(element_data);
+  std::cout << "UIElement structure created successfully." << std::endl;
+  return ui_element;
+};
+
+/////////////////////////////////////////////////
+UIElement
+UIElementFactory::RecursivlyBuildUIElement(const UIElementData &element_data) {
+  // create UIElement with general configuration
+  UIElement ui_element = ConfigureGeneralUIElement(element_data);
+
+  std::cout << "Configured general UIElement properties" << std::endl;
+
+  // Configure the UIElement based on its type
+  switch (element_data.type()) {
+
+    // Panel
+  case UIElementType::UIElementType_Panel: {
+    std::cout << "Configuring Panel UIElement" << std::endl;
+    ui_element.element_type =
+        ConfigurePanel(*element_data.element_as_PanelData());
+    break;
+  }
+    // Button
+  case UIElementType::UIElementType_Button: {
+    std::cout << "Configuring Button UIElement" << std::endl;
+    ui_element.element_type =
+        ConfigureButton(*element_data.element_as_ButtonData());
+
+    break;
+  }
+    // DropDown
+  case UIElementType::UIElementType_DropDown: {
+    ui_element.element_type =
+        ConfigureDropDown(*element_data.element_as_DropDownData());
+  }
+  case UIElementType::UIElementType_None: {
+    // add an empty Panel element to the UIElement for the None type
+    ui_element.element_type = Panel{};
+
+    break;
+  }
+  }
+  std::cout << "UIElement configured successfully." << std::endl;
+
+  // Recursively build child elements if they exist
+  if (element_data.children()) {
+    std::cout << "Recursively building child elements" << std::endl;
+    for (const auto &child_element : *element_data.children()) {
+      // Recursively build the child UIElement
+      UIElement child_ui_element = RecursivlyBuildUIElement(*child_element);
+      // Add the child UIElement to the parent UIElement
+      ui_element.child_elements.push_back(child_ui_element);
+    }
+  }
+  return ui_element;
+};
+
+UIElement
+UIElementFactory::ConfigureGeneralUIElement(const UIElementData &element) {
+  // create UIElement
+  UIElement ui_element;
+  // general configuration for the UIElement (only variables specificied in the
+  // UIElement struct)
+  ui_element.layout = element.layout();
+  if (element.position()) {
+    ui_element.position =
+        sf::Vector2f(element.position()->x(), element.position()->y());
+  }
+  if (element.size()) {
+    ui_element.size = sf::Vector2f(element.size()->x(), element.size()->y());
+  }
+  if (element.action()) {
+    ui_element.action = element.action()->action_name();
+
+    // convert action keys to EventBitset
+    ui_element.trigger_event = ConvertActionKeysToEvent(*element.action());
+  }
+  if (element.data()) {
+
+    // give it a scene type enum based on string (this needs to be switched to a
+    // fbs enum at some point)
+    if (element.data()->scene_type()) {
+
+      // Title scene type
+      if (element.data()->scene_type()->str() == "TITLE") {
+        ui_element.ui_data_package.scene_type = SceneType::title;
+        // Crafting scene type
+      } else if (element.data()->scene_type()->str() == "CRAFTING") {
+        ui_element.ui_data_package.scene_type = SceneType::crafting;
+      }
+    }
+  }
+  return ui_element;
+}
+
+/////////////////////////////////////////////////
+Panel UIElementFactory::ConfigurePanel(const PanelData &panel_data) {
+  Panel panel_element;
+  // configure the panel element
+
+  return panel_element;
+}
+
+/////////////////////////////////////////////////
+Button UIElementFactory::ConfigureButton(const ButtonData &button_data) {
+  Button button_element;
+  // configure the button element
+  button_element.label = button_data.label()->str();
+  // add to the UIElement
+  return button_element;
+}
+
+DropDown
+UIElementFactory::ConfigureDropDown(const DropDownData &dropdown_data) {
+  DropDown dropdown_element;
+  // configure the dropdown_element
+
+  return dropdown_element;
+}
+} // namespace steamrot

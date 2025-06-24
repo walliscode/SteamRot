@@ -8,6 +8,7 @@ enum UIElementType: byte{
   None= 0, 
   Panel = 1,
   Button = 2,   
+  DropDown = 3
   }
 
 enum LayoutType: byte{ 
@@ -27,9 +28,12 @@ table ButtonData {
   label: string (required);
 }
 
+table DropDownData{}
+
 union UIElementDataUnion {
   PanelData,
-  ButtonData 
+  ButtonData,
+  DropDownData
 }
 
 table UIElementData{

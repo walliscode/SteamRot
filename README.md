@@ -1,4 +1,5 @@
 # SteamRot game structure
+
 <!--toc:start-->
 - [SteamRot game structure](#steamrot-game-structure)
   - [Directory structure](#directory-structure)
@@ -9,6 +10,10 @@
   - [Game Running](#game-running)
     - [RunGame](#rungame)
     - [UpdateSystems](#updatesystems)
+  - [Workflows](#workflows)
+    - [Actions](#actions)
+      - [Action Generation](#action-generation)
+      - [Action Registration](#action-registration)
   - [Classes](#classes)
     - [DataManager](#datamanager)
     - [Logic Class](#logic-class)
@@ -77,6 +82,27 @@ vector of scenes to update
 1. [sMovement](#smovement): handles the movement of all entities in the scene.
 
 ## Workflows
+
+## UI Elements
+
+### Adding New Element types
+
+Element definition is contained in `src/user_interface`. An UI Element is a struct such as Panel or Button.
+
+The general UIElement struct contains information common to all element structs and stores one of the possible structs (Panel, Button e.t.c.) as a std::variant.
+
+To create a new struct, add it as a header file in the `src/user_interface` and then add it to the ElementType typedef in UIElement.h file.
+
+We then need to create the flatbuffers data equivalent. In `src/flatbuffers_headers/user_interface.fbs` add the new element as `table NewElementData{}` and add that to the `union UIElementDataUnion`
+
+We need to interface the two in the UIElementFactory. Provide a specific function for just that Element and then add it to the switch statement.
+
+The element should contain information about the state of the UI Element.
+For things like drop down choices we store in the UIElementDataPackage.
+
+This all leads to storing the data of the UIElement in the CUserInteface component. We then need to know how to draw the new element. This is a combination of a style struct and logic.
+
+In the UIRenderLogic.h create a NewElementStyle struct which inherits from the Style struct. Again, create a relevant flatbuffers data equivalent under themes.fbs
 
 ### Actions
 

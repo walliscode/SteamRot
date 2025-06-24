@@ -27,6 +27,9 @@ struct PanelDataBuilder;
 struct ButtonData;
 struct ButtonDataBuilder;
 
+struct DropDownData;
+struct DropDownDataBuilder;
+
 struct UIElementData;
 struct UIElementDataBuilder;
 
@@ -37,31 +40,34 @@ enum UIElementType : int8_t {
   UIElementType_None = 0,
   UIElementType_Panel = 1,
   UIElementType_Button = 2,
+  UIElementType_DropDown = 3,
   UIElementType_MIN = UIElementType_None,
-  UIElementType_MAX = UIElementType_Button
+  UIElementType_MAX = UIElementType_DropDown
 };
 
-inline const UIElementType (&EnumValuesUIElementType())[3] {
+inline const UIElementType (&EnumValuesUIElementType())[4] {
   static const UIElementType values[] = {
     UIElementType_None,
     UIElementType_Panel,
-    UIElementType_Button
+    UIElementType_Button,
+    UIElementType_DropDown
   };
   return values;
 }
 
 inline const char * const *EnumNamesUIElementType() {
-  static const char * const names[4] = {
+  static const char * const names[5] = {
     "None",
     "Panel",
     "Button",
+    "DropDown",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameUIElementType(UIElementType e) {
-  if (::flatbuffers::IsOutRange(e, UIElementType_None, UIElementType_Button)) return "";
+  if (::flatbuffers::IsOutRange(e, UIElementType_None, UIElementType_DropDown)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesUIElementType()[index];
 }
@@ -106,31 +112,34 @@ enum UIElementDataUnion : uint8_t {
   UIElementDataUnion_NONE = 0,
   UIElementDataUnion_PanelData = 1,
   UIElementDataUnion_ButtonData = 2,
+  UIElementDataUnion_DropDownData = 3,
   UIElementDataUnion_MIN = UIElementDataUnion_NONE,
-  UIElementDataUnion_MAX = UIElementDataUnion_ButtonData
+  UIElementDataUnion_MAX = UIElementDataUnion_DropDownData
 };
 
-inline const UIElementDataUnion (&EnumValuesUIElementDataUnion())[3] {
+inline const UIElementDataUnion (&EnumValuesUIElementDataUnion())[4] {
   static const UIElementDataUnion values[] = {
     UIElementDataUnion_NONE,
     UIElementDataUnion_PanelData,
-    UIElementDataUnion_ButtonData
+    UIElementDataUnion_ButtonData,
+    UIElementDataUnion_DropDownData
   };
   return values;
 }
 
 inline const char * const *EnumNamesUIElementDataUnion() {
-  static const char * const names[4] = {
+  static const char * const names[5] = {
     "NONE",
     "PanelData",
     "ButtonData",
+    "DropDownData",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameUIElementDataUnion(UIElementDataUnion e) {
-  if (::flatbuffers::IsOutRange(e, UIElementDataUnion_NONE, UIElementDataUnion_ButtonData)) return "";
+  if (::flatbuffers::IsOutRange(e, UIElementDataUnion_NONE, UIElementDataUnion_DropDownData)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesUIElementDataUnion()[index];
 }
@@ -145,6 +154,10 @@ template<> struct UIElementDataUnionTraits<steamrot::PanelData> {
 
 template<> struct UIElementDataUnionTraits<steamrot::ButtonData> {
   static const UIElementDataUnion enum_value = UIElementDataUnion_ButtonData;
+};
+
+template<> struct UIElementDataUnionTraits<steamrot::DropDownData> {
+  static const UIElementDataUnion enum_value = UIElementDataUnion_DropDownData;
 };
 
 bool VerifyUIElementDataUnion(::flatbuffers::Verifier &verifier, const void *obj, UIElementDataUnion type);
@@ -282,6 +295,35 @@ inline ::flatbuffers::Offset<ButtonData> CreateButtonDataDirect(
       label__);
 }
 
+struct DropDownData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef DropDownDataBuilder Builder;
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct DropDownDataBuilder {
+  typedef DropDownData Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  explicit DropDownDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<DropDownData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<DropDownData>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<DropDownData> CreateDropDownData(
+    ::flatbuffers::FlatBufferBuilder &_fbb) {
+  DropDownDataBuilder builder_(_fbb);
+  return builder_.Finish();
+}
+
 struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef UIElementDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -323,6 +365,9 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::ButtonData *element_as_ButtonData() const {
     return element_type() == steamrot::UIElementDataUnion_ButtonData ? static_cast<const steamrot::ButtonData *>(element()) : nullptr;
   }
+  const steamrot::DropDownData *element_as_DropDownData() const {
+    return element_type() == steamrot::UIElementDataUnion_DropDownData ? static_cast<const steamrot::DropDownData *>(element()) : nullptr;
+  }
   const steamrot::Action *action() const {
     return GetPointer<const steamrot::Action *>(VT_ACTION);
   }
@@ -357,6 +402,10 @@ template<> inline const steamrot::PanelData *UIElementData::element_as<steamrot:
 
 template<> inline const steamrot::ButtonData *UIElementData::element_as<steamrot::ButtonData>() const {
   return element_as_ButtonData();
+}
+
+template<> inline const steamrot::DropDownData *UIElementData::element_as<steamrot::DropDownData>() const {
+  return element_as_DropDownData();
 }
 
 struct UIElementDataBuilder {
@@ -538,6 +587,10 @@ inline bool VerifyUIElementDataUnion(::flatbuffers::Verifier &verifier, const vo
     }
     case UIElementDataUnion_ButtonData: {
       auto ptr = reinterpret_cast<const steamrot::ButtonData *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case UIElementDataUnion_DropDownData: {
+      auto ptr = reinterpret_cast<const steamrot::DropDownData *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;

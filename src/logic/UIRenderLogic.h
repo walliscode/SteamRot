@@ -15,6 +15,7 @@
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <cstddef>
+
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 namespace steamrot {
@@ -44,11 +45,34 @@ struct ButtonStyle : public Style {
   std::string font;
 };
 
+struct DropDownStyle : public Style {
+  sf::Color text_color;
+  sf::Color hover_color;
+  std::string font;
+};
+
 class UIRenderLogic : public Logic<CUserInterface> {
 private:
+  /////////////////////////////////////////////////
+  /// @brief Draws a Panel struct with PanelStyle styling
+  ///
+  /// @param element UIElement struct containing any data
+  /////////////////////////////////////////////////
   void DrawPanel(UIElement &element);
 
+  /////////////////////////////////////////////////
+  /// @brief Draws a Button structu with ButtonStyle styling
+  ///
+  /// @param element UIElement structu containging any data
+  /////////////////////////////////////////////////
   void DrawButton(UIElement &element);
+
+  /////////////////////////////////////////////////
+  /// @brief Draws a DropDown structu with DropDownStyle styling
+  ///
+  /// @param element UILement structure containin any data
+  /////////////////////////////////////////////////
+  void DrawDropDown(UIElement &element);
 
   ////////////////////////////////////////////////////////////
   // |brief add in styles from flatbuffer config
@@ -64,6 +88,10 @@ private:
    */
   PanelStyle m_panel_style;
 
+  /////////////////////////////////////////////////
+  /// @brief Member variable tot hold the style for panels in the UI.
+  /////////////////////////////////////////////////
+  DropDownStyle m_dropdown_style;
   /**
    * @brief Draws all UIElements containted in the CUserInterface components.
    */

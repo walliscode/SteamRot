@@ -29,10 +29,17 @@ table ButtonStyle {
   font: string;
   }
 
+table DropDownStyle {
+  style: Style;
+  text_color: Color;
+  hover_color: Color;
+  font: string;
+  }
 
 table UIObjects {
     panel_style: PanelStyle;
     button_style: ButtonStyle;
+dropdown_style: DropDownStyle;
 
   }
 root_type UIObjects;
