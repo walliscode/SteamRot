@@ -14,8 +14,27 @@ CraftingScene::CraftingScene(const size_t pool_size,
 
 /////////////////////////////////////////////////
 void CraftingScene::ProcessActions() {
+
+  // reset actions and data
+  m_scene_action = ActionNames{0};
+  m_scene_data_package = SceneDataPackage{};
   // process actions
   ActionNames action = ScrapeLogicForActions().first;
+  LogicData logic_data = ScrapeLogicForActions().second;
+
+  switch (action) {
+
+  case ActionNames_ACTION_CHANGE_SCENE: {
+    // Change Scene is handled by the SceneManager, so set Scene variables
+    m_scene_action = action;
+    m_scene_data_package.new_scene_type = logic_data.ui_data_package.scene_type;
+  }
+
+  default: {
+    // do nothing
+    break;
+  }
+  }
 }
 
 /////////////////////////////////////////////////

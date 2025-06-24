@@ -87,12 +87,12 @@ protected:
   /**
    * @brief How often the logic should be updated.
    */
-  size_t m_update_frequency{2};
+  size_t m_update_frequency{1};
 
   /**
    * @brief Current cycle count for the logic. increased by RunLogic()
    */
-  size_t m_cycle_count{0};
+  size_t m_cycle_count{1};
 
   /**
    * @brief Member variable that contains the context of the scene the logic
