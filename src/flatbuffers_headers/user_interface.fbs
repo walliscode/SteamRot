@@ -25,10 +25,12 @@ table UIElementDataPackageData {
 table PanelData{}
 
 table ButtonData {
-  label: string (required);
+ label: string (required);
 }
 
-table DropDownData{}
+table DropDownData{
+    label: string (required);
+  }
 
 union UIElementDataUnion {
   PanelData,

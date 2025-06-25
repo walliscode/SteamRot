@@ -77,7 +77,9 @@ struct Style FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_BORDER_COLOR = 6,
     VT_BORDER_THICKNESS = 8,
     VT_RADIUS_RESOLUTION = 10,
-    VT_INNER_MARGIN = 12
+    VT_INNER_MARGIN = 12,
+    VT_MINIMUM_SIZE = 14,
+    VT_MAXIMUM_SIZE = 16
   };
   const steamrot::themes::Color *background_color() const {
     return GetStruct<const steamrot::themes::Color *>(VT_BACKGROUND_COLOR);
@@ -94,14 +96,24 @@ struct Style FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const Vector2f *inner_margin() const {
     return GetPointer<const Vector2f *>(VT_INNER_MARGIN);
   }
+  const Vector2f *minimum_size() const {
+    return GetPointer<const Vector2f *>(VT_MINIMUM_SIZE);
+  }
+  const Vector2f *maximum_size() const {
+    return GetPointer<const Vector2f *>(VT_MAXIMUM_SIZE);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<steamrot::themes::Color>(verifier, VT_BACKGROUND_COLOR, 1) &&
-           VerifyField<steamrot::themes::Color>(verifier, VT_BORDER_COLOR, 1) &&
+           VerifyFieldRequired<steamrot::themes::Color>(verifier, VT_BACKGROUND_COLOR, 1) &&
+           VerifyFieldRequired<steamrot::themes::Color>(verifier, VT_BORDER_COLOR, 1) &&
            VerifyField<float>(verifier, VT_BORDER_THICKNESS, 4) &&
            VerifyField<int32_t>(verifier, VT_RADIUS_RESOLUTION, 4) &&
-           VerifyOffset(verifier, VT_INNER_MARGIN) &&
+           VerifyOffsetRequired(verifier, VT_INNER_MARGIN) &&
            verifier.VerifyTable(inner_margin()) &&
+           VerifyOffsetRequired(verifier, VT_MINIMUM_SIZE) &&
+           verifier.VerifyTable(minimum_size()) &&
+           VerifyOffsetRequired(verifier, VT_MAXIMUM_SIZE) &&
+           verifier.VerifyTable(maximum_size()) &&
            verifier.EndTable();
   }
 };
@@ -125,6 +137,12 @@ struct StyleBuilder {
   void add_inner_margin(::flatbuffers::Offset<Vector2f> inner_margin) {
     fbb_.AddOffset(Style::VT_INNER_MARGIN, inner_margin);
   }
+  void add_minimum_size(::flatbuffers::Offset<Vector2f> minimum_size) {
+    fbb_.AddOffset(Style::VT_MINIMUM_SIZE, minimum_size);
+  }
+  void add_maximum_size(::flatbuffers::Offset<Vector2f> maximum_size) {
+    fbb_.AddOffset(Style::VT_MAXIMUM_SIZE, maximum_size);
+  }
   explicit StyleBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -132,6 +150,11 @@ struct StyleBuilder {
   ::flatbuffers::Offset<Style> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = ::flatbuffers::Offset<Style>(end);
+    fbb_.Required(o, Style::VT_BACKGROUND_COLOR);
+    fbb_.Required(o, Style::VT_BORDER_COLOR);
+    fbb_.Required(o, Style::VT_INNER_MARGIN);
+    fbb_.Required(o, Style::VT_MINIMUM_SIZE);
+    fbb_.Required(o, Style::VT_MAXIMUM_SIZE);
     return o;
   }
 };
@@ -142,8 +165,12 @@ inline ::flatbuffers::Offset<Style> CreateStyle(
     const steamrot::themes::Color *border_color = nullptr,
     float border_thickness = 0.0f,
     int32_t radius_resolution = 0,
-    ::flatbuffers::Offset<Vector2f> inner_margin = 0) {
+    ::flatbuffers::Offset<Vector2f> inner_margin = 0,
+    ::flatbuffers::Offset<Vector2f> minimum_size = 0,
+    ::flatbuffers::Offset<Vector2f> maximum_size = 0) {
   StyleBuilder builder_(_fbb);
+  builder_.add_maximum_size(maximum_size);
+  builder_.add_minimum_size(minimum_size);
   builder_.add_inner_margin(inner_margin);
   builder_.add_radius_resolution(radius_resolution);
   builder_.add_border_thickness(border_thickness);
@@ -288,7 +315,10 @@ struct DropDownStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_STYLE = 4,
     VT_TEXT_COLOR = 6,
     VT_HOVER_COLOR = 8,
-    VT_FONT = 10
+    VT_FONT = 10,
+    VT_DROP_SYMBOL_RATIO = 12,
+    VT_DROP_SYMBOL_CONTAINER_COLOR = 14,
+    VT_DROP_SYMBOL_COLOR = 16
   };
   const steamrot::themes::Style *style() const {
     return GetPointer<const steamrot::themes::Style *>(VT_STYLE);
@@ -302,6 +332,15 @@ struct DropDownStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ::flatbuffers::String *font() const {
     return GetPointer<const ::flatbuffers::String *>(VT_FONT);
   }
+  float drop_symbol_ratio() const {
+    return GetField<float>(VT_DROP_SYMBOL_RATIO, 0.0f);
+  }
+  const steamrot::themes::Color *drop_symbol_container_color() const {
+    return GetStruct<const steamrot::themes::Color *>(VT_DROP_SYMBOL_CONTAINER_COLOR);
+  }
+  const steamrot::themes::Color *drop_symbol_color() const {
+    return GetStruct<const steamrot::themes::Color *>(VT_DROP_SYMBOL_COLOR);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_STYLE) &&
@@ -310,6 +349,9 @@ struct DropDownStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<steamrot::themes::Color>(verifier, VT_HOVER_COLOR, 1) &&
            VerifyOffset(verifier, VT_FONT) &&
            verifier.VerifyString(font()) &&
+           VerifyField<float>(verifier, VT_DROP_SYMBOL_RATIO, 4) &&
+           VerifyField<steamrot::themes::Color>(verifier, VT_DROP_SYMBOL_CONTAINER_COLOR, 1) &&
+           VerifyField<steamrot::themes::Color>(verifier, VT_DROP_SYMBOL_COLOR, 1) &&
            verifier.EndTable();
   }
 };
@@ -330,6 +372,15 @@ struct DropDownStyleBuilder {
   void add_font(::flatbuffers::Offset<::flatbuffers::String> font) {
     fbb_.AddOffset(DropDownStyle::VT_FONT, font);
   }
+  void add_drop_symbol_ratio(float drop_symbol_ratio) {
+    fbb_.AddElement<float>(DropDownStyle::VT_DROP_SYMBOL_RATIO, drop_symbol_ratio, 0.0f);
+  }
+  void add_drop_symbol_container_color(const steamrot::themes::Color *drop_symbol_container_color) {
+    fbb_.AddStruct(DropDownStyle::VT_DROP_SYMBOL_CONTAINER_COLOR, drop_symbol_container_color);
+  }
+  void add_drop_symbol_color(const steamrot::themes::Color *drop_symbol_color) {
+    fbb_.AddStruct(DropDownStyle::VT_DROP_SYMBOL_COLOR, drop_symbol_color);
+  }
   explicit DropDownStyleBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -346,8 +397,14 @@ inline ::flatbuffers::Offset<DropDownStyle> CreateDropDownStyle(
     ::flatbuffers::Offset<steamrot::themes::Style> style = 0,
     const steamrot::themes::Color *text_color = nullptr,
     const steamrot::themes::Color *hover_color = nullptr,
-    ::flatbuffers::Offset<::flatbuffers::String> font = 0) {
+    ::flatbuffers::Offset<::flatbuffers::String> font = 0,
+    float drop_symbol_ratio = 0.0f,
+    const steamrot::themes::Color *drop_symbol_container_color = nullptr,
+    const steamrot::themes::Color *drop_symbol_color = nullptr) {
   DropDownStyleBuilder builder_(_fbb);
+  builder_.add_drop_symbol_color(drop_symbol_color);
+  builder_.add_drop_symbol_container_color(drop_symbol_container_color);
+  builder_.add_drop_symbol_ratio(drop_symbol_ratio);
   builder_.add_font(font);
   builder_.add_hover_color(hover_color);
   builder_.add_text_color(text_color);
@@ -360,14 +417,20 @@ inline ::flatbuffers::Offset<DropDownStyle> CreateDropDownStyleDirect(
     ::flatbuffers::Offset<steamrot::themes::Style> style = 0,
     const steamrot::themes::Color *text_color = nullptr,
     const steamrot::themes::Color *hover_color = nullptr,
-    const char *font = nullptr) {
+    const char *font = nullptr,
+    float drop_symbol_ratio = 0.0f,
+    const steamrot::themes::Color *drop_symbol_container_color = nullptr,
+    const steamrot::themes::Color *drop_symbol_color = nullptr) {
   auto font__ = font ? _fbb.CreateString(font) : 0;
   return steamrot::themes::CreateDropDownStyle(
       _fbb,
       style,
       text_color,
       hover_color,
-      font__);
+      font__,
+      drop_symbol_ratio,
+      drop_symbol_container_color,
+      drop_symbol_color);
 }
 
 struct UIObjects FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -388,11 +451,11 @@ struct UIObjects FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_PANEL_STYLE) &&
+           VerifyOffsetRequired(verifier, VT_PANEL_STYLE) &&
            verifier.VerifyTable(panel_style()) &&
-           VerifyOffset(verifier, VT_BUTTON_STYLE) &&
+           VerifyOffsetRequired(verifier, VT_BUTTON_STYLE) &&
            verifier.VerifyTable(button_style()) &&
-           VerifyOffset(verifier, VT_DROPDOWN_STYLE) &&
+           VerifyOffsetRequired(verifier, VT_DROPDOWN_STYLE) &&
            verifier.VerifyTable(dropdown_style()) &&
            verifier.EndTable();
   }
@@ -418,6 +481,9 @@ struct UIObjectsBuilder {
   ::flatbuffers::Offset<UIObjects> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = ::flatbuffers::Offset<UIObjects>(end);
+    fbb_.Required(o, UIObjects::VT_PANEL_STYLE);
+    fbb_.Required(o, UIObjects::VT_BUTTON_STYLE);
+    fbb_.Required(o, UIObjects::VT_DROPDOWN_STYLE);
     return o;
   }
 };

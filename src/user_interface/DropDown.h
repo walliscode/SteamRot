@@ -17,5 +17,5 @@ struct DropDown {
   /// @brief The name you see when the items are not expanded. It should
   /// indicate role of the dropdown
   /////////////////////////////////////////////////
-  std::string m_display_name{"items..."};
+  std::string label{"items..."};
 };

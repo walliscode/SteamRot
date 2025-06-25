@@ -53,6 +53,14 @@
                     "LEFT_CLICK"
                   ]
                 }
+              },
+              {
+                "type": "DropDown",
+                "layout": "Horizontal",
+                "children": [],
+                "element_type": "DropDownData",
+                "element": {},
+                "action": {}
               }
             ],
             "position": {

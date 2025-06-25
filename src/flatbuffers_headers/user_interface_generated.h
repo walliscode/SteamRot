@@ -297,8 +297,16 @@ inline ::flatbuffers::Offset<ButtonData> CreateButtonDataDirect(
 
 struct DropDownData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef DropDownDataBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_LABEL = 4
+  };
+  const ::flatbuffers::String *label() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_LABEL);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_LABEL) &&
+           verifier.VerifyString(label()) &&
            verifier.EndTable();
   }
 };
@@ -307,6 +315,9 @@ struct DropDownDataBuilder {
   typedef DropDownData Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
+  void add_label(::flatbuffers::Offset<::flatbuffers::String> label) {
+    fbb_.AddOffset(DropDownData::VT_LABEL, label);
+  }
   explicit DropDownDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -314,14 +325,26 @@ struct DropDownDataBuilder {
   ::flatbuffers::Offset<DropDownData> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = ::flatbuffers::Offset<DropDownData>(end);
+    fbb_.Required(o, DropDownData::VT_LABEL);
     return o;
   }
 };
 
 inline ::flatbuffers::Offset<DropDownData> CreateDropDownData(
-    ::flatbuffers::FlatBufferBuilder &_fbb) {
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::String> label = 0) {
   DropDownDataBuilder builder_(_fbb);
+  builder_.add_label(label);
   return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<DropDownData> CreateDropDownDataDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const char *label = nullptr) {
+  auto label__ = label ? _fbb.CreateString(label) : 0;
+  return steamrot::CreateDropDownData(
+      _fbb,
+      label__);
 }
 
 struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {

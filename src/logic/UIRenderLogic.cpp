@@ -46,6 +46,7 @@ void UIRenderLogic::ProcessLogic() {
 
 ////////////////////////////////////////////////////////////
 void UIRenderLogic::AddStyles(const themes::UIObjects *config) {
+  std::cout << "UIEngine: Adding styles from config" << std::endl;
   // add guard to check if config is not null
   if (!config) {
     log_handler::ProcessLog(
@@ -54,65 +55,141 @@ void UIRenderLogic::AddStyles(const themes::UIObjects *config) {
     return;
   }
 
-  // set the panel style from the flatbuffer config
-  m_panel_style.background_color =
-      sf::Color(config->panel_style()->style()->background_color()->r(),
-                config->panel_style()->style()->background_color()->g(),
-                config->panel_style()->style()->background_color()->b(),
-                config->panel_style()->style()->background_color()->a());
-  m_panel_style.border_color =
-      sf::Color(config->panel_style()->style()->border_color()->r(),
-                config->panel_style()->style()->border_color()->g(),
-                config->panel_style()->style()->border_color()->b(),
-                config->panel_style()->style()->border_color()->a());
-  m_panel_style.border_thickness =
-      config->panel_style()->style()->border_thickness();
-  m_panel_style.radius_resolution =
-      config->panel_style()->style()->radius_resolution();
-  m_panel_style.inner_margin =
-      sf::Vector2f(config->panel_style()->style()->inner_margin()->x(),
-                   config->panel_style()->style()->inner_margin()->y());
+  // configure the styles from the flatbuffer config
+  if (config->panel_style()) {
+    ConfigurePanelStyle(config->panel_style());
+  } else {
+    log_handler::ProcessLog(
+        spdlog::level::level_enum::err, log_handler::LogCode::kNoCode,
+        "UIEngine: Null panel style provided, cannot configure panel style");
+  }
 
-  // set the button style from the flatbuffer config
-  m_button_style.background_color =
-      sf::Color(config->button_style()->style()->background_color()->r(),
-                config->button_style()->style()->background_color()->g(),
-                config->button_style()->style()->background_color()->b(),
-                config->button_style()->style()->background_color()->a());
+  if (config->button_style()) {
+    ConfigureButtonStyle(config->button_style());
+  } else {
+    log_handler::ProcessLog(
+        spdlog::level::level_enum::err, log_handler::LogCode::kNoCode,
+        "UIEngine: Null button style provided, cannot configure button style");
+  }
+  std::cout << "UIEngine: Configured button style" << std::endl;
+  if (config->dropdown_style()) {
+    ConfigureDropDownStyle(config->dropdown_style());
+  } else {
+    log_handler::ProcessLog(
+        spdlog::level::level_enum::err, log_handler::LogCode::kNoCode,
+        "UIEngine: Null dropdown style provided, cannot configure dropdown "
+        "style");
+  }
 
-  m_button_style.border_color =
-      sf::Color(config->button_style()->style()->border_color()->r(),
-                config->button_style()->style()->border_color()->g(),
-                config->button_style()->style()->border_color()->b(),
-                config->button_style()->style()->border_color()->a());
-
-  m_button_style.border_thickness =
-      config->button_style()->style()->border_thickness();
-
-  m_button_style.radius_resolution =
-      config->button_style()->style()->radius_resolution();
-
-  m_button_style.inner_margin =
-      sf::Vector2f(config->button_style()->style()->inner_margin()->x(),
-                   config->button_style()->style()->inner_margin()->y());
-
-  m_button_style.text_color =
-      sf::Color(config->button_style()->text_color()->r(),
-                config->button_style()->text_color()->g(),
-                config->button_style()->text_color()->b(),
-                config->button_style()->text_color()->a());
-
-  m_button_style.hover_color =
-      sf::Color(config->button_style()->hover_color()->r(),
-                config->button_style()->hover_color()->g(),
-                config->button_style()->hover_color()->b(),
-                config->button_style()->hover_color()->a());
-
-  log_handler::ProcessLog(
-      spdlog::level::level_enum::info, log_handler::LogCode::kNoCode,
-      "UIEngine: Button styles added from flatbuffer config");
+  std::cout << "UIEngine: Styles added successfully" << std::endl;
 }
 
+/////////////////////////////////////////////////
+void UIRenderLogic::ConfigurePanelStyle(const themes::PanelStyle *panel_style) {
+  // set the panel style from the flatbuffer config
+  m_panel_style.background_color =
+      sf::Color(panel_style->style()->background_color()->r(),
+                panel_style->style()->background_color()->g(),
+                panel_style->style()->background_color()->b(),
+                panel_style->style()->background_color()->a());
+  m_panel_style.border_color =
+      sf::Color(panel_style->style()->border_color()->r(),
+                panel_style->style()->border_color()->g(),
+                panel_style->style()->border_color()->b(),
+                panel_style->style()->border_color()->a());
+  m_panel_style.border_thickness = panel_style->style()->border_thickness();
+  m_panel_style.radius_resolution = panel_style->style()->radius_resolution();
+  m_panel_style.inner_margin =
+      sf::Vector2f(panel_style->style()->inner_margin()->x(),
+                   panel_style->style()->inner_margin()->y());
+
+  m_panel_style.minimum_size =
+      sf::Vector2f(panel_style->style()->minimum_size()->x(),
+                   panel_style->style()->minimum_size()->y());
+  m_panel_style.maximum_size =
+      sf::Vector2f(panel_style->style()->maximum_size()->x(),
+                   panel_style->style()->maximum_size()->y());
+  std::cout << "UIEngine: Panel style configured successfully" << std::endl;
+}
+
+/////////////////////////////////////////////////
+void UIRenderLogic::ConfigureButtonStyle(
+    const themes::ButtonStyle *button_style) {
+  // set the button style from the flatbuffer config
+  m_button_style.background_color =
+      sf::Color(button_style->style()->background_color()->r(),
+                button_style->style()->background_color()->g(),
+                button_style->style()->background_color()->b(),
+                button_style->style()->background_color()->a());
+  m_button_style.border_color =
+      sf::Color(button_style->style()->border_color()->r(),
+                button_style->style()->border_color()->g(),
+                button_style->style()->border_color()->b(),
+                button_style->style()->border_color()->a());
+  m_button_style.border_thickness = button_style->style()->border_thickness();
+  m_button_style.radius_resolution = button_style->style()->radius_resolution();
+  m_button_style.inner_margin =
+      sf::Vector2f(button_style->style()->inner_margin()->x(),
+                   button_style->style()->inner_margin()->y());
+  m_button_style.text_color = sf::Color(
+      button_style->text_color()->r(), button_style->text_color()->g(),
+      button_style->text_color()->b(), button_style->text_color()->a());
+  m_button_style.hover_color = sf::Color(
+      button_style->hover_color()->r(), button_style->hover_color()->g(),
+      button_style->hover_color()->b(), button_style->hover_color()->a());
+
+  m_button_style.minimum_size =
+      sf::Vector2f(button_style->style()->minimum_size()->x(),
+                   button_style->style()->minimum_size()->y());
+  m_button_style.maximum_size =
+      sf::Vector2f(button_style->style()->maximum_size()->x(),
+                   button_style->style()->maximum_size()->y());
+  std::cout << "UIEngine: Button style configured successfully" << std::endl;
+}
+
+/////////////////////////////////////////////////
+void UIRenderLogic::ConfigureDropDownStyle(
+    const themes::DropDownStyle *dropdown_style) {
+
+  // set the DropDown style from the flatbuffer config
+  m_dropdown_style.background_color =
+      sf::Color(dropdown_style->style()->background_color()->r(),
+                dropdown_style->style()->background_color()->g(),
+                dropdown_style->style()->background_color()->b(),
+                dropdown_style->style()->background_color()->a());
+  m_dropdown_style.border_color =
+      sf::Color(dropdown_style->style()->border_color()->r(),
+                dropdown_style->style()->border_color()->g(),
+                dropdown_style->style()->border_color()->b(),
+                dropdown_style->style()->border_color()->a());
+  m_dropdown_style.border_thickness =
+      dropdown_style->style()->border_thickness();
+  m_dropdown_style.radius_resolution =
+      dropdown_style->style()->radius_resolution();
+  m_dropdown_style.inner_margin =
+      sf::Vector2f(dropdown_style->style()->inner_margin()->x(),
+                   dropdown_style->style()->inner_margin()->y());
+
+  m_dropdown_style.drop_symbol_ratio = dropdown_style->drop_symbol_ratio();
+  m_dropdown_style.drop_symbol_container_color =
+      sf::Color(dropdown_style->drop_symbol_container_color()->r(),
+                dropdown_style->drop_symbol_container_color()->g(),
+                dropdown_style->drop_symbol_container_color()->b(),
+                dropdown_style->drop_symbol_container_color()->a());
+  m_dropdown_style.drop_symbol_color = m_dropdown_style.drop_symbol_color =
+      sf::Color(dropdown_style->drop_symbol_color()->r(),
+                dropdown_style->drop_symbol_color()->g(),
+                dropdown_style->drop_symbol_color()->b(),
+                dropdown_style->drop_symbol_color()->a());
+
+  m_dropdown_style.minimum_size =
+      sf::Vector2f(dropdown_style->style()->minimum_size()->x(),
+                   dropdown_style->style()->minimum_size()->y());
+  m_dropdown_style.maximum_size =
+      sf::Vector2f(dropdown_style->style()->maximum_size()->x(),
+                   dropdown_style->style()->maximum_size()->y());
+  std::cout << "UIEngine: DropDown style configured successfully" << std::endl;
+}
 void UIRenderLogic::DrawUIElements() {
 
   // cycle through all the Archetype IDs associated with this logic
@@ -160,6 +237,13 @@ void UIRenderLogic::RecursiveDrawUIElement(UIElement &element) {
       DrawButton(element);
       border_thickness = m_button_style.border_thickness;
       inner_margin = m_button_style.inner_margin;
+
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(element_type)>,
+                                        DropDown>) {
+
+      DrawDropDown(element);
+      border_thickness = m_dropdown_style.border_thickness;
+      inner_margin = m_dropdown_style.inner_margin;
     } else {
       std::cout << "Unknown element type for drawing" << std::endl;
     }
@@ -177,7 +261,6 @@ void UIRenderLogic::RecursiveDrawUIElement(UIElement &element) {
   // Recursively draw child elements if they exist
 
   for (size_t i = 0; i < number_of_children; ++i) {
-
     switch (element.layout) {
 
     case LayoutType::LayoutType_Vertical: {
@@ -276,6 +359,117 @@ void UIRenderLogic::DrawButton(UIElement &element) {
   m_logic_context.scene_texture.draw(button_text);
 }
 /////////////////////////////////////////////////
+void UIRenderLogic::DrawDropDown(UIElement &element) {
+
+  // adjust the size of th dropdown element
+  AdjustSize(element);
+
+  // print out the size and position of the dropdown element
+  std::cout << "DropDown Element Size: " << element.size.x << "x"
+            << element.size.y << " Position: (" << element.position.x << ", "
+            << element.position.y << ")" << std::endl;
+  // Draw the box first
+  DrawBoxWithRadiusCorners(element);
+
+  // DropDown symbol
+  // create rectangle shape to hold the drop down symbol
+  sf::RectangleShape drop_symbol_container;
+
+  // set size of the container and account for border thickness
+  drop_symbol_container.setSize(
+      {(element.size.x - (2 * m_dropdown_style.border_thickness)) *
+           m_dropdown_style.drop_symbol_ratio,
+       element.size.y - (2 * m_dropdown_style.border_thickness)});
+
+  // set the position of the container accounting for the border thickness (not
+  // inner margin) the symbol is place to the right of the dropdown
+  drop_symbol_container.setPosition(
+      {element.position.x + element.size.x - drop_symbol_container.getSize().x -
+           m_dropdown_style.border_thickness,
+       element.position.y + m_dropdown_style.border_thickness});
+
+  // set the fill color of the container
+  drop_symbol_container.setFillColor(
+      m_dropdown_style.drop_symbol_container_color);
+  // draw the container to the render texture
+  m_logic_context.scene_texture.draw(drop_symbol_container);
+
+  // create an upside down triangle for the drop symbol
+  sf::ConvexShape drop_symbol;
+  drop_symbol.setPointCount(3);
+
+  // set the points of the triangle
+  // the triangle is upside down so the points are in the order of
+  // top, bottom left, bottom right
+  // the top point is at the top of the container
+  // the bottom left and right points are at the bottom of the container
+  drop_symbol.setPoint(0, {drop_symbol_container.getSize().x / 2, 0});
+  drop_symbol.setPoint(1, {0, drop_symbol_container.getSize().y});
+  drop_symbol.setPoint(2, {drop_symbol_container.getSize().x,
+                           drop_symbol_container.getSize().y});
+  // set the position of the drop symbol to the top left corner of the container
+  drop_symbol.setPosition(drop_symbol_container.getPosition());
+
+  // set the fill color of the drop symbol
+  drop_symbol.setFillColor(m_dropdown_style.drop_symbol_color);
+
+  // draw the drop symbol to the render texture
+  m_logic_context.scene_texture.draw(drop_symbol);
+}
+
+/////////////////////////////////////////////////
+void UIRenderLogic::AdjustSize(UIElement &element) {
+  // variales to hold the minimum and maximum sizes
+  sf::Vector2f min_size;
+  sf::Vector2f max_size;
+
+  // the minimum and maximum sizes are contained within the relevant style
+  // we get that using a visitor function and assign it to variables
+  auto UIVisitor = [&](auto &element_type) -> void {
+    if constexpr (std::is_same_v<std::decay_t<decltype(element_type)>, Panel>) {
+      min_size = m_panel_style.minimum_size;
+      max_size = m_panel_style.maximum_size;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(element_type)>,
+                                        Button>) {
+      min_size = m_button_style.minimum_size;
+      max_size = m_button_style.maximum_size;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(element_type)>,
+                                        DropDown>) {
+      std::cout << "Adjusting size for DropDown element" << std::endl;
+
+      min_size = m_dropdown_style.minimum_size;
+      max_size = m_dropdown_style.maximum_size;
+
+      std::cout << "DropDown minimum size: " << min_size.x << "x" << min_size.y
+                << std::endl;
+      std::cout << "DropDown maximum size: " << max_size.x << "x" << max_size.y
+                << std::endl;
+    } else {
+      std::cout << "Unknown element type for size adjustment" << std::endl;
+    }
+  };
+
+  // call the visitor function with the element type
+  std::visit(UIVisitor, element.element_type);
+
+  // adjust the size of the element based on the minimum and maximum sizes
+  // if the size is smaller than the minimum size, set it to the minimum size
+  if (element.size.x < min_size.x) {
+    element.size.x = min_size.x;
+  }
+  if (element.size.y < min_size.y) {
+    element.size.y = min_size.y;
+  }
+  // if the size is larger than the maximum size, set it to the maximum size
+  if (element.size.x > max_size.x) {
+    element.size.x = max_size.x;
+  }
+  if (element.size.y > max_size.y) {
+    element.size.y = max_size.y;
+  }
+}
+
+/////////////////////////////////////////////////
 void UIRenderLogic::DrawBoxWithRadiusCorners(UIElement &ui_element) {
   // set element specific variables
   float radius;
@@ -306,7 +500,17 @@ void UIRenderLogic::DrawBoxWithRadiusCorners(UIElement &ui_element) {
       } else {
         background_color = m_button_style.background_color;
       }
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(element_type)>,
+                                        DropDown>) {
 
+      radius = m_dropdown_style.border_thickness;
+      resolution = m_dropdown_style.radius_resolution;
+      border_color = m_dropdown_style.border_color;
+      if (ui_element.mouse_over) {
+        background_color = m_dropdown_style.hover_color;
+      } else {
+        background_color = m_dropdown_style.background_color;
+      }
     } else {
       std::cout << "Unknown style type selected" << std::endl;
     }

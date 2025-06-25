@@ -47,10 +47,13 @@ UIElementFactory::RecursivlyBuildUIElement(const UIElementData &element_data) {
   }
     // DropDown
   case UIElementType::UIElementType_DropDown: {
+    std::cout << "Configuring DropDown UIElement" << std::endl;
     ui_element.element_type =
         ConfigureDropDown(*element_data.element_as_DropDownData());
+
+    break;
   }
-  case UIElementType::UIElementType_None: {
+  default: {
     // add an empty Panel element to the UIElement for the None type
     ui_element.element_type = Panel{};
 

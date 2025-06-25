@@ -29,6 +29,14 @@
                 "data": {
                   "scene_type": "TITLE"
                 }
+              },
+              {
+                "type": "DropDown",
+                "layout": "Horizontal",
+                "children": [],
+                "element_type": "DropDownData",
+                "element": {},
+                "action": {}
               }
             ],
             "position": {
