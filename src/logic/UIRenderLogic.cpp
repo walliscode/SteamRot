@@ -4,15 +4,19 @@
 #include "UIRenderLogic.h"
 #include "BaseLogic.h"
 #include "CUserInterface.h"
+#include "DropDown.h"
 #include "EntityHelpers.h"
 #include "log_handler.h"
+#include "themes_generated.h"
 #include "user_interface_generated.h"
 
+#include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/ConvexShape.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Text.hpp>
+#include <SFML/System/Angle.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <iostream>
 
@@ -72,13 +76,40 @@ void UIRenderLogic::AddStyles(const themes::UIObjects *config) {
         "UIEngine: Null button style provided, cannot configure button style");
   }
   std::cout << "UIEngine: Configured button style" << std::endl;
-  if (config->dropdown_style()) {
-    ConfigureDropDownStyle(config->dropdown_style());
+  if (config->drop_down_container_style()) {
+    ConfigureDropDownContainerStyle(config->drop_down_container_style());
   } else {
     log_handler::ProcessLog(
         spdlog::level::level_enum::err, log_handler::LogCode::kNoCode,
         "UIEngine: Null dropdown style provided, cannot configure dropdown "
         "style");
+  }
+
+  if (config->drop_down_list_style()) {
+    ConfigureDropDownListStyle(config->drop_down_list_style());
+  } else {
+    log_handler::ProcessLog(
+        spdlog::level::level_enum::err, log_handler::LogCode::kNoCode,
+        "UIEngine: Null dropdown list style provided, cannot configure "
+        "dropdown list style");
+  }
+
+  if (config->drop_down_item_style()) {
+    ConfigureDropDownItemStyle(config->drop_down_item_style());
+  } else {
+    log_handler::ProcessLog(
+        spdlog::level::level_enum::err, log_handler::LogCode::kNoCode,
+        "UIEngine: Null dropdown item style provided, cannot configure "
+        "dropdown item style");
+  }
+
+  if (config->drop_down_button_style()) {
+    ConfigureDropDownButtonStyle(config->drop_down_button_style());
+  } else {
+    log_handler::ProcessLog(
+        spdlog::level::level_enum::err, log_handler::LogCode::kNoCode,
+        "UIEngine: Null dropdown button style provided, cannot configure "
+        "dropdown button style");
   }
 
   std::cout << "UIEngine: Styles added successfully" << std::endl;
@@ -148,8 +179,8 @@ void UIRenderLogic::ConfigureButtonStyle(
 }
 
 /////////////////////////////////////////////////
-void UIRenderLogic::ConfigureDropDownStyle(
-    const themes::DropDownStyle *dropdown_style) {
+void UIRenderLogic::ConfigureDropDownContainerStyle(
+    const themes::DropDownContainerStyle *dropdown_style) {
 
   // set the DropDown style from the flatbuffer config
   m_dropdown_style.background_color =
@@ -171,16 +202,6 @@ void UIRenderLogic::ConfigureDropDownStyle(
                    dropdown_style->style()->inner_margin()->y());
 
   m_dropdown_style.drop_symbol_ratio = dropdown_style->drop_symbol_ratio();
-  m_dropdown_style.drop_symbol_container_color =
-      sf::Color(dropdown_style->drop_symbol_container_color()->r(),
-                dropdown_style->drop_symbol_container_color()->g(),
-                dropdown_style->drop_symbol_container_color()->b(),
-                dropdown_style->drop_symbol_container_color()->a());
-  m_dropdown_style.drop_symbol_color = m_dropdown_style.drop_symbol_color =
-      sf::Color(dropdown_style->drop_symbol_color()->r(),
-                dropdown_style->drop_symbol_color()->g(),
-                dropdown_style->drop_symbol_color()->b(),
-                dropdown_style->drop_symbol_color()->a());
 
   m_dropdown_style.minimum_size =
       sf::Vector2f(dropdown_style->style()->minimum_size()->x(),
@@ -190,6 +211,130 @@ void UIRenderLogic::ConfigureDropDownStyle(
                    dropdown_style->style()->maximum_size()->y());
   std::cout << "UIEngine: DropDown style configured successfully" << std::endl;
 }
+
+/////////////////////////////////////////////////
+void UIRenderLogic::ConfigureDropDownListStyle(
+    const themes::DropDownListStyle *dropdown_list_style) {
+  // set the DropDownList style from the flatbuffer config
+  m_dropdown_list_style.background_color =
+      sf::Color(dropdown_list_style->style()->background_color()->r(),
+                dropdown_list_style->style()->background_color()->g(),
+                dropdown_list_style->style()->background_color()->b(),
+                dropdown_list_style->style()->background_color()->a());
+  m_dropdown_list_style.border_color =
+      sf::Color(dropdown_list_style->style()->border_color()->r(),
+                dropdown_list_style->style()->border_color()->g(),
+                dropdown_list_style->style()->border_color()->b(),
+                dropdown_list_style->style()->border_color()->a());
+  m_dropdown_list_style.border_thickness =
+      dropdown_list_style->style()->border_thickness();
+  m_dropdown_list_style.radius_resolution =
+      dropdown_list_style->style()->radius_resolution();
+  m_dropdown_list_style.inner_margin =
+      sf::Vector2f(dropdown_list_style->style()->inner_margin()->x(),
+                   dropdown_list_style->style()->inner_margin()->y());
+  m_dropdown_list_style.minimum_size =
+      sf::Vector2f(dropdown_list_style->style()->minimum_size()->x(),
+                   dropdown_list_style->style()->minimum_size()->y());
+  m_dropdown_list_style.maximum_size =
+      sf::Vector2f(dropdown_list_style->style()->maximum_size()->x(),
+                   dropdown_list_style->style()->maximum_size()->y());
+
+  m_dropdown_list_style.text_color =
+      sf::Color(dropdown_list_style->text_color()->r(),
+                dropdown_list_style->text_color()->g(),
+                dropdown_list_style->text_color()->b(),
+                dropdown_list_style->text_color()->a());
+  m_dropdown_list_style.hover_color =
+      sf::Color(dropdown_list_style->hover_color()->r(),
+                dropdown_list_style->hover_color()->g(),
+                dropdown_list_style->hover_color()->b(),
+                dropdown_list_style->hover_color()->a());
+
+  m_dropdown_list_style.font = dropdown_list_style->font()->str();
+
+  std::cout << "UIEngine: DropDownList style configured successfully"
+            << std::endl;
+}
+
+/////////////////////////////////////////////////
+void UIRenderLogic::ConfigureDropDownItemStyle(
+    const themes::DropDownItemStyle *dropdown_item_style) {
+  // set the DropDownItem style from the flatbuffer config
+  m_dropdown_item_style.background_color =
+      sf::Color(dropdown_item_style->style()->background_color()->r(),
+                dropdown_item_style->style()->background_color()->g(),
+                dropdown_item_style->style()->background_color()->b(),
+                dropdown_item_style->style()->background_color()->a());
+  m_dropdown_item_style.border_color =
+      sf::Color(dropdown_item_style->style()->border_color()->r(),
+                dropdown_item_style->style()->border_color()->g(),
+                dropdown_item_style->style()->border_color()->b(),
+                dropdown_item_style->style()->border_color()->a());
+  m_dropdown_item_style.border_thickness =
+      dropdown_item_style->style()->border_thickness();
+  m_dropdown_item_style.radius_resolution =
+      dropdown_item_style->style()->radius_resolution();
+  m_dropdown_item_style.inner_margin =
+      sf::Vector2f(dropdown_item_style->style()->inner_margin()->x(),
+                   dropdown_item_style->style()->inner_margin()->y());
+  m_dropdown_item_style.minimum_size =
+      sf::Vector2f(dropdown_item_style->style()->minimum_size()->x(),
+                   dropdown_item_style->style()->minimum_size()->y());
+  m_dropdown_item_style.maximum_size =
+      sf::Vector2f(dropdown_item_style->style()->maximum_size()->x(),
+                   dropdown_item_style->style()->maximum_size()->y());
+
+  m_dropdown_item_style.text_color =
+      sf::Color(dropdown_item_style->text_color()->r(),
+                dropdown_item_style->text_color()->g(),
+                dropdown_item_style->text_color()->b(),
+                dropdown_item_style->text_color()->a());
+  m_dropdown_item_style.hover_color =
+      sf::Color(dropdown_item_style->hover_color()->r(),
+                dropdown_item_style->hover_color()->g(),
+                dropdown_item_style->hover_color()->b(),
+                dropdown_item_style->hover_color()->a());
+
+  std::cout << "UIEngine: DropDownItem style configured successfully"
+            << std::endl;
+}
+
+/////////////////////////////////////////////////
+void UIRenderLogic::ConfigureDropDownButtonStyle(
+    const themes::DropDownButtonStyle *dropdown_button_style) {
+  // set the DropDownButton style from the flatbuffer config
+  m_dropdown_button_style.background_color =
+      sf::Color(dropdown_button_style->style()->background_color()->r(),
+                dropdown_button_style->style()->background_color()->g(),
+                dropdown_button_style->style()->background_color()->b(),
+                dropdown_button_style->style()->background_color()->a());
+  m_dropdown_button_style.border_color =
+      sf::Color(dropdown_button_style->style()->border_color()->r(),
+                dropdown_button_style->style()->border_color()->g(),
+                dropdown_button_style->style()->border_color()->b(),
+                dropdown_button_style->style()->border_color()->a());
+  m_dropdown_button_style.border_thickness =
+      dropdown_button_style->style()->border_thickness();
+  m_dropdown_button_style.radius_resolution =
+      dropdown_button_style->style()->radius_resolution();
+  m_dropdown_button_style.inner_margin =
+      sf::Vector2f(dropdown_button_style->style()->inner_margin()->x(),
+                   dropdown_button_style->style()->inner_margin()->y());
+  m_dropdown_button_style.triangle_color =
+      sf::Color(dropdown_button_style->triangle_color()->r(),
+                dropdown_button_style->triangle_color()->g(),
+                dropdown_button_style->triangle_color()->b(),
+                dropdown_button_style->triangle_color()->a());
+  m_dropdown_button_style.hover_color =
+      sf::Color(dropdown_button_style->hover_color()->r(),
+                dropdown_button_style->hover_color()->g(),
+                dropdown_button_style->hover_color()->b(),
+                dropdown_button_style->hover_color()->a());
+  std::cout << "UIEngine: DropDownButton style configured successfully"
+            << std::endl;
+}
+
 void UIRenderLogic::DrawUIElements() {
 
   // cycle through all the Archetype IDs associated with this logic
@@ -233,23 +378,45 @@ void UIRenderLogic::RecursiveDrawUIElement(UIElement &element) {
       inner_margin = m_panel_style.inner_margin;
     } else if constexpr (std::is_same_v<std::decay_t<decltype(element_type)>,
                                         Button>) {
-
+      std::cout << "UIEngine: Drawing Button" << std::endl;
       DrawButton(element);
       border_thickness = m_button_style.border_thickness;
       inner_margin = m_button_style.inner_margin;
 
     } else if constexpr (std::is_same_v<std::decay_t<decltype(element_type)>,
-                                        DropDown>) {
+                                        DropDownContainer>) {
 
-      DrawDropDown(element);
+      std::cout << "UIEngine: Drawing DropDownContainer" << std::endl;
+      DrawDropDownContainer(element);
       border_thickness = m_dropdown_style.border_thickness;
       inner_margin = m_dropdown_style.inner_margin;
+
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(element_type)>,
+                                        DropDownList>) {
+      DrawDropDownList(element);
+      border_thickness = m_dropdown_list_style.border_thickness;
+      inner_margin = m_dropdown_list_style.inner_margin;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(element_type)>,
+                                        DropDownItem>) {
+      DrawDropDownItem(element);
+      border_thickness = m_dropdown_item_style.border_thickness;
+      inner_margin = m_dropdown_item_style.inner_margin;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(element_type)>,
+                                        DropDownButton>) {
+      DrawDropDownButton(element);
+      border_thickness = m_dropdown_button_style.border_thickness;
+      inner_margin = m_dropdown_button_style.inner_margin;
     } else {
       std::cout << "Unknown element type for drawing" << std::endl;
     }
   };
   // call the visitor function with the element type
   std::visit(UIVisitor, element.element_type);
+
+  // GUARD: return early if children are not active
+  if (!element.children_active) {
+    return;
+  }
 
   // pull out number of children for convenience
   size_t number_of_children = element.child_elements.size();
@@ -259,8 +426,8 @@ void UIRenderLogic::RecursiveDrawUIElement(UIElement &element) {
   sf::Vector2f child_size;
 
   // Recursively draw child elements if they exist
-
   for (size_t i = 0; i < number_of_children; ++i) {
+
     switch (element.layout) {
 
     case LayoutType::LayoutType_Vertical: {
@@ -311,6 +478,22 @@ void UIRenderLogic::RecursiveDrawUIElement(UIElement &element) {
     case LayoutType::LayoutType_Grid: {
       break;
     }
+    case LayoutType::LayoutType_DropDown: {
+      // the children in a dropdown are not nested inside the parent
+
+      // calculate size of the child element in a dropdown, it should be the
+      // same size as the current element
+      child_size = element.size;
+
+      // the child position is positioned below the current element in a
+      // vertically stacked format
+      float child_origin_x = element.position.x;
+      float child_origin_y = element.position.y + (element.size.y * (i + 1));
+      child_origin = sf::Vector2f(child_origin_x, child_origin_y);
+
+      break;
+    }
+
     default:
       break;
     }
@@ -318,7 +501,6 @@ void UIRenderLogic::RecursiveDrawUIElement(UIElement &element) {
     element.child_elements[i].position = child_origin;
     element.child_elements[i].size = child_size;
 
-    // recursively draw the child element
     RecursiveDrawUIElement(element.child_elements[i]);
   }
 }
@@ -359,64 +541,111 @@ void UIRenderLogic::DrawButton(UIElement &element) {
   m_logic_context.scene_texture.draw(button_text);
 }
 /////////////////////////////////////////////////
-void UIRenderLogic::DrawDropDown(UIElement &element) {
+void UIRenderLogic::DrawDropDownContainer(UIElement &element) {
 
   // adjust the size of th dropdown element
   AdjustSize(element);
 
-  // print out the size and position of the dropdown element
-  std::cout << "DropDown Element Size: " << element.size.x << "x"
-            << element.size.y << " Position: (" << element.position.x << ", "
-            << element.position.y << ")" << std::endl;
   // Draw the box first
   DrawBoxWithRadiusCorners(element);
-
-  // DropDown symbol
-  // create rectangle shape to hold the drop down symbol
-  sf::RectangleShape drop_symbol_container;
-
-  // set size of the container and account for border thickness
-  drop_symbol_container.setSize(
-      {(element.size.x - (2 * m_dropdown_style.border_thickness)) *
-           m_dropdown_style.drop_symbol_ratio,
-       element.size.y - (2 * m_dropdown_style.border_thickness)});
-
-  // set the position of the container accounting for the border thickness (not
-  // inner margin) the symbol is place to the right of the dropdown
-  drop_symbol_container.setPosition(
-      {element.position.x + element.size.x - drop_symbol_container.getSize().x -
-           m_dropdown_style.border_thickness,
-       element.position.y + m_dropdown_style.border_thickness});
-
-  // set the fill color of the container
-  drop_symbol_container.setFillColor(
-      m_dropdown_style.drop_symbol_container_color);
-  // draw the container to the render texture
-  m_logic_context.scene_texture.draw(drop_symbol_container);
-
-  // create an upside down triangle for the drop symbol
-  sf::ConvexShape drop_symbol;
-  drop_symbol.setPointCount(3);
-
-  // set the points of the triangle
-  // the triangle is upside down so the points are in the order of
-  // top, bottom left, bottom right
-  // the top point is at the top of the container
-  // the bottom left and right points are at the bottom of the container
-  drop_symbol.setPoint(0, {drop_symbol_container.getSize().x / 2, 0});
-  drop_symbol.setPoint(1, {0, drop_symbol_container.getSize().y});
-  drop_symbol.setPoint(2, {drop_symbol_container.getSize().x,
-                           drop_symbol_container.getSize().y});
-  // set the position of the drop symbol to the top left corner of the container
-  drop_symbol.setPosition(drop_symbol_container.getPosition());
-
-  // set the fill color of the drop symbol
-  drop_symbol.setFillColor(m_dropdown_style.drop_symbol_color);
-
-  // draw the drop symbol to the render texture
-  m_logic_context.scene_texture.draw(drop_symbol);
 }
 
+/////////////////////////////////////////////////
+void UIRenderLogic::DrawDropDownList(UIElement &element) {
+  // This should only ever be contained in a DropDownContainer, so we don't
+  // adjust size for this element
+
+  // Draw a standard rectangle for this
+  sf::RectangleShape dropdown_shape;
+  dropdown_shape.setSize(element.size);
+  dropdown_shape.setPosition(element.position);
+  dropdown_shape.setFillColor(m_dropdown_list_style.background_color);
+  // no border for this element
+  dropdown_shape.setOutlineThickness(0.f);
+  // draw the rectangle to the render texture
+  m_logic_context.scene_texture.draw(dropdown_shape);
+
+  // get the dropdown list specific details from the variant
+  DropDownList dropdown_list_element =
+      std::get<DropDownList>(element.element_type);
+  // Create a text object for the dropdown list label
+  sf::Text dropdown_text(
+      m_logic_context.asset_manager.GetFont(m_dropdown_list_style.font),
+      dropdown_list_element.label);
+  dropdown_text.setCharacterSize(24); // Set the character size
+  dropdown_text.setFillColor(m_dropdown_list_style.text_color);
+  // Center the text within the dropdown list
+  dropdown_text.setPosition(
+      {element.position.x +
+           (element.size.x - dropdown_text.getLocalBounds().size.x) / 2,
+       // Text is aligned so that the bottom of the text is the bottom of the
+       // y bounds so we need to adjust the y position to account for that
+       element.position.y +
+           (element.size.y / 2 - dropdown_text.getLocalBounds().size.y)});
+  // Draw the dropdown list text to the render texture
+  m_logic_context.scene_texture.draw(dropdown_text);
+}
+
+/////////////////////////////////////////////////
+void UIRenderLogic::DrawDropDownItem(UIElement &element) {
+  // This should only ever be contained in a DropDownList, so we don't
+  // adjust size for this element
+  // Draw a standard rectangle for this
+  sf::RectangleShape dropdown_shape;
+  dropdown_shape.setSize(element.size);
+  dropdown_shape.setPosition(element.position);
+  dropdown_shape.setFillColor(m_dropdown_item_style.background_color);
+  // no border for this element
+  dropdown_shape.setOutlineThickness(0.f);
+  // draw the rectangle to the render texture
+  m_logic_context.scene_texture.draw(dropdown_shape);
+  // get the dropdown item specific details from the variant
+  DropDownItem dropdown_item_element =
+      std::get<DropDownItem>(element.element_type);
+  // Create a text object for the dropdown item label
+  sf::Text dropdown_text(
+      m_logic_context.asset_manager.GetFont(m_dropdown_item_style.font),
+      dropdown_item_element.label);
+  dropdown_text.setCharacterSize(24); // Set the character size
+  dropdown_text.setFillColor(m_dropdown_item_style.text_color);
+  // Center the text within the dropdown item
+  dropdown_text.setPosition(
+      {element.position.x +
+           (element.size.x - dropdown_text.getLocalBounds().size.x) / 2,
+       // Text is aligned so that the bottom of the text is the bottom of the
+       // y bounds so we need to adjust the y position to account for that
+       element.position.y +
+           (element.size.y / 2 - dropdown_text.getLocalBounds().size.y)});
+  // Draw the dropdown item text to the render texture
+  m_logic_context.scene_texture.draw(dropdown_text);
+}
+
+/////////////////////////////////////////////////
+void UIRenderLogic::DrawDropDownButton(UIElement &element) {
+
+  // draw a standard rectangle and fill it with the background color
+  sf::RectangleShape drop_down_button_container;
+  drop_down_button_container.setSize(element.size);
+  drop_down_button_container.setPosition(element.position);
+  drop_down_button_container.setFillColor(
+      m_dropdown_button_style.background_color);
+  // no border for this element
+  drop_down_button_container.setOutlineThickness(0.f);
+  // draw the rectangle to the render texture
+  m_logic_context.scene_texture.draw(drop_down_button_container);
+
+  // now create the triangle for the dropdown button
+  sf::CircleShape triangle_button{element.size.y / 2.f, 3};
+
+  // rotate the triangle to point downwards
+  triangle_button.rotate(sf::degrees(180));
+
+  // set the position of the triangle to be in the center of the button
+  triangle_button.setPosition(element.position);
+
+  // set the fill color of the triangle
+  triangle_button.setFillColor(m_dropdown_button_style.triangle_color);
+}
 /////////////////////////////////////////////////
 void UIRenderLogic::AdjustSize(UIElement &element) {
   // variales to hold the minimum and maximum sizes
@@ -434,7 +663,7 @@ void UIRenderLogic::AdjustSize(UIElement &element) {
       min_size = m_button_style.minimum_size;
       max_size = m_button_style.maximum_size;
     } else if constexpr (std::is_same_v<std::decay_t<decltype(element_type)>,
-                                        DropDown>) {
+                                        DropDownContainer>) {
       std::cout << "Adjusting size for DropDown element" << std::endl;
 
       min_size = m_dropdown_style.minimum_size;
@@ -501,16 +730,12 @@ void UIRenderLogic::DrawBoxWithRadiusCorners(UIElement &ui_element) {
         background_color = m_button_style.background_color;
       }
     } else if constexpr (std::is_same_v<std::decay_t<decltype(element_type)>,
-                                        DropDown>) {
+                                        DropDownContainer>) {
 
       radius = m_dropdown_style.border_thickness;
       resolution = m_dropdown_style.radius_resolution;
       border_color = m_dropdown_style.border_color;
-      if (ui_element.mouse_over) {
-        background_color = m_dropdown_style.hover_color;
-      } else {
-        background_color = m_dropdown_style.background_color;
-      }
+
     } else {
       std::cout << "Unknown style type selected" << std::endl;
     }

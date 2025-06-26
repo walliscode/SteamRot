@@ -6,16 +6,42 @@
 #pragma once
 
 #include <string>
-struct DropDown {
-
+struct DropDownContainer {
   /////////////////////////////////////////////////
-  /// @brief Is the DropDown element currently expanded or "dropped"
+  /// @brief Indicates whether the dropdown is expanded or not. This should be
+  /// passed to associated children elements
   /////////////////////////////////////////////////
-  bool expanded{false};
+  bool is_expanded{false};
+};
 
+struct DropDownList {
   /////////////////////////////////////////////////
   /// @brief The name you see when the items are not expanded. It should
   /// indicate role of the dropdown
   /////////////////////////////////////////////////
   std::string label{"items..."};
+
+  /////////////////////////////////////////////////
+  /// @brief The name you see when the items are expanded.
+  /////////////////////////////////////////////////
+  std::string expanded_label{"items..."};
+};
+
+struct DropDownItem {
+  /////////////////////////////////////////////////
+  /// @brief The name of the item
+  /////////////////////////////////////////////////
+  std::string label{"item..."};
+
+  /////////////////////////////////////////////////
+  /// @brief The value of the item, used for selection
+  /////////////////////////////////////////////////
+  std::string value{"value..."};
+};
+
+struct DropDownButton {
+  /////////////////////////////////////////////////
+  /// @brief Indicates whether the associated dropdown is expanded or not
+  /////////////////////////////////////////////////
+  bool is_expanded{false};
 };

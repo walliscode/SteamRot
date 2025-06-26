@@ -17,7 +17,8 @@
 #include <vector>
 namespace steamrot {
 
-using ElementType = std::variant<Panel, Button, DropDown>;
+using ElementType = std::variant<Panel, Button, DropDownContainer, DropDownList,
+                                 DropDownItem, DropDownButton>;
 
 /////////////////////////////////////////////////
 /// @class UIElementDataPackage
@@ -77,6 +78,12 @@ struct UIElement {
   /// @brief Helper variable to check if the mouse is over a child element
   /////////////////////////////////////////////////
   bool mouse_over_child{false};
+
+  /////////////////////////////////////////////////
+  /// @brief Helper variable for the UIRenderLogic and UICollisionLogic whether
+  /// to recursively process the childred
+  /////////////////////////////////////////////////
+  bool children_active{true};
 
   /////////////////////////////////////////////////
   /// @brief Trigger event for the UI element

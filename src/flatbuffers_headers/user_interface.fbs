@@ -8,7 +8,10 @@ enum UIElementType: byte{
   None= 0, 
   Panel = 1,
   Button = 2,   
-  DropDown = 3
+  DropDownContainer= 3,
+  DropDownList = 4,
+  DropDownItem = 5,
+  DropDownButton = 6,
   }
 
 enum LayoutType: byte{ 
@@ -16,6 +19,8 @@ enum LayoutType: byte{
   Horizontal = 1,
   Vertical = 2,
   Grid = 3,
+  DropDown = 4,
+
   }
 
 table UIElementDataPackageData {
@@ -28,14 +33,31 @@ table ButtonData {
  label: string (required);
 }
 
-table DropDownData{
+table DropDownContainerData{
+
+  }
+
+table DropDownListData{
     label: string (required);
+    expanded_label: string (required);
+  }
+
+table DropDownItemData {
+    label: string (required);
+
+  }
+
+table DropDownButtonData {
+    is_expanded: bool;
   }
 
 union UIElementDataUnion {
   PanelData,
   ButtonData,
-  DropDownData
+  DropDownListData,
+  DropDownContainerData,
+  DropDownItemData,
+  DropDownButtonData
 }
 
 table UIElementData{

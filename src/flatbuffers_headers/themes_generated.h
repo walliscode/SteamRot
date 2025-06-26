@@ -29,8 +29,17 @@ struct PanelStyleBuilder;
 struct ButtonStyle;
 struct ButtonStyleBuilder;
 
-struct DropDownStyle;
-struct DropDownStyleBuilder;
+struct DropDownContainerStyle;
+struct DropDownContainerStyleBuilder;
+
+struct DropDownListStyle;
+struct DropDownListStyleBuilder;
+
+struct DropDownItemStyle;
+struct DropDownItemStyleBuilder;
+
+struct DropDownButtonStyle;
+struct DropDownButtonStyleBuilder;
 
 struct UIObjects;
 struct UIObjectsBuilder;
@@ -309,16 +318,65 @@ inline ::flatbuffers::Offset<ButtonStyle> CreateButtonStyleDirect(
       font__);
 }
 
-struct DropDownStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef DropDownStyleBuilder Builder;
+struct DropDownContainerStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef DropDownContainerStyleBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_STYLE = 4,
+    VT_DROP_SYMBOL_RATIO = 6
+  };
+  const steamrot::themes::Style *style() const {
+    return GetPointer<const steamrot::themes::Style *>(VT_STYLE);
+  }
+  float drop_symbol_ratio() const {
+    return GetField<float>(VT_DROP_SYMBOL_RATIO, 0.0f);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_STYLE) &&
+           verifier.VerifyTable(style()) &&
+           VerifyField<float>(verifier, VT_DROP_SYMBOL_RATIO, 4) &&
+           verifier.EndTable();
+  }
+};
+
+struct DropDownContainerStyleBuilder {
+  typedef DropDownContainerStyle Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_style(::flatbuffers::Offset<steamrot::themes::Style> style) {
+    fbb_.AddOffset(DropDownContainerStyle::VT_STYLE, style);
+  }
+  void add_drop_symbol_ratio(float drop_symbol_ratio) {
+    fbb_.AddElement<float>(DropDownContainerStyle::VT_DROP_SYMBOL_RATIO, drop_symbol_ratio, 0.0f);
+  }
+  explicit DropDownContainerStyleBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<DropDownContainerStyle> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<DropDownContainerStyle>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<DropDownContainerStyle> CreateDropDownContainerStyle(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<steamrot::themes::Style> style = 0,
+    float drop_symbol_ratio = 0.0f) {
+  DropDownContainerStyleBuilder builder_(_fbb);
+  builder_.add_drop_symbol_ratio(drop_symbol_ratio);
+  builder_.add_style(style);
+  return builder_.Finish();
+}
+
+struct DropDownListStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef DropDownListStyleBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_STYLE = 4,
     VT_TEXT_COLOR = 6,
     VT_HOVER_COLOR = 8,
-    VT_FONT = 10,
-    VT_DROP_SYMBOL_RATIO = 12,
-    VT_DROP_SYMBOL_CONTAINER_COLOR = 14,
-    VT_DROP_SYMBOL_COLOR = 16
+    VT_FONT = 10
   };
   const steamrot::themes::Style *style() const {
     return GetPointer<const steamrot::themes::Style *>(VT_STYLE);
@@ -332,14 +390,93 @@ struct DropDownStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ::flatbuffers::String *font() const {
     return GetPointer<const ::flatbuffers::String *>(VT_FONT);
   }
-  float drop_symbol_ratio() const {
-    return GetField<float>(VT_DROP_SYMBOL_RATIO, 0.0f);
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_STYLE) &&
+           verifier.VerifyTable(style()) &&
+           VerifyField<steamrot::themes::Color>(verifier, VT_TEXT_COLOR, 1) &&
+           VerifyField<steamrot::themes::Color>(verifier, VT_HOVER_COLOR, 1) &&
+           VerifyOffset(verifier, VT_FONT) &&
+           verifier.VerifyString(font()) &&
+           verifier.EndTable();
   }
-  const steamrot::themes::Color *drop_symbol_container_color() const {
-    return GetStruct<const steamrot::themes::Color *>(VT_DROP_SYMBOL_CONTAINER_COLOR);
+};
+
+struct DropDownListStyleBuilder {
+  typedef DropDownListStyle Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_style(::flatbuffers::Offset<steamrot::themes::Style> style) {
+    fbb_.AddOffset(DropDownListStyle::VT_STYLE, style);
   }
-  const steamrot::themes::Color *drop_symbol_color() const {
-    return GetStruct<const steamrot::themes::Color *>(VT_DROP_SYMBOL_COLOR);
+  void add_text_color(const steamrot::themes::Color *text_color) {
+    fbb_.AddStruct(DropDownListStyle::VT_TEXT_COLOR, text_color);
+  }
+  void add_hover_color(const steamrot::themes::Color *hover_color) {
+    fbb_.AddStruct(DropDownListStyle::VT_HOVER_COLOR, hover_color);
+  }
+  void add_font(::flatbuffers::Offset<::flatbuffers::String> font) {
+    fbb_.AddOffset(DropDownListStyle::VT_FONT, font);
+  }
+  explicit DropDownListStyleBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<DropDownListStyle> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<DropDownListStyle>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<DropDownListStyle> CreateDropDownListStyle(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<steamrot::themes::Style> style = 0,
+    const steamrot::themes::Color *text_color = nullptr,
+    const steamrot::themes::Color *hover_color = nullptr,
+    ::flatbuffers::Offset<::flatbuffers::String> font = 0) {
+  DropDownListStyleBuilder builder_(_fbb);
+  builder_.add_font(font);
+  builder_.add_hover_color(hover_color);
+  builder_.add_text_color(text_color);
+  builder_.add_style(style);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<DropDownListStyle> CreateDropDownListStyleDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<steamrot::themes::Style> style = 0,
+    const steamrot::themes::Color *text_color = nullptr,
+    const steamrot::themes::Color *hover_color = nullptr,
+    const char *font = nullptr) {
+  auto font__ = font ? _fbb.CreateString(font) : 0;
+  return steamrot::themes::CreateDropDownListStyle(
+      _fbb,
+      style,
+      text_color,
+      hover_color,
+      font__);
+}
+
+struct DropDownItemStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef DropDownItemStyleBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_STYLE = 4,
+    VT_TEXT_COLOR = 6,
+    VT_HOVER_COLOR = 8,
+    VT_FONT = 10
+  };
+  const steamrot::themes::Style *style() const {
+    return GetPointer<const steamrot::themes::Style *>(VT_STYLE);
+  }
+  const steamrot::themes::Color *text_color() const {
+    return GetStruct<const steamrot::themes::Color *>(VT_TEXT_COLOR);
+  }
+  const steamrot::themes::Color *hover_color() const {
+    return GetStruct<const steamrot::themes::Color *>(VT_HOVER_COLOR);
+  }
+  const ::flatbuffers::String *font() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_FONT);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -349,62 +486,44 @@ struct DropDownStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<steamrot::themes::Color>(verifier, VT_HOVER_COLOR, 1) &&
            VerifyOffset(verifier, VT_FONT) &&
            verifier.VerifyString(font()) &&
-           VerifyField<float>(verifier, VT_DROP_SYMBOL_RATIO, 4) &&
-           VerifyField<steamrot::themes::Color>(verifier, VT_DROP_SYMBOL_CONTAINER_COLOR, 1) &&
-           VerifyField<steamrot::themes::Color>(verifier, VT_DROP_SYMBOL_COLOR, 1) &&
            verifier.EndTable();
   }
 };
 
-struct DropDownStyleBuilder {
-  typedef DropDownStyle Table;
+struct DropDownItemStyleBuilder {
+  typedef DropDownItemStyle Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_style(::flatbuffers::Offset<steamrot::themes::Style> style) {
-    fbb_.AddOffset(DropDownStyle::VT_STYLE, style);
+    fbb_.AddOffset(DropDownItemStyle::VT_STYLE, style);
   }
   void add_text_color(const steamrot::themes::Color *text_color) {
-    fbb_.AddStruct(DropDownStyle::VT_TEXT_COLOR, text_color);
+    fbb_.AddStruct(DropDownItemStyle::VT_TEXT_COLOR, text_color);
   }
   void add_hover_color(const steamrot::themes::Color *hover_color) {
-    fbb_.AddStruct(DropDownStyle::VT_HOVER_COLOR, hover_color);
+    fbb_.AddStruct(DropDownItemStyle::VT_HOVER_COLOR, hover_color);
   }
   void add_font(::flatbuffers::Offset<::flatbuffers::String> font) {
-    fbb_.AddOffset(DropDownStyle::VT_FONT, font);
+    fbb_.AddOffset(DropDownItemStyle::VT_FONT, font);
   }
-  void add_drop_symbol_ratio(float drop_symbol_ratio) {
-    fbb_.AddElement<float>(DropDownStyle::VT_DROP_SYMBOL_RATIO, drop_symbol_ratio, 0.0f);
-  }
-  void add_drop_symbol_container_color(const steamrot::themes::Color *drop_symbol_container_color) {
-    fbb_.AddStruct(DropDownStyle::VT_DROP_SYMBOL_CONTAINER_COLOR, drop_symbol_container_color);
-  }
-  void add_drop_symbol_color(const steamrot::themes::Color *drop_symbol_color) {
-    fbb_.AddStruct(DropDownStyle::VT_DROP_SYMBOL_COLOR, drop_symbol_color);
-  }
-  explicit DropDownStyleBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit DropDownItemStyleBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<DropDownStyle> Finish() {
+  ::flatbuffers::Offset<DropDownItemStyle> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<DropDownStyle>(end);
+    auto o = ::flatbuffers::Offset<DropDownItemStyle>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<DropDownStyle> CreateDropDownStyle(
+inline ::flatbuffers::Offset<DropDownItemStyle> CreateDropDownItemStyle(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::themes::Style> style = 0,
     const steamrot::themes::Color *text_color = nullptr,
     const steamrot::themes::Color *hover_color = nullptr,
-    ::flatbuffers::Offset<::flatbuffers::String> font = 0,
-    float drop_symbol_ratio = 0.0f,
-    const steamrot::themes::Color *drop_symbol_container_color = nullptr,
-    const steamrot::themes::Color *drop_symbol_color = nullptr) {
-  DropDownStyleBuilder builder_(_fbb);
-  builder_.add_drop_symbol_color(drop_symbol_color);
-  builder_.add_drop_symbol_container_color(drop_symbol_container_color);
-  builder_.add_drop_symbol_ratio(drop_symbol_ratio);
+    ::flatbuffers::Offset<::flatbuffers::String> font = 0) {
+  DropDownItemStyleBuilder builder_(_fbb);
   builder_.add_font(font);
   builder_.add_hover_color(hover_color);
   builder_.add_text_color(text_color);
@@ -412,25 +531,81 @@ inline ::flatbuffers::Offset<DropDownStyle> CreateDropDownStyle(
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<DropDownStyle> CreateDropDownStyleDirect(
+inline ::flatbuffers::Offset<DropDownItemStyle> CreateDropDownItemStyleDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::themes::Style> style = 0,
     const steamrot::themes::Color *text_color = nullptr,
     const steamrot::themes::Color *hover_color = nullptr,
-    const char *font = nullptr,
-    float drop_symbol_ratio = 0.0f,
-    const steamrot::themes::Color *drop_symbol_container_color = nullptr,
-    const steamrot::themes::Color *drop_symbol_color = nullptr) {
+    const char *font = nullptr) {
   auto font__ = font ? _fbb.CreateString(font) : 0;
-  return steamrot::themes::CreateDropDownStyle(
+  return steamrot::themes::CreateDropDownItemStyle(
       _fbb,
       style,
       text_color,
       hover_color,
-      font__,
-      drop_symbol_ratio,
-      drop_symbol_container_color,
-      drop_symbol_color);
+      font__);
+}
+
+struct DropDownButtonStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef DropDownButtonStyleBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_STYLE = 4,
+    VT_TRIANGLE_COLOR = 6,
+    VT_HOVER_COLOR = 8
+  };
+  const steamrot::themes::Style *style() const {
+    return GetPointer<const steamrot::themes::Style *>(VT_STYLE);
+  }
+  const steamrot::themes::Color *triangle_color() const {
+    return GetStruct<const steamrot::themes::Color *>(VT_TRIANGLE_COLOR);
+  }
+  const steamrot::themes::Color *hover_color() const {
+    return GetStruct<const steamrot::themes::Color *>(VT_HOVER_COLOR);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_STYLE) &&
+           verifier.VerifyTable(style()) &&
+           VerifyField<steamrot::themes::Color>(verifier, VT_TRIANGLE_COLOR, 1) &&
+           VerifyField<steamrot::themes::Color>(verifier, VT_HOVER_COLOR, 1) &&
+           verifier.EndTable();
+  }
+};
+
+struct DropDownButtonStyleBuilder {
+  typedef DropDownButtonStyle Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_style(::flatbuffers::Offset<steamrot::themes::Style> style) {
+    fbb_.AddOffset(DropDownButtonStyle::VT_STYLE, style);
+  }
+  void add_triangle_color(const steamrot::themes::Color *triangle_color) {
+    fbb_.AddStruct(DropDownButtonStyle::VT_TRIANGLE_COLOR, triangle_color);
+  }
+  void add_hover_color(const steamrot::themes::Color *hover_color) {
+    fbb_.AddStruct(DropDownButtonStyle::VT_HOVER_COLOR, hover_color);
+  }
+  explicit DropDownButtonStyleBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<DropDownButtonStyle> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<DropDownButtonStyle>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<DropDownButtonStyle> CreateDropDownButtonStyle(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<steamrot::themes::Style> style = 0,
+    const steamrot::themes::Color *triangle_color = nullptr,
+    const steamrot::themes::Color *hover_color = nullptr) {
+  DropDownButtonStyleBuilder builder_(_fbb);
+  builder_.add_hover_color(hover_color);
+  builder_.add_triangle_color(triangle_color);
+  builder_.add_style(style);
+  return builder_.Finish();
 }
 
 struct UIObjects FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -438,7 +613,10 @@ struct UIObjects FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_PANEL_STYLE = 4,
     VT_BUTTON_STYLE = 6,
-    VT_DROPDOWN_STYLE = 8
+    VT_DROP_DOWN_CONTAINER_STYLE = 8,
+    VT_DROP_DOWN_LIST_STYLE = 10,
+    VT_DROP_DOWN_ITEM_STYLE = 12,
+    VT_DROP_DOWN_BUTTON_STYLE = 14
   };
   const steamrot::themes::PanelStyle *panel_style() const {
     return GetPointer<const steamrot::themes::PanelStyle *>(VT_PANEL_STYLE);
@@ -446,8 +624,17 @@ struct UIObjects FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::themes::ButtonStyle *button_style() const {
     return GetPointer<const steamrot::themes::ButtonStyle *>(VT_BUTTON_STYLE);
   }
-  const steamrot::themes::DropDownStyle *dropdown_style() const {
-    return GetPointer<const steamrot::themes::DropDownStyle *>(VT_DROPDOWN_STYLE);
+  const steamrot::themes::DropDownContainerStyle *drop_down_container_style() const {
+    return GetPointer<const steamrot::themes::DropDownContainerStyle *>(VT_DROP_DOWN_CONTAINER_STYLE);
+  }
+  const steamrot::themes::DropDownListStyle *drop_down_list_style() const {
+    return GetPointer<const steamrot::themes::DropDownListStyle *>(VT_DROP_DOWN_LIST_STYLE);
+  }
+  const steamrot::themes::DropDownItemStyle *drop_down_item_style() const {
+    return GetPointer<const steamrot::themes::DropDownItemStyle *>(VT_DROP_DOWN_ITEM_STYLE);
+  }
+  const steamrot::themes::DropDownButtonStyle *drop_down_button_style() const {
+    return GetPointer<const steamrot::themes::DropDownButtonStyle *>(VT_DROP_DOWN_BUTTON_STYLE);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -455,8 +642,14 @@ struct UIObjects FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyTable(panel_style()) &&
            VerifyOffsetRequired(verifier, VT_BUTTON_STYLE) &&
            verifier.VerifyTable(button_style()) &&
-           VerifyOffsetRequired(verifier, VT_DROPDOWN_STYLE) &&
-           verifier.VerifyTable(dropdown_style()) &&
+           VerifyOffsetRequired(verifier, VT_DROP_DOWN_CONTAINER_STYLE) &&
+           verifier.VerifyTable(drop_down_container_style()) &&
+           VerifyOffsetRequired(verifier, VT_DROP_DOWN_LIST_STYLE) &&
+           verifier.VerifyTable(drop_down_list_style()) &&
+           VerifyOffsetRequired(verifier, VT_DROP_DOWN_ITEM_STYLE) &&
+           verifier.VerifyTable(drop_down_item_style()) &&
+           VerifyOffsetRequired(verifier, VT_DROP_DOWN_BUTTON_STYLE) &&
+           verifier.VerifyTable(drop_down_button_style()) &&
            verifier.EndTable();
   }
 };
@@ -471,8 +664,17 @@ struct UIObjectsBuilder {
   void add_button_style(::flatbuffers::Offset<steamrot::themes::ButtonStyle> button_style) {
     fbb_.AddOffset(UIObjects::VT_BUTTON_STYLE, button_style);
   }
-  void add_dropdown_style(::flatbuffers::Offset<steamrot::themes::DropDownStyle> dropdown_style) {
-    fbb_.AddOffset(UIObjects::VT_DROPDOWN_STYLE, dropdown_style);
+  void add_drop_down_container_style(::flatbuffers::Offset<steamrot::themes::DropDownContainerStyle> drop_down_container_style) {
+    fbb_.AddOffset(UIObjects::VT_DROP_DOWN_CONTAINER_STYLE, drop_down_container_style);
+  }
+  void add_drop_down_list_style(::flatbuffers::Offset<steamrot::themes::DropDownListStyle> drop_down_list_style) {
+    fbb_.AddOffset(UIObjects::VT_DROP_DOWN_LIST_STYLE, drop_down_list_style);
+  }
+  void add_drop_down_item_style(::flatbuffers::Offset<steamrot::themes::DropDownItemStyle> drop_down_item_style) {
+    fbb_.AddOffset(UIObjects::VT_DROP_DOWN_ITEM_STYLE, drop_down_item_style);
+  }
+  void add_drop_down_button_style(::flatbuffers::Offset<steamrot::themes::DropDownButtonStyle> drop_down_button_style) {
+    fbb_.AddOffset(UIObjects::VT_DROP_DOWN_BUTTON_STYLE, drop_down_button_style);
   }
   explicit UIObjectsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -483,7 +685,10 @@ struct UIObjectsBuilder {
     auto o = ::flatbuffers::Offset<UIObjects>(end);
     fbb_.Required(o, UIObjects::VT_PANEL_STYLE);
     fbb_.Required(o, UIObjects::VT_BUTTON_STYLE);
-    fbb_.Required(o, UIObjects::VT_DROPDOWN_STYLE);
+    fbb_.Required(o, UIObjects::VT_DROP_DOWN_CONTAINER_STYLE);
+    fbb_.Required(o, UIObjects::VT_DROP_DOWN_LIST_STYLE);
+    fbb_.Required(o, UIObjects::VT_DROP_DOWN_ITEM_STYLE);
+    fbb_.Required(o, UIObjects::VT_DROP_DOWN_BUTTON_STYLE);
     return o;
   }
 };
@@ -492,9 +697,15 @@ inline ::flatbuffers::Offset<UIObjects> CreateUIObjects(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::themes::PanelStyle> panel_style = 0,
     ::flatbuffers::Offset<steamrot::themes::ButtonStyle> button_style = 0,
-    ::flatbuffers::Offset<steamrot::themes::DropDownStyle> dropdown_style = 0) {
+    ::flatbuffers::Offset<steamrot::themes::DropDownContainerStyle> drop_down_container_style = 0,
+    ::flatbuffers::Offset<steamrot::themes::DropDownListStyle> drop_down_list_style = 0,
+    ::flatbuffers::Offset<steamrot::themes::DropDownItemStyle> drop_down_item_style = 0,
+    ::flatbuffers::Offset<steamrot::themes::DropDownButtonStyle> drop_down_button_style = 0) {
   UIObjectsBuilder builder_(_fbb);
-  builder_.add_dropdown_style(dropdown_style);
+  builder_.add_drop_down_button_style(drop_down_button_style);
+  builder_.add_drop_down_item_style(drop_down_item_style);
+  builder_.add_drop_down_list_style(drop_down_list_style);
+  builder_.add_drop_down_container_style(drop_down_container_style);
   builder_.add_button_style(button_style);
   builder_.add_panel_style(panel_style);
   return builder_.Finish();

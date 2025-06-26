@@ -55,10 +55,30 @@
                 }
               },
               {
-                "type": "DropDown",
+                "type": "DropDownContainer",
                 "layout": "Horizontal",
-                "children": [],
-                "element_type": "DropDownData",
+                "children": [
+                  {
+                    "type": "DropDownList",
+                    "layout": "DropDown",
+                    "children": [],
+                    "element_type": "DropDownListData",
+                    "element": {
+                      "label": "Drop down up...",
+                      "expanded_label": "Drop down down..."
+                    },
+                    "action": {}
+                  },
+                  {
+                    "type": "DropDownButton",
+                    "layout": "Vertical",
+                    "children": [],
+                    "element_type": "DropDownButtonData",
+                    "element": {},
+                    "action": {}
+                  }
+                ],
+                "element_type": "DropDownContainerData",
                 "element": {},
                 "action": {}
               }

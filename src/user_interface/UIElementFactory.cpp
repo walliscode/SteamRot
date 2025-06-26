@@ -39,18 +39,42 @@ UIElementFactory::RecursivlyBuildUIElement(const UIElementData &element_data) {
   }
     // Button
   case UIElementType::UIElementType_Button: {
-    std::cout << "Configuring Button UIElement" << std::endl;
+    std::cout << "MOTHERFUCKER: Configuring Button UIElement" << std::endl;
     ui_element.element_type =
         ConfigureButton(*element_data.element_as_ButtonData());
 
     break;
   }
-    // DropDown
-  case UIElementType::UIElementType_DropDown: {
+    // DropDownContainer
+  case UIElementType::UIElementType_DropDownContainer: {
     std::cout << "Configuring DropDown UIElement" << std::endl;
-    ui_element.element_type =
-        ConfigureDropDown(*element_data.element_as_DropDownData());
+    ui_element.element_type = ConfigureDropDownContainer(
+        *element_data.element_as_DropDownContainerData());
 
+    break;
+  }
+
+    // DropDownList
+  case UIElementType::UIElementType_DropDownList: {
+    std::cout << "Configuring DropDownList UIElement" << std::endl;
+    ui_element.element_type =
+        ConfigureDropDownList(*element_data.element_as_DropDownListData());
+    break;
+  }
+
+    // DropDownItem
+  case UIElementType::UIElementType_DropDownItem: {
+    std::cout << "Configuring DropDownItem UIElement" << std::endl;
+    ui_element.element_type =
+        ConfigureDropDownItem(*element_data.element_as_DropDownItemData());
+    break;
+  }
+
+  // DropDownButton
+  case UIElementType::UIElementType_DropDownButton: {
+    std::cout << "Configuring DropDownButton UIElement" << std::endl;
+    ui_element.element_type =
+        ConfigureDropDownButton(*element_data.element_as_DropDownButtonData());
     break;
   }
   default: {
@@ -79,8 +103,8 @@ UIElement
 UIElementFactory::ConfigureGeneralUIElement(const UIElementData &element) {
   // create UIElement
   UIElement ui_element;
-  // general configuration for the UIElement (only variables specificied in the
-  // UIElement struct)
+  // general configuration for the UIElement (only variables specificied in
+  // the UIElement struct)
   ui_element.layout = element.layout();
   if (element.position()) {
     ui_element.position =
@@ -97,8 +121,8 @@ UIElementFactory::ConfigureGeneralUIElement(const UIElementData &element) {
   }
   if (element.data()) {
 
-    // give it a scene type enum based on string (this needs to be switched to a
-    // fbs enum at some point)
+    // give it a scene type enum based on string (this needs to be switched to
+    // a fbs enum at some point)
     if (element.data()->scene_type()) {
 
       // Title scene type
@@ -130,11 +154,42 @@ Button UIElementFactory::ConfigureButton(const ButtonData &button_data) {
   return button_element;
 }
 
-DropDown
-UIElementFactory::ConfigureDropDown(const DropDownData &dropdown_data) {
-  DropDown dropdown_element;
+/////////////////////////////////////////////////
+DropDownContainer UIElementFactory::ConfigureDropDownContainer(
+    const DropDownContainerData &dropdown_data) {
+  DropDownContainer dropdown_element;
   // configure the dropdown_element
 
   return dropdown_element;
 }
+
+/////////////////////////////////////////////////
+DropDownList
+UIElementFactory::ConfigureDropDownList(const DropDownListData &dropdown_data) {
+  DropDownList dropdown_list_element;
+  // configure the dropdown_list_element
+  dropdown_list_element.label = dropdown_data.label()->str();
+  dropdown_list_element.expanded_label = dropdown_data.expanded_label()->str();
+  return dropdown_list_element;
+}
+
+//////////////////////////////////////////////////
+DropDownItem
+UIElementFactory::ConfigureDropDownItem(const DropDownItemData &dropdown_data) {
+  DropDownItem dropdown_item_element;
+  // configure the dropdown_item_element
+  dropdown_item_element.label = dropdown_data.label()->str();
+
+  return dropdown_item_element;
+}
+
+///////////////////////////////////////////////////
+DropDownButton UIElementFactory::ConfigureDropDownButton(
+    const DropDownButtonData &dropdown_data) {
+  DropDownButton dropdown_button_element;
+  // configure the dropdown_button_element
+  dropdown_button_element.is_expanded = dropdown_data.is_expanded();
+  return dropdown_button_element;
+}
+
 } // namespace steamrot

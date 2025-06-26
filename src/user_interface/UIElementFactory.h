@@ -49,7 +49,33 @@ private:
   /// @param dropdown_data DrowDown specific flatbuffers data
   /// @return A configured DropDown struct
   /////////////////////////////////////////////////
-  DropDown ConfigureDropDown(const DropDownData &dropdown_data);
+  DropDownContainer
+  ConfigureDropDownContainer(const DropDownContainerData &dropdown_data);
+
+  /// /////////////////////////////////////////////////
+  /// @brief Provides a DropDownList struct for UIElement.element_type
+  ///
+  /// @param dropdown_data DropDownList specific flatbuffers data
+  /// @return A configured DropDownList struct
+  /// ///////////////////////////////////////////////
+  DropDownList ConfigureDropDownList(const DropDownListData &dropdown_data);
+
+  /////////////////////////////////////////////////
+  /// @brief Provides a DropDownItem struct for UIElement.element_type
+  ///
+  /// @param dropdown_data DropDownItem specific flatbuffers data
+  /// @return A configured DropDownItem struct
+  /// ///////////////////////////////////////////////
+  DropDownItem ConfigureDropDownItem(const DropDownItemData &dropdown_data);
+
+  /////////////////////////////////////////////////
+  /// @brief Provides a DropDownButton struct for UIElement.element_type
+  ///
+  /// @param dropdown_data DropDownButton specific flatbuffers data
+  /// @return A configured DropDownButton struct
+  /// ///////////////////////////////////////////////
+  DropDownButton
+  ConfigureDropDownButton(const DropDownButtonData &dropdown_data);
 
 public:
   /////////////////////////////////////////////////

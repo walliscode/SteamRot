@@ -16,8 +16,6 @@
 #include <SFML/System/Vector2.hpp>
 #include <cstddef>
 
-#include <nlohmann/json.hpp>
-using json = nlohmann::json;
 namespace steamrot {
 
 struct Style {
@@ -74,26 +72,61 @@ struct ButtonStyle : public Style {
   std::string font;
 };
 
-struct DropDownStyle : public Style {
-  sf::Color text_color;
-  sf::Color hover_color;
-  std::string font;
+/////////////////////////////////////////////////
+/// @class DropDownContainerStyle
+/// @brief Structure containing the style properties for a dropdown container
+///
+/////////////////////////////////////////////////
+struct DropDownContainerStyle : public Style {
 
   /////////////////////////////////////////////////
   /// @brief The ratio of the drop symbol to the dropdown width
   /////////////////////////////////////////////////
   float drop_symbol_ratio{0.2f};
+};
+
+struct DropDownListStyle : public Style {
+  /////////////////////////////////////////////////
+  /// @brief Text color of the dropdown list
+  /////////////////////////////////////////////////
+  sf::Color text_color;
 
   /////////////////////////////////////////////////
-  /// @brief The drop symbol container fill color
+  /// @brief Background color of the dropdown list on hover
   /////////////////////////////////////////////////
-  sf::Color drop_symbol_container_color{
-      sf::Color::Transparent}; // Color of the container for the drop symbol
+  sf::Color hover_color;
 
   /////////////////////////////////////////////////
-  /// @brief The color of the drop symbol
+  /// @brief Font used for the dropdown list
   /////////////////////////////////////////////////
-  sf::Color drop_symbol_color{sf::Color::Black}; // Color of the drop symbol
+  std::string font;
+};
+
+struct DropDownItemStyle : public Style {
+  /////////////////////////////////////////////////
+  /// @brief Text color of the dropdown item
+  /////////////////////////////////////////////////
+  sf::Color text_color;
+  /////////////////////////////////////////////////
+  /// @brief Background color of the dropdown item on hover
+  /////////////////////////////////////////////////
+  sf::Color hover_color;
+  /////////////////////////////////////////////////
+  /// @brief Font used for the dropdown item
+  /////////////////////////////////////////////////
+  std::string font;
+};
+
+struct DropDownButtonStyle : public Style {
+  /////////////////////////////////////////////////
+  /// @brief Coloer of the triangle in the dropdown button
+  /////////////////////////////////////////////////
+  sf::Color triangle_color;
+
+  /////////////////////////////////////////////////
+  /// @brief Background color of the dropdown button on hover
+  /////////////////////////////////////////////////
+  sf::Color hover_color;
 };
 
 class UIRenderLogic : public Logic<CUserInterface> {
@@ -117,7 +150,28 @@ private:
   ///
   /// @param element UILement structure containin any data
   /////////////////////////////////////////////////
-  void DrawDropDown(UIElement &element);
+  void DrawDropDownContainer(UIElement &element);
+
+  /////////////////////////////////////////////////
+  /// @brief Draws the top element of a DropDownList (not the items themselves)
+  ///
+  /// @param element UIElement structure containing any data
+  /////////////////////////////////////////////////
+  void DrawDropDownList(UIElement &element);
+
+  /////////////////////////////////////////////////
+  /// @brief Draws a DropDownItem with DropDownItemStyle styling
+  ///
+  /// @param element UIElement structure containing any data
+  /////////////////////////////////////////////////
+  void DrawDropDownItem(UIElement &element);
+
+  /////////////////////////////////////////////////
+  /// @brief Draws a DropDownButton with DropDownButtonStyle styling
+  ///
+  /// @param element UIElement structure containing any data
+  /////////////////////////////////////////////////
+  void DrawDropDownButton(UIElement &element);
 
   ////////////////////////////////////////////////////////////
   // |brief add in styles from flatbuffer config
@@ -143,20 +197,63 @@ private:
   ///
   /// @param dropdown_style Flatbuffer DropDownStyle object
   /////////////////////////////////////////////////
-  void ConfigureDropDownStyle(const themes::DropDownStyle *dropdown_style);
-  /**
-   * @brief Member variable to hold the style for buttons in the UI.
-   */
+  void ConfigureDropDownContainerStyle(
+      const themes::DropDownContainerStyle *dropdown_style);
+
+  /////////////////////////////////////////////////
+  /// @brief Configures the DropDownListStyle from the flatbuffer config
+  ///
+  /// @param dropdown_list_style Flatbuffer DropDownListStyle object
+  /////////////////////////////////////////////////
+  void ConfigureDropDownListStyle(
+      const themes::DropDownListStyle *dropdown_list_style);
+
+  /////////////////////////////////////////////////
+  /// @brief Configures the DropDownItemStyle from the flatbuffer config
+  ///
+  /// @param dropdown_item_style Flatbuffer DropDownItemStyle object
+  /////////////////////////////////////////////////
+  void ConfigureDropDownItemStyle(
+      const themes::DropDownItemStyle *dropdown_item_style);
+
+  /////////////////////////////////////////////////
+  /// @brief Configures the DropDownButtonStyle from the flatbuffer config
+  ///
+  /// @param dropdown_button_style DropDownButtonStyle object
+  /////////////////////////////////////////////////
+  void ConfigureDropDownButtonStyle(
+      const themes::DropDownButtonStyle *dropdown_button_style);
+
+  /////////////////////////////////////////////////
+  /// @brief Member variable to hold the style for buttons in the UI.
+  /////////////////////////////////////////////////
   ButtonStyle m_button_style;
-  /**
-   * @brief Member variable to hold the style for panels in the UI.
-   */
+
+  /////////////////////////////////////////////////
+  /// @brief Member variable to hold the style for panels in the UI.
+  /////////////////////////////////////////////////
   PanelStyle m_panel_style;
 
   /////////////////////////////////////////////////
   /// @brief Member variable tot hold the style for panels in the UI.
   /////////////////////////////////////////////////
-  DropDownStyle m_dropdown_style;
+  DropDownContainerStyle m_dropdown_style;
+
+  ////////////////////////////////////////////////////////////
+  /// @brief Member variable to hold the style for DropDownLists in the UI.
+  ////////////////////////////////////////////////////////////
+  DropDownListStyle m_dropdown_list_style;
+
+  /// /////////////////////////////////////////////////
+  /// @brief Member variable to hold the style for DropDownItems in the UI.
+  /// /////////////////////////////////////////////
+  DropDownItemStyle m_dropdown_item_style;
+
+  /////////////////////////////////////////////////
+  /// @brief Member variable to hold the style for DropDownButtons in the UI.
+  /////////////////////////////////////////////////
+  DropDownButtonStyle m_dropdown_button_style;
+
   /**
    * @brief Draws all UIElements containted in the CUserInterface components.
    */
@@ -183,7 +280,8 @@ private:
   void AdjustSize(UIElement &element);
 
   /**
-   * @brief Gather all logic here, to be called by the Logic.RunLogic() function
+   * @brief Gather all logic here, to be called by the Logic.RunLogic()
+   * function
    *
    * @param entities A reference to the EntityMemoryPool containing all
    * entities.
