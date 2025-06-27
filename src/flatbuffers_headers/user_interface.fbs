@@ -23,6 +23,13 @@ enum LayoutType: byte{
 
   }
 
+enum SpacingAndSizingType: byte {
+    None = 0,
+    Even = 1,
+    Ratioed = 2,
+
+  }
+
 table UIElementDataPackageData {
     scene_type: string;
   }

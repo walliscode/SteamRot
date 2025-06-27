@@ -129,6 +129,39 @@ inline const char *EnumNameLayoutType(LayoutType e) {
   return EnumNamesLayoutType()[index];
 }
 
+enum SpacingAndSizingType : int8_t {
+  SpacingAndSizingType_None = 0,
+  SpacingAndSizingType_Even = 1,
+  SpacingAndSizingType_Ratioed = 2,
+  SpacingAndSizingType_MIN = SpacingAndSizingType_None,
+  SpacingAndSizingType_MAX = SpacingAndSizingType_Ratioed
+};
+
+inline const SpacingAndSizingType (&EnumValuesSpacingAndSizingType())[3] {
+  static const SpacingAndSizingType values[] = {
+    SpacingAndSizingType_None,
+    SpacingAndSizingType_Even,
+    SpacingAndSizingType_Ratioed
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesSpacingAndSizingType() {
+  static const char * const names[4] = {
+    "None",
+    "Even",
+    "Ratioed",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameSpacingAndSizingType(SpacingAndSizingType e) {
+  if (::flatbuffers::IsOutRange(e, SpacingAndSizingType_None, SpacingAndSizingType_Ratioed)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesSpacingAndSizingType()[index];
+}
+
 enum UIElementDataUnion : uint8_t {
   UIElementDataUnion_NONE = 0,
   UIElementDataUnion_PanelData = 1,
