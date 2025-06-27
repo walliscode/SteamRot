@@ -11,11 +11,13 @@ struct Color {
   }
 
 table Style {
-  background_color: Color; 
-  border_color: Color ;
+  background_color: Color (required); 
+  border_color: Color (required);
   border_thickness: float ;
   radius_resolution: int ;
-  inner_margin: Vector2f;
+  inner_margin: Vector2f (required);
+  minimum_size: Vector2f (required);
+  maximum_size: Vector2f (required);
 }
 
 table PanelStyle {
@@ -29,10 +31,39 @@ table ButtonStyle {
   font: string;
   }
 
+table DropDownContainerStyle {
+  style: Style;
+  drop_symbol_ratio: float;
+  }
+
+table DropDownListStyle {
+  style: Style;
+  text_color: Color;
+  hover_color: Color;
+  font: string; 
+  }
+
+table DropDownItemStyle {
+  style: Style;
+  text_color: Color;
+  hover_color: Color;
+  font: string; 
+  }
+
+table DropDownButtonStyle {
+  style: Style;
+triangle_color: Color;
+  hover_color: Color;
+
+
+}
 
 table UIObjects {
-    panel_style: PanelStyle;
-    button_style: ButtonStyle;
-
+    panel_style: PanelStyle (required);
+    button_style: ButtonStyle (required);
+    drop_down_container_style: DropDownContainerStyle (required);
+    drop_down_list_style: DropDownListStyle (required);
+    drop_down_item_style: DropDownItemStyle (required);
+    drop_down_button_style: DropDownButtonStyle (required);
   }
 root_type UIObjects;
