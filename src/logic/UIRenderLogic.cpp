@@ -16,6 +16,7 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Text.hpp>
+#include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/System/Angle.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <iostream>
@@ -378,7 +379,7 @@ void UIRenderLogic::RecursiveDrawUIElement(UIElement &element) {
       inner_margin = m_panel_style.inner_margin;
     } else if constexpr (std::is_same_v<std::decay_t<decltype(element_type)>,
                                         Button>) {
-      std::cout << "UIEngine: Drawing Button" << std::endl;
+
       DrawButton(element);
       border_thickness = m_button_style.border_thickness;
       inner_margin = m_button_style.inner_margin;
@@ -386,7 +387,6 @@ void UIRenderLogic::RecursiveDrawUIElement(UIElement &element) {
     } else if constexpr (std::is_same_v<std::decay_t<decltype(element_type)>,
                                         DropDownContainer>) {
 
-      std::cout << "UIEngine: Drawing DropDownContainer" << std::endl;
       DrawDropDownContainer(element);
       border_thickness = m_dropdown_style.border_thickness;
       inner_margin = m_dropdown_style.inner_margin;
@@ -404,6 +404,7 @@ void UIRenderLogic::RecursiveDrawUIElement(UIElement &element) {
     } else if constexpr (std::is_same_v<std::decay_t<decltype(element_type)>,
                                         DropDownButton>) {
       DrawDropDownButton(element);
+
       border_thickness = m_dropdown_button_style.border_thickness;
       inner_margin = m_dropdown_button_style.inner_margin;
     } else {
@@ -635,16 +636,23 @@ void UIRenderLogic::DrawDropDownButton(UIElement &element) {
   m_logic_context.scene_texture.draw(drop_down_button_container);
 
   // now create the triangle for the dropdown button
-  sf::CircleShape triangle_button{element.size.y / 2.f, 3};
+  sf::VertexArray triangle_button(sf::PrimitiveType::Triangles,
+                                  3); // create a triangle vertex array
 
-  // rotate the triangle to point downwards
-  triangle_button.rotate(sf::degrees(180));
-
-  // set the position of the triangle to be in the center of the button
-  triangle_button.setPosition(element.position);
-
+  // set the position of the triangle vertices
+  triangle_button[0].position = sf::Vector2f(element.position);
+  triangle_button[1].position =
+      sf::Vector2f(element.position.x + element.size.x, element.position.y);
+  triangle_button[2].position =
+      sf::Vector2f(element.position.x + (element.size.x / 2),
+                   element.position.y + element.size.y);
   // set the fill color of the triangle
-  triangle_button.setFillColor(m_dropdown_button_style.triangle_color);
+  triangle_button[0].color = m_dropdown_button_style.triangle_color;
+  triangle_button[1].color = m_dropdown_button_style.triangle_color;
+  triangle_button[2].color = m_dropdown_button_style.triangle_color;
+
+  // draw the triangle to the render texture
+  m_logic_context.scene_texture.draw(triangle_button);
 }
 /////////////////////////////////////////////////
 void UIRenderLogic::AdjustSize(UIElement &element) {
@@ -664,15 +672,10 @@ void UIRenderLogic::AdjustSize(UIElement &element) {
       max_size = m_button_style.maximum_size;
     } else if constexpr (std::is_same_v<std::decay_t<decltype(element_type)>,
                                         DropDownContainer>) {
-      std::cout << "Adjusting size for DropDown element" << std::endl;
 
       min_size = m_dropdown_style.minimum_size;
       max_size = m_dropdown_style.maximum_size;
 
-      std::cout << "DropDown minimum size: " << min_size.x << "x" << min_size.y
-                << std::endl;
-      std::cout << "DropDown maximum size: " << max_size.x << "x" << max_size.y
-                << std::endl;
     } else {
       std::cout << "Unknown element type for size adjustment" << std::endl;
     }
