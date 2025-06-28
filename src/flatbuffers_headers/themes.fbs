@@ -29,6 +29,7 @@ table ButtonStyle {
   text_color: Color;
   hover_color: Color;
   font: string;
+  font_size: int;
   }
 
 table DropDownContainerStyle {
@@ -41,6 +42,7 @@ table DropDownListStyle {
   text_color: Color;
   hover_color: Color;
   font: string; 
+  font_size: int;
   }
 
 table DropDownItemStyle {
@@ -48,6 +50,7 @@ table DropDownItemStyle {
   text_color: Color;
   hover_color: Color;
   font: string; 
+  font_size: int;
   }
 
 table DropDownButtonStyle {

@@ -23,6 +23,13 @@ enum LayoutType: byte{
 
   }
 
+enum SpacingAndSizingType: byte {
+    None = 0,
+    Even = 1,
+    Ratioed = 2,
+
+  }
+
 table UIElementDataPackageData {
     scene_type: string;
   }
@@ -64,8 +71,10 @@ table UIElementData{
     type: UIElementType;
     children: [UIElementData];
     layout: LayoutType;
+    spacing_strategy: SpacingAndSizingType;
     position: Vector2f;
     size: Vector2f;
+    ratio: float;
     element: UIElementDataUnion (required);
     action: Action;
     data: UIElementDataPackageData;

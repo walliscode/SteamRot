@@ -65,6 +65,17 @@ struct UIElement {
   sf::Vector2f size{0.f, 0.f};
 
   /////////////////////////////////////////////////
+  /// @brief An optional ratio for the UI element, used in spacing strategies
+  /////////////////////////////////////////////////
+  std::optional<float> ratio{std::nullopt};
+
+  /////////////////////////////////////////////////
+  /// @brief Spacing and sizing strategy for the children elements defaulting to
+  /// Even
+  /////////////////////////////////////////////////
+  SpacingAndSizingType spacing_strategy{
+      SpacingAndSizingType::SpacingAndSizingType_Even};
+  /////////////////////////////////////////////////
   /// @brief Layout type of the children elements
   /////////////////////////////////////////////////
   LayoutType layout{0};

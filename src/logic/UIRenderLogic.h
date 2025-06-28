@@ -10,6 +10,7 @@
 #include "CUserInterface.h"
 #include "Logic.h"
 #include "themes_generated.h"
+#include "user_interface_generated.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
@@ -18,6 +19,9 @@
 
 namespace steamrot {
 
+using SpacingStrategy =
+    std::function<void(UIElement &ui_element, sf::Vector2f &inner_margin,
+                       float &parent_border_thickness)>;
 struct Style {
   /////////////////////////////////////////////////
   /// @brief Fill color of the background
@@ -100,6 +104,11 @@ struct DropDownListStyle : public Style {
   /// @brief Font used for the dropdown list
   /////////////////////////////////////////////////
   std::string font;
+
+  /////////////////////////////////////////////////
+  /// @brief Font size used for the dropdown list
+  /////////////////////////////////////////////////
+  size_t font_size{12};
 };
 
 struct DropDownItemStyle : public Style {
@@ -289,6 +298,39 @@ private:
    * EnittyMemoryPool.
    */
   void ProcessLogic() override;
+
+  /////////////////////////////////////////////////
+  /// @brief Defines a spacing strategy for UI elements based on the provided
+  /// enum
+  ///
+  /// @param spacing_strategy_name Enum defined in flatbuffers file
+  /// @return Function which will modify positions and sizes of UI element
+  /////////////////////////////////////////////////
+  SpacingStrategy
+  GetSpacingStrategy(const SpacingAndSizingType &spacing_strategy_name) const;
+
+  /////////////////////////////////////////////////
+  /// @brief Splits the provided space into even parts and sizes the children
+  /// appropriately.
+  ///
+  /// @param ulement [TODO:parameter]
+  /// @param inner_margin [TODO:parameter]
+  /// @param parent_border_thickness [TODO:parameter]
+  /////////////////////////////////////////////////
+  static void EvenSpacingStrategy(UIElement &ul_element,
+                                  sf::Vector2f &inner_margin,
+                                  float &parent_border_thickness);
+
+  /////////////////////////////////////////////////
+  /// @brief Trawls children for any ratios present and calculates them
+  ///
+  /// @param ulement [TODO:parameter]
+  /// @param inner_margin [TODO:parameter]
+  /// @param parent_border_thickness [TODO:parameter]
+  /////////////////////////////////////////////////
+  static void RatioedSpacingStrategy(UIElement &ul_element,
+                                     sf::Vector2f &inner_margin,
+                                     float &parent_border_thickness);
 
 public:
   ////////////////////////////////////////////////////////////
