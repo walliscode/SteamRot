@@ -19,6 +19,7 @@
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/System/Angle.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <cstddef>
 #include <iostream>
 
 namespace steamrot {
@@ -499,7 +500,8 @@ void UIRenderLogic::DrawDropDownList(UIElement &element) {
   sf::Text dropdown_text(
       m_logic_context.asset_manager.GetFont(m_dropdown_list_style.font),
       dropdown_list_element.label);
-  dropdown_text.setCharacterSize(24); // Set the character size
+  dropdown_text.setCharacterSize(
+      m_dropdown_list_style.font_size); // Set the character size
   dropdown_text.setFillColor(m_dropdown_list_style.text_color);
   // Center the text within the dropdown list
   dropdown_text.setPosition(
@@ -573,9 +575,15 @@ void UIRenderLogic::DrawDropDownButton(UIElement &element) {
       sf::Vector2f(element.position.x + (element.size.x / 2),
                    element.position.y + element.size.y);
   // set the fill color of the triangle
-  triangle_button[0].color = m_dropdown_button_style.triangle_color;
-  triangle_button[1].color = m_dropdown_button_style.triangle_color;
-  triangle_button[2].color = m_dropdown_button_style.triangle_color;
+  if (element.mouse_over) {
+    triangle_button[0].color = m_dropdown_button_style.hover_color;
+    triangle_button[1].color = m_dropdown_button_style.hover_color;
+    triangle_button[2].color = m_dropdown_button_style.hover_color;
+  } else {
+    triangle_button[0].color = m_dropdown_button_style.triangle_color;
+    triangle_button[1].color = m_dropdown_button_style.triangle_color;
+    triangle_button[2].color = m_dropdown_button_style.triangle_color;
+  }
 
   // draw the triangle to the render texture
   m_logic_context.scene_texture.draw(triangle_button);
@@ -815,19 +823,20 @@ void UIRenderLogic::EvenSpacingStrategy(UIElement &ul_element,
 }
 
 /////////////////////////////////////////////////
-void UIRenderLogic::RatioedSpacingStrategy(UIElement &ul_element,
+void UIRenderLogic::RatioedSpacingStrategy(UIElement &ui_element,
                                            sf::Vector2f &inner_margin,
                                            float &parent_border_thickness) {
   // get the orientation of the children
-  LayoutType layout = ul_element.layout;
+  LayoutType layout = ui_element.layout;
   // get the children
-  std::vector<UIElement> &children = ul_element.child_elements;
+  std::vector<UIElement> &children = ui_element.child_elements;
   // get the number of children
   size_t number_of_children = children.size();
 
   // need to account for ratios adding up to more than 1.0, or some not having
   // ratios
   // default: if sum is greater than 1.0, then we will scale down all the parts
+  // default: if sum is less than 1.0, then we will scale up all the parts
   // default: if elements do not have ratio then we will asign an even ratio
 
   // calculate the correct ratio for each child
@@ -841,10 +850,65 @@ void UIRenderLogic::RatioedSpacingStrategy(UIElement &ul_element,
     }
     total_ratio += ratios[i];
   }
-  // if the total ratio is greater than 1.0, then scale down all the ratios
-  if (total_ratio > 1.0f) {
+  // if the total ratio does not equal 1.0, then scale
+  if (total_ratio != 1.0f) {
     for (size_t i = 0; i < number_of_children; ++i) {
       ratios[i] /= total_ratio;
+    }
+  }
+
+  // now apply ratios depending on layout strategy
+  if (layout == LayoutType::LayoutType_Vertical) {
+    // width is constant for each child
+    float child_width = ui_element.size.x - (2 * parent_border_thickness) -
+                        (2 * inner_margin.x);
+
+    // variable to keep track of position moving down
+    float moving_vertical_position{ui_element.position.y +
+                                   parent_border_thickness + inner_margin.y};
+
+    for (size_t i = 0; i < number_of_children; ++i) {
+      // calculate the height of each child based on the ratio
+      float child_height = (ui_element.size.y - (2 * parent_border_thickness) -
+                            ((number_of_children + 1) * inner_margin.y)) *
+                           ratios[i];
+      // set the size and position of each child
+      children[i].size.x = child_width;
+      children[i].size.y = child_height;
+      children[i].position.x =
+          ui_element.position.x + parent_border_thickness + inner_margin.x;
+      children[i].position.y = moving_vertical_position;
+
+      // add child_height and inner margin to moving_vertical_position
+      moving_vertical_position =
+          moving_vertical_position + child_height + inner_margin.x;
+    }
+
+  } else if (layout == LayoutType::LayoutType_Horizontal) {
+    // height is constant for each child
+    float child_height = ui_element.size.y - (2 * parent_border_thickness) -
+                         (2 * inner_margin.y);
+
+    // variable to keep track of position moving right
+    float moving_horizontal_position{ui_element.position.x +
+                                     parent_border_thickness + inner_margin.x};
+
+    for (size_t i = 0; i < number_of_children; ++i) {
+      // calculate the width of each child based on the ratio
+      float child_width = (ui_element.size.x - (2 * parent_border_thickness) -
+                           ((number_of_children + 1) * inner_margin.x)) *
+                          ratios[i];
+
+      // set the size and position of each child
+      children[i].size.y = child_height;
+      children[i].size.x = child_width;
+      children[i].position.y =
+          ui_element.position.y + parent_border_thickness + inner_margin.y;
+      children[i].position.x = moving_horizontal_position;
+
+      // add child_width and inner margin to moving_horizontal_position
+      moving_horizontal_position =
+          moving_horizontal_position + child_width + inner_margin.x;
     }
   }
 }

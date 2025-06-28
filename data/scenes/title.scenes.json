@@ -8,6 +8,7 @@
           "start_visible": true,
           "root_ui_element": {
             "type": "Panel",
+            "spacing_strategy": "Even",
             "layout": "Vertical",
             "element_type": "PanelData",
             "element": {},
@@ -57,11 +58,13 @@
               {
                 "type": "DropDownContainer",
                 "layout": "Horizontal",
+                "spacing_strategy": "Ratioed",
                 "children": [
                   {
                     "type": "DropDownList",
                     "layout": "DropDown",
                     "children": [],
+                    "ratio": 0.9,
                     "element_type": "DropDownListData",
                     "element": {
                       "label": "Drop down up...",
@@ -73,6 +76,7 @@
                     "type": "DropDownButton",
                     "layout": "Vertical",
                     "children": [],
+                    "ratio": 0.1,
                     "element_type": "DropDownButtonData",
                     "element": {},
                     "action": {}

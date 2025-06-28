@@ -236,7 +236,8 @@ struct ButtonStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_STYLE = 4,
     VT_TEXT_COLOR = 6,
     VT_HOVER_COLOR = 8,
-    VT_FONT = 10
+    VT_FONT = 10,
+    VT_FONT_SIZE = 12
   };
   const steamrot::themes::Style *style() const {
     return GetPointer<const steamrot::themes::Style *>(VT_STYLE);
@@ -250,6 +251,9 @@ struct ButtonStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ::flatbuffers::String *font() const {
     return GetPointer<const ::flatbuffers::String *>(VT_FONT);
   }
+  int32_t font_size() const {
+    return GetField<int32_t>(VT_FONT_SIZE, 0);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_STYLE) &&
@@ -258,6 +262,7 @@ struct ButtonStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<steamrot::themes::Color>(verifier, VT_HOVER_COLOR, 1) &&
            VerifyOffset(verifier, VT_FONT) &&
            verifier.VerifyString(font()) &&
+           VerifyField<int32_t>(verifier, VT_FONT_SIZE, 4) &&
            verifier.EndTable();
   }
 };
@@ -278,6 +283,9 @@ struct ButtonStyleBuilder {
   void add_font(::flatbuffers::Offset<::flatbuffers::String> font) {
     fbb_.AddOffset(ButtonStyle::VT_FONT, font);
   }
+  void add_font_size(int32_t font_size) {
+    fbb_.AddElement<int32_t>(ButtonStyle::VT_FONT_SIZE, font_size, 0);
+  }
   explicit ButtonStyleBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -294,8 +302,10 @@ inline ::flatbuffers::Offset<ButtonStyle> CreateButtonStyle(
     ::flatbuffers::Offset<steamrot::themes::Style> style = 0,
     const steamrot::themes::Color *text_color = nullptr,
     const steamrot::themes::Color *hover_color = nullptr,
-    ::flatbuffers::Offset<::flatbuffers::String> font = 0) {
+    ::flatbuffers::Offset<::flatbuffers::String> font = 0,
+    int32_t font_size = 0) {
   ButtonStyleBuilder builder_(_fbb);
+  builder_.add_font_size(font_size);
   builder_.add_font(font);
   builder_.add_hover_color(hover_color);
   builder_.add_text_color(text_color);
@@ -308,14 +318,16 @@ inline ::flatbuffers::Offset<ButtonStyle> CreateButtonStyleDirect(
     ::flatbuffers::Offset<steamrot::themes::Style> style = 0,
     const steamrot::themes::Color *text_color = nullptr,
     const steamrot::themes::Color *hover_color = nullptr,
-    const char *font = nullptr) {
+    const char *font = nullptr,
+    int32_t font_size = 0) {
   auto font__ = font ? _fbb.CreateString(font) : 0;
   return steamrot::themes::CreateButtonStyle(
       _fbb,
       style,
       text_color,
       hover_color,
-      font__);
+      font__,
+      font_size);
 }
 
 struct DropDownContainerStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -376,7 +388,8 @@ struct DropDownListStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
     VT_STYLE = 4,
     VT_TEXT_COLOR = 6,
     VT_HOVER_COLOR = 8,
-    VT_FONT = 10
+    VT_FONT = 10,
+    VT_FONT_SIZE = 12
   };
   const steamrot::themes::Style *style() const {
     return GetPointer<const steamrot::themes::Style *>(VT_STYLE);
@@ -390,6 +403,9 @@ struct DropDownListStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
   const ::flatbuffers::String *font() const {
     return GetPointer<const ::flatbuffers::String *>(VT_FONT);
   }
+  int32_t font_size() const {
+    return GetField<int32_t>(VT_FONT_SIZE, 0);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_STYLE) &&
@@ -398,6 +414,7 @@ struct DropDownListStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
            VerifyField<steamrot::themes::Color>(verifier, VT_HOVER_COLOR, 1) &&
            VerifyOffset(verifier, VT_FONT) &&
            verifier.VerifyString(font()) &&
+           VerifyField<int32_t>(verifier, VT_FONT_SIZE, 4) &&
            verifier.EndTable();
   }
 };
@@ -418,6 +435,9 @@ struct DropDownListStyleBuilder {
   void add_font(::flatbuffers::Offset<::flatbuffers::String> font) {
     fbb_.AddOffset(DropDownListStyle::VT_FONT, font);
   }
+  void add_font_size(int32_t font_size) {
+    fbb_.AddElement<int32_t>(DropDownListStyle::VT_FONT_SIZE, font_size, 0);
+  }
   explicit DropDownListStyleBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -434,8 +454,10 @@ inline ::flatbuffers::Offset<DropDownListStyle> CreateDropDownListStyle(
     ::flatbuffers::Offset<steamrot::themes::Style> style = 0,
     const steamrot::themes::Color *text_color = nullptr,
     const steamrot::themes::Color *hover_color = nullptr,
-    ::flatbuffers::Offset<::flatbuffers::String> font = 0) {
+    ::flatbuffers::Offset<::flatbuffers::String> font = 0,
+    int32_t font_size = 0) {
   DropDownListStyleBuilder builder_(_fbb);
+  builder_.add_font_size(font_size);
   builder_.add_font(font);
   builder_.add_hover_color(hover_color);
   builder_.add_text_color(text_color);
@@ -448,14 +470,16 @@ inline ::flatbuffers::Offset<DropDownListStyle> CreateDropDownListStyleDirect(
     ::flatbuffers::Offset<steamrot::themes::Style> style = 0,
     const steamrot::themes::Color *text_color = nullptr,
     const steamrot::themes::Color *hover_color = nullptr,
-    const char *font = nullptr) {
+    const char *font = nullptr,
+    int32_t font_size = 0) {
   auto font__ = font ? _fbb.CreateString(font) : 0;
   return steamrot::themes::CreateDropDownListStyle(
       _fbb,
       style,
       text_color,
       hover_color,
-      font__);
+      font__,
+      font_size);
 }
 
 struct DropDownItemStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -464,7 +488,8 @@ struct DropDownItemStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
     VT_STYLE = 4,
     VT_TEXT_COLOR = 6,
     VT_HOVER_COLOR = 8,
-    VT_FONT = 10
+    VT_FONT = 10,
+    VT_FONT_SIZE = 12
   };
   const steamrot::themes::Style *style() const {
     return GetPointer<const steamrot::themes::Style *>(VT_STYLE);
@@ -478,6 +503,9 @@ struct DropDownItemStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
   const ::flatbuffers::String *font() const {
     return GetPointer<const ::flatbuffers::String *>(VT_FONT);
   }
+  int32_t font_size() const {
+    return GetField<int32_t>(VT_FONT_SIZE, 0);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_STYLE) &&
@@ -486,6 +514,7 @@ struct DropDownItemStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
            VerifyField<steamrot::themes::Color>(verifier, VT_HOVER_COLOR, 1) &&
            VerifyOffset(verifier, VT_FONT) &&
            verifier.VerifyString(font()) &&
+           VerifyField<int32_t>(verifier, VT_FONT_SIZE, 4) &&
            verifier.EndTable();
   }
 };
@@ -506,6 +535,9 @@ struct DropDownItemStyleBuilder {
   void add_font(::flatbuffers::Offset<::flatbuffers::String> font) {
     fbb_.AddOffset(DropDownItemStyle::VT_FONT, font);
   }
+  void add_font_size(int32_t font_size) {
+    fbb_.AddElement<int32_t>(DropDownItemStyle::VT_FONT_SIZE, font_size, 0);
+  }
   explicit DropDownItemStyleBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -522,8 +554,10 @@ inline ::flatbuffers::Offset<DropDownItemStyle> CreateDropDownItemStyle(
     ::flatbuffers::Offset<steamrot::themes::Style> style = 0,
     const steamrot::themes::Color *text_color = nullptr,
     const steamrot::themes::Color *hover_color = nullptr,
-    ::flatbuffers::Offset<::flatbuffers::String> font = 0) {
+    ::flatbuffers::Offset<::flatbuffers::String> font = 0,
+    int32_t font_size = 0) {
   DropDownItemStyleBuilder builder_(_fbb);
+  builder_.add_font_size(font_size);
   builder_.add_font(font);
   builder_.add_hover_color(hover_color);
   builder_.add_text_color(text_color);
@@ -536,14 +570,16 @@ inline ::flatbuffers::Offset<DropDownItemStyle> CreateDropDownItemStyleDirect(
     ::flatbuffers::Offset<steamrot::themes::Style> style = 0,
     const steamrot::themes::Color *text_color = nullptr,
     const steamrot::themes::Color *hover_color = nullptr,
-    const char *font = nullptr) {
+    const char *font = nullptr,
+    int32_t font_size = 0) {
   auto font__ = font ? _fbb.CreateString(font) : 0;
   return steamrot::themes::CreateDropDownItemStyle(
       _fbb,
       style,
       text_color,
       hover_color,
-      font__);
+      font__,
+      font_size);
 }
 
 struct DropDownButtonStyle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {

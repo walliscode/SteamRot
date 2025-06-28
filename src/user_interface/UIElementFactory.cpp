@@ -106,13 +106,26 @@ UIElementFactory::ConfigureGeneralUIElement(const UIElementData &element) {
   // general configuration for the UIElement (only variables specificied in
   // the UIElement struct)
   ui_element.layout = element.layout();
+
+  if (element.spacing_strategy()) {
+    ui_element.spacing_strategy = element.spacing_strategy();
+  }
+
   if (element.position()) {
     ui_element.position =
         sf::Vector2f(element.position()->x(), element.position()->y());
   }
+
   if (element.size()) {
+
     ui_element.size = sf::Vector2f(element.size()->x(), element.size()->y());
   }
+
+  if (element.ratio()) {
+
+    ui_element.ratio = element.ratio();
+  }
+
   if (element.action()) {
     ui_element.action = element.action()->action_name();
 

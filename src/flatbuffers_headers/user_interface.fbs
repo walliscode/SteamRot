@@ -71,8 +71,10 @@ table UIElementData{
     type: UIElementType;
     children: [UIElementData];
     layout: LayoutType;
+    spacing_strategy: SpacingAndSizingType;
     position: Vector2f;
     size: Vector2f;
+    ratio: float;
     element: UIElementDataUnion (required);
     action: Action;
     data: UIElementDataPackageData;

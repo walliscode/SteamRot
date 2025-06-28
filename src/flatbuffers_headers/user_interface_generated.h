@@ -565,12 +565,14 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_TYPE = 4,
     VT_CHILDREN = 6,
     VT_LAYOUT = 8,
-    VT_POSITION = 10,
-    VT_SIZE = 12,
-    VT_ELEMENT_TYPE = 14,
-    VT_ELEMENT = 16,
-    VT_ACTION = 18,
-    VT_DATA = 20
+    VT_SPACING_STRATEGY = 10,
+    VT_POSITION = 12,
+    VT_SIZE = 14,
+    VT_RATIO = 16,
+    VT_ELEMENT_TYPE = 18,
+    VT_ELEMENT = 20,
+    VT_ACTION = 22,
+    VT_DATA = 24
   };
   steamrot::UIElementType type() const {
     return static_cast<steamrot::UIElementType>(GetField<int8_t>(VT_TYPE, 0));
@@ -581,11 +583,17 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   steamrot::LayoutType layout() const {
     return static_cast<steamrot::LayoutType>(GetField<int8_t>(VT_LAYOUT, 0));
   }
+  steamrot::SpacingAndSizingType spacing_strategy() const {
+    return static_cast<steamrot::SpacingAndSizingType>(GetField<int8_t>(VT_SPACING_STRATEGY, 0));
+  }
   const Vector2f *position() const {
     return GetPointer<const Vector2f *>(VT_POSITION);
   }
   const Vector2f *size() const {
     return GetPointer<const Vector2f *>(VT_SIZE);
+  }
+  float ratio() const {
+    return GetField<float>(VT_RATIO, 0.0f);
   }
   steamrot::UIElementDataUnion element_type() const {
     return static_cast<steamrot::UIElementDataUnion>(GetField<uint8_t>(VT_ELEMENT_TYPE, 0));
@@ -625,10 +633,12 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyVector(children()) &&
            verifier.VerifyVectorOfTables(children()) &&
            VerifyField<int8_t>(verifier, VT_LAYOUT, 1) &&
+           VerifyField<int8_t>(verifier, VT_SPACING_STRATEGY, 1) &&
            VerifyOffset(verifier, VT_POSITION) &&
            verifier.VerifyTable(position()) &&
            VerifyOffset(verifier, VT_SIZE) &&
            verifier.VerifyTable(size()) &&
+           VerifyField<float>(verifier, VT_RATIO, 4) &&
            VerifyField<uint8_t>(verifier, VT_ELEMENT_TYPE, 1) &&
            VerifyOffsetRequired(verifier, VT_ELEMENT) &&
            VerifyUIElementDataUnion(verifier, element(), element_type()) &&
@@ -677,11 +687,17 @@ struct UIElementDataBuilder {
   void add_layout(steamrot::LayoutType layout) {
     fbb_.AddElement<int8_t>(UIElementData::VT_LAYOUT, static_cast<int8_t>(layout), 0);
   }
+  void add_spacing_strategy(steamrot::SpacingAndSizingType spacing_strategy) {
+    fbb_.AddElement<int8_t>(UIElementData::VT_SPACING_STRATEGY, static_cast<int8_t>(spacing_strategy), 0);
+  }
   void add_position(::flatbuffers::Offset<Vector2f> position) {
     fbb_.AddOffset(UIElementData::VT_POSITION, position);
   }
   void add_size(::flatbuffers::Offset<Vector2f> size) {
     fbb_.AddOffset(UIElementData::VT_SIZE, size);
+  }
+  void add_ratio(float ratio) {
+    fbb_.AddElement<float>(UIElementData::VT_RATIO, ratio, 0.0f);
   }
   void add_element_type(steamrot::UIElementDataUnion element_type) {
     fbb_.AddElement<uint8_t>(UIElementData::VT_ELEMENT_TYPE, static_cast<uint8_t>(element_type), 0);
@@ -712,8 +728,10 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementData(
     steamrot::UIElementType type = steamrot::UIElementType_None,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::UIElementData>>> children = 0,
     steamrot::LayoutType layout = steamrot::LayoutType_None,
+    steamrot::SpacingAndSizingType spacing_strategy = steamrot::SpacingAndSizingType_None,
     ::flatbuffers::Offset<Vector2f> position = 0,
     ::flatbuffers::Offset<Vector2f> size = 0,
+    float ratio = 0.0f,
     steamrot::UIElementDataUnion element_type = steamrot::UIElementDataUnion_NONE,
     ::flatbuffers::Offset<void> element = 0,
     ::flatbuffers::Offset<steamrot::Action> action = 0,
@@ -722,10 +740,12 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementData(
   builder_.add_data(data);
   builder_.add_action(action);
   builder_.add_element(element);
+  builder_.add_ratio(ratio);
   builder_.add_size(size);
   builder_.add_position(position);
   builder_.add_children(children);
   builder_.add_element_type(element_type);
+  builder_.add_spacing_strategy(spacing_strategy);
   builder_.add_layout(layout);
   builder_.add_type(type);
   return builder_.Finish();
@@ -736,8 +756,10 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
     steamrot::UIElementType type = steamrot::UIElementType_None,
     const std::vector<::flatbuffers::Offset<steamrot::UIElementData>> *children = nullptr,
     steamrot::LayoutType layout = steamrot::LayoutType_None,
+    steamrot::SpacingAndSizingType spacing_strategy = steamrot::SpacingAndSizingType_None,
     ::flatbuffers::Offset<Vector2f> position = 0,
     ::flatbuffers::Offset<Vector2f> size = 0,
+    float ratio = 0.0f,
     steamrot::UIElementDataUnion element_type = steamrot::UIElementDataUnion_NONE,
     ::flatbuffers::Offset<void> element = 0,
     ::flatbuffers::Offset<steamrot::Action> action = 0,
@@ -748,8 +770,10 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
       type,
       children__,
       layout,
+      spacing_strategy,
       position,
       size,
+      ratio,
       element_type,
       element,
       action,
