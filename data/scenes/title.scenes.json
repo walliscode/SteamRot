@@ -12,6 +12,7 @@
             "layout": "Vertical",
             "element_type": "PanelData",
             "element": {},
+            "children_active": true,
             "children": [
               {
                 "type": "Button",
@@ -59,11 +60,33 @@
                 "type": "DropDownContainer",
                 "layout": "Horizontal",
                 "spacing_strategy": "Ratioed",
+                "children_active": true,
                 "children": [
                   {
                     "type": "DropDownList",
                     "layout": "DropDown",
-                    "children": [],
+                    "spacing_strategy": "DropDownList",
+                    "children_active": true,
+                    "children": [
+                      {
+                        "type": "DropDownItem",
+                        "children": [],
+                        "element_type": "DropDownItemData",
+                        "element": {
+                          "label": "Option 1"
+                        },
+                        "action": {}
+                      },
+                      {
+                        "type": "DropDownItem",
+                        "children": [],
+                        "element_type": "DropDownItemData",
+                        "element": {
+                          "label": "Option 2"
+                        },
+                        "action": {}
+                      }
+                    ],
                     "ratio": 0.9,
                     "element_type": "DropDownListData",
                     "element": {

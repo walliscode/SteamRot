@@ -496,10 +496,17 @@ void UIRenderLogic::DrawDropDownList(UIElement &element) {
   // get the dropdown list specific details from the variant
   DropDownList dropdown_list_element =
       std::get<DropDownList>(element.element_type);
-  // Create a text object for the dropdown list label
+  // Create a text object for the dropdown list label depending on whether its
+  // expanded
+
+  std::string label_to_use = dropdown_list_element.is_expanded
+                                 ? dropdown_list_element.expanded_label
+                                 : dropdown_list_element.label;
+
   sf::Text dropdown_text(
+
       m_logic_context.asset_manager.GetFont(m_dropdown_list_style.font),
-      dropdown_list_element.label);
+      label_to_use);
   dropdown_text.setCharacterSize(
       m_dropdown_list_style.font_size); // Set the character size
   dropdown_text.setFillColor(m_dropdown_list_style.text_color);
@@ -523,7 +530,13 @@ void UIRenderLogic::DrawDropDownItem(UIElement &element) {
   sf::RectangleShape dropdown_shape;
   dropdown_shape.setSize(element.size);
   dropdown_shape.setPosition(element.position);
-  dropdown_shape.setFillColor(m_dropdown_item_style.background_color);
+
+  // set the fill color based on whether the mouse is over the element
+  if (element.mouse_over) {
+    dropdown_shape.setFillColor(m_dropdown_item_style.hover_color);
+  } else {
+    dropdown_shape.setFillColor(m_dropdown_item_style.background_color);
+  }
   // no border for this element
   dropdown_shape.setOutlineThickness(0.f);
   // draw the rectangle to the render texture
@@ -535,7 +548,7 @@ void UIRenderLogic::DrawDropDownItem(UIElement &element) {
   sf::Text dropdown_text(
       m_logic_context.asset_manager.GetFont(m_dropdown_item_style.font),
       dropdown_item_element.label);
-  dropdown_text.setCharacterSize(24); // Set the character size
+  dropdown_text.setCharacterSize(12); // Set the character size
   dropdown_text.setFillColor(m_dropdown_item_style.text_color);
   // Center the text within the dropdown item
   dropdown_text.setPosition(
@@ -766,6 +779,9 @@ SpacingStrategy UIRenderLogic::GetSpacingStrategy(
   case (SpacingAndSizingType::SpacingAndSizingType_Ratioed): {
     return RatioedSpacingStrategy;
   }
+  case (SpacingAndSizingType::SpacingAndSizingType_DropDownList): {
+    return DropDownSpacingStrategy;
+  }
   default:
 
     return EvenSpacingStrategy;
@@ -910,6 +926,35 @@ void UIRenderLogic::RatioedSpacingStrategy(UIElement &ui_element,
       moving_horizontal_position =
           moving_horizontal_position + child_width + inner_margin.x;
     }
+  }
+}
+
+void UIRenderLogic::DropDownSpacingStrategy(UIElement &ui_element,
+                                            sf::Vector2f &inner_margin,
+                                            float &parent_border_thickness) {
+
+  // This strategy takes the parent element's size and positions the children
+  // beneath it with no margins or borders.
+
+  std::vector<UIElement> &children = ui_element.child_elements;
+  size_t number_of_children = children.size();
+
+  std::cout << "Drop Down list starts at: " << ui_element.position.x << ", "
+            << ui_element.position.y << std::endl;
+  // size is constant
+  sf::Vector2f child_size = ui_element.size;
+
+  // iterate through the children and set their size and position
+  for (size_t i = 0; i < number_of_children; ++i) {
+    // set the size of the child
+    children[i].size = child_size;
+    // set the position of the child
+    children[i].position.x = ui_element.position.x;
+    children[i].position.y =
+        ui_element.position.y + (ui_element.size.y * (i + 1));
+    std::cout << "UIEngine: Child " << i
+              << " positioned at: " << children[i].position.x << ", "
+              << children[i].position.y << std::endl;
   }
 }
 } // namespace steamrot

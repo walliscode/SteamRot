@@ -3,6 +3,7 @@
 /// @brief Implementation of the UIEventLogic class.
 /////////////////////////////////////////////////
 #include "UIActionLogic.h"
+#include "DropDown.h"
 #include "EntityHelpers.h"
 #include <SFML/Window/Mouse.hpp>
 #include <magic_enum/magic_enum.hpp>
@@ -60,6 +61,7 @@ void UIActionLogic::RecursiveProcessMouseEvents(UIElement &element) {
       // match LogicAction to the element action
       // we want to overwrite the current logic action as we only want one
       // action per tick
+      LocalUIActions(element);
       m_logic_action = element.action;
       std::cout << "Mouse event triggered for element: "
                 << magic_enum::enum_name(element.action) << std::endl;
@@ -71,5 +73,28 @@ void UIActionLogic::RecursiveProcessMouseEvents(UIElement &element) {
   for (UIElement &child : element.child_elements) {
     RecursiveProcessMouseEvents(child);
   }
+}
+
+/////////////////////////////////////////////////
+bool UIActionLogic::LocalUIActions(UIElement &element) {
+  // Check if the element has a local action
+  bool has_local_action{true};
+
+  if (element.action == ActionNames::ActionNames_ACTION_TOGGLE_DROP_DOWN) {
+    if constexpr (std::is_same_v<std::decay_t<decltype(element.element_type)>,
+                                 DropDownContainer>) {
+      DropDownContainer &dropdown_container =
+          std::get<DropDownContainer>(element.element_type);
+
+      // toggle the dropdown state and children active state
+      dropdown_container.is_expanded = !dropdown_container.is_expanded;
+      element.children_active = !element.children_active;
+
+    } else {
+      // if the action is not a local action, then we do not have a local action
+      has_local_action = false;
+    }
+  }
+  return has_local_action;
 }
 } // namespace steamrot

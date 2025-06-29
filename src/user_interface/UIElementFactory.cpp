@@ -39,10 +39,12 @@ UIElementFactory::RecursivlyBuildUIElement(const UIElementData &element_data) {
   }
     // Button
   case UIElementType::UIElementType_Button: {
-    std::cout << "MOTHERFUCKER: Configuring Button UIElement" << std::endl;
+    std::cout << "Configuring Button UIElement" << std::endl;
     ui_element.element_type =
         ConfigureButton(*element_data.element_as_ButtonData());
 
+    std::cout << "Button label: "
+              << std::get<Button>(ui_element.element_type).label << std::endl;
     break;
   }
     // DropDownContainer
@@ -126,6 +128,10 @@ UIElementFactory::ConfigureGeneralUIElement(const UIElementData &element) {
     ui_element.ratio = element.ratio();
   }
 
+  if (element.children_active()) {
+    ui_element.children_active = element.children_active();
+  }
+
   if (element.action()) {
     ui_element.action = element.action()->action_name();
 
@@ -160,9 +166,14 @@ Panel UIElementFactory::ConfigurePanel(const PanelData &panel_data) {
 
 /////////////////////////////////////////////////
 Button UIElementFactory::ConfigureButton(const ButtonData &button_data) {
+
   Button button_element;
+
   // configure the button element
-  button_element.label = button_data.label()->str();
+  if (button_data.label()) {
+
+    button_element.label = button_data.label()->str();
+  }
   // add to the UIElement
   return button_element;
 }
