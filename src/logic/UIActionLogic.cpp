@@ -61,11 +61,10 @@ void UIActionLogic::RecursiveProcessMouseEvents(UIElement &element) {
       // match LogicAction to the element action
       // we want to overwrite the current logic action as we only want one
       // action per tick
-      LocalUIActions(element);
-      m_logic_action = element.action;
       std::cout << "Mouse event triggered for element: "
                 << magic_enum::enum_name(element.action) << std::endl;
-
+      LocalUIActions(element);
+      m_logic_action = element.action;
       m_logic_data.ui_data_package = element.ui_data_package;
     }
   }
@@ -80,21 +79,60 @@ bool UIActionLogic::LocalUIActions(UIElement &element) {
   // Check if the element has a local action
   bool has_local_action{true};
 
-  if (element.action == ActionNames::ActionNames_ACTION_TOGGLE_DROP_DOWN) {
-    if constexpr (std::is_same_v<std::decay_t<decltype(element.element_type)>,
-                                 DropDownContainer>) {
-      DropDownContainer &dropdown_container =
-          std::get<DropDownContainer>(element.element_type);
-
-      // toggle the dropdown state and children active state
-      dropdown_container.is_expanded = !dropdown_container.is_expanded;
-      element.children_active = !element.children_active;
+  // create std::visit lamda function to handle different variant types in
+  // element.element_type
+  auto handle_element_type = [&](const auto &element_type) {
+    using ElementType = std::decay_t<decltype(element_type)>;
+    if constexpr (std::is_same_v<ElementType, DropDownContainer>) {
+      // Handle DropDown specific logic
+      HandleDropDownContainerActions(element);
 
     } else {
-      // if the action is not a local action, then we do not have a local action
+      // If the type is not recognized, we can set has_local_action to false
       has_local_action = false;
     }
-  }
+  };
+  // Visit the variant to handle the element type
+  std::visit(handle_element_type, element.element_type);
   return has_local_action;
 }
+
+/////////////////////////////////////////////////
+void UIActionLogic::HandleDropDownContainerActions(UIElement &element) {
+  DropDownContainer &drop_down_container =
+      std::get<DropDownContainer>(element.element_type);
+
+  switch (element.action) {
+  case ActionNames::ActionNames_ACTION_TOGGLE_DROP_DOWN: {
+    drop_down_container.is_expanded = !drop_down_container.is_expanded;
+
+    auto toggle_child_elements = [](UIElement &child) {
+      std::visit(
+          [&](auto &actual_elem_type) {
+            using T = std::decay_t<decltype(actual_elem_type)>;
+            if constexpr (std::is_same_v<T, DropDownList>) {
+
+              actual_elem_type.is_expanded = !actual_elem_type.is_expanded;
+              child.children_active = actual_elem_type.is_expanded;
+            } else if constexpr (std::is_same_v<T, DropDownButton>) {
+              actual_elem_type.is_expanded = !actual_elem_type.is_expanded;
+
+            } else {
+              std::cout << "Unknown element type in DropDownContainer: "
+                        << magic_enum::enum_name(child.action) << std::endl;
+            }
+          },
+          child.element_type);
+    };
+
+    for (UIElement &child : element.child_elements) {
+      toggle_child_elements(child);
+    }
+    break;
+  }
+  default:
+    break;
+  }
+}
+
 } // namespace steamrot

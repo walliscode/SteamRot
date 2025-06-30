@@ -38,6 +38,13 @@ private:
   /////////////////////////////////////////////////
   bool LocalUIActions(UIElement &element);
 
+  /////////////////////////////////////////////////
+  /// @brief Handle any actions associated with a drop down container.
+  ///
+  /// @param element UIElement containing the DropDownContainer variant.
+  /////////////////////////////////////////////////
+  void HandleDropDownContainerActions(UIElement &element);
+
 public:
   /////////////////////////////////////////////////
   /// @brief COnstructor for UIEventLogic.

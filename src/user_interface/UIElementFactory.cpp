@@ -191,6 +191,7 @@ DropDownContainer UIElementFactory::ConfigureDropDownContainer(
 DropDownList
 UIElementFactory::ConfigureDropDownList(const DropDownListData &dropdown_data) {
   DropDownList dropdown_list_element;
+  std::cout << "Configuring DropDownList UIElement" << std::endl;
   // configure the dropdown_list_element
   dropdown_list_element.label = dropdown_data.label()->str();
   dropdown_list_element.expanded_label = dropdown_data.expanded_label()->str();

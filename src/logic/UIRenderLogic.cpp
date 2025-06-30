@@ -581,12 +581,31 @@ void UIRenderLogic::DrawDropDownButton(UIElement &element) {
                                   3); // create a triangle vertex array
 
   // set the position of the triangle vertices
-  triangle_button[0].position = sf::Vector2f(element.position);
-  triangle_button[1].position =
-      sf::Vector2f(element.position.x + element.size.x, element.position.y);
-  triangle_button[2].position =
-      sf::Vector2f(element.position.x + (element.size.x / 2),
-                   element.position.y + element.size.y);
+  // triangle_button[0].position = sf::Vector2f(element.position);
+  // triangle_button[1].position =
+  //     sf::Vector2f(element.position.x + element.size.x, element.position.y);
+  // triangle_button[2].position =
+  //     sf::Vector2f(element.position.x + (element.size.x / 2),
+  //                  element.position.y + element.size.y);
+
+  // if is_expanded, point triangle upwards, otherwise downwards
+  if (!std::get<DropDownButton>(element.element_type).is_expanded) {
+    triangle_button[0].position =
+        sf::Vector2f(element.position.x + (element.size.x / 2),
+                     element.position.y + element.size.y);
+    triangle_button[1].position =
+        sf::Vector2f(element.position.x + element.size.x, element.position.y);
+    triangle_button[2].position =
+        sf::Vector2f(element.position.x, element.position.y);
+  } else {
+    triangle_button[0].position = sf::Vector2f(
+        element.position.x + (element.size.x / 2), element.position.y);
+    triangle_button[1].position =
+        sf::Vector2f(element.position.x + element.size.x,
+                     element.position.y + element.size.y);
+    triangle_button[2].position =
+        sf::Vector2f(element.position.x, element.position.y + element.size.y);
+  }
   // set the fill color of the triangle
   if (element.mouse_over) {
     triangle_button[0].color = m_dropdown_button_style.hover_color;
@@ -939,8 +958,6 @@ void UIRenderLogic::DropDownSpacingStrategy(UIElement &ui_element,
   std::vector<UIElement> &children = ui_element.child_elements;
   size_t number_of_children = children.size();
 
-  std::cout << "Drop Down list starts at: " << ui_element.position.x << ", "
-            << ui_element.position.y << std::endl;
   // size is constant
   sf::Vector2f child_size = ui_element.size;
 
@@ -952,9 +969,6 @@ void UIRenderLogic::DropDownSpacingStrategy(UIElement &ui_element,
     children[i].position.x = ui_element.position.x;
     children[i].position.y =
         ui_element.position.y + (ui_element.size.y * (i + 1));
-    std::cout << "UIEngine: Child " << i
-              << " positioned at: " << children[i].position.x << ", "
-              << children[i].position.y << std::endl;
   }
 }
 } // namespace steamrot

@@ -59,14 +59,21 @@
               {
                 "type": "DropDownContainer",
                 "layout": "Horizontal",
+                "action": {
+                  "action_name": "ACTION_TOGGLE_DROP_DOWN",
+                  "mouse_released": [
+                    "LEFT_CLICK"
+                  ]
+                },
                 "spacing_strategy": "Ratioed",
                 "children_active": true,
                 "children": [
                   {
                     "type": "DropDownList",
                     "layout": "DropDown",
+                    "action": {},
                     "spacing_strategy": "DropDownList",
-                    "children_active": true,
+                    "children_active": false,
                     "children": [
                       {
                         "type": "DropDownItem",
@@ -92,8 +99,7 @@
                     "element": {
                       "label": "Drop down up...",
                       "expanded_label": "Drop down down..."
-                    },
-                    "action": {}
+                    }
                   },
                   {
                     "type": "DropDownButton",
@@ -106,8 +112,7 @@
                   }
                 ],
                 "element_type": "DropDownContainerData",
-                "element": {},
-                "action": {}
+                "element": {}
               }
             ],
             "position": {
