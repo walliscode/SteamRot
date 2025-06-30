@@ -133,31 +133,34 @@ enum SpacingAndSizingType : int8_t {
   SpacingAndSizingType_None = 0,
   SpacingAndSizingType_Even = 1,
   SpacingAndSizingType_Ratioed = 2,
+  SpacingAndSizingType_DropDownList = 3,
   SpacingAndSizingType_MIN = SpacingAndSizingType_None,
-  SpacingAndSizingType_MAX = SpacingAndSizingType_Ratioed
+  SpacingAndSizingType_MAX = SpacingAndSizingType_DropDownList
 };
 
-inline const SpacingAndSizingType (&EnumValuesSpacingAndSizingType())[3] {
+inline const SpacingAndSizingType (&EnumValuesSpacingAndSizingType())[4] {
   static const SpacingAndSizingType values[] = {
     SpacingAndSizingType_None,
     SpacingAndSizingType_Even,
-    SpacingAndSizingType_Ratioed
+    SpacingAndSizingType_Ratioed,
+    SpacingAndSizingType_DropDownList
   };
   return values;
 }
 
 inline const char * const *EnumNamesSpacingAndSizingType() {
-  static const char * const names[4] = {
+  static const char * const names[5] = {
     "None",
     "Even",
     "Ratioed",
+    "DropDownList",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameSpacingAndSizingType(SpacingAndSizingType e) {
-  if (::flatbuffers::IsOutRange(e, SpacingAndSizingType_None, SpacingAndSizingType_Ratioed)) return "";
+  if (::flatbuffers::IsOutRange(e, SpacingAndSizingType_None, SpacingAndSizingType_DropDownList)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesSpacingAndSizingType()[index];
 }
@@ -564,21 +567,25 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TYPE = 4,
     VT_CHILDREN = 6,
-    VT_LAYOUT = 8,
-    VT_SPACING_STRATEGY = 10,
-    VT_POSITION = 12,
-    VT_SIZE = 14,
-    VT_RATIO = 16,
-    VT_ELEMENT_TYPE = 18,
-    VT_ELEMENT = 20,
-    VT_ACTION = 22,
-    VT_DATA = 24
+    VT_CHILDREN_ACTIVE = 8,
+    VT_LAYOUT = 10,
+    VT_SPACING_STRATEGY = 12,
+    VT_POSITION = 14,
+    VT_SIZE = 16,
+    VT_RATIO = 18,
+    VT_ELEMENT_TYPE = 20,
+    VT_ELEMENT = 22,
+    VT_ACTION = 24,
+    VT_DATA = 26
   };
   steamrot::UIElementType type() const {
     return static_cast<steamrot::UIElementType>(GetField<int8_t>(VT_TYPE, 0));
   }
   const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::UIElementData>> *children() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::UIElementData>> *>(VT_CHILDREN);
+  }
+  bool children_active() const {
+    return GetField<uint8_t>(VT_CHILDREN_ACTIVE, 0) != 0;
   }
   steamrot::LayoutType layout() const {
     return static_cast<steamrot::LayoutType>(GetField<int8_t>(VT_LAYOUT, 0));
@@ -632,6 +639,7 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_CHILDREN) &&
            verifier.VerifyVector(children()) &&
            verifier.VerifyVectorOfTables(children()) &&
+           VerifyField<uint8_t>(verifier, VT_CHILDREN_ACTIVE, 1) &&
            VerifyField<int8_t>(verifier, VT_LAYOUT, 1) &&
            VerifyField<int8_t>(verifier, VT_SPACING_STRATEGY, 1) &&
            VerifyOffset(verifier, VT_POSITION) &&
@@ -684,6 +692,9 @@ struct UIElementDataBuilder {
   void add_children(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::UIElementData>>> children) {
     fbb_.AddOffset(UIElementData::VT_CHILDREN, children);
   }
+  void add_children_active(bool children_active) {
+    fbb_.AddElement<uint8_t>(UIElementData::VT_CHILDREN_ACTIVE, static_cast<uint8_t>(children_active), 0);
+  }
   void add_layout(steamrot::LayoutType layout) {
     fbb_.AddElement<int8_t>(UIElementData::VT_LAYOUT, static_cast<int8_t>(layout), 0);
   }
@@ -727,6 +738,7 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     steamrot::UIElementType type = steamrot::UIElementType_None,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::UIElementData>>> children = 0,
+    bool children_active = false,
     steamrot::LayoutType layout = steamrot::LayoutType_None,
     steamrot::SpacingAndSizingType spacing_strategy = steamrot::SpacingAndSizingType_None,
     ::flatbuffers::Offset<Vector2f> position = 0,
@@ -747,6 +759,7 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementData(
   builder_.add_element_type(element_type);
   builder_.add_spacing_strategy(spacing_strategy);
   builder_.add_layout(layout);
+  builder_.add_children_active(children_active);
   builder_.add_type(type);
   return builder_.Finish();
 }
@@ -755,6 +768,7 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     steamrot::UIElementType type = steamrot::UIElementType_None,
     const std::vector<::flatbuffers::Offset<steamrot::UIElementData>> *children = nullptr,
+    bool children_active = false,
     steamrot::LayoutType layout = steamrot::LayoutType_None,
     steamrot::SpacingAndSizingType spacing_strategy = steamrot::SpacingAndSizingType_None,
     ::flatbuffers::Offset<Vector2f> position = 0,
@@ -769,6 +783,7 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
       _fbb,
       type,
       children__,
+      children_active,
       layout,
       spacing_strategy,
       position,

@@ -18,7 +18,7 @@ private:
   /////////////////////////////////////////////////
   void CheckMouseCollision(CUserInterface &ui_component);
 
-  bool RecursiveCheckMouseCollision(UIElement &element,
+  void RecursiveCheckMouseCollision(UIElement &element,
                                     sf::Vector2i mouse_position);
 
   void RecursiveResetMouseOver(UIElement &element);

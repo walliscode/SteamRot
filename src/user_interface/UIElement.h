@@ -94,7 +94,7 @@ struct UIElement {
   /// @brief Helper variable for the UIRenderLogic and UICollisionLogic whether
   /// to recursively process the childred
   /////////////////////////////////////////////////
-  bool children_active{true};
+  bool children_active{false};
 
   /////////////////////////////////////////////////
   /// @brief Trigger event for the UI element

@@ -15,6 +15,8 @@ struct DropDownContainer {
 };
 
 struct DropDownList {
+  bool is_expanded{false};
+
   /////////////////////////////////////////////////
   /// @brief The name you see when the items are not expanded. It should
   /// indicate role of the dropdown

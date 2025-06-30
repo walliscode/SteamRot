@@ -45,7 +45,7 @@ void UICollisionLogic::CheckMouseCollision(CUserInterface &ui_component) {
 }
 
 /////////////////////////////////////////////////
-bool UICollisionLogic::RecursiveCheckMouseCollision(
+void UICollisionLogic::RecursiveCheckMouseCollision(
     UIElement &element, sf::Vector2i mouse_position) {
 
   // reset mouse_over and mouse_over_child for the element
@@ -67,27 +67,16 @@ bool UICollisionLogic::RecursiveCheckMouseCollision(
     // set mouse_over to true, reset to false if we are over a child
     // element
     element.mouse_over = true;
+  }
+  // recursively check child elements
+  for (auto &child : element.child_elements) {
 
-    // recursively check child elements
-    for (auto &child : element.child_elements) {
-
-      // if mouse is over a child element, we set the mouse_over_child to
-      // true and mouse_over to false
-      if (RecursiveCheckMouseCollision(child, mouse_position)) {
-        element.mouse_over_child = true;
-        element.mouse_over = false;
-      }
-    }
-    return true;
-
-    // adding in mouse_over_child prevents recursive calls every tick
-
-  } else if (!is_mouse_over && element.mouse_over_child) {
-    // if mouse is not over the element and it was previously over a child,
-    RecursiveResetMouseOver(element);
+    // if mouse is over a child element, we set the mouse_over_child to
+    // true and mouse_over to false
+    RecursiveCheckMouseCollision(child, mouse_position);
   }
 
-  return false;
+  // adding in mouse_over_child prevents recursive calls every tick
 }
 
 void UICollisionLogic::RecursiveResetMouseOver(UIElement &element) {

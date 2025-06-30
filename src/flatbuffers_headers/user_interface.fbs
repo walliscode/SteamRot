@@ -27,6 +27,7 @@ enum SpacingAndSizingType: byte {
     None = 0,
     Even = 1,
     Ratioed = 2,
+    DropDownList = 3,
 
   }
 
@@ -70,6 +71,7 @@ union UIElementDataUnion {
 table UIElementData{
     type: UIElementType;
     children: [UIElementData];
+    children_active: bool;
     layout: LayoutType;
     spacing_strategy: SpacingAndSizingType;
     position: Vector2f;

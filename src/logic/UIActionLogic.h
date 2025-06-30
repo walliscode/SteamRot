@@ -29,6 +29,22 @@ private:
   /////////////////////////////////////////////////
   void RecursiveProcessMouseEvents(UIElement &element);
 
+  /////////////////////////////////////////////////
+  /// @brief Process actions that just affect the local UI without passing to
+  /// the LogicBus
+  ///
+  /// @param element UIElement being evaluated
+  /// @return True if the action was processed, false otherwise.
+  /////////////////////////////////////////////////
+  bool LocalUIActions(UIElement &element);
+
+  /////////////////////////////////////////////////
+  /// @brief Handle any actions associated with a drop down container.
+  ///
+  /// @param element UIElement containing the DropDownContainer variant.
+  /////////////////////////////////////////////////
+  void HandleDropDownContainerActions(UIElement &element);
+
 public:
   /////////////////////////////////////////////////
   /// @brief COnstructor for UIEventLogic.

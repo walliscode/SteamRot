@@ -332,6 +332,17 @@ private:
                                      sf::Vector2f &inner_margin,
                                      float &parent_border_thickness);
 
+  /////////////////////////////////////////////////
+  /// @brief Ignores parent bounds and draws over the top of whatever is there.
+  ///
+  /// @param ul_element [TODO:parameter]
+  /// @param inner_margin [TODO:parameter]
+  /// @param parent_border_thickness [TODO:parameter]
+  /////////////////////////////////////////////////
+  static void DropDownSpacingStrategy(UIElement &ul_element,
+                                      sf::Vector2f &inner_margin,
+                                      float &parent_border_thickness);
+
 public:
   ////////////////////////////////////////////////////////////
   // |brief Constructor taking in flatbuffer config
