@@ -55,64 +55,6 @@
                     "LEFT_CLICK"
                   ]
                 }
-              },
-              {
-                "type": "DropDownContainer",
-                "layout": "Horizontal",
-                "action": {
-                  "action_name": "ACTION_TOGGLE_DROP_DOWN",
-                  "mouse_released": [
-                    "LEFT_CLICK"
-                  ]
-                },
-                "spacing_strategy": "Ratioed",
-                "children_active": true,
-                "children": [
-                  {
-                    "type": "DropDownList",
-                    "layout": "DropDown",
-                    "action": {},
-                    "spacing_strategy": "DropDownList",
-                    "children_active": false,
-                    "children": [
-                      {
-                        "type": "DropDownItem",
-                        "children": [],
-                        "element_type": "DropDownItemData",
-                        "element": {
-                          "label": "Option 1"
-                        },
-                        "action": {}
-                      },
-                      {
-                        "type": "DropDownItem",
-                        "children": [],
-                        "element_type": "DropDownItemData",
-                        "element": {
-                          "label": "Option 2"
-                        },
-                        "action": {}
-                      }
-                    ],
-                    "ratio": 0.9,
-                    "element_type": "DropDownListData",
-                    "element": {
-                      "label": "Drop down up...",
-                      "expanded_label": "Drop down down..."
-                    }
-                  },
-                  {
-                    "type": "DropDownButton",
-                    "layout": "Vertical",
-                    "children": [],
-                    "ratio": 0.1,
-                    "element_type": "DropDownButtonData",
-                    "element": {},
-                    "action": {}
-                  }
-                ],
-                "element_type": "DropDownContainerData",
-                "element": {}
               }
             ],
             "position": {

@@ -11,6 +11,7 @@
             "layout": "Vertical",
             "element_type": "PanelData",
             "element": {},
+            "children_active": true,
             "children": [
               {
                 "type": "Button",
@@ -29,6 +30,17 @@
                 "data": {
                   "scene_type": "TITLE"
                 }
+              },
+              {
+                "type": "Button",
+                "layout": "Horizontal",
+                "children": [],
+                "element_type": "ButtonData",
+                "element": {
+                  "label": "New Construct"
+                },
+                "action": {},
+                "data": {}
               }
             ],
             "position": {
@@ -36,7 +48,7 @@
               "y": 0
             },
             "size": {
-              "x": 200,
+              "x": 220,
               "y": 600
             }
           }
