@@ -3,6 +3,7 @@ add_library(components
 CMeta.cpp
 CUserInterface.cpp
 CMachinaForm.cpp
+CGrimoireMachina.cpp
 
 )
 
