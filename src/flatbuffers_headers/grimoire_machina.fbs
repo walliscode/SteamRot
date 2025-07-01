@@ -1,0 +1,7 @@
+include "fragments.fbs";
+
+namespace steamrot;
+
+table GrimoireMachina {
+  fragments : [FragmentData] (required);
+  }

@@ -1,4 +1,5 @@
 #include "DataManager.h"
+
 #include "log_handler.h"
 #include "spdlog/common.h"
 #include "steamrot_directory_paths.h"
@@ -110,4 +111,5 @@ DataManager::ProvideFonts(const SceneType &scene_type) {
 
   return fonts;
 }
+
 } // namespace steamrot

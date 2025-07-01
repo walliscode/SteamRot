@@ -16,6 +16,43 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 struct Vector2f;
 struct Vector2fBuilder;
 
+struct Color;
+
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(1) Color FLATBUFFERS_FINAL_CLASS {
+ private:
+  uint8_t r_;
+  uint8_t g_;
+  uint8_t b_;
+  uint8_t a_;
+
+ public:
+  Color()
+      : r_(0),
+        g_(0),
+        b_(0),
+        a_(0) {
+  }
+  Color(uint8_t _r, uint8_t _g, uint8_t _b, uint8_t _a)
+      : r_(::flatbuffers::EndianScalar(_r)),
+        g_(::flatbuffers::EndianScalar(_g)),
+        b_(::flatbuffers::EndianScalar(_b)),
+        a_(::flatbuffers::EndianScalar(_a)) {
+  }
+  uint8_t r() const {
+    return ::flatbuffers::EndianScalar(r_);
+  }
+  uint8_t g() const {
+    return ::flatbuffers::EndianScalar(g_);
+  }
+  uint8_t b() const {
+    return ::flatbuffers::EndianScalar(b_);
+  }
+  uint8_t a() const {
+    return ::flatbuffers::EndianScalar(a_);
+  }
+};
+FLATBUFFERS_STRUCT_END(Color, 4);
+
 struct Vector2f FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef Vector2fBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {

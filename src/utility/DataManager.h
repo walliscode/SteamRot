@@ -41,14 +41,19 @@ public:
   ////////////////////////////////////////////////////////////
   const themes::UIObjects *ProvideThemeData(const std::string &theme_name);
 
-  /**
-   * @brief Provides Scene configuration data as a flatbuffer object.
-   *
-   * @param scene_identifier String scene identifier
-   * @return Raw Pointer to SceneData flatbuffer object
-   */
+  /////////////////////////////////////////////////
+  /// @brief Provide scene data as flatbuffers data
+  ///
+  /// @param scene_type Enum representing the type of scene
+  /// @return Return a pointer to the SceneData
+  /////////////////////////////////////////////////
   const SceneData *ProvideSceneData(const SceneType &scene_type);
 
+  /////////////////////////////////////////////////
+  /// @brief Provide font files for a specific scene type
+  ///
+  /// @param scene_type Enum representing the type of scene
+  /////////////////////////////////////////////////
   std::vector<std::pair<std::string, sf::Font>>
   ProvideFonts(const SceneType &scene_type);
 };

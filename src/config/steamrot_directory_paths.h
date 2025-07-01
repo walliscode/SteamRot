@@ -33,6 +33,7 @@ const std::filesystem::path getAssetsFolder();
 /////////////////////////////////////////////////
 const std::filesystem::path getFontsFolder();
 
+
 ////////////////////////////////////////////////////////////
 /// \brief return folder path for configuration files
 ///

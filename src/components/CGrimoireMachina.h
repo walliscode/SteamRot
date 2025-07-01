@@ -8,6 +8,9 @@
 #include "CMachinaForm.h"
 #include "Component.h"
 #include "Fragment.h"
+#include "fragments_generated.h"
+#include "grimoire_machina_generated.h"
+
 #include <map>
 namespace steamrot {
 
@@ -35,8 +38,30 @@ struct CGrimoireMachina : public Component {
   /////////////////////////////////////////////////
   CMachinaForm m_holding_form;
 
+  /////////////////////////////////////////////////
+  /// @brief Get the position of the Component in the Component Register.
+  ///
+  /// @return index of the component in the component register
+  /////////////////////////////////////////////////
   const size_t GetComponentRegisterIndex() const override;
 
+  /////////////////////////////////////////////////
+  /// @brief Creates and returns a string representation of the component name.
+  /////////////////////////////////////////////////
   const std::string &Name() override;
+
+  /////////////////////////////////////////////////
+  /// @brief Configure the CGrimoireMachina component.
+  /////////////////////////////////////////////////
+  void Configure(const GrimoireMachina *grimoire_data);
+
+private:
+  /////////////////////////////////////////////////
+  /// @brief Configure and load all fragments from the provided data.
+  ///
+  /// @param fragment_data Flatbuffers data containing all fragments from
+  /// specified file.
+  /////////////////////////////////////////////////
+  void ConfigureFragment(const FragmentData *fragment_data);
 };
 } // namespace steamrot

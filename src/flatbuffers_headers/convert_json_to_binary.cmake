@@ -58,8 +58,10 @@ foreach(json_file ${scenes_jsons})
   )
 endforeach()
 
+
 add_custom_target(flatbuffers_generate_themes_binaries ALL
   DEPENDS
   ${themes_generated_binaries}
   ${scenes_generated_binaries}
+  ${fragments_generated_binaries}
 )

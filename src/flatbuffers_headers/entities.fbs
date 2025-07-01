@@ -1,10 +1,13 @@
 include "user_interface.fbs";
+include "grimoire_machina.fbs";
 namespace steamrot;
 
 
 table EntityData{
   index: uint32;
-    c_user_interface: UserInterface;
+  c_user_interface: UserInterface;
+  c_grimoire_machina: GrimoireMachina;
+
   }
 
 // wrapper table to allow for metadata in the future

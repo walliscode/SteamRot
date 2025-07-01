@@ -3,12 +3,6 @@ include "types.fbs";
 namespace steamrot.themes; 
 
 
-struct Color {
-    r:uint8;
-    g:uint8;
-    b:uint8;
-    a:uint8;
-  }
 
 table Style {
   background_color: Color (required); 
