@@ -2,6 +2,7 @@
 // headers
 ////////////////////////////////////////////////////////////
 #include "UIRenderLogic.h"
+#include "ArchetypeHelpers.h"
 #include "BaseLogic.h"
 #include "CUserInterface.h"
 #include "DropDown.h"
@@ -26,7 +27,7 @@ namespace steamrot {
 
 /////////////////////////////////////////////////////////////
 UIRenderLogic::UIRenderLogic(const LogicContext logic_context)
-    : Logic<CUserInterface>(logic_context) {
+    : BaseLogic(logic_context) {
   // Initialize the UI engine with the provided flatbuffer configuration
   // This could include setting up styles, themes, and other UI elements
   if (!logic_context.ui_config) {
@@ -339,28 +340,21 @@ void UIRenderLogic::ConfigureDropDownButtonStyle(
 
 void UIRenderLogic::DrawUIElements() {
 
-  // cycle through all the Archetype IDs associated with this logic
-  // class
-  for (const ArchetypeID &archetype_id : m_archetype_IDs) {
+  ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<CUserInterface>();
+  // if it is not in the archetyps map, then skip
+  if (m_logic_context.archetypes.contains(archetype_id)) {
+    Archetype &archetype = m_logic_context.archetypes[archetype_id];
 
-    // if it is not in the archetyps map, then skip
-    if (!m_logic_context.archetypes.contains(archetype_id)) {
-      continue;
-    } else {
-      // get the archetype from the map
-      Archetype &archetype = m_logic_context.archetypes[archetype_id];
+    // cycle through all the entity indexs in the archetype
+    for (size_t entity_id : archetype) {
 
-      // cycle through all the entity indexs in the archetype
-      for (size_t entity_id : archetype) {
+      // get the CUserInterface component
+      CUserInterface &ui_component = GetComponent<CUserInterface>(
+          entity_id, m_logic_context.scene_entities);
 
-        // get the CUserInterface component
-        CUserInterface &ui_component = GetComponent<CUserInterface>(
-            entity_id, m_logic_context.scene_entities);
-
-        // recursively draw the UI elements starting from the root
-        // element
-        RecursiveDrawUIElement(ui_component.m_root_element);
-      }
+      // recursively draw the UI elements starting from the root
+      // element
+      RecursiveDrawUIElement(ui_component.m_root_element);
     }
   }
 }
