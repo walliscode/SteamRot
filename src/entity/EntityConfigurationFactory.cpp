@@ -39,6 +39,13 @@ void EntityConfigurationFactory::ConfigureEntitiesFromDefaultData(
       // pass the data through the CUserInterface component
       GetComponent<CUserInterface>(i, entity_memory_pool)
           .Configure(entity_data->c_user_interface());
+      std::cout << "Configured CUserInterface for entity " << i << std::endl;
+    }
+    if (entity_data->c_grimoire_machina()) {
+      // pass the data through the CGrimoireMachina component
+      GetComponent<CGrimoireMachina>(i, entity_memory_pool)
+          .Configure(entity_data->c_grimoire_machina());
+      std::cout << "Configured CGrimoireMachina for entity " << i << std::endl;
     }
   }
 };

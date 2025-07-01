@@ -1,0 +1,22 @@
+include "types.fbs";
+
+namespace steamrot;
+
+
+
+table SocketData{
+  vertices: [Vector2f] (required);
+  }
+
+table RenderOverlayData {
+  vertices : [Vector2f] (required);
+  color: Color (required);
+  
+}
+
+table FragmentData {
+name: string (required);
+socket_data: SocketData (required);
+render_overlay_data: RenderOverlayData (required);
+  }
+
