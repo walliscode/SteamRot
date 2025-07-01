@@ -1,36 +1,34 @@
 #include "UICollisionLogic.h"
+#include "ArchetypeHelpers.h"
+#include "CUserInterface.h"
 #include "EntityHelpers.h"
 #include <SFML/Window/Mouse.hpp>
 
 namespace steamrot {
 /////////////////////////////////////////////////
 UICollisionLogic::UICollisionLogic(const LogicContext logic_context)
-    : Logic<CUserInterface>(logic_context) {}
+    : BaseLogic(logic_context) {}
 
 /////////////////////////////////////////////////
 void UICollisionLogic::ProcessLogic() {
 
-  // cycle through all the Archetype IDs  associated with this logic class
-  for (const ArchetypeID &archetype_id : m_archetype_IDs) {
+  ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<CUserInterface>();
 
-    // if it is not in the archetyps map, then skip
-    if (!m_logic_context.archetypes.contains(archetype_id)) {
-      continue;
-    } else {
-      // get the archetype from the map
-      Archetype &archetype = m_logic_context.archetypes[archetype_id];
+  // if it is not in the archetyps map, then skip
+  if (m_logic_context.archetypes.contains(archetype_id)) {
 
-      // cycle through all the entity indexs in the archetype
-      for (size_t entity_id : archetype) {
+    Archetype &archetype = m_logic_context.archetypes[archetype_id];
 
-        // get the CUserInterface component
-        CUserInterface &ui_component = GetComponent<CUserInterface>(
-            entity_id, m_logic_context.scene_entities);
+    // cycle through all the entity indexs in the archetype
+    for (size_t entity_id : archetype) {
 
-        // group collision logic here
-        CheckMouseCollision(ui_component);
-      };
-    }
+      // get the CUserInterface component
+      CUserInterface &ui_component = GetComponent<CUserInterface>(
+          entity_id, m_logic_context.scene_entities);
+
+      // group collision logic here
+      CheckMouseCollision(ui_component);
+    };
   }
 }
 

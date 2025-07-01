@@ -7,8 +7,8 @@
 // Headers
 ////////////////////////////////////////////////////////////
 
+#include "ArchetypeHelpers.h"
 #include "containers.h"
-#include <bitset>
 #include <cstddef>
 #include <cstdlib>
 #include <unordered_map>
@@ -19,8 +19,6 @@ namespace steamrot {
 ////////////////////////////////////////////////////////////
 using Archetype = std::vector<size_t>;
 
-using ArchetypeID =
-    std::bitset<steamrot::components::containers::kComponentRegisterSize>;
 ////////////////////////////////////////////////////////////
 // class ArchetypeManager
 ////////////////////////////////////////////////////////////

@@ -5,10 +5,9 @@
 
 #include "BaseLogic.h"
 #include "CUserInterface.h"
-#include "Logic.h"
 
 namespace steamrot {
-class UICollisionLogic : public Logic<CUserInterface> {
+class UICollisionLogic : public BaseLogic {
 
 private:
   /////////////////////////////////////////////////

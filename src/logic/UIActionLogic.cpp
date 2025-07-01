@@ -3,39 +3,40 @@
 /// @brief Implementation of the UIEventLogic class.
 /////////////////////////////////////////////////
 #include "UIActionLogic.h"
+#include "ArchetypeHelpers.h"
+#include "BaseLogic.h"
+#include "CUserInterface.h"
 #include "DropDown.h"
 #include "EntityHelpers.h"
 #include <SFML/Window/Mouse.hpp>
+#include <iostream>
 #include <magic_enum/magic_enum.hpp>
 
 using namespace magic_enum::bitwise_operators;
 namespace steamrot {
 /////////////////////////////////////////////////
 UIActionLogic::UIActionLogic(const LogicContext logic_context)
-    : Logic<CUserInterface>(logic_context) {}
+    : BaseLogic(logic_context) {}
 
 /////////////////////////////////////////////////
 void UIActionLogic::ProcessLogic() {
 
-  // cycle through all the Archetype IDs  associated with this logic class
-  for (const ArchetypeID &archetype_id : m_archetype_IDs) {
+  ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<CUserInterface>();
 
-    // if it is not in the archetyps map, then skip
-    if (!m_logic_context.archetypes.contains(archetype_id)) {
-      continue;
-    } else {
-      // get the archetype from the map
-      Archetype &archetype = m_logic_context.archetypes[archetype_id];
+  // if it is not in the archetyps map, then skip
+  if (m_logic_context.archetypes.contains(archetype_id)) {
 
-      // cycle through all the entity indexs in the archetype
-      for (size_t entity_id : archetype) {
+    // get the archetype from the map
+    Archetype &archetype = m_logic_context.archetypes[archetype_id];
 
-        // get the CUserInterface component
-        CUserInterface &ui_component = GetComponent<CUserInterface>(
-            entity_id, m_logic_context.scene_entities);
+    // cycle through all the entity indexs in the archetype
+    for (size_t entity_id : archetype) {
 
-        ProcessMouseEvents(ui_component);
-      }
+      // get the CUserInterface component
+      CUserInterface &ui_component = GetComponent<CUserInterface>(
+          entity_id, m_logic_context.scene_entities);
+
+      ProcessMouseEvents(ui_component);
     }
   }
 }
