@@ -195,6 +195,8 @@ UIElementFactory::ConfigureDropDownList(const DropDownListData &dropdown_data) {
   // configure the dropdown_list_element
   dropdown_list_element.label = dropdown_data.label()->str();
   dropdown_list_element.expanded_label = dropdown_data.expanded_label()->str();
+  dropdown_list_element.data_populate_function =
+      dropdown_data.data_populate_function();
   return dropdown_list_element;
 }
 
@@ -217,4 +219,13 @@ DropDownButton UIElementFactory::ConfigureDropDownButton(
   return dropdown_button_element;
 }
 
+/////////////////////////////////////////////////
+UIElement UIElementFactory::CreateDropDownItem() {
+  // Create a new UIElement for the DropDownItem
+  UIElement dropdown_item_element;
+  // Configure the DropDownItem properties
+  dropdown_item_element.element_type = DropDownItem{};
+  // Set any additional properties as needed
+  return dropdown_item_element;
+}
 } // namespace steamrot

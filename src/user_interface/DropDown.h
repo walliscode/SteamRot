@@ -4,8 +4,10 @@
 /////////////////////////////////////////////////
 
 #pragma once
-
+#include "user_interface_generated.h"
 #include <string>
+namespace steamrot {
+
 struct DropDownContainer {
   /////////////////////////////////////////////////
   /// @brief Indicates whether the dropdown is expanded or not. This should be
@@ -27,6 +29,12 @@ struct DropDownList {
   /// @brief The name you see when the items are expanded.
   /////////////////////////////////////////////////
   std::string expanded_label{"items..."};
+
+  /////////////////////////////////////////////////
+  /// @brief Enum to allow Logic class to populate the correct data into the
+  /// list
+  /////////////////////////////////////////////////
+  DataPopulateFunction data_populate_function{DataPopulateFunction_None};
 };
 
 struct DropDownItem {
@@ -47,3 +55,4 @@ struct DropDownButton {
   /////////////////////////////////////////////////
   bool is_expanded{false};
 };
+} // namespace steamrot

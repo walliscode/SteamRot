@@ -55,6 +55,71 @@
         }
       },
       {
+        "c_user_interface": {
+          "ui_name": "fragment_selection_menu",
+          "start_visible": true,
+          "root_ui_element": {
+            "type": "Panel",
+            "layout": "Vertical",
+            "element_type": "PanelData",
+            "element": {},
+            "children_active": true,
+            "children": [
+              {
+                "type": "DropDownContainer",
+                "layout": "Horizontal",
+                "spacing_strategy": "Ratioed",
+                "children_active": true,
+                "children": [
+                  {
+                    "type": "DropDownList",
+                    "layout": "DropDown",
+                    "spacing_strategy": "DropDownList",
+                    "ratio": 0.8,
+                    "children": [],
+                    "element_type": "DropDownListData",
+                    "element": {
+                      "label": "Fragments...",
+                      "expanded_label": "...",
+                      "data_populate_function": "PopulateWithFragmentData"
+                    },
+                    "action": {},
+                    "data": {}
+                  },
+                  {
+                    "type": "DropDownButton",
+                    "layout": "Horizontal",
+                    "ratio": 0.2,
+                    "children": [],
+                    "element_type": "DropDownButtonData",
+                    "element": {},
+                    "action": {},
+                    "data": {}
+                  }
+                ],
+                "element_type": "DropDownContainerData",
+                "element": {},
+                "action": {
+                  "action_name": "ACTION_TOGGLE_DROP_DOWN",
+                  "mouse_released": [
+                    "LEFT_CLICK"
+                  ]
+                },
+                "data": {}
+              }
+            ],
+            "position": {
+              "x": 600,
+              "y": 0
+            },
+            "size": {
+              "x": 150,
+              "y": 50
+            }
+          }
+        }
+      },
+      {
         "c_grimoire_machina": {
           "fragments": [
             {

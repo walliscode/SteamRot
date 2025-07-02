@@ -45,9 +45,15 @@ table DropDownContainerData{
 
   }
 
+enum DataPopulateFunction: byte {
+    None = 0,
+    PopulateWithFragmentData = 1,
+    
+  }
 table DropDownListData{
     label: string (required);
     expanded_label: string (required);
+    data_populate_function: DataPopulateFunction;
   }
 
 table DropDownItemData {

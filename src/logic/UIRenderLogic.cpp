@@ -22,6 +22,7 @@
 #include <SFML/System/Vector2.hpp>
 #include <cstddef>
 #include <iostream>
+#include <print>
 
 namespace steamrot {
 
@@ -501,8 +502,10 @@ void UIRenderLogic::DrawDropDownList(UIElement &element) {
 
       m_logic_context.asset_manager.GetFont(m_dropdown_list_style.font),
       label_to_use);
-  dropdown_text.setCharacterSize(
-      m_dropdown_list_style.font_size); // Set the character size
+
+  // calculate the font size based on the size of the dropdown list
+  int font_size = static_cast<int>(element.size.y * 0.5);
+  dropdown_text.setCharacterSize(font_size);
   dropdown_text.setFillColor(m_dropdown_list_style.text_color);
   // Center the text within the dropdown list
   dropdown_text.setPosition(
@@ -518,12 +521,15 @@ void UIRenderLogic::DrawDropDownList(UIElement &element) {
 
 /////////////////////////////////////////////////
 void UIRenderLogic::DrawDropDownItem(UIElement &element) {
+  std::println("drawing dropdown item");
   // This should only ever be contained in a DropDownList, so we don't
   // adjust size for this element
   // Draw a standard rectangle for this
   sf::RectangleShape dropdown_shape;
   dropdown_shape.setSize(element.size);
   dropdown_shape.setPosition(element.position);
+  std::println("dropdown item position: (x: {}, y: {})", element.position.x,
+               element.position.y); // debug print the position
 
   // set the fill color based on whether the mouse is over the element
   if (element.mouse_over) {
