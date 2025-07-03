@@ -1,5 +1,6 @@
 
 #include "LogicFactory.h"
+#include "CraftingRenderLogic.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
 #include "UIRenderLogic.h"
@@ -73,11 +74,11 @@ std::vector<std::unique_ptr<BaseLogic>>
 LogicFactory::CreateRenderLogics(const LogicContext logic_context) {
   // Create a vector of unique pointers to BaseLogic for rendering
   std::vector<std::unique_ptr<BaseLogic>> render_logics;
-  std::cout << "Creating a vector of render logics." << std::endl;
+
   // compile time defined order of logic types
+  render_logics.push_back(std::make_unique<CraftingRenderLogic>(logic_context));
   render_logics.push_back(std::make_unique<UIRenderLogic>(logic_context));
-  std::cout << "Render logics created with size: " << render_logics.size()
-            << std::endl;
+
   return render_logics;
 }
 

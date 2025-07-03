@@ -12,6 +12,7 @@
 #include "grimoire_machina_generated.h"
 
 #include <map>
+#include <memory>
 namespace steamrot {
 
 struct CGrimoireMachina : public Component {
@@ -36,7 +37,7 @@ struct CGrimoireMachina : public Component {
   /////////////////////////////////////////////////
   /// @brief A holding form used to build up a new structure
   /////////////////////////////////////////////////
-  CMachinaForm m_holding_form;
+  std::unique_ptr<CMachinaForm> m_holding_form{nullptr};
 
   /////////////////////////////////////////////////
   /// @brief Get the position of the Component in the Component Register.
