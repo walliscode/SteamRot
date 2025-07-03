@@ -4,6 +4,7 @@ LogicFactory.cpp
   UICollisionLogic.cpp
   UIActionLogic.cpp
   BaseLogic.cpp
+  CraftingRenderLogic.cpp
 )
 
 target_include_directories(logic

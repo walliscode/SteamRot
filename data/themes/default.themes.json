@@ -13,8 +13,8 @@
         "b": 105,
         "a": 255
       },
-      "border_thickness": 3,
-      "radius_resolution": 10,
+      "border_thickness": 5,
+      "radius_resolution": 50,
       "inner_margin": {
         "x": 10,
         "y": 10
