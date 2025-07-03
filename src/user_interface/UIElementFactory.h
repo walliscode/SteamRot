@@ -90,5 +90,7 @@ public:
   /// @return A UIElement containing the element type and its children.
   /////////////////////////////////////////////////
   UIElement CreateUIStructure(const UIElementData &element_data);
+
+  UIElement CreateDropDownItem();
 };
 } // namespace steamrot

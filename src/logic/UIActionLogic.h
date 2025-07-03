@@ -34,7 +34,7 @@ private:
   /// the LogicBus
   ///
   /// @param element UIElement being evaluated
-  /// @return True if the action was processed, false otherwise.
+  /// @return True
   /////////////////////////////////////////////////
   bool LocalUIActions(UIElement &element);
 
@@ -44,6 +44,12 @@ private:
   /// @param element UIElement containing the DropDownContainer variant.
   /////////////////////////////////////////////////
   void HandleDropDownContainerActions(UIElement &element);
+
+  /////////////////////////////////////////////////
+  /// @brief Returns a vector of the names of all available fragments in the
+  /// CGrimoireMachina.
+  /////////////////////////////////////////////////
+  std::vector<std::string> GetAvailableFragments();
 
 public:
   /////////////////////////////////////////////////

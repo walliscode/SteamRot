@@ -93,7 +93,7 @@
         "y": 0
       },
       "minimum_size": {
-        "x": 200,
+        "x": 100,
         "y": 30
       },
       "maximum_size": {
@@ -124,7 +124,7 @@
         "y": 0
       },
       "minimum_size": {
-        "x": 200,
+        "x": 100,
         "y": 30
       },
       "maximum_size": {
