@@ -64,5 +64,7 @@ private:
   /// specified file.
   /////////////////////////////////////////////////
   void ConfigureFragment(const FragmentData *fragment_data);
+
+  void ConfigureJoint(const JointData *joint_data);
 };
 } // namespace steamrot

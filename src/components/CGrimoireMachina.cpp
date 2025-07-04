@@ -6,8 +6,11 @@
 #include "CGrimoireMachina.h"
 #include "containers.h"
 #include "fragments_generated.h"
+#include "joints_generated.h"
 #include "log_handler.h"
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/PrimitiveType.hpp>
+#include <print>
 namespace steamrot {
 
 /////////////////////////////////////////////////
@@ -35,6 +38,15 @@ void CGrimoireMachina::Configure(const GrimoireMachina *grimoire_data) {
     if (fragment_data) {
       // Configure fragments with the provided data
       ConfigureFragment(fragment_data);
+      std::println("Configured fragment: {}", fragment_data->name()->str());
+    }
+  }
+  // Load all joints from the provided data
+  for (const auto *joint_data : *grimoire_data->joints()) {
+    if (joint_data) {
+      // Configure joints with the provided data
+      ConfigureJoint(joint_data);
+      std::println("Configured joint: {}", joint_data->name()->str());
     }
   }
 }
@@ -73,5 +85,39 @@ void CGrimoireMachina::ConfigureFragment(const FragmentData *fragment_data) {
 
   // add to fragments map by name
   m_all_fragments.emplace(fragment_data->name()->str(), new_fragment);
+}
+
+/////////////////////////////////////////////////
+void CGrimoireMachina::ConfigureJoint(const JointData *joint_data) {
+  // Guard statement to ensure data is not null
+  if (!joint_data) {
+    log_handler::ProcessLog(spdlog::level::info, log_handler::LogCode::kNoCode,
+                            "Configuration data is null for CGrimoireMachina");
+    return;
+  }
+  Joint new_joint;
+  new_joint.m_joint_name = joint_data->name()->str();
+  new_joint.m_number_of_connections = joint_data->number_of_connections();
+
+  // new triangle based vertex array for the joint
+  new_joint.m_render_overlay.setPrimitiveType(sf::PrimitiveType::Triangles);
+
+  // get the colour for the joint
+  sf::Color joint_color(joint_data->render_overlay()->color()->r(),
+                        joint_data->render_overlay()->color()->g(),
+                        joint_data->render_overlay()->color()->b(),
+                        joint_data->render_overlay()->color()->a());
+
+  // add all triangles to the vertex array
+  for (const auto &triangle : *joint_data->render_overlay()->triangles()) {
+    for (const auto &vertex : *triangle->vertices()) {
+      sf::Vertex vertex_sf;
+      vertex_sf.position = sf::Vector2f(vertex->x(), vertex->y());
+      vertex_sf.color = joint_color;
+      new_joint.m_render_overlay.append(vertex_sf);
+    }
+  }
+  // Add to joints map by name
+  m_all_joints.emplace(new_joint.m_joint_name, std::move(new_joint));
 }
 } // namespace steamrot

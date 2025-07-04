@@ -14,6 +14,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
              "Non-compatible flatbuffers version included");
 
 #include "fragments_generated.h"
+#include "joints_generated.h"
 
 namespace steamrot {
 
@@ -23,16 +24,23 @@ struct GrimoireMachinaBuilder;
 struct GrimoireMachina FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef GrimoireMachinaBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_FRAGMENTS = 4
+    VT_FRAGMENTS = 4,
+    VT_JOINTS = 6
   };
   const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::FragmentData>> *fragments() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::FragmentData>> *>(VT_FRAGMENTS);
+  }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::JointData>> *joints() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::JointData>> *>(VT_JOINTS);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_FRAGMENTS) &&
            verifier.VerifyVector(fragments()) &&
            verifier.VerifyVectorOfTables(fragments()) &&
+           VerifyOffsetRequired(verifier, VT_JOINTS) &&
+           verifier.VerifyVector(joints()) &&
+           verifier.VerifyVectorOfTables(joints()) &&
            verifier.EndTable();
   }
 };
@@ -44,6 +52,9 @@ struct GrimoireMachinaBuilder {
   void add_fragments(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::FragmentData>>> fragments) {
     fbb_.AddOffset(GrimoireMachina::VT_FRAGMENTS, fragments);
   }
+  void add_joints(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::JointData>>> joints) {
+    fbb_.AddOffset(GrimoireMachina::VT_JOINTS, joints);
+  }
   explicit GrimoireMachinaBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -52,25 +63,31 @@ struct GrimoireMachinaBuilder {
     const auto end = fbb_.EndTable(start_);
     auto o = ::flatbuffers::Offset<GrimoireMachina>(end);
     fbb_.Required(o, GrimoireMachina::VT_FRAGMENTS);
+    fbb_.Required(o, GrimoireMachina::VT_JOINTS);
     return o;
   }
 };
 
 inline ::flatbuffers::Offset<GrimoireMachina> CreateGrimoireMachina(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::FragmentData>>> fragments = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::FragmentData>>> fragments = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::JointData>>> joints = 0) {
   GrimoireMachinaBuilder builder_(_fbb);
+  builder_.add_joints(joints);
   builder_.add_fragments(fragments);
   return builder_.Finish();
 }
 
 inline ::flatbuffers::Offset<GrimoireMachina> CreateGrimoireMachinaDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<steamrot::FragmentData>> *fragments = nullptr) {
+    const std::vector<::flatbuffers::Offset<steamrot::FragmentData>> *fragments = nullptr,
+    const std::vector<::flatbuffers::Offset<steamrot::JointData>> *joints = nullptr) {
   auto fragments__ = fragments ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::FragmentData>>(*fragments) : 0;
+  auto joints__ = joints ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::JointData>>(*joints) : 0;
   return steamrot::CreateGrimoireMachina(
       _fbb,
-      fragments__);
+      fragments__,
+      joints__);
 }
 
 }  // namespace steamrot

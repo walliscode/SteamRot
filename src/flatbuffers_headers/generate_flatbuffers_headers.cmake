@@ -10,6 +10,7 @@ set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/grimoire_machina.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/assets.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/fragments.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/joints.fbs
 )
 
 set(generated_headers)

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <SFML/Graphics/Transform.hpp>
+#include <SFML/Graphics.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <cstdint>

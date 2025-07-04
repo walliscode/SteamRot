@@ -1,7 +1,8 @@
 include "fragments.fbs";
-
+include "joints.fbs";
 namespace steamrot;
 
 table GrimoireMachina {
   fragments : [FragmentData] (required);
+  joints : [JointData] (required);
   }
