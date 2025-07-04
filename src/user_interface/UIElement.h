@@ -102,7 +102,7 @@ struct UIElement {
   /// This is designed to be used in conjuction with the ActionNames. If
   /// trigger_event is true then signal the action
   /////////////////////////////////////////////////
-  EventBitset trigger_event{0};
+  UserInputBitset trigger_event{0};
 
   /////////////////////////////////////////////////
   /// @brief Action that should be performed when the UI Element is interacted

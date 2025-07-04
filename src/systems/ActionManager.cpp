@@ -2,7 +2,7 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "ActionManager.h"
-#include "EventHandler.h"
+
 #include "actions_generated.h"
 #include "log_handler.h"
 
@@ -89,7 +89,7 @@ void ActionManager::RegisterActions(const ActionsData *actions_data) {
   for (const auto &action : *actions_data->actions()) {
 
     // create new bitset for this action
-    EventBitset key_bitset;
+    UserInputBitset key_bitset;
 
     if (action->keyboard_pressed()) {
       for (const auto &key : *action->keyboard_pressed()) {
@@ -138,7 +138,8 @@ void ActionManager::RegisterActions(const ActionsData *actions_data) {
 }
 
 ////////////////////////////////////////////////////////////
-void ActionManager::ProcessSceneLevelActions(const EventBitset &input_event) {
+void ActionManager::ProcessSceneLevelActions(
+    const UserInputBitset &input_event) {
   m_scene_level_actions = m_scene_event_to_action_map[input_event];
 }
 

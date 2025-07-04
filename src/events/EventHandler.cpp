@@ -2,16 +2,60 @@
 // headers
 ////////////////////////////////////////////////////////////
 #include "EventHandler.h"
+#include "event_helpers.h"
 #include <SFML/Window/Event.hpp>
 #include <iostream>
 #include <magic_enum/magic_enum.hpp>
 #include <optional>
 namespace steamrot {
-////////////////////////////////////////////////////////////
-void EventHandler::HandleEvents(sf::RenderWindow &window) {
 
+/////////////////////////////////////////////////
+void EventHandler::PreloadEvents(sf::RenderWindow &window) {
+
+  // handle SMFL events
+  HandleSFMLEvents(window);
+}
+/////////////////////////////////////////////////
+void EventHandler::CleanUpEventBus() {
+  // decrement the lifetime of all events in the event bus
+  DecrementEventLifetimes();
+  // remove all events with a lifetime of 0
+  RemoveDeadEvents();
+}
+
+/////////////////////////////////////////////////
+void EventHandler::DecrementEventLifetimes() {
+  // go over all events in the event bus and decrement their lifetimes
+  for (auto &event : m_global_event_bus) {
+    event.DecrementLifetime();
+  }
+}
+/////////////////////////////////////////////////
+void EventHandler::RemoveDeadEvents() {
+  // remove all events with a lifetime of 0
+  m_global_event_bus.erase(std::remove_if(m_global_event_bus.begin(),
+                                          m_global_event_bus.end(),
+                                          [](const EventPacket &event) {
+                                            return event.GetLifetime() == 0;
+                                          }),
+                           m_global_event_bus.end());
+}
+
+/////////////////////////////////////////////////
+void EventHandler::AddEvent(const EventPacket &event) {
+  // add the event to the global event bus
+  m_global_event_bus.push_back(event);
+
+  // add any sorting algorithms here if needed
+}
+
+////////////////////////////////////////////////////////////
+void EventHandler::HandleSFMLEvents(sf::RenderWindow &window) {
+
+  // create a new UserInputBitset
+  UserInputBitset user_input_events;
   // reset the event bitsets
-  m_events.reset();
+  user_input_events.reset();
 
   // poll events from the window
   while (const std::optional<sf::Event> event = window.pollEvent()) {
@@ -27,18 +71,31 @@ void EventHandler::HandleEvents(sf::RenderWindow &window) {
     else if (event->is<sf::Event::KeyPressed>() ||
              event->is<sf::Event::KeyReleased>()) {
 
-      HandleKeyboardEvents(event.value());
+      HandleKeyboardEvents(event.value(), user_input_events);
     }
     // handle mouse events
     else if (event->is<sf::Event::MouseButtonPressed>() ||
              event->is<sf::Event::MouseButtonReleased>()) {
-      HandleMouseEvents(event.value());
+      HandleMouseEvents(event.value(), user_input_events);
     }
   }
+
+  // create a new event packet with a lifetime of 1
+  EventPacket event_packet(1);
+
+  // set the event type to UserInputEvent
+  event_packet.m_event_type = EventType::UserInputEvent;
+
+  // set the data for the event packet
+  event_packet.m_event_data = user_input_events;
+
+  // add the event packet to the global event bus
+  AddEvent(event_packet);
 }
 
 ////////////////////////////////////////////////////////////
-void EventHandler::HandleKeyboardEvents(const sf::Event &event) {
+void EventHandler::HandleKeyboardEvents(const sf::Event &event,
+                                        UserInputBitset &user_input_events) {
 
   // if key pressed, set the corresponding bit in the pressed events bitset
   if (const auto *keyPressed = event.getIf<sf::Event::KeyPressed>()) {
@@ -48,7 +105,7 @@ void EventHandler::HandleKeyboardEvents(const sf::Event &event) {
     std::cout << "Key code: " << static_cast<int>(keyPressed->code)
               << std::endl;
     // modify relevant bitset
-    m_events.set(static_cast<size_t>(keyPressed->code));
+    user_input_events.set(static_cast<size_t>(keyPressed->code));
 
   } else if (const auto *keyReleased = event.getIf<sf::Event::KeyReleased>()) {
 
@@ -56,22 +113,25 @@ void EventHandler::HandleKeyboardEvents(const sf::Event &event) {
               << std::endl;
 
     // if key released, then remember add the key count
-    m_events.set(static_cast<size_t>(keyReleased->code) +
-                 sf::Keyboard::KeyCount);
+    user_input_events.set(static_cast<size_t>(keyReleased->code) +
+                          sf::Keyboard::KeyCount);
   }
 }
-////////////////////////////////////////////////////////////
-void EventHandler::HandleMouseEvents(const sf::Event &event) {
 
-  // if mouse button pressed, set the corresponding bit in the pressed events
+////////////////////////////////////////////////////////////
+void EventHandler::HandleMouseEvents(const sf::Event &event,
+                                     UserInputBitset &user_input_events) {
+
+  // if mouse button pressed, set the corresponding bit in the pressed
+  // events
   if (const auto *mouseButtonPressed =
           event.getIf<sf::Event::MouseButtonPressed>()) {
 
     std::cout << "Mouse button pressed: "
               << magic_enum::enum_name(mouseButtonPressed->button) << std::endl;
     // shift the mouse button by the number of keys x 2
-    m_events.set(static_cast<size_t>(mouseButtonPressed->button) +
-                 static_cast<size_t>(sf::Keyboard::KeyCount * 2));
+    user_input_events.set(static_cast<size_t>(mouseButtonPressed->button) +
+                          static_cast<size_t>(sf::Keyboard::KeyCount * 2));
 
   } else if (const auto *mouseButtonReleased =
                  event.getIf<sf::Event::MouseButtonReleased>()) {
@@ -79,15 +139,12 @@ void EventHandler::HandleMouseEvents(const sf::Event &event) {
     std::cout << "Mouse button released: "
               << magic_enum::enum_name(mouseButtonReleased->button)
               << std::endl;
-    // if mouse button released, then remember to add the key count x 2 and the
-    // mouse button count
-    m_events.set(static_cast<size_t>(mouseButtonReleased->button) +
-                 static_cast<size_t>((sf::Keyboard::KeyCount * 2) +
-                                     sf::Mouse::ButtonCount));
+    // if mouse button released, then remember to add the key count x 2 and
+    // the mouse button count
+    user_input_events.set(static_cast<size_t>(mouseButtonReleased->button) +
+                          static_cast<size_t>((sf::Keyboard::KeyCount * 2) +
+                                              sf::Mouse::ButtonCount));
   }
 }
-
-/////////////////////////////////////////////////
-const EventBitset &EventHandler::GetEvents() const { return m_events; }
 
 } // namespace steamrot

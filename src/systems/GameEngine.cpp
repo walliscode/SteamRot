@@ -29,9 +29,8 @@ GameEngine::GameEngine()
 
   // create the GameContext object and pass by value so that it does not have to
   // stay alive
-  GameContext game_context{m_window,         m_event_handler.GetEvents(),
-                           m_mouse_position, m_loop_number,
-                           m_asset_manager,  m_data_manager};
+  GameContext game_context{m_window,      m_event_handler, m_mouse_position,
+                           m_loop_number, m_asset_manager, m_data_manager};
 
   // initialise all objects that need the GameContext
   m_scene_manager = std::make_unique<SceneManager>(game_context);
@@ -71,7 +70,7 @@ void GameEngine::RunGameLoop() {
     m_loop_number++;
 
     // Handle events and return map of user events
-    m_event_handler.HandleEvents(m_window);
+    m_event_handler.HandleSFMLEvents(m_window);
 
     // Handle actions
     UpdateActions();
@@ -90,6 +89,9 @@ void GameEngine::RunGameLoop() {
     //   ExportSimulationData("test");
     //   break;
     // };
+
+    // update EventBus lifetimes
+    m_event_handler.CleanUpEventBus();
   }
 }
 

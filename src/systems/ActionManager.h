@@ -6,8 +6,8 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include "EventHandler.h"
 #include "actions_generated.h"
+#include "event_helpers.h"
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
 
@@ -18,7 +18,7 @@ private:
   ////////////////////////////////////////////////////////////
   // |Member: stores key mappings to actions for this scene
   ////////////////////////////////////////////////////////////
-  std::unordered_map<EventBitset, ActionNames> m_scene_event_to_action_map;
+  std::unordered_map<UserInputBitset, ActionNames> m_scene_event_to_action_map;
 
   ////////////////////////////////////////////////////////////
   // |brief: returns map of string letters to sf::Keyboard enum
@@ -60,7 +60,7 @@ public:
   ///
   /// @param input_event Bitset of user input events
   /////////////////////////////////////////////////
-  void ProcessSceneLevelActions(const EventBitset &input_event);
+  void ProcessSceneLevelActions(const UserInputBitset &input_event);
 
   /////////////////////////////////////////////////
   /// @brief Reset the Scene level and Logic level actions to their default

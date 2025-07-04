@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <bitset>
 
-using EventBitset =
+using UserInputBitset =
     std::bitset<sf::Keyboard::KeyCount + sf::Keyboard::KeyCount +
                 sf::Mouse::ButtonCount + sf::Mouse::ButtonCount>;
 namespace steamrot {
@@ -28,5 +28,5 @@ GetFlatbuffersToSFMLMouseMap();
 ///
 /// @return [TODO:return]
 /////////////////////////////////////////////////
-const EventBitset ConvertActionKeysToEvent(const Action &action);
+const UserInputBitset ConvertActionKeysToEvent(const Action &action);
 } // namespace steamrot

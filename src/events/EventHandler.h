@@ -7,28 +7,48 @@
 // headers
 ////////////////////////////////////////////////////////////
 
+#include "EventPacket.h"
 #include "event_helpers.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
+#include <vector>
 
 namespace steamrot {
 
-class EventHandler {
+using EventBus = std::vector<EventPacket>;
 
+class EventHandler {
 private:
+  /////////////////////////////////////////////////
+  /// @brief This will be the only event bus used in the game engine.
+  /////////////////////////////////////////////////
+  EventBus m_global_event_bus;
+
   ////////////////////////////////////////////////////////////
   // |brief process keyboard events: pressed and released
   ////////////////////////////////////////////////////////////
-  void HandleKeyboardEvents(const sf::Event &event);
+  void HandleKeyboardEvents(const sf::Event &event,
+                            UserInputBitset &user_input_events);
+  ;
 
   ////////////////////////////////////////////////////////////
   // |brief process mouse events: pressed and released
   ////////////////////////////////////////////////////////////
-  void HandleMouseEvents(const sf::Event &event);
+  void HandleMouseEvents(const sf::Event &event,
+                         UserInputBitset &user_input_events);
 
-  EventBitset m_events;
+  /////////////////////////////////////////////////
+  /// @brief Go over all events in the event bus and decrement their lifetimes.
+  /////////////////////////////////////////////////
+  void DecrementEventLifetimes();
+
+  /////////////////////////////////////////////////
+  /// @brief Remove all events with a lifetimve of 0 from the event bus.
+  ///
+  /////////////////////////////////////////////////
+  void RemoveDeadEvents();
 
 public:
   ////////////////////////////////////////////////////////////
@@ -36,17 +56,44 @@ public:
   ////////////////////////////////////////////////////////////
   EventHandler() = default;
 
-  ////////////////////////////////////////////////////////////
-  // |brief process events from the window
-  ////////////////////////////////////////////////////////////
-  void HandleEvents(sf::RenderWindow &window);
+  /////////////////////////////////////////////////
+  /// @brief Handle all events that dont originate from the Scenes/Logic
+  /// [TODO: Give this a better name]
+  /////////////////////////////////////////////////
+  void PreloadEvents(sf::RenderWindow &window);
+
+  /////////////////////////////////////////////////
+  /// @brief Container function for all clean up/tear down functions at the end
+  /// of the tick.
+  /////////////////////////////////////////////////
+  void CleanUpEventBus();
+
+  /////////////////////////////////////////////////
+  /// @brief Adds an event to the global event bus and calls any sorting algos.
+  ///
+  /// @param event Newly created event to be added to the event bus.
+  /////////////////////////////////////////////////
+  void AddEvent(const EventPacket &event);
+
+  /////////////////////////////////////////////////
+  /// @brief Get the global event bus.
+  ///
+  /// @return A reference to the global event bus.
+  /////////////////////////////////////////////////
+  const EventBus &GetEventBus();
+
+  /////////////////////////////////////////////////
+  /// @brief Adapater function to turn SFML events into the game engine's event
+  /// system.
+  ///
+  /// @param window Reference to the SFML window to poll events from.
+  /////////////////////////////////////////////////
+  void HandleSFMLEvents(sf::RenderWindow &window);
 
   ////////////////////////////////////////////////////////////
   // |member: bool queried by GameEngine about whether to close the window or
   // not
   ////////////////////////////////////////////////////////////
   bool m_close_window{false};
-
-  const EventBitset &GetEvents() const;
 };
 } // namespace steamrot
