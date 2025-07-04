@@ -1,0 +1,18 @@
+include "types.fbs";
+
+namespace steamrot;
+
+
+table Triangle {
+    vertices: [Vector2f]; 
+  }
+
+table JoinRenderOverlay {
+    triangles: [Triangle] (required);
+    color: Color;
+  }
+table JointData {
+name: string (required);
+render_overlay: JoinRenderOverlay (required);
+number_of_connections: int ;
+  }
