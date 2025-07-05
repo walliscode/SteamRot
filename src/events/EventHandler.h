@@ -76,6 +76,13 @@ public:
   void AddEvent(const EventPacket &event);
 
   /////////////////////////////////////////////////
+  /// @brief Add a collection of events to the global event bus.
+  ///
+  /// @param events A holding bus of events to be added to the global event bus.
+  /////////////////////////////////////////////////
+  void AddEvents(const EventBus &events);
+
+  /////////////////////////////////////////////////
   /// @brief Get the global event bus.
   ///
   /// @return A reference to the global event bus.

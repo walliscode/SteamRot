@@ -23,6 +23,36 @@ namespace steamrot {
 struct SceneData;
 struct SceneDataBuilder;
 
+enum SceneType : int8_t {
+  SceneType_TITLE = 0,
+  SceneType_CRAFTING = 1,
+  SceneType_MIN = SceneType_TITLE,
+  SceneType_MAX = SceneType_CRAFTING
+};
+
+inline const SceneType (&EnumValuesSceneType())[2] {
+  static const SceneType values[] = {
+    SceneType_TITLE,
+    SceneType_CRAFTING
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesSceneType() {
+  static const char * const names[3] = {
+    "TITLE",
+    "CRAFTING",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameSceneType(SceneType e) {
+  if (::flatbuffers::IsOutRange(e, SceneType_TITLE, SceneType_CRAFTING)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesSceneType()[index];
+}
+
 struct SceneData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef SceneDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {

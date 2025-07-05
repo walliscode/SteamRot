@@ -43,7 +43,5 @@ private:
   void sCollision() override;
 
   void sAction() override;
-
-  void ProcessActions() override;
 };
 } // namespace steamrot

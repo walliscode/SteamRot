@@ -14,18 +14,6 @@
 namespace steamrot {
 using EntityIndicies = std::vector<size_t>;
 
-/////////////////////////////////////////////////
-/// @class LogicData
-/// @brief General container for all logic data, such as other structs e.t.c
-///
-/////////////////////////////////////////////////
-struct LogicData {
-
-  /////////////////////////////////////////////////
-  /// @brief Data copied over from any UI Elements
-  /////////////////////////////////////////////////
-  UIElementDataPackage ui_data_package;
-};
 /**
 * @class LogicContext
  * @brief Provides all the specific Scene data required for logic processing.
@@ -69,7 +57,7 @@ struct LogicContext {
   ///
   /// This contains the global event bus and is used to adapt other events.
   /////////////////////////////////////////////////
-  const EventHandler &event_handler;
+  EventHandler &event_handler;
 };
 
 /**
@@ -103,13 +91,6 @@ protected:
    */
   LogicContext m_logic_context;
 
-  ActionNames m_logic_action{0};
-
-  /////////////////////////////////////////////////
-  /// @brief Updated by Logic functions, will then be scraped by the Scene
-  /////////////////////////////////////////////////
-  LogicData m_logic_data;
-
 public:
   /**
    * @brief Default constructor
@@ -127,19 +108,5 @@ public:
    * @param entity_indicies Entity mask for required entities.
    */
   void RunLogic();
-
-  /////////////////////////////////////////////////
-  /// @brief Return the Logic level action bit flag
-  ///
-  /// @return [TODO:return]
-  /////////////////////////////////////////////////
-  const ActionNames &GetLogicAction();
-
-  const LogicData &GetLogicData() const;
-
-  /////////////////////////////////////////////////
-  /// @brief Reset the Logic level action to 0 value
-  /////////////////////////////////////////////////
-  void ResetLogicAction();
 };
 } // namespace steamrot

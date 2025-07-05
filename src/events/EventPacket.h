@@ -4,16 +4,18 @@
 /////////////////////////////////////////////////
 
 #pragma once
-
-#include "EventTypes.h"
 #include "event_helpers.h"
+#include "events_generated.h"
+#include "scenes_generated.h"
 #include "uuid.h"
 #include <optional>
 #include <variant>
 namespace steamrot {
 
-// int is a placeholder for now. remove when you have a real event data type
-using EventData = std::variant<UserInputBitset>;
+using SceneChangeData = std::pair<std::optional<uuids::uuid>, SceneType>;
+
+// all data types that can be used in an event packet
+using EventData = std::variant<UserInputBitset, SceneChangeData>;
 
 struct EventPacket {
 
@@ -27,7 +29,7 @@ struct EventPacket {
   /////////////////////////////////////////////////
   /// @brief Enum based name for the event type
   /////////////////////////////////////////////////
-  EventType m_event_type{EventType::NoEvent};
+  EventType m_event_type{EventType::EventType_NONE};
 
   /////////////////////////////////////////////////
   /// @brief Unique identifier for the event

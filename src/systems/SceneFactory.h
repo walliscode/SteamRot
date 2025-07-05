@@ -9,7 +9,6 @@
 #include "CraftingScene.h"
 #include "GameContext.h"
 #include "Scene.h"
-#include "SceneType.h"
 #include "TitleScene.h"
 #include "scenes_generated.h"
 #include "uuid.h"

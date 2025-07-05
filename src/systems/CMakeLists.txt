@@ -40,4 +40,7 @@ utilities
 logger
 stduuid
 context
-logic)
+logic
+flatbuffers
+flatbuffers_headers
+)

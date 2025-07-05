@@ -49,6 +49,17 @@ void EventHandler::AddEvent(const EventPacket &event) {
   // add any sorting algorithms here if needed
 }
 
+/////////////////////////////////////////////////
+void EventHandler::AddEvents(const std::vector<EventPacket> &events) {
+
+  // add each one separately, so that any sorting algorithms do not to be
+  // defined twice
+  for (const auto &event : events) {
+    // add each event to the global event bus
+    AddEvent(event);
+  }
+}
+
 ////////////////////////////////////////////////////////////
 void EventHandler::HandleSFMLEvents(sf::RenderWindow &window) {
 
@@ -84,7 +95,7 @@ void EventHandler::HandleSFMLEvents(sf::RenderWindow &window) {
   EventPacket event_packet(1);
 
   // set the event type to UserInputEvent
-  event_packet.m_event_type = EventType::UserInputEvent;
+  event_packet.m_event_type = EventType::EventType_EVENT_USER_INPUT;
 
   // set the data for the event packet
   event_packet.m_event_data = user_input_events;

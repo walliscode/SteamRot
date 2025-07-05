@@ -1,0 +1,10 @@
+
+enum EventType: ulong (bit_flags) {
+EVENT_NONE = 0,
+EVENT_USER_INPUT = 1,
+EVENT_CHANGE_SCENE = 2,
+EVENT_QUIT_GAME =3,
+  }
+
+
+

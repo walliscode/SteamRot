@@ -1,6 +1,6 @@
 #pragma once
 #include "DataManager.h"
-#include "SceneType.h"
+
 #include <SFML/Graphics.hpp>
 
 #include <SFML/Graphics/Font.hpp>

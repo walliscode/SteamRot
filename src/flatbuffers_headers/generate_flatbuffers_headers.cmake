@@ -11,6 +11,7 @@ set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/assets.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/fragments.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/joints.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/events.fbs
 )
 
 set(generated_headers)

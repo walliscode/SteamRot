@@ -2,9 +2,6 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "SceneFactory.h"
-
-#include "SceneType.h"
-
 #include "uuid.h"
 #include <iostream>
 #include <memory>
@@ -44,11 +41,11 @@ std::unique_ptr<Scene> SceneFactory::CreateScene(const SceneType &scene_type) {
   switch (scene_type) {
 
     // TitleScene
-  case SceneType::title:
+  case SceneType::SceneType_TITLE:
     std::cout << "Title scene type detected." << std::endl;
     return CreateTitleScene(scene_data, scene_uuid);
 
-  case SceneType::crafting:
+  case SceneType::SceneType_CRAFTING:
     std::cout << "Crafting scene type detected." << std::endl;
     // create a new crafting scene object, we are creating a raw pointer here
     // due to CraftingScene having a private constuctor
