@@ -31,12 +31,12 @@
                   "label": "Crafting Table"
                 },
                 "trigger_event": "EVENT_USER_INPUT",
-                "trigger_event_data_type": "user_input_data",
+                "trigger_event_data_type": "UserInputBitsetData",
                 "trigger_event_data": {
                   "mouse_released": ["LEFT_CLICK"]
                 },
                 "response_event": "EVENT_CHANGE_SCENE",
-                "response_event_data_type": "scene_change_data",
+                "response_event_data_type": "SceneChangeData",
                 "response_event_data": {
                   "scene_type": "CRAFTING"
                 }
@@ -51,7 +51,7 @@
                 },
 
                 "trigger_event": "EVENT_USER_INPUT",
-                "trigger_event_data_type": "user_input_data",
+                "trigger_event_data_type": "UserInputBitsetData",
                 "trigger_event_data": {
                   "mouse_released": ["LEFT_CLICK"]
                 },
