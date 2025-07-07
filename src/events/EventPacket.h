@@ -6,16 +6,19 @@
 #pragma once
 #include "event_helpers.h"
 #include "events_generated.h"
-#include "scenes_generated.h"
+#include "scene_types_generated.h"
 #include "uuid.h"
 #include <optional>
 #include <variant>
 namespace steamrot {
 
 using SceneChangeData = std::pair<std::optional<uuids::uuid>, SceneType>;
+using UIElementName = std::string;
 
-// all data types that can be used in an event packet
-using EventData = std::variant<UserInputBitset, SceneChangeData>;
+// all data types that can be used in an event packet (monostate to represent no
+// data)
+using EventData = std::variant<std::monostate, UserInputBitset, SceneChangeData,
+                               UIElementName>;
 
 struct EventPacket {
 
@@ -43,7 +46,7 @@ struct EventPacket {
   /////////////////////////////////////////////////
   uuids::uuid source_id;
 
-  std::optional<EventData> m_event_data;
+  EventData m_event_data{std::monostate{}};
 
   const uint8_t GetLifetime() const { return event_lifetime; }
 

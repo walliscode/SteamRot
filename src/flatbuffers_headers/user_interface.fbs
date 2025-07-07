@@ -1,6 +1,7 @@
 include "types.fbs";
-include "actions.fbs";
-
+include "events.fbs";
+include "scene_types.fbs";
+include "user_input.fbs";
 namespace steamrot;
 
 enum UIElementType: byte{
@@ -31,8 +32,16 @@ enum SpacingAndSizingType: byte {
 
   }
 
-table UIElementDataPackageData {
-    scene_type: string;
+
+table SceneChangeDataFBS {
+  scene_type: SceneType ;
+  scene_id: string;
+}
+
+union EventDataType{
+  UserInputBitsetData: UserInputBitsetData,
+  SceneChangeData: SceneChangeDataFBS,
+  UIElementName: string,
   }
 
 table PanelData{}
@@ -75,6 +84,7 @@ union UIElementDataUnion {
 }
 
 table UIElementData{
+    name: string;
     type: UIElementType;
     children: [UIElementData];
     children_active: bool;
@@ -84,8 +94,10 @@ table UIElementData{
     size: Vector2f;
     ratio: float;
     element: UIElementDataUnion (required);
-    action: Action;
-    data: UIElementDataPackageData;
+    trigger_event: EventType;
+    trigger_event_data: EventDataType;
+    response_event: EventType;
+    response_event_data: EventDataType; 
   }
 
 table UserInterface{

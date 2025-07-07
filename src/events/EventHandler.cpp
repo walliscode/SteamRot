@@ -24,6 +24,13 @@ void EventHandler::CleanUpEventBus() {
 }
 
 /////////////////////////////////////////////////
+
+const EventBus &EventHandler::GetEventBus() {
+  // return the global event bus
+  return m_global_event_bus;
+}
+
+/////////////////////////////////////////////////
 void EventHandler::DecrementEventLifetimes() {
   // go over all events in the event bus and decrement their lifetimes
   for (auto &event : m_global_event_bus) {

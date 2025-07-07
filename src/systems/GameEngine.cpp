@@ -99,17 +99,12 @@ void GameEngine::RetrieveEvents() {
   // retrieve events from the event handler
   const EventBus &event_bus = m_event_handler.GetEventBus();
 
-  // create holding bus to add any new events to
   EventBus holding_bus;
   // iterate over the event bus and check for events that are relevant to the
   // game engine
   for (const auto &event : event_bus) {
-    // check if the event is relevant to the game engine
-    if (m_game_engine_events.contains(event.m_event_type)) {
 
-      // if the event is relevant, process it
-      ProcessGameEngineEvents(event, holding_bus);
-    }
+    ProcessGameEngineEvents(event, holding_bus);
   }
   // add any new events to the event handler's event bus
   m_event_handler.AddEvents(holding_bus);
@@ -123,10 +118,12 @@ void GameEngine::ProcessGameEngineEvents(const EventPacket &event,
 
   case (EventType::EventType_EVENT_CHANGE_SCENE): {
     // check if the event has data
-    if (std::holds_alternative<SceneChangeData>(event.m_event_data.value())) {
+    if (std::holds_alternative<SceneChangeData>(event.m_event_data)) {
+      std::cout << "Scene change event received: "
+                << magic_enum::enum_name(event.m_event_type) << std::endl;
       // get the data from the event
       const SceneChangeData &scene_change_data =
-          std::get<SceneChangeData>(event.m_event_data.value());
+          std::get<SceneChangeData>(event.m_event_data);
       // check if the scene change data has a new scene type
       if (scene_change_data.second == SceneType::SceneType_TITLE) {
         ShowTitleScene();

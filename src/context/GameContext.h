@@ -13,7 +13,7 @@ namespace steamrot {
 struct GameContext {
   GameContext() = delete;
 
-  GameContext(sf::RenderWindow &window, const EventHandler &event_handler,
+  GameContext(sf::RenderWindow &window, EventHandler &event_handler,
               const sf::Vector2i &mouse_position, const size_t &loop_number,
               AssetManager &asset_manager, DataManager &data_manager);
 
@@ -27,7 +27,7 @@ struct GameContext {
   /////////////////////////////////////////////////
   /// @brief Reference to the global event handler which contains the event bus.
   /////////////////////////////////////////////////
-  const EventHandler &event_handler;
+  EventHandler &event_handler;
 
   /////////////////////////////////////////////////
   /// @brief Reference to mouse position in the game window. (local).

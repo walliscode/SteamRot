@@ -1,5 +1,4 @@
 {
-  "actions": {},
   "entity_collection": {
     "entities": [
       {
@@ -31,13 +30,14 @@
                 "element": {
                   "label": "Crafting Table"
                 },
-                "action": {
-                  "action_name": "ACTION_CHANGE_SCENE",
-                  "mouse_released": [
-                    "LEFT_CLICK"
-                  ]
+                "trigger_event": "EVENT_USER_INPUT",
+                "trigger_event_data_type": "user_input_data",
+                "trigger_event_data": {
+                  "mouse_released": ["LEFT_CLICK"]
                 },
-                "data": {
+                "response_event": "EVENT_CHANGE_SCENE",
+                "response_event_data_type": "scene_change_data",
+                "response_event_data": {
                   "scene_type": "CRAFTING"
                 }
               },
@@ -49,12 +49,13 @@
                 "element": {
                   "label": "Quit Game"
                 },
-                "action": {
-                  "action_name": "ACTION_QUIT_GAME",
-                  "mouse_released": [
-                    "LEFT_CLICK"
-                  ]
-                }
+
+                "trigger_event": "EVENT_USER_INPUT",
+                "trigger_event_data_type": "user_input_data",
+                "trigger_event_data": {
+                  "mouse_released": ["LEFT_CLICK"]
+                },
+                "response_event": "EVENT_QUIT_GAME"
               }
             ],
             "position": {
@@ -71,11 +72,7 @@
     ]
   },
   "logic_collection": {
-    "types": [
-      "Render",
-      "Collision",
-      "Action"
-    ]
+    "types": ["Render", "Collision", "Action"]
   },
   "ui_theme": "default",
   "assets": {

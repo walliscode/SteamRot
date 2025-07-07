@@ -23,7 +23,7 @@ private:
   /////////////////////////////////////////////////
   void ProcessEvents(CUserInterface &ui_component);
 
-  void RecursiveProcessEvents(UIElement &ui_element);
+  void RecursiveProcessEvents(UIElement &ui_element, const EventPacket &event);
 
   /////////////////////////////////////////////////
   /// @brief Applies the logic for processing mouse events recursively
@@ -46,7 +46,7 @@ private:
   ///
   /// @param element UIElement containing the DropDownContainer variant.
   /////////////////////////////////////////////////
-  void HandleDropDownContainerActions(UIElement &element);
+  void ToggleDropDown(UIElement &element);
 
   /////////////////////////////////////////////////
   /// @brief Returns a vector of the names of all available fragments in the

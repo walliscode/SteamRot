@@ -36,25 +36,12 @@ enum MouseInput: ubyte {
     SCROLL_DOWN = 4,
   }
 
-enum ActionNames: ulong (bit_flags) {
-  ACTION_NONE = 0,
-  ACTION_CHANGE_SCENE = 1,
-  ACTION_QUIT_GAME = 2,
-  ACTION_TOGGLE_DROP_DOWN = 3,
-  }
-
-// an action is composed of 1 or more inputs 
-table Action{
+table UserInputBitsetData {
   keyboard_pressed: [KeyboardInput];
   keyboard_released: [KeyboardInput];
   mouse_pressed: [MouseInput];
   mouse_released: [MouseInput];
-  action_name: ActionNames;
   }
 
-  // all actions for this scene or display manager
-table ActionsData{
-actions: [Action]; 
-  }
 
-root_type ActionsData;
+

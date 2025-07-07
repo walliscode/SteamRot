@@ -2,8 +2,7 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-GameContext::GameContext(sf::RenderWindow &window,
-                         const EventHandler &event_handler,
+GameContext::GameContext(sf::RenderWindow &window, EventHandler &event_handler,
                          const sf::Vector2i &mouse_position,
                          const size_t &loop_number, AssetManager &asset_manager,
                          DataManager &data_manager)

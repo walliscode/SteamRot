@@ -52,224 +52,216 @@ void UIActionLogic::ProcessLogic() {
 }
 /////////////////////////////////////////////////
 void UIActionLogic::ProcessEvents(CUserInterface &ui_component) {
-
-  RecursiveProcessEvents(ui_component.m_root_element);
-}
-/////////////////////////////////////////////////
-void UIActionLogic::RecursiveProcessEvents(UIElement &ui_element) {
-
+  // print out the size of the event bus for debugging if it is greater than 1
   // cycle through EventBus
   for (auto const &event : m_logic_context.event_handler.GetEventBus()) {
+    // print the event type for debugging, except for EVENT_USER_INPUT
+    if (event.m_event_type != EventType::EventType_EVENT_USER_INPUT) {
+    }
+    RecursiveProcessEvents(ui_component.m_root_element, event);
+  }
+}
+/////////////////////////////////////////////////
+void UIActionLogic::RecursiveProcessEvents(UIElement &ui_element,
+                                           const EventPacket &event) {
 
-    // guard statement to check if the event is a trigger event for the ui
-    // element
-    if (ui_element.trigger_event != event.m_event_type) {
-      // check children
-      for (UIElement &child : ui_element.child_elements) {
-        // if the child element has the same trigger event, process it
-        if (child.trigger_event == event.m_event_type) {
-          RecursiveProcessEvents(child);
+  // guard statement to check if the event is a trigger event for the ui
+  // element
+
+  if (ui_element.trigger_event != event.m_event_type) {
+    // check children
+    for (UIElement &child : ui_element.child_elements) {
+      RecursiveProcessEvents(child, event);
+    }
+    // return early if the event is not a trigger event for the ui element
+    return;
+  }
+
+  // If the event is a user input event, process it
+  // Process relevant events
+  switch (event.m_event_type) {
+
+  case (EventType::EventType_EVENT_USER_INPUT): {
+
+    // check if any data is present
+    if (std::holds_alternative<UserInputBitset>(event.m_event_data)) {
+
+      // Check if the event data is of type UserInputBitset
+      if (std::holds_alternative<UserInputBitset>(event.m_event_data)) {
+        UserInputBitset user_input_data =
+            std::get<UserInputBitset>(event.m_event_data);
+
+        // call functions which required user input data
+        ProcessMouseEvents(ui_element, user_input_data);
+      }
+    }
+    break;
+  }
+  case (EventType::EventType_EVENT_TOGGLE_DROPDOWN): {
+    // check if any data is present
+    if (!std::holds_alternative<std::monostate>(event.m_event_data)) {
+
+      // Check if the event data is of type UIElementName
+      if (std::holds_alternative<UIElementName>(event.m_event_data)) {
+
+        UIElementName element_name =
+            std::get<UIElementName>(event.m_event_data);
+
+        // check if the element name matches the current element
+        if (ui_element.name == element_name) {
+
+          // check if ui element type is a DropDownContainer
+          if (std::holds_alternative<DropDownList>(ui_element.element_type) ||
+              std::holds_alternative<DropDownButton>(ui_element.element_type)) {
+            // call the toggle drop down function
+            ToggleDropDown(ui_element);
+          }
         }
       }
-      // if no child element has the same trigger event, skip to next event
-      continue;
     }
+    break;
+  }
 
-    // If the event is a user input event, process it
-    // Process relevant events
-    switch (event.m_event_type) {
-
-    case (EventType::EventType_EVENT_USER_INPUT): {
-
-      // check if any data is present
-      if (event.m_event_data) {
-
-        // Check if the event data is of type UserInputBitset
-        if (std::holds_alternative<UserInputBitset>(
-                event.m_event_data.value())) {
-          UserInputBitset user_input_data =
-              std::get<UserInputBitset>(event.m_event_data.value());
-
-          // call functions which required user input data
-          ProcessMouseEvents(ui_element, user_input_data);
-        }
-      }
-    }
-    default:
-      break;
-    }
+  default:
+    break;
   }
 }
 
 /////////////////////////////////////////////////
 void UIActionLogic::ProcessMouseEvents(UIElement &element,
                                        UserInputBitset &user_input) {
-  {
 
-    // Process mouse events for the current element
-    if (element.mouse_over) {
+  // check if the mouse is over the element
+  if (element.mouse_over) {
 
-      // default to no matching data
-      bool input_matches = false;
+    // default to no events matching
+    bool events_match = false;
 
-      // check that the element data is populated
-      if (element.trigger_event_data.has_value()) {
+    // check that the element data is populated
+    if (!std::holds_alternative<std::monostate>(element.trigger_event_data)) {
 
-        // get the trigger event data
-        auto &trigger_event_data = element.trigger_event_data.value();
+      // get the trigger event data
+      auto &trigger_event_data = element.trigger_event_data;
 
-        // check that the trigger event data is of type UserInputBitset
-        if (std::holds_alternative<UserInputBitset>(trigger_event_data)) {
-          UserInputBitset trigger_data =
-              std::get<UserInputBitset>(trigger_event_data);
+      // check that the trigger event data is of type UserInputBitset
+      if (std::holds_alternative<UserInputBitset>(trigger_event_data)) {
+        UserInputBitset trigger_data =
+            std::get<UserInputBitset>(trigger_event_data);
 
-          // check that they match
-          input_matches = (trigger_data & user_input) != 0;
-        }
-      }
-      if (input_matches) {
-        // match LogicAction to the element action
-        // we want to overwrite the current logic action as we only want one
-        // action per tick
-        std::cout << "Mouse event triggered for element: "
-                  << magic_enum::enum_name(element.trigger_event) << std::endl;
-
-        // pass through local action processing first (e.g. stays at Element
-        // level)
-        bool is_local_action = LocalUIActions(element);
+        // check that they match
+        events_match = (trigger_data & user_input) != 0;
       }
     }
-  }
+    if (events_match) {
+      // if events match generate a new event packet to add to the event bus
+      EventPacket event_packet{2};
+      event_packet.m_event_type = element.response_event;
+      event_packet.m_event_data = element.response_event_data;
 
-  /////////////////////////////////////////////////
-  bool UIActionLogic::LocalUIActions(UIElement & element) {
-    // Check if the element has a local action
-    bool has_local_action{true};
-
-    // create std::visit lamda function to handle different variant types in
-    // element.element_type
-    auto handle_element_type = [&](const auto &element_type) {
-      using ElementType = std::decay_t<decltype(element_type)>;
-      if constexpr (std::is_same_v<ElementType, DropDownContainer>) {
-        // Handle DropDown specific logic
-        HandleDropDownContainerActions(element);
-
-      } else {
-        // If the type is not recognized, we can set has_local_action to false
-        has_local_action = false;
-      }
-    };
-    // Visit the variant to handle the element type
-    std::visit(handle_element_type, element.element_type);
-    return has_local_action;
-  }
-
-  /////////////////////////////////////////////////
-  std::vector<std::string> UIActionLogic::GetAvailableFragments() {
-
-    // Create a vector to hold the names of available fragments
-    std::vector<std::string> available_fragments;
-
-    // Get ArcetypeID for CGrimoireMachina and resultant Archetype
-    Archetype grimoire_id =
-        m_logic_context
-            .archetypes[GenerateArchetypeIDfromTypes<CGrimoireMachina>()];
-
-    // pull just the first entity in the archetype
-    if (!grimoire_id.empty()) {
-
-      // Get the CGrimoireMachina component from the entity
-      CGrimoireMachina &grimoire_component = GetComponent<CGrimoireMachina>(
-          grimoire_id[0], m_logic_context.scene_entities);
-
-      // Get the available fragments from the CGrimoireMachina component
-      for (auto &fragmet : grimoire_component.m_all_fragments) {
-        // Add the fragment name to the vector
-        available_fragments.push_back(fragmet.first);
-      }
-    } else {
-      std::cout << "No CGrimoireMachina found in the current scene."
+      // print out the EventPacket for debugging
+      std::cout << "Generated EventPacket: "
+                << "EventType: "
+                << magic_enum::enum_name(event_packet.m_event_type)
+                << ", EventData: " << event_packet.m_event_data.index()
                 << std::endl;
+      m_logic_context.event_handler.AddEvent(event_packet);
     }
-    return available_fragments;
   }
-  /////////////////////////////////////////////////
-  void UIActionLogic::HandleDropDownContainerActions(UIElement & element) {
-    DropDownContainer &drop_down_container =
-        std::get<DropDownContainer>(element.element_type);
+}
 
-    switch (element.action) {
-    case ActionNames::ActionNames_ACTION_TOGGLE_DROP_DOWN: {
-      drop_down_container.is_expanded = !drop_down_container.is_expanded;
+/////////////////////////////////////////////////
+bool UIActionLogic::LocalUIActions(UIElement &element) {
+  // Check if the element has a local action
+  bool has_local_action{true};
 
-      auto toggle_child_elements = [&](UIElement &child) {
-        std::visit(
-            [&](auto &actual_elem_type) {
-              using T = std::decay_t<decltype(actual_elem_type)>;
-              if constexpr (std::is_same_v<T, DropDownList>) {
+  // create std::visit lamda function to handle different variant types in
+  // element.element_type
+  auto handle_element_type = [&](const auto &element_type) {
+    using ElementType = std::decay_t<decltype(element_type)>;
+    if constexpr (std::is_same_v<ElementType, DropDownContainer>) {
+      // Handle DropDown specific logic
+      ToggleDropDown(element);
 
-                actual_elem_type.is_expanded = !actual_elem_type.is_expanded;
-                child.children_active = actual_elem_type.is_expanded;
+    } else {
+      // If the type is not recognized, we can set has_local_action to false
+      has_local_action = false;
+    }
+  };
+  // Visit the variant to handle the element type
+  std::visit(handle_element_type, element.element_type);
+  return has_local_action;
+}
 
-                // if the drop down is expanded, we want to populate the list
-                if (actual_elem_type.is_expanded) {
+/////////////////////////////////////////////////
+std::vector<std::string> UIActionLogic::GetAvailableFragments() {
 
-                  // create instance of the UIElementFactory
-                  UIElementFactory ui_element_factory;
+  // Create a vector to hold the names of available fragments
+  std::vector<std::string> available_fragments;
 
-                  // create a vector of available fragment names and populate
-                  std::vector<std::string> available_fragments;
+  // Get ArcetypeID for CGrimoireMachina and resultant Archetype
+  Archetype grimoire_id =
+      m_logic_context
+          .archetypes[GenerateArchetypeIDfromTypes<CGrimoireMachina>()];
 
-                  switch (actual_elem_type.data_populate_function) {
-                  case DataPopulateFunction_PopulateWithFragmentData: {
-                    std::cout << "Populating DropDownList with fragment data."
-                              << std::endl;
-                    available_fragments = GetAvailableFragments();
-                  }
+  // pull just the first entity in the archetype
+  if (!grimoire_id.empty()) {
 
-                  default: {
-                    break;
-                  }
-                  }
+    // Get the CGrimoireMachina component from the entity
+    CGrimoireMachina &grimoire_component = GetComponent<CGrimoireMachina>(
+        grimoire_id[0], m_logic_context.scene_entities);
 
-                  // Create new DropDownItem for each available fragment
-                  for (const std::string &fragment_name : available_fragments) {
-                    // Create a new UIElement for the DropDownItem
-                    UIElement drop_down_item_element =
-                        ui_element_factory.CreateDropDownItem();
-                    // Configure the DropDownItem properties
-                    drop_down_item_element.element_type =
-                        DropDownItem{fragment_name};
-                    // add the DropDownItem to the child elements
-                    child.child_elements.push_back(drop_down_item_element);
-                  }
-                  // } else {
-                  //   // Clear the dropdown list if it is not expanded
-                  //   child.child_elements.clear();
-                } else {
-                  // Clear the dropdown list if it is not expanded
-                  child.child_elements.clear();
-                }
+    // Get the available fragments from the CGrimoireMachina component
+    for (auto &fragmet : grimoire_component.m_all_fragments) {
+      // Add the fragment name to the vector
+      available_fragments.push_back(fragmet.first);
+    }
+  } else {
+    std::cout << "No CGrimoireMachina found in the current scene." << std::endl;
+  }
+  return available_fragments;
+}
+/////////////////////////////////////////////////
+void UIActionLogic::ToggleDropDown(UIElement &element) {
+  auto toggle_element = [&](UIElement &element) {
+    std::visit(
+        [&](auto &actual_elem_type) {
+          using T = std::decay_t<decltype(actual_elem_type)>;
+          if constexpr (std::is_same_v<T, DropDownList>) {
+            actual_elem_type.is_expanded = !actual_elem_type.is_expanded;
+            element.children_active = actual_elem_type.is_expanded;
 
-              } else if constexpr (std::is_same_v<T, DropDownButton>) {
-                actual_elem_type.is_expanded = !actual_elem_type.is_expanded;
+            if (actual_elem_type.is_expanded) {
+              UIElementFactory ui_element_factory;
+              std::vector<std::string> available_fragments;
 
-              } else {
-                std::cout << "Unknown element type in DropDownContainer: "
-                          << magic_enum::enum_name(child.action) << std::endl;
+              switch (actual_elem_type.data_populate_function) {
+              case DataPopulateFunction_PopulateWithFragmentData:
+                std::cout << "Populating DropDownList with fragment data."
+                          << std::endl;
+                available_fragments = GetAvailableFragments();
+                break;
+              default:
+                break;
               }
-            },
-            child.element_type);
-      };
 
-      for (UIElement &child : element.child_elements) {
-        toggle_child_elements(child);
-      }
-      break;
-    }
-    default:
-      break;
-    }
-  }
+              for (const std::string &fragment_name : available_fragments) {
+                UIElement drop_down_item_element =
+                    ui_element_factory.CreateDropDownItem();
+                drop_down_item_element.element_type =
+                    DropDownItem{fragment_name};
+                element.child_elements.push_back(drop_down_item_element);
+              }
+            } else {
+              element.child_elements.clear();
+            }
+          } else if constexpr (std::is_same_v<T, DropDownButton>) {
+            actual_elem_type.is_expanded = !actual_elem_type.is_expanded;
+          }
+        },
+        element.element_type);
+  };
 
+  // Call the lambda for the given element
+  toggle_element(element);
+}
 } // namespace steamrot

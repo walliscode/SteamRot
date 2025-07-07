@@ -1,5 +1,4 @@
 #include "AssetManager.h"
-#include "SceneType.h"
 #include <SFML/Graphics/Font.hpp>
 #include <string>
 #include <utility>

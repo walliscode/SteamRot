@@ -2,25 +2,12 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "ActionManager.h"
-
-#include "actions_generated.h"
-#include "log_handler.h"
-
-#include "spdlog/common.h"
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
-#include <iostream>
 
 namespace steamrot {
 
-////////////////////////////////////////////////////////////
-ActionManager::ActionManager(const ActionsData *actions_data) {
-  // register actions from ActionsData object
-  std::cout << "Registering actions from ActionsData object..." << std::endl;
-  RegisterActions(actions_data);
-  std::cout << "Actions registered from ActionsData object." << std::endl;
-}
 ////////////////////////////////////////////////////////////
 const std::unordered_map<KeyboardInput, sf::Keyboard::Key> &
 ActionManager::getFlatbuffersToSFMLKeyboardMap() {
@@ -73,78 +60,4 @@ ActionManager::getStringToMouseMap() {
   return string_to_mouse_map;
 }
 
-////////////////////////////////////////////////////////////
-void ActionManager::RegisterActions(const ActionsData *actions_data) {
-  // check if actions_data is null
-
-  if (actions_data->actions() == nullptr) {
-    log_handler::ProcessLog(spdlog::level::level_enum::info,
-                            log_handler::LogCode::kNoCode,
-                            "ActionsData object is null");
-    std::cout << "ActionsData object is null, skipping registration"
-              << std::endl;
-    return;
-  }
-  // cycle through the actions in the ActionsData object
-  for (const auto &action : *actions_data->actions()) {
-
-    // create new bitset for this action
-    UserInputBitset key_bitset;
-
-    if (action->keyboard_pressed()) {
-      for (const auto &key : *action->keyboard_pressed()) {
-        // needs casting back to its enum type (not sure why it has not
-        // maintained its original type)
-        KeyboardInput keyboard_press = static_cast<KeyboardInput>(key);
-        key_bitset.set(static_cast<size_t>(keyboard_press));
-      }
-    }
-    if (action->keyboard_released()) {
-      for (const auto &key : *action->keyboard_released()) {
-        // needs casting back to its enum type (not sure why it has not
-        // maintained its original type)
-        KeyboardInput keyboard_release = static_cast<KeyboardInput>(key);
-        // make sure it has been shifted by the number of keys
-        key_bitset.set(
-            static_cast<size_t>(keyboard_release + sf::Keyboard::KeyCount));
-      }
-    }
-
-    if (action->mouse_pressed()) {
-      for (const auto &button : *action->mouse_pressed()) {
-        MouseInput mouse_press = static_cast<MouseInput>(button);
-
-        // make sure it has been shifted by the number of keys * 2
-        key_bitset.set(static_cast<size_t>(mouse_press) +
-                       (sf::Keyboard::KeyCount * 2));
-      }
-    }
-    if (action->mouse_released()) {
-      for (const auto &button : *action->mouse_released()) {
-        MouseInput mouse_release = static_cast<MouseInput>(button);
-
-        // make sure it has been shifted by the number of keys * 2 and the
-        // number of mouse buttons
-        key_bitset.set(static_cast<size_t>(mouse_release) +
-                       (sf::Keyboard::KeyCount * 2) +
-                       static_cast<size_t>(sf::Mouse::ButtonCount));
-      }
-    }
-
-    // add to the action map
-    m_scene_event_to_action_map.at(key_bitset) =
-        ActionNames(action->action_name());
-  }
-}
-
-////////////////////////////////////////////////////////////
-void ActionManager::ProcessSceneLevelActions(
-    const UserInputBitset &input_event) {
-  m_scene_level_actions = m_scene_event_to_action_map[input_event];
-}
-
-/////////////////////////////////////////////////
-void ActionManager::ClearActions() {
-  m_scene_level_actions = static_cast<ActionNames>(0);
-}
 } // namespace steamrot

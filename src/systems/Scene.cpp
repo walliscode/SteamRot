@@ -12,8 +12,7 @@ namespace steamrot {
 ////////////////////////////////////////////////////////////
 Scene::Scene(const size_t &pool_size, const SceneData *scene_data,
              const uuids::uuid &id, const GameContext game_context)
-    : m_action_manager(scene_data->actions()),
-      m_entity_manager(pool_size, scene_data->entity_collection()),
+    : m_entity_manager(pool_size, scene_data->entity_collection()),
       m_game_context(game_context), m_logic_factory(), m_id(id) {
 
   // update map of Logic classes

@@ -18,6 +18,7 @@ using ElementType = std::variant<Panel, Button, DropDownContainer, DropDownList,
                                  DropDownItem, DropDownButton>;
 
 struct UIElement {
+  std::string name{"UIElement"};
 
   /////////////////////////////////////////////////
   /// @brief UIELement type, contains extra data for the element, can only be
@@ -78,9 +79,9 @@ struct UIElement {
   EventType trigger_event{EventType::EventType_NONE};
 
   /////////////////////////////////////////////////
-  /// @brief Optional data package to chcek against the trigger event.
+  /// @brief Optional data package to check against the trigger event.
   /////////////////////////////////////////////////
-  std::optional<EventData> trigger_event_data{std::nullopt};
+  EventData trigger_event_data{std::monostate{}};
 
   /////////////////////////////////////////////////
   /// @brief Potential response event that is sent to the EventBus
@@ -90,6 +91,6 @@ struct UIElement {
   /////////////////////////////////////////////////
   /// @brief Optional data package to be associated with the response event.
   /////////////////////////////////////////////////
-  std::optional<EventData> response_event_data{std::nullopt};
+  EventData response_event_data{std::monostate{}};
 };
 } // namespace steamrot

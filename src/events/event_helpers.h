@@ -1,6 +1,6 @@
 #pragma once
 
-#include "actions_generated.h"
+#include "user_input_generated.h"
 #include <SFML/Graphics.hpp>
 #include <bitset>
 
@@ -28,5 +28,5 @@ GetFlatbuffersToSFMLMouseMap();
 ///
 /// @return [TODO:return]
 /////////////////////////////////////////////////
-const UserInputBitset ConvertActionKeysToEvent(const Action &action);
+const UserInputBitset ConvertActionKeysToEvent(const UserInputBitsetData &data);
 } // namespace steamrot

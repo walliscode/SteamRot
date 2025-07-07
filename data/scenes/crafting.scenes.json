@@ -1,5 +1,4 @@
 {
-  "actions": {},
   "entity_collection": {
     "entities": [
       {
@@ -21,13 +20,15 @@
                 "element": {
                   "label": "Return"
                 },
-                "action": {
-                  "action_name": "ACTION_CHANGE_SCENE",
-                  "mouse_released": [
-                    "LEFT_CLICK"
-                  ]
+
+                "trigger_event": "EVENT_USER_INPUT",
+                "trigger_event_data_type": "UserInputBitsetData",
+                "trigger_event_data": {
+                  "mouse_released": ["LEFT_CLICK"]
                 },
-                "data": {
+                "response_event": "EVENT_CHANGE_SCENE",
+                "response_event_data_type": "SceneChangeData",
+                "response_event_data": {
                   "scene_type": "TITLE"
                 }
               },
@@ -38,9 +39,7 @@
                 "element_type": "ButtonData",
                 "element": {
                   "label": "New Construct"
-                },
-                "action": {},
-                "data": {}
+                }
               }
             ],
             "position": {
@@ -67,12 +66,14 @@
             "children": [
               {
                 "type": "DropDownContainer",
+                "name": "fragment_selection_menu",
                 "layout": "Horizontal",
                 "spacing_strategy": "Ratioed",
                 "children_active": true,
                 "children": [
                   {
                     "type": "DropDownList",
+                    "name": "fragment_selection_menu",
                     "layout": "DropDown",
                     "spacing_strategy": "DropDownList",
                     "ratio": 0.8,
@@ -83,29 +84,30 @@
                       "expanded_label": "...",
                       "data_populate_function": "PopulateWithFragmentData"
                     },
-                    "action": {},
-                    "data": {}
+                    "trigger_event": "EVENT_TOGGLE_DROPDOWN"
                   },
                   {
                     "type": "DropDownButton",
+                    "name": "fragment_selection_menu",
                     "layout": "Horizontal",
                     "ratio": 0.2,
                     "children": [],
                     "element_type": "DropDownButtonData",
                     "element": {},
-                    "action": {},
-                    "data": {}
+                    "trigger_event": "EVENT_TOGGLE_DROPDOWN"
                   }
                 ],
                 "element_type": "DropDownContainerData",
                 "element": {},
-                "action": {
-                  "action_name": "ACTION_TOGGLE_DROP_DOWN",
-                  "mouse_released": [
-                    "LEFT_CLICK"
-                  ]
+
+                "trigger_event": "EVENT_USER_INPUT",
+                "trigger_event_data_type": "UserInputBitsetData",
+                "trigger_event_data": {
+                  "mouse_released": ["LEFT_CLICK"]
                 },
-                "data": {}
+                "response_event": "EVENT_TOGGLE_DROPDOWN",
+                "response_event_data_type": "UIElementName",
+                "response_event_data": "fragment_selection_menu"
               }
             ],
             "position": {
@@ -162,6 +164,47 @@
                   "a": 255
                 }
               }
+            },
+            {
+              "name": "tree",
+              "socket_data": {
+                "vertices": [
+                  {
+                    "x": 2.5,
+                    "y": 0.0
+                  },
+                  {
+                    "x": 2.5,
+                    "y": 12.0
+                  }
+                ]
+              },
+              "render_overlay_data": {
+                "vertices": [
+                  {
+                    "x": 0.0,
+                    "y": 0.0
+                  },
+                  {
+                    "x": 5.0,
+                    "y": 0.0
+                  },
+                  {
+                    "x": 5.0,
+                    "y": 12.0
+                  },
+                  {
+                    "x": 0.0,
+                    "y": 12.0
+                  }
+                ],
+                "color": {
+                  "r": 255,
+                  "g": 255,
+                  "b": 255,
+                  "a": 255
+                }
+              }
             }
           ],
           "joints": [
@@ -179,15 +222,15 @@
                   {
                     "vertices": [
                       {
-                        "x": 4.00,
-                        "y": 0.00
+                        "x": 4.0,
+                        "y": 0.0
                       },
                       {
-                        "x": 2.00,
+                        "x": 2.0,
                         "y": 3.46
                       },
                       {
-                        "x": 1.00,
+                        "x": 1.0,
                         "y": 1.73
                       }
                     ]
@@ -195,47 +238,31 @@
                   {
                     "vertices": [
                       {
-                        "x": 4.00,
-                        "y": 0.00
+                        "x": 4.0,
+                        "y": 0.0
                       },
                       {
-                        "x": 1.00,
+                        "x": 1.0,
                         "y": 1.73
                       },
                       {
-                        "x": 2.00,
-                        "y": 0.00
+                        "x": 2.0,
+                        "y": 0.0
                       }
                     ]
                   },
                   {
                     "vertices": [
                       {
-                        "x": 2.00,
+                        "x": 2.0,
                         "y": 3.46
                       },
                       {
-                        "x": -2.00,
+                        "x": -2.0,
                         "y": 3.46
                       },
                       {
-                        "x": -1.00,
-                        "y": 1.73
-                      }
-                    ]
-                  },
-                  {
-                    "vertices": [
-                      {
-                        "x": 2.00,
-                        "y": 3.46
-                      },
-                      {
-                        "x": -1.00,
-                        "y": 1.73
-                      },
-                      {
-                        "x": 1.00,
+                        "x": -1.0,
                         "y": 1.73
                       }
                     ]
@@ -243,31 +270,15 @@
                   {
                     "vertices": [
                       {
-                        "x": -2.00,
+                        "x": 2.0,
                         "y": 3.46
                       },
                       {
-                        "x": -4.00,
-                        "y": -0.00
+                        "x": -1.0,
+                        "y": 1.73
                       },
                       {
-                        "x": -2.00,
-                        "y": -0.00
-                      }
-                    ]
-                  },
-                  {
-                    "vertices": [
-                      {
-                        "x": -2.00,
-                        "y": 3.46
-                      },
-                      {
-                        "x": -2.00,
-                        "y": -0.00
-                      },
-                      {
-                        "x": -1.00,
+                        "x": 1.0,
                         "y": 1.73
                       }
                     ]
@@ -275,15 +286,47 @@
                   {
                     "vertices": [
                       {
-                        "x": -4.00,
-                        "y": -0.00
+                        "x": -2.0,
+                        "y": 3.46
                       },
                       {
-                        "x": -2.00,
+                        "x": -4.0,
+                        "y": -0.0
+                      },
+                      {
+                        "x": -2.0,
+                        "y": -0.0
+                      }
+                    ]
+                  },
+                  {
+                    "vertices": [
+                      {
+                        "x": -2.0,
+                        "y": 3.46
+                      },
+                      {
+                        "x": -2.0,
+                        "y": -0.0
+                      },
+                      {
+                        "x": -1.0,
+                        "y": 1.73
+                      }
+                    ]
+                  },
+                  {
+                    "vertices": [
+                      {
+                        "x": -4.0,
+                        "y": -0.0
+                      },
+                      {
+                        "x": -2.0,
                         "y": -3.46
                       },
                       {
-                        "x": -1.00,
+                        "x": -1.0,
                         "y": -1.73
                       }
                     ]
@@ -291,47 +334,31 @@
                   {
                     "vertices": [
                       {
-                        "x": -4.00,
-                        "y": -0.00
+                        "x": -4.0,
+                        "y": -0.0
                       },
                       {
-                        "x": -1.00,
+                        "x": -1.0,
                         "y": -1.73
                       },
                       {
-                        "x": -2.00,
-                        "y": -0.00
+                        "x": -2.0,
+                        "y": -0.0
                       }
                     ]
                   },
                   {
                     "vertices": [
                       {
-                        "x": -2.00,
+                        "x": -2.0,
                         "y": -3.46
                       },
                       {
-                        "x": 2.00,
+                        "x": 2.0,
                         "y": -3.46
                       },
                       {
-                        "x": 1.00,
-                        "y": -1.73
-                      }
-                    ]
-                  },
-                  {
-                    "vertices": [
-                      {
-                        "x": -2.00,
-                        "y": -3.46
-                      },
-                      {
-                        "x": 1.00,
-                        "y": -1.73
-                      },
-                      {
-                        "x": -1.00,
+                        "x": 1.0,
                         "y": -1.73
                       }
                     ]
@@ -339,31 +366,47 @@
                   {
                     "vertices": [
                       {
-                        "x": 2.00,
+                        "x": -2.0,
                         "y": -3.46
                       },
                       {
-                        "x": 4.00,
-                        "y": 0.00
+                        "x": 1.0,
+                        "y": -1.73
                       },
                       {
-                        "x": 2.00,
-                        "y": 0.00
+                        "x": -1.0,
+                        "y": -1.73
                       }
                     ]
                   },
                   {
                     "vertices": [
                       {
-                        "x": 2.00,
+                        "x": 2.0,
                         "y": -3.46
                       },
                       {
-                        "x": 2.00,
-                        "y": 0.00
+                        "x": 4.0,
+                        "y": 0.0
                       },
                       {
-                        "x": 1.00,
+                        "x": 2.0,
+                        "y": 0.0
+                      }
+                    ]
+                  },
+                  {
+                    "vertices": [
+                      {
+                        "x": 2.0,
+                        "y": -3.46
+                      },
+                      {
+                        "x": 2.0,
+                        "y": 0.0
+                      },
+                      {
+                        "x": 1.0,
                         "y": -1.73
                       }
                     ]
@@ -377,11 +420,7 @@
     ]
   },
   "logic_collection": {
-    "types": [
-      "Render",
-      "Collision",
-      "Action"
-    ]
+    "types": ["Render", "Collision", "Action"]
   },
   "ui_theme": "default",
   "assets": {
