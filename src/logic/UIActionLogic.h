@@ -5,6 +5,7 @@
 
 #include "BaseLogic.h"
 #include "CUserInterface.h"
+#include "event_helpers.h"
 
 namespace steamrot {
 
@@ -18,16 +19,18 @@ private:
   void ProcessLogic() override;
 
   /////////////////////////////////////////////////
-  /// @brief Encapsualtes the logic for processing all mouse events in the UI.
+  /// @brief Cycles through the EventBus and processes relevant events.
   /////////////////////////////////////////////////
-  void ProcessMouseEvents(CUserInterface &ui_component);
+  void ProcessEvents(CUserInterface &ui_component);
+
+  void RecursiveProcessEvents(UIElement &ui_element, const EventPacket &event);
 
   /////////////////////////////////////////////////
   /// @brief Applies the logic for processing mouse events recursively
   ///
   /// @param element UILement to process mouse events for.
   /////////////////////////////////////////////////
-  void RecursiveProcessMouseEvents(UIElement &element);
+  void ProcessMouseEvents(UIElement &element, UserInputBitset &user_input);
 
   /////////////////////////////////////////////////
   /// @brief Process actions that just affect the local UI without passing to
@@ -43,7 +46,7 @@ private:
   ///
   /// @param element UIElement containing the DropDownContainer variant.
   /////////////////////////////////////////////////
-  void HandleDropDownContainerActions(UIElement &element);
+  void ToggleDropDown(UIElement &element);
 
   /////////////////////////////////////////////////
   /// @brief Returns a vector of the names of all available fragments in the

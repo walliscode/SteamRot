@@ -77,6 +77,10 @@ private:
   DropDownButton
   ConfigureDropDownButton(const DropDownButtonData &dropdown_data);
 
+  EventData ConfigureTriggerEventData(const UIElementData &element_data);
+
+  EventData ConfigureResponseEventData(const UIElementData &element_data);
+
 public:
   /////////////////////////////////////////////////
   /// @brief Default constructor for the UIElementFactory

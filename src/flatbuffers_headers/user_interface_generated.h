@@ -13,13 +13,15 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
-#include "actions_generated.h"
+#include "events_generated.h"
+#include "scene_types_generated.h"
 #include "types_generated.h"
+#include "user_input_generated.h"
 
 namespace steamrot {
 
-struct UIElementDataPackageData;
-struct UIElementDataPackageDataBuilder;
+struct SceneChangeDataFBS;
+struct SceneChangeDataFBSBuilder;
 
 struct PanelData;
 struct PanelDataBuilder;
@@ -165,6 +167,61 @@ inline const char *EnumNameSpacingAndSizingType(SpacingAndSizingType e) {
   return EnumNamesSpacingAndSizingType()[index];
 }
 
+enum EventDataType : uint8_t {
+  EventDataType_NONE = 0,
+  EventDataType_UserInputBitsetData = 1,
+  EventDataType_SceneChangeData = 2,
+  EventDataType_UIElementName = 3,
+  EventDataType_MIN = EventDataType_NONE,
+  EventDataType_MAX = EventDataType_UIElementName
+};
+
+inline const EventDataType (&EnumValuesEventDataType())[4] {
+  static const EventDataType values[] = {
+    EventDataType_NONE,
+    EventDataType_UserInputBitsetData,
+    EventDataType_SceneChangeData,
+    EventDataType_UIElementName
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesEventDataType() {
+  static const char * const names[5] = {
+    "NONE",
+    "UserInputBitsetData",
+    "SceneChangeData",
+    "UIElementName",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameEventDataType(EventDataType e) {
+  if (::flatbuffers::IsOutRange(e, EventDataType_NONE, EventDataType_UIElementName)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesEventDataType()[index];
+}
+
+template<typename T> struct EventDataTypeTraits {
+  static const EventDataType enum_value = EventDataType_NONE;
+};
+
+template<> struct EventDataTypeTraits<steamrot::UserInputBitsetData> {
+  static const EventDataType enum_value = EventDataType_UserInputBitsetData;
+};
+
+template<> struct EventDataTypeTraits<steamrot::SceneChangeDataFBS> {
+  static const EventDataType enum_value = EventDataType_SceneChangeData;
+};
+
+template<> struct EventDataTypeTraits<::flatbuffers::String> {
+  static const EventDataType enum_value = EventDataType_UIElementName;
+};
+
+bool VerifyEventDataType(::flatbuffers::Verifier &verifier, const void *obj, EventDataType type);
+bool VerifyEventDataTypeVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types);
+
 enum DataPopulateFunction : int8_t {
   DataPopulateFunction_None = 0,
   DataPopulateFunction_PopulateWithFragmentData = 1,
@@ -271,55 +328,67 @@ template<> struct UIElementDataUnionTraits<steamrot::DropDownButtonData> {
 bool VerifyUIElementDataUnion(::flatbuffers::Verifier &verifier, const void *obj, UIElementDataUnion type);
 bool VerifyUIElementDataUnionVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types);
 
-struct UIElementDataPackageData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef UIElementDataPackageDataBuilder Builder;
+struct SceneChangeDataFBS FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SceneChangeDataFBSBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_SCENE_TYPE = 4
+    VT_SCENE_TYPE = 4,
+    VT_SCENE_ID = 6
   };
-  const ::flatbuffers::String *scene_type() const {
-    return GetPointer<const ::flatbuffers::String *>(VT_SCENE_TYPE);
+  steamrot::SceneType scene_type() const {
+    return static_cast<steamrot::SceneType>(GetField<int8_t>(VT_SCENE_TYPE, 0));
+  }
+  const ::flatbuffers::String *scene_id() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_SCENE_ID);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_SCENE_TYPE) &&
-           verifier.VerifyString(scene_type()) &&
+           VerifyField<int8_t>(verifier, VT_SCENE_TYPE, 1) &&
+           VerifyOffset(verifier, VT_SCENE_ID) &&
+           verifier.VerifyString(scene_id()) &&
            verifier.EndTable();
   }
 };
 
-struct UIElementDataPackageDataBuilder {
-  typedef UIElementDataPackageData Table;
+struct SceneChangeDataFBSBuilder {
+  typedef SceneChangeDataFBS Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_scene_type(::flatbuffers::Offset<::flatbuffers::String> scene_type) {
-    fbb_.AddOffset(UIElementDataPackageData::VT_SCENE_TYPE, scene_type);
+  void add_scene_type(steamrot::SceneType scene_type) {
+    fbb_.AddElement<int8_t>(SceneChangeDataFBS::VT_SCENE_TYPE, static_cast<int8_t>(scene_type), 0);
   }
-  explicit UIElementDataPackageDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  void add_scene_id(::flatbuffers::Offset<::flatbuffers::String> scene_id) {
+    fbb_.AddOffset(SceneChangeDataFBS::VT_SCENE_ID, scene_id);
+  }
+  explicit SceneChangeDataFBSBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<UIElementDataPackageData> Finish() {
+  ::flatbuffers::Offset<SceneChangeDataFBS> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<UIElementDataPackageData>(end);
+    auto o = ::flatbuffers::Offset<SceneChangeDataFBS>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<UIElementDataPackageData> CreateUIElementDataPackageData(
+inline ::flatbuffers::Offset<SceneChangeDataFBS> CreateSceneChangeDataFBS(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::String> scene_type = 0) {
-  UIElementDataPackageDataBuilder builder_(_fbb);
+    steamrot::SceneType scene_type = steamrot::SceneType_TITLE,
+    ::flatbuffers::Offset<::flatbuffers::String> scene_id = 0) {
+  SceneChangeDataFBSBuilder builder_(_fbb);
+  builder_.add_scene_id(scene_id);
   builder_.add_scene_type(scene_type);
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<UIElementDataPackageData> CreateUIElementDataPackageDataDirect(
+inline ::flatbuffers::Offset<SceneChangeDataFBS> CreateSceneChangeDataFBSDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const char *scene_type = nullptr) {
-  auto scene_type__ = scene_type ? _fbb.CreateString(scene_type) : 0;
-  return steamrot::CreateUIElementDataPackageData(
+    steamrot::SceneType scene_type = steamrot::SceneType_TITLE,
+    const char *scene_id = nullptr) {
+  auto scene_id__ = scene_id ? _fbb.CreateString(scene_id) : 0;
+  return steamrot::CreateSceneChangeDataFBS(
       _fbb,
-      scene_type__);
+      scene_type,
+      scene_id__);
 }
 
 struct PanelData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -607,19 +676,27 @@ inline ::flatbuffers::Offset<DropDownButtonData> CreateDropDownButtonData(
 struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef UIElementDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_TYPE = 4,
-    VT_CHILDREN = 6,
-    VT_CHILDREN_ACTIVE = 8,
-    VT_LAYOUT = 10,
-    VT_SPACING_STRATEGY = 12,
-    VT_POSITION = 14,
-    VT_SIZE = 16,
-    VT_RATIO = 18,
-    VT_ELEMENT_TYPE = 20,
-    VT_ELEMENT = 22,
-    VT_ACTION = 24,
-    VT_DATA = 26
+    VT_NAME = 4,
+    VT_TYPE = 6,
+    VT_CHILDREN = 8,
+    VT_CHILDREN_ACTIVE = 10,
+    VT_LAYOUT = 12,
+    VT_SPACING_STRATEGY = 14,
+    VT_POSITION = 16,
+    VT_SIZE = 18,
+    VT_RATIO = 20,
+    VT_ELEMENT_TYPE = 22,
+    VT_ELEMENT = 24,
+    VT_TRIGGER_EVENT = 26,
+    VT_TRIGGER_EVENT_DATA_TYPE = 28,
+    VT_TRIGGER_EVENT_DATA = 30,
+    VT_RESPONSE_EVENT = 32,
+    VT_RESPONSE_EVENT_DATA_TYPE = 34,
+    VT_RESPONSE_EVENT_DATA = 36
   };
+  const ::flatbuffers::String *name() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_NAME);
+  }
   steamrot::UIElementType type() const {
     return static_cast<steamrot::UIElementType>(GetField<int8_t>(VT_TYPE, 0));
   }
@@ -669,14 +746,48 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::DropDownButtonData *element_as_DropDownButtonData() const {
     return element_type() == steamrot::UIElementDataUnion_DropDownButtonData ? static_cast<const steamrot::DropDownButtonData *>(element()) : nullptr;
   }
-  const steamrot::Action *action() const {
-    return GetPointer<const steamrot::Action *>(VT_ACTION);
+  steamrot::EventType trigger_event() const {
+    return static_cast<steamrot::EventType>(GetField<uint64_t>(VT_TRIGGER_EVENT, 0));
   }
-  const steamrot::UIElementDataPackageData *data() const {
-    return GetPointer<const steamrot::UIElementDataPackageData *>(VT_DATA);
+  steamrot::EventDataType trigger_event_data_type() const {
+    return static_cast<steamrot::EventDataType>(GetField<uint8_t>(VT_TRIGGER_EVENT_DATA_TYPE, 0));
+  }
+  const void *trigger_event_data() const {
+    return GetPointer<const void *>(VT_TRIGGER_EVENT_DATA);
+  }
+  template<typename T> const T *trigger_event_data_as() const;
+  const steamrot::UserInputBitsetData *trigger_event_data_as_UserInputBitsetData() const {
+    return trigger_event_data_type() == steamrot::EventDataType_UserInputBitsetData ? static_cast<const steamrot::UserInputBitsetData *>(trigger_event_data()) : nullptr;
+  }
+  const steamrot::SceneChangeDataFBS *trigger_event_data_as_SceneChangeData() const {
+    return trigger_event_data_type() == steamrot::EventDataType_SceneChangeData ? static_cast<const steamrot::SceneChangeDataFBS *>(trigger_event_data()) : nullptr;
+  }
+  const ::flatbuffers::String *trigger_event_data_as_UIElementName() const {
+    return trigger_event_data_type() == steamrot::EventDataType_UIElementName ? static_cast<const ::flatbuffers::String *>(trigger_event_data()) : nullptr;
+  }
+  steamrot::EventType response_event() const {
+    return static_cast<steamrot::EventType>(GetField<uint64_t>(VT_RESPONSE_EVENT, 0));
+  }
+  steamrot::EventDataType response_event_data_type() const {
+    return static_cast<steamrot::EventDataType>(GetField<uint8_t>(VT_RESPONSE_EVENT_DATA_TYPE, 0));
+  }
+  const void *response_event_data() const {
+    return GetPointer<const void *>(VT_RESPONSE_EVENT_DATA);
+  }
+  template<typename T> const T *response_event_data_as() const;
+  const steamrot::UserInputBitsetData *response_event_data_as_UserInputBitsetData() const {
+    return response_event_data_type() == steamrot::EventDataType_UserInputBitsetData ? static_cast<const steamrot::UserInputBitsetData *>(response_event_data()) : nullptr;
+  }
+  const steamrot::SceneChangeDataFBS *response_event_data_as_SceneChangeData() const {
+    return response_event_data_type() == steamrot::EventDataType_SceneChangeData ? static_cast<const steamrot::SceneChangeDataFBS *>(response_event_data()) : nullptr;
+  }
+  const ::flatbuffers::String *response_event_data_as_UIElementName() const {
+    return response_event_data_type() == steamrot::EventDataType_UIElementName ? static_cast<const ::flatbuffers::String *>(response_event_data()) : nullptr;
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_NAME) &&
+           verifier.VerifyString(name()) &&
            VerifyField<int8_t>(verifier, VT_TYPE, 1) &&
            VerifyOffset(verifier, VT_CHILDREN) &&
            verifier.VerifyVector(children()) &&
@@ -692,10 +803,14 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_ELEMENT_TYPE, 1) &&
            VerifyOffsetRequired(verifier, VT_ELEMENT) &&
            VerifyUIElementDataUnion(verifier, element(), element_type()) &&
-           VerifyOffset(verifier, VT_ACTION) &&
-           verifier.VerifyTable(action()) &&
-           VerifyOffset(verifier, VT_DATA) &&
-           verifier.VerifyTable(data()) &&
+           VerifyField<uint64_t>(verifier, VT_TRIGGER_EVENT, 8) &&
+           VerifyField<uint8_t>(verifier, VT_TRIGGER_EVENT_DATA_TYPE, 1) &&
+           VerifyOffset(verifier, VT_TRIGGER_EVENT_DATA) &&
+           VerifyEventDataType(verifier, trigger_event_data(), trigger_event_data_type()) &&
+           VerifyField<uint64_t>(verifier, VT_RESPONSE_EVENT, 8) &&
+           VerifyField<uint8_t>(verifier, VT_RESPONSE_EVENT_DATA_TYPE, 1) &&
+           VerifyOffset(verifier, VT_RESPONSE_EVENT_DATA) &&
+           VerifyEventDataType(verifier, response_event_data(), response_event_data_type()) &&
            verifier.EndTable();
   }
 };
@@ -724,10 +839,37 @@ template<> inline const steamrot::DropDownButtonData *UIElementData::element_as<
   return element_as_DropDownButtonData();
 }
 
+template<> inline const steamrot::UserInputBitsetData *UIElementData::trigger_event_data_as<steamrot::UserInputBitsetData>() const {
+  return trigger_event_data_as_UserInputBitsetData();
+}
+
+template<> inline const steamrot::SceneChangeDataFBS *UIElementData::trigger_event_data_as<steamrot::SceneChangeDataFBS>() const {
+  return trigger_event_data_as_SceneChangeData();
+}
+
+template<> inline const ::flatbuffers::String *UIElementData::trigger_event_data_as<::flatbuffers::String>() const {
+  return trigger_event_data_as_UIElementName();
+}
+
+template<> inline const steamrot::UserInputBitsetData *UIElementData::response_event_data_as<steamrot::UserInputBitsetData>() const {
+  return response_event_data_as_UserInputBitsetData();
+}
+
+template<> inline const steamrot::SceneChangeDataFBS *UIElementData::response_event_data_as<steamrot::SceneChangeDataFBS>() const {
+  return response_event_data_as_SceneChangeData();
+}
+
+template<> inline const ::flatbuffers::String *UIElementData::response_event_data_as<::flatbuffers::String>() const {
+  return response_event_data_as_UIElementName();
+}
+
 struct UIElementDataBuilder {
   typedef UIElementData Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
+  void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
+    fbb_.AddOffset(UIElementData::VT_NAME, name);
+  }
   void add_type(steamrot::UIElementType type) {
     fbb_.AddElement<int8_t>(UIElementData::VT_TYPE, static_cast<int8_t>(type), 0);
   }
@@ -758,11 +900,23 @@ struct UIElementDataBuilder {
   void add_element(::flatbuffers::Offset<void> element) {
     fbb_.AddOffset(UIElementData::VT_ELEMENT, element);
   }
-  void add_action(::flatbuffers::Offset<steamrot::Action> action) {
-    fbb_.AddOffset(UIElementData::VT_ACTION, action);
+  void add_trigger_event(steamrot::EventType trigger_event) {
+    fbb_.AddElement<uint64_t>(UIElementData::VT_TRIGGER_EVENT, static_cast<uint64_t>(trigger_event), 0);
   }
-  void add_data(::flatbuffers::Offset<steamrot::UIElementDataPackageData> data) {
-    fbb_.AddOffset(UIElementData::VT_DATA, data);
+  void add_trigger_event_data_type(steamrot::EventDataType trigger_event_data_type) {
+    fbb_.AddElement<uint8_t>(UIElementData::VT_TRIGGER_EVENT_DATA_TYPE, static_cast<uint8_t>(trigger_event_data_type), 0);
+  }
+  void add_trigger_event_data(::flatbuffers::Offset<void> trigger_event_data) {
+    fbb_.AddOffset(UIElementData::VT_TRIGGER_EVENT_DATA, trigger_event_data);
+  }
+  void add_response_event(steamrot::EventType response_event) {
+    fbb_.AddElement<uint64_t>(UIElementData::VT_RESPONSE_EVENT, static_cast<uint64_t>(response_event), 0);
+  }
+  void add_response_event_data_type(steamrot::EventDataType response_event_data_type) {
+    fbb_.AddElement<uint8_t>(UIElementData::VT_RESPONSE_EVENT_DATA_TYPE, static_cast<uint8_t>(response_event_data_type), 0);
+  }
+  void add_response_event_data(::flatbuffers::Offset<void> response_event_data) {
+    fbb_.AddOffset(UIElementData::VT_RESPONSE_EVENT_DATA, response_event_data);
   }
   explicit UIElementDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -778,6 +932,7 @@ struct UIElementDataBuilder {
 
 inline ::flatbuffers::Offset<UIElementData> CreateUIElementData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::String> name = 0,
     steamrot::UIElementType type = steamrot::UIElementType_None,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::UIElementData>>> children = 0,
     bool children_active = false,
@@ -788,16 +943,25 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementData(
     float ratio = 0.0f,
     steamrot::UIElementDataUnion element_type = steamrot::UIElementDataUnion_NONE,
     ::flatbuffers::Offset<void> element = 0,
-    ::flatbuffers::Offset<steamrot::Action> action = 0,
-    ::flatbuffers::Offset<steamrot::UIElementDataPackageData> data = 0) {
+    steamrot::EventType trigger_event = static_cast<steamrot::EventType>(0),
+    steamrot::EventDataType trigger_event_data_type = steamrot::EventDataType_NONE,
+    ::flatbuffers::Offset<void> trigger_event_data = 0,
+    steamrot::EventType response_event = static_cast<steamrot::EventType>(0),
+    steamrot::EventDataType response_event_data_type = steamrot::EventDataType_NONE,
+    ::flatbuffers::Offset<void> response_event_data = 0) {
   UIElementDataBuilder builder_(_fbb);
-  builder_.add_data(data);
-  builder_.add_action(action);
+  builder_.add_response_event(response_event);
+  builder_.add_trigger_event(trigger_event);
+  builder_.add_response_event_data(response_event_data);
+  builder_.add_trigger_event_data(trigger_event_data);
   builder_.add_element(element);
   builder_.add_ratio(ratio);
   builder_.add_size(size);
   builder_.add_position(position);
   builder_.add_children(children);
+  builder_.add_name(name);
+  builder_.add_response_event_data_type(response_event_data_type);
+  builder_.add_trigger_event_data_type(trigger_event_data_type);
   builder_.add_element_type(element_type);
   builder_.add_spacing_strategy(spacing_strategy);
   builder_.add_layout(layout);
@@ -808,6 +972,7 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementData(
 
 inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
+    const char *name = nullptr,
     steamrot::UIElementType type = steamrot::UIElementType_None,
     const std::vector<::flatbuffers::Offset<steamrot::UIElementData>> *children = nullptr,
     bool children_active = false,
@@ -818,11 +983,17 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
     float ratio = 0.0f,
     steamrot::UIElementDataUnion element_type = steamrot::UIElementDataUnion_NONE,
     ::flatbuffers::Offset<void> element = 0,
-    ::flatbuffers::Offset<steamrot::Action> action = 0,
-    ::flatbuffers::Offset<steamrot::UIElementDataPackageData> data = 0) {
+    steamrot::EventType trigger_event = static_cast<steamrot::EventType>(0),
+    steamrot::EventDataType trigger_event_data_type = steamrot::EventDataType_NONE,
+    ::flatbuffers::Offset<void> trigger_event_data = 0,
+    steamrot::EventType response_event = static_cast<steamrot::EventType>(0),
+    steamrot::EventDataType response_event_data_type = steamrot::EventDataType_NONE,
+    ::flatbuffers::Offset<void> response_event_data = 0) {
+  auto name__ = name ? _fbb.CreateString(name) : 0;
   auto children__ = children ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::UIElementData>>(*children) : 0;
   return steamrot::CreateUIElementData(
       _fbb,
+      name__,
       type,
       children__,
       children_active,
@@ -833,8 +1004,12 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
       ratio,
       element_type,
       element,
-      action,
-      data);
+      trigger_event,
+      trigger_event_data_type,
+      trigger_event_data,
+      response_event,
+      response_event_data_type,
+      response_event_data);
 }
 
 struct UserInterface FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -911,6 +1086,39 @@ inline ::flatbuffers::Offset<UserInterface> CreateUserInterfaceDirect(
       root_ui_element,
       ui_name__,
       start_visible);
+}
+
+inline bool VerifyEventDataType(::flatbuffers::Verifier &verifier, const void *obj, EventDataType type) {
+  switch (type) {
+    case EventDataType_NONE: {
+      return true;
+    }
+    case EventDataType_UserInputBitsetData: {
+      auto ptr = reinterpret_cast<const steamrot::UserInputBitsetData *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case EventDataType_SceneChangeData: {
+      auto ptr = reinterpret_cast<const steamrot::SceneChangeDataFBS *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case EventDataType_UIElementName: {
+      auto ptr = reinterpret_cast<const ::flatbuffers::String *>(obj);
+      return verifier.VerifyString(ptr);
+    }
+    default: return true;
+  }
+}
+
+inline bool VerifyEventDataTypeVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types) {
+  if (!values || !types) return !values && !types;
+  if (values->size() != types->size()) return false;
+  for (::flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
+    if (!VerifyEventDataType(
+        verifier,  values->Get(i), types->GetEnum<EventDataType>(i))) {
+      return false;
+    }
+  }
+  return true;
 }
 
 inline bool VerifyUIElementDataUnion(::flatbuffers::Verifier &verifier, const void *obj, UIElementDataUnion type) {

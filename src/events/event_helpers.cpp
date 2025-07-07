@@ -52,12 +52,13 @@ GetFlatbuffersToSFMLMouseMap() {
 };
 
 /////////////////////////////////////////////////
-const EventBitset ConvertActionKeysToEvent(const Action &action) {
+const UserInputBitset
+ConvertActionKeysToEvent(const UserInputBitsetData &data) {
 
   // create EventBitset that represents the keys for this action
-  EventBitset event_bitset{0};
-  if (action.keyboard_pressed()) {
-    for (const auto &key_pressed : *action.keyboard_pressed()) {
+  UserInputBitset event_bitset{0};
+  if (data.keyboard_pressed()) {
+    for (const auto &key_pressed : *data.keyboard_pressed()) {
       // not sure how to pull the enum straight out so just recasting it
       KeyboardInput key_pressed_cast = KeyboardInput(key_pressed);
       size_t bit_position = static_cast<size_t>(
@@ -67,8 +68,8 @@ const EventBitset ConvertActionKeysToEvent(const Action &action) {
       event_bitset.set(bit_position, true);
     }
   }
-  if (action.keyboard_released()) {
-    for (const auto &key_released : *action.keyboard_released()) {
+  if (data.keyboard_released()) {
+    for (const auto &key_released : *data.keyboard_released()) {
       // not sure how to pull the enum straight out so just recasting it
       KeyboardInput key_released_cast = KeyboardInput(key_released);
       size_t bit_position = static_cast<size_t>(
@@ -77,8 +78,8 @@ const EventBitset ConvertActionKeysToEvent(const Action &action) {
       event_bitset.set(bit_position + sf::Keyboard::KeyCount, true);
     }
   }
-  if (action.mouse_pressed()) {
-    for (const auto &mouse_pressed : *action.mouse_pressed()) {
+  if (data.mouse_pressed()) {
+    for (const auto &mouse_pressed : *data.mouse_pressed()) {
       // not sure how to pull the enum straight out so just recasting it
       MouseInput mouse_pressed_cast = MouseInput(mouse_pressed);
       size_t bit_position = static_cast<size_t>(
@@ -87,8 +88,8 @@ const EventBitset ConvertActionKeysToEvent(const Action &action) {
       event_bitset.set(bit_position + sf::Keyboard::KeyCount * 2, true);
     }
   }
-  if (action.mouse_released()) {
-    for (const auto &mouse_released : *action.mouse_released()) {
+  if (data.mouse_released()) {
+    for (const auto &mouse_released : *data.mouse_released()) {
       // not sure how to pull the enum straight out so just recasting it
       MouseInput mouse_released_cast = MouseInput(mouse_released);
       size_t bit_position = static_cast<size_t>(

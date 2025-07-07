@@ -28,11 +28,6 @@ private:
   CraftingScene(const size_t pool_size, const SceneData *scene_data,
                 const uuids::uuid &id, const GameContext game_context);
 
-  /////////////////////////////////////////////////
-  /// @brief Actions taken by the CraftingScene
-  /////////////////////////////////////////////////
-  void ProcessActions() override;
-
 public:
   /////////////////////////////////////////////////
   /// @brief Systems for dealing with events and actions in the CraftingScene

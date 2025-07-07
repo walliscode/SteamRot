@@ -1,10 +1,10 @@
 #pragma once
 
-#include "actions_generated.h"
+#include "user_input_generated.h"
 #include <SFML/Graphics.hpp>
 #include <bitset>
 
-using EventBitset =
+using UserInputBitset =
     std::bitset<sf::Keyboard::KeyCount + sf::Keyboard::KeyCount +
                 sf::Mouse::ButtonCount + sf::Mouse::ButtonCount>;
 namespace steamrot {
@@ -28,5 +28,5 @@ GetFlatbuffersToSFMLMouseMap();
 ///
 /// @return [TODO:return]
 /////////////////////////////////////////////////
-const EventBitset ConvertActionKeysToEvent(const Action &action);
+const UserInputBitset ConvertActionKeysToEvent(const UserInputBitsetData &data);
 } // namespace steamrot

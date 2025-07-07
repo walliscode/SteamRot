@@ -5,6 +5,7 @@
 #include "steamrot_directory_paths.h"
 #include "themes_generated.h"
 #include <fstream>
+#include <iostream>
 #include <magic_enum/magic_enum.hpp>
 
 using json = nlohmann::json;
@@ -65,10 +66,23 @@ DataManager::ProvideThemeData(const std::string &theme_name) {
 ////////////////////////////////////////////////////////////
 const SceneData *DataManager::ProvideSceneData(const SceneType &scene_type) {
   // get string identifier for scene type
-  std::string scene_identifier = magic_enum::enum_name(scene_type).data();
+  std::string scene_identifier;
+
+  switch (scene_type) {
+  case SceneType::SceneType_TITLE: {
+    scene_identifier = "title";
+    break;
+  }
+  case SceneType::SceneType_CRAFTING: {
+    scene_identifier = "crafting";
+    break;
+  }
+  }
   // load scene data from binary into buffer
   char *scene_data =
       LoadBinaryData(getScenesFolder() / (scene_identifier + ".scenes.bin"));
+
+  std::cout << "Loading scene data for: " << scene_identifier << std::endl;
   // return flatbuffers data from binary buffer
   return GetSceneData(scene_data);
 }

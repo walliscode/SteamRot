@@ -5,14 +5,11 @@
 /////////////////////////////////////////////////
 #include "Button.h"
 #include "DropDown.h"
+#include "EventPacket.h"
 #include "Panel.h"
-#include "SceneType.h"
-#include "actions_generated.h"
-#include "event_helpers.h"
 #include "user_interface_generated.h"
 #include <SFML/Graphics.hpp>
 #include <optional>
-#include <string>
 #include <variant>
 #include <vector>
 namespace steamrot {
@@ -20,28 +17,8 @@ namespace steamrot {
 using ElementType = std::variant<Panel, Button, DropDownContainer, DropDownList,
                                  DropDownItem, DropDownButton>;
 
-/////////////////////////////////////////////////
-/// @class UIElementDataPackage
-/// @brief A bit of a catch all for the UI element data.
-///
-/// As the game develops, this can be split out, but we'll see how much data we
-/// need to store
-/////////////////////////////////////////////////
-struct UIElementDataPackage {
-
-  /////////////////////////////////////////////////
-  /// @brief Contains scene_type information, for when we want to switch to a
-  /// fresh scene.
-  /////////////////////////////////////////////////
-  std::optional<SceneType> scene_type{std::nullopt};
-
-  /////////////////////////////////////////////////
-  /// @brief Choices for the DropDown UIElement. String for now but will
-  /// probably become a custom struct so we can add pictures
-  /////////////////////////////////////////////////
-  std::optional<std::vector<std::string>> drop_down_choices{std::nullopt};
-};
 struct UIElement {
+  std::string name{"UIElement"};
 
   /////////////////////////////////////////////////
   /// @brief UIELement type, contains extra data for the element, can only be
@@ -97,23 +74,23 @@ struct UIElement {
   bool children_active{false};
 
   /////////////////////////////////////////////////
-  /// @brief Trigger event for the UI element
-  ///
-  /// This is designed to be used in conjuction with the ActionNames. If
-  /// trigger_event is true then signal the action
+  /// @brief Event that triggers this UIELement
   /////////////////////////////////////////////////
-  EventBitset trigger_event{0};
+  EventType trigger_event{EventType::EventType_NONE};
 
   /////////////////////////////////////////////////
-  /// @brief Action that should be performed when the UI Element is interacted
-  /// with
+  /// @brief Optional data package to check against the trigger event.
   /////////////////////////////////////////////////
-  ActionNames action{0};
+  EventData trigger_event_data{std::monostate{}};
 
   /////////////////////////////////////////////////
-  /// @brief Data package for the UI element, all members should be optional so
-  /// test with if statements
+  /// @brief Potential response event that is sent to the EventBus
   /////////////////////////////////////////////////
-  UIElementDataPackage ui_data_package{};
+  EventType response_event{EventType::EventType_NONE};
+
+  /////////////////////////////////////////////////
+  /// @brief Optional data package to be associated with the response event.
+  /////////////////////////////////////////////////
+  EventData response_event_data{std::monostate{}};
 };
 } // namespace steamrot

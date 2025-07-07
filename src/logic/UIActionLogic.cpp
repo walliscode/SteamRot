@@ -12,11 +12,14 @@
 #include "EntityHelpers.h"
 #include "UIElement.h"
 #include "UIElementFactory.h"
+#include "event_helpers.h"
+#include "events_generated.h"
 #include "user_interface_generated.h"
 
 #include <SFML/Window/Mouse.hpp>
 #include <iostream>
 #include <magic_enum/magic_enum.hpp>
+#include <variant>
 #include <vector>
 
 using namespace magic_enum::bitwise_operators;
@@ -43,49 +46,126 @@ void UIActionLogic::ProcessLogic() {
       CUserInterface &ui_component = GetComponent<CUserInterface>(
           entity_id, m_logic_context.scene_entities);
 
-      ProcessMouseEvents(ui_component);
+      ProcessEvents(ui_component);
     }
   }
 }
-
 /////////////////////////////////////////////////
-void UIActionLogic::ProcessMouseEvents(CUserInterface &ui_component) {
-  RecursiveProcessMouseEvents(ui_component.m_root_element);
+void UIActionLogic::ProcessEvents(CUserInterface &ui_component) {
+  // print out the size of the event bus for debugging if it is greater than 1
+  // cycle through EventBus
+  for (auto const &event : m_logic_context.event_handler.GetEventBus()) {
+    // print the event type for debugging, except for EVENT_USER_INPUT
+    if (event.m_event_type != EventType::EventType_EVENT_USER_INPUT) {
+    }
+    RecursiveProcessEvents(ui_component.m_root_element, event);
+  }
 }
-
 /////////////////////////////////////////////////
-void UIActionLogic::RecursiveProcessMouseEvents(UIElement &element) {
+void UIActionLogic::RecursiveProcessEvents(UIElement &ui_element,
+                                           const EventPacket &event) {
 
-  // Process mouse events for the current element
-  if (element.mouse_over) {
+  // guard statement to check if the event is a trigger event for the ui
+  // element
 
-    // check if elements even has been triggered (bitwise operations)
-    // print out trigger event and user events
+  if (ui_element.trigger_event != event.m_event_type) {
+    // check children
+    for (UIElement &child : ui_element.child_elements) {
+      RecursiveProcessEvents(child, event);
+    }
+    // return early if the event is not a trigger event for the ui element
+    return;
+  }
 
-    bool event_triggered =
-        (element.trigger_event & m_logic_context.user_events) != 0;
+  // If the event is a user input event, process it
+  // Process relevant events
+  switch (event.m_event_type) {
 
-    if (event_triggered) {
-      // match LogicAction to the element action
-      // we want to overwrite the current logic action as we only want one
-      // action per tick
-      std::cout << "Mouse event triggered for element: "
-                << magic_enum::enum_name(element.action) << std::endl;
+  case (EventType::EventType_EVENT_USER_INPUT): {
 
-      // pass through local action processing first (e.g. stays at Element
-      // level)
-      bool is_local_action = LocalUIActions(element);
+    // check if any data is present
+    if (std::holds_alternative<UserInputBitset>(event.m_event_data)) {
 
-      // if it is a local action then it is not passed to the LogicBus
-      if (!is_local_action) {
-        m_logic_action = element.action;
-        m_logic_data.ui_data_package = element.ui_data_package;
+      // Check if the event data is of type UserInputBitset
+      if (std::holds_alternative<UserInputBitset>(event.m_event_data)) {
+        UserInputBitset user_input_data =
+            std::get<UserInputBitset>(event.m_event_data);
+
+        // call functions which required user input data
+        ProcessMouseEvents(ui_element, user_input_data);
       }
     }
+    break;
   }
-  // Recursively process child elements
-  for (UIElement &child : element.child_elements) {
-    RecursiveProcessMouseEvents(child);
+  case (EventType::EventType_EVENT_TOGGLE_DROPDOWN): {
+    // check if any data is present
+    if (!std::holds_alternative<std::monostate>(event.m_event_data)) {
+
+      // Check if the event data is of type UIElementName
+      if (std::holds_alternative<UIElementName>(event.m_event_data)) {
+
+        UIElementName element_name =
+            std::get<UIElementName>(event.m_event_data);
+
+        // check if the element name matches the current element
+        if (ui_element.name == element_name) {
+
+          // check if ui element type is a DropDownContainer
+          if (std::holds_alternative<DropDownList>(ui_element.element_type) ||
+              std::holds_alternative<DropDownButton>(ui_element.element_type)) {
+            // call the toggle drop down function
+            ToggleDropDown(ui_element);
+          }
+        }
+      }
+    }
+    break;
+  }
+
+  default:
+    break;
+  }
+}
+
+/////////////////////////////////////////////////
+void UIActionLogic::ProcessMouseEvents(UIElement &element,
+                                       UserInputBitset &user_input) {
+
+  // check if the mouse is over the element
+  if (element.mouse_over) {
+
+    // default to no events matching
+    bool events_match = false;
+
+    // check that the element data is populated
+    if (!std::holds_alternative<std::monostate>(element.trigger_event_data)) {
+
+      // get the trigger event data
+      auto &trigger_event_data = element.trigger_event_data;
+
+      // check that the trigger event data is of type UserInputBitset
+      if (std::holds_alternative<UserInputBitset>(trigger_event_data)) {
+        UserInputBitset trigger_data =
+            std::get<UserInputBitset>(trigger_event_data);
+
+        // check that they match
+        events_match = (trigger_data & user_input) != 0;
+      }
+    }
+    if (events_match) {
+      // if events match generate a new event packet to add to the event bus
+      EventPacket event_packet{2};
+      event_packet.m_event_type = element.response_event;
+      event_packet.m_event_data = element.response_event_data;
+
+      // print out the EventPacket for debugging
+      std::cout << "Generated EventPacket: "
+                << "EventType: "
+                << magic_enum::enum_name(event_packet.m_event_type)
+                << ", EventData: " << event_packet.m_event_data.index()
+                << std::endl;
+      m_logic_context.event_handler.AddEvent(event_packet);
+    }
   }
 }
 
@@ -100,7 +180,7 @@ bool UIActionLogic::LocalUIActions(UIElement &element) {
     using ElementType = std::decay_t<decltype(element_type)>;
     if constexpr (std::is_same_v<ElementType, DropDownContainer>) {
       // Handle DropDown specific logic
-      HandleDropDownContainerActions(element);
+      ToggleDropDown(element);
 
     } else {
       // If the type is not recognized, we can set has_local_action to false
@@ -141,82 +221,47 @@ std::vector<std::string> UIActionLogic::GetAvailableFragments() {
   return available_fragments;
 }
 /////////////////////////////////////////////////
-void UIActionLogic::HandleDropDownContainerActions(UIElement &element) {
-  DropDownContainer &drop_down_container =
-      std::get<DropDownContainer>(element.element_type);
+void UIActionLogic::ToggleDropDown(UIElement &element) {
+  auto toggle_element = [&](UIElement &element) {
+    std::visit(
+        [&](auto &actual_elem_type) {
+          using T = std::decay_t<decltype(actual_elem_type)>;
+          if constexpr (std::is_same_v<T, DropDownList>) {
+            actual_elem_type.is_expanded = !actual_elem_type.is_expanded;
+            element.children_active = actual_elem_type.is_expanded;
 
-  switch (element.action) {
-  case ActionNames::ActionNames_ACTION_TOGGLE_DROP_DOWN: {
-    drop_down_container.is_expanded = !drop_down_container.is_expanded;
+            if (actual_elem_type.is_expanded) {
+              UIElementFactory ui_element_factory;
+              std::vector<std::string> available_fragments;
 
-    auto toggle_child_elements = [&](UIElement &child) {
-      std::visit(
-          [&](auto &actual_elem_type) {
-            using T = std::decay_t<decltype(actual_elem_type)>;
-            if constexpr (std::is_same_v<T, DropDownList>) {
-
-              actual_elem_type.is_expanded = !actual_elem_type.is_expanded;
-              child.children_active = actual_elem_type.is_expanded;
-
-              // if the drop down is expanded, we want to populate the list
-              if (actual_elem_type.is_expanded) {
-
-                // create instance of the UIElementFactory
-                UIElementFactory ui_element_factory;
-
-                // create a vector of available fragment names and populate
-                std::vector<std::string> available_fragments;
-
-                switch (actual_elem_type.data_populate_function) {
-                case DataPopulateFunction_PopulateWithFragmentData: {
-                  std::cout << "Populating DropDownList with fragment data."
-                            << std::endl;
-                  available_fragments = GetAvailableFragments();
-                }
-
-                default: {
-                  break;
-                }
-                }
-
-                // Create new DropDownItem for each available fragment
-                for (const std::string &fragment_name : available_fragments) {
-                  // Create a new UIElement for the DropDownItem
-                  UIElement drop_down_item_element =
-                      ui_element_factory.CreateDropDownItem();
-                  // Configure the DropDownItem properties
-                  drop_down_item_element.element_type =
-                      DropDownItem{fragment_name};
-                  // add the DropDownItem to the child elements
-                  child.child_elements.push_back(drop_down_item_element);
-                }
-                // } else {
-                //   // Clear the dropdown list if it is not expanded
-                //   child.child_elements.clear();
-              } else {
-                // Clear the dropdown list if it is not expanded
-                child.child_elements.clear();
+              switch (actual_elem_type.data_populate_function) {
+              case DataPopulateFunction_PopulateWithFragmentData:
+                std::cout << "Populating DropDownList with fragment data."
+                          << std::endl;
+                available_fragments = GetAvailableFragments();
+                break;
+              default:
+                break;
               }
 
-            } else if constexpr (std::is_same_v<T, DropDownButton>) {
-              actual_elem_type.is_expanded = !actual_elem_type.is_expanded;
-
+              for (const std::string &fragment_name : available_fragments) {
+                UIElement drop_down_item_element =
+                    ui_element_factory.CreateDropDownItem();
+                drop_down_item_element.element_type =
+                    DropDownItem{fragment_name};
+                element.child_elements.push_back(drop_down_item_element);
+              }
             } else {
-              std::cout << "Unknown element type in DropDownContainer: "
-                        << magic_enum::enum_name(child.action) << std::endl;
+              element.child_elements.clear();
             }
-          },
-          child.element_type);
-    };
+          } else if constexpr (std::is_same_v<T, DropDownButton>) {
+            actual_elem_type.is_expanded = !actual_elem_type.is_expanded;
+          }
+        },
+        element.element_type);
+  };
 
-    for (UIElement &child : element.child_elements) {
-      toggle_child_elements(child);
-    }
-    break;
-  }
-  default:
-    break;
-  }
+  // Call the lambda for the given element
+  toggle_element(element);
 }
-
 } // namespace steamrot

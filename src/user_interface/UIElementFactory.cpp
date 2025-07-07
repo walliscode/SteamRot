@@ -4,7 +4,9 @@
 /////////////////////////////////////////////////
 #include "UIElementFactory.h"
 #include "DropDown.h"
+#include "event_helpers.h"
 #include "user_interface_generated.h"
+#include "uuid.h"
 #include <iostream>
 
 namespace steamrot {
@@ -107,6 +109,10 @@ UIElementFactory::ConfigureGeneralUIElement(const UIElementData &element) {
   UIElement ui_element;
   // general configuration for the UIElement (only variables specificied in
   // the UIElement struct)
+
+  if (element.name()) {
+    ui_element.name = element.name()->str();
+  }
   ui_element.layout = element.layout();
 
   if (element.spacing_strategy()) {
@@ -132,27 +138,18 @@ UIElementFactory::ConfigureGeneralUIElement(const UIElementData &element) {
     ui_element.children_active = element.children_active();
   }
 
-  if (element.action()) {
-    ui_element.action = element.action()->action_name();
-
-    // convert action keys to EventBitset
-    ui_element.trigger_event = ConvertActionKeysToEvent(*element.action());
+  if (element.trigger_event()) {
+    // convert the trigger event to an EventType enum
+    ui_element.trigger_event = element.trigger_event();
+    ui_element.trigger_event_data = ConfigureTriggerEventData(element);
   }
-  if (element.data()) {
 
-    // give it a scene type enum based on string (this needs to be switched to
-    // a fbs enum at some point)
-    if (element.data()->scene_type()) {
-
-      // Title scene type
-      if (element.data()->scene_type()->str() == "TITLE") {
-        ui_element.ui_data_package.scene_type = SceneType::title;
-        // Crafting scene type
-      } else if (element.data()->scene_type()->str() == "CRAFTING") {
-        ui_element.ui_data_package.scene_type = SceneType::crafting;
-      }
-    }
+  if (element.response_event()) {
+    // convert the response event to an EventType enum
+    ui_element.response_event = element.response_event();
+    ui_element.response_event_data = ConfigureResponseEventData(element);
   }
+
   return ui_element;
 }
 
@@ -227,5 +224,87 @@ UIElement UIElementFactory::CreateDropDownItem() {
   dropdown_item_element.element_type = DropDownItem{};
   // Set any additional properties as needed
   return dropdown_item_element;
+}
+
+/////////////////////////////////////////////////
+EventData
+UIElementFactory::ConfigureTriggerEventData(const UIElementData &element_data) {
+  // Create an EventData object based on the type
+  switch (element_data.trigger_event_data_type()) {
+
+  case EventDataType::EventDataType_UserInputBitsetData: {
+
+    UserInputBitset user_input_data = ConvertActionKeysToEvent(
+        *element_data.trigger_event_data_as_UserInputBitsetData());
+
+    return user_input_data;
+  }
+  case EventDataType::EventDataType_SceneChangeData: {
+
+    SceneChangeData scene_change_data;
+    if (element_data.trigger_event_data_as_SceneChangeData()) {
+      const auto &data = *element_data.trigger_event_data_as_SceneChangeData();
+      if (data.scene_id()) {
+
+        // the scene_id is optional and so is the return value form the
+        // uuids::uuid::from_string method. Not sure if this is sensible to
+        // directly cast it in
+        scene_change_data.first =
+            uuids::uuid::from_string(data.scene_id()->str()).value();
+      }
+      scene_change_data.second = data.scene_type();
+    }
+    return scene_change_data;
+  }
+  case EventDataType::EventDataType_UIElementName: {
+
+    UIElementName ui_element_name;
+
+    if (element_data.trigger_event_data_as_UIElementName()) {
+      ui_element_name =
+          element_data.trigger_event_data_as_UIElementName()->str();
+    }
+    return ui_element_name;
+  }
+  default:
+    return std::monostate{};
+  }
+}
+/////////////////////////////////////////////////
+EventData UIElementFactory::ConfigureResponseEventData(
+    const UIElementData &element_data) {
+  // Create an EventData object based on the type
+  switch (element_data.response_event_data_type()) {
+  case EventDataType::EventDataType_UserInputBitsetData: {
+    UserInputBitset user_input_data = ConvertActionKeysToEvent(
+        *element_data.response_event_data_as_UserInputBitsetData());
+    return user_input_data;
+  }
+  case EventDataType::EventDataType_SceneChangeData: {
+    SceneChangeData scene_change_data;
+    if (element_data.response_event_data_as_SceneChangeData()) {
+      const auto &data = *element_data.response_event_data_as_SceneChangeData();
+      if (data.scene_id()) {
+        // the scene_id is optional and so is the return value form the
+        // uuids::uuid::from_string method. Not sure if this is sensible to
+        // directly cast it in
+        scene_change_data.first =
+            uuids::uuid::from_string(data.scene_id()->str()).value();
+      }
+      scene_change_data.second = data.scene_type();
+    }
+    return scene_change_data;
+  }
+  case EventDataType::EventDataType_UIElementName: {
+    UIElementName ui_element_name;
+    if (element_data.response_event_data_as_UIElementName()) {
+      ui_element_name =
+          element_data.response_event_data_as_UIElementName()->str();
+    }
+    return ui_element_name;
+  }
+  default:
+    return std::monostate{};
+  }
 }
 } // namespace steamrot

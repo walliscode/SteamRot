@@ -13,7 +13,6 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
-#include "actions_generated.h"
 #include "assets_generated.h"
 #include "entities_generated.h"
 #include "logics_generated.h"
@@ -26,15 +25,11 @@ struct SceneDataBuilder;
 struct SceneData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef SceneDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_ACTIONS = 4,
-    VT_ENTITY_COLLECTION = 6,
-    VT_LOGIC_COLLECTION = 8,
-    VT_UI_THEME = 10,
-    VT_ASSETS = 12
+    VT_ENTITY_COLLECTION = 4,
+    VT_LOGIC_COLLECTION = 6,
+    VT_UI_THEME = 8,
+    VT_ASSETS = 10
   };
-  const steamrot::ActionsData *actions() const {
-    return GetPointer<const steamrot::ActionsData *>(VT_ACTIONS);
-  }
   const steamrot::EntityCollection *entity_collection() const {
     return GetPointer<const steamrot::EntityCollection *>(VT_ENTITY_COLLECTION);
   }
@@ -49,8 +44,6 @@ struct SceneData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_ACTIONS) &&
-           verifier.VerifyTable(actions()) &&
            VerifyOffset(verifier, VT_ENTITY_COLLECTION) &&
            verifier.VerifyTable(entity_collection()) &&
            VerifyOffset(verifier, VT_LOGIC_COLLECTION) &&
@@ -67,9 +60,6 @@ struct SceneDataBuilder {
   typedef SceneData Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_actions(::flatbuffers::Offset<steamrot::ActionsData> actions) {
-    fbb_.AddOffset(SceneData::VT_ACTIONS, actions);
-  }
   void add_entity_collection(::flatbuffers::Offset<steamrot::EntityCollection> entity_collection) {
     fbb_.AddOffset(SceneData::VT_ENTITY_COLLECTION, entity_collection);
   }
@@ -96,7 +86,6 @@ struct SceneDataBuilder {
 
 inline ::flatbuffers::Offset<SceneData> CreateSceneData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<steamrot::ActionsData> actions = 0,
     ::flatbuffers::Offset<steamrot::EntityCollection> entity_collection = 0,
     ::flatbuffers::Offset<steamrot::LogicCollection> logic_collection = 0,
     ::flatbuffers::Offset<::flatbuffers::String> ui_theme = 0,
@@ -106,13 +95,11 @@ inline ::flatbuffers::Offset<SceneData> CreateSceneData(
   builder_.add_ui_theme(ui_theme);
   builder_.add_logic_collection(logic_collection);
   builder_.add_entity_collection(entity_collection);
-  builder_.add_actions(actions);
   return builder_.Finish();
 }
 
 inline ::flatbuffers::Offset<SceneData> CreateSceneDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<steamrot::ActionsData> actions = 0,
     ::flatbuffers::Offset<steamrot::EntityCollection> entity_collection = 0,
     ::flatbuffers::Offset<steamrot::LogicCollection> logic_collection = 0,
     const char *ui_theme = nullptr,
@@ -120,7 +107,6 @@ inline ::flatbuffers::Offset<SceneData> CreateSceneDataDirect(
   auto ui_theme__ = ui_theme ? _fbb.CreateString(ui_theme) : 0;
   return steamrot::CreateSceneData(
       _fbb,
-      actions,
       entity_collection,
       logic_collection,
       ui_theme__,

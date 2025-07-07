@@ -2,7 +2,7 @@
 set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/themes.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/scenes.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/actions.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/user_input.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/entities.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/logics.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/types.fbs
@@ -11,6 +11,9 @@ set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/assets.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/fragments.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/joints.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/events.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/scene_types.fbs
+
 )
 
 set(generated_headers)
