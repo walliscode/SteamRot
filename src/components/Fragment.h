@@ -5,10 +5,17 @@
 
 #pragma once
 
+#include "fragments_generated.h"
 #include <SFML/Graphics/ConvexShape.hpp>
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 
+namespace steamrot {
+/////////////////////////////////////////////////
+/// @class Fragment
+/// @brief Contains the data for a Fragment in the Grimoire Machina.
+///
+/////////////////////////////////////////////////
 struct Fragment {
   /////////////////////////////////////////////////
   /// @brief Local positions of the Fragmens's sockets
@@ -21,10 +28,10 @@ struct Fragment {
   sf::Transform m_transform;
 
   /////////////////////////////////////////////////
-  /// @brief Designed to be draw over a skeletal mesh so it is separate from
-  /// calculations
+  /// @brief Contains all the render overlays for this fragment, describing each
+  /// possible view.
   /////////////////////////////////////////////////
-  sf::VertexArray m_render_overlay;
+  std::unordered_map<ViewDirection, sf::VertexArray> m_overlays;
 
   /////////////////////////////////////////////////
   /// @brief Maps render vertices to sockets
@@ -35,3 +42,4 @@ struct Fragment {
   /////////////////////////////////////////////////
   std::vector<uint8_t> m_render_vertex_to_socket_map;
 };
+} // namespace steamrot

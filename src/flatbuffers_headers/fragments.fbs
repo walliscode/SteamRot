@@ -2,15 +2,21 @@ include "types.fbs";
 
 namespace steamrot;
 
+enum ViewDirection: ubyte {
+FRONT = 0,
+  }
 
+table View {
+    triangles : [Triangle] (required);
+    direction : ViewDirection;
+  }
 
 table SocketData{
   vertices: [Vector2f] (required);
   }
 
 table RenderOverlayData {
-  vertices : [Vector2f] (required);
-  color: Color (required);
+  views: [View] (required);
   
 }
 

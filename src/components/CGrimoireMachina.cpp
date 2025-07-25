@@ -69,6 +69,9 @@ void CGrimoireMachina::ConfigureFragment(const FragmentData *fragment_data) {
   }
 
   // deal with render overlay
+
+  for (const auto view : *fragment_data->render_overlay_data()->views()) {
+  }
   // color is constant across all vertices in the render overlay
   sf::Color overlay_color(fragment_data->render_overlay_data()->color()->r(),
                           fragment_data->render_overlay_data()->color()->g(),
