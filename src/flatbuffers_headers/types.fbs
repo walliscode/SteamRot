@@ -12,3 +12,14 @@ struct Color {
     b:uint8;
     a:uint8;
   }
+
+
+table Vertex {
+  position: Vector2f (required);
+  color: Color (required);
+}
+
+
+table Triangle {
+vertices: [Vertex];
+  }

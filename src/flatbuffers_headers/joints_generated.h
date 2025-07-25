@@ -17,85 +17,25 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
-struct Triangle;
-struct TriangleBuilder;
-
 struct JoinRenderOverlay;
 struct JoinRenderOverlayBuilder;
 
 struct JointData;
 struct JointDataBuilder;
 
-struct Triangle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef TriangleBuilder Builder;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_VERTICES = 4
-  };
-  const ::flatbuffers::Vector<::flatbuffers::Offset<Vector2f>> *vertices() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Vector2f>> *>(VT_VERTICES);
-  }
-  bool Verify(::flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_VERTICES) &&
-           verifier.VerifyVector(vertices()) &&
-           verifier.VerifyVectorOfTables(vertices()) &&
-           verifier.EndTable();
-  }
-};
-
-struct TriangleBuilder {
-  typedef Triangle Table;
-  ::flatbuffers::FlatBufferBuilder &fbb_;
-  ::flatbuffers::uoffset_t start_;
-  void add_vertices(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Vector2f>>> vertices) {
-    fbb_.AddOffset(Triangle::VT_VERTICES, vertices);
-  }
-  explicit TriangleBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  ::flatbuffers::Offset<Triangle> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<Triangle>(end);
-    return o;
-  }
-};
-
-inline ::flatbuffers::Offset<Triangle> CreateTriangle(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Vector2f>>> vertices = 0) {
-  TriangleBuilder builder_(_fbb);
-  builder_.add_vertices(vertices);
-  return builder_.Finish();
-}
-
-inline ::flatbuffers::Offset<Triangle> CreateTriangleDirect(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<Vector2f>> *vertices = nullptr) {
-  auto vertices__ = vertices ? _fbb.CreateVector<::flatbuffers::Offset<Vector2f>>(*vertices) : 0;
-  return steamrot::CreateTriangle(
-      _fbb,
-      vertices__);
-}
-
 struct JoinRenderOverlay FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef JoinRenderOverlayBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_TRIANGLES = 4,
-    VT_COLOR = 6
+    VT_TRIANGLES = 4
   };
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Triangle>> *triangles() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Triangle>> *>(VT_TRIANGLES);
-  }
-  const Color *color() const {
-    return GetStruct<const Color *>(VT_COLOR);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<Triangle>> *triangles() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Triangle>> *>(VT_TRIANGLES);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_TRIANGLES) &&
            verifier.VerifyVector(triangles()) &&
            verifier.VerifyVectorOfTables(triangles()) &&
-           VerifyField<Color>(verifier, VT_COLOR, 1) &&
            verifier.EndTable();
   }
 };
@@ -104,11 +44,8 @@ struct JoinRenderOverlayBuilder {
   typedef JoinRenderOverlay Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_triangles(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Triangle>>> triangles) {
+  void add_triangles(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Triangle>>> triangles) {
     fbb_.AddOffset(JoinRenderOverlay::VT_TRIANGLES, triangles);
-  }
-  void add_color(const Color *color) {
-    fbb_.AddStruct(JoinRenderOverlay::VT_COLOR, color);
   }
   explicit JoinRenderOverlayBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -124,23 +61,19 @@ struct JoinRenderOverlayBuilder {
 
 inline ::flatbuffers::Offset<JoinRenderOverlay> CreateJoinRenderOverlay(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Triangle>>> triangles = 0,
-    const Color *color = nullptr) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Triangle>>> triangles = 0) {
   JoinRenderOverlayBuilder builder_(_fbb);
-  builder_.add_color(color);
   builder_.add_triangles(triangles);
   return builder_.Finish();
 }
 
 inline ::flatbuffers::Offset<JoinRenderOverlay> CreateJoinRenderOverlayDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<steamrot::Triangle>> *triangles = nullptr,
-    const Color *color = nullptr) {
-  auto triangles__ = triangles ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::Triangle>>(*triangles) : 0;
+    const std::vector<::flatbuffers::Offset<Triangle>> *triangles = nullptr) {
+  auto triangles__ = triangles ? _fbb.CreateVector<::flatbuffers::Offset<Triangle>>(*triangles) : 0;
   return steamrot::CreateJoinRenderOverlay(
       _fbb,
-      triangles__,
-      color);
+      triangles__);
 }
 
 struct JointData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {

@@ -18,6 +18,12 @@ struct Vector2fBuilder;
 
 struct Color;
 
+struct Vertex;
+struct VertexBuilder;
+
+struct Triangle;
+struct TriangleBuilder;
+
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(1) Color FLATBUFFERS_FINAL_CLASS {
  private:
   uint8_t r_;
@@ -102,6 +108,112 @@ inline ::flatbuffers::Offset<Vector2f> CreateVector2f(
   builder_.add_y(y);
   builder_.add_x(x);
   return builder_.Finish();
+}
+
+struct Vertex FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef VertexBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_POSITION = 4,
+    VT_COLOR = 6
+  };
+  const Vector2f *position() const {
+    return GetPointer<const Vector2f *>(VT_POSITION);
+  }
+  const Color *color() const {
+    return GetStruct<const Color *>(VT_COLOR);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_POSITION) &&
+           verifier.VerifyTable(position()) &&
+           VerifyFieldRequired<Color>(verifier, VT_COLOR, 1) &&
+           verifier.EndTable();
+  }
+};
+
+struct VertexBuilder {
+  typedef Vertex Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_position(::flatbuffers::Offset<Vector2f> position) {
+    fbb_.AddOffset(Vertex::VT_POSITION, position);
+  }
+  void add_color(const Color *color) {
+    fbb_.AddStruct(Vertex::VT_COLOR, color);
+  }
+  explicit VertexBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<Vertex> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<Vertex>(end);
+    fbb_.Required(o, Vertex::VT_POSITION);
+    fbb_.Required(o, Vertex::VT_COLOR);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<Vertex> CreateVertex(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<Vector2f> position = 0,
+    const Color *color = nullptr) {
+  VertexBuilder builder_(_fbb);
+  builder_.add_color(color);
+  builder_.add_position(position);
+  return builder_.Finish();
+}
+
+struct Triangle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef TriangleBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_VERTICES = 4
+  };
+  const ::flatbuffers::Vector<::flatbuffers::Offset<Vertex>> *vertices() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Vertex>> *>(VT_VERTICES);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_VERTICES) &&
+           verifier.VerifyVector(vertices()) &&
+           verifier.VerifyVectorOfTables(vertices()) &&
+           verifier.EndTable();
+  }
+};
+
+struct TriangleBuilder {
+  typedef Triangle Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_vertices(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Vertex>>> vertices) {
+    fbb_.AddOffset(Triangle::VT_VERTICES, vertices);
+  }
+  explicit TriangleBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<Triangle> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<Triangle>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<Triangle> CreateTriangle(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Vertex>>> vertices = 0) {
+  TriangleBuilder builder_(_fbb);
+  builder_.add_vertices(vertices);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<Triangle> CreateTriangleDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<::flatbuffers::Offset<Vertex>> *vertices = nullptr) {
+  auto vertices__ = vertices ? _fbb.CreateVector<::flatbuffers::Offset<Vertex>>(*vertices) : 0;
+  return CreateTriangle(
+      _fbb,
+      vertices__);
 }
 
 #endif  // FLATBUFFERS_GENERATED_TYPES_H_

@@ -8,6 +8,7 @@
 #include "ArchetypeManager.h"
 #include "CGrimoireMachina.h"
 #include "EntityHelpers.h"
+#include "fragments_generated.h"
 #include "log_handler.h"
 
 namespace steamrot {
@@ -77,7 +78,8 @@ void CraftingRenderLogic::RenderJoint(Joint &joint) {
 void CraftingRenderLogic::RenderFragment(Fragment &fragment) {
 
   // should be as simple as applying the transform to the render overlay
-  m_logic_context.scene_texture.draw(fragment.m_render_overlay,
-                                     fragment.m_transform);
+  m_logic_context.scene_texture.draw(
+      fragment.m_overlays[ViewDirection::ViewDirection_FRONT],
+      fragment.m_transform);
 }
 } // namespace steamrot

@@ -17,6 +17,9 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
+struct View;
+struct ViewBuilder;
+
 struct SocketData;
 struct SocketDataBuilder;
 
@@ -25,6 +28,98 @@ struct RenderOverlayDataBuilder;
 
 struct FragmentData;
 struct FragmentDataBuilder;
+
+enum ViewDirection : uint8_t {
+  ViewDirection_FRONT = 0,
+  ViewDirection_MIN = ViewDirection_FRONT,
+  ViewDirection_MAX = ViewDirection_FRONT
+};
+
+inline const ViewDirection (&EnumValuesViewDirection())[1] {
+  static const ViewDirection values[] = {
+    ViewDirection_FRONT
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesViewDirection() {
+  static const char * const names[2] = {
+    "FRONT",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameViewDirection(ViewDirection e) {
+  if (::flatbuffers::IsOutRange(e, ViewDirection_FRONT, ViewDirection_FRONT)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesViewDirection()[index];
+}
+
+struct View FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef ViewBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_TRIANGLES = 4,
+    VT_DIRECTION = 6
+  };
+  const ::flatbuffers::Vector<::flatbuffers::Offset<Triangle>> *triangles() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Triangle>> *>(VT_TRIANGLES);
+  }
+  steamrot::ViewDirection direction() const {
+    return static_cast<steamrot::ViewDirection>(GetField<uint8_t>(VT_DIRECTION, 0));
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_TRIANGLES) &&
+           verifier.VerifyVector(triangles()) &&
+           verifier.VerifyVectorOfTables(triangles()) &&
+           VerifyField<uint8_t>(verifier, VT_DIRECTION, 1) &&
+           verifier.EndTable();
+  }
+};
+
+struct ViewBuilder {
+  typedef View Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_triangles(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Triangle>>> triangles) {
+    fbb_.AddOffset(View::VT_TRIANGLES, triangles);
+  }
+  void add_direction(steamrot::ViewDirection direction) {
+    fbb_.AddElement<uint8_t>(View::VT_DIRECTION, static_cast<uint8_t>(direction), 0);
+  }
+  explicit ViewBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<View> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<View>(end);
+    fbb_.Required(o, View::VT_TRIANGLES);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<View> CreateView(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Triangle>>> triangles = 0,
+    steamrot::ViewDirection direction = steamrot::ViewDirection_FRONT) {
+  ViewBuilder builder_(_fbb);
+  builder_.add_triangles(triangles);
+  builder_.add_direction(direction);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<View> CreateViewDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<::flatbuffers::Offset<Triangle>> *triangles = nullptr,
+    steamrot::ViewDirection direction = steamrot::ViewDirection_FRONT) {
+  auto triangles__ = triangles ? _fbb.CreateVector<::flatbuffers::Offset<Triangle>>(*triangles) : 0;
+  return steamrot::CreateView(
+      _fbb,
+      triangles__,
+      direction);
+}
 
 struct SocketData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef SocketDataBuilder Builder;
@@ -82,21 +177,16 @@ inline ::flatbuffers::Offset<SocketData> CreateSocketDataDirect(
 struct RenderOverlayData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef RenderOverlayDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_VERTICES = 4,
-    VT_COLOR = 6
+    VT_VIEWS = 4
   };
-  const ::flatbuffers::Vector<::flatbuffers::Offset<Vector2f>> *vertices() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Vector2f>> *>(VT_VERTICES);
-  }
-  const Color *color() const {
-    return GetStruct<const Color *>(VT_COLOR);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::View>> *views() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::View>> *>(VT_VIEWS);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffsetRequired(verifier, VT_VERTICES) &&
-           verifier.VerifyVector(vertices()) &&
-           verifier.VerifyVectorOfTables(vertices()) &&
-           VerifyFieldRequired<Color>(verifier, VT_COLOR, 1) &&
+           VerifyOffsetRequired(verifier, VT_VIEWS) &&
+           verifier.VerifyVector(views()) &&
+           verifier.VerifyVectorOfTables(views()) &&
            verifier.EndTable();
   }
 };
@@ -105,11 +195,8 @@ struct RenderOverlayDataBuilder {
   typedef RenderOverlayData Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_vertices(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Vector2f>>> vertices) {
-    fbb_.AddOffset(RenderOverlayData::VT_VERTICES, vertices);
-  }
-  void add_color(const Color *color) {
-    fbb_.AddStruct(RenderOverlayData::VT_COLOR, color);
+  void add_views(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::View>>> views) {
+    fbb_.AddOffset(RenderOverlayData::VT_VIEWS, views);
   }
   explicit RenderOverlayDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -118,31 +205,26 @@ struct RenderOverlayDataBuilder {
   ::flatbuffers::Offset<RenderOverlayData> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = ::flatbuffers::Offset<RenderOverlayData>(end);
-    fbb_.Required(o, RenderOverlayData::VT_VERTICES);
-    fbb_.Required(o, RenderOverlayData::VT_COLOR);
+    fbb_.Required(o, RenderOverlayData::VT_VIEWS);
     return o;
   }
 };
 
 inline ::flatbuffers::Offset<RenderOverlayData> CreateRenderOverlayData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Vector2f>>> vertices = 0,
-    const Color *color = nullptr) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::View>>> views = 0) {
   RenderOverlayDataBuilder builder_(_fbb);
-  builder_.add_color(color);
-  builder_.add_vertices(vertices);
+  builder_.add_views(views);
   return builder_.Finish();
 }
 
 inline ::flatbuffers::Offset<RenderOverlayData> CreateRenderOverlayDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<Vector2f>> *vertices = nullptr,
-    const Color *color = nullptr) {
-  auto vertices__ = vertices ? _fbb.CreateVector<::flatbuffers::Offset<Vector2f>>(*vertices) : 0;
+    const std::vector<::flatbuffers::Offset<steamrot::View>> *views = nullptr) {
+  auto views__ = views ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::View>>(*views) : 0;
   return steamrot::CreateRenderOverlayData(
       _fbb,
-      vertices__,
-      color);
+      views__);
 }
 
 struct FragmentData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
