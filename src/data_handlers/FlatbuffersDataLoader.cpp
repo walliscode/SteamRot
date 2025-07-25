@@ -1,0 +1,20 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Implementation of FlatbuffersDataLoader class
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include "FlatbuffersDataLoader.h"
+#include "Fragment.h"
+
+namespace steamrot {
+
+/////////////////////////////////////////////////
+std::expected<Fragment, DataFailMode>
+FlatbuffersDataLoader::ProvideFragment(const std::string &fragment_name) const {
+
+  return std::unexpected(DataFailMode::FileNotFound);
+}
+} // namespace steamrot

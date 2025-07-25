@@ -72,22 +72,6 @@ void CGrimoireMachina::ConfigureFragment(const FragmentData *fragment_data) {
 
   for (const auto view : *fragment_data->render_overlay_data()->views()) {
   }
-  // color is constant across all vertices in the render overlay
-  sf::Color overlay_color(fragment_data->render_overlay_data()->color()->r(),
-                          fragment_data->render_overlay_data()->color()->g(),
-                          fragment_data->render_overlay_data()->color()->b(),
-                          fragment_data->render_overlay_data()->color()->a());
-
-  for (const auto *render_vertex :
-       *fragment_data->render_overlay_data()->vertices()) {
-    sf::Vertex vertex;
-    vertex.position = sf::Vector2f(render_vertex->x(), render_vertex->y());
-    vertex.color = overlay_color;
-    new_fragment.m_render_overlay.append(vertex);
-  }
-
-  // add to fragments map by name
-  m_all_fragments.emplace(fragment_data->name()->str(), new_fragment);
 }
 
 /////////////////////////////////////////////////
@@ -101,26 +85,5 @@ void CGrimoireMachina::ConfigureJoint(const JointData *joint_data) {
   Joint new_joint;
   new_joint.m_joint_name = joint_data->name()->str();
   new_joint.m_number_of_connections = joint_data->number_of_connections();
-
-  // new triangle based vertex array for the joint
-  new_joint.m_render_overlay.setPrimitiveType(sf::PrimitiveType::Triangles);
-
-  // get the colour for the joint
-  sf::Color joint_color(joint_data->render_overlay()->color()->r(),
-                        joint_data->render_overlay()->color()->g(),
-                        joint_data->render_overlay()->color()->b(),
-                        joint_data->render_overlay()->color()->a());
-
-  // add all triangles to the vertex array
-  for (const auto &triangle : *joint_data->render_overlay()->triangles()) {
-    for (const auto &vertex : *triangle->vertices()) {
-      sf::Vertex vertex_sf;
-      vertex_sf.position = sf::Vector2f(vertex->x(), vertex->y());
-      vertex_sf.color = joint_color;
-      new_joint.m_render_overlay.append(vertex_sf);
-    }
-  }
-  // Add to joints map by name
-  m_all_joints.emplace(new_joint.m_joint_name, std::move(new_joint));
 }
 } // namespace steamrot

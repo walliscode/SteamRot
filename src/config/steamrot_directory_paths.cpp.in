@@ -36,12 +36,3 @@ const std::filesystem::path getConfigurationFolder() {
 
 ////////////////////////////////////////////////////////////
 const std::filesystem::path getLogsFolder() { return getDataFolder() / "logs"; }
-
-////////////////////////////////////////////////////////////
-const std::filesystem::path getTestFolder() { return "@test_path@"; }
-
-///////////////////////////////////////////////////////////
-const std::filesystem::path getTestDataFolder() {
-
-  return getTestFolder() / "data";
-}

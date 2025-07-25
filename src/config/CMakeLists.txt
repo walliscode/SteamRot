@@ -1,6 +1,12 @@
+# generate the steamrot_directory_paths.cpp file based on whether
+# the executable has specified TEST_DIRECTORIES
 
-cmake_path(SET data_path ${CMAKE_SOURCE_DIR}/data)
-cmake_path(SET test_path ${CMAKE_SOURCE_DIR}/tests)
+if(USE_TEST_DIRECTORIES)
+  cmake_path(SET data_path ${CMAKE_SOURCE_DIR}/tests/test_data)
+
+else()
+  cmake_path(SET data_path ${CMAKE_SOURCE_DIR}/data)
+endif()
 
 configure_file(
   steamrot_directory_paths.cpp.in

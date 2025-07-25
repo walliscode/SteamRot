@@ -29,7 +29,7 @@ endif()
 # set the cmake module path (for import libraries and other cmake files)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/FetchContentModules")
 
-# set project wide locations
+# set project wide variables
 set(DATA_DIR "${CMAKE_SOURCE_DIR}/data")
 
 # fetch_content_modules.cmake contains a menu list of all fetch content
