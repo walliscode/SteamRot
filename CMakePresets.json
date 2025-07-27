@@ -11,8 +11,7 @@
       "cacheVariables": {
         "CMAKE_CXX_COMPILER": "clang++",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-        "CMAKE_BUILD_WITH_INSTALL_RPATH": "ON",
-        "USE_TEST_DIRECTORIES": "OFF"
+        "CMAKE_BUILD_WITH_INSTALL_RPATH": "ON"
       }
     },
     {

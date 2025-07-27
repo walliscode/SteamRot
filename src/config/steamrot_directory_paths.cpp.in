@@ -2,8 +2,15 @@
 #include <filesystem>
 #include <steamrot_directory_paths.h>
 
+#ifdef USE_TEST_DIRECTORIES
+
+const std::filesystem::path getDataFolder() {
+  return std::filesystem::path("@test_data_path@");
+}
+#else
 ////////////////////////////////////////////////////////////
 const std::filesystem::path getDataFolder() { return "@data_path@"; };
+#endif // !USE_TEST_DIRECTORIES
 
 ////////////////////////////////////////////////////////////
 const std::filesystem::path getScenesFolder() {

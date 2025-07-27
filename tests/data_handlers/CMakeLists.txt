@@ -2,6 +2,10 @@ add_executable(test_data_handlers
   FlatbuffersDataLoader.test.cpp
 )
 
+target_compile_definitions(test_data_handlers
+PRIVATE
+USE_TEST_DIRECTORIES)
+
 target_link_libraries(test_data_handlers
 PRIVATE
   Catch2::Catch2WithMain

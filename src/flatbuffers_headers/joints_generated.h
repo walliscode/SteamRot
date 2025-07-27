@@ -13,81 +13,26 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
+#include "fragments_generated.h"
 #include "types_generated.h"
 
 namespace steamrot {
 
-struct JoinRenderOverlay;
-struct JoinRenderOverlayBuilder;
-
 struct JointData;
 struct JointDataBuilder;
-
-struct JoinRenderOverlay FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef JoinRenderOverlayBuilder Builder;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_TRIANGLES = 4
-  };
-  const ::flatbuffers::Vector<::flatbuffers::Offset<Triangle>> *triangles() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Triangle>> *>(VT_TRIANGLES);
-  }
-  bool Verify(::flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyOffsetRequired(verifier, VT_TRIANGLES) &&
-           verifier.VerifyVector(triangles()) &&
-           verifier.VerifyVectorOfTables(triangles()) &&
-           verifier.EndTable();
-  }
-};
-
-struct JoinRenderOverlayBuilder {
-  typedef JoinRenderOverlay Table;
-  ::flatbuffers::FlatBufferBuilder &fbb_;
-  ::flatbuffers::uoffset_t start_;
-  void add_triangles(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Triangle>>> triangles) {
-    fbb_.AddOffset(JoinRenderOverlay::VT_TRIANGLES, triangles);
-  }
-  explicit JoinRenderOverlayBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  ::flatbuffers::Offset<JoinRenderOverlay> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<JoinRenderOverlay>(end);
-    fbb_.Required(o, JoinRenderOverlay::VT_TRIANGLES);
-    return o;
-  }
-};
-
-inline ::flatbuffers::Offset<JoinRenderOverlay> CreateJoinRenderOverlay(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Triangle>>> triangles = 0) {
-  JoinRenderOverlayBuilder builder_(_fbb);
-  builder_.add_triangles(triangles);
-  return builder_.Finish();
-}
-
-inline ::flatbuffers::Offset<JoinRenderOverlay> CreateJoinRenderOverlayDirect(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<Triangle>> *triangles = nullptr) {
-  auto triangles__ = triangles ? _fbb.CreateVector<::flatbuffers::Offset<Triangle>>(*triangles) : 0;
-  return steamrot::CreateJoinRenderOverlay(
-      _fbb,
-      triangles__);
-}
 
 struct JointData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef JointDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_NAME = 4,
-    VT_RENDER_OVERLAY = 6,
+    VT_RENDER_OVERLAY_DATA = 6,
     VT_NUMBER_OF_CONNECTIONS = 8
   };
   const ::flatbuffers::String *name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_NAME);
   }
-  const steamrot::JoinRenderOverlay *render_overlay() const {
-    return GetPointer<const steamrot::JoinRenderOverlay *>(VT_RENDER_OVERLAY);
+  const steamrot::RenderOverlayData *render_overlay_data() const {
+    return GetPointer<const steamrot::RenderOverlayData *>(VT_RENDER_OVERLAY_DATA);
   }
   int32_t number_of_connections() const {
     return GetField<int32_t>(VT_NUMBER_OF_CONNECTIONS, 0);
@@ -96,8 +41,8 @@ struct JointData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_NAME) &&
            verifier.VerifyString(name()) &&
-           VerifyOffsetRequired(verifier, VT_RENDER_OVERLAY) &&
-           verifier.VerifyTable(render_overlay()) &&
+           VerifyOffsetRequired(verifier, VT_RENDER_OVERLAY_DATA) &&
+           verifier.VerifyTable(render_overlay_data()) &&
            VerifyField<int32_t>(verifier, VT_NUMBER_OF_CONNECTIONS, 4) &&
            verifier.EndTable();
   }
@@ -110,8 +55,8 @@ struct JointDataBuilder {
   void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
     fbb_.AddOffset(JointData::VT_NAME, name);
   }
-  void add_render_overlay(::flatbuffers::Offset<steamrot::JoinRenderOverlay> render_overlay) {
-    fbb_.AddOffset(JointData::VT_RENDER_OVERLAY, render_overlay);
+  void add_render_overlay_data(::flatbuffers::Offset<steamrot::RenderOverlayData> render_overlay_data) {
+    fbb_.AddOffset(JointData::VT_RENDER_OVERLAY_DATA, render_overlay_data);
   }
   void add_number_of_connections(int32_t number_of_connections) {
     fbb_.AddElement<int32_t>(JointData::VT_NUMBER_OF_CONNECTIONS, number_of_connections, 0);
@@ -124,7 +69,7 @@ struct JointDataBuilder {
     const auto end = fbb_.EndTable(start_);
     auto o = ::flatbuffers::Offset<JointData>(end);
     fbb_.Required(o, JointData::VT_NAME);
-    fbb_.Required(o, JointData::VT_RENDER_OVERLAY);
+    fbb_.Required(o, JointData::VT_RENDER_OVERLAY_DATA);
     return o;
   }
 };
@@ -132,11 +77,11 @@ struct JointDataBuilder {
 inline ::flatbuffers::Offset<JointData> CreateJointData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::String> name = 0,
-    ::flatbuffers::Offset<steamrot::JoinRenderOverlay> render_overlay = 0,
+    ::flatbuffers::Offset<steamrot::RenderOverlayData> render_overlay_data = 0,
     int32_t number_of_connections = 0) {
   JointDataBuilder builder_(_fbb);
   builder_.add_number_of_connections(number_of_connections);
-  builder_.add_render_overlay(render_overlay);
+  builder_.add_render_overlay_data(render_overlay_data);
   builder_.add_name(name);
   return builder_.Finish();
 }
@@ -144,13 +89,13 @@ inline ::flatbuffers::Offset<JointData> CreateJointData(
 inline ::flatbuffers::Offset<JointData> CreateJointDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const char *name = nullptr,
-    ::flatbuffers::Offset<steamrot::JoinRenderOverlay> render_overlay = 0,
+    ::flatbuffers::Offset<steamrot::RenderOverlayData> render_overlay_data = 0,
     int32_t number_of_connections = 0) {
   auto name__ = name ? _fbb.CreateString(name) : 0;
   return steamrot::CreateJointData(
       _fbb,
       name__,
-      render_overlay,
+      render_overlay_data,
       number_of_connections);
 }
 
