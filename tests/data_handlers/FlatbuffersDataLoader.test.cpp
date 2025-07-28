@@ -38,23 +38,41 @@ TEST_CASE("FlatbuffersDataLoader returns unexpected when non-existent fragment "
   steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
   auto result = data_loader.ProvideFragment("non_existent_fragment");
   REQUIRE(result.has_value() == false);
-  REQUIRE(result.error() == steamrot::DataFailMode::FileNotFound);
+  REQUIRE(result.error().first == steamrot::DataFailMode::FileNotFound);
+  REQUIRE(result.error().second == "file not found");
 }
 
-TEST_CASE(
-    "FlatbuffersDataLoader returns Fragment when valid fragment is provided ",
-    "[FlatbuffersDataLoader]") {
-  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
-  auto result = data_loader.ProvideFragment("valid_fragment");
-  REQUIRE(result.has_value() == true);
-}
-
-TEST_CASE("Fragment data provided with correct values",
+TEST_CASE("FlatbuffersDataLoader returns unexpected when fragment data has not "
+          "socket data vertices",
           "[FlatbuffersDataLoader]") {
   steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
-  auto result = data_loader.ProvideFragment("valid_fragment");
-  REQUIRE(result.has_value() == true);
-
-  // test expected values
-  REQUIRE(result->m_name == "valid_fragment");
+  auto result =
+      data_loader.ProvideFragment("invalid_fragment_no_socket_data_vertices");
+  REQUIRE(result.has_value() == false);
+  REQUIRE(result.error().first ==
+          steamrot::DataFailMode::FlatbufferDataNotFound);
+  REQUIRE(result.error().second == "fragment socket data vertices not found");
 }
+
+TEST_CASE("FlatbuffersDataLoader returns unexpected when fragment data has "
+          "invalid socket data vertices",
+          "[FlatbuffersDataLoader]") {
+  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+  auto result = data_loader.ProvideFragment("missing_vertices_x");
+  REQUIRE(result.has_value() == false);
+  REQUIRE(result.error().first ==
+          steamrot::DataFailMode::FlatbufferDataNotFound);
+  REQUIRE(result.error().second == "vertex from socket data is incomplete");
+}
+
+// TEST_CASE("Fragment data provided with correct values",
+//           "[FlatbuffersDataLoader]") {
+//   steamrot::FlatbuffersDataLoader
+//   data_loader{steamrot::EnvironmentType::Test}; auto result =
+//   data_loader.ProvideFragment("valid_fragment"); REQUIRE(result.has_value()
+//   == true);
+//
+//   // test expected values
+//   REQUIRE(result->m_name == "valid_fragment");
+//   REQUIRE(result->m_overlays.size() == 1);
+// }

@@ -16,11 +16,16 @@
 #include "PathProvider.h"
 #include <expected>
 #include <string>
+#include <utility>
 namespace steamrot {
 
 enum class DataFailMode {
   FileNotFound,
+  FlatbufferDataNotFound,
 };
+
+using FailureData = std::pair<DataFailMode, std::string>;
+
 /////////////////////////////////////////////////
 /// @class DataLoader
 /// @brief Abstract base class for data loading
@@ -50,7 +55,7 @@ public:
   /////////////////////////////////////////////////
   DataLoader(const EnvironmentType env_type = EnvironmentType::None);
 
-  virtual std::expected<Fragment, DataFailMode>
+  virtual std::expected<Fragment, FailureData>
   ProvideFragment(const std::string &fragment_name) const = 0;
 };
 } // namespace steamrot

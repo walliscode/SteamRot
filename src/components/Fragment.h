@@ -37,14 +37,5 @@ struct Fragment {
   /// possible view.
   /////////////////////////////////////////////////
   std::unordered_map<ViewDirection, sf::VertexArray> m_overlays;
-
-  /////////////////////////////////////////////////
-  /// @brief Maps render vertices to sockets
-  ///
-  /// the position in the vector is the index of the vertex in the render
-  /// overlay and the value is the index of the socket in the m_sockets
-  /// ConvexShape.
-  /////////////////////////////////////////////////
-  std::vector<uint8_t> m_render_vertex_to_socket_map;
 };
 } // namespace steamrot
