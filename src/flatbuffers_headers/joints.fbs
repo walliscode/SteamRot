@@ -1,16 +1,13 @@
 include "types.fbs";
+include "fragments.fbs";
 
 namespace steamrot;
 
 
 
-table JoinRenderOverlay {
-    triangles: [Triangle] (required);
-
-  }
 
 table JointData {
 name: string (required);
-render_overlay: JoinRenderOverlay (required);
+render_overlay_data: RenderOverlayData (required);
 number_of_connections: int ;
   }

@@ -1,8 +1,8 @@
 #include "DataManager.h"
 
+#include "directory_paths.h"
 #include "log_handler.h"
 #include "spdlog/common.h"
-#include "steamrot_directory_paths.h"
 #include "themes_generated.h"
 #include <fstream>
 #include <iostream>
@@ -57,7 +57,7 @@ const themes::UIObjects *
 DataManager::ProvideThemeData(const std::string &theme_name) {
   // load theme data from binary into buffer
   char *theme_data =
-      LoadBinaryData(getThemesFolder() / (theme_name + ".themes.bin"));
+      LoadBinaryData(config::getThemesFolder() / (theme_name + ".themes.bin"));
 
   // return flatbuffers data from binary buffer
   return themes::GetUIObjects(theme_data);
@@ -79,8 +79,8 @@ const SceneData *DataManager::ProvideSceneData(const SceneType &scene_type) {
   }
   }
   // load scene data from binary into buffer
-  char *scene_data =
-      LoadBinaryData(getScenesFolder() / (scene_identifier + ".scenes.bin"));
+  char *scene_data = LoadBinaryData(config::getScenesFolder() /
+                                    (scene_identifier + ".scenes.bin"));
 
   std::cout << "Loading scene data for: " << scene_identifier << std::endl;
   // return flatbuffers data from binary buffer
@@ -111,7 +111,7 @@ DataManager::ProvideFonts(const SceneType &scene_type) {
     // full font name
     std::string font_file_name = font->name()->str() + ".ttf";
     // load the font from file
-    if (new_font.openFromFile(getFontsFolder() / font_file_name)) {
+    if (new_font.openFromFile(config::getFontsFolder() / font_file_name)) {
       // add the font to the vector with its tag
       fonts.emplace_back(font->name()->str(), new_font);
 

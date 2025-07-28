@@ -1,0 +1,37 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Implementation of PathProvider class
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include "PathProvider.h"
+namespace steamrot {
+
+/////////////////////////////////////////////////
+EnvironmentType PathProvider::m_environment = EnvironmentType::None;
+
+/////////////////////////////////////////////////
+PathProvider::PathProvider(EnvironmentType env_type) {
+  if (env_type == EnvironmentType::None) {
+    throw std::invalid_argument("Environment type cannot be None.");
+  }
+  if (m_environment != EnvironmentType::None) {
+    throw std::runtime_error("PathProvider can only be initiated once.");
+  }
+  m_environment = env_type;
+}
+
+/////////////////////////////////////////////////
+const std::filesystem::path PathProvider::GetDataDirectory() const {
+  switch (m_environment) {
+  case EnvironmentType::Test:
+    return std::filesystem::path{"@CMAKE_SOURCE_DIR@"} / "tests" / "data";
+  case EnvironmentType::Production:
+    return std::filesystem::path{"@CMAKE_SOURCE_DIR@"} / "data";
+  default:
+    throw std::runtime_error("Environment has not been set.");
+  }
+}
+} // namespace steamrot

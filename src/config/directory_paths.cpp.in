@@ -1,12 +1,14 @@
-#include "steamrot_directory_paths.h"
+#include "config.cpp"
+#include "directory_paths.h"
 #include <filesystem>
-#include <steamrot_directory_paths.h>
 
+namespace config {
 ////////////////////////////////////////////////////////////
 const std::filesystem::path getDataFolder() { return "@data_path@"; };
 
 ////////////////////////////////////////////////////////////
 const std::filesystem::path getScenesFolder() {
+
   return getDataFolder() / "scenes";
 };
 ////////////////////////////////////////////////////////////
@@ -16,6 +18,7 @@ const std::filesystem::path getSchemaFolder() {
 
 ////////////////////////////////////////////////////////////
 const std::filesystem::path getThemesFolder() {
+  config::CanIAccessThis();
   return getDataFolder() / "themes";
 }
 
@@ -36,12 +39,4 @@ const std::filesystem::path getConfigurationFolder() {
 
 ////////////////////////////////////////////////////////////
 const std::filesystem::path getLogsFolder() { return getDataFolder() / "logs"; }
-
-////////////////////////////////////////////////////////////
-const std::filesystem::path getTestFolder() { return "@test_path@"; }
-
-///////////////////////////////////////////////////////////
-const std::filesystem::path getTestDataFolder() {
-
-  return getTestFolder() / "data";
-}
+} // namespace config

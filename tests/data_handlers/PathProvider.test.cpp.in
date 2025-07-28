@@ -1,0 +1,40 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Unit test for PathProvider class
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include "PathProvider.h"
+#include <catch2/catch_test_macros.hpp>
+
+TEST_CASE("PathProvider must be initiated with a valid environment",
+          "[PathProvider]") {
+
+  REQUIRE_THROWS(steamrot::PathProvider{steamrot::EnvironmentType::None});
+}
+TEST_CASE("PathProvider enviroment can only be initiated once",
+          "[PathProvider]") {
+
+  // create PathProvider instance with production environment
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Production};
+
+  // try to create another PathProvider instance with test environment, this
+  // should throw an exception
+  REQUIRE_THROWS(steamrot::PathProvider{steamrot::EnvironmentType::Test});
+}
+TEST_CASE("PathProvider intiated with a test environment", "[PathProvider]") {
+
+  // create PathProvider instance with test environment
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+
+  REQUIRE(path_provider.GetDataDirectory() == "@CMAKE_SOURCE_DIR@/tests/data");
+}
+
+TEST_CASE("PathProvider intiated with a production environment",
+          "[PathProvider]") {
+  // create PathProvider instance with production environment
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Production};
+  REQUIRE(path_provider.GetDataDirectory() == "@CMAKE_SOURCE_DIR@/data");
+}
