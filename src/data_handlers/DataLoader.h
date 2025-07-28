@@ -28,13 +28,11 @@ enum class DataFailMode {
 /////////////////////////////////////////////////
 class DataLoader {
 
-private:
+protected:
   /////////////////////////////////////////////////
   /// @brief member variable to hold the path provider instance
   /////////////////////////////////////////////////
   PathProvider m_path_provider;
-
-  bool CheckFileExists(const std::string &file_name) const;
 
 public:
   // Virtual destructor to ensure proper cleanup of derived classes

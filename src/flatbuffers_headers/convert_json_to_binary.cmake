@@ -1,7 +1,13 @@
+# set data directory types
+set(DIRECTORY_TYPES
+"PRODUCTION"
+"TEST")
+
 # -- FlatBuffers generation for themes.fbs --
 
+
 set(themes_schema "${CMAKE_CURRENT_SOURCE_DIR}/themes.fbs")
-set(THEMES_DIR "${DATA_DIR}/themes")
+set(THEMES_DIR "${data_dir}/themes")
 
 # All JSON files for themes.fbs
 file(GLOB themes_jsons "${THEMES_DIR}/*.themes.json")
@@ -30,7 +36,7 @@ endforeach()
 
 # generate all scene binaries
 set(scenes_schema "${CMAKE_CURRENT_SOURCE_DIR}/scenes.fbs")
-set(SCENES_DIR "${DATA_DIR}/scenes")
+set(SCENES_DIR "${data_dir}/scenes")
 
 # All JSON files for scenes.fbs
 file(GLOB scenes_jsons "${SCENES_DIR}/*.scenes.json")
@@ -57,6 +63,9 @@ foreach(json_file ${scenes_jsons})
     VERBATIM
   )
 endforeach()
+
+# -- FlatBuffers generation for fragment.fbs --
+
 
 
 add_custom_target(flatbuffers_generate_themes_binaries ALL

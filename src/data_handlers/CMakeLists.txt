@@ -1,6 +1,4 @@
 
-cmake_path(SET data_dir ${CMAKE_SOURCE_DIR}/data)
-cmake_path(SET test_data_dir ${CMAKE_SOURCE_DIR}/tests/data)
 
 configure_file(
 PathProvider.cpp.in

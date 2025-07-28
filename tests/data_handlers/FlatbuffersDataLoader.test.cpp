@@ -31,3 +31,30 @@ TEST_CASE("DataLoader can only initiate PathProvider once", "[DataLoader]") {
   REQUIRE_THROWS(
       steamrot::FlatbuffersDataLoader{steamrot::EnvironmentType::Production});
 }
+
+TEST_CASE("FlatbuffersDataLoader returns unexpected when non-existent fragment "
+          "is provided",
+          "[FlatbuffersDataLoader]") {
+  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+  auto result = data_loader.ProvideFragment("non_existent_fragment");
+  REQUIRE(result.has_value() == false);
+  REQUIRE(result.error() == steamrot::DataFailMode::FileNotFound);
+}
+
+TEST_CASE(
+    "FlatbuffersDataLoader returns Fragment when valid fragment is provided ",
+    "[FlatbuffersDataLoader]") {
+  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+  auto result = data_loader.ProvideFragment("valid_fragment");
+  REQUIRE(result.has_value() == true);
+}
+
+TEST_CASE("Fragment data provided with correct values",
+          "[FlatbuffersDataLoader]") {
+  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+  auto result = data_loader.ProvideFragment("valid_fragment");
+  REQUIRE(result.has_value() == true);
+
+  // test expected values
+  REQUIRE(result->m_name == "valid_fragment");
+}

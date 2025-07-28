@@ -43,4 +43,9 @@ const std::filesystem::path PathProvider::GetDataDirectory() const {
     throw std::runtime_error("Environment has not been set.");
   }
 }
+/////////////////////////////////////////////////
+const std::filesystem::path PathProvider::GetFragmentDirectory() const {
+
+  return GetDataDirectory() / "fragments";
+}
 } // namespace steamrot

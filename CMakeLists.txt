@@ -30,8 +30,8 @@ endif()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/FetchContentModules")
 
 # set project wide variables
-set(DATA_DIR "${CMAKE_SOURCE_DIR}/data")
-
+cmake_path(SET data_dir ${CMAKE_SOURCE_DIR}/data)
+cmake_path(SET test_data_dir ${CMAKE_SOURCE_DIR}/tests/data)
 # fetch_content_modules.cmake contains a menu list of all fetch content
 # scripts to include. to keep top level cmake tidier
 include(fetch_content_modules)
