@@ -35,7 +35,14 @@ public:
   ///
   /// @param env_type Environment type enum to determine the base path
   /////////////////////////////////////////////////
-  PathProvider(EnvironmentType env_type = EnvironmentType::Production);
+  PathProvider(EnvironmentType env_type = EnvironmentType::None);
+
+  /////////////////////////////////////////////////
+  /// @brief Gets the current environment type
+  ///
+  /// @return EnvironmentType
+  /////////////////////////////////////////////////
+  const EnvironmentType GetEnvironment() const;
 
   /////////////////////////////////////////////////
   /// @brief Provides top level data directory path

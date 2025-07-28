@@ -24,6 +24,15 @@ TEST_CASE("PathProvider enviroment can only be initiated once",
   // should throw an exception
   REQUIRE_THROWS(steamrot::PathProvider{steamrot::EnvironmentType::Test});
 }
+
+TEST_CASE("PathProvider can instantiated with a None enviroment if already set",
+          "[PathProvider]") {
+  // create PathProvider instance with production environment
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Production};
+  // try to create another PathProvider instance with None environment, this
+  // should not throw an exception
+  REQUIRE_NOTHROW(steamrot::PathProvider{});
+}
 TEST_CASE("PathProvider intiated with a test environment", "[PathProvider]") {
 
   // create PathProvider instance with test environment
