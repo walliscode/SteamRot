@@ -5,8 +5,8 @@ configure_file(
 
 
 add_executable(test_data_handlers
-
   PathProvider.test.cpp
+  FlatbuffersDataLoader.test.cpp
 )
 
 target_compile_definitions(test_data_handlers
