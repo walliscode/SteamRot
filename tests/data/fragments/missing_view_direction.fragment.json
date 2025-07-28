@@ -1,5 +1,5 @@
 {
-  "name": "valid_fragment",
+  "name": "missing_view_direction",
   "socket_data": { "vertices": [{ "x": 5, "y": 7 }] },
   "render_overlay_data": {
     "views": [
@@ -21,8 +21,7 @@
               }
             ]
           }
-        ],
-        "direction": "FRONT"
+        ]
       }
     ]
   }
