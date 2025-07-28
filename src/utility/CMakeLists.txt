@@ -33,6 +33,7 @@ logger
 flatbuffers_headers
 flatbuffers
 systems
+config
 )
 
 

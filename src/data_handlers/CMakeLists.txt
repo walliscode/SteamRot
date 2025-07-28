@@ -1,5 +1,15 @@
+
+cmake_path(SET data_dir ${CMAKE_SOURCE_DIR}/data)
+cmake_path(SET test_data_dir ${CMAKE_SOURCE_DIR}/tests/data)
+
+configure_file(
+PathProvider.cpp.in
+PathProvider.cpp
+@ONLY)
+
 add_library(data_handlers
   FlatbuffersDataLoader.cpp
+  PathProvider.cpp
 )
 
 target_include_directories(data_handlers

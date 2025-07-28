@@ -1,5 +1,6 @@
 #include <filesystem>
 
+namespace config {
 ////////////////////////////////////////////////////////////
 /// \brief return folder path for data,
 /// this should be used for other paths
@@ -44,3 +45,4 @@ const std::filesystem::path getConfigurationFolder();
 ///
 ////////////////////////////////////////////////////////////
 const std::filesystem::path getLogsFolder();
+} // namespace config
