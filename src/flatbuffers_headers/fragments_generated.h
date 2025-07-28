@@ -307,6 +307,36 @@ inline ::flatbuffers::Offset<FragmentData> CreateFragmentDataDirect(
       render_overlay_data);
 }
 
+inline const steamrot::FragmentData *GetFragmentData(const void *buf) {
+  return ::flatbuffers::GetRoot<steamrot::FragmentData>(buf);
+}
+
+inline const steamrot::FragmentData *GetSizePrefixedFragmentData(const void *buf) {
+  return ::flatbuffers::GetSizePrefixedRoot<steamrot::FragmentData>(buf);
+}
+
+inline bool VerifyFragmentDataBuffer(
+    ::flatbuffers::Verifier &verifier) {
+  return verifier.VerifyBuffer<steamrot::FragmentData>(nullptr);
+}
+
+inline bool VerifySizePrefixedFragmentDataBuffer(
+    ::flatbuffers::Verifier &verifier) {
+  return verifier.VerifySizePrefixedBuffer<steamrot::FragmentData>(nullptr);
+}
+
+inline void FinishFragmentDataBuffer(
+    ::flatbuffers::FlatBufferBuilder &fbb,
+    ::flatbuffers::Offset<steamrot::FragmentData> root) {
+  fbb.Finish(root);
+}
+
+inline void FinishSizePrefixedFragmentDataBuffer(
+    ::flatbuffers::FlatBufferBuilder &fbb,
+    ::flatbuffers::Offset<steamrot::FragmentData> root) {
+  fbb.FinishSizePrefixed(root);
+}
+
 }  // namespace steamrot
 
 #endif  // FLATBUFFERS_GENERATED_FRAGMENTS_STEAMROT_H_

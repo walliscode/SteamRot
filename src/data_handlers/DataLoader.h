@@ -34,6 +34,11 @@ protected:
   /////////////////////////////////////////////////
   PathProvider m_path_provider;
 
+  ////////////////////////////////////////////////////////////
+  /// \brief load binary data from file and return as vector of chars
+  ////////////////////////////////////////////////////////////
+  char *LoadBinaryData(const std::filesystem::path &file_path) const;
+
 public:
   // Virtual destructor to ensure proper cleanup of derived classes
   virtual ~DataLoader() = default;

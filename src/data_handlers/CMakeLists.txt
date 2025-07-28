@@ -19,4 +19,6 @@ target_include_directories(data_handlers
 target_link_libraries(data_handlers
   PUBLIC
   components
+  flatbuffers
+  flatbuffers_headers
 )

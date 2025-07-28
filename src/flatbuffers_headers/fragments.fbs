@@ -26,3 +26,5 @@ socket_data: SocketData (required);
 render_overlay_data: RenderOverlayData (required);
   }
 
+root_type FragmentData;
+
