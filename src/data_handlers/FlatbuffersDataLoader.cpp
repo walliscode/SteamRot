@@ -10,7 +10,9 @@
 #include "Fragment.h"
 
 namespace steamrot {
-
+/////////////////////////////////////////////////
+FlatbuffersDataLoader::FlatbuffersDataLoader(const EnvironmentType env_type)
+    : DataLoader(env_type) {}
 /////////////////////////////////////////////////
 std::expected<Fragment, DataFailMode>
 FlatbuffersDataLoader::ProvideFragment(const std::string &fragment_name) const {

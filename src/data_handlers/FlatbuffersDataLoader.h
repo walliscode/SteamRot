@@ -17,11 +17,7 @@ namespace steamrot {
 class FlatbuffersDataLoader : public DataLoader {
 
 public:
-  /////////////////////////////////////////////////
-  /// @brief Default constructor for FlatbuffersDataLoader
-  /////////////////////////////////////////////////
-  FlatbuffersDataLoader() = default;
-
+  FlatbuffersDataLoader(const EnvironmentType env_type = EnvironmentType::None);
   /////////////////////////////////////////////////
   /// @brief Provides Fragment object based on the fragment name
   ///
