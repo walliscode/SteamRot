@@ -9,6 +9,8 @@
 #include <SFML/Graphics/ConvexShape.hpp>
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
+#include <SFML/System/Vector2.hpp>
+#include <vector>
 
 namespace steamrot {
 /////////////////////////////////////////////////
@@ -25,7 +27,7 @@ struct Fragment {
   /////////////////////////////////////////////////
   /// @brief Local positions of the Fragment's sockets
   /////////////////////////////////////////////////
-  sf::VertexArray m_sockets;
+  std::vector<sf::Vector2f> m_sockets;
 
   /////////////////////////////////////////////////
   /// @brief Global transform of the fragment

@@ -60,6 +60,9 @@ FlatbuffersDataLoader::ProvideFragment(const std::string &fragment_name) const {
       return std::unexpected(
           std::make_pair(DataFailMode::FlatbufferDataNotFound,
                          "vertex from socket data is incomplete"));
+
+    // add vector data to fragment sockets
+    fragment.m_sockets.emplace_back(vertex->x(), vertex->y());
   }
 
   // handle render overlays

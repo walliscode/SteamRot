@@ -129,4 +129,13 @@ TEST_CASE("Fragment data provided with correct values",
           5.0f);
   REQUIRE(result->m_overlays[steamrot::ViewDirection_FRONT][0].position.y ==
           10.0f);
+  REQUIRE(result->m_overlays[steamrot::ViewDirection_FRONT][0].color.r == 255);
+  REQUIRE(result->m_overlays[steamrot::ViewDirection_FRONT][0].color.g == 255);
+  REQUIRE(result->m_overlays[steamrot::ViewDirection_FRONT][0].color.b == 255);
+  REQUIRE(result->m_overlays[steamrot::ViewDirection_FRONT][0].color.a == 255);
+
+  REQUIRE(result->m_transform == sf::Transform::Identity);
+  REQUIRE(result->m_sockets.size() == 1);
+  REQUIRE(result->m_sockets[0].x == 5.0f);
+  REQUIRE(result->m_sockets[0].y == 7.0f);
 }
