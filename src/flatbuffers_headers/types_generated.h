@@ -174,7 +174,7 @@ struct Triangle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_VERTICES) &&
+           VerifyOffsetRequired(verifier, VT_VERTICES) &&
            verifier.VerifyVector(vertices()) &&
            verifier.VerifyVectorOfTables(vertices()) &&
            verifier.EndTable();
@@ -195,6 +195,7 @@ struct TriangleBuilder {
   ::flatbuffers::Offset<Triangle> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = ::flatbuffers::Offset<Triangle>(end);
+    fbb_.Required(o, Triangle::VT_VERTICES);
     return o;
   }
 };

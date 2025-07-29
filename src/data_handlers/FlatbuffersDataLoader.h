@@ -24,7 +24,7 @@ public:
   /// Any fail modes are provided through std::expected as the error type
   /// @param fragment_name String representing the name of the fragment
   /////////////////////////////////////////////////
-  std::expected<Fragment, DataFailMode>
+  std::expected<Fragment, FailureData>
   ProvideFragment(const std::string &fragment_name) const override;
 };
 

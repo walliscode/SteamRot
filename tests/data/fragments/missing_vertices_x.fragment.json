@@ -1,0 +1,5 @@
+{
+  "name": "invalid_fragment_socket_vertices_missing_position",
+  "socket_data": { "vertices": [{ "x": 5 }] },
+  "render_overlay_data": { "views": [] }
+}

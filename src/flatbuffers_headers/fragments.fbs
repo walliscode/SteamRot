@@ -3,7 +3,8 @@ include "types.fbs";
 namespace steamrot;
 
 enum ViewDirection: ubyte {
-FRONT = 0,
+  NONE = 0,
+FRONT = 1,
   }
 
 table View {
@@ -25,4 +26,6 @@ name: string (required);
 socket_data: SocketData (required);
 render_overlay_data: RenderOverlayData (required);
   }
+
+root_type FragmentData;
 

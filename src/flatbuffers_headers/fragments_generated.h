@@ -30,20 +30,23 @@ struct FragmentData;
 struct FragmentDataBuilder;
 
 enum ViewDirection : uint8_t {
-  ViewDirection_FRONT = 0,
-  ViewDirection_MIN = ViewDirection_FRONT,
+  ViewDirection_NONE = 0,
+  ViewDirection_FRONT = 1,
+  ViewDirection_MIN = ViewDirection_NONE,
   ViewDirection_MAX = ViewDirection_FRONT
 };
 
-inline const ViewDirection (&EnumValuesViewDirection())[1] {
+inline const ViewDirection (&EnumValuesViewDirection())[2] {
   static const ViewDirection values[] = {
+    ViewDirection_NONE,
     ViewDirection_FRONT
   };
   return values;
 }
 
 inline const char * const *EnumNamesViewDirection() {
-  static const char * const names[2] = {
+  static const char * const names[3] = {
+    "NONE",
     "FRONT",
     nullptr
   };
@@ -51,7 +54,7 @@ inline const char * const *EnumNamesViewDirection() {
 }
 
 inline const char *EnumNameViewDirection(ViewDirection e) {
-  if (::flatbuffers::IsOutRange(e, ViewDirection_FRONT, ViewDirection_FRONT)) return "";
+  if (::flatbuffers::IsOutRange(e, ViewDirection_NONE, ViewDirection_FRONT)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesViewDirection()[index];
 }
@@ -103,7 +106,7 @@ struct ViewBuilder {
 inline ::flatbuffers::Offset<View> CreateView(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Triangle>>> triangles = 0,
-    steamrot::ViewDirection direction = steamrot::ViewDirection_FRONT) {
+    steamrot::ViewDirection direction = steamrot::ViewDirection_NONE) {
   ViewBuilder builder_(_fbb);
   builder_.add_triangles(triangles);
   builder_.add_direction(direction);
@@ -113,7 +116,7 @@ inline ::flatbuffers::Offset<View> CreateView(
 inline ::flatbuffers::Offset<View> CreateViewDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<::flatbuffers::Offset<Triangle>> *triangles = nullptr,
-    steamrot::ViewDirection direction = steamrot::ViewDirection_FRONT) {
+    steamrot::ViewDirection direction = steamrot::ViewDirection_NONE) {
   auto triangles__ = triangles ? _fbb.CreateVector<::flatbuffers::Offset<Triangle>>(*triangles) : 0;
   return steamrot::CreateView(
       _fbb,
@@ -305,6 +308,36 @@ inline ::flatbuffers::Offset<FragmentData> CreateFragmentDataDirect(
       name__,
       socket_data,
       render_overlay_data);
+}
+
+inline const steamrot::FragmentData *GetFragmentData(const void *buf) {
+  return ::flatbuffers::GetRoot<steamrot::FragmentData>(buf);
+}
+
+inline const steamrot::FragmentData *GetSizePrefixedFragmentData(const void *buf) {
+  return ::flatbuffers::GetSizePrefixedRoot<steamrot::FragmentData>(buf);
+}
+
+inline bool VerifyFragmentDataBuffer(
+    ::flatbuffers::Verifier &verifier) {
+  return verifier.VerifyBuffer<steamrot::FragmentData>(nullptr);
+}
+
+inline bool VerifySizePrefixedFragmentDataBuffer(
+    ::flatbuffers::Verifier &verifier) {
+  return verifier.VerifySizePrefixedBuffer<steamrot::FragmentData>(nullptr);
+}
+
+inline void FinishFragmentDataBuffer(
+    ::flatbuffers::FlatBufferBuilder &fbb,
+    ::flatbuffers::Offset<steamrot::FragmentData> root) {
+  fbb.Finish(root);
+}
+
+inline void FinishSizePrefixedFragmentDataBuffer(
+    ::flatbuffers::FlatBufferBuilder &fbb,
+    ::flatbuffers::Offset<steamrot::FragmentData> root) {
+  fbb.FinishSizePrefixed(root);
 }
 
 }  // namespace steamrot

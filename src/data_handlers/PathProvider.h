@@ -48,5 +48,10 @@ public:
   /// @brief Provides top level data directory path
   /////////////////////////////////////////////////
   const std::filesystem::path GetDataDirectory() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Provides the path to the fragments directory
+  /////////////////////////////////////////////////
+  const std::filesystem::path GetFragmentDirectory() const;
 };
 } // namespace steamrot

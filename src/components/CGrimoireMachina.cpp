@@ -10,6 +10,7 @@
 #include "log_handler.h"
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/PrimitiveType.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <print>
 namespace steamrot {
 
@@ -63,9 +64,11 @@ void CGrimoireMachina::ConfigureFragment(const FragmentData *fragment_data) {
 
   // deal with sockets
   for (const auto *socket : *fragment_data->socket_data()->vertices()) {
-    sf::Vertex vertex;
-    vertex.position = sf::Vector2f(socket->x(), socket->y());
-    new_fragment.m_sockets.append(vertex);
+
+    sf::Vector2f vec{socket->x() ? socket->x() : 0.0f,
+                     socket->y() ? socket->y() : 0.0f};
+
+    new_fragment.m_sockets.push_back(vec);
   }
 
   // deal with render overlay

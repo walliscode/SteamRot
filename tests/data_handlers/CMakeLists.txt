@@ -17,6 +17,7 @@ target_link_libraries(test_data_handlers
 PRIVATE
   Catch2::Catch2WithMain
   data_handlers
+  components
 )
 
 catch_discover_tests(test_data_handlers)

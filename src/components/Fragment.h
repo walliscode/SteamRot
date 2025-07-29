@@ -9,6 +9,8 @@
 #include <SFML/Graphics/ConvexShape.hpp>
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
+#include <SFML/System/Vector2.hpp>
+#include <vector>
 
 namespace steamrot {
 /////////////////////////////////////////////////
@@ -18,9 +20,14 @@ namespace steamrot {
 /////////////////////////////////////////////////
 struct Fragment {
   /////////////////////////////////////////////////
+  /// @brief Fragment name
+  /////////////////////////////////////////////////
+  std::string m_name{"unnamed fragment"};
+
+  /////////////////////////////////////////////////
   /// @brief Local positions of the Fragment's sockets
   /////////////////////////////////////////////////
-  sf::VertexArray m_sockets;
+  std::vector<sf::Vector2f> m_sockets;
 
   /////////////////////////////////////////////////
   /// @brief Global transform of the fragment
@@ -32,14 +39,5 @@ struct Fragment {
   /// possible view.
   /////////////////////////////////////////////////
   std::unordered_map<ViewDirection, sf::VertexArray> m_overlays;
-
-  /////////////////////////////////////////////////
-  /// @brief Maps render vertices to sockets
-  ///
-  /// the position in the vector is the index of the vertex in the render
-  /// overlay and the value is the index of the socket in the m_sockets
-  /// ConvexShape.
-  /////////////////////////////////////////////////
-  std::vector<uint8_t> m_render_vertex_to_socket_map;
 };
 } // namespace steamrot

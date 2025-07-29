@@ -1,0 +1,5 @@
+{
+  "name": "missing_view_triangles",
+  "socket_data": { "vertices": [{ "x": 5, "y": 7 }] },
+  "render_overlay_data": { "views": [{ "triangles": [{ "vertices": [] }] }] }
+}

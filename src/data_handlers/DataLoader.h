@@ -16,11 +16,16 @@
 #include "PathProvider.h"
 #include <expected>
 #include <string>
+#include <utility>
 namespace steamrot {
 
 enum class DataFailMode {
   FileNotFound,
+  FlatbufferDataNotFound,
 };
+
+using FailureData = std::pair<DataFailMode, std::string>;
+
 /////////////////////////////////////////////////
 /// @class DataLoader
 /// @brief Abstract base class for data loading
@@ -28,13 +33,16 @@ enum class DataFailMode {
 /////////////////////////////////////////////////
 class DataLoader {
 
-private:
+protected:
   /////////////////////////////////////////////////
   /// @brief member variable to hold the path provider instance
   /////////////////////////////////////////////////
   PathProvider m_path_provider;
 
-  bool CheckFileExists(const std::string &file_name) const;
+  ////////////////////////////////////////////////////////////
+  /// \brief load binary data from file and return as vector of chars
+  ////////////////////////////////////////////////////////////
+  char *LoadBinaryData(const std::filesystem::path &file_path) const;
 
 public:
   // Virtual destructor to ensure proper cleanup of derived classes
@@ -47,7 +55,7 @@ public:
   /////////////////////////////////////////////////
   DataLoader(const EnvironmentType env_type = EnvironmentType::None);
 
-  virtual std::expected<Fragment, DataFailMode>
+  virtual std::expected<Fragment, FailureData>
   ProvideFragment(const std::string &fragment_name) const = 0;
 };
 } // namespace steamrot
