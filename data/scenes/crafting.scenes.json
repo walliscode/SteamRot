@@ -123,61 +123,8 @@
       },
       {
         "c_grimoire_machina": {
-          "fragments": [
-            {
-              "name": "bone",
-              "socket_data": {
-                "vertices": [
-                  {
-                    "x": 2.5,
-                    "y": 0.0
-                  },
-                  {
-                    "x": 2.5,
-                    "y": 12.0
-                  }
-                ]
-              },
-              "render_overlay_data": {
-                "views": [
-                  {
-                    "triangles": [
-                      {
-                        "vertices": [
-                          {
-                            "position": { "x": 2.5, "y": 0.0 },
-                            "color": { "r": 255, "g": 255, "b": 255, "a": 255 }
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
-            }
-          ],
-          "joints": [
-            {
-              "name": "hex",
-              "number_of_connections": 6,
-              "render_overlay_data": {
-                "views": [
-                  {
-                    "triangles": [
-                      {
-                        "vertices": [
-                          {
-                            "position": { "x": 2.5, "y": 0.0 },
-                            "color": { "r": 255, "g": 255, "b": 255, "a": 255 }
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
-            }
-          ]
+          "fragments": [],
+          "joints": []
         }
       }
     ]

@@ -12,6 +12,9 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "DataLoader.h"
+#include <expected>
+#include <string>
+#include <unordered_map>
 
 namespace steamrot {
 class FlatbuffersDataLoader : public DataLoader {
@@ -26,6 +29,15 @@ public:
   /////////////////////////////////////////////////
   std::expected<Fragment, FailureData>
   ProvideFragment(const std::string &fragment_name) const override;
+
+  /////////////////////////////////////////////////
+  /// @brief Provides all Fragments based on the provided names
+  ///
+  /// @param fragment_names Vector of strings representing the names of the
+  /// fragments
+  /////////////////////////////////////////////////
+  std::expected<std::unordered_map<std::string, Fragment>, FailureData>
+  ProvideAllFragments(std::vector<std::string> fragment_names) const override;
 };
 
 } // namespace steamrot

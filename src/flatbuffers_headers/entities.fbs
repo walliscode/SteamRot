@@ -6,7 +6,7 @@ namespace steamrot;
 table EntityData{
   index: uint32;
   c_user_interface: UserInterface;
-  c_grimoire_machina: GrimoireMachina;
+  c_grimoire_machina: GrimoireMachinaData;
 
   }
 

@@ -57,5 +57,8 @@ public:
 
   virtual std::expected<Fragment, FailureData>
   ProvideFragment(const std::string &fragment_name) const = 0;
+
+  virtual std::expected<std::unordered_map<std::string, Fragment>, FailureData>
+  ProvideAllFragments(std::vector<std::string> fragment_names) const = 0;
 };
 } // namespace steamrot

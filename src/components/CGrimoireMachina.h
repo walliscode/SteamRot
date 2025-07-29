@@ -8,7 +8,7 @@
 #include "CMachinaForm.h"
 #include "Component.h"
 #include "Fragment.h"
-#include "fragments_generated.h"
+
 #include "grimoire_machina_generated.h"
 
 #include <map>
@@ -54,17 +54,8 @@ struct CGrimoireMachina : public Component {
   /////////////////////////////////////////////////
   /// @brief Configure the CGrimoireMachina component.
   /////////////////////////////////////////////////
-  void Configure(const GrimoireMachina *grimoire_data);
+  void Configure(const GrimoireMachinaData *grimoire_data);
 
 private:
-  /////////////////////////////////////////////////
-  /// @brief Configure and load all fragments from the provided data.
-  ///
-  /// @param fragment_data Flatbuffers data containing all fragments from
-  /// specified file.
-  /////////////////////////////////////////////////
-  void ConfigureFragment(const FragmentData *fragment_data);
-
-  void ConfigureJoint(const JointData *joint_data);
 };
 } // namespace steamrot
