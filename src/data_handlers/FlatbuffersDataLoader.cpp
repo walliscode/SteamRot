@@ -117,6 +117,7 @@ FlatbuffersDataLoader::ProvideFragment(const std::string &fragment_name) const {
 std::expected<std::unordered_map<std::string, Fragment>, FailureData>
 FlatbuffersDataLoader::ProvideAllFragments(
     std::vector<std::string> fragment_names) const {
+
   std::unordered_map<std::string, Fragment> fragments;
 
   for (const auto &fragment_name : fragment_names) {

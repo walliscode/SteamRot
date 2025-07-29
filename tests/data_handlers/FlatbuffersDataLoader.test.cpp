@@ -140,8 +140,27 @@ TEST_CASE("Fragment data provided with correct values",
   REQUIRE(result->m_sockets[0].y == 7.0f);
 }
 
-TEST_CASE("Given GrimoireMachina data return a unordered map with all "
-          "requested Fragments",
+TEST_CASE("FlatbuffersDataLoader returns error when fragments do not exist",
           "[FlatbuffersDataLoader]") {
   steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+  auto result = data_loader.ProvideAllFragments({"non_existent_fragment"});
+  REQUIRE(result.has_value() == false);
+  REQUIRE(result.error().first == steamrot::DataFailMode::FileNotFound);
+  REQUIRE(result.error().second == "file not found");
+}
+
+TEST_CASE("FlatbuffersDataLoader returns all fragments",
+          "[FlatbuffersDataLoader]") {
+  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+  auto result = data_loader.ProvideAllFragments({"valid_fragment"});
+  REQUIRE(result.has_value() == true);
+  REQUIRE(result.value().size() == 1);
+  REQUIRE(result.value().contains("valid_fragment"));
+  const auto &fragment = result.value().at("valid_fragment");
+
+  // test expected values
+  REQUIRE(fragment.m_name == "valid_fragment");
+  REQUIRE(fragment.m_overlays.size() == 1);
+  REQUIRE(fragment.m_overlays.contains(
+      steamrot::ViewDirection::ViewDirection_FRONT));
 }
