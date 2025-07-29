@@ -112,4 +112,21 @@ FlatbuffersDataLoader::ProvideFragment(const std::string &fragment_name) const {
 
   return fragment;
 }
+
+/////////////////////////////////////////////////
+std::expected<std::unordered_map<std::string, Fragment>, FailureData>
+FlatbuffersDataLoader::ProvideAllFragments(
+    std::vector<std::string> fragment_names) const {
+  std::unordered_map<std::string, Fragment> fragments;
+
+  for (const auto &fragment_name : fragment_names) {
+    auto fragment_result = ProvideFragment(fragment_name);
+    // pass up any errors
+    if (!fragment_result.has_value()) {
+      return std::unexpected(fragment_result.error());
+    }
+    fragments[fragment_name] = fragment_result.value();
+  }
+  return fragments;
+}
 } // namespace steamrot

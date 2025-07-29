@@ -139,3 +139,9 @@ TEST_CASE("Fragment data provided with correct values",
   REQUIRE(result->m_sockets[0].x == 5.0f);
   REQUIRE(result->m_sockets[0].y == 7.0f);
 }
+
+TEST_CASE("Given GrimoireMachina data return a unordered map with all "
+          "requested Fragments",
+          "[FlatbuffersDataLoader]") {
+  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+}

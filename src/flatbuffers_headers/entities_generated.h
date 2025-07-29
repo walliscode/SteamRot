@@ -37,8 +37,8 @@ struct EntityData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::UserInterface *c_user_interface() const {
     return GetPointer<const steamrot::UserInterface *>(VT_C_USER_INTERFACE);
   }
-  const steamrot::GrimoireMachina *c_grimoire_machina() const {
-    return GetPointer<const steamrot::GrimoireMachina *>(VT_C_GRIMOIRE_MACHINA);
+  const steamrot::GrimoireMachinaData *c_grimoire_machina() const {
+    return GetPointer<const steamrot::GrimoireMachinaData *>(VT_C_GRIMOIRE_MACHINA);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -61,7 +61,7 @@ struct EntityDataBuilder {
   void add_c_user_interface(::flatbuffers::Offset<steamrot::UserInterface> c_user_interface) {
     fbb_.AddOffset(EntityData::VT_C_USER_INTERFACE, c_user_interface);
   }
-  void add_c_grimoire_machina(::flatbuffers::Offset<steamrot::GrimoireMachina> c_grimoire_machina) {
+  void add_c_grimoire_machina(::flatbuffers::Offset<steamrot::GrimoireMachinaData> c_grimoire_machina) {
     fbb_.AddOffset(EntityData::VT_C_GRIMOIRE_MACHINA, c_grimoire_machina);
   }
   explicit EntityDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
@@ -79,7 +79,7 @@ inline ::flatbuffers::Offset<EntityData> CreateEntityData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t index = 0,
     ::flatbuffers::Offset<steamrot::UserInterface> c_user_interface = 0,
-    ::flatbuffers::Offset<steamrot::GrimoireMachina> c_grimoire_machina = 0) {
+    ::flatbuffers::Offset<steamrot::GrimoireMachinaData> c_grimoire_machina = 0) {
   EntityDataBuilder builder_(_fbb);
   builder_.add_c_grimoire_machina(c_grimoire_machina);
   builder_.add_c_user_interface(c_user_interface);

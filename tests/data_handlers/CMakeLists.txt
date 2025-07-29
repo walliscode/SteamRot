@@ -18,6 +18,8 @@ PRIVATE
   Catch2::Catch2WithMain
   data_handlers
   components
+  flatbuffers
+  flatbuffers_headers
 )
 
 catch_discover_tests(test_data_handlers)
