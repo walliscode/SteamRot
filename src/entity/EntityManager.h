@@ -8,7 +8,6 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "ArchetypeManager.h"
-#include "EntityConfigurationFactory.h"
 
 #include "containers.h"
 #include "entities_generated.h"
@@ -34,7 +33,6 @@ private:
   std::vector<size_t> m_entities_to_remove;
   std::unique_ptr<components::containers::EntityMemoryPool> m_pool;
   ArchetypeManager m_archetype_manager;
-  EntityConfigurationFactory m_entity_configuration_factory;
 
 public:
   EntityManager() = default;

@@ -3,16 +3,28 @@
 ////////////////////////////////////////////////////////////
 #include "EntityConfigurationFactory.h"
 #include "CUserInterface.h"
+#include "DataLoader.h"
 #include "EntityHelpers.h"
 #include "containers.h"
 #include "entities_generated.h"
 #include "log_handler.h"
 #include <iostream>
+#include <memory>
 namespace steamrot {
 ////////////////////////////////////////////////////////////
-EntityConfigurationFactory::EntityConfigurationFactory() {};
+EntityConfigurationFactory::EntityConfigurationFactory(
+    std::shared_ptr<DataLoader> data_loader)
+    : m_data_loader(data_loader) {};
 
 ////////////////////////////////////////////////////////////
+void EntityConfigurationFactory::ConfigureComponent(Component &component) {
+  // set general component properties
+  component.m_active = true;
+}
+
+/////////////////////////////////////////////////
+void EntityConfigurationFactory::ConfigureComponentSpecifics(
+    CGrimoireMachina &grimoire) {}
 ////////////////////////////////////////////////////////////
 void EntityConfigurationFactory::ConfigureEntitiesFromDefaultData(
     components::containers::EntityMemoryPool &entity_memory_pool,

@@ -15,6 +15,7 @@ target_link_libraries(entity
   PUBLIC
   nlohmann_json::nlohmann_json
   SFML::Graphics
+  data_handlers
   components
   logger
   flatbuffers
