@@ -1,18 +1,51 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Delcaration of the Component struct
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Preprocessor Directives
+/////////////////////////////////////////////////
 #pragma once
 
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
+namespace steamrot {
+/////////////////////////////////////////////////
+/// @class Component
+/// @brief [TODO:description]
+///
+/////////////////////////////////////////////////
 struct Component {
+
+  /////////////////////////////////////////////////
+  /// @brief Destrcutor for the abstract Component struct
+  /////////////////////////////////////////////////
   virtual ~Component() = default;
+
+  /////////////////////////////////////////////////
+  /// @brief Virtual method to generate the Component's name
+  /////////////////////////////////////////////////
   virtual const std::string &Name() = 0;
 
-  /**
-   * @brief Generates a unique index for the component based on its type and its
-   * position in the component register.
-   *
-   * @return Index of the component in the component register.
-   */
+  /////////////////////////////////////////////////
+  /// @brief Virtual method to find the Component's position in the component
+  /// register
+  ///
+  /// @return Size_t representing the index of the component in the register
+  /////////////////////////////////////////////////
   virtual const size_t GetComponentRegisterIndex() const = 0;
+
+  /////////////////////////////////////////////////
+  /// @brief Is this Component active?
+  ///
+  /// This is used to determine whether the Component is included in archetype
+  /// calculations. Not use to dictate whether the Entity is "alive" in game
+  /// sense.
+  /////////////////////////////////////////////////
   bool m_active{false};
 };
+} // namespace steamrot
