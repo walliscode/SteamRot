@@ -6,7 +6,7 @@ PathProvider.cpp
 @ONLY)
 
 add_library(data_handlers
-DataLoader.cpp
+  DataLoader.cpp
   FlatbuffersDataLoader.cpp
   PathProvider.cpp
 )

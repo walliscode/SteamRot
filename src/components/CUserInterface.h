@@ -38,12 +38,6 @@ struct CUserInterface : public Component {
   /////////////////////////////////////////////////
   bool m_UI_visible{false};
 
-  /**
-   * @brief String representation of the component name, this will return a
-   * static value so it is constant across all instances
-   */
-  const std::string &Name() override;
-
   /////////////////////////////////////////////////
   /// @brief Confiure the component with flatbuffer data
   ///

@@ -9,12 +9,6 @@
 #include "user_interface_generated.h"
 
 namespace steamrot {
-////////////////////////////////////////////////////////////
-const std::string &CUserInterface::Name() {
-
-  static const std::string name = "CUserInterface";
-  return name;
-}
 
 /////////////////////////////////////////////////
 void CUserInterface::Configure(const UserInterface *user_interface_data) {

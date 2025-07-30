@@ -1,9 +1,9 @@
 add_library(entity
     EntityManager.cpp
-    EntityConfigurationFactory.cpp
+    EntityConfigurator.cpp
     ArchetypeManager.cpp
     EntityHelpers.cpp
-   )
+  )
 
 target_include_directories(entity
   PUBLIC
@@ -15,6 +15,7 @@ target_link_libraries(entity
   PUBLIC
   nlohmann_json::nlohmann_json
   SFML::Graphics
+  data_handlers
   components
   logger
   flatbuffers

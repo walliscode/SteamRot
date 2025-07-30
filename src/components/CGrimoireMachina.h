@@ -47,11 +47,6 @@ struct CGrimoireMachina : public Component {
   const size_t GetComponentRegisterIndex() const override;
 
   /////////////////////////////////////////////////
-  /// @brief Creates and returns a string representation of the component name.
-  /////////////////////////////////////////////////
-  const std::string &Name() override;
-
-  /////////////////////////////////////////////////
   /// @brief Configure the CGrimoireMachina component.
   /////////////////////////////////////////////////
   void Configure(const GrimoireMachinaData *grimoire_data);

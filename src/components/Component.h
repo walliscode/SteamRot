@@ -27,11 +27,6 @@ struct Component {
   virtual ~Component() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Virtual method to generate the Component's name
-  /////////////////////////////////////////////////
-  virtual const std::string &Name() = 0;
-
-  /////////////////////////////////////////////////
   /// @brief Virtual method to find the Component's position in the component
   /// register
   ///
