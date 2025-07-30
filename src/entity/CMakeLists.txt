@@ -1,9 +1,9 @@
 add_library(entity
     EntityManager.cpp
-    EntityConfigurationFactory.cpp
+    EntityConfigurator.cpp
     ArchetypeManager.cpp
     EntityHelpers.cpp
-   )
+  )
 
 target_include_directories(entity
   PUBLIC

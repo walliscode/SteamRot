@@ -9,12 +9,6 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-const std::string &CMachinaForm::Name() {
-  static const std::string name = "CMachinaForm";
-  return name;
-}
-
-/////////////////////////////////////////////////
 const size_t CMachinaForm::GetComponentRegisterIndex() const {
 
   // Get the index of this component in the component register

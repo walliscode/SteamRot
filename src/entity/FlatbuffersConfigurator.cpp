@@ -1,41 +1,28 @@
-////////////////////////////////////////////////////////////
-// Headers
-////////////////////////////////////////////////////////////
-#include "EntityConfigurationFactory.h"
-#include "CUserInterface.h"
-#include "DataLoader.h"
-#include "EntityHelpers.h"
-#include "containers.h"
-#include "entities_generated.h"
-#include "log_handler.h"
-#include <iostream>
-#include <memory>
-namespace steamrot {
-////////////////////////////////////////////////////////////
-EntityConfigurationFactory::EntityConfigurationFactory(
-    std::shared_ptr<DataLoader> data_loader)
-    : m_data_loader(data_loader) {};
-
-////////////////////////////////////////////////////////////
-void EntityConfigurationFactory::ConfigureComponent(Component &component) {
-  // set general component properties
-  component.m_active = true;
-}
+/////////////////////////////////////////////////
+/// @file
+/// @brief Implementation of FlatbuffersConfigurator class
+/////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
-void EntityConfigurationFactory::ConfigureComponentSpecifics(
-    CGrimoireMachina &grimoire) {}
+/// Headers
+/////////////////////////////////////////////////
+#include "FlatbuffersConfigurator.h"
+#include "EntityHelpers.h"
+#include <iostream>
+
+namespace steamrot {
+/////////////////////////////////////////////////
+FlatbuffersConfigurator::FlatbuffersConfigurator(const EnvironmentType env_type)
+    : m_data_loader(env_type) {}
+
 ////////////////////////////////////////////////////////////
-void EntityConfigurationFactory::ConfigureEntitiesFromDefaultData(
+void FlatbuffersConfigurator::ConfigureEntitiesFromDefaultData(
     components::containers::EntityMemoryPool &entity_memory_pool,
     const EntityCollection *entity_collection) {
 
   // check if entity_data is not null
   if (entity_collection->entities() == nullptr) {
 
-    log_handler::ProcessLog(spdlog::level::level_enum::info,
-                            log_handler::LogCode::kNoCode,
-                            "Entity data is empty, please add Entitiy Data.");
     return;
   }
   std::cout << "Configuring " << entity_collection->entities()->size()
