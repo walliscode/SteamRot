@@ -41,6 +41,8 @@ TEST_CASE("PathProvider intiated with a test environment", "[PathProvider]") {
   REQUIRE(path_provider.GetDataDirectory() == "@CMAKE_SOURCE_DIR@/tests/data");
   REQUIRE(path_provider.GetFragmentDirectory() ==
           "@CMAKE_SOURCE_DIR@/tests/data/fragments");
+  REQUIRE(path_provider.GetSceneDirectory() ==
+          "@CMAKE_SOURCE_DIR@/tests/data/scenes");
 }
 
 TEST_CASE("PathProvider intiated with a production environment",
@@ -50,4 +52,6 @@ TEST_CASE("PathProvider intiated with a production environment",
   REQUIRE(path_provider.GetDataDirectory() == "@CMAKE_SOURCE_DIR@/data");
   REQUIRE(path_provider.GetFragmentDirectory() ==
           "@CMAKE_SOURCE_DIR@/data/fragments");
+  REQUIRE(path_provider.GetSceneDirectory() ==
+          "@CMAKE_SOURCE_DIR@/data/scenes");
 }

@@ -9,6 +9,7 @@
 #include "FlatbuffersDataLoader.h"
 #include "Fragment.h"
 #include "fragments_generated.h"
+#include "scenes_generated.h"
 #include <SFML/Graphics/PrimitiveType.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <iostream>
@@ -129,5 +130,44 @@ FlatbuffersDataLoader::ProvideAllFragments(
     fragments[fragment_name] = fragment_result.value();
   }
   return fragments;
+}
+
+/////////////////////////////////////////////////
+const std::expected<SceneData, FailureData>
+FlatbuffersDataLoader::ProvideSceneData(const SceneType scene_type) const {
+
+  // get file prefix from scene type
+  std::string scene_file_prefix;
+  switch (scene_type) {
+  case SceneType::SceneType_UNKNOWN: {
+    scene_file_prefix = "unknown";
+    break;
+  }
+  case SceneType::SceneType_TEST: {
+    scene_file_prefix = "test";
+    break;
+  }
+  default:
+    return std::unexpected(std::make_pair(DataFailMode::InvalidSceneType,
+                                          "Invalid SceneType provided"));
+  }
+
+  // construct the file path
+  std::filesystem::path scene_path =
+      m_path_provider.GetSceneDirectory() / (scene_file_prefix + ".scene.bin");
+
+  // check if the file exists
+  if (!std::filesystem::exists(scene_path)) {
+    std::string error_message =
+        std::format("Scene file not found: {}", scene_file_prefix);
+    return std::unexpected(
+        std::make_pair(DataFailMode::FileNotFound, error_message));
+  }
+
+  // load the scene data
+  const steamrot::SceneData *scene_data =
+      GetSceneData(LoadBinaryData(scene_path));
+  return std::unexpected(std::make_pair(DataFailMode::FunctionNotImplemented,
+                                        "ProvideSceneData not implemented"));
 }
 } // namespace steamrot

@@ -20,8 +20,10 @@
 namespace steamrot {
 
 enum class DataFailMode {
+  FunctionNotImplemented,
   FileNotFound,
   FlatbufferDataNotFound,
+  InvalidSceneType,
 };
 
 using FailureData = std::pair<DataFailMode, std::string>;

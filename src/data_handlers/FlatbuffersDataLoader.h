@@ -12,6 +12,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "DataLoader.h"
+#include "scene_types_generated.h"
+#include "scenes_generated.h"
 #include <expected>
 #include <string>
 #include <unordered_map>
@@ -38,6 +40,14 @@ public:
   /////////////////////////////////////////////////
   std::expected<std::unordered_map<std::string, Fragment>, FailureData>
   ProvideAllFragments(std::vector<std::string> fragment_names) const override;
+
+  /////////////////////////////////////////////////
+  /// @brief Provides SceneData based on the SceneType
+  ///
+  /// @param scene_type Enum representing the type of scene
+  /////////////////////////////////////////////////
+  const std::expected<SceneData, FailureData>
+  ProvideSceneData(const SceneType scene_type) const;
 };
 
 } // namespace steamrot

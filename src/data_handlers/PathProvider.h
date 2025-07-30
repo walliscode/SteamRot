@@ -53,5 +53,10 @@ public:
   /// @brief Provides the path to the fragments directory
   /////////////////////////////////////////////////
   const std::filesystem::path GetFragmentDirectory() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Provides the path to the scenes directory
+  /////////////////////////////////////////////////
+  const std::filesystem::path GetSceneDirectory() const;
 };
 } // namespace steamrot

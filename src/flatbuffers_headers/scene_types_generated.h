@@ -16,14 +16,18 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 namespace steamrot {
 
 enum SceneType : int8_t {
-  SceneType_TITLE = 0,
-  SceneType_CRAFTING = 1,
-  SceneType_MIN = SceneType_TITLE,
+  SceneType_UNKNOWN = 0,
+  SceneType_TEST = 1,
+  SceneType_TITLE = 2,
+  SceneType_CRAFTING = 3,
+  SceneType_MIN = SceneType_UNKNOWN,
   SceneType_MAX = SceneType_CRAFTING
 };
 
-inline const SceneType (&EnumValuesSceneType())[2] {
+inline const SceneType (&EnumValuesSceneType())[4] {
   static const SceneType values[] = {
+    SceneType_UNKNOWN,
+    SceneType_TEST,
     SceneType_TITLE,
     SceneType_CRAFTING
   };
@@ -31,7 +35,9 @@ inline const SceneType (&EnumValuesSceneType())[2] {
 }
 
 inline const char * const *EnumNamesSceneType() {
-  static const char * const names[3] = {
+  static const char * const names[5] = {
+    "UNKNOWN",
+    "TEST",
     "TITLE",
     "CRAFTING",
     nullptr
@@ -40,7 +46,7 @@ inline const char * const *EnumNamesSceneType() {
 }
 
 inline const char *EnumNameSceneType(SceneType e) {
-  if (::flatbuffers::IsOutRange(e, SceneType_TITLE, SceneType_CRAFTING)) return "";
+  if (::flatbuffers::IsOutRange(e, SceneType_UNKNOWN, SceneType_CRAFTING)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesSceneType()[index];
 }

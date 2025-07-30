@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "FlatbuffersDataLoader.h"
 #include "fragments_generated.h"
+#include "scene_types_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Dataloader fails to initiate PathProvider", "[DataLoader]") {
@@ -163,4 +164,25 @@ TEST_CASE("FlatbuffersDataLoader returns all fragments",
   REQUIRE(fragment.m_overlays.size() == 1);
   REQUIRE(fragment.m_overlays.contains(
       steamrot::ViewDirection::ViewDirection_FRONT));
+}
+
+TEST_CASE(
+    "FlatbuffersDataLoader returns file not found when loading scene data",
+    "[FlatbuffersDataLoader]") {
+  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+  auto result = data_loader.ProvideSceneData(steamrot::SceneType_UNKNOWN);
+  REQUIRE(result.has_value() == false);
+  REQUIRE(result.error().first == steamrot::DataFailMode::FileNotFound);
+  REQUIRE(result.error().second == "Scene file not found: "
+                                   "unknown");
+}
+
+TEST_CASE("Flatbuffers returns error when missing entity data",
+          "[FlatbuffersDataLoader]") {
+  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+  auto result = data_loader.ProvideSceneData(steamrot::SceneType_TEST);
+  REQUIRE(result.has_value() == false);
+  REQUIRE(result.error().first ==
+          steamrot::DataFailMode::FlatbufferDataNotFound);
+  REQUIRE(result.error().second == "Scene entities not found");
 }
