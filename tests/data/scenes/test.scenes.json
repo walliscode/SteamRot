@@ -1,0 +1,65 @@
+{
+  "entity_collection": {
+    "entities": [
+      {
+        "c_user_interface": {
+          "ui_name": "navigation_menu",
+          "start_visible": true,
+          "root_ui_element": {
+            "type": "Panel",
+            "layout": "Vertical",
+            "element_type": "PanelData",
+            "element": {},
+            "children_active": true,
+            "children": [
+              {
+                "type": "Button",
+                "layout": "Horizontal",
+                "children": [],
+                "element_type": "ButtonData",
+                "element": {
+                  "label": "Return"
+                },
+
+                "trigger_event": "EVENT_USER_INPUT",
+                "trigger_event_data_type": "UserInputBitsetData",
+                "trigger_event_data": {
+                  "mouse_released": ["LEFT_CLICK"]
+                },
+                "response_event": "EVENT_CHANGE_SCENE",
+                "response_event_data_type": "SceneChangeData",
+                "response_event_data": {
+                  "scene_type": "TITLE"
+                }
+              },
+              {
+                "type": "Button",
+                "layout": "Horizontal",
+                "children": [],
+                "element_type": "ButtonData",
+                "element": {
+                  "label": "New Construct"
+                }
+              }
+            ],
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "size": {
+              "x": 220,
+              "y": 600
+            }
+          }
+        }
+      }
+    ]
+  },
+  "logic_collection": {
+    "types": ["Render", "Collision"]
+  },
+  "ui_theme": "test_theme",
+  "assets": {
+    "fonts": [{ "name": "TestFont-Regular" }]
+  }
+}

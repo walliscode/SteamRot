@@ -20,6 +20,7 @@ PRIVATE
   components
   flatbuffers
   flatbuffers_headers
+  magic_enum::magic_enum
 )
 
 catch_discover_tests(test_data_handlers)

@@ -133,7 +133,7 @@ FlatbuffersDataLoader::ProvideAllFragments(
 }
 
 /////////////////////////////////////////////////
-const std::expected<SceneData, FailureData>
+std::expected<const SceneData *, FailureData>
 FlatbuffersDataLoader::ProvideSceneData(const SceneType scene_type) const {
 
   // get file prefix from scene type
@@ -154,7 +154,7 @@ FlatbuffersDataLoader::ProvideSceneData(const SceneType scene_type) const {
 
   // construct the file path
   std::filesystem::path scene_path =
-      m_path_provider.GetSceneDirectory() / (scene_file_prefix + ".scene.bin");
+      m_path_provider.GetSceneDirectory() / (scene_file_prefix + ".scenes.bin");
 
   // check if the file exists
   if (!std::filesystem::exists(scene_path)) {
@@ -167,7 +167,7 @@ FlatbuffersDataLoader::ProvideSceneData(const SceneType scene_type) const {
   // load the scene data
   const steamrot::SceneData *scene_data =
       GetSceneData(LoadBinaryData(scene_path));
-  return std::unexpected(std::make_pair(DataFailMode::FunctionNotImplemented,
-                                        "ProvideSceneData not implemented"));
+
+  return scene_data;
 }
 } // namespace steamrot

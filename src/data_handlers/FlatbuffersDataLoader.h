@@ -46,7 +46,7 @@ public:
   ///
   /// @param scene_type Enum representing the type of scene
   /////////////////////////////////////////////////
-  const std::expected<SceneData, FailureData>
+  std::expected<const SceneData *, FailureData>
   ProvideSceneData(const SceneType scene_type) const;
 };
 
