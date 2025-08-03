@@ -20,5 +20,4 @@ TEST_CASE("Configuring a CGrimoireMachina turns it active",
   REQUIRE(grimoire.m_machina_forms.empty());
   REQUIRE(grimoire.m_holding_form == nullptr);
   REQUIRE(grimoire.GetComponentRegisterIndex() == 3);
-  REQUIRE(grimoire.Name() == "CGrimoireMachina");
 }

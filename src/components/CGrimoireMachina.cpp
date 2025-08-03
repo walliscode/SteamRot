@@ -21,11 +21,6 @@ const size_t CGrimoireMachina::GetComponentRegisterIndex() const {
 }
 
 /////////////////////////////////////////////////
-const std::string &CGrimoireMachina::Name() {
-  static const std::string name = "CGrimoireMachina";
-  return name;
-}
-/////////////////////////////////////////////////
 void CGrimoireMachina::Configure(const GrimoireMachinaData *grimoire_data) {
 
   // Set component level data

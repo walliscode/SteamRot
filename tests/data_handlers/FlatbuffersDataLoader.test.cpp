@@ -9,6 +9,7 @@
 #include "FlatbuffersDataLoader.h"
 #include "fragments_generated.h"
 #include <catch2/catch_test_macros.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 TEST_CASE("Dataloader fails to initiate PathProvider", "[DataLoader]") {
   REQUIRE_THROWS(
@@ -163,4 +164,15 @@ TEST_CASE("FlatbuffersDataLoader returns all fragments",
   REQUIRE(fragment.m_overlays.size() == 1);
   REQUIRE(fragment.m_overlays.contains(
       steamrot::ViewDirection::ViewDirection_FRONT));
+}
+
+TEST_CASE("FlatbuffersDataLoader provides scene data",
+          "[FlatbuffersDataLoader]") {
+  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+  auto result =
+      data_loader.ProvideSceneData(steamrot::SceneType::SceneType_TEST);
+  REQUIRE(result.has_value() == true);
+  const auto &scene_data = result.value();
+  REQUIRE(scene_data != nullptr);
+  REQUIRE(!scene_data->entity_collection()->entities()->empty());
 }

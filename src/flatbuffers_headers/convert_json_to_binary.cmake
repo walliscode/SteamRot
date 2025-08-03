@@ -1,106 +1,52 @@
-# set data directory types
+# Set data directory types (root dirs)
 set(DIRECTORY_ROOTS
-${CMAKE_SOURCE_DIR}/data
-${CMAKE_SOURCE_DIR}/tests/data
+    ${CMAKE_SOURCE_DIR}/data
+    ${CMAKE_SOURCE_DIR}/tests/data
 )
 
+# Clear the global binary list at configure time
+set(FLATBUFFERS_ALL_GENERATED_BINARIES)
 
-# -- FlatBuffers generation for themes.fbs --
-set(themes_schema "${CMAKE_CURRENT_SOURCE_DIR}/themes.fbs")
-set(THEMES_DIR "${data_dir}/themes")
+# Macro to define FlatBuffers generation for a given schema/json type
+# Arguments:
+#   1 - schema name without extension (e.g. themes, scenes, fragments)
+#   2 - json file extension pattern (e.g. .themes.json, .scenes.json, .fragment.json)
+#   3 - subdirectory under root (e.g. themes, scenes, fragments)
+macro(flatbuffers_generate_for_type schema_name json_ext subdir)
+  set(schema "${CMAKE_CURRENT_SOURCE_DIR}/${schema_name}.fbs")
+  foreach(root_dir ${DIRECTORY_ROOTS})
+    set(data_dir "${root_dir}/${subdir}")
+    file(GLOB jsons "${data_dir}/*${json_ext}")
 
-# All JSON files for themes.fbs
-file(GLOB themes_jsons "${THEMES_DIR}/*.themes.json")
+    foreach(json_file ${jsons})
+      get_filename_component(json_we ${json_file} NAME_WE)
+      set(bin_file "${data_dir}/${json_we}${json_ext}.bin")
 
-set(themes_generated_binaries)
+      # Accumulate all binaries in a global variable
+      list(APPEND FLATBUFFERS_ALL_GENERATED_BINARIES "${bin_file}")
 
-foreach(json_file ${themes_jsons})
-  get_filename_component(json_we ${json_file} NAME_WE) # strips .json
-  set(bin_file "${THEMES_DIR}/${json_we}.themes.bin")
-  list(APPEND themes_generated_binaries "${bin_file}")
-
-  add_custom_command(
-    OUTPUT "${bin_file}"
-    COMMAND flatc
-      --binary
-      -o "${THEMES_DIR}"
-      "${themes_schema}"
-      "${json_file}"
-    DEPENDS "${themes_schema}" "${json_file}"
-    COMMAND ${CMAKE_COMMAND}
-      -E echo "Generating binary FlatBuffer ${bin_file}
-       from ${json_file} using ${themes_schema}"
-    VERBATIM
-  )
-endforeach()
-
-# generate all scene binaries
-set(scenes_schema "${CMAKE_CURRENT_SOURCE_DIR}/scenes.fbs")
-set(SCENES_DIR "${data_dir}/scenes")
-
-# All JSON files for scenes.fbs
-file(GLOB scenes_jsons "${SCENES_DIR}/*.scenes.json")
-
-# message out detected scene_jsons
-
-set(scenes_generated_binaries)
-
-foreach(json_file ${scenes_jsons})
-  get_filename_component(json_we ${json_file} NAME_WE) # strips .json
-  set(bin_file "${SCENES_DIR}/${json_we}.scenes.bin")
-  list(APPEND scenes_generated_binaries "${bin_file}")
-  add_custom_command(
-    OUTPUT "${bin_file}"
-    COMMAND flatc
-      --binary
-      -o "${SCENES_DIR}"
-      "${scenes_schema}"
-      "${json_file}"
-    DEPENDS "${scenes_schema}" "${json_file}"
-    COMMAND ${CMAKE_COMMAND}
-      -E echo "Generating binary FlatBuffer ${bin_file}
-       from ${json_file} using ${scenes_schema}"
-    VERBATIM
-  )
-endforeach()
-
-# -- FlatBuffers generation for fragment.fbs --
-set(fragments_schema "${CMAKE_CURRENT_SOURCE_DIR}/fragments.fbs")
-## cycle through all directory roots
-foreach(root_dir ${DIRECTORY_ROOTS})
-  message(STATUS "Processing FlatBuffers fragments in: ${fragments_dir}")
-  set(fragments_dir "${root_dir}/fragments")
-  # All JSON files for fragments.fbs
-  file(GLOB fragments_jsons "${fragments_dir}/*.fragment.json")
-  if(NOT EXISTS "${fragments_jsons}")
-    message(STATUS "No fragment JSON files found in ${fragments_dir}. Skipping.")
-  else()
-    message(STATUS "Found fragment files in ${fragments_dir}: ${fragments_jsons}")
-  endif()
-  set(fragments_generated_binaries)
-  foreach(json_file ${fragments_jsons})
-    get_filename_component(json_we ${json_file} NAME_WE) # strips .json
-    set(bin_file "${root_dir}/${json_we}.fragment.bin")
-    list(APPEND fragments_generated_binaries "${bin_file}")
-    add_custom_command(
-      OUTPUT "${bin_file}"
-      COMMAND flatc
-        --binary
-        -o "${fragments_dir}"
-        "${fragments_schema}"
-        "${json_file}"
-      DEPENDS "${fragments_schema}" "${json_file}"
-      COMMAND ${CMAKE_COMMAND}
-        -E echo "Generating binary FlatBuffer ${bin_file}
-         from ${json_file} using ${fragments_schema}"
-      VERBATIM
-    )
+      add_custom_command(
+                OUTPUT "${bin_file}"
+                COMMAND flatc
+                    --binary
+                    -o "${data_dir}"
+                    "${schema}"
+                    "${json_file}"
+                DEPENDS "${schema}" "${json_file}"
+                COMMAND ${CMAKE_COMMAND}
+                    -E echo "Generating binary FlatBuffer ${bin_file} from ${json_file} using ${schema}"
+                VERBATIM
+            )
+    endforeach()
   endforeach()
-endforeach()
+endmacro()
 
-add_custom_target(flatbuffers_generate_themes_binaries ALL
-  DEPENDS
-  ${themes_generated_binaries}
-  ${scenes_generated_binaries}
-  ${fragments_generated_binaries}
+# Call macro for each supported type
+flatbuffers_generate_for_type(themes ".themes.json" "themes")
+flatbuffers_generate_for_type(scenes ".scenes.json" "scenes")
+flatbuffers_generate_for_type(fragments ".fragment.json" "fragments")
+
+# This target will actually trigger all the binary generation
+add_custom_target(flatbuffers_generate_binaries ALL
+    DEPENDS ${FLATBUFFERS_ALL_GENERATED_BINARIES}
 )

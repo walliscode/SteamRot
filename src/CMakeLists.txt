@@ -1,5 +1,3 @@
-# order of subdirectories is important
-
 add_subdirectory(config)
 add_subdirectory(components)
 add_subdirectory(display)

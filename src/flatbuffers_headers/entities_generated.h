@@ -97,7 +97,7 @@ struct EntityCollection FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_ENTITIES) &&
+           VerifyOffsetRequired(verifier, VT_ENTITIES) &&
            verifier.VerifyVector(entities()) &&
            verifier.VerifyVectorOfTables(entities()) &&
            verifier.EndTable();
@@ -118,6 +118,7 @@ struct EntityCollectionBuilder {
   ::flatbuffers::Offset<EntityCollection> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = ::flatbuffers::Offset<EntityCollection>(end);
+    fbb_.Required(o, EntityCollection::VT_ENTITIES);
     return o;
   }
 };

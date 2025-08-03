@@ -48,4 +48,9 @@ const std::filesystem::path PathProvider::GetFragmentDirectory() const {
 
   return GetDataDirectory() / "fragments";
 }
+
+/////////////////////////////////////////////////
+const std::filesystem::path PathProvider::GetSceneDirectory() const {
+  return GetDataDirectory() / "scenes";
+}
 } // namespace steamrot
