@@ -51,6 +51,11 @@ std::unique_ptr<Scene> SceneFactory::CreateScene(const SceneType &scene_type) {
     // due to CraftingScene having a private constuctor
 
     return CreateCraftingScene(scene_data, scene_uuid);
+
+  default:
+    std::cerr << "Unknown scene type: " << static_cast<int>(scene_type)
+              << std::endl;
+    throw std::runtime_error("SceneFactory::CreateScene: Unknown scene type.");
   }
 }
 ////////////////////////////////////////////////////////////

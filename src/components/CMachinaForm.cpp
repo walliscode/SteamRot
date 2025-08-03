@@ -9,7 +9,7 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-const size_t CMachinaForm::GetComponentRegisterIndex() const {
+size_t CMachinaForm::GetComponentRegisterIndex() const {
 
   // Get the index of this component in the component register
   static constexpr size_t index = components::containers::TupleTypeIndex<

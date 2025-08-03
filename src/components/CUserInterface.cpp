@@ -44,7 +44,7 @@ void CUserInterface::Configure(const UserInterface *user_interface_data) {
 };
 
 /////////////////////////////////////////////////
-const size_t CUserInterface::GetComponentRegisterIndex() const {
+size_t CUserInterface::GetComponentRegisterIndex() const {
 
   // Get the index of this component in the component register
   static constexpr size_t index = components::containers::TupleTypeIndex<

@@ -12,7 +12,7 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-const size_t CGrimoireMachina::GetComponentRegisterIndex() const {
+size_t CGrimoireMachina::GetComponentRegisterIndex() const {
 
   // Get the index of this component in the component register
   static constexpr size_t index = components::containers::TupleTypeIndex<

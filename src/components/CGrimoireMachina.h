@@ -44,7 +44,7 @@ struct CGrimoireMachina : public Component {
   ///
   /// @return index of the component in the component register
   /////////////////////////////////////////////////
-  const size_t GetComponentRegisterIndex() const override;
+  size_t GetComponentRegisterIndex() const override;
 
   /////////////////////////////////////////////////
   /// @brief Configure the CGrimoireMachina component.

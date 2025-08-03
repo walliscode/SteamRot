@@ -50,6 +50,6 @@ struct CUserInterface : public Component {
   ///
   /// @return Index of the component in the component register
   /////////////////////////////////////////////////
-  const size_t GetComponentRegisterIndex() const override;
+  size_t GetComponentRegisterIndex() const override;
 };
 } // namespace steamrot
