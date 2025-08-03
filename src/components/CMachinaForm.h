@@ -32,6 +32,6 @@ struct CMachinaForm : public Component {
 
   std::vector<Joint> m_joints;
 
-  const size_t GetComponentRegisterIndex() const override;
+  size_t GetComponentRegisterIndex() const override;
 };
 } // namespace steamrot

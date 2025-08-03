@@ -31,7 +31,6 @@ private:
   ////////////////////////////////////////////////////////////
   void HandleKeyboardEvents(const sf::Event &event,
                             UserInputBitset &user_input_events);
-  ;
 
   ////////////////////////////////////////////////////////////
   // |brief process mouse events: pressed and released

@@ -48,7 +48,7 @@ struct EventPacket {
 
   EventData m_event_data{std::monostate{}};
 
-  const uint8_t GetLifetime() const { return event_lifetime; }
+  uint8_t GetLifetime() const { return event_lifetime; }
 
   void DecrementLifetime() {
     if (event_lifetime > 0) {

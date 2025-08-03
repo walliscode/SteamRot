@@ -32,7 +32,7 @@ struct Component {
   ///
   /// @return Size_t representing the index of the component in the register
   /////////////////////////////////////////////////
-  virtual const size_t GetComponentRegisterIndex() const = 0;
+  virtual size_t GetComponentRegisterIndex() const = 0;
 
   /////////////////////////////////////////////////
   /// @brief Is this Component active?

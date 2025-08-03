@@ -6,7 +6,7 @@
 
 namespace steamrot {
 
-const size_t CMeta::GetComponentRegisterIndex() const {
+size_t CMeta::GetComponentRegisterIndex() const {
 
   // Get the index of the CMeta component in the component register
   static constexpr size_t index = components::containers::TupleTypeIndex<

@@ -77,6 +77,10 @@ const SceneData *DataManager::ProvideSceneData(const SceneType &scene_type) {
     scene_identifier = "crafting";
     break;
   }
+  default: {
+    scene_identifier = "unknown";
+    break;
+  }
   }
   // load scene data from binary into buffer
   char *scene_data = LoadBinaryData(config::getScenesFolder() /
