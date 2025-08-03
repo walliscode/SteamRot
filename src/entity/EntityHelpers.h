@@ -1,8 +1,15 @@
+/////////////////////////////////////////////////
+/// Preprocessor Directives
+/////////////////////////////////////////////////
 #pragma once
 
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
 #include "containers.h"
 
 namespace steamrot {
+
 ////////////////////////////////////////////////////////////
 /// |brief reset a component at a given index to default values
 ///
@@ -83,6 +90,17 @@ const T &GetComponent(
 template <typename T> bool HasComponent(size_t entityID) {
   return GetComponent<T>(entityID).getHas();
 }
+
+/////////////////////////////////////////////////
+/// @brief Function to resize the entity memory pool.
+///
+/// @param entity_memory_pool Instance of the EntityMemoryPool to resize.
+/// @param new_size New size for the memory pool. (essentially the number of
+/// entities);
+/////////////////////////////////////////////////
+void ResizeEntityMemoryPool(
+    components::containers::EntityMemoryPool &entity_memory_pool,
+    const size_t new_size);
 
 /**
  * @brief Gets the current size of the entity memory pool.

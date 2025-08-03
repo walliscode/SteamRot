@@ -12,9 +12,12 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "EntityConfigurator.h"
+#include "FailInfo.h"
 #include "FlatbuffersDataLoader.h"
 #include "containers.h"
-#include "entities_generated.h"
+
+#include <expected>
+#include <variant>
 
 namespace steamrot {
 class FlatbuffersConfigurator : public EntityConfigurator {
@@ -28,9 +31,9 @@ private:
 public:
   FlatbuffersConfigurator(const EnvironmentType env_type);
 
-  void ConfigureEntitiesFromDefaultData(
+  std::expected<std::monostate, FailInfo> ConfigureEntitiesFromDefaultData(
       components::containers::EntityMemoryPool &entity_memory_pool,
-      const EntityCollection *entity_collection);
+      const SceneType scene_type);
 };
 
 } // namespace steamrot
