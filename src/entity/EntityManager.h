@@ -30,7 +30,7 @@ private:
   /////////////////////////////////////////////////
   /// @brief Member variable to hold all the entities/components for a scene.
   /////////////////////////////////////////////////
-  components::containers::EntityMemoryPool m_pool;
+  components::containers::EntityMemoryPool m_entity_memory_pool;
 
   /////////////////////////////////////////////////
   /// @brief Holds the archetype manager instance for this EntityManager and
@@ -77,20 +77,17 @@ private:
   /////////////////////////////////////////////////
   /// @brief Function to resize the entity memory pool.
   ///
-  /// @param entity_memory_pool Instance of the EntityMemoryPool to resize.
   /// @param new_size New size for the memory pool. (essentially the number of
   /// entities);
   /////////////////////////////////////////////////
-  void ResizeEntityMemoryPool(
-      components::containers::EntityMemoryPool &entity_memory_pool,
-      const size_t new_size);
+  void ResizeEntityMemoryPool(const size_t pool_size);
 
 public:
   ////////////////////////////////////////////////////////////
   /// \brief Default constructor
   ///
   ////////////////////////////////////////////////////////////
-  EntityManager(const size_t &pool_size);
+  EntityManager(const size_t &pool_size = 100);
 
   /////////////////////////////////////////////////
   /// @brief Get a read/write reference to the entity memory pool
@@ -102,13 +99,6 @@ public:
   ///
   /////////////////////////////////////////////////
   const ArchetypeManager &GetArchetypeManager();
-
-  /////////////////////////////////////////////////
-  /// @brief Resize the entity memory pool
-  ///
-  /// @param pool_size Number of entities to reserve space for in the pool
-  /////////////////////////////////////////////////
-  void ResizePool(const size_t &pool_size);
 
   ////////////////////////////////////////////////////////////
   /// \brief return index of next "free" entity
