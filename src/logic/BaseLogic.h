@@ -30,7 +30,7 @@ struct LogicContext {
    * @brief Struct member that contains a reference to the archetypes in the
    * Scene.
    */
-  std::unordered_map<ArchetypeID, Archetype> &archetypes;
+  const std::unordered_map<ArchetypeID, Archetype> &archetypes;
 
   /**
    * @brief Struct member that contains a reference to Scenes RenderTexture.

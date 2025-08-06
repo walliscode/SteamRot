@@ -12,24 +12,30 @@ UICollisionLogic::UICollisionLogic(const LogicContext logic_context)
 /////////////////////////////////////////////////
 void UICollisionLogic::ProcessLogic() {
 
+  // generate required archetype id
   ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<CUserInterface>();
 
-  // if it is not in the archetyps map, then skip
-  if (m_logic_context.archetypes.contains(archetype_id)) {
+  // check if archetype exists
+  auto const it = m_logic_context.archetypes.find(archetype_id);
 
-    Archetype &archetype = m_logic_context.archetypes[archetype_id];
-
-    // cycle through all the entity indexs in the archetype
-    for (size_t entity_id : archetype) {
-
-      // get the CUserInterface component
-      CUserInterface &ui_component = GetComponent<CUserInterface>(
-          entity_id, m_logic_context.scene_entities);
-
-      // group collision logic here
-      CheckMouseCollision(ui_component);
-    };
+  // if archetype does not exist, we return
+  if (it == m_logic_context.archetypes.end()) {
+    return;
   }
+
+  // get the archetype
+  Archetype archetype = it->second;
+
+  // cycle through all the entity indexs in the archetype
+  for (size_t entity_id : archetype) {
+
+    // get the CUserInterface component
+    CUserInterface &ui_component =
+        GetComponent<CUserInterface>(entity_id, m_logic_context.scene_entities);
+
+    // group collision logic here
+    CheckMouseCollision(ui_component);
+  };
 }
 
 /////////////////////////////////////////////////

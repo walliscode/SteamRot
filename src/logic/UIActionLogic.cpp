@@ -33,11 +33,12 @@ void UIActionLogic::ProcessLogic() {
 
   ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<CUserInterface>();
 
+  const auto it = m_logic_context.archetypes.find(archetype_id);
   // if it is not in the archetyps map, then skip
-  if (m_logic_context.archetypes.contains(archetype_id)) {
+  if (it != m_logic_context.archetypes.end()) {
 
     // get the archetype from the map
-    Archetype &archetype = m_logic_context.archetypes[archetype_id];
+    const Archetype &archetype = it->second;
 
     // cycle through all the entity indexs in the archetype
     for (size_t entity_id : archetype) {
@@ -198,17 +199,18 @@ std::vector<std::string> UIActionLogic::GetAvailableFragments() {
   // Create a vector to hold the names of available fragments
   std::vector<std::string> available_fragments;
 
-  // Get ArcetypeID for CGrimoireMachina and resultant Archetype
-  Archetype grimoire_id =
-      m_logic_context
-          .archetypes[GenerateArchetypeIDfromTypes<CGrimoireMachina>()];
+  // Get the archetype ID for CGrimoireMachina
+  ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<CGrimoireMachina>();
+  // Get the archetype from the logic context
+  const auto it = m_logic_context.archetypes.find(archetype_id);
 
   // pull just the first entity in the archetype
-  if (!grimoire_id.empty()) {
+  if (it != m_logic_context.archetypes.end()) {
+    const Archetype &archetype = it->second;
 
     // Get the CGrimoireMachina component from the entity
     CGrimoireMachina &grimoire_component = GetComponent<CGrimoireMachina>(
-        grimoire_id[0], m_logic_context.scene_entities);
+        archetype_id[0], m_logic_context.scene_entities);
 
     // Get the available fragments from the CGrimoireMachina component
     for (auto &fragmet : grimoire_component.m_all_fragments) {

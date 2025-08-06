@@ -27,16 +27,16 @@ void CraftingRenderLogic::ProcessLogic() {
 /////////////////////////////////////////////////
 void CraftingRenderLogic::DrawMachinaForm() {
 
-  // Get the Archetype for CGrimoireMachina
-  Archetype archetype =
-      m_logic_context
-          .archetypes[GenerateArchetypeIDfromTypes<CGrimoireMachina>()];
+  // get required archetype ID for CGrimoireMachina
+  ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<CGrimoireMachina>();
+  const auto it = m_logic_context.archetypes.find(archetype_id);
 
-  // if archetype is empty, return early
-  if (archetype.empty()) {
+  // If the archetype is not found, return early
+  if (it == m_logic_context.archetypes.end()) {
     return;
   }
 
+  const Archetype archetype = it->second;
   // Check if the archetype is greater than 1 and log an error if so
   if (archetype.size() > 1) {
     log_handler::ProcessLog(

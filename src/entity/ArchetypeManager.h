@@ -71,7 +71,7 @@ public:
    *
    * @return archetype map
    */
-  std::unordered_map<ArchetypeID, Archetype> &GetArchetypes();
+  const std::unordered_map<ArchetypeID, Archetype> &GetArchetypes() const;
 };
 
 } // namespace steamrot
