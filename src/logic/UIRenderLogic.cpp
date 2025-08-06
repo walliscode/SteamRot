@@ -11,15 +11,7 @@
 #include "themes_generated.h"
 #include "user_interface_generated.h"
 
-#include <SFML/Graphics/CircleShape.hpp>
-#include <SFML/Graphics/Color.hpp>
-#include <SFML/Graphics/ConvexShape.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
-#include <SFML/Graphics/RenderTexture.hpp>
-#include <SFML/Graphics/Text.hpp>
-#include <SFML/Graphics/VertexArray.hpp>
-#include <SFML/System/Angle.hpp>
-#include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics.hpp>
 #include <cstddef>
 #include <iostream>
 #include <print>
@@ -342,21 +334,25 @@ void UIRenderLogic::ConfigureDropDownButtonStyle(
 void UIRenderLogic::DrawUIElements() {
 
   ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<CUserInterface>();
-  // if it is not in the archetyps map, then skip
-  if (m_logic_context.archetypes.contains(archetype_id)) {
-    Archetype &archetype = m_logic_context.archetypes[archetype_id];
 
-    // cycle through all the entity indexs in the archetype
-    for (size_t entity_id : archetype) {
+  const auto it = m_logic_context.archetypes.find(archetype_id);
+  // if it is not in the archetypes map, then return
+  if (it == m_logic_context.archetypes.end()) {
+    return;
+  }
 
-      // get the CUserInterface component
-      CUserInterface &ui_component = GetComponent<CUserInterface>(
-          entity_id, m_logic_context.scene_entities);
+  Archetype archetype = it->second;
 
-      // recursively draw the UI elements starting from the root
-      // element
-      RecursiveDrawUIElement(ui_component.m_root_element);
-    }
+  // cycle through all the entity indexs in the archetype
+  for (size_t entity_id : archetype) {
+
+    // get the CUserInterface component
+    CUserInterface &ui_component =
+        GetComponent<CUserInterface>(entity_id, m_logic_context.scene_entities);
+
+    // recursively draw the UI elements starting from the root
+    // element
+    RecursiveDrawUIElement(ui_component.m_root_element);
   }
 }
 

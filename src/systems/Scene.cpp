@@ -12,8 +12,8 @@ namespace steamrot {
 ////////////////////////////////////////////////////////////
 Scene::Scene(const size_t &pool_size, const SceneData *scene_data,
              const uuids::uuid &id, const GameContext game_context)
-    : m_entity_manager(pool_size, scene_data->entity_collection()),
-      m_game_context(game_context), m_logic_factory(), m_id(id) {
+    : m_entity_manager(pool_size), m_game_context(game_context),
+      m_logic_factory(), m_id(id) {
 
   // update map of Logic classes
   if (scene_data->logic_collection() != nullptr) {
@@ -27,7 +27,7 @@ Scene::Scene(const size_t &pool_size, const SceneData *scene_data,
     // Create the logic context with the current scene data
     LogicContext logic_context{
         m_entity_manager.GetEntityMemoryPool(),
-        m_entity_manager.GetArchetypeManager().GetArchetypes(),
+        this->m_entity_manager.GetArchetypeManager().GetArchetypes(),
         this->m_render_texture,
         m_game_context.game_window,
         ui_objects,
