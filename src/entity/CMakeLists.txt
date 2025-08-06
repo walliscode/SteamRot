@@ -2,7 +2,7 @@ add_library(entity
     EntityManager.cpp
     EntityConfigurator.cpp
     ArchetypeManager.cpp
-    EntityHelpers.cpp
+    emp_helpers.cpp
   )
 
 target_include_directories(entity

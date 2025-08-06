@@ -7,7 +7,7 @@
 #include "ArchetypeHelpers.h"
 #include "ArchetypeManager.h"
 #include "CGrimoireMachina.h"
-#include "EntityHelpers.h"
+#include "emp_helpers.h"
 #include "fragments_generated.h"
 #include "log_handler.h"
 
@@ -48,8 +48,9 @@ void CraftingRenderLogic::DrawMachinaForm() {
 
   // Get the first entity in the archetype and pull out the CGrimoireMachina
   // component
-  CGrimoireMachina &grimoire_machina = GetComponent<CGrimoireMachina>(
-      archetype[0], m_logic_context.scene_entities);
+  CGrimoireMachina &grimoire_machina =
+      emp_helpers::GetComponent<CGrimoireMachina>(
+          archetype[0], m_logic_context.scene_entities);
 
   // Check if the holding form is not null, return early if it is
   if (!grimoire_machina.m_holding_form) {

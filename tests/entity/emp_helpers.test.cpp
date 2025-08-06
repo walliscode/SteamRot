@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief unit tests for FlatbuffersConfigurator
+/// @brief Units tests for steamrot::emp_helpers namespace
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -8,6 +8,3 @@
 /////////////////////////////////////////////////
 
 #include <catch2/catch_test_macros.hpp>
-
-TEST_CASE("The entity memory pool is configured correctly for the test data",
-          "[FlatbuffersConfigurator]") {}

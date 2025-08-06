@@ -1,7 +1,7 @@
 #include "UICollisionLogic.h"
 #include "ArchetypeHelpers.h"
 #include "CUserInterface.h"
-#include "EntityHelpers.h"
+#include "emp_helpers.h"
 #include <SFML/Window/Mouse.hpp>
 
 namespace steamrot {
@@ -30,8 +30,8 @@ void UICollisionLogic::ProcessLogic() {
   for (size_t entity_id : archetype) {
 
     // get the CUserInterface component
-    CUserInterface &ui_component =
-        GetComponent<CUserInterface>(entity_id, m_logic_context.scene_entities);
+    CUserInterface &ui_component = emp_helpers::GetComponent<CUserInterface>(
+        entity_id, m_logic_context.scene_entities);
 
     // group collision logic here
     CheckMouseCollision(ui_component);

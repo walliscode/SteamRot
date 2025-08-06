@@ -1,5 +1,6 @@
 add_executable(test_entity
   FlatbuffersConfigurator.test.cpp
+  emp_helpers.test.cpp
 )
 
 target_include_directories(test_entity

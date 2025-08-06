@@ -9,9 +9,9 @@
 #include "CGrimoireMachina.h"
 #include "CUserInterface.h"
 #include "DropDown.h"
-#include "EntityHelpers.h"
 #include "UIElement.h"
 #include "UIElementFactory.h"
+#include "emp_helpers.h"
 #include "event_helpers.h"
 #include "events_generated.h"
 #include "user_interface_generated.h"
@@ -44,7 +44,7 @@ void UIActionLogic::ProcessLogic() {
     for (size_t entity_id : archetype) {
 
       // get the CUserInterface component
-      CUserInterface &ui_component = GetComponent<CUserInterface>(
+      CUserInterface &ui_component = emp_helpers::GetComponent<CUserInterface>(
           entity_id, m_logic_context.scene_entities);
 
       ProcessEvents(ui_component);
@@ -209,8 +209,9 @@ std::vector<std::string> UIActionLogic::GetAvailableFragments() {
     const Archetype &archetype = it->second;
 
     // Get the CGrimoireMachina component from the entity
-    CGrimoireMachina &grimoire_component = GetComponent<CGrimoireMachina>(
-        archetype_id[0], m_logic_context.scene_entities);
+    CGrimoireMachina &grimoire_component =
+        emp_helpers::GetComponent<CGrimoireMachina>(
+            archetype_id[0], m_logic_context.scene_entities);
 
     // Get the available fragments from the CGrimoireMachina component
     for (auto &fragmet : grimoire_component.m_all_fragments) {
