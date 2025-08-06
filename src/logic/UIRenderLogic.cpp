@@ -6,7 +6,7 @@
 #include "BaseLogic.h"
 #include "CUserInterface.h"
 #include "DropDown.h"
-#include "EntityHelpers.h"
+#include "emp_helpers.h"
 #include "log_handler.h"
 #include "themes_generated.h"
 #include "user_interface_generated.h"
@@ -347,8 +347,8 @@ void UIRenderLogic::DrawUIElements() {
   for (size_t entity_id : archetype) {
 
     // get the CUserInterface component
-    CUserInterface &ui_component =
-        GetComponent<CUserInterface>(entity_id, m_logic_context.scene_entities);
+    CUserInterface &ui_component = emp_helpers::GetComponent<CUserInterface>(
+        entity_id, m_logic_context.scene_entities);
 
     // recursively draw the UI elements starting from the root
     // element

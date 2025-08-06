@@ -7,7 +7,7 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "EntityManager.h"
-#include "EntityHelpers.h"
+#include "emp_helpers.h"
 
 namespace steamrot {
 
@@ -61,7 +61,7 @@ void EntityManager::ResizePool(const size_t &pool_size) {
 size_t EntityManager::GetNextFreeEntityIndex() {
 
   // get CMeta vector from the pool
-  std::vector<CMeta> meta_data = GetComponentVector<CMeta>(m_pool);
+  std::vector<CMeta> meta_data = emp_helpers::GetComponentVector<CMeta>(m_pool);
 
   // find next inactive entity index
   for (size_t i = 0; i < meta_data.size(); ++i) {

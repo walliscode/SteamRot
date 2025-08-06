@@ -37,6 +37,53 @@ private:
   /// this Scene
   /////////////////////////////////////////////////
   ArchetypeManager m_archetype_manager;
+  ////////////////////////////////////////////////////////////
+  /// |brief reset a component at a given index to default values
+  ///
+  ////////////////////////////////////////////////////////////
+  template <typename T>
+  void ResetValues(T &component_vector, const size_t index) {
+
+    // Get the type of the Component the vector holds
+    using ComponentType = typename T::value_type;
+
+    // Set the index to a default constructed Component type
+    component_vector[index] = ComponentType();
+  };
+
+  ////////////////////////////////////////////////////////////
+  /// |brief reset all components in a tuple at a given index
+  ///
+  ////////////////////////////////////////////////////////////
+  template <typename TupleT, std::size_t... tuple_index_sequence>
+  void ResetTupleElements(TupleT &component_tuple,
+                          std::index_sequence<tuple_index_sequence...>,
+                          const size_t index) {
+
+    (ResetValues(std::get<tuple_index_sequence>(component_tuple), index), ...);
+  }
+
+  ////////////////////////////////////////////////////////////
+  /// |brief refresh all components in a tuple at a given index
+  ///
+  ////////////////////////////////////////////////////////////
+  template <typename TupleT, std::size_t TupleSize = std::tuple_size_v<TupleT>>
+  void RefreshEntity(TupleT &component_tuple, const size_t index) {
+
+    ResetTupleElements(component_tuple, std::make_index_sequence<TupleSize>{},
+                       index);
+  }
+
+  /////////////////////////////////////////////////
+  /// @brief Function to resize the entity memory pool.
+  ///
+  /// @param entity_memory_pool Instance of the EntityMemoryPool to resize.
+  /// @param new_size New size for the memory pool. (essentially the number of
+  /// entities);
+  /////////////////////////////////////////////////
+  void ResizeEntityMemoryPool(
+      components::containers::EntityMemoryPool &entity_memory_pool,
+      const size_t new_size);
 
 public:
   ////////////////////////////////////////////////////////////
