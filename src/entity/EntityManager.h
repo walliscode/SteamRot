@@ -30,7 +30,7 @@ private:
   /////////////////////////////////////////////////
   /// @brief Member variable to hold all the entities/components for a scene.
   /////////////////////////////////////////////////
-  components::containers::EntityMemoryPool m_entity_memory_pool;
+  EntityMemoryPool m_entity_memory_pool;
 
   /////////////////////////////////////////////////
   /// @brief Holds the archetype manager instance for this EntityManager and
@@ -92,7 +92,7 @@ public:
   /////////////////////////////////////////////////
   /// @brief Get a read/write reference to the entity memory pool
   /////////////////////////////////////////////////
-  components::containers::EntityMemoryPool &GetEntityMemoryPool();
+  EntityMemoryPool &GetEntityMemoryPool();
 
   /////////////////////////////////////////////////
   /// @brief Get a reference to the archetype manager

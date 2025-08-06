@@ -36,8 +36,7 @@ std::vector<size_t> ArchetypeManager::GetEntityIndexes(
   return entityIndexes;
 }
 const ArchetypeID ArchetypeManager::GenerateArchetypeID(
-    const components::containers::EntityMemoryPool &entity_memory_pool,
-    size_t entityIndex) {
+    const EntityMemoryPool &entity_memory_pool, size_t entityIndex) {
 
   // create blank archetypeID
   ArchetypeID archetypeID{0};
@@ -58,7 +57,7 @@ const ArchetypeID ArchetypeManager::GenerateArchetypeID(
 };
 
 void ArchetypeManager::GenerateAllArchetypes(
-    const components::containers::EntityMemoryPool &entity_memory_pool) {
+    const EntityMemoryPool &entity_memory_pool) {
   // clear existing archetypes
   m_archetypes.clear();
 

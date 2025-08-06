@@ -47,8 +47,8 @@ void CUserInterface::Configure(const UserInterface *user_interface_data) {
 size_t CUserInterface::GetComponentRegisterIndex() const {
 
   // Get the index of this component in the component register
-  static constexpr size_t index = components::containers::TupleTypeIndex<
-      CUserInterface, components::containers::ComponentRegister>;
+  static constexpr size_t index =
+      TupleTypeIndex<CUserInterface, ComponentRegister>;
   return index;
 }
 } // namespace steamrot

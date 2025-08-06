@@ -19,8 +19,7 @@ FlatbuffersConfigurator::FlatbuffersConfigurator(const EnvironmentType env_type)
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 FlatbuffersConfigurator::ConfigureEntitiesFromDefaultData(
-    components::containers::EntityMemoryPool &entity_memory_pool,
-    const SceneType scene_type) {
+    EntityMemoryPool &entity_memory_pool, const SceneType scene_type) {
 
   // get the entity collection from the flatbuffers data loader
   const SceneData *scene_data =
