@@ -7,9 +7,6 @@
 // Headers
 ////////////////////////////////////////////////////////////
 
-#include "Component.h"
-#include <nlohmann/json.hpp>
-
 namespace steamrot {
 
 class EntityConfigurator {
@@ -21,13 +18,6 @@ public:
   /// @param data_loader shared pointer to instance of derived DataLoader object
   /////////////////////////////////////////////////
   EntityConfigurator() = default;
-
-  /////////////////////////////////////////////////
-  /// @brief Interface function for configuring any Component
-  ///
-  /// @param component Component to configure
-  /////////////////////////////////////////////////
-  virtual void ConfigureComponent(Component &component);
 };
 
 } // namespace steamrot

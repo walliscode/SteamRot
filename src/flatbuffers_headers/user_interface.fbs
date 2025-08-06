@@ -100,7 +100,7 @@ table UIElementData{
     response_event_data: EventDataType; 
   }
 
-table UserInterface{
+table UserInterfaceData{
     root_ui_element: UIElementData;
     ui_name: string; 
     start_visible: bool;

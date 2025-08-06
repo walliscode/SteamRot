@@ -44,8 +44,8 @@ struct DropDownButtonDataBuilder;
 struct UIElementData;
 struct UIElementDataBuilder;
 
-struct UserInterface;
-struct UserInterfaceBuilder;
+struct UserInterfaceData;
+struct UserInterfaceDataBuilder;
 
 enum UIElementType : int8_t {
   UIElementType_None = 0,
@@ -372,7 +372,7 @@ struct SceneChangeDataFBSBuilder {
 
 inline ::flatbuffers::Offset<SceneChangeDataFBS> CreateSceneChangeDataFBS(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    steamrot::SceneType scene_type = steamrot::SceneType_TITLE,
+    steamrot::SceneType scene_type = steamrot::SceneType_UNKNOWN,
     ::flatbuffers::Offset<::flatbuffers::String> scene_id = 0) {
   SceneChangeDataFBSBuilder builder_(_fbb);
   builder_.add_scene_id(scene_id);
@@ -382,7 +382,7 @@ inline ::flatbuffers::Offset<SceneChangeDataFBS> CreateSceneChangeDataFBS(
 
 inline ::flatbuffers::Offset<SceneChangeDataFBS> CreateSceneChangeDataFBSDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    steamrot::SceneType scene_type = steamrot::SceneType_TITLE,
+    steamrot::SceneType scene_type = steamrot::SceneType_UNKNOWN,
     const char *scene_id = nullptr) {
   auto scene_id__ = scene_id ? _fbb.CreateString(scene_id) : 0;
   return steamrot::CreateSceneChangeDataFBS(
@@ -1012,8 +1012,8 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
       response_event_data);
 }
 
-struct UserInterface FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef UserInterfaceBuilder Builder;
+struct UserInterfaceData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UserInterfaceDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ROOT_UI_ELEMENT = 4,
     VT_UI_NAME = 6,
@@ -1039,49 +1039,49 @@ struct UserInterface FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct UserInterfaceBuilder {
-  typedef UserInterface Table;
+struct UserInterfaceDataBuilder {
+  typedef UserInterfaceData Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_root_ui_element(::flatbuffers::Offset<steamrot::UIElementData> root_ui_element) {
-    fbb_.AddOffset(UserInterface::VT_ROOT_UI_ELEMENT, root_ui_element);
+    fbb_.AddOffset(UserInterfaceData::VT_ROOT_UI_ELEMENT, root_ui_element);
   }
   void add_ui_name(::flatbuffers::Offset<::flatbuffers::String> ui_name) {
-    fbb_.AddOffset(UserInterface::VT_UI_NAME, ui_name);
+    fbb_.AddOffset(UserInterfaceData::VT_UI_NAME, ui_name);
   }
   void add_start_visible(bool start_visible) {
-    fbb_.AddElement<uint8_t>(UserInterface::VT_START_VISIBLE, static_cast<uint8_t>(start_visible), 0);
+    fbb_.AddElement<uint8_t>(UserInterfaceData::VT_START_VISIBLE, static_cast<uint8_t>(start_visible), 0);
   }
-  explicit UserInterfaceBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit UserInterfaceDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<UserInterface> Finish() {
+  ::flatbuffers::Offset<UserInterfaceData> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<UserInterface>(end);
+    auto o = ::flatbuffers::Offset<UserInterfaceData>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<UserInterface> CreateUserInterface(
+inline ::flatbuffers::Offset<UserInterfaceData> CreateUserInterfaceData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::UIElementData> root_ui_element = 0,
     ::flatbuffers::Offset<::flatbuffers::String> ui_name = 0,
     bool start_visible = false) {
-  UserInterfaceBuilder builder_(_fbb);
+  UserInterfaceDataBuilder builder_(_fbb);
   builder_.add_ui_name(ui_name);
   builder_.add_root_ui_element(root_ui_element);
   builder_.add_start_visible(start_visible);
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<UserInterface> CreateUserInterfaceDirect(
+inline ::flatbuffers::Offset<UserInterfaceData> CreateUserInterfaceDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::UIElementData> root_ui_element = 0,
     const char *ui_name = nullptr,
     bool start_visible = false) {
   auto ui_name__ = ui_name ? _fbb.CreateString(ui_name) : 0;
-  return steamrot::CreateUserInterface(
+  return steamrot::CreateUserInterfaceData(
       _fbb,
       root_ui_element,
       ui_name__,

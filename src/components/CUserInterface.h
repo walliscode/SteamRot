@@ -43,7 +43,7 @@ struct CUserInterface : public Component {
   ///
   /// @param user_interface_data Flatbuffer data for the user interface
   /////////////////////////////////////////////////
-  void Configure(const UserInterface *user_interface_data);
+  void Configure(const UserInterfaceData *user_interface_data);
 
   /////////////////////////////////////////////////
   /// @brief returns the index of the component in the component register

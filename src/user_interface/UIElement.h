@@ -55,7 +55,7 @@ struct UIElement {
   /////////////////////////////////////////////////
   /// @brief Layout type of the children elements
   /////////////////////////////////////////////////
-  LayoutType layout{0};
+  LayoutType layout{LayoutType::LayoutType_Vertical};
 
   /////////////////////////////////////////////////
   /// @brief Is mouse over this element, false if it over a child element
