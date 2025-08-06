@@ -1,6 +1,7 @@
 add_library(entity
     EntityManager.cpp
     EntityConfigurator.cpp
+    FlatbuffersConfigurator.cpp
     ArchetypeManager.cpp
     emp_helpers.cpp
   )

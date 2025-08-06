@@ -7,6 +7,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersConfigurator.h"
+#include "CUserInterface.h"
+#include "emp_helpers.h"
 #include "scene_types_generated.h"
 #include <expected>
 #include <variant>
@@ -32,6 +34,35 @@ FlatbuffersConfigurator::ConfigureEntitiesFromDefaultData(
                        "Entity data not found in the collection."};
 
     return std::unexpected(fail_info);
+  }
+
+  // some helper values
+  size_t entity_count = scene_data->entity_collection()->entities()->size();
+  // check the entity memory pool is big enough
+  if (emp_helpers::GetMemoryPoolSize(entity_memory_pool) < entity_count) {
+
+    std::string fail_msg = std::format(
+        "Entity memory pool size: {}, required size: {}",
+        emp_helpers::GetMemoryPoolSize(entity_memory_pool), entity_count);
+
+    FailInfo fail_info{FailMode::ParameterOutOfBounds, fail_msg};
+    return std::unexpected(fail_info);
+  }
+
+  // configure entities from the flatbuffers data
+  for (size_t i = 0; i < entity_count; ++i) {
+
+    const EntityData *entity_data =
+        scene_data->entity_collection()->entities()->Get(i);
+
+    if (entity_data == nullptr) {
+      continue; // Skip null entities
+    }
+
+    if (entity_data->c_user_interface()) {
+      ConfigureComponent(
+          emp_helpers::GetComponent<CUserInterface>(i, entity_memory_pool));
+    }
   }
 
   return std::monostate{};
