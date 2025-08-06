@@ -24,7 +24,7 @@ struct LogicContext {
    * @brief Struct memmber that contains a reference to the EntityMemoryPool for
    * this Scene.
    */
-  components::containers::EntityMemoryPool &scene_entities;
+  EntityMemoryPool &scene_entities;
 
   /**
    * @brief Struct member that contains a reference to the archetypes in the

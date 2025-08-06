@@ -2,8 +2,7 @@
 
 #include "containers.h"
 
-using ArchetypeID =
-    std::bitset<steamrot::components::containers::kComponentRegisterSize>;
+using ArchetypeID = std::bitset<steamrot::kComponentRegisterSize>;
 
 namespace steamrot {
 
@@ -17,10 +16,7 @@ namespace steamrot {
 template <typename... Components> ArchetypeID GenerateArchetypeIDfromTypes() {
   ArchetypeID archetype_id;
   // Set the bits for the components in the ArchetypeID
-  ((archetype_id.set(
-       components::containers::IndexOf<
-           Components, components::containers::ComponentRegister>::value)),
-   ...);
+  ((archetype_id.set(IndexOf<Components, ComponentRegister>::value)), ...);
   return archetype_id;
 }
 } // namespace steamrot

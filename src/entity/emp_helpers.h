@@ -15,8 +15,7 @@ namespace steamrot::emp_helpers {
 ///
 ////////////////////////////////////////////////////////////
 template <typename T>
-std::vector<T> &GetComponentVector(
-    components::containers::EntityMemoryPool &entity_memory_pool) {
+std::vector<T> &GetComponentVector(EntityMemoryPool &entity_memory_pool) {
 
   auto &component_vector = std::get<std::vector<T>>(entity_memory_pool);
 
@@ -24,8 +23,7 @@ std::vector<T> &GetComponentVector(
 }
 
 template <typename T>
-std::vector<T> &GetComponentVector(
-    const components::containers::EntityMemoryPool &entity_memory_pool) {
+std::vector<T> &GetComponentVector(const EntityMemoryPool &entity_memory_pool) {
   auto &component_vector = std::get<std::vector<T>>(entity_memory_pool);
   return component_vector;
 }
@@ -35,16 +33,14 @@ std::vector<T> &GetComponentVector(
 ///
 ////////////////////////////////////////////////////////////
 template <typename T>
-T &GetComponent(size_t entity_id,
-                components::containers::EntityMemoryPool &entity_memory_pool) {
+T &GetComponent(size_t entity_id, EntityMemoryPool &entity_memory_pool) {
 
   return GetComponentVector<T>(entity_memory_pool)[entity_id];
 }
 
 template <typename T>
-const T &GetComponent(
-    size_t entity_id,
-    const components::containers::EntityMemoryPool &entity_memory_pool) {
+const T &GetComponent(size_t entity_id,
+                      const EntityMemoryPool &entity_memory_pool) {
   return GetComponentVector<T>(entity_memory_pool)[entity_id];
 }
 
@@ -54,6 +50,5 @@ const T &GetComponent(
 /// @param entity_memory_pool Instance of EntityMemoryPool
 /// @return Size of the EntityMemoryPool
 /////////////////////////////////////////////////
-size_t GetMemoryPoolSize(
-    const components::containers::EntityMemoryPool &entity_memory_pool);
+size_t GetMemoryPoolSize(const EntityMemoryPool &entity_memory_pool);
 } // namespace steamrot::emp_helpers

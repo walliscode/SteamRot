@@ -13,9 +13,6 @@
 #include <magic_enum/magic_enum.hpp>
 
 namespace steamrot {
-namespace components {
-
-namespace containers {
 
 ////////////////////////////////////////////////////////////
 // |brief: template helper struct
@@ -76,6 +73,4 @@ struct IndexOf<T, std::tuple<U, Ts...>> {
 template <typename T, typename Tuple>
 constexpr size_t TupleTypeIndex = IndexOf<T, Tuple>::value;
 
-}; // namespace containers
-}; // namespace components
 }; // namespace steamrot

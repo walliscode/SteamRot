@@ -17,7 +17,7 @@ EntityManager::EntityManager(const size_t &pool_size) {
   ResizeEntityMemoryPool(pool_size);
 };
 
-components::containers::EntityMemoryPool &EntityManager::GetEntityMemoryPool() {
+EntityMemoryPool &EntityManager::GetEntityMemoryPool() {
   // return a reference to the memory pool
   return m_entity_memory_pool;
 }

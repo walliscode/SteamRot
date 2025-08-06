@@ -31,9 +31,9 @@ private:
 public:
   FlatbuffersConfigurator(const EnvironmentType env_type);
 
-  std::expected<std::monostate, FailInfo> ConfigureEntitiesFromDefaultData(
-      components::containers::EntityMemoryPool &entity_memory_pool,
-      const SceneType scene_type);
+  std::expected<std::monostate, FailInfo>
+  ConfigureEntitiesFromDefaultData(EntityMemoryPool &entity_memory_pool,
+                                   const SceneType scene_type);
 };
 
 } // namespace steamrot

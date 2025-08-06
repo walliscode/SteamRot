@@ -37,9 +37,9 @@ private:
    * @param entity_index The index of the entity in the EntityMemoryPool
    * @return A bitset representing the ArchetypeID for the entity.
    */
-  const ArchetypeID GenerateArchetypeID(
-      const components::containers::EntityMemoryPool &entity_memory_pool,
-      size_t entity_index);
+  const ArchetypeID
+  GenerateArchetypeID(const EntityMemoryPool &entity_memory_pool,
+                      size_t entity_index);
 
 public:
   ////////////////////////////////////////////////////////////
@@ -62,8 +62,7 @@ public:
    * @param entity_memory_pool A reference to the entity memory pool containing
    * all configurations for this scene.
    */
-  void GenerateAllArchetypes(
-      const components::containers::EntityMemoryPool &entity_memory_pool);
+  void GenerateAllArchetypes(const EntityMemoryPool &entity_memory_pool);
 
   /**
    * @brief Returns a reference to the map of Archetypes. This should not modify
