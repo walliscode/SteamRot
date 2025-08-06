@@ -11,7 +11,7 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-void CUserInterface::Configure(const UserInterface *user_interface_data) {
+void CUserInterface::Configure(const UserInterfaceData *user_interface_data) {
 
   // guard statement to ensure data is not null
   if (!user_interface_data) {

@@ -2,12 +2,4 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "EntityConfigurator.h"
-namespace steamrot {
-
-////////////////////////////////////////////////////////////
-void EntityConfigurator::ConfigureComponent(Component &component) {
-  // set general component properties
-  component.m_active = true;
-}
-
-} // namespace steamrot
+namespace steamrot {} // namespace steamrot

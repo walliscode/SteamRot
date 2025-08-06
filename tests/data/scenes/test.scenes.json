@@ -3,13 +3,22 @@
     "entities": [
       {
         "c_user_interface": {
-          "ui_name": "navigation_menu",
+          "ui_name": "test_menu",
           "start_visible": true,
           "root_ui_element": {
-            "type": "Panel",
-            "layout": "Vertical",
+            "type": "Button",
+            "layout": "Horizontal",
             "element_type": "PanelData",
             "element": {},
+            "spacing_strategy": "Ratioed",
+            "position": {
+              "x": 20,
+              "y": 25
+            },
+            "size": {
+              "x": 220,
+              "y": 600
+            },
             "children_active": true,
             "children": [
               {
@@ -41,15 +50,7 @@
                   "label": "New Construct"
                 }
               }
-            ],
-            "position": {
-              "x": 0,
-              "y": 0
-            },
-            "size": {
-              "x": 220,
-              "y": 600
-            }
+            ]
           }
         }
       }

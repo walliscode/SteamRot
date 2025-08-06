@@ -11,10 +11,12 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "CUserInterface.h"
 #include "EntityConfigurator.h"
 #include "FailInfo.h"
 #include "FlatbuffersDataLoader.h"
 #include "containers.h"
+#include "user_interface_generated.h"
 
 #include <expected>
 #include <variant>
@@ -27,6 +29,25 @@ private:
   /// @brief FlatbuffersDataLoader instance for providing flatbuffers data
   /////////////////////////////////////////////////
   FlatbuffersDataLoader m_data_loader;
+
+  /////////////////////////////////////////////////
+  /// @brief For Configuring values sitting on the abstract Component class
+  ///
+  /// @param entity_data Any flatbuffers table data
+  /// @param component Instance of derived Component to be configured
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ConfigureComponent(Component &component);
+
+  /////////////////////////////////////////////////
+  /// @brief Overloaded method for configuring CUserInterface component
+  ///
+  /// @param ui_data Flatbuffers table data for UserInterface
+  /// @param ui_component CUserInterface instance to be configured
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ConfigureComponent(const UserInterfaceData *ui_data,
+                     CUserInterface &ui_component);
 
 public:
   FlatbuffersConfigurator(const EnvironmentType env_type);

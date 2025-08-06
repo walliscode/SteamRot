@@ -13,7 +13,7 @@
   - [Game Running](#game-running)
     - [RunGame](#rungame)
     - [UpdateSystems](#updatesystems)
-  - [Workflows](#workflows)
+- [Workflows](#workflows)
   - [UI Elements](#ui-elements)
     - [Adding New Element types](#adding-new-element-types)
     - [Actions](#actions)
@@ -113,6 +113,43 @@ The UpdateScenes function will also be responsible for the logic deciding which
 vector of scenes to update
 
 ## Workflows
+
+### Adding/Modifying Components
+
+#### Creating Components
+
+Any new component struct should inherit from the Component struct. These are
+designed to be pure data containers with no logic.
+
+Create the necessary header/source files in the `src/components` directory and
+"register" the component with the ComponentRegister tuple. This step is vital to
+ensure further container creation and archetype management.
+
+Add data as necessary making sure the Component can be default constructed, so
+provide default data as necessary.
+
+#### Creating Flatbuffers data for Components
+
+Each component should have a flatbuffers data equivalent. This is done by adding
+a new .fbs file for each component. Try to add the name Data to the end of the
+name of the component when specifying table name in the .fbs file, e.g.
+`NewComponentData`. To allow for easy differentiation between the component
+struct and the flatbuffers data struct.
+
+This .fbs file should then be included in the entities.fbs file and added to the
+EntityData table/
+
+#### Configuring and testing the Component
+
+Each component will have its own overloaded ConfigureComponent method under the
+relevant Configurator class. Generate these methods via TDD to ensure the
+configuration works correctly. Then add an if statement to the overaching
+configure method in the Configurator class to call the new ConfigureComponent
+method.
+
+Make sure to add as many if statements as you can as the flatbuffers data is
+susceptible to segfaults as the schema does not allow all data types to be
+required.
 
 ## UI Elements
 

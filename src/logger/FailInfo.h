@@ -9,6 +9,7 @@ namespace steamrot {
 enum class FailMode {
   None = 0,
   FlatbuffersDataNotFound,
+  ParameterOutOfBounds,
 };
 
 struct FailInfo {
