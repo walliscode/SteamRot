@@ -60,10 +60,22 @@ FlatbuffersConfigurator::ConfigureEntitiesFromDefaultData(
       continue; // Skip null entities
     }
 
+    // CUserInterface component configuration
     if (entity_data->c_user_interface()) {
       auto configure_result = ConfigureComponent(
           entity_data->c_user_interface(),
           emp_helpers::GetComponent<CUserInterface>(i, entity_memory_pool));
+
+      if (!configure_result.has_value())
+        return std::unexpected(configure_result.error());
+    }
+
+    // CGrimoireMac    // CGrimoireMachina component configuration
+    if (entity_data->c_grimoire_machina()) {
+
+      auto configure_result = ConfigureComponent(
+          entity_data->c_grimoire_machina(),
+          emp_helpers::GetComponent<CGrimoireMachina>(i, entity_memory_pool));
 
       if (!configure_result.has_value())
         return std::unexpected(configure_result.error());
@@ -119,6 +131,40 @@ FlatbuffersConfigurator::ConfigureComponent(const UserInterfaceData *ui_data,
   }
   // assign the created UI structure to the CUserInterface component
   ui_component.m_root_element = std::move(result.value());
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+FlatbuffersConfigurator::ConfigureComponent(
+    const GrimoireMachinaData *grimoire_data,
+    CGrimoireMachina &grimoire_component) {
+
+  // configure the underlying Component type
+  auto configure_result =
+      ConfigureComponent(static_cast<Component &>(grimoire_component));
+
+  if (!configure_result.has_value())
+    return std::unexpected(configure_result.error());
+
+  // configure the CGrimoireMachina specific data
+  std::vector<std::string> fragment_names;
+  if (grimoire_data->fragments()) {
+    for (const auto &name : *grimoire_data->fragments()) {
+      fragment_names.push_back(name->str());
+    }
+  }
+  // attempt to load the fragments
+  auto fragment_load_result = m_data_loader.ProvideAllFragments(fragment_names);
+
+  if (!fragment_load_result.has_value()) {
+    FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
+                       "Failed to load fragments for CGrimoireMachina."};
+    return std::unexpected(fail_info);
+  }
+  // assign the loaded fragments to the CGrimoireMachina component
+  grimoire_component.m_all_fragments = fragment_load_result.value();
 
   return std::monostate{};
 }

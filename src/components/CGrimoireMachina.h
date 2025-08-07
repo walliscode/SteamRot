@@ -8,9 +8,6 @@
 #include "CMachinaForm.h"
 #include "Component.h"
 #include "Fragment.h"
-
-#include "grimoire_machina_generated.h"
-
 #include <map>
 #include <memory>
 namespace steamrot {
@@ -45,12 +42,5 @@ struct CGrimoireMachina : public Component {
   /// @return index of the component in the component register
   /////////////////////////////////////////////////
   size_t GetComponentRegisterIndex() const override;
-
-  /////////////////////////////////////////////////
-  /// @brief Configure the CGrimoireMachina component.
-  /////////////////////////////////////////////////
-  void Configure(const GrimoireMachinaData *grimoire_data);
-
-private:
 };
 } // namespace steamrot

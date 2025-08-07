@@ -15,14 +15,20 @@
 #include "scene_types_generated.h"
 #include "scenes_generated.h"
 #include <expected>
+#include <map>
 #include <string>
-#include <unordered_map>
 
 namespace steamrot {
 class FlatbuffersDataLoader : public DataLoader {
 
 public:
+  /////////////////////////////////////////////////
+  /// @brief Constructor for FlatbuffersDataLoader taking an EnvironmentType
+  ///
+  /// @param env_type Enumeration representing the environment type
+  /////////////////////////////////////////////////
   FlatbuffersDataLoader(const EnvironmentType env_type = EnvironmentType::None);
+
   /////////////////////////////////////////////////
   /// @brief Provides Fragment object based on the fragment name
   ///
@@ -38,7 +44,7 @@ public:
   /// @param fragment_names Vector of strings representing the names of the
   /// fragments
   /////////////////////////////////////////////////
-  std::expected<std::unordered_map<std::string, Fragment>, FailureData>
+  std::expected<std::map<std::string, Fragment>, FailureData>
   ProvideAllFragments(std::vector<std::string> fragment_names) const override;
 
   /////////////////////////////////////////////////

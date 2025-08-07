@@ -15,6 +15,7 @@
 #include "Fragment.h"
 #include "PathProvider.h"
 #include <expected>
+#include <map>
 #include <string>
 #include <utility>
 namespace steamrot {
@@ -60,7 +61,7 @@ public:
   virtual std::expected<Fragment, FailureData>
   ProvideFragment(const std::string &fragment_name) const = 0;
 
-  virtual std::expected<std::unordered_map<std::string, Fragment>, FailureData>
+  virtual std::expected<std::map<std::string, Fragment>, FailureData>
   ProvideAllFragments(std::vector<std::string> fragment_names) const = 0;
 };
 } // namespace steamrot
