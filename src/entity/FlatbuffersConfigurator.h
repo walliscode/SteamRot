@@ -16,6 +16,7 @@
 #include "FailInfo.h"
 #include "FlatbuffersDataLoader.h"
 #include "containers.h"
+#include "grimoire_machina_generated.h"
 #include "user_interface_generated.h"
 
 #include <expected>
@@ -48,6 +49,16 @@ private:
   std::expected<std::monostate, FailInfo>
   ConfigureComponent(const UserInterfaceData *ui_data,
                      CUserInterface &ui_component);
+
+  /////////////////////////////////////////////////
+  /// @brief Overloaded method for configuring CGrimoireMachina component
+  ///
+  /// @param grimoire_data Flatbuffers table data for GrimoireMachina
+  /// @param grimoire_component CGrimoireMachina instance to be configured
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ConfigureComponent(const GrimoireMachinaData *grimoire_data,
+                     CGrimoireMachina &grimoire_component);
 
 public:
   FlatbuffersConfigurator(const EnvironmentType env_type);

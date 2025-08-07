@@ -20,11 +20,4 @@ size_t CGrimoireMachina::GetComponentRegisterIndex() const {
   return index;
 }
 
-/////////////////////////////////////////////////
-void CGrimoireMachina::Configure(const GrimoireMachinaData *grimoire_data) {
-
-  // Set component level data
-  m_active = true;
-}
-
 } // namespace steamrot

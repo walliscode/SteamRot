@@ -59,7 +59,10 @@ TEST_CASE("Data is configured correctly", "[FlatbuffersConfigurator]") {
   steamrot::FlatbuffersConfigurator configurator{
       steamrot::EnvironmentType::Test};
 
-  // check Components have default values
+  /////////////////////////////////////////////////
+  /// Default value testing
+  /////////////////////////////////////////////////
+
   steamrot::EntityMemoryPool &entity_memory_pool_before =
       entity_manager.GetEntityMemoryPool();
 
@@ -84,6 +87,22 @@ TEST_CASE("Data is configured correctly", "[FlatbuffersConfigurator]") {
     REQUIRE(component.m_root_element.mouse_over_child == false);
     REQUIRE(component.m_root_element.mouse_over == false);
   }
+
+  // CGrimoireMachina testing
+  auto &grimoire_machina_component_vector =
+      steamrot::emp_helpers::GetComponentVector<steamrot::CGrimoireMachina>(
+          entity_memory_pool_before);
+  for (auto &component : grimoire_machina_component_vector) {
+    REQUIRE(component.m_active == false);
+    REQUIRE(component.m_all_fragments.empty());
+    REQUIRE(component.m_all_joints.empty());
+    REQUIRE(component.m_machina_forms.empty());
+    REQUIRE(component.m_holding_form == nullptr);
+  }
+  /////////////////////////////////////////////////
+  /// Post configuration testing
+  /////////////////////////////////////////////////
+
   auto result = configurator.ConfigureEntitiesFromDefaultData(
       entity_manager.GetEntityMemoryPool(),
       steamrot::SceneType::SceneType_TEST);
@@ -115,4 +134,17 @@ TEST_CASE("Data is configured correctly", "[FlatbuffersConfigurator]") {
           steamrot::SpacingAndSizingType::SpacingAndSizingType_Ratioed);
   REQUIRE(root_element.layout == steamrot::LayoutType::LayoutType_Horizontal);
   REQUIRE(std::holds_alternative<steamrot::Button>(root_element.element_type));
+
+  // check CGrimoireMachina component
+  auto &grimoire_machina_component_vector_after =
+      steamrot::emp_helpers::GetComponentVector<steamrot::CGrimoireMachina>(
+          entity_memory_pool_after);
+  steamrot::CGrimoireMachina &grimoire_machina_component =
+      grimoire_machina_component_vector_after[1];
+
+  REQUIRE(grimoire_machina_component.m_active == true);
+  REQUIRE(grimoire_machina_component.m_all_fragments.size() == 1);
+  REQUIRE(grimoire_machina_component.m_all_joints.size() == 0);
+  REQUIRE(grimoire_machina_component.m_machina_forms.size() == 0);
+  REQUIRE(grimoire_machina_component.m_holding_form == nullptr);
 }

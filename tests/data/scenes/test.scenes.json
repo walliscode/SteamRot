@@ -55,6 +55,12 @@
             ]
           }
         }
+      },
+      {
+        "c_grimoire_machina": {
+          "fragments": ["valid_fragment"],
+          "joints": []
+        }
       }
     ]
   },
