@@ -1,12 +1,23 @@
-#pragma once
 /////////////////////////////////////////////////
 /// @file
-/// @brief Decelaration of the UIElementFactory class
+/// @brief Declaration of the UIElementFactory class
 /////////////////////////////////////////////////
 
+/////////////////////////////////////////////////
+/// Preprocessor Directives
+/////////////////////////////////////////////////
+#pragma once
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
 #include "DropDown.h"
+#include "FlatbuffersConfigurator.h"
+#include "Panel.h"
 #include "UIElement.h"
 #include "user_interface_generated.h"
+#include <expected>
+
 namespace steamrot {
 
 class UIElementFactory {
@@ -17,7 +28,8 @@ private:
   /// @param element_data Provided flatbuffer data for the UI element
   /// @return Nested UIElement containing the element type and its children.
   /////////////////////////////////////////////////
-  UIElement RecursivlyBuildUIElement(const UIElementData &element_data);
+  std::expected<UIElement, FailInfo>
+  RecursivlyBuildUIElement(const UIElementData &element_data);
 
   /////////////////////////////////////////////////
   /// @brief Provides the UIElement with shared properties
@@ -25,7 +37,8 @@ private:
   /// @param element Flatbuffer data for the UI element
   /// @return Generally configured UIElement
   /////////////////////////////////////////////////
-  UIElement ConfigureGeneralUIElement(const UIElementData &element);
+  std::expected<UIElement, FailInfo>
+  ConfigureGeneralUIElement(const UIElementData &element);
 
   /////////////////////////////////////////////////
   /// @brief Provides a Panel struct for UIElement.element_type
@@ -33,7 +46,7 @@ private:
   /// @param element Panel specific flatbuffers data
   /// @return A configured Panel struct
   /////////////////////////////////////////////////
-  Panel ConfigurePanel(const PanelData &panel_data);
+  std::expected<Panel, FailInfo> ConfigurePanel(const PanelData &panel_data);
 
   /////////////////////////////////////////////////
   /// @brief Provides a Button struct for UIElement.element_type
@@ -41,7 +54,8 @@ private:
   /// @param button_data Button specific flatbuffers data
   /// @return A configured Button struct
   /////////////////////////////////////////////////
-  Button ConfigureButton(const ButtonData &button_data);
+  std::expected<Button, FailInfo>
+  ConfigureButton(const ButtonData &button_data);
 
   /////////////////////////////////////////////////
   /// @brief Provides a DropDown struct for UIElement.element_type
@@ -49,37 +63,53 @@ private:
   /// @param dropdown_data DrowDown specific flatbuffers data
   /// @return A configured DropDown struct
   /////////////////////////////////////////////////
-  DropDownContainer
+  std::expected<DropDownContainer, FailInfo>
   ConfigureDropDownContainer(const DropDownContainerData &dropdown_data);
 
-  /// /////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   /// @brief Provides a DropDownList struct for UIElement.element_type
   ///
   /// @param dropdown_data DropDownList specific flatbuffers data
   /// @return A configured DropDownList struct
-  /// ///////////////////////////////////////////////
-  DropDownList ConfigureDropDownList(const DropDownListData &dropdown_data);
+  /////////////////////////////////////////////////
+  std::expected<DropDownList, FailInfo>
+  ConfigureDropDownList(const DropDownListData &dropdown_data);
 
   /////////////////////////////////////////////////
   /// @brief Provides a DropDownItem struct for UIElement.element_type
   ///
   /// @param dropdown_data DropDownItem specific flatbuffers data
   /// @return A configured DropDownItem struct
-  /// ///////////////////////////////////////////////
-  DropDownItem ConfigureDropDownItem(const DropDownItemData &dropdown_data);
+  /////////////////////////////////////////////////
+  std::expected<DropDownItem, FailInfo>
+  ConfigureDropDownItem(const DropDownItemData &dropdown_data);
 
   /////////////////////////////////////////////////
   /// @brief Provides a DropDownButton struct for UIElement.element_type
   ///
   /// @param dropdown_data DropDownButton specific flatbuffers data
   /// @return A configured DropDownButton struct
-  /// ///////////////////////////////////////////////
-  DropDownButton
+  /////////////////////////////////////////////////
+  std::expected<DropDownButton, FailInfo>
   ConfigureDropDownButton(const DropDownButtonData &dropdown_data);
 
-  EventData ConfigureTriggerEventData(const UIElementData &element_data);
+  /////////////////////////////////////////////////
+  /// @brief Configures Trigger Event Data for a UI element
+  ///
+  /// @param element_data UI element data
+  /// @return Configured EventData or error
+  /////////////////////////////////////////////////
+  std::expected<EventData, FailInfo>
+  ConfigureTriggerEventData(const UIElementData &element_data);
 
-  EventData ConfigureResponseEventData(const UIElementData &element_data);
+  /////////////////////////////////////////////////
+  /// @brief Configures Response Event Data for a UI element
+  ///
+  /// @param element_data UI element data
+  /// @return Configured EventData or error
+  /////////////////////////////////////////////////
+  std::expected<EventData, FailInfo>
+  ConfigureResponseEventData(const UIElementData &element_data);
 
 public:
   /////////////////////////////////////////////////
@@ -93,8 +123,15 @@ public:
   /// @param element_data Flatbuffer data for the UI element
   /// @return A UIElement containing the element type and its children.
   /////////////////////////////////////////////////
-  UIElement CreateUIStructure(const UIElementData &element_data);
+  std::expected<UIElement, FailInfo>
+  CreateUIStructure(const UIElementData &element_data);
 
-  UIElement CreateDropDownItem();
+  /////////////////////////////////////////////////
+  /// @brief Creates a DropDownItem structure (example public test)
+  ///
+  /// @return A DropDownItem or an error
+  /////////////////////////////////////////////////
+  std::expected<UIElement, FailInfo> CreateDropDownItem();
 };
+
 } // namespace steamrot

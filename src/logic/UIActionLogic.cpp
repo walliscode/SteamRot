@@ -248,8 +248,12 @@ void UIActionLogic::ToggleDropDown(UIElement &element) {
               }
 
               for (const std::string &fragment_name : available_fragments) {
+                auto ddi_result = ui_element_factory.CreateDropDownItem();
+                //[TODO:handle unexpected result]
+
                 UIElement drop_down_item_element =
-                    ui_element_factory.CreateDropDownItem();
+                    std::move(ddi_result.value());
+
                 drop_down_item_element.element_type =
                     DropDownItem{fragment_name};
                 element.child_elements.push_back(drop_down_item_element);

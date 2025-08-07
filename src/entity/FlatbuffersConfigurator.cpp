@@ -113,8 +113,12 @@ FlatbuffersConfigurator::ConfigureComponent(const UserInterfaceData *ui_data,
   UIElementFactory element_factory;
 
   // start building from the root element
-  // ui_component.m_root_element =
-  // element_factory.CreateUIStructure(*ui_data->root_ui_element());
+  auto result = element_factory.CreateUIStructure(*ui_data->root_ui_element());
+  if (!result.has_value()) {
+    return std::unexpected(result.error());
+  }
+  // assign the created UI structure to the CUserInterface component
+  ui_component.m_root_element = std::move(result.value());
 
   return std::monostate{};
 }
