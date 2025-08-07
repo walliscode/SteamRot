@@ -8,8 +8,10 @@
           "root_ui_element": {
             "type": "Button",
             "layout": "Horizontal",
-            "element_type": "PanelData",
-            "element": {},
+            "element_type": "ButtonData",
+            "element": {
+              "label": "test button"
+            },
             "spacing_strategy": "Ratioed",
             "position": {
               "x": 20,

@@ -9,7 +9,6 @@
 ////////////////////////////////////////////////////////////
 #include "Component.h"
 #include "UIElement.h"
-#include "user_interface_generated.h"
 #include <SFML/System/Vector2.hpp>
 
 namespace steamrot {
@@ -37,13 +36,6 @@ struct CUserInterface : public Component {
   /// @brief Is the this element of the user interface visible to Users.
   /////////////////////////////////////////////////
   bool m_UI_visible{false};
-
-  /////////////////////////////////////////////////
-  /// @brief Confiure the component with flatbuffer data
-  ///
-  /// @param user_interface_data Flatbuffer data for the user interface
-  /////////////////////////////////////////////////
-  void Configure(const UserInterfaceData *user_interface_data);
 
   /////////////////////////////////////////////////
   /// @brief returns the index of the component in the component register

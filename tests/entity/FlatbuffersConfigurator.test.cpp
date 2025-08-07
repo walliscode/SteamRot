@@ -47,7 +47,9 @@ TEST_CASE("Succeeds if memory pool is big enough",
   auto result = configurator.ConfigureEntitiesFromDefaultData(
       entity_manager.GetEntityMemoryPool(),
       steamrot::SceneType::SceneType_TEST);
-  REQUIRE(result.has_value() == true);
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
 }
 
 TEST_CASE("Data is configured correctly", "[FlatbuffersConfigurator]") {
