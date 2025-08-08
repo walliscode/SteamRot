@@ -1,15 +1,8 @@
 
 add_library(systems
     GameEngine.cpp
-    SceneManager.cpp
-    SceneFactory.cpp
     AssetManager.cpp
-    Scene.cpp
     ActionManager.cpp
-    CraftingScene.cpp
-    TitleScene.cpp
-
-
 )
 
 # check if set definitions exist
@@ -32,6 +25,7 @@ target_include_directories(systems
 
 target_link_libraries(systems PUBLIC
 SFML::Graphics
+scenes
 display
 magic_enum
 entity
