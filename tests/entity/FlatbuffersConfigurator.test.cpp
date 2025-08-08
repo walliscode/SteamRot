@@ -11,9 +11,11 @@
 #include "Button.h"
 #include "CUserInterface.h"
 #include "EntityManager.h"
+#include "containers.h"
 #include "emp_helpers.h"
 #include "user_interface_generated.h"
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 
 TEST_CASE("Fails if memory pool is not big enough",
           "[FlatbuffersConfigurator]") {
@@ -52,24 +54,36 @@ TEST_CASE("Succeeds if memory pool is big enough",
   }
 }
 
-TEST_CASE("Data is configured correctly", "[FlatbuffersConfigurator]") {
-  // create EntityManager with a big memory pool
+TEST_CASE("Data is configured correctly from default data",
+          "[FlatbuffersConfigurator]") {
+
+  // Set up EntityMemoryPool objects here so they outlive GENERATE
+  size_t pool_size{100};
+  steamrot::EntityMemoryPool entity_memory_pool_one;
+  std::apply(
+      [pool_size](auto &...component_vector) {
+        (component_vector.resize(pool_size), ...);
+      },
+      entity_memory_pool_one);
+
   steamrot::EntityManager entity_manager{100};
-  // create configurator with test environment
+  steamrot::EntityMemoryPool &entity_memory_pool_two =
+      entity_manager.GetEntityMemoryPool();
+
+  // Create configurator with test environment
   steamrot::FlatbuffersConfigurator configurator{
       steamrot::EnvironmentType::Test};
+
+  auto emp = GENERATE_REF(std::ref(entity_memory_pool_one),
+                          std::ref(entity_memory_pool_two));
 
   /////////////////////////////////////////////////
   /// Default value testing
   /////////////////////////////////////////////////
 
-  steamrot::EntityMemoryPool &entity_memory_pool_before =
-      entity_manager.GetEntityMemoryPool();
-
   // user interface values
   auto &user_interface_component_vector =
-      steamrot::emp_helpers::GetComponentVector<steamrot::CUserInterface>(
-          entity_memory_pool_before);
+      steamrot::emp_helpers::GetComponentVector<steamrot::CUserInterface>(emp);
 
   for (auto &component : user_interface_component_vector) {
     REQUIRE(component.m_active == false);
@@ -91,7 +105,7 @@ TEST_CASE("Data is configured correctly", "[FlatbuffersConfigurator]") {
   // CGrimoireMachina testing
   auto &grimoire_machina_component_vector =
       steamrot::emp_helpers::GetComponentVector<steamrot::CGrimoireMachina>(
-          entity_memory_pool_before);
+          emp);
   for (auto &component : grimoire_machina_component_vector) {
     REQUIRE(component.m_active == false);
     REQUIRE(component.m_all_fragments.empty());
@@ -107,7 +121,7 @@ TEST_CASE("Data is configured correctly", "[FlatbuffersConfigurator]") {
       entity_manager.GetEntityMemoryPool(),
       steamrot::SceneType::SceneType_TEST);
   REQUIRE(result.has_value() == true);
-  // Check if entities are configured correctly
+
   steamrot::EntityMemoryPool &entity_memory_pool_after =
       entity_manager.GetEntityMemoryPool();
 

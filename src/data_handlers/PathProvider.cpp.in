@@ -19,10 +19,18 @@ PathProvider::PathProvider(EnvironmentType env_type) {
       m_environment == EnvironmentType::None) {
     throw std::invalid_argument(
         "Environment type cannot be None if environment has not been set.");
-  }
 
-  else if (env_type != EnvironmentType::None &&
-           m_environment != EnvironmentType::None) {
+    // allow for Test enviroment to be set multiple times, this allows for
+    // catch2 to run the GENERATE macro
+  } else if (env_type == EnvironmentType::Test &&
+             m_environment == EnvironmentType::Test) {
+    // DO NOTHING
+
+  } else if (env_type == EnvironmentType::Production &&
+             m_environment == EnvironmentType::None) {
+    // do nothing, this is the first time setting the environment
+  } else if (env_type != EnvironmentType::None &&
+             m_environment != EnvironmentType::None) {
     throw std::runtime_error("PathProvider can only be initiated once.");
   }
   m_environment = env_type;
