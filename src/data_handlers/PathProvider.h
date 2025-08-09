@@ -42,7 +42,7 @@ public:
   ///
   /// @return EnvironmentType
   /////////////////////////////////////////////////
-  const EnvironmentType GetEnvironment() const;
+  EnvironmentType GetEnvironment() const;
 
   /////////////////////////////////////////////////
   /// @brief Provides top level data directory path

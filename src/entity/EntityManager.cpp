@@ -7,7 +7,11 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "EntityManager.h"
+#include "FlatbuffersConfigurator.h"
+#include "PathProvider.h"
 #include "emp_helpers.h"
+#include <expected>
+#include <variant>
 
 namespace steamrot {
 
@@ -38,6 +42,31 @@ void EntityManager::ResizeEntityMemoryPool(const size_t pool_size) {
       m_entity_memory_pool);
 }
 
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+EntityManager::ConfigureEntitiesFromDefaultData(const SceneType scene_type,
+                                                const EnvironmentType env_type,
+                                                const DataType data_type) {
+
+  std::variant<FlatbuffersConfigurator> configurator(env_type);
+  switch (data_type) {
+  case DataType::Flatbuffers:
+    configurator = FlatbuffersConfigurator{EnvironmentType::Test};
+    break;
+  default:
+    return std::unexpected(
+        FailInfo{FailMode::NonExistentEnumValue, "Invalid enum value"});
+  }
+
+  // call the configurator to configure entities
+  auto result = std::visit(
+      [&scene_type, this](auto &configurator_instance) {
+        return configurator_instance.ConfigureEntitiesFromDefaultData(
+            m_entity_memory_pool, scene_type);
+      },
+      configurator);
+  return result;
+}
 ////////////////////////////////////////////////////////////
 size_t EntityManager::GetNextFreeEntityIndex() {
 

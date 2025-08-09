@@ -37,9 +37,7 @@ PathProvider::PathProvider(EnvironmentType env_type) {
 }
 
 /////////////////////////////////////////////////
-const EnvironmentType PathProvider::GetEnvironment() const {
-  return m_environment;
-}
+EnvironmentType PathProvider::GetEnvironment() const { return m_environment; }
 /////////////////////////////////////////////////
 const std::filesystem::path PathProvider::GetDataDirectory() const {
   switch (m_environment) {
