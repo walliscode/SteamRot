@@ -10,6 +10,7 @@ enum class FailMode {
   None = 0,
   FlatbuffersDataNotFound,
   ParameterOutOfBounds,
+  NonExistentEnumValue,
 };
 
 struct FailInfo {

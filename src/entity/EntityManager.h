@@ -13,11 +13,18 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "ArchetypeManager.h"
+#include "FlatbuffersConfigurator.h"
+#include "PathProvider.h"
 #include "containers.h"
 #include <cstddef>
+#include <variant>
 
 namespace steamrot {
 
+enum class DataType {
+  Flatbuffers,
+
+};
 /////////////////////////////////////////////////
 /// @class EntityManager
 /// @brief The EntityManager class is responsiblle for managing entity lifetimes
@@ -88,6 +95,17 @@ public:
   ///
   ////////////////////////////////////////////////////////////
   EntityManager(const size_t &pool_size = 100);
+
+  /////////////////////////////////////////////////
+  /// @brief Call correct configurator to configure entities from default data
+  ///
+  /// @param scene_type SceneType to configure entities for
+  /// @param data_type DataType to configure entities from
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ConfigureEntitiesFromDefaultData(const SceneType scene_type,
+                                   const EnvironmentType env_type,
+                                   const DataType data_type);
 
   /////////////////////////////////////////////////
   /// @brief Get a read/write reference to the entity memory pool

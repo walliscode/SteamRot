@@ -18,13 +18,14 @@ template <typename T>
 std::vector<T> &GetComponentVector(EntityMemoryPool &entity_memory_pool) {
 
   auto &component_vector = std::get<std::vector<T>>(entity_memory_pool);
-
   return component_vector;
 }
 
 template <typename T>
-std::vector<T> &GetComponentVector(const EntityMemoryPool &entity_memory_pool) {
-  auto &component_vector = std::get<std::vector<T>>(entity_memory_pool);
+const std::vector<T> &
+GetComponentVector(const EntityMemoryPool &entity_memory_pool) {
+
+  const auto &component_vector = std::get<std::vector<T>>(entity_memory_pool);
   return component_vector;
 }
 
