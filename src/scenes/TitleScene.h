@@ -1,40 +1,49 @@
-/**
- * @file
- * @brief TitleScreen class for display entry point of the game.
- */
+/////////////////////////////////////////////////
+/// @file
+/// @brief Declaration of the TitleScene class.
+/////////////////////////////////////////////////
 
+/////////////////////////////////////////////////
+/// Preprocessor Directives
+/////////////////////////////////////////////////
 #pragma once
 
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
 #include "GameContext.h"
 #include "Scene.h"
-#include "scenes_generated.h"
 namespace steamrot {
 
-/**
- * @class TitleScreen
- * @brief Contains information and logic for the title screen of the game.
- *
- */
+/////////////////////////////////////////////////
+/// @class TitleScene
+/// @brief Designed to handle the title screen of the game.
+///
+/////////////////////////////////////////////////
 class TitleScene : public Scene {
   friend class SceneFactory;
 
 public:
+private:
+  /////////////////////////////////////////////////
+  /// @brief Constructor for the TitleScene class.
+  ///
+  /// @param pool_size [TODO:parameter]
+  /// @param scene_data [TODO:parameter]
+  /// @param id [TODO:parameter]
+  /// @param game_context [TODO:parameter]
+  /////////////////////////////////////////////////
+  TitleScene(const size_t pool_size, const uuids::uuid &id,
+             const GameContext game_context);
+
+  /////////////////////////////////////////////////
+  /// @brief Call rendering Logic for TitleScene
+  /////////////////////////////////////////////////
   void sRender() override;
 
-private:
-  /**
-   * @brief Constructor for TitleScreen
-   *
-   * @param pool_size EntityMemoryPool size for the scene
-   * @param config_data JSON configuration data for the scene
-   * @param id Unique identifier for the scene
-   */
-  TitleScene(const size_t pool_size, const SceneData *scene_data,
-             const uuids::uuid &id, const GameContext game_context);
-
-  ////////////////////////////////////////////////////////////
-  /// \brief call movement Logic for TitleScene
-  ////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////
+  /// @brief Call movement Logic for TitleScene
+  /////////////////////////////////////////////////
   void sMovement() override;
 
   /////////////////////////////////////////////////
@@ -42,6 +51,9 @@ private:
   /////////////////////////////////////////////////
   void sCollision() override;
 
+  /////////////////////////////////////////////////
+  /// @brief Call action Logic for TitleScene
+  /////////////////////////////////////////////////
   void sAction() override;
 };
 } // namespace steamrot

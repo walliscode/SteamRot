@@ -66,7 +66,7 @@ SceneFactory::CreateTitleScene(const SceneData *scene_data,
   // create a new title scene object, we are creating a raw pointer here due to
   // TitleScene having a private constuctor
   std::unique_ptr<TitleScene> title_scene(
-      new TitleScene(100, scene_data, scene_uuid, m_game_context));
+      new TitleScene(100, scene_uuid, m_game_context));
   std::cout << "Created TitleScene with UUID: " << scene_uuid << std::endl;
   return title_scene;
 }
@@ -78,7 +78,7 @@ SceneFactory::CreateCraftingScene(const SceneData *scene_data,
   // create a new crafting scene object, we are creating a raw pointer here due
   // to CraftingScene having a private constuctor
   std::unique_ptr<CraftingScene> crafting_scene(
-      new CraftingScene(100, scene_data, scene_uuid, m_game_context));
+      new CraftingScene(100, scene_uuid, m_game_context));
   std::cout << "Created CraftingScene with UUID: " << scene_uuid << std::endl;
   return crafting_scene;
 }

@@ -3,14 +3,16 @@
 /// @brief Implementation of the CraftingScene class
 /////////////////////////////////////////////////
 
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
 #include "CraftingScene.h"
 
 namespace steamrot {
 /////////////////////////////////////////////////
-CraftingScene::CraftingScene(const size_t pool_size,
-                             const SceneData *scene_data, const uuids::uuid &id,
+CraftingScene::CraftingScene(const size_t pool_size, const uuids::uuid &id,
                              const GameContext game_context)
-    : Scene(pool_size, scene_data, id, game_context) {}
+    : Scene(pool_size, id, game_context) {}
 
 /////////////////////////////////////////////////
 void CraftingScene::sAction() {
@@ -21,6 +23,7 @@ void CraftingScene::sAction() {
   }
 }
 
+/////////////////////////////////////////////////
 void CraftingScene::sMovement() {
   // process movement logic
 }

@@ -3,6 +3,6 @@ namespace steamrot;
 enum SceneType: byte {
   UNKNOWN = 0,
   TEST = 1,
-    TITLE = 2,
-    CRAFTING = 3
+  TITLE = 2,
+  CRAFTING = 3
   }
