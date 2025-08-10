@@ -1,3 +1,8 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Declaration of the abstract Scene class.
+/////////////////////////////////////////////////
+
 ////////////////////////////////////////////////////////////
 // Preprocessor directives
 ////////////////////////////////////////////////////////////
@@ -11,13 +16,9 @@
 #include "EntityManager.h"
 #include "GameContext.h"
 #include "LogicFactory.h"
-
 #include "global_constants.h"
 #include "logics_generated.h"
-#include "scenes_generated.h"
-#include <SFML/Graphics/Drawable.hpp>
-#include <SFML/Graphics/RenderTexture.hpp>
-#include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics.hpp>
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
@@ -28,9 +29,8 @@ typedef std::vector<std::shared_ptr<sf::Drawable>> SceneDrawables;
 namespace steamrot {
 
 /////////////////////////////////////////////////
-/// @class SceneDataPackage
-/// @brief Data struct to be accessed by the SceneManager. Provides data to any
-/// relevenat actions
+/// @class Scene
+/// @brief Abstract base class for all Scenes in the game.
 ///
 /////////////////////////////////////////////////
 class Scene {
@@ -41,6 +41,7 @@ protected:
   // Member: Entity Manager instance
   ////////////////////////////////////////////////////////////
   EntityManager m_entity_manager;
+
   ////////////////////////////////////////////////////////////
   // Member: Action Manager instance
   ////////////////////////////////////////////////////////////
@@ -74,40 +75,31 @@ protected:
   sf::RenderTexture m_render_texture{kWindowSize};
 
   /////////////////////////////////////////////////
-  /// @brief Is the Scene paused? Should not update logic or render texture
-  /////////////////////////////////////////////////
-  bool m_paused = false;
-
-  /////////////////////////////////////////////////
   /// @brief Is the Scene active? Should update logic and render texture
   /////////////////////////////////////////////////
   bool m_active = true;
-
-  /////////////////////////////////////////////////
-  /// @brief Is the Scene interactable? Should allow user input
-  /////////////////////////////////////////////////
-  bool m_interactable = false;
-
-  /**
-   * @brief Scene constructor that initilizes the Scene with  flatbuffers data
-   *
-   * @param pool_size Size of the EntityMemoryPool for the Scene
-   * @param scene_data Any config/data needed to initialize the Scene
-   * @param id Unique identifier for the Scene
-   */
-  Scene(const size_t &pool_size, const SceneData *scene_data,
-        const uuids::uuid &id, const GameContext game_context);
 
   /////////////////////////////////////////////////
   /// @brief contains all event types that the Scene is interested in
   /////////////////////////////////////////////////
   std::unordered_set<EventType> m_scene_event_types;
 
+  /////////////////////////////////////////////////
+  /// @brief Constructor for Scene class.
+  ///
+  /// @param pool_size [TODO:parameter]
+  /// @param id [TODO:parameter]
+  /// @param game_context [TODO:parameter]
+  /////////////////////////////////////////////////
+  Scene(const size_t &pool_size, const uuids::uuid &id,
+        const GameContext game_context);
+
 public:
-  /**
-   * @brief Virtual destructor for the Scene class, needed for proper cleanup
-   */
+  /////////////////////////////////////////////////
+  /// @brief Destructor for Scene class.
+  /////////////////////////////////////////////////
   virtual ~Scene() = default;
+
   ////////////////////////////////////////////////////////////
   /// \brief function container for all movement related logic
   ///
@@ -119,20 +111,26 @@ public:
   /////////////////////////////////////////////////
   virtual void sCollision() = 0;
 
+  /////////////////////////////////////////////////
+  /// @brief Virtual container function for running all action related logic.
+  /////////////////////////////////////////////////
   virtual void sAction() = 0;
-  /**
-   * @brief Function container for all rendering related logic.
-   */
+
+  /////////////////////////////////////////////////
+  /// @brief Virtual container function for running all rendering related logic.
+  /////////////////////////////////////////////////
   virtual void sRender() = 0;
-  /**
-   * @brief Return the RenderTexture for the Scene instance.
-   */
+
+  /////////////////////////////////////////////////
+  /// @brief Returns a reference to the RenderTexture of the Scene.
+  /////////////////////////////////////////////////
   sf::RenderTexture &GetRenderTexture();
 
-  ////////////////////////////////////////////////////////////
-  /// \brief Inidcicates if the Scenes is active or not
+  /////////////////////////////////////////////////
+  /// @brief Returns the active state of the Scene.
   ///
-  ////////////////////////////////////////////////////////////
+  /// @return Boolean indicating if the Scene is active.
+  /////////////////////////////////////////////////
   bool GetActive() const;
 
   ////////////////////////////////////////////////////////////

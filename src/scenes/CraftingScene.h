@@ -3,9 +3,16 @@
 /// @brief Implementation of the CraftingScene class
 /////////////////////////////////////////////////
 
+/////////////////////////////////////////////////
+/// Preprocessor Directives
+/////////////////////////////////////////////////
 #pragma once
 
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
 #include "Scene.h"
+
 namespace steamrot {
 
 /////////////////////////////////////////////////
@@ -25,8 +32,8 @@ private:
   /// @param id Unique identifier for the scene instance
   /// @param game_context GameContext containing game-wide data for the scene
   /////////////////////////////////////////////////
-  CraftingScene(const size_t pool_size, const SceneData *scene_data,
-                const uuids::uuid &id, const GameContext game_context);
+  CraftingScene(const size_t pool_size, const uuids::uuid &id,
+                const GameContext game_context);
 
 public:
   /////////////////////////////////////////////////
