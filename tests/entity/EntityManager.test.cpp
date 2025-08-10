@@ -9,6 +9,7 @@
 #include "EntityManager.h"
 #include "PathProvider.h"
 #include "catch2/generators/catch_generators.hpp"
+#include "configuration_helpers.h"
 #include "emp_helpers.h"
 #include <catch2/catch_test_macros.hpp>
 
@@ -31,9 +32,18 @@ TEST_CASE("EntityManager calls configurator with no errors",
 
   steamrot::EntityManager entity_manager;
 
+  // test the EntityMemoryPool pre configuration
+  steamrot::TestEMPIsDefaultConstructed(entity_manager.GetEntityMemoryPool());
+
+  // configure entities from default data
   auto result = entity_manager.ConfigureEntitiesFromDefaultData(
       steamrot::SceneType::SceneType_TEST, steamrot::EnvironmentType::Test,
       steamrot::DataType::Flatbuffers);
 
   REQUIRE(result.has_value() == true);
+
+  // test the EntityMemoryPool post configuration
+  steamrot::TestConfigurationOfEMPfromDefaultData(
+      entity_manager.GetEntityMemoryPool(),
+      steamrot::SceneType::SceneType_TEST);
 }
