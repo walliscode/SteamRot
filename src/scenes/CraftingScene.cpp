@@ -15,6 +15,12 @@ CraftingScene::CraftingScene(const uuids::uuid &id,
     : Scene(id, game_context) {}
 
 /////////////////////////////////////////////////
+SceneType CraftingScene::GetSceneType() const {
+  static SceneType scene_type = SceneType::SceneType_CRAFTING;
+  return scene_type;
+}
+
+/////////////////////////////////////////////////
 void CraftingScene::sAction() {
 
   // process action logic

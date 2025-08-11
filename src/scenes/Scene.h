@@ -142,6 +142,8 @@ public:
   /// \brief return Scene id
   ////////////////////////////////////////////////////////////
   const uuids::uuid GetSceneID();
+
+  virtual SceneType GetSceneType() const = 0;
 };
 
 } // namespace steamrot

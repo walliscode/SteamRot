@@ -11,6 +11,7 @@ enum class FailMode {
   FlatbuffersDataNotFound,
   ParameterOutOfBounds,
   NonExistentEnumValue,
+  SceneTypeNotFound,
 };
 
 struct FailInfo {

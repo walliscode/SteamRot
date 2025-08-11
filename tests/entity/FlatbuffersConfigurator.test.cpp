@@ -70,7 +70,7 @@ TEST_CASE("Data is configured correctly from default data",
   /// Default value testing
   /////////////////////////////////////////////////
 
-  steamrot::TestEMPIsDefaultConstructed(entity_memory_pool_one);
+  steamrot::tests::TestEMPIsDefaultConstructed(entity_memory_pool_one);
 
   // Create configurator with test environment
   steamrot::FlatbuffersConfigurator configurator{
@@ -83,6 +83,6 @@ TEST_CASE("Data is configured correctly from default data",
   /// Post configuration testing
   /////////////////////////////////////////////////
 
-  steamrot::TestConfigurationOfEMPfromDefaultData(entity_memory_pool_one,
-                                                  steamrot::SceneType_TEST);
+  steamrot::tests::TestConfigurationOfEMPfromDefaultData(
+      entity_memory_pool_one, steamrot::SceneType_TEST);
 }

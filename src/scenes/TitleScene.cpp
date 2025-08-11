@@ -1,10 +1,24 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Implementation of the TitleScene class.
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
 #include "TitleScene.h"
 #include "logics_generated.h"
 
 namespace steamrot {
+/////////////////////////////////////////////////
 TitleScene::TitleScene(const uuids::uuid &id, const GameContext game_context)
     : Scene(id, game_context) {}
 
+/////////////////////////////////////////////////
+SceneType TitleScene::GetSceneType() const {
+  static const SceneType scene_type = SceneType::SceneType_TITLE;
+  return scene_type;
+}
 ////////////////////////////////////////////////////////////
 void TitleScene::sMovement() {};
 
@@ -24,6 +38,7 @@ void TitleScene::sCollision() {
   }
 }
 
+/////////////////////////////////////////////////
 void TitleScene::sAction() {
   // process action logic
   for (auto &action_logic : m_logics[LogicType::LogicType_Action]) {

@@ -1,5 +1,5 @@
 add_executable(test_scenes
-
+SceneFactory.test.cpp
 )
 
 target_include_directories(test_scenes
@@ -12,6 +12,7 @@ target_link_libraries(test_scenes
   Catch2::Catch2WithMain
   SFML::Graphics
   scenes
+  systems
 )
 
 catch_discover_tests(test_scenes)

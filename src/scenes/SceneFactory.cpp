@@ -7,6 +7,7 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "SceneFactory.h"
+#include "CraftingScene.h"
 #include "TitleScene.h"
 #include "uuid.h"
 #include <iostream>
@@ -34,7 +35,7 @@ const uuids::uuid SceneFactory::CreateUUID() {
   return id;
 }
 ////////////////////////////////////////////////////////////
-std::unique_ptr<Scene>
+std::expected<std::unique_ptr<Scene>, FailInfo>
 SceneFactory::CreateDefaultScene(const SceneType &scene_type) {
 
   // generate UUID for the scene
@@ -50,12 +51,15 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type) {
   }
 
   case SceneType::SceneType_CRAFTING: {
+    std::unique_ptr<CraftingScene> crafting_scene(
+        new CraftingScene(scene_uuid, m_game_context));
+    return crafting_scene;
   }
 
   default:
-    std::cerr << "Unknown scene type: " << static_cast<int>(scene_type)
-              << std::endl;
-    throw std::runtime_error("SceneFactory::CreateScene: Unknown scene type.");
+    FailInfo fail_info(FailMode::NonExistentEnumValue, "SceneType not found");
+
+    return std::unexpected(fail_info);
   }
 }
 

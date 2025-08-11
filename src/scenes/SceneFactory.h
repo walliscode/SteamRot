@@ -11,10 +11,12 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
+#include "FlatbuffersConfigurator.h"
 #include "GameContext.h"
 #include "Scene.h"
 #include "uuid.h"
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <expected>
 #include <memory>
 
 namespace steamrot {
@@ -49,6 +51,7 @@ public:
   /// \brief gathers all scene creation methods
   ///
   ////////////////////////////////////////////////////////////
-  std::unique_ptr<Scene> CreateDefaultScene(const SceneType &scene_type);
+  std::expected<std::unique_ptr<Scene>, FailInfo>
+  CreateDefaultScene(const SceneType &scene_type);
 };
 } // namespace steamrot
