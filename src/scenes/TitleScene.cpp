@@ -2,9 +2,8 @@
 #include "logics_generated.h"
 
 namespace steamrot {
-TitleScene::TitleScene(const size_t pool_size, const uuids::uuid &id,
-                       const GameContext game_context)
-    : Scene(pool_size, id, game_context) {}
+TitleScene::TitleScene(const uuids::uuid &id, const GameContext game_context)
+    : Scene(id, game_context) {}
 
 ////////////////////////////////////////////////////////////
 void TitleScene::sMovement() {};

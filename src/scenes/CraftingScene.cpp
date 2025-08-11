@@ -10,9 +10,9 @@
 
 namespace steamrot {
 /////////////////////////////////////////////////
-CraftingScene::CraftingScene(const size_t pool_size, const uuids::uuid &id,
+CraftingScene::CraftingScene(const uuids::uuid &id,
                              const GameContext game_context)
-    : Scene(pool_size, id, game_context) {}
+    : Scene(id, game_context) {}
 
 /////////////////////////////////////////////////
 void CraftingScene::sAction() {

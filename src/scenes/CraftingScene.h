@@ -32,8 +32,7 @@ private:
   /// @param id Unique identifier for the scene instance
   /// @param game_context GameContext containing game-wide data for the scene
   /////////////////////////////////////////////////
-  CraftingScene(const size_t pool_size, const uuids::uuid &id,
-                const GameContext game_context);
+  CraftingScene(const uuids::uuid &id, const GameContext game_context);
 
 public:
   /////////////////////////////////////////////////

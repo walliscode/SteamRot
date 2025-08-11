@@ -13,7 +13,7 @@
 #include "containers.h"
 #include "grimoire_machina_generated.h"
 #include "user_interface_generated.h"
-namespace steamrot {
+namespace steamrot::tests {
 
 /////////////////////////////////////////////////
 /// @brief Helper function to compare two CUserInterface instances
@@ -62,4 +62,4 @@ void CompareToData(const CGrimoireMachina &actual,
 void TestConfigurationOfEMPfromDefaultData(EntityMemoryPool &entity_memory_pool,
                                            const SceneType scene_type);
 
-} // namespace steamrot
+} // namespace steamrot::tests

@@ -16,7 +16,7 @@
 #include "scenes_generated.h"
 #include <unistd.h>
 
-namespace steamrot {
+namespace steamrot::tests {
 
 /////////////////////////////////////////////////
 void CompareToDefault(const CUserInterface &actual) {
@@ -116,4 +116,4 @@ void TestConfigurationOfEMPfromDefaultData(EntityMemoryPool &entity_memory_pool,
     }
   }
 }
-} // namespace steamrot
+} // namespace steamrot::tests

@@ -33,8 +33,7 @@ private:
   /// @param id [TODO:parameter]
   /// @param game_context [TODO:parameter]
   /////////////////////////////////////////////////
-  TitleScene(const size_t pool_size, const uuids::uuid &id,
-             const GameContext game_context);
+  TitleScene(const uuids::uuid &id, const GameContext game_context);
 
   /////////////////////////////////////////////////
   /// @brief Call rendering Logic for TitleScene

@@ -91,8 +91,7 @@ protected:
   /// @param id [TODO:parameter]
   /// @param game_context [TODO:parameter]
   /////////////////////////////////////////////////
-  Scene(const size_t &pool_size, const uuids::uuid &id,
-        const GameContext game_context);
+  Scene(const uuids::uuid &id, const GameContext game_context);
 
 public:
   /////////////////////////////////////////////////
