@@ -12,10 +12,13 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "ArchetypeHelpers.h"
+#include "FlatbuffersConfigurator.h"
 #include "containers.h"
 #include <cstddef>
 #include <cstdlib>
+#include <expected>
 #include <unordered_map>
+#include <variant>
 #include <vector>
 
 namespace steamrot {
@@ -36,15 +39,27 @@ private:
   /////////////////////////////////////////////////
   std::unordered_map<ArchetypeID, Archetype> m_archetypes;
 
-  const ArchetypeID
-  GenerateArchetypeID(const EntityMemoryPool &entity_memory_pool,
-                      size_t entity_index);
+  /////////////////////////////////////////////////
+  /// @brief Reference to the EntityMemoryPool in the scene.
+  /////////////////////////////////////////////////
+  const EntityMemoryPool &m_entity_memory_pool;
+
+  /////////////////////////////////////////////////
+  /// @brief Inspects the entity memory pool and that index and generates an ID
+  ///
+  /// @param entity_index Index of the entity to generate an ArchetypeID for.
+  /////////////////////////////////////////////////
+  std::expected<const ArchetypeID, FailInfo>
+  GenerateArchetypeID(size_t entity_index);
 
 public:
   /////////////////////////////////////////////////
-  /// @brief Default constructor for ArchetypeManager
+  /// @brief Constructor for the ArchetypeManager class taking an
+  /// EntityMemoryPool reference.
+  ///
+  /// @param entity_memory_pool Reference to the EntityMemoryPool in the scene.
   /////////////////////////////////////////////////
-  ArchetypeManager();
+  ArchetypeManager(const EntityMemoryPool &entity_memory_pool);
 
   /////////////////////////////////////////////////
   /// @brief Returns the entity indexes for the given archetype IDs.
@@ -59,7 +74,7 @@ public:
   ///
   /// @param entity_memory_pool Reference to the EntityMemoryPool in the scene
   /////////////////////////////////////////////////
-  void GenerateAllArchetypes(const EntityMemoryPool &entity_memory_pool);
+  std::expected<std::monostate, FailInfo> GenerateAllArchetypes();
 
   /////////////////////////////////////////////////
   /// @brief Returns the archetypes map.

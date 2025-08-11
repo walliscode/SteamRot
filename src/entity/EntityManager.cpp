@@ -16,11 +16,15 @@
 namespace steamrot {
 
 ////////////////////////////////////////////////////////////
-EntityManager::EntityManager(const size_t &pool_size) {
+EntityManager::EntityManager() : m_archetype_manager(m_entity_memory_pool) {}
 
+/////////////////////////////////////////////////
+EntityManager::EntityManager(const size_t pool_size)
+    : m_archetype_manager(m_entity_memory_pool) {
+  // resize the entity memory pool to the given size
   ResizeEntityMemoryPool(pool_size);
-};
-
+}
+/////////////////////////////////////////////////
 EntityMemoryPool &EntityManager::GetEntityMemoryPool() {
   // return a reference to the memory pool
   return m_entity_memory_pool;

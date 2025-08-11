@@ -13,5 +13,6 @@ table EntityData{
 // wrapper table to allow for metadata in the future
 table EntityCollection {
   entities: [EntityData] (required);
+  entity_memory_pool_size: int;
 }
 

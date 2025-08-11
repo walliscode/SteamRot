@@ -8,6 +8,8 @@
 /////////////////////////////////////////////////
 #pragma once
 
+#include "ArchetypeHelpers.h"
+#include "ArchetypeManager.h"
 #include "CGrimoireMachina.h"
 #include "CUserInterface.h"
 #include "containers.h"
@@ -62,4 +64,22 @@ void CompareToData(const CGrimoireMachina &actual,
 void TestConfigurationOfEMPfromDefaultData(EntityMemoryPool &entity_memory_pool,
                                            const SceneType scene_type);
 
+/////////////////////////////////////////////////
+/// @brief Checks the archetypes of an unconfigured EntityMemoryPool
+///
+/// @param archetypes Map of ArchetypeID to Archetype
+/////////////////////////////////////////////////
+void TestArchetypesOfUnconfiguredEMP(
+    const std::unordered_map<ArchetypeID, Archetype> &archetypes);
+
+/////////////////////////////////////////////////
+/// @brief Loads the default data and tests that the archetypes match the
+/// provided data
+///
+/// @param archetypes generated archetypes from the EntityMemoryPool
+/// @param scene_type SceneType to pull default data from
+/////////////////////////////////////////////////
+void TestArchetypesOfConfiguredEMPfromDefaultData(
+    const std::unordered_map<ArchetypeID, Archetype> &archetypes,
+    const SceneType scene_type);
 } // namespace steamrot::tests

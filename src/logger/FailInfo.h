@@ -10,6 +10,7 @@ enum class FailMode {
   None = 0,
   FlatbuffersDataNotFound,
   ParameterOutOfBounds,
+  IndexOutOfBounds,
   NonExistentEnumValue,
   SceneTypeNotFound,
 };
