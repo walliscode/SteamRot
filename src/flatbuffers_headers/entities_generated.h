@@ -90,16 +90,21 @@ inline ::flatbuffers::Offset<EntityData> CreateEntityData(
 struct EntityCollection FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef EntityCollectionBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_ENTITIES = 4
+    VT_ENTITIES = 4,
+    VT_ENTITY_MEMORY_POOL_SIZE = 6
   };
   const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EntityData>> *entities() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EntityData>> *>(VT_ENTITIES);
+  }
+  int32_t entity_memory_pool_size() const {
+    return GetField<int32_t>(VT_ENTITY_MEMORY_POOL_SIZE, 0);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_ENTITIES) &&
            verifier.VerifyVector(entities()) &&
            verifier.VerifyVectorOfTables(entities()) &&
+           VerifyField<int32_t>(verifier, VT_ENTITY_MEMORY_POOL_SIZE, 4) &&
            verifier.EndTable();
   }
 };
@@ -110,6 +115,9 @@ struct EntityCollectionBuilder {
   ::flatbuffers::uoffset_t start_;
   void add_entities(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EntityData>>> entities) {
     fbb_.AddOffset(EntityCollection::VT_ENTITIES, entities);
+  }
+  void add_entity_memory_pool_size(int32_t entity_memory_pool_size) {
+    fbb_.AddElement<int32_t>(EntityCollection::VT_ENTITY_MEMORY_POOL_SIZE, entity_memory_pool_size, 0);
   }
   explicit EntityCollectionBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -125,19 +133,23 @@ struct EntityCollectionBuilder {
 
 inline ::flatbuffers::Offset<EntityCollection> CreateEntityCollection(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EntityData>>> entities = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EntityData>>> entities = 0,
+    int32_t entity_memory_pool_size = 0) {
   EntityCollectionBuilder builder_(_fbb);
+  builder_.add_entity_memory_pool_size(entity_memory_pool_size);
   builder_.add_entities(entities);
   return builder_.Finish();
 }
 
 inline ::flatbuffers::Offset<EntityCollection> CreateEntityCollectionDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<steamrot::EntityData>> *entities = nullptr) {
+    const std::vector<::flatbuffers::Offset<steamrot::EntityData>> *entities = nullptr,
+    int32_t entity_memory_pool_size = 0) {
   auto entities__ = entities ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::EntityData>>(*entities) : 0;
   return steamrot::CreateEntityCollection(
       _fbb,
-      entities__);
+      entities__,
+      entity_memory_pool_size);
 }
 
 }  // namespace steamrot

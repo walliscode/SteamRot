@@ -37,6 +37,22 @@ FlatbuffersConfigurator::ConfigureEntitiesFromDefaultData(
     return std::unexpected(fail_info);
   }
 
+  // check that the entity memory pool size has been added
+  if (!scene_data->entity_collection()->entity_memory_pool_size()) {
+    FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
+                       "No entity memory pool size found in the scene data."};
+    return std::unexpected(fail_info);
+  }
+
+  // resize the entity memory pool to the size specified in the flatbuffers
+  size_t pool_size = scene_data->entity_collection()->entity_memory_pool_size();
+
+  std::apply(
+      [pool_size](auto &...component_vector) {
+        (component_vector.resize(pool_size), ...);
+      },
+      entity_memory_pool);
+
   // some helper values
   size_t entity_count = scene_data->entity_collection()->entities()->size();
   // check the entity memory pool is big enough

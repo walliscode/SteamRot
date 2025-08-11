@@ -26,7 +26,7 @@ std::vector<size_t> ArchetypeManager::GetEntityIndexes(
     const std::vector<ArchetypeID> &archetype_IDs) const {
 
   // create return vector
-  std::vector<size_t> entityIndexes;
+  std::vector<size_t> entity_indexes;
 
   // iterate over provided archetypeIDs
   for (const auto &archetypeID : archetype_IDs) {
@@ -37,15 +37,15 @@ std::vector<size_t> ArchetypeManager::GetEntityIndexes(
     // if found, add the entity indexes to the return vector
     if (it != m_archetypes.end()) {
       const Archetype &archetype = it->second;
-      entityIndexes.insert(entityIndexes.end(), archetype.begin(),
-                           archetype.end());
+      entity_indexes.insert(entity_indexes.end(), archetype.begin(),
+                            archetype.end());
 
     } else {
       // no error needed, it just means that ArcchtypeID is currently empty
     }
   }
 
-  return entityIndexes;
+  return entity_indexes;
 }
 
 /////////////////////////////////////////////////

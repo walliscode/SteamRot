@@ -27,7 +27,7 @@ TEST_CASE("ArchetypeManager archetype map is empty with a non configured EMP",
           "[ArchetypeManager]") {
 
   // create an instance of the entity manager but don't configure it
-  steamrot::EntityManager entity_manager;
+  steamrot::EntityManager entity_manager{100};
   // check that the EMP is default constructed
   steamrot::tests::TestEMPIsDefaultConstructed(
       entity_manager.GetEntityMemoryPool());
@@ -70,6 +70,6 @@ TEST_CASE("ArchetypeManager generates archetype IDs correctly",
 
   // check that the archetypes are generated correctly
   const auto &archetypes = archetype_manager.GetArchetypes();
-  REQUIRE(archetypes.size() == 3);
-  REQUIRE(archetypes.at(0).size() == 98);
+  steamrot::tests::TestArchetypesOfConfiguredEMPfromDefaultData(
+      archetypes, steamrot::SceneType_TEST);
 }
