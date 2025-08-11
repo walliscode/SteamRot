@@ -1,22 +1,24 @@
-/**
- * @file SceneManager.h
- * @brief Declares the SceneManager class and related functionality.
- */
+/////////////////////////////////////////////////
+/// @file
+/// @brief Declaration of the SceneManager class
+/////////////////////////////////////////////////
 
+/////////////////////////////////////////////////
+/// Preprocessor Directives
+/////////////////////////////////////////////////
 #pragma once
 
-// Headers
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
 #include "GameContext.h"
 #include "Scene.h"
 #include "SceneFactory.h"
 #include "TexturesPackage.h"
 #include "uuid.h"
 #include <SFML/Graphics.hpp>
-#include <SFML/Window/Event.hpp>
 #include <memory>
-#include <nlohmann/json.hpp>
 #include <unordered_map>
-#include <unordered_set>
 
 namespace steamrot {
 
@@ -30,6 +32,8 @@ class SceneManager {
 private:
   /////////////////////////////////////////////////
   /// @brief Instance of SceneFactory class. Used to create Scene objects.
+  ///
+  /// Its kept alive as it posses an instance of GameContext. Happy to change
   /////////////////////////////////////////////////
   SceneFactory m_scene_factory;
 
@@ -43,8 +47,6 @@ private:
   /////////////////////////////////////////////////
   std::unordered_map<uuids::uuid, std::unique_ptr<Scene>> m_scenes;
 
-  std::unordered_set<EventType> m_scene_manager_event_types;
-
 public:
   /////////////////////////////////////////////////
   /// @brief Constructor taking a GameContext object.
@@ -53,39 +55,48 @@ public:
   /////////////////////////////////////////////////
   SceneManager(const GameContext game_context);
 
-  /**
-   * @brief Start up the SceneManager for the game.
-   */
+  /////////////////////////////////////////////////
+  /// @brief Function that encapsulates the startup logic for the SceneManager.
+  /////////////////////////////////////////////////
   void StartUp();
 
-  /**
-   * @brief Clear all scenes and load the title scene.
-   * @return The UUID of the loaded title scene.
-   */
+  /////////////////////////////////////////////////
+  /// @brief A convenience function to load the title scene.
+  ///
+  /// If the title scene is called it should clear all other scenes and create a
+  /// new one.
+  /////////////////////////////////////////////////
   uuids::uuid LoadTitleScene();
 
   /////////////////////////////////////////////////
-  /// @brief Clear all scenes and load the crafting scene.
+  /// @brief A convenience function to load the crafting scene.
   ///
+  /// If the crafting scene is called it should clear all other scenes and
+  /// create a new one.
   /////////////////////////////////////////////////
   uuids::uuid LoadCraftingScene();
 
-  /**
-   * @brief Update all Scenes.
-   */
+  /////////////////////////////////////////////////
+  /// @brief Updates all scennes by calling their various system methods.
+  ///
+  /// This encapsulation method means that all scenes have their systems/logic
+  /// called in the same order.
+  /////////////////////////////////////////////////
   void UpdateScenes();
 
-  /**
-   * @brief Add a new scene from default data.
-   * @param scene_type The type of scene to add.
-   * @param pool_size The pool size for the scene.
-   */
-  void AddSceneFromDefault(const SceneType &scene_type, size_t pool_size);
+  /////////////////////////////////////////////////
+  /// @brief Cause the cascade of events that will add a scene from default
+  /// data.
+  ///
+  /// @param scene_type An enum value representing the type of scene to create.
+  /////////////////////////////////////////////////
+  void AddSceneFromDefault(const SceneType &scene_type);
 
-  /**
-   * @brief Collate textures from relevant scenes and provide as package.
-   * @return A TexturesPackage containing textures from scenes.
-   */
+  /////////////////////////////////////////////////
+  /// @brief Provide a textures package by value to be passed along
+  ///
+  /// Currently not happy with this system, will improve it later.
+  /////////////////////////////////////////////////
   TexturesPackage ProvideTexturesPackage();
 };
 
