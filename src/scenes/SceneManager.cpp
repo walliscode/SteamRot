@@ -18,7 +18,8 @@ void SceneManager::StartUp() {}
 void SceneManager::AddSceneFromDefault(const SceneType &scene_type,
                                        const size_t pool_size) {
 
-  std::unique_ptr<Scene> new_scene = m_scene_factory.CreateScene(scene_type);
+  std::unique_ptr<Scene> new_scene =
+      m_scene_factory.CreateDefaultScene(scene_type);
   std::cout << "Created new scene of type: "
             << magic_enum::enum_name(scene_type) << std::endl;
   // print the scene ID
