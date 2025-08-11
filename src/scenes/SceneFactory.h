@@ -1,3 +1,8 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Declaration of the SceneFactory class.
+/////////////////////////////////////////////////
+
 ////////////////////////////////////////////////////////////
 // Preprocessor directives
 ////////////////////////////////////////////////////////////
@@ -6,32 +11,27 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include "CraftingScene.h"
 #include "GameContext.h"
 #include "Scene.h"
-#include "TitleScene.h"
-#include "scenes_generated.h"
 #include "uuid.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <memory>
 
 namespace steamrot {
 
+/////////////////////////////////////////////////
+/// @class SceneFactory
+/// @brief Generates scenes objects ready for use in the game engine.
+///
+/////////////////////////////////////////////////
 class SceneFactory {
 private:
+  /////////////////////////////////////////////////
+  /// @brief GameContext object provided at construction, used to generate
+  /// Scenes.
+  /////////////////////////////////////////////////
   const GameContext m_game_context;
-  /**
-   * @brief Creates a TitleScreen object with provided values
-   *
-   * @param scene_data Contains all Scene config data such as entities, actions
-   * e.t.c.
-   * @param id A uniue ID generated and provided by the SceneFactory
-   */
-  std::unique_ptr<TitleScene> CreateTitleScene(const SceneData *scene_data,
-                                               const uuids::uuid &id);
 
-  std::unique_ptr<CraftingScene>
-  CreateCraftingScene(const SceneData *scene_data, const uuids::uuid &id);
   ////////////////////////////////////////////////////////////
   /// \brief create a uuid if none is in provided json data
   ///
@@ -49,6 +49,6 @@ public:
   /// \brief gathers all scene creation methods
   ///
   ////////////////////////////////////////////////////////////
-  std::unique_ptr<Scene> CreateScene(const SceneType &scene_type);
+  std::unique_ptr<Scene> CreateDefaultScene(const SceneType &scene_type);
 };
 } // namespace steamrot
