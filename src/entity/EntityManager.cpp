@@ -16,7 +16,8 @@
 namespace steamrot {
 
 ////////////////////////////////////////////////////////////
-EntityManager::EntityManager(const size_t &pool_size) {
+EntityManager::EntityManager(const size_t &pool_size)
+    : m_archetype_manager(m_entity_memory_pool) {
 
   ResizeEntityMemoryPool(pool_size);
 };
