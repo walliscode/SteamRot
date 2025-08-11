@@ -1,3 +1,8 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Declaration of the ArchetypeManager class
+/////////////////////////////////////////////////
+
 ////////////////////////////////////////////////////////////
 // Preprocessor directives
 ////////////////////////////////////////////////////////////
@@ -6,70 +11,59 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-
 #include "ArchetypeHelpers.h"
 #include "containers.h"
 #include <cstddef>
 #include <cstdlib>
 #include <unordered_map>
 #include <vector>
+
 namespace steamrot {
 ////////////////////////////////////////////////////////////
 // typedefs
 ////////////////////////////////////////////////////////////
 using Archetype = std::vector<size_t>;
 
-////////////////////////////////////////////////////////////
-// class ArchetypeManager
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
+/// @class ArchetypeManager
+/// @brief Manages the creation and retrieval of Archetypes
+///
+/////////////////////////////////////////////////
 class ArchetypeManager {
 private:
-  ////////////////////////////////////////////////////////////
-  // Member data
-  ////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////
+  /// @brief Contains all archetypes for (this->Scenes) entity memory pool.
+  /////////////////////////////////////////////////
   std::unordered_map<ArchetypeID, Archetype> m_archetypes;
 
-  /**
-   * @brief Generates the ArchetypeID for a given entity based on its
-   * Components.
-   *
-   * @param entity_memory_pool An instance of EntityMemoryPool
-   * @param entity_index The index of the entity in the EntityMemoryPool
-   * @return A bitset representing the ArchetypeID for the entity.
-   */
   const ArchetypeID
   GenerateArchetypeID(const EntityMemoryPool &entity_memory_pool,
                       size_t entity_index);
 
 public:
-  ////////////////////////////////////////////////////////////
-  /// \brief Default constructor
-  ///
-  ////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////
+  /// @brief Default constructor for ArchetypeManager
+  /////////////////////////////////////////////////
   ArchetypeManager();
 
-  ////////////////////////////////////////////////////////////
-  /// \brief returns an all entity indexes from provided ArchetypeIDs
+  /////////////////////////////////////////////////
+  /// @brief Returns the entity indexes for the given archetype IDs.
   ///
-  ////////////////////////////////////////////////////////////
+  /// @param An almgamated vector of ArchetypeIDs.
+  /////////////////////////////////////////////////
   std::vector<size_t>
   GetEntityIndexes(const std::vector<ArchetypeID> &archtype_IDs) const;
 
-  /**
-   * @brief Creates all archetypes based on the current state of the entities.
-   * To be run infrequently.
-   *
-   * @param entity_memory_pool A reference to the entity memory pool containing
-   * all configurations for this scene.
-   */
+  /////////////////////////////////////////////////
+  /// @brief Clears current archetypes and generates all archetypes
+  ///
+  /// @param entity_memory_pool Reference to the EntityMemoryPool in the scene
+  /////////////////////////////////////////////////
   void GenerateAllArchetypes(const EntityMemoryPool &entity_memory_pool);
 
-  /**
-   * @brief Returns a reference to the map of Archetypes. This should not modify
-   * the data
-   *
-   * @return archetype map
-   */
+  /////////////////////////////////////////////////
+  /// @brief Returns the archetypes map.
+  /////////////////////////////////////////////////
   const std::unordered_map<ArchetypeID, Archetype> &GetArchetypes() const;
 };
 

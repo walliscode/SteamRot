@@ -1,3 +1,11 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Implementation of the ArchetypeManager class
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
 #include "ArchetypeManager.h"
 #include "emp_helpers.h"
 #include <cstddef>
@@ -35,6 +43,8 @@ std::vector<size_t> ArchetypeManager::GetEntityIndexes(
 
   return entityIndexes;
 }
+
+/////////////////////////////////////////////////
 const ArchetypeID ArchetypeManager::GenerateArchetypeID(
     const EntityMemoryPool &entity_memory_pool, size_t entityIndex) {
 
@@ -56,6 +66,7 @@ const ArchetypeID ArchetypeManager::GenerateArchetypeID(
   return archetypeID;
 };
 
+/////////////////////////////////////////////////
 void ArchetypeManager::GenerateAllArchetypes(
     const EntityMemoryPool &entity_memory_pool) {
   // clear existing archetypes
@@ -83,6 +94,7 @@ void ArchetypeManager::GenerateAllArchetypes(
   }
 }
 
+/////////////////////////////////////////////////
 const std::unordered_map<ArchetypeID, Archetype> &
 ArchetypeManager::GetArchetypes() const {
   return m_archetypes;
