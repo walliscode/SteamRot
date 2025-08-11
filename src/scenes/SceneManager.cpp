@@ -1,7 +1,5 @@
 #include "SceneManager.h"
-#include "magic_enum/magic_enum.hpp"
 #include "uuid.h"
-#include <iostream>
 #include <memory>
 #include <utility>
 
@@ -15,33 +13,25 @@ SceneManager::SceneManager(const GameContext game_contest)
 void SceneManager::StartUp() {}
 
 /////////////////////////////////////////////////
-void SceneManager::AddSceneFromDefault(const SceneType &scene_type,
-                                       const size_t pool_size) {
+void SceneManager::AddSceneFromDefault(const SceneType &scene_type) {
 
   std::unique_ptr<Scene> new_scene =
       m_scene_factory.CreateDefaultScene(scene_type).value();
-  std::cout << "Created new scene of type: "
-            << magic_enum::enum_name(scene_type) << std::endl;
-  // print the scene ID
-  std::cout << "Scene ID: " << new_scene->GetSceneID() << std::endl;
+
   // add to m_scenes maps
   m_scenes[new_scene->GetSceneID()] = std::move(new_scene);
-  std::cout << "Added scene to m_scenes map." << std::endl;
 
   // load default scene assets
   m_game_context.asset_manager.LoadSceneAssets(scene_type);
-  std::cout << "Loaded default assets for scene type: "
-            << magic_enum::enum_name(scene_type) << std::endl;
 };
 
 /////////////////////////////////////////////////
 uuids::uuid SceneManager::LoadTitleScene() {
   // clear existing scenes
   m_scenes.clear();
-  std::cout << "Cleared existing scenes." << std::endl;
+
   // create title scene
-  AddSceneFromDefault(SceneType::SceneType_TITLE, 100);
-  std::cout << "Added title scene." << std::endl;
+  AddSceneFromDefault(SceneType::SceneType_TITLE);
 
   // return the ID of the title scene
   return m_scenes.begin()->first;
@@ -51,16 +41,15 @@ uuids::uuid SceneManager::LoadTitleScene() {
 uuids::uuid SceneManager::LoadCraftingScene() {
   // clear existing scenes
   m_scenes.clear();
-  std::cout << "Cleared existing scenes." << std::endl;
+
   // create crafting scene
-  AddSceneFromDefault(SceneType::SceneType_CRAFTING, 100);
-  std::cout << "Added crafting scene." << std::endl;
+  AddSceneFromDefault(SceneType::SceneType_CRAFTING);
+
   // return the ID of the crafting scene
   return m_scenes.begin()->first;
 }
-/**
- * -------------------------------------------------------
- */
+
+/////////////////////////////////////////////////
 TexturesPackage SceneManager::ProvideTexturesPackage() {
   // create textures package object
   TexturesPackage textures_package;
