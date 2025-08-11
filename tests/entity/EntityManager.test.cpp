@@ -33,7 +33,8 @@ TEST_CASE("EntityManager calls configurator with no errors",
   steamrot::EntityManager entity_manager;
 
   // test the EntityMemoryPool pre configuration
-  steamrot::TestEMPIsDefaultConstructed(entity_manager.GetEntityMemoryPool());
+  steamrot::tests::TestEMPIsDefaultConstructed(
+      entity_manager.GetEntityMemoryPool());
 
   // configure entities from default data
   auto result = entity_manager.ConfigureEntitiesFromDefaultData(
@@ -43,7 +44,7 @@ TEST_CASE("EntityManager calls configurator with no errors",
   REQUIRE(result.has_value() == true);
 
   // test the EntityMemoryPool post configuration
-  steamrot::TestConfigurationOfEMPfromDefaultData(
+  steamrot::tests::TestConfigurationOfEMPfromDefaultData(
       entity_manager.GetEntityMemoryPool(),
       steamrot::SceneType::SceneType_TEST);
 }

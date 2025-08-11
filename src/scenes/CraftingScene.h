@@ -54,5 +54,12 @@ public:
   /// @brief Systems for dealing with rendering in the CraftingScene
   /////////////////////////////////////////////////
   void sRender() override;
+
+  /////////////////////////////////////////////////
+  /// @brief Returns the type of scene
+  ///
+  /// @return Type of the scene as SceneType enum
+  /////////////////////////////////////////////////
+  SceneType GetSceneType() const override;
 };
 } // namespace steamrot
