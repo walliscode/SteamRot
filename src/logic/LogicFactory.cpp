@@ -1,4 +1,11 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Implementation of the LogicFactory class.
+/////////////////////////////////////////////////
 
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
 #include "LogicFactory.h"
 #include "CraftingRenderLogic.h"
 #include "UIActionLogic.h"
@@ -12,6 +19,7 @@
 
 namespace steamrot {
 
+/////////////////////////////////////////////////
 std::unordered_map<LogicType, std::vector<std::unique_ptr<BaseLogic>>>
 LogicFactory::CreateLogicMap(const LogicCollection &logic_collection,
                              const LogicContext logic_context) {
@@ -70,6 +78,7 @@ LogicFactory::CreateLogicMap(const LogicCollection &logic_collection,
   return logic_map;
 }
 
+/////////////////////////////////////////////////
 std::vector<std::unique_ptr<BaseLogic>>
 LogicFactory::CreateRenderLogics(const LogicContext logic_context) {
   // Create a vector of unique pointers to BaseLogic for rendering
