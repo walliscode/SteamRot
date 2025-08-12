@@ -12,11 +12,20 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "Logic.h"
-#include "logics_generated.h"
+#include "scene_types_generated.h"
+#include <expected>
 #include <memory>
 #include <unordered_map>
 namespace steamrot {
 
+enum class LogicType {
+  Collision,
+  Render,
+  Action,
+  Movement,
+};
+using LogicVector = std::vector<std::unique_ptr<Logic>>;
+using LogicCollection = std::unordered_map<LogicType, LogicVector>;
 /////////////////////////////////////////////////
 /// @class LogicFactory
 /// @brief Provides Logic objects for Scenes to store and use.
@@ -26,43 +35,44 @@ class LogicFactory {
 
 private:
   /////////////////////////////////////////////////
+  /// @brief SceneType of the scene for which logics are created.
+  /////////////////////////////////////////////////
+  const SceneType m_scene_type;
+
+  /////////////////////////////////////////////////
+  /// @brief member variable that holds the LogicContext
+  /////////////////////////////////////////////////
+  LogicContext m_logic_context;
+
+  /////////////////////////////////////////////////
   /// @brief Create a vector of logic objects specifically for collision
   ///
-  /// @param logic_context  LogicContext containing references to the scene
   /////////////////////////////////////////////////
-  std::vector<std::unique_ptr<Logic>>
-  CreateCollisionLogics(const LogicContext logic_context);
+  std::expected<LogicVector, FailInfo> CreateCollisionLogics();
 
   /////////////////////////////////////////////////
   /// @brief Create a vector of logic objects specifically for rendering
-  ///
-  /// @param logic_context [TODO:parameter]
   /////////////////////////////////////////////////
-  std::vector<std::unique_ptr<Logic>>
-  CreateRenderLogics(const LogicContext logic_context);
+  std::expected<LogicVector, FailInfo> CreateRenderLogics();
 
   /////////////////////////////////////////////////
   /// @brief Create a vector of logic objects specifically for actions
-  ///
-  /// @param logic_context [TODO:parameter]
   /////////////////////////////////////////////////
-  std::vector<std::unique_ptr<Logic>>
-  CreateActionLogics(const LogicContext logic_context);
+  std::expected<LogicVector, FailInfo> CreateActionLogics();
 
 public:
   /////////////////////////////////////////////////
-  /// @brief Default constructor for LogicFactory.
+  /// @brief Constructor for the LogicFactory class.
+  ///
+  /// @param logic_context LogicContext object containing references to the
+  /// scene
   /////////////////////////////////////////////////
-  LogicFactory() = default;
+  LogicFactory(const SceneType scene_type, const LogicContext &logic_context);
 
   /////////////////////////////////////////////////
   /// @brief Create and return a map of logic objects.
   ///
-  /// @param logic_collection [TODO:parameter]
-  /// @param logic_context [TODO:parameter]
   /////////////////////////////////////////////////
-  std::unordered_map<LogicType, std::vector<std::unique_ptr<Logic>>>
-  CreateLogicMap(const LogicCollection &logic_collection,
-                 const LogicContext logic_context);
+  std::expected<LogicCollection, FailInfo> CreateLogicMap();
 };
 } // namespace steamrot

@@ -24,7 +24,7 @@ SceneType CraftingScene::GetSceneType() const {
 void CraftingScene::sAction() {
 
   // process action logic
-  for (auto &action_logic : m_logics[LogicType::LogicType_Action]) {
+  for (auto &action_logic : m_logics[LogicType::Action]) {
     action_logic->RunLogic();
   }
 }
@@ -37,7 +37,7 @@ void CraftingScene::sMovement() {
 /////////////////////////////////////////////////
 void CraftingScene::sCollision() {
   // process collision logic
-  for (auto &collision_logic : m_logics[LogicType::LogicType_Collision]) {
+  for (auto &collision_logic : m_logics[LogicType::Collision]) {
     collision_logic->RunLogic();
   }
 }
@@ -45,7 +45,7 @@ void CraftingScene::sCollision() {
 /////////////////////////////////////////////////
 void CraftingScene::sRender() {
   // process render logic
-  for (auto &render_logic : m_logics[LogicType::LogicType_Render]) {
+  for (auto &render_logic : m_logics[LogicType::Render]) {
     render_logic->RunLogic();
   }
 }

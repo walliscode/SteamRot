@@ -7,117 +7,120 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "LogicFactory.h"
-#include "CraftingRenderLogic.h"
+#include "FlatbuffersConfigurator.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
-#include "UIRenderLogic.h"
-#include "log_handler.h"
-#include "logics_generated.h"
-#include "spdlog/common.h"
-#include <iostream>
-#include <unordered_map>
+#include <expected>
 
 namespace steamrot {
+/////////////////////////////////////////////////
+LogicFactory::LogicFactory(const SceneType scene_type,
+                           const LogicContext &logic_context)
+    : m_scene_type(scene_type), m_logic_context(logic_context) {}
 
 /////////////////////////////////////////////////
-std::unordered_map<LogicType, std::vector<std::unique_ptr<Logic>>>
-LogicFactory::CreateLogicMap(const LogicCollection &logic_collection,
-                             const LogicContext logic_context) {
+std::expected<LogicCollection, FailInfo> LogicFactory::CreateLogicMap() {
 
   // create return object
-  std::unordered_map<LogicType, std::vector<std::unique_ptr<Logic>>> logic_map;
+  LogicCollection logic_collection;
 
-  // guard against empty logic collection
-  if (logic_collection.types()->empty()) {
-    log_handler::ProcessLog(spdlog::level::err, log_handler::LogCode::kNoCode,
-                            "Logic collection is empty, no logics to create.");
+  // create collision logics
+  auto collision_logics = CreateCollisionLogics();
+  if (!collision_logics.has_value()) {
+    return std::unexpected(collision_logics.error());
   }
-  // Iterate through the provided logic types and create the corresponding
-  // logics
-  std::cout << "Creating logic map with " << logic_collection.types()->size()
-            << " logic types." << std::endl;
-  for (const auto &logic_type : *logic_collection.types()) {
-    switch (logic_type) {
+  logic_collection[LogicType::Collision] = std::move(collision_logics.value());
 
-    // Render Logic
-    case LogicType::LogicType_Render: {
-      std::cout << "Creating Render logics." << std::endl;
-      logic_map[LogicType::LogicType_Render] =
-          CreateRenderLogics(logic_context);
-      std::cout << "Render logics created." << std::endl;
-      break;
-    }
-
-    // Collision Logic
-    case LogicType::LogicType_Collision: {
-      std::cout << "Creating Collision logics." << std::endl;
-      logic_map[LogicType::LogicType_Collision] =
-          CreateCollisionLogics(logic_context);
-      std::cout << "Collision logics created." << std::endl;
-      break;
-    }
-
-      // Event Logic
-    case LogicType::LogicType_Action: {
-      std::cout << "Creating Event logics." << std::endl;
-      logic_map[LogicType::LogicType_Action] =
-          CreateActionLogics(logic_context);
-      std::cout << "Event logics created." << std::endl;
-      break;
-    }
-
-    // Add cases for other logic types as needed
-    default:
-      // Handle unknown logic type if necessary
-      break;
-    }
+  // create render logics
+  auto render_logics = CreateRenderLogics();
+  if (!render_logics.has_value()) {
+    return std::unexpected(render_logics.error());
   }
-  std::cout << "Logic map created with " << logic_map.size() << " logic types."
-            << std::endl;
-  return logic_map;
+  logic_collection[LogicType::Render] = std::move(render_logics.value());
+
+  // create action logics
+  auto action_logics = CreateActionLogics();
+  if (!action_logics.has_value()) {
+    return std::unexpected(action_logics.error());
+  }
+  logic_collection[LogicType::Action] = std::move(action_logics.value());
+
+  return logic_collection;
 }
 
 /////////////////////////////////////////////////
-std::vector<std::unique_ptr<Logic>>
-LogicFactory::CreateRenderLogics(const LogicContext logic_context) {
-  // Create a vector of unique pointers to Logic for rendering
-  std::vector<std::unique_ptr<Logic>> render_logics;
+std::expected<LogicVector, FailInfo> LogicFactory::CreateRenderLogics() {
 
-  // compile time defined order of logic types
-  render_logics.push_back(std::make_unique<CraftingRenderLogic>(logic_context));
-  render_logics.push_back(std::make_unique<UIRenderLogic>(logic_context));
+  LogicVector render_logics;
 
+  switch (m_scene_type) {
+  case SceneType::SceneType_TITLE: {
+    break;
+  }
+  case SceneType::SceneType_CRAFTING: {
+    break;
+  }
+  case SceneType::SceneType_TEST: {
+    // add render logics for test purposes
+    render_logics.push_back(std::make_unique<UIActionLogic>(m_logic_context));
+    break;
+  }
+  default:
+    return std::unexpected(FailInfo{FailMode::NonExistentEnumValue,
+                                    "Unsupported scene type for render logic"});
+  }
   return render_logics;
 }
-
 /////////////////////////////////////////////////
-std::vector<std::unique_ptr<Logic>>
-LogicFactory::CreateCollisionLogics(const LogicContext logic_context) {
+std::expected<LogicVector, FailInfo> LogicFactory::CreateCollisionLogics() {
 
-  // Create a vector of unique pointers to Logic for collision
-  std::vector<std::unique_ptr<Logic>> collision_logics;
-  std::cout << "Creating a vector of collision logics." << std::endl;
+  LogicVector collision_logics;
 
-  // compile time defined order of logic types
-  collision_logics.push_back(std::make_unique<UICollisionLogic>(logic_context));
-  std::cout << "Collision logics created with size: " << collision_logics.size()
-            << std::endl;
+  switch (m_scene_type) {
+  case SceneType::SceneType_TITLE: {
+    break;
+  }
+  case SceneType::SceneType_CRAFTING: {
+    break;
+  }
+  case SceneType::SceneType_TEST: {
 
+    // add collision logics for test purposes
+    collision_logics.push_back(
+        std::make_unique<UICollisionLogic>(m_logic_context));
+
+    break;
+  }
+  default:
+    return std::unexpected(
+        FailInfo{FailMode::NonExistentEnumValue,
+                 "Unsupported scene type for collision logic"});
+  }
   return collision_logics;
 }
 
 /////////////////////////////////////////////////
-std::vector<std::unique_ptr<Logic>>
-LogicFactory::CreateActionLogics(const LogicContext logic_context) {
+std::expected<LogicVector, FailInfo> LogicFactory::CreateActionLogics() {
 
-  // Create a vector of unique pointers to Logic for events
-  std::vector<std::unique_ptr<Logic>> event_logics;
-  std::cout << "Creating a vector of event logics." << std::endl;
+  LogicVector action_logics;
 
-  // compile time defined order of logic types
-  event_logics.push_back(std::make_unique<UIActionLogic>(logic_context));
-  std::cout << "Event logics created with size: " << event_logics.size()
-            << std::endl;
-  return event_logics;
+  switch (m_scene_type) {
+  case SceneType::SceneType_TITLE: {
+    break;
+  }
+  case SceneType::SceneType_CRAFTING: {
+    break;
+  }
+  case SceneType::SceneType_TEST: {
+    // add action logics for test purposes
+    action_logics.push_back(std::make_unique<UIActionLogic>(m_logic_context));
+    break;
+  }
+  default:
+    return std::unexpected(FailInfo{FailMode::NonExistentEnumValue,
+                                    "Unsupported scene type for action logic"});
+  }
+  return action_logics;
 }
+
 } // namespace steamrot

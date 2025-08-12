@@ -129,9 +129,6 @@
       }
     ]
   },
-  "logic_collection": {
-    "types": ["Render", "Collision", "Action"]
-  },
   "ui_theme": "default",
   "assets": {
     "fonts": [

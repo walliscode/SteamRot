@@ -4,7 +4,6 @@ set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/scenes.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/user_input.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/entities.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/logics.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/types.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/user_interface.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/grimoire_machina.fbs
