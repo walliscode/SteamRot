@@ -7,7 +7,7 @@
 namespace steamrot {
 /////////////////////////////////////////////////
 UICollisionLogic::UICollisionLogic(const LogicContext logic_context)
-    : BaseLogic(logic_context) {}
+    : Logic(logic_context) {}
 
 /////////////////////////////////////////////////
 void UICollisionLogic::ProcessLogic() {

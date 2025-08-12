@@ -3,11 +3,11 @@
 /// @brief Declaration of UICollisionLogic class
 /////////////////////////////////////////////////
 
-#include "BaseLogic.h"
 #include "CUserInterface.h"
+#include "Logic.h"
 
 namespace steamrot {
-class UICollisionLogic : public BaseLogic {
+class UICollisionLogic : public Logic {
 
 private:
   /////////////////////////////////////////////////

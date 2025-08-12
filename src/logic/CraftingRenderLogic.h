@@ -5,10 +5,10 @@
 
 #pragma once
 
-#include "BaseLogic.h"
+#include "Logic.h"
 
 namespace steamrot {
-class CraftingRenderLogic : public BaseLogic {
+class CraftingRenderLogic : public Logic {
 private:
   /////////////////////////////////////////////////
   /// @brief Virtual function that acts as the entry point for this Logic class

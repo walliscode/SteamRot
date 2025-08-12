@@ -12,9 +12,9 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "ActionManager.h"
-#include "BaseLogic.h"
 #include "EntityManager.h"
 #include "GameContext.h"
+#include "Logic.h"
 #include "LogicFactory.h"
 #include "global_constants.h"
 #include "logics_generated.h"
@@ -61,8 +61,7 @@ protected:
   /////////////////////////////////////////////////
   /// @brief Map of all logic objects needed by the Scene.
   /////////////////////////////////////////////////
-  std::unordered_map<LogicType, std::vector<std::unique_ptr<BaseLogic>>>
-      m_logics;
+  std::unordered_map<LogicType, std::vector<std::unique_ptr<Logic>>> m_logics;
 
   ////////////////////////////////////////////////////////////
   // Member: unique id generated for each Scene instance
