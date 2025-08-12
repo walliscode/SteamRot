@@ -3,13 +3,13 @@
 /// @brief Declaration of the UIEventLogic class.
 /////////////////////////////////////////////////
 
-#include "BaseLogic.h"
 #include "CUserInterface.h"
+#include "Logic.h"
 #include "event_helpers.h"
 
 namespace steamrot {
 
-class UIActionLogic : public BaseLogic {
+class UIActionLogic : public Logic {
 
 private:
   /////////////////////////////////////////////////

@@ -11,7 +11,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "BaseLogic.h"
+#include "Logic.h"
 #include "logics_generated.h"
 #include <memory>
 #include <unordered_map>
@@ -30,7 +30,7 @@ private:
   ///
   /// @param logic_context  LogicContext containing references to the scene
   /////////////////////////////////////////////////
-  std::vector<std::unique_ptr<BaseLogic>>
+  std::vector<std::unique_ptr<Logic>>
   CreateCollisionLogics(const LogicContext logic_context);
 
   /////////////////////////////////////////////////
@@ -38,7 +38,7 @@ private:
   ///
   /// @param logic_context [TODO:parameter]
   /////////////////////////////////////////////////
-  std::vector<std::unique_ptr<BaseLogic>>
+  std::vector<std::unique_ptr<Logic>>
   CreateRenderLogics(const LogicContext logic_context);
 
   /////////////////////////////////////////////////
@@ -46,7 +46,7 @@ private:
   ///
   /// @param logic_context [TODO:parameter]
   /////////////////////////////////////////////////
-  std::vector<std::unique_ptr<BaseLogic>>
+  std::vector<std::unique_ptr<Logic>>
   CreateActionLogics(const LogicContext logic_context);
 
 public:
@@ -61,7 +61,7 @@ public:
   /// @param logic_collection [TODO:parameter]
   /// @param logic_context [TODO:parameter]
   /////////////////////////////////////////////////
-  std::unordered_map<LogicType, std::vector<std::unique_ptr<BaseLogic>>>
+  std::unordered_map<LogicType, std::vector<std::unique_ptr<Logic>>>
   CreateLogicMap(const LogicCollection &logic_collection,
                  const LogicContext logic_context);
 };

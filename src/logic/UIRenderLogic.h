@@ -6,7 +6,7 @@
 ////////////////////////////////////////////////////////////
 // headers
 ////////////////////////////////////////////////////////////
-#include "BaseLogic.h"
+#include "Logic.h"
 #include "themes_generated.h"
 #include "user_interface_generated.h"
 #include <SFML/Graphics.hpp>
@@ -136,7 +136,7 @@ struct DropDownButtonStyle : public Style {
   sf::Color hover_color;
 };
 
-class UIRenderLogic : public BaseLogic {
+class UIRenderLogic : public Logic {
 private:
   /////////////////////////////////////////////////
   /// @brief Draws a Panel struct with PanelStyle styling

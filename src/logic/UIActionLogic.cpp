@@ -5,10 +5,10 @@
 #include "UIActionLogic.h"
 #include "ArchetypeHelpers.h"
 #include "ArchetypeManager.h"
-#include "BaseLogic.h"
 #include "CGrimoireMachina.h"
 #include "CUserInterface.h"
 #include "DropDown.h"
+#include "Logic.h"
 #include "UIElement.h"
 #include "UIElementFactory.h"
 #include "emp_helpers.h"
@@ -26,7 +26,7 @@ using namespace magic_enum::bitwise_operators;
 namespace steamrot {
 /////////////////////////////////////////////////
 UIActionLogic::UIActionLogic(const LogicContext logic_context)
-    : BaseLogic(logic_context) {}
+    : Logic(logic_context) {}
 
 /////////////////////////////////////////////////
 void UIActionLogic::ProcessLogic() {

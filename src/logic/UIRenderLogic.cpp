@@ -3,9 +3,9 @@
 ////////////////////////////////////////////////////////////
 #include "UIRenderLogic.h"
 #include "ArchetypeHelpers.h"
-#include "BaseLogic.h"
 #include "CUserInterface.h"
 #include "DropDown.h"
+#include "Logic.h"
 #include "emp_helpers.h"
 #include "log_handler.h"
 #include "themes_generated.h"
@@ -20,7 +20,7 @@ namespace steamrot {
 
 /////////////////////////////////////////////////////////////
 UIRenderLogic::UIRenderLogic(const LogicContext logic_context)
-    : BaseLogic(logic_context) {
+    : Logic(logic_context) {
   // Initialize the UI engine with the provided flatbuffer configuration
   // This could include setting up styles, themes, and other UI elements
   if (!logic_context.ui_config) {

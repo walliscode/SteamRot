@@ -3,7 +3,7 @@ LogicFactory.cpp
   UIRenderLogic.cpp
   UICollisionLogic.cpp
   UIActionLogic.cpp
-  BaseLogic.cpp
+  Logic.cpp
   CraftingRenderLogic.cpp
 )
 

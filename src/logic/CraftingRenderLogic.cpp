@@ -15,7 +15,7 @@ namespace steamrot {
 
 /////////////////////////////////////////////////
 CraftingRenderLogic::CraftingRenderLogic(const LogicContext logic_context)
-    : BaseLogic(logic_context) {}
+    : Logic(logic_context) {}
 
 /////////////////////////////////////////////////
 void CraftingRenderLogic::ProcessLogic() {

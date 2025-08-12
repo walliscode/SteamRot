@@ -20,13 +20,12 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-std::unordered_map<LogicType, std::vector<std::unique_ptr<BaseLogic>>>
+std::unordered_map<LogicType, std::vector<std::unique_ptr<Logic>>>
 LogicFactory::CreateLogicMap(const LogicCollection &logic_collection,
                              const LogicContext logic_context) {
 
   // create return object
-  std::unordered_map<LogicType, std::vector<std::unique_ptr<BaseLogic>>>
-      logic_map;
+  std::unordered_map<LogicType, std::vector<std::unique_ptr<Logic>>> logic_map;
 
   // guard against empty logic collection
   if (logic_collection.types()->empty()) {
@@ -79,10 +78,10 @@ LogicFactory::CreateLogicMap(const LogicCollection &logic_collection,
 }
 
 /////////////////////////////////////////////////
-std::vector<std::unique_ptr<BaseLogic>>
+std::vector<std::unique_ptr<Logic>>
 LogicFactory::CreateRenderLogics(const LogicContext logic_context) {
-  // Create a vector of unique pointers to BaseLogic for rendering
-  std::vector<std::unique_ptr<BaseLogic>> render_logics;
+  // Create a vector of unique pointers to Logic for rendering
+  std::vector<std::unique_ptr<Logic>> render_logics;
 
   // compile time defined order of logic types
   render_logics.push_back(std::make_unique<CraftingRenderLogic>(logic_context));
@@ -92,11 +91,11 @@ LogicFactory::CreateRenderLogics(const LogicContext logic_context) {
 }
 
 /////////////////////////////////////////////////
-std::vector<std::unique_ptr<BaseLogic>>
+std::vector<std::unique_ptr<Logic>>
 LogicFactory::CreateCollisionLogics(const LogicContext logic_context) {
 
-  // Create a vector of unique pointers to BaseLogic for collision
-  std::vector<std::unique_ptr<BaseLogic>> collision_logics;
+  // Create a vector of unique pointers to Logic for collision
+  std::vector<std::unique_ptr<Logic>> collision_logics;
   std::cout << "Creating a vector of collision logics." << std::endl;
 
   // compile time defined order of logic types
@@ -108,11 +107,11 @@ LogicFactory::CreateCollisionLogics(const LogicContext logic_context) {
 }
 
 /////////////////////////////////////////////////
-std::vector<std::unique_ptr<BaseLogic>>
+std::vector<std::unique_ptr<Logic>>
 LogicFactory::CreateActionLogics(const LogicContext logic_context) {
 
-  // Create a vector of unique pointers to BaseLogic for events
-  std::vector<std::unique_ptr<BaseLogic>> event_logics;
+  // Create a vector of unique pointers to Logic for events
+  std::vector<std::unique_ptr<Logic>> event_logics;
   std::cout << "Creating a vector of event logics." << std::endl;
 
   // compile time defined order of logic types
