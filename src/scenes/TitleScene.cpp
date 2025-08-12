@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "TitleScene.h"
-#include "logics_generated.h"
 
 namespace steamrot {
 /////////////////////////////////////////////////
@@ -25,7 +24,7 @@ void TitleScene::sMovement() {};
 /////////////////////////////////////////////////
 void TitleScene::sRender() {
 
-  for (auto &render_logic : m_logics[LogicType::LogicType_Render]) {
+  for (auto &render_logic : m_logics[LogicType::Render]) {
     render_logic->RunLogic();
   }
 }
@@ -33,7 +32,7 @@ void TitleScene::sRender() {
 /////////////////////////////////////////////////
 void TitleScene::sCollision() {
   // process collision logic
-  for (auto &collision_logic : m_logics[LogicType::LogicType_Collision]) {
+  for (auto &collision_logic : m_logics[LogicType::Collision]) {
     collision_logic->RunLogic();
   }
 }
@@ -41,7 +40,7 @@ void TitleScene::sCollision() {
 /////////////////////////////////////////////////
 void TitleScene::sAction() {
   // process action logic
-  for (auto &action_logic : m_logics[LogicType::LogicType_Action]) {
+  for (auto &action_logic : m_logics[LogicType::Action]) {
     action_logic->RunLogic();
   }
 }

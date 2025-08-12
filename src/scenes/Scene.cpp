@@ -13,8 +13,7 @@ namespace steamrot {
 
 ////////////////////////////////////////////////////////////
 Scene::Scene(const uuids::uuid &id, const GameContext game_context)
-    : m_entity_manager(), m_game_context(game_context), m_logic_factory(),
-      m_id(id) {}
+    : m_entity_manager(), m_game_context(game_context), m_id(id) {}
 
 /////////////////////////////////////////////////
 sf::RenderTexture &Scene::GetRenderTexture() { return m_render_texture; }

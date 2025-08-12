@@ -17,7 +17,6 @@
 #include "Logic.h"
 #include "LogicFactory.h"
 #include "global_constants.h"
-#include "logics_generated.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <unordered_map>
@@ -46,12 +45,6 @@ protected:
   // Member: Action Manager instance
   ////////////////////////////////////////////////////////////
   ActionManager m_action_manager;
-
-  /////////////////////////////////////////////////
-  /// @brief Instance of LogicFactory class. Create Logic objects for Scene to
-  /// store.
-  /////////////////////////////////////////////////
-  LogicFactory m_logic_factory;
 
   /////////////////////////////////////////////////
   /// @brief GameContext object passed down from the GameEngine.

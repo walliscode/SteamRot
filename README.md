@@ -13,9 +13,13 @@
   - [Game Running](#game-running)
     - [RunGame](#rungame)
     - [UpdateSystems](#updatesystems)
-- [Workflows](#workflows)
-  - [UI Elements](#ui-elements)
-    - [Adding New Element types](#adding-new-element-types)
+  - [Workflows](#workflows)
+    - [Adding/Modifying Components](#addingmodifying-components)
+      - [Creating Components](#creating-components)
+      - [Creating Flatbuffers data for Components](#creating-flatbuffers-data-for-components)
+      - [Configuring and testing the Component](#configuring-and-testing-the-component)
+    - [UI Elements](#ui-elements)
+      - [Adding New Element types](#adding-new-element-types)
     - [Actions](#actions)
       - [Action Generation](#action-generation)
       - [Action Registration](#action-registration)
@@ -151,9 +155,9 @@ Make sure to add as many if statements as you can as the flatbuffers data is
 susceptible to segfaults as the schema does not allow all data types to be
 required.
 
-## UI Elements
+### UI Elements
 
-### Adding New Element types
+#### Adding New Element types
 
 Element definition is contained in `src/user_interface`. An UI Element is a
 struct such as Panel or Button.
@@ -181,6 +185,30 @@ combination of a style struct and logic.
 In the UIRenderLogic.h create a NewElementStyle struct which inherits from the
 Style struct. Again, create a relevant flatbuffers data equivalent under
 themes.fbs
+
+### Adding Logic
+
+#### Logic classes
+
+Logic classes are responsible for changing the game state. Each Logic class
+needs to be added to a "system" such as movement or action.
+
+Although adding new systems will be necessary, try to keep this to a minimum as
+it will increase the complexity of the game engine.
+
+#### LogicFactory
+
+Once a derived Logic class has been created and its functions defined it needs
+to be added to the LogicFactory. This will be hard baked into the LogicFactory
+on a per SceneType basis, as we don't want the Logic classes and order to be
+extensible/modifiable at runtime.
+
+1. Define a new Logic class and its functions via unit tests.
+2. [TDD] LogicFactory.test.cpp should be updated to include the new Logic class
+   in the relevant scene. The order and number of Logic classes should be tested
+   for.
+3. Update the LogicFactory.cpp to include the new Logic class in relevant
+   function under the relevent switch statement. d
 
 ### Actions
 
