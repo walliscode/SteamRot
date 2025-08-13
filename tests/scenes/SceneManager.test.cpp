@@ -40,3 +40,22 @@ TEST_CASE(
          crafting_result.error().message);
   }
 }
+
+TEST_CASE("SceneManager LoadTitleScene returns monostate", "[SceneManager]") {
+  steamrot::SceneManager scene_manager{steamrot::tests::create_game_context()};
+  auto load_title_result = scene_manager.LoadTitleScene();
+
+  if (!load_title_result.has_value()) {
+    FAIL("Failed to load title scene: " + load_title_result.error().message);
+  }
+}
+
+TEST_CASE("SceneManager LoadCraftingScene returns monostate",
+          "[SceneManager]") {
+  steamrot::SceneManager scene_manager{steamrot::tests::create_game_context()};
+  auto load_crafting_result = scene_manager.LoadCraftingScene();
+  if (!load_crafting_result.has_value()) {
+    FAIL("Failed to load crafting scene: " +
+         load_crafting_result.error().message);
+  }
+}

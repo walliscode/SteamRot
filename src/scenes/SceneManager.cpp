@@ -54,6 +54,13 @@ std::expected<uuids::uuid, FailInfo> SceneManager::LoadTitleScene() {
   if (!title_result.has_value())
     return std::unexpected(title_result.error());
 
+  // check that there is only one scene in the map and the uuids match
+  if (m_scenes.size() != 1) {
+    FailInfo fail_info(FailMode::NotAddedToMap,
+                       "Title scene was not added correctly");
+    return std::unexpected(fail_info);
+  }
+
   // return the ID of the title scene
   return m_scenes.begin()->first;
 }
@@ -68,6 +75,7 @@ std::expected<uuids::uuid, FailInfo> SceneManager::LoadCraftingScene() {
   if (!crafting_result.has_value())
     return std::unexpected(crafting_result.error());
 
+  // check that there is only one scene in the map and the uuids match
   // return the ID of the crafting scene
   return m_scenes.begin()->first;
 }
