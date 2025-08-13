@@ -3,16 +3,27 @@
 /// @brief decleration of FailInfo struct
 /////////////////////////////////////////////////
 
+/////////////////////////////////////////////////
+/// Preprocessor Directives
+/////////////////////////////////////////////////
+#pragma once
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
 #include <string>
 namespace steamrot {
 
 enum class FailMode {
   None = 0,
+  FileNotFound,
+  EnvironmentNotSet,
   FlatbuffersDataNotFound,
   ParameterOutOfBounds,
   IndexOutOfBounds,
   NonExistentEnumValue,
   SceneTypeNotFound,
+  NotAddedToMap,
 };
 
 struct FailInfo {

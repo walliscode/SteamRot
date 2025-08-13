@@ -47,12 +47,26 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type) {
   case SceneType::SceneType_TITLE: {
     std::unique_ptr<TitleScene> title_scene(
         new TitleScene(scene_uuid, m_game_context));
+
+    // run scene default Scene set up
+    auto configure_result = title_scene->ConfigureFromDefault();
+
+    // pass along error if it fails
+    if (!configure_result)
+      return std::unexpected(configure_result.error());
+
     return title_scene;
   }
 
   case SceneType::SceneType_CRAFTING: {
     std::unique_ptr<CraftingScene> crafting_scene(
         new CraftingScene(scene_uuid, m_game_context));
+
+    // run scene default Scene set up
+    auto configure_result = crafting_scene->ConfigureFromDefault();
+    // pass along error if it fails
+    if (!configure_result)
+      return std::unexpected(configure_result.error());
     return crafting_scene;
   }
 

@@ -54,12 +54,5 @@ private:
   /// @brief Call action Logic for TitleScene
   /////////////////////////////////////////////////
   void sAction() override;
-
-  /////////////////////////////////////////////////
-  /// @brief Returns the type of the Scene.
-  ///
-  /// @return Type of the Scene as SceneType enum.
-  /////////////////////////////////////////////////
-  SceneType GetSceneType() const override;
 };
 } // namespace steamrot

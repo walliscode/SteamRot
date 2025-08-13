@@ -1,12 +1,14 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Implementation of PathProvider class
+/// @brief Implementation of PathProvider class using std::expected and FailInfo
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
 #include "PathProvider.h"
+#include <stdexcept>
+
 namespace steamrot {
 
 /////////////////////////////////////////////////
@@ -20,7 +22,7 @@ PathProvider::PathProvider(EnvironmentType env_type) {
     throw std::invalid_argument(
         "Environment type cannot be None if environment has not been set.");
 
-    // allow for Test enviroment to be set multiple times, this allows for
+    // allow for Test environment to be set multiple times, this allows for
     // catch2 to run the GENERATE macro
   } else if (env_type == EnvironmentType::Test &&
              m_environment == EnvironmentType::Test) {
@@ -38,25 +40,39 @@ PathProvider::PathProvider(EnvironmentType env_type) {
 
 /////////////////////////////////////////////////
 EnvironmentType PathProvider::GetEnvironment() const { return m_environment; }
+
 /////////////////////////////////////////////////
-const std::filesystem::path PathProvider::GetDataDirectory() const {
+std::expected<std::filesystem::path, FailInfo>
+PathProvider::GetDataDirectory() const {
   switch (m_environment) {
   case EnvironmentType::Test:
     return std::filesystem::path{"@CMAKE_SOURCE_DIR@"} / "tests" / "data";
   case EnvironmentType::Production:
     return std::filesystem::path{"@CMAKE_SOURCE_DIR@"} / "data";
   default:
-    throw std::runtime_error("Environment has not been set.");
+    return std::unexpected(
+        FailInfo(FailMode::EnvironmentNotSet, "Environment has not been set."));
   }
 }
-/////////////////////////////////////////////////
-const std::filesystem::path PathProvider::GetFragmentDirectory() const {
 
-  return GetDataDirectory() / "fragments";
+/////////////////////////////////////////////////
+std::expected<std::filesystem::path, FailInfo>
+PathProvider::GetFragmentDirectory() const {
+  auto dataDirResult = GetDataDirectory();
+  if (!dataDirResult.has_value()) {
+    return std::unexpected(dataDirResult.error());
+  }
+  return dataDirResult.value() / "fragments";
 }
 
 /////////////////////////////////////////////////
-const std::filesystem::path PathProvider::GetSceneDirectory() const {
-  return GetDataDirectory() / "scenes";
+std::expected<std::filesystem::path, FailInfo>
+PathProvider::GetSceneDirectory() const {
+  auto dataDirResult = GetDataDirectory();
+  if (!dataDirResult.has_value()) {
+    return std::unexpected(dataDirResult.error());
+  }
+  return dataDirResult.value() / "scenes";
 }
+
 } // namespace steamrot

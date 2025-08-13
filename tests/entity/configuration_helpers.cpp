@@ -81,11 +81,16 @@ void CompareToData(const CGrimoireMachina &actual,
 }
 
 /////////////////////////////////////////////////
-void TestConfigurationOfEMPfromDefaultData(EntityMemoryPool &entity_memory_pool,
-                                           const SceneType scene_type) {
+void TestConfigurationOfEMPfromDefaultData(
+    const EntityMemoryPool &entity_memory_pool, const SceneType scene_type) {
 
   FlatbuffersDataLoader flatbuffers_data_loader(EnvironmentType::Test);
+
   // get default scene data
+  auto scene_data_result = flatbuffers_data_loader.ProvideSceneData(scene_type);
+  if (!scene_data_result.has_value()) {
+    FAIL("Failed to load scene data: " + scene_data_result.error().message);
+  }
   const SceneData &scene_data =
       *flatbuffers_data_loader.ProvideSceneData(scene_type).value();
 

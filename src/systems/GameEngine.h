@@ -134,7 +134,7 @@ public:
   /// \brief Default constructor
   ///
   ////////////////////////////////////////////////////////////
-  GameEngine();
+  GameEngine(const EnvironmentType env_type = EnvironmentType::Production);
 
   ////////////////////////////////////////////////////////////
   /// \brief Start up and Run the game engine

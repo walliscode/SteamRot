@@ -7,17 +7,13 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "TitleScene.h"
+#include "scene_types_generated.h"
 
 namespace steamrot {
 /////////////////////////////////////////////////
 TitleScene::TitleScene(const uuids::uuid &id, const GameContext game_context)
-    : Scene(id, game_context) {}
+    : Scene(SceneType::SceneType_TITLE, id, game_context) {}
 
-/////////////////////////////////////////////////
-SceneType TitleScene::GetSceneType() const {
-  static const SceneType scene_type = SceneType::SceneType_TITLE;
-  return scene_type;
-}
 ////////////////////////////////////////////////////////////
 void TitleScene::sMovement() {};
 

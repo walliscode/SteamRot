@@ -13,12 +13,13 @@
 /////////////////////////////////////////////////
 #include "GameContext.h"
 #include "Scene.h"
-#include "SceneFactory.h"
 #include "TexturesPackage.h"
 #include "uuid.h"
 #include <SFML/Graphics.hpp>
+#include <expected>
 #include <memory>
 #include <unordered_map>
+#include <variant>
 
 namespace steamrot {
 
@@ -30,13 +31,6 @@ namespace steamrot {
 /////////////////////////////////////////////////
 class SceneManager {
 private:
-  /////////////////////////////////////////////////
-  /// @brief Instance of SceneFactory class. Used to create Scene objects.
-  ///
-  /// Its kept alive as it posses an instance of GameContext. Happy to change
-  /////////////////////////////////////////////////
-  SceneFactory m_scene_factory;
-
   /////////////////////////////////////////////////
   /// @brief Context from GameEngine, providing access to game-wide resources
   /////////////////////////////////////////////////
@@ -56,17 +50,12 @@ public:
   SceneManager(const GameContext game_context);
 
   /////////////////////////////////////////////////
-  /// @brief Function that encapsulates the startup logic for the SceneManager.
-  /////////////////////////////////////////////////
-  void StartUp();
-
-  /////////////////////////////////////////////////
   /// @brief A convenience function to load the title scene.
   ///
   /// If the title scene is called it should clear all other scenes and create a
   /// new one.
   /////////////////////////////////////////////////
-  uuids::uuid LoadTitleScene();
+  std::expected<uuids::uuid, FailInfo> LoadTitleScene();
 
   /////////////////////////////////////////////////
   /// @brief A convenience function to load the crafting scene.
@@ -74,7 +63,7 @@ public:
   /// If the crafting scene is called it should clear all other scenes and
   /// create a new one.
   /////////////////////////////////////////////////
-  uuids::uuid LoadCraftingScene();
+  std::expected<uuids::uuid, FailInfo> LoadCraftingScene();
 
   /////////////////////////////////////////////////
   /// @brief Updates all scennes by calling their various system methods.
@@ -90,7 +79,8 @@ public:
   ///
   /// @param scene_type An enum value representing the type of scene to create.
   /////////////////////////////////////////////////
-  void AddSceneFromDefault(const SceneType &scene_type);
+  std::expected<std::monostate, FailInfo>
+  AddSceneFromDefault(const SceneType &scene_type);
 
   /////////////////////////////////////////////////
   /// @brief Provide a textures package by value to be passed along
