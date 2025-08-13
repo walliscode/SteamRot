@@ -5,8 +5,6 @@
 #include "GameEngine.h"
 #include "EventHandler.h"
 #include "log_handler.h"
-#include "uuid.h"
-
 #include <SFML/Graphics.hpp>
 #include <cstddef>
 
@@ -184,17 +182,20 @@ void GameEngine::ShowTitleScene() {
 
   // pass the id to the display manager
   m_display_manager.LoadTitleSceneTiles(load_result.value());
-  std::cout << "Title scene tiles loaded" << std::endl;
 }
 /////////////////////////////////////////////////
 void GameEngine::ShowCraftingScene() {
-  std::cout << "Loading crafting scene..." << std::endl;
+
   // Load the crafting scene in the scene manager and get unique id
-  uuids::uuid crafting_scene_id = m_scene_manager->LoadCraftingScene();
-  std::cout << "Crafting scene loaded with ID: " << crafting_scene_id
-            << std::endl;
+  auto crafting_scene_load_result = m_scene_manager->LoadCraftingScene();
+  if (!crafting_scene_load_result.has_value()) {
+    std::cerr << "Failed to load crafting scene: "
+              << crafting_scene_load_result.error().message << std::endl;
+    return;
+  }
+
   // pass the id to the display manager
-  m_display_manager.LoadCraftingSceneTiles(crafting_scene_id);
+  m_display_manager.LoadCraftingSceneTiles(crafting_scene_load_result.value());
   std::cout << "Crafting scene tiles loaded" << std::endl;
 }
 

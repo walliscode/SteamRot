@@ -11,7 +11,6 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "FlatbuffersConfigurator.h"
 #include "GameContext.h"
 #include "Scene.h"
 #include "TexturesPackage.h"
@@ -64,7 +63,7 @@ public:
   /// If the crafting scene is called it should clear all other scenes and
   /// create a new one.
   /////////////////////////////////////////////////
-  uuids::uuid LoadCraftingScene();
+  std::expected<uuids::uuid, FailInfo> LoadCraftingScene();
 
   /////////////////////////////////////////////////
   /// @brief Updates all scennes by calling their various system methods.

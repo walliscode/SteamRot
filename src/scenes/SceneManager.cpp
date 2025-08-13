@@ -1,5 +1,5 @@
 #include "SceneManager.h"
-#include "FlatbuffersConfigurator.h"
+#include "FailInfo.h"
 #include "SceneFactory.h"
 #include "uuid.h"
 #include <expected>
@@ -49,19 +49,24 @@ std::expected<uuids::uuid, FailInfo> SceneManager::LoadTitleScene() {
   m_scenes.clear();
 
   // create title scene
-  AddSceneFromDefault(SceneType::SceneType_TITLE);
+
+  auto title_result = AddSceneFromDefault(SceneType::SceneType_TITLE);
+  if (!title_result.has_value())
+    return std::unexpected(title_result.error());
 
   // return the ID of the title scene
   return m_scenes.begin()->first;
 }
 
 /////////////////////////////////////////////////
-uuids::uuid SceneManager::LoadCraftingScene() {
+std::expected<uuids::uuid, FailInfo> SceneManager::LoadCraftingScene() {
   // clear existing scenes
   m_scenes.clear();
 
   // create crafting scene
-  AddSceneFromDefault(SceneType::SceneType_CRAFTING);
+  auto crafting_result = AddSceneFromDefault(SceneType::SceneType_CRAFTING);
+  if (!crafting_result.has_value())
+    return std::unexpected(crafting_result.error());
 
   // return the ID of the crafting scene
   return m_scenes.begin()->first;
