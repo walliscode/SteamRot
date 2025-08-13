@@ -6,6 +6,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "FailInfo.h"
 #include "FlatbuffersDataLoader.h"
 #include "fragments_generated.h"
 #include <catch2/catch_test_macros.hpp>
@@ -40,8 +41,11 @@ TEST_CASE("FlatbuffersDataLoader returns unexpected when non-existent fragment "
   steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
   auto result = data_loader.ProvideFragment("non_existent_fragment");
   REQUIRE(result.has_value() == false);
-  REQUIRE(result.error().first == steamrot::DataFailMode::FileNotFound);
-  REQUIRE(result.error().second == "file not found");
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message ==
+          std::string("Fragment file not found: "
+                      "@CMAKE_SOURCE_DIR@/tests/data/fragments/"
+                      "non_existent_fragment.fragment.bin"));
 }
 
 TEST_CASE("FlatbuffersDataLoader returns unexpected when fragment data has not "
@@ -51,9 +55,8 @@ TEST_CASE("FlatbuffersDataLoader returns unexpected when fragment data has not "
   auto result =
       data_loader.ProvideFragment("invalid_fragment_no_socket_data_vertices");
   REQUIRE(result.has_value() == false);
-  REQUIRE(result.error().first ==
-          steamrot::DataFailMode::FlatbufferDataNotFound);
-  REQUIRE(result.error().second == "fragment socket data vertices not found");
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message == "fragment socket data vertices not found");
 }
 
 TEST_CASE("FlatbuffersDataLoader returns unexpected when fragment data has "
@@ -62,9 +65,9 @@ TEST_CASE("FlatbuffersDataLoader returns unexpected when fragment data has "
   steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
   auto result = data_loader.ProvideFragment("missing_vertices_x");
   REQUIRE(result.has_value() == false);
-  REQUIRE(result.error().first ==
-          steamrot::DataFailMode::FlatbufferDataNotFound);
-  REQUIRE(result.error().second == "vertex from socket data is incomplete");
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+
+  REQUIRE(result.error().message == "vertex from socket data is incomplete");
 }
 
 TEST_CASE("FlatbuffersDataLoader returns unexpected when fragment data has "
@@ -73,9 +76,8 @@ TEST_CASE("FlatbuffersDataLoader returns unexpected when fragment data has "
   steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
   auto result = data_loader.ProvideFragment("missing_render_views");
   REQUIRE(result.has_value() == false);
-  REQUIRE(result.error().first ==
-          steamrot::DataFailMode::FlatbufferDataNotFound);
-  REQUIRE(result.error().second == "fragment render views not found");
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message == "fragment render views not found");
 }
 
 TEST_CASE(
@@ -84,9 +86,8 @@ TEST_CASE(
   steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
   auto result = data_loader.ProvideFragment("missing_view_triangles");
   REQUIRE(result.has_value() == false);
-  REQUIRE(result.error().first ==
-          steamrot::DataFailMode::FlatbufferDataNotFound);
-  REQUIRE(result.error().second == "view triangles not found");
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message == "view triangles not found");
 }
 
 TEST_CASE("FlatbuffersDataLoader returns unexpected when fragment triangles "
@@ -95,9 +96,8 @@ TEST_CASE("FlatbuffersDataLoader returns unexpected when fragment triangles "
   steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
   auto result = data_loader.ProvideFragment("missing_triangle_vertices");
   REQUIRE(result.has_value() == false);
-  REQUIRE(result.error().first ==
-          steamrot::DataFailMode::FlatbufferDataNotFound);
-  REQUIRE(result.error().second == "fragment triangles must have 3 vertices");
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message == "fragment triangles must have 3 vertices");
 }
 
 TEST_CASE("FlatbuffersDataLoader returns unexpected when view has no direction",
@@ -105,17 +105,18 @@ TEST_CASE("FlatbuffersDataLoader returns unexpected when view has no direction",
   steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
   auto result = data_loader.ProvideFragment("missing_view_direction");
   REQUIRE(result.has_value() == false);
-  REQUIRE(result.error().first ==
-          steamrot::DataFailMode::FlatbufferDataNotFound);
-  REQUIRE(result.error().second == "view direction not found");
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message == "view direction not found");
 }
+
 TEST_CASE("Fragment data provided with correct values",
           "[FlatbuffersDataLoader]") {
   steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
   auto result = data_loader.ProvideFragment("valid_fragment");
   if (!result.has_value()) {
-    std::string error_message =
-        result.error().second.empty() ? "unknown error" : result.error().second;
+    std::string error_message = result.error().message.empty()
+                                    ? "unknown error"
+                                    : result.error().message;
     FAIL(error_message);
   }
 
@@ -146,8 +147,11 @@ TEST_CASE("FlatbuffersDataLoader returns error when fragments do not exist",
   steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
   auto result = data_loader.ProvideAllFragments({"non_existent_fragment"});
   REQUIRE(result.has_value() == false);
-  REQUIRE(result.error().first == steamrot::DataFailMode::FileNotFound);
-  REQUIRE(result.error().second == "file not found");
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message ==
+          std::string("Fragment file not found: "
+                      "@CMAKE_SOURCE_DIR@/tests/data/fragments/"
+                      "non_existent_fragment.fragment.bin"));
 }
 
 TEST_CASE("FlatbuffersDataLoader returns all fragments",

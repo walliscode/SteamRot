@@ -119,6 +119,13 @@ public:
   EntityMemoryPool &GetEntityMemoryPool();
 
   /////////////////////////////////////////////////
+  /// @brief Read only reference to the entity memory pool
+  ///
+  /// @return A const reference to the entity memory pool
+  /////////////////////////////////////////////////
+  const EntityMemoryPool &GetEntityMemoryPool() const;
+
+  /////////////////////////////////////////////////
   /// @brief Get a reference to the archetype manager
   ///
   /////////////////////////////////////////////////

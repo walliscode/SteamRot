@@ -17,6 +17,7 @@
 #include "Logic.h"
 #include "LogicFactory.h"
 #include "global_constants.h"
+#include "scene_types_generated.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <unordered_map>
@@ -56,6 +57,11 @@ protected:
   /////////////////////////////////////////////////
   std::unordered_map<LogicType, std::vector<std::unique_ptr<Logic>>> m_logics;
 
+  /////////////////////////////////////////////////
+  /// @brief SceneType set by the derived class
+  /////////////////////////////////////////////////
+  const SceneType m_scene_type;
+
   ////////////////////////////////////////////////////////////
   // Member: unique id generated for each Scene instance
   ////////////////////////////////////////////////////////////
@@ -83,13 +89,22 @@ protected:
   /// @param id [TODO:parameter]
   /// @param game_context [TODO:parameter]
   /////////////////////////////////////////////////
-  Scene(const uuids::uuid &id, const GameContext game_context);
+  Scene(const SceneType scene_type, const uuids::uuid &id,
+        const GameContext game_context);
 
 public:
   /////////////////////////////////////////////////
   /// @brief Destructor for Scene class.
   /////////////////////////////////////////////////
   virtual ~Scene() = default;
+
+  /////////////////////////////////////////////////
+  /// @brief wrapper function for any Scene configuration that needs to be done
+  ///
+  /// @param data_type Which data type to use for configuration.
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ConfigureFromDefault(const DataType &data_type = DataType::Flatbuffers);
 
   ////////////////////////////////////////////////////////////
   /// \brief function container for all movement related logic
@@ -135,7 +150,16 @@ public:
   ////////////////////////////////////////////////////////////
   const uuids::uuid GetSceneID();
 
-  virtual SceneType GetSceneType() const = 0;
+  /////////////////////////////////////////////////
+  /// @brief Returns the SceneType of the Scene.
+  ///
+  /// @return SceneType indicating the type of the Scene.
+  /////////////////////////////////////////////////
+  const SceneType &GetSceneType() const;
+
+#ifdef DEBUG
+  const EntityMemoryPool &GetEntityMemoryPool() const;
+#endif
 };
 
 } // namespace steamrot

@@ -7,18 +7,13 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "CraftingScene.h"
+#include "scene_types_generated.h"
 
 namespace steamrot {
 /////////////////////////////////////////////////
 CraftingScene::CraftingScene(const uuids::uuid &id,
                              const GameContext game_context)
-    : Scene(id, game_context) {}
-
-/////////////////////////////////////////////////
-SceneType CraftingScene::GetSceneType() const {
-  static SceneType scene_type = SceneType::SceneType_CRAFTING;
-  return scene_type;
-}
+    : Scene(SceneType::SceneType_CRAFTING, id, game_context) {}
 
 /////////////////////////////////////////////////
 void CraftingScene::sAction() {

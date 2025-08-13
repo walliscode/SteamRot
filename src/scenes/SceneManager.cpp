@@ -1,32 +1,50 @@
 #include "SceneManager.h"
+#include "FlatbuffersConfigurator.h"
+#include "SceneFactory.h"
 #include "uuid.h"
+#include <expected>
 #include <memory>
 #include <utility>
+#include <variant>
 
 namespace steamrot {
 
 /////////////////////////////////////////////////
 SceneManager::SceneManager(const GameContext game_contest)
-    : m_scene_factory(game_contest), m_scenes(), m_game_context(game_contest) {}
+    : m_scenes(), m_game_context(game_contest) {}
 
 /////////////////////////////////////////////////
-void SceneManager::StartUp() {}
+std::expected<std::monostate, FailInfo>
+SceneManager::AddSceneFromDefault(const SceneType &scene_type) {
 
-/////////////////////////////////////////////////
-void SceneManager::AddSceneFromDefault(const SceneType &scene_type) {
+  // create SceneFactory object
+  SceneFactory scene_factory(m_game_context);
 
-  std::unique_ptr<Scene> new_scene =
-      m_scene_factory.CreateDefaultScene(scene_type).value();
+  auto scene_creation_result = scene_factory.CreateDefaultScene(scene_type);
+  if (!scene_creation_result.has_value()) {
 
+    return std::unexpected(scene_creation_result.error());
+  }
   // add to m_scenes maps
-  m_scenes[new_scene->GetSceneID()] = std::move(new_scene);
+  auto adding_result =
+      m_scenes.emplace(scene_creation_result.value()->GetSceneID(),
+                       std::move(scene_creation_result.value()));
 
-  // load default scene assets
-  m_game_context.asset_manager.LoadSceneAssets(scene_type);
+  if (!adding_result.second) {
+    FailInfo fail_info(FailMode::NotAddedToMap,
+                       "Scene with this ID already exists or function failed");
+    return std::unexpected(fail_info);
+  }
+
+  // // load default scene assets
+  // m_game_context.asset_manager.LoadSceneAssets(scene_type);
+
+  return std::monostate{};
 };
 
 /////////////////////////////////////////////////
-uuids::uuid SceneManager::LoadTitleScene() {
+std::expected<uuids::uuid, FailInfo> SceneManager::LoadTitleScene() {
+
   // clear existing scenes
   m_scenes.clear();
 

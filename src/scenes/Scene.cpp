@@ -8,12 +8,15 @@
 ////////////////////////////////////////////////////////////
 #include "Scene.h"
 #include "EntityManager.h"
+#include "scene_types_generated.h"
 
 namespace steamrot {
 
 ////////////////////////////////////////////////////////////
-Scene::Scene(const uuids::uuid &id, const GameContext game_context)
-    : m_entity_manager(), m_game_context(game_context), m_id(id) {}
+Scene::Scene(const SceneType scene_type, const uuids::uuid &id,
+             const GameContext game_context)
+    : m_scene_type(scene_type), m_entity_manager(),
+      m_game_context(game_context), m_id(id) {}
 
 /////////////////////////////////////////////////
 sf::RenderTexture &Scene::GetRenderTexture() { return m_render_texture; }
@@ -27,4 +30,26 @@ void Scene::SetActive(bool active) { m_active = active; }
 ////////////////////////////////////////////////////////////
 const uuids::uuid Scene::GetSceneID() { return m_id; }
 
+/////////////////////////////////////////////////
+const SceneType &Scene::GetSceneType() const { return m_scene_type; }
+
+/////////////////////////////////////////////////
+#ifdef DEBUG
+const EntityMemoryPool &Scene::GetEntityMemoryPool() const {
+  return m_entity_manager.GetEntityMemoryPool();
+}
+#endif
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+Scene::ConfigureFromDefault(const DataType &data_type) {
+
+  // configure the entity memory pool
+  auto emp_configure_result = m_entity_manager.ConfigureEntitiesFromDefaultData(
+      m_scene_type, m_game_context.env_type, data_type);
+  if (!emp_configure_result)
+    return std::unexpected(emp_configure_result.error());
+
+  return std::monostate{};
+}
 } // namespace steamrot

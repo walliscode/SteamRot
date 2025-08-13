@@ -8,32 +8,29 @@
 /////////////////////////////////////////////////
 #include "SceneFactory.h"
 #include "CraftingScene.h"
-#include "GameContext.h"
 #include "TitleScene.h"
+#include "configuration_helpers.h"
+#include "containers.h"
+#include "scene_helpers.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 // create a GameContext object for use by all tests
-sf::RenderWindow window(sf::VideoMode({800, 600}), "Test Window");
-steamrot::EventHandler event_handler;
-sf::Vector2i mouse_position(0, 0);
-size_t loop_number = 0;
-steamrot::AssetManager asset_manager;
-steamrot::DataManager data_manager;
-
-steamrot::GameContext game_context(window, event_handler, mouse_position,
-                                   loop_number, asset_manager, data_manager);
-
 TEST_CASE("SceneFactory can be constructed without errors", "[SceneFactory]") {
-  steamrot::SceneFactory scene_factory(game_context);
+
+  steamrot::SceneFactory scene_factory(steamrot::tests::create_game_context());
   REQUIRE_NOTHROW(scene_factory);
 }
 
-TEST_CASE("SceneFactory can create a TitleScene", "[SceneFactory]") {
-  steamrot::SceneFactory scene_factory(game_context);
+TEST_CASE("SceneFactory can create a TitleScene from default",
+          "[SceneFactory]") {
+  steamrot::SceneFactory scene_factory(steamrot::tests::create_game_context());
+
+  // define SceneType for the test
+  const steamrot::SceneType scene_type = steamrot::SceneType::SceneType_TITLE;
+
   // create a TitleScene
-  auto scene_creation_result =
-      scene_factory.CreateDefaultScene(steamrot::SceneType::SceneType_TITLE);
+  auto scene_creation_result = scene_factory.CreateDefaultScene(scene_type);
 
   if (!scene_creation_result.has_value()) {
     FAIL("Scene creation failed: " + scene_creation_result.error().message);
@@ -42,12 +39,20 @@ TEST_CASE("SceneFactory can create a TitleScene", "[SceneFactory]") {
   // check that the created scene is a TitleScene
   auto title_scene = std::move(scene_creation_result.value());
   REQUIRE(title_scene != nullptr);
-  REQUIRE(title_scene->GetSceneType() == steamrot::SceneType::SceneType_TITLE);
+  REQUIRE(title_scene->GetSceneType() == scene_type);
   REQUIRE(dynamic_cast<steamrot::TitleScene *>(title_scene.get()));
+
+  // check that the TitleScene entities are initialized correctly
+  const steamrot::EntityMemoryPool &entity_memory_pool =
+      title_scene->GetEntityMemoryPool();
+
+  steamrot::tests::TestConfigurationOfEMPfromDefaultData(entity_memory_pool,
+                                                         scene_type);
 }
 
-TEST_CASE("SceneFactory can create a CraftingScene", "[SceneFactory]") {
-  steamrot::SceneFactory scene_factory(game_context);
+TEST_CASE("SceneFactory can create a CraftingScene from default",
+          "[SceneFactory]") {
+  steamrot::SceneFactory scene_factory(steamrot::tests::create_game_context());
   // create a CraftingScene
   auto scene_creation_result =
       scene_factory.CreateDefaultScene(steamrot::SceneType::SceneType_CRAFTING);
@@ -60,4 +65,10 @@ TEST_CASE("SceneFactory can create a CraftingScene", "[SceneFactory]") {
   REQUIRE(crafting_scene->GetSceneType() ==
           steamrot::SceneType::SceneType_CRAFTING);
   REQUIRE(dynamic_cast<steamrot::CraftingScene *>(crafting_scene.get()));
+
+  // check that the CraftingScene entities are initialized correctly
+  const steamrot::EntityMemoryPool &entity_memory_pool =
+      crafting_scene->GetEntityMemoryPool();
+  steamrot::tests::TestConfigurationOfEMPfromDefaultData(
+      entity_memory_pool, steamrot::SceneType::SceneType_CRAFTING);
 }

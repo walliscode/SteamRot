@@ -12,12 +12,13 @@
 /// Headers
 /////////////////////////////////////////////////
 
+#include "FailInfo.h"
 #include "Fragment.h"
 #include "PathProvider.h"
 #include <expected>
 #include <map>
 #include <string>
-#include <utility>
+
 namespace steamrot {
 
 enum class DataFailMode {
@@ -26,8 +27,6 @@ enum class DataFailMode {
   FlatbufferDataNotFound,
   InvalidSceneType,
 };
-
-using FailureData = std::pair<DataFailMode, std::string>;
 
 /////////////////////////////////////////////////
 /// @class DataLoader
@@ -58,10 +57,10 @@ public:
   /////////////////////////////////////////////////
   DataLoader(const EnvironmentType env_type = EnvironmentType::None);
 
-  virtual std::expected<Fragment, FailureData>
+  virtual std::expected<Fragment, FailInfo>
   ProvideFragment(const std::string &fragment_name) const = 0;
 
-  virtual std::expected<std::map<std::string, Fragment>, FailureData>
+  virtual std::expected<std::map<std::string, Fragment>, FailInfo>
   ProvideAllFragments(std::vector<std::string> fragment_names) const = 0;
 };
 } // namespace steamrot

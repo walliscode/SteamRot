@@ -6,6 +6,7 @@
 #pragma once
 #include "AssetManager.h"
 #include "EventHandler.h"
+#include "PathProvider.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Vector2.hpp>
 
@@ -15,7 +16,8 @@ struct GameContext {
 
   GameContext(sf::RenderWindow &window, EventHandler &event_handler,
               const sf::Vector2i &mouse_position, const size_t &loop_number,
-              AssetManager &asset_manager, DataManager &data_manager);
+              AssetManager &asset_manager, DataManager &data_manager,
+              const EnvironmentType &env_type);
 
   /////////////////////////////////////////////////
   /// @brief Reference to the game window.
@@ -52,5 +54,10 @@ struct GameContext {
   /// keeps things cleaner.
   /////////////////////////////////////////////////
   DataManager &data_manager;
+
+  /////////////////////////////////////////////////
+  /// @brief Describes the environment type the game is running in.
+  /////////////////////////////////////////////////
+  const EnvironmentType env_type;
 };
 } // namespace steamrot

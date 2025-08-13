@@ -30,6 +30,13 @@ EntityMemoryPool &EntityManager::GetEntityMemoryPool() {
   return m_entity_memory_pool;
 }
 
+/////////////////////////////////////////////////
+const EntityMemoryPool &EntityManager::GetEntityMemoryPool() const {
+  // return a const reference to the memory pool
+  return m_entity_memory_pool;
+}
+
+/////////////////////////////////////////////////
 const ArchetypeManager &EntityManager::GetArchetypeManager() {
   // return a const reference to the archetype manager
   return m_archetype_manager;

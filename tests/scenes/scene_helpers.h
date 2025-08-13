@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #pragma once
 
+#include "GameContext.h"
 #include "uuid.h"
 namespace steamrot::tests {
 
@@ -15,4 +16,6 @@ namespace steamrot::tests {
 /// @brief Create a UUID for testing purposes
 /////////////////////////////////////////////////
 const uuids::uuid create_uuid();
+
+const GameContext create_game_context();
 } // namespace steamrot::tests

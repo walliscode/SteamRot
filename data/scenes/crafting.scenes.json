@@ -1,5 +1,6 @@
 {
   "entity_collection": {
+    "entity_memory_pool_size": 55,
     "entities": [
       {
         "c_user_interface": {

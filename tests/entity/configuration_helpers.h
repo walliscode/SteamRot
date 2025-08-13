@@ -61,8 +61,8 @@ void CompareToData(const CGrimoireMachina &actual,
 /// @param entity_memory_pool Instance of EntityMemoryPool to configure
 /// @param scene_type SceneType to pull default data from
 /////////////////////////////////////////////////
-void TestConfigurationOfEMPfromDefaultData(EntityMemoryPool &entity_memory_pool,
-                                           const SceneType scene_type);
+void TestConfigurationOfEMPfromDefaultData(
+    const EntityMemoryPool &entity_memory_pool, const SceneType scene_type);
 
 /////////////////////////////////////////////////
 /// @brief Checks the archetypes of an unconfigured EntityMemoryPool

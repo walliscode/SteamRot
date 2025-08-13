@@ -1,6 +1,5 @@
 
 add_library(scenes
-
     SceneManager.cpp
     SceneFactory.cpp
     Scene.cpp
@@ -8,6 +7,9 @@ add_library(scenes
     TitleScene.cpp
 )
 
+target_compile_definitions(scenes PRIVATE
+    $<$<CONFIG:Debug>:DEBUG>
+)
 
 target_include_directories(scenes
   PUBLIC
@@ -16,7 +18,7 @@ target_include_directories(scenes
 
 
 
-target_link_libraries(scenes PRIVATE
+target_link_libraries(scenes PUBLIC
 SFML::Graphics
 display
 magic_enum

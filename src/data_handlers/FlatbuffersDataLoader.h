@@ -35,7 +35,7 @@ public:
   /// Any fail modes are provided through std::expected as the error type
   /// @param fragment_name String representing the name of the fragment
   /////////////////////////////////////////////////
-  std::expected<Fragment, FailureData>
+  std::expected<Fragment, FailInfo>
   ProvideFragment(const std::string &fragment_name) const override;
 
   /////////////////////////////////////////////////
@@ -44,7 +44,7 @@ public:
   /// @param fragment_names Vector of strings representing the names of the
   /// fragments
   /////////////////////////////////////////////////
-  std::expected<std::map<std::string, Fragment>, FailureData>
+  std::expected<std::map<std::string, Fragment>, FailInfo>
   ProvideAllFragments(std::vector<std::string> fragment_names) const override;
 
   /////////////////////////////////////////////////
@@ -52,7 +52,7 @@ public:
   ///
   /// @param scene_type Enum representing the type of scene
   /////////////////////////////////////////////////
-  std::expected<const SceneData *, FailureData>
+  std::expected<const SceneData *, FailInfo>
   ProvideSceneData(const SceneType scene_type) const;
 };
 

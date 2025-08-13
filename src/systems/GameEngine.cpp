@@ -21,7 +21,7 @@ using namespace magic_enum::bitwise_operators;
 namespace steamrot {
 
 ///////////////////////////////////////////////////////////
-GameEngine::GameEngine()
+GameEngine::GameEngine(EnvironmentType env_type)
     : m_window({sf::VideoMode(steamrot::kWindowSize), "SteamRot"}),
       m_data_manager(), m_event_handler(), m_asset_manager(),
       m_display_manager(m_window) {
@@ -29,7 +29,8 @@ GameEngine::GameEngine()
   // create the GameContext object and pass by value so that it does not have to
   // stay alive
   GameContext game_context{m_window,      m_event_handler, m_mouse_position,
-                           m_loop_number, m_asset_manager, m_data_manager};
+                           m_loop_number, m_asset_manager, m_data_manager,
+                           env_type};
 
   // initialise all objects that need the GameContext
   m_scene_manager = std::make_unique<SceneManager>(game_context);
@@ -177,12 +178,12 @@ void GameEngine::RunSimulation(int loops) {
 
 ////////////////////////////////////////////////////////////
 void GameEngine::ShowTitleScene() {
-  std::cout << "Loading title scene..." << std::endl;
+
   // Load the title scene in the scene manager and get unique id
-  uuids::uuid title_scene_id = m_scene_manager->LoadTitleScene();
-  std::cout << "Title scene loaded with ID: " << title_scene_id << std::endl;
+  auto load_result = m_scene_manager->LoadTitleScene();
+
   // pass the id to the display manager
-  m_display_manager.LoadTitleSceneTiles(title_scene_id);
+  m_display_manager.LoadTitleSceneTiles(load_result.value());
   std::cout << "Title scene tiles loaded" << std::endl;
 }
 /////////////////////////////////////////////////

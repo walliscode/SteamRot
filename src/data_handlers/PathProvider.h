@@ -1,14 +1,14 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of PathProvider class
+/// @brief Declaration of PathProvider class with std::expected and FailInfo
 /////////////////////////////////////////////////
 
-/////////////////////////////////////////////////
-/// Preprocessor Directives
-/////////////////////////////////////////////////
 #pragma once
 
+#include "FailInfo.h"
+#include <expected>
 #include <filesystem>
+
 namespace steamrot {
 
 enum class EnvironmentType {
@@ -16,9 +16,10 @@ enum class EnvironmentType {
   Test,
   Production,
 };
+
 /////////////////////////////////////////////////
 /// @class PathProvider
-/// @brief Provide paths for data files
+/// @brief Provide paths for data files, with error handling via std::expected
 ///
 /////////////////////////////////////////////////
 class PathProvider {
@@ -46,17 +47,24 @@ public:
 
   /////////////////////////////////////////////////
   /// @brief Provides top level data directory path
+  ///
+  /// @return std::expected<std::filesystem::path, FailInfo>
   /////////////////////////////////////////////////
-  const std::filesystem::path GetDataDirectory() const;
+  std::expected<std::filesystem::path, FailInfo> GetDataDirectory() const;
 
   /////////////////////////////////////////////////
   /// @brief Provides the path to the fragments directory
+  ///
+  /// @return std::expected<std::filesystem::path, FailInfo>
   /////////////////////////////////////////////////
-  const std::filesystem::path GetFragmentDirectory() const;
+  std::expected<std::filesystem::path, FailInfo> GetFragmentDirectory() const;
 
   /////////////////////////////////////////////////
   /// @brief Provides the path to the scenes directory
+  ///
+  /// @return std::expected<std::filesystem::path, FailInfo>
   /////////////////////////////////////////////////
-  const std::filesystem::path GetSceneDirectory() const;
+  std::expected<std::filesystem::path, FailInfo> GetSceneDirectory() const;
 };
+
 } // namespace steamrot
