@@ -13,7 +13,6 @@
 #include "EventPacket.h"
 #include "SceneManager.h"
 #include <SFML/Graphics.hpp>
-
 #include <memory>
 #include <nlohmann/json.hpp>
 #include <unordered_set>
@@ -32,15 +31,11 @@ private:
   /////////////////////////////////////////////////
   DisplayManager m_display_manager;
 
+  DataManager m_data_manager;
   /////////////////////////////////////////////////
   /// @brief SceneManager object for managing scenes and scene contaienrs.
   /////////////////////////////////////////////////
   std::unique_ptr<SceneManager> m_scene_manager;
-
-  /////////////////////////////////////////////////
-  /// @brief Stateless DataManager object for loading data from file.
-  /////////////////////////////////////////////////
-  DataManager m_data_manager;
 
   /////////////////////////////////////////////////
   /// @brief EventHandler object to handle user input and events.

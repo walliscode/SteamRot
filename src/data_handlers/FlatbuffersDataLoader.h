@@ -54,6 +54,14 @@ public:
   /////////////////////////////////////////////////
   std::expected<const SceneData *, FailInfo>
   ProvideSceneData(const SceneType scene_type) const;
+
+  /////////////////////////////////////////////////
+  /// @brief Provides AssetCollection data as a subset of SceneData
+  ///
+  /// @param scene_type An enum representing the type of scene
+  /////////////////////////////////////////////////
+  std::expected<const AssetCollection *, FailInfo>
+  ProvideAssetData(const SceneType scene_type) const;
 };
 
 } // namespace steamrot

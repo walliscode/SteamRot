@@ -31,7 +31,7 @@ const GameContext create_game_context() {
   steamrot::EventHandler event_handler;
   sf::Vector2i mouse_position(0, 0);
   size_t loop_number = 0;
-  steamrot::AssetManager asset_manager;
+  steamrot::AssetManager asset_manager{EnvironmentType::Test};
   steamrot::DataManager data_manager;
 
   steamrot::GameContext game_context(window, event_handler, mouse_position,

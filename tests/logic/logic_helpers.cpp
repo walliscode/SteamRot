@@ -22,7 +22,7 @@ LogicContext CreateLogicContext() {
   // create a render window
   sf::RenderWindow render_window(sf::VideoMode({800, 600}), "Test Window");
   // construct AssetManager
-  AssetManager asset_manager;
+  AssetManager asset_manager{EnvironmentType::Test};
   // construct EventHandler
   EventHandler event_handler;
   // create a LogicContext object
