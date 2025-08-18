@@ -5,6 +5,7 @@
 
 #pragma once
 #include "AssetManager.h"
+#include "DataManager.h"
 #include "EventHandler.h"
 #include "PathProvider.h"
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -56,7 +57,7 @@ struct GameContext {
   DataManager &data_manager;
 
   /////////////////////////////////////////////////
-  /// @brief Describes the environment type the game is running in.
+  /// @brief Desc
   /////////////////////////////////////////////////
   const EnvironmentType env_type;
 };

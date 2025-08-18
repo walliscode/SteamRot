@@ -1,7 +1,6 @@
 
 add_library(systems
     GameEngine.cpp
-    AssetManager.cpp
     ActionManager.cpp
 )
 
@@ -37,4 +36,5 @@ context
 logic
 flatbuffers
 flatbuffers_headers
+assets
 )

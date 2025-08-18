@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "PathProvider.h"
+#include <iostream>
 #include <stdexcept>
 
 namespace steamrot {
@@ -35,7 +36,9 @@ PathProvider::PathProvider(EnvironmentType env_type) {
              m_environment != EnvironmentType::None) {
     throw std::runtime_error("PathProvider can only be initiated once.");
   }
-  m_environment = env_type;
+  // dont overwrite the environment if it has already been set with None type
+  if (env_type != EnvironmentType::None)
+    m_environment = env_type;
 }
 
 /////////////////////////////////////////////////
@@ -68,11 +71,30 @@ PathProvider::GetFragmentDirectory() const {
 /////////////////////////////////////////////////
 std::expected<std::filesystem::path, FailInfo>
 PathProvider::GetSceneDirectory() const {
+  auto data_dir_result = GetDataDirectory();
+  if (!data_dir_result.has_value()) {
+    return std::unexpected(data_dir_result.error());
+  }
+  return data_dir_result.value() / "scenes";
+}
+
+/////////////////////////////////////////////////
+std::expected<std::filesystem::path, FailInfo>
+PathProvider::GetAssetsDirectory() const {
   auto dataDirResult = GetDataDirectory();
   if (!dataDirResult.has_value()) {
     return std::unexpected(dataDirResult.error());
   }
-  return dataDirResult.value() / "scenes";
+  return dataDirResult.value() / "assets";
 }
 
+/////////////////////////////////////////////////
+std::expected<std::filesystem::path, FailInfo>
+PathProvider::GetFontsDirectory() const {
+  auto assetsDirResult = GetAssetsDirectory();
+  if (!assetsDirResult.has_value()) {
+    return std::unexpected(assetsDirResult.error());
+  }
+  return assetsDirResult.value() / "fonts";
+}
 } // namespace steamrot

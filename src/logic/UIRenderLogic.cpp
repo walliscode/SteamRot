@@ -440,7 +440,7 @@ void UIRenderLogic::DrawButton(UIElement &element) {
 
   // Create a text object for the button label
   sf::Text button_text(
-      m_logic_context.asset_manager.GetFont(m_button_style.font),
+      m_logic_context.asset_manager.GetFont(m_button_style.font).value(),
       button_element.label);
 
   button_text.setCharacterSize(24); // Set the character size
@@ -496,7 +496,7 @@ void UIRenderLogic::DrawDropDownList(UIElement &element) {
 
   sf::Text dropdown_text(
 
-      m_logic_context.asset_manager.GetFont(m_dropdown_list_style.font),
+      m_logic_context.asset_manager.GetFont(m_dropdown_list_style.font).value(),
       label_to_use);
 
   // calculate the font size based on the size of the dropdown list
@@ -542,7 +542,7 @@ void UIRenderLogic::DrawDropDownItem(UIElement &element) {
       std::get<DropDownItem>(element.element_type);
   // Create a text object for the dropdown item label
   sf::Text dropdown_text(
-      m_logic_context.asset_manager.GetFont(m_dropdown_item_style.font),
+      m_logic_context.asset_manager.GetFont(m_dropdown_item_style.font).value(),
       dropdown_item_element.label);
   dropdown_text.setCharacterSize(12); // Set the character size
   dropdown_text.setFillColor(m_dropdown_item_style.text_color);

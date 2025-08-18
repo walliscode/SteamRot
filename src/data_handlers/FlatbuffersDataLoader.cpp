@@ -162,10 +162,14 @@ FlatbuffersDataLoader::ProvideSceneData(const SceneType scene_type) const {
         FailInfo(FailMode::SceneTypeNotFound, "Invalid SceneType provided"));
   }
 
+  // check the SceneDirectory is error free
+  auto scene_dir_result = m_path_provider.GetSceneDirectory();
+  if (!scene_dir_result.has_value()) {
+    return std::unexpected(scene_dir_result.error());
+  }
   // construct the file path
   std::filesystem::path scene_path =
-      m_path_provider.GetSceneDirectory().value() /
-      (scene_file_prefix + ".scenes.bin");
+      scene_dir_result.value() / (scene_file_prefix + ".scenes.bin");
 
   // check if the file exists
   if (!std::filesystem::exists(scene_path)) {
@@ -179,5 +183,27 @@ FlatbuffersDataLoader::ProvideSceneData(const SceneType scene_type) const {
       GetSceneData(LoadBinaryData(scene_path));
 
   return scene_data;
+}
+
+/////////////////////////////////////////////////
+std::expected<const AssetCollection *, FailInfo>
+FlatbuffersDataLoader::ProvideAssetData(const SceneType scene_type) const {
+  // get scene data
+  auto scene_data_result = ProvideSceneData(scene_type);
+  if (!scene_data_result.has_value()) {
+    return std::unexpected(scene_data_result.error());
+  }
+
+  const SceneData *scene_data = scene_data_result.value();
+  if (!scene_data) {
+    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
+                                    "SceneData pointer is null"));
+  }
+
+  if (!scene_data->assets()) {
+    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
+                                    "Asset collection not found"));
+  }
+  return scene_data->assets();
 }
 } // namespace steamrot

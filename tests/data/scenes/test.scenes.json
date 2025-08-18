@@ -67,6 +67,6 @@
   },
   "ui_theme": "test_theme",
   "assets": {
-    "fonts": [{ "name": "TestFont-Regular" }]
+    "fonts": [{ "name": "DaddyTimeMonoNerdFont-Regular" }]
   }
 }

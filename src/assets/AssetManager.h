@@ -7,14 +7,20 @@
 /// Preprocessor Directives
 /////////////////////////////////////////////////
 #pragma once
+
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-///
-#include "DataManager.h"
+#include "FailInfo.h"
+
+#include "PathProvider.h"
+#include "scene_types_generated.h"
 #include <SFML/Graphics.hpp>
+#include <expected>
+#include <functional>
 #include <string>
-#include <utility>
+#include <unordered_map>
+#include <variant>
 
 namespace steamrot {
 
@@ -26,19 +32,26 @@ private:
   std::unordered_map<std::string, sf::Font> m_fonts;
 
   /////////////////////////////////////////////////
-  /// @brief Instance of the DataManager to handle loading of assets from file.
+  /// @brief PathProvider for getting asset paths
   /////////////////////////////////////////////////
-  DataManager m_data_manager;
+  PathProvider m_path_provider;
 
   /////////////////////////////////////////////////
-  /// @brief Add all the fonts to the AssetManager.
+  /// @brief Adds a single font to the Font map in the AssetManager
   ///
-  /// @param fonts [TODO:parameter]
+  /// @param font_name The name of the font as a string
   /////////////////////////////////////////////////
-  void AddFonts(const std::vector<std::pair<std::string, sf::Font>> &fonts);
+  std::expected<std::monostate, FailInfo> AddFont(const std::string &font_name);
 
 public:
-  AssetManager();
+  /////////////////////////////////////////////////
+  /// @brief Constructor taking an EnvironmentType parameter for setting up
+  /// PathProvider.
+  ///
+  /// @param env_type Enum representing the environment type (e.g., development,
+  /// production).
+  /////////////////////////////////////////////////
+  AssetManager(const EnvironmentType &env_type = EnvironmentType::None);
 
   /////////////////////////////////////////////////
   /// @brief Load all the assets for a given scene type.
@@ -46,13 +59,16 @@ public:
   /// @param scene_type Enum representing the derived scene type to load assets
   /// for.
   /////////////////////////////////////////////////
-  void LoadSceneAssets(const SceneType &scene_type);
+  std::expected<std::monostate, FailInfo>
+  LoadSceneAssets(const SceneType &scene_type);
 
   /////////////////////////////////////////////////
-  /// @brief Return a reference to a font by name.
+  /// @brief Return a font from the AssetManager
   ///
-  /// @param name String name of the font to retrieve.
+  /// std::reference wrapper required to return a reference to the font
+  /// @param font_name String representing the name of the font to retrieve.
   /////////////////////////////////////////////////
-  const sf::Font &GetFont(const std::string &name) const; // get a font
+  std::expected<std::reference_wrapper<const sf::Font>, FailInfo>
+  GetFont(const std::string &font_name) const;
 };
 }; // namespace steamrot

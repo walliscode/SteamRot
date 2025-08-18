@@ -65,6 +65,16 @@ public:
   /// @return std::expected<std::filesystem::path, FailInfo>
   /////////////////////////////////////////////////
   std::expected<std::filesystem::path, FailInfo> GetSceneDirectory() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Provides the path to the assets directory
+  /////////////////////////////////////////////////
+  std::expected<std::filesystem::path, FailInfo> GetAssetsDirectory() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Provides the path to the fonts directory
+  /////////////////////////////////////////////////
+  std::expected<std::filesystem::path, FailInfo> GetFontsDirectory() const;
 };
 
 } // namespace steamrot
