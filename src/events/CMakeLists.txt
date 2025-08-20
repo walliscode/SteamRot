@@ -1,6 +1,7 @@
 add_library(events
 EventHandler.cpp
 event_helpers.cpp
+Subscriber.cpp
 )
 
 target_include_directories(events
@@ -14,4 +15,5 @@ flatbuffers
 flatbuffers_headers
 stduuid
 magic_enum::magic_enum
+logger
 )

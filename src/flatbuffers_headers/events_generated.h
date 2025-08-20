@@ -17,17 +17,19 @@ namespace steamrot {
 
 enum EventType : uint64_t {
   EventType_EVENT_NONE = 1ULL,
-  EventType_EVENT_USER_INPUT = 2ULL,
-  EventType_EVENT_CHANGE_SCENE = 4ULL,
-  EventType_EVENT_QUIT_GAME = 8ULL,
-  EventType_EVENT_TOGGLE_DROPDOWN = 16ULL,
+  EventType_EVENT_TEST = 2ULL,
+  EventType_EVENT_USER_INPUT = 4ULL,
+  EventType_EVENT_CHANGE_SCENE = 8ULL,
+  EventType_EVENT_QUIT_GAME = 16ULL,
+  EventType_EVENT_TOGGLE_DROPDOWN = 32ULL,
   EventType_NONE = 0,
-  EventType_ANY = 31ULL
+  EventType_ANY = 63ULL
 };
 
-inline const EventType (&EnumValuesEventType())[5] {
+inline const EventType (&EnumValuesEventType())[6] {
   static const EventType values[] = {
     EventType_EVENT_NONE,
+    EventType_EVENT_TEST,
     EventType_EVENT_USER_INPUT,
     EventType_EVENT_CHANGE_SCENE,
     EventType_EVENT_QUIT_GAME,
@@ -36,33 +38,16 @@ inline const EventType (&EnumValuesEventType())[5] {
   return values;
 }
 
-inline const char * const *EnumNamesEventType() {
-  static const char * const names[17] = {
-    "EVENT_NONE",
-    "EVENT_USER_INPUT",
-    "",
-    "EVENT_CHANGE_SCENE",
-    "",
-    "",
-    "",
-    "EVENT_QUIT_GAME",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "EVENT_TOGGLE_DROPDOWN",
-    nullptr
-  };
-  return names;
-}
-
 inline const char *EnumNameEventType(EventType e) {
-  if (::flatbuffers::IsOutRange(e, EventType_EVENT_NONE, EventType_EVENT_TOGGLE_DROPDOWN)) return "";
-  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(EventType_EVENT_NONE);
-  return EnumNamesEventType()[index];
+  switch (e) {
+    case EventType_EVENT_NONE: return "EVENT_NONE";
+    case EventType_EVENT_TEST: return "EVENT_TEST";
+    case EventType_EVENT_USER_INPUT: return "EVENT_USER_INPUT";
+    case EventType_EVENT_CHANGE_SCENE: return "EVENT_CHANGE_SCENE";
+    case EventType_EVENT_QUIT_GAME: return "EVENT_QUIT_GAME";
+    case EventType_EVENT_TOGGLE_DROPDOWN: return "EVENT_TOGGLE_DROPDOWN";
+    default: return "";
+  }
 }
 
 }  // namespace steamrot
