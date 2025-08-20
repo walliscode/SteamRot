@@ -36,8 +36,13 @@ SceneManager::AddSceneFromDefault(const SceneType &scene_type) {
     return std::unexpected(fail_info);
   }
 
-  // // load default scene assets
-  // m_game_context.asset_manager.LoadSceneAssets(scene_type);
+  // load default scene assets
+  auto load_asset_result =
+      m_game_context.asset_manager.LoadSceneAssets(scene_type);
+
+  if (!load_asset_result.has_value()) {
+    return std::unexpected(load_asset_result.error());
+  }
 
   return std::monostate{};
 };

@@ -2,6 +2,7 @@ include(CTest)
 include(Catch)
 
 add_subdirectory(assets)
+add_subdirectory(context)
 add_subdirectory(data_handlers)
 add_subdirectory(components)
 add_subdirectory(entity)

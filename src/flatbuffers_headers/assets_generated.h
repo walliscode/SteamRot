@@ -31,7 +31,7 @@ struct FontData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_NAME) &&
+           VerifyOffsetRequired(verifier, VT_NAME) &&
            verifier.VerifyString(name()) &&
            verifier.EndTable();
   }
@@ -51,6 +51,7 @@ struct FontDataBuilder {
   ::flatbuffers::Offset<FontData> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = ::flatbuffers::Offset<FontData>(end);
+    fbb_.Required(o, FontData::VT_NAME);
     return o;
   }
 };

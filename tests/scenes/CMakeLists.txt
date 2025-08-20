@@ -19,6 +19,8 @@ target_link_libraries(test_scenes
   scenes
   systems
   entity_helpers
+  asset_helpers
+  test_context
 )
 
 catch_discover_tests(test_scenes)
