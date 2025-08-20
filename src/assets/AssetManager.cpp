@@ -16,6 +16,7 @@
 #include <filesystem>
 #include <format>
 #include <functional>
+#include <iostream>
 #include <string>
 #include <variant>
 
@@ -29,6 +30,8 @@ AssetManager::AssetManager(const EnvironmentType &env_type)
 std::expected<std::monostate, FailInfo>
 AssetManager::LoadSceneAssets(const SceneType &scene_type) {
 
+  std::cout << "[DEBUG] AssetManager::LoadSceneAssets called for scene type: "
+            << static_cast<int>(scene_type) << std::endl;
   // provide Asset configuration data (not the Assets themselves)
   FlatbuffersDataLoader fb_data_loader;
 
@@ -38,25 +41,38 @@ AssetManager::LoadSceneAssets(const SceneType &scene_type) {
 
   const AssetCollection *asset_config = asset_config_result.value();
 
+  std::cout << "[DEBUG] AssetManager::LoadSceneAssets: "
+            << "Asset configuration loaded successfully." << std::endl;
   if (!asset_config->fonts()->empty()) {
 
+    std::cout << "[DEBUG] AssetManager::LoadSceneAssets: "
+              << "Loading fonts for scene type: "
+              << static_cast<int>(scene_type) << std::endl;
     // Load Scene Fonts
     for (auto const &font_data : *asset_config->fonts()) {
 
+      std::cout << "[DEBUG] AssetManager::LoadSceneAssets: "
+                << "Loading font: " << font_data->name()->str() << std::endl;
       // attempt to add font
       auto add_font_result = AddFont(font_data->name()->str());
 
       if (!add_font_result.has_value())
         return std::unexpected<FailInfo>(add_font_result.error());
+      std::cout << "[DEBUG] AssetManager::LoadSceneAssets: "
+                << "Font loaded successfully: " << font_data->name()->str()
+                << std::endl;
     }
   }
+  std::cout << "[DEBUG] AssetManager::LoadSceneAssets: "
+            << "Fonts loaded successfully." << std::endl;
   return std::monostate();
 }
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 AssetManager::AddFont(const std::string &font_name) {
-
+  std::cout << "[DEBUG] AssetManager::AddFont called for font: " << font_name
+            << std::endl;
   // check get font function
   auto font_dir_result = m_path_provider.GetFontsDirectory();
   if (!font_dir_result.has_value()) {
@@ -80,12 +96,15 @@ AssetManager::AddFont(const std::string &font_name) {
     // return early with FileNotFound error
     return std::unexpected<FailInfo>(fail_info);
   }
-
+  std::cout << "[DEBUG] AssetManager::AddFont: "
+            << "Font file found: " << font_path.string() << std::endl;
   // create a new font object
   sf::Font font;
+
   // load the font from file
   bool sucess = font.openFromFile(font_path);
   if (!sucess) {
+
     // construct error message
     std::string error_message =
         std::format("Failed to load font from file: {}", font_path.string());
@@ -94,9 +113,14 @@ AssetManager::AddFont(const std::string &font_name) {
     // return early with FileNotFound error
     return std::unexpected<FailInfo>(fail_info);
   }
+
+  std::cout << "[DEBUG] AssetManager::AddFont: "
+            << "Font loaded successfully: " << font_name << std::endl;
   // insert the font into the map
   m_fonts.insert({font_name, font});
 
+  std::cout << "[DEBUG] AssetManager::AddFont: "
+            << "Font added to map: " << font_name << std::endl;
   return std::monostate{};
 }
 /////////////////////////////////////////////////

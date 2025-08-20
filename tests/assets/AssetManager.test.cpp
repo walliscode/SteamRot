@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "AssetManager.h"
 #include "PathProvider.h"
+#include "asset_helpers.h"
 #include "scene_types_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
@@ -26,11 +27,6 @@ TEST_CASE("AssetManager loads scene assets correctly", "[AssetManager]") {
     FAIL(result.error().message);
 
   // check if the assets were loaded correctly
-  std::vector<std::string> expected_fonts = {"DaddyTimeMonoNerdFont-Regular"};
-  for (const auto &font_name : expected_fonts) {
-    auto font_result = asset_manager.GetFont(font_name);
-    if (!font_result.has_value()) {
-      FAIL(font_result.error().message);
-    }
-  }
+  steamrot::tests::check_asset_configuration(steamrot::SceneType_TEST,
+                                             asset_manager);
 }
