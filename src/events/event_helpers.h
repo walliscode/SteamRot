@@ -4,11 +4,11 @@
 #include <SFML/Graphics.hpp>
 #include <bitset>
 
+namespace steamrot {
+
 using UserInputBitset =
     std::bitset<sf::Keyboard::KeyCount + sf::Keyboard::KeyCount +
                 sf::Mouse::ButtonCount + sf::Mouse::ButtonCount>;
-namespace steamrot {
-
 ////////////////////////////////////////////////////////////
 // |brief: maps flatbuffer defined enum KeyboardInput to SFML enum
 // sf::Keyboard::Key

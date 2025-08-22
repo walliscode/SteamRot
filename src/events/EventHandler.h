@@ -8,11 +8,14 @@
 ////////////////////////////////////////////////////////////
 
 #include "EventPacket.h"
+#include "Subscriber.h"
 #include "event_helpers.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
+#include <memory>
+#include <unordered_map>
 #include <vector>
 
 namespace steamrot {
@@ -25,6 +28,12 @@ private:
   /// @brief This will be the only event bus used in the game engine.
   /////////////////////////////////////////////////
   EventBus m_global_event_bus;
+
+  /////////////////////////////////////////////////
+  /// @brief Register of subscribers interested in user input events.
+  /////////////////////////////////////////////////
+  std::unordered_map<UserInputBitset, std::vector<std::weak_ptr<Subscriber>>>
+      m_user_input_register;
 
   ////////////////////////////////////////////////////////////
   // |brief process keyboard events: pressed and released
@@ -54,6 +63,14 @@ public:
   // |brief default constructor
   ////////////////////////////////////////////////////////////
   EventHandler() = default;
+
+  /////////////////////////////////////////////////
+  /// @brief store a subscriber in the event handler.
+  ///
+  /// @param subscriber Shared pointer to the subscriber to be registered.
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  RegisterSubscriber(const std::shared_ptr<Subscriber> subscriber);
 
   /////////////////////////////////////////////////
   /// @brief Handle all events that dont originate from the Scenes/Logic
@@ -96,10 +113,11 @@ public:
   /////////////////////////////////////////////////
   void HandleSFMLEvents(sf::RenderWindow &window);
 
-  ////////////////////////////////////////////////////////////
-  // |member: bool queried by GameEngine about whether to close the window or
-  // not
-  ////////////////////////////////////////////////////////////
-  bool m_close_window{false};
+  /////////////////////////////////////////////////
+  /// @brief Return the user input register.
+  /////////////////////////////////////////////////
+  const std::unordered_map<UserInputBitset,
+                           std::vector<std::weak_ptr<Subscriber>>>
+  GetUserInputRegister() const;
 };
 } // namespace steamrot

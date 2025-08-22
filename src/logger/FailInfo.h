@@ -24,6 +24,7 @@ enum class FailMode {
   NonExistentEnumValue,
   SceneTypeNotFound,
   NotAddedToMap,
+  EnumValueNotHandled
 };
 
 struct FailInfo {
