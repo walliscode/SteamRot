@@ -2,6 +2,7 @@ add_library(events
 EventHandler.cpp
 event_helpers.cpp
 Subscriber.cpp
+SubscriberFactory.cpp
 )
 
 target_include_directories(events

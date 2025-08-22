@@ -190,7 +190,7 @@ void EventHandler::HandleMouseEvents(const sf::Event &event,
 
 /////////////////////////////////////////////////
 const std::unordered_map<UserInputBitset,
-                         std::vector<std::weak_ptr<Subscriber>>>
+                         std::vector<std::weak_ptr<Subscriber>>> &
 EventHandler::GetUserInputRegister() const {
   return m_user_input_register;
 }
