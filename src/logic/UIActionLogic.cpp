@@ -55,7 +55,7 @@ void UIActionLogic::ProcessLogic() {
 void UIActionLogic::ProcessEvents(CUserInterface &ui_component) {
   // print out the size of the event bus for debugging if it is greater than 1
   // cycle through EventBus
-  for (auto const &event : m_logic_context.event_handler.GetEventBus()) {
+  for (auto const &event : m_logic_context.event_handler.GetGlobalEventBus()) {
     // print the event type for debugging, except for EVENT_USER_INPUT
     if (event.m_event_type != EventType::EventType_EVENT_USER_INPUT) {
     }
@@ -165,7 +165,7 @@ void UIActionLogic::ProcessMouseEvents(UIElement &element,
                 << magic_enum::enum_name(event_packet.m_event_type)
                 << ", EventData: " << event_packet.m_event_data.index()
                 << std::endl;
-      m_logic_context.event_handler.AddEvent(event_packet);
+      m_logic_context.event_handler.AddToGlobalEventBus({event_packet});
     }
   }
 }

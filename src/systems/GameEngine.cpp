@@ -89,14 +89,14 @@ void GameEngine::RunGameLoop() {
     // };
 
     // update EventBus lifetimes
-    m_event_handler.CleanUpEventBus();
+    m_event_handler.TickGlobalEventBus();
   }
 }
 
 /////////////////////////////////////////////////
 void GameEngine::RetrieveEvents() {
   // retrieve events from the event handler
-  const EventBus &event_bus = m_event_handler.GetEventBus();
+  const EventBus &event_bus = m_event_handler.GetGlobalEventBus();
 
   EventBus holding_bus;
   // iterate over the event bus and check for events that are relevant to the
@@ -106,7 +106,7 @@ void GameEngine::RetrieveEvents() {
     ProcessGameEngineEvents(event, holding_bus);
   }
   // add any new events to the event handler's event bus
-  m_event_handler.AddEvents(holding_bus);
+  m_event_handler.AddToGlobalEventBus(holding_bus);
 }
 
 /////////////////////////////////////////////////
