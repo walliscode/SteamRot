@@ -2,13 +2,36 @@
 // headers
 ////////////////////////////////////////////////////////////
 #include "EventHandler.h"
+#include "FailInfo.h"
 #include "event_helpers.h"
 #include <SFML/Window/Event.hpp>
+#include <expected>
 #include <iostream>
 #include <magic_enum/magic_enum.hpp>
 #include <optional>
 namespace steamrot {
 
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+EventHandler::RegisterSubscriber(std::shared_ptr<Subscriber> subscriber) {
+
+  switch (subscriber->GetRegistrationInfo().first) {
+  case EventType::EventType_EVENT_USER_INPUT: {
+    // get the user input bitset from the subscriber
+    const UserInputBitset user_input_bitset =
+        std::get<UserInputBitset>(subscriber->GetRegistrationInfo().second);
+    // add the subscriber to the user input register
+    m_user_input_register[user_input_bitset].push_back(subscriber);
+    break;
+  }
+  default:
+    // if the event type is not handled, return an error
+    return std::unexpected(
+        FailInfo{FailMode::EnumValueNotHandled,
+                 "Event type not handled in Subscriber registration."});
+  }
+  return std::monostate{};
+}
 /////////////////////////////////////////////////
 void EventHandler::PreloadEvents(sf::RenderWindow &window) {
 
@@ -165,4 +188,10 @@ void EventHandler::HandleMouseEvents(const sf::Event &event,
   }
 }
 
+/////////////////////////////////////////////////
+const std::unordered_map<UserInputBitset,
+                         std::vector<std::weak_ptr<Subscriber>>>
+EventHandler::GetUserInputRegister() const {
+  return m_user_input_register;
+}
 } // namespace steamrot

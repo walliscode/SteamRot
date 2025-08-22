@@ -1,5 +1,6 @@
 add_executable(test_events
 Subscriber.test.cpp
+EventHandler.test.cpp
 )
 
 target_include_directories(test_events
