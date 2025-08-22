@@ -38,56 +38,27 @@ void EventHandler::PreloadEvents(sf::RenderWindow &window) {
   // handle SMFL events
   HandleSFMLEvents(window);
 }
+
 /////////////////////////////////////////////////
-void EventHandler::CleanUpEventBus() {
-  // decrement the lifetime of all events in the event bus
-  DecrementEventLifetimes();
+void EventHandler::AddToGlobalEventBus(const std::vector<EventPacket> &events) {
+
+  for (const auto &event : events) {
+    AddEvent(m_global_event_bus, event);
+  }
+}
+/////////////////////////////////////////////////
+void EventHandler::TickGlobalEventBus() {
+  // decrement the lifetime of all events in the global event bus
+  DecrementEventLifetimes(m_global_event_bus);
   // remove all events with a lifetime of 0
-  RemoveDeadEvents();
+  RemoveDeadEvents(m_global_event_bus);
 }
 
 /////////////////////////////////////////////////
 
-const EventBus &EventHandler::GetEventBus() {
+const EventBus &EventHandler::GetGlobalEventBus() {
   // return the global event bus
   return m_global_event_bus;
-}
-
-/////////////////////////////////////////////////
-void EventHandler::DecrementEventLifetimes() {
-  // go over all events in the event bus and decrement their lifetimes
-  for (auto &event : m_global_event_bus) {
-    event.DecrementLifetime();
-  }
-}
-/////////////////////////////////////////////////
-void EventHandler::RemoveDeadEvents() {
-  // remove all events with a lifetime of 0
-  m_global_event_bus.erase(std::remove_if(m_global_event_bus.begin(),
-                                          m_global_event_bus.end(),
-                                          [](const EventPacket &event) {
-                                            return event.GetLifetime() == 0;
-                                          }),
-                           m_global_event_bus.end());
-}
-
-/////////////////////////////////////////////////
-void EventHandler::AddEvent(const EventPacket &event) {
-  // add the event to the global event bus
-  m_global_event_bus.push_back(event);
-
-  // add any sorting algorithms here if needed
-}
-
-/////////////////////////////////////////////////
-void EventHandler::AddEvents(const std::vector<EventPacket> &events) {
-
-  // add each one separately, so that any sorting algorithms do not to be
-  // defined twice
-  for (const auto &event : events) {
-    // add each event to the global event bus
-    AddEvent(event);
-  }
 }
 
 ////////////////////////////////////////////////////////////
@@ -131,7 +102,7 @@ void EventHandler::HandleSFMLEvents(sf::RenderWindow &window) {
   event_packet.m_event_data = user_input_events;
 
   // add the event packet to the global event bus
-  AddEvent(event_packet);
+  AddEvent(m_global_event_bus, event_packet);
 }
 
 ////////////////////////////////////////////////////////////
@@ -193,5 +164,32 @@ const std::unordered_map<UserInputBitset,
                          std::vector<std::weak_ptr<Subscriber>>> &
 EventHandler::GetUserInputRegister() const {
   return m_user_input_register;
+}
+/////////////////////////////////////////////////
+void AddEvent(EventBus &event_bus, const EventPacket &event) {
+  event_bus.push_back(event);
+}
+
+/////////////////////////////////////////////////
+void DecrementLifteime(EventPacket &event) {
+  if (event.event_lifetime > 0) {
+    --event.event_lifetime;
+  }
+}
+
+/////////////////////////////////////////////////
+void DecrementEventLifetimes(EventBus &event_bus) {
+  for (auto &event : event_bus) {
+    DecrementLifteime(event);
+  }
+}
+
+/////////////////////////////////////////////////
+void RemoveDeadEvents(EventBus &event_bus) {
+  event_bus.erase(std::remove_if(event_bus.begin(), event_bus.end(),
+                                 [](const EventPacket &event) {
+                                   return event.event_lifetime == 0;
+                                 }),
+                  event_bus.end());
 }
 } // namespace steamrot

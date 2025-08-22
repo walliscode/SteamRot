@@ -50,13 +50,6 @@ struct EventPacket {
 
   uint8_t GetLifetime() const { return event_lifetime; }
 
-  void DecrementLifetime() {
-    if (event_lifetime > 0) {
-      --event_lifetime;
-    }
-  }
-
-private:
   /////////////////////////////////////////////////
   /// @brief Event of the lifetime, will be ticked down 1 each cycle
   /////////////////////////////////////////////////

@@ -47,17 +47,6 @@ private:
   void HandleMouseEvents(const sf::Event &event,
                          UserInputBitset &user_input_events);
 
-  /////////////////////////////////////////////////
-  /// @brief Go over all events in the event bus and decrement their lifetimes.
-  /////////////////////////////////////////////////
-  void DecrementEventLifetimes();
-
-  /////////////////////////////////////////////////
-  /// @brief Remove all events with a lifetimve of 0 from the event bus.
-  ///
-  /////////////////////////////////////////////////
-  void RemoveDeadEvents();
-
 public:
   ////////////////////////////////////////////////////////////
   // |brief default constructor
@@ -79,31 +68,23 @@ public:
   void PreloadEvents(sf::RenderWindow &window);
 
   /////////////////////////////////////////////////
-  /// @brief Container function for all clean up/tear down functions at the end
-  /// of the tick.
+  /// @brief Wrapper function to specifally to add to the global event bus.
+  ///
+  /// @param events Vector of events to be added to the global event bus.
   /////////////////////////////////////////////////
-  void CleanUpEventBus();
+  void AddToGlobalEventBus(const std::vector<EventPacket> &events);
 
   /////////////////////////////////////////////////
-  /// @brief Adds an event to the global event bus and calls any sorting algos.
-  ///
-  /// @param event Newly created event to be added to the event bus.
+  /// @brief Wrapper function for handling lifetimes and removing dead events.
   /////////////////////////////////////////////////
-  void AddEvent(const EventPacket &event);
-
-  /////////////////////////////////////////////////
-  /// @brief Add a collection of events to the global event bus.
-  ///
-  /// @param events A holding bus of events to be added to the global event bus.
-  /////////////////////////////////////////////////
-  void AddEvents(const EventBus &events);
+  void TickGlobalEventBus();
 
   /////////////////////////////////////////////////
   /// @brief Get the global event bus.
   ///
   /// @return A reference to the global event bus.
   /////////////////////////////////////////////////
-  const EventBus &GetEventBus();
+  const EventBus &GetGlobalEventBus();
 
   /////////////////////////////////////////////////
   /// @brief Adapater function to turn SFML events into the game engine's event
@@ -120,4 +101,29 @@ public:
                            std::vector<std::weak_ptr<Subscriber>>> &
   GetUserInputRegister() const;
 };
+
+/////////////////////////////////////////////////
+/// @brief Adds an event to the global event bus and calls any sorting algos.
+///
+/// @param event Newly created event to be added to the event bus.
+/////////////////////////////////////////////////
+void AddEvent(EventBus &event_bus, const EventPacket &event);
+
+/////////////////////////////////////////////////
+/// @brief Decrement the lifetime of a single event by 1.
+///
+/// @param event Event to decrement the lifetime of.
+/////////////////////////////////////////////////
+void DecrementLifteime(EventPacket &event);
+
+/////////////////////////////////////////////////
+/// @brief Go over all events in the event bus and decrement their lifetimes.
+/////////////////////////////////////////////////
+void DecrementEventLifetimes(EventBus &event_bus);
+
+/////////////////////////////////////////////////
+/// @brief Remove all events with a lifetimve of 0 from the event bus.
+///
+/////////////////////////////////////////////////
+void RemoveDeadEvents(EventBus &event_bus);
 } // namespace steamrot

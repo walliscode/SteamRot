@@ -45,3 +45,102 @@ TEST_CASE("EventHandler registers Subscribers", "[EventHandler]") {
   subscriber.reset();
   REQUIRE(user_input_register[user_input_bitset][0].expired());
 }
+TEST_CASE("AddEvent adds an event to an EventBus", "[EventHandler]") {
+  // create a mock EventBus
+  steamrot::EventBus event_bus;
+  REQUIRE(event_bus.empty());
+
+  // create an event and add it to the bus
+  steamrot::EventPacket event{5};
+  steamrot::AddEvent(event_bus, event);
+
+  // check that the event was added
+  REQUIRE(event_bus.size() == 1);
+}
+
+TEST_CASE("DecrementEventLifetimes decrease all lifetimes by 1",
+          "[EventHandler]") {
+
+  // create a mock EventBus with events of varying lifetimes
+  steamrot::EventBus event_bus;
+  steamrot::EventPacket event1{3};
+  steamrot::EventPacket event2{1};
+  steamrot::EventPacket event3{2};
+
+  // add events to the bus
+  AddEvent(event_bus, event1);
+  AddEvent(event_bus, event2);
+  AddEvent(event_bus, event3);
+  REQUIRE(event_bus.size() == 3);
+
+  // decrement lifetimes
+  steamrot::DecrementEventLifetimes(event_bus);
+  REQUIRE(event_bus[0].GetLifetime() == 2);
+  REQUIRE(event_bus[1].GetLifetime() == 0);
+  REQUIRE(event_bus[2].GetLifetime() == 1);
+}
+
+TEST_CASE("RemoveDeadEvents removes dead events", "[EventHandler]") {
+  // create a mock EventBus with events of varying lifetimes
+  steamrot::EventBus event_bus;
+  steamrot::EventPacket event1{3};
+  steamrot::EventPacket event2{0}; // dead event
+  steamrot::EventPacket event3{1};
+  // add events to the bus
+  AddEvent(event_bus, event1);
+  AddEvent(event_bus, event2);
+  AddEvent(event_bus, event3);
+  REQUIRE(event_bus.size() == 3);
+  // remove dead events
+  steamrot::RemoveDeadEvents(event_bus);
+  REQUIRE(event_bus.size() == 2);
+  REQUIRE(event_bus[0].GetLifetime() == 3);
+  REQUIRE(event_bus[1].GetLifetime() == 1);
+}
+
+TEST_CASE(
+    "EventHandler::AddToGlobalEventBus adds events to the global event bus",
+    "[EventHandler]") {
+  // Create an EventHandler instance
+  steamrot::EventHandler event_handler;
+  // Check that the global event bus is empty initially
+  auto global_event_bus = event_handler.GetGlobalEventBus();
+  REQUIRE(global_event_bus.empty());
+  // Create some EventPackets to add
+  steamrot::EventPacket event1{3};
+  steamrot::EventPacket event2{2};
+  std::vector<steamrot::EventPacket> events_to_add = {event1, event2};
+  // Add events to the global event bus
+  event_handler.AddToGlobalEventBus(events_to_add);
+  // Check that the events were added successfully
+  global_event_bus = event_handler.GetGlobalEventBus();
+  REQUIRE(global_event_bus.size() == 2);
+  REQUIRE(global_event_bus[0].GetLifetime() == 3);
+  REQUIRE(global_event_bus[1].GetLifetime() == 2);
+}
+
+TEST_CASE("EventHandler::TickGlobalEventBus updates the global event bus",
+          "[EventHandler]") {
+  // Create an EventHandler instance
+  steamrot::EventHandler event_handler;
+  // Create some EventPackets to add
+  steamrot::EventPacket event1{2};
+  steamrot::EventPacket event2{1};
+  std::vector<steamrot::EventPacket> events_to_add = {event1, event2};
+  // Add events to the global event bus
+  event_handler.AddToGlobalEventBus(events_to_add);
+  // Check that the events were added successfully
+  auto global_event_bus = event_handler.GetGlobalEventBus();
+  REQUIRE(global_event_bus.size() == 2);
+  REQUIRE(global_event_bus[0].GetLifetime() == 2);
+  REQUIRE(global_event_bus[1].GetLifetime() == 1);
+  // Tick the global event bus to update lifetimes and remove dead events
+  event_handler.TickGlobalEventBus();
+  global_event_bus = event_handler.GetGlobalEventBus();
+  REQUIRE(global_event_bus.size() == 1);
+  REQUIRE(global_event_bus[0].GetLifetime() == 1);
+  // Tick again, which should remove the last event
+  event_handler.TickGlobalEventBus();
+  global_event_bus = event_handler.GetGlobalEventBus();
+  REQUIRE(global_event_bus.empty());
+}
