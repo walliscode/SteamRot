@@ -117,7 +117,7 @@ public:
   /// @brief Return the user input register.
   /////////////////////////////////////////////////
   const std::unordered_map<UserInputBitset,
-                           std::vector<std::weak_ptr<Subscriber>>>
+                           std::vector<std::weak_ptr<Subscriber>>> &
   GetUserInputRegister() const;
 };
 } // namespace steamrot
