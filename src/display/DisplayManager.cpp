@@ -15,8 +15,7 @@ namespace steamrot {
 
 ///////////////////////////////////////////////////////////
 DisplayManager::DisplayManager(sf::RenderWindow &window)
-    : m_active_session(std::make_shared<Session>()), m_data_manager(),
-      m_window(window) {
+    : m_active_session(std::make_shared<Session>()), m_window(window) {
 
   // Initialize the RenderTexture for the UI layer wihth the same size as the
   // window
@@ -29,13 +28,6 @@ DisplayManager::DisplayManager(sf::RenderWindow &window)
   //             << std::endl;
   //   throw std::runtime_error("Failed to resize UI layer RenderTexture");
   // }
-
-  // Load in the desired theme data for the UI engine
-  const themes::UIObjects *theme_data =
-      m_data_manager.ProvideThemeData("default");
-  std::cout << "DisplayManager: Loaded theme data for UI engine" << std::endl;
-  // create the UI engine with the theme data
-  // m_ui_engine = UIRenderLogic(theme_data);
 };
 
 ///////////////////////////////////////////////////////////

@@ -21,14 +21,12 @@ namespace steamrot {
 ///////////////////////////////////////////////////////////
 GameEngine::GameEngine(EnvironmentType env_type)
     : m_window({sf::VideoMode(steamrot::kWindowSize), "SteamRot"}),
-      m_data_manager(), m_event_handler(), m_asset_manager(),
-      m_display_manager(m_window) {
+      m_event_handler(), m_asset_manager(), m_display_manager(m_window) {
 
   // create the GameContext object and pass by value so that it does not have to
   // stay alive
   GameContext game_context{m_window,      m_event_handler, m_mouse_position,
-                           m_loop_number, m_asset_manager, m_data_manager,
-                           env_type};
+                           m_loop_number, m_asset_manager, env_type};
 
   // initialise all objects that need the GameContext
   m_scene_manager = std::make_unique<SceneManager>(game_context);
