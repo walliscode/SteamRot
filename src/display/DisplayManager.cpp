@@ -8,7 +8,6 @@
 ////////////////////////////////////////////////////////////
 #include "DisplayManager.h"
 #include "Session.h"
-#include "TexturesPackage.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <iostream>
@@ -20,40 +19,7 @@ DisplayManager::DisplayManager(sf::RenderWindow &window)
     : m_active_session(std::make_shared<Session>()), m_window(window) {};
 
 ///////////////////////////////////////////////////////////
-void DisplayManager::Render(TexturesPackage &textures_package) {
-  // clear the window with the background color, this always be at the start
-  m_window.clear();
-
-  // get tiles from active session
-  if (!m_active_session) {
-    throw std::runtime_error("No active session set for DisplayManager");
-  }
-  auto tiles = m_active_session->GetTiles();
-
-  // get the tile overlay texture from the textures package
-  for (auto &tile : tiles) {
-
-    // // print tile scene ID for debugging
-    // std::cout << "Tile scene ID: " << tile->GetSceneId() << std::endl;
-    // check if held scene id is in the textures package
-    auto scene_texture =
-        textures_package.GetTextures().find(tile->GetSceneId());
-
-    // if yes, then draw the scene texture to that tile
-    if (scene_texture != textures_package.GetTextures().end()) {
-
-      // create sprite from tile texture, this is a reference wrapper so .get()
-      // method is necessary
-      sf::Sprite tile_sprite{scene_texture->second.get().getTexture()};
-
-      // draw the sprite to the window
-      m_window.draw(tile_sprite);
-    }
-  }
-
-  // display the contents of the window to the screen
-  m_window.display();
-};
+void DisplayManager::Render() {};
 
 void DisplayManager::LoadTitleSceneTiles(const uuids::uuid &title_scene_id) {
   std::cout << "DisplayManager: Loading title scene tiles with ID: "

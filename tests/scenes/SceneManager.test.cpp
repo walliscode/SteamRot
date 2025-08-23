@@ -104,3 +104,54 @@ TEST_CASE("SceneManager LoadCraftingScene returns monostate",
       steamrot::SceneType::SceneType_CRAFTING,
       test_context.GetGameContext().asset_manager);
 }
+
+TEST_CASE("SceneManager::ProvideTextures returns empty map for no scene IDs",
+          "[SceneManager]") {
+  steamrot::tests::TestContext test_context;
+  steamrot::SceneManager scene_manager{test_context.GetGameContext()};
+  // create an empty vector of scene IDs
+  std::vector<uuids::uuid> scene_ids;
+  // call ProvideTextures with the empty vector
+  auto textures_result = scene_manager.ProvideTextures(scene_ids);
+  if (!textures_result.has_value()) {
+    FAIL(textures_result.error().message);
+  }
+  // check that the returned map is empty
+  REQUIRE(textures_result->empty());
+}
+
+TEST_CASE("SceneManager::ProvideTextures returns FailInfo for invalid scene ID",
+          "[SceneManager]") {
+  steamrot::tests::TestContext test_context;
+  steamrot::SceneManager scene_manager{test_context.GetGameContext()};
+  // create a vector with an invalid scene ID
+  std::vector<uuids::uuid> scene_ids = {uuids::uuid{}};
+  // call ProvideTextures with the invalid scene ID
+  auto textures_result = scene_manager.ProvideTextures(scene_ids);
+  // check that the result is a failure
+  REQUIRE(!textures_result.has_value());
+  REQUIRE(textures_result.error().message ==
+          "Scene ID not found in SceneManager");
+}
+
+TEST_CASE("SceneManager::ProvideTextures returns textures for valid scene IDs",
+          "[SceneManager]") {
+  steamrot::tests::TestContext test_context;
+  steamrot::SceneManager scene_manager{test_context.GetGameContext()};
+  // Add a Title scene and a Crafting scene to the SceneManager
+  auto title_result = scene_manager.LoadTitleScene();
+  if (!title_result.has_value()) {
+    FAIL("Failed to add Title scene: " + title_result.error().message);
+  }
+  // create a vector with the valid scene IDs
+  std::vector<uuids::uuid> scene_ids = {title_result.value()};
+
+  // call ProvideTextures with the valid scene IDs
+  auto textures_result = scene_manager.ProvideTextures(scene_ids);
+  if (!textures_result.has_value()) {
+    FAIL("Failed to provide textures: " + textures_result.error().message);
+  }
+  // check that the returned map has the correct number of textures
+  REQUIRE(!textures_result->empty());
+  REQUIRE(textures_result->size() == scene_ids.size());
+}

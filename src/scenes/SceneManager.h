@@ -13,7 +13,7 @@
 /////////////////////////////////////////////////
 #include "GameContext.h"
 #include "Scene.h"
-#include "TexturesPackage.h"
+#include "TextureProvider.h"
 #include "uuid.h"
 #include <SFML/Graphics.hpp>
 #include <expected>
@@ -29,7 +29,7 @@ namespace steamrot {
 /// providing textures
 ///
 /////////////////////////////////////////////////
-class SceneManager {
+class SceneManager : public TextureProvider {
 private:
   /////////////////////////////////////////////////
   /// @brief Context from GameEngine, providing access to game-wide resources
@@ -82,12 +82,10 @@ public:
   std::expected<std::monostate, FailInfo>
   AddSceneFromDefault(const SceneType &scene_type);
 
-  /////////////////////////////////////////////////
-  /// @brief Provide a textures package by value to be passed along
-  ///
-  /// Currently not happy with this system, will improve it later.
-  /////////////////////////////////////////////////
-  TexturesPackage ProvideTexturesPackage();
+  std::expected<std::unordered_map<uuids::uuid,
+                                   std::reference_wrapper<sf::RenderTexture>>,
+                FailInfo>
+  ProvideTextures(std::vector<uuids::uuid> &scene_ids) override;
 };
 
 } // namespace steamrot

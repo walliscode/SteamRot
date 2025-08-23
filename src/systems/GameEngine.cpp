@@ -150,10 +150,6 @@ void GameEngine::UpdateSystems() {
 ////////////////////////////////////////////////////////////
 void GameEngine::PassRenderPackage() {
 
-  // textures package should only live for the duration of the render call so
-  // called by value
-  TexturesPackage textures_package = m_scene_manager->ProvideTexturesPackage();
-  m_display_manager.Render(textures_package);
 };
 
 ////////////////////////////////////////////////////////////
