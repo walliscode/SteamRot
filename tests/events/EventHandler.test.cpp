@@ -144,3 +144,91 @@ TEST_CASE("EventHandler::TickGlobalEventBus updates the global event bus",
   global_event_bus = event_handler.GetGlobalEventBus();
   REQUIRE(global_event_bus.empty());
 }
+
+TEST_CASE("UpdateSubscribers notifies subscribers of events",
+          "[EventHandler]") {
+
+  // create Subscriber variables
+  const steamrot::EventType event_type =
+      steamrot::EventType::EventType_EVENT_USER_INPUT;
+  const steamrot::UserInputBitset user_input_bitset{2};
+
+  // Create a Subscriber instance
+  std::shared_ptr<steamrot::Subscriber> subscriber =
+      std::make_shared<steamrot::Subscriber>(event_type, user_input_bitset);
+  // check that the subscriber is not active
+  REQUIRE(!subscriber->IsActive());
+
+  std::weak_ptr<steamrot::Subscriber> weak_subscriber = subscriber;
+  steamrot::UpdateSubscriber(weak_subscriber);
+
+  REQUIRE(subscriber->IsActive());
+}
+
+TEST_CASE("EventHandler::UpdateSubscribersFrom does not update Subscribers "
+          "when events do not match",
+          "[EventHandler]") {
+  // Create an EventHandler instance
+  steamrot::EventHandler event_handler;
+  // create Subscriber variables
+  const steamrot::EventType event_type =
+      steamrot::EventType::EventType_EVENT_USER_INPUT;
+  const steamrot::UserInputBitset user_input_bitset{2};
+  // Create a Subscriber instance
+  std::shared_ptr<steamrot::Subscriber> subscriber =
+      std::make_shared<steamrot::Subscriber>(event_type, user_input_bitset);
+  // check that the subscriber is not active
+  REQUIRE(!subscriber->IsActive());
+  auto result = event_handler.RegisterSubscriber(subscriber);
+  if (!result.has_value())
+    FAIL(result.error().message);
+
+  // Create some EventPackets to add that do not match the subscriber
+  steamrot::EventPacket event1{2};
+  event1.m_event_type = steamrot::EventType::EventType_EVENT_USER_INPUT;
+  event1.m_event_data = steamrot::UserInputBitset{3};
+  std::vector<steamrot::EventPacket> events_to_add = {event1};
+  // Add events to the global event bus
+  event_handler.AddToGlobalEventBus(events_to_add);
+  // Update subscribers from the global event bus
+  event_handler.UpateSubscribersFromGlobalEventBus();
+  // check that the subscriber is still not active
+  REQUIRE(!subscriber->IsActive());
+}
+TEST_CASE("EventHandler::UpdateSubscribersFromGlobalEventBus updates correct "
+          "subsribers",
+          "[EventHandler]") {
+  // Create an EventHandler instance
+  steamrot::EventHandler event_handler;
+  // create Subscriber variables
+  const steamrot::EventType event_type =
+      steamrot::EventType::EventType_EVENT_USER_INPUT;
+  const steamrot::UserInputBitset user_input_bitset{2};
+  // Create a couple of Subscriber instances
+  std::shared_ptr<steamrot::Subscriber> subscriber =
+      std::make_shared<steamrot::Subscriber>(event_type, user_input_bitset);
+  std::shared_ptr<steamrot::Subscriber> subscriber2 =
+      std::make_shared<steamrot::Subscriber>(event_type, user_input_bitset);
+  // check that the subscriber is not active
+  REQUIRE(!subscriber->IsActive());
+  REQUIRE(!subscriber2->IsActive());
+  auto result = event_handler.RegisterSubscriber(subscriber);
+  if (!result.has_value())
+    FAIL(result.error().message);
+  auto result2 = event_handler.RegisterSubscriber(subscriber2);
+  if (!result2.has_value())
+    FAIL(result2.error().message);
+  // Create some EventPackets to add
+  steamrot::EventPacket event1{2};
+  event1.m_event_type = event_type;
+  event1.m_event_data = user_input_bitset;
+
+  std::vector<steamrot::EventPacket> events_to_add = {event1};
+  // Add events to the global event bus
+  event_handler.AddToGlobalEventBus(events_to_add);
+  // Update subscribers from the global event bus
+  event_handler.UpateSubscribersFromGlobalEventBus();
+  // check that the subscriber is now active
+  REQUIRE(subscriber->IsActive());
+  REQUIRE(subscriber2->IsActive());
+}
