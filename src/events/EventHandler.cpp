@@ -165,6 +165,31 @@ const std::unordered_map<UserInputBitset,
 EventHandler::GetUserInputRegister() const {
   return m_user_input_register;
 }
+
+/////////////////////////////////////////////////
+void EventHandler::UpateSubscribersFromGlobalEventBus() {
+  // go through each event in the global event bus
+  for (const auto &event : m_global_event_bus) {
+    switch (event.m_event_type) {
+    case EventType::EventType_EVENT_USER_INPUT: {
+
+      // get the vector of subscribers interested in this event
+      auto subscriber_vec =
+          m_user_input_register[std::get<UserInputBitset>(event.m_event_data)];
+
+      // go through each subscriber and update them
+      for (auto &subscriber : subscriber_vec) {
+        UpdateSubscriber(subscriber);
+      }
+
+      break;
+    }
+    default:
+      // if the event type is not handled, do nothing
+      break;
+    }
+  }
+}
 /////////////////////////////////////////////////
 void AddEvent(EventBus &event_bus, const EventPacket &event) {
   event_bus.push_back(event);
@@ -191,5 +216,11 @@ void RemoveDeadEvents(EventBus &event_bus) {
                                    return event.event_lifetime == 0;
                                  }),
                   event_bus.end());
+}
+
+/////////////////////////////////////////////////
+void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber) {
+  // update any releveant information for the subscriber
+  auto activate_result = subscriber.lock()->SetActive();
 }
 } // namespace steamrot

@@ -75,6 +75,11 @@ public:
   void AddToGlobalEventBus(const std::vector<EventPacket> &events);
 
   /////////////////////////////////////////////////
+  /// @brief Update all subscribers based on the events in the global event bus.
+  /////////////////////////////////////////////////
+  void UpateSubscribersFromGlobalEventBus();
+
+  /////////////////////////////////////////////////
   /// @brief Wrapper function for handling lifetimes and removing dead events.
   /////////////////////////////////////////////////
   void TickGlobalEventBus();
@@ -126,4 +131,11 @@ void DecrementEventLifetimes(EventBus &event_bus);
 ///
 /////////////////////////////////////////////////
 void RemoveDeadEvents(EventBus &event_bus);
+
+/////////////////////////////////////////////////
+/// @brief Update releveant informtion for a subscriber object
+///
+/// @param subscriber Weak pointer to the subscriber to be updated.
+/////////////////////////////////////////////////
+void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber);
 } // namespace steamrot
