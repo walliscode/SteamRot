@@ -1,3 +1,8 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Implementation of DisplayManager class
+/////////////////////////////////////////////////
+
 ////////////////////////////////////////////////////////////
 // headers
 ////////////////////////////////////////////////////////////
@@ -8,30 +13,11 @@
 #include <SFML/System/Vector2.hpp>
 #include <iostream>
 
-////////////////////////////////////////////////////////////
-// namespaces/using
-////////////////////////////////////////////////////////////
 namespace steamrot {
 
 ///////////////////////////////////////////////////////////
 DisplayManager::DisplayManager(sf::RenderWindow &window)
-    : m_active_session(std::make_shared<Session>()), m_window(window) {
-
-  // Initialize the RenderTexture for the UI layer wihth the same size as the
-  // window
-  std::cout << "DisplayManager: Initializing UI layer RenderTexture"
-            << std::endl;
-  // bool resize_succesful = m_ui_layer.resize(m_window.getSize());
-  // // guard against resize failure
-  // if (!resize_succesful) {
-  //   std::cout << "DisplayManager: Failed to resize UI layer RenderTexture"
-  //             << std::endl;
-  //   throw std::runtime_error("Failed to resize UI layer RenderTexture");
-  // }
-};
-
-///////////////////////////////////////////////////////////
-sf::RenderWindow &DisplayManager::GetWindow() { return m_window; };
+    : m_active_session(std::make_shared<Session>()), m_window(window) {};
 
 ///////////////////////////////////////////////////////////
 void DisplayManager::Render(TexturesPackage &textures_package) {
@@ -65,15 +51,6 @@ void DisplayManager::Render(TexturesPackage &textures_package) {
     }
   }
 
-  // create sprite from tile overlay texture
-  sf::Sprite tile_overlay_sprite{m_tile_overlay.getTexture()};
-  m_window.draw(tile_overlay_sprite);
-
-  // draw the UI layer to the window
-  // m_ui_engine.DrawUILayer(m_ui_layer);
-  // sf::Sprite ui_layer_sprite{m_ui_layer.getTexture()};
-  // m_window.draw(ui_layer_sprite);
-
   // display the contents of the window to the screen
   m_window.display();
 };
@@ -89,8 +66,6 @@ void DisplayManager::LoadTitleSceneTiles(const uuids::uuid &title_scene_id) {
 
   // pass the title scene ID to the active tile in the active session
   m_active_session->GetActiveTile()->SetSceneId(title_scene_id);
-  // set the title scene active flag to true
-  m_title_scene_active = true;
 };
 
 void DisplayManager::LoadCraftingSceneTiles(
@@ -103,8 +78,6 @@ void DisplayManager::LoadCraftingSceneTiles(
   m_active_session = crafting_session;
   // pass the crafting scene ID to the active tile in the active session
   m_active_session->GetActiveTile()->SetSceneId(crafting_scene_id);
-  // set the title scene active flag to false
-  m_title_scene_active = false;
 };
 
 } // namespace steamrot
