@@ -20,11 +20,13 @@
       - [Configuring and testing the Component](#configuring-and-testing-the-component)
     - [UI Elements](#ui-elements)
       - [Adding New Element types](#adding-new-element-types)
+    - [Adding Logic](#adding-logic)
+      - [Logic classes](#logic-classes)
+      - [LogicFactory](#logicfactory)
     - [Actions](#actions)
       - [Action Generation](#action-generation)
       - [Action Registration](#action-registration)
   - [Classes](#classes)
-    - [DataManager](#datamanager)
     - [Logic Class](#logic-class)
     - [LogicFactory](#logicfactory)
   - [Style Guide](#style-guide) - [Formatting](#formatting) -
@@ -262,19 +264,6 @@ So the steps an operator would take to add an action are:
 ```
 
 ## Classes
-
-### DataManager
-
-The DataManager class will live in the GameEngine class. Its current
-responsibilities include:
-
-1. Passing data objects to the GameEngine class.
-2. Receiving data objects from the GameEngine class.
-3. Loading and saving data objects to and from files.
-4. Error checking the files/data objects at run time.
-
-It will also contain factory classes for providing methods for handling
-different types of data objects.
 
 ### Logic Class
 

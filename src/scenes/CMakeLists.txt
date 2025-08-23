@@ -24,7 +24,7 @@ display
 magic_enum
 entity
 config
-utilities
+
 logger
 stduuid
 context

@@ -7,12 +7,9 @@
 // headers
 ////////////////////////////////////////////////////////////
 
-#include "DataManager.h"
 #include "Session.h"
 #include "TexturesPackage.h"
-
 #include <SFML/Graphics.hpp>
-
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <memory>
 #include <nlohmann/json.hpp>
@@ -43,10 +40,6 @@ private:
    * tiling controls
    */
   bool m_title_scene_active{false};
-  ////////////////////////////////////////////////////////////
-  // Member: DataManager for loading and saving data
-  ////////////////////////////////////////////////////////////
-  DataManager m_data_manager;
 
   ////////////////////////////////////////////////////////////
   // Member: UIengine (for handling UI elements for tiles)

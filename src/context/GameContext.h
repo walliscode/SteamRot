@@ -5,7 +5,6 @@
 
 #pragma once
 #include "AssetManager.h"
-#include "DataManager.h"
 #include "EventHandler.h"
 #include "PathProvider.h"
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -17,8 +16,7 @@ struct GameContext {
 
   GameContext(sf::RenderWindow &window, EventHandler &event_handler,
               const sf::Vector2i &mouse_position, const size_t &loop_number,
-              AssetManager &asset_manager, DataManager &data_manager,
-              const EnvironmentType &env_type);
+              AssetManager &asset_manager, const EnvironmentType &env_type);
 
   /////////////////////////////////////////////////
   /// @brief Reference to the game window.
@@ -47,14 +45,6 @@ struct GameContext {
   /// should only be one instance of this.
   /////////////////////////////////////////////////
   AssetManager &asset_manager;
-
-  /////////////////////////////////////////////////
-  /// @brief Reference to the DataManager living on the GameEngine
-  ///
-  /// This is a lightweight object, but having it in the GameContext object
-  /// keeps things cleaner.
-  /////////////////////////////////////////////////
-  DataManager &data_manager;
 
   /////////////////////////////////////////////////
   /// @brief Desc

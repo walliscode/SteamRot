@@ -28,8 +28,9 @@ scenes
 display
 magic_enum
 entity
+events
 config
-utilities
+
 logger
 stduuid
 context

@@ -7,7 +7,7 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "AssetManager.h"
-#include "DataManager.h"
+
 #include "DisplayManager.h"
 #include "EventHandler.h"
 #include "EventPacket.h"
@@ -31,7 +31,6 @@ private:
   /////////////////////////////////////////////////
   DisplayManager m_display_manager;
 
-  DataManager m_data_manager;
   /////////////////////////////////////////////////
   /// @brief SceneManager object for managing scenes and scene contaienrs.
   /////////////////////////////////////////////////
