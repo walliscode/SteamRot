@@ -19,8 +19,4 @@ target_link_libraries(display PUBLIC
     systems
     stduuid
     logic
-    data
-
-
-
 )

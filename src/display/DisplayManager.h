@@ -13,9 +13,7 @@
 ////////////////////////////////////////////////////////////
 
 #include "Session.h"
-#include "TexturesPackage.h"
 #include <SFML/Graphics.hpp>
-#include <SFML/Graphics/RenderTexture.hpp>
 #include <memory>
 #include <nlohmann/json.hpp>
 
@@ -57,7 +55,7 @@ public:
   ////////////////////////////////////////////////////////////
   // |brief render/draw all textures to the window
   ////////////////////////////////////////////////////////////
-  void Render(TexturesPackage &textures_package);
+  void Render();
 
   /////////////////////////////////////////////////
   /// @brief Clears all tiles from the active session and display the title

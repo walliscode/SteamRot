@@ -2,6 +2,7 @@
 #include "FailInfo.h"
 #include "SceneFactory.h"
 #include "uuid.h"
+#include <SFML/Graphics/RenderTexture.hpp>
 #include <expected>
 #include <memory>
 #include <utility>
@@ -86,20 +87,27 @@ std::expected<uuids::uuid, FailInfo> SceneManager::LoadCraftingScene() {
 }
 
 /////////////////////////////////////////////////
-TexturesPackage SceneManager::ProvideTexturesPackage() {
-  // create textures package object
-  TexturesPackage textures_package;
+std::expected<
+    std::unordered_map<uuids::uuid, std::reference_wrapper<sf::RenderTexture>>,
+    FailInfo>
+SceneManager::ProvideTextures(std::vector<uuids::uuid> &scene_ids) {
 
-  // cycle through desired scenes
-  // TODO: pass along required IDs from display manager for picking Scenes
-  for (auto &pair : m_scenes) {
-    // get scene
-    auto &scene = pair.second;
-
-    // add created scene texture to texture map
-    textures_package.AddTexture(scene->GetSceneID(), scene->GetRenderTexture());
+  // create a map of textures to return
+  std::unordered_map<uuids::uuid, std::reference_wrapper<sf::RenderTexture>>
+      texture_map;
+  // loop through the scene IDs and get the textures from the scenes
+  for (const auto &scene_id : scene_ids) {
+    auto scene_it = m_scenes.find(scene_id);
+    if (scene_it != m_scenes.end()) {
+      texture_map.emplace(scene_id,
+                          std::ref(scene_it->second->GetRenderTexture()));
+    } else {
+      FailInfo fail_info(FailMode::NotAddedToMap,
+                         "Scene ID not found in SceneManager");
+      return std::unexpected(fail_info);
+    }
   }
-  return textures_package;
+  return texture_map;
 }
 
 /////////////////////////////////////////////////
