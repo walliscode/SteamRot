@@ -1,5 +1,6 @@
 #include "SceneManager.h"
 #include "FailInfo.h"
+#include "Scene.h"
 #include "SceneFactory.h"
 #include "uuid.h"
 #include <SFML/Graphics/RenderTexture.hpp>
@@ -7,6 +8,7 @@
 #include <memory>
 #include <utility>
 #include <variant>
+#include <vector>
 
 namespace steamrot {
 
@@ -28,7 +30,7 @@ SceneManager::AddSceneFromDefault(const SceneType &scene_type) {
   }
   // add to m_scenes maps
   auto adding_result =
-      m_scenes.emplace(scene_creation_result.value()->GetSceneID(),
+      m_scenes.emplace(scene_creation_result.value()->GetSceneInfo().id,
                        std::move(scene_creation_result.value()));
 
   if (!adding_result.second) {
@@ -108,6 +110,16 @@ SceneManager::ProvideTextures(std::vector<uuids::uuid> &scene_ids) {
     }
   }
   return texture_map;
+}
+
+/////////////////////////////////////////////////
+std::expected<std::vector<SceneInfo>, FailInfo>
+SceneManager::ProvideAvailableSceneInfo() {
+  std::vector<SceneInfo> scene_info_list;
+  for (const auto &pair : m_scenes) {
+    scene_info_list.push_back(pair.second->GetSceneInfo());
+  }
+  return scene_info_list;
 }
 
 /////////////////////////////////////////////////

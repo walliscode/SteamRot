@@ -155,3 +155,25 @@ TEST_CASE("SceneManager::ProvideTextures returns textures for valid scene IDs",
   REQUIRE(!textures_result->empty());
   REQUIRE(textures_result->size() == scene_ids.size());
 }
+
+TEST_CASE("SceneManager::ProvideAvaiableSceneInfo returns available SceneInfo",
+          "[SceneManager]") {
+  steamrot::tests::TestContext test_context;
+  steamrot::SceneManager scene_manager{test_context.GetGameContext()};
+  // add a Title scene
+  auto title_result = scene_manager.LoadTitleScene();
+  if (!title_result.has_value()) {
+    FAIL("Failed to add Title scene: " + title_result.error().message);
+  }
+  // call ProvideSceneInfo
+  auto scene_info_result = scene_manager.ProvideAvailableSceneInfo();
+  if (!scene_info_result.has_value()) {
+    FAIL("Failed to provide scene info: " + scene_info_result.error().message);
+  }
+  // check that the returned vector has the correct number of SceneInfo entries
+  REQUIRE(!scene_info_result->empty());
+  REQUIRE(scene_info_result->size() == 1);
+  REQUIRE(scene_info_result->at(0).type ==
+          steamrot::SceneType::SceneType_TITLE);
+  REQUIRE(scene_info_result->at(0).id == title_result.value());
+}

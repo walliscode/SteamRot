@@ -39,7 +39,7 @@ TEST_CASE("SceneFactory can create a TitleScene from default",
   // check that the created scene is a TitleScene
   auto title_scene = std::move(scene_creation_result.value());
   REQUIRE(title_scene != nullptr);
-  REQUIRE(title_scene->GetSceneType() == scene_type);
+  REQUIRE(title_scene->GetSceneInfo().type == scene_type);
   REQUIRE(dynamic_cast<steamrot::TitleScene *>(title_scene.get()));
 
   // check that the TitleScene entities are initialized correctly
@@ -62,7 +62,7 @@ TEST_CASE("SceneFactory can create a CraftingScene from default",
   // check that the created scene is a CraftingScene
   auto crafting_scene = std::move(scene_creation_result.value());
   REQUIRE(crafting_scene != nullptr);
-  REQUIRE(crafting_scene->GetSceneType() ==
+  REQUIRE(crafting_scene->GetSceneInfo().type ==
           steamrot::SceneType::SceneType_CRAFTING);
   REQUIRE(dynamic_cast<steamrot::CraftingScene *>(crafting_scene.get()));
 
