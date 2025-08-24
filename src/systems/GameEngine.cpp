@@ -4,14 +4,14 @@
 
 #include "GameEngine.h"
 #include "EventHandler.h"
-#include "log_handler.h"
+#include "GameContext.h"
 #include <SFML/Graphics.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <cstddef>
 
 #include <iostream>
 #include <magic_enum/magic_enum.hpp>
 #include <magic_enum/magic_enum_iostream.hpp>
-#include <memory>
 #include <stdexcept>
 
 using namespace magic_enum::bitwise_operators;
@@ -20,21 +20,13 @@ namespace steamrot {
 
 ///////////////////////////////////////////////////////////
 GameEngine::GameEngine(EnvironmentType env_type)
-    : m_window({sf::VideoMode(steamrot::kWindowSize), "SteamRot"}),
-      m_event_handler(), m_asset_manager(), m_display_manager(m_window) {
+    : m_window({sf::VideoMode({800, 600}), "SteamRot"}), m_event_handler(),
+      m_asset_manager() {
 
   // create the GameContext object and pass by value so that it does not have to
   // stay alive
   GameContext game_context{m_window,      m_event_handler, m_mouse_position,
                            m_loop_number, m_asset_manager, env_type};
-
-  // initialise all objects that need the GameContext
-  m_scene_manager = std::make_unique<SceneManager>(game_context);
-
-  std::cout << "GameEngine constructor called" << std::endl;
-  log_handler::ProcessLog(spdlog::level::level_enum::info,
-                          log_handler::LogCode::kNoCode,
-                          "GameEngine constructor called");
 }
 
 ////////////////////////////////////////////////////////////
@@ -141,11 +133,7 @@ void GameEngine::ProcessGameEngineEvents(const EventPacket &event,
 }
 
 ////////////////////////////////////////////////////////////
-void GameEngine::UpdateSystems() {
-
-  // call the update function of the scene manager
-  m_scene_manager->UpdateScenes();
-}
+void GameEngine::UpdateSystems() {}
 
 ////////////////////////////////////////////////////////////
 void GameEngine::PassRenderPackage() {
@@ -169,29 +157,9 @@ void GameEngine::RunSimulation(int loops) {
 }
 
 ////////////////////////////////////////////////////////////
-void GameEngine::ShowTitleScene() {
-
-  // Load the title scene in the scene manager and get unique id
-  auto load_result = m_scene_manager->LoadTitleScene();
-
-  // pass the id to the display manager
-  m_display_manager.LoadTitleSceneTiles(load_result.value());
-}
+void GameEngine::ShowTitleScene() {}
 /////////////////////////////////////////////////
-void GameEngine::ShowCraftingScene() {
-
-  // Load the crafting scene in the scene manager and get unique id
-  auto crafting_scene_load_result = m_scene_manager->LoadCraftingScene();
-  if (!crafting_scene_load_result.has_value()) {
-    std::cerr << "Failed to load crafting scene: "
-              << crafting_scene_load_result.error().message << std::endl;
-    return;
-  }
-
-  // pass the id to the display manager
-  m_display_manager.LoadCraftingSceneTiles(crafting_scene_load_result.value());
-  std::cout << "Crafting scene tiles loaded" << std::endl;
-}
+void GameEngine::ShowCraftingScene() {}
 
 ////////////////////////////////////////////////////////////
 void GameEngine::ShutDown() {}
