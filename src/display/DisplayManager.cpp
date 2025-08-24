@@ -25,12 +25,37 @@ std::expected<std::monostate, FailInfo> DisplayManager::CallRenderCycle() {
   m_window.clear(sf::Color::Black);
 
   // ADD CODE BETWEEN HERE
-  // add container/wrapper functions for drawing here
-
+  DrawTextures();
   // AND HERE
+
   // display the window
   m_window.display();
 
   return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+void DisplayManager::DrawTextures() {
+  // get all available scene info
+  auto scene_info_result =
+      m_scene_manager_interface.ProvideAvailableSceneInfo();
+
+  // generate a vector of scene ids
+  std::vector<uuids::uuid> scene_ids;
+  if (scene_info_result) {
+    for (const auto &scene_info : scene_info_result.value()) {
+      scene_ids.push_back(scene_info.id);
+    }
+  }
+
+  // get textures for the scenes
+  auto textures_result = m_scene_manager_interface.ProvideTextures(scene_ids);
+
+  // draw each scene's texture to the window
+  for (const auto &texture_pair : textures_result.value()) {
+    const auto &render_texture = texture_pair.second.get();
+    sf::Sprite sprite(render_texture.getTexture());
+    m_window.draw(sprite);
+  }
 }
 } // namespace steamrot

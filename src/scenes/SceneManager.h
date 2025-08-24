@@ -87,16 +87,16 @@ public:
   ///
   /// @param scene_ids A vector of scene IDs to fetch textures for
   /////////////////////////////////////////////////
-  std::expected<std::unordered_map<uuids::uuid,
-                                   std::reference_wrapper<sf::RenderTexture>>,
-                FailInfo>
-  ProvideTextures(std::vector<uuids::uuid> &scene_ids) override;
+  const std::expected<std::unordered_map<uuids::uuid, std::reference_wrapper<
+                                                          sf::RenderTexture>>,
+                      FailInfo>
+  ProvideTextures(std::vector<uuids::uuid> &scene_ids) const override;
 
   /////////////////////////////////////////////////
   /// @brief Provides information about all available scenes.
   /////////////////////////////////////////////////
-  std::expected<std::vector<SceneInfo>, FailInfo>
-  ProvideAvailableSceneInfo() override;
+  const std::expected<std::vector<SceneInfo>, FailInfo>
+  ProvideAvailableSceneInfo() const override;
 };
 
 } // namespace steamrot

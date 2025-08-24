@@ -89,10 +89,10 @@ std::expected<uuids::uuid, FailInfo> SceneManager::LoadCraftingScene() {
 }
 
 /////////////////////////////////////////////////
-std::expected<
+const std::expected<
     std::unordered_map<uuids::uuid, std::reference_wrapper<sf::RenderTexture>>,
     FailInfo>
-SceneManager::ProvideTextures(std::vector<uuids::uuid> &scene_ids) {
+SceneManager::ProvideTextures(std::vector<uuids::uuid> &scene_ids) const {
 
   // create a map of textures to return
   std::unordered_map<uuids::uuid, std::reference_wrapper<sf::RenderTexture>>
@@ -113,8 +113,8 @@ SceneManager::ProvideTextures(std::vector<uuids::uuid> &scene_ids) {
 }
 
 /////////////////////////////////////////////////
-std::expected<std::vector<SceneInfo>, FailInfo>
-SceneManager::ProvideAvailableSceneInfo() {
+const std::expected<std::vector<SceneInfo>, FailInfo>
+SceneManager::ProvideAvailableSceneInfo() const {
   std::vector<SceneInfo> scene_info_list;
   for (const auto &pair : m_scenes) {
     scene_info_list.push_back(pair.second->GetSceneInfo());
