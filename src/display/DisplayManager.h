@@ -12,9 +12,11 @@
 // headers
 ////////////////////////////////////////////////////////////
 
+#include "FailInfo.h"
 #include "SceneInfoProvider.h"
 #include "Session.h"
 #include <SFML/Graphics.hpp>
+#include <expected>
 #include <memory>
 
 namespace steamrot {
@@ -57,5 +59,10 @@ public:
   /////////////////////////////////////////////////
   DisplayManager(sf::RenderWindow &window,
                  const SceneInfoProvider &scene_manager_interface);
+
+  /////////////////////////////////////////////////
+  /// @brief Calls clear, draw, and display on the RenderWindow
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> CallRenderCycle();
 };
 } // namespace steamrot
