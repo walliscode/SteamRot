@@ -1,0 +1,25 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Unit tests for DisplayManager class
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include "DisplayManager.h"
+#include "SceneManager.h"
+#include "TestContext.h"
+#include <catch2/catch_test_macros.hpp>
+
+TEST_CASE("DisplayManager Initializes with SceneManager", "[DisplayManager]") {
+
+  steamrot::tests::TestContext test_context;
+  steamrot::GameContext game_context =
+      test_context
+          .GetGameContext(); // Get the game context from the test context
+  steamrot::SceneManager scene_manager{test_context.GetGameContext()};
+  steamrot::DisplayManager display_manager{game_context.game_window,
+                                           scene_manager};
+
+  SUCCEED("DisplayManager initialized successfully");
+}

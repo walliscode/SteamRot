@@ -7,14 +7,9 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "AssetManager.h"
-
-#include "DisplayManager.h"
 #include "EventHandler.h"
 #include "EventPacket.h"
-#include "SceneManager.h"
 #include <SFML/Graphics.hpp>
-#include <memory>
-#include <nlohmann/json.hpp>
 #include <unordered_set>
 
 namespace steamrot {
@@ -26,16 +21,6 @@ namespace steamrot {
 /////////////////////////////////////////////////
 class GameEngine {
 private:
-  /////////////////////////////////////////////////
-  /// @brief DisplayManager object for all rendering and view management.
-  /////////////////////////////////////////////////
-  DisplayManager m_display_manager;
-
-  /////////////////////////////////////////////////
-  /// @brief SceneManager object for managing scenes and scene contaienrs.
-  /////////////////////////////////////////////////
-  std::unique_ptr<SceneManager> m_scene_manager;
-
   /////////////////////////////////////////////////
   /// @brief EventHandler object to handle user input and events.
   /////////////////////////////////////////////////

@@ -12,10 +12,10 @@
 // headers
 ////////////////////////////////////////////////////////////
 
+#include "SceneInfoProvider.h"
 #include "Session.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
-#include <nlohmann/json.hpp>
 
 namespace steamrot {
 
@@ -30,6 +30,11 @@ private:
   /// @brief Reference to the RenderWindow for the Game
   /////////////////////////////////////////////////
   sf::RenderWindow &m_window;
+
+  /////////////////////////////////////////////////
+  /// @brief Reference to the SceneInfoProvider for scene data
+  /////////////////////////////////////////////////
+  const SceneInfoProvider &m_scene_manager_interface;
 
   /////////////////////////////////////////////////
   /// @brief Potential Sessions to choose from
@@ -50,27 +55,7 @@ public:
   ///
   /// @param window RenderWindow reference
   /////////////////////////////////////////////////
-  DisplayManager(sf::RenderWindow &window);
-
-  ////////////////////////////////////////////////////////////
-  // |brief render/draw all textures to the window
-  ////////////////////////////////////////////////////////////
-  void Render();
-
-  /////////////////////////////////////////////////
-  /// @brief Clears all tiles from the active session and display the title
-  /// scene
-  ///
-  /// @param title_scene_id UUID of the title scene to load
-  /////////////////////////////////////////////////
-  void LoadTitleSceneTiles(const uuids::uuid &title_scene_id);
-
-  /////////////////////////////////////////////////
-  /// @brief Clears all tiles from the active session and display the crafting
-  /// scene
-  ///
-  /// @param crafting_scene_id UUID of the crafting scene to load
-  /////////////////////////////////////////////////
-  void LoadCraftingSceneTiles(const uuids::uuid &crafting_scene_id);
+  DisplayManager(sf::RenderWindow &window,
+                 const SceneInfoProvider &scene_manager_interface);
 };
 } // namespace steamrot

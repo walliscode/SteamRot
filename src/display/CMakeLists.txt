@@ -14,7 +14,7 @@ target_include_directories(display
 )
 target_link_libraries(display PUBLIC
     SFML::Graphics
-    nlohmann_json::nlohmann_json
+    scenes
     magic_enum
     systems
     stduuid
