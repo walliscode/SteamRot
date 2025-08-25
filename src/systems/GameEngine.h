@@ -27,7 +27,7 @@ private:
   /// 60FPS so on a 32 bit system this will last 2.27 years. and on a 64 bit
   /// system this will last 9.75 trillion years. Probably long enough.
   /////////////////////////////////////////////////
-  size_t m_loop_number = 0;
+  size_t m_loop_number = 1;
 
   /////////////////////////////////////////////////
   /// @brief Member: RenderWindow for the game engine
@@ -69,7 +69,7 @@ private:
   /////////////////////////////////////////////////
   /// @brief Run the game loop until exit condition is met
   /////////////////////////////////////////////////
-  void RunGameLoop();
+  void RunGameLoop(size_t number_of_loops = 0, bool simulation = false);
 
   ////////////////////////////////////////////////////////////
   /// \brief Shutdown the game engine
@@ -82,28 +82,24 @@ private:
   void UpdateLocalMousePosition();
 
 public:
-  ////////////////////////////////////////////////////////////
-  /// \brief Default constructor
+  /////////////////////////////////////////////////
+  /// @brief Constructor for the GameEngine class
   ///
-  ////////////////////////////////////////////////////////////
+  /// @param env_type Environment type with which to initialize the engine
+  /////////////////////////////////////////////////
   GameEngine(const EnvironmentType env_type = EnvironmentType::Production);
 
-  ////////////////////////////////////////////////////////////
-  /// \brief Start up and Run the game engine
-  ///
-  ////////////////////////////////////////////////////////////
-  void RunGame(size_t numLoops = 0, bool use_test_window = false);
+  /////////////////////////////////////////////////
+  /// @brief Runs the game loop, either indefinitely or for a set number of
+  /// loops
+  /////////////////////////////////////////////////
+  void RunGame(size_t number_of_loops = 0, bool simulation = false);
 
   ////////////////////////////////////////////////////////////
   /// \brief Get the current loop number
   ///
   ////////////////////////////////////////////////////////////
-  size_t getLoopNumber();
-
-  /////////////////////////////////////////////////
-  /// @brief Getter function for the GameEngine's RenderWindow
-  /////////////////////////////////////////////////
-  sf::RenderWindow &GetWindow();
+  size_t GetLoopNumber() const;
 };
 
 } // namespace steamrot
