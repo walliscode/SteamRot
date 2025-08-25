@@ -10,6 +10,7 @@
 #include "CraftingRenderLogic.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
+#include "UIRenderLogic.h"
 #include "logic_helpers.h"
 #include "scene_types_generated.h"
 #include <catch2/catch_test_macros.hpp>
@@ -63,7 +64,7 @@ TEST_CASE("LogicFactory creates the correct Logic instances with a test Scene",
   steamrot::LogicVector &render_logics =
       logic_collection.at(steamrot::LogicType::Render);
   REQUIRE(render_logics.size() == 1);
-  REQUIRE(dynamic_cast<steamrot::UIActionLogic *>(render_logics[0].get()));
+  REQUIRE(dynamic_cast<steamrot::UIRenderLogic *>(render_logics[0].get()));
 }
 
 TEST_CASE("LogicFactory creates correct Logic instances for TitleScene",

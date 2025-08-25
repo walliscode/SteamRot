@@ -22,8 +22,8 @@ GameEngine::GameEngine(EnvironmentType env_type)
 ////////////////////////////////////////////////////////////
 void GameEngine::RunGame(size_t number_of_loops, bool simulation) {
 
-  // // set up resources for the game engine
-  // StartUp();
+  // set up resources for the game engine
+  StartUp();
   //
   // Start the game loop
   RunGameLoop(number_of_loops, simulation);
@@ -33,7 +33,19 @@ void GameEngine::RunGame(size_t number_of_loops, bool simulation) {
 };
 
 /////////////////////////////////////////////////
-void GameEngine::StartUp() {}
+void GameEngine::StartUp() {
+  // limit window framerate
+  m_window.setFramerateLimit(60);
+
+  // load the title scene
+  auto load_scene_result = m_scene_manager.LoadTitleScene();
+  if (!load_scene_result)
+    if (!load_scene_result) {
+      std::cerr << "Failed to load title scene: "
+                << load_scene_result.error().message << "\n";
+      m_window.close();
+    }
+}
 
 void GameEngine::RunGameLoop(size_t number_of_loops, bool simulation) {
 
@@ -41,7 +53,7 @@ void GameEngine::RunGameLoop(size_t number_of_loops, bool simulation) {
   while (m_window.isOpen()) {
 
     // Handle all system updates
-    // UpdateSystems();
+    UpdateSystems();
 
     // statement to handle simulation mode
     if (simulation && (number_of_loops == m_loop_number))
@@ -53,7 +65,13 @@ void GameEngine::RunGameLoop(size_t number_of_loops, bool simulation) {
 }
 
 ////////////////////////////////////////////////////////////
-void GameEngine::UpdateSystems() {}
+void GameEngine::UpdateSystems() {
+  // Update Scenes
+  m_scene_manager.UpdateScenes();
+
+  // Call Render Cycle
+  auto call_render_cycle_result = m_display_manager.CallRenderCycle();
+}
 
 ////////////////////////////////////////////////////////////
 size_t GameEngine::GetLoopNumber() const { return m_loop_number; }

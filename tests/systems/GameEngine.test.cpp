@@ -30,3 +30,10 @@ TEST_CASE("GameEngine runs for a set number of frames", "[GameEngine]") {
   REQUIRE(game_engine.GetLoopNumber() == frame_count);
   SUCCEED("GameEngine ran for the specified number of frames");
 }
+
+TEST_CASE("GameEngine starts and stops correctly", "[GameEngine]") {
+  // Create a GameEngine instance
+  steamrot::GameEngine game_engine(steamrot::EnvironmentType::Test);
+  // Start the game engine
+  game_engine.RunGame(60, true);
+}
