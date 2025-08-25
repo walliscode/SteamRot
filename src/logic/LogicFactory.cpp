@@ -8,9 +8,9 @@
 /////////////////////////////////////////////////
 #include "LogicFactory.h"
 #include "CraftingRenderLogic.h"
-#include "FlatbuffersConfigurator.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
+#include "UIRenderLogic.h"
 #include <expected>
 
 namespace steamrot {
@@ -56,18 +56,18 @@ std::expected<LogicVector, FailInfo> LogicFactory::CreateRenderLogics() {
 
   switch (m_scene_type) {
   case SceneType::SceneType_TITLE: {
-    render_logics.push_back(std::make_unique<UIActionLogic>(m_logic_context));
+    render_logics.push_back(std::make_unique<UIRenderLogic>(m_logic_context));
     break;
   }
   case SceneType::SceneType_CRAFTING: {
     render_logics.push_back(
         std::make_unique<CraftingRenderLogic>(m_logic_context));
-    render_logics.push_back(std::make_unique<UIActionLogic>(m_logic_context));
+    render_logics.push_back(std::make_unique<UIRenderLogic>(m_logic_context));
     break;
   }
   case SceneType::SceneType_TEST: {
     // add render logics for test purposes
-    render_logics.push_back(std::make_unique<UIActionLogic>(m_logic_context));
+    render_logics.push_back(std::make_unique<UIRenderLogic>(m_logic_context));
     break;
   }
   default:
