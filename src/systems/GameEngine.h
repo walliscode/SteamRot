@@ -8,21 +8,18 @@
 ////////////////////////////////////////////////////////////
 #include "AssetManager.h"
 #include "EventHandler.h"
-#include "EventPacket.h"
 #include <SFML/Graphics.hpp>
-#include <unordered_set>
 
 namespace steamrot {
 /////////////////////////////////////////////////
 /// @class GameEngine
 /// @brief Methods for managing the game loop, user input and object
 /// communication.
-
 /////////////////////////////////////////////////
 class GameEngine {
 private:
   /////////////////////////////////////////////////
-  /// @brief EventHandler object to handle user input and events.
+  /// @brief EventHandler object to manage the EventBus/ event system.
   /////////////////////////////////////////////////
   EventHandler m_event_handler;
 
@@ -31,12 +28,13 @@ private:
   /// textures.
   /////////////////////////////////////////////////
   AssetManager m_asset_manager;
+
   /////////////////////////////////////////////////
   /// @brief Variable to keep track of the current loop number.
   ///
   /// Increments by 1 at the start of each loop, the game will be maxed out at
   /// 60FPS so on a 32 bit system this will last 2.27 years. and on a 64 bit
-  /// system this will last 9.75 trillion years.
+  /// system this will last 9.75 trillion years. Probably long enough.
   /////////////////////////////////////////////////
   size_t m_loop_number = 0;
 
@@ -46,32 +44,9 @@ private:
   sf::RenderWindow m_window;
 
   /////////////////////////////////////////////////
-  /// @brief Lookup table for game engine events
+  /// @brief Wrapper function to update any relevant systems
   /////////////////////////////////////////////////
-  std::unordered_set<EventType> m_game_engine_events;
-
-  /////////////////////////////////////////////////
-  /// @brief Get EventBus from EventHandler and check to see if there are any
-  /// relevant events
-  /////////////////////////////////////////////////
-  void RetrieveEvents();
-
-  /////////////////////////////////////////////////
-  /// @brief Process events specific to the game engine
-  /////////////////////////////////////////////////
-  void ProcessGameEngineEvents(const EventPacket &event, EventBus &holding_bus);
-
-  ////////////////////////////////////////////////////////////
-  /// \brief Update all Systems
-  ///
-  ////////////////////////////////////////////////////////////
   void UpdateSystems();
-
-  ////////////////////////////////////////////////////////////
-  /// \brief Render Game Drwables
-  ///
-  ////////////////////////////////////////////////////////////
-  void PassRenderPackage();
 
   /////////////////////////////////////////////////
   /// @brief Start up the game engine and load any resources
@@ -88,21 +63,6 @@ private:
   ///
   ////////////////////////////////////////////////////////////
   void ShutDown();
-
-  /////////////////////////////////////////////////
-  /// @brief Container function, calling on SceneManager and DisplayManager for
-  /// Title Scene loading
-  /////////////////////////////////////////////////
-  void ShowTitleScene();
-
-  /////////////////////////////////////////////////
-  /// @brief Container function, calling on SceneManager and DisplayManager for
-  /// Crafting Scene loading
-  ///
-  /// This approach will eventually be replaced as we develop the display
-  /// manager, but for now this allows us to quickly test the crafting scene.
-  /////////////////////////////////////////////////
-  void ShowCraftingScene();
 
   sf::Vector2i m_mouse_position;
 
@@ -126,12 +86,6 @@ public:
   ///
   ////////////////////////////////////////////////////////////
   size_t getLoopNumber();
-
-  ////////////////////////////////////////////////////////////
-  /// \brief Run the simulation (the while loop for a given number)
-  ///
-  ////////////////////////////////////////////////////////////
-  void RunSimulation(int loops);
 
   /////////////////////////////////////////////////
   /// @brief Getter function for the GameEngine's RenderWindow
