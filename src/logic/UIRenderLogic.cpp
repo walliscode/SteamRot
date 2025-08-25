@@ -21,21 +21,10 @@ namespace steamrot {
 /////////////////////////////////////////////////////////////
 UIRenderLogic::UIRenderLogic(const LogicContext logic_context)
     : Logic(logic_context) {
-  // Initialize the UI engine with the provided flatbuffer configuration
-  // This could include setting up styles, themes, and other UI elements
-  if (!logic_context.ui_config) {
-    log_handler::ProcessLog(spdlog::level::level_enum::err,
-                            log_handler::LogCode::kNoCode,
-                            "UIEngine: Null UI configuration provided, cannot "
-                            "initialize UI styles");
-    return;
-  }
-  AddStyles(logic_context.ui_config);
+
+  // AddStyles(logic_context.ui_config);
 }
 void UIRenderLogic::ProcessLogic() {
-
-  // clear the render texture before drawing
-  m_logic_context.scene_texture.clear();
 
   // Draw all UI elements to the render texture
   DrawUIElements();

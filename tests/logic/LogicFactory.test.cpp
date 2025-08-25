@@ -104,7 +104,7 @@ TEST_CASE("LogicFactory creates correct Logic instances for TitleScene",
   steamrot::LogicVector &render_logics =
       logic_collection.at(steamrot::LogicType::Render);
   REQUIRE(render_logics.size() == 1);
-  REQUIRE(dynamic_cast<steamrot::UIActionLogic *>(render_logics[0].get()));
+  REQUIRE(dynamic_cast<steamrot::UIRenderLogic *>(render_logics[0].get()));
 }
 
 TEST_CASE("LogicFactory creates correct Logic instances for CraftingScene",
@@ -146,5 +146,5 @@ TEST_CASE("LogicFactory creates correct Logic instances for CraftingScene",
   REQUIRE(render_logics.size() == 2);
   REQUIRE(
       dynamic_cast<steamrot::CraftingRenderLogic *>(render_logics[0].get()));
-  REQUIRE(dynamic_cast<steamrot::UIActionLogic *>(render_logics[1].get()));
+  REQUIRE(dynamic_cast<steamrot::UIRenderLogic *>(render_logics[1].get()));
 }
