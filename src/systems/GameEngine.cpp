@@ -6,6 +6,7 @@
 #include <SFML/Graphics.hpp>
 
 #include <cstddef>
+#include <iostream>
 
 namespace steamrot {
 
@@ -19,46 +20,35 @@ GameEngine::GameEngine(EnvironmentType env_type)
       m_display_manager(m_window, m_scene_manager) {}
 
 ////////////////////////////////////////////////////////////
-void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
+void GameEngine::RunGame(size_t number_of_loops, bool simulation) {
 
-  // set up resources for the game engine
-  StartUp();
-
+  // // set up resources for the game engine
+  // StartUp();
+  //
   // Start the game loop
-  RunGameLoop();
-
-  // Shut down the game engine
-  ShutDown();
+  RunGameLoop(number_of_loops, simulation);
+  //
+  // // Shut down the game engine
+  // ShutDown();
 };
 
 /////////////////////////////////////////////////
 void GameEngine::StartUp() {}
 
-void GameEngine::RunGameLoop() {
+void GameEngine::RunGameLoop(size_t number_of_loops, bool simulation) {
 
   // Run the program as long as the window is open
   while (m_window.isOpen()) {
 
-    // handle loop number increase at beginning of loop
-    m_loop_number++;
-
-    // Handle and events from external sources, such as the window
-    // m_event_handler.PreloadEvents(m_window);
-
     // Handle all system updates
-    UpdateSystems();
+    // UpdateSystems();
 
-    // statement to test whether to break the loop, must be called at end
-    // if (numLoops > 0 && m_loop_number >= numLoops) {
-    //   // export data to json, first variable is the directory name, second
-    //   is
-    //   // the file name
-    //   ExportSimulationData("test");
-    //   break;
-    // };
+    // statement to handle simulation mode
+    if (simulation && (number_of_loops == m_loop_number))
+      break;
 
-    // update EventBus lifetimes
-    // m_event_handler.TickGlobalEventBus();
+    std::cout << "Loop number: " << m_loop_number << "\n";
+    m_loop_number++;
   }
 }
 
@@ -66,10 +56,7 @@ void GameEngine::RunGameLoop() {
 void GameEngine::UpdateSystems() {}
 
 ////////////////////////////////////////////////////////////
-size_t GameEngine::getLoopNumber() { return m_loop_number; }
-
-/////////////////////////////////////////////////
-sf::RenderWindow &GameEngine::GetWindow() { return m_window; }
+size_t GameEngine::GetLoopNumber() const { return m_loop_number; }
 
 ////////////////////////////////////////////////////////////
 void GameEngine::ShutDown() {}
