@@ -3,24 +3,20 @@
 ////////////////////////////////////////////////////////////
 
 #include "GameEngine.h"
-#include "EventHandler.h"
-#include "GameContext.h"
 #include <SFML/Graphics.hpp>
-#include <SFML/System/Vector2.hpp>
+
 #include <cstddef>
 
 namespace steamrot {
 
 ///////////////////////////////////////////////////////////
-GameEngine::GameEngine(EnvironmentType env_type)
-    : m_window({sf::VideoMode({800, 600}), "SteamRot"}), m_event_handler(),
-      m_asset_manager() {
 
-  // create the GameContext object and pass by value so that it does not have to
-  // stay alive
-  GameContext game_context{m_window,      m_event_handler, m_mouse_position,
-                           m_loop_number, m_asset_manager, env_type};
-}
+GameEngine::GameEngine(EnvironmentType env_type)
+    : m_asset_manager(env_type),
+      m_window({sf::VideoMode({800, 600}), "SteamRot"}),
+      m_scene_manager(GameContext{m_window, m_event_handler, m_mouse_position,
+                                  m_loop_number, m_asset_manager, env_type}),
+      m_display_manager(m_window, m_scene_manager) {}
 
 ////////////////////////////////////////////////////////////
 void GameEngine::RunGame(size_t numLoops, bool use_test_window) {
@@ -47,7 +43,7 @@ void GameEngine::RunGameLoop() {
     m_loop_number++;
 
     // Handle and events from external sources, such as the window
-    m_event_handler.PreloadEvents(m_window);
+    // m_event_handler.PreloadEvents(m_window);
 
     // Handle all system updates
     UpdateSystems();
@@ -62,7 +58,7 @@ void GameEngine::RunGameLoop() {
     // };
 
     // update EventBus lifetimes
-    m_event_handler.TickGlobalEventBus();
+    // m_event_handler.TickGlobalEventBus();
   }
 }
 
