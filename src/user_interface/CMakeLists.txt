@@ -8,9 +8,6 @@ target_include_directories(user_interface
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-
-
-
 target_link_libraries(user_interface
   PUBLIC
   SFML::Graphics
@@ -20,3 +17,14 @@ target_link_libraries(user_interface
   events
 )
 
+add_library(ui_styles INTERFACE)
+
+target_include_directories(ui_styles
+  INTERFACE
+  ${CMAKE_CURRENT_SOURCE_DIR}/styles
+)
+
+target_link_libraries(ui_styles
+  INTERFACE
+  SFML::Graphics
+)

@@ -13,135 +13,22 @@
 // headers
 ////////////////////////////////////////////////////////////
 #include "Logic.h"
+#include "styles/ButtonStyle.h"
+#include "styles/DropDownButtonStyle.h"
+#include "styles/DropDownContainerStyle.h"
+#include "styles/DropDownItemStyle.h"
+#include "styles/DropDownListStyle.h"
+#include "styles/PanelStyle.h"
+
 #include "themes_generated.h"
 #include "user_interface_generated.h"
 #include <SFML/Graphics.hpp>
-#include <SFML/Graphics/Color.hpp>
-#include <SFML/Graphics/RenderTexture.hpp>
-#include <SFML/System/Vector2.hpp>
-#include <cstddef>
 
 namespace steamrot {
 
 using SpacingStrategy =
     std::function<void(UIElement &ui_element, sf::Vector2f &inner_margin,
                        float &parent_border_thickness)>;
-struct Style {
-  /////////////////////////////////////////////////
-  /// @brief Fill color of the background
-  /////////////////////////////////////////////////
-  sf::Color background_color;
-
-  /////////////////////////////////////////////////
-  /// @brief Fill color of the border
-  /////////////////////////////////////////////////
-  sf::Color border_color;
-
-  /////////////////////////////////////////////////
-  /// @brief How thick the the element border is
-  /////////////////////////////////////////////////
-  float border_thickness;
-
-  /////////////////////////////////////////////////
-  /// @brief How many points a corner radius is drawn with
-  /////////////////////////////////////////////////
-  size_t radius_resolution;
-
-  /////////////////////////////////////////////////
-  /// @brief Distance from the outer edge of the element to its children
-  /////////////////////////////////////////////////
-  sf::Vector2f inner_margin;
-
-  /////////////////////////////////////////////////
-  /// @brief Minium size of the element
-  /////////////////////////////////////////////////
-  sf::Vector2f minimum_size;
-
-  /////////////////////////////////////////////////
-  /// @brief Maximum size of the element
-  /////////////////////////////////////////////////
-  sf::Vector2f maximum_size;
-};
-/**
- * @class PanelStyle
- * @brief Contains the style properties for a panel in the UI.
- *
- */
-struct PanelStyle : public Style {};
-
-/**
- * @class ButtonStyle
- * @brief Contains the style properties for a button in the UI.
- *
- */
-struct ButtonStyle : public Style {
-  sf::Color text_color;
-  sf::Color hover_color;
-  std::string font;
-};
-
-/////////////////////////////////////////////////
-/// @class DropDownContainerStyle
-/// @brief Structure containing the style properties for a dropdown container
-///
-/////////////////////////////////////////////////
-struct DropDownContainerStyle : public Style {
-
-  /////////////////////////////////////////////////
-  /// @brief The ratio of the drop symbol to the dropdown width
-  /////////////////////////////////////////////////
-  float drop_symbol_ratio{0.2f};
-};
-
-struct DropDownListStyle : public Style {
-  /////////////////////////////////////////////////
-  /// @brief Text color of the dropdown list
-  /////////////////////////////////////////////////
-  sf::Color text_color;
-
-  /////////////////////////////////////////////////
-  /// @brief Background color of the dropdown list on hover
-  /////////////////////////////////////////////////
-  sf::Color hover_color;
-
-  /////////////////////////////////////////////////
-  /// @brief Font used for the dropdown list
-  /////////////////////////////////////////////////
-  std::string font;
-
-  /////////////////////////////////////////////////
-  /// @brief Font size used for the dropdown list
-  /////////////////////////////////////////////////
-  size_t font_size{12};
-};
-
-struct DropDownItemStyle : public Style {
-  /////////////////////////////////////////////////
-  /// @brief Text color of the dropdown item
-  /////////////////////////////////////////////////
-  sf::Color text_color;
-  /////////////////////////////////////////////////
-  /// @brief Background color of the dropdown item on hover
-  /////////////////////////////////////////////////
-  sf::Color hover_color;
-  /////////////////////////////////////////////////
-  /// @brief Font used for the dropdown item
-  /////////////////////////////////////////////////
-  std::string font;
-};
-
-struct DropDownButtonStyle : public Style {
-  /////////////////////////////////////////////////
-  /// @brief Coloer of the triangle in the dropdown button
-  /////////////////////////////////////////////////
-  sf::Color triangle_color;
-
-  /////////////////////////////////////////////////
-  /// @brief Background color of the dropdown button on hover
-  /////////////////////////////////////////////////
-  sf::Color hover_color;
-};
-
 class UIRenderLogic : public Logic {
 private:
   /////////////////////////////////////////////////
