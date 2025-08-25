@@ -19,6 +19,8 @@ void TitleScene::sMovement() {};
 
 /////////////////////////////////////////////////
 void TitleScene::sRender() {
+  // clear the render texture and the start of each Scene render step
+  m_render_texture.clear(sf::Color::Black);
 
   for (auto &render_logic : m_logics[LogicType::Render]) {
     render_logic->RunLogic();
