@@ -1,12 +1,12 @@
 // general types to use in other schemas
 
-table Vector2f{
+table Vector2fData {
     x: float;
     y: float;
   }
 
 
-struct Color {
+struct ColorData{
     r:uint8;
     g:uint8;
     b:uint8;
@@ -15,8 +15,8 @@ struct Color {
 
 
 table Vertex {
-  position: Vector2f (required);
-  color: Color (required);
+  position: Vector2fData(required);
+  color: ColorData (required);
 }
 
 

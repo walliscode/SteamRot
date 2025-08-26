@@ -203,15 +203,3 @@ TEST_CASE("FlatbuffersDataLoader provides ui_styles data",
   }
   REQUIRE(result.value() != nullptr);
 }
-
-TEST_CASE("FlatbuffersDataLoader returns a map of ui_styles data",
-          "[FlatbuffersDataLoader]") {
-  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
-  auto result = data_loader.ProvideAllUIStylesData({"default"});
-  if (!result.has_value()) {
-    FAIL(result.error().message);
-  }
-  REQUIRE(result.value().size() == 1);
-  REQUIRE(result.value().contains("default"));
-  REQUIRE(result.value().at("default") != nullptr);
-}

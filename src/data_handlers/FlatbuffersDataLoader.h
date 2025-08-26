@@ -69,9 +69,6 @@ public:
   /////////////////////////////////////////////////
   std::expected<const UIStyleData *, FailInfo>
   ProvideUIStylesData(const std::string &style_name) const;
-
-  std::expected<std::unordered_map<std::string, const UIStyleData *>, FailInfo>
-  ProvideAllUIStylesData(std::vector<std::string> style_names) const;
 };
 
 } // namespace steamrot

@@ -129,8 +129,8 @@ struct SocketData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_VERTICES = 4
   };
-  const ::flatbuffers::Vector<::flatbuffers::Offset<Vector2f>> *vertices() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Vector2f>> *>(VT_VERTICES);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<Vector2fData>> *vertices() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Vector2fData>> *>(VT_VERTICES);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -145,7 +145,7 @@ struct SocketDataBuilder {
   typedef SocketData Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_vertices(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Vector2f>>> vertices) {
+  void add_vertices(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Vector2fData>>> vertices) {
     fbb_.AddOffset(SocketData::VT_VERTICES, vertices);
   }
   explicit SocketDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
@@ -162,7 +162,7 @@ struct SocketDataBuilder {
 
 inline ::flatbuffers::Offset<SocketData> CreateSocketData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Vector2f>>> vertices = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Vector2fData>>> vertices = 0) {
   SocketDataBuilder builder_(_fbb);
   builder_.add_vertices(vertices);
   return builder_.Finish();
@@ -170,8 +170,8 @@ inline ::flatbuffers::Offset<SocketData> CreateSocketData(
 
 inline ::flatbuffers::Offset<SocketData> CreateSocketDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<Vector2f>> *vertices = nullptr) {
-  auto vertices__ = vertices ? _fbb.CreateVector<::flatbuffers::Offset<Vector2f>>(*vertices) : 0;
+    const std::vector<::flatbuffers::Offset<Vector2fData>> *vertices = nullptr) {
+  auto vertices__ = vertices ? _fbb.CreateVector<::flatbuffers::Offset<Vector2fData>>(*vertices) : 0;
   return steamrot::CreateSocketData(
       _fbb,
       vertices__);

@@ -712,11 +712,11 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   steamrot::SpacingAndSizingType spacing_strategy() const {
     return static_cast<steamrot::SpacingAndSizingType>(GetField<int8_t>(VT_SPACING_STRATEGY, 0));
   }
-  const Vector2f *position() const {
-    return GetPointer<const Vector2f *>(VT_POSITION);
+  const Vector2fData *position() const {
+    return GetPointer<const Vector2fData *>(VT_POSITION);
   }
-  const Vector2f *size() const {
-    return GetPointer<const Vector2f *>(VT_SIZE);
+  const Vector2fData *size() const {
+    return GetPointer<const Vector2fData *>(VT_SIZE);
   }
   float ratio() const {
     return GetField<float>(VT_RATIO, 0.0f);
@@ -885,10 +885,10 @@ struct UIElementDataBuilder {
   void add_spacing_strategy(steamrot::SpacingAndSizingType spacing_strategy) {
     fbb_.AddElement<int8_t>(UIElementData::VT_SPACING_STRATEGY, static_cast<int8_t>(spacing_strategy), 0);
   }
-  void add_position(::flatbuffers::Offset<Vector2f> position) {
+  void add_position(::flatbuffers::Offset<Vector2fData> position) {
     fbb_.AddOffset(UIElementData::VT_POSITION, position);
   }
-  void add_size(::flatbuffers::Offset<Vector2f> size) {
+  void add_size(::flatbuffers::Offset<Vector2fData> size) {
     fbb_.AddOffset(UIElementData::VT_SIZE, size);
   }
   void add_ratio(float ratio) {
@@ -938,8 +938,8 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementData(
     bool children_active = false,
     steamrot::LayoutType layout = steamrot::LayoutType_None,
     steamrot::SpacingAndSizingType spacing_strategy = steamrot::SpacingAndSizingType_None,
-    ::flatbuffers::Offset<Vector2f> position = 0,
-    ::flatbuffers::Offset<Vector2f> size = 0,
+    ::flatbuffers::Offset<Vector2fData> position = 0,
+    ::flatbuffers::Offset<Vector2fData> size = 0,
     float ratio = 0.0f,
     steamrot::UIElementDataUnion element_type = steamrot::UIElementDataUnion_NONE,
     ::flatbuffers::Offset<void> element = 0,
@@ -978,8 +978,8 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
     bool children_active = false,
     steamrot::LayoutType layout = steamrot::LayoutType_None,
     steamrot::SpacingAndSizingType spacing_strategy = steamrot::SpacingAndSizingType_None,
-    ::flatbuffers::Offset<Vector2f> position = 0,
-    ::flatbuffers::Offset<Vector2f> size = 0,
+    ::flatbuffers::Offset<Vector2fData> position = 0,
+    ::flatbuffers::Offset<Vector2fData> size = 0,
     float ratio = 0.0f,
     steamrot::UIElementDataUnion element_type = steamrot::UIElementDataUnion_NONE,
     ::flatbuffers::Offset<void> element = 0,
