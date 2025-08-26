@@ -16,7 +16,6 @@
 #include "AssetManager.h"
 #include "EventHandler.h"
 #include "containers.h"
-#include "themes_generated.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 
 namespace steamrot {
@@ -45,11 +44,6 @@ struct LogicContext {
   /// @brief Reference to the game window.
   /////////////////////////////////////////////////
   sf::RenderWindow &game_window;
-
-  /////////////////////////////////////////////////
-  /// @brief Reference to the UI configuration for the game.
-  /////////////////////////////////////////////////
-  const themes::UIObjects *ui_config{nullptr};
 
   /////////////////////////////////////////////////
   /// @brief Reference to the AssetManager for the game.

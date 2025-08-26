@@ -1,0 +1,30 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Declaration of the StylesConfigurator class
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Preprocessor Directives
+/////////////////////////////////////////////////
+#pragma once
+#include "FailInfo.h"
+#include <expected>
+#include <string>
+#include <vector>
+namespace steamrot {
+
+/////////////////////////////////////////////////
+/// @class StylesConfigurator
+/// @brief Responsible for providing UI styles configured from external data
+///
+/////////////////////////////////////////////////
+class StylesConfigurator {
+
+private:
+public:
+  StylesConfigurator() = default;
+
+  /////////////////////////////////////////////////
+  std::expected<std::vector<std::string>, FailInfo> GetAllStyleNames();
+};
+} // namespace steamrot

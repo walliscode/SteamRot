@@ -46,6 +46,9 @@ TEST_CASE("PathProvider intiated with a test environment", "[PathProvider]") {
   REQUIRE(path_provider.GetSceneDirectory() ==
           "@CMAKE_SOURCE_DIR@/tests/data/scenes");
 
+  REQUIRE(path_provider.GetUIStylesDirectory() ==
+          "@CMAKE_SOURCE_DIR@/tests/data/ui_styles");
+
   REQUIRE(path_provider.GetAssetsDirectory() ==
           "@CMAKE_SOURCE_DIR@/tests/data/assets");
 
@@ -65,6 +68,9 @@ TEST_CASE("PathProvider intiated with a production environment",
 
   REQUIRE(path_provider.GetSceneDirectory() ==
           "@CMAKE_SOURCE_DIR@/data/scenes");
+
+  REQUIRE(path_provider.GetUIStylesDirectory() ==
+          "@CMAKE_SOURCE_DIR@/data/ui_styles");
 
   REQUIRE(path_provider.GetAssetsDirectory() ==
           "@CMAKE_SOURCE_DIR@/data/assets");

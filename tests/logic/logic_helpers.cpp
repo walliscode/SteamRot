@@ -28,8 +28,7 @@ LogicContext CreateLogicContext() {
   // create a LogicContext object
   LogicContext context{entity_pool,    archetype_manager.GetArchetypes(),
                        render_texture, render_window,
-                       nullptr,        asset_manager,
-                       event_handler};
+                       asset_manager,  event_handler};
   return context;
 }
 } // namespace steamrot::tests

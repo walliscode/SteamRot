@@ -96,4 +96,14 @@ PathProvider::GetFontsDirectory() const {
   }
   return assetsDirResult.value() / "fonts";
 }
+
+/////////////////////////////////////////////////
+std::expected<std::filesystem::path, FailInfo>
+PathProvider::GetUIStylesDirectory() const {
+  auto dataDirResult = GetDataDirectory();
+  if (!dataDirResult.has_value()) {
+    return std::unexpected(dataDirResult.error());
+  }
+  return dataDirResult.value() / "ui_styles";
+}
 } // namespace steamrot

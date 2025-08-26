@@ -14,6 +14,7 @@
 #include "DataLoader.h"
 #include "scene_types_generated.h"
 #include "scenes_generated.h"
+#include "ui_style_generated.h"
 #include <expected>
 #include <map>
 #include <string>
@@ -62,6 +63,15 @@ public:
   /////////////////////////////////////////////////
   std::expected<const AssetCollection *, FailInfo>
   ProvideAssetData(const SceneType scene_type) const;
+
+  /////////////////////////////////////////////////
+  /// @brief Provide a single UIStyleData object
+  /////////////////////////////////////////////////
+  std::expected<const UIStyleData *, FailInfo>
+  ProvideUIStylesData(const std::string &style_name) const;
+
+  std::expected<std::unordered_map<std::string, const UIStyleData *>, FailInfo>
+  ProvideAllUIStylesData(std::vector<std::string> style_names) const;
 };
 
 } // namespace steamrot
