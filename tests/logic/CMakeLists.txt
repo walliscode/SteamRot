@@ -1,5 +1,6 @@
 add_executable(test_logic
 LogicFactory.test.cpp
+UIRenderLogic.test.cpp
 logic_helpers.cpp
 )
 
@@ -12,8 +13,7 @@ target_link_libraries(test_logic
   PRIVATE
   Catch2::Catch2WithMain
   logic
-
-
+  test_context
 )
 
 catch_discover_tests(test_logic)
