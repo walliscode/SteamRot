@@ -8,6 +8,8 @@
 /////////////////////////////////////////////////
 #include "StylesConfigurator.h"
 #include "PathProvider.h"
+#include "UIStyle.h"
+#include <expected>
 #include <iostream>
 
 namespace steamrot {
@@ -45,6 +47,15 @@ StylesConfigurator::GetAllStyleNames() {
     }
   }
   return style_names;
+}
+
+/////////////////////////////////////////////////
+std::expected<UIStyle, FailInfo>
+StylesConfigurator::ConfigureStyle(const UIStyleData &style_data) {
+  // create UIStyle object to return
+  UIStyle ui_style;
+
+  return ui_style;
 }
 
 } // namespace steamrot

@@ -4,7 +4,7 @@ namespace steamrot;
 
 
 
-table Style {
+table StyleData{
   background_color: Color (required); 
   border_color: Color (required);
   border_thickness: float ;
@@ -14,52 +14,52 @@ table Style {
   maximum_size: Vector2f (required);
 }
 
-table PanelStyle {
-  style: Style (required);
+table PanelStyleData{
+  style: StyleData (required);
   }
 
-table ButtonStyle {
-  style: Style (required);
+table ButtonStyleData {
+  style: StyleData (required);
   text_color: Color (required);
   hover_color: Color (required);
   font: string (required);
   font_size: int;
   }
 
-table DropDownContainerStyle {
-  style: Style (required);
+table DropDownContainerStyleData {
+  style: StyleData (required);
   drop_symbol_ratio: float;
   }
 
-table DropDownListStyle {
-  style: Style (required);
+table DropDownListStyleData {
+  style: StyleData (required);
   text_color: Color (required);
   hover_color: Color (required);
   font: string (required);
   font_size: int;
   }
 
-table DropDownItemStyle {
-  style: Style (required);
+table DropDownItemStyleData {
+  style: StyleData (required);
   text_color: Color (required);
   hover_color: Color (required);
   font: string (required);
   font_size: int;
   }
 
-table DropDownButtonStyle {
-  style: Style (required);
+table DropDownButtonStyleData {
+  style: StyleData (required);
 triangle_color: Color (required);
   hover_color: Color (required);
 }
 
 table UIStyleData{
-    panel_style: PanelStyle (required);
-    button_style: ButtonStyle (required);
-    drop_down_container_style: DropDownContainerStyle (required);
-    drop_down_list_style: DropDownListStyle (required);
-    drop_down_item_style: DropDownItemStyle (required);
-    drop_down_button_style: DropDownButtonStyle (required);
+    panel_style: PanelStyleData (required);
+    button_style: ButtonStyleData (required);
+    drop_down_container_style: DropDownContainerStyleData (required);
+    drop_down_list_style: DropDownListStyleData (required);
+    drop_down_item_style: DropDownItemStyleData (required);
+    drop_down_button_style: DropDownButtonStyleData (required);
     name: string (required);
   }
 
