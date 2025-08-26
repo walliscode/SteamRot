@@ -1,6 +1,6 @@
 # List your schema files
 set(schema_files
-    ${CMAKE_CURRENT_SOURCE_DIR}/themes.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/ui_style.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/scenes.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/user_input.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/entities.fbs

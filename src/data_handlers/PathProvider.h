@@ -75,6 +75,11 @@ public:
   /// @brief Provides the path to the fonts directory
   /////////////////////////////////////////////////
   std::expected<std::filesystem::path, FailInfo> GetFontsDirectory() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Provides the path to the ui_styles directory
+  /////////////////////////////////////////////////
+  std::expected<std::filesystem::path, FailInfo> GetUIStylesDirectory() const;
 };
 
 } // namespace steamrot

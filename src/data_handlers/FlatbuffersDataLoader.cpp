@@ -12,6 +12,7 @@
 #include "fragments_generated.h"
 #include "scene_types_generated.h"
 #include "scenes_generated.h"
+#include "ui_style_generated.h"
 #include <SFML/Graphics/PrimitiveType.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <expected>
@@ -205,5 +206,54 @@ FlatbuffersDataLoader::ProvideAssetData(const SceneType scene_type) const {
                                     "Asset collection not found"));
   }
   return scene_data->assets();
+}
+
+/////////////////////////////////////////////////
+std::expected<const UIStyleData *, FailInfo>
+FlatbuffersDataLoader::ProvideUIStylesData(
+    const std::string &style_name) const {
+  // check the UIStyleDirectory is error free
+  auto ui_style_dir_result = m_path_provider.GetUIStylesDirectory();
+  if (!ui_style_dir_result.has_value()) {
+    return std::unexpected(ui_style_dir_result.error());
+  }
+  // construct the file path
+  std::filesystem::path ui_style_path =
+      ui_style_dir_result.value() / (style_name + ".styles.bin");
+  // check if the file exists
+  if (!std::filesystem::exists(ui_style_path)) {
+    std::string error_message =
+        std::format("UI Style file not found: {}", ui_style_path.string());
+    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
+  }
+  // load the UI style data
+  const steamrot::UIStyleData *ui_style_data =
+      GetUIStyleData(LoadBinaryData(ui_style_path));
+  if (!ui_style_data) {
+    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
+                                    "UIStyleData pointer is null"));
+  }
+
+  return ui_style_data;
+}
+
+/////////////////////////////////////////////////
+std::expected<std::unordered_map<std::string, const UIStyleData *>, FailInfo>
+FlatbuffersDataLoader::ProvideAllUIStylesData(
+    std::vector<std::string> style_names) const {
+
+  // create map to hold styles
+  std::unordered_map<std::string, const UIStyleData *> styles_map;
+
+  for (const auto &style_name : style_names) {
+    // get each style
+    auto style_result = ProvideUIStylesData(style_name);
+    // pass up any errors
+    if (!style_result.has_value()) {
+      return std::unexpected(style_result.error());
+    }
+    styles_map[style_name] = style_result.value();
+  }
+  return styles_map;
 }
 } // namespace steamrot

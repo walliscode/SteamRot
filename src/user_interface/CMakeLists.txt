@@ -17,14 +17,18 @@ target_link_libraries(user_interface
   events
 )
 
-add_library(ui_styles INTERFACE)
+add_library(ui_styles
+styles/StylesConfigurator.cpp
+)
 
 target_include_directories(ui_styles
-  INTERFACE
+  PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/styles
 )
 
 target_link_libraries(ui_styles
-  INTERFACE
+  PUBLIC
   SFML::Graphics
+  logger
+  data_handlers
 )

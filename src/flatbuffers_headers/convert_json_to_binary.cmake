@@ -82,7 +82,7 @@ macro(flatbuffers_generate_for_type schema_name json_ext subdir)
 endmacro()
 
 # Call macro for each supported type
-flatbuffers_generate_for_type(themes ".themes.json" "themes")
+flatbuffers_generate_for_type(ui_style ".styles.json" "ui_styles")
 flatbuffers_generate_for_type(scenes ".scenes.json" "scenes")
 flatbuffers_generate_for_type(fragments ".fragment.json" "fragments")
 
