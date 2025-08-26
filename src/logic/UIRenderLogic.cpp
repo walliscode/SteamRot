@@ -3,6 +3,7 @@
 ////////////////////////////////////////////////////////////
 #include "UIRenderLogic.h"
 #include "Logic.h"
+#include "StylesConfigurator.h"
 #include <SFML/Graphics.hpp>
 
 namespace steamrot {
@@ -10,6 +11,17 @@ namespace steamrot {
 /////////////////////////////////////////////////////////////
 UIRenderLogic::UIRenderLogic(const LogicContext logic_context)
     : Logic(logic_context) {}
+
+/////////////////////////////////////////////////
+const std::unordered_map<std::string, UIStyle> &UIRenderLogic::GetUIStyles() {
+  // use a lambda to ensure this is only run once
+  static std::unordered_map<std::string, UIStyle> ui_styles = [] {
+    StylesConfigurator styles_configurator;
+    auto styles_map_result = styles_configurator.ProvideUIStylesMap();
+    return styles_map_result.value();
+  }();
+  return ui_styles;
+}
 
 ////////////////////////////////////////////////////
 void UIRenderLogic::ProcessLogic() {
@@ -674,4 +686,5 @@ void UIRenderLogic::ProcessLogic() {
 ///        ui_element.position.y + (ui_element.size.y * (i + 1));
 ///  }
 ///}
+
 } // namespace steamrot

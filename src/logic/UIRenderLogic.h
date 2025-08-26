@@ -13,14 +13,17 @@
 // headers
 ////////////////////////////////////////////////////////////
 #include "Logic.h"
-#include "user_interface_generated.h"
+#include "UIStyle.h"
+
 #include <SFML/Graphics.hpp>
+#include <unordered_map>
 
 namespace steamrot {
 
 using SpacingStrategy =
     std::function<void(UIElement &ui_element, sf::Vector2f &inner_margin,
                        float &parent_border_thickness)>;
+
 class UIRenderLogic : public Logic {
 private:
   /////////////////////////////////////////////////
@@ -149,10 +152,16 @@ private:
   //                                     float &parent_border_thickness);
   //
 public:
-  ////////////////////////////////////////////////////////////
-  // |brief Constructor taking in flatbuffer config
-  ////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////
+  /// @brief Constructor for UIRenderLogic
+  ///
+  /// @param logic_context Takes a LogicContext struct
+  /////////////////////////////////////////////////
   UIRenderLogic(const LogicContext logic_context);
 
-}; // namespace UIEngine
+  /////////////////////////////////////////////////
+  /// @brief Returns the map of all available UI styles
+  /////////////////////////////////////////////////
+  static const std::unordered_map<std::string, UIStyle> &GetUIStyles();
+};
 } // namespace steamrot

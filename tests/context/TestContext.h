@@ -10,7 +10,10 @@
 
 #include "EventHandler.h"
 #include "GameContext.h"
+#include "LogicContext.h"
 #include "PathProvider.h"
+#include "containers.h"
+#include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 namespace steamrot::tests {
 /////////////////////////////////////////////////
@@ -56,11 +59,36 @@ private:
   /////////////////////////////////////////////////
   const EnvironmentType env_type{EnvironmentType::Test};
 
+  /////////////////////////////////////////////////
+  /// @brief Test EntityMemoryPool instance
+  /////////////////////////////////////////////////
+  EntityMemoryPool scene_entities;
+
+  /////////////////////////////////////////////////
+  /// @brief Test archetypes map instance
+  /////////////////////////////////////////////////
+  std::unordered_map<ArchetypeID, Archetype> archetypes;
+
+  /////////////////////////////////////////////////
+  /// @brief Test RenderTexture instance
+  /////////////////////////////////////////////////
+  sf::RenderTexture render_texture;
+
+  /////////////////////////////////////////////////
+  /// @brief Gamecontext instance for tests
+  /////////////////////////////////////////////////
   GameContext game_context;
+
+  /////////////////////////////////////////////////
+  /// @brief LogicContext instance for tests
+  /////////////////////////////////////////////////
+  LogicContext logic_context;
 
 public:
   TestContext();
 
   const steamrot::GameContext &GetGameContext() const;
+
+  const steamrot::LogicContext &GetLogicContext() const;
 };
 } // namespace steamrot::tests
