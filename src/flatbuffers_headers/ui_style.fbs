@@ -5,13 +5,13 @@ namespace steamrot;
 
 
 table StyleData{
-  background_color: Color (required); 
-  border_color: Color (required);
+  background_color: ColorData(required); 
+  border_color: ColorData(required);
   border_thickness: float ;
   radius_resolution: int ;
-  inner_margin: Vector2f (required);
-  minimum_size: Vector2f (required);
-  maximum_size: Vector2f (required);
+  inner_margin: Vector2fData (required);
+  minimum_size: Vector2fData (required);
+  maximum_size: Vector2fData (required);
 }
 
 table PanelStyleData{
@@ -20,8 +20,8 @@ table PanelStyleData{
 
 table ButtonStyleData {
   style: StyleData (required);
-  text_color: Color (required);
-  hover_color: Color (required);
+  text_color: ColorData (required);
+  hover_color: ColorData (required);
   font: string (required);
   font_size: int;
   }
@@ -33,24 +33,24 @@ table DropDownContainerStyleData {
 
 table DropDownListStyleData {
   style: StyleData (required);
-  text_color: Color (required);
-  hover_color: Color (required);
+  text_color: ColorData(required);
+  hover_color: ColorData (required);
   font: string (required);
   font_size: int;
   }
 
 table DropDownItemStyleData {
   style: StyleData (required);
-  text_color: Color (required);
-  hover_color: Color (required);
+  text_color: ColorData (required);
+  hover_color: ColorData (required);
   font: string (required);
   font_size: int;
   }
 
 table DropDownButtonStyleData {
   style: StyleData (required);
-triangle_color: Color (required);
-  hover_color: Color (required);
+triangle_color: ColorData (required);
+  hover_color: ColorData (required);
 }
 
 table UIStyleData{

@@ -12,6 +12,7 @@
 #include "ui_style_generated.h"
 #include <expected>
 #include <string>
+#include <unordered_map>
 #include <vector>
 namespace steamrot {
 
@@ -38,5 +39,11 @@ public:
   /////////////////////////////////////////////////
   std::expected<UIStyle, FailInfo>
   ConfigureStyle(const UIStyleData &style_data);
+
+  /////////////////////////////////////////////////
+  /// @brief Provide a map of all available UIStyles
+  /////////////////////////////////////////////////
+  std::expected<std::unordered_map<std::string, UIStyle>, FailInfo>
+  ProvideUIStylesMap();
 };
 } // namespace steamrot

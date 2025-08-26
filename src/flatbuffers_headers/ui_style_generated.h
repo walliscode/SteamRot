@@ -52,11 +52,11 @@ struct StyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_MINIMUM_SIZE = 14,
     VT_MAXIMUM_SIZE = 16
   };
-  const Color *background_color() const {
-    return GetStruct<const Color *>(VT_BACKGROUND_COLOR);
+  const ColorData *background_color() const {
+    return GetStruct<const ColorData *>(VT_BACKGROUND_COLOR);
   }
-  const Color *border_color() const {
-    return GetStruct<const Color *>(VT_BORDER_COLOR);
+  const ColorData *border_color() const {
+    return GetStruct<const ColorData *>(VT_BORDER_COLOR);
   }
   float border_thickness() const {
     return GetField<float>(VT_BORDER_THICKNESS, 0.0f);
@@ -64,19 +64,19 @@ struct StyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   int32_t radius_resolution() const {
     return GetField<int32_t>(VT_RADIUS_RESOLUTION, 0);
   }
-  const Vector2f *inner_margin() const {
-    return GetPointer<const Vector2f *>(VT_INNER_MARGIN);
+  const Vector2fData *inner_margin() const {
+    return GetPointer<const Vector2fData *>(VT_INNER_MARGIN);
   }
-  const Vector2f *minimum_size() const {
-    return GetPointer<const Vector2f *>(VT_MINIMUM_SIZE);
+  const Vector2fData *minimum_size() const {
+    return GetPointer<const Vector2fData *>(VT_MINIMUM_SIZE);
   }
-  const Vector2f *maximum_size() const {
-    return GetPointer<const Vector2f *>(VT_MAXIMUM_SIZE);
+  const Vector2fData *maximum_size() const {
+    return GetPointer<const Vector2fData *>(VT_MAXIMUM_SIZE);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyFieldRequired<Color>(verifier, VT_BACKGROUND_COLOR, 1) &&
-           VerifyFieldRequired<Color>(verifier, VT_BORDER_COLOR, 1) &&
+           VerifyFieldRequired<ColorData>(verifier, VT_BACKGROUND_COLOR, 1) &&
+           VerifyFieldRequired<ColorData>(verifier, VT_BORDER_COLOR, 1) &&
            VerifyField<float>(verifier, VT_BORDER_THICKNESS, 4) &&
            VerifyField<int32_t>(verifier, VT_RADIUS_RESOLUTION, 4) &&
            VerifyOffsetRequired(verifier, VT_INNER_MARGIN) &&
@@ -93,10 +93,10 @@ struct StyleDataBuilder {
   typedef StyleData Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_background_color(const Color *background_color) {
+  void add_background_color(const ColorData *background_color) {
     fbb_.AddStruct(StyleData::VT_BACKGROUND_COLOR, background_color);
   }
-  void add_border_color(const Color *border_color) {
+  void add_border_color(const ColorData *border_color) {
     fbb_.AddStruct(StyleData::VT_BORDER_COLOR, border_color);
   }
   void add_border_thickness(float border_thickness) {
@@ -105,13 +105,13 @@ struct StyleDataBuilder {
   void add_radius_resolution(int32_t radius_resolution) {
     fbb_.AddElement<int32_t>(StyleData::VT_RADIUS_RESOLUTION, radius_resolution, 0);
   }
-  void add_inner_margin(::flatbuffers::Offset<Vector2f> inner_margin) {
+  void add_inner_margin(::flatbuffers::Offset<Vector2fData> inner_margin) {
     fbb_.AddOffset(StyleData::VT_INNER_MARGIN, inner_margin);
   }
-  void add_minimum_size(::flatbuffers::Offset<Vector2f> minimum_size) {
+  void add_minimum_size(::flatbuffers::Offset<Vector2fData> minimum_size) {
     fbb_.AddOffset(StyleData::VT_MINIMUM_SIZE, minimum_size);
   }
-  void add_maximum_size(::flatbuffers::Offset<Vector2f> maximum_size) {
+  void add_maximum_size(::flatbuffers::Offset<Vector2fData> maximum_size) {
     fbb_.AddOffset(StyleData::VT_MAXIMUM_SIZE, maximum_size);
   }
   explicit StyleDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
@@ -132,13 +132,13 @@ struct StyleDataBuilder {
 
 inline ::flatbuffers::Offset<StyleData> CreateStyleData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const Color *background_color = nullptr,
-    const Color *border_color = nullptr,
+    const ColorData *background_color = nullptr,
+    const ColorData *border_color = nullptr,
     float border_thickness = 0.0f,
     int32_t radius_resolution = 0,
-    ::flatbuffers::Offset<Vector2f> inner_margin = 0,
-    ::flatbuffers::Offset<Vector2f> minimum_size = 0,
-    ::flatbuffers::Offset<Vector2f> maximum_size = 0) {
+    ::flatbuffers::Offset<Vector2fData> inner_margin = 0,
+    ::flatbuffers::Offset<Vector2fData> minimum_size = 0,
+    ::flatbuffers::Offset<Vector2fData> maximum_size = 0) {
   StyleDataBuilder builder_(_fbb);
   builder_.add_maximum_size(maximum_size);
   builder_.add_minimum_size(minimum_size);
@@ -205,11 +205,11 @@ struct ButtonStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::StyleData *style() const {
     return GetPointer<const steamrot::StyleData *>(VT_STYLE);
   }
-  const Color *text_color() const {
-    return GetStruct<const Color *>(VT_TEXT_COLOR);
+  const ColorData *text_color() const {
+    return GetStruct<const ColorData *>(VT_TEXT_COLOR);
   }
-  const Color *hover_color() const {
-    return GetStruct<const Color *>(VT_HOVER_COLOR);
+  const ColorData *hover_color() const {
+    return GetStruct<const ColorData *>(VT_HOVER_COLOR);
   }
   const ::flatbuffers::String *font() const {
     return GetPointer<const ::flatbuffers::String *>(VT_FONT);
@@ -221,8 +221,8 @@ struct ButtonStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_STYLE) &&
            verifier.VerifyTable(style()) &&
-           VerifyFieldRequired<Color>(verifier, VT_TEXT_COLOR, 1) &&
-           VerifyFieldRequired<Color>(verifier, VT_HOVER_COLOR, 1) &&
+           VerifyFieldRequired<ColorData>(verifier, VT_TEXT_COLOR, 1) &&
+           VerifyFieldRequired<ColorData>(verifier, VT_HOVER_COLOR, 1) &&
            VerifyOffsetRequired(verifier, VT_FONT) &&
            verifier.VerifyString(font()) &&
            VerifyField<int32_t>(verifier, VT_FONT_SIZE, 4) &&
@@ -237,10 +237,10 @@ struct ButtonStyleDataBuilder {
   void add_style(::flatbuffers::Offset<steamrot::StyleData> style) {
     fbb_.AddOffset(ButtonStyleData::VT_STYLE, style);
   }
-  void add_text_color(const Color *text_color) {
+  void add_text_color(const ColorData *text_color) {
     fbb_.AddStruct(ButtonStyleData::VT_TEXT_COLOR, text_color);
   }
-  void add_hover_color(const Color *hover_color) {
+  void add_hover_color(const ColorData *hover_color) {
     fbb_.AddStruct(ButtonStyleData::VT_HOVER_COLOR, hover_color);
   }
   void add_font(::flatbuffers::Offset<::flatbuffers::String> font) {
@@ -267,8 +267,8 @@ struct ButtonStyleDataBuilder {
 inline ::flatbuffers::Offset<ButtonStyleData> CreateButtonStyleData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::StyleData> style = 0,
-    const Color *text_color = nullptr,
-    const Color *hover_color = nullptr,
+    const ColorData *text_color = nullptr,
+    const ColorData *hover_color = nullptr,
     ::flatbuffers::Offset<::flatbuffers::String> font = 0,
     int32_t font_size = 0) {
   ButtonStyleDataBuilder builder_(_fbb);
@@ -283,8 +283,8 @@ inline ::flatbuffers::Offset<ButtonStyleData> CreateButtonStyleData(
 inline ::flatbuffers::Offset<ButtonStyleData> CreateButtonStyleDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::StyleData> style = 0,
-    const Color *text_color = nullptr,
-    const Color *hover_color = nullptr,
+    const ColorData *text_color = nullptr,
+    const ColorData *hover_color = nullptr,
     const char *font = nullptr,
     int32_t font_size = 0) {
   auto font__ = font ? _fbb.CreateString(font) : 0;
@@ -362,11 +362,11 @@ struct DropDownListStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Ta
   const steamrot::StyleData *style() const {
     return GetPointer<const steamrot::StyleData *>(VT_STYLE);
   }
-  const Color *text_color() const {
-    return GetStruct<const Color *>(VT_TEXT_COLOR);
+  const ColorData *text_color() const {
+    return GetStruct<const ColorData *>(VT_TEXT_COLOR);
   }
-  const Color *hover_color() const {
-    return GetStruct<const Color *>(VT_HOVER_COLOR);
+  const ColorData *hover_color() const {
+    return GetStruct<const ColorData *>(VT_HOVER_COLOR);
   }
   const ::flatbuffers::String *font() const {
     return GetPointer<const ::flatbuffers::String *>(VT_FONT);
@@ -378,8 +378,8 @@ struct DropDownListStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Ta
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_STYLE) &&
            verifier.VerifyTable(style()) &&
-           VerifyFieldRequired<Color>(verifier, VT_TEXT_COLOR, 1) &&
-           VerifyFieldRequired<Color>(verifier, VT_HOVER_COLOR, 1) &&
+           VerifyFieldRequired<ColorData>(verifier, VT_TEXT_COLOR, 1) &&
+           VerifyFieldRequired<ColorData>(verifier, VT_HOVER_COLOR, 1) &&
            VerifyOffsetRequired(verifier, VT_FONT) &&
            verifier.VerifyString(font()) &&
            VerifyField<int32_t>(verifier, VT_FONT_SIZE, 4) &&
@@ -394,10 +394,10 @@ struct DropDownListStyleDataBuilder {
   void add_style(::flatbuffers::Offset<steamrot::StyleData> style) {
     fbb_.AddOffset(DropDownListStyleData::VT_STYLE, style);
   }
-  void add_text_color(const Color *text_color) {
+  void add_text_color(const ColorData *text_color) {
     fbb_.AddStruct(DropDownListStyleData::VT_TEXT_COLOR, text_color);
   }
-  void add_hover_color(const Color *hover_color) {
+  void add_hover_color(const ColorData *hover_color) {
     fbb_.AddStruct(DropDownListStyleData::VT_HOVER_COLOR, hover_color);
   }
   void add_font(::flatbuffers::Offset<::flatbuffers::String> font) {
@@ -424,8 +424,8 @@ struct DropDownListStyleDataBuilder {
 inline ::flatbuffers::Offset<DropDownListStyleData> CreateDropDownListStyleData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::StyleData> style = 0,
-    const Color *text_color = nullptr,
-    const Color *hover_color = nullptr,
+    const ColorData *text_color = nullptr,
+    const ColorData *hover_color = nullptr,
     ::flatbuffers::Offset<::flatbuffers::String> font = 0,
     int32_t font_size = 0) {
   DropDownListStyleDataBuilder builder_(_fbb);
@@ -440,8 +440,8 @@ inline ::flatbuffers::Offset<DropDownListStyleData> CreateDropDownListStyleData(
 inline ::flatbuffers::Offset<DropDownListStyleData> CreateDropDownListStyleDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::StyleData> style = 0,
-    const Color *text_color = nullptr,
-    const Color *hover_color = nullptr,
+    const ColorData *text_color = nullptr,
+    const ColorData *hover_color = nullptr,
     const char *font = nullptr,
     int32_t font_size = 0) {
   auto font__ = font ? _fbb.CreateString(font) : 0;
@@ -466,11 +466,11 @@ struct DropDownItemStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Ta
   const steamrot::StyleData *style() const {
     return GetPointer<const steamrot::StyleData *>(VT_STYLE);
   }
-  const Color *text_color() const {
-    return GetStruct<const Color *>(VT_TEXT_COLOR);
+  const ColorData *text_color() const {
+    return GetStruct<const ColorData *>(VT_TEXT_COLOR);
   }
-  const Color *hover_color() const {
-    return GetStruct<const Color *>(VT_HOVER_COLOR);
+  const ColorData *hover_color() const {
+    return GetStruct<const ColorData *>(VT_HOVER_COLOR);
   }
   const ::flatbuffers::String *font() const {
     return GetPointer<const ::flatbuffers::String *>(VT_FONT);
@@ -482,8 +482,8 @@ struct DropDownItemStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Ta
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_STYLE) &&
            verifier.VerifyTable(style()) &&
-           VerifyFieldRequired<Color>(verifier, VT_TEXT_COLOR, 1) &&
-           VerifyFieldRequired<Color>(verifier, VT_HOVER_COLOR, 1) &&
+           VerifyFieldRequired<ColorData>(verifier, VT_TEXT_COLOR, 1) &&
+           VerifyFieldRequired<ColorData>(verifier, VT_HOVER_COLOR, 1) &&
            VerifyOffsetRequired(verifier, VT_FONT) &&
            verifier.VerifyString(font()) &&
            VerifyField<int32_t>(verifier, VT_FONT_SIZE, 4) &&
@@ -498,10 +498,10 @@ struct DropDownItemStyleDataBuilder {
   void add_style(::flatbuffers::Offset<steamrot::StyleData> style) {
     fbb_.AddOffset(DropDownItemStyleData::VT_STYLE, style);
   }
-  void add_text_color(const Color *text_color) {
+  void add_text_color(const ColorData *text_color) {
     fbb_.AddStruct(DropDownItemStyleData::VT_TEXT_COLOR, text_color);
   }
-  void add_hover_color(const Color *hover_color) {
+  void add_hover_color(const ColorData *hover_color) {
     fbb_.AddStruct(DropDownItemStyleData::VT_HOVER_COLOR, hover_color);
   }
   void add_font(::flatbuffers::Offset<::flatbuffers::String> font) {
@@ -528,8 +528,8 @@ struct DropDownItemStyleDataBuilder {
 inline ::flatbuffers::Offset<DropDownItemStyleData> CreateDropDownItemStyleData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::StyleData> style = 0,
-    const Color *text_color = nullptr,
-    const Color *hover_color = nullptr,
+    const ColorData *text_color = nullptr,
+    const ColorData *hover_color = nullptr,
     ::flatbuffers::Offset<::flatbuffers::String> font = 0,
     int32_t font_size = 0) {
   DropDownItemStyleDataBuilder builder_(_fbb);
@@ -544,8 +544,8 @@ inline ::flatbuffers::Offset<DropDownItemStyleData> CreateDropDownItemStyleData(
 inline ::flatbuffers::Offset<DropDownItemStyleData> CreateDropDownItemStyleDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::StyleData> style = 0,
-    const Color *text_color = nullptr,
-    const Color *hover_color = nullptr,
+    const ColorData *text_color = nullptr,
+    const ColorData *hover_color = nullptr,
     const char *font = nullptr,
     int32_t font_size = 0) {
   auto font__ = font ? _fbb.CreateString(font) : 0;
@@ -568,18 +568,18 @@ struct DropDownButtonStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::
   const steamrot::StyleData *style() const {
     return GetPointer<const steamrot::StyleData *>(VT_STYLE);
   }
-  const Color *triangle_color() const {
-    return GetStruct<const Color *>(VT_TRIANGLE_COLOR);
+  const ColorData *triangle_color() const {
+    return GetStruct<const ColorData *>(VT_TRIANGLE_COLOR);
   }
-  const Color *hover_color() const {
-    return GetStruct<const Color *>(VT_HOVER_COLOR);
+  const ColorData *hover_color() const {
+    return GetStruct<const ColorData *>(VT_HOVER_COLOR);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_STYLE) &&
            verifier.VerifyTable(style()) &&
-           VerifyFieldRequired<Color>(verifier, VT_TRIANGLE_COLOR, 1) &&
-           VerifyFieldRequired<Color>(verifier, VT_HOVER_COLOR, 1) &&
+           VerifyFieldRequired<ColorData>(verifier, VT_TRIANGLE_COLOR, 1) &&
+           VerifyFieldRequired<ColorData>(verifier, VT_HOVER_COLOR, 1) &&
            verifier.EndTable();
   }
 };
@@ -591,10 +591,10 @@ struct DropDownButtonStyleDataBuilder {
   void add_style(::flatbuffers::Offset<steamrot::StyleData> style) {
     fbb_.AddOffset(DropDownButtonStyleData::VT_STYLE, style);
   }
-  void add_triangle_color(const Color *triangle_color) {
+  void add_triangle_color(const ColorData *triangle_color) {
     fbb_.AddStruct(DropDownButtonStyleData::VT_TRIANGLE_COLOR, triangle_color);
   }
-  void add_hover_color(const Color *hover_color) {
+  void add_hover_color(const ColorData *hover_color) {
     fbb_.AddStruct(DropDownButtonStyleData::VT_HOVER_COLOR, hover_color);
   }
   explicit DropDownButtonStyleDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
@@ -614,8 +614,8 @@ struct DropDownButtonStyleDataBuilder {
 inline ::flatbuffers::Offset<DropDownButtonStyleData> CreateDropDownButtonStyleData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::StyleData> style = 0,
-    const Color *triangle_color = nullptr,
-    const Color *hover_color = nullptr) {
+    const ColorData *triangle_color = nullptr,
+    const ColorData *hover_color = nullptr) {
   DropDownButtonStyleDataBuilder builder_(_fbb);
   builder_.add_hover_color(hover_color);
   builder_.add_triangle_color(triangle_color);

@@ -18,4 +18,5 @@ struct ButtonStyle : public Style {
   sf::Color text_color;
   sf::Color hover_color;
   std::string font;
+  uint8_t font_size;
 };

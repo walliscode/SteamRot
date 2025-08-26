@@ -13,7 +13,7 @@ table View {
   }
 
 table SocketData{
-  vertices: [Vector2f] (required);
+  vertices: [Vector2fData] (required);
   }
 
 table RenderOverlayData {

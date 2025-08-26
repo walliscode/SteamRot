@@ -90,8 +90,8 @@ table UIElementData{
     children_active: bool;
     layout: LayoutType;
     spacing_strategy: SpacingAndSizingType;
-    position: Vector2f;
-    size: Vector2f;
+    position: Vector2fData;
+    size: Vector2fData;
     ratio: float;
     element: UIElementDataUnion (required);
     trigger_event: EventType;

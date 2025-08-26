@@ -237,23 +237,4 @@ FlatbuffersDataLoader::ProvideUIStylesData(
   return ui_style_data;
 }
 
-/////////////////////////////////////////////////
-std::expected<std::unordered_map<std::string, const UIStyleData *>, FailInfo>
-FlatbuffersDataLoader::ProvideAllUIStylesData(
-    std::vector<std::string> style_names) const {
-
-  // create map to hold styles
-  std::unordered_map<std::string, const UIStyleData *> styles_map;
-
-  for (const auto &style_name : style_names) {
-    // get each style
-    auto style_result = ProvideUIStylesData(style_name);
-    // pass up any errors
-    if (!style_result.has_value()) {
-      return std::unexpected(style_result.error());
-    }
-    styles_map[style_name] = style_result.value();
-  }
-  return styles_map;
-}
 } // namespace steamrot
