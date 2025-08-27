@@ -10,6 +10,7 @@
 #include "Component.h"
 #include "UIElement.h"
 #include <SFML/System/Vector2.hpp>
+#include <memory>
 
 namespace steamrot {
 
@@ -30,7 +31,7 @@ struct CUserInterface : public Component {
   /////////////////////////////////////////////////
   /// @brief Root UI element of the user interface component
   /////////////////////////////////////////////////
-  UIElement m_root_element;
+  std::unique_ptr<UIElement> m_root_element;
 
   /////////////////////////////////////////////////
   /// @brief Is the this element of the user interface visible to Users.

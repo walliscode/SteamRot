@@ -35,8 +35,6 @@ public:
   /// @param element_data Flatbuffer data for the UI element
   /// @return A UIElement containing the element type and its children.
   /////////////////////////////////////////////////
-  std::expected<UIElement, FailInfo>
-  CreateUIStructure(const UIElementData &element_data);
 };
 
 std::expected<std::unique_ptr<UIElement>, FailInfo>

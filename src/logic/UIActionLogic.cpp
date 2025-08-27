@@ -10,16 +10,14 @@
 
 #include "Logic.h"
 #include "UIElement.h"
-#include "UIElementFactory.h"
 #include "emp_helpers.h"
 #include "event_helpers.h"
 #include "events_generated.h"
-#include "user_interface_generated.h"
 
 #include <SFML/Window/Mouse.hpp>
 #include <iostream>
 #include <magic_enum/magic_enum.hpp>
-#include <variant>
+
 #include <vector>
 
 using namespace magic_enum::bitwise_operators;
@@ -59,7 +57,7 @@ void UIActionLogic::ProcessEvents(CUserInterface &ui_component) {
     // print the event type for debugging, except for EVENT_USER_INPUT
     if (event.m_event_type != EventType::EventType_EVENT_USER_INPUT) {
     }
-    RecursiveProcessEvents(ui_component.m_root_element, event);
+    RecursiveProcessEvents(*ui_component.m_root_element, event);
   }
 }
 /////////////////////////////////////////////////

@@ -27,5 +27,12 @@ void TestUIELementProperites(const UIElement &element,
   // Check children_active
   REQUIRE(element.children_active == data.children_active());
 }
+
+/////////////////////////////////////////////////
+void TestPanelElementProperties(const PanelElement &element,
+                                const PanelData &data) {
+  // Currently no specific properties to test
+  SUCCEED("PanelElement currently has no specific properties to test.");
+}
 } // namespace tests
 } // namespace steamrot

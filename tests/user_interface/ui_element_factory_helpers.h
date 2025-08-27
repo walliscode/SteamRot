@@ -6,6 +6,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "PanelElement.h"
 #include "UIElement.h"
 #include <catch2/catch_test_macros.hpp>
 
@@ -14,5 +15,8 @@ namespace tests {
 
 void TestUIELementProperites(const UIElement &element,
                              const UIElementData &data);
+
+void TestPanelElementProperties(const PanelElement &element,
+                                const PanelData &data);
 } // namespace tests
 } // namespace steamrot

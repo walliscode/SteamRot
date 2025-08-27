@@ -24,6 +24,10 @@ namespace steamrot {
 /// @brief Base struct for all UI elements, contains common properties
 /////////////////////////////////////////////////
 struct UIElement {
+  /////////////////////////////////////////////////
+  /// @brief VIrtual default destructor to add polymorphic behavior
+  /////////////////////////////////////////////////
+  virtual ~UIElement() = default;
 
   /////////////////////////////////////////////////
   /// @brief Position of the UI element in the window

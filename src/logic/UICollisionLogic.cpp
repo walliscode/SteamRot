@@ -45,7 +45,7 @@ void UICollisionLogic::CheckMouseCollision(CUserInterface &ui_component) {
   sf::Vector2i mouse_position =
       sf::Mouse::getPosition(m_logic_context.game_window);
   // recursively check the root element for mouse collision
-  RecursiveCheckMouseCollision(ui_component.m_root_element, mouse_position);
+  RecursiveCheckMouseCollision(*ui_component.m_root_element, mouse_position);
 }
 
 /////////////////////////////////////////////////
