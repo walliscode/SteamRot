@@ -3,14 +3,13 @@
 /// @brief Declaration of the UIElementFactory class
 /////////////////////////////////////////////////
 
-/////////////////////////////////////////////////
-/// Preprocessor Directives
-/////////////////////////////////////////////////
 #pragma once
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "ButtonElement.h"
+#include "DropDownElement.h"
 #include "FailInfo.h"
 #include "PanelElement.h"
 #include "UIElement.h"
@@ -22,7 +21,6 @@
 namespace steamrot {
 
 class UIElementFactory {
-private:
 public:
   /////////////////////////////////////////////////
   /// @brief Default constructor for the UIElementFactory
@@ -35,8 +33,18 @@ public:
   /// @param element_data Flatbuffer data for the UI element
   /// @return A UIElement containing the element type and its children.
   /////////////////////////////////////////////////
+  // Implementation is typically in the .cpp file
 };
 
+/////////////////////////////////////////////////
+/// @brief Create a UIElement (optionally nested) from the provided flatbuffer
+/// data
+///
+/// @param data_type The flatbuffers union type for the element
+/// @param data Pointer to the root flatbuffer table of the element
+/// @return A std::expected containing a unique_ptr to a UIElement, or FailInfo
+/// on error
+/////////////////////////////////////////////////
 std::expected<std::unique_ptr<UIElement>, FailInfo>
 CreateUIElement(const UIElementDataUnion &data_type, const void *data);
 
@@ -53,10 +61,61 @@ ConfigureBaseUIElement(UIElement &element, const UIElementData &data);
 /////////////////////////////////////////////////
 /// @brief Configure a Panel UIElement from the provided flatbuffers data
 ///
-/// @param element PanelElement to configure
+/// @param panel_element PanelElement to configure
 /// @param data Flatbuffers data to configure from
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 ConfigurePanelElement(PanelElement &panel_element, const PanelData &data);
+
+/////////////////////////////////////////////////
+/// @brief Configure a Button UIElement from the provided flatbuffers data
+///
+/// @param button_element ButtonElement to configure
+/// @param data Flatbuffers data to configure from
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureButtonElement(ButtonElement &button_element, const ButtonData &data);
+
+/////////////////////////////////////////////////
+/// @brief Configure a DropDownList UIElement from the provided flatbuffers data
+///
+/// @param dropdown_list_element DropDownListElement to configure
+/// @param data Flatbuffers data to configure from
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureDropDownListElement(DropDownListElement &dropdown_list_element,
+                             const DropDownListData &data);
+
+/////////////////////////////////////////////////
+/// @brief Configure a DropDownContainer UIElement from the provided flatbuffers
+/// data
+///
+/// @param dropdown_container_element DropDownContainerElement to configure
+/// @param data Flatbuffers data to configure from
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo> ConfigureDropDownContainerElement(
+    DropDownContainerElement &dropdown_container_element,
+    const DropDownContainerData &data);
+
+/////////////////////////////////////////////////
+/// @brief Configure a DropDownItem UIElement from the provided flatbuffers data
+///
+/// @param dropdown_item_element DropDownItemElement to configure
+/// @param data Flatbuffers data to configure from
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureDropDownItemElement(DropDownItemElement &dropdown_item_element,
+                             const DropDownItemData &data);
+
+/////////////////////////////////////////////////
+/// @brief Configure a DropDownButton UIElement from the provided flatbuffers
+/// data
+///
+/// @param dropdown_button_element DropDownButtonElement to configure
+/// @param data Flatbuffers data to configure from
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureDropDownButtonElement(DropDownButtonElement &dropdown_button_element,
+                               const DropDownButtonData &data);
 
 } // namespace steamrot
