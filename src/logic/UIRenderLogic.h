@@ -14,8 +14,6 @@
 ////////////////////////////////////////////////////////////
 #include "Logic.h"
 #include "UIStyle.h"
-
-#include <SFML/Graphics.hpp>
 #include <unordered_map>
 
 namespace steamrot {
@@ -26,48 +24,6 @@ using SpacingStrategy =
 
 class UIRenderLogic : public Logic {
 private:
-  /////////////////////////////////////////////////
-  /// @brief Draws a Panel struct with PanelStyle styling
-  ///
-  /// @param element UIElement struct containing any data
-  /////////////////////////////////////////////////
-  // void DrawPanel(UIElement &element);
-  //
-  // /////////////////////////////////////////////////
-  // /// @brief Draws a Button structu with ButtonStyle styling
-  // ///
-  // /// @param element UIElement structu containging any data
-  // /////////////////////////////////////////////////
-  // void DrawButton(UIElement &element);
-  //
-  // /////////////////////////////////////////////////
-  // /// @brief Draws a DropDown structu with DropDownStyle styling
-  // ///
-  // /// @param element UILement structure containin any data
-  // /////////////////////////////////////////////////
-  // void DrawDropDownContainer(UIElement &element);
-  //
-  // /////////////////////////////////////////////////
-  // /// @brief Draws the top element of a DropDownList (not the items
-  // themselves)
-  // ///
-  // /// @param element UIElement structure containing any data
-  // /////////////////////////////////////////////////
-  // void DrawDropDownList(UIElement &element);
-  //
-  // /////////////////////////////////////////////////
-  // /// @brief Draws a DropDownItem with DropDownItemStyle styling
-  // ///
-  // /// @param element UIElement structure containing any data
-  // /////////////////////////////////////////////////
-  // void DrawDropDownItem(UIElement &element);
-  //
-  // /////////////////////////////////////////////////
-  // /// @brief Draws a DropDownButton with DropDownButtonStyle styling
-  // ///
-  // /// @param element UIElement structure containing any data
-  // /////////////////////////////////////////////////
-  // void DrawDropDownButton(UIElement &element);
   //
   // /**
   //  * @brief Draws all UIElements containted in the CUserInterface components.

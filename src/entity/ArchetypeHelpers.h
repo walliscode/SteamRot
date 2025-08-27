@@ -1,6 +1,7 @@
 #pragma once
 
 #include "containers.h"
+#include <bitset>
 
 using ArchetypeID = std::bitset<steamrot::kComponentRegisterSize>;
 

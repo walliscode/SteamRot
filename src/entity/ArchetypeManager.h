@@ -12,7 +12,7 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "ArchetypeHelpers.h"
-#include "FlatbuffersConfigurator.h"
+#include "FailInfo.h"
 #include "containers.h"
 #include <cstddef>
 #include <cstdlib>

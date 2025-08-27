@@ -6,66 +6,64 @@
         "c_user_interface": {
           "ui_name": "title_screen_menu",
           "start_visible": true,
+          "root_ui_element_type": "PanelData",
           "root_ui_element": {
-            "type": "Panel",
-            "spacing_strategy": "Even",
-            "layout": "Vertical",
-            "element_type": "PanelData",
-            "element": {},
-            "children_active": true,
-            "children": [
-              {
-                "type": "Button",
-                "layout": "Horizontal",
-                "children": [],
-                "element_type": "ButtonData",
-                "element": {
-                  "label": "Start Game"
+            "base_data": {
+              "spacing_strategy": "Even",
+              "layout": "Vertical",
+              "children_active": true,
+              "children": [
+                {
+                  "element_type": "ButtonData",
+                  "element": {
+                    "base_data": {
+                      "position": { "x": 0, "y": 0 },
+                      "size": { "x": 0, "y": 0 },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    },
+                    "label": "Start Game"
+                  }
+                },
+                {
+                  "element_type": "ButtonData",
+                  "element": {
+                    "base_data": {
+                      "position": { "x": 0, "y": 0 },
+                      "size": { "x": 0, "y": 0 },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    },
+                    "label": "Crafting Table"
+                  }
+                },
+                {
+                  "element_type": "ButtonData",
+                  "element": {
+                    "base_data": {
+                      "position": { "x": 0, "y": 0 },
+                      "size": { "x": 0, "y": 0 },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    },
+                    "label": "Quit Game"
+                  }
                 }
+              ],
+              "position": {
+                "x": 325,
+                "y": 150
               },
-              {
-                "type": "Button",
-                "layout": "Horizontal",
-                "children": [],
-                "element_type": "ButtonData",
-                "element": {
-                  "label": "Crafting Table"
-                },
-                "trigger_event": "EVENT_USER_INPUT",
-                "trigger_event_data_type": "UserInputBitsetData",
-                "trigger_event_data": {
-                  "mouse_released": ["LEFT_CLICK"]
-                },
-                "response_event": "EVENT_CHANGE_SCENE",
-                "response_event_data_type": "SceneChangeData",
-                "response_event_data": {
-                  "scene_type": "CRAFTING"
-                }
-              },
-              {
-                "type": "Button",
-                "layout": "Horizontal",
-                "children": [],
-                "element_type": "ButtonData",
-                "element": {
-                  "label": "Quit Game"
-                },
-
-                "trigger_event": "EVENT_USER_INPUT",
-                "trigger_event_data_type": "UserInputBitsetData",
-                "trigger_event_data": {
-                  "mouse_released": ["LEFT_CLICK"]
-                },
-                "response_event": "EVENT_QUIT_GAME"
+              "size": {
+                "x": 250,
+                "y": 300
               }
-            ],
-            "position": {
-              "x": 325,
-              "y": 150
-            },
-            "size": {
-              "x": 250,
-              "y": 300
             }
           }
         }

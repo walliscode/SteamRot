@@ -1,419 +1,183 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// @file
 /// @brief Implementation of the UIElementFactory class
-/////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 #include "UIElementFactory.h"
-#include "DropDown.h"
-#include "FlatbuffersConfigurator.h"
-#include "event_helpers.h"
+#include "FailInfo.h"
 #include "user_interface_generated.h"
-#include "uuid.h"
 #include <expected>
-#include <iostream>
+#include <string>
 
 namespace steamrot {
 
 /////////////////////////////////////////////////
-std::expected<UIElement, FailInfo>
-UIElementFactory::CreateUIStructure(const UIElementData &element_data) {
+std::expected<std::unique_ptr<UIElement>, FailInfo>
+CreateUIElement(const UIElementDataUnion &data_type, const void *data) {
+  // arrange
+  std::unique_ptr<UIElement> element;
+  const UIElementData *base_data = nullptr;
 
-  const auto result = RecursivlyBuildUIElement(element_data);
-
-  // propagate the error if the result is not valid
-  if (!result.has_value()) {
-    return std::unexpected(result.error());
-  }
-  return result.value();
-};
-
-/////////////////////////////////////////////////
-std::expected<UIElement, FailInfo>
-UIElementFactory::RecursivlyBuildUIElement(const UIElementData &element_data) {
-  // create UIElement with general configuration
-  auto result = ConfigureGeneralUIElement(element_data);
-
-  // propagate the error if the result is not valid
-  if (!result.has_value()) {
-    return std::unexpected(result.error());
-  }
-  UIElement ui_element = result.value();
-
-  // check type is present
-  if (!element_data.type()) {
-    FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
-                       "UIElement type not found"};
-    return std::unexpected(fail_info);
-  }
-  // Configure the UIElement based on its type
-  switch (element_data.type()) {
-
-    // Panel
-  case UIElementType::UIElementType_Panel: {
-    auto panel_ptr = element_data.element_as_PanelData();
-    if (!panel_ptr) {
-      FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
-                         "UIElement Panel data not found"};
-      return std::unexpected(fail_info);
-    }
-    auto panel_result = ConfigurePanel(*panel_ptr);
-
-    // propagate the error if the result is not valid
-    if (!panel_result.has_value()) {
-      return std::unexpected(panel_result.error());
-    }
-    ui_element.element_type = panel_result.value();
-
+  switch (data_type) {
+  case UIElementDataUnion::UIElementDataUnion_PanelData: {
+    auto panel_data = static_cast<const PanelData *>(data);
+    auto panel = std::make_unique<PanelElement>();
+    auto config_result = ConfigurePanelElement(*panel, *panel_data);
+    if (!config_result.has_value())
+      return std::unexpected(config_result.error());
+    element = std::move(panel);
+    base_data = panel_data->base_data();
     break;
   }
-    // Button
-  case UIElementType::UIElementType_Button: {
-    std::cout << "Configuring Button UIElement" << std::endl;
-    auto button_ptr = element_data.element_as_ButtonData();
-    if (!button_ptr) {
-      FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
-                         "UIElement Button data not found"};
-      return std::unexpected(fail_info);
-    }
-    auto button_result = ConfigureButton(*button_ptr);
-    if (!button_result.has_value()) {
-      return std::unexpected(button_result.error());
-    }
-    ui_element.element_type = button_result.value();
-
-    std::cout << "Button label: "
-              << std::get<Button>(ui_element.element_type).label << std::endl;
+  case UIElementDataUnion::UIElementDataUnion_ButtonData: {
+    auto button_data = static_cast<const ButtonData *>(data);
+    auto button = std::make_unique<ButtonElement>();
+    auto config_result = ConfigureButtonElement(*button, *button_data);
+    if (!config_result.has_value())
+      return std::unexpected(config_result.error());
+    element = std::move(button);
+    base_data = button_data->base_data();
     break;
   }
-    // DropDownContainer
-  case UIElementType::UIElementType_DropDownContainer: {
-    std::cout << "Configuring DropDown UIElement" << std::endl;
-    auto dd_ptr = element_data.element_as_DropDownContainerData();
-    if (!dd_ptr) {
-      FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
-                         "UIElement DropDownContainer data not found"};
-      return std::unexpected(fail_info);
-    }
-    auto dd_result = ConfigureDropDownContainer(*dd_ptr);
-
-    if (!dd_result.has_value()) {
-      return std::unexpected(dd_result.error());
-    }
-    ui_element.element_type = dd_result.value();
-
+  case UIElementDataUnion::UIElementDataUnion_DropDownListData: {
+    auto ddlist_data = static_cast<const DropDownListData *>(data);
+    auto ddlist = std::make_unique<DropDownListElement>();
+    auto config_result = ConfigureDropDownListElement(*ddlist, *ddlist_data);
+    if (!config_result.has_value())
+      return std::unexpected(config_result.error());
+    element = std::move(ddlist);
+    base_data = ddlist_data->base_data();
     break;
   }
-
-    // DropDownList
-  case UIElementType::UIElementType_DropDownList: {
-    std::cout << "Configuring DropDownList UIElement" << std::endl;
-    auto ddl_ptr = element_data.element_as_DropDownListData();
-    if (!ddl_ptr) {
-      FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
-                         "UIElement DropDownList data not found"};
-      return std::unexpected(fail_info);
-    }
-    auto ddl_result = ConfigureDropDownList(*ddl_ptr);
-    if (!ddl_result.has_value()) {
-      return std::unexpected(ddl_result.error());
-    }
-    ui_element.element_type = ddl_result.value();
+  case UIElementDataUnion::UIElementDataUnion_DropDownContainerData: {
+    auto ddcont_data = static_cast<const DropDownContainerData *>(data);
+    auto ddcont = std::make_unique<DropDownContainerElement>();
+    auto config_result =
+        ConfigureDropDownContainerElement(*ddcont, *ddcont_data);
+    if (!config_result.has_value())
+      return std::unexpected(config_result.error());
+    element = std::move(ddcont);
+    base_data = ddcont_data->base_data();
     break;
   }
-
-    // DropDownItem
-  case UIElementType::UIElementType_DropDownItem: {
-    std::cout << "Configuring DropDownItem UIElement" << std::endl;
-    auto ddi_ptr = element_data.element_as_DropDownItemData();
-    if (!ddi_ptr) {
-      FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
-                         "UIElement DropDownItem data not found"};
-      return std::unexpected(fail_info);
-    }
-    auto ddi_result = ConfigureDropDownItem(*ddi_ptr);
-    if (!ddi_result.has_value()) {
-      return std::unexpected(ddi_result.error());
-    }
-    ui_element.element_type = ddi_result.value();
+  case UIElementDataUnion::UIElementDataUnion_DropDownItemData: {
+    auto dditem_data = static_cast<const DropDownItemData *>(data);
+    auto dditem = std::make_unique<DropDownItemElement>();
+    auto config_result = ConfigureDropDownItemElement(*dditem, *dditem_data);
+    if (!config_result.has_value())
+      return std::unexpected(config_result.error());
+    element = std::move(dditem);
+    base_data = dditem_data->base_data();
     break;
   }
-
-  // DropDownButton
-  case UIElementType::UIElementType_DropDownButton: {
-    std::cout << "Configuring DropDownButton UIElement" << std::endl;
-    auto ddb_ptr = element_data.element_as_DropDownButtonData();
-    if (!ddb_ptr) {
-      FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
-                         "UIElement DropDownButton data not found"};
-      return std::unexpected(fail_info);
-    }
-    auto ddb_result = ConfigureDropDownButton(*ddb_ptr);
-    if (!ddb_result.has_value()) {
-      return std::unexpected(ddb_result.error());
-    }
-    ui_element.element_type = ddb_result.value();
+  case UIElementDataUnion::UIElementDataUnion_DropDownButtonData: {
+    auto ddbtn_data = static_cast<const DropDownButtonData *>(data);
+    auto ddbtn = std::make_unique<DropDownButtonElement>();
+    auto config_result = ConfigureDropDownButtonElement(*ddbtn, *ddbtn_data);
+    if (!config_result.has_value())
+      return std::unexpected(config_result.error());
+    element = std::move(ddbtn);
+    base_data = ddbtn_data->base_data();
     break;
   }
-  default: {
-    // add an empty Panel element to the UIElement for the None type
-    ui_element.element_type = Panel{};
-
-    break;
-  }
-  }
-  std::cout << "UIElement configured successfully." << std::endl;
-
-  // Recursively build child elements if they exist
-  if (element_data.children()) {
-    std::cout << "Recursively building child elements" << std::endl;
-    for (const auto &child_element : *element_data.children()) {
-      // Recursively build the child UIElement
-      auto child_result = RecursivlyBuildUIElement(*child_element);
-
-      // Check if the child UIElement was created successfully
-      if (!child_result.has_value()) {
-        // If not, propagate the error
-        return std::unexpected(child_result.error());
-      }
-
-      // Get the successfully created child UIElement
-      UIElement child_ui_element = child_result.value();
-
-      // Add the child UIElement to the parent UIElement
-      ui_element.child_elements.push_back(child_ui_element);
-    }
-  }
-  return ui_element;
-};
-
-std::expected<UIElement, FailInfo>
-UIElementFactory::ConfigureGeneralUIElement(const UIElementData &element) {
-  UIElement ui_element;
-
-  if (element.name()) {
-    ui_element.name = element.name()->str();
-  }
-  if (element.layout())
-    ui_element.layout = element.layout();
-
-  if (element.spacing_strategy()) {
-    ui_element.spacing_strategy = element.spacing_strategy();
-  }
-
-  if (element.position()) {
-    ui_element.position =
-        sf::Vector2f(element.position()->x(), element.position()->y());
-  }
-
-  if (element.size()) {
-    ui_element.size = sf::Vector2f(element.size()->x(), element.size()->y());
-  }
-
-  if (element.ratio()) {
-    ui_element.ratio = element.ratio();
-  }
-
-  if (element.children_active()) {
-    ui_element.children_active = element.children_active();
-  }
-
-  if (element.trigger_event()) {
-    ui_element.trigger_event = element.trigger_event();
-    auto trigger_event_data_result = ConfigureTriggerEventData(element);
-    if (!trigger_event_data_result.has_value()) {
-      return std::unexpected(trigger_event_data_result.error());
-    }
-    ui_element.trigger_event_data = trigger_event_data_result.value();
-  }
-
-  if (element.response_event()) {
-    ui_element.response_event = element.response_event();
-    auto response_event_data_result = ConfigureResponseEventData(element);
-    if (!response_event_data_result.has_value()) {
-      return std::unexpected(response_event_data_result.error());
-    }
-    ui_element.response_event_data = response_event_data_result.value();
-  }
-
-  return ui_element;
-}
-
-/////////////////////////////////////////////////
-std::expected<Panel, FailInfo>
-UIElementFactory::ConfigurePanel(const PanelData &panel_data) {
-  Panel panel_element;
-  // configure the panel element
-
-  return panel_element;
-}
-
-/////////////////////////////////////////////////
-std::expected<Button, FailInfo>
-UIElementFactory::ConfigureButton(const ButtonData &button_data) {
-
-  Button button_element;
-
-  if (button_data.label()) {
-    button_element.label = button_data.label()->str();
-  }
-
-  return button_element;
-}
-
-/////////////////////////////////////////////////
-std::expected<DropDownContainer, FailInfo>
-UIElementFactory::ConfigureDropDownContainer(
-    const DropDownContainerData &dropdown_data) {
-  DropDownContainer dropdown_element;
-  // configure the dropdown_element
-
-  return dropdown_element;
-}
-
-/////////////////////////////////////////////////
-std::expected<DropDownList, FailInfo>
-UIElementFactory::ConfigureDropDownList(const DropDownListData &dropdown_data) {
-  DropDownList dropdown_list_element;
-  std::cout << "Configuring DropDownList UIElement" << std::endl;
-  if (dropdown_data.label()) {
-    dropdown_list_element.label = dropdown_data.label()->str();
-  }
-  if (dropdown_data.expanded_label()) {
-    dropdown_list_element.expanded_label =
-        dropdown_data.expanded_label()->str();
-  }
-  dropdown_list_element.data_populate_function =
-      dropdown_data.data_populate_function();
-  return dropdown_list_element;
-}
-
-//////////////////////////////////////////////////
-std::expected<DropDownItem, FailInfo>
-UIElementFactory::ConfigureDropDownItem(const DropDownItemData &dropdown_data) {
-  DropDownItem dropdown_item_element;
-  if (dropdown_data.label()) {
-    dropdown_item_element.label = dropdown_data.label()->str();
-  }
-  return dropdown_item_element;
-}
-
-///////////////////////////////////////////////////
-std::expected<DropDownButton, FailInfo>
-UIElementFactory::ConfigureDropDownButton(
-    const DropDownButtonData &dropdown_data) {
-  DropDownButton dropdown_button_element;
-  dropdown_button_element.is_expanded = dropdown_data.is_expanded();
-  return dropdown_button_element;
-}
-
-/////////////////////////////////////////////////
-std::expected<UIElement, FailInfo> UIElementFactory::CreateDropDownItem() {
-  UIElement dropdown_item_element;
-  dropdown_item_element.element_type = DropDownItem{};
-  return dropdown_item_element;
-}
-
-/////////////////////////////////////////////////
-std::expected<EventData, FailInfo>
-UIElementFactory::ConfigureTriggerEventData(const UIElementData &element_data) {
-  switch (element_data.trigger_event_data_type()) {
-
-  case EventDataType::EventDataType_UserInputBitsetData: {
-    if (!element_data.trigger_event_data_as_UserInputBitsetData()) {
-      FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
-                         "Trigger event UserInputBitsetData not found"};
-      return std::unexpected(fail_info);
-    }
-
-    UserInputBitset user_input_data = ConvertActionKeysToEvent(
-        *element_data.trigger_event_data_as_UserInputBitsetData());
-
-    return user_input_data;
-  }
-  case EventDataType::EventDataType_SceneChangeData: {
-    if (!element_data.trigger_event_data_as_SceneChangeData()) {
-      FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
-                         "Trigger event SceneChangeData not found"};
-      return std::unexpected(fail_info);
-    }
-
-    SceneChangeData scene_change_data;
-    const auto &data = *element_data.trigger_event_data_as_SceneChangeData();
-    if (data.scene_id()) {
-      auto uuid_opt = uuids::uuid::from_string(data.scene_id()->str());
-      if (!uuid_opt.has_value()) {
-        FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
-                           "Invalid scene_id format in trigger event"};
-        return std::unexpected(fail_info);
-      }
-      scene_change_data.first = uuid_opt.value();
-    }
-    scene_change_data.second = data.scene_type();
-    return scene_change_data;
-  }
-  case EventDataType::EventDataType_UIElementName: {
-    if (!element_data.trigger_event_data_as_UIElementName()) {
-      FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
-                         "Trigger event UIElementName not found"};
-      return std::unexpected(fail_info);
-    }
-
-    UIElementName ui_element_name =
-        element_data.trigger_event_data_as_UIElementName()->str();
-    return ui_element_name;
-  }
-  case EventDataType::EventDataType_NONE:
   default:
-    return std::monostate{};
+    return std::unexpected(
+        FailInfo{FailMode::NonExistentEnumValue,
+                 "CreateUIElement: Unsupported UI element type in union."});
   }
-}
-/////////////////////////////////////////////////
-std::expected<EventData, FailInfo> UIElementFactory::ConfigureResponseEventData(
-    const UIElementData &element_data) {
-  switch (element_data.response_event_data_type()) {
-  case EventDataType::EventDataType_UserInputBitsetData: {
-    if (!element_data.response_event_data_as_UserInputBitsetData()) {
-      FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
-                         "Response event UserInputBitsetData not found"};
-      return std::unexpected(fail_info);
-    }
-    UserInputBitset user_input_data = ConvertActionKeysToEvent(
-        *element_data.response_event_data_as_UserInputBitsetData());
-    return user_input_data;
-  }
-  case EventDataType::EventDataType_SceneChangeData: {
-    if (!element_data.response_event_data_as_SceneChangeData()) {
-      FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
-                         "Response event SceneChangeData not found"};
-      return std::unexpected(fail_info);
-    }
 
-    SceneChangeData scene_change_data;
-    const auto &data = *element_data.response_event_data_as_SceneChangeData();
-    if (data.scene_id()) {
-      auto uuid_opt = uuids::uuid::from_string(data.scene_id()->str());
-      if (!uuid_opt.has_value()) {
-        FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
-                           "Invalid scene_id format in response event"};
-        return std::unexpected(fail_info);
-      }
-      scene_change_data.first = uuid_opt.value();
-    }
-    scene_change_data.second = data.scene_type();
-    return scene_change_data;
+  // Only call this once!
+  if (base_data) {
+    auto base_config_result = ConfigureBaseUIElement(*element, *base_data);
+    if (!base_config_result.has_value())
+      return std::unexpected(base_config_result.error());
   }
-  case EventDataType::EventDataType_UIElementName: {
-    if (!element_data.response_event_data_as_UIElementName()) {
-      FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
-                         "Response event UIElementName not found"};
-      return std::unexpected(fail_info);
-    }
-    UIElementName ui_element_name =
-        element_data.response_event_data_as_UIElementName()->str();
-    return ui_element_name;
-  }
-  case EventDataType::EventDataType_NONE:
-  default:
-    return std::monostate{};
-  }
+
+  return element;
 }
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureBaseUIElement(UIElement &element, const UIElementData &data) {
+
+  element.position = sf::Vector2f({data.position()->x(), data.position()->y()});
+  element.size = sf::Vector2f({data.size()->x(), data.size()->y()});
+  element.spacing_strategy = data.spacing_strategy();
+  element.layout = data.layout();
+  element.children_active = data.children_active();
+
+  // Recursively create and attach children
+  if (data.children()) {
+    for (auto child_fb : *data.children()) {
+      if (!child_fb)
+        continue;
+      auto type = child_fb->element_type();
+      auto child_table = child_fb->element();
+      if (!child_table)
+        continue;
+      auto child_element_result = CreateUIElement(type, child_table);
+      if (!child_element_result.has_value())
+        return std::unexpected(child_element_result.error());
+      element.child_elements.push_back(std::move(child_element_result.value()));
+    }
+  }
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigurePanelElement(PanelElement &panel_element, const PanelData &data) {
+  // No extra fields for panel
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureButtonElement(ButtonElement &button_element, const ButtonData &data) {
+  if (data.label()) {
+    button_element.label = data.label()->str();
+  }
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureDropDownListElement(DropDownListElement &dropdown_list_element,
+                             const DropDownListData &data) {
+  if (data.label()) {
+    dropdown_list_element.unexpanded_label = data.label()->str();
+  }
+  if (data.expanded_label()) {
+    dropdown_list_element.expanded_label = data.expanded_label()->str();
+  }
+  dropdown_list_element.data_populate_function = data.data_populate_function();
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo> ConfigureDropDownContainerElement(
+    DropDownContainerElement &dropdown_container_element,
+    const DropDownContainerData &data) {
+  // No extra fields for container
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureDropDownItemElement(DropDownItemElement &dropdown_item_element,
+                             const DropDownItemData &data) {
+  if (data.label()) {
+    dropdown_item_element.label = data.label()->str();
+  }
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureDropDownButtonElement(DropDownButtonElement &dropdown_button_element,
+                               const DropDownButtonData &data) {
+  dropdown_button_element.is_expanded = data.is_expanded();
+  return std::monostate{};
+}
+
 } // namespace steamrot
