@@ -6,50 +6,44 @@
         "c_user_interface": {
           "ui_name": "navigation_menu",
           "start_visible": true,
+          "root_ui_element_type": "PanelData",
           "root_ui_element": {
-            "type": "Panel",
-            "layout": "Vertical",
-            "element_type": "PanelData",
-            "element": {},
-            "children_active": true,
-            "children": [
-              {
-                "type": "Button",
-                "layout": "Horizontal",
-                "children": [],
-                "element_type": "ButtonData",
-                "element": {
-                  "label": "Return"
+            "base_data": {
+              "position": { "x": 0, "y": 0 },
+              "size": { "x": 220, "y": 600 },
+              "children_active": true,
+              "children": [
+                {
+                  "element_type": "ButtonData",
+                  "element": {
+                    "base_data": {
+                      "position": { "x": 0, "y": 0 },
+                      "size": { "x": 0, "y": 0 },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    },
+                    "label": "Return"
+                  }
                 },
-
-                "trigger_event": "EVENT_USER_INPUT",
-                "trigger_event_data_type": "UserInputBitsetData",
-                "trigger_event_data": {
-                  "mouse_released": ["LEFT_CLICK"]
-                },
-                "response_event": "EVENT_CHANGE_SCENE",
-                "response_event_data_type": "SceneChangeData",
-                "response_event_data": {
-                  "scene_type": "TITLE"
+                {
+                  "element_type": "ButtonData",
+                  "element": {
+                    "base_data": {
+                      "position": { "x": 0, "y": 0 },
+                      "size": { "x": 0, "y": 0 },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    },
+                    "label": "New Construct"
+                  }
                 }
-              },
-              {
-                "type": "Button",
-                "layout": "Horizontal",
-                "children": [],
-                "element_type": "ButtonData",
-                "element": {
-                  "label": "New Construct"
-                }
-              }
-            ],
-            "position": {
-              "x": 0,
-              "y": 0
-            },
-            "size": {
-              "x": 220,
-              "y": 600
+              ],
+              "layout": "Vertical",
+              "spacing_strategy": "None"
             }
           }
         }
@@ -58,66 +52,59 @@
         "c_user_interface": {
           "ui_name": "fragment_selection_menu",
           "start_visible": true,
+          "root_ui_element_type": "PanelData",
           "root_ui_element": {
-            "type": "Panel",
-            "layout": "Vertical",
-            "element_type": "PanelData",
-            "element": {},
-            "children_active": true,
-            "children": [
-              {
-                "type": "DropDownContainer",
-                "name": "fragment_selection_menu",
-                "layout": "Horizontal",
-                "spacing_strategy": "Ratioed",
-                "children_active": true,
-                "children": [
-                  {
-                    "type": "DropDownList",
-                    "name": "fragment_selection_menu",
-                    "layout": "DropDown",
-                    "spacing_strategy": "DropDownList",
-                    "ratio": 0.8,
-                    "children": [],
-                    "element_type": "DropDownListData",
-                    "element": {
-                      "label": "Fragments...",
-                      "expanded_label": "...",
-                      "data_populate_function": "PopulateWithFragmentData"
-                    },
-                    "trigger_event": "EVENT_TOGGLE_DROPDOWN"
-                  },
-                  {
-                    "type": "DropDownButton",
-                    "name": "fragment_selection_menu",
-                    "layout": "Horizontal",
-                    "ratio": 0.2,
-                    "children": [],
-                    "element_type": "DropDownButtonData",
-                    "element": {},
-                    "trigger_event": "EVENT_TOGGLE_DROPDOWN"
+            "base_data": {
+              "position": { "x": 600, "y": 0 },
+              "size": { "x": 150, "y": 50 },
+              "children_active": true,
+              "children": [
+                {
+                  "element_type": "DropDownContainerData",
+                  "element": {
+                    "base_data": {
+                      "position": { "x": 0, "y": 0 },
+                      "size": { "x": 0, "y": 0 },
+                      "children_active": true,
+                      "children": [
+                        {
+                          "element_type": "DropDownListData",
+                          "element": {
+                            "base_data": {
+                              "position": { "x": 0, "y": 0 },
+                              "size": { "x": 0, "y": 0 },
+                              "children_active": false,
+                              "children": [],
+                              "layout": "DropDown",
+                              "spacing_strategy": "DropDownList"
+                            },
+                            "label": "Fragments...",
+                            "expanded_label": "...",
+                            "data_populate_function": "PopulateWithFragmentData"
+                          }
+                        },
+                        {
+                          "element_type": "DropDownButtonData",
+                          "element": {
+                            "base_data": {
+                              "position": { "x": 0, "y": 0 },
+                              "size": { "x": 0, "y": 0 },
+                              "children_active": false,
+                              "children": [],
+                              "layout": "Horizontal",
+                              "spacing_strategy": "None"
+                            }
+                          }
+                        }
+                      ],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "Ratioed"
+                    }
                   }
-                ],
-                "element_type": "DropDownContainerData",
-                "element": {},
-
-                "trigger_event": "EVENT_USER_INPUT",
-                "trigger_event_data_type": "UserInputBitsetData",
-                "trigger_event_data": {
-                  "mouse_released": ["LEFT_CLICK"]
-                },
-                "response_event": "EVENT_TOGGLE_DROPDOWN",
-                "response_event_data_type": "UIElementName",
-                "response_event_data": "fragment_selection_menu"
-              }
-            ],
-            "position": {
-              "x": 600,
-              "y": 0
-            },
-            "size": {
-              "x": 150,
-              "y": 50
+                }
+              ],
+              "layout": "Vertical",
+              "spacing_strategy": "None"
             }
           }
         }

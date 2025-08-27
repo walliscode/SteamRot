@@ -4,16 +4,6 @@ include "scene_types.fbs";
 include "user_input.fbs";
 namespace steamrot;
 
-enum UIElementType: byte{
-
-  None= 0, 
-  Panel = 1,
-  Button = 2,   
-  DropDownContainer= 3,
-  DropDownList = 4,
-  DropDownItem = 5,
-  DropDownButton = 6,
-  }
 
 enum LayoutType: byte{ 
   None = 0,
@@ -44,36 +34,6 @@ union EventDataType{
   UIElementName: string,
   }
 
-table PanelData{}
-
-table ButtonData {
- label: string (required);
-}
-
-table DropDownContainerData{
-
-  }
-
-enum DataPopulateFunction: byte {
-    None = 0,
-    PopulateWithFragmentData = 1,
-    
-  }
-table DropDownListData{
-    label: string (required);
-    expanded_label: string (required);
-    data_populate_function: DataPopulateFunction;
-  }
-
-table DropDownItemData {
-    label: string (required);
-
-  }
-
-table DropDownButtonData {
-    is_expanded: bool;
-  }
-
 union UIElementDataUnion {
   PanelData,
   ButtonData,
@@ -83,25 +43,57 @@ union UIElementDataUnion {
   DropDownButtonData
 }
 
+table child {
+  element: UIElementDataUnion (required);
+}
+
 table UIElementData{
-    name: string;
-    type: UIElementType;
-    children: [UIElementData];
-    children_active: bool;
+    position: Vector2fData (required);
+    size: Vector2fData (required);
+    children_active: bool ;
+    children: [child] (required);
     layout: LayoutType;
     spacing_strategy: SpacingAndSizingType;
-    position: Vector2fData;
-    size: Vector2fData;
-    ratio: float;
-    element: UIElementDataUnion (required);
-    trigger_event: EventType;
-    trigger_event_data: EventDataType;
-    response_event: EventType;
-    response_event_data: EventDataType; 
+  }
+table PanelData{  base_data: UIElementData(required);}
+
+table ButtonData {
+  base_data: UIElementData(required);
+ label: string (required);
+}
+
+table DropDownContainerData{
+  base_data: UIElementData(required);
   }
 
+enum DataPopulateFunction: byte {
+    None = 0,
+    PopulateWithFragmentData = 1,
+    
+  }
+table DropDownListData{
+  base_data: UIElementData(required);
+    label: string (required);
+    expanded_label: string (required);
+    data_populate_function: DataPopulateFunction;
+  }
+
+table DropDownItemData {
+  base_data: UIElementData(required);
+    label: string (required);
+
+  }
+
+table DropDownButtonData {
+  base_data: UIElementData(required);
+    is_expanded: bool;
+  }
+
+
+
+
 table UserInterfaceData{
-    root_ui_element: UIElementData;
+    root_ui_element: UIElementDataUnion (required);
     ui_name: string; 
     start_visible: bool;
   }

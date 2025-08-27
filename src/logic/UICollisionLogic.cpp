@@ -54,7 +54,6 @@ void UICollisionLogic::RecursiveCheckMouseCollision(
 
   // reset mouse_over and mouse_over_child for the element
   element.mouse_over = false;
-  element.mouse_over_child = false;
 
   // lamda function to check if mouse is within bounds of the element
   bool is_mouse_over = [&]() -> bool {
@@ -74,10 +73,6 @@ void UICollisionLogic::RecursiveCheckMouseCollision(
   }
   // recursively check child elements
   for (auto &child : element.child_elements) {
-
-    // if mouse is over a child element, we set the mouse_over_child to
-    // true and mouse_over to false
-    RecursiveCheckMouseCollision(child, mouse_position);
   }
 
   // adding in mouse_over_child prevents recursive calls every tick
@@ -86,10 +81,5 @@ void UICollisionLogic::RecursiveCheckMouseCollision(
 void UICollisionLogic::RecursiveResetMouseOver(UIElement &element) {
   // reset mouse_over state for the element
   element.mouse_over = false;
-  element.mouse_over_child = false;
-  // recursively reset child elements
-  for (auto &child : element.child_elements) {
-    RecursiveResetMouseOver(child);
-  }
 }
 } // namespace steamrot

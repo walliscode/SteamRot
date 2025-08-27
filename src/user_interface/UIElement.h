@@ -3,33 +3,27 @@
 /// @file
 /// @brief Declaration of the UIElement struct
 /////////////////////////////////////////////////
-#include "Button.h"
-#include "DropDown.h"
-#include "EventPacket.h"
-#include "Panel.h"
+
+/////////////////////////////////////////////////
+/// Preprocessor Directives
+/////////////////////////////////////////////////
+#pragma once
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
 #include "user_interface_generated.h"
 #include <SFML/Graphics.hpp>
-#include <optional>
-#include <variant>
+#include <memory>
 #include <vector>
+
 namespace steamrot {
 
-using ElementType = std::variant<Panel, Button, DropDownContainer, DropDownList,
-                                 DropDownItem, DropDownButton>;
-
+/////////////////////////////////////////////////
+/// @class UIElement
+/// @brief Base struct for all UI elements, contains common properties
+/////////////////////////////////////////////////
 struct UIElement {
-  std::string name{"UIElement"};
-
-  /////////////////////////////////////////////////
-  /// @brief UIELement type, contains extra data for the element, can only be
-  /// one of the options.
-  /////////////////////////////////////////////////
-  ElementType element_type;
-
-  /////////////////////////////////////////////////
-  /// @brief Container for all child elements. Can be empty
-  /////////////////////////////////////////////////
-  std::vector<UIElement> child_elements;
 
   /////////////////////////////////////////////////
   /// @brief Position of the UI element in the window
@@ -42,30 +36,9 @@ struct UIElement {
   sf::Vector2f size{0.f, 0.f};
 
   /////////////////////////////////////////////////
-  /// @brief An optional ratio for the UI element, used in spacing strategies
-  /////////////////////////////////////////////////
-  std::optional<float> ratio{std::nullopt};
-
-  /////////////////////////////////////////////////
-  /// @brief Spacing and sizing strategy for the children elements defaulting to
-  /// Even
-  /////////////////////////////////////////////////
-  SpacingAndSizingType spacing_strategy{
-      SpacingAndSizingType::SpacingAndSizingType_Even};
-  /////////////////////////////////////////////////
-  /// @brief Layout type of the children elements
-  /////////////////////////////////////////////////
-  LayoutType layout{LayoutType::LayoutType_Vertical};
-
-  /////////////////////////////////////////////////
   /// @brief Is mouse over this element, false if it over a child element
   /////////////////////////////////////////////////
   bool mouse_over{false};
-
-  /////////////////////////////////////////////////
-  /// @brief Helper variable to check if the mouse is over a child element
-  /////////////////////////////////////////////////
-  bool mouse_over_child{false};
 
   /////////////////////////////////////////////////
   /// @brief Helper variable for the UIRenderLogic and UICollisionLogic whether
@@ -74,23 +47,20 @@ struct UIElement {
   bool children_active{false};
 
   /////////////////////////////////////////////////
-  /// @brief Event that triggers this UIELement
+  /// @brief Container for all child elements. Can be empty
   /////////////////////////////////////////////////
-  EventType trigger_event{EventType::EventType_NONE};
+  std::vector<std::unique_ptr<UIElement>> child_elements;
 
   /////////////////////////////////////////////////
-  /// @brief Optional data package to check against the trigger event.
+  /// @brief Spacing and sizing strategy for the children elements defaulting to
+  /// Even
   /////////////////////////////////////////////////
-  EventData trigger_event_data{std::monostate{}};
+  SpacingAndSizingType spacing_strategy{
+      SpacingAndSizingType::SpacingAndSizingType_Even};
 
   /////////////////////////////////////////////////
-  /// @brief Potential response event that is sent to the EventBus
+  /// @brief Layout type of the children elements
   /////////////////////////////////////////////////
-  EventType response_event{EventType::EventType_NONE};
-
-  /////////////////////////////////////////////////
-  /// @brief Optional data package to be associated with the response event.
-  /////////////////////////////////////////////////
-  EventData response_event_data{std::monostate{}};
+  LayoutType layout{LayoutType::LayoutType_Vertical};
 };
 } // namespace steamrot

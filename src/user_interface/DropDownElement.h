@@ -3,12 +3,21 @@
 /// @brief Declaration of DropDown struct
 /////////////////////////////////////////////////
 
+/////////////////////////////////////////////////
+/// Preprocessor Directives
+/////////////////////////////////////////////////
 #pragma once
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include "UIElement.h"
 #include "user_interface_generated.h"
 #include <string>
+
 namespace steamrot {
 
-struct DropDownContainer {
+struct DropDownContainerElement : public UIElement {
   /////////////////////////////////////////////////
   /// @brief Indicates whether the dropdown is expanded or not. This should be
   /// passed to associated children elements
@@ -16,14 +25,17 @@ struct DropDownContainer {
   bool is_expanded{false};
 };
 
-struct DropDownList {
+struct DropDownListElement : public UIElement {
+  /////////////////////////////////////////////////
+  /// @brief Indicates whether the dropdown is expanded or not.
+  /////////////////////////////////////////////////
   bool is_expanded{false};
 
   /////////////////////////////////////////////////
   /// @brief The name you see when the items are not expanded. It should
   /// indicate role of the dropdown
   /////////////////////////////////////////////////
-  std::string label{"items..."};
+  std::string unexpanded_label{"items..."};
 
   /////////////////////////////////////////////////
   /// @brief The name you see when the items are expanded.
@@ -37,7 +49,7 @@ struct DropDownList {
   DataPopulateFunction data_populate_function{DataPopulateFunction_None};
 };
 
-struct DropDownItem {
+struct DropDownItemElement : public UIElement {
   /////////////////////////////////////////////////
   /// @brief The name of the item
   /////////////////////////////////////////////////
@@ -49,7 +61,7 @@ struct DropDownItem {
   std::string value{"value..."};
 };
 
-struct DropDownButton {
+struct DropDownButtonElement : public UIElement {
   /////////////////////////////////////////////////
   /// @brief Indicates whether the associated dropdown is expanded or not
   /////////////////////////////////////////////////
