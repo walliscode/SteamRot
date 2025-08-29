@@ -93,7 +93,8 @@ table DropDownButtonData {
 
 
 table UserInterfaceData{
-    root_ui_element: UIElementDataUnion (required);
+  // first structure must be a PanelElement
+    root_ui_element: PanelData (required); 
     ui_name: string; 
     start_visible: bool;
   }

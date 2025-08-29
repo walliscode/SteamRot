@@ -278,3 +278,32 @@ TEST_CASE("UIElementFactory::CreateUIElement - DropDownButton",
   steamrot::tests::TestUIELementProperites(*ddbutton_element,
                                            *ddbutton_data->base_data());
 }
+TEST_CASE("UIElementFactory::CreateUIElement - Deeply Nested Panel",
+          "[UIElementFactory][nested]") {
+  flatbuffers::FlatBufferBuilder builder{4096};
+
+  // Create deeply nested PanelData (with DropDownContainer, DropDownList,
+  // Button, DropDownItem, DropDownButton)
+  const auto *nested_panel_data =
+      TestUIElementDataFactory::CreateDeeplyNestedTestPanel(builder);
+  REQUIRE(nested_panel_data != nullptr);
+
+  // act: create the element using the factory
+  auto element_result = CreateUIElement(
+      steamrot::UIElementDataUnion::UIElementDataUnion_PanelData,
+      nested_panel_data);
+  if (!element_result.has_value()) {
+    FAIL(element_result.error().message);
+  }
+
+  // assert: check that we got a PanelElement with nested structure
+  auto *panel_element =
+      dynamic_cast<steamrot::PanelElement *>(element_result.value().get());
+  REQUIRE(panel_element != nullptr);
+
+  // Deep recursive test: check all nested elements match their data
+  // This uses the helpers discussed in previous answers.
+  steamrot::tests::TestNestedElementProperties(
+      *panel_element, nested_panel_data,
+      steamrot::UIElementDataUnion::UIElementDataUnion_PanelData);
+}

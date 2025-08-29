@@ -144,6 +144,81 @@ public:
 
     return builder.CreateVector(children_vec);
   }
+  //////////////////////////////////////////////////////////////////////////////
+  /// @brief Create a 4-level nested UIElementData structure for testing.
+  /// Example structure (Panel):
+  /// - Panel
+  ///   - DropDownContainer
+  ///     - DropDownList
+  ///       - Button
+  ///       - DropDownItem
+  ///     - DropDownButton
+  //////////////////////////////////////////////////////////////////////////////
+  static const PanelData *
+  CreateDeeplyNestedTestPanel(flatbuffers::FlatBufferBuilder &builder) {
+    // Level 3: Children of DropDownList
+    auto button_base = CreateTestUIElementData(builder, 5, 5, 20, 10, false,
+                                               SpacingAndSizingType_None,
+                                               LayoutType_Horizontal);
+    auto button_label = builder.CreateString("NestedButton");
+    auto button_offset = CreateButtonData(builder, button_base, button_label);
+
+    auto item_base =
+        CreateTestUIElementData(builder, 6, 6, 18, 8, false,
+                                SpacingAndSizingType_None, LayoutType_DropDown);
+    auto item_label = builder.CreateString("NestedItem");
+    auto item_offset = CreateDropDownItemData(builder, item_base, item_label);
+
+    std::vector<std::pair<UIElementDataUnion, flatbuffers::Offset<void>>>
+        ddl_children{
+            {UIElementDataUnion_ButtonData, button_offset.Union()},
+            {UIElementDataUnion_DropDownItemData, item_offset.Union()}};
+    auto ddl_children_vec = CreateChildrenVector(builder, ddl_children);
+
+    // Level 2: DropDownList, DropDownButton
+    auto ddl_base = CreateTestUIElementData(
+        builder, 7, 7, 60, 20, false, SpacingAndSizingType_None,
+        LayoutType_DropDown, ddl_children_vec);
+    auto ddl_label = builder.CreateString("ListLevel2");
+    auto ddl_expanded_label = builder.CreateString("ExpandedLevel2");
+    auto ddl_offset =
+        CreateDropDownListData(builder, ddl_base, ddl_label, ddl_expanded_label,
+                               DataPopulateFunction_None);
+
+    auto ddb_base =
+        CreateTestUIElementData(builder, 8, 8, 20, 10, false,
+                                SpacingAndSizingType_None, LayoutType_DropDown);
+    auto ddb_offset = CreateDropDownButtonData(builder, ddb_base, false);
+
+    std::vector<std::pair<UIElementDataUnion, flatbuffers::Offset<void>>>
+        ddcontainer_children{
+            {UIElementDataUnion_DropDownListData, ddl_offset.Union()},
+            {UIElementDataUnion_DropDownButtonData, ddb_offset.Union()}};
+    auto ddcontainer_children_vec =
+        CreateChildrenVector(builder, ddcontainer_children);
+
+    // Level 1: DropDownContainer as Panel's child
+    auto ddcontainer_base = CreateTestUIElementData(
+        builder, 9, 9, 100, 40, true, SpacingAndSizingType_DropDownList,
+        LayoutType_DropDown, ddcontainer_children_vec);
+    auto ddcontainer_offset =
+        CreateDropDownContainerData(builder, ddcontainer_base);
+
+    // Wrap DropDownContainer as a child for the Panel root
+    std::vector<std::pair<UIElementDataUnion, flatbuffers::Offset<void>>>
+        panel_children{{UIElementDataUnion_DropDownContainerData,
+                        ddcontainer_offset.Union()}};
+    auto panel_children_vec = CreateChildrenVector(builder, panel_children);
+
+    // Create the Panel as the root element
+    auto panel_base = CreateTestUIElementData(
+        builder, 10, 20, 100, 200, true, SpacingAndSizingType_DropDownList,
+        LayoutType_Grid, panel_children_vec);
+    auto panel_offset = CreatePanelData(builder, panel_base);
+
+    builder.Finish(panel_offset);
+    return flatbuffers::GetRoot<PanelData>(builder.GetBufferPointer());
+  }
 };
 
 } // namespace steamrot::tests

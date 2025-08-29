@@ -26,7 +26,7 @@ struct CUserInterface : public Component {
   ///
   /// UI components should be few enough that manual unique naming is viable.
   /////////////////////////////////////////////////
-  std::string UIName{"Default UI"};
+  std::string m_name{"Default UI"};
 
   /////////////////////////////////////////////////
   /// @brief Root UI element of the user interface component

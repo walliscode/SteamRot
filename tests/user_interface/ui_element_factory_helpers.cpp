@@ -66,5 +66,160 @@ void TestDropDownButtonElementProperties(const DropDownButtonElement &element,
   REQUIRE(element.is_expanded == data.is_expanded());
 }
 
+/////////////////////////////////////////////////
+/// Template specializations for TestFlatbufferElement, templates off of
+/// Flatbuffers UIElementDataUnion
+/////////////////////////////////////////////////
+
+template <typename DataT>
+void TestFlatbufferElement(const UIElement &element, const DataT &data);
+template <>
+void TestFlatbufferElement<PanelData>(const UIElement &element,
+                                      const PanelData &data) {
+  auto derived = dynamic_cast<const PanelElement *>(&element);
+  REQUIRE(derived != nullptr);
+
+  TestUIELementProperites(*derived, *data.base_data());
+  TestPanelElementProperties(*derived, data);
+
+  auto children_data = data.base_data()->children();
+  REQUIRE(children_data);
+  REQUIRE(children_data->size() == derived->child_elements.size());
+  for (size_t i = 0; i < children_data->size(); ++i) {
+    const auto *child = children_data->Get(i);
+    const auto &child_element = *(derived->child_elements[i]);
+    auto child_union_type = child->element_type();
+    auto child_union_ptr = child->element();
+    TestNestedElementProperties(child_element, child_union_ptr,
+                                child_union_type);
+  }
+}
+
+// --- ButtonData specialization --- //
+template <>
+void TestFlatbufferElement<ButtonData>(const UIElement &element,
+                                       const ButtonData &data) {
+  auto derived = dynamic_cast<const ButtonElement *>(&element);
+  REQUIRE(derived != nullptr);
+
+  TestUIELementProperites(*derived, *data.base_data());
+  TestButtonElementProperties(*derived, data);
+
+  auto children_data = data.base_data()->children();
+  if (children_data && children_data->size() > 0) {
+    REQUIRE(children_data->size() == derived->child_elements.size());
+    for (size_t i = 0; i < children_data->size(); ++i) {
+      const auto *child = children_data->Get(i);
+      const auto &child_element = *(derived->child_elements[i]);
+      auto child_union_type = child->element_type();
+      auto child_union_ptr = child->element();
+      TestNestedElementProperties(child_element, child_union_ptr,
+                                  child_union_type);
+    }
+  }
+}
+
+// --- DropDownContainerData specialization --- //
+template <>
+void TestFlatbufferElement<DropDownContainerData>(
+    const UIElement &element, const DropDownContainerData &data) {
+  auto derived = dynamic_cast<const DropDownContainerElement *>(&element);
+  REQUIRE(derived != nullptr);
+
+  TestUIELementProperites(*derived, *data.base_data());
+  TestDropDownContainerElementProperties(*derived, data);
+
+  auto children_data = data.base_data()->children();
+  if (children_data && children_data->size() > 0) {
+    REQUIRE(children_data->size() == derived->child_elements.size());
+    for (size_t i = 0; i < children_data->size(); ++i) {
+      const auto *child = children_data->Get(i);
+      const auto &child_element = *(derived->child_elements[i]);
+      auto child_union_type = child->element_type();
+      auto child_union_ptr = child->element();
+      TestNestedElementProperties(child_element, child_union_ptr,
+                                  child_union_type);
+    }
+  }
+}
+
+// --- DropDownListData specialization --- //
+template <>
+void TestFlatbufferElement<DropDownListData>(const UIElement &element,
+                                             const DropDownListData &data) {
+  auto derived = dynamic_cast<const DropDownListElement *>(&element);
+  REQUIRE(derived != nullptr);
+
+  TestUIELementProperites(*derived, *data.base_data());
+  TestDropDownListElementProperties(*derived, data);
+
+  auto children_data = data.base_data()->children();
+  if (children_data && children_data->size() > 0) {
+    REQUIRE(children_data->size() == derived->child_elements.size());
+    for (size_t i = 0; i < children_data->size(); ++i) {
+      const auto *child = children_data->Get(i);
+      const auto &child_element = *(derived->child_elements[i]);
+      auto child_union_type = child->element_type();
+      auto child_union_ptr = child->element();
+      TestNestedElementProperties(child_element, child_union_ptr,
+                                  child_union_type);
+    }
+  }
+}
+
+// --- DropDownItemData specialization --- //
+template <>
+void TestFlatbufferElement<DropDownItemData>(const UIElement &element,
+                                             const DropDownItemData &data) {
+  auto derived = dynamic_cast<const DropDownItemElement *>(&element);
+  REQUIRE(derived != nullptr);
+
+  TestUIELementProperites(*derived, *data.base_data());
+  TestDropDownItemElementProperties(*derived, data);
+  // Typically no children
+}
+
+// --- DropDownButtonData specialization --- //
+template <>
+void TestFlatbufferElement<DropDownButtonData>(const UIElement &element,
+                                               const DropDownButtonData &data) {
+  auto derived = dynamic_cast<const DropDownButtonElement *>(&element);
+  REQUIRE(derived != nullptr);
+
+  TestUIELementProperites(*derived, *data.base_data());
+  TestDropDownButtonElementProperties(*derived, data);
+  // Typically no children
+}
+void TestNestedElementProperties(const UIElement &element, const void *data,
+                                 UIElementDataUnion type) {
+  using namespace steamrot;
+
+  switch (type) {
+  case UIElementDataUnion_PanelData:
+    TestFlatbufferElement(element, *reinterpret_cast<const PanelData *>(data));
+    break;
+  case UIElementDataUnion_ButtonData:
+    TestFlatbufferElement(element, *reinterpret_cast<const ButtonData *>(data));
+    break;
+  case UIElementDataUnion_DropDownContainerData:
+    TestFlatbufferElement(
+        element, *reinterpret_cast<const DropDownContainerData *>(data));
+    break;
+  case UIElementDataUnion_DropDownListData:
+    TestFlatbufferElement(element,
+                          *reinterpret_cast<const DropDownListData *>(data));
+    break;
+  case UIElementDataUnion_DropDownItemData:
+    TestFlatbufferElement(element,
+                          *reinterpret_cast<const DropDownItemData *>(data));
+    break;
+  case UIElementDataUnion_DropDownButtonData:
+    TestFlatbufferElement(element,
+                          *reinterpret_cast<const DropDownButtonData *>(data));
+    break;
+  default:
+    FAIL("Unknown FlatBuffer UIElementDataUnion type in nested check.");
+  }
+}
 } // namespace tests
 } // namespace steamrot

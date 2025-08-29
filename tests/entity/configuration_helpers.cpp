@@ -14,8 +14,8 @@
 #include "emp_helpers.h"
 #include "entities_generated.h"
 #include "scenes_generated.h"
-#include <unistd.h>
-
+#include "ui_element_factory_helpers.h"
+#include "user_interface_generated.h"
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
@@ -24,7 +24,7 @@ void CompareToDefault(const CUserInterface &actual) {
   // create instance of CUserInterface
   CUserInterface c_user_interface;
 
-  REQUIRE(actual.UIName == c_user_interface.UIName);
+  REQUIRE(actual.m_name == c_user_interface.m_name);
   REQUIRE(actual.m_active == c_user_interface.m_active);
   REQUIRE(actual.m_UI_visible == c_user_interface.m_UI_visible);
 }
@@ -68,8 +68,15 @@ void TestEMPIsDefaultConstructed(const EntityMemoryPool &entity_memory_pool) {
 void CompareToData(const CUserInterface &actual,
                    const UserInterfaceData &data) {
 
-  REQUIRE(actual.UIName == data.ui_name()->str());
+  REQUIRE(actual.m_name == data.ui_name()->str());
   REQUIRE(actual.m_UI_visible == data.start_visible());
+  // test the root element and its nested structure
+  REQUIRE(actual.m_root_element != nullptr);
+  REQUIRE(data.root_ui_element() != nullptr);
+
+  const auto *root_panel_data = data.root_ui_element();
+  TestNestedElementProperties(*actual.m_root_element, root_panel_data,
+                              UIElementDataUnion::UIElementDataUnion_PanelData);
 }
 
 /////////////////////////////////////////////////

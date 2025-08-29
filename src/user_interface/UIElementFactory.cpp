@@ -14,7 +14,7 @@ namespace steamrot {
 std::expected<std::unique_ptr<UIElement>, FailInfo>
 CreateUIElement(const UIElementDataUnion &data_type, const void *data) {
   // arrange
-  std::unique_ptr<UIElement> element;
+  std::unique_ptr<UIElement> element{nullptr};
   const UIElementData *base_data = nullptr;
 
   switch (data_type) {
@@ -90,6 +90,12 @@ CreateUIElement(const UIElementDataUnion &data_type, const void *data) {
     auto base_config_result = ConfigureBaseUIElement(*element, *base_data);
     if (!base_config_result.has_value())
       return std::unexpected(base_config_result.error());
+  }
+  // return unexpected if element is still null
+  if (!element) {
+    return std::unexpected(
+        FailInfo{FailMode::FlatbuffersDataNotFound,
+                 "CreateUIElement: Element creation failed, element is null."});
   }
 
   return element;

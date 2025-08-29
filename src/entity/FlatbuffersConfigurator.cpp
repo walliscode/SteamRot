@@ -8,9 +8,11 @@
 /////////////////////////////////////////////////
 #include "FlatbuffersConfigurator.h"
 #include "CUserInterface.h"
+#include "UIElement.h"
 #include "UIElementFactory.h"
 #include "emp_helpers.h"
 #include "scene_types_generated.h"
+#include "user_interface_generated.h"
 #include <expected>
 #include <variant>
 
@@ -125,7 +127,7 @@ FlatbuffersConfigurator::ConfigureComponent(const UserInterfaceData *ui_data,
   // configure the CUserInterface specific data, wrap in if statements to avoid
   // any segfaults
   if (ui_data->ui_name())
-    ui_component.UIName = ui_data->ui_name()->str();
+    ui_component.m_name = ui_data->ui_name()->str();
 
   if (ui_data->start_visible())
     ui_component.m_UI_visible = ui_data->start_visible();
@@ -140,8 +142,16 @@ FlatbuffersConfigurator::ConfigureComponent(const UserInterfaceData *ui_data,
   // create instance of UIElementFactory for use.
   UIElementFactory element_factory;
 
-  // start building from the root element
+  // add the root element using the factory (it should build any recursive
+  // structure)
+  // the first
+  auto root_element_result =
+      CreateUIElement(UIElementDataUnion::UIElementDataUnion_PanelData,
+                      ui_data->root_ui_element());
+  if (!root_element_result.has_value())
+    return std::unexpected(root_element_result.error());
 
+  ui_component.m_root_element = std::move(root_element_result.value());
   return std::monostate{};
 }
 
