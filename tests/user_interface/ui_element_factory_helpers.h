@@ -39,5 +39,8 @@ void TestDropDownItemElementProperties(const DropDownItemElement &element,
 void TestDropDownButtonElementProperties(const DropDownButtonElement &element,
                                          const DropDownButtonData &data);
 
+void TestNestedElementProperties(const UIElement &element, const void *data,
+                                 UIElementDataUnion type);
+
 } // namespace tests
 } // namespace steamrot

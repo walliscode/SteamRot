@@ -6,7 +6,6 @@
         "c_user_interface": {
           "ui_name": "test_menu",
           "start_visible": true,
-          "root_ui_element_type": "ButtonData",
           "root_ui_element": {
             "base_data": {
               "position": { "x": 20, "y": 25 },
@@ -44,8 +43,7 @@
               ],
               "layout": "Horizontal",
               "spacing_strategy": "Ratioed"
-            },
-            "label": "test button"
+            }
           }
         }
       },

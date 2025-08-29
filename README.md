@@ -161,32 +161,19 @@ required.
 
 #### Adding New Element types
 
-Element definition is contained in `src/user_interface`. An UI Element is a
-struct such as Panel or Button.
+Each element is derived from UIElement contained in `src/user_interface/`,
+UIElement contains a virtual destructor to allow for polymorphism
 
-The general UIElement struct contains information common to all element structs
-and stores one of the possible structs (Panel, Button e.t.c.) as a std::variant.
+The UIElement and derived types are designed to be pure data containers with no
+methods.
 
-To create a new struct, add it as a header file in the `src/user_interface` and
-then add it to the ElementType typedef in UIElement.h file.
+The UIElement contains data common to all UI elements such as position, size,
+visibility e.t.c.
 
-We then need to create the flatbuffers data equivalent. In
-`src/flatbuffers_headers/user_interface.fbs` add the new element as
-`table NewElementData{}` and add that to the `union UIElementDataUnion`
+Once a new UIElement type has been created, a style and drawing method will need
+to be created for it.
 
-We need to interface the two in the UIElementFactory. Provide a specific
-function for just that Element and then add it to the switch statement.
-
-The element should contain information about the state of the UI Element. For
-things like drop down choices we store in the UIElementDataPackage.
-
-This all leads to storing the data of the UIElement in the CUserInteface
-component. We then need to know how to draw the new element. This is a
-combination of a style struct and logic.
-
-In the UIRenderLogic.h create a NewElementStyle struct which inherits from the
-Style struct. Again, create a relevant flatbuffers data equivalent under
-themes.fbs
+Creating tests for this is covered under Testing
 
 ### Adding Logic
 
@@ -286,6 +273,30 @@ The LogicFactory abstract class will be responsible for creating Logic objects.
 It will have a pure virtual function (CreateLogic()) that will return a unique
 pointer to a Logic object. So a MovementLogicFactory will create a MovementLogic
 object depending on the parameters passed to it.
+
+## Testing
+
+### user_interface
+
+#### Testing UI Elements
+
+The TestUIElementDataProvider.h file defines a class with static methods that
+provide some specific methods. (This could be updated in the future to provide
+randomly generated data so we can provide a wider range of test cases).
+
+So any new UIElement type will need to have a static method added to this class
+to provide data.
+
+The ui_element_factory_helpers.h defines a series of functions that will compare
+the flatbuffers data to the produced UIElement (from the UIElementFactory
+configure).
+
+Any new UIElement type will need to have a new test function added to this file.
+
+The ui_element_factory_helpers.cpp file also contains a full template
+specialization for each flatbuffers data type to UIElement type. Any new
+UIElement type will need to have a new template specialization added to this
+file. These templates are to allow for testing a nested strcture of UIElements.
 
 ## Style Guide
 

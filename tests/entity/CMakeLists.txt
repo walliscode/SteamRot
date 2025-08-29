@@ -7,16 +7,17 @@ add_executable(test_entity
 )
 
 target_include_directories(test_entity
-PRIVATE
+PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_link_libraries(test_entity
-  PRIVATE
+  PUBLIC
   Catch2::Catch2WithMain
   entity
   entity_helpers
-)
+
+  )
 
 catch_discover_tests(test_entity)
 
@@ -33,4 +34,5 @@ target_link_libraries(entity_helpers
   PUBLIC
   Catch2::Catch2WithMain
   entity
+  user_interface_helpers
 )
