@@ -11,52 +11,21 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "PanelElement.h"
+#include "UIStyle.h"
+#include <SFML/Graphics/RenderTexture.hpp>
 
-#include "UIElement.h"
 namespace steamrot {
 namespace draw_ui_elements {
 
 /////////////////////////////////////////////////
-/// @brief Draws a Panel struct with PanelStyle styling
+/// @brief Overloaded function to draw a PanelElement on a RenderTexture
 ///
-/// @param element UIElement struct containing any data
+/// @param texture Reference to the RenderTexture to draw on
+/// @param panel PanelElement to draw
+/// @param style UIStyle providing values for drawing
 /////////////////////////////////////////////////
-void DrawPanel(UIElement &element);
-
-/////////////////////////////////////////////////
-/// @brief Draws a Button structu with ButtonStyle styling
-///
-/// @param element UIElement structu containging any data
-/////////////////////////////////////////////////
-void DrawButton(UIElement &element);
-
-/////////////////////////////////////////////////
-/// @brief Draws a DropDown structu with DropDownStyle styling
-///
-/// @param element UILement structure containin any data
-/////////////////////////////////////////////////
-void DrawDropDownContainer(UIElement &element);
-
-/////////////////////////////////////////////////
-/// @brief Draws the top element of a DropDownList (not the items
-/// themselves)
-///
-/// @param element UIElement structure containing any data
-/////////////////////////////////////////////////
-void DrawDropDownList(UIElement &element);
-
-/////////////////////////////////////////////////
-/// @brief Draws a DropDownItem with DropDownItemStyle styling
-///
-/// @param element UIElement structure containing any data
-/////////////////////////////////////////////////
-void DrawDropDownItem(UIElement &element);
-
-/////////////////////////////////////////////////
-/// @brief Draws a DropDownButton with DropDownButtonStyle styling
-///
-/// @param element UIElement structure containing any data
-/////////////////////////////////////////////////
-void DrawDropDownButton(UIElement &element);
+void DrawUIElement(sf::RenderTexture &texture, const PanelElement &panel,
+                   const UIStyle &style);
 } // namespace draw_ui_elements
 } // namespace steamrot

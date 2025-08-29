@@ -1,6 +1,7 @@
 add_library(logic
-LogicFactory.cpp
+  LogicFactory.cpp
   UIRenderLogic.cpp
+  draw_ui_elements.cpp
   UICollisionLogic.cpp
   UIActionLogic.cpp
   Logic.cpp
