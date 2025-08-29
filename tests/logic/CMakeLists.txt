@@ -2,6 +2,8 @@ add_executable(test_logic
 LogicFactory.test.cpp
 UIRenderLogic.test.cpp
 logic_helpers.cpp
+draw_ui_elements.test.cpp
+draw_ui_elements_helpers.cpp
 )
 
 target_include_directories(test_logic
