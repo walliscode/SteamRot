@@ -15,8 +15,11 @@
 #include "ArchetypeManager.h"
 #include "AssetManager.h"
 #include "EventHandler.h"
+#include "UIStyle.h"
 #include "containers.h"
 #include <SFML/Graphics/RenderTexture.hpp>
+#include <memory>
+#include <unordered_map>
 
 namespace steamrot {
 /////////////////////////////////////////////////
@@ -56,5 +59,11 @@ struct LogicContext {
   /// This contains the global event bus and is used to adapt other events.
   /////////////////////////////////////////////////
   EventHandler &event_handler;
+
+  /////////////////////////////////////////////////
+  /// @brief Style map containing all available UI styles. Should be the only
+  /// instance
+  /////////////////////////////////////////////////
+  std::shared_ptr<std::unordered_map<std::string, UIStyle>> ui_styles{nullptr};
 };
 } // namespace steamrot

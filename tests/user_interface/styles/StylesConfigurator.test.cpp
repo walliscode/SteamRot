@@ -7,8 +7,10 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "StylesConfigurator.h"
+#include "AssetManager.h"
 #include "FlatbuffersDataLoader.h"
 #include "PathProvider.h"
+#include "scene_types_generated.h"
 #include <catch2/catch_test_macros.hpp>
 #include <vector>
 
@@ -44,13 +46,17 @@ TEST_CASE("StylesConfigurator ConfigureStyle returns expected result for "
 
   steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
   steamrot::StylesConfigurator styles_configurator;
-
+  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
+  auto load_test_scene_results =
+      asset_manager.LoadSceneAssets(steamrot::SceneType::SceneType_TEST);
+  if (!load_test_scene_results)
+    FAIL(load_test_scene_results.error().message);
   auto style_data_result = data_loader.ProvideUIStylesData("default");
   if (!style_data_result)
     FAIL(style_data_result.error().message);
 
-  auto ui_style_result =
-      styles_configurator.ConfigureStyle(*style_data_result.value());
+  auto ui_style_result = styles_configurator.ConfigureStyle(
+      *style_data_result.value(), asset_manager);
   if (!ui_style_result)
     FAIL(ui_style_result.error().message);
 
@@ -107,7 +113,9 @@ TEST_CASE("StylesConfigurator ConfigureStyle returns expected result for "
               button_style_fb->style()->maximum_size());
   check_color(button_style.text_color, button_style_fb->text_color());
   check_color(button_style.hover_color, button_style_fb->hover_color());
-  REQUIRE(button_style.font == button_style_fb->font()->str());
+  REQUIRE(button_style.font != nullptr);
+  REQUIRE(button_style.font->getInfo().family ==
+          button_style_fb->font()->str());
   REQUIRE(button_style.font_size == button_style_fb->font_size());
 
   // ----- DropDownContainerStyle -----

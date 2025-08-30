@@ -7,6 +7,7 @@
 /// Preprocessor Directives
 /////////////////////////////////////////////////
 #pragma once
+#include "AssetManager.h"
 #include "FailInfo.h"
 #include "UIStyle.h"
 #include "ui_style_generated.h"
@@ -38,12 +39,13 @@ public:
   /// @param style_data Flatbuffer data containing style configuration
   /////////////////////////////////////////////////
   std::expected<UIStyle, FailInfo>
-  ConfigureStyle(const UIStyleData &style_data);
+  ConfigureStyle(const UIStyleData &style_data,
+                 const AssetManager &asset_manager);
 
   /////////////////////////////////////////////////
   /// @brief Provide a map of all available UIStyles
   /////////////////////////////////////////////////
   std::expected<std::unordered_map<std::string, UIStyle>, FailInfo>
-  ProvideUIStylesMap();
+  ProvideUIStylesMap(const AssetManager &asset_manager);
 };
 } // namespace steamrot

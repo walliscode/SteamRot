@@ -17,6 +17,7 @@
 #include <format>
 #include <functional>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <variant>
 
@@ -117,14 +118,14 @@ AssetManager::AddFont(const std::string &font_name) {
   std::cout << "[DEBUG] AssetManager::AddFont: "
             << "Font loaded successfully: " << font_name << std::endl;
   // insert the font into the map
-  m_fonts.insert({font_name, font});
+  m_fonts.insert({font_name, std::make_shared<sf::Font>(font)});
 
   std::cout << "[DEBUG] AssetManager::AddFont: "
             << "Font added to map: " << font_name << std::endl;
   return std::monostate{};
 }
 /////////////////////////////////////////////////
-std::expected<std::reference_wrapper<const sf ::Font>, FailInfo>
+std::expected<std::shared_ptr<const sf::Font>, FailInfo>
 AssetManager::GetFont(const std::string &font_name) const {
 
   // check if font exists in the map
