@@ -16,8 +16,9 @@
 #include "PathProvider.h"
 #include "scene_types_generated.h"
 #include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Font.hpp>
 #include <expected>
-#include <functional>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <variant>
@@ -29,7 +30,7 @@ private:
   /////////////////////////////////////////////////
   /// @brief Member variable contining all the fonts for the game.
   /////////////////////////////////////////////////
-  std::unordered_map<std::string, sf::Font> m_fonts;
+  std::unordered_map<std::string, std::shared_ptr<const sf::Font>> m_fonts;
 
   /////////////////////////////////////////////////
   /// @brief PathProvider for getting asset paths
@@ -63,12 +64,11 @@ public:
   LoadSceneAssets(const SceneType &scene_type);
 
   /////////////////////////////////////////////////
-  /// @brief Return a font from the AssetManager
+  /// @brief Return a shared_ptr to a font from the AssetManager
   ///
-  /// std::reference wrapper required to return a reference to the font
   /// @param font_name String representing the name of the font to retrieve.
   /////////////////////////////////////////////////
-  std::expected<std::reference_wrapper<const sf::Font>, FailInfo>
+  std::expected<std::shared_ptr<const sf::Font>, FailInfo>
   GetFont(const std::string &font_name) const;
 };
 }; // namespace steamrot

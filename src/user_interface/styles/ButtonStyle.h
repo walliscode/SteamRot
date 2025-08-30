@@ -13,10 +13,11 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "Style.h"
+#include <memory>
 
 struct ButtonStyle : public Style {
   sf::Color text_color;
   sf::Color hover_color;
-  std::string font;
+  std::shared_ptr<const sf::Font> font{nullptr};
   uint8_t font_size;
 };

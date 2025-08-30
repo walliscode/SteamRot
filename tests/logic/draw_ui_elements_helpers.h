@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #pragma once
 
+#include "ButtonElement.h"
 #include "PanelElement.h"
 #include "UIStyle.h"
 #include <SFML/Graphics/Image.hpp>
@@ -28,8 +29,33 @@ void TestDrawBoxWithBorder(const sf::Image &image, const Style &base_style,
                            const sf::Vector2f &size);
 
 /////////////////////////////////////////////////
+/// @brief Tests if coloured pixels are present in the area where text should be
+///
+/// This is not pixel-perfect, but checks that some pixels are drawn in the
+/// area. Could definitely be improved.
+///
+/// @param image [TODO:parameter]
+/// @param position [TODO:parameter]
+/// @param size [TODO:parameter]
+/// @param text_color [TODO:parameter]
+/////////////////////////////////////////////////
+void TestTextIsPresent(const sf::Image &image, const sf::Vector2f &position,
+                       const sf::Vector2f &size, const sf::Color &text_color);
+
+/////////////////////////////////////////////////
 /// @brief Test that the correct pixels are drawn on the RenderTexture
 /////////////////////////////////////////////////
 void TestDrawPanel(sf::Image &image, const PanelElement &panel,
                    const UIStyle &style);
+
+/////////////////////////////////////////////////
+/// @brief Test that the correct pixels are drawn on the RenderTexture for a
+/// button
+///
+/// @param image Image of the texture after drawing
+/// @param button Instance of ButtonElement being drawn
+/// @param style UIStyle used for drawing
+/////////////////////////////////////////////////
+void TestDrawButton(sf::Image &image, const ButtonElement &button,
+                    const UIStyle &style);
 } // namespace steamrot::tests

@@ -70,7 +70,8 @@ static sf::Vector2f ToVec2f(const Vector2fData *vec_fb) {
 
 /////////////////////////////////////////////////
 std::expected<UIStyle, FailInfo>
-StylesConfigurator::ConfigureStyle(const UIStyleData &style_data) {
+StylesConfigurator::ConfigureStyle(const UIStyleData &style_data,
+                                   const AssetManager &asset_manager) {
   UIStyle ui_style;
 
   // ----- PanelStyle -----
@@ -152,7 +153,8 @@ StylesConfigurator::ConfigureStyle(const UIStyleData &style_data) {
   ui_style.button_style.maximum_size = ToVec2f(button_style_fb->maximum_size());
   ui_style.button_style.text_color = ToColor(button_fb->text_color());
   ui_style.button_style.hover_color = ToColor(button_fb->hover_color());
-  ui_style.button_style.font = button_fb->font()->str();
+  ui_style.button_style.font =
+      asset_manager.GetFont(button_fb->font()->str()).value_or(nullptr);
   ui_style.button_style.font_size = button_fb->font_size();
 
   // ----- DropDownContainerStyle -----
@@ -390,7 +392,7 @@ StylesConfigurator::ConfigureStyle(const UIStyleData &style_data) {
 
 /////////////////////////////////////////////////
 std::expected<std::unordered_map<std::string, UIStyle>, FailInfo>
-StylesConfigurator::ProvideUIStylesMap() {
+StylesConfigurator::ProvideUIStylesMap(const AssetManager &asset_manager) {
   // create map to return
   std::unordered_map<std::string, UIStyle> styles_map;
 
@@ -410,7 +412,8 @@ StylesConfigurator::ProvideUIStylesMap() {
     if (!style_data_result) {
       return std::unexpected(style_data_result.error());
     }
-    auto ui_style_result = ConfigureStyle(*style_data_result.value());
+    auto ui_style_result =
+        ConfigureStyle(*style_data_result.value(), asset_manager);
     if (!ui_style_result) {
       return std::unexpected(ui_style_result.error());
     }

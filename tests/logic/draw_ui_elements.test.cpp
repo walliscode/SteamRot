@@ -81,3 +81,28 @@ TEST_CASE(
   // test that the correct pixels are drawn
   steamrot::tests::TestDrawPanel(image, panel, style);
 }
+
+TEST_CASE("steamrot::draw_ui_elements::DrawButton draws a button on a "
+          "RenderTexture",
+          "[draw_ui_elements]") {
+  // create a RenderTexture
+  size_t width = 100;
+  size_t height = 100;
+  sf::RenderTexture render_texture{sf::Vector2u(
+      {static_cast<unsigned int>(width), static_cast<unsigned int>(height)})};
+  // create a ButtonElement
+  steamrot::ButtonElement button;
+  button.position = {25.0f, 25.0f};
+  button.size = {50.0f, 50.0f};
+
+  // load a test UIStyle
+  steamrot::UIStyle style = steamrot::tests::CreateTestUIStyle();
+  // clear the RenderTexture
+  render_texture.clear(sf::Color::Black);
+  // draw the button on the RenderTexture
+  steamrot::draw_ui_elements::DrawUIElement(render_texture, button, style);
+  // get the image from the RenderTexture
+  sf::Image image = render_texture.getTexture().copyToImage();
+  // test that the correct pixels are drawn
+  steamrot::tests::TestDrawButton(image, button, style);
+}

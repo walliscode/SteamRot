@@ -118,6 +118,6 @@ public:
   /////////////////////////////////////////////////
   /// @brief Returns the map of all available UI styles
   /////////////////////////////////////////////////
-  static const std::unordered_map<std::string, UIStyle> &GetUIStyles();
+  const std::unordered_map<std::string, UIStyle> &GetUIStyles();
 };
 } // namespace steamrot
