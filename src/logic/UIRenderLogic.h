@@ -13,8 +13,6 @@
 // headers
 ////////////////////////////////////////////////////////////
 #include "Logic.h"
-#include "UIStyle.h"
-#include <unordered_map>
 
 namespace steamrot {
 
@@ -114,10 +112,5 @@ public:
   /// @param logic_context Takes a LogicContext struct
   /////////////////////////////////////////////////
   UIRenderLogic(const LogicContext logic_context);
-
-  /////////////////////////////////////////////////
-  /// @brief Returns the map of all available UI styles
-  /////////////////////////////////////////////////
-  const std::unordered_map<std::string, UIStyle> &GetUIStyles();
 };
 } // namespace steamrot

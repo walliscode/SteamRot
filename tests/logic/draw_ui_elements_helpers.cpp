@@ -17,10 +17,10 @@ namespace steamrot::tests {
 /////////////////////////////////////////////////
 UIStyle CreateTestUIStyle() {
   steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
-  auto load_scene_assets_result =
-      asset_manager.LoadSceneAssets(steamrot::SceneType::SceneType_TEST);
-  if (!load_scene_assets_result) {
-    FAIL(load_scene_assets_result.error().message);
+  auto load_default_assets_result = asset_manager.LoadDefaultAssets();
+
+  if (!load_default_assets_result) {
+    FAIL(load_default_assets_result.error().message);
   }
   UIStyle style;
   style.name = "test_style";

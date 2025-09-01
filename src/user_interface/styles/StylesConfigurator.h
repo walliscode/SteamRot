@@ -29,11 +29,6 @@ public:
   StylesConfigurator() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Gather all available style names from the styles directory
-  /////////////////////////////////////////////////
-  std::expected<std::vector<std::string>, FailInfo> GetAllStyleNames();
-
-  /////////////////////////////////////////////////
   /// @brief Configure a UIStyle object based on the provided flatbuffer
   ///
   /// @param style_data Flatbuffer data containing style configuration
@@ -46,6 +41,7 @@ public:
   /// @brief Provide a map of all available UIStyles
   /////////////////////////////////////////////////
   std::expected<std::unordered_map<std::string, UIStyle>, FailInfo>
-  ProvideUIStylesMap(const AssetManager &asset_manager);
+  ProvideUIStylesMap(const AssetManager &asset_manager,
+                     std::vector<std::string> style_names = {});
 };
 } // namespace steamrot

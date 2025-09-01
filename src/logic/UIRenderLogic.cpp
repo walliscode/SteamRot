@@ -11,11 +11,6 @@ namespace steamrot {
 UIRenderLogic::UIRenderLogic(const LogicContext logic_context)
     : Logic(logic_context) {}
 
-/////////////////////////////////////////////////
-const std::unordered_map<std::string, UIStyle> &UIRenderLogic::GetUIStyles() {
-  return *m_logic_context.ui_styles;
-}
-
 ////////////////////////////////////////////////////
 void UIRenderLogic::ProcessLogic() {
 

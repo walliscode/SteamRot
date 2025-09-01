@@ -8,49 +8,11 @@
 /////////////////////////////////////////////////
 #include "StylesConfigurator.h"
 #include "FlatbuffersDataLoader.h"
-#include "PathProvider.h"
 #include "UIStyle.h"
 #include "types_generated.h"
 #include <expected>
-#include <iostream>
 
 namespace steamrot {
-/////////////////////////////////////////////////
-std::expected<std::vector<std::string>, FailInfo>
-StylesConfigurator::GetAllStyleNames() {
-
-  // get ui_styles path from path provider
-  PathProvider path_provider;
-  auto ui_styles_path_result = path_provider.GetUIStylesDirectory();
-
-  if (!ui_styles_path_result) {
-    return std::unexpected(ui_styles_path_result.error());
-  }
-
-  // set up vector to return
-  std::vector<std::string> style_names;
-
-  // set up file extension to look for
-  std::string file_extension = ".styles.bin";
-
-  // go through the directory and check for files with the .styles.bin extension
-  for (const auto &entry :
-       std::filesystem::directory_iterator(ui_styles_path_result.value())) {
-    std::cout << "Found file: " << entry.path() << std::endl;
-    if (entry.is_regular_file() &&
-        (entry.path().string().ends_with(file_extension))) {
-
-      std::string entry_path = entry.path().filename().string();
-      // remove the suffix from the filename to get the style name
-      std::string style_name =
-          entry_path.substr(0, entry_path.size() - file_extension.size());
-      // add the style name to the vector
-      style_names.push_back(style_name);
-    }
-  }
-  return style_names;
-}
-
 /////////////////////////////////////////////////
 static sf::Color ToColor(const ColorData *color_fb) {
   sf::Color color;
@@ -153,8 +115,10 @@ StylesConfigurator::ConfigureStyle(const UIStyleData &style_data,
   ui_style.button_style.maximum_size = ToVec2f(button_style_fb->maximum_size());
   ui_style.button_style.text_color = ToColor(button_fb->text_color());
   ui_style.button_style.hover_color = ToColor(button_fb->hover_color());
-  ui_style.button_style.font =
-      asset_manager.GetFont(button_fb->font()->str()).value_or(nullptr);
+  auto get_font_result = asset_manager.GetFont(button_fb->font()->str());
+  if (!get_font_result.has_value())
+    return std::unexpected(get_font_result.error());
+  ui_style.button_style.font = get_font_result.value();
   ui_style.button_style.font_size = button_fb->font_size();
 
   // ----- DropDownContainerStyle -----
@@ -392,40 +356,36 @@ StylesConfigurator::ConfigureStyle(const UIStyleData &style_data,
 
 /////////////////////////////////////////////////
 std::expected<std::unordered_map<std::string, UIStyle>, FailInfo>
-StylesConfigurator::ProvideUIStylesMap(const AssetManager &asset_manager) {
-  // create map to return
-  std::unordered_map<std::string, UIStyle> styles_map;
+StylesConfigurator::ProvideUIStylesMap(const AssetManager &asset_manager,
+                                       std::vector<std::string> style_names) {
+  {
+    // create map to return
+    std::unordered_map<std::string, UIStyle> styles_map;
 
-  // get all available style names
-  auto style_names_result = GetAllStyleNames();
-  if (!style_names_result) {
-    return std::unexpected(style_names_result.error());
+    // set up data loader
+    FlatbuffersDataLoader data_loader;
+
+    // go through all style names, load their data and configure the styles
+    for (const auto &style_name : style_names) {
+      auto style_data_result = data_loader.ProvideUIStylesData(style_name);
+      if (!style_data_result) {
+        return std::unexpected(style_data_result.error());
+      }
+      auto ui_style_result =
+          ConfigureStyle(*style_data_result.value(), asset_manager);
+      if (!ui_style_result) {
+        return std::unexpected(ui_style_result.error());
+      }
+      // add the style to the map, if duplicatae return error
+      if (styles_map.find(style_name) != styles_map.end()) {
+        return std::unexpected(
+            FailInfo{FailMode::ParameterOutOfBounds,
+                     "Duplicate style name found when creating styles map: " +
+                         style_name});
+      }
+      styles_map[style_name] = ui_style_result.value();
+    }
+    return styles_map;
   }
-  auto style_names = style_names_result.value();
-
-  // set up data loader
-  FlatbuffersDataLoader data_loader;
-
-  // go through all style names, load their data and configure the styles
-  for (const auto &style_name : style_names) {
-    auto style_data_result = data_loader.ProvideUIStylesData(style_name);
-    if (!style_data_result) {
-      return std::unexpected(style_data_result.error());
-    }
-    auto ui_style_result =
-        ConfigureStyle(*style_data_result.value(), asset_manager);
-    if (!ui_style_result) {
-      return std::unexpected(ui_style_result.error());
-    }
-    // add the style to the map, if duplicatae return error
-    if (styles_map.find(style_name) != styles_map.end()) {
-      return std::unexpected(
-          FailInfo{FailMode::ParameterOutOfBounds,
-                   "Duplicate style name found when creating styles map: " +
-                       style_name});
-    }
-    styles_map[style_name] = ui_style_result.value();
-  }
-  return styles_map;
 }
 } // namespace steamrot

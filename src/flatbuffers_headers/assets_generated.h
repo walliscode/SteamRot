@@ -76,16 +76,23 @@ inline ::flatbuffers::Offset<FontData> CreateFontDataDirect(
 struct AssetCollection FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef AssetCollectionBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_FONTS = 4
+    VT_FONTS = 4,
+    VT_UI_STYLES = 6
   };
   const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::FontData>> *fonts() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::FontData>> *>(VT_FONTS);
+  }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>> *ui_styles() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>> *>(VT_UI_STYLES);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_FONTS) &&
            verifier.VerifyVector(fonts()) &&
            verifier.VerifyVectorOfTables(fonts()) &&
+           VerifyOffset(verifier, VT_UI_STYLES) &&
+           verifier.VerifyVector(ui_styles()) &&
+           verifier.VerifyVectorOfStrings(ui_styles()) &&
            verifier.EndTable();
   }
 };
@@ -96,6 +103,9 @@ struct AssetCollectionBuilder {
   ::flatbuffers::uoffset_t start_;
   void add_fonts(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::FontData>>> fonts) {
     fbb_.AddOffset(AssetCollection::VT_FONTS, fonts);
+  }
+  void add_ui_styles(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>> ui_styles) {
+    fbb_.AddOffset(AssetCollection::VT_UI_STYLES, ui_styles);
   }
   explicit AssetCollectionBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -110,19 +120,54 @@ struct AssetCollectionBuilder {
 
 inline ::flatbuffers::Offset<AssetCollection> CreateAssetCollection(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::FontData>>> fonts = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::FontData>>> fonts = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>> ui_styles = 0) {
   AssetCollectionBuilder builder_(_fbb);
+  builder_.add_ui_styles(ui_styles);
   builder_.add_fonts(fonts);
   return builder_.Finish();
 }
 
 inline ::flatbuffers::Offset<AssetCollection> CreateAssetCollectionDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<steamrot::FontData>> *fonts = nullptr) {
+    const std::vector<::flatbuffers::Offset<steamrot::FontData>> *fonts = nullptr,
+    const std::vector<::flatbuffers::Offset<::flatbuffers::String>> *ui_styles = nullptr) {
   auto fonts__ = fonts ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::FontData>>(*fonts) : 0;
+  auto ui_styles__ = ui_styles ? _fbb.CreateVector<::flatbuffers::Offset<::flatbuffers::String>>(*ui_styles) : 0;
   return steamrot::CreateAssetCollection(
       _fbb,
-      fonts__);
+      fonts__,
+      ui_styles__);
+}
+
+inline const steamrot::AssetCollection *GetAssetCollection(const void *buf) {
+  return ::flatbuffers::GetRoot<steamrot::AssetCollection>(buf);
+}
+
+inline const steamrot::AssetCollection *GetSizePrefixedAssetCollection(const void *buf) {
+  return ::flatbuffers::GetSizePrefixedRoot<steamrot::AssetCollection>(buf);
+}
+
+inline bool VerifyAssetCollectionBuffer(
+    ::flatbuffers::Verifier &verifier) {
+  return verifier.VerifyBuffer<steamrot::AssetCollection>(nullptr);
+}
+
+inline bool VerifySizePrefixedAssetCollectionBuffer(
+    ::flatbuffers::Verifier &verifier) {
+  return verifier.VerifySizePrefixedBuffer<steamrot::AssetCollection>(nullptr);
+}
+
+inline void FinishAssetCollectionBuffer(
+    ::flatbuffers::FlatBufferBuilder &fbb,
+    ::flatbuffers::Offset<steamrot::AssetCollection> root) {
+  fbb.Finish(root);
+}
+
+inline void FinishSizePrefixedAssetCollectionBuffer(
+    ::flatbuffers::FlatBufferBuilder &fbb,
+    ::flatbuffers::Offset<steamrot::AssetCollection> root) {
+  fbb.FinishSizePrefixed(root);
 }
 
 }  // namespace steamrot

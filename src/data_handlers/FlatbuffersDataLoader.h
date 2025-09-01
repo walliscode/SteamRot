@@ -57,6 +57,11 @@ public:
   ProvideSceneData(const SceneType scene_type) const;
 
   /////////////////////////////////////////////////
+  /// @brief Provide default AssetCollection data
+  /////////////////////////////////////////////////
+  std::expected<const AssetCollection *, FailInfo> ProvideAssetData() const;
+
+  /////////////////////////////////////////////////
   /// @brief Provides AssetCollection data as a subset of SceneData
   ///
   /// @param scene_type An enum representing the type of scene

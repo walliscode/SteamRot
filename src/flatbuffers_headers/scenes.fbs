@@ -7,7 +7,6 @@ namespace steamrot;
 
 table SceneData{
     entity_collection: EntityCollection;
-    ui_theme: string (required);
     assets: AssetCollection;
   }
 

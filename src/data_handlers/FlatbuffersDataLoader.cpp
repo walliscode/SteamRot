@@ -9,6 +9,7 @@
 #include "FlatbuffersDataLoader.h"
 #include "FailInfo.h"
 #include "Fragment.h"
+#include "assets_generated.h"
 #include "fragments_generated.h"
 #include "scene_types_generated.h"
 #include "scenes_generated.h"
@@ -186,6 +187,36 @@ FlatbuffersDataLoader::ProvideSceneData(const SceneType scene_type) const {
   return scene_data;
 }
 
+/////////////////////////////////////////////////
+
+std::expected<const AssetCollection *, FailInfo>
+FlatbuffersDataLoader::ProvideAssetData() const {
+
+  // get the  data directory
+  auto result = m_path_provider.GetDataDirectory();
+  if (!result.has_value()) {
+    return std::unexpected(result.error());
+  }
+
+  // construct the file path
+  std::filesystem::path asset_path =
+      result.value() / "asset_manager" / "asset_manager.bin";
+
+  // check if the file exists
+  if (!std::filesystem::exists(asset_path)) {
+    std::string error_message =
+        std::format("Asset file not found: {}", asset_path.string());
+    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
+  }
+  // load the asset data
+  const steamrot::AssetCollection *asset_data =
+      GetAssetCollection(LoadBinaryData(asset_path));
+  if (!asset_data) {
+    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
+                                    "AssetCollection pointer is null"));
+  }
+  return asset_data;
+}
 /////////////////////////////////////////////////
 std::expected<const AssetCollection *, FailInfo>
 FlatbuffersDataLoader::ProvideAssetData(const SceneType scene_type) const {
