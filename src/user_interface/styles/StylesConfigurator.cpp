@@ -103,6 +103,12 @@ StylesConfigurator::ConfigureStyle(const UIStyleData &style_data,
   if (!button_fb->font())
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     "button_style.font missing"});
+  if (!button_fb->font_size())
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    "button_style.font_size missing"});
+  if (button_fb->font_size() == 0)
+    return std::unexpected(FailInfo{FailMode::ParameterOutOfBounds,
+                                    "button_style.font_size is 0"});
 
   ui_style.button_style.background_color =
       ToColor(button_style_fb->background_color());

@@ -15,12 +15,17 @@
 #include "PanelElement.h"
 #include "UIStyle.h"
 #include <SFML/Graphics/RenderTexture.hpp>
+#include <cstdint>
+#include <memory>
+#include <sys/types.h>
 
 namespace steamrot {
 namespace draw_ui_elements {
 
 void DrawText(sf::RenderTexture &texture, const std::string &text,
-              const sf::Vector2f &position, const UIStyle &style);
+              const sf::Vector2f &position,
+              std::shared_ptr<const sf::Font> font, uint8_t font_size,
+              const sf::Color &color);
 /////////////////////////////////////////////////
 /// @brief Overloaded function to draw a PanelElement on a RenderTexture
 ///

@@ -71,7 +71,8 @@
       "b": 210,
       "a": 255
     },
-    "font": "DaddyTimeMonoNerdFont-Regular"
+    "font": "DaddyTimeMonoNerdFont-Regular",
+    "font_size": 5
   },
   "drop_down_container_style": {
     "style": {

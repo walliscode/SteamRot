@@ -10,7 +10,6 @@
 #include "AssetManager.h"
 #include "FlatbuffersDataLoader.h"
 #include "PathProvider.h"
-#include "scene_types_generated.h"
 #include <catch2/catch_test_macros.hpp>
 #include <vector>
 

@@ -55,7 +55,38 @@ TEST_CASE("Determine whether pixels can be tested on a RenderTexture",
     }
   }
 }
-
+TEST_CASE("drawn text can be detected", "[draw_ui_elements]") {
+  std::cout << "Starting DrawText test..." << std::endl;
+  // create a RenderTexture
+  size_t width = 200;
+  size_t height = 100;
+  sf::RenderTexture render_texture{sf::Vector2u(
+      {static_cast<unsigned int>(width), static_cast<unsigned int>(height)})};
+  // load a font
+  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
+  auto load_default_assets_result = asset_manager.LoadDefaultAssets();
+  if (!load_default_assets_result) {
+    FAIL(load_default_assets_result.error().message);
+  }
+  auto font = asset_manager.GetFont("DaddyTimeMonoNerdFont-Regular");
+  if (!font) {
+    FAIL("Failed to get default font");
+  }
+  // clear the RenderTexture
+  render_texture.clear(sf::Color::Black);
+  // draw some text on the RenderTexture
+  std::string text = "Hello, World!";
+  sf::Vector2f position = {50.0f, 25.0f};
+  uint8_t font_size = 24;
+  sf::Color color = sf::Color::White;
+  steamrot::draw_ui_elements::DrawText(render_texture, text, position, *font,
+                                       font_size, color);
+  // get the image from the RenderTexture
+  sf::Image image = render_texture.getTexture().copyToImage();
+  // test that some pixels in the area where the text was drawn are not black
+  steamrot::tests::TestTextIsPresent(image, {50.f, 25.f}, {200.f, 100.f},
+                                     sf::Color::White);
+}
 TEST_CASE(
     "steamrot::draw_ui_elements::DrawPanel draws a panel on a RenderTexture",
     "[draw_ui_elements]") {
@@ -102,11 +133,18 @@ TEST_CASE("steamrot::draw_ui_elements::DrawButton draws a button on a "
       {static_cast<unsigned int>(width), static_cast<unsigned int>(height)})};
   // create a ButtonElement
   steamrot::ButtonElement button;
+  button.label = "Click Me";
   button.position = {25.0f, 25.0f};
   button.size = {50.0f, 50.0f};
 
-  // load a test UIStyle
-  steamrot::UIStyle style = steamrot::tests::CreateTestUIStyle();
+  // load the default UIStyle
+  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
+  auto load_default_assets_result = asset_manager.LoadDefaultAssets();
+  if (!load_default_assets_result) {
+    FAIL(load_default_assets_result.error().message);
+  }
+  auto style = asset_manager.GetDefaultUIStyle();
+
   // clear the RenderTexture
   render_texture.clear(sf::Color::Black);
   // draw the button on the RenderTexture
@@ -114,5 +152,5 @@ TEST_CASE("steamrot::draw_ui_elements::DrawButton draws a button on a "
   // get the image from the RenderTexture
   sf::Image image = render_texture.getTexture().copyToImage();
   // test that the correct pixels are drawn
-  // steamrot::tests::TestDrawButton(image, button, style);
+  steamrot::tests::TestDrawButton(image, button, style);
 }

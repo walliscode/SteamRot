@@ -26,7 +26,8 @@ UIStyle CreateTestUIStyle();
 /////////////////////////////////////////////////
 void TestDrawBoxWithBorder(const sf::Image &image, const Style &base_style,
                            const sf::Vector2f &position,
-                           const sf::Vector2f &size);
+                           const sf::Vector2f &size,
+                           bool test_inner_area = false);
 
 /////////////////////////////////////////////////
 /// @brief Tests if coloured pixels are present in the area where text should be

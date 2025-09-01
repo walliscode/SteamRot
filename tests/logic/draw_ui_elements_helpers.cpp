@@ -7,7 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "draw_ui_elements_helpers.h"
-#include "AssetManager.h"
+
 #include "catch2/catch_test_macros.hpp"
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -15,45 +15,9 @@
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
-UIStyle CreateTestUIStyle() {
-  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
-  auto load_default_assets_result = asset_manager.LoadDefaultAssets();
-
-  if (!load_default_assets_result) {
-    FAIL(load_default_assets_result.error().message);
-  }
-  UIStyle style;
-  style.name = "test_style";
-
-  // Panel style
-  style.panel_style.background_color = sf::Color::Green;
-  style.panel_style.border_color = sf::Color::Red;
-  style.panel_style.border_thickness = 5.0f;
-  style.panel_style.radius_resolution = 10;
-  style.panel_style.inner_margin = {10.0f, 10.0f};
-  style.panel_style.minimum_size = {20.0f, 20.0f};
-  style.panel_style.maximum_size = {200.0f, 200.0f};
-
-  // Button style
-  style.button_style.background_color = sf::Color::Blue;
-  style.button_style.border_color = sf::Color::Yellow;
-  style.button_style.border_thickness = 3.0f;
-  style.button_style.radius_resolution = 10;
-  style.button_style.inner_margin = {5.0f, 5.0f};
-  style.button_style.minimum_size = {10.0f, 10.0f};
-  style.button_style.maximum_size = {100.0f, 100.0f};
-  style.button_style.text_color = sf::Color::White;
-  style.button_style.hover_color = sf::Color::Cyan;
-  style.button_style.font_size = 12;
-  style.button_style.font =
-      asset_manager.GetFont("DaddyTimeMonoNerdFont-Regular").value();
-
-  return style;
-}
-/////////////////////////////////////////////////
 void TestDrawBoxWithBorder(const sf::Image &image, const Style &base_style,
                            const sf::Vector2f &position,
-                           const sf::Vector2f &size) {
+                           const sf::Vector2f &size, bool test_inner_area) {
   // Check the border pixels
   for (int x = static_cast<int>(position.x);
        x < static_cast<int>(position.x + size.x); x++) {
@@ -77,8 +41,9 @@ void TestDrawBoxWithBorder(const sf::Image &image, const Style &base_style,
         // Pixel should be border color
         REQUIRE(pixel == base_style.border_color);
       } else {
-        // Pixel should be background color
-        REQUIRE(pixel == base_style.background_color);
+        // only test inner area if specified
+        if (test_inner_area)
+          REQUIRE(pixel == base_style.background_color);
       }
     }
   }
@@ -107,7 +72,8 @@ void TestDrawPanel(sf::Image &image, const PanelElement &panel,
                    const UIStyle &style) {
 
   // test that the correct pixels are drawn
-  TestDrawBoxWithBorder(image, style.panel_style, panel.position, panel.size);
+  TestDrawBoxWithBorder(image, style.panel_style, panel.position, panel.size,
+                        true);
 }
 
 /////////////////////////////////////////////////
