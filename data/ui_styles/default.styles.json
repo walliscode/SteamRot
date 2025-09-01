@@ -44,7 +44,7 @@
         "b": 105,
         "a": 255
       },
-      "border_thickness": 1,
+      "border_thickness": 3,
       "radius_resolution": 100,
       "inner_margin": {
         "x": 5,
@@ -72,7 +72,7 @@
       "a": 255
     },
     "font": "DaddyTimeMonoNerdFont-Regular",
-    "font_size": 5
+    "font_size": 12
   },
   "drop_down_container_style": {
     "style": {

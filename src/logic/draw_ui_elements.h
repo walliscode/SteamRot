@@ -22,10 +22,22 @@
 namespace steamrot {
 namespace draw_ui_elements {
 
+/////////////////////////////////////////////////
+/// @brief Draw text onto a RenderTexture
+///
+/// @param texture [TODO:parameter]
+/// @param text [TODO:parameter]
+/// @param position [TODO:parameter]
+/// @param size [TODO:parameter]
+/// @param font [TODO:parameter]
+/// @param font_size [TODO:parameter]
+/// @param color [TODO:parameter]
+/////////////////////////////////////////////////
 void DrawText(sf::RenderTexture &texture, const std::string &text,
-              const sf::Vector2f &position,
+              const sf::Vector2f &position, const sf::Vector2f size,
               std::shared_ptr<const sf::Font> font, uint8_t font_size,
               const sf::Color &color);
+
 /////////////////////////////////////////////////
 /// @brief Overloaded function to draw a PanelElement on a RenderTexture
 ///

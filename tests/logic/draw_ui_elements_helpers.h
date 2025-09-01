@@ -59,4 +59,13 @@ void TestDrawPanel(sf::Image &image, const PanelElement &panel,
 /////////////////////////////////////////////////
 void TestDrawButton(sf::Image &image, const ButtonElement &button,
                     const UIStyle &style);
+
+/////////////////////////////////////////////////
+/// @brief Display a RenderTexture in a window for a number of cycles
+///
+/// @param renderTexture [TODO:parameter]
+/// @param numCycles [TODO:parameter]
+/////////////////////////////////////////////////
+void DisplayRenderTextureForCycles(const sf::RenderTexture &renderTexture);
+
 } // namespace steamrot::tests
