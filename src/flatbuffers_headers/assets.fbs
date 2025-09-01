@@ -10,5 +10,8 @@ table FontData {
 
 
 table AssetCollection {
-    fonts:[FontData];
+    fonts: [FontData];
+    ui_styles :[string];
   }
+
+root_type AssetCollection;

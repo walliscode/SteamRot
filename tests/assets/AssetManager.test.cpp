@@ -17,6 +17,29 @@ TEST_CASE("AssetManager is constructed correctly", "[AssetManager]") {
   steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
   REQUIRE_NOTHROW(asset_manager);
 }
+
+TEST_CASE("AssetManager::LoadDefaultAssets works correctly", "[AssetManager]") {
+  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
+
+  auto load_result = asset_manager.LoadDefaultAssets();
+  if (!load_result.has_value())
+    FAIL(load_result.error().message);
+
+  // create a list of expected fonts
+  std::vector<std::string> expected_fonts = {"DaddyTimeMonoNerdFont-Regular"};
+
+  // get the fonts map and check
+  const auto &fonts = asset_manager.GetAllFonts();
+  for (const auto &font_name : expected_fonts) {
+    REQUIRE(fonts.contains(font_name));
+    REQUIRE(fonts.at(font_name) != nullptr);
+  }
+
+  // get the UIStyles map
+  const auto &ui_styles = asset_manager.GetAllUIStyles();
+  REQUIRE(!ui_styles.empty());
+  REQUIRE(ui_styles.contains("default"));
+}
 TEST_CASE("AssetManager loads scene assets correctly", "[AssetManager]") {
 
   steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};

@@ -26,7 +26,6 @@ void check_asset_configuration(const SceneType &scene_type,
   REQUIRE(asset_collection != nullptr);
 
   // check fonts
-  REQUIRE(asset_collection->fonts() != nullptr);
   check_font_configuration(*asset_collection, asset_manager);
 }
 
@@ -34,6 +33,10 @@ void check_asset_configuration(const SceneType &scene_type,
 void check_font_configuration(const AssetCollection &asset_collection,
                               const AssetManager &asset_manager) {
 
+  if (!asset_collection.fonts()) {
+    // no fonts to check
+    return;
+  }
   // cycle through the fonts required by the Scene
   for (const auto &font : *asset_collection.fonts()) {
 

@@ -180,6 +180,16 @@ TEST_CASE("FlatbuffersDataLoader provides scene data",
   REQUIRE(scene_data != nullptr);
   REQUIRE(!scene_data->entity_collection()->entities()->empty());
 }
+TEST_CASE("FlatbuffersDataLoader::ProvideAssetData returns default data",
+          "[FlatbuffersDataLoader]") {
+  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+  auto result = data_loader.ProvideAssetData();
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+  REQUIRE(result.value() != nullptr);
+  REQUIRE(!result.value()->fonts()->empty());
+}
 
 TEST_CASE("FlatbuffersDataLoader provides asset data from test scene",
           "[FlatbuffersDataLoader]") {
@@ -191,7 +201,7 @@ TEST_CASE("FlatbuffersDataLoader provides asset data from test scene",
     FAIL(result.error().message);
   }
   REQUIRE(result.value() != nullptr);
-  REQUIRE(!result.value()->fonts()->empty());
+  // fonts not in Scene data so do not check
 }
 
 TEST_CASE("FlatbuffersDataLoader provides ui_styles data",

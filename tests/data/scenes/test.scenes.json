@@ -55,8 +55,6 @@
       }
     ]
   },
-  "ui_theme": "test_theme",
-  "assets": {
-    "fonts": [{ "name": "DaddyTimeMonoNerdFont-Regular" }]
-  }
+
+  "assets": {}
 }

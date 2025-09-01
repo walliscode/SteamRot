@@ -70,12 +70,6 @@
       }
     ]
   },
-  "ui_theme": "default",
-  "assets": {
-    "fonts": [
-      {
-        "name": "DaddyTimeMonoNerdFont-Regular"
-      }
-    ]
-  }
+
+  "assets": {}
 }
