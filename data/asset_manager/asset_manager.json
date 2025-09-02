@@ -1,4 +1,7 @@
 {
-  "fonts": [{ "name": "DaddyTimeMonoNerdFont-Regular" }],
+  "fonts": [
+    { "name": "DaddyTimeMonoNerdFont-Regular" },
+    { "name": "Roboto-Regular" }
+  ],
   "ui_styles": ["default"]
 }

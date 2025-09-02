@@ -26,7 +26,8 @@ UIStyle CreateTestUIStyle();
 /////////////////////////////////////////////////
 void TestDrawBoxWithBorder(const sf::Image &image, const Style &base_style,
                            const sf::Vector2f &position,
-                           const sf::Vector2f &size);
+                           const sf::Vector2f &size,
+                           bool test_inner_area = false);
 
 /////////////////////////////////////////////////
 /// @brief Tests if coloured pixels are present in the area where text should be
@@ -58,4 +59,19 @@ void TestDrawPanel(sf::Image &image, const PanelElement &panel,
 /////////////////////////////////////////////////
 void TestDrawButton(sf::Image &image, const ButtonElement &button,
                     const UIStyle &style);
+
+/////////////////////////////////////////////////
+/// @brief Display a RenderTexture in a window for a number of cycles
+///
+/// @param renderTexture [TODO:parameter]
+/// @param numCycles [TODO:parameter]
+/////////////////////////////////////////////////
+void DisplayRenderTexture(const sf::RenderTexture &renderTexture);
+
+/////////////////////////////////////////////////
+/// @brief Draws text to a window for visual inspection
+///
+/// @param text [TODO:parameter]
+/////////////////////////////////////////////////
+void DisplayTextToWindow(const sf::Text &text);
 } // namespace steamrot::tests
