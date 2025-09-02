@@ -66,6 +66,12 @@ void TestDrawButton(sf::Image &image, const ButtonElement &button,
 /// @param renderTexture [TODO:parameter]
 /// @param numCycles [TODO:parameter]
 /////////////////////////////////////////////////
-void DisplayRenderTextureForCycles(const sf::RenderTexture &renderTexture);
+void DisplayRenderTexture(const sf::RenderTexture &renderTexture);
 
+/////////////////////////////////////////////////
+/// @brief Draws text to a window for visual inspection
+///
+/// @param text [TODO:parameter]
+/////////////////////////////////////////////////
+void DisplayTextToWindow(const sf::Text &text);
 } // namespace steamrot::tests

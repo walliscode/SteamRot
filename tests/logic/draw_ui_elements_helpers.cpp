@@ -104,7 +104,7 @@ void TestDrawButton(sf::Image &image, const ButtonElement &button,
 }
 
 /////////////////////////////////////////////////
-void DisplayRenderTextureForCycles(const sf::RenderTexture &renderTexture) {
+void DisplayRenderTexture(const sf::RenderTexture &renderTexture) {
 
   // Retrieve the texture from the render texture
 
@@ -132,4 +132,5 @@ void DisplayRenderTextureForCycles(const sf::RenderTexture &renderTexture) {
     window.display();
   }
 }
+
 } // namespace steamrot::tests

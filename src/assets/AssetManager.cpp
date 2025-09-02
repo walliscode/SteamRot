@@ -133,6 +133,8 @@ AssetManager::AddFont(const std::string &font_name) {
     // return early with FileNotFound error
     return std::unexpected<FailInfo>(fail_info);
   }
+  // unsmooth the font
+  font.setSmooth(false);
 
   // insert the font into the map
   m_fonts.insert({font_name, std::make_shared<sf::Font>(font)});

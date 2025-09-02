@@ -118,7 +118,7 @@ TEST_CASE(
   steamrot::draw_ui_elements::DrawUIElement(render_texture, panel, style);
 
   // display the Panel for visual inspection
-  steamrot::tests::DisplayRenderTextureForCycles(render_texture);
+  steamrot::tests::DisplayRenderTexture(render_texture);
   // get the image from the RenderTexture
   sf::Image image = render_texture.getTexture().copyToImage();
 
@@ -154,7 +154,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawButton draws a button on a "
   steamrot::draw_ui_elements::DrawUIElement(render_texture, button, style);
 
   // display the button for visual inspection
-  steamrot::tests::DisplayRenderTextureForCycles(render_texture);
+  steamrot::tests::DisplayRenderTexture(render_texture);
   // get the image from the RenderTexture
   sf::Image image = render_texture.getTexture().copyToImage();
   // test that the correct pixels are drawn

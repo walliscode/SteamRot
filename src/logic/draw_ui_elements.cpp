@@ -22,6 +22,7 @@ void DrawText(sf::RenderTexture &texture, const std::string &text,
 
   // create the text object
   sf::Text text_object(*font, text, font_size);
+
   // set the fill color
   text_object.setFillColor(color);
   // set the origin to the center of the text
