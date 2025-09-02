@@ -9,12 +9,16 @@
 
 #include "draw_ui_elements.h"
 #include "AssetManager.h"
+#include "ButtonElement.h"
+#include "DropDownButtonElement.h"
+#include "DropDownContainerElement.h"
+#include "DropDownListElement.h"
 #include "PanelElement.h"
 #include "draw_ui_elements_helpers.h"
 #include <SFML/Graphics.hpp>
-
 #include <catch2/catch_test_macros.hpp>
 #include <iostream>
+#include <memory>
 
 TEST_CASE("Determine whether pixels can be tested on a RenderTexture",
           "[draw_ui_elements]") {
@@ -87,9 +91,9 @@ TEST_CASE("drawn text can be detected", "[draw_ui_elements]") {
   steamrot::tests::TestTextIsPresent(image, position, {150.f, 75.f},
                                      sf::Color::White);
 }
-TEST_CASE(
-    "steamrot::draw_ui_elements::DrawPanel draws a panel on a RenderTexture",
-    "[draw_ui_elements]") {
+TEST_CASE("steamrot::draw_ui_elements::DrawUIELement draws a panel on a "
+          "RenderTexture",
+          "[draw_ui_elements]") {
   std::cout << "Starting DrawPanel test..." << std::endl;
 
   // create a RenderTexture
@@ -115,7 +119,7 @@ TEST_CASE(
   render_texture.clear(sf::Color::Black);
 
   // draw the panel on the RenderTexture
-  steamrot::draw_ui_elements::DrawUIElement(render_texture, panel, style);
+  panel.DrawUIElement(render_texture, style);
 
   // display the Panel for visual inspection
   steamrot::tests::DisplayRenderTexture(render_texture);
@@ -125,9 +129,10 @@ TEST_CASE(
   steamrot::tests::TestDrawPanel(image, panel, style);
 }
 
-TEST_CASE("steamrot::draw_ui_elements::DrawButton draws a button on a "
-          "RenderTexture",
-          "[draw_ui_elements]") {
+TEST_CASE(
+    "steamrot::draw_ui_elements::DrawUIELement draws a ButtonElement on a "
+    "RenderTexture",
+    "[draw_ui_elements]") {
   // create a RenderTexture
   size_t width = 200;
   size_t height = 200;
@@ -151,7 +156,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawButton draws a button on a "
   render_texture.clear(sf::Color::Black);
 
   // draw the button on the RenderTexture
-  steamrot::draw_ui_elements::DrawUIElement(render_texture, button, style);
+  button.DrawUIElement(render_texture, style);
 
   // display the button for visual inspection
   steamrot::tests::DisplayRenderTexture(render_texture);
@@ -159,4 +164,155 @@ TEST_CASE("steamrot::draw_ui_elements::DrawButton draws a button on a "
   sf::Image image = render_texture.getTexture().copyToImage();
   // test that the correct pixels are drawn
   // steamrot::tests::TestDrawButton(image, button, style);
+}
+TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws a "
+          "DropdownContainerElement "
+          "on a RenderTexture",
+          "[draw_ui_elements]") {
+
+  // create a RenderTexture
+  size_t width = 200;
+  size_t height = 200;
+  sf::RenderTexture render_texture{sf::Vector2u(
+      {static_cast<unsigned int>(width), static_cast<unsigned int>(height)})};
+
+  // create a DropDownContainerElement
+  steamrot::DropDownContainerElement dd_container;
+  dd_container.position = {25.0f, 25.0f};
+  dd_container.size = {150.0f, 50.0f};
+  dd_container.is_expanded = false;
+
+  // load the default UIStyle
+  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
+  auto load_default_assets_result = asset_manager.LoadDefaultAssets();
+  if (!load_default_assets_result) {
+    FAIL(load_default_assets_result.error().message);
+  }
+
+  auto style = asset_manager.GetDefaultUIStyle();
+
+  // clear the RenderTexture
+  render_texture.clear(sf::Color::Black);
+
+  // draw the DropDownContainerElement on the RenderTexture
+  dd_container.DrawUIElement(render_texture, style);
+
+  // display the button for visual
+  // inspection
+  steamrot::tests::DisplayRenderTexture(render_texture);
+}
+TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an unexpanded "
+          "DropDownListElement "
+          "on a RenderTexture",
+          "[draw_ui_elements]") {
+  // create a RenderTexture
+  size_t width = 200;
+  size_t height = 200;
+  sf::RenderTexture render_texture{sf::Vector2u(
+      {static_cast<unsigned int>(width), static_cast<unsigned int>(height)})};
+  // create a DropDownListElement
+  steamrot::DropDownListElement dd_list;
+  dd_list.position = {25.0f, 25.0f};
+  dd_list.size = {100.0f, 25.0f};
+  dd_list.is_expanded = false;
+  // load the default UIStyle
+  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
+  auto load_default_assets_result = asset_manager.LoadDefaultAssets();
+  if (!load_default_assets_result) {
+    FAIL(load_default_assets_result.error().message);
+  }
+  auto style = asset_manager.GetDefaultUIStyle();
+  // clear the RenderTexture
+  render_texture.clear(sf::Color::Black);
+  // draw the DropDownListElement on the RenderTexture
+  dd_list.DrawUIElement(render_texture, style);
+  // display the button for visual inspection
+  steamrot::tests::DisplayRenderTexture(render_texture);
+}
+TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an expanded "
+          "DropDownListElement "
+          "on a RenderTexture",
+          "[draw_ui_elements]") {
+  // create a RenderTexture
+  size_t width = 200;
+  size_t height = 200;
+  sf::RenderTexture render_texture{sf::Vector2u(
+      {static_cast<unsigned int>(width), static_cast<unsigned int>(height)})};
+  // create a DropDownListElement
+  steamrot::DropDownListElement dd_list;
+  dd_list.position = {25.0f, 25.0f};
+  dd_list.size = {100.0f, 100.0f};
+  dd_list.is_expanded = true;
+  // load the default UIStyle
+  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
+  auto load_default_assets_result = asset_manager.LoadDefaultAssets();
+  if (!load_default_assets_result) {
+    FAIL(load_default_assets_result.error().message);
+  }
+  auto style = asset_manager.GetDefaultUIStyle();
+  // clear the RenderTexture
+  render_texture.clear(sf::Color::Black);
+  // draw the DropDownListElement on the RenderTexture
+  dd_list.DrawUIElement(render_texture, style);
+  // display the button for visual inspection
+  steamrot::tests::DisplayRenderTexture(render_texture);
+}
+TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an unexpanded "
+          "DropDownButtonElement on a RenderTexture",
+          "[draw_ui_elements]") {
+  // create a RenderTexture
+  size_t width = 200;
+  size_t height = 200;
+  sf::RenderTexture render_texture{sf::Vector2u(
+      {static_cast<unsigned int>(width), static_cast<unsigned int>(height)})};
+  // create a DropDownButtonElement
+  steamrot::DropDownButtonElement dd_button;
+
+  dd_button.position = {25.0f, 25.0f};
+  dd_button.size = {100.0f, 100.0f};
+  // load the default UIStyle
+  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
+  auto load_default_assets_result = asset_manager.LoadDefaultAssets();
+  if (!load_default_assets_result) {
+    FAIL(load_default_assets_result.error().message);
+  }
+  auto style = asset_manager.GetDefaultUIStyle();
+  // clear the RenderTexture
+  render_texture.clear(sf::Color::Black);
+
+  // draw the button on the RenderTexture
+  dd_button.DrawUIElement(render_texture, style);
+  // display the button for visual inspection
+  steamrot::tests::DisplayRenderTexture(render_texture);
+}
+
+TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an expanded "
+          "DropdownButtonElement "
+          "on a RenderTexture",
+          "[draw_ui_elements]") {
+  // create a RenderTexture
+  size_t width = 200;
+  size_t height = 200;
+  sf::RenderTexture render_texture{sf::Vector2u(
+      {static_cast<unsigned int>(width), static_cast<unsigned int>(height)})};
+  // create a DropDownButtonElement
+  steamrot::DropDownButtonElement dd_button;
+  dd_button.position = {25.0f, 25.0f};
+  dd_button.size = {100.0f, 100.0f};
+  dd_button.is_expanded = true;
+  // load the default UIStyle
+  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
+  auto load_default_assets_result = asset_manager.LoadDefaultAssets();
+  if (!load_default_assets_result) {
+    FAIL(load_default_assets_result.error().message);
+  }
+  auto style = asset_manager.GetDefaultUIStyle();
+  // clear the RenderTexture
+  render_texture.clear(sf::Color::Black);
+
+  // draw the button on the RenderTexture
+  dd_button.DrawUIElement(render_texture, style);
+
+  // display the button for visual inspection
+  steamrot::tests::DisplayRenderTexture(render_texture);
 }

@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of the PanelElement struct
+/// @brief Declaration of DropDownContainerElement struct
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -16,18 +16,25 @@
 
 namespace steamrot {
 
-struct PanelElement : public UIElement {
+struct DropDownContainerElement : public UIElement {
+  /////////////////////////////////////////////////
+  /// @brief Indicates whether the dropdown is expanded or not. This should be
+  /// passed to associated children elements
+  /////////////////////////////////////////////////
+  bool is_expanded{false};
 
   /////////////////////////////////////////////////
-  /// @brief Draws the PanelElement on a RenderTexture
+  /// @brief Draws the DropDownContainerElement on a RenderTexture
   ///
   /// @param texture Reference to the RenderTexture to draw on
   /// @param style UIStyle providing values for drawing
   /////////////////////////////////////////////////
   void DrawUIElement(sf::RenderTexture &texture,
                      const UIStyle &style) const override {
+
+    // Draw the border and background for the container
     draw_ui_elements::DrawBorderAndBackground(texture, position, size,
-                                              style.panel_style);
+                                              style.drop_down_container_style);
   }
 };
 

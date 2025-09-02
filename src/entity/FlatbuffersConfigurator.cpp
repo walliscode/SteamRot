@@ -8,7 +8,6 @@
 /////////////////////////////////////////////////
 #include "FlatbuffersConfigurator.h"
 #include "CUserInterface.h"
-#include "UIElement.h"
 #include "UIElementFactory.h"
 #include "emp_helpers.h"
 #include "scene_types_generated.h"

@@ -231,7 +231,11 @@ StylesConfigurator::ConfigureStyle(const UIStyleData &style_data,
   ui_style.drop_down_list_style.text_color = ToColor(dd_list_fb->text_color());
   ui_style.drop_down_list_style.hover_color =
       ToColor(dd_list_fb->hover_color());
-  ui_style.drop_down_list_style.font = dd_list_fb->font()->str();
+  auto get_dd_list_font_result =
+      asset_manager.GetFont(dd_list_fb->font()->str());
+  if (!get_dd_list_font_result.has_value())
+    return std::unexpected(get_dd_list_font_result.error());
+  ui_style.drop_down_list_style.font = get_dd_list_font_result.value();
   ui_style.drop_down_list_style.font_size = dd_list_fb->font_size();
 
   // ----- DropDownItemStyle -----
@@ -291,7 +295,11 @@ StylesConfigurator::ConfigureStyle(const UIStyleData &style_data,
   ui_style.drop_down_item_style.text_color = ToColor(dd_item_fb->text_color());
   ui_style.drop_down_item_style.hover_color =
       ToColor(dd_item_fb->hover_color());
-  ui_style.drop_down_item_style.font = dd_item_fb->font()->str();
+  auto get_dd_item_font_result =
+      asset_manager.GetFont(dd_item_fb->font()->str());
+  if (!get_dd_item_font_result.has_value())
+    return std::unexpected(get_dd_item_font_result.error());
+  ui_style.drop_down_item_style.font = get_dd_item_font_result.value();
   ui_style.drop_down_item_style.font_size = dd_item_fb->font_size();
 
   // ----- DropDownButtonStyle -----

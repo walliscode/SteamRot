@@ -64,6 +64,7 @@ table ButtonData {
 
 table DropDownContainerData{
   base_data: UIElementData(required);
+
   }
 
 enum DataPopulateFunction: byte {

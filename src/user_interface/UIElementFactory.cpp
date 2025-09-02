@@ -156,7 +156,7 @@ ConfigureDropDownListElement(DropDownListElement &dropdown_list_element,
   if (data.expanded_label()) {
     dropdown_list_element.expanded_label = data.expanded_label()->str();
   }
-  dropdown_list_element.data_populate_function = data.data_populate_function();
+
   return std::monostate{};
 }
 
@@ -164,7 +164,42 @@ ConfigureDropDownListElement(DropDownListElement &dropdown_list_element,
 std::expected<std::monostate, FailInfo> ConfigureDropDownContainerElement(
     DropDownContainerElement &dropdown_container_element,
     const DropDownContainerData &data) {
-  // No extra fields for container
+
+  // return if children are empty
+  if (!data.base_data()->children()) {
+    return std::unexpected(FailInfo{
+        FailMode::FlatbuffersDataNotFound,
+        "DropDownContainerData must have exactly 2 children: a "
+        "DropDownListData and a DropDownButtonData. This one has none."});
+  }
+  // ensure that the data contains only a list and a button as children
+  if (data.base_data()->children()->size() != 2) {
+    size_t num_children = data.base_data()->children()->size();
+    return std::unexpected(
+        FailInfo{FailMode::FlatbuffersDataNotFound,
+                 "DropDownContainerData must have exactly 2 children: a "
+                 "DropDownListData and a DropDownButtonData. This one has " +
+                     std::to_string(num_children) + " children."});
+  }
+  // ensure the first child in the data is DropDownListData
+  auto first_child_fb = data.base_data()->children()->Get(0);
+  if (!first_child_fb ||
+      first_child_fb->element_type() !=
+          UIElementDataUnion::UIElementDataUnion_DropDownListData) {
+    return std::unexpected(FailInfo{
+        FailMode::FlatbuffersDataNotFound,
+        "DropDownContainerData's first child must be a DropDownListData."});
+  }
+  // ensure the second child in the data is DropDownButtonData
+  auto second_child_fb = data.base_data()->children()->Get(1);
+  if (!second_child_fb ||
+      second_child_fb->element_type() !=
+          UIElementDataUnion::UIElementDataUnion_DropDownButtonData) {
+    return std::unexpected(FailInfo{
+        FailMode::FlatbuffersDataNotFound,
+        "DropDownContainerData's second child must be a DropDownButtonData."});
+  }
+
   return std::monostate{};
 }
 

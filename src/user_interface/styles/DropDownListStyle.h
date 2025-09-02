@@ -27,7 +27,7 @@ struct DropDownListStyle : public Style {
   /////////////////////////////////////////////////
   /// @brief Font used for the dropdown list
   /////////////////////////////////////////////////
-  std::string font;
+  std::shared_ptr<const sf::Font> font{nullptr};
 
   /////////////////////////////////////////////////
   /// @brief Font size used for the dropdown list
