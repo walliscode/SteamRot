@@ -23,8 +23,8 @@
 namespace steamrot {
 namespace draw_ui_elements {
 
-void DrawUIRecursively(sf::RenderTexture &texture, const UIElement &element,
-                       const UIStyle &style);
+void DrawNestedUIElements(sf::RenderTexture &texture, const UIElement &element,
+                          const UIStyle &style);
 
 void DrawBorderAndBackground(sf::RenderTexture &texture,
                              const sf::Vector2f &position,

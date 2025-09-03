@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "draw_ui_elements.h"
+#include "DropDownContainerElement.h"
 #include "user_interface_generated.h"
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/Text.hpp>
@@ -17,9 +18,20 @@
 namespace steamrot {
 namespace draw_ui_elements {
 /////////////////////////////////////////////////
-void DrawUIRecursively(sf::RenderTexture &texture, const UIElement &element,
-                       const UIStyle &style) {
+void DrawNestedUIElements(sf::RenderTexture &texture, const UIElement &element,
+                          const UIStyle &style) {
+  // draw the parent element first
   element.DrawUIElement(texture, style);
+
+  // update the size and position of the child elements
+  UpdateSizeAndPositionOfChildElements(element, style);
+
+  // if children are active, draw them
+  if (element.children_active) {
+    for (const auto &child : element.child_elements) {
+      DrawNestedUIElements(texture, *child, style);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -64,6 +76,49 @@ void UpdateSizeAndPositionOfChildElements(const UIElement &element,
 
   // guard clause for no children
   if (element.child_elements.empty()) {
+    return;
+  }
+  // handle DropDownContainer Children
+  if (dynamic_cast<const DropDownContainerElement *>(&element)) {
+    // static cast for speed, only safe because of the above check
+    auto dd_container = static_cast<const DropDownContainerElement *>(&element);
+
+    // pull out ratio
+    float ratio = style.drop_down_container_style.drop_symbol_ratio;
+
+    // ignore Inner margines for dropdown container children
+    float available_width =
+        element.size.x - 2 * style.drop_down_container_style.border_thickness;
+    float available_height =
+        element.size.y - 2 * style.drop_down_container_style.border_thickness;
+
+    sf::Vector2f available_size{available_width, available_height};
+
+    // calculate the start position for the dropdown list
+    sf::Vector2f dd_list_position{
+        element.position.x + style.drop_down_container_style.border_thickness,
+        element.position.y + style.drop_down_container_style.border_thickness};
+
+    // calculate the size of the dropdown list
+    sf::Vector2f dd_list_size{available_size.x * (1 - ratio), available_size.y};
+
+    // set the size and position of the dropdown list child
+    if (!dd_container->child_elements.empty()) {
+      dd_container->child_elements[0]->size = dd_list_size;
+      dd_container->child_elements[0]->position = dd_list_position;
+    }
+
+    // calculate the start position for the dropdown button
+    sf::Vector2f dd_button_position{dd_list_position.x + dd_list_size.x,
+                                    dd_list_position.y};
+
+    // calculate the size of the dropdown button
+    sf::Vector2f dd_button_size{available_size.x * ratio, available_size.y};
+    // set the size and position of the dropdown button child
+    if (dd_container->child_elements.size() > 1) {
+      dd_container->child_elements[1]->size = dd_button_size;
+      dd_container->child_elements[1]->position = dd_button_position;
+    }
     return;
   }
 
