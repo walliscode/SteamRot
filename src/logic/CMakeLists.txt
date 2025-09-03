@@ -19,4 +19,5 @@ target_link_libraries(logic PUBLIC
   flatbuffers_headers
   systems
   ui_styles
+  user_interface
 )
