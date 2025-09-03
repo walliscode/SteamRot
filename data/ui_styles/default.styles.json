@@ -14,7 +14,7 @@
         "b": 105,
         "a": 255
       },
-      "border_thickness": 5,
+      "border_thickness": 1,
       "radius_resolution": 50,
       "inner_margin": {
         "x": 10,
@@ -88,7 +88,7 @@
         "b": 105,
         "a": 255
       },
-      "border_thickness": 1,
+      "border_thickness": 2,
       "radius_resolution": 100,
       "inner_margin": {
         "x": 0,
@@ -146,7 +146,7 @@
       "b": 0,
       "a": 255
     },
-    "font": "DaddyTimeMonoNerdFont-Regular"
+    "font": "Roboto-Regular"
   },
   "drop_down_item_style": {
     "style": {
@@ -189,7 +189,7 @@
       "b": 210,
       "a": 255
     },
-    "font": "DaddyTimeMonoNerdFont-Regular"
+    "font": "Roboto-Regular"
   },
   "drop_down_button_style": {
     "style": {

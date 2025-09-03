@@ -9,7 +9,10 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "ButtonElement.h"
-#include "DropDownElement.h"
+#include "DropDownButtonElement.h"
+#include "DropDownContainerElement.h"
+#include "DropDownItemElement.h"
+#include "DropDownListElement.h"
 #include "PanelElement.h"
 #include "UIElement.h"
 #include "user_interface_generated.h"

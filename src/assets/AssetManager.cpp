@@ -144,11 +144,7 @@ AssetManager::AddFont(const std::string &font_name) {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 AssetManager::LoadUIStyles(std::vector<std::string> &style_names) {
-  std::cout << "Loading UI Styles\n";
-  std::cout << "Style names to load:\n";
-  for (const auto &name : style_names) {
-    std::cout << " - " << name << "\n";
-  }
+
   // create StylesConfigurator object
   StylesConfigurator styles_configurator;
   // provide map of UIStyles

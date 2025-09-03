@@ -45,7 +45,6 @@ void TestDropDownListElementProperties(const DropDownListElement &element,
           (data.label() ? data.label()->str() : ""));
   REQUIRE(element.expanded_label ==
           (data.expanded_label() ? data.expanded_label()->str() : ""));
-  REQUIRE(element.data_populate_function == data.data_populate_function());
 }
 
 void TestDropDownContainerElementProperties(

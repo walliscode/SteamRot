@@ -69,14 +69,43 @@ public:
     return flatbuffers::GetRoot<ButtonData>(builder.GetBufferPointer());
   }
 
-  // Create DropDownContainerData, finish buffer, return pointer
+  // Create DropDownContainerData with DropDownListData and DropDownButtonData
+  // as children, finish buffer, return pointer
   static const DropDownContainerData *CreateTestDropDownContainerData(
       flatbuffers::FlatBufferBuilder &builder,
-      flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<child>>>
-          children = 0) {
+      // Optionally allow custom DropDownListData and DropDownButtonData args
+      const std::string &list_label = "List",
+      const std::string &list_expanded_label = "Expanded",
+      DataPopulateFunction data_populate_function = DataPopulateFunction_None,
+      bool button_is_expanded = false) {
+    // --- Create DropDownList child ---
+    auto ddl_base =
+        CreateTestUIElementData(builder, 10, 20, 100, 40, false,
+                                SpacingAndSizingType_None, LayoutType_DropDown);
+    auto ddl_label_offset = builder.CreateString(list_label);
+    auto ddl_expanded_label_offset = builder.CreateString(list_expanded_label);
+    auto ddl_offset = CreateDropDownListData(
+        builder, ddl_base, ddl_label_offset, ddl_expanded_label_offset,
+        data_populate_function);
+
+    // --- Create DropDownButton child ---
+    auto ddb_base =
+        CreateTestUIElementData(builder, 10, 20, 100, 40, false,
+                                SpacingAndSizingType_None, LayoutType_DropDown);
+    auto ddb_offset =
+        CreateDropDownButtonData(builder, ddb_base, button_is_expanded);
+
+    // --- Wrap both children ---
+    std::vector<std::pair<UIElementDataUnion, flatbuffers::Offset<void>>>
+        children_data{
+            {UIElementDataUnion_DropDownListData, ddl_offset.Union()},
+            {UIElementDataUnion_DropDownButtonData, ddb_offset.Union()}};
+    auto children_vec = CreateChildrenVector(builder, children_data);
+
+    // --- Create DropDownContainer with these children ---
     auto base = CreateTestUIElementData(builder, 10, 20, 100, 200, true,
                                         SpacingAndSizingType_DropDownList,
-                                        LayoutType_DropDown, children);
+                                        LayoutType_DropDown, children_vec);
     auto offset = CreateDropDownContainerData(builder, base);
     builder.Finish(offset);
     return flatbuffers::GetRoot<DropDownContainerData>(
@@ -144,6 +173,7 @@ public:
 
     return builder.CreateVector(children_vec);
   }
+
   //////////////////////////////////////////////////////////////////////////////
   /// @brief Create a 4-level nested UIElementData structure for testing.
   /// Example structure (Panel):

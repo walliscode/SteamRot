@@ -7,6 +7,7 @@
 /////////////////////////////////////////////////
 /// Preprocessor Directives
 /////////////////////////////////////////////////
+#include "UIStyle.h"
 #pragma once
 
 /////////////////////////////////////////////////
@@ -24,10 +25,6 @@ namespace steamrot {
 /// @brief Base struct for all UI elements, contains common properties
 /////////////////////////////////////////////////
 struct UIElement {
-  /////////////////////////////////////////////////
-  /// @brief VIrtual default destructor to add polymorphic behavior
-  /////////////////////////////////////////////////
-  virtual ~UIElement() = default;
 
   /////////////////////////////////////////////////
   /// @brief Position of the UI element in the window
@@ -66,5 +63,10 @@ struct UIElement {
   /// @brief Layout type of the children elements
   /////////////////////////////////////////////////
   LayoutType layout{LayoutType::LayoutType_Vertical};
+
+  virtual void DrawUIElement(sf::RenderTexture &texture,
+                             const UIStyle &style) const = 0;
+
+  virtual ~UIElement() = default;
 };
 } // namespace steamrot

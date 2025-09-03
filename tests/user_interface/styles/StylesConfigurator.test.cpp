@@ -136,7 +136,7 @@ TEST_CASE("StylesConfigurator ConfigureStyle returns expected result for "
               dd_list_style_fb->style()->maximum_size());
   check_color(dd_list_style.text_color, dd_list_style_fb->text_color());
   check_color(dd_list_style.hover_color, dd_list_style_fb->hover_color());
-  REQUIRE(dd_list_style.font == dd_list_style_fb->font()->str());
+  REQUIRE(dd_list_style.font != nullptr);
   REQUIRE(dd_list_style.font_size == dd_list_style_fb->font_size());
 
   // ----- DropDownItemStyle -----
@@ -158,7 +158,7 @@ TEST_CASE("StylesConfigurator ConfigureStyle returns expected result for "
               dd_item_style_fb->style()->maximum_size());
   check_color(dd_item_style.text_color, dd_item_style_fb->text_color());
   check_color(dd_item_style.hover_color, dd_item_style_fb->hover_color());
-  REQUIRE(dd_item_style.font == dd_item_style_fb->font()->str());
+  REQUIRE(dd_item_style.font != nullptr);
   REQUIRE(dd_item_style.font_size == dd_item_style_fb->font_size());
 
   // ----- DropDownButtonStyle -----

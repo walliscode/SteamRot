@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of the PanelElement struct
+/// @brief Declaration of the DropDownItemElement struct
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -16,10 +16,19 @@
 
 namespace steamrot {
 
-struct PanelElement : public UIElement {
+struct DropDownItemElement : public UIElement {
+  /////////////////////////////////////////////////
+  /// @brief The name of the item
+  /////////////////////////////////////////////////
+  std::string label{"item..."};
 
   /////////////////////////////////////////////////
-  /// @brief Draws the PanelElement on a RenderTexture
+  /// @brief The value of the item, used for selection
+  /////////////////////////////////////////////////
+  std::string value{"value..."};
+
+  /////////////////////////////////////////////////
+  /// @brief Draws the DropDownItemElement on a RenderTexture
   ///
   /// @param texture Reference to the RenderTexture to draw on
   /// @param style UIStyle providing values for drawing
@@ -27,7 +36,7 @@ struct PanelElement : public UIElement {
   void DrawUIElement(sf::RenderTexture &texture,
                      const UIStyle &style) const override {
     draw_ui_elements::DrawBorderAndBackground(texture, position, size,
-                                              style.panel_style);
+                                              style.drop_down_item_style);
   }
 };
 

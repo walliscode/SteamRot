@@ -1,6 +1,7 @@
 add_library(user_interface
 UIElement.cpp
 UIElementFactory.cpp
+draw_ui_elements.cpp
 )
 
 target_include_directories(user_interface
