@@ -215,6 +215,8 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an unexpanded "
   dd_list.position = {25.0f, 25.0f};
   dd_list.size = {100.0f, 25.0f};
   dd_list.is_expanded = false;
+  dd_list.unexpanded_label = "...open up";
+  dd_list.expanded_label = "...select";
   // load the default UIStyle
   steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
@@ -243,6 +245,8 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an expanded "
   dd_list.position = {25.0f, 25.0f};
   dd_list.size = {100.0f, 100.0f};
   dd_list.is_expanded = true;
+  dd_list.unexpanded_label = "...open up";
+  dd_list.expanded_label = "...select";
   // load the default UIStyle
   steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
@@ -315,4 +319,100 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an expanded "
 
   // display the button for visual inspection
   steamrot::tests::DisplayRenderTexture(render_texture);
+}
+
+TEST_CASE("steamrot::draw_ui_elements::DrawNestedUIElements draws a unexpanded "
+          "drop down setup",
+          "[draw_ui_elements]") {
+  // create a RenderTexture
+  size_t width = 200;
+  size_t height = 200;
+  sf::RenderTexture render_texture{sf::Vector2u(
+      {static_cast<unsigned int>(width), static_cast<unsigned int>(height)})};
+  // create a DropDownContainerElement
+  steamrot::DropDownContainerElement dd_container;
+  dd_container.position = {25.0f, 25.0f};
+  dd_container.size = {150.0f, 25.0f};
+  dd_container.is_expanded = false;
+  dd_container.children_active = true;
+  dd_container.layout = steamrot::LayoutType::LayoutType_Horizontal;
+  // create a DropDownListElement
+  std::unique_ptr<steamrot::DropDownListElement> dd_list =
+      std::make_unique<steamrot::DropDownListElement>();
+  dd_list->position = {0.0f, 50.0f};
+  dd_list->size = {150.0f, 100.0f};
+  dd_list->is_expanded = false;
+
+  // add the DropDownListElement to the DropDownContainerElement
+  // as a child
+  dd_container.child_elements.push_back(std::move(dd_list));
+  // create a DropDownButtonElement
+  std::unique_ptr<steamrot::DropDownButtonElement> dd_button =
+      std::make_unique<steamrot::DropDownButtonElement>();
+  dd_button->position = {0.0f, 0.0f};
+  dd_button->size = {150.0f, 50.0f};
+  dd_button->is_expanded = false;
+  // add the DropDownButtonElement to the DropDownContainerElement
+  // as a child
+  dd_container.child_elements.push_back(std::move(dd_button));
+  // load the default UIStyle
+  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
+  auto load_default_assets_result = asset_manager.LoadDefaultAssets();
+  if (!load_default_assets_result) {
+    FAIL(load_default_assets_result.error().message);
+  }
+  auto style = asset_manager.GetDefaultUIStyle();
+  // clear the RenderTexture
+  render_texture.clear(sf::Color::Black);
+  // draw the DropDownContainerElement and its children on the RenderTexture
+  steamrot::draw_ui_elements::DrawNestedUIElements(render_texture, dd_container,
+                                                   style);
+  // display the button for visual inspection
+  steamrot::tests::DisplayRenderTexture(render_texture);
+}
+
+TEST_CASE("steamrot::draw_ui_elements::DrawNestedUIElements draws an expanded "
+          "drop down setup",
+          "[draw_ui_elements]") {
+  // create a RenderTexture
+  size_t width = 200;
+  size_t height = 200;
+  sf::RenderTexture render_texture{sf::Vector2u(
+      {static_cast<unsigned int>(width), static_cast<unsigned int>(height)})};
+  // create a DropDownContainerElement
+  steamrot::DropDownContainerElement dd_container;
+  dd_container.position = {25.0f, 25.0f};
+  dd_container.size = {150.0f, 100.0f};
+  dd_container.is_expanded = true;
+  dd_container.children_active = true;
+  dd_container.layout = steamrot::LayoutType::LayoutType_Horizontal;
+  // create a DropDownListElement
+  std::unique_ptr<steamrot::DropDownListElement> dd_list =
+      std::make_unique<steamrot::DropDownListElement>();
+  dd_list->position = {0.0f, 50.0f};
+  dd_list->size = {150.0f, 100.0f};
+  dd_list->is_expanded = true;
+  // add the DropDownListElement to the DropDownContainerElement
+  // as a child
+  dd_container.child_elements.push_back(std::move(dd_list));
+  // create a DropDownButtonElement
+  std::unique_ptr<steamrot::DropDownButtonElement> dd_button =
+      std::make_unique<steamrot::DropDownButtonElement>();
+  dd_button->position = {0.0f, 0.0f};
+  dd_button->size = {150.0f, 50.0f};
+  dd_button->is_expanded = false;
+  // add the DropDownButtonElement to the DropDownContainerElement
+  // as a child
+  dd_container.child_elements.push_back(std::move(dd_button));
+
+  // add three DropDownL
+  // load the default UIStyle
+  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
+  auto load_default_assets_result = asset_manager.LoadDefaultAssets();
+  if (!load_default_assets_result) {
+    FAIL(load_default_assets_result.error().message);
+  }
+  auto style = asset_manager.GetDefaultUIStyle();
+  // clear the RenderTexture
+  render_texture.clear(sf::Color::Black);
 }
