@@ -110,9 +110,9 @@ void DisplayRenderTexture(const sf::RenderTexture &renderTexture) {
 
   sf::Sprite sprite(renderTexture.getTexture());
   // have to flip the sprite vertically to display correctly
-  sprite.setScale({1.f, -1.f});
-  sprite.setOrigin({0.f, sprite.getLocalBounds().size.y});
-  sf::RenderWindow window(sf::VideoMode({400, 400}),
+  // sprite.setScale({1.f, -1.f});
+  // sprite.setOrigin({0.f, sprite.getLocalBounds().size.y});
+  sf::RenderWindow window(sf::VideoMode({900, 600}),
                           "SFML RenderTexture Display");
   window.setFramerateLimit(60);
 

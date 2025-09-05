@@ -16,10 +16,6 @@
 
 namespace steamrot {
 
-using SpacingStrategy =
-    std::function<void(UIElement &ui_element, sf::Vector2f &inner_margin,
-                       float &parent_border_thickness)>;
-
 class UIRenderLogic : public Logic {
 private:
   /////////////////////////////////////////////////

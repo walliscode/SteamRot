@@ -155,6 +155,7 @@ void UpdateSizeAndPositionOfChildElements(const UIElement &element,
           start_position.y +
               i * (child_height + style.panel_style.inner_margin.y)};
     }
+    break;
   }
   case LayoutType_Horizontal: {
     // calculate the available size for the children

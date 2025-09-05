@@ -9,7 +9,7 @@
           "root_ui_element": {
             "base_data": {
               "position": { "x": 20, "y": 25 },
-              "size": { "x": 220, "y": 600 },
+              "size": { "x": 220, "y": 300 },
               "children_active": true,
               "children": [
                 {
@@ -41,7 +41,7 @@
                   }
                 }
               ],
-              "layout": "Horizontal",
+              "layout": "Vertical",
               "spacing_strategy": "Ratioed"
             }
           }
