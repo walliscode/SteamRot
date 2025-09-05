@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "ArchetypeManager.h"
-#include "FlatbuffersConfigurator.h"
 #include "containers.h"
 #include "emp_helpers.h"
 #include <cstddef>
