@@ -68,7 +68,8 @@ protected:
   /////////////////////////////////////////////////
   /// @brief Map of all logic objects needed by the Scene.
   /////////////////////////////////////////////////
-  std::unordered_map<LogicType, std::vector<std::unique_ptr<Logic>>> m_logics;
+  std::unordered_map<LogicType, std::vector<std::unique_ptr<Logic>>>
+      m_logic_map;
 
   /////////////////////////////////////////////////
   /// @brief RenderTexture for the Scene instance.
@@ -136,6 +137,22 @@ public:
   sf::RenderTexture &GetRenderTexture();
 
   /////////////////////////////////////////////////
+  /// @brief Returns a const reference to the LogicMap of the Scene.
+  ///
+  /// @return The LogicMap of the Scene.
+  /////////////////////////////////////////////////
+  const LogicCollection &GetLogicMap() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Sets LogicMap for the scene (only if the map is empty)
+  ///
+  /// @param logic_map Logic map to set for the scene, passed by value and
+  /// moved.
+  /////////////////////////////////////////////////
+  void
+  SetLogicMap(std::unordered_map<LogicType, std::vector<std::unique_ptr<Logic>>>
+                  logic_map);
+  /////////////////////////////////////////////////
   /// @brief Returns the active state of the Scene.
   ///
   /// @return Boolean indicating if the Scene is active.
@@ -152,6 +169,13 @@ public:
   /// @brief Returns the SceneInfo of the Scene.
   /////////////////////////////////////////////////
   const SceneInfo &GetSceneInfo() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Create and return a LogicContext for the Scene.
+  ///
+  /// @return a Scene specific LogicContext object
+  /////////////////////////////////////////////////
+  LogicContext GetLogicContext();
 
 #ifdef DEBUG
   const EntityMemoryPool &GetEntityMemoryPool() const;

@@ -13,7 +13,6 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "ArchetypeManager.h"
-#include "FlatbuffersConfigurator.h"
 #include "PathProvider.h"
 #include "containers.h"
 #include <cstddef>
@@ -129,7 +128,7 @@ public:
   /// @brief Get a reference to the archetype manager
   ///
   /////////////////////////////////////////////////
-  const ArchetypeManager &GetArchetypeManager();
+  const ArchetypeManager &GetArchetypeManager() const;
 
   ////////////////////////////////////////////////////////////
   /// \brief return index of next "free" entity

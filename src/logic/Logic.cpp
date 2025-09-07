@@ -15,10 +15,6 @@ Logic::Logic(const LogicContext logic_context)
     : m_logic_context(logic_context) {}
 
 /////////////////////////////////////////////////
-void Logic::RunLogic() {
-
-  // [TODO: add in some frequency modifier]
-  ProcessLogic();
-}
+void Logic::RunLogic() { ProcessLogic(); }
 
 } // namespace steamrot

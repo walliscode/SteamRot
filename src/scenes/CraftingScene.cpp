@@ -19,7 +19,7 @@ CraftingScene::CraftingScene(const uuids::uuid &id,
 void CraftingScene::sAction() {
 
   // process action logic
-  for (auto &action_logic : m_logics[LogicType::Action]) {
+  for (auto &action_logic : m_logic_map[LogicType::Action]) {
     action_logic->RunLogic();
   }
 }
@@ -32,7 +32,7 @@ void CraftingScene::sMovement() {
 /////////////////////////////////////////////////
 void CraftingScene::sCollision() {
   // process collision logic
-  for (auto &collision_logic : m_logics[LogicType::Collision]) {
+  for (auto &collision_logic : m_logic_map[LogicType::Collision]) {
     collision_logic->RunLogic();
   }
 }
@@ -40,7 +40,7 @@ void CraftingScene::sCollision() {
 /////////////////////////////////////////////////
 void CraftingScene::sRender() {
   // process render logic
-  for (auto &render_logic : m_logics[LogicType::Render]) {
+  for (auto &render_logic : m_logic_map[LogicType::Render]) {
     render_logic->RunLogic();
   }
 }

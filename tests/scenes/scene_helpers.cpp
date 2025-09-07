@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "scene_helpers.h"
-#include "PathProvider.h"
 #include "uuid.h"
 
 namespace steamrot::tests {
@@ -23,20 +22,5 @@ const uuids::uuid create_uuid() {
   uuids::uuid_random_generator gen{generator};
   uuids::uuid const id = gen();
   return id;
-}
-
-/////////////////////////////////////////////////
-const GameContext create_game_context() {
-  sf::RenderWindow window(sf::VideoMode({800, 600}), "Test Window");
-  steamrot::EventHandler event_handler;
-  sf::Vector2i mouse_position(0, 0);
-  size_t loop_number = 0;
-  steamrot::AssetManager asset_manager{EnvironmentType::Test};
-
-  steamrot::GameContext game_context(window, event_handler, mouse_position,
-                                     loop_number, asset_manager,
-                                     EnvironmentType::Test);
-
-  return game_context;
 }
 } // namespace steamrot::tests
