@@ -39,7 +39,7 @@ struct UIElement {
   /////////////////////////////////////////////////
   /// @brief Is mouse over this element, false if it over a child element
   /////////////////////////////////////////////////
-  bool mouse_over{false};
+  bool is_mouse_over{false};
 
   /////////////////////////////////////////////////
   /// @brief Helper variable for the UIRenderLogic and UICollisionLogic whether

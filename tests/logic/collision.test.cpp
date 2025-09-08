@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "collision.h"
+#include "PanelElement.h"
 #include "catch2/generators/catch_generators.hpp"
 #include <SFML/Graphics/Rect.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -60,4 +61,23 @@ TEST_CASE("IsMouseOverBounds returns correct results for various bounds and "
   bool result =
       steamrot::collision::IsMouseOverBounds(cases.mouse_pos, cases.bounds);
   REQUIRE(result == cases.expected);
+}
+
+TEST_CASE("CheckMouseOverUIElement toggles Panel Element", "[collision]") {
+
+  // create Panel Element and set position and size
+  steamrot::PanelElement panel_element;
+  panel_element.position = {0, 0};
+  panel_element.size = {100, 100};
+
+  // ensure is_mouse_over is false initially
+  REQUIRE(panel_element.is_mouse_over == false);
+  // check mouse position inside bounds
+  sf::Vector2i mouse_position(50, 50);
+  steamrot::collision::CheckMouseOverUIElement(mouse_position, panel_element);
+  REQUIRE(panel_element.is_mouse_over == true);
+  // now move mouse outside bounds
+  mouse_position = sf::Vector2i(150, 150);
+  steamrot::collision::CheckMouseOverUIElement(mouse_position, panel_element);
+  REQUIRE(panel_element.is_mouse_over == false);
 }

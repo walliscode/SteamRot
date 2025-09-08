@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #pragma once
 
+#include "UIElement.h"
 #include <SFML/Graphics/Rect.hpp>
 namespace steamrot {
 namespace collision {
@@ -21,6 +22,9 @@ namespace collision {
 /////////////////////////////////////////////////
 bool IsMouseOverBounds(const sf::Vector2i &mouse_position,
                        const sf::FloatRect &bounds);
+
+void CheckMouseOverUIElement(const sf::Vector2i &mouse_position,
+                             UIElement &element);
 
 } // namespace collision
 } // namespace steamrot
