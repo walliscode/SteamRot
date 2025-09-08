@@ -81,3 +81,40 @@ TEST_CASE("CheckMouseOverUIElement toggles Panel Element", "[collision]") {
   steamrot::collision::CheckMouseOverUIElement(mouse_position, panel_element);
   REQUIRE(panel_element.is_mouse_over == false);
 }
+
+TEST_CASE("CheckMouseOverNestedUIElement toggles parent and child elements",
+          "[collision]") {
+  // create parent Panel Element and set position and size
+  steamrot::PanelElement parent_element;
+  parent_element.position = {0, 0};
+  parent_element.size = {200, 200};
+  // create child Panel Element and set position and size
+  auto child_element_to_add = std::make_unique<steamrot::PanelElement>();
+  child_element_to_add->position = {50, 50};
+  child_element_to_add->size = {100, 100};
+  // add child to parent
+  parent_element.child_elements.push_back(std::move(child_element_to_add));
+  auto &child_element = *parent_element.child_elements[0].get();
+
+  // ensure is_mouse_over is false initially for both
+  REQUIRE(parent_element.is_mouse_over == false);
+  REQUIRE(child_element.is_mouse_over == false);
+  // check mouse position inside child bounds
+  sf::Vector2i mouse_position(75, 75);
+  steamrot::collision::CheckMouseOverNestedUIElement(mouse_position,
+                                                     parent_element);
+  REQUIRE(child_element.is_mouse_over == true);
+  REQUIRE(parent_element.is_mouse_over == false);
+  // now move mouse outside child but inside parent bounds
+  mouse_position = sf::Vector2i(25, 25);
+  steamrot::collision::CheckMouseOverNestedUIElement(mouse_position,
+                                                     parent_element);
+  REQUIRE(child_element.is_mouse_over == false);
+  REQUIRE(parent_element.is_mouse_over == true);
+  // now move mouse outside both bounds
+  mouse_position = sf::Vector2i(250, 250);
+  steamrot::collision::CheckMouseOverNestedUIElement(mouse_position,
+                                                     parent_element);
+  REQUIRE(child_element.is_mouse_over == false);
+  REQUIRE(parent_element.is_mouse_over == false);
+}
