@@ -1,0 +1,21 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Implementation of collision detection functions.
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include "collision.h"
+
+namespace steamrot {
+namespace collision {
+
+/////////////////////////////////////////////////
+bool IsMouseOverBounds(const sf::Vector2i &mouse_position,
+                       const sf::FloatRect &bounds) {
+
+  return (bounds.contains(sf::Vector2f(mouse_position)));
+}
+} // namespace collision
+} // namespace steamrot

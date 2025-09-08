@@ -3,6 +3,7 @@ LogicFactory.test.cpp
 UIRenderLogic.test.cpp
 draw_ui_elements.test.cpp
 draw_ui_elements_helpers.cpp
+collision.test.cpp
 )
 
 target_include_directories(test_logic
