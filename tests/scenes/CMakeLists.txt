@@ -3,6 +3,7 @@ SceneFactory.test.cpp
 SceneManager.test.cpp
 scene_helpers.cpp
 TitleScene.test.cpp
+CraftingScene.test.cpp
 )
 
 target_compile_definitions(test_scenes PRIVATE
