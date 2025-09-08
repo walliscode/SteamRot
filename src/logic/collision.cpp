@@ -17,5 +17,16 @@ bool IsMouseOverBounds(const sf::Vector2i &mouse_position,
 
   return (bounds.contains(sf::Vector2f(mouse_position)));
 }
+
+/////////////////////////////////////////////////
+void CheckMouseOverUIElement(const sf::Vector2i &mouse_position,
+                             UIElement &element) {
+  if (IsMouseOverBounds(mouse_position,
+                        sf::FloatRect(element.position, element.size))) {
+    element.is_mouse_over = true;
+  } else {
+    element.is_mouse_over = false;
+  }
+}
 } // namespace collision
 } // namespace steamrot

@@ -78,7 +78,7 @@ void UIActionLogic::ProcessMouseEvents(UIElement &element,
                                        UserInputBitset &user_input) {
 
   // check if the mouse is over the element
-  if (element.mouse_over) {
+  if (element.is_mouse_over) {
 
     // default to no events matching
     bool events_match = false;
