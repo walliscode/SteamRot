@@ -5,6 +5,7 @@ add_library(logic
   UIActionLogic.cpp
   Logic.cpp
   CraftingRenderLogic.cpp
+  collision.cpp
 )
 
 target_include_directories(logic
