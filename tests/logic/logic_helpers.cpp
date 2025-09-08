@@ -7,28 +7,103 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "logic_helpers.h"
-
+#include "CraftingRenderLogic.h"
+#include "LogicFactory.h"
+#include "UIActionLogic.h"
+#include "UICollisionLogic.h"
+#include "UIRenderLogic.h"
+#include "catch2/catch_test_macros.hpp"
+#include "scene_types_generated.h"
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
-LogicContext CreateLogicContext() {
+void CheckStaticLogicCollections(const steamrot::LogicCollection &collection,
+                                 const steamrot::SceneType &scene_type) {
+  switch (scene_type) {
+  case steamrot::SceneType::SceneType_TEST: {
+    // general map properties
+    REQUIRE(collection.size() == 3);
+    // Check for specific LogicVectors
+    REQUIRE(collection.find(steamrot::LogicType::Action) != collection.end());
+    REQUIRE(collection.find(steamrot::LogicType::Collision) !=
+            collection.end());
+    REQUIRE(collection.find(steamrot::LogicType::Render) != collection.end());
+    // Evaluate actions logics
+    const steamrot::LogicVector &action_logics =
+        collection.at(steamrot::LogicType::Action);
+    REQUIRE(action_logics.size() == 1);
+    REQUIRE(dynamic_cast<steamrot::UIActionLogic *>(action_logics[0].get()));
+    // Evaluate collision logics
+    const steamrot::LogicVector &collision_logics =
+        collection.at(steamrot::LogicType::Collision);
+    REQUIRE(collision_logics.size() == 1);
+    REQUIRE(
+        dynamic_cast<steamrot::UICollisionLogic *>(collision_logics[0].get()));
+    // Evaluate render logics
+    const steamrot::LogicVector &render_logics =
+        collection.at(steamrot::LogicType::Render);
+    REQUIRE(render_logics.size() == 1);
+    REQUIRE(dynamic_cast<steamrot::UIRenderLogic *>(render_logics[0].get()));
 
-  // construct EntityMemoryPool
-  EntityMemoryPool entity_pool;
-  // construct ArchetypeManager
-  ArchetypeManager archetype_manager(entity_pool);
-  // construct a render texture
-  sf::RenderTexture render_texture;
-  // create a render window
-  sf::RenderWindow render_window(sf::VideoMode({800, 600}), "Test Window");
-  // construct AssetManager
-  AssetManager asset_manager{EnvironmentType::Test};
-  // construct EventHandler
-  EventHandler event_handler;
-  // create a LogicContext object
-  LogicContext context{entity_pool,    archetype_manager.GetArchetypes(),
-                       render_texture, render_window,
-                       asset_manager,  event_handler};
-  return context;
+    break;
+  }
+  case steamrot::SceneType::SceneType_TITLE: {
+
+    // general map properties
+    REQUIRE(collection.size() == 3);
+    // Check for specific LogicVectors
+    REQUIRE(collection.find(steamrot::LogicType::Action) != collection.end());
+    REQUIRE(collection.find(steamrot::LogicType::Collision) !=
+            collection.end());
+    REQUIRE(collection.find(steamrot::LogicType::Render) != collection.end());
+
+    // Evaluate actions logics
+    const steamrot::LogicVector &action_logics =
+        collection.at(steamrot::LogicType::Action);
+    REQUIRE(action_logics.size() == 1);
+    REQUIRE(dynamic_cast<steamrot::UIActionLogic *>(action_logics[0].get()));
+
+    // Evaluate collision logics
+    const steamrot::LogicVector &collision_logics =
+        collection.at(steamrot::LogicType::Collision);
+    REQUIRE(collision_logics.size() == 1);
+    REQUIRE(
+        dynamic_cast<steamrot::UICollisionLogic *>(collision_logics[0].get()));
+
+    break;
+  }
+  case steamrot::SceneType::SceneType_CRAFTING: {
+    // general map properties
+    REQUIRE(collection.size() == 3);
+    // Check for specific LogicVectors
+    REQUIRE(collection.find(steamrot::LogicType::Action) != collection.end());
+    REQUIRE(collection.find(steamrot::LogicType::Collision) !=
+            collection.end());
+    REQUIRE(collection.find(steamrot::LogicType::Render) != collection.end());
+
+    // Evaluate actions logics
+    const steamrot::LogicVector &action_logics =
+        collection.at(steamrot::LogicType::Action);
+    REQUIRE(action_logics.size() == 1);
+    REQUIRE(dynamic_cast<steamrot::UIActionLogic *>(action_logics[0].get()));
+    // Evaluate collision logics
+    const steamrot::LogicVector &collision_logics =
+        collection.at(steamrot::LogicType::Collision);
+    REQUIRE(collision_logics.size() == 1);
+    REQUIRE(
+        dynamic_cast<steamrot::UICollisionLogic *>(collision_logics[0].get()));
+    // Evaluate render logics
+    const steamrot::LogicVector &render_logics =
+        collection.at(steamrot::LogicType::Render);
+    REQUIRE(render_logics.size() == 2);
+    REQUIRE(
+        dynamic_cast<steamrot::CraftingRenderLogic *>(render_logics[0].get()));
+    REQUIRE(dynamic_cast<steamrot::UIRenderLogic *>(render_logics[1].get()));
+    break;
+  }
+  default: {
+    FAIL("Unhandled SceneType in CheckStaticLogicCollections");
+  }
+  }
 }
 } // namespace steamrot::tests

@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////
 #pragma once
 
-#include "GameContext.h"
+#include "Scene.h"
 #include "uuid.h"
 namespace steamrot::tests {
 
@@ -17,5 +17,13 @@ namespace steamrot::tests {
 /////////////////////////////////////////////////
 const uuids::uuid create_uuid();
 
-const GameContext create_game_context();
+/////////////////////////////////////////////////
+/// @brief Checks the full default configuration of a scene
+///
+/// This will bring together other helper functions for specific parts of the
+/// scene
+/// @param scene Scene to check
+/////////////////////////////////////////////////
+void CheckDefaultSceneConfiguration(const Scene &scene);
+
 } // namespace steamrot::tests

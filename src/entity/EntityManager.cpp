@@ -37,7 +37,7 @@ const EntityMemoryPool &EntityManager::GetEntityMemoryPool() const {
 }
 
 /////////////////////////////////////////////////
-const ArchetypeManager &EntityManager::GetArchetypeManager() {
+const ArchetypeManager &EntityManager::GetArchetypeManager() const {
   // return a const reference to the archetype manager
   return m_archetype_manager;
 }
@@ -94,5 +94,14 @@ size_t EntityManager::GetNextFreeEntityIndex() {
   // if no inactive entity found, return the size of the vector
   return meta_data.size();
 };
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo> EntityManager::GenerateAllArchetypes() {
+  auto generate_result = m_archetype_manager.GenerateAllArchetypes();
+  if (!generate_result.has_value()) {
+    return std::unexpected(generate_result.error());
+  }
+  return std::monostate{};
+}
 
 } // namespace steamrot

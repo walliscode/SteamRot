@@ -42,32 +42,26 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type) {
   uuids::uuid scene_uuid = CreateUUID();
   std::cout << "Creating scene with UUID: " << scene_uuid << std::endl;
 
+  // make a pointer to a base Scene and assign it to a derived scene type
+  std::unique_ptr<Scene> scene_ptr{nullptr};
+
   switch (scene_type) {
 
   case SceneType::SceneType_TITLE: {
+    // create a unique pointer to a TitleScene as it can't be constructed
+    // directly into scene_ptr
     std::unique_ptr<TitleScene> title_scene(
         new TitleScene(scene_uuid, m_game_context));
-
-    // run scene default Scene set up
-    auto configure_result = title_scene->ConfigureFromDefault();
-
-    // pass along error if it fails
-    if (!configure_result)
-      return std::unexpected(configure_result.error());
-
-    return title_scene;
+    scene_ptr = std::move(title_scene);
+    break;
   }
 
   case SceneType::SceneType_CRAFTING: {
     std::unique_ptr<CraftingScene> crafting_scene(
         new CraftingScene(scene_uuid, m_game_context));
 
-    // run scene default Scene set up
-    auto configure_result = crafting_scene->ConfigureFromDefault();
-    // pass along error if it fails
-    if (!configure_result)
-      return std::unexpected(configure_result.error());
-    return crafting_scene;
+    scene_ptr = std::move(crafting_scene);
+    break;
   }
 
   default:
@@ -75,6 +69,27 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type) {
 
     return std::unexpected(fail_info);
   }
+  // configure scene entities from default data
+  auto configure_result = scene_ptr->ConfigureFromDefault();
+  if (!configure_result) {
+    return std::unexpected(configure_result.error());
+  }
+
+  // Get ArchetypeManager to gerenate all archetypes
+  auto archetype_result = scene_ptr->m_entity_manager.GenerateAllArchetypes();
+  if (!archetype_result) {
+    return std::unexpected(archetype_result.error());
+  }
+
+  // configure LogicMap
+  LogicFactory logic_factory(scene_type, scene_ptr->GetLogicContext());
+  auto create_map_result = logic_factory.CreateLogicMap();
+  if (!create_map_result) {
+    return std::unexpected(create_map_result.error());
+  }
+  // pass the created logic map to the scene
+  scene_ptr->SetLogicMap(std::move(create_map_result.value()));
+  return scene_ptr;
 }
 
 } // namespace steamrot

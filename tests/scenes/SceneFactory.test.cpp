@@ -8,7 +8,10 @@
 /////////////////////////////////////////////////
 #include "SceneFactory.h"
 #include "CraftingScene.h"
+#include "TestContext.h"
 #include "TitleScene.h"
+#include "UIActionLogic.h"
+#include "UICollisionLogic.h"
 #include "configuration_helpers.h"
 #include "containers.h"
 #include "scene_helpers.h"
@@ -17,14 +20,15 @@
 
 // create a GameContext object for use by all tests
 TEST_CASE("SceneFactory can be constructed without errors", "[SceneFactory]") {
-
-  steamrot::SceneFactory scene_factory(steamrot::tests::create_game_context());
+  steamrot::tests::TestContext test_context;
+  steamrot::SceneFactory scene_factory(test_context.GetGameContext());
   REQUIRE_NOTHROW(scene_factory);
 }
 
 TEST_CASE("SceneFactory can create a TitleScene from default",
           "[SceneFactory]") {
-  steamrot::SceneFactory scene_factory(steamrot::tests::create_game_context());
+  steamrot::tests::TestContext test_context;
+  steamrot::SceneFactory scene_factory(test_context.GetGameContext());
 
   // define SceneType for the test
   const steamrot::SceneType scene_type = steamrot::SceneType::SceneType_TITLE;
@@ -42,17 +46,14 @@ TEST_CASE("SceneFactory can create a TitleScene from default",
   REQUIRE(title_scene->GetSceneInfo().type == scene_type);
   REQUIRE(dynamic_cast<steamrot::TitleScene *>(title_scene.get()));
 
-  // check that the TitleScene entities are initialized correctly
-  const steamrot::EntityMemoryPool &entity_memory_pool =
-      title_scene->GetEntityMemoryPool();
-
-  steamrot::tests::TestConfigurationOfEMPfromDefaultData(entity_memory_pool,
-                                                         scene_type);
+  // check that the TitleScene is configured correctly
+  steamrot::tests::CheckDefaultSceneConfiguration(*title_scene);
 }
 
 TEST_CASE("SceneFactory can create a CraftingScene from default",
           "[SceneFactory]") {
-  steamrot::SceneFactory scene_factory(steamrot::tests::create_game_context());
+  steamrot::tests::TestContext test_context;
+  steamrot::SceneFactory scene_factory(test_context.GetGameContext());
   // create a CraftingScene
   auto scene_creation_result =
       scene_factory.CreateDefaultScene(steamrot::SceneType::SceneType_CRAFTING);
@@ -66,9 +67,6 @@ TEST_CASE("SceneFactory can create a CraftingScene from default",
           steamrot::SceneType::SceneType_CRAFTING);
   REQUIRE(dynamic_cast<steamrot::CraftingScene *>(crafting_scene.get()));
 
-  // check that the CraftingScene entities are initialized correctly
-  const steamrot::EntityMemoryPool &entity_memory_pool =
-      crafting_scene->GetEntityMemoryPool();
-  steamrot::tests::TestConfigurationOfEMPfromDefaultData(
-      entity_memory_pool, steamrot::SceneType::SceneType_CRAFTING);
+  // check that the CraftingScene is configured correctly
+  steamrot::tests::CheckDefaultSceneConfiguration(*crafting_scene);
 }

@@ -7,7 +7,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "scene_helpers.h"
-#include "PathProvider.h"
+#include "configuration_helpers.h"
+#include "logic_helpers.h"
 #include "uuid.h"
 
 namespace steamrot::tests {
@@ -26,17 +27,18 @@ const uuids::uuid create_uuid() {
 }
 
 /////////////////////////////////////////////////
-const GameContext create_game_context() {
-  sf::RenderWindow window(sf::VideoMode({800, 600}), "Test Window");
-  steamrot::EventHandler event_handler;
-  sf::Vector2i mouse_position(0, 0);
-  size_t loop_number = 0;
-  steamrot::AssetManager asset_manager{EnvironmentType::Test};
+void CheckDefaultSceneConfiguration(const Scene &scene) {
 
-  steamrot::GameContext game_context(window, event_handler, mouse_position,
-                                     loop_number, asset_manager,
-                                     EnvironmentType::Test);
+  const SceneType scene_type = scene.GetSceneInfo().type;
+  // check entity memory pool default configuration
+  TestConfigurationOfEMPfromDefaultData(scene.GetEntityMemoryPool(),
+                                        scene_type);
 
-  return game_context;
+  // check archetypes of configured entity memory pool
+  TestArchetypesOfConfiguredEMPfromDefaultData(scene.GetArchetypes(),
+                                               scene_type);
+
+  // check logic map default configuration
+  CheckStaticLogicCollections(scene.GetLogicMap(), scene_type);
 }
 } // namespace steamrot::tests

@@ -2,6 +2,7 @@ add_executable(test_scenes
 SceneFactory.test.cpp
 SceneManager.test.cpp
 scene_helpers.cpp
+TitleScene.test.cpp
 )
 
 target_compile_definitions(test_scenes PRIVATE
@@ -17,10 +18,13 @@ target_link_libraries(test_scenes
   Catch2::Catch2WithMain
   SFML::Graphics
   scenes
+  logic
   systems
   entity_helpers
   asset_helpers
   test_context
+  user_interface
+  test_logic_helpers
 )
 
 catch_discover_tests(test_scenes)

@@ -60,15 +60,20 @@ std::expected<std::monostate, FailInfo> AssetManager::LoadDefaultAssets() {
   ////// Load UI Styles //////
   // create a vector of style names to load and pass to LoadUIStyles
   std::vector<std::string> style_names;
-  if (!asset_config->ui_styles()->empty()) {
+  if (asset_config->ui_styles()->empty())
+    return std::unexpected<FailInfo>(
+        {FailMode::FlatbuffersDataNotFound,
+         "No UI styles defined in AssetCollection"});
+
+  else {
     for (auto const &style_name : *asset_config->ui_styles()) {
       style_names.push_back(style_name->str());
     }
   }
 
-  auto load_ui_style_resylt = LoadUIStyles(style_names);
-  if (!load_ui_style_resylt.has_value())
-    return std::unexpected<FailInfo>(load_ui_style_resylt.error());
+  auto load_ui_style_result = LoadUIStyles(style_names);
+  if (!load_ui_style_result.has_value())
+    return std::unexpected<FailInfo>(load_ui_style_result.error());
 
   return std::monostate();
 }

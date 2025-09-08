@@ -13,10 +13,11 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "ArchetypeManager.h"
-#include "FlatbuffersConfigurator.h"
+#include "FailInfo.h"
 #include "PathProvider.h"
 #include "containers.h"
 #include <cstddef>
+#include <expected>
 #include <variant>
 
 namespace steamrot {
@@ -114,6 +115,12 @@ public:
                                    const DataType data_type);
 
   /////////////////////////////////////////////////
+  /// @brief Calls the ArchetypeManager to generate all archetypes from the
+  /// EntityMemoryPool
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> GenerateAllArchetypes();
+
+  /////////////////////////////////////////////////
   /// @brief Get a read/write reference to the entity memory pool
   /////////////////////////////////////////////////
   EntityMemoryPool &GetEntityMemoryPool();
@@ -129,7 +136,7 @@ public:
   /// @brief Get a reference to the archetype manager
   ///
   /////////////////////////////////////////////////
-  const ArchetypeManager &GetArchetypeManager();
+  const ArchetypeManager &GetArchetypeManager() const;
 
   ////////////////////////////////////////////////////////////
   /// \brief return index of next "free" entity
