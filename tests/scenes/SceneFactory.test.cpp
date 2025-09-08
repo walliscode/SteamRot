@@ -12,9 +12,9 @@
 #include "TitleScene.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
-#include "UIRenderLogic.h"
 #include "configuration_helpers.h"
 #include "containers.h"
+#include "scene_helpers.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <catch2/catch_test_macros.hpp>
 
@@ -46,40 +46,8 @@ TEST_CASE("SceneFactory can create a TitleScene from default",
   REQUIRE(title_scene->GetSceneInfo().type == scene_type);
   REQUIRE(dynamic_cast<steamrot::TitleScene *>(title_scene.get()));
 
-  // check that the TitleScene entities are initialized correctly
-  const steamrot::EntityMemoryPool &entity_memory_pool =
-      title_scene->GetEntityMemoryPool();
-
-  steamrot::tests::TestConfigurationOfEMPfromDefaultData(entity_memory_pool,
-                                                         scene_type);
-
-  // check that the TitleScene logic map is initialized correctly
-  const steamrot::LogicCollection &logic_collection =
-      title_scene->GetLogicMap();
-
-  REQUIRE_NOTHROW(logic_collection.at(steamrot::LogicType::Collision));
-  REQUIRE_NOTHROW(logic_collection.at(steamrot::LogicType::Action));
-  REQUIRE_NOTHROW(logic_collection.at(steamrot::LogicType::Render));
-
-  // evaluate collision logics
-  const steamrot::LogicVector &collision_logics =
-      logic_collection.at(steamrot::LogicType::Collision);
-  REQUIRE(collision_logics.size() == 1);
-  REQUIRE(
-      dynamic_cast<steamrot::UICollisionLogic *>(collision_logics[0].get()));
-
-  // evaluate action logics
-  const steamrot::LogicVector &action_logics =
-      logic_collection.at(steamrot::LogicType::Action);
-  REQUIRE(action_logics.size() == 1);
-  REQUIRE(dynamic_cast<steamrot::UIActionLogic *>(action_logics[0].get()));
-
-  // evaluate render logics
-  const steamrot::LogicVector &render_logics =
-
-      logic_collection.at(steamrot::LogicType::Render);
-  REQUIRE(render_logics.size() == 1);
-  REQUIRE(dynamic_cast<steamrot::UIRenderLogic *>(render_logics[0].get()));
+  // check that the TitleScene is configured correctly
+  steamrot::tests::CheckDefaultSceneConfiguration(*title_scene);
 }
 
 TEST_CASE("SceneFactory can create a CraftingScene from default",
@@ -99,9 +67,6 @@ TEST_CASE("SceneFactory can create a CraftingScene from default",
           steamrot::SceneType::SceneType_CRAFTING);
   REQUIRE(dynamic_cast<steamrot::CraftingScene *>(crafting_scene.get()));
 
-  // check that the CraftingScene entities are initialized correctly
-  const steamrot::EntityMemoryPool &entity_memory_pool =
-      crafting_scene->GetEntityMemoryPool();
-  steamrot::tests::TestConfigurationOfEMPfromDefaultData(
-      entity_memory_pool, steamrot::SceneType::SceneType_CRAFTING);
+  // check that the CraftingScene is configured correctly
+  steamrot::tests::CheckDefaultSceneConfiguration(*crafting_scene);
 }

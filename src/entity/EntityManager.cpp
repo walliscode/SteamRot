@@ -95,4 +95,13 @@ size_t EntityManager::GetNextFreeEntityIndex() {
   return meta_data.size();
 };
 
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo> EntityManager::GenerateAllArchetypes() {
+  auto generate_result = m_archetype_manager.GenerateAllArchetypes();
+  if (!generate_result.has_value()) {
+    return std::unexpected(generate_result.error());
+  }
+  return std::monostate{};
+}
+
 } // namespace steamrot

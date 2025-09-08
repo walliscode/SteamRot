@@ -89,9 +89,8 @@ protected:
   /////////////////////////////////////////////////
   /// @brief Constructor for Scene class.
   ///
-  /// @param pool_size [TODO:parameter]
-  /// @param id [TODO:parameter]
-  /// @param game_context [TODO:parameter]
+  /// @param id Generated UUID for the Scene.
+  /// @param game_context GameContext object passed down from the GameEngine.
   /////////////////////////////////////////////////
   Scene(const SceneType scene_type, const uuids::uuid &id,
         const GameContext game_context);
@@ -179,6 +178,8 @@ public:
 
 #ifdef DEBUG
   const EntityMemoryPool &GetEntityMemoryPool() const;
+
+  const std::unordered_map<ArchetypeID, Archetype> &GetArchetypes() const;
 #endif
 };
 

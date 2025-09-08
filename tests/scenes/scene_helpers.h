@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #pragma once
 
+#include "Scene.h"
 #include "uuid.h"
 namespace steamrot::tests {
 
@@ -15,4 +16,14 @@ namespace steamrot::tests {
 /// @brief Create a UUID for testing purposes
 /////////////////////////////////////////////////
 const uuids::uuid create_uuid();
+
+/////////////////////////////////////////////////
+/// @brief Checks the full default configuration of a scene
+///
+/// This will bring together other helper functions for specific parts of the
+/// scene
+/// @param scene Scene to check
+/////////////////////////////////////////////////
+void CheckDefaultSceneConfiguration(const Scene &scene);
+
 } // namespace steamrot::tests

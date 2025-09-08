@@ -13,9 +13,11 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "ArchetypeManager.h"
+#include "FailInfo.h"
 #include "PathProvider.h"
 #include "containers.h"
 #include <cstddef>
+#include <expected>
 #include <variant>
 
 namespace steamrot {
@@ -111,6 +113,12 @@ public:
   ConfigureEntitiesFromDefaultData(const SceneType scene_type,
                                    const EnvironmentType env_type,
                                    const DataType data_type);
+
+  /////////////////////////////////////////////////
+  /// @brief Calls the ArchetypeManager to generate all archetypes from the
+  /// EntityMemoryPool
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> GenerateAllArchetypes();
 
   /////////////////////////////////////////////////
   /// @brief Get a read/write reference to the entity memory pool

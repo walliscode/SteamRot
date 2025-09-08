@@ -7,6 +7,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "scene_helpers.h"
+#include "configuration_helpers.h"
+#include "logic_helpers.h"
 #include "uuid.h"
 
 namespace steamrot::tests {
@@ -22,5 +24,21 @@ const uuids::uuid create_uuid() {
   uuids::uuid_random_generator gen{generator};
   uuids::uuid const id = gen();
   return id;
+}
+
+/////////////////////////////////////////////////
+void CheckDefaultSceneConfiguration(const Scene &scene) {
+
+  const SceneType scene_type = scene.GetSceneInfo().type;
+  // check entity memory pool default configuration
+  TestConfigurationOfEMPfromDefaultData(scene.GetEntityMemoryPool(),
+                                        scene_type);
+
+  // check archetypes of configured entity memory pool
+  TestArchetypesOfConfiguredEMPfromDefaultData(scene.GetArchetypes(),
+                                               scene_type);
+
+  // check logic map default configuration
+  CheckStaticLogicCollections(scene.GetLogicMap(), scene_type);
 }
 } // namespace steamrot::tests

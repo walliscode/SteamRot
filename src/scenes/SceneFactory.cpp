@@ -74,6 +74,13 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type) {
   if (!configure_result) {
     return std::unexpected(configure_result.error());
   }
+
+  // Get ArchetypeManager to gerenate all archetypes
+  auto archetype_result = scene_ptr->m_entity_manager.GenerateAllArchetypes();
+  if (!archetype_result) {
+    return std::unexpected(archetype_result.error());
+  }
+
   // configure LogicMap
   LogicFactory logic_factory(scene_type, scene_ptr->GetLogicContext());
   auto create_map_result = logic_factory.CreateLogicMap();

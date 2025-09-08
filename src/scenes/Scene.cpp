@@ -74,4 +74,8 @@ LogicContext Scene::GetLogicContext() {
       m_game_context.event_handler};
   return logic_context;
 }
+/////////////////////////////////////////////////
+const std::unordered_map<ArchetypeID, Archetype> &Scene::GetArchetypes() const {
+  return m_entity_manager.GetArchetypeManager().GetArchetypes();
+}
 } // namespace steamrot

@@ -7,21 +7,22 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "LogicFactory.h"
-#include "CraftingRenderLogic.h"
+#include "TestContext.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
-#include "UIRenderLogic.h"
 #include "logic_helpers.h"
 #include "scene_types_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("LogicFactory constructed without errors", "[LogicFactory]") {
 
-  // create a LogicContext with mock dependencies
-  steamrot::LogicContext logic_context = steamrot::tests::CreateLogicContext();
+  // create a Testcontext to provide mock dependencies
+
+  steamrot::tests::TestContext test_context;
   // create a LogicFactory instance
-  steamrot::LogicFactory logic_factory(steamrot::SceneType::SceneType_TEST,
-                                       logic_context);
+  steamrot::LogicFactory logic_factory(
+      steamrot::SceneType::SceneType_TEST,
+      test_context.GetLogicContextForTestScene());
 
   REQUIRE_NOTHROW(logic_factory);
 }
@@ -30,10 +31,13 @@ TEST_CASE("LogicFactory creates the correct Logic instances with a test Scene",
           "[LogicFactory]") {
 
   // create a LogicContext with mock dependencies
-  steamrot::LogicContext logic_context = steamrot::tests::CreateLogicContext();
+  steamrot::tests::TestContext test_context{
+      steamrot::SceneType::SceneType_TEST};
+
   // create a LogicFactory instance
-  steamrot::LogicFactory logic_factory(steamrot::SceneType::SceneType_TEST,
-                                       logic_context);
+  steamrot::LogicFactory logic_factory(
+      steamrot::SceneType::SceneType_TEST,
+      test_context.GetLogicContextForTestScene());
 
   auto logic_map_result = logic_factory.CreateLogicMap();
   if (!logic_map_result.has_value()) {
@@ -43,37 +47,19 @@ TEST_CASE("LogicFactory creates the correct Logic instances with a test Scene",
 
   steamrot::LogicCollection &logic_collection = logic_map_result.value();
 
-  REQUIRE_NOTHROW(logic_collection.at(steamrot::LogicType::Collision));
-  REQUIRE_NOTHROW(logic_collection.at(steamrot::LogicType::Action));
-  REQUIRE_NOTHROW(logic_collection.at(steamrot::LogicType::Render));
-
-  // evaluate collision logics
-  steamrot::LogicVector &collision_logics =
-      logic_collection.at(steamrot::LogicType::Collision);
-  REQUIRE(collision_logics.size() == 1);
-  REQUIRE(
-      dynamic_cast<steamrot::UICollisionLogic *>(collision_logics[0].get()));
-
-  // evaluate action logics
-  steamrot::LogicVector &action_logics =
-      logic_collection.at(steamrot::LogicType::Action);
-  REQUIRE(action_logics.size() == 1);
-  REQUIRE(dynamic_cast<steamrot::UIActionLogic *>(action_logics[0].get()));
-
-  // evaluate render logics
-  steamrot::LogicVector &render_logics =
-      logic_collection.at(steamrot::LogicType::Render);
-  REQUIRE(render_logics.size() == 1);
-  REQUIRE(dynamic_cast<steamrot::UIRenderLogic *>(render_logics[0].get()));
+  steamrot::tests::CheckStaticLogicCollections(
+      logic_collection, steamrot::SceneType::SceneType_TEST);
 }
 
 TEST_CASE("LogicFactory creates correct Logic instances for TitleScene",
           "[LogicFactory]") {
-  // create a LogicContext with mock dependencies
-  steamrot::LogicContext logic_context = steamrot::tests::CreateLogicContext();
+
+  steamrot::tests::TestContext test_context{
+      steamrot::SceneType::SceneType_TITLE};
   // create a LogicFactory instance
-  steamrot::LogicFactory logic_factory(steamrot::SceneType::SceneType_TITLE,
-                                       logic_context);
+  steamrot::LogicFactory logic_factory(
+      steamrot::SceneType::SceneType_TITLE,
+      test_context.GetLogicContextForTitleScene());
 
   auto logic_map_result = logic_factory.CreateLogicMap();
   if (!logic_map_result.has_value()) {
@@ -83,37 +69,18 @@ TEST_CASE("LogicFactory creates correct Logic instances for TitleScene",
 
   steamrot::LogicCollection &logic_collection = logic_map_result.value();
 
-  REQUIRE_NOTHROW(logic_collection.at(steamrot::LogicType::Collision));
-  REQUIRE_NOTHROW(logic_collection.at(steamrot::LogicType::Action));
-  REQUIRE_NOTHROW(logic_collection.at(steamrot::LogicType::Render));
-
-  // evaluate collision logics
-  steamrot::LogicVector &collision_logics =
-      logic_collection.at(steamrot::LogicType::Collision);
-  REQUIRE(collision_logics.size() == 1);
-  REQUIRE(
-      dynamic_cast<steamrot::UICollisionLogic *>(collision_logics[0].get()));
-
-  // evaluate action logics
-  steamrot::LogicVector &action_logics =
-      logic_collection.at(steamrot::LogicType::Action);
-  REQUIRE(action_logics.size() == 1);
-  REQUIRE(dynamic_cast<steamrot::UIActionLogic *>(action_logics[0].get()));
-
-  // evaluate render logics
-  steamrot::LogicVector &render_logics =
-      logic_collection.at(steamrot::LogicType::Render);
-  REQUIRE(render_logics.size() == 1);
-  REQUIRE(dynamic_cast<steamrot::UIRenderLogic *>(render_logics[0].get()));
+  steamrot::tests::CheckStaticLogicCollections(
+      logic_collection, steamrot::SceneType::SceneType_TITLE);
 }
-
 TEST_CASE("LogicFactory creates correct Logic instances for CraftingScene",
           "[LogicFactory]") {
-  // create a LogicContext with mock dependencies
-  steamrot::LogicContext logic_context = steamrot::tests::CreateLogicContext();
+
+  steamrot::tests::TestContext test_context{
+      steamrot::SceneType::SceneType_CRAFTING};
   // create a LogicFactory instance
-  steamrot::LogicFactory logic_factory(steamrot::SceneType::SceneType_CRAFTING,
-                                       logic_context);
+  steamrot::LogicFactory logic_factory(
+      steamrot::SceneType::SceneType_CRAFTING,
+      test_context.GetLogicContextForCraftingScene());
 
   auto logic_map_result = logic_factory.CreateLogicMap();
   if (!logic_map_result.has_value()) {
@@ -123,28 +90,6 @@ TEST_CASE("LogicFactory creates correct Logic instances for CraftingScene",
 
   steamrot::LogicCollection &logic_collection = logic_map_result.value();
 
-  REQUIRE_NOTHROW(logic_collection.at(steamrot::LogicType::Collision));
-  REQUIRE_NOTHROW(logic_collection.at(steamrot::LogicType::Action));
-  REQUIRE_NOTHROW(logic_collection.at(steamrot::LogicType::Render));
-
-  // evaluate collision logics
-  steamrot::LogicVector &collision_logics =
-      logic_collection.at(steamrot::LogicType::Collision);
-  REQUIRE(collision_logics.size() == 1);
-  REQUIRE(
-      dynamic_cast<steamrot::UICollisionLogic *>(collision_logics[0].get()));
-
-  // evaluate action logics
-  steamrot::LogicVector &action_logics =
-      logic_collection.at(steamrot::LogicType::Action);
-  REQUIRE(action_logics.size() == 1);
-  REQUIRE(dynamic_cast<steamrot::UIActionLogic *>(action_logics[0].get()));
-
-  // evaluate render logics
-  steamrot::LogicVector &render_logics =
-      logic_collection.at(steamrot::LogicType::Render);
-  REQUIRE(render_logics.size() == 2);
-  REQUIRE(
-      dynamic_cast<steamrot::CraftingRenderLogic *>(render_logics[0].get()));
-  REQUIRE(dynamic_cast<steamrot::UIRenderLogic *>(render_logics[1].get()));
+  steamrot::tests::CheckStaticLogicCollections(
+      logic_collection, steamrot::SceneType::SceneType_CRAFTING);
 }
