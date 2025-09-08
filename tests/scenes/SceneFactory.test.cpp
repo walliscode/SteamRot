@@ -12,8 +12,6 @@
 #include "TitleScene.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
-#include "configuration_helpers.h"
-#include "containers.h"
 #include "scene_helpers.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <catch2/catch_test_macros.hpp>
