@@ -40,7 +40,7 @@ struct DropDownListElement : public UIElement {
   /////////////////////////////////////////////////
   void DrawUIElement(sf::RenderTexture &texture,
                      const UIStyle &style) const override {
-    draw_ui_elements::DrawBorderAndBackground(texture, position, size,
+    draw_ui_elements::DrawBorderAndBackground(texture, *this,
                                               style.drop_down_list_style);
 
     // calculate the position for the text

@@ -30,7 +30,7 @@ struct DropDownButtonElement : public UIElement {
   void DrawUIElement(sf::RenderTexture &texture,
                      const UIStyle &style) const override {
 
-    draw_ui_elements::DrawBorderAndBackground(texture, position, size,
+    draw_ui_elements::DrawBorderAndBackground(texture, *this,
                                               style.drop_down_button_style);
 
     // calculate the radius of the triangle using the size, border thickness,

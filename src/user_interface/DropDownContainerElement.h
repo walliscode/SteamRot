@@ -33,7 +33,7 @@ struct DropDownContainerElement : public UIElement {
                      const UIStyle &style) const override {
 
     // Draw the border and background for the container
-    draw_ui_elements::DrawBorderAndBackground(texture, position, size,
+    draw_ui_elements::DrawBorderAndBackground(texture, *this,
                                               style.drop_down_container_style);
   }
 };

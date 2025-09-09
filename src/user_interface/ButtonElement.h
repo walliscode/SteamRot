@@ -39,7 +39,7 @@ struct ButtonElement : public UIElement {
                      const UIStyle &style) const override {
 
     // Draw the border and background
-    draw_ui_elements::DrawBorderAndBackground(texture, position, size,
+    draw_ui_elements::DrawBorderAndBackground(texture, *this,
                                               style.button_style);
 
     // Draw the button text
