@@ -10,6 +10,7 @@
 #include "DropDownContainerElement.h"
 #include "user_interface_generated.h"
 #include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/System/Angle.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -36,12 +37,29 @@ void DrawNestedUIElements(sf::RenderTexture &texture, const UIElement &element,
 
 /////////////////////////////////////////////////
 void DrawBorderAndBackground(sf::RenderTexture &texture,
-                             const sf::Vector2f &position,
-                             const sf::Vector2f &size, const Style &style) {
+                             const UIElement &element, const Style &style) {
+
   // Create the rectangle using the element's position and size
-  sf::RectangleShape rectangle(size);
-  rectangle.setPosition(position);
+  sf::RectangleShape rectangle(element.size);
+  rectangle.setPosition(element.position);
   rectangle.setFillColor(style.background_color);
+  rectangle.setOutlineColor(style.border_color);
+  // Border thickness is negative to draw inwards
+  rectangle.setOutlineThickness(-style.border_thickness);
+  // Draw the rectangle on the texture
+  texture.draw(rectangle);
+}
+
+/////////////////////////////////////////////////
+void DrawBorderAndBackground(sf::RenderTexture &texture,
+                             const UIElement &element,
+                             const ButtonStyle &style) {
+  // Create the rectangle using the element's position and size
+  sf::RectangleShape rectangle(element.size);
+  rectangle.setPosition(element.position);
+  // Change color if hovered
+  element.is_mouse_over ? rectangle.setFillColor(style.hover_color)
+                        : rectangle.setFillColor(style.background_color);
   rectangle.setOutlineColor(style.border_color);
   // Border thickness is negative to draw inwards
   rectangle.setOutlineThickness(-style.border_thickness);
