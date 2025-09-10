@@ -15,8 +15,8 @@ struct GameContext {
   GameContext() = delete;
 
   GameContext(sf::RenderWindow &window, EventHandler &event_handler,
-              const sf::Vector2i &mouse_position, const size_t &loop_number,
-              AssetManager &asset_manager, const EnvironmentType &env_type);
+              const size_t &loop_number, AssetManager &asset_manager,
+              const EnvironmentType &env_type);
 
   /////////////////////////////////////////////////
   /// @brief Reference to the game window.
@@ -33,7 +33,7 @@ struct GameContext {
   /////////////////////////////////////////////////
   /// @brief Reference to mouse position in the game window. (local).
   /////////////////////////////////////////////////
-  const sf::Vector2i mouse_position;
+  sf::Vector2i mouse_position{0, 0};
 
   /////////////////////////////////////////////////
   /// @brief Loop number for the current game loop. Lives on the GameEngine

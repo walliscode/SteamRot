@@ -1,6 +1,7 @@
 #include "UICollisionLogic.h"
 #include "ArchetypeHelpers.h"
 #include "CUserInterface.h"
+#include "collision.h"
 #include "emp_helpers.h"
 #include <SFML/Window/Mouse.hpp>
 
@@ -34,52 +35,9 @@ void UICollisionLogic::ProcessLogic() {
         entity_id, m_logic_context.scene_entities);
 
     // group collision logic here
-    CheckMouseCollision(ui_component);
+    collision::CheckMouseOverNestedUIElement(m_logic_context.mouse_position,
+                                             *ui_component.m_root_element);
   };
 }
 
-/////////////////////////////////////////////////
-void UICollisionLogic::CheckMouseCollision(CUserInterface &ui_component) {
-
-  // get mouse position relative to the game window
-  sf::Vector2i mouse_position =
-      sf::Mouse::getPosition(m_logic_context.game_window);
-  // recursively check the root element for mouse collision
-  RecursiveCheckMouseCollision(*ui_component.m_root_element, mouse_position);
-}
-
-/////////////////////////////////////////////////
-void UICollisionLogic::RecursiveCheckMouseCollision(
-    UIElement &element, sf::Vector2i mouse_position) {
-
-  // reset mouse_over and mouse_over_child for the element
-  element.is_mouse_over = false;
-
-  // lamda function to check if mouse is within bounds of the element
-  bool is_mouse_over = [&]() -> bool {
-    // Assuming we have a way to get the mouse position
-    return (mouse_position.x >= element.position.x &&
-            mouse_position.x <= element.position.x + element.size.x &&
-            mouse_position.y >= element.position.y &&
-            mouse_position.y <= element.position.y + element.size.y);
-  }();
-
-  // check is mouse over the element
-  if (is_mouse_over) {
-
-    // set mouse_over to true, reset to false if we are over a child
-    // element
-    element.is_mouse_over = true;
-  }
-  // recursively check child elements
-  for (auto &child : element.child_elements) {
-  }
-
-  // adding in mouse_over_child prevents recursive calls every tick
-}
-
-void UICollisionLogic::RecursiveResetMouseOver(UIElement &element) {
-  // reset mouse_over state for the element
-  element.is_mouse_over = false;
-}
 } // namespace steamrot

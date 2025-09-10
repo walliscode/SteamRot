@@ -57,5 +57,10 @@ struct LogicContext {
   /// This contains the global event bus and is used to adapt other events.
   /////////////////////////////////////////////////
   EventHandler &event_handler;
+
+  /////////////////////////////////////////////////
+  /// @brief Reference to mouse position in the game window. (local).
+  /////////////////////////////////////////////////
+  const sf::Vector2i &mouse_position;
 };
 } // namespace steamrot

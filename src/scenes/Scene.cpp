@@ -71,7 +71,8 @@ LogicContext Scene::GetLogicContext() {
       m_render_texture,
       m_game_context.game_window,
       m_game_context.asset_manager,
-      m_game_context.event_handler};
+      m_game_context.event_handler,
+      m_game_context.mouse_position};
   return logic_context;
 }
 /////////////////////////////////////////////////
