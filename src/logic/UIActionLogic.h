@@ -3,9 +3,7 @@
 /// @brief Declaration of the UIEventLogic class.
 /////////////////////////////////////////////////
 
-#include "CUserInterface.h"
 #include "Logic.h"
-#include "event_helpers.h"
 
 namespace steamrot {
 
@@ -17,29 +15,6 @@ private:
   /// class.
   /////////////////////////////////////////////////
   void ProcessLogic() override;
-
-  /////////////////////////////////////////////////
-  /// @brief Cycles through the EventBus and processes relevant events.
-  /////////////////////////////////////////////////
-  void ProcessEvents(CUserInterface &ui_component);
-
-  void RecursiveProcessEvents(UIElement &ui_element, const EventPacket &event);
-
-  /////////////////////////////////////////////////
-  /// @brief Applies the logic for processing mouse events recursively
-  ///
-  /// @param element UILement to process mouse events for.
-  /////////////////////////////////////////////////
-  void ProcessMouseEvents(UIElement &element, UserInputBitset &user_input);
-
-  /////////////////////////////////////////////////
-  /// @brief Process actions that just affect the local UI without passing to
-  /// the LogicBus
-  ///
-  /// @param element UIElement being evaluated
-  /// @return True
-  /////////////////////////////////////////////////
-  bool LocalUIActions(UIElement &element);
 
   /////////////////////////////////////////////////
   /// @brief Handle any actions associated with a drop down container.
