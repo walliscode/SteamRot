@@ -7,13 +7,9 @@
 #include "ArchetypeManager.h"
 #include "CGrimoireMachina.h"
 #include "CUserInterface.h"
-
 #include "Logic.h"
 #include "UIElement.h"
 #include "emp_helpers.h"
-#include "event_helpers.h"
-#include "events_generated.h"
-
 #include <SFML/Window/Mouse.hpp>
 #include <iostream>
 #include <magic_enum/magic_enum.hpp>
@@ -44,55 +40,8 @@ void UIActionLogic::ProcessLogic() {
       // get the CUserInterface component
       CUserInterface &ui_component = emp_helpers::GetComponent<CUserInterface>(
           entity_id, m_logic_context.scene_entities);
-
-      ProcessEvents(ui_component);
     }
   }
-}
-/////////////////////////////////////////////////
-void UIActionLogic::ProcessEvents(CUserInterface &ui_component) {
-  // print out the size of the event bus for debugging if it is greater than 1
-  // cycle through EventBus
-  for (auto const &event : m_logic_context.event_handler.GetGlobalEventBus()) {
-    // print the event type for debugging, except for EVENT_USER_INPUT
-    if (event.m_event_type != EventType::EventType_EVENT_USER_INPUT) {
-    }
-    RecursiveProcessEvents(*ui_component.m_root_element, event);
-  }
-}
-/////////////////////////////////////////////////
-void UIActionLogic::RecursiveProcessEvents(UIElement &ui_element,
-                                           const EventPacket &event) {
-
-  // guard statement to check if the event is a trigger event for the ui
-  // element
-
-  // check children
-}
-
-// If the event is a user in0.1f, process it
-// Process relevant events
-
-/////////////////////////////////////////////////
-void UIActionLogic::ProcessMouseEvents(UIElement &element,
-                                       UserInputBitset &user_input) {
-
-  // check if the mouse is over the element
-  if (element.is_mouse_over) {
-
-    // default to no events matching
-    bool events_match = false;
-
-    // check that the element data is populated
-  }
-}
-
-/////////////////////////////////////////////////
-bool UIActionLogic::LocalUIActions(UIElement &element) {
-  // Check if the element has a local action
-  bool has_local_action{true};
-
-  return has_local_action;
 }
 
 /////////////////////////////////////////////////
