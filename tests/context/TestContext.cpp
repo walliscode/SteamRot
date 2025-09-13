@@ -47,7 +47,7 @@ TestContext::TestContext(const SceneType scene_type)
 }
 
 /////////////////////////////////////////////////
-const GameContext &TestContext::GetGameContext() const {
+GameContext &TestContext::GetGameContext() const {
   if (!game_context_ptr) {
     // configure the game context if it hasn't been already
 
@@ -85,6 +85,7 @@ const LogicContext &TestContext::GetLogicContextForCraftingScene() const {
   }
   return *logic_context_for_crafting_scene;
 }
+
 /////////////////////////////////////////////////
 void TestContext::ConfigureGameContext() {
   game_context_ptr =

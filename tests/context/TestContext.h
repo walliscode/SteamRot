@@ -114,7 +114,7 @@ private:
 public:
   TestContext(const SceneType scene_type = SceneType::SceneType_TEST);
 
-  const steamrot::GameContext &GetGameContext() const;
+  steamrot::GameContext &GetGameContext() const;
 
   const steamrot::LogicContext &GetLogicContextForTestScene() const;
 

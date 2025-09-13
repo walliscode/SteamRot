@@ -31,15 +31,17 @@ TEST_CASE("UICollisionLogic::RunLogic changes is_mouse_over to true if mouse "
   steamrot::tests::TestContext test_context;
 
   // pull out the LogicContext and GameContext references
-  auto game_context = test_context.GetGameContext();
+  auto &game_context = test_context.GetGameContext();
   auto logic_context = test_context.GetLogicContextForTestScene();
 
-  // find the first UIELement which is a panel
+  // Get all active CUserInterface entities
   ArchetypeID archetype_id =
       steamrot::GenerateArchetypeIDfromTypes<steamrot::CUserInterface>();
+
   // check if the archetype exists
   auto const it = logic_context.archetypes.find(archetype_id);
   REQUIRE(it != logic_context.archetypes.end());
+
   // assign the archetype
   steamrot::Archetype archetype = it->second;
   // check the archetype has at least one entity
@@ -67,6 +69,7 @@ TEST_CASE("UICollisionLogic::RunLogic changes is_mouse_over to true if mouse "
 
   CAPTURE(logic_context.mouse_position.x, logic_context.mouse_position.y);
   CAPTURE(game_context.mouse_position.x, game_context.mouse_position.y);
+
   REQUIRE(logic_context.mouse_position == game_context.mouse_position);
   // check that the button is not hovered
   REQUIRE(panel_element->is_mouse_over == false);
