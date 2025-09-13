@@ -15,8 +15,8 @@ namespace steamrot {
 GameEngine::GameEngine(EnvironmentType env_type)
     : m_asset_manager(env_type),
       m_window({sf::VideoMode({800, 600}), "SteamRot"}),
-      m_scene_manager(GameContext{m_window, m_event_handler, m_mouse_position,
-                                  m_loop_number, m_asset_manager, env_type}),
+      m_scene_manager(GameContext{m_window, m_event_handler, m_loop_number,
+                                  m_asset_manager, env_type}),
       m_display_manager(m_window, m_scene_manager) {}
 
 ////////////////////////////////////////////////////////////

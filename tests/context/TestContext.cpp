@@ -47,7 +47,7 @@ TestContext::TestContext(const SceneType scene_type)
 }
 
 /////////////////////////////////////////////////
-const GameContext &TestContext::GetGameContext() const {
+GameContext &TestContext::GetGameContext() const {
   if (!game_context_ptr) {
     // configure the game context if it hasn't been already
 
@@ -85,11 +85,12 @@ const LogicContext &TestContext::GetLogicContextForCraftingScene() const {
   }
   return *logic_context_for_crafting_scene;
 }
+
 /////////////////////////////////////////////////
 void TestContext::ConfigureGameContext() {
-  game_context_ptr = std::make_unique<GameContext>(
-      render_window, event_handler, mouse_position, loop_number, asset_manager,
-      EnvironmentType::Test);
+  game_context_ptr =
+      std::make_unique<GameContext>(render_window, event_handler, loop_number,
+                                    asset_manager, EnvironmentType::Test);
 }
 
 /////////////////////////////////////////////////
@@ -112,9 +113,10 @@ void TestContext::ConfigureLogicContextForTestScene() {
     std::cerr << "Error generating archetypes: " << error.message << std::endl;
   }
   // create pointer to the logic context for the test scene
-  logic_context_for_test_scene = std::make_unique<LogicContext>(LogicContext{
-      scene_entities, archetype_manager.GetArchetypes(), render_texture,
-      render_window, asset_manager, event_handler});
+  logic_context_for_test_scene = std::make_unique<LogicContext>(
+      LogicContext{scene_entities, archetype_manager.GetArchetypes(),
+                   render_texture, render_window, asset_manager, event_handler,
+                   game_context_ptr->mouse_position});
 }
 
 /////////////////////////////////////////////////
@@ -137,9 +139,10 @@ void TestContext::ConfigureLogicContextForTitleScene() {
     std::cerr << "Error generating archetypes: " << error.message << std::endl;
   }
   // create pointer to the logic context for the title scene
-  logic_context_for_title_scene = std::make_unique<LogicContext>(LogicContext{
-      scene_entities, archetype_manager.GetArchetypes(), render_texture,
-      render_window, asset_manager, event_handler});
+  logic_context_for_title_scene = std::make_unique<LogicContext>(
+      LogicContext{scene_entities, archetype_manager.GetArchetypes(),
+                   render_texture, render_window, asset_manager, event_handler,
+                   game_context_ptr->mouse_position});
 }
 
 /////////////////////////////////////////////////
@@ -162,9 +165,9 @@ void TestContext::ConfigureLogicContextForCraftingScene() {
     std::cerr << "Error generating archetypes: " << error.message << std::endl;
   }
   // create pointer to the logic context for the crafting scene
-  logic_context_for_crafting_scene =
-      std::make_unique<LogicContext>(LogicContext{
-          scene_entities, archetype_manager.GetArchetypes(), render_texture,
-          render_window, asset_manager, event_handler});
+  logic_context_for_crafting_scene = std::make_unique<LogicContext>(
+      LogicContext{scene_entities, archetype_manager.GetArchetypes(),
+                   render_texture, render_window, asset_manager, event_handler,
+                   game_context_ptr->mouse_position});
 }
 } // namespace steamrot::tests

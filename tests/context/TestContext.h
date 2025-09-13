@@ -47,11 +47,6 @@ private:
   steamrot::AssetManager asset_manager;
 
   /////////////////////////////////////////////////
-  /// @brief mouse position intialized to (0, 0)
-  /////////////////////////////////////////////////
-  const sf::Vector2i mouse_position{0, 0};
-
-  /////////////////////////////////////////////////
   /// @brief loop number initialized to 0
   /////////////////////////////////////////////////
   const size_t loop_number{0};
@@ -119,7 +114,7 @@ private:
 public:
   TestContext(const SceneType scene_type = SceneType::SceneType_TEST);
 
-  const steamrot::GameContext &GetGameContext() const;
+  steamrot::GameContext &GetGameContext() const;
 
   const steamrot::LogicContext &GetLogicContextForTestScene() const;
 
