@@ -154,7 +154,34 @@ ConfigureBaseUIElement(UIElement &element, const UIElementData &data,
     element.subscription.reset();
     element.subscription = std::move(create_subscriber_result.value());
   }
-  std::cout << "Subscriber set." << std::endl;
+
+  // set ResponseEvent if response_event_data exists and EventType is not none
+  if (data.response_event_data() &&
+      (data.response_event_data()->event_type() != EventType::EventType_NONE)) {
+
+    // set EventType
+    if (!data.response_event_data()->event_type()) {
+      return std::unexpected(
+          FailInfo{FailMode::FlatbuffersDataNotFound,
+                   "UIElementData has response_event_data but no event_type."});
+    }
+    EventType event_type = data.response_event_data()->event_type();
+
+    // create EventData by running the flatbuffers data through the converter
+    auto event_data_conversion_result =
+        ConvertFlatbuffersEventDataDataToEventData(
+            data.response_event_data()->event_data_data_type(),
+            data.response_event_data()->event_data_data());
+    if (!event_data_conversion_result.has_value())
+      return std::unexpected(event_data_conversion_result.error());
+
+    EventData event_data = event_data_conversion_result.value();
+
+    // create EventPacket and set on element
+    EventPacket event_packet(event_type, event_data,
+                             data.response_event_data()->event_lifetime());
+    element.response_event = event_packet;
+  }
 
   element.spacing_strategy = data.spacing_strategy();
   element.layout = data.layout();

@@ -1,6 +1,7 @@
 include "types.fbs";
 include "scene_types.fbs";
 include "subscriber_config.fbs";
+include "event_packet_data.fbs";
 namespace steamrot;
 
 
@@ -39,6 +40,7 @@ table UIElementData{
     position: Vector2fData (required);
     size: Vector2fData (required);
     subscriber_data: SubscriberData;
+    response_event_data: EventPacketData;
     children_active: bool ;
     children: [child] (required);
     layout: LayoutType;

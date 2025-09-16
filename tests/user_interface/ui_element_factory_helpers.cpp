@@ -32,6 +32,16 @@ void TestUIELementProperites(const UIElement &element,
     REQUIRE(!std::holds_alternative<std::monostate>(
         element.subscription.value()->GetRegistrationInfo().second));
   }
+
+  // check the EventPacket data
+  if (data.response_event_data()) {
+    REQUIRE(element.response_event.has_value());
+    REQUIRE(element.response_event.value().m_event_type ==
+            data.response_event_data()->event_type());
+    // checking EventData matches the flatbuffers needs some proper work on it
+    REQUIRE(std::holds_alternative<std::monostate>(
+        element.response_event.value().m_event_data));
+  }
   // Check spacing strategy
   REQUIRE(element.spacing_strategy == data.spacing_strategy());
   // Check layout
