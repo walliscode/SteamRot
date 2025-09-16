@@ -36,9 +36,14 @@ TEST_CASE("UIElementFactory::ConfigurePanelElement", "[UIElementFactory]") {
 }
 
 TEST_CASE("UIElementFactory::CreateUIElement - Panel", "[UIElementFactory]") {
-  // arrange
+
   // create test context
   steamrot::tests::TestContext test_context;
+  // check that the map from the EventHandler is empty
+  REQUIRE(test_context.GetGameContext()
+              .event_handler.GetUserInputRegister()
+              .size() == 0);
+
   flatbuffers::FlatBufferBuilder builder{1024};
   const auto *panel_data =
       TestUIElementDataFactory::CreateTestPanelData(builder);
@@ -52,6 +57,9 @@ TEST_CASE("UIElementFactory::CreateUIElement - Panel", "[UIElementFactory]") {
     FAIL(element_result.error().message);
   }
   // assert
+  REQUIRE(test_context.GetGameContext()
+              .event_handler.GetUserInputRegister()
+              .size() == 1);
 
   // pull out as PanelElement
   auto panel_element =
