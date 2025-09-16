@@ -75,9 +75,9 @@ TEST_CASE("DecrementEventLifetimes decrease all lifetimes by 1",
 
   // decrement lifetimes
   steamrot::DecrementEventLifetimes(event_bus);
-  REQUIRE(event_bus[0].GetLifetime() == 2);
-  REQUIRE(event_bus[1].GetLifetime() == 0);
-  REQUIRE(event_bus[2].GetLifetime() == 1);
+  REQUIRE(event_bus[0].event_lifetime == 2);
+  REQUIRE(event_bus[1].event_lifetime == 0);
+  REQUIRE(event_bus[2].event_lifetime == 1);
 }
 
 TEST_CASE("RemoveDeadEvents removes dead events", "[EventHandler]") {
@@ -94,8 +94,8 @@ TEST_CASE("RemoveDeadEvents removes dead events", "[EventHandler]") {
   // remove dead events
   steamrot::RemoveDeadEvents(event_bus);
   REQUIRE(event_bus.size() == 2);
-  REQUIRE(event_bus[0].GetLifetime() == 3);
-  REQUIRE(event_bus[1].GetLifetime() == 1);
+  REQUIRE(event_bus[0].event_lifetime == 3);
+  REQUIRE(event_bus[1].event_lifetime == 1);
 }
 
 TEST_CASE(
@@ -115,8 +115,8 @@ TEST_CASE(
   // Check that the events were added successfully
   global_event_bus = event_handler.GetGlobalEventBus();
   REQUIRE(global_event_bus.size() == 2);
-  REQUIRE(global_event_bus[0].GetLifetime() == 3);
-  REQUIRE(global_event_bus[1].GetLifetime() == 2);
+  REQUIRE(global_event_bus[0].event_lifetime == 3);
+  REQUIRE(global_event_bus[1].event_lifetime == 2);
 }
 
 TEST_CASE("EventHandler::TickGlobalEventBus updates the global event bus",
@@ -132,13 +132,13 @@ TEST_CASE("EventHandler::TickGlobalEventBus updates the global event bus",
   // Check that the events were added successfully
   auto global_event_bus = event_handler.GetGlobalEventBus();
   REQUIRE(global_event_bus.size() == 2);
-  REQUIRE(global_event_bus[0].GetLifetime() == 2);
-  REQUIRE(global_event_bus[1].GetLifetime() == 1);
+  REQUIRE(global_event_bus[0].event_lifetime == 2);
+  REQUIRE(global_event_bus[1].event_lifetime == 1);
   // Tick the global event bus to update lifetimes and remove dead events
   event_handler.TickGlobalEventBus();
   global_event_bus = event_handler.GetGlobalEventBus();
   REQUIRE(global_event_bus.size() == 1);
-  REQUIRE(global_event_bus[0].GetLifetime() == 1);
+  REQUIRE(global_event_bus[0].event_lifetime == 1);
   // Tick again, which should remove the last event
   event_handler.TickGlobalEventBus();
   global_event_bus = event_handler.GetGlobalEventBus();

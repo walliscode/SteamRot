@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "mock_fb_event_packet_data.h"
 #include "mock_fb_subscriber_data.h"
 #include "user_interface_generated.h"
 #include <flatbuffers/flatbuffers.h>
@@ -30,12 +31,13 @@ public:
     auto position = CreateVector2fData(builder, x, y);
     auto size = CreateVector2fData(builder, w, h);
     auto subscriber_data = CreateTestUserInputSubscriberData(builder);
-
+    auto response_event = CreateTestQuitGameEventPacketData(builder);
     if (!children.o) {
       children = builder.CreateVector<flatbuffers::Offset<child>>({});
     }
     return CreateUIElementData(builder, position, size, subscriber_data,
-                               children_active, children, layout, spacing);
+                               response_event, children_active, children,
+                               layout, spacing);
   }
 
   // Create child wrapper for a UIElementDataUnion

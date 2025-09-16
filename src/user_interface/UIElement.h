@@ -7,6 +7,7 @@
 /////////////////////////////////////////////////
 /// Preprocessor Directives
 /////////////////////////////////////////////////
+#include "EventPacket.h"
 #include "Subscriber.h"
 #include "UIStyle.h"
 #include <optional>
@@ -42,6 +43,11 @@ struct UIElement {
   /// @brief Specific event this element is subscribed to
   /////////////////////////////////////////////////
   std::optional<std::shared_ptr<Subscriber>> subscription{std::nullopt};
+
+  /////////////////////////////////////////////////
+  /// @brief EventPacket to be pushed to the EventBus if criteria are met
+  /////////////////////////////////////////////////
+  std::optional<EventPacket> response_event{std::nullopt};
 
   /////////////////////////////////////////////////
   /// @brief Is mouse over this element, false if it over a child element

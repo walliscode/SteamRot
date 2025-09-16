@@ -13,6 +13,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
+#include "event_packet_data_generated.h"
 #include "scene_types_generated.h"
 #include "subscriber_config_generated.h"
 #include "types_generated.h"
@@ -329,10 +330,11 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_POSITION = 4,
     VT_SIZE = 6,
     VT_SUBSCRIBER_DATA = 8,
-    VT_CHILDREN_ACTIVE = 10,
-    VT_CHILDREN = 12,
-    VT_LAYOUT = 14,
-    VT_SPACING_STRATEGY = 16
+    VT_RESPONSE_EVENT_DATA = 10,
+    VT_CHILDREN_ACTIVE = 12,
+    VT_CHILDREN = 14,
+    VT_LAYOUT = 16,
+    VT_SPACING_STRATEGY = 18
   };
   const Vector2fData *position() const {
     return GetPointer<const Vector2fData *>(VT_POSITION);
@@ -342,6 +344,9 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   const steamrot::SubscriberData *subscriber_data() const {
     return GetPointer<const steamrot::SubscriberData *>(VT_SUBSCRIBER_DATA);
+  }
+  const steamrot::EventPacketData *response_event_data() const {
+    return GetPointer<const steamrot::EventPacketData *>(VT_RESPONSE_EVENT_DATA);
   }
   bool children_active() const {
     return GetField<uint8_t>(VT_CHILDREN_ACTIVE, 0) != 0;
@@ -363,6 +368,8 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyTable(size()) &&
            VerifyOffset(verifier, VT_SUBSCRIBER_DATA) &&
            verifier.VerifyTable(subscriber_data()) &&
+           VerifyOffset(verifier, VT_RESPONSE_EVENT_DATA) &&
+           verifier.VerifyTable(response_event_data()) &&
            VerifyField<uint8_t>(verifier, VT_CHILDREN_ACTIVE, 1) &&
            VerifyOffsetRequired(verifier, VT_CHILDREN) &&
            verifier.VerifyVector(children()) &&
@@ -385,6 +392,9 @@ struct UIElementDataBuilder {
   }
   void add_subscriber_data(::flatbuffers::Offset<steamrot::SubscriberData> subscriber_data) {
     fbb_.AddOffset(UIElementData::VT_SUBSCRIBER_DATA, subscriber_data);
+  }
+  void add_response_event_data(::flatbuffers::Offset<steamrot::EventPacketData> response_event_data) {
+    fbb_.AddOffset(UIElementData::VT_RESPONSE_EVENT_DATA, response_event_data);
   }
   void add_children_active(bool children_active) {
     fbb_.AddElement<uint8_t>(UIElementData::VT_CHILDREN_ACTIVE, static_cast<uint8_t>(children_active), 0);
@@ -417,12 +427,14 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementData(
     ::flatbuffers::Offset<Vector2fData> position = 0,
     ::flatbuffers::Offset<Vector2fData> size = 0,
     ::flatbuffers::Offset<steamrot::SubscriberData> subscriber_data = 0,
+    ::flatbuffers::Offset<steamrot::EventPacketData> response_event_data = 0,
     bool children_active = false,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::child>>> children = 0,
     steamrot::LayoutType layout = steamrot::LayoutType_None,
     steamrot::SpacingAndSizingType spacing_strategy = steamrot::SpacingAndSizingType_None) {
   UIElementDataBuilder builder_(_fbb);
   builder_.add_children(children);
+  builder_.add_response_event_data(response_event_data);
   builder_.add_subscriber_data(subscriber_data);
   builder_.add_size(size);
   builder_.add_position(position);
@@ -437,6 +449,7 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
     ::flatbuffers::Offset<Vector2fData> position = 0,
     ::flatbuffers::Offset<Vector2fData> size = 0,
     ::flatbuffers::Offset<steamrot::SubscriberData> subscriber_data = 0,
+    ::flatbuffers::Offset<steamrot::EventPacketData> response_event_data = 0,
     bool children_active = false,
     const std::vector<::flatbuffers::Offset<steamrot::child>> *children = nullptr,
     steamrot::LayoutType layout = steamrot::LayoutType_None,
@@ -447,6 +460,7 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
       position,
       size,
       subscriber_data,
+      response_event_data,
       children_active,
       children__,
       layout,
