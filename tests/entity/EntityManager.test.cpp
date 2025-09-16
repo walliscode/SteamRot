@@ -8,13 +8,17 @@
 /////////////////////////////////////////////////
 #include "EntityManager.h"
 #include "PathProvider.h"
+#include "TestContext.h"
 #include "configuration_helpers.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("EntityManager calls configurator with no errors",
           "[EntityManager]") {
 
-  steamrot::EntityManager entity_manager;
+  // create text context
+  steamrot::tests::TestContext test_context;
+  steamrot::EntityManager entity_manager{
+      test_context.GetGameContext().event_handler};
 
   // test the EntityMemoryPool pre configuration
   steamrot::tests::TestEMPIsDefaultConstructed(

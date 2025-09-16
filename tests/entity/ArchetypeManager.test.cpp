@@ -9,6 +9,7 @@
 #include "ArchetypeManager.h"
 #include "EntityManager.h"
 #include "PathProvider.h"
+#include "TestContext.h"
 #include "configuration_helpers.h"
 #include "containers.h"
 #include "scene_types_generated.h"
@@ -26,8 +27,11 @@ TEST_CASE("ArchetypeManager is constructed without errors",
 TEST_CASE("ArchetypeManager archetype map is empty with a non configured EMP",
           "[ArchetypeManager]") {
 
+  // create text context
+  steamrot::tests::TestContext test_context;
   // create an instance of the entity manager but don't configure it
-  steamrot::EntityManager entity_manager{100};
+  steamrot::EntityManager entity_manager{
+      100, test_context.GetGameContext().event_handler};
   // check that the EMP is default constructed
   steamrot::tests::TestEMPIsDefaultConstructed(
       entity_manager.GetEntityMemoryPool());
@@ -49,8 +53,11 @@ TEST_CASE("ArchetypeManager archetype map is empty with a non configured EMP",
 
 TEST_CASE("ArchetypeManager generates archetype IDs correctly",
           "[ArchetypeManager]") {
+  // create test context
+  steamrot::tests::TestContext test_context;
   // create an instance of the entity manager and configure it
-  steamrot::EntityManager entity_manager;
+  steamrot::EntityManager entity_manager{
+      test_context.GetGameContext().event_handler};
   steamrot::tests::TestEMPIsDefaultConstructed(
       entity_manager.GetEntityMemoryPool());
 

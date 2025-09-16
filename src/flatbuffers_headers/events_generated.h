@@ -13,6 +13,8 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
+#include "user_input_generated.h"
+
 namespace steamrot {
 
 enum EventType : uint64_t {
@@ -48,6 +50,72 @@ inline const char *EnumNameEventType(EventType e) {
     case EventType_EVENT_TOGGLE_DROPDOWN: return "EVENT_TOGGLE_DROPDOWN";
     default: return "";
   }
+}
+
+enum EventDataData : uint8_t {
+  EventDataData_NONE = 0,
+  EventDataData_UserInputBitsetData = 1,
+  EventDataData_MIN = EventDataData_NONE,
+  EventDataData_MAX = EventDataData_UserInputBitsetData
+};
+
+inline const EventDataData (&EnumValuesEventDataData())[2] {
+  static const EventDataData values[] = {
+    EventDataData_NONE,
+    EventDataData_UserInputBitsetData
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesEventDataData() {
+  static const char * const names[3] = {
+    "NONE",
+    "UserInputBitsetData",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameEventDataData(EventDataData e) {
+  if (::flatbuffers::IsOutRange(e, EventDataData_NONE, EventDataData_UserInputBitsetData)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesEventDataData()[index];
+}
+
+template<typename T> struct EventDataDataTraits {
+  static const EventDataData enum_value = EventDataData_NONE;
+};
+
+template<> struct EventDataDataTraits<steamrot::UserInputBitsetData> {
+  static const EventDataData enum_value = EventDataData_UserInputBitsetData;
+};
+
+bool VerifyEventDataData(::flatbuffers::Verifier &verifier, const void *obj, EventDataData type);
+bool VerifyEventDataDataVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types);
+
+inline bool VerifyEventDataData(::flatbuffers::Verifier &verifier, const void *obj, EventDataData type) {
+  switch (type) {
+    case EventDataData_NONE: {
+      return true;
+    }
+    case EventDataData_UserInputBitsetData: {
+      auto ptr = reinterpret_cast<const steamrot::UserInputBitsetData *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    default: return true;
+  }
+}
+
+inline bool VerifyEventDataDataVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types) {
+  if (!values || !types) return !values && !types;
+  if (values->size() != types->size()) return false;
+  for (::flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
+    if (!VerifyEventDataData(
+        verifier,  values->Get(i), types->GetEnum<EventDataData>(i))) {
+      return false;
+    }
+  }
+  return true;
 }
 
 }  // namespace steamrot

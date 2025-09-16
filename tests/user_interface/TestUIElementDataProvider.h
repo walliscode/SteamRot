@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "mock_fb_subscriber_data.h"
 #include "user_interface_generated.h"
 #include <flatbuffers/flatbuffers.h>
 #include <string>
@@ -25,13 +26,16 @@ public:
       LayoutType layout = LayoutType_Grid,
       flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<child>>>
           children = 0) {
+
     auto position = CreateVector2fData(builder, x, y);
     auto size = CreateVector2fData(builder, w, h);
+    auto subscriber_data = CreateTestUserInputSubscriberData(builder);
+
     if (!children.o) {
       children = builder.CreateVector<flatbuffers::Offset<child>>({});
     }
-    return CreateUIElementData(builder, position, size, children_active,
-                               children, layout, spacing);
+    return CreateUIElementData(builder, position, size, subscriber_data,
+                               children_active, children, layout, spacing);
   }
 
   // Create child wrapper for a UIElementDataUnion

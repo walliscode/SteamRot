@@ -9,11 +9,12 @@
 #include "UIElementFactory.h"
 #include "ButtonElement.h"
 #include "PanelElement.h"
+#include "TestContext.h"
 #include "TestUIElementDataProvider.h"
-
 #include "catch2/catch_test_macros.hpp"
 #include "ui_element_factory_helpers.h"
 #include "user_interface_generated.h"
+#include <iostream>
 #include <memory>
 #include <string>
 
@@ -36,6 +37,8 @@ TEST_CASE("UIElementFactory::ConfigurePanelElement", "[UIElementFactory]") {
 
 TEST_CASE("UIElementFactory::CreateUIElement - Panel", "[UIElementFactory]") {
   // arrange
+  // create test context
+  steamrot::tests::TestContext test_context;
   flatbuffers::FlatBufferBuilder builder{1024};
   const auto *panel_data =
       TestUIElementDataFactory::CreateTestPanelData(builder);
@@ -43,7 +46,8 @@ TEST_CASE("UIElementFactory::CreateUIElement - Panel", "[UIElementFactory]") {
 
   // act
   auto element_result = CreateUIElement(
-      steamrot::UIElementDataUnion::UIElementDataUnion_PanelData, panel_data);
+      steamrot::UIElementDataUnion::UIElementDataUnion_PanelData, panel_data,
+      test_context.GetGameContext().event_handler);
   if (!element_result.has_value()) {
     FAIL(element_result.error().message);
   }
@@ -76,19 +80,26 @@ TEST_CASE("UIElementFactory::ConfigureButtonElement", "[UIElementFactory]") {
 }
 
 TEST_CASE("UIElementFactory::CreateUIElement - Button", "[UIElementFactory]") {
+
+  steamrot::tests::TestContext test_context;
   flatbuffers::FlatBufferBuilder builder{1024};
   const auto *button_data =
       TestUIElementDataFactory::CreateTestButtonData(builder, "TestButton");
   REQUIRE(button_data != nullptr);
-
+  std::cout << "Creating UI Element" << std::endl;
   auto element_result = CreateUIElement(
-      steamrot::UIElementDataUnion::UIElementDataUnion_ButtonData, button_data);
+      steamrot::UIElementDataUnion::UIElementDataUnion_ButtonData, button_data,
+      test_context.GetGameContext().event_handler);
+
   if (!element_result.has_value()) {
     FAIL(element_result.error().message);
   }
 
+  std::cout << "Attempting t o dynamic cast to ButtonElement" << std::endl;
+
   auto button_element =
       dynamic_cast<steamrot::ButtonElement *>(element_result.value().get());
+
   // ensure it is not null
   REQUIRE(button_element != nullptr);
   steamrot::tests::TestButtonElementProperties(*button_element, *button_data);
@@ -116,6 +127,7 @@ TEST_CASE("UIElementFactory::ConfigureDropDownListElement",
 
 TEST_CASE("UIElementFactory::CreateUIElement - DropDownList",
           "[UIElementFactory]") {
+  steamrot::tests::TestContext test_context;
   flatbuffers::FlatBufferBuilder builder{1024};
   const auto *ddlist_data =
       TestUIElementDataFactory::CreateTestDropDownListData(builder, "TestList",
@@ -124,7 +136,7 @@ TEST_CASE("UIElementFactory::CreateUIElement - DropDownList",
 
   auto element_result = CreateUIElement(
       steamrot::UIElementDataUnion::UIElementDataUnion_DropDownListData,
-      ddlist_data);
+      ddlist_data, test_context.GetGameContext().event_handler);
   if (!element_result.has_value()) {
     FAIL(element_result.error().message);
   }
@@ -158,6 +170,7 @@ TEST_CASE("UIElementFactory::ConfigureDropDownContainerElement",
 
 TEST_CASE("UIElementFactory::CreateUIElement - DropDownContainer",
           "[UIElementFactory]") {
+  steamrot::tests::TestContext test_context;
   flatbuffers::FlatBufferBuilder builder{1024};
   const auto *ddcontainer_data =
       TestUIElementDataFactory::CreateTestDropDownContainerData(builder);
@@ -165,7 +178,7 @@ TEST_CASE("UIElementFactory::CreateUIElement - DropDownContainer",
 
   auto element_result = CreateUIElement(
       steamrot::UIElementDataUnion::UIElementDataUnion_DropDownContainerData,
-      ddcontainer_data);
+      ddcontainer_data, test_context.GetGameContext().event_handler);
   if (!element_result.has_value()) {
     FAIL(element_result.error().message);
   }
@@ -200,6 +213,7 @@ TEST_CASE("UIElementFactory::ConfigureDropDownItemElement",
 
 TEST_CASE("UIElementFactory::CreateUIElement - DropDownItem",
           "[UIElementFactory]") {
+  steamrot::tests::TestContext test_context;
   flatbuffers::FlatBufferBuilder builder{1024};
   const auto *dditem_data =
       TestUIElementDataFactory::CreateTestDropDownItemData(builder, "TestItem");
@@ -207,7 +221,7 @@ TEST_CASE("UIElementFactory::CreateUIElement - DropDownItem",
 
   auto element_result = CreateUIElement(
       steamrot::UIElementDataUnion::UIElementDataUnion_DropDownItemData,
-      dditem_data);
+      dditem_data, test_context.GetGameContext().event_handler);
   if (!element_result.has_value()) {
     FAIL(element_result.error().message);
   }
@@ -240,6 +254,7 @@ TEST_CASE("UIElementFactory::ConfigureDropDownButtonElement",
 
 TEST_CASE("UIElementFactory::CreateUIElement - DropDownButton",
           "[UIElementFactory]") {
+  steamrot::tests::TestContext test_context;
   flatbuffers::FlatBufferBuilder builder{1024};
   const auto *ddbutton_data =
       TestUIElementDataFactory::CreateTestDropDownButtonData(builder, true);
@@ -247,7 +262,7 @@ TEST_CASE("UIElementFactory::CreateUIElement - DropDownButton",
 
   auto element_result = CreateUIElement(
       steamrot::UIElementDataUnion::UIElementDataUnion_DropDownButtonData,
-      ddbutton_data);
+      ddbutton_data, test_context.GetGameContext().event_handler);
   if (!element_result.has_value()) {
     FAIL(element_result.error().message);
   }
@@ -262,6 +277,7 @@ TEST_CASE("UIElementFactory::CreateUIElement - DropDownButton",
 }
 TEST_CASE("UIElementFactory::CreateUIElement - Deeply Nested Panel",
           "[UIElementFactory][nested]") {
+  steamrot::tests::TestContext test_context;
   flatbuffers::FlatBufferBuilder builder{4096};
 
   // Create deeply nested PanelData (with DropDownContainer, DropDownList,
@@ -273,7 +289,7 @@ TEST_CASE("UIElementFactory::CreateUIElement - Deeply Nested Panel",
   // act: create the element using the factory
   auto element_result = CreateUIElement(
       steamrot::UIElementDataUnion::UIElementDataUnion_PanelData,
-      nested_panel_data);
+      nested_panel_data, test_context.GetGameContext().event_handler);
   if (!element_result.has_value()) {
     FAIL(element_result.error().message);
   }

@@ -3,7 +3,6 @@
 ////////////////////////////////////////////////////////////
 #include "EventHandler.h"
 #include "FailInfo.h"
-#include "event_helpers.h"
 #include <SFML/Window/Event.hpp>
 #include <expected>
 #include <iostream>
@@ -17,19 +16,38 @@ EventHandler::RegisterSubscriber(std::shared_ptr<Subscriber> subscriber) {
 
   switch (subscriber->GetRegistrationInfo().first) {
   case EventType::EventType_EVENT_USER_INPUT: {
-    // get the user input bitset from the subscriber
-    const UserInputBitset user_input_bitset =
-        std::get<UserInputBitset>(subscriber->GetRegistrationInfo().second);
-    // add the subscriber to the user input register
-    m_user_input_register[user_input_bitset].push_back(subscriber);
+    // ensure the variant holds a UserInputBitset as these bits of data are not
+    // definitely coupled
+    if (std::holds_alternative<UserInputBitset>(
+            subscriber->GetRegistrationInfo().second)) {
+      const UserInputBitset user_input_bitset =
+          std::get<UserInputBitset>(subscriber->GetRegistrationInfo().second);
+      m_user_input_register[user_input_bitset].push_back(subscriber);
+    } else {
+      // Handle the case where the variant does not hold UserInputBitset
+      return std::unexpected(
+          FailInfo{FailMode::VariantTypeMismatch,
+                   "Subscriber with EventType_EVENT_USER_INPUT must have "
+                   "UserInputBitset as event data."});
+    }
+    break;
+  }
+  case EventType::EventType_EVENT_NONE: {
+    std::cout << "Subscriber has NONE event type, no registration needed."
+              << std::endl;
+    // no registration needed for NONE event type
     break;
   }
   default:
+
     // if the event type is not handled, return an error
     return std::unexpected(
         FailInfo{FailMode::EnumValueNotHandled,
-                 "Event type not handled in Subscriber registration."});
+                 "EventType not handled in Subscriber registration."});
   }
+  std::cout << "Subscriber registered for event type: "
+            << magic_enum::enum_name(subscriber->GetRegistrationInfo().first)
+            << std::endl;
   return std::monostate{};
 }
 /////////////////////////////////////////////////

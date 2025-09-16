@@ -14,6 +14,8 @@ target_link_libraries(test_user_interface
   PUBLIC
   Catch2::Catch2WithMain
   ui_styles
+  test_context
+  mock_subscriber_data
 )
 
 add_library(user_interface_helpers
@@ -31,6 +33,7 @@ target_link_libraries(user_interface_helpers
   PUBLIC
   Catch2::Catch2WithMain
   ui_styles
+  mock_subscriber_data
 )
 
 catch_discover_tests(test_user_interface)

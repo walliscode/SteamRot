@@ -9,7 +9,6 @@
 
 #include "EventPacket.h"
 #include "Subscriber.h"
-#include "event_helpers.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>

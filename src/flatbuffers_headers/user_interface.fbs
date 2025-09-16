@@ -1,7 +1,6 @@
 include "types.fbs";
-include "events.fbs";
 include "scene_types.fbs";
-include "user_input.fbs";
+include "subscriber_config.fbs";
 namespace steamrot;
 
 
@@ -23,17 +22,6 @@ enum SpacingAndSizingType: byte {
   }
 
 
-table SceneChangeDataFBS {
-  scene_type: SceneType ;
-  scene_id: string;
-}
-
-union EventDataType{
-  UserInputBitsetData: UserInputBitsetData,
-  SceneChangeData: SceneChangeDataFBS,
-  UIElementName: string,
-  }
-
 union UIElementDataUnion {
   PanelData,
   ButtonData,
@@ -50,6 +38,7 @@ table child {
 table UIElementData{
     position: Vector2fData (required);
     size: Vector2fData (required);
+    subscriber_data: SubscriberData;
     children_active: bool ;
     children: [child] (required);
     layout: LayoutType;

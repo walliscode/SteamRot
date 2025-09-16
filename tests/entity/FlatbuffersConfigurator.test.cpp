@@ -8,11 +8,10 @@
 /////////////////////////////////////////////////
 
 #include "FlatbuffersConfigurator.h"
+#include "TestContext.h"
 #include "configuration_helpers.h"
 #include "containers.h"
-
 #include "scene_types_generated.h"
-
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
@@ -34,9 +33,12 @@ TEST_CASE("Data is configured correctly from default data",
 
   steamrot::tests::TestEMPIsDefaultConstructed(entity_memory_pool_one);
 
+  // create TextContext object
+  steamrot::tests::TestContext text_context;
   // Create configurator with test environment
   steamrot::FlatbuffersConfigurator configurator{
-      steamrot::EnvironmentType::Test};
+      steamrot::EnvironmentType::Test,
+      text_context.GetGameContext().event_handler};
 
   auto result = configurator.ConfigureEntitiesFromDefaultData(
       entity_memory_pool_one, steamrot::SceneType::SceneType_TEST);

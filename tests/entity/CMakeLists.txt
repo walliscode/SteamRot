@@ -16,7 +16,7 @@ target_link_libraries(test_entity
   Catch2::Catch2WithMain
   entity
   entity_helpers
-
+  test_context
   )
 
 catch_discover_tests(test_entity)

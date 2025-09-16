@@ -39,7 +39,6 @@ std::expected<std::monostate, FailInfo> AssetManager::LoadDefaultAssets() {
   if (!asset_config_result.has_value())
     return std::unexpected<FailInfo>(asset_config_result.error());
 
-  std::cout << "Asset configuration data loaded" << std::endl;
   const AssetCollection *asset_config = asset_config_result.value();
 
   ////// Load Fonts //////

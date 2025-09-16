@@ -1,32 +1,29 @@
 #pragma once
 
+#include "EventPacket.h"
+#include "FailInfo.h"
 #include "user_input_generated.h"
 #include <SFML/Graphics.hpp>
-#include <bitset>
+#include <expected>
 
 namespace steamrot {
 
-using UserInputBitset =
-    std::bitset<sf::Keyboard::KeyCount + sf::Keyboard::KeyCount +
-                sf::Mouse::ButtonCount + sf::Mouse::ButtonCount>;
-////////////////////////////////////////////////////////////
-// |brief: maps flatbuffer defined enum KeyboardInput to SFML enum
-// sf::Keyboard::Key
-////////////////////////////////////////////////////////////
-// static const std::unordered_map<KeyboardInput, sf::Keyboard::Key> &
-// GetFlatbuffersToSFMLKeyboardMap();
-
-////////////////////////////////////////////////////////////
-// |brief: maps flatbuffer defined enum MouseInput to SFML enum
-// sf::Mouse::Button
-////////////////////////////////////////////////////////////
-// static const std::unordered_map<MouseInput, sf::Mouse::Button> &
-// GetFlatbuffersToSFMLMouseMap();
-
 /////////////////////////////////////////////////
-/// @brief Take in flatbuffers data object and convert EventBitset
+/// @brief Convert the flatbuffers UserInputBitsetData to a UserInputBitset
 ///
-/// @return [TODO:return]
+/// @param data Data to convert
 /////////////////////////////////////////////////
-const UserInputBitset ConvertActionKeysToEvent(const UserInputBitsetData &data);
+std::expected<UserInputBitset, FailInfo>
+ConvertFBDataToUserInputBitset(const UserInputBitsetData &data);
+
+/////////////////////////////////////////////////
+/// @brief Given the flatbuffers EventData union type and data pointer, convert
+/// to EventData
+///
+/// @param data_type Enum type of the data in the union
+/// @param data Flatbuffers data pointer
+/////////////////////////////////////////////////
+std::expected<EventData, FailInfo>
+ConvertFlatbuffersEventDataDataToEventData(const EventDataData data_type,
+                                           const void *data);
 } // namespace steamrot

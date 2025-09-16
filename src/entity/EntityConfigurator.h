@@ -7,17 +7,18 @@
 // Headers
 ////////////////////////////////////////////////////////////
 
+#include "EventHandler.h"
 namespace steamrot {
 
 class EntityConfigurator {
+protected:
+  /////////////////////////////////////////////////
+  /// @brief Reference to the EventHandler for creating Subscribers
+  /////////////////////////////////////////////////
+  EventHandler &m_event_handler;
 
 public:
-  /////////////////////////////////////////////////
-  /// @brief Constructor for EntityConfigurationFactory
-  ///
-  /// @param data_loader shared pointer to instance of derived DataLoader object
-  /////////////////////////////////////////////////
-  EntityConfigurator() = default;
+  EntityConfigurator(EventHandler &event_handler);
 };
 
 } // namespace steamrot

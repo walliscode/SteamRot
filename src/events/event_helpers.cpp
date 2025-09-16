@@ -1,6 +1,6 @@
 #include "event_helpers.h"
 #include <cstddef>
-#include <iostream>
+#include <variant>
 
 namespace steamrot {
 
@@ -52,8 +52,38 @@ GetFlatbuffersToSFMLMouseMap() {
 };
 
 /////////////////////////////////////////////////
-const UserInputBitset
-ConvertActionKeysToEvent(const UserInputBitsetData &data) {
+std::expected<EventData, FailInfo>
+ConvertFlatbuffersEventDataDataToEventData(const EventDataData data_type,
+                                           const void *data) {
+
+  switch (data_type) {
+  case EventDataData::EventDataData_UserInputBitsetData: {
+
+    // cast data to UserInputBitsetData
+    auto user_input_bitset_data =
+        static_cast<const UserInputBitsetData *>(data);
+
+    // convert to UserInputBitset
+    auto user_input_bitset_result =
+        ConvertFBDataToUserInputBitset(*user_input_bitset_data);
+    if (!user_input_bitset_result.has_value())
+      return std::unexpected(user_input_bitset_result.error());
+    return user_input_bitset_result.value();
+  }
+  case EventDataData::EventDataData_NONE: {
+    return std::monostate();
+  }
+
+  default:
+    return std::unexpected(FailInfo{
+        FailMode::EnumValueNotHandled,
+        "ConvertFlatbuffersEventDataDataToEventData: EventDataData type not "
+        "handled."});
+  }
+}
+/////////////////////////////////////////////////
+std::expected<UserInputBitset, FailInfo>
+ConvertFBDataToUserInputBitset(const UserInputBitsetData &data) {
 
   // create EventBitset that represents the keys for this action
   UserInputBitset event_bitset{0};
@@ -100,7 +130,6 @@ ConvertActionKeysToEvent(const UserInputBitsetData &data) {
                        true);
     }
   }
-  std::cout << "EventBitset: " << event_bitset << std::endl;
 
   return event_bitset;
 };

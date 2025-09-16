@@ -14,6 +14,7 @@
 
 #include "DropDownItemElement.h"
 #include "DropDownListElement.h"
+#include "EventHandler.h"
 #include "FailInfo.h"
 #include "PanelElement.h"
 #include "UIElement.h"
@@ -25,19 +26,14 @@
 namespace steamrot {
 
 class UIElementFactory {
+
 public:
   /////////////////////////////////////////////////
-  /// @brief Default constructor for the UIElementFactory
+  /// @brief Constructor taking in an EventHandler reference
+  ///
+  /// @param event_handler Ref
   /////////////////////////////////////////////////
   UIElementFactory() = default;
-
-  /////////////////////////////////////////////////
-  /// @brief Creates a (nested) UIElement structure from the provided data.
-  ///
-  /// @param element_data Flatbuffer data for the UI element
-  /// @return A UIElement containing the element type and its children.
-  /////////////////////////////////////////////////
-  // Implementation is typically in the .cpp file
 };
 
 /////////////////////////////////////////////////
@@ -50,7 +46,8 @@ public:
 /// on error
 /////////////////////////////////////////////////
 std::expected<std::unique_ptr<UIElement>, FailInfo>
-CreateUIElement(const UIElementDataUnion &data_type, const void *data);
+CreateUIElement(const UIElementDataUnion &data_type, const void *data,
+                EventHandler &event_handler);
 
 /////////////////////////////////////////////////
 /// @brief Configure the base properties of a UIElement from the provided
@@ -60,7 +57,8 @@ CreateUIElement(const UIElementDataUnion &data_type, const void *data);
 /// @param data Flatbuffers data to configure from
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigureBaseUIElement(UIElement &element, const UIElementData &data);
+ConfigureBaseUIElement(UIElement &element, const UIElementData &data,
+                       EventHandler &event_handler);
 
 /////////////////////////////////////////////////
 /// @brief Configure a Panel UIElement from the provided flatbuffers data

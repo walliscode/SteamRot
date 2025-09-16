@@ -16,7 +16,8 @@ namespace steamrot {
 ////////////////////////////////////////////////////////////
 Scene::Scene(const SceneType scene_type, const uuids::uuid &id,
              const GameContext game_context)
-    : m_scene_info{id, scene_type}, m_entity_manager(),
+    : m_scene_info{id, scene_type},
+      m_entity_manager(game_context.event_handler),
       m_game_context(game_context) {}
 
 ////////////////////////////////////////////////////////////
