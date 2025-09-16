@@ -7,6 +7,8 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "EntityManager.h"
+#include "EventHandler.h"
+#include "FailInfo.h"
 #include "FlatbuffersConfigurator.h"
 #include "PathProvider.h"
 #include "emp_helpers.h"
@@ -16,11 +18,15 @@
 namespace steamrot {
 
 ////////////////////////////////////////////////////////////
-EntityManager::EntityManager() : m_archetype_manager(m_entity_memory_pool) {}
+EntityManager::EntityManager(EventHandler &event_handler)
+    : m_archetype_manager(m_entity_memory_pool),
+      m_event_handler(event_handler) {}
 
 /////////////////////////////////////////////////
-EntityManager::EntityManager(const size_t pool_size)
-    : m_archetype_manager(m_entity_memory_pool) {
+EntityManager::EntityManager(const size_t pool_size,
+                             EventHandler &event_handler)
+    : m_archetype_manager(m_entity_memory_pool),
+      m_event_handler(event_handler) {
   // resize the entity memory pool to the given size
   ResizeEntityMemoryPool(pool_size);
 }
@@ -59,24 +65,23 @@ EntityManager::ConfigureEntitiesFromDefaultData(const SceneType scene_type,
                                                 const EnvironmentType env_type,
                                                 const DataType data_type) {
 
-  std::variant<FlatbuffersConfigurator> configurator(env_type);
   switch (data_type) {
-  case DataType::Flatbuffers:
-    configurator = FlatbuffersConfigurator{EnvironmentType::Test};
+  case DataType::Flatbuffers: {
+
+    FlatbuffersConfigurator configurator{env_type, m_event_handler};
+    auto configure_result = configurator.ConfigureEntitiesFromDefaultData(
+        m_entity_memory_pool, scene_type);
+    if (!configure_result.has_value())
+      return std::unexpected<FailInfo>(configure_result.error());
+
     break;
+  }
   default:
     return std::unexpected(
         FailInfo{FailMode::NonExistentEnumValue, "Invalid enum value"});
   }
 
-  // call the configurator to configure entities
-  auto result = std::visit(
-      [&scene_type, this](auto &configurator_instance) {
-        return configurator_instance.ConfigureEntitiesFromDefaultData(
-            m_entity_memory_pool, scene_type);
-      },
-      configurator);
-  return result;
+  return std::monostate();
 }
 ////////////////////////////////////////////////////////////
 size_t EntityManager::GetNextFreeEntityIndex() {

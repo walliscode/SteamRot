@@ -8,17 +8,20 @@
 /////////////////////////////////////////////////
 #include "FlatbuffersConfigurator.h"
 #include "CUserInterface.h"
+#include "EntityConfigurator.h"
 #include "UIElementFactory.h"
 #include "emp_helpers.h"
 #include "scene_types_generated.h"
 #include "user_interface_generated.h"
 #include <expected>
+#include <iostream>
 #include <variant>
 
 namespace steamrot {
 /////////////////////////////////////////////////
-FlatbuffersConfigurator::FlatbuffersConfigurator(const EnvironmentType env_type)
-    : m_data_loader(env_type) {}
+FlatbuffersConfigurator::FlatbuffersConfigurator(const EnvironmentType env_type,
+                                                 EventHandler &event_handler)
+    : m_data_loader(env_type), EntityConfigurator(event_handler) {}
 
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
@@ -76,7 +79,7 @@ FlatbuffersConfigurator::ConfigureEntitiesFromDefaultData(
     if (entity_data == nullptr) {
       continue; // Skip null entities
     }
-
+    std::cout << "Configuring entity index: " << i << std::endl;
     // CUserInterface component configuration
     if (entity_data->c_user_interface()) {
       auto configure_result = ConfigureComponent(
@@ -138,15 +141,11 @@ FlatbuffersConfigurator::ConfigureComponent(const UserInterfaceData *ui_data,
     return std::unexpected(fail_info);
   }
 
-  // create instance of UIElementFactory for use.
-  UIElementFactory element_factory;
-
-  // add the root element using the factory (it should build any recursive
-  // structure)
-  // the first
+  // create the root UI element using the factory function, this will
+  // recursively create the nested structure
   auto root_element_result =
       CreateUIElement(UIElementDataUnion::UIElementDataUnion_PanelData,
-                      ui_data->root_ui_element());
+                      ui_data->root_ui_element(), m_event_handler);
   if (!root_element_result.has_value())
     return std::unexpected(root_element_result.error());
 

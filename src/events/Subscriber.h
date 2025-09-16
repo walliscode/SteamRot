@@ -10,7 +10,6 @@
 
 #include "EventPacket.h"
 #include "FailInfo.h"
-#include "events_generated.h"
 #include <expected>
 #include <utility>
 #include <variant>

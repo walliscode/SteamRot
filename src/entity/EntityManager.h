@@ -13,6 +13,7 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "ArchetypeManager.h"
+#include "EventHandler.h"
 #include "FailInfo.h"
 #include "PathProvider.h"
 #include "containers.h"
@@ -45,6 +46,12 @@ private:
   /// this Scene
   /////////////////////////////////////////////////
   ArchetypeManager m_archetype_manager;
+
+  /////////////////////////////////////////////////
+  /// @brief Reference to the EventHandler for the game
+  /////////////////////////////////////////////////
+  EventHandler &m_event_handler;
+
   ////////////////////////////////////////////////////////////
   /// |brief reset a component at a given index to default values
   ///
@@ -92,16 +99,19 @@ private:
 
 public:
   /////////////////////////////////////////////////
-  /// @brief Default constructor for EntityManager
+  /// @brief Constructor for EntityManager
+  ///
+  /// @param event_handler Reference to the EventHandler for the game
   /////////////////////////////////////////////////
-  EntityManager();
+  EntityManager(EventHandler &event_handler);
 
   /////////////////////////////////////////////////
   /// @brief Constructor for EntityManager with a specified pool size
   ///
   /// @param pool_size Size of the entity memory pool to be created
+  /// @param event_handler Reference to the EventHandler for the game
   /////////////////////////////////////////////////
-  EntityManager(const size_t pool_size);
+  EntityManager(const size_t pool_size, EventHandler &event_handler);
 
   /////////////////////////////////////////////////
   /// @brief Call correct configurator to configure entities from default data

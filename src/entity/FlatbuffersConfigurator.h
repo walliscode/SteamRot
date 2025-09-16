@@ -13,6 +13,7 @@
 /////////////////////////////////////////////////
 #include "CUserInterface.h"
 #include "EntityConfigurator.h"
+#include "EventHandler.h"
 #include "FailInfo.h"
 #include "FlatbuffersDataLoader.h"
 #include "containers.h"
@@ -61,8 +62,15 @@ private:
                      CGrimoireMachina &grimoire_component);
 
 public:
-  FlatbuffersConfigurator(const EnvironmentType env_type);
+  FlatbuffersConfigurator(const EnvironmentType env_type,
+                          EventHandler &event_handler);
 
+  /////////////////////////////////////////////////
+  /// @brief Configure the default entities based on the SceneType
+  ///
+  /// @param entity_memory_pool EntityMemoryPool to configure
+  /// @param scene_type SceneType enum indicating which scene to load
+  /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo>
   ConfigureEntitiesFromDefaultData(EntityMemoryPool &entity_memory_pool,
                                    const SceneType scene_type);

@@ -4,15 +4,23 @@
 /////////////////////////////////////////////////
 
 #pragma once
-#include "event_helpers.h"
+
 #include "events_generated.h"
 #include "scene_types_generated.h"
 #include "uuid.h"
+#include <SFML/Window/Keyboard.hpp>
+#include <SFML/Window/Mouse.hpp>
+#include <bitset>
 #include <optional>
 #include <variant>
 namespace steamrot {
 
+using UserInputBitset =
+    std::bitset<sf::Keyboard::KeyCount + sf::Keyboard::KeyCount +
+                sf::Mouse::ButtonCount + sf::Mouse::ButtonCount>;
+
 using SceneChangeData = std::pair<std::optional<uuids::uuid>, SceneType>;
+
 using UIElementName = std::string;
 
 // all data types that can be used in an event packet (monostate to represent no

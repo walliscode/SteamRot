@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "ui_element_factory_helpers.h"
 #include <string>
+#include <variant>
 
 namespace steamrot {
 namespace tests {
@@ -20,6 +21,17 @@ void TestUIELementProperites(const UIElement &element,
   // Check size
   REQUIRE(element.size.x == data.size()->x());
   REQUIRE(element.size.y == data.size()->y());
+
+  // check the Subscriber data
+  if (data.subscriber_data()) {
+    REQUIRE(element.subscription.has_value());
+    // check the EventType matches
+    REQUIRE(element.subscription.value()->GetRegistrationInfo().first ==
+            data.subscriber_data()->event_type_data());
+    // checking EventData matches the flatbuffers needs some proper work on it
+    REQUIRE(!std::holds_alternative<std::monostate>(
+        element.subscription.value()->GetRegistrationInfo().second));
+  }
   // Check spacing strategy
   REQUIRE(element.spacing_strategy == data.spacing_strategy());
   // Check layout

@@ -3,17 +3,24 @@
 /// @brief Implementation of the UIElementFactory class
 ///////////////////////////////////////////////////////////////////////////////
 #include "UIElementFactory.h"
+#include "EventHandler.h"
+#include "EventPacket.h"
 #include "FailInfo.h"
+#include "SubscriberFactory.h"
+#include "event_helpers.h"
 #include "user_interface_generated.h"
 #include <expected>
+#include <iostream>
 #include <string>
+#include <variant>
 
 namespace steamrot {
 
 /////////////////////////////////////////////////
 std::expected<std::unique_ptr<UIElement>, FailInfo>
-CreateUIElement(const UIElementDataUnion &data_type, const void *data) {
-  // arrange
+CreateUIElement(const UIElementDataUnion &data_type, const void *data,
+                EventHandler &event_hanlder) {
+
   std::unique_ptr<UIElement> element{nullptr};
   const UIElementData *base_data = nullptr;
 
@@ -84,10 +91,14 @@ CreateUIElement(const UIElementDataUnion &data_type, const void *data) {
         FailInfo{FailMode::NonExistentEnumValue,
                  "CreateUIElement: Unsupported UI element type in union."});
   }
+  std::cout << "Swtich statment complete." << std::endl;
 
   // Only call this once!
   if (base_data) {
-    auto base_config_result = ConfigureBaseUIElement(*element, *base_data);
+
+    std::cout << "Configuring base UI element." << std::endl;
+    auto base_config_result =
+        ConfigureBaseUIElement(*element, *base_data, event_hanlder);
     if (!base_config_result.has_value())
       return std::unexpected(base_config_result.error());
   }
@@ -97,16 +108,58 @@ CreateUIElement(const UIElementDataUnion &data_type, const void *data) {
         FailInfo{FailMode::FlatbuffersDataNotFound,
                  "CreateUIElement: Element creation failed, element is null."});
   }
-
+  std::cout << "UI element created successfully." << std::endl;
   return element;
 }
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigureBaseUIElement(UIElement &element, const UIElementData &data) {
+ConfigureBaseUIElement(UIElement &element, const UIElementData &data,
+                       EventHandler &event_handler) {
 
   element.position = sf::Vector2f({data.position()->x(), data.position()->y()});
   element.size = sf::Vector2f({data.size()->x(), data.size()->y()});
+
+  // set Subscription if subscriber_data exists and EventType is not none
+  if (data.subscriber_data() && (data.subscriber_data()->event_type_data() !=
+                                 EventType::EventType_NONE)) {
+
+    // set EventType
+    if (!data.subscriber_data()->event_type_data()) {
+      return std::unexpected(FailInfo{
+          FailMode::FlatbuffersDataNotFound,
+          "UIElementData has subscriber_data but no event_type_data."});
+    }
+    EventType event_type = data.subscriber_data()->event_type_data();
+
+    std::cout << "Creating subscriber for event type: "
+              << EnumNameEventType(event_type) << std::endl;
+
+    // create EventData by running the flatbuffers data through the converter
+    auto event_data_conversion_result =
+        ConvertFlatbuffersEventDataDataToEventData(
+            data.subscriber_data()->event_data_data_type(),
+            data.subscriber_data()->event_data_data());
+
+    if (!event_data_conversion_result.has_value())
+      return std::unexpected(event_data_conversion_result.error());
+    EventData event_data = event_data_conversion_result.value();
+
+    // create and register subscriber if not
+    SubscriberFactory factory{event_handler};
+    auto create_subscriber_result =
+        factory.CreateAndRegisterSubscriber(event_type, event_data);
+
+    std::cout << "Subscriber created and registered." << std::endl;
+    if (!create_subscriber_result.has_value())
+      return std::unexpected(create_subscriber_result.error());
+
+    // reset the element's subscription to be sure
+    element.subscription.reset();
+    element.subscription = std::move(create_subscriber_result.value());
+  }
+  std::cout << "Subscriber set." << std::endl;
+
   element.spacing_strategy = data.spacing_strategy();
   element.layout = data.layout();
   element.children_active = data.children_active();
@@ -120,7 +173,8 @@ ConfigureBaseUIElement(UIElement &element, const UIElementData &data) {
       auto child_table = child_fb->element();
       if (!child_table)
         continue;
-      auto child_element_result = CreateUIElement(type, child_table);
+      auto child_element_result =
+          CreateUIElement(type, child_table, event_handler);
       if (!child_element_result.has_value())
         return std::unexpected(child_element_result.error());
       element.child_elements.push_back(std::move(child_element_result.value()));
@@ -129,14 +183,12 @@ ConfigureBaseUIElement(UIElement &element, const UIElementData &data) {
 
   return std::monostate{};
 }
-
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 ConfigurePanelElement(PanelElement &panel_element, const PanelData &data) {
   // No extra fields for panel
   return std::monostate{};
 }
-
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 ConfigureButtonElement(ButtonElement &button_element, const ButtonData &data) {
@@ -195,9 +247,9 @@ std::expected<std::monostate, FailInfo> ConfigureDropDownContainerElement(
   if (!second_child_fb ||
       second_child_fb->element_type() !=
           UIElementDataUnion::UIElementDataUnion_DropDownButtonData) {
-    return std::unexpected(FailInfo{
-        FailMode::FlatbuffersDataNotFound,
-        "DropDownContainerData's second child must be a DropDownButtonData."});
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    "DropDownContainerData's second child "
+                                    "must be a DropDownButtonData."});
   }
 
   return std::monostate{};

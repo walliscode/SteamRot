@@ -2,4 +2,9 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "EntityConfigurator.h"
-namespace steamrot {} // namespace steamrot
+namespace steamrot {
+
+/////////////////////////////////////////////////
+EntityConfigurator::EntityConfigurator(EventHandler &event_handler)
+    : m_event_handler(event_handler) {}
+} // namespace steamrot

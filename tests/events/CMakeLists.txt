@@ -16,3 +16,12 @@ target_link_libraries(test_events
 )
 
 catch_discover_tests(test_events)
+
+add_library(mock_subscriber_data
+INTERFACE
+)
+
+target_include_directories(mock_subscriber_data
+INTERFACE
+  ${CMAKE_CURRENT_SOURCE_DIR}
+)

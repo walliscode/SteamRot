@@ -28,9 +28,10 @@ TestContext::TestContext(const SceneType scene_type)
     std::cerr << "Error loading default assets: " << error.message << std::endl;
   }
 
+  std::cout << "Default assets loaded into AssetManager" << std::endl;
   // configure the game context
   ConfigureGameContext();
-
+  std::cout << "GameContext configured" << std::endl;
   switch (scene_type) {
   case SceneType::SceneType_TEST:
     ConfigureLogicContextForTestScene();
@@ -44,6 +45,7 @@ TestContext::TestContext(const SceneType scene_type)
   default:
     throw std::runtime_error("Unsupported scene type for TestContext");
   }
+  std::cout << "LogicContext for scene configured" << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -96,9 +98,12 @@ void TestContext::ConfigureGameContext() {
 /////////////////////////////////////////////////
 void TestContext::ConfigureLogicContextForTestScene() {
   // Configure the EntityMemoryPool for the test scene
-  FlatbuffersConfigurator configurator(EnvironmentType::Test);
+  FlatbuffersConfigurator configurator(EnvironmentType::Test, event_handler);
+
+  std::cout << "Configuring entities for Test Scene" << std::endl;
   auto configure_result = configurator.ConfigureEntitiesFromDefaultData(
       scene_entities, SceneType::SceneType_TEST);
+  std::cout << "Entities configured for Test Scene" << std::endl;
   // check the configuration was successful
   if (!configure_result.has_value()) {
     // handle the error (for example, log it)
@@ -122,7 +127,7 @@ void TestContext::ConfigureLogicContextForTestScene() {
 /////////////////////////////////////////////////
 void TestContext::ConfigureLogicContextForTitleScene() {
   // Configure the EntityMemoryPool for the title scene
-  FlatbuffersConfigurator configurator(EnvironmentType::Test);
+  FlatbuffersConfigurator configurator(EnvironmentType::Test, event_handler);
   auto configure_result = configurator.ConfigureEntitiesFromDefaultData(
       scene_entities, SceneType::SceneType_TITLE);
   // check the configuration was successful
@@ -148,7 +153,7 @@ void TestContext::ConfigureLogicContextForTitleScene() {
 /////////////////////////////////////////////////
 void TestContext::ConfigureLogicContextForCraftingScene() {
   // Configure the EntityMemoryPool for the crafting scene
-  FlatbuffersConfigurator configurator(EnvironmentType::Test);
+  FlatbuffersConfigurator configurator(EnvironmentType::Test, event_handler);
   auto configure_result = configurator.ConfigureEntitiesFromDefaultData(
       scene_entities, SceneType::SceneType_CRAFTING);
   // check the configuration was successful
