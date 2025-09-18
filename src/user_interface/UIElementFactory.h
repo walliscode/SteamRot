@@ -25,6 +25,11 @@
 
 namespace steamrot {
 
+using UIELementVariant =
+    std::variant<PanelElement, ButtonElement, DropDownListElement,
+                 DropDownContainerElement, DropDownItemElement,
+                 DropDownButtonElement>;
+
 class UIElementFactory {
 
 public:
