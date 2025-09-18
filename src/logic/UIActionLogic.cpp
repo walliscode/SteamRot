@@ -40,6 +40,25 @@ void UIActionLogic::ProcessLogic() {
 }
 
 /////////////////////////////////////////////////
+void ProcessUIActionsAndEvents(UIElement &ui_element,
+                               EventHandler &event_handler) {
+
+  // check the subscription first
+  if (ui_element.subscription == std::nullopt)
+    return;
+
+  // if there is a subscription, then it must be active
+  if (!ui_element.subscription.value()->IsActive())
+    return;
+
+  // use a dynamic cast to determine the type of UIElement
+  if (ButtonElement *button_element =
+          dynamic_cast<ButtonElement *>(&ui_element)) {
+    ProcessButtonElementActions(*button_element, event_handler);
+  }
+}
+
+/////////////////////////////////////////////////
 void ProcessButtonElementActions(ButtonElement &button_element,
                                  EventHandler &event_handler) {
 
