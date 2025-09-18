@@ -3,7 +3,9 @@
 /// @brief Declaration of the UIEventLogic class.
 /////////////////////////////////////////////////
 
+#include "EventHandler.h"
 #include "Logic.h"
+#include "UIElementFactory.h"
 
 namespace steamrot {
 
@@ -16,19 +18,6 @@ private:
   /////////////////////////////////////////////////
   void ProcessLogic() override;
 
-  /////////////////////////////////////////////////
-  /// @brief Handle any actions associated with a drop down container.
-  ///
-  /// @param element UIElement containing the DropDownContainer variant.
-  /////////////////////////////////////////////////
-  void ToggleDropDown(UIElement &element);
-
-  /////////////////////////////////////////////////
-  /// @brief Returns a vector of the names of all available fragments in the
-  /// CGrimoireMachina.
-  /////////////////////////////////////////////////
-  std::vector<std::string> GetAvailableFragments();
-
 public:
   /////////////////////////////////////////////////
   /// @brief COnstructor for UIEventLogic.
@@ -38,4 +27,23 @@ public:
   /////////////////////////////////////////////////
   UIActionLogic(const LogicContext logic_context);
 };
+
+/////////////////////////////////////////////////
+/// @brief Dispatches the variant to the correct action processing function.
+///
+/// @param ui_element Element to process.
+/////////////////////////////////////////////////
+void ProcesUIActionsAndEvents(UIELementVariant &ui_element);
+
+/////////////////////////////////////////////////
+/// @brief Process actions for a ButtonElement
+///
+/// This function checks if the button is in a state to trigger its response
+/// event. Thee subscriber will have already been checked before this function
+/// is called.
+///
+/// @param button_element ButtonElement to process
+/////////////////////////////////////////////////
+void ProcessButtonElementActions(ButtonElement &button_element,
+                                 EventHandler &event_handler);
 } // namespace steamrot

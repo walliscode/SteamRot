@@ -5,15 +5,10 @@
 #include "UIActionLogic.h"
 #include "ArchetypeHelpers.h"
 #include "ArchetypeManager.h"
-#include "CGrimoireMachina.h"
 #include "CUserInterface.h"
 #include "Logic.h"
-#include "UIElement.h"
 #include "emp_helpers.h"
 #include <SFML/Window/Mouse.hpp>
-#include <iostream>
-#include <magic_enum/magic_enum.hpp>
-
 #include <vector>
 
 using namespace magic_enum::bitwise_operators;
@@ -45,35 +40,20 @@ void UIActionLogic::ProcessLogic() {
 }
 
 /////////////////////////////////////////////////
-std::vector<std::string> UIActionLogic::GetAvailableFragments() {
+void ProcessButtonElementActions(ButtonElement &button_element,
+                                 EventHandler &event_handler) {
 
-  // Create a vector to hold the names of available fragments
-  std::vector<std::string> available_fragments;
+  // for now, all buttons need a mouse over to be clicked, so this will be the
+  // top level flow control
+  if (button_element.is_mouse_over) {
 
-  // Get the archetype ID for CGrimoireMachina
-  ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<CGrimoireMachina>();
-  // Get the archetype from the logic context
-  const auto it = m_logic_context.archetypes.find(archetype_id);
+    // check if button has an event packet. for now, all event packets are sent
+    // to the global event bus
+    if (button_element.response_event.has_value())
 
-  // pull just the first entity in the archetype
-  if (it != m_logic_context.archetypes.end()) {
-    const Archetype &archetype = it->second;
-
-    // Get the CGrimoireMachina component from the entity
-    CGrimoireMachina &grimoire_component =
-        emp_helpers::GetComponent<CGrimoireMachina>(
-            archetype_id[0], m_logic_context.scene_entities);
-
-    // Get the available fragments from the CGrimoireMachina component
-    for (auto &fragmet : grimoire_component.m_all_fragments) {
-      // Add the fragment name to the vector
-      available_fragments.push_back(fragmet.first);
-    }
-  } else {
-    std::cout << "No CGrimoireMachina found in the current scene." << std::endl;
+      event_handler.AddToGlobalEventBus(
+          {button_element.response_event.value()});
   }
-  return available_fragments;
 }
-/////////////////////////////////////////////////
-void UIActionLogic::ToggleDropDown(UIElement &element) {};
+
 } // namespace steamrot
