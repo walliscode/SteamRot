@@ -3,9 +3,9 @@
 /// @brief Declaration of the UIEventLogic class.
 /////////////////////////////////////////////////
 
+#include "ButtonElement.h"
 #include "EventHandler.h"
 #include "Logic.h"
-#include "UIElementFactory.h"
 
 namespace steamrot {
 
@@ -33,7 +33,8 @@ public:
 ///
 /// @param ui_element Element to process.
 /////////////////////////////////////////////////
-void ProcesUIActionsAndEvents(UIELementVariant &ui_element);
+void ProcessUIActionsAndEvents(UIElement &ui_element,
+                               EventHandler &event_handler);
 
 /////////////////////////////////////////////////
 /// @brief Process actions for a ButtonElement
