@@ -8,7 +8,9 @@
 /////////////////////////////////////////////////
 #include "SceneManager.h"
 
+#include "FlatbuffersDataLoader.h"
 #include "GameContext.h"
+#include "PathProvider.h"
 #include "TestContext.h"
 
 #include "asset_helpers.h"
@@ -23,6 +25,17 @@ TEST_CASE("SceneManager is constructed without any errors", "[SceneManager]") {
           .GetGameContext(); // Get the game context from the test context
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
   REQUIRE_NOTHROW(scene_manager);
+
+  // test number of subscriptions
+  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+  auto load_sm_data_result = data_loader.ProvideSceneManagerData();
+  if (!load_sm_data_result.has_value()) {
+    FAIL("Failed to load SceneManager data: " +
+         load_sm_data_result.error().message);
+  }
+  const steamrot::SceneManagerData *sm_data = load_sm_data_result.value();
+  REQUIRE(sm_data->subscriptions()->size() ==
+          scene_manager.GetSubscriptions().size());
 }
 
 TEST_CASE("SceneManager's AddSceneFromDefault creates a configured TitleScene",
@@ -156,7 +169,7 @@ TEST_CASE("SceneManager::ProvideTextures returns textures for valid scene IDs",
   REQUIRE(textures_result->size() == scene_ids.size());
 }
 
-TEST_CASE("SceneManager::ProvideAvaiableSceneInfo returns available SceneInfo",
+TEST_CASE("SceneManager::ProvideAvailableSceneInfo returns available SceneInfo",
           "[SceneManager]") {
   steamrot::tests::TestContext test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
@@ -176,4 +189,10 @@ TEST_CASE("SceneManager::ProvideAvaiableSceneInfo returns available SceneInfo",
   REQUIRE(scene_info_result->at(0).type ==
           steamrot::SceneType::SceneType_TITLE);
   REQUIRE(scene_info_result->at(0).id == title_result.value());
+}
+
+TEST_CASE("SceneManager RegistersSubscribers", "[SceneManager]") {
+  // set up SceneManager
+  steamrot::tests::TestContext test_context;
+  steamrot::SceneManager scene_manager{test_context.GetGameContext()};
 }

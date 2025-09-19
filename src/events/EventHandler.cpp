@@ -32,6 +32,12 @@ EventHandler::RegisterSubscriber(std::shared_ptr<Subscriber> subscriber) {
     }
     break;
   }
+  // handle scene change subscribers
+  case EventType::EventType_EVENT_CHANGE_SCENE: {
+    m_change_scene_subscribers.push_back(subscriber);
+    break;
+  }
+
   case EventType::EventType_EVENT_NONE: {
     std::cout << "Subscriber has NONE event type, no registration needed."
               << std::endl;

@@ -34,6 +34,11 @@ private:
   std::unordered_map<UserInputBitset, std::vector<std::weak_ptr<Subscriber>>>
       m_user_input_register;
 
+  /////////////////////////////////////////////////
+  /// @brief Register of subscribers interested in scene change events.:
+  /////////////////////////////////////////////////
+  std::vector<std::shared_ptr<Subscriber>> m_change_scene_subscribers;
+
   ////////////////////////////////////////////////////////////
   // |brief process keyboard events: pressed and released
   ////////////////////////////////////////////////////////////

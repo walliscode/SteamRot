@@ -14,12 +14,14 @@
 #include "GameContext.h"
 #include "Scene.h"
 #include "SceneInfoProvider.h"
+#include "Subscriber.h"
 #include "uuid.h"
 #include <SFML/Graphics.hpp>
 #include <expected>
 #include <memory>
 #include <unordered_map>
 #include <variant>
+#include <vector>
 
 namespace steamrot {
 
@@ -40,6 +42,12 @@ private:
   /// @brief Map of scenes, keyed by their unique UUIDs.
   /////////////////////////////////////////////////
   std::unordered_map<uuids::uuid, std::unique_ptr<Scene>> m_scenes;
+
+  /////////////////////////////////////////////////
+  /// @brief Subscriptions to any events that the SceneManager needs to listen
+  /// to.
+  /////////////////////////////////////////////////
+  std::vector<std::shared_ptr<Subscriber>> m_subscriptions;
 
 public:
   /////////////////////////////////////////////////
@@ -97,6 +105,8 @@ public:
   /////////////////////////////////////////////////
   const std::expected<std::vector<SceneInfo>, FailInfo>
   ProvideAvailableSceneInfo() const override;
+
+  const std::vector<std::shared_ptr<Subscriber>> &GetSubscriptions() const;
 };
 
 } // namespace steamrot

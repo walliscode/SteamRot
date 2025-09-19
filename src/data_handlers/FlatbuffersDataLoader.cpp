@@ -137,6 +137,34 @@ FlatbuffersDataLoader::ProvideAllFragments(
 }
 
 /////////////////////////////////////////////////
+std::expected<const SceneManagerData *, FailInfo>
+FlatbuffersDataLoader::ProvideSceneManagerData() const {
+  // get data directory
+  auto data_dir_result = m_path_provider.GetDataDirectory();
+
+  if (!data_dir_result.has_value()) {
+    return std::unexpected(data_dir_result.error());
+  }
+  // construct the file path
+  std::filesystem::path scene_manager_path =
+      data_dir_result.value() / "scene_manager" / "scene_manager.bin";
+  // check if the file exists
+  if (!std::filesystem::exists(scene_manager_path)) {
+    std::string error_message = std::format("Scene Manager file not found: {}",
+                                            scene_manager_path.string());
+    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
+  }
+  // load the scene manager data
+  const steamrot::SceneManagerData *scene_manager_data =
+      GetSceneManagerData(LoadBinaryData(scene_manager_path));
+
+  return scene_manager_data;
+
+  return std::unexpected(FailInfo(
+      FailMode::NotImplemented,
+      "FlatbuffersDataLoader::ProvideSceneManagerData not implemented"));
+}
+/////////////////////////////////////////////////
 std::expected<const SceneData *, FailInfo>
 FlatbuffersDataLoader::ProvideSceneData(const SceneType scene_type) const {
 
