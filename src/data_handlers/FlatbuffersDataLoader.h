@@ -12,6 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "DataLoader.h"
+#include "scene_manager_generated.h"
 #include "scene_types_generated.h"
 #include "scenes_generated.h"
 #include "ui_style_generated.h"
@@ -47,6 +48,12 @@ public:
   /////////////////////////////////////////////////
   std::expected<std::map<std::string, Fragment>, FailInfo>
   ProvideAllFragments(std::vector<std::string> fragment_names) const override;
+
+  /////////////////////////////////////////////////
+  /// @brief Provides SceneManagerData from binary file
+  /////////////////////////////////////////////////
+  std::expected<const SceneManagerData *, FailInfo>
+  ProvideSceneManagerData() const;
 
   /////////////////////////////////////////////////
   /// @brief Provides SceneData based on the SceneType

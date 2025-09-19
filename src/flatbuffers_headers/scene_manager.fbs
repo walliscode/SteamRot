@@ -1,0 +1,10 @@
+include "subscriber_config.fbs";
+
+
+namespace steamrot; 
+
+table SceneManagerData {
+subscriptions: [SubscriberData];
+  }
+
+root_type SceneManagerData;

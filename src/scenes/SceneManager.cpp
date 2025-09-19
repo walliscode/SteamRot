@@ -1,7 +1,16 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Implementation of the SceneManager class
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
 #include "SceneManager.h"
 #include "FailInfo.h"
 #include "Scene.h"
 #include "SceneFactory.h"
+#include "Subscriber.h"
 #include "uuid.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <expected>
@@ -13,8 +22,8 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-SceneManager::SceneManager(const GameContext game_contest)
-    : m_scenes(), m_game_context(game_contest) {}
+SceneManager::SceneManager(const GameContext game_context)
+    : m_scenes(), m_game_context(game_context) {}
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
@@ -137,5 +146,10 @@ void SceneManager::UpdateScenes() {
 
     // add further systems here
   }
+}
+/////////////////////////////////////////////////
+const std::vector<std::shared_ptr<Subscriber>> &
+SceneManager::GetSubscriptions() const {
+  return m_subscriptions;
 }
 } // namespace steamrot

@@ -213,3 +213,11 @@ TEST_CASE("FlatbuffersDataLoader provides ui_styles data",
   }
   REQUIRE(result.value() != nullptr);
 }
+
+TEST_CASE("FlatbuffersDataLoader provides scene_manager data",
+          "[FlatbuffersDataLoader]") {
+  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+  auto result = data_loader.ProvideSceneManagerData();
+  REQUIRE(result.has_value());
+  ;
+}
