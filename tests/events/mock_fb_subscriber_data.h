@@ -31,8 +31,6 @@ CreateTestUserInputSubscriberData(flatbuffers::FlatBufferBuilder &builder) {
       CreateUserInputBitsetData(builder, key_press_vec, key_release_vec,
                                 mouse_press_vec, mouse_release_vec);
 
-  return CreateSubscriberData(builder, EventType_EVENT_USER_INPUT,
-                              EventDataData_UserInputBitsetData,
-                              user_input_bitset_data.Union());
+  return CreateSubscriberData(builder, EventType_EVENT_USER_INPUT);
 }
 } // namespace steamrot::tests
