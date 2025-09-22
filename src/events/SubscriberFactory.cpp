@@ -15,10 +15,10 @@ SubscriberFactory::SubscriberFactory(EventHandler &event_handler)
 
 /////////////////////////////////////////////////
 std::expected<std::shared_ptr<Subscriber>, FailInfo>
-SubscriberFactory::CreateAndRegisterSubscriber(const EventType &event_type,
-                                               const EventData &event_data) {
+SubscriberFactory::CreateAndRegisterSubscriber(const EventType &event_type) {
+
   std::shared_ptr<Subscriber> subscriber =
-      std::make_shared<Subscriber>(event_type, event_data);
+      std::make_shared<Subscriber>(event_type);
 
   auto result = m_event_handler.RegisterSubscriber(subscriber);
   if (!result.has_value())

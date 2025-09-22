@@ -28,9 +28,6 @@ void TestUIELementProperites(const UIElement &element,
     // check the EventType matches
     REQUIRE(element.subscription.value()->GetRegistrationInfo().first ==
             data.subscriber_data()->event_type_data());
-    // checking EventData matches the flatbuffers needs some proper work on it
-    REQUIRE(!std::holds_alternative<std::monostate>(
-        element.subscription.value()->GetRegistrationInfo().second));
   }
 
   // check the EventPacket data

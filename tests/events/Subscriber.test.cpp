@@ -14,8 +14,8 @@
 TEST_CASE("Subscriber: check functions", "[Subscriber]") {
 
   // create a Subscriber object
-  steamrot::Subscriber subscriber{steamrot::EventType::EventType_EVENT_TEST,
-                                  std::monostate()};
+  steamrot::Subscriber subscriber{steamrot::EventType::EventType_EVENT_TEST};
+
   // check the event type
   auto registration_info = subscriber.GetRegistrationInfo();
   REQUIRE(registration_info.first == steamrot::EventType::EventType_EVENT_TEST);

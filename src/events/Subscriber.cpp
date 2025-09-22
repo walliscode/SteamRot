@@ -14,8 +14,8 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-Subscriber::Subscriber(const EventType event_type, const EventData &event_data)
-    : m_event_type(event_type), m_event_data(event_data) {}
+Subscriber::Subscriber(const EventType event_type)
+    : m_event_type(event_type) {};
 
 /////////////////////////////////////////////////
 std::pair<EventType, EventData> Subscriber::GetRegistrationInfo() const {
@@ -47,4 +47,20 @@ std::expected<std::monostate, FailInfo> Subscriber::SetInactive() {
   }
   return std::monostate{};
 }
+/////////////////////////////////////////////////
+void Subscriber::UpdateEventData(const EventData &new_event_data) {
+  m_event_data = new_event_data;
+}
+
+/////////////////////////////////////////////////
+const EventType &Subscriber::GetEventType() const { return m_event_type; }
+
+/////////////////////////////////////////////////
+EventData Subscriber::GetEventData() const { return m_event_data; }
+
+/////////////////////////////////////////////////
+void Subscriber::SetEventData(const EventData &event_data) {
+  m_event_data = event_data;
+}
+
 } // namespace steamrot

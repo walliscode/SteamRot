@@ -145,7 +145,7 @@ ConfigureBaseUIElement(UIElement &element, const UIElementData &data,
     // create and register subscriber if not
     SubscriberFactory factory{event_handler};
     auto create_subscriber_result =
-        factory.CreateAndRegisterSubscriber(event_type, event_data);
+        factory.CreateAndRegisterSubscriber(event_type);
 
     if (!create_subscriber_result.has_value())
       return std::unexpected(create_subscriber_result.error());
