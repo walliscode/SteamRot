@@ -132,17 +132,7 @@ ConfigureBaseUIElement(UIElement &element, const UIElementData &data,
     }
     EventType event_type = data.subscriber_data()->event_type_data();
 
-    // create EventData by running the flatbuffers data through the converter
-    auto event_data_conversion_result =
-        ConvertFlatbuffersEventDataDataToEventData(
-            data.subscriber_data()->event_data_data_type(),
-            data.subscriber_data()->event_data_data());
-
-    if (!event_data_conversion_result.has_value())
-      return std::unexpected(event_data_conversion_result.error());
-    EventData event_data = event_data_conversion_result.value();
-
-    // create and register subscriber if not
+    // create and register subscriber
     SubscriberFactory factory{event_handler};
     auto create_subscriber_result =
         factory.CreateAndRegisterSubscriber(event_type);
