@@ -1,5 +1,10 @@
 /////////////////////////////////////////////////
 /// @file
+/// @brief [TODO:description]
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// @file
 /// @brief Implementation of the SceneManager class
 /////////////////////////////////////////////////
 
@@ -11,10 +16,13 @@
 #include "Scene.h"
 #include "SceneFactory.h"
 #include "Subscriber.h"
+#include "SubscriberFactory.h"
+#include "events_generated.h"
 #include "uuid.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <expected>
 #include <memory>
+#include <unordered_map>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -25,6 +33,23 @@ namespace steamrot {
 SceneManager::SceneManager(const GameContext game_context)
     : m_scenes(), m_game_context(game_context) {}
 
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+SceneManager::ConfigureSceneManagerFromData(
+    const SceneManagerData *scene_manager_data) {
+  if (!scene_manager_data) {
+    FailInfo fail_info(FailMode::NullPointer,
+                       "SceneManagerData is a null pointer");
+    return std::unexpected(fail_info);
+  }
+  // configure Subscribers from data
+  auto configure_result =
+      ConfigureSubscribersFromData(scene_manager_data->subscriptions());
+  if (!configure_result.has_value()) {
+    return std::unexpected(configure_result.error());
+  }
+  return std::monostate{};
+}
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 SceneManager::AddSceneFromDefault(const SceneType &scene_type) {
@@ -148,8 +173,61 @@ void SceneManager::UpdateScenes() {
   }
 }
 /////////////////////////////////////////////////
-const std::vector<std::shared_ptr<Subscriber>> &
+const std::unordered_map<EventType, std::shared_ptr<Subscriber>> &
 SceneManager::GetSubscriptions() const {
   return m_subscriptions;
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+SceneManager::RegisterSubscriber(std::shared_ptr<Subscriber> subscriber) {
+  // add in guard statements and potential fail modes
+  if (!subscriber) {
+    FailInfo fail_info(FailMode::NullPointer, "Subscriber is a null pointer");
+    return std::unexpected(fail_info);
+  }
+
+  // attempt to add the subscriber to the map, fail if duplicate
+  auto result = m_subscriptions.emplace(subscriber->GetEventType(), subscriber);
+  if (!result.second) {
+    FailInfo fail_info(
+        FailMode::NotAddedToMap,
+        "Subscriber for this event type already exists in the SceneManager");
+    return std::unexpected(fail_info);
+  }
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+SceneManager::ConfigureSubscribersFromData(
+    const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>>
+        *subscriptions) {
+
+  if (!subscriptions) {
+    FailInfo fail_info(FailMode::NullPointer,
+                       "Subscriptions data is a null pointer");
+    return std::unexpected(fail_info);
+  }
+
+  // set up SubscriberFactory
+  SubscriberFactory subscriber_factory(m_game_context.event_handler);
+  // loop through the SubscriberData and create subscribers and register them
+  for (const auto &subscription : *subscriptions) {
+
+    // create and register subscriber with EventHandler
+    auto create_result = subscriber_factory.CreateAndRegisterSubscriber(
+        subscription->event_type_data());
+    if (!create_result.has_value()) {
+      return std::unexpected(create_result.error());
+    }
+    // register produced Subscriber with SceneManager
+    auto register_result = RegisterSubscriber(create_result.value());
+    if (!register_result.has_value()) {
+      return std::unexpected(register_result.error());
+    }
+  }
+
+  return std::monostate();
 }
 } // namespace steamrot
