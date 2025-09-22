@@ -41,7 +41,7 @@ TEST_CASE("UIElementFactory::CreateUIElement - Panel", "[UIElementFactory]") {
   steamrot::tests::TestContext test_context;
   // check that the map from the EventHandler is empty
   REQUIRE(test_context.GetGameContext()
-              .event_handler.GetUserInputRegister()
+              .event_handler.GetSubcriberRegister()
               .size() == 0);
 
   flatbuffers::FlatBufferBuilder builder{1024};
@@ -58,7 +58,7 @@ TEST_CASE("UIElementFactory::CreateUIElement - Panel", "[UIElementFactory]") {
   }
   // assert
   REQUIRE(test_context.GetGameContext()
-              .event_handler.GetUserInputRegister()
+              .event_handler.GetSubcriberRegister()
               .size() == 1);
 
   // pull out as PanelElement

@@ -5,8 +5,6 @@
 #include "FailInfo.h"
 #include <SFML/Window/Event.hpp>
 #include <expected>
-#include <iostream>
-#include <magic_enum/magic_enum.hpp>
 #include <optional>
 namespace steamrot {
 
@@ -14,46 +12,11 @@ namespace steamrot {
 std::expected<std::monostate, FailInfo>
 EventHandler::RegisterSubscriber(std::shared_ptr<Subscriber> subscriber) {
 
-  switch (subscriber->GetRegistrationInfo().first) {
-  case EventType::EventType_EVENT_USER_INPUT: {
-    // ensure the variant holds a UserInputBitset as these bits of data are not
-    // definitely coupled
-    if (std::holds_alternative<UserInputBitset>(
-            subscriber->GetRegistrationInfo().second)) {
-      const UserInputBitset user_input_bitset =
-          std::get<UserInputBitset>(subscriber->GetRegistrationInfo().second);
-      m_user_input_register[user_input_bitset].push_back(subscriber);
-    } else {
-      // Handle the case where the variant does not hold UserInputBitset
-      return std::unexpected(
-          FailInfo{FailMode::VariantTypeMismatch,
-                   "Subscriber with EventType_EVENT_USER_INPUT must have "
-                   "UserInputBitset as event data."});
-    }
-    break;
-  }
-  // handle scene change subscribers
-  case EventType::EventType_EVENT_CHANGE_SCENE: {
-    m_change_scene_subscribers.push_back(subscriber);
-    break;
-  }
+  // get the event type the subscriber is interested in and add it to the
+  // register
+  auto event_type = subscriber->GetRegistrationInfo().first;
+  m_subscriber_register[event_type].push_back(subscriber);
 
-  case EventType::EventType_EVENT_NONE: {
-    std::cout << "Subscriber has NONE event type, no registration needed."
-              << std::endl;
-    // no registration needed for NONE event type
-    break;
-  }
-  default:
-
-    // if the event type is not handled, return an error
-    return std::unexpected(
-        FailInfo{FailMode::EnumValueNotHandled,
-                 "EventType not handled in Subscriber registration."});
-  }
-  std::cout << "Subscriber registered for event type: "
-            << magic_enum::enum_name(subscriber->GetRegistrationInfo().first)
-            << std::endl;
   return std::monostate{};
 }
 /////////////////////////////////////////////////
@@ -88,10 +51,8 @@ const EventBus &EventHandler::GetGlobalEventBus() {
 ////////////////////////////////////////////////////////////
 void EventHandler::HandleSFMLEvents(sf::RenderWindow &window) {
 
-  // create a new UserInputBitset
-  UserInputBitset user_input_events;
-  // reset the event bitsets
-  user_input_events.reset();
+  // create a vector to hold user input events
+  std::vector<sf::Event> user_input_events;
 
   // poll events from the window
   while (const std::optional<sf::Event> event = window.pollEvent()) {
@@ -103,114 +64,51 @@ void EventHandler::HandleSFMLEvents(sf::RenderWindow &window) {
     if (event->is<sf::Event::Closed>()) {
       window.close();
     }
-    // handle keyboard events
-    else if (event->is<sf::Event::KeyPressed>() ||
-             event->is<sf::Event::KeyReleased>()) {
-
-      HandleKeyboardEvents(event.value(), user_input_events);
-    }
-    // handle mouse events
-    else if (event->is<sf::Event::MouseButtonPressed>() ||
-             event->is<sf::Event::MouseButtonReleased>()) {
-      HandleMouseEvents(event.value(), user_input_events);
+    // handle keyboard and mouse events by adding to the user input events
+    // vector
+    if (event->is<sf::Event::KeyPressed>() ||
+        event->is<sf::Event::KeyReleased>() ||
+        event->is<sf::Event::MouseButtonPressed>() ||
+        event->is<sf::Event::MouseButtonReleased>()) {
+      user_input_events.push_back(*event);
     }
   }
 
-  // create a new event packet with a lifetime of 1
-  EventPacket event_packet(1);
+  // specifically handle keyboard and mouse events
+  if (!user_input_events.empty()) {
 
-  // set the event type to UserInputEvent
-  event_packet.m_event_type = EventType::EventType_EVENT_USER_INPUT;
+    // create a new event packet with a lifetime of 1
+    EventPacket event_packet(1);
 
-  // set the data for the event packet
-  event_packet.m_event_data = user_input_events;
+    // set the event type to UserInputEvent
+    event_packet.m_event_type = EventType::EventType_EVENT_USER_INPUT;
 
-  // add the event packet to the global event bus
-  AddEvent(m_global_event_bus, event_packet);
-}
+    // set the data for the event packet
+    event_packet.m_event_data = user_input_events;
 
-////////////////////////////////////////////////////////////
-void EventHandler::HandleKeyboardEvents(const sf::Event &event,
-                                        UserInputBitset &user_input_events) {
-
-  // if key pressed, set the corresponding bit in the pressed events bitset
-  if (const auto *keyPressed = event.getIf<sf::Event::KeyPressed>()) {
-
-    std::cout << "Key pressed: " << magic_enum::enum_name(keyPressed->scancode)
-              << std::endl;
-    std::cout << "Key code: " << static_cast<int>(keyPressed->code)
-              << std::endl;
-    // modify relevant bitset
-    user_input_events.set(static_cast<size_t>(keyPressed->code));
-
-  } else if (const auto *keyReleased = event.getIf<sf::Event::KeyReleased>()) {
-
-    std::cout << "Key released: " << magic_enum::enum_name(keyReleased->code)
-              << std::endl;
-
-    // if key released, then remember add the key count
-    user_input_events.set(static_cast<size_t>(keyReleased->code) +
-                          sf::Keyboard::KeyCount);
-  }
-}
-
-////////////////////////////////////////////////////////////
-void EventHandler::HandleMouseEvents(const sf::Event &event,
-                                     UserInputBitset &user_input_events) {
-
-  // if mouse button pressed, set the corresponding bit in the pressed
-  // events
-  if (const auto *mouseButtonPressed =
-          event.getIf<sf::Event::MouseButtonPressed>()) {
-
-    std::cout << "Mouse button pressed: "
-              << magic_enum::enum_name(mouseButtonPressed->button) << std::endl;
-    // shift the mouse button by the number of keys x 2
-    user_input_events.set(static_cast<size_t>(mouseButtonPressed->button) +
-                          static_cast<size_t>(sf::Keyboard::KeyCount * 2));
-
-  } else if (const auto *mouseButtonReleased =
-                 event.getIf<sf::Event::MouseButtonReleased>()) {
-
-    std::cout << "Mouse button released: "
-              << magic_enum::enum_name(mouseButtonReleased->button)
-              << std::endl;
-    // if mouse button released, then remember to add the key count x 2 and
-    // the mouse button count
-    user_input_events.set(static_cast<size_t>(mouseButtonReleased->button) +
-                          static_cast<size_t>((sf::Keyboard::KeyCount * 2) +
-                                              sf::Mouse::ButtonCount));
+    // add the event packet to the global event bus
+    AddEvent(m_global_event_bus, event_packet);
   }
 }
 
 /////////////////////////////////////////////////
-const std::unordered_map<UserInputBitset,
-                         std::vector<std::weak_ptr<Subscriber>>> &
-EventHandler::GetUserInputRegister() const {
-  return m_user_input_register;
+const std::unordered_map<EventType, std::vector<std::weak_ptr<Subscriber>>> &
+EventHandler::GetSubcriberRegister() const {
+  return m_subscriber_register;
 }
 
 /////////////////////////////////////////////////
 void EventHandler::UpateSubscribersFromGlobalEventBus() {
   // go through each event in the global event bus
   for (const auto &event : m_global_event_bus) {
-    switch (event.m_event_type) {
-    case EventType::EventType_EVENT_USER_INPUT: {
+    if (m_subscriber_register.contains(event.m_event_type)) {
+      // go through each subscriber registered for the event type
+      for (auto &subscriber_weak :
+           m_subscriber_register.at(event.m_event_type)) {
 
-      // get the vector of subscribers interested in this event
-      auto subscriber_vec =
-          m_user_input_register[std::get<UserInputBitset>(event.m_event_data)];
-
-      // go through each subscriber and update them
-      for (auto &subscriber : subscriber_vec) {
-        UpdateSubscriber(subscriber);
+        // pass to the UpdateSubscriber function
+        UpdateSubscriber(subscriber_weak, event.m_event_data);
       }
-
-      break;
-    }
-    default:
-      // if the event type is not handled, do nothing
-      break;
     }
   }
 }
@@ -243,8 +141,12 @@ void RemoveDeadEvents(EventBus &event_bus) {
 }
 
 /////////////////////////////////////////////////
-void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber) {
+void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
+                      const EventData &event_data) {
   // update any releveant information for the subscriber
   auto activate_result = subscriber.lock()->SetActive();
+
+  // copy the event data to the subscriber
+  subscriber.lock()->SetEventData(event_data);
 }
 } // namespace steamrot

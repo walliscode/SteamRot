@@ -86,7 +86,7 @@ std::expected<UserInputBitset, FailInfo>
 ConvertFBDataToUserInputBitset(const UserInputBitsetData &data) {
 
   // create EventBitset that represents the keys for this action
-  UserInputBitset event_bitset{0};
+  UserInputBitset event_bitset;
   if (data.keyboard_pressed()) {
     for (const auto &key_pressed : *data.keyboard_pressed()) {
       // not sure how to pull the enum straight out so just recasting it

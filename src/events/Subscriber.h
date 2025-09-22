@@ -39,13 +39,13 @@ private:
   /////////////////////////////////////////////////
   /// @brief Used as a key to store the subscriber in the EventHandler.
   /////////////////////////////////////////////////
-  const EventData m_event_data;
+  EventData m_event_data;
 
 public:
   /////////////////////////////////////////////////
   /// @brief Constructor for the Subscriber class.
   /////////////////////////////////////////////////
-  Subscriber(const EventType event_type, const EventData &event_data);
+  Subscriber(const EventType event_type);
 
   /////////////////////////////////////////////////
   /// @brief Delete the default constructor to prevent instantiation without
@@ -75,5 +75,28 @@ public:
   /// @brief Provide the registration information for the subscriber.
   /////////////////////////////////////////////////
   std::pair<EventType, EventData> GetRegistrationInfo() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Return a reference to the event type the subscriber is registered
+  /// for.
+  ///
+  /// @return a reference to the event type.
+  /////////////////////////////////////////////////
+  const EventType &GetEventType() const;
+
+  EventData GetEventData() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Copy the event data for the subscriber.
+  ///
+  /// @param event_data Event data to be copied.
+  /////////////////////////////////////////////////
+  void SetEventData(const EventData &event_data);
+  /////////////////////////////////////////////////
+  /// @brief Replace the event data for the subscriber.
+  ///
+  /// @param new_event_data
+  /////////////////////////////////////////////////
+  void UpdateEventData(const EventData &new_event_data);
 };
 } // namespace steamrot

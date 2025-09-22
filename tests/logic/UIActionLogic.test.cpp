@@ -11,6 +11,8 @@
 #include "Subscriber.h"
 #include "TestContext.h"
 #include "events_generated.h"
+#include <SFML/Window/Event.hpp>
+#include <SFML/Window/Keyboard.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <optional>
 #include <variant>
@@ -43,8 +45,8 @@ TEST_CASE(
   button_element.size = {200.0f, 50.0f};
   button_element.is_mouse_over = false;
   button_element.label = "Quit Game";
-  steamrot::Subscriber subscriber{steamrot::EventType_EVENT_USER_INPUT,
-                                  steamrot::UserInputBitset{2}};
+  steamrot::Subscriber subscriber{steamrot::EventType_EVENT_USER_INPUT};
+
   button_element.subscription =
       std::make_shared<steamrot::Subscriber>(subscriber);
   steamrot::EventPacket event_packet{steamrot::EventType_EVENT_QUIT_GAME,
@@ -127,8 +129,8 @@ TEST_CASE(
   button_element.size = {200.0f, 50.0f};
   button_element.is_mouse_over = true; // simulate mouse over
   button_element.label = "Quit Game";
-  steamrot::Subscriber subscriber{steamrot::EventType_EVENT_USER_INPUT,
-                                  steamrot::UserInputBitset{2}};
+  steamrot::Subscriber subscriber{steamrot::EventType_EVENT_USER_INPUT};
+
   button_element.subscription =
       std::make_shared<steamrot::Subscriber>(subscriber);
 
@@ -150,9 +152,11 @@ TEST_CASE(
 
   // Add an unrelated triggering event to event bus: the bitset does not match
   // the subscriber
-  steamrot::EventPacket unrelated_event_packet{
-      steamrot::EventType_EVENT_USER_INPUT,
-      steamrot::UserInputBitset{3}}; // bitset 3, subscriber expects 2
+  sf::Event event_sf{sf::Event::KeyPressed()};
+
+  steamrot::EventPacket unrelated_event_packet{steamrot::EventType_EVENT_TEST,
+                                               std::monostate()};
+
   test_context.GetGameContext().event_handler.AddToGlobalEventBus(
       {unrelated_event_packet});
 
@@ -203,8 +207,8 @@ TEST_CASE("UIActionLogic checks subscription before adding Event to EventBus "
   button_element.size = {200.0f, 50.0f};
   button_element.is_mouse_over = true; // simulate mouse over
   button_element.label = "Quit Game";
-  steamrot::Subscriber subscriber{steamrot::EventType_EVENT_USER_INPUT,
-                                  steamrot::UserInputBitset{2}};
+  steamrot::Subscriber subscriber{steamrot::EventType_EVENT_USER_INPUT};
+
   button_element.subscription =
       std::make_shared<steamrot::Subscriber>(subscriber);
   // register the subscriber with the event handler
@@ -224,7 +228,7 @@ TEST_CASE("UIActionLogic checks subscription before adding Event to EventBus "
 
   // add triggering event to event bus
   steamrot::EventPacket trigger_event_packet{
-      steamrot::EventType_EVENT_USER_INPUT, steamrot::UserInputBitset{2}};
+      steamrot::EventType_EVENT_USER_INPUT, steamrot::UserInputBitset{}};
   test_context.GetGameContext().event_handler.AddToGlobalEventBus(
       {trigger_event_packet});
 

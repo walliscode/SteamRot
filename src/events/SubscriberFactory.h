@@ -8,8 +8,10 @@
 /////////////////////////////////////////////////
 #pragma once
 
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
 #include "EventHandler.h"
-#include "EventPacket.h"
 #include "Subscriber.h"
 #include <expected>
 namespace steamrot {
@@ -44,7 +46,6 @@ public:
   /// @param event_data Reference to the EventData for the subscriber
   /////////////////////////////////////////////////
   std::expected<std::shared_ptr<Subscriber>, FailInfo>
-  CreateAndRegisterSubscriber(const EventType &event_type,
-                              const EventData &event_data);
+  CreateAndRegisterSubscriber(const EventType &event_type);
 };
 } // namespace steamrot

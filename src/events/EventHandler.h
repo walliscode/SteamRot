@@ -9,6 +9,7 @@
 
 #include "EventPacket.h"
 #include "Subscriber.h"
+#include "events_generated.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
@@ -29,27 +30,10 @@ private:
   EventBus m_global_event_bus;
 
   /////////////////////////////////////////////////
-  /// @brief Register of subscribers interested in user input events.
+  /// @brief Register of all subscribers
   /////////////////////////////////////////////////
-  std::unordered_map<UserInputBitset, std::vector<std::weak_ptr<Subscriber>>>
-      m_user_input_register;
-
-  /////////////////////////////////////////////////
-  /// @brief Register of subscribers interested in scene change events.:
-  /////////////////////////////////////////////////
-  std::vector<std::shared_ptr<Subscriber>> m_change_scene_subscribers;
-
-  ////////////////////////////////////////////////////////////
-  // |brief process keyboard events: pressed and released
-  ////////////////////////////////////////////////////////////
-  void HandleKeyboardEvents(const sf::Event &event,
-                            UserInputBitset &user_input_events);
-
-  ////////////////////////////////////////////////////////////
-  // |brief process mouse events: pressed and released
-  ////////////////////////////////////////////////////////////
-  void HandleMouseEvents(const sf::Event &event,
-                         UserInputBitset &user_input_events);
+  std::unordered_map<EventType, std::vector<std::weak_ptr<Subscriber>>>
+      m_subscriber_register;
 
 public:
   ////////////////////////////////////////////////////////////
@@ -104,11 +88,10 @@ public:
   void HandleSFMLEvents(sf::RenderWindow &window);
 
   /////////////////////////////////////////////////
-  /// @brief Return the user input register.
+  /// @brief Return the subscriber register.
   /////////////////////////////////////////////////
-  const std::unordered_map<UserInputBitset,
-                           std::vector<std::weak_ptr<Subscriber>>> &
-  GetUserInputRegister() const;
+  const std::unordered_map<EventType, std::vector<std::weak_ptr<Subscriber>>> &
+  GetSubcriberRegister() const;
 };
 
 /////////////////////////////////////////////////
@@ -141,5 +124,6 @@ void RemoveDeadEvents(EventBus &event_bus);
 ///
 /// @param subscriber Weak pointer to the subscriber to be updated.
 /////////////////////////////////////////////////
-void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber);
+void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
+                      const EventData &event_data);
 } // namespace steamrot
