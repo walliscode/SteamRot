@@ -1,3 +1,3 @@
 {
-  "subscriptions": []
+  "subscriptions": [{ "event_type_data": "EVENT_CHANGE_SCENE" }]
 }

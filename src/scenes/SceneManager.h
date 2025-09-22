@@ -15,6 +15,9 @@
 #include "Scene.h"
 #include "SceneInfoProvider.h"
 #include "Subscriber.h"
+#include "events_generated.h"
+#include "scene_manager_generated.h"
+#include "subscriber_config_generated.h"
 #include "uuid.h"
 #include <SFML/Graphics.hpp>
 #include <expected>
@@ -44,10 +47,9 @@ private:
   std::unordered_map<uuids::uuid, std::unique_ptr<Scene>> m_scenes;
 
   /////////////////////////////////////////////////
-  /// @brief Subscriptions to any events that the SceneManager needs to listen
-  /// to.
+  /// @brief Map of all event subscriptions, stored by event type.
   /////////////////////////////////////////////////
-  std::vector<std::shared_ptr<Subscriber>> m_subscriptions;
+  std::unordered_map<EventType, std::shared_ptr<Subscriber>> m_subscriptions;
 
 public:
   /////////////////////////////////////////////////
@@ -58,10 +60,36 @@ public:
   SceneManager(const GameContext game_context);
 
   /////////////////////////////////////////////////
+  /// @brief Container function for configuring the SceneManager from
+  /// flatbuffers data
+  ///
+  /// @param scene_manager_data Flatbuffers SceneManagerData object to configure
+  /// from
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ConfigureSceneManagerFromData(const SceneManagerData *scene_manager_data);
+
+  /////////////////////////////////////////////////
+  /// @brief Add the Subscriber to the subscriptions map.
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+      RegisterSubscriber(std::shared_ptr<Subscriber>);
+
+  /////////////////////////////////////////////////
+  /// @brief Given multiple subscription data, configure the subscribers for the
+  /// SceneManager.
+  ///
+  /// @param subscriptions A flatbuffers vector of SubscriberData objects.
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> ConfigureSubscribersFromData(
+      const ::flatbuffers::Vector<
+          ::flatbuffers::Offset<steamrot::SubscriberData>> *subscriptions);
+
+  /////////////////////////////////////////////////
   /// @brief A convenience function to load the title scene.
   ///
-  /// If the title scene is called it should clear all other scenes and create a
-  /// new one.
+  /// If the title scene is called it should clear all other scenes and
+  /// create a new one.
   /////////////////////////////////////////////////
   std::expected<uuids::uuid, FailInfo> LoadTitleScene();
 
@@ -106,7 +134,12 @@ public:
   const std::expected<std::vector<SceneInfo>, FailInfo>
   ProvideAvailableSceneInfo() const override;
 
-  const std::vector<std::shared_ptr<Subscriber>> &GetSubscriptions() const;
+  /////////////////////////////////////////////////
+  /// @brief Returns a constant reference to the subscriptions map. for
+  /// inspection
+  /////////////////////////////////////////////////
+  const std::unordered_map<EventType, std::shared_ptr<Subscriber>> &
+  GetSubscriptions() const;
 };
 
 } // namespace steamrot
