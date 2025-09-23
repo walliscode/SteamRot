@@ -56,7 +56,7 @@ void Subscriber::UpdateEventData(const EventData &new_event_data) {
 const EventType &Subscriber::GetEventType() const { return m_event_type; }
 
 /////////////////////////////////////////////////
-EventData Subscriber::GetEventData() const { return m_event_data; }
+const EventData &Subscriber::GetEventData() const { return m_event_data; }
 
 /////////////////////////////////////////////////
 void Subscriber::SetEventData(const EventData &event_data) {

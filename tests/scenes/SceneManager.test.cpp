@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "SceneManager.h"
-
 #include "FlatbuffersDataLoader.h"
 #include "GameContext.h"
 #include "PathProvider.h"
@@ -316,8 +315,127 @@ TEST_CASE("SceneManager::ProvideAvailableSceneInfo returns available "
   REQUIRE(scene_info_result->at(0).id == title_result.value());
 }
 
-TEST_CASE("SceneManager RegistersSubscribers", "[SceneManager]") {
-  // set up SceneManager
+TEST_CASE("SceneManager loads TitleScene when Subscriber is turned active",
+          "[SceneManager]") {
   steamrot::tests::TestContext test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
+  // Create and register a Subscriber for EventType_EVENT_CHANGE_SCENE
+  auto subscriber = std::make_shared<steamrot::Subscriber>(
+      steamrot::EventType_EVENT_CHANGE_SCENE);
+  auto register_result = scene_manager.RegisterSubscriber(subscriber);
+  if (!register_result.has_value()) {
+    FAIL("Failed to register subscriber: " + register_result.error().message);
+  }
+
+  // check that no scenes are loaded initially
+  REQUIRE(scene_manager.GetScenes().empty());
+
+  // Activate the Subscriber with SceneChangeData to load Title scene
+  steamrot::SceneChangeData scene_change_data{
+      uuids::uuid{}, steamrot::SceneType::SceneType_TITLE};
+  auto set_active_result = subscriber->SetActive();
+  if (!set_active_result.has_value()) {
+    FAIL("Failed to activate subscriber: " + set_active_result.error().message);
+  }
+  subscriber->SetEventData(scene_change_data);
+
+  // Process subscriptions in SceneManager
+  auto process_result = scene_manager.ProcessSubscriptions();
+  if (!process_result.has_value()) {
+    FAIL("Failed to process subscriptions: " + process_result.error().message);
+  }
+  // Check that the Title scene was loaded
+  REQUIRE(scene_manager.GetScenes().size() == 1);
+  REQUIRE(scene_manager.GetScenes().begin()->second->GetSceneInfo().type ==
+          steamrot::SceneType::SceneType_TITLE);
+}
+
+// attempt to load crafting scene via subscriber
+TEST_CASE("SceneManager loads CraftingScene when Subscriber is turned active",
+          "[SceneManager]") {
+  steamrot::tests::TestContext test_context;
+  steamrot::SceneManager scene_manager{test_context.GetGameContext()};
+  // Create and register a Subscriber for EventType_EVENT_CHANGE_SCENE
+  auto subscriber = std::make_shared<steamrot::Subscriber>(
+      steamrot::EventType_EVENT_CHANGE_SCENE);
+  auto register_result = scene_manager.RegisterSubscriber(subscriber);
+  if (!register_result.has_value()) {
+    FAIL("Failed to register subscriber: " + register_result.error().message);
+  }
+  // check that no scenes are loaded initially
+  REQUIRE(scene_manager.GetScenes().empty());
+  // Activate the Subscriber with SceneChangeData to load Crafting scene
+  steamrot::SceneChangeData scene_change_data{
+      uuids::uuid{}, steamrot::SceneType::SceneType_CRAFTING};
+  auto set_active_result = subscriber->SetActive();
+  if (!set_active_result.has_value()) {
+    FAIL("Failed to activate subscriber: " + set_active_result.error().message);
+  }
+  subscriber->SetEventData(scene_change_data);
+  // Process subscriptions in SceneManager
+  auto process_result = scene_manager.ProcessSubscriptions();
+  if (!process_result.has_value()) {
+    FAIL("Failed to process subscriptions: " + process_result.error().message);
+  }
+  // Check that the Crafting scene was loaded
+  REQUIRE(scene_manager.GetScenes().size() == 1);
+  REQUIRE(scene_manager.GetScenes().begin()->second->GetSceneInfo().type ==
+          steamrot::SceneType::SceneType_CRAFTING);
+}
+
+// when no SceneData is provided, changing scene does nothing
+TEST_CASE("SceneManager provides error when Subscriber is active but no "
+          "SceneData set",
+          "[SceneManager]") {
+  steamrot::tests::TestContext test_context;
+  steamrot::SceneManager scene_manager{test_context.GetGameContext()};
+  // Create and register a Subscriber for EventType_EVENT_CHANGE_SCENE
+  auto subscriber = std::make_shared<steamrot::Subscriber>(
+      steamrot::EventType_EVENT_CHANGE_SCENE);
+  auto register_result = scene_manager.RegisterSubscriber(subscriber);
+  if (!register_result.has_value()) {
+    FAIL("Failed to register subscriber: " + register_result.error().message);
+  }
+  // check that no scenes are loaded initially
+  REQUIRE(scene_manager.GetScenes().empty());
+  // Activate the Subscriber without setting SceneChangeData
+  auto set_active_result = subscriber->SetActive();
+  if (!set_active_result.has_value()) {
+    FAIL("Failed to activate subscriber: " + set_active_result.error().message);
+  }
+  // Process subscriptions in SceneManager
+  auto process_result = scene_manager.ProcessSubscriptions();
+  REQUIRE(!process_result.has_value());
+
+  // Check that no scenes were loaded
+  REQUIRE(scene_manager.GetScenes().empty());
+}
+
+TEST_CASE("SceneManager::UpdateSceneManager cause scene change via subscribers",
+          "[SceneManager]") {
+  steamrot::tests::TestContext test_context;
+  steamrot::SceneManager scene_manager{test_context.GetGameContext()};
+  // Create and register a Subscriber for EventType_EVENT_CHANGE_SCENE
+  auto subscriber = std::make_shared<steamrot::Subscriber>(
+      steamrot::EventType_EVENT_CHANGE_SCENE);
+  auto register_result = scene_manager.RegisterSubscriber(subscriber);
+  if (!register_result.has_value()) {
+    FAIL("Failed to register subscriber: " + register_result.error().message);
+  }
+  // check that no scenes are loaded initially
+  REQUIRE(scene_manager.GetScenes().empty());
+  // Activate the Subscriber with SceneChangeData to load Title scene
+  steamrot::SceneChangeData scene_change_data{
+      uuids::uuid{}, steamrot::SceneType::SceneType_TITLE};
+  auto set_active_result = subscriber->SetActive();
+  if (!set_active_result.has_value()) {
+    FAIL("Failed to activate subscriber: " + set_active_result.error().message);
+  }
+  subscriber->SetEventData(scene_change_data);
+  // Call UpdateSceneManager in SceneManager
+  scene_manager.UpdateSceneManager();
+  // Check that the Title scene was loaded
+  REQUIRE(scene_manager.GetScenes().size() == 1);
+  REQUIRE(scene_manager.GetScenes().begin()->second->GetSceneInfo().type ==
+          steamrot::SceneType::SceneType_TITLE);
 }

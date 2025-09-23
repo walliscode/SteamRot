@@ -110,6 +110,12 @@ public:
   void UpdateScenes();
 
   /////////////////////////////////////////////////
+  /// @brief Container function for all other functions required for each update
+  /// cycle
+  /////////////////////////////////////////////////
+  void UpdateSceneManager();
+
+  /////////////////////////////////////////////////
   /// @brief Cause the cascade of events that will add a scene from default
   /// data.
   ///
@@ -140,6 +146,25 @@ public:
   /////////////////////////////////////////////////
   const std::unordered_map<EventType, std::shared_ptr<Subscriber>> &
   GetSubscriptions() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Loads unique scenes that run by themselves,
+  ///
+  /// @param scene_type Enum pointing to the type of scene to load
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  LoadStandAloneScene(const SceneType &scene_type);
+
+  /////////////////////////////////////////////////
+  /// @brief Go through all subscriptions, if active call relevant Logic
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> ProcessSubscriptions();
+
+  /////////////////////////////////////////////////
+  /// @brief Returns all available Scenes for inspection
+  /////////////////////////////////////////////////
+  const std::unordered_map<uuids::uuid, std::unique_ptr<Scene>> &
+  GetScenes() const;
 };
 
 } // namespace steamrot
