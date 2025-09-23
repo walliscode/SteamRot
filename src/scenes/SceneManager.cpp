@@ -1,10 +1,5 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief [TODO:description]
-/////////////////////////////////////////////////
-
-/////////////////////////////////////////////////
-/// @file
 /// @brief Implementation of the SceneManager class
 /////////////////////////////////////////////////
 
@@ -12,12 +7,14 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "SceneManager.h"
+#include "EventPacket.h"
 #include "FailInfo.h"
 #include "Scene.h"
 #include "SceneFactory.h"
 #include "Subscriber.h"
 #include "SubscriberFactory.h"
 #include "events_generated.h"
+#include "scene_types_generated.h"
 #include "uuid.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <expected>
@@ -49,6 +46,22 @@ SceneManager::ConfigureSceneManagerFromData(
     return std::unexpected(configure_result.error());
   }
   return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+const std::unordered_map<uuids::uuid, std::unique_ptr<Scene>> &
+SceneManager::GetScenes() const {
+  return m_scenes;
+}
+
+/////////////////////////////////////////////////
+void SceneManager::UpdateSceneManager() {
+
+  // process subscriptions, [TODO: handle potential failure]
+  auto process_result = ProcessSubscriptions();
+
+  // // update all scenes
+  // UpdateScenes();
 }
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
@@ -229,5 +242,70 @@ SceneManager::ConfigureSubscribersFromData(
   }
 
   return std::monostate();
+}
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+SceneManager::LoadStandAloneScene(const SceneType &scene_type) {
+  // clear existing scenes
+  m_scenes.clear();
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo> SceneManager::ProcessSubscriptions() {
+
+  for (const auto &[event_type, subscriber] : m_subscriptions) {
+
+    // only process active subscribers
+    if (subscriber->IsActive()) {
+
+      // get the event data
+      const EventData &event_data = subscriber->GetEventData();
+
+      switch (event_type) {
+      case EventType::EventType_EVENT_CHANGE_SCENE: {
+
+        // make sure the data type is correct
+        if (!std::holds_alternative<SceneChangeData>(event_data)) {
+          FailInfo fail_info(FailMode::ParameterOutOfBounds,
+                             "EventData type does not match EventType");
+          return std::unexpected(fail_info);
+        }
+        // case to SceneChangeData
+        const SceneChangeData &scene_change_data =
+            std::get<SceneChangeData>(event_data);
+
+        // check for scene type
+        switch (scene_change_data.second) {
+
+          // deal with Title Scene Loading
+        case SceneType_TITLE: {
+          auto load_scene_result = LoadTitleScene();
+          if (!load_scene_result.has_value()) {
+            return std::unexpected(load_scene_result.error());
+          }
+          break;
+        }
+
+        case SceneType_CRAFTING: {
+          auto load_scene_result = LoadCraftingScene();
+          if (!load_scene_result.has_value()) {
+            return std::unexpected(load_scene_result.error());
+          }
+          break;
+        }
+        default:
+          break;
+        }
+
+        break;
+      }
+      default:
+        break;
+      }
+    }
+  }
+  return std::monostate{};
 }
 } // namespace steamrot

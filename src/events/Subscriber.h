@@ -84,7 +84,7 @@ public:
   /////////////////////////////////////////////////
   const EventType &GetEventType() const;
 
-  EventData GetEventData() const;
+  const EventData &GetEventData() const;
 
   /////////////////////////////////////////////////
   /// @brief Copy the event data for the subscriber.
