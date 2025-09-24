@@ -179,3 +179,95 @@ TEST_CASE("GameEngine::ConfigureGameEngineFromData configures without errors",
   REQUIRE(game_engine.GetSubscriptions().size() ==
           ge_data->subscriptions()->size());
 }
+
+TEST_CASE("GameEngine::ProcessSubscribers quits game when correct Subscriber "
+          "is active",
+          "[GameEngine]") {
+  // create and pre-initialize PathProvider
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  // Create a GameEngine instance
+  steamrot::GameEngine game_engine(steamrot::EnvironmentType::Test);
+  // Create and register a Subscriber for EventType_EVENT_QUIT_GAME
+  auto subscriber = std::make_shared<steamrot::Subscriber>(
+      steamrot::EventType_EVENT_QUIT_GAME);
+  auto register_result = game_engine.RegisterSubscriber(subscriber);
+  if (!register_result.has_value()) {
+    FAIL("Failed to register subscriber: " + register_result.error().message);
+  }
+
+  // check that the window is open initially
+  REQUIRE(game_engine.GetWindow().isOpen());
+
+  // Activate the Subscriber
+  auto set_active_result = subscriber->SetActive();
+  if (!set_active_result.has_value()) {
+    FAIL("Failed to activate subscriber: " + set_active_result.error().message);
+  }
+  // Process subscriptions in GameEngine
+  auto process_subscriptions_result = game_engine.ProcessSubscriptions();
+  if (!process_subscriptions_result.has_value()) {
+    FAIL("Failed to process subscriptions: " +
+         process_subscriptions_result.error().message);
+  }
+  // check that the window is now closed
+  REQUIRE(!game_engine.GetWindow().isOpen());
+}
+
+TEST_CASE("GameEngine::RunGameLoop processes subscribers and quits game",
+          "[GameEngine]") {
+  // create and pre-initialize PathProvider
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  // Create a GameEngine instance
+  steamrot::GameEngine game_engine(steamrot::EnvironmentType::Test);
+  // Create and register a Subscriber for EventType_EVENT_QUIT_GAME
+  auto subscriber = std::make_shared<steamrot::Subscriber>(
+      steamrot::EventType_EVENT_QUIT_GAME);
+  auto register_result = game_engine.RegisterSubscriber(subscriber);
+  if (!register_result.has_value()) {
+    FAIL("Failed to register subscriber: " + register_result.error().message);
+  }
+  // check that the window is open initially
+  REQUIRE(game_engine.GetWindow().isOpen());
+  // Activate the Subscriber
+  auto set_active_result = subscriber->SetActive();
+  if (!set_active_result.has_value()) {
+    FAIL("Failed to activate subscriber: " + set_active_result.error().message);
+  }
+  // Run the game loop in simulation mode to process subscriptions
+  game_engine.RunGame(10, true);
+
+  // game should quit after 1 loop due to active quit subscriber
+  // this will be 2 loops because the loop number is incremented at the end
+  REQUIRE(game_engine.GetLoopNumber() == 2);
+}
+
+TEST_CASE("GameEngine::ProcessSubscriptions does not quit if another "
+          "subscriber type is present",
+          "[GameEngine]") {
+  // create and pre-initialize PathProvider
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  // Create a GameEngine instance
+  steamrot::GameEngine game_engine(steamrot::EnvironmentType::Test);
+  // Create and register a Subscriber for EventType_EVENT_CHANGE_SCENE
+  auto subscriber = std::make_shared<steamrot::Subscriber>(
+      steamrot::EventType_EVENT_CHANGE_SCENE);
+  auto register_result = game_engine.RegisterSubscriber(subscriber);
+  if (!register_result.has_value()) {
+    FAIL("Failed to register subscriber: " + register_result.error().message);
+  }
+  // check that the window is open initially
+  REQUIRE(game_engine.GetWindow().isOpen());
+  // Activate the Subscriber
+  auto set_active_result = subscriber->SetActive();
+  if (!set_active_result.has_value()) {
+    FAIL("Failed to activate subscriber: " + set_active_result.error().message);
+  }
+  // Process subscriptions in GameEngine
+  auto process_subscriptions_result = game_engine.ProcessSubscriptions();
+  if (!process_subscriptions_result.has_value()) {
+    FAIL("Failed to process subscriptions: " +
+         process_subscriptions_result.error().message);
+  }
+  // check that the window is still open
+  REQUIRE(game_engine.GetWindow().isOpen());
+}
