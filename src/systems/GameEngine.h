@@ -137,6 +137,16 @@ public:
   /// @brief Returns all registered subscribers for inspection
   /////////////////////////////////////////////////
   const std::vector<std::shared_ptr<Subscriber>> &GetSubscriptions() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Go through all subscriptions, if active call relevant Logic
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> ProcessSubscriptions();
+
+  /////////////////////////////////////////////////
+  /// @brief Returns a constant reference to the RenderWindow
+  /////////////////////////////////////////////////
+  const sf::RenderWindow &GetWindow() const;
 };
 
 } // namespace steamrot

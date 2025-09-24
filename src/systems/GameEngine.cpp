@@ -96,6 +96,14 @@ void GameEngine::RunGameLoop(size_t number_of_loops, bool simulation) {
       } // if the event is a close event, set the close window flag to true
     }
 
+    // Handle subscriptions
+    auto process_subscriptions_result = ProcessSubscriptions();
+    if (!process_subscriptions_result.has_value()) {
+      std::cerr << "Failed to process subscriptions: "
+                << process_subscriptions_result.error().message << "\n";
+      m_window.close();
+    }
+
     // Handle all system updates
     UpdateSystems();
 
@@ -111,7 +119,7 @@ void GameEngine::RunGameLoop(size_t number_of_loops, bool simulation) {
 ////////////////////////////////////////////////////////////
 void GameEngine::UpdateSystems() {
   // Update Scenes
-  m_scene_manager.UpdateScenes();
+  m_scene_manager.UpdateSceneManager();
 
   // Call Render Cycle
   auto call_render_cycle_result = m_display_manager.CallRenderCycle();
@@ -174,5 +182,34 @@ const std::vector<std::shared_ptr<Subscriber>> &
 GameEngine::GetSubscriptions() const {
   return m_subscriptions;
 };
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo> GameEngine::ProcessSubscriptions() {
+
+  // cycle through all subscribers and process active ones
+  for (const auto &subscriber : m_subscriptions) {
+    // only process active subscribers
+    if (subscriber->IsActive()) {
+
+      // get the event data
+      const EventData &event_data = subscriber->GetEventData();
+
+      // switch on the EventType
+      switch (subscriber->GetEventType()) {
+      case EventType::EventType_EVENT_QUIT_GAME: {
+        // close the window to quit the game
+        m_window.close();
+        break;
+      }
+      default:
+        break;
+      }
+    }
+  }
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+const sf::RenderWindow &GameEngine::GetWindow() const { return m_window; }
 
 } // namespace steamrot

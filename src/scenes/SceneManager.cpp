@@ -60,8 +60,8 @@ void SceneManager::UpdateSceneManager() {
   // process subscriptions, [TODO: handle potential failure]
   auto process_result = ProcessSubscriptions();
 
-  // // update all scenes
-  // UpdateScenes();
+  // update all scenes
+  UpdateScenes();
 }
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
