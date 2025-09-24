@@ -10,7 +10,13 @@
 #include "DisplayManager.h"
 #include "EventHandler.h"
 #include "SceneManager.h"
+#include "Subscriber.h"
+#include "game_engine_generated.h"
 #include <SFML/Graphics.hpp>
+#include <expected>
+#include <memory>
+#include <variant>
+#include <vector>
 
 namespace steamrot {
 /////////////////////////////////////////////////
@@ -81,6 +87,8 @@ private:
 
   void UpdateLocalMousePosition();
 
+  std::vector<std::shared_ptr<Subscriber>> m_subscriptions;
+
 public:
   /////////////////////////////////////////////////
   /// @brief Constructor for the GameEngine class
@@ -88,6 +96,15 @@ public:
   /// @param env_type Environment type with which to initialize the engine
   /////////////////////////////////////////////////
   GameEngine(const EnvironmentType env_type = EnvironmentType::None);
+
+  /////////////////////////////////////////////////
+  /// @brief Container function to configure the GameEngine from flatbuffers
+  /// data
+  ///
+  /// @param game_engine_data Flatbuffers GameEngineData object to configure
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ConfigureGameEngineFromData(const GameEngineData *game_engine_data);
 
   /////////////////////////////////////////////////
   /// @brief Runs the game loop, either indefinitely or for a set number of
@@ -100,6 +117,26 @@ public:
   ///
   ////////////////////////////////////////////////////////////
   size_t GetLoopNumber() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Add the Subscriber to the subscriptions vector.
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+      RegisterSubscriber(std::shared_ptr<Subscriber>);
+
+  /////////////////////////////////////////////////
+  /// @brief Configure subscribers from flatbuffers data
+  ///
+  /// @param subscriptions Flatbuffers vector of SubscriberData objects
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> ConfigureSubscribersFromData(
+      const ::flatbuffers::Vector<
+          ::flatbuffers::Offset<steamrot::SubscriberData>> *subscriptions);
+
+  /////////////////////////////////////////////////
+  /// @brief Returns all registered subscribers for inspection
+  /////////////////////////////////////////////////
+  const std::vector<std::shared_ptr<Subscriber>> &GetSubscriptions() const;
 };
 
 } // namespace steamrot
