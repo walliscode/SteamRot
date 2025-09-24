@@ -8,37 +8,26 @@
 /////////////////////////////////////////////////
 #include "FailInfo.h"
 #include "FlatbuffersDataLoader.h"
+#include "PathProvider.h"
 #include "fragments_generated.h"
 #include <catch2/catch_test_macros.hpp>
 #include <magic_enum/magic_enum.hpp>
 
-TEST_CASE("Dataloader fails to initiate PathProvider", "[DataLoader]") {
-  REQUIRE_THROWS(
-      steamrot::FlatbuffersDataLoader{steamrot::EnvironmentType::None});
-}
+TEST_CASE("DataLoader fails if PathProvider is not initiated", "[DataLoader]") {
 
-TEST_CASE("DataLoader can be initiated with a valid environment",
-          "[DataLoader]") {
-  REQUIRE_NOTHROW(
-      steamrot::FlatbuffersDataLoader{steamrot::EnvironmentType::Test});
+  REQUIRE_THROWS(steamrot::FlatbuffersDataLoader{});
 }
-
-TEST_CASE("DataLoader can be called with a None environment after being set",
-          "[DataLoader]") {
-  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+TEST_CASE("DataLoader succeeds if PathProvider is initiated", "[DataLoader]") {
+  // init PathProvider
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
   REQUIRE_NOTHROW(steamrot::FlatbuffersDataLoader{});
-}
-
-TEST_CASE("DataLoader can only initiate PathProvider once", "[DataLoader]") {
-  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
-  REQUIRE_THROWS(
-      steamrot::FlatbuffersDataLoader{steamrot::EnvironmentType::Production});
 }
 
 TEST_CASE("FlatbuffersDataLoader returns unexpected when non-existent fragment "
           "is provided",
           "[FlatbuffersDataLoader]") {
-  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
   auto result = data_loader.ProvideFragment("non_existent_fragment");
   REQUIRE(result.has_value() == false);
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
@@ -51,7 +40,9 @@ TEST_CASE("FlatbuffersDataLoader returns unexpected when non-existent fragment "
 TEST_CASE("FlatbuffersDataLoader returns unexpected when fragment data has not "
           "socket data vertices",
           "[FlatbuffersDataLoader]") {
-  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
   auto result =
       data_loader.ProvideFragment("invalid_fragment_no_socket_data_vertices");
   REQUIRE(result.has_value() == false);
@@ -62,7 +53,9 @@ TEST_CASE("FlatbuffersDataLoader returns unexpected when fragment data has not "
 TEST_CASE("FlatbuffersDataLoader returns unexpected when fragment data has "
           "invalid socket data vertices",
           "[FlatbuffersDataLoader]") {
-  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
   auto result = data_loader.ProvideFragment("missing_vertices_x");
   REQUIRE(result.has_value() == false);
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
@@ -73,7 +66,9 @@ TEST_CASE("FlatbuffersDataLoader returns unexpected when fragment data has "
 TEST_CASE("FlatbuffersDataLoader returns unexpected when fragment data has "
           "no views",
           "[FlatbuffersDataLoader]") {
-  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
   auto result = data_loader.ProvideFragment("missing_render_views");
   REQUIRE(result.has_value() == false);
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
@@ -83,7 +78,9 @@ TEST_CASE("FlatbuffersDataLoader returns unexpected when fragment data has "
 TEST_CASE(
     "FlatbuffersDataLoader returns unexpected when a view has no triangles",
     "[FlatbuffersDataLoader]") {
-  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
   auto result = data_loader.ProvideFragment("missing_view_triangles");
   REQUIRE(result.has_value() == false);
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
@@ -93,7 +90,9 @@ TEST_CASE(
 TEST_CASE("FlatbuffersDataLoader returns unexpected when fragment triangles "
           "have zero vertices",
           "[FlatbuffersDataLoader]") {
-  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
   auto result = data_loader.ProvideFragment("missing_triangle_vertices");
   REQUIRE(result.has_value() == false);
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
@@ -102,7 +101,8 @@ TEST_CASE("FlatbuffersDataLoader returns unexpected when fragment triangles "
 
 TEST_CASE("FlatbuffersDataLoader returns unexpected when view has no direction",
           "[FlatbuffersDataLoader]") {
-  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
   auto result = data_loader.ProvideFragment("missing_view_direction");
   REQUIRE(result.has_value() == false);
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
@@ -111,7 +111,8 @@ TEST_CASE("FlatbuffersDataLoader returns unexpected when view has no direction",
 
 TEST_CASE("Fragment data provided with correct values",
           "[FlatbuffersDataLoader]") {
-  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
   auto result = data_loader.ProvideFragment("valid_fragment");
   if (!result.has_value()) {
     std::string error_message = result.error().message.empty()
@@ -144,7 +145,8 @@ TEST_CASE("Fragment data provided with correct values",
 
 TEST_CASE("FlatbuffersDataLoader returns error when fragments do not exist",
           "[FlatbuffersDataLoader]") {
-  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
   auto result = data_loader.ProvideAllFragments({"non_existent_fragment"});
   REQUIRE(result.has_value() == false);
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
@@ -156,7 +158,8 @@ TEST_CASE("FlatbuffersDataLoader returns error when fragments do not exist",
 
 TEST_CASE("FlatbuffersDataLoader returns all fragments",
           "[FlatbuffersDataLoader]") {
-  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
   auto result = data_loader.ProvideAllFragments({"valid_fragment"});
   REQUIRE(result.has_value() == true);
   REQUIRE(result.value().size() == 1);
@@ -172,7 +175,8 @@ TEST_CASE("FlatbuffersDataLoader returns all fragments",
 
 TEST_CASE("FlatbuffersDataLoader provides scene data",
           "[FlatbuffersDataLoader]") {
-  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
   auto result =
       data_loader.ProvideSceneData(steamrot::SceneType::SceneType_TEST);
   REQUIRE(result.has_value() == true);
@@ -182,7 +186,8 @@ TEST_CASE("FlatbuffersDataLoader provides scene data",
 }
 TEST_CASE("FlatbuffersDataLoader::ProvideAssetData returns default data",
           "[FlatbuffersDataLoader]") {
-  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
   auto result = data_loader.ProvideAssetData();
   if (!result.has_value()) {
     FAIL(result.error().message);
@@ -193,7 +198,8 @@ TEST_CASE("FlatbuffersDataLoader::ProvideAssetData returns default data",
 
 TEST_CASE("FlatbuffersDataLoader provides asset data from test scene",
           "[FlatbuffersDataLoader]") {
-  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
   auto result =
       data_loader.ProvideAssetData(steamrot::SceneType::SceneType_TEST);
 
@@ -206,7 +212,8 @@ TEST_CASE("FlatbuffersDataLoader provides asset data from test scene",
 
 TEST_CASE("FlatbuffersDataLoader provides ui_styles data",
           "[FlatbuffersDataLoader]") {
-  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
   auto result = data_loader.ProvideUIStylesData("default");
   if (!result.has_value()) {
     FAIL(result.error().message);
@@ -216,7 +223,8 @@ TEST_CASE("FlatbuffersDataLoader provides ui_styles data",
 
 TEST_CASE("FlatbuffersDataLoader provides scene_manager data",
           "[FlatbuffersDataLoader]") {
-  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
   auto result = data_loader.ProvideSceneManagerData();
   REQUIRE(result.has_value());
   ;

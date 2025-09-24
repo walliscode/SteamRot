@@ -7,6 +7,7 @@ int main() {
 
   // wrap the whole game engine in a try-catch block to catch any exceptions
   try {
+    steamrot::PathProvider path_provider{steamrot::EnvironmentType::Production};
     steamrot::GameEngine steam_rot(steamrot::EnvironmentType::Production);
     steam_rot.RunGame();
 

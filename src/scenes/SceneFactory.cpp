@@ -69,18 +69,23 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type) {
 
     return std::unexpected(fail_info);
   }
+  std::cout << "Scene of type " << static_cast<int>(scene_type)
+            << " created with UUID: " << scene_ptr->GetSceneInfo().id
+            << std::endl;
   // configure scene entities from default data
   auto configure_result = scene_ptr->ConfigureFromDefault();
   if (!configure_result) {
     return std::unexpected(configure_result.error());
   }
-
+  std::cout << "Entities configured for scene UUID: "
+            << scene_ptr->GetSceneInfo().id << std::endl;
   // Get ArchetypeManager to gerenate all archetypes
   auto archetype_result = scene_ptr->m_entity_manager.GenerateAllArchetypes();
   if (!archetype_result) {
     return std::unexpected(archetype_result.error());
   }
-
+  std::cout << "Archetypes generated for scene UUID: "
+            << scene_ptr->GetSceneInfo().id << std::endl;
   // configure LogicMap
   LogicFactory logic_factory(scene_type, scene_ptr->GetLogicContext());
   auto create_map_result = logic_factory.CreateLogicMap();

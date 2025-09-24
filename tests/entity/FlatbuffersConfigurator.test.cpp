@@ -18,6 +18,7 @@
 TEST_CASE("Data is configured correctly from default data",
           "[FlatbuffersConfigurator]") {
 
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
   // Set up EntityMemoryPool objects here so they outlive GENERATE
   size_t pool_size{100};
   steamrot::EntityMemoryPool entity_memory_pool_one;
@@ -37,7 +38,6 @@ TEST_CASE("Data is configured correctly from default data",
   steamrot::tests::TestContext text_context;
   // Create configurator with test environment
   steamrot::FlatbuffersConfigurator configurator{
-      steamrot::EnvironmentType::Test,
       text_context.GetGameContext().event_handler};
 
   auto result = configurator.ConfigureEntitiesFromDefaultData(

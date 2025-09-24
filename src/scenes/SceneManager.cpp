@@ -72,7 +72,6 @@ SceneManager::AddSceneFromDefault(const SceneType &scene_type) {
 
   auto scene_creation_result = scene_factory.CreateDefaultScene(scene_type);
   if (!scene_creation_result.has_value()) {
-
     return std::unexpected(scene_creation_result.error());
   }
   // add to m_scenes maps
@@ -104,7 +103,6 @@ std::expected<uuids::uuid, FailInfo> SceneManager::LoadTitleScene() {
   m_scenes.clear();
 
   // create title scene
-
   auto title_result = AddSceneFromDefault(SceneType::SceneType_TITLE);
   if (!title_result.has_value())
     return std::unexpected(title_result.error());

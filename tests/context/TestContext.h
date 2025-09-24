@@ -12,7 +12,6 @@
 #include "EventHandler.h"
 #include "GameContext.h"
 #include "LogicContext.h"
-#include "PathProvider.h"
 #include "containers.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>

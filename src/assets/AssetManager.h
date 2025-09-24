@@ -12,7 +12,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FailInfo.h"
-
 #include "PathProvider.h"
 #include "UIStyle.h"
 #include "scene_types_generated.h"
@@ -53,13 +52,9 @@ private:
 
 public:
   /////////////////////////////////////////////////
-  /// @brief Constructor taking an EnvironmentType parameter for setting up
-  /// PathProvider.
-  ///
-  /// @param env_type Enum representing the environment type (e.g., development,
-  /// production).
+  /// @brief Default constructor
   /////////////////////////////////////////////////
-  AssetManager(const EnvironmentType &env_type = EnvironmentType::None);
+  AssetManager() = default;
 
   /////////////////////////////////////////////////
   /// @brief Load all the default assets for the game, independent of scene

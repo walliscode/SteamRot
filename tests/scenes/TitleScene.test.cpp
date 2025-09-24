@@ -14,6 +14,7 @@
 TEST_CASE("TitleScene's call of sRender is correct", "[TitleScene]") {
 
   // arrange
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
   steamrot::SceneFactory scene_factory(test_context.GetGameContext());
 

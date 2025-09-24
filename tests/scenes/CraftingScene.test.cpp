@@ -13,6 +13,7 @@
 
 TEST_CASE("CraftingScene's call to sRender is correct", "[CraftingScene]") {
   // arrange
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
   steamrot::SceneFactory scene_factory(test_context.GetGameContext());
   // create a CraftingScene

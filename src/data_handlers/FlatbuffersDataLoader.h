@@ -25,11 +25,9 @@ class FlatbuffersDataLoader : public DataLoader {
 
 public:
   /////////////////////////////////////////////////
-  /// @brief Constructor for FlatbuffersDataLoader taking an EnvironmentType
-  ///
-  /// @param env_type Enumeration representing the environment type
+  /// @brief Default constructor for FlatbuffersDataLoader
   /////////////////////////////////////////////////
-  FlatbuffersDataLoader(const EnvironmentType env_type = EnvironmentType::None);
+  FlatbuffersDataLoader() = default;
 
   /////////////////////////////////////////////////
   /// @brief Provides Fragment object based on the fragment name

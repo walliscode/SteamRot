@@ -61,14 +61,14 @@ void EntityManager::ResizeEntityMemoryPool(const size_t pool_size) {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-EntityManager::ConfigureEntitiesFromDefaultData(const SceneType scene_type,
-                                                const EnvironmentType env_type,
-                                                const DataType data_type) {
+EntityManager::ConfigureEntitiesFromDefaultData(
+    const SceneType scene_type, const DataType data_type,
+    const EnvironmentType env_type) {
 
   switch (data_type) {
   case DataType::Flatbuffers: {
 
-    FlatbuffersConfigurator configurator{env_type, m_event_handler};
+    FlatbuffersConfigurator configurator{m_event_handler};
     auto configure_result = configurator.ConfigureEntitiesFromDefaultData(
         m_entity_memory_pool, scene_type);
     if (!configure_result.has_value())

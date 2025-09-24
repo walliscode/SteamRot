@@ -19,9 +19,6 @@
 #include <expected>
 
 namespace steamrot {
-/////////////////////////////////////////////////
-FlatbuffersDataLoader::FlatbuffersDataLoader(const EnvironmentType env_type)
-    : DataLoader(env_type) {}
 
 /////////////////////////////////////////////////
 std::expected<Fragment, FailInfo>
@@ -248,6 +245,7 @@ FlatbuffersDataLoader::ProvideAssetData() const {
 /////////////////////////////////////////////////
 std::expected<const AssetCollection *, FailInfo>
 FlatbuffersDataLoader::ProvideAssetData(const SceneType scene_type) const {
+
   // get scene data
   auto scene_data_result = ProvideSceneData(scene_type);
   if (!scene_data_result.has_value()) {

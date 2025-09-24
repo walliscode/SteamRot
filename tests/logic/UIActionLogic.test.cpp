@@ -19,6 +19,7 @@
 
 TEST_CASE("UIActionLogic::UIActionLogic Constructor", "[UIActionLogic]") {
   // Create a dummy LogicContext
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
   // Instantiate UIActionLogic
   steamrot::UIActionLogic ui_action_logic(
@@ -30,6 +31,7 @@ TEST_CASE(
     "UIActionLogic fails to process button click for EventType_EVENT_QUIT_GAME",
     "[UIActionLogic]") {
   // arrange the UIActionLogic
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
   steamrot::UIActionLogic ui_action_logic(
       test_context.GetLogicContextForTestScene());
@@ -72,6 +74,7 @@ TEST_CASE("UIActionLogic adds Event to EventBus for ButtonElement with a "
           "[UIActionLogic]") {
 
   // arrange the UIActionLogic
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
   steamrot::UIActionLogic ui_action_logic(
       test_context.GetLogicContextForTestScene());
@@ -114,6 +117,7 @@ TEST_CASE(
     "[UIActionLogic][Negative][UnrelatedEvent]") {
 
   // Arrange the UIActionLogic
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
   steamrot::UIActionLogic ui_action_logic(
       test_context.GetLogicContextForTestScene());
@@ -193,6 +197,7 @@ TEST_CASE("UIActionLogic checks subscription before adding Event to EventBus "
           "[UIActionLogic]") {
 
   // arrange the UIActionLogic
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
   steamrot::UIActionLogic ui_action_logic(
       test_context.GetLogicContextForTestScene());
