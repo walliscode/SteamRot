@@ -1,0 +1,9 @@
+include "subscriber_config.fbs";
+
+namespace steamrot; 
+
+table GameEngineData {
+subscriptions: [SubscriberData];
+  }
+
+root_type GameEngineData;

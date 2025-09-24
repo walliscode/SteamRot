@@ -15,6 +15,7 @@ set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/subscriber_config.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/event_packet_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/scene_manager.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/game_engine.fbs
 
 
 

@@ -134,6 +134,29 @@ FlatbuffersDataLoader::ProvideAllFragments(
 }
 
 /////////////////////////////////////////////////
+std::expected<const GameEngineData *, FailInfo>
+FlatbuffersDataLoader::ProvideGameEngineData() const {
+  // get data directory
+  auto data_dir_result = m_path_provider.GetDataDirectory();
+  if (!data_dir_result.has_value()) {
+    return std::unexpected(data_dir_result.error());
+  }
+  // construct the file path
+  std::filesystem::path game_engine_path =
+      data_dir_result.value() / "game_engine" / "game_engine.bin";
+  // check if the file exists
+  if (!std::filesystem::exists(game_engine_path)) {
+    std::string error_message = std::format("Game Engine file not found: {}",
+                                            game_engine_path.string());
+    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
+  }
+  // load the game engine data
+  const steamrot::GameEngineData *game_engine_data =
+      GetGameEngineData(LoadBinaryData(game_engine_path));
+  return game_engine_data;
+}
+
+/////////////////////////////////////////////////
 std::expected<const SceneManagerData *, FailInfo>
 FlatbuffersDataLoader::ProvideSceneManagerData() const {
   // get data directory

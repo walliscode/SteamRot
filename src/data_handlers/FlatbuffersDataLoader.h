@@ -12,6 +12,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "DataLoader.h"
+#include "FailInfo.h"
+#include "game_engine_generated.h"
 #include "scene_manager_generated.h"
 #include "scene_types_generated.h"
 #include "scenes_generated.h"
@@ -46,6 +48,11 @@ public:
   /////////////////////////////////////////////////
   std::expected<std::map<std::string, Fragment>, FailInfo>
   ProvideAllFragments(std::vector<std::string> fragment_names) const override;
+
+  /////////////////////////////////////////////////
+  /// @brief Provides GameEngineData from binary file
+  /////////////////////////////////////////////////
+  std::expected<const GameEngineData *, FailInfo> ProvideGameEngineData() const;
 
   /////////////////////////////////////////////////
   /// @brief Provides SceneManagerData from binary file

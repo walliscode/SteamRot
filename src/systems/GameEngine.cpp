@@ -3,10 +3,15 @@
 ////////////////////////////////////////////////////////////
 
 #include "GameEngine.h"
+#include "FailInfo.h"
+#include "SubscriberFactory.h"
 #include <SFML/Graphics.hpp>
 
 #include <cstddef>
+#include <expected>
 #include <iostream>
+#include <variant>
+#include <vector>
 
 namespace steamrot {
 
@@ -18,6 +23,22 @@ GameEngine::GameEngine(EnvironmentType env_type)
                                   m_asset_manager, env_type}),
       m_display_manager(m_window, m_scene_manager) {}
 
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo> GameEngine::ConfigureGameEngineFromData(
+    const GameEngineData *game_engine_data) {
+  if (!game_engine_data) {
+    FailInfo fail_info(FailMode::NullPointer,
+                       "GameEngineData is a null pointer");
+    return std::unexpected(fail_info);
+  }
+  // configure Subscribers from data
+  auto configure_result =
+      ConfigureSubscribersFromData(game_engine_data->subscriptions());
+  if (!configure_result.has_value()) {
+    return std::unexpected(configure_result.error());
+  }
+  return std::monostate{};
+}
 ////////////////////////////////////////////////////////////
 void GameEngine::RunGame(size_t number_of_loops, bool simulation) {
 
@@ -74,12 +95,16 @@ void GameEngine::RunGameLoop(size_t number_of_loops, bool simulation) {
           m_window.close();
       } // if the event is a close event, set the close window flag to true
     }
+
     // Handle all system updates
     UpdateSystems();
 
     // statement to handle simulation mode
     if (simulation && (number_of_loops == m_loop_number))
       break;
+
+    // Increment the loop counter
+    m_loop_number++;
   }
 }
 
@@ -97,5 +122,57 @@ size_t GameEngine::GetLoopNumber() const { return m_loop_number; }
 
 ////////////////////////////////////////////////////////////
 void GameEngine::ShutDown() {}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+GameEngine::RegisterSubscriber(std::shared_ptr<Subscriber> subscriber) {
+  // add in guard statements and potential fail modes
+  if (!subscriber) {
+    FailInfo fail_info(FailMode::NullPointer, "Subscriber is a null pointer");
+    return std::unexpected(fail_info);
+  }
+
+  // add the subscriber to the vector
+  m_subscriptions.push_back(subscriber);
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+GameEngine::ConfigureSubscribersFromData(
+    const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>>
+        *subscriptions) {
+
+  if (!subscriptions) {
+    FailInfo fail_info(FailMode::NullPointer,
+                       "Subscriptions data is a null pointer");
+    return std::unexpected(fail_info);
+  }
+
+  // set up SubscriberFactory
+  SubscriberFactory subscriber_factory(m_event_handler);
+  // loop through the SubscriberData and create subscribers and register them
+  for (const auto &subscription : *subscriptions) {
+
+    // create and register subscriber with EventHandler
+    auto create_result = subscriber_factory.CreateAndRegisterSubscriber(
+        subscription->event_type_data());
+    if (!create_result.has_value()) {
+      return std::unexpected(create_result.error());
+    }
+    // register produced Subscriber with SceneManager
+    auto register_result = RegisterSubscriber(create_result.value());
+    if (!register_result.has_value()) {
+      return std::unexpected(register_result.error());
+    }
+  }
+  return std::monostate{};
+}
+/////////////////////////////////////////////////
+const std::vector<std::shared_ptr<Subscriber>> &
+GameEngine::GetSubscriptions() const {
+  return m_subscriptions;
+};
 
 } // namespace steamrot

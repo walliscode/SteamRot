@@ -26,15 +26,6 @@ TEST_CASE("SceneManager is constructed without any errors", "[SceneManager]") {
           .GetGameContext(); // Get the game context from the test context
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
   REQUIRE_NOTHROW(scene_manager);
-
-  // test number of subscriptions
-  steamrot::FlatbuffersDataLoader data_loader;
-  auto load_sm_data_result = data_loader.ProvideSceneManagerData();
-  if (!load_sm_data_result.has_value()) {
-    FAIL("Failed to load SceneManager data: " +
-         load_sm_data_result.error().message);
-  }
-  const steamrot::SceneManagerData *sm_data = load_sm_data_result.value();
 }
 
 TEST_CASE("SceneManager::RegistersSubscriber  adds a subscriber",
