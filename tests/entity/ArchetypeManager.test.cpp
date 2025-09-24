@@ -28,6 +28,7 @@ TEST_CASE("ArchetypeManager archetype map is empty with a non configured EMP",
           "[ArchetypeManager]") {
 
   // create text context
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
   steamrot::tests::TestContext test_context;
   // create an instance of the entity manager but don't configure it
   steamrot::EntityManager entity_manager{
@@ -54,6 +55,7 @@ TEST_CASE("ArchetypeManager archetype map is empty with a non configured EMP",
 TEST_CASE("ArchetypeManager generates archetype IDs correctly",
           "[ArchetypeManager]") {
   // create test context
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
   steamrot::tests::TestContext test_context;
   // create an instance of the entity manager and configure it
   steamrot::EntityManager entity_manager{
@@ -66,8 +68,7 @@ TEST_CASE("ArchetypeManager generates archetype IDs correctly",
 
   // configure the entity memory pool and then generate archetypes
   auto configure_result = entity_manager.ConfigureEntitiesFromDefaultData(
-      steamrot::SceneType_TEST, steamrot::EnvironmentType::Test,
-      steamrot::DataType::Flatbuffers);
+      steamrot::SceneType_TEST, steamrot::DataType::Flatbuffers);
   if (!configure_result.has_value())
     FAIL(configure_result.error().message);
 

@@ -24,10 +24,11 @@ TEST_CASE("StylesConfigurator ConfigureStyle returns expected result for "
           "default style (all fields checked)",
           "[StylesConfigurator][Fields]") {
 
-  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::FlatbuffersDataLoader data_loader;
   steamrot::StylesConfigurator styles_configurator;
 
-  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
+  steamrot::AssetManager asset_manager;
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result)
     FAIL(load_default_assets_result.error().message);
@@ -189,9 +190,10 @@ TEST_CASE("StylesConfigurator ConfigureStyle returns expected result for "
 TEST_CASE("StylesConfigurator returns a map of all available styles",
           "[StylesConfigurator]") {
   // Arrange
-  steamrot::FlatbuffersDataLoader data_loader{steamrot::EnvironmentType::Test};
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::FlatbuffersDataLoader data_loader;
   steamrot::StylesConfigurator styles_configurator;
-  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
+  steamrot::AssetManager asset_manager;
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result)
     FAIL(load_default_assets_result.error().message);

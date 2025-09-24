@@ -62,8 +62,12 @@ private:
                      CGrimoireMachina &grimoire_component);
 
 public:
-  FlatbuffersConfigurator(const EnvironmentType env_type,
-                          EventHandler &event_handler);
+  /////////////////////////////////////////////////
+  /// @brief Constructor for FlatbuffersConfigurator
+  ///
+  /// @param event_handler Gamewide EventHandler reference
+  /////////////////////////////////////////////////
+  FlatbuffersConfigurator(EventHandler &event_handler);
 
   /////////////////////////////////////////////////
   /// @brief Configure the default entities based on the SceneType

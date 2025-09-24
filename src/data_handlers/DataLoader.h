@@ -51,15 +51,23 @@ public:
   virtual ~DataLoader() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Constructor for DataLoader taking an environment type
-  ///
-  /// @param env_type [TODO:parameter]
+  /// @brief Default constructor
   /////////////////////////////////////////////////
-  DataLoader(const EnvironmentType env_type = EnvironmentType::None);
+  DataLoader() = default;
 
+  /////////////////////////////////////////////////
+  /// @brief Provide a Fragment object given its name
+  ///
+  /// @param fragment_name String name of the fragment to be loaded
+  /////////////////////////////////////////////////
   virtual std::expected<Fragment, FailInfo>
   ProvideFragment(const std::string &fragment_name) const = 0;
 
+  /////////////////////////////////////////////////
+  /// @brief Give a list of fragment names, provide a map of Fragment objects
+  ///
+  /// @param fragment_names Fragment names to be loaded
+  /////////////////////////////////////////////////
   virtual std::expected<std::map<std::string, Fragment>, FailInfo>
   ProvideAllFragments(std::vector<std::string> fragment_names) const = 0;
 };

@@ -119,10 +119,9 @@ public:
   /// @param scene_type SceneType to configure entities for
   /// @param data_type DataType to configure entities from
   /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  ConfigureEntitiesFromDefaultData(const SceneType scene_type,
-                                   const EnvironmentType env_type,
-                                   const DataType data_type);
+  std::expected<std::monostate, FailInfo> ConfigureEntitiesFromDefaultData(
+      const SceneType scene_type, const DataType data_type,
+      const EnvironmentType env_type = EnvironmentType::None);
 
   /////////////////////////////////////////////////
   /// @brief Calls the ArchetypeManager to generate all archetypes from the

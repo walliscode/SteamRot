@@ -87,7 +87,7 @@ public:
   ///
   /// @param env_type Environment type with which to initialize the engine
   /////////////////////////////////////////////////
-  GameEngine(const EnvironmentType env_type = EnvironmentType::Production);
+  GameEngine(const EnvironmentType env_type = EnvironmentType::None);
 
   /////////////////////////////////////////////////
   /// @brief Runs the game loop, either indefinitely or for a set number of

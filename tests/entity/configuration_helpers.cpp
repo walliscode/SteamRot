@@ -91,7 +91,7 @@ void CompareToData(const CGrimoireMachina &actual,
 void TestConfigurationOfEMPfromDefaultData(
     const EntityMemoryPool &entity_memory_pool, const SceneType scene_type) {
 
-  FlatbuffersDataLoader flatbuffers_data_loader(EnvironmentType::Test);
+  FlatbuffersDataLoader flatbuffers_data_loader;
 
   // get default scene data
   auto scene_data_result = flatbuffers_data_loader.ProvideSceneData(scene_type);
@@ -149,7 +149,7 @@ void TestArchetypesOfConfiguredEMPfromDefaultData(
     const SceneType scene_type) {
 
   // load the scene data
-  FlatbuffersDataLoader flatbuffers_data_loader(EnvironmentType::Test);
+  FlatbuffersDataLoader flatbuffers_data_loader;
   const SceneData &scene_data =
       *flatbuffers_data_loader.ProvideSceneData(scene_type).value();
   const EntityCollection &entity_collection = *scene_data.entity_collection();

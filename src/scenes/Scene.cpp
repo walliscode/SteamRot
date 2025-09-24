@@ -42,7 +42,7 @@ Scene::ConfigureFromDefault(const DataType &data_type) {
 
   // configure the entity memory pool
   auto emp_configure_result = m_entity_manager.ConfigureEntitiesFromDefaultData(
-      m_scene_info.type, m_game_context.env_type, data_type);
+      m_scene_info.type, data_type);
   if (!emp_configure_result)
     return std::unexpected(emp_configure_result.error());
 

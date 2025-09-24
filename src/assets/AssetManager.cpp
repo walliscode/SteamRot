@@ -16,18 +16,11 @@
 #include <expected>
 #include <filesystem>
 #include <format>
-#include <iostream>
 #include <memory>
 #include <string>
 #include <variant>
 
 namespace steamrot {
-
-/////////////////////////////////////////////////
-AssetManager::AssetManager(const EnvironmentType &env_type)
-    : m_path_provider(env_type) {
-
-      };
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> AssetManager::LoadDefaultAssets() {
@@ -86,7 +79,7 @@ AssetManager::LoadSceneAssets(const SceneType &scene_type) {
   auto asset_config_result = fb_data_loader.ProvideAssetData(scene_type);
   if (!asset_config_result.has_value())
     return std::unexpected<FailInfo>(asset_config_result.error());
-  std::cout << "Asset configuration data loaded" << std::endl;
+
   const AssetCollection *asset_config = asset_config_result.value();
 
   // return early if no data is in the AssetCollection

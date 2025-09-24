@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "DisplayManager.h"
+#include "PathProvider.h"
 #include "SceneManager.h"
 #include "TestContext.h"
 #include <catch2/catch_test_macros.hpp>
@@ -14,6 +15,7 @@
 
 TEST_CASE("DisplayManager Initializes with SceneManager", "[DisplayManager]") {
 
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
   steamrot::tests::TestContext test_context;
   std::cout << "TestContext initialized successfully" << std::endl;
   steamrot::GameContext &game_context =
@@ -29,6 +31,7 @@ TEST_CASE("DisplayManager Initializes with SceneManager", "[DisplayManager]") {
 }
 
 TEST_CASE("DisplayManager Render Cycle", "[DisplayManager]") {
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
   steamrot::tests::TestContext test_context;
   steamrot::GameContext game_context =
       test_context

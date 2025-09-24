@@ -17,6 +17,7 @@
 TEST_CASE("UICollisionLogic::UICollisionLogic Constructor",
           "[UICollisionLogic]") {
   // Create a dummy LogicContext
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
   // Instantiate UICollisionLogic
   steamrot::UICollisionLogic ui_collision_logic(
@@ -28,6 +29,7 @@ TEST_CASE("UICollisionLogic::RunLogic changes is_mouse_over to true if mouse "
           "over element"
           "[UICollisionLogic]") {
   // Create a dummy LogicContext
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
 
   // pull out the LogicContext and GameContext references

@@ -18,8 +18,7 @@ namespace steamrot::tests {
 /////////////////////////////////////////////////
 TestContext::TestContext(const SceneType scene_type)
     : render_window(sf::VideoMode({900, 600}), "SteamRot Test Window"),
-      event_handler(), asset_manager(EnvironmentType::Test),
-      archetype_manager(scene_entities) {
+      event_handler(), archetype_manager(scene_entities) {
 
   // load default assets into the asset manager
   auto load_result = asset_manager.LoadDefaultAssets();
@@ -98,7 +97,7 @@ void TestContext::ConfigureGameContext() {
 /////////////////////////////////////////////////
 void TestContext::ConfigureLogicContextForTestScene() {
   // Configure the EntityMemoryPool for the test scene
-  FlatbuffersConfigurator configurator(EnvironmentType::Test, event_handler);
+  FlatbuffersConfigurator configurator(event_handler);
 
   std::cout << "Configuring entities for Test Scene" << std::endl;
   auto configure_result = configurator.ConfigureEntitiesFromDefaultData(
@@ -127,7 +126,7 @@ void TestContext::ConfigureLogicContextForTestScene() {
 /////////////////////////////////////////////////
 void TestContext::ConfigureLogicContextForTitleScene() {
   // Configure the EntityMemoryPool for the title scene
-  FlatbuffersConfigurator configurator(EnvironmentType::Test, event_handler);
+  FlatbuffersConfigurator configurator(event_handler);
   auto configure_result = configurator.ConfigureEntitiesFromDefaultData(
       scene_entities, SceneType::SceneType_TITLE);
   // check the configuration was successful
@@ -153,7 +152,7 @@ void TestContext::ConfigureLogicContextForTitleScene() {
 /////////////////////////////////////////////////
 void TestContext::ConfigureLogicContextForCraftingScene() {
   // Configure the EntityMemoryPool for the crafting scene
-  FlatbuffersConfigurator configurator(EnvironmentType::Test, event_handler);
+  FlatbuffersConfigurator configurator(event_handler);
   auto configure_result = configurator.ConfigureEntitiesFromDefaultData(
       scene_entities, SceneType::SceneType_CRAFTING);
   // check the configuration was successful

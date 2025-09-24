@@ -16,6 +16,7 @@ TEST_CASE("EntityManager calls configurator with no errors",
           "[EntityManager]") {
 
   // create text context
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
   steamrot::tests::TestContext test_context;
   steamrot::EntityManager entity_manager{
       test_context.GetGameContext().event_handler};
@@ -26,8 +27,7 @@ TEST_CASE("EntityManager calls configurator with no errors",
 
   // configure entities from default data
   auto result = entity_manager.ConfigureEntitiesFromDefaultData(
-      steamrot::SceneType::SceneType_TEST, steamrot::EnvironmentType::Test,
-      steamrot::DataType::Flatbuffers);
+      steamrot::SceneType::SceneType_TEST, steamrot::DataType::Flatbuffers);
 
   if (!result.has_value()) {
     FAIL(result.error().message);

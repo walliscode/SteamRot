@@ -61,13 +61,14 @@ TEST_CASE("Determine whether pixels can be tested on a RenderTexture",
 }
 TEST_CASE("drawn text can be detected", "[draw_ui_elements]") {
   std::cout << "Starting DrawText test..." << std::endl;
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   // create a RenderTexture
   size_t width = 200;
   size_t height = 100;
   sf::RenderTexture render_texture{sf::Vector2u(
       {static_cast<unsigned int>(width), static_cast<unsigned int>(height)})};
   // load a font
-  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
+  steamrot::AssetManager asset_manager;
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result) {
     FAIL(load_default_assets_result.error().message);
@@ -97,6 +98,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawBorderAndBackground draws the hover "
 
           "[draw_ui_elements]") {
 
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   // create a RenderTexture
   size_t width = 100;
   size_t height = 100;
@@ -108,7 +110,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawBorderAndBackground draws the hover "
   button.size = {50.0f, 50.0f};
   button.is_mouse_over = true;
   // load the default UIStyle
-  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
+  steamrot::AssetManager asset_manager;
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result) {
     FAIL(load_default_assets_result.error().message);
@@ -131,6 +133,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIELement draws a panel on a "
           "RenderTexture",
           "[draw_ui_elements]") {
 
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   // create a RenderTexture
   size_t width = 100;
   size_t height = 100;
@@ -143,7 +146,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIELement draws a panel on a "
   panel.size = {50.0f, 50.0f};
 
   // load the default UIStyle
-  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
+  steamrot::AssetManager asset_manager;
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result) {
     FAIL(load_default_assets_result.error().message);
@@ -168,6 +171,8 @@ TEST_CASE(
     "steamrot::draw_ui_elements::DrawUIELement draws a ButtonElement on a "
     "RenderTexture",
     "[draw_ui_elements]") {
+
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   // create a RenderTexture
   size_t width = 200;
   size_t height = 200;
@@ -180,7 +185,7 @@ TEST_CASE(
   button.size = {50.0f, 50.0f};
 
   // load the default UIStyle
-  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
+  steamrot::AssetManager asset_manager;
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result) {
     FAIL(load_default_assets_result.error().message);
@@ -206,6 +211,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws a "
           "on a RenderTexture",
           "[draw_ui_elements]") {
 
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   // create a RenderTexture
   size_t width = 200;
   size_t height = 200;
@@ -219,7 +225,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws a "
   dd_container.is_expanded = false;
 
   // load the default UIStyle
-  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
+  steamrot::AssetManager asset_manager;
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result) {
     FAIL(load_default_assets_result.error().message);
@@ -241,6 +247,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an unexpanded "
           "DropDownListElement "
           "on a RenderTexture",
           "[draw_ui_elements]") {
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   // create a RenderTexture
   size_t width = 200;
   size_t height = 200;
@@ -254,7 +261,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an unexpanded "
   dd_list.unexpanded_label = "...open up";
   dd_list.expanded_label = "...select";
   // load the default UIStyle
-  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
+  steamrot::AssetManager asset_manager;
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result) {
     FAIL(load_default_assets_result.error().message);
@@ -271,6 +278,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an expanded "
           "DropDownListElement "
           "on a RenderTexture",
           "[draw_ui_elements]") {
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   // create a RenderTexture
   size_t width = 200;
   size_t height = 200;
@@ -284,7 +292,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an expanded "
   dd_list.unexpanded_label = "...open up";
   dd_list.expanded_label = "...select";
   // load the default UIStyle
-  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
+  steamrot::AssetManager asset_manager;
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result) {
     FAIL(load_default_assets_result.error().message);
@@ -300,6 +308,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an expanded "
 TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an unexpanded "
           "DropDownButtonElement on a RenderTexture",
           "[draw_ui_elements]") {
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   // create a RenderTexture
   size_t width = 200;
   size_t height = 200;
@@ -311,7 +320,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an unexpanded "
   dd_button.position = {25.0f, 25.0f};
   dd_button.size = {100.0f, 100.0f};
   // load the default UIStyle
-  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
+  steamrot::AssetManager asset_manager;
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result) {
     FAIL(load_default_assets_result.error().message);
@@ -330,6 +339,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an expanded "
           "DropdownButtonElement "
           "on a RenderTexture",
           "[draw_ui_elements]") {
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   // create a RenderTexture
   size_t width = 200;
   size_t height = 200;
@@ -341,7 +351,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an expanded "
   dd_button.size = {100.0f, 100.0f};
   dd_button.is_expanded = true;
   // load the default UIStyle
-  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
+  steamrot::AssetManager asset_manager;
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result) {
     FAIL(load_default_assets_result.error().message);
@@ -360,6 +370,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an expanded "
 TEST_CASE("steamrot::draw_ui_elements::DrawNestedUIElements draws a unexpanded "
           "drop down setup",
           "[draw_ui_elements]") {
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   // create a RenderTexture
   size_t width = 200;
   size_t height = 200;
@@ -392,7 +403,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawNestedUIElements draws a unexpanded "
   // as a child
   dd_container.child_elements.push_back(std::move(dd_button));
   // load the default UIStyle
-  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
+  steamrot::AssetManager asset_manager;
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result) {
     FAIL(load_default_assets_result.error().message);
@@ -410,6 +421,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawNestedUIElements draws a unexpanded "
 TEST_CASE("steamrot::draw_ui_elements::DrawNestedUIElements draws an expanded "
           "drop down setup",
           "[draw_ui_elements]") {
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   // create a RenderTexture
   size_t width = 200;
   size_t height = 200;
@@ -443,7 +455,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawNestedUIElements draws an expanded "
 
   // add three DropDownL
   // load the default UIStyle
-  steamrot::AssetManager asset_manager{steamrot::EnvironmentType::Test};
+  steamrot::AssetManager asset_manager;
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result) {
     FAIL(load_default_assets_result.error().message);

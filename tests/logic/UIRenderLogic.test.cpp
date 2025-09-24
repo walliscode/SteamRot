@@ -13,6 +13,7 @@
 
 TEST_CASE("UIRenderLogic::UIRenderLogic Constructor", "[UIRenderLogic]") {
   // Create a dummy LogicContext
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
   // Instantiate UIRenderLogic
   steamrot::UIRenderLogic ui_render_logic(
@@ -23,6 +24,7 @@ TEST_CASE("UIRenderLogic::UIRenderLogic Constructor", "[UIRenderLogic]") {
 
 TEST_CASE("UIRenderLogic draws default for test scene", "[UIRenderLogic]") {
   // Create a dummy LogicContext
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
 
   // size the render texture and clear it
@@ -47,6 +49,7 @@ TEST_CASE("UIRenderLogic draws default for test scene", "[UIRenderLogic]") {
 
 TEST_CASE("UIRenderLogic draws title scene", "[UIRenderLogic]") {
   // Create a dummy LogicContext
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context{
       steamrot::SceneType::SceneType_TITLE};
   // size the render texture and clear it
@@ -68,6 +71,7 @@ TEST_CASE("UIRenderLogic draws title scene", "[UIRenderLogic]") {
 
 TEST_CASE("UIRenderLogic draws crafting scene", "[UIRenderLogic]") {
   // Create a dummy LogicContext
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context{
       steamrot::SceneType::SceneType_CRAFTING};
   // size the render texture and clear it

@@ -19,9 +19,8 @@
 
 namespace steamrot {
 /////////////////////////////////////////////////
-FlatbuffersConfigurator::FlatbuffersConfigurator(const EnvironmentType env_type,
-                                                 EventHandler &event_handler)
-    : m_data_loader(env_type), EntityConfigurator(event_handler) {}
+FlatbuffersConfigurator::FlatbuffersConfigurator(EventHandler &event_handler)
+    : EntityConfigurator(event_handler) {}
 
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>

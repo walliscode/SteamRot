@@ -9,9 +9,6 @@
 #include "DataLoader.h"
 #include <fstream>
 namespace steamrot {
-/////////////////////////////////////////////////
-DataLoader::DataLoader(const EnvironmentType env_type)
-    : m_path_provider(env_type) {}
 
 ////////////////////////////////////////////////////////////
 char *DataLoader::LoadBinaryData(const std::filesystem::path &file_path) const {
