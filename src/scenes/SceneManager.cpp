@@ -302,6 +302,8 @@ std::expected<std::monostate, FailInfo> SceneManager::ProcessSubscriptions() {
       default:
         break;
       }
+      // FINAL PART: set subscriber to inactive after processing.
+      auto set_inactive_result = subscriber->SetInactive();
     }
   }
   return std::monostate{};

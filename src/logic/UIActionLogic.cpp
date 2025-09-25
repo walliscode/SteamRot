@@ -56,6 +56,9 @@ void ProcessUIActionsAndEvents(UIElement &ui_element,
           dynamic_cast<ButtonElement *>(&ui_element)) {
     ProcessButtonElementActions(*button_element, event_handler);
   }
+
+  // FINALLY set the subscriber to inactive
+  auto set_inactive_result = ui_element.subscription.value()->SetInactive();
 }
 
 /////////////////////////////////////////////////
