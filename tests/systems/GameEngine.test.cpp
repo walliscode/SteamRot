@@ -271,3 +271,35 @@ TEST_CASE("GameEngine::ProcessSubscriptions does not quit if another "
   // check that the window is still open
   REQUIRE(game_engine.GetWindow().isOpen());
 }
+
+// check subscribers are set to inactive at end of game loop
+TEST_CASE("GameEngine::ProcessSubscriptions sets subscribers to inactive after "
+          "processing",
+          "[GameEngine]") {
+  // create and pre-initialize PathProvider
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  // Create a GameEngine instance
+  steamrot::GameEngine game_engine(steamrot::EnvironmentType::Test);
+  // Create and register a Subscriber for EventType_EVENT_CHANGE_SCENE
+  auto subscriber = std::make_shared<steamrot::Subscriber>(
+      steamrot::EventType_EVENT_CHANGE_SCENE);
+  auto register_result = game_engine.RegisterSubscriber(subscriber);
+  if (!register_result.has_value()) {
+    FAIL("Failed to register subscriber: " + register_result.error().message);
+  }
+  // check that the window is open initially
+  REQUIRE(game_engine.GetWindow().isOpen());
+  // Activate the Subscriber
+  auto set_active_result = subscriber->SetActive();
+  if (!set_active_result.has_value()) {
+    FAIL("Failed to activate subscriber: " + set_active_result.error().message);
+  }
+  // Process subscriptions in GameEngine
+  auto process_subscriptions_result = game_engine.ProcessSubscriptions();
+  if (!process_subscriptions_result.has_value()) {
+    FAIL("Failed to process subscriptions: " +
+         process_subscriptions_result.error().message);
+  }
+  // check that the subscriber is now inactive
+  REQUIRE(!subscriber->IsActive());
+}

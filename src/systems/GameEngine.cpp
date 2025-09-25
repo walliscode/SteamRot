@@ -204,6 +204,9 @@ std::expected<std::monostate, FailInfo> GameEngine::ProcessSubscriptions() {
       default:
         break;
       }
+
+      // FINALLY set the subscriber to inactive
+      auto set_inactive_result = subscriber->SetInactive();
     }
   }
   return std::monostate{};

@@ -264,3 +264,72 @@ TEST_CASE("UIActionLogic checks subscription before adding Event to EventBus "
   REQUIRE(steamrot::EnumNameEventType(event.m_event_type) ==
           steamrot::EnumNameEventType(steamrot::EventType_EVENT_QUIT_GAME));
 }
+
+// Check that ProcessUIActionsAndEvents return Subscriber inactive
+TEST_CASE("UIActionLogic sets Subscriber to inactive after processing "
+          "[UIActionLogic]") {
+  // arrange the UIActionLogic
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::tests::TestContext test_context;
+  steamrot::UIActionLogic ui_action_logic(
+      test_context.GetLogicContextForTestScene());
+  // assert that the EventBus has no events
+  REQUIRE(
+      test_context.GetGameContext().event_handler.GetGlobalEventBus().size() ==
+      0);
+  // arrange a button element
+  steamrot::ButtonElement button_element;
+  ;
+  button_element.position = {100.0f, 100.0f};
+  button_element.size = {200.0f, 50.0f};
+  button_element.is_mouse_over = true; // simulate mouse over
+  button_element.label = "Quit Game";
+  steamrot::Subscriber subscriber{steamrot::EventType_EVENT_USER_INPUT};
+  button_element.subscription =
+      std::make_shared<steamrot::Subscriber>(subscriber);
+  // register the subscriber with the event handler
+  auto registration_result =
+      test_context.GetGameContext().event_handler.RegisterSubscriber(
+          button_element.subscription.value());
+  if (!registration_result) {
+    FAIL("Failed to register subscriber: " +
+         registration_result.error().message);
+  }
+  // create response packet
+  steamrot::EventPacket event_packet{steamrot::EventType_EVENT_QUIT_GAME,
+                                     std::monostate()};
+  button_element.response_event = event_packet;
+  REQUIRE(button_element.response_event != std::nullopt);
+  REQUIRE(button_element.subscription != std::nullopt);
+  // add triggering event to event bus
+  steamrot::EventPacket trigger_event_packet{
+      steamrot::EventType_EVENT_USER_INPUT, steamrot::UserInputBitset{}};
+  test_context.GetGameContext().event_handler.AddToGlobalEventBus(
+      {trigger_event_packet});
+  REQUIRE(
+      test_context.GetGameContext().event_handler.GetGlobalEventBus().size() ==
+      1);
+  // process events to notify subscribers
+  test_context.GetGameContext()
+      .event_handler.UpateSubscribersFromGlobalEventBus();
+  // check subscriber is now active
+  REQUIRE(button_element.subscription.value()->IsActive());
+  // run ProcessUIActionsAndEvents and this should add the quit event to the
+  // event bus
+  steamrot::ProcessUIActionsAndEvents(
+      button_element, test_context.GetGameContext().event_handler);
+
+  // assert - that the EventBus has two events now
+  REQUIRE(
+      test_context.GetGameContext().event_handler.GetGlobalEventBus().size() ==
+      2);
+
+  // assert - that the last event is of type EventType_EVENT_QUIT_GAME
+  const auto &event =
+      test_context.GetGameContext().event_handler.GetGlobalEventBus().back();
+  REQUIRE(steamrot::EnumNameEventType(event.m_event_type) ==
+          steamrot::EnumNameEventType(steamrot::EventType_EVENT_QUIT_GAME));
+
+  // now check that the subscriber is set to inactive after processing
+  REQUIRE_FALSE(button_element.subscription.value()->IsActive());
+}
