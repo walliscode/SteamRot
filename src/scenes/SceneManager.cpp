@@ -27,7 +27,7 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-SceneManager::SceneManager(const GameContext game_context)
+SceneManager::SceneManager(const GameContext &game_context)
     : m_scenes(), m_game_context(game_context) {}
 
 /////////////////////////////////////////////////
@@ -68,9 +68,10 @@ std::expected<std::monostate, FailInfo>
 SceneManager::AddSceneFromDefault(const SceneType &scene_type) {
 
   // create SceneFactory object
-  SceneFactory scene_factory(m_game_context);
+  SceneFactory scene_factory;
 
-  auto scene_creation_result = scene_factory.CreateDefaultScene(scene_type);
+  auto scene_creation_result =
+      scene_factory.CreateDefaultScene(scene_type, m_game_context);
   if (!scene_creation_result.has_value()) {
     return std::unexpected(scene_creation_result.error());
   }
@@ -177,7 +178,7 @@ void SceneManager::UpdateScenes() {
 
     // scene->sAction();
     // scene->sMovement();
-    // scene->sCollision();
+    scene->sCollision();
     scene->sRender();
 
     // add further systems here

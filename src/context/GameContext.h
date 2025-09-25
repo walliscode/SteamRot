@@ -31,7 +31,9 @@ struct GameContext {
   EventHandler &event_handler;
 
   /////////////////////////////////////////////////
-  /// @brief Reference to mouse position in the game window. (local).
+  /// @brief Represents the current mouse position in window coordinates.
+  ///
+  /// This is not a live value, it must be updated each frame
   /////////////////////////////////////////////////
   sf::Vector2i mouse_position{0, 0};
 

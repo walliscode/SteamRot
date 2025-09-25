@@ -39,7 +39,7 @@ private:
   /////////////////////////////////////////////////
   /// @brief Context from GameEngine, providing access to game-wide resources
   /////////////////////////////////////////////////
-  const GameContext m_game_context;
+  const GameContext &m_game_context;
 
   /////////////////////////////////////////////////
   /// @brief Map of scenes, keyed by their unique UUIDs.
@@ -57,7 +57,7 @@ public:
   ///
   /// @param game_context GameContext object
   /////////////////////////////////////////////////
-  SceneManager(const GameContext game_context);
+  SceneManager(const GameContext &game_context);
 
   /////////////////////////////////////////////////
   /// @brief Container function for configuring the SceneManager from

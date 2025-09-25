@@ -15,7 +15,7 @@ namespace steamrot {
 
 ////////////////////////////////////////////////////////////
 Scene::Scene(const SceneType scene_type, const uuids::uuid &id,
-             const GameContext game_context)
+             const GameContext &game_context)
     : m_scene_info{id, scene_type},
       m_entity_manager(game_context.event_handler),
       m_game_context(game_context) {}
@@ -66,6 +66,7 @@ const SceneInfo &Scene::GetSceneInfo() const { return m_scene_info; }
 
 /////////////////////////////////////////////////
 LogicContext Scene::GetLogicContext() {
+
   LogicContext logic_context{
       m_entity_manager.GetEntityMemoryPool(),
       m_entity_manager.GetArchetypeManager().GetArchetypes(),
@@ -74,6 +75,7 @@ LogicContext Scene::GetLogicContext() {
       m_game_context.asset_manager,
       m_game_context.event_handler,
       m_game_context.mouse_position};
+
   return logic_context;
 }
 /////////////////////////////////////////////////

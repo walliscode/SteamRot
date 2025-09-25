@@ -11,7 +11,7 @@
 
 namespace steamrot {
 /////////////////////////////////////////////////
-TitleScene::TitleScene(const uuids::uuid &id, const GameContext game_context)
+TitleScene::TitleScene(const uuids::uuid &id, const GameContext &game_context)
     : Scene(SceneType::SceneType_TITLE, id, game_context) {}
 
 ////////////////////////////////////////////////////////////
@@ -32,7 +32,8 @@ void TitleScene::sRender() {
 
 /////////////////////////////////////////////////
 void TitleScene::sCollision() {
-  // process collision logic
+
+  // process collision logick
   for (auto &collision_logic : m_logic_map[LogicType::Collision]) {
     collision_logic->RunLogic();
   }

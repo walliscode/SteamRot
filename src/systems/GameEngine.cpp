@@ -4,6 +4,7 @@
 
 #include "GameEngine.h"
 #include "FailInfo.h"
+#include "GameContext.h"
 #include "SubscriberFactory.h"
 #include <SFML/Graphics.hpp>
 
@@ -19,8 +20,9 @@ namespace steamrot {
 
 GameEngine::GameEngine(EnvironmentType env_type)
     : m_window({sf::VideoMode({800, 600}), "SteamRot"}),
-      m_scene_manager(GameContext{m_window, m_event_handler, m_loop_number,
-                                  m_asset_manager, env_type}),
+      m_game_context(m_window, m_event_handler, m_loop_number, m_asset_manager,
+                     env_type),
+      m_scene_manager(m_game_context),
       m_display_manager(m_window, m_scene_manager) {}
 
 /////////////////////////////////////////////////
@@ -96,14 +98,6 @@ void GameEngine::RunGameLoop(size_t number_of_loops, bool simulation) {
       } // if the event is a close event, set the close window flag to true
     }
 
-    // Handle subscriptions
-    auto process_subscriptions_result = ProcessSubscriptions();
-    if (!process_subscriptions_result.has_value()) {
-      std::cerr << "Failed to process subscriptions: "
-                << process_subscriptions_result.error().message << "\n";
-      m_window.close();
-    }
-
     // Handle all system updates
     UpdateSystems();
 
@@ -118,6 +112,16 @@ void GameEngine::RunGameLoop(size_t number_of_loops, bool simulation) {
 
 ////////////////////////////////////////////////////////////
 void GameEngine::UpdateSystems() {
+  // Update GameContext
+  UpdateGameContext(m_game_context);
+
+  // Handle subscriptions
+  auto process_subscriptions_result = ProcessSubscriptions();
+  if (!process_subscriptions_result.has_value()) {
+    std::cerr << "Failed to process subscriptions: "
+              << process_subscriptions_result.error().message << "\n";
+    m_window.close();
+  }
   // Update Scenes
   m_scene_manager.UpdateSceneManager();
 
@@ -215,4 +219,13 @@ std::expected<std::monostate, FailInfo> GameEngine::ProcessSubscriptions() {
 /////////////////////////////////////////////////
 const sf::RenderWindow &GameEngine::GetWindow() const { return m_window; }
 
+/////////////////////////////////////////////////
+void GameEngine::UpdateGameContext(GameContext &game_context) {
+  // update mouse position
+  game_context.mouse_position =
+      sf::Mouse::getPosition(game_context.game_window);
+}
+
+/////////////////////////////////////////////////
+const GameContext &GameEngine::GetGameContext() const { return m_game_context; }
 } // namespace steamrot

@@ -9,6 +9,9 @@
 #include "GameEngine.h"
 #include "FlatbuffersDataLoader.h"
 #include "PathProvider.h"
+#include "TestContext.h"
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Window/Mouse.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
@@ -302,4 +305,63 @@ TEST_CASE("GameEngine::ProcessSubscriptions sets subscribers to inactive after "
   }
   // check that the subscriber is now inactive
   REQUIRE(!subscriber->IsActive());
+}
+
+TEST_CASE(
+    "GameEngine::UpdateGameContext updates members of GameContext correctly",
+    "[GameEngine]") {
+
+  // create and pre-initialize PathProvider
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  // get game context genereted from TextContext
+  steamrot::tests::TestContext test_context;
+  steamrot::GameContext &game_context = test_context.GetGameContext();
+
+  // create GameEngine object
+  steamrot::GameEngine game_engine(steamrot::EnvironmentType::Test);
+
+  // check current variables
+  REQUIRE(game_context.loop_number == 0);
+  REQUIRE(game_context.mouse_position == sf::Vector2i(0, 0));
+
+  // simulate some changes
+  sf::Mouse::setPosition({20, 35}, game_context.game_window);
+
+  // call UpdateGameContext to update the GameContext
+  game_engine.UpdateGameContext(game_context);
+
+  // check that the members have been updated correctly
+
+  REQUIRE(game_context.mouse_position.x ==
+          sf::Mouse::getPosition(game_context.game_window).x);
+  REQUIRE(game_context.mouse_position.y ==
+          sf::Mouse::getPosition(game_context.game_window).y);
+}
+
+// test that the GameContext that lives on the GameEngine is updated
+TEST_CASE("GameEngine::RunGameLoop updates GameContext members correctly",
+          "[GameEngine]") {
+  // create and pre-initialize PathProvider
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  // Create a GameEngine instance
+  steamrot::GameEngine game_engine(steamrot::EnvironmentType::Test);
+
+  // get reference to GameContext from GameEngine
+  const steamrot::GameContext &game_context = game_engine.GetGameContext();
+  // check current variables
+  REQUIRE(game_context.loop_number == 1);
+  REQUIRE(game_context.mouse_position == sf::Vector2i(0, 0));
+
+  // simulate some changes
+  sf::Vector2i sim_position{
+      50, 75}; // sim position required otherwise it grabs mouse actual position
+  sf::Mouse::setPosition(sim_position, game_context.game_window);
+
+  // run one loop of the game to update the GameContext
+  game_engine.RunGame(1, true);
+
+  // check that the members have been updated correctly
+  REQUIRE(game_context.loop_number == 1);
+  REQUIRE(game_context.mouse_position.x == sim_position.x);
+  REQUIRE(game_context.mouse_position.y == sim_position.y);
 }

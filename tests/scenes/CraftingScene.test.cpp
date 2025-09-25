@@ -15,10 +15,11 @@ TEST_CASE("CraftingScene's call to sRender is correct", "[CraftingScene]") {
   // arrange
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
-  steamrot::SceneFactory scene_factory(test_context.GetGameContext());
+  steamrot::SceneFactory scene_factory;
   // create a CraftingScene
-  auto scene_creation_result =
-      scene_factory.CreateDefaultScene(steamrot::SceneType::SceneType_CRAFTING);
+  auto scene_creation_result = scene_factory.CreateDefaultScene(
+      steamrot::SceneType::SceneType_CRAFTING, test_context.GetGameContext());
+  ;
   if (!scene_creation_result.has_value()) {
     FAIL("Scene creation failed: " + scene_creation_result.error().message);
   }
