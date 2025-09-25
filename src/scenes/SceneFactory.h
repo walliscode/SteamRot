@@ -28,12 +28,6 @@ namespace steamrot {
 /////////////////////////////////////////////////
 class SceneFactory {
 private:
-  /////////////////////////////////////////////////
-  /// @brief GameContext object provided at construction, used to generate
-  /// Scenes.
-  /////////////////////////////////////////////////
-  const GameContext m_game_context;
-
   ////////////////////////////////////////////////////////////
   /// \brief create a uuid if none is in provided json data
   ///
@@ -45,13 +39,14 @@ public:
   /// \brief Default constructor
   ///
   ////////////////////////////////////////////////////////////
-  SceneFactory(const GameContext game_context);
+  SceneFactory() = default;
 
   ////////////////////////////////////////////////////////////
   /// \brief gathers all scene creation methods
   ///
   ////////////////////////////////////////////////////////////
   std::expected<std::unique_ptr<Scene>, FailInfo>
-  CreateDefaultScene(const SceneType &scene_type);
+  CreateDefaultScene(const SceneType &scene_type,
+                     const GameContext &game_context);
 };
 } // namespace steamrot

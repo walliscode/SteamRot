@@ -12,7 +12,7 @@
 namespace steamrot {
 /////////////////////////////////////////////////
 CraftingScene::CraftingScene(const uuids::uuid &id,
-                             const GameContext game_context)
+                             const GameContext &game_context)
     : Scene(SceneType::SceneType_CRAFTING, id, game_context) {}
 
 /////////////////////////////////////////////////

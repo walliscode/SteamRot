@@ -21,7 +21,7 @@
 TEST_CASE("SceneFactory can be constructed without errors", "[SceneFactory]") {
   steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
   steamrot::tests::TestContext test_context;
-  steamrot::SceneFactory scene_factory(test_context.GetGameContext());
+  steamrot::SceneFactory scene_factory;
   REQUIRE_NOTHROW(scene_factory);
 }
 
@@ -29,13 +29,15 @@ TEST_CASE("SceneFactory can create a TitleScene from default",
           "[SceneFactory]") {
   steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
   steamrot::tests::TestContext test_context;
-  steamrot::SceneFactory scene_factory(test_context.GetGameContext());
+  steamrot::SceneFactory scene_factory;
 
   // define SceneType for the test
   const steamrot::SceneType scene_type = steamrot::SceneType::SceneType_TITLE;
 
   // create a TitleScene
-  auto scene_creation_result = scene_factory.CreateDefaultScene(scene_type);
+  auto scene_creation_result = scene_factory.CreateDefaultScene(
+      scene_type, test_context.GetGameContext());
+  ;
 
   if (!scene_creation_result.has_value()) {
     FAIL("Scene creation failed: " + scene_creation_result.error().message);
@@ -55,10 +57,11 @@ TEST_CASE("SceneFactory can create a CraftingScene from default",
           "[SceneFactory]") {
   steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
   steamrot::tests::TestContext test_context;
-  steamrot::SceneFactory scene_factory(test_context.GetGameContext());
+  steamrot::SceneFactory scene_factory;
   // create a CraftingScene
-  auto scene_creation_result =
-      scene_factory.CreateDefaultScene(steamrot::SceneType::SceneType_CRAFTING);
+  auto scene_creation_result = scene_factory.CreateDefaultScene(
+      steamrot::SceneType::SceneType_CRAFTING, test_context.GetGameContext());
+  ;
   if (!scene_creation_result.has_value()) {
     FAIL("Scene creation failed: " + scene_creation_result.error().message);
   }

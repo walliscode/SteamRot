@@ -34,7 +34,6 @@ void UICollisionLogic::ProcessLogic() {
     CUserInterface &ui_component = emp_helpers::GetComponent<CUserInterface>(
         entity_id, m_logic_context.scene_entities);
 
-    // group collision logic here
     collision::CheckMouseOverNestedUIElement(m_logic_context.mouse_position,
                                              *ui_component.m_root_element);
   };

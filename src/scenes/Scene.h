@@ -63,7 +63,7 @@ protected:
   /////////////////////////////////////////////////
   /// @brief GameContext object passed down from the GameEngine.
   /////////////////////////////////////////////////
-  const GameContext m_game_context;
+  const GameContext &m_game_context;
 
   /////////////////////////////////////////////////
   /// @brief Map of all logic objects needed by the Scene.
@@ -93,7 +93,7 @@ protected:
   /// @param game_context GameContext object passed down from the GameEngine.
   /////////////////////////////////////////////////
   Scene(const SceneType scene_type, const uuids::uuid &id,
-        const GameContext game_context);
+        const GameContext &game_context);
 
 public:
   /////////////////////////////////////////////////

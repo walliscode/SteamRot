@@ -24,6 +24,7 @@ void CheckMouseOverUIElement(const sf::Vector2i &mouse_position,
   if (IsMouseOverBounds(mouse_position,
                         sf::FloatRect(element.position, element.size))) {
     element.is_mouse_over = true;
+
   } else {
     element.is_mouse_over = false;
   }

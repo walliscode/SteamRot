@@ -61,6 +61,6 @@ struct LogicContext {
   /////////////////////////////////////////////////
   /// @brief Reference to mouse position in the game window. (local).
   /////////////////////////////////////////////////
-  const sf::Vector2i &mouse_position;
+  const sf::Vector2i &mouse_position{0, 0};
 };
 } // namespace steamrot

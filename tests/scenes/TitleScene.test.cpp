@@ -16,11 +16,12 @@ TEST_CASE("TitleScene's call of sRender is correct", "[TitleScene]") {
   // arrange
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
-  steamrot::SceneFactory scene_factory(test_context.GetGameContext());
+  steamrot::SceneFactory scene_factory;
 
   // create a TitleScene
-  auto scene_creation_result =
-      scene_factory.CreateDefaultScene(steamrot::SceneType::SceneType_TITLE);
+  auto scene_creation_result = scene_factory.CreateDefaultScene(
+      steamrot::SceneType::SceneType_TITLE, test_context.GetGameContext());
+  ;
 
   if (!scene_creation_result.has_value()) {
     FAIL("Scene creation failed: " + scene_creation_result.error().message);
