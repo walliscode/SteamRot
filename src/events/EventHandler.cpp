@@ -4,6 +4,7 @@
 #include "EventHandler.h"
 #include "FailInfo.h"
 #include <SFML/Window/Event.hpp>
+#include <SFML/Window/Keyboard.hpp>
 #include <expected>
 #include <optional>
 namespace steamrot {
@@ -58,7 +59,7 @@ void EventHandler::HandleSFMLEvents(sf::RenderWindow &window) {
   while (const std::optional<sf::Event> event = window.pollEvent()) {
     // add in ctrl + c to close the window
     if (const auto *keyPressed = event->getIf<sf::Event::KeyPressed>()) {
-      if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
+      if (keyPressed->code == sf::Keyboard::Key::Escape)
         window.close();
     } // if the event is a close event, set the close window flag to true
     if (event->is<sf::Event::Closed>()) {
@@ -143,10 +144,22 @@ void RemoveDeadEvents(EventBus &event_bus) {
 /////////////////////////////////////////////////
 void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
                       const EventData &event_data) {
+
+  auto locked_subscriber = subscriber.lock();
+  if (!locked_subscriber)
+    // if the Subscriber has expired, do nothing
+    return;
+
+  // if the Subscriber has trigger data compare against the event data
+  if (locked_subscriber->GetTriggerData() &&
+      (locked_subscriber->GetTriggerData().value() != event_data))
+    // if they do not match, do not update the subscriber
+    return;
+
   // update any releveant information for the subscriber
-  auto activate_result = subscriber.lock()->SetActive();
+  auto activate_result = locked_subscriber->SetActive();
 
   // copy the event data to the subscriber
-  subscriber.lock()->SetEventData(event_data);
+  locked_subscriber->SetEventData(event_data);
 }
 } // namespace steamrot

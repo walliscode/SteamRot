@@ -11,6 +11,7 @@
 #include "EventPacket.h"
 #include "FailInfo.h"
 #include <expected>
+#include <optional>
 #include <utility>
 #include <variant>
 namespace steamrot {
@@ -37,6 +38,12 @@ private:
   const EventType m_event_type;
 
   /////////////////////////////////////////////////
+  /// @brief If set, the subscriber will only be activated if the event data
+  /// matches the trigger data.
+  /////////////////////////////////////////////////
+  std::optional<const EventData> m_trigger_data{std::nullopt};
+
+  /////////////////////////////////////////////////
   /// @brief Used as a key to store the subscriber in the EventHandler.
   /////////////////////////////////////////////////
   EventData m_event_data;
@@ -46,6 +53,14 @@ public:
   /// @brief Constructor for the Subscriber class.
   /////////////////////////////////////////////////
   Subscriber(const EventType event_type);
+
+  /////////////////////////////////////////////////
+  /// @brief Constructor for the Subscriber class with trigger data.
+  ///
+  /// @param event_type Event type to register for.
+  /// @param trigger_data Event data that will trigger the subscriber.
+  /////////////////////////////////////////////////
+  Subscriber(const EventType event_type, const EventData &trigger_data);
 
   /////////////////////////////////////////////////
   /// @brief Delete the default constructor to prevent instantiation without
@@ -86,12 +101,15 @@ public:
 
   const EventData &GetEventData() const;
 
+  const std::optional<const EventData> &GetTriggerData() const;
+
   /////////////////////////////////////////////////
   /// @brief Copy the event data for the subscriber.
   ///
   /// @param event_data Event data to be copied.
   /////////////////////////////////////////////////
   void SetEventData(const EventData &event_data);
+
   /////////////////////////////////////////////////
   /// @brief Replace the event data for the subscriber.
   ///

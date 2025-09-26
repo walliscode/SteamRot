@@ -11,6 +11,7 @@
 #include "catch2/catch_test_macros.hpp"
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <SFML/Window/Keyboard.hpp>
 #include <iostream>
 
 namespace steamrot::tests {
@@ -120,7 +121,7 @@ void DisplayRenderTexture(const sf::RenderTexture &renderTexture) {
     while (const std::optional<sf::Event> event = window.pollEvent()) {
       // add in ctrl + c to close the window
       if (const auto *keyPressed = event->getIf<sf::Event::KeyPressed>()) {
-        if (keyPressed->scancode == sf::Keyboard::Scancode::Enter)
+        if (keyPressed->code == sf::Keyboard::Key::Enter)
           window.close();
       } // if the event is a close event, set the close window flag to true
       if (event->is<sf::Event::Closed>()) {

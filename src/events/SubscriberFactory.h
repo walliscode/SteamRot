@@ -12,8 +12,11 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "EventHandler.h"
+#include "FailInfo.h"
 #include "Subscriber.h"
+#include "subscriber_config_generated.h"
 #include <expected>
+#include <memory>
 namespace steamrot {
 
 /////////////////////////////////////////////////
@@ -43,9 +46,28 @@ public:
   /// @brief Given event type and data, create and register a subscriber.
   ///
   /// @param event_type Reference to the EventType for the subscriber
-  /// @param event_data Reference to the EventData for the subscriber
   /////////////////////////////////////////////////
   std::expected<std::shared_ptr<Subscriber>, FailInfo>
   CreateAndRegisterSubscriber(const EventType &event_type);
+
+  /////////////////////////////////////////////////
+  /// @brief Given event type and trigger data, create and register a
+  /// subscriber.
+  ///
+  /// @param event_type Reference to the EventType for the subscriber
+  /// @param trigger_data Reference to the EventData for the subscriber trigger
+  /////////////////////////////////////////////////
+  std::expected<std::shared_ptr<Subscriber>, FailInfo>
+  CreateAndRegisterSubscriber(const EventType &event_type,
+                              const EventData &trigger_data);
+
+  /////////////////////////////////////////////////
+  /// @brief Create a Subscriber from flatbuffers data
+  ///
+  /// @param subscriber_data Flatbuffers SubscriberData to create the subscriber
+  /// from.
+  /////////////////////////////////////////////////
+  std::expected<std::shared_ptr<Subscriber>, FailInfo>
+  CreateAndRegisterSubscriber(const SubscriberData &subscriber_data);
 };
 } // namespace steamrot

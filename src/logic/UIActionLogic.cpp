@@ -9,6 +9,7 @@
 #include "Logic.h"
 #include "emp_helpers.h"
 #include <SFML/Window/Mouse.hpp>
+#include <iostream>
 #include <vector>
 
 using namespace magic_enum::bitwise_operators;
@@ -35,6 +36,10 @@ void UIActionLogic::ProcessLogic() {
       // get the CUserInterface component
       CUserInterface &ui_component = emp_helpers::GetComponent<CUserInterface>(
           entity_id, m_logic_context.scene_entities);
+
+      // Perform any aciton logic here
+      ProcessUIActionsAndEvents(*ui_component.m_root_element,
+                                m_logic_context.event_handler);
     }
   }
 }
@@ -51,6 +56,8 @@ void ProcessUIActionsAndEvents(UIElement &ui_element,
   if (!ui_element.subscription.value()->IsActive())
     return;
 
+  std::cout << "Subscription is active, processing UI element actions"
+            << std::endl;
   // use a dynamic cast to determine the type of UIElement
   if (ButtonElement *button_element =
           dynamic_cast<ButtonElement *>(&ui_element)) {
