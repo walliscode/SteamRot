@@ -18,6 +18,11 @@ Subscriber::Subscriber(const EventType event_type)
     : m_event_type(event_type) {};
 
 /////////////////////////////////////////////////
+Subscriber::Subscriber(const EventType event_type,
+                       const EventData &trigger_data)
+    : m_event_type(event_type), m_trigger_data(trigger_data) {};
+
+/////////////////////////////////////////////////
 std::pair<EventType, EventData> Subscriber::GetRegistrationInfo() const {
   return {m_event_type, m_event_data};
 }
@@ -57,6 +62,11 @@ const EventType &Subscriber::GetEventType() const { return m_event_type; }
 
 /////////////////////////////////////////////////
 const EventData &Subscriber::GetEventData() const { return m_event_data; }
+
+/////////////////////////////////////////////////
+const std::optional<const EventData> &Subscriber::GetTriggerData() const {
+  return m_trigger_data;
+}
 
 /////////////////////////////////////////////////
 void Subscriber::SetEventData(const EventData &event_data) {

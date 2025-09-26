@@ -115,13 +115,15 @@ void GameEngine::UpdateSystems() {
   // Update GameContext
   UpdateGameContext(m_game_context);
 
-  // Handle subscriptions
+  // Handle subscriptions for the GameEngine
   auto process_subscriptions_result = ProcessSubscriptions();
   if (!process_subscriptions_result.has_value()) {
     std::cerr << "Failed to process subscriptions: "
               << process_subscriptions_result.error().message << "\n";
     m_window.close();
   }
+  // Update EventHandler
+
   // Update Scenes
   m_scene_manager.UpdateSceneManager();
 

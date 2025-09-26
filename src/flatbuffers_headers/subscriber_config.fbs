@@ -5,5 +5,5 @@ namespace steamrot;
 table SubscriberData{
 
   event_type_data: EventType;
-
+trigger_data: EventDataData;
   }

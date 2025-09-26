@@ -19,7 +19,6 @@ enum SpacingAndSizingType: byte {
     Even = 1,
     Ratioed = 2,
     DropDownList = 3,
-
   }
 
 

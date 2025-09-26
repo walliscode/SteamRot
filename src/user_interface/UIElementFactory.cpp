@@ -124,18 +124,10 @@ ConfigureBaseUIElement(UIElement &element, const UIElementData &data,
   if (data.subscriber_data() && (data.subscriber_data()->event_type_data() !=
                                  EventType::EventType_NONE)) {
 
-    // set EventType
-    if (!data.subscriber_data()->event_type_data()) {
-      return std::unexpected(FailInfo{
-          FailMode::FlatbuffersDataNotFound,
-          "UIElementData has subscriber_data but no event_type_data."});
-    }
-    EventType event_type = data.subscriber_data()->event_type_data();
-
     // create and register subscriber
     SubscriberFactory factory{event_handler};
     auto create_subscriber_result =
-        factory.CreateAndRegisterSubscriber(event_type);
+        factory.CreateAndRegisterSubscriber(*data.subscriber_data());
 
     if (!create_subscriber_result.has_value())
       return std::unexpected(create_subscriber_result.error());
