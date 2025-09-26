@@ -324,3 +324,66 @@ TEST_CASE("EventHandler: trigger event allows activation when condition is met",
   REQUIRE(subscriber_with_trigger->IsActive());
   REQUIRE(subscriber_with_trigger->GetEventData() == trigger_data);
 }
+
+TEST_CASE("EventHandler: multiple subscribers with different trigger conditions", "[EventHandler]") {
+  // Create an EventHandler instance
+  steamrot::EventHandler event_handler;
+  
+  // create test data
+  const steamrot::EventType event_type = steamrot::EventType::EventType_EVENT_TOGGLE_DROPDOWN;
+  const steamrot::EventData trigger_data1 = std::string("dropdown_1");
+  const steamrot::EventData trigger_data2 = std::string("dropdown_2");
+  
+  // Create subscribers with different trigger conditions
+  std::shared_ptr<steamrot::Subscriber> subscriber1 =
+      std::make_shared<steamrot::Subscriber>(event_type, trigger_data1);
+  std::shared_ptr<steamrot::Subscriber> subscriber2 =
+      std::make_shared<steamrot::Subscriber>(event_type, trigger_data2);
+  std::shared_ptr<steamrot::Subscriber> subscriber_no_trigger =
+      std::make_shared<steamrot::Subscriber>(event_type);
+  
+  // Register all subscribers
+  auto result1 = event_handler.RegisterSubscriber(subscriber1);
+  auto result2 = event_handler.RegisterSubscriber(subscriber2);
+  auto result3 = event_handler.RegisterSubscriber(subscriber_no_trigger);
+  REQUIRE(result1.has_value());
+  REQUIRE(result2.has_value());
+  REQUIRE(result3.has_value());
+  REQUIRE(!subscriber1->IsActive());
+  REQUIRE(!subscriber2->IsActive());
+  REQUIRE(!subscriber_no_trigger->IsActive());
+  
+  // Create event that matches only subscriber1's trigger
+  steamrot::EventPacket event1{1};
+  event1.m_event_type = event_type;
+  event1.m_event_data = trigger_data1;
+  
+  std::vector<steamrot::EventPacket> events1 = {event1};
+  event_handler.AddToGlobalEventBus(events1);
+  event_handler.UpateSubscribersFromGlobalEventBus();
+  
+  // Only subscriber1 and subscriber_no_trigger should be activated
+  REQUIRE(subscriber1->IsActive());
+  REQUIRE(!subscriber2->IsActive());
+  REQUIRE(subscriber_no_trigger->IsActive());
+  
+  // Reset states
+  subscriber1->SetInactive();
+  subscriber_no_trigger->SetInactive();
+  
+  // Create event that matches subscriber2's trigger
+  steamrot::EventPacket event2{1};
+  event2.m_event_type = event_type;
+  event2.m_event_data = trigger_data2;
+  
+  // Clear previous events and add new ones
+  event_handler.TickGlobalEventBus(); // Remove old events
+  std::vector<steamrot::EventPacket> events2 = {event2};
+  event_handler.AddToGlobalEventBus(events2);
+  event_handler.UpateSubscribersFromGlobalEventBus();
+  
+  // Only subscriber2 and subscriber_no_trigger should be activated
+  REQUIRE(!subscriber1->IsActive());
+  REQUIRE(subscriber2->IsActive());
+  REQUIRE(subscriber_no_trigger->IsActive());
+}
