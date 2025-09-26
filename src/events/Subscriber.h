@@ -11,6 +11,7 @@
 #include "EventPacket.h"
 #include "FailInfo.h"
 #include <expected>
+#include <optional>
 #include <utility>
 #include <variant>
 namespace steamrot {
@@ -41,11 +42,24 @@ private:
   /////////////////////////////////////////////////
   EventData m_event_data;
 
+  /////////////////////////////////////////////////
+  /// @brief Optional trigger condition - if present, must match EventPacket data for activation
+  /////////////////////////////////////////////////
+  std::optional<EventData> m_trigger_event;
+
 public:
   /////////////////////////////////////////////////
   /// @brief Constructor for the Subscriber class.
   /////////////////////////////////////////////////
   Subscriber(const EventType event_type);
+
+  /////////////////////////////////////////////////
+  /// @brief Constructor for the Subscriber class with optional trigger event.
+  ///
+  /// @param event_type The event type to register for
+  /// @param trigger_event Optional trigger condition that must match for activation
+  /////////////////////////////////////////////////
+  Subscriber(const EventType event_type, const std::optional<EventData>& trigger_event);
 
   /////////////////////////////////////////////////
   /// @brief Delete the default constructor to prevent instantiation without
@@ -98,5 +112,20 @@ public:
   /// @param new_event_data
   /////////////////////////////////////////////////
   void UpdateEventData(const EventData &new_event_data);
+
+  /////////////////////////////////////////////////
+  /// @brief Get the optional trigger event condition
+  ///
+  /// @return Optional trigger event data
+  /////////////////////////////////////////////////
+  const std::optional<EventData>& GetTriggerEvent() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Check if trigger event condition matches the provided event data
+  ///
+  /// @param event_data Event data to compare against trigger condition
+  /// @return true if no trigger is set or if trigger matches, false otherwise
+  /////////////////////////////////////////////////
+  bool ShouldActivate(const EventData& event_data) const;
 };
 } // namespace steamrot

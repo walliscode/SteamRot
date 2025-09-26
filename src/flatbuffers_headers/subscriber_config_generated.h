@@ -23,17 +23,36 @@ struct SubscriberDataBuilder;
 struct SubscriberData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef SubscriberDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_EVENT_TYPE_DATA = 4
+    VT_EVENT_TYPE_DATA = 4,
+    VT_TRIGGER_EVENT_DATA_TYPE = 6,
+    VT_TRIGGER_EVENT_DATA = 8
   };
   steamrot::EventType event_type_data() const {
     return static_cast<steamrot::EventType>(GetField<uint64_t>(VT_EVENT_TYPE_DATA, 0));
   }
+  steamrot::EventDataData trigger_event_data_type() const {
+    return static_cast<steamrot::EventDataData>(GetField<uint8_t>(VT_TRIGGER_EVENT_DATA_TYPE, 0));
+  }
+  const void *trigger_event_data() const {
+    return GetPointer<const void *>(VT_TRIGGER_EVENT_DATA);
+  }
+  template<typename T> const T *trigger_event_data_as() const;
+  const steamrot::UserInputBitsetData *trigger_event_data_as_UserInputBitsetData() const {
+    return trigger_event_data_type() == steamrot::EventDataData_UserInputBitsetData ? static_cast<const steamrot::UserInputBitsetData *>(trigger_event_data()) : nullptr;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint64_t>(verifier, VT_EVENT_TYPE_DATA, 8) &&
+           VerifyField<uint8_t>(verifier, VT_TRIGGER_EVENT_DATA_TYPE, 1) &&
+           VerifyOffset(verifier, VT_TRIGGER_EVENT_DATA) &&
+           VerifyEventDataData(verifier, trigger_event_data(), trigger_event_data_type()) &&
            verifier.EndTable();
   }
 };
+
+template<> inline const steamrot::UserInputBitsetData *SubscriberData::trigger_event_data_as<steamrot::UserInputBitsetData>() const {
+  return trigger_event_data_as_UserInputBitsetData();
+}
 
 struct SubscriberDataBuilder {
   typedef SubscriberData Table;
@@ -41,6 +60,12 @@ struct SubscriberDataBuilder {
   ::flatbuffers::uoffset_t start_;
   void add_event_type_data(steamrot::EventType event_type_data) {
     fbb_.AddElement<uint64_t>(SubscriberData::VT_EVENT_TYPE_DATA, static_cast<uint64_t>(event_type_data), 0);
+  }
+  void add_trigger_event_data_type(steamrot::EventDataData trigger_event_data_type) {
+    fbb_.AddElement<uint8_t>(SubscriberData::VT_TRIGGER_EVENT_DATA_TYPE, static_cast<uint8_t>(trigger_event_data_type), 0);
+  }
+  void add_trigger_event_data(::flatbuffers::Offset<void> trigger_event_data) {
+    fbb_.AddOffset(SubscriberData::VT_TRIGGER_EVENT_DATA, trigger_event_data);
   }
   explicit SubscriberDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -55,9 +80,13 @@ struct SubscriberDataBuilder {
 
 inline ::flatbuffers::Offset<SubscriberData> CreateSubscriberData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    steamrot::EventType event_type_data = static_cast<steamrot::EventType>(0)) {
+    steamrot::EventType event_type_data = static_cast<steamrot::EventType>(0),
+    steamrot::EventDataData trigger_event_data_type = steamrot::EventDataData_NONE,
+    ::flatbuffers::Offset<void> trigger_event_data = 0) {
   SubscriberDataBuilder builder_(_fbb);
+  builder_.add_trigger_event_data(trigger_event_data);
   builder_.add_event_type_data(event_type_data);
+  builder_.add_trigger_event_data_type(trigger_event_data_type);
   return builder_.Finish();
 }
 

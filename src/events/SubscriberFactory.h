@@ -47,5 +47,14 @@ public:
   /////////////////////////////////////////////////
   std::expected<std::shared_ptr<Subscriber>, FailInfo>
   CreateAndRegisterSubscriber(const EventType &event_type);
+
+  /////////////////////////////////////////////////
+  /// @brief Given event type and optional trigger event, create and register a subscriber.
+  ///
+  /// @param event_type Reference to the EventType for the subscriber
+  /// @param trigger_event Optional trigger condition for subscriber activation
+  /////////////////////////////////////////////////
+  std::expected<std::shared_ptr<Subscriber>, FailInfo>
+  CreateAndRegisterSubscriber(const EventType &event_type, const std::optional<EventData>& trigger_event);
 };
 } // namespace steamrot

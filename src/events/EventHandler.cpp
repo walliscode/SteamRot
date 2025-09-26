@@ -143,10 +143,18 @@ void RemoveDeadEvents(EventBus &event_bus) {
 /////////////////////////////////////////////////
 void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
                       const EventData &event_data) {
-  // update any releveant information for the subscriber
-  auto activate_result = subscriber.lock()->SetActive();
+  // Check if subscriber should be activated based on trigger condition
+  auto subscriber_ptr = subscriber.lock();
+  if (!subscriber_ptr) {
+    return; // Subscriber no longer exists
+  }
+  
+  if (subscriber_ptr->ShouldActivate(event_data)) {
+    // update any releveant information for the subscriber
+    auto activate_result = subscriber_ptr->SetActive();
 
-  // copy the event data to the subscriber
-  subscriber.lock()->SetEventData(event_data);
+    // copy the event data to the subscriber
+    subscriber_ptr->SetEventData(event_data);
+  }
 }
 } // namespace steamrot

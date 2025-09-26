@@ -262,3 +262,65 @@ TEST_CASE("EventHandler::UpdateSubscribersFromGlobalEventBus updates correct "
   REQUIRE(subscriber->IsActive());
   REQUIRE(subscriber2->IsActive());
 }
+
+TEST_CASE("EventHandler: trigger event prevents activation when condition not met", "[EventHandler]") {
+  // Create an EventHandler instance
+  steamrot::EventHandler event_handler;
+  
+  // create test data
+  const steamrot::EventType event_type = steamrot::EventType::EventType_EVENT_TOGGLE_DROPDOWN;
+  const steamrot::EventData trigger_data = std::string("specific_dropdown");
+  const steamrot::EventData different_data = std::string("other_dropdown");
+  
+  // Create subscriber with trigger condition
+  std::shared_ptr<steamrot::Subscriber> subscriber_with_trigger =
+      std::make_shared<steamrot::Subscriber>(event_type, trigger_data);
+  
+  // Register the subscriber
+  auto result = event_handler.RegisterSubscriber(subscriber_with_trigger);
+  REQUIRE(result.has_value());
+  REQUIRE(!subscriber_with_trigger->IsActive());
+  
+  // Create event with different data that doesn't match trigger
+  steamrot::EventPacket event_no_match{1};
+  event_no_match.m_event_type = event_type;
+  event_no_match.m_event_data = different_data;
+  
+  std::vector<steamrot::EventPacket> events_no_match = {event_no_match};
+  event_handler.AddToGlobalEventBus(events_no_match);
+  event_handler.UpateSubscribersFromGlobalEventBus();
+  
+  // Subscriber should NOT be activated due to trigger mismatch
+  REQUIRE(!subscriber_with_trigger->IsActive());
+}
+
+TEST_CASE("EventHandler: trigger event allows activation when condition is met", "[EventHandler]") {
+  // Create an EventHandler instance
+  steamrot::EventHandler event_handler;
+  
+  // create test data
+  const steamrot::EventType event_type = steamrot::EventType::EventType_EVENT_TOGGLE_DROPDOWN;
+  const steamrot::EventData trigger_data = std::string("specific_dropdown");
+  
+  // Create subscriber with trigger condition
+  std::shared_ptr<steamrot::Subscriber> subscriber_with_trigger =
+      std::make_shared<steamrot::Subscriber>(event_type, trigger_data);
+  
+  // Register the subscriber
+  auto result = event_handler.RegisterSubscriber(subscriber_with_trigger);
+  REQUIRE(result.has_value());
+  REQUIRE(!subscriber_with_trigger->IsActive());
+  
+  // Create event with matching data
+  steamrot::EventPacket event_match{1};
+  event_match.m_event_type = event_type;
+  event_match.m_event_data = trigger_data;
+  
+  std::vector<steamrot::EventPacket> events_match = {event_match};
+  event_handler.AddToGlobalEventBus(events_match);
+  event_handler.UpateSubscribersFromGlobalEventBus();
+  
+  // Subscriber should be activated due to trigger match
+  REQUIRE(subscriber_with_trigger->IsActive());
+  REQUIRE(subscriber_with_trigger->GetEventData() == trigger_data);
+}
