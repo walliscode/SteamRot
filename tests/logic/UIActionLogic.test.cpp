@@ -100,7 +100,8 @@ TEST_CASE("UIActionLogic adds Event to EventBus for ButtonElement with a "
   steamrot::ProcessButtonElementActions(
       button_element, test_context.GetGameContext().event_handler);
   ;
-
+  // need to move events from waiting room to global event bus
+  test_context.GetGameContext().event_handler.ProcessWaitingRoomEventBus();
   // assert - that the EventBus has one event
   REQUIRE(
       test_context.GetGameContext().event_handler.GetGlobalEventBus().size() ==
@@ -161,9 +162,8 @@ TEST_CASE(
   steamrot::EventPacket unrelated_event_packet{steamrot::EventType_EVENT_TEST,
                                                std::monostate()};
 
-  test_context.GetGameContext().event_handler.AddToGlobalEventBus(
-      {unrelated_event_packet});
-
+  test_context.GetGameContext().event_handler.AddEvent(unrelated_event_packet);
+  test_context.GetGameContext().event_handler.ProcessWaitingRoomEventBus();
   REQUIRE(
       test_context.GetGameContext().event_handler.GetGlobalEventBus().size() ==
       1);
@@ -234,8 +234,8 @@ TEST_CASE("UIActionLogic checks subscription before adding Event to EventBus "
   // add triggering event to event bus
   steamrot::EventPacket trigger_event_packet{
       steamrot::EventType_EVENT_USER_INPUT, steamrot::UserInputBitset{}};
-  test_context.GetGameContext().event_handler.AddToGlobalEventBus(
-      {trigger_event_packet});
+  test_context.GetGameContext().event_handler.AddEvent(trigger_event_packet);
+  test_context.GetGameContext().event_handler.ProcessWaitingRoomEventBus();
 
   REQUIRE(
       test_context.GetGameContext().event_handler.GetGlobalEventBus().size() ==
@@ -253,6 +253,8 @@ TEST_CASE("UIActionLogic checks subscription before adding Event to EventBus "
   steamrot::ProcessUIActionsAndEvents(
       button_element, test_context.GetGameContext().event_handler);
 
+  // move events from waiting room to global event bus
+  test_context.GetGameContext().event_handler.ProcessWaitingRoomEventBus();
   // assert - that the EventBus has two events now
   REQUIRE(
       test_context.GetGameContext().event_handler.GetGlobalEventBus().size() ==
@@ -304,8 +306,8 @@ TEST_CASE("UIActionLogic sets Subscriber to inactive after processing "
   // add triggering event to event bus
   steamrot::EventPacket trigger_event_packet{
       steamrot::EventType_EVENT_USER_INPUT, steamrot::UserInputBitset{}};
-  test_context.GetGameContext().event_handler.AddToGlobalEventBus(
-      {trigger_event_packet});
+  test_context.GetGameContext().event_handler.AddEvent(trigger_event_packet);
+  test_context.GetGameContext().event_handler.ProcessWaitingRoomEventBus();
   REQUIRE(
       test_context.GetGameContext().event_handler.GetGlobalEventBus().size() ==
       1);
@@ -319,6 +321,7 @@ TEST_CASE("UIActionLogic sets Subscriber to inactive after processing "
   steamrot::ProcessUIActionsAndEvents(
       button_element, test_context.GetGameContext().event_handler);
 
+  test_context.GetGameContext().event_handler.ProcessWaitingRoomEventBus();
   // assert - that the EventBus has two events now
   REQUIRE(
       test_context.GetGameContext().event_handler.GetGlobalEventBus().size() ==

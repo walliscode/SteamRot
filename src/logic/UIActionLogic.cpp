@@ -10,7 +10,6 @@
 #include "emp_helpers.h"
 #include <SFML/Window/Mouse.hpp>
 #include <iostream>
-#include <vector>
 
 using namespace magic_enum::bitwise_operators;
 namespace steamrot {
@@ -80,8 +79,7 @@ void ProcessButtonElementActions(ButtonElement &button_element,
     // to the global event bus
     if (button_element.response_event.has_value())
 
-      event_handler.AddToGlobalEventBus(
-          {button_element.response_event.value()});
+      event_handler.AddEvent(button_element.response_event.value());
   }
 }
 

@@ -100,9 +100,11 @@ void GameEngine::UpdateSystems() {
   // Update GameContext
   UpdateGameContext(m_game_context);
 
-  // Preload Events
+  // Preload Events, namely any external events that need adding to the waiting
+  // room
   m_event_handler.PreloadEvents(m_window);
-
+  // Process Waiting Room Event Bus into Global Event Bus
+  m_event_handler.ProcessWaitingRoomEventBus();
   // Update Subscribers from Global Event Bus
   m_event_handler.UpateSubscribersFromGlobalEventBus();
 
@@ -120,6 +122,9 @@ void GameEngine::UpdateSystems() {
 
   // Call Render Cycle
   auto call_render_cycle_result = m_display_manager.CallRenderCycle();
+
+  // Tick the Global Event Bus
+  m_event_handler.TickGlobalEventBus();
 }
 
 ////////////////////////////////////////////////////////////
