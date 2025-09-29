@@ -25,15 +25,26 @@ using EventBus = std::vector<EventPacket>;
 class EventHandler {
 private:
   /////////////////////////////////////////////////
-  /// @brief This will be the only event bus used in the game engine.
+  /// @brief EventBus from which Subscribers will be updated.
   /////////////////////////////////////////////////
   EventBus m_global_event_bus;
 
+  /////////////////////////////////////////////////
+  /// @brief  EventBus for collating all generated Events
+  /////////////////////////////////////////////////
+  EventBus m_waiting_room_event_bus;
   /////////////////////////////////////////////////
   /// @brief Register of all subscribers
   /////////////////////////////////////////////////
   std::unordered_map<EventType, std::vector<std::weak_ptr<Subscriber>>>
       m_subscriber_register;
+
+  /////////////////////////////////////////////////
+  /// @brief Wrapper function to specifally to add to the global event bus.
+  ///
+  /// @param events Vector of events to be added to the global event bus.
+  /////////////////////////////////////////////////
+  void AddToGlobalEventBus(const std::vector<EventPacket> &events);
 
 public:
   ////////////////////////////////////////////////////////////
@@ -55,11 +66,18 @@ public:
   void PreloadEvents(sf::RenderWindow &window);
 
   /////////////////////////////////////////////////
-  /// @brief Wrapper function to specifally to add to the global event bus.
+  /// @brief Adds an event to the waiting room event bus.
   ///
-  /// @param events Vector of events to be added to the global event bus.
+  /// @param event Newly created event to be added to the waiting room event
+  /// bus.
   /////////////////////////////////////////////////
-  void AddToGlobalEventBus(const std::vector<EventPacket> &events);
+  void AddEvent(const EventPacket &event);
+
+  /////////////////////////////////////////////////
+  /// @brief Add all events from the waiting room event bus to the global event
+  /// bus
+  /////////////////////////////////////////////////
+  void ProcessWaitingRoomEventBus();
 
   /////////////////////////////////////////////////
   /// @brief Update all subscribers based on the events in the global event bus.
@@ -84,13 +102,6 @@ public:
   const std::unordered_map<EventType, std::vector<std::weak_ptr<Subscriber>>> &
   GetSubcriberRegister() const;
 };
-
-/////////////////////////////////////////////////
-/// @brief Adds an event to the global event bus and calls any sorting algos.
-///
-/// @param event Newly created event to be added to the event bus.
-/////////////////////////////////////////////////
-void AddEvent(EventBus &event_bus, const EventPacket &event);
 
 /////////////////////////////////////////////////
 /// @brief Decrement the lifetime of a single event by 1.
@@ -125,5 +136,5 @@ void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
 /// @param window Reference to the SFML window to poll events from.
 /// @param event_bus Reference to the event bus to add events to.
 /////////////////////////////////////////////////
-void HandleSFMLEvents(sf::RenderWindow &window, EventBus &event_bus);
+void HandleSFMLEvents(sf::RenderWindow &window, EventHandler &event_handler);
 } // namespace steamrot

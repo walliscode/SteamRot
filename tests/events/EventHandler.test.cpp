@@ -50,16 +50,17 @@ TEST_CASE("EventHandler registers Subscribers", "[EventHandler]") {
   REQUIRE(subscriber_register.at(event_type)[0].expired());
 }
 TEST_CASE("AddEvent adds an event to an EventBus", "[EventHandler]") {
-  // create a mock EventBus
-  steamrot::EventBus event_bus;
-  REQUIRE(event_bus.empty());
+  // create an eventHandler
+  steamrot::EventHandler event_handler;
+  REQUIRE(event_handler.GetGlobalEventBus().empty());
 
   // create an event and add it to the bus
   steamrot::EventPacket event{5};
-  steamrot::AddEvent(event_bus, event);
+  event_handler.AddEvent(event);
 
+  event_handler.ProcessWaitingRoomEventBus();
   // check that the event was added
-  REQUIRE(event_bus.size() == 1);
+  REQUIRE(event_handler.GetGlobalEventBus().size() == 1);
 }
 
 TEST_CASE("DecrementEventLifetimes decrease all lifetimes by 1",
@@ -72,9 +73,10 @@ TEST_CASE("DecrementEventLifetimes decrease all lifetimes by 1",
   steamrot::EventPacket event3{2};
 
   // add events to the bus
-  AddEvent(event_bus, event1);
-  AddEvent(event_bus, event2);
-  AddEvent(event_bus, event3);
+  event_bus.push_back(event1);
+  event_bus.push_back(event2);
+  event_bus.push_back(event3);
+
   REQUIRE(event_bus.size() == 3);
 
   // decrement lifetimes
@@ -91,9 +93,10 @@ TEST_CASE("RemoveDeadEvents removes dead events", "[EventHandler]") {
   steamrot::EventPacket event2{0}; // dead event
   steamrot::EventPacket event3{1};
   // add events to the bus
-  AddEvent(event_bus, event1);
-  AddEvent(event_bus, event2);
-  AddEvent(event_bus, event3);
+  event_bus.push_back(event1);
+  event_bus.push_back(event2);
+  event_bus.push_back(event3);
+
   REQUIRE(event_bus.size() == 3);
   // remove dead events
   steamrot::RemoveDeadEvents(event_bus);
@@ -119,8 +122,10 @@ TEST_CASE(
   std::vector<steamrot::EventPacket> events_to_add = {event1, event2};
 
   // Add events to the global event bus
-  event_handler.AddToGlobalEventBus(events_to_add);
+  for (const auto &event : events_to_add)
+    event_handler.AddEvent(event);
 
+  event_handler.ProcessWaitingRoomEventBus();
   // Check that the events were added successfully
   global_event_bus = event_handler.GetGlobalEventBus();
 
@@ -145,7 +150,9 @@ TEST_CASE("EventHandler::TickGlobalEventBus updates the global event bus",
   steamrot::EventPacket event2{1};
   std::vector<steamrot::EventPacket> events_to_add = {event1, event2};
   // Add events to the global event bus
-  event_handler.AddToGlobalEventBus(events_to_add);
+  for (const auto &event : events_to_add)
+    event_handler.AddEvent(event);
+  event_handler.ProcessWaitingRoomEventBus();
   // Check that the events were added successfully
   auto global_event_bus = event_handler.GetGlobalEventBus();
   REQUIRE(global_event_bus.size() == 2);
@@ -220,7 +227,8 @@ TEST_CASE("EventHandler::UpdateSubscribersFrom does not update Subscribers "
   std::vector<steamrot::EventPacket> events_to_add = {event1};
 
   // Add events to the global event bus
-  event_handler.AddToGlobalEventBus(events_to_add);
+  for (const auto &event : events_to_add)
+    event_handler.AddEvent(event);
 
   // Update subscribers from the global event bus
   event_handler.UpateSubscribersFromGlobalEventBus();
@@ -353,8 +361,10 @@ TEST_CASE("EventHandler::UpdateSubscribersFromGlobalEventBus updates correct "
   event1.m_event_type = event_type;
   event1.m_event_data = user_input_bitset;
   std::vector<steamrot::EventPacket> events_to_add = {event1};
-  event_handler.AddToGlobalEventBus(events_to_add);
+  for (const auto &event : events_to_add)
+    event_handler.AddEvent(event);
 
+  event_handler.ProcessWaitingRoomEventBus();
   // Update subscribers from the global event bus
   event_handler.UpateSubscribersFromGlobalEventBus();
 

@@ -24,15 +24,22 @@ EventHandler::RegisterSubscriber(std::shared_ptr<Subscriber> subscriber) {
 /////////////////////////////////////////////////
 void EventHandler::PreloadEvents(sf::RenderWindow &window) {
 
-  // handle SMFL events
-  HandleSFMLEvents(window, m_global_event_bus);
+  // handle SMFL events and pass to the waiting room event bus
+  HandleSFMLEvents(window, *this);
 }
 
+/////////////////////////////////////////////////
+void EventHandler::ProcessWaitingRoomEventBus() {
+  // add all events from the waiting room event bus to the global event bus
+  AddToGlobalEventBus(m_waiting_room_event_bus);
+  // clear the waiting room event bus
+  m_waiting_room_event_bus.clear();
+}
 /////////////////////////////////////////////////
 void EventHandler::AddToGlobalEventBus(const std::vector<EventPacket> &events) {
 
   for (const auto &event : events) {
-    AddEvent(m_global_event_bus, event);
+    m_global_event_bus.push_back(event);
   }
 }
 /////////////////////////////////////////////////
@@ -51,7 +58,7 @@ const EventBus &EventHandler::GetGlobalEventBus() {
 }
 
 ////////////////////////////////////////////////////////////
-void HandleSFMLEvents(sf::RenderWindow &window, EventBus &m_global_event_bus) {
+void HandleSFMLEvents(sf::RenderWindow &window, EventHandler &event_handler) {
 
   // create a vector to hold user input events
   std::vector<sf::Event> user_input_events;
@@ -95,8 +102,8 @@ void HandleSFMLEvents(sf::RenderWindow &window, EventBus &m_global_event_bus) {
     std::cout << "User Input Event Packet Created " << std::endl;
     std::cout << "UserInputBitset: " << user_input_bitset << std::endl;
 
-    // add the event packet to the global event bus
-    AddEvent(m_global_event_bus, event_packet);
+    // add the event packet to the waiting room event bus
+    event_handler.AddEvent(event_packet);
   }
 
   // Add other event types here as needed
@@ -125,8 +132,8 @@ void EventHandler::UpateSubscribersFromGlobalEventBus() {
   }
 }
 /////////////////////////////////////////////////
-void AddEvent(EventBus &event_bus, const EventPacket &event) {
-  event_bus.push_back(event);
+void EventHandler::AddEvent(const EventPacket &event) {
+  m_waiting_room_event_bus.push_back(event);
 }
 
 /////////////////////////////////////////////////
