@@ -10,10 +10,11 @@
 #include "EventPacket.h"
 #include "Subscriber.h"
 #include "events_generated.h"
+#include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
+#include <X11/extensions/XTest.h>
 #include <catch2/catch_test_macros.hpp>
-#include <memory>
 
 TEST_CASE("EventHandler registers Subscribers", "[EventHandler]") {
   // Create an EventHandler instance
@@ -126,6 +127,13 @@ TEST_CASE(
   REQUIRE(global_event_bus.size() == 2);
   REQUIRE(global_event_bus[0].event_lifetime == 3);
   REQUIRE(global_event_bus[1].event_lifetime == 2);
+}
+
+TEST_CASE("HandleSFMLEvents adds events to anEventBus") {
+
+  // create render window and event bus
+  sf::RenderWindow window(sf::VideoMode({800, 600}), "Test Window");
+  steamrot::EventBus event_bus;
 }
 
 TEST_CASE("EventHandler::TickGlobalEventBus updates the global event bus",
