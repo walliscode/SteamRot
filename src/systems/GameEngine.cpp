@@ -83,21 +83,6 @@ void GameEngine::RunGameLoop(size_t number_of_loops, bool simulation) {
   // Run the program as long as the window is open
   while (m_window.isOpen()) {
 
-    // [TODO: Move this to the event handler]
-    // add in manual exit strategy
-    while (const std::optional event = m_window.pollEvent()) {
-      // "close requested" event: we close the window
-      if (event->is<sf::Event::Closed>())
-        m_window.close();
-
-      // close on escape key press
-
-      if (const auto *keyPressed = event->getIf<sf::Event::KeyPressed>()) {
-        if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
-          m_window.close();
-      } // if the event is a close event, set the close window flag to true
-    }
-
     // Handle all system updates
     UpdateSystems();
 
@@ -114,6 +99,12 @@ void GameEngine::RunGameLoop(size_t number_of_loops, bool simulation) {
 void GameEngine::UpdateSystems() {
   // Update GameContext
   UpdateGameContext(m_game_context);
+
+  // Preload Events
+  m_event_handler.PreloadEvents(m_window);
+
+  // Update Subscribers from Global Event Bus
+  m_event_handler.UpateSubscribersFromGlobalEventBus();
 
   // Handle subscriptions for the GameEngine
   auto process_subscriptions_result = ProcessSubscriptions();
@@ -197,6 +188,8 @@ std::expected<std::monostate, FailInfo> GameEngine::ProcessSubscriptions() {
     // only process active subscribers
     if (subscriber->IsActive()) {
 
+      std::cout << "Processing Subscriber for EventType on GameEngine: "
+                << static_cast<int>(subscriber->GetEventType()) << std::endl;
       // get the event data
       const EventData &event_data = subscriber->GetEventData();
 

@@ -50,8 +50,7 @@ public:
   RegisterSubscriber(const std::shared_ptr<Subscriber> subscriber);
 
   /////////////////////////////////////////////////
-  /// @brief Handle all events that dont originate from the Scenes/Logic
-  /// [TODO: Give this a better name]
+  /// @brief Handle all events pre Scene updates.
   /////////////////////////////////////////////////
   void PreloadEvents(sf::RenderWindow &window);
 
@@ -78,14 +77,6 @@ public:
   /// @return A reference to the global event bus.
   /////////////////////////////////////////////////
   const EventBus &GetGlobalEventBus();
-
-  /////////////////////////////////////////////////
-  /// @brief Adapater function to turn SFML events into the game engine's event
-  /// system.
-  ///
-  /// @param window Reference to the SFML window to poll events from.
-  /////////////////////////////////////////////////
-  void HandleSFMLEvents(sf::RenderWindow &window);
 
   /////////////////////////////////////////////////
   /// @brief Return the subscriber register.
@@ -126,4 +117,13 @@ void RemoveDeadEvents(EventBus &event_bus);
 /////////////////////////////////////////////////
 void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
                       const EventData &event_data);
+
+/////////////////////////////////////////////////
+/// @brief Adapater function to turn SFML events into the game engine's event
+/// system.
+///
+/// @param window Reference to the SFML window to poll events from.
+/// @param event_bus Reference to the event bus to add events to.
+/////////////////////////////////////////////////
+void HandleSFMLEvents(sf::RenderWindow &window, EventBus &event_bus);
 } // namespace steamrot

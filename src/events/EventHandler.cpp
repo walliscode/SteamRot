@@ -6,6 +6,7 @@
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <expected>
+#include <iostream>
 #include <optional>
 namespace steamrot {
 
@@ -24,7 +25,7 @@ EventHandler::RegisterSubscriber(std::shared_ptr<Subscriber> subscriber) {
 void EventHandler::PreloadEvents(sf::RenderWindow &window) {
 
   // handle SMFL events
-  HandleSFMLEvents(window);
+  HandleSFMLEvents(window, m_global_event_bus);
 }
 
 /////////////////////////////////////////////////
@@ -50,7 +51,7 @@ const EventBus &EventHandler::GetGlobalEventBus() {
 }
 
 ////////////////////////////////////////////////////////////
-void EventHandler::HandleSFMLEvents(sf::RenderWindow &window) {
+void HandleSFMLEvents(sf::RenderWindow &window, EventBus &m_global_event_bus) {
 
   // create a vector to hold user input events
   std::vector<sf::Event> user_input_events;
@@ -67,6 +68,7 @@ void EventHandler::HandleSFMLEvents(sf::RenderWindow &window) {
     }
     // handle keyboard and mouse events by adding to the user input events
     // vector
+
     if (event->is<sf::Event::KeyPressed>() ||
         event->is<sf::Event::KeyReleased>() ||
         event->is<sf::Event::MouseButtonPressed>() ||
@@ -84,12 +86,20 @@ void EventHandler::HandleSFMLEvents(sf::RenderWindow &window) {
     // set the event type to UserInputEvent
     event_packet.m_event_type = EventType::EventType_EVENT_USER_INPUT;
 
-    // set the data for the event packet
-    event_packet.m_event_data = user_input_events;
+    // create a UserInputBitset from the vector of hardware events
+    auto user_input_bitset = UserInputBitset{user_input_events};
+
+    // set the event data to the UserInputBitset
+    event_packet.m_event_data = user_input_bitset;
+
+    std::cout << "User Input Event Packet Created " << std::endl;
+    std::cout << "UserInputBitset: " << user_input_bitset << std::endl;
 
     // add the event packet to the global event bus
     AddEvent(m_global_event_bus, event_packet);
   }
+
+  // Add other event types here as needed
 }
 
 /////////////////////////////////////////////////
@@ -102,6 +112,7 @@ EventHandler::GetSubcriberRegister() const {
 void EventHandler::UpateSubscribersFromGlobalEventBus() {
   // go through each event in the global event bus
   for (const auto &event : m_global_event_bus) {
+
     if (m_subscriber_register.contains(event.m_event_type)) {
       // go through each subscriber registered for the event type
       for (auto &subscriber_weak :
@@ -156,6 +167,8 @@ void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
     // if they do not match, do not update the subscriber
     return;
 
+  std::cout << "Updating Subscriber of type "
+            << locked_subscriber->GetRegistrationInfo().first << std::endl;
   // update any releveant information for the subscriber
   auto activate_result = locked_subscriber->SetActive();
 
