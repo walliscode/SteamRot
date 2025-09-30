@@ -24,9 +24,9 @@ void TestUIELementProperites(const UIElement &element,
 
   // check the Subscriber data
   if (data.subscriber_data()) {
-    REQUIRE(element.subscription.has_value());
+    REQUIRE(element.subscription);
     // check the EventType matches
-    REQUIRE(element.subscription.value()->GetRegistrationInfo().first ==
+    REQUIRE(element.subscription->GetRegistrationInfo().first ==
             data.subscriber_data()->event_type_data());
   }
 

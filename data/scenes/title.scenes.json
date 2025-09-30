@@ -53,7 +53,7 @@
                         "trigger_data": { "mouse_released": ["LEFT_CLICK"] }
                       },
                       "response_event_data": {
-                        "event_lifetime": 1,
+                        "event_lifetime": 2,
                         "event_type": "EVENT_QUIT_GAME"
                       },
                       "children_active": false,

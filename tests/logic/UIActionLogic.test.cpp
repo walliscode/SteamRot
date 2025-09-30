@@ -55,7 +55,7 @@ TEST_CASE(
                                      std::monostate()};
   button_element.response_event = event_packet;
 
-  REQUIRE(button_element.subscription != std::nullopt);
+  REQUIRE(button_element.subscription != nullptr);
   REQUIRE(button_element.response_event != std::nullopt);
 
   // act - process a button click
@@ -142,7 +142,7 @@ TEST_CASE(
   // Register the subscriber with the event handler
   auto registration_result =
       test_context.GetGameContext().event_handler.RegisterSubscriber(
-          button_element.subscription.value());
+          button_element.subscription);
   if (!registration_result) {
     FAIL("Failed to register subscriber: " +
          registration_result.error().message);
@@ -153,7 +153,7 @@ TEST_CASE(
                                      std::monostate()};
   button_element.response_event = event_packet;
   REQUIRE(button_element.response_event != std::nullopt);
-  REQUIRE(button_element.subscription != std::nullopt);
+  REQUIRE(button_element.subscription);
 
   // Add an unrelated triggering event to event bus: the bitset does not match
   // the subscriber
@@ -173,7 +173,7 @@ TEST_CASE(
       .event_handler.UpateSubscribersFromGlobalEventBus();
 
   // Check subscriber is not active (since no matching event on bus)
-  REQUIRE_FALSE(button_element.subscription.value()->IsActive());
+  REQUIRE_FALSE(button_element.subscription->IsActive());
 
   // Run ProcessUIActionsAndEvents; should NOT add the quit event to the event
   // bus
@@ -219,7 +219,7 @@ TEST_CASE("UIActionLogic checks subscription before adding Event to EventBus "
   // register the subscriber with the event handler
   auto registration_result =
       test_context.GetGameContext().event_handler.RegisterSubscriber(
-          button_element.subscription.value());
+          button_element.subscription);
   if (!registration_result) {
     FAIL("Failed to register subscriber: " +
          registration_result.error().message);
@@ -229,7 +229,7 @@ TEST_CASE("UIActionLogic checks subscription before adding Event to EventBus "
                                      std::monostate()};
   button_element.response_event = event_packet;
   REQUIRE(button_element.response_event != std::nullopt);
-  REQUIRE(button_element.subscription != std::nullopt);
+  REQUIRE(button_element.subscription);
 
   // add triggering event to event bus
   steamrot::EventPacket trigger_event_packet{
@@ -246,7 +246,7 @@ TEST_CASE("UIActionLogic checks subscription before adding Event to EventBus "
       .event_handler.UpateSubscribersFromGlobalEventBus();
 
   // check subscriber is now active
-  REQUIRE(button_element.subscription.value()->IsActive());
+  REQUIRE(button_element.subscription->IsActive());
 
   // run ProcessUIActionsAndEvents and this should add the quit event to the
   // event bus
@@ -292,7 +292,7 @@ TEST_CASE("UIActionLogic sets Subscriber to inactive after processing "
   // register the subscriber with the event handler
   auto registration_result =
       test_context.GetGameContext().event_handler.RegisterSubscriber(
-          button_element.subscription.value());
+          button_element.subscription);
   if (!registration_result) {
     FAIL("Failed to register subscriber: " +
          registration_result.error().message);
@@ -302,7 +302,7 @@ TEST_CASE("UIActionLogic sets Subscriber to inactive after processing "
                                      std::monostate()};
   button_element.response_event = event_packet;
   REQUIRE(button_element.response_event != std::nullopt);
-  REQUIRE(button_element.subscription != std::nullopt);
+  REQUIRE(button_element.subscription);
   // add triggering event to event bus
   steamrot::EventPacket trigger_event_packet{
       steamrot::EventType_EVENT_USER_INPUT, steamrot::UserInputBitset{}};
@@ -315,7 +315,7 @@ TEST_CASE("UIActionLogic sets Subscriber to inactive after processing "
   test_context.GetGameContext()
       .event_handler.UpateSubscribersFromGlobalEventBus();
   // check subscriber is now active
-  REQUIRE(button_element.subscription.value()->IsActive());
+  REQUIRE(button_element.subscription->IsActive());
   // run ProcessUIActionsAndEvents and this should add the quit event to the
   // event bus
   steamrot::ProcessUIActionsAndEvents(
@@ -334,5 +334,5 @@ TEST_CASE("UIActionLogic sets Subscriber to inactive after processing "
           steamrot::EnumNameEventType(steamrot::EventType_EVENT_QUIT_GAME));
 
   // now check that the subscriber is set to inactive after processing
-  REQUIRE_FALSE(button_element.subscription.value()->IsActive());
+  REQUIRE_FALSE(button_element.subscription->IsActive());
 }
