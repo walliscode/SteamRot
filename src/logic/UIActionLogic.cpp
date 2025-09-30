@@ -48,12 +48,17 @@ void ProcessUIActionsAndEvents(UIElement &ui_element,
                                EventHandler &event_handler) {
 
   // check the subscription first
-  if (ui_element.subscription == std::nullopt)
+  if (!ui_element.subscription) {
+
     return;
+  }
 
   // if there is a subscription, then it must be active
-  if (!ui_element.subscription.value()->IsActive())
+  if (!ui_element.subscription->IsActive()) {
+    std::cout << "Subscription is not active, skipping UI element actions"
+              << std::endl;
     return;
+  }
 
   std::cout << "Subscription is active, processing UI element actions"
             << std::endl;
@@ -64,7 +69,7 @@ void ProcessUIActionsAndEvents(UIElement &ui_element,
   }
 
   // FINALLY set the subscriber to inactive
-  auto set_inactive_result = ui_element.subscription.value()->SetInactive();
+  auto set_inactive_result = ui_element.subscription->SetInactive();
 }
 
 /////////////////////////////////////////////////
@@ -73,13 +78,17 @@ void ProcessButtonElementActions(ButtonElement &button_element,
 
   // for now, all buttons need a mouse over to be clicked, so this will be the
   // top level flow control
+  std::cout << "Processing Button Element Actions" << std::endl;
   if (button_element.is_mouse_over) {
 
+    std::cout << "Button is mouse over, checking for click" << std::endl;
     // check if button has an event packet. for now, all event packets are sent
     // to the global event bus
     if (button_element.response_event.has_value())
 
-      event_handler.AddEvent(button_element.response_event.value());
+      std::cout << "Button has response event, adding to event bus"
+                << std::endl;
+    event_handler.AddEvent(button_element.response_event.value());
   }
 }
 

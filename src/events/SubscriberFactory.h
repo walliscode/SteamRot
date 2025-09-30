@@ -43,6 +43,15 @@ public:
   SubscriberFactory(EventHandler &event_handler);
 
   /////////////////////////////////////////////////
+  /// @brief Create a Subscriber from flatbuffers data
+  ///
+  /// @param subscriber_data Flatbuffers SubscriberData to create the subscriber
+  /// from.
+  /////////////////////////////////////////////////
+  std::expected<std::shared_ptr<Subscriber>, FailInfo>
+  CreateAndRegisterSubscriber(const SubscriberData &subscriber_data);
+
+  /////////////////////////////////////////////////
   /// @brief Given event type and data, create and register a subscriber.
   ///
   /// @param event_type Reference to the EventType for the subscriber
@@ -60,14 +69,5 @@ public:
   std::expected<std::shared_ptr<Subscriber>, FailInfo>
   CreateAndRegisterSubscriber(const EventType &event_type,
                               const EventData &trigger_data);
-
-  /////////////////////////////////////////////////
-  /// @brief Create a Subscriber from flatbuffers data
-  ///
-  /// @param subscriber_data Flatbuffers SubscriberData to create the subscriber
-  /// from.
-  /////////////////////////////////////////////////
-  std::expected<std::shared_ptr<Subscriber>, FailInfo>
-  CreateAndRegisterSubscriber(const SubscriberData &subscriber_data);
 };
 } // namespace steamrot

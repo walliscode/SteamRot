@@ -3,6 +3,7 @@
 ////////////////////////////////////////////////////////////
 #include "EventHandler.h"
 #include "FailInfo.h"
+#include "events_generated.h"
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <expected>
@@ -120,6 +121,8 @@ void EventHandler::UpateSubscribersFromGlobalEventBus() {
   // go through each event in the global event bus
   for (const auto &event : m_global_event_bus) {
 
+    std::cout << "Processing Event of type "
+              << EnumNameEventType(event.m_event_type) << std::endl;
     if (m_subscriber_register.contains(event.m_event_type)) {
       // go through each subscriber registered for the event type
       for (auto &subscriber_weak :
@@ -175,7 +178,7 @@ void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
     return;
 
   std::cout << "Updating Subscriber of type "
-            << locked_subscriber->GetRegistrationInfo().first << std::endl;
+            << EnumNameEventType(locked_subscriber->GetEventType());
   // update any releveant information for the subscriber
   auto activate_result = locked_subscriber->SetActive();
 

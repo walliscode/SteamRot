@@ -42,7 +42,7 @@ struct UIElement {
   /////////////////////////////////////////////////
   /// @brief Specific event this element is subscribed to
   /////////////////////////////////////////////////
-  std::optional<std::shared_ptr<Subscriber>> subscription{std::nullopt};
+  std::shared_ptr<Subscriber> subscription{nullptr};
 
   /////////////////////////////////////////////////
   /// @brief EventPacket to be pushed to the EventBus if criteria are met

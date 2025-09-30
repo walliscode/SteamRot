@@ -6,6 +6,7 @@
 #include "FailInfo.h"
 #include "GameContext.h"
 #include "SubscriberFactory.h"
+#include "events_generated.h"
 #include <SFML/Graphics.hpp>
 
 #include <cstddef>
@@ -166,8 +167,8 @@ GameEngine::ConfigureSubscribersFromData(
   for (const auto &subscription : *subscriptions) {
 
     // create and register subscriber with EventHandler
-    auto create_result = subscriber_factory.CreateAndRegisterSubscriber(
-        subscription->event_type_data());
+    auto create_result =
+        subscriber_factory.CreateAndRegisterSubscriber(*subscription);
     if (!create_result.has_value()) {
       return std::unexpected(create_result.error());
     }
@@ -190,11 +191,13 @@ std::expected<std::monostate, FailInfo> GameEngine::ProcessSubscriptions() {
 
   // cycle through all subscribers and process active ones
   for (const auto &subscriber : m_subscriptions) {
+    std::cout << "Checking Subscriber for EventType on GameEngine: "
+              << EnumNameEventType(subscriber->GetEventType()) << std::endl;
     // only process active subscribers
     if (subscriber->IsActive()) {
 
       std::cout << "Processing Subscriber for EventType on GameEngine: "
-                << static_cast<int>(subscriber->GetEventType()) << std::endl;
+                << EnumNameEventType(subscriber->GetEventType()) << std::endl;
       // get the event data
       const EventData &event_data = subscriber->GetEventData();
 

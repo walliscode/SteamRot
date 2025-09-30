@@ -228,8 +228,8 @@ SceneManager::ConfigureSubscribersFromData(
   for (const auto &subscription : *subscriptions) {
 
     // create and register subscriber with EventHandler
-    auto create_result = subscriber_factory.CreateAndRegisterSubscriber(
-        subscription->event_type_data());
+    auto create_result =
+        subscriber_factory.CreateAndRegisterSubscriber(*subscription);
     if (!create_result.has_value()) {
       return std::unexpected(create_result.error());
     }
