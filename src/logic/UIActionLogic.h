@@ -37,6 +37,20 @@ void ProcessUIActionsAndEvents(UIElement &ui_element,
                                EventHandler &event_handler);
 
 /////////////////////////////////////////////////
+/// @brief Process actions for a UI element and its nested children recursively.
+///
+/// This function processes UI elements in a depth-first manner, ensuring that
+/// child elements are processed before their parents. If a child element is
+/// processed, the parent element will not be processed to avoid overlapping
+/// element actions.
+///
+/// @param ui_element Element to process along with its children.
+/// @param event_handler Event handler to process actions with.
+/////////////////////////////////////////////////
+void ProcessNestedUIActionsAndEvents(UIElement &ui_element,
+                                     EventHandler &event_handler);
+
+/////////////////////////////////////////////////
 /// @brief Process actions for a ButtonElement
 ///
 /// This function checks if the button is in a state to trigger its response

@@ -36,9 +36,9 @@ void UIActionLogic::ProcessLogic() {
       CUserInterface &ui_component = emp_helpers::GetComponent<CUserInterface>(
           entity_id, m_logic_context.scene_entities);
 
-      // Perform any aciton logic here
-      ProcessUIActionsAndEvents(*ui_component.m_root_element,
-                                m_logic_context.event_handler);
+      // Perform any aciton logic here, processing nested elements recursively
+      ProcessNestedUIActionsAndEvents(*ui_component.m_root_element,
+                                      m_logic_context.event_handler);
     }
   }
 }
@@ -70,6 +70,39 @@ void ProcessUIActionsAndEvents(UIElement &ui_element,
 
   // FINALLY set the subscriber to inactive
   auto set_inactive_result = ui_element.subscription->SetInactive();
+}
+
+/////////////////////////////////////////////////
+void ProcessNestedUIActionsAndEvents(UIElement &ui_element,
+                                     EventHandler &event_handler) {
+  // bool to keep track if any child was processed
+  bool child_processed = false;
+
+  // cycle through all child elements and process recursively
+  for (auto &child : ui_element.child_elements) {
+
+    // Check if this child has an active subscription before processing
+    bool child_has_active_subscription = 
+        child->subscription && child->subscription->IsActive();
+
+    // go as deep as possible first, this will stop when no children are
+    // detected
+    ProcessNestedUIActionsAndEvents(*child, event_handler);
+    
+    // If the child had an active subscription, it (or one of its descendants)
+    // was processed
+    if (child_has_active_subscription) {
+      // for the parent to evaluate - child was processed
+      child_processed = true;
+      // if a child was processed, no need to check further children
+      break;
+    }
+  }
+  
+  if (!child_processed) {
+    // this will occur if no child was processed (or no children exist)
+    ProcessUIActionsAndEvents(ui_element, event_handler);
+  }
 }
 
 /////////////////////////////////////////////////
