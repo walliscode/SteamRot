@@ -369,16 +369,344 @@ cd build && ctest
 
 ### Adding Logic Classes
 
-1. **Define Logic Class** (TDD approach)
-   - Inherit from `Logic` abstract class
-   - Implement `PerformLogic()` method
-   - Takes `EntityMemoryPool` unique pointer
-   - Takes container of entity indices
+Logic classes implement game system behaviors (collision, rendering, actions, movement). Follow TDD approach: write tests first, then implement.
 
-2. **Update LogicFactory**
-   - Write tests in `LogicFactory.test.cpp` first
-   - Test order and number of Logic classes per scene
-   - Add to relevant `LogicFactory` switch statement
+#### Quick Reference Steps
+
+1. **Create Logic Class** (`src/logic/NewLogic.h` and `.cpp`)
+   - Inherit from `Logic` abstract class
+   - Override `ProcessLogic()` private method
+   - Constructor takes `const LogicContext` parameter
+
+2. **Write Unit Tests** (`tests/logic/NewLogic.test.cpp`)
+   - Test construction
+   - Test logic execution with various states
+   - Add to `tests/logic/CMakeLists.txt`
+
+3. **Update LogicFactory Tests** (`tests/logic/LogicFactory.test.cpp`)
+   - Add test case for scene using new Logic
+   - Verify order and count in LogicCollection
+
+4. **Update LogicFactory** (`src/logic/LogicFactory.cpp`)
+   - Add include for new Logic class
+   - Add to appropriate Create method (Render, Collision, Action)
+   - Add to correct scene case in switch statement
+
+5. **Update Test Helpers** (`tests/logic/logic_helpers.cpp`)
+   - Add include for new Logic class
+   - Update `CheckStaticLogicCollections()` for affected scenes
+   - Verify count, order, and types with `dynamic_cast`
+
+6. **Build and Test**
+   - `cmake --build build -j$(nproc)`
+   - `cd build && ./tests/logic/test_logic`
+
+#### Detailed Workflow
+
+Follow these steps to create a new derived Logic class:
+
+##### 1. Create Logic Header File
+
+**File: `src/logic/NewLogic.h`**
+
+```cpp
+/////////////////////////////////////////////////
+/// @file
+/// @brief Declaration of the NewLogic class.
+/////////////////////////////////////////////////
+
+#pragma once
+
+#include "Logic.h"
+
+namespace steamrot {
+
+class NewLogic : public Logic {
+
+private:
+  /////////////////////////////////////////////////
+  /// @brief Override method to encapsulate all logic for NewLogic
+  /////////////////////////////////////////////////
+  void ProcessLogic() override;
+
+public:
+  /////////////////////////////////////////////////
+  /// @brief Constructor for NewLogic.
+  ///
+  /// @param logic_context LogicContext object containing the context for the logic.
+  /////////////////////////////////////////////////
+  NewLogic(const LogicContext logic_context);
+};
+
+} // namespace steamrot
+```
+
+##### 2. Implement Logic Class
+
+**File: `src/logic/NewLogic.cpp`**
+
+```cpp
+/////////////////////////////////////////////////
+/// @file
+/// @brief Implementation of the NewLogic class.
+/////////////////////////////////////////////////
+
+#include "NewLogic.h"
+#include "ArchetypeHelpers.h"
+#include "CYourComponent.h"
+#include "emp_helpers.h"
+
+namespace steamrot {
+
+/////////////////////////////////////////////////
+NewLogic::NewLogic(const LogicContext logic_context)
+    : Logic(logic_context) {}
+
+/////////////////////////////////////////////////
+void NewLogic::ProcessLogic() {
+
+  // Generate archetype ID for needed components
+  ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<CYourComponent>();
+
+  const auto it = m_logic_context.archetypes.find(archetype_id);
+  
+  if (it != m_logic_context.archetypes.end()) {
+    const Archetype &archetype = it->second;
+
+    for (size_t entity_id : archetype) {
+      CYourComponent &component = emp_helpers::GetComponent<CYourComponent>(
+          entity_id, m_logic_context.scene_entities);
+
+      // Perform logic operations
+      // Access m_logic_context members as needed:
+      // - scene_texture, game_window, asset_manager
+      // - event_handler, mouse_position, etc.
+    }
+  }
+}
+
+} // namespace steamrot
+```
+
+##### 3. Write Unit Tests (TDD)
+
+**File: `tests/logic/NewLogic.test.cpp`**
+
+```cpp
+/////////////////////////////////////////////////
+/// @file
+/// @brief Unit tests for NewLogic class
+/////////////////////////////////////////////////
+
+#include "NewLogic.h"
+#include "TestContext.h"
+#include <catch2/catch_test_macros.hpp>
+
+TEST_CASE("NewLogic::NewLogic Constructor", "[NewLogic]") {
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::tests::TestContext test_context;
+  
+  steamrot::NewLogic new_logic(
+      test_context.GetLogicContextForTestScene());
+  SUCCEED("NewLogic instantiated successfully");
+}
+
+TEST_CASE("NewLogic::ProcessLogic performs expected logic", "[NewLogic]") {
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::tests::TestContext test_context;
+  
+  auto logic_context = test_context.GetLogicContextForTestScene();
+  
+  // Set up test entities and components
+  // ...
+  
+  steamrot::NewLogic new_logic(logic_context);
+  new_logic.RunLogic();
+  
+  // Assert expected state changes
+  // REQUIRE(...);
+}
+```
+
+**Add to `tests/logic/CMakeLists.txt`:**
+```cmake
+add_executable(test_logic
+  # ... existing tests ...
+  NewLogic.test.cpp
+)
+```
+
+##### 4. Update LogicFactory Tests
+
+**In `tests/logic/LogicFactory.test.cpp`:**
+
+```cpp
+TEST_CASE("LogicFactory creates correct Logic instances for YourScene",
+          "[LogicFactory]") {
+
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::tests::TestContext test_context{
+      steamrot::SceneType::SceneType_YOUR_SCENE};
+  
+  steamrot::LogicFactory logic_factory(
+      steamrot::SceneType::SceneType_YOUR_SCENE,
+      test_context.GetLogicContextForYourScene());
+
+  auto logic_map_result = logic_factory.CreateLogicMap();
+  REQUIRE(logic_map_result.has_value());
+
+  steamrot::tests::CheckStaticLogicCollections(
+      logic_map_result.value(), 
+      steamrot::SceneType::SceneType_YOUR_SCENE);
+}
+```
+
+##### 5. Update LogicFactory Implementation
+
+**In `src/logic/LogicFactory.cpp`:**
+
+Add include:
+```cpp
+#include "NewLogic.h"
+```
+
+Add to appropriate Create method:
+```cpp
+std::expected<LogicVector, FailInfo> LogicFactory::CreateActionLogics() {
+  LogicVector action_logics;
+
+  switch (m_scene_type) {
+  case SceneType::SceneType_YOUR_SCENE: {
+    action_logics.push_back(std::make_unique<NewLogic>(m_logic_context));
+    break;
+  }
+  // ... other cases ...
+  default:
+    return std::unexpected(FailInfo{FailMode::NonExistentEnumValue,
+                                    "Unsupported scene type"});
+  }
+  return action_logics;
+}
+```
+
+**Note:** Order matters - Logic classes execute in vector order.
+
+##### 6. Update Test Helper Functions
+
+**In `tests/logic/logic_helpers.cpp`:**
+
+Add include:
+```cpp
+#include "NewLogic.h"
+```
+
+Update `CheckStaticLogicCollections()`:
+```cpp
+void CheckStaticLogicCollections(const LogicCollection &collection,
+                                 const SceneType &scene_type) {
+  switch (scene_type) {
+  case SceneType::SceneType_YOUR_SCENE: {
+    REQUIRE(collection.size() == 3);
+    REQUIRE(collection.find(LogicType::Action) != collection.end());
+    
+    const LogicVector &action_logics = collection.at(LogicType::Action);
+    REQUIRE(action_logics.size() == 2);  // Updated count
+    REQUIRE(dynamic_cast<NewLogic *>(action_logics[0].get()));
+    REQUIRE(dynamic_cast<UIActionLogic *>(action_logics[1].get()));
+    
+    // ... check other LogicTypes ...
+    break;
+  }
+  // ... other cases ...
+  }
+}
+```
+
+#### Logic Class Patterns
+
+**Archetype-Based Processing:**
+```cpp
+ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<CComponent1, CComponent2>();
+const auto it = m_logic_context.archetypes.find(archetype_id);
+if (it != m_logic_context.archetypes.end()) {
+  // Process entities
+}
+```
+
+**Component Access:**
+```cpp
+CComponent &comp = emp_helpers::GetComponent<CComponent>(
+    entity_id, m_logic_context.scene_entities);
+```
+
+**Rendering Logic:**
+```cpp
+m_logic_context.scene_texture.draw(drawable);
+```
+
+**Event Handling:**
+```cpp
+m_logic_context.event_handler.AddEvent(event_packet);
+```
+
+#### LogicType Categories
+
+- **Collision**: Spatial interactions (UI collision, physics)
+- **Render**: Drawing to render texture (UI, entities)
+- **Action**: Input processing and event triggering
+- **Movement**: Position updates (player, AI)
+
+#### Testing Best Practices
+
+1. **Unit Tests**: Test Logic in isolation
+   - Constructor without errors
+   - ProcessLogic() with various states
+   - Edge cases (empty archetypes, null checks)
+
+2. **Integration Tests**: Test with LogicFactory
+   - Correct Logic creation for scenes
+   - Correct order in LogicVector
+   - Correct LogicType assignment
+
+3. **Use TestContext**: Provides mock dependencies
+   - `GetLogicContextForTestScene()`
+   - `GetLogicContextForTitleScene()`
+   - `GetLogicContextForCraftingScene()`
+
+4. **Validation Helpers**: Use `CheckStaticLogicCollections()`
+   - Verifies count, order, and types
+   - Uses `dynamic_cast` for type checking
+   - Add case for each scene type
+
+#### Common Issues and Solutions
+
+**Issue**: Logic not executing
+- **Check**: Archetype exists in scene
+- **Check**: Entities have required components
+- **Check**: Logic added to correct LogicType
+
+**Issue**: Test failures with "dynamic_cast returned null"
+- **Check**: Logic added to LogicFactory for that scene
+- **Check**: Include statement in LogicFactory.cpp
+- **Check**: Order in vector matches test expectations
+
+**Issue**: Wrong Logic order
+- **Remember**: Order in LogicVector = execution order
+- **Check**: Test helper validates expected order
+- **Update**: Both LogicFactory and test helper together
+
+#### Key Reminders
+
+- **Always** call base constructor: `Logic(logic_context)`
+- **Always** check archetype existence before iterating
+- **Always** write tests before implementation (TDD)
+- **Always** update test helpers when changing LogicFactory
+- **Never** add logic to component classes (keep them pure data)
+- **Never** modify entities outside their archetype's Logic
+- Use `m_logic_context` members (don't store duplicates)
+- Use visual dividers (`/////////////////////////////////////////////////`)
+- Use Doxygen documentation (`///`)
+- Use 2-space indentation
 
 ### Adding Actions
 
