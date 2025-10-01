@@ -9,7 +9,7 @@
 #include "Scene.h"
 #include "EntityManager.h"
 #include "LogicFactory.h"
-#include "scene_types_generated.h"
+#include "scene_change_packet_generated.h"
 
 namespace steamrot {
 

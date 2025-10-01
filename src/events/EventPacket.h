@@ -7,7 +7,7 @@
 
 #include "UserInputBitset.h"
 #include "events_generated.h"
-#include "scene_types_generated.h"
+#include "scene_change_packet_generated.h"
 #include "uuid.h"
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
@@ -15,14 +15,14 @@
 #include <variant>
 namespace steamrot {
 
-using SceneChangeData = std::pair<std::optional<uuids::uuid>, SceneType>;
+using SceneChangePacket = std::pair<std::optional<uuids::uuid>, SceneType>;
 
 using UIElementName = std::string;
 
 // all data types that can be used in an event packet (monostate to represent no
 // data)
-using EventData = std::variant<std::monostate, UserInputBitset, SceneChangeData,
-                               UIElementName>;
+using EventData = std::variant<std::monostate, UserInputBitset,
+                               SceneChangePacket, UIElementName>;
 
 struct EventPacket {
 

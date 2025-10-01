@@ -11,7 +11,6 @@
 #include "Fragment.h"
 #include "assets_generated.h"
 #include "fragments_generated.h"
-#include "scene_types_generated.h"
 #include "scenes_generated.h"
 #include "ui_style_generated.h"
 #include <SFML/Graphics/PrimitiveType.hpp>

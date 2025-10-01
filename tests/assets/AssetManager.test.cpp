@@ -9,7 +9,7 @@
 #include "AssetManager.h"
 #include "PathProvider.h"
 #include "asset_helpers.h"
-#include "scene_types_generated.h"
+#include "scene_change_packet_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("AssetManager is constructed correctly", "[AssetManager]") {

@@ -13,6 +13,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
+#include "scene_change_packet_generated.h"
 #include "user_input_generated.h"
 
 namespace steamrot {
@@ -55,29 +56,32 @@ inline const char *EnumNameEventType(EventType e) {
 enum EventDataData : uint8_t {
   EventDataData_NONE = 0,
   EventDataData_UserInputBitsetData = 1,
+  EventDataData_SceneChangePacketData = 2,
   EventDataData_MIN = EventDataData_NONE,
-  EventDataData_MAX = EventDataData_UserInputBitsetData
+  EventDataData_MAX = EventDataData_SceneChangePacketData
 };
 
-inline const EventDataData (&EnumValuesEventDataData())[2] {
+inline const EventDataData (&EnumValuesEventDataData())[3] {
   static const EventDataData values[] = {
     EventDataData_NONE,
-    EventDataData_UserInputBitsetData
+    EventDataData_UserInputBitsetData,
+    EventDataData_SceneChangePacketData
   };
   return values;
 }
 
 inline const char * const *EnumNamesEventDataData() {
-  static const char * const names[3] = {
+  static const char * const names[4] = {
     "NONE",
     "UserInputBitsetData",
+    "SceneChangePacketData",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameEventDataData(EventDataData e) {
-  if (::flatbuffers::IsOutRange(e, EventDataData_NONE, EventDataData_UserInputBitsetData)) return "";
+  if (::flatbuffers::IsOutRange(e, EventDataData_NONE, EventDataData_SceneChangePacketData)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesEventDataData()[index];
 }
@@ -90,6 +94,10 @@ template<> struct EventDataDataTraits<steamrot::UserInputBitsetData> {
   static const EventDataData enum_value = EventDataData_UserInputBitsetData;
 };
 
+template<> struct EventDataDataTraits<steamrot::SceneChangePacketData> {
+  static const EventDataData enum_value = EventDataData_SceneChangePacketData;
+};
+
 bool VerifyEventDataData(::flatbuffers::Verifier &verifier, const void *obj, EventDataData type);
 bool VerifyEventDataDataVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types);
 
@@ -100,6 +108,10 @@ inline bool VerifyEventDataData(::flatbuffers::Verifier &verifier, const void *o
     }
     case EventDataData_UserInputBitsetData: {
       auto ptr = reinterpret_cast<const steamrot::UserInputBitsetData *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case EventDataData_SceneChangePacketData: {
+      auto ptr = reinterpret_cast<const steamrot::SceneChangePacketData *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;

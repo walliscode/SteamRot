@@ -10,7 +10,7 @@
 #include "FlatbuffersConfigurator.h"
 #include "GameContext.h"
 #include "PathProvider.h"
-#include "scene_types_generated.h"
+#include "scene_change_packet_generated.h"
 #include <iostream>
 
 namespace steamrot::tests {

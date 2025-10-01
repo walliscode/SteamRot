@@ -12,7 +12,7 @@
 #include "TestContext.h"
 #include "configuration_helpers.h"
 #include "containers.h"
-#include "scene_types_generated.h"
+#include "scene_change_packet_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("ArchetypeManager is constructed without errors",

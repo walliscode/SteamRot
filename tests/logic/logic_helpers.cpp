@@ -13,7 +13,7 @@
 #include "UICollisionLogic.h"
 #include "UIRenderLogic.h"
 #include "catch2/catch_test_macros.hpp"
-#include "scene_types_generated.h"
+#include "scene_change_packet_generated.h"
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////

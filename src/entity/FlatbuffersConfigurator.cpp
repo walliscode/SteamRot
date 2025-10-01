@@ -11,7 +11,7 @@
 #include "EntityConfigurator.h"
 #include "UIElementFactory.h"
 #include "emp_helpers.h"
-#include "scene_types_generated.h"
+
 #include "user_interface_generated.h"
 #include <expected>
 #include <iostream>

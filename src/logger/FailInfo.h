@@ -28,6 +28,7 @@ enum class FailMode {
   EnumValueNotHandled,
   VariantTypeMismatch,
   NullPointer,
+  InvalidUUID
 };
 
 struct FailInfo {

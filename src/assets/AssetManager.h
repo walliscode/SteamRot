@@ -14,7 +14,7 @@
 #include "FailInfo.h"
 #include "PathProvider.h"
 #include "UIStyle.h"
-#include "scene_types_generated.h"
+#include "scene_change_packet_generated.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Font.hpp>
 #include <expected>

@@ -14,7 +14,7 @@
 #include "Subscriber.h"
 #include "SubscriberFactory.h"
 #include "events_generated.h"
-#include "scene_types_generated.h"
+#include "scene_change_packet_generated.h"
 #include "uuid.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <expected>
@@ -266,14 +266,14 @@ std::expected<std::monostate, FailInfo> SceneManager::ProcessSubscriptions() {
       case EventType::EventType_EVENT_CHANGE_SCENE: {
 
         // make sure the data type is correct
-        if (!std::holds_alternative<SceneChangeData>(event_data)) {
+        if (!std::holds_alternative<SceneChangePacket>(event_data)) {
           FailInfo fail_info(FailMode::ParameterOutOfBounds,
                              "EventData type does not match EventType");
           return std::unexpected(fail_info);
         }
         // case to SceneChangeData
-        const SceneChangeData &scene_change_data =
-            std::get<SceneChangeData>(event_data);
+        const SceneChangePacket &scene_change_data =
+            std::get<SceneChangePacket>(event_data);
 
         // check for scene type
         switch (scene_change_data.second) {

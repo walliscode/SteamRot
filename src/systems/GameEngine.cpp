@@ -87,6 +87,15 @@ void GameEngine::StartUp() {
       m_window.close();
     }
 
+  // Configure the SceneManager from data
+  auto configure_sm_result = m_scene_manager.ConfigureSceneManagerFromData(
+      data_loader.ProvideSceneManagerData().value());
+  if (!configure_sm_result)
+    if (!configure_sm_result) {
+      std::cerr << "Failed to configure scene manager: "
+                << configure_sm_result.error().message << "\n";
+      m_window.close();
+    }
   // load the title scene
   auto load_scene_result = m_scene_manager.LoadTitleScene();
   if (!load_scene_result)
