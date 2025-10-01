@@ -16,6 +16,7 @@
 #include <SFML/Graphics/PrimitiveType.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <expected>
+#include <format>
 
 namespace steamrot {
 

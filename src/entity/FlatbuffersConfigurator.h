@@ -11,6 +11,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "CUIState.h"
 #include "CUserInterface.h"
 #include "EntityConfigurator.h"
 #include "EventHandler.h"
@@ -18,6 +19,7 @@
 #include "FlatbuffersDataLoader.h"
 #include "containers.h"
 #include "grimoire_machina_generated.h"
+#include "ui_state_generated.h"
 #include "user_interface_generated.h"
 
 #include <expected>
@@ -60,6 +62,18 @@ private:
   std::expected<std::monostate, FailInfo>
   ConfigureComponent(const GrimoireMachinaData *grimoire_data,
                      CGrimoireMachina &grimoire_component);
+
+  /////////////////////////////////////////////////
+  /// @brief Overloaded method for configuring CUIState component
+  ///
+  /// @param ui_state_data Flatbuffers table data for UIState
+  /// @param ui_state_component CUIState instance to be configured
+  /// @param entity_memory_pool Reference to EntityMemoryPool to resolve UI names
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ConfigureComponent(const UIStateData *ui_state_data,
+                     CUIState &ui_state_component,
+                     const EntityMemoryPool &entity_memory_pool);
 
 public:
   /////////////////////////////////////////////////

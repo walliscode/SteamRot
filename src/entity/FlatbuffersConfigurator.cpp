@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersConfigurator.h"
+#include "CUIState.h"
 #include "CUserInterface.h"
 #include "EntityConfigurator.h"
 #include "UIElementFactory.h"
@@ -89,12 +90,35 @@ FlatbuffersConfigurator::ConfigureEntitiesFromDefaultData(
         return std::unexpected(configure_result.error());
     }
 
-    // CGrimoireMac    // CGrimoireMachina component configuration
+    // CGrimoireMachina component configuration
     if (entity_data->c_grimoire_machina()) {
 
       auto configure_result = ConfigureComponent(
           entity_data->c_grimoire_machina(),
           emp_helpers::GetComponent<CGrimoireMachina>(i, entity_memory_pool));
+
+      if (!configure_result.has_value())
+        return std::unexpected(configure_result.error());
+    }
+  }
+
+  // Configure compound components after simpler components
+  // CUIState needs to reference CUserInterface components by name
+  for (size_t i = 0; i < entity_count; ++i) {
+
+    const EntityData *entity_data =
+        scene_data->entity_collection()->entities()->Get(i);
+
+    if (entity_data == nullptr) {
+      continue; // Skip null entities
+    }
+
+    // CUIState component configuration (compound component)
+    if (entity_data->c_ui_state()) {
+      auto configure_result = ConfigureComponent(
+          entity_data->c_ui_state(),
+          emp_helpers::GetComponent<CUIState>(i, entity_memory_pool),
+          entity_memory_pool);
 
       if (!configure_result.has_value())
         return std::unexpected(configure_result.error());
@@ -182,6 +206,104 @@ FlatbuffersConfigurator::ConfigureComponent(
   }
   // assign the loaded fragments to the CGrimoireMachina component
   grimoire_component.m_all_fragments = fragment_load_result.value();
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+FlatbuffersConfigurator::ConfigureComponent(
+    const UIStateData *ui_state_data, CUIState &ui_state_component,
+    const EntityMemoryPool &entity_memory_pool) {
+
+  // configure the underlying Component type
+  auto configure_result =
+      ConfigureComponent(static_cast<Component &>(ui_state_component));
+
+  if (!configure_result.has_value())
+    return std::unexpected(configure_result.error());
+
+  // check that mappings exist
+  if (!ui_state_data->mappings()) {
+    FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
+                       "No mappings found in UIStateData."};
+    return std::unexpected(fail_info);
+  }
+
+  // Build a map of UI names to entity indices for quick lookup
+  std::unordered_map<std::string, size_t> ui_name_to_index;
+  const auto &ui_components =
+      std::get<std::vector<CUserInterface>>(entity_memory_pool);
+
+  for (size_t i = 0; i < ui_components.size(); ++i) {
+    if (ui_components[i].m_active) {
+      ui_name_to_index[ui_components[i].m_name] = i;
+    }
+  }
+
+  // Process each mapping
+  for (const auto *mapping : *ui_state_data->mappings()) {
+    if (!mapping) {
+      continue;
+    }
+
+    // Check state_key exists
+    if (!mapping->state_key()) {
+      FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
+                         "State key not found in UIStateMapping."};
+      return std::unexpected(fail_info);
+    }
+
+    std::string state_key = mapping->state_key()->str();
+    UIVisibilityState visibility_state;
+
+    // Process ui_names_on (UIs that should be visible)
+    if (mapping->ui_names_on()) {
+      for (const auto *ui_name_fb : *mapping->ui_names_on()) {
+        if (!ui_name_fb) {
+          continue;
+        }
+
+        std::string ui_name = ui_name_fb->str();
+
+        // Look up the index for this UI name
+        auto it = ui_name_to_index.find(ui_name);
+        if (it == ui_name_to_index.end()) {
+          std::string error_msg =
+              "UI component with name '" + ui_name + "' not found in ui_names_on.";
+          FailInfo fail_info{FailMode::FlatbuffersDataNotFound, error_msg};
+          return std::unexpected(fail_info);
+        }
+
+        visibility_state.m_ui_indices_on.push_back(it->second);
+      }
+    }
+
+    // Process ui_names_off (UIs that should be hidden)
+    if (mapping->ui_names_off()) {
+      for (const auto *ui_name_fb : *mapping->ui_names_off()) {
+        if (!ui_name_fb) {
+          continue;
+        }
+
+        std::string ui_name = ui_name_fb->str();
+
+        // Look up the index for this UI name
+        auto it = ui_name_to_index.find(ui_name);
+        if (it == ui_name_to_index.end()) {
+          std::string error_msg =
+              "UI component with name '" + ui_name + "' not found in ui_names_off.";
+          FailInfo fail_info{FailMode::FlatbuffersDataNotFound, error_msg};
+          return std::unexpected(fail_info);
+        }
+
+        visibility_state.m_ui_indices_off.push_back(it->second);
+      }
+    }
+
+    // Store the visibility state for this state key
+    ui_state_component.m_state_to_ui_visibility[state_key] = visibility_state;
+  }
 
   return std::monostate{};
 }
