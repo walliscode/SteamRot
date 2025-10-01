@@ -19,10 +19,28 @@
 namespace steamrot {
 
 ////////////////////////////////////////////////////////////
+/// @brief Holds UI visibility state for a particular state key
+///
+/// Specifies which UI components should be visible (on) and
+/// which should be hidden (off) for a given state.
+////////////////////////////////////////////////////////////
+struct UIVisibilityState {
+  ////////////////////////////////////////////////////////////
+  /// @brief Entity indices of UI components that should be visible
+  ////////////////////////////////////////////////////////////
+  std::vector<size_t> m_ui_indices_on;
+
+  ////////////////////////////////////////////////////////////
+  /// @brief Entity indices of UI components that should be hidden
+  ////////////////////////////////////////////////////////////
+  std::vector<size_t> m_ui_indices_off;
+};
+
+////////////////////////////////////////////////////////////
 /// @brief Component for managing UI visibility based on scene state
 ///
-/// This component maps state keys to CUserInterface component indices
-/// and manages their visibility based on the scene state.
+/// This component maps state keys to UI visibility states,
+/// specifying which UI components should be on and which should be off.
 ////////////////////////////////////////////////////////////
 struct CUIState : public Component {
 
@@ -32,13 +50,13 @@ struct CUIState : public Component {
   CUIState() = default;
 
   ////////////////////////////////////////////////////////////
-  /// @brief Mapping of state keys to vectors of UI component indices
+  /// @brief Mapping of state keys to UI visibility states
   ///
-  /// Each state key maps to a vector of entity indices that have
-  /// CUserInterface components. When a state key is true, the
-  /// corresponding UI components should be visible.
+  /// Each state key maps to a UIVisibilityState that specifies
+  /// which UI components should be visible (on) and which should
+  /// be hidden (off).
   ////////////////////////////////////////////////////////////
-  std::unordered_map<std::string, std::vector<size_t>> m_state_to_ui_indices;
+  std::unordered_map<std::string, UIVisibilityState> m_state_to_ui_visibility;
 
   ////////////////////////////////////////////////////////////
   /// @brief Get the position of the Component in the Component Register.

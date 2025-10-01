@@ -25,21 +25,28 @@ struct UIStateMapping FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef UIStateMappingBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_STATE_KEY = 4,
-    VT_UI_NAMES = 6
+    VT_UI_NAMES_ON = 6,
+    VT_UI_NAMES_OFF = 8
   };
   const ::flatbuffers::String *state_key() const {
     return GetPointer<const ::flatbuffers::String *>(VT_STATE_KEY);
   }
-  const ::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>> *ui_names() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>> *>(VT_UI_NAMES);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>> *ui_names_on() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>> *>(VT_UI_NAMES_ON);
+  }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>> *ui_names_off() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>> *>(VT_UI_NAMES_OFF);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_STATE_KEY) &&
            verifier.VerifyString(state_key()) &&
-           VerifyOffsetRequired(verifier, VT_UI_NAMES) &&
-           verifier.VerifyVector(ui_names()) &&
-           verifier.VerifyVectorOfStrings(ui_names()) &&
+           VerifyOffset(verifier, VT_UI_NAMES_ON) &&
+           verifier.VerifyVector(ui_names_on()) &&
+           verifier.VerifyVectorOfStrings(ui_names_on()) &&
+           VerifyOffset(verifier, VT_UI_NAMES_OFF) &&
+           verifier.VerifyVector(ui_names_off()) &&
+           verifier.VerifyVectorOfStrings(ui_names_off()) &&
            verifier.EndTable();
   }
 };
@@ -51,8 +58,11 @@ struct UIStateMappingBuilder {
   void add_state_key(::flatbuffers::Offset<::flatbuffers::String> state_key) {
     fbb_.AddOffset(UIStateMapping::VT_STATE_KEY, state_key);
   }
-  void add_ui_names(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>> ui_names) {
-    fbb_.AddOffset(UIStateMapping::VT_UI_NAMES, ui_names);
+  void add_ui_names_on(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>> ui_names_on) {
+    fbb_.AddOffset(UIStateMapping::VT_UI_NAMES_ON, ui_names_on);
+  }
+  void add_ui_names_off(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>> ui_names_off) {
+    fbb_.AddOffset(UIStateMapping::VT_UI_NAMES_OFF, ui_names_off);
   }
   explicit UIStateMappingBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -62,7 +72,6 @@ struct UIStateMappingBuilder {
     const auto end = fbb_.EndTable(start_);
     auto o = ::flatbuffers::Offset<UIStateMapping>(end);
     fbb_.Required(o, UIStateMapping::VT_STATE_KEY);
-    fbb_.Required(o, UIStateMapping::VT_UI_NAMES);
     return o;
   }
 };
@@ -70,9 +79,11 @@ struct UIStateMappingBuilder {
 inline ::flatbuffers::Offset<UIStateMapping> CreateUIStateMapping(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::String> state_key = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>> ui_names = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>> ui_names_on = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>> ui_names_off = 0) {
   UIStateMappingBuilder builder_(_fbb);
-  builder_.add_ui_names(ui_names);
+  builder_.add_ui_names_off(ui_names_off);
+  builder_.add_ui_names_on(ui_names_on);
   builder_.add_state_key(state_key);
   return builder_.Finish();
 }
@@ -80,13 +91,16 @@ inline ::flatbuffers::Offset<UIStateMapping> CreateUIStateMapping(
 inline ::flatbuffers::Offset<UIStateMapping> CreateUIStateMappingDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const char *state_key = nullptr,
-    const std::vector<::flatbuffers::Offset<::flatbuffers::String>> *ui_names = nullptr) {
+    const std::vector<::flatbuffers::Offset<::flatbuffers::String>> *ui_names_on = nullptr,
+    const std::vector<::flatbuffers::Offset<::flatbuffers::String>> *ui_names_off = nullptr) {
   auto state_key__ = state_key ? _fbb.CreateString(state_key) : 0;
-  auto ui_names__ = ui_names ? _fbb.CreateVector<::flatbuffers::Offset<::flatbuffers::String>>(*ui_names) : 0;
+  auto ui_names_on__ = ui_names_on ? _fbb.CreateVector<::flatbuffers::Offset<::flatbuffers::String>>(*ui_names_on) : 0;
+  auto ui_names_off__ = ui_names_off ? _fbb.CreateVector<::flatbuffers::Offset<::flatbuffers::String>>(*ui_names_off) : 0;
   return steamrot::CreateUIStateMapping(
       _fbb,
       state_key__,
-      ui_names__);
+      ui_names_on__,
+      ui_names_off__);
 }
 
 struct UIStateData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {

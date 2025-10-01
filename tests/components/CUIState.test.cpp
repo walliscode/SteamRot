@@ -15,6 +15,6 @@ TEST_CASE("CUIState is default constructible and has correct properties",
   steamrot::CUIState ui_state;
   // Test pre configuration state
   REQUIRE(ui_state.m_active == false);
-  REQUIRE(ui_state.m_state_to_ui_indices.empty());
+  REQUIRE(ui_state.m_state_to_ui_visibility.empty());
   REQUIRE(ui_state.GetComponentRegisterIndex() == 4);
 }

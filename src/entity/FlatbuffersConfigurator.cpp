@@ -255,37 +255,54 @@ FlatbuffersConfigurator::ConfigureComponent(
     }
 
     std::string state_key = mapping->state_key()->str();
+    UIVisibilityState visibility_state;
 
-    // Check ui_names exists
-    if (!mapping->ui_names()) {
-      FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
-                         "UI names not found in UIStateMapping."};
-      return std::unexpected(fail_info);
+    // Process ui_names_on (UIs that should be visible)
+    if (mapping->ui_names_on()) {
+      for (const auto *ui_name_fb : *mapping->ui_names_on()) {
+        if (!ui_name_fb) {
+          continue;
+        }
+
+        std::string ui_name = ui_name_fb->str();
+
+        // Look up the index for this UI name
+        auto it = ui_name_to_index.find(ui_name);
+        if (it == ui_name_to_index.end()) {
+          std::string error_msg =
+              "UI component with name '" + ui_name + "' not found in ui_names_on.";
+          FailInfo fail_info{FailMode::FlatbuffersDataNotFound, error_msg};
+          return std::unexpected(fail_info);
+        }
+
+        visibility_state.m_ui_indices_on.push_back(it->second);
+      }
     }
 
-    // Resolve UI names to indices
-    std::vector<size_t> ui_indices;
-    for (const auto *ui_name_fb : *mapping->ui_names()) {
-      if (!ui_name_fb) {
-        continue;
+    // Process ui_names_off (UIs that should be hidden)
+    if (mapping->ui_names_off()) {
+      for (const auto *ui_name_fb : *mapping->ui_names_off()) {
+        if (!ui_name_fb) {
+          continue;
+        }
+
+        std::string ui_name = ui_name_fb->str();
+
+        // Look up the index for this UI name
+        auto it = ui_name_to_index.find(ui_name);
+        if (it == ui_name_to_index.end()) {
+          std::string error_msg =
+              "UI component with name '" + ui_name + "' not found in ui_names_off.";
+          FailInfo fail_info{FailMode::FlatbuffersDataNotFound, error_msg};
+          return std::unexpected(fail_info);
+        }
+
+        visibility_state.m_ui_indices_off.push_back(it->second);
       }
-
-      std::string ui_name = ui_name_fb->str();
-
-      // Look up the index for this UI name
-      auto it = ui_name_to_index.find(ui_name);
-      if (it == ui_name_to_index.end()) {
-        std::string error_msg =
-            "UI component with name '" + ui_name + "' not found.";
-        FailInfo fail_info{FailMode::FlatbuffersDataNotFound, error_msg};
-        return std::unexpected(fail_info);
-      }
-
-      ui_indices.push_back(it->second);
     }
 
-    // Store the mapping
-    ui_state_component.m_state_to_ui_indices[state_key] = ui_indices;
+    // Store the visibility state for this state key
+    ui_state_component.m_state_to_ui_visibility[state_key] = visibility_state;
   }
 
   return std::monostate{};

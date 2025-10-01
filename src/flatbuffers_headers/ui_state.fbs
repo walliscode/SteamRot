@@ -1,12 +1,13 @@
 namespace steamrot;
 
-// Maps a state key to a list of UI component names
+// Maps a state key to lists of UI components that should be on/off
 table UIStateMapping {
   state_key: string (required);
-  ui_names: [string] (required);
+  ui_names_on: [string];
+  ui_names_off: [string];
 }
 
 table UIStateData {
-  // Collection of state key to UI name mappings
+  // Collection of state key to UI visibility mappings
   mappings: [UIStateMapping] (required);
 }
