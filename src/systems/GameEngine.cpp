@@ -4,6 +4,7 @@
 
 #include "GameEngine.h"
 #include "FailInfo.h"
+#include "FlatbuffersDataLoader.h"
 #include "GameContext.h"
 #include "SubscriberFactory.h"
 #include "events_generated.h"
@@ -59,6 +60,23 @@ void GameEngine::RunGame(size_t number_of_loops, bool simulation) {
 void GameEngine::StartUp() {
   // limit window framerate
   m_window.setFramerateLimit(60);
+
+  // configure the GameEngine from data
+  FlatbuffersDataLoader data_loader;
+  auto load_data_result = data_loader.ProvideGameEngineData();
+  if (!load_data_result)
+    if (!load_data_result) {
+      std::cerr << "Failed to load game engine data: "
+                << load_data_result.error().message << "\n";
+      m_window.close();
+    }
+  auto configure_result = ConfigureGameEngineFromData(load_data_result.value());
+  if (!configure_result)
+    if (!configure_result) {
+      std::cerr << "Failed to configure game engine: "
+                << configure_result.error().message << "\n";
+      m_window.close();
+    }
 
   // load default assets
   auto load_assets_result = m_asset_manager.LoadDefaultAssets();
@@ -191,13 +209,10 @@ std::expected<std::monostate, FailInfo> GameEngine::ProcessSubscriptions() {
 
   // cycle through all subscribers and process active ones
   for (const auto &subscriber : m_subscriptions) {
-    std::cout << "Checking Subscriber for EventType on GameEngine: "
-              << EnumNameEventType(subscriber->GetEventType()) << std::endl;
+
     // only process active subscribers
     if (subscriber->IsActive()) {
 
-      std::cout << "Processing Subscriber for EventType on GameEngine: "
-                << EnumNameEventType(subscriber->GetEventType()) << std::endl;
       // get the event data
       const EventData &event_data = subscriber->GetEventData();
 

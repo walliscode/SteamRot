@@ -421,6 +421,7 @@ TEST_CASE("SceneManager::UpdateSceneManager cause scene change via subscribers",
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
+
   // Create and register a Subscriber for EventType_EVENT_CHANGE_SCENE
   auto subscriber = std::make_shared<steamrot::Subscriber>(
       steamrot::EventType_EVENT_CHANGE_SCENE);
@@ -428,8 +429,10 @@ TEST_CASE("SceneManager::UpdateSceneManager cause scene change via subscribers",
   if (!register_result.has_value()) {
     FAIL("Failed to register subscriber: " + register_result.error().message);
   }
+
   // check that no scenes are loaded initially
   REQUIRE(scene_manager.GetScenes().empty());
+
   // Activate the Subscriber with SceneChangeData to load Title scene
   steamrot::SceneChangeData scene_change_data{
       uuids::uuid{}, steamrot::SceneType::SceneType_TITLE};
@@ -461,6 +464,7 @@ TEST_CASE("SceneManager processes Subscriber and sets it to inactive",
   }
   // check that no scenes are loaded initially
   REQUIRE(scene_manager.GetScenes().empty());
+
   // Activate the Subscriber with SceneChangeData to load Title scene
   steamrot::SceneChangeData scene_change_data{
       uuids::uuid{}, steamrot::SceneType::SceneType_TITLE};

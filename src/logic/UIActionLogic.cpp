@@ -55,13 +55,9 @@ void ProcessUIActionsAndEvents(UIElement &ui_element,
 
   // if there is a subscription, then it must be active
   if (!ui_element.subscription->IsActive()) {
-    std::cout << "Subscription is not active, skipping UI element actions"
-              << std::endl;
     return;
   }
 
-  std::cout << "Subscription is active, processing UI element actions"
-            << std::endl;
   // use a dynamic cast to determine the type of UIElement
   if (ButtonElement *button_element =
           dynamic_cast<ButtonElement *>(&ui_element)) {
@@ -82,13 +78,13 @@ void ProcessNestedUIActionsAndEvents(UIElement &ui_element,
   for (auto &child : ui_element.child_elements) {
 
     // Check if this child has an active subscription before processing
-    bool child_has_active_subscription = 
+    bool child_has_active_subscription =
         child->subscription && child->subscription->IsActive();
 
     // go as deep as possible first, this will stop when no children are
     // detected
     ProcessNestedUIActionsAndEvents(*child, event_handler);
-    
+
     // If the child had an active subscription, it (or one of its descendants)
     // was processed
     if (child_has_active_subscription) {
@@ -98,7 +94,7 @@ void ProcessNestedUIActionsAndEvents(UIElement &ui_element,
       break;
     }
   }
-  
+
   if (!child_processed) {
     // this will occur if no child was processed (or no children exist)
     ProcessUIActionsAndEvents(ui_element, event_handler);
