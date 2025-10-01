@@ -11,6 +11,7 @@
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
 #include "UIRenderLogic.h"
+#include "UIStateLogic.h"
 #include <expected>
 
 namespace steamrot {
@@ -118,15 +119,18 @@ std::expected<LogicVector, FailInfo> LogicFactory::CreateActionLogics() {
   switch (m_scene_type) {
   case SceneType::SceneType_TITLE: {
 
+    action_logics.push_back(std::make_unique<UIStateLogic>(m_logic_context));
     action_logics.push_back(std::make_unique<UIActionLogic>(m_logic_context));
     break;
   }
   case SceneType::SceneType_CRAFTING: {
+    action_logics.push_back(std::make_unique<UIStateLogic>(m_logic_context));
     action_logics.push_back(std::make_unique<UIActionLogic>(m_logic_context));
     break;
   }
   case SceneType::SceneType_TEST: {
     // add action logics for test purposes
+    action_logics.push_back(std::make_unique<UIStateLogic>(m_logic_context));
     action_logics.push_back(std::make_unique<UIActionLogic>(m_logic_context));
     break;
   }
