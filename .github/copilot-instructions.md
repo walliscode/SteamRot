@@ -124,22 +124,231 @@ The project follows the [Pitchfork](https://github.com/vector-of-bool/pitchfork)
 
 ### Adding/Modifying Components
 
-1. **Create Component Struct** (`src/components/`)
-   - Inherit from `Component`
-   - Pure data container (no methods)
-   - Ensure default-constructible
-   - Register in `ComponentRegister` tuple
+Follow these steps to add a new component to the game engine:
 
-2. **Create FlatBuffers Schema** (`.fbs` file)
-   - Name: `ComponentNameData`
-   - Include in `entities.fbs`
-   - Add to `EntityData` table
+#### 1. Create Component Struct (`src/components/`)
 
-3. **Configure Component** (TDD approach)
-   - Create overloaded `ConfigureComponent` method in relevant Configurator
-   - Write tests first to validate configuration
-   - Add if statement to main configure method
-   - Add null/validation checks for FlatBuffers fields
+**Files to create:**
+- `src/components/CNewComponent.h` (header)
+- `src/components/CNewComponent.cpp` (source)
+
+**Component Requirements:**
+- Inherit from `Component` struct
+- Pure data container (no logic, only data members + `GetComponentRegisterIndex()`)
+- Must be default-constructible (initialize all members)
+- Use `C` prefix for class name (e.g., `CNewComponent`)
+- Use `m_` prefix for member variables
+
+**Example Header:**
+```cpp
+////////////////////////////////////////////////////////////
+/// @file
+/// @brief Declaration of the CNewComponent class.
+////////////////////////////////////////////////////////////
+
+#pragma once
+
+#include "Component.h"
+#include <string>
+
+namespace steamrot {
+
+struct CNewComponent : public Component {
+  CNewComponent() = default;
+
+  ////////////////////////////////////////////////////////////
+  /// @brief Description of data member
+  ////////////////////////////////////////////////////////////
+  std::string m_data_field{"default_value"};
+  
+  int m_numeric_value{0};
+
+  ////////////////////////////////////////////////////////////
+  /// @brief Get the position of the Component in the Component Register.
+  ///
+  /// @return index of the component in the component register
+  ////////////////////////////////////////////////////////////
+  size_t GetComponentRegisterIndex() const override;
+};
+} // namespace steamrot
+```
+
+**Example Source:**
+```cpp
+#include "CNewComponent.h"
+#include "containers.h"
+
+namespace steamrot {
+
+////////////////////////////////////////////////////////////
+size_t CNewComponent::GetComponentRegisterIndex() const {
+  return TupleTypeIndex<CNewComponent, ComponentRegister>;
+}
+
+} // namespace steamrot
+```
+
+#### 2. Register Component
+
+**In `src/components/containers.h`:**
+
+Add include:
+```cpp
+#include "CNewComponent.h"
+```
+
+Add to `ComponentRegister` tuple (at the end):
+```cpp
+typedef std::tuple<CMeta, CUserInterface, CMachinaForm, CGrimoireMachina, CNewComponent>
+    ComponentRegister;
+```
+
+#### 3. Create FlatBuffers Schema (`.fbs` file)
+
+**Create `src/flatbuffers_headers/new_component.fbs`:**
+```fbs
+namespace steamrot;
+
+table NewComponentData {
+  data_field: string;
+  numeric_value: int;
+}
+```
+
+**Add to `src/flatbuffers_headers/generate_flatbuffers_headers.cmake`:**
+```cmake
+set(schema_files
+    # ... existing files ...
+    ${CMAKE_CURRENT_SOURCE_DIR}/new_component.fbs
+)
+```
+
+**Include in `src/flatbuffers_headers/entities.fbs`:**
+```fbs
+include "user_interface.fbs";
+include "grimoire_machina.fbs";
+include "new_component.fbs";  // Add this
+namespace steamrot;
+
+table EntityData{
+  index: uint32;
+  c_user_interface: UserInterfaceData;
+  c_grimoire_machina: GrimoireMachinaData;
+  c_new_component: NewComponentData;  // Add this
+}
+```
+
+**Build to generate headers:**
+```bash
+cmake --build build
+```
+
+#### 4. Create ConfigureComponent Method (TDD approach)
+
+**In `src/entity/FlatbuffersConfigurator.h`:**
+
+Add includes:
+```cpp
+#include "CNewComponent.h"
+#include "new_component_generated.h"
+```
+
+Add method declaration in private section:
+```cpp
+////////////////////////////////////////////////////////////
+/// @brief Overloaded method for configuring CNewComponent
+///
+/// @param component_data Flatbuffers table data for NewComponent
+/// @param component CNewComponent instance to be configured
+////////////////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureComponent(const NewComponentData *component_data,
+                   CNewComponent &component);
+```
+
+**In `src/entity/FlatbuffersConfigurator.cpp`:**
+
+Add implementation:
+```cpp
+////////////////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+FlatbuffersConfigurator::ConfigureComponent(
+    const NewComponentData *component_data,
+    CNewComponent &component) {
+
+  // Configure base Component first
+  auto configure_result =
+      ConfigureComponent(static_cast<Component &>(component));
+
+  if (!configure_result.has_value())
+    return std::unexpected(configure_result.error());
+
+  // Configure specific data with null checks
+  if (component_data->data_field())
+    component.m_data_field = component_data->data_field()->str();
+
+  component.m_numeric_value = component_data->numeric_value();
+
+  return std::monostate{};
+}
+```
+
+#### 5. Add Configuration Call
+
+**In `FlatbuffersConfigurator::ConfigureEntitiesFromDefaultData`:**
+
+Add this block with other component configurations:
+```cpp
+// CNewComponent component configuration
+if (entity_data->c_new_component()) {
+  auto configure_result = ConfigureComponent(
+      entity_data->c_new_component(),
+      emp_helpers::GetComponent<CNewComponent>(i, entity_memory_pool));
+
+  if (!configure_result.has_value())
+    return std::unexpected(configure_result.error());
+}
+```
+
+#### 6. Write Tests
+
+**Create `tests/components/CNewComponent.test.cpp` (if testing component itself):**
+```cpp
+#include "CNewComponent.h"
+#include <catch2/catch_test_macros.hpp>
+
+TEST_CASE("CNewComponent is default constructible", "[CNewComponent]") {
+  steamrot::CNewComponent component;
+  REQUIRE(component.m_active == false);
+  REQUIRE(component.m_data_field == "default_value");
+}
+```
+
+**Add to `tests/components/CMakeLists.txt`:**
+```cmake
+add_executable(test_components
+  CGrimoireMachina.test.cpp
+  CNewComponent.test.cpp  # Add this
+)
+```
+
+**Update `tests/entity/FlatbuffersConfigurator.test.cpp`** for configuration testing
+
+#### 7. Build and Test
+
+```bash
+cmake --build build
+cd build && ctest
+```
+
+#### Critical Points
+
+- **Always** wrap FlatBuffers field access in `if` statements (strings, vectors, tables)
+- **Always** call base `ConfigureComponent(Component&)` first
+- **Always** use default initialization for all member variables
+- **Follow TDD**: Write tests before implementing configuration
+- **Primitive types** (int, bool, float) can be accessed directly from FlatBuffers
+- **Complex types** (strings, vectors, tables) must be null-checked
 
 ### Adding UI Elements
 
