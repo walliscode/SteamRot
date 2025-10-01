@@ -1,3 +1,4 @@
+
 namespace steamrot;
 
 enum SceneType: byte {
@@ -6,3 +7,9 @@ enum SceneType: byte {
   TITLE = 2,
   CRAFTING = 3
   }
+
+table SceneChangePacketData {
+  uuid: string ;
+  scene_type: SceneType ;
+}
+

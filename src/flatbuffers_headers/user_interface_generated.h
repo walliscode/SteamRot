@@ -14,7 +14,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
              "Non-compatible flatbuffers version included");
 
 #include "event_packet_data_generated.h"
-#include "scene_types_generated.h"
+#include "scene_change_packet_generated.h"
 #include "subscriber_config_generated.h"
 #include "types_generated.h"
 

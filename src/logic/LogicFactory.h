@@ -12,7 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "Logic.h"
-#include "scene_types_generated.h"
+#include "scene_change_packet_generated.h"
 #include <expected>
 #include <memory>
 #include <unordered_map>

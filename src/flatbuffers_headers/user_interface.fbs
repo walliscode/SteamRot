@@ -1,5 +1,5 @@
 include "types.fbs";
-include "scene_types.fbs";
+include "scene_change_packet.fbs";
 include "subscriber_config.fbs";
 include "event_packet_data.fbs";
 namespace steamrot;

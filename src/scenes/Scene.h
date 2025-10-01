@@ -17,7 +17,7 @@
 #include "Logic.h"
 #include "LogicFactory.h"
 #include "global_constants.h"
-#include "scene_types_generated.h"
+#include "scene_change_packet_generated.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <unordered_map>

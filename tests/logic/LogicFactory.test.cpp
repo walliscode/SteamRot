@@ -11,7 +11,7 @@
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
 #include "logic_helpers.h"
-#include "scene_types_generated.h"
+#include "scene_change_packet_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("LogicFactory constructed without errors", "[LogicFactory]") {

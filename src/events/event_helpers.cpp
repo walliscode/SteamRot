@@ -1,4 +1,6 @@
 #include "event_helpers.h"
+#include "events_generated.h"
+#include "uuid.h"
 #include <cstddef>
 #include <variant>
 
@@ -68,8 +70,42 @@ ConvertFlatbuffersEventDataDataToEventData(const EventDataData data_type,
         ConvertFBDataToUserInputBitset(*user_input_bitset_data);
     if (!user_input_bitset_result.has_value())
       return std::unexpected(user_input_bitset_result.error());
+
     return user_input_bitset_result.value();
   }
+  case EventDataData::EventDataData_SceneChangePacketData: {
+    // cast data to SceneChangePacketData
+    auto scene_change_packet_data =
+        static_cast<const SceneChangePacketData *>(data);
+
+    // construct SceneChangePacket
+    SceneChangePacket scene_change_packet;
+
+    if (scene_change_packet_data->uuid()) {
+
+      // check if uuid is valid
+      if (!uuids::uuid::is_valid_uuid(
+              scene_change_packet_data->uuid()->c_str())) {
+        return std::unexpected(FailInfo{
+            FailMode::InvalidUUID,
+            "ConvertFlatbuffersEventDataDataToEventData: SceneChangePacketData "
+            "contains invalid UUID."});
+      }
+
+      scene_change_packet.first =
+          uuids::uuid::from_string(scene_change_packet_data->uuid()->c_str());
+    }
+    if (!scene_change_packet_data->scene_type()) {
+      return std::unexpected(FailInfo{
+          FailMode::FlatbuffersDataNotFound,
+          "ConvertFlatbuffersEventDataDataToEventData: SceneChangePacketData "
+          "missing scene_type."});
+    }
+    scene_change_packet.second = scene_change_packet_data->scene_type();
+
+    return scene_change_packet;
+  }
+
   case EventDataData::EventDataData_NONE: {
     return std::monostate();
   }

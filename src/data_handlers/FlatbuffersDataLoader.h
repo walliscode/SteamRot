@@ -14,8 +14,8 @@
 #include "DataLoader.h"
 #include "FailInfo.h"
 #include "game_engine_generated.h"
+#include "scene_change_packet_generated.h"
 #include "scene_manager_generated.h"
-#include "scene_types_generated.h"
 #include "scenes_generated.h"
 #include "ui_style_generated.h"
 #include <expected>

@@ -19,6 +19,18 @@
                     "base_data": {
                       "position": { "x": 0, "y": 0 },
                       "size": { "x": 0, "y": 0 },
+
+                      "subscriber_data": {
+                        "event_type_data": "EVENT_USER_INPUT",
+                        "trigger_data_type": "UserInputBitsetData",
+                        "trigger_data": { "mouse_released": ["LEFT_CLICK"] }
+                      },
+                      "response_event_data": {
+                        "event_lifetime": 1,
+                        "event_type": "EVENT_CHANGE_SCENE",
+                        "event_data_data_type": "SceneChangePacketData",
+                        "event_data_data": { "scene_type": "TITLE" }
+                      },
                       "children_active": false,
                       "children": [],
                       "layout": "Horizontal",

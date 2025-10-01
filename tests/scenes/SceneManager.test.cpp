@@ -14,7 +14,7 @@
 
 #include "asset_helpers.h"
 #include "events_generated.h"
-#include "scene_types_generated.h"
+#include "scene_change_packet_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("SceneManager is constructed without any errors", "[SceneManager]") {
@@ -334,7 +334,7 @@ TEST_CASE("SceneManager loads TitleScene when Subscriber is turned active",
   REQUIRE(scene_manager.GetScenes().empty());
 
   // Activate the Subscriber with SceneChangeData to load Title scene
-  steamrot::SceneChangeData scene_change_data{
+  steamrot::SceneChangePacket scene_change_data{
       uuids::uuid{}, steamrot::SceneType::SceneType_TITLE};
   auto set_active_result = subscriber->SetActive();
   if (!set_active_result.has_value()) {
@@ -369,7 +369,7 @@ TEST_CASE("SceneManager loads CraftingScene when Subscriber is turned active",
   // check that no scenes are loaded initially
   REQUIRE(scene_manager.GetScenes().empty());
   // Activate the Subscriber with SceneChangeData to load Crafting scene
-  steamrot::SceneChangeData scene_change_data{
+  steamrot::SceneChangePacket scene_change_data{
       uuids::uuid{}, steamrot::SceneType::SceneType_CRAFTING};
   auto set_active_result = subscriber->SetActive();
   if (!set_active_result.has_value()) {
@@ -434,7 +434,7 @@ TEST_CASE("SceneManager::UpdateSceneManager cause scene change via subscribers",
   REQUIRE(scene_manager.GetScenes().empty());
 
   // Activate the Subscriber with SceneChangeData to load Title scene
-  steamrot::SceneChangeData scene_change_data{
+  steamrot::SceneChangePacket scene_change_data{
       uuids::uuid{}, steamrot::SceneType::SceneType_TITLE};
   auto set_active_result = subscriber->SetActive();
   if (!set_active_result.has_value()) {
@@ -466,7 +466,7 @@ TEST_CASE("SceneManager processes Subscriber and sets it to inactive",
   REQUIRE(scene_manager.GetScenes().empty());
 
   // Activate the Subscriber with SceneChangeData to load Title scene
-  steamrot::SceneChangeData scene_change_data{
+  steamrot::SceneChangePacket scene_change_data{
       uuids::uuid{}, steamrot::SceneType::SceneType_TITLE};
   auto set_active_result = subscriber->SetActive();
   if (!set_active_result.has_value()) {
