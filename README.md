@@ -421,6 +421,10 @@ instances can exist for each type within a scene.
 Logic classes. Write tests first to define expected behavior, then implement the
 Logic class to pass those tests.
 
+**See Also**: Complete example files with all patterns demonstrated can be found
+in `documentation/examples/` (ExampleLogic.h, ExampleLogic.cpp, and
+ExampleLogic.test.cpp).
+
 #### Step 1: Define the Logic Class (Header)
 
 Create the header file in `src/logic/`:

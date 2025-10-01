@@ -371,6 +371,8 @@ cd build && ctest
 
 Logic classes implement game system behaviors (collision, rendering, actions, movement). Follow TDD approach: write tests first, then implement.
 
+**Complete Examples**: See `documentation/examples/` for full example files (ExampleLogic.h, ExampleLogic.cpp, ExampleLogic.test.cpp) demonstrating all patterns.
+
 #### Quick Reference Steps
 
 1. **Create Logic Class** (`src/logic/NewLogic.h` and `.cpp`)
