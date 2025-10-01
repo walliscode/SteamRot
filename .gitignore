@@ -367,3 +367,7 @@ CMakeUserPresets.json
 
 # data output files 
 .data_out/
+
+# CMake build directory
+build/
+!build/.gitkeep
