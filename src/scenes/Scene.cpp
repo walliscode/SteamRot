@@ -78,8 +78,10 @@ LogicContext Scene::GetLogicContext() {
 
   return logic_context;
 }
+#ifdef DEBUG
 /////////////////////////////////////////////////
 const std::unordered_map<ArchetypeID, Archetype> &Scene::GetArchetypes() const {
   return m_entity_manager.GetArchetypeManager().GetArchetypes();
 }
+#endif
 } // namespace steamrot
