@@ -1,0 +1,12 @@
+namespace steamrot;
+
+// Maps a state key to a list of UI component names
+table UIStateMapping {
+  state_key: string (required);
+  ui_names: [string] (required);
+}
+
+table UIStateData {
+  // Collection of state key to UI name mappings
+  mappings: [UIStateMapping] (required);
+}

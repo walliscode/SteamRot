@@ -3,6 +3,7 @@ CMeta.cpp
 CUserInterface.cpp
 CMachinaForm.cpp
 CGrimoireMachina.cpp
+CUIState.cpp
 
 )
 

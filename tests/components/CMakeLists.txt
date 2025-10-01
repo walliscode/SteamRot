@@ -1,5 +1,6 @@
 add_executable(test_components
   CGrimoireMachina.test.cpp
+  CUIState.test.cpp
 )
 
 target_link_libraries(test_components

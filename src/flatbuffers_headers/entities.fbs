@@ -1,5 +1,6 @@
 include "user_interface.fbs";
 include "grimoire_machina.fbs";
+include "ui_state.fbs";
 namespace steamrot;
 
 
@@ -7,6 +8,7 @@ table EntityData{
   index: uint32;
   c_user_interface: UserInterfaceData;
   c_grimoire_machina: GrimoireMachinaData;
+  c_ui_state: UIStateData;
 
   }
 

@@ -9,6 +9,7 @@
 #include "CGrimoireMachina.h"
 #include "CMachinaForm.h"
 #include "CMeta.h"
+#include "CUIState.h"
 #include "CUserInterface.h"
 #include <magic_enum/magic_enum.hpp>
 
@@ -31,7 +32,8 @@ struct ComponentContainer<std::tuple<Components...>> {
 // |brief: ComponentRegister is a tuple of all the components for the game
 //  "One source of truth"
 ////////////////////////////////////////////////////////////
-typedef std::tuple<CMeta, CUserInterface, CMachinaForm, CGrimoireMachina>
+typedef std::tuple<CMeta, CUserInterface, CMachinaForm, CGrimoireMachina,
+                   CUIState>
     ComponentRegister;
 
 ////////////////////////////////////////////////////////////
