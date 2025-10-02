@@ -33,14 +33,21 @@ void UIStateLogic::ProcessLogic() {
     CUIState &ui_state = emp_helpers::GetComponent<CUIState>(
         entity_id, m_logic_context.scene_entities);
 
-    // Check each subscriber and update corresponding state
-    for (auto &[state_key, subscriber] : ui_state.m_state_subscribers) {
-      if (subscriber && subscriber->IsActive()) {
-        // Set the state to true when subscriber is active
+    // Check all subscribers for each state
+    for (auto &[state_key, subscribers] : ui_state.m_state_subscribers) {
+      // Check if any subscriber is active
+      bool any_active = false;
+      for (auto &subscriber : subscribers) {
+        if (subscriber && subscriber->IsActive()) {
+          any_active = true;
+          // Deactivate the subscriber after processing
+          subscriber->SetInactive();
+        }
+      }
+      
+      // Set the state to true if any subscriber was active
+      if (any_active) {
         ui_state.m_state_values[state_key] = true;
-        
-        // Deactivate the subscriber after processing
-        subscriber->SetInactive();
       }
     }
   }

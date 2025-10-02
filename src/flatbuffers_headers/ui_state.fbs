@@ -7,7 +7,7 @@ table UIStateMapping {
   state_key: string (required);
   ui_names_on: [string];
   ui_names_off: [string];
-  subscriber_data: SubscriberData;
+  subscribers: [SubscriberData];
 }
 
 table UIStateData {
