@@ -5,9 +5,13 @@
 #include "UIActionLogic.h"
 #include "ArchetypeHelpers.h"
 #include "ArchetypeManager.h"
+#include "CGrimoireMachina.h"
 #include "CUserInterface.h"
+#include "DropDownItemElement.h"
+#include "DropDownListElement.h"
 #include "Logic.h"
 #include "emp_helpers.h"
+#include "entity_helpers.h"
 #include <SFML/Window/Mouse.hpp>
 #include <iostream>
 
@@ -38,14 +42,16 @@ void UIActionLogic::ProcessLogic() {
 
       // Perform any aciton logic here, processing nested elements recursively
       ProcessNestedUIActionsAndEvents(*ui_component.m_root_element,
-                                      m_logic_context.event_handler);
+                                      m_logic_context.event_handler,
+                                      m_logic_context);
     }
   }
 }
 
 /////////////////////////////////////////////////
 void ProcessUIActionsAndEvents(UIElement &ui_element,
-                               EventHandler &event_handler) {
+                               EventHandler &event_handler,
+                               const LogicContext &logic_context) {
 
   // check the subscription first
   if (!ui_element.subscription) {
@@ -62,6 +68,9 @@ void ProcessUIActionsAndEvents(UIElement &ui_element,
   if (ButtonElement *button_element =
           dynamic_cast<ButtonElement *>(&ui_element)) {
     ProcessButtonElementActions(*button_element, event_handler);
+  } else if (DropDownListElement *dropdown_list_element =
+                 dynamic_cast<DropDownListElement *>(&ui_element)) {
+    ProcessDropDownListElementActions(*dropdown_list_element, logic_context);
   }
 
   // FINALLY set the subscriber to inactive
@@ -70,7 +79,8 @@ void ProcessUIActionsAndEvents(UIElement &ui_element,
 
 /////////////////////////////////////////////////
 void ProcessNestedUIActionsAndEvents(UIElement &ui_element,
-                                     EventHandler &event_handler) {
+                                     EventHandler &event_handler,
+                                     const LogicContext &logic_context) {
   // bool to keep track if any child was processed
   bool child_processed = false;
 
@@ -83,7 +93,7 @@ void ProcessNestedUIActionsAndEvents(UIElement &ui_element,
 
     // go as deep as possible first, this will stop when no children are
     // detected
-    ProcessNestedUIActionsAndEvents(*child, event_handler);
+    ProcessNestedUIActionsAndEvents(*child, event_handler, logic_context);
 
     // If the child had an active subscription, it (or one of its descendants)
     // was processed
@@ -97,7 +107,7 @@ void ProcessNestedUIActionsAndEvents(UIElement &ui_element,
 
   if (!child_processed) {
     // this will occur if no child was processed (or no children exist)
-    ProcessUIActionsAndEvents(ui_element, event_handler);
+    ProcessUIActionsAndEvents(ui_element, event_handler, logic_context);
   }
 }
 
@@ -118,6 +128,98 @@ void ProcessButtonElementActions(ButtonElement &button_element,
       std::cout << "Button has response event, adding to event bus"
                 << std::endl;
     event_handler.AddEvent(button_element.response_event.value());
+  }
+}
+
+/////////////////////////////////////////////////
+void ProcessDropDownListElementActions(
+    DropDownListElement &dropdown_list_element,
+    const LogicContext &logic_context) {
+
+  // Only populate if the function is set and not None
+  if (dropdown_list_element.data_populate_function ==
+      DataPopulateFunction::DataPopulateFunction_None) {
+    return;
+  }
+
+  // Dispatch to appropriate data population function based on enum
+  switch (dropdown_list_element.data_populate_function) {
+  case DataPopulateFunction::DataPopulateFunction_PopulateWithFragmentData: {
+    // Find CGrimoireMachina in the scene
+    ArchetypeID grimoire_archetype_id =
+        GenerateArchetypeIDfromTypes<CGrimoireMachina>();
+
+    const auto it = logic_context.archetypes.find(grimoire_archetype_id);
+    if (it != logic_context.archetypes.end()) {
+      const Archetype &archetype = it->second;
+
+      // Get the first entity with CGrimoireMachina (should only be one)
+      if (!archetype.empty()) {
+        size_t entity_id = *archetype.begin();
+        const CGrimoireMachina &grimoire_machina =
+            emp_helpers::GetComponent<CGrimoireMachina>(
+                entity_id, logic_context.scene_entities);
+
+        // Get all fragment names
+        std::vector<std::string> fragment_names =
+            entity_helpers::GetAllFragmentNames(grimoire_machina);
+
+        // Clear existing child elements
+        dropdown_list_element.child_elements.clear();
+
+        // Create DropDownItemElements for each fragment
+        for (const std::string &fragment_name : fragment_names) {
+          auto item = std::make_unique<DropDownItemElement>();
+          item->label = fragment_name;
+          item->value = fragment_name;
+          dropdown_list_element.child_elements.push_back(std::move(item));
+        }
+      }
+    }
+    break;
+  }
+  case DataPopulateFunction::DataPopulateFunction_PopulateWithJointData: {
+    // Find CGrimoireMachina in the scene
+    ArchetypeID grimoire_archetype_id =
+        GenerateArchetypeIDfromTypes<CGrimoireMachina>();
+
+    const auto it = logic_context.archetypes.find(grimoire_archetype_id);
+    if (it != logic_context.archetypes.end()) {
+      const Archetype &archetype = it->second;
+
+      // Get the first entity with CGrimoireMachina (should only be one)
+      if (!archetype.empty()) {
+        size_t entity_id = *archetype.begin();
+        const CGrimoireMachina &grimoire_machina =
+            emp_helpers::GetComponent<CGrimoireMachina>(
+                entity_id, logic_context.scene_entities);
+
+        // Get all joint names
+        std::vector<std::string> joint_names =
+            entity_helpers::GetAllJointNames(grimoire_machina);
+
+        // Clear existing child elements
+        dropdown_list_element.child_elements.clear();
+
+        // Create DropDownItemElements for each joint
+        for (const std::string &joint_name : joint_names) {
+          auto item = std::make_unique<DropDownItemElement>();
+          item->label = joint_name;
+          item->value = joint_name;
+          dropdown_list_element.child_elements.push_back(std::move(item));
+        }
+      }
+    }
+    break;
+  }
+  case DataPopulateFunction::DataPopulateFunction_None:
+    // Already handled above
+    break;
+  default:
+    std::cout << "Warning: Unhandled DataPopulateFunction value: "
+              << static_cast<int>(dropdown_list_element.data_populate_function)
+              << std::endl;
+    break;
   }
 }
 

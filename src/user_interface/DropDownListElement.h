@@ -33,6 +33,12 @@ struct DropDownListElement : public UIElement {
   std::string expanded_label{"items..."};
 
   /////////////////////////////////////////////////
+  /// @brief Function to populate dropdown data dynamically
+  /////////////////////////////////////////////////
+  DataPopulateFunction data_populate_function{
+      DataPopulateFunction::DataPopulateFunction_None};
+
+  /////////////////////////////////////////////////
   /// @brief Draws the DropDownListElement on a RenderTexture
   ///
   /// @param texture Reference to the RenderTexture to draw on

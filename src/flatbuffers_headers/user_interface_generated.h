@@ -201,29 +201,32 @@ bool VerifyUIElementDataUnionVector(::flatbuffers::Verifier &verifier, const ::f
 enum DataPopulateFunction : int8_t {
   DataPopulateFunction_None = 0,
   DataPopulateFunction_PopulateWithFragmentData = 1,
+  DataPopulateFunction_PopulateWithJointData = 2,
   DataPopulateFunction_MIN = DataPopulateFunction_None,
-  DataPopulateFunction_MAX = DataPopulateFunction_PopulateWithFragmentData
+  DataPopulateFunction_MAX = DataPopulateFunction_PopulateWithJointData
 };
 
-inline const DataPopulateFunction (&EnumValuesDataPopulateFunction())[2] {
+inline const DataPopulateFunction (&EnumValuesDataPopulateFunction())[3] {
   static const DataPopulateFunction values[] = {
     DataPopulateFunction_None,
-    DataPopulateFunction_PopulateWithFragmentData
+    DataPopulateFunction_PopulateWithFragmentData,
+    DataPopulateFunction_PopulateWithJointData
   };
   return values;
 }
 
 inline const char * const *EnumNamesDataPopulateFunction() {
-  static const char * const names[3] = {
+  static const char * const names[4] = {
     "None",
     "PopulateWithFragmentData",
+    "PopulateWithJointData",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameDataPopulateFunction(DataPopulateFunction e) {
-  if (::flatbuffers::IsOutRange(e, DataPopulateFunction_None, DataPopulateFunction_PopulateWithFragmentData)) return "";
+  if (::flatbuffers::IsOutRange(e, DataPopulateFunction_None, DataPopulateFunction_PopulateWithJointData)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesDataPopulateFunction()[index];
 }

@@ -60,7 +60,7 @@ table DropDownContainerData{
 enum DataPopulateFunction: byte {
     None = 0,
     PopulateWithFragmentData = 1,
-    
+    PopulateWithJointData = 2,
   }
 table DropDownListData{
   base_data: UIElementData(required);

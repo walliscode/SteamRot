@@ -178,7 +178,8 @@ TEST_CASE(
   // Run ProcessUIActionsAndEvents; should NOT add the quit event to the event
   // bus
   steamrot::ProcessUIActionsAndEvents(
-      button_element, test_context.GetGameContext().event_handler);
+      button_element, test_context.GetGameContext().event_handler,
+      test_context.GetLogicContextForTestScene());
 
   // Assert - that the EventBus still has only the unrelated event (no quit
   // event added)
@@ -251,7 +252,8 @@ TEST_CASE("UIActionLogic checks subscription before adding Event to EventBus "
   // run ProcessUIActionsAndEvents and this should add the quit event to the
   // event bus
   steamrot::ProcessUIActionsAndEvents(
-      button_element, test_context.GetGameContext().event_handler);
+      button_element, test_context.GetGameContext().event_handler,
+      test_context.GetLogicContextForTestScene());
 
   // move events from waiting room to global event bus
   test_context.GetGameContext().event_handler.ProcessWaitingRoomEventBus();
@@ -319,7 +321,8 @@ TEST_CASE("UIActionLogic sets Subscriber to inactive after processing "
   // run ProcessUIActionsAndEvents and this should add the quit event to the
   // event bus
   steamrot::ProcessUIActionsAndEvents(
-      button_element, test_context.GetGameContext().event_handler);
+      button_element, test_context.GetGameContext().event_handler,
+      test_context.GetLogicContextForTestScene());
 
   test_context.GetGameContext().event_handler.ProcessWaitingRoomEventBus();
   // assert - that the EventBus has two events now
@@ -404,7 +407,8 @@ TEST_CASE("ProcessNestedUIActionsAndEvents processes child before parent "
 
   // Act - Process nested UI actions
   steamrot::ProcessNestedUIActionsAndEvents(
-      *parent_button, test_context.GetGameContext().event_handler);
+      *parent_button, test_context.GetGameContext().event_handler,
+      test_context.GetLogicContextForTestScene());
 
   // Assert - Child subscription should be inactive (was processed)
   REQUIRE_FALSE(parent_button->child_elements[0]->subscription->IsActive());
@@ -482,7 +486,8 @@ TEST_CASE("ProcessNestedUIActionsAndEvents processes parent when child has no "
 
   // Act - Process nested UI actions
   steamrot::ProcessNestedUIActionsAndEvents(
-      *parent_button, test_context.GetGameContext().event_handler);
+      *parent_button, test_context.GetGameContext().event_handler,
+      test_context.GetLogicContextForTestScene());
 
   // Assert - Parent subscription should be inactive (was processed)
   REQUIRE_FALSE(parent_button->subscription->IsActive());

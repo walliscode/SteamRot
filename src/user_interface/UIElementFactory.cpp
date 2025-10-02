@@ -214,6 +214,8 @@ ConfigureDropDownListElement(DropDownListElement &dropdown_list_element,
     dropdown_list_element.expanded_label = data.expanded_label()->str();
   }
 
+  dropdown_list_element.data_populate_function = data.data_populate_function();
+
   return std::monostate{};
 }
 
