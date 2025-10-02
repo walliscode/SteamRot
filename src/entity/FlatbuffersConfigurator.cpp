@@ -10,6 +10,7 @@
 #include "CUIState.h"
 #include "CUserInterface.h"
 #include "EntityConfigurator.h"
+#include "SubscriberFactory.h"
 #include "UIElementFactory.h"
 #include "emp_helpers.h"
 
@@ -241,6 +242,9 @@ FlatbuffersConfigurator::ConfigureComponent(
     }
   }
 
+  // Create SubscriberFactory for registering subscribers
+  SubscriberFactory subscriber_factory(m_event_handler);
+
   // Process each mapping
   for (const auto *mapping : *ui_state_data->mappings()) {
     if (!mapping) {
@@ -303,6 +307,32 @@ FlatbuffersConfigurator::ConfigureComponent(
 
     // Store the visibility state for this state key
     ui_state_component.m_state_to_ui_visibility[state_key] = visibility_state;
+
+    // Initialize state value to false
+    ui_state_component.m_state_values[state_key] = false;
+
+    // Create and register subscribers if provided
+    if (mapping->subscribers()) {
+      std::vector<std::shared_ptr<Subscriber>> subscribers;
+      
+      for (const auto *subscriber_data : *mapping->subscribers()) {
+        if (!subscriber_data) {
+          continue;
+        }
+
+        auto subscriber_result = subscriber_factory.CreateAndRegisterSubscriber(
+            *subscriber_data);
+
+        if (!subscriber_result.has_value()) {
+          return std::unexpected(subscriber_result.error());
+        }
+
+        subscribers.push_back(subscriber_result.value());
+      }
+
+      // Store all subscribers for this state key
+      ui_state_component.m_state_subscribers[state_key] = std::move(subscribers);
+    }
   }
 
   return std::monostate{};

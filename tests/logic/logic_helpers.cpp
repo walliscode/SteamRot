@@ -12,6 +12,7 @@
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
 #include "UIRenderLogic.h"
+#include "UIStateLogic.h"
 #include "catch2/catch_test_macros.hpp"
 #include "scene_change_packet_generated.h"
 namespace steamrot::tests {
@@ -31,8 +32,9 @@ void CheckStaticLogicCollections(const steamrot::LogicCollection &collection,
     // Evaluate actions logics
     const steamrot::LogicVector &action_logics =
         collection.at(steamrot::LogicType::Action);
-    REQUIRE(action_logics.size() == 1);
-    REQUIRE(dynamic_cast<steamrot::UIActionLogic *>(action_logics[0].get()));
+    REQUIRE(action_logics.size() == 2);
+    REQUIRE(dynamic_cast<steamrot::UIStateLogic *>(action_logics[0].get()));
+    REQUIRE(dynamic_cast<steamrot::UIActionLogic *>(action_logics[1].get()));
     // Evaluate collision logics
     const steamrot::LogicVector &collision_logics =
         collection.at(steamrot::LogicType::Collision);
@@ -60,8 +62,9 @@ void CheckStaticLogicCollections(const steamrot::LogicCollection &collection,
     // Evaluate actions logics
     const steamrot::LogicVector &action_logics =
         collection.at(steamrot::LogicType::Action);
-    REQUIRE(action_logics.size() == 1);
-    REQUIRE(dynamic_cast<steamrot::UIActionLogic *>(action_logics[0].get()));
+    REQUIRE(action_logics.size() == 2);
+    REQUIRE(dynamic_cast<steamrot::UIStateLogic *>(action_logics[0].get()));
+    REQUIRE(dynamic_cast<steamrot::UIActionLogic *>(action_logics[1].get()));
 
     // Evaluate collision logics
     const steamrot::LogicVector &collision_logics =
@@ -84,8 +87,9 @@ void CheckStaticLogicCollections(const steamrot::LogicCollection &collection,
     // Evaluate actions logics
     const steamrot::LogicVector &action_logics =
         collection.at(steamrot::LogicType::Action);
-    REQUIRE(action_logics.size() == 1);
-    REQUIRE(dynamic_cast<steamrot::UIActionLogic *>(action_logics[0].get()));
+    REQUIRE(action_logics.size() == 2);
+    REQUIRE(dynamic_cast<steamrot::UIStateLogic *>(action_logics[0].get()));
+    REQUIRE(dynamic_cast<steamrot::UIActionLogic *>(action_logics[1].get()));
     // Evaluate collision logics
     const steamrot::LogicVector &collision_logics =
         collection.at(steamrot::LogicType::Collision);

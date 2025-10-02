@@ -3,6 +3,7 @@ add_library(logic
   UIRenderLogic.cpp
   UICollisionLogic.cpp
   UIActionLogic.cpp
+  UIStateLogic.cpp
   Logic.cpp
   CraftingRenderLogic.cpp
   collision.cpp

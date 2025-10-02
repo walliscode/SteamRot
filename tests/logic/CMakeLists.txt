@@ -1,6 +1,7 @@
 add_executable(test_logic
 LogicFactory.test.cpp
 UIRenderLogic.test.cpp
+UIStateLogic.test.cpp
 draw_ui_elements.test.cpp
 draw_ui_elements_helpers.cpp
 collision.test.cpp

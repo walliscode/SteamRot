@@ -12,6 +12,8 @@
 // headers
 ////////////////////////////////////////////////////////////
 #include "Component.h"
+#include "Subscriber.h"
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -57,6 +59,23 @@ struct CUIState : public Component {
   /// be hidden (off).
   ////////////////////////////////////////////////////////////
   std::unordered_map<std::string, UIVisibilityState> m_state_to_ui_visibility;
+
+  ////////////////////////////////////////////////////////////
+  /// @brief Mapping of state keys to their current boolean values
+  ///
+  /// Tracks the current state for each registered state key.
+  /// States default to false until activated by their associated subscriber.
+  ////////////////////////////////////////////////////////////
+  std::unordered_map<std::string, bool> m_state_values;
+
+  ////////////////////////////////////////////////////////////
+  /// @brief Mapping of state keys to their associated subscribers
+  ///
+  /// Each state key can have multiple subscribers. The state will only
+  /// be set to true when ALL subscribers are activated (AND logic).
+  ////////////////////////////////////////////////////////////
+  std::unordered_map<std::string, std::vector<std::shared_ptr<Subscriber>>>
+      m_state_subscribers;
 
   ////////////////////////////////////////////////////////////
   /// @brief Get the position of the Component in the Component Register.
