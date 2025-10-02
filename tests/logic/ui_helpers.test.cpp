@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Unit tests for entity_helpers namespace
+/// @brief Unit tests for ui_helpers namespace
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "entity_helpers.h"
+#include "ui_helpers.h"
 #include "CGrimoireMachina.h"
 #include "Fragment.h"
 #include "Joint.h"
@@ -14,18 +14,18 @@
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("GetAllFragmentNames returns empty vector for empty fragments map",
-          "[entity_helpers]") {
+          "[ui_helpers]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::CGrimoireMachina grimoire;
 
   std::vector<std::string> fragment_names =
-      steamrot::entity_helpers::GetAllFragmentNames(grimoire);
+      steamrot::ui_helpers::GetAllFragmentNames(grimoire);
 
   REQUIRE(fragment_names.empty());
 }
 
 TEST_CASE("GetAllFragmentNames returns all fragment names",
-          "[entity_helpers]") {
+          "[ui_helpers]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::CGrimoireMachina grimoire;
 
@@ -43,7 +43,7 @@ TEST_CASE("GetAllFragmentNames returns all fragment names",
   grimoire.m_all_fragments["fragment_c"] = fragment3;
 
   std::vector<std::string> fragment_names =
-      steamrot::entity_helpers::GetAllFragmentNames(grimoire);
+      steamrot::ui_helpers::GetAllFragmentNames(grimoire);
 
   REQUIRE(fragment_names.size() == 3);
   REQUIRE(std::find(fragment_names.begin(), fragment_names.end(),
@@ -55,17 +55,17 @@ TEST_CASE("GetAllFragmentNames returns all fragment names",
 }
 
 TEST_CASE("GetAllJointNames returns empty vector for empty joints map",
-          "[entity_helpers]") {
+          "[ui_helpers]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::CGrimoireMachina grimoire;
 
   std::vector<std::string> joint_names =
-      steamrot::entity_helpers::GetAllJointNames(grimoire);
+      steamrot::ui_helpers::GetAllJointNames(grimoire);
 
   REQUIRE(joint_names.empty());
 }
 
-TEST_CASE("GetAllJointNames returns all joint names", "[entity_helpers]") {
+TEST_CASE("GetAllJointNames returns all joint names", "[ui_helpers]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::CGrimoireMachina grimoire;
 
@@ -83,7 +83,7 @@ TEST_CASE("GetAllJointNames returns all joint names", "[entity_helpers]") {
   grimoire.m_all_joints["joint_c"] = joint3;
 
   std::vector<std::string> joint_names =
-      steamrot::entity_helpers::GetAllJointNames(grimoire);
+      steamrot::ui_helpers::GetAllJointNames(grimoire);
 
   REQUIRE(joint_names.size() == 3);
   REQUIRE(std::find(joint_names.begin(), joint_names.end(), "joint_a") !=

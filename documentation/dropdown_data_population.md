@@ -2,7 +2,7 @@
 
 ## Overview
 
-The dropdown data population system allows dropdown lists to dynamically populate their items based on game data. This is implemented using the `DataPopulateFunction` enum and the `entity_helpers` namespace.
+The dropdown data population system allows dropdown lists to dynamically populate their items based on game data. This is implemented using the `DataPopulateFunction` enum and the `ui_helpers` namespace.
 
 ## Components
 
@@ -18,9 +18,9 @@ enum DataPopulateFunction: byte {
 }
 ```
 
-### 2. entity_helpers Namespace
+### 2. ui_helpers Namespace
 
-Located in `src/logic/entity_helpers.h/.cpp`:
+Located in `src/logic/ui_helpers.h/.cpp`:
 
 Functions for extracting data from game components:
 - `GetAllFragmentNames(const CGrimoireMachina &)` - Returns vector of all fragment names
@@ -67,7 +67,7 @@ When defining a dropdown list in your UI JSON data, set the `data_populate_funct
 
 3. **Dynamic Population**: The function:
    - Finds the `CGrimoireMachina` component in the scene
-   - Calls the appropriate `entity_helpers` function
+   - Calls the appropriate `ui_helpers` function
    - Clears existing child elements
    - Creates new `DropDownItemElement` instances for each item
    - Each item gets both a `label` (display text) and `value` (data value)
@@ -97,14 +97,14 @@ cmake --build build --target flatbuffers_generate_headers
 
 ### 3. Add Helper Function
 
-In `src/logic/entity_helpers.h`:
+In `src/logic/ui_helpers.h`:
 
 ```cpp
 std::vector<std::string>
 GetNewDataNames(const CYourComponent &component);
 ```
 
-In `src/logic/entity_helpers.cpp`:
+In `src/logic/ui_helpers.cpp`:
 
 ```cpp
 std::vector<std::string>
@@ -138,7 +138,7 @@ case DataPopulateFunction::DataPopulateFunction_PopulateWithNewData: {
               entity_id, logic_context.scene_entities);
       
       std::vector<std::string> names =
-          entity_helpers::GetNewDataNames(component);
+          ui_helpers::GetNewDataNames(component);
       
       dropdown_list_element.child_elements.clear();
       
@@ -156,10 +156,10 @@ case DataPopulateFunction::DataPopulateFunction_PopulateWithNewData: {
 
 ### 5. Write Tests
 
-Create tests in `tests/logic/entity_helpers.test.cpp`:
+Create tests in `tests/logic/ui_helpers.test.cpp`:
 
 ```cpp
-TEST_CASE("GetNewDataNames returns all names", "[entity_helpers]") {
+TEST_CASE("GetNewDataNames returns all names", "[ui_helpers]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::CYourComponent component;
   
@@ -168,7 +168,7 @@ TEST_CASE("GetNewDataNames returns all names", "[entity_helpers]") {
   component.m_your_map["item2"] = YourData{};
   
   std::vector<std::string> names =
-      steamrot::entity_helpers::GetNewDataNames(component);
+      steamrot::ui_helpers::GetNewDataNames(component);
   
   REQUIRE(names.size() == 2);
   REQUIRE(std::find(names.begin(), names.end(), "item1") != names.end());
@@ -180,7 +180,7 @@ TEST_CASE("GetNewDataNames returns all names", "[entity_helpers]") {
 
 ### Design Decisions
 
-1. **Namespace Choice**: `entity_helpers` follows the pattern of `emp_helpers` for entity manipulation utilities
+1. **Namespace Choice**: `ui_helpers` follows the pattern of `emp_helpers` for entity manipulation utilities
 
 2. **Location**: Files are in `src/logic/` because they're used by Logic classes and manipulate entity state
 

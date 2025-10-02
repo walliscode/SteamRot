@@ -11,7 +11,7 @@
 #include "DropDownListElement.h"
 #include "Logic.h"
 #include "emp_helpers.h"
-#include "entity_helpers.h"
+#include "ui_helpers.h"
 #include <SFML/Window/Mouse.hpp>
 #include <iostream>
 
@@ -162,7 +162,7 @@ void ProcessDropDownListElementActions(
 
         // Get all fragment names
         std::vector<std::string> fragment_names =
-            entity_helpers::GetAllFragmentNames(grimoire_machina);
+            ui_helpers::GetAllFragmentNames(grimoire_machina);
 
         // Clear existing child elements
         dropdown_list_element.child_elements.clear();
@@ -196,7 +196,7 @@ void ProcessDropDownListElementActions(
 
         // Get all joint names
         std::vector<std::string> joint_names =
-            entity_helpers::GetAllJointNames(grimoire_machina);
+            ui_helpers::GetAllJointNames(grimoire_machina);
 
         // Clear existing child elements
         dropdown_list_element.child_elements.clear();

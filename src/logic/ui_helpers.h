@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of entity manipulation helper functions
+/// @brief Declaration of UI helper functions
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-namespace steamrot::entity_helpers {
+namespace steamrot::ui_helpers {
 
 /////////////////////////////////////////////////
 /// @brief Get all available fragment names from CGrimoireMachina
@@ -35,4 +35,4 @@ GetAllFragmentNames(const CGrimoireMachina &grimoire_machina);
 std::vector<std::string>
 GetAllJointNames(const CGrimoireMachina &grimoire_machina);
 
-} // namespace steamrot::entity_helpers
+} // namespace steamrot::ui_helpers

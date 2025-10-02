@@ -1,14 +1,14 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Implementation of entity manipulation helper functions
+/// @brief Implementation of UI helper functions
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "entity_helpers.h"
+#include "ui_helpers.h"
 
-namespace steamrot::entity_helpers {
+namespace steamrot::ui_helpers {
 
 /////////////////////////////////////////////////
 std::vector<std::string>
@@ -36,4 +36,4 @@ GetAllJointNames(const CGrimoireMachina &grimoire_machina) {
   return joint_names;
 }
 
-} // namespace steamrot::entity_helpers
+} // namespace steamrot::ui_helpers
