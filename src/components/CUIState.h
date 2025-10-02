@@ -71,8 +71,8 @@ struct CUIState : public Component {
   ////////////////////////////////////////////////////////////
   /// @brief Mapping of state keys to their associated subscribers
   ///
-  /// Each state key can have multiple subscribers. When any subscriber
-  /// is activated, the state will be set to true.
+  /// Each state key can have multiple subscribers. The state will only
+  /// be set to true when ALL subscribers are activated (AND logic).
   ////////////////////////////////////////////////////////////
   std::unordered_map<std::string, std::vector<std::shared_ptr<Subscriber>>>
       m_state_subscribers;

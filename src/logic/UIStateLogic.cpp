@@ -35,19 +35,28 @@ void UIStateLogic::ProcessLogic() {
 
     // Check all subscribers for each state
     for (auto &[state_key, subscribers] : ui_state.m_state_subscribers) {
-      // Check if any subscriber is active
-      bool any_active = false;
+      // Skip if no subscribers
+      if (subscribers.empty()) {
+        continue;
+      }
+      
+      // Check if ALL subscribers are active (AND logic)
+      bool all_active = true;
       for (auto &subscriber : subscribers) {
-        if (subscriber && subscriber->IsActive()) {
-          any_active = true;
-          // Deactivate the subscriber after processing
-          subscriber->SetInactive();
+        if (!subscriber || !subscriber->IsActive()) {
+          all_active = false;
+          break;
         }
       }
       
-      // Set the state to true if any subscriber was active
-      if (any_active) {
+      // Set the state to true only if ALL subscribers are active
+      if (all_active) {
         ui_state.m_state_values[state_key] = true;
+        
+        // Deactivate all subscribers after processing
+        for (auto &subscriber : subscribers) {
+          subscriber->SetInactive();
+        }
       }
     }
   }
