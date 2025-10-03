@@ -7,6 +7,7 @@ draw_ui_elements_helpers.cpp
 collision.test.cpp
 UICollisionLogic.test.cpp
 UIActionLogic.test.cpp
+ui_helpers.test.cpp
 )
 
 target_include_directories(test_logic

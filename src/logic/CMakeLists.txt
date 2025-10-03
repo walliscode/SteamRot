@@ -7,6 +7,7 @@ add_library(logic
   Logic.cpp
   CraftingRenderLogic.cpp
   collision.cpp
+  ui_helpers.cpp
 )
 
 target_include_directories(logic
