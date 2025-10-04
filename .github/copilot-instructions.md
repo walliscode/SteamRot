@@ -47,11 +47,23 @@ Use Doxygen-style comments with visual dividers:
 - This is enforced in `.editorconfig`
 
 #### Naming Conventions
+
+**Variables and Code Elements:**
 - Member variables: `m_variable_name` (prefix with `m_`)
 - Classes: `PascalCase`
 - Functions: `PascalCase` for public methods
 - Namespaces: `lowercase`
 - Components: Prefix with `C` (e.g., `CUserInterface`, `CGrimoireMachina`)
+
+**File Naming:**
+See [FILE_NAMING_CONVENTIONS.md](../documentation/FILE_NAMING_CONVENTIONS.md) for complete details.
+
+Quick reference:
+- **Classes**: `ClassName.h/cpp` (PascalCase) → `steamrot::ClassName`
+- **Free Functions**: `subsystem_category.h/cpp` (snake_case) → `steamrot::subsystem::category`
+- **Template Utils**: `SubsystemUtils.h` (PascalCase, header-only) → `steamrot::subsystem`
+- **Test Helpers**: `subsystem_test_helpers.h/cpp` (snake_case) → `steamrot::tests::subsystem`
+- **Test Files**: `ModuleName.test.cpp` (matches module being tested)
 
 #### Comments
 - Prefer Doxygen-style documentation comments (`///`)

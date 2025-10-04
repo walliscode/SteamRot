@@ -29,9 +29,11 @@
   - [Classes](#classes)
     - [Logic Class](#logic-class)
     - [LogicFactory](#logicfactory)
-  - [Style Guide](#style-guide) - [Formatting](#formatting) -
-  [Spacing between functions](#spacing-between-functions) -
-  [Funtionality brief](#funtionality-brief)
+  - [Style Guide](#style-guide)
+    - [File Naming Conventions](#file-naming-conventions)
+    - [Formatting](#formatting)
+      - [Spacing between functions](#spacing-between-functions)
+      - [Funtionality brief](#funtionality-brief)
   <!--toc:end-->
 
 ## src structure
@@ -954,6 +956,20 @@ file. These templates are to allow for testing a nested strcture of UIElements.
 
 In general we follow the
 [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html).
+
+### File Naming Conventions
+
+The project uses a cohesive naming system to distinguish between classes, free functions, and test utilities. See:
+
+- **[FILE_NAMING_CONVENTIONS.md](documentation/FILE_NAMING_CONVENTIONS.md)** - Complete naming system documentation
+- **[NAMING_QUICK_REFERENCE.md](documentation/NAMING_QUICK_REFERENCE.md)** - Quick reference guide
+
+**Quick Summary**:
+- **Classes**: `ClassName.h/cpp` (PascalCase) → `steamrot::ClassName`
+- **Free Functions**: `subsystem_category.h/cpp` (snake_case) → `steamrot::subsystem::category`
+- **Template Utils**: `SubsystemUtils.h` (PascalCase, header-only) → `steamrot::subsystem`
+- **Test Helpers**: `subsystem_test_helpers.h/cpp` (snake_case) → `steamrot::tests::subsystem`
+- **Test Files**: `ModuleName.test.cpp` (matches module being tested)
 
 ### Formatting
 
