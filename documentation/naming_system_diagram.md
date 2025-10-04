@@ -121,30 +121,7 @@ Visual scan immediately shows:
 ✓ Easy to find where to add new functions
 ```
 
-## Pattern Comparison: Before vs After
-
-### Before: Inconsistent Naming
-
-```
-❌ Hard to distinguish types:
-src/logic/
-├── Logic.h              (class)
-├── collision.h          (functions? class?)
-├── ui_helpers.h         (functions)
-├── UIActionLogic.h      (class)
-└── UIRenderLogic.h      (class)
-
-src/entity/
-├── EntityManager.h      (class)
-├── emp_helpers.h        (functions - unclear!)
-└── ArchetypeHelpers.h   (templates? functions?)
-
-tests/logic/
-├── logic_helpers.h      (test utilities)
-└── draw_ui_elements_helpers.h (test utilities)
-```
-
-### After: Cohesive System
+## Naming Convention Structure
 
 ```
 ✅ Clear visual distinction:
