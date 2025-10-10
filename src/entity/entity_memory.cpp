@@ -1,9 +1,9 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "emp_helpers.h"
+#include "entity_memory.h"
 
-namespace steamrot::emp_helpers {
+namespace steamrot::entity::memory {
 /////////////////////////////////////////////////
 
 void ResizeEntityMemoryPool(EntityMemoryPool &entity_memory_pool,
@@ -20,4 +20,4 @@ size_t GetMemoryPoolSize(const EntityMemoryPool &entity_memory_pool) {
   // Get the size of the first component vector in the tuple
   return std::get<0>(entity_memory_pool).size();
 }
-} // namespace steamrot::emp_helpers
+} // namespace steamrot::entity::memory

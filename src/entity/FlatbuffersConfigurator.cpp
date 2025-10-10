@@ -12,7 +12,7 @@
 #include "EntityConfigurator.h"
 #include "SubscriberFactory.h"
 #include "UIElementFactory.h"
-#include "emp_helpers.h"
+#include "entity_memory.h"
 
 #include "user_interface_generated.h"
 #include <expected>
@@ -61,11 +61,11 @@ FlatbuffersConfigurator::ConfigureEntitiesFromDefaultData(
   // some helper values
   size_t entity_count = scene_data->entity_collection()->entities()->size();
   // check the entity memory pool is big enough
-  if (emp_helpers::GetMemoryPoolSize(entity_memory_pool) < entity_count) {
+  if (entity::memory::GetMemoryPoolSize(entity_memory_pool) < entity_count) {
 
     std::string fail_msg = std::format(
         "Entity memory pool size: {}, required size: {}",
-        emp_helpers::GetMemoryPoolSize(entity_memory_pool), entity_count);
+        entity::memory::GetMemoryPoolSize(entity_memory_pool), entity_count);
 
     FailInfo fail_info{FailMode::ParameterOutOfBounds, fail_msg};
     return std::unexpected(fail_info);
@@ -85,7 +85,7 @@ FlatbuffersConfigurator::ConfigureEntitiesFromDefaultData(
     if (entity_data->c_user_interface()) {
       auto configure_result = ConfigureComponent(
           entity_data->c_user_interface(),
-          emp_helpers::GetComponent<CUserInterface>(i, entity_memory_pool));
+          entity::memory::GetComponent<CUserInterface>(i, entity_memory_pool));
 
       if (!configure_result.has_value())
         return std::unexpected(configure_result.error());
@@ -96,7 +96,7 @@ FlatbuffersConfigurator::ConfigureEntitiesFromDefaultData(
 
       auto configure_result = ConfigureComponent(
           entity_data->c_grimoire_machina(),
-          emp_helpers::GetComponent<CGrimoireMachina>(i, entity_memory_pool));
+          entity::memory::GetComponent<CGrimoireMachina>(i, entity_memory_pool));
 
       if (!configure_result.has_value())
         return std::unexpected(configure_result.error());
@@ -118,7 +118,7 @@ FlatbuffersConfigurator::ConfigureEntitiesFromDefaultData(
     if (entity_data->c_ui_state()) {
       auto configure_result = ConfigureComponent(
           entity_data->c_ui_state(),
-          emp_helpers::GetComponent<CUIState>(i, entity_memory_pool),
+          entity::memory::GetComponent<CUIState>(i, entity_memory_pool),
           entity_memory_pool);
 
       if (!configure_result.has_value())

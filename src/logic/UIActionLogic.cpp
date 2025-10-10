@@ -10,8 +10,8 @@
 #include "DropDownItemElement.h"
 #include "DropDownListElement.h"
 #include "Logic.h"
-#include "emp_helpers.h"
-#include "ui_helpers.h"
+#include "entity_memory.h"
+#include "logic_ui.h"
 #include <SFML/Window/Mouse.hpp>
 #include <iostream>
 
@@ -37,7 +37,7 @@ void UIActionLogic::ProcessLogic() {
     for (size_t entity_id : archetype) {
 
       // get the CUserInterface component
-      CUserInterface &ui_component = emp_helpers::GetComponent<CUserInterface>(
+      CUserInterface &ui_component = entity::memory::GetComponent<CUserInterface>(
           entity_id, m_logic_context.scene_entities);
 
       // Perform any aciton logic here, processing nested elements recursively
@@ -157,12 +157,12 @@ void ProcessDropDownListElementActions(
       if (!archetype.empty()) {
         size_t entity_id = *archetype.begin();
         const CGrimoireMachina &grimoire_machina =
-            emp_helpers::GetComponent<CGrimoireMachina>(
+            entity::memory::GetComponent<CGrimoireMachina>(
                 entity_id, logic_context.scene_entities);
 
         // Get all fragment names
         std::vector<std::string> fragment_names =
-            ui_helpers::GetAllFragmentNames(grimoire_machina);
+            logic::ui::GetAllFragmentNames(grimoire_machina);
 
         // Clear existing child elements
         dropdown_list_element.child_elements.clear();
@@ -191,12 +191,12 @@ void ProcessDropDownListElementActions(
       if (!archetype.empty()) {
         size_t entity_id = *archetype.begin();
         const CGrimoireMachina &grimoire_machina =
-            emp_helpers::GetComponent<CGrimoireMachina>(
+            entity::memory::GetComponent<CGrimoireMachina>(
                 entity_id, logic_context.scene_entities);
 
         // Get all joint names
         std::vector<std::string> joint_names =
-            ui_helpers::GetAllJointNames(grimoire_machina);
+            logic::ui::GetAllJointNames(grimoire_machina);
 
         // Clear existing child elements
         dropdown_list_element.child_elements.clear();

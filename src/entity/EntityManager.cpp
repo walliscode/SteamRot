@@ -11,7 +11,7 @@
 #include "FailInfo.h"
 #include "FlatbuffersConfigurator.h"
 #include "PathProvider.h"
-#include "emp_helpers.h"
+#include "entity_memory.h"
 #include <expected>
 #include <variant>
 
@@ -88,7 +88,7 @@ size_t EntityManager::GetNextFreeEntityIndex() {
 
   // get CMeta vector from the pool
   std::vector<CMeta> meta_data =
-      emp_helpers::GetComponentVector<CMeta>(m_entity_memory_pool);
+      entity::memory::GetComponentVector<CMeta>(m_entity_memory_pool);
 
   // find next inactive entity index
   for (size_t i = 0; i < meta_data.size(); ++i) {

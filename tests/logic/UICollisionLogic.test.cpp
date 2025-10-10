@@ -10,7 +10,7 @@
 #include "ArchetypeManager.h"
 #include "PanelElement.h"
 #include "TestContext.h"
-#include "emp_helpers.h"
+#include "entity_memory.h"
 #include <SFML/System/Vector2.hpp>
 #include <catch2/catch_test_macros.hpp>
 
@@ -53,7 +53,7 @@ TEST_CASE("UICollisionLogic::RunLogic changes is_mouse_over to true if mouse "
 
   // get the CUserInterface component
   steamrot::CUserInterface &ui_component =
-      steamrot::emp_helpers::GetComponent<steamrot::CUserInterface>(
+      steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(
           entity_id, logic_context.scene_entities);
 
   // pull out the root element

@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-namespace steamrot::ui_helpers {
+namespace steamrot::logic::ui {
 
 /////////////////////////////////////////////////
 /// @brief Get all available fragment names from CGrimoireMachina
@@ -35,4 +35,4 @@ GetAllFragmentNames(const CGrimoireMachina &grimoire_machina);
 std::vector<std::string>
 GetAllJointNames(const CGrimoireMachina &grimoire_machina);
 
-} // namespace steamrot::ui_helpers
+} // namespace steamrot::logic::ui

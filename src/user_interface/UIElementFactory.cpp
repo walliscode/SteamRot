@@ -7,7 +7,7 @@
 #include "EventPacket.h"
 #include "FailInfo.h"
 #include "SubscriberFactory.h"
-#include "event_helpers.h"
+#include "event_conversion.h"
 #include "user_interface_generated.h"
 #include <expected>
 #include <iostream>
@@ -151,7 +151,7 @@ ConfigureBaseUIElement(UIElement &element, const UIElementData &data,
 
     // create EventData by running the flatbuffers data through the converter
     auto event_data_conversion_result =
-        ConvertFlatbuffersEventDataDataToEventData(
+        event::conversion::ConvertFlatbuffersEventDataDataToEventData(
             data.response_event_data()->event_data_data_type(),
             data.response_event_data()->event_data_data());
     if (!event_data_conversion_result.has_value())

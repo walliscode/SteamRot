@@ -6,7 +6,7 @@
 #include "UIStateLogic.h"
 #include "ArchetypeUtils.h"
 #include "CUIState.h"
-#include "emp_helpers.h"
+#include "entity_memory.h"
 
 namespace steamrot {
 /////////////////////////////////////////////////
@@ -30,7 +30,7 @@ void UIStateLogic::ProcessLogic() {
 
   // Process each entity with CUIState component
   for (size_t entity_id : archetype) {
-    CUIState &ui_state = emp_helpers::GetComponent<CUIState>(
+    CUIState &ui_state = entity::memory::GetComponent<CUIState>(
         entity_id, m_logic_context.scene_entities);
 
     // Check all subscribers for each state

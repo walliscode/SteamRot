@@ -11,7 +11,7 @@
 #include "CUserInterface.h"
 #include "FlatbuffersDataLoader.h"
 #include "catch2/catch_test_macros.hpp"
-#include "emp_helpers.h"
+#include "entity_memory.h"
 #include "entities_generated.h"
 #include "scenes_generated.h"
 #include "ui_element_factory_test_helpers.h"
@@ -48,18 +48,18 @@ void CompareToDefault(const CGrimoireMachina &actual) {
 void TestEMPIsDefaultConstructed(const EntityMemoryPool &entity_memory_pool) {
 
   // cycle through entity memory pool and compare all Component instances
-  for (size_t i{0}; i < emp_helpers::GetMemoryPoolSize(entity_memory_pool);
+  for (size_t i{0}; i < entity::memory::GetMemoryPoolSize(entity_memory_pool);
        i++) {
 
     // check each component type
     /////////////////////////////////////////////////
     const CUserInterface &c_user_interface =
-        emp_helpers::GetComponent<CUserInterface>(i, entity_memory_pool);
+        entity::memory::GetComponent<CUserInterface>(i, entity_memory_pool);
     CompareToDefault(c_user_interface);
 
     /////////////////////////////////////////////////
     const CGrimoireMachina &c_grimoire_machina =
-        emp_helpers::GetComponent<CGrimoireMachina>(i, entity_memory_pool);
+        entity::memory::GetComponent<CGrimoireMachina>(i, entity_memory_pool);
     CompareToDefault(c_grimoire_machina);
   }
 }
@@ -107,8 +107,8 @@ void TestConfigurationOfEMPfromDefaultData(
   // some helper values
   size_t entity_count = entity_collection.entities()->size();
   // check the entity memory pool is big enough
-  REQUIRE(emp_helpers::GetMemoryPoolSize(entity_memory_pool) >= entity_count);
-  REQUIRE(emp_helpers::GetMemoryPoolSize(entity_memory_pool) ==
+  REQUIRE(entity::memory::GetMemoryPoolSize(entity_memory_pool) >= entity_count);
+  REQUIRE(entity::memory::GetMemoryPoolSize(entity_memory_pool) ==
           scene_data.entity_collection()->entity_memory_pool_size());
 
   // Go through each entity in the scene data and check that the
@@ -119,13 +119,13 @@ void TestConfigurationOfEMPfromDefaultData(
     // CUserInterface component configuration
     if (entity_data->c_user_interface()) {
       const CUserInterface &c_user_interface =
-          emp_helpers::GetComponent<CUserInterface>(i, entity_memory_pool);
+          entity::memory::GetComponent<CUserInterface>(i, entity_memory_pool);
       CompareToData(c_user_interface, *entity_data->c_user_interface());
     }
     // CGrimoireMachina component configuration
     if (entity_data->c_grimoire_machina()) {
       const CGrimoireMachina &c_grimoire_machina =
-          emp_helpers::GetComponent<CGrimoireMachina>(i, entity_memory_pool);
+          entity::memory::GetComponent<CGrimoireMachina>(i, entity_memory_pool);
       CompareToData(c_grimoire_machina, *entity_data->c_grimoire_machina());
     }
   }
