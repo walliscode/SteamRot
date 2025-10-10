@@ -90,10 +90,10 @@ Create a new file following the pattern: `subsystem_category.h/cpp`
 📚 **[examples/naming_examples/README.md](examples/naming_examples/README.md)** (8KB)
 - Real scenario walkthroughs
 - Directory structure examples
-- Migration paths
-- Before/after comparisons
+- Naming convention examples
+- Implementation patterns
 
-**Best for:** Seeing it in action, planning refactoring
+**Best for:** Seeing it in action, understanding patterns
 
 ## The System at a Glance
 

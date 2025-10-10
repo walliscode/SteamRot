@@ -203,69 +203,58 @@ src/logic/logic_collision.h          # Obviously functions
 src/entity/entity_memory.h           # Obviously functions
 ```
 
-## Migration Path Examples
+## Naming Convention Examples
 
-### Example 1: Migrating collision.h
+### Example 1: Logic Collision Functions
 
-**Current**:
-```
-src/logic/collision.h/cpp
-namespace steamrot::collision
-```
-
-**New** (when refactoring):
+**File structure**:
 ```
 src/logic/logic_collision.h/cpp
 namespace steamrot::logic::collision
 ```
 
-**Steps**:
-1. Rename files: `collision.h` → `logic_collision.h`
-2. Update namespace: `steamrot::collision` → `steamrot::logic::collision`
-3. Update all includes: `#include "collision.h"` → `#include "logic_collision.h"`
-4. Update namespace references in code
-5. Update CMakeLists.txt
-6. Update tests
-
-### Example 2: Migrating ui_helpers.h
-
-**Current**:
-```
-src/logic/ui_helpers.h/cpp
-namespace steamrot::ui_helpers
+**Implementation**:
+```cpp
+// src/logic/logic_collision.h
+namespace steamrot::logic::collision {
+  bool IsMouseOverBounds(const sf::FloatRect& bounds, const sf::Vector2f& mousePos);
+  void CheckCollision(Entity& entity1, Entity& entity2);
+}
 ```
 
-**New** (when refactoring):
+### Example 2: Logic UI Functions
+
+**File structure**:
 ```
 src/logic/logic_ui.h/cpp
 namespace steamrot::logic::ui
 ```
 
-**Steps**:
-1. Rename files: `ui_helpers.h` → `logic_ui.h`
-2. Update namespace: `steamrot::ui_helpers` → `steamrot::logic::ui`
-3. Update all includes and references
-4. Update tests: `ui_helpers.test.cpp` → `logic_ui.test.cpp`
-
-### Example 3: Migrating test helpers
-
-**Current**:
-```
-tests/logic/logic_helpers.h/cpp
-namespace steamrot::tests
+**Implementation**:
+```cpp
+// src/logic/logic_ui.h
+namespace steamrot::logic::ui {
+  std::vector<std::string> GetAllFragmentNames();
+  std::vector<std::string> GetAllJointNames();
+}
 ```
 
-**New** (easiest migration):
+### Example 3: Test Helpers
+
+**File structure**:
 ```
 tests/logic/logic_test_helpers.h/cpp
 namespace steamrot::tests::logic
 ```
 
-**Steps**:
-1. Rename files: `logic_helpers.h` → `logic_test_helpers.h`
-2. Update namespace: `steamrot::tests` → `steamrot::tests::logic`
-3. Update includes in test files
-4. Update CMakeLists.txt
+**Implementation**:
+```cpp
+// tests/logic/logic_test_helpers.h
+namespace steamrot::tests::logic {
+  void CheckStaticLogicCollections(const LogicCollection& collection, SceneType type);
+  LogicContext CreateMockLogicContext();
+}
+```
 
 ## Summary
 
