@@ -3,7 +3,7 @@
 /// @brief Implementation of the UIEventLogic class.
 /////////////////////////////////////////////////
 #include "UIActionLogic.h"
-#include "ArchetypeHelpers.h"
+#include "ArchetypeUtils.h"
 #include "ArchetypeManager.h"
 #include "CGrimoireMachina.h"
 #include "CUserInterface.h"

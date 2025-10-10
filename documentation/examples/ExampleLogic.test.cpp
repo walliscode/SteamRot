@@ -15,7 +15,7 @@
 #include "ExampleLogic.h"
 #include "TestContext.h"
 #include "CYourComponent.h"
-#include "ArchetypeHelpers.h"
+#include "ArchetypeUtils.h"
 #include "emp_helpers.h"
 #include <catch2/catch_test_macros.hpp>
 

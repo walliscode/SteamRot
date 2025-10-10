@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "ui_element_factory_helpers.h"
+#include "ui_element_factory_test_helpers.h"
 #include <string>
 #include <variant>
 

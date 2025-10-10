@@ -6,9 +6,9 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "scene_helpers.h"
-#include "configuration_helpers.h"
-#include "logic_helpers.h"
+#include "scene_test_helpers.h"
+#include "entity_test_helpers.h"
+#include "logic_test_helpers.h"
 #include "uuid.h"
 
 namespace steamrot::tests {

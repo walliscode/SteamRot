@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "logic_helpers.h"
+#include "logic_test_helpers.h"
 #include "CraftingRenderLogic.h"
 #include "LogicFactory.h"
 #include "UIActionLogic.h"

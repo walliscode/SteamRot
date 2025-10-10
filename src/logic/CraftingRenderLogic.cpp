@@ -4,7 +4,7 @@
 /////////////////////////////////////////////////
 
 #include "CraftingRenderLogic.h"
-#include "ArchetypeHelpers.h"
+#include "ArchetypeUtils.h"
 #include "ArchetypeManager.h"
 #include "CGrimoireMachina.h"
 #include "emp_helpers.h"

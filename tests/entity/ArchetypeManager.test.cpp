@@ -10,7 +10,7 @@
 #include "EntityManager.h"
 #include "PathProvider.h"
 #include "TestContext.h"
-#include "configuration_helpers.h"
+#include "entity_test_helpers.h"
 #include "containers.h"
 #include "scene_change_packet_generated.h"
 #include <catch2/catch_test_macros.hpp>

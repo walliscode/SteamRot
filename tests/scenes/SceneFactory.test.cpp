@@ -13,7 +13,7 @@
 #include "TitleScene.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
-#include "scene_helpers.h"
+#include "scene_test_helpers.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <catch2/catch_test_macros.hpp>
 

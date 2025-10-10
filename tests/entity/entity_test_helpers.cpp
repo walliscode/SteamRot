@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "configuration_helpers.h"
+#include "entity_test_helpers.h"
 #include "CGrimoireMachina.h"
 #include "CUserInterface.h"
 #include "FlatbuffersDataLoader.h"
@@ -14,7 +14,7 @@
 #include "emp_helpers.h"
 #include "entities_generated.h"
 #include "scenes_generated.h"
-#include "ui_element_factory_helpers.h"
+#include "ui_element_factory_test_helpers.h"
 #include "user_interface_generated.h"
 namespace steamrot::tests {
 

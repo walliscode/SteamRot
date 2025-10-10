@@ -1,5 +1,5 @@
 #include "UICollisionLogic.h"
-#include "ArchetypeHelpers.h"
+#include "ArchetypeUtils.h"
 #include "CUserInterface.h"
 #include "collision.h"
 #include "emp_helpers.h"

@@ -14,7 +14,7 @@
 #include "DropDownContainerElement.h"
 #include "DropDownListElement.h"
 #include "PanelElement.h"
-#include "draw_ui_elements_helpers.h"
+#include "draw_ui_elements_test_helpers.h"
 #include <SFML/Graphics.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <iostream>

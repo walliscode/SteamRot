@@ -4,7 +4,7 @@
 /////////////////////////////////////////////////
 
 #include "UIStateLogic.h"
-#include "ArchetypeHelpers.h"
+#include "ArchetypeUtils.h"
 #include "CUIState.h"
 #include "emp_helpers.h"
 

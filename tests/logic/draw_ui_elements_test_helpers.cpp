@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "draw_ui_elements_helpers.h"
+#include "draw_ui_elements_test_helpers.h"
 
 #include "catch2/catch_test_macros.hpp"
 #include <SFML/Graphics/Image.hpp>

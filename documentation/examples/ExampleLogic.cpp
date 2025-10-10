@@ -13,7 +13,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "ExampleLogic.h"
-#include "ArchetypeHelpers.h"
+#include "ArchetypeUtils.h"
 #include "ArchetypeManager.h"
 #include "CYourComponent.h"
 #include "emp_helpers.h"

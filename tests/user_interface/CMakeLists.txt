@@ -1,7 +1,7 @@
 add_executable(test_user_interface
   styles/StylesConfigurator.test.cpp
   UIElementFactory.test.cpp
-  ui_element_factory_helpers.cpp
+  ui_element_factory_test_helpers.cpp
 )
 
 target_include_directories(test_user_interface
@@ -19,7 +19,7 @@ target_link_libraries(test_user_interface
 )
 
 add_library(user_interface_helpers
-  ui_element_factory_helpers.cpp
+  ui_element_factory_test_helpers.cpp
 
 )
 
