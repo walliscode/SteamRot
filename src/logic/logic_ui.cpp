@@ -6,9 +6,9 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "ui_helpers.h"
+#include "logic_ui.h"
 
-namespace steamrot::ui_helpers {
+namespace steamrot::logic::ui {
 
 /////////////////////////////////////////////////
 std::vector<std::string>
@@ -36,4 +36,4 @@ GetAllJointNames(const CGrimoireMachina &grimoire_machina) {
   return joint_names;
 }
 
-} // namespace steamrot::ui_helpers
+} // namespace steamrot::logic::ui

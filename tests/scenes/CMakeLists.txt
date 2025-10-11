@@ -1,7 +1,7 @@
 add_executable(test_scenes
 SceneFactory.test.cpp
 SceneManager.test.cpp
-scene_helpers.cpp
+scene_test_helpers.cpp
 TitleScene.test.cpp
 CraftingScene.test.cpp
 )
@@ -22,7 +22,7 @@ target_link_libraries(test_scenes
   logic
   systems
   entity_helpers
-  asset_helpers
+  asset_test_helpers
   test_context
   user_interface
   test_logic_helpers

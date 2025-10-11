@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////
 #include "containers.h"
 
-namespace steamrot::emp_helpers {
+namespace steamrot::entity::memory {
 
 ////////////////////////////////////////////////////////////
 /// |brief template to get vector of given component type
@@ -52,4 +52,4 @@ const T &GetComponent(size_t entity_id,
 /// @return Size of the EntityMemoryPool
 /////////////////////////////////////////////////
 size_t GetMemoryPoolSize(const EntityMemoryPool &entity_memory_pool);
-} // namespace steamrot::emp_helpers
+} // namespace steamrot::entity::memory

@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////
 #include "ArchetypeManager.h"
 #include "containers.h"
-#include "emp_helpers.h"
+#include "entity_memory.h"
 #include <cstddef>
 #include <expected>
 #include <magic_enum/magic_enum.hpp>
@@ -76,7 +76,7 @@ ArchetypeManager::GenerateAllArchetypes() {
   m_archetypes.clear();
 
   // get current pool size
-  size_t pool_size = emp_helpers::GetMemoryPoolSize(m_entity_memory_pool);
+  size_t pool_size = entity::memory::GetMemoryPoolSize(m_entity_memory_pool);
 
   // iterate over all entities in the memory pool
   for (size_t entity_index = 0; entity_index < pool_size; ++entity_index) {

@@ -3,7 +3,7 @@ add_library(entity
     EntityConfigurator.cpp
     FlatbuffersConfigurator.cpp
     ArchetypeManager.cpp
-    emp_helpers.cpp
+    entity_memory.cpp
   )
 
 target_include_directories(entity

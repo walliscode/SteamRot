@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////
 #include "SceneFactory.h"
 #include "TestContext.h"
-#include "draw_ui_elements_helpers.h"
+#include "draw_ui_elements_test_helpers.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("TitleScene's call of sRender is correct", "[TitleScene]") {

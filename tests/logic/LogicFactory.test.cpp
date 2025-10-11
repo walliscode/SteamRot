@@ -10,7 +10,7 @@
 #include "TestContext.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
-#include "logic_helpers.h"
+#include "logic_test_helpers.h"
 #include "scene_change_packet_generated.h"
 #include <catch2/catch_test_macros.hpp>
 

@@ -12,7 +12,7 @@
 #include "TestContext.h"
 #include "TestUIElementDataProvider.h"
 #include "catch2/catch_test_macros.hpp"
-#include "ui_element_factory_helpers.h"
+#include "ui_element_factory_test_helpers.h"
 #include "user_interface_generated.h"
 #include <iostream>
 #include <memory>

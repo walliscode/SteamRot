@@ -4,7 +4,7 @@
 #include "UIRenderLogic.h"
 #include "Logic.h"
 #include "draw_ui_elements.h"
-#include "emp_helpers.h"
+#include "entity_memory.h"
 #include <SFML/Graphics.hpp>
 
 namespace steamrot {
@@ -39,7 +39,7 @@ void UIRenderLogic::DrawUIElements() {
   for (size_t entity_id : archetype) {
 
     // get the CUserInterface component
-    CUserInterface &ui_component = emp_helpers::GetComponent<CUserInterface>(
+    CUserInterface &ui_component = entity::memory::GetComponent<CUserInterface>(
         entity_id, m_logic_context.scene_entities);
 
     draw_ui_elements::DrawNestedUIElements(

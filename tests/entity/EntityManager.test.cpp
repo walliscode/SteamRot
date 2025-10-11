@@ -9,7 +9,7 @@
 #include "EntityManager.h"
 #include "PathProvider.h"
 #include "TestContext.h"
-#include "configuration_helpers.h"
+#include "entity_test_helpers.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("EntityManager calls configurator with no errors",

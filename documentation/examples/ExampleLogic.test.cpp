@@ -15,8 +15,8 @@
 #include "ExampleLogic.h"
 #include "TestContext.h"
 #include "CYourComponent.h"
-#include "ArchetypeHelpers.h"
-#include "emp_helpers.h"
+#include "ArchetypeUtils.h"
+#include "entity_memory.h"
 #include <catch2/catch_test_macros.hpp>
 
 ////////////////////////////////////////////////////////////
@@ -63,7 +63,7 @@ TEST_CASE("ExampleLogic::ProcessLogic modifies component state",
   
   // Get component and verify initial state
   steamrot::CYourComponent &component = 
-      steamrot::emp_helpers::GetComponent<steamrot::CYourComponent>(
+      steamrot::entity::memory::GetComponent<steamrot::CYourComponent>(
           entity_id, logic_context.scene_entities);
   
   // Verify initial state
@@ -162,7 +162,7 @@ TEST_CASE("ExampleLogic::ProcessLogic handles multiple entities",
   // Assert - Verify all entities were processed
   for (size_t entity_id : archetype) {
     steamrot::CYourComponent &component = 
-        steamrot::emp_helpers::GetComponent<steamrot::CYourComponent>(
+        steamrot::entity::memory::GetComponent<steamrot::CYourComponent>(
             entity_id, logic_context.scene_entities);
     
     REQUIRE(component.m_some_flag == true);
@@ -191,7 +191,7 @@ TEST_CASE("ExampleLogic::ProcessLogic respects conditions",
   size_t entity_id = it->second[0];
   
   steamrot::CYourComponent &component = 
-      steamrot::emp_helpers::GetComponent<steamrot::CYourComponent>(
+      steamrot::entity::memory::GetComponent<steamrot::CYourComponent>(
           entity_id, logic_context.scene_entities);
   
   // Set condition to false

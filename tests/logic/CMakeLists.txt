@@ -3,7 +3,7 @@ LogicFactory.test.cpp
 UIRenderLogic.test.cpp
 UIStateLogic.test.cpp
 draw_ui_elements.test.cpp
-draw_ui_elements_helpers.cpp
+draw_ui_elements_test_helpers.cpp
 collision.test.cpp
 UICollisionLogic.test.cpp
 UIActionLogic.test.cpp
@@ -26,8 +26,8 @@ target_link_libraries(test_logic
 catch_discover_tests(test_logic)
 
 add_library(test_logic_helpers
-draw_ui_elements_helpers.cpp
-logic_helpers.cpp
+draw_ui_elements_test_helpers.cpp
+logic_test_helpers.cpp
 )
 
 target_include_directories(test_logic_helpers

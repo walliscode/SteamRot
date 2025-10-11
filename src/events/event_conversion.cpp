@@ -1,10 +1,12 @@
-#include "event_helpers.h"
+#include "event_conversion.h"
 #include "events_generated.h"
 #include "uuid.h"
 #include <cstddef>
 #include <variant>
 
 namespace steamrot {
+namespace event {
+namespace conversion {
 
 /////////////////////////////////////////////////
 static const std::unordered_map<KeyboardInput, sf::Keyboard::Key> &
@@ -169,4 +171,6 @@ ConvertFBDataToUserInputBitset(const UserInputBitsetData &data) {
 
   return event_bitset;
 };
+} // namespace conversion
+} // namespace event
 } // namespace steamrot

@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "ui_helpers.h"
+#include "logic_ui.h"
 #include "CGrimoireMachina.h"
 #include "Fragment.h"
 #include "Joint.h"
@@ -19,7 +19,7 @@ TEST_CASE("GetAllFragmentNames returns empty vector for empty fragments map",
   steamrot::CGrimoireMachina grimoire;
 
   std::vector<std::string> fragment_names =
-      steamrot::ui_helpers::GetAllFragmentNames(grimoire);
+      steamrot::logic::ui::GetAllFragmentNames(grimoire);
 
   REQUIRE(fragment_names.empty());
 }
@@ -43,7 +43,7 @@ TEST_CASE("GetAllFragmentNames returns all fragment names",
   grimoire.m_all_fragments["fragment_c"] = fragment3;
 
   std::vector<std::string> fragment_names =
-      steamrot::ui_helpers::GetAllFragmentNames(grimoire);
+      steamrot::logic::ui::GetAllFragmentNames(grimoire);
 
   REQUIRE(fragment_names.size() == 3);
   REQUIRE(std::find(fragment_names.begin(), fragment_names.end(),
@@ -60,7 +60,7 @@ TEST_CASE("GetAllJointNames returns empty vector for empty joints map",
   steamrot::CGrimoireMachina grimoire;
 
   std::vector<std::string> joint_names =
-      steamrot::ui_helpers::GetAllJointNames(grimoire);
+      steamrot::logic::ui::GetAllJointNames(grimoire);
 
   REQUIRE(joint_names.empty());
 }
@@ -83,7 +83,7 @@ TEST_CASE("GetAllJointNames returns all joint names", "[ui_helpers]") {
   grimoire.m_all_joints["joint_c"] = joint3;
 
   std::vector<std::string> joint_names =
-      steamrot::ui_helpers::GetAllJointNames(grimoire);
+      steamrot::logic::ui::GetAllJointNames(grimoire);
 
   REQUIRE(joint_names.size() == 3);
   REQUIRE(std::find(joint_names.begin(), joint_names.end(), "joint_a") !=

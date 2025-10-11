@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////
 #include "AssetManager.h"
 #include "PathProvider.h"
-#include "asset_helpers.h"
+#include "asset_test_helpers.h"
 #include "scene_change_packet_generated.h"
 #include <catch2/catch_test_macros.hpp>
 

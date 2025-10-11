@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "asset_helpers.h"
+#include "asset_test_helpers.h"
 #include "FlatbuffersDataLoader.h"
 #include "PathProvider.h"
 #include "catch2/catch_test_macros.hpp"

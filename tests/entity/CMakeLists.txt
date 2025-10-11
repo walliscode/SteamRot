@@ -22,7 +22,7 @@ target_link_libraries(test_entity
 catch_discover_tests(test_entity)
 
 add_library(entity_helpers
-configuration_helpers.cpp
+entity_test_helpers.cpp
 )
 
 target_include_directories(entity_helpers

@@ -13,10 +13,10 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "ExampleLogic.h"
-#include "ArchetypeHelpers.h"
+#include "ArchetypeUtils.h"
 #include "ArchetypeManager.h"
 #include "CYourComponent.h"
-#include "emp_helpers.h"
+#include "entity_memory.h"
 
 namespace steamrot {
 
@@ -49,7 +49,7 @@ void ExampleLogic::ProcessLogic() {
     for (size_t entity_id : archetype) {
 
       // Get the component for this entity
-      CYourComponent &component = emp_helpers::GetComponent<CYourComponent>(
+      CYourComponent &component = entity::memory::GetComponent<CYourComponent>(
           entity_id, m_logic_context.scene_entities);
 
       // Example: Modify component state
@@ -73,9 +73,9 @@ void ExampleLogic::ProcessLogic() {
 
     for (size_t entity_id : multi_archetype) {
       // Get both components
-      CComponent1 &comp1 = emp_helpers::GetComponent<CComponent1>(
+      CComponent1 &comp1 = entity::memory::GetComponent<CComponent1>(
           entity_id, m_logic_context.scene_entities);
-      CComponent2 &comp2 = emp_helpers::GetComponent<CComponent2>(
+      CComponent2 &comp2 = entity::memory::GetComponent<CComponent2>(
           entity_id, m_logic_context.scene_entities);
 
       // Use both components in logic
@@ -96,7 +96,7 @@ void ExampleLogic::ProcessLogic() {
     const Archetype &render_archetype = render_it->second;
 
     for (size_t entity_id : render_archetype) {
-      CRenderComponent &render_comp = emp_helpers::GetComponent<CRenderComponent>(
+      CRenderComponent &render_comp = entity::memory::GetComponent<CRenderComponent>(
           entity_id, m_logic_context.scene_entities);
 
       if (render_comp.m_visible) {
@@ -120,7 +120,7 @@ void ExampleLogic::ProcessLogic() {
     const Archetype &ui_archetype = ui_it->second;
 
     for (size_t entity_id : ui_archetype) {
-      CUserInterface &ui_comp = emp_helpers::GetComponent<CUserInterface>(
+      CUserInterface &ui_comp = entity::memory::GetComponent<CUserInterface>(
           entity_id, m_logic_context.scene_entities);
 
       // Access mouse position from context
@@ -152,7 +152,7 @@ void ExampleLogic::ProcessLogic() {
     const Archetype &action_archetype = action_it->second;
 
     for (size_t entity_id : action_archetype) {
-      CActionComponent &action_comp = emp_helpers::GetComponent<CActionComponent>(
+      CActionComponent &action_comp = entity::memory::GetComponent<CActionComponent>(
           entity_id, m_logic_context.scene_entities);
 
       // Check if action should be triggered
@@ -180,7 +180,7 @@ void ExampleLogic::ProcessLogic() {
     const Archetype &sprite_archetype = sprite_it->second;
 
     for (size_t entity_id : sprite_archetype) {
-      CSpriteComponent &sprite_comp = emp_helpers::GetComponent<CSpriteComponent>(
+      CSpriteComponent &sprite_comp = entity::memory::GetComponent<CSpriteComponent>(
           entity_id, m_logic_context.scene_entities);
 
       // Access textures from asset manager
@@ -205,7 +205,7 @@ void ExampleLogic::ProcessLogic() {
 
     for (size_t entity_id : conditional_archetype) {
       CConditionalComponent &cond_comp = 
-          emp_helpers::GetComponent<CConditionalComponent>(
+          entity::memory::GetComponent<CConditionalComponent>(
               entity_id, m_logic_context.scene_entities);
 
       // Only process active components

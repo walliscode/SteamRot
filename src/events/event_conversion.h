@@ -7,6 +7,8 @@
 #include <expected>
 
 namespace steamrot {
+namespace event {
+namespace conversion {
 
 /////////////////////////////////////////////////
 /// @brief Convert the flatbuffers UserInputBitsetData to a UserInputBitset
@@ -26,4 +28,6 @@ ConvertFBDataToUserInputBitset(const UserInputBitsetData &data);
 std::expected<EventData, FailInfo>
 ConvertFlatbuffersEventDataDataToEventData(const EventDataData data_type,
                                            const void *data);
+} // namespace conversion
+} // namespace event
 } // namespace steamrot
