@@ -10,7 +10,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("CUIState is default constructible and has correct properties",
-          "[Components][CUIState]") {
+          "[unit][Components][CUIState]") {
 
   steamrot::CUIState ui_state;
   // Test pre configuration state

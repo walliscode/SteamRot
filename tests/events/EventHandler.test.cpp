@@ -16,7 +16,7 @@
 #include <X11/extensions/XTest.h>
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("EventHandler registers Subscribers", "[EventHandler]") {
+TEST_CASE("EventHandler registers Subscribers", "[unit][EventHandler]") {
   // Create an EventHandler instance
   steamrot::EventHandler event_handler;
 
@@ -49,7 +49,7 @@ TEST_CASE("EventHandler registers Subscribers", "[EventHandler]") {
   subscriber.reset();
   REQUIRE(subscriber_register.at(event_type)[0].expired());
 }
-TEST_CASE("AddEvent adds an event to an EventBus", "[EventHandler]") {
+TEST_CASE("AddEvent adds an event to an EventBus", "[unit][EventHandler]") {
   // create an eventHandler
   steamrot::EventHandler event_handler;
   REQUIRE(event_handler.GetGlobalEventBus().empty());
@@ -64,7 +64,7 @@ TEST_CASE("AddEvent adds an event to an EventBus", "[EventHandler]") {
 }
 
 TEST_CASE("DecrementEventLifetimes decrease all lifetimes by 1",
-          "[EventHandler]") {
+          "[unit][EventHandler]") {
 
   // create a mock EventBus with events of varying lifetimes
   steamrot::EventBus event_bus;
@@ -86,7 +86,7 @@ TEST_CASE("DecrementEventLifetimes decrease all lifetimes by 1",
   REQUIRE(event_bus[2].event_lifetime == 1);
 }
 
-TEST_CASE("RemoveDeadEvents removes dead events", "[EventHandler]") {
+TEST_CASE("RemoveDeadEvents removes dead events", "[unit][EventHandler]") {
   // create a mock EventBus with events of varying lifetimes
   steamrot::EventBus event_bus;
   steamrot::EventPacket event1{3};
@@ -107,7 +107,7 @@ TEST_CASE("RemoveDeadEvents removes dead events", "[EventHandler]") {
 
 TEST_CASE(
     "EventHandler::AddToGlobalEventBus adds events to the global event bus",
-    "[EventHandler]") {
+    "[unit][EventHandler]") {
 
   // Create an EventHandler instance
   steamrot::EventHandler event_handler;
@@ -142,7 +142,7 @@ TEST_CASE("HandleSFMLEvents adds events to anEventBus") {
 }
 
 TEST_CASE("EventHandler::TickGlobalEventBus updates the global event bus",
-          "[EventHandler]") {
+          "[unit][EventHandler]") {
   // Create an EventHandler instance
   steamrot::EventHandler event_handler;
   // Create some EventPackets to add
@@ -170,7 +170,7 @@ TEST_CASE("EventHandler::TickGlobalEventBus updates the global event bus",
 }
 
 TEST_CASE("UpdateSubscribers turns on Subscribers and copies EventData",
-          "[EventHandler]") {
+          "[unit][EventHandler]") {
 
   // create Subscriber variables
   const steamrot::EventType event_type =
@@ -204,7 +204,7 @@ TEST_CASE("UpdateSubscribers turns on Subscribers and copies EventData",
 
 TEST_CASE("EventHandler::UpdateSubscribersFrom does not update Subscribers "
           "when events do not match",
-          "[EventHandler]") {
+          "[unit][EventHandler]") {
   // Create an EventHandler instance
   steamrot::EventHandler event_handler;
   // create Subscriber variables
@@ -239,7 +239,7 @@ TEST_CASE("EventHandler::UpdateSubscribersFrom does not update Subscribers "
 
 TEST_CASE("EventHandler::UpdateSubscribers does not update Subscriber if "
           "trigger_data is present and does not match",
-          "[EventHandler]") {
+          "[unit][EventHandler]") {
   // create Subscriber variables
   const steamrot::EventType event_type =
       steamrot::EventType::EventType_EVENT_USER_INPUT;
@@ -276,7 +276,7 @@ TEST_CASE("EventHandler::UpdateSubscribers does not update Subscriber if "
 TEST_CASE(
     "EventHandler::UpdateSubscribers activates Subscriber if trigger_data "
     "is present and matches",
-    "[EventHandler]") {
+    "[unit][EventHandler]") {
   // create Subscriber variables
   const steamrot::EventType event_type =
       steamrot::EventType::EventType_EVENT_USER_INPUT;
@@ -307,7 +307,7 @@ TEST_CASE(
 }
 TEST_CASE("EventHandler::UpdateSubscribersFromGlobalEventBus updates correct "
           "subscribers, with and without trigger data",
-          "[EventHandler]") {
+          "[unit][EventHandler]") {
   sf::Event::KeyPressed event_sf;
   event_sf.code = sf::Keyboard::Key::A;
   sf::Event event{event_sf};

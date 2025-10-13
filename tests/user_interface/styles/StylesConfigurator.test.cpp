@@ -13,7 +13,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <vector>
 
-TEST_CASE("StylesConfigurator can be instantiated", "[StylesConfigurator]") {
+TEST_CASE("StylesConfigurator can be instantiated", "[unit][StylesConfigurator]") {
   // Arrange & Act
   steamrot::StylesConfigurator stylesConfigurator;
 
@@ -188,7 +188,7 @@ TEST_CASE("StylesConfigurator ConfigureStyle returns expected result for "
 }
 
 TEST_CASE("StylesConfigurator returns a map of all available styles",
-          "[StylesConfigurator]") {
+          "[unit][StylesConfigurator]") {
   // Arrange
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::FlatbuffersDataLoader data_loader;

@@ -11,7 +11,7 @@
 #include "draw_ui_elements_test_helpers.h"
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("UIRenderLogic::UIRenderLogic Constructor", "[UIRenderLogic]") {
+TEST_CASE("UIRenderLogic::UIRenderLogic Constructor", "[unit][UIRenderLogic]") {
   // Create a dummy LogicContext
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
@@ -22,7 +22,7 @@ TEST_CASE("UIRenderLogic::UIRenderLogic Constructor", "[UIRenderLogic]") {
   SUCCEED("UIRenderLogic instantiated successfully");
 }
 
-TEST_CASE("UIRenderLogic draws default for test scene", "[UIRenderLogic]") {
+TEST_CASE("UIRenderLogic draws default for test scene", "[unit][UIRenderLogic]") {
   // Create a dummy LogicContext
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
@@ -47,7 +47,7 @@ TEST_CASE("UIRenderLogic draws default for test scene", "[UIRenderLogic]") {
       test_context.GetLogicContextForTestScene().scene_texture);
 }
 
-TEST_CASE("UIRenderLogic draws title scene", "[UIRenderLogic]") {
+TEST_CASE("UIRenderLogic draws title scene", "[unit][UIRenderLogic]") {
   // Create a dummy LogicContext
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context{
@@ -69,7 +69,7 @@ TEST_CASE("UIRenderLogic draws title scene", "[UIRenderLogic]") {
       test_context.GetLogicContextForTitleScene().scene_texture);
 }
 
-TEST_CASE("UIRenderLogic draws crafting scene", "[UIRenderLogic]") {
+TEST_CASE("UIRenderLogic draws crafting scene", "[unit][UIRenderLogic]") {
   // Create a dummy LogicContext
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context{

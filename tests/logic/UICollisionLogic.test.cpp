@@ -15,7 +15,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("UICollisionLogic::UICollisionLogic Constructor",
-          "[UICollisionLogic]") {
+          "[unit][UICollisionLogic]") {
   // Create a dummy LogicContext
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
@@ -27,7 +27,7 @@ TEST_CASE("UICollisionLogic::UICollisionLogic Constructor",
 
 TEST_CASE("UICollisionLogic::RunLogic changes is_mouse_over to true if mouse "
           "over element"
-          "[UICollisionLogic]") {
+          "[unit][UICollisionLogic]") {
   // Create a dummy LogicContext
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;

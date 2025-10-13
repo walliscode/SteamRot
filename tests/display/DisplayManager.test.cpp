@@ -13,7 +13,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <iostream>
 
-TEST_CASE("DisplayManager Initializes with SceneManager", "[DisplayManager]") {
+TEST_CASE("DisplayManager Initializes with SceneManager", "[unit][DisplayManager]") {
 
   steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
   steamrot::tests::TestContext test_context;
@@ -30,7 +30,7 @@ TEST_CASE("DisplayManager Initializes with SceneManager", "[DisplayManager]") {
   SUCCEED("DisplayManager initialized successfully");
 }
 
-TEST_CASE("DisplayManager Render Cycle", "[DisplayManager]") {
+TEST_CASE("DisplayManager Render Cycle", "[unit][DisplayManager]") {
   steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
   steamrot::tests::TestContext test_context;
   steamrot::GameContext game_context =

@@ -16,7 +16,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("ArchetypeManager is constructed without errors",
-          "[ArchetypeManager]") {
+          "[unit][ArchetypeManager]") {
 
   // create an instance of the EMP to pass to the ArchetypeManager
   steamrot::EntityMemoryPool emp;
@@ -25,7 +25,7 @@ TEST_CASE("ArchetypeManager is constructed without errors",
 }
 
 TEST_CASE("ArchetypeManager archetype map is empty with a non configured EMP",
-          "[ArchetypeManager]") {
+          "[unit][ArchetypeManager]") {
 
   // create text context
   steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
@@ -53,7 +53,7 @@ TEST_CASE("ArchetypeManager archetype map is empty with a non configured EMP",
 }
 
 TEST_CASE("ArchetypeManager generates archetype IDs correctly",
-          "[ArchetypeManager]") {
+          "[unit][ArchetypeManager]") {
   // create test context
   steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
   steamrot::tests::TestContext test_context;

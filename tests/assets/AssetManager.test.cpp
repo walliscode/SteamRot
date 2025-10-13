@@ -12,14 +12,14 @@
 #include "scene_change_packet_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("AssetManager is constructed correctly", "[AssetManager]") {
+TEST_CASE("AssetManager is constructed correctly", "[unit][AssetManager]") {
 
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::AssetManager asset_manager;
   REQUIRE_NOTHROW(asset_manager);
 }
 
-TEST_CASE("AssetManager::LoadDefaultAssets works correctly", "[AssetManager]") {
+TEST_CASE("AssetManager::LoadDefaultAssets works correctly", "[unit][AssetManager]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::AssetManager asset_manager;
 
@@ -42,7 +42,7 @@ TEST_CASE("AssetManager::LoadDefaultAssets works correctly", "[AssetManager]") {
   REQUIRE(!ui_styles.empty());
   REQUIRE(ui_styles.contains("default"));
 }
-TEST_CASE("AssetManager loads scene assets correctly", "[AssetManager]") {
+TEST_CASE("AssetManager loads scene assets correctly", "[unit][AssetManager]") {
 
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::AssetManager asset_manager;

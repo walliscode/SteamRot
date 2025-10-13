@@ -10,7 +10,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Configuring a CGrimoireMachina turns it active",
-          "[Components][CGrimoireMachina]") {
+          "[unit][Components][CGrimoireMachina]") {
 
   steamrot::CGrimoireMachina grimoire;
   // Test pre configuration state

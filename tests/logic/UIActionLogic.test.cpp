@@ -17,7 +17,7 @@
 #include <optional>
 #include <variant>
 
-TEST_CASE("UIActionLogic::UIActionLogic Constructor", "[UIActionLogic]") {
+TEST_CASE("UIActionLogic::UIActionLogic Constructor", "[unit][UIActionLogic]") {
   // Create a dummy LogicContext
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
@@ -29,7 +29,7 @@ TEST_CASE("UIActionLogic::UIActionLogic Constructor", "[UIActionLogic]") {
 
 TEST_CASE(
     "UIActionLogic fails to process button click for EventType_EVENT_QUIT_GAME",
-    "[UIActionLogic]") {
+    "[unit][UIActionLogic]") {
   // arrange the UIActionLogic
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
@@ -71,7 +71,7 @@ TEST_CASE(
 
 TEST_CASE("UIActionLogic adds Event to EventBus for ButtonElement with a "
           "click/mouse collision",
-          "[UIActionLogic]") {
+          "[unit][UIActionLogic]") {
 
   // arrange the UIActionLogic
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
@@ -195,7 +195,7 @@ TEST_CASE(
 }
 TEST_CASE("UIActionLogic checks subscription before adding Event to EventBus "
           "for ButtonElement"
-          "[UIActionLogic]") {
+          "[unit][UIActionLogic]") {
 
   // arrange the UIActionLogic
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
@@ -271,7 +271,7 @@ TEST_CASE("UIActionLogic checks subscription before adding Event to EventBus "
 
 // Check that ProcessUIActionsAndEvents return Subscriber inactive
 TEST_CASE("UIActionLogic sets Subscriber to inactive after processing "
-          "[UIActionLogic]") {
+          "[unit][UIActionLogic]") {
   // arrange the UIActionLogic
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;

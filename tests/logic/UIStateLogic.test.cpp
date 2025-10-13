@@ -7,7 +7,7 @@
 #include "TestContext.h"
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("UIStateLogic::UIStateLogic Constructor", "[UIStateLogic]") {
+TEST_CASE("UIStateLogic::UIStateLogic Constructor", "[unit][UIStateLogic]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
 
@@ -17,7 +17,7 @@ TEST_CASE("UIStateLogic::UIStateLogic Constructor", "[UIStateLogic]") {
 }
 
 TEST_CASE("UIStateLogic::ProcessLogic runs without errors on test scene",
-          "[UIStateLogic]") {
+          "[unit][UIStateLogic]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
 

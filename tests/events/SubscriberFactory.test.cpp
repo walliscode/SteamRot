@@ -14,7 +14,7 @@
 
 TEST_CASE("SubscriberFactory::CreateAndRegisterSubscriber creates a subscriber "
           "with no trigger data",
-          "[SubscriberFactory]") {
+          "[unit][SubscriberFactory]") {
   // create a mock EventHandler
   steamrot::EventHandler mock_event_handler;
 
@@ -45,7 +45,7 @@ TEST_CASE("SubscriberFactory::CreateAndRegisterSubscriber creates a subscriber "
 TEST_CASE(
     "SubscriberFactory::CreateAndRegisterSubscriber creates a subscriber with "
     "trigger data",
-    "[SubscriberFactory]") {
+    "[unit][SubscriberFactory]") {
   // create a mock EventHandler
   steamrot::EventHandler mock_event_handler;
   // create a SubscriberFactory with the mock EventHandler
