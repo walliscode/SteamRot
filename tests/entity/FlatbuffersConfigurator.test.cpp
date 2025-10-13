@@ -16,7 +16,7 @@
 #include <catch2/generators/catch_generators.hpp>
 
 TEST_CASE("Data is configured correctly from default data",
-          "[FlatbuffersConfigurator]") {
+          "[unit][FlatbuffersConfigurator]") {
 
   steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
   // Set up EntityMemoryPool objects here so they outlive GENERATE

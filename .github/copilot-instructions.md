@@ -252,7 +252,7 @@ table EntityData{
 
 **Build to generate headers:**
 ```bash
-cmake --build build
+cmake --build --preset Debug
 ```
 
 #### 4. Create ConfigureComponent Method (TDD approach)
@@ -349,8 +349,9 @@ add_executable(test_components
 #### 7. Build and Test
 
 ```bash
-cmake --build build
-cd build && ctest
+cmake --preset Debug  # Configure if not already done
+cmake --build --preset Debug
+ctest --preset Debug
 ```
 
 #### Critical Points
@@ -412,8 +413,9 @@ Logic classes implement game system behaviors (collision, rendering, actions, mo
    - Verify count, order, and types with `dynamic_cast`
 
 6. **Build and Test**
-   - `cmake --build build -j$(nproc)`
-   - `cd build && ./tests/logic/test_logic`
+   - `cmake --preset Debug` (if not already configured)
+   - `cmake --build --preset Debug`
+   - `ctest --preset Debug -R logic`
 
 #### Detailed Workflow
 
@@ -753,16 +755,73 @@ m_logic_context.event_handler.AddEvent(event_packet);
   - Logic classes
   - LogicFactory updates
 
-### Test Organization
-- Mirror `src/` structure in `tests/`
-- Use Catch2 framework
-- Test file naming: `*.test.cpp`
+### Test Organization and Classification
+
+**Directory Structure:**
+```
+tests/
+├── unit/                    # Unit tests (isolated, future location)
+├── integration/             # Integration tests (2+ components)
+├── system/                  # End-to-end tests (future location)
+├── perf/                    # Performance tests (future location)
+├── data/                    # Test data files
+├── context/                 # Test utilities
+├── components/              # Component tests (current location)
+├── entity/                  # Entity tests (current location)
+└── ...                      # Other subsystem tests (current)
+```
+
+**Test Tags:**
+All tests must include appropriate Catch2 tags:
+- `[unit]` - Unit tests (isolated with mocked dependencies)
+- `[integration]` - Integration tests (multiple components)
+- `[system]` - System tests (end-to-end, future)
+- `[perf]` - Performance tests (benchmarks, future)
+
+**Example:**
+```cpp
+TEST_CASE("ClassName constructor", "[unit][ClassName]") {
+  // Test implementation
+}
+
+TEST_CASE("Feature workflow", "[integration][feature_name]") {
+  // Test implementation
+}
+```
 
 ### Running Tests
+
+**Using CMake Presets (Required):**
 ```bash
-cd build/Debug  # or your build directory
-ctest
+# Configure the project
+cmake --preset Debug
+
+# Build the project
+cmake --build --preset Debug
+
+# Run all tests
+ctest --preset Debug
+
+# Run only unit tests
+ctest --preset Debug -L unit
+
+# Run only integration tests
+ctest --preset Debug -L integration
+
+# Run tests from specific subsystem
+ctest --preset Debug -R logic
+
+# Verbose output on failure
+ctest --preset Debug --output-on-failure
 ```
+
+### Test File Naming
+- Unit tests: `ClassName.test.cpp` (existing, in subsystem directories)
+- Integration tests: `feature_name.integration.test.cpp`
+- System tests: `workflow.system.test.cpp` (future)
+- Performance tests: `component.perf.test.cpp` (future)
+
+See [TESTING_IMPROVEMENT_PLAN.md](../documentation/TESTING_IMPROVEMENT_PLAN.md) for detailed test infrastructure roadmap.
 
 ## Build System
 
@@ -770,16 +829,39 @@ ctest
 - Minimum CMake version: 3.31
 - C++23 standard required
 - Enable testing with `enable_testing()`
+- **Uses CMake Presets** (see `CMakePresets.json`)
 
-### Build Commands
+### Build Commands (Using Presets)
+
+**Always use CMake presets for configuration and building:**
+
 ```bash
-cmake -B build -S .
-cmake --build build
+# Configure with Debug preset
+cmake --preset Debug
+
+# Build with Debug preset
+cmake --build --preset Debug
+
+# Configure and build with Release preset
+cmake --preset Release
+cmake --build --preset Release
+
+# Run workflow preset (configure + build + test)
+cmake --workflow --preset Debug
 ```
+
+### Available Presets
+- **Debug**: Debug build with Ninja generator
+- **Release**: Release build with Ninja generator
 
 ### Key CMake Variables
 - `data_dir`: `${CMAKE_SOURCE_DIR}/data`
 - `test_data_dir`: `${CMAKE_SOURCE_DIR}/tests/data`
+
+### Important Notes
+- **DO NOT** use `cmake -B build -S .` - use `cmake --preset Debug` instead
+- **DO NOT** use `cmake --build build` - use `cmake --build --preset Debug` instead
+- Presets ensure consistent compiler settings and build configurations
 
 ## When Updating README
 

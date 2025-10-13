@@ -14,7 +14,7 @@
 #include "scene_change_packet_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("LogicFactory constructed without errors", "[LogicFactory]") {
+TEST_CASE("LogicFactory constructed without errors", "[unit][LogicFactory]") {
 
   // create a Testcontext to provide mock dependencies
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
@@ -28,7 +28,7 @@ TEST_CASE("LogicFactory constructed without errors", "[LogicFactory]") {
 }
 
 TEST_CASE("LogicFactory creates the correct Logic instances with a test Scene",
-          "[LogicFactory]") {
+          "[unit][LogicFactory]") {
 
   // create a LogicContext with mock dependencies
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
@@ -53,7 +53,7 @@ TEST_CASE("LogicFactory creates the correct Logic instances with a test Scene",
 }
 
 TEST_CASE("LogicFactory creates correct Logic instances for TitleScene",
-          "[LogicFactory]") {
+          "[unit][LogicFactory]") {
 
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context{
@@ -75,7 +75,7 @@ TEST_CASE("LogicFactory creates correct Logic instances for TitleScene",
       logic_collection, steamrot::SceneType::SceneType_TITLE);
 }
 TEST_CASE("LogicFactory creates correct Logic instances for CraftingScene",
-          "[LogicFactory]") {
+          "[unit][LogicFactory]") {
 
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context{

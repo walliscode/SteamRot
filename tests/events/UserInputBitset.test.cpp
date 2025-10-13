@@ -13,7 +13,7 @@
 using namespace steamrot;
 
 TEST_CASE("UserInputBitset default constructor resets all bits",
-          "[UserInputBitset]") {
+          "[unit][UserInputBitset]") {
   UserInputBitset input;
   for (size_t i = 0; i < kTotalBits; ++i) {
     REQUIRE_FALSE(input.test(i));
@@ -21,7 +21,7 @@ TEST_CASE("UserInputBitset default constructor resets all bits",
 }
 
 TEST_CASE("UserInputBitset sets key pressed and released bits correctly",
-          "[UserInputBitset]") {
+          "[unit][UserInputBitset]") {
   UserInputBitset input;
   input.setKeyPressed(sf::Keyboard::Key::A);
   REQUIRE(input.test(static_cast<size_t>(sf::Keyboard::Key::A)));
@@ -31,7 +31,7 @@ TEST_CASE("UserInputBitset sets key pressed and released bits correctly",
 }
 
 TEST_CASE("UserInputBitset sets mouse pressed and released bits correctly",
-          "[UserInputBitset]") {
+          "[unit][UserInputBitset]") {
   UserInputBitset input;
   input.setMousePressed(sf::Mouse::Button::Left);
   REQUIRE(
@@ -42,7 +42,7 @@ TEST_CASE("UserInputBitset sets mouse pressed and released bits correctly",
                      sf::Mouse::ButtonCount));
 }
 
-TEST_CASE("UserInputBitset resets all bits", "[UserInputBitset]") {
+TEST_CASE("UserInputBitset resets all bits", "[unit][UserInputBitset]") {
   UserInputBitset input;
   input.setKeyPressed(sf::Keyboard::Key::A);
   input.setMousePressed(sf::Mouse::Button::Left);
@@ -54,7 +54,7 @@ TEST_CASE("UserInputBitset resets all bits", "[UserInputBitset]") {
 
 TEST_CASE(
     "UserInputBitset constructor from vector of events sets bits correctly",
-    "[UserInputBitset]") {
+    "[unit][UserInputBitset]") {
   std::vector<sf::Event> events;
 
   // Use event variants directly
@@ -87,7 +87,7 @@ TEST_CASE(
 }
 
 TEST_CASE("UserInputBitset equality operator works as expected",
-          "[UserInputBitset]") {
+          "[unit][UserInputBitset]") {
   UserInputBitset a;
   UserInputBitset b;
   REQUIRE(a == b);

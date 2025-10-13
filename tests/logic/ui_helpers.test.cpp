@@ -14,7 +14,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("GetAllFragmentNames returns empty vector for empty fragments map",
-          "[ui_helpers]") {
+          "[unit][ui_helpers]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::CGrimoireMachina grimoire;
 
@@ -25,7 +25,7 @@ TEST_CASE("GetAllFragmentNames returns empty vector for empty fragments map",
 }
 
 TEST_CASE("GetAllFragmentNames returns all fragment names",
-          "[ui_helpers]") {
+          "[unit][ui_helpers]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::CGrimoireMachina grimoire;
 
@@ -55,7 +55,7 @@ TEST_CASE("GetAllFragmentNames returns all fragment names",
 }
 
 TEST_CASE("GetAllJointNames returns empty vector for empty joints map",
-          "[ui_helpers]") {
+          "[unit][ui_helpers]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::CGrimoireMachina grimoire;
 
@@ -65,7 +65,7 @@ TEST_CASE("GetAllJointNames returns empty vector for empty joints map",
   REQUIRE(joint_names.empty());
 }
 
-TEST_CASE("GetAllJointNames returns all joint names", "[ui_helpers]") {
+TEST_CASE("GetAllJointNames returns all joint names", "[unit][ui_helpers]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::CGrimoireMachina grimoire;
 

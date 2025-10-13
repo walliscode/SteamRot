@@ -11,7 +11,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <variant>
 
-TEST_CASE("Subscriber: check functions", "[Subscriber]") {
+TEST_CASE("Subscriber: check functions", "[unit][Subscriber]") {
 
   // create a Subscriber object
   steamrot::Subscriber subscriber{steamrot::EventType::EventType_EVENT_TEST};

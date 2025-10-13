@@ -13,7 +13,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("EntityManager calls configurator with no errors",
-          "[EntityManager]") {
+          "[unit][EntityManager]") {
 
   // create text context
   steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);

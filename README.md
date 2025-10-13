@@ -265,7 +265,7 @@ table EntityData{
 4. Rebuild the project to generate FlatBuffers headers:
 
 ```bash
-cmake --build build
+cmake --build --preset Debug
 ```
 
 This generates `new_component_generated.h` automatically.
@@ -374,12 +374,14 @@ add_executable(test_components
 #### Step 7: Build and Test
 
 ```bash
+# Configure the project (if not already done)
+cmake --preset Debug
+
 # Build the project
-cmake --build build
+cmake --build --preset Debug
 
 # Run tests
-cd build
-ctest
+ctest --preset Debug
 ```
 
 #### Important Notes
@@ -757,14 +759,17 @@ const LogicContext &TestContext::GetLogicContextForYourScene() const {
 #### Step 8: Build and Test
 
 ```bash
+# Configure the project (if not already done)
+cmake --preset Debug
+
 # Build the project
-cmake --build build -j$(nproc)
+cmake --build --preset Debug
 
 # Run all tests
-cd build && ctest
+ctest --preset Debug
 
 # Run specific Logic tests
-cd build && ./tests/logic/test_logic
+ctest --preset Debug -R logic
 ```
 
 #### Common Patterns and Best Practices
@@ -929,6 +934,85 @@ pointer to a Logic object. So a MovementLogicFactory will create a MovementLogic
 object depending on the parameters passed to it.
 
 ## Testing
+
+SteamRot uses Catch2 for testing with a clear test taxonomy to distinguish between unit, integration, and system tests.
+
+### Test Directory Structure
+
+```
+tests/
+├── unit/                    # Unit tests (isolated, future location)
+├── integration/             # Integration tests (2+ components)
+│   └── scene_change/
+├── system/                  # End-to-end tests (future location)
+├── perf/                    # Performance tests (future location)
+│   └── benchmarks/
+├── data/                    # Test data files
+├── context/                 # Test utilities (TestContext, helpers)
+├── components/              # Component tests (current location)
+├── entity/                  # Entity system tests (current location)
+├── logic/                   # Logic class tests (current location)
+├── scenes/                  # Scene tests (current location)
+└── ...                      # Other subsystem tests
+```
+
+**Note**: The new `unit/`, `system/`, and `perf/` directories are reserved for future tests. Existing tests remain in their current subsystem-based locations for now and will be migrated opportunistically.
+
+### Test Classification
+
+All tests are tagged with Catch2 tags to enable filtering by test type:
+
+- **`[unit]`** - Unit tests: Test a single class/function in isolation with mocked dependencies
+- **`[integration]`** - Integration tests: Test interactions between multiple components
+- **`[system]`** - System tests: End-to-end tests through the entire system (future)
+- **`[perf]`** - Performance tests: Benchmarks for critical code paths (future)
+
+### Running Tests
+
+**Build and run all tests:**
+```bash
+# Configure with preset
+cmake --preset Debug
+
+# Build
+cmake --build --preset Debug
+
+# Run all tests
+ctest --preset Debug
+```
+
+**Run specific test types:**
+```bash
+# Run only unit tests
+ctest --preset Debug -L unit
+
+# Run only integration tests
+ctest --preset Debug -L integration
+
+# Run tests from a specific subsystem
+ctest --preset Debug -R logic
+```
+
+**Run tests with verbose output:**
+```bash
+ctest --preset Debug --output-on-failure
+```
+
+### Writing Tests
+
+All tests should include appropriate Catch2 tags:
+
+```cpp
+TEST_CASE("ClassName constructor", "[unit][ClassName]") {
+  // Unit test implementation
+}
+
+TEST_CASE("Feature workflow", "[integration][feature_name]") {
+  // Integration test implementation
+}
+```
+
+See [TESTING_IMPROVEMENT_PLAN.md](documentation/TESTING_IMPROVEMENT_PLAN.md) for detailed testing guidelines and the roadmap for test infrastructure improvements.
 
 ### user_interface
 
