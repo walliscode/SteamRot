@@ -1,0 +1,2 @@
+/usr/bin/ar qc libuser_interface_helpers.a CMakeFiles/user_interface_helpers.dir/ui_element_factory_test_helpers.cpp.o
+/usr/bin/ranlib libuser_interface_helpers.a

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libcomponents.a CMakeFiles/components.dir/CMeta.cpp.o CMakeFiles/components.dir/CUserInterface.cpp.o CMakeFiles/components.dir/CMachinaForm.cpp.o CMakeFiles/components.dir/CGrimoireMachina.cpp.o CMakeFiles/components.dir/CUIState.cpp.o
+/usr/bin/ranlib libcomponents.a

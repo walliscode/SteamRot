@@ -1,0 +1,2 @@
+/usr/bin/ar qc libentity_helpers.a CMakeFiles/entity_helpers.dir/entity_test_helpers.cpp.o
+/usr/bin/ranlib libentity_helpers.a

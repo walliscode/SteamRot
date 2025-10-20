@@ -1,0 +1,231 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Unit tests for FlatbuffersDataLoader
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include "FailInfo.h"
+#include "FlatbuffersDataLoader.h"
+#include "PathProvider.h"
+#include "fragments_generated.h"
+#include <catch2/catch_test_macros.hpp>
+#include <magic_enum/magic_enum.hpp>
+
+TEST_CASE("DataLoader fails if PathProvider is not initiated", "[DataLoader]") {
+
+  REQUIRE_THROWS(steamrot::FlatbuffersDataLoader{});
+}
+TEST_CASE("DataLoader succeeds if PathProvider is initiated", "[DataLoader]") {
+  // init PathProvider
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  REQUIRE_NOTHROW(steamrot::FlatbuffersDataLoader{});
+}
+
+TEST_CASE("FlatbuffersDataLoader returns unexpected when non-existent fragment "
+          "is provided",
+          "[FlatbuffersDataLoader]") {
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideFragment("non_existent_fragment");
+  REQUIRE(result.has_value() == false);
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message ==
+          std::string("Fragment file not found: "
+                      "/home/runner/work/SteamRot/SteamRot/tests/data/fragments/"
+                      "non_existent_fragment.fragment.bin"));
+}
+
+TEST_CASE("FlatbuffersDataLoader returns unexpected when fragment data has not "
+          "socket data vertices",
+          "[FlatbuffersDataLoader]") {
+
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result =
+      data_loader.ProvideFragment("invalid_fragment_no_socket_data_vertices");
+  REQUIRE(result.has_value() == false);
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message == "fragment socket data vertices not found");
+}
+
+TEST_CASE("FlatbuffersDataLoader returns unexpected when fragment data has "
+          "invalid socket data vertices",
+          "[FlatbuffersDataLoader]") {
+
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideFragment("missing_vertices_x");
+  REQUIRE(result.has_value() == false);
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+
+  REQUIRE(result.error().message == "vertex from socket data is incomplete");
+}
+
+TEST_CASE("FlatbuffersDataLoader returns unexpected when fragment data has "
+          "no views",
+          "[FlatbuffersDataLoader]") {
+
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideFragment("missing_render_views");
+  REQUIRE(result.has_value() == false);
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message == "fragment render views not found");
+}
+
+TEST_CASE(
+    "FlatbuffersDataLoader returns unexpected when a view has no triangles",
+    "[FlatbuffersDataLoader]") {
+
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideFragment("missing_view_triangles");
+  REQUIRE(result.has_value() == false);
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message == "view triangles not found");
+}
+
+TEST_CASE("FlatbuffersDataLoader returns unexpected when fragment triangles "
+          "have zero vertices",
+          "[FlatbuffersDataLoader]") {
+
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideFragment("missing_triangle_vertices");
+  REQUIRE(result.has_value() == false);
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message == "fragment triangles must have 3 vertices");
+}
+
+TEST_CASE("FlatbuffersDataLoader returns unexpected when view has no direction",
+          "[FlatbuffersDataLoader]") {
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideFragment("missing_view_direction");
+  REQUIRE(result.has_value() == false);
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message == "view direction not found");
+}
+
+TEST_CASE("Fragment data provided with correct values",
+          "[FlatbuffersDataLoader]") {
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideFragment("valid_fragment");
+  if (!result.has_value()) {
+    std::string error_message = result.error().message.empty()
+                                    ? "unknown error"
+                                    : result.error().message;
+    FAIL(error_message);
+  }
+
+  // test expected values
+  REQUIRE(result->m_name == "valid_fragment");
+  REQUIRE(result->m_overlays.size() == 1);
+  REQUIRE(result->m_overlays.contains(
+      steamrot::ViewDirection::ViewDirection_FRONT));
+  REQUIRE(result->m_overlays[steamrot::ViewDirection_FRONT].getVertexCount() ==
+          3);
+  REQUIRE(result->m_overlays[steamrot::ViewDirection_FRONT][0].position.x ==
+          5.0f);
+  REQUIRE(result->m_overlays[steamrot::ViewDirection_FRONT][0].position.y ==
+          10.0f);
+  REQUIRE(result->m_overlays[steamrot::ViewDirection_FRONT][0].color.r == 255);
+  REQUIRE(result->m_overlays[steamrot::ViewDirection_FRONT][0].color.g == 255);
+  REQUIRE(result->m_overlays[steamrot::ViewDirection_FRONT][0].color.b == 255);
+  REQUIRE(result->m_overlays[steamrot::ViewDirection_FRONT][0].color.a == 255);
+
+  REQUIRE(result->m_transform == sf::Transform::Identity);
+  REQUIRE(result->m_sockets.size() == 1);
+  REQUIRE(result->m_sockets[0].x == 5.0f);
+  REQUIRE(result->m_sockets[0].y == 7.0f);
+}
+
+TEST_CASE("FlatbuffersDataLoader returns error when fragments do not exist",
+          "[FlatbuffersDataLoader]") {
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideAllFragments({"non_existent_fragment"});
+  REQUIRE(result.has_value() == false);
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message ==
+          std::string("Fragment file not found: "
+                      "/home/runner/work/SteamRot/SteamRot/tests/data/fragments/"
+                      "non_existent_fragment.fragment.bin"));
+}
+
+TEST_CASE("FlatbuffersDataLoader returns all fragments",
+          "[FlatbuffersDataLoader]") {
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideAllFragments({"valid_fragment"});
+  REQUIRE(result.has_value() == true);
+  REQUIRE(result.value().size() == 1);
+  REQUIRE(result.value().contains("valid_fragment"));
+  const auto &fragment = result.value().at("valid_fragment");
+
+  // test expected values
+  REQUIRE(fragment.m_name == "valid_fragment");
+  REQUIRE(fragment.m_overlays.size() == 1);
+  REQUIRE(fragment.m_overlays.contains(
+      steamrot::ViewDirection::ViewDirection_FRONT));
+}
+
+TEST_CASE("FlatbuffersDataLoader provides scene data",
+          "[FlatbuffersDataLoader]") {
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result =
+      data_loader.ProvideSceneData(steamrot::SceneType::SceneType_TEST);
+  REQUIRE(result.has_value() == true);
+  const auto &scene_data = result.value();
+  REQUIRE(scene_data != nullptr);
+  REQUIRE(!scene_data->entity_collection()->entities()->empty());
+}
+TEST_CASE("FlatbuffersDataLoader::ProvideAssetData returns default data",
+          "[FlatbuffersDataLoader]") {
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideAssetData();
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+  REQUIRE(result.value() != nullptr);
+  REQUIRE(!result.value()->fonts()->empty());
+}
+
+TEST_CASE("FlatbuffersDataLoader provides asset data from test scene",
+          "[FlatbuffersDataLoader]") {
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result =
+      data_loader.ProvideAssetData(steamrot::SceneType::SceneType_TEST);
+
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+  REQUIRE(result.value() != nullptr);
+  // fonts not in Scene data so do not check
+}
+
+TEST_CASE("FlatbuffersDataLoader provides ui_styles data",
+          "[FlatbuffersDataLoader]") {
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideUIStylesData("default");
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+  REQUIRE(result.value() != nullptr);
+}
+
+TEST_CASE("FlatbuffersDataLoader provides scene_manager data",
+          "[FlatbuffersDataLoader]") {
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideSceneManagerData();
+  REQUIRE(result.has_value());
+  ;
+}

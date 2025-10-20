@@ -1,0 +1,2 @@
+/usr/bin/ar qc libtest_context.a CMakeFiles/test_context.dir/TestContext.cpp.o CMakeFiles/test_context.dir/TestScenarios.cpp.o CMakeFiles/test_context.dir/test_assertions.cpp.o
+/usr/bin/ranlib libtest_context.a

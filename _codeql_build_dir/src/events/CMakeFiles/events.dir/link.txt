@@ -1,0 +1,2 @@
+/usr/bin/ar qc libevents.a CMakeFiles/events.dir/EventHandler.cpp.o CMakeFiles/events.dir/event_conversion.cpp.o CMakeFiles/events.dir/Subscriber.cpp.o CMakeFiles/events.dir/SubscriberFactory.cpp.o
+/usr/bin/ranlib libevents.a

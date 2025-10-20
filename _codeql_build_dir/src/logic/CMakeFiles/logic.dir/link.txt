@@ -1,0 +1,2 @@
+/usr/bin/ar qc liblogic.a CMakeFiles/logic.dir/LogicFactory.cpp.o CMakeFiles/logic.dir/UIRenderLogic.cpp.o CMakeFiles/logic.dir/UICollisionLogic.cpp.o CMakeFiles/logic.dir/UIActionLogic.cpp.o CMakeFiles/logic.dir/UIStateLogic.cpp.o CMakeFiles/logic.dir/Logic.cpp.o CMakeFiles/logic.dir/CraftingRenderLogic.cpp.o CMakeFiles/logic.dir/logic_collision.cpp.o CMakeFiles/logic.dir/logic_ui.cpp.o
+/usr/bin/ranlib liblogic.a
