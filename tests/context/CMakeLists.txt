@@ -1,5 +1,7 @@
 add_library(test_context
-  TestContext.cpp)
+  TestContext.cpp
+  TestScenarios.cpp
+  test_assertions.cpp)
 
 target_include_directories(test_context
   PUBLIC
@@ -9,5 +11,6 @@ target_include_directories(test_context
 target_link_libraries(test_context
   PUBLIC
   context
+  Catch2::Catch2
 )
 

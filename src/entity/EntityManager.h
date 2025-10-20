@@ -64,7 +64,7 @@ private:
 
     // Set the index to a default constructed Component type
     component_vector[index] = ComponentType();
-  };
+  }
 
   ////////////////////////////////////////////////////////////
   /// |brief reset all components in a tuple at a given index

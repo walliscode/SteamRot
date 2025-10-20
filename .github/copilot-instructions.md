@@ -970,6 +970,143 @@ void Function() {
 6. **Documentation**: Update README when adding new workflows or patterns
 7. **Consistency**: Follow existing patterns in the codebase
 8. **Default Construction**: Ensure all components can be default-constructed
+9. **Reusable Test Infrastructure**: Use TestScenarios, assertions, and mixins for tests
+10. **Test Tags**: Always tag tests with `[unit]`, `[integration]`, or `[system]`
+
+## Testing Infrastructure (Stage 2)
+
+### Reusable Test Components
+
+SteamRot provides reusable test infrastructure to reduce boilerplate:
+
+#### TestScenarios
+
+Pre-configured entity and component setups:
+
+```cpp
+#include "TestScenarios.h"
+
+// Create 10 UI entities
+auto pool = steamrot::tests::TestScenarios::CreatePoolWithMultipleUIEntities(10);
+
+// Create archetype manager
+auto manager = steamrot::tests::TestScenarios::CreatePopulatedArchetypeManager(pool);
+
+// Activate/deactivate components
+steamrot::tests::TestScenarios::ActivateComponent<CMyComponent>(0, pool);
+```
+
+Available methods:
+- `CreateEmptyPool()` - Empty entity pool
+- `CreatePoolWithNEntities(n)` - Pool with n entities
+- `CreatePoolWithArchetype(archetype_id, n)` - Entities matching archetype
+- `CreatePoolWithSingleUIEntity()` - One UI entity
+- `CreatePoolWithMultipleUIEntities(n)` - n UI entities
+- `CreatePoolWithSingleGrimoireEntity()` - One grimoire entity
+- `CreatePopulatedArchetypeManager(pool)` - Configured manager
+- `ActivateComponent<T>(entity_id, pool)` - Activate component
+- `DeactivateComponent<T>(entity_id, pool)` - Deactivate component
+
+#### Test Assertions
+
+Domain-specific assertions:
+
+```cpp
+#include "test_assertions.h"
+
+steamrot::tests::AssertComponentActive(component, true, "TestName");
+steamrot::tests::AssertEntityInArchetype(id, archetype_id, manager, "TestName");
+steamrot::tests::AssertArchetypeEntityCount(archetype_id, 5, manager, "TestName");
+```
+
+#### ComponentTestMixin
+
+Template for component contract tests:
+
+```cpp
+#include "component_test_mixin.h"
+
+TEST_CASE("MyComponent contract", "[unit][MyComponent]") {
+  steamrot::tests::ComponentTestMixin<MyComponent>::RunAllTests();
+}
+```
+
+Validates:
+- Default construction
+- Component register index
+- Activation/deactivation
+- Copy construction/assignment
+
+#### LogicTestBase
+
+Base class for Logic tests:
+
+```cpp
+#include "logic_test_base.h"
+
+class MyLogicTest : public steamrot::tests::LogicTestBase<MyLogic> {
+protected:
+  void TestProcessWithSingleEntity() override {
+    SetUp();
+    // Setup entities...
+    logic = CreateLogic();
+    REQUIRE_NOTHROW(logic->RunLogic());
+    // Verify...
+  }
+};
+```
+
+### TDD Guidelines for Agents
+
+When implementing new features:
+
+1. **Write tests first** using reusable infrastructure
+2. **Use TestScenarios** for entity/component setup
+3. **Use domain assertions** for clear test intent
+4. **Use mixins/base classes** to reduce boilerplate
+5. **Tag tests appropriately** with `[unit]`, `[integration]`, or `[system]`
+6. **Run tests frequently** after each change
+7. **Keep tests independent** - no shared state between tests
+8. **Test edge cases** - boundary conditions and errors
+
+### Example TDD Workflow
+
+**Adding a new Component:**
+
+```cpp
+// 1. Write test first
+TEST_CASE("NewComponent contract", "[unit][NewComponent]") {
+  ComponentTestMixin<NewComponent>::RunAllTests();
+}
+
+TEST_CASE("NewComponent defaults", "[unit][NewComponent]") {
+  NewComponent c;
+  REQUIRE(c.m_value == 0);
+}
+
+// 2. Run test (will fail)
+// 3. Implement minimal component
+// 4. Run test (should pass)
+// 5. Add to ComponentRegister
+// 6. Create FlatBuffers schema (with tests)
+// 7. Implement configurator (with tests)
+```
+
+**Adding a new Logic:**
+
+```cpp
+// 1. Write test using LogicTestBase
+class NewLogicTest : public LogicTestBase<NewLogic> {
+  void TestProcessWithSingleEntity() override {
+    // Test implementation
+  }
+};
+
+// 2. Run test (will fail)
+// 3. Implement minimal Logic
+// 4. Run test (should pass)
+// 5. Add to LogicFactory (with tests)
+```
 
 ## Common Gotchas
 
