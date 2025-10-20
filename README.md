@@ -29,6 +29,19 @@
   - [Classes](#classes)
     - [Logic Class](#logic-class)
     - [LogicFactory](#logicfactory)
+  - [Testing](#testing)
+    - [Test Directory Structure](#test-directory-structure)
+    - [Test Classification](#test-classification)
+    - [Running Tests](#running-tests)
+    - [Writing Tests](#writing-tests)
+    - [Test-Driven Development (TDD) in SteamRot](#test-driven-development-tdd-in-steamrot)
+      - [TDD Workflow](#tdd-workflow)
+      - [Using Reusable Test Infrastructure](#using-reusable-test-infrastructure)
+      - [TDD Examples for Common Scenarios](#tdd-examples-for-common-scenarios)
+      - [TDD Best Practices for SteamRot](#tdd-best-practices-for-steamrot)
+      - [Testing Checklist](#testing-checklist)
+    - [user_interface](#user_interface)
+      - [Testing UI Elements](#testing-ui-elements)
   - [Style Guide](#style-guide)
     - [File Naming Conventions](#file-naming-conventions)
     - [Formatting](#formatting)
@@ -1013,6 +1026,282 @@ TEST_CASE("Feature workflow", "[integration][feature_name]") {
 ```
 
 See [TESTING_IMPROVEMENT_PLAN.md](documentation/TESTING_IMPROVEMENT_PLAN.md) for detailed testing guidelines and the roadmap for test infrastructure improvements.
+
+### Test-Driven Development (TDD) in SteamRot
+
+SteamRot follows a Test-Driven Development approach for all new features and components. This section documents how to implement TDD effectively in this repository.
+
+#### TDD Workflow
+
+The standard TDD workflow is:
+
+1. **Write the test first** - Define expected behavior before implementing
+2. **Run the test** - Verify it fails (red)
+3. **Implement minimal code** - Make the test pass (green)
+4. **Run all tests** - Ensure no regressions
+5. **Refactor** - Improve code while keeping tests green
+6. **Repeat** - Continue with next feature
+
+#### Using Reusable Test Infrastructure
+
+SteamRot provides reusable test infrastructure to reduce boilerplate and improve test quality:
+
+##### TestScenarios Class
+
+Provides pre-configured entity and component setups:
+
+```cpp
+#include "TestScenarios.h"
+
+TEST_CASE("Logic processes entities correctly", "[unit][MyLogic]") {
+  // Create 10 entities with UI components
+  auto pool = steamrot::tests::TestScenarios::CreatePoolWithMultipleUIEntities(10);
+  
+  // Create populated archetype manager
+  auto manager = steamrot::tests::TestScenarios::CreatePopulatedArchetypeManager(pool);
+  
+  // Test your logic...
+}
+```
+
+**Available methods:**
+- `CreateEmptyPool()` - Empty entity pool
+- `CreatePoolWithNEntities(n)` - Pool with n default entities
+- `CreatePoolWithArchetype(archetype_id, n)` - Pool with entities matching archetype
+- `CreatePoolWithSingleUIEntity()` - One UI entity
+- `CreatePoolWithMultipleUIEntities(n)` - n UI entities
+- `CreatePoolWithSingleGrimoireEntity()` - One grimoire entity
+- `CreatePopulatedArchetypeManager(pool)` - Configured archetype manager
+- `ActivateComponent<T>(entity_id, pool)` - Activate specific component
+- `DeactivateComponent<T>(entity_id, pool)` - Deactivate specific component
+
+##### Test Assertions
+
+Domain-specific assertions for clearer test intent:
+
+```cpp
+#include "test_assertions.h"
+
+TEST_CASE("Component configuration", "[unit][MyComponent]") {
+  MyComponent component;
+  component.m_active = true;
+  
+  // Use domain-specific assertions
+  steamrot::tests::AssertComponentActive(component, true, "MyTest");
+  steamrot::tests::AssertArchetypeExists(archetype_id, manager, "MyTest");
+  steamrot::tests::AssertEntityInArchetype(0, archetype_id, manager, "MyTest");
+  steamrot::tests::AssertArchetypeEntityCount(archetype_id, 5, manager, "MyTest");
+}
+```
+
+**Available assertions:**
+- `AssertComponentActive(component, expected, test_name)` - Verify activation state
+- `AssertEntityInArchetype(entity_id, archetype_id, manager, test_name)` - Verify membership
+- `AssertArchetypeExists(archetype_id, manager, test_name)` - Verify archetype presence
+- `AssertArchetypeEntityCount(archetype_id, count, manager, test_name)` - Verify entity count
+- `AssertEntityPoolValid(pool, test_name)` - Verify pool consistency
+
+##### ComponentTestMixin
+
+Template for testing Component contract compliance:
+
+```cpp
+#include "component_test_mixin.h"
+
+TEST_CASE("MyComponent follows Component contract", "[unit][MyComponent]") {
+  // Run all standard component tests
+  steamrot::tests::ComponentTestMixin<MyComponent>::RunAllTests();
+  
+  // Or run individual tests
+  steamrot::tests::ComponentTestMixin<MyComponent>::TestDefaultConstruction();
+  steamrot::tests::ComponentTestMixin<MyComponent>::TestComponentRegisterIndex();
+  steamrot::tests::ComponentTestMixin<MyComponent>::TestActivation();
+  steamrot::tests::ComponentTestMixin<MyComponent>::TestCopyConstruction();
+  steamrot::tests::ComponentTestMixin<MyComponent>::TestCopyAssignment();
+}
+```
+
+This ensures all components:
+- Are default-constructible
+- Return correct register index
+- Can be activated/deactivated
+- Are copyable (if needed)
+
+##### LogicTestBase
+
+Base class for Logic tests to reduce boilerplate:
+
+```cpp
+#include "logic_test_base.h"
+
+class MyLogicTest : public steamrot::tests::LogicTestBase<MyLogic> {
+protected:
+  void TestProcessWithSingleEntity() override {
+    SetUp();
+    
+    // Create entity with required components
+    auto& game_context = test_context->GetGameContext();
+    // ... setup entities ...
+    
+    logic = CreateLogic();
+    REQUIRE_NOTHROW(logic->RunLogic());
+    
+    // Verify expected behavior
+    // REQUIRE(...);
+  }
+};
+
+TEST_CASE_METHOD(MyLogicTest, "MyLogic construction", "[unit][MyLogic]") {
+  TestConstruction();
+}
+
+TEST_CASE_METHOD(MyLogicTest, "MyLogic with entities", "[unit][MyLogic]") {
+  TestProcessWithSingleEntity();
+  TestProcessWithMultipleEntities(5);
+}
+```
+
+**Provided test methods:**
+- `TestConstruction()` - Verify Logic instantiates without errors
+- `TestProcessWithEmptyArchetype()` - Verify graceful handling of no entities
+- `TestProcessWithSingleEntity()` - Override to test single entity processing
+- `TestProcessWithMultipleEntities(n)` - Override to test batch processing
+- `RunStandardTests()` - Run all standard tests at once
+
+#### TDD Examples for Common Scenarios
+
+##### Example 1: Adding a New Component (TDD)
+
+**Step 1: Write the test first**
+
+```cpp
+// tests/components/CNewComponent.test.cpp
+#include "CNewComponent.h"
+#include "component_test_mixin.h"
+#include <catch2/catch_test_macros.hpp>
+
+TEST_CASE("CNewComponent follows Component contract", "[unit][CNewComponent]") {
+  steamrot::tests::ComponentTestMixin<steamrot::CNewComponent>::RunAllTests();
+}
+
+TEST_CASE("CNewComponent has correct default values", "[unit][CNewComponent]") {
+  steamrot::CNewComponent component;
+  REQUIRE(component.m_data_field == "default");
+  REQUIRE(component.m_value == 0);
+}
+```
+
+**Step 2: Run the test (it will fail - component doesn't exist yet)**
+
+```bash
+cmake --build --preset Debug
+# Compilation will fail - CNewComponent doesn't exist
+```
+
+**Step 3: Implement minimal Component**
+
+```cpp
+// src/components/CNewComponent.h
+#pragma once
+#include "Component.h"
+#include <string>
+
+namespace steamrot {
+struct CNewComponent : public Component {
+  CNewComponent() = default;
+  std::string m_data_field{"default"};
+  int m_value{0};
+  size_t GetComponentRegisterIndex() const override;
+};
+}
+```
+
+**Step 4: Run tests - verify they pass**
+
+```bash
+cmake --build --preset Debug
+ctest --preset Debug -R CNewComponent
+```
+
+**Step 5: Add FlatBuffers schema and configurator (with tests)**
+
+Continue the TDD cycle for configuration...
+
+##### Example 2: Adding a New Logic Class (TDD)
+
+**Step 1: Write the test first**
+
+```cpp
+// tests/logic/NewLogic.test.cpp
+#include "NewLogic.h"
+#include "logic_test_base.h"
+#include "TestScenarios.h"
+#include <catch2/catch_test_macros.hpp>
+
+class NewLogicTest : public steamrot::tests::LogicTestBase<steamrot::NewLogic> {
+protected:
+  void TestProcessWithSingleEntity() override {
+    SetUp();
+    
+    // Create entity with required components
+    // Use TestScenarios for setup
+    
+    logic = CreateLogic();
+    REQUIRE_NOTHROW(logic->RunLogic());
+    
+    // Verify expected state changes
+  }
+};
+
+TEST_CASE_METHOD(NewLogicTest, "NewLogic construction", "[unit][NewLogic]") {
+  TestConstruction();
+}
+
+TEST_CASE_METHOD(NewLogicTest, "NewLogic processes entities", "[unit][NewLogic]") {
+  TestProcessWithSingleEntity();
+}
+```
+
+**Step 2: Run test (will fail - Logic doesn't exist)**
+
+**Step 3: Implement minimal Logic class**
+
+```cpp
+// src/logic/NewLogic.h & .cpp
+// Implement ProcessLogic() with minimal behavior to make test pass
+```
+
+**Step 4: Run tests - verify they pass**
+
+**Step 5: Add to LogicFactory (with tests)**
+
+Update LogicFactory tests first, then implementation.
+
+#### TDD Best Practices for SteamRot
+
+1. **Always write tests first** - Define behavior before implementation
+2. **Use reusable infrastructure** - Leverage TestScenarios, assertions, mixins
+3. **Test one thing at a time** - Each TEST_CASE should verify a single behavior
+4. **Use descriptive names** - Test names should describe what is being tested
+5. **Tag appropriately** - Use `[unit]`, `[integration]`, or `[system]` tags
+6. **Keep tests fast** - Unit tests should run in milliseconds
+7. **Avoid test interdependence** - Each test should be independent
+8. **Test edge cases** - Include tests for boundary conditions and error cases
+9. **Refactor tests too** - Keep test code clean and maintainable
+10. **Run tests frequently** - After every change, run relevant tests
+
+#### Testing Checklist
+
+Before committing code, ensure:
+
+- [ ] All new code has tests written first (TDD)
+- [ ] Tests use reusable infrastructure where applicable
+- [ ] Tests are tagged with `[unit]`, `[integration]`, or `[system]`
+- [ ] All tests pass: `ctest --preset Debug`
+- [ ] Test names clearly describe what is being tested
+- [ ] Tests are independent and can run in any order
+- [ ] Edge cases and error conditions are tested
+- [ ] Test code is clean and well-organized
 
 ### user_interface
 
