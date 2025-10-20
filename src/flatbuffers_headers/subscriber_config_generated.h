@@ -40,6 +40,9 @@ struct SubscriberData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::UserInputBitsetData *trigger_data_as_UserInputBitsetData() const {
     return trigger_data_type() == steamrot::EventDataData_UserInputBitsetData ? static_cast<const steamrot::UserInputBitsetData *>(trigger_data()) : nullptr;
   }
+  const steamrot::SceneChangePacketData *trigger_data_as_SceneChangePacketData() const {
+    return trigger_data_type() == steamrot::EventDataData_SceneChangePacketData ? static_cast<const steamrot::SceneChangePacketData *>(trigger_data()) : nullptr;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint64_t>(verifier, VT_EVENT_TYPE_DATA, 8) &&
@@ -52,6 +55,10 @@ struct SubscriberData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
 
 template<> inline const steamrot::UserInputBitsetData *SubscriberData::trigger_data_as<steamrot::UserInputBitsetData>() const {
   return trigger_data_as_UserInputBitsetData();
+}
+
+template<> inline const steamrot::SceneChangePacketData *SubscriberData::trigger_data_as<steamrot::SceneChangePacketData>() const {
+  return trigger_data_as_SceneChangePacketData();
 }
 
 struct SubscriberDataBuilder {
