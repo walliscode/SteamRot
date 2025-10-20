@@ -437,7 +437,8 @@ The implementation is broken down into 5 stages for incremental rollout.
 
 **Files Created:**
 - `tests/data/test_configs/test_data_schema.json` (60 lines)
-- `tests/data/test_configs/README.md` (235 lines)
+- `tests/data/test_configs/README.md` (250 lines)
+- `tests/data/test_configs/validate_test_data.py` (150 lines) - Python validation script
 - `tests/data/test_configs/component_configs/cgrimoire_machina_test_data.json` (89 lines)
 - `tests/data/test_configs/component_configs/cuser_interface_test_data.json` (141 lines)
 - `tests/data/test_configs/component_configs/cmeta_test_data.json` (37 lines)

@@ -157,7 +157,29 @@ TEST_CASE("Component configuration with test data",
 
 ## Validation
 
-Test data files can be validated against the JSON schema using standard tools:
+Test data files can be validated against the JSON schema using the provided validation script or standard tools:
+
+### Using the Validation Script (Recommended)
+
+```bash
+# Validate all test data files
+cd tests/data/test_configs
+python3 validate_test_data.py
+
+# Validate a specific directory
+python3 validate_test_data.py component_configs/
+
+# Validate a single file
+python3 validate_test_data.py component_configs/cmeta_test_data.json
+```
+
+The validation script checks:
+- Required fields (test_suite, test_cases, name, input, expected)
+- Proper data types (strings, arrays, booleans, objects)
+- Minimum array length requirements
+- Optional field types
+
+### Using Standard JSON Schema Validators
 
 ```bash
 # Using jsonschema (Python)
