@@ -45,10 +45,10 @@ struct FailInfo {
   /////////////////////////////////////////////////
   /// @brief Default constructor for FailInfo
   ///
-  /// @param mode Enum representing the fail mode
+  /// @param fail_mode Enum representing the fail mode
   /// @param msg Message describing the failure
   /////////////////////////////////////////////////
-  FailInfo(FailMode mode, const std::string &msg) : mode(mode), message(msg) {}
+  FailInfo(FailMode fail_mode, const std::string &msg) : mode(fail_mode), message(msg) {}
 
   /////////////////////////////////////////////////
   /// @brief Delete
