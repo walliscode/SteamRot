@@ -139,7 +139,13 @@ def main():
     
     for file_path in sorted(files_to_validate):
         is_valid, errors = validate_file(file_path)
-        relative_path = file_path.relative_to(Path(__file__).parent)
+        
+        # Try to get a relative path, fall back to absolute if it fails
+        try:
+            relative_path = file_path.relative_to(Path(__file__).parent)
+        except ValueError:
+            # If relative path fails, use the path as-is
+            relative_path = file_path
         
         if is_valid:
             results.append(f"✓ {relative_path}")
