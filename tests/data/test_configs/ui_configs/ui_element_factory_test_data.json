@@ -1,0 +1,233 @@
+{
+  "test_suite": "UIElementFactory",
+  "description": "Test data for UI element creation and configuration",
+  "test_cases": [
+    {
+      "name": "create_simple_panel",
+      "description": "Create a basic panel element",
+      "tags": ["happy_path", "panel", "ui_creation"],
+      "input": {
+        "element_type": "Panel",
+        "base_data": {
+          "position": {"x": 10.0, "y": 20.0},
+          "size": {"x": 100.0, "y": 150.0},
+          "children_active": false,
+          "children": [],
+          "layout": "None",
+          "spacing_strategy": "None"
+        }
+      },
+      "expected": {
+        "element_type": "PanelElement",
+        "position_x": 10.0,
+        "position_y": 20.0,
+        "size_x": 100.0,
+        "size_y": 150.0,
+        "has_children": false,
+        "is_visible": true
+      }
+    },
+    {
+      "name": "create_button_with_label",
+      "description": "Create a button element with text label",
+      "tags": ["happy_path", "button", "ui_creation"],
+      "input": {
+        "element_type": "Button",
+        "base_data": {
+          "position": {"x": 50.0, "y": 50.0},
+          "size": {"x": 120.0, "y": 40.0},
+          "children_active": false,
+          "children": [],
+          "layout": "None",
+          "spacing_strategy": "None"
+        },
+        "label": "Click Me"
+      },
+      "expected": {
+        "element_type": "ButtonElement",
+        "position_x": 50.0,
+        "position_y": 50.0,
+        "size_x": 120.0,
+        "size_y": 40.0,
+        "label_text": "Click Me",
+        "is_clickable": true
+      }
+    },
+    {
+      "name": "create_nested_panel",
+      "description": "Create a panel with nested child elements",
+      "tags": ["complex_case", "nested", "panel"],
+      "input": {
+        "element_type": "Panel",
+        "base_data": {
+          "position": {"x": 0.0, "y": 0.0},
+          "size": {"x": 300.0, "y": 300.0},
+          "children_active": true,
+          "children": [
+            {
+              "element": {
+                "base_data": {
+                  "position": {"x": 10.0, "y": 10.0},
+                  "size": {"x": 80.0, "y": 30.0},
+                  "children_active": false,
+                  "children": [],
+                  "layout": "None",
+                  "spacing_strategy": "None"
+                }
+              }
+            },
+            {
+              "element": {
+                "base_data": {
+                  "position": {"x": 10.0, "y": 50.0},
+                  "size": {"x": 80.0, "y": 30.0},
+                  "children_active": false,
+                  "children": [],
+                  "layout": "None",
+                  "spacing_strategy": "None"
+                }
+              }
+            }
+          ],
+          "layout": "Vertical",
+          "spacing_strategy": "Even"
+        }
+      },
+      "expected": {
+        "element_type": "PanelElement",
+        "position_x": 0.0,
+        "position_y": 0.0,
+        "size_x": 300.0,
+        "size_y": 300.0,
+        "has_children": true,
+        "child_count": 2,
+        "layout_type": "Vertical",
+        "spacing_type": "Even"
+      }
+    },
+    {
+      "name": "create_dropdown_list",
+      "description": "Create a dropdown list element",
+      "tags": ["happy_path", "dropdown", "ui_creation"],
+      "input": {
+        "element_type": "DropDownList",
+        "base_data": {
+          "position": {"x": 100.0, "y": 100.0},
+          "size": {"x": 150.0, "y": 30.0},
+          "children_active": false,
+          "children": [],
+          "layout": "None",
+          "spacing_strategy": "None"
+        },
+        "label": "Select Option",
+        "expanded_label": "Choose...",
+        "data_populate_function": "None"
+      },
+      "expected": {
+        "element_type": "DropDownListElement",
+        "position_x": 100.0,
+        "position_y": 100.0,
+        "size_x": 150.0,
+        "size_y": 30.0,
+        "label_text": "Select Option",
+        "expanded_label_text": "Choose...",
+        "is_expanded": false
+      }
+    },
+    {
+      "name": "create_zero_size_element",
+      "description": "Test edge case with zero-sized element",
+      "tags": ["edge_case", "zero_size", "error_case"],
+      "input": {
+        "element_type": "Panel",
+        "base_data": {
+          "position": {"x": 0.0, "y": 0.0},
+          "size": {"x": 0.0, "y": 0.0},
+          "children_active": false,
+          "children": [],
+          "layout": "None",
+          "spacing_strategy": "None"
+        }
+      },
+      "expected": {
+        "element_type": "PanelElement",
+        "position_x": 0.0,
+        "position_y": 0.0,
+        "size_x": 0.0,
+        "size_y": 0.0,
+        "is_visible": true
+      }
+    },
+    {
+      "name": "create_button_with_empty_label",
+      "description": "Create button with empty label string",
+      "tags": ["edge_case", "empty_string", "button"],
+      "input": {
+        "element_type": "Button",
+        "base_data": {
+          "position": {"x": 0.0, "y": 0.0},
+          "size": {"x": 100.0, "y": 40.0},
+          "children_active": false,
+          "children": [],
+          "layout": "None",
+          "spacing_strategy": "None"
+        },
+        "label": ""
+      },
+      "expected": {
+        "element_type": "ButtonElement",
+        "label_text": "",
+        "is_clickable": true
+      }
+    },
+    {
+      "name": "create_deeply_nested_ui",
+      "description": "Create UI with multiple levels of nesting",
+      "tags": ["stress_test", "nested", "complex_case"],
+      "input": {
+        "element_type": "Panel",
+        "base_data": {
+          "position": {"x": 0.0, "y": 0.0},
+          "size": {"x": 500.0, "y": 500.0},
+          "children_active": true,
+          "children": [
+            {
+              "element": {
+                "base_data": {
+                  "position": {"x": 10.0, "y": 10.0},
+                  "size": {"x": 200.0, "y": 200.0},
+                  "children_active": true,
+                  "children": [
+                    {
+                      "element": {
+                        "base_data": {
+                          "position": {"x": 5.0, "y": 5.0},
+                          "size": {"x": 50.0, "y": 50.0},
+                          "children_active": false,
+                          "children": [],
+                          "layout": "None",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  ],
+                  "layout": "None",
+                  "spacing_strategy": "None"
+                }
+              }
+            }
+          ],
+          "layout": "None",
+          "spacing_strategy": "None"
+        }
+      },
+      "expected": {
+        "element_type": "PanelElement",
+        "has_children": true,
+        "child_count": 1,
+        "nesting_depth": 3,
+        "total_elements": 3
+      }
+    }
+  ]
+}

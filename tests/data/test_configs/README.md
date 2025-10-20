@@ -13,6 +13,10 @@ tests/data/test_configs/
 │   ├── cgrimoire_machina_test_data.json
 │   ├── cuser_interface_test_data.json
 │   └── cmeta_test_data.json
+├── integration_configs/           # Test data for integration tests
+│   └── entity_loading_test_data.json
+├── ui_configs/                    # Test data for UI element tests
+│   └── ui_element_factory_test_data.json
 └── README.md                      # This file
 ```
 
@@ -99,9 +103,10 @@ Use these standardized tags to categorize test cases:
 
 ### 1. Choose a Location
 
-- Component tests: `component_configs/`
-- Integration tests: Create new subdirectory as needed
-- System tests: Create new subdirectory as needed
+- **Component tests**: `component_configs/` - For testing individual component configuration and behavior
+- **Integration tests**: `integration_configs/` - For testing interactions between multiple components/systems
+- **UI tests**: `ui_configs/` - For testing UI element creation, layout, and interaction
+- **System tests**: Create new subdirectory as needed for end-to-end workflow tests
 
 ### 2. Follow Naming Convention
 
