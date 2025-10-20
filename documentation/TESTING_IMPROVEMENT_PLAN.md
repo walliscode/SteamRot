@@ -376,115 +376,123 @@ The implementation is broken down into 5 stages for incremental rollout.
 ### Tasks
 
 #### 3.1 Create Test Data Configuration System
-- **Action**: Define JSON schema for test data configurations
+- **Action**: Use FlatBuffers EntityData schema for test configurations
+- **Approach**: Leverage existing FlatBuffers infrastructure instead of creating custom JSON schema
 - **Example**:
   ```json
-  // tests/data/component_configs/cgrimoire_machina_test_data.json
+  // tests/data/test_configs/grimoire_default.test_config.json
   {
-    "test_cases": [
+    "entity_memory_pool_size": 10,
+    "entities": [
       {
-        "name": "default_configuration",
-        "input": {
-          "c_grimoire_machina": {
-            "data_field": "test_value",
-            "numeric_value": 42
-          }
-        },
-        "expected": {
-          "m_data_field": "test_value",
-          "m_numeric_value": 42
-        }
-      },
-      {
-        "name": "edge_case_empty_string",
-        "input": {
-          "c_grimoire_machina": {
-            "data_field": "",
-            "numeric_value": 0
-          }
-        },
-        "expected": {
-          "m_data_field": "",
-          "m_numeric_value": 0
+        "index": 0,
+        "c_grimoire_machina": {
+          "fragments": ["fragment1", "fragment2"],
+          "joints": ["joint1"]
         }
       }
     ]
   }
   ```
-- **Files**: `tests/data/test_configs/`, JSON schema file
-- **Effort**: Medium (2-3 days)
+- **Files**: `tests/data/test_configs/*.test_config.json`, compiled to `.bin` files
+- **Effort**: Low (1 day) - Uses existing schema and infrastructure
 - **Status**: ✅ COMPLETE
 
 **Implementation Notes (Section 3.1):**
-- Created `tests/data/test_configs/` directory structure with subdirectories:
-  - `component_configs/` - Component configuration test data
-  - `integration_configs/` - Integration test data
-  - `ui_configs/` - UI element test data
-- Implemented JSON schema in `test_data_schema.json` with validation support
-- Created example test data files for five different test scenarios:
-  - `cgrimoire_machina_test_data.json` - 5 test cases covering happy path, edge cases, and stress tests
-  - `cuser_interface_test_data.json` - 5 test cases covering panels, buttons, nested elements
-  - `cmeta_test_data.json` - 3 test cases for simple component configuration
-  - `entity_loading_test_data.json` - 4 integration test cases for entity loading workflows
-  - `ui_element_factory_test_data.json` - 7 test cases for UI element creation and edge cases
-- Documented system in `tests/data/test_configs/README.md` with:
-  - Schema structure and field descriptions
-  - Usage examples and best practices
-  - Common test tags for categorization
-  - Directory organization guidelines
-  - Validation instructions
-  - Future integration with TestDataLoader
+- Switched to FlatBuffers-based approach to avoid duplicating data loading infrastructure
+- Uses existing `entities.fbs` schema for test configurations
+- Test files stored as JSON (`.test_config.json`) and compiled to binary (`.test_config.bin`)
+- Leverages existing FlatbuffersDataLoader and FlatbuffersConfigurator
+- Added CMake integration to automatically compile test configs during build
+- Created example test configuration files:
+  - `grimoire_default.test_config.json` - CGrimoireMachina with fragments and joints
+  - `grimoire_empty.test_config.json` - CGrimoireMachina with empty collections
+  - `ui_simple_panel.test_config.json` - CUserInterface with simple panel
+  - `ui_button.test_config.json` - CUserInterface with button element
+  - `multiple_entities.test_config.json` - Multiple entities test
+  - `combined_components.test_config.json` - Entity with multiple components
+- Documented approach in `tests/data/test_configs/README.md` with:
+  - FlatBuffers schema usage
+  - File naming conventions
+  - Build integration
+  - Usage examples in tests
+  - Benefits of FlatBuffers approach
 
 **Files Created:**
-- `tests/data/test_configs/test_data_schema.json` (60 lines)
-- `tests/data/test_configs/README.md` (250 lines)
-- `tests/data/test_configs/validate_test_data.py` (150 lines) - Python validation script
-- `tests/data/test_configs/component_configs/cgrimoire_machina_test_data.json` (89 lines)
-- `tests/data/test_configs/component_configs/cuser_interface_test_data.json` (141 lines)
-- `tests/data/test_configs/component_configs/cmeta_test_data.json` (37 lines)
-- `tests/data/test_configs/integration_configs/entity_loading_test_data.json` (123 lines)
-- `tests/data/test_configs/ui_configs/ui_element_factory_test_data.json` (221 lines)
+- `tests/data/test_configs/README.md` (220 lines) - Comprehensive documentation
+- `tests/data/test_configs/grimoire_default.test_config.json`
+- `tests/data/test_configs/grimoire_empty.test_config.json`
+- `tests/data/test_configs/ui_simple_panel.test_config.json`
+- `tests/data/test_configs/ui_button.test_config.json`
+- `tests/data/test_configs/multiple_entities.test_config.json`
+- `tests/data/test_configs/combined_components.test_config.json`
 
-**Total Test Cases**: 24 test cases across 5 test data files covering components, integration, and UI scenarios
+**Files Modified:**
+- `src/flatbuffers_headers/convert_json_to_binary.cmake` - Added test_config compilation
+
+**Benefits of FlatBuffers Approach:**
+- No duplication of data loading and configuration logic
+- Uses production-proven FlatBuffers schema and infrastructure
+- Type-safe with compile-time validation
+- Binary format for efficient loading
+- Schema evolution support for versioning
+- Same format as production scene data
+
+**Total Test Configurations**: 6 test configuration files covering components and integration scenarios
 
 **Date Completed**: 2025-10-20
 
 #### 3.2 Create Test Data Loader
-- **Action**: Build utility to load test configurations
+- **Action**: Use existing FlatbuffersDataLoader to load test configurations
+- **Approach**: No new loader needed - reuse production data loading infrastructure
 - **Example**:
   ```cpp
-  // tests/context/TestDataLoader.h
-  namespace steamrot::tests {
-    class TestDataLoader {
-    public:
-      // Load test cases from JSON
-      std::vector<TestCase> LoadTestCases(const std::string& config_file);
-      
-      // Load specific test data type
-      template<typename TData>
-      std::vector<TData> LoadTestData(const std::string& config_file);
-    };
+  // Using existing FlatbuffersDataLoader in tests
+  TEST_CASE("Load test configuration", "[unit][test_data]") {
+    steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+    steamrot::FlatbuffersDataLoader loader;
+    
+    // Load test configuration
+    auto result = loader.LoadEntityData("grimoire_default.test_config.bin");
+    REQUIRE(result.has_value());
+    
+    const auto* entity_collection = result.value();
+    REQUIRE(entity_collection->entities()->size() == 1);
   }
   ```
-- **Files**: `tests/context/TestDataLoader.h/cpp`
-- **Effort**: Medium (2-3 days)
+- **Files**: No new files - use existing `src/data_handlers/FlatbuffersDataLoader.h/cpp`
+- **Effort**: Minimal (already complete) - Just use existing loader
 
 #### 3.3 Integrate with Catch2 Generators
-- **Action**: Use Catch2's GENERATE for data-driven tests
+- **Action**: Use Catch2's GENERATE with FlatBuffers test configurations
 - **Example**:
   ```cpp
-  TEST_CASE("Component configuration with various inputs", 
+  TEST_CASE("Component configuration with test configs", 
             "[unit][data-driven][CGrimoireMachina]") {
-    TestDataLoader loader;
-    auto test_cases = loader.LoadTestCases("cgrimoire_machina_test_data.json");
+    steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+    steamrot::FlatbuffersDataLoader loader;
+    steamrot::FlatbuffersConfigurator configurator;
     
-    auto test_case = GENERATE_COPY(from_range(test_cases));
+    // Test multiple configurations
+    auto config_file = GENERATE(
+      "grimoire_default.test_config.bin",
+      "grimoire_empty.test_config.bin"
+    );
     
-    SECTION(test_case.name) {
-      // Test with test_case.input
-      // Assert test_case.expected
+    SECTION(config_file) {
+      EntityMemoryPool entity_pool;
+      entity_pool.AllocateEntityMemory(10);
+      
+      auto result = configurator.ConfigureEntitiesFromDefaultData(
+          entity_pool, config_file);
+      
+      REQUIRE(result.has_value());
+      // Verify component state based on configuration
     }
   }
+  ```
+- **Files**: Update existing test files to use GENERATE with FlatBuffers configs
+- **Effort**: Low-Medium (1-2 days) - Simpler than original plan
   ```
 - **Files**: Existing test files, updated with GENERATE
 - **Effort**: High (refactor multiple tests, 3-5 days)

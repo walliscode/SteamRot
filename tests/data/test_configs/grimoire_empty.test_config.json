@@ -1,0 +1,12 @@
+{
+  "entity_memory_pool_size": 10,
+  "entities": [
+    {
+      "index": 0,
+      "c_grimoire_machina": {
+        "fragments": [],
+        "joints": []
+      }
+    }
+  ]
+}

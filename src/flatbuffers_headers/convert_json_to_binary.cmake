@@ -88,6 +88,7 @@ flatbuffers_generate_for_type(fragments ".fragment.json" "fragments")
 flatbuffers_generate_for_type(assets ".json" "asset_manager")
 flatbuffers_generate_for_type(scene_manager ".json" "scene_manager")
 flatbuffers_generate_for_type(game_engine ".json" "game_engine")
+flatbuffers_generate_for_type(test_config ".test_config.json" "test_configs")
 # This target will actually trigger all the binary generation
 add_custom_target(flatbuffers_generate_binaries ALL
     DEPENDS ${FLATBUFFERS_ALL_GENERATED_BINARIES}

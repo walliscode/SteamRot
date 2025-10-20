@@ -1,0 +1,26 @@
+{
+  "entity_memory_pool_size": 10,
+  "entities": [
+    {
+      "index": 0,
+      "c_user_interface": {
+        "ui_name": "CombinedUI",
+        "start_visible": true,
+        "root_ui_element": {
+          "base_data": {
+            "position": { "x": 0.0, "y": 0.0 },
+            "size": { "x": 200.0, "y": 200.0 },
+            "children_active": false,
+            "children": [],
+            "layout": "None",
+            "spacing_strategy": "None"
+          }
+        }
+      },
+      "c_grimoire_machina": {
+        "fragments": ["frag1", "frag2"],
+        "joints": ["joint1"]
+      }
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+include "entities.fbs";
+
+namespace steamrot;
+
+// Root type for test configuration files
+root_type EntityCollection;

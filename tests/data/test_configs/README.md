@@ -1,205 +1,195 @@
-# Test Data Configuration System
+# Test Configuration Data
 
 ## Overview
 
-The test data configuration system provides a standardized way to define test cases using JSON files. This enables data-driven testing where test logic can be reused across multiple test cases without code duplication.
+Test configuration files use the existing FlatBuffers EntityData schema to define test scenarios. This approach leverages the production data loading infrastructure (FlatbuffersConfigurator, FlatbuffersDataLoader) without duplication.
 
-## Directory Structure
+## Structure
 
-```
-tests/data/test_configs/
-├── test_data_schema.json          # JSON schema defining the structure
-├── component_configs/             # Test data for component configuration
-│   ├── cgrimoire_machina_test_data.json
-│   ├── cuser_interface_test_data.json
-│   └── cmeta_test_data.json
-├── integration_configs/           # Test data for integration tests
-│   └── entity_loading_test_data.json
-├── ui_configs/                    # Test data for UI element tests
-│   └── ui_element_factory_test_data.json
-└── README.md                      # This file
-```
+Test configuration files follow the same structure as scene files:
+- JSON source files (`.test_config.json`)
+- Compiled to binary FlatBuffers (`.test_config.bin`) via CMake
+- Loaded using FlatbuffersDataLoader
+- Configured using FlatbuffersConfigurator
 
-## JSON Schema
+## File Naming Convention
 
-Test data files follow the schema defined in `test_data_schema.json`. The schema ensures consistency and provides validation for test configurations.
+Use descriptive names that indicate what is being tested:
+- `component_type_scenario.test_config.json`
+- Examples:
+  - `grimoire_default.test_config.json` - Default CGrimoireMachina configuration
+  - `ui_simple_panel.test_config.json` - Simple UI panel test
+  - `multiple_entities.test_config.json` - Multiple entity test
 
-### Schema Structure
+## Schema
 
-```json
-{
-  "test_suite": "string (required)",
-  "description": "string (optional)",
-  "test_cases": [
-    {
-      "name": "string (required)",
-      "description": "string (optional)",
-      "tags": ["string", ...] (optional),
-      "input": { ... } (required),
-      "expected": { ... } (required),
-      "should_fail": boolean (optional, default: false)
-    }
-  ]
+Test files use the existing `entities.fbs` schema:
+
+```fbs
+table EntityData {
+  index: uint32;
+  c_user_interface: UserInterfaceData;
+  c_grimoire_machina: GrimoireMachinaData;
+  c_ui_state: UIStateData;
+}
+
+table EntityCollection {
+  entities: [EntityData] (required);
+  entity_memory_pool_size: int;
 }
 ```
 
-### Field Descriptions
+## Example Test Configuration
 
-- **test_suite**: Name of the test suite (e.g., component name, feature name)
-- **description**: Human-readable description of what the test suite validates
-- **test_cases**: Array of individual test case configurations
-  - **name**: Unique identifier for the test case
-  - **description**: What this test case validates
-  - **tags**: Categories for the test case (e.g., `happy_path`, `edge_case`, `error_case`)
-  - **input**: Input data structure (depends on what is being tested)
-  - **expected**: Expected output or state after processing the input
-  - **should_fail**: If true, the test expects the operation to fail
-
-## Example Test Data File
-
-### Component Configuration Test Data
+### Simple Component Test
 
 ```json
 {
-  "test_suite": "CGrimoireMachina",
-  "description": "Test data for CGrimoireMachina component configuration",
-  "test_cases": [
+  "entity_memory_pool_size": 10,
+  "entities": [
     {
-      "name": "default_configuration",
-      "description": "Test with valid fragment and joint data",
-      "tags": ["happy_path", "valid_input"],
-      "input": {
-        "c_grimoire_machina": {
-          "fragments": ["fragment1", "fragment2"],
-          "joints": ["joint1"]
-        }
-      },
-      "expected": {
-        "m_active": true,
-        "m_all_fragments_count": 2,
-        "m_all_joints_count": 1
+      "index": 0,
+      "c_grimoire_machina": {
+        "fragments": ["fragment1", "fragment2"],
+        "joints": ["joint1"]
       }
     }
   ]
 }
 ```
 
-## Common Test Tags
+### Multiple Component Test
 
-Use these standardized tags to categorize test cases:
+```json
+{
+  "entity_memory_pool_size": 10,
+  "entities": [
+    {
+      "index": 0,
+      "c_user_interface": {
+        "ui_name": "TestUI",
+        "start_visible": true,
+        "root_ui_element": {
+          "base_data": {
+            "position": { "x": 0.0, "y": 0.0 },
+            "size": { "x": 100.0, "y": 100.0 },
+            "children_active": false,
+            "children": [],
+            "layout": "None",
+            "spacing_strategy": "None"
+          }
+        }
+      },
+      "c_grimoire_machina": {
+        "fragments": ["frag1"],
+        "joints": ["joint1"]
+      }
+    }
+  ]
+}
+```
 
-- **happy_path**: Normal, expected usage scenarios
-- **edge_case**: Boundary conditions and unusual but valid inputs
-- **error_case**: Invalid inputs that should trigger errors
-- **stress_test**: Large data sets or performance testing
-- **integration**: Tests involving multiple components
-- **regression**: Tests for previously fixed bugs
-- **empty_data**: Tests with empty collections or strings
-- **null_data**: Tests with null/missing data
-- **duplicate_data**: Tests with duplicate entries
-- **default_values**: Tests verifying default initialization
+## Building Test Data
 
-## Creating New Test Data Files
+Test configuration files are automatically compiled to binary FlatBuffers during CMake build:
 
-### 1. Choose a Location
+```bash
+cmake --preset Debug
+cmake --build --preset Debug
+```
 
-- **Component tests**: `component_configs/` - For testing individual component configuration and behavior
-- **Integration tests**: `integration_configs/` - For testing interactions between multiple components/systems
-- **UI tests**: `ui_configs/` - For testing UI element creation, layout, and interaction
-- **System tests**: Create new subdirectory as needed for end-to-end workflow tests
+The CMake build system:
+1. Finds all `.test_config.json` files in `tests/data/test_configs/`
+2. Compiles them to `.test_config.bin` using flatc
+3. Uses the `entities.fbs` schema
 
-### 2. Follow Naming Convention
+## Using Test Data in Tests
 
-- Use snake_case: `component_name_test_data.json`
-- Be descriptive: `ui_collision_rendering_test_data.json`
-
-### 3. Define Test Cases
-
-1. Start with happy path scenarios
-2. Add edge cases (empty data, boundary conditions)
-3. Add error cases (invalid data, should_fail: true)
-4. Add stress tests if relevant (large datasets)
-
-### 4. Use Consistent Structure
-
-- Keep `input` structure consistent with FlatBuffers schema
-- Make `expected` structure match the component's public members
-- Use descriptive names and descriptions
-- Tag appropriately for filtering
-
-## Usage in Tests (Future Implementation)
-
-Once the TestDataLoader is implemented (Section 3.2), test data will be loaded like this:
+### Loading Test Configuration
 
 ```cpp
-TEST_CASE("Component configuration with test data", 
-          "[unit][data-driven][CGrimoireMachina]") {
-  steamrot::tests::TestDataLoader loader;
-  auto test_cases = loader.LoadTestCases("cgrimoire_machina_test_data.json");
+#include "FlatbuffersDataLoader.h"
+#include "FlatbuffersConfigurator.h"
+#include "PathProvider.h"
+
+TEST_CASE("Load test configuration", "[unit][test_data]") {
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::FlatbuffersDataLoader loader;
   
-  auto test_case = GENERATE_COPY(from_range(test_cases));
+  // Load test configuration
+  auto result = loader.LoadEntityData("grimoire_default.test_config.bin");
+  REQUIRE(result.has_value());
   
-  SECTION(test_case.name) {
-    // Configure component with test_case.input
-    // Verify against test_case.expected
-  }
+  const auto* entity_collection = result.value();
+  REQUIRE(entity_collection->entities()->size() == 1);
+}
+```
+
+### Configuring Entities from Test Data
+
+```cpp
+TEST_CASE("Configure entity from test data", "[unit][configurator]") {
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::FlatbuffersDataLoader loader;
+  steamrot::FlatbuffersConfigurator configurator;
+  
+  EntityMemoryPool entity_pool;
+  entity_pool.AllocateEntityMemory(10);
+  
+  // Load and configure
+  auto result = configurator.ConfigureEntitiesFromDefaultData(
+      entity_pool, "grimoire_default.test_config.bin");
+  
+  REQUIRE(result.has_value());
+  
+  // Verify configuration
+  auto& grimoire = emp_helpers::GetComponent<CGrimoireMachina>(0, entity_pool);
+  REQUIRE(grimoire.m_active == true);
+  REQUIRE(grimoire.m_all_fragments.size() == 3);
 }
 ```
 
 ## Benefits
 
-1. **Separation of Concerns**: Test data is separate from test logic
-2. **Maintainability**: Easy to add new test cases without modifying code
-3. **Readability**: JSON format is human-readable and easy to understand
-4. **Reusability**: Same test logic can process multiple test cases
-5. **Coverage**: Easy to expand test coverage by adding more test cases
-6. **Documentation**: Test data serves as examples of valid configurations
+1. **No Duplication**: Uses existing FlatBuffers schema and loading infrastructure
+2. **Type Safety**: FlatBuffers provides compile-time type checking
+3. **Binary Efficiency**: Compiled binary format is fast to load
+4. **Schema Evolution**: FlatBuffers schema evolution handles versioning
+5. **Production Parity**: Test data uses same format as production data
+6. **Reusable**: Existing configurator logic works with test data
+
+## Test Scenarios Covered
+
+### Component Tests
+- `grimoire_default.test_config.json` - CGrimoireMachina with fragments and joints
+- `grimoire_empty.test_config.json` - CGrimoireMachina with empty collections
+- `ui_simple_panel.test_config.json` - CUserInterface with simple panel
+- `ui_button.test_config.json` - CUserInterface with button element
+
+### Integration Tests
+- `multiple_entities.test_config.json` - Multiple entities with different components
+- `combined_components.test_config.json` - Single entity with multiple components
+
+## Adding New Test Configurations
+
+1. Create JSON file: `tests/data/test_configs/your_test.test_config.json`
+2. Follow EntityCollection schema structure
+3. Build project - CMake will compile to binary
+4. Load in tests using FlatbuffersDataLoader
+5. Configure using FlatbuffersConfigurator
 
 ## Validation
 
-Test data files can be validated against the JSON schema using the provided validation script or standard tools:
-
-### Using the Validation Script (Recommended)
-
+FlatBuffers compiler validates JSON files against the schema during build:
 ```bash
-# Validate all test data files
-cd tests/data/test_configs
-python3 validate_test_data.py
-
-# Validate a specific directory
-python3 validate_test_data.py component_configs/
-
-# Validate a single file
-python3 validate_test_data.py component_configs/cmeta_test_data.json
+cmake --build --preset Debug
 ```
 
-The validation script checks:
-- Required fields (test_suite, test_cases, name, input, expected)
-- Proper data types (strings, arrays, booleans, objects)
-- Minimum array length requirements
-- Optional field types
+If there are schema errors, the build will fail with descriptive messages.
 
-### Using Standard JSON Schema Validators
+## Related Files
 
-```bash
-# Using jsonschema (Python)
-jsonschema -i component_configs/cgrimoire_machina_test_data.json test_data_schema.json
-
-# Using ajv-cli (Node.js)
-ajv validate -s test_data_schema.json -d "component_configs/*.json"
-```
-
-## Next Steps
-
-The following tasks are planned for future implementation:
-
-1. **TestDataLoader** (Section 3.2): Load test cases from JSON files
-2. **Catch2 Integration** (Section 3.3): Use GENERATE with loaded test data
-3. **Test Data Generators** (Section 3.4): Generate random valid test data
-4. **Convert Existing Tests**: Migrate existing tests to data-driven format
-
-## Related Documentation
-
-- [TESTING_IMPROVEMENT_PLAN.md](../../../documentation/TESTING_IMPROVEMENT_PLAN.md) - Overall testing strategy
-- [test_data_schema.json](test_data_schema.json) - JSON schema definition
-- Component test data examples in `component_configs/`
+- Schema: `src/flatbuffers_headers/entities.fbs`
+- Data Loader: `src/data_handlers/FlatbuffersDataLoader.h/cpp`
+- Configurator: `src/entity/FlatbuffersConfigurator.h/cpp`
+- Build Script: `src/flatbuffers_headers/convert_json_to_binary.cmake`
