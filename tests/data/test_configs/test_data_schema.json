@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SteamRot Test Data Configuration Schema",
+  "description": "JSON schema for test data configurations used in data-driven testing",
+  "type": "object",
+  "required": ["test_suite", "test_cases"],
+  "properties": {
+    "test_suite": {
+      "type": "string",
+      "description": "Name of the test suite (e.g., component name, feature name)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of what this test suite validates"
+    },
+    "test_cases": {
+      "type": "array",
+      "description": "Array of test case configurations",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "input", "expected"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Unique name for this test case"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of what this test case validates"
+          },
+          "tags": {
+            "type": "array",
+            "description": "Tags for categorizing test cases (e.g., edge_case, happy_path, error_case)",
+            "items": {
+              "type": "string"
+            }
+          },
+          "input": {
+            "type": "object",
+            "description": "Input data for the test case (structure depends on what is being tested)"
+          },
+          "expected": {
+            "type": "object",
+            "description": "Expected output or state after processing input"
+          },
+          "should_fail": {
+            "type": "boolean",
+            "description": "If true, this test case expects the operation to fail",
+            "default": false
+          }
+        }
+      }
+    }
+  }
+}
