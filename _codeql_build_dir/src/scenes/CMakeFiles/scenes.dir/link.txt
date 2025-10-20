@@ -1,0 +1,2 @@
+/usr/bin/ar qc libscenes.a CMakeFiles/scenes.dir/SceneManager.cpp.o CMakeFiles/scenes.dir/SceneFactory.cpp.o CMakeFiles/scenes.dir/Scene.cpp.o CMakeFiles/scenes.dir/CraftingScene.cpp.o CMakeFiles/scenes.dir/TitleScene.cpp.o
+/usr/bin/ranlib libscenes.a

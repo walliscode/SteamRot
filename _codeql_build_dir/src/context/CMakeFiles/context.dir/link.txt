@@ -1,0 +1,2 @@
+/usr/bin/ar qc libcontext.a CMakeFiles/context.dir/GameContext.cpp.o
+/usr/bin/ranlib libcontext.a

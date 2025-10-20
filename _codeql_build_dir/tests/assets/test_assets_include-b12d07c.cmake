@@ -1,0 +1,5 @@
+if(EXISTS "/home/runner/work/SteamRot/SteamRot/_codeql_build_dir/tests/assets/test_assets_tests-b12d07c.cmake")
+  include("/home/runner/work/SteamRot/SteamRot/_codeql_build_dir/tests/assets/test_assets_tests-b12d07c.cmake")
+else()
+  add_test(test_assets_NOT_BUILT-b12d07c test_assets_NOT_BUILT-b12d07c)
+endif()

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libuser_interface.a CMakeFiles/user_interface.dir/UIElement.cpp.o CMakeFiles/user_interface.dir/UIElementFactory.cpp.o CMakeFiles/user_interface.dir/draw_ui_elements.cpp.o
+/usr/bin/ranlib libuser_interface.a

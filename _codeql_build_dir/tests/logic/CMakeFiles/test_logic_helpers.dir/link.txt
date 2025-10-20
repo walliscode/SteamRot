@@ -1,0 +1,2 @@
+/usr/bin/ar qc libtest_logic_helpers.a CMakeFiles/test_logic_helpers.dir/draw_ui_elements_test_helpers.cpp.o CMakeFiles/test_logic_helpers.dir/logic_test_helpers.cpp.o
+/usr/bin/ranlib libtest_logic_helpers.a

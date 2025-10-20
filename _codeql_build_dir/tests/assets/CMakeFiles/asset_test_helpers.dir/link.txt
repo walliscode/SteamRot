@@ -1,0 +1,2 @@
+/usr/bin/ar qc libasset_test_helpers.a CMakeFiles/asset_test_helpers.dir/asset_test_helpers.cpp.o
+/usr/bin/ranlib libasset_test_helpers.a
