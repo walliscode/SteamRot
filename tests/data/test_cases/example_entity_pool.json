@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "test_case": {
+    "metadata": {
+      "test_name": "Example Entity Pool Test",
+      "test_description": "Tests basic entity memory pool configuration",
+      "tick": 0,
+      "test_tags": ["unit", "entity", "memory_pool"],
+      "expected_result": "PASS"
+    },
+    "before_state": {
+      "metadata": {
+        "test_name": "Before State",
+        "test_description": "Initial state before test execution",
+        "tick": 0,
+        "expected_result": "PASS"
+      },
+      "data_type": "EntityMemoryPoolData",
+      "data": {
+        "entity_memory_pool_size": 10,
+        "entities": [
+          {
+            "index": 0,
+            "c_user_interface": {
+              "ui_element_type": "UIElementType_BUTTON"
+            }
+          },
+          {
+            "index": 1,
+            "c_user_interface": {
+              "ui_element_type": "UIElementType_TEXT"
+            }
+          }
+        ]
+      }
+    },
+    "after_state": {
+      "metadata": {
+        "test_name": "After State",
+        "test_description": "Expected state after test execution",
+        "tick": 1,
+        "expected_result": "PASS"
+      },
+      "data_type": "EntityMemoryPoolData",
+      "data": {
+        "entity_memory_pool_size": 10,
+        "entities": [
+          {
+            "index": 0,
+            "c_user_interface": {
+              "ui_element_type": "UIElementType_BUTTON"
+            },
+            "c_ui_state": {
+              "is_hovered": true
+            }
+          },
+          {
+            "index": 1,
+            "c_user_interface": {
+              "ui_element_type": "UIElementType_TEXT"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,7 +1,9 @@
 add_library(test_context
   TestContext.cpp
   TestScenarios.cpp
-  test_assertions.cpp)
+  test_assertions.cpp
+  test_comparisons.cpp
+  TestDataLoader.cpp)
 
 target_include_directories(test_context
   PUBLIC
@@ -12,5 +14,6 @@ target_link_libraries(test_context
   PUBLIC
   context
   Catch2::Catch2
+  flatbuffers_headers
 )
 
