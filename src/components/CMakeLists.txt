@@ -4,6 +4,8 @@ CUserInterface.cpp
 CMachinaForm.cpp
 CGrimoireMachina.cpp
 CUIState.cpp
+Fragment.cpp
+Joint.cpp
 
 )
 

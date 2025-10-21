@@ -43,5 +43,13 @@ struct Joint {
   sf::VertexArray m_render_overlay;
 
   sf::Transform m_transform;
+
+  /////////////////////////////////////////////////
+  /// @brief Equality operator for Joint
+  ///
+  /// @param other The Joint to compare with
+  /// @return true if joints are equal, false otherwise
+  /////////////////////////////////////////////////
+  bool operator==(const Joint &other) const;
 };
 } // namespace steamrot

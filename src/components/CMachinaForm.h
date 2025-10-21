@@ -33,5 +33,21 @@ struct CMachinaForm : public Component {
   std::vector<Joint> m_joints;
 
   size_t GetComponentRegisterIndex() const override;
+
+  ////////////////////////////////////////////////////////////
+  /// @brief Three-way comparison operator for CMachinaForm
+  ///
+  /// @param other The CMachinaForm to compare with
+  /// @return Ordering result
+  ////////////////////////////////////////////////////////////
+  auto operator<=>(const CMachinaForm &other) const = default;
+
+  ////////////////////////////////////////////////////////////
+  /// @brief Equality operator for CMachinaForm
+  ///
+  /// @param other The CMachinaForm to compare with
+  /// @return true if components are equal, false otherwise
+  ////////////////////////////////////////////////////////////
+  bool operator==(const CMachinaForm &other) const = default;
 };
 } // namespace steamrot
