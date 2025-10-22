@@ -32,7 +32,7 @@ endfunction()
 
 # Find all .test_data.json files in tests/data and subdirectories
 file(GLOB_RECURSE test_data_json_files 
-  "${CMAKE_SOURCE_DIR}/tests/data/**/*.test_data.json"
+  "${CMAKE_SOURCE_DIR}/tests/data/*.test_data.json"
 )
 
 # Path to the test_data.fbs schema
