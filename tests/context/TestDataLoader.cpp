@@ -16,16 +16,33 @@
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
+TestDataLoader::TestDataLoader() : m_path_provider(EnvironmentType::Test) {}
+
+/////////////////////////////////////////////////
+char *TestDataLoader::LoadBinaryData(const std::filesystem::path &file_path) const {
+  // open file in binary mode
+  std::ifstream infile;
+  infile.open(file_path, std::ios::binary | std::ios::in);
+  infile.seekg(0, std::ios::end);
+  int length = infile.tellg();
+  infile.seekg(0, std::ios::beg);
+  char *data = new char[length];
+  infile.read(data, length);
+  infile.close();
+  return data;
+}
+
+/////////////////////////////////////////////////
 std::filesystem::path
 TestDataLoader::GetTestDataPath(const std::string &test_name,
                                 const std::string &subdirectory) const {
-  // Get the test data directory
-  auto test_data_dir_result = m_path_provider.GetTestDataDirectory();
-  if (!test_data_dir_result.has_value()) {
+  // Get the data directory (already returns tests/data in Test environment)
+  auto data_dir_result = m_path_provider.GetDataDirectory();
+  if (!data_dir_result.has_value()) {
     return std::filesystem::path();
   }
 
-  std::filesystem::path base_path = test_data_dir_result.value();
+  std::filesystem::path base_path = data_dir_result.value();
 
   // Add subdirectory if provided
   if (!subdirectory.empty()) {
@@ -79,13 +96,13 @@ TestDataLoader::LoadTestData(const std::string &test_name,
 std::expected<std::vector<std::string>, FailInfo>
 TestDataLoader::DiscoverTestDataFiles(const std::string &subdirectory) const {
 
-  // Get the test data directory
-  auto test_data_dir_result = m_path_provider.GetTestDataDirectory();
-  if (!test_data_dir_result.has_value()) {
-    return std::unexpected(test_data_dir_result.error());
+  // Get the data directory (already returns tests/data in Test environment)
+  auto data_dir_result = m_path_provider.GetDataDirectory();
+  if (!data_dir_result.has_value()) {
+    return std::unexpected(data_dir_result.error());
   }
 
-  std::filesystem::path search_path = test_data_dir_result.value();
+  std::filesystem::path search_path = data_dir_result.value();
 
   // Add subdirectory if provided
   if (!subdirectory.empty()) {
