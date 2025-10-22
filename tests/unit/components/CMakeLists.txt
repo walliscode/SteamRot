@@ -10,7 +10,7 @@ add_executable(test_components
 
 target_include_directories(test_components
 PRIVATE
-  ${CMAKE_SOURCE_DIR}/tests/components
+  ${CMAKE_SOURCE_DIR}/tests/unit/components
 )
 
 target_link_libraries(test_components

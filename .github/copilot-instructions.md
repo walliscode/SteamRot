@@ -760,16 +760,27 @@ m_logic_context.event_handler.AddEvent(event_packet);
 **Directory Structure:**
 ```
 tests/
-├── unit/                    # Unit tests (isolated, future location)
+├── unit/                    # Unit tests organized by subsystem
+│   ├── assets/
+│   ├── components/
+│   ├── data_handlers/
+│   ├── display/
+│   ├── entity/
+│   ├── events/
+│   ├── logic/
+│   ├── scenes/
+│   ├── systems/
+│   └── user_interface/
 ├── integration/             # Integration tests (2+ components)
-├── system/                  # End-to-end tests (future location)
-├── perf/                    # Performance tests (future location)
+│   └── scene_change/
+├── system/                  # End-to-end tests (future)
+├── perf/                    # Performance tests (future)
+│   └── benchmarks/
 ├── data/                    # Test data files
-├── context/                 # Test utilities
-├── components/              # Component tests (current location)
-├── entity/                  # Entity tests (current location)
-└── ...                      # Other subsystem tests (current)
+└── context/                 # Test utilities
 ```
+
+**Note**: All unit tests have been migrated to `unit/` directory and organized by subsystem.
 
 **Test Tags:**
 All tests must include appropriate Catch2 tags:

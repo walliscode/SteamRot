@@ -220,7 +220,7 @@ mocking.
 
 ### Implementation Status: COMPLETE ✅
 
-**Date Completed**: 2025-10-13
+**Date Completed**: 2025-10-13 (Initial), 2025-10-22 (Migration Completed)
 
 **Changes Made**:
 
@@ -234,14 +234,15 @@ mocking.
 6. Updated .github/copilot-instructions.md with test classification guidelines
    and preset usage
 7. All build and test commands now use CMake presets (`--preset Debug`)
+8. **MIGRATION COMPLETED (2025-10-22)**: All subsystem test directories moved to `tests/unit/` subdirectories
 
 **Migration Notes**:
 
-- Existing tests remain in their current subsystem-based locations
-- New directories (`unit/`, `system/`, `perf/`) are reserved for future tests
-- Migration to new structure will happen opportunistically
-- All documentation updated to use CMake presets instead of direct cmake
-  commands
+- ✅ All unit tests migrated from subsystem-based locations to `tests/unit/` with subsystem subdirectories
+- ✅ Directory structure now matches the intended design from Stage 1.2
+- ✅ `tests/unit/` contains: assets/, components/, data_handlers/, display/, entity/, events/, logic/, scenes/, systems/, user_interface/
+- ✅ CMakeLists.txt files updated to reflect new structure
+- ✅ All documentation updated to reflect completed migration
 
 ---
 
