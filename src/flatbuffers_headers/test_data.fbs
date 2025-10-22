@@ -1,0 +1,53 @@
+include "entities.fbs";
+
+namespace steamrot;
+
+////////////////////////////////////////////////////////////
+/// @brief Test metadata for data-driven testing
+///
+/// This table contains metadata about a test case that can
+/// be extended in the future with additional fields.
+////////////////////////////////////////////////////////////
+table TestMetadata {
+  /// @brief Human-readable name for the test case
+  test_name: string (required);
+  
+  /// @brief Optional description of what the test validates
+  description: string;
+  
+  /// @brief Tags for categorizing tests (e.g., "unit", "integration")
+  tags: [string];
+  
+  /// @brief Expected test outcome (true = should pass, false = should fail)
+  expected_to_pass: bool = true;
+  
+  /// @brief Optional author or creator of the test case
+  author: string;
+  
+  /// @brief Version identifier for the test data format
+  version: uint32 = 1;
+}
+
+////////////////////////////////////////////////////////////
+/// @brief Root table for test data configuration
+///
+/// This is the main container for test data. It's designed
+/// to be extensible - new data types can be added as optional
+/// fields without breaking existing tests.
+////////////////////////////////////////////////////////////
+table TestDataConfig {
+  /// @brief Metadata about this test case
+  metadata: TestMetadata (required);
+  
+  /// @brief Optional entity collection for entity-based tests
+  entity_collection: EntityCollection;
+  
+  /// @brief Reserved for future test data types
+  /// Can be extended with additional fields like:
+  /// - event_data: EventCollection;
+  /// - ui_data: UITestData;
+  /// - logic_data: LogicTestData;
+  /// etc.
+}
+
+root_type TestDataConfig;

@@ -1108,6 +1108,151 @@ class NewLogicTest : public LogicTestBase<NewLogic> {
 // 5. Add to LogicFactory (with tests)
 ```
 
+## Test Data Configuration System (Stage 3.1)
+
+### Overview
+
+The Test Data Configuration System provides a FlatBuffers-based framework for data-driven testing. Tests can be defined in JSON files and loaded at runtime, enabling easy addition of test cases without code changes.
+
+See `documentation/TEST_DATA_CONFIGURATION.md` for complete documentation.
+
+### Quick Start
+
+#### 1. Create Test Data JSON
+
+```json
+// tests/components/data/my_test.test_data.json
+{
+  "metadata": {
+    "test_name": "my_component_test",
+    "description": "Test component configuration",
+    "tags": ["unit", "component"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "position": { "x": 100.0, "y": 200.0 },
+          "size": { "x": 50.0, "y": 30.0 }
+        }
+      }
+    ]
+  }
+}
+```
+
+#### 2. Build Project (compiles JSON to binary)
+
+```bash
+cmake --build --preset Debug
+```
+
+#### 3. Use TestDataLoader in Tests
+
+```cpp
+#include "TestDataLoader.h"
+
+TEST_CASE("Load and use test data", "[unit][data-driven]") {
+  steamrot::tests::TestDataLoader loader;
+  auto result = loader.LoadTestData("my_test", "components");
+  
+  REQUIRE(result.has_value());
+  const auto* config = result.value();
+  
+  // Access metadata
+  REQUIRE(config->metadata()->test_name()->str() == "my_component_test");
+  
+  // Access entity data
+  if (config->entity_collection()) {
+    // Process entities
+  }
+}
+```
+
+### File Naming Convention
+
+- **JSON files**: `<test_name>.test_data.json`
+- **Compiled binaries**: `<test_name>.test_data.bin` (auto-generated)
+- **Location**: `tests/<test_executable_dir>/data/`
+
+### Key Features
+
+- **Extensible Schema**: Add new data types without breaking existing tests
+- **Auto-Discovery**: `DiscoverTestDataFiles()` finds all test data
+- **Batch Loading**: `LoadMultipleTestData()` for multiple configurations
+- **Type-Safe**: FlatBuffers ensures compile-time type checking
+- **Organized**: Subdirectory structure matches test organization
+
+### Example: Data-Driven Testing with Generators
+
+```cpp
+TEST_CASE("Run all component test data", "[unit][data-driven]") {
+  steamrot::tests::TestDataLoader loader;
+  
+  // Discover all test data files
+  auto discovery_result = loader.DiscoverTestDataFiles("components");
+  REQUIRE(discovery_result.has_value());
+  
+  // Use Catch2 generator to run test for each data file
+  auto test_name = GENERATE_COPY(from_range(discovery_result.value()));
+  
+  SECTION(test_name) {
+    auto config = loader.LoadTestData(test_name, "components");
+    REQUIRE(config.has_value());
+    // Run test with this configuration
+  }
+}
+```
+
+### Adding New Data Types
+
+To extend the schema with new data types:
+
+1. **Create FlatBuffers schema** for new data
+2. **Update `test_data.fbs`** with new optional field
+3. **Rebuild project** to generate headers
+4. **Use in JSON** test data files
+
+Example:
+
+```fbs
+// test_data.fbs
+table TestDataConfig {
+  metadata: TestMetadata (required);
+  entity_collection: EntityCollection;
+  new_data_type: NewDataType;  // Add new field
+}
+```
+
+### Best Practices
+
+- **Organize by category**: Place test data in matching subdirectories
+- **Descriptive names**: Use clear names for test data files
+- **Include metadata**: Always fill out test metadata fields
+- **Keep focused**: One scenario per test data file
+- **Reuse types**: Leverage existing FlatBuffers tables
+
+### TestDataLoader Methods
+
+```cpp
+// Load single test data file
+std::expected<const TestDataConfig*, FailInfo>
+LoadTestData(const std::string& test_name, const std::string& subdirectory = "");
+
+// Discover all test data files in a directory
+std::expected<std::vector<std::string>, FailInfo>
+DiscoverTestDataFiles(const std::string& subdirectory = "");
+
+// Load multiple test data files
+std::expected<std::vector<const TestDataConfig*>, FailInfo>
+LoadMultipleTestData(const std::vector<std::string>& test_names,
+                     const std::string& subdirectory = "");
+```
+
 ## Common Gotchas
 
 1. **FlatBuffers Segfaults**: Always check for null before accessing FlatBuffers fields

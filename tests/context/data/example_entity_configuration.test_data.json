@@ -1,0 +1,31 @@
+{
+  "metadata": {
+    "test_name": "example_entity_configuration",
+    "description": "Example test case demonstrating entity configuration from test data",
+    "tags": ["unit", "entity", "example"],
+    "expected_to_pass": true,
+    "author": "GitHub Copilot",
+    "version": 1
+  },
+  "entity_collection": {
+    "entity_memory_pool_size": 10,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "position": { "x": 100.0, "y": 200.0 },
+          "size": { "x": 50.0, "y": 30.0 },
+          "visible": true
+        }
+      },
+      {
+        "index": 1,
+        "c_user_interface": {
+          "position": { "x": 150.0, "y": 250.0 },
+          "size": { "x": 60.0, "y": 40.0 },
+          "visible": true
+        }
+      }
+    ]
+  }
+}
