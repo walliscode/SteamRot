@@ -35,14 +35,6 @@ struct CMachinaForm : public Component {
   size_t GetComponentRegisterIndex() const override;
 
   ////////////////////////////////////////////////////////////
-  /// @brief Three-way comparison operator for CMachinaForm
-  ///
-  /// @param other The CMachinaForm to compare with
-  /// @return Ordering result
-  ////////////////////////////////////////////////////////////
-  auto operator<=>(const CMachinaForm &other) const = default;
-
-  ////////////////////////////////////////////////////////////
   /// @brief Equality operator for CMachinaForm
   ///
   /// @param other The CMachinaForm to compare with

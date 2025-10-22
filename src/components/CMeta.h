@@ -25,14 +25,6 @@ struct CMeta : public Component {
   size_t GetComponentRegisterIndex() const override;
 
   ////////////////////////////////////////////////////////////
-  /// @brief Three-way comparison operator for CMeta
-  ///
-  /// @param other The CMeta to compare with
-  /// @return Ordering result
-  ////////////////////////////////////////////////////////////
-  auto operator<=>(const CMeta &other) const = default;
-
-  ////////////////////////////////////////////////////////////
   /// @brief Equality operator for CMeta
   ///
   /// @param other The CMeta to compare with

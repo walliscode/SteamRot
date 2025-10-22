@@ -44,22 +44,6 @@ TEST_CASE("CMeta equality operator works correctly",
   }
 }
 
-TEST_CASE("CMeta spaceship operator works correctly",
-          "[unit][Components][CMeta][spaceship]") {
-  steamrot::CMeta meta1;
-  steamrot::CMeta meta2;
-
-  SECTION("Default constructed CMeta objects compare equal") {
-    REQUIRE((meta1 <=> meta2) == std::strong_ordering::equal);
-  }
-
-  SECTION("CMeta with m_active=true > m_active=false") {
-    meta1.m_active = true;
-    meta2.m_active = false;
-    REQUIRE((meta1 <=> meta2) != std::strong_ordering::equal);
-  }
-}
-
 TEST_CASE("CUserInterface equality operator works correctly",
           "[unit][Components][CUserInterface][equality]") {
   steamrot::CUserInterface ui1;
@@ -103,16 +87,6 @@ TEST_CASE("CMachinaForm equality operator works correctly",
     form1.m_active = true;
     form2.m_active = false;
     REQUIRE_FALSE(form1 == form2);
-  }
-}
-
-TEST_CASE("CMachinaForm spaceship operator works correctly",
-          "[unit][Components][CMachinaForm][spaceship]") {
-  steamrot::CMachinaForm form1;
-  steamrot::CMachinaForm form2;
-
-  SECTION("Default constructed CMachinaForm objects compare equal") {
-    REQUIRE((form1 <=> form2) == std::strong_ordering::equal);
   }
 }
 

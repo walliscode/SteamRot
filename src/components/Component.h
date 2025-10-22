@@ -11,7 +11,6 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include <compare>
 #include <nlohmann/json.hpp>
 
 namespace steamrot {
@@ -43,14 +42,6 @@ struct Component {
   /// sense.
   /////////////////////////////////////////////////
   bool m_active{false};
-
-  /////////////////////////////////////////////////
-  /// @brief Three-way comparison operator for Component
-  ///
-  /// @param other The Component to compare with
-  /// @return Ordering result (strong_ordering)
-  /////////////////////////////////////////////////
-  auto operator<=>(const Component &other) const = default;
 
   /////////////////////////////////////////////////
   /// @brief Equality operator for Component

@@ -38,14 +38,6 @@ struct UIVisibilityState {
   std::vector<size_t> m_ui_indices_off;
 
   ////////////////////////////////////////////////////////////
-  /// @brief Three-way comparison operator for UIVisibilityState
-  ///
-  /// @param other The UIVisibilityState to compare with
-  /// @return Ordering result
-  ////////////////////////////////////////////////////////////
-  auto operator<=>(const UIVisibilityState &other) const = default;
-
-  ////////////////////////////////////////////////////////////
   /// @brief Equality operator for UIVisibilityState
   ///
   /// @param other The UIVisibilityState to compare with
