@@ -23,5 +23,13 @@ struct CMeta : public Component {
    * @return Index of the CMeta component in the component register.
    */
   size_t GetComponentRegisterIndex() const override;
+
+  ////////////////////////////////////////////////////////////
+  /// @brief Equality operator for CMeta
+  ///
+  /// @param other The CMeta to compare with
+  /// @return true if components are equal, false otherwise
+  ////////////////////////////////////////////////////////////
+  bool operator==(const CMeta &other) const = default;
 };
 } // namespace steamrot

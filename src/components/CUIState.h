@@ -36,6 +36,14 @@ struct UIVisibilityState {
   /// @brief Entity indices of UI components that should be hidden
   ////////////////////////////////////////////////////////////
   std::vector<size_t> m_ui_indices_off;
+
+  ////////////////////////////////////////////////////////////
+  /// @brief Equality operator for UIVisibilityState
+  ///
+  /// @param other The UIVisibilityState to compare with
+  /// @return true if states are equal, false otherwise
+  ////////////////////////////////////////////////////////////
+  bool operator==(const UIVisibilityState &other) const = default;
 };
 
 ////////////////////////////////////////////////////////////
@@ -83,6 +91,16 @@ struct CUIState : public Component {
   /// @return index of the component in the component register
   ////////////////////////////////////////////////////////////
   size_t GetComponentRegisterIndex() const override;
+
+  ////////////////////////////////////////////////////////////
+  /// @brief Equality operator for CUIState
+  ///
+  /// Note: Subscriber comparison is pointer-based
+  ///
+  /// @param other The CUIState to compare with
+  /// @return true if components are equal, false otherwise
+  ////////////////////////////////////////////////////////////
+  bool operator==(const CUIState &other) const;
 };
 
 } // namespace steamrot

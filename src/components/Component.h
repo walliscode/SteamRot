@@ -42,5 +42,13 @@ struct Component {
   /// sense.
   /////////////////////////////////////////////////
   bool m_active{false};
+
+  /////////////////////////////////////////////////
+  /// @brief Equality operator for Component
+  ///
+  /// @param other The Component to compare with
+  /// @return true if components are equal, false otherwise
+  /////////////////////////////////////////////////
+  bool operator==(const Component &other) const = default;
 };
 } // namespace steamrot

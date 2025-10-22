@@ -4,6 +4,8 @@ add_executable(test_components
   CMeta.test.cpp
   CUserInterface.test.cpp
   CMachinaForm.test.cpp
+  component_equality.test.cpp
+  component_matchers.test.cpp
 )
 
 target_include_directories(test_components
@@ -15,6 +17,7 @@ target_link_libraries(test_components
 PRIVATE
   Catch2::Catch2WithMain
   components
+  entity
 )
 
 catch_discover_tests(test_components)
