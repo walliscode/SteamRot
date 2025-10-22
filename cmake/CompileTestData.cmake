@@ -1,7 +1,8 @@
 # CMake script to compile test data JSON files to binary using flatc
 #
-# This script discovers all .test_data.json files in the tests/data directory
-# and its subdirectories, then compiles them to .test_data.bin files using flatc.
+# This script discovers all .test_data.json files in data/ subdirectories
+# within each test executable directory (e.g., tests/components/data/,
+# tests/entity/data/, etc.) and compiles them to .test_data.bin files using flatc.
 
 # Function to compile a single test data JSON file
 function(compile_test_data_file json_file schema_file)
@@ -30,20 +31,29 @@ function(compile_test_data_file json_file schema_file)
   set(TEST_DATA_BINARIES ${TEST_DATA_BINARIES} "${binary_file}" PARENT_SCOPE)
 endfunction()
 
-# Find all .test_data.json files in tests/data and subdirectories
-file(GLOB_RECURSE test_data_json_files 
-  "${CMAKE_SOURCE_DIR}/tests/data/*.test_data.json"
-)
-
-# Path to the test_data.fbs schema
-set(test_data_schema "${CMAKE_SOURCE_DIR}/src/flatbuffers_headers/test_data.fbs")
+# Find all data/ directories within tests/ subdirectories
+file(GLOB test_subdirectories "${CMAKE_SOURCE_DIR}/tests/*/")
 
 # List to accumulate all binary files
 set(TEST_DATA_BINARIES "")
 
-# Compile each test data file
-foreach(json_file ${test_data_json_files})
-  compile_test_data_file(${json_file} ${test_data_schema})
+# Path to the test_data.fbs schema
+set(test_data_schema "${CMAKE_SOURCE_DIR}/src/flatbuffers_headers/test_data.fbs")
+
+# Recursively search for .test_data.json files in each test subdirectory's data/ folder
+foreach(test_subdir ${test_subdirectories})
+  # Check if a data/ subdirectory exists
+  if(IS_DIRECTORY "${test_subdir}/data")
+    # Find all .test_data.json files in this data directory and its subdirectories
+    file(GLOB_RECURSE test_data_json_files 
+      "${test_subdir}/data/*.test_data.json"
+    )
+    
+    # Compile each test data file found
+    foreach(json_file ${test_data_json_files})
+      compile_test_data_file(${json_file} ${test_data_schema})
+    endforeach()
+  endif()
 endforeach()
 
 # Create a custom target that depends on all compiled test data

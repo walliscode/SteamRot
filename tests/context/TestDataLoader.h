@@ -69,11 +69,13 @@ public:
   /// @brief Load a test data configuration by name
   ///
   /// Loads a test data configuration from a .test_data.bin file.
-  /// In Test environment, files are located in tests/data/<subdirectory>.
+  /// In Test environment:
+  ///   - If subdirectory is provided: looks in tests/<subdirectory>/data/
+  ///   - If subdirectory is empty: looks in tests/data/ (backward compatibility)
   /// Uses PathProvider to determine the correct base path.
   ///
   /// @param test_name Name of the test (without .test_data.bin extension)
-  /// @param subdirectory Optional subdirectory within data directory (e.g., "components", "logic")
+  /// @param subdirectory Test executable directory name (e.g., "components", "logic", "entity")
   /// @return TestDataConfig pointer or FailInfo on error
   /////////////////////////////////////////////////
   std::expected<const TestDataConfig *, FailInfo>
@@ -84,10 +86,12 @@ public:
   /// @brief Find all test data files in a directory
   ///
   /// Scans a directory for files matching the .test_data.bin pattern.
-  /// Uses PathProvider to determine base directory (tests/data in Test environment).
+  /// In Test environment:
+  ///   - If subdirectory is provided: looks in tests/<subdirectory>/data/
+  ///   - If subdirectory is empty: looks in tests/data/
   /// Useful for discovering available test configurations.
   ///
-  /// @param subdirectory Subdirectory within data directory to search
+  /// @param subdirectory Test executable directory name (e.g., "components", "logic")
   /// @return Vector of test names (without extension) or FailInfo on error
   /////////////////////////////////////////////////
   std::expected<std::vector<std::string>, FailInfo>
@@ -97,10 +101,10 @@ public:
   /// @brief Load multiple test data configurations
   ///
   /// Loads all test data configurations from a list of test names.
-  /// Uses PathProvider to determine base directory.
+  /// Uses same directory resolution as LoadTestData.
   ///
   /// @param test_names Vector of test names to load
-  /// @param subdirectory Optional subdirectory within data directory
+  /// @param subdirectory Test executable directory name (e.g., "components", "logic")
   /// @return Vector of TestDataConfig pointers or FailInfo on error
   /////////////////////////////////////////////////
   std::expected<std::vector<const TestDataConfig *>, FailInfo>

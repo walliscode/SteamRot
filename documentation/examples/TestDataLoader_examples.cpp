@@ -18,7 +18,7 @@ TEST_CASE("Example: Load single test data file", "[example][data-driven]") {
   steamrot::tests::TestDataLoader loader;
   
   // Load a specific test data file from examples subdirectory
-  auto result = loader.LoadTestData("example_entity_configuration", "examples");
+  auto result = loader.LoadTestData("example_entity_configuration", "context");
   
   // Verify the load was successful
   REQUIRE(result.has_value());
@@ -54,13 +54,13 @@ TEST_CASE("Example: Load single test data file", "[example][data-driven]") {
 TEST_CASE("Example: Discover all test data in directory", "[example][data-driven]") {
   steamrot::tests::TestDataLoader loader;
   
-  // Discover all test data files in examples directory
-  auto discovery_result = loader.DiscoverTestDataFiles("examples");
+  // Discover all test data files in context directory
+  auto discovery_result = loader.DiscoverTestDataFiles("context");
   
   REQUIRE(discovery_result.has_value());
   const auto& test_names = discovery_result.value();
   
-  // We know examples directory has at least 2 test files
+  // We know context directory has at least 2 test files
   REQUIRE(test_names.size() >= 2);
   
   // Verify expected files are present
@@ -87,7 +87,7 @@ TEST_CASE("Example: Data-driven test using generator", "[example][data-driven]")
   steamrot::tests::TestDataLoader loader;
   
   // Discover all test data
-  auto discovery_result = loader.DiscoverTestDataFiles("examples");
+  auto discovery_result = loader.DiscoverTestDataFiles("context");
   REQUIRE(discovery_result.has_value());
   
   // Use GENERATE_COPY to run test for each discovered file
@@ -95,7 +95,7 @@ TEST_CASE("Example: Data-driven test using generator", "[example][data-driven]")
   
   SECTION(test_name) {
     // Load the configuration
-    auto config_result = loader.LoadTestData(test_name, "examples");
+    auto config_result = loader.LoadTestData(test_name, "context");
     REQUIRE(config_result.has_value());
     
     const auto* config = config_result.value();
@@ -131,7 +131,7 @@ TEST_CASE("Example: Load multiple test data files at once", "[example][data-driv
   };
   
   // Load all configurations
-  auto result = loader.LoadMultipleTestData(test_names, "examples");
+  auto result = loader.LoadMultipleTestData(test_names, "context");
   
   REQUIRE(result.has_value());
   const auto& configs = result.value();
@@ -165,7 +165,7 @@ TEST_CASE("Example: Load multiple test data files at once", "[example][data-driv
 TEST_CASE("Example: Use metadata to control test behavior", "[example][data-driven]") {
   steamrot::tests::TestDataLoader loader;
   
-  auto result = loader.LoadTestData("example_entity_configuration", "examples");
+  auto result = loader.LoadTestData("example_entity_configuration", "context");
   REQUIRE(result.has_value());
   
   const auto* config = result.value();
@@ -222,7 +222,7 @@ TEST_CASE("Example: Handle errors when loading test data", "[example][data-drive
   steamrot::tests::TestDataLoader loader;
   
   // Try to load a non-existent file
-  auto result = loader.LoadTestData("nonexistent_test", "examples");
+  auto result = loader.LoadTestData("nonexistent_test", "context");
   
   // Should fail gracefully
   REQUIRE_FALSE(result.has_value());
@@ -242,7 +242,7 @@ TEST_CASE("Example: Organize test data by subdirectory", "[example][data-driven]
   steamrot::tests::TestDataLoader loader;
   
   // Load from examples subdirectory
-  auto result = loader.LoadTestData("simple_metadata_only", "examples");
+  auto result = loader.LoadTestData("simple_metadata_only", "context");
   REQUIRE(result.has_value());
   
   // Future: could have component-specific test data

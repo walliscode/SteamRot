@@ -36,17 +36,23 @@ char *TestDataLoader::LoadBinaryData(const std::filesystem::path &file_path) con
 std::filesystem::path
 TestDataLoader::GetTestDataPath(const std::string &test_name,
                                 const std::string &subdirectory) const {
-  // Get the data directory (already returns tests/data in Test environment)
+  // Get the data directory (returns tests/data in Test environment)
   auto data_dir_result = m_path_provider.GetDataDirectory();
   if (!data_dir_result.has_value()) {
     return std::filesystem::path();
   }
 
-  std::filesystem::path base_path = data_dir_result.value();
-
-  // Add subdirectory if provided
+  // Base path is tests/
+  std::filesystem::path tests_path = data_dir_result.value().parent_path();
+  
+  std::filesystem::path base_path;
+  
+  // If subdirectory provided, look in tests/<subdirectory>/data/
+  // Otherwise, look in tests/data/ for backward compatibility
   if (!subdirectory.empty()) {
-    base_path /= subdirectory;
+    base_path = tests_path / subdirectory / "data";
+  } else {
+    base_path = data_dir_result.value();
   }
 
   // Construct the full path with .test_data.bin extension
@@ -96,17 +102,23 @@ TestDataLoader::LoadTestData(const std::string &test_name,
 std::expected<std::vector<std::string>, FailInfo>
 TestDataLoader::DiscoverTestDataFiles(const std::string &subdirectory) const {
 
-  // Get the data directory (already returns tests/data in Test environment)
+  // Get the data directory (returns tests/data in Test environment)
   auto data_dir_result = m_path_provider.GetDataDirectory();
   if (!data_dir_result.has_value()) {
     return std::unexpected(data_dir_result.error());
   }
 
-  std::filesystem::path search_path = data_dir_result.value();
-
-  // Add subdirectory if provided
+  // Base path is tests/
+  std::filesystem::path tests_path = data_dir_result.value().parent_path();
+  
+  std::filesystem::path search_path;
+  
+  // If subdirectory provided, look in tests/<subdirectory>/data/
+  // Otherwise, look in tests/data/ for backward compatibility
   if (!subdirectory.empty()) {
-    search_path /= subdirectory;
+    search_path = tests_path / subdirectory / "data";
+  } else {
+    search_path = data_dir_result.value();
   }
 
   // Check if directory exists

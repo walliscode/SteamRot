@@ -27,18 +27,40 @@ Test data files use the `.test_data.json` suffix for easy identification:
 
 ## Directory Structure
 
-Test data files are organized in subdirectories matching the test structure:
+Test data files are organized within each test executable's directory:
 
 ```
-tests/data/
-├── examples/              # Example test data files
-│   ├── example_entity_configuration.test_data.json
-│   └── simple_metadata_only.test_data.json
-├── components/            # Component-specific test data
-├── entity/                # Entity-specific test data
-├── logic/                 # Logic-specific test data
-└── integration/           # Integration test data
+tests/
+├── components/
+│   ├── data/                           # Component test data
+│   │   ├── component_test_1.test_data.json
+│   │   └── component_test_2.test_data.json
+│   ├── CMakeLists.txt
+│   └── *.test.cpp
+├── entity/
+│   ├── data/                           # Entity test data
+│   │   └── entity_test.test_data.json
+│   ├── CMakeLists.txt
+│   └── *.test.cpp
+├── logic/
+│   ├── data/                           # Logic test data
+│   ├── CMakeLists.txt
+│   └── *.test.cpp
+├── context/
+│   ├── data/                           # Test infrastructure examples
+│   │   ├── example_entity_configuration.test_data.json
+│   │   └── simple_metadata_only.test_data.json
+│   ├── CMakeLists.txt
+│   └── *.cpp
+└── integration/
+    ├── scene_change/
+    │   ├── data/                       # Scene change test data
+    │   ├── CMakeLists.txt
+    │   └── *.test.cpp
+    └── ...
 ```
+
+Each test executable directory can have its own `data/` subdirectory containing test data files specific to those tests.
 
 ## Schema Structure
 
@@ -118,7 +140,7 @@ table TestDataConfig {
 
 Test data JSON files are automatically compiled to binary during the build process:
 
-1. **Discovery**: CMake finds all `.test_data.json` files in `tests/data/`
+1. **Discovery**: CMake recursively searches for `data/` subdirectories in each test executable directory and finds all `.test_data.json` files
 2. **Compilation**: `flatc` compiles each JSON to `.test_data.bin`
 3. **Integration**: Compiled binaries are available for tests at runtime
 
@@ -136,7 +158,7 @@ TEST_CASE("Load test data", "[unit][data-driven]") {
   steamrot::tests::TestDataLoader loader;
   
   // Load a specific test data file
-  auto result = loader.LoadTestData("example_entity_configuration", "examples");
+  auto result = loader.LoadTestData("example_entity_configuration", "context");
   
   REQUIRE(result.has_value());
   const auto* config = result.value();
@@ -159,7 +181,7 @@ TEST_CASE("Discover test data files", "[unit][data-driven]") {
   steamrot::tests::TestDataLoader loader;
   
   // Find all test data files in a subdirectory
-  auto result = loader.DiscoverTestDataFiles("examples");
+  auto result = loader.DiscoverTestDataFiles("context");
   
   REQUIRE(result.has_value());
   const auto& test_names = result.value();
@@ -271,10 +293,10 @@ cmake --build --preset Debug
 
 ### 1. Organize by Test Category
 
-Place test data files in subdirectories matching the test structure:
-- `tests/data/components/` for component tests
-- `tests/data/logic/` for logic tests
-- `tests/data/integration/` for integration tests
+Place test data files in `data/` subdirectories within each test executable directory:
+- `tests/components/data/` for component tests
+- `tests/logic/data/` for logic tests
+- `tests/integration/scene_change/data/` for integration tests
 
 ### 2. Use Descriptive Names
 
@@ -316,7 +338,7 @@ Leverage existing FlatBuffers tables (EntityCollection, etc.) instead of duplica
 1. **Create Test Data JSON**
 
 ```bash
-# tests/data/components/new_component_default_values.test_data.json
+# tests/components/data/new_component_default_values.test_data.json
 {
   "metadata": {
     "test_name": "new_component_default_values",
@@ -386,7 +408,7 @@ All can be added by extending `TestDataConfig` with new optional fields.
 
 **Solution**: 
 - Check file naming: must end with `.test_data.json`
-- Check file location: should be in `tests/data/<subdirectory>/`
+- Check file location: should be in `tests/<test_executable_dir>/data/`
 - Rebuild project to ensure binary was generated
 
 ### Parse Error
@@ -411,5 +433,5 @@ All can be added by extending `TestDataConfig` with new optional fields.
 
 - **Testing Improvement Plan**: `documentation/TESTING_IMPROVEMENT_PLAN.md`
 - **FlatBuffers Schema**: `src/flatbuffers_headers/test_data.fbs`
-- **Example Files**: `tests/data/examples/`
+- **Example Files**: `tests/context/data/`
 - **TestDataLoader**: `tests/context/TestDataLoader.h`

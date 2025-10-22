@@ -28,7 +28,7 @@ These are demonstration files showing patterns and usage. To use them in your ow
 
 Note: These files are in `documentation/examples/` for reference only. They are not compiled as part of the test suite. To use the patterns:
 
-1. Create your test data JSON files in `tests/data/<subdirectory>/`
+1. Create your test data JSON files in `tests/<test_executable_dir>/data/`
 2. Build the project to compile JSON to binary
 3. Use TestDataLoader in your tests following these patterns
 
@@ -37,7 +37,7 @@ Note: These files are in `documentation/examples/` for reference only. They are 
 ### 1. Create Test Data JSON
 
 ```json
-// tests/data/my_tests/my_test.test_data.json
+// tests/components/data/my_test.test_data.json
 {
   "metadata": {
     "test_name": "my_test",
@@ -64,7 +64,7 @@ This compiles `my_test.test_data.json` → `my_test.test_data.bin`
 
 TEST_CASE("My test", "[unit]") {
   steamrot::tests::TestDataLoader loader;
-  auto result = loader.LoadTestData("my_test", "my_tests");
+  auto result = loader.LoadTestData("my_test", "components");
   REQUIRE(result.has_value());
   
   const auto* config = result.value();
@@ -76,5 +76,5 @@ TEST_CASE("My test", "[unit]") {
 
 - **Complete Documentation**: `documentation/TEST_DATA_CONFIGURATION.md`
 - **Schema**: `src/flatbuffers_headers/test_data.fbs`
-- **Example Data**: `tests/data/examples/`
+- **Example Data**: `tests/context/data/`
 - **TestDataLoader**: `tests/context/TestDataLoader.h`

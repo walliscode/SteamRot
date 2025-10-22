@@ -509,12 +509,12 @@ duplication.
    - Automatic compilation to `.test_data.bin`
 
 4. **CMake Integration** (`cmake/CompileTestData.cmake`):
-   - Automatic discovery of all `.test_data.json` files
-   - Compilation to binary during build process
+   - Recursive discovery of `data/` subdirectories in test executable directories
+   - Automatic compilation of all `.test_data.json` files to binary
    - Proper dependency management with FlatBuffers headers
    - Custom target `compile_test_data` for building test data
 
-5. **Example Test Data Files** (`tests/data/examples/`):
+5. **Example Test Data Files** (`tests/context/data/`):
    - `example_entity_configuration.test_data.json` - Entity collection example
    - `simple_metadata_only.test_data.json` - Minimal metadata example
    - Demonstrates extensibility and various use cases
@@ -552,8 +552,8 @@ duplication.
 - `tests/context/TestDataLoader.h` (98 lines)
 - `tests/context/TestDataLoader.cpp` (153 lines)
 - `cmake/CompileTestData.cmake` (60 lines)
-- `tests/data/examples/example_entity_configuration.test_data.json`
-- `tests/data/examples/simple_metadata_only.test_data.json`
+- `tests/context/data/example_entity_configuration.test_data.json`
+- `tests/context/data/simple_metadata_only.test_data.json`
 - `documentation/TEST_DATA_CONFIGURATION.md` (400+ lines)
 
 **Documentation Updates**:

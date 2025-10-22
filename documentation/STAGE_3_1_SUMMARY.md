@@ -59,7 +59,7 @@ Created automatic compilation system:
 Established clear naming pattern:
 - Source: `<name>.test_data.json`
 - Compiled: `<name>.test_data.bin`
-- Location: `tests/data/<subdirectory>/`
+- Location: `tests/<test_executable_dir>/data/`
 
 Benefits:
 - Easy identification by CMake/flatc
@@ -68,7 +68,7 @@ Benefits:
 
 ### 5. Example Test Data Files
 
-Created two demonstration files in `tests/data/examples/`:
+Created two demonstration files in `tests/context/data/`:
 
 1. **example_entity_configuration.test_data.json**
    - Shows entity collection usage
@@ -282,7 +282,7 @@ When building locally, verify:
 
 2. **Test Data Compilation**
    ```bash
-   # Check: tests/data/examples/*.test_data.bin files created
+   # Check: tests/context/data/*.test_data.bin files created
    ```
 
 3. **TestDataLoader Compilation**

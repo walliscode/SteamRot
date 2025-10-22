@@ -1121,7 +1121,7 @@ See `documentation/TEST_DATA_CONFIGURATION.md` for complete documentation.
 #### 1. Create Test Data JSON
 
 ```json
-// tests/data/components/my_test.test_data.json
+// tests/components/data/my_test.test_data.json
 {
   "metadata": {
     "test_name": "my_component_test",
@@ -1177,7 +1177,7 @@ TEST_CASE("Load and use test data", "[unit][data-driven]") {
 
 - **JSON files**: `<test_name>.test_data.json`
 - **Compiled binaries**: `<test_name>.test_data.bin` (auto-generated)
-- **Location**: `tests/data/<subdirectory>/`
+- **Location**: `tests/<test_executable_dir>/data/`
 
 ### Key Features
 
