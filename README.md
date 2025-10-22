@@ -954,22 +954,27 @@ SteamRot uses Catch2 for testing with a clear test taxonomy to distinguish betwe
 
 ```
 tests/
-├── unit/                    # Unit tests (isolated, future location)
+├── unit/                    # Unit tests organized by subsystem
+│   ├── assets/
+│   ├── components/
+│   ├── data_handlers/
+│   ├── display/
+│   ├── entity/
+│   ├── events/
+│   ├── logic/
+│   ├── scenes/
+│   ├── systems/
+│   └── user_interface/
 ├── integration/             # Integration tests (2+ components)
 │   └── scene_change/
-├── system/                  # End-to-end tests (future location)
-├── perf/                    # Performance tests (future location)
+├── system/                  # End-to-end tests (future)
+├── perf/                    # Performance tests (future)
 │   └── benchmarks/
 ├── data/                    # Test data files
-├── context/                 # Test utilities (TestContext, helpers)
-├── components/              # Component tests (current location)
-├── entity/                  # Entity system tests (current location)
-├── logic/                   # Logic class tests (current location)
-├── scenes/                  # Scene tests (current location)
-└── ...                      # Other subsystem tests
+└── context/                 # Test utilities (TestContext, helpers)
 ```
 
-**Note**: The new `unit/`, `system/`, and `perf/` directories are reserved for future tests. Existing tests remain in their current subsystem-based locations for now and will be migrated opportunistically.
+**Note**: All unit tests have been migrated to the `unit/` directory and organized by subsystem. Integration tests are in `integration/` directory. System tests and performance tests directories are ready for future use.
 
 ### Test Classification
 
