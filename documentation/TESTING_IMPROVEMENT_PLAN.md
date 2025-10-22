@@ -451,6 +451,7 @@ duplication.
     the future
   - don't try and define all data we need now, just a system to easily add to as
     we go
+- **Status**: ✅ COMPLETE
 
 #### 3.2 Define where to find data for tests and how to load
 
@@ -461,6 +462,7 @@ duplication.
     the flatbuffers compiler can easily identify the files without the user
     having to specify each one
   - build on FlatbuffersDataLoader to load data in for testing
+- **Status**: ✅ COMPLETE
 
 #### 3.3 Build re-useable functions/objects
 
@@ -480,6 +482,84 @@ duplication.
     the json so we can isolate at will.
   - we don't need to end up with one cohesive function in one location, but we
     do want them to be reusable across various test executables.
+- **Status**: ⏸️ DEFERRED (foundation established, will be added as needed)
+
+### Implementation Status: COMPLETE ✅
+
+**Date Completed**: 2025-10-22
+
+**Changes Made**:
+
+1. **Created FlatBuffers Schema** (`src/flatbuffers_headers/test_data.fbs`):
+   - Extensible `TestMetadata` table with test information
+   - `TestDataConfig` root table designed for easy extension
+   - Supports entity collections with room to add more data types
+   - Version field for tracking data format changes
+
+2. **Created TestDataLoader** (`tests/context/TestDataLoader.h/cpp`):
+   - Extends DataLoader pattern for consistency
+   - `LoadTestData()` - Load individual test configurations
+   - `DiscoverTestDataFiles()` - Auto-discover test data files
+   - `LoadMultipleTestData()` - Batch loading support
+   - Subdirectory organization support
+
+3. **File Naming Convention**: `.test_data.json` suffix
+   - Easy identification by flatc compiler
+   - Clear distinction from production data files
+   - Automatic compilation to `.test_data.bin`
+
+4. **CMake Integration** (`cmake/CompileTestData.cmake`):
+   - Automatic discovery of all `.test_data.json` files
+   - Compilation to binary during build process
+   - Proper dependency management with FlatBuffers headers
+   - Custom target `compile_test_data` for building test data
+
+5. **Example Test Data Files** (`tests/data/examples/`):
+   - `example_entity_configuration.test_data.json` - Entity collection example
+   - `simple_metadata_only.test_data.json` - Minimal metadata example
+   - Demonstrates extensibility and various use cases
+
+6. **Documentation** (`documentation/TEST_DATA_CONFIGURATION.md`):
+   - Comprehensive guide on using the test data system
+   - Examples for common scenarios
+   - Best practices and troubleshooting
+   - Clear workflow for adding new test data
+
+7. **Updated CMake Configuration**:
+   - Added `test_data.fbs` to schema compilation list
+   - Included `CompileTestData.cmake` in main CMakeLists.txt
+   - Added TestDataLoader to test_context library
+
+**Design Principles**:
+
+- **Extensible**: New data types can be added as optional fields
+- **Discoverable**: Automatic file discovery via naming convention
+- **Organized**: Subdirectory structure matches test organization
+- **Type-Safe**: FlatBuffers provides compile-time type checking
+- **Consistent**: Follows existing FlatbuffersDataLoader patterns
+- **Simple**: Minimal initial schema, grow as needed
+
+**Migration Notes**:
+
+- Test data infrastructure is ready for immediate use
+- Stage 3.3 (comparison/simulation functions) deferred to be added as needed
+- Examples provided demonstrate the extensibility
+- Future test data types can be added without breaking existing files
+
+**Files Created**:
+
+- `src/flatbuffers_headers/test_data.fbs` (50 lines)
+- `tests/context/TestDataLoader.h` (98 lines)
+- `tests/context/TestDataLoader.cpp` (153 lines)
+- `cmake/CompileTestData.cmake` (60 lines)
+- `tests/data/examples/example_entity_configuration.test_data.json`
+- `tests/data/examples/simple_metadata_only.test_data.json`
+- `documentation/TEST_DATA_CONFIGURATION.md` (400+ lines)
+
+**Documentation Updates**:
+
+- Created comprehensive TEST_DATA_CONFIGURATION.md guide
+- Updated TESTING_IMPROVEMENT_PLAN.md with Stage 3.1 completion
 
 ---
 

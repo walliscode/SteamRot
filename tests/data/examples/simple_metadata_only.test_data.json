@@ -1,0 +1,9 @@
+{
+  "metadata": {
+    "test_name": "simple_metadata_only",
+    "description": "Minimal test data with only metadata - demonstrates extensibility",
+    "tags": ["unit", "minimal"],
+    "expected_to_pass": true,
+    "version": 1
+  }
+}
