@@ -337,4 +337,98 @@ FlatbuffersConfigurator::ConfigureComponent(
 
   return std::monostate{};
 }
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+FlatbuffersConfigurator::ConfigureEntitiesFromCollection(
+    EntityMemoryPool &entity_memory_pool,
+    const EntityCollection *entity_collection) {
+
+  // check the list of entities is not empty
+  if (!entity_collection || entity_collection->entities()->empty()) {
+    FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
+                       "Entity data not found in the collection."};
+    return std::unexpected(fail_info);
+  }
+
+  // check that the entity memory pool size has been added
+  if (!entity_collection->entity_memory_pool_size()) {
+    FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
+                       "No entity memory pool size found in the entity collection."};
+    return std::unexpected(fail_info);
+  }
+
+  // resize the entity memory pool to the size specified in the flatbuffers
+  size_t pool_size = entity_collection->entity_memory_pool_size();
+
+  std::apply(
+      [pool_size](auto &...component_vector) {
+        (component_vector.resize(pool_size), ...);
+      },
+      entity_memory_pool);
+
+  // some helper values
+  size_t entity_count = entity_collection->entities()->size();
+  // check the entity memory pool is big enough
+  if (entity::memory::GetMemoryPoolSize(entity_memory_pool) < entity_count) {
+    std::string fail_msg = std::format(
+        "Entity memory pool size: {}, required size: {}",
+        entity::memory::GetMemoryPoolSize(entity_memory_pool), entity_count);
+
+    FailInfo fail_info{FailMode::ParameterOutOfBounds, fail_msg};
+    return std::unexpected(fail_info);
+  }
+
+  // configure entities from the flatbuffers data
+  for (size_t i = 0; i < entity_count; ++i) {
+    const EntityData *entity_data = entity_collection->entities()->Get(i);
+
+    if (entity_data == nullptr) {
+      continue; // Skip null entities
+    }
+
+    // CUserInterface component configuration
+    if (entity_data->c_user_interface()) {
+      auto configure_result = ConfigureComponent(
+          entity_data->c_user_interface(),
+          entity::memory::GetComponent<CUserInterface>(i, entity_memory_pool));
+
+      if (!configure_result.has_value())
+        return std::unexpected(configure_result.error());
+    }
+
+    // CGrimoireMachina component configuration
+    if (entity_data->c_grimoire_machina()) {
+      auto configure_result = ConfigureComponent(
+          entity_data->c_grimoire_machina(),
+          entity::memory::GetComponent<CGrimoireMachina>(i, entity_memory_pool));
+
+      if (!configure_result.has_value())
+        return std::unexpected(configure_result.error());
+    }
+  }
+
+  // Configure compound components after simpler components
+  // CUIState needs to reference CUserInterface components by name
+  for (size_t i = 0; i < entity_count; ++i) {
+    const EntityData *entity_data = entity_collection->entities()->Get(i);
+
+    if (entity_data == nullptr) {
+      continue; // Skip null entities
+    }
+
+    // CUIState component configuration (compound component)
+    if (entity_data->c_ui_state()) {
+      auto configure_result = ConfigureComponent(
+          entity_data->c_ui_state(),
+          entity::memory::GetComponent<CUIState>(i, entity_memory_pool),
+          entity_memory_pool);
+
+      if (!configure_result.has_value())
+        return std::unexpected(configure_result.error());
+    }
+  }
+
+  return std::monostate{};
+}
 } // namespace steamrot

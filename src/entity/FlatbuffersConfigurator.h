@@ -92,6 +92,16 @@ public:
   std::expected<std::monostate, FailInfo>
   ConfigureEntitiesFromDefaultData(EntityMemoryPool &entity_memory_pool,
                                    const SceneType scene_type);
+
+  /////////////////////////////////////////////////
+  /// @brief Configure entities from an EntityCollection (for testing)
+  ///
+  /// @param entity_memory_pool EntityMemoryPool to configure
+  /// @param entity_collection EntityCollection containing entity data
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ConfigureEntitiesFromCollection(EntityMemoryPool &entity_memory_pool,
+                                  const EntityCollection *entity_collection);
 };
 
 } // namespace steamrot
