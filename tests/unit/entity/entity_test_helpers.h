@@ -14,7 +14,13 @@
 #include "CUserInterface.h"
 #include "containers.h"
 #include "grimoire_machina_generated.h"
+#include "test_data_generated.h"
 #include "user_interface_generated.h"
+
+namespace steamrot {
+class FlatbuffersConfigurator;
+}
+
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
@@ -91,4 +97,21 @@ void TestArchetypesOfConfiguredEMPfromDefaultData(
 /////////////////////////////////////////////////
 void CompareEntityMemoryPools(const EntityMemoryPool &actual,
                               const EntityMemoryPool &expected);
+
+/////////////////////////////////////////////////
+/// @brief Wrapper function to run EMP comparison tests based on TestDataConfig
+///
+/// This function examines the TestDataConfig and runs appropriate tests based
+/// on what data is present:
+/// - If start_entity_collection and expected_entity_collection are present,
+///   creates both pools and compares them
+/// - If only entity_collection is present, uses the old behavior
+/// - If start_entity_collection is not present, starts with default-constructed pool
+///
+/// @param config The test data configuration to process
+/// @param configurator FlatbuffersConfigurator instance for configuring pools
+/////////////////////////////////////////////////
+void RunEMPComparisonTest(const TestDataConfig *config,
+                          FlatbuffersConfigurator &configurator);
+
 } // namespace steamrot::tests

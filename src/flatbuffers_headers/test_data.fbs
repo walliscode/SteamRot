@@ -39,8 +39,15 @@ table TestDataConfig {
   /// @brief Metadata about this test case
   metadata: TestMetadata (required);
   
-  /// @brief Optional entity collection for entity-based tests
+  /// @brief Optional entity collection for entity-based tests (deprecated, use start_entity_collection)
   entity_collection: EntityCollection;
+  
+  /// @brief Starting state entity collection for comparison tests
+  /// If not provided, defaults to default-constructed EntityMemoryPool
+  start_entity_collection: EntityCollection;
+  
+  /// @brief Expected state entity collection for comparison tests
+  expected_entity_collection: EntityCollection;
   
   /// @brief Reserved for future test data types
   /// Can be extended with additional fields like:
