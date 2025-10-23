@@ -31,8 +31,8 @@ function(compile_test_data_file json_file schema_file)
   set(TEST_DATA_BINARIES ${TEST_DATA_BINARIES} "${binary_file}" PARENT_SCOPE)
 endfunction()
 
-# Find all data/ directories within tests/ subdirectories
-file(GLOB test_subdirectories "${CMAKE_SOURCE_DIR}/tests/*/")
+# Find all data/ directories within tests/ subdirectories (including nested)
+file(GLOB_RECURSE all_data_dirs "${CMAKE_SOURCE_DIR}/tests/*/data")
 
 # List to accumulate all binary files
 set(TEST_DATA_BINARIES "")
@@ -40,20 +40,14 @@ set(TEST_DATA_BINARIES "")
 # Path to the test_data.fbs schema
 set(test_data_schema "${CMAKE_SOURCE_DIR}/src/flatbuffers_headers/test_data.fbs")
 
-# Recursively search for .test_data.json files in each test subdirectory's data/ folder
-foreach(test_subdir ${test_subdirectories})
-  # Check if a data/ subdirectory exists
-  if(IS_DIRECTORY "${test_subdir}/data")
-    # Find all .test_data.json files in this data directory and its subdirectories
-    file(GLOB_RECURSE test_data_json_files 
-      "${test_subdir}/data/*.test_data.json"
-    )
-    
-    # Compile each test data file found
-    foreach(json_file ${test_data_json_files})
-      compile_test_data_file(${json_file} ${test_data_schema})
-    endforeach()
-  endif()
+# Find all .test_data.json files in all data directories
+file(GLOB_RECURSE test_data_json_files 
+  "${CMAKE_SOURCE_DIR}/tests/**/data/*.test_data.json"
+)
+
+# Compile each test data file found
+foreach(json_file ${test_data_json_files})
+  compile_test_data_file(${json_file} ${test_data_schema})
 endforeach()
 
 # Create a custom target that depends on all compiled test data

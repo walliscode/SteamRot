@@ -1,200 +1,153 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Unit tests for entity test helper functions
+/// @brief Unit tests for entity test helper functions using data-driven approach
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
 #include "entity_test_helpers.h"
+#include "FlatbuffersConfigurator.h"
+#include "TestContext.h"
+#include "TestDataLoader.h"
 #include "entity_memory.h"
 #include "containers.h"
-#include "CMeta.h"
-#include "CUserInterface.h"
-#include "CMachinaForm.h"
-#include "CGrimoireMachina.h"
-#include "CUIState.h"
+#include "UIElementFactory.h"
 #include <catch2/catch_test_macros.hpp>
 
+/////////////////////////////////////////////////
+/// @brief Helper function to create and configure an EntityMemoryPool from test data
+///
+/// @param test_data_name Name of the test data file to load
+/// @param configurator FlatbuffersConfigurator instance to use
+/// @return Configured EntityMemoryPool
+/////////////////////////////////////////////////
+steamrot::EntityMemoryPool CreatePoolFromTestData(
+    const std::string &test_data_name,
+    steamrot::FlatbuffersConfigurator &configurator) {
+  
+  steamrot::tests::TestDataLoader loader;
+  
+  // Load test data
+  auto result = loader.LoadTestData(test_data_name, "unit/entity");
+  REQUIRE(result.has_value());
+  
+  const auto *config = result.value();
+  REQUIRE(config->entity_collection() != nullptr);
+  
+  // Get pool size from test data
+  size_t pool_size = config->entity_collection()->entity_memory_pool_size();
+  
+  // Create and resize entity memory pool
+  steamrot::EntityMemoryPool pool;
+  std::apply(
+      [pool_size](auto &...component_vector) {
+        (component_vector.resize(pool_size), ...);
+      },
+      pool);
+  
+  // Configure entities from the test data manually
+  const auto *entity_collection = config->entity_collection();
+  size_t entity_count = entity_collection->entities()->size();
+  
+  for (size_t i = 0; i < entity_count; ++i) {
+    const auto *entity_data = entity_collection->entities()->Get(i);
+    
+    // Configure CUserInterface if present
+    if (entity_data->c_user_interface()) {
+      auto &ui_component =
+          steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(i, pool);
+      
+      const auto *ui_data = entity_data->c_user_interface();
+      
+      // Set basic properties
+      ui_component.m_active = true;
+      if (ui_data->ui_name()) {
+        ui_component.m_name = ui_data->ui_name()->str();
+      }
+      ui_component.m_UI_visible = ui_data->start_visible();
+      
+      // Create root UI element if present
+      if (ui_data->root_ui_element()) {
+        steamrot::UIElementFactory factory;
+        auto element_result = factory.CreateUIElement(ui_data->root_ui_element());
+        if (element_result.has_value()) {
+          ui_component.m_root_element = std::move(element_result.value());
+        }
+      }
+    }
+    
+    // Configure CGrimoireMachina if present
+    if (entity_data->c_grimoire_machina()) {
+      auto &grimoire_component =
+          steamrot::entity::memory::GetComponent<steamrot::CGrimoireMachina>(i, pool);
+      
+      grimoire_component.m_active = true;
+      
+      const auto *grimoire_data = entity_data->c_grimoire_machina();
+      
+      // Configure fragments if present
+      if (grimoire_data->fragments()) {
+        // Fragment configuration would go here
+        // For now, just mark as active
+      }
+    }
+  }
+  
+  return pool;
+}
+
 TEST_CASE("CompareEntityMemoryPools detects equal pools",
-          "[unit][entity_test_helpers]") {
+          "[unit][entity_test_helpers][data-driven]") {
 
-  steamrot::EntityMemoryPool pool1;
-  steamrot::EntityMemoryPool pool2;
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::tests::TestContext test_context;
+  
+  // Create configurator with test environment
+  steamrot::FlatbuffersConfigurator configurator{
+      test_context.GetGameContext().event_handler};
 
-  // Initialize both pools with same number of entities
-  const size_t num_entities = 3;
+  // Create two identical pools from the same test data
+  auto pool1 = CreatePoolFromTestData("pool_comparison_equal", configurator);
+  auto pool2 = CreatePoolFromTestData("pool_comparison_equal", configurator);
 
-  // Add components to pool1
-  auto &cmeta_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMeta>(pool1);
-  cmeta_vec1.resize(num_entities);
-
-  auto &cui_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CUserInterface>(
-          pool1);
-  cui_vec1.resize(num_entities);
-
-  auto &cform_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
-          pool1);
-  cform_vec1.resize(num_entities);
-
-  auto &cgrim_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
-          pool1);
-  cgrim_vec1.resize(num_entities);
-
-  auto &cstate_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(pool1);
-  cstate_vec1.resize(num_entities);
-
-  // Add components to pool2 (same configuration)
-  auto &cmeta_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMeta>(pool2);
-  cmeta_vec2.resize(num_entities);
-
-  auto &cui_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CUserInterface>(
-          pool2);
-  cui_vec2.resize(num_entities);
-
-  auto &cform_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
-          pool2);
-  cform_vec2.resize(num_entities);
-
-  auto &cgrim_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
-          pool2);
-  cgrim_vec2.resize(num_entities);
-
-  auto &cstate_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(pool2);
-  cstate_vec2.resize(num_entities);
-
-  // This should pass without throwing
+  // This should pass without throwing - both pools are identical
   REQUIRE_NOTHROW(
       steamrot::tests::CompareEntityMemoryPools(pool1, pool2));
 }
 
 TEST_CASE("CompareEntityMemoryPools fails for different pool sizes",
-          "[unit][entity_test_helpers]") {
+          "[unit][entity_test_helpers][data-driven]") {
 
-  steamrot::EntityMemoryPool pool1;
-  steamrot::EntityMemoryPool pool2;
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::tests::TestContext test_context;
+  
+  // Create configurator with test environment
+  steamrot::FlatbuffersConfigurator configurator{
+      test_context.GetGameContext().event_handler};
 
-  // Initialize pools with different sizes
-  auto &cmeta_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMeta>(pool1);
-  cmeta_vec1.resize(5);
+  // Create pools with different sizes from different test data
+  auto pool1 = CreatePoolFromTestData("pool_comparison_equal", configurator);
+  auto pool2 = CreatePoolFromTestData("pool_comparison_different_size", configurator);
 
-  auto &cui_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CUserInterface>(
-          pool1);
-  cui_vec1.resize(5);
-
-  auto &cform_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
-          pool1);
-  cform_vec1.resize(5);
-
-  auto &cgrim_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
-          pool1);
-  cgrim_vec1.resize(5);
-
-  auto &cstate_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(pool1);
-  cstate_vec1.resize(5);
-
-  // pool2 with different size
-  auto &cmeta_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMeta>(pool2);
-  cmeta_vec2.resize(3);
-
-  auto &cui_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CUserInterface>(
-          pool2);
-  cui_vec2.resize(3);
-
-  auto &cform_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
-          pool2);
-  cform_vec2.resize(3);
-
-  auto &cgrim_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
-          pool2);
-  cgrim_vec2.resize(3);
-
-  auto &cstate_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(pool2);
-  cstate_vec2.resize(3);
-
-  // This should throw/fail because the pools are different sizes
+  // This should throw/fail because the pools have different sizes
   REQUIRE_THROWS(
       steamrot::tests::CompareEntityMemoryPools(pool1, pool2));
 }
 
 TEST_CASE("CompareEntityMemoryPools fails for different component values",
-          "[unit][entity_test_helpers]") {
+          "[unit][entity_test_helpers][data-driven]") {
 
-  steamrot::EntityMemoryPool pool1;
-  steamrot::EntityMemoryPool pool2;
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::tests::TestContext test_context;
+  
+  // Create configurator with test environment
+  steamrot::FlatbuffersConfigurator configurator{
+      test_context.GetGameContext().event_handler};
 
-  // Initialize both pools with same number of entities
-  const size_t num_entities = 3;
-
-  // Set up pool1
-  auto &cmeta_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMeta>(pool1);
-  cmeta_vec1.resize(num_entities);
-  cmeta_vec1[0].m_active = true;  // Set different value
-
-  auto &cui_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CUserInterface>(
-          pool1);
-  cui_vec1.resize(num_entities);
-
-  auto &cform_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
-          pool1);
-  cform_vec1.resize(num_entities);
-
-  auto &cgrim_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
-          pool1);
-  cgrim_vec1.resize(num_entities);
-
-  auto &cstate_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(pool1);
-  cstate_vec1.resize(num_entities);
-
-  // Set up pool2 with different component values
-  auto &cmeta_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMeta>(pool2);
-  cmeta_vec2.resize(num_entities);
-  cmeta_vec2[0].m_active = false;  // Different from pool1
-
-  auto &cui_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CUserInterface>(
-          pool2);
-  cui_vec2.resize(num_entities);
-
-  auto &cform_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
-          pool2);
-  cform_vec2.resize(num_entities);
-
-  auto &cgrim_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
-          pool2);
-  cgrim_vec2.resize(num_entities);
-
-  auto &cstate_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(pool2);
-  cstate_vec2.resize(num_entities);
+  // Create pools with different component values from different test data
+  auto pool1 = CreatePoolFromTestData("pool_comparison_equal", configurator);
+  auto pool2 = CreatePoolFromTestData("pool_comparison_different_values", configurator);
 
   // This should throw/fail because component values differ
   REQUIRE_THROWS(
