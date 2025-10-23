@@ -250,10 +250,7 @@ table EntityData{
 }
 ```
 
-**Build to generate headers:**
-```bash
-cmake --build --preset Debug
-```
+**Note:** Building is done locally by the user. FlatBuffers headers are auto-generated during the build process.
 
 #### 4. Create ConfigureComponent Method (TDD approach)
 
@@ -346,13 +343,9 @@ add_executable(test_components
 
 **Update `tests/entity/FlatbuffersConfigurator.test.cpp`** for configuration testing
 
-#### 7. Build and Test
+#### 7. Testing
 
-```bash
-cmake --preset Debug  # Configure if not already done
-cmake --build --preset Debug
-ctest --preset Debug
-```
+**Note:** Building is done locally by the user. Agents should focus on code changes and tests will be run locally.
 
 #### Critical Points
 
@@ -412,10 +405,10 @@ Logic classes implement game system behaviors (collision, rendering, actions, mo
    - Update `CheckStaticLogicCollections()` for affected scenes
    - Verify count, order, and types with `dynamic_cast`
 
-6. **Build and Test**
-   - `cmake --preset Debug` (if not already configured)
-   - `cmake --build --preset Debug`
-   - `ctest --preset Debug -R logic`
+6. **Testing**
+   - Building is done locally by the user
+   - Focus on code implementation and test writing
+   - Tests will be run locally after changes are committed
 
 #### Detailed Workflow
 
@@ -802,13 +795,11 @@ TEST_CASE("Feature workflow", "[integration][feature_name]") {
 
 ### Running Tests
 
-**Using CMake Presets (Required):**
-```bash
-# Configure the project
-cmake --preset Debug
+**Note:** Building is done locally by the user. The following commands are for reference on how tests will be run locally.
 
-# Build the project
-cmake --build --preset Debug
+**Using CMake Presets (Reference):**
+```bash
+# Tests will be run locally after code changes
 
 # Run all tests
 ctest --preset Debug
@@ -842,23 +833,19 @@ See [TESTING_IMPROVEMENT_PLAN.md](../documentation/TESTING_IMPROVEMENT_PLAN.md) 
 - Enable testing with `enable_testing()`
 - **Uses CMake Presets** (see `CMakePresets.json`)
 
-### Build Commands (Using Presets)
+### Build Commands (Reference Only)
 
-**Always use CMake presets for configuration and building:**
+**Note:** Agents should NOT attempt to build. Building is done locally by the user. The following information is provided for reference only.
 
 ```bash
-# Configure with Debug preset
+# Configuration (if needed for understanding)
 cmake --preset Debug
 
-# Build with Debug preset
-cmake --build --preset Debug
+# Building (done locally by user, NOT by agents)
+# cmake --build --preset Debug
 
-# Configure and build with Release preset
-cmake --preset Release
-cmake --build --preset Release
-
-# Run workflow preset (configure + build + test)
-cmake --workflow --preset Debug
+# Testing (may be run to verify changes)
+ctest --preset Debug
 ```
 
 ### Available Presets
@@ -870,9 +857,9 @@ cmake --workflow --preset Debug
 - `test_data_dir`: `${CMAKE_SOURCE_DIR}/tests/data`
 
 ### Important Notes
-- **DO NOT** use `cmake -B build -S .` - use `cmake --preset Debug` instead
-- **DO NOT** use `cmake --build build` - use `cmake --build --preset Debug` instead
-- Presets ensure consistent compiler settings and build configurations
+- **Agents should NOT build** - Building is done locally by the user
+- CMake presets are used for configuration and building (done locally)
+- Focus on making code changes and writing tests
 
 ## When Updating README
 
@@ -1076,9 +1063,9 @@ When implementing new features:
 3. **Use domain assertions** for clear test intent
 4. **Use mixins/base classes** to reduce boilerplate
 5. **Tag tests appropriately** with `[unit]`, `[integration]`, or `[system]`
-6. **Run tests frequently** after each change
-7. **Keep tests independent** - no shared state between tests
-8. **Test edge cases** - boundary conditions and errors
+6. **Keep tests independent** - no shared state between tests
+7. **Test edge cases** - boundary conditions and errors
+8. **Note:** Building and test execution done locally by user
 
 ### Example TDD Workflow
 
@@ -1095,12 +1082,11 @@ TEST_CASE("NewComponent defaults", "[unit][NewComponent]") {
   REQUIRE(c.m_value == 0);
 }
 
-// 2. Run test (will fail)
-// 3. Implement minimal component
-// 4. Run test (should pass)
-// 5. Add to ComponentRegister
-// 6. Create FlatBuffers schema (with tests)
-// 7. Implement configurator (with tests)
+// 2. Implement minimal component
+// 3. Add to ComponentRegister
+// 4. Create FlatBuffers schema
+// 5. Implement configurator (with tests)
+// Note: Building and testing done locally by user
 ```
 
 **Adding a new Logic:**
@@ -1113,10 +1099,9 @@ class NewLogicTest : public LogicTestBase<NewLogic> {
   }
 };
 
-// 2. Run test (will fail)
-// 3. Implement minimal Logic
-// 4. Run test (should pass)
-// 5. Add to LogicFactory (with tests)
+// 2. Implement minimal Logic
+// 3. Add to LogicFactory (with tests)
+// Note: Building and testing done locally by user
 ```
 
 ## Test Data Configuration System (Stage 3.1)
@@ -1156,11 +1141,9 @@ See `documentation/TEST_DATA_CONFIGURATION.md` for complete documentation.
 }
 ```
 
-#### 2. Build Project (compiles JSON to binary)
+#### 2. Build Project (done locally)
 
-```bash
-cmake --build --preset Debug
-```
+**Note:** Building is done locally by the user. FlatBuffers compilation from JSON to binary happens during the build process.
 
 #### 3. Use TestDataLoader in Tests
 
@@ -1225,7 +1208,7 @@ To extend the schema with new data types:
 
 1. **Create FlatBuffers schema** for new data
 2. **Update `test_data.fbs`** with new optional field
-3. **Rebuild project** to generate headers
+3. **Build happens locally** - Headers will be generated during local build
 4. **Use in JSON** test data files
 
 Example:
@@ -1293,5 +1276,5 @@ When working as a GitHub Copilot agent:
 6. **Maintain consistency** with existing code patterns
 7. **Use visual dividers** (`////////////////////////////////////////////////////////////`) as shown in existing code
 8. **Document with Doxygen** style comments
-9. **Test incrementally** - build and test after each change
+9. **Do NOT attempt to build** - building is done locally by the user
 10. **Keep changes minimal** - don't refactor unless necessary
