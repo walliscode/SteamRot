@@ -11,7 +11,9 @@
 #include "CUserInterface.h"
 #include "FlatbuffersDataLoader.h"
 #include "catch2/catch_test_macros.hpp"
+#include "catch2/matchers/catch_matchers.hpp"
 #include "entity_memory.h"
+#include "entity_memory_pool_matchers.h"
 #include "entities_generated.h"
 #include "scenes_generated.h"
 #include "ui_element_factory_test_helpers.h"
@@ -197,5 +199,11 @@ void TestArchetypesOfConfiguredEMPfromDefaultData(
 
   // compare the expected archetypes with the actual ones
   REQUIRE(archetypes == expected_archetypes);
+}
+
+/////////////////////////////////////////////////
+void CompareEntityMemoryPools(const EntityMemoryPool &actual,
+                              const EntityMemoryPool &expected) {
+  REQUIRE_THAT(actual, EqualsEntityMemoryPool(expected));
 }
 } // namespace steamrot::tests

@@ -2,8 +2,7 @@ add_executable(test_entity
   EntityManager.test.cpp
   ArchetypeManager.test.cpp
   FlatbuffersConfigurator.test.cpp
-
-
+  entity_test_helpers.test.cpp
 )
 
 target_include_directories(test_entity

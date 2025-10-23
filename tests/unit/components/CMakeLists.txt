@@ -18,6 +18,7 @@ PRIVATE
   Catch2::Catch2WithMain
   components
   entity
+  entity_helpers
 )
 
 catch_discover_tests(test_components)

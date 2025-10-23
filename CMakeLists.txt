@@ -28,16 +28,16 @@ endif()
 
 # set the cmake module path (for import libraries and other cmake files)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/FetchContentModules")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/FlatbuffersCompilation")
 
 # set project wide variables
 cmake_path(SET data_dir ${CMAKE_SOURCE_DIR}/data)
 cmake_path(SET test_data_dir ${CMAKE_SOURCE_DIR}/tests/data)
 
-# Include test data compilation script
-include(${CMAKE_SOURCE_DIR}/cmake/CompileTestData.cmake)
+# Include flatbuffers compilation scripts
+include(flatbuffers_compilation)
 
 # fetch_content_modules.cmake contains a menu list of all fetch content
-# scripts to include. to keep top level cmake tidier
 include(fetch_content_modules)
 
 add_subdirectory(steamrot)

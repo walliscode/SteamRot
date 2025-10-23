@@ -82,4 +82,13 @@ void TestArchetypesOfUnconfiguredEMP(
 void TestArchetypesOfConfiguredEMPfromDefaultData(
     const std::unordered_map<ArchetypeID, Archetype> &archetypes,
     const SceneType scene_type);
+
+/////////////////////////////////////////////////
+/// @brief Compares two EntityMemoryPool instances and fails if they don't match
+///
+/// @param actual The actual EntityMemoryPool to compare
+/// @param expected The expected EntityMemoryPool to compare against
+/////////////////////////////////////////////////
+void CompareEntityMemoryPools(const EntityMemoryPool &actual,
+                              const EntityMemoryPool &expected);
 } // namespace steamrot::tests
