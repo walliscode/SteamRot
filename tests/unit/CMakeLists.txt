@@ -2,6 +2,9 @@
 # Unit tests test individual classes/functions in isolation with mocked dependencies
 # Run with: ctest -L unit
 
+# Test utilities (matchers, helpers)
+add_subdirectory(matchers)
+
 # Unit tests organized by subsystem
 add_subdirectory(assets)
 add_subdirectory(components)

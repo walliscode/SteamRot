@@ -11,7 +11,8 @@
 #include "CMeta.h"
 #include "CUIState.h"
 #include "CUserInterface.h"
-#include "component_matchers.h"
+#include "cmeta_matchers.h"
+#include "cuser_interface_matchers.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("CMeta equality operator works correctly",
