@@ -1,30 +1,21 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Unit tests for TestDataGenerator utilities
+/// @brief Unit tests for test data generator utilities
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "TestDataGenerator.h"
+#include "test_data_generator.h"
 #include "TestDataLoader.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/generators/catch_generators_range.hpp>
 
-TEST_CASE("DiscoverTestDataJsonFiles finds JSON files in directory",
+TEST_CASE("discover_test_data_json_files finds JSON files in adjacent data directory",
           "[unit][data_generators]") {
   
-  // Get path to our test data directory
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  auto data_dir_result = path_provider.GetDataDirectory();
-  REQUIRE(data_dir_result.has_value());
-
-  // Construct path to data_generators/data directory
-  auto tests_path = data_dir_result.value().parent_path();
-  auto data_generators_data_path = tests_path / "data_generators" / "data";
-
-  auto result = steamrot::tests::DiscoverTestDataJsonFiles(data_generators_data_path);
+  auto result = steamrot::tests::discover_test_data_json_files();
   
   REQUIRE(result.has_value());
   const auto &json_files = result.value();
@@ -38,20 +29,10 @@ TEST_CASE("DiscoverTestDataJsonFiles finds JSON files in directory",
   }
 }
 
-TEST_CASE("DiscoverTestDataJsonFiles returns error for non-existent directory",
+TEST_CASE("get_test_names_for_generator returns test names",
           "[unit][data_generators]") {
   
-  std::filesystem::path non_existent_path = "/non/existent/path";
-  auto result = steamrot::tests::DiscoverTestDataJsonFiles(non_existent_path);
-  
-  REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().m_fail_mode == steamrot::FailMode::FileNotFound);
-}
-
-TEST_CASE("GetTestNamesForGenerator returns test names from subdirectory",
-          "[unit][data_generators]") {
-  
-  auto result = steamrot::tests::GetTestNamesForGenerator("data_generators");
+  auto result = steamrot::tests::get_test_names_for_generator();
   
   REQUIRE(result.has_value());
   const auto &test_names = result.value();
@@ -66,10 +47,10 @@ TEST_CASE("GetTestNamesForGenerator returns test names from subdirectory",
   }
 }
 
-TEST_CASE("LoadTestDataForGenerator loads TestDataConfig objects",
+TEST_CASE("load_test_data_for_generator loads TestDataConfig objects",
           "[unit][data_generators]") {
   
-  auto result = steamrot::tests::LoadTestDataForGenerator("data_generators");
+  auto result = steamrot::tests::load_test_data_for_generator();
   
   REQUIRE(result.has_value());
   const auto &configs = result.value();
@@ -85,11 +66,11 @@ TEST_CASE("LoadTestDataForGenerator loads TestDataConfig objects",
   }
 }
 
-TEST_CASE("TestDataGenerator works with Catch2 GENERATE for test names",
+TEST_CASE("test data generator works with Catch2 GENERATE for test names",
           "[unit][data_generators]") {
   
   // Discover test names
-  auto test_names_result = steamrot::tests::GetTestNamesForGenerator("data_generators");
+  auto test_names_result = steamrot::tests::get_test_names_for_generator();
   REQUIRE(test_names_result.has_value());
   
   // Use Catch2 generator to iterate through test names
@@ -110,11 +91,11 @@ TEST_CASE("TestDataGenerator works with Catch2 GENERATE for test names",
   REQUIRE(metadata_name == test_name);
 }
 
-TEST_CASE("TestDataGenerator works with Catch2 GENERATE for TestDataConfig objects",
+TEST_CASE("test data generator works with Catch2 GENERATE for TestDataConfig objects",
           "[unit][data_generators]") {
   
   // Load all test data configs
-  auto configs_result = steamrot::tests::LoadTestDataForGenerator("data_generators");
+  auto configs_result = steamrot::tests::load_test_data_for_generator();
   REQUIRE(configs_result.has_value());
   
   // Use Catch2 generator to iterate through configs
@@ -133,39 +114,16 @@ TEST_CASE("TestDataGenerator works with Catch2 GENERATE for TestDataConfig objec
   }
 }
 
-TEST_CASE("TestDataGenerator handles subdirectory parameter correctly",
-          "[unit][data_generators]") {
-  
-  SECTION("Valid subdirectory returns results") {
-    auto result = steamrot::tests::GetTestNamesForGenerator("data_generators");
-    REQUIRE(result.has_value());
-    REQUIRE(result.value().size() >= 3);
-  }
-  
-  SECTION("Empty subdirectory uses tests/data") {
-    // This should work if there are files in tests/data, otherwise fail
-    auto result = steamrot::tests::GetTestNamesForGenerator("");
-    // Result depends on whether tests/data exists and has files
-    // We just verify the function doesn't crash
-    REQUIRE(true);
-  }
-  
-  SECTION("Non-existent subdirectory returns error") {
-    auto result = steamrot::tests::GetTestNamesForGenerator("non_existent_subdir_xyz");
-    REQUIRE_FALSE(result.has_value());
-  }
-}
-
-TEST_CASE("Sample test demonstrates full workflow with generators",
+TEST_CASE("sample test demonstrates full workflow with generators",
           "[unit][data_generators]") {
   
   // This test demonstrates the complete intended workflow:
-  // 1. Discover test data files in a directory
+  // 1. Discover test data files in adjacent data directory
   // 2. Load them as TestDataConfig objects
   // 3. Use them with Catch2 generators
   
   // Step 1: Get test names
-  auto test_names_result = steamrot::tests::GetTestNamesForGenerator("data_generators");
+  auto test_names_result = steamrot::tests::get_test_names_for_generator();
   REQUIRE(test_names_result.has_value());
   
   // Step 2 & 3: Generate test cases for each test name

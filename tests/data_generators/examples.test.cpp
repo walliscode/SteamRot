@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Example demonstrating practical usage of TestDataGenerator in a real test scenario
+/// @brief Example demonstrating practical usage of test data generators in a real test scenario
 ///
 /// This file shows how test data generators can be used in actual test files
 /// to avoid manual test data management and enable data-driven testing.
@@ -9,7 +9,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "TestDataGenerator.h"
+#include "test_data_generator.h"
 #include "TestDataLoader.h"
 #include "FlatbuffersConfigurator.h"
 #include "TestContext.h"
@@ -24,8 +24,8 @@
 TEST_CASE("EXAMPLE: Validate metadata for all test data files",
           "[unit][data_generators][example]") {
   
-  // Get all test names from the data_generators subdirectory
-  auto test_names_result = steamrot::tests::GetTestNamesForGenerator("data_generators");
+  // Get all test names from the adjacent data directory
+  auto test_names_result = steamrot::tests::get_test_names_for_generator();
   REQUIRE(test_names_result.has_value());
   
   // Generate a test case for each test name
@@ -54,7 +54,7 @@ TEST_CASE("EXAMPLE: Process entity collections from test data",
           "[unit][data_generators][example]") {
   
   // Load all test data configs
-  auto configs_result = steamrot::tests::LoadTestDataForGenerator("data_generators");
+  auto configs_result = steamrot::tests::load_test_data_for_generator();
   REQUIRE(configs_result.has_value());
   
   // Generate a test case for each config
@@ -83,10 +83,10 @@ TEST_CASE("EXAMPLE: Process entity collections from test data",
 TEST_CASE("EXAMPLE: Integration with entity test helpers",
           "[unit][data_generators][example]") {
   
-  // This example shows how TestDataGenerator would be used with
+  // This example shows how test data generators would be used with
   // the existing entity test helper functions
   
-  auto test_names_result = steamrot::tests::GetTestNamesForGenerator("data_generators");
+  auto test_names_result = steamrot::tests::get_test_names_for_generator();
   REQUIRE(test_names_result.has_value());
   
   auto test_name = GENERATE_COPY(from_range(test_names_result.value()));
@@ -125,7 +125,7 @@ TEST_CASE("EXAMPLE: Filter tests by metadata tags",
           "[unit][data_generators][example]") {
   
   // Load all configs
-  auto configs_result = steamrot::tests::LoadTestDataForGenerator("data_generators");
+  auto configs_result = steamrot::tests::load_test_data_for_generator();
   REQUIRE(configs_result.has_value());
   
   // Filter to only configs with "multiple" tag
@@ -162,7 +162,7 @@ TEST_CASE("EXAMPLE: Filter tests by metadata tags",
 TEST_CASE("EXAMPLE: Separate test suites from same data source",
           "[unit][data_generators][example]") {
   
-  auto test_names_result = steamrot::tests::GetTestNamesForGenerator("data_generators");
+  auto test_names_result = steamrot::tests::get_test_names_for_generator();
   REQUIRE(test_names_result.has_value());
   
   auto test_name = GENERATE_COPY(from_range(test_names_result.value()));

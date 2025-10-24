@@ -2,13 +2,13 @@
 
 ## Overview
 
-This directory contains utilities for data-driven testing with Catch2 generators. The functions here help discover and load test data files for use in parameterized tests.
+This directory contains utilities for data-driven testing with Catch2 generators. The functions here help discover and load test data files from an adjacent `data/` directory for use in parameterized tests.
 
 ## Purpose
 
 To avoid cluttering individual unit test directories with generator-specific code, these utilities are centralized here. They provide a clean interface for:
 
-1. Discovering `*.test_data.json` files in adjacent data directories
+1. Discovering `*.test_data.json` files in the adjacent `data/` directory
 2. Loading them as `TestDataConfig` objects
 3. Integrating them with Catch2's `GENERATE` functionality
 
@@ -16,13 +16,13 @@ To avoid cluttering individual unit test directories with generator-specific cod
 
 ```
 data_generators/
-├── TestDataGenerator.h        # Header with generator utility functions
-├── TestDataGenerator.cpp      # Implementation
-├── TestDataGenerator.test.cpp # Tests demonstrating usage
-├── examples.test.cpp          # Practical examples and patterns
-├── CMakeLists.txt             # Build configuration
-├── README.md                  # This file
-└── data/                      # Sample test data files
+├── test_data_generator.h        # Header with generator utility functions
+├── test_data_generator.cpp      # Implementation
+├── test_data_generator.test.cpp # Tests demonstrating usage
+├── examples.test.cpp            # Practical examples and patterns
+├── CMakeLists.txt               # Build configuration
+├── README.md                    # This file
+└── data/                        # Adjacent data directory
     ├── sample_test_1.test_data.json
     ├── sample_test_2.test_data.json
     └── sample_test_3.test_data.json
@@ -35,12 +35,12 @@ data_generators/
 The simplest way to use the generator is to get test names and iterate through them:
 
 ```cpp
-#include "TestDataGenerator.h"
+#include "test_data_generator.h"
 #include <catch2/generators/catch_generators_range.hpp>
 
 TEST_CASE("My parameterized test", "[unit][my_component]") {
-  // Get all test names from the subdirectory
-  auto test_names = steamrot::tests::GetTestNamesForGenerator("my_component");
+  // Get all test names from the adjacent data directory
+  auto test_names = steamrot::tests::get_test_names_for_generator();
   REQUIRE(test_names.has_value());
   
   // Generate a test case for each test name
@@ -48,7 +48,7 @@ TEST_CASE("My parameterized test", "[unit][my_component]") {
   
   // Load the specific test data
   steamrot::tests::TestDataLoader loader;
-  auto config = loader.LoadTestData(test_name, "my_component");
+  auto config = loader.LoadTestData(test_name, "data_generators");
   REQUIRE(config.has_value());
   
   // Use the config in your test
@@ -62,12 +62,12 @@ TEST_CASE("My parameterized test", "[unit][my_component]") {
 You can also load all configs upfront and iterate through them:
 
 ```cpp
-#include "TestDataGenerator.h"
+#include "test_data_generator.h"
 #include <catch2/generators/catch_generators_range.hpp>
 
 TEST_CASE("My test with configs", "[unit][my_component]") {
-  // Load all test data configs from subdirectory
-  auto configs = steamrot::tests::LoadTestDataForGenerator("my_component");
+  // Load all test data configs from adjacent data directory
+  auto configs = steamrot::tests::load_test_data_for_generator();
   REQUIRE(configs.has_value());
   
   // Generate a test case for each config
@@ -84,11 +84,10 @@ TEST_CASE("My test with configs", "[unit][my_component]") {
 If you need to work with the raw JSON file paths:
 
 ```cpp
-#include "TestDataGenerator.h"
+#include "test_data_generator.h"
 
 TEST_CASE("Work with JSON files", "[unit]") {
-  std::filesystem::path data_path = "/path/to/data";
-  auto json_files = steamrot::tests::DiscoverTestDataJsonFiles(data_path);
+  auto json_files = steamrot::tests::discover_test_data_json_files();
   
   REQUIRE(json_files.has_value());
   for (const auto &file : json_files.value()) {
@@ -99,46 +98,39 @@ TEST_CASE("Work with JSON files", "[unit]") {
 
 ## Functions
 
-### `DiscoverTestDataJsonFiles(directory_path)`
+### `discover_test_data_json_files()`
 
-Finds all `*.test_data.json` files in a directory.
+Finds all `*.test_data.json` files in the adjacent `data/` directory.
 
-**Parameters:**
-- `directory_path`: Path to search for JSON files
+**Parameters:** None (uses adjacent data directory)
 
 **Returns:** `std::expected<std::vector<std::filesystem::path>, FailInfo>`
 
-### `GetTestNamesForGenerator(subdirectory)`
+### `get_test_names_for_generator()`
 
-Returns test names (without extensions) suitable for Catch2 generators.
+Returns test names (without extensions) suitable for Catch2 generators from the adjacent `data/` directory.
 
-**Parameters:**
-- `subdirectory`: Test executable subdirectory (e.g., "entity", "components")
+**Parameters:** None (uses adjacent data directory)
 
 **Returns:** `std::expected<std::vector<std::string>, FailInfo>`
 
-### `LoadTestDataForGenerator(subdirectory)`
+### `load_test_data_for_generator()`
 
-Loads all TestDataConfig objects from a subdirectory.
+Loads all TestDataConfig objects from the adjacent `data/` directory.
 
-**Parameters:**
-- `subdirectory`: Test executable subdirectory (e.g., "entity", "components")
+**Parameters:** None (uses adjacent data directory)
 
 **Returns:** `std::expected<std::vector<const TestDataConfig *>, FailInfo>`
 
-## Directory Parameter
+## Adjacent Data Directory
 
-The `subdirectory` parameter refers to the test executable directory:
-- `"entity"` → looks in `tests/unit/entity/data/`
-- `"components"` → looks in `tests/unit/components/data/`
-- `"data_generators"` → looks in `tests/data_generators/data/`
-- `""` (empty) → looks in `tests/data/` (backward compatibility)
+All functions automatically use the `data/` directory adjacent to the source files. The directory path is determined using the `__FILE__` macro. If the adjacent `data/` directory does not exist, the functions will return an error.
 
 ## Test Data Files
 
 Test data files must follow the naming convention: `<test_name>.test_data.json`
 
-They are compiled to `.test_data.bin` during the build process. The generator functions work with the compiled binary files, but discover them based on the JSON filenames.
+They are compiled to `.test_data.bin` during the build process. The generator functions work with the compiled binary files through TestDataLoader.
 
 ## Integration with Existing Code
 
@@ -149,7 +141,7 @@ These utilities build on top of:
 
 ## Examples
 
-See `TestDataGenerator.test.cpp` for comprehensive unit tests of all functions.
+See `test_data_generator.test.cpp` for comprehensive unit tests of all functions.
 
 See `examples.test.cpp` for practical usage patterns including:
 - Validation tests with generators
@@ -163,4 +155,5 @@ See `examples.test.cpp` for practical usage patterns including:
 - This directory is separate from `tests/context/` to avoid cluttering the core test utilities
 - The sample data files in `data/` demonstrate the expected JSON structure
 - The functions handle errors gracefully using `std::expected`
-- All functions work with both JSON discovery and binary loading seamlessly
+- All functions automatically use the adjacent `data/` directory via `__FILE__` macro
+- An error is returned if the adjacent `data/` directory does not exist

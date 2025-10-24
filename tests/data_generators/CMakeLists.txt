@@ -1,5 +1,5 @@
 add_library(test_data_generators
-  TestDataGenerator.cpp
+  test_data_generator.cpp
 )
 
 target_include_directories(test_data_generators
@@ -15,7 +15,7 @@ target_link_libraries(test_data_generators
 
 # Create test executable for data generators
 add_executable(test_data_generators_tests
-  TestDataGenerator.test.cpp
+  test_data_generator.test.cpp
   examples.test.cpp
 )
 
