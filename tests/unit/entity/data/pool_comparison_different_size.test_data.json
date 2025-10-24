@@ -6,7 +6,7 @@
     "expected_to_pass": true,
     "version": 1
   },
-  "entity_collection": {
+  "start_entity_collection": {
     "entity_memory_pool_size": 8,
     "entities": [
       {
