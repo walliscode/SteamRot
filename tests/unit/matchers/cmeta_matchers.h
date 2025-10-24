@@ -52,7 +52,9 @@ public:
     return oss.str();
   }
 
-  std::string get_mismatch_description() const { return m_mismatch_description; }
+  std::string get_mismatch_description() const {
+    return m_mismatch_description;
+  }
 };
 
 inline CMetaEqualsMatcher EqualsCMeta(const CMeta &expected) {
