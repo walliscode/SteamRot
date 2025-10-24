@@ -1,0 +1,53 @@
+{
+  "metadata": {
+    "test_name": "sample_test_3",
+    "description": "Third sample test for comprehensive generator testing",
+    "tags": ["unit", "data_generators", "multiple"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "start_ui",
+          "start_visible": false,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 0, "y": 0 },
+              "size": { "x": 100, "y": 100 },
+              "children_active": false,
+              "children": [],
+              "layout": "Vertical",
+              "spacing_strategy": "Ratioed"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "expected_ui",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 10, "y": 20 },
+              "size": { "x": 150, "y": 200 },
+              "children_active": false,
+              "children": [],
+              "layout": "Vertical",
+              "spacing_strategy": "Ratioed"
+            }
+          }
+        }
+      }
+    ]
+  }
+}
