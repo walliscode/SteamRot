@@ -42,15 +42,5 @@ struct CGrimoireMachina : public Component {
   /// @return index of the component in the component register
   /////////////////////////////////////////////////
   size_t GetComponentRegisterIndex() const override;
-
-  ////////////////////////////////////////////////////////////
-  /// @brief Equality operator for CGrimoireMachina
-  ///
-  /// Note: m_holding_form comparison is pointer-based
-  ///
-  /// @param other The CGrimoireMachina to compare with
-  /// @return true if components are equal, false otherwise
-  ////////////////////////////////////////////////////////////
-  bool operator==(const CGrimoireMachina &other) const;
 };
 } // namespace steamrot
