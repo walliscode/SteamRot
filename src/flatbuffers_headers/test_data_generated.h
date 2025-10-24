@@ -165,22 +165,30 @@ struct TestDataConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef TestDataConfigBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_METADATA = 4,
-    VT_ENTITY_COLLECTION = 6
+    VT_START_ENTITY_COLLECTION = 6,
+    VT_EXPECTED_ENTITY_COLLECTION = 8
   };
   /// @brief Metadata about this test case
   const steamrot::TestMetadata *metadata() const {
     return GetPointer<const steamrot::TestMetadata *>(VT_METADATA);
   }
-  /// @brief Optional entity collection for entity-based tests
-  const steamrot::EntityCollection *entity_collection() const {
-    return GetPointer<const steamrot::EntityCollection *>(VT_ENTITY_COLLECTION);
+  /// @brief Starting state entity collection for comparison tests
+  /// If not provided, defaults to default-constructed EntityMemoryPool
+  const steamrot::EntityCollection *start_entity_collection() const {
+    return GetPointer<const steamrot::EntityCollection *>(VT_START_ENTITY_COLLECTION);
+  }
+  /// @brief Expected state entity collection for comparison tests
+  const steamrot::EntityCollection *expected_entity_collection() const {
+    return GetPointer<const steamrot::EntityCollection *>(VT_EXPECTED_ENTITY_COLLECTION);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_METADATA) &&
            verifier.VerifyTable(metadata()) &&
-           VerifyOffset(verifier, VT_ENTITY_COLLECTION) &&
-           verifier.VerifyTable(entity_collection()) &&
+           VerifyOffset(verifier, VT_START_ENTITY_COLLECTION) &&
+           verifier.VerifyTable(start_entity_collection()) &&
+           VerifyOffset(verifier, VT_EXPECTED_ENTITY_COLLECTION) &&
+           verifier.VerifyTable(expected_entity_collection()) &&
            verifier.EndTable();
   }
 };
@@ -192,8 +200,11 @@ struct TestDataConfigBuilder {
   void add_metadata(::flatbuffers::Offset<steamrot::TestMetadata> metadata) {
     fbb_.AddOffset(TestDataConfig::VT_METADATA, metadata);
   }
-  void add_entity_collection(::flatbuffers::Offset<steamrot::EntityCollection> entity_collection) {
-    fbb_.AddOffset(TestDataConfig::VT_ENTITY_COLLECTION, entity_collection);
+  void add_start_entity_collection(::flatbuffers::Offset<steamrot::EntityCollection> start_entity_collection) {
+    fbb_.AddOffset(TestDataConfig::VT_START_ENTITY_COLLECTION, start_entity_collection);
+  }
+  void add_expected_entity_collection(::flatbuffers::Offset<steamrot::EntityCollection> expected_entity_collection) {
+    fbb_.AddOffset(TestDataConfig::VT_EXPECTED_ENTITY_COLLECTION, expected_entity_collection);
   }
   explicit TestDataConfigBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -210,9 +221,11 @@ struct TestDataConfigBuilder {
 inline ::flatbuffers::Offset<TestDataConfig> CreateTestDataConfig(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::TestMetadata> metadata = 0,
-    ::flatbuffers::Offset<steamrot::EntityCollection> entity_collection = 0) {
+    ::flatbuffers::Offset<steamrot::EntityCollection> start_entity_collection = 0,
+    ::flatbuffers::Offset<steamrot::EntityCollection> expected_entity_collection = 0) {
   TestDataConfigBuilder builder_(_fbb);
-  builder_.add_entity_collection(entity_collection);
+  builder_.add_expected_entity_collection(expected_entity_collection);
+  builder_.add_start_entity_collection(start_entity_collection);
   builder_.add_metadata(metadata);
   return builder_.Finish();
 }
