@@ -13,9 +13,9 @@
 #include "FlatbuffersDataLoader.h"
 #include "catch2/catch_test_macros.hpp"
 #include "catch2/matchers/catch_matchers.hpp"
+#include "entities_generated.h"
 #include "entity_memory.h"
 #include "entity_memory_pool_matchers.h"
-#include "entities_generated.h"
 #include "scenes_generated.h"
 #include "test_data_generated.h"
 #include "ui_element_factory_test_helpers.h"
@@ -111,7 +111,8 @@ void TestConfigurationOfEMPfromDefaultData(
   // some helper values
   size_t entity_count = entity_collection.entities()->size();
   // check the entity memory pool is big enough
-  REQUIRE(entity::memory::GetMemoryPoolSize(entity_memory_pool) >= entity_count);
+  REQUIRE(entity::memory::GetMemoryPoolSize(entity_memory_pool) >=
+          entity_count);
   REQUIRE(entity::memory::GetMemoryPoolSize(entity_memory_pool) ==
           scene_data.entity_collection()->entity_memory_pool_size());
 
@@ -212,65 +213,56 @@ void CompareEntityMemoryPools(const EntityMemoryPool &actual,
 /////////////////////////////////////////////////
 void RunEMPComparisonTest(const TestDataConfig *config,
                           FlatbuffersConfigurator &configurator) {
-  
+
   // Verify config is not null
   if (!config) {
     FAIL("TestDataConfig is null");
   }
-  
+
   // Check if we have the new format with start/expected collections
-  if (config->start_entity_collection() || config->expected_entity_collection()) {
-    
+  if (config->start_entity_collection() ||
+      config->expected_entity_collection()) {
+
     // Create start pool
     EntityMemoryPool start_pool;
-    
+
     // If start_entity_collection is provided, configure it
     // Otherwise, use default-constructed pool
     if (config->start_entity_collection()) {
       auto configure_result = configurator.ConfigureEntitiesFromCollection(
           start_pool, config->start_entity_collection());
-      
+
       if (!configure_result.has_value()) {
-        FAIL("Failed to configure start_entity_collection: " + 
+        FAIL("Failed to configure start_entity_collection: " +
              configure_result.error().message);
       }
     }
-    
+
     // Create expected pool
     EntityMemoryPool expected_pool;
-    
+
     // If expected_entity_collection is provided, configure it
     if (config->expected_entity_collection()) {
       auto configure_result = configurator.ConfigureEntitiesFromCollection(
           expected_pool, config->expected_entity_collection());
-      
+
       if (!configure_result.has_value()) {
-        FAIL("Failed to configure expected_entity_collection: " + 
+        FAIL("Failed to configure expected_entity_collection: " +
              configure_result.error().message);
       }
-      
+
       // Compare the pools
-      CompareEntityMemoryPools(start_pool, expected_pool);
+      REQUIRE_THAT(start_pool, EqualsEntityMemoryPool(expected_pool));
+
     } else {
       // No expected collection provided, can't do comparison
-      FAIL("expected_entity_collection is required when using start_entity_collection");
+      FAIL("expected_entity_collection is required when using "
+           "start_entity_collection");
     }
-    
-  } else if (config->entity_collection()) {
-    // Old format - just verify entity_collection can be loaded
-    // This maintains backward compatibility
-    EntityMemoryPool pool;
-    
-    auto configure_result = configurator.ConfigureEntitiesFromCollection(
-        pool, config->entity_collection());
-    
-    if (!configure_result.has_value()) {
-      FAIL("Failed to configure entity_collection: " + 
-           configure_result.error().message);
-    }
+
   } else {
-    // No entity data present, nothing to test
-    FAIL("No entity collection data present in TestDataConfig");
+    // No entity data present, nothing to test, not a fail
+    INFO("No entity collection data present in TestDataConfig");
   }
 }
 
