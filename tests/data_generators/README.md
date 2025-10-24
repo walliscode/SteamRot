@@ -19,6 +19,7 @@ data_generators/
 ├── TestDataGenerator.h        # Header with generator utility functions
 ├── TestDataGenerator.cpp      # Implementation
 ├── TestDataGenerator.test.cpp # Tests demonstrating usage
+├── examples.test.cpp          # Practical examples and patterns
 ├── CMakeLists.txt             # Build configuration
 ├── README.md                  # This file
 └── data/                      # Sample test data files
@@ -148,7 +149,14 @@ These utilities build on top of:
 
 ## Examples
 
-See `TestDataGenerator.test.cpp` for comprehensive examples of all usage patterns.
+See `TestDataGenerator.test.cpp` for comprehensive unit tests of all functions.
+
+See `examples.test.cpp` for practical usage patterns including:
+- Validation tests with generators
+- Integration with entity memory pool tests
+- Filtering tests by metadata tags
+- Organizing multiple test suites from the same data source
+- Patterns for real-world test scenarios
 
 ## Notes
 

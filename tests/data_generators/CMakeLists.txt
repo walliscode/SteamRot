@@ -16,11 +16,13 @@ target_link_libraries(test_data_generators
 # Create test executable for data generators
 add_executable(test_data_generators_tests
   TestDataGenerator.test.cpp
+  examples.test.cpp
 )
 
 target_link_libraries(test_data_generators_tests
   PRIVATE
   test_data_generators
+  entity
   Catch2::Catch2WithMain
 )
 
