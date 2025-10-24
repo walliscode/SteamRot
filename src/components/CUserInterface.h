@@ -44,15 +44,5 @@ struct CUserInterface : public Component {
   /// @return Index of the component in the component register
   /////////////////////////////////////////////////
   size_t GetComponentRegisterIndex() const override;
-
-  ////////////////////////////////////////////////////////////
-  /// @brief Equality operator for CUserInterface
-  ///
-  /// Note: UIElement comparison is pointer-based due to polymorphism
-  ///
-  /// @param other The CUserInterface to compare with
-  /// @return true if components are equal, false otherwise
-  ////////////////////////////////////////////////////////////
-  bool operator==(const CUserInterface &other) const;
 };
 } // namespace steamrot

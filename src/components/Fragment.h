@@ -39,13 +39,5 @@ struct Fragment {
   /// possible view.
   /////////////////////////////////////////////////
   std::unordered_map<ViewDirection, sf::VertexArray> m_overlays;
-
-  /////////////////////////////////////////////////
-  /// @brief Equality operator for Fragment
-  ///
-  /// @param other The Fragment to compare with
-  /// @return true if fragments are equal, false otherwise
-  /////////////////////////////////////////////////
-  bool operator==(const Fragment &other) const;
 };
 } // namespace steamrot

@@ -25,7 +25,7 @@ TEST_CASE("CMeta custom matcher works correctly",
   SECTION("Matcher detects differences") {
     actual.m_active = false;
     actual.m_entity_active = false;
-    REQUIRE_FALSE(actual == expected);
+    REQUIRE_THAT(actual, !steamrot::tests::EqualsCMeta(expected));
   }
 
   SECTION("Matcher detects equality") {
@@ -46,7 +46,7 @@ TEST_CASE("CUserInterface custom matcher works correctly",
   SECTION("Matcher detects differences in m_name") {
     actual.m_name = "DifferentUI";
     actual.m_UI_visible = true;
-    REQUIRE_FALSE(actual == expected);
+    REQUIRE_THAT(actual, !steamrot::tests::EqualsCUserInterface(expected));
   }
 
   SECTION("Matcher detects equality") {
@@ -75,6 +75,6 @@ TEST_CASE("Generic Component matcher works correctly",
     steamrot::CMeta actual;
     actual.m_active = false;
 
-    REQUIRE_FALSE(actual == expected);
+    REQUIRE_THAT(actual, !steamrot::tests::EqualsComponent(expected));
   }
 }

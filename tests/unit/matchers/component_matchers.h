@@ -49,17 +49,14 @@ public:
     if (actual.m_active != m_expected.m_active) {
       oss << "m_active differs: actual=" << actual.m_active
           << ", expected=" << m_expected.m_active << "; ";
+      m_mismatch_description = oss.str();
+      return false;
     }
 
-    // Use equality operator for full comparison
-    bool are_equal = (actual == m_expected);
-
-    if (!are_equal && m_mismatch_description.empty()) {
-      oss << "Components differ in derived class fields";
-    }
-
+    // For more detailed comparison, use derived class specific matchers
+    // This generic matcher only compares the base Component fields
     m_mismatch_description = oss.str();
-    return are_equal;
+    return m_mismatch_description.empty();
   }
 
   ////////////////////////////////////////////////////////////
