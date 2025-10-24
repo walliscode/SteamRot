@@ -2,6 +2,26 @@
 
 This document provides guidelines for GitHub Copilot agents working on the SteamRot game engine repository.
 
+## ⚠️ IMPORTANT: No Build or Test Steps for Agents
+
+**Agents should NEVER attempt to build, test, or lint this repository.**
+
+All building, testing, and linting is done locally by the user. Your role is to:
+- Make code changes only
+- Write test files (but not run them)
+- Focus on code implementation
+- Trust that the user will build and test your changes locally
+
+**Do NOT:**
+- Run `cmake` commands
+- Run build commands
+- Run test commands (`ctest`, individual test executables)
+- Run linters
+- Attempt to verify that code compiles
+- Check if tests pass
+
+The testing and build infrastructure documentation in this file is for **reference only** to help you understand the project structure and write appropriate code and tests.
+
 ## Project Overview
 
 SteamRot is a C++ game engine built using:
@@ -250,9 +270,9 @@ table EntityData{
 }
 ```
 
-**Note:** Building is done locally by the user. FlatBuffers headers are auto-generated during the build process.
+**Note:** Building is done locally by the user. FlatBuffers headers are auto-generated during the build process by the user.
 
-#### 4. Create ConfigureComponent Method (TDD approach)
+#### 4. Create ConfigureComponent Method
 
 **In `src/entity/FlatbuffersConfigurator.h`:**
 
@@ -343,16 +363,16 @@ add_executable(test_components
 
 **Update `tests/entity/FlatbuffersConfigurator.test.cpp`** for configuration testing
 
-#### 7. Testing
+#### 7. Completion
 
-**Note:** Building is done locally by the user. Agents should focus on code changes and tests will be run locally.
+**Note:** Building and testing are done locally by the user. Agents should focus on code changes and writing test files. Tests will be run and verified locally.
 
 #### Critical Points
 
 - **Always** wrap FlatBuffers field access in `if` statements (strings, vectors, tables)
 - **Always** call base `ConfigureComponent(Component&)` first
 - **Always** use default initialization for all member variables
-- **Follow TDD**: Write tests before implementing configuration
+- **Write tests** for new functionality (but don't run them - user will test locally)
 - **Primitive types** (int, bool, float) can be accessed directly from FlatBuffers
 - **Complex types** (strings, vectors, tables) must be null-checked
 
@@ -375,7 +395,7 @@ add_executable(test_components
 
 ### Adding Logic Classes
 
-Logic classes implement game system behaviors (collision, rendering, actions, movement). Follow TDD approach: write tests first, then implement.
+Logic classes implement game system behaviors (collision, rendering, actions, movement).
 
 **Complete Examples**: See `documentation/examples/` for full example files (ExampleLogic.h, ExampleLogic.cpp, ExampleLogic.test.cpp) demonstrating all patterns.
 
@@ -405,10 +425,10 @@ Logic classes implement game system behaviors (collision, rendering, actions, mo
    - Update `CheckStaticLogicCollections()` for affected scenes
    - Verify count, order, and types with `dynamic_cast`
 
-6. **Testing**
-   - Building is done locally by the user
-   - Focus on code implementation and test writing
-   - Tests will be run locally after changes are committed
+6. **Completion**
+   - Building and testing done locally by the user
+   - Focus on code implementation and test file writing
+   - Tests will be run and verified locally by the user
 
 #### Detailed Workflow
 
@@ -497,7 +517,7 @@ void NewLogic::ProcessLogic() {
 } // namespace steamrot
 ```
 
-##### 3. Write Unit Tests (TDD)
+##### 3. Write Unit Tests
 
 **File: `tests/logic/NewLogic.test.cpp`**
 
@@ -708,7 +728,7 @@ m_logic_context.event_handler.AddEvent(event_packet);
 
 - **Always** call base constructor: `Logic(logic_context)`
 - **Always** check archetype existence before iterating
-- **Always** write tests before implementation (TDD)
+- **Write tests** for new implementation (but don't run them - user tests locally)
 - **Always** update test helpers when changing LogicFactory
 - **Never** add logic to component classes (keep them pure data)
 - **Never** modify entities outside their archetype's Logic
@@ -739,11 +759,14 @@ m_logic_context.event_handler.AddEvent(event_packet);
      }
      ```
 
-## Testing Guidelines
+## Testing Guidelines (Reference Only)
+
+**Note: Agents do NOT run tests. This section is for reference to help you write test files.**
 
 ### Test-Driven Development (TDD)
-- Write tests **before** implementing features
-- Especially important for:
+- Write test files when implementing features
+- Users will run tests locally
+- Important areas for test coverage:
   - Component configuration
   - Logic classes
   - LogicFactory updates
@@ -825,7 +848,9 @@ ctest --preset Debug --output-on-failure
 
 See [TESTING_IMPROVEMENT_PLAN.md](../documentation/TESTING_IMPROVEMENT_PLAN.md) for detailed test infrastructure roadmap.
 
-## Build System
+## Build System (Reference Only)
+
+**Note: Agents do NOT build. This section is for reference only.**
 
 ### CMake Configuration
 - Minimum CMake version: 3.31
@@ -833,19 +858,15 @@ See [TESTING_IMPROVEMENT_PLAN.md](../documentation/TESTING_IMPROVEMENT_PLAN.md) 
 - Enable testing with `enable_testing()`
 - **Uses CMake Presets** (see `CMakePresets.json`)
 
-### Build Commands (Reference Only)
+### Build Commands (Reference Only - DO NOT USE)
 
-**Note:** Agents should NOT attempt to build. Building is done locally by the user. The following information is provided for reference only.
+**Agents must NEVER run these commands. This is documentation only.**
 
 ```bash
-# Configuration (if needed for understanding)
-cmake --preset Debug
-
-# Building (done locally by user, NOT by agents)
+# Example commands (for reference, DO NOT RUN):
+# cmake --preset Debug
 # cmake --build --preset Debug
-
-# Testing (may be run to verify changes)
-ctest --preset Debug
+# ctest --preset Debug
 ```
 
 ### Available Presets
@@ -857,9 +878,9 @@ ctest --preset Debug
 - `test_data_dir`: `${CMAKE_SOURCE_DIR}/tests/data`
 
 ### Important Notes
-- **Agents should NOT build** - Building is done locally by the user
-- CMake presets are used for configuration and building (done locally)
-- Focus on making code changes and writing tests
+- **Agents NEVER build, test, or lint** - All done locally by the user
+- CMake presets are used for configuration and building (done locally only)
+- Focus on making code changes and writing test files
 
 ## When Updating README
 
@@ -962,7 +983,7 @@ void Function() {
 
 1. **Minimal Changes**: Make the smallest possible changes to achieve the goal
 2. **Pure Data Containers**: Components and UIElements should have no logic
-3. **TDD**: Write tests before implementation, especially for configurators
+3. **Write Tests**: Create test files for new features (but don't run them)
 4. **Null Safety**: Always validate FlatBuffers data before access
 5. **Error Handling**: Use std::expected for runtime failures, exceptions for critical errors
 6. **Documentation**: Update README when adding new workflows or patterns
@@ -1054,25 +1075,25 @@ protected:
 };
 ```
 
-### TDD Guidelines for Agents
+### Guidelines for Agents
 
 When implementing new features:
 
-1. **Write tests first** using reusable infrastructure
-2. **Use TestScenarios** for entity/component setup
+1. **Write test files** using reusable infrastructure (but don't run them)
+2. **Use TestScenarios** for entity/component setup in test files
 3. **Use domain assertions** for clear test intent
 4. **Use mixins/base classes** to reduce boilerplate
 5. **Tag tests appropriately** with `[unit]`, `[integration]`, or `[system]`
 6. **Keep tests independent** - no shared state between tests
-7. **Test edge cases** - boundary conditions and errors
-8. **Note:** Building and test execution done locally by user
+7. **Test edge cases** - boundary conditions and errors in test files
+8. **Note:** Building and test execution done locally by user - agents only write code and test files
 
-### Example TDD Workflow
+### Example Workflow
 
 **Adding a new Component:**
 
 ```cpp
-// 1. Write test first
+// 1. Write test file
 TEST_CASE("NewComponent contract", "[unit][NewComponent]") {
   ComponentTestMixin<NewComponent>::RunAllTests();
 }
@@ -1085,14 +1106,14 @@ TEST_CASE("NewComponent defaults", "[unit][NewComponent]") {
 // 2. Implement minimal component
 // 3. Add to ComponentRegister
 // 4. Create FlatBuffers schema
-// 5. Implement configurator (with tests)
+// 5. Implement configurator with test files
 // Note: Building and testing done locally by user
 ```
 
 **Adding a new Logic:**
 
 ```cpp
-// 1. Write test using LogicTestBase
+// 1. Write test file using LogicTestBase
 class NewLogicTest : public LogicTestBase<NewLogic> {
   void TestProcessWithSingleEntity() override {
     // Test implementation
@@ -1100,7 +1121,7 @@ class NewLogicTest : public LogicTestBase<NewLogic> {
 };
 
 // 2. Implement minimal Logic
-// 3. Add to LogicFactory (with tests)
+// 3. Add to LogicFactory with test files
 // Note: Building and testing done locally by user
 ```
 
@@ -1268,13 +1289,13 @@ LoadMultipleTestData(const std::vector<std::string>& test_names,
 
 When working as a GitHub Copilot agent:
 
-1. **Always read README.md first** to understand current project state
-2. **Check existing tests** before writing new code
-3. **Follow TDD** when adding configurators or logic classes
-4. **Validate FlatBuffers data** with extensive null checks
-5. **Update README** when adding new workflows or significant features
-6. **Maintain consistency** with existing code patterns
-7. **Use visual dividers** (`////////////////////////////////////////////////////////////`) as shown in existing code
-8. **Document with Doxygen** style comments
-9. **Do NOT attempt to build** - building is done locally by the user
+1. **NEVER build, test, or lint** - All building, testing, and linting is done locally by the user
+2. **Always read README.md first** to understand current project state
+3. **Write test files** but do NOT run them - tests will be executed locally
+4. **Focus on code implementation only** - trust the user will verify your changes
+5. **Validate FlatBuffers data** with extensive null checks in your code
+6. **Update README** when adding new workflows or significant features
+7. **Maintain consistency** with existing code patterns
+8. **Use visual dividers** (`////////////////////////////////////////////////////////////`) as shown in existing code
+9. **Document with Doxygen** style comments
 10. **Keep changes minimal** - don't refactor unless necessary
