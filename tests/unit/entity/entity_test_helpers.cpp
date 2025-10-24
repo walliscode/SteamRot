@@ -9,6 +9,7 @@
 #include "entity_test_helpers.h"
 #include "CGrimoireMachina.h"
 #include "CUserInterface.h"
+#include "FlatbuffersConfigurator.h"
 #include "FlatbuffersDataLoader.h"
 #include "catch2/catch_test_macros.hpp"
 #include "catch2/matchers/catch_matchers.hpp"
@@ -16,6 +17,7 @@
 #include "entity_memory_pool_matchers.h"
 #include "entities_generated.h"
 #include "scenes_generated.h"
+#include "test_data_generated.h"
 #include "ui_element_factory_test_helpers.h"
 #include "user_interface_generated.h"
 namespace steamrot::tests {
@@ -206,4 +208,70 @@ void CompareEntityMemoryPools(const EntityMemoryPool &actual,
                               const EntityMemoryPool &expected) {
   REQUIRE_THAT(actual, EqualsEntityMemoryPool(expected));
 }
+
+/////////////////////////////////////////////////
+void RunEMPComparisonTest(const TestDataConfig *config,
+                          FlatbuffersConfigurator &configurator) {
+  
+  // Verify config is not null
+  if (!config) {
+    FAIL("TestDataConfig is null");
+  }
+  
+  // Check if we have the new format with start/expected collections
+  if (config->start_entity_collection() || config->expected_entity_collection()) {
+    
+    // Create start pool
+    EntityMemoryPool start_pool;
+    
+    // If start_entity_collection is provided, configure it
+    // Otherwise, use default-constructed pool
+    if (config->start_entity_collection()) {
+      auto configure_result = configurator.ConfigureEntitiesFromCollection(
+          start_pool, config->start_entity_collection());
+      
+      if (!configure_result.has_value()) {
+        FAIL("Failed to configure start_entity_collection: " + 
+             configure_result.error().message);
+      }
+    }
+    
+    // Create expected pool
+    EntityMemoryPool expected_pool;
+    
+    // If expected_entity_collection is provided, configure it
+    if (config->expected_entity_collection()) {
+      auto configure_result = configurator.ConfigureEntitiesFromCollection(
+          expected_pool, config->expected_entity_collection());
+      
+      if (!configure_result.has_value()) {
+        FAIL("Failed to configure expected_entity_collection: " + 
+             configure_result.error().message);
+      }
+      
+      // Compare the pools
+      CompareEntityMemoryPools(start_pool, expected_pool);
+    } else {
+      // No expected collection provided, can't do comparison
+      FAIL("expected_entity_collection is required when using start_entity_collection");
+    }
+    
+  } else if (config->entity_collection()) {
+    // Old format - just verify entity_collection can be loaded
+    // This maintains backward compatibility
+    EntityMemoryPool pool;
+    
+    auto configure_result = configurator.ConfigureEntitiesFromCollection(
+        pool, config->entity_collection());
+    
+    if (!configure_result.has_value()) {
+      FAIL("Failed to configure entity_collection: " + 
+           configure_result.error().message);
+    }
+  } else {
+    // No entity data present, nothing to test
+    FAIL("No entity collection data present in TestDataConfig");
+  }
+}
+
 } // namespace steamrot::tests

@@ -87,11 +87,18 @@ Root table containing test data:
 
 ```cpp
 table TestDataConfig {
-  metadata: TestMetadata (required);   // Test metadata
-  entity_collection: EntityCollection; // Optional entity data
+  metadata: TestMetadata (required);        // Test metadata
+  entity_collection: EntityCollection;      // Optional entity data (deprecated)
+  start_entity_collection: EntityCollection; // Starting state for comparison tests
+  expected_entity_collection: EntityCollection; // Expected state for comparison tests
   // More fields can be added here in the future
 }
 ```
+
+**Note on entity collections:**
+- `entity_collection`: Deprecated. Use for backward compatibility with single-pool tests.
+- `start_entity_collection`: Starting state for comparison tests. If not provided, defaults to a default-constructed EntityMemoryPool.
+- `expected_entity_collection`: Expected state for comparison tests. Required when using `start_entity_collection`.
 
 ## Creating Test Data Files
 
@@ -136,6 +143,48 @@ table TestDataConfig {
 }
 ```
 
+### Example with Start and Expected Entity Collections (New Format)
+
+For comparison tests where you want to test transformations or state changes:
+
+```json
+{
+  "metadata": {
+    "test_name": "entity_state_comparison_test",
+    "description": "Test entity state transitions",
+    "tags": ["unit", "entity", "comparison"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "test_ui",
+          "start_visible": false
+        }
+      }
+    ]
+  },
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "test_ui",
+          "start_visible": true
+        }
+      }
+    ]
+  }
+}
+```
+
+**Note:** If `start_entity_collection` is omitted, the test will use a default-constructed EntityMemoryPool as the starting state.
+
 ## Compilation Process
 
 Test data JSON files are automatically compiled to binary during the build process:
@@ -173,6 +222,45 @@ TEST_CASE("Load test data", "[unit][data-driven]") {
   }
 }
 ```
+
+### Using RunEMPComparisonTest Wrapper
+
+For entity memory pool comparison tests, use the `RunEMPComparisonTest` wrapper function:
+
+```cpp
+#include "TestDataLoader.h"
+#include "entity_test_helpers.h"
+#include "FlatbuffersConfigurator.h"
+#include "TestContext.h"
+#include <catch2/catch_test_macros.hpp>
+
+TEST_CASE("Run EMP comparison from test data", "[unit][entity][data-driven]") {
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::tests::TestContext test_context;
+  
+  // Create configurator
+  steamrot::FlatbuffersConfigurator configurator{
+      test_context.GetGameContext().event_handler};
+  
+  // Load test data
+  steamrot::tests::TestDataLoader loader;
+  auto result = loader.LoadTestData("entity_state_comparison_test", "unit/entity");
+  
+  REQUIRE(result.has_value());
+  const auto* config = result.value();
+  
+  // Run the comparison test - wrapper handles all the logic
+  steamrot::tests::RunEMPComparisonTest(config, configurator);
+}
+```
+
+The `RunEMPComparisonTest` wrapper function:
+- Checks if `start_entity_collection` and `expected_entity_collection` are present
+- Creates and configures both pools
+- Runs the comparison using `CompareEntityMemoryPools`
+- Falls back to old `entity_collection` behavior for backward compatibility
+- Uses default-constructed pool if `start_entity_collection` is not provided
+
 
 ### Discovering Available Test Data
 
