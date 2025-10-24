@@ -5,7 +5,6 @@ add_executable(test_components
   CUserInterface.test.cpp
   CMachinaForm.test.cpp
   component_equality.test.cpp
-  component_matchers.test.cpp
 )
 
 target_include_directories(test_components
@@ -19,6 +18,7 @@ PRIVATE
   components
   entity
   entity_helpers
+  test_matchers
 )
 
 catch_discover_tests(test_components)
