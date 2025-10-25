@@ -21,11 +21,13 @@ target_link_libraries(test_scenes
   scenes
   logic
   systems
+  entity
   entity_helpers
   asset_test_helpers
   test_context
   user_interface
   test_logic_helpers
+  test_matchers
 )
 
 catch_discover_tests(test_scenes)

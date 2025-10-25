@@ -9,7 +9,7 @@
 #include "scene_test_helpers.h"
 #include "entity_test_helpers.h"
 #include "entity_memory_pool_matchers.h"
-#include "EntityManager.h"
+#include "FlatbuffersConfigurator.h"
 #include "logic_test_helpers.h"
 #include "uuid.h"
 #include <catch2/catch_test_macros.hpp>
