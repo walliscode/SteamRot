@@ -4,8 +4,8 @@ include(Catch)
 # Test utilities and shared context
 add_subdirectory(context)
 
-# Test data generators - utilities for data-driven testing
-add_subdirectory(data_generators)
+# Test harness - utilities for data-driven testing
+add_subdirectory(harness)
 
 # Test structure organized by test type
 add_subdirectory(unit)
