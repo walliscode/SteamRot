@@ -69,4 +69,20 @@ load_test_data_configs(const std::string &subdirectory);
 std::expected<std::monostate, FailInfo>
 run_test_data_config(const TestDataConfig *config);
 
+/////////////////////////////////////////////////
+/// @brief Wrapper function to run EMP comparison tests based on TestDataConfig
+///
+/// This function examines the TestDataConfig and runs appropriate tests based
+/// on what data is present:
+/// - If start_entity_collection and expected_entity_collection are present,
+///   creates both pools and compares them using matchers
+/// - If start_entity_collection is not present, starts with default-constructed pool
+///
+/// Uses the EqualsEntityMemoryPool matcher for comparison, ensuring detailed
+/// error messages on mismatch.
+///
+/// @param config The test data configuration to process
+/////////////////////////////////////////////////
+void run_entity_memory_pool_comparison_test(const TestDataConfig *config);
+
 } // namespace steamrot::tests

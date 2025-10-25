@@ -86,10 +86,26 @@ TEST_CASE("Validate test data configuration", "[unit]") {
   REQUIRE(result.has_value());
   
   INFO("Test name: " << config->metadata()->test_name()->str());
+}
+```
+
+### Running Entity Memory Pool Comparison Tests
+
+The `run_entity_memory_pool_comparison_test()` function runs entity memory pool comparison tests based on TestDataConfig:
+
+```cpp
+#include "test_data_harness.h"
+
+TEST_CASE("Entity memory pool comparison test", "[unit]") {
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
   
-  // Now dispatch to appropriate test functions based on data type
-  // For example, if entity collections are present:
-  // steamrot::tests::RunEMPComparisonTest(config, configurator);
+  const auto *config = GENERATE_COPY(from_range(configs.value()));
+  
+  // Run entity memory pool comparison test
+  // This will compare start_entity_collection with expected_entity_collection
+  // using the EqualsEntityMemoryPool matcher
+  steamrot::tests::run_entity_memory_pool_comparison_test(config);
 }
 ```
 
@@ -145,25 +161,52 @@ REQUIRE(result.has_value());
 - Entity Memory Pool comparisons (`start_entity_collection` + `expected_entity_collection`)
 - Future: Event sequences, UI configurations, Logic tests, etc.
 
-**Note:** This wrapper performs validation and dispatching. Actual test execution should be done by calling specialized test functions like `RunEMPComparisonTest` from the appropriate test helper modules.
+**Note:** This wrapper performs validation only. For actual test execution, use specialized test functions like `run_entity_memory_pool_comparison_test()`.
+
+### `run_entity_memory_pool_comparison_test(config)`
+
+Runs entity memory pool comparison tests based on TestDataConfig contents. This function creates and configures entity memory pools from the test data and compares them using the EqualsEntityMemoryPool matcher.
+
+**Parameters:**
+- `config`: Pointer to TestDataConfig object containing `start_entity_collection` and `expected_entity_collection`
+
+**Returns:** None (uses Catch2 assertions internally)
+
+**Example:**
+```cpp
+auto configs = steamrot::tests::load_test_data_configs();
+REQUIRE(configs.has_value());
+
+const auto *config = GENERATE_COPY(from_range(configs.value()));
+steamrot::tests::run_entity_memory_pool_comparison_test(config);
+```
+
+**Required Data:**
+- `expected_entity_collection` (required)
+- `start_entity_collection` (optional - if omitted, starts with default-constructed pool)
+
+**Behavior:**
+- Creates a start pool (default-constructed or configured from `start_entity_collection`)
+- Creates an expected pool (configured from `expected_entity_collection`)
+- Compares pools using `EqualsEntityMemoryPool` matcher
+- Provides detailed error messages on mismatch
 
 ## Integration with Matchers
 
-The test harness is designed to work seamlessly with the existing matcher infrastructure in `tests/unit/matchers/`. Use matchers for assertions:
+The test harness is designed to work seamlessly with the existing matcher infrastructure in `tests/unit/matchers/`. The `run_entity_memory_pool_comparison_test()` function uses the `EqualsEntityMemoryPool` matcher internally:
 
 ```cpp
 #include "test_data_harness.h"
-#include "entity_memory_pool_matchers.h"
 
-TEST_CASE("Test with matchers", "[unit]") {
+TEST_CASE("Test entity pools with data-driven approach", "[unit]") {
   auto configs = steamrot::tests::load_test_data_configs();
   REQUIRE(configs.has_value());
   
   const auto *config = GENERATE_COPY(from_range(configs.value()));
   
-  // Use matchers for assertions
-  // ... configure entity pools from config ...
-  // REQUIRE_THAT(actual_pool, EqualsEntityMemoryPool(expected_pool));
+  // Automatically uses EqualsEntityMemoryPool matcher for comparison
+  steamrot::tests::run_entity_memory_pool_comparison_test(config);
+}
 }
 ```
 

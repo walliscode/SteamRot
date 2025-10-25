@@ -11,9 +11,11 @@
 #include "PathProvider.h"
 #include "TestContext.h"
 #include "entity_test_helpers.h"
+#include "entity_memory_pool_matchers.h"
 #include "containers.h"
 #include "scene_change_packet_generated.h"
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers.hpp>
 
 TEST_CASE("ArchetypeManager is constructed without errors",
           "[unit][ArchetypeManager]") {
@@ -33,9 +35,10 @@ TEST_CASE("ArchetypeManager archetype map is empty with a non configured EMP",
   // create an instance of the entity manager but don't configure it
   steamrot::EntityManager entity_manager{
       100, test_context.GetGameContext().event_handler};
-  // check that the EMP is default constructed
-  steamrot::tests::TestEMPIsDefaultConstructed(
-      entity_manager.GetEntityMemoryPool());
+  // check that the EMP is default constructed by comparing to a new EMP
+  steamrot::EntityMemoryPool expected_default_pool;
+  REQUIRE_THAT(entity_manager.GetEntityMemoryPool(),
+               steamrot::tests::EqualsEntityMemoryPool(expected_default_pool));
 
   // create an instance of the ArchetypeManager
   steamrot::ArchetypeManager archetype_manager(
@@ -60,8 +63,10 @@ TEST_CASE("ArchetypeManager generates archetype IDs correctly",
   // create an instance of the entity manager and configure it
   steamrot::EntityManager entity_manager{
       test_context.GetGameContext().event_handler};
-  steamrot::tests::TestEMPIsDefaultConstructed(
-      entity_manager.GetEntityMemoryPool());
+  // check that the EMP is default constructed by comparing to a new EMP
+  steamrot::EntityMemoryPool expected_default_pool;
+  REQUIRE_THAT(entity_manager.GetEntityMemoryPool(),
+               steamrot::tests::EqualsEntityMemoryPool(expected_default_pool));
 
   steamrot::ArchetypeManager archetype_manager(
       entity_manager.GetEntityMemoryPool());
