@@ -262,6 +262,49 @@ The `RunEMPComparisonTest` wrapper function:
 - Uses default-constructed pool if `start_entity_collection` is not provided
 
 
+### Using run_test_data_config Top-Level Wrapper
+
+The test harness provides a top-level `run_test_data_config()` wrapper that validates test configurations:
+
+```cpp
+#include "test_data_harness.h"
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators_range.hpp>
+
+TEST_CASE("Validate and run test configurations", "[unit][data-driven]") {
+  // Load all test data from adjacent data/ directory
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  
+  // Use with Catch2 generator for parameterized testing
+  const auto *config = GENERATE_COPY(from_range(configs.value()));
+  
+  // Validate the configuration structure
+  auto validation_result = steamrot::tests::run_test_data_config(config);
+  REQUIRE(validation_result.has_value());
+  
+  INFO("Test name: " << config->metadata()->test_name()->str());
+  
+  // Dispatch to appropriate test functions based on data type
+  if (config->start_entity_collection() && config->expected_entity_collection()) {
+    // Run entity comparison tests
+    // steamrot::tests::RunEMPComparisonTest(config, configurator);
+  }
+  
+  // Future: handle other data types
+  // if (config->event_data()) { ... }
+  // if (config->ui_data()) { ... }
+}
+```
+
+The `run_test_data_config()` wrapper:
+- Validates that the config is not null
+- Checks that required metadata is present
+- Validates entity collection consistency
+- Provides a single entry point for data-driven testing
+- Is extensible for future data types
+
+
 ### Discovering Available Test Data
 
 ```cpp
