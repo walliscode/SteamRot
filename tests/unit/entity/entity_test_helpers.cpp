@@ -23,7 +23,9 @@
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
-void CompareToDefault(const CUserInterface &actual) {
+/// @brief Internal helper to compare CUserInterface to default
+/////////////////////////////////////////////////
+static void CompareToDefault(const CUserInterface &actual) {
 
   // create instance of CUserInterface
   CUserInterface c_user_interface;
@@ -34,7 +36,9 @@ void CompareToDefault(const CUserInterface &actual) {
 }
 
 /////////////////////////////////////////////////
-void CompareToDefault(const CGrimoireMachina &actual) {
+/// @brief Internal helper to compare CGrimoireMachina to default
+/////////////////////////////////////////////////
+static void CompareToDefault(const CGrimoireMachina &actual) {
 
   // create instance of CGrimoireMachina
   CGrimoireMachina c_grimoire_machina;
@@ -46,6 +50,33 @@ void CompareToDefault(const CGrimoireMachina &actual) {
           c_grimoire_machina.m_machina_forms.size());
   REQUIRE(actual.m_all_joints.size() == c_grimoire_machina.m_all_joints.size());
   REQUIRE(actual.m_holding_form == c_grimoire_machina.m_holding_form);
+}
+
+/////////////////////////////////////////////////
+/// @brief Internal helper to compare CUserInterface to data
+/////////////////////////////////////////////////
+static void CompareToData(const CUserInterface &actual,
+                   const UserInterfaceData &data) {
+
+  REQUIRE(actual.m_name == data.ui_name()->str());
+  REQUIRE(actual.m_UI_visible == data.start_visible());
+  // test the root element and its nested structure
+  REQUIRE(actual.m_root_element != nullptr);
+  REQUIRE(data.root_ui_element() != nullptr);
+
+  const auto *root_panel_data = data.root_ui_element();
+  TestNestedElementProperties(*actual.m_root_element, root_panel_data,
+                              UIElementDataUnion::UIElementDataUnion_PanelData);
+}
+
+/////////////////////////////////////////////////
+/// @brief Internal helper to compare CGrimoireMachina to data
+/////////////////////////////////////////////////
+static void CompareToData(const CGrimoireMachina &actual,
+                   const GrimoireMachinaData &data) {
+
+  REQUIRE(actual.m_all_fragments.size() == data.fragments()->size());
+  REQUIRE(actual.m_all_joints.size() == data.joints()->size());
 }
 
 /////////////////////////////////////////////////
@@ -66,29 +97,6 @@ void TestEMPIsDefaultConstructed(const EntityMemoryPool &entity_memory_pool) {
         entity::memory::GetComponent<CGrimoireMachina>(i, entity_memory_pool);
     CompareToDefault(c_grimoire_machina);
   }
-}
-
-/////////////////////////////////////////////////
-void CompareToData(const CUserInterface &actual,
-                   const UserInterfaceData &data) {
-
-  REQUIRE(actual.m_name == data.ui_name()->str());
-  REQUIRE(actual.m_UI_visible == data.start_visible());
-  // test the root element and its nested structure
-  REQUIRE(actual.m_root_element != nullptr);
-  REQUIRE(data.root_ui_element() != nullptr);
-
-  const auto *root_panel_data = data.root_ui_element();
-  TestNestedElementProperties(*actual.m_root_element, root_panel_data,
-                              UIElementDataUnion::UIElementDataUnion_PanelData);
-}
-
-/////////////////////////////////////////////////
-void CompareToData(const CGrimoireMachina &actual,
-                   const GrimoireMachinaData &data) {
-
-  REQUIRE(actual.m_all_fragments.size() == data.fragments()->size());
-  REQUIRE(actual.m_all_joints.size() == data.joints()->size());
 }
 
 /////////////////////////////////////////////////
@@ -202,12 +210,6 @@ void TestArchetypesOfConfiguredEMPfromDefaultData(
 
   // compare the expected archetypes with the actual ones
   REQUIRE(archetypes == expected_archetypes);
-}
-
-/////////////////////////////////////////////////
-void CompareEntityMemoryPools(const EntityMemoryPool &actual,
-                              const EntityMemoryPool &expected) {
-  REQUIRE_THAT(actual, EqualsEntityMemoryPool(expected));
 }
 
 /////////////////////////////////////////////////
