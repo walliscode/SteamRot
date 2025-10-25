@@ -1,8 +1,7 @@
 add_library(test_context
   TestContext.cpp
   TestScenarios.cpp
-  test_assertions.cpp
-  TestDataLoader.cpp)
+  test_assertions.cpp)
 
 target_include_directories(test_context
   PUBLIC
