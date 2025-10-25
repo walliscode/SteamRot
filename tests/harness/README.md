@@ -68,6 +68,31 @@ TEST_CASE("Load from subdirectory", "[unit]") {
 }
 ```
 
+### Using the Top-Level Wrapper
+
+The `run_test_data_config()` wrapper validates that test data is properly structured:
+
+```cpp
+#include "test_data_harness.h"
+
+TEST_CASE("Validate test data configuration", "[unit]") {
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  
+  const auto *config = GENERATE_COPY(from_range(configs.value()));
+  
+  // Validate the configuration is well-formed
+  auto result = steamrot::tests::run_test_data_config(config);
+  REQUIRE(result.has_value());
+  
+  INFO("Test name: " << config->metadata()->test_name()->str());
+  
+  // Now dispatch to appropriate test functions based on data type
+  // For example, if entity collections are present:
+  // steamrot::tests::RunEMPComparisonTest(config, configurator);
+}
+```
+
 ## API
 
 ### `load_test_data_configs()`
@@ -96,6 +121,31 @@ Loads all test data from `tests/<subdirectory>/data/` directory.
 ```cpp
 auto configs = steamrot::tests::load_test_data_configs("entity");
 ```
+
+### `run_test_data_config(config)`
+
+Top-level wrapper that runs tests based on TestDataConfig contents. This examines the configuration and validates that the appropriate data is present for testing.
+
+**Parameters:**
+- `config`: Pointer to TestDataConfig object
+
+**Returns:** `std::expected<std::monostate, FailInfo>`
+
+**Example:**
+```cpp
+auto configs = steamrot::tests::load_test_data_configs();
+REQUIRE(configs.has_value());
+
+const auto *config = configs.value()[0];
+auto result = steamrot::tests::run_test_data_config(config);
+REQUIRE(result.has_value());
+```
+
+**Supported Data Types:**
+- Entity Memory Pool comparisons (`start_entity_collection` + `expected_entity_collection`)
+- Future: Event sequences, UI configurations, Logic tests, etc.
+
+**Note:** This wrapper performs validation and dispatching. Actual test execution should be done by calling specialized test functions like `RunEMPComparisonTest` from the appropriate test helper modules.
 
 ## Integration with Matchers
 

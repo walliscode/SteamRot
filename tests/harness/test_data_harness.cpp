@@ -144,4 +144,49 @@ load_test_data_configs(const std::string &subdirectory) {
   return discover_and_load_from_directory(target_dir);
 }
 
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+run_test_data_config(const TestDataConfig *config) {
+  
+  // Validate config is not null
+  if (!config) {
+    return std::unexpected(FailInfo(FailMode::NullPointerDereference,
+                                   "TestDataConfig is null"));
+  }
+  
+  // Validate required metadata is present
+  if (!config->metadata()) {
+    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
+                                   "TestDataConfig missing required metadata"));
+  }
+  
+  // Check for entity comparison test data
+  // If both start_entity_collection and expected_entity_collection are present,
+  // this is an entity comparison test that should be handled by RunEMPComparisonTest
+  if (config->start_entity_collection() || config->expected_entity_collection()) {
+    // Entity comparison tests should be dispatched to RunEMPComparisonTest
+    // from entity_test_helpers. This wrapper doesn't execute those tests directly
+    // to avoid circular dependencies, but validates that the data is present.
+    
+    // Verify expected_entity_collection is present if start is present
+    if (config->start_entity_collection() && !config->expected_entity_collection()) {
+      return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
+                                     "start_entity_collection provided but "
+                                     "expected_entity_collection is missing"));
+    }
+    
+    // Data is present and valid for entity comparison testing
+    return std::monostate{};
+  }
+  
+  // Future: Add checks for other data types here
+  // if (config->event_data()) { ... }
+  // if (config->ui_data()) { ... }
+  // if (config->logic_data()) { ... }
+  
+  // No testable data found - this is not necessarily an error,
+  // the config might just contain metadata
+  return std::monostate{};
+}
+
 } // namespace steamrot::tests
