@@ -1,8 +1,8 @@
 {
   "metadata": {
     "test_name": "sample_test_3",
-    "description": "Third sample test for comprehensive generator testing",
-    "tags": ["unit", "data_generators", "multiple"],
+    "description": "Third sample test for comprehensive harness testing",
+    "tags": ["unit", "harness", "multiple"],
     "expected_to_pass": true,
     "version": 1
   },

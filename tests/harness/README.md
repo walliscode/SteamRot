@@ -165,3 +165,37 @@ auto configs = steamrot::tests::load_test_data_configs("subdirectory");
 - Works with adjacent `data/` directory by default (via `__FILE__`)
 - Seamlessly integrates with Catch2 generators and existing matchers
 - Uses free functions following project conventions
+
+## Test Data File Format
+
+Test data JSON files must follow the `test_data.fbs` schema located in `src/flatbuffers_headers/test_data.fbs`.
+
+**Required fields:**
+- `metadata` (required) - Test metadata including `test_name`, `description`, `tags`, etc.
+
+**Entity collection fields:**
+- `start_entity_collection` - Starting state for comparison tests
+- `expected_entity_collection` - Expected state for comparison tests
+
+**Example:**
+```json
+{
+  "metadata": {
+    "test_name": "my_test",
+    "description": "Test description",
+    "tags": ["unit"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": [...]
+  },
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": [...]
+  }
+}
+```
+
+**Important:** The schema uses `start_entity_collection` and `expected_entity_collection`, NOT `entity_collection`. Always refer to `src/flatbuffers_headers/test_data.fbs` for the authoritative schema definition.

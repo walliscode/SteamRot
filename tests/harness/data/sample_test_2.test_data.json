@@ -2,11 +2,23 @@
   "metadata": {
     "test_name": "sample_test_2",
     "description": "Another sample test data with different configuration",
-    "tags": ["unit", "data_generators"],
+    "tags": ["unit", "harness"],
     "expected_to_pass": true,
     "version": 1
   },
-  "entity_collection": {
+  "start_entity_collection": {
+    "entity_memory_pool_size": 2,
+    "entities": [
+      {
+        "index": 0,
+        "c_grimoire_machina": {
+          "fragments": [],
+          "joints": []
+        }
+      }
+    ]
+  },
+  "expected_entity_collection": {
     "entity_memory_pool_size": 2,
     "entities": [
       {

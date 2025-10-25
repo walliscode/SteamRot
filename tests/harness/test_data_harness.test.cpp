@@ -48,8 +48,7 @@ TEST_CASE("load_test_data_configs works with Catch2 generators",
   REQUIRE(config->metadata()->expected_to_pass() == true);
   
   // Verify at least some entity data is present
-  bool has_entity_data = (config->entity_collection() != nullptr ||
-                          config->start_entity_collection() != nullptr ||
+  bool has_entity_data = (config->start_entity_collection() != nullptr ||
                           config->expected_entity_collection() != nullptr);
   REQUIRE(has_entity_data);
 }

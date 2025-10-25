@@ -1147,14 +1147,46 @@ See `documentation/TEST_DATA_CONFIGURATION.md` for complete documentation.
     "expected_to_pass": true,
     "version": 1
   },
-  "entity_collection": {
+  "start_entity_collection": {
     "entity_memory_pool_size": 5,
     "entities": [
       {
         "index": 0,
         "c_user_interface": {
-          "position": { "x": 100.0, "y": 200.0 },
-          "size": { "x": 50.0, "y": 30.0 }
+          "ui_name": "test_ui",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 100, "y": 200 },
+              "size": { "x": 50, "y": 30 },
+              "children_active": false,
+              "children": [],
+              "layout": "Horizontal",
+              "spacing_strategy": "None"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "test_ui",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 100, "y": 200 },
+              "size": { "x": 50, "y": 30 },
+              "children_active": false,
+              "children": [],
+              "layout": "Horizontal",
+              "spacing_strategy": "None"
+            }
+          }
         }
       }
     ]
@@ -1166,24 +1198,27 @@ See `documentation/TEST_DATA_CONFIGURATION.md` for complete documentation.
 
 **Note:** Building is done locally by the user. FlatBuffers compilation from JSON to binary happens during the build process.
 
-#### 3. Use TestDataLoader in Tests
+#### 3. Use test_data_harness in Tests
 
 ```cpp
-#include "TestDataLoader.h"
+#include "test_data_harness.h"
 
 TEST_CASE("Load and use test data", "[unit][data-driven]") {
-  steamrot::tests::TestDataLoader loader;
-  auto result = loader.LoadTestData("my_test", "components");
+  // Load all test data configs from adjacent data/ directory
+  auto configs = steamrot::tests::load_test_data_configs();
   
-  REQUIRE(result.has_value());
-  const auto* config = result.value();
+  REQUIRE(configs.has_value());
+  const auto* config = configs.value()[0];  // Get first config
   
   // Access metadata
   REQUIRE(config->metadata()->test_name()->str() == "my_component_test");
   
   // Access entity data
-  if (config->entity_collection()) {
-    // Process entities
+  if (config->start_entity_collection()) {
+    // Process starting entities
+  }
+  if (config->expected_entity_collection()) {
+    // Process expected entities
   }
 }
 ```
@@ -1197,8 +1232,8 @@ TEST_CASE("Load and use test data", "[unit][data-driven]") {
 ### Key Features
 
 - **Extensible Schema**: Add new data types without breaking existing tests
-- **Auto-Discovery**: `DiscoverTestDataFiles()` finds all test data
-- **Batch Loading**: `LoadMultipleTestData()` for multiple configurations
+- **Auto-Discovery**: Automatically finds all .test_data.bin files
+- **Simple API**: Single function call to load all test configs
 - **Type-Safe**: FlatBuffers ensures compile-time type checking
 - **Organized**: Subdirectory structure matches test organization
 
@@ -1206,20 +1241,15 @@ TEST_CASE("Load and use test data", "[unit][data-driven]") {
 
 ```cpp
 TEST_CASE("Run all component test data", "[unit][data-driven]") {
-  steamrot::tests::TestDataLoader loader;
+  // Load all test data configs with one call
+  auto configs = steamrot::tests::load_test_data_configs("components");
+  REQUIRE(configs.has_value());
   
-  // Discover all test data files
-  auto discovery_result = loader.DiscoverTestDataFiles("components");
-  REQUIRE(discovery_result.has_value());
+  // Use Catch2 generator to run test for each config
+  const auto* config = GENERATE_COPY(from_range(configs.value()));
   
-  // Use Catch2 generator to run test for each data file
-  auto test_name = GENERATE_COPY(from_range(discovery_result.value()));
-  
-  SECTION(test_name) {
-    auto config = loader.LoadTestData(test_name, "components");
-    REQUIRE(config.has_value());
-    // Run test with this configuration
-  }
+  REQUIRE(config->metadata() != nullptr);
+  // Run test with this configuration
 }
 ```
 
@@ -1238,7 +1268,8 @@ Example:
 // test_data.fbs
 table TestDataConfig {
   metadata: TestMetadata (required);
-  entity_collection: EntityCollection;
+  start_entity_collection: EntityCollection;
+  expected_entity_collection: EntityCollection;
   new_data_type: NewDataType;  // Add new field
 }
 ```
@@ -1250,22 +1281,18 @@ table TestDataConfig {
 - **Include metadata**: Always fill out test metadata fields
 - **Keep focused**: One scenario per test data file
 - **Reuse types**: Leverage existing FlatBuffers tables
+- **Follow schema**: Use `start_entity_collection` and `expected_entity_collection` as defined in `test_data.fbs`
 
-### TestDataLoader Methods
+### test_data_harness Functions
 
 ```cpp
-// Load single test data file
-std::expected<const TestDataConfig*, FailInfo>
-LoadTestData(const std::string& test_name, const std::string& subdirectory = "");
-
-// Discover all test data files in a directory
-std::expected<std::vector<std::string>, FailInfo>
-DiscoverTestDataFiles(const std::string& subdirectory = "");
-
-// Load multiple test data files
+// Load all test data configs from adjacent data/ directory
 std::expected<std::vector<const TestDataConfig*>, FailInfo>
-LoadMultipleTestData(const std::vector<std::string>& test_names,
-                     const std::string& subdirectory = "");
+load_test_data_configs();
+
+// Load test data configs from specific subdirectory
+std::expected<std::vector<const TestDataConfig*>, FailInfo>
+load_test_data_configs(const std::string& subdirectory);
 ```
 
 ## Common Gotchas
