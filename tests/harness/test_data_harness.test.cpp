@@ -89,3 +89,57 @@ TEST_CASE("Test data harness demonstrates simple workflow",
   // Verify the config has expected structure
   REQUIRE(config->metadata()->version() >= 1);
 }
+
+TEST_CASE("run_test_data_config validates null config",
+          "[unit][harness]") {
+  
+  auto result = steamrot::tests::run_test_data_config(nullptr);
+  
+  REQUIRE_FALSE(result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::NullPointerDereference);
+}
+
+TEST_CASE("run_test_data_config validates config with entity collections",
+          "[unit][harness]") {
+  
+  // Load sample test data which has entity collections
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  REQUIRE(configs.value().size() >= 1);
+  
+  const auto *config = configs.value()[0];
+  
+  auto result = steamrot::tests::run_test_data_config(config);
+  
+  // Should succeed - validation passes
+  REQUIRE(result.has_value());
+}
+
+TEST_CASE("run_test_data_config handles all sample data",
+          "[unit][harness]") {
+  
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  
+  // Run wrapper on all sample configs
+  for (const auto *config : configs.value()) {
+    auto result = steamrot::tests::run_test_data_config(config);
+    
+    INFO("Test name: " << config->metadata()->test_name()->str());
+    REQUIRE(result.has_value());
+  }
+}
+
+TEST_CASE("run_test_data_config works with Catch2 generators",
+          "[unit][harness]") {
+  
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  
+  const auto *config = GENERATE_COPY(from_range(configs.value()));
+  
+  auto result = steamrot::tests::run_test_data_config(config);
+  
+  INFO("Test name: " << config->metadata()->test_name()->str());
+  REQUIRE(result.has_value());
+}
