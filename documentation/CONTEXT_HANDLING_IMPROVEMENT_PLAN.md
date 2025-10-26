@@ -28,8 +28,17 @@ struct GameContext {
 1. **Tight Coupling**: All components are required at construction time
 2. **Non-extensible**: Adding new context data requires changing the struct and all instantiation sites
 3. **Not Data-Driven**: Configuration is hardcoded in C++
-4. **Reference Management**: Uses references which limits flexibility (can't be reassigned)
+4. **Limited Construction Flexibility**: References must be initialized in constructor, limiting validation and error handling
 5. **Single Point of Failure**: All context must be valid at GameEngine creation
+
+**Note on Reference-Based Design:**
+The current system uses references (not pointers) which provides important safety guarantees:
+- **Compile-time lifetime safety**: References must be valid when created
+- **No null state**: References cannot be null, preventing a class of runtime errors
+- **Clear ownership**: References signal that the context doesn't own the resources
+- **Strict ordering**: Forces proper initialization order, making bugs more visible
+
+The proposed builder pattern preserves these benefits using `std::optional<std::reference_wrapper<T>>` instead of pointers.
 
 ### 2. LogicContext (Scene-Specific)
 
@@ -110,6 +119,23 @@ GameEngine Constructor
 
 ### Phase 1: Introduce Context Builder Pattern
 
+**Design Philosophy: References Over Pointers**
+
+The builder pattern implementation maintains the existing codebase's preference for references over pointers:
+
+- **Builder Internal State**: Uses `std::optional<std::reference_wrapper<T>>` to store references during construction
+  - Allows checking if a reference has been set (via `has_value()`)
+  - Maintains reference semantics (no null pointers)
+  - Enforces strict lifetime requirements
+  - Forces errors at build time if references become invalid
+
+- **Final Context**: Continues to use references (not pointers) matching the current design
+  - No risk of dangling pointers in production code
+  - Clear ownership semantics
+  - Compiler-enforced lifetime guarantees
+
+This approach provides builder pattern flexibility while preserving the safety and clarity of reference-based design.
+
 #### 1.1 Create ContextBuilder Base Class
 
 **New File:** `src/context/ContextBuilder.h`
@@ -147,11 +173,11 @@ namespace steamrot {
 
 class GameContextBuilder : public ContextBuilder<GameContext> {
 private:
-  sf::RenderWindow* m_window{nullptr};
-  EventHandler* m_event_handler{nullptr};
-  AssetManager* m_asset_manager{nullptr};
-  const size_t* m_loop_number{nullptr};
-  EnvironmentType m_env_type{EnvironmentType::None};
+  std::optional<std::reference_wrapper<sf::RenderWindow>> m_window;
+  std::optional<std::reference_wrapper<EventHandler>> m_event_handler;
+  std::optional<std::reference_wrapper<AssetManager>> m_asset_manager;
+  std::optional<std::reference_wrapper<const size_t>> m_loop_number;
+  std::optional<EnvironmentType> m_env_type;
   
 public:
   GameContextBuilder& SetWindow(sf::RenderWindow& window);
@@ -173,6 +199,8 @@ public:
 - Easy validation before building
 - Clear error messages for missing dependencies
 - Testable in isolation
+- **Uses references (via std::reference_wrapper) to maintain strict lifetime guarantees**
+- **Forces errors at build time if references become invalid**
 
 #### 1.3 Create LogicContextBuilder
 
@@ -183,10 +211,10 @@ namespace steamrot {
 
 class LogicContextBuilder : public ContextBuilder<LogicContext> {
 private:
-  EntityMemoryPool* m_scene_entities{nullptr};
-  const std::unordered_map<ArchetypeID, Archetype>* m_archetypes{nullptr};
-  sf::RenderTexture* m_scene_texture{nullptr};
-  const GameContext* m_game_context{nullptr}; // Use GameContext for shared data
+  std::optional<std::reference_wrapper<EntityMemoryPool>> m_scene_entities;
+  std::optional<std::reference_wrapper<const std::unordered_map<ArchetypeID, Archetype>>> m_archetypes;
+  std::optional<std::reference_wrapper<sf::RenderTexture>> m_scene_texture;
+  std::optional<std::reference_wrapper<const GameContext>> m_game_context;
   
 public:
   LogicContextBuilder& SetSceneEntities(EntityMemoryPool& entities);
@@ -207,6 +235,8 @@ public:
 - Clear dependency on GameContext
 - Can be configured incrementally
 - Easy to extend with new scene-specific data
+- **Uses references (via std::reference_wrapper) to enforce strict lifetime management**
+- **Prevents dangling pointer issues by requiring valid references**
 
 ### Phase 2: Data-Driven Context Configuration
 
