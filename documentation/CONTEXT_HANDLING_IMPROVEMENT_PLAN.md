@@ -142,9 +142,19 @@ Based on review feedback, the following architectural decisions guide the implem
    - Builders don't store the context - just build and return it
 
 5. **FlatBuffers Integration**
-   - Root table named `ContextData` (not ContextConfiguration)
-   - Use existing `FlatbuffersDataLoader` with new `ProvideContextData()` method
+   - Root tables: `ContextData` for main game, `TestContextData` for tests
+   - Use existing `FlatbuffersDataLoader` with new methods
    - Consistent with existing data loading patterns
+
+6. **Test Infrastructure - Director Pattern**
+   - TestContextDirector with static registry (like ContextDirector)
+   - TestResources struct stores permanent objects
+   - TestContext is a simple wrapper for convenience
+   - Data-driven via TestContextData
+
+7. **No Extensibility System**
+   - Keeping it simple - no extension framework needed at this stage
+   - Can add specific features directly to contexts as needed
 
 ### Phase 1: Introduce Context Builder Pattern
 
@@ -280,15 +290,6 @@ table SceneContextConfig {
   entity_pool_size: uint32 = 100;
   render_texture_width: uint32 = 800;
   render_texture_height: uint32 = 600;
-  // Future: add configurable context extensions
-  extensions: [ContextExtension];
-}
-
-// Extensible context data
-table ContextExtension {
-  key: string;
-  value_type: string; // "int", "float", "string", "bool"
-  value_data: [ubyte]; // Serialized value
 }
 
 // Root table for context configuration
@@ -434,44 +435,117 @@ public:
 
 ### Phase 4: Improve Test Infrastructure
 
-#### 4.1 Refactor TestContext to Use Builders
+#### 4.1 Data-Driven Test Context Configuration
+
+**New File:** `src/flatbuffers_headers/test_context_data.fbs`
+
+```fbs
+namespace steamrot;
+
+// Configuration for test contexts
+table TestContextConfig {
+  scene_type: string;
+  entity_pool_size: uint32 = 100;
+  ui_entity_count: uint32 = 0;
+  grimoire_entity_count: uint32 = 0;
+}
+
+// Root table for test context configuration
+table TestContextData {
+  configs: [TestContextConfig];
+}
+
+root_type TestContextData;
+```
+
+**Modified:** `src/data_handlers/FlatbuffersDataLoader.h`
+
+Add method to existing class:
+
+```cpp
+/////////////////////////////////////////////////
+/// @brief Provides TestContextData from binary file
+/////////////////////////////////////////////////
+std::expected<const TestContextData *, FailInfo> ProvideTestContextData() const;
+```
+
+#### 4.2 TestContextDirector - Static Registry for Test Contexts
+
+**New File:** `tests/context/TestContextDirector.h`
+
+```cpp
+namespace steamrot::tests {
+
+// Stores the permanent test objects that contexts reference
+struct TestResources {
+  sf::RenderWindow render_window;
+  EventHandler event_handler;
+  AssetManager asset_manager;
+  size_t loop_number{0};
+  EnvironmentType env_type{EnvironmentType::Test};
+  
+  TestResources();
+};
+
+class TestContextDirector {
+private:
+  // Static storage for permanent test resources
+  static std::unique_ptr<TestResources> s_resources;
+  
+  // Static map to cache built contexts by scene type
+  static std::unordered_map<SceneType, GameContext> s_game_contexts;
+  static std::unordered_map<SceneType, LogicContext> s_logic_contexts;
+  
+  TestContextDirector() = delete;
+  
+public:
+  // Initialize resources (call once at test start)
+  static void Initialize();
+  
+  // Get or build GameContext
+  static std::expected<const GameContext&, FailInfo> GetGameContext();
+  
+  // Get or build LogicContext for a scene type
+  static std::expected<const LogicContext&, FailInfo> 
+  GetLogicContext(SceneType scene_type);
+  
+  // Clear all cached contexts (for test isolation)
+  static void ClearContexts();
+  
+  // Reset everything (for test cleanup)
+  static void Reset();
+};
+
+} // namespace steamrot::tests
+```
+
+**Design Rationale:**
+- **TestContextDirector**: Static registry pattern (like ContextDirector)
+- **TestResources**: Permanent storage for objects that contexts reference
+- **No Factory needed**: Director handles both storage and context creation
+- **Data-driven**: Can load configurations from TestContextData
+
+#### 4.3 Simplified TestContext as Convenience Wrapper
 
 **Modified:** `tests/context/TestContext.h`
 
 ```cpp
 namespace steamrot::tests {
 
+// Simple convenience wrapper around TestContextDirector
 class TestContext {
 private:
-  // Core test resources (owned by TestContext)
-  sf::RenderWindow m_render_window;
-  EventHandler m_event_handler;
-  AssetManager m_asset_manager;
-  const size_t m_loop_number{0};
-  const EnvironmentType m_env_type{EnvironmentType::Test};
-  
-  // Builders created on demand
-  GameContextBuilder CreateGameContextBuilder() const;
-  LogicContextBuilder CreateLogicContextBuilder(SceneType scene_type) const;
-  
-  // Cached contexts (built on demand)
-  mutable std::optional<GameContext> m_game_context_cache;
-  mutable std::unordered_map<SceneType, LogicContext> m_logic_context_cache;
+  SceneType m_scene_type{SceneType::SceneType_TEST};
   
 public:
-  // Simplified constructor - doesn't require scene type upfront
-  TestContext();
+  TestContext(SceneType scene_type = SceneType::SceneType_TEST);
   
-  // Get contexts (built lazily using builders)
+  // Get contexts via director
   const GameContext& GetGameContext() const;
-  const LogicContext& GetLogicContext(SceneType scene_type) const;
+  const LogicContext& GetLogicContext() const;
   
-  // Configure for specific test scenarios
+  // Configure scene type
   TestContext& WithSceneType(SceneType scene_type);
-  TestContext& WithEntityCount(size_t count);
-  
-  // Clear cached contexts (for multi-scene tests)
-  void ClearContextCache();
 };
 
 } // namespace steamrot::tests
@@ -479,158 +553,40 @@ public:
 
 **Usage Example:**
 ```cpp
-// Old way - forced to pick scene in constructor
-TEST_CASE("Some test", "[unit]") {
-  steamrot::tests::TestContext context{SceneType::SceneType_TITLE};
-  auto& game_ctx = context.GetGameContext();
-  auto& logic_ctx = context.GetLogicContextForTitleScene();
-}
-
-// New way - flexible and lazy
-TEST_CASE("Some test", "[unit]") {
+// Simple usage
+TEST_CASE("Test with default context", "[unit]") {
   steamrot::tests::TestContext context;
-  context.WithSceneType(SceneType::SceneType_TITLE)
-         .WithEntityCount(50);
-  
   auto& game_ctx = context.GetGameContext();
-  auto& logic_ctx = context.GetLogicContext(SceneType::SceneType_TITLE);
+  // Test using game_ctx
 }
 
-// Even better - only get what you need
-TEST_CASE("Simple test", "[unit]") {
-  steamrot::tests::TestContext context;
-  auto& game_ctx = context.GetGameContext(); // No scene needed!
+// With specific scene
+TEST_CASE("Test title scene", "[unit]") {
+  steamrot::tests::TestContext context(SceneType::SceneType_TITLE);
+  auto& logic_ctx = context.GetLogicContext();
+  // Test using logic_ctx
 }
-```
 
-#### 4.2 Create TestContextFactory
-
-**New File:** `tests/context/TestContextFactory.h`
-
-```cpp
-namespace steamrot::tests {
-
-class TestContextFactory {
-public:
-  // Preset configurations for common test scenarios
-  static TestContext CreateMinimal();
-  static TestContext CreateWithUI(size_t ui_entity_count = 10);
-  static TestContext CreateWithGrimoire(size_t grimoire_count = 5);
-  static TestContext CreateForScene(SceneType scene_type);
-  static TestContext CreateFromConfig(const std::string& test_config_path);
-  
-  // For data-driven tests
-  static std::vector<TestContext> CreateAllSceneContexts();
-};
-
-} // namespace steamrot::tests
+// Using director directly (for advanced cases)
+TEST_CASE("Direct director usage", "[unit]") {
+  TestContextDirector::Initialize();
+  auto& game_ctx = TestContextDirector::GetGameContext().value();
+  auto& logic_ctx = TestContextDirector::GetLogicContext(SceneType::SceneType_TITLE).value();
+  // Test using contexts
+  TestContextDirector::ClearContexts();
+}
 ```
 
 **Benefits:**
-- Reduced test boilerplate
-- Consistent test setup
-- Easy to create specialized test contexts
-- Supports data-driven testing
-
-### Phase 5: Extensibility Improvements
-
-#### 5.1 Context Extension System
-
-**New File:** `src/context/ContextExtensions.h`
-
-```cpp
-namespace steamrot {
-
-// Base class for context extensions
-class IContextExtension {
-public:
-  virtual ~IContextExtension() = default;
-  virtual const std::string& GetKey() const = 0;
-  virtual std::expected<std::monostate, FailInfo> 
-    LoadFromData(const ContextExtension* data) = 0;
-};
-
-// Manager for dynamic context extensions
-class ContextExtensionManager {
-private:
-  std::unordered_map<std::string, std::unique_ptr<IContextExtension>> 
-    m_extensions;
-  
-public:
-  template<typename T>
-  void RegisterExtension(const std::string& key, std::unique_ptr<T> extension);
-  
-  template<typename T>
-  T* GetExtension(const std::string& key);
-  
-  std::expected<std::monostate, FailInfo>
-  LoadExtensionsFromData(const ContextConfiguration* config);
-};
-
-// Example extension for debug info
-class DebugContextExtension : public IContextExtension {
-private:
-  bool m_show_fps{false};
-  bool m_show_entity_count{false};
-  
-public:
-  const std::string& GetKey() const override { 
-    static const std::string key = "debug";
-    return key; 
-  }
-  
-  std::expected<std::monostate, FailInfo> 
-  LoadFromData(const ContextExtension* data) override;
-  
-  bool ShouldShowFPS() const { return m_show_fps; }
-  bool ShouldShowEntityCount() const { return m_show_entity_count; }
-};
-
-} // namespace steamrot
-```
-
-**Benefits:**
-- Add new context data without modifying core structs
-- Plugin-style extensibility
-- Can be loaded from data files
-- Easy to add domain-specific context
-
-#### 5.2 Modified Context Structs to Support Extensions
-
-**Modified:** `src/context/GameContext.h`
-
-```cpp
-namespace steamrot {
-
-struct GameContext {
-  // Core required fields (unchanged)
-  sf::RenderWindow &game_window;
-  EventHandler &event_handler;
-  sf::Vector2i mouse_position{0, 0};
-  const size_t &loop_number;
-  AssetManager &asset_manager;
-  const EnvironmentType env_type;
-  
-  // NEW: Extension support
-  std::shared_ptr<ContextExtensionManager> extensions;
-  
-  // Helper to get extensions safely
-  template<typename T>
-  T* GetExtension(const std::string& key) {
-    if (extensions) {
-      return extensions->GetExtension<T>(key);
-    }
-    return nullptr;
-  }
-};
-
-} // namespace steamrot
-```
+- TestResources stores permanent objects
+- TestContextDirector manages context lifecycle
+- TestContext provides simple wrapper for common cases
+- Data-driven via TestContextData FlatBuffers
+- Static pattern (no singleton)
 
 ## Implementation Roadmap
 
 ### Stage 1: Foundation (Week 1-2)
-- [ ] Create ContextBuilder base class and implementations
 - [ ] Create GameContextBuilder
 - [ ] Create LogicContextBuilder
 - [ ] Add unit tests for builders
@@ -638,7 +594,8 @@ struct GameContext {
 - [ ] Update Scene to use LogicContextBuilder
 
 ### Stage 2: Data-Driven Configuration (Week 3-4)
-- [ ] Create context_config.fbs schema
+- [ ] Create context_data.fbs schema
+- [ ] Add ProvideContextData() to FlatbuffersDataLoader
 - [ ] Implement ContextConfigurator
 - [ ] Create default configuration JSON files
 - [ ] Add configuration loading to GameEngine startup
@@ -646,28 +603,22 @@ struct GameContext {
 - [ ] Document configuration format
 
 ### Stage 3: Context Management (Week 5-6)
-- [ ] Implement ContextManager singleton
-- [ ] Integrate ContextManager into GameEngine
-- [ ] Update SceneFactory to use ContextManager
-- [ ] Add context caching and lazy initialization
+- [ ] Implement ContextDirector with static registry
+- [ ] Integrate ContextDirector into GameEngine
+- [ ] Update SceneFactory to use ContextDirector
 - [ ] Add context lifecycle tests
 
 ### Stage 4: Test Infrastructure (Week 7-8)
-- [ ] Refactor TestContext to use builders
-- [ ] Create TestContextFactory
+- [ ] Create test_context_data.fbs schema
+- [ ] Add ProvideTestContextData() to FlatbuffersDataLoader
+- [ ] Implement TestResources struct
+- [ ] Implement TestContextDirector with static registry
+- [ ] Create TestContext wrapper class
 - [ ] Update existing tests to use new TestContext API
 - [ ] Add test context configuration files
 - [ ] Document new test patterns
 
-### Stage 5: Extension System (Week 9-10)
-- [ ] Implement IContextExtension interface
-- [ ] Create ContextExtensionManager
-- [ ] Add extension support to context structs
-- [ ] Create example extensions (Debug, Metrics)
-- [ ] Add extension loading from data
-- [ ] Document extension creation guide
-
-### Stage 6: Migration and Cleanup (Week 11-12)
+### Stage 5: Migration and Cleanup (Week 9-10)
 - [ ] Migrate all scenes to new context system
 - [ ] Migrate all logic classes to new context system
 - [ ] Remove deprecated context creation methods
@@ -747,28 +698,27 @@ TEST_CASE("All scene contexts load correctly", "[integration][data-driven]") {
 ## Benefits Summary
 
 ### For Developers
-1. **Easier Testing**: Simplified test context creation with less boilerplate
+1. **Easier Testing**: Simplified test context creation with TestContextDirector
 2. **Better Separation of Concerns**: Context building separate from usage
 3. **Clearer Dependencies**: Builder pattern makes dependencies explicit
-4. **Extensibility**: Easy to add new context data without breaking existing code
+4. **Simple Design**: No complex extension system - just core functionality
 
 ### For Maintainability
 1. **Data-Driven**: Configuration changes don't require recompilation
-2. **Centralized Management**: Single source of truth for context state
+2. **Static Registry**: ContextDirector and TestContextDirector use simple static maps
 3. **Validation**: Built-in validation before context creation
 4. **Documentation**: Configuration files serve as documentation
 
 ### For Testing
 1. **Isolation**: Easy to test components with minimal context
-2. **Flexibility**: Create exactly the context needed for each test
-3. **Reusability**: TestContextFactory provides common configurations
-4. **Performance**: Lazy initialization reduces test setup overhead
+2. **Flexibility**: TestContextDirector manages all test resources
+3. **Data-Driven**: TestContextData allows configurable test scenarios
+4. **Simple API**: TestContext wrapper provides convenient interface
 
 ### For Future Features
-1. **Plugin System**: Extensions allow for domain-specific context data
-2. **Serialization**: Context configuration can be saved/loaded
-3. **Hot Reload**: Configuration changes can be applied at runtime
-4. **Multi-Environment**: Easy to maintain different configs for dev/test/prod
+1. **Serialization**: Context configuration can be saved/loaded
+2. **Multi-Environment**: Easy to maintain different configs for dev/test/prod
+3. **Incremental Enhancement**: Can add features to contexts directly as needed
 
 ## Migration Path
 
@@ -792,11 +742,10 @@ auto new_ctx = builder
 
 ### Gradual Migration
 1. Week 1-2: Add new builders alongside existing constructors
-2. Week 3-4: Update GameEngine to use builders
+2. Week 3-4: Update GameEngine to use builders and ContextDirector
 3. Week 5-6: Update Scene/SceneFactory to use builders
-4. Week 7-8: Update test infrastructure
-5. Week 9-10: Migrate all Logic classes
-6. Week 11-12: Remove old constructors, cleanup
+4. Week 7-8: Update test infrastructure with TestContextDirector
+5. Week 9-10: Migrate all scenes and logic classes, remove old constructors, cleanup
 
 ## Risk Mitigation
 
@@ -820,33 +769,32 @@ auto new_ctx = builder
 This improvement plan addresses the current limitations of the context handling system by introducing:
 
 1. **Builder Pattern** for flexible, validated context construction
-2. **Data-Driven Configuration** to externalize settings
-3. **Centralized Management** for better lifecycle control
-4. **Lazy Initialization** to improve performance
-5. **Extension System** for future-proof extensibility
-6. **Improved Test Infrastructure** for better developer experience
+2. **Data-Driven Configuration** to externalize settings via FlatBuffers
+3. **Static Registry Pattern** (ContextDirector, TestContextDirector) for simple lifecycle control
+4. **Improved Test Infrastructure** with TestResources and data-driven configuration
+5. **Simplified Design** - no complex extensibility framework, just core functionality
 
-The phased approach allows for gradual migration while maintaining backward compatibility, reducing risk while delivering continuous value.
+The phased approach allows for gradual migration (10 weeks) while maintaining backward compatibility, reducing risk while delivering continuous value.
 
 ## Appendix A: File Structure After Implementation
 
 ```
 src/
 ├── context/
-│   ├── GameContext.h/cpp           [Modified: Add extensions]
+│   ├── GameContext.h/cpp           [Unchanged]
 │   ├── GameContextBuilder.h/cpp    [New]
 │   ├── ContextConfigurator.h/cpp   [New]
 │   ├── ContextDirector.h/cpp       [New]
-│   ├── ContextExtensions.h/cpp     [New]
 │   └── CMakeLists.txt              [Modified]
 ├── logic/
 │   ├── LogicContext.h              [Modified: Pull fields from GameContext individually]
 │   ├── LogicContextBuilder.h/cpp   [New]
 │   └── CMakeLists.txt              [Modified]
 ├── data_handlers/
-│   └── FlatbuffersDataLoader.h/cpp [Modified: Add ProvideContextData()]
+│   └── FlatbuffersDataLoader.h/cpp [Modified: Add ProvideContextData(), ProvideTestContextData()]
 ├── flatbuffers_headers/
-│   └── context_data.fbs            [New]
+│   ├── context_data.fbs            [New]
+│   └── test_context_data.fbs       [New]
 └── ...
 
 data/
@@ -856,14 +804,11 @@ data/
 
 tests/
 ├── context/
-│   ├── TestContext.h/cpp           [Modified: Use builders]
-│   ├── TestContextFactory.h/cpp    [New]
+│   ├── TestContext.h/cpp           [Modified: Simplified wrapper]
+│   ├── TestContextDirector.h/cpp   [New]
 │   └── CMakeLists.txt              [Modified]
 ├── data/
-│   └── test_context_configs/       [New]
-│       ├── minimal.json
-│       ├── ui_heavy.json
-│       └── grimoire.json
+│   └── test_context_data.bin       [New: Compiled FlatBuffers]
 └── ...
 ```
 
