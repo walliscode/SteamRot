@@ -4,6 +4,9 @@ include(Catch)
 # Test utilities and shared context
 add_subdirectory(context)
 
+# Test matchers - custom Catch2 matchers
+add_subdirectory(matchers)
+
 # Test harness - utilities for data-driven testing
 add_subdirectory(harness)
 

@@ -91,21 +91,20 @@ TEST_CASE("Validate test data configuration", "[unit]") {
 
 ### Running Entity Memory Pool Comparison Tests
 
-The `run_entity_memory_pool_comparison_test()` function runs entity memory pool comparison tests based on TestDataConfig:
+The `run_entity_memory_pool_comparison_test()` function compares two EntityMemoryPool instances directly:
 
 ```cpp
 #include "test_data_harness.h"
 
 TEST_CASE("Entity memory pool comparison test", "[unit]") {
-  auto configs = steamrot::tests::load_test_data_configs();
-  REQUIRE(configs.has_value());
+  // Create and configure pools
+  EntityMemoryPool actual_pool;
+  EntityMemoryPool expected_pool;
   
-  const auto *config = GENERATE_COPY(from_range(configs.value()));
+  // ... configure pools, simulate logic, etc ...
   
-  // Run entity memory pool comparison test
-  // This will compare start_entity_collection with expected_entity_collection
-  // using the EqualsEntityMemoryPool matcher
-  steamrot::tests::run_entity_memory_pool_comparison_test(config);
+  // Compare pools using matcher
+  steamrot::tests::run_entity_memory_pool_comparison_test(actual_pool, expected_pool);
 }
 ```
 
@@ -163,50 +162,47 @@ REQUIRE(result.has_value());
 
 **Note:** This wrapper performs validation only. For actual test execution, use specialized test functions like `run_entity_memory_pool_comparison_test()`.
 
-### `run_entity_memory_pool_comparison_test(config)`
+### `run_entity_memory_pool_comparison_test(actual, expected)`
 
-Runs entity memory pool comparison tests based on TestDataConfig contents. This function creates and configures entity memory pools from the test data and compares them using the EqualsEntityMemoryPool matcher.
+Compares two EntityMemoryPool instances using the EqualsEntityMemoryPool matcher.
 
 **Parameters:**
-- `config`: Pointer to TestDataConfig object containing `start_entity_collection` and `expected_entity_collection`
+- `actual`: The actual EntityMemoryPool to test
+- `expected`: The expected EntityMemoryPool to compare against
 
 **Returns:** None (uses Catch2 assertions internally)
 
 **Example:**
 ```cpp
-auto configs = steamrot::tests::load_test_data_configs();
-REQUIRE(configs.has_value());
+EntityMemoryPool actual_pool;
+EntityMemoryPool expected_pool;
 
-const auto *config = GENERATE_COPY(from_range(configs.value()));
-steamrot::tests::run_entity_memory_pool_comparison_test(config);
+// Configure pools, simulate logic, etc.
+// ...
+
+steamrot::tests::run_entity_memory_pool_comparison_test(actual_pool, expected_pool);
 ```
 
-**Required Data:**
-- `expected_entity_collection` (required)
-- `start_entity_collection` (optional - if omitted, starts with default-constructed pool)
-
 **Behavior:**
-- Creates a start pool (default-constructed or configured from `start_entity_collection`)
-- Creates an expected pool (configured from `expected_entity_collection`)
 - Compares pools using `EqualsEntityMemoryPool` matcher
 - Provides detailed error messages on mismatch
+- Allows pools to be instantiated and manipulated before comparison (e.g., simulating logic)
 
 ## Integration with Matchers
 
-The test harness is designed to work seamlessly with the existing matcher infrastructure in `tests/unit/matchers/`. The `run_entity_memory_pool_comparison_test()` function uses the `EqualsEntityMemoryPool` matcher internally:
+The test harness is designed to work seamlessly with the existing matcher infrastructure in `tests/matchers/`. The `run_entity_memory_pool_comparison_test()` function uses the `EqualsEntityMemoryPool` matcher internally:
 
 ```cpp
 #include "test_data_harness.h"
 
-TEST_CASE("Test entity pools with data-driven approach", "[unit]") {
-  auto configs = steamrot::tests::load_test_data_configs();
-  REQUIRE(configs.has_value());
+TEST_CASE("Test entity pools with matcher", "[unit]") {
+  EntityMemoryPool actual_pool;
+  EntityMemoryPool expected_pool;
   
-  const auto *config = GENERATE_COPY(from_range(configs.value()));
+  // Configure and manipulate pools...
   
   // Automatically uses EqualsEntityMemoryPool matcher for comparison
-  steamrot::tests::run_entity_memory_pool_comparison_test(config);
-}
+  steamrot::tests::run_entity_memory_pool_comparison_test(actual_pool, expected_pool);
 }
 ```
 

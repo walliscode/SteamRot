@@ -8,8 +8,6 @@
 /////////////////////////////////////////////////
 #include "test_data_harness.h"
 #include "PathProvider.h"
-#include "FlatbuffersConfigurator.h"
-#include "entity_memory.h"
 #include "entity_memory_pool_matchers.h"
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
@@ -195,61 +193,10 @@ run_test_data_config(const TestDataConfig *config) {
 }
 
 /////////////////////////////////////////////////
-void run_entity_memory_pool_comparison_test(const TestDataConfig *config) {
-  
-  // Verify config is not null
-  if (!config) {
-    FAIL("TestDataConfig is null");
-  }
-
-  // Check if we have the new format with start/expected collections
-  if (config->start_entity_collection() ||
-      config->expected_entity_collection()) {
-
-    // Create configurator for setting up pools
-    FlatbuffersConfigurator configurator;
-
-    // Create start pool
-    EntityMemoryPool start_pool;
-
-    // If start_entity_collection is provided, configure it
-    // Otherwise, use default-constructed pool
-    if (config->start_entity_collection()) {
-      auto configure_result = configurator.ConfigureEntitiesFromCollection(
-          start_pool, config->start_entity_collection());
-
-      if (!configure_result.has_value()) {
-        FAIL("Failed to configure start_entity_collection: " +
-             configure_result.error().message);
-      }
-    }
-
-    // Create expected pool
-    EntityMemoryPool expected_pool;
-
-    // If expected_entity_collection is provided, configure it
-    if (config->expected_entity_collection()) {
-      auto configure_result = configurator.ConfigureEntitiesFromCollection(
-          expected_pool, config->expected_entity_collection());
-
-      if (!configure_result.has_value()) {
-        FAIL("Failed to configure expected_entity_collection: " +
-             configure_result.error().message);
-      }
-
-      // Compare the pools using matcher
-      REQUIRE_THAT(start_pool, EqualsEntityMemoryPool(expected_pool));
-
-    } else {
-      // No expected collection provided, can't do comparison
-      FAIL("expected_entity_collection is required when using "
-           "start_entity_collection");
-    }
-
-  } else {
-    // No entity data present, nothing to test, not a fail
-    INFO("No entity collection data present in TestDataConfig");
-  }
+void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
+                                            const EntityMemoryPool &expected) {
+  // Compare the pools using matcher
+  REQUIRE_THAT(actual, EqualsEntityMemoryPool(expected));
 }
 
 } // namespace steamrot::tests

@@ -12,6 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FailInfo.h"
+#include "containers.h"
 #include "test_data_generated.h"
 #include <expected>
 #include <string>
@@ -70,19 +71,18 @@ std::expected<std::monostate, FailInfo>
 run_test_data_config(const TestDataConfig *config);
 
 /////////////////////////////////////////////////
-/// @brief Wrapper function to run EMP comparison tests based on TestDataConfig
+/// @brief Wrapper function to run EMP comparison tests
 ///
-/// This function examines the TestDataConfig and runs appropriate tests based
-/// on what data is present:
-/// - If start_entity_collection and expected_entity_collection are present,
-///   creates both pools and compares them using matchers
-/// - If start_entity_collection is not present, starts with default-constructed pool
+/// This function compares two EntityMemoryPool instances using the
+/// EqualsEntityMemoryPool matcher, ensuring detailed error messages on mismatch.
 ///
-/// Uses the EqualsEntityMemoryPool matcher for comparison, ensuring detailed
-/// error messages on mismatch.
+/// This allows tests to instantiate and manipulate EMPs (e.g., simulate logic)
+/// before comparison.
 ///
-/// @param config The test data configuration to process
+/// @param actual The actual EntityMemoryPool to test
+/// @param expected The expected EntityMemoryPool to compare against
 /////////////////////////////////////////////////
-void run_entity_memory_pool_comparison_test(const TestDataConfig *config);
+void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
+                                            const EntityMemoryPool &expected);
 
 } // namespace steamrot::tests
