@@ -117,132 +117,150 @@ GameEngine Constructor
 
 ## Proposed Improvements
 
+### Key Design Decisions
+
+Based on review feedback, the following architectural decisions guide the implementation:
+
+1. **Smart Pointers in Builders, References in Contexts**
+   - Builders use `std::shared_ptr<T>` internally for flexibility
+   - Final contexts use references (matching existing design philosophy)
+   - Avoids undefined behavior while maintaining strict lifetime guarantees
+
+2. **LogicContext Pulls Individual Fields (Not GameContext)**
+   - LogicContext takes individual resources (window, asset_manager, etc.)
+   - Does not store a reference to GameContext itself
+   - More explicit dependencies and better testability
+
+3. **No Singleton Pattern - Static Registry Instead**
+   - ContextDirector uses static map and methods (not singleton)
+   - Simpler, more testable, not time-critical
+   - Easy to clear for testing
+
+4. **Non-Templated, Concrete Builders**
+   - GameContextBuilder and LogicContextBuilder are concrete classes
+   - No template base class needed
+   - Builders don't store the context - just build and return it
+
+5. **FlatBuffers Integration**
+   - Root table named `ContextData` (not ContextConfiguration)
+   - Use existing `FlatbuffersDataLoader` with new `ProvideContextData()` method
+   - Consistent with existing data loading patterns
+
 ### Phase 1: Introduce Context Builder Pattern
 
-**Design Philosophy: References Over Pointers**
+**Design Philosophy: Smart Pointers in Builders, References in Contexts**
 
-The builder pattern implementation maintains the existing codebase's preference for references over pointers:
+The builder pattern uses smart pointers internally for flexibility during construction, but produces contexts with references:
 
-- **Builder Internal State**: Uses `std::optional<std::reference_wrapper<T>>` to store references during construction
-  - Allows checking if a reference has been set (via `has_value()`)
-  - Maintains reference semantics (no null pointers)
-  - Enforces strict lifetime requirements
-  - Forces errors at build time if references become invalid
+- **Builder Internal State**: Uses smart pointers (`std::shared_ptr<T>`) to store objects during construction
+  - Allows builders to own temporary objects if needed
+  - Explicit lifetime management during building phase
+  - No undefined behavior from uninitialized references
 
-- **Final Context**: Continues to use references (not pointers) matching the current design
+- **Final Context**: Built contexts use references (matching current design)
+  - Builders pass through references from their smart pointers when calling `Build()`
   - No risk of dangling pointers in production code
   - Clear ownership semantics
   - Compiler-enforced lifetime guarantees
 
-This approach provides builder pattern flexibility while preserving the safety and clarity of reference-based design.
+- **Simplified Design**: Builders don't need to be templated or store the final Context
+  - Each builder is a concrete class for its specific context type
+  - Build() returns the context directly, not a stored copy
+  - Easier to understand and maintain
 
-#### 1.1 Create ContextBuilder Base Class
+This approach provides builder pattern flexibility while preserving the safety and clarity of reference-based design for the final contexts.
 
-**New File:** `src/context/ContextBuilder.h`
-
-```cpp
-namespace steamrot {
-
-template<typename ContextT>
-class ContextBuilder {
-protected:
-  std::optional<ContextT> m_context;
-  
-public:
-  virtual ~ContextBuilder() = default;
-  
-  // Build and validate context
-  virtual std::expected<ContextT, FailInfo> Build() = 0;
-  
-  // Check if context is ready
-  virtual bool IsValid() const = 0;
-  
-  // Reset builder state
-  virtual void Reset() = 0;
-};
-
-} // namespace steamrot
-```
-
-#### 1.2 Create GameContextBuilder
+#### 1.1 Create GameContextBuilder
 
 **New File:** `src/context/GameContextBuilder.h`
 
 ```cpp
 namespace steamrot {
 
-class GameContextBuilder : public ContextBuilder<GameContext> {
+class GameContextBuilder {
 private:
-  std::optional<std::reference_wrapper<sf::RenderWindow>> m_window;
-  std::optional<std::reference_wrapper<EventHandler>> m_event_handler;
-  std::optional<std::reference_wrapper<AssetManager>> m_asset_manager;
-  std::optional<std::reference_wrapper<const size_t>> m_loop_number;
-  std::optional<EnvironmentType> m_env_type;
+  std::shared_ptr<sf::RenderWindow> m_window;
+  std::shared_ptr<EventHandler> m_event_handler;
+  std::shared_ptr<AssetManager> m_asset_manager;
+  std::shared_ptr<const size_t> m_loop_number;
+  EnvironmentType m_env_type{EnvironmentType::None};
   
 public:
-  GameContextBuilder& SetWindow(sf::RenderWindow& window);
-  GameContextBuilder& SetEventHandler(EventHandler& handler);
-  GameContextBuilder& SetAssetManager(AssetManager& manager);
-  GameContextBuilder& SetLoopNumber(const size_t& loop_num);
+  GameContextBuilder() = default;
+  
+  GameContextBuilder& SetWindow(std::shared_ptr<sf::RenderWindow> window);
+  GameContextBuilder& SetEventHandler(std::shared_ptr<EventHandler> handler);
+  GameContextBuilder& SetAssetManager(std::shared_ptr<AssetManager> manager);
+  GameContextBuilder& SetLoopNumber(std::shared_ptr<const size_t> loop_num);
   GameContextBuilder& SetEnvironmentType(EnvironmentType env_type);
   
-  std::expected<GameContext, FailInfo> Build() override;
-  bool IsValid() const override;
-  void Reset() override;
+  // Build returns GameContext with references extracted from smart pointers
+  std::expected<GameContext, FailInfo> Build() const;
 };
 
 } // namespace steamrot
 ```
 
 **Benefits:**
-- Flexible construction order
-- Easy validation before building
-- Clear error messages for missing dependencies
-- Testable in isolation
-- **Uses references (via std::reference_wrapper) to maintain strict lifetime guarantees**
-- **Forces errors at build time if references become invalid**
+- Smart pointers in builder allow flexible ownership during construction
+- Build() extracts references from smart pointers for the final context
+- No templating needed - concrete class for GameContext
+- Clear validation before building
 
-#### 1.3 Create LogicContextBuilder
+#### 1.2 Create LogicContextBuilder
 
 **New File:** `src/logic/LogicContextBuilder.h`
 
 ```cpp
 namespace steamrot {
 
-class LogicContextBuilder : public ContextBuilder<LogicContext> {
+class LogicContextBuilder {
 private:
-  std::optional<std::reference_wrapper<EntityMemoryPool>> m_scene_entities;
-  std::optional<std::reference_wrapper<const std::unordered_map<ArchetypeID, Archetype>>> m_archetypes;
-  std::optional<std::reference_wrapper<sf::RenderTexture>> m_scene_texture;
-  std::optional<std::reference_wrapper<const GameContext>> m_game_context;
+  std::shared_ptr<EntityMemoryPool> m_scene_entities;
+  std::shared_ptr<const std::unordered_map<ArchetypeID, Archetype>> m_archetypes;
+  std::shared_ptr<sf::RenderTexture> m_scene_texture;
+  std::shared_ptr<sf::RenderWindow> m_game_window;
+  std::shared_ptr<const AssetManager> m_asset_manager;
+  std::shared_ptr<EventHandler> m_event_handler;
+  std::shared_ptr<const sf::Vector2i> m_mouse_position;
   
 public:
-  LogicContextBuilder& SetSceneEntities(EntityMemoryPool& entities);
-  LogicContextBuilder& SetArchetypes(const ArchetypeManager& manager);
-  LogicContextBuilder& SetSceneTexture(sf::RenderTexture& texture);
-  LogicContextBuilder& SetGameContext(const GameContext& context);
+  LogicContextBuilder() = default;
   
-  std::expected<LogicContext, FailInfo> Build() override;
-  bool IsValid() const override;
-  void Reset() override;
+  LogicContextBuilder& SetSceneEntities(std::shared_ptr<EntityMemoryPool> entities);
+  LogicContextBuilder& SetArchetypes(std::shared_ptr<const std::unordered_map<ArchetypeID, Archetype>> archetypes);
+  LogicContextBuilder& SetSceneTexture(std::shared_ptr<sf::RenderTexture> texture);
+  LogicContextBuilder& SetGameWindow(std::shared_ptr<sf::RenderWindow> window);
+  LogicContextBuilder& SetAssetManager(std::shared_ptr<const AssetManager> manager);
+  LogicContextBuilder& SetEventHandler(std::shared_ptr<EventHandler> handler);
+  LogicContextBuilder& SetMousePosition(std::shared_ptr<const sf::Vector2i> mouse_pos);
+  
+  // Build returns LogicContext with references extracted from smart pointers
+  std::expected<LogicContext, FailInfo> Build() const;
 };
 
 } // namespace steamrot
 ```
 
+**Design Note: LogicContext and GameContext**
+
+LogicContext pulls individual fields from GameContext rather than storing a reference to GameContext itself:
+- **Explicit dependencies**: Each Logic class sees exactly what it needs
+- **Better testability**: Can mock individual resources without full GameContext
+- **Clearer API**: SetGameWindow(), SetAssetManager() etc. are more explicit than SetGameContext()
+- **Flexibility**: Can mix scene-specific and game-global resources freely
+
 **Benefits:**
-- Reuse GameContext data instead of duplicating
-- Clear dependency on GameContext
-- Can be configured incrementally
-- Easy to extend with new scene-specific data
-- **Uses references (via std::reference_wrapper) to enforce strict lifetime management**
-- **Prevents dangling pointer issues by requiring valid references**
+- Smart pointers in builder allow flexible ownership during construction
+- Build() extracts references for the final context
+- No dependency on GameContext object - pulls what's needed
+- Explicit about which resources come from game vs scene
 
 ### Phase 2: Data-Driven Context Configuration
 
 #### 2.1 Create Context Configuration Schema
 
-**New File:** `src/flatbuffers_headers/context_config.fbs`
+**New File:** `src/flatbuffers_headers/context_data.fbs`
 
 ```fbs
 namespace steamrot;
@@ -273,10 +291,13 @@ table ContextExtension {
   value_data: [ubyte]; // Serialized value
 }
 
-table ContextConfiguration {
+// Root table for context configuration
+table ContextData {
   game_context: GameContextConfig;
   scene_contexts: [SceneContextConfig];
 }
+
+root_type ContextData;
 ```
 
 **Example JSON Configuration:**
@@ -306,7 +327,18 @@ table ContextConfiguration {
 }
 ```
 
-#### 2.2 Create ContextConfigurator
+#### 2.2 Context Data Loading with FlatbuffersDataLoader
+
+**Modified:** `src/data_handlers/FlatbuffersDataLoader.h`
+
+Add method to existing class:
+
+```cpp
+/////////////////////////////////////////////////
+/// @brief Provides ContextData from binary file
+/////////////////////////////////////////////////
+std::expected<const ContextData *, FailInfo> ProvideContextData() const;
+```
 
 **New File:** `src/context/ContextConfigurator.h`
 
@@ -315,25 +347,37 @@ namespace steamrot {
 
 class ContextConfigurator {
 private:
-  const ContextConfiguration* m_config_data{nullptr};
+  const ContextData* m_config_data{nullptr};
   
   std::expected<EnvironmentType, FailInfo> 
-  ParseEnvironmentType(const std::string& type_str);
+  ParseEnvironmentType(const std::string& type_str) const;
   
 public:
-  explicit ContextConfigurator(const ContextConfiguration* config);
+  explicit ContextConfigurator(const ContextData* config);
   
+  // Create builder from configuration data
   std::expected<GameContextBuilder, FailInfo> 
   CreateGameContextBuilder() const;
   
   std::expected<LogicContextBuilder, FailInfo>
   CreateLogicContextBuilder(const SceneType& scene_type) const;
-  
-  std::expected<std::monostate, FailInfo>
-  LoadFromFile(const std::string& config_path);
 };
 
 } // namespace steamrot
+```
+
+**Usage Pattern:**
+```cpp
+// In GameEngine::StartUp() or similar
+FlatbuffersDataLoader data_loader;
+auto context_data_result = data_loader.ProvideContextData();
+if (!context_data_result.has_value()) {
+  // Handle error
+}
+
+ContextConfigurator configurator(context_data_result.value());
+auto builder_result = configurator.CreateGameContextBuilder();
+// ... use builder
 ```
 
 **Benefits:**
@@ -342,57 +386,51 @@ public:
 - Easy to have different configs for different environments
 - Version control friendly
 
-### Phase 3: Lazy Context Initialization
+### Phase 3: Context Management with Static Registry
 
-#### 3.1 Create ContextManager (Singleton)
+#### 3.1 Create ContextDirector (Static Registry Pattern)
 
-**New File:** `src/context/ContextManager.h`
+**New File:** `src/context/ContextDirector.h`
 
 ```cpp
 namespace steamrot {
 
-class ContextManager {
+class ContextDirector {
 private:
-  static std::unique_ptr<ContextManager> s_instance;
+  // Static map to register builders by scene type
+  static std::unordered_map<SceneType, LogicContextBuilder> s_logic_context_builders;
   
-  std::optional<GameContext> m_game_context;
-  std::unordered_map<SceneType, LogicContextBuilder> m_logic_context_builders;
-  std::unique_ptr<ContextConfigurator> m_configurator;
-  
-  ContextManager() = default;
+  // No singleton - just static methods and data
+  ContextDirector() = delete;
   
 public:
-  static ContextManager& GetInstance();
+  // Register a builder for a specific scene type
+  static void RegisterLogicContextBuilder(SceneType type, LogicContextBuilder builder);
   
-  // Initialize from configuration file
-  std::expected<std::monostate, FailInfo>
-  Initialize(const std::string& config_path);
+  // Get builder for a scene type (returns copy for further configuration)
+  static std::expected<LogicContextBuilder, FailInfo> 
+  GetLogicContextBuilder(SceneType scene_type);
   
-  // Get or create GameContext
-  std::expected<const GameContext&, FailInfo> GetGameContext();
+  // Build and return a LogicContext directly
+  static std::expected<LogicContext, FailInfo> 
+  BuildLogicContext(SceneType scene_type);
   
-  // Register scene-specific context builder
-  void RegisterSceneContextBuilder(SceneType type, LogicContextBuilder builder);
+  // Clear all registered builders (useful for testing)
+  static void ClearBuilders();
   
-  // Get or build LogicContext for a scene
-  std::expected<LogicContext, FailInfo> 
-  GetLogicContext(SceneType scene_type);
-  
-  // Clear all contexts (useful for scene transitions)
-  void ClearSceneContexts();
-  
-  // For testing: reset singleton
-  static void ResetForTesting();
+  // Check if a builder is registered for a scene type
+  static bool HasBuilder(SceneType scene_type);
 };
 
 } // namespace steamrot
 ```
 
 **Benefits:**
-- Centralized context management
-- Lazy initialization (contexts created when first needed)
-- Easy to reset for testing
-- Single source of truth for context state
+- **No singleton pattern** - uses static methods and data instead
+- **Not time-critical** - builders can be registered during initialization
+- **Simple registry** - static map stores builders by scene type
+- **Testable** - ClearBuilders() allows clean test setup
+- **Explicit control** - callers decide when to build contexts
 
 ### Phase 4: Improve Test Infrastructure
 
@@ -405,38 +443,32 @@ namespace steamrot::tests {
 
 class TestContext {
 private:
-  // Core test resources
+  // Core test resources (owned by TestContext)
   sf::RenderWindow m_render_window;
   EventHandler m_event_handler;
   AssetManager m_asset_manager;
   const size_t m_loop_number{0};
   const EnvironmentType m_env_type{EnvironmentType::Test};
   
-  // Builders for different contexts
-  std::unique_ptr<GameContextBuilder> m_game_context_builder;
-  std::unordered_map<SceneType, std::unique_ptr<LogicContextBuilder>> 
-    m_logic_context_builders;
+  // Builders created on demand
+  GameContextBuilder CreateGameContextBuilder() const;
+  LogicContextBuilder CreateLogicContextBuilder(SceneType scene_type) const;
   
   // Cached contexts (built on demand)
   mutable std::optional<GameContext> m_game_context_cache;
   mutable std::unordered_map<SceneType, LogicContext> m_logic_context_cache;
   
-  // Internal helpers
-  void InitializeGameContextBuilder();
-  void InitializeLogicContextBuilder(SceneType scene_type);
-  
 public:
   // Simplified constructor - doesn't require scene type upfront
   TestContext();
   
-  // Get contexts (built lazily)
+  // Get contexts (built lazily using builders)
   const GameContext& GetGameContext() const;
   const LogicContext& GetLogicContext(SceneType scene_type) const;
   
   // Configure for specific test scenarios
   TestContext& WithSceneType(SceneType scene_type);
   TestContext& WithEntityCount(size_t count);
-  TestContext& WithCustomConfig(const std::string& config_path);
   
   // Clear cached contexts (for multi-scene tests)
   void ClearContextCache();
@@ -678,16 +710,22 @@ TEST_CASE("GameContextBuilder builds successfully", "[unit][context]") {
 ### Integration Tests
 ```cpp
 // Context configuration loading
-TEST_CASE("ContextManager loads from config file", "[integration][context]") {
-  ContextManager::GetInstance().ResetForTesting();
+TEST_CASE("ContextDirector registers and builds contexts", "[integration][context]") {
+  ContextDirector::ClearBuilders();
   
-  auto init_result = ContextManager::GetInstance()
-    .Initialize("test_configs/context_config.json");
+  FlatbuffersDataLoader data_loader;
+  auto context_data_result = data_loader.ProvideContextData();
+  REQUIRE(context_data_result.has_value());
   
-  REQUIRE(init_result.has_value());
+  ContextConfigurator configurator(context_data_result.value());
+  auto builder_result = configurator.CreateLogicContextBuilder(SceneType::SceneType_TITLE);
+  REQUIRE(builder_result.has_value());
   
-  auto game_ctx_result = ContextManager::GetInstance().GetGameContext();
-  REQUIRE(game_ctx_result.has_value());
+  ContextDirector::RegisterLogicContextBuilder(SceneType::SceneType_TITLE, builder_result.value());
+  REQUIRE(ContextDirector::HasBuilder(SceneType::SceneType_TITLE));
+  
+  auto logic_ctx_result = ContextDirector::BuildLogicContext(SceneType::SceneType_TITLE);
+  REQUIRE(logic_ctx_result.has_value());
 }
 ```
 
@@ -797,23 +835,23 @@ src/
 ├── context/
 │   ├── GameContext.h/cpp           [Modified: Add extensions]
 │   ├── GameContextBuilder.h/cpp    [New]
-│   ├── ContextBuilder.h            [New: Template base]
 │   ├── ContextConfigurator.h/cpp   [New]
-│   ├── ContextManager.h/cpp        [New]
+│   ├── ContextDirector.h/cpp       [New]
 │   ├── ContextExtensions.h/cpp     [New]
 │   └── CMakeLists.txt              [Modified]
 ├── logic/
-│   ├── LogicContext.h              [Modified: Add extensions]
+│   ├── LogicContext.h              [Modified: Pull fields from GameContext individually]
 │   ├── LogicContextBuilder.h/cpp   [New]
 │   └── CMakeLists.txt              [Modified]
+├── data_handlers/
+│   └── FlatbuffersDataLoader.h/cpp [Modified: Add ProvideContextData()]
 ├── flatbuffers_headers/
-│   └── context_config.fbs          [New]
+│   └── context_data.fbs            [New]
 └── ...
 
 data/
 ├── context/
-│   ├── game_context.json           [New]
-│   └── scene_contexts.json         [New]
+│   └── context_data.bin            [New: Compiled FlatBuffers]
 └── ...
 
 tests/
@@ -906,22 +944,24 @@ tests/
 ### Creating Game Context in GameEngine
 ```cpp
 // In GameEngine::StartUp()
-ContextConfigurator configurator;
-auto load_result = configurator.LoadFromFile("data/context/game_context.json");
-if (!load_result.has_value()) {
+FlatbuffersDataLoader data_loader;
+auto context_data_result = data_loader.ProvideContextData();
+if (!context_data_result.has_value()) {
   // Handle error
 }
 
+ContextConfigurator configurator(context_data_result.value());
 auto builder_result = configurator.CreateGameContextBuilder();
 if (!builder_result.has_value()) {
   // Handle error
 }
 
+// Configure builder with actual objects from GameEngine
 auto builder = builder_result.value();
-builder.SetWindow(m_window)
-       .SetEventHandler(m_event_handler)
-       .SetAssetManager(m_asset_manager)
-       .SetLoopNumber(m_loop_number);
+builder.SetWindow(std::make_shared<sf::RenderWindow>(m_window))
+       .SetEventHandler(std::make_shared<EventHandler>(m_event_handler))
+       .SetAssetManager(std::make_shared<AssetManager>(m_asset_manager))
+       .SetLoopNumber(std::make_shared<const size_t>(m_loop_number));
 
 auto context_result = builder.Build();
 if (!context_result.has_value()) {
@@ -934,19 +974,23 @@ m_game_context = context_result.value();
 ### Creating Scene-Specific Logic Context
 ```cpp
 // In SceneFactory::CreateDefaultScene()
-auto& context_mgr = ContextManager::GetInstance();
 
-// Register scene-specific builder
+// Create builder and configure with scene resources
 LogicContextBuilder builder;
-builder.SetSceneEntities(scene_ptr->m_entity_manager.GetEntityMemoryPool())
-       .SetArchetypes(scene_ptr->m_entity_manager.GetArchetypeManager())
-       .SetSceneTexture(scene_ptr->m_render_texture)
-       .SetGameContext(game_context);
+builder.SetSceneEntities(std::make_shared<EntityMemoryPool>(scene_ptr->m_entity_manager.GetEntityMemoryPool()))
+       .SetArchetypes(std::make_shared<const std::unordered_map<ArchetypeID, Archetype>>(
+           scene_ptr->m_entity_manager.GetArchetypeManager().GetArchetypes()))
+       .SetSceneTexture(std::make_shared<sf::RenderTexture>(scene_ptr->m_render_texture))
+       .SetGameWindow(std::make_shared<sf::RenderWindow>(game_context.game_window))
+       .SetAssetManager(std::make_shared<const AssetManager>(game_context.asset_manager))
+       .SetEventHandler(std::make_shared<EventHandler>(game_context.event_handler))
+       .SetMousePosition(std::make_shared<const sf::Vector2i>(game_context.mouse_position));
 
-context_mgr.RegisterSceneContextBuilder(scene_type, builder);
+// Register builder with ContextDirector for later use
+ContextDirector::RegisterLogicContextBuilder(scene_type, builder);
 
-// Get LogicContext when needed
-auto logic_ctx_result = context_mgr.GetLogicContext(scene_type);
+// Or build immediately
+auto logic_ctx_result = builder.Build();
 if (logic_ctx_result.has_value()) {
   LogicFactory logic_factory(scene_type, logic_ctx_result.value());
   // ... create logic
