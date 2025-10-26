@@ -8,8 +8,12 @@
 /////////////////////////////////////////////////
 #include "scene_test_helpers.h"
 #include "entity_test_helpers.h"
+#include "entity_memory_pool_matchers.h"
+#include "FlatbuffersConfigurator.h"
 #include "logic_test_helpers.h"
 #include "uuid.h"
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers.hpp>
 
 namespace steamrot::tests {
 
@@ -30,9 +34,15 @@ const uuids::uuid create_uuid() {
 void CheckDefaultSceneConfiguration(const Scene &scene) {
 
   const SceneType scene_type = scene.GetSceneInfo().type;
-  // check entity memory pool default configuration
-  TestConfigurationOfEMPfromDefaultData(scene.GetEntityMemoryPool(),
-                                        scene_type);
+  
+  // check entity memory pool default configuration by creating expected pool
+  EntityMemoryPool expected_pool;
+  FlatbuffersConfigurator configurator;
+  auto result = configurator.ConfigureEntitiesFromDefaultData(expected_pool, scene_type);
+  REQUIRE(result.has_value());
+  
+  REQUIRE_THAT(scene.GetEntityMemoryPool(),
+               EqualsEntityMemoryPool(expected_pool));
 
   // check archetypes of configured entity memory pool
   TestArchetypesOfConfiguredEMPfromDefaultData(scene.GetArchetypes(),

@@ -8,6 +8,8 @@
 /////////////////////////////////////////////////
 #include "test_data_harness.h"
 #include "PathProvider.h"
+#include "entity_memory_pool_matchers.h"
+#include <catch2/catch_test_macros.hpp>
 #include <filesystem>
 #include <format>
 #include <fstream>
@@ -162,11 +164,12 @@ run_test_data_config(const TestDataConfig *config) {
   
   // Check for entity comparison test data
   // If both start_entity_collection and expected_entity_collection are present,
-  // this is an entity comparison test that should be handled by RunEMPComparisonTest
+  // this is an entity comparison test that should be handled by
+  // run_entity_memory_pool_comparison_test
   if (config->start_entity_collection() || config->expected_entity_collection()) {
-    // Entity comparison tests should be dispatched to RunEMPComparisonTest
-    // from entity_test_helpers. This wrapper doesn't execute those tests directly
-    // to avoid circular dependencies, but validates that the data is present.
+    // Entity comparison tests should be dispatched to
+    // run_entity_memory_pool_comparison_test. This wrapper doesn't execute those
+    // tests directly but validates that the data is present.
     
     // Verify expected_entity_collection is present if start is present
     if (config->start_entity_collection() && !config->expected_entity_collection()) {
@@ -187,6 +190,13 @@ run_test_data_config(const TestDataConfig *config) {
   // No testable data found - this is not necessarily an error,
   // the config might just contain metadata
   return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
+                                            const EntityMemoryPool &expected) {
+  // Compare the pools using matcher
+  REQUIRE_THAT(actual, EqualsEntityMemoryPool(expected));
 }
 
 } // namespace steamrot::tests

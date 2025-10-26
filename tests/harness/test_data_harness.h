@@ -12,6 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FailInfo.h"
+#include "containers.h"
 #include "test_data_generated.h"
 #include <expected>
 #include <string>
@@ -68,5 +69,20 @@ load_test_data_configs(const std::string &subdirectory);
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 run_test_data_config(const TestDataConfig *config);
+
+/////////////////////////////////////////////////
+/// @brief Wrapper function to run EMP comparison tests
+///
+/// This function compares two EntityMemoryPool instances using the
+/// EqualsEntityMemoryPool matcher, ensuring detailed error messages on mismatch.
+///
+/// This allows tests to instantiate and manipulate EMPs (e.g., simulate logic)
+/// before comparison.
+///
+/// @param actual The actual EntityMemoryPool to test
+/// @param expected The expected EntityMemoryPool to compare against
+/////////////////////////////////////////////////
+void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
+                                            const EntityMemoryPool &expected);
 
 } // namespace steamrot::tests
