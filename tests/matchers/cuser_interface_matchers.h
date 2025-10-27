@@ -9,6 +9,7 @@
 #pragma once
 
 #include "CUserInterface.h"
+#include "ui_element_matchers.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
 #include <sstream>
@@ -48,14 +49,20 @@ public:
           << ", expected=" << m_expected.m_UI_visible << "; ";
     }
 
-    // Check root element pointers
-    bool root_elem_match = (actual.m_root_element == nullptr &&
-                            m_expected.m_root_element == nullptr) ||
-                           (actual.m_root_element != nullptr &&
-                            m_expected.m_root_element != nullptr);
+    // Check root element pointers - both null or both non-null
+    bool both_null = (actual.m_root_element == nullptr &&
+                      m_expected.m_root_element == nullptr);
+    bool both_non_null = (actual.m_root_element != nullptr &&
+                          m_expected.m_root_element != nullptr);
 
-    if (!root_elem_match) {
-      oss << "m_root_element: pointers differ; ";
+    if (!both_null && !both_non_null) {
+      oss << "m_root_element: one is null, other is not; ";
+    } else if (both_non_null) {
+      // Both are non-null, use UIElement matcher to compare them recursively
+      UIElementEqualsMatcher element_matcher(*m_expected.m_root_element);
+      if (!element_matcher.match(*actual.m_root_element)) {
+        oss << "m_root_element: " << element_matcher.get_mismatch_description();
+      }
     }
 
     m_mismatch_description = oss.str();
