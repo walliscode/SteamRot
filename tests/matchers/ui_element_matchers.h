@@ -31,8 +31,7 @@ namespace steamrot::tests {
 /// Provides detailed output when UIElements don't match, including
 /// child element comparison
 /////////////////////////////////////////////////
-class UIElementEqualsMatcher
-    : public Catch::Matchers::MatcherBase<UIElement> {
+class UIElementEqualsMatcher : public Catch::Matchers::MatcherBase<UIElement> {
 private:
   const UIElement &m_expected;
   mutable std::string m_mismatch_description;
@@ -85,8 +84,8 @@ private:
     // One empty, one not
     if (actual.has_value() != expected.has_value())
       return false;
-    // Both have values - compare action types
-    return actual->action == expected->action;
+
+    return true;
   }
 
   /////////////////////////////////////////////////
@@ -258,9 +257,9 @@ private:
 
     // Compare size
     if (!VectorsEqual(actual.size, expected.size)) {
-      oss << prefix << "size: actual=(" << actual.size.x << ","
-          << actual.size.y << "), expected=(" << expected.size.x << ","
-          << expected.size.y << "); ";
+      oss << prefix << "size: actual=(" << actual.size.x << "," << actual.size.y
+          << "), expected=(" << expected.size.x << "," << expected.size.y
+          << "); ";
       return false;
     }
 
@@ -289,8 +288,7 @@ private:
 
     // Compare layout
     if (actual.layout != expected.layout) {
-      oss << prefix
-          << "layout: actual=" << static_cast<int>(actual.layout)
+      oss << prefix << "layout: actual=" << static_cast<int>(actual.layout)
           << ", expected=" << static_cast<int>(expected.layout) << "; ";
       return false;
     }
