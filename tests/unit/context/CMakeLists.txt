@@ -2,6 +2,7 @@ add_executable(test_context
   GameContextBuilder.test.cpp
   LogicContextBuilder.test.cpp
   ContextConfigurator.test.cpp
+  ContextDirector.test.cpp
 )
 
 target_include_directories(test_context
@@ -17,6 +18,7 @@ PRIVATE
   systems
   data_handlers
   flatbuffers_headers
+  context_test_helpers
 )
 
 catch_discover_tests(test_context)
