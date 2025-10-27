@@ -7,6 +7,7 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "SceneFactory.h"
+#include "ContextDirector.h"
 #include "CraftingScene.h"
 #include "TitleScene.h"
 #include "uuid.h"
@@ -79,7 +80,22 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type,
   }
 
   // configure LogicMap
-  LogicFactory logic_factory(scene_type, scene_ptr->GetLogicContext());
+  // First, check if ContextDirector has a builder registered for this scene
+  LogicContext logic_context;
+  
+  if (ContextDirector::HasBuilder(scene_type)) {
+    // Use ContextDirector to build the logic context
+    auto context_result = ContextDirector::BuildLogicContext(scene_type);
+    if (!context_result) {
+      return std::unexpected(context_result.error());
+    }
+    logic_context = context_result.value();
+  } else {
+    // Fall back to scene's GetLogicContext() method
+    logic_context = scene_ptr->GetLogicContext();
+  }
+  
+  LogicFactory logic_factory(scene_type, logic_context);
   auto create_map_result = logic_factory.CreateLogicMap();
   if (!create_map_result) {
     return std::unexpected(create_map_result.error());

@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "SceneFactory.h"
+#include "ContextDirector.h"
 #include "CraftingScene.h"
 #include "PathProvider.h"
 #include "TestContext.h"
@@ -74,4 +75,78 @@ TEST_CASE("SceneFactory can create a CraftingScene from default",
 
   // check that the CraftingScene is configured correctly
   steamrot::tests::CheckDefaultSceneConfiguration(*crafting_scene);
+}
+
+////////////////////////////////////////////////////////////
+TEST_CASE("SceneFactory uses ContextDirector when builder is registered",
+          "[unit][SceneFactory]") {
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::tests::TestContext test_context;
+  steamrot::SceneFactory scene_factory;
+
+  // Clear any existing builders
+  steamrot::ContextDirector::ClearBuilders();
+
+  // Create and register a builder for TITLE scene
+  steamrot::LogicContextBuilder builder;
+  auto logic_context = test_context.GetLogicContextForTitleScene();
+
+  builder
+      .SetSceneEntities(std::make_shared<steamrot::EntityMemoryPool>(
+          logic_context.scene_entities))
+      .SetArchetypes(
+          std::make_shared<const std::unordered_map<steamrot::ArchetypeID,
+                                                     steamrot::Archetype>>(
+              logic_context.archetypes))
+      .SetSceneTexture(
+          std::make_shared<sf::RenderTexture>(logic_context.scene_texture))
+      .SetGameWindow(
+          std::make_shared<sf::RenderWindow>(logic_context.game_window))
+      .SetAssetManager(
+          std::make_shared<const steamrot::AssetManager>(
+              logic_context.asset_manager))
+      .SetEventHandler(
+          std::make_shared<steamrot::EventHandler>(logic_context.event_handler))
+      .SetMousePosition(std::make_shared<const sf::Vector2i>(
+          logic_context.mouse_position));
+
+  steamrot::ContextDirector::RegisterLogicContextBuilder(
+      steamrot::SceneType::SceneType_TITLE, builder);
+
+  // Create scene - should use ContextDirector's builder
+  auto scene_creation_result = scene_factory.CreateDefaultScene(
+      steamrot::SceneType::SceneType_TITLE, test_context.GetGameContext());
+
+  REQUIRE(scene_creation_result.has_value());
+  auto title_scene = std::move(scene_creation_result.value());
+  REQUIRE(title_scene != nullptr);
+  REQUIRE(title_scene->GetSceneInfo().type ==
+          steamrot::SceneType::SceneType_TITLE);
+
+  // Clean up
+  steamrot::ContextDirector::ClearBuilders();
+}
+
+////////////////////////////////////////////////////////////
+TEST_CASE("SceneFactory falls back to GetLogicContext when no builder registered",
+          "[unit][SceneFactory]") {
+  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::tests::TestContext test_context;
+  steamrot::SceneFactory scene_factory;
+
+  // Clear any existing builders to ensure fallback
+  steamrot::ContextDirector::ClearBuilders();
+
+  // Create scene without registering a builder
+  auto scene_creation_result = scene_factory.CreateDefaultScene(
+      steamrot::SceneType::SceneType_TITLE, test_context.GetGameContext());
+
+  REQUIRE(scene_creation_result.has_value());
+  auto title_scene = std::move(scene_creation_result.value());
+  REQUIRE(title_scene != nullptr);
+  REQUIRE(title_scene->GetSceneInfo().type ==
+          steamrot::SceneType::SceneType_TITLE);
+
+  // Verify scene is properly configured (using GetLogicContext path)
+  steamrot::tests::CheckDefaultSceneConfiguration(*title_scene);
 }
