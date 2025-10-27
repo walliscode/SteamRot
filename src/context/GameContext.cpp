@@ -1,12 +1,19 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Implementation of the GameContext struct
+/////////////////////////////////////////////////
+
 #include "GameContext.h"
+
 namespace steamrot {
 
 /////////////////////////////////////////////////
-GameContext::GameContext(sf::RenderWindow &window, EventHandler &event_handler,
+GameContext::GameContext(GameResources &resources)
+    : game_window(resources.game_window),
+      event_handler(resources.event_handler),
+      mouse_position(resources.mouse_position),
+      loop_number(resources.loop_number),
+      asset_manager(resources.asset_manager),
+      env_type(resources.env_type) {}
 
-                         const size_t &loop_number, AssetManager &asset_manager,
-                         const EnvironmentType &env_type)
-    : game_window(window), event_handler(event_handler),
-      loop_number(loop_number), asset_manager(asset_manager),
-      env_type(env_type) {}
 } // namespace steamrot

@@ -13,4 +13,5 @@ target_link_libraries(context PUBLIC
   systems
   logic
   flatbuffers_headers
+  resources
 )

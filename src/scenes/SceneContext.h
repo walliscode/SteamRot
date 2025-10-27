@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of the GameContext struct
+/// @brief Declaration of the SceneContext struct
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -12,23 +12,40 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "GameResources.h"
+#include "SceneResources.h"
 
 namespace steamrot {
 
 /////////////////////////////////////////////////
-/// @struct GameContext
-/// @brief Lightweight reference container to GameResources
+/// @struct SceneContext
+/// @brief Lightweight reference container combining scene and game resources
 ///
-/// This context provides convenient access to game-level resources
-/// through references. It does not own the resources.
+/// This context provides convenient access to both scene-level and game-level
+/// resources through references. It does not own the resources.
 /////////////////////////////////////////////////
-struct GameContext {
+struct SceneContext {
   /////////////////////////////////////////////////
-  /// @brief Constructor taking reference to GameResources
+  /// @brief Constructor taking references to both resource containers
   ///
-  /// @param resources Reference to the game resources
+  /// @param scene_res Reference to scene resources
+  /// @param game_res Reference to game resources
   /////////////////////////////////////////////////
-  explicit GameContext(GameResources &resources);
+  SceneContext(SceneResources &scene_res, GameResources &game_res);
+
+  /////////////////////////////////////////////////
+  /// @brief Reference to the entity memory pool for the scene
+  /////////////////////////////////////////////////
+  EntityMemoryPool &scene_entities;
+
+  /////////////////////////////////////////////////
+  /// @brief Reference to the available archetypes in the scene
+  /////////////////////////////////////////////////
+  const std::unordered_map<ArchetypeID, Archetype> &archetypes;
+
+  /////////////////////////////////////////////////
+  /// @brief Reference to the render texture for the scene
+  /////////////////////////////////////////////////
+  sf::RenderTexture &scene_texture;
 
   /////////////////////////////////////////////////
   /// @brief Reference to the game window
@@ -36,29 +53,19 @@ struct GameContext {
   sf::RenderWindow &game_window;
 
   /////////////////////////////////////////////////
-  /// @brief Reference to the global event handler
-  /////////////////////////////////////////////////
-  EventHandler &event_handler;
-
-  /////////////////////////////////////////////////
-  /// @brief Reference to the current mouse position
-  /////////////////////////////////////////////////
-  sf::Vector2i &mouse_position;
-
-  /////////////////////////////////////////////////
-  /// @brief Reference to the loop number
-  /////////////////////////////////////////////////
-  size_t &loop_number;
-
-  /////////////////////////////////////////////////
   /// @brief Reference to the asset manager
   /////////////////////////////////////////////////
   AssetManager &asset_manager;
 
   /////////////////////////////////////////////////
-  /// @brief Reference to the environment type
+  /// @brief Reference to the event handler
   /////////////////////////////////////////////////
-  EnvironmentType &env_type;
+  EventHandler &event_handler;
+
+  /////////////////////////////////////////////////
+  /// @brief Reference to the mouse position
+  /////////////////////////////////////////////////
+  sf::Vector2i &mouse_position;
 };
 
 } // namespace steamrot

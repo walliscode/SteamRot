@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of the GameContext struct
+/// @brief Declaration of the GameResources struct
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -11,54 +11,51 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "GameResources.h"
+#include "AssetManager.h"
+#include "EventHandler.h"
+#include "PathProvider.h"
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/System/Vector2.hpp>
 
 namespace steamrot {
 
 /////////////////////////////////////////////////
-/// @struct GameContext
-/// @brief Lightweight reference container to GameResources
+/// @struct GameResources
+/// @brief Contains all game-level resources (no references to other Resources)
 ///
-/// This context provides convenient access to game-level resources
-/// through references. It does not own the resources.
+/// This struct holds the actual resource objects at the game engine level.
+/// Resources are standalone objects without cross-references.
 /////////////////////////////////////////////////
-struct GameContext {
+struct GameResources {
   /////////////////////////////////////////////////
-  /// @brief Constructor taking reference to GameResources
-  ///
-  /// @param resources Reference to the game resources
+  /// @brief The game window
   /////////////////////////////////////////////////
-  explicit GameContext(GameResources &resources);
+  sf::RenderWindow game_window;
 
   /////////////////////////////////////////////////
-  /// @brief Reference to the game window
+  /// @brief Global event handler containing the event bus
   /////////////////////////////////////////////////
-  sf::RenderWindow &game_window;
+  EventHandler event_handler;
 
   /////////////////////////////////////////////////
-  /// @brief Reference to the global event handler
+  /// @brief Current mouse position in window coordinates (updated each frame)
   /////////////////////////////////////////////////
-  EventHandler &event_handler;
+  sf::Vector2i mouse_position{0, 0};
 
   /////////////////////////////////////////////////
-  /// @brief Reference to the current mouse position
+  /// @brief Loop number for the current game loop
   /////////////////////////////////////////////////
-  sf::Vector2i &mouse_position;
+  size_t loop_number{0};
 
   /////////////////////////////////////////////////
-  /// @brief Reference to the loop number
+  /// @brief Asset manager for the game
   /////////////////////////////////////////////////
-  size_t &loop_number;
+  AssetManager asset_manager;
 
   /////////////////////////////////////////////////
-  /// @brief Reference to the asset manager
+  /// @brief Environment type (Test, Production, etc.)
   /////////////////////////////////////////////////
-  AssetManager &asset_manager;
-
-  /////////////////////////////////////////////////
-  /// @brief Reference to the environment type
-  /////////////////////////////////////////////////
-  EnvironmentType &env_type;
+  EnvironmentType env_type{EnvironmentType::None};
 };
 
 } // namespace steamrot
