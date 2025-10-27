@@ -277,11 +277,112 @@ When adding new configuration fields:
 
 ### Stage 3: Context Management
 
-The next stage will introduce `ContextDirector` for managing context lifecycle and registration:
+## Stage 3: ContextDirector Integration
+
+**Status**: ✅ IMPLEMENTED (See `documentation/STAGE_3_SUMMARY.md`)
+
+Stage 3 introduces `ContextDirector` for centralized context lifecycle management:
 
 - Static registry for LogicContextBuilders by scene type
-- Centralized context creation and caching
-- Easier scene switching
+- Centralized context creation and management
+- Automatic integration with SceneFactory
+- Backward compatible with existing code
+
+### Using ContextDirector
+
+#### 1. Register Builders from Configuration
+
+```cpp
+#include "ContextDirector.h"
+#include "ContextConfigurator.h"
+#include "FlatbuffersDataLoader.h"
+
+// Load configuration
+steamrot::FlatbuffersDataLoader loader;
+auto context_data = loader.ProvideContextData().value();
+
+// Create configurator
+steamrot::ContextConfigurator configurator(context_data);
+
+// Register builders for all configured scenes
+for (const auto* scene_config : *context_data->scene_contexts()) {
+  // Get builder from configurator
+  auto builder = configurator.CreateLogicContextBuilder(
+      scene_config->scene_type()).value();
+  
+  // Configure builder with runtime objects
+  builder.SetSceneEntities(scene_entities_ptr)
+         .SetArchetypes(archetypes_ptr)
+         .SetSceneTexture(scene_texture_ptr)
+         .SetGameWindow(game_window_ptr)
+         .SetAssetManager(asset_manager_ptr)
+         .SetEventHandler(event_handler_ptr)
+         .SetMousePosition(mouse_position_ptr);
+  
+  // Register with ContextDirector
+  steamrot::ContextDirector::RegisterLogicContextBuilder(
+      scene_config->scene_type(), builder);
+}
+```
+
+#### 2. SceneFactory Automatic Integration
+
+SceneFactory automatically uses ContextDirector when builders are registered:
+
+```cpp
+steamrot::SceneFactory factory;
+
+// If builder is registered with ContextDirector, it will be used
+// Otherwise, falls back to Scene::GetLogicContext()
+auto scene = factory.CreateDefaultScene(
+    steamrot::SceneType::SceneType_TITLE, game_context);
+```
+
+#### 3. Manual Context Building
+
+You can also build contexts directly from ContextDirector:
+
+```cpp
+// Check if builder is registered
+if (steamrot::ContextDirector::HasBuilder(steamrot::SceneType::SceneType_TITLE)) {
+  // Build context
+  auto context = steamrot::ContextDirector::BuildLogicContext(
+      steamrot::SceneType::SceneType_TITLE);
+  
+  if (context.has_value()) {
+    // Use context
+    steamrot::LogicContext logic_ctx = context.value();
+  }
+}
+```
+
+#### 4. Lifecycle Management
+
+```cpp
+// Clear all registered builders (useful for testing)
+steamrot::ContextDirector::ClearBuilders();
+
+// Get a copy of a builder for further configuration
+auto builder = steamrot::ContextDirector::GetLogicContextBuilder(
+    steamrot::SceneType::SceneType_TITLE).value();
+```
+
+### Benefits of ContextDirector
+
+1. **Centralized Management**: All LogicContext builders in one place
+2. **Reusable Contexts**: Register once, build multiple times
+3. **Configuration Integration**: Works seamlessly with ContextConfigurator
+4. **Backward Compatible**: Existing code continues to work
+5. **Test Friendly**: Easy to clear and reset for testing
+
+## Future Enhancements (Stage 4 and Beyond)
+
+The next stages will introduce:
+
+- `TestContextDirector` - Similar pattern for test infrastructure
+- `TestResources` - Permanent storage for test objects
+- Enhanced test configuration via `test_context_data.fbs`
+- Improved test context API
 
 See `documentation/CONTEXT_HANDLING_IMPROVEMENT_PLAN.md` for details.
 
@@ -290,7 +391,9 @@ See `documentation/CONTEXT_HANDLING_IMPROVEMENT_PLAN.md` for details.
 ### Source Files
 - `src/flatbuffers_headers/context_data.fbs` - Schema definition
 - `src/context/ContextConfigurator.h/cpp` - Configuration loader
+- `src/context/ContextDirector.h/cpp` - Context lifecycle manager (Stage 3)
 - `src/data_handlers/FlatbuffersDataLoader.h/cpp` - Data loading
+- `src/scenes/SceneFactory.cpp` - Integrated with ContextDirector (Stage 3)
 
 ### Configuration Files
 - `data/context/context_data.json` - Production configuration
@@ -298,8 +401,13 @@ See `documentation/CONTEXT_HANDLING_IMPROVEMENT_PLAN.md` for details.
 
 ### Tests
 - `tests/unit/context/ContextConfigurator.test.cpp` - Unit tests
-- `tests/integration/context_configuration/` - Integration tests
+- `tests/unit/context/ContextDirector.test.cpp` - ContextDirector unit tests (Stage 3)
+- `tests/integration/context_configuration/` - Configuration integration tests
+- `tests/integration/context_director/` - ContextDirector integration tests (Stage 3)
+- `tests/unit/scenes/SceneFactory.test.cpp` - SceneFactory with ContextDirector tests (Stage 3)
 
 ### Documentation
 - `documentation/CONTEXT_HANDLING_IMPROVEMENT_PLAN.md` - Overall plan
+- `documentation/STAGE_2_SUMMARY.md` - Stage 2 implementation summary
+- `documentation/STAGE_3_SUMMARY.md` - Stage 3 implementation summary
 - This file - Configuration format reference
