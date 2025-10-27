@@ -31,7 +31,7 @@ TEST_CASE("CraftingScene's call to sRender is correct", "[unit][CraftingScene]")
   }
   // add the LogicMap
   steamrot::LogicFactory logic_factory(steamrot::SceneType::SceneType_CRAFTING,
-                                       crafting_scene->GetLogicContext());
+                                       crafting_scene->GetSceneContext());
   auto create_map_result = logic_factory.CreateLogicMap();
   if (!create_map_result) {
     FAIL("Logic map creation failed: " + create_map_result.error().message);

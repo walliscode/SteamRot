@@ -32,8 +32,8 @@ public:
   /////////////////////////////////////////////////
   /// @brief Constructor for UIRenderLogic
   ///
-  /// @param logic_context Takes a LogicContext struct
+  /// @param logic_context Takes a SceneContext struct
   /////////////////////////////////////////////////
-  UIRenderLogic(const LogicContext logic_context);
+  UIRenderLogic(const SceneContext logic_context);
 };
 } // namespace steamrot

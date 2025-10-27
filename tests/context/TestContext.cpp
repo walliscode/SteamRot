@@ -33,18 +33,18 @@ TestContext::TestContext(const SceneType scene_type)
   std::cout << "GameContext configured" << std::endl;
   switch (scene_type) {
   case SceneType::SceneType_TEST:
-    ConfigureLogicContextForTestScene();
+    ConfigureSceneContextForTestScene();
     break;
   case SceneType::SceneType_TITLE:
-    ConfigureLogicContextForTitleScene();
+    ConfigureSceneContextForTitleScene();
     break;
   case SceneType::SceneType_CRAFTING:
-    ConfigureLogicContextForCraftingScene();
+    ConfigureSceneContextForCraftingScene();
     break;
   default:
     throw std::runtime_error("Unsupported scene type for TestContext");
   }
-  std::cout << "LogicContext for scene configured" << std::endl;
+  std::cout << "SceneContext for scene configured" << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -59,30 +59,30 @@ GameContext &TestContext::GetGameContext() const {
 }
 
 /////////////////////////////////////////////////
-const LogicContext &TestContext::GetLogicContextForTestScene() const {
+const SceneContext &TestContext::GetSceneContextForTestScene() const {
 
   if (!logic_context_for_test_scene) {
-    throw std::runtime_error("LogicContext for Test Scene not configured. Call "
-                             "ConfigureLogicContextForTestScene() first.");
+    throw std::runtime_error("SceneContext for Test Scene not configured. Call "
+                             "ConfigureSceneContextForTestScene() first.");
   }
   return *logic_context_for_test_scene;
 }
 /////////////////////////////////////////////////
-const LogicContext &TestContext::GetLogicContextForTitleScene() const {
+const SceneContext &TestContext::GetSceneContextForTitleScene() const {
   if (!logic_context_for_title_scene) {
     throw std::runtime_error(
-        "LogicContext for Title Scene not configured. Call "
-        "ConfigureLogicContextForTitleScene() first.");
+        "SceneContext for Title Scene not configured. Call "
+        "ConfigureSceneContextForTitleScene() first.");
   }
   return *logic_context_for_title_scene;
 }
 
 /////////////////////////////////////////////////
-const LogicContext &TestContext::GetLogicContextForCraftingScene() const {
+const SceneContext &TestContext::GetSceneContextForCraftingScene() const {
   if (!logic_context_for_crafting_scene) {
     throw std::runtime_error(
-        "LogicContext for Crafting Scene not configured. Call "
-        "ConfigureLogicContextForCraftingScene() first.");
+        "SceneContext for Crafting Scene not configured. Call "
+        "ConfigureSceneContextForCraftingScene() first.");
   }
   return *logic_context_for_crafting_scene;
 }
@@ -95,7 +95,7 @@ void TestContext::ConfigureGameContext() {
 }
 
 /////////////////////////////////////////////////
-void TestContext::ConfigureLogicContextForTestScene() {
+void TestContext::ConfigureSceneContextForTestScene() {
   // Configure the EntityMemoryPool for the test scene
   FlatbuffersConfigurator configurator(event_handler);
 
@@ -117,14 +117,14 @@ void TestContext::ConfigureLogicContextForTestScene() {
     std::cerr << "Error generating archetypes: " << error.message << std::endl;
   }
   // create pointer to the logic context for the test scene
-  logic_context_for_test_scene = std::make_unique<LogicContext>(
-      LogicContext{scene_entities, archetype_manager.GetArchetypes(),
+  logic_context_for_test_scene = std::make_unique<SceneContext>(
+      SceneContext{scene_entities, archetype_manager.GetArchetypes(),
                    render_texture, render_window, asset_manager, event_handler,
                    game_context_ptr->mouse_position});
 }
 
 /////////////////////////////////////////////////
-void TestContext::ConfigureLogicContextForTitleScene() {
+void TestContext::ConfigureSceneContextForTitleScene() {
   // Configure the EntityMemoryPool for the title scene
   FlatbuffersConfigurator configurator(event_handler);
   auto configure_result = configurator.ConfigureEntitiesFromDefaultData(
@@ -143,14 +143,14 @@ void TestContext::ConfigureLogicContextForTitleScene() {
     std::cerr << "Error generating archetypes: " << error.message << std::endl;
   }
   // create pointer to the logic context for the title scene
-  logic_context_for_title_scene = std::make_unique<LogicContext>(
-      LogicContext{scene_entities, archetype_manager.GetArchetypes(),
+  logic_context_for_title_scene = std::make_unique<SceneContext>(
+      SceneContext{scene_entities, archetype_manager.GetArchetypes(),
                    render_texture, render_window, asset_manager, event_handler,
                    game_context_ptr->mouse_position});
 }
 
 /////////////////////////////////////////////////
-void TestContext::ConfigureLogicContextForCraftingScene() {
+void TestContext::ConfigureSceneContextForCraftingScene() {
   // Configure the EntityMemoryPool for the crafting scene
   FlatbuffersConfigurator configurator(event_handler);
   auto configure_result = configurator.ConfigureEntitiesFromDefaultData(
@@ -169,8 +169,8 @@ void TestContext::ConfigureLogicContextForCraftingScene() {
     std::cerr << "Error generating archetypes: " << error.message << std::endl;
   }
   // create pointer to the logic context for the crafting scene
-  logic_context_for_crafting_scene = std::make_unique<LogicContext>(
-      LogicContext{scene_entities, archetype_manager.GetArchetypes(),
+  logic_context_for_crafting_scene = std::make_unique<SceneContext>(
+      SceneContext{scene_entities, archetype_manager.GetArchetypes(),
                    render_texture, render_window, asset_manager, event_handler,
                    game_context_ptr->mouse_position});
 }

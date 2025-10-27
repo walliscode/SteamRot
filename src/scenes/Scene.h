@@ -170,11 +170,11 @@ public:
   const SceneInfo &GetSceneInfo() const;
 
   /////////////////////////////////////////////////
-  /// @brief Create and return a LogicContext for the Scene.
+  /// @brief Create and return a SceneContext for the Scene.
   ///
-  /// @return a Scene specific LogicContext object
+  /// @return a Scene specific SceneContext object
   /////////////////////////////////////////////////
-  LogicContext GetLogicContext();
+  SceneContext GetSceneContext();
 
 #ifdef DEBUG
   const EntityMemoryPool &GetEntityMemoryPool() const;

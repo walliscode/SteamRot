@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Unit tests for LogicContextBuilder class
+/// @brief Unit tests for SceneContextBuilder class
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "LogicContextBuilder.h"
+#include "SceneContextBuilder.h"
 #include "ArchetypeManager.h"
 #include "AssetManager.h"
 #include "EventHandler.h"
@@ -18,18 +18,18 @@
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
 
-TEST_CASE("LogicContextBuilder validates required fields",
-          "[unit][logic][LogicContextBuilder]") {
-  steamrot::LogicContextBuilder builder;
+TEST_CASE("SceneContextBuilder validates required fields",
+          "[unit][logic][SceneContextBuilder]") {
+  steamrot::SceneContextBuilder builder;
   auto result = builder.Build();
 
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::MissingRequiredField);
 }
 
-TEST_CASE("LogicContextBuilder fails when scene entities is missing",
-          "[unit][logic][LogicContextBuilder]") {
-  steamrot::LogicContextBuilder builder;
+TEST_CASE("SceneContextBuilder fails when scene entities is missing",
+          "[unit][logic][SceneContextBuilder]") {
+  steamrot::SceneContextBuilder builder;
 
   auto archetypes = std::make_shared<
       const std::unordered_map<steamrot::ArchetypeID, steamrot::Archetype>>();
@@ -54,9 +54,9 @@ TEST_CASE("LogicContextBuilder fails when scene entities is missing",
   REQUIRE(result.error().message == "SceneEntities is required");
 }
 
-TEST_CASE("LogicContextBuilder fails when archetypes is missing",
-          "[unit][logic][LogicContextBuilder]") {
-  steamrot::LogicContextBuilder builder;
+TEST_CASE("SceneContextBuilder fails when archetypes is missing",
+          "[unit][logic][SceneContextBuilder]") {
+  steamrot::SceneContextBuilder builder;
 
   auto scene_entities = std::make_shared<steamrot::EntityMemoryPool>();
   auto scene_texture = std::make_shared<sf::RenderTexture>();
@@ -80,9 +80,9 @@ TEST_CASE("LogicContextBuilder fails when archetypes is missing",
   REQUIRE(result.error().message == "Archetypes is required");
 }
 
-TEST_CASE("LogicContextBuilder fails when scene texture is missing",
-          "[unit][logic][LogicContextBuilder]") {
-  steamrot::LogicContextBuilder builder;
+TEST_CASE("SceneContextBuilder fails when scene texture is missing",
+          "[unit][logic][SceneContextBuilder]") {
+  steamrot::SceneContextBuilder builder;
 
   auto scene_entities = std::make_shared<steamrot::EntityMemoryPool>();
   auto archetypes = std::make_shared<
@@ -107,9 +107,9 @@ TEST_CASE("LogicContextBuilder fails when scene texture is missing",
   REQUIRE(result.error().message == "SceneTexture is required");
 }
 
-TEST_CASE("LogicContextBuilder fails when game window is missing",
-          "[unit][logic][LogicContextBuilder]") {
-  steamrot::LogicContextBuilder builder;
+TEST_CASE("SceneContextBuilder fails when game window is missing",
+          "[unit][logic][SceneContextBuilder]") {
+  steamrot::SceneContextBuilder builder;
 
   auto scene_entities = std::make_shared<steamrot::EntityMemoryPool>();
   auto archetypes = std::make_shared<
@@ -134,9 +134,9 @@ TEST_CASE("LogicContextBuilder fails when game window is missing",
   REQUIRE(result.error().message == "GameWindow is required");
 }
 
-TEST_CASE("LogicContextBuilder fails when asset manager is missing",
-          "[unit][logic][LogicContextBuilder]") {
-  steamrot::LogicContextBuilder builder;
+TEST_CASE("SceneContextBuilder fails when asset manager is missing",
+          "[unit][logic][SceneContextBuilder]") {
+  steamrot::SceneContextBuilder builder;
 
   auto scene_entities = std::make_shared<steamrot::EntityMemoryPool>();
   auto archetypes = std::make_shared<
@@ -160,9 +160,9 @@ TEST_CASE("LogicContextBuilder fails when asset manager is missing",
   REQUIRE(result.error().message == "AssetManager is required");
 }
 
-TEST_CASE("LogicContextBuilder fails when event handler is missing",
-          "[unit][logic][LogicContextBuilder]") {
-  steamrot::LogicContextBuilder builder;
+TEST_CASE("SceneContextBuilder fails when event handler is missing",
+          "[unit][logic][SceneContextBuilder]") {
+  steamrot::SceneContextBuilder builder;
 
   auto scene_entities = std::make_shared<steamrot::EntityMemoryPool>();
   auto archetypes = std::make_shared<
@@ -187,9 +187,9 @@ TEST_CASE("LogicContextBuilder fails when event handler is missing",
   REQUIRE(result.error().message == "EventHandler is required");
 }
 
-TEST_CASE("LogicContextBuilder fails when mouse position is missing",
-          "[unit][logic][LogicContextBuilder]") {
-  steamrot::LogicContextBuilder builder;
+TEST_CASE("SceneContextBuilder fails when mouse position is missing",
+          "[unit][logic][SceneContextBuilder]") {
+  steamrot::SceneContextBuilder builder;
 
   auto scene_entities = std::make_shared<steamrot::EntityMemoryPool>();
   auto archetypes = std::make_shared<
@@ -214,9 +214,9 @@ TEST_CASE("LogicContextBuilder fails when mouse position is missing",
   REQUIRE(result.error().message == "MousePosition is required");
 }
 
-TEST_CASE("LogicContextBuilder builds successfully with all fields",
-          "[unit][logic][LogicContextBuilder]") {
-  steamrot::LogicContextBuilder builder;
+TEST_CASE("SceneContextBuilder builds successfully with all fields",
+          "[unit][logic][SceneContextBuilder]") {
+  steamrot::SceneContextBuilder builder;
 
   auto scene_entities = std::make_shared<steamrot::EntityMemoryPool>();
   auto archetypes = std::make_shared<
@@ -247,9 +247,9 @@ TEST_CASE("LogicContextBuilder builds successfully with all fields",
   REQUIRE(&result.value().mouse_position == mouse_position.get());
 }
 
-TEST_CASE("LogicContextBuilder supports method chaining",
-          "[unit][logic][LogicContextBuilder]") {
-  steamrot::LogicContextBuilder builder;
+TEST_CASE("SceneContextBuilder supports method chaining",
+          "[unit][logic][SceneContextBuilder]") {
+  steamrot::SceneContextBuilder builder;
 
   auto scene_entities = std::make_shared<steamrot::EntityMemoryPool>();
   auto archetypes = std::make_shared<

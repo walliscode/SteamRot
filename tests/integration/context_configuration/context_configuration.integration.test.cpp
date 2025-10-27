@@ -9,7 +9,7 @@
 #include "ContextConfigurator.h"
 #include "FlatbuffersDataLoader.h"
 #include "GameContextBuilder.h"
-#include "LogicContextBuilder.h"
+#include "SceneContextBuilder.h"
 #include "PathProvider.h"
 #include <catch2/catch_test_macros.hpp>
 
@@ -43,10 +43,10 @@ TEST_CASE("Load context configuration and create builders",
   auto game_builder_result = configurator.CreateGameContextBuilder();
   REQUIRE(game_builder_result.has_value());
 
-  // Create LogicContextBuilder for each configured scene
+  // Create SceneContextBuilder for each configured scene
   for (const auto *scene_config : *context_data->scene_contexts()) {
     auto logic_builder_result =
-        configurator.CreateLogicContextBuilder(scene_config->scene_type());
+        configurator.CreateSceneContextBuilder(scene_config->scene_type());
     REQUIRE(logic_builder_result.has_value());
   }
 }
@@ -62,12 +62,12 @@ TEST_CASE("Configuration supports all required scene types",
   steamrot::ContextConfigurator configurator(context_data_result.value());
 
   // Verify TEST scene is configured
-  auto test_builder = configurator.CreateLogicContextBuilder(
+  auto test_builder = configurator.CreateSceneContextBuilder(
       steamrot::SceneType::SceneType_TEST);
   REQUIRE(test_builder.has_value());
 
   // Verify TITLE scene is configured
-  auto title_builder = configurator.CreateLogicContextBuilder(
+  auto title_builder = configurator.CreateSceneContextBuilder(
       steamrot::SceneType::SceneType_TITLE);
   REQUIRE(title_builder.has_value());
 }
