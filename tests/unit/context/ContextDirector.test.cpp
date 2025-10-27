@@ -7,6 +7,7 @@
 #include "LogicContextBuilder.h"
 #include "PathProvider.h"
 #include "TestContext.h"
+#include "TestContextDirector.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("ContextDirector::RegisterLogicContextBuilder registers a builder",
@@ -112,34 +113,12 @@ TEST_CASE("ContextDirector::BuildLogicContext builds context from registered "
           "builder",
           "[unit][ContextDirector]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestContext test_context;
 
   // Clear any existing builders
   steamrot::ContextDirector::ClearBuilders();
 
-  // Create a fully configured builder
-  steamrot::LogicContextBuilder builder;
-  auto logic_context = test_context.GetLogicContextForTestScene();
-
-  // Configure builder with test context resources
-  builder
-      .SetSceneEntities(std::make_shared<steamrot::EntityMemoryPool>(
-          logic_context.scene_entities))
-      .SetArchetypes(
-          std::make_shared<const std::unordered_map<steamrot::ArchetypeID,
-                                                     steamrot::Archetype>>(
-              logic_context.archetypes))
-      .SetSceneTexture(
-          std::make_shared<sf::RenderTexture>(logic_context.scene_texture))
-      .SetGameWindow(
-          std::make_shared<sf::RenderWindow>(logic_context.game_window))
-      .SetAssetManager(
-          std::make_shared<const steamrot::AssetManager>(
-              logic_context.asset_manager))
-      .SetEventHandler(
-          std::make_shared<steamrot::EventHandler>(logic_context.event_handler))
-      .SetMousePosition(std::make_shared<const sf::Vector2i>(
-          logic_context.mouse_position));
+  // Get a fully configured builder from TestContextDirector
+  auto builder = steamrot::tests::TestContextDirector::GetLogicContextBuilder();
 
   // Register the builder
   steamrot::ContextDirector::RegisterLogicContextBuilder(
@@ -153,6 +132,7 @@ TEST_CASE("ContextDirector::BuildLogicContext builds context from registered "
 
   // Clean up
   steamrot::ContextDirector::ClearBuilders();
+  steamrot::tests::TestContextDirector::Reset();
 }
 
 ////////////////////////////////////////////////////////////
@@ -204,38 +184,17 @@ TEST_CASE("ContextDirector::RegisterLogicContextBuilder overwrites existing "
           "builder",
           "[unit][ContextDirector]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestContext test_context;
 
   // Clear any existing builders
   steamrot::ContextDirector::ClearBuilders();
 
-  // Register first builder
+  // Register first builder (empty)
   steamrot::LogicContextBuilder builder1;
   steamrot::ContextDirector::RegisterLogicContextBuilder(
       steamrot::SceneType::SceneType_TEST, builder1);
 
-  // Register second builder for the same scene type
-  steamrot::LogicContextBuilder builder2;
-  auto logic_context = test_context.GetLogicContextForTestScene();
-
-  builder2
-      .SetSceneEntities(std::make_shared<steamrot::EntityMemoryPool>(
-          logic_context.scene_entities))
-      .SetArchetypes(
-          std::make_shared<const std::unordered_map<steamrot::ArchetypeID,
-                                                     steamrot::Archetype>>(
-              logic_context.archetypes))
-      .SetSceneTexture(
-          std::make_shared<sf::RenderTexture>(logic_context.scene_texture))
-      .SetGameWindow(
-          std::make_shared<sf::RenderWindow>(logic_context.game_window))
-      .SetAssetManager(
-          std::make_shared<const steamrot::AssetManager>(
-              logic_context.asset_manager))
-      .SetEventHandler(
-          std::make_shared<steamrot::EventHandler>(logic_context.event_handler))
-      .SetMousePosition(std::make_shared<const sf::Vector2i>(
-          logic_context.mouse_position));
+  // Register second builder for the same scene type (fully configured)
+  auto builder2 = steamrot::tests::TestContextDirector::GetLogicContextBuilder();
 
   steamrot::ContextDirector::RegisterLogicContextBuilder(
       steamrot::SceneType::SceneType_TEST, builder2);
@@ -251,4 +210,5 @@ TEST_CASE("ContextDirector::RegisterLogicContextBuilder overwrites existing "
 
   // Clean up
   steamrot::ContextDirector::ClearBuilders();
+  steamrot::tests::TestContextDirector::Reset();
 }

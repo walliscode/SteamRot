@@ -1,7 +1,9 @@
 add_library(context_test_helpers
   TestContext.cpp
   TestScenarios.cpp
-  test_assertions.cpp)
+  test_assertions.cpp
+  TestContextDirector.cpp
+)
 
 target_include_directories(context_test_helpers
   PUBLIC

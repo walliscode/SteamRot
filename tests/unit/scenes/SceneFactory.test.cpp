@@ -11,6 +11,7 @@
 #include "CraftingScene.h"
 #include "PathProvider.h"
 #include "TestContext.h"
+#include "TestContextDirector.h"
 #include "TitleScene.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
@@ -87,28 +88,8 @@ TEST_CASE("SceneFactory uses ContextDirector when builder is registered",
   // Clear any existing builders
   steamrot::ContextDirector::ClearBuilders();
 
-  // Create and register a builder for TITLE scene
-  steamrot::LogicContextBuilder builder;
-  auto logic_context = test_context.GetLogicContextForTitleScene();
-
-  builder
-      .SetSceneEntities(std::make_shared<steamrot::EntityMemoryPool>(
-          logic_context.scene_entities))
-      .SetArchetypes(
-          std::make_shared<const std::unordered_map<steamrot::ArchetypeID,
-                                                     steamrot::Archetype>>(
-              logic_context.archetypes))
-      .SetSceneTexture(
-          std::make_shared<sf::RenderTexture>(logic_context.scene_texture))
-      .SetGameWindow(
-          std::make_shared<sf::RenderWindow>(logic_context.game_window))
-      .SetAssetManager(
-          std::make_shared<const steamrot::AssetManager>(
-              logic_context.asset_manager))
-      .SetEventHandler(
-          std::make_shared<steamrot::EventHandler>(logic_context.event_handler))
-      .SetMousePosition(std::make_shared<const sf::Vector2i>(
-          logic_context.mouse_position));
+  // Get a builder from TestContextDirector
+  auto builder = steamrot::tests::TestContextDirector::GetLogicContextBuilder();
 
   steamrot::ContextDirector::RegisterLogicContextBuilder(
       steamrot::SceneType::SceneType_TITLE, builder);
@@ -125,6 +106,7 @@ TEST_CASE("SceneFactory uses ContextDirector when builder is registered",
 
   // Clean up
   steamrot::ContextDirector::ClearBuilders();
+  steamrot::tests::TestContextDirector::Reset();
 }
 
 ////////////////////////////////////////////////////////////
