@@ -28,7 +28,8 @@ enum class FailMode {
   EnumValueNotHandled,
   VariantTypeMismatch,
   NullPointer,
-  InvalidUUID
+  InvalidUUID,
+  MissingRequiredField
 };
 
 struct FailInfo {
