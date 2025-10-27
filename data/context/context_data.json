@@ -1,0 +1,29 @@
+{
+  "game_context": {
+    "window_width": 800,
+    "window_height": 600,
+    "window_title": "SteamRot",
+    "framerate_limit": 60,
+    "environment_type": "Production"
+  },
+  "scene_contexts": [
+    {
+      "scene_type": "TEST",
+      "entity_pool_size": 100,
+      "render_texture_width": 800,
+      "render_texture_height": 600
+    },
+    {
+      "scene_type": "TITLE",
+      "entity_pool_size": 50,
+      "render_texture_width": 800,
+      "render_texture_height": 600
+    },
+    {
+      "scene_type": "CRAFTING",
+      "entity_pool_size": 200,
+      "render_texture_width": 800,
+      "render_texture_height": 600
+    }
+  ]
+}

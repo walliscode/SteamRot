@@ -3,10 +3,9 @@
 #include "containers.h"
 #include <bitset>
 
-using ArchetypeID = std::bitset<steamrot::kComponentRegisterSize>;
-
 namespace steamrot {
 
+using ArchetypeID = std::bitset<steamrot::kComponentRegisterSize>;
 /////////////////////////////////////////////////
 /// @brief Generates an ArchetypeID based on the provided Components.
 ///

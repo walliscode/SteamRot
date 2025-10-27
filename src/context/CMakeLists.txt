@@ -1,6 +1,7 @@
 add_library(context
   GameContext.cpp
   GameContextBuilder.cpp
+  ContextConfigurator.cpp
 )
 
 target_include_directories(context
@@ -10,4 +11,6 @@ target_include_directories(context
 target_link_libraries(context PUBLIC
   SFML::Graphics
   systems
+  logic
+  flatbuffers_headers
 )

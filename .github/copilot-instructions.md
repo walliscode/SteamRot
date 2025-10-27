@@ -992,6 +992,61 @@ void Function() {
 9. **Reusable Test Infrastructure**: Use TestScenarios, assertions, and mixins for tests
 10. **Test Tags**: Always tag tests with `[unit]`, `[integration]`, or `[system]`
 
+## Context Configuration (Stage 2)
+
+### Overview
+
+Stage 2 of the Context Handling Improvement Plan provides data-driven context configuration via FlatBuffers. This allows game and scene settings to be externalized to JSON files.
+
+See `documentation/CONTEXT_CONFIGURATION.md` for complete documentation.
+
+### Configuration Files
+
+- **Production**: `data/context/context_data.json`
+- **Test**: `tests/data/context/test_context_data.json`
+
+### Using ContextConfigurator
+
+```cpp
+// Load configuration
+steamrot::FlatbuffersDataLoader loader;
+auto context_data = loader.ProvideContextData().value();
+
+// Create configurator
+steamrot::ContextConfigurator configurator(context_data);
+
+// Get builder with static settings pre-configured
+auto builder = configurator.CreateGameContextBuilder().value();
+
+// Add runtime objects
+builder.SetWindow(window_ptr)
+       .SetEventHandler(handler_ptr)
+       .SetAssetManager(assets_ptr)
+       .SetLoopNumber(loop_num_ptr);
+
+// Build context
+auto context = builder.Build().value();
+```
+
+### Configuration Structure
+
+- **GameContextConfig**: Window size, title, framerate, environment type
+- **SceneContextConfig**: Entity pool size, render texture dimensions per scene
+- **ContextData**: Root table containing game and scene configurations
+
+### Key Features
+
+- **Environment Type Support**: Separate configs for Test/Production
+- **Scene-Specific Settings**: Each scene can have different entity pool sizes
+- **Automatic Build Integration**: JSON files auto-converted to binary
+- **Error Handling**: std::expected with detailed FailInfo messages
+
+### Related Documentation
+
+- `documentation/STAGE_2_SUMMARY.md` - Implementation summary
+- `documentation/CONTEXT_CONFIGURATION.md` - Complete usage guide
+- `documentation/CONTEXT_HANDLING_IMPROVEMENT_PLAN.md` - Overall plan
+
 ## Testing Infrastructure (Stage 2)
 
 ### Reusable Test Components

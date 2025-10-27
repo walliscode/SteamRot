@@ -13,6 +13,7 @@
 /////////////////////////////////////////////////
 #include "DataLoader.h"
 #include "FailInfo.h"
+#include "context_data_generated.h"
 #include "game_engine_generated.h"
 #include "scene_change_packet_generated.h"
 #include "scene_manager_generated.h"
@@ -86,6 +87,11 @@ public:
   /////////////////////////////////////////////////
   std::expected<const UIStyleData *, FailInfo>
   ProvideUIStylesData(const std::string &style_name) const;
+
+  /////////////////////////////////////////////////
+  /// @brief Provides ContextData from binary file
+  /////////////////////////////////////////////////
+  std::expected<const ContextData *, FailInfo> ProvideContextData() const;
 };
 
 } // namespace steamrot

@@ -9,7 +9,6 @@
 #include "EntityManager.h"
 #include "PathProvider.h"
 #include "TestContext.h"
-#include "entity_test_helpers.h"
 #include "entity_memory_pool_matchers.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
@@ -39,10 +38,11 @@ TEST_CASE("EntityManager calls configurator with no errors",
   // test the EntityMemoryPool post configuration by creating expected pool
   steamrot::EntityManager expected_entity_manager{
       test_context.GetGameContext().event_handler};
-  auto expected_result = expected_entity_manager.ConfigureEntitiesFromDefaultData(
-      steamrot::SceneType::SceneType_TEST, steamrot::DataType::Flatbuffers);
+  auto expected_result =
+      expected_entity_manager.ConfigureEntitiesFromDefaultData(
+          steamrot::SceneType::SceneType_TEST, steamrot::DataType::Flatbuffers);
   REQUIRE(expected_result.has_value());
-  
+
   REQUIRE_THAT(entity_manager.GetEntityMemoryPool(),
                steamrot::tests::EqualsEntityMemoryPool(
                    expected_entity_manager.GetEntityMemoryPool()));

@@ -7,9 +7,10 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "scene_test_helpers.h"
-#include "entity_test_helpers.h"
-#include "entity_memory_pool_matchers.h"
+#include "EventHandler.h"
 #include "FlatbuffersConfigurator.h"
+#include "entity_memory_pool_matchers.h"
+#include "entity_test_helpers.h"
 #include "logic_test_helpers.h"
 #include "uuid.h"
 #include <catch2/catch_test_macros.hpp>
@@ -34,13 +35,15 @@ const uuids::uuid create_uuid() {
 void CheckDefaultSceneConfiguration(const Scene &scene) {
 
   const SceneType scene_type = scene.GetSceneInfo().type;
-  
+
   // check entity memory pool default configuration by creating expected pool
   EntityMemoryPool expected_pool;
-  FlatbuffersConfigurator configurator;
-  auto result = configurator.ConfigureEntitiesFromDefaultData(expected_pool, scene_type);
+  steamrot::EventHandler event_handler;
+  FlatbuffersConfigurator configurator(event_handler);
+  auto result =
+      configurator.ConfigureEntitiesFromDefaultData(expected_pool, scene_type);
   REQUIRE(result.has_value());
-  
+
   REQUIRE_THAT(scene.GetEntityMemoryPool(),
                EqualsEntityMemoryPool(expected_pool));
 
