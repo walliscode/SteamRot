@@ -20,7 +20,7 @@ target_link_libraries(test_logic
   Catch2::Catch2WithMain
   logic
   test_logic_helpers
-  test_context
+  context_test_helpers
 )
 
 catch_discover_tests(test_logic)

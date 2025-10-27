@@ -11,7 +11,7 @@ target_link_libraries(test_systems
   PRIVATE
   Catch2::Catch2WithMain
   systems
-  test_context
+  context_test_helpers
 
 
 )

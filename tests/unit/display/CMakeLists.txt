@@ -11,7 +11,7 @@ target_link_libraries(test_display
   PRIVATE
   Catch2::Catch2WithMain
   display
-  test_context
+  context_test_helpers
 )
 
 catch_discover_tests(test_display)
