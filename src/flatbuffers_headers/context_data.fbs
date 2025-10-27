@@ -1,0 +1,34 @@
+include "scene_change_packet.fbs";
+
+namespace steamrot;
+
+////////////////////////////////////////////////////////////
+// Configuration for GameContext initialization
+////////////////////////////////////////////////////////////
+table GameContextConfig {
+  window_width: uint32 = 800;
+  window_height: uint32 = 600;
+  window_title: string;
+  framerate_limit: uint32 = 60;
+  environment_type: string; // "None", "Test", "Production"
+}
+
+////////////////////////////////////////////////////////////
+// Configuration for scene-specific context
+////////////////////////////////////////////////////////////
+table SceneContextConfig {
+  scene_type: SceneType;
+  entity_pool_size: uint32 = 100;
+  render_texture_width: uint32 = 800;
+  render_texture_height: uint32 = 600;
+}
+
+////////////////////////////////////////////////////////////
+// Root table for context configuration
+////////////////////////////////////////////////////////////
+table ContextData {
+  game_context: GameContextConfig;
+  scene_contexts: [SceneContextConfig];
+}
+
+root_type ContextData;

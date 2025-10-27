@@ -317,4 +317,36 @@ FlatbuffersDataLoader::ProvideUIStylesData(
   return ui_style_data;
 }
 
+/////////////////////////////////////////////////
+std::expected<const ContextData *, FailInfo>
+FlatbuffersDataLoader::ProvideContextData() const {
+  // get data directory
+  auto data_dir_result = m_path_provider.GetDataDirectory();
+  if (!data_dir_result.has_value()) {
+    return std::unexpected(data_dir_result.error());
+  }
+
+  // construct the file path
+  std::filesystem::path context_path =
+      data_dir_result.value() / "context" / "context_data.bin";
+
+  // check if the file exists
+  if (!std::filesystem::exists(context_path)) {
+    std::string error_message =
+        std::format("Context data file not found: {}", context_path.string());
+    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
+  }
+
+  // load the context data
+  const steamrot::ContextData *context_data =
+      GetContextData(LoadBinaryData(context_path));
+
+  if (!context_data) {
+    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
+                                    "ContextData pointer is null"));
+  }
+
+  return context_data;
+}
+
 } // namespace steamrot
