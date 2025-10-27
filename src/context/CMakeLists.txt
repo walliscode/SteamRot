@@ -1,5 +1,6 @@
 add_library(context
   GameContext.cpp
+  GameContextBuilder.cpp
   ContextConfigurator.cpp
 )
 
@@ -12,5 +13,4 @@ target_link_libraries(context PUBLIC
   systems
   logic
   flatbuffers_headers
-  resources
 )

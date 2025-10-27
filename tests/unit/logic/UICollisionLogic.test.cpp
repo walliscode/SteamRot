@@ -16,25 +16,25 @@
 
 TEST_CASE("UICollisionLogic::UICollisionLogic Constructor",
           "[unit][UICollisionLogic]") {
-  // Create a dummy SceneContext
+  // Create a dummy LogicContext
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
   // Instantiate UICollisionLogic
   steamrot::UICollisionLogic ui_collision_logic(
-      test_context.GetSceneContextForTestScene());
+      test_context.GetLogicContextForTestScene());
   SUCCEED("UICollisionLogic instantiated successfully");
 }
 
 TEST_CASE("UICollisionLogic::RunLogic changes is_mouse_over to true if mouse "
           "over element"
           "[unit][UICollisionLogic]") {
-  // Create a dummy SceneContext
+  // Create a dummy LogicContext
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
 
-  // pull out the SceneContext and GameContext references
+  // pull out the LogicContext and GameContext references
   auto &game_context = test_context.GetGameContext();
-  auto logic_context = test_context.GetSceneContextForTestScene();
+  auto logic_context = test_context.GetLogicContextForTestScene();
 
   // Get all active CUserInterface entities
   steamrot::ArchetypeID archetype_id =

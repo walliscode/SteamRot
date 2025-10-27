@@ -21,9 +21,9 @@ public:
   /////////////////////////////////////////////////
   /// @brief Constructor for UIStateLogic.
   ///
-  /// @param logic_context SceneContext object containing the context for the logic.
+  /// @param logic_context LogicContext object containing the context for the logic.
   /////////////////////////////////////////////////
-  UIStateLogic(const SceneContext logic_context);
+  UIStateLogic(const LogicContext logic_context);
 };
 
 } // namespace steamrot

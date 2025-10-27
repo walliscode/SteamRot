@@ -18,7 +18,7 @@
 using namespace magic_enum::bitwise_operators;
 namespace steamrot {
 /////////////////////////////////////////////////
-UIActionLogic::UIActionLogic(const SceneContext logic_context)
+UIActionLogic::UIActionLogic(const LogicContext logic_context)
     : Logic(logic_context) {}
 
 /////////////////////////////////////////////////
@@ -26,9 +26,9 @@ void UIActionLogic::ProcessLogic() {
 
   ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<CUserInterface>();
 
-  const auto it = m_scene_context.archetypes.find(archetype_id);
+  const auto it = m_logic_context.archetypes.find(archetype_id);
   // if it is not in the archetyps map, then skip
-  if (it != m_scene_context.archetypes.end()) {
+  if (it != m_logic_context.archetypes.end()) {
 
     // get the archetype from the map
     const Archetype &archetype = it->second;
@@ -38,12 +38,12 @@ void UIActionLogic::ProcessLogic() {
 
       // get the CUserInterface component
       CUserInterface &ui_component = entity::memory::GetComponent<CUserInterface>(
-          entity_id, m_scene_context.scene_entities);
+          entity_id, m_logic_context.scene_entities);
 
       // Perform any aciton logic here, processing nested elements recursively
       ProcessNestedUIActionsAndEvents(*ui_component.m_root_element,
-                                      m_scene_context.event_handler,
-                                      m_scene_context);
+                                      m_logic_context.event_handler,
+                                      m_logic_context);
     }
   }
 }
@@ -51,7 +51,7 @@ void UIActionLogic::ProcessLogic() {
 /////////////////////////////////////////////////
 void ProcessUIActionsAndEvents(UIElement &ui_element,
                                EventHandler &event_handler,
-                               const SceneContext &logic_context) {
+                               const LogicContext &logic_context) {
 
   // check the subscription first
   if (!ui_element.subscription) {
@@ -80,7 +80,7 @@ void ProcessUIActionsAndEvents(UIElement &ui_element,
 /////////////////////////////////////////////////
 void ProcessNestedUIActionsAndEvents(UIElement &ui_element,
                                      EventHandler &event_handler,
-                                     const SceneContext &logic_context) {
+                                     const LogicContext &logic_context) {
   // bool to keep track if any child was processed
   bool child_processed = false;
 
@@ -134,7 +134,7 @@ void ProcessButtonElementActions(ButtonElement &button_element,
 /////////////////////////////////////////////////
 void ProcessDropDownListElementActions(
     DropDownListElement &dropdown_list_element,
-    const SceneContext &logic_context) {
+    const LogicContext &logic_context) {
 
   // Only populate if the function is set and not None
   if (dropdown_list_element.data_populate_function ==

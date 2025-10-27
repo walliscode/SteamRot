@@ -16,7 +16,6 @@
 #include <expected>
 #include <memory>
 #include <unordered_map>
-
 namespace steamrot {
 
 enum class LogicType {
@@ -25,10 +24,8 @@ enum class LogicType {
   Action,
   Movement,
 };
-
 using LogicVector = std::vector<std::unique_ptr<Logic>>;
 using LogicCollection = std::unordered_map<LogicType, LogicVector>;
-
 /////////////////////////////////////////////////
 /// @class LogicFactory
 /// @brief Provides Logic objects for Scenes to store and use.
@@ -43,9 +40,9 @@ private:
   const SceneType m_scene_type;
 
   /////////////////////////////////////////////////
-  /// @brief member variable that holds the SceneContext
+  /// @brief member variable that holds the LogicContext
   /////////////////////////////////////////////////
-  SceneContext m_scene_context;
+  LogicContext m_logic_context;
 
   /////////////////////////////////////////////////
   /// @brief Create a vector of logic objects specifically for collision
@@ -67,10 +64,10 @@ public:
   /////////////////////////////////////////////////
   /// @brief Constructor for the LogicFactory class.
   ///
-  /// @param scene_type SceneType for which logics are created
-  /// @param scene_context SceneContext object containing references to the scene
+  /// @param logic_context LogicContext object containing references to the
+  /// scene
   /////////////////////////////////////////////////
-  LogicFactory(const SceneType scene_type, const SceneContext &scene_context);
+  LogicFactory(const SceneType scene_type, const LogicContext &logic_context);
 
   /////////////////////////////////////////////////
   /// @brief Create and return a map of logic objects.
@@ -78,5 +75,4 @@ public:
   /////////////////////////////////////////////////
   std::expected<LogicCollection, FailInfo> CreateLogicMap();
 };
-
 } // namespace steamrot

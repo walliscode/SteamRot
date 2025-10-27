@@ -65,9 +65,9 @@ void Scene::SetLogicMap(
 const SceneInfo &Scene::GetSceneInfo() const { return m_scene_info; }
 
 /////////////////////////////////////////////////
-SceneContext Scene::GetSceneContext() {
+LogicContext Scene::GetLogicContext() {
 
-  SceneContext logic_context{
+  LogicContext logic_context{
       m_entity_manager.GetEntityMemoryPool(),
       m_entity_manager.GetArchetypeManager().GetArchetypes(),
       m_render_texture,

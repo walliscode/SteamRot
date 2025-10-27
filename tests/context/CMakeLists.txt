@@ -1,8 +1,7 @@
 add_library(context_test_helpers
   TestContext.cpp
   TestScenarios.cpp
-  test_assertions.cpp
-  TestFixture.cpp)
+  test_assertions.cpp)
 
 target_include_directories(context_test_helpers
   PUBLIC
@@ -12,8 +11,6 @@ target_include_directories(context_test_helpers
 target_link_libraries(context_test_helpers
   PUBLIC
   context
-  resources
-  scenes
   Catch2::Catch2
 )
 

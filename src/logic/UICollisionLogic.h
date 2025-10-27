@@ -16,11 +16,11 @@ private:
 
 public:
   /////////////////////////////////////////////////
-  /// @brief Constructor for UICollisionLogic taking in a SceneContext
+  /// @brief Constructor for UICollisionLogic taking in a LogicContext
   ///
-  /// @param logic_context SceneContext containing references to the scene
+  /// @param logic_context LogicContext containing references to the scene
   /////////////////////////////////////////////////
-  UICollisionLogic(const SceneContext logic_context);
+  UICollisionLogic(const LogicContext logic_context);
 };
 
 } // namespace steamrot

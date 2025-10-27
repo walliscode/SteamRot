@@ -11,7 +11,7 @@
 #include "ArchetypeManager.h"
 #include "EventHandler.h"
 #include "GameContext.h"
-#include "SceneContext.h"
+#include "LogicContext.h"
 #include "containers.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -76,19 +76,19 @@ private:
   std::unique_ptr<GameContext> game_context_ptr{nullptr};
 
   /////////////////////////////////////////////////
-  /// @brief Mock SceneContext instance for tests with a test scene
+  /// @brief Mock LogicContext instance for tests with a test scene
   /////////////////////////////////////////////////
-  std::unique_ptr<SceneContext> logic_context_for_test_scene{nullptr};
+  std::unique_ptr<LogicContext> logic_context_for_test_scene{nullptr};
 
   /////////////////////////////////////////////////
-  /// @brief Mock SceneContext instance for tests with a title scene
+  /// @brief Mock LogicContext instance for tests with a title scene
   /////////////////////////////////////////////////
-  std::unique_ptr<SceneContext> logic_context_for_title_scene{nullptr};
+  std::unique_ptr<LogicContext> logic_context_for_title_scene{nullptr};
 
   /////////////////////////////////////////////////
-  /// @brief Mock SceneContext instance for tests with a crafting scene
+  /// @brief Mock LogicContext instance for tests with a crafting scene
   /////////////////////////////////////////////////
-  std::unique_ptr<SceneContext> logic_context_for_crafting_scene{nullptr};
+  std::unique_ptr<LogicContext> logic_context_for_crafting_scene{nullptr};
 
   /////////////////////////////////////////////////
   /// @brief Configure the GameContext instance
@@ -98,27 +98,27 @@ private:
   /////////////////////////////////////////////////
   /// @brief Configure the Logic Context for the Test Scene
   /////////////////////////////////////////////////
-  void ConfigureSceneContextForTestScene();
+  void ConfigureLogicContextForTestScene();
 
   /////////////////////////////////////////////////
   /// @brief Configure the Logic Context for the Title Scene
   /////////////////////////////////////////////////
-  void ConfigureSceneContextForTitleScene();
+  void ConfigureLogicContextForTitleScene();
 
   /////////////////////////////////////////////////
   /// @brief Configure the Logic Context for the Crafting Scene
   /////////////////////////////////////////////////
-  void ConfigureSceneContextForCraftingScene();
+  void ConfigureLogicContextForCraftingScene();
 
 public:
   TestContext(const SceneType scene_type = SceneType::SceneType_TEST);
 
   steamrot::GameContext &GetGameContext() const;
 
-  const steamrot::SceneContext &GetSceneContextForTestScene() const;
+  const steamrot::LogicContext &GetLogicContextForTestScene() const;
 
-  const steamrot::SceneContext &GetSceneContextForTitleScene() const;
+  const steamrot::LogicContext &GetLogicContextForTitleScene() const;
 
-  const steamrot::SceneContext &GetSceneContextForCraftingScene() const;
+  const steamrot::LogicContext &GetLogicContextForCraftingScene() const;
 };
 } // namespace steamrot::tests

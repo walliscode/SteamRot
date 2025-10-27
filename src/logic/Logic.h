@@ -11,8 +11,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "SceneContext.h"
-
+#include "LogicContext.h"
 namespace steamrot {
 
 using EntityIndicies = std::vector<size_t>;
@@ -30,17 +29,17 @@ protected:
   virtual void ProcessLogic() = 0;
 
   /////////////////////////////////////////////////
-  /// @brief Contains an instance of the SceneContext struct.
+  /// @brief Contains an instance of the LogicContest struct.
   /////////////////////////////////////////////////
-  SceneContext m_scene_context;
+  LogicContext m_logic_context;
 
 public:
   /////////////////////////////////////////////////
   /// @brief Constructor for the Logic class.
   ///
-  /// @param scene_context Instance of the SceneContext struct
+  /// @param logic_context Instance of the LogicContext struct
   /////////////////////////////////////////////////
-  Logic(const SceneContext scene_context);
+  Logic(const LogicContext logic_context);
 
   /////////////////////////////////////////////////
   /// @brief Default destructor for the Logic class.
@@ -56,5 +55,4 @@ public:
   /////////////////////////////////////////////////
   void RunLogic();
 };
-
 } // namespace steamrot

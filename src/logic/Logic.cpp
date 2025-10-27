@@ -11,8 +11,8 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-Logic::Logic(const SceneContext scene_context)
-    : m_scene_context(scene_context) {}
+Logic::Logic(const LogicContext logic_context)
+    : m_logic_context(logic_context) {}
 
 /////////////////////////////////////////////////
 void Logic::RunLogic() { ProcessLogic(); }

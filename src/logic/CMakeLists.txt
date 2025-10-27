@@ -8,6 +8,7 @@ add_library(logic
   CraftingRenderLogic.cpp
   logic_collision.cpp
   logic_ui.cpp
+  LogicContextBuilder.cpp
 )
 
 target_include_directories(logic
@@ -23,5 +24,4 @@ target_link_libraries(logic PUBLIC
   systems
   ui_styles
   user_interface
-  scenes
 )

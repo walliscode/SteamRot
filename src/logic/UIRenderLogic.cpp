@@ -10,7 +10,7 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////////////////
-UIRenderLogic::UIRenderLogic(const SceneContext logic_context)
+UIRenderLogic::UIRenderLogic(const LogicContext logic_context)
     : Logic(logic_context) {}
 
 ////////////////////////////////////////////////////
@@ -20,16 +20,16 @@ void UIRenderLogic::ProcessLogic() {
   DrawUIElements();
 
   // display the render texture after drawing
-  m_scene_context.scene_texture.display();
+  m_logic_context.scene_texture.display();
 }
 
 void UIRenderLogic::DrawUIElements() {
 
   ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<CUserInterface>();
 
-  const auto it = m_scene_context.archetypes.find(archetype_id);
+  const auto it = m_logic_context.archetypes.find(archetype_id);
   // if it is not in the archetypes map, then return
-  if (it == m_scene_context.archetypes.end()) {
+  if (it == m_logic_context.archetypes.end()) {
     return;
   }
 
@@ -40,11 +40,11 @@ void UIRenderLogic::DrawUIElements() {
 
     // get the CUserInterface component
     CUserInterface &ui_component = entity::memory::GetComponent<CUserInterface>(
-        entity_id, m_scene_context.scene_entities);
+        entity_id, m_logic_context.scene_entities);
 
     draw_ui_elements::DrawNestedUIElements(
-        m_scene_context.scene_texture, *ui_component.m_root_element,
-        m_scene_context.asset_manager.GetDefaultUIStyle());
+        m_logic_context.scene_texture, *ui_component.m_root_element,
+        m_logic_context.asset_manager.GetDefaultUIStyle());
   }
 }
 

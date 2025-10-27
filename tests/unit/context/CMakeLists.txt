@@ -1,4 +1,6 @@
 add_executable(test_context
+  GameContextBuilder.test.cpp
+  LogicContextBuilder.test.cpp
   ContextConfigurator.test.cpp
 )
 
@@ -15,7 +17,6 @@ PRIVATE
   systems
   data_handlers
   flatbuffers_headers
-  resources
 )
 
 catch_discover_tests(test_context)

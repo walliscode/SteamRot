@@ -36,11 +36,11 @@ private:
 
 public:
   /////////////////////////////////////////////////
-  /// @brief Constructor for CraftingRenderLogic taking in a SceneContext
+  /// @brief Constructor for CraftingRenderLogic taking in a LogicContext
   /// object.
   ///
   /// @param logic_context The logic context for this scene
   /////////////////////////////////////////////////
-  CraftingRenderLogic(const SceneContext logic_context);
+  CraftingRenderLogic(const LogicContext logic_context);
 };
 } // namespace steamrot

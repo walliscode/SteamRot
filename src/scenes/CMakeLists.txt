@@ -5,7 +5,6 @@ add_library(scenes
     Scene.cpp
     CraftingScene.cpp
     TitleScene.cpp
-    SceneContext.cpp
 )
 
 target_compile_definitions(scenes PRIVATE
@@ -31,5 +30,4 @@ context
 logic
 flatbuffers
 flatbuffers_headers
-resources
 )
