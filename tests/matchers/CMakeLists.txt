@@ -13,6 +13,7 @@ INTERFACE
   Catch2::Catch2WithMain
   components
   entity
+  user_interface
 )
 
 # Test executable for component matchers
@@ -25,6 +26,7 @@ PRIVATE
   Catch2::Catch2WithMain
   test_matchers
   components
+  user_interface
 )
 
 catch_discover_tests(test_component_matchers)
