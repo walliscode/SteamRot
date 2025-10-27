@@ -8,12 +8,12 @@
 /////////////////////////////////////////////////
 #include "ContextConfigurator.h"
 #include "FlatbuffersDataLoader.h"
-#include "GameContextBuilder.h"
-#include "SceneContextBuilder.h"
+#include "GameResources.h"
+#include "SceneResources.h"
 #include "PathProvider.h"
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("Load context configuration and create builders",
+TEST_CASE("Load context configuration and configure resources",
           "[integration][context][configuration]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::FlatbuffersDataLoader loader;
@@ -39,15 +39,18 @@ TEST_CASE("Load context configuration and create builders",
   // Create configurator
   steamrot::ContextConfigurator configurator(context_data);
 
-  // Create GameContextBuilder from configuration
-  auto game_builder_result = configurator.CreateGameContextBuilder();
-  REQUIRE(game_builder_result.has_value());
+  // Configure GameResources from configuration
+  steamrot::GameResources game_resources;
+  auto game_result = configurator.ConfigureGameResources(game_resources);
+  REQUIRE(game_result.has_value());
+  REQUIRE(game_resources.game_window.isOpen());
 
-  // Create SceneContextBuilder for each configured scene
+  // Configure SceneResources for each configured scene
   for (const auto *scene_config : *context_data->scene_contexts()) {
-    auto logic_builder_result =
-        configurator.CreateSceneContextBuilder(scene_config->scene_type());
-    REQUIRE(logic_builder_result.has_value());
+    steamrot::SceneResources scene_resources;
+    auto scene_result = configurator.ConfigureSceneResources(
+        scene_resources, scene_config->scene_type());
+    REQUIRE(scene_result.has_value());
   }
 }
 
@@ -62,14 +65,16 @@ TEST_CASE("Configuration supports all required scene types",
   steamrot::ContextConfigurator configurator(context_data_result.value());
 
   // Verify TEST scene is configured
-  auto test_builder = configurator.CreateSceneContextBuilder(
-      steamrot::SceneType::SceneType_TEST);
-  REQUIRE(test_builder.has_value());
+  steamrot::SceneResources test_resources;
+  auto test_result = configurator.ConfigureSceneResources(
+      test_resources, steamrot::SceneType::SceneType_TEST);
+  REQUIRE(test_result.has_value());
 
   // Verify TITLE scene is configured
-  auto title_builder = configurator.CreateSceneContextBuilder(
-      steamrot::SceneType::SceneType_TITLE);
-  REQUIRE(title_builder.has_value());
+  steamrot::SceneResources title_resources;
+  auto title_result = configurator.ConfigureSceneResources(
+      title_resources, steamrot::SceneType::SceneType_TITLE);
+  REQUIRE(title_result.has_value());
 }
 
 TEST_CASE("Configuration values are properly loaded",
@@ -97,7 +102,7 @@ TEST_CASE("Configuration values are properly loaded",
   }
 }
 
-TEST_CASE("Builder can be used to create context with runtime objects",
+TEST_CASE("Resources can be configured and used to create contexts",
           "[integration][context][configuration]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::FlatbuffersDataLoader loader;
@@ -107,29 +112,20 @@ TEST_CASE("Builder can be used to create context with runtime objects",
 
   steamrot::ContextConfigurator configurator(context_data_result.value());
 
-  // Get builder from configurator
-  auto builder_result = configurator.CreateGameContextBuilder();
-  REQUIRE(builder_result.has_value());
+  // Configure game resources
+  steamrot::GameResources game_resources;
+  auto game_result = configurator.ConfigureGameResources(game_resources);
+  REQUIRE(game_result.has_value());
 
-  auto builder = builder_result.value();
+  // Verify the resources were configured
+  REQUIRE(game_resources.game_window.isOpen());
+  REQUIRE(game_resources.env_type == steamrot::EnvironmentType::Test);
 
-  // Add runtime objects to builder
-  auto window = std::make_shared<sf::RenderWindow>();
-  auto event_handler = std::make_shared<steamrot::EventHandler>();
-  auto asset_manager = std::make_shared<steamrot::AssetManager>();
-  auto loop_num = std::make_shared<const size_t>(0);
-
-  builder.SetWindow(window)
-      .SetEventHandler(event_handler)
-      .SetAssetManager(asset_manager)
-      .SetLoopNumber(loop_num);
-
-  // Build the context
-  auto context_result = builder.Build();
-  REQUIRE(context_result.has_value());
-
-  // Verify the context was created with correct values
-  REQUIRE(&context_result.value().game_window == window.get());
-  REQUIRE(&context_result.value().event_handler == event_handler.get());
-  REQUIRE(&context_result.value().asset_manager == asset_manager.get());
+  // Create context from resources
+  steamrot::GameContext game_context(game_resources);
+  
+  // Verify the context references the resources
+  REQUIRE(&game_context.game_window == &game_resources.game_window);
+  REQUIRE(&game_context.event_handler == &game_resources.event_handler);
+  REQUIRE(&game_context.asset_manager == &game_resources.asset_manager);
 }

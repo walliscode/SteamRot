@@ -1,6 +1,5 @@
 add_library(context
   GameContext.cpp
-  GameContextBuilder.cpp
   ContextConfigurator.cpp
 )
 
