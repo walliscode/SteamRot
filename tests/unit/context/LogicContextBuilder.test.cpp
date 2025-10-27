@@ -31,7 +31,8 @@ TEST_CASE("LogicContextBuilder fails when scene entities is missing",
           "[unit][logic][LogicContextBuilder]") {
   steamrot::LogicContextBuilder builder;
 
-  auto archetypes = std::make_shared<const std::unordered_map<steamrot::ArchetypeID, steamrot::Archetype>>();
+  auto archetypes = std::make_shared<
+      const std::unordered_map<steamrot::ArchetypeID, steamrot::Archetype>>();
   auto scene_texture = std::make_shared<sf::RenderTexture>();
   auto game_window = std::make_shared<sf::RenderWindow>();
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
@@ -84,7 +85,8 @@ TEST_CASE("LogicContextBuilder fails when scene texture is missing",
   steamrot::LogicContextBuilder builder;
 
   auto scene_entities = std::make_shared<steamrot::EntityMemoryPool>();
-  auto archetypes = std::make_shared<const std::unordered_map<steamrot::ArchetypeID, steamrot::Archetype>>();
+  auto archetypes = std::make_shared<
+      const std::unordered_map<steamrot::ArchetypeID, steamrot::Archetype>>();
   auto game_window = std::make_shared<sf::RenderWindow>();
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   auto asset_manager = std::make_shared<const steamrot::AssetManager>();
@@ -110,7 +112,8 @@ TEST_CASE("LogicContextBuilder fails when game window is missing",
   steamrot::LogicContextBuilder builder;
 
   auto scene_entities = std::make_shared<steamrot::EntityMemoryPool>();
-  auto archetypes = std::make_shared<const std::unordered_map<steamrot::ArchetypeID, steamrot::Archetype>>();
+  auto archetypes = std::make_shared<
+      const std::unordered_map<steamrot::ArchetypeID, steamrot::Archetype>>();
   auto scene_texture = std::make_shared<sf::RenderTexture>();
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   auto asset_manager = std::make_shared<const steamrot::AssetManager>();
@@ -136,7 +139,8 @@ TEST_CASE("LogicContextBuilder fails when asset manager is missing",
   steamrot::LogicContextBuilder builder;
 
   auto scene_entities = std::make_shared<steamrot::EntityMemoryPool>();
-  auto archetypes = std::make_shared<const std::unordered_map<steamrot::ArchetypeID, steamrot::Archetype>>();
+  auto archetypes = std::make_shared<
+      const std::unordered_map<steamrot::ArchetypeID, steamrot::Archetype>>();
   auto scene_texture = std::make_shared<sf::RenderTexture>();
   auto game_window = std::make_shared<sf::RenderWindow>();
   auto event_handler = std::make_shared<steamrot::EventHandler>();
@@ -161,7 +165,8 @@ TEST_CASE("LogicContextBuilder fails when event handler is missing",
   steamrot::LogicContextBuilder builder;
 
   auto scene_entities = std::make_shared<steamrot::EntityMemoryPool>();
-  auto archetypes = std::make_shared<const std::unordered_map<steamrot::ArchetypeID, steamrot::Archetype>>();
+  auto archetypes = std::make_shared<
+      const std::unordered_map<steamrot::ArchetypeID, steamrot::Archetype>>();
   auto scene_texture = std::make_shared<sf::RenderTexture>();
   auto game_window = std::make_shared<sf::RenderWindow>();
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
@@ -187,7 +192,8 @@ TEST_CASE("LogicContextBuilder fails when mouse position is missing",
   steamrot::LogicContextBuilder builder;
 
   auto scene_entities = std::make_shared<steamrot::EntityMemoryPool>();
-  auto archetypes = std::make_shared<const std::unordered_map<steamrot::ArchetypeID, steamrot::Archetype>>();
+  auto archetypes = std::make_shared<
+      const std::unordered_map<steamrot::ArchetypeID, steamrot::Archetype>>();
   auto scene_texture = std::make_shared<sf::RenderTexture>();
   auto game_window = std::make_shared<sf::RenderWindow>();
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
@@ -213,7 +219,8 @@ TEST_CASE("LogicContextBuilder builds successfully with all fields",
   steamrot::LogicContextBuilder builder;
 
   auto scene_entities = std::make_shared<steamrot::EntityMemoryPool>();
-  auto archetypes = std::make_shared<const std::unordered_map<steamrot::ArchetypeID, steamrot::Archetype>>();
+  auto archetypes = std::make_shared<
+      const std::unordered_map<steamrot::ArchetypeID, steamrot::Archetype>>();
   auto scene_texture = std::make_shared<sf::RenderTexture>();
   auto game_window = std::make_shared<sf::RenderWindow>();
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
@@ -222,13 +229,13 @@ TEST_CASE("LogicContextBuilder builds successfully with all fields",
   auto mouse_position = std::make_shared<const sf::Vector2i>(100, 200);
 
   auto result = builder.SetSceneEntities(scene_entities)
-                     .SetArchetypes(archetypes)
-                     .SetSceneTexture(scene_texture)
-                     .SetGameWindow(game_window)
-                     .SetAssetManager(asset_manager)
-                     .SetEventHandler(event_handler)
-                     .SetMousePosition(mouse_position)
-                     .Build();
+                    .SetArchetypes(archetypes)
+                    .SetSceneTexture(scene_texture)
+                    .SetGameWindow(game_window)
+                    .SetAssetManager(asset_manager)
+                    .SetEventHandler(event_handler)
+                    .SetMousePosition(mouse_position)
+                    .Build();
 
   REQUIRE(result.has_value());
   REQUIRE(&result.value().scene_entities == scene_entities.get());
@@ -245,7 +252,8 @@ TEST_CASE("LogicContextBuilder supports method chaining",
   steamrot::LogicContextBuilder builder;
 
   auto scene_entities = std::make_shared<steamrot::EntityMemoryPool>();
-  auto archetypes = std::make_shared<const std::unordered_map<steamrot::ArchetypeID, steamrot::Archetype>>();
+  auto archetypes = std::make_shared<
+      const std::unordered_map<steamrot::ArchetypeID, steamrot::Archetype>>();
   auto scene_texture = std::make_shared<sf::RenderTexture>();
   auto game_window = std::make_shared<sf::RenderWindow>();
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};

@@ -17,6 +17,7 @@
 #include "entity_memory.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
+#include <ostream>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -81,9 +82,8 @@ private:
         // pass through the mismatch description from
         // CUserInterfaceEqualsMatcher
         oss << "CUserInterface mismatch at index " << i << ": "
-            << CUserInterfaceEqualsMatcher(expected_pool[i])
-                   .get_mismatch_description()
-            << "; ";
+            << CUserInterfaceEqualsMatcher(expected_pool[i]).describe()
+            << std::endl;
         // switch flag to false
         do_components_match = false;
       }
@@ -197,8 +197,8 @@ public:
     size_t expected_size = entity::memory::GetMemoryPoolSize(m_expected);
 
     if (actual_size != expected_size) {
-      oss << "Pool sizes differ: actual=" << actual_size
-          << ", expected=" << expected_size << "; ";
+      oss << "Pool sizes differ: actual =" << actual_size
+          << ", expected =" << expected_size << "; ";
       m_mismatch_description = oss.str();
       return false;
     }
@@ -206,7 +206,7 @@ public:
     // Compare each component vector in the pools
     CompareAllComponentVectors(actual, m_expected, oss);
     if (!do_components_match) {
-      oss << "EntityMemoryPools do not match; ";
+
       m_mismatch_description = oss.str();
       return false;
     }
@@ -219,10 +219,8 @@ public:
   /// @return Description string
   ////////////////////////////////////////////////////////////
   std::string describe() const override {
-    std::ostringstream oss;
-    size_t expected_size = entity::memory::GetMemoryPoolSize(m_expected);
-    oss << "equals EntityMemoryPool with size=" << expected_size;
-    return oss.str();
+
+    return "EntityMemoryPool mismatch: " + m_mismatch_description;
   }
 
   ////////////////////////////////////////////////////////////

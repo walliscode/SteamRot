@@ -49,12 +49,10 @@ public:
     }
 
     // Check root element pointers
-    bool root_elem_match =
-        (actual.m_root_element == nullptr &&
-         m_expected.m_root_element == nullptr) ||
-        (actual.m_root_element != nullptr &&
-         m_expected.m_root_element != nullptr &&
-         actual.m_root_element.get() == m_expected.m_root_element.get());
+    bool root_elem_match = (actual.m_root_element == nullptr &&
+                            m_expected.m_root_element == nullptr) ||
+                           (actual.m_root_element != nullptr &&
+                            m_expected.m_root_element != nullptr);
 
     if (!root_elem_match) {
       oss << "m_root_element: pointers differ; ";
@@ -65,12 +63,12 @@ public:
   }
 
   std::string describe() const override {
-    std::ostringstream oss;
-    oss << "equals CUserInterface(m_name='" << m_expected.m_name << "')";
-    return oss.str();
+    return "CUserInterface mismatch: " + m_mismatch_description;
   }
 
-  std::string get_mismatch_description() const { return m_mismatch_description; }
+  std::string get_mismatch_description() const {
+    return m_mismatch_description;
+  }
 };
 
 inline CUserInterfaceEqualsMatcher

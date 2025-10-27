@@ -37,7 +37,7 @@ TEST_CASE("UICollisionLogic::RunLogic changes is_mouse_over to true if mouse "
   auto logic_context = test_context.GetLogicContextForTestScene();
 
   // Get all active CUserInterface entities
-  ArchetypeID archetype_id =
+  steamrot::ArchetypeID archetype_id =
       steamrot::GenerateArchetypeIDfromTypes<steamrot::CUserInterface>();
 
   // check if the archetype exists

@@ -2,7 +2,10 @@
 
 ## Executive Summary
 
-This document presents a comprehensive analysis of the current context handling system in SteamRot and proposes improvements to make it more extensible, data-driven, and maintainable. The analysis covers both the main game context handling and test infrastructure.
+This document presents a comprehensive analysis of the current context handling
+system in SteamRot and proposes improvements to make it more extensible,
+data-driven, and maintainable. The analysis covers both the main game context
+handling and test infrastructure.
 
 ## Current State Analysis
 
@@ -11,6 +14,7 @@ This document presents a comprehensive analysis of the current context handling 
 **Location:** `src/context/GameContext.h/cpp`
 
 **Current Structure:**
+
 ```cpp
 struct GameContext {
   sf::RenderWindow &game_window;
@@ -22,29 +26,39 @@ struct GameContext {
 };
 ```
 
-**Instantiation:** Created once in `GameEngine` constructor and passed by const reference throughout the system.
+**Instantiation:** Created once in `GameEngine` constructor and passed by const
+reference throughout the system.
 
 **Issues:**
+
 1. **Tight Coupling**: All components are required at construction time
-2. **Non-extensible**: Adding new context data requires changing the struct and all instantiation sites
+2. **Non-extensible**: Adding new context data requires changing the struct and
+   all instantiation sites
 3. **Not Data-Driven**: Configuration is hardcoded in C++
-4. **Limited Construction Flexibility**: References must be initialized in constructor, limiting validation and error handling
+4. **Limited Construction Flexibility**: References must be initialized in
+   constructor, limiting validation and error handling
 5. **Single Point of Failure**: All context must be valid at GameEngine creation
 
-**Note on Reference-Based Design:**
-The current system uses references (not pointers) which provides important safety guarantees:
-- **Compile-time lifetime safety**: References must be valid when created
-- **No null state**: References cannot be null, preventing a class of runtime errors
-- **Clear ownership**: References signal that the context doesn't own the resources
-- **Strict ordering**: Forces proper initialization order, making bugs more visible
+**Note on Reference-Based Design:** The current system uses references (not
+pointers) which provides important safety guarantees:
 
-The proposed builder pattern preserves these benefits using `std::optional<std::reference_wrapper<T>>` instead of pointers.
+- **Compile-time lifetime safety**: References must be valid when created
+- **No null state**: References cannot be null, preventing a class of runtime
+  errors
+- **Clear ownership**: References signal that the context doesn't own the
+  resources
+- **Strict ordering**: Forces proper initialization order, making bugs more
+  visible
+
+The proposed builder pattern preserves these benefits using
+`std::optional<std::reference_wrapper<T>>` instead of pointers.
 
 ### 2. LogicContext (Scene-Specific)
 
 **Location:** `src/logic/LogicContext.h`
 
 **Current Structure:**
+
 ```cpp
 struct LogicContext {
   EntityMemoryPool &scene_entities;
@@ -57,20 +71,28 @@ struct LogicContext {
 };
 ```
 
-**Instantiation:** Created in `Scene::GetLogicContext()` method, called during scene creation in `SceneFactory::CreateDefaultScene()`.
+**Instantiation:** Created in `Scene::GetLogicContext()` method, called during
+scene creation in `SceneFactory::CreateDefaultScene()`.
 
 **Issues:**
-1. **Duplication**: Overlaps with GameContext (game_window, asset_manager, event_handler, mouse_position)
-2. **Tight Coupling**: Requires both Scene and GameContext to be fully initialized
-3. **Creation Timing**: Created during scene initialization, limiting when logic can be created
-4. **Not Reusable**: New LogicContext created each time GetLogicContext() is called
-5. **No Lazy Initialization**: All scene resources must exist before any logic can be created
+
+1. **Duplication**: Overlaps with GameContext (game_window, asset_manager,
+   event_handler, mouse_position)
+2. **Tight Coupling**: Requires both Scene and GameContext to be fully
+   initialized
+3. **Creation Timing**: Created during scene initialization, limiting when logic
+   can be created
+4. **Not Reusable**: New LogicContext created each time GetLogicContext() is
+   called
+5. **No Lazy Initialization**: All scene resources must exist before any logic
+   can be created
 
 ### 3. TestContext (Test Infrastructure)
 
 **Location:** `tests/context/TestContext.h/cpp`
 
 **Current Structure:**
+
 ```cpp
 class TestContext {
 private:
@@ -90,15 +112,20 @@ private:
 ```
 
 **Issues:**
-1. **Scene-Specific Logic Contexts**: Separate unique_ptr for each scene type is not scalable
-2. **Eager Initialization**: Creates all objects in constructor based on scene type
+
+1. **Scene-Specific Logic Contexts**: Separate unique_ptr for each scene type is
+   not scalable
+2. **Eager Initialization**: Creates all objects in constructor based on scene
+   type
 3. **Hardcoded Scenes**: Adding new scenes requires modifying TestContext
 4. **Duplicated Logic**: Scene configuration logic duplicated 3 times
-5. **Heavy Construction**: Every test pays the cost of full initialization even if not needed
+5. **Heavy Construction**: Every test pays the cost of full initialization even
+   if not needed
 
 ### 4. Context Flow Architecture
 
 **Current Flow:**
+
 ```
 GameEngine Constructor
   └─> Create GameContext (with all dependencies)
@@ -110,6 +137,7 @@ GameEngine Constructor
 ```
 
 **Problems:**
+
 - Long dependency chain with no lazy evaluation
 - No separation between construction and initialization
 - Difficult to add optional context data
@@ -119,7 +147,8 @@ GameEngine Constructor
 
 ### Key Design Decisions
 
-Based on review feedback, the following architectural decisions guide the implementation:
+Based on review feedback, the following architectural decisions guide the
+implementation:
 
 1. **Smart Pointers in Builders, References in Contexts**
    - Builders use `std::shared_ptr<T>` internally for flexibility
@@ -160,25 +189,30 @@ Based on review feedback, the following architectural decisions guide the implem
 
 **Design Philosophy: Smart Pointers in Builders, References in Contexts**
 
-The builder pattern uses smart pointers internally for flexibility during construction, but produces contexts with references:
+The builder pattern uses smart pointers internally for flexibility during
+construction, but produces contexts with references:
 
-- **Builder Internal State**: Uses smart pointers (`std::shared_ptr<T>`) to store objects during construction
+- **Builder Internal State**: Uses smart pointers (`std::shared_ptr<T>`) to
+  store objects during construction
   - Allows builders to own temporary objects if needed
   - Explicit lifetime management during building phase
   - No undefined behavior from uninitialized references
 
 - **Final Context**: Built contexts use references (matching current design)
-  - Builders pass through references from their smart pointers when calling `Build()`
+  - Builders pass through references from their smart pointers when calling
+    `Build()`
   - No risk of dangling pointers in production code
   - Clear ownership semantics
   - Compiler-enforced lifetime guarantees
 
-- **Simplified Design**: Builders don't need to be templated or store the final Context
+- **Simplified Design**: Builders don't need to be templated or store the final
+  Context
   - Each builder is a concrete class for its specific context type
   - Build() returns the context directly, not a stored copy
   - Easier to understand and maintain
 
-This approach provides builder pattern flexibility while preserving the safety and clarity of reference-based design for the final contexts.
+This approach provides builder pattern flexibility while preserving the safety
+and clarity of reference-based design for the final contexts.
 
 #### 1.1 Create GameContextBuilder
 
@@ -194,16 +228,16 @@ private:
   std::shared_ptr<AssetManager> m_asset_manager;
   std::shared_ptr<const size_t> m_loop_number;
   EnvironmentType m_env_type{EnvironmentType::None};
-  
+
 public:
   GameContextBuilder() = default;
-  
+
   GameContextBuilder& SetWindow(std::shared_ptr<sf::RenderWindow> window);
   GameContextBuilder& SetEventHandler(std::shared_ptr<EventHandler> handler);
   GameContextBuilder& SetAssetManager(std::shared_ptr<AssetManager> manager);
   GameContextBuilder& SetLoopNumber(std::shared_ptr<const size_t> loop_num);
   GameContextBuilder& SetEnvironmentType(EnvironmentType env_type);
-  
+
   // Build returns GameContext with references extracted from smart pointers
   std::expected<GameContext, FailInfo> Build() const;
 };
@@ -212,6 +246,7 @@ public:
 ```
 
 **Benefits:**
+
 - Smart pointers in builder allow flexible ownership during construction
 - Build() extracts references from smart pointers for the final context
 - No templating needed - concrete class for GameContext
@@ -233,10 +268,10 @@ private:
   std::shared_ptr<const AssetManager> m_asset_manager;
   std::shared_ptr<EventHandler> m_event_handler;
   std::shared_ptr<const sf::Vector2i> m_mouse_position;
-  
+
 public:
   LogicContextBuilder() = default;
-  
+
   LogicContextBuilder& SetSceneEntities(std::shared_ptr<EntityMemoryPool> entities);
   LogicContextBuilder& SetArchetypes(std::shared_ptr<const std::unordered_map<ArchetypeID, Archetype>> archetypes);
   LogicContextBuilder& SetSceneTexture(std::shared_ptr<sf::RenderTexture> texture);
@@ -244,7 +279,7 @@ public:
   LogicContextBuilder& SetAssetManager(std::shared_ptr<const AssetManager> manager);
   LogicContextBuilder& SetEventHandler(std::shared_ptr<EventHandler> handler);
   LogicContextBuilder& SetMousePosition(std::shared_ptr<const sf::Vector2i> mouse_pos);
-  
+
   // Build returns LogicContext with references extracted from smart pointers
   std::expected<LogicContext, FailInfo> Build() const;
 };
@@ -254,13 +289,17 @@ public:
 
 **Design Note: LogicContext and GameContext**
 
-LogicContext pulls individual fields from GameContext rather than storing a reference to GameContext itself:
+LogicContext pulls individual fields from GameContext rather than storing a
+reference to GameContext itself:
+
 - **Explicit dependencies**: Each Logic class sees exactly what it needs
 - **Better testability**: Can mock individual resources without full GameContext
-- **Clearer API**: SetGameWindow(), SetAssetManager() etc. are more explicit than SetGameContext()
+- **Clearer API**: SetGameWindow(), SetAssetManager() etc. are more explicit
+  than SetGameContext()
 - **Flexibility**: Can mix scene-specific and game-global resources freely
 
 **Benefits:**
+
 - Smart pointers in builder allow flexible ownership during construction
 - Build() extracts references for the final context
 - No dependency on GameContext object - pulls what's needed
@@ -302,6 +341,7 @@ root_type ContextData;
 ```
 
 **Example JSON Configuration:**
+
 ```json
 {
   "game_context": {
@@ -349,17 +389,17 @@ namespace steamrot {
 class ContextConfigurator {
 private:
   const ContextData* m_config_data{nullptr};
-  
-  std::expected<EnvironmentType, FailInfo> 
+
+  std::expected<EnvironmentType, FailInfo>
   ParseEnvironmentType(const std::string& type_str) const;
-  
+
 public:
   explicit ContextConfigurator(const ContextData* config);
-  
+
   // Create builder from configuration data
-  std::expected<GameContextBuilder, FailInfo> 
+  std::expected<GameContextBuilder, FailInfo>
   CreateGameContextBuilder() const;
-  
+
   std::expected<LogicContextBuilder, FailInfo>
   CreateLogicContextBuilder(const SceneType& scene_type) const;
 };
@@ -368,6 +408,7 @@ public:
 ```
 
 **Usage Pattern:**
+
 ```cpp
 // In GameEngine::StartUp() or similar
 FlatbuffersDataLoader data_loader;
@@ -382,6 +423,7 @@ auto builder_result = configurator.CreateGameContextBuilder();
 ```
 
 **Benefits:**
+
 - Game configuration externalized to JSON
 - No code changes needed for common adjustments
 - Easy to have different configs for different environments
@@ -400,25 +442,25 @@ class ContextDirector {
 private:
   // Static map to register builders by scene type
   static std::unordered_map<SceneType, LogicContextBuilder> s_logic_context_builders;
-  
+
   // No singleton - just static methods and data
   ContextDirector() = delete;
-  
+
 public:
   // Register a builder for a specific scene type
   static void RegisterLogicContextBuilder(SceneType type, LogicContextBuilder builder);
-  
+
   // Get builder for a scene type (returns copy for further configuration)
-  static std::expected<LogicContextBuilder, FailInfo> 
+  static std::expected<LogicContextBuilder, FailInfo>
   GetLogicContextBuilder(SceneType scene_type);
-  
+
   // Build and return a LogicContext directly
-  static std::expected<LogicContext, FailInfo> 
+  static std::expected<LogicContext, FailInfo>
   BuildLogicContext(SceneType scene_type);
-  
+
   // Clear all registered builders (useful for testing)
   static void ClearBuilders();
-  
+
   // Check if a builder is registered for a scene type
   static bool HasBuilder(SceneType scene_type);
 };
@@ -427,6 +469,7 @@ public:
 ```
 
 **Benefits:**
+
 - **No singleton pattern** - uses static methods and data instead
 - **Not time-critical** - builders can be registered during initialization
 - **Simple registry** - static map stores builders by scene type
@@ -483,7 +526,7 @@ struct TestResources {
   AssetManager asset_manager;
   size_t loop_number{0};
   EnvironmentType env_type{EnvironmentType::Test};
-  
+
   TestResources();
 };
 
@@ -491,27 +534,27 @@ class TestContextDirector {
 private:
   // Static storage for permanent test resources
   static std::unique_ptr<TestResources> s_resources;
-  
+
   // Static map to cache built contexts by scene type
   static std::unordered_map<SceneType, GameContext> s_game_contexts;
   static std::unordered_map<SceneType, LogicContext> s_logic_contexts;
-  
+
   TestContextDirector() = delete;
-  
+
 public:
   // Initialize resources (call once at test start)
   static void Initialize();
-  
+
   // Get or build GameContext
   static std::expected<const GameContext&, FailInfo> GetGameContext();
-  
+
   // Get or build LogicContext for a scene type
-  static std::expected<const LogicContext&, FailInfo> 
+  static std::expected<const LogicContext&, FailInfo>
   GetLogicContext(SceneType scene_type);
-  
+
   // Clear all cached contexts (for test isolation)
   static void ClearContexts();
-  
+
   // Reset everything (for test cleanup)
   static void Reset();
 };
@@ -520,6 +563,7 @@ public:
 ```
 
 **Design Rationale:**
+
 - **TestContextDirector**: Static registry pattern (like ContextDirector)
 - **TestResources**: Permanent storage for objects that contexts reference
 - **No Factory needed**: Director handles both storage and context creation
@@ -536,14 +580,14 @@ namespace steamrot::tests {
 class TestContext {
 private:
   SceneType m_scene_type{SceneType::SceneType_TEST};
-  
+
 public:
   TestContext(SceneType scene_type = SceneType::SceneType_TEST);
-  
+
   // Get contexts via director
   const GameContext& GetGameContext() const;
   const LogicContext& GetLogicContext() const;
-  
+
   // Configure scene type
   TestContext& WithSceneType(SceneType scene_type);
 };
@@ -552,6 +596,7 @@ public:
 ```
 
 **Usage Example:**
+
 ```cpp
 // Simple usage
 TEST_CASE("Test with default context", "[unit]") {
@@ -578,6 +623,7 @@ TEST_CASE("Direct director usage", "[unit]") {
 ```
 
 **Benefits:**
+
 - TestResources stores permanent objects
 - TestContextDirector manages context lifecycle
 - TestContext provides simple wrapper for common cases
@@ -587,6 +633,7 @@ TEST_CASE("Direct director usage", "[unit]") {
 ## Implementation Roadmap
 
 ### Stage 1: Foundation (Week 1-2)
+
 - [ ] Create GameContextBuilder
 - [ ] Create LogicContextBuilder
 - [ ] Add unit tests for builders
@@ -594,6 +641,7 @@ TEST_CASE("Direct director usage", "[unit]") {
 - [ ] Update Scene to use LogicContextBuilder
 
 ### Stage 2: Data-Driven Configuration (Week 3-4)
+
 - [ ] Create context_data.fbs schema
 - [ ] Add ProvideContextData() to FlatbuffersDataLoader
 - [ ] Implement ContextConfigurator
@@ -603,12 +651,14 @@ TEST_CASE("Direct director usage", "[unit]") {
 - [ ] Document configuration format
 
 ### Stage 3: Context Management (Week 5-6)
+
 - [ ] Implement ContextDirector with static registry
 - [ ] Integrate ContextDirector into GameEngine
 - [ ] Update SceneFactory to use ContextDirector
 - [ ] Add context lifecycle tests
 
 ### Stage 4: Test Infrastructure (Week 7-8)
+
 - [ ] Create test_context_data.fbs schema
 - [ ] Add ProvideTestContextData() to FlatbuffersDataLoader
 - [ ] Implement TestResources struct
@@ -619,6 +669,7 @@ TEST_CASE("Direct director usage", "[unit]") {
 - [ ] Document new test patterns
 
 ### Stage 5: Migration and Cleanup (Week 9-10)
+
 - [ ] Migrate all scenes to new context system
 - [ ] Migrate all logic classes to new context system
 - [ ] Remove deprecated context creation methods
@@ -629,6 +680,7 @@ TEST_CASE("Direct director usage", "[unit]") {
 ## Testing Strategy
 
 ### Unit Tests
+
 ```cpp
 // Builder validation
 TEST_CASE("GameContextBuilder validates required fields", "[unit][context]") {
@@ -645,7 +697,7 @@ TEST_CASE("GameContextBuilder builds successfully", "[unit][context]") {
   EventHandler handler;
   AssetManager assets;
   size_t loop_num = 0;
-  
+
   auto result = builder
     .SetWindow(window)
     .SetEventHandler(handler)
@@ -653,43 +705,45 @@ TEST_CASE("GameContextBuilder builds successfully", "[unit][context]") {
     .SetLoopNumber(loop_num)
     .SetEnvironmentType(EnvironmentType::Test)
     .Build();
-    
+
   REQUIRE(result.has_value());
 }
 ```
 
 ### Integration Tests
+
 ```cpp
 // Context configuration loading
 TEST_CASE("ContextDirector registers and builds contexts", "[integration][context]") {
   ContextDirector::ClearBuilders();
-  
+
   FlatbuffersDataLoader data_loader;
   auto context_data_result = data_loader.ProvideContextData();
   REQUIRE(context_data_result.has_value());
-  
+
   ContextConfigurator configurator(context_data_result.value());
   auto builder_result = configurator.CreateLogicContextBuilder(SceneType::SceneType_TITLE);
   REQUIRE(builder_result.has_value());
-  
+
   ContextDirector::RegisterLogicContextBuilder(SceneType::SceneType_TITLE, builder_result.value());
   REQUIRE(ContextDirector::HasBuilder(SceneType::SceneType_TITLE));
-  
+
   auto logic_ctx_result = ContextDirector::BuildLogicContext(SceneType::SceneType_TITLE);
   REQUIRE(logic_ctx_result.has_value());
 }
 ```
 
 ### Data-Driven Tests
+
 ```cpp
 // Test all scene configurations
 TEST_CASE("All scene contexts load correctly", "[integration][data-driven]") {
   auto configs = LoadAllSceneConfigs();
-  
+
   for (const auto& config : configs) {
     auto context = TestContextFactory::CreateFromConfig(config);
     auto logic_ctx = context.GetLogicContext(config.scene_type);
-    
+
     REQUIRE(logic_ctx.scene_entities.size() >= config.min_entity_count);
   }
 }
@@ -698,24 +752,29 @@ TEST_CASE("All scene contexts load correctly", "[integration][data-driven]") {
 ## Benefits Summary
 
 ### For Developers
+
 1. **Easier Testing**: Simplified test context creation with TestContextDirector
 2. **Better Separation of Concerns**: Context building separate from usage
 3. **Clearer Dependencies**: Builder pattern makes dependencies explicit
 4. **Simple Design**: No complex extension system - just core functionality
 
 ### For Maintainability
+
 1. **Data-Driven**: Configuration changes don't require recompilation
-2. **Static Registry**: ContextDirector and TestContextDirector use simple static maps
+2. **Static Registry**: ContextDirector and TestContextDirector use simple
+   static maps
 3. **Validation**: Built-in validation before context creation
 4. **Documentation**: Configuration files serve as documentation
 
 ### For Testing
+
 1. **Isolation**: Easy to test components with minimal context
 2. **Flexibility**: TestContextDirector manages all test resources
 3. **Data-Driven**: TestContextData allows configurable test scenarios
 4. **Simple API**: TestContext wrapper provides convenient interface
 
 ### For Future Features
+
 1. **Serialization**: Context configuration can be saved/loaded
 2. **Multi-Environment**: Easy to maintain different configs for dev/test/prod
 3. **Incremental Enhancement**: Can add features to contexts directly as needed
@@ -723,6 +782,7 @@ TEST_CASE("All scene contexts load correctly", "[integration][data-driven]") {
 ## Migration Path
 
 ### Backward Compatibility
+
 During migration, both old and new systems will coexist:
 
 ```cpp
@@ -741,40 +801,50 @@ auto new_ctx = builder
 ```
 
 ### Gradual Migration
+
 1. Week 1-2: Add new builders alongside existing constructors
 2. Week 3-4: Update GameEngine to use builders and ContextDirector
 3. Week 5-6: Update Scene/SceneFactory to use builders
 4. Week 7-8: Update test infrastructure with TestContextDirector
-5. Week 9-10: Migrate all scenes and logic classes, remove old constructors, cleanup
+5. Week 9-10: Migrate all scenes and logic classes, remove old constructors,
+   cleanup
 
 ## Risk Mitigation
 
 ### Performance Concerns
+
 - **Risk**: Builder pattern adds overhead
 - **Mitigation**: Contexts built once and cached; negligible runtime impact
 - **Validation**: Performance benchmarks before/after
 
 ### Complexity Concerns
+
 - **Risk**: More classes/files to maintain
 - **Mitigation**: Clear documentation, examples, and migration guide
 - **Validation**: Code review focus on simplicity
 
 ### Breaking Changes
+
 - **Risk**: Existing code stops working
 - **Mitigation**: Gradual migration with backward compatibility period
 - **Validation**: Comprehensive test suite validates all changes
 
 ## Conclusion
 
-This improvement plan addresses the current limitations of the context handling system by introducing:
+This improvement plan addresses the current limitations of the context handling
+system by introducing:
 
 1. **Builder Pattern** for flexible, validated context construction
 2. **Data-Driven Configuration** to externalize settings via FlatBuffers
-3. **Static Registry Pattern** (ContextDirector, TestContextDirector) for simple lifecycle control
-4. **Improved Test Infrastructure** with TestResources and data-driven configuration
-5. **Simplified Design** - no complex extensibility framework, just core functionality
+3. **Static Registry Pattern** (ContextDirector, TestContextDirector) for simple
+   lifecycle control
+4. **Improved Test Infrastructure** with TestResources and data-driven
+   configuration
+5. **Simplified Design** - no complex extensibility framework, just core
+   functionality
 
-The phased approach allows for gradual migration (10 weeks) while maintaining backward compatibility, reducing risk while delivering continuous value.
+The phased approach allows for gradual migration (10 weeks) while maintaining
+backward compatibility, reducing risk while delivering continuous value.
 
 ## Appendix A: File Structure After Implementation
 
@@ -815,7 +885,9 @@ tests/
 ## Appendix B: Configuration File Examples
 
 ### Game Context Configuration
+
 **File:** `data/context/game_context.json`
+
 ```json
 {
   "window_width": 800,
@@ -838,7 +910,9 @@ tests/
 ```
 
 ### Scene Context Configuration
+
 **File:** `data/context/scene_contexts.json`
+
 ```json
 {
   "scenes": [
@@ -870,7 +944,9 @@ tests/
 ```
 
 ### Test Context Configuration
+
 **File:** `tests/data/test_context_configs/ui_heavy.json`
+
 ```json
 {
   "scene_type": "TEST",
@@ -887,6 +963,7 @@ tests/
 ## Appendix C: Example Usage Patterns
 
 ### Creating Game Context in GameEngine
+
 ```cpp
 // In GameEngine::StartUp()
 FlatbuffersDataLoader data_loader;
@@ -917,6 +994,7 @@ m_game_context = context_result.value();
 ```
 
 ### Creating Scene-Specific Logic Context
+
 ```cpp
 // In SceneFactory::CreateDefaultScene()
 
@@ -943,6 +1021,7 @@ if (logic_ctx_result.has_value()) {
 ```
 
 ### Using Context Extensions
+
 ```cpp
 // In a Logic class
 void MyLogic::ProcessLogic() {
@@ -952,18 +1031,19 @@ void MyLogic::ProcessLogic() {
       // Draw FPS counter
     }
   }
-  
+
   // Normal logic continues...
 }
 ```
 
 ### Test Context Usage
+
 ```cpp
 // Minimal test - just need GameContext
 TEST_CASE("Test EventHandler", "[unit]") {
   auto context = TestContextFactory::CreateMinimal();
   auto& game_ctx = context.GetGameContext();
-  
+
   REQUIRE(game_ctx.event_handler.GetGlobalEventBus().empty());
 }
 
@@ -971,10 +1051,10 @@ TEST_CASE("Test EventHandler", "[unit]") {
 TEST_CASE("Test UI Rendering", "[unit]") {
   auto context = TestContextFactory::CreateWithUI(50);
   auto& logic_ctx = context.GetLogicContext(SceneType::SceneType_TEST);
-  
+
   UIRenderLogic render_logic(logic_ctx);
   render_logic.RunLogic();
-  
+
   // Verify rendering...
 }
 
@@ -983,7 +1063,7 @@ TEST_CASE("Test Custom Scenario", "[integration]") {
   auto context = TestContextFactory::CreateFromConfig(
     "tests/data/test_context_configs/custom_scenario.json"
   );
-  
+
   // Test with custom configuration...
 }
 ```
