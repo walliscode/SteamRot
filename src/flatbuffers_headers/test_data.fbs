@@ -49,7 +49,7 @@ table TestDataConfig {
   
   /// @brief Resource data for test fixtures
   game_resources: GameResourcesData;
-  scene_resources: SceneResourcesCollection;
+  scene_resources: SceneResourcesData;
   
   /// @brief Reserved for future test data types
   /// Can be extended with additional fields like:

@@ -14,17 +14,9 @@ table GameResourcesData {
 }
 
 ////////////////////////////////////////////////////////////
-// Configuration for a single scene's resources
+// Configuration for a scene's resources
 ////////////////////////////////////////////////////////////
 table SceneResourcesData {
-  scene_type: SceneType;
   render_texture_width: uint32 = 800;
   render_texture_height: uint32 = 600;
-}
-
-////////////////////////////////////////////////////////////
-// Collection of all scene resource configurations
-////////////////////////////////////////////////////////////
-table SceneResourcesCollection {
-  scenes: [SceneResourcesData];
 }

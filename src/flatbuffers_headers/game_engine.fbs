@@ -6,7 +6,6 @@ namespace steamrot;
 table GameEngineData {
   subscriptions: [SubscriberData];
   game_resources: GameResourcesData;
-  scene_resources: SceneResourcesCollection;
 }
 
 root_type GameEngineData;

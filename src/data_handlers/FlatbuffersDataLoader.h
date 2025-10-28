@@ -101,10 +101,10 @@ public:
   ProvideGameResourcesData() const;
 
   /////////////////////////////////////////////////
-  /// @brief Provides SceneResourcesCollection from binary file
+  /// @brief Provides SceneResourcesData from SceneData for a specific scene
   /////////////////////////////////////////////////
-  std::expected<const SceneResourcesCollection *, FailInfo>
-  ProvideSceneResourcesData() const;
+  std::expected<const SceneResourcesData *, FailInfo>
+  ProvideSceneResourcesData(const SceneType scene_type) const;
 };
 
 } // namespace steamrot

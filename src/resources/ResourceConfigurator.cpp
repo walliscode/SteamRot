@@ -11,10 +11,8 @@
 namespace steamrot {
 
 ////////////////////////////////////////////////////////////
-ResourceConfigurator::ResourceConfigurator(
-    const GameResourcesData *game_data,
-    const SceneResourcesCollection *scene_data)
-    : m_game_resources_data(game_data), m_scene_resources_data(scene_data) {}
+ResourceConfigurator::ResourceConfigurator(const GameResourcesData *game_data)
+    : m_game_resources_data(game_data) {}
 
 ////////////////////////////////////////////////////////////
 std::expected<EnvironmentType, FailInfo>
@@ -71,36 +69,20 @@ ResourceConfigurator::ConfigureGameResources(GameResources &resources) const {
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 ResourceConfigurator::ConfigureSceneResources(
-    SceneResources &resources, const SceneType &scene_type) const {
-  if (!m_scene_resources_data) {
-    return std::unexpected(
-        FailInfo{FailMode::NullPointer, "SceneResourcesCollection is null"});
+    SceneResources &resources, const SceneResourcesData *scene_data) const {
+  
+  // Default dimensions
+  uint32_t texture_width = 800;
+  uint32_t texture_height = 600;
+
+  // Use configured dimensions if provided
+  if (scene_data) {
+    texture_width = scene_data->render_texture_width();
+    texture_height = scene_data->render_texture_height();
   }
 
-  if (!m_scene_resources_data->scenes()) {
-    return std::unexpected(
-        FailInfo{FailMode::MissingRequiredField, "Scene resources are missing"});
-  }
-
-  // Find the configuration for the requested scene type
-  const SceneResourcesData *scene_config = nullptr;
-  for (const auto *config : *m_scene_resources_data->scenes()) {
-    if (config && config->scene_type() == scene_type) {
-      scene_config = config;
-      break;
-    }
-  }
-
-  if (!scene_config) {
-    return std::unexpected(
-        FailInfo{FailMode::SceneTypeNotFound,
-                 "Scene configuration not found for requested scene type"});
-  }
-
-  // Create the render texture with configured dimensions (SFML 3.0 API)
-  sf::Vector2u texture_size(scene_config->render_texture_width(),
-                            scene_config->render_texture_height());
-
+  // Create the render texture with configured or default dimensions (SFML 3.0 API)
+  sf::Vector2u texture_size(texture_width, texture_height);
   resources.scene_texture = sf::RenderTexture(texture_size);
 
   return std::monostate{};

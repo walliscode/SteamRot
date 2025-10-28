@@ -30,7 +30,6 @@ namespace steamrot {
 class ResourceConfigurator {
 private:
   const GameResourcesData *m_game_resources_data{nullptr};
-  const SceneResourcesCollection *m_scene_resources_data{nullptr};
 
   ////////////////////////////////////////////////////////////
   /// @brief Parse environment type string to EnvironmentType enum.
@@ -46,10 +45,8 @@ public:
   /// @brief Constructor for ResourceConfigurator.
   ///
   /// @param game_data Pointer to GameResourcesData configuration
-  /// @param scene_data Pointer to SceneResourcesCollection configuration
   ////////////////////////////////////////////////////////////
-  explicit ResourceConfigurator(const GameResourcesData *game_data,
-                                const SceneResourcesCollection *scene_data);
+  explicit ResourceConfigurator(const GameResourcesData *game_data);
 
   ////////////////////////////////////////////////////////////
   /// @brief Configure GameResources from FlatBuffers data.
@@ -67,16 +64,17 @@ public:
   ////////////////////////////////////////////////////////////
   /// @brief Configure SceneResources from FlatBuffers data.
   ///
-  /// Configures render texture dimensions for the specified scene type.
+  /// Configures render texture dimensions from the scene data.
+  /// If scene_data is null, uses default dimensions (800x600).
   /// The render texture is created directly during configuration.
   ///
   /// @param resources SceneResources instance to configure
-  /// @param scene_type Scene type to get configuration for
+  /// @param scene_data Scene resource data (can be null for defaults)
   /// @return Expected containing monostate or FailInfo on error
   ////////////////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo>
   ConfigureSceneResources(SceneResources &resources,
-                          const SceneType &scene_type) const;
+                          const SceneResourcesData *scene_data) const;
 };
 
 } // namespace steamrot
