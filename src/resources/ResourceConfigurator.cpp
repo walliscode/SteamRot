@@ -11,8 +11,10 @@
 namespace steamrot {
 
 ////////////////////////////////////////////////////////////
-ResourceConfigurator::ResourceConfigurator(const ContextData *config)
-    : m_config_data(config) {}
+ResourceConfigurator::ResourceConfigurator(
+    const GameResourcesData *game_data,
+    const SceneResourcesCollection *scene_data)
+    : m_game_resources_data(game_data), m_scene_resources_data(scene_data) {}
 
 ////////////////////////////////////////////////////////////
 std::expected<EnvironmentType, FailInfo>
@@ -32,17 +34,12 @@ ResourceConfigurator::ParseEnvironmentType(const std::string &type_str) const {
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 ResourceConfigurator::ConfigureGameResources(GameResources &resources) const {
-  if (!m_config_data) {
+  if (!m_game_resources_data) {
     return std::unexpected(
-        FailInfo{FailMode::NullPointer, "ContextData is null"});
+        FailInfo{FailMode::NullPointer, "GameResourcesData is null"});
   }
 
-  if (!m_config_data->game_context()) {
-    return std::unexpected(FailInfo{FailMode::MissingRequiredField,
-                                    "GameContextConfig is missing"});
-  }
-
-  const GameContextConfig *game_config = m_config_data->game_context();
+  const GameResourcesData *game_config = m_game_resources_data;
 
   // Parse and set environment type if provided
   if (game_config->environment_type()) {
@@ -75,19 +72,19 @@ ResourceConfigurator::ConfigureGameResources(GameResources &resources) const {
 std::expected<std::monostate, FailInfo>
 ResourceConfigurator::ConfigureSceneResources(
     SceneResources &resources, const SceneType &scene_type) const {
-  if (!m_config_data) {
+  if (!m_scene_resources_data) {
     return std::unexpected(
-        FailInfo{FailMode::NullPointer, "ContextData is null"});
+        FailInfo{FailMode::NullPointer, "SceneResourcesCollection is null"});
   }
 
-  if (!m_config_data->scene_contexts()) {
+  if (!m_scene_resources_data->scenes()) {
     return std::unexpected(
-        FailInfo{FailMode::MissingRequiredField, "Scene contexts are missing"});
+        FailInfo{FailMode::MissingRequiredField, "Scene resources are missing"});
   }
 
   // Find the configuration for the requested scene type
-  const SceneContextConfig *scene_config = nullptr;
-  for (const auto *config : *m_config_data->scene_contexts()) {
+  const SceneResourcesData *scene_config = nullptr;
+  for (const auto *config : *m_scene_resources_data->scenes()) {
     if (config && config->scene_type() == scene_type) {
       scene_config = config;
       break;

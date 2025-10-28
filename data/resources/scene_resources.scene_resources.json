@@ -1,0 +1,19 @@
+{
+  "scenes": [
+    {
+      "scene_type": "TEST",
+      "render_texture_width": 800,
+      "render_texture_height": 600
+    },
+    {
+      "scene_type": "TITLE",
+      "render_texture_width": 800,
+      "render_texture_height": 600
+    },
+    {
+      "scene_type": "CRAFTING",
+      "render_texture_width": 800,
+      "render_texture_height": 600
+    }
+  ]
+}

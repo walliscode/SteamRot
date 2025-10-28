@@ -11,8 +11,9 @@
 #include "FailInfo.h"
 #include "GameResources.h"
 #include "SceneResources.h"
-#include "context_data_generated.h"
+#include "game_resources_generated.h"
 #include "scene_change_packet_generated.h"
+#include "scene_resources_generated.h"
 #include <expected>
 #include <string>
 
@@ -23,11 +24,14 @@ namespace steamrot {
 /// @brief Configures resource structs from FlatBuffers data.
 ///
 /// Provides methods to configure GameResources and SceneResources
-/// instances from ContextData configuration.
+/// instances from resource-specific FlatBuffers data (not ContextData).
+/// This allows resource configuration to be independent of context
+/// configuration.
 ////////////////////////////////////////////////////////////
 class ResourceConfigurator {
 private:
-  const ContextData *m_config_data{nullptr};
+  const GameResourcesData *m_game_resources_data{nullptr};
+  const SceneResourcesCollection *m_scene_resources_data{nullptr};
 
   ////////////////////////////////////////////////////////////
   /// @brief Parse environment type string to EnvironmentType enum.
@@ -42,16 +46,18 @@ public:
   ////////////////////////////////////////////////////////////
   /// @brief Constructor for ResourceConfigurator.
   ///
-  /// @param config Pointer to ContextData configuration
+  /// @param game_data Pointer to GameResourcesData configuration
+  /// @param scene_data Pointer to SceneResourcesCollection configuration
   ////////////////////////////////////////////////////////////
-  explicit ResourceConfigurator(const ContextData *config);
+  explicit ResourceConfigurator(const GameResourcesData *game_data,
+                                const SceneResourcesCollection *scene_data);
 
   ////////////////////////////////////////////////////////////
   /// @brief Configure GameResources from FlatBuffers data.
   ///
   /// Configures window settings (size, title, framerate) and environment
-  /// type from the configuration data. Note that the window object must
-  /// be created separately after configuration.
+  /// type from the configuration data. The window is created directly
+  /// during configuration.
   ///
   /// @param resources GameResources instance to configure
   /// @return Expected containing monostate or FailInfo on error
@@ -63,7 +69,7 @@ public:
   /// @brief Configure SceneResources from FlatBuffers data.
   ///
   /// Configures render texture dimensions for the specified scene type.
-  /// The render texture must be created separately after configuration.
+  /// The render texture is created directly during configuration.
   ///
   /// @param resources SceneResources instance to configure
   /// @param scene_type Scene type to get configuration for

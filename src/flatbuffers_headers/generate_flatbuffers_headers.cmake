@@ -19,6 +19,8 @@ set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/scene_change_packet.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/test_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/context_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/game_resources.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/scene_resources.fbs
 
 
 

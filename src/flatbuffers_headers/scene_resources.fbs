@@ -1,0 +1,21 @@
+include "scene_change_packet.fbs";
+
+namespace steamrot;
+
+////////////////////////////////////////////////////////////
+// Configuration for a single scene's resources
+////////////////////////////////////////////////////////////
+table SceneResourcesData {
+  scene_type: SceneType;
+  render_texture_width: uint32 = 800;
+  render_texture_height: uint32 = 600;
+}
+
+////////////////////////////////////////////////////////////
+// Collection of all scene resource configurations
+////////////////////////////////////////////////////////////
+table SceneResourcesCollection {
+  scenes: [SceneResourcesData];
+}
+
+root_type SceneResourcesCollection;
