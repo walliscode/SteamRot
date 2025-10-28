@@ -12,9 +12,9 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FailInfo.h"
-#include "GameContextBuilder.h"
-#include "LogicContextBuilder.h"
-#include "PathProvider.h"
+#include "GameResources.h"
+#include "ResourceConfigurator.h"
+#include "SceneResources.h"
 #include "context_data_generated.h"
 #include "scene_change_packet_generated.h"
 #include <expected>
@@ -24,23 +24,14 @@ namespace steamrot {
 
 /////////////////////////////////////////////////
 /// @class ContextConfigurator
-/// @brief Configures and creates context builders from FlatBuffers data.
+/// @brief Configures resources from FlatBuffers data.
 ///
-/// Provides methods to create GameContextBuilder and LogicContextBuilder
-/// instances from ContextData configuration.
+/// Provides a simplified interface that wraps ResourceConfigurator
+/// for configuring GameResources and SceneResources.
 /////////////////////////////////////////////////
 class ContextConfigurator {
 private:
-  const ContextData *m_config_data{nullptr};
-
-  /////////////////////////////////////////////////
-  /// @brief Parse environment type string to EnvironmentType enum.
-  ///
-  /// @param type_str String representation of environment type
-  /// @return Expected containing EnvironmentType or FailInfo on error
-  /////////////////////////////////////////////////
-  std::expected<EnvironmentType, FailInfo>
-  ParseEnvironmentType(const std::string &type_str) const;
+  ResourceConfigurator m_resource_configurator;
 
 public:
   /////////////////////////////////////////////////
@@ -51,28 +42,30 @@ public:
   explicit ContextConfigurator(const ContextData *config);
 
   /////////////////////////////////////////////////
-  /// @brief Create GameContextBuilder from configuration data.
+  /// @brief Configure GameResources from FlatBuffers data.
   ///
-  /// Note: The builder still needs runtime objects set via SetWindow(),
-  /// SetEventHandler(), etc. This method only configures static settings
-  /// like environment type from the configuration data.
+  /// Configures window settings, environment type, and other game-level
+  /// resources from the configuration data.
   ///
-  /// @return Expected containing GameContextBuilder or FailInfo on error
+  /// @param resources GameResources instance to configure
+  /// @return Expected containing monostate or FailInfo on error
   /////////////////////////////////////////////////
-  std::expected<GameContextBuilder, FailInfo> CreateGameContextBuilder() const;
+  std::expected<std::monostate, FailInfo>
+  ConfigureGameResources(GameResources &resources) const;
 
   /////////////////////////////////////////////////
-  /// @brief Create LogicContextBuilder from configuration for a scene type.
+  /// @brief Configure SceneResources from FlatBuffers data.
   ///
-  /// Note: The builder still needs runtime objects set via SetSceneEntities(),
-  /// SetGameWindow(), etc. This method only validates the scene configuration
-  /// exists.
+  /// Configures scene-level resources (render texture) for the specified
+  /// scene type from the configuration data.
   ///
+  /// @param resources SceneResources instance to configure
   /// @param scene_type Scene type to get configuration for
-  /// @return Expected containing LogicContextBuilder or FailInfo on error
+  /// @return Expected containing monostate or FailInfo on error
   /////////////////////////////////////////////////
-  std::expected<LogicContextBuilder, FailInfo>
-  CreateLogicContextBuilder(const SceneType &scene_type) const;
+  std::expected<std::monostate, FailInfo>
+  ConfigureSceneResources(SceneResources &resources,
+                          const SceneType &scene_type) const;
 };
 
 } // namespace steamrot
