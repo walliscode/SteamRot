@@ -9,6 +9,7 @@
 #include "AssetManager.h"
 #include "DisplayManager.h"
 #include "EventHandler.h"
+#include "GameResources.h"
 #include "SceneManager.h"
 #include "Subscriber.h"
 #include "game_engine_generated.h"
@@ -32,29 +33,9 @@ namespace steamrot {
 class GameEngine {
 private:
   /////////////////////////////////////////////////
-  /// @brief Variable to keep track of the current loop number.
-  ///
-  /// Increments by 1 at the start of each loop, the game will be maxed out at
-  /// 60FPS so on a 32 bit system this will last 2.27 years. and on a 64 bit
-  /// system this will last 9.75 trillion years. Probably long enough.
+  /// @brief Game-level resources (window, event handler, asset manager, etc.)
   /////////////////////////////////////////////////
-  size_t m_loop_number = 1;
-
-  /////////////////////////////////////////////////
-  /// @brief Member: RenderWindow for the game engine
-  /////////////////////////////////////////////////
-  sf::RenderWindow m_window;
-
-  /////////////////////////////////////////////////
-  /// @brief EventHandler for managing events, this should be the only instance
-  /////////////////////////////////////////////////
-  EventHandler m_event_handler;
-
-  /////////////////////////////////////////////////
-  /// @brief AssetManager for managing game assets, this should be the only
-  /// instance
-  /////////////////////////////////////////////////
-  AssetManager m_asset_manager;
+  GameResources m_game_resources;
 
   /////////////////////////////////////////////////
   /// @brief GameContext for the game
