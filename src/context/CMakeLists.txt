@@ -2,6 +2,7 @@ add_library(context
   GameContext.cpp
   GameContextBuilder.cpp
   ContextConfigurator.cpp
+  ContextDirector.cpp
 )
 
 target_include_directories(context

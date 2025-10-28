@@ -1047,6 +1047,106 @@ auto context = builder.Build().value();
 - `documentation/CONTEXT_CONFIGURATION.md` - Complete usage guide
 - `documentation/CONTEXT_HANDLING_IMPROVEMENT_PLAN.md` - Overall plan
 
+## Context Management (Stage 3)
+
+### Overview
+
+Stage 3 of the Context Handling Improvement Plan provides centralized context management via ContextDirector. This static registry pattern allows easy registration, retrieval, and building of LogicContext instances by scene type.
+
+See `documentation/STAGE_3_SUMMARY.md` for complete documentation.
+
+### Using ContextDirector
+
+#### Registering a Builder
+
+```cpp
+// Create and configure builder
+LogicContextBuilder builder;
+builder.SetSceneEntities(entities_ptr)
+       .SetArchetypes(archetypes_ptr)
+       .SetSceneTexture(texture_ptr)
+       .SetGameWindow(window_ptr)
+       .SetAssetManager(assets_ptr)
+       .SetEventHandler(handler_ptr)
+       .SetMousePosition(mouse_pos_ptr);
+
+// Register for scene type
+ContextDirector::RegisterLogicContextBuilder(SceneType::TITLE, builder);
+```
+
+#### Getting a Builder
+
+```cpp
+// Get builder copy for modification
+auto builder_result = ContextDirector::GetLogicContextBuilder(SceneType::CRAFTING);
+
+if (builder_result.has_value()) {
+  auto builder = builder_result.value();
+  
+  // Modify builder as needed
+  builder.SetMousePosition(new_mouse_pos);
+  
+  // Build context
+  auto context = builder.Build();
+}
+```
+
+#### Building Context Directly
+
+```cpp
+// One-step context creation
+auto context_result = ContextDirector::BuildLogicContext(SceneType::TEST);
+
+if (context_result.has_value()) {
+  LogicContext& ctx = context_result.value();
+  // Use context...
+}
+```
+
+#### Test Isolation
+
+```cpp
+TEST_CASE("My test", "[unit]") {
+  ContextDirector::ClearBuilders();  // Clean slate for test
+  
+  // Setup test builders
+  auto builder = CreateTestBuilder();
+  ContextDirector::RegisterLogicContextBuilder(SceneType::TEST, builder);
+  
+  // Test with registered builder
+  auto ctx = ContextDirector::BuildLogicContext(SceneType::TEST);
+  REQUIRE(ctx.has_value());
+}
+```
+
+### Key Methods
+
+- `RegisterLogicContextBuilder(type, builder)` - Register builder for scene type
+- `GetLogicContextBuilder(scene_type)` - Get builder copy for modification
+- `BuildLogicContext(scene_type)` - Build context directly in one step
+- `ClearBuilders()` - Clear all registered builders (for testing)
+- `HasBuilder(scene_type)` - Check if builder is registered
+
+### Key Features
+
+- **Static Registry Pattern**: Simple static methods and data (not singleton)
+- **Builder Copies**: GetLogicContextBuilder returns copies for safe modification
+- **Type Safety**: Uses SceneType enum for compile-time checks
+- **Test-Friendly**: ClearBuilders() provides easy test isolation
+- **Error Handling**: std::expected with detailed FailInfo messages
+
+### Design Principles
+
+1. **No Singleton**: Uses static methods and static map for simplicity
+2. **Builder Independence**: Returns copies to prevent accidental registry corruption
+3. **Explicit Control**: Callers decide when to register and build contexts
+4. **Not Time-Critical**: Registration happens during initialization
+
+### Related Documentation
+
+- `documentation/STAGE_3_SUMMARY.md` - Implementation summary
+- `documentation/CONTEXT_HANDLING_IMPROVEMENT_PLAN.md` - Overall plan
+
 ## Testing Infrastructure (Stage 2)
 
 ### Reusable Test Components
