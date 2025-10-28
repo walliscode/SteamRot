@@ -8,15 +8,18 @@
 /////////////////////////////////////////////////
 #include "ContextConfigurator.h"
 #include "FlatbuffersDataLoader.h"
+#include "GameResources.h"
 #include "PathProvider.h"
+#include "SceneResources.h"
 #include "context_data_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("ContextConfigurator constructor with null config",
           "[unit][context][ContextConfigurator]") {
   steamrot::ContextConfigurator configurator(nullptr);
+  steamrot::GameResources resources;
 
-  auto result = configurator.CreateGameContextBuilder();
+  auto result = configurator.ConfigureGameResources(resources);
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
@@ -33,11 +36,12 @@ TEST_CASE("ContextConfigurator loads context data successfully",
   REQUIRE(context_data != nullptr);
 
   steamrot::ContextConfigurator configurator(context_data);
-  auto builder_result = configurator.CreateGameContextBuilder();
-  REQUIRE(builder_result.has_value());
+  steamrot::GameResources resources;
+  auto config_result = configurator.ConfigureGameResources(resources);
+  REQUIRE(config_result.has_value());
 }
 
-TEST_CASE("ContextConfigurator creates GameContextBuilder with environment type",
+TEST_CASE("ContextConfigurator configures GameResources with environment type",
           "[unit][context][ContextConfigurator]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::FlatbuffersDataLoader loader;
@@ -46,14 +50,15 @@ TEST_CASE("ContextConfigurator creates GameContextBuilder with environment type"
   REQUIRE(context_data_result.has_value());
 
   steamrot::ContextConfigurator configurator(context_data_result.value());
-  auto builder_result = configurator.CreateGameContextBuilder();
-  REQUIRE(builder_result.has_value());
+  steamrot::GameResources resources;
+  auto config_result = configurator.ConfigureGameResources(resources);
+  REQUIRE(config_result.has_value());
 
-  // Builder should have environment type set (we can't directly check it,
-  // but we can verify Build fails due to missing runtime objects)
-  auto build_result = builder_result.value().Build();
-  REQUIRE_FALSE(build_result.has_value());
-  REQUIRE(build_result.error().mode == steamrot::FailMode::MissingRequiredField);
+  // Verify environment type was set
+  REQUIRE(resources.env_type == steamrot::EnvironmentType::Test);
+  
+  // Verify window was created
+  REQUIRE(resources.game_window.isOpen());
 }
 
 TEST_CASE("ContextConfigurator fails with missing game context config",
@@ -67,7 +72,8 @@ TEST_CASE("ContextConfigurator fails with missing game context config",
       steamrot::GetContextData(fbb.GetBufferPointer());
 
   steamrot::ContextConfigurator configurator(data);
-  auto result = configurator.CreateGameContextBuilder();
+  steamrot::GameResources resources;
+  auto result = configurator.ConfigureGameResources(resources);
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::MissingRequiredField);
 }
@@ -88,8 +94,10 @@ TEST_CASE("ContextConfigurator parses environment type correctly",
       steamrot::GetContextData(fbb.GetBufferPointer());
 
   steamrot::ContextConfigurator configurator(data);
-  auto result = configurator.CreateGameContextBuilder();
+  steamrot::GameResources resources;
+  auto result = configurator.ConfigureGameResources(resources);
   REQUIRE(result.has_value());
+  REQUIRE(resources.env_type == steamrot::EnvironmentType::Test);
 }
 
 TEST_CASE("ContextConfigurator fails with invalid environment type",
@@ -108,12 +116,13 @@ TEST_CASE("ContextConfigurator fails with invalid environment type",
       steamrot::GetContextData(fbb.GetBufferPointer());
 
   steamrot::ContextConfigurator configurator(data);
-  auto result = configurator.CreateGameContextBuilder();
+  steamrot::GameResources resources;
+  auto result = configurator.ConfigureGameResources(resources);
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::NonExistentEnumValue);
 }
 
-TEST_CASE("ContextConfigurator creates LogicContextBuilder for existing scene",
+TEST_CASE("ContextConfigurator configures SceneResources for existing scene",
           "[unit][context][ContextConfigurator]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::FlatbuffersDataLoader loader;
@@ -122,27 +131,46 @@ TEST_CASE("ContextConfigurator creates LogicContextBuilder for existing scene",
   REQUIRE(context_data_result.has_value());
 
   steamrot::ContextConfigurator configurator(context_data_result.value());
-  auto builder_result = configurator.CreateLogicContextBuilder(
-      steamrot::SceneType::SceneType_TEST);
-  REQUIRE(builder_result.has_value());
+  steamrot::SceneResources resources;
+  auto config_result = configurator.ConfigureSceneResources(
+      resources, steamrot::SceneType::SceneType_TEST);
+  REQUIRE(config_result.has_value());
+  
+  // Verify render texture was created
+  REQUIRE(resources.scene_texture.getSize().x > 0);
+  REQUIRE(resources.scene_texture.getSize().y > 0);
 }
 
 TEST_CASE("ContextConfigurator fails for non-existent scene type",
           "[unit][context][ContextConfigurator]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::FlatbuffersDataLoader loader;
+  flatbuffers::FlatBufferBuilder fbb;
 
-  auto context_data_result = loader.ProvideContextData();
-  REQUIRE(context_data_result.has_value());
-
-  steamrot::ContextConfigurator configurator(context_data_result.value());
-  auto builder_result = configurator.CreateLogicContextBuilder(
-      steamrot::SceneType::SceneType_CRAFTING);
+  auto env_type = fbb.CreateString("Test");
+  auto window_title = fbb.CreateString("Test");
+  auto game_config = steamrot::CreateGameContextConfig(
+      fbb, 800, 600, window_title, 60, env_type);
   
-  // This should fail if CRAFTING is not in test_context_data.json
-  // But succeed if it is. Adjust based on actual data.
-  // For now, we'll just verify the method can be called
-  // The actual failure case would need a scene type not in the config
+  // Create scene context for TEST only
+  auto test_scene = steamrot::CreateSceneContextConfig(
+      fbb, steamrot::SceneType::SceneType_TEST, 100, 640, 480);
+  std::vector<flatbuffers::Offset<steamrot::SceneContextConfig>> scenes;
+  scenes.push_back(test_scene);
+  auto scene_contexts = fbb.CreateVector(scenes);
+  
+  auto context_data = steamrot::CreateContextData(fbb, game_config, scene_contexts);
+  fbb.Finish(context_data);
+
+  const steamrot::ContextData *data =
+      steamrot::GetContextData(fbb.GetBufferPointer());
+
+  steamrot::ContextConfigurator configurator(data);
+  steamrot::SceneResources resources;
+  
+  // Try to configure CRAFTING scene which doesn't exist in config
+  auto result = configurator.ConfigureSceneResources(
+      resources, steamrot::SceneType::SceneType_CRAFTING);
+  REQUIRE_FALSE(result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::SceneTypeNotFound);
 }
 
 TEST_CASE("ContextConfigurator fails with missing scene contexts",
@@ -161,13 +189,14 @@ TEST_CASE("ContextConfigurator fails with missing scene contexts",
       steamrot::GetContextData(fbb.GetBufferPointer());
 
   steamrot::ContextConfigurator configurator(data);
-  auto result = configurator.CreateLogicContextBuilder(
-      steamrot::SceneType::SceneType_TEST);
+  steamrot::SceneResources resources;
+  auto result = configurator.ConfigureSceneResources(
+      resources, steamrot::SceneType::SceneType_TEST);
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::MissingRequiredField);
 }
 
-TEST_CASE("ContextConfigurator creates builder for multiple scene types",
+TEST_CASE("ContextConfigurator configures resources for multiple scene types",
           "[unit][context][ContextConfigurator]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::FlatbuffersDataLoader loader;
@@ -178,11 +207,13 @@ TEST_CASE("ContextConfigurator creates builder for multiple scene types",
   steamrot::ContextConfigurator configurator(context_data_result.value());
 
   // Test multiple scene types if they exist in test data
-  auto test_builder = configurator.CreateLogicContextBuilder(
-      steamrot::SceneType::SceneType_TEST);
-  REQUIRE(test_builder.has_value());
+  steamrot::SceneResources test_resources;
+  auto test_result = configurator.ConfigureSceneResources(
+      test_resources, steamrot::SceneType::SceneType_TEST);
+  REQUIRE(test_result.has_value());
 
-  auto title_builder = configurator.CreateLogicContextBuilder(
-      steamrot::SceneType::SceneType_TITLE);
-  REQUIRE(title_builder.has_value());
+  steamrot::SceneResources title_resources;
+  auto title_result = configurator.ConfigureSceneResources(
+      title_resources, steamrot::SceneType::SceneType_TITLE);
+  REQUIRE(title_result.has_value());
 }
