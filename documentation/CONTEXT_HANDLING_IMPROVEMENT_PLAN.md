@@ -1,5 +1,13 @@
 # Context Handling System Improvement Plan
 
+## Update 2025-10-28
+
+The implementation was simplified by removing the ContextConfigurator wrapper class. ResourceConfigurator is now used directly for configuring GameResources and SceneResources from ContextData. The original plan outlined below describes the general approach, but the final implementation is simpler and more direct.
+
+See `STAGE_2_SUMMARY.md` for details on the actual implementation and the simplification made.
+
+---
+
 ## Executive Summary
 
 This document presents a comprehensive analysis of the current context handling

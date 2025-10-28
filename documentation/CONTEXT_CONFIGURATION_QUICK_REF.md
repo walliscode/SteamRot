@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Stage 2 adds data-driven context configuration. Edit JSON files instead of recompiling for configuration changes.
+Stage 2 adds data-driven configuration for resources. Edit JSON files instead of recompiling for configuration changes.
 
 ## File Locations
 
@@ -16,43 +16,35 @@ Stage 2 adds data-driven context configuration. Edit JSON files instead of recom
 
 ```cpp
 #include "FlatbuffersDataLoader.h"
-#include "ContextConfigurator.h"
+#include "ResourceConfigurator.h"
 
 steamrot::FlatbuffersDataLoader loader;
 auto context_data = loader.ProvideContextData().value();
-steamrot::ContextConfigurator configurator(context_data);
+steamrot::ResourceConfigurator configurator(context_data);
 ```
 
-### 2. Create GameContext
+### 2. Configure GameResources
 
 ```cpp
-auto builder = configurator.CreateGameContextBuilder().value();
-
-// Add runtime objects
-builder.SetWindow(window_ptr)
-       .SetEventHandler(handler_ptr)
-       .SetAssetManager(assets_ptr)
-       .SetLoopNumber(loop_num_ptr);
-
-auto context = builder.Build().value();
+steamrot::GameResources game_resources;
+auto result = configurator.ConfigureGameResources(game_resources);
+if (!result.has_value()) {
+  // Handle error
+}
+// game_resources.game_window is now created and configured
+// game_resources.env_type is set
 ```
 
-### 3. Create LogicContext for Scene
+### 3. Configure SceneResources
 
 ```cpp
-auto logic_builder = configurator.CreateLogicContextBuilder(
-    steamrot::SceneType::SceneType_TITLE).value();
-
-// Set runtime objects
-logic_builder.SetSceneEntities(entities_ptr)
-             .SetArchetypes(archetypes_ptr)
-             .SetSceneTexture(texture_ptr)
-             .SetGameWindow(window_ptr)
-             .SetAssetManager(assets_ptr)
-             .SetEventHandler(handler_ptr)
-             .SetMousePosition(mouse_pos_ptr);
-
-auto logic_context = logic_builder.Build().value();
+steamrot::SceneResources scene_resources;
+auto result = configurator.ConfigureSceneResources(
+    scene_resources, steamrot::SceneType::SceneType_TITLE);
+if (!result.has_value()) {
+  // Handle error
+}
+// scene_resources.scene_texture is now created with correct dimensions
 ```
 
 ## Configuration Format
@@ -124,7 +116,7 @@ Copy production config to `tests/data/context/test_context_data.json` and modify
 All methods return `std::expected`:
 
 ```cpp
-auto result = configurator.CreateGameContextBuilder();
+auto result = configurator.ConfigureGameResources(game_resources);
 if (!result.has_value()) {
   const auto& error = result.error();
   // error.mode = FailMode enum
@@ -170,29 +162,21 @@ test_context --test-case-name="ContextConfigurator*"
 test_context_configuration
 ```
 
-## What the Configurator Does
+## What the ResourceConfigurator Does
 
-### ✅ Sets from Configuration
+### ✅ Configures from JSON
+- Window creation (size, title, framerate)
 - Environment type
+- Scene render texture dimensions
 
-### ❌ Still Needs Runtime Objects
-- Window
-- Event Handler
-- Asset Manager
-- Loop Number
-- Scene Entities
-- Archetypes
-- Scene Texture
-- Mouse Position
+### Configuration is Direct
+Resources (GameResources, SceneResources) are configured directly from ContextData. No builder pattern - resources are modified in place.
 
-**Note**: Configurator prepares builder with static settings. Runtime objects must still be added before calling `Build()`.
+**Note**: Configurator creates and configures resources directly from JSON configuration data.
 
-## Next: Stage 3
+## Next Steps
 
-Stage 3 will add `ContextDirector` for:
-- Static registry of builders by scene type
-- Centralized context lifecycle management
-- Easier scene switching
+Future improvements may add centralized context management for easier scene switching.
 
 See `documentation/CONTEXT_HANDLING_IMPROVEMENT_PLAN.md` for roadmap.
 
@@ -201,5 +185,5 @@ See `documentation/CONTEXT_HANDLING_IMPROVEMENT_PLAN.md` for roadmap.
 - **Full Docs**: `documentation/CONTEXT_CONFIGURATION.md`
 - **Implementation Summary**: `documentation/STAGE_2_SUMMARY.md`
 - **Overall Plan**: `documentation/CONTEXT_HANDLING_IMPROVEMENT_PLAN.md`
-- **Code**: `src/context/ContextConfigurator.h/cpp`
-- **Tests**: `tests/unit/context/ContextConfigurator.test.cpp`
+- **Code**: `src/resources/ResourceConfigurator.h/cpp`
+- **Tests**: `tests/integration/context_configuration/`

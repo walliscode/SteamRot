@@ -1005,7 +1005,7 @@ See `documentation/CONTEXT_CONFIGURATION.md` for complete documentation.
 - **Production**: `data/context/context_data.json`
 - **Test**: `tests/data/context/test_context_data.json`
 
-### Using ContextConfigurator
+### Using ResourceConfigurator
 
 ```cpp
 // Load configuration
@@ -1013,19 +1013,22 @@ steamrot::FlatbuffersDataLoader loader;
 auto context_data = loader.ProvideContextData().value();
 
 // Create configurator
-steamrot::ContextConfigurator configurator(context_data);
+steamrot::ResourceConfigurator configurator(context_data);
 
-// Get builder with static settings pre-configured
-auto builder = configurator.CreateGameContextBuilder().value();
+// Configure GameResources
+steamrot::GameResources game_resources;
+auto result = configurator.ConfigureGameResources(game_resources);
+if (!result.has_value()) {
+  // Handle error
+}
 
-// Add runtime objects
-builder.SetWindow(window_ptr)
-       .SetEventHandler(handler_ptr)
-       .SetAssetManager(assets_ptr)
-       .SetLoopNumber(loop_num_ptr);
-
-// Build context
-auto context = builder.Build().value();
+// Configure SceneResources
+steamrot::SceneResources scene_resources;
+result = configurator.ConfigureSceneResources(
+    scene_resources, steamrot::SceneType::SceneType_TITLE);
+if (!result.has_value()) {
+  // Handle error
+}
 ```
 
 ### Configuration Structure

@@ -91,7 +91,7 @@ Configures scene-specific settings. Multiple scenes can be configured:
 
 ```cpp
 #include "FlatbuffersDataLoader.h"
-#include "ContextConfigurator.h"
+#include "ResourceConfigurator.h"
 
 steamrot::PathProvider path_provider{steamrot::EnvironmentType::Production};
 steamrot::FlatbuffersDataLoader loader;
@@ -102,66 +102,73 @@ if (!context_data_result.has_value()) {
 }
 ```
 
-### 2. Create Configurator
+### 2. Create ResourceConfigurator
 
 ```cpp
 const steamrot::ContextData* context_data = context_data_result.value();
-steamrot::ContextConfigurator configurator(context_data);
+steamrot::ResourceConfigurator configurator(context_data);
 ```
 
-### 3. Create GameContextBuilder
+### 3. Configure GameResources
 
 ```cpp
-auto builder_result = configurator.CreateGameContextBuilder();
-if (!builder_result.has_value()) {
+steamrot::GameResources game_resources;
+auto config_result = configurator.ConfigureGameResources(game_resources);
+if (!config_result.has_value()) {
   // Handle error
 }
-
-auto builder = builder_result.value();
+// game_resources.game_window is now created and configured
+// game_resources.env_type is set
 ```
 
-### 4. Set Runtime Objects
-
-The builder from the configurator has static configuration (like environment type) pre-set, but still requires runtime objects:
+### 4. Configure SceneResources
 
 ```cpp
-builder.SetWindow(window_ptr)
-       .SetEventHandler(event_handler_ptr)
-       .SetAssetManager(asset_manager_ptr)
-       .SetLoopNumber(loop_num_ptr);
-```
-
-### 5. Build Context
-
-```cpp
-auto context_result = builder.Build();
-if (context_result.has_value()) {
-  steamrot::GameContext context = context_result.value();
-  // Use context
+steamrot::SceneResources scene_resources;
+auto scene_result = configurator.ConfigureSceneResources(
+    scene_resources, steamrot::SceneType::SceneType_TITLE);
+if (!scene_result.has_value()) {
+  // Handle error
 }
+// scene_resources.scene_texture is now created with correct dimensions
 ```
 
-### Creating LogicContext from Configuration
+### Complete Example
 
 ```cpp
-auto logic_builder_result = configurator.CreateLogicContextBuilder(
-    steamrot::SceneType::SceneType_TITLE);
+#include "FlatbuffersDataLoader.h"
+#include "ResourceConfigurator.h"
+#include "GameResources.h"
+#include "SceneResources.h"
 
-if (logic_builder_result.has_value()) {
-  auto logic_builder = logic_builder_result.value();
-  
-  // Set runtime objects
-  logic_builder.SetSceneEntities(scene_entities_ptr)
-               .SetArchetypes(archetypes_ptr)
-               .SetSceneTexture(scene_texture_ptr)
-               .SetGameWindow(game_window_ptr)
-               .SetAssetManager(asset_manager_ptr)
-               .SetEventHandler(event_handler_ptr)
-               .SetMousePosition(mouse_position_ptr);
-  
-  auto logic_context = logic_builder.Build();
-  // Use logic context
+// Load context configuration data
+steamrot::FlatbuffersDataLoader loader;
+auto context_data_result = loader.ProvideContextData();
+if (!context_data_result.has_value()) {
+  std::cerr << "Failed to load context data\n";
+  return;
 }
+
+// Create configurator
+steamrot::ResourceConfigurator configurator(context_data_result.value());
+
+// Configure game resources
+steamrot::GameResources game_resources;
+if (!configurator.ConfigureGameResources(game_resources).has_value()) {
+  std::cerr << "Failed to configure game resources\n";
+  return;
+}
+
+// Configure scene resources
+steamrot::SceneResources scene_resources;
+if (!configurator.ConfigureSceneResources(
+    scene_resources, steamrot::SceneType::SceneType_TITLE).has_value()) {
+  std::cerr << "Failed to configure scene resources\n";
+  return;
+}
+
+// Resources are now ready to use
+// Create contexts from resources as needed
 ```
 
 ## Build System Integration
@@ -184,7 +191,7 @@ This happens via CMake macro `flatbuffers_generate_for_type()` in `convert_json_
 
 ## Error Handling
 
-The `ContextConfigurator` returns `std::expected` for all operations, providing detailed error information on failure:
+The `ResourceConfigurator` returns `std::expected` for all operations, providing detailed error information on failure:
 
 ### Common Error Cases
 
@@ -206,9 +213,9 @@ The `ContextConfigurator` returns `std::expected` for all operations, providing 
 ### Example Error Handling
 
 ```cpp
-auto builder_result = configurator.CreateGameContextBuilder();
-if (!builder_result.has_value()) {
-  const auto& error = builder_result.error();
+auto config_result = configurator.ConfigureGameResources(game_resources);
+if (!config_result.has_value()) {
+  const auto& error = config_result.error();
   
   switch (error.mode) {
     case steamrot::FailMode::NullPointer:
@@ -271,15 +278,15 @@ When adding new configuration fields:
 1. Update the FlatBuffers schema
 2. Update this documentation
 3. Update example JSON files
-4. Add validation in ContextConfigurator if needed
+4. Add validation in ResourceConfigurator if needed
 
 ## Future Enhancements
 
 ### Stage 3: Context Management
 
-The next stage will introduce `ContextDirector` for managing context lifecycle and registration:
+Future improvements may introduce centralized context management:
 
-- Static registry for LogicContextBuilders by scene type
+- Static registry for context configurations by scene type
 - Centralized context creation and caching
 - Easier scene switching
 
@@ -289,7 +296,7 @@ See `documentation/CONTEXT_HANDLING_IMPROVEMENT_PLAN.md` for details.
 
 ### Source Files
 - `src/flatbuffers_headers/context_data.fbs` - Schema definition
-- `src/context/ContextConfigurator.h/cpp` - Configuration loader
+- `src/resources/ResourceConfigurator.h/cpp` - Configuration loader
 - `src/data_handlers/FlatbuffersDataLoader.h/cpp` - Data loading
 
 ### Configuration Files
@@ -297,7 +304,6 @@ See `documentation/CONTEXT_HANDLING_IMPROVEMENT_PLAN.md` for details.
 - `tests/data/context/test_context_data.json` - Test configuration
 
 ### Tests
-- `tests/unit/context/ContextConfigurator.test.cpp` - Unit tests
 - `tests/integration/context_configuration/` - Integration tests
 
 ### Documentation
