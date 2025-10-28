@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "ContextConfigurator.h"
+#include "ContextDirector.h"
 #include "FlatbuffersDataLoader.h"
 #include "GameContextBuilder.h"
 #include "LogicContextBuilder.h"
@@ -133,3 +134,73 @@ TEST_CASE("Builder can be used to create context with runtime objects",
   REQUIRE(&context_result.value().event_handler == event_handler.get());
   REQUIRE(&context_result.value().asset_manager == asset_manager.get());
 }
+
+TEST_CASE("ContextDirector registers and builds contexts from configuration",
+          "[integration][context][director]") {
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::ContextDirector::ClearBuilders();
+
+  steamrot::FlatbuffersDataLoader loader;
+  auto context_data_result = loader.ProvideContextData();
+  REQUIRE(context_data_result.has_value());
+
+  steamrot::ContextConfigurator configurator(context_data_result.value());
+
+  // Create builder from configuration for TITLE scene
+  auto builder_result = configurator.CreateLogicContextBuilder(
+      steamrot::SceneType::SceneType_TITLE);
+  REQUIRE(builder_result.has_value());
+
+  // Register builder with ContextDirector
+  steamrot::ContextDirector::RegisterLogicContextBuilder(
+      steamrot::SceneType::SceneType_TITLE, builder_result.value());
+
+  // Verify builder is registered
+  REQUIRE(steamrot::ContextDirector::HasBuilder(
+      steamrot::SceneType::SceneType_TITLE));
+
+  // Get builder from director
+  auto retrieved_builder =
+      steamrot::ContextDirector::GetLogicContextBuilder(
+          steamrot::SceneType::SceneType_TITLE);
+  REQUIRE(retrieved_builder.has_value());
+}
+
+TEST_CASE("ContextDirector can manage multiple scene contexts",
+          "[integration][context][director]") {
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::ContextDirector::ClearBuilders();
+
+  steamrot::FlatbuffersDataLoader loader;
+  auto context_data_result = loader.ProvideContextData();
+  REQUIRE(context_data_result.has_value());
+
+  steamrot::ContextConfigurator configurator(context_data_result.value());
+
+  // Register builders for all configured scenes
+  const auto *context_data = context_data_result.value();
+  for (const auto *scene_config : *context_data->scene_contexts()) {
+    auto builder_result =
+        configurator.CreateLogicContextBuilder(scene_config->scene_type());
+    REQUIRE(builder_result.has_value());
+
+    steamrot::ContextDirector::RegisterLogicContextBuilder(
+        scene_config->scene_type(), builder_result.value());
+  }
+
+  // Verify all scenes are registered
+  REQUIRE(steamrot::ContextDirector::HasBuilder(
+      steamrot::SceneType::SceneType_TEST));
+  REQUIRE(steamrot::ContextDirector::HasBuilder(
+      steamrot::SceneType::SceneType_TITLE));
+
+  // Verify can retrieve builders for each scene
+  auto test_builder = steamrot::ContextDirector::GetLogicContextBuilder(
+      steamrot::SceneType::SceneType_TEST);
+  REQUIRE(test_builder.has_value());
+
+  auto title_builder = steamrot::ContextDirector::GetLogicContextBuilder(
+      steamrot::SceneType::SceneType_TITLE);
+  REQUIRE(title_builder.has_value());
+}
+
