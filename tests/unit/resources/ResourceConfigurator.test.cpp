@@ -141,7 +141,7 @@ TEST_CASE("ResourceConfigurator with custom scene resource data",
   fbb.Finish(scene_data);
   
   const steamrot::SceneResourcesData *custom_scene_data =
-      steamrot::GetSceneResourcesData(fbb.GetBufferPointer());
+      flatbuffers::GetRoot<steamrot::SceneResourcesData>(fbb.GetBufferPointer());
 
   // Create minimal game resources
   flatbuffers::FlatBufferBuilder fbb2;
@@ -152,7 +152,7 @@ TEST_CASE("ResourceConfigurator with custom scene resource data",
   fbb2.Finish(game_data);
   
   const steamrot::GameResourcesData *game_resources =
-      steamrot::GetGameResourcesData(fbb2.GetBufferPointer());
+      flatbuffers::GetRoot<steamrot::GameResourcesData>(fbb2.GetBufferPointer());
 
   steamrot::ResourceConfigurator configurator(game_resources);
   steamrot::SceneResources resources;
