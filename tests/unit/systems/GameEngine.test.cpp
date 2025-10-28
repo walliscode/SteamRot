@@ -15,7 +15,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-TEST_CASE("GameEngine fails when EnviromentType is None", "[unit][GameEngine]") {
+TEST_CASE("GameEngine fails when EnviromentType is None",
+          "[unit][GameEngine]") {
   // Attempt to create a GameEngine instance with EnvironmentType::None
   try {
     steamrot::GameEngine game_engine(steamrot::EnvironmentType::None);
@@ -88,7 +89,8 @@ TEST_CASE("GameEngine runs for a set number of frames in production enviroment",
   SUCCEED("GameEngine ran for the specified number of frames");
 }
 
-TEST_CASE("GameEngine::RegisterSubscriber adds a subscriber", "[unit][GameEngine]") {
+TEST_CASE("GameEngine::RegisterSubscriber adds a subscriber",
+          "[unit][GameEngine]") {
   // create and pre-initialize PathProvider
   steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
   // Create a GameEngine instance
@@ -327,8 +329,8 @@ TEST_CASE(
   // simulate some changes
   sf::Mouse::setPosition({20, 35}, game_context.game_window);
 
-  // call UpdateGameContext to update the GameContext
-  game_engine.UpdateGameContext(game_context);
+  // call UpdateGameResources to update GameContext members
+  game_engine.UpdateGameResources(game_context.game_resources);
 
   // check that the members have been updated correctly
 

@@ -22,8 +22,7 @@ namespace steamrot {
 ///////////////////////////////////////////////////////////
 
 GameEngine::GameEngine(EnvironmentType env_type)
-    : m_game_context(m_game_resources),
-      m_scene_manager(m_game_context),
+    : m_game_context(m_game_resources), m_scene_manager(m_game_context),
       m_display_manager(m_game_resources.game_window, m_scene_manager) {
   // Set initial environment type and loop number
   m_game_resources.env_type = env_type;
@@ -149,8 +148,8 @@ void GameEngine::RunGameLoop(size_t number_of_loops, bool simulation) {
 
 ////////////////////////////////////////////////////////////
 void GameEngine::UpdateSystems() {
-  // Update GameContext
-  UpdateGameContext(m_game_context);
+  // Update Game Resources
+  UpdateGameResources(m_game_resources);
 
   // Preload Events, namely any external events that need adding to the waiting
   // room
@@ -275,12 +274,14 @@ const sf::RenderWindow &GameEngine::GetWindow() const {
 }
 
 /////////////////////////////////////////////////
-void GameEngine::UpdateGameContext(GameContext &game_context) {
-  // update mouse position
-  game_context.mouse_position =
-      sf::Mouse::getPosition(game_context.game_window);
-}
+const GameContext &GameEngine::GetGameContext() const { return m_game_context; }
 
 /////////////////////////////////////////////////
-const GameContext &GameEngine::GetGameContext() const { return m_game_context; }
+void GameEngine::UpdateGameResources(GameResources &game_resources) {
+
+  // update mouse position
+  game_resources.mouse_position =
+      sf::Mouse::getPosition(game_resources.game_window);
+}
+
 } // namespace steamrot

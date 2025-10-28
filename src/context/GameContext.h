@@ -35,11 +35,9 @@ struct GameContext {
   EventHandler &event_handler;
 
   /////////////////////////////////////////////////
-  /// @brief Represents the current mouse position in window coordinates.
-  ///
-  /// This is not a live value, it must be updated each frame
+  /// @brief Reference to global mouse position
   /////////////////////////////////////////////////
-  sf::Vector2i mouse_position{0, 0};
+  sf::Vector2i &mouse_position;
 
   /////////////////////////////////////////////////
   /// @brief Loop number for the current game loop. Lives on the GameEngine
