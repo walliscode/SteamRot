@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of the ResourceConfigurator class.
+/// @brief Free functions for configuring resources from FlatBuffers data.
 ////////////////////////////////////////////////////////////
 
 #pragma once
@@ -19,53 +19,32 @@
 namespace steamrot {
 
 ////////////////////////////////////////////////////////////
-/// @class ResourceConfigurator
-/// @brief Configures resource structs from FlatBuffers data.
+/// @brief Configure GameResources from FlatBuffers data.
 ///
-/// Provides methods to configure GameResources and SceneResources
-/// instances from resource-specific FlatBuffers data (not ContextData).
-/// This allows resource configuration to be independent of context
-/// configuration.
+/// Configures window settings (size, title, framerate) from the
+/// configuration data. The window is created directly during configuration.
+///
+/// @param resources GameResources instance to configure
+/// @param game_data Pointer to GameResourcesData configuration
+/// @return Expected containing monostate or FailInfo on error
 ////////////////////////////////////////////////////////////
-class ResourceConfigurator {
-private:
-  const GameResourcesData *m_game_resources_data{nullptr};
+std::expected<std::monostate, FailInfo>
+ConfigureGameResources(GameResources &resources,
+                       const GameResourcesData *game_data);
 
-public:
-  ////////////////////////////////////////////////////////////
-  /// @brief Constructor for ResourceConfigurator.
-  ///
-  /// @param game_data Pointer to GameResourcesData configuration
-  ////////////////////////////////////////////////////////////
-  explicit ResourceConfigurator(const GameResourcesData *game_data);
-
-  ////////////////////////////////////////////////////////////
-  /// @brief Configure GameResources from FlatBuffers data.
-  ///
-  /// Configures window settings (size, title, framerate) and environment
-  /// type from the configuration data. The window is created directly
-  /// during configuration.
-  ///
-  /// @param resources GameResources instance to configure
-  /// @return Expected containing monostate or FailInfo on error
-  ////////////////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  ConfigureGameResources(GameResources &resources) const;
-
-  ////////////////////////////////////////////////////////////
-  /// @brief Configure SceneResources from FlatBuffers data.
-  ///
-  /// Configures render texture dimensions from the scene data.
-  /// If scene_data is null, uses default dimensions (800x600).
-  /// The render texture is created directly during configuration.
-  ///
-  /// @param resources SceneResources instance to configure
-  /// @param scene_data Scene resource data (can be null for defaults)
-  /// @return Expected containing monostate or FailInfo on error
-  ////////////////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  ConfigureSceneResources(SceneResources &resources,
-                          const SceneResourcesData *scene_data) const;
-};
+////////////////////////////////////////////////////////////
+/// @brief Configure SceneResources from FlatBuffers data.
+///
+/// Configures render texture dimensions from the scene data.
+/// If scene_data is null, uses default dimensions (800x600).
+/// The render texture is created directly during configuration.
+///
+/// @param resources SceneResources instance to configure
+/// @param scene_data Scene resource data (can be null for defaults)
+/// @return Expected containing monostate or FailInfo on error
+////////////////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureSceneResources(SceneResources &resources,
+                        const SceneResourcesData *scene_data);
 
 } // namespace steamrot

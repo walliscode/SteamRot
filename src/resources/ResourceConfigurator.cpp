@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////
 /// @file
-/// @brief Implementation of the ResourceConfigurator class.
+/// @brief Free functions for configuring resources from FlatBuffers data.
 ////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////
@@ -11,40 +11,35 @@
 namespace steamrot {
 
 ////////////////////////////////////////////////////////////
-ResourceConfigurator::ResourceConfigurator(const GameResourcesData *game_data)
-    : m_game_resources_data(game_data) {}
-
-////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ResourceConfigurator::ConfigureGameResources(GameResources &resources) const {
-  if (!m_game_resources_data) {
+ConfigureGameResources(GameResources &resources,
+                       const GameResourcesData *game_data) {
+  if (!game_data) {
     return std::unexpected(
         FailInfo{FailMode::NullPointer, "GameResourcesData is null"});
   }
 
-  const GameResourcesData *game_config = m_game_resources_data;
-
   // Create the window with configured settings (SFML 3.0 API)
-  sf::Vector2u window_size(game_config->window_width(),
-                           game_config->window_height());
+  sf::Vector2u window_size(game_data->window_width(),
+                           game_data->window_height());
 
   std::string window_title = "SteamRot"; // Default title
-  if (game_config->window_title()) {
-    window_title = game_config->window_title()->str();
+  if (game_data->window_title()) {
+    window_title = game_data->window_title()->str();
   }
 
   resources.game_window.create(sf::VideoMode(window_size), window_title);
 
   // Set framerate limit
-  resources.game_window.setFramerateLimit(game_config->framerate_limit());
+  resources.game_window.setFramerateLimit(game_data->framerate_limit());
 
   return std::monostate{};
 }
 
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ResourceConfigurator::ConfigureSceneResources(
-    SceneResources &resources, const SceneResourcesData *scene_data) const {
+ConfigureSceneResources(SceneResources &resources,
+                        const SceneResourcesData *scene_data) {
   
   // Default dimensions
   uint32_t texture_width = 800;

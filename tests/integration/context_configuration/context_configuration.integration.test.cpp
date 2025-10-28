@@ -1,119 +1,117 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Integration tests for context configuration loading
+/// @brief Integration tests for resource configuration loading
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "ContextConfigurator.h"
 #include "FlatbuffersDataLoader.h"
 #include "GameResources.h"
 #include "PathProvider.h"
+#include "ResourceConfigurator.h"
 #include "SceneResources.h"
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("Load context configuration and configure resources",
-          "[integration][context][configuration]") {
+TEST_CASE("Load resource configuration and configure resources",
+          "[integration][resources][configuration]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::FlatbuffersDataLoader loader;
 
-  // Load context configuration data
-  auto context_data_result = loader.ProvideContextData();
-  REQUIRE(context_data_result.has_value());
+  // Load game resources data
+  auto game_resources_result = loader.ProvideGameResourcesData();
+  REQUIRE(game_resources_result.has_value());
 
-  const steamrot::ContextData *context_data = context_data_result.value();
-  REQUIRE(context_data != nullptr);
+  const steamrot::GameResourcesData *game_data = game_resources_result.value();
+  REQUIRE(game_data != nullptr);
 
-  // Verify game context configuration
-  REQUIRE(context_data->game_context() != nullptr);
-  REQUIRE(context_data->game_context()->window_width() > 0);
-  REQUIRE(context_data->game_context()->window_height() > 0);
-  REQUIRE(context_data->game_context()->window_title() != nullptr);
-
-  // Verify scene contexts configuration
-  REQUIRE(context_data->scene_contexts() != nullptr);
-  REQUIRE(context_data->scene_contexts()->size() > 0);
-
-  // Create configurator
-  steamrot::ContextConfigurator configurator(context_data);
+  // Verify game resource configuration
+  REQUIRE(game_data->window_width() > 0);
+  REQUIRE(game_data->window_height() > 0);
+  REQUIRE(game_data->window_title() != nullptr);
 
   // Configure GameResources from configuration
   steamrot::GameResources game_resources;
-  auto game_config_result = configurator.ConfigureGameResources(game_resources);
+  auto game_config_result = steamrot::ConfigureGameResources(game_resources, game_data);
   REQUIRE(game_config_result.has_value());
 
-  // Configure SceneResources for each configured scene
-  for (const auto *scene_config : *context_data->scene_contexts()) {
-    steamrot::SceneResources scene_resources;
-    auto scene_config_result =
-        configurator.ConfigureSceneResources(scene_resources,
-                                             scene_config->scene_type());
-    REQUIRE(scene_config_result.has_value());
-  }
+  // Configure SceneResources for test scene
+  auto scene_resources_result =
+      loader.ProvideSceneResourcesData(steamrot::SceneType::SceneType_TEST);
+  REQUIRE(scene_resources_result.has_value());
+
+  steamrot::SceneResources scene_resources;
+  auto scene_config_result =
+      steamrot::ConfigureSceneResources(scene_resources,
+                                        scene_resources_result.value());
+  REQUIRE(scene_config_result.has_value());
 }
 
 TEST_CASE("Configuration supports all required scene types",
-          "[integration][context][configuration]") {
+          "[integration][resources][configuration]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::FlatbuffersDataLoader loader;
 
-  auto context_data_result = loader.ProvideContextData();
-  REQUIRE(context_data_result.has_value());
-
-  steamrot::ContextConfigurator configurator(context_data_result.value());
-
   // Verify TEST scene is configured
+  auto test_scene_data =
+      loader.ProvideSceneResourcesData(steamrot::SceneType::SceneType_TEST);
+  REQUIRE(test_scene_data.has_value());
+
   steamrot::SceneResources test_resources;
-  auto test_result = configurator.ConfigureSceneResources(
-      test_resources, steamrot::SceneType::SceneType_TEST);
+  auto test_result = steamrot::ConfigureSceneResources(
+      test_resources, test_scene_data.value());
   REQUIRE(test_result.has_value());
 
   // Verify TITLE scene is configured
+  auto title_scene_data =
+      loader.ProvideSceneResourcesData(steamrot::SceneType::SceneType_TITLE);
+  REQUIRE(title_scene_data.has_value());
+
   steamrot::SceneResources title_resources;
-  auto title_result = configurator.ConfigureSceneResources(
-      title_resources, steamrot::SceneType::SceneType_TITLE);
+  auto title_result = steamrot::ConfigureSceneResources(
+      title_resources, title_scene_data.value());
   REQUIRE(title_result.has_value());
 }
 
 TEST_CASE("Configuration values are properly loaded",
-          "[integration][context][configuration]") {
+          "[integration][resources][configuration]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::FlatbuffersDataLoader loader;
 
-  auto context_data_result = loader.ProvideContextData();
-  REQUIRE(context_data_result.has_value());
+  auto game_resources_result = loader.ProvideGameResourcesData();
+  REQUIRE(game_resources_result.has_value());
 
-  const steamrot::ContextData *context_data = context_data_result.value();
-  const steamrot::GameContextConfig *game_config = context_data->game_context();
+  const steamrot::GameResourcesData *game_data = game_resources_result.value();
 
   // Verify configuration values are reasonable
-  REQUIRE(game_config->window_width() >= 640);
-  REQUIRE(game_config->window_height() >= 480);
-  REQUIRE(game_config->framerate_limit() > 0);
-  REQUIRE(game_config->framerate_limit() <= 240);
+  REQUIRE(game_data->window_width() >= 640);
+  REQUIRE(game_data->window_height() >= 480);
+  REQUIRE(game_data->framerate_limit() > 0);
+  REQUIRE(game_data->framerate_limit() <= 240);
 
   // Verify scene configurations have valid values
-  for (const auto *scene_config : *context_data->scene_contexts()) {
-    REQUIRE(scene_config->entity_pool_size() > 0);
-    REQUIRE(scene_config->render_texture_width() > 0);
-    REQUIRE(scene_config->render_texture_height() > 0);
+  auto test_scene_data =
+      loader.ProvideSceneResourcesData(steamrot::SceneType::SceneType_TEST);
+  REQUIRE(test_scene_data.has_value());
+
+  const steamrot::SceneResourcesData *scene_data = test_scene_data.value();
+  if (scene_data) {
+    REQUIRE(scene_data->render_texture_width() > 0);
+    REQUIRE(scene_data->render_texture_height() > 0);
   }
 }
 
-TEST_CASE("Resources can be configured from context data",
-          "[integration][context][configuration]") {
+TEST_CASE("Resources can be configured from resource data",
+          "[integration][resources][configuration]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::FlatbuffersDataLoader loader;
 
-  auto context_data_result = loader.ProvideContextData();
-  REQUIRE(context_data_result.has_value());
+  auto game_resources_result = loader.ProvideGameResourcesData();
+  REQUIRE(game_resources_result.has_value());
 
-  steamrot::ContextConfigurator configurator(context_data_result.value());
-
-  // Configure GameResources from configurator
+  // Configure GameResources from resource data
   steamrot::GameResources game_resources;
-  auto config_result = configurator.ConfigureGameResources(game_resources);
+  auto config_result = steamrot::ConfigureGameResources(game_resources, game_resources_result.value());
   REQUIRE(config_result.has_value());
 
   // Verify the resources were configured with correct values

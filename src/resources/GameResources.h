@@ -25,7 +25,7 @@ namespace steamrot {
 ///
 /// All members are concrete objects (no references/pointers to other
 /// resource members). This struct is default-constructible and should
-/// be configured via ResourceConfigurator.
+/// be configured via ConfigureGameResources free function.
 ////////////////////////////////////////////////////////////
 struct GameResources {
   ////////////////////////////////////////////////////////////

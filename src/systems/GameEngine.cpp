@@ -3,10 +3,10 @@
 ////////////////////////////////////////////////////////////
 
 #include "GameEngine.h"
-#include "ContextConfigurator.h"
 #include "FailInfo.h"
 #include "FlatbuffersDataLoader.h"
 #include "GameContext.h"
+#include "ResourceConfigurator.h"
 #include "SubscriberFactory.h"
 #include "events_generated.h"
 #include <SFML/Graphics.hpp>
@@ -62,20 +62,19 @@ void GameEngine::RunGame(size_t number_of_loops, bool simulation) {
 void GameEngine::StartUp() {
   FlatbuffersDataLoader data_loader;
 
-  // Configure GameResources from context data
-  auto context_data_result = data_loader.ProvideContextData();
-  if (!context_data_result) {
-    std::cerr << "Failed to load context data: "
-              << context_data_result.error().message << "\n";
+  // Configure GameResources from resource data
+  auto game_resources_result = data_loader.ProvideGameResourcesData();
+  if (!game_resources_result) {
+    std::cerr << "Failed to load game resources data: "
+              << game_resources_result.error().message << "\n";
     if (m_game_resources.game_window.isOpen()) {
       m_game_resources.game_window.close();
     }
     return;
   }
 
-  ContextConfigurator context_configurator(context_data_result.value());
   auto configure_resources_result =
-      context_configurator.ConfigureGameResources(m_game_resources);
+      ConfigureGameResources(m_game_resources, game_resources_result.value());
   if (!configure_resources_result) {
     std::cerr << "Failed to configure game resources: "
               << configure_resources_result.error().message << "\n";
