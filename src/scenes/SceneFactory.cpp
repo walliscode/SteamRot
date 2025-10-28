@@ -7,9 +7,9 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "SceneFactory.h"
-#include "ContextConfigurator.h"
 #include "CraftingScene.h"
 #include "FlatbuffersDataLoader.h"
+#include "ResourceConfigurator.h"
 #include "TitleScene.h"
 #include "uuid.h"
 #include <memory>
@@ -75,8 +75,8 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type,
     return std::unexpected(context_data_result.error());
   }
 
-  ContextConfigurator context_configurator(context_data_result.value());
-  auto configure_resources_result = context_configurator.ConfigureSceneResources(
+  ResourceConfigurator resource_configurator(context_data_result.value());
+  auto configure_resources_result = resource_configurator.ConfigureSceneResources(
       scene_ptr->m_scene_resources, scene_type);
   if (!configure_resources_result) {
     return std::unexpected(configure_resources_result.error());

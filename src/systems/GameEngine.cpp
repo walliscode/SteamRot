@@ -3,10 +3,10 @@
 ////////////////////////////////////////////////////////////
 
 #include "GameEngine.h"
-#include "ContextConfigurator.h"
 #include "FailInfo.h"
 #include "FlatbuffersDataLoader.h"
 #include "GameContext.h"
+#include "ResourceConfigurator.h"
 #include "SubscriberFactory.h"
 #include "events_generated.h"
 #include <SFML/Graphics.hpp>
@@ -74,9 +74,9 @@ void GameEngine::StartUp() {
     return;
   }
 
-  ContextConfigurator context_configurator(context_data_result.value());
+  ResourceConfigurator resource_configurator(context_data_result.value());
   auto configure_resources_result =
-      context_configurator.ConfigureGameResources(m_game_resources);
+      resource_configurator.ConfigureGameResources(m_game_resources);
   if (!configure_resources_result) {
     std::cerr << "Failed to configure game resources: "
               << configure_resources_result.error().message << "\n";

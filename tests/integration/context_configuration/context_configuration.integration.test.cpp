@@ -6,10 +6,10 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "ContextConfigurator.h"
 #include "FlatbuffersDataLoader.h"
 #include "GameResources.h"
 #include "PathProvider.h"
+#include "ResourceConfigurator.h"
 #include "SceneResources.h"
 #include <catch2/catch_test_macros.hpp>
 
@@ -37,7 +37,7 @@ TEST_CASE("Load context configuration and configure resources",
   REQUIRE(context_data->scene_contexts()->size() > 0);
 
   // Create configurator
-  steamrot::ContextConfigurator configurator(context_data);
+  steamrot::ResourceConfigurator configurator(context_data);
 
   // Configure GameResources from configuration
   steamrot::GameResources game_resources;
@@ -62,7 +62,7 @@ TEST_CASE("Configuration supports all required scene types",
   auto context_data_result = loader.ProvideContextData();
   REQUIRE(context_data_result.has_value());
 
-  steamrot::ContextConfigurator configurator(context_data_result.value());
+  steamrot::ResourceConfigurator configurator(context_data_result.value());
 
   // Verify TEST scene is configured
   steamrot::SceneResources test_resources;
@@ -110,7 +110,7 @@ TEST_CASE("Resources can be configured from context data",
   auto context_data_result = loader.ProvideContextData();
   REQUIRE(context_data_result.has_value());
 
-  steamrot::ContextConfigurator configurator(context_data_result.value());
+  steamrot::ResourceConfigurator configurator(context_data_result.value());
 
   // Configure GameResources from configurator
   steamrot::GameResources game_resources;
