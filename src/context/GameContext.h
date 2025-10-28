@@ -6,6 +6,7 @@
 #pragma once
 #include "AssetManager.h"
 #include "EventHandler.h"
+#include "GameResources.h"
 #include "PathProvider.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -14,9 +15,12 @@ namespace steamrot {
 struct GameContext {
   GameContext() = delete;
 
-  GameContext(sf::RenderWindow &window, EventHandler &event_handler,
-              const size_t &loop_number, AssetManager &asset_manager,
-              const EnvironmentType &env_type);
+  explicit GameContext(GameResources &resources);
+
+  /////////////////////////////////////////////////
+  /// @brief Reference to the GameResources this context was created from.
+  /////////////////////////////////////////////////
+  GameResources &game_resources;
 
   /////////////////////////////////////////////////
   /// @brief Reference to the game window.
@@ -40,7 +44,7 @@ struct GameContext {
   /////////////////////////////////////////////////
   /// @brief Loop number for the current game loop. Lives on the GameEngine
   /////////////////////////////////////////////////
-  const size_t &loop_number;
+  size_t &loop_number;
 
   /////////////////////////////////////////////////
   /// @brief Reference to the AssetManager living on the GameEngine, there
@@ -49,8 +53,8 @@ struct GameContext {
   AssetManager &asset_manager;
 
   /////////////////////////////////////////////////
-  /// @brief Desc
+  /// @brief Environment type for the game.
   /////////////////////////////////////////////////
-  const EnvironmentType env_type;
+  EnvironmentType &env_type;
 };
 } // namespace steamrot

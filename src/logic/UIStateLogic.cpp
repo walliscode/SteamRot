@@ -10,8 +10,8 @@
 
 namespace steamrot {
 /////////////////////////////////////////////////
-UIStateLogic::UIStateLogic(const LogicContext logic_context)
-    : Logic(logic_context) {}
+UIStateLogic::UIStateLogic(const SceneContext scene_context)
+    : Logic(scene_context) {}
 
 /////////////////////////////////////////////////
 void UIStateLogic::ProcessLogic() {
@@ -19,10 +19,10 @@ void UIStateLogic::ProcessLogic() {
   // Generate archetype ID for CUIState components
   ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<CUIState>();
 
-  const auto it = m_logic_context.archetypes.find(archetype_id);
+  const auto it = m_scene_context.archetypes.find(archetype_id);
   
   // If archetype doesn't exist, skip processing
-  if (it == m_logic_context.archetypes.end()) {
+  if (it == m_scene_context.archetypes.end()) {
     return;
   }
 
@@ -31,7 +31,7 @@ void UIStateLogic::ProcessLogic() {
   // Process each entity with CUIState component
   for (size_t entity_id : archetype) {
     CUIState &ui_state = entity::memory::GetComponent<CUIState>(
-        entity_id, m_logic_context.scene_entities);
+        entity_id, m_scene_context.scene_entities);
 
     // Check all subscribers for each state
     for (auto &[state_key, subscribers] : ui_state.m_state_subscribers) {

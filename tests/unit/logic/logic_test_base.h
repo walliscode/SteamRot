@@ -9,7 +9,7 @@
 #pragma once
 
 #include "Logic.h"
-#include "LogicContext.h"
+#include "SceneContext.h"
 #include "TestContext.h"
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
@@ -85,16 +85,16 @@ protected:
   /////////////////////////////////////////////////
   std::unique_ptr<TLogic> CreateLogic() {
     return std::make_unique<TLogic>(
-        test_context->GetLogicContextForTestScene());
+        test_context->GetSceneContextForTestScene());
   }
 
   /////////////////////////////////////////////////
-  /// @brief Create Logic instance with custom LogicContext
+  /// @brief Create Logic instance with custom SceneContext
   ///
-  /// @param context Custom LogicContext to use
+  /// @param context Custom SceneContext to use
   /// @return Unique pointer to Logic instance
   /////////////////////////////////////////////////
-  std::unique_ptr<TLogic> CreateLogicWithContext(const LogicContext &context) {
+  std::unique_ptr<TLogic> CreateLogicWithContext(const SceneContext &context) {
     return std::make_unique<TLogic>(context);
   }
 

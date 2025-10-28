@@ -17,8 +17,8 @@
 namespace steamrot {
 /////////////////////////////////////////////////
 LogicFactory::LogicFactory(const SceneType scene_type,
-                           const LogicContext &logic_context)
-    : m_scene_type(scene_type), m_logic_context(logic_context) {}
+                           const SceneContext &scene_context)
+    : m_scene_type(scene_type), m_scene_context(scene_context) {}
 
 /////////////////////////////////////////////////
 std::expected<LogicCollection, FailInfo> LogicFactory::CreateLogicMap() {
@@ -57,18 +57,18 @@ std::expected<LogicVector, FailInfo> LogicFactory::CreateRenderLogics() {
 
   switch (m_scene_type) {
   case SceneType::SceneType_TITLE: {
-    render_logics.push_back(std::make_unique<UIRenderLogic>(m_logic_context));
+    render_logics.push_back(std::make_unique<UIRenderLogic>(m_scene_context));
     break;
   }
   case SceneType::SceneType_CRAFTING: {
     render_logics.push_back(
-        std::make_unique<CraftingRenderLogic>(m_logic_context));
-    render_logics.push_back(std::make_unique<UIRenderLogic>(m_logic_context));
+        std::make_unique<CraftingRenderLogic>(m_scene_context));
+    render_logics.push_back(std::make_unique<UIRenderLogic>(m_scene_context));
     break;
   }
   case SceneType::SceneType_TEST: {
     // add render logics for test purposes
-    render_logics.push_back(std::make_unique<UIRenderLogic>(m_logic_context));
+    render_logics.push_back(std::make_unique<UIRenderLogic>(m_scene_context));
     break;
   }
   default:
@@ -86,20 +86,20 @@ std::expected<LogicVector, FailInfo> LogicFactory::CreateCollisionLogics() {
   case SceneType::SceneType_TITLE: {
 
     collision_logics.push_back(
-        std::make_unique<UICollisionLogic>(m_logic_context));
+        std::make_unique<UICollisionLogic>(m_scene_context));
     break;
   }
   case SceneType::SceneType_CRAFTING: {
 
     collision_logics.push_back(
-        std::make_unique<UICollisionLogic>(m_logic_context));
+        std::make_unique<UICollisionLogic>(m_scene_context));
     break;
   }
   case SceneType::SceneType_TEST: {
 
     // add collision logics for test purposes
     collision_logics.push_back(
-        std::make_unique<UICollisionLogic>(m_logic_context));
+        std::make_unique<UICollisionLogic>(m_scene_context));
 
     break;
   }
@@ -119,19 +119,19 @@ std::expected<LogicVector, FailInfo> LogicFactory::CreateActionLogics() {
   switch (m_scene_type) {
   case SceneType::SceneType_TITLE: {
 
-    action_logics.push_back(std::make_unique<UIStateLogic>(m_logic_context));
-    action_logics.push_back(std::make_unique<UIActionLogic>(m_logic_context));
+    action_logics.push_back(std::make_unique<UIStateLogic>(m_scene_context));
+    action_logics.push_back(std::make_unique<UIActionLogic>(m_scene_context));
     break;
   }
   case SceneType::SceneType_CRAFTING: {
-    action_logics.push_back(std::make_unique<UIStateLogic>(m_logic_context));
-    action_logics.push_back(std::make_unique<UIActionLogic>(m_logic_context));
+    action_logics.push_back(std::make_unique<UIStateLogic>(m_scene_context));
+    action_logics.push_back(std::make_unique<UIActionLogic>(m_scene_context));
     break;
   }
   case SceneType::SceneType_TEST: {
     // add action logics for test purposes
-    action_logics.push_back(std::make_unique<UIStateLogic>(m_logic_context));
-    action_logics.push_back(std::make_unique<UIActionLogic>(m_logic_context));
+    action_logics.push_back(std::make_unique<UIStateLogic>(m_scene_context));
+    action_logics.push_back(std::make_unique<UIActionLogic>(m_scene_context));
     break;
   }
   default:

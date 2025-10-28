@@ -40,9 +40,9 @@ private:
   const SceneType m_scene_type;
 
   /////////////////////////////////////////////////
-  /// @brief member variable that holds the LogicContext
+  /// @brief member variable that holds the SceneContext
   /////////////////////////////////////////////////
-  LogicContext m_logic_context;
+  SceneContext m_scene_context;
 
   /////////////////////////////////////////////////
   /// @brief Create a vector of logic objects specifically for collision
@@ -64,10 +64,10 @@ public:
   /////////////////////////////////////////////////
   /// @brief Constructor for the LogicFactory class.
   ///
-  /// @param logic_context LogicContext object containing references to the
-  /// scene
+  /// @param scene_type SceneType of the scene for which logics are created
+  /// @param scene_context SceneContext object containing references to the scene
   /////////////////////////////////////////////////
-  LogicFactory(const SceneType scene_type, const LogicContext &logic_context);
+  LogicFactory(const SceneType scene_type, const SceneContext &scene_context);
 
   /////////////////////////////////////////////////
   /// @brief Create and return a map of logic objects.

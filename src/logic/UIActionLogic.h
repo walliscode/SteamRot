@@ -23,10 +23,10 @@ public:
   /////////////////////////////////////////////////
   /// @brief COnstructor for UIEventLogic.
   ///
-  /// @param logic_context LogicContext object containing the context for the
+  /// @param scene_context SceneContext object containing the context for the
   /// logic.
   /////////////////////////////////////////////////
-  UIActionLogic(const LogicContext logic_context);
+  UIActionLogic(const SceneContext scene_context);
 };
 
 /////////////////////////////////////////////////
@@ -34,11 +34,11 @@ public:
 ///
 /// @param ui_element Element to process.
 /// @param event_handler Event handler to process actions with.
-/// @param logic_context LogicContext containing scene entities and archetypes
+/// @param scene_context SceneContext containing scene entities and archetypes
 /////////////////////////////////////////////////
 void ProcessUIActionsAndEvents(UIElement &ui_element,
                                EventHandler &event_handler,
-                               const LogicContext &logic_context);
+                               const SceneContext &scene_context);
 
 /////////////////////////////////////////////////
 /// @brief Process actions for a UI element and its nested children recursively.
@@ -50,11 +50,11 @@ void ProcessUIActionsAndEvents(UIElement &ui_element,
 ///
 /// @param ui_element Element to process along with its children.
 /// @param event_handler Event handler to process actions with.
-/// @param logic_context LogicContext containing scene entities and archetypes
+/// @param scene_context SceneContext containing scene entities and archetypes
 /////////////////////////////////////////////////
 void ProcessNestedUIActionsAndEvents(UIElement &ui_element,
                                      EventHandler &event_handler,
-                                     const LogicContext &logic_context);
+                                     const SceneContext &scene_context);
 
 /////////////////////////////////////////////////
 /// @brief Process actions for a ButtonElement
@@ -75,8 +75,8 @@ void ProcessButtonElementActions(ButtonElement &button_element,
 /// DataPopulateFunction enum value.
 ///
 /// @param dropdown_list_element DropDownListElement to process
-/// @param logic_context LogicContext containing scene entities and archetypes
+/// @param scene_context SceneContext containing scene entities and archetypes
 /////////////////////////////////////////////////
 void ProcessDropDownListElementActions(DropDownListElement &dropdown_list_element,
-                                       const LogicContext &logic_context);
+                                       const SceneContext &scene_context);
 } // namespace steamrot
