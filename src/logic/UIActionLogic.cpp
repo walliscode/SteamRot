@@ -18,17 +18,17 @@
 using namespace magic_enum::bitwise_operators;
 namespace steamrot {
 /////////////////////////////////////////////////
-UIActionLogic::UIActionLogic(const LogicContext logic_context)
-    : Logic(logic_context) {}
+UIActionLogic::UIActionLogic(const SceneContext scene_context)
+    : Logic(scene_context) {}
 
 /////////////////////////////////////////////////
 void UIActionLogic::ProcessLogic() {
 
   ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<CUserInterface>();
 
-  const auto it = m_logic_context.archetypes.find(archetype_id);
+  const auto it = m_scene_context.archetypes.find(archetype_id);
   // if it is not in the archetyps map, then skip
-  if (it != m_logic_context.archetypes.end()) {
+  if (it != m_scene_context.archetypes.end()) {
 
     // get the archetype from the map
     const Archetype &archetype = it->second;
@@ -38,12 +38,12 @@ void UIActionLogic::ProcessLogic() {
 
       // get the CUserInterface component
       CUserInterface &ui_component = entity::memory::GetComponent<CUserInterface>(
-          entity_id, m_logic_context.scene_entities);
+          entity_id, m_scene_context.scene_entities);
 
       // Perform any aciton logic here, processing nested elements recursively
       ProcessNestedUIActionsAndEvents(*ui_component.m_root_element,
-                                      m_logic_context.event_handler,
-                                      m_logic_context);
+                                      m_scene_context.event_handler,
+                                      m_scene_context);
     }
   }
 }
@@ -51,7 +51,7 @@ void UIActionLogic::ProcessLogic() {
 /////////////////////////////////////////////////
 void ProcessUIActionsAndEvents(UIElement &ui_element,
                                EventHandler &event_handler,
-                               const LogicContext &logic_context) {
+                               const SceneContext &scene_context) {
 
   // check the subscription first
   if (!ui_element.subscription) {
@@ -70,7 +70,7 @@ void ProcessUIActionsAndEvents(UIElement &ui_element,
     ProcessButtonElementActions(*button_element, event_handler);
   } else if (DropDownListElement *dropdown_list_element =
                  dynamic_cast<DropDownListElement *>(&ui_element)) {
-    ProcessDropDownListElementActions(*dropdown_list_element, logic_context);
+    ProcessDropDownListElementActions(*dropdown_list_element, scene_context);
   }
 
   // FINALLY set the subscriber to inactive
@@ -80,7 +80,7 @@ void ProcessUIActionsAndEvents(UIElement &ui_element,
 /////////////////////////////////////////////////
 void ProcessNestedUIActionsAndEvents(UIElement &ui_element,
                                      EventHandler &event_handler,
-                                     const LogicContext &logic_context) {
+                                     const SceneContext &scene_context) {
   // bool to keep track if any child was processed
   bool child_processed = false;
 
@@ -93,7 +93,7 @@ void ProcessNestedUIActionsAndEvents(UIElement &ui_element,
 
     // go as deep as possible first, this will stop when no children are
     // detected
-    ProcessNestedUIActionsAndEvents(*child, event_handler, logic_context);
+    ProcessNestedUIActionsAndEvents(*child, event_handler, scene_context);
 
     // If the child had an active subscription, it (or one of its descendants)
     // was processed
@@ -107,7 +107,7 @@ void ProcessNestedUIActionsAndEvents(UIElement &ui_element,
 
   if (!child_processed) {
     // this will occur if no child was processed (or no children exist)
-    ProcessUIActionsAndEvents(ui_element, event_handler, logic_context);
+    ProcessUIActionsAndEvents(ui_element, event_handler, scene_context);
   }
 }
 
@@ -134,7 +134,7 @@ void ProcessButtonElementActions(ButtonElement &button_element,
 /////////////////////////////////////////////////
 void ProcessDropDownListElementActions(
     DropDownListElement &dropdown_list_element,
-    const LogicContext &logic_context) {
+    const SceneContext &scene_context) {
 
   // Only populate if the function is set and not None
   if (dropdown_list_element.data_populate_function ==
@@ -149,8 +149,8 @@ void ProcessDropDownListElementActions(
     ArchetypeID grimoire_archetype_id =
         GenerateArchetypeIDfromTypes<CGrimoireMachina>();
 
-    const auto it = logic_context.archetypes.find(grimoire_archetype_id);
-    if (it != logic_context.archetypes.end()) {
+    const auto it = scene_context.archetypes.find(grimoire_archetype_id);
+    if (it != scene_context.archetypes.end()) {
       const Archetype &archetype = it->second;
 
       // Get the first entity with CGrimoireMachina (should only be one)
@@ -158,7 +158,7 @@ void ProcessDropDownListElementActions(
         size_t entity_id = *archetype.begin();
         const CGrimoireMachina &grimoire_machina =
             entity::memory::GetComponent<CGrimoireMachina>(
-                entity_id, logic_context.scene_entities);
+                entity_id, scene_context.scene_entities);
 
         // Get all fragment names
         std::vector<std::string> fragment_names =
@@ -183,8 +183,8 @@ void ProcessDropDownListElementActions(
     ArchetypeID grimoire_archetype_id =
         GenerateArchetypeIDfromTypes<CGrimoireMachina>();
 
-    const auto it = logic_context.archetypes.find(grimoire_archetype_id);
-    if (it != logic_context.archetypes.end()) {
+    const auto it = scene_context.archetypes.find(grimoire_archetype_id);
+    if (it != scene_context.archetypes.end()) {
       const Archetype &archetype = it->second;
 
       // Get the first entity with CGrimoireMachina (should only be one)
@@ -192,7 +192,7 @@ void ProcessDropDownListElementActions(
         size_t entity_id = *archetype.begin();
         const CGrimoireMachina &grimoire_machina =
             entity::memory::GetComponent<CGrimoireMachina>(
-                entity_id, logic_context.scene_entities);
+                entity_id, scene_context.scene_entities);
 
         // Get all joint names
         std::vector<std::string> joint_names =

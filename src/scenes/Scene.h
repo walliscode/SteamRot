@@ -16,6 +16,7 @@
 #include "GameContext.h"
 #include "Logic.h"
 #include "LogicFactory.h"
+#include "SceneResources.h"
 #include "global_constants.h"
 #include "scene_change_packet_generated.h"
 #include <SFML/Graphics.hpp>
@@ -72,9 +73,9 @@ protected:
       m_logic_map;
 
   /////////////////////////////////////////////////
-  /// @brief RenderTexture for the Scene instance.
+  /// @brief Scene-level resources (render texture, etc.).
   /////////////////////////////////////////////////
-  sf::RenderTexture m_render_texture{kWindowSize};
+  SceneResources m_scene_resources;
 
   /////////////////////////////////////////////////
   /// @brief Is the Scene active? Should update logic and render texture
@@ -170,11 +171,11 @@ public:
   const SceneInfo &GetSceneInfo() const;
 
   /////////////////////////////////////////////////
-  /// @brief Create and return a LogicContext for the Scene.
+  /// @brief Create and return a SceneContext for the Scene.
   ///
-  /// @return a Scene specific LogicContext object
+  /// @return a Scene specific SceneContext object
   /////////////////////////////////////////////////
-  LogicContext GetLogicContext();
+  SceneContext GetSceneContext();
 
 #ifdef DEBUG
   const EntityMemoryPool &GetEntityMemoryPool() const;

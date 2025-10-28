@@ -79,7 +79,7 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type,
   }
 
   // configure LogicMap
-  LogicFactory logic_factory(scene_type, scene_ptr->GetLogicContext());
+  LogicFactory logic_factory(scene_type, scene_ptr->GetSceneContext());
   auto create_map_result = logic_factory.CreateLogicMap();
   if (!create_map_result) {
     return std::unexpected(create_map_result.error());

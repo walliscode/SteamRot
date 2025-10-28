@@ -8,7 +8,10 @@
 ////////////////////////////////////////////////////////////
 #include "Scene.h"
 #include "EntityManager.h"
+#include "GameResources.h"
 #include "LogicFactory.h"
+#include "SceneContext.h"
+#include "SceneResources.h"
 #include "scene_change_packet_generated.h"
 
 namespace steamrot {
@@ -34,7 +37,9 @@ const EntityMemoryPool &Scene::GetEntityMemoryPool() const {
 #endif
 
 /////////////////////////////////////////////////
-sf::RenderTexture &Scene::GetRenderTexture() { return m_render_texture; }
+sf::RenderTexture &Scene::GetRenderTexture() {
+  return m_scene_resources.scene_texture;
+}
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
@@ -65,18 +70,12 @@ void Scene::SetLogicMap(
 const SceneInfo &Scene::GetSceneInfo() const { return m_scene_info; }
 
 /////////////////////////////////////////////////
-LogicContext Scene::GetLogicContext() {
+SceneContext Scene::GetSceneContext() {
 
-  LogicContext logic_context{
-      m_entity_manager.GetEntityMemoryPool(),
-      m_entity_manager.GetArchetypeManager().GetArchetypes(),
-      m_render_texture,
-      m_game_context.game_window,
-      m_game_context.asset_manager,
-      m_game_context.event_handler,
-      m_game_context.mouse_position};
+  SceneContext scene_context{m_scene_resources, m_game_context.game_resources,
+                             m_entity_manager};
 
-  return logic_context;
+  return scene_context;
 }
 #ifdef DEBUG
 /////////////////////////////////////////////////

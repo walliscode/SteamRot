@@ -7,8 +7,8 @@
 
 namespace steamrot {
 /////////////////////////////////////////////////
-UICollisionLogic::UICollisionLogic(const LogicContext logic_context)
-    : Logic(logic_context) {}
+UICollisionLogic::UICollisionLogic(const SceneContext scene_context)
+    : Logic(scene_context) {}
 
 /////////////////////////////////////////////////
 void UICollisionLogic::ProcessLogic() {
@@ -17,10 +17,10 @@ void UICollisionLogic::ProcessLogic() {
   ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<CUserInterface>();
 
   // check if archetype exists
-  auto const it = m_logic_context.archetypes.find(archetype_id);
+  auto const it = m_scene_context.archetypes.find(archetype_id);
 
   // if archetype does not exist, we return
-  if (it == m_logic_context.archetypes.end()) {
+  if (it == m_scene_context.archetypes.end()) {
     return;
   }
 
@@ -32,9 +32,9 @@ void UICollisionLogic::ProcessLogic() {
 
     // get the CUserInterface component
     CUserInterface &ui_component = entity::memory::GetComponent<CUserInterface>(
-        entity_id, m_logic_context.scene_entities);
+        entity_id, m_scene_context.scene_entities);
 
-    logic::collision::CheckMouseOverNestedUIElement(m_logic_context.mouse_position,
+    logic::collision::CheckMouseOverNestedUIElement(m_scene_context.mouse_position,
                                              *ui_component.m_root_element);
   };
 }
