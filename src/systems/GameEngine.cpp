@@ -3,6 +3,7 @@
 ////////////////////////////////////////////////////////////
 
 #include "GameEngine.h"
+#include "ContextConfigurator.h"
 #include "FailInfo.h"
 #include "FlatbuffersDataLoader.h"
 #include "GameContext.h"
@@ -21,11 +22,13 @@ namespace steamrot {
 ///////////////////////////////////////////////////////////
 
 GameEngine::GameEngine(EnvironmentType env_type)
-    : m_window({sf::VideoMode({800, 600}), "SteamRot"}),
-      m_game_context(m_window, m_event_handler, m_loop_number, m_asset_manager,
-                     env_type),
+    : m_game_context(m_game_resources),
       m_scene_manager(m_game_context),
-      m_display_manager(m_window, m_scene_manager) {}
+      m_display_manager(m_game_resources.game_window, m_scene_manager) {
+  // Set initial environment type and loop number
+  m_game_resources.env_type = env_type;
+  m_game_resources.loop_number = 1;
+}
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> GameEngine::ConfigureGameEngineFromData(
@@ -58,68 +61,89 @@ void GameEngine::RunGame(size_t number_of_loops, bool simulation) {
 
 /////////////////////////////////////////////////
 void GameEngine::StartUp() {
-  // limit window framerate
-  m_window.setFramerateLimit(60);
+  FlatbuffersDataLoader data_loader;
+
+  // Configure GameResources from context data
+  auto context_data_result = data_loader.ProvideContextData();
+  if (!context_data_result) {
+    std::cerr << "Failed to load context data: "
+              << context_data_result.error().message << "\n";
+    if (m_game_resources.game_window.isOpen()) {
+      m_game_resources.game_window.close();
+    }
+    return;
+  }
+
+  ContextConfigurator context_configurator(context_data_result.value());
+  auto configure_resources_result =
+      context_configurator.ConfigureGameResources(m_game_resources);
+  if (!configure_resources_result) {
+    std::cerr << "Failed to configure game resources: "
+              << configure_resources_result.error().message << "\n";
+    if (m_game_resources.game_window.isOpen()) {
+      m_game_resources.game_window.close();
+    }
+    return;
+  }
 
   // configure the GameEngine from data
-  FlatbuffersDataLoader data_loader;
   auto load_data_result = data_loader.ProvideGameEngineData();
-  if (!load_data_result)
-    if (!load_data_result) {
-      std::cerr << "Failed to load game engine data: "
-                << load_data_result.error().message << "\n";
-      m_window.close();
-    }
+  if (!load_data_result) {
+    std::cerr << "Failed to load game engine data: "
+              << load_data_result.error().message << "\n";
+    m_game_resources.game_window.close();
+    return;
+  }
   auto configure_result = ConfigureGameEngineFromData(load_data_result.value());
-  if (!configure_result)
-    if (!configure_result) {
-      std::cerr << "Failed to configure game engine: "
-                << configure_result.error().message << "\n";
-      m_window.close();
-    }
+  if (!configure_result) {
+    std::cerr << "Failed to configure game engine: "
+              << configure_result.error().message << "\n";
+    m_game_resources.game_window.close();
+    return;
+  }
 
   // load default assets
-  auto load_assets_result = m_asset_manager.LoadDefaultAssets();
-  if (!load_assets_result)
-    if (!load_assets_result) {
-      std::cerr << "Failed to load default assets: "
-                << load_assets_result.error().message << "\n";
-      m_window.close();
-    }
+  auto load_assets_result = m_game_resources.asset_manager.LoadDefaultAssets();
+  if (!load_assets_result) {
+    std::cerr << "Failed to load default assets: "
+              << load_assets_result.error().message << "\n";
+    m_game_resources.game_window.close();
+    return;
+  }
 
   // Configure the SceneManager from data
   auto configure_sm_result = m_scene_manager.ConfigureSceneManagerFromData(
       data_loader.ProvideSceneManagerData().value());
-  if (!configure_sm_result)
-    if (!configure_sm_result) {
-      std::cerr << "Failed to configure scene manager: "
-                << configure_sm_result.error().message << "\n";
-      m_window.close();
-    }
+  if (!configure_sm_result) {
+    std::cerr << "Failed to configure scene manager: "
+              << configure_sm_result.error().message << "\n";
+    m_game_resources.game_window.close();
+    return;
+  }
   // load the title scene
   auto load_scene_result = m_scene_manager.LoadTitleScene();
-  if (!load_scene_result)
-    if (!load_scene_result) {
-      std::cerr << "Failed to load title scene: "
-                << load_scene_result.error().message << "\n";
-      m_window.close();
-    }
+  if (!load_scene_result) {
+    std::cerr << "Failed to load title scene: "
+              << load_scene_result.error().message << "\n";
+    m_game_resources.game_window.close();
+    return;
+  }
 }
 
 void GameEngine::RunGameLoop(size_t number_of_loops, bool simulation) {
 
   // Run the program as long as the window is open
-  while (m_window.isOpen()) {
+  while (m_game_resources.game_window.isOpen()) {
 
     // Handle all system updates
     UpdateSystems();
 
     // statement to handle simulation mode
-    if (simulation && (number_of_loops == m_loop_number))
+    if (simulation && (number_of_loops == m_game_resources.loop_number))
       break;
 
     // Increment the loop counter
-    m_loop_number++;
+    m_game_resources.loop_number++;
   }
 }
 
@@ -130,18 +154,18 @@ void GameEngine::UpdateSystems() {
 
   // Preload Events, namely any external events that need adding to the waiting
   // room
-  m_event_handler.PreloadEvents(m_window);
+  m_game_resources.event_handler.PreloadEvents(m_game_resources.game_window);
   // Process Waiting Room Event Bus into Global Event Bus
-  m_event_handler.ProcessWaitingRoomEventBus();
+  m_game_resources.event_handler.ProcessWaitingRoomEventBus();
   // Update Subscribers from Global Event Bus
-  m_event_handler.UpateSubscribersFromGlobalEventBus();
+  m_game_resources.event_handler.UpateSubscribersFromGlobalEventBus();
 
   // Handle subscriptions for the GameEngine
   auto process_subscriptions_result = ProcessSubscriptions();
   if (!process_subscriptions_result.has_value()) {
     std::cerr << "Failed to process subscriptions: "
               << process_subscriptions_result.error().message << "\n";
-    m_window.close();
+    m_game_resources.game_window.close();
   }
   // Update EventHandler
 
@@ -152,11 +176,13 @@ void GameEngine::UpdateSystems() {
   auto call_render_cycle_result = m_display_manager.CallRenderCycle();
 
   // Tick the Global Event Bus
-  m_event_handler.TickGlobalEventBus();
+  m_game_resources.event_handler.TickGlobalEventBus();
 }
 
 ////////////////////////////////////////////////////////////
-size_t GameEngine::GetLoopNumber() const { return m_loop_number; }
+size_t GameEngine::GetLoopNumber() const {
+  return m_game_resources.loop_number;
+}
 
 ////////////////////////////////////////////////////////////
 void GameEngine::ShutDown() {}
@@ -189,7 +215,7 @@ GameEngine::ConfigureSubscribersFromData(
   }
 
   // set up SubscriberFactory
-  SubscriberFactory subscriber_factory(m_event_handler);
+  SubscriberFactory subscriber_factory(m_game_resources.event_handler);
   // loop through the SubscriberData and create subscribers and register them
   for (const auto &subscription : *subscriptions) {
 
@@ -229,7 +255,7 @@ std::expected<std::monostate, FailInfo> GameEngine::ProcessSubscriptions() {
       switch (subscriber->GetEventType()) {
       case EventType::EventType_EVENT_QUIT_GAME: {
         // close the window to quit the game
-        m_window.close();
+        m_game_resources.game_window.close();
         break;
       }
       default:
@@ -244,7 +270,9 @@ std::expected<std::monostate, FailInfo> GameEngine::ProcessSubscriptions() {
 }
 
 /////////////////////////////////////////////////
-const sf::RenderWindow &GameEngine::GetWindow() const { return m_window; }
+const sf::RenderWindow &GameEngine::GetWindow() const {
+  return m_game_resources.game_window;
+}
 
 /////////////////////////////////////////////////
 void GameEngine::UpdateGameContext(GameContext &game_context) {

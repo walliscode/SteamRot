@@ -81,10 +81,7 @@ EntityManager &TestFixture::GetEntityManager() { return m_entity_manager; }
 ////////////////////////////////////////////////////////////
 GameContext &TestFixture::GetGameContext() {
   if (!m_game_context) {
-    m_game_context = std::make_unique<GameContext>(
-        m_game_resources.game_window, m_game_resources.event_handler,
-        m_game_resources.loop_number, m_game_resources.asset_manager,
-        m_game_resources.env_type);
+    m_game_context = std::make_unique<GameContext>(m_game_resources);
   }
   return *m_game_context;
 }
