@@ -15,6 +15,7 @@
 #include "FailInfo.h"
 #include "context_data_generated.h"
 #include "game_engine_generated.h"
+#include "resource_data_generated.h"
 #include "scene_change_packet_generated.h"
 #include "scene_manager_generated.h"
 #include "scenes_generated.h"
@@ -92,6 +93,18 @@ public:
   /// @brief Provides ContextData from binary file
   /////////////////////////////////////////////////
   std::expected<const ContextData *, FailInfo> ProvideContextData() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Provides GameResourcesData from binary file
+  /////////////////////////////////////////////////
+  std::expected<const GameResourcesData *, FailInfo>
+  ProvideGameResourcesData() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Provides SceneResourcesData from SceneData for a specific scene
+  /////////////////////////////////////////////////
+  std::expected<const SceneResourcesData *, FailInfo>
+  ProvideSceneResourcesData(const SceneType scene_type) const;
 };
 
 } // namespace steamrot

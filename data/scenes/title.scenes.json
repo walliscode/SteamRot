@@ -91,5 +91,10 @@
     ]
   },
 
-  "assets": {}
+  "assets": {},
+
+  "scene_resources": {
+    "render_texture_width": 800,
+    "render_texture_height": 600
+  }
 }

@@ -11,8 +11,8 @@
 namespace steamrot {
 
 ////////////////////////////////////////////////////////////
-ResourceConfigurator::ResourceConfigurator(const ContextData *config)
-    : m_config_data(config) {}
+ResourceConfigurator::ResourceConfigurator(const GameResourcesData *game_data)
+    : m_game_resources_data(game_data) {}
 
 ////////////////////////////////////////////////////////////
 std::expected<EnvironmentType, FailInfo>
@@ -32,17 +32,12 @@ ResourceConfigurator::ParseEnvironmentType(const std::string &type_str) const {
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 ResourceConfigurator::ConfigureGameResources(GameResources &resources) const {
-  if (!m_config_data) {
+  if (!m_game_resources_data) {
     return std::unexpected(
-        FailInfo{FailMode::NullPointer, "ContextData is null"});
+        FailInfo{FailMode::NullPointer, "GameResourcesData is null"});
   }
 
-  if (!m_config_data->game_context()) {
-    return std::unexpected(FailInfo{FailMode::MissingRequiredField,
-                                    "GameContextConfig is missing"});
-  }
-
-  const GameContextConfig *game_config = m_config_data->game_context();
+  const GameResourcesData *game_config = m_game_resources_data;
 
   // Parse and set environment type if provided
   if (game_config->environment_type()) {
@@ -74,36 +69,20 @@ ResourceConfigurator::ConfigureGameResources(GameResources &resources) const {
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 ResourceConfigurator::ConfigureSceneResources(
-    SceneResources &resources, const SceneType &scene_type) const {
-  if (!m_config_data) {
-    return std::unexpected(
-        FailInfo{FailMode::NullPointer, "ContextData is null"});
+    SceneResources &resources, const SceneResourcesData *scene_data) const {
+  
+  // Default dimensions
+  uint32_t texture_width = 800;
+  uint32_t texture_height = 600;
+
+  // Use configured dimensions if provided
+  if (scene_data) {
+    texture_width = scene_data->render_texture_width();
+    texture_height = scene_data->render_texture_height();
   }
 
-  if (!m_config_data->scene_contexts()) {
-    return std::unexpected(
-        FailInfo{FailMode::MissingRequiredField, "Scene contexts are missing"});
-  }
-
-  // Find the configuration for the requested scene type
-  const SceneContextConfig *scene_config = nullptr;
-  for (const auto *config : *m_config_data->scene_contexts()) {
-    if (config && config->scene_type() == scene_type) {
-      scene_config = config;
-      break;
-    }
-  }
-
-  if (!scene_config) {
-    return std::unexpected(
-        FailInfo{FailMode::SceneTypeNotFound,
-                 "Scene configuration not found for requested scene type"});
-  }
-
-  // Create the render texture with configured dimensions (SFML 3.0 API)
-  sf::Vector2u texture_size(scene_config->render_texture_width(),
-                            scene_config->render_texture_height());
-
+  // Create the render texture with configured or default dimensions (SFML 3.0 API)
+  sf::Vector2u texture_size(texture_width, texture_height);
   resources.scene_texture = sf::RenderTexture(texture_size);
 
   return std::monostate{};

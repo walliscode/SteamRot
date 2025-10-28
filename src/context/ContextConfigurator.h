@@ -13,7 +13,6 @@
 /////////////////////////////////////////////////
 #include "FailInfo.h"
 #include "GameResources.h"
-#include "ResourceConfigurator.h"
 #include "SceneResources.h"
 #include "context_data_generated.h"
 #include "scene_change_packet_generated.h"
@@ -27,11 +26,13 @@ namespace steamrot {
 /// @brief Configures resources from FlatBuffers data.
 ///
 /// Provides a simplified interface that wraps ResourceConfigurator
-/// for configuring GameResources and SceneResources.
+/// for configuring GameResources and SceneResources. This class
+/// maintains backward compatibility while separating resource
+/// configuration from context configuration.
 /////////////////////////////////////////////////
 class ContextConfigurator {
 private:
-  ResourceConfigurator m_resource_configurator;
+  const ContextData *m_context_data{nullptr};
 
 public:
   /////////////////////////////////////////////////
@@ -44,8 +45,8 @@ public:
   /////////////////////////////////////////////////
   /// @brief Configure GameResources from FlatBuffers data.
   ///
-  /// Configures window settings, environment type, and other game-level
-  /// resources from the configuration data.
+  /// Loads GameResourcesData and uses ResourceConfigurator to configure
+  /// the GameResources instance.
   ///
   /// @param resources GameResources instance to configure
   /// @return Expected containing monostate or FailInfo on error
@@ -56,8 +57,8 @@ public:
   /////////////////////////////////////////////////
   /// @brief Configure SceneResources from FlatBuffers data.
   ///
-  /// Configures scene-level resources (render texture) for the specified
-  /// scene type from the configuration data.
+  /// Loads SceneResourcesCollection and uses ResourceConfigurator to
+  /// configure the SceneResources instance.
   ///
   /// @param resources SceneResources instance to configure
   /// @param scene_type Scene type to get configuration for

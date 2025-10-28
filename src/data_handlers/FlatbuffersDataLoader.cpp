@@ -349,4 +349,40 @@ FlatbuffersDataLoader::ProvideContextData() const {
   return context_data;
 }
 
+/////////////////////////////////////////////////
+std::expected<const GameResourcesData *, FailInfo>
+FlatbuffersDataLoader::ProvideGameResourcesData() const {
+  // Load from GameEngineData
+  auto game_engine_result = ProvideGameEngineData();
+  if (!game_engine_result.has_value()) {
+    return std::unexpected(game_engine_result.error());
+  }
+
+  const GameEngineData *game_engine_data = game_engine_result.value();
+  if (!game_engine_data->game_resources()) {
+    return std::unexpected(
+        FailInfo(FailMode::FlatbuffersDataNotFound,
+                 "GameResourcesData not found in GameEngineData"));
+  }
+
+  return game_engine_data->game_resources();
+}
+
+/////////////////////////////////////////////////
+std::expected<const SceneResourcesData *, FailInfo>
+FlatbuffersDataLoader::ProvideSceneResourcesData(
+    const SceneType scene_type) const {
+  // Load from SceneData for the specified scene type
+  auto scene_data_result = ProvideSceneData(scene_type);
+  if (!scene_data_result.has_value()) {
+    return std::unexpected(scene_data_result.error());
+  }
+
+  const SceneData *scene_data = scene_data_result.value();
+  
+  // scene_resources is optional, so it's okay if it's not present
+  // Return nullptr if not configured - caller should handle defaults
+  return scene_data->scene_resources();
+}
+
 } // namespace steamrot
