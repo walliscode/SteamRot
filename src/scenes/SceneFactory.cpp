@@ -7,7 +7,9 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "SceneFactory.h"
+#include "ContextConfigurator.h"
 #include "CraftingScene.h"
+#include "FlatbuffersDataLoader.h"
 #include "TitleScene.h"
 #include "uuid.h"
 #include <memory>
@@ -64,6 +66,20 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type,
     FailInfo fail_info(FailMode::NonExistentEnumValue, "SceneType not found");
 
     return std::unexpected(fail_info);
+  }
+
+  // Configure SceneResources from FlatBuffers data
+  FlatbuffersDataLoader data_loader;
+  auto context_data_result = data_loader.ProvideContextData();
+  if (!context_data_result) {
+    return std::unexpected(context_data_result.error());
+  }
+
+  ContextConfigurator context_configurator(context_data_result.value());
+  auto configure_resources_result = context_configurator.ConfigureSceneResources(
+      scene_ptr->m_scene_resources, scene_type);
+  if (!configure_resources_result) {
+    return std::unexpected(configure_resources_result.error());
   }
 
   // configure scene entities from default data
