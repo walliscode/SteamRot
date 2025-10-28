@@ -3,6 +3,17 @@ include "scene_change_packet.fbs";
 namespace steamrot;
 
 ////////////////////////////////////////////////////////////
+// Configuration for GameResources
+////////////////////////////////////////////////////////////
+table GameResourcesData {
+  window_width: uint32 = 800;
+  window_height: uint32 = 600;
+  window_title: string;
+  framerate_limit: uint32 = 60;
+  environment_type: string; // "None", "Test", "Production"
+}
+
+////////////////////////////////////////////////////////////
 // Configuration for a single scene's resources
 ////////////////////////////////////////////////////////////
 table SceneResourcesData {
@@ -17,5 +28,3 @@ table SceneResourcesData {
 table SceneResourcesCollection {
   scenes: [SceneResourcesData];
 }
-
-root_type SceneResourcesCollection;

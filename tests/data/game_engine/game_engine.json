@@ -3,9 +3,9 @@
   "game_resources": {
     "window_width": 800,
     "window_height": 600,
-    "window_title": "SteamRot",
+    "window_title": "SteamRot Test",
     "framerate_limit": 60,
-    "environment_type": "Production"
+    "environment_type": "Test"
   },
   "scene_resources": {
     "scenes": [

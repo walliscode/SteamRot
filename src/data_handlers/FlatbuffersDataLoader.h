@@ -15,10 +15,9 @@
 #include "FailInfo.h"
 #include "context_data_generated.h"
 #include "game_engine_generated.h"
-#include "game_resources_generated.h"
+#include "resource_data_generated.h"
 #include "scene_change_packet_generated.h"
 #include "scene_manager_generated.h"
-#include "scene_resources_generated.h"
 #include "scenes_generated.h"
 #include "ui_style_generated.h"
 #include <expected>

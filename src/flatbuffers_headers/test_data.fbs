@@ -1,4 +1,5 @@
 include "entities.fbs";
+include "resource_data.fbs";
 
 namespace steamrot;
 
@@ -45,6 +46,10 @@ table TestDataConfig {
   
   /// @brief Expected state entity collection for comparison tests
   expected_entity_collection: EntityCollection;
+  
+  /// @brief Resource data for test fixtures
+  game_resources: GameResourcesData;
+  scene_resources: SceneResourcesCollection;
   
   /// @brief Reserved for future test data types
   /// Can be extended with additional fields like:

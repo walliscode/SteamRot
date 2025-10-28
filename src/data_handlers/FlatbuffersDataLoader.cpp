@@ -352,66 +352,39 @@ FlatbuffersDataLoader::ProvideContextData() const {
 /////////////////////////////////////////////////
 std::expected<const GameResourcesData *, FailInfo>
 FlatbuffersDataLoader::ProvideGameResourcesData() const {
-  // get data directory
-  auto data_dir_result = m_path_provider.GetDataDirectory();
-  if (!data_dir_result.has_value()) {
-    return std::unexpected(data_dir_result.error());
+  // Load from GameEngineData
+  auto game_engine_result = ProvideGameEngineData();
+  if (!game_engine_result.has_value()) {
+    return std::unexpected(game_engine_result.error());
   }
 
-  // construct the file path
-  std::filesystem::path resources_path =
-      data_dir_result.value() / "resources" / "game_resources.game_resources.bin";
-
-  // check if the file exists
-  if (!std::filesystem::exists(resources_path)) {
-    std::string error_message = std::format(
-        "Game resources data file not found: {}", resources_path.string());
-    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
+  const GameEngineData *game_engine_data = game_engine_result.value();
+  if (!game_engine_data->game_resources()) {
+    return std::unexpected(
+        FailInfo(FailMode::FlatbuffersDataNotFound,
+                 "GameResourcesData not found in GameEngineData"));
   }
 
-  // load the game resources data
-  const steamrot::GameResourcesData *resources_data =
-      GetGameResourcesData(LoadBinaryData(resources_path));
-
-  if (!resources_data) {
-    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
-                                    "GameResourcesData pointer is null"));
-  }
-
-  return resources_data;
+  return game_engine_data->game_resources();
 }
 
 /////////////////////////////////////////////////
 std::expected<const SceneResourcesCollection *, FailInfo>
 FlatbuffersDataLoader::ProvideSceneResourcesData() const {
-  // get data directory
-  auto data_dir_result = m_path_provider.GetDataDirectory();
-  if (!data_dir_result.has_value()) {
-    return std::unexpected(data_dir_result.error());
+  // Load from GameEngineData
+  auto game_engine_result = ProvideGameEngineData();
+  if (!game_engine_result.has_value()) {
+    return std::unexpected(game_engine_result.error());
   }
 
-  // construct the file path
-  std::filesystem::path resources_path = data_dir_result.value() / "resources" /
-                                         "scene_resources.scene_resources.bin";
-
-  // check if the file exists
-  if (!std::filesystem::exists(resources_path)) {
-    std::string error_message = std::format(
-        "Scene resources data file not found: {}", resources_path.string());
-    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
-  }
-
-  // load the scene resources data
-  const steamrot::SceneResourcesCollection *resources_data =
-      GetSceneResourcesCollection(LoadBinaryData(resources_path));
-
-  if (!resources_data) {
+  const GameEngineData *game_engine_data = game_engine_result.value();
+  if (!game_engine_data->scene_resources()) {
     return std::unexpected(
         FailInfo(FailMode::FlatbuffersDataNotFound,
-                 "SceneResourcesCollection pointer is null"));
+                 "SceneResourcesCollection not found in GameEngineData"));
   }
 
-  return resources_data;
+  return game_engine_data->scene_resources();
 }
 
 } // namespace steamrot

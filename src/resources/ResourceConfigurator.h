@@ -11,9 +11,8 @@
 #include "FailInfo.h"
 #include "GameResources.h"
 #include "SceneResources.h"
-#include "game_resources_generated.h"
+#include "resource_data_generated.h"
 #include "scene_change_packet_generated.h"
-#include "scene_resources_generated.h"
 #include <expected>
 #include <string>
 
