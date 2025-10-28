@@ -150,12 +150,6 @@ Build system automatically:
 
 ## Testing
 
-### Unit Tests
-```bash
-# Tests auto-discovered by CTest (user runs locally)
-test_context --test-case-name="ContextConfigurator*"
-```
-
 ### Integration Tests
 ```bash
 # Full workflow tests (user runs locally)
