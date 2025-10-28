@@ -24,9 +24,8 @@ ResourceConfigurator::ParseEnvironmentType(const std::string &type_str) const {
   } else if (type_str == "Production") {
     return EnvironmentType::Production;
   } else {
-    return std::unexpected(
-        FailInfo{FailMode::NonExistentEnumValue,
-                 "Unknown environment type: " + type_str});
+    return std::unexpected(FailInfo{FailMode::NonExistentEnumValue,
+                                    "Unknown environment type: " + type_str});
   }
 }
 
@@ -40,7 +39,7 @@ ResourceConfigurator::ConfigureGameResources(GameResources &resources) const {
 
   if (!m_config_data->game_context()) {
     return std::unexpected(FailInfo{FailMode::MissingRequiredField,
-                                     "GameContextConfig is missing"});
+                                    "GameContextConfig is missing"});
   }
 
   const GameContextConfig *game_config = m_config_data->game_context();
@@ -82,8 +81,8 @@ ResourceConfigurator::ConfigureSceneResources(
   }
 
   if (!m_config_data->scene_contexts()) {
-    return std::unexpected(FailInfo{FailMode::MissingRequiredField,
-                                     "Scene contexts are missing"});
+    return std::unexpected(
+        FailInfo{FailMode::MissingRequiredField, "Scene contexts are missing"});
   }
 
   // Find the configuration for the requested scene type
@@ -104,14 +103,8 @@ ResourceConfigurator::ConfigureSceneResources(
   // Create the render texture with configured dimensions (SFML 3.0 API)
   sf::Vector2u texture_size(scene_config->render_texture_width(),
                             scene_config->render_texture_height());
-  
+
   resources.scene_texture = sf::RenderTexture(texture_size);
-  
-  if (!resources.scene_texture) {
-    return std::unexpected(
-        FailInfo{FailMode::ResourceCreationFailure,
-                 "Failed to create scene render texture"});
-  }
 
   return std::monostate{};
 }
