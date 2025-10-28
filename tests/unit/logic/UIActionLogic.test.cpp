@@ -9,7 +9,7 @@
 #include "UIActionLogic.h"
 #include "EventPacket.h"
 #include "Subscriber.h"
-#include "TestContext.h"
+#include "TestFixture.h"
 #include "events_generated.h"
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
@@ -20,10 +20,10 @@
 TEST_CASE("UIActionLogic::UIActionLogic Constructor", "[unit][UIActionLogic]") {
   // Create a dummy SceneContext
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestContext test_context;
+  steamrot::tests::TestFixture test_context;
   // Instantiate UIActionLogic
   steamrot::UIActionLogic ui_action_logic(
-      test_context.GetSceneContextForTestScene());
+      test_context.GetSceneContext());
   SUCCEED("UIActionLogic instantiated successfully");
 }
 
@@ -32,9 +32,9 @@ TEST_CASE(
     "[unit][UIActionLogic]") {
   // arrange the UIActionLogic
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestContext test_context;
+  steamrot::tests::TestFixture test_context;
   steamrot::UIActionLogic ui_action_logic(
-      test_context.GetSceneContextForTestScene());
+      test_context.GetSceneContext());
 
   // assert that the EventBus has no events
   REQUIRE(
@@ -75,9 +75,9 @@ TEST_CASE("UIActionLogic adds Event to EventBus for ButtonElement with a "
 
   // arrange the UIActionLogic
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestContext test_context;
+  steamrot::tests::TestFixture test_context;
   steamrot::UIActionLogic ui_action_logic(
-      test_context.GetSceneContextForTestScene());
+      test_context.GetSceneContext());
   // assert that the EventBus has no events
   REQUIRE(
       test_context.GetGameContext().event_handler.GetGlobalEventBus().size() ==
@@ -119,9 +119,9 @@ TEST_CASE(
 
   // Arrange the UIActionLogic
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestContext test_context;
+  steamrot::tests::TestFixture test_context;
   steamrot::UIActionLogic ui_action_logic(
-      test_context.GetSceneContextForTestScene());
+      test_context.GetSceneContext());
 
   // Assert that the EventBus is empty
   REQUIRE(
@@ -179,7 +179,7 @@ TEST_CASE(
   // bus
   steamrot::ProcessUIActionsAndEvents(
       button_element, test_context.GetGameContext().event_handler,
-      test_context.GetSceneContextForTestScene());
+      test_context.GetSceneContext());
 
   // Assert - that the EventBus still has only the unrelated event (no quit
   // event added)
@@ -199,9 +199,9 @@ TEST_CASE("UIActionLogic checks subscription before adding Event to EventBus "
 
   // arrange the UIActionLogic
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestContext test_context;
+  steamrot::tests::TestFixture test_context;
   steamrot::UIActionLogic ui_action_logic(
-      test_context.GetSceneContextForTestScene());
+      test_context.GetSceneContext());
   // assert that the EventBus has no events
   REQUIRE(
       test_context.GetGameContext().event_handler.GetGlobalEventBus().size() ==
@@ -253,7 +253,7 @@ TEST_CASE("UIActionLogic checks subscription before adding Event to EventBus "
   // event bus
   steamrot::ProcessUIActionsAndEvents(
       button_element, test_context.GetGameContext().event_handler,
-      test_context.GetSceneContextForTestScene());
+      test_context.GetSceneContext());
 
   // move events from waiting room to global event bus
   test_context.GetGameContext().event_handler.ProcessWaitingRoomEventBus();
@@ -274,9 +274,9 @@ TEST_CASE("UIActionLogic sets Subscriber to inactive after processing "
           "[unit][UIActionLogic]") {
   // arrange the UIActionLogic
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestContext test_context;
+  steamrot::tests::TestFixture test_context;
   steamrot::UIActionLogic ui_action_logic(
-      test_context.GetSceneContextForTestScene());
+      test_context.GetSceneContext());
   // assert that the EventBus has no events
   REQUIRE(
       test_context.GetGameContext().event_handler.GetGlobalEventBus().size() ==
@@ -322,7 +322,7 @@ TEST_CASE("UIActionLogic sets Subscriber to inactive after processing "
   // event bus
   steamrot::ProcessUIActionsAndEvents(
       button_element, test_context.GetGameContext().event_handler,
-      test_context.GetSceneContextForTestScene());
+      test_context.GetSceneContext());
 
   test_context.GetGameContext().event_handler.ProcessWaitingRoomEventBus();
   // assert - that the EventBus has two events now
@@ -344,7 +344,7 @@ TEST_CASE("ProcessNestedUIActionsAndEvents processes child before parent "
           "[UIActionLogic][Nested]") {
   // Arrange
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestContext test_context;
+  steamrot::tests::TestFixture test_context;
 
   // Create a parent button element with an active subscription
   auto parent_button = std::make_unique<steamrot::ButtonElement>();
@@ -408,7 +408,7 @@ TEST_CASE("ProcessNestedUIActionsAndEvents processes child before parent "
   // Act - Process nested UI actions
   steamrot::ProcessNestedUIActionsAndEvents(
       *parent_button, test_context.GetGameContext().event_handler,
-      test_context.GetSceneContextForTestScene());
+      test_context.GetSceneContext());
 
   // Assert - Child subscription should be inactive (was processed)
   REQUIRE_FALSE(parent_button->child_elements[0]->subscription->IsActive());
@@ -437,7 +437,7 @@ TEST_CASE("ProcessNestedUIActionsAndEvents processes parent when child has no "
           "[UIActionLogic][Nested]") {
   // Arrange
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestContext test_context;
+  steamrot::tests::TestFixture test_context;
 
   // Create a parent button element with an active subscription
   auto parent_button = std::make_unique<steamrot::ButtonElement>();
@@ -487,7 +487,7 @@ TEST_CASE("ProcessNestedUIActionsAndEvents processes parent when child has no "
   // Act - Process nested UI actions
   steamrot::ProcessNestedUIActionsAndEvents(
       *parent_button, test_context.GetGameContext().event_handler,
-      test_context.GetSceneContextForTestScene());
+      test_context.GetSceneContext());
 
   // Assert - Parent subscription should be inactive (was processed)
   REQUIRE_FALSE(parent_button->subscription->IsActive());

@@ -7,7 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "SceneFactory.h"
-#include "TestContext.h"
+#include "TestFixture.h"
 #include "draw_ui_elements_test_helpers.h"
 #include <catch2/catch_test_macros.hpp>
 
@@ -15,7 +15,7 @@ TEST_CASE("TitleScene's call of sRender is correct", "[unit][TitleScene]") {
 
   // arrange
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestContext test_context;
+  steamrot::tests::TestFixture test_context;
   steamrot::SceneFactory scene_factory;
 
   // create a TitleScene
