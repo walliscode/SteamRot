@@ -9,15 +9,15 @@
 #include "DisplayManager.h"
 #include "PathProvider.h"
 #include "SceneManager.h"
-#include "TestContext.h"
+#include "TestFixture.h"
 #include <catch2/catch_test_macros.hpp>
 #include <iostream>
 
 TEST_CASE("DisplayManager Initializes with SceneManager", "[unit][DisplayManager]") {
 
   steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  steamrot::tests::TestContext test_context;
-  std::cout << "TestContext initialized successfully" << std::endl;
+  steamrot::tests::TestFixture test_context;
+  std::cout << "TestFixture initialized successfully" << std::endl;
   steamrot::GameContext &game_context =
       test_context
           .GetGameContext(); // Get the game context from the test context
@@ -32,7 +32,7 @@ TEST_CASE("DisplayManager Initializes with SceneManager", "[unit][DisplayManager
 
 TEST_CASE("DisplayManager Render Cycle", "[unit][DisplayManager]") {
   steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  steamrot::tests::TestContext test_context;
+  steamrot::tests::TestFixture test_context;
   steamrot::GameContext game_context =
       test_context
           .GetGameContext(); // Get the game context from the test context

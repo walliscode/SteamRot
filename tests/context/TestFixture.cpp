@@ -7,9 +7,11 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "TestFixture.h"
+#include "FlatbuffersConfigurator.h"
 #include "FlatbuffersDataLoader.h"
 #include "PathProvider.h"
 #include "ResourceConfigurator.h"
+#include <iostream>
 
 namespace steamrot::tests {
 
@@ -23,50 +25,39 @@ TestFixture::TestFixture(const SceneType &scene_type)
 
 ////////////////////////////////////////////////////////////
 void TestFixture::ConfigureGameResources() {
-  // Use ResourceConfigurator to configure from test data
-  PathProvider path_provider(EnvironmentType::Test);
-  FlatbuffersDataLoader loader;
-
-  auto context_data_result = loader.ProvideContextData();
-  if (context_data_result.has_value()) {
-    ResourceConfigurator configurator(context_data_result.value());
-    auto config_result = configurator.ConfigureGameResources(m_game_resources);
-
-    if (config_result.has_value()) {
-      // Configuration successful - resources configured from test data
-      return;
-    }
-  }
-
-  // Fallback: If loading/configuration fails, use hardcoded defaults
+  // Initialize GameResources
+  m_game_resources.game_window.create(sf::VideoMode({900, 600}),
+                                      "SteamRot Test Window");
   m_game_resources.env_type = EnvironmentType::Test;
-  sf::Vector2u window_size(800, 600);
-  m_game_resources.game_window.create(sf::VideoMode(window_size),
-                                      "SteamRot Test");
-  m_game_resources.game_window.setFramerateLimit(60);
+
+  // Load default assets into the asset manager
+  auto load_result = m_game_resources.asset_manager.LoadDefaultAssets();
+  if (!load_result.has_value()) {
+    const FailInfo &error = load_result.error();
+    std::cerr << "Error loading default assets: " << error.message << std::endl;
+  }
 }
 
 ////////////////////////////////////////////////////////////
 void TestFixture::ConfigureSceneResources(const SceneType &scene_type) {
-  // Use ResourceConfigurator to configure from test data
-  PathProvider path_provider(EnvironmentType::Test);
-  FlatbuffersDataLoader loader;
+  // Configure the EntityMemoryPool for the scene
+  FlatbuffersConfigurator configurator(m_game_resources.event_handler);
 
-  auto context_data_result = loader.ProvideContextData();
-  if (context_data_result.has_value()) {
-    ResourceConfigurator configurator(context_data_result.value());
-    auto config_result =
-        configurator.ConfigureSceneResources(m_scene_resources, scene_type);
-
-    if (config_result.has_value()) {
-      // Configuration successful - resources configured from test data
-      return;
-    }
+  auto configure_result = configurator.ConfigureEntitiesFromDefaultData(
+      m_entity_manager.GetEntityMemoryPool(), scene_type);
+  
+  // Check the configuration was successful
+  if (!configure_result.has_value()) {
+    const FailInfo &error = configure_result.error();
+    std::cerr << "Error configuring entities: " << error.message << std::endl;
   }
-
-  // Fallback: If loading/configuration fails, use hardcoded defaults
-  sf::Vector2u texture_size(800, 600);
-  m_scene_resources.scene_texture = sf::RenderTexture(texture_size);
+  
+  // Generate all archetypes for the scene
+  auto archetype_result = m_entity_manager.GenerateAllArchetypes();
+  if (!archetype_result.has_value()) {
+    const FailInfo &error = archetype_result.error();
+    std::cerr << "Error generating archetypes: " << error.message << std::endl;
+  }
 }
 
 ////////////////////////////////////////////////////////////

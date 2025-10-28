@@ -10,7 +10,7 @@
 
 #include "Logic.h"
 #include "SceneContext.h"
-#include "TestContext.h"
+#include "TestFixture.h"
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
 #include <type_traits>
@@ -51,9 +51,9 @@ class LogicTestBase {
 
 protected:
   /////////////////////////////////////////////////
-  /// @brief Test context providing mock dependencies
+  /// @brief Test fixture providing mock dependencies
   /////////////////////////////////////////////////
-  std::unique_ptr<TestContext> test_context;
+  std::unique_ptr<TestFixture> test_fixture;
 
   /////////////////////////////////////////////////
   /// @brief The Logic instance under test
@@ -75,17 +75,17 @@ protected:
   /////////////////////////////////////////////////
   virtual void SetUp(SceneType test_scene_type = SceneType::SceneType_TEST) {
     scene_type = test_scene_type;
-    test_context = std::make_unique<TestContext>(scene_type);
+    test_fixture = std::make_unique<TestFixture>(scene_type);
   }
 
   /////////////////////////////////////////////////
-  /// @brief Create Logic instance with TestContext
+  /// @brief Create Logic instance with TestFixture
   ///
   /// @return Unique pointer to Logic instance
   /////////////////////////////////////////////////
   std::unique_ptr<TLogic> CreateLogic() {
     return std::make_unique<TLogic>(
-        test_context->GetSceneContextForTestScene());
+        test_fixture->GetSceneContext());
   }
 
   /////////////////////////////////////////////////

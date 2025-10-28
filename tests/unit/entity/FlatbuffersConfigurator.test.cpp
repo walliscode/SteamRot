@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////
 
 #include "FlatbuffersConfigurator.h"
-#include "TestContext.h"
+#include "TestFixture.h"
 #include "entity_test_helpers.h"
 #include "entity_memory_pool_matchers.h"
 #include "containers.h"
@@ -45,7 +45,7 @@ TEST_CASE("Data is configured correctly from default data",
                steamrot::tests::EqualsEntityMemoryPool(expected_default_pool));
 
   // create TextContext object
-  steamrot::tests::TestContext text_context;
+  steamrot::tests::TestFixture text_context;
   // Create configurator with test environment
   steamrot::FlatbuffersConfigurator configurator{
       text_context.GetGameContext().event_handler};

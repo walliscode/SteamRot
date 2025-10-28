@@ -9,7 +9,7 @@
 #include "UIElementFactory.h"
 #include "ButtonElement.h"
 #include "PanelElement.h"
-#include "TestContext.h"
+#include "TestFixture.h"
 #include "TestUIElementDataProvider.h"
 #include "catch2/catch_test_macros.hpp"
 #include "ui_element_factory_test_helpers.h"
@@ -39,7 +39,7 @@ TEST_CASE("UIElementFactory::CreateUIElement - Panel", "[UIElementFactory]") {
 
   // create test context
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestContext test_context;
+  steamrot::tests::TestFixture test_context;
   // check that the map from the EventHandler is empty
   REQUIRE(test_context.GetGameContext()
               .event_handler.GetSubcriberRegister()
@@ -91,7 +91,7 @@ TEST_CASE("UIElementFactory::ConfigureButtonElement", "[UIElementFactory]") {
 TEST_CASE("UIElementFactory::CreateUIElement - Button", "[UIElementFactory]") {
 
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestContext test_context;
+  steamrot::tests::TestFixture test_context;
   flatbuffers::FlatBufferBuilder builder{1024};
   const auto *button_data =
       TestUIElementDataFactory::CreateTestButtonData(builder, "TestButton");
@@ -138,7 +138,7 @@ TEST_CASE("UIElementFactory::ConfigureDropDownListElement",
 TEST_CASE("UIElementFactory::CreateUIElement - DropDownList",
           "[UIElementFactory]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestContext test_context;
+  steamrot::tests::TestFixture test_context;
   flatbuffers::FlatBufferBuilder builder{1024};
   const auto *ddlist_data =
       TestUIElementDataFactory::CreateTestDropDownListData(builder, "TestList",
@@ -182,7 +182,7 @@ TEST_CASE("UIElementFactory::ConfigureDropDownContainerElement",
 TEST_CASE("UIElementFactory::CreateUIElement - DropDownContainer",
           "[UIElementFactory]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestContext test_context;
+  steamrot::tests::TestFixture test_context;
   flatbuffers::FlatBufferBuilder builder{1024};
   const auto *ddcontainer_data =
       TestUIElementDataFactory::CreateTestDropDownContainerData(builder);
@@ -226,7 +226,7 @@ TEST_CASE("UIElementFactory::ConfigureDropDownItemElement",
 TEST_CASE("UIElementFactory::CreateUIElement - DropDownItem",
           "[UIElementFactory]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestContext test_context;
+  steamrot::tests::TestFixture test_context;
   flatbuffers::FlatBufferBuilder builder{1024};
   const auto *dditem_data =
       TestUIElementDataFactory::CreateTestDropDownItemData(builder, "TestItem");
@@ -268,7 +268,7 @@ TEST_CASE("UIElementFactory::ConfigureDropDownButtonElement",
 TEST_CASE("UIElementFactory::CreateUIElement - DropDownButton",
           "[UIElementFactory]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestContext test_context;
+  steamrot::tests::TestFixture test_context;
   flatbuffers::FlatBufferBuilder builder{1024};
   const auto *ddbutton_data =
       TestUIElementDataFactory::CreateTestDropDownButtonData(builder, true);
@@ -292,7 +292,7 @@ TEST_CASE("UIElementFactory::CreateUIElement - DropDownButton",
 TEST_CASE("UIElementFactory::CreateUIElement - Deeply Nested Panel",
           "[UIElementFactory][nested]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestContext test_context;
+  steamrot::tests::TestFixture test_context;
   flatbuffers::FlatBufferBuilder builder{4096};
 
   // Create deeply nested PanelData (with DropDownContainer, DropDownList,

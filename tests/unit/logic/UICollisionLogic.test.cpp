@@ -9,7 +9,7 @@
 #include "UICollisionLogic.h"
 #include "ArchetypeManager.h"
 #include "PanelElement.h"
-#include "TestContext.h"
+#include "TestFixture.h"
 #include "entity_memory.h"
 #include <SFML/System/Vector2.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -18,10 +18,10 @@ TEST_CASE("UICollisionLogic::UICollisionLogic Constructor",
           "[unit][UICollisionLogic]") {
   // Create a dummy SceneContext
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestContext test_context;
+  steamrot::tests::TestFixture test_context;
   // Instantiate UICollisionLogic
   steamrot::UICollisionLogic ui_collision_logic(
-      test_context.GetSceneContextForTestScene());
+      test_context.GetSceneContext());
   SUCCEED("UICollisionLogic instantiated successfully");
 }
 
@@ -30,11 +30,11 @@ TEST_CASE("UICollisionLogic::RunLogic changes is_mouse_over to true if mouse "
           "[unit][UICollisionLogic]") {
   // Create a dummy SceneContext
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestContext test_context;
+  steamrot::tests::TestFixture test_context;
 
   // pull out the SceneContext and GameContext references
   auto &game_context = test_context.GetGameContext();
-  auto logic_context = test_context.GetSceneContextForTestScene();
+  auto logic_context = test_context.GetSceneContext();
 
   // Get all active CUserInterface entities
   steamrot::ArchetypeID archetype_id =

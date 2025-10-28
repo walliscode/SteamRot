@@ -9,7 +9,7 @@
 #include "SceneFactory.h"
 #include "CraftingScene.h"
 #include "PathProvider.h"
-#include "TestContext.h"
+#include "TestFixture.h"
 #include "TitleScene.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
@@ -20,7 +20,7 @@
 // create a GameContext object for use by all tests
 TEST_CASE("SceneFactory can be constructed without errors", "[unit][SceneFactory]") {
   steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  steamrot::tests::TestContext test_context;
+  steamrot::tests::TestFixture test_context;
   steamrot::SceneFactory scene_factory;
   REQUIRE_NOTHROW(scene_factory);
 }
@@ -28,7 +28,7 @@ TEST_CASE("SceneFactory can be constructed without errors", "[unit][SceneFactory
 TEST_CASE("SceneFactory can create a TitleScene from default",
           "[unit][SceneFactory]") {
   steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  steamrot::tests::TestContext test_context;
+  steamrot::tests::TestFixture test_context;
   steamrot::SceneFactory scene_factory;
 
   // define SceneType for the test
@@ -56,7 +56,7 @@ TEST_CASE("SceneFactory can create a TitleScene from default",
 TEST_CASE("SceneFactory can create a CraftingScene from default",
           "[unit][SceneFactory]") {
   steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  steamrot::tests::TestContext test_context;
+  steamrot::tests::TestFixture test_context;
   steamrot::SceneFactory scene_factory;
   // create a CraftingScene
   auto scene_creation_result = scene_factory.CreateDefaultScene(

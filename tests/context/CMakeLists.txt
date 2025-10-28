@@ -1,5 +1,4 @@
 add_library(context_test_helpers
-  TestContext.cpp
   TestScenarios.cpp
   test_assertions.cpp
   TestFixture.cpp)
