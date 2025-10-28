@@ -4,6 +4,20 @@
 
 This document outlines the plan to refactor SteamRot's context and resource handling system to improve separation of concerns, eliminate builder pattern complexity, and enable data-driven resource configuration.
 
+## Key Architectural Decisions
+
+Based on design review feedback:
+
+1. **EntityMemoryPool stays in EntityManager** - Not moved to SceneResources
+2. **SceneResources contains only RenderTexture** - For now, minimal scope
+3. **Resources live on relevant objects**:
+   - GameEngine owns GameResources
+   - Scene owns SceneResources
+   - EntityManager owns EntityMemoryPool and ArchetypeManager
+4. **SceneContext takes three parameters**: SceneResources, GameResources, AND EntityManager
+   - This allows access to entity/archetype data from EntityManager
+   - While keeping render texture in SceneResources
+
 ## Problem Statement Requirements
 
 Based on the original requirements:
@@ -93,25 +107,18 @@ struct GameResources {
 namespace steamrot {
 
 struct SceneResources {
-  // Entity memory pool
-  EntityMemoryPool scene_entities;
-  
-  // Archetype manager
-  ArchetypeManager archetype_manager;
-  
-  // Render texture
+  // Render texture for the scene
   sf::RenderTexture scene_texture;
-  
-  // Constructor to properly initialize archetype_manager
-  SceneResources() : archetype_manager(scene_entities) {}
 };
 
 } // namespace steamrot
 ```
 
 **Key Points**:
+- Contains only the render texture for now
+- EntityMemoryPool and ArchetypeManager remain in EntityManager
 - All members are concrete objects
-- archetype_manager needs scene_entities reference (handled in constructor)
+- Default-constructible
 - Lives in Scene instances
 
 ### 3. GameContext Struct
@@ -167,12 +174,15 @@ GameContext::GameContext(GameResources &resources)
 namespace steamrot {
 
 struct SceneContext {
-  // Constructor takes both resource containers
-  SceneContext(SceneResources &scene_res, GameResources &game_res);
+  // Constructor takes resources AND EntityManager
+  SceneContext(SceneResources &scene_res, GameResources &game_res,
+               EntityManager &entity_manager);
   
-  // Scene resource references
+  // Scene resource references (from EntityManager)
   EntityMemoryPool &scene_entities;
   const std::unordered_map<ArchetypeID, Archetype> &archetypes;
+  
+  // Scene resource references (from SceneResources)
   sf::RenderTexture &scene_texture;
   
   // Game resource references
@@ -187,9 +197,10 @@ struct SceneContext {
 
 **Implementation**:
 ```cpp
-SceneContext::SceneContext(SceneResources &scene_res, GameResources &game_res)
-    : scene_entities(scene_res.scene_entities),
-      archetypes(scene_res.archetype_manager.GetArchetypes()),
+SceneContext::SceneContext(SceneResources &scene_res, GameResources &game_res,
+                           EntityManager &entity_manager)
+    : scene_entities(entity_manager.GetEntityMemoryPool()),
+      archetypes(entity_manager.GetArchetypeManager().GetArchetypes()),
       scene_texture(scene_res.scene_texture),
       game_window(game_res.game_window),
       asset_manager(game_res.asset_manager),
@@ -200,7 +211,8 @@ SceneContext::SceneContext(SceneResources &scene_res, GameResources &game_res)
 **Migration from LogicContext**:
 - Rename LogicContext -> SceneContext
 - Move from `src/logic/` to `src/scenes/`
-- Change constructor to take resource references
+- Change constructor to take SceneResources, GameResources, and EntityManager
+- EntityMemoryPool and Archetypes accessed from EntityManager, not SceneResources
 
 ### 5. ResourceConfigurator Class
 
@@ -238,9 +250,9 @@ public:
 **Responsibilities**:
 - Parse environment types from strings
 - Configure window settings (size, title, framerate)
-- Configure entity pool sizes
-- Configure render texture dimensions
+- Configure render texture dimensions for scenes
 - Use existing context_data.fbs schema
+- Note: Entity pool configuration remains in EntityManager (not in SceneResources)
 
 ### 6. TestFixture Class
 
@@ -256,6 +268,7 @@ class TestFixture {
 private:
   GameResources m_game_resources;
   SceneResources m_scene_resources;
+  EntityManager m_entity_manager;  // Needed for SceneContext
   std::unique_ptr<GameContext> m_game_context;
   std::unique_ptr<SceneContext> m_scene_context;
   
@@ -267,6 +280,7 @@ public:
   
   GameResources &GetGameResources();
   SceneResources &GetSceneResources();
+  EntityManager &GetEntityManager();
   GameContext &GetGameContext();
   SceneContext &GetSceneContext();
 };
@@ -394,14 +408,16 @@ SceneContext &ctx = fixture.GetSceneContext();
 
 ### Phase 5: Integration
 
-**Step 5.1**: Future GameEngine Integration (Optional)
-- [ ] Consider updating GameEngine to own GameResources
-- [ ] Update GameEngine constructor
-- [ ] Update initialization flow
+**Step 5.1**: GameEngine Integration
+- [ ] Update GameEngine to own GameResources member variable
+- [ ] Update GameEngine constructor to initialize GameResources
+- [ ] Update initialization flow to use GameResources
+- [ ] Update places that create GameContext to pass GameResources
 
-**Step 5.2**: Future Scene Integration (Optional)
-- [ ] Consider updating Scene to own SceneResources
-- [ ] Update Scene initialization
+**Step 5.2**: Scene Integration
+- [ ] Update Scene to own SceneResources member variable
+- [ ] Update Scene initialization to create SceneResources
+- [ ] Update GetSceneContext() to pass SceneResources, GameResources, and EntityManager
 - [ ] Update resource lifecycle management
 
 ## Testing Strategy
@@ -475,7 +491,8 @@ LogicContext logic_context{scene_entities, archetypes, scene_texture,
 
 **After**:
 ```cpp
-SceneContext scene_context(scene_resources, game_resources);
+// SceneContext now requires SceneResources, GameResources, AND EntityManager
+SceneContext scene_context(scene_resources, game_resources, entity_manager);
 ```
 
 ### For Tests
