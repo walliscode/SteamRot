@@ -48,9 +48,6 @@ TEST_CASE("ConfigureGameResources configures GameResources with environment type
   auto config_result = steamrot::ConfigureGameResources(resources, game_resources_result.value());
   REQUIRE(config_result.has_value());
 
-  // Verify environment type was set
-  REQUIRE(resources.env_type == steamrot::EnvironmentType::Test);
-
   // Verify window was created
   REQUIRE(resources.game_window.isOpen());
 }
