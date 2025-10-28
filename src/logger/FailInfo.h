@@ -29,7 +29,8 @@ enum class FailMode {
   VariantTypeMismatch,
   NullPointer,
   InvalidUUID,
-  MissingRequiredField
+  MissingRequiredField,
+  ResourceCreationFailure
 };
 
 struct FailInfo {
@@ -49,7 +50,8 @@ struct FailInfo {
   /// @param fail_mode Enum representing the fail mode
   /// @param msg Message describing the failure
   /////////////////////////////////////////////////
-  FailInfo(FailMode fail_mode, const std::string &msg) : mode(fail_mode), message(msg) {}
+  FailInfo(FailMode fail_mode, const std::string &msg)
+      : mode(fail_mode), message(msg) {}
 
   /////////////////////////////////////////////////
   /// @brief Delete
