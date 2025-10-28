@@ -30,7 +30,6 @@ TEST_CASE("Load context configuration and configure resources",
   REQUIRE(context_data->game_context()->window_width() > 0);
   REQUIRE(context_data->game_context()->window_height() > 0);
   REQUIRE(context_data->game_context()->window_title() != nullptr);
-  REQUIRE(context_data->game_context()->environment_type() != nullptr);
 
   // Verify scene contexts configuration
   REQUIRE(context_data->scene_contexts() != nullptr);
@@ -119,7 +118,6 @@ TEST_CASE("Resources can be configured from context data",
 
   // Verify the resources were configured with correct values
   REQUIRE(game_resources.game_window.isOpen());
-  REQUIRE(game_resources.env_type == steamrot::EnvironmentType::Test);
   
   // Verify default initialization of other resources
   REQUIRE(game_resources.loop_number == 0);

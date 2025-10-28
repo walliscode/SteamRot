@@ -15,21 +15,6 @@ ResourceConfigurator::ResourceConfigurator(const GameResourcesData *game_data)
     : m_game_resources_data(game_data) {}
 
 ////////////////////////////////////////////////////////////
-std::expected<EnvironmentType, FailInfo>
-ResourceConfigurator::ParseEnvironmentType(const std::string &type_str) const {
-  if (type_str == "None") {
-    return EnvironmentType::None;
-  } else if (type_str == "Test") {
-    return EnvironmentType::Test;
-  } else if (type_str == "Production") {
-    return EnvironmentType::Production;
-  } else {
-    return std::unexpected(FailInfo{FailMode::NonExistentEnumValue,
-                                    "Unknown environment type: " + type_str});
-  }
-}
-
-////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 ResourceConfigurator::ConfigureGameResources(GameResources &resources) const {
   if (!m_game_resources_data) {
@@ -38,16 +23,6 @@ ResourceConfigurator::ConfigureGameResources(GameResources &resources) const {
   }
 
   const GameResourcesData *game_config = m_game_resources_data;
-
-  // Parse and set environment type if provided
-  if (game_config->environment_type()) {
-    auto env_type_result =
-        ParseEnvironmentType(game_config->environment_type()->str());
-    if (!env_type_result.has_value()) {
-      return std::unexpected(env_type_result.error());
-    }
-    resources.env_type = env_type_result.value();
-  }
 
   // Create the window with configured settings (SFML 3.0 API)
   sf::Vector2u window_size(game_config->window_width(),
