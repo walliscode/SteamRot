@@ -31,15 +31,6 @@ class ResourceConfigurator {
 private:
   const GameResourcesData *m_game_resources_data{nullptr};
 
-  ////////////////////////////////////////////////////////////
-  /// @brief Parse environment type string to EnvironmentType enum.
-  ///
-  /// @param type_str String representation of environment type
-  /// @return Expected containing EnvironmentType or FailInfo on error
-  ////////////////////////////////////////////////////////////
-  std::expected<EnvironmentType, FailInfo>
-  ParseEnvironmentType(const std::string &type_str) const;
-
 public:
   ////////////////////////////////////////////////////////////
   /// @brief Constructor for ResourceConfigurator.

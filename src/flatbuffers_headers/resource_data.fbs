@@ -10,7 +10,6 @@ table GameResourcesData {
   window_height: uint32 = 600;
   window_title: string;
   framerate_limit: uint32 = 60;
-  environment_type: string; // "None", "Test", "Production"
 }
 
 ////////////////////////////////////////////////////////////
