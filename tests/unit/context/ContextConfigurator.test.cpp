@@ -16,6 +16,7 @@
 
 TEST_CASE("ContextConfigurator constructor with null config",
           "[unit][context][ContextConfigurator]") {
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::ContextConfigurator configurator(nullptr);
   steamrot::GameResources resources;
 
@@ -56,7 +57,7 @@ TEST_CASE("ContextConfigurator configures GameResources with environment type",
 
   // Verify environment type was set
   REQUIRE(resources.env_type == steamrot::EnvironmentType::Test);
-  
+
   // Verify window was created
   REQUIRE(resources.game_window.isOpen());
 }
@@ -135,7 +136,7 @@ TEST_CASE("ContextConfigurator configures SceneResources for existing scene",
   auto config_result = configurator.ConfigureSceneResources(
       resources, steamrot::SceneType::SceneType_TEST);
   REQUIRE(config_result.has_value());
-  
+
   // Verify render texture was created
   REQUIRE(resources.scene_texture.getSize().x > 0);
   REQUIRE(resources.scene_texture.getSize().y > 0);
@@ -149,15 +150,16 @@ TEST_CASE("ContextConfigurator fails for non-existent scene type",
   auto window_title = fbb.CreateString("Test");
   auto game_config = steamrot::CreateGameContextConfig(
       fbb, 800, 600, window_title, 60, env_type);
-  
+
   // Create scene context for TEST only
   auto test_scene = steamrot::CreateSceneContextConfig(
       fbb, steamrot::SceneType::SceneType_TEST, 100, 640, 480);
   std::vector<flatbuffers::Offset<steamrot::SceneContextConfig>> scenes;
   scenes.push_back(test_scene);
   auto scene_contexts = fbb.CreateVector(scenes);
-  
-  auto context_data = steamrot::CreateContextData(fbb, game_config, scene_contexts);
+
+  auto context_data =
+      steamrot::CreateContextData(fbb, game_config, scene_contexts);
   fbb.Finish(context_data);
 
   const steamrot::ContextData *data =
@@ -165,7 +167,7 @@ TEST_CASE("ContextConfigurator fails for non-existent scene type",
 
   steamrot::ContextConfigurator configurator(data);
   steamrot::SceneResources resources;
-  
+
   // Try to configure CRAFTING scene which doesn't exist in config
   auto result = configurator.ConfigureSceneResources(
       resources, steamrot::SceneType::SceneType_CRAFTING);

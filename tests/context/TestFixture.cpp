@@ -8,9 +8,7 @@
 ////////////////////////////////////////////////////////////
 #include "TestFixture.h"
 #include "FlatbuffersConfigurator.h"
-#include "FlatbuffersDataLoader.h"
 #include "PathProvider.h"
-#include "ResourceConfigurator.h"
 #include <iostream>
 
 namespace steamrot::tests {
@@ -18,11 +16,14 @@ namespace steamrot::tests {
 ////////////////////////////////////////////////////////////
 TestFixture::TestFixture(const SceneType &scene_type)
     : m_entity_manager(m_game_resources.event_handler),
-      m_scene_type(scene_type) {
-  ConfigureGameResources();
-  ConfigureSceneResources(scene_type);
-}
+      m_scene_type(scene_type) {}
 
+void TestFixture::Intialize() {
+
+  PathProvider path_provider{EnvironmentType::Test};
+  ConfigureGameResources();
+  ConfigureSceneResources(m_scene_type);
+}
 ////////////////////////////////////////////////////////////
 void TestFixture::ConfigureGameResources() {
   // Initialize GameResources
@@ -45,13 +46,13 @@ void TestFixture::ConfigureSceneResources(const SceneType &scene_type) {
 
   auto configure_result = configurator.ConfigureEntitiesFromDefaultData(
       m_entity_manager.GetEntityMemoryPool(), scene_type);
-  
+
   // Check the configuration was successful
   if (!configure_result.has_value()) {
     const FailInfo &error = configure_result.error();
     std::cerr << "Error configuring entities: " << error.message << std::endl;
   }
-  
+
   // Generate all archetypes for the scene
   auto archetype_result = m_entity_manager.GenerateAllArchetypes();
   if (!archetype_result.has_value()) {
