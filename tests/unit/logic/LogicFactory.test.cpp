@@ -22,7 +22,7 @@ TEST_CASE("LogicFactory constructed without errors", "[unit][LogicFactory]") {
   // create a LogicFactory instance
   steamrot::LogicFactory logic_factory(
       steamrot::SceneType::SceneType_TEST,
-      test_context.GetLogicContextForTestScene());
+      test_context.GetSceneContextForTestScene());
 
   REQUIRE_NOTHROW(logic_factory);
 }
@@ -30,7 +30,7 @@ TEST_CASE("LogicFactory constructed without errors", "[unit][LogicFactory]") {
 TEST_CASE("LogicFactory creates the correct Logic instances with a test Scene",
           "[unit][LogicFactory]") {
 
-  // create a LogicContext with mock dependencies
+  // create a SceneContext with mock dependencies
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context{
       steamrot::SceneType::SceneType_TEST};
@@ -38,7 +38,7 @@ TEST_CASE("LogicFactory creates the correct Logic instances with a test Scene",
   // create a LogicFactory instance
   steamrot::LogicFactory logic_factory(
       steamrot::SceneType::SceneType_TEST,
-      test_context.GetLogicContextForTestScene());
+      test_context.GetSceneContextForTestScene());
 
   auto logic_map_result = logic_factory.CreateLogicMap();
   if (!logic_map_result.has_value()) {
@@ -61,7 +61,7 @@ TEST_CASE("LogicFactory creates correct Logic instances for TitleScene",
   // create a LogicFactory instance
   steamrot::LogicFactory logic_factory(
       steamrot::SceneType::SceneType_TITLE,
-      test_context.GetLogicContextForTitleScene());
+      test_context.GetSceneContextForTitleScene());
 
   auto logic_map_result = logic_factory.CreateLogicMap();
   if (!logic_map_result.has_value()) {
@@ -83,7 +83,7 @@ TEST_CASE("LogicFactory creates correct Logic instances for CraftingScene",
   // create a LogicFactory instance
   steamrot::LogicFactory logic_factory(
       steamrot::SceneType::SceneType_CRAFTING,
-      test_context.GetLogicContextForCraftingScene());
+      test_context.GetSceneContextForCraftingScene());
 
   auto logic_map_result = logic_factory.CreateLogicMap();
   if (!logic_map_result.has_value()) {

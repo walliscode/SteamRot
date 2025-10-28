@@ -35,7 +35,7 @@ TEST_CASE("TitleScene's call of sRender is correct", "[unit][TitleScene]") {
   }
   // add the LogicMap
   steamrot::LogicFactory logic_factory(steamrot::SceneType::SceneType_TITLE,
-                                       title_scene->GetLogicContext());
+                                       title_scene->GetSceneContext());
 
   auto create_map_result = logic_factory.CreateLogicMap();
   if (!create_map_result) {

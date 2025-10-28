@@ -9,9 +9,12 @@
 #pragma once
 
 #include "ArchetypeManager.h"
+#include "EntityManager.h"
 #include "EventHandler.h"
 #include "GameContext.h"
-#include "LogicContext.h"
+#include "GameResources.h"
+#include "SceneContext.h"
+#include "SceneResources.h"
 #include "containers.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -31,44 +34,19 @@ class TestContext {
 
 private:
   /////////////////////////////////////////////////
-  /// @brief Instance of the SFML RenderWindow used for tests
+  /// @brief GameResources instance for tests
   /////////////////////////////////////////////////
-  sf::RenderWindow render_window;
+  steamrot::GameResources game_resources;
 
   /////////////////////////////////////////////////
-  /// @brief Instance of the EventHandler used for tests
+  /// @brief SceneResources instance for tests
   /////////////////////////////////////////////////
-  steamrot::EventHandler event_handler;
+  steamrot::SceneResources scene_resources;
 
   /////////////////////////////////////////////////
-  /// @brief Instance of the AssetManager used for tests
+  /// @brief EntityManager instance for tests
   /////////////////////////////////////////////////
-  steamrot::AssetManager asset_manager;
-
-  /////////////////////////////////////////////////
-  /// @brief loop number initialized to 0
-  /////////////////////////////////////////////////
-  const size_t loop_number{0};
-
-  /////////////////////////////////////////////////
-  /// @brief environment type for the test context
-  /////////////////////////////////////////////////
-  const EnvironmentType env_type{EnvironmentType::Test};
-
-  /////////////////////////////////////////////////
-  /// @brief Test EntityMemoryPool instance
-  /////////////////////////////////////////////////
-  EntityMemoryPool scene_entities;
-
-  /////////////////////////////////////////////////
-  /// @brief ArchetypeManager instance for tests
-  /////////////////////////////////////////////////
-  ArchetypeManager archetype_manager;
-
-  /////////////////////////////////////////////////
-  /// @brief Test RenderTexture instance
-  /////////////////////////////////////////////////
-  sf::RenderTexture render_texture;
+  steamrot::EntityManager entity_manager;
 
   /////////////////////////////////////////////////
   /// @brief Mock GameContext instance for tests
@@ -76,19 +54,19 @@ private:
   std::unique_ptr<GameContext> game_context_ptr{nullptr};
 
   /////////////////////////////////////////////////
-  /// @brief Mock LogicContext instance for tests with a test scene
+  /// @brief Mock SceneContext instance for tests with a test scene
   /////////////////////////////////////////////////
-  std::unique_ptr<LogicContext> logic_context_for_test_scene{nullptr};
+  std::unique_ptr<SceneContext> scene_context_for_test_scene{nullptr};
 
   /////////////////////////////////////////////////
-  /// @brief Mock LogicContext instance for tests with a title scene
+  /// @brief Mock SceneContext instance for tests with a title scene
   /////////////////////////////////////////////////
-  std::unique_ptr<LogicContext> logic_context_for_title_scene{nullptr};
+  std::unique_ptr<SceneContext> scene_context_for_title_scene{nullptr};
 
   /////////////////////////////////////////////////
-  /// @brief Mock LogicContext instance for tests with a crafting scene
+  /// @brief Mock SceneContext instance for tests with a crafting scene
   /////////////////////////////////////////////////
-  std::unique_ptr<LogicContext> logic_context_for_crafting_scene{nullptr};
+  std::unique_ptr<SceneContext> scene_context_for_crafting_scene{nullptr};
 
   /////////////////////////////////////////////////
   /// @brief Configure the GameContext instance
@@ -96,29 +74,29 @@ private:
   void ConfigureGameContext();
 
   /////////////////////////////////////////////////
-  /// @brief Configure the Logic Context for the Test Scene
+  /// @brief Configure the Scene Context for the Test Scene
   /////////////////////////////////////////////////
-  void ConfigureLogicContextForTestScene();
+  void ConfigureSceneContextForTestScene();
 
   /////////////////////////////////////////////////
-  /// @brief Configure the Logic Context for the Title Scene
+  /// @brief Configure the Scene Context for the Title Scene
   /////////////////////////////////////////////////
-  void ConfigureLogicContextForTitleScene();
+  void ConfigureSceneContextForTitleScene();
 
   /////////////////////////////////////////////////
-  /// @brief Configure the Logic Context for the Crafting Scene
+  /// @brief Configure the Scene Context for the Crafting Scene
   /////////////////////////////////////////////////
-  void ConfigureLogicContextForCraftingScene();
+  void ConfigureSceneContextForCraftingScene();
 
 public:
   TestContext(const SceneType scene_type = SceneType::SceneType_TEST);
 
   steamrot::GameContext &GetGameContext() const;
 
-  const steamrot::LogicContext &GetLogicContextForTestScene() const;
+  const steamrot::SceneContext &GetSceneContextForTestScene() const;
 
-  const steamrot::LogicContext &GetLogicContextForTitleScene() const;
+  const steamrot::SceneContext &GetSceneContextForTitleScene() const;
 
-  const steamrot::LogicContext &GetLogicContextForCraftingScene() const;
+  const steamrot::SceneContext &GetSceneContextForCraftingScene() const;
 };
 } // namespace steamrot::tests
