@@ -13,6 +13,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
+#include "resource_data_generated.h"
 #include "subscriber_config_generated.h"
 
 namespace steamrot {
@@ -23,16 +24,22 @@ struct GameEngineDataBuilder;
 struct GameEngineData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef GameEngineDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_SUBSCRIPTIONS = 4
+    VT_SUBSCRIPTIONS = 4,
+    VT_GAME_RESOURCES = 6
   };
   const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>> *subscriptions() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>> *>(VT_SUBSCRIPTIONS);
+  }
+  const steamrot::GameResourcesData *game_resources() const {
+    return GetPointer<const steamrot::GameResourcesData *>(VT_GAME_RESOURCES);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_SUBSCRIPTIONS) &&
            verifier.VerifyVector(subscriptions()) &&
            verifier.VerifyVectorOfTables(subscriptions()) &&
+           VerifyOffset(verifier, VT_GAME_RESOURCES) &&
+           verifier.VerifyTable(game_resources()) &&
            verifier.EndTable();
   }
 };
@@ -43,6 +50,9 @@ struct GameEngineDataBuilder {
   ::flatbuffers::uoffset_t start_;
   void add_subscriptions(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>>> subscriptions) {
     fbb_.AddOffset(GameEngineData::VT_SUBSCRIPTIONS, subscriptions);
+  }
+  void add_game_resources(::flatbuffers::Offset<steamrot::GameResourcesData> game_resources) {
+    fbb_.AddOffset(GameEngineData::VT_GAME_RESOURCES, game_resources);
   }
   explicit GameEngineDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -57,19 +67,23 @@ struct GameEngineDataBuilder {
 
 inline ::flatbuffers::Offset<GameEngineData> CreateGameEngineData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>>> subscriptions = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>>> subscriptions = 0,
+    ::flatbuffers::Offset<steamrot::GameResourcesData> game_resources = 0) {
   GameEngineDataBuilder builder_(_fbb);
+  builder_.add_game_resources(game_resources);
   builder_.add_subscriptions(subscriptions);
   return builder_.Finish();
 }
 
 inline ::flatbuffers::Offset<GameEngineData> CreateGameEngineDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<steamrot::SubscriberData>> *subscriptions = nullptr) {
+    const std::vector<::flatbuffers::Offset<steamrot::SubscriberData>> *subscriptions = nullptr,
+    ::flatbuffers::Offset<steamrot::GameResourcesData> game_resources = 0) {
   auto subscriptions__ = subscriptions ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::SubscriberData>>(*subscriptions) : 0;
   return steamrot::CreateGameEngineData(
       _fbb,
-      subscriptions__);
+      subscriptions__,
+      game_resources);
 }
 
 inline const steamrot::GameEngineData *GetGameEngineData(const void *buf) {

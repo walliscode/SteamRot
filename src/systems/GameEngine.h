@@ -6,9 +6,7 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include "AssetManager.h"
 #include "DisplayManager.h"
-#include "EventHandler.h"
 #include "GameResources.h"
 #include "SceneManager.h"
 #include "Subscriber.h"
@@ -146,9 +144,11 @@ public:
   const GameContext &GetGameContext() const;
 
   /////////////////////////////////////////////////
-  /// @brief Update the game context members
+  /// @brief Update the game resources
+  ///
+  /// @param game_resources to update
   /////////////////////////////////////////////////
-  void UpdateGameContext(GameContext &game_context);
+  void UpdateGameResources(GameResources &game_resources);
 };
 
 } // namespace steamrot

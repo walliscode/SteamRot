@@ -34,8 +34,7 @@ struct GameContextConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
     VT_WINDOW_WIDTH = 4,
     VT_WINDOW_HEIGHT = 6,
     VT_WINDOW_TITLE = 8,
-    VT_FRAMERATE_LIMIT = 10,
-    VT_ENVIRONMENT_TYPE = 12
+    VT_FRAMERATE_LIMIT = 10
   };
   uint32_t window_width() const {
     return GetField<uint32_t>(VT_WINDOW_WIDTH, 800);
@@ -49,9 +48,6 @@ struct GameContextConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
   uint32_t framerate_limit() const {
     return GetField<uint32_t>(VT_FRAMERATE_LIMIT, 60);
   }
-  const ::flatbuffers::String *environment_type() const {
-    return GetPointer<const ::flatbuffers::String *>(VT_ENVIRONMENT_TYPE);
-  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint32_t>(verifier, VT_WINDOW_WIDTH, 4) &&
@@ -59,8 +55,6 @@ struct GameContextConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
            VerifyOffset(verifier, VT_WINDOW_TITLE) &&
            verifier.VerifyString(window_title()) &&
            VerifyField<uint32_t>(verifier, VT_FRAMERATE_LIMIT, 4) &&
-           VerifyOffset(verifier, VT_ENVIRONMENT_TYPE) &&
-           verifier.VerifyString(environment_type()) &&
            verifier.EndTable();
   }
 };
@@ -81,9 +75,6 @@ struct GameContextConfigBuilder {
   void add_framerate_limit(uint32_t framerate_limit) {
     fbb_.AddElement<uint32_t>(GameContextConfig::VT_FRAMERATE_LIMIT, framerate_limit, 60);
   }
-  void add_environment_type(::flatbuffers::Offset<::flatbuffers::String> environment_type) {
-    fbb_.AddOffset(GameContextConfig::VT_ENVIRONMENT_TYPE, environment_type);
-  }
   explicit GameContextConfigBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -100,10 +91,8 @@ inline ::flatbuffers::Offset<GameContextConfig> CreateGameContextConfig(
     uint32_t window_width = 800,
     uint32_t window_height = 600,
     ::flatbuffers::Offset<::flatbuffers::String> window_title = 0,
-    uint32_t framerate_limit = 60,
-    ::flatbuffers::Offset<::flatbuffers::String> environment_type = 0) {
+    uint32_t framerate_limit = 60) {
   GameContextConfigBuilder builder_(_fbb);
-  builder_.add_environment_type(environment_type);
   builder_.add_framerate_limit(framerate_limit);
   builder_.add_window_title(window_title);
   builder_.add_window_height(window_height);
@@ -116,17 +105,14 @@ inline ::flatbuffers::Offset<GameContextConfig> CreateGameContextConfigDirect(
     uint32_t window_width = 800,
     uint32_t window_height = 600,
     const char *window_title = nullptr,
-    uint32_t framerate_limit = 60,
-    const char *environment_type = nullptr) {
+    uint32_t framerate_limit = 60) {
   auto window_title__ = window_title ? _fbb.CreateString(window_title) : 0;
-  auto environment_type__ = environment_type ? _fbb.CreateString(environment_type) : 0;
   return steamrot::CreateGameContextConfig(
       _fbb,
       window_width,
       window_height,
       window_title__,
-      framerate_limit,
-      environment_type__);
+      framerate_limit);
 }
 
 ////////////////////////////////////////////////////////////

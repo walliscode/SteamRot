@@ -15,6 +15,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 #include "assets_generated.h"
 #include "entities_generated.h"
+#include "resource_data_generated.h"
 
 namespace steamrot {
 
@@ -25,7 +26,8 @@ struct SceneData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef SceneDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ENTITY_COLLECTION = 4,
-    VT_ASSETS = 6
+    VT_ASSETS = 6,
+    VT_SCENE_RESOURCES = 8
   };
   const steamrot::EntityCollection *entity_collection() const {
     return GetPointer<const steamrot::EntityCollection *>(VT_ENTITY_COLLECTION);
@@ -33,12 +35,17 @@ struct SceneData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::AssetCollection *assets() const {
     return GetPointer<const steamrot::AssetCollection *>(VT_ASSETS);
   }
+  const steamrot::SceneResourcesData *scene_resources() const {
+    return GetPointer<const steamrot::SceneResourcesData *>(VT_SCENE_RESOURCES);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_ENTITY_COLLECTION) &&
            verifier.VerifyTable(entity_collection()) &&
            VerifyOffset(verifier, VT_ASSETS) &&
            verifier.VerifyTable(assets()) &&
+           VerifyOffset(verifier, VT_SCENE_RESOURCES) &&
+           verifier.VerifyTable(scene_resources()) &&
            verifier.EndTable();
   }
 };
@@ -52,6 +59,9 @@ struct SceneDataBuilder {
   }
   void add_assets(::flatbuffers::Offset<steamrot::AssetCollection> assets) {
     fbb_.AddOffset(SceneData::VT_ASSETS, assets);
+  }
+  void add_scene_resources(::flatbuffers::Offset<steamrot::SceneResourcesData> scene_resources) {
+    fbb_.AddOffset(SceneData::VT_SCENE_RESOURCES, scene_resources);
   }
   explicit SceneDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -67,8 +77,10 @@ struct SceneDataBuilder {
 inline ::flatbuffers::Offset<SceneData> CreateSceneData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::EntityCollection> entity_collection = 0,
-    ::flatbuffers::Offset<steamrot::AssetCollection> assets = 0) {
+    ::flatbuffers::Offset<steamrot::AssetCollection> assets = 0,
+    ::flatbuffers::Offset<steamrot::SceneResourcesData> scene_resources = 0) {
   SceneDataBuilder builder_(_fbb);
+  builder_.add_scene_resources(scene_resources);
   builder_.add_assets(assets);
   builder_.add_entity_collection(entity_collection);
   return builder_.Finish();

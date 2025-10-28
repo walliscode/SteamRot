@@ -5,6 +5,7 @@ namespace steamrot {
 GameContext::GameContext(GameResources &resources)
     : game_resources(resources), game_window(resources.game_window),
       event_handler(resources.event_handler),
-      loop_number(resources.loop_number), asset_manager(resources.asset_manager),
-      env_type(resources.env_type) {}
+      loop_number(resources.loop_number),
+      mouse_position(resources.mouse_position),
+      asset_manager(resources.asset_manager), env_type(resources.env_type) {}
 } // namespace steamrot

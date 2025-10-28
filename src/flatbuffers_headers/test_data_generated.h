@@ -14,6 +14,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
              "Non-compatible flatbuffers version included");
 
 #include "entities_generated.h"
+#include "resource_data_generated.h"
 
 namespace steamrot {
 
@@ -166,7 +167,9 @@ struct TestDataConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_METADATA = 4,
     VT_START_ENTITY_COLLECTION = 6,
-    VT_EXPECTED_ENTITY_COLLECTION = 8
+    VT_EXPECTED_ENTITY_COLLECTION = 8,
+    VT_GAME_RESOURCES = 10,
+    VT_SCENE_RESOURCES = 12
   };
   /// @brief Metadata about this test case
   const steamrot::TestMetadata *metadata() const {
@@ -181,6 +184,13 @@ struct TestDataConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::EntityCollection *expected_entity_collection() const {
     return GetPointer<const steamrot::EntityCollection *>(VT_EXPECTED_ENTITY_COLLECTION);
   }
+  /// @brief Resource data for test fixtures
+  const steamrot::GameResourcesData *game_resources() const {
+    return GetPointer<const steamrot::GameResourcesData *>(VT_GAME_RESOURCES);
+  }
+  const steamrot::SceneResourcesData *scene_resources() const {
+    return GetPointer<const steamrot::SceneResourcesData *>(VT_SCENE_RESOURCES);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_METADATA) &&
@@ -189,6 +199,10 @@ struct TestDataConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyTable(start_entity_collection()) &&
            VerifyOffset(verifier, VT_EXPECTED_ENTITY_COLLECTION) &&
            verifier.VerifyTable(expected_entity_collection()) &&
+           VerifyOffset(verifier, VT_GAME_RESOURCES) &&
+           verifier.VerifyTable(game_resources()) &&
+           VerifyOffset(verifier, VT_SCENE_RESOURCES) &&
+           verifier.VerifyTable(scene_resources()) &&
            verifier.EndTable();
   }
 };
@@ -206,6 +220,12 @@ struct TestDataConfigBuilder {
   void add_expected_entity_collection(::flatbuffers::Offset<steamrot::EntityCollection> expected_entity_collection) {
     fbb_.AddOffset(TestDataConfig::VT_EXPECTED_ENTITY_COLLECTION, expected_entity_collection);
   }
+  void add_game_resources(::flatbuffers::Offset<steamrot::GameResourcesData> game_resources) {
+    fbb_.AddOffset(TestDataConfig::VT_GAME_RESOURCES, game_resources);
+  }
+  void add_scene_resources(::flatbuffers::Offset<steamrot::SceneResourcesData> scene_resources) {
+    fbb_.AddOffset(TestDataConfig::VT_SCENE_RESOURCES, scene_resources);
+  }
   explicit TestDataConfigBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -222,8 +242,12 @@ inline ::flatbuffers::Offset<TestDataConfig> CreateTestDataConfig(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::TestMetadata> metadata = 0,
     ::flatbuffers::Offset<steamrot::EntityCollection> start_entity_collection = 0,
-    ::flatbuffers::Offset<steamrot::EntityCollection> expected_entity_collection = 0) {
+    ::flatbuffers::Offset<steamrot::EntityCollection> expected_entity_collection = 0,
+    ::flatbuffers::Offset<steamrot::GameResourcesData> game_resources = 0,
+    ::flatbuffers::Offset<steamrot::SceneResourcesData> scene_resources = 0) {
   TestDataConfigBuilder builder_(_fbb);
+  builder_.add_scene_resources(scene_resources);
+  builder_.add_game_resources(game_resources);
   builder_.add_expected_entity_collection(expected_entity_collection);
   builder_.add_start_entity_collection(start_entity_collection);
   builder_.add_metadata(metadata);
