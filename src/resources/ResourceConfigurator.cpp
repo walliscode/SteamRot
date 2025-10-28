@@ -55,8 +55,8 @@ ResourceConfigurator::ConfigureGameResources(GameResources &resources) const {
     resources.env_type = env_type_result.value();
   }
 
-  // Create the window with configured settings
-  sf::VideoMode video_mode(game_config->window_width(),
+  // Create the window with configured settings (SFML 3.0 API)
+  sf::Vector2u window_size(game_config->window_width(),
                            game_config->window_height());
 
   std::string window_title = "SteamRot"; // Default title
@@ -64,7 +64,7 @@ ResourceConfigurator::ConfigureGameResources(GameResources &resources) const {
     window_title = game_config->window_title()->str();
   }
 
-  resources.game_window.create(video_mode, window_title);
+  resources.game_window.create(sf::VideoMode(window_size), window_title);
 
   // Set framerate limit
   resources.game_window.setFramerateLimit(game_config->framerate_limit());
@@ -101,9 +101,13 @@ ResourceConfigurator::ConfigureSceneResources(
                  "Scene configuration not found for requested scene type"});
   }
 
-  // Create the render texture with configured dimensions
-  if (!resources.scene_texture.create(scene_config->render_texture_width(),
-                                      scene_config->render_texture_height())) {
+  // Create the render texture with configured dimensions (SFML 3.0 API)
+  sf::Vector2u texture_size(scene_config->render_texture_width(),
+                            scene_config->render_texture_height());
+  
+  resources.scene_texture = sf::RenderTexture(texture_size);
+  
+  if (!resources.scene_texture) {
     return std::unexpected(
         FailInfo{FailMode::ResourceCreationFailure,
                  "Failed to create scene render texture"});

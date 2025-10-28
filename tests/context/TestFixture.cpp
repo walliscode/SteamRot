@@ -7,7 +7,9 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "TestFixture.h"
+#include "FlatbuffersDataLoader.h"
 #include "PathProvider.h"
+#include "ResourceConfigurator.h"
 
 namespace steamrot::tests {
 
@@ -21,24 +23,50 @@ TestFixture::TestFixture(const SceneType &scene_type)
 
 ////////////////////////////////////////////////////////////
 void TestFixture::ConfigureGameResources() {
-  // Set environment type to Test
+  // Use ResourceConfigurator to configure from test data
+  PathProvider path_provider(EnvironmentType::Test);
+  FlatbuffersDataLoader loader;
+  
+  auto context_data_result = loader.ProvideContextData();
+  if (context_data_result.has_value()) {
+    ResourceConfigurator configurator(context_data_result.value());
+    auto config_result = configurator.ConfigureGameResources(m_game_resources);
+    
+    if (config_result.has_value()) {
+      // Configuration successful - resources configured from test data
+      return;
+    }
+  }
+  
+  // Fallback: If loading/configuration fails, use hardcoded defaults
   m_game_resources.env_type = EnvironmentType::Test;
-
-  // Create window with test settings
-  m_game_resources.game_window.create(sf::VideoMode(800, 600),
-                                      "SteamRot Test");
+  sf::Vector2u window_size(800, 600);
+  m_game_resources.game_window.create(sf::VideoMode(window_size), "SteamRot Test");
   m_game_resources.game_window.setFramerateLimit(60);
-
-  // Initialize other resources (mouse_position and loop_number already have
-  // default values)
 }
 
 ////////////////////////////////////////////////////////////
 void TestFixture::ConfigureSceneResources(const SceneType &scene_type) {
-  // Create render texture with test dimensions
-  if (!m_scene_resources.scene_texture.create(800, 600)) {
-    // Handle error - for tests we can throw since this indicates a serious
-    // problem
+  // Use ResourceConfigurator to configure from test data
+  PathProvider path_provider(EnvironmentType::Test);
+  FlatbuffersDataLoader loader;
+  
+  auto context_data_result = loader.ProvideContextData();
+  if (context_data_result.has_value()) {
+    ResourceConfigurator configurator(context_data_result.value());
+    auto config_result = configurator.ConfigureSceneResources(m_scene_resources, scene_type);
+    
+    if (config_result.has_value()) {
+      // Configuration successful - resources configured from test data
+      return;
+    }
+  }
+  
+  // Fallback: If loading/configuration fails, use hardcoded defaults
+  sf::Vector2u texture_size(800, 600);
+  m_scene_resources.scene_texture = sf::RenderTexture(texture_size);
+  
+  if (!m_scene_resources.scene_texture) {
     throw std::runtime_error("Failed to create test render texture");
   }
 }
