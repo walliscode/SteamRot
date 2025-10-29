@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "test_data_harness.h"
+#include "FlatbuffersConfigurator.h"
 #include "PathProvider.h"
 #include "entity_memory_pool_matchers.h"
 #include <catch2/catch_test_macros.hpp>
@@ -201,6 +202,84 @@ void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
                                             const EntityMemoryPool &expected) {
   // Compare the pools using matcher
   REQUIRE_THAT(actual, EqualsEntityMemoryPool(expected));
+}
+
+/////////////////////////////////////////////////
+std::expected<TestFixture, FailInfo>
+create_fixture_from_test_data(const TestDataConfig *config,
+                              const SceneType &scene_type) {
+  
+  // Validate config
+  if (!config) {
+    return std::unexpected(
+        FailInfo(FailMode::NullPointer, "TestDataConfig is null"));
+  }
+
+  // Create and initialize the fixture with the scene type
+  TestFixture fixture(scene_type);
+  fixture.Intialize();
+
+  // If start_entity_collection is provided, configure entities from it
+  if (config->start_entity_collection()) {
+    const EntityCollection *entity_collection = config->start_entity_collection();
+    
+    // Use FlatbuffersConfigurator to populate entities from test data
+    FlatbuffersConfigurator configurator(fixture.GetGameResources().event_handler);
+    
+    auto configure_result = configurator.ConfigureEntitiesFromCollection(
+        fixture.GetEntityManager().GetEntityMemoryPool(),
+        entity_collection);
+    
+    if (!configure_result.has_value()) {
+      return std::unexpected(configure_result.error());
+    }
+
+    // Regenerate archetypes after configuring entities
+    auto archetype_result = fixture.GetEntityManager().GenerateAllArchetypes();
+    if (!archetype_result.has_value()) {
+      return std::unexpected(archetype_result.error());
+    }
+  }
+
+  return fixture;
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+run_fixture_test(const TestDataConfig *config) {
+  
+  // Create fixture from test data
+  auto fixture_result = create_fixture_from_test_data(config);
+  if (!fixture_result.has_value()) {
+    return std::unexpected(fixture_result.error());
+  }
+
+  TestFixture &fixture = fixture_result.value();
+
+  // If expected_entity_collection is provided, compare results
+  if (config->expected_entity_collection()) {
+    const EntityCollection *expected_collection = config->expected_entity_collection();
+    
+    // Create an expected EntityMemoryPool
+    EntityMemoryPool expected_pool;
+    
+    // Configure expected pool from test data
+    FlatbuffersConfigurator configurator(fixture.GetGameResources().event_handler);
+    auto configure_result = configurator.ConfigureEntitiesFromCollection(
+        expected_pool, expected_collection);
+    
+    if (!configure_result.has_value()) {
+      return std::unexpected(configure_result.error());
+    }
+
+    // Compare actual vs expected
+    const EntityMemoryPool &actual_pool = 
+        fixture.GetEntityManager().GetEntityMemoryPool();
+    
+    run_entity_memory_pool_comparison_test(actual_pool, expected_pool);
+  }
+
+  return std::monostate{};
 }
 
 } // namespace steamrot::tests

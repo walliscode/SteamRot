@@ -1,5 +1,6 @@
 add_library(test_harness
   test_data_harness.cpp
+  TestFixture.cpp
 )
 
 target_include_directories(test_harness
@@ -12,6 +13,8 @@ target_link_libraries(test_harness
   context
   entity
   test_matchers
+  resources
+  scenes
   Catch2::Catch2
 )
 

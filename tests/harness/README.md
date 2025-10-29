@@ -2,12 +2,18 @@
 
 ## Overview
 
-The test harness provides a unified, simplified interface for loading test data configurations for data-driven testing with Catch2 generators. This consolidates functionality previously spread across `TestDataLoader` and `test_data_generator`.
+The test harness provides a unified, simplified interface for:
+1. Loading test data configurations for data-driven testing with Catch2 generators
+2. Creating and configuring TestFixture instances from test data
+3. Running comparison tests between expected and actual entity states
+
+This consolidates functionality for resource-based testing and data-driven test execution.
 
 ## Purpose
 
 - Provide a single, simple API for loading test data
-- Eliminate redundancy between different test data loading approaches
+- Integrate TestFixture for resource setup and management
+- Enable data-driven testing with automatic fixture creation
 - Work seamlessly with Catch2 generators and matchers
 - Keep the interface minimal and easy to use
 
@@ -18,6 +24,8 @@ harness/
 ├── test_data_harness.h           # Unified API for loading test data
 ├── test_data_harness.cpp         # Implementation
 ├── test_data_harness.test.cpp    # Unit tests
+├── TestFixture.h                 # Resource management for tests
+├── TestFixture.cpp               # Implementation
 ├── CMakeLists.txt                # Build configuration
 ├── README.md                     # This file
 └── data/                         # Sample test data files
@@ -27,6 +35,61 @@ harness/
 ```
 
 ## Usage
+
+### TestFixture Integration (Recommended)
+
+The main wrapper function for data-driven testing with TestFixture:
+
+```cpp
+#include "test_data_harness.h"
+#include <catch2/generators/catch_generators_range.hpp>
+
+TEST_CASE("Data-driven test with TestFixture", "[unit][my_component]") {
+  // Load test configurations
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  
+  // Use Catch2 generator to iterate through configs
+  const auto *config = GENERATE_COPY(from_range(configs.value()));
+  
+  // Create fixture, configure entities, and run comparisons
+  auto result = steamrot::tests::run_fixture_test(config);
+  REQUIRE(result.has_value());
+}
+```
+
+This pattern:
+- Loads test data from adjacent `data/` directory
+- Creates a TestFixture for each configuration
+- Configures entities from `start_entity_collection`
+- Compares with `expected_entity_collection` automatically
+- Ready for future simulation functionality
+
+### Manual Fixture Creation
+
+For more control, create the fixture manually:
+
+```cpp
+#include "test_data_harness.h"
+
+TEST_CASE("Manual fixture creation", "[unit]") {
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  
+  const auto *config = configs.value()[0];
+  
+  // Create and configure fixture from test data
+  auto fixture_result = steamrot::tests::create_fixture_from_test_data(config);
+  REQUIRE(fixture_result.has_value());
+  
+  auto &fixture = fixture_result.value();
+  
+  // Access resources and entity manager
+  auto &entity_mgr = fixture.GetEntityManager();
+  auto &game_resources = fixture.GetGameResources();
+  // ... test logic ...
+}
+```
 
 ### Basic Usage - Adjacent Data Directory
 
@@ -187,6 +250,64 @@ steamrot::tests::run_entity_memory_pool_comparison_test(actual_pool, expected_po
 - Compares pools using `EqualsEntityMemoryPool` matcher
 - Provides detailed error messages on mismatch
 - Allows pools to be instantiated and manipulated before comparison (e.g., simulating logic)
+
+### `create_fixture_from_test_data(config, scene_type)`
+
+Creates and configures a TestFixture from test data configuration.
+
+**Parameters:**
+- `config`: Pointer to TestDataConfig containing entity setup
+- `scene_type`: Scene type for the fixture (default: SceneType_TEST)
+
+**Returns:** `std::expected<TestFixture, FailInfo>`
+
+**Example:**
+```cpp
+auto configs = steamrot::tests::load_test_data_configs();
+const auto *config = configs.value()[0];
+
+auto fixture_result = steamrot::tests::create_fixture_from_test_data(config);
+REQUIRE(fixture_result.has_value());
+
+auto &fixture = fixture_result.value();
+// Use fixture for testing
+```
+
+**Behavior:**
+- Creates TestFixture with specified scene type
+- Initializes game and scene resources
+- Configures entities from `start_entity_collection` if present
+- Generates archetypes automatically
+
+### `run_fixture_test(config)`
+
+Wrapper function for data-driven testing with TestFixture and Catch2 generators.
+
+**Parameters:**
+- `config`: Test data configuration
+
+**Returns:** `std::expected<std::monostate, FailInfo>`
+
+**Example:**
+```cpp
+TEST_CASE("Data-driven test with fixture", "[unit]") {
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  
+  const auto *config = GENERATE_COPY(from_range(configs.value()));
+  
+  auto result = steamrot::tests::run_fixture_test(config);
+  REQUIRE(result.has_value());
+}
+```
+
+**Behavior:**
+1. Creates TestFixture from test data configuration
+2. Configures entities from `start_entity_collection`
+3. If `expected_entity_collection` is present, compares entity states automatically
+4. Leaves room for future simulation functionality
+
+**This is the main wrapper function for data-driven testing with TestFixture.**
 
 ## Integration with Matchers
 

@@ -25,6 +25,7 @@ target_link_libraries(test_scenes
   entity_helpers
   asset_test_helpers
   context_test_helpers
+  test_harness
   user_interface
   test_logic_helpers
   test_matchers
