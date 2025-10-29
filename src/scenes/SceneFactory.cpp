@@ -9,7 +9,7 @@
 #include "SceneFactory.h"
 #include "CraftingScene.h"
 #include "FlatbuffersDataLoader.h"
-#include "ResourceConfigurator.h"
+#include "resources_configuration.h"
 #include "TitleScene.h"
 #include "uuid.h"
 #include <memory>
@@ -80,7 +80,7 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type,
     return std::unexpected(scene_resources_result.error());
   }
 
-  auto configure_resources_result = ConfigureSceneResources(
+  auto configure_resources_result = resources::ConfigureSceneResources(
       scene_ptr->m_scene_resources, scene_resources_result.value());
   if (!configure_resources_result) {
     return std::unexpected(configure_resources_result.error());

@@ -6,7 +6,7 @@
 #include "FailInfo.h"
 #include "FlatbuffersDataLoader.h"
 #include "GameContext.h"
-#include "ResourceConfigurator.h"
+#include "resources_configuration.h"
 #include "SubscriberFactory.h"
 #include "events_generated.h"
 #include <SFML/Graphics.hpp>
@@ -74,7 +74,7 @@ void GameEngine::StartUp() {
   }
 
   auto configure_resources_result =
-      ConfigureGameResources(m_game_resources, game_resources_result.value());
+      resources::ConfigureGameResources(m_game_resources, game_resources_result.value());
   if (!configure_resources_result) {
     std::cerr << "Failed to configure game resources: "
               << configure_resources_result.error().message << "\n";

@@ -6,9 +6,10 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include "ResourceConfigurator.h"
+#include "resources_configuration.h"
 
 namespace steamrot {
+namespace resources {
 
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
@@ -58,4 +59,5 @@ ConfigureSceneResources(SceneResources &resources,
   return std::monostate{};
 }
 
+} // namespace resources
 } // namespace steamrot

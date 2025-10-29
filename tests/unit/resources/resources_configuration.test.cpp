@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "ResourceConfigurator.h"
+#include "resources_configuration.h"
 #include "FlatbuffersDataLoader.h"
 #include "GameResources.h"
 #include "PathProvider.h"
@@ -14,17 +14,17 @@
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("ConfigureGameResources with null game data",
-          "[unit][resources][ResourceConfigurator]") {
+          "[unit][resources][resources_configuration]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::GameResources resources;
 
-  auto result = steamrot::ConfigureGameResources(resources, nullptr);
+  auto result = steamrot::resources::ConfigureGameResources(resources, nullptr);
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
 
 TEST_CASE("ConfigureGameResources loads game resources data successfully",
-          "[unit][resources][ResourceConfigurator]") {
+          "[unit][resources][resources_configuration]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::FlatbuffersDataLoader loader;
 
@@ -32,12 +32,12 @@ TEST_CASE("ConfigureGameResources loads game resources data successfully",
   REQUIRE(game_resources_result.has_value());
 
   steamrot::GameResources resources;
-  auto config_result = steamrot::ConfigureGameResources(resources, game_resources_result.value());
+  auto config_result = steamrot::resources::ConfigureGameResources(resources, game_resources_result.value());
   REQUIRE(config_result.has_value());
 }
 
 TEST_CASE("ConfigureGameResources configures GameResources with environment type",
-          "[unit][resources][ResourceConfigurator]") {
+          "[unit][resources][resources_configuration]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::FlatbuffersDataLoader loader;
 
@@ -45,7 +45,7 @@ TEST_CASE("ConfigureGameResources configures GameResources with environment type
   REQUIRE(game_resources_result.has_value());
 
   steamrot::GameResources resources;
-  auto config_result = steamrot::ConfigureGameResources(resources, game_resources_result.value());
+  auto config_result = steamrot::resources::ConfigureGameResources(resources, game_resources_result.value());
   REQUIRE(config_result.has_value());
 
   // Verify window was created
@@ -53,7 +53,7 @@ TEST_CASE("ConfigureGameResources configures GameResources with environment type
 }
 
 TEST_CASE("ConfigureSceneResources from scene data",
-          "[unit][resources][ResourceConfigurator]") {
+          "[unit][resources][resources_configuration]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::FlatbuffersDataLoader loader;
 
@@ -62,7 +62,7 @@ TEST_CASE("ConfigureSceneResources from scene data",
   REQUIRE(scene_resources_result.has_value());
 
   steamrot::SceneResources resources;
-  auto config_result = steamrot::ConfigureSceneResources(
+  auto config_result = steamrot::resources::ConfigureSceneResources(
       resources, scene_resources_result.value());
   REQUIRE(config_result.has_value());
 
@@ -72,12 +72,12 @@ TEST_CASE("ConfigureSceneResources from scene data",
 }
 
 TEST_CASE("ConfigureSceneResources uses defaults when scene data is null",
-          "[unit][resources][ResourceConfigurator]") {
+          "[unit][resources][resources_configuration]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::SceneResources resources;
 
   // Configure with null scene data - should use defaults
-  auto result = steamrot::ConfigureSceneResources(resources, nullptr);
+  auto result = steamrot::resources::ConfigureSceneResources(resources, nullptr);
   REQUIRE(result.has_value());
 
   // Verify default dimensions were used (800x600)
@@ -86,7 +86,7 @@ TEST_CASE("ConfigureSceneResources uses defaults when scene data is null",
 }
 
 TEST_CASE("ConfigureSceneResources configures resources for multiple scene types",
-          "[unit][resources][ResourceConfigurator]") {
+          "[unit][resources][resources_configuration]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::FlatbuffersDataLoader loader;
 
@@ -96,7 +96,7 @@ TEST_CASE("ConfigureSceneResources configures resources for multiple scene types
   REQUIRE(test_scene_data.has_value());
 
   steamrot::SceneResources test_resources;
-  auto test_result = steamrot::ConfigureSceneResources(
+  auto test_result = steamrot::resources::ConfigureSceneResources(
       test_resources, test_scene_data.value());
   REQUIRE(test_result.has_value());
 
@@ -105,13 +105,13 @@ TEST_CASE("ConfigureSceneResources configures resources for multiple scene types
   REQUIRE(title_scene_data.has_value());
 
   steamrot::SceneResources title_resources;
-  auto title_result = steamrot::ConfigureSceneResources(
+  auto title_result = steamrot::resources::ConfigureSceneResources(
       title_resources, title_scene_data.value());
   REQUIRE(title_result.has_value());
 }
 
 TEST_CASE("ConfigureSceneResources with custom scene resource data",
-          "[unit][resources][ResourceConfigurator]") {
+          "[unit][resources][resources_configuration]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
 
   // Create custom scene resources
@@ -126,7 +126,7 @@ TEST_CASE("ConfigureSceneResources with custom scene resource data",
   steamrot::SceneResources resources;
 
   auto result =
-      steamrot::ConfigureSceneResources(resources, custom_scene_data);
+      steamrot::resources::ConfigureSceneResources(resources, custom_scene_data);
   REQUIRE(result.has_value());
   REQUIRE(resources.scene_texture.getSize().x == 1024);
   REQUIRE(resources.scene_texture.getSize().y == 768);
