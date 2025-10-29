@@ -157,11 +157,6 @@ TEST_CASE("create_fixture_from_test_data creates initialized fixture",
   REQUIRE(fixture_result.has_value());
 
   auto &fixture = fixture_result.value();
-
-  // Verify fixture is initialized
-  REQUIRE(&fixture.GetGameResources() != nullptr);
-  REQUIRE(&fixture.GetSceneResources() != nullptr);
-  REQUIRE(&fixture.GetEntityManager() != nullptr);
 }
 
 TEST_CASE("create_fixture_from_test_data rejects null config",
@@ -173,8 +168,7 @@ TEST_CASE("create_fixture_from_test_data rejects null config",
   REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
 
-TEST_CASE("run_fixture_test executes comparison test",
-          "[unit][harness]") {
+TEST_CASE("run_fixture_test executes comparison test", "[unit][harness]") {
 
   auto configs = steamrot::tests::load_test_data_configs();
   REQUIRE(configs.has_value());
@@ -188,8 +182,7 @@ TEST_CASE("run_fixture_test executes comparison test",
   REQUIRE(result.has_value());
 }
 
-TEST_CASE("run_fixture_test works with Catch2 generators",
-          "[unit][harness]") {
+TEST_CASE("run_fixture_test works with Catch2 generators", "[unit][harness]") {
 
   auto configs = steamrot::tests::load_test_data_configs();
   REQUIRE(configs.has_value());
@@ -202,4 +195,3 @@ TEST_CASE("run_fixture_test works with Catch2 generators",
   INFO("Test name: " << config->metadata()->test_name()->str());
   REQUIRE(result.has_value());
 }
-
