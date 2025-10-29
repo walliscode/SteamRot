@@ -18,7 +18,6 @@
 
 namespace steamrot {
 namespace resources {
-namespace configuration {
 
 ////////////////////////////////////////////////////////////
 /// @brief Configure GameResources from FlatBuffers data.
@@ -49,6 +48,5 @@ std::expected<std::monostate, FailInfo>
 ConfigureSceneResources(SceneResources &resources,
                         const SceneResourcesData *scene_data);
 
-} // namespace configuration
 } // namespace resources
 } // namespace steamrot

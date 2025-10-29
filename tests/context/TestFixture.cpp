@@ -33,7 +33,7 @@ void TestFixture::ConfigureGameResourcesForTest() {
   auto game_data_result = loader.ProvideGameResourcesData();
   
   if (game_data_result.has_value()) {
-    auto config_result = resources::configuration::ConfigureGameResources(
+    auto config_result = resources::ConfigureGameResources(
         m_game_resources, game_data_result.value());
     
     if (!config_result.has_value()) {
@@ -63,7 +63,7 @@ void TestFixture::ConfigureSceneResourcesForTest(const SceneType &scene_type) {
   auto scene_data_result = loader.ProvideSceneResourcesData(scene_type);
   
   if (scene_data_result.has_value()) {
-    auto config_result = resources::configuration::ConfigureSceneResources(
+    auto config_result = resources::ConfigureSceneResources(
         m_scene_resources, scene_data_result.value());
     
     if (!config_result.has_value()) {

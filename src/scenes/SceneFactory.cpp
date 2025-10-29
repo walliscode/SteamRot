@@ -80,7 +80,7 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type,
     return std::unexpected(scene_resources_result.error());
   }
 
-  auto configure_resources_result = resources::configuration::ConfigureSceneResources(
+  auto configure_resources_result = resources::ConfigureSceneResources(
       scene_ptr->m_scene_resources, scene_resources_result.value());
   if (!configure_resources_result) {
     return std::unexpected(configure_resources_result.error());

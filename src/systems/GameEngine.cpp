@@ -74,7 +74,7 @@ void GameEngine::StartUp() {
   }
 
   auto configure_resources_result =
-      resources::configuration::ConfigureGameResources(m_game_resources, game_resources_result.value());
+      resources::ConfigureGameResources(m_game_resources, game_resources_result.value());
   if (!configure_resources_result) {
     std::cerr << "Failed to configure game resources: "
               << configure_resources_result.error().message << "\n";

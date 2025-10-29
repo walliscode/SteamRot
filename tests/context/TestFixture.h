@@ -63,7 +63,7 @@ private:
   ////////////////////////////////////////////////////////////
   /// @brief Configure GameResources for testing.
   ///
-  /// Uses the reusable resources::configuration::ConfigureGameResources
+  /// Uses the reusable resources::ConfigureGameResources
   /// function and additionally loads assets and sets environment type.
   ////////////////////////////////////////////////////////////
   void ConfigureGameResourcesForTest();
@@ -71,7 +71,7 @@ private:
   ////////////////////////////////////////////////////////////
   /// @brief Configure SceneResources and entities for testing.
   ///
-  /// Uses the reusable resources::configuration::ConfigureSceneResources
+  /// Uses the reusable resources::ConfigureSceneResources
   /// function and additionally configures entities and generates archetypes.
   ///
   /// @param scene_type Scene type to configure for
