@@ -12,6 +12,7 @@ target_link_libraries(test_systems
   Catch2::Catch2WithMain
   systems
   context_test_helpers
+  test_harness
 
 
 )

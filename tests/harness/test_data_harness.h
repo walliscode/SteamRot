@@ -12,9 +12,11 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FailInfo.h"
+#include "TestFixture.h"
 #include "containers.h"
 #include "test_data_generated.h"
 #include <expected>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -84,5 +86,76 @@ run_test_data_config(const TestDataConfig *config);
 /////////////////////////////////////////////////
 void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
                                             const EntityMemoryPool &expected);
+
+/////////////////////////////////////////////////
+/// @brief Setup TestFixture from test data configuration
+///
+/// This function creates and initializes a TestFixture based on the
+/// start_entity_collection from the test data configuration.
+/// The fixture's entities will be configured according to the test data.
+///
+/// @param config The test data configuration containing entity setup
+/// @param scene_type The scene type for the fixture (default: SceneType_TEST)
+/// @return Initialized TestFixture or FailInfo on error
+/////////////////////////////////////////////////
+std::expected<TestFixture, FailInfo>
+setup_fixture_from_test_data(const TestDataConfig *config,
+                             const SceneType &scene_type = SceneType::SceneType_TEST);
+
+/////////////////////////////////////////////////
+/// @brief Container function for running tests with TestFixture
+///
+/// This is the main integration function that:
+/// 1. Loads test data from adjacent data directory
+/// 2. For each test configuration:
+///    a. Creates TestFixture with resources configured from test data
+///    b. Calls the simulation function to manipulate the fixture
+///    c. Compares final state with expected state from test data
+///
+/// The simulation function receives a reference to the TestFixture and can:
+/// - Access and modify entities via fixture.GetEntityManager()
+/// - Run logic simulations
+/// - Trigger events
+/// - Modify game/scene resources
+///
+/// After simulation, the function automatically compares the resulting
+/// EntityMemoryPool with the expected state from test data.
+///
+/// @param simulation_fn Function to run simulations on the fixture
+/// @return std::monostate on success, FailInfo on error
+///
+/// Example usage:
+/// @code
+/// auto result = run_test_with_fixture([](TestFixture& fixture) {
+///   // Get entity manager and simulate logic
+///   auto& entity_manager = fixture.GetEntityManager();
+///   auto& pool = entity_manager.GetEntityMemoryPool();
+///   
+///   // Perform simulations...
+///   // Modify entities, run logic, etc.
+/// });
+/// REQUIRE(result.has_value());
+/// @endcode
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+run_test_with_fixture(std::function<void(TestFixture&)> simulation_fn);
+
+/////////////////////////////////////////////////
+/// @brief Run a single test configuration with TestFixture
+///
+/// This function runs a test for a single configuration:
+/// 1. Creates TestFixture from test data
+/// 2. Calls the simulation function
+/// 3. Compares result with expected state
+///
+/// @param config The test data configuration
+/// @param simulation_fn Function to run simulations on the fixture
+/// @param scene_type The scene type for the fixture (default: SceneType_TEST)
+/// @return std::monostate on success, FailInfo on error
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+run_single_test_with_fixture(const TestDataConfig *config,
+                             std::function<void(TestFixture&)> simulation_fn,
+                             const SceneType &scene_type = SceneType::SceneType_TEST);
 
 } // namespace steamrot::tests

@@ -2,12 +2,18 @@
 
 ## Overview
 
-The test harness provides a unified, simplified interface for loading test data configurations for data-driven testing with Catch2 generators. This consolidates functionality previously spread across `TestDataLoader` and `test_data_generator`.
+The test harness provides a unified, simplified interface for:
+1. Loading test data configurations for data-driven testing with Catch2 generators
+2. Running tests with TestFixture - a complete resource management solution for tests
+3. Comparing entity states with expected results
+
+This consolidates functionality for resource-based testing and data-driven test execution.
 
 ## Purpose
 
 - Provide a single, simple API for loading test data
-- Eliminate redundancy between different test data loading approaches
+- Integrate TestFixture for resource setup and management
+- Enable simulation-based testing with automatic state comparison
 - Work seamlessly with Catch2 generators and matchers
 - Keep the interface minimal and easy to use
 
@@ -18,6 +24,8 @@ harness/
 ├── test_data_harness.h           # Unified API for loading test data
 ├── test_data_harness.cpp         # Implementation
 ├── test_data_harness.test.cpp    # Unit tests
+├── TestFixture.h                 # Resource management for tests
+├── TestFixture.cpp               # Implementation
 ├── CMakeLists.txt                # Build configuration
 ├── README.md                     # This file
 └── data/                         # Sample test data files
@@ -27,6 +35,80 @@ harness/
 ```
 
 ## Usage
+
+### TestFixture Integration (Recommended for Complex Tests)
+
+The harness now includes TestFixture for complete resource management. This is the recommended approach for tests that need game resources, entities, and logic simulation:
+
+```cpp
+#include "test_data_harness.h"
+
+TEST_CASE("Run simulation with TestFixture", "[unit][my_component]") {
+  // One call to run all tests from adjacent data directory
+  auto result = steamrot::tests::run_test_with_fixture(
+      [](steamrot::tests::TestFixture &fixture) {
+        // Access resources
+        auto &entity_manager = fixture.GetEntityManager();
+        auto &pool = entity_manager.GetEntityMemoryPool();
+        
+        // Simulate logic, modify entities, etc.
+        // ... your simulation code ...
+      });
+  
+  REQUIRE(result.has_value());
+}
+```
+
+### Running a Single Test with TestFixture
+
+For more control, you can run a single test configuration:
+
+```cpp
+#include "test_data_harness.h"
+
+TEST_CASE("Run single config with simulation", "[unit]") {
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  
+  const auto *config = configs.value()[0];
+  
+  auto result = steamrot::tests::run_single_test_with_fixture(
+      config,
+      [](steamrot::tests::TestFixture &fixture) {
+        // Your simulation code here
+        auto &entity_mgr = fixture.GetEntityManager();
+        // Modify entities, run logic...
+      });
+  
+  REQUIRE(result.has_value());
+}
+```
+
+### Manual Fixture Setup
+
+For even more control, set up the fixture manually:
+
+```cpp
+#include "test_data_harness.h"
+
+TEST_CASE("Manual fixture setup", "[unit]") {
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  
+  const auto *config = configs.value()[0];
+  
+  // Setup fixture from test data
+  auto fixture_result = steamrot::tests::setup_fixture_from_test_data(config);
+  REQUIRE(fixture_result.has_value());
+  
+  auto &fixture = fixture_result.value();
+  
+  // Use fixture for testing
+  auto &entity_mgr = fixture.GetEntityManager();
+  auto &game_resources = fixture.GetGameResources();
+  // ... test logic ...
+}
+```
 
 ### Basic Usage - Adjacent Data Directory
 
@@ -161,6 +243,96 @@ REQUIRE(result.has_value());
 - Future: Event sequences, UI configurations, Logic tests, etc.
 
 **Note:** This wrapper performs validation only. For actual test execution, use specialized test functions like `run_entity_memory_pool_comparison_test()`.
+
+### `setup_fixture_from_test_data(config, scene_type)`
+
+Creates and initializes a TestFixture from test data configuration.
+
+**Parameters:**
+- `config`: Pointer to TestDataConfig containing entity setup
+- `scene_type`: Scene type for the fixture (default: SceneType_TEST)
+
+**Returns:** `std::expected<TestFixture, FailInfo>`
+
+**Example:**
+```cpp
+auto configs = steamrot::tests::load_test_data_configs();
+const auto *config = configs.value()[0];
+
+auto fixture_result = steamrot::tests::setup_fixture_from_test_data(config);
+REQUIRE(fixture_result.has_value());
+
+auto &fixture = fixture_result.value();
+// Use fixture for testing
+```
+
+**Behavior:**
+- Creates TestFixture with specified scene type
+- Initializes game and scene resources
+- Configures entities from `start_entity_collection` if present
+- Generates archetypes automatically
+
+### `run_single_test_with_fixture(config, simulation_fn, scene_type)`
+
+Runs a single test configuration with TestFixture and simulation.
+
+**Parameters:**
+- `config`: Test data configuration
+- `simulation_fn`: Function to run simulations on the fixture `void(TestFixture&)`
+- `scene_type`: Scene type for the fixture (default: SceneType_TEST)
+
+**Returns:** `std::expected<std::monostate, FailInfo>`
+
+**Example:**
+```cpp
+auto configs = steamrot::tests::load_test_data_configs();
+const auto *config = configs.value()[0];
+
+auto result = steamrot::tests::run_single_test_with_fixture(
+    config,
+    [](steamrot::tests::TestFixture &fixture) {
+      auto &entity_mgr = fixture.GetEntityManager();
+      // Simulate logic, modify entities...
+    });
+
+REQUIRE(result.has_value());
+```
+
+**Behavior:**
+1. Creates TestFixture from test data
+2. Calls the simulation function with the fixture
+3. If `expected_entity_collection` is present, compares results automatically
+
+### `run_test_with_fixture(simulation_fn)`
+
+Container function for running all tests from adjacent data directory with TestFixture.
+
+**Parameters:**
+- `simulation_fn`: Function to run simulations on the fixture `void(TestFixture&)`
+
+**Returns:** `std::expected<std::monostate, FailInfo>`
+
+**Example:**
+```cpp
+auto result = steamrot::tests::run_test_with_fixture(
+    [](steamrot::tests::TestFixture &fixture) {
+      auto &entity_mgr = fixture.GetEntityManager();
+      auto &pool = entity_mgr.GetEntityMemoryPool();
+      
+      // Your simulation logic here
+    });
+
+REQUIRE(result.has_value());
+```
+
+**Behavior:**
+1. Loads all test data from adjacent `data/` directory
+2. For each configuration:
+   - Creates TestFixture from test data
+   - Calls simulation function
+   - Compares with expected state if present
+
+**This is the main integration function for data-driven testing with TestFixture.**
 
 ### `run_entity_memory_pool_comparison_test(actual, expected)`
 

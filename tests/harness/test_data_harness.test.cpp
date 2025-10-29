@@ -141,3 +141,105 @@ TEST_CASE("run_test_data_config works with Catch2 generators",
   INFO("Test name: " << config->metadata()->test_name()->str());
   REQUIRE(result.has_value());
 }
+
+TEST_CASE("setup_fixture_from_test_data creates initialized fixture",
+          "[unit][harness]") {
+
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  REQUIRE(configs.value().size() >= 1);
+
+  const auto *config = configs.value()[0];
+
+  // Setup fixture from test data
+  auto fixture_result = steamrot::tests::setup_fixture_from_test_data(config);
+
+  REQUIRE(fixture_result.has_value());
+
+  auto &fixture = fixture_result.value();
+
+  // Verify fixture is initialized
+  REQUIRE(&fixture.GetGameResources() != nullptr);
+  REQUIRE(&fixture.GetSceneResources() != nullptr);
+  REQUIRE(&fixture.GetEntityManager() != nullptr);
+}
+
+TEST_CASE("setup_fixture_from_test_data rejects null config",
+          "[unit][harness]") {
+
+  auto result = steamrot::tests::setup_fixture_from_test_data(nullptr);
+
+  REQUIRE_FALSE(result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
+}
+
+TEST_CASE("run_single_test_with_fixture executes simulation function",
+          "[unit][harness]") {
+
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  REQUIRE(configs.value().size() >= 1);
+
+  const auto *config = configs.value()[0];
+
+  bool simulation_called = false;
+
+  // Run test with a simple simulation function
+  auto result = steamrot::tests::run_single_test_with_fixture(
+      config,
+      [&simulation_called](steamrot::tests::TestFixture &fixture) {
+        // Mark that the simulation was called
+        simulation_called = true;
+
+        // Verify we can access fixture resources
+        REQUIRE(&fixture.GetEntityManager() != nullptr);
+      });
+
+  REQUIRE(result.has_value());
+  REQUIRE(simulation_called);
+}
+
+TEST_CASE("run_test_with_fixture processes all test configs",
+          "[unit][harness]") {
+
+  size_t simulation_count = 0;
+
+  // Run tests with a counting simulation function
+  auto result = steamrot::tests::run_test_with_fixture(
+      [&simulation_count](steamrot::tests::TestFixture &fixture) {
+        simulation_count++;
+        
+        // Verify we can access fixture resources
+        REQUIRE(&fixture.GetEntityManager() != nullptr);
+      });
+
+  REQUIRE(result.has_value());
+
+  // Should have run simulation for each test config
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  REQUIRE(simulation_count == configs.value().size());
+}
+
+TEST_CASE("run_single_test_with_fixture compares with expected state",
+          "[unit][harness]") {
+
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  REQUIRE(configs.value().size() >= 1);
+
+  // Use a config that has both start and expected entity collections
+  const auto *config = configs.value()[0];
+  REQUIRE(config->start_entity_collection() != nullptr);
+  REQUIRE(config->expected_entity_collection() != nullptr);
+
+  // Run test without modifying entities - should match expected state
+  auto result = steamrot::tests::run_single_test_with_fixture(
+      config,
+      [](steamrot::tests::TestFixture &fixture) {
+        // No modifications - entities should match expected state
+      });
+
+  REQUIRE(result.has_value());
+}
+

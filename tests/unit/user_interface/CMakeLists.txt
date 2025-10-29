@@ -15,6 +15,7 @@ target_link_libraries(test_user_interface
   Catch2::Catch2WithMain
   ui_styles
   context_test_helpers
+  test_harness
   mock_subscriber_data
 )
 

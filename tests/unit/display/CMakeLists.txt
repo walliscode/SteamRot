@@ -12,6 +12,7 @@ target_link_libraries(test_display
   Catch2::Catch2WithMain
   display
   context_test_helpers
+  test_harness
 )
 
 catch_discover_tests(test_display)

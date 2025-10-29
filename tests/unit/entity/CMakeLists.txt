@@ -16,6 +16,7 @@ target_link_libraries(test_entity
   entity
   entity_helpers
   context_test_helpers
+  test_harness
   )
 
 catch_discover_tests(test_entity)
