@@ -2,7 +2,7 @@
 
 ## Overview
 
-Stage 2 of the Context Handling Improvement Plan introduces data-driven configuration for context initialization. This allows game and scene settings to be externalized to JSON files, making it easier to adjust configurations without recompiling.
+The context configuration system provides data-driven configuration for context initialization. This allows game and scene settings to be externalized to JSON files, making it easier to adjust configurations without recompiling.
 
 ## Configuration Files
 
@@ -275,15 +275,13 @@ When adding new configuration fields:
 
 ## Future Enhancements
 
-### Stage 3: Context Management
+### Context Management
 
-The next stage will introduce `ContextDirector` for managing context lifecycle and registration:
+Future enhancements will introduce `ContextDirector` for managing context lifecycle and registration:
 
 - Static registry for LogicContextBuilders by scene type
 - Centralized context creation and caching
 - Easier scene switching
-
-See `documentation/CONTEXT_HANDLING_IMPROVEMENT_PLAN.md` for details.
 
 ## Related Files
 
@@ -301,5 +299,4 @@ See `documentation/CONTEXT_HANDLING_IMPROVEMENT_PLAN.md` for details.
 - `tests/integration/context_configuration/` - Integration tests
 
 ### Documentation
-- `documentation/CONTEXT_HANDLING_IMPROVEMENT_PLAN.md` - Overall plan
 - This file - Configuration format reference

@@ -1,6 +1,6 @@
 # Test Data Configuration System Examples
 
-This directory contains example code demonstrating how to use the Test Data Configuration System implemented in Stage 3.1 of the Testing Improvement Plan.
+This directory contains example code demonstrating how to use the Test Data Configuration System.
 
 ## Files in This Directory
 

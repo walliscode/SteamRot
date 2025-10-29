@@ -290,9 +290,7 @@ if (!game_data_result.has_value()) {
 
 ## Related Documentation
 
-- `RESOURCE_CONTEXT_REFACTORING_PLAN.md` - Overall refactoring plan
 - `CONTEXT_CONFIGURATION.md` - Context configuration (separate from resources)
-- `CONTEXT_HANDLING_IMPROVEMENT_PLAN.md` - Long-term improvement plan
 
 ## Future Enhancements
 

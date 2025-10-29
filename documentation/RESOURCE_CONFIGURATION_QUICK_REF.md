@@ -180,5 +180,4 @@ if (!result.has_value()) {
 ## See Also
 
 - `RESOURCE_CONFIGURATION.md` - Detailed documentation
-- `RESOURCE_CONTEXT_REFACTORING_PLAN.md` - Refactoring plan
 - `CONTEXT_CONFIGURATION.md` - Context configuration (separate concern)

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Test Data Configuration System (Stage 3.1 of the Testing Improvement Plan) provides an extensible framework for creating data-driven tests using FlatBuffers. This system allows tests to be defined in JSON files and loaded at runtime, making it easy to add new test cases without modifying code.
+The Test Data Configuration System provides an extensible framework for creating data-driven tests using FlatBuffers. This system allows tests to be defined in JSON files and loaded at runtime, making it easy to add new test cases without modifying code.
 
 ## Key Features
 
@@ -562,7 +562,6 @@ All can be added by extending `TestDataConfig` with new optional fields.
 
 ## References
 
-- **Testing Improvement Plan**: `documentation/TESTING_IMPROVEMENT_PLAN.md`
 - **FlatBuffers Schema**: `src/flatbuffers_headers/test_data.fbs`
 - **Example Files**: `tests/context/data/`
 - **TestDataLoader**: `tests/context/TestDataLoader.h`

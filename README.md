@@ -1030,8 +1030,6 @@ TEST_CASE("Feature workflow", "[integration][feature_name]") {
 }
 ```
 
-See [TESTING_IMPROVEMENT_PLAN.md](documentation/TESTING_IMPROVEMENT_PLAN.md) for detailed testing guidelines and the roadmap for test infrastructure improvements.
-
 ### Test-Driven Development (TDD) in SteamRot
 
 SteamRot follows a Test-Driven Development approach for all new features and components. This section documents how to implement TDD effectively in this repository.

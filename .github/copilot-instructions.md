@@ -846,8 +846,6 @@ ctest --preset Debug --output-on-failure
 - System tests: `workflow.system.test.cpp` (future)
 - Performance tests: `component.perf.test.cpp` (future)
 
-See [TESTING_IMPROVEMENT_PLAN.md](../documentation/TESTING_IMPROVEMENT_PLAN.md) for detailed test infrastructure roadmap.
-
 ## Build System (Reference Only)
 
 **Note: Agents do NOT build. This section is for reference only.**
@@ -992,11 +990,11 @@ void Function() {
 9. **Reusable Test Infrastructure**: Use TestScenarios, assertions, and mixins for tests
 10. **Test Tags**: Always tag tests with `[unit]`, `[integration]`, or `[system]`
 
-## Context Configuration (Stage 2)
+## Context Configuration
 
 ### Overview
 
-Stage 2 of the Context Handling Improvement Plan provides data-driven context configuration via FlatBuffers. This allows game and scene settings to be externalized to JSON files.
+The context configuration system provides data-driven context configuration via FlatBuffers. This allows game and scene settings to be externalized to JSON files.
 
 See `documentation/CONTEXT_CONFIGURATION.md` for complete documentation.
 
@@ -1043,11 +1041,9 @@ auto context = builder.Build().value();
 
 ### Related Documentation
 
-- `documentation/STAGE_2_SUMMARY.md` - Implementation summary
 - `documentation/CONTEXT_CONFIGURATION.md` - Complete usage guide
-- `documentation/CONTEXT_HANDLING_IMPROVEMENT_PLAN.md` - Overall plan
 
-## Testing Infrastructure (Stage 2)
+## Testing Infrastructure
 
 ### Reusable Test Components
 
@@ -1180,7 +1176,7 @@ class NewLogicTest : public LogicTestBase<NewLogic> {
 // Note: Building and testing done locally by user
 ```
 
-## Test Data Configuration System (Stage 3.1)
+## Test Data Configuration System
 
 ### Overview
 
