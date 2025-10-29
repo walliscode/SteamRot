@@ -990,11 +990,11 @@ void Function() {
 9. **Reusable Test Infrastructure**: Use TestScenarios, assertions, and mixins for tests
 10. **Test Tags**: Always tag tests with `[unit]`, `[integration]`, or `[system]`
 
-## Context Configuration (Stage 2)
+## Context Configuration
 
 ### Overview
 
-Stage 2 of the Context Handling Improvement Plan provides data-driven context configuration via FlatBuffers. This allows game and scene settings to be externalized to JSON files.
+The context configuration system provides data-driven context configuration via FlatBuffers. This allows game and scene settings to be externalized to JSON files.
 
 See `documentation/CONTEXT_CONFIGURATION.md` for complete documentation.
 
@@ -1176,7 +1176,7 @@ class NewLogicTest : public LogicTestBase<NewLogic> {
 // Note: Building and testing done locally by user
 ```
 
-## Test Data Configuration System (Stage 3.1)
+## Test Data Configuration System
 
 ### Overview
 

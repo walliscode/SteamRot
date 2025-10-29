@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-Stage 2 adds data-driven context configuration. Edit JSON files instead of recompiling for configuration changes.
+Data-driven context configuration allows editing JSON files instead of recompiling for configuration changes.
 
 ## File Locations
 
@@ -187,9 +187,9 @@ test_context_configuration
 
 **Note**: Configurator prepares builder with static settings. Runtime objects must still be added before calling `Build()`.
 
-## Next: Stage 3
+## Future Enhancements
 
-Stage 3 will add `ContextDirector` for:
+Future enhancements will add `ContextDirector` for:
 - Static registry of builders by scene type
 - Centralized context lifecycle management
 - Easier scene switching
