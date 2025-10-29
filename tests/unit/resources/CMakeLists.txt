@@ -1,5 +1,5 @@
 add_executable(test_resources
-  ResourceConfigurator.test.cpp
+  resources_configuration.test.cpp
 )
 
 target_link_libraries(test_resources

@@ -9,7 +9,7 @@
 #include "FlatbuffersDataLoader.h"
 #include "GameResources.h"
 #include "PathProvider.h"
-#include "ResourceConfigurator.h"
+#include "resources_configuration.h"
 #include "SceneResources.h"
 #include <catch2/catch_test_macros.hpp>
 
@@ -32,7 +32,7 @@ TEST_CASE("Load resource configuration and configure resources",
 
   // Configure GameResources from configuration
   steamrot::GameResources game_resources;
-  auto game_config_result = steamrot::ConfigureGameResources(game_resources, game_data);
+  auto game_config_result = steamrot::resources::configuration::ConfigureGameResources(game_resources, game_data);
   REQUIRE(game_config_result.has_value());
 
   // Configure SceneResources for test scene
@@ -42,7 +42,7 @@ TEST_CASE("Load resource configuration and configure resources",
 
   steamrot::SceneResources scene_resources;
   auto scene_config_result =
-      steamrot::ConfigureSceneResources(scene_resources,
+      steamrot::resources::configuration::ConfigureSceneResources(scene_resources,
                                         scene_resources_result.value());
   REQUIRE(scene_config_result.has_value());
 }
@@ -58,7 +58,7 @@ TEST_CASE("Configuration supports all required scene types",
   REQUIRE(test_scene_data.has_value());
 
   steamrot::SceneResources test_resources;
-  auto test_result = steamrot::ConfigureSceneResources(
+  auto test_result = steamrot::resources::configuration::ConfigureSceneResources(
       test_resources, test_scene_data.value());
   REQUIRE(test_result.has_value());
 
@@ -68,7 +68,7 @@ TEST_CASE("Configuration supports all required scene types",
   REQUIRE(title_scene_data.has_value());
 
   steamrot::SceneResources title_resources;
-  auto title_result = steamrot::ConfigureSceneResources(
+  auto title_result = steamrot::resources::configuration::ConfigureSceneResources(
       title_resources, title_scene_data.value());
   REQUIRE(title_result.has_value());
 }
@@ -111,7 +111,7 @@ TEST_CASE("Resources can be configured from resource data",
 
   // Configure GameResources from resource data
   steamrot::GameResources game_resources;
-  auto config_result = steamrot::ConfigureGameResources(game_resources, game_resources_result.value());
+  auto config_result = steamrot::resources::configuration::ConfigureGameResources(game_resources, game_resources_result.value());
   REQUIRE(config_result.has_value());
 
   // Verify the resources were configured with correct values

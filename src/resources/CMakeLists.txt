@@ -1,5 +1,5 @@
 add_library(resources
-  ResourceConfigurator.cpp
+  resources_configuration.cpp
 )
 
 target_include_directories(resources

@@ -61,16 +61,22 @@ private:
   SceneType m_scene_type;
 
   ////////////////////////////////////////////////////////////
-  /// @brief Configure GameResources with test defaults.
+  /// @brief Configure GameResources for testing.
+  ///
+  /// Uses the reusable resources::configuration::ConfigureGameResources
+  /// function and additionally loads assets and sets environment type.
   ////////////////////////////////////////////////////////////
-  void ConfigureGameResources();
+  void ConfigureGameResourcesForTest();
 
   ////////////////////////////////////////////////////////////
-  /// @brief Configure SceneResources with test defaults.
+  /// @brief Configure SceneResources and entities for testing.
+  ///
+  /// Uses the reusable resources::configuration::ConfigureSceneResources
+  /// function and additionally configures entities and generates archetypes.
   ///
   /// @param scene_type Scene type to configure for
   ////////////////////////////////////////////////////////////
-  void ConfigureSceneResources(const SceneType &scene_type);
+  void ConfigureSceneResourcesForTest(const SceneType &scene_type);
 
 public:
   ////////////////////////////////////////////////////////////
