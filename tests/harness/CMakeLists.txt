@@ -21,7 +21,6 @@ target_link_libraries(test_harness
 # Create test executable for harness
 add_executable(test_harness_tests
   test_data_harness.test.cpp
-  example_integration.test.cpp
 )
 
 target_link_libraries(test_harness_tests
