@@ -194,12 +194,8 @@ Stage 3 will add `ContextDirector` for:
 - Centralized context lifecycle management
 - Easier scene switching
 
-See `documentation/CONTEXT_HANDLING_IMPROVEMENT_PLAN.md` for roadmap.
-
 ## Help
 
 - **Full Docs**: `documentation/CONTEXT_CONFIGURATION.md`
-- **Implementation Summary**: `documentation/STAGE_2_SUMMARY.md`
-- **Overall Plan**: `documentation/CONTEXT_HANDLING_IMPROVEMENT_PLAN.md`
 - **Code**: `src/context/ContextConfigurator.h/cpp`
 - **Tests**: `tests/unit/context/ContextConfigurator.test.cpp`

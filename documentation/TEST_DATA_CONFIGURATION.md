@@ -562,7 +562,6 @@ All can be added by extending `TestDataConfig` with new optional fields.
 
 ## References
 
-- **Testing Improvement Plan**: `documentation/TESTING_IMPROVEMENT_PLAN.md`
 - **FlatBuffers Schema**: `src/flatbuffers_headers/test_data.fbs`
 - **Example Files**: `tests/context/data/`
 - **TestDataLoader**: `tests/context/TestDataLoader.h`

@@ -846,8 +846,6 @@ ctest --preset Debug --output-on-failure
 - System tests: `workflow.system.test.cpp` (future)
 - Performance tests: `component.perf.test.cpp` (future)
 
-See [TESTING_IMPROVEMENT_PLAN.md](../documentation/TESTING_IMPROVEMENT_PLAN.md) for detailed test infrastructure roadmap.
-
 ## Build System (Reference Only)
 
 **Note: Agents do NOT build. This section is for reference only.**
@@ -1043,11 +1041,9 @@ auto context = builder.Build().value();
 
 ### Related Documentation
 
-- `documentation/STAGE_2_SUMMARY.md` - Implementation summary
 - `documentation/CONTEXT_CONFIGURATION.md` - Complete usage guide
-- `documentation/CONTEXT_HANDLING_IMPROVEMENT_PLAN.md` - Overall plan
 
-## Testing Infrastructure (Stage 2)
+## Testing Infrastructure
 
 ### Reusable Test Components
 

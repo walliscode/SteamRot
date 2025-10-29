@@ -283,8 +283,6 @@ The next stage will introduce `ContextDirector` for managing context lifecycle a
 - Centralized context creation and caching
 - Easier scene switching
 
-See `documentation/CONTEXT_HANDLING_IMPROVEMENT_PLAN.md` for details.
-
 ## Related Files
 
 ### Source Files
@@ -301,5 +299,4 @@ See `documentation/CONTEXT_HANDLING_IMPROVEMENT_PLAN.md` for details.
 - `tests/integration/context_configuration/` - Integration tests
 
 ### Documentation
-- `documentation/CONTEXT_HANDLING_IMPROVEMENT_PLAN.md` - Overall plan
 - This file - Configuration format reference
