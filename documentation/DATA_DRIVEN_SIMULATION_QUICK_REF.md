@@ -2,158 +2,196 @@
 
 This is a quick reference guide for the comprehensive [Data-Driven Simulation Design document](DATA_DRIVEN_SIMULATION_DESIGN.md).
 
-## Three Approaches Overview
+**PRIMARY FOCUS: Free functions for testing and incremental development!**
 
-### 1. Logic Class-Based System (Extend Current Pattern)
-**Best for:** Parameterizing existing logic, scene-specific variations  
-**Effort:** Low  
-**Flexibility:** Medium  
-**Performance:** Excellent  
+## Primary Approach: Free Function-Based System
 
-Define Logic behavior in JSON/FlatBuffers configuration:
-```json
-{
-  "name": "CustomMovementLogic",
-  "type": "Movement",
-  "archetype_components": ["CPosition", "CVelocity"],
-  "parameters": {
-    "max_speed": 5.0,
-    "friction": 0.95
-  }
-}
-```
-
-### 2. Free Function-Based System
-**Best for:** Composable pipelines, reusable utilities  
-**Effort:** Medium  
+**Best for:** Testing, prototyping, incremental development  
+**Effort:** Minimal (just write functions!)  
 **Flexibility:** High  
 **Performance:** Excellent  
 
-Compose simulation from registered free functions:
-```json
-{
-  "steps": [
-    { "function": "movement::apply_velocity", "parameters": {"delta_time": 0.016} },
-    { "function": "movement::apply_friction", "parameters": {"friction": 0.95} }
-  ]
+### Quick Start
+
+Write simulation functions that take SceneContext:
+
+```cpp
+// File: src/logic/simulation_test.h
+namespace steamrot::simulation::test {
+
+void MyTestFunction(SceneContext &context, const Parameters &params) {
+  // Access entities, components, archetypes directly
+  ArchetypeID archetype = GenerateArchetypeIDfromTypes<CPosition>();
+  
+  const auto it = context.archetypes.find(archetype);
+  if (it != context.archetypes.end()) {
+    for (size_t entity_id : it->second) {
+      // Test your logic here
+    }
+  }
+}
+
+} // namespace
+```
+
+### Test Directly
+
+```cpp
+// tests/logic/simulation_test.test.cpp
+TEST_CASE("My test function works", "[unit][simulation]") {
+  steamrot::tests::TestContext test_context;
+  auto context = test_context.GetLogicContextForTestScene();
+  
+  steamrot::simulation::test::Parameters params;
+  
+  // Call directly - no Logic class needed!
+  REQUIRE_NOTHROW(steamrot::simulation::test::MyTestFunction(context, params));
 }
 ```
 
-### 3. Lua Scripting System
+### Key Benefits for Testing
+
+- ✅ **No Logic class required** - Write functions, test them
+- ✅ **Direct testing** - Call functions in unit tests
+- ✅ **Incremental** - Add one function at a time
+- ✅ **Easy debugging** - Standard C++ function debugging
+- ✅ **Reusable** - Functions can be called anywhere
+
+## Alternative Approaches
+
+### Logic Class-Based System
+**Best for:** Organizing stable, tested functions  
+**Effort:** Medium  
+**Flexibility:** Medium  
+**Performance:** Excellent  
+
+Wrap tested functions in Logic classes when you have a stable set that belongs together.
+
+```json
+{
+  "name": "CustomMovementLogic",
+  "archetype_components": ["CPosition", "CVelocity"],
+  "parameters": {"max_speed": 5.0}
+}
+```
+
+### Lua Scripting System
 **Best for:** Complex logic, designer content, modding  
 **Effort:** High  
 **Flexibility:** Excellent  
 **Performance:** Good  
 
-Write simulation logic in Lua:
+Full scripting when you need maximum flexibility:
+
 ```lua
 function update_simulation(context)
-  apply_velocity(context)
-  apply_friction(context)
-  check_boundaries(context)
+  -- Full Lua scripting power
 end
 ```
 
-## Recommended Hybrid Approach
+## Decision Guide
 
-**Phase 1 (Short Term):** Free Function System
-- Build on existing `logic::collision`, `logic::ui` namespaces
-- Low integration effort, immediate benefits
-- Runtime pipeline configuration
-
-**Phase 2 (Medium Term):** Add Lua for High-Level Logic
-- Complex game rules and state machines
-- Designer-driven content
-- Modding support
-
-**Phase 3 (Long Term):** Unified System
-- C++ for performance-critical paths
-- Lua for gameplay logic
-- Seamless interop
-
-## Quick Decision Guide
-
-| Scenario | Use This Approach |
-|----------|-------------------|
-| Parameterizing existing logic | Logic Classes |
-| Performance-critical paths | Logic Classes or Free Functions |
-| Composable, reusable systems | Free Functions |
-| Runtime reconfiguration needed | Free Functions or Lua |
+| Scenario | Use This |
+|----------|----------|
+| Testing new logic | **Free Functions** |
+| Prototyping features | **Free Functions** |
+| Building incrementally | **Free Functions** |
+| Performance-critical | Free Functions or Logic Classes |
+| Organizing tested code | Logic Classes |
 | Complex state machines | Lua |
 | Designer-driven content | Lua |
 | Modding support | Lua |
-| Prototyping new features | Lua |
 
-## Key Files to Create
+## When to Use Logic Classes
 
-### For Free Functions:
-- `src/logic/FunctionRegistry.h/cpp` - Function registration system
-- `src/logic/simulation_*.h/cpp` - Simulation function namespaces
-- `src/logic/SimulationPipeline.h/cpp` - Pipeline executor Logic class
-- `data/simulation/*.json` - Pipeline configuration files
+Logic classes are **optional organizational wrappers**. Use them only when:
+- ✅ You have a stable set of tested functions
+- ✅ Functions always run together
+- ✅ You need to manage shared state
+- ✅ You want LogicFactory integration
 
-### For Lua:
-- `src/scripting/LuaEngine.h/cpp` - Lua engine wrapper
-- `src/scripting/bindings/*.h/cpp` - C++ to Lua bindings
-- `src/logic/LuaLogic.h/cpp` - Lua script executor Logic class
-- `data/scripts/*.lua` - Lua simulation scripts
+**For testing and prototyping, stick with free functions!**
 
-## Existing Patterns in SteamRot
+## Implementation Path
 
-SteamRot already uses free functions in logic namespaces:
+### Phase 1: Testing with Free Functions (Start Here!)
+1. Create `src/logic/simulation_test.h/cpp`
+2. Write free functions with SceneContext parameter
+3. Write unit tests that call functions directly
+4. Add more functions incrementally
 
-**`logic::collision` namespace:**
-- `IsMouseOverBounds()`
-- `CheckMouseOverUIElement()`
-- `CheckMouseOverNestedUIElement()`
+**Time: Minutes to hours**
 
-**`logic::ui` namespace:**
-- `GetAllFragmentNames()`
-- `GetAllJointNames()`
+### Phase 2: Optional Data-Driven Execution
+1. Create FunctionRegistry (only if you want data-driven pipelines)
+2. Register functions for string-based lookup
+3. Create JSON pipeline configurations
+4. Implement SimulationPipeline class
 
-These can be registered and used in pipelines!
+**Time: 2-3 weeks (optional, not needed for testing!)**
 
-## Example: Converting UICollisionLogic
+### Phase 3: Optional Lua Integration
+1. Add Sol2/Lua dependencies
+2. Create C++ bindings
+3. Write Lua scripts for complex logic
 
-**Current (Logic Class):**
+**Time: 4-6 weeks (optional, for advanced use cases)**
+
+## Examples
+
+### Example: Testing a Movement Function
+
 ```cpp
-class UICollisionLogic : public Logic {
-  void ProcessLogic() override {
-    // Find UI entities...
-    logic::collision::CheckMouseOverNestedUIElement(...);
+// src/logic/simulation_movement.h
+namespace steamrot::simulation::movement {
+
+void ApplyVelocity(SceneContext &context, const Parameters &params) {
+  ArchetypeID archetype = GenerateArchetypeIDfromTypes<CPosition, CVelocity>();
+  const auto it = context.archetypes.find(archetype);
+  
+  if (it != context.archetypes.end()) {
+    for (size_t entity_id : it->second) {
+      auto &pos = entity::memory::GetComponent<CPosition>(entity_id, context.scene_entities);
+      auto &vel = entity::memory::GetComponent<CVelocity>(entity_id, context.scene_entities);
+      
+      pos.m_x += vel.m_x * 0.016f;
+      pos.m_y += vel.m_y * 0.016f;
+    }
   }
-};
+}
+
+} // namespace
 ```
 
-**Future (Free Function Pipeline):**
-```json
-{
-  "name": "ui_collision_pipeline",
-  "type": "Collision",
-  "steps": [
-    {
-      "function": "collision::check_mouse_over_nested_ui",
-      "parameters": {}
-    }
-  ]
+```cpp
+// tests/logic/simulation_movement.test.cpp
+TEST_CASE("ApplyVelocity moves entities", "[unit][movement]") {
+  // Setup test context with entities
+  steamrot::tests::TestContext test_context;
+  auto context = test_context.GetLogicContextForTestScene();
+  
+  // Create test entities with position and velocity
+  // ... test setup ...
+  
+  // Call function directly
+  steamrot::simulation::movement::Parameters params;
+  steamrot::simulation::movement::ApplyVelocity(context, params);
+  
+  // Assert positions changed
+  // ... assertions ...
 }
 ```
 
-## Implementation Timelines
-
-- **Free Function System:** 2-3 weeks
-- **Lua Integration:** 4-6 weeks
-- **Full Hybrid System:** 3-4 months
-
 ## Next Steps
 
-1. Read the full [Data-Driven Simulation Design](DATA_DRIVEN_SIMULATION_DESIGN.md) document
-2. Choose which approach fits your immediate needs
-3. Follow the implementation roadmap for your chosen approach
-4. Start with one simple Logic class as a proof of concept
+1. **Read the full design document** for detailed explanations
+2. **Start with free functions** for testing
+3. **Build incrementally** - one function at a time
+4. **Test each function** independently
+5. **Optionally organize** into Logic classes or pipelines later
 
 ## See Also
 
 - [DATA_DRIVEN_SIMULATION_DESIGN.md](DATA_DRIVEN_SIMULATION_DESIGN.md) - Complete design document
 - [README.md](../README.md#adding-logic) - Current Logic class workflow
-- [CONTEXT_CONFIGURATION.md](CONTEXT_CONFIGURATION.md) - Existing data-driven configuration patterns
+- [CONTEXT_CONFIGURATION.md](CONTEXT_CONFIGURATION.md) - Existing data-driven patterns

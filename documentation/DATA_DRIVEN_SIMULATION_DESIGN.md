@@ -1,14 +1,15 @@
 # Data-Driven Simulation System Design Plan
 
-This document outlines design options for creating a data-driven simulation system in SteamRot. The goal is to enable flexible, configurable simulation logic that can be defined in data files (JSON, Lua, etc.) rather than hardcoded in C++.
+This document outlines design options for creating a data-driven simulation system in SteamRot. **The primary focus is on the free function approach for testing and prototyping**, allowing you to build up individual simulation functions incrementally rather than requiring full Logic class implementations.
 
 ## Table of Contents
 
 - [Overview](#overview)
+- [Quick Start: Free Functions for Testing](#quick-start-free-functions-for-testing)
 - [Current Architecture](#current-architecture)
-- [Design Approach 1: Logic Class-Based System (Current Pattern)](#design-approach-1-logic-class-based-system-current-pattern)
-- [Design Approach 2: Free Function-Based System](#design-approach-2-free-function-based-system)
-- [Design Approach 3: Lua Scripting System](#design-approach-3-lua-scripting-system)
+- [Primary Approach: Free Function-Based System](#primary-approach-free-function-based-system)
+- [Alternative Approach 1: Logic Class-Based System](#alternative-approach-1-logic-class-based-system)
+- [Alternative Approach 2: Lua Scripting System](#alternative-approach-2-lua-scripting-system)
 - [Comparison Matrix](#comparison-matrix)
 - [Recommendations](#recommendations)
 - [Implementation Roadmap](#implementation-roadmap)
@@ -18,11 +19,20 @@ This document outlines design options for creating a data-driven simulation syst
 
 A data-driven simulation system allows game logic to be defined in external configuration files, enabling:
 
+- **Incremental Testing**: Build and test individual functions in isolation before integration
 - **Runtime Reconfiguration**: Change simulation behavior without recompiling
-- **Designer-Friendly**: Non-programmers can modify game logic
-- **Rapid Iteration**: Test different simulation parameters quickly
-- **Modding Support**: Enable community-created content
+- **Rapid Prototyping**: Test different simulation functions quickly
+- **Function Composition**: Combine tested functions into larger systems
 - **Reduced Code Complexity**: Separate logic definition from implementation
+
+### Testing-First Philosophy
+
+This document emphasizes a **testing-first approach** where you:
+1. Write individual simulation functions
+2. Test each function independently
+3. Register functions for data-driven execution
+4. Compose tested functions into pipelines (optional)
+5. Optionally wrap in Logic classes for organization (not required)
 
 ### Key Requirements
 
@@ -31,6 +41,147 @@ A data-driven simulation system allows game logic to be defined in external conf
 3. **Type Safety**: Maintain C++ type safety where possible
 4. **Performance**: Minimize overhead for real-time game simulation
 5. **Debuggability**: Easy to trace and debug simulation behavior
+
+## Quick Start: Free Functions for Testing
+
+**Start here if you want to test individual simulation functions without the overhead of Logic classes.**
+
+### Step 1: Write a Simple Simulation Function
+
+```cpp
+// File: src/logic/simulation_test.h
+#pragma once
+#include "SceneContext.h"
+#include <unordered_map>
+#include <string>
+#include <variant>
+
+namespace steamrot::simulation::test {
+
+// Simple parameter type for testing
+using ParamValue = std::variant<int, float, std::string, bool>;
+using Parameters = std::unordered_map<std::string, ParamValue>;
+
+////////////////////////////////////////////////////////////
+/// @brief Simple test function that logs entity count
+///
+/// @param context SceneContext with access to entities
+/// @param params Parameters (unused in this example)
+////////////////////////////////////////////////////////////
+void LogEntityCount(SceneContext &context, const Parameters &params) {
+  size_t total_entities = 0;
+  
+  // Count entities across all archetypes
+  for (const auto &[archetype_id, entities] : context.archetypes) {
+    total_entities += entities.size();
+  }
+  
+  std::cout << "Total entities in scene: " << total_entities << std::endl;
+}
+
+} // namespace steamrot::simulation::test
+```
+
+### Step 2: Test Your Function Directly
+
+```cpp
+// File: tests/logic/simulation_test.test.cpp
+#include "simulation_test.h"
+#include "TestContext.h"
+#include <catch2/catch_test_macros.hpp>
+
+TEST_CASE("LogEntityCount function works", "[unit][simulation]") {
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::tests::TestContext test_context;
+  
+  auto context = test_context.GetLogicContextForTestScene();
+  steamrot::simulation::test::Parameters params;
+  
+  // Call function directly - no Logic class needed!
+  REQUIRE_NOTHROW(steamrot::simulation::test::LogEntityCount(context, params));
+}
+```
+
+### Step 3: Add More Functions Incrementally
+
+```cpp
+namespace steamrot::simulation::test {
+
+////////////////////////////////////////////////////////////
+/// @brief Test function that modifies component data
+////////////////////////////////////////////////////////////
+void IncrementAllPositions(SceneContext &context, const Parameters &params) {
+  ArchetypeID archetype = GenerateArchetypeIDfromTypes<CPosition>();
+  
+  const auto it = context.archetypes.find(archetype);
+  if (it != context.archetypes.end()) {
+    for (size_t entity_id : it->second) {
+      auto &pos = entity::memory::GetComponent<CPosition>(entity_id, context.scene_entities);
+      pos.m_x += 1.0f;
+      pos.m_y += 1.0f;
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////
+/// @brief Test function with parameters
+////////////////////////////////////////////////////////////
+void ScaleVelocity(SceneContext &context, const Parameters &params) {
+  // Extract parameter with default
+  float scale = 1.0f;
+  if (params.contains("scale") && std::holds_alternative<float>(params.at("scale"))) {
+    scale = std::get<float>(params.at("scale"));
+  }
+  
+  ArchetypeID archetype = GenerateArchetypeIDfromTypes<CVelocity>();
+  const auto it = context.archetypes.find(archetype);
+  
+  if (it != context.archetypes.end()) {
+    for (size_t entity_id : it->second) {
+      auto &vel = entity::memory::GetComponent<CVelocity>(entity_id, context.scene_entities);
+      vel.m_x *= scale;
+      vel.m_y *= scale;
+    }
+  }
+}
+
+} // namespace
+```
+
+### Step 4: (Optional) Register for Data-Driven Execution
+
+Only when you're ready to use functions in a data-driven way:
+
+```cpp
+#include "FunctionRegistry.h"
+
+// In your initialization code
+namespace steamrot::simulation::test {
+  void RegisterTestFunctions() {
+    FunctionRegistry::Instance().RegisterFunction("test::log_entity_count", LogEntityCount);
+    FunctionRegistry::Instance().RegisterFunction("test::increment_positions", IncrementAllPositions);
+    FunctionRegistry::Instance().RegisterFunction("test::scale_velocity", ScaleVelocity);
+  }
+}
+```
+
+### Key Benefits for Testing
+
+- ✅ **No Logic class required** - Functions are standalone and testable
+- ✅ **Direct testing** - Call functions directly in unit tests
+- ✅ **Incremental development** - Add one function at a time
+- ✅ **Easy debugging** - Standard C++ function debugging
+- ✅ **Reusable** - Functions can be called from anywhere
+- ✅ **Optional organization** - Wrap in Logic classes later if desired
+
+### When to Use Logic Classes
+
+Logic classes are **optional organizational wrappers**. Use them when:
+- You have a stable set of functions that always run together
+- You need to manage shared state across multiple function calls
+- You want to integrate with the existing LogicFactory system
+
+**For testing and prototyping, stick with free functions!**
 
 ## Current Architecture
 
@@ -120,151 +271,19 @@ namespace steamrot::logic::ui {
 }
 ```
 
-These functions are called **by** Logic classes but could form the basis of a data-driven system.
+These functions are called **by** Logic classes but form the foundation for a testing-friendly data-driven system.
 
-## Design Approach 1: Logic Class-Based System (Current Pattern)
+## Primary Approach: Free Function-Based System
 
-### Overview
-
-Extend the current Logic class pattern to be data-driven by defining Logic behavior in JSON/FlatBuffers configuration files.
-
-### Architecture
-
-**1. Logic Configuration Schema**
-
-Define simulation behavior in FlatBuffers/JSON:
-
-```json
-{
-  "logic_definitions": [
-    {
-      "name": "CustomMovementLogic",
-      "type": "Movement",
-      "scene_types": ["CRAFTING"],
-      "archetype_components": ["CPosition", "CVelocity"],
-      "parameters": {
-        "max_speed": 5.0,
-        "acceleration": 0.5,
-        "friction": 0.9
-      },
-      "execution_order": 10
-    },
-    {
-      "name": "DamageOverTimeLogic",
-      "type": "Action",
-      "scene_types": ["CRAFTING", "TITLE"],
-      "archetype_components": ["CHealth", "CStatusEffect"],
-      "parameters": {
-        "damage_per_tick": 1.0,
-        "tick_rate": 60
-      },
-      "execution_order": 20
-    }
-  ]
-}
-```
-
-**2. Generic ConfigurableLogic Class**
-
-```cpp
-class ConfigurableLogic : public Logic {
-private:
-  LogicDefinition m_definition;
-  std::unordered_map<std::string, float> m_parameters;
-  
-  void ProcessLogic() override {
-    // Use m_definition to determine which components to process
-    ArchetypeID archetype_id = GenerateArchetypeFromDefinition(m_definition);
-    
-    const auto it = m_scene_context.archetypes.find(archetype_id);
-    if (it != m_scene_context.archetypes.end()) {
-      for (size_t entity_id : it->second) {
-        // Apply logic based on m_definition and m_parameters
-        ProcessEntity(entity_id);
-      }
-    }
-  }
-  
-  void ProcessEntity(size_t entity_id);
-
-public:
-  ConfigurableLogic(const SceneContext scene_context, 
-                   const LogicDefinition &definition);
-};
-```
-
-**3. Enhanced LogicFactory**
-
-```cpp
-class LogicFactory {
-private:
-  std::vector<LogicDefinition> m_logic_definitions;
-  
-  std::expected<LogicVector, FailInfo> CreateLogiсsFromDefinitions(
-    LogicType type);
-
-public:
-  LogicFactory(const SceneType scene_type, 
-               const SceneContext &scene_context,
-               const std::vector<LogicDefinition> &definitions);
-};
-```
-
-### Implementation Steps
-
-1. **Create FlatBuffers schema for logic definitions**
-   - File: `src/flatbuffers_headers/logic_definition.fbs`
-   - Define tables for LogicDefinition, Parameters, ComponentList
-
-2. **Implement LogicDefinitionLoader**
-   - File: `src/data_handlers/LogicDefinitionLoader.h/cpp`
-   - Load JSON files and convert to LogicDefinition objects
-
-3. **Create ConfigurableLogic base class**
-   - File: `src/logic/ConfigurableLogic.h/cpp`
-   - Template or polymorphic approach for different logic types
-
-4. **Update LogicFactory**
-   - Load logic definitions from JSON
-   - Create ConfigurableLogic instances based on definitions
-   - Sort by execution_order
-
-5. **Add configuration files**
-   - `data/logic/title_logic.json`
-   - `data/logic/crafting_logic.json`
-   - `tests/data/logic/test_logic.json`
-
-### Pros
-
-- **Type Safety**: C++ types enforced at compile time
-- **Performance**: No runtime interpretation overhead
-- **Familiar Pattern**: Extends existing Logic class architecture
-- **Debugging**: Standard C++ debugging tools work
-- **Strong Integration**: Direct access to all C++ types and functions
-
-### Cons
-
-- **Limited Flexibility**: Only predefined logic patterns supported
-- **Requires Recompilation**: Adding new logic types requires C++ changes
-- **Complex Configuration**: JSON becomes verbose for complex logic
-- **Not True Scripting**: Can't define arbitrary control flow in data
-
-### Best Use Cases
-
-- Parameterizing existing logic types
-- Configuring component processing patterns
-- Scene-specific logic variations
-- Performance-critical simulation
-
-## Design Approach 2: Free Function-Based System
+**Recommended for testing, prototyping, and incremental development.**
 
 ### Overview
 
-Generate simulation logic from composable free functions defined in namespaces, coordinated by data files.
+Build simulation logic from composable free functions defined in namespaces. Functions can be tested independently, then optionally coordinated by data files or wrapped in Logic classes for organization.
 
 ### Architecture
 
-**1. Function Registry System**
+**1. Function Registry System (Optional for Advanced Use)**
 
 Create a registry mapping string names to function pointers:
 
@@ -338,14 +357,14 @@ void ApplyFriction(SceneContext &context, const Parameters &params) {
   }
 }
 
-// Register functions
+// Optional: Register functions for data-driven execution
 REGISTER_SIMULATION_FUNCTION(movement::apply_velocity, ApplyVelocity);
 REGISTER_SIMULATION_FUNCTION(movement::apply_friction, ApplyFriction);
 
 } // namespace steamrot::simulation::movement
 ```
 
-**3. Simulation Pipeline Configuration**
+**3. Simulation Pipeline Configuration (Optional)**
 
 Define execution pipeline in JSON:
 
@@ -383,7 +402,7 @@ Define execution pipeline in JSON:
 }
 ```
 
-**4. Pipeline Executor**
+**4. Pipeline Executor (Optional - for organizing tested functions)**
 
 ```cpp
 class SimulationPipeline : public Logic {
@@ -408,56 +427,213 @@ public:
 
 ### Implementation Steps
 
-1. **Create FunctionRegistry infrastructure**
+**For Testing (Minimal Setup):**
+
+1. **Create simulation function namespace**
+   - File: `src/logic/simulation_test.h/cpp`
+   - Write free functions with SceneContext parameter
+   - No registration needed initially
+
+2. **Write unit tests**
+   - File: `tests/logic/simulation_test.test.cpp`
+   - Test functions directly by calling them
+   - Use TestContext to provide SceneContext
+
+**For Data-Driven Execution (Optional):**
+
+3. **Create FunctionRegistry infrastructure**
    - File: `src/logic/FunctionRegistry.h/cpp`
    - Implement registration system and lookup
 
-2. **Define simulation function namespaces**
+4. **Define simulation function namespaces**
    - Files: `src/logic/simulation_*.h/cpp`
    - Create functions for movement, collision, rendering, actions
    - Register each function with unique name
 
-3. **Create Pipeline schema and loader**
+5. **Create Pipeline schema and loader**
    - File: `src/flatbuffers_headers/simulation_pipeline.fbs`
    - File: `src/data_handlers/SimulationPipelineLoader.h/cpp`
 
-4. **Implement SimulationPipeline Logic class**
+6. **Implement SimulationPipeline Logic class**
    - File: `src/logic/SimulationPipeline.h/cpp`
    - Execute functions in sequence based on configuration
 
-5. **Update LogicFactory**
+7. **Update LogicFactory**
    - Load pipeline definitions
    - Create SimulationPipeline instances
 
-6. **Add configuration files**
+8. **Add configuration files**
    - `data/simulation/movement_pipeline.json`
    - `data/simulation/combat_pipeline.json`
 
 ### Pros
 
-- **Composability**: Mix and match functions in different combinations
-- **Reusability**: Functions can be used across multiple pipelines
-- **Clear Boundaries**: Each function has well-defined responsibility
-- **Easy Testing**: Test individual functions in isolation
-- **Runtime Configuration**: Change execution order and parameters without recompiling
-- **Existing Pattern**: Builds on existing free function usage in codebase
+- ✅ **Direct Testing**: Test functions in isolation without overhead
+- ✅ **Composability**: Mix and match functions in different combinations
+- ✅ **Reusability**: Functions can be used across multiple systems
+- ✅ **Clear Boundaries**: Each function has well-defined responsibility
+- ✅ **Incremental Development**: Add one function at a time
+- ✅ **No Logic Class Required**: Functions work standalone
+- ✅ **Runtime Configuration**: Change execution order without recompiling (when using pipelines)
+- ✅ **Existing Pattern**: Builds on existing free function usage in codebase
 
 ### Cons
 
-- **Manual Registration**: Functions must be explicitly registered
-- **String-Based Lookup**: Runtime overhead and potential for typos
-- **Limited Type Safety**: Parameters passed as generic map
-- **Debugging Complexity**: Stack traces through function pointers
-- **No Control Flow**: Can't express conditionals/loops in data
+- ⚠️ **Manual Registration**: Functions must be explicitly registered (only for data-driven use)
+- ⚠️ **String-Based Lookup**: Runtime overhead and potential for typos (only for data-driven use)
+- ⚠️ **Limited Type Safety**: Parameters passed as generic map (only for data-driven use)
+- ⚠️ **No Control Flow**: Can't express conditionals/loops in data (only for data-driven use)
+
+**Note:** Most cons only apply when using the optional data-driven pipeline system. For testing, you just write and call functions directly!
 
 ### Best Use Cases
 
-- Sequential processing pipelines
-- Combining existing logic functions in new ways
-- Prototyping new simulation behaviors
-- Modular, composable game systems
+- ✅ Testing and prototyping simulation logic
+- ✅ Sequential processing pipelines
+- ✅ Combining existing logic functions in new ways
+- ✅ Building up simulation incrementally
+- ✅ Modular, composable game systems
 
-## Design Approach 3: Lua Scripting System
+## Alternative Approach 1: Logic Class-Based System
+
+*Use when you have stable, well-tested functions that you want to organize into reusable Logic classes.*
+
+### Overview
+
+Extend the current Logic class pattern to be data-driven by defining Logic behavior in JSON/FlatBuffers configuration files. This approach wraps simulation logic in Logic classes that can be configured via data.
+
+### Architecture
+
+**1. Logic Configuration Schema**
+
+Define simulation behavior in FlatBuffers/JSON:
+
+```json
+{
+  "logic_definitions": [
+    {
+      "name": "CustomMovementLogic",
+      "type": "Movement",
+      "scene_types": ["CRAFTING"],
+      "archetype_components": ["CPosition", "CVelocity"],
+      "parameters": {
+        "max_speed": 5.0,
+        "acceleration": 0.5,
+        "friction": 0.9
+      },
+      "execution_order": 10
+    },
+    {
+      "name": "DamageOverTimeLogic",
+      "type": "Action",
+      "scene_types": ["CRAFTING", "TITLE"],
+      "archetype_components": ["CHealth", "CStatusEffect"],
+      "parameters": {
+        "damage_per_tick": 1.0,
+        "tick_rate": 60
+      },
+      "execution_order": 20
+    }
+  ]
+}
+```
+
+**2. Generic ConfigurableLogic Class**
+
+```cpp
+class ConfigurableLogic : public Logic {
+private:
+  LogicDefinition m_definition;
+  std::unordered_map<std::string, float> m_parameters;
+  
+  void ProcessLogic() override {
+    // Use m_definition to determine which components to process
+    ArchetypeID archetype_id = GenerateArchetypeFromDefinition(m_definition);
+    
+    const auto it = m_scene_context.archetypes.find(archetype_id);
+    if (it != m_scene_context.archetypes.end()) {
+      for (size_t entity_id : it->second) {
+        // Apply logic based on m_definition and m_parameters
+        ProcessEntity(entity_id);
+      }
+    }
+  }
+  
+  void ProcessEntity(size_t entity_id);
+
+public:
+  ConfigurableLogic(const SceneContext scene_context, 
+                   const LogicDefinition &definition);
+};
+```
+
+**3. Enhanced LogicFactory**
+
+```cpp
+class LogicFactory {
+private:
+  std::vector<LogicDefinition> m_logic_definitions;
+  
+  std::expected<LogicVector, FailInfo> CreateLogicsFromDefinitions(
+    LogicType type);
+
+public:
+  LogicFactory(const SceneType scene_type, 
+               const SceneContext &scene_context,
+               const std::vector<LogicDefinition> &definitions);
+};
+```
+
+### Implementation Steps
+
+1. **Create FlatBuffers schema for logic definitions**
+   - File: `src/flatbuffers_headers/logic_definition.fbs`
+   - Define tables for LogicDefinition, Parameters, ComponentList
+
+2. **Implement LogicDefinitionLoader**
+   - File: `src/data_handlers/LogicDefinitionLoader.h/cpp`
+   - Load JSON files and convert to LogicDefinition objects
+
+3. **Create ConfigurableLogic base class**
+   - File: `src/logic/ConfigurableLogic.h/cpp`
+   - Template or polymorphic approach for different logic types
+
+4. **Update LogicFactory**
+   - Load logic definitions from JSON
+   - Create ConfigurableLogic instances based on definitions
+   - Sort by execution_order
+
+5. **Add configuration files**
+   - `data/logic/title_logic.json`
+   - `data/logic/crafting_logic.json`
+   - `tests/data/logic/test_logic.json`
+
+### Pros
+
+- **Type Safety**: C++ types enforced at compile time
+- **Performance**: No runtime interpretation overhead
+- **Familiar Pattern**: Extends existing Logic class architecture
+- **Debugging**: Standard C++ debugging tools work
+- **Strong Integration**: Direct access to all C++ types and functions
+- **Organization**: Groups related logic together
+
+### Cons
+
+- **Overhead**: Requires Logic class infrastructure
+- **Limited Flexibility**: Only predefined logic patterns supported
+- **Requires Recompilation**: Adding new logic types requires C++ changes
+- **Complex Configuration**: JSON becomes verbose for complex logic
+- **Not for Testing**: Too much overhead for simple function testing
+
+### Best Use Cases
+
+- Organizing stable, tested functions into reusable classes
+- Parameterizing existing logic types
+- Configuring component processing patterns
+- Scene-specific logic variations
+- Performance-critical simulation with stable patterns
+
+## Alternative Approach 2: Lua Scripting System
 
 ### Overview
 
