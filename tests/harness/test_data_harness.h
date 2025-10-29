@@ -12,6 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FailInfo.h"
+#include "TestFixture.h"
 #include "containers.h"
 #include "test_data_generated.h"
 #include <expected>
@@ -84,5 +85,50 @@ run_test_data_config(const TestDataConfig *config);
 /////////////////////////////////////////////////
 void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
                                             const EntityMemoryPool &expected);
+
+/////////////////////////////////////////////////
+/// @brief Create and configure TestFixture from test data configuration
+///
+/// This function creates a TestFixture and configures it based on the
+/// test data configuration. The fixture will have entities populated from
+/// start_entity_collection if present.
+///
+/// @param config The test data configuration
+/// @param scene_type The scene type for the fixture (default: SceneType_TEST)
+/// @return Configured TestFixture or FailInfo on error
+/////////////////////////////////////////////////
+std::expected<TestFixture, FailInfo>
+create_fixture_from_test_data(const TestDataConfig *config,
+                              const SceneType &scene_type = SceneType::SceneType_TEST);
+
+/////////////////////////////////////////////////
+/// @brief Wrapper function for data-driven testing with TestFixture
+///
+/// This function creates a TestFixture from test data configuration,
+/// and if expected_entity_collection is present, compares the fixture's
+/// entity state with the expected state.
+///
+/// This wrapper is designed to be used in TEST_CASE with Catch2 generators.
+/// It handles fixture creation and comparison, leaving room for future
+/// simulation functionality.
+///
+/// @param config The test data configuration
+/// @return std::monostate on success, FailInfo on error
+///
+/// Example usage:
+/// @code
+/// TEST_CASE("Data-driven test with fixture", "[unit]") {
+///   auto configs = steamrot::tests::load_test_data_configs();
+///   REQUIRE(configs.has_value());
+///   
+///   const auto *config = GENERATE_COPY(from_range(configs.value()));
+///   
+///   auto result = steamrot::tests::run_fixture_test(config);
+///   REQUIRE(result.has_value());
+/// }
+/// @endcode
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+run_fixture_test(const TestDataConfig *config);
 
 } // namespace steamrot::tests

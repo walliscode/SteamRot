@@ -141,3 +141,65 @@ TEST_CASE("run_test_data_config works with Catch2 generators",
   INFO("Test name: " << config->metadata()->test_name()->str());
   REQUIRE(result.has_value());
 }
+
+TEST_CASE("create_fixture_from_test_data creates initialized fixture",
+          "[unit][harness]") {
+
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  REQUIRE(configs.value().size() >= 1);
+
+  const auto *config = configs.value()[0];
+
+  // Create fixture from test data
+  auto fixture_result = steamrot::tests::create_fixture_from_test_data(config);
+
+  REQUIRE(fixture_result.has_value());
+
+  auto &fixture = fixture_result.value();
+
+  // Verify fixture is initialized
+  REQUIRE(&fixture.GetGameResources() != nullptr);
+  REQUIRE(&fixture.GetSceneResources() != nullptr);
+  REQUIRE(&fixture.GetEntityManager() != nullptr);
+}
+
+TEST_CASE("create_fixture_from_test_data rejects null config",
+          "[unit][harness]") {
+
+  auto result = steamrot::tests::create_fixture_from_test_data(nullptr);
+
+  REQUIRE_FALSE(result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
+}
+
+TEST_CASE("run_fixture_test executes comparison test",
+          "[unit][harness]") {
+
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  REQUIRE(configs.value().size() >= 1);
+
+  const auto *config = configs.value()[0];
+
+  // Run fixture test with comparison
+  auto result = steamrot::tests::run_fixture_test(config);
+
+  REQUIRE(result.has_value());
+}
+
+TEST_CASE("run_fixture_test works with Catch2 generators",
+          "[unit][harness]") {
+
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+
+  const auto *config = GENERATE_COPY(from_range(configs.value()));
+
+  // This is the main wrapper function for data-driven testing
+  auto result = steamrot::tests::run_fixture_test(config);
+
+  INFO("Test name: " << config->metadata()->test_name()->str());
+  REQUIRE(result.has_value());
+}
+
