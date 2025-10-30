@@ -263,6 +263,51 @@ The `RunEMPComparisonTest` wrapper function:
 - Falls back to old `entity_collection` behavior for backward compatibility
 - Uses default-constructed pool if `start_entity_collection` is not provided
 
+### EntityMemoryPool Matcher with Test Metadata
+
+When using the `run_fixture_test` or `run_entity_memory_pool_comparison_test` functions with test data configurations, test metadata (test name and description) is automatically included in failure messages. This makes it easier to identify which test case failed when multiple tests are run with Catch2 generators.
+
+**Automatic Usage (Recommended):**
+```cpp
+#include "test_data_harness.h"
+#include <catch2/generators/catch_generators_range.hpp>
+
+TEST_CASE("Data-driven tests with automatic metadata", "[unit][data-driven]") {
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  
+  const auto *config = GENERATE_COPY(from_range(configs.value()));
+  
+  // Test metadata from JSON is automatically included in failure messages
+  auto result = steamrot::tests::run_fixture_test(config);
+  REQUIRE(result.has_value());
+}
+```
+
+**Manual Usage:**
+```cpp
+#include "test_data_harness.h"
+
+TEST_CASE("Manual metadata usage", "[unit]") {
+  // ... create or load actual and expected pools ...
+  
+  // Pass metadata string manually
+  std::string metadata = "Test: my_test, Description: Tests feature X";
+  steamrot::tests::run_entity_memory_pool_comparison_test(
+      actual_pool, expected_pool, metadata);
+}
+```
+
+**Example Failure Message:**
+When a comparison fails, the error message now includes the test metadata:
+```
+EntityMemoryPool mismatch [Test: pool_comparison_different_values, Description: Entity memory pool with different component values for comparison testing]: Pool sizes differ: actual =5, expected =3;
+```
+
+This enhancement is especially useful when:
+- Running parameterized tests with Catch2 generators
+- Debugging multiple test cases defined in JSON files
+- Working with large test suites where identifying failures quickly is important
 
 ### Using run_test_data_config Top-Level Wrapper
 

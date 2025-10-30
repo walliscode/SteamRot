@@ -1184,6 +1184,20 @@ The Test Data Configuration System provides a FlatBuffers-based framework for da
 
 See `documentation/TEST_DATA_CONFIGURATION.md` for complete documentation.
 
+### EntityMemoryPool Matcher with Test Metadata
+
+The `EntityMemoryPoolEqualsMatcher` supports optional test metadata that is included in failure messages. When using data-driven tests with `run_fixture_test()` or `run_entity_memory_pool_comparison_test()`, test metadata (test name and description) from JSON files is automatically extracted and included in error messages, making it easier to identify which test case failed.
+
+**Example usage:**
+```cpp
+// Automatic - metadata extracted from config
+auto result = steamrot::tests::run_fixture_test(config);
+
+// Manual - pass metadata string
+steamrot::tests::run_entity_memory_pool_comparison_test(
+    actual_pool, expected_pool, "Test: my_test");
+```
+
 ### Quick Start
 
 #### 1. Create Test Data JSON
