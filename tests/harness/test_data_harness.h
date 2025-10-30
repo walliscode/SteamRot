@@ -14,6 +14,7 @@
 #include "FailInfo.h"
 #include "TestFixture.h"
 #include "containers.h"
+#include "simulation_generated.h"
 #include "test_data_generated.h"
 #include <expected>
 #include <string>
