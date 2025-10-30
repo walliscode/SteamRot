@@ -10,6 +10,7 @@
 #include "FlatbuffersConfigurator.h"
 #include "PathProvider.h"
 #include "entity_memory_pool_matchers.h"
+#include "simulation_runner.h"
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
 #include <format>
@@ -255,6 +256,16 @@ run_fixture_test(const TestDataConfig *config) {
   }
 
   TestFixture &fixture = fixture_result.value();
+
+  // If simulation_data is provided, execute the simulation
+  if (config->simulation_data()) {
+    auto simulation_result = execute_simulation_with_fixture(
+        config->simulation_data(), fixture);
+    
+    if (!simulation_result.has_value()) {
+      return std::unexpected(simulation_result.error());
+    }
+  }
 
   // If expected_entity_collection is provided, compare results
   if (config->expected_entity_collection()) {

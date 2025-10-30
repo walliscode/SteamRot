@@ -1,6 +1,7 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of test data harness utilities for loading test configurations
+/// @brief Declaration of test data harness utilities for loading test
+/// configurations
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -41,7 +42,8 @@ load_test_data_configs();
 /// @brief Load test data configurations from a specific subdirectory
 ///
 /// Loads test data from tests/<subdirectory>/data/ directory.
-/// This is useful when you need to load test data from a specific test directory.
+/// This is useful when you need to load test data from a specific test
+/// directory.
 ///
 /// @param subdirectory Test subdirectory name (e.g., "entity", "components")
 /// @return Vector of TestDataConfig pointers or FailInfo on error
@@ -57,7 +59,8 @@ load_test_data_configs(const std::string &subdirectory);
 /// entry point for data-driven testing.
 ///
 /// Currently supports:
-/// - Entity Memory Pool comparison tests (start_entity_collection + expected_entity_collection)
+/// - Entity Memory Pool comparison tests (start_entity_collection +
+/// expected_entity_collection)
 ///
 /// Future extensions can add support for:
 /// - Event sequence tests
@@ -75,7 +78,8 @@ run_test_data_config(const TestDataConfig *config);
 /// @brief Wrapper function to run EMP comparison tests
 ///
 /// This function compares two EntityMemoryPool instances using the
-/// EqualsEntityMemoryPool matcher, ensuring detailed error messages on mismatch.
+/// EqualsEntityMemoryPool matcher, ensuring detailed error messages on
+/// mismatch.
 ///
 /// This allows tests to instantiate and manipulate EMPs (e.g., simulate logic)
 /// before comparison.
@@ -97,9 +101,9 @@ void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
 /// @param scene_type The scene type for the fixture (default: SceneType_TEST)
 /// @return Configured TestFixture or FailInfo on error
 /////////////////////////////////////////////////
-std::expected<TestFixture, FailInfo>
-create_fixture_from_test_data(const TestDataConfig *config,
-                              const SceneType &scene_type = SceneType::SceneType_TEST);
+std::expected<TestFixture, FailInfo> create_fixture_from_test_data(
+    const TestDataConfig *config,
+    const SceneType &scene_type = SceneType::SceneType_TEST);
 
 /////////////////////////////////////////////////
 /// @brief Wrapper function for data-driven testing with TestFixture
@@ -120,9 +124,9 @@ create_fixture_from_test_data(const TestDataConfig *config,
 /// TEST_CASE("Data-driven test with fixture", "[unit]") {
 ///   auto configs = steamrot::tests::load_test_data_configs();
 ///   REQUIRE(configs.has_value());
-///   
+///
 ///   const auto *config = GENERATE_COPY(from_range(configs.value()));
-///   
+///
 ///   auto result = steamrot::tests::run_fixture_test(config);
 ///   REQUIRE(result.has_value());
 /// }

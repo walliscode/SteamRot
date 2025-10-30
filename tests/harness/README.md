@@ -5,14 +5,16 @@
 The test harness provides a unified, simplified interface for:
 1. Loading test data configurations for data-driven testing with Catch2 generators
 2. Creating and configuring TestFixture instances from test data
-3. Running comparison tests between expected and actual entity states
+3. **Executing simulations** - running sequences of Logic classes or free functions
+4. Running comparison tests between expected and actual entity states
 
-This consolidates functionality for resource-based testing and data-driven test execution.
+This consolidates functionality for resource-based testing and data-driven test execution with support for complex simulation scenarios.
 
 ## Purpose
 
 - Provide a single, simple API for loading test data
 - Integrate TestFixture for resource setup and management
+- **Execute simulations** - run sequences of Logic classes or free functions defined in test data
 - Enable data-driven testing with automatic fixture creation
 - Work seamlessly with Catch2 generators and matchers
 - Keep the interface minimal and easy to use
@@ -24,6 +26,9 @@ harness/
 ├── test_data_harness.h           # Unified API for loading test data
 ├── test_data_harness.cpp         # Implementation
 ├── test_data_harness.test.cpp    # Unit tests
+├── simulation_runner.h           # Simulation execution engine
+├── simulation_runner.cpp         # Implementation
+├── simulation_runner.test.cpp    # Simulation tests
 ├── TestFixture.h                 # Resource management for tests
 ├── TestFixture.cpp               # Implementation
 ├── CMakeLists.txt                # Build configuration
@@ -31,7 +36,9 @@ harness/
 └── data/                         # Sample test data files
     ├── sample_test_1.test_data.json
     ├── sample_test_2.test_data.json
-    └── sample_test_3.test_data.json
+    ├── sample_test_3.test_data.json
+    ├── sample_simulation_test.test_data.json
+    └── sample_function_simulation.test_data.json
 ```
 
 ## Usage
@@ -304,10 +311,206 @@ TEST_CASE("Data-driven test with fixture", "[unit]") {
 **Behavior:**
 1. Creates TestFixture from test data configuration
 2. Configures entities from `start_entity_collection`
-3. If `expected_entity_collection` is present, compares entity states automatically
-4. Leaves room for future simulation functionality
+3. **Executes simulation if `simulation_data` is present**
+4. If `expected_entity_collection` is present, compares entity states automatically
 
 **This is the main wrapper function for data-driven testing with TestFixture.**
+
+## Simulations
+
+### Overview
+
+The test harness now supports **data-driven simulations** that allow test data to specify which Logic classes or free functions to execute and in which order. This mimics the Scene systems organization (Action, Movement, Render, Collision) and enables complex, multi-step test scenarios.
+
+### Simulation Concepts
+
+**SimulationType**: Groups logic into categories matching Scene logic organization
+- `Action` - UI actions, input processing
+- `Movement` - Entity movement, physics
+- `Render` - Drawing and rendering
+- `Collision` - Collision detection
+
+**ExecutionMode**: Determines what to execute
+- `Function` - Execute individual free function
+- `LogicClass` - Execute entire Logic class
+
+**Simulation Step**: A single execution step with:
+- `simulation_type` - Which system category
+- `execution_mode` - Function or LogicClass
+- `function_type` - Which specific function (if mode is Function)
+- `logic_class_type` - Which Logic class (if mode is LogicClass)
+- `description` - Optional description
+
+### Using Simulations
+
+#### Test Data Format
+
+```json
+{
+  "metadata": {
+    "test_name": "my_simulation_test",
+    "description": "Test with simulation",
+    "tags": ["unit", "simulation"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 3,
+    "entities": [...]
+  },
+  "simulation_data": {
+    "description": "Execute collision, then render, then actions",
+    "steps": [
+      {
+        "simulation_type": "Collision",
+        "execution_mode": "LogicClass",
+        "logic_class_type": "UICollisionLogic",
+        "description": "Detect UI collision"
+      },
+      {
+        "simulation_type": "Render",
+        "execution_mode": "LogicClass",
+        "logic_class_type": "UIRenderLogic",
+        "description": "Render UI elements"
+      },
+      {
+        "simulation_type": "Action",
+        "execution_mode": "Function",
+        "function_type": "ProcessNestedUIActionsAndEvents",
+        "description": "Process UI actions"
+      }
+    ]
+  },
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 3,
+    "entities": [...]
+  }
+}
+```
+
+#### Executing Simulations
+
+Simulations are automatically executed by `run_fixture_test()`:
+
+```cpp
+TEST_CASE("Run simulation from test data", "[unit][simulation]") {
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  
+  const auto *config = GENERATE_COPY(from_range(configs.value()));
+  
+  // If config has simulation_data, it will be executed automatically
+  auto result = steamrot::tests::run_fixture_test(config);
+  REQUIRE(result.has_value());
+}
+```
+
+#### Manual Simulation Execution
+
+For more control, use the simulation runner directly:
+
+```cpp
+#include "simulation_runner.h"
+
+TEST_CASE("Manual simulation execution", "[unit]") {
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  
+  const auto *config = configs.value()[0];
+  
+  // Create fixture
+  auto fixture_result = steamrot::tests::create_fixture_from_test_data(config);
+  REQUIRE(fixture_result.has_value());
+  auto &fixture = fixture_result.value();
+  
+  // Execute simulation manually
+  if (config->simulation_data()) {
+    auto sim_result = steamrot::tests::execute_simulation_with_fixture(
+        config->simulation_data(), fixture);
+    REQUIRE(sim_result.has_value());
+  }
+}
+```
+
+### Available Logic Classes
+
+Current LogicClassType values:
+- `UIActionLogic` - Process UI actions and events
+- `UICollisionLogic` - Check UI collision with mouse
+- `UIRenderLogic` - Render UI elements
+- `UIStateLogic` - Update UI state
+- `CraftingRenderLogic` - Render crafting UI
+
+### Available Free Functions
+
+Current FunctionType values:
+- `ProcessUIActionsAndEvents` - Process UI actions for elements
+- `ProcessNestedUIActionsAndEvents` - Process UI actions recursively
+- `ProcessButtonElementActions` - Process button actions
+- `ProcessDropDownListElementActions` - Process dropdown actions
+
+### Simulation API
+
+#### `execute_simulation_step(step, scene_context)`
+
+Execute a single simulation step.
+
+**Parameters:**
+- `step`: SimulationStep to execute
+- `scene_context`: SceneContext with resources and entities
+
+**Returns:** `std::expected<std::monostate, FailInfo>`
+
+#### `execute_simulation(simulation_data, scene_context)`
+
+Execute a complete simulation sequence.
+
+**Parameters:**
+- `simulation_data`: SimulationData with steps
+- `scene_context`: SceneContext with resources and entities
+
+**Returns:** `std::expected<std::monostate, FailInfo>`
+
+#### `execute_simulation_with_fixture(simulation_data, fixture)`
+
+Execute simulation using a TestFixture (convenience wrapper).
+
+**Parameters:**
+- `simulation_data`: SimulationData with steps
+- `fixture`: TestFixture containing the test environment
+
+**Returns:** `std::expected<std::monostate, FailInfo>`
+
+### Extending Simulations
+
+To add new functions or Logic classes to simulations:
+
+1. **Add to FlatBuffers enum** in `src/flatbuffers_headers/simulation.fbs`:
+   ```fbs
+   enum FunctionType : byte {
+     // ... existing values ...
+     MyNewFunction = 50,
+   }
+   ```
+
+2. **Add case to dispatcher** in `tests/harness/simulation_runner.cpp`:
+   ```cpp
+   case FunctionType::MyNewFunction: {
+     MyNewFunction(scene_context);
+     return std::monostate{};
+   }
+   ```
+
+3. **Rebuild** to regenerate headers
+
+4. **Use in test data**:
+   ```json
+   {
+     "simulation_type": "Action",
+     "execution_mode": "Function",
+     "function_type": "MyNewFunction"
+   }
+   ```
 
 ## Integration with Matchers
 
@@ -386,6 +589,9 @@ Test data JSON files must follow the `test_data.fbs` schema located in `src/flat
 **Entity collection fields:**
 - `start_entity_collection` - Starting state for comparison tests
 - `expected_entity_collection` - Expected state for comparison tests
+
+**Simulation fields:**
+- `simulation_data` - Optional simulation steps to execute between start and expected states
 
 **Example:**
 ```json

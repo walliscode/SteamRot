@@ -1,5 +1,6 @@
 include "entities.fbs";
 include "resource_data.fbs";
+include "simulation.fbs";
 
 namespace steamrot;
 
@@ -51,11 +52,13 @@ table TestDataConfig {
   game_resources: GameResourcesData;
   scene_resources: SceneResourcesData;
   
+  /// @brief Simulation data for executing logic steps during tests
+  simulation_data: SimulationData;
+  
   /// @brief Reserved for future test data types
   /// Can be extended with additional fields like:
   /// - event_data: EventCollection;
   /// - ui_data: UITestData;
-  /// - logic_data: LogicTestData;
   /// etc.
 }
 

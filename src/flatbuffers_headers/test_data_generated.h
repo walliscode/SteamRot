@@ -15,6 +15,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 #include "entities_generated.h"
 #include "resource_data_generated.h"
+#include "simulation_generated.h"
 
 namespace steamrot {
 
@@ -169,7 +170,8 @@ struct TestDataConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_START_ENTITY_COLLECTION = 6,
     VT_EXPECTED_ENTITY_COLLECTION = 8,
     VT_GAME_RESOURCES = 10,
-    VT_SCENE_RESOURCES = 12
+    VT_SCENE_RESOURCES = 12,
+    VT_SIMULATION_DATA = 14
   };
   /// @brief Metadata about this test case
   const steamrot::TestMetadata *metadata() const {
@@ -191,6 +193,10 @@ struct TestDataConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::SceneResourcesData *scene_resources() const {
     return GetPointer<const steamrot::SceneResourcesData *>(VT_SCENE_RESOURCES);
   }
+  /// @brief Simulation data for executing logic steps during tests
+  const steamrot::SimulationData *simulation_data() const {
+    return GetPointer<const steamrot::SimulationData *>(VT_SIMULATION_DATA);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_METADATA) &&
@@ -203,6 +209,8 @@ struct TestDataConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyTable(game_resources()) &&
            VerifyOffset(verifier, VT_SCENE_RESOURCES) &&
            verifier.VerifyTable(scene_resources()) &&
+           VerifyOffset(verifier, VT_SIMULATION_DATA) &&
+           verifier.VerifyTable(simulation_data()) &&
            verifier.EndTable();
   }
 };
@@ -226,6 +234,9 @@ struct TestDataConfigBuilder {
   void add_scene_resources(::flatbuffers::Offset<steamrot::SceneResourcesData> scene_resources) {
     fbb_.AddOffset(TestDataConfig::VT_SCENE_RESOURCES, scene_resources);
   }
+  void add_simulation_data(::flatbuffers::Offset<steamrot::SimulationData> simulation_data) {
+    fbb_.AddOffset(TestDataConfig::VT_SIMULATION_DATA, simulation_data);
+  }
   explicit TestDataConfigBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -244,8 +255,10 @@ inline ::flatbuffers::Offset<TestDataConfig> CreateTestDataConfig(
     ::flatbuffers::Offset<steamrot::EntityCollection> start_entity_collection = 0,
     ::flatbuffers::Offset<steamrot::EntityCollection> expected_entity_collection = 0,
     ::flatbuffers::Offset<steamrot::GameResourcesData> game_resources = 0,
-    ::flatbuffers::Offset<steamrot::SceneResourcesData> scene_resources = 0) {
+    ::flatbuffers::Offset<steamrot::SceneResourcesData> scene_resources = 0,
+    ::flatbuffers::Offset<steamrot::SimulationData> simulation_data = 0) {
   TestDataConfigBuilder builder_(_fbb);
+  builder_.add_simulation_data(simulation_data);
   builder_.add_scene_resources(scene_resources);
   builder_.add_game_resources(game_resources);
   builder_.add_expected_entity_collection(expected_entity_collection);

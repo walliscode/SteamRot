@@ -1,0 +1,123 @@
+{
+  "metadata": {
+    "test_name": "sample_complete_workflow",
+    "description": "Complete workflow simulation demonstrating all simulation capabilities - combines multiple system types and execution modes",
+    "tags": ["integration", "simulation", "workflow", "ui"],
+    "expected_to_pass": true,
+    "author": "SteamRot Test Harness",
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "main_menu",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 100, "y": 100 },
+              "size": { "x": 300, "y": 400 },
+              "children_active": true,
+              "children": [],
+              "layout": "Vertical",
+              "spacing_strategy": "Even"
+            }
+          }
+        }
+      },
+      {
+        "index": 1,
+        "c_user_interface": {
+          "ui_name": "button_panel",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 420, "y": 100 },
+              "size": { "x": 200, "y": 300 },
+              "children_active": false,
+              "children": [],
+              "layout": "Horizontal",
+              "spacing_strategy": "None"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "simulation_data": {
+    "description": "Complete UI interaction workflow: collision -> state update -> render -> action processing",
+    "steps": [
+      {
+        "simulation_type": "Collision",
+        "execution_mode": "LogicClass",
+        "logic_class_type": "UICollisionLogic",
+        "description": "Step 1: Detect mouse collision with all UI elements"
+      },
+      {
+        "simulation_type": "Action",
+        "execution_mode": "LogicClass",
+        "logic_class_type": "UIStateLogic",
+        "description": "Step 2: Update UI element states based on collision"
+      },
+      {
+        "simulation_type": "Render",
+        "execution_mode": "LogicClass",
+        "logic_class_type": "UIRenderLogic",
+        "description": "Step 3: Render all UI elements to scene texture"
+      },
+      {
+        "simulation_type": "Action",
+        "execution_mode": "Function",
+        "function_type": "ProcessNestedUIActionsAndEvents",
+        "description": "Step 4: Process UI actions recursively for nested elements"
+      },
+      {
+        "simulation_type": "Action",
+        "execution_mode": "LogicClass",
+        "logic_class_type": "UIActionLogic",
+        "description": "Step 5: Complete action processing via UIActionLogic"
+      }
+    ]
+  },
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "main_menu",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 100, "y": 100 },
+              "size": { "x": 300, "y": 400 },
+              "children_active": true,
+              "children": [],
+              "layout": "Vertical",
+              "spacing_strategy": "Even"
+            }
+          }
+        }
+      },
+      {
+        "index": 1,
+        "c_user_interface": {
+          "ui_name": "button_panel",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 420, "y": 100 },
+              "size": { "x": 200, "y": 300 },
+              "children_active": false,
+              "children": [],
+              "layout": "Horizontal",
+              "spacing_strategy": "None"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

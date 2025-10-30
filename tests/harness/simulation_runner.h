@@ -1,0 +1,66 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Declaration of simulation runner for data-driven logic testing
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Preprocessor Directives
+/////////////////////////////////////////////////
+#pragma once
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include "FailInfo.h"
+#include "SceneContext.h"
+#include "TestFixture.h"
+#include "simulation_generated.h"
+#include <expected>
+#include <memory>
+
+namespace steamrot::tests {
+
+/////////////////////////////////////////////////
+/// @brief Execute a single simulation step
+///
+/// Dispatches to the appropriate function or Logic class based on the
+/// step configuration. This is the core dispatcher that uses switch/case
+/// to call individual free functions or instantiate and run Logic classes.
+///
+/// @param step The simulation step to execute
+/// @param scene_context SceneContext containing scene resources and entities
+/// @return std::monostate on success, FailInfo on error
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+execute_simulation_step(const SimulationStep *step,
+                       SceneContext &scene_context);
+
+/////////////////////////////////////////////////
+/// @brief Execute a complete simulation sequence
+///
+/// Runs all steps in the simulation data in order. Each step can be
+/// either a function call or a Logic class execution.
+///
+/// @param simulation_data The simulation configuration with steps
+/// @param scene_context SceneContext containing scene resources and entities
+/// @return std::monostate on success, FailInfo on error
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+execute_simulation(const SimulationData *simulation_data,
+                  SceneContext &scene_context);
+
+/////////////////////////////////////////////////
+/// @brief Execute a complete simulation using a TestFixture
+///
+/// Convenience wrapper that extracts the SceneContext from a TestFixture
+/// and executes the simulation.
+///
+/// @param simulation_data The simulation configuration with steps
+/// @param fixture TestFixture containing the test environment
+/// @return std::monostate on success, FailInfo on error
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+execute_simulation_with_fixture(const SimulationData *simulation_data,
+                               TestFixture &fixture);
+
+} // namespace steamrot::tests
