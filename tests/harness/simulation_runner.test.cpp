@@ -141,9 +141,9 @@ TEST_CASE("Simulation execution modes work correctly", "[unit][harness][simulati
     
     auto step_offset = steamrot::CreateSimulationStep(
         builder,
-        steamrot::SimulationType::Action,
-        steamrot::ExecutionMode::Function,
-        steamrot::FunctionType::ProcessNestedUIActionsAndEvents);
+        steamrot::SimulationType_Action,
+        steamrot::ExecutionMode_Function,
+        steamrot::FunctionType_ProcessNestedUIActionsAndEvents);
     
     builder.Finish(step_offset);
     
@@ -160,10 +160,10 @@ TEST_CASE("Simulation execution modes work correctly", "[unit][harness][simulati
     
     auto step_offset = steamrot::CreateSimulationStep(
         builder,
-        steamrot::SimulationType::Action,
-        steamrot::ExecutionMode::LogicClass,
-        steamrot::FunctionType::None,
-        steamrot::LogicClassType::UIActionLogic);
+        steamrot::SimulationType_Action,
+        steamrot::ExecutionMode_LogicClass,
+        steamrot::FunctionType_None,
+        steamrot::LogicClassType_UIActionLogic);
     
     builder.Finish(step_offset);
     

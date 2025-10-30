@@ -27,7 +27,7 @@ execute_function(const FunctionType function_type,
                 SceneContext &scene_context) {
 
   switch (function_type) {
-  case FunctionType::ProcessUIActionsAndEvents: {
+  case FunctionType_ProcessUIActionsAndEvents: {
     // This function needs a UIElement - we need to iterate through
     // UI entities in the scene
     ArchetypeID ui_archetype = GenerateArchetypeIDfromTypes<CUserInterface>();
@@ -50,7 +50,7 @@ execute_function(const FunctionType function_type,
     return std::monostate{};
   }
 
-  case FunctionType::ProcessNestedUIActionsAndEvents: {
+  case FunctionType_ProcessNestedUIActionsAndEvents: {
     // Similar to above but processes nested elements
     ArchetypeID ui_archetype = GenerateArchetypeIDfromTypes<CUserInterface>();
     const auto it = scene_context.archetypes.find(ui_archetype);
@@ -72,21 +72,21 @@ execute_function(const FunctionType function_type,
     return std::monostate{};
   }
 
-  case FunctionType::ProcessButtonElementActions: {
+  case FunctionType_ProcessButtonElementActions: {
     // This function operates on ButtonElement instances
     // For now, we'll skip this as it requires specific element type
     // It's typically called from ProcessUIActionsAndEvents
     return std::monostate{};
   }
 
-  case FunctionType::ProcessDropDownListElementActions: {
+  case FunctionType_ProcessDropDownListElementActions: {
     // This function operates on DropDownListElement instances
     // For now, we'll skip this as it requires specific element type
     // It's typically called from ProcessUIActionsAndEvents
     return std::monostate{};
   }
 
-  case FunctionType::None:
+  case FunctionType_None:
   default:
     std::string error_msg =
         std::format("Unknown or unsupported FunctionType: {}",
@@ -104,37 +104,37 @@ execute_logic_class(const LogicClassType logic_class_type,
                    SceneContext &scene_context) {
 
   switch (logic_class_type) {
-  case LogicClassType::UIActionLogic: {
+  case LogicClassType_UIActionLogic: {
     UIActionLogic logic(scene_context);
     logic.RunLogic();
     return std::monostate{};
   }
 
-  case LogicClassType::UICollisionLogic: {
+  case LogicClassType_UICollisionLogic: {
     UICollisionLogic logic(scene_context);
     logic.RunLogic();
     return std::monostate{};
   }
 
-  case LogicClassType::UIRenderLogic: {
+  case LogicClassType_UIRenderLogic: {
     UIRenderLogic logic(scene_context);
     logic.RunLogic();
     return std::monostate{};
   }
 
-  case LogicClassType::UIStateLogic: {
+  case LogicClassType_UIStateLogic: {
     UIStateLogic logic(scene_context);
     logic.RunLogic();
     return std::monostate{};
   }
 
-  case LogicClassType::CraftingRenderLogic: {
+  case LogicClassType_CraftingRenderLogic: {
     CraftingRenderLogic logic(scene_context);
     logic.RunLogic();
     return std::monostate{};
   }
 
-  case LogicClassType::None:
+  case LogicClassType_None:
   default:
     std::string error_msg =
         std::format("Unknown or unsupported LogicClassType: {}",
@@ -157,10 +157,10 @@ execute_simulation_step(const SimulationStep *step,
 
   // Dispatch based on execution mode
   switch (step->execution_mode()) {
-  case ExecutionMode::Function:
+  case ExecutionMode_Function:
     return execute_function(step->function_type(), scene_context);
 
-  case ExecutionMode::LogicClass:
+  case ExecutionMode_LogicClass:
     return execute_logic_class(step->logic_class_type(), scene_context);
 
   default:
