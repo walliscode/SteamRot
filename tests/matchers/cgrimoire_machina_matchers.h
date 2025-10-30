@@ -69,12 +69,11 @@ public:
   }
 
   std::string describe() const override {
-    std::ostringstream oss;
-    oss << "equals CGrimoireMachina";
-    return oss.str();
+    if (m_mismatch_description.empty()) {
+      return "equals CGrimoireMachina";
+    }
+    return "CGrimoireMachina mismatch: " + m_mismatch_description;
   }
-
-  std::string get_mismatch_description() const { return m_mismatch_description; }
 };
 
 inline CGrimoireMachinaEqualsMatcher

@@ -46,14 +46,13 @@ public:
   }
 
   std::string describe() const override {
-    std::ostringstream oss;
-    oss << "equals CMeta(m_active=" << m_expected.m_active
-        << ", m_entity_active=" << m_expected.m_entity_active << ")";
-    return oss.str();
-  }
-
-  std::string get_mismatch_description() const {
-    return m_mismatch_description;
+    if (m_mismatch_description.empty()) {
+      std::ostringstream oss;
+      oss << "equals CMeta(m_active=" << m_expected.m_active
+          << ", m_entity_active=" << m_expected.m_entity_active << ")";
+      return oss.str();
+    }
+    return "CMeta mismatch: " + m_mismatch_description;
   }
 };
 
