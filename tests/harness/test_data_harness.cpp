@@ -206,6 +206,14 @@ void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
 }
 
 /////////////////////////////////////////////////
+void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
+                                            const EntityMemoryPool &expected,
+                                            const std::string &test_metadata) {
+  // Compare the pools using matcher with metadata
+  REQUIRE_THAT(actual, EqualsEntityMemoryPool(expected, test_metadata));
+}
+
+/////////////////////////////////////////////////
 std::expected<TestFixture, FailInfo>
 create_fixture_from_test_data(const TestDataConfig *config,
                               const SceneType &scene_type) {
@@ -287,7 +295,23 @@ run_fixture_test(const TestDataConfig *config) {
     const EntityMemoryPool &actual_pool = 
         fixture.GetEntityManager().GetEntityMemoryPool();
     
-    run_entity_memory_pool_comparison_test(actual_pool, expected_pool);
+    // Build test metadata string from config
+    std::string test_metadata;
+    if (config->metadata()) {
+      if (config->metadata()->test_name()) {
+        test_metadata += "Test: " + std::string(config->metadata()->test_name()->str());
+      }
+      if (config->metadata()->description()) {
+        test_metadata += ", Description: " + std::string(config->metadata()->description()->str());
+      }
+    }
+    
+    // Use overload with metadata if available, otherwise use simple version
+    if (!test_metadata.empty()) {
+      run_entity_memory_pool_comparison_test(actual_pool, expected_pool, test_metadata);
+    } else {
+      run_entity_memory_pool_comparison_test(actual_pool, expected_pool);
+    }
   }
 
   return std::monostate{};
