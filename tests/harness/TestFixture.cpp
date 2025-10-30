@@ -22,7 +22,6 @@ TestFixture::TestFixture(const SceneType &scene_type)
 
 void TestFixture::Intialize() {
 
-  PathProvider path_provider{EnvironmentType::Test};
   ConfigureGameResourcesForTest();
   ConfigureSceneResourcesForTest(m_scene_type);
 }
@@ -31,17 +30,17 @@ void TestFixture::ConfigureGameResourcesForTest() {
   // Use the reusable configuration function to set up GameResources
   FlatbuffersDataLoader loader;
   auto game_data_result = loader.ProvideGameResourcesData();
-  
+
   if (game_data_result.has_value()) {
     auto config_result = resources::ConfigureGameResources(
         m_game_resources, game_data_result.value());
-    
+
     if (!config_result.has_value()) {
-      std::cerr << "Error configuring game resources: " 
+      std::cerr << "Error configuring game resources: "
                 << config_result.error().message << std::endl;
     }
   } else {
-    std::cerr << "Error loading game resources data: " 
+    std::cerr << "Error loading game resources data: "
               << game_data_result.error().message << std::endl;
   }
 
@@ -61,17 +60,17 @@ void TestFixture::ConfigureSceneResourcesForTest(const SceneType &scene_type) {
   // Use the reusable configuration function to set up SceneResources
   FlatbuffersDataLoader loader;
   auto scene_data_result = loader.ProvideSceneResourcesData(scene_type);
-  
+
   if (scene_data_result.has_value()) {
     auto config_result = resources::ConfigureSceneResources(
         m_scene_resources, scene_data_result.value());
-    
+
     if (!config_result.has_value()) {
-      std::cerr << "Error configuring scene resources: " 
+      std::cerr << "Error configuring scene resources: "
                 << config_result.error().message << std::endl;
     }
   } else {
-    std::cerr << "Error loading scene resources data: " 
+    std::cerr << "Error loading scene resources data: "
               << scene_data_result.error().message << std::endl;
   }
 

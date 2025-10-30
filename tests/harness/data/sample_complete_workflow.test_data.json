@@ -22,7 +22,7 @@
               "children_active": true,
               "children": [],
               "layout": "Vertical",
-              "spacing_strategy": "EvenSpacing"
+              "spacing_strategy": "Even"
             }
           }
         }
@@ -96,7 +96,7 @@
               "children_active": true,
               "children": [],
               "layout": "Vertical",
-              "spacing_strategy": "EvenSpacing"
+              "spacing_strategy": "Even"
             }
           }
         }
