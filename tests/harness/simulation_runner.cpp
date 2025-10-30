@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "simulation_runner.h"
+#include "ArchetypeUtils.h"
 #include "CUserInterface.h"
 #include "CraftingRenderLogic.h"
 #include "UIActionLogic.h"
