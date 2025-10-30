@@ -87,10 +87,12 @@ Root table containing test data:
 
 ```cpp
 table TestDataConfig {
-  metadata: TestMetadata (required);        // Test metadata
-  entity_collection: EntityCollection;      // Optional entity data (deprecated)
-  start_entity_collection: EntityCollection; // Starting state for comparison tests
-  expected_entity_collection: EntityCollection; // Expected state for comparison tests
+  metadata: TestMetadata (required);             // Test metadata
+  start_entity_collection: EntityCollection;     // Starting state for comparison tests
+  expected_entity_collection: EntityCollection;  // Expected state for comparison tests
+  game_resources: GameResourcesData;             // Resource data for test fixtures
+  scene_resources: SceneResourcesData;           // Scene-specific resources
+  simulation_data: SimulationData;               // Simulation steps to execute (NEW)
   // More fields can be added here in the future
 }
 ```
@@ -519,15 +521,194 @@ TEST_CASE("NewComponent default values", "[unit][NewComponent][data-driven]") {
 ctest --preset Debug -R NewComponent
 ```
 
+## Simulation Data (NEW)
+
+### Overview
+
+The test harness now supports **simulation data** - a powerful feature for testing complex, multi-step scenarios. Simulations allow test data to specify which Logic classes or free functions to execute and in which order.
+
+### What Are Simulations?
+
+Simulations are sequences of execution steps that mimic the Scene systems organization:
+- **Action** - UI actions, input processing
+- **Movement** - Entity movement, physics
+- **Render** - Drawing and rendering
+- **Collision** - Collision detection
+
+Each step can execute either:
+- **Individual free functions** (e.g., `ProcessNestedUIActionsAndEvents`)
+- **Entire Logic classes** (e.g., `UIActionLogic`)
+
+### Simulation Schema
+
+```fbs
+// src/flatbuffers_headers/simulation.fbs
+
+enum SimulationType : byte {
+  Action, Movement, Render, Collision
+}
+
+enum ExecutionMode : byte {
+  Function,    // Execute individual free function
+  LogicClass   // Execute entire Logic class
+}
+
+table SimulationStep {
+  simulation_type: SimulationType;
+  execution_mode: ExecutionMode;
+  function_type: FunctionType;        // Used if mode is Function
+  logic_class_type: LogicClassType;   // Used if mode is LogicClass
+  description: string;
+}
+
+table SimulationData {
+  steps: [SimulationStep];
+  description: string;
+}
+```
+
+### Example Test Data with Simulation
+
+```json
+{
+  "metadata": {
+    "test_name": "ui_interaction_simulation",
+    "description": "Test UI collision detection, rendering, and action processing",
+    "tags": ["integration", "simulation", "ui"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 3,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "test_ui",
+          "start_visible": true,
+          "root_ui_element": { /* ... */ }
+        }
+      }
+    ]
+  },
+  "simulation_data": {
+    "description": "Simulate complete UI interaction workflow",
+    "steps": [
+      {
+        "simulation_type": "Collision",
+        "execution_mode": "LogicClass",
+        "logic_class_type": "UICollisionLogic",
+        "description": "Detect mouse collision with UI elements"
+      },
+      {
+        "simulation_type": "Render",
+        "execution_mode": "LogicClass",
+        "logic_class_type": "UIRenderLogic",
+        "description": "Render UI to scene texture"
+      },
+      {
+        "simulation_type": "Action",
+        "execution_mode": "Function",
+        "function_type": "ProcessNestedUIActionsAndEvents",
+        "description": "Process UI actions recursively"
+      }
+    ]
+  },
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 3,
+    "entities": [ /* expected state after simulation */ ]
+  }
+}
+```
+
+### Using Simulations in Tests
+
+Simulations are automatically executed by the test harness:
+
+```cpp
+#include "test_data_harness.h"
+#include <catch2/generators/catch_generators_range.hpp>
+
+TEST_CASE("Run simulation from test data", "[integration][simulation]") {
+  // Load test configurations
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  
+  // Use Catch2 generator
+  const auto *config = GENERATE_COPY(from_range(configs.value()));
+  
+  // If config has simulation_data, it will be executed automatically
+  auto result = steamrot::tests::run_fixture_test(config);
+  REQUIRE(result.has_value());
+}
+```
+
+The workflow is:
+1. **Setup** - Entities configured from `start_entity_collection`
+2. **Simulate** - Steps executed in order (if `simulation_data` present)
+3. **Verify** - Compare with `expected_entity_collection`
+
+### Available Logic Classes
+
+- `UIActionLogic` - Process UI actions and events
+- `UICollisionLogic` - Check UI collision with mouse
+- `UIRenderLogic` - Render UI elements
+- `UIStateLogic` - Update UI state
+- `CraftingRenderLogic` - Render crafting UI
+
+### Available Free Functions
+
+- `ProcessUIActionsAndEvents` - Process UI actions for elements
+- `ProcessNestedUIActionsAndEvents` - Process UI actions recursively
+- `ProcessButtonElementActions` - Process button-specific actions
+- `ProcessDropDownListElementActions` - Process dropdown actions
+
+### Extending Simulations
+
+To add new functions or Logic classes:
+
+1. **Add to FlatBuffers enum** (`simulation.fbs`):
+   ```fbs
+   enum FunctionType : byte {
+     // ... existing values ...
+     MyNewFunction = 50,
+   }
+   ```
+
+2. **Add dispatcher case** (`simulation_runner.cpp`):
+   ```cpp
+   case FunctionType::MyNewFunction: {
+     MyNewFunction(scene_context);
+     return std::monostate{};
+   }
+   ```
+
+3. **Rebuild project** to regenerate headers
+
+4. **Use in test data**:
+   ```json
+   {
+     "simulation_type": "Action",
+     "execution_mode": "Function",
+     "function_type": "MyNewFunction"
+   }
+   ```
+
+### Benefits
+
+- **Data-Driven**: Test scenarios defined in JSON, no code changes needed
+- **Flexible**: Mix function calls and Logic class execution
+- **Organized**: Follows Scene systems structure (Action, Movement, Render, Collision)
+- **Extensible**: Easy to add new functions and Logic classes
+- **Reusable**: Same simulation can be used across multiple tests
+
 ## Future Enhancements
 
 The system is designed to grow. Future additions might include:
 
 - **Event Data**: Test event sequences
 - **UI Data**: Test UI configurations
-- **Logic Data**: Test logic execution scenarios
-- **Comparison Data**: Expected vs actual results
-- **Simulation Data**: Multi-step workflow definitions
+- **Comparison Data**: More sophisticated expected vs actual comparisons
 
 All can be added by extending `TestDataConfig` with new optional fields.
 
