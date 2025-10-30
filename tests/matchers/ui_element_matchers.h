@@ -344,16 +344,10 @@ public:
   /// @return Description string
   ////////////////////////////////////////////////////////////
   std::string describe() const override {
+    if (m_mismatch_description.empty()) {
+      return "equals UIElement";
+    }
     return "UIElement mismatch: " + m_mismatch_description;
-  }
-
-  ////////////////////////////////////////////////////////////
-  /// @brief Get the mismatch description
-  ///
-  /// @return Mismatch description string
-  ////////////////////////////////////////////////////////////
-  std::string get_mismatch_description() const {
-    return m_mismatch_description;
   }
 };
 

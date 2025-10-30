@@ -61,7 +61,7 @@ public:
       // Both are non-null, use UIElement matcher to compare them recursively
       UIElementEqualsMatcher element_matcher(*m_expected.m_root_element);
       if (!element_matcher.match(*actual.m_root_element)) {
-        oss << "m_root_element: " << element_matcher.get_mismatch_description();
+        oss << "m_root_element: " << element_matcher.describe();
       }
     }
 
@@ -70,11 +70,14 @@ public:
   }
 
   std::string describe() const override {
+    if (m_mismatch_description.empty()) {
+      std::ostringstream oss;
+      oss << "equals CUserInterface(m_active=" << m_expected.m_active
+          << ", m_name='" << m_expected.m_name << "', m_UI_visible=" 
+          << m_expected.m_UI_visible << ")";
+      return oss.str();
+    }
     return "CUserInterface mismatch: " + m_mismatch_description;
-  }
-
-  std::string get_mismatch_description() const {
-    return m_mismatch_description;
   }
 };
 

@@ -46,10 +46,11 @@ public:
   }
 
   std::string describe() const override {
-    return "equals UIVisibilityState";
+    if (m_mismatch_description.empty()) {
+      return "equals UIVisibilityState";
+    }
+    return "UIVisibilityState mismatch: " + m_mismatch_description;
   }
-
-  std::string get_mismatch_description() const { return m_mismatch_description; }
 };
 
 inline UIVisibilityStateEqualsMatcher
@@ -96,10 +97,11 @@ public:
   }
 
   std::string describe() const override {
-    return "equals CUIState";
+    if (m_mismatch_description.empty()) {
+      return "equals CUIState";
+    }
+    return "CUIState mismatch: " + m_mismatch_description;
   }
-
-  std::string get_mismatch_description() const { return m_mismatch_description; }
 };
 
 inline CUIStateEqualsMatcher EqualsCUIState(const CUIState &expected) {

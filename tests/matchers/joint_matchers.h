@@ -72,12 +72,13 @@ public:
   }
 
   std::string describe() const override {
-    std::ostringstream oss;
-    oss << "equals Joint(m_joint_name='" << m_expected.m_joint_name << "')";
-    return oss.str();
+    if (m_mismatch_description.empty()) {
+      std::ostringstream oss;
+      oss << "equals Joint(m_joint_name='" << m_expected.m_joint_name << "')";
+      return oss.str();
+    }
+    return "Joint mismatch: " + m_mismatch_description;
   }
-
-  std::string get_mismatch_description() const { return m_mismatch_description; }
 };
 
 inline JointEqualsMatcher EqualsJoint(const Joint &expected) {

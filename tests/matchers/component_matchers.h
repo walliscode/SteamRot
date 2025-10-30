@@ -65,17 +65,13 @@ public:
   /// @return Description string
   ////////////////////////////////////////////////////////////
   std::string describe() const override {
-    std::ostringstream oss;
-    oss << "equals Component with m_active=" << m_expected.m_active;
-    return oss.str();
+    if (m_mismatch_description.empty()) {
+      std::ostringstream oss;
+      oss << "equals Component with m_active=" << m_expected.m_active;
+      return oss.str();
+    }
+    return "Component mismatch: " + m_mismatch_description;
   }
-
-  ////////////////////////////////////////////////////////////
-  /// @brief Get the mismatch description
-  ///
-  /// @return Mismatch description string
-  ////////////////////////////////////////////////////////////
-  std::string get_mismatch_description() const { return m_mismatch_description; }
 };
 
 /////////////////////////////////////////////////

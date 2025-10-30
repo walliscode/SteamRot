@@ -61,11 +61,10 @@ private:
                               std::ostringstream &oss) const {
 
     for (size_t i = 0; i < expected_vec.size(); ++i) {
-      if (!CMetaEqualsMatcher(expected_vec[i]).match(actual_vec[i])) {
+      CMetaEqualsMatcher matcher(expected_vec[i]);
+      if (!matcher.match(actual_vec[i])) {
         // pass through the mismatch description from CMetaEqualsMatcher
-        oss << "CMeta mismatch at index " << i << ": "
-            << CMetaEqualsMatcher(expected_vec[i]).get_mismatch_description()
-            << "; ";
+        oss << "CMeta at index " << i << ": " << matcher.describe() << "; ";
 
         // switch flag to false
         do_components_match = false;
@@ -79,12 +78,12 @@ private:
                               std::ostringstream &oss) const {
 
     for (size_t i = 0; i < expected_pool.size(); ++i) {
-      if (!CUserInterfaceEqualsMatcher(expected_pool[i]).match(actual_vec[i])) {
+      CUserInterfaceEqualsMatcher matcher(expected_pool[i]);
+      if (!matcher.match(actual_vec[i])) {
         // pass through the mismatch description from
         // CUserInterfaceEqualsMatcher
-        oss << "CUserInterface mismatch at index " << i << ": "
-            << CUserInterfaceEqualsMatcher(expected_pool[i]).describe()
-            << std::endl;
+        oss << "CUserInterface at index " << i << ": " << matcher.describe()
+            << "; ";
         // switch flag to false
         do_components_match = false;
       }
@@ -96,12 +95,11 @@ private:
                               const std::vector<CMachinaForm> &expected_pool,
                               std::ostringstream &oss) const {
     for (size_t i = 0; i < expected_pool.size(); ++i) {
-      if (!CMachinaFormEqualsMatcher(expected_pool[i]).match(actual_vec[i])) {
+      CMachinaFormEqualsMatcher matcher(expected_pool[i]);
+      if (!matcher.match(actual_vec[i])) {
 
         // pass through the mismatch description from CMachinaFormEqualsMatcher
-        oss << "CMachinaForm mismatch at index " << i << ": "
-            << CMachinaFormEqualsMatcher(expected_pool[i])
-                   .get_mismatch_description()
+        oss << "CMachinaForm at index " << i << ": " << matcher.describe()
             << "; ";
 
         // switch flag to false
@@ -116,13 +114,11 @@ private:
                          const std::vector<CGrimoireMachina> &expected_pool,
                          std::ostringstream &oss) const {
     for (size_t i = 0; i < expected_pool.size(); ++i) {
-      if (!CGrimoireMachinaEqualsMatcher(expected_pool[i])
-               .match(actual_vec[i])) {
+      CGrimoireMachinaEqualsMatcher matcher(expected_pool[i]);
+      if (!matcher.match(actual_vec[i])) {
         // pass through the mismatch description from
         // CGrimoireMachinaEqualsMatcher
-        oss << "CGrimoireMachina mismatch at index " << i << ": "
-            << CGrimoireMachinaEqualsMatcher(expected_pool[i])
-                   .get_mismatch_description()
+        oss << "CGrimoireMachina at index " << i << ": " << matcher.describe()
             << "; ";
         // switch flag to false
         do_components_match = false;
@@ -135,13 +131,11 @@ private:
                               std::ostringstream &oss) const {
 
     for (size_t i = 0; i < expected_pool.size(); ++i) {
-      if (!CUIStateEqualsMatcher(expected_pool[i]).match(actual_vec[i])) {
+      CUIStateEqualsMatcher matcher(expected_pool[i]);
+      if (!matcher.match(actual_vec[i])) {
 
         // pass through the mismatch description from CUIStateEqualsMatcher
-        oss << "CUIState mismatch at index " << i << ": "
-            << CUIStateEqualsMatcher(expected_pool[i])
-                   .get_mismatch_description()
-            << "; ";
+        oss << "CUIState at index " << i << ": " << matcher.describe() << "; ";
 
         // switch flag to false
         do_components_match = false;

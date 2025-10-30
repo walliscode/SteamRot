@@ -64,12 +64,13 @@ public:
   }
 
   std::string describe() const override {
-    std::ostringstream oss;
-    oss << "equals Fragment(m_name='" << m_expected.m_name << "')";
-    return oss.str();
+    if (m_mismatch_description.empty()) {
+      std::ostringstream oss;
+      oss << "equals Fragment(m_name='" << m_expected.m_name << "')";
+      return oss.str();
+    }
+    return "Fragment mismatch: " + m_mismatch_description;
   }
-
-  std::string get_mismatch_description() const { return m_mismatch_description; }
 };
 
 inline FragmentEqualsMatcher EqualsFragment(const Fragment &expected) {
