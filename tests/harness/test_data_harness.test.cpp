@@ -7,6 +7,12 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "test_data_harness.h"
+#include "entity_memory.h"
+#include "CMeta.h"
+#include "CUserInterface.h"
+#include "CMachinaForm.h"
+#include "CGrimoireMachina.h"
+#include "CUIState.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/generators/catch_generators_range.hpp>
@@ -194,4 +200,73 @@ TEST_CASE("run_fixture_test works with Catch2 generators", "[unit][harness]") {
 
   INFO("Test name: " << config->metadata()->test_name()->str());
   REQUIRE(result.has_value());
+}
+
+TEST_CASE("run_entity_memory_pool_comparison_test with metadata",
+          "[unit][harness]") {
+  
+  steamrot::EntityMemoryPool pool1;
+  steamrot::EntityMemoryPool pool2;
+
+  // Create pools with same structure
+  const size_t num_entities = 3;
+
+  auto &cmeta_vec1 =
+      steamrot::entity::memory::GetComponentVector<steamrot::CMeta>(pool1);
+  cmeta_vec1.resize(num_entities);
+
+  auto &cui_vec1 =
+      steamrot::entity::memory::GetComponentVector<steamrot::CUserInterface>(
+          pool1);
+  cui_vec1.resize(num_entities);
+
+  auto &cform_vec1 =
+      steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
+          pool1);
+  cform_vec1.resize(num_entities);
+
+  auto &cgrim_vec1 =
+      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
+          pool1);
+  cgrim_vec1.resize(num_entities);
+
+  auto &cstate_vec1 =
+      steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(pool1);
+  cstate_vec1.resize(num_entities);
+
+  auto &cmeta_vec2 =
+      steamrot::entity::memory::GetComponentVector<steamrot::CMeta>(pool2);
+  cmeta_vec2.resize(num_entities);
+
+  auto &cui_vec2 =
+      steamrot::entity::memory::GetComponentVector<steamrot::CUserInterface>(
+          pool2);
+  cui_vec2.resize(num_entities);
+
+  auto &cform_vec2 =
+      steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
+          pool2);
+  cform_vec2.resize(num_entities);
+
+  auto &cgrim_vec2 =
+      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
+          pool2);
+  cgrim_vec2.resize(num_entities);
+
+  auto &cstate_vec2 =
+      steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(pool2);
+  cstate_vec2.resize(num_entities);
+
+  SECTION("Comparison succeeds with equal pools") {
+    // Pools are equal, test should pass
+    steamrot::tests::run_entity_memory_pool_comparison_test(pool1, pool2, 
+        "Test: metadata_test");
+    SUCCEED("Comparison passed with metadata");
+  }
+
+  SECTION("Comparison can be done without metadata") {
+    // Test backwards compatibility - should still work without metadata
+    steamrot::tests::run_entity_memory_pool_comparison_test(pool1, pool2);
+    SUCCEED("Comparison passed without metadata");
+  }
 }

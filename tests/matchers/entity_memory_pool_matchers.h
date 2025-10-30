@@ -37,6 +37,7 @@ private:
   const EntityMemoryPool &m_expected;
   mutable std::string m_mismatch_description;
   mutable bool do_components_match{true};
+  std::string m_test_metadata;
   ////////////////////////////////////////////////////////////
   /// @brief Helper to compare component vectors
   ///
@@ -180,7 +181,17 @@ private:
 
 public:
   explicit EntityMemoryPoolEqualsMatcher(const EntityMemoryPool &expected)
-      : m_expected(expected) {}
+      : m_expected(expected), m_test_metadata("") {}
+
+  ////////////////////////////////////////////////////////////
+  /// @brief Constructor with test metadata
+  ///
+  /// @param expected The expected EntityMemoryPool
+  /// @param test_metadata Optional test metadata (e.g., test name)
+  ////////////////////////////////////////////////////////////
+  EntityMemoryPoolEqualsMatcher(const EntityMemoryPool &expected,
+                                const std::string &test_metadata)
+      : m_expected(expected), m_test_metadata(test_metadata) {}
 
   ////////////////////////////////////////////////////////////
   /// @brief Check if the EntityMemoryPools match
@@ -219,8 +230,15 @@ public:
   /// @return Description string
   ////////////////////////////////////////////////////////////
   std::string describe() const override {
-
-    return "EntityMemoryPool mismatch: " + m_mismatch_description;
+    std::string description = "EntityMemoryPool mismatch";
+    
+    // Add test metadata if available
+    if (!m_test_metadata.empty()) {
+      description += " [" + m_test_metadata + "]";
+    }
+    
+    description += ": " + m_mismatch_description;
+    return description;
   }
 
   ////////////////////////////////////////////////////////////
@@ -242,6 +260,19 @@ public:
 inline EntityMemoryPoolEqualsMatcher
 EqualsEntityMemoryPool(const EntityMemoryPool &expected) {
   return EntityMemoryPoolEqualsMatcher(expected);
+}
+
+/////////////////////////////////////////////////
+/// @brief Helper function to create EntityMemoryPoolEqualsMatcher with metadata
+///
+/// @param expected The expected EntityMemoryPool
+/// @param test_metadata Test metadata to include in failure messages
+/// @return EntityMemoryPoolEqualsMatcher instance
+/////////////////////////////////////////////////
+inline EntityMemoryPoolEqualsMatcher
+EqualsEntityMemoryPool(const EntityMemoryPool &expected,
+                       const std::string &test_metadata) {
+  return EntityMemoryPoolEqualsMatcher(expected, test_metadata);
 }
 
 } // namespace steamrot::tests
