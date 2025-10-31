@@ -7,11 +7,16 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "input_simulation.h"
+#include "EventHandler.h"
+#include "EventPacket.h"
 #include "GameContext.h"
+#include "UserInputBitset.h"
+#include <SFML/Window/Event.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <algorithm>
 #include <format>
 #include <set>
+#include <vector>
 
 namespace steamrot::tests {
 
@@ -25,10 +30,14 @@ execute_input_event(const InputEvent *input_event, TestFixture &fixture) {
         FailInfo(FailMode::NullPointer, "InputEvent is null"));
   }
 
-  // Get game context for accessing mouse position
+  // Get game context for accessing mouse position and event handler
   GameContext &game_context = fixture.GetGameContext();
+  EventHandler &event_handler = fixture.GetGameResources().event_handler;
 
-  // Handle different input types
+  // Create a vector of SFML events to convert to UserInputBitset
+  std::vector<sf::Event> sfml_events;
+
+  // Handle different input types by creating SFML events
   switch (input_event->input_type()) {
   case InputType_MouseMove: {
     if (input_event->input_data_type() != InputEventData_MouseInputData) {
@@ -54,15 +63,16 @@ execute_input_event(const InputEvent *input_event, TestFixture &fixture) {
         static_cast<int>(mouse_data->position()->x());
     game_context.mouse_position.y =
         static_cast<int>(mouse_data->position()->y());
-    break;
+
+    // MouseMove doesn't generate a UserInput event (no button/key change)
+    return std::monostate{};
   }
 
-  case InputType_MouseClick:
-  case InputType_MouseRelease: {
+  case InputType_MouseClick: {
     if (input_event->input_data_type() != InputEventData_MouseInputData) {
       return std::unexpected(FailInfo(
           FailMode::InvalidEnumValue,
-          "MouseClick/MouseRelease input requires MouseInputData"));
+          "MouseClick input requires MouseInputData"));
     }
 
     const MouseInputData *mouse_data =
@@ -83,18 +93,54 @@ execute_input_event(const InputEvent *input_event, TestFixture &fixture) {
     game_context.mouse_position.y =
         static_cast<int>(mouse_data->position()->y());
 
-    // Note: Mouse button state tracking would require extending GameContext
-    // or SceneContext to store button states. For now, we just update position.
-    // The actual button processing would happen in collision/action logic.
+    // Create SFML MouseButtonPressed event
+    sf::Event::MouseButtonPressed mouse_pressed;
+    mouse_pressed.button = static_cast<sf::Mouse::Button>(mouse_data->button());
+    mouse_pressed.position.x = static_cast<int>(mouse_data->position()->x());
+    mouse_pressed.position.y = static_cast<int>(mouse_data->position()->y());
+    sfml_events.push_back(sf::Event{mouse_pressed});
     break;
   }
 
-  case InputType_KeyPress:
-  case InputType_KeyRelease: {
+  case InputType_MouseRelease: {
+    if (input_event->input_data_type() != InputEventData_MouseInputData) {
+      return std::unexpected(FailInfo(
+          FailMode::InvalidEnumValue,
+          "MouseRelease input requires MouseInputData"));
+    }
+
+    const MouseInputData *mouse_data =
+        input_event->input_data_as_MouseInputData();
+    if (!mouse_data) {
+      return std::unexpected(
+          FailInfo(FailMode::NullPointer, "MouseInputData is null"));
+    }
+
+    if (!mouse_data->position()) {
+      return std::unexpected(
+          FailInfo(FailMode::NullPointer, "MouseInputData position is null"));
+    }
+
+    // Update mouse position
+    game_context.mouse_position.x =
+        static_cast<int>(mouse_data->position()->x());
+    game_context.mouse_position.y =
+        static_cast<int>(mouse_data->position()->y());
+
+    // Create SFML MouseButtonReleased event
+    sf::Event::MouseButtonReleased mouse_released;
+    mouse_released.button = static_cast<sf::Mouse::Button>(mouse_data->button());
+    mouse_released.position.x = static_cast<int>(mouse_data->position()->x());
+    mouse_released.position.y = static_cast<int>(mouse_data->position()->y());
+    sfml_events.push_back(sf::Event{mouse_released});
+    break;
+  }
+
+  case InputType_KeyPress: {
     if (input_event->input_data_type() != InputEventData_KeyboardInputData) {
       return std::unexpected(FailInfo(
           FailMode::InvalidEnumValue,
-          "KeyPress/KeyRelease input requires KeyboardInputData"));
+          "KeyPress input requires KeyboardInputData"));
     }
 
     const KeyboardInputData *keyboard_data =
@@ -104,9 +150,39 @@ execute_input_event(const InputEvent *input_event, TestFixture &fixture) {
           FailInfo(FailMode::NullPointer, "KeyboardInputData is null"));
     }
 
-    // Note: Keyboard state tracking would require extending GameContext
-    // or SceneContext to store key states. For now, this is a placeholder.
-    // The actual key processing would happen in action logic.
+    // Create SFML KeyPressed event
+    sf::Event::KeyPressed key_pressed;
+    key_pressed.code = static_cast<sf::Keyboard::Key>(keyboard_data->key_code());
+    key_pressed.alt = keyboard_data->alt();
+    key_pressed.control = keyboard_data->control();
+    key_pressed.shift = keyboard_data->shift();
+    key_pressed.system = false;
+    sfml_events.push_back(sf::Event{key_pressed});
+    break;
+  }
+
+  case InputType_KeyRelease: {
+    if (input_event->input_data_type() != InputEventData_KeyboardInputData) {
+      return std::unexpected(FailInfo(
+          FailMode::InvalidEnumValue,
+          "KeyRelease input requires KeyboardInputData"));
+    }
+
+    const KeyboardInputData *keyboard_data =
+        input_event->input_data_as_KeyboardInputData();
+    if (!keyboard_data) {
+      return std::unexpected(
+          FailInfo(FailMode::NullPointer, "KeyboardInputData is null"));
+    }
+
+    // Create SFML KeyReleased event
+    sf::Event::KeyReleased key_released;
+    key_released.code = static_cast<sf::Keyboard::Key>(keyboard_data->key_code());
+    key_released.alt = keyboard_data->alt();
+    key_released.control = keyboard_data->control();
+    key_released.shift = keyboard_data->shift();
+    key_released.system = false;
+    sfml_events.push_back(sf::Event{key_released});
     break;
   }
 
@@ -115,6 +191,18 @@ execute_input_event(const InputEvent *input_event, TestFixture &fixture) {
         FailMode::InvalidEnumValue,
         std::format("Unknown InputType: {}",
                     static_cast<int>(input_event->input_type()))));
+  }
+
+  // If we have SFML events, create an EventPacket and add to EventHandler
+  if (!sfml_events.empty()) {
+    // Create UserInputBitset from SFML events
+    UserInputBitset user_input_bitset(sfml_events);
+
+    // Create EventPacket
+    EventPacket event_packet(EventType_EVENT_USER_INPUT, user_input_bitset, 1);
+
+    // Add to EventHandler
+    event_handler.AddEvent(event_packet);
   }
 
   return std::monostate{};

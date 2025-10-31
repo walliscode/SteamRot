@@ -21,9 +21,10 @@ namespace steamrot::tests {
 /////////////////////////////////////////////////
 /// @brief Execute a single input event
 ///
-/// Injects a single input event into the test fixture. The input event
-/// is converted to the appropriate SFML event type and applied to the
-/// context (e.g., updating mouse position, triggering keyboard events).
+/// Converts the input event to SFML event(s), creates a UserInputBitset,
+/// and generates an EVENT_USER_INPUT EventPacket that is added to the
+/// EventHandler. Mouse position is also updated in GameContext.
+/// MouseMove events only update position without generating EventPackets.
 ///
 /// @param input_event The input event to execute
 /// @param fixture TestFixture containing the test environment
@@ -51,13 +52,14 @@ execute_input_events_for_tick(const InputSequence *input_sequence, uint32_t tick
 /////////////////////////////////////////////////
 /// @brief Execute a complete input sequence
 ///
-/// Processes all input events in the sequence, calling them at the appropriate
-/// tick. This is a convenience function that iterates through all ticks and
-/// calls execute_input_events_for_tick for each unique tick value.
+/// Processes all input events in the sequence, generating EventPackets at the
+/// appropriate tick. This is a convenience function that iterates through all
+/// ticks and calls execute_input_events_for_tick for each unique tick value.
 ///
-/// Note: This function does NOT advance simulation ticks automatically.
-/// It only injects the inputs. The caller is responsible for running
-/// simulations or logic between ticks as needed.
+/// Note: This function does NOT advance simulation ticks automatically or
+/// process the waiting room event bus. It only adds EventPackets to the
+/// waiting room. The caller is responsible for calling
+/// ProcessWaitingRoomEventBus() and running simulations between ticks.
 ///
 /// @param input_sequence The input sequence to execute
 /// @param fixture TestFixture containing the test environment

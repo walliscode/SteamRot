@@ -9,6 +9,7 @@
 #include "event_simulation.h"
 #include "EventPacket.h"
 #include "UserInputBitset.h"
+#include "event_conversion.h"
 #include "uuid.h"
 #include <algorithm>
 #include <format>
@@ -43,38 +44,15 @@ execute_event_test_data(const EventTestData *event_data, TestFixture &fixture) {
     const UserInputBitsetData *input_data =
         packet_data->event_data_data_as_UserInputBitsetData();
     if (input_data) {
-      // Create UserInputBitset from the data
-      UserInputBitset input_bitset;
-
-      // Process keyboard pressed
-      if (input_data->keyboard_pressed()) {
-        for (auto key : *input_data->keyboard_pressed()) {
-          input_bitset.SetKeyboard(key, true);
-        }
+      // Use the existing conversion function from event_conversion.h
+      auto input_bitset_result = 
+          event::conversion::ConvertFBDataToUserInputBitset(*input_data);
+      
+      if (!input_bitset_result.has_value()) {
+        return std::unexpected(input_bitset_result.error());
       }
 
-      // Process keyboard released
-      if (input_data->keyboard_released()) {
-        for (auto key : *input_data->keyboard_released()) {
-          input_bitset.SetKeyboard(key, false);
-        }
-      }
-
-      // Process mouse pressed
-      if (input_data->mouse_pressed()) {
-        for (auto button : *input_data->mouse_pressed()) {
-          input_bitset.SetMouse(button, true);
-        }
-      }
-
-      // Process mouse released
-      if (input_data->mouse_released()) {
-        for (auto button : *input_data->mouse_released()) {
-          input_bitset.SetMouse(button, false);
-        }
-      }
-
-      event_packet.m_event_data = input_bitset;
+      event_packet.m_event_data = input_bitset_result.value();
     }
   } else if (packet_data->event_data_data_type() ==
              EventDataData_SceneChangePacketData) {
