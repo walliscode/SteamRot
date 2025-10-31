@@ -1330,6 +1330,70 @@ Before committing code, ensure:
 - [ ] Edge cases and error conditions are tested
 - [ ] Test code is clean and well-organized
 
+#### Data-Driven Testing with Test Harness
+
+SteamRot has a comprehensive test harness system that enables data-driven testing using JSON configuration files. This approach reduces test code boilerplate and makes tests easier to maintain.
+
+**Test Harness Adoption Progress**:
+- ✅ **Phase 2.1 Complete**: Entity pool comparison tests migrated to data-driven approach
+- 🔄 **In Progress**: Additional phases documented in `documentation/TEST_HARNESS_ADOPTION_PLAN.md`
+
+**Basic Usage**:
+
+```cpp
+#include "test_data_harness.h"
+#include <catch2/generators/catch_generators_range.hpp>
+
+TEST_CASE("Data-driven test example", "[unit][MyComponent]") {
+  // Load test data from adjacent data/ directory
+  auto configs_result = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs_result.has_value());
+
+  // Use Catch2 generator for parameterized testing
+  const auto *config = GENERATE_COPY(from_range(configs_result.value()));
+
+  SECTION(config->metadata()->test_name()->c_str()) {
+    // Run fixture test - creates fixture, executes simulations, compares results
+    auto result = steamrot::tests::run_fixture_test(config);
+    REQUIRE(result.has_value());
+  }
+}
+```
+
+**Test Data File Structure** (`tests/unit/entity/data/my_test.test_data.json`):
+
+```json
+{
+  "metadata": {
+    "test_name": "my_test",
+    "description": "What this test verifies",
+    "tags": ["unit", "entity"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": [/* initial entity configuration */]
+  },
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": [/* expected entity state after test */]
+  }
+}
+```
+
+**Key Benefits**:
+- Test data is externalized to JSON files (easier to read and maintain)
+- Automatic compilation of JSON to binary during build
+- Parameterized testing via Catch2 generators
+- Detailed error messages with test metadata
+- Reusable test infrastructure across subsystems
+
+**Documentation**:
+- Complete adoption plan: `documentation/TEST_HARNESS_ADOPTION_PLAN.md`
+- Test data configuration guide: `documentation/TEST_DATA_CONFIGURATION.md`
+- Migration patterns and examples included in adoption plan
+
 ### user_interface
 
 #### Testing UI Elements

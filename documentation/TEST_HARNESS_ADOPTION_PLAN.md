@@ -278,32 +278,60 @@ table TestDataConfig {
 
 These are foundational use cases that leverage the newly extended harness. With Phase 1 extensions complete, these tests can be adopted immediately.
 
-### 2.1 Entity Pool Comparison Tests
+### 2.1 Entity Pool Comparison Tests ✅ COMPLETE
 
 **Target**: `tests/unit/entity/FlatbuffersConfigurator.test.cpp`
 
-**Current State**: Tests manually create and compare entity pools
+**Status**: ✅ **COMPLETE** - Implemented with data-driven approach
+
+**Implementation Summary**:
+- Created 4 new test data files covering different entity configuration scenarios:
+  - `configurator_basic.test_data.json` - Simple UI entity configuration
+  - `configurator_grimoire.test_data.json` - Grimoire component configuration  
+  - `configurator_multi_component.test_data.json` - Entity with multiple components
+  - `configurator_multiple_entities.test_data.json` - Multiple entities with different components
+- Added new data-driven test case using `run_fixture_test()` with Catch2 generators
+- Kept existing manual test as it specifically tests `ConfigureEntitiesFromDefaultData` method
 
 **Migration Target**: Use `start_entity_collection` and `expected_entity_collection`
 
-**Benefits**:
-- Clearer test intent
-- Easier to maintain test data
-- Automatic pool comparison with detailed error messages
+**Benefits Achieved**:
+- ✅ Clearer test intent through descriptive test data
+- ✅ Easier to maintain test data (JSON files vs C++ code)
+- ✅ Automatic pool comparison with detailed error messages via matcher
+- ✅ Parameterized testing via Catch2 generators
 
 **Example Test Data** (`tests/unit/entity/data/configurator_basic.test_data.json`):
 ```json
 {
   "metadata": {
     "test_name": "configurator_basic",
-    "description": "Basic entity configuration from FlatBuffers data",
+    "description": "Basic entity configuration from FlatBuffers data - verifies a simple UI entity is configured correctly",
     "tags": ["unit", "entity", "configurator"],
     "expected_to_pass": true,
     "version": 1
   },
   "start_entity_collection": {
     "entity_memory_pool_size": 5,
-    "entities": []
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "test_ui",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 100, "y": 200 },
+              "size": { "x": 50, "y": 30 },
+              "children_active": false,
+              "children": [],
+              "layout": "Horizontal",
+              "spacing_strategy": "None"
+            }
+          }
+        }
+      }
+    ]
   },
   "expected_entity_collection": {
     "entity_memory_pool_size": 5,
@@ -312,7 +340,17 @@ These are foundational use cases that leverage the newly extended harness. With 
         "index": 0,
         "c_user_interface": {
           "ui_name": "test_ui",
-          "start_visible": true
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 100, "y": 200 },
+              "size": { "x": 50, "y": 30 },
+              "children_active": false,
+              "children": [],
+              "layout": "Horizontal",
+              "spacing_strategy": "None"
+            }
+          }
         }
       }
     ]
@@ -323,6 +361,12 @@ These are foundational use cases that leverage the newly extended harness. With 
 **Harness Extensions Needed**: None - fully supported
 
 **Priority**: High (existing tests can be migrated)
+
+**Lessons Learned**:
+- Test data should have matching `start_entity_collection` and `expected_entity_collection` for configuration tests
+- The harness automatically compiles `.test_data.json` files to `.test_data.bin` during build
+- `load_test_data_configs()` discovers all test data in adjacent data directory
+- Catch2 generators work seamlessly with test harness for parameterized testing
 
 ### 2.2 Metadata-Only Test Cases
 
@@ -891,7 +935,7 @@ table PerformanceBenchmark {
 3. **Phase 1.2: Input simulation** (CRITICAL - Start immediately)
 
 ### High Priority - Weeks 7-9 (Phase 2: Simple Use Cases)
-1. Phase 2.1: Migrate entity pool comparison tests
+1. ✅ Phase 2.1: Migrate entity pool comparison tests (COMPLETE)
 2. Phase 2.2: Create metadata-only validation tests
 3. Begin adopting harness with newly extended capabilities
 
@@ -1073,10 +1117,111 @@ This plan prioritizes getting the test harness "up to scratch" first by implemen
 **Next Steps**:
 1. Review and approve this plan
 2. **Begin Phase 1 immediately**: Implement event sequence testing and input simulation
-3. Once Phase 1 is complete, adopt simple use cases (Phase 2)
+3. ✅ Phase 2.1 Complete - Continue with remaining Phase 2 use cases
 4. Monitor progress and adjust timeline as needed
 
-## Appendix A: Example Directory Structure After Full Adoption
+## Appendix A: Migration Patterns from Phase 2.1
+
+### Pattern 1: Basic Entity Configuration Test
+
+**Scenario**: Testing that entities are configured correctly from test data
+
+**Implementation**:
+```cpp
+TEST_CASE("Entity configuration from test data (data-driven)",
+          "[unit][FlatbuffersConfigurator]") {
+
+  // Load test data configurations from adjacent data directory
+  auto configs_result = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs_result.has_value());
+
+  // Use Catch2 generator to parameterize test with each config
+  const auto *config = GENERATE_COPY(from_range(configs_result.value()));
+
+  SECTION(config->metadata()->test_name()->c_str()) {
+    // Run the fixture test which will:
+    // 1. Create a TestFixture with start_entity_collection
+    // 2. If expected_entity_collection is present, compare results
+    auto result = steamrot::tests::run_fixture_test(config);
+    
+    // The test should succeed
+    REQUIRE(result.has_value());
+  }
+}
+```
+
+**Key Points**:
+- Use `load_test_data_configs()` to discover all test data in adjacent `data/` directory
+- Use `GENERATE_COPY(from_range(...))` for parameterized testing
+- Use `SECTION` with test name for better test output
+- Use `run_fixture_test()` for automatic fixture creation and comparison
+- Test data files are automatically discovered and compiled by CMake
+
+### Pattern 2: Test Data File Structure
+
+**For Configuration Tests** (no simulation):
+```json
+{
+  "metadata": {
+    "test_name": "descriptive_test_name",
+    "description": "What this test verifies",
+    "tags": ["unit", "entity", "configurator"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": [/* initial entity state */]
+  },
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": [/* expected entity state - same as start for config tests */]
+  }
+}
+```
+
+**Important**: For entity configuration tests, `start_entity_collection` and `expected_entity_collection` should be **identical** because we're verifying that the configuration system correctly loads and maintains the data.
+
+### Pattern 3: Test Data Organization
+
+**File Naming**: `<test_scenario>.test_data.json`
+- Examples: `configurator_basic.test_data.json`, `configurator_multi_component.test_data.json`
+
+**Directory Structure**:
+```
+tests/unit/entity/
+├── FlatbuffersConfigurator.test.cpp
+└── data/
+    ├── configurator_basic.test_data.json
+    ├── configurator_grimoire.test_data.json
+    ├── configurator_multi_component.test_data.json
+    └── configurator_multiple_entities.test_data.json
+```
+
+### Pattern 4: Gradual Migration Strategy
+
+**Approach Used in Phase 2.1**:
+1. Keep existing manual tests (they may test specific methods)
+2. Add new data-driven tests alongside
+3. Document what each test type covers
+4. Eventually remove manual tests if coverage is equivalent
+
+**Example**: The manual test in `FlatbuffersConfigurator.test.cpp` specifically tests `ConfigureEntitiesFromDefaultData()` which loads from actual scene files. The data-driven tests use `ConfigureEntitiesFromCollection()` via the test harness. Both are valuable for different reasons.
+
+### Pattern 5: Test Coverage Areas
+
+**Good Scenarios for Data-Driven Configuration Tests**:
+- ✅ Single entity with single component
+- ✅ Single entity with multiple components
+- ✅ Multiple entities with different component combinations
+- ✅ Edge cases (empty pools, specific entity indices, etc.)
+
+**Keep Manual Tests For**:
+- Testing specific configurator methods directly
+- Complex setup that doesn't fit test data model
+- Tests that need direct access to internal state
+
+## Appendix B: Example Directory Structure After Full Adoption
 
 ```
 tests/
