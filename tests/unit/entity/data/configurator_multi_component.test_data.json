@@ -1,0 +1,61 @@
+{
+  "metadata": {
+    "test_name": "configurator_multi_component",
+    "description": "Entity with multiple components (UI and Grimoire)",
+    "tags": ["unit", "entity", "configurator", "multi-component"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "grimoire_ui",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 50, "y": 100 },
+              "size": { "x": 300, "y": 400 },
+              "children_active": false,
+              "children": [],
+              "layout": "Vertical",
+              "spacing_strategy": "None"
+            }
+          }
+        },
+        "c_grimoire_machina": {
+          "fragments": [],
+          "joints": []
+        }
+      }
+    ]
+  },
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "grimoire_ui",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 50, "y": 100 },
+              "size": { "x": 300, "y": 400 },
+              "children_active": false,
+              "children": [],
+              "layout": "Vertical",
+              "spacing_strategy": "None"
+            }
+          }
+        },
+        "c_grimoire_machina": {
+          "fragments": [],
+          "joints": []
+        }
+      }
+    ]
+  }
+}

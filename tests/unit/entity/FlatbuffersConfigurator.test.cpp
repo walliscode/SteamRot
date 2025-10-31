@@ -13,8 +13,10 @@
 #include "entity_memory_pool_matchers.h"
 #include "containers.h"
 #include "scene_change_packet_generated.h"
+#include "test_data_harness.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
+#include <catch2/generators/catch_generators_range.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
 
 TEST_CASE("Data is configured correctly from default data",
@@ -72,4 +74,29 @@ TEST_CASE("Data is configured correctly from default data",
   // Compare the pools using matcher
   REQUIRE_THAT(entity_memory_pool_one,
                steamrot::tests::EqualsEntityMemoryPool(expected_configured_pool));
+}
+
+/////////////////////////////////////////////////
+/// Data-driven configurator tests using test harness
+/////////////////////////////////////////////////
+
+TEST_CASE("Entity configuration from test data (data-driven)",
+          "[unit][FlatbuffersConfigurator]") {
+
+  // Load test data configurations from adjacent data directory
+  auto configs_result = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs_result.has_value());
+
+  // Use Catch2 generator to parameterize test with each config
+  const auto *config = GENERATE_COPY(from_range(configs_result.value()));
+
+  SECTION(config->metadata()->test_name()->c_str()) {
+    // Run the fixture test which will:
+    // 1. Create a TestFixture with start_entity_collection
+    // 2. If expected_entity_collection is present, compare results
+    auto result = steamrot::tests::run_fixture_test(config);
+    
+    // The test should succeed
+    REQUIRE(result.has_value());
+  }
 }

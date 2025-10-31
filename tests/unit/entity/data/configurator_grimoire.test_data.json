@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "test_name": "configurator_grimoire",
+    "description": "Entity with grimoire component configuration",
+    "tags": ["unit", "entity", "configurator", "grimoire"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 3,
+    "entities": [
+      {
+        "index": 0,
+        "c_grimoire_machina": {
+          "fragments": [],
+          "joints": []
+        }
+      }
+    ]
+  },
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 3,
+    "entities": [
+      {
+        "index": 0,
+        "c_grimoire_machina": {
+          "fragments": [],
+          "joints": []
+        }
+      }
+    ]
+  }
+}
