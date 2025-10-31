@@ -131,7 +131,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawBorderAndBackground draws the hover "
 
 TEST_CASE("steamrot::draw_ui_elements::DrawUIELement draws a panel on a "
           "RenderTexture",
-          "[unit][draw_ui_elements]") {
+          "[unit][draw_ui_elements][.visual]") {
 
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   // create a RenderTexture
@@ -170,7 +170,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIELement draws a panel on a "
 TEST_CASE(
     "steamrot::draw_ui_elements::DrawUIELement draws a ButtonElement on a "
     "RenderTexture",
-    "[unit][draw_ui_elements]") {
+    "[unit][draw_ui_elements][.visual]") {
 
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   // create a RenderTexture
@@ -209,7 +209,7 @@ TEST_CASE(
 TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws a "
           "DropdownContainerElement "
           "on a RenderTexture",
-          "[unit][draw_ui_elements]") {
+          "[unit][draw_ui_elements][.visual]") {
 
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   // create a RenderTexture
@@ -246,7 +246,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws a "
 TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an unexpanded "
           "DropDownListElement "
           "on a RenderTexture",
-          "[unit][draw_ui_elements]") {
+          "[unit][draw_ui_elements][.visual]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   // create a RenderTexture
   size_t width = 200;
@@ -277,7 +277,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an unexpanded "
 TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an expanded "
           "DropDownListElement "
           "on a RenderTexture",
-          "[unit][draw_ui_elements]") {
+          "[unit][draw_ui_elements][.visual]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   // create a RenderTexture
   size_t width = 200;
@@ -307,7 +307,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an expanded "
 }
 TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an unexpanded "
           "DropDownButtonElement on a RenderTexture",
-          "[unit][draw_ui_elements]") {
+          "[unit][draw_ui_elements][.visual]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   // create a RenderTexture
   size_t width = 200;
@@ -338,7 +338,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an unexpanded "
 TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an expanded "
           "DropdownButtonElement "
           "on a RenderTexture",
-          "[unit][draw_ui_elements]") {
+          "[unit][draw_ui_elements][.visual]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   // create a RenderTexture
   size_t width = 200;
@@ -369,7 +369,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an expanded "
 
 TEST_CASE("steamrot::draw_ui_elements::DrawNestedUIElements draws a unexpanded "
           "drop down setup",
-          "[unit][draw_ui_elements]") {
+          "[unit][draw_ui_elements][.visual]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   // create a RenderTexture
   size_t width = 200;
@@ -420,7 +420,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawNestedUIElements draws a unexpanded "
 
 TEST_CASE("steamrot::draw_ui_elements::DrawNestedUIElements draws an expanded "
           "drop down setup",
-          "[unit][draw_ui_elements]") {
+          "[unit][draw_ui_elements][.visual]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   // create a RenderTexture
   size_t width = 200;

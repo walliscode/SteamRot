@@ -984,6 +984,7 @@ All tests are tagged with Catch2 tags to enable filtering by test type:
 - **`[integration]`** - Integration tests: Test interactions between multiple components
 - **`[system]`** - System tests: End-to-end tests through the entire system (future)
 - **`[perf]`** - Performance tests: Benchmarks for critical code paths (future)
+- **`[.visual]`** - Visual confirmation tests: Tests requiring user input or visual verification (hidden tag - excluded by default)
 
 ### Running Tests
 
@@ -1016,6 +1017,23 @@ ctest --preset Debug -R logic
 ctest --preset Debug --output-on-failure
 ```
 
+**Visual confirmation tests:**
+
+Some tests require user input or visual confirmation (they open SFML windows and wait for interaction). These tests are tagged with `[.visual]` (hidden tag), which means they are **automatically excluded** from default test runs.
+
+```bash
+# Run all tests (visual tests excluded by default due to hidden tag)
+ctest --preset Debug
+
+# Run ONLY visual tests (explicit request for manual verification)
+ctest --preset Debug --test-args "[.visual]"
+# or with test executable:
+./build/Debug/tests/unit/logic/test_logic "[.visual]"
+
+# Run all hidden tests
+./build/Debug/tests/unit/logic/test_logic "[.]"
+```
+
 ### Writing Tests
 
 All tests should include appropriate Catch2 tags:
@@ -1027,6 +1045,12 @@ TEST_CASE("ClassName constructor", "[unit][ClassName]") {
 
 TEST_CASE("Feature workflow", "[integration][feature_name]") {
   // Integration test implementation
+}
+
+TEST_CASE("Visual confirmation test", "[unit][ClassName][.visual]") {
+  // Test requiring user input or visual confirmation
+  // These tests open windows and wait for user interaction
+  // Hidden tag [.visual] means this test is excluded by default
 }
 ```
 
