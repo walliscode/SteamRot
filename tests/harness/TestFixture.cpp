@@ -20,17 +20,10 @@ TestFixture::TestFixture(const SceneType &scene_type)
     : m_entity_manager(m_game_resources.event_handler),
       m_scene_type(scene_type) {}
 
-void TestFixture::Intialize() {
+void TestFixture::Intialize(const EntityCollection *entity_collection) {
 
   ConfigureGameResourcesForTest();
-  ConfigureSceneResourcesForTest(m_scene_type);
-}
-
-////////////////////////////////////////////////////////////
-void TestFixture::InitializeWithoutEntities() {
-
-  ConfigureGameResourcesForTest();
-  ConfigureSceneResourcesWithoutEntities(m_scene_type);
+  ConfigureSceneLevelResources(m_scene_type, entity_collection);
 }
 
 ////////////////////////////////////////////////////////////
@@ -64,7 +57,8 @@ void TestFixture::ConfigureGameResourcesForTest() {
 }
 
 ////////////////////////////////////////////////////////////
-void TestFixture::ConfigureSceneResourcesForTest(const SceneType &scene_type) {
+void TestFixture::ConfigureSceneLevelResources(
+    const SceneType &scene_type, const EntityCollection *entity_collection) {
   // Use the reusable configuration function to set up SceneResources
   FlatbuffersDataLoader loader;
   auto scene_data_result = loader.ProvideSceneResourcesData(scene_type);
@@ -85,8 +79,15 @@ void TestFixture::ConfigureSceneResourcesForTest(const SceneType &scene_type) {
   // Configure the EntityMemoryPool for the scene
   FlatbuffersConfigurator configurator(m_game_resources.event_handler);
 
-  auto configure_result = configurator.ConfigureEntitiesFromDefaultData(
-      m_entity_manager.GetEntityMemoryPool(), scene_type);
+  // If entity_collection is provided, use it; otherwise load from default data
+  std::expected<std::monostate, FailInfo> configure_result;
+  if (entity_collection) {
+    configure_result = configurator.ConfigureEntitiesFromCollection(
+        m_entity_manager.GetEntityMemoryPool(), entity_collection);
+  } else {
+    configure_result = configurator.ConfigureEntitiesFromDefaultData(
+        m_entity_manager.GetEntityMemoryPool(), scene_type);
+  }
 
   // Check the configuration was successful
   if (!configure_result.has_value()) {
@@ -100,30 +101,6 @@ void TestFixture::ConfigureSceneResourcesForTest(const SceneType &scene_type) {
     const FailInfo &error = archetype_result.error();
     std::cerr << "Error generating archetypes: " << error.message << std::endl;
   }
-}
-
-////////////////////////////////////////////////////////////
-void TestFixture::ConfigureSceneResourcesWithoutEntities(
-    const SceneType &scene_type) {
-  // Use the reusable configuration function to set up SceneResources
-  FlatbuffersDataLoader loader;
-  auto scene_data_result = loader.ProvideSceneResourcesData(scene_type);
-
-  if (scene_data_result.has_value()) {
-    auto config_result = resources::ConfigureSceneResources(
-        m_scene_resources, scene_data_result.value());
-
-    if (!config_result.has_value()) {
-      std::cerr << "Error configuring scene resources: "
-                << config_result.error().message << std::endl;
-    }
-  } else {
-    std::cerr << "Error loading scene resources data: "
-              << scene_data_result.error().message << std::endl;
-  }
-
-  // Note: Entity configuration is skipped here
-  // Caller is responsible for configuring entities from test data
 }
 
 ////////////////////////////////////////////////////////////

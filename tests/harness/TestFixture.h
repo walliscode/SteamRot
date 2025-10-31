@@ -13,6 +13,7 @@
 #include "GameResources.h"
 #include "SceneContext.h"
 #include "SceneResources.h"
+#include "entities_generated.h"
 #include "scene_change_packet_generated.h"
 #include <memory>
 
@@ -74,25 +75,17 @@ private:
   void ConfigureGameResourcesForTest();
 
   ////////////////////////////////////////////////////////////
-  /// @brief Configure SceneResources and entities for testing.
+  /// @brief Configure scene-level resources including EntityManager.
   ///
-  /// Uses the reusable resources::ConfigureSceneResources
-  /// function and additionally configures entities and generates archetypes.
-  ///
-  /// @param scene_type Scene type to configure for
-  ////////////////////////////////////////////////////////////
-  void ConfigureSceneResourcesForTest(const SceneType &scene_type);
-
-  ////////////////////////////////////////////////////////////
-  /// @brief Configure SceneResources without loading entities.
-  ///
-  /// Uses the reusable resources::ConfigureSceneResources
-  /// function but skips entity configuration. Useful when you want
-  /// to configure entities from test data instead of default scene data.
+  /// Configures SceneResources and EntityManager. If entity_collection is
+  /// provided, entities are configured from it; otherwise, entities are
+  /// loaded from default scene data.
   ///
   /// @param scene_type Scene type to configure for
+  /// @param entity_collection Optional entity collection for custom entity data
   ////////////////////////////////////////////////////////////
-  void ConfigureSceneResourcesWithoutEntities(const SceneType &scene_type);
+  void ConfigureSceneLevelResources(const SceneType &scene_type,
+                                    const EntityCollection *entity_collection = nullptr);
 
 public:
   ////////////////////////////////////////////////////////////
@@ -104,17 +97,14 @@ public:
 
   /////////////////////////////////////////////////
   /// @brief Set up the test fixture by configuring resources.
-  /////////////////////////////////////////////////
-  void Intialize();
-
-  /////////////////////////////////////////////////
-  /// @brief Set up the test fixture without loading default scene entities.
   ///
-  /// This is useful when you want to configure entities from test data
-  /// without loading the default scene data first. It configures game
-  /// and scene resources but skips entity configuration.
+  /// Configures game resources and scene-level resources (including
+  /// EntityManager). If entity_collection is provided, entities are
+  /// configured from it instead of loading default scene data.
+  ///
+  /// @param entity_collection Optional entity collection for custom entity data
   /////////////////////////////////////////////////
-  void InitializeWithoutEntities();
+  void Intialize(const EntityCollection *entity_collection = nullptr);
 
   ////////////////////////////////////////////////////////////
   /// @brief Get reference to owned GameResources.

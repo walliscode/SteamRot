@@ -225,31 +225,10 @@ create_fixture_from_test_data(const TestDataConfig *config,
   }
 
   // Create and initialize the fixture with the scene type
-  // Use InitializeWithoutEntities to avoid loading default scene entities
+  // Pass entity_collection to Initialize so it configures entities from test data
+  // instead of loading default scene data
   TestFixture fixture(scene_type);
-  fixture.InitializeWithoutEntities();
-
-  // If start_entity_collection is provided, configure entities from it
-  if (config->start_entity_collection()) {
-    const EntityCollection *entity_collection = config->start_entity_collection();
-    
-    // Use FlatbuffersConfigurator to populate entities from test data
-    FlatbuffersConfigurator configurator(fixture.GetGameResources().event_handler);
-    
-    auto configure_result = configurator.ConfigureEntitiesFromCollection(
-        fixture.GetEntityManager().GetEntityMemoryPool(),
-        entity_collection);
-    
-    if (!configure_result.has_value()) {
-      return std::unexpected(configure_result.error());
-    }
-
-    // Regenerate archetypes after configuring entities
-    auto archetype_result = fixture.GetEntityManager().GenerateAllArchetypes();
-    if (!archetype_result.has_value()) {
-      return std::unexpected(archetype_result.error());
-    }
-  }
+  fixture.Intialize(config->start_entity_collection());
 
   return fixture;
 }
