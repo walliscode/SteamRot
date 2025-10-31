@@ -29,6 +29,12 @@ std::expected<std::monostate, FailInfo>
 execute_single_tick(uint32_t tick, const TestDataConfig *config,
                     TestFixture &fixture) {
 
+  // Handles null config
+  if (!config) {
+    return std::unexpected(
+        FailInfo(FailMode::NullPointer, "TestDataConfig is null"));
+  }
+
   // 1. Execute inputs scheduled for this tick
   if (config->input_sequence()) {
     auto input_result =

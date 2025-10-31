@@ -309,7 +309,8 @@ struct SimulationData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef SimulationDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_STEPS = 4,
-    VT_DESCRIPTION = 6
+    VT_DESCRIPTION = 6,
+    VT_NUM_TICKS = 8
   };
   /// @brief Ordered sequence of simulation steps to execute
   const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SimulationStep>> *steps() const {
@@ -319,6 +320,12 @@ struct SimulationData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ::flatbuffers::String *description() const {
     return GetPointer<const ::flatbuffers::String *>(VT_DESCRIPTION);
   }
+  /// @brief DEPRECATED: This field is NOT used for tick determination.
+  /// Use TestDataConfig.num_ticks instead to control tick count.
+  /// This field is kept for backward compatibility but has no effect.
+  uint32_t num_ticks() const {
+    return GetField<uint32_t>(VT_NUM_TICKS, 1);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_STEPS) &&
@@ -326,6 +333,7 @@ struct SimulationData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyVectorOfTables(steps()) &&
            VerifyOffset(verifier, VT_DESCRIPTION) &&
            verifier.VerifyString(description()) &&
+           VerifyField<uint32_t>(verifier, VT_NUM_TICKS, 4) &&
            verifier.EndTable();
   }
 };
@@ -339,6 +347,9 @@ struct SimulationDataBuilder {
   }
   void add_description(::flatbuffers::Offset<::flatbuffers::String> description) {
     fbb_.AddOffset(SimulationData::VT_DESCRIPTION, description);
+  }
+  void add_num_ticks(uint32_t num_ticks) {
+    fbb_.AddElement<uint32_t>(SimulationData::VT_NUM_TICKS, num_ticks, 1);
   }
   explicit SimulationDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -354,8 +365,10 @@ struct SimulationDataBuilder {
 inline ::flatbuffers::Offset<SimulationData> CreateSimulationData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SimulationStep>>> steps = 0,
-    ::flatbuffers::Offset<::flatbuffers::String> description = 0) {
+    ::flatbuffers::Offset<::flatbuffers::String> description = 0,
+    uint32_t num_ticks = 1) {
   SimulationDataBuilder builder_(_fbb);
+  builder_.add_num_ticks(num_ticks);
   builder_.add_description(description);
   builder_.add_steps(steps);
   return builder_.Finish();
@@ -364,13 +377,15 @@ inline ::flatbuffers::Offset<SimulationData> CreateSimulationData(
 inline ::flatbuffers::Offset<SimulationData> CreateSimulationDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<::flatbuffers::Offset<steamrot::SimulationStep>> *steps = nullptr,
-    const char *description = nullptr) {
+    const char *description = nullptr,
+    uint32_t num_ticks = 1) {
   auto steps__ = steps ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::SimulationStep>>(*steps) : 0;
   auto description__ = description ? _fbb.CreateString(description) : 0;
   return steamrot::CreateSimulationData(
       _fbb,
       steps__,
-      description__);
+      description__,
+      num_ticks);
 }
 
 }  // namespace steamrot

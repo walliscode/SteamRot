@@ -210,11 +210,12 @@ struct TestDataConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::EventSequence *event_sequence() const {
     return GetPointer<const steamrot::EventSequence *>(VT_EVENT_SEQUENCE);
   }
-  /// @brief Number of ticks to run the test for (default: auto-detect from inputs/events/simulation)
-  /// If specified, overrides automatic tick detection. The test will execute for exactly
+  /// @brief Number of ticks to run the test for (default: 1)
+  /// This is the ONLY field consulted to determine tick count. The test will execute for exactly
   /// this many ticks, processing inputs, events, and simulation steps scheduled for each tick.
-  /// If not specified, the number of ticks is determined by the maximum tick value found
-  /// in input_sequence, event_sequence, and simulation_data.
+  /// If not specified (value is 0), defaults to 1 tick.
+  /// Note: input_sequence, event_sequence, and simulation_data.num_ticks are NOT consulted
+  /// for tick determination. Only this TestDataConfig level field is used.
   uint32_t num_ticks() const {
     return GetField<uint32_t>(VT_NUM_TICKS, 0);
   }
