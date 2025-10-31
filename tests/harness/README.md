@@ -5,17 +5,19 @@
 The test harness provides a unified, simplified interface for:
 1. Loading test data configurations for data-driven testing with Catch2 generators
 2. Creating and configuring TestFixture instances from test data
-3. **Executing input sequences** - simulating user input (mouse/keyboard) on a tick-by-tick basis
-4. **Executing event sequences** - injecting engine events on a tick-by-tick basis
-5. **Executing simulations** - running sequences of Logic classes or free functions
-6. Running comparison tests between expected and actual entity states
+3. **Tick-based test execution** - coordinated execution of inputs, events, and simulation per tick
+4. **Executing input sequences** - simulating user input (mouse/keyboard) on a tick-by-tick basis
+5. **Executing event sequences** - injecting engine events on a tick-by-tick basis
+6. **Executing simulations** - running sequences of Logic classes or free functions
+7. Running comparison tests between expected and actual entity states
 
-This consolidates functionality for resource-based testing and data-driven test execution with support for complex simulation scenarios and tick-by-tick input/event injection.
+This consolidates functionality for resource-based testing and data-driven test execution with support for complex simulation scenarios and tick-by-tick coordination of inputs, events, and simulation steps.
 
 ## Purpose
 
 - Provide a single, simple API for loading test data
 - Integrate TestFixture for resource setup and management
+- **Tick-based execution** - coordinate inputs, events, and simulation per tick
 - **Execute input sequences** - simulate user input tick-by-tick
 - **Execute event sequences** - inject engine events tick-by-tick
 - **Execute simulations** - run sequences of Logic classes or free functions defined in test data
@@ -39,6 +41,9 @@ harness/
 ├── event_simulation.h             # Event sequence simulation
 ├── event_simulation.cpp           # Implementation
 ├── event_simulation.test.cpp      # Event simulation tests
+├── tick_executor.h                # Tick-based test execution
+├── tick_executor.cpp              # Implementation
+├── tick_executor.test.cpp         # Tick execution tests
 ├── TestFixture.h                  # Resource management for tests
 ├── TestFixture.cpp                # Implementation
 ├── CMakeLists.txt                 # Build configuration
@@ -51,7 +56,8 @@ harness/
     ├── sample_function_simulation.test_data.json
     ├── sample_input_sequence.test_data.json
     ├── sample_event_sequence.test_data.json
-    └── sample_input_event_simulation.test_data.json
+    ├── sample_input_event_simulation.test_data.json
+    └── sample_tick_based_execution.test_data.json
 ```
 
 ## Usage
@@ -525,11 +531,174 @@ To add new functions or Logic classes to simulations:
    }
    ```
 
+## Tick-Based Test Execution
+
+### Overview
+
+The test harness now supports **tick-based test execution**, where inputs, events, and simulation steps are coordinated and executed on a per-tick basis. This allows precise control over the timing and sequencing of test actions, mimicking how the game engine processes updates in discrete ticks.
+
+### How It Works
+
+When `run_fixture_test()` is called, the test executes in ticks. For each tick (0, 1, 2, ...):
+
+1. **Execute inputs** scheduled for this tick (e.g., mouse movement, key presses)
+2. **Execute events** scheduled for this tick (added to event handler)
+3. **Process event waiting room** (move events to global event bus)
+4. **Execute simulation steps** scheduled for this tick (Logic classes or functions)
+5. **Tick the global event bus** (decrement event lifetimes, remove expired events)
+
+### Specifying Number of Ticks
+
+You can control how many ticks the test runs for:
+
+**Option 1: Explicit `num_ticks`** (recommended for clarity):
+```json
+{
+  "metadata": {...},
+  "num_ticks": 5,
+  "input_sequence": {...},
+  "event_sequence": {...},
+  "simulation_data": {...}
+}
+```
+
+**Option 2: Auto-detection** (omit `num_ticks`):
+The harness automatically determines the number of ticks by finding the maximum tick value across all inputs, events, and simulation steps, then adds 1.
+
+**Option 3: Per-simulation `num_ticks`**:
+```json
+{
+  "simulation_data": {
+    "num_ticks": 10,
+    "steps": [...]
+  }
+}
+```
+
+### Example: Tick-Based Test Data
+
+```json
+{
+  "metadata": {
+    "test_name": "tick_based_button_test",
+    "description": "Button interaction over 3 ticks",
+    "tags": ["unit", "tick"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "num_ticks": 3,
+  "input_sequence": {
+    "inputs": [
+      {
+        "input_type": "MouseMove",
+        "input_data": {"position": {"x": 150.0, "y": 125.0}},
+        "tick": 0,
+        "description": "Move mouse to button"
+      },
+      {
+        "input_type": "MouseClick",
+        "input_data": {"position": {"x": 150.0, "y": 125.0}, "button": 0},
+        "tick": 1,
+        "description": "Click button"
+      }
+    ]
+  },
+  "event_sequence": {
+    "events": [
+      {
+        "tick": 0,
+        "event_packet": {"event_type": "EVENT_TEST", "event_lifetime": 3}
+      }
+    ]
+  },
+  "simulation_data": {
+    "steps": [
+      {
+        "simulation_type": "Collision",
+        "execution_mode": "LogicClass",
+        "logic_class_type": "UICollisionLogic",
+        "tick": 0,
+        "description": "Check collision at tick 0"
+      },
+      {
+        "simulation_type": "Collision",
+        "execution_mode": "LogicClass",
+        "logic_class_type": "UICollisionLogic",
+        "tick": 1,
+        "description": "Check collision at tick 1"
+      },
+      {
+        "simulation_type": "Action",
+        "execution_mode": "Function",
+        "function_type": "ProcessButtonElementActions",
+        "tick": 2,
+        "description": "Process button actions at tick 2"
+      }
+    ]
+  }
+}
+```
+
+### Execution Timeline
+
+For the example above, the execution timeline is:
+
+**Tick 0:**
+- Input: MouseMove to (150, 125)
+- Event: Add EVENT_TEST with lifetime 3
+- Process waiting room → EVENT_TEST moves to global bus
+- Simulation: UICollisionLogic executes
+- Tick event bus → EVENT_TEST lifetime = 2
+
+**Tick 1:**
+- Input: MouseClick at (150, 125)
+- Simulation: UICollisionLogic executes
+- Tick event bus → EVENT_TEST lifetime = 1
+
+**Tick 2:**
+- Simulation: ProcessButtonElementActions executes
+- Tick event bus → EVENT_TEST lifetime = 0, removed
+
+### Benefits
+
+- **Precise timing control**: Schedule actions at exact ticks
+- **Realistic testing**: Mimics actual game loop timing
+- **Event lifetime testing**: Verify event expiration and persistence
+- **Complex scenarios**: Model multi-step interactions accurately
+- **Debugging**: Clear tick-by-tick execution makes issues easier to trace
+
+### API
+
+#### `determine_num_ticks(config)`
+
+Determines how many ticks to execute for a test.
+
+**Returns:** Number of ticks (uses explicit `num_ticks` or auto-detects)
+
+#### `execute_single_tick(tick, config, fixture)`
+
+Executes all actions for a single tick.
+
+**Parameters:**
+- `tick`: Tick number to execute
+- `config`: Test data configuration
+- `fixture`: TestFixture containing test environment
+
+#### `execute_tick_based_test(config, fixture)`
+
+Executes the complete tick-based test.
+
+**Parameters:**
+- `config`: Test data configuration
+- `fixture`: TestFixture containing test environment
+
+**This is automatically called by `run_fixture_test()`.**
+
 ## Input and Event Sequences
 
 ### Overview
 
-**New in Stage 1.1**: The test harness now supports tick-by-tick input and event injection. This allows test data to specify sequences of user inputs (mouse/keyboard) and engine events that should be injected at specific ticks during testing.
+The test harness supports tick-by-tick input and event injection. Test data specifies sequences of user inputs (mouse/keyboard) and engine events that should be injected at specific ticks during testing.
 
 ### Input Sequences
 
@@ -731,19 +900,14 @@ Input sequences, event sequences, and simulations can be combined in a single te
 
 **Execution order** in `run_fixture_test()`:
 1. Create fixture and configure entities from `start_entity_collection`
-2. Execute `input_sequence` (if present)
-3. Execute `event_sequence` (if present) and process waiting room
-4. Execute `simulation_data` (if present)
-5. Compare with `expected_entity_collection` (if present)
+2. Execute tick-based test (for each tick 0 to num_ticks-1):
+   - Execute inputs for this tick
+   - Execute events for this tick and process waiting room
+   - Execute simulation steps for this tick
+   - Tick the global event bus
+3. Compare with `expected_entity_collection` (if present)
 
-### Tick-Based Execution
-
-Both input and event sequences use a tick-based execution model:
-
-- Each input/event has a `tick` field (default: 0)
-- Events/inputs with the same tick are processed together in sequence order
-- Ticks are processed in ascending order (0, 1, 2, ...)
-- The caller is responsible for advancing game state between ticks if needed
+**Note:** All inputs, events, and simulation steps are now coordinated per-tick automatically. See the "Tick-Based Test Execution" section for details.
 
 This allows precise control over the timing and sequencing of inputs and events during testing.
 

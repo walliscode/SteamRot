@@ -1,14 +1,35 @@
 {
   "metadata": {
-    "test_name": "sample_input_event_simulation",
-    "description": "Comprehensive sample combining input, events, and simulation with tick-based execution",
-    "tags": ["unit", "harness", "input", "event", "simulation"],
+    "test_name": "sample_tick_based_execution",
+    "description": "Demonstrates tick-based test execution with coordinated inputs, events, and simulation",
+    "tags": ["unit", "harness", "tick", "simulation"],
     "expected_to_pass": true,
     "version": 1
   },
+  "num_ticks": 5,
   "input_sequence": {
-    "description": "User clicks a button",
+    "description": "Mouse movement over 5 ticks",
     "inputs": [
+      {
+        "input_type": "MouseMove",
+        "input_data_type": "MouseInputData",
+        "input_data": {
+          "position": { "x": 100.0, "y": 100.0 },
+          "button": 0
+        },
+        "tick": 0,
+        "description": "Start position"
+      },
+      {
+        "input_type": "MouseMove",
+        "input_data_type": "MouseInputData",
+        "input_data": {
+          "position": { "x": 125.0, "y": 115.0 },
+          "button": 0
+        },
+        "tick": 2,
+        "description": "Mid-way position"
+      },
       {
         "input_type": "MouseMove",
         "input_data_type": "MouseInputData",
@@ -16,63 +37,70 @@
           "position": { "x": 150.0, "y": 125.0 },
           "button": 0
         },
-        "tick": 0,
-        "description": "Move mouse over button"
-      },
-      {
-        "input_type": "MouseClick",
-        "input_data_type": "MouseInputData",
-        "input_data": {
-          "position": { "x": 150.0, "y": 125.0 },
-          "button": 0
-        },
-        "tick": 1,
-        "description": "Click the button"
+        "tick": 4,
+        "description": "Final position"
       }
     ]
   },
   "event_sequence": {
-    "description": "Generate test events in response to input",
+    "description": "Events triggered at specific ticks",
     "events": [
       {
         "tick": 0,
         "event_packet": {
-          "event_lifetime": 2,
+          "event_lifetime": 5,
           "event_type": "EVENT_TEST",
           "event_data_data_type": "NONE"
         },
-        "description": "Initial test event"
+        "description": "Start event at tick 0"
+      },
+      {
+        "tick": 2,
+        "event_packet": {
+          "event_lifetime": 3,
+          "event_type": "EVENT_USER_INPUT",
+          "event_data_data_type": "NONE"
+        },
+        "description": "Mid event at tick 2"
+      },
+      {
+        "tick": 4,
+        "event_packet": {
+          "event_lifetime": 1,
+          "event_type": "EVENT_TEST",
+          "event_data_data_type": "NONE"
+        },
+        "description": "End event at tick 4"
       }
     ]
   },
   "simulation_data": {
-    "description": "Process UI collision and actions per tick",
-    "num_ticks": 3,
+    "description": "Simulation steps distributed across ticks",
+    "num_ticks": 5,
     "steps": [
       {
         "simulation_type": "Collision",
         "execution_mode": "LogicClass",
         "logic_class_type": "UICollisionLogic",
-        "tick": 0,
-        "description": "Detect mouse collision with button at tick 0"
+        "tick": 1,
+        "description": "Collision check at tick 1"
       },
       {
         "simulation_type": "Collision",
         "execution_mode": "LogicClass",
         "logic_class_type": "UICollisionLogic",
-        "tick": 1,
-        "description": "Detect mouse collision with button at tick 1"
+        "tick": 3,
+        "description": "Collision check at tick 3"
       },
       {
         "simulation_type": "Action",
         "execution_mode": "Function",
         "function_type": "ProcessButtonElementActions",
-        "tick": 2,
-        "description": "Process button click action at tick 2"
+        "tick": 4,
+        "description": "Process actions at tick 4"
       }
     ]
   },
-  "num_ticks": 3,
   "start_entity_collection": {
     "entity_memory_pool_size": 2,
     "entities": [

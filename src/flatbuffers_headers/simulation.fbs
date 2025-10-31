@@ -78,6 +78,9 @@ table SimulationStep {
   /// @brief Which Logic class to execute (if execution_mode is LogicClass)
   logic_class_type: LogicClassType = None;
   
+  /// @brief Tick number when this step should execute (0-based)
+  tick: uint32 = 0;
+  
   /// @brief Optional description of what this step does
   description: string;
 }
@@ -94,4 +97,9 @@ table SimulationData {
   
   /// @brief Optional description of the overall simulation
   description: string;
+  
+  /// @brief Number of ticks to execute (default: 1)
+  /// When specified, the test will run for this many ticks,
+  /// executing inputs, events, and simulation steps scheduled for each tick.
+  num_ticks: uint32 = 1;
 }
