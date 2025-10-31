@@ -25,72 +25,7 @@ The test harness system (`tests/harness/`) currently supports:
 
 These are the foundational use cases that demonstrate basic harness functionality and can be adopted immediately.
 
-### 1.1 Component Default Value Tests
-
-**Target**: `tests/unit/components/*.test.cpp`
-
-**Current State**: Tests manually check default values in code
-```cpp
-TEST_CASE("CUserInterface has correct default values") {
-  steamrot::CUserInterface ui;
-  REQUIRE(ui.m_active == false);
-  REQUIRE(ui.m_name == "Default UI");
-  // ...
-}
-```
-
-**Migration Target**: Data-driven with test data JSON files
-
-**Benefits**:
-- Easy to add new test cases without code changes
-- Clear separation of test data from test logic
-- Reduces boilerplate
-
-**Example Test Data** (`tests/unit/components/data/c_user_interface_defaults.test_data.json`):
-```json
-{
-  "metadata": {
-    "test_name": "c_user_interface_defaults",
-    "description": "Verify CUserInterface default values",
-    "tags": ["unit", "component", "CUserInterface"],
-    "expected_to_pass": true,
-    "version": 1
-  },
-  "start_entity_collection": {
-    "entity_memory_pool_size": 1,
-    "entities": [
-      {
-        "index": 0,
-        "c_user_interface": {
-          "ui_name": "Default UI",
-          "start_visible": false,
-          "root_ui_element": null
-        }
-      }
-    ]
-  }
-}
-```
-
-**Implementation**:
-```cpp
-TEST_CASE("CUserInterface default values (data-driven)", "[unit][CUserInterface]") {
-  auto configs = steamrot::tests::load_test_data_configs();
-  REQUIRE(configs.has_value());
-  
-  const auto *config = GENERATE_COPY(from_range(configs.value()));
-  
-  // Verify component values from test data
-  auto result = steamrot::tests::run_fixture_test(config);
-  REQUIRE(result.has_value());
-}
-```
-
-**Harness Extensions Needed**: None - fully supported
-
-**Priority**: High (easy wins, demonstrates value)
-
-### 1.2 Entity Pool Comparison Tests
+### 1.1 Entity Pool Comparison Tests
 
 **Target**: `tests/unit/entity/FlatbuffersConfigurator.test.cpp`
 
@@ -136,7 +71,7 @@ TEST_CASE("CUserInterface default values (data-driven)", "[unit][CUserInterface]
 
 **Priority**: High (existing tests can be migrated)
 
-### 1.3 Metadata-Only Test Cases
+### 1.2 Metadata-Only Test Cases
 
 **Target**: New tests that only need to validate test infrastructure
 
@@ -872,14 +807,14 @@ table PerformanceBenchmark {
 **Goal**: Convert existing simple tests (Phase 1 use cases)
 
 **Actions**:
-1. Migrate component default value tests
-2. Convert simple entity pool comparison tests
-3. Add test data files to existing test directories
-4. Keep old tests alongside new tests initially
+1. Convert simple entity pool comparison tests
+2. Add test data files to existing test directories
+3. Keep old tests alongside new tests initially
+4. Create metadata-only validation tests
 
 **Success Metrics**:
-- 20+ component tests migrated
 - 10+ entity tests migrated
+- Metadata validation tests operational
 - No test coverage regression
 
 ### Step 3: Implement High-Priority Extensions (Weeks 5-8)
@@ -958,8 +893,8 @@ table PerformanceBenchmark {
 
 ### Immediate (Start Now)
 1. ✅ Create this plan document
-2. Phase 1.1: Migrate component default value tests
-3. Phase 1.2: Migrate entity pool comparison tests
+2. Phase 1.1: Migrate entity pool comparison tests
+3. Phase 1.2: Create metadata-only validation tests
 4. Phase 2.1: Create logic class simulation tests
 
 ### High Priority (Weeks 1-8)
@@ -1159,10 +1094,8 @@ tests/
 ├── unit/
 │   ├── components/
 │   │   ├── data/                            # Component test data
-│   │   │   ├── c_user_interface_defaults.test_data.json
-│   │   │   ├── c_grimoire_machina_values.test_data.json
 │   │   │   └── multi_component_entity.test_data.json
-│   │   └── *.test.cpp                       # Component tests (data-driven)
+│   │   └── *.test.cpp                       # Component tests
 │   ├── logic/
 │   │   ├── data/                            # Logic test data with simulations
 │   │   │   ├── ui_action_button_click.test_data.json
