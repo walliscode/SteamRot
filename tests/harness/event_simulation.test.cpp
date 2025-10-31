@@ -95,7 +95,7 @@ TEST_CASE("execute_event_test_data adds event to waiting room",
 
   // Verify the event has correct type
   const auto &last_event = updated_bus.back();
-  REQUIRE(last_event.event_type == steamrot::EventType_EVENT_TEST);
+  REQUIRE(last_event.m_event_type == steamrot::EventType_EVENT_TEST);
   REQUIRE(last_event.event_lifetime == 5);
 }
 
@@ -143,7 +143,7 @@ TEST_CASE("execute_events_for_tick processes only specified tick",
   const auto &bus_after_tick0 = event_handler.GetGlobalEventBus();
   size_t size_after_tick0 = bus_after_tick0.size();
   REQUIRE(size_after_tick0 == 1);
-  REQUIRE(bus_after_tick0.back().event_type == steamrot::EventType_EVENT_TEST);
+  REQUIRE(bus_after_tick0.back().m_event_type == steamrot::EventType_EVENT_TEST);
 
   // Execute tick 1
   result = steamrot::tests::execute_events_for_tick(event_sequence, 1, fixture);
@@ -155,7 +155,7 @@ TEST_CASE("execute_events_for_tick processes only specified tick",
   // Verify second event was added
   const auto &bus_after_tick1 = event_handler.GetGlobalEventBus();
   REQUIRE(bus_after_tick1.size() == size_after_tick0 + 1);
-  REQUIRE(bus_after_tick1.back().event_type ==
+  REQUIRE(bus_after_tick1.back().m_event_type ==
           steamrot::EventType_EVENT_USER_INPUT);
 }
 
@@ -205,7 +205,7 @@ TEST_CASE("execute_event_sequence processes all ticks in order",
   REQUIRE(bus.size() == 3);
 
   // Events should be processed in tick order (0, 1, 2)
-  REQUIRE(bus[0].event_type == steamrot::EventType_EVENT_TEST);
-  REQUIRE(bus[1].event_type == steamrot::EventType_EVENT_QUIT_GAME);
-  REQUIRE(bus[2].event_type == steamrot::EventType_EVENT_USER_INPUT);
+  REQUIRE(bus[0].m_event_type == steamrot::EventType_EVENT_TEST);
+  REQUIRE(bus[1].m_event_type == steamrot::EventType_EVENT_QUIT_GAME);
+  REQUIRE(bus[2].m_event_type == steamrot::EventType_EVENT_USER_INPUT);
 }

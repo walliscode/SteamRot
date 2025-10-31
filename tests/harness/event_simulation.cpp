@@ -8,8 +8,8 @@
 /////////////////////////////////////////////////
 #include "event_simulation.h"
 #include "EventPacket.h"
-#include "SceneChangePacket.h"
 #include "UserInputBitset.h"
+#include "uuid.h"
 #include <algorithm>
 #include <format>
 #include <set>
@@ -34,9 +34,8 @@ execute_event_test_data(const EventTestData *event_data, TestFixture &fixture) {
   const EventPacketData *packet_data = event_data->event_packet();
 
   // Create EventPacket from the data
-  EventPacket event_packet;
-  event_packet.event_lifetime = packet_data->event_lifetime();
-  event_packet.event_type = packet_data->event_type();
+  EventPacket event_packet(packet_data->event_lifetime());
+  event_packet.m_event_type = packet_data->event_type();
 
   // Handle different event data types
   if (packet_data->event_data_data_type() ==
@@ -75,16 +74,24 @@ execute_event_test_data(const EventTestData *event_data, TestFixture &fixture) {
         }
       }
 
-      event_packet.event_data = input_bitset;
+      event_packet.m_event_data = input_bitset;
     }
   } else if (packet_data->event_data_data_type() ==
              EventDataData_SceneChangePacketData) {
     const SceneChangePacketData *scene_data =
         packet_data->event_data_data_as_SceneChangePacketData();
     if (scene_data) {
-      SceneChangePacket scene_packet;
-      scene_packet.scene_type = scene_data->scene_type();
-      event_packet.event_data = scene_packet;
+      // SceneChangePacket is std::pair<std::optional<uuids::uuid>, SceneType>
+      std::optional<uuids::uuid> uuid_opt;
+      if (scene_data->uuid()) {
+        // Parse UUID string if provided
+        std::string uuid_str = scene_data->uuid()->str();
+        if (uuids::uuid::is_valid_uuid(uuid_str.c_str())) {
+          uuid_opt = uuids::uuid::from_string(uuid_str.c_str());
+        }
+      }
+      SceneChangePacket scene_packet = std::make_pair(uuid_opt, scene_data->scene_type());
+      event_packet.m_event_data = scene_packet;
     }
   }
 
