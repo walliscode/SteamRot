@@ -151,17 +151,45 @@ load_test_data_configs(const std::string &subdirectory) {
 
 /////////////////////////////////////////////////
 void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
-                                            const EntityMemoryPool &expected) {
-  // Compare the pools using matcher
-  REQUIRE_THAT(actual, EqualsEntityMemoryPool(expected));
+                                            const EntityMemoryPool &expected,
+                                            bool expected_to_pass) {
+  // Create matcher
+  auto matcher = EqualsEntityMemoryPool(expected);
+  
+  if (expected_to_pass) {
+    // Test expects pools to match - use REQUIRE_THAT
+    REQUIRE_THAT(actual, matcher);
+  } else {
+    // Test expects pools to NOT match - verify mismatch
+    bool pools_match = matcher.match(actual);
+    if (pools_match) {
+      FAIL("Expected pools to be different, but they matched");
+    }
+  }
 }
 
 /////////////////////////////////////////////////
 void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
                                             const EntityMemoryPool &expected,
-                                            const std::string &test_metadata) {
-  // Compare the pools using matcher with metadata
-  REQUIRE_THAT(actual, EqualsEntityMemoryPool(expected, test_metadata));
+                                            const std::string &test_metadata,
+                                            bool expected_to_pass) {
+  // Create matcher with metadata
+  auto matcher = EqualsEntityMemoryPool(expected, test_metadata);
+  
+  if (expected_to_pass) {
+    // Test expects pools to match - use REQUIRE_THAT
+    REQUIRE_THAT(actual, matcher);
+  } else {
+    // Test expects pools to NOT match - verify mismatch
+    bool pools_match = matcher.match(actual);
+    if (pools_match) {
+      std::string error_msg = "Expected pools to be different, but they matched";
+      if (!test_metadata.empty()) {
+        error_msg += " [" + test_metadata + "]";
+      }
+      FAIL(error_msg);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -228,6 +256,8 @@ run_fixture_test(const TestDataConfig *config) {
 
     // Build test metadata string from config
     std::string test_metadata;
+    bool expected_to_pass = true; // default value
+    
     if (config->metadata()) {
       if (config->metadata()->test_name()) {
         test_metadata +=
@@ -237,14 +267,17 @@ run_fixture_test(const TestDataConfig *config) {
         test_metadata += ", Description: " +
                          std::string(config->metadata()->description()->str());
       }
+      // Get expected_to_pass from metadata
+      expected_to_pass = config->metadata()->expected_to_pass();
     }
 
     // Use overload with metadata if available, otherwise use simple version
     if (!test_metadata.empty()) {
       run_entity_memory_pool_comparison_test(actual_pool, expected_pool,
-                                             test_metadata);
+                                             test_metadata, expected_to_pass);
     } else {
-      run_entity_memory_pool_comparison_test(actual_pool, expected_pool);
+      run_entity_memory_pool_comparison_test(actual_pool, expected_pool,
+                                             expected_to_pass);
     }
   }
 
