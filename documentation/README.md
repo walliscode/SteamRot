@@ -52,6 +52,29 @@ A cohesive naming system for organizing code as the project scales.
 
 - **[dropdown_data_population.md](dropdown_data_population.md)** - Dropdown data population guide
 
+### 🧪 Testing Infrastructure
+
+- **[TEST_DATA_CONFIGURATION.md](TEST_DATA_CONFIGURATION.md)** - Data-driven testing guide
+  - Creating test data files
+  - Using TestDataLoader
+  - Simulations and tick-based execution
+  
+- **[TEST_HARNESS_DATA_FLOW.md](TEST_HARNESS_DATA_FLOW.md)** ⭐ **Architecture overview**
+  - Complete data/function flow
+  - Component interactions
+  - Test lifecycle from JSON to execution
+  - Extension points and patterns
+
+- **[tests/harness/README.md](../tests/harness/README.md)** - Test harness API reference
+
+### 🏗️ Architecture & Configuration
+
+- **[CONTEXT_CONFIGURATION.md](CONTEXT_CONFIGURATION.md)** - Context configuration system
+- **[CONTEXT_CONFIGURATION_QUICK_REF.md](CONTEXT_CONFIGURATION_QUICK_REF.md)** - Quick reference
+- **[RESOURCE_CONFIGURATION.md](RESOURCE_CONFIGURATION.md)** - Resource configuration
+- **[RESOURCE_CONFIGURATION_QUICK_REF.md](RESOURCE_CONFIGURATION_QUICK_REF.md)** - Quick reference
+- **[RESOURCE_CONTEXT_ARCHITECTURE.md](RESOURCE_CONTEXT_ARCHITECTURE.md)** - Architecture overview
+
 ## Documentation Structure
 
 ```
@@ -63,6 +86,15 @@ documentation/
 │   ├── NAMING_QUICK_REFERENCE.md      # Daily quick reference
 │   ├── FILE_NAMING_CONVENTIONS.md     # Complete naming guide
 │   └── naming_system_diagram.md       # Visual diagrams
+│
+├── Testing Infrastructure/
+│   ├── TEST_HARNESS_DATA_FLOW.md      # Architecture & flow overview
+│   └── TEST_DATA_CONFIGURATION.md     # Data-driven testing guide
+│
+├── Architecture & Configuration/
+│   ├── CONTEXT_CONFIGURATION.md       # Context configuration
+│   ├── RESOURCE_CONFIGURATION.md      # Resource configuration
+│   └── RESOURCE_CONTEXT_ARCHITECTURE.md  # Architecture overview
 │
 ├── examples/
 │   ├── README.md                      # Examples overview
@@ -99,6 +131,15 @@ documentation/
 
 **...know where to add new functions**
 → Use the decision tree in [NAMING_QUICK_REFERENCE.md](NAMING_QUICK_REFERENCE.md)
+
+**...understand the test harness architecture**
+→ Start with [TEST_HARNESS_DATA_FLOW.md](TEST_HARNESS_DATA_FLOW.md)
+
+**...write data-driven tests**
+→ Check [TEST_DATA_CONFIGURATION.md](TEST_DATA_CONFIGURATION.md)
+
+**...use the test harness API**
+→ See [tests/harness/README.md](../tests/harness/README.md)
 
 ## Contributing to Documentation
 
@@ -146,13 +187,19 @@ Potential future documentation:
 
 - [ ] Component creation workflow guide
 - [ ] FlatBuffers schema guide
-- [ ] Testing patterns and strategies
+- [x] Testing patterns and strategies (see TEST_HARNESS_DATA_FLOW.md)
 - [ ] Asset management guide
 - [ ] Scene configuration guide
 - [ ] Event system overview
 - [ ] Architecture decision records
 
 ## Recent Updates
+
+- **2024**: Added comprehensive test harness data flow documentation
+  - Complete architecture overview in TEST_HARNESS_DATA_FLOW.md
+  - Data flow from JSON to test execution
+  - Component interactions and lifecycle
+  - Extension points and usage patterns
 
 - **2024**: Added comprehensive file naming system documentation
   - Overview, quick reference, complete guide, and visual diagrams
