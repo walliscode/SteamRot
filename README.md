@@ -984,6 +984,7 @@ All tests are tagged with Catch2 tags to enable filtering by test type:
 - **`[integration]`** - Integration tests: Test interactions between multiple components
 - **`[system]`** - System tests: End-to-end tests through the entire system (future)
 - **`[perf]`** - Performance tests: Benchmarks for critical code paths (future)
+- **`[visual]`** - Visual confirmation tests: Tests requiring user input or visual verification (excluded by default from automatic runs)
 
 ### Running Tests
 
@@ -1016,6 +1017,21 @@ ctest --preset Debug -R logic
 ctest --preset Debug --output-on-failure
 ```
 
+**Exclude visual confirmation tests:**
+
+Some tests require user input or visual confirmation (they open SFML windows and wait for interaction). These tests are tagged with `[visual]` and can be excluded:
+
+```bash
+# Exclude visual tests from automatic runs
+ctest --preset Debug --test-args "~[visual]"
+
+# Or run tests directly with Catch2
+./build/Debug/tests/unit/logic/test_logic "~[visual]"
+
+# Run ONLY visual tests (on request for manual verification)
+./build/Debug/tests/unit/logic/test_logic "[visual]"
+```
+
 ### Writing Tests
 
 All tests should include appropriate Catch2 tags:
@@ -1027,6 +1043,11 @@ TEST_CASE("ClassName constructor", "[unit][ClassName]") {
 
 TEST_CASE("Feature workflow", "[integration][feature_name]") {
   // Integration test implementation
+}
+
+TEST_CASE("Visual confirmation test", "[unit][ClassName][visual]") {
+  // Test requiring user input or visual confirmation
+  // These tests open windows and wait for user interaction
 }
 ```
 
