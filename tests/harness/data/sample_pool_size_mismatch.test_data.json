@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "test_name": "sample_pool_size_mismatch",
+    "description": "Test with different pool sizes - expected_to_pass is false",
+    "tags": ["unit", "harness", "mismatch"],
+    "expected_to_pass": false,
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 2,
+    "entities": [
+      {
+        "index": 0,
+        "c_grimoire_machina": {
+          "fragments": [],
+          "joints": []
+        }
+      }
+    ]
+  },
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": [
+      {
+        "index": 0,
+        "c_grimoire_machina": {
+          "fragments": [],
+          "joints": []
+        }
+      }
+    ]
+  }
+}

@@ -50,9 +50,6 @@ TEST_CASE("load_test_data_configs works with Catch2 generators",
   REQUIRE(config->metadata() != nullptr);
   REQUIRE(config->metadata()->test_name() != nullptr);
 
-  // Verify expected_to_pass is set
-  REQUIRE(config->metadata()->expected_to_pass() == true);
-
   // Verify at least some entity data is present
   bool has_entity_data = (config->start_entity_collection() != nullptr ||
                           config->expected_entity_collection() != nullptr);
@@ -257,5 +254,129 @@ TEST_CASE("run_entity_memory_pool_comparison_test with metadata",
     // Test backwards compatibility - should still work without metadata
     steamrot::tests::run_entity_memory_pool_comparison_test(pool1, pool2);
     SUCCEED("Comparison passed without metadata");
+  }
+}
+
+TEST_CASE("run_entity_memory_pool_comparison_test respects expected_to_pass",
+          "[unit][harness]") {
+
+  steamrot::EntityMemoryPool pool1;
+  steamrot::EntityMemoryPool pool2;
+
+  const size_t num_entities = 3;
+
+  // Setup pool1
+  auto &cmeta_vec1 =
+      steamrot::entity::memory::GetComponentVector<steamrot::CMeta>(pool1);
+  cmeta_vec1.resize(num_entities);
+
+  auto &cui_vec1 =
+      steamrot::entity::memory::GetComponentVector<steamrot::CUserInterface>(
+          pool1);
+  cui_vec1.resize(num_entities);
+
+  auto &cform_vec1 =
+      steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
+          pool1);
+  cform_vec1.resize(num_entities);
+
+  auto &cgrim_vec1 =
+      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
+          pool1);
+  cgrim_vec1.resize(num_entities);
+
+  auto &cstate_vec1 =
+      steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(pool1);
+  cstate_vec1.resize(num_entities);
+
+  // Setup pool2
+  auto &cmeta_vec2 =
+      steamrot::entity::memory::GetComponentVector<steamrot::CMeta>(pool2);
+  cmeta_vec2.resize(num_entities);
+
+  auto &cui_vec2 =
+      steamrot::entity::memory::GetComponentVector<steamrot::CUserInterface>(
+          pool2);
+  cui_vec2.resize(num_entities);
+
+  auto &cform_vec2 =
+      steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
+          pool2);
+  cform_vec2.resize(num_entities);
+
+  auto &cgrim_vec2 =
+      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
+          pool2);
+  cgrim_vec2.resize(num_entities);
+
+  auto &cstate_vec2 =
+      steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(pool2);
+  cstate_vec2.resize(num_entities);
+
+  SECTION("expected_to_pass=true succeeds when pools match") {
+    // Pools are equal, test should pass
+    steamrot::tests::run_entity_memory_pool_comparison_test(pool1, pool2, true);
+    SUCCEED("Comparison passed with expected_to_pass=true");
+  }
+
+  SECTION("expected_to_pass=false succeeds when pools differ") {
+    // Modify pool1 to make it different from pool2
+    cmeta_vec1[0].m_active = true;
+    cmeta_vec2[0].m_active = false;
+
+    // Pools are different, expected_to_pass=false should succeed
+    steamrot::tests::run_entity_memory_pool_comparison_test(pool1, pool2,
+                                                            false);
+    SUCCEED("Comparison passed with expected_to_pass=false");
+  }
+
+  SECTION("expected_to_pass=false with metadata succeeds when pools differ") {
+    // Modify pool1 to make it different from pool2
+    cui_vec1[1].m_name = "different_name";
+    cui_vec2[1].m_name = "original_name";
+
+    // Pools are different, expected_to_pass=false should succeed
+    steamrot::tests::run_entity_memory_pool_comparison_test(
+        pool1, pool2, "Test: mismatch_test", false);
+    SUCCEED("Comparison passed with expected_to_pass=false and metadata");
+  }
+}
+
+TEST_CASE("run_fixture_test handles expected_to_pass from config metadata",
+          "[unit][harness]") {
+
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+
+  SECTION("Test with expected_to_pass=true passes when pools match") {
+    // Find a test with expected_to_pass=true
+    const steamrot::TestDataConfig *pass_config = nullptr;
+    for (const auto *config : configs.value()) {
+      if (config->metadata()->expected_to_pass() == true &&
+          config->metadata()->test_name()->str() == "sample_test_1") {
+        pass_config = config;
+        break;
+      }
+    }
+    REQUIRE(pass_config != nullptr);
+
+    auto result = steamrot::tests::run_fixture_test(pass_config);
+    REQUIRE(result.has_value());
+  }
+
+  SECTION("Test with expected_to_pass=false passes when pools mismatch") {
+    // Find a test with expected_to_pass=false
+    const steamrot::TestDataConfig *fail_config = nullptr;
+    for (const auto *config : configs.value()) {
+      if (config->metadata()->expected_to_pass() == false &&
+          config->metadata()->test_name()->str() == "sample_mismatch_test") {
+        fail_config = config;
+        break;
+      }
+    }
+    REQUIRE(fail_config != nullptr);
+
+    auto result = steamrot::tests::run_fixture_test(fail_config);
+    REQUIRE(result.has_value());
   }
 }

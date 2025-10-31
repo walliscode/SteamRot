@@ -63,9 +63,11 @@ load_test_data_configs(const std::string &subdirectory);
 ///
 /// @param actual The actual EntityMemoryPool to test
 /// @param expected The expected EntityMemoryPool to compare against
+/// @param expected_to_pass If true, expects pools to match; if false, expects mismatch
 /////////////////////////////////////////////////
 void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
-                                            const EntityMemoryPool &expected);
+                                            const EntityMemoryPool &expected,
+                                            bool expected_to_pass = true);
 
 /////////////////////////////////////////////////
 /// @brief Wrapper function to run EMP comparison tests with test metadata
@@ -77,10 +79,12 @@ void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
 /// @param actual The actual EntityMemoryPool to test
 /// @param expected The expected EntityMemoryPool to compare against
 /// @param test_metadata Test metadata string to include in error messages
+/// @param expected_to_pass If true, expects pools to match; if false, expects mismatch
 /////////////////////////////////////////////////
 void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
                                             const EntityMemoryPool &expected,
-                                            const std::string &test_metadata);
+                                            const std::string &test_metadata,
+                                            bool expected_to_pass = true);
 
 /////////////////////////////////////////////////
 /// @brief Create and configure TestFixture from test data configuration

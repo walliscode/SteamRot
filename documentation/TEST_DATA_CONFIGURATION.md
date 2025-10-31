@@ -75,9 +75,33 @@ table TestMetadata {
   test_name: string (required);        // Human-readable test name
   description: string;                 // Optional test description
   tags: [string];                      // Test tags (e.g., "unit", "integration")
-  expected_to_pass: bool = true;       // Expected outcome
+  expected_to_pass: bool = true;       // Expected test outcome (default: true)
   author: string;                      // Optional test author
   version: uint32 = 1;                 // Data format version
+}
+```
+
+#### Understanding expected_to_pass
+
+The `expected_to_pass` field controls how the test harness validates comparison results:
+
+- **`expected_to_pass: true` (default)**: The test expects the actual and expected entity pools to **match**. If they don't match, the test fails. This is the typical use case for validating correct behavior.
+
+- **`expected_to_pass: false`**: The test expects the actual and expected entity pools to **NOT match**. If they do match when they shouldn't, the test fails. This is useful for:
+  - Testing error detection mechanisms
+  - Validating that certain operations produce different results
+  - Negative testing scenarios
+
+Example with mismatch expectation:
+```json
+{
+  "metadata": {
+    "test_name": "validation_detects_mismatch",
+    "description": "Verify validation detects incorrect state",
+    "expected_to_pass": false
+  },
+  "start_entity_collection": { /* initial state */ },
+  "expected_entity_collection": { /* intentionally different state */ }
 }
 ```
 
@@ -186,6 +210,48 @@ For comparison tests where you want to test transformations or state changes:
 ```
 
 **Note:** If `start_entity_collection` is omitted, the test will use a default-constructed EntityMemoryPool as the starting state.
+
+### Example with Mismatch Expectation (expected_to_pass: false)
+
+For negative testing or validation testing where you expect entities to differ:
+
+```json
+{
+  "metadata": {
+    "test_name": "entity_mismatch_detection",
+    "description": "Test that validation detects different entity states",
+    "tags": ["unit", "entity", "validation"],
+    "expected_to_pass": false,
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 3,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "original_ui",
+          "start_visible": true
+        }
+      }
+    ]
+  },
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 3,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "modified_ui",
+          "start_visible": false
+        }
+      }
+    ]
+  }
+}
+```
+
+In this case, the test **expects** the pools to be different. If they match, the test will fail.
 
 ## Compilation Process
 
@@ -490,7 +556,7 @@ Always fill out the metadata fields:
 - `test_name`: Clear, descriptive name
 - `description`: What the test validates
 - `tags`: Categorization for filtering
-- `expected_to_pass`: Expected outcome
+- `expected_to_pass`: Set to `true` if test expects pools to match, `false` if expecting mismatch
 
 ### 4. Version Your Data
 
