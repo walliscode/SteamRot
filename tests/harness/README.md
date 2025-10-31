@@ -567,15 +567,7 @@ You can control how many ticks the test runs for:
 **Option 2: Auto-detection** (omit `num_ticks`):
 The harness automatically determines the number of ticks by finding the maximum tick value across all inputs and events, then adds 1.
 
-**Option 3: Per-simulation `num_ticks`**:
-```json
-{
-  "simulation_data": {
-    "num_ticks": 10,
-    "steps": [...]
-  }
-}
-```
+**Note:** The `num_ticks` field in `simulation_data` is NOT used to determine the number of ticks to execute. Only the top-level `num_ticks` field in `TestDataConfig` determines the explicit tick count.
 
 ### Example: Tick-Based Test Data
 

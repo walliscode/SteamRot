@@ -132,6 +132,28 @@ TEST_CASE("execute_tick_based_test handles null config",
   REQUIRE(result.error().fail_mode == steamrot::FailMode::NullPointer);
 }
 
+TEST_CASE("determine_num_ticks ignores simulation_data num_ticks",
+          "[unit][harness][tick_executor]") {
+  flatbuffers::FlatBufferBuilder builder;
+
+  // Create simulation data with num_ticks = 10
+  std::vector<flatbuffers::Offset<steamrot::SimulationStep>> steps;
+  auto sim_data = steamrot::CreateSimulationData(builder, builder.CreateVector(steps),
+                                                   0, 10);
+
+  auto metadata = steamrot::CreateTestMetadata(builder, builder.CreateString("test"));
+  // TestDataConfig without explicit num_ticks (should default to 1, not 10)
+  auto config = steamrot::CreateTestDataConfig(builder, metadata, 0, 0, 0, 0, sim_data);
+  builder.Finish(config);
+
+  const steamrot::TestDataConfig *test_config =
+      steamrot::GetTestDataConfig(builder.GetBufferPointer());
+
+  uint32_t num_ticks = steamrot::tests::determine_num_ticks(test_config);
+  // Should be 1 (default), not 10 from simulation_data
+  REQUIRE(num_ticks == 1);
+}
+
 TEST_CASE("execute_tick_based_test executes multiple ticks",
           "[unit][harness][tick_executor]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};

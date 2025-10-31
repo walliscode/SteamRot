@@ -21,8 +21,7 @@ uint32_t determine_num_ticks(const TestDataConfig *config) {
     return config->num_ticks();
   }
 
-  // Otherwise, auto-detect from input_sequence, event_sequence, and
-  // simulation_data
+  // Otherwise, auto-detect from input_sequence and event_sequence
   uint32_t max_tick = 0;
 
   // Check input sequence
@@ -42,12 +41,6 @@ uint32_t determine_num_ticks(const TestDataConfig *config) {
         max_tick = std::max(max_tick, event_data->tick());
       }
     }
-  }
-
-  // Check simulation data num_ticks field
-  if (config->simulation_data() &&
-      config->simulation_data()->num_ticks() > 0) {
-    max_tick = std::max(max_tick, config->simulation_data()->num_ticks() - 1);
   }
 
   // Return max_tick + 1 (since ticks are 0-based), with minimum of 1
