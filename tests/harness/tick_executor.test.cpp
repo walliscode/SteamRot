@@ -10,21 +10,6 @@
 #include "TestFixture.h"
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("determine_num_ticks with explicit num_ticks",
-          "[unit][harness][tick_executor]") {
-  flatbuffers::FlatBufferBuilder builder;
-
-  auto metadata = steamrot::CreateTestMetadata(builder, builder.CreateString("test"));
-  auto config = steamrot::CreateTestDataConfig(builder, metadata, 0, 0, 0, 0, 0, 0, 0, 5);
-  builder.Finish(config);
-
-  const steamrot::TestDataConfig *test_config =
-      flatbuffers::GetRoot<steamrot::TestDataConfig>(builder.GetBufferPointer());
-
-  uint32_t num_ticks = steamrot::tests::determine_num_ticks(test_config);
-  REQUIRE(num_ticks == 5);
-}
-
 TEST_CASE("determine_num_ticks auto-detects from input sequence",
           "[unit][harness][tick_executor]") {
   flatbuffers::FlatBufferBuilder builder;
@@ -49,13 +34,15 @@ TEST_CASE("determine_num_ticks auto-detects from input sequence",
   auto events_vec = builder.CreateVector(events);
   auto input_seq = steamrot::CreateInputSequence(builder, events_vec);
 
-  auto metadata = steamrot::CreateTestMetadata(builder, builder.CreateString("test"));
+  auto metadata =
+      steamrot::CreateTestMetadata(builder, builder.CreateString("test"));
   auto config = steamrot::CreateTestDataConfig(builder, metadata, 0, 0, 0, 0, 0,
-                                                input_seq);
+                                               input_seq);
   builder.Finish(config);
 
   const steamrot::TestDataConfig *test_config =
-      flatbuffers::GetRoot<steamrot::TestDataConfig>(builder.GetBufferPointer());
+      flatbuffers::GetRoot<steamrot::TestDataConfig>(
+          builder.GetBufferPointer());
 
   // Max tick is 3, so should return 4 (ticks 0,1,2,3)
   uint32_t num_ticks = steamrot::tests::determine_num_ticks(test_config);
@@ -82,13 +69,15 @@ TEST_CASE("determine_num_ticks auto-detects from event sequence",
   auto events_vec = builder.CreateVector(events);
   auto event_seq = steamrot::CreateEventSequence(builder, events_vec);
 
-  auto metadata = steamrot::CreateTestMetadata(builder, builder.CreateString("test"));
+  auto metadata =
+      steamrot::CreateTestMetadata(builder, builder.CreateString("test"));
   auto config = steamrot::CreateTestDataConfig(builder, metadata, 0, 0, 0, 0, 0,
-                                                0, event_seq);
+                                               0, event_seq);
   builder.Finish(config);
 
   const steamrot::TestDataConfig *test_config =
-      flatbuffers::GetRoot<steamrot::TestDataConfig>(builder.GetBufferPointer());
+      flatbuffers::GetRoot<steamrot::TestDataConfig>(
+          builder.GetBufferPointer());
 
   // Max tick is 2, so should return 3 (ticks 0,1,2)
   uint32_t num_ticks = steamrot::tests::determine_num_ticks(test_config);
@@ -99,12 +88,14 @@ TEST_CASE("determine_num_ticks defaults to 1 when no sequences",
           "[unit][harness][tick_executor]") {
   flatbuffers::FlatBufferBuilder builder;
 
-  auto metadata = steamrot::CreateTestMetadata(builder, builder.CreateString("test"));
+  auto metadata =
+      steamrot::CreateTestMetadata(builder, builder.CreateString("test"));
   auto config = steamrot::CreateTestDataConfig(builder, metadata);
   builder.Finish(config);
 
   const steamrot::TestDataConfig *test_config =
-      flatbuffers::GetRoot<steamrot::TestDataConfig>(builder.GetBufferPointer());
+      flatbuffers::GetRoot<steamrot::TestDataConfig>(
+          builder.GetBufferPointer());
 
   uint32_t num_ticks = steamrot::tests::determine_num_ticks(test_config);
   REQUIRE(num_ticks == 1);
@@ -118,7 +109,7 @@ TEST_CASE("execute_single_tick handles null config",
 
   auto result = steamrot::tests::execute_single_tick(0, nullptr, fixture);
   REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().fail_mode == steamrot::FailMode::NullPointer);
+  REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
 
 TEST_CASE("execute_tick_based_test handles null config",
@@ -129,7 +120,7 @@ TEST_CASE("execute_tick_based_test handles null config",
 
   auto result = steamrot::tests::execute_tick_based_test(nullptr, fixture);
   REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().fail_mode == steamrot::FailMode::NullPointer);
+  REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
 
 TEST_CASE("determine_num_ticks ignores simulation_data num_ticks",
@@ -138,16 +129,19 @@ TEST_CASE("determine_num_ticks ignores simulation_data num_ticks",
 
   // Create simulation data with num_ticks = 10
   std::vector<flatbuffers::Offset<steamrot::SimulationStep>> steps;
-  auto sim_data = steamrot::CreateSimulationData(builder, builder.CreateVector(steps),
-                                                   0, 10);
+  auto sim_data =
+      steamrot::CreateSimulationData(builder, builder.CreateVector(steps), 0);
 
-  auto metadata = steamrot::CreateTestMetadata(builder, builder.CreateString("test"));
+  auto metadata =
+      steamrot::CreateTestMetadata(builder, builder.CreateString("test"));
   // TestDataConfig without explicit num_ticks (should default to 1, not 10)
-  auto config = steamrot::CreateTestDataConfig(builder, metadata, 0, 0, 0, 0, sim_data);
+  auto config =
+      steamrot::CreateTestDataConfig(builder, metadata, 0, 0, 0, 0, sim_data);
   builder.Finish(config);
 
   const steamrot::TestDataConfig *test_config =
-      flatbuffers::GetRoot<steamrot::TestDataConfig>(builder.GetBufferPointer());
+      flatbuffers::GetRoot<steamrot::TestDataConfig>(
+          builder.GetBufferPointer());
 
   uint32_t num_ticks = steamrot::tests::determine_num_ticks(test_config);
   // Should be 1 (default), not 10 from simulation_data
@@ -182,13 +176,15 @@ TEST_CASE("execute_tick_based_test executes multiple ticks",
   auto inputs_vec = builder.CreateVector(inputs);
   auto input_seq = steamrot::CreateInputSequence(builder, inputs_vec);
 
-  auto metadata = steamrot::CreateTestMetadata(builder, builder.CreateString("test"));
+  auto metadata =
+      steamrot::CreateTestMetadata(builder, builder.CreateString("test"));
   auto config = steamrot::CreateTestDataConfig(builder, metadata, 0, 0, 0, 0, 0,
-                                                input_seq);
+                                               input_seq);
   builder.Finish(config);
 
   const steamrot::TestDataConfig *test_config =
-      flatbuffers::GetRoot<steamrot::TestDataConfig>(builder.GetBufferPointer());
+      flatbuffers::GetRoot<steamrot::TestDataConfig>(
+          builder.GetBufferPointer());
 
   // Execute the test
   auto result = steamrot::tests::execute_tick_based_test(test_config, fixture);

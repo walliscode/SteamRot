@@ -14,6 +14,8 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
              "Non-compatible flatbuffers version included");
 
 #include "entities_generated.h"
+#include "event_test_data_generated.h"
+#include "input_test_data_generated.h"
 #include "resource_data_generated.h"
 #include "simulation_generated.h"
 
@@ -171,7 +173,10 @@ struct TestDataConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_EXPECTED_ENTITY_COLLECTION = 8,
     VT_GAME_RESOURCES = 10,
     VT_SCENE_RESOURCES = 12,
-    VT_SIMULATION_DATA = 14
+    VT_SIMULATION_DATA = 14,
+    VT_INPUT_SEQUENCE = 16,
+    VT_EVENT_SEQUENCE = 18,
+    VT_NUM_TICKS = 20
   };
   /// @brief Metadata about this test case
   const steamrot::TestMetadata *metadata() const {
@@ -197,6 +202,22 @@ struct TestDataConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::SimulationData *simulation_data() const {
     return GetPointer<const steamrot::SimulationData *>(VT_SIMULATION_DATA);
   }
+  /// @brief Input sequence for simulating user input tick-by-tick
+  const steamrot::InputSequence *input_sequence() const {
+    return GetPointer<const steamrot::InputSequence *>(VT_INPUT_SEQUENCE);
+  }
+  /// @brief Event sequence for adding events tick-by-tick
+  const steamrot::EventSequence *event_sequence() const {
+    return GetPointer<const steamrot::EventSequence *>(VT_EVENT_SEQUENCE);
+  }
+  /// @brief Number of ticks to run the test for (default: auto-detect from inputs/events/simulation)
+  /// If specified, overrides automatic tick detection. The test will execute for exactly
+  /// this many ticks, processing inputs, events, and simulation steps scheduled for each tick.
+  /// If not specified, the number of ticks is determined by the maximum tick value found
+  /// in input_sequence, event_sequence, and simulation_data.
+  uint32_t num_ticks() const {
+    return GetField<uint32_t>(VT_NUM_TICKS, 0);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_METADATA) &&
@@ -211,6 +232,11 @@ struct TestDataConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyTable(scene_resources()) &&
            VerifyOffset(verifier, VT_SIMULATION_DATA) &&
            verifier.VerifyTable(simulation_data()) &&
+           VerifyOffset(verifier, VT_INPUT_SEQUENCE) &&
+           verifier.VerifyTable(input_sequence()) &&
+           VerifyOffset(verifier, VT_EVENT_SEQUENCE) &&
+           verifier.VerifyTable(event_sequence()) &&
+           VerifyField<uint32_t>(verifier, VT_NUM_TICKS, 4) &&
            verifier.EndTable();
   }
 };
@@ -237,6 +263,15 @@ struct TestDataConfigBuilder {
   void add_simulation_data(::flatbuffers::Offset<steamrot::SimulationData> simulation_data) {
     fbb_.AddOffset(TestDataConfig::VT_SIMULATION_DATA, simulation_data);
   }
+  void add_input_sequence(::flatbuffers::Offset<steamrot::InputSequence> input_sequence) {
+    fbb_.AddOffset(TestDataConfig::VT_INPUT_SEQUENCE, input_sequence);
+  }
+  void add_event_sequence(::flatbuffers::Offset<steamrot::EventSequence> event_sequence) {
+    fbb_.AddOffset(TestDataConfig::VT_EVENT_SEQUENCE, event_sequence);
+  }
+  void add_num_ticks(uint32_t num_ticks) {
+    fbb_.AddElement<uint32_t>(TestDataConfig::VT_NUM_TICKS, num_ticks, 0);
+  }
   explicit TestDataConfigBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -256,8 +291,14 @@ inline ::flatbuffers::Offset<TestDataConfig> CreateTestDataConfig(
     ::flatbuffers::Offset<steamrot::EntityCollection> expected_entity_collection = 0,
     ::flatbuffers::Offset<steamrot::GameResourcesData> game_resources = 0,
     ::flatbuffers::Offset<steamrot::SceneResourcesData> scene_resources = 0,
-    ::flatbuffers::Offset<steamrot::SimulationData> simulation_data = 0) {
+    ::flatbuffers::Offset<steamrot::SimulationData> simulation_data = 0,
+    ::flatbuffers::Offset<steamrot::InputSequence> input_sequence = 0,
+    ::flatbuffers::Offset<steamrot::EventSequence> event_sequence = 0,
+    uint32_t num_ticks = 0) {
   TestDataConfigBuilder builder_(_fbb);
+  builder_.add_num_ticks(num_ticks);
+  builder_.add_event_sequence(event_sequence);
+  builder_.add_input_sequence(input_sequence);
   builder_.add_simulation_data(simulation_data);
   builder_.add_scene_resources(scene_resources);
   builder_.add_game_resources(game_resources);

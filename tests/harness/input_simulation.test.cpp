@@ -110,7 +110,7 @@ TEST_CASE("execute_input_events_for_tick processes only specified tick",
       steamrot::InputEventData_MouseInputData, mouse0.Union(), 0);
 
   // Event at tick 1
-  auto pos1 = CreateVector2fData(builder, 200.0f, 200.0f);
+  auto pos1 = steamrot::CreateVector2fData(builder, 200.0f, 200.0f);
   auto mouse1 = steamrot::CreateMouseInputData(builder, pos1, 0);
   auto event1 = steamrot::CreateInputEvent(
       builder, steamrot::InputType_MouseMove,
