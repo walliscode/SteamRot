@@ -325,14 +325,15 @@ TEST_CASE("run_entity_memory_pool_comparison_test respects expected_to_pass",
     cmeta_vec2[0].m_active = false;
 
     // Pools are different, expected_to_pass=false should succeed
-    steamrot::tests::run_entity_memory_pool_comparison_test(pool1, pool2, false);
+    steamrot::tests::run_entity_memory_pool_comparison_test(pool1, pool2,
+                                                            false);
     SUCCEED("Comparison passed with expected_to_pass=false");
   }
 
   SECTION("expected_to_pass=false with metadata succeeds when pools differ") {
     // Modify pool1 to make it different from pool2
-    cui_vec1[1].m_ui_name = "different_name";
-    cui_vec2[1].m_ui_name = "original_name";
+    cui_vec1[1].m_name = "different_name";
+    cui_vec2[1].m_name = "original_name";
 
     // Pools are different, expected_to_pass=false should succeed
     steamrot::tests::run_entity_memory_pool_comparison_test(
