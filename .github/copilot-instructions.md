@@ -804,7 +804,7 @@ All tests must include appropriate Catch2 tags:
 - `[integration]` - Integration tests (multiple components)
 - `[system]` - System tests (end-to-end, future)
 - `[perf]` - Performance tests (benchmarks, future)
-- `[visual]` - Visual confirmation tests (require user input/visual verification, excluded from automatic runs)
+- `[.visual]` - Visual confirmation tests (hidden tag - automatically excluded from default runs, require user input/visual verification)
 
 **Example:**
 ```cpp
@@ -816,9 +816,10 @@ TEST_CASE("Feature workflow", "[integration][feature_name]") {
   // Test implementation
 }
 
-TEST_CASE("Visual confirmation test", "[unit][ClassName][visual]") {
+TEST_CASE("Visual confirmation test", "[unit][ClassName][.visual]") {
   // Test requiring user input or visual confirmation
   // These tests open windows and wait for user interaction
+  // Hidden tag [.visual] means excluded by default
 }
 ```
 
@@ -830,10 +831,7 @@ TEST_CASE("Visual confirmation test", "[unit][ClassName][visual]") {
 ```bash
 # Tests will be run locally after code changes
 
-# Run all tests (excluding visual tests by default)
-ctest --preset Debug --test-args "~[visual]"
-
-# Run all tests including visual tests
+# Run all tests (visual tests automatically excluded via hidden tag)
 ctest --preset Debug
 
 # Run only unit tests
@@ -845,8 +843,11 @@ ctest --preset Debug -L integration
 # Run tests from specific subsystem
 ctest --preset Debug -R logic
 
-# Run ONLY visual tests (for manual verification)
-ctest --preset Debug --test-args "[visual]"
+# Run ONLY visual tests (explicit request for manual verification)
+ctest --preset Debug --test-args "[.visual]"
+
+# Run all hidden tests
+ctest --preset Debug --test-args "[.]"
 
 # Verbose output on failure
 ctest --preset Debug --output-on-failure

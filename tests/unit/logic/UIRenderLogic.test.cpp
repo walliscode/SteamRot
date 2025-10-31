@@ -22,7 +22,7 @@ TEST_CASE("UIRenderLogic::UIRenderLogic Constructor", "[unit][UIRenderLogic]") {
   SUCCEED("UIRenderLogic instantiated successfully");
 }
 
-TEST_CASE("UIRenderLogic draws default for test scene", "[unit][UIRenderLogic][visual]") {
+TEST_CASE("UIRenderLogic draws default for test scene", "[unit][UIRenderLogic][.visual]") {
   // Create a dummy SceneContext
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestFixture test_context;
@@ -47,7 +47,7 @@ TEST_CASE("UIRenderLogic draws default for test scene", "[unit][UIRenderLogic][v
       test_context.GetSceneContext().scene_texture);
 }
 
-TEST_CASE("UIRenderLogic draws title scene", "[unit][UIRenderLogic][visual]") {
+TEST_CASE("UIRenderLogic draws title scene", "[unit][UIRenderLogic][.visual]") {
   // Create a dummy SceneContext
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestFixture test_context{
@@ -69,7 +69,7 @@ TEST_CASE("UIRenderLogic draws title scene", "[unit][UIRenderLogic][visual]") {
       test_context.GetSceneContext().scene_texture);
 }
 
-TEST_CASE("UIRenderLogic draws crafting scene", "[unit][UIRenderLogic][visual]") {
+TEST_CASE("UIRenderLogic draws crafting scene", "[unit][UIRenderLogic][.visual]") {
   // Create a dummy SceneContext
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestFixture test_context{

@@ -11,7 +11,7 @@
 #include "draw_ui_elements_test_helpers.h"
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("CraftingScene's call to sRender is correct", "[unit][CraftingScene][visual]") {
+TEST_CASE("CraftingScene's call to sRender is correct", "[unit][CraftingScene][.visual]") {
   // arrange
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestFixture test_context;
