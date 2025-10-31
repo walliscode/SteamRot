@@ -95,8 +95,8 @@ table SimulationData {
   /// @brief Optional description of the overall simulation
   description: string;
   
-  /// @brief Number of ticks to execute (default: 1)
-  /// When specified, the test will run for this many ticks,
-  /// executing inputs, events, and simulation steps scheduled for each tick.
+  /// @brief DEPRECATED: This field is NOT used for tick determination.
+  /// Use TestDataConfig.num_ticks instead to control tick count.
+  /// This field is kept for backward compatibility but has no effect.
   num_ticks: uint32 = 1;
 }
