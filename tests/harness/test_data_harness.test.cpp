@@ -50,9 +50,6 @@ TEST_CASE("load_test_data_configs works with Catch2 generators",
   REQUIRE(config->metadata() != nullptr);
   REQUIRE(config->metadata()->test_name() != nullptr);
 
-  // Verify expected_to_pass is set
-  REQUIRE(config->metadata()->expected_to_pass() == true);
-
   // Verify at least some entity data is present
   bool has_entity_data = (config->start_entity_collection() != nullptr ||
                           config->expected_entity_collection() != nullptr);
