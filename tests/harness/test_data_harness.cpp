@@ -10,9 +10,6 @@
 #include "FlatbuffersConfigurator.h"
 #include "PathProvider.h"
 #include "entity_memory_pool_matchers.h"
-#include "event_simulation.h"
-#include "input_simulation.h"
-#include "simulation_runner.h"
 #include "tick_executor.h"
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
@@ -153,55 +150,6 @@ load_test_data_configs(const std::string &subdirectory) {
 }
 
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-run_test_data_config(const TestDataConfig *config) {
-
-  // Validate config is not null
-  if (!config) {
-    return std::unexpected(
-        FailInfo(FailMode::NullPointer, "TestDataConfig is null"));
-  }
-
-  // Validate required metadata is present
-  if (!config->metadata()) {
-    return std::unexpected(
-        FailInfo(FailMode::FlatbuffersDataNotFound,
-                 "TestDataConfig missing required metadata"));
-  }
-
-  // Check for entity comparison test data
-  // If both start_entity_collection and expected_entity_collection are present,
-  // this is an entity comparison test that should be handled by
-  // run_entity_memory_pool_comparison_test
-  if (config->start_entity_collection() ||
-      config->expected_entity_collection()) {
-    // Entity comparison tests should be dispatched to
-    // run_entity_memory_pool_comparison_test. This wrapper doesn't execute
-    // those tests directly but validates that the data is present.
-
-    // Verify expected_entity_collection is present if start is present
-    if (config->start_entity_collection() &&
-        !config->expected_entity_collection()) {
-      return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
-                                      "start_entity_collection provided but "
-                                      "expected_entity_collection is missing"));
-    }
-
-    // Data is present and valid for entity comparison testing
-    return std::monostate{};
-  }
-
-  // Future: Add checks for other data types here
-  // if (config->event_data()) { ... }
-  // if (config->ui_data()) { ... }
-  // if (config->logic_data()) { ... }
-
-  // No testable data found - this is not necessarily an error,
-  // the config might just contain metadata
-  return std::monostate{};
-}
-
-/////////////////////////////////////////////////
 void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
                                             const EntityMemoryPool &expected) {
   // Compare the pools using matcher
@@ -220,7 +168,7 @@ void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
 std::expected<TestFixture, FailInfo>
 create_fixture_from_test_data(const TestDataConfig *config,
                               const SceneType &scene_type) {
-  
+
   // Validate config
   if (!config) {
     return std::unexpected(
@@ -228,8 +176,8 @@ create_fixture_from_test_data(const TestDataConfig *config,
   }
 
   // Create and initialize the fixture with the scene type
-  // Pass entity_collection to Initialize so it configures entities from test data
-  // instead of loading default scene data
+  // Pass entity_collection to Initialize so it configures entities from test
+  // data instead of loading default scene data
   TestFixture fixture(scene_type);
   fixture.Intialize(config->start_entity_collection());
 
@@ -239,7 +187,7 @@ create_fixture_from_test_data(const TestDataConfig *config,
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 run_fixture_test(const TestDataConfig *config) {
-  
+
   // Create fixture from test data
   auto fixture_result = create_fixture_from_test_data(config);
   if (!fixture_result.has_value()) {
@@ -249,7 +197,8 @@ run_fixture_test(const TestDataConfig *config) {
   TestFixture &fixture = fixture_result.value();
 
   // Execute the test using tick-based execution
-  // This will process inputs, events, and simulation steps on a tick-by-tick basis
+  // This will process inputs, events, and simulation steps on a tick-by-tick
+  // basis
   auto tick_result = execute_tick_based_test(config, fixture);
   if (!tick_result.has_value()) {
     return std::unexpected(tick_result.error());
@@ -257,38 +206,43 @@ run_fixture_test(const TestDataConfig *config) {
 
   // If expected_entity_collection is provided, compare results
   if (config->expected_entity_collection()) {
-    const EntityCollection *expected_collection = config->expected_entity_collection();
-    
+    const EntityCollection *expected_collection =
+        config->expected_entity_collection();
+
     // Create an expected EntityMemoryPool
     EntityMemoryPool expected_pool;
-    
+
     // Configure expected pool from test data
-    FlatbuffersConfigurator configurator(fixture.GetGameResources().event_handler);
+    FlatbuffersConfigurator configurator(
+        fixture.GetGameResources().event_handler);
     auto configure_result = configurator.ConfigureEntitiesFromCollection(
         expected_pool, expected_collection);
-    
+
     if (!configure_result.has_value()) {
       return std::unexpected(configure_result.error());
     }
 
     // Compare actual vs expected
-    const EntityMemoryPool &actual_pool = 
+    const EntityMemoryPool &actual_pool =
         fixture.GetEntityManager().GetEntityMemoryPool();
-    
+
     // Build test metadata string from config
     std::string test_metadata;
     if (config->metadata()) {
       if (config->metadata()->test_name()) {
-        test_metadata += "Test: " + std::string(config->metadata()->test_name()->str());
+        test_metadata +=
+            "Test: " + std::string(config->metadata()->test_name()->str());
       }
       if (config->metadata()->description()) {
-        test_metadata += ", Description: " + std::string(config->metadata()->description()->str());
+        test_metadata += ", Description: " +
+                         std::string(config->metadata()->description()->str());
       }
     }
-    
+
     // Use overload with metadata if available, otherwise use simple version
     if (!test_metadata.empty()) {
-      run_entity_memory_pool_comparison_test(actual_pool, expected_pool, test_metadata);
+      run_entity_memory_pool_comparison_test(actual_pool, expected_pool,
+                                             test_metadata);
     } else {
       run_entity_memory_pool_comparison_test(actual_pool, expected_pool);
     }

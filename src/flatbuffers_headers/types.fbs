@@ -1,4 +1,5 @@
 // general types to use in other schemas
+namespace steamrot;
 
 table Vector2fData {
     x: float;

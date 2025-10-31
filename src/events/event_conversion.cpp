@@ -21,6 +21,8 @@ GetFlatbuffersToSFMLKeyboardMap() {
           {KeyboardInput_F, sf::Keyboard::Key::F},
           {KeyboardInput_G, sf::Keyboard::Key::G},
           {KeyboardInput_H, sf::Keyboard::Key::H},
+          {KeyboardInput_I, sf::Keyboard::Key::I},
+          {KeyboardInput_J, sf::Keyboard::Key::J},
           {KeyboardInput_K, sf::Keyboard::Key::K},
           {KeyboardInput_L, sf::Keyboard::Key::L},
           {KeyboardInput_M, sf::Keyboard::Key::M},

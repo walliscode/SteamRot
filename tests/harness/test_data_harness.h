@@ -52,29 +52,6 @@ std::expected<std::vector<const TestDataConfig *>, FailInfo>
 load_test_data_configs(const std::string &subdirectory);
 
 /////////////////////////////////////////////////
-/// @brief Top-level wrapper to run tests based on TestDataConfig contents
-///
-/// This wrapper examines the TestDataConfig and dispatches to appropriate
-/// test functions based on what data is present. It provides a unified
-/// entry point for data-driven testing.
-///
-/// Currently supports:
-/// - Entity Memory Pool comparison tests (start_entity_collection +
-/// expected_entity_collection)
-///
-/// Future extensions can add support for:
-/// - Event sequence tests
-/// - UI configuration tests
-/// - Logic execution tests
-/// - etc.
-///
-/// @param config The test data configuration to process
-/// @return std::monostate on success, FailInfo on error
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-run_test_data_config(const TestDataConfig *config);
-
-/////////////////////////////////////////////////
 /// @brief Wrapper function to run EMP comparison tests
 ///
 /// This function compares two EntityMemoryPool instances using the
@@ -94,7 +71,7 @@ void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
 /// @brief Wrapper function to run EMP comparison tests with test metadata
 ///
 /// This function compares two EntityMemoryPool instances using the
-/// EqualsEntityMemoryPool matcher with test metadata, ensuring detailed 
+/// EqualsEntityMemoryPool matcher with test metadata, ensuring detailed
 /// error messages on mismatch that include the test name and description.
 ///
 /// @param actual The actual EntityMemoryPool to test
