@@ -11,12 +11,11 @@
 #include "EventPacket.h"
 #include "GameContext.h"
 #include "UserInputBitset.h"
-#include <SFML/Window/Event.hpp>
+#include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <algorithm>
 #include <format>
 #include <set>
-#include <vector>
 
 namespace steamrot::tests {
 
@@ -34,10 +33,11 @@ execute_input_event(const InputEvent *input_event, TestFixture &fixture) {
   GameContext &game_context = fixture.GetGameContext();
   EventHandler &event_handler = fixture.GetGameResources().event_handler;
 
-  // Create a vector of SFML events to convert to UserInputBitset
-  std::vector<sf::Event> sfml_events;
+  // Create UserInputBitset for the event (if applicable)
+  UserInputBitset user_input_bitset;
+  bool should_create_event = false;
 
-  // Handle different input types by creating SFML events
+  // Handle different input types by directly setting the bitset
   switch (input_event->input_type()) {
   case InputType_MouseMove: {
     if (input_event->input_data_type() != InputEventData_MouseInputData) {
@@ -93,12 +93,10 @@ execute_input_event(const InputEvent *input_event, TestFixture &fixture) {
     game_context.mouse_position.y =
         static_cast<int>(mouse_data->position()->y());
 
-    // Create SFML MouseButtonPressed event
-    sf::Event::MouseButtonPressed mouse_pressed;
-    mouse_pressed.button = static_cast<sf::Mouse::Button>(mouse_data->button());
-    mouse_pressed.position.x = static_cast<int>(mouse_data->position()->x());
-    mouse_pressed.position.y = static_cast<int>(mouse_data->position()->y());
-    sfml_events.push_back(sf::Event{mouse_pressed});
+    // Set mouse button pressed in the bitset
+    user_input_bitset.setMousePressed(
+        static_cast<sf::Mouse::Button>(mouse_data->button()));
+    should_create_event = true;
     break;
   }
 
@@ -127,12 +125,10 @@ execute_input_event(const InputEvent *input_event, TestFixture &fixture) {
     game_context.mouse_position.y =
         static_cast<int>(mouse_data->position()->y());
 
-    // Create SFML MouseButtonReleased event
-    sf::Event::MouseButtonReleased mouse_released;
-    mouse_released.button = static_cast<sf::Mouse::Button>(mouse_data->button());
-    mouse_released.position.x = static_cast<int>(mouse_data->position()->x());
-    mouse_released.position.y = static_cast<int>(mouse_data->position()->y());
-    sfml_events.push_back(sf::Event{mouse_released});
+    // Set mouse button released in the bitset
+    user_input_bitset.setMouseReleased(
+        static_cast<sf::Mouse::Button>(mouse_data->button()));
+    should_create_event = true;
     break;
   }
 
@@ -150,14 +146,10 @@ execute_input_event(const InputEvent *input_event, TestFixture &fixture) {
           FailInfo(FailMode::NullPointer, "KeyboardInputData is null"));
     }
 
-    // Create SFML KeyPressed event
-    sf::Event::KeyPressed key_pressed;
-    key_pressed.code = static_cast<sf::Keyboard::Key>(keyboard_data->key_code());
-    key_pressed.alt = keyboard_data->alt();
-    key_pressed.control = keyboard_data->control();
-    key_pressed.shift = keyboard_data->shift();
-    key_pressed.system = false;
-    sfml_events.push_back(sf::Event{key_pressed});
+    // Set key pressed in the bitset
+    user_input_bitset.setKeyPressed(
+        static_cast<sf::Keyboard::Key>(keyboard_data->key_code()));
+    should_create_event = true;
     break;
   }
 
@@ -175,14 +167,10 @@ execute_input_event(const InputEvent *input_event, TestFixture &fixture) {
           FailInfo(FailMode::NullPointer, "KeyboardInputData is null"));
     }
 
-    // Create SFML KeyReleased event
-    sf::Event::KeyReleased key_released;
-    key_released.code = static_cast<sf::Keyboard::Key>(keyboard_data->key_code());
-    key_released.alt = keyboard_data->alt();
-    key_released.control = keyboard_data->control();
-    key_released.shift = keyboard_data->shift();
-    key_released.system = false;
-    sfml_events.push_back(sf::Event{key_released});
+    // Set key released in the bitset
+    user_input_bitset.setKeyReleased(
+        static_cast<sf::Keyboard::Key>(keyboard_data->key_code()));
+    should_create_event = true;
     break;
   }
 
@@ -193,12 +181,9 @@ execute_input_event(const InputEvent *input_event, TestFixture &fixture) {
                     static_cast<int>(input_event->input_type()))));
   }
 
-  // If we have SFML events, create an EventPacket and add to EventHandler
-  if (!sfml_events.empty()) {
-    // Create UserInputBitset from SFML events
-    UserInputBitset user_input_bitset(sfml_events);
-
-    // Create EventPacket
+  // If we should create an event, create EventPacket and add to EventHandler
+  if (should_create_event) {
+    // Create EventPacket with the UserInputBitset
     EventPacket event_packet(EventType_EVENT_USER_INPUT, user_input_bitset, 1);
 
     // Add to EventHandler

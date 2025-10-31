@@ -21,9 +21,9 @@ namespace steamrot::tests {
 /////////////////////////////////////////////////
 /// @brief Execute a single input event
 ///
-/// Converts the input event to SFML event(s), creates a UserInputBitset,
-/// and generates an EVENT_USER_INPUT EventPacket that is added to the
-/// EventHandler. Mouse position is also updated in GameContext.
+/// Creates a UserInputBitset directly from the input event data and generates
+/// an EVENT_USER_INPUT EventPacket that is added to the EventHandler.
+/// Mouse position is also updated in GameContext for mouse events.
 /// MouseMove events only update position without generating EventPackets.
 ///
 /// @param input_event The input event to execute
