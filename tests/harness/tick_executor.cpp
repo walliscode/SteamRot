@@ -21,8 +21,7 @@ uint32_t determine_num_ticks(const TestDataConfig *config) {
     return config->num_ticks();
   }
 
-  // Otherwise, auto-detect from input_sequence, event_sequence, and
-  // simulation_data
+  // Otherwise, auto-detect from input_sequence and event_sequence
   uint32_t max_tick = 0;
 
   // Check input sequence
