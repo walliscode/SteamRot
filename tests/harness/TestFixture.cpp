@@ -25,6 +25,14 @@ void TestFixture::Intialize() {
   ConfigureGameResourcesForTest();
   ConfigureSceneResourcesForTest(m_scene_type);
 }
+
+////////////////////////////////////////////////////////////
+void TestFixture::InitializeWithoutEntities() {
+
+  ConfigureGameResourcesForTest();
+  ConfigureSceneResourcesWithoutEntities(m_scene_type);
+}
+
 ////////////////////////////////////////////////////////////
 void TestFixture::ConfigureGameResourcesForTest() {
   // Use the reusable configuration function to set up GameResources
@@ -92,6 +100,30 @@ void TestFixture::ConfigureSceneResourcesForTest(const SceneType &scene_type) {
     const FailInfo &error = archetype_result.error();
     std::cerr << "Error generating archetypes: " << error.message << std::endl;
   }
+}
+
+////////////////////////////////////////////////////////////
+void TestFixture::ConfigureSceneResourcesWithoutEntities(
+    const SceneType &scene_type) {
+  // Use the reusable configuration function to set up SceneResources
+  FlatbuffersDataLoader loader;
+  auto scene_data_result = loader.ProvideSceneResourcesData(scene_type);
+
+  if (scene_data_result.has_value()) {
+    auto config_result = resources::ConfigureSceneResources(
+        m_scene_resources, scene_data_result.value());
+
+    if (!config_result.has_value()) {
+      std::cerr << "Error configuring scene resources: "
+                << config_result.error().message << std::endl;
+    }
+  } else {
+    std::cerr << "Error loading scene resources data: "
+              << scene_data_result.error().message << std::endl;
+  }
+
+  // Note: Entity configuration is skipped here
+  // Caller is responsible for configuring entities from test data
 }
 
 ////////////////////////////////////////////////////////////

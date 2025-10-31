@@ -174,6 +174,44 @@ TEST_CASE("create_fixture_from_test_data rejects null config",
   REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
 
+TEST_CASE("create_fixture_from_test_data does not load default scene entities",
+          "[unit][harness]") {
+
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  REQUIRE(configs.value().size() >= 1);
+
+  // Find sample_test_1 config (only has c_user_interface, no c_grimoire_machina)
+  const steamrot::TestDataConfig *test_config = nullptr;
+  for (const auto *config : configs.value()) {
+    if (config->metadata()->test_name()->str() == "sample_test_1") {
+      test_config = config;
+      break;
+    }
+  }
+  REQUIRE(test_config != nullptr);
+
+  // Create fixture from test data
+  auto fixture_result = steamrot::tests::create_fixture_from_test_data(test_config);
+  REQUIRE(fixture_result.has_value());
+
+  auto &fixture = fixture_result.value();
+  const auto &pool = fixture.GetEntityManager().GetEntityMemoryPool();
+
+  // Get component vectors
+  const auto &grimoire_vec =
+      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(pool);
+
+  // Verify that CGrimoireMachina components are NOT active
+  // (i.e., they weren't loaded from default scene data)
+  for (size_t i = 0; i < grimoire_vec.size(); ++i) {
+    // All CGrimoireMachina components should be inactive since sample_test_1
+    // doesn't define any c_grimoire_machina
+    REQUIRE_FALSE(grimoire_vec[i].m_active);
+    REQUIRE(grimoire_vec[i].m_all_fragments.empty());
+  }
+}
+
 TEST_CASE("run_fixture_test executes comparison test", "[unit][harness]") {
 
   auto configs = steamrot::tests::load_test_data_configs();

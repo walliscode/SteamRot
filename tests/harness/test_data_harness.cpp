@@ -225,8 +225,9 @@ create_fixture_from_test_data(const TestDataConfig *config,
   }
 
   // Create and initialize the fixture with the scene type
+  // Use InitializeWithoutEntities to avoid loading default scene entities
   TestFixture fixture(scene_type);
-  fixture.Intialize();
+  fixture.InitializeWithoutEntities();
 
   // If start_entity_collection is provided, configure entities from it
   if (config->start_entity_collection()) {

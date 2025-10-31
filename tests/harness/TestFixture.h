@@ -83,6 +83,17 @@ private:
   ////////////////////////////////////////////////////////////
   void ConfigureSceneResourcesForTest(const SceneType &scene_type);
 
+  ////////////////////////////////////////////////////////////
+  /// @brief Configure SceneResources without loading entities.
+  ///
+  /// Uses the reusable resources::ConfigureSceneResources
+  /// function but skips entity configuration. Useful when you want
+  /// to configure entities from test data instead of default scene data.
+  ///
+  /// @param scene_type Scene type to configure for
+  ////////////////////////////////////////////////////////////
+  void ConfigureSceneResourcesWithoutEntities(const SceneType &scene_type);
+
 public:
   ////////////////////////////////////////////////////////////
   /// @brief Constructor for TestFixture.
@@ -95,6 +106,15 @@ public:
   /// @brief Set up the test fixture by configuring resources.
   /////////////////////////////////////////////////
   void Intialize();
+
+  /////////////////////////////////////////////////
+  /// @brief Set up the test fixture without loading default scene entities.
+  ///
+  /// This is useful when you want to configure entities from test data
+  /// without loading the default scene data first. It configures game
+  /// and scene resources but skips entity configuration.
+  /////////////////////////////////////////////////
+  void InitializeWithoutEntities();
 
   ////////////////////////////////////////////////////////////
   /// @brief Get reference to owned GameResources.
