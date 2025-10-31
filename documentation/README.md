@@ -54,18 +54,28 @@ A cohesive naming system for organizing code as the project scales.
 
 ### 🧪 Testing Infrastructure
 
-- **[TEST_DATA_CONFIGURATION.md](TEST_DATA_CONFIGURATION.md)** - Data-driven testing guide
-  - Creating test data files
-  - Using TestDataLoader
-  - Simulations and tick-based execution
-  
-- **[TEST_HARNESS_DATA_FLOW.md](TEST_HARNESS_DATA_FLOW.md)** ⭐ **Architecture overview**
+- **[TEST_HARNESS_OVERVIEW.md](TEST_HARNESS_OVERVIEW.md)** ⭐ **Start here!**
+  - Quick start guide for beginners
+  - Conversation-style explanations
+  - Complete example walkthrough
+  - Common workflows and patterns
+
+- **[TEST_HARNESS_DATA_FLOW.md](TEST_HARNESS_DATA_FLOW.md)** 📐 **Architecture deep dive**
   - Complete data/function flow
   - Component interactions
   - Test lifecycle from JSON to execution
   - Extension points and patterns
 
-- **[tests/harness/README.md](../tests/harness/README.md)** - Test harness API reference
+- **[TEST_DATA_CONFIGURATION.md](TEST_DATA_CONFIGURATION.md)** 📕 **Complete reference**
+  - Creating test data files
+  - Schema documentation
+  - Simulations and tick-based execution
+  - All available features
+
+- **[tests/harness/README.md](../tests/harness/README.md)** 📋 **API reference**
+  - Function signatures
+  - Usage examples
+  - Best practices
 
 ### 🏗️ Architecture & Configuration
 
@@ -88,8 +98,9 @@ documentation/
 │   └── naming_system_diagram.md       # Visual diagrams
 │
 ├── Testing Infrastructure/
-│   ├── TEST_HARNESS_DATA_FLOW.md      # Architecture & flow overview
-│   └── TEST_DATA_CONFIGURATION.md     # Data-driven testing guide
+│   ├── TEST_HARNESS_OVERVIEW.md       # Quick start guide
+│   ├── TEST_HARNESS_DATA_FLOW.md      # Architecture deep dive
+│   └── TEST_DATA_CONFIGURATION.md     # Complete reference
 │
 ├── Architecture & Configuration/
 │   ├── CONTEXT_CONFIGURATION.md       # Context configuration
@@ -132,8 +143,11 @@ documentation/
 **...know where to add new functions**
 → Use the decision tree in [NAMING_QUICK_REFERENCE.md](NAMING_QUICK_REFERENCE.md)
 
+**...get started with the test harness**
+→ Start with [TEST_HARNESS_OVERVIEW.md](TEST_HARNESS_OVERVIEW.md)
+
 **...understand the test harness architecture**
-→ Start with [TEST_HARNESS_DATA_FLOW.md](TEST_HARNESS_DATA_FLOW.md)
+→ Read [TEST_HARNESS_DATA_FLOW.md](TEST_HARNESS_DATA_FLOW.md)
 
 **...write data-driven tests**
 → Check [TEST_DATA_CONFIGURATION.md](TEST_DATA_CONFIGURATION.md)
