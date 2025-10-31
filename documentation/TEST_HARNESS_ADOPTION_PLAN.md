@@ -21,319 +21,11 @@ The test harness system (`tests/harness/`) currently supports:
 - **Free Functions**: ProcessUIActionsAndEvents, ProcessNestedUIActionsAndEvents, ProcessButtonElementActions, ProcessDropDownListElementActions
 - **System Types**: Action, Movement, Render, Collision
 
-## Phase 1: Simple Use Cases (Low Complexity, High Value)
+## Phase 1: Critical Harness Extensions (HIGH PRIORITY)
 
-These are the foundational use cases that demonstrate basic harness functionality and can be adopted immediately.
+These extensions must be implemented first to make the test harness fully capable for comprehensive testing. Prioritizing these ensures the harness has all necessary features before widespread adoption.
 
-### 1.1 Entity Pool Comparison Tests
-
-**Target**: `tests/unit/entity/FlatbuffersConfigurator.test.cpp`
-
-**Current State**: Tests manually create and compare entity pools
-
-**Migration Target**: Use `start_entity_collection` and `expected_entity_collection`
-
-**Benefits**:
-- Clearer test intent
-- Easier to maintain test data
-- Automatic pool comparison with detailed error messages
-
-**Example Test Data** (`tests/unit/entity/data/configurator_basic.test_data.json`):
-```json
-{
-  "metadata": {
-    "test_name": "configurator_basic",
-    "description": "Basic entity configuration from FlatBuffers data",
-    "tags": ["unit", "entity", "configurator"],
-    "expected_to_pass": true,
-    "version": 1
-  },
-  "start_entity_collection": {
-    "entity_memory_pool_size": 5,
-    "entities": []
-  },
-  "expected_entity_collection": {
-    "entity_memory_pool_size": 5,
-    "entities": [
-      {
-        "index": 0,
-        "c_user_interface": {
-          "ui_name": "test_ui",
-          "start_visible": true
-        }
-      }
-    ]
-  }
-}
-```
-
-**Harness Extensions Needed**: None - fully supported
-
-**Priority**: High (existing tests can be migrated)
-
-### 1.2 Metadata-Only Test Cases
-
-**Target**: New tests that only need to validate test infrastructure
-
-**Use Case**: Testing that the harness itself works correctly, validating data loading
-
-**Example Test Data** (`tests/harness/data/metadata_validation.test_data.json`):
-```json
-{
-  "metadata": {
-    "test_name": "metadata_validation",
-    "description": "Validates test harness metadata loading",
-    "tags": ["unit", "harness", "infrastructure"],
-    "expected_to_pass": true,
-    "author": "Test Infrastructure Team",
-    "version": 1
-  }
-}
-```
-
-**Harness Extensions Needed**: None - fully supported
-
-**Priority**: Medium (useful for infrastructure validation)
-
-## Phase 2: Intermediate Use Cases (Medium Complexity, High Value)
-
-These use cases involve more complex scenarios like simulations and multi-step workflows.
-
-### 2.1 Logic Class Tests with Simulations
-
-**Target**: `tests/unit/logic/*.test.cpp`
-
-**Current State**: Tests manually instantiate Logic classes and test behavior
-
-**Migration Target**: Use simulation data to test Logic execution
-
-**Benefits**:
-- Test complex multi-step scenarios
-- Mimic real Scene system behavior
-- Test Logic interactions
-
-**Example**: Testing UIActionLogic button processing
-
-**Test Data** (`tests/unit/logic/data/ui_action_button_click.test_data.json`):
-```json
-{
-  "metadata": {
-    "test_name": "ui_action_button_click",
-    "description": "Test button click processing via UIActionLogic",
-    "tags": ["unit", "logic", "UIActionLogic"],
-    "expected_to_pass": true,
-    "version": 1
-  },
-  "start_entity_collection": {
-    "entity_memory_pool_size": 3,
-    "entities": [
-      {
-        "index": 0,
-        "c_user_interface": {
-          "ui_name": "button_ui",
-          "start_visible": true,
-          "root_ui_element": {
-            "button_data": {
-              "label": "Test Button",
-              "is_mouse_over": true
-            }
-          }
-        }
-      }
-    ]
-  },
-  "simulation_data": {
-    "description": "Simulate button click: collision -> action",
-    "steps": [
-      {
-        "simulation_type": "Collision",
-        "execution_mode": "LogicClass",
-        "logic_class_type": "UICollisionLogic",
-        "description": "Detect mouse collision"
-      },
-      {
-        "simulation_type": "Action",
-        "execution_mode": "Function",
-        "function_type": "ProcessButtonElementActions",
-        "description": "Process button click"
-      }
-    ]
-  },
-  "expected_entity_collection": {
-    "entity_memory_pool_size": 3,
-    "entities": [
-      {
-        "index": 0,
-        "c_user_interface": {
-          "ui_name": "button_ui",
-          "start_visible": true
-        }
-      }
-    ]
-  }
-}
-```
-
-**Harness Extensions Needed**: None - simulations fully supported
-
-**Priority**: High (logic tests are core to game engine)
-
-### 2.2 UI Interaction Workflows
-
-**Target**: `tests/unit/user_interface/*.test.cpp`
-
-**Current State**: Manual UI element setup and validation
-
-**Migration Target**: Complete UI workflows with render + collision + action
-
-**Benefits**:
-- Test real UI interaction patterns
-- Validate UI element behavior end-to-end
-- Easy to test edge cases
-
-**Example Test Data** (`tests/unit/user_interface/data/dropdown_interaction.test_data.json`):
-```json
-{
-  "metadata": {
-    "test_name": "dropdown_interaction",
-    "description": "Test dropdown menu interaction workflow",
-    "tags": ["unit", "ui", "dropdown"],
-    "expected_to_pass": true,
-    "version": 1
-  },
-  "start_entity_collection": {
-    "entity_memory_pool_size": 2,
-    "entities": [
-      {
-        "index": 0,
-        "c_user_interface": {
-          "ui_name": "dropdown_menu",
-          "start_visible": true,
-          "root_ui_element": {
-            "dropdown_data": {
-              "options": ["Option A", "Option B", "Option C"],
-              "selected_index": 0,
-              "is_open": false
-            }
-          }
-        }
-      }
-    ]
-  },
-  "simulation_data": {
-    "description": "Open dropdown, hover over option, select",
-    "steps": [
-      {
-        "simulation_type": "Collision",
-        "execution_mode": "LogicClass",
-        "logic_class_type": "UICollisionLogic",
-        "description": "Check collision with dropdown"
-      },
-      {
-        "simulation_type": "Action",
-        "execution_mode": "Function",
-        "function_type": "ProcessDropDownListElementActions",
-        "description": "Toggle dropdown open"
-      },
-      {
-        "simulation_type": "Render",
-        "execution_mode": "LogicClass",
-        "logic_class_type": "UIRenderLogic",
-        "description": "Render expanded dropdown"
-      }
-    ]
-  },
-  "expected_entity_collection": {
-    "entity_memory_pool_size": 2,
-    "entities": [
-      {
-        "index": 0,
-        "c_user_interface": {
-          "ui_name": "dropdown_menu",
-          "start_visible": true,
-          "root_ui_element": {
-            "dropdown_data": {
-              "is_open": true
-            }
-          }
-        }
-      }
-    ]
-  }
-}
-```
-
-**Harness Extensions Needed**: None - fully supported
-
-**Priority**: High (UI is core game functionality)
-
-### 2.3 Multi-Component Entity Tests
-
-**Target**: Tests involving entities with multiple components (e.g., CUserInterface + CGrimoireMachina)
-
-**Current State**: Tests focus on single components
-
-**Migration Target**: Test entity configurations with multiple components
-
-**Benefits**:
-- Test realistic entity configurations
-- Validate component interactions
-- Test archetype generation
-
-**Example Test Data** (`tests/unit/components/data/multi_component_entity.test_data.json`):
-```json
-{
-  "metadata": {
-    "test_name": "multi_component_entity",
-    "description": "Entity with UI and Grimoire components",
-    "tags": ["unit", "entity", "multi-component"],
-    "expected_to_pass": true,
-    "version": 1
-  },
-  "start_entity_collection": {
-    "entity_memory_pool_size": 3,
-    "entities": [
-      {
-        "index": 0,
-        "c_user_interface": {
-          "ui_name": "grimoire_ui",
-          "start_visible": true
-        },
-        "c_grimoire_machina": {
-          "grimoire_name": "Test Grimoire",
-          "page_count": 10
-        }
-      }
-    ]
-  },
-  "expected_entity_collection": {
-    "entity_memory_pool_size": 3,
-    "entities": [
-      {
-        "index": 0,
-        "c_user_interface": {
-          "ui_name": "grimoire_ui",
-          "start_visible": true
-        },
-        "c_grimoire_machina": {
-          "grimoire_name": "Test Grimoire",
-          "page_count": 10
-        }
-      }
-    ]
-  }
-}
-```
-
-**Harness Extensions Needed**: None - fully supported
-
-**Priority**: Medium (important for integration-like tests)
-
-## Phase 3: Advanced Use Cases (High Complexity, Extensions Required)
-
-These use cases require extending the harness with new capabilities. They should be prioritized based on testing needs.
-
-### 3.1 Event Sequence Testing (HIGH PRIORITY EXTENSION)
+### 1.1 Event Sequence Testing (HIGH PRIORITY EXTENSION)
 
 **Target**: `tests/unit/events/*.test.cpp`
 
@@ -428,7 +120,7 @@ table TestDataConfig {
 
 **Priority**: **HIGH** - Events are fundamental to game engine architecture
 
-### 3.2 Input Simulation (HIGH PRIORITY EXTENSION)
+### 1.2 Input Simulation (HIGH PRIORITY EXTENSION)
 
 **Target**: Tests that need to simulate user input (mouse, keyboard)
 
@@ -582,7 +274,315 @@ table TestDataConfig {
 
 **Priority**: **HIGH** - Essential for testing user interactions
 
-### 3.3 Custom Resource Configuration (MEDIUM PRIORITY EXTENSION)
+## Phase 2: Simple Use Cases (Low Complexity, High Value)
+
+These are foundational use cases that leverage the newly extended harness. With Phase 1 extensions complete, these tests can be adopted immediately.
+
+### 2.1 Entity Pool Comparison Tests
+
+**Target**: `tests/unit/entity/FlatbuffersConfigurator.test.cpp`
+
+**Current State**: Tests manually create and compare entity pools
+
+**Migration Target**: Use `start_entity_collection` and `expected_entity_collection`
+
+**Benefits**:
+- Clearer test intent
+- Easier to maintain test data
+- Automatic pool comparison with detailed error messages
+
+**Example Test Data** (`tests/unit/entity/data/configurator_basic.test_data.json`):
+```json
+{
+  "metadata": {
+    "test_name": "configurator_basic",
+    "description": "Basic entity configuration from FlatBuffers data",
+    "tags": ["unit", "entity", "configurator"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": []
+  },
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "test_ui",
+          "start_visible": true
+        }
+      }
+    ]
+  }
+}
+```
+
+**Harness Extensions Needed**: None - fully supported
+
+**Priority**: High (existing tests can be migrated)
+
+### 2.2 Metadata-Only Test Cases
+
+**Target**: New tests that only need to validate test infrastructure
+
+**Use Case**: Testing that the harness itself works correctly, validating data loading
+
+**Example Test Data** (`tests/harness/data/metadata_validation.test_data.json`):
+```json
+{
+  "metadata": {
+    "test_name": "metadata_validation",
+    "description": "Validates test harness metadata loading",
+    "tags": ["unit", "harness", "infrastructure"],
+    "expected_to_pass": true,
+    "author": "Test Infrastructure Team",
+    "version": 1
+  }
+}
+```
+
+**Harness Extensions Needed**: None - fully supported
+
+**Priority**: Medium (useful for infrastructure validation)
+
+### 2.3 Logic Class Tests with Simulations
+
+**Target**: `tests/unit/logic/*.test.cpp`
+
+**Current State**: Tests manually instantiate Logic classes and test behavior
+
+**Migration Target**: Use simulation data to test Logic execution
+
+**Benefits**:
+- Test complex multi-step scenarios
+- Mimic real Scene system behavior
+- Test Logic interactions
+
+**Example**: Testing UIActionLogic button processing
+
+**Test Data** (`tests/unit/logic/data/ui_action_button_click.test_data.json`):
+```json
+{
+  "metadata": {
+    "test_name": "ui_action_button_click",
+    "description": "Test button click processing via UIActionLogic",
+    "tags": ["unit", "logic", "UIActionLogic"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 3,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "button_ui",
+          "start_visible": true,
+          "root_ui_element": {
+            "button_data": {
+              "label": "Test Button",
+              "is_mouse_over": true
+            }
+          }
+        }
+      }
+    ]
+  },
+  "simulation_data": {
+    "description": "Simulate button click: collision -> action",
+    "steps": [
+      {
+        "simulation_type": "Collision",
+        "execution_mode": "LogicClass",
+        "logic_class_type": "UICollisionLogic",
+        "description": "Detect mouse collision"
+      },
+      {
+        "simulation_type": "Action",
+        "execution_mode": "Function",
+        "function_type": "ProcessButtonElementActions",
+        "description": "Process button click"
+      }
+    ]
+  },
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 3,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "button_ui",
+          "start_visible": true
+        }
+      }
+    ]
+  }
+}
+```
+
+**Harness Extensions Needed**: None - simulations fully supported
+
+**Priority**: High (logic tests are core to game engine)
+
+### 2.4 UI Interaction Workflows
+
+**Target**: `tests/unit/user_interface/*.test.cpp`
+
+**Current State**: Manual UI element setup and validation
+
+**Migration Target**: Complete UI workflows with render + collision + action
+
+**Benefits**:
+- Test real UI interaction patterns
+- Validate UI element behavior end-to-end
+- Easy to test edge cases
+
+**Example Test Data** (`tests/unit/user_interface/data/dropdown_interaction.test_data.json`):
+```json
+{
+  "metadata": {
+    "test_name": "dropdown_interaction",
+    "description": "Test dropdown menu interaction workflow",
+    "tags": ["unit", "ui", "dropdown"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 2,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "dropdown_menu",
+          "start_visible": true,
+          "root_ui_element": {
+            "dropdown_data": {
+              "options": ["Option A", "Option B", "Option C"],
+              "selected_index": 0,
+              "is_open": false
+            }
+          }
+        }
+      }
+    ]
+  },
+  "simulation_data": {
+    "description": "Open dropdown, hover over option, select",
+    "steps": [
+      {
+        "simulation_type": "Collision",
+        "execution_mode": "LogicClass",
+        "logic_class_type": "UICollisionLogic",
+        "description": "Check collision with dropdown"
+      },
+      {
+        "simulation_type": "Action",
+        "execution_mode": "Function",
+        "function_type": "ProcessDropDownListElementActions",
+        "description": "Toggle dropdown open"
+      },
+      {
+        "simulation_type": "Render",
+        "execution_mode": "LogicClass",
+        "logic_class_type": "UIRenderLogic",
+        "description": "Render expanded dropdown"
+      }
+    ]
+  },
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 2,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "dropdown_menu",
+          "start_visible": true,
+          "root_ui_element": {
+            "dropdown_data": {
+              "is_open": true
+            }
+          }
+        }
+      }
+    ]
+  }
+}
+```
+
+**Harness Extensions Needed**: None - fully supported
+
+**Priority**: High (UI is core game functionality)
+
+### 2.5 Multi-Component Entity Tests
+
+**Target**: Tests involving entities with multiple components (e.g., CUserInterface + CGrimoireMachina)
+
+**Current State**: Tests focus on single components
+
+**Migration Target**: Test entity configurations with multiple components
+
+**Benefits**:
+- Test realistic entity configurations
+- Validate component interactions
+- Test archetype generation
+
+**Example Test Data** (`tests/unit/components/data/multi_component_entity.test_data.json`):
+```json
+{
+  "metadata": {
+    "test_name": "multi_component_entity",
+    "description": "Entity with UI and Grimoire components",
+    "tags": ["unit", "entity", "multi-component"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 3,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "grimoire_ui",
+          "start_visible": true
+        },
+        "c_grimoire_machina": {
+          "grimoire_name": "Test Grimoire",
+          "page_count": 10
+        }
+      }
+    ]
+  },
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 3,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "grimoire_ui",
+          "start_visible": true
+        },
+        "c_grimoire_machina": {
+          "grimoire_name": "Test Grimoire",
+          "page_count": 10
+        }
+      }
+    ]
+  }
+}
+```
+
+**Harness Extensions Needed**: None - fully supported
+
+**Priority**: Medium (important for integration-like tests)
+
+## Phase 3: Additional Harness Extensions (Medium/Low Priority)
+
+These extensions add valuable capabilities but are lower priority than Phase 1. They can be implemented as testing needs arise.
+
+### 3.1 Custom Resource Configuration (MEDIUM PRIORITY EXTENSION)
 
 **Target**: Tests that need specific asset or resource configurations
 
@@ -635,7 +635,7 @@ table TestDataConfig {
 
 **Priority**: MEDIUM - Useful but not critical for most tests
 
-### 3.4 Scene Transition Testing (MEDIUM PRIORITY EXTENSION)
+### 3.2 Scene Transition Testing (MEDIUM PRIORITY EXTENSION)
 
 **Target**: `tests/integration/scene_change/*.test.cpp`
 
@@ -713,7 +713,7 @@ table TestDataConfig {
 
 **Priority**: MEDIUM - Important for integration tests
 
-### 3.5 Asset Validation Testing (LOW PRIORITY EXTENSION)
+### 3.3 Asset Validation Testing (LOW PRIORITY EXTENSION)
 
 **Target**: `tests/unit/assets/*.test.cpp`
 
@@ -753,7 +753,7 @@ table AssetValidationSequence {
 
 **Priority**: LOW - Nice to have, but manual tests are sufficient
 
-### 3.6 Performance Benchmarking (LOW PRIORITY EXTENSION)
+### 3.4 Performance Benchmarking (LOW PRIORITY EXTENSION)
 
 **Target**: New performance tests
 
@@ -787,94 +787,88 @@ table PerformanceBenchmark {
 
 ## Phase 4: Migration Strategy
 
-### Step 1: Start with New Tests (Weeks 1-2)
+### Step 1: Implement Critical Harness Extensions (Weeks 1-6)
 
-**Goal**: Build confidence with the harness without disrupting existing tests
-
-**Actions**:
-1. Create data-driven tests for new features/components
-2. Document patterns and best practices
-3. Create example test data files for each category
-4. Train team on harness usage
-
-**Success Metrics**:
-- 5+ new data-driven tests created
-- Team comfortable with harness basics
-- Documentation complete
-
-### Step 2: Migrate Simple Tests (Weeks 3-4)
-
-**Goal**: Convert existing simple tests (Phase 1 use cases)
+**Goal**: Complete Phase 1 - Make the test harness fully capable before widespread adoption
 
 **Actions**:
-1. Convert simple entity pool comparison tests
-2. Add test data files to existing test directories
-3. Keep old tests alongside new tests initially
-4. Create metadata-only validation tests
-
-**Success Metrics**:
-- 10+ entity tests migrated
-- Metadata validation tests operational
-- No test coverage regression
-
-### Step 3: Implement High-Priority Extensions (Weeks 5-8)
-
-**Goal**: Enable advanced testing capabilities
-
-**Actions**:
-1. **Week 5-6**: Implement event sequence testing (Priority: HIGH)
+1. **Week 1-3**: Implement event sequence testing (Phase 1.1)
    - Add event_test_data.fbs schema
    - Update test_data.fbs
    - Implement event validation in harness
+   - Add simulation support for triggering events
+   - Add verification for event bus state
    - Create example tests
 
-2. **Week 7-8**: Implement input simulation (Priority: HIGH)
+2. **Week 4-6**: Implement input simulation (Phase 1.2)
    - Add input_test_data.fbs schema
    - Update test_data.fbs
    - Implement input injection mechanism
+   - Add input replay functionality to simulation_runner
+   - Integrate with SFML event system
    - Create example tests
 
 **Success Metrics**:
 - Event sequence testing operational
 - Input simulation operational
-- 10+ tests using new capabilities
+- 10+ tests demonstrating new capabilities
+- Test harness fully capable for comprehensive testing
 
-### Step 4: Migrate Complex Tests (Weeks 9-12)
+### Step 2: Adopt Simple Use Cases (Weeks 7-9)
 
-**Goal**: Convert logic and integration tests (Phase 2 use cases)
+**Goal**: Migrate existing simple tests (Phase 2 use cases) using the newly extended harness
 
 **Actions**:
-1. Migrate logic class tests to use simulations
-2. Convert UI interaction tests
-3. Create multi-component entity tests
-4. Add integration test data files
+1. Convert entity pool comparison tests
+2. Add test data files to existing test directories
+3. Create metadata-only validation tests
+4. Keep old tests alongside new tests initially
+5. Document migration patterns
 
 **Success Metrics**:
-- 30+ logic tests migrated
-- 15+ UI tests migrated
-- Integration tests using harness
+- 10+ entity tests migrated
+- Metadata validation tests operational
+- No test coverage regression
+- Team comfortable with harness basics
 
-### Step 5: Implement Medium-Priority Extensions (Weeks 13-16)
+### Step 3: Migrate to Simulations and Complex Tests (Weeks 10-14)
 
-**Goal**: Add remaining useful features
+**Goal**: Adopt simulation-based testing for logic and UI workflows
 
 **Actions**:
-1. **Week 13-14**: Enhance resource configuration
+1. Migrate logic class tests to use simulations (Phase 2.3)
+2. Convert UI interaction workflows (Phase 2.4)
+3. Create multi-component entity tests (Phase 2.5)
+4. Add integration test data files
+5. Leverage event and input simulation capabilities
+
+**Success Metrics**:
+- 30+ logic tests migrated to simulations
+- 15+ UI workflow tests created
+- Multi-component tests operational
+- Integration tests using harness
+
+### Step 4: Implement Additional Extensions (Weeks 15-17)
+
+**Goal**: Add Phase 3 extensions based on testing needs
+
+**Actions**:
+1. **Week 15**: Enhance resource configuration (Phase 3.1)
    - Implement resource loading in TestFixture
    - Document resource patterns
    - Create example tests
 
-2. **Week 15-16**: Implement scene transition testing
+2. **Week 16-17**: Implement scene transition testing (Phase 3.2)
    - Add scene_test_data.fbs schema
    - Implement scene transition simulation
    - Create integration tests
 
 **Success Metrics**:
-- Resource configuration working
-- Scene transition tests operational
+- Resource configuration operational
+- Scene transition tests working
 - Integration test suite complete
 
-### Step 6: Cleanup and Optimization (Weeks 17-18)
+### Step 5: Cleanup and Optimization (Week 18)
 
 **Goal**: Remove old tests, optimize harness
 
@@ -891,27 +885,30 @@ table PerformanceBenchmark {
 
 ## Implementation Priority Summary
 
-### Immediate (Start Now)
+### Immediate - Weeks 1-6 (Phase 1: Critical Extensions)
 1. ✅ Create this plan document
-2. Phase 1.1: Migrate entity pool comparison tests
-3. Phase 1.2: Create metadata-only validation tests
-4. Phase 2.1: Create logic class simulation tests
+2. **Phase 1.1: Event sequence testing** (CRITICAL - Start immediately)
+3. **Phase 1.2: Input simulation** (CRITICAL - Start immediately)
 
-### High Priority (Weeks 1-8)
-1. **Phase 3.1: Event sequence testing** (CRITICAL EXTENSION)
-2. **Phase 3.2: Input simulation** (CRITICAL EXTENSION)
-3. Phase 2.2: UI interaction workflow tests
-4. Complete Phase 1 and Phase 2 migrations
+### High Priority - Weeks 7-9 (Phase 2: Simple Use Cases)
+1. Phase 2.1: Migrate entity pool comparison tests
+2. Phase 2.2: Create metadata-only validation tests
+3. Begin adopting harness with newly extended capabilities
 
-### Medium Priority (Weeks 9-16)
-1. Phase 3.3: Resource configuration enhancement
-2. Phase 3.4: Scene transition testing
-3. Phase 2.3: Multi-component entity tests
+### High Priority - Weeks 10-14 (Phase 2: Advanced Use Cases)
+1. Phase 2.3: Logic class tests with simulations
+2. Phase 2.4: UI interaction workflow tests
+3. Phase 2.5: Multi-component entity tests
 4. Integration test migrations
 
-### Low Priority (Future)
-1. Phase 3.5: Asset validation testing
-2. Phase 3.6: Performance benchmarking
+### Medium Priority - Weeks 15-17 (Phase 3: Additional Extensions)
+1. Phase 3.1: Resource configuration enhancement
+2. Phase 3.2: Scene transition testing
+3. Additional integration tests as needed
+
+### Low Priority - Future (Phase 3: Nice-to-Have)
+1. Phase 3.3: Asset validation testing
+2. Phase 3.4: Performance benchmarking
 3. Additional simulation features as needed
 
 ## Required Harness Extensions Detail
@@ -1071,12 +1068,12 @@ Each extension should have its own test file demonstrating usage:
 
 ## Conclusion
 
-This plan provides a clear path from simple to complex use cases, identifies necessary harness extensions, and prioritizes work based on value and complexity. The phased approach allows for learning and adjustment while making steady progress toward comprehensive data-driven testing.
+This plan prioritizes getting the test harness "up to scratch" first by implementing critical extensions (Phase 1) before widespread adoption. This ensures the harness has all necessary features (event sequencing, input simulation) before teams begin migrating tests. The phased approach builds the foundation first, then adopts simple use cases, and finally tackles complex testing scenarios.
 
 **Next Steps**:
 1. Review and approve this plan
-2. Begin Phase 1 migrations
-3. Start implementing high-priority extensions (Event sequence and Input simulation)
+2. **Begin Phase 1 immediately**: Implement event sequence testing and input simulation
+3. Once Phase 1 is complete, adopt simple use cases (Phase 2)
 4. Monitor progress and adjust timeline as needed
 
 ## Appendix A: Example Directory Structure After Full Adoption
