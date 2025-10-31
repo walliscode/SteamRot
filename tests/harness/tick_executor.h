@@ -38,8 +38,11 @@ execute_single_tick(uint32_t tick, const TestDataConfig *config,
 ///
 /// If config->num_ticks() is specified, returns that value.
 /// Otherwise, auto-detects the number of ticks by finding the maximum
-/// tick value in input_sequence, event_sequence, and simulation_data,
-/// then adds 1 (since ticks are 0-based).
+/// tick value in input_sequence and event_sequence, then adds 1 
+/// (since ticks are 0-based).
+///
+/// Note: simulation_data()->num_ticks() is NOT used for determination.
+/// Only the TestDataConfig level num_ticks field determines explicit tick count.
 ///
 /// @param config Test data configuration
 /// @return Number of ticks to execute (minimum 1)

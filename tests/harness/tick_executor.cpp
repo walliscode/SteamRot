@@ -44,12 +44,6 @@ uint32_t determine_num_ticks(const TestDataConfig *config) {
     }
   }
 
-  // Check simulation data num_ticks field
-  if (config->simulation_data() &&
-      config->simulation_data()->num_ticks() > 0) {
-    max_tick = std::max(max_tick, config->simulation_data()->num_ticks() - 1);
-  }
-
   // Return max_tick + 1 (since ticks are 0-based), with minimum of 1
   return std::max(1u, max_tick + 1);
 }
