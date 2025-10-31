@@ -1,0 +1,75 @@
+include "types.fbs";
+
+namespace steamrot;
+
+////////////////////////////////////////////////////////////
+/// @brief Types of input events that can be simulated
+////////////////////////////////////////////////////////////
+enum InputType : byte {
+  MouseMove,
+  MouseClick,
+  MouseRelease,
+  KeyPress,
+  KeyRelease
+}
+
+////////////////////////////////////////////////////////////
+/// @brief Mouse input data for simulation
+////////////////////////////////////////////////////////////
+table MouseInputData {
+  position: Vector2fData;
+  button: uint8;  // SFML mouse button enum
+}
+
+////////////////////////////////////////////////////////////
+/// @brief Keyboard input data for simulation
+////////////////////////////////////////////////////////////
+table KeyboardInputData {
+  key_code: uint32;  // SFML key code
+  alt: bool = false;
+  control: bool = false;
+  shift: bool = false;
+}
+
+////////////////////////////////////////////////////////////
+/// @brief Union of possible input data types
+////////////////////////////////////////////////////////////
+union InputEventData {
+  MouseInputData,
+  KeyboardInputData
+}
+
+////////////////////////////////////////////////////////////
+/// @brief A single input event to be simulated
+///
+/// Each input event represents a discrete input action that can be
+/// injected into the test fixture at a specific tick/timestamp.
+////////////////////////////////////////////////////////////
+table InputEvent {
+  /// @brief Type of input event
+  input_type: InputType;
+  
+  /// @brief Input-specific data
+  input_data: InputEventData;
+  
+  /// @brief Relative tick number for sequencing (0-based)
+  /// Events with the same tick are processed together
+  tick: uint32 = 0;
+  
+  /// @brief Optional description for debugging
+  description: string;
+}
+
+////////////////////////////////////////////////////////////
+/// @brief Sequence of input events for simulation
+///
+/// Represents a complete sequence of inputs that can be replayed
+/// during a test, allowing tick-by-tick input injection.
+////////////////////////////////////////////////////////////
+table InputSequence {
+  /// @brief Ordered list of input events
+  inputs: [InputEvent];
+  
+  /// @brief Optional description of the input sequence
+  description: string;
+}

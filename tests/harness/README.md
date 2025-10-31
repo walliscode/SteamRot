@@ -5,15 +5,21 @@
 The test harness provides a unified, simplified interface for:
 1. Loading test data configurations for data-driven testing with Catch2 generators
 2. Creating and configuring TestFixture instances from test data
-3. **Executing simulations** - running sequences of Logic classes or free functions
-4. Running comparison tests between expected and actual entity states
+3. **Tick-based test execution** - coordinated execution of inputs, events, and simulation per tick
+4. **Executing input sequences** - simulating user input (mouse/keyboard) on a tick-by-tick basis
+5. **Executing event sequences** - injecting engine events on a tick-by-tick basis
+6. **Executing simulations** - running sequences of Logic classes or free functions
+7. Running comparison tests between expected and actual entity states
 
-This consolidates functionality for resource-based testing and data-driven test execution with support for complex simulation scenarios.
+This consolidates functionality for resource-based testing and data-driven test execution with support for complex simulation scenarios and tick-by-tick coordination of inputs, events, and simulation steps.
 
 ## Purpose
 
 - Provide a single, simple API for loading test data
 - Integrate TestFixture for resource setup and management
+- **Tick-based execution** - coordinate inputs, events, and simulation per tick
+- **Execute input sequences** - simulate user input tick-by-tick
+- **Execute event sequences** - inject engine events tick-by-tick
 - **Execute simulations** - run sequences of Logic classes or free functions defined in test data
 - Enable data-driven testing with automatic fixture creation
 - Work seamlessly with Catch2 generators and matchers
@@ -23,22 +29,35 @@ This consolidates functionality for resource-based testing and data-driven test 
 
 ```
 harness/
-├── test_data_harness.h           # Unified API for loading test data
-├── test_data_harness.cpp         # Implementation
-├── test_data_harness.test.cpp    # Unit tests
-├── simulation_runner.h           # Simulation execution engine
-├── simulation_runner.cpp         # Implementation
-├── simulation_runner.test.cpp    # Simulation tests
-├── TestFixture.h                 # Resource management for tests
-├── TestFixture.cpp               # Implementation
-├── CMakeLists.txt                # Build configuration
-├── README.md                     # This file
-└── data/                         # Sample test data files
+├── test_data_harness.h            # Unified API for loading test data
+├── test_data_harness.cpp          # Implementation
+├── test_data_harness.test.cpp     # Unit tests
+├── simulation_runner.h            # Simulation execution engine
+├── simulation_runner.cpp          # Implementation
+├── simulation_runner.test.cpp     # Simulation tests
+├── input_simulation.h             # Input sequence simulation
+├── input_simulation.cpp           # Implementation
+├── input_simulation.test.cpp      # Input simulation tests
+├── event_simulation.h             # Event sequence simulation
+├── event_simulation.cpp           # Implementation
+├── event_simulation.test.cpp      # Event simulation tests
+├── tick_executor.h                # Tick-based test execution
+├── tick_executor.cpp              # Implementation
+├── tick_executor.test.cpp         # Tick execution tests
+├── TestFixture.h                  # Resource management for tests
+├── TestFixture.cpp                # Implementation
+├── CMakeLists.txt                 # Build configuration
+├── README.md                      # This file
+└── data/                          # Sample test data files
     ├── sample_test_1.test_data.json
     ├── sample_test_2.test_data.json
     ├── sample_test_3.test_data.json
     ├── sample_simulation_test.test_data.json
-    └── sample_function_simulation.test_data.json
+    ├── sample_function_simulation.test_data.json
+    ├── sample_input_sequence.test_data.json
+    ├── sample_event_sequence.test_data.json
+    ├── sample_input_event_simulation.test_data.json
+    └── sample_tick_based_execution.test_data.json
 ```
 
 ## Usage
@@ -511,6 +530,381 @@ To add new functions or Logic classes to simulations:
      "function_type": "MyNewFunction"
    }
    ```
+
+## Tick-Based Test Execution
+
+### Overview
+
+The test harness now supports **tick-based test execution**, where inputs, events, and simulation steps are coordinated and executed on a per-tick basis. This allows precise control over the timing and sequencing of test actions, mimicking how the game engine processes updates in discrete ticks.
+
+### How It Works
+
+When `run_fixture_test()` is called, the test executes in ticks. For each tick (0, 1, 2, ...):
+
+1. **Execute inputs** scheduled for this tick (e.g., mouse movement, key presses)
+2. **Execute events** scheduled for this tick (added to event handler)
+3. **Process event waiting room** (move events to global event bus)
+4. **Execute ALL simulation steps** (Logic classes or functions run on every tick)
+5. **Tick the global event bus** (decrement event lifetimes, remove expired events)
+
+**Note:** Simulation steps are configured once and execute on every tick. You cannot schedule simulation steps for specific ticks - the simulation configuration defines what runs throughout the entire test.
+
+### Specifying Number of Ticks
+
+You can control how many ticks the test runs for:
+
+**Option 1: Explicit `num_ticks`** (recommended for clarity):
+```json
+{
+  "metadata": {...},
+  "num_ticks": 5,
+  "input_sequence": {...},
+  "event_sequence": {...},
+  "simulation_data": {...}
+}
+```
+
+**Option 2: Auto-detection** (omit `num_ticks`):
+The harness automatically determines the number of ticks by finding the maximum tick value across all inputs and events, then adds 1.
+
+**Option 3: Per-simulation `num_ticks`**:
+```json
+{
+  "simulation_data": {
+    "num_ticks": 10,
+    "steps": [...]
+  }
+}
+```
+
+### Example: Tick-Based Test Data
+
+```json
+{
+  "metadata": {
+    "test_name": "tick_based_button_test",
+    "description": "Button interaction over 3 ticks",
+    "tags": ["unit", "tick"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "num_ticks": 3,
+  "input_sequence": {
+    "inputs": [
+      {
+        "input_type": "MouseMove",
+        "input_data": {"position": {"x": 150.0, "y": 125.0}},
+        "tick": 0,
+        "description": "Move mouse to button"
+      },
+      {
+        "input_type": "MouseClick",
+        "input_data": {"position": {"x": 150.0, "y": 125.0}, "button": 0},
+        "tick": 1,
+        "description": "Click button"
+      }
+    ]
+  },
+  "event_sequence": {
+    "events": [
+      {
+        "tick": 0,
+        "event_packet": {"event_type": "EVENT_TEST", "event_lifetime": 3}
+      }
+    ]
+  },
+  "simulation_data": {
+    "steps": [
+      {
+        "simulation_type": "Collision",
+        "execution_mode": "LogicClass",
+        "logic_class_type": "UICollisionLogic",
+        "description": "Check collision (runs every tick)"
+      },
+      {
+        "simulation_type": "Action",
+        "execution_mode": "Function",
+        "function_type": "ProcessButtonElementActions",
+        "description": "Process button actions (runs every tick)"
+      }
+    ]
+  }
+}
+```
+
+### Execution Timeline
+
+For the example above, the execution timeline is:
+
+**Tick 0:**
+- Input: MouseMove to (150, 125)
+- Event: Add EVENT_TEST with lifetime 3
+- Process waiting room → EVENT_TEST moves to global bus
+- Simulation: UICollisionLogic executes, then ProcessButtonElementActions executes
+- Tick event bus → EVENT_TEST lifetime = 2
+
+**Tick 1:**
+- Input: MouseClick at (150, 125)
+- Simulation: UICollisionLogic executes, then ProcessButtonElementActions executes
+- Tick event bus → EVENT_TEST lifetime = 1
+
+**Tick 2:**
+- Simulation: UICollisionLogic executes, then ProcessButtonElementActions executes
+- Tick event bus → EVENT_TEST lifetime = 0, removed
+
+**Note:** The simulation steps (UICollisionLogic and ProcessButtonElementActions) run on every tick. The simulation configuration is set once and does not change during the test.
+
+### Benefits
+
+- **Precise timing control**: Schedule actions at exact ticks
+- **Realistic testing**: Mimics actual game loop timing
+- **Event lifetime testing**: Verify event expiration and persistence
+- **Complex scenarios**: Model multi-step interactions accurately
+- **Debugging**: Clear tick-by-tick execution makes issues easier to trace
+
+### API
+
+#### `determine_num_ticks(config)`
+
+Determines how many ticks to execute for a test.
+
+**Returns:** Number of ticks (uses explicit `num_ticks` or auto-detects)
+
+#### `execute_single_tick(tick, config, fixture)`
+
+Executes all actions for a single tick.
+
+**Parameters:**
+- `tick`: Tick number to execute
+- `config`: Test data configuration
+- `fixture`: TestFixture containing test environment
+
+#### `execute_tick_based_test(config, fixture)`
+
+Executes the complete tick-based test.
+
+**Parameters:**
+- `config`: Test data configuration
+- `fixture`: TestFixture containing test environment
+
+**This is automatically called by `run_fixture_test()`.**
+
+## Input and Event Sequences
+
+### Overview
+
+The test harness supports tick-by-tick input and event injection. Test data specifies sequences of user inputs (mouse/keyboard) and engine events that should be injected at specific ticks during testing.
+
+### Input Sequences
+
+Input sequences allow simulation of user input events on a tick-by-tick basis.
+
+#### Supported Input Types
+
+- `MouseMove` - Update mouse position
+- `MouseClick` - Mouse button press
+- `MouseRelease` - Mouse button release  
+- `KeyPress` - Keyboard key press
+- `KeyRelease` - Keyboard key release
+
+#### Test Data Format
+
+```json
+{
+  "metadata": {
+    "test_name": "input_simulation_test",
+    "description": "Test with input sequence",
+    "tags": ["unit", "input"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "input_sequence": {
+    "description": "User clicks a button",
+    "inputs": [
+      {
+        "input_type": "MouseMove",
+        "input_data_type": "MouseInputData",
+        "input_data": {
+          "position": { "x": 150.0, "y": 125.0 },
+          "button": 0
+        },
+        "tick": 0,
+        "description": "Move mouse to button"
+      },
+      {
+        "input_type": "MouseClick",
+        "input_data_type": "MouseInputData",
+        "input_data": {
+          "position": { "x": 150.0, "y": 125.0 },
+          "button": 0
+        },
+        "tick": 1,
+        "description": "Click button"
+      }
+    ]
+  }
+}
+```
+
+#### Execution
+
+Input sequences are automatically executed by `run_fixture_test()` before simulations:
+
+```cpp
+TEST_CASE("Test with input sequence", "[unit][input]") {
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  
+  const auto *config = GENERATE_COPY(from_range(configs.value()));
+  
+  // Input sequence (if present) is executed automatically before simulation
+  auto result = steamrot::tests::run_fixture_test(config);
+  REQUIRE(result.has_value());
+}
+```
+
+#### Manual Input Execution
+
+For fine-grained control:
+
+```cpp
+#include "input_simulation.h"
+
+// Execute single input event
+auto result = steamrot::tests::execute_input_event(input_event, fixture);
+
+// Execute all inputs for a specific tick
+auto result = steamrot::tests::execute_input_events_for_tick(input_sequence, tick, fixture);
+
+// Execute entire input sequence
+auto result = steamrot::tests::execute_input_sequence(input_sequence, fixture);
+```
+
+### Event Sequences
+
+Event sequences allow injection of engine events into the event system on a tick-by-tick basis.
+
+#### Test Data Format
+
+```json
+{
+  "metadata": {
+    "test_name": "event_simulation_test",
+    "description": "Test with event sequence",
+    "tags": ["unit", "event"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "event_sequence": {
+    "description": "Generate test events",
+    "events": [
+      {
+        "tick": 0,
+        "event_packet": {
+          "event_lifetime": 5,
+          "event_type": "EVENT_TEST",
+          "event_data_data_type": "NONE"
+        },
+        "description": "Test event at tick 0"
+      },
+      {
+        "tick": 1,
+        "event_packet": {
+          "event_lifetime": 3,
+          "event_type": "EVENT_USER_INPUT",
+          "event_data_data_type": "UserInputBitsetData",
+          "event_data_data": {
+            "keyboard_pressed": ["A", "W"],
+            "mouse_pressed": ["LEFT_CLICK"]
+          }
+        },
+        "description": "Input event at tick 1"
+      }
+    ]
+  }
+}
+```
+
+#### Execution
+
+Event sequences are automatically executed by `run_fixture_test()` before simulations, with automatic processing of the waiting room event bus:
+
+```cpp
+TEST_CASE("Test with event sequence", "[unit][event]") {
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  
+  const auto *config = GENERATE_COPY(from_range(configs.value()));
+  
+  // Event sequence (if present) is executed automatically before simulation
+  // Events are added to waiting room and processed into global event bus
+  auto result = steamrot::tests::run_fixture_test(config);
+  REQUIRE(result.has_value());
+}
+```
+
+#### Manual Event Execution
+
+For fine-grained control:
+
+```cpp
+#include "event_simulation.h"
+
+// Execute single event
+auto result = steamrot::tests::execute_event_test_data(event_data, fixture);
+
+// Execute all events for a specific tick  
+auto result = steamrot::tests::execute_events_for_tick(event_sequence, tick, fixture);
+
+// Execute entire event sequence
+auto result = steamrot::tests::execute_event_sequence(event_sequence, fixture);
+
+// Don't forget to process the waiting room
+fixture.GetGameResources().event_handler.ProcessWaitingRoomEventBus();
+```
+
+### Combined Usage
+
+Input sequences, event sequences, and simulations can be combined in a single test:
+
+```json
+{
+  "metadata": {
+    "test_name": "comprehensive_test",
+    "description": "Combines input, events, and simulation",
+    "tags": ["unit", "comprehensive"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "input_sequence": {
+    "description": "User interaction",
+    "inputs": [...]
+  },
+  "event_sequence": {
+    "description": "Engine events",
+    "events": [...]
+  },
+  "simulation_data": {
+    "description": "Process logic",
+    "steps": [...]
+  },
+  "start_entity_collection": {...},
+  "expected_entity_collection": {...}
+}
+```
+
+**Execution order** in `run_fixture_test()`:
+1. Create fixture and configure entities from `start_entity_collection`
+2. Execute tick-based test (for each tick 0 to num_ticks-1):
+   - Execute inputs for this tick
+   - Execute events for this tick and process waiting room
+   - Execute simulation steps for this tick
+   - Tick the global event bus
+3. Compare with `expected_entity_collection` (if present)
+
+**Note:** All inputs, events, and simulation steps are now coordinated per-tick automatically. See the "Tick-Based Test Execution" section for details.
+
+This allows precise control over the timing and sequencing of inputs and events during testing.
 
 ## Integration with Matchers
 

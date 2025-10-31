@@ -94,4 +94,9 @@ table SimulationData {
   
   /// @brief Optional description of the overall simulation
   description: string;
+  
+  /// @brief Number of ticks to execute (default: 1)
+  /// When specified, the test will run for this many ticks,
+  /// executing inputs, events, and simulation steps scheduled for each tick.
+  num_ticks: uint32 = 1;
 }

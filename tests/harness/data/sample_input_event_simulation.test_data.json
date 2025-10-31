@@ -1,0 +1,89 @@
+{
+  "metadata": {
+    "test_name": "sample_input_event_simulation",
+    "description": "Comprehensive sample combining input, events, and simulation with tick-based execution",
+    "tags": ["unit", "harness", "input", "event", "simulation"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "input_sequence": {
+    "description": "User clicks a button",
+    "inputs": [
+      {
+        "input_type": "MouseMove",
+        "input_data_type": "MouseInputData",
+        "input_data": {
+          "position": { "x": 150.0, "y": 125.0 },
+          "button": 0
+        },
+        "tick": 0,
+        "description": "Move mouse over button"
+      },
+      {
+        "input_type": "MouseClick",
+        "input_data_type": "MouseInputData",
+        "input_data": {
+          "position": { "x": 150.0, "y": 125.0 },
+          "button": 0
+        },
+        "tick": 1,
+        "description": "Click the button"
+      }
+    ]
+  },
+  "event_sequence": {
+    "description": "Generate test events in response to input",
+    "events": [
+      {
+        "tick": 0,
+        "event_packet": {
+          "event_lifetime": 2,
+          "event_type": "EVENT_TEST",
+          "event_data_data_type": "NONE"
+        },
+        "description": "Initial test event"
+      }
+    ]
+  },
+  "simulation_data": {
+    "description": "Process UI collision and actions on every tick",
+    "num_ticks": 3,
+    "steps": [
+      {
+        "simulation_type": "Collision",
+        "execution_mode": "LogicClass",
+        "logic_class_type": "UICollisionLogic",
+        "description": "Detect mouse collision with button"
+      },
+      {
+        "simulation_type": "Action",
+        "execution_mode": "Function",
+        "function_type": "ProcessButtonElementActions",
+        "description": "Process button click actions"
+      }
+    ]
+  },
+  "num_ticks": 3,
+  "start_entity_collection": {
+    "entity_memory_pool_size": 2,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "button_ui",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 100, "y": 100 },
+              "size": { "x": 100, "y": 50 },
+              "children_active": false,
+              "children": [],
+              "layout": "Horizontal",
+              "spacing_strategy": "None"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

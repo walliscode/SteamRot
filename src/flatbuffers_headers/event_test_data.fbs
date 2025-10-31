@@ -1,0 +1,34 @@
+include "event_packet_data.fbs";
+
+namespace steamrot;
+
+////////////////////////////////////////////////////////////
+/// @brief Test data for a single event
+///
+/// Represents an event that should be added to the event system
+/// during testing. Can include expected subscribers for validation.
+////////////////////////////////////////////////////////////
+table EventTestData {
+  /// @brief Relative tick number when this event should be added (0-based)
+  tick: uint32 = 0;
+  
+  /// @brief Event data to be added
+  event_packet: EventPacketData;
+  
+  /// @brief Optional description for debugging
+  description: string;
+}
+
+////////////////////////////////////////////////////////////
+/// @brief Sequence of events for simulation
+///
+/// Represents a complete sequence of events that can be added
+/// to the event system during testing on a tick-by-tick basis.
+////////////////////////////////////////////////////////////
+table EventSequence {
+  /// @brief Ordered list of events to add
+  events: [EventTestData];
+  
+  /// @brief Optional description of the event sequence
+  description: string;
+}

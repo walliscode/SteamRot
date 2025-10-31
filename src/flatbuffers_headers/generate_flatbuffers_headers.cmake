@@ -21,9 +21,8 @@ set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/context_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/resource_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/simulation.fbs
-
-
-
+    ${CMAKE_CURRENT_SOURCE_DIR}/input_test_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/event_test_data.fbs
 )
 
 set(generated_headers)

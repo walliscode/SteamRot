@@ -10,7 +10,10 @@
 #include "FlatbuffersConfigurator.h"
 #include "PathProvider.h"
 #include "entity_memory_pool_matchers.h"
+#include "event_simulation.h"
+#include "input_simulation.h"
 #include "simulation_runner.h"
+#include "tick_executor.h"
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
 #include <format>
@@ -245,14 +248,11 @@ run_fixture_test(const TestDataConfig *config) {
 
   TestFixture &fixture = fixture_result.value();
 
-  // If simulation_data is provided, execute the simulation
-  if (config->simulation_data()) {
-    auto simulation_result = execute_simulation_with_fixture(
-        config->simulation_data(), fixture);
-    
-    if (!simulation_result.has_value()) {
-      return std::unexpected(simulation_result.error());
-    }
+  // Execute the test using tick-based execution
+  // This will process inputs, events, and simulation steps on a tick-by-tick basis
+  auto tick_result = execute_tick_based_test(config, fixture);
+  if (!tick_result.has_value()) {
+    return std::unexpected(tick_result.error());
   }
 
   // If expected_entity_collection is provided, compare results

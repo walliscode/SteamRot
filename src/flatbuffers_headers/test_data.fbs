@@ -1,6 +1,8 @@
 include "entities.fbs";
 include "resource_data.fbs";
 include "simulation.fbs";
+include "input_test_data.fbs";
+include "event_test_data.fbs";
 
 namespace steamrot;
 
@@ -55,10 +57,23 @@ table TestDataConfig {
   /// @brief Simulation data for executing logic steps during tests
   simulation_data: SimulationData;
   
+  /// @brief Input sequence for simulating user input tick-by-tick
+  input_sequence: InputSequence;
+  
+  /// @brief Event sequence for adding events tick-by-tick
+  event_sequence: EventSequence;
+  
+  /// @brief Number of ticks to run the test for (default: auto-detect from inputs/events/simulation)
+  /// If specified, overrides automatic tick detection. The test will execute for exactly
+  /// this many ticks, processing inputs, events, and simulation steps scheduled for each tick.
+  /// If not specified, the number of ticks is determined by the maximum tick value found
+  /// in input_sequence, event_sequence, and simulation_data.
+  num_ticks: uint32;
+  
   /// @brief Reserved for future test data types
   /// Can be extended with additional fields like:
-  /// - event_data: EventCollection;
   /// - ui_data: UITestData;
+  /// - scene_transitions: SceneTransitionSequence;
   /// etc.
 }
 
