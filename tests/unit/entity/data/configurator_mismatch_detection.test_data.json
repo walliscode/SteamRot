@@ -1,0 +1,53 @@
+{
+  "metadata": {
+    "test_name": "configurator_mismatch_detection",
+    "description": "Negative test - intentionally mismatched entities to verify test harness detects differences",
+    "tags": ["unit", "entity", "configurator", "negative"],
+    "expected_to_pass": false,
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "start_ui",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 100, "y": 200 },
+              "size": { "x": 50, "y": 30 },
+              "children_active": false,
+              "children": [],
+              "layout": "Horizontal",
+              "spacing_strategy": "None"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "different_ui_name",
+          "start_visible": false,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 999, "y": 888 },
+              "size": { "x": 50, "y": 30 },
+              "children_active": false,
+              "children": [],
+              "layout": "Horizontal",
+              "spacing_strategy": "None"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

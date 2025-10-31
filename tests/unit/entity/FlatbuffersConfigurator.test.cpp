@@ -96,7 +96,15 @@ TEST_CASE("Entity configuration from test data (data-driven)",
     // 2. If expected_entity_collection is present, compare results
     auto result = steamrot::tests::run_fixture_test(config);
     
-    // The test should succeed
-    REQUIRE(result.has_value());
+    // Check if test is expected to pass or fail based on metadata
+    bool expected_to_pass = config->metadata()->expected_to_pass();
+    
+    if (expected_to_pass) {
+      // Positive test - should succeed
+      REQUIRE(result.has_value());
+    } else {
+      // Negative test - should fail (detect mismatch)
+      REQUIRE_FALSE(result.has_value());
+    }
   }
 }
