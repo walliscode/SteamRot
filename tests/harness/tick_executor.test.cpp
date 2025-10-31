@@ -19,7 +19,7 @@ TEST_CASE("determine_num_ticks with explicit num_ticks",
   builder.Finish(config);
 
   const steamrot::TestDataConfig *test_config =
-      steamrot::GetTestDataConfig(builder.GetBufferPointer());
+      flatbuffers::GetRoot<steamrot::TestDataConfig>(builder.GetBufferPointer());
 
   uint32_t num_ticks = steamrot::tests::determine_num_ticks(test_config);
   REQUIRE(num_ticks == 5);
@@ -55,7 +55,7 @@ TEST_CASE("determine_num_ticks auto-detects from input sequence",
   builder.Finish(config);
 
   const steamrot::TestDataConfig *test_config =
-      steamrot::GetTestDataConfig(builder.GetBufferPointer());
+      flatbuffers::GetRoot<steamrot::TestDataConfig>(builder.GetBufferPointer());
 
   // Max tick is 3, so should return 4 (ticks 0,1,2,3)
   uint32_t num_ticks = steamrot::tests::determine_num_ticks(test_config);
@@ -88,7 +88,7 @@ TEST_CASE("determine_num_ticks auto-detects from event sequence",
   builder.Finish(config);
 
   const steamrot::TestDataConfig *test_config =
-      steamrot::GetTestDataConfig(builder.GetBufferPointer());
+      flatbuffers::GetRoot<steamrot::TestDataConfig>(builder.GetBufferPointer());
 
   // Max tick is 2, so should return 3 (ticks 0,1,2)
   uint32_t num_ticks = steamrot::tests::determine_num_ticks(test_config);
@@ -104,7 +104,7 @@ TEST_CASE("determine_num_ticks defaults to 1 when no sequences",
   builder.Finish(config);
 
   const steamrot::TestDataConfig *test_config =
-      steamrot::GetTestDataConfig(builder.GetBufferPointer());
+      flatbuffers::GetRoot<steamrot::TestDataConfig>(builder.GetBufferPointer());
 
   uint32_t num_ticks = steamrot::tests::determine_num_ticks(test_config);
   REQUIRE(num_ticks == 1);
@@ -147,7 +147,7 @@ TEST_CASE("determine_num_ticks ignores simulation_data num_ticks",
   builder.Finish(config);
 
   const steamrot::TestDataConfig *test_config =
-      steamrot::GetTestDataConfig(builder.GetBufferPointer());
+      flatbuffers::GetRoot<steamrot::TestDataConfig>(builder.GetBufferPointer());
 
   uint32_t num_ticks = steamrot::tests::determine_num_ticks(test_config);
   // Should be 1 (default), not 10 from simulation_data
@@ -188,7 +188,7 @@ TEST_CASE("execute_tick_based_test executes multiple ticks",
   builder.Finish(config);
 
   const steamrot::TestDataConfig *test_config =
-      steamrot::GetTestDataConfig(builder.GetBufferPointer());
+      flatbuffers::GetRoot<steamrot::TestDataConfig>(builder.GetBufferPointer());
 
   // Execute the test
   auto result = steamrot::tests::execute_tick_based_test(test_config, fixture);

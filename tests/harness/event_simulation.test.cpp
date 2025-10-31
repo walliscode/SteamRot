@@ -55,7 +55,7 @@ TEST_CASE("execute_event_sequence handles empty sequence",
   builder.Finish(sequence);
 
   const steamrot::EventSequence *event_sequence =
-      steamrot::GetEventSequence(builder.GetBufferPointer());
+      flatbuffers::GetRoot<steamrot::EventSequence>(builder.GetBufferPointer());
 
   auto result =
       steamrot::tests::execute_event_sequence(event_sequence, fixture);
@@ -76,7 +76,7 @@ TEST_CASE("execute_event_test_data adds event to waiting room",
   builder.Finish(event_data);
 
   const steamrot::EventTestData *test_data =
-      steamrot::GetEventTestData(builder.GetBufferPointer());
+      flatbuffers::GetRoot<steamrot::EventTestData>(builder.GetBufferPointer());
 
   // Get initial event bus state
   auto &event_handler = fixture.GetGameResources().event_handler;
@@ -128,7 +128,7 @@ TEST_CASE("execute_events_for_tick processes only specified tick",
   builder.Finish(sequence);
 
   const steamrot::EventSequence *event_sequence =
-      steamrot::GetEventSequence(builder.GetBufferPointer());
+      flatbuffers::GetRoot<steamrot::EventSequence>(builder.GetBufferPointer());
 
   auto &event_handler = fixture.GetGameResources().event_handler;
 
@@ -192,7 +192,7 @@ TEST_CASE("execute_event_sequence processes all ticks in order",
   builder.Finish(sequence);
 
   const steamrot::EventSequence *event_sequence =
-      steamrot::GetEventSequence(builder.GetBufferPointer());
+      flatbuffers::GetRoot<steamrot::EventSequence>(builder.GetBufferPointer());
 
   // Execute entire sequence
   auto result =

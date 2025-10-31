@@ -58,7 +58,7 @@ TEST_CASE("execute_input_sequence handles empty sequence",
   builder.Finish(sequence);
 
   const steamrot::InputSequence *input_sequence =
-      steamrot::GetInputSequence(builder.GetBufferPointer());
+      flatbuffers::GetRoot<steamrot::InputSequence>(builder.GetBufferPointer());
 
   auto result =
       steamrot::tests::execute_input_sequence(input_sequence, fixture);
@@ -81,7 +81,7 @@ TEST_CASE("execute_input_event updates mouse position for MouseMove",
   builder.Finish(input_event);
 
   const steamrot::InputEvent *event =
-      steamrot::GetInputEvent(builder.GetBufferPointer());
+      flatbuffers::GetRoot<steamrot::InputEvent>(builder.GetBufferPointer());
 
   // Execute the event
   auto result = steamrot::tests::execute_input_event(event, fixture);
@@ -125,7 +125,7 @@ TEST_CASE("execute_input_events_for_tick processes only specified tick",
   builder.Finish(sequence);
 
   const steamrot::InputSequence *input_sequence =
-      steamrot::GetInputSequence(builder.GetBufferPointer());
+      flatbuffers::GetRoot<steamrot::InputSequence>(builder.GetBufferPointer());
 
   // Execute only tick 0
   auto result = steamrot::tests::execute_input_events_for_tick(input_sequence,
@@ -164,7 +164,7 @@ TEST_CASE("execute_input_event generates EventPacket for MouseClick",
   builder.Finish(input_event);
 
   const steamrot::InputEvent *event =
-      steamrot::GetInputEvent(builder.GetBufferPointer());
+      flatbuffers::GetRoot<steamrot::InputEvent>(builder.GetBufferPointer());
 
   auto &event_handler = fixture.GetGameResources().event_handler;
 
@@ -211,7 +211,7 @@ TEST_CASE("execute_input_event generates EventPacket for KeyPress",
   builder.Finish(input_event);
 
   const steamrot::InputEvent *event =
-      steamrot::GetInputEvent(builder.GetBufferPointer());
+      flatbuffers::GetRoot<steamrot::InputEvent>(builder.GetBufferPointer());
 
   auto &event_handler = fixture.GetGameResources().event_handler;
 
@@ -252,7 +252,7 @@ TEST_CASE("execute_input_event does not generate EventPacket for MouseMove",
   builder.Finish(input_event);
 
   const steamrot::InputEvent *event =
-      steamrot::GetInputEvent(builder.GetBufferPointer());
+      flatbuffers::GetRoot<steamrot::InputEvent>(builder.GetBufferPointer());
 
   auto &event_handler = fixture.GetGameResources().event_handler;
 
