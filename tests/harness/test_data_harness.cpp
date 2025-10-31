@@ -239,12 +239,27 @@ run_fixture_test(const TestDataConfig *config) {
       }
     }
 
-    // Use overload with metadata if available, otherwise use simple version
-    if (!test_metadata.empty()) {
-      run_entity_memory_pool_comparison_test(actual_pool, expected_pool,
-                                             test_metadata);
+    // Check if test is expected to pass or fail based on metadata
+    bool expected_to_pass = config->metadata()->expected_to_pass();
+
+    if (expected_to_pass) {
+      // Positive test - pools should match
+      if (!test_metadata.empty()) {
+        run_entity_memory_pool_comparison_test(actual_pool, expected_pool,
+                                               test_metadata);
+      } else {
+        run_entity_memory_pool_comparison_test(actual_pool, expected_pool);
+      }
     } else {
-      run_entity_memory_pool_comparison_test(actual_pool, expected_pool);
+      // Negative test - pools should NOT match
+      // Create matcher to check if pools are different
+      if (!test_metadata.empty()) {
+        EqualsEntityMemoryPool matcher(expected_pool, test_metadata);
+        REQUIRE_FALSE(matcher.match(actual_pool));
+      } else {
+        EqualsEntityMemoryPool matcher(expected_pool);
+        REQUIRE_FALSE(matcher.match(actual_pool));
+      }
     }
   }
 
