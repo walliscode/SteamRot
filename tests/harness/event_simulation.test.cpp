@@ -18,7 +18,7 @@ TEST_CASE("execute_event_test_data handles null event data",
 
   auto result = steamrot::tests::execute_event_test_data(nullptr, fixture);
   REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().fail_mode == steamrot::FailMode::NullPointer);
+  REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
 
 TEST_CASE("execute_events_for_tick handles null sequence",
@@ -29,7 +29,7 @@ TEST_CASE("execute_events_for_tick handles null sequence",
 
   auto result = steamrot::tests::execute_events_for_tick(nullptr, 0, fixture);
   REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().fail_mode == steamrot::FailMode::NullPointer);
+  REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
 
 TEST_CASE("execute_event_sequence handles null sequence",
@@ -40,7 +40,7 @@ TEST_CASE("execute_event_sequence handles null sequence",
 
   auto result = steamrot::tests::execute_event_sequence(nullptr, fixture);
   REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().fail_mode == steamrot::FailMode::NullPointer);
+  REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
 
 TEST_CASE("execute_event_sequence handles empty sequence",
@@ -57,7 +57,8 @@ TEST_CASE("execute_event_sequence handles empty sequence",
   const steamrot::EventSequence *event_sequence =
       steamrot::GetEventSequence(builder.GetBufferPointer());
 
-  auto result = steamrot::tests::execute_event_sequence(event_sequence, fixture);
+  auto result =
+      steamrot::tests::execute_event_sequence(event_sequence, fixture);
   REQUIRE(result.has_value());
 }
 
@@ -143,7 +144,8 @@ TEST_CASE("execute_events_for_tick processes only specified tick",
   const auto &bus_after_tick0 = event_handler.GetGlobalEventBus();
   size_t size_after_tick0 = bus_after_tick0.size();
   REQUIRE(size_after_tick0 == 1);
-  REQUIRE(bus_after_tick0.back().m_event_type == steamrot::EventType_EVENT_TEST);
+  REQUIRE(bus_after_tick0.back().m_event_type ==
+          steamrot::EventType_EVENT_TEST);
 
   // Execute tick 1
   result = steamrot::tests::execute_events_for_tick(event_sequence, 1, fixture);
@@ -193,7 +195,8 @@ TEST_CASE("execute_event_sequence processes all ticks in order",
       steamrot::GetEventSequence(builder.GetBufferPointer());
 
   // Execute entire sequence
-  auto result = steamrot::tests::execute_event_sequence(event_sequence, fixture);
+  auto result =
+      steamrot::tests::execute_event_sequence(event_sequence, fixture);
   REQUIRE(result.has_value());
 
   // Process waiting room to move all events to global bus

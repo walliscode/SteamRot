@@ -8,11 +8,8 @@
 /////////////////////////////////////////////////
 #include "event_simulation.h"
 #include "EventPacket.h"
-#include "UserInputBitset.h"
 #include "event_conversion.h"
 #include "uuid.h"
-#include <algorithm>
-#include <format>
 #include <set>
 
 namespace steamrot::tests {
@@ -45,9 +42,9 @@ execute_event_test_data(const EventTestData *event_data, TestFixture &fixture) {
         packet_data->event_data_data_as_UserInputBitsetData();
     if (input_data) {
       // Use the existing conversion function from event_conversion.h
-      auto input_bitset_result = 
+      auto input_bitset_result =
           event::conversion::ConvertFBDataToUserInputBitset(*input_data);
-      
+
       if (!input_bitset_result.has_value()) {
         return std::unexpected(input_bitset_result.error());
       }
@@ -68,7 +65,8 @@ execute_event_test_data(const EventTestData *event_data, TestFixture &fixture) {
           uuid_opt = uuids::uuid::from_string(uuid_str.c_str());
         }
       }
-      SceneChangePacket scene_packet = std::make_pair(uuid_opt, scene_data->scene_type());
+      SceneChangePacket scene_packet =
+          std::make_pair(uuid_opt, scene_data->scene_type());
       event_packet.m_event_data = scene_packet;
     }
   }

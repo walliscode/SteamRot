@@ -11,9 +11,6 @@
 #include "EventPacket.h"
 #include "GameContext.h"
 #include "UserInputBitset.h"
-#include <SFML/Window/Keyboard.hpp>
-#include <SFML/Window/Mouse.hpp>
-#include <algorithm>
 #include <format>
 #include <set>
 
@@ -42,7 +39,7 @@ execute_input_event(const InputEvent *input_event, TestFixture &fixture) {
   case InputType_MouseMove: {
     if (input_event->input_data_type() != InputEventData_MouseInputData) {
       return std::unexpected(
-          FailInfo(FailMode::InvalidEnumValue,
+          FailInfo(FailMode::NonExistentEnumValue,
                    "MouseMove input requires MouseInputData"));
     }
 
@@ -70,9 +67,9 @@ execute_input_event(const InputEvent *input_event, TestFixture &fixture) {
 
   case InputType_MouseClick: {
     if (input_event->input_data_type() != InputEventData_MouseInputData) {
-      return std::unexpected(FailInfo(
-          FailMode::InvalidEnumValue,
-          "MouseClick input requires MouseInputData"));
+      return std::unexpected(
+          FailInfo(FailMode::NonExistentEnumValue,
+                   "MouseClick input requires MouseInputData"));
     }
 
     const MouseInputData *mouse_data =
@@ -102,9 +99,9 @@ execute_input_event(const InputEvent *input_event, TestFixture &fixture) {
 
   case InputType_MouseRelease: {
     if (input_event->input_data_type() != InputEventData_MouseInputData) {
-      return std::unexpected(FailInfo(
-          FailMode::InvalidEnumValue,
-          "MouseRelease input requires MouseInputData"));
+      return std::unexpected(
+          FailInfo(FailMode::NonExistentEnumValue,
+                   "MouseRelease input requires MouseInputData"));
     }
 
     const MouseInputData *mouse_data =
@@ -134,9 +131,9 @@ execute_input_event(const InputEvent *input_event, TestFixture &fixture) {
 
   case InputType_KeyPress: {
     if (input_event->input_data_type() != InputEventData_KeyboardInputData) {
-      return std::unexpected(FailInfo(
-          FailMode::InvalidEnumValue,
-          "KeyPress input requires KeyboardInputData"));
+      return std::unexpected(
+          FailInfo(FailMode::NonExistentEnumValue,
+                   "KeyPress input requires KeyboardInputData"));
     }
 
     const KeyboardInputData *keyboard_data =
@@ -155,9 +152,9 @@ execute_input_event(const InputEvent *input_event, TestFixture &fixture) {
 
   case InputType_KeyRelease: {
     if (input_event->input_data_type() != InputEventData_KeyboardInputData) {
-      return std::unexpected(FailInfo(
-          FailMode::InvalidEnumValue,
-          "KeyRelease input requires KeyboardInputData"));
+      return std::unexpected(
+          FailInfo(FailMode::NonExistentEnumValue,
+                   "KeyRelease input requires KeyboardInputData"));
     }
 
     const KeyboardInputData *keyboard_data =
@@ -175,10 +172,10 @@ execute_input_event(const InputEvent *input_event, TestFixture &fixture) {
   }
 
   default:
-    return std::unexpected(FailInfo(
-        FailMode::InvalidEnumValue,
-        std::format("Unknown InputType: {}",
-                    static_cast<int>(input_event->input_type()))));
+    return std::unexpected(
+        FailInfo(FailMode::NonExistentEnumValue,
+                 std::format("Unknown InputType: {}",
+                             static_cast<int>(input_event->input_type()))));
   }
 
   // If we should create an event, create EventPacket and add to EventHandler
@@ -196,7 +193,7 @@ execute_input_event(const InputEvent *input_event, TestFixture &fixture) {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 execute_input_events_for_tick(const InputSequence *input_sequence,
-                               uint32_t tick, TestFixture &fixture) {
+                              uint32_t tick, TestFixture &fixture) {
 
   // Validate input sequence
   if (!input_sequence) {

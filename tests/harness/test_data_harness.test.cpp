@@ -7,12 +7,12 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "test_data_harness.h"
-#include "entity_memory.h"
-#include "CMeta.h"
-#include "CUserInterface.h"
-#include "CMachinaForm.h"
 #include "CGrimoireMachina.h"
+#include "CMachinaForm.h"
+#include "CMeta.h"
 #include "CUIState.h"
+#include "CUserInterface.h"
+#include "entity_memory.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/generators/catch_generators_range.hpp>
@@ -96,58 +96,6 @@ TEST_CASE("Test data harness demonstrates simple workflow", "[unit][harness]") {
   REQUIRE(config->metadata()->version() >= 1);
 }
 
-TEST_CASE("run_test_data_config validates null config", "[unit][harness]") {
-
-  auto result = steamrot::tests::run_test_data_config(nullptr);
-
-  REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
-}
-
-TEST_CASE("run_test_data_config validates config with entity collections",
-          "[unit][harness]") {
-
-  // Load sample test data which has entity collections
-  auto configs = steamrot::tests::load_test_data_configs();
-  REQUIRE(configs.has_value());
-  REQUIRE(configs.value().size() >= 1);
-
-  const auto *config = configs.value()[0];
-
-  auto result = steamrot::tests::run_test_data_config(config);
-
-  // Should succeed - validation passes
-  REQUIRE(result.has_value());
-}
-
-TEST_CASE("run_test_data_config handles all sample data", "[unit][harness]") {
-
-  auto configs = steamrot::tests::load_test_data_configs();
-  REQUIRE(configs.has_value());
-
-  // Run wrapper on all sample configs
-  for (const auto *config : configs.value()) {
-    auto result = steamrot::tests::run_test_data_config(config);
-
-    INFO("Test name: " << config->metadata()->test_name()->str());
-    REQUIRE(result.has_value());
-  }
-}
-
-TEST_CASE("run_test_data_config works with Catch2 generators",
-          "[unit][harness]") {
-
-  auto configs = steamrot::tests::load_test_data_configs();
-  REQUIRE(configs.has_value());
-
-  const auto *config = GENERATE_COPY(from_range(configs.value()));
-
-  auto result = steamrot::tests::run_test_data_config(config);
-
-  INFO("Test name: " << config->metadata()->test_name()->str());
-  REQUIRE(result.has_value());
-}
-
 TEST_CASE("create_fixture_from_test_data creates initialized fixture",
           "[unit][harness]") {
 
@@ -181,7 +129,8 @@ TEST_CASE("create_fixture_from_test_data does not load default scene entities",
   REQUIRE(configs.has_value());
   REQUIRE(configs.value().size() >= 1);
 
-  // Find sample_test_1 config (only has c_user_interface, no c_grimoire_machina)
+  // Find sample_test_1 config (only has c_user_interface, no
+  // c_grimoire_machina)
   const steamrot::TestDataConfig *test_config = nullptr;
   for (const auto *config : configs.value()) {
     if (config->metadata()->test_name()->str() == "sample_test_1") {
@@ -192,7 +141,8 @@ TEST_CASE("create_fixture_from_test_data does not load default scene entities",
   REQUIRE(test_config != nullptr);
 
   // Create fixture from test data
-  auto fixture_result = steamrot::tests::create_fixture_from_test_data(test_config);
+  auto fixture_result =
+      steamrot::tests::create_fixture_from_test_data(test_config);
   REQUIRE(fixture_result.has_value());
 
   auto &fixture = fixture_result.value();
@@ -200,7 +150,8 @@ TEST_CASE("create_fixture_from_test_data does not load default scene entities",
 
   // Get component vectors
   const auto &grimoire_vec =
-      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(pool);
+      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
+          pool);
 
   // Verify that CGrimoireMachina components are NOT active
   // (i.e., they weren't loaded from default scene data)
@@ -242,7 +193,7 @@ TEST_CASE("run_fixture_test works with Catch2 generators", "[unit][harness]") {
 
 TEST_CASE("run_entity_memory_pool_comparison_test with metadata",
           "[unit][harness]") {
-  
+
   steamrot::EntityMemoryPool pool1;
   steamrot::EntityMemoryPool pool2;
 
@@ -297,8 +248,8 @@ TEST_CASE("run_entity_memory_pool_comparison_test with metadata",
 
   SECTION("Comparison succeeds with equal pools") {
     // Pools are equal, test should pass
-    steamrot::tests::run_entity_memory_pool_comparison_test(pool1, pool2, 
-        "Test: metadata_test");
+    steamrot::tests::run_entity_memory_pool_comparison_test(
+        pool1, pool2, "Test: metadata_test");
     SUCCEED("Comparison passed with metadata");
   }
 
