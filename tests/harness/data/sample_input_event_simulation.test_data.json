@@ -46,29 +46,20 @@
     ]
   },
   "simulation_data": {
-    "description": "Process UI collision and actions per tick",
+    "description": "Process UI collision and actions on every tick",
     "num_ticks": 3,
     "steps": [
       {
         "simulation_type": "Collision",
         "execution_mode": "LogicClass",
         "logic_class_type": "UICollisionLogic",
-        "tick": 0,
-        "description": "Detect mouse collision with button at tick 0"
-      },
-      {
-        "simulation_type": "Collision",
-        "execution_mode": "LogicClass",
-        "logic_class_type": "UICollisionLogic",
-        "tick": 1,
-        "description": "Detect mouse collision with button at tick 1"
+        "description": "Detect mouse collision with button"
       },
       {
         "simulation_type": "Action",
         "execution_mode": "Function",
         "function_type": "ProcessButtonElementActions",
-        "tick": 2,
-        "description": "Process button click action at tick 2"
+        "description": "Process button click actions"
       }
     ]
   },

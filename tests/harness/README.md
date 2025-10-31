@@ -544,8 +544,10 @@ When `run_fixture_test()` is called, the test executes in ticks. For each tick (
 1. **Execute inputs** scheduled for this tick (e.g., mouse movement, key presses)
 2. **Execute events** scheduled for this tick (added to event handler)
 3. **Process event waiting room** (move events to global event bus)
-4. **Execute simulation steps** scheduled for this tick (Logic classes or functions)
+4. **Execute ALL simulation steps** (Logic classes or functions run on every tick)
 5. **Tick the global event bus** (decrement event lifetimes, remove expired events)
+
+**Note:** Simulation steps are configured once and execute on every tick. You cannot schedule simulation steps for specific ticks - the simulation configuration defines what runs throughout the entire test.
 
 ### Specifying Number of Ticks
 
@@ -563,7 +565,7 @@ You can control how many ticks the test runs for:
 ```
 
 **Option 2: Auto-detection** (omit `num_ticks`):
-The harness automatically determines the number of ticks by finding the maximum tick value across all inputs, events, and simulation steps, then adds 1.
+The harness automatically determines the number of ticks by finding the maximum tick value across all inputs and events, then adds 1.
 
 **Option 3: Per-simulation `num_ticks`**:
 ```json
@@ -617,22 +619,13 @@ The harness automatically determines the number of ticks by finding the maximum 
         "simulation_type": "Collision",
         "execution_mode": "LogicClass",
         "logic_class_type": "UICollisionLogic",
-        "tick": 0,
-        "description": "Check collision at tick 0"
-      },
-      {
-        "simulation_type": "Collision",
-        "execution_mode": "LogicClass",
-        "logic_class_type": "UICollisionLogic",
-        "tick": 1,
-        "description": "Check collision at tick 1"
+        "description": "Check collision (runs every tick)"
       },
       {
         "simulation_type": "Action",
         "execution_mode": "Function",
         "function_type": "ProcessButtonElementActions",
-        "tick": 2,
-        "description": "Process button actions at tick 2"
+        "description": "Process button actions (runs every tick)"
       }
     ]
   }
@@ -647,17 +640,19 @@ For the example above, the execution timeline is:
 - Input: MouseMove to (150, 125)
 - Event: Add EVENT_TEST with lifetime 3
 - Process waiting room → EVENT_TEST moves to global bus
-- Simulation: UICollisionLogic executes
+- Simulation: UICollisionLogic executes, then ProcessButtonElementActions executes
 - Tick event bus → EVENT_TEST lifetime = 2
 
 **Tick 1:**
 - Input: MouseClick at (150, 125)
-- Simulation: UICollisionLogic executes
+- Simulation: UICollisionLogic executes, then ProcessButtonElementActions executes
 - Tick event bus → EVENT_TEST lifetime = 1
 
 **Tick 2:**
-- Simulation: ProcessButtonElementActions executes
+- Simulation: UICollisionLogic executes, then ProcessButtonElementActions executes
 - Tick event bus → EVENT_TEST lifetime = 0, removed
+
+**Note:** The simulation steps (UICollisionLogic and ProcessButtonElementActions) run on every tick. The simulation configuration is set once and does not change during the test.
 
 ### Benefits
 

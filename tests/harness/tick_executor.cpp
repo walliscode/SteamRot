@@ -44,21 +44,10 @@ uint32_t determine_num_ticks(const TestDataConfig *config) {
     }
   }
 
-  // Check simulation data
-  if (config->simulation_data()) {
-    // Check num_ticks field in simulation_data
-    if (config->simulation_data()->num_ticks() > 0) {
-      max_tick = std::max(max_tick, config->simulation_data()->num_ticks() - 1);
-    }
-
-    // Check individual simulation steps
-    if (config->simulation_data()->steps()) {
-      for (const SimulationStep *step : *config->simulation_data()->steps()) {
-        if (step) {
-          max_tick = std::max(max_tick, step->tick());
-        }
-      }
-    }
+  // Check simulation data num_ticks field
+  if (config->simulation_data() &&
+      config->simulation_data()->num_ticks() > 0) {
+    max_tick = std::max(max_tick, config->simulation_data()->num_ticks() - 1);
   }
 
   // Return max_tick + 1 (since ticks are 0-based), with minimum of 1
@@ -91,10 +80,10 @@ execute_single_tick(uint32_t tick, const TestDataConfig *config,
     fixture.GetGameResources().event_handler.ProcessWaitingRoomEventBus();
   }
 
-  // 4. Execute simulation steps scheduled for this tick
+  // 4. Execute simulation steps (all steps execute on every tick)
   if (config->simulation_data() && config->simulation_data()->steps()) {
     for (const SimulationStep *step : *config->simulation_data()->steps()) {
-      if (step && step->tick() == tick) {
+      if (step) {
         auto sim_result =
             execute_simulation_step(step, fixture.GetSceneContext());
         if (!sim_result.has_value()) {

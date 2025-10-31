@@ -75,29 +75,20 @@
     ]
   },
   "simulation_data": {
-    "description": "Simulation steps distributed across ticks",
+    "description": "Simulation steps executed on every tick",
     "num_ticks": 5,
     "steps": [
       {
         "simulation_type": "Collision",
         "execution_mode": "LogicClass",
         "logic_class_type": "UICollisionLogic",
-        "tick": 1,
-        "description": "Collision check at tick 1"
-      },
-      {
-        "simulation_type": "Collision",
-        "execution_mode": "LogicClass",
-        "logic_class_type": "UICollisionLogic",
-        "tick": 3,
-        "description": "Collision check at tick 3"
+        "description": "Collision check (runs every tick)"
       },
       {
         "simulation_type": "Action",
         "execution_mode": "Function",
         "function_type": "ProcessButtonElementActions",
-        "tick": 4,
-        "description": "Process actions at tick 4"
+        "description": "Process actions (runs every tick)"
       }
     ]
   },
