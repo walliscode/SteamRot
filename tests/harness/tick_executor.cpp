@@ -15,17 +15,25 @@ namespace steamrot::tests {
 
 /////////////////////////////////////////////////
 uint32_t determine_num_ticks(const TestDataConfig *config) {
-  // If num_ticks is explicitly specified, use it
+  // Only use TestDataConfig level num_ticks field
+  // Do NOT auto-detect from input_sequence, event_sequence, or simulation_data
   if (config->num_ticks() > 0) {
-    return config->num_ticks() + 1;
-  } else
-    return 1;
+    return config->num_ticks();
+  }
+  // Default to 1 tick if not specified
+  return 1;
 }
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 execute_single_tick(uint32_t tick, const TestDataConfig *config,
                     TestFixture &fixture) {
+
+  // Handles null config
+  if (!config) {
+    return std::unexpected(
+        FailInfo(FailMode::NullPointer, "TestDataConfig is null"));
+  }
 
   // 1. Execute inputs scheduled for this tick
   if (config->input_sequence()) {

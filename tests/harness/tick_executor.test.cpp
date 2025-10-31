@@ -10,11 +10,11 @@
 #include "TestFixture.h"
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("determine_num_ticks auto-detects from input sequence",
+TEST_CASE("determine_num_ticks uses explicit num_ticks from TestDataConfig",
           "[unit][harness][tick_executor]") {
   flatbuffers::FlatBufferBuilder builder;
 
-  // Create inputs with max tick = 3
+  // Create inputs with tick = 3, but set explicit num_ticks = 5
   auto pos0 = steamrot::CreateVector2fData(builder, 100.0f, 100.0f);
   auto mouse0 = steamrot::CreateMouseInputData(builder, pos0, 0);
   auto event0 = steamrot::CreateInputEvent(
@@ -36,20 +36,21 @@ TEST_CASE("determine_num_ticks auto-detects from input sequence",
 
   auto metadata =
       steamrot::CreateTestMetadata(builder, builder.CreateString("test"));
+  // Explicitly set num_ticks = 5 (last parameter)
   auto config = steamrot::CreateTestDataConfig(builder, metadata, 0, 0, 0, 0, 0,
-                                               input_seq);
+                                               input_seq, 0, 5);
   builder.Finish(config);
 
   const steamrot::TestDataConfig *test_config =
       flatbuffers::GetRoot<steamrot::TestDataConfig>(
           builder.GetBufferPointer());
 
-  // Max tick is 3, so should return 4 (ticks 0,1,2,3)
+  // Should return exactly 5, not based on input_sequence max tick
   uint32_t num_ticks = steamrot::tests::determine_num_ticks(test_config);
-  REQUIRE(num_ticks == 4);
+  REQUIRE(num_ticks == 5);
 }
 
-TEST_CASE("determine_num_ticks auto-detects from event sequence",
+TEST_CASE("determine_num_ticks ignores event_sequence max tick",
           "[unit][harness][tick_executor]") {
   flatbuffers::FlatBufferBuilder builder;
 
@@ -71,6 +72,7 @@ TEST_CASE("determine_num_ticks auto-detects from event sequence",
 
   auto metadata =
       steamrot::CreateTestMetadata(builder, builder.CreateString("test"));
+  // No explicit num_ticks set, should default to 1 despite event_sequence
   auto config = steamrot::CreateTestDataConfig(builder, metadata, 0, 0, 0, 0, 0,
                                                0, event_seq);
   builder.Finish(config);
@@ -79,17 +81,18 @@ TEST_CASE("determine_num_ticks auto-detects from event sequence",
       flatbuffers::GetRoot<steamrot::TestDataConfig>(
           builder.GetBufferPointer());
 
-  // Max tick is 2, so should return 3 (ticks 0,1,2)
+  // Should be 1 (default), not based on event_sequence max tick
   uint32_t num_ticks = steamrot::tests::determine_num_ticks(test_config);
-  REQUIRE(num_ticks == 3);
+  REQUIRE(num_ticks == 1);
 }
 
-TEST_CASE("determine_num_ticks defaults to 1 when no sequences",
+TEST_CASE("determine_num_ticks defaults to 1 when num_ticks not specified",
           "[unit][harness][tick_executor]") {
   flatbuffers::FlatBufferBuilder builder;
 
   auto metadata =
       steamrot::CreateTestMetadata(builder, builder.CreateString("test"));
+  // No num_ticks specified, should default to 1
   auto config = steamrot::CreateTestDataConfig(builder, metadata);
   builder.Finish(config);
 
@@ -148,7 +151,7 @@ TEST_CASE("determine_num_ticks ignores simulation_data num_ticks",
   REQUIRE(num_ticks == 1);
 }
 
-TEST_CASE("execute_tick_based_test executes multiple ticks",
+TEST_CASE("execute_tick_based_test executes specified num_ticks",
           "[unit][harness][tick_executor]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestFixture fixture;
@@ -178,8 +181,9 @@ TEST_CASE("execute_tick_based_test executes multiple ticks",
 
   auto metadata =
       steamrot::CreateTestMetadata(builder, builder.CreateString("test"));
+  // Explicitly set num_ticks = 2 to execute both input events
   auto config = steamrot::CreateTestDataConfig(builder, metadata, 0, 0, 0, 0, 0,
-                                               input_seq);
+                                               input_seq, 0, 2);
   builder.Finish(config);
 
   const steamrot::TestDataConfig *test_config =
