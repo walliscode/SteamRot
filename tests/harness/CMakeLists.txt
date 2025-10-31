@@ -26,6 +26,8 @@ target_link_libraries(test_harness
 add_executable(test_harness_tests
   test_data_harness.test.cpp
   simulation_runner.test.cpp
+  input_simulation.test.cpp
+  event_simulation.test.cpp
 )
 
 target_link_libraries(test_harness_tests
