@@ -2,6 +2,8 @@ add_library(test_harness
   test_data_harness.cpp
   TestFixture.cpp
   simulation_runner.cpp
+  input_simulation.cpp
+  event_simulation.cpp
 )
 
 target_include_directories(test_harness

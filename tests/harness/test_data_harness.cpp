@@ -10,6 +10,8 @@
 #include "FlatbuffersConfigurator.h"
 #include "PathProvider.h"
 #include "entity_memory_pool_matchers.h"
+#include "event_simulation.h"
+#include "input_simulation.h"
 #include "simulation_runner.h"
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
@@ -244,6 +246,25 @@ run_fixture_test(const TestDataConfig *config) {
   }
 
   TestFixture &fixture = fixture_result.value();
+
+  // If input_sequence is provided, execute it before simulation
+  if (config->input_sequence()) {
+    auto input_result = execute_input_sequence(config->input_sequence(), fixture);
+    if (!input_result.has_value()) {
+      return std::unexpected(input_result.error());
+    }
+  }
+
+  // If event_sequence is provided, execute it before simulation
+  if (config->event_sequence()) {
+    auto event_result = execute_event_sequence(config->event_sequence(), fixture);
+    if (!event_result.has_value()) {
+      return std::unexpected(event_result.error());
+    }
+    
+    // Process waiting room events into global event bus
+    fixture.GetGameResources().event_handler.ProcessWaitingRoomEventBus();
+  }
 
   // If simulation_data is provided, execute the simulation
   if (config->simulation_data()) {
