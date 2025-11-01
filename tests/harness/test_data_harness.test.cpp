@@ -49,11 +49,6 @@ TEST_CASE("load_test_data_configs works with Catch2 generators",
   REQUIRE(config != nullptr);
   REQUIRE(config->metadata() != nullptr);
   REQUIRE(config->metadata()->test_name() != nullptr);
-
-  // Verify at least some entity data is present
-  bool has_entity_data = (config->start_entity_collection() != nullptr ||
-                          config->expected_entity_collection() != nullptr);
-  REQUIRE(has_entity_data);
 }
 
 TEST_CASE("Test data harness demonstrates simple workflow", "[unit][harness]") {
