@@ -23,20 +23,32 @@
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
-/// @brief Load all test data configurations from an adjacent data directory
+/// @brief Load test data configurations from an adjacent data directory
 ///
-/// This is the primary function for loading test data. It automatically:
+/// Internal function that takes the calling source file path to determine
+/// the adjacent data directory. Use the LOAD_TEST_DATA_CONFIGS() macro instead.
+///
+/// @param source_file_path Path to the calling source file (__FILE__)
+/// @return Vector of TestDataConfig pointers or FailInfo on error
+/////////////////////////////////////////////////
+std::expected<std::vector<const TestDataConfig *>, FailInfo>
+load_test_data_configs_impl(const char *source_file_path);
+
+/////////////////////////////////////////////////
+/// @brief Macro to load test data from adjacent data directory
+///
+/// This macro uses __FILE__ from the call site to determine the adjacent
+/// data/ directory. It automatically:
 /// - Discovers all .test_data.bin files in the adjacent data/ directory
 /// - Loads them as TestDataConfig objects
 /// - Returns a vector suitable for use with Catch2 generators
 ///
-/// The adjacent data/ directory is determined using the __FILE__ macro.
-/// An error is returned if the adjacent data/ directory does not exist.
+/// The adjacent data/ directory is determined relative to where this macro
+/// is invoked. An error is returned if the adjacent data/ directory does not exist.
 ///
 /// @return Vector of TestDataConfig pointers or FailInfo on error
 /////////////////////////////////////////////////
-std::expected<std::vector<const TestDataConfig *>, FailInfo>
-load_test_data_configs();
+#define load_test_data_configs() load_test_data_configs_impl(__FILE__)
 
 /////////////////////////////////////////////////
 /// @brief Load test data configurations from a specific subdirectory

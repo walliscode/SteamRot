@@ -34,12 +34,12 @@ static char *load_binary_data(const std::filesystem::path &file_path) {
 }
 
 /////////////////////////////////////////////////
-/// @brief Helper to get adjacent data directory using __FILE__
+/// @brief Helper to get adjacent data directory from source file path
 /////////////////////////////////////////////////
 static std::expected<std::filesystem::path, FailInfo>
-get_adjacent_data_directory() {
-  std::filesystem::path source_file_path = __FILE__;
-  std::filesystem::path source_dir = source_file_path.parent_path();
+get_adjacent_data_directory(const char *source_file_path) {
+  std::filesystem::path source_path = source_file_path;
+  std::filesystem::path source_dir = source_path.parent_path();
   std::filesystem::path data_dir = source_dir / "data";
 
   if (!std::filesystem::exists(data_dir)) {
@@ -106,10 +106,10 @@ discover_and_load_from_directory(const std::filesystem::path &data_dir) {
 
 /////////////////////////////////////////////////
 std::expected<std::vector<const TestDataConfig *>, FailInfo>
-load_test_data_configs() {
+load_test_data_configs_impl(const char *source_file_path) {
 
-  // Get the adjacent data directory
-  auto data_dir_result = get_adjacent_data_directory();
+  // Get the adjacent data directory using the provided source file path
+  auto data_dir_result = get_adjacent_data_directory(source_file_path);
   if (!data_dir_result.has_value()) {
     return std::unexpected(data_dir_result.error());
   }
