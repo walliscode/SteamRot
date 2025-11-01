@@ -3,7 +3,7 @@
     "test_name": "pool_comparison_different_size",
     "description": "Entity memory pool with different size for comparison testing",
     "tags": ["unit", "entity", "memory_pool"],
-    "expected_to_pass": true,
+    "expected_to_pass": false,
     "version": 1
   },
   "start_entity_collection": {

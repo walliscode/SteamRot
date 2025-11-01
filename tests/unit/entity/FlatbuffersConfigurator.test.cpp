@@ -13,63 +13,58 @@
 #include "entity_memory_pool_matchers.h"
 #include "containers.h"
 #include "scene_change_packet_generated.h"
+#include "test_data_harness.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
+#include <catch2/generators/catch_generators_range.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
+#include <algorithm>
+#include <vector>
+#include <string>
 
 TEST_CASE("Data is configured correctly from default data",
           "[unit][FlatbuffersConfigurator]") {
 
   steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  // Set up EntityMemoryPool objects here so they outlive GENERATE
-  size_t pool_size{100};
-  steamrot::EntityMemoryPool entity_memory_pool_one;
-  std::apply(
-      [pool_size](auto &...component_vector) {
-        (component_vector.resize(pool_size), ...);
-      },
-      entity_memory_pool_one);
-
-  /////////////////////////////////////////////////
-  /// Default value testing
-  /////////////////////////////////////////////////
-
-  // Check that the pool is default constructed by comparing to a new pool
-  steamrot::EntityMemoryPool expected_default_pool;
-  std::apply(
-      [pool_size](auto &...component_vector) {
-        (component_vector.resize(pool_size), ...);
-      },
-      expected_default_pool);
-  REQUIRE_THAT(entity_memory_pool_one,
-               steamrot::tests::EqualsEntityMemoryPool(expected_default_pool));
-
-  // create TextContext object
-  steamrot::tests::TestFixture text_context;
-  // Create configurator with test environment
-  steamrot::FlatbuffersConfigurator configurator{
-      text_context.GetGameContext().event_handler};
-
-  auto result = configurator.ConfigureEntitiesFromDefaultData(
-      entity_memory_pool_one, steamrot::SceneType::SceneType_TEST);
-  REQUIRE(result.has_value() == true);
   
-  /////////////////////////////////////////////////
-  /// Post configuration testing
-  /////////////////////////////////////////////////
-
-  // Create expected pool configured with the same data
-  steamrot::EntityMemoryPool expected_configured_pool;
-  std::apply(
-      [pool_size](auto &...component_vector) {
-        (component_vector.resize(pool_size), ...);
-      },
-      expected_configured_pool);
-  auto expected_result = configurator.ConfigureEntitiesFromDefaultData(
-      expected_configured_pool, steamrot::SceneType::SceneType_TEST);
-  REQUIRE(expected_result.has_value() == true);
-
-  // Compare the pools using matcher
-  REQUIRE_THAT(entity_memory_pool_one,
-               steamrot::tests::EqualsEntityMemoryPool(expected_configured_pool));
+  // Load test data configs from adjacent data directory
+  auto configs_result = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs_result.has_value());
+  
+  const auto &configs = configs_result.value();
+  
+  // Define expected test data names to ensure all tests are run
+  std::vector<std::string> expected_test_names = {
+    "configurator_basic",
+    "pool_comparison_equal",
+    "pool_comparison_different_size",
+    "pool_comparison_different_values"
+  };
+  
+  // Collect actual test names from loaded configs
+  std::vector<std::string> actual_test_names;
+  for (const auto *config : configs) {
+    if (config->metadata() && config->metadata()->test_name()) {
+      actual_test_names.push_back(config->metadata()->test_name()->str());
+    }
+  }
+  
+  // Verify all expected tests are present
+  for (const auto &expected_name : expected_test_names) {
+    INFO("Checking for test: " << expected_name);
+    REQUIRE(std::find(actual_test_names.begin(), actual_test_names.end(), 
+                     expected_name) != actual_test_names.end());
+  }
+  
+  // Use Catch2 generator to run test for each config
+  const auto *config = GENERATE_COPY(from_range(configs));
+  
+  REQUIRE(config != nullptr);
+  REQUIRE(config->metadata() != nullptr);
+  
+  INFO("Running test: " << config->metadata()->test_name()->str());
+  
+  // Run standard fixture test for all configs
+  auto result = steamrot::tests::run_fixture_test(config);
+  REQUIRE(result.has_value());
 }
