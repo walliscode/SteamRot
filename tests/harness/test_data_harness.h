@@ -51,19 +51,6 @@ load_test_data_configs_impl(const char *source_file_path);
 #define load_test_data_configs() load_test_data_configs_impl(__FILE__)
 
 /////////////////////////////////////////////////
-/// @brief Load test data configurations from a specific subdirectory
-///
-/// Loads test data from tests/<subdirectory>/data/ directory.
-/// This is useful when you need to load test data from a specific test
-/// directory.
-///
-/// @param subdirectory Test subdirectory name (e.g., "entity", "components")
-/// @return Vector of TestDataConfig pointers or FailInfo on error
-/////////////////////////////////////////////////
-std::expected<std::vector<const TestDataConfig *>, FailInfo>
-load_test_data_configs(const std::string &subdirectory);
-
-/////////////////////////////////////////////////
 /// @brief Wrapper function to run EMP comparison tests
 ///
 /// This function compares two EntityMemoryPool instances using the

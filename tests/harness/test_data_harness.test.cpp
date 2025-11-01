@@ -56,23 +56,6 @@ TEST_CASE("load_test_data_configs works with Catch2 generators",
   REQUIRE(has_entity_data);
 }
 
-TEST_CASE("load_test_data_configs with subdirectory parameter",
-          "[unit][harness]") {
-
-  SECTION("Valid subdirectory returns results") {
-    auto result = steamrot::tests::load_test_data_configs("harness");
-    REQUIRE(result.has_value());
-    REQUIRE(result.value().size() >= 3);
-  }
-
-  SECTION("Non-existent subdirectory returns error") {
-    auto result =
-        steamrot::tests::load_test_data_configs("non_existent_subdir_xyz");
-    REQUIRE_FALSE(result.has_value());
-    REQUIRE(result.error().mode == steamrot::FailMode::FileNotFound);
-  }
-}
-
 TEST_CASE("Test data harness demonstrates simple workflow", "[unit][harness]") {
 
   // Simple one-line call to load all test data

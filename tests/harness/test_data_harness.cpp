@@ -117,37 +117,7 @@ load_test_data_configs_impl(const char *source_file_path) {
   return discover_and_load_from_directory(data_dir_result.value());
 }
 
-/////////////////////////////////////////////////
-std::expected<std::vector<const TestDataConfig *>, FailInfo>
-load_test_data_configs(const std::string &subdirectory) {
 
-  // Use PathProvider to get the base tests directory
-  PathProvider path_provider(EnvironmentType::Test);
-  auto data_dir_result = path_provider.GetDataDirectory();
-  if (!data_dir_result.has_value()) {
-    return std::unexpected(data_dir_result.error());
-  }
-
-  // Base path is tests/
-  std::filesystem::path tests_path = data_dir_result.value().parent_path();
-
-  // Construct path to subdirectory data
-  std::filesystem::path target_dir;
-  if (!subdirectory.empty()) {
-    target_dir = tests_path / subdirectory / "data";
-  } else {
-    target_dir = data_dir_result.value();
-  }
-
-  // Check if directory exists
-  if (!std::filesystem::exists(target_dir)) {
-    std::string error_message =
-        std::format("Test data directory not found: {}", target_dir.string());
-    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
-  }
-
-  return discover_and_load_from_directory(target_dir);
-}
 
 /////////////////////////////////////////////////
 void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
