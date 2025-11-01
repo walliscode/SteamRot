@@ -2,28 +2,39 @@
 
 ## Overview
 
-This document provides a phased adoption plan for migrating existing tests to the new data-driven test harness system and identifying areas where new data-driven tests should be created. The plan progresses from simple cases to complex scenarios, prioritizing high-value use cases and identifying necessary harness extensions.
+This document provides a phased adoption plan for migrating existing tests to
+the new data-driven test harness system and identifying areas where new
+data-driven tests should be created. The plan progresses from simple cases to
+complex scenarios, prioritizing high-value use cases and identifying necessary
+harness extensions.
 
 ## Current Test Harness Capabilities
 
 The test harness system (`tests/harness/`) currently supports:
 
-1. **Test Data Configuration**: Loading test data from JSON files via FlatBuffers
+1. **Test Data Configuration**: Loading test data from JSON files via
+   FlatBuffers
 2. **Entity Pool Comparisons**: Comparing start and expected entity memory pools
-3. **TestFixture Integration**: Automatic creation of test fixtures with game/scene resources
+3. **TestFixture Integration**: Automatic creation of test fixtures with
+   game/scene resources
 4. **Simulations**: Executing sequences of Logic classes and free functions
 5. **Metadata Support**: Test name, description, tags, expected outcomes
 6. **Catch2 Integration**: Works with generators for parameterized testing
 
 ### Current Simulation Support
 
-- **Logic Classes**: UIActionLogic, UICollisionLogic, UIRenderLogic, UIStateLogic, CraftingRenderLogic
-- **Free Functions**: ProcessUIActionsAndEvents, ProcessNestedUIActionsAndEvents, ProcessButtonElementActions, ProcessDropDownListElementActions
+- **Logic Classes**: UIActionLogic, UICollisionLogic, UIRenderLogic,
+  UIStateLogic, CraftingRenderLogic
+- **Free Functions**: ProcessUIActionsAndEvents,
+  ProcessNestedUIActionsAndEvents, ProcessButtonElementActions,
+  ProcessDropDownListElementActions
 - **System Types**: Action, Movement, Render, Collision
 
 ## Phase 1: Critical Harness Extensions (HIGH PRIORITY)
 
-These extensions must be implemented first to make the test harness fully capable for comprehensive testing. Prioritizing these ensures the harness has all necessary features before widespread adoption.
+These extensions must be implemented first to make the test harness fully
+capable for comprehensive testing. Prioritizing these ensures the harness has
+all necessary features before widespread adoption.
 
 ### 1.1 Event Sequence Testing (HIGH PRIORITY EXTENSION)
 
@@ -34,11 +45,13 @@ These extensions must be implemented first to make the test harness fully capabl
 **Needed Extension**: Event sequence data in test_data.fbs
 
 **Benefits**:
+
 - Test event-driven workflows
 - Validate event handler behavior
 - Test event subscriptions and responses
 
 **Proposed Schema Addition** (`src/flatbuffers_headers/event_test_data.fbs`):
+
 ```fbs
 namespace steamrot;
 
@@ -55,6 +68,7 @@ table EventSequence {
 ```
 
 **Update test_data.fbs**:
+
 ```fbs
 table TestDataConfig {
   metadata: TestMetadata (required);
@@ -67,7 +81,9 @@ table TestDataConfig {
 }
 ```
 
-**Example Test Data** (`tests/unit/events/data/button_click_event.test_data.json`):
+**Example Test Data**
+(`tests/unit/events/data/button_click_event.test_data.json`):
+
 ```json
 {
   "metadata": {
@@ -112,6 +128,7 @@ table TestDataConfig {
 ```
 
 **Implementation Additions Needed**:
+
 1. Add `event_test_data.fbs` schema
 2. Update `test_data.fbs` with `event_sequence` field
 3. Add event validation functions to harness
@@ -127,11 +144,13 @@ table TestDataConfig {
 **Needed Extension**: Input event data in test_data.fbs
 
 **Benefits**:
+
 - Test input handling logic
 - Validate input-driven behaviors
 - Test UI interactions realistically
 
 **Proposed Schema Addition** (`src/flatbuffers_headers/input_test_data.fbs`):
+
 ```fbs
 namespace steamrot;
 
@@ -174,6 +193,7 @@ table InputSequence {
 ```
 
 **Update test_data.fbs**:
+
 ```fbs
 table TestDataConfig {
   metadata: TestMetadata (required);
@@ -187,7 +207,9 @@ table TestDataConfig {
 }
 ```
 
-**Example Test Data** (`tests/unit/logic/data/button_click_with_input.test_data.json`):
+**Example Test Data**
+(`tests/unit/logic/data/button_click_with_input.test_data.json`):
+
 ```json
 {
   "metadata": {
@@ -266,6 +288,7 @@ table TestDataConfig {
 ```
 
 **Implementation Additions Needed**:
+
 1. Add `input_test_data.fbs` schema
 2. Update `test_data.fbs` with `input_sequence` field
 3. Add input injection mechanism to TestFixture
@@ -276,7 +299,8 @@ table TestDataConfig {
 
 ## Phase 2: Simple Use Cases (Low Complexity, High Value)
 
-These are foundational use cases that leverage the newly extended harness. With Phase 1 extensions complete, these tests can be adopted immediately.
+These are foundational use cases that leverage the newly extended harness. With
+Phase 1 extensions complete, these tests can be adopted immediately.
 
 ### 2.1 Entity Pool Comparison Tests
 
@@ -284,14 +308,18 @@ These are foundational use cases that leverage the newly extended harness. With 
 
 **Current State**: Tests manually create and compare entity pools
 
-**Migration Target**: Use `start_entity_collection` and `expected_entity_collection`
+**Migration Target**: Use `start_entity_collection` and
+`expected_entity_collection`
 
 **Benefits**:
+
 - Clearer test intent
 - Easier to maintain test data
 - Automatic pool comparison with detailed error messages
 
-**Example Test Data** (`tests/unit/entity/data/configurator_basic.test_data.json`):
+**Example Test Data**
+(`tests/unit/entity/data/configurator_basic.test_data.json`):
+
 ```json
 {
   "metadata": {
@@ -324,18 +352,20 @@ These are foundational use cases that leverage the newly extended harness. With 
 
 **Priority**: High (existing tests can be migrated)
 
-### 2.2 Metadata-Only Test Cases
+### 2.2 Metadata-Only Test Cases ✅ COMPLETE
 
 **Target**: New tests that only need to validate test infrastructure
 
-**Use Case**: Testing that the harness itself works correctly, validating data loading
+**Use Case**: Testing that the harness itself works correctly, validating data
+loading
 
 **Example Test Data** (`tests/harness/data/metadata_validation.test_data.json`):
+
 ```json
 {
   "metadata": {
     "test_name": "metadata_validation",
-    "description": "Validates test harness metadata loading",
+    "description": "Validates test harness metadata loading without entity collections",
     "tags": ["unit", "harness", "infrastructure"],
     "expected_to_pass": true,
     "author": "Test Infrastructure Team",
@@ -343,6 +373,20 @@ These are foundational use cases that leverage the newly extended harness. With 
   }
 }
 ```
+
+**Implementation Details**:
+
+- Created `tests/harness/data/metadata_validation.test_data.json` with minimal
+  metadata-only configuration
+- Added three new test cases to `tests/harness/test_data_harness.test.cpp`:
+  1. `"Metadata-only test data loads successfully"` - Validates all metadata
+     fields load correctly
+  2. `"Metadata-only test data has no entity collections"` - Verifies no
+     entity/simulation data is present
+  3. `"Metadata-only test data can be used with generators"` - Demonstrates use
+     with Catch2 generators
+- Tests validate that the harness correctly handles test data files with only
+  metadata (no entity collections, simulation data, etc.)
 
 **Harness Extensions Needed**: None - fully supported
 
@@ -357,6 +401,7 @@ These are foundational use cases that leverage the newly extended harness. With 
 **Migration Target**: Use simulation data to test Logic execution
 
 **Benefits**:
+
 - Test complex multi-step scenarios
 - Mimic real Scene system behavior
 - Test Logic interactions
@@ -364,6 +409,7 @@ These are foundational use cases that leverage the newly extended harness. With 
 **Example**: Testing UIActionLogic button processing
 
 **Test Data** (`tests/unit/logic/data/ui_action_button_click.test_data.json`):
+
 ```json
 {
   "metadata": {
@@ -436,11 +482,14 @@ These are foundational use cases that leverage the newly extended harness. With 
 **Migration Target**: Complete UI workflows with render + collision + action
 
 **Benefits**:
+
 - Test real UI interaction patterns
 - Validate UI element behavior end-to-end
 - Easy to test edge cases
 
-**Example Test Data** (`tests/unit/user_interface/data/dropdown_interaction.test_data.json`):
+**Example Test Data**
+(`tests/unit/user_interface/data/dropdown_interaction.test_data.json`):
+
 ```json
 {
   "metadata": {
@@ -518,18 +567,22 @@ These are foundational use cases that leverage the newly extended harness. With 
 
 ### 2.5 Multi-Component Entity Tests
 
-**Target**: Tests involving entities with multiple components (e.g., CUserInterface + CGrimoireMachina)
+**Target**: Tests involving entities with multiple components (e.g.,
+CUserInterface + CGrimoireMachina)
 
 **Current State**: Tests focus on single components
 
 **Migration Target**: Test entity configurations with multiple components
 
 **Benefits**:
+
 - Test realistic entity configurations
 - Validate component interactions
 - Test archetype generation
 
-**Example Test Data** (`tests/unit/components/data/multi_component_entity.test_data.json`):
+**Example Test Data**
+(`tests/unit/components/data/multi_component_entity.test_data.json`):
+
 ```json
 {
   "metadata": {
@@ -578,19 +631,51 @@ These are foundational use cases that leverage the newly extended harness. With 
 
 **Priority**: Medium (important for integration-like tests)
 
+### Phase 2 Completion Status
+
+**Completed Items**:
+
+- ✅ **Phase 2.1**: Entity pool comparison tests migrated (basic entity pool
+  comparison tests using `start_entity_collection` and
+  `expected_entity_collection`)
+- ✅ **Phase 2.2**: Metadata-only validation tests created (validates test
+  infrastructure without entity data)
+
+**Remaining Items**:
+
+- Phase 2.3: Logic class tests with simulations
+- Phase 2.4: UI interaction workflow tests
+- Phase 2.5: Multi-component entity tests
+
+**Key Achievements**:
+
+1. Demonstrated test harness capability to handle test data with only metadata
+2. Added comprehensive validation tests for metadata loading
+3. Validated harness correctly handles optional fields (entity collections,
+   simulation data, etc.)
+4. Demonstrated use with Catch2 generators for parameterized testing
+
+**Next Steps**:
+
+- Continue with Phase 2.3: Migrate logic class tests to use simulation data
+- Leverage event and input simulation capabilities from Phase 1 extensions
+
 ## Phase 3: Additional Harness Extensions (Medium/Low Priority)
 
-These extensions add valuable capabilities but are lower priority than Phase 1. They can be implemented as testing needs arise.
+These extensions add valuable capabilities but are lower priority than Phase 1.
+They can be implemented as testing needs arise.
 
 ### 3.1 Custom Resource Configuration (MEDIUM PRIORITY EXTENSION)
 
 **Target**: Tests that need specific asset or resource configurations
 
-**Current State**: test_data.fbs has `game_resources` and `scene_resources` fields, but they're not fully utilized
+**Current State**: test_data.fbs has `game_resources` and `scene_resources`
+fields, but they're not fully utilized
 
 **Needed Enhancement**: Implement resource configuration in TestFixture creation
 
 **Benefits**:
+
 - Test with specific assets
 - Validate resource loading
 - Test resource-dependent behaviors
@@ -598,6 +683,7 @@ These extensions add valuable capabilities but are lower priority than Phase 1. 
 **Example**: The schema already exists but needs implementation
 
 **Test Data** (`tests/unit/assets/data/font_loading.test_data.json`):
+
 ```json
 {
   "metadata": {
@@ -628,6 +714,7 @@ These extensions add valuable capabilities but are lower priority than Phase 1. 
 ```
 
 **Implementation Additions Needed**:
+
 1. Enhance `create_fixture_from_test_data()` to configure resources
 2. Add resource validation to TestFixture
 3. Add resource accessor methods for tests
@@ -642,11 +729,13 @@ These extensions add valuable capabilities but are lower priority than Phase 1. 
 **Needed Extension**: Scene transition data
 
 **Benefits**:
+
 - Test scene change logic
 - Validate state persistence
 - Test scene initialization
 
 **Proposed Schema Addition** (`src/flatbuffers_headers/scene_test_data.fbs`):
+
 ```fbs
 namespace steamrot;
 
@@ -664,6 +753,7 @@ table SceneTransitionSequence {
 ```
 
 **Update test_data.fbs**:
+
 ```fbs
 table TestDataConfig {
   metadata: TestMetadata (required);
@@ -678,7 +768,9 @@ table TestDataConfig {
 }
 ```
 
-**Example Test Data** (`tests/integration/scene_change/data/title_to_crafting.test_data.json`):
+**Example Test Data**
+(`tests/integration/scene_change/data/title_to_crafting.test_data.json`):
+
 ```json
 {
   "metadata": {
@@ -705,6 +797,7 @@ table TestDataConfig {
 ```
 
 **Implementation Additions Needed**:
+
 1. Add `scene_test_data.fbs` schema
 2. Update `test_data.fbs` with `scene_transitions` field
 3. Add scene transition simulation to harness
@@ -720,11 +813,13 @@ table TestDataConfig {
 **Needed Extension**: Asset validation criteria
 
 **Benefits**:
+
 - Validate asset integrity
 - Test asset loading failures
 - Test asset format compatibility
 
 **Proposed Schema Addition** (`src/flatbuffers_headers/asset_test_data.fbs`):
+
 ```fbs
 namespace steamrot;
 
@@ -760,11 +855,13 @@ table AssetValidationSequence {
 **Needed Extension**: Performance criteria and measurement
 
 **Benefits**:
+
 - Regression testing for performance
 - Identify bottlenecks
 - Validate optimizations
 
 **Proposed Schema Addition** (`src/flatbuffers_headers/perf_test_data.fbs`):
+
 ```fbs
 namespace steamrot;
 
@@ -789,9 +886,11 @@ table PerformanceBenchmark {
 
 ### Step 1: Implement Critical Harness Extensions (Weeks 1-6)
 
-**Goal**: Complete Phase 1 - Make the test harness fully capable before widespread adoption
+**Goal**: Complete Phase 1 - Make the test harness fully capable before
+widespread adoption
 
 **Actions**:
+
 1. **Week 1-3**: Implement event sequence testing (Phase 1.1)
    - Add event_test_data.fbs schema
    - Update test_data.fbs
@@ -809,6 +908,7 @@ table PerformanceBenchmark {
    - Create example tests
 
 **Success Metrics**:
+
 - Event sequence testing operational
 - Input simulation operational
 - 10+ tests demonstrating new capabilities
@@ -816,9 +916,11 @@ table PerformanceBenchmark {
 
 ### Step 2: Adopt Simple Use Cases (Weeks 7-9)
 
-**Goal**: Migrate existing simple tests (Phase 2 use cases) using the newly extended harness
+**Goal**: Migrate existing simple tests (Phase 2 use cases) using the newly
+extended harness
 
 **Actions**:
+
 1. Convert entity pool comparison tests
 2. Add test data files to existing test directories
 3. Create metadata-only validation tests
@@ -826,6 +928,7 @@ table PerformanceBenchmark {
 5. Document migration patterns
 
 **Success Metrics**:
+
 - 10+ entity tests migrated
 - Metadata validation tests operational
 - No test coverage regression
@@ -836,6 +939,7 @@ table PerformanceBenchmark {
 **Goal**: Adopt simulation-based testing for logic and UI workflows
 
 **Actions**:
+
 1. Migrate logic class tests to use simulations (Phase 2.3)
 2. Convert UI interaction workflows (Phase 2.4)
 3. Create multi-component entity tests (Phase 2.5)
@@ -843,6 +947,7 @@ table PerformanceBenchmark {
 5. Leverage event and input simulation capabilities
 
 **Success Metrics**:
+
 - 30+ logic tests migrated to simulations
 - 15+ UI workflow tests created
 - Multi-component tests operational
@@ -853,6 +958,7 @@ table PerformanceBenchmark {
 **Goal**: Add Phase 3 extensions based on testing needs
 
 **Actions**:
+
 1. **Week 15**: Enhance resource configuration (Phase 3.1)
    - Implement resource loading in TestFixture
    - Document resource patterns
@@ -864,6 +970,7 @@ table PerformanceBenchmark {
    - Create integration tests
 
 **Success Metrics**:
+
 - Resource configuration operational
 - Scene transition tests working
 - Integration test suite complete
@@ -873,12 +980,14 @@ table PerformanceBenchmark {
 **Goal**: Remove old tests, optimize harness
 
 **Actions**:
+
 1. Remove old non-data-driven tests
 2. Optimize test data compilation
 3. Add harness performance improvements
 4. Final documentation updates
 
 **Success Metrics**:
+
 - All tests migrated or documented as intentionally manual
 - Test execution time acceptable
 - Documentation complete
@@ -886,27 +995,32 @@ table PerformanceBenchmark {
 ## Implementation Priority Summary
 
 ### Immediate - Weeks 1-6 (Phase 1: Critical Extensions)
+
 1. ✅ Create this plan document
 2. **Phase 1.1: Event sequence testing** (CRITICAL - Start immediately)
 3. **Phase 1.2: Input simulation** (CRITICAL - Start immediately)
 
 ### High Priority - Weeks 7-9 (Phase 2: Simple Use Cases)
-1. Phase 2.1: Migrate entity pool comparison tests
-2. Phase 2.2: Create metadata-only validation tests
+
+1. ✅ Phase 2.1: Migrate entity pool comparison tests
+2. ✅ Phase 2.2: Create metadata-only validation tests
 3. Begin adopting harness with newly extended capabilities
 
 ### High Priority - Weeks 10-14 (Phase 2: Advanced Use Cases)
+
 1. Phase 2.3: Logic class tests with simulations
 2. Phase 2.4: UI interaction workflow tests
 3. Phase 2.5: Multi-component entity tests
 4. Integration test migrations
 
 ### Medium Priority - Weeks 15-17 (Phase 3: Additional Extensions)
+
 1. Phase 3.1: Resource configuration enhancement
 2. Phase 3.2: Scene transition testing
 3. Additional integration tests as needed
 
 ### Low Priority - Future (Phase 3: Nice-to-Have)
+
 1. Phase 3.3: Asset validation testing
 2. Phase 3.4: Performance benchmarking
 3. Additional simulation features as needed
@@ -916,6 +1030,7 @@ table PerformanceBenchmark {
 ### Extension 1: Event Sequence Testing (HIGH PRIORITY)
 
 **Files to Create/Modify**:
+
 - `src/flatbuffers_headers/event_test_data.fbs` (NEW)
 - `src/flatbuffers_headers/test_data.fbs` (UPDATE)
 - `tests/harness/event_simulation.h` (NEW)
@@ -923,6 +1038,7 @@ table PerformanceBenchmark {
 - `tests/harness/event_simulation.test.cpp` (NEW)
 
 **API Design**:
+
 ```cpp
 namespace steamrot::tests {
 
@@ -943,11 +1059,13 @@ execute_event_sequence_with_fixture(const EventSequence *event_sequence,
 }
 ```
 
-**Integration**: Add to `run_fixture_test()` to automatically execute event sequences
+**Integration**: Add to `run_fixture_test()` to automatically execute event
+sequences
 
 ### Extension 2: Input Simulation (HIGH PRIORITY)
 
 **Files to Create/Modify**:
+
 - `src/flatbuffers_headers/input_test_data.fbs` (NEW)
 - `src/flatbuffers_headers/test_data.fbs` (UPDATE)
 - `tests/harness/input_simulation.h` (NEW)
@@ -957,6 +1075,7 @@ execute_event_sequence_with_fixture(const EventSequence *event_sequence,
 - `tests/harness/TestFixture.cpp` (UPDATE)
 
 **API Design**:
+
 ```cpp
 namespace steamrot::tests {
 
@@ -975,16 +1094,20 @@ void advance_time(uint32_t ms, TestFixture &fixture);
 }
 ```
 
-**Integration**: Add to `run_fixture_test()` to execute input sequences before simulations
+**Integration**: Add to `run_fixture_test()` to execute input sequences before
+simulations
 
 ### Extension 3: Resource Configuration (MEDIUM PRIORITY)
 
 **Files to Modify**:
-- `tests/harness/test_data_harness.cpp` (UPDATE `create_fixture_from_test_data()`)
+
+- `tests/harness/test_data_harness.cpp` (UPDATE
+  `create_fixture_from_test_data()`)
 - `tests/harness/TestFixture.h` (ADD resource configuration methods)
 - `tests/harness/TestFixture.cpp` (UPDATE)
 
 **API Enhancement**:
+
 ```cpp
 namespace steamrot::tests {
 
@@ -1004,6 +1127,7 @@ create_fixture_from_test_data(const TestDataConfig *config,
 ### Extension 4: Scene Transition Testing (MEDIUM PRIORITY)
 
 **Files to Create/Modify**:
+
 - `src/flatbuffers_headers/scene_test_data.fbs` (NEW)
 - `src/flatbuffers_headers/test_data.fbs` (UPDATE)
 - `tests/harness/scene_simulation.h` (NEW)
@@ -1011,6 +1135,7 @@ create_fixture_from_test_data(const TestDataConfig *config,
 - `tests/harness/scene_simulation.test.cpp` (NEW)
 
 **API Design**:
+
 ```cpp
 namespace steamrot::tests {
 
@@ -1038,12 +1163,14 @@ Each extension should have its own test file demonstrating usage:
 ## Success Criteria
 
 ### Quantitative Metrics
+
 - 80%+ of unit tests converted to data-driven by end of Phase 6
 - 50%+ of integration tests using harness
 - Test data file count > test code file count
 - Test code reduction of 40%+ (measured in lines of code)
 
 ### Qualitative Metrics
+
 - New tests primarily data-driven
 - Team prefers harness over manual tests
 - Test maintenance time reduced
@@ -1052,27 +1179,39 @@ Each extension should have its own test file demonstrating usage:
 ## Risks and Mitigations
 
 ### Risk 1: Learning Curve
+
 **Mitigation**: Provide training, examples, and gradual adoption
 
 ### Risk 2: Test Data Maintenance
+
 **Mitigation**: Clear naming conventions, documentation, and validation tools
 
 ### Risk 3: Harness Bugs
+
 **Mitigation**: Thorough testing of harness itself, gradual rollout
 
 ### Risk 4: Performance Overhead
+
 **Mitigation**: Monitor test execution times, optimize as needed
 
 ### Risk 5: Complexity Creep
+
 **Mitigation**: Keep harness simple, resist over-engineering
 
 ## Conclusion
 
-This plan prioritizes getting the test harness "up to scratch" first by implementing critical extensions (Phase 1) before widespread adoption. This ensures the harness has all necessary features (event sequencing, input simulation) before teams begin migrating tests. The phased approach builds the foundation first, then adopts simple use cases, and finally tackles complex testing scenarios.
+This plan prioritizes getting the test harness "up to scratch" first by
+implementing critical extensions (Phase 1) before widespread adoption. This
+ensures the harness has all necessary features (event sequencing, input
+simulation) before teams begin migrating tests. The phased approach builds the
+foundation first, then adopts simple use cases, and finally tackles complex
+testing scenarios.
 
 **Next Steps**:
+
 1. Review and approve this plan
-2. **Begin Phase 1 immediately**: Implement event sequence testing and input simulation
+2. **Begin Phase 1 immediately**: Implement event sequence testing and input
+   simulation
 3. Once Phase 1 is complete, adopt simple use cases (Phase 2)
 4. Monitor progress and adjust timeline as needed
 
@@ -1125,6 +1264,7 @@ tests/
 ## Appendix B: Quick Reference Commands
 
 ### Creating New Test Data
+
 ```bash
 # 1. Create JSON file in appropriate data/ directory
 # tests/unit/components/data/my_test.test_data.json
@@ -1136,6 +1276,7 @@ cmake --build --preset Debug
 ```
 
 ### Writing Data-Driven Test
+
 ```cpp
 #include "test_data_harness.h"
 #include <catch2/generators/catch_generators_range.hpp>
@@ -1143,15 +1284,16 @@ cmake --build --preset Debug
 TEST_CASE("My data-driven test", "[unit][my_component]") {
   auto configs = steamrot::tests::load_test_data_configs();
   REQUIRE(configs.has_value());
-  
+
   const auto *config = GENERATE_COPY(from_range(configs.value()));
-  
+
   auto result = steamrot::tests::run_fixture_test(config);
   REQUIRE(result.has_value());
 }
 ```
 
 ### Running Tests
+
 ```bash
 # Run all tests
 ctest --preset Debug
