@@ -124,53 +124,100 @@ Add to `Logic` base class (`src/logic/Logic.h`):
 ```cpp
 protected:
   /////////////////////////////////////////////////
-  /// @brief Get archetype for given component types
+  /// @brief Get entity IDs for exact archetype match
   ///
-  /// Convenience wrapper for archetype lookup. Returns std::nullopt
-  /// if archetype doesn't exist.
+  /// Returns entity IDs for entities that have exactly the specified
+  /// components. Returns empty vector if archetype doesn't exist.
   ///
   /// @tparam Components Component types to generate archetype from
-  /// @return Optional archetype reference
+  /// @return Vector of entity IDs (empty if archetype not found)
   /////////////////////////////////////////////////
   template <typename... Components>
-  std::optional<std::reference_wrapper<const Archetype>>
-  GetArchetype() const {
+  std::vector<size_t> GetEntitiesWithExactComponents() const {
     ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<Components...>();
     const auto it = m_scene_context.archetypes.find(archetype_id);
     
     if (it != m_scene_context.archetypes.end()) {
-      return std::ref(it->second);
+      return it->second;  // Return copy of entity ID vector
     }
-    return std::nullopt;
+    return {};  // Return empty vector if not found
   }
 
   /////////////////////////////////////////////////
-  /// @brief Execute function for each entity in archetype
+  /// @brief Get entity IDs for any archetype containing specified components
   ///
-  /// Convenience wrapper for iterating entities in archetype and
-  /// retrieving components. Automatically handles archetype lookup
-  /// and component access.
+  /// Returns entity IDs for entities that have AT LEAST the specified
+  /// components (may have additional components). Concatenates and returns
+  /// all matching entity IDs in a single vector.
   ///
-  /// @tparam Components Component types for archetype
-  /// @tparam Func Function type (lambda or function pointer)
-  /// @param func Function to execute for each entity (receives entity_id and component references)
+  /// @tparam Components Component types that must be present
+  /// @return Vector of entity IDs from all matching archetypes (empty if none found)
   /////////////////////////////////////////////////
-  template <typename... Components, typename Func>
-  void ForEachEntity(Func func) {
-    auto archetype_opt = GetArchetype<Components...>();
-    if (!archetype_opt.has_value()) {
-      return;
+  template <typename... Components>
+  std::vector<size_t> GetEntitiesWithComponents() const {
+    ArchetypeID required_components = GenerateArchetypeIDfromTypes<Components...>();
+    std::vector<size_t> all_entities;
+    
+    // Iterate through all archetypes
+    for (const auto &[archetype_id, entity_ids] : m_scene_context.archetypes) {
+      // Check if archetype contains all required components
+      if ((archetype_id & required_components) == required_components) {
+        // Concatenate entity IDs
+        all_entities.insert(all_entities.end(), entity_ids.begin(), entity_ids.end());
+      }
     }
     
-    const Archetype &archetype = archetype_opt.value().get();
-    for (size_t entity_id : archetype) {
-      auto components = std::make_tuple(
-          std::ref(entity::memory::GetComponent<Components>(
-              entity_id, m_scene_context.scene_entities))...);
-      
-      std::apply([&](auto&... comps) {
-        func(entity_id, comps...);
-      }, components);
+    return all_entities;
+  }
+
+  /////////////////////////////////////////////////
+  /// @brief Execute function(s) for each entity with exact components
+  ///
+  /// Convenience wrapper for iterating entities with exact component match.
+  /// Maintains memory contiguity by directly accessing component vectors
+  /// without creating intermediate tuples.
+  ///
+  /// Supports multiple functions via variadic templates - all functions
+  /// must have signature: void(size_t entity_id, Components&...)
+  ///
+  /// @tparam Components Component types for archetype
+  /// @tparam Funcs Function types (lambdas or function pointers)
+  /// @param funcs Functions to execute for each entity (receives entity_id and component references)
+  /////////////////////////////////////////////////
+  template <typename... Components, typename... Funcs>
+  void ForEachEntityExact(Funcs... funcs) {
+    auto entity_ids = GetEntitiesWithExactComponents<Components...>();
+    
+    for (size_t entity_id : entity_ids) {
+      // Call each function in sequence for this entity
+      // Components are accessed directly from contiguous memory vectors
+      (funcs(entity_id, 
+             entity::memory::GetComponent<Components>(entity_id, m_scene_context.scene_entities)...), ...);
+    }
+  }
+
+  /////////////////////////////////////////////////
+  /// @brief Execute function(s) for each entity with at least specified components
+  ///
+  /// Convenience wrapper for iterating entities that contain the specified
+  /// components (may have additional components). Maintains memory contiguity.
+  ///
+  /// Supports multiple functions via variadic templates - all functions
+  /// must have signature: void(size_t entity_id, Components&...)
+  ///
+  /// @tparam Components Component types that must be present
+  /// @tparam Funcs Function types (lambdas or function pointers)
+  /// @param funcs Functions to execute for each entity (receives entity_id and component references)
+  /////////////////////////////////////////////////
+  template <typename... Components, typename... Funcs>
+  void ForEachEntityWith(Funcs... funcs) {
+    auto entity_ids = GetEntitiesWithComponents<Components...>();
+    
+    for (size_t entity_id : entity_ids) {
+      // Call each function in sequence for this entity
+      // Components are accessed directly from contiguous memory vectors
+      (funcs(entity_id, 
+             entity::memory::GetComponent<Components>(entity_id, m_scene_context.scene_entities)...), ...);
     }
   }
 ```
@@ -178,12 +225,18 @@ protected:
 #### Benefits
 
 - **Reduces boilerplate:** Eliminates 6+ lines per archetype access
-- **Consistent error handling:** Uniform null-checking
-- **Type-safe:** Template ensures component types match
-- **Readable:** Intent is clear (`ForEachEntity<CUserInterface>`)
+- **Simple return types:** Empty vector instead of optional reference wrapper
+- **Flexible querying:** Support for exact match or "contains" semantics
+- **Memory efficient:** Returns vector copy (entity IDs are just size_t)
+- **Maintains contiguity:** Components accessed directly from contiguous memory vectors
+- **Type-safe:** Templates ensure component types match
+- **Function composition:** Support for multiple functions with fold expressions
+- **Readable:** Intent is clear (`ForEachEntityExact<CUserInterface>`)
 - **Testable:** Wrapper functions can be tested independently
 
 #### Example Usage
+
+**Example 1: Basic usage with exact component match**
 
 **Before:**
 ```cpp
@@ -206,13 +259,122 @@ void UIActionLogic::ProcessLogic() {
 **After:**
 ```cpp
 void UIActionLogic::ProcessLogic() {
-  ForEachEntity<CUserInterface>([&](size_t entity_id, CUserInterface &ui_component) {
-    ProcessNestedUIActionsAndEvents(*ui_component.m_root_element,
-                                    m_scene_context.event_handler,
-                                    m_scene_context);
-  });
+  ForEachEntityExact<CUserInterface>(
+    [&](size_t entity_id, CUserInterface &ui_component) {
+      ProcessNestedUIActionsAndEvents(*ui_component.m_root_element,
+                                      m_scene_context.event_handler,
+                                      m_scene_context);
+    }
+  );
 }
 ```
+
+**Example 2: Multiple component access**
+```cpp
+// Process entities with both CUserInterface and CGrimoireMachina
+ForEachEntityExact<CUserInterface, CGrimoireMachina>(
+  [&](size_t entity_id, CUserInterface &ui, CGrimoireMachina &grimoire) {
+    UpdateGrimoireUI(ui, grimoire);
+  }
+);
+```
+
+**Example 3: Using "contains" semantics**
+```cpp
+// Get all entities that have CUserInterface (regardless of other components)
+ForEachEntityWith<CUserInterface>(
+  [&](size_t entity_id, CUserInterface &ui) {
+    ProcessAnyUIElement(ui);
+  }
+);
+```
+
+**Example 4: Multiple functions with fold expressions**
+```cpp
+// Apply multiple operations to each entity
+ForEachEntityExact<CUserInterface>(
+  // Function 1: Update state
+  [&](size_t entity_id, CUserInterface &ui) {
+    ui.m_frame_count++;
+  },
+  // Function 2: Process logic
+  [&](size_t entity_id, CUserInterface &ui) {
+    ProcessNestedUIActionsAndEvents(*ui.m_root_element,
+                                    m_scene_context.event_handler,
+                                    m_scene_context);
+  },
+  // Function 3: Log activity
+  [&](size_t entity_id, CUserInterface &ui) {
+    LogUIActivity(entity_id, ui.m_ui_name);
+  }
+);
+```
+
+**Example 5: Direct vector access for custom iteration**
+```cpp
+// Get entity IDs for custom processing
+auto entity_ids = GetEntitiesWithExactComponents<CUserInterface>();
+if (entity_ids.empty()) {
+  return;  // No entities with this component
+}
+
+// Custom iteration logic
+for (size_t i = 0; i < entity_ids.size(); i += 2) {
+  size_t entity_id = entity_ids[i];
+  CUserInterface &ui = entity::memory::GetComponent<CUserInterface>(
+      entity_id, m_scene_context.scene_entities);
+  ProcessEveryOtherUI(ui);
+}
+```
+
+#### Design Rationale: Memory Contiguity and Performance
+
+**Q: Why not create tuples of component references?**
+
+The original proposal created tuples of component references:
+```cpp
+auto components = std::make_tuple(
+    std::ref(entity::memory::GetComponent<Components>(entity_id, pool))...);
+```
+
+**Issues with this approach:**
+1. **Extra indirection:** Creates temporary tuple objects
+2. **Doesn't leverage contiguity:** EntityMemoryPool stores components in contiguous vectors (`std::vector<T>` for each component type)
+3. **Unnecessary complexity:** Fold expressions can call functions directly
+
+**Improved approach:**
+```cpp
+// Components accessed directly from contiguous memory
+(funcs(entity_id, 
+       entity::memory::GetComponent<Components>(entity_id, pool)...), ...);
+```
+
+**Benefits:**
+- **Direct memory access:** Components retrieved directly from contiguous `std::vector<T>` storage
+- **Cache-friendly:** Maintains benefit of EntityMemoryPool's contiguous layout
+- **Zero overhead:** No intermediate objects created
+- **Fold expression support:** Multiple functions applied in sequence
+
+**Memory Layout Preserved:**
+
+EntityMemoryPool stores components as:
+```cpp
+std::tuple<std::vector<CMeta>, std::vector<CUserInterface>, ...>
+```
+
+Each `std::vector<T>` is contiguous in memory. When iterating through entity IDs in order and accessing components via `GetComponent<T>(entity_id, pool)`, we traverse the contiguous memory sequentially, maximizing cache hits.
+
+**Q: Why return a vector copy instead of reference?**
+
+Entity IDs are `size_t` (8 bytes each). Even with thousands of entities:
+- 1,000 entities = 8 KB
+- 10,000 entities = 80 KB
+
+Modern CPUs can copy this efficiently. Benefits:
+- **Simpler API:** No lifetime management concerns
+- **Flexible usage:** Can be stored, modified, or passed around
+- **Clear semantics:** Caller owns the data
+- **Empty vector idiom:** Natural "not found" representation
 
 ### 2. Establish Free Function vs Class Method Guidelines
 
@@ -965,7 +1127,7 @@ void UIActionLogic::ProcessLogic() {
 // UIActionLogic.cpp
 void UIActionLogic::ProcessLogic() {
   // 3 lines total - all logic
-  ForEachEntity<CUserInterface>([&](size_t entity_id, CUserInterface &ui_component) {
+  ForEachEntityExact<CUserInterface>([&](size_t entity_id, CUserInterface &ui_component) {
     ProcessNestedUIActionsAndEvents(*ui_component.m_root_element,
                                     m_scene_context.event_handler,
                                     m_scene_context);
@@ -976,6 +1138,55 @@ void UIActionLogic::ProcessLogic() {
 **Lines:** 3 total (0 boilerplate, 3 logic)
 
 **Improvement:** 70% reduction in code, 100% reduction in boilerplate
+
+### Advanced Example: Multiple Functions
+
+```cpp
+// UIActionLogic.cpp with multiple operations
+void UIActionLogic::ProcessLogic() {
+  // Apply multiple functions in sequence to each entity
+  ForEachEntityExact<CUserInterface>(
+    // Update frame counter
+    [&](size_t id, CUserInterface &ui) { 
+      ui.m_frame_count++; 
+    },
+    // Process UI logic
+    [&](size_t id, CUserInterface &ui) {
+      ProcessNestedUIActionsAndEvents(*ui.m_root_element,
+                                      m_scene_context.event_handler,
+                                      m_scene_context);
+    },
+    // Log activity (debug builds only)
+    [&](size_t id, CUserInterface &ui) {
+      #ifdef DEBUG
+      LogUIActivity(id, ui.m_ui_name);
+      #endif
+    }
+  );
+}
+```
+
+### Example: Flexible Archetype Matching
+
+```cpp
+// Process entities with CUserInterface AND CGrimoireMachina
+void ProcessGrimoireUI() {
+  ForEachEntityExact<CUserInterface, CGrimoireMachina>(
+    [&](size_t id, CUserInterface &ui, CGrimoireMachina &grimoire) {
+      UpdateGrimoireDisplay(ui, grimoire);
+    }
+  );
+}
+
+// Process ALL entities that have CUserInterface (regardless of other components)
+void ProcessAllUI() {
+  ForEachEntityWith<CUserInterface>(
+    [&](size_t id, CUserInterface &ui) {
+      DrawUIElement(ui);
+    }
+  );
+}
+```
 
 ## Appendix C: Example Test Progression
 

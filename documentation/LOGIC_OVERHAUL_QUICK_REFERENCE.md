@@ -26,30 +26,66 @@ New logic code to write...
 
 ## Wrapper Functions (Planned)
 
-### GetArchetype
+### GetEntitiesWithExactComponents
+
+Returns entity IDs for entities with exactly the specified components.
 
 ```cpp
 // In any Logic class
-auto archetype_opt = GetArchetype<CUserInterface>();
-if (archetype_opt.has_value()) {
-  const Archetype &archetype = archetype_opt.value().get();
-  // ... use archetype
+auto entity_ids = GetEntitiesWithExactComponents<CUserInterface>();
+if (entity_ids.empty()) {
+  return;  // No entities found
+}
+
+for (size_t entity_id : entity_ids) {
+  CUserInterface &ui = entity::memory::GetComponent<CUserInterface>(
+      entity_id, m_scene_context.scene_entities);
+  // Process component
 }
 ```
 
-### ForEachEntity
+### GetEntitiesWithComponents
+
+Returns entity IDs for entities with at least the specified components (may have additional).
 
 ```cpp
 // In any Logic class
-ForEachEntity<CUserInterface>([&](size_t entity_id, CUserInterface &ui) {
-  // Process each entity with CUserInterface component
+auto entity_ids = GetEntitiesWithComponents<CUserInterface>();
+// Returns all entities that have CUserInterface, regardless of other components
+```
+
+### ForEachEntityExact
+
+Iterate entities with exact component match.
+
+```cpp
+// Single function
+ForEachEntityExact<CUserInterface>([&](size_t entity_id, CUserInterface &ui) {
   ProcessUIElement(*ui.m_root_element);
 });
 
 // Multiple components
-ForEachEntity<CUserInterface, CGrimoireMachina>(
+ForEachEntityExact<CUserInterface, CGrimoireMachina>(
     [&](size_t entity_id, CUserInterface &ui, CGrimoireMachina &grimoire) {
-  // Process entities with both components
+  UpdateGrimoireUI(ui, grimoire);
+});
+
+// Multiple functions (applied in sequence)
+ForEachEntityExact<CUserInterface>(
+  [&](size_t id, CUserInterface &ui) { ui.m_frame_count++; },
+  [&](size_t id, CUserInterface &ui) { ProcessUILogic(ui); },
+  [&](size_t id, CUserInterface &ui) { LogActivity(id); }
+);
+```
+
+### ForEachEntityWith
+
+Iterate entities that contain the specified components (flexible matching).
+
+```cpp
+// Process all entities with CUserInterface (regardless of other components)
+ForEachEntityWith<CUserInterface>([&](size_t entity_id, CUserInterface &ui) {
+  ProcessAnyUIElement(ui);
 });
 ```
 
@@ -205,7 +241,7 @@ void UIActionLogic::ProcessLogic() {
 ```cpp
 void UIActionLogic::ProcessLogic() {
   // 3 lines total - all logic, no boilerplate
-  ForEachEntity<CUserInterface>([&](size_t entity_id, CUserInterface &ui) {
+  ForEachEntityExact<CUserInterface>([&](size_t entity_id, CUserInterface &ui) {
     ProcessNestedUIActionsAndEvents(*ui.m_root_element,
                                     m_scene_context.event_handler,
                                     m_scene_context);
@@ -214,6 +250,12 @@ void UIActionLogic::ProcessLogic() {
 ```
 
 **Improvement:** 70% reduction in code, 100% reduction in boilerplate
+
+**Key Benefits:**
+- Returns empty vector instead of optional reference wrapper (simpler)
+- Maintains memory contiguity (no tuple creation overhead)
+- Supports multiple functions via fold expressions
+- Flexible querying (exact match or "contains" semantics)
 
 ## Benefits Summary
 
