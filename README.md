@@ -472,10 +472,10 @@ public:
   /////////////////////////////////////////////////
   /// @brief Constructor for NewLogic.
   ///
-  /// @param logic_context LogicContext object containing the context for the
+  /// @param scene_context SceneContext object containing the context for the
   /// logic.
   /////////////////////////////////////////////////
-  NewLogic(const LogicContext logic_context);
+  NewLogic(const SceneContext scene_context);
 };
 
 } // namespace steamrot
@@ -484,7 +484,7 @@ public:
 **Key Requirements:**
 - Inherit from `Logic` abstract class
 - Override `ProcessLogic()` private method
-- Constructor takes `const LogicContext` parameter
+- Constructor takes `const SceneContext` parameter
 - Use visual dividers (`/////////////////////////////////////////////////`)
 - Add Doxygen documentation
 
@@ -501,47 +501,45 @@ Create the implementation file in `src/logic/`:
 /////////////////////////////////////////////////
 
 #include "NewLogic.h"
-#include "ArchetypeHelpers.h"
+#include "ArchetypeUtils.h"
 #include "ArchetypeManager.h"
 #include "CYourComponent.h"
-#include "emp_helpers.h"
+#include "entity_memory.h"
 
 namespace steamrot {
 
 /////////////////////////////////////////////////
-NewLogic::NewLogic(const LogicContext logic_context)
-    : Logic(logic_context) {}
+NewLogic::NewLogic(const SceneContext scene_context)
+    : Logic(scene_context) {}
 
 /////////////////////////////////////////////////
 void NewLogic::ProcessLogic() {
 
-  // Generate archetype ID for the components you need
-  ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<CYourComponent>();
+  // NEW RECOMMENDED APPROACH: Use GatherEntityIndices
+  // Exact match: Get entities with ONLY CYourComponent
+  std::set<size_t> exact_indices = 
+      GatherEntityIndices<CYourComponent>(m_scene_context.archetypes, true);
 
-  // Find the archetype in the context
-  const auto it = m_logic_context.archetypes.find(archetype_id);
-  
-  // If archetype doesn't exist, skip processing
-  if (it != m_logic_context.archetypes.end()) {
+  for (size_t entity_id : exact_indices) {
+    // Get the component for this entity
+    CYourComponent &component = entity::memory::GetComponent<CYourComponent>(
+        entity_id, m_scene_context.scene_entities);
 
-    // Get the archetype from the map
-    const Archetype &archetype = it->second;
+    // Perform your logic here
+    // Access other context members as needed:
+    // - m_scene_context.scene_texture (for rendering)
+    // - m_scene_context.game_window (for window info)
+    // - m_scene_context.asset_manager (for assets)
+    // - m_scene_context.event_handler (for events)
+    // - m_scene_context.mouse_position (for input)
+  }
 
-    // Process each entity in the archetype
-    for (size_t entity_id : archetype) {
+  // ALTERNATIVE: Partial match for entities with AT LEAST CYourComponent
+  std::set<size_t> partial_indices = 
+      GatherEntityIndices<CYourComponent>(m_scene_context.archetypes, false);
 
-      // Get the component for this entity
-      CYourComponent &component = emp_helpers::GetComponent<CYourComponent>(
-          entity_id, m_logic_context.scene_entities);
-
-      // Perform your logic here
-      // Access other context members as needed:
-      // - m_logic_context.scene_texture (for rendering)
-      // - m_logic_context.game_window (for window info)
-      // - m_logic_context.asset_manager (for assets)
-      // - m_logic_context.event_handler (for events)
-      // - m_logic_context.mouse_position (for input)
-    }
+  for (size_t entity_id : partial_indices) {
+    // Process all entities with the component, regardless of other components
   }
 }
 
@@ -549,12 +547,13 @@ void NewLogic::ProcessLogic() {
 ```
 
 **Implementation Pattern:**
-1. Call base class constructor with `LogicContext`
-2. In `ProcessLogic()`, generate archetype IDs for needed components
-3. Check if archetype exists in context
-4. Iterate through entities in archetype
-5. Get components and perform logic operations
-6. Use `m_logic_context` members to access game state
+1. Call base class constructor with `SceneContext`
+2. In `ProcessLogic()`, use `GatherEntityIndices<>()` to get entity indices
+3. Choose exact_match=true for precise component combinations
+4. Choose exact_match=false to include entities with additional components
+5. Iterate through the returned set of entity indices
+6. Get components and perform logic operations
+7. Use `m_scene_context` members to access game state
 
 #### Step 3: Write Unit Tests (TDD Approach)
 
@@ -787,40 +786,73 @@ ctest --preset Debug -R logic
 
 #### Common Patterns and Best Practices
 
-**1. Archetype-Based Processing:**
+**1. Archetype-Based Processing (New Recommended Pattern):**
 ```cpp
-// Generate archetype for multiple components
+// Exact match: Get entities with EXACTLY the specified components
+std::set<size_t> exact_indices = 
+    GatherEntityIndices<CComponent1, CComponent2>(m_scene_context.archetypes, true);
+
+for (size_t entity_id : exact_indices) {
+  // Process entities with exactly these components
+}
+
+// Partial match: Get entities with AT LEAST the specified components
+std::set<size_t> partial_indices = 
+    GatherEntityIndices<CUserInterface>(m_scene_context.archetypes, false);
+
+for (size_t entity_id : partial_indices) {
+  // Process entities that have the component, regardless of other components
+}
+```
+
+**1b. Archetype-Based Processing (Legacy Pattern):**
+```cpp
+// Legacy approach - still valid but less flexible
 ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<CComponent1, CComponent2>();
 
-// Check if archetype exists
-const auto it = m_logic_context.archetypes.find(archetype_id);
-if (it != m_logic_context.archetypes.end()) {
-  // Process entities...
+const auto it = m_scene_context.archetypes.find(archetype_id);
+if (it != m_scene_context.archetypes.end()) {
+  const Archetype &archetype = it->second;
+  for (size_t entity_id : archetype) {
+    // Process entities...
+  }
 }
 ```
 
 **2. Component Access:**
 ```cpp
 // Get component from entity
-CYourComponent &component = emp_helpers::GetComponent<CYourComponent>(
-    entity_id, m_logic_context.scene_entities);
+CYourComponent &component = entity::memory::GetComponent<CYourComponent>(
+    entity_id, m_scene_context.scene_entities);
 ```
 
 **3. Rendering Logic Pattern:**
 ```cpp
 void YourRenderLogic::ProcessLogic() {
-  // Draw to scene texture
-  m_logic_context.scene_texture.draw(drawable);
+  // Use GatherEntityIndices for flexible entity gathering
+  std::set<size_t> render_indices = 
+      GatherEntityIndices<CRenderComponent>(m_scene_context.archetypes, true);
+  
+  for (size_t entity_id : render_indices) {
+    // Draw to scene texture
+    m_scene_context.scene_texture.draw(drawable);
+  }
 }
 ```
 
 **4. Collision Logic Pattern:**
 ```cpp
 void YourCollisionLogic::ProcessLogic() {
-  // Check mouse position against element bounds
-  if (element.position.x <= m_logic_context.mouse_position.x &&
-      element.position.y <= m_logic_context.mouse_position.y) {
-    element.is_mouse_over = true;
+  // Use partial match to get all UI entities regardless of other components
+  std::set<size_t> ui_indices = 
+      GatherEntityIndices<CUserInterface>(m_scene_context.archetypes, false);
+  
+  for (size_t entity_id : ui_indices) {
+    // Check mouse position against element bounds
+    if (element.position.x <= m_scene_context.mouse_position.x &&
+        element.position.y <= m_scene_context.mouse_position.y) {
+      element.is_mouse_over = true;
+    }
   }
 }
 ```
@@ -828,9 +860,14 @@ void YourCollisionLogic::ProcessLogic() {
 **5. Action Logic Pattern:**
 ```cpp
 void YourActionLogic::ProcessLogic() {
-  // Process events and trigger responses
-  if (should_trigger_action) {
-    m_logic_context.event_handler.AddEvent(event_packet);
+  std::set<size_t> action_indices = 
+      GatherEntityIndices<CActionComponent>(m_scene_context.archetypes, true);
+  
+  for (size_t entity_id : action_indices) {
+    // Process events and trigger responses
+    if (should_trigger_action) {
+      m_scene_context.event_handler.AddEvent(event_packet);
+    }
   }
 }
 ```
