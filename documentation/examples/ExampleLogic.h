@@ -5,7 +5,7 @@
 /// This file shows the recommended structure for Logic class headers:
 /// - Proper inheritance from Logic base class
 /// - Private ProcessLogic() method
-/// - Public constructor with LogicContext parameter
+/// - Public constructor with SceneContext parameter
 /// - Doxygen documentation
 /// - Visual dividers between sections
 /////////////////////////////////////////////////
@@ -24,9 +24,10 @@ namespace steamrot {
 /// @brief Example Logic class that demonstrates standard patterns.
 ///
 /// This Logic class shows common patterns used in the game engine:
-/// - Processing entities with specific components
+/// - Processing entities with specific components (exact and partial matching)
 /// - Interacting with game systems (events, rendering)
 /// - Handling edge cases gracefully
+/// - Using the new GatherEntityIndices function for flexible archetype queries
 ///
 /// ExampleLogic would typically belong to a LogicType category:
 /// - Collision: For spatial interactions
@@ -44,10 +45,10 @@ private:
   /// It should contain all the logic processing for this system.
   /// 
   /// Common operations include:
-  /// - Finding archetypes with required components
-  /// - Iterating through entities in archetypes
+  /// - Gathering entity indices with exact or partial component matching
+  /// - Iterating through entities in gathered sets
   /// - Reading/modifying component state
-  /// - Interacting with game systems via m_logic_context
+  /// - Interacting with game systems via m_scene_context
   /////////////////////////////////////////////////
   void ProcessLogic() override;
 
@@ -55,11 +56,11 @@ public:
   /////////////////////////////////////////////////
   /// @brief Constructor for ExampleLogic.
   ///
-  /// @param logic_context LogicContext object containing references to
+  /// @param scene_context SceneContext object containing references to
   ///                      game systems and scene data needed for logic
   ///                      processing.
   ///
-  /// The LogicContext provides access to:
+  /// The SceneContext provides access to:
   /// - scene_entities: EntityMemoryPool for the scene
   /// - archetypes: Map of available component combinations
   /// - scene_texture: RenderTexture for drawing
@@ -68,7 +69,7 @@ public:
   /// - event_handler: Event system for game events
   /// - mouse_position: Current mouse position in window
   /////////////////////////////////////////////////
-  ExampleLogic(const LogicContext logic_context);
+  ExampleLogic(const SceneContext scene_context);
 };
 
 } // namespace steamrot
