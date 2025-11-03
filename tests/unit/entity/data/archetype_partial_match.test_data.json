@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "test_name": "archetype_partial_match",
+    "description": "Test partial archetype matching with entities having multiple components",
+    "tags": ["unit", "entity", "archetype"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 10,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "ui_only",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 0, "y": 0 },
+              "size": { "x": 100, "y": 100 },
+              "children_active": false,
+              "children": [],
+              "layout": "Horizontal",
+              "spacing_strategy": "None"
+            }
+          }
+        }
+      },
+      {
+        "index": 1,
+        "c_user_interface": {
+          "ui_name": "ui_with_grimoire",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 0, "y": 0 },
+              "size": { "x": 100, "y": 100 },
+              "children_active": false,
+              "children": [],
+              "layout": "Horizontal",
+              "spacing_strategy": "None"
+            }
+          }
+        },
+        "c_grimoire_machina": {
+          "fragments": [],
+          "joints": []
+        }
+      },
+      {
+        "index": 2,
+        "c_grimoire_machina": {
+          "fragments": [],
+          "joints": []
+        }
+      }
+    ]
+  }
+}

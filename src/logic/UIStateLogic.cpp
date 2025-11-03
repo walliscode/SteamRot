@@ -16,20 +16,14 @@ UIStateLogic::UIStateLogic(const SceneContext scene_context)
 /////////////////////////////////////////////////
 void UIStateLogic::ProcessLogic() {
 
-  // Generate archetype ID for CUIState components
-  ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<CUIState>();
-
-  const auto it = m_scene_context.archetypes.find(archetype_id);
-  
-  // If archetype doesn't exist, skip processing
-  if (it == m_scene_context.archetypes.end()) {
-    return;
-  }
-
-  const Archetype &archetype = it->second;
+  // Gather entity indices using the new archetype gathering functionality
+  // Use exact_match=true for entities with only CUIState component
+  // Use exact_match=false to include entities with CUIState plus other components
+  std::set<size_t> entity_indices = 
+      GatherEntityIndices<CUIState>(m_scene_context.archetypes, true);
 
   // Process each entity with CUIState component
-  for (size_t entity_id : archetype) {
+  for (size_t entity_id : entity_indices) {
     CUIState &ui_state = entity::memory::GetComponent<CUIState>(
         entity_id, m_scene_context.scene_entities);
 

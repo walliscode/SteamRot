@@ -25,18 +25,13 @@ void UIRenderLogic::ProcessLogic() {
 
 void UIRenderLogic::DrawUIElements() {
 
-  ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<CUserInterface>();
+  // Gather entity indices using the new archetype gathering functionality
+  // Using exact_match=true to get only entities with exactly CUserInterface
+  std::set<size_t> entity_indices = 
+      GatherEntityIndices<CUserInterface>(m_scene_context.archetypes, true);
 
-  const auto it = m_scene_context.archetypes.find(archetype_id);
-  // if it is not in the archetypes map, then return
-  if (it == m_scene_context.archetypes.end()) {
-    return;
-  }
-
-  Archetype archetype = it->second;
-
-  // cycle through all the entity indexs in the archetype
-  for (size_t entity_id : archetype) {
+  // cycle through all the entity indices
+  for (size_t entity_id : entity_indices) {
 
     // get the CUserInterface component
     CUserInterface &ui_component = entity::memory::GetComponent<CUserInterface>(
