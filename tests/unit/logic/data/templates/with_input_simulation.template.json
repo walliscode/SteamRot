@@ -1,0 +1,103 @@
+{
+  "metadata": {
+    "test_name": "template_with_input_simulation",
+    "description": "Template for test with input sequence (mouse/keyboard simulation)",
+    "tags": ["unit", "logic", "input", "template"],
+    "expected_to_pass": true,
+    "author": "Your Name",
+    "version": 1
+  },
+  "num_ticks": 3,
+  "input_sequence": {
+    "description": "Simulate user mouse interaction",
+    "inputs": [
+      {
+        "input_type": "MouseMove",
+        "input_data_type": "MouseInputData",
+        "input_data": {
+          "position": { "x": 150.0, "y": 125.0 },
+          "button": 0
+        },
+        "tick": 0,
+        "description": "Move mouse to button center"
+      },
+      {
+        "input_type": "MouseClick",
+        "input_data_type": "MouseInputData",
+        "input_data": {
+          "position": { "x": 150.0, "y": 125.0 },
+          "button": 0
+        },
+        "tick": 1,
+        "description": "Click left mouse button"
+      },
+      {
+        "input_type": "MouseRelease",
+        "input_data_type": "MouseInputData",
+        "input_data": {
+          "position": { "x": 150.0, "y": 125.0 },
+          "button": 0
+        },
+        "tick": 2,
+        "description": "Release left mouse button"
+      }
+    ]
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 3,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "button_ui",
+          "start_visible": true,
+          "root_ui_element": {
+            "button_data": {
+              "position": { "x": 100, "y": 100 },
+              "size": { "x": 100, "y": 50 },
+              "label": "Click Me",
+              "is_mouse_over": false
+            }
+          }
+        }
+      }
+    ]
+  },
+  "simulation_data": {
+    "description": "Process collision and actions on each tick",
+    "steps": [
+      {
+        "simulation_type": "Collision",
+        "execution_mode": "LogicClass",
+        "logic_class_type": "UICollisionLogic",
+        "description": "Check mouse collision (runs every tick)"
+      },
+      {
+        "simulation_type": "Action",
+        "execution_mode": "Function",
+        "function_type": "ProcessButtonElementActions",
+        "description": "Process button actions (runs every tick)"
+      }
+    ]
+  },
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 3,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "button_ui",
+          "start_visible": true,
+          "root_ui_element": {
+            "button_data": {
+              "position": { "x": 100, "y": 100 },
+              "size": { "x": 100, "y": 50 },
+              "label": "Click Me",
+              "is_mouse_over": true
+            }
+          }
+        }
+      }
+    ]
+  }
+}
