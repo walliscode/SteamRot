@@ -13,39 +13,11 @@
 #include <expected>
 #include <magic_enum/magic_enum.hpp>
 #include <variant>
-#include <vector>
 
 namespace steamrot {
 ////////////////////////////////////////////////////////////
 ArchetypeManager::ArchetypeManager(const EntityMemoryPool &emp)
     : m_entity_memory_pool(emp) {}
-
-////////////////////////////////////////////////////////////
-std::vector<size_t> ArchetypeManager::GetEntityIndexes(
-    const std::vector<ArchetypeID> &archetype_IDs) const {
-
-  // create return vector
-  std::vector<size_t> entity_indexes;
-
-  // iterate over provided archetypeIDs
-  for (const auto &archetypeID : archetype_IDs) {
-
-    // find the archetype in the map
-    auto it = m_archetypes.find(archetypeID);
-
-    // if found, add the entity indexes to the return vector
-    if (it != m_archetypes.end()) {
-      const Archetype &archetype = it->second;
-      entity_indexes.insert(entity_indexes.end(), archetype.begin(),
-                            archetype.end());
-
-    } else {
-      // no error needed, it just means that ArcchtypeID is currently empty
-    }
-  }
-
-  return entity_indexes;
-}
 
 /////////////////////////////////////////////////
 std::expected<const ArchetypeID, FailInfo>

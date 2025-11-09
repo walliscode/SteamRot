@@ -339,11 +339,11 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_LAYOUT = 16,
     VT_SPACING_STRATEGY = 18
   };
-  const Vector2fData *position() const {
-    return GetPointer<const Vector2fData *>(VT_POSITION);
+  const steamrot::Vector2fData *position() const {
+    return GetPointer<const steamrot::Vector2fData *>(VT_POSITION);
   }
-  const Vector2fData *size() const {
-    return GetPointer<const Vector2fData *>(VT_SIZE);
+  const steamrot::Vector2fData *size() const {
+    return GetPointer<const steamrot::Vector2fData *>(VT_SIZE);
   }
   const steamrot::SubscriberData *subscriber_data() const {
     return GetPointer<const steamrot::SubscriberData *>(VT_SUBSCRIBER_DATA);
@@ -387,10 +387,10 @@ struct UIElementDataBuilder {
   typedef UIElementData Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_position(::flatbuffers::Offset<Vector2fData> position) {
+  void add_position(::flatbuffers::Offset<steamrot::Vector2fData> position) {
     fbb_.AddOffset(UIElementData::VT_POSITION, position);
   }
-  void add_size(::flatbuffers::Offset<Vector2fData> size) {
+  void add_size(::flatbuffers::Offset<steamrot::Vector2fData> size) {
     fbb_.AddOffset(UIElementData::VT_SIZE, size);
   }
   void add_subscriber_data(::flatbuffers::Offset<steamrot::SubscriberData> subscriber_data) {
@@ -427,8 +427,8 @@ struct UIElementDataBuilder {
 
 inline ::flatbuffers::Offset<UIElementData> CreateUIElementData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<Vector2fData> position = 0,
-    ::flatbuffers::Offset<Vector2fData> size = 0,
+    ::flatbuffers::Offset<steamrot::Vector2fData> position = 0,
+    ::flatbuffers::Offset<steamrot::Vector2fData> size = 0,
     ::flatbuffers::Offset<steamrot::SubscriberData> subscriber_data = 0,
     ::flatbuffers::Offset<steamrot::EventPacketData> response_event_data = 0,
     bool children_active = false,
@@ -449,8 +449,8 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementData(
 
 inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<Vector2fData> position = 0,
-    ::flatbuffers::Offset<Vector2fData> size = 0,
+    ::flatbuffers::Offset<steamrot::Vector2fData> position = 0,
+    ::flatbuffers::Offset<steamrot::Vector2fData> size = 0,
     ::flatbuffers::Offset<steamrot::SubscriberData> subscriber_data = 0,
     ::flatbuffers::Offset<steamrot::EventPacketData> response_event_data = 0,
     bool children_active = false,

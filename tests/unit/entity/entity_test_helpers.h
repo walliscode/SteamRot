@@ -8,8 +8,8 @@
 /////////////////////////////////////////////////
 #pragma once
 
-#include "ArchetypeUtils.h"
 #include "ArchetypeManager.h"
+#include "archetype_helpers.h"
 #include "containers.h"
 
 namespace steamrot {

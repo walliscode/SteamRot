@@ -1,5 +1,4 @@
 add_library(context_test_helpers
-  TestScenarios.cpp
   test_assertions.cpp)
 
 target_include_directories(context_test_helpers

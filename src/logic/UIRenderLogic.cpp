@@ -3,6 +3,7 @@
 ////////////////////////////////////////////////////////////
 #include "UIRenderLogic.h"
 #include "Logic.h"
+#include "archetype_helpers.h"
 #include "draw_ui_elements.h"
 #include "entity_memory.h"
 #include <SFML/Graphics.hpp>
@@ -25,18 +26,12 @@ void UIRenderLogic::ProcessLogic() {
 
 void UIRenderLogic::DrawUIElements() {
 
-  ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<CUserInterface>();
-
-  const auto it = m_scene_context.archetypes.find(archetype_id);
-  // if it is not in the archetypes map, then return
-  if (it == m_scene_context.archetypes.end()) {
-    return;
-  }
-
-  Archetype archetype = it->second;
+  // Generate entity indexes for entities with only CUserInterface component
+  auto entity_indexes = GenerateEntityIndexesFromComponents<CUserInterface>(
+      m_scene_context.archetypes, true);
 
   // cycle through all the entity indexs in the archetype
-  for (size_t entity_id : archetype) {
+  for (size_t entity_id : entity_indexes) {
 
     // get the CUserInterface component
     CUserInterface &ui_component = entity::memory::GetComponent<CUserInterface>(

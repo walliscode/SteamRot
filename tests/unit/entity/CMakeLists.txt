@@ -3,6 +3,7 @@ add_executable(test_entity
   ArchetypeManager.test.cpp
   FlatbuffersConfigurator.test.cpp
   entity_test_helpers.test.cpp
+  archetype_helpers.test.cpp
 )
 
 target_include_directories(test_entity

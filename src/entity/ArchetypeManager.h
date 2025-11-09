@@ -11,21 +11,16 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include "ArchetypeUtils.h"
 #include "FailInfo.h"
 #include "containers.h"
+#include "entity_types.h"
 #include <cstddef>
 #include <cstdlib>
 #include <expected>
 #include <unordered_map>
 #include <variant>
-#include <vector>
 
 namespace steamrot {
-////////////////////////////////////////////////////////////
-// typedefs
-////////////////////////////////////////////////////////////
-using Archetype = std::vector<size_t>;
 
 /////////////////////////////////////////////////
 /// @class ArchetypeManager
@@ -60,14 +55,6 @@ public:
   /// @param entity_memory_pool Reference to the EntityMemoryPool in the scene.
   /////////////////////////////////////////////////
   ArchetypeManager(const EntityMemoryPool &entity_memory_pool);
-
-  /////////////////////////////////////////////////
-  /// @brief Returns the entity indexes for the given archetype IDs.
-  ///
-  /// @param An almgamated vector of ArchetypeIDs.
-  /////////////////////////////////////////////////
-  std::vector<size_t>
-  GetEntityIndexes(const std::vector<ArchetypeID> &archtype_IDs) const;
 
   /////////////////////////////////////////////////
   /// @brief Clears current archetypes and generates all archetypes

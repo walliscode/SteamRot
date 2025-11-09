@@ -9,10 +9,9 @@
 #include "entity_test_helpers.h"
 #include "CGrimoireMachina.h"
 #include "CUserInterface.h"
-#include "FlatbuffersConfigurator.h"
 #include "FlatbuffersDataLoader.h"
+#include "archetype_helpers.h"
 #include "catch2/catch_test_macros.hpp"
-#include "ArchetypeUtils.h"
 #include "scenes_generated.h"
 
 namespace steamrot::tests {
