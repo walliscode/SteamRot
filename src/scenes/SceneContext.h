@@ -8,7 +8,6 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include "ArchetypeManager.h"
 #include "AssetManager.h"
 #include "EntityManager.h"
 #include "EventHandler.h"
@@ -35,11 +34,13 @@ namespace steamrot {
 ////////////////////////////////////////////////////////////
 struct SceneContext {
   ////////////////////////////////////////////////////////////
-  /// @brief Constructor taking SceneResources, GameResources, and EntityManager.
+  /// @brief Constructor taking SceneResources, GameResources, and
+  /// EntityManager.
   ///
   /// @param scene_res Reference to SceneResources (contains render texture)
   /// @param game_res Reference to GameResources (contains window, assets, etc.)
-  /// @param entity_manager Reference to EntityManager (contains entities/archetypes)
+  /// @param entity_manager Reference to EntityManager (contains
+  /// entities/archetypes)
   ////////////////////////////////////////////////////////////
   SceneContext(SceneResources &scene_res, GameResources &game_res,
                EntityManager &entity_manager);

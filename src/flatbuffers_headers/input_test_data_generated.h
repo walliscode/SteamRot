@@ -131,8 +131,8 @@ struct MouseInputData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_POSITION = 4,
     VT_BUTTON = 6
   };
-  const Vector2fData *position() const {
-    return GetPointer<const Vector2fData *>(VT_POSITION);
+  const steamrot::Vector2fData *position() const {
+    return GetPointer<const steamrot::Vector2fData *>(VT_POSITION);
   }
   uint8_t button() const {
     return GetField<uint8_t>(VT_BUTTON, 0);
@@ -150,7 +150,7 @@ struct MouseInputDataBuilder {
   typedef MouseInputData Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_position(::flatbuffers::Offset<Vector2fData> position) {
+  void add_position(::flatbuffers::Offset<steamrot::Vector2fData> position) {
     fbb_.AddOffset(MouseInputData::VT_POSITION, position);
   }
   void add_button(uint8_t button) {
@@ -169,7 +169,7 @@ struct MouseInputDataBuilder {
 
 inline ::flatbuffers::Offset<MouseInputData> CreateMouseInputData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<Vector2fData> position = 0,
+    ::flatbuffers::Offset<steamrot::Vector2fData> position = 0,
     uint8_t button = 0) {
   MouseInputDataBuilder builder_(_fbb);
   builder_.add_position(position);

@@ -16,6 +16,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/generators/catch_generators_range.hpp>
+#include <iostream>
 
 TEST_CASE("load_test_data_configs loads from adjacent data directory",
           "[unit][harness]") {
@@ -157,8 +158,11 @@ TEST_CASE("run_fixture_test works with Catch2 generators", "[unit][harness]") {
   auto configs = steamrot::tests::load_test_data_configs();
   REQUIRE(configs.has_value());
 
+  std::cout << "Total test configs loaded: " << configs->size() << std::endl;
   const auto *config = GENERATE_COPY(from_range(configs.value()));
 
+  std::cout << "Running test: " << config->metadata()->test_name()->str()
+            << std::endl;
   // This is the main wrapper function for data-driven testing
   auto result = steamrot::tests::run_fixture_test(config);
 

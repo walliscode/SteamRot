@@ -7,13 +7,13 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "simulation_runner.h"
-#include "ArchetypeUtils.h"
 #include "CUserInterface.h"
 #include "CraftingRenderLogic.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
 #include "UIRenderLogic.h"
 #include "UIStateLogic.h"
+#include "archetype_helpers.h"
 #include "entity_memory.h"
 #include <format>
 
@@ -24,7 +24,7 @@ namespace steamrot::tests {
 /////////////////////////////////////////////////
 static std::expected<std::monostate, FailInfo>
 execute_function(const FunctionType function_type,
-                SceneContext &scene_context) {
+                 SceneContext &scene_context) {
 
   switch (function_type) {
   case FunctionType_ProcessUIActionsAndEvents: {
@@ -32,18 +32,17 @@ execute_function(const FunctionType function_type,
     // UI entities in the scene
     ArchetypeID ui_archetype = GenerateArchetypeIDfromTypes<CUserInterface>();
     const auto it = scene_context.archetypes.find(ui_archetype);
-    
+
     if (it != scene_context.archetypes.end()) {
       const Archetype &archetype = it->second;
       for (size_t entity_id : archetype) {
         CUserInterface &ui_component =
             entity::memory::GetComponent<CUserInterface>(
                 entity_id, scene_context.scene_entities);
-        
+
         if (ui_component.m_root_element) {
           ProcessUIActionsAndEvents(*ui_component.m_root_element,
-                                   scene_context.event_handler,
-                                   scene_context);
+                                    scene_context.event_handler, scene_context);
         }
       }
     }
@@ -54,18 +53,18 @@ execute_function(const FunctionType function_type,
     // Similar to above but processes nested elements
     ArchetypeID ui_archetype = GenerateArchetypeIDfromTypes<CUserInterface>();
     const auto it = scene_context.archetypes.find(ui_archetype);
-    
+
     if (it != scene_context.archetypes.end()) {
       const Archetype &archetype = it->second;
       for (size_t entity_id : archetype) {
         CUserInterface &ui_component =
             entity::memory::GetComponent<CUserInterface>(
                 entity_id, scene_context.scene_entities);
-        
+
         if (ui_component.m_root_element) {
           ProcessNestedUIActionsAndEvents(*ui_component.m_root_element,
-                                         scene_context.event_handler,
-                                         scene_context);
+                                          scene_context.event_handler,
+                                          scene_context);
         }
       }
     }
@@ -90,9 +89,8 @@ execute_function(const FunctionType function_type,
   default:
     std::string error_msg =
         std::format("Unknown or unsupported FunctionType: {}",
-                   static_cast<int>(function_type));
-    return std::unexpected(
-        FailInfo(FailMode::NonExistentEnumValue, error_msg));
+                    static_cast<int>(function_type));
+    return std::unexpected(FailInfo(FailMode::NonExistentEnumValue, error_msg));
   }
 }
 
@@ -101,7 +99,7 @@ execute_function(const FunctionType function_type,
 /////////////////////////////////////////////////
 static std::expected<std::monostate, FailInfo>
 execute_logic_class(const LogicClassType logic_class_type,
-                   SceneContext &scene_context) {
+                    SceneContext &scene_context) {
 
   switch (logic_class_type) {
   case LogicClassType_UIActionLogic: {
@@ -138,16 +136,15 @@ execute_logic_class(const LogicClassType logic_class_type,
   default:
     std::string error_msg =
         std::format("Unknown or unsupported LogicClassType: {}",
-                   static_cast<int>(logic_class_type));
-    return std::unexpected(
-        FailInfo(FailMode::NonExistentEnumValue, error_msg));
+                    static_cast<int>(logic_class_type));
+    return std::unexpected(FailInfo(FailMode::NonExistentEnumValue, error_msg));
   }
 }
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 execute_simulation_step(const SimulationStep *step,
-                       SceneContext &scene_context) {
+                        SceneContext &scene_context) {
 
   // Validate step
   if (!step) {
@@ -164,18 +161,16 @@ execute_simulation_step(const SimulationStep *step,
     return execute_logic_class(step->logic_class_type(), scene_context);
 
   default:
-    std::string error_msg =
-        std::format("Unknown ExecutionMode: {}",
-                   static_cast<int>(step->execution_mode()));
-    return std::unexpected(
-        FailInfo(FailMode::NonExistentEnumValue, error_msg));
+    std::string error_msg = std::format(
+        "Unknown ExecutionMode: {}", static_cast<int>(step->execution_mode()));
+    return std::unexpected(FailInfo(FailMode::NonExistentEnumValue, error_msg));
   }
 }
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 execute_simulation(const SimulationData *simulation_data,
-                  SceneContext &scene_context) {
+                   SceneContext &scene_context) {
 
   // Validate simulation data
   if (!simulation_data) {
@@ -203,7 +198,7 @@ execute_simulation(const SimulationData *simulation_data,
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 execute_simulation_with_fixture(const SimulationData *simulation_data,
-                               TestFixture &fixture) {
+                                TestFixture &fixture) {
 
   // Get the SceneContext from the fixture
   SceneContext &scene_context = fixture.GetSceneContext();

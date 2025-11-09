@@ -3,13 +3,12 @@
 /// @brief Implementation of the UIEventLogic class.
 /////////////////////////////////////////////////
 #include "UIActionLogic.h"
-#include "ArchetypeUtils.h"
-#include "ArchetypeManager.h"
 #include "CGrimoireMachina.h"
 #include "CUserInterface.h"
 #include "DropDownItemElement.h"
 #include "DropDownListElement.h"
 #include "Logic.h"
+#include "archetype_helpers.h"
 #include "entity_memory.h"
 #include "logic_ui.h"
 #include <SFML/Window/Mouse.hpp>
@@ -24,27 +23,22 @@ UIActionLogic::UIActionLogic(const SceneContext scene_context)
 /////////////////////////////////////////////////
 void UIActionLogic::ProcessLogic() {
 
-  ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<CUserInterface>();
+  // get all entity indexes with CUserInterface component
+  std::set<size_t> entity_indexes =
+      GenerateEntityIndexesFromComponents<CUserInterface>(
+          m_scene_context.archetypes, true);
 
-  const auto it = m_scene_context.archetypes.find(archetype_id);
-  // if it is not in the archetyps map, then skip
-  if (it != m_scene_context.archetypes.end()) {
+  // cycle through all the entity indexs in the archetype
+  for (size_t entity_id : entity_indexes) {
 
-    // get the archetype from the map
-    const Archetype &archetype = it->second;
+    // get the CUserInterface component
+    CUserInterface &ui_component = entity::memory::GetComponent<CUserInterface>(
+        entity_id, m_scene_context.scene_entities);
 
-    // cycle through all the entity indexs in the archetype
-    for (size_t entity_id : archetype) {
-
-      // get the CUserInterface component
-      CUserInterface &ui_component = entity::memory::GetComponent<CUserInterface>(
-          entity_id, m_scene_context.scene_entities);
-
-      // Perform any aciton logic here, processing nested elements recursively
-      ProcessNestedUIActionsAndEvents(*ui_component.m_root_element,
-                                      m_scene_context.event_handler,
-                                      m_scene_context);
-    }
+    // Perform any aciton logic here, processing nested elements recursively
+    ProcessNestedUIActionsAndEvents(*ui_component.m_root_element,
+                                    m_scene_context.event_handler,
+                                    m_scene_context);
   }
 }
 

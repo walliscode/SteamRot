@@ -65,8 +65,8 @@ struct View FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_TRIANGLES = 4,
     VT_DIRECTION = 6
   };
-  const ::flatbuffers::Vector<::flatbuffers::Offset<Triangle>> *triangles() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Triangle>> *>(VT_TRIANGLES);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Triangle>> *triangles() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Triangle>> *>(VT_TRIANGLES);
   }
   steamrot::ViewDirection direction() const {
     return static_cast<steamrot::ViewDirection>(GetField<uint8_t>(VT_DIRECTION, 0));
@@ -85,7 +85,7 @@ struct ViewBuilder {
   typedef View Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_triangles(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Triangle>>> triangles) {
+  void add_triangles(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Triangle>>> triangles) {
     fbb_.AddOffset(View::VT_TRIANGLES, triangles);
   }
   void add_direction(steamrot::ViewDirection direction) {
@@ -105,7 +105,7 @@ struct ViewBuilder {
 
 inline ::flatbuffers::Offset<View> CreateView(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Triangle>>> triangles = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Triangle>>> triangles = 0,
     steamrot::ViewDirection direction = steamrot::ViewDirection_NONE) {
   ViewBuilder builder_(_fbb);
   builder_.add_triangles(triangles);
@@ -115,9 +115,9 @@ inline ::flatbuffers::Offset<View> CreateView(
 
 inline ::flatbuffers::Offset<View> CreateViewDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<Triangle>> *triangles = nullptr,
+    const std::vector<::flatbuffers::Offset<steamrot::Triangle>> *triangles = nullptr,
     steamrot::ViewDirection direction = steamrot::ViewDirection_NONE) {
-  auto triangles__ = triangles ? _fbb.CreateVector<::flatbuffers::Offset<Triangle>>(*triangles) : 0;
+  auto triangles__ = triangles ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::Triangle>>(*triangles) : 0;
   return steamrot::CreateView(
       _fbb,
       triangles__,
@@ -129,8 +129,8 @@ struct SocketData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_VERTICES = 4
   };
-  const ::flatbuffers::Vector<::flatbuffers::Offset<Vector2fData>> *vertices() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Vector2fData>> *>(VT_VERTICES);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Vector2fData>> *vertices() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Vector2fData>> *>(VT_VERTICES);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -145,7 +145,7 @@ struct SocketDataBuilder {
   typedef SocketData Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_vertices(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Vector2fData>>> vertices) {
+  void add_vertices(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Vector2fData>>> vertices) {
     fbb_.AddOffset(SocketData::VT_VERTICES, vertices);
   }
   explicit SocketDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
@@ -162,7 +162,7 @@ struct SocketDataBuilder {
 
 inline ::flatbuffers::Offset<SocketData> CreateSocketData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Vector2fData>>> vertices = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Vector2fData>>> vertices = 0) {
   SocketDataBuilder builder_(_fbb);
   builder_.add_vertices(vertices);
   return builder_.Finish();
@@ -170,8 +170,8 @@ inline ::flatbuffers::Offset<SocketData> CreateSocketData(
 
 inline ::flatbuffers::Offset<SocketData> CreateSocketDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<Vector2fData>> *vertices = nullptr) {
-  auto vertices__ = vertices ? _fbb.CreateVector<::flatbuffers::Offset<Vector2fData>>(*vertices) : 0;
+    const std::vector<::flatbuffers::Offset<steamrot::Vector2fData>> *vertices = nullptr) {
+  auto vertices__ = vertices ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::Vector2fData>>(*vertices) : 0;
   return steamrot::CreateSocketData(
       _fbb,
       vertices__);

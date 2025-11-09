@@ -10,6 +10,7 @@
 #include "ArchetypeManager.h"
 #include "PanelElement.h"
 #include "TestFixture.h"
+#include "archetype_helpers.h"
 #include "entity_memory.h"
 #include <SFML/System/Vector2.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -20,8 +21,7 @@ TEST_CASE("UICollisionLogic::UICollisionLogic Constructor",
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestFixture test_context;
   // Instantiate UICollisionLogic
-  steamrot::UICollisionLogic ui_collision_logic(
-      test_context.GetSceneContext());
+  steamrot::UICollisionLogic ui_collision_logic(test_context.GetSceneContext());
   SUCCEED("UICollisionLogic instantiated successfully");
 }
 
