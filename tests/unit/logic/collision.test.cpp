@@ -6,9 +6,9 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "logic_collision.h"
 #include "PanelElement.h"
 #include "catch2/generators/catch_generators.hpp"
+#include "logic_collision.h"
 #include <SFML/Graphics/Rect.hpp>
 #include <catch2/catch_test_macros.hpp>
 
@@ -17,7 +17,8 @@ TEST_CASE("IsMouseOverBounds returns false for point outside bounds",
   sf::Vector2i mouse_position(150, 150);
   sf::FloatRect bounds({0, 0}, {100, 100});
 
-  bool result = steamrot::logic::collision::IsMouseOverBounds(mouse_position, bounds);
+  bool result =
+      steamrot::logic::collision::IsMouseOverBounds(mouse_position, bounds);
   REQUIRE(result == false);
 }
 
@@ -58,12 +59,13 @@ TEST_CASE("IsMouseOverBounds returns correct results for various bounds and "
           static_cast<float>(cases.mouse_pos.y), cases.bounds.position.x,
           cases.bounds.position.y,
           (cases.bounds.position.x + cases.bounds.size.x), cases.expected);
-  bool result =
-      steamrot::logic::collision::IsMouseOverBounds(cases.mouse_pos, cases.bounds);
+  bool result = steamrot::logic::collision::IsMouseOverBounds(cases.mouse_pos,
+                                                              cases.bounds);
   REQUIRE(result == cases.expected);
 }
 
-TEST_CASE("CheckMouseOverUIElement toggles Panel Element", "[unit][collision]") {
+TEST_CASE("CheckMouseOverUIElement toggles Panel Element",
+          "[unit][collision]") {
 
   // create Panel Element and set position and size
   steamrot::PanelElement panel_element;
@@ -74,47 +76,12 @@ TEST_CASE("CheckMouseOverUIElement toggles Panel Element", "[unit][collision]") 
   REQUIRE(panel_element.is_mouse_over == false);
   // check mouse position inside bounds
   sf::Vector2i mouse_position(50, 50);
-  steamrot::logic::collision::CheckMouseOverUIElement(mouse_position, panel_element);
+  steamrot::logic::collision::CheckMouseOverUIElement(mouse_position,
+                                                      panel_element);
   REQUIRE(panel_element.is_mouse_over == true);
   // now move mouse outside bounds
   mouse_position = sf::Vector2i(150, 150);
-  steamrot::logic::collision::CheckMouseOverUIElement(mouse_position, panel_element);
+  steamrot::logic::collision::CheckMouseOverUIElement(mouse_position,
+                                                      panel_element);
   REQUIRE(panel_element.is_mouse_over == false);
-}
-
-TEST_CASE("CheckMouseOverNestedUIElement toggles parent and child elements",
-          "[unit][collision]") {
-  // create parent Panel Element and set position and size
-  steamrot::PanelElement parent_element;
-  parent_element.position = {0, 0};
-  parent_element.size = {200, 200};
-  // create child Panel Element and set position and size
-  auto child_element_to_add = std::make_unique<steamrot::PanelElement>();
-  child_element_to_add->position = {50, 50};
-  child_element_to_add->size = {100, 100};
-  // add child to parent
-  parent_element.child_elements.push_back(std::move(child_element_to_add));
-  auto &child_element = *parent_element.child_elements[0].get();
-
-  // ensure is_mouse_over is false initially for both
-  REQUIRE(parent_element.is_mouse_over == false);
-  REQUIRE(child_element.is_mouse_over == false);
-  // check mouse position inside child bounds
-  sf::Vector2i mouse_position(75, 75);
-  steamrot::logic::collision::CheckMouseOverNestedUIElement(mouse_position,
-                                                     parent_element);
-  REQUIRE(child_element.is_mouse_over == true);
-  REQUIRE(parent_element.is_mouse_over == false);
-  // now move mouse outside child but inside parent bounds
-  mouse_position = sf::Vector2i(25, 25);
-  steamrot::logic::collision::CheckMouseOverNestedUIElement(mouse_position,
-                                                     parent_element);
-  REQUIRE(child_element.is_mouse_over == false);
-  REQUIRE(parent_element.is_mouse_over == true);
-  // now move mouse outside both bounds
-  mouse_position = sf::Vector2i(250, 250);
-  steamrot::logic::collision::CheckMouseOverNestedUIElement(mouse_position,
-                                                     parent_element);
-  REQUIRE(child_element.is_mouse_over == false);
-  REQUIRE(parent_element.is_mouse_over == false);
 }

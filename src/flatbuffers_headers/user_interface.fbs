@@ -42,6 +42,7 @@ table UIElementData{
     response_event_data: EventPacketData;
     children_active: bool ;
     children: [child] (required);
+    is_mouse_over: bool;
     layout: LayoutType;
     spacing_strategy: SpacingAndSizingType;
   }

@@ -336,8 +336,9 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_RESPONSE_EVENT_DATA = 10,
     VT_CHILDREN_ACTIVE = 12,
     VT_CHILDREN = 14,
-    VT_LAYOUT = 16,
-    VT_SPACING_STRATEGY = 18
+    VT_IS_MOUSE_OVER = 16,
+    VT_LAYOUT = 18,
+    VT_SPACING_STRATEGY = 20
   };
   const steamrot::Vector2fData *position() const {
     return GetPointer<const steamrot::Vector2fData *>(VT_POSITION);
@@ -356,6 +357,9 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::child>> *children() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::child>> *>(VT_CHILDREN);
+  }
+  bool is_mouse_over() const {
+    return GetField<uint8_t>(VT_IS_MOUSE_OVER, 0) != 0;
   }
   steamrot::LayoutType layout() const {
     return static_cast<steamrot::LayoutType>(GetField<int8_t>(VT_LAYOUT, 0));
@@ -377,6 +381,7 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffsetRequired(verifier, VT_CHILDREN) &&
            verifier.VerifyVector(children()) &&
            verifier.VerifyVectorOfTables(children()) &&
+           VerifyField<uint8_t>(verifier, VT_IS_MOUSE_OVER, 1) &&
            VerifyField<int8_t>(verifier, VT_LAYOUT, 1) &&
            VerifyField<int8_t>(verifier, VT_SPACING_STRATEGY, 1) &&
            verifier.EndTable();
@@ -404,6 +409,9 @@ struct UIElementDataBuilder {
   }
   void add_children(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::child>>> children) {
     fbb_.AddOffset(UIElementData::VT_CHILDREN, children);
+  }
+  void add_is_mouse_over(bool is_mouse_over) {
+    fbb_.AddElement<uint8_t>(UIElementData::VT_IS_MOUSE_OVER, static_cast<uint8_t>(is_mouse_over), 0);
   }
   void add_layout(steamrot::LayoutType layout) {
     fbb_.AddElement<int8_t>(UIElementData::VT_LAYOUT, static_cast<int8_t>(layout), 0);
@@ -433,6 +441,7 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementData(
     ::flatbuffers::Offset<steamrot::EventPacketData> response_event_data = 0,
     bool children_active = false,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::child>>> children = 0,
+    bool is_mouse_over = false,
     steamrot::LayoutType layout = steamrot::LayoutType_None,
     steamrot::SpacingAndSizingType spacing_strategy = steamrot::SpacingAndSizingType_None) {
   UIElementDataBuilder builder_(_fbb);
@@ -443,6 +452,7 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementData(
   builder_.add_position(position);
   builder_.add_spacing_strategy(spacing_strategy);
   builder_.add_layout(layout);
+  builder_.add_is_mouse_over(is_mouse_over);
   builder_.add_children_active(children_active);
   return builder_.Finish();
 }
@@ -455,6 +465,7 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
     ::flatbuffers::Offset<steamrot::EventPacketData> response_event_data = 0,
     bool children_active = false,
     const std::vector<::flatbuffers::Offset<steamrot::child>> *children = nullptr,
+    bool is_mouse_over = false,
     steamrot::LayoutType layout = steamrot::LayoutType_None,
     steamrot::SpacingAndSizingType spacing_strategy = steamrot::SpacingAndSizingType_None) {
   auto children__ = children ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::child>>(*children) : 0;
@@ -466,6 +477,7 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
       response_event_data,
       children_active,
       children__,
+      is_mouse_over,
       layout,
       spacing_strategy);
 }

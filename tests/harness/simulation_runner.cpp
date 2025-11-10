@@ -15,6 +15,8 @@
 #include "UIStateLogic.h"
 #include "archetype_helpers.h"
 #include "entity_memory.h"
+#include "logic_collision.h"
+#include "simulation_generated.h"
 #include <format>
 
 namespace steamrot::tests {
@@ -85,14 +87,32 @@ execute_function(const FunctionType function_type,
     return std::monostate{};
   }
 
+  case FunctionType_CheckMouseOverNestedUIElement: {
+
+    // grab the relvant entity ids
+    auto entity_indexes = GenerateEntityIndexesFromComponents<CUserInterface>(
+        scene_context.archetypes);
+
+    for (size_t entity_id : entity_indexes) {
+      CUserInterface &ui_component =
+          entity::memory::GetComponent<CUserInterface>(
+              entity_id, scene_context.scene_entities);
+      if (ui_component.m_root_element) {
+        steamrot::logic::collision::CheckMouseOverNestedUIElement(
+            scene_context.mouse_position, *ui_component.m_root_element);
+      }
+    }
+    return std::monostate{};
+  }
+
   case FunctionType_None:
   default:
     std::string error_msg =
         std::format("Unknown or unsupported FunctionType: {}",
-                    static_cast<int>(function_type));
+                    EnumNameFunctionType(function_type));
     return std::unexpected(FailInfo(FailMode::NonExistentEnumValue, error_msg));
   }
-}
+} // namespace steamrot::tests
 
 /////////////////////////////////////////////////
 /// @brief Execute a Logic class based on LogicClassType enum

@@ -91,12 +91,10 @@ CreateUIElement(const UIElementDataUnion &data_type, const void *data,
         FailInfo{FailMode::NonExistentEnumValue,
                  "CreateUIElement: Unsupported UI element type in union."});
   }
-  std::cout << "Swtich statment complete." << std::endl;
 
-  // Only call this once!
+  // Only call this once! for configuring the base data
   if (base_data) {
 
-    std::cout << "Configuring base UI element." << std::endl;
     auto base_config_result =
         ConfigureBaseUIElement(*element, *base_data, event_hanlder);
     if (!base_config_result.has_value())
@@ -119,6 +117,10 @@ ConfigureBaseUIElement(UIElement &element, const UIElementData &data,
 
   element.position = sf::Vector2f({data.position()->x(), data.position()->y()});
   element.size = sf::Vector2f({data.size()->x(), data.size()->y()});
+
+  // set is_mouse_over if available
+  if (data.is_mouse_over())
+    element.is_mouse_over = data.is_mouse_over();
 
   // set Subscription if subscriber_data exists and EventType is not none
   if (data.subscriber_data() && (data.subscriber_data()->event_type_data() !=

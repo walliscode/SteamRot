@@ -72,35 +72,38 @@ enum FunctionType : int8_t {
   FunctionType_ProcessNestedUIActionsAndEvents = 2,
   FunctionType_ProcessButtonElementActions = 3,
   FunctionType_ProcessDropDownListElementActions = 4,
+  FunctionType_CheckMouseOverNestedUIElement = 5,
   FunctionType_MIN = FunctionType_None,
-  FunctionType_MAX = FunctionType_ProcessDropDownListElementActions
+  FunctionType_MAX = FunctionType_CheckMouseOverNestedUIElement
 };
 
-inline const FunctionType (&EnumValuesFunctionType())[5] {
+inline const FunctionType (&EnumValuesFunctionType())[6] {
   static const FunctionType values[] = {
     FunctionType_None,
     FunctionType_ProcessUIActionsAndEvents,
     FunctionType_ProcessNestedUIActionsAndEvents,
     FunctionType_ProcessButtonElementActions,
-    FunctionType_ProcessDropDownListElementActions
+    FunctionType_ProcessDropDownListElementActions,
+    FunctionType_CheckMouseOverNestedUIElement
   };
   return values;
 }
 
 inline const char * const *EnumNamesFunctionType() {
-  static const char * const names[6] = {
+  static const char * const names[7] = {
     "None",
     "ProcessUIActionsAndEvents",
     "ProcessNestedUIActionsAndEvents",
     "ProcessButtonElementActions",
     "ProcessDropDownListElementActions",
+    "CheckMouseOverNestedUIElement",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameFunctionType(FunctionType e) {
-  if (::flatbuffers::IsOutRange(e, FunctionType_None, FunctionType_ProcessDropDownListElementActions)) return "";
+  if (::flatbuffers::IsOutRange(e, FunctionType_None, FunctionType_CheckMouseOverNestedUIElement)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesFunctionType()[index];
 }
