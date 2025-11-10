@@ -1,0 +1,73 @@
+{
+  "metadata": {
+    "test_name": "template_multi_step_workflow",
+    "description": "Template for multi-step workflow with multiple Logic classes",
+    "tags": ["unit", "logic", "workflow", "template"],
+    "expected_to_pass": true,
+    "author": "Your Name",
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 3,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "button_ui",
+          "start_visible": true,
+          "root_ui_element": {
+            "button_data": {
+              "position": { "x": 100, "y": 100 },
+              "size": { "x": 100, "y": 50 },
+              "label": "Test Button",
+              "is_mouse_over": false
+            }
+          }
+        }
+      }
+    ]
+  },
+  "simulation_data": {
+    "description": "Complete button interaction workflow: collision -> render -> action",
+    "steps": [
+      {
+        "simulation_type": "Collision",
+        "execution_mode": "LogicClass",
+        "logic_class_type": "UICollisionLogic",
+        "description": "Step 1: Check collision with mouse"
+      },
+      {
+        "simulation_type": "Render",
+        "execution_mode": "LogicClass",
+        "logic_class_type": "UIRenderLogic",
+        "description": "Step 2: Render UI elements"
+      },
+      {
+        "simulation_type": "Action",
+        "execution_mode": "Function",
+        "function_type": "ProcessButtonElementActions",
+        "description": "Step 3: Process button actions"
+      }
+    ]
+  },
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 3,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "button_ui",
+          "start_visible": true,
+          "root_ui_element": {
+            "button_data": {
+              "position": { "x": 100, "y": 100 },
+              "size": { "x": 100, "y": 50 },
+              "label": "Test Button",
+              "is_mouse_over": true
+            }
+          }
+        }
+      }
+    ]
+  }
+}
