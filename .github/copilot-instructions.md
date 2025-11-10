@@ -76,7 +76,7 @@ Use Doxygen-style comments with visual dividers:
 - Components: Prefix with `C` (e.g., `CUserInterface`, `CGrimoireMachina`)
 
 **File Naming:**
-See [FILE_NAMING_CONVENTIONS.md](../documentation/FILE_NAMING_CONVENTIONS.md) for complete details.
+See [FILE_NAMING_CONVENTIONS.md](../documentation/naming/FILE_NAMING_CONVENTIONS.md) for complete details.
 
 Quick reference:
 - **Classes**: `ClassName.h/cpp` (PascalCase) → `steamrot::ClassName`
@@ -1009,7 +1009,7 @@ void Function() {
 
 The context configuration system provides data-driven context configuration via FlatBuffers. This allows game and scene settings to be externalized to JSON files.
 
-See `documentation/CONTEXT_CONFIGURATION.md` for complete documentation.
+See `documentation/configuration/CONTEXT_CONFIGURATION.md` for complete documentation.
 
 ### Configuration Files
 
@@ -1054,7 +1054,7 @@ auto context = builder.Build().value();
 
 ### Related Documentation
 
-- `documentation/CONTEXT_CONFIGURATION.md` - Complete usage guide
+- `documentation/configuration/CONTEXT_CONFIGURATION.md` - Complete usage guide
 
 ## Testing Infrastructure
 
@@ -1195,7 +1195,7 @@ class NewLogicTest : public LogicTestBase<NewLogic> {
 
 The Test Data Configuration System provides a FlatBuffers-based framework for data-driven testing. Tests can be defined in JSON files and loaded at runtime, enabling easy addition of test cases without code changes.
 
-See `documentation/TEST_DATA_CONFIGURATION.md` for complete documentation.
+See `documentation/testing/TEST_DATA_CONFIGURATION.md` for complete documentation.
 
 ### EntityMemoryPool Matcher with Test Metadata
 
