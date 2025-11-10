@@ -4,6 +4,7 @@ draw_ui_elements.test.cpp
 draw_ui_elements_test_helpers.cpp
 collision.test.cpp
 ui_helpers.test.cpp
+logic_data_driven.test.cpp
 )
 
 target_include_directories(test_logic
