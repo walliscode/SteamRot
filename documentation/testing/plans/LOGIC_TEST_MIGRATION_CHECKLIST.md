@@ -29,39 +29,29 @@ This checklist helps track progress during the logic unit test migration to the 
 
 ## Stage 1: Simple Logic Tests (Week 2)
 
+**Note:** Using unified `logic_data_driven.test.cpp` file - no separate test files per Logic class needed. Just add JSON test data files.
+
 ### UICollisionLogic Tests
 - [x] `ui_collision_basic.test_data.json` - Basic collision detection
-- [ ] `ui_collision_constructor.test_data.json` - Constructor test (if needed - constructor test already exists in UICollisionLogic.test.cpp)
 - [ ] `ui_collision_mouse_over.test_data.json` - Mouse over element
 - [ ] `ui_collision_mouse_outside.test_data.json` - Mouse outside element
-- [x] Update `UICollisionLogic.test.cpp` to use data-driven approach
 - [ ] All tests pass (to be validated by user after local build)
-- [ ] Original tests kept for validation (N/A - no original Logic class tests existed)
 
 ### UIActionLogic Tests
-- [x] `ui_action_basic.test_data.json` - Basic action processing
-- [ ] `ui_action_constructor.test_data.json` - Constructor test (if needed - constructor test already exists in UIActionLogic.test.cpp)
+- [ ] `ui_action_basic.test_data.json` - Basic action processing
 - [ ] `ui_action_button_no_event.test_data.json` - Button without event
 - [ ] `ui_action_button_with_event.test_data.json` - Button with event
-- [x] Update `UIActionLogic.test.cpp` to use data-driven approach
 - [ ] All tests pass (to be validated by user after local build)
-- [ ] Original tests kept for validation (N/A - no original Logic class tests existed)
 
 ### UIRenderLogic Tests
 - [ ] `ui_render_basic.test_data.json` - Basic rendering
-- [ ] `ui_render_constructor.test_data.json` - Constructor test
 - [ ] `ui_render_single_element.test_data.json` - Single element
 - [ ] `ui_render_multiple_elements.test_data.json` - Multiple elements
-- [ ] Update `UIRenderLogic.test.cpp` to use data-driven approach
-- [ ] All tests pass
-- [ ] Original tests kept for validation
+- [ ] All tests pass (to be validated by user after local build)
 
 ### UIStateLogic Tests
 - [ ] `ui_state_basic.test_data.json` - Basic state update
-- [ ] `ui_state_constructor.test_data.json` - Constructor test
-- [ ] Update `UIStateLogic.test.cpp` to use data-driven approach
-- [ ] All tests pass
-- [ ] Original tests kept for validation
+- [ ] All tests pass (to be validated by user after local build)
 
 ### Stage 1 Validation
 - [ ] All Stage 1 tests pass
