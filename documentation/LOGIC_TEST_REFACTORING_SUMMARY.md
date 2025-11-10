@@ -80,20 +80,23 @@ TEST_CASE("UICollisionLogic tests", "[unit][data-driven]") {
 
 ## File Organization
 
+**Note:** The test harness discovers test data files non-recursively from the `data/` directory. Use a flat structure with descriptive file names to categorize tests.
+
 ```
 tests/unit/logic/
-├── data/                              # NEW: All test data here
-│   ├── ui_collision/
-│   │   ├── basic_collision.test_data.json
-│   │   └── edge_outside_bounds.test_data.json
-│   ├── ui_action/
-│   │   ├── button_click.test_data.json
-│   │   └── button_with_event.test_data.json
-│   └── workflows/
-│       └── button_click_workflow.test_data.json
-├── UIActionLogic.test.cpp             # UPDATED: Data-driven
-├── UICollisionLogic.test.cpp          # UPDATED: Data-driven
-└── UIRenderLogic.test.cpp             # UPDATED: Data-driven
+├── data/                                      # All test data files (flat)
+│   ├── templates/                             # Templates (not loaded)
+│   ├── ui_collision_basic.test_data.json      # UICollisionLogic tests
+│   ├── ui_collision_edge_outside_bounds.test_data.json
+│   ├── ui_action_button_click.test_data.json  # UIActionLogic tests
+│   ├── ui_action_button_with_event.test_data.json
+│   ├── ui_render_basic.test_data.json         # UIRenderLogic tests
+│   ├── ui_state_update.test_data.json         # UIStateLogic tests
+│   ├── workflow_button_click.test_data.json   # Multi-Logic workflows
+│   └── workflow_complete_cycle.test_data.json
+├── UIActionLogic.test.cpp                     # UPDATED: Data-driven
+├── UICollisionLogic.test.cpp                  # UPDATED: Data-driven
+└── UIRenderLogic.test.cpp                     # UPDATED: Data-driven
 ```
 
 ## Success Criteria

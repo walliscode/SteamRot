@@ -602,47 +602,54 @@ TEST_CASE("Input test", "[unit]") {
 
 ### Directory Structure
 
+The test harness automatically discovers all `.test_data.bin` files in the adjacent `data/` directory. We use a **flat directory structure** with descriptive file names rather than subdirectories, since the test harness doesn't traverse subdirectories and the file names themselves provide clear categorization.
+
 ```
 tests/unit/logic/
-├── data/                                    # NEW: Test data files
-│   ├── ui_collision/                        # Organized by Logic class
-│   │   ├── basic_collision.test_data.json
-│   │   ├── edge_outside_bounds.test_data.json
-│   │   └── nested_elements.test_data.json
-│   ├── ui_action/
-│   │   ├── button_click.test_data.json
-│   │   ├── button_with_event.test_data.json
-│   │   └── nested_actions.test_data.json
-│   ├── ui_render/
-│   │   ├── basic_render.test_data.json
-│   │   └── complex_layout.test_data.json
-│   ├── ui_state/
-│   │   └── state_update.test_data.json
-│   └── workflows/                           # Multi-Logic workflows
-│       ├── button_click_workflow.test_data.json
-│       ├── dropdown_interaction.test_data.json
-│       └── complete_ui_cycle.test_data.json
-├── UIActionLogic.test.cpp                   # Updated: data-driven
-├── UICollisionLogic.test.cpp                # Updated: data-driven
-├── UIRenderLogic.test.cpp                   # Updated: data-driven
-├── UIStateLogic.test.cpp                    # Updated: data-driven
-├── LogicFactory.test.cpp                    # Keep as-is (unit test)
-├── collision.test.cpp                       # Keep or migrate helpers
-├── draw_ui_elements.test.cpp                # Keep or migrate helpers
-├── ui_helpers.test.cpp                      # Keep or migrate helpers
-├── logic_test_base.h                        # Keep helper infrastructure
-├── logic_test_helpers.cpp                   # Keep helper infrastructure
-└── logic_test_helpers.h                     # Keep helper infrastructure
+├── data/                                          # NEW: All test data files
+│   ├── templates/                                 # Templates (not loaded by harness)
+│   │   ├── README.md
+│   │   ├── simple_logic_test.template.json
+│   │   ├── multi_step_workflow.template.json
+│   │   └── with_input_simulation.template.json
+│   ├── ui_collision_basic.test_data.json          # UICollisionLogic tests
+│   ├── ui_collision_edge_outside_bounds.test_data.json
+│   ├── ui_collision_nested_elements.test_data.json
+│   ├── ui_action_button_click.test_data.json      # UIActionLogic tests
+│   ├── ui_action_button_with_event.test_data.json
+│   ├── ui_action_nested_actions.test_data.json
+│   ├── ui_render_basic.test_data.json             # UIRenderLogic tests
+│   ├── ui_render_complex_layout.test_data.json
+│   ├── ui_state_update.test_data.json             # UIStateLogic tests
+│   ├── workflow_button_click.test_data.json       # Multi-Logic workflows
+│   ├── workflow_dropdown_interaction.test_data.json
+│   └── workflow_complete_ui_cycle.test_data.json
+├── UIActionLogic.test.cpp                         # Updated: data-driven
+├── UICollisionLogic.test.cpp                      # Updated: data-driven
+├── UIRenderLogic.test.cpp                         # Updated: data-driven
+├── UIStateLogic.test.cpp                          # Updated: data-driven
+├── LogicFactory.test.cpp                          # Keep as-is (unit test)
+├── collision.test.cpp                             # Keep or migrate helpers
+├── draw_ui_elements.test.cpp                      # Keep or migrate helpers
+├── ui_helpers.test.cpp                            # Keep or migrate helpers
+├── logic_test_base.h                              # Keep helper infrastructure
+├── logic_test_helpers.cpp                         # Keep helper infrastructure
+└── logic_test_helpers.h                           # Keep helper infrastructure
 ```
+
+**Note:** The test harness uses `std::filesystem::directory_iterator` which is non-recursive, so all test data files must be directly in the `data/` directory (not in subdirectories). The `templates/` subdirectory is an exception since template files are not loaded by the test harness (they don't have the `.test_data.bin` extension after compilation).
 
 ### Naming Conventions
 
 **Test Data Files:**
-- `{logic_class}_{test_scenario}.test_data.json`
+- `{logic_class}_{test_scenario}.test_data.json` for Logic-specific tests
+- `workflow_{scenario}.test_data.json` for multi-Logic workflows
+- Use underscores to separate words, be descriptive
 - Examples:
   - `ui_collision_basic.test_data.json`
   - `ui_action_button_click.test_data.json`
   - `workflow_complete_interaction.test_data.json`
+  - `ui_collision_edge_outside_bounds.test_data.json`
 
 **Test Names in Metadata:**
 - Clear, descriptive names

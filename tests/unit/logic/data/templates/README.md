@@ -80,8 +80,10 @@ Pick the template that matches your test scenario:
 ### Step 2: Copy and Rename
 
 ```bash
-cp simple_logic_test.template.json ../ui_collision/my_test.test_data.json
+cp simple_logic_test.template.json ../my_test.test_data.json
 ```
+
+**Note:** All test data files should be placed directly in the `data/` directory (not in subdirectories) since the test harness's `load_test_data_configs()` function discovers files non-recursively using `std::filesystem::directory_iterator`.
 
 **Naming convention:** `{logic_class}_{scenario}.test_data.json`
 

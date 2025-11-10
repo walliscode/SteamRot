@@ -5,10 +5,11 @@ This checklist helps track progress during the logic unit test migration to the 
 ## Pre-Migration (Stage 0)
 
 ### Infrastructure Setup
-- [ ] Create `tests/unit/logic/data/` directory
-- [ ] Create subdirectories: `ui_collision/`, `ui_action/`, `ui_render/`, `ui_state/`, `workflows/`
+- [ ] Create `tests/unit/logic/data/` directory (flat structure - no subdirectories needed)
 - [ ] Templates accessible at `tests/unit/logic/data/templates/`
 - [ ] Documentation reviewed by team
+
+**Note:** Use a flat directory structure with descriptive file names (e.g., `ui_collision_basic.test_data.json`) rather than subdirectories, since the test harness discovers files non-recursively.
 
 ### Proof of Concept
 - [ ] Select 1-2 simple tests for POC
