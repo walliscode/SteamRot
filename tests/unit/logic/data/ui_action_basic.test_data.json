@@ -1,0 +1,66 @@
+{
+  "metadata": {
+    "test_name": "ui_action_basic",
+    "description": "Basic UIActionLogic test - processes actions on a simple UI panel element",
+    "tags": ["unit", "logic", "UIActionLogic"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 3,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "test_panel",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 100, "y": 100 },
+              "size": { "x": 200, "y": 50 },
+              "is_mouse_over": false,
+              "children_active": false,
+              "children": [],
+              "layout": "Horizontal",
+              "spacing_strategy": "None"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "simulation_data": {
+    "description": "Execute action processing on UI panel element",
+    "steps": [
+      {
+        "simulation_type": "Action",
+        "execution_mode": "LogicClass",
+        "logic_class_type": "UIActionLogic",
+        "description": "Process UI actions - panel has no active subscriptions so no actions occur"
+      }
+    ]
+  },
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 3,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "test_panel",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 100, "y": 100 },
+              "size": { "x": 200, "y": 50 },
+              "is_mouse_over": false,
+              "children_active": false,
+              "children": [],
+              "layout": "Horizontal",
+              "spacing_strategy": "None"
+            }
+          }
+        }
+      }
+    ]
+  }
+}
