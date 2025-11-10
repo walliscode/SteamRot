@@ -7,6 +7,7 @@ This document provides a comprehensive overview of testing in SteamRot, includin
 **Related Documentation:**
 - [Test Data Configuration](TEST_DATA_CONFIGURATION.md) - Data-driven testing
 - [Test Harness Adoption](TEST_HARNESS_ADOPTION_PLAN.md) - Migration plan
+- [Testing Plans](plans/) - Future work and migration plans
 - [Workflows](../workflows/) - Implementation guides with testing
 
 ---

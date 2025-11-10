@@ -166,9 +166,9 @@ All planning documentation created:
 
 ### Context
 
-- [TEST_HARNESS_ADOPTION_PLAN.md](TEST_HARNESS_ADOPTION_PLAN.md) - Overall adoption strategy (this is Phase 2.3)
-- [TEST_DATA_CONFIGURATION.md](TEST_DATA_CONFIGURATION.md) - Test data system documentation
-- [tests/harness/README.md](../tests/harness/README.md) - Test harness API reference
+- [TEST_HARNESS_ADOPTION_PLAN.md](../TEST_HARNESS_ADOPTION_PLAN.md) - Overall adoption strategy (this is Phase 2.3)
+- [TEST_DATA_CONFIGURATION.md](../TEST_DATA_CONFIGURATION.md) - Test data system documentation
+- [tests/harness/README.md](../../../tests/harness/README.md) - Test harness API reference
 
 ### Examples
 

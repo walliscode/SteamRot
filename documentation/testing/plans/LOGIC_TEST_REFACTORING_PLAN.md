@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-This document outlines the staged approach to refactoring logic unit tests from manual TestFixture setup to data-driven tests using the test harness system. This refactoring aligns with **Phase 2.3** of the [TEST_HARNESS_ADOPTION_PLAN.md](TEST_HARNESS_ADOPTION_PLAN.md).
+This document outlines the staged approach to refactoring logic unit tests from manual TestFixture setup to data-driven tests using the test harness system. This refactoring aligns with **Phase 2.3** of the [TEST_HARNESS_ADOPTION_PLAN.md](../TEST_HARNESS_ADOPTION_PLAN.md).
 
 ## Current State Analysis
 
@@ -44,7 +44,7 @@ TEST_CASE("UIActionLogic test", "[unit][UIActionLogic]") {
 
 ### Test Harness Capabilities
 
-The test harness (documented in `tests/harness/README.md`) provides:
+The test harness (documented in `../../../tests/harness/README.md`) provides:
 
 1. **Automatic fixture creation** from test data
 2. **Entity configuration** from JSON (`start_entity_collection`)
@@ -77,7 +77,7 @@ TEST_CASE("Data-driven logic test", "[unit][logic][data-driven]") {
 3. **Leverage simulation capabilities** - Test multi-step Logic sequences
 4. **Enable data-driven testing** - Use Catch2 generators for parameterization
 5. **Maintain test coverage** - No regression in test coverage
-6. **Follow adoption plan** - Implement Phase 2.3 from TEST_HARNESS_ADOPTION_PLAN.md
+6. **Follow adoption plan** - Implement Phase 2.3 from [TEST_HARNESS_ADOPTION_PLAN.md](../TEST_HARNESS_ADOPTION_PLAN.md)
 
 ## Stage Plan
 
@@ -812,10 +812,10 @@ See:
 
 ## References
 
-- [TEST_HARNESS_ADOPTION_PLAN.md](TEST_HARNESS_ADOPTION_PLAN.md) - Overall adoption plan
-- [TEST_DATA_CONFIGURATION.md](TEST_DATA_CONFIGURATION.md) - Test data system docs
-- [tests/harness/README.md](../tests/harness/README.md) - Test harness API
-- [Phase 2.3 in Adoption Plan](TEST_HARNESS_ADOPTION_PLAN.md#23-logic-class-tests-with-simulations) - Relevant section
+- [TEST_HARNESS_ADOPTION_PLAN.md](../TEST_HARNESS_ADOPTION_PLAN.md) - Overall adoption plan
+- [TEST_DATA_CONFIGURATION.md](../TEST_DATA_CONFIGURATION.md) - Test data system docs
+- [tests/harness/README.md](../../../tests/harness/README.md) - Test harness API
+- [Phase 2.3 in Adoption Plan](../TEST_HARNESS_ADOPTION_PLAN.md#23-logic-class-tests-with-simulations) - Relevant section
 
 ## Conclusion
 

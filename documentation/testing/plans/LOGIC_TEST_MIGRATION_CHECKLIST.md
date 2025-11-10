@@ -269,4 +269,4 @@ Use this section to track issues, decisions, and learnings during migration:
 - [Full Plan](LOGIC_TEST_REFACTORING_PLAN.md)
 - [Executive Summary](LOGIC_TEST_REFACTORING_SUMMARY.md)
 - [Documentation Index](LOGIC_TEST_REFACTORING_INDEX.md)
-- [Template Guide](../tests/unit/logic/data/templates/README.md)
+- [Template Guide](../../../tests/unit/logic/data/templates/README.md)

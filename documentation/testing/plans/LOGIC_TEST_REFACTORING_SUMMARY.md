@@ -6,7 +6,7 @@
 
 **Timeline:** 6 weeks (Stages 0-5)
 
-**Alignment:** Phase 2.3 of [TEST_HARNESS_ADOPTION_PLAN.md](TEST_HARNESS_ADOPTION_PLAN.md)
+**Alignment:** Phase 2.3 of [TEST_HARNESS_ADOPTION_PLAN.md](../TEST_HARNESS_ADOPTION_PLAN.md)
 
 ## The Change
 
@@ -126,9 +126,9 @@ tests/unit/logic/
 ## Key Resources
 
 - **Full Plan:** [LOGIC_TEST_REFACTORING_PLAN.md](LOGIC_TEST_REFACTORING_PLAN.md)
-- **Test Harness API:** [tests/harness/README.md](../tests/harness/README.md)
-- **Test Data System:** [TEST_DATA_CONFIGURATION.md](TEST_DATA_CONFIGURATION.md)
-- **Overall Strategy:** [TEST_HARNESS_ADOPTION_PLAN.md](TEST_HARNESS_ADOPTION_PLAN.md)
+- **Test Harness API:** [tests/harness/README.md](../../../tests/harness/README.md)
+- **Test Data System:** [TEST_DATA_CONFIGURATION.md](../TEST_DATA_CONFIGURATION.md)
+- **Overall Strategy:** [TEST_HARNESS_ADOPTION_PLAN.md](../TEST_HARNESS_ADOPTION_PLAN.md)
 
 ## Quick Start (Stage 0)
 
@@ -197,8 +197,8 @@ auto sim_result = steamrot::tests::execute_simulation_with_fixture(
 
 Refer to:
 - [Full refactoring plan](LOGIC_TEST_REFACTORING_PLAN.md) - Detailed stages, examples, patterns
-- [Test harness README](../tests/harness/README.md) - API documentation
-- [Adoption plan Phase 2.3](TEST_HARNESS_ADOPTION_PLAN.md#23-logic-class-tests-with-simulations) - Strategy context
+- [Test harness README](../../../tests/harness/README.md) - API documentation
+- [Adoption plan Phase 2.3](../TEST_HARNESS_ADOPTION_PLAN.md#23-logic-class-tests-with-simulations) - Strategy context
 
 ## Status Tracking
 

@@ -33,9 +33,9 @@
 
 | Document | Relevance |
 |----------|-----------|
-| [TEST_HARNESS_ADOPTION_PLAN.md](TEST_HARNESS_ADOPTION_PLAN.md) | Overall test harness adoption strategy (Phase 2.3 = this plan) |
-| [TEST_DATA_CONFIGURATION.md](TEST_DATA_CONFIGURATION.md) | Test data system documentation |
-| [tests/harness/README.md](../tests/harness/README.md) | Test harness API reference |
+| [TEST_HARNESS_ADOPTION_PLAN.md](../TEST_HARNESS_ADOPTION_PLAN.md) | Overall test harness adoption strategy (Phase 2.3 = this plan) |
+| [TEST_DATA_CONFIGURATION.md](../TEST_DATA_CONFIGURATION.md) | Test data system documentation |
+| [tests/harness/README.md](../../../tests/harness/README.md) | Test harness API reference |
 
 ## Common Questions
 
@@ -71,7 +71,7 @@
 - See `tests/unit/logic/data/templates/*.template.json`
 
 **In test harness:**
-- See `tests/harness/data/*.test_data.json`
+- See `../../../tests/harness/data/*.test_data.json`
 - Especially `sample_simulation_test.test_data.json`
 - And `sample_complete_workflow.test_data.json`
 
@@ -215,13 +215,13 @@ Consult the [risk mitigation section](LOGIC_TEST_REFACTORING_PLAN.md#risks-and-m
 
 ### Documentation Issues
 - Check [full plan](LOGIC_TEST_REFACTORING_PLAN.md) for detailed guidance
-- Review [template README](../tests/unit/logic/data/templates/README.md) for usage patterns
-- Consult [test harness API](../tests/harness/README.md)
+- Review [template README](../../../tests/unit/logic/data/templates/README.md) for usage patterns
+- Consult [test harness API](../../../tests/harness/README.md)
 
 ### Technical Issues
-- Review [test data configuration docs](TEST_DATA_CONFIGURATION.md)
-- Check [test harness adoption plan](TEST_HARNESS_ADOPTION_PLAN.md)
-- Look at existing examples in `tests/harness/data/`
+- Review [test data configuration docs](../TEST_DATA_CONFIGURATION.md)
+- Check [test harness adoption plan](../TEST_HARNESS_ADOPTION_PLAN.md)
+- Look at existing examples in `../../../tests/harness/data/`
 
 ### Process Questions
 - See [risk mitigation](LOGIC_TEST_REFACTORING_PLAN.md#risks-and-mitigations)
@@ -241,9 +241,9 @@ Consult the [risk mitigation section](LOGIC_TEST_REFACTORING_PLAN.md#risks-and-m
 - [Input Simulation →](../tests/unit/logic/data/templates/with_input_simulation.template.json)
 
 **Reference:**
-- [Test Harness API →](../tests/harness/README.md)
-- [Test Data Configuration →](TEST_DATA_CONFIGURATION.md)
-- [Adoption Plan Phase 2.3 →](TEST_HARNESS_ADOPTION_PLAN.md#23-logic-class-tests-with-simulations)
+- [Test Harness API →](../../../tests/harness/README.md)
+- [Test Data Configuration →](../TEST_DATA_CONFIGURATION.md)
+- [Adoption Plan Phase 2.3 →](../TEST_HARNESS_ADOPTION_PLAN.md#23-logic-class-tests-with-simulations)
 
 ## Status Tracking
 
