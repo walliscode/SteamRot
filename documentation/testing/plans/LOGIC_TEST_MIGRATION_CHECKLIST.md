@@ -5,47 +5,47 @@ This checklist helps track progress during the logic unit test migration to the 
 ## Pre-Migration (Stage 0)
 
 ### Infrastructure Setup
-- [ ] Create `tests/unit/logic/data/` directory (flat structure - no subdirectories needed)
-- [ ] Templates accessible at `tests/unit/logic/data/templates/`
+- [x] Create `tests/unit/logic/data/` directory (flat structure - no subdirectories needed)
+- [x] Templates accessible at `tests/unit/logic/data/templates/`
 - [ ] Documentation reviewed by team
 
 **Note:** Use a flat directory structure with descriptive file names (e.g., `ui_collision_basic.test_data.json`) rather than subdirectories, since the test harness discovers files non-recursively.
 
 ### Proof of Concept
-- [ ] Select 1-2 simple tests for POC
-- [ ] Copy appropriate template
-- [ ] Customize test data
-- [ ] Build project successfully
-- [ ] Run POC tests - all pass
-- [ ] Compare with original manual tests - behavior matches
+- [x] Select 1-2 simple tests for POC
+- [x] Copy appropriate template
+- [x] Customize test data
+- [ ] Build project successfully (to be done by user locally)
+- [ ] Run POC tests - all pass (to be done by user locally)
+- [ ] Compare with original manual tests - behavior matches (to be done by user locally)
 - [ ] Team review and approval
 
 ### Validation
-- [ ] Test harness works with logic tests
-- [ ] Entity configuration works correctly
-- [ ] Simulation execution works
-- [ ] State comparison works
+- [ ] Test harness works with logic tests (to be validated by user after local build)
+- [ ] Entity configuration works correctly (to be validated by user after local build)
+- [ ] Simulation execution works (to be validated by user after local build)
+- [ ] State comparison works (to be validated by user after local build)
 - [ ] Team comfortable with approach
 
 ## Stage 1: Simple Logic Tests (Week 2)
 
 ### UICollisionLogic Tests
-- [ ] `ui_collision_basic.test_data.json` - Basic collision detection
-- [ ] `ui_collision_constructor.test_data.json` - Constructor test
+- [x] `ui_collision_basic.test_data.json` - Basic collision detection
+- [ ] `ui_collision_constructor.test_data.json` - Constructor test (if needed - constructor test already exists in UICollisionLogic.test.cpp)
 - [ ] `ui_collision_mouse_over.test_data.json` - Mouse over element
 - [ ] `ui_collision_mouse_outside.test_data.json` - Mouse outside element
-- [ ] Update `UICollisionLogic.test.cpp` to use data-driven approach
-- [ ] All tests pass
-- [ ] Original tests kept for validation
+- [x] Update `UICollisionLogic.test.cpp` to use data-driven approach
+- [ ] All tests pass (to be validated by user after local build)
+- [ ] Original tests kept for validation (N/A - no original Logic class tests existed)
 
 ### UIActionLogic Tests
-- [ ] `ui_action_basic.test_data.json` - Basic action processing
-- [ ] `ui_action_constructor.test_data.json` - Constructor test
+- [x] `ui_action_basic.test_data.json` - Basic action processing
+- [ ] `ui_action_constructor.test_data.json` - Constructor test (if needed - constructor test already exists in UIActionLogic.test.cpp)
 - [ ] `ui_action_button_no_event.test_data.json` - Button without event
 - [ ] `ui_action_button_with_event.test_data.json` - Button with event
-- [ ] Update `UIActionLogic.test.cpp` to use data-driven approach
-- [ ] All tests pass
-- [ ] Original tests kept for validation
+- [x] Update `UIActionLogic.test.cpp` to use data-driven approach
+- [ ] All tests pass (to be validated by user after local build)
+- [ ] Original tests kept for validation (N/A - no original Logic class tests existed)
 
 ### UIRenderLogic Tests
 - [ ] `ui_render_basic.test_data.json` - Basic rendering
