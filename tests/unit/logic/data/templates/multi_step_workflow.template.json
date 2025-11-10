@@ -13,14 +13,32 @@
       {
         "index": 0,
         "c_user_interface": {
-          "ui_name": "button_ui",
+          "ui_name": "panel_with_button",
           "start_visible": true,
           "root_ui_element": {
-            "button_data": {
-              "position": { "x": 100, "y": 100 },
-              "size": { "x": 100, "y": 50 },
-              "label": "Test Button",
-              "is_mouse_over": false
+            "base_data": {
+              "position": { "x": 50, "y": 50 },
+              "size": { "x": 300, "y": 200 },
+              "children_active": true,
+              "children": [
+                {
+                  "element": {
+                    "button_data": {
+                      "base_data": {
+                        "position": { "x": 100, "y": 100 },
+                        "size": { "x": 100, "y": 50 },
+                        "children_active": false,
+                        "children": [],
+                        "layout": "None",
+                        "spacing_strategy": "None"
+                      },
+                      "label": "Test Button"
+                    }
+                  }
+                }
+              ],
+              "layout": "Horizontal",
+              "spacing_strategy": "None"
             }
           }
         }
@@ -45,8 +63,8 @@
       {
         "simulation_type": "Action",
         "execution_mode": "Function",
-        "function_type": "ProcessButtonElementActions",
-        "description": "Step 3: Process button actions"
+        "function_type": "ProcessNestedUIActionsAndEvents",
+        "description": "Step 3: Process nested UI actions"
       }
     ]
   },
@@ -56,14 +74,32 @@
       {
         "index": 0,
         "c_user_interface": {
-          "ui_name": "button_ui",
+          "ui_name": "panel_with_button",
           "start_visible": true,
           "root_ui_element": {
-            "button_data": {
-              "position": { "x": 100, "y": 100 },
-              "size": { "x": 100, "y": 50 },
-              "label": "Test Button",
-              "is_mouse_over": true
+            "base_data": {
+              "position": { "x": 50, "y": 50 },
+              "size": { "x": 300, "y": 200 },
+              "children_active": true,
+              "children": [
+                {
+                  "element": {
+                    "button_data": {
+                      "base_data": {
+                        "position": { "x": 100, "y": 100 },
+                        "size": { "x": 100, "y": 50 },
+                        "children_active": false,
+                        "children": [],
+                        "layout": "None",
+                        "spacing_strategy": "None"
+                      },
+                      "label": "Test Button"
+                    }
+                  }
+                }
+              ],
+              "layout": "Horizontal",
+              "spacing_strategy": "None"
             }
           }
         }
