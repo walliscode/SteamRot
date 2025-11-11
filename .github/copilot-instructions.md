@@ -1195,7 +1195,24 @@ class NewLogicTest : public LogicTestBase<NewLogic> {
 
 The Test Data Configuration System provides a FlatBuffers-based framework for data-driven testing. Tests can be defined in JSON files and loaded at runtime, enabling easy addition of test cases without code changes.
 
-See `documentation/testing/TEST_DATA_CONFIGURATION.md` for complete documentation.
+**Documentation:**
+- **Human Workflow Guide**: `documentation/workflows/FILLING_TEST_DATA.md` - Practical guide for creating test_data.json files
+- **Technical Reference**: `documentation/testing/TEST_DATA_CONFIGURATION.md` - Complete API and schema reference
+
+**When helping users create test_data.json files:**
+1. Direct them to `documentation/workflows/FILLING_TEST_DATA.md` for workflow-based guidance
+2. Reference the specific workflow section that matches their testing scenario:
+   - Workflow 1: Metadata-Only Test
+   - Workflow 2: Simple Entity Comparison
+   - Workflow 3: Entity State Transformation
+   - Workflow 4: Simulation with Logic Classes
+   - Workflow 5: Simulation with Free Functions
+   - Workflow 6: Input Sequence Testing
+   - Workflow 7: Event Sequence Testing
+   - Workflow 8: Combined Testing (Input + Events + Simulation)
+   - Workflow 9: Negative Testing (Expected to Fail)
+3. Use the field reference and examples in the workflow guide
+4. For technical details about schemas and APIs, reference `TEST_DATA_CONFIGURATION.md`
 
 ### EntityMemoryPool Matcher with Test Metadata
 
