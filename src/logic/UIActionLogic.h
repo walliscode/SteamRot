@@ -3,9 +3,6 @@
 /// @brief Declaration of the UIEventLogic class.
 /////////////////////////////////////////////////
 
-#include "ButtonElement.h"
-#include "DropDownListElement.h"
-#include "EventHandler.h"
 #include "Logic.h"
 
 namespace steamrot {
@@ -29,54 +26,4 @@ public:
   UIActionLogic(const SceneContext scene_context);
 };
 
-/////////////////////////////////////////////////
-/// @brief Dispatches the variant to the correct action processing function.
-///
-/// @param ui_element Element to process.
-/// @param event_handler Event handler to process actions with.
-/// @param scene_context SceneContext containing scene entities and archetypes
-/////////////////////////////////////////////////
-void ProcessUIActionsAndEvents(UIElement &ui_element,
-                               EventHandler &event_handler,
-                               const SceneContext &scene_context);
-
-/////////////////////////////////////////////////
-/// @brief Process actions for a UI element and its nested children recursively.
-///
-/// This function processes UI elements in a depth-first manner, ensuring that
-/// child elements are processed before their parents. If a child element is
-/// processed, the parent element will not be processed to avoid overlapping
-/// element actions.
-///
-/// @param ui_element Element to process along with its children.
-/// @param event_handler Event handler to process actions with.
-/// @param scene_context SceneContext containing scene entities and archetypes
-/////////////////////////////////////////////////
-void ProcessNestedUIActionsAndEvents(UIElement &ui_element,
-                                     EventHandler &event_handler,
-                                     const SceneContext &scene_context);
-
-/////////////////////////////////////////////////
-/// @brief Process actions for a ButtonElement
-///
-/// This function checks if the button is in a state to trigger its response
-/// event. Thee subscriber will have already been checked before this function
-/// is called.
-///
-/// @param button_element ButtonElement to process
-/////////////////////////////////////////////////
-void ProcessButtonElementActions(ButtonElement &button_element,
-                                 EventHandler &event_handler);
-
-/////////////////////////////////////////////////
-/// @brief Process actions for a DropDownListElement
-///
-/// This function handles data population for dropdown lists based on their
-/// DataPopulateFunction enum value.
-///
-/// @param dropdown_list_element DropDownListElement to process
-/// @param scene_context SceneContext containing scene entities and archetypes
-/////////////////////////////////////////////////
-void ProcessDropDownListElementActions(DropDownListElement &dropdown_list_element,
-                                       const SceneContext &scene_context);
 } // namespace steamrot
