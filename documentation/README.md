@@ -143,7 +143,6 @@ Conventions for code organization:
 | **[Quick Reference](naming/NAMING_QUICK_REFERENCE.md)** | Decision trees and lookup tables |
 | **[Complete Guide](naming/FILE_NAMING_CONVENTIONS.md)** | Detailed rules and rationale |
 | **[Visual Guide](naming/naming_system_diagram.md)** | ASCII diagrams and examples |
-| **[Summary](naming/NAMING_SYSTEM_SUMMARY.md)** | Concise naming summary |
 
 ### Style Guide
 
