@@ -13,7 +13,6 @@
 #include "DropDownContainerElement.h"
 #include "DropDownItemElement.h"
 #include "DropDownListElement.h"
-#include "PanelElement.h"
 #include "UIElement.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>

@@ -24,11 +24,9 @@ enum FunctionType : byte {
   ProcessNestedUIActionsAndEvents = 2,
   ProcessButtonElementActions = 3,
   ProcessDropDownListElementActions = 4,
-  
-  // Future: Add other free functions as needed
-  // ProcessUICollision = 10,
-  // ProcessUIRender = 20,
-  // ProcessMovement = 30,
+
+// logic collision functions
+CheckMouseOverNestedUIElement,
 }
 
 ////////////////////////////////////////////////////////////

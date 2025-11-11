@@ -36,7 +36,7 @@ public:
       children = builder.CreateVector<flatbuffers::Offset<child>>({});
     }
     return CreateUIElementData(builder, position, size, subscriber_data,
-                               response_event, children_active, children,
+                               response_event, children_active, children, false,
                                layout, spacing);
   }
 
