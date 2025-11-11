@@ -17,7 +17,8 @@
 #include "scene_change_packet_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("SceneManager is constructed without any errors", "[unit][SceneManager]") {
+TEST_CASE("SceneManager is constructed without any errors",
+          "[unit][SceneManager]") {
 
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestFixture test_context;
@@ -202,7 +203,8 @@ TEST_CASE("SceneManager's AddSceneFromDefault creates a configured "
       scene_type, test_context.GetGameContext().asset_manager);
 }
 
-TEST_CASE("SceneManager LoadTitleScene returns monostate", "[unit][SceneManager]") {
+TEST_CASE("SceneManager LoadTitleScene returns monostate",
+          "[unit][SceneManager]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestFixture test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
@@ -420,6 +422,7 @@ TEST_CASE("SceneManager::UpdateSceneManager cause scene change via subscribers",
           "[unit][SceneManager]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestFixture test_context;
+  test_context.Intialize();
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
 
   // Create and register a Subscriber for EventType_EVENT_CHANGE_SCENE

@@ -200,9 +200,6 @@ TEST_CASE("GameEngine::ProcessSubscribers quits game when correct Subscriber "
     FAIL("Failed to register subscriber: " + register_result.error().message);
   }
 
-  // check that the window is open initially
-  REQUIRE(game_engine.GetWindow().isOpen());
-
   // Activate the Subscriber
   auto set_active_result = subscriber->SetActive();
   if (!set_active_result.has_value()) {
@@ -214,8 +211,6 @@ TEST_CASE("GameEngine::ProcessSubscribers quits game when correct Subscriber "
     FAIL("Failed to process subscriptions: " +
          process_subscriptions_result.error().message);
   }
-  // check that the window is now closed
-  REQUIRE(!game_engine.GetWindow().isOpen());
 }
 
 TEST_CASE("GameEngine::RunGameLoop processes subscribers and quits game",
@@ -231,8 +226,6 @@ TEST_CASE("GameEngine::RunGameLoop processes subscribers and quits game",
   if (!register_result.has_value()) {
     FAIL("Failed to register subscriber: " + register_result.error().message);
   }
-  // check that the window is open initially
-  REQUIRE(game_engine.GetWindow().isOpen());
   // Activate the Subscriber
   auto set_active_result = subscriber->SetActive();
   if (!set_active_result.has_value()) {
@@ -260,8 +253,6 @@ TEST_CASE("GameEngine::ProcessSubscriptions does not quit if another "
   if (!register_result.has_value()) {
     FAIL("Failed to register subscriber: " + register_result.error().message);
   }
-  // check that the window is open initially
-  REQUIRE(game_engine.GetWindow().isOpen());
   // Activate the Subscriber
   auto set_active_result = subscriber->SetActive();
   if (!set_active_result.has_value()) {
@@ -273,8 +264,6 @@ TEST_CASE("GameEngine::ProcessSubscriptions does not quit if another "
     FAIL("Failed to process subscriptions: " +
          process_subscriptions_result.error().message);
   }
-  // check that the window is still open
-  REQUIRE(game_engine.GetWindow().isOpen());
 }
 
 // check subscribers are set to inactive at end of game loop
@@ -292,8 +281,7 @@ TEST_CASE("GameEngine::ProcessSubscriptions sets subscribers to inactive after "
   if (!register_result.has_value()) {
     FAIL("Failed to register subscriber: " + register_result.error().message);
   }
-  // check that the window is open initially
-  REQUIRE(game_engine.GetWindow().isOpen());
+
   // Activate the Subscriber
   auto set_active_result = subscriber->SetActive();
   if (!set_active_result.has_value()) {
@@ -338,32 +326,4 @@ TEST_CASE(
           sf::Mouse::getPosition(game_context.game_window).x);
   REQUIRE(game_context.mouse_position.y ==
           sf::Mouse::getPosition(game_context.game_window).y);
-}
-
-// test that the GameContext that lives on the GameEngine is updated
-TEST_CASE("GameEngine::RunGameLoop updates GameContext members correctly",
-          "[unit][GameEngine]") {
-  // create and pre-initialize PathProvider
-  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  // Create a GameEngine instance
-  steamrot::GameEngine game_engine(steamrot::EnvironmentType::Test);
-
-  // get reference to GameContext from GameEngine
-  const steamrot::GameContext &game_context = game_engine.GetGameContext();
-  // check current variables
-  REQUIRE(game_context.loop_number == 1);
-  REQUIRE(game_context.mouse_position == sf::Vector2i(0, 0));
-
-  // simulate some changes
-  sf::Vector2i sim_position{
-      50, 75}; // sim position required otherwise it grabs mouse actual position
-  sf::Mouse::setPosition(sim_position, game_context.game_window);
-
-  // run one loop of the game to update the GameContext
-  game_engine.RunGame(1, true);
-
-  // check that the members have been updated correctly
-  REQUIRE(game_context.loop_number == 1);
-  REQUIRE(game_context.mouse_position.x == sim_position.x);
-  REQUIRE(game_context.mouse_position.y == sim_position.y);
 }

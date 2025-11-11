@@ -2,7 +2,7 @@
   "metadata": {
     "test_name": "logic_collision_check_mouse_over",
     "description": "given a UI element, when checking for mouse over collision, then the collision is detected correctly",
-    "tags": ["unit", "logic", "collisiont"],
+    "tags": ["unit", "logic", "collision"],
     "expected_to_pass": true,
     "version": 1
   },
