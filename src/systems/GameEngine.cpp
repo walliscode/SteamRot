@@ -6,9 +6,9 @@
 #include "FailInfo.h"
 #include "FlatbuffersDataLoader.h"
 #include "GameContext.h"
-#include "resources_configuration.h"
 #include "SubscriberFactory.h"
 #include "events_generated.h"
+#include "resources_configuration.h"
 #include <SFML/Graphics.hpp>
 
 #include <cstddef>
@@ -32,11 +32,13 @@ GameEngine::GameEngine(EnvironmentType env_type)
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> GameEngine::ConfigureGameEngineFromData(
     const GameEngineData *game_engine_data) {
+
   if (!game_engine_data) {
     FailInfo fail_info(FailMode::NullPointer,
                        "GameEngineData is a null pointer");
     return std::unexpected(fail_info);
   }
+
   // configure Subscribers from data
   auto configure_result =
       ConfigureSubscribersFromData(game_engine_data->subscriptions());
@@ -73,8 +75,8 @@ void GameEngine::StartUp() {
     return;
   }
 
-  auto configure_resources_result =
-      resources::ConfigureGameResources(m_game_resources, game_resources_result.value());
+  auto configure_resources_result = resources::ConfigureGameResources(
+      m_game_resources, game_resources_result.value());
   if (!configure_resources_result) {
     std::cerr << "Failed to configure game resources: "
               << configure_resources_result.error().message << "\n";
