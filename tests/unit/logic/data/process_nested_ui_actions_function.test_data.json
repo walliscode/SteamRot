@@ -1,0 +1,152 @@
+{
+  "metadata": {
+    "test_name": "process_nested_ui_actions_function",
+    "description": "Test ProcessNestedUIActionsAndEvents function with nested UI elements - verifies depth-first recursive processing",
+    "tags": ["unit", "logic", "action", "function"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 3,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "nested_panel",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 0, "y": 0 },
+              "size": { "x": 400, "y": 300 },
+              "children_active": true,
+              "children": [
+                {
+                  "element": {
+                    "button_data": {
+                      "base_data": {
+                        "position": { "x": 50, "y": 50 },
+                        "size": { "x": 100, "y": 40 },
+                        "children_active": false,
+                        "children": [],
+                        "layout": "None",
+                        "spacing_strategy": "None"
+                      },
+                      "label": "Child Button"
+                    }
+                  }
+                },
+                {
+                  "element": {
+                    "base_data": {
+                      "position": { "x": 50, "y": 100 },
+                      "size": { "x": 300, "y": 150 },
+                      "children_active": true,
+                      "children": [
+                        {
+                          "element": {
+                            "button_data": {
+                              "base_data": {
+                                "position": { "x": 70, "y": 120 },
+                                "size": { "x": 100, "y": 40 },
+                                "children_active": false,
+                                "children": [],
+                                "layout": "None",
+                                "spacing_strategy": "None"
+                              },
+                              "label": "Nested Button"
+                            }
+                          }
+                        }
+                      ],
+                      "layout": "Vertical",
+                      "spacing_strategy": "Even"
+                    }
+                  }
+                }
+              ],
+              "layout": "Vertical",
+              "spacing_strategy": "Even"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "simulation_data": {
+    "description": "Process UI actions recursively for nested elements using the standalone function",
+    "steps": [
+      {
+        "simulation_type": "Action",
+        "execution_mode": "Function",
+        "function_type": "ProcessNestedUIActionsAndEvents",
+        "description": "Recursively process nested UI actions and events"
+      }
+    ]
+  },
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 3,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "nested_panel",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 0, "y": 0 },
+              "size": { "x": 400, "y": 300 },
+              "children_active": true,
+              "children": [
+                {
+                  "element": {
+                    "button_data": {
+                      "base_data": {
+                        "position": { "x": 50, "y": 50 },
+                        "size": { "x": 100, "y": 40 },
+                        "children_active": false,
+                        "children": [],
+                        "layout": "None",
+                        "spacing_strategy": "None"
+                      },
+                      "label": "Child Button"
+                    }
+                  }
+                },
+                {
+                  "element": {
+                    "base_data": {
+                      "position": { "x": 50, "y": 100 },
+                      "size": { "x": 300, "y": 150 },
+                      "children_active": true,
+                      "children": [
+                        {
+                          "element": {
+                            "button_data": {
+                              "base_data": {
+                                "position": { "x": 70, "y": 120 },
+                                "size": { "x": 100, "y": 40 },
+                                "children_active": false,
+                                "children": [],
+                                "layout": "None",
+                                "spacing_strategy": "None"
+                              },
+                              "label": "Nested Button"
+                            }
+                          }
+                        }
+                      ],
+                      "layout": "Vertical",
+                      "spacing_strategy": "Even"
+                    }
+                  }
+                }
+              ],
+              "layout": "Vertical",
+              "spacing_strategy": "Even"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

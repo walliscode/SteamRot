@@ -1,0 +1,252 @@
+{
+  "metadata": {
+    "test_name": "ui_action_logic_class",
+    "description": "Test UIActionLogic class processing multiple UI entities - verifies that the Logic class correctly iterates through all UI entities and processes their actions",
+    "tags": ["unit", "logic", "action", "class"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "main_menu",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 100, "y": 100 },
+              "size": { "x": 300, "y": 400 },
+              "children_active": true,
+              "children": [
+                {
+                  "element": {
+                    "button_data": {
+                      "base_data": {
+                        "position": { "x": 150, "y": 150 },
+                        "size": { "x": 200, "y": 50 },
+                        "children_active": false,
+                        "children": [],
+                        "layout": "None",
+                        "spacing_strategy": "None"
+                      },
+                      "label": "Start Game"
+                    }
+                  }
+                },
+                {
+                  "element": {
+                    "button_data": {
+                      "base_data": {
+                        "position": { "x": 150, "y": 220 },
+                        "size": { "x": 200, "y": 50 },
+                        "children_active": false,
+                        "children": [],
+                        "layout": "None",
+                        "spacing_strategy": "None"
+                      },
+                      "label": "Settings"
+                    }
+                  }
+                },
+                {
+                  "element": {
+                    "button_data": {
+                      "base_data": {
+                        "position": { "x": 150, "y": 290 },
+                        "size": { "x": 200, "y": 50 },
+                        "children_active": false,
+                        "children": [],
+                        "layout": "None",
+                        "spacing_strategy": "None"
+                      },
+                      "label": "Exit"
+                    }
+                  }
+                }
+              ],
+              "layout": "Vertical",
+              "spacing_strategy": "Even"
+            }
+          }
+        }
+      },
+      {
+        "index": 1,
+        "c_user_interface": {
+          "ui_name": "sidebar_panel",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 450, "y": 100 },
+              "size": { "x": 200, "y": 400 },
+              "children_active": true,
+              "children": [
+                {
+                  "element": {
+                    "button_data": {
+                      "base_data": {
+                        "position": { "x": 480, "y": 130 },
+                        "size": { "x": 140, "y": 40 },
+                        "children_active": false,
+                        "children": [],
+                        "layout": "None",
+                        "spacing_strategy": "None"
+                      },
+                      "label": "Info"
+                    }
+                  }
+                },
+                {
+                  "element": {
+                    "button_data": {
+                      "base_data": {
+                        "position": { "x": 480, "y": 190 },
+                        "size": { "x": 140, "y": 40 },
+                        "children_active": false,
+                        "children": [],
+                        "layout": "None",
+                        "spacing_strategy": "None"
+                      },
+                      "label": "Help"
+                    }
+                  }
+                }
+              ],
+              "layout": "Vertical",
+              "spacing_strategy": "Even"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "simulation_data": {
+    "description": "Execute UIActionLogic class to process all UI entities in the scene",
+    "steps": [
+      {
+        "simulation_type": "Action",
+        "execution_mode": "LogicClass",
+        "logic_class_type": "UIActionLogic",
+        "description": "Process UI actions for all entities via UIActionLogic"
+      }
+    ]
+  },
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "main_menu",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 100, "y": 100 },
+              "size": { "x": 300, "y": 400 },
+              "children_active": true,
+              "children": [
+                {
+                  "element": {
+                    "button_data": {
+                      "base_data": {
+                        "position": { "x": 150, "y": 150 },
+                        "size": { "x": 200, "y": 50 },
+                        "children_active": false,
+                        "children": [],
+                        "layout": "None",
+                        "spacing_strategy": "None"
+                      },
+                      "label": "Start Game"
+                    }
+                  }
+                },
+                {
+                  "element": {
+                    "button_data": {
+                      "base_data": {
+                        "position": { "x": 150, "y": 220 },
+                        "size": { "x": 200, "y": 50 },
+                        "children_active": false,
+                        "children": [],
+                        "layout": "None",
+                        "spacing_strategy": "None"
+                      },
+                      "label": "Settings"
+                    }
+                  }
+                },
+                {
+                  "element": {
+                    "button_data": {
+                      "base_data": {
+                        "position": { "x": 150, "y": 290 },
+                        "size": { "x": 200, "y": 50 },
+                        "children_active": false,
+                        "children": [],
+                        "layout": "None",
+                        "spacing_strategy": "None"
+                      },
+                      "label": "Exit"
+                    }
+                  }
+                }
+              ],
+              "layout": "Vertical",
+              "spacing_strategy": "Even"
+            }
+          }
+        }
+      },
+      {
+        "index": 1,
+        "c_user_interface": {
+          "ui_name": "sidebar_panel",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 450, "y": 100 },
+              "size": { "x": 200, "y": 400 },
+              "children_active": true,
+              "children": [
+                {
+                  "element": {
+                    "button_data": {
+                      "base_data": {
+                        "position": { "x": 480, "y": 130 },
+                        "size": { "x": 140, "y": 40 },
+                        "children_active": false,
+                        "children": [],
+                        "layout": "None",
+                        "spacing_strategy": "None"
+                      },
+                      "label": "Info"
+                    }
+                  }
+                },
+                {
+                  "element": {
+                    "button_data": {
+                      "base_data": {
+                        "position": { "x": 480, "y": 190 },
+                        "size": { "x": 140, "y": 40 },
+                        "children_active": false,
+                        "children": [],
+                        "layout": "None",
+                        "spacing_strategy": "None"
+                      },
+                      "label": "Help"
+                    }
+                  }
+                }
+              ],
+              "layout": "Vertical",
+              "spacing_strategy": "Even"
+            }
+          }
+        }
+      }
+    ]
+  }
+}
