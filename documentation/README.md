@@ -108,8 +108,6 @@ Testing guides and infrastructure:
 |----------|-------------|
 | **[Testing Overview](testing/TESTING_OVERVIEW.md)** | Test structure, classification, and TDD workflow |
 | **[Test Data Configuration](testing/TEST_DATA_CONFIGURATION.md)** | Data-driven testing with FlatBuffers |
-| **[Test Harness Adoption](testing/TEST_HARNESS_ADOPTION_PLAN.md)** | Migration plan for test infrastructure |
-| **[Testing Plans](testing/plans/)** | Future work and migration plans |
 
 ### Testing Quick Reference
 
@@ -145,7 +143,6 @@ Conventions for code organization:
 | **[Quick Reference](naming/NAMING_QUICK_REFERENCE.md)** | Decision trees and lookup tables |
 | **[Complete Guide](naming/FILE_NAMING_CONVENTIONS.md)** | Detailed rules and rationale |
 | **[Visual Guide](naming/naming_system_diagram.md)** | ASCII diagrams and examples |
-| **[Summary](naming/NAMING_SYSTEM_SUMMARY.md)** | Concise naming summary |
 
 ### Style Guide
 
