@@ -17,6 +17,7 @@
 #include "entity_memory.h"
 #include "logic_action.h"
 #include "logic_collision.h"
+#include "logic_ui.h"
 #include "simulation_generated.h"
 #include <format>
 
@@ -103,6 +104,23 @@ execute_function(const FunctionType function_type,
         steamrot::logic::collision::CheckMouseOverNestedUIElement(
             scene_context.mouse_position, *ui_component.m_root_element);
       }
+    }
+    return std::monostate{};
+  }
+
+  case FunctionType_UpdateCUserInterfaceVisibilityFromCUIState: {
+    // grab the relevant entity ids
+    auto entity_indexes =
+        GenerateEntityIndexesFromComponents<CUserInterface, CUIState>(
+            scene_context.archetypes);
+
+    for (size_t entity_id : entity_indexes) {
+
+      CUIState &ui_state = entity::memory::GetComponent<CUIState>(
+          entity_id, scene_context.scene_entities);
+
+      steamrot::logic::ui::UpdateCUserInterfaceVisibilityFromCUIState(
+          ui_state, scene_context.scene_entities);
     }
     return std::monostate{};
   }

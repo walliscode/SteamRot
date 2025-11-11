@@ -20,13 +20,16 @@ enum FunctionType : byte {
   None = 0,
   
   // UI Action functions
-  ProcessUIActionsAndEvents = 1,
-  ProcessNestedUIActionsAndEvents = 2,
-  ProcessButtonElementActions = 3,
-  ProcessDropDownListElementActions = 4,
+  ProcessUIActionsAndEvents,
+  ProcessNestedUIActionsAndEvents,
+  ProcessButtonElementActions,
+  ProcessDropDownListElementActions,
 
-// logic collision functions
-CheckMouseOverNestedUIElement,
+  // logic collision functions
+  CheckMouseOverNestedUIElement,
+
+  // ui functions
+  UpdateCUserInterfaceVisibilityFromCUIState
 }
 
 ////////////////////////////////////////////////////////////

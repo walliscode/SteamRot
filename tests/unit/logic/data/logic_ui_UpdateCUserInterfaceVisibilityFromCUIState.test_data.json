@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "test_name": "",
+    "description": "",
+    "tags": ["unit", "logic", "ui"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": []
+  },
+
+  "simulation_data": {
+    "description": "",
+    "steps": [
+      {
+        "simulation_type": "Action",
+        "execution_mode": "Function",
+        "function_type": "UpdateCUserInterfaceVisibilityFromCUIState",
+        "description": "Step 1: "
+      }
+    ]
+  },
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 5,
+    "entities": []
+  }
+}
