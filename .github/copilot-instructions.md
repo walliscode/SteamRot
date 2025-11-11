@@ -1199,10 +1199,6 @@ The Test Data Configuration System provides a FlatBuffers-based framework for da
 - **Human Workflow Guide**: `documentation/workflows/FILLING_TEST_DATA.md` - Practical guide for creating test_data.json files
 - **Technical Reference**: `documentation/testing/TEST_DATA_CONFIGURATION.md` - Complete API and schema reference
 
-**Documentation:**
-- **Human Workflow Guide**: `documentation/workflows/FILLING_TEST_DATA.md` - Practical guide for creating test_data.json files
-- **Technical Reference**: `documentation/testing/TEST_DATA_CONFIGURATION.md` - Complete API and schema reference
-
 **When helping users create test_data.json files:**
 1. Direct them to `documentation/workflows/FILLING_TEST_DATA.md` for workflow-based guidance
 2. Reference the specific workflow section that matches their testing scenario:
