@@ -36,4 +36,8 @@ GetAllJointNames(const CGrimoireMachina &grimoire_machina) {
   return joint_names;
 }
 
+/////////////////////////////////////////////////
+void UpdateCUserInterfaceVisibilityFromCUIState(
+    const CUIState &ui_state, EntityMemoryPool &scene_entities) {}
+
 } // namespace steamrot::logic::ui
