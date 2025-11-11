@@ -108,8 +108,6 @@ Testing guides and infrastructure:
 |----------|-------------|
 | **[Testing Overview](testing/TESTING_OVERVIEW.md)** | Test structure, classification, and TDD workflow |
 | **[Test Data Configuration](testing/TEST_DATA_CONFIGURATION.md)** | Data-driven testing with FlatBuffers |
-| **[Test Harness Adoption](testing/TEST_HARNESS_ADOPTION_PLAN.md)** | Migration plan for test infrastructure |
-| **[Testing Plans](testing/plans/)** | Future work and migration plans |
 
 ### Testing Quick Reference
 
