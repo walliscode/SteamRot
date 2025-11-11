@@ -431,13 +431,12 @@ TEST_CASE("My logic tests", "[unit][logic][data-driven]") {
 
 ## References
 
-- [Full refactoring plan](../../documentation/LOGIC_TEST_REFACTORING_PLAN.md)
-- [Test harness README](../../harness/README.md)
-- [Test data configuration docs](../../documentation/TEST_DATA_CONFIGURATION.md)
+- [Test harness README](../../../harness/README.md)
+- [Test data configuration docs](../../../../documentation/testing/TEST_DATA_CONFIGURATION.md)
 
 ## Questions?
 
 See the full documentation:
-- **Detailed plan:** `documentation/LOGIC_TEST_REFACTORING_PLAN.md`
-- **Quick summary:** `documentation/LOGIC_TEST_REFACTORING_SUMMARY.md`
+- **Testing overview:** `documentation/testing/TESTING_OVERVIEW.md`
+- **Test data config:** `documentation/testing/TEST_DATA_CONFIGURATION.md`
 - **Test harness API:** `tests/harness/README.md`
