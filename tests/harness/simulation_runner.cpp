@@ -15,6 +15,7 @@
 #include "UIStateLogic.h"
 #include "archetype_helpers.h"
 #include "entity_memory.h"
+#include "logic_action.h"
 #include "logic_collision.h"
 #include "simulation_generated.h"
 #include <format>
@@ -43,8 +44,9 @@ execute_function(const FunctionType function_type,
                 entity_id, scene_context.scene_entities);
 
         if (ui_component.m_root_element) {
-          ProcessUIActionsAndEvents(*ui_component.m_root_element,
-                                    scene_context.event_handler, scene_context);
+          steamrot::logic::action::ProcessUIActionsAndEvents(
+              *ui_component.m_root_element, scene_context.event_handler,
+              scene_context);
         }
       }
     }
@@ -64,9 +66,9 @@ execute_function(const FunctionType function_type,
                 entity_id, scene_context.scene_entities);
 
         if (ui_component.m_root_element) {
-          ProcessNestedUIActionsAndEvents(*ui_component.m_root_element,
-                                          scene_context.event_handler,
-                                          scene_context);
+          steamrot::logic::action::ProcessNestedUIActionsAndEvents(
+              *ui_component.m_root_element, scene_context.event_handler,
+              scene_context);
         }
       }
     }

@@ -7,6 +7,7 @@ add_library(logic
   Logic.cpp
   CraftingRenderLogic.cpp
   logic_collision.cpp
+  logic_action.cpp
   logic_ui.cpp
 )
 
