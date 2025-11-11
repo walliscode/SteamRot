@@ -88,6 +88,7 @@ The `documentation/` directory contains comprehensive guides organized by topic:
 - **[Adding Logic](documentation/workflows/ADDING_LOGIC.md)** - Implement game systems
 - **[Adding UI Elements](documentation/workflows/ADDING_UI_ELEMENTS.md)** - Create UI components
 - **[Adding Actions](documentation/workflows/ADDING_ACTIONS.md)** - Handle user input
+- **[Filling Out Test Data](documentation/workflows/FILLING_TEST_DATA.md)** - Create test_data.json files
 
 ### 🏗️ Architecture
 - **[Error Handling](documentation/architecture/ERROR_HANDLING.md)** - Exception and error patterns
