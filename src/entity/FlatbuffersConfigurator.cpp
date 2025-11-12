@@ -16,6 +16,7 @@
 
 #include "user_interface_generated.h"
 #include <expected>
+#include <iostream>
 #include <variant>
 
 namespace steamrot {
@@ -181,8 +182,8 @@ FlatbuffersConfigurator::ConfigureComponent(
         // Look up the index for this UI name
         auto it = ui_name_to_index.find(ui_name);
         if (it == ui_name_to_index.end()) {
-          std::string error_msg =
-              "UI component with name '" + ui_name + "' not found in ui_names_on.";
+          std::string error_msg = "UI component with name '" + ui_name +
+                                  "' not found in ui_names_on.";
           FailInfo fail_info{FailMode::FlatbuffersDataNotFound, error_msg};
           return std::unexpected(fail_info);
         }
@@ -203,8 +204,8 @@ FlatbuffersConfigurator::ConfigureComponent(
         // Look up the index for this UI name
         auto it = ui_name_to_index.find(ui_name);
         if (it == ui_name_to_index.end()) {
-          std::string error_msg =
-              "UI component with name '" + ui_name + "' not found in ui_names_off.";
+          std::string error_msg = "UI component with name '" + ui_name +
+                                  "' not found in ui_names_off.";
           FailInfo fail_info{FailMode::FlatbuffersDataNotFound, error_msg};
           return std::unexpected(fail_info);
         }
@@ -216,20 +217,28 @@ FlatbuffersConfigurator::ConfigureComponent(
     // Store the visibility state for this state key
     ui_state_component.m_state_to_ui_visibility[state_key] = visibility_state;
 
-    // Initialize state value to false
-    ui_state_component.m_state_values[state_key] = false;
+    // if starting state is provided, set it
+    if (mapping->starting_state()) {
+      std::cout << "Setting starting state for key: " << state_key << " to "
+                << (mapping->starting_state() ? "true" : "false") << "\n";
+      ui_state_component.m_state_values[state_key] = mapping->starting_state();
+
+      // else Initialize state value to false
+    } else {
+      ui_state_component.m_state_values[state_key] = false;
+    }
 
     // Create and register subscribers if provided
     if (mapping->subscribers()) {
       std::vector<std::shared_ptr<Subscriber>> subscribers;
-      
+
       for (const auto *subscriber_data : *mapping->subscribers()) {
         if (!subscriber_data) {
           continue;
         }
 
-        auto subscriber_result = subscriber_factory.CreateAndRegisterSubscriber(
-            *subscriber_data);
+        auto subscriber_result =
+            subscriber_factory.CreateAndRegisterSubscriber(*subscriber_data);
 
         if (!subscriber_result.has_value()) {
           return std::unexpected(subscriber_result.error());
@@ -239,7 +248,8 @@ FlatbuffersConfigurator::ConfigureComponent(
       }
 
       // Store all subscribers for this state key
-      ui_state_component.m_state_subscribers[state_key] = std::move(subscribers);
+      ui_state_component.m_state_subscribers[state_key] =
+          std::move(subscribers);
     }
   }
 
@@ -261,8 +271,9 @@ FlatbuffersConfigurator::ConfigureEntitiesFromCollection(
 
   // check that the entity memory pool size has been added
   if (!entity_collection->entity_memory_pool_size()) {
-    FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
-                       "No entity memory pool size found in the entity collection."};
+    FailInfo fail_info{
+        FailMode::FlatbuffersDataNotFound,
+        "No entity memory pool size found in the entity collection."};
     return std::unexpected(fail_info);
   }
 
@@ -307,9 +318,10 @@ FlatbuffersConfigurator::ConfigureEntitiesFromCollection(
 
     // CGrimoireMachina component configuration
     if (entity_data->c_grimoire_machina()) {
-      auto configure_result = ConfigureComponent(
-          entity_data->c_grimoire_machina(),
-          entity::memory::GetComponent<CGrimoireMachina>(i, entity_memory_pool));
+      auto configure_result =
+          ConfigureComponent(entity_data->c_grimoire_machina(),
+                             entity::memory::GetComponent<CGrimoireMachina>(
+                                 i, entity_memory_pool));
 
       if (!configure_result.has_value())
         return std::unexpected(configure_result.error());
@@ -327,6 +339,7 @@ FlatbuffersConfigurator::ConfigureEntitiesFromCollection(
 
     // CUIState component configuration (compound component)
     if (entity_data->c_ui_state()) {
+
       auto configure_result = ConfigureComponent(
           entity_data->c_ui_state(),
           entity::memory::GetComponent<CUIState>(i, entity_memory_pool),

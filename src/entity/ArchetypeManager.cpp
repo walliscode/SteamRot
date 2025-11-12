@@ -60,7 +60,7 @@ ArchetypeManager::GenerateAllArchetypes() {
           id_result.error()); // return error if failed to generate ID
     }
     // get the component mask for the current entity
-    ArchetypeID archetypeID = GenerateArchetypeID(entity_index).value();
+    ArchetypeID archetypeID = id_result.value();
 
     // [] operator should create a new vector if the key does not exist, hence
     // this over .find()
