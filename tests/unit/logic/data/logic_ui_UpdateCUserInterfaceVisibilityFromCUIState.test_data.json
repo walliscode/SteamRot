@@ -1,29 +1,191 @@
 {
   "metadata": {
-    "test_name": "",
-    "description": "",
+    "test_name": "UpdateCUserInterfaceVisibilityFromCUIState_basic_test",
+    "description": "Test UpdateCUserInterfaceVisibilityFromCUIState function - 4 UI entities controlled by 1 CUIState entity that manages visibility of 2 of them",
     "tags": ["unit", "logic", "ui"],
     "expected_to_pass": true,
     "version": 1
   },
   "start_entity_collection": {
     "entity_memory_pool_size": 5,
-    "entities": []
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "main_menu",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 100, "y": 100 },
+              "size": { "x": 200, "y": 150 },
+              "children_active": false,
+              "children": [],
+              "layout": "Vertical",
+              "spacing_strategy": "None"
+            }
+          }
+        }
+      },
+      {
+        "index": 1,
+        "c_user_interface": {
+          "ui_name": "settings_panel",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 350, "y": 100 },
+              "size": { "x": 200, "y": 150 },
+              "children_active": false,
+              "children": [],
+              "layout": "Vertical",
+              "spacing_strategy": "None"
+            }
+          }
+        }
+      },
+      {
+        "index": 2,
+        "c_user_interface": {
+          "ui_name": "play_button",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 100, "y": 300 },
+              "size": { "x": 150, "y": 50 },
+              "children_active": false,
+              "children": [],
+              "layout": "Horizontal",
+              "spacing_strategy": "None"
+            }
+          }
+        }
+      },
+      {
+        "index": 3,
+        "c_user_interface": {
+          "ui_name": "quit_button",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 100, "y": 400 },
+              "size": { "x": 150, "y": 50 },
+              "children_active": false,
+              "children": [],
+              "layout": "Horizontal",
+              "spacing_strategy": "None"
+            }
+          }
+        }
+      },
+      {
+        "index": 4,
+        "c_ui_state": {
+          "mappings": [
+            {
+              "state_key": "menu_state",
+              "ui_names_on": ["main_menu", "play_button"],
+              "ui_names_off": ["settings_panel", "quit_button"]
+            }
+          ]
+        }
+      }
+    ]
   },
 
   "simulation_data": {
-    "description": "",
+    "description": "Call UpdateCUserInterfaceVisibilityFromCUIState to update UI visibility based on CUIState mappings",
     "steps": [
       {
         "simulation_type": "Action",
         "execution_mode": "Function",
         "function_type": "UpdateCUserInterfaceVisibilityFromCUIState",
-        "description": "Step 1: "
+        "description": "Step 1: Update UI visibility - main_menu and play_button should be visible, settings_panel and quit_button should be hidden"
       }
     ]
   },
   "expected_entity_collection": {
     "entity_memory_pool_size": 5,
-    "entities": []
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "main_menu",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 100, "y": 100 },
+              "size": { "x": 200, "y": 150 },
+              "children_active": false,
+              "children": [],
+              "layout": "Vertical",
+              "spacing_strategy": "None"
+            }
+          }
+        }
+      },
+      {
+        "index": 1,
+        "c_user_interface": {
+          "ui_name": "settings_panel",
+          "start_visible": false,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 350, "y": 100 },
+              "size": { "x": 200, "y": 150 },
+              "children_active": false,
+              "children": [],
+              "layout": "Vertical",
+              "spacing_strategy": "None"
+            }
+          }
+        }
+      },
+      {
+        "index": 2,
+        "c_user_interface": {
+          "ui_name": "play_button",
+          "start_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 100, "y": 300 },
+              "size": { "x": 150, "y": 50 },
+              "children_active": false,
+              "children": [],
+              "layout": "Horizontal",
+              "spacing_strategy": "None"
+            }
+          }
+        }
+      },
+      {
+        "index": 3,
+        "c_user_interface": {
+          "ui_name": "quit_button",
+          "start_visible": false,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 100, "y": 400 },
+              "size": { "x": 150, "y": 50 },
+              "children_active": false,
+              "children": [],
+              "layout": "Horizontal",
+              "spacing_strategy": "None"
+            }
+          }
+        }
+      },
+      {
+        "index": 4,
+        "c_ui_state": {
+          "mappings": [
+            {
+              "state_key": "menu_state",
+              "ui_names_on": ["main_menu", "play_button"],
+              "ui_names_off": ["settings_panel", "quit_button"]
+            }
+          ]
+        }
+      }
+    ]
   }
 }
