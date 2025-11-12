@@ -7,11 +7,76 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "tick_executor.h"
+#include "FlatbuffersConfigurator.h"
 #include "event_simulation.h"
 #include "input_simulation.h"
 #include "simulation_runner.h"
+#include "test_data_harness.h"
 
 namespace steamrot::tests {
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+compare_tick_snapshot(uint32_t tick, const TestDataConfig *config,
+                     TestFixture &fixture) {
+
+  // Return early if no snapshots defined
+  if (!config->tick_snapshots()) {
+    return std::monostate{}; // No snapshots to compare
+  }
+
+  // Look for snapshot matching this tick
+  for (const TickSnapshot *snapshot : *config->tick_snapshots()) {
+    if (snapshot && snapshot->tick() == tick) {
+      // Found snapshot for this tick
+
+      // Validate snapshot has entity_collection
+      if (!snapshot->entity_collection()) {
+        return std::unexpected(FailInfo(
+            FailMode::NullPointer,
+            std::format("Snapshot at tick {} missing entity_collection", tick)));
+      }
+
+      // Create expected pool from snapshot
+      EntityMemoryPool expected_pool;
+
+      // Configure expected pool from snapshot's entity_collection
+      FlatbuffersConfigurator configurator(
+          fixture.GetGameResources().event_handler);
+      auto configure_result = configurator.ConfigureEntitiesFromCollection(
+          expected_pool, snapshot->entity_collection());
+
+      if (!configure_result.has_value()) {
+        return std::unexpected(configure_result.error());
+      }
+
+      // Get actual pool from fixture
+      const EntityMemoryPool &actual_pool =
+          fixture.GetEntityManager().GetEntityMemoryPool();
+
+      // Build snapshot metadata string
+      std::string snapshot_info = std::format("Tick {}", tick);
+      if (snapshot->description()) {
+        snapshot_info += " (" + std::string(snapshot->description()->c_str()) + ")";
+      }
+
+      // Get expected_to_pass from test metadata (default true)
+      bool expected_to_pass = true;
+      if (config->metadata()) {
+        expected_to_pass = config->metadata()->expected_to_pass();
+      }
+
+      // Compare pools using existing infrastructure
+      run_entity_memory_pool_comparison_test(actual_pool, expected_pool,
+                                             snapshot_info, expected_to_pass);
+
+      // Only one snapshot per tick expected, so break after finding it
+      break;
+    }
+  }
+
+  return std::monostate{};
+}
 
 /////////////////////////////////////////////////
 uint32_t determine_num_ticks(const TestDataConfig *config) {
@@ -69,7 +134,13 @@ execute_single_tick(uint32_t tick, const TestDataConfig *config,
     }
   }
 
-  // 5. Tick the global event bus
+  // 5. Check for tick snapshot (compare after simulation, before event bus tick)
+  auto snapshot_result = compare_tick_snapshot(tick, config, fixture);
+  if (!snapshot_result.has_value()) {
+    return std::unexpected(snapshot_result.error());
+  }
+
+  // 6. Tick the global event bus
   fixture.GetGameResources().event_handler.TickGlobalEventBus();
 
   return std::monostate{};

@@ -7,6 +7,27 @@ include "event_test_data.fbs";
 namespace steamrot;
 
 ////////////////////////////////////////////////////////////
+/// @brief Snapshot of expected entity state at a specific tick
+///
+/// Represents a checkpoint during test execution where the
+/// actual entity state should match the expected state defined
+/// in the entity_collection field.
+////////////////////////////////////////////////////////////
+table TickSnapshot {
+  /// @brief Tick number when this snapshot should be compared (0-based)
+  /// The comparison happens AFTER simulation steps execute for this tick,
+  /// but BEFORE the event bus is ticked.
+  tick: uint32;
+  
+  /// @brief Expected entity state at this tick
+  entity_collection: EntityCollection (required);
+  
+  /// @brief Optional human-readable description of this checkpoint
+  /// Used in failure messages to identify which snapshot failed.
+  description: string;
+}
+
+////////////////////////////////////////////////////////////
 /// @brief Test metadata for data-driven testing
 ///
 /// This table contains metadata about a test case that can
@@ -70,6 +91,12 @@ table TestDataConfig {
   /// Note: input_sequence, event_sequence, and simulation_data.num_ticks are NOT consulted
   /// for tick determination. Only this TestDataConfig level field is used.
   num_ticks: uint32;
+  
+  /// @brief Intermediate entity state snapshots for tick-by-tick validation
+  /// Optional field. If present, the test harness will compare actual entity
+  /// state with expected state at each specified tick.
+  /// Snapshots are compared AFTER simulation steps but BEFORE event bus tick.
+  tick_snapshots: [TickSnapshot];
   
   /// @brief Reserved for future test data types
   /// Can be extended with additional fields like:
