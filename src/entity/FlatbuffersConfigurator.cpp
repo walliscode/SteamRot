@@ -339,7 +339,7 @@ FlatbuffersConfigurator::ConfigureEntitiesFromCollection(
 
     // CUIState component configuration (compound component)
     if (entity_data->c_ui_state()) {
-      std::cout << "Configuring CUIState for entity index: " << i << "\n";
+
       auto configure_result = ConfigureComponent(
           entity_data->c_ui_state(),
           entity::memory::GetComponent<CUIState>(i, entity_memory_pool),
