@@ -8,12 +8,14 @@
 ////////////////////////////////////////////////////////////
 
 #include "EventPacket.h"
+#include "FailInfo.h"
 #include "Subscriber.h"
 #include "events_generated.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
+#include <expected>
 #include <memory>
 #include <unordered_map>
 #include <vector>
