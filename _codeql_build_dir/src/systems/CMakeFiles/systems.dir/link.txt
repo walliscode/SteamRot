@@ -1,2 +1,0 @@
-/usr/bin/ar qc libsystems.a CMakeFiles/systems.dir/GameEngine.cpp.o CMakeFiles/systems.dir/ActionManager.cpp.o
-/usr/bin/ranlib libsystems.a

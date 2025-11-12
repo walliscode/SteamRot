@@ -1,5 +1,0 @@
-if(EXISTS "/home/runner/work/SteamRot/SteamRot/_codeql_build_dir/tests/user_interface/test_user_interface_tests-b12d07c.cmake")
-  include("/home/runner/work/SteamRot/SteamRot/_codeql_build_dir/tests/user_interface/test_user_interface_tests-b12d07c.cmake")
-else()
-  add_test(test_user_interface_NOT_BUILT-b12d07c test_user_interface_NOT_BUILT-b12d07c)
-endif()
