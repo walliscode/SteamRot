@@ -111,8 +111,7 @@ execute_function(const FunctionType function_type,
   case FunctionType_UpdateCUserInterfaceVisibilityFromCUIState: {
     // grab the relevant entity ids
     auto entity_indexes =
-        GenerateEntityIndexesFromComponents<CUserInterface, CUIState>(
-            scene_context.archetypes);
+        GenerateEntityIndexesFromComponents<CUIState>(scene_context.archetypes);
 
     for (size_t entity_id : entity_indexes) {
 

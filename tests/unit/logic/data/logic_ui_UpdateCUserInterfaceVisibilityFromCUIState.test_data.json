@@ -30,7 +30,7 @@
         "index": 1,
         "c_user_interface": {
           "ui_name": "settings_panel",
-          "start_visible": true,
+          "start_visible": false,
           "root_ui_element": {
             "base_data": {
               "position": { "x": 350, "y": 100 },
@@ -47,7 +47,7 @@
         "index": 2,
         "c_user_interface": {
           "ui_name": "play_button",
-          "start_visible": true,
+          "start_visible": false,
           "root_ui_element": {
             "base_data": {
               "position": { "x": 100, "y": 300 },
@@ -84,7 +84,8 @@
             {
               "state_key": "menu_state",
               "ui_names_on": ["main_menu", "play_button"],
-              "ui_names_off": ["settings_panel", "quit_button"]
+              "ui_names_off": ["settings_panel", "quit_button"],
+              "starting_state": "true"
             }
           ]
         }
@@ -181,7 +182,8 @@
             {
               "state_key": "menu_state",
               "ui_names_on": ["main_menu", "play_button"],
-              "ui_names_off": ["settings_panel", "quit_button"]
+              "ui_names_off": ["settings_panel", "quit_button"],
+              "starting_state": "true"
             }
           ]
         }
