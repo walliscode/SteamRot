@@ -14,7 +14,6 @@ INTERFACE
   components
   entity
   user_interface
-  events
 )
 
 # Test executable for component matchers
@@ -46,18 +45,3 @@ PRIVATE
 )
 
 catch_discover_tests(test_entity_memory_pool_matchers)
-
-# Test executable for event matchers
-add_executable(test_event_matchers
-  event_matchers.test.cpp
-)
-
-target_link_libraries(test_event_matchers
-PRIVATE
-  Catch2::Catch2WithMain
-  test_matchers
-  events
-)
-
-catch_discover_tests(test_event_matchers)
-
