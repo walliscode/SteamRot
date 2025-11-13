@@ -14,6 +14,22 @@
 #include "scene_change_packet_generated.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
+#include <random>
+
+/////////////////////////////////////////////////
+/// @brief Helper function to generate UUIDs for testing
+///
+/// @return A newly generated UUID
+/////////////////////////////////////////////////
+static uuids::uuid GenerateTestUUID() {
+  std::random_device rd;
+  auto seed_data = std::array<int, std::mt19937::state_size>{};
+  std::generate(std::begin(seed_data), std::end(seed_data), std::ref(rd));
+  std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
+  std::mt19937 generator(seq);
+  uuids::uuid_random_generator gen{generator};
+  return gen();
+}
 
 TEST_CASE("EventPacket matcher compares m_event_type correctly",
           "[unit][EventPacket][matcher]") {
@@ -51,10 +67,10 @@ TEST_CASE("EventPacket matcher compares event_lifetime correctly",
 TEST_CASE("EventPacket matcher compares event_id correctly",
           "[unit][EventPacket][matcher]") {
   steamrot::EventPacket expected{1};
-  expected.event_id = uuids::uuid_system_generator{}();
+  expected.event_id = GenerateTestUUID();
 
   steamrot::EventPacket actual{1};
-  actual.event_id = uuids::uuid_system_generator{}();
+  actual.event_id = GenerateTestUUID();
 
   SECTION("Matcher detects event_id differences") {
     REQUIRE_THAT(actual, !steamrot::tests::EqualsEventPacket(expected));
@@ -69,10 +85,10 @@ TEST_CASE("EventPacket matcher compares event_id correctly",
 TEST_CASE("EventPacket matcher compares source_id correctly",
           "[unit][EventPacket][matcher]") {
   steamrot::EventPacket expected{1};
-  expected.source_id = uuids::uuid_system_generator{}();
+  expected.source_id = GenerateTestUUID();
 
   steamrot::EventPacket actual{1};
-  actual.source_id = uuids::uuid_system_generator{}();
+  actual.source_id = GenerateTestUUID();
 
   SECTION("Matcher detects source_id differences") {
     REQUIRE_THAT(actual, !steamrot::tests::EqualsEventPacket(expected));
@@ -134,8 +150,8 @@ TEST_CASE("EventPacket matcher compares m_event_data with UserInputBitset",
 
 TEST_CASE("EventPacket matcher compares m_event_data with SceneChangePacket",
           "[unit][EventPacket][matcher]") {
-  uuids::uuid test_uuid = uuids::uuid_system_generator{}();
-  steamrot::SceneType scene_type = steamrot::SceneType::SceneType_TITLE_SCREEN;
+  uuids::uuid test_uuid = GenerateTestUUID();
+  steamrot::SceneType scene_type = steamrot::SceneType_TITLE;
 
   steamrot::EventPacket expected{1};
   expected.m_event_data =
@@ -149,7 +165,7 @@ TEST_CASE("EventPacket matcher compares m_event_data with SceneChangePacket",
   }
 
   SECTION("Matcher detects SceneChangePacket UUID differences") {
-    uuids::uuid different_uuid = uuids::uuid_system_generator{}();
+    uuids::uuid different_uuid = GenerateTestUUID();
     actual.m_event_data =
         steamrot::SceneChangePacket{different_uuid, scene_type};
     REQUIRE_THAT(actual, !steamrot::tests::EqualsEventPacket(expected));
@@ -157,7 +173,7 @@ TEST_CASE("EventPacket matcher compares m_event_data with SceneChangePacket",
 
   SECTION("Matcher detects SceneChangePacket SceneType differences") {
     actual.m_event_data = steamrot::SceneChangePacket{
-        test_uuid, steamrot::SceneType::SceneType_CRAFTING_SCREEN};
+        test_uuid, steamrot::SceneType_CRAFTING};
     REQUIRE_THAT(actual, !steamrot::tests::EqualsEventPacket(expected));
   }
 
@@ -209,8 +225,8 @@ TEST_CASE("EventPacket matcher compares m_event_data with UIElementName",
 
 TEST_CASE("EventPacket matcher works with complete EventPacket comparison",
           "[unit][EventPacket][matcher]") {
-  uuids::uuid event_uuid = uuids::uuid_system_generator{}();
-  uuids::uuid source_uuid = uuids::uuid_system_generator{}();
+  uuids::uuid event_uuid = GenerateTestUUID();
+  uuids::uuid source_uuid = GenerateTestUUID();
 
   sf::Event::KeyPressed key_event;
   key_event.code = sf::Keyboard::Key::Space;
@@ -371,10 +387,10 @@ TEST_CASE("EventBus matcher compares EventPackets with complex event data",
   packet2.m_event_data = steamrot::UIElementName{"Button1"};
   expected.push_back(packet2);
 
-  uuids::uuid test_uuid = uuids::uuid_system_generator{}();
+  uuids::uuid test_uuid = GenerateTestUUID();
   steamrot::EventPacket packet3{3};
   packet3.m_event_data = steamrot::SceneChangePacket{
-      test_uuid, steamrot::SceneType::SceneType_CRAFTING_SCREEN};
+      test_uuid, steamrot::SceneType_CRAFTING};
   expected.push_back(packet3);
 
   steamrot::EventBus actual;
@@ -390,7 +406,7 @@ TEST_CASE("EventBus matcher compares EventPackets with complex event data",
 
     steamrot::EventPacket actual_packet3{3};
     actual_packet3.m_event_data = steamrot::SceneChangePacket{
-        test_uuid, steamrot::SceneType::SceneType_CRAFTING_SCREEN};
+        test_uuid, steamrot::SceneType_CRAFTING};
     actual.push_back(actual_packet3);
 
     REQUIRE_THAT(actual, steamrot::tests::EqualsEventBus(expected));
@@ -407,7 +423,7 @@ TEST_CASE("EventBus matcher compares EventPackets with complex event data",
 
     steamrot::EventPacket actual_packet3{3};
     actual_packet3.m_event_data = steamrot::SceneChangePacket{
-        test_uuid, steamrot::SceneType::SceneType_CRAFTING_SCREEN};
+        test_uuid, steamrot::SceneType_CRAFTING};
     actual.push_back(actual_packet3);
 
     REQUIRE_THAT(actual, !steamrot::tests::EqualsEventBus(expected));
