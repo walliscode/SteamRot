@@ -15,6 +15,7 @@ target_link_libraries(test_events
   PRIVATE
   Catch2::Catch2WithMain
   events
+  test_matchers
 )
 
 catch_discover_tests(test_events)

@@ -16,7 +16,7 @@ TEST_CASE("ConvertEventBusDataToEventBus handles null input", "[unit][event_bus_
   auto result = steamrot::event::conversion::ConvertEventBusDataToEventBus(nullptr);
   
   REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().fail_mode == steamrot::FailMode::NullPointer);
+  REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
 
 TEST_CASE("ConvertEventBusDataToEventBus handles empty EventBusData", "[unit][event_bus_conversion]") {
@@ -167,7 +167,7 @@ TEST_CASE("ConfigureEventHandlerFromEventBusData handles null input", "[unit][ev
       nullptr, event_handler);
   
   REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().fail_mode == steamrot::FailMode::NullPointer);
+  REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
 
 TEST_CASE("ConfigureEventHandlerFromEventBusData handles empty EventBusData", "[unit][event_bus_conversion]") {
