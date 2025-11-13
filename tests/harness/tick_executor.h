@@ -19,6 +19,22 @@
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
+/// @brief Compare actual entity state with tick snapshot if present
+///
+/// Checks if a snapshot exists for the given tick number. If found,
+/// creates an EntityMemoryPool from the snapshot's entity_collection
+/// and compares it with the actual pool.
+///
+/// @param tick Tick number to check for snapshot
+/// @param config Test data configuration containing snapshots
+/// @param fixture TestFixture containing the test environment
+/// @return std::monostate on success or match, FailInfo on error
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+compare_tick_snapshot(uint32_t tick, const TestDataConfig *config,
+                     TestFixture &fixture);
+
+/////////////////////////////////////////////////
 /// @brief Execute test for a single tick
 ///
 /// Executes all inputs, events, and simulation steps scheduled for the
@@ -59,7 +75,8 @@ uint32_t determine_num_ticks(const TestDataConfig *config);
 /// 2. Execute events scheduled for this tick
 /// 3. Process event waiting room
 /// 4. Execute simulation steps scheduled for this tick
-/// 5. Tick the global event bus
+/// 5. Compare tick snapshot if present
+/// 6. Tick the global event bus
 ///
 /// @param config Test data configuration
 /// @param fixture TestFixture containing the test environment
