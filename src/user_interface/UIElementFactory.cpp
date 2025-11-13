@@ -10,7 +10,6 @@
 #include "event_conversion.h"
 #include "user_interface_generated.h"
 #include <expected>
-#include <iostream>
 #include <string>
 #include <variant>
 
@@ -106,7 +105,7 @@ CreateUIElement(const UIElementDataUnion &data_type, const void *data,
         FailInfo{FailMode::FlatbuffersDataNotFound,
                  "CreateUIElement: Element creation failed, element is null."});
   }
-  std::cout << "UI element created successfully." << std::endl;
+
   return element;
 }
 
