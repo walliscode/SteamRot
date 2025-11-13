@@ -10,6 +10,8 @@
 #include "FlatbuffersConfigurator.h"
 #include "PathProvider.h"
 #include "entity_memory_pool_matchers.h"
+#include "event_bus_conversion.h"
+#include "event_matchers.h"
 #include "tick_executor.h"
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
@@ -161,6 +163,52 @@ void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
 }
 
 /////////////////////////////////////////////////
+void run_event_bus_comparison_test(const EventBus &actual,
+                                   const EventBus &expected,
+                                   bool expected_to_pass) {
+  // Create matcher
+  auto matcher = EqualsEventBus(expected);
+
+  if (expected_to_pass) {
+    // Test expects event buses to match - use REQUIRE_THAT
+    REQUIRE_THAT(actual, matcher);
+  } else {
+    // Test expects event buses to NOT match - verify mismatch
+    REQUIRE_THAT(actual, !matcher);
+  }
+}
+
+/////////////////////////////////////////////////
+void run_event_bus_comparison_test(const EventBus &actual,
+                                   const EventBus &expected,
+                                   const std::string &test_metadata,
+                                   bool expected_to_pass) {
+  // Create matcher (EventBusEqualsMatcher doesn't support metadata yet,
+  // but we can add context to failure messages through INFO)
+  auto matcher = EqualsEventBus(expected);
+
+  if (!test_metadata.empty()) {
+    INFO(test_metadata);
+  }
+
+  if (expected_to_pass) {
+    // Test expects event buses to match - use REQUIRE_THAT
+    REQUIRE_THAT(actual, matcher);
+  } else {
+    // Test expects event buses to NOT match - verify mismatch
+    bool buses_match = matcher.match(actual);
+    if (buses_match) {
+      std::string error_msg =
+          "Expected event buses to be different, but they matched";
+      if (!test_metadata.empty()) {
+        error_msg += " [" + test_metadata + "]";
+      }
+      FAIL(error_msg);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 std::expected<TestFixture, FailInfo>
 create_fixture_from_test_data(const TestDataConfig *config,
                               const SceneType &scene_type) {
@@ -176,6 +224,17 @@ create_fixture_from_test_data(const TestDataConfig *config,
   // data instead of loading default scene data
   TestFixture fixture(scene_type);
   fixture.Intialize(config->start_entity_collection());
+
+  // Configure EventBus from start_event_bus if present
+  if (config->start_event_bus()) {
+    auto configure_result =
+        event::conversion::ConfigureEventHandlerFromEventBusData(
+            config->start_event_bus(), fixture.GetGameResources().event_handler);
+
+    if (!configure_result.has_value()) {
+      return std::unexpected(configure_result.error());
+    }
+  }
 
   return fixture;
 }
@@ -246,6 +305,51 @@ run_fixture_test(const TestDataConfig *config) {
     } else {
       run_entity_memory_pool_comparison_test(actual_pool, expected_pool,
                                              expected_to_pass);
+    }
+  }
+
+  // If expected_event_bus is provided, compare results
+  if (config->expected_event_bus()) {
+    const EventBusData *expected_event_bus_data = config->expected_event_bus();
+
+    // Convert EventBusData to EventBus
+    auto expected_event_bus_result =
+        event::conversion::ConvertEventBusDataToEventBus(expected_event_bus_data);
+
+    if (!expected_event_bus_result.has_value()) {
+      return std::unexpected(expected_event_bus_result.error());
+    }
+
+    EventBus expected_event_bus = expected_event_bus_result.value();
+
+    // Get actual event bus from fixture
+    const EventBus &actual_event_bus =
+        fixture.GetGameResources().event_handler.GetGlobalEventBus();
+
+    // Build test metadata string from config
+    std::string test_metadata;
+    bool expected_to_pass = true; // default value
+
+    if (config->metadata()) {
+      if (config->metadata()->test_name()) {
+        test_metadata +=
+            "Test: " + std::string(config->metadata()->test_name()->str());
+      }
+      if (config->metadata()->description()) {
+        test_metadata += ", Description: " +
+                         std::string(config->metadata()->description()->str());
+      }
+      // Get expected_to_pass from metadata
+      expected_to_pass = config->metadata()->expected_to_pass();
+    }
+
+    // Use overload with metadata if available, otherwise use simple version
+    if (!test_metadata.empty()) {
+      run_event_bus_comparison_test(actual_event_bus, expected_event_bus,
+                                    test_metadata, expected_to_pass);
+    } else {
+      run_event_bus_comparison_test(actual_event_bus, expected_event_bus,
+                                    expected_to_pass);
     }
   }
 

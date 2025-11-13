@@ -3,6 +3,7 @@ include "resource_data.fbs";
 include "simulation.fbs";
 include "input_test_data.fbs";
 include "event_test_data.fbs";
+include "event_bus_data.fbs";
 
 namespace steamrot;
 
@@ -21,6 +22,12 @@ table TickSnapshot {
   
   /// @brief Expected entity state at this tick
   entity_collection: EntityCollection (required);
+  
+  /// @brief Expected EventBus state at this tick (optional)
+  /// If present, the global event bus will be compared with this expected state.
+  /// Comparison happens at the same time as entity_collection comparison
+  /// (AFTER simulation steps, BEFORE event bus tick).
+  event_bus: EventBusData;
   
   /// @brief Optional human-readable description of this checkpoint
   /// Used in failure messages to identify which snapshot failed.
@@ -70,6 +77,16 @@ table TestDataConfig {
   
   /// @brief Expected state entity collection for comparison tests
   expected_entity_collection: EntityCollection;
+  
+  /// @brief Starting state of the global event bus
+  /// If present, the global event bus will be populated with these events
+  /// at the start of the test (before any ticks are executed).
+  start_event_bus: EventBusData;
+  
+  /// @brief Expected state of the global event bus at the end of the test
+  /// If present, the global event bus will be compared with this expected state
+  /// after all ticks have been executed.
+  expected_event_bus: EventBusData;
   
   /// @brief Resource data for test fixtures
   game_resources: GameResourcesData;

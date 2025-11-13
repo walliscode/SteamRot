@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "tick_executor.h"
 #include "FlatbuffersConfigurator.h"
+#include "event_bus_conversion.h"
 #include "event_simulation.h"
 #include "input_simulation.h"
 #include "simulation_runner.h"
@@ -69,6 +70,27 @@ compare_tick_snapshot(uint32_t tick, const TestDataConfig *config,
       // Compare pools using existing infrastructure
       run_entity_memory_pool_comparison_test(actual_pool, expected_pool,
                                              snapshot_info, expected_to_pass);
+
+      // Compare EventBus if present in snapshot
+      if (snapshot->event_bus()) {
+        // Convert EventBusData to EventBus
+        auto expected_event_bus_result =
+            event::conversion::ConvertEventBusDataToEventBus(snapshot->event_bus());
+
+        if (!expected_event_bus_result.has_value()) {
+          return std::unexpected(expected_event_bus_result.error());
+        }
+
+        EventBus expected_event_bus = expected_event_bus_result.value();
+
+        // Get actual event bus from fixture
+        const EventBus &actual_event_bus =
+            fixture.GetGameResources().event_handler.GetGlobalEventBus();
+
+        // Compare event buses using existing infrastructure
+        run_event_bus_comparison_test(actual_event_bus, expected_event_bus,
+                                      snapshot_info, expected_to_pass);
+      }
 
       // Only one snapshot per tick expected, so break after finding it
       break;
