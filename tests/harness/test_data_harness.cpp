@@ -8,7 +8,6 @@
 /////////////////////////////////////////////////
 #include "test_data_harness.h"
 #include "FlatbuffersConfigurator.h"
-#include "PathProvider.h"
 #include "entity_memory_pool_matchers.h"
 #include "event_bus_conversion.h"
 #include "event_matchers.h"
@@ -119,8 +118,6 @@ load_test_data_configs_impl(const char *source_file_path) {
   return discover_and_load_from_directory(data_dir_result.value());
 }
 
-
-
 /////////////////////////////////////////////////
 void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
                                             const EntityMemoryPool &expected,
@@ -229,7 +226,8 @@ create_fixture_from_test_data(const TestDataConfig *config,
   if (config->start_event_bus()) {
     auto configure_result =
         event::conversion::ConfigureEventHandlerFromEventBusData(
-            config->start_event_bus(), fixture.GetGameResources().event_handler);
+            config->start_event_bus(),
+            fixture.GetGameResources().event_handler);
 
     if (!configure_result.has_value()) {
       return std::unexpected(configure_result.error());
@@ -314,7 +312,8 @@ run_fixture_test(const TestDataConfig *config) {
 
     // Convert EventBusData to EventBus
     auto expected_event_bus_result =
-        event::conversion::ConvertEventBusDataToEventBus(expected_event_bus_data);
+        event::conversion::ConvertEventBusDataToEventBus(
+            expected_event_bus_data);
 
     if (!expected_event_bus_result.has_value()) {
       return std::unexpected(expected_event_bus_result.error());

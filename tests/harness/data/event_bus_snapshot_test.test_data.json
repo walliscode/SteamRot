@@ -28,7 +28,7 @@
   "num_ticks": 2,
   "tick_snapshots": [
     {
-      "tick": 0,
+      "tick": 1,
       "entity_collection": {
         "entity_memory_pool_size": 1,
         "entities": []
@@ -51,7 +51,7 @@
       "description": "Tick 0 snapshot"
     },
     {
-      "tick": 1,
+      "tick": 2,
       "entity_collection": {
         "entity_memory_pool_size": 1,
         "entities": []

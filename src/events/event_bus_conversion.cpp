@@ -9,7 +9,6 @@
 #include "event_bus_conversion.h"
 #include "event_conversion.h"
 #include "uuid.h"
-#include <format>
 
 namespace steamrot::event::conversion {
 
@@ -48,8 +47,7 @@ ConvertEventBusDataToEventBus(const EventBusData *event_bus_data) {
           packet_data->event_data_data_as_UserInputBitsetData();
       if (input_data) {
         // Use the existing conversion function from event_conversion.h
-        auto input_bitset_result =
-            ConvertFBDataToUserInputBitset(*input_data);
+        auto input_bitset_result = ConvertFBDataToUserInputBitset(*input_data);
 
         if (!input_bitset_result.has_value()) {
           return std::unexpected(input_bitset_result.error());

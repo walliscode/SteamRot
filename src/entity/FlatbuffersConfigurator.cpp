@@ -263,7 +263,7 @@ FlatbuffersConfigurator::ConfigureEntitiesFromCollection(
     const EntityCollection *entity_collection) {
 
   // check the list of entities is not empty
-  if (!entity_collection || entity_collection->entities()->empty()) {
+  if (!entity_collection) {
     FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
                        "Entity data not found in the collection."};
     return std::unexpected(fail_info);
