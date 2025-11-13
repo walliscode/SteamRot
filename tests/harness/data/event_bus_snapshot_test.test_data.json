@@ -1,0 +1,96 @@
+{
+  "metadata": {
+    "test_name": "event_bus_snapshot_test",
+    "description": "Test EventBus state comparison at start, tick snapshots, and end",
+    "tags": ["unit", "event_bus"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 1,
+    "entities": []
+  },
+  "start_event_bus": {
+    "description": "Initial event bus with 2 events",
+    "events": [
+      {
+        "event_lifetime": 3,
+        "event_type": "EVENT_TEST",
+        "event_data_data_type": "NONE"
+      },
+      {
+        "event_lifetime": 5,
+        "event_type": "EVENT_QUIT_GAME",
+        "event_data_data_type": "NONE"
+      }
+    ]
+  },
+  "num_ticks": 2,
+  "tick_snapshots": [
+    {
+      "tick": 1,
+      "entity_collection": {
+        "entity_memory_pool_size": 1,
+        "entities": []
+      },
+      "event_bus": {
+        "description": "After tick 0, event lifetimes decremented",
+        "events": [
+          {
+            "event_lifetime": 2,
+            "event_type": "EVENT_TEST",
+            "event_data_data_type": "NONE"
+          },
+          {
+            "event_lifetime": 4,
+            "event_type": "EVENT_QUIT_GAME",
+            "event_data_data_type": "NONE"
+          }
+        ]
+      },
+      "description": "Tick 0 snapshot"
+    },
+    {
+      "tick": 2,
+      "entity_collection": {
+        "entity_memory_pool_size": 1,
+        "entities": []
+      },
+      "event_bus": {
+        "description": "After tick 1, event lifetimes decremented again",
+        "events": [
+          {
+            "event_lifetime": 1,
+            "event_type": "EVENT_TEST",
+            "event_data_data_type": "NONE"
+          },
+          {
+            "event_lifetime": 3,
+            "event_type": "EVENT_QUIT_GAME",
+            "event_data_data_type": "NONE"
+          }
+        ]
+      },
+      "description": "Tick 1 snapshot"
+    }
+  ],
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 1,
+    "entities": []
+  },
+  "expected_event_bus": {
+    "description": "Final event bus state after all ticks",
+    "events": [
+      {
+        "event_lifetime": 1,
+        "event_type": "EVENT_TEST",
+        "event_data_data_type": "NONE"
+      },
+      {
+        "event_lifetime": 3,
+        "event_type": "EVENT_QUIT_GAME",
+        "event_data_data_type": "NONE"
+      }
+    ]
+  }
+}

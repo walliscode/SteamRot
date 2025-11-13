@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "test_name": "simple_event_bus_test",
+    "description": "Test basic EventBus state initialization and final comparison",
+    "tags": ["unit", "event_bus", "simple"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 1,
+    "entities": []
+  },
+  "start_event_bus": {
+    "description": "Initial event bus with 1 event",
+    "events": [
+      {
+        "event_lifetime": 2,
+        "event_type": "EVENT_TEST",
+        "event_data_data_type": "NONE"
+      }
+    ]
+  },
+  "num_ticks": 1,
+  "expected_entity_collection": {
+    "entity_memory_pool_size": 1,
+    "entities": []
+  },
+  "expected_event_bus": {
+    "description": "Final event bus state after 1 tick (lifetime decremented)",
+    "events": [
+      {
+        "event_lifetime": 1,
+        "event_type": "EVENT_TEST",
+        "event_data_data_type": "NONE"
+      }
+    ]
+  }
+}

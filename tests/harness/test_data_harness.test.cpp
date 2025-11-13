@@ -167,7 +167,9 @@ TEST_CASE("run_fixture_test works with Catch2 generators", "[unit][harness]") {
   auto result = steamrot::tests::run_fixture_test(config);
 
   INFO("Test name: " << config->metadata()->test_name()->str());
-  REQUIRE(result.has_value());
+  if (!result.has_value()) {
+    FAIL("Fixture test failed: " << result.error().message);
+  }
 }
 
 TEST_CASE("run_entity_memory_pool_comparison_test with metadata",

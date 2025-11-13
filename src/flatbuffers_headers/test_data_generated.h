@@ -14,6 +14,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
              "Non-compatible flatbuffers version included");
 
 #include "entities_generated.h"
+#include "event_bus_data_generated.h"
 #include "event_test_data_generated.h"
 #include "input_test_data_generated.h"
 #include "resource_data_generated.h"
@@ -21,11 +22,121 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
+struct TickSnapshot;
+struct TickSnapshotBuilder;
+
 struct TestMetadata;
 struct TestMetadataBuilder;
 
 struct TestDataConfig;
 struct TestDataConfigBuilder;
+
+////////////////////////////////////////////////////////////
+/// @brief Snapshot of expected entity state at a specific tick
+///
+/// Represents a checkpoint during test execution where the
+/// actual entity state should match the expected state defined
+/// in the entity_collection field.
+////////////////////////////////////////////////////////////
+struct TickSnapshot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef TickSnapshotBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_TICK = 4,
+    VT_ENTITY_COLLECTION = 6,
+    VT_EVENT_BUS = 8,
+    VT_DESCRIPTION = 10
+  };
+  /// @brief Tick number when this snapshot should be compared (0-based)
+  /// The comparison happens AFTER simulation steps execute for this tick,
+  /// but BEFORE the event bus is ticked.
+  uint32_t tick() const {
+    return GetField<uint32_t>(VT_TICK, 0);
+  }
+  /// @brief Expected entity state at this tick
+  const steamrot::EntityCollection *entity_collection() const {
+    return GetPointer<const steamrot::EntityCollection *>(VT_ENTITY_COLLECTION);
+  }
+  /// @brief Expected EventBus state at this tick (optional)
+  /// If present, the global event bus will be compared with this expected state.
+  /// Comparison happens at the same time as entity_collection comparison
+  /// (AFTER simulation steps, BEFORE event bus tick).
+  const steamrot::EventBusData *event_bus() const {
+    return GetPointer<const steamrot::EventBusData *>(VT_EVENT_BUS);
+  }
+  /// @brief Optional human-readable description of this checkpoint
+  /// Used in failure messages to identify which snapshot failed.
+  const ::flatbuffers::String *description() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_DESCRIPTION);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint32_t>(verifier, VT_TICK, 4) &&
+           VerifyOffsetRequired(verifier, VT_ENTITY_COLLECTION) &&
+           verifier.VerifyTable(entity_collection()) &&
+           VerifyOffset(verifier, VT_EVENT_BUS) &&
+           verifier.VerifyTable(event_bus()) &&
+           VerifyOffset(verifier, VT_DESCRIPTION) &&
+           verifier.VerifyString(description()) &&
+           verifier.EndTable();
+  }
+};
+
+struct TickSnapshotBuilder {
+  typedef TickSnapshot Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_tick(uint32_t tick) {
+    fbb_.AddElement<uint32_t>(TickSnapshot::VT_TICK, tick, 0);
+  }
+  void add_entity_collection(::flatbuffers::Offset<steamrot::EntityCollection> entity_collection) {
+    fbb_.AddOffset(TickSnapshot::VT_ENTITY_COLLECTION, entity_collection);
+  }
+  void add_event_bus(::flatbuffers::Offset<steamrot::EventBusData> event_bus) {
+    fbb_.AddOffset(TickSnapshot::VT_EVENT_BUS, event_bus);
+  }
+  void add_description(::flatbuffers::Offset<::flatbuffers::String> description) {
+    fbb_.AddOffset(TickSnapshot::VT_DESCRIPTION, description);
+  }
+  explicit TickSnapshotBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<TickSnapshot> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<TickSnapshot>(end);
+    fbb_.Required(o, TickSnapshot::VT_ENTITY_COLLECTION);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<TickSnapshot> CreateTickSnapshot(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint32_t tick = 0,
+    ::flatbuffers::Offset<steamrot::EntityCollection> entity_collection = 0,
+    ::flatbuffers::Offset<steamrot::EventBusData> event_bus = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> description = 0) {
+  TickSnapshotBuilder builder_(_fbb);
+  builder_.add_description(description);
+  builder_.add_event_bus(event_bus);
+  builder_.add_entity_collection(entity_collection);
+  builder_.add_tick(tick);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<TickSnapshot> CreateTickSnapshotDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint32_t tick = 0,
+    ::flatbuffers::Offset<steamrot::EntityCollection> entity_collection = 0,
+    ::flatbuffers::Offset<steamrot::EventBusData> event_bus = 0,
+    const char *description = nullptr) {
+  auto description__ = description ? _fbb.CreateString(description) : 0;
+  return steamrot::CreateTickSnapshot(
+      _fbb,
+      tick,
+      entity_collection,
+      event_bus,
+      description__);
+}
 
 ////////////////////////////////////////////////////////////
 /// @brief Test metadata for data-driven testing
@@ -171,12 +282,15 @@ struct TestDataConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_METADATA = 4,
     VT_START_ENTITY_COLLECTION = 6,
     VT_EXPECTED_ENTITY_COLLECTION = 8,
-    VT_GAME_RESOURCES = 10,
-    VT_SCENE_RESOURCES = 12,
-    VT_SIMULATION_DATA = 14,
-    VT_INPUT_SEQUENCE = 16,
-    VT_EVENT_SEQUENCE = 18,
-    VT_NUM_TICKS = 20
+    VT_START_EVENT_BUS = 10,
+    VT_EXPECTED_EVENT_BUS = 12,
+    VT_GAME_RESOURCES = 14,
+    VT_SCENE_RESOURCES = 16,
+    VT_SIMULATION_DATA = 18,
+    VT_INPUT_SEQUENCE = 20,
+    VT_EVENT_SEQUENCE = 22,
+    VT_NUM_TICKS = 24,
+    VT_TICK_SNAPSHOTS = 26
   };
   /// @brief Metadata about this test case
   const steamrot::TestMetadata *metadata() const {
@@ -190,6 +304,18 @@ struct TestDataConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   /// @brief Expected state entity collection for comparison tests
   const steamrot::EntityCollection *expected_entity_collection() const {
     return GetPointer<const steamrot::EntityCollection *>(VT_EXPECTED_ENTITY_COLLECTION);
+  }
+  /// @brief Starting state of the global event bus
+  /// If present, the global event bus will be populated with these events
+  /// at the start of the test (before any ticks are executed).
+  const steamrot::EventBusData *start_event_bus() const {
+    return GetPointer<const steamrot::EventBusData *>(VT_START_EVENT_BUS);
+  }
+  /// @brief Expected state of the global event bus at the end of the test
+  /// If present, the global event bus will be compared with this expected state
+  /// after all ticks have been executed.
+  const steamrot::EventBusData *expected_event_bus() const {
+    return GetPointer<const steamrot::EventBusData *>(VT_EXPECTED_EVENT_BUS);
   }
   /// @brief Resource data for test fixtures
   const steamrot::GameResourcesData *game_resources() const {
@@ -219,6 +345,13 @@ struct TestDataConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   uint32_t num_ticks() const {
     return GetField<uint32_t>(VT_NUM_TICKS, 0);
   }
+  /// @brief Intermediate entity state snapshots for tick-by-tick validation
+  /// Optional field. If present, the test harness will compare actual entity
+  /// state with expected state at each specified tick.
+  /// Snapshots are compared AFTER simulation steps but BEFORE event bus tick.
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::TickSnapshot>> *tick_snapshots() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::TickSnapshot>> *>(VT_TICK_SNAPSHOTS);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_METADATA) &&
@@ -227,6 +360,10 @@ struct TestDataConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyTable(start_entity_collection()) &&
            VerifyOffset(verifier, VT_EXPECTED_ENTITY_COLLECTION) &&
            verifier.VerifyTable(expected_entity_collection()) &&
+           VerifyOffset(verifier, VT_START_EVENT_BUS) &&
+           verifier.VerifyTable(start_event_bus()) &&
+           VerifyOffset(verifier, VT_EXPECTED_EVENT_BUS) &&
+           verifier.VerifyTable(expected_event_bus()) &&
            VerifyOffset(verifier, VT_GAME_RESOURCES) &&
            verifier.VerifyTable(game_resources()) &&
            VerifyOffset(verifier, VT_SCENE_RESOURCES) &&
@@ -238,6 +375,9 @@ struct TestDataConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_EVENT_SEQUENCE) &&
            verifier.VerifyTable(event_sequence()) &&
            VerifyField<uint32_t>(verifier, VT_NUM_TICKS, 4) &&
+           VerifyOffset(verifier, VT_TICK_SNAPSHOTS) &&
+           verifier.VerifyVector(tick_snapshots()) &&
+           verifier.VerifyVectorOfTables(tick_snapshots()) &&
            verifier.EndTable();
   }
 };
@@ -254,6 +394,12 @@ struct TestDataConfigBuilder {
   }
   void add_expected_entity_collection(::flatbuffers::Offset<steamrot::EntityCollection> expected_entity_collection) {
     fbb_.AddOffset(TestDataConfig::VT_EXPECTED_ENTITY_COLLECTION, expected_entity_collection);
+  }
+  void add_start_event_bus(::flatbuffers::Offset<steamrot::EventBusData> start_event_bus) {
+    fbb_.AddOffset(TestDataConfig::VT_START_EVENT_BUS, start_event_bus);
+  }
+  void add_expected_event_bus(::flatbuffers::Offset<steamrot::EventBusData> expected_event_bus) {
+    fbb_.AddOffset(TestDataConfig::VT_EXPECTED_EVENT_BUS, expected_event_bus);
   }
   void add_game_resources(::flatbuffers::Offset<steamrot::GameResourcesData> game_resources) {
     fbb_.AddOffset(TestDataConfig::VT_GAME_RESOURCES, game_resources);
@@ -273,6 +419,9 @@ struct TestDataConfigBuilder {
   void add_num_ticks(uint32_t num_ticks) {
     fbb_.AddElement<uint32_t>(TestDataConfig::VT_NUM_TICKS, num_ticks, 0);
   }
+  void add_tick_snapshots(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::TickSnapshot>>> tick_snapshots) {
+    fbb_.AddOffset(TestDataConfig::VT_TICK_SNAPSHOTS, tick_snapshots);
+  }
   explicit TestDataConfigBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -290,23 +439,60 @@ inline ::flatbuffers::Offset<TestDataConfig> CreateTestDataConfig(
     ::flatbuffers::Offset<steamrot::TestMetadata> metadata = 0,
     ::flatbuffers::Offset<steamrot::EntityCollection> start_entity_collection = 0,
     ::flatbuffers::Offset<steamrot::EntityCollection> expected_entity_collection = 0,
+    ::flatbuffers::Offset<steamrot::EventBusData> start_event_bus = 0,
+    ::flatbuffers::Offset<steamrot::EventBusData> expected_event_bus = 0,
     ::flatbuffers::Offset<steamrot::GameResourcesData> game_resources = 0,
     ::flatbuffers::Offset<steamrot::SceneResourcesData> scene_resources = 0,
     ::flatbuffers::Offset<steamrot::SimulationData> simulation_data = 0,
     ::flatbuffers::Offset<steamrot::InputSequence> input_sequence = 0,
     ::flatbuffers::Offset<steamrot::EventSequence> event_sequence = 0,
-    uint32_t num_ticks = 0) {
+    uint32_t num_ticks = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::TickSnapshot>>> tick_snapshots = 0) {
   TestDataConfigBuilder builder_(_fbb);
+  builder_.add_tick_snapshots(tick_snapshots);
   builder_.add_num_ticks(num_ticks);
   builder_.add_event_sequence(event_sequence);
   builder_.add_input_sequence(input_sequence);
   builder_.add_simulation_data(simulation_data);
   builder_.add_scene_resources(scene_resources);
   builder_.add_game_resources(game_resources);
+  builder_.add_expected_event_bus(expected_event_bus);
+  builder_.add_start_event_bus(start_event_bus);
   builder_.add_expected_entity_collection(expected_entity_collection);
   builder_.add_start_entity_collection(start_entity_collection);
   builder_.add_metadata(metadata);
   return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<TestDataConfig> CreateTestDataConfigDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<steamrot::TestMetadata> metadata = 0,
+    ::flatbuffers::Offset<steamrot::EntityCollection> start_entity_collection = 0,
+    ::flatbuffers::Offset<steamrot::EntityCollection> expected_entity_collection = 0,
+    ::flatbuffers::Offset<steamrot::EventBusData> start_event_bus = 0,
+    ::flatbuffers::Offset<steamrot::EventBusData> expected_event_bus = 0,
+    ::flatbuffers::Offset<steamrot::GameResourcesData> game_resources = 0,
+    ::flatbuffers::Offset<steamrot::SceneResourcesData> scene_resources = 0,
+    ::flatbuffers::Offset<steamrot::SimulationData> simulation_data = 0,
+    ::flatbuffers::Offset<steamrot::InputSequence> input_sequence = 0,
+    ::flatbuffers::Offset<steamrot::EventSequence> event_sequence = 0,
+    uint32_t num_ticks = 0,
+    const std::vector<::flatbuffers::Offset<steamrot::TickSnapshot>> *tick_snapshots = nullptr) {
+  auto tick_snapshots__ = tick_snapshots ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::TickSnapshot>>(*tick_snapshots) : 0;
+  return steamrot::CreateTestDataConfig(
+      _fbb,
+      metadata,
+      start_entity_collection,
+      expected_entity_collection,
+      start_event_bus,
+      expected_event_bus,
+      game_resources,
+      scene_resources,
+      simulation_data,
+      input_sequence,
+      event_sequence,
+      num_ticks,
+      tick_snapshots__);
 }
 
 inline const steamrot::TestDataConfig *GetTestDataConfig(const void *buf) {

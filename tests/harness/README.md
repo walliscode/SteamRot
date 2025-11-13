@@ -10,8 +10,9 @@ The test harness provides a unified, simplified interface for:
 5. **Executing event sequences** - injecting engine events on a tick-by-tick basis
 6. **Executing simulations** - running sequences of Logic classes or free functions
 7. Running comparison tests between expected and actual entity states
+8. **EventBus state management and comparison** - initializing and validating EventBus state at start, during ticks, and at end
 
-This consolidates functionality for resource-based testing and data-driven test execution with support for complex simulation scenarios and tick-by-tick coordination of inputs, events, and simulation steps.
+This consolidates functionality for resource-based testing and data-driven test execution with support for complex simulation scenarios and tick-by-tick coordination of inputs, events, simulation steps, and EventBus state validation.
 
 ## Purpose
 
@@ -21,6 +22,7 @@ This consolidates functionality for resource-based testing and data-driven test 
 - **Execute input sequences** - simulate user input tick-by-tick
 - **Execute event sequences** - inject engine events tick-by-tick
 - **Execute simulations** - run sequences of Logic classes or free functions defined in test data
+- **EventBus testing** - configure initial EventBus state, validate state at tick snapshots, and compare final state
 - Enable data-driven testing with automatic fixture creation
 - Work seamlessly with Catch2 generators and matchers
 - Keep the interface minimal and easy to use
@@ -897,6 +899,238 @@ Input sequences, event sequences, and simulations can be combined in a single te
 **Note:** All inputs, events, and simulation steps are now coordinated per-tick automatically. See the "Tick-Based Test Execution" section for details.
 
 This allows precise control over the timing and sequencing of inputs and events during testing.
+
+## EventBus State Testing
+
+### Overview
+
+The test harness now supports **EventBus state configuration and validation**. Tests can:
+- Initialize the EventBus with specific events at the start of a test
+- Validate EventBus state at tick snapshots during execution
+- Compare final EventBus state after all ticks complete
+
+This enables comprehensive testing of event lifetimes, event propagation, and event system behavior.
+
+### Key Concepts
+
+**EventBusData**: FlatBuffers schema representing a snapshot of EventBus state
+- Contains an array of `EventPacketData`
+- Can be used for initial state, expected state, or tick snapshots
+
+**start_event_bus**: Optional field in `TestDataConfig`
+- Populates the global event bus at the start of the test
+- Events are added before any ticks are executed
+- Useful for testing logic that processes existing events
+
+**expected_event_bus**: Optional field in `TestDataConfig`
+- Defines the expected EventBus state after all ticks complete
+- Compared automatically using the `EqualsEventBus` matcher
+- Useful for validating event lifetime management and event processing
+
+**Tick Snapshot EventBus**: Optional field in `TickSnapshot`
+- Validates EventBus state at specific ticks during execution
+- Compared after simulation steps but before the event bus is ticked
+- Enables tick-by-tick validation of event state changes
+
+### Example: Basic EventBus Test
+
+```json
+{
+  "metadata": {
+    "test_name": "simple_event_bus_test",
+    "description": "Test basic EventBus state initialization and final comparison",
+    "tags": ["unit", "event_bus"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "start_entity_collection": {
+    "entity_memory_pool_size": 1,
+    "entities": []
+  },
+  "start_event_bus": {
+    "description": "Initial event bus with 1 event",
+    "events": [
+      {
+        "event_lifetime": 2,
+        "event_type": "EVENT_TEST",
+        "event_data_data_type": "NONE"
+      }
+    ]
+  },
+  "num_ticks": 1,
+  "expected_event_bus": {
+    "description": "After 1 tick, event lifetime decremented",
+    "events": [
+      {
+        "event_lifetime": 1,
+        "event_type": "EVENT_TEST",
+        "event_data_data_type": "NONE"
+      }
+    ]
+  }
+}
+```
+
+### Example: EventBus with Tick Snapshots
+
+```json
+{
+  "metadata": {
+    "test_name": "event_bus_snapshot_test",
+    "description": "Test EventBus state at multiple ticks",
+    "tags": ["unit", "event_bus"],
+    "expected_to_pass": true
+  },
+  "start_event_bus": {
+    "events": [
+      {
+        "event_lifetime": 3,
+        "event_type": "EVENT_TEST",
+        "event_data_data_type": "NONE"
+      }
+    ]
+  },
+  "num_ticks": 2,
+  "tick_snapshots": [
+    {
+      "tick": 0,
+      "entity_collection": {...},
+      "event_bus": {
+        "events": [
+          {
+            "event_lifetime": 2,
+            "event_type": "EVENT_TEST",
+            "event_data_data_type": "NONE"
+          }
+        ]
+      }
+    },
+    {
+      "tick": 1,
+      "entity_collection": {...},
+      "event_bus": {
+        "events": [
+          {
+            "event_lifetime": 1,
+            "event_type": "EVENT_TEST",
+            "event_data_data_type": "NONE"
+          }
+        ]
+      }
+    }
+  ],
+  "expected_event_bus": {
+    "events": [
+      {
+        "event_lifetime": 1,
+        "event_type": "EVENT_TEST",
+        "event_data_data_type": "NONE"
+      }
+    ]
+  }
+}
+```
+
+### EventBus Comparison API
+
+#### `run_event_bus_comparison_test(actual, expected, expected_to_pass)`
+
+Compare two EventBus instances directly.
+
+**Parameters:**
+- `actual`: The actual EventBus to test
+- `expected`: The expected EventBus to compare against
+- `expected_to_pass`: If true, expects buses to match; if false, expects mismatch (default: true)
+
+**Example:**
+```cpp
+steamrot::EventBus actual_bus;
+steamrot::EventBus expected_bus;
+
+// ... populate buses ...
+
+steamrot::tests::run_event_bus_comparison_test(actual_bus, expected_bus);
+```
+
+#### `run_event_bus_comparison_test(actual, expected, test_metadata, expected_to_pass)`
+
+Compare two EventBus instances with test metadata for better error messages.
+
+**Parameters:**
+- `actual`: The actual EventBus to test
+- `expected`: The expected EventBus to compare against
+- `test_metadata`: Test metadata string to include in error messages
+- `expected_to_pass`: If true, expects buses to match; if false, expects mismatch (default: true)
+
+### EventBus Configuration API
+
+#### `ConvertEventBusDataToEventBus(event_bus_data)`
+
+Convert EventBusData FlatBuffers to an EventBus instance.
+
+**Parameters:**
+- `event_bus_data`: FlatBuffers EventBusData to convert
+
+**Returns:** `std::expected<EventBus, FailInfo>`
+
+**Example:**
+```cpp
+#include "event_bus_conversion.h"
+
+auto result = steamrot::event::conversion::ConvertEventBusDataToEventBus(event_bus_data);
+if (result.has_value()) {
+  steamrot::EventBus event_bus = result.value();
+  // Use event_bus
+}
+```
+
+#### `ConfigureEventHandlerFromEventBusData(event_bus_data, event_handler)`
+
+Populate an EventHandler's global event bus from EventBusData.
+
+**Parameters:**
+- `event_bus_data`: FlatBuffers EventBusData to convert
+- `event_handler`: EventHandler to configure
+
+**Returns:** `std::expected<std::monostate, FailInfo>`
+
+**Example:**
+```cpp
+steamrot::EventHandler event_handler;
+auto result = steamrot::event::conversion::ConfigureEventHandlerFromEventBusData(
+    event_bus_data, event_handler);
+```
+
+### Automatic EventBus Testing
+
+When using `run_fixture_test()`, EventBus testing is automatic:
+
+1. **Initialization**: If `start_event_bus` is present, the global event bus is populated before any ticks execute
+2. **Tick Snapshots**: If tick snapshots contain `event_bus` fields, the global event bus is compared at each specified tick
+3. **Final Comparison**: If `expected_event_bus` is present, the global event bus is compared after all ticks complete
+
+**Example:**
+```cpp
+TEST_CASE("Data-driven EventBus test", "[unit][event_bus]") {
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  
+  const auto *config = GENERATE_COPY(from_range(configs.value()));
+  
+  // EventBus initialization, tick snapshots, and final comparison
+  // all happen automatically
+  auto result = steamrot::tests::run_fixture_test(config);
+  REQUIRE(result.has_value());
+}
+```
+
+### EventBus Testing Benefits
+
+- **Event Lifetime Validation**: Verify events are properly decremented and removed
+- **Event Propagation**: Test that events are added and processed correctly
+- **State Transitions**: Validate EventBus state changes over time
+- **Regression Testing**: Detect unexpected changes to event system behavior
+- **Data-Driven**: Define test cases in JSON without writing C++ code
 
 ## Integration with Matchers
 

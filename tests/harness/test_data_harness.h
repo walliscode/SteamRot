@@ -12,6 +12,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "EventHandler.h"
 #include "FailInfo.h"
 #include "TestFixture.h"
 #include "containers.h"
@@ -84,6 +85,38 @@ void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
                                             const EntityMemoryPool &expected,
                                             const std::string &test_metadata,
                                             bool expected_to_pass = true);
+
+/////////////////////////////////////////////////
+/// @brief Wrapper function to run EventBus comparison tests
+///
+/// This function compares two EventBus instances using the
+/// EqualsEventBus matcher, ensuring detailed error messages on
+/// mismatch.
+///
+/// @param actual The actual EventBus to test
+/// @param expected The expected EventBus to compare against
+/// @param expected_to_pass If true, expects buses to match; if false, expects mismatch
+/////////////////////////////////////////////////
+void run_event_bus_comparison_test(const EventBus &actual,
+                                   const EventBus &expected,
+                                   bool expected_to_pass = true);
+
+/////////////////////////////////////////////////
+/// @brief Wrapper function to run EventBus comparison tests with test metadata
+///
+/// This function compares two EventBus instances using the
+/// EqualsEventBus matcher with test metadata context, ensuring detailed
+/// error messages on mismatch that include the test name and description.
+///
+/// @param actual The actual EventBus to test
+/// @param expected The expected EventBus to compare against
+/// @param test_metadata Test metadata string to include in error messages
+/// @param expected_to_pass If true, expects buses to match; if false, expects mismatch
+/////////////////////////////////////////////////
+void run_event_bus_comparison_test(const EventBus &actual,
+                                   const EventBus &expected,
+                                   const std::string &test_metadata,
+                                   bool expected_to_pass = true);
 
 /////////////////////////////////////////////////
 /// @brief Create and configure TestFixture from test data configuration

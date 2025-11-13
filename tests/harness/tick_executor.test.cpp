@@ -37,8 +37,8 @@ TEST_CASE("determine_num_ticks uses explicit num_ticks from TestDataConfig",
   auto metadata =
       steamrot::CreateTestMetadata(builder, builder.CreateString("test"));
   // Explicitly set num_ticks = 5 (last parameter)
-  auto config = steamrot::CreateTestDataConfig(builder, metadata, 0, 0, 0, 0, 0,
-                                               input_seq, 0, 5);
+  auto config = steamrot::CreateTestDataConfig(builder, metadata, 0, 0, 0, 0, 0, 0,
+                                               0, input_seq, 0, 5);
   builder.Finish(config);
 
   const steamrot::TestDataConfig *test_config =
@@ -73,8 +73,8 @@ TEST_CASE("determine_num_ticks ignores event_sequence max tick",
   auto metadata =
       steamrot::CreateTestMetadata(builder, builder.CreateString("test"));
   // No explicit num_ticks set, should default to 1 despite event_sequence
-  auto config = steamrot::CreateTestDataConfig(builder, metadata, 0, 0, 0, 0, 0,
-                                               0, event_seq);
+  auto config = steamrot::CreateTestDataConfig(builder, metadata, 0, 0, 0, 0, 0, 0,
+                                               0, 0, event_seq);
   builder.Finish(config);
 
   const steamrot::TestDataConfig *test_config =
@@ -139,7 +139,7 @@ TEST_CASE("determine_num_ticks ignores simulation_data num_ticks",
       steamrot::CreateTestMetadata(builder, builder.CreateString("test"));
   // TestDataConfig without explicit num_ticks (should default to 1, not 10)
   auto config =
-      steamrot::CreateTestDataConfig(builder, metadata, 0, 0, 0, 0, sim_data);
+      steamrot::CreateTestDataConfig(builder, metadata, 0, 0, 0, 0, 0, 0, sim_data);
   builder.Finish(config);
 
   const steamrot::TestDataConfig *test_config =
@@ -182,8 +182,8 @@ TEST_CASE("execute_tick_based_test executes specified num_ticks",
   auto metadata =
       steamrot::CreateTestMetadata(builder, builder.CreateString("test"));
   // Explicitly set num_ticks = 2 to execute both input events
-  auto config = steamrot::CreateTestDataConfig(builder, metadata, 0, 0, 0, 0, 0,
-                                               input_seq, 0, 2);
+  auto config = steamrot::CreateTestDataConfig(builder, metadata, 0, 0, 0, 0, 0, 0,
+                                               0, input_seq, 0, 2);
   builder.Finish(config);
 
   const steamrot::TestDataConfig *test_config =
