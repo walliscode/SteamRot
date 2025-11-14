@@ -30,7 +30,7 @@ TEST_CASE("execute_input_events_for_tick handles null sequence",
   fixture.Intialize();
 
   auto result =
-      steamrot::tests::ExecuteInputEventsForTick(nullptr, 0, fixture);
+      steamrot::tests::ExecuteInputEventsForTick(nullptr, 1, fixture);
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
@@ -77,7 +77,7 @@ TEST_CASE("execute_input_event updates mouse position for MouseMove",
   auto mouse_data = steamrot::CreateMouseInputData(builder, position, 0);
   auto input_event = steamrot::CreateInputEvent(
       builder, steamrot::InputType_MouseMove,
-      steamrot::InputEventData_MouseInputData, mouse_data.Union(), 0);
+      steamrot::InputEventData_MouseInputData, mouse_data.Union(), 1);
   builder.Finish(input_event);
 
   const steamrot::InputEvent *event =
@@ -127,9 +127,9 @@ TEST_CASE("execute_input_events_for_tick processes only specified tick",
   const steamrot::InputSequence *input_sequence =
       flatbuffers::GetRoot<steamrot::InputSequence>(builder.GetBufferPointer());
 
-  // Execute only tick 0
+  // Execute only tick 1
   auto result = steamrot::tests::ExecuteInputEventsForTick(input_sequence,
-                                                               0, fixture);
+                                                               1, fixture);
   REQUIRE(result.has_value());
 
   // Verify only tick 1 event was processed
@@ -137,8 +137,8 @@ TEST_CASE("execute_input_events_for_tick processes only specified tick",
   REQUIRE(game_context.mouse_position.x == 100);
   REQUIRE(game_context.mouse_position.y == 100);
 
-  // Execute tick 1
-  result = steamrot::tests::ExecuteInputEventsForTick(input_sequence, 1,
+  // Execute tick 2
+  result = steamrot::tests::ExecuteInputEventsForTick(input_sequence, 2,
                                                           fixture);
   REQUIRE(result.has_value());
 
@@ -160,7 +160,7 @@ TEST_CASE("execute_input_event generates EventPacket for MouseClick",
       builder, position, static_cast<uint8_t>(sf::Mouse::Button::Left));
   auto input_event = steamrot::CreateInputEvent(
       builder, steamrot::InputType_MouseClick,
-      steamrot::InputEventData_MouseInputData, mouse_data.Union(), 0);
+      steamrot::InputEventData_MouseInputData, mouse_data.Union(), 1);
   builder.Finish(input_event);
 
   const steamrot::InputEvent *event =
@@ -207,7 +207,7 @@ TEST_CASE("execute_input_event generates EventPacket for KeyPress",
       false);
   auto input_event = steamrot::CreateInputEvent(
       builder, steamrot::InputType_KeyPress,
-      steamrot::InputEventData_KeyboardInputData, keyboard_data.Union(), 0);
+      steamrot::InputEventData_KeyboardInputData, keyboard_data.Union(), 1);
   builder.Finish(input_event);
 
   const steamrot::InputEvent *event =
@@ -248,7 +248,7 @@ TEST_CASE("execute_input_event does not generate EventPacket for MouseMove",
   auto mouse_data = steamrot::CreateMouseInputData(builder, position, 0);
   auto input_event = steamrot::CreateInputEvent(
       builder, steamrot::InputType_MouseMove,
-      steamrot::InputEventData_MouseInputData, mouse_data.Union(), 0);
+      steamrot::InputEventData_MouseInputData, mouse_data.Union(), 1);
   builder.Finish(input_event);
 
   const steamrot::InputEvent *event =
