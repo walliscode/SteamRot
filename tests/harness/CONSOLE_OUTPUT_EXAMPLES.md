@@ -12,6 +12,33 @@ This document shows examples of the improved console output formatting for the t
 - [Tick N] Tick number annotations in cyan (when relevant)
 - Proper spacing with newlines for readability
 - **ANSI color support** with automatic detection
+- **Quiet mode by default** - only failed tests shown
+
+## Output Verbosity
+
+**By default, console output is suppressed for passing tests** to reduce noise when running many data-driven tests. Only failed test output is displayed.
+
+### Enabling Verbose Output
+
+To see all test output (including passing tests):
+
+```bash
+export STEAMROT_VERBOSE_TESTS=1
+```
+
+**Error messages are always displayed** regardless of verbosity setting, ensuring failures are never missed.
+
+### Example: Quiet Mode (Default)
+
+When running tests without `STEAMROT_VERBOSE_TESTS=1`:
+- ✓ Passing tests: No output (silent)
+- ✗ Failing tests: Full output with error details
+
+### Example: Verbose Mode
+
+When running tests with `STEAMROT_VERBOSE_TESTS=1`:
+- ✓ Passing tests: Full output with banners, progress, and success messages
+- ✗ Failing tests: Full output with error details
 
 ## Color Support
 
@@ -36,7 +63,9 @@ export STEAMROT_NO_COLOR=1
 
 This follows the [NO_COLOR standard](https://no-color.org/) for respecting user preferences and CI environments.
 
-## Example Output: Tick-Based Test Execution (with colors)
+## Example Output: Tick-Based Test Execution (verbose mode)
+
+The following output is shown when `STEAMROT_VERBOSE_TESTS=1` is set:
 
 ```
 • Running test: sample_tick_based_execution
@@ -142,12 +171,14 @@ When errors occur during fixture initialization:
 
 ## Benefits
 
-1. **Visual Clarity**: Colored tick boxes (✓/✗) provide instant visual feedback
-2. **Tick Context**: Cyan tick numbers show exactly when events/errors occur
-3. **Structure**: Yellow section dividers organize output into logical sections
-4. **Readability**: Proper newlines, colors, and indentation improve scanning
-5. **Debugging**: Easy to spot failures and their context (tick number, phase)
-6. **Accessibility**: Colors can be disabled via environment variable
+1. **Reduced Noise**: Quiet mode by default suppresses output for passing tests
+2. **Visual Clarity**: Colored tick boxes (✓/✗) provide instant visual feedback
+3. **Tick Context**: Cyan tick numbers show exactly when events/errors occur
+4. **Structure**: Yellow section dividers organize output into logical sections
+5. **Readability**: Proper newlines, colors, and indentation improve scanning
+6. **Debugging**: Easy to spot failures and their context (tick number, phase)
+7. **Accessibility**: Colors and verbosity can be controlled via environment variables
+8. **CI-Friendly**: Quiet mode reduces log size in continuous integration
 
 ## Usage in Tests
 

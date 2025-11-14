@@ -76,6 +76,19 @@ The test harness provides formatted console output with visual indicators and **
 - **[Tick N]** (cyan) - Tick numbers included in relevant messages
 - **Box-drawn banners** (bold cyan) - Test start indicators
 
+### Output Verbosity
+
+**By default, only failed test output is shown** to reduce console noise when running many data-driven tests. Passing tests run silently.
+
+To see all test output (including passing tests):
+```bash
+export STEAMROT_VERBOSE_TESTS=1
+```
+
+**Error messages are always displayed** regardless of verbosity setting.
+
+### Color Control
+
 Colors are enabled by default and can be disabled by setting the `NO_COLOR` or `STEAMROT_NO_COLOR` environment variable. This follows the [NO_COLOR standard](https://no-color.org/).
 
 See `CONSOLE_OUTPUT_EXAMPLES.md` for detailed examples of the formatted output.
@@ -90,27 +103,36 @@ Available in `console_output.h`:
 // Check if colors are enabled
 bool colors = steamrot::tests::console::IsColorEnabled();
 
+// Check if verbose output is enabled
+bool verbose = steamrot::tests::console::IsVerboseEnabled();
+
 // Success message with optional tick number (green with cyan tick)
+// Only shown if STEAMROT_VERBOSE_TESTS=1
 steamrot::tests::console::PrintSuccess("Operation completed", 5);
 // Output: ✓ [Tick 5] Operation completed
 
 // Error message with optional tick number (red with cyan tick)
+// Always shown regardless of verbosity
 steamrot::tests::console::PrintError("Operation failed", 3);
 // Output: ✗ [Tick 3] Operation failed
 
 // Info message (blue bullet)
+// Only shown if STEAMROT_VERBOSE_TESTS=1
 steamrot::tests::console::PrintInfo("Processing data", 2);
 // Output: • [Tick 2] Processing data
 
 // Section header (yellow)
+// Only shown if STEAMROT_VERBOSE_TESTS=1
 steamrot::tests::console::PrintSectionHeader("Entity Pool Comparison");
 // Output: ━━━━ Entity Pool Comparison ━━━━
 
 // Test start banner (bold cyan)
+// Only shown if STEAMROT_VERBOSE_TESTS=1
 steamrot::tests::console::PrintTestStart("my_test_name");
 // Output: Box-drawn banner with test name
 
 // Tick progress indicator (magenta arrow, blue numbers)
+// Only shown if STEAMROT_VERBOSE_TESTS=1
 steamrot::tests::console::PrintTickProgress(3, 10);
 // Output: ➤ Executing Tick 3 of 10
 ```

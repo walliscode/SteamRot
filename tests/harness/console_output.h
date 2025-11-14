@@ -61,13 +61,42 @@ inline bool IsColorEnabled() {
 }
 
 /////////////////////////////////////////////////
+/// @brief Check if verbose output is enabled
+///
+/// Verbose output is disabled by default for passing tests to reduce
+/// console noise. Set STEAMROT_VERBOSE_TESTS=1 to see all test output.
+/// Error messages are always shown regardless of this setting.
+///
+/// @return true if verbose output should be shown, false otherwise
+/////////////////////////////////////////////////
+inline bool IsVerboseEnabled() {
+  static bool checked = false;
+  static bool enabled = false;
+
+  if (!checked) {
+    // Check for STEAMROT_VERBOSE_TESTS environment variable
+    const char *verbose = std::getenv("STEAMROT_VERBOSE_TESTS");
+    enabled = (verbose != nullptr && std::string(verbose) == "1");
+    checked = true;
+  }
+
+  return enabled;
+}
+
+/////////////////////////////////////////////////
 /// @brief Print a formatted success message with tick box
+///
+/// Only prints if verbose mode is enabled.
 ///
 /// @param message Message to display
 /// @param tick Optional tick number to include
 /////////////////////////////////////////////////
 inline void PrintSuccess(const std::string &message,
                          std::optional<uint32_t> tick = std::nullopt) {
+  if (!IsVerboseEnabled()) {
+    return;  // Suppress success messages in non-verbose mode
+  }
+  
   if (IsColorEnabled()) {
     std::cout << "\n" << Color::BoldGreen << "✓ " << Color::Reset;
   } else {
@@ -87,11 +116,14 @@ inline void PrintSuccess(const std::string &message,
 /////////////////////////////////////////////////
 /// @brief Print a formatted error message with cross mark
 ///
+/// Always prints regardless of verbose mode.
+///
 /// @param message Message to display
 /// @param tick Optional tick number to include
 /////////////////////////////////////////////////
 inline void PrintError(const std::string &message,
                        std::optional<uint32_t> tick = std::nullopt) {
+  // Errors are always shown
   if (IsColorEnabled()) {
     std::cerr << "\n" << Color::BoldRed << "✗ " << Color::Reset;
   } else {
@@ -111,11 +143,17 @@ inline void PrintError(const std::string &message,
 /////////////////////////////////////////////////
 /// @brief Print a formatted info message with bullet point
 ///
+/// Only prints if verbose mode is enabled.
+///
 /// @param message Message to display
 /// @param tick Optional tick number to include
 /////////////////////////////////////////////////
 inline void PrintInfo(const std::string &message,
                       std::optional<uint32_t> tick = std::nullopt) {
+  if (!IsVerboseEnabled()) {
+    return;  // Suppress info messages in non-verbose mode
+  }
+  
   if (IsColorEnabled()) {
     std::cout << "\n" << Color::Blue << "• " << Color::Reset;
   } else {
@@ -135,9 +173,15 @@ inline void PrintInfo(const std::string &message,
 /////////////////////////////////////////////////
 /// @brief Print a formatted section header
 ///
+/// Only prints if verbose mode is enabled.
+///
 /// @param title Section title
 /////////////////////////////////////////////////
 inline void PrintSectionHeader(const std::string &title) {
+  if (!IsVerboseEnabled()) {
+    return;  // Suppress section headers in non-verbose mode
+  }
+  
   if (IsColorEnabled()) {
     std::cout << "\n" << Color::BoldYellow << "━━━━ " << title << " ━━━━"
               << Color::Reset << std::endl;
@@ -149,9 +193,15 @@ inline void PrintSectionHeader(const std::string &title) {
 /////////////////////////////////////////////////
 /// @brief Print a formatted test start message
 ///
+/// Only prints if verbose mode is enabled.
+///
 /// @param test_name Name of the test
 /////////////////////////////////////////////////
 inline void PrintTestStart(const std::string &test_name) {
+  if (!IsVerboseEnabled()) {
+    return;  // Suppress test start banners in non-verbose mode
+  }
+  
   if (IsColorEnabled()) {
     std::cout << "\n" << Color::BoldCyan
               << "┌─────────────────────────────────────" << std::endl;
@@ -169,10 +219,16 @@ inline void PrintTestStart(const std::string &test_name) {
 /////////////////////////////////////////////////
 /// @brief Print a formatted tick progress message
 ///
+/// Only prints if verbose mode is enabled.
+///
 /// @param current_tick Current tick number
 /// @param total_ticks Total number of ticks
 /////////////////////////////////////////////////
 inline void PrintTickProgress(uint32_t current_tick, uint32_t total_ticks) {
+  if (!IsVerboseEnabled()) {
+    return;  // Suppress tick progress in non-verbose mode
+  }
+  
   if (IsColorEnabled()) {
     std::cout << "\n" << Color::Magenta << "➤ " << Color::Reset
               << "Executing Tick " << Color::BoldBlue << current_tick
