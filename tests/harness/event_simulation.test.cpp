@@ -27,7 +27,7 @@ TEST_CASE("execute_events_for_tick handles null sequence",
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 
-  auto result = steamrot::tests::execute_events_for_tick(nullptr, 0, fixture);
+  auto result = steamrot::tests::execute_events_for_tick(nullptr, 1, fixture);
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
@@ -109,15 +109,15 @@ TEST_CASE("execute_events_for_tick processes only specified tick",
   // Create event sequence with events on different ticks
   flatbuffers::FlatBufferBuilder builder;
 
-  // Event at tick 0
+  // Event at tick 1
   auto packet0 = steamrot::CreateEventPacketData(
       builder, 5, steamrot::EventType_EVENT_TEST);
-  auto event0 = steamrot::CreateEventTestData(builder, 0, packet0);
+  auto event0 = steamrot::CreateEventTestData(builder, 1, packet0);
 
-  // Event at tick 1
+  // Event at tick 2
   auto packet1 = steamrot::CreateEventPacketData(
       builder, 5, steamrot::EventType_EVENT_USER_INPUT);
-  auto event1 = steamrot::CreateEventTestData(builder, 1, packet1);
+  auto event1 = steamrot::CreateEventTestData(builder, 2, packet1);
 
   std::vector<flatbuffers::Offset<steamrot::EventTestData>> events;
   events.push_back(event0);
@@ -132,32 +132,32 @@ TEST_CASE("execute_events_for_tick processes only specified tick",
 
   auto &event_handler = fixture.GetGameResources().event_handler;
 
-  // Execute only tick 0
+  // Execute only tick 1
   auto result =
-      steamrot::tests::execute_events_for_tick(event_sequence, 0, fixture);
+      steamrot::tests::execute_events_for_tick(event_sequence, 1, fixture);
   REQUIRE(result.has_value());
 
   // Process waiting room
   event_handler.ProcessWaitingRoomEventBus();
 
   // Verify only one event was added
-  const auto &bus_after_tick0 = event_handler.GetGlobalEventBus();
-  size_t size_after_tick0 = bus_after_tick0.size();
-  REQUIRE(size_after_tick0 == 1);
-  REQUIRE(bus_after_tick0.back().m_event_type ==
+  const auto &bus_after_tick1 = event_handler.GetGlobalEventBus();
+  size_t size_after_tick1 = bus_after_tick1.size();
+  REQUIRE(size_after_tick1 == 1);
+  REQUIRE(bus_after_tick1.back().m_event_type ==
           steamrot::EventType_EVENT_TEST);
 
-  // Execute tick 1
-  result = steamrot::tests::execute_events_for_tick(event_sequence, 1, fixture);
+  // Execute tick 2
+  result = steamrot::tests::execute_events_for_tick(event_sequence, 2, fixture);
   REQUIRE(result.has_value());
 
   // Process waiting room
   event_handler.ProcessWaitingRoomEventBus();
 
   // Verify second event was added
-  const auto &bus_after_tick1 = event_handler.GetGlobalEventBus();
-  REQUIRE(bus_after_tick1.size() == size_after_tick0 + 1);
-  REQUIRE(bus_after_tick1.back().m_event_type ==
+  const auto &bus_after_tick2 = event_handler.GetGlobalEventBus();
+  REQUIRE(bus_after_tick2.size() == size_after_tick1 + 1);
+  REQUIRE(bus_after_tick2.back().m_event_type ==
           steamrot::EventType_EVENT_USER_INPUT);
 }
 
@@ -172,15 +172,15 @@ TEST_CASE("execute_event_sequence processes all ticks in order",
 
   auto packet0 = steamrot::CreateEventPacketData(
       builder, 5, steamrot::EventType_EVENT_TEST);
-  auto event0 = steamrot::CreateEventTestData(builder, 0, packet0);
+  auto event0 = steamrot::CreateEventTestData(builder, 1, packet0);
 
   auto packet1 = steamrot::CreateEventPacketData(
       builder, 3, steamrot::EventType_EVENT_USER_INPUT);
-  auto event1 = steamrot::CreateEventTestData(builder, 2, packet1);
+  auto event1 = steamrot::CreateEventTestData(builder, 3, packet1);
 
   auto packet2 = steamrot::CreateEventPacketData(
       builder, 1, steamrot::EventType_EVENT_QUIT_GAME);
-  auto event2 = steamrot::CreateEventTestData(builder, 1, packet2);
+  auto event2 = steamrot::CreateEventTestData(builder, 2, packet2);
 
   std::vector<flatbuffers::Offset<steamrot::EventTestData>> events;
   events.push_back(event0);
@@ -207,7 +207,7 @@ TEST_CASE("execute_event_sequence processes all ticks in order",
   const auto &bus = event_handler.GetGlobalEventBus();
   REQUIRE(bus.size() == 3);
 
-  // Events should be processed in tick order (0, 1, 2)
+  // Events should be processed in tick order (1, 2, 3)
   REQUIRE(bus[0].m_event_type == steamrot::EventType_EVENT_TEST);
   REQUIRE(bus[1].m_event_type == steamrot::EventType_EVENT_QUIT_GAME);
   REQUIRE(bus[2].m_event_type == steamrot::EventType_EVENT_USER_INPUT);
