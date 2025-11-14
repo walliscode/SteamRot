@@ -48,6 +48,8 @@ harness/
 ├── tick_executor.test.cpp         # Tick execution tests
 ├── TestFixture.h                  # Resource management for tests
 ├── TestFixture.cpp                # Implementation
+├── console_output.h               # Formatted console output utilities
+├── CONSOLE_OUTPUT_EXAMPLES.md     # Console output examples
 ├── CMakeLists.txt                 # Build configuration
 ├── README.md                      # This file
 └── data/                          # Sample test data files
@@ -61,6 +63,54 @@ harness/
     ├── sample_input_event_simulation.test_data.json
     └── sample_tick_based_execution.test_data.json
 ```
+
+## Formatted Console Output
+
+The test harness provides formatted console output with visual indicators for improved readability:
+
+- **✓ Success messages** - Indicate successful operations
+- **✗ Error messages** - Highlight failures and errors
+- **• Info messages** - General information bullets
+- **➤ Tick progress** - Show current tick execution
+- **━━━━ Section dividers** - Organize output into logical sections
+- **[Tick N]** - Tick numbers included in relevant messages
+- **Box-drawn banners** - Test start indicators
+
+See `CONSOLE_OUTPUT_EXAMPLES.md` for detailed examples of the formatted output.
+
+### Console Output Functions
+
+Available in `console_output.h`:
+
+```cpp
+#include "console_output.h"
+
+// Success message with optional tick number
+steamrot::tests::console::PrintSuccess("Operation completed", 5);
+// Output: ✓ [Tick 5] Operation completed
+
+// Error message with optional tick number
+steamrot::tests::console::PrintError("Operation failed", 3);
+// Output: ✗ [Tick 3] Operation failed
+
+// Info message
+steamrot::tests::console::PrintInfo("Processing data", 2);
+// Output: • [Tick 2] Processing data
+
+// Section header
+steamrot::tests::console::PrintSectionHeader("Entity Pool Comparison");
+// Output: ━━━━ Entity Pool Comparison ━━━━
+
+// Test start banner
+steamrot::tests::console::PrintTestStart("my_test_name");
+// Output: Box-drawn banner with test name
+
+// Tick progress indicator
+steamrot::tests::console::PrintTickProgress(3, 10);
+// Output: ➤ Executing Tick 3 of 10
+```
+
+All console output functions automatically include newlines for proper spacing and support optional tick numbers for context.
 
 ## Usage
 
