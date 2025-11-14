@@ -181,8 +181,8 @@ ExecuteTickBasedTest(const TestDataConfig *config, TestFixture &fixture) {
   // Determine number of ticks to execute
   uint32_t num_ticks = DetermineNumTicks(config);
 
-  // Execute each tick in sequence
-  for (uint32_t tick = 0; tick < num_ticks; ++tick) {
+  // Execute each tick in sequence (1-based to match game loop)
+  for (uint32_t tick = 1; tick <= num_ticks; ++tick) {
     auto tick_result = ExecuteSingleTick(tick, config, fixture);
     if (!tick_result.has_value()) {
       return std::unexpected(tick_result.error());

@@ -28,7 +28,7 @@ TEST_CASE("execute_events_for_tick handles null sequence",
   fixture.Intialize();
 
 
-  auto result = steamrot::tests::ExecuteEventsForTick(nullptr, 0, fixture);
+  auto result = steamrot::tests::ExecuteEventsForTick(nullptr, 1, fixture);
 
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
@@ -74,7 +74,7 @@ TEST_CASE("execute_event_test_data adds event to waiting room",
   flatbuffers::FlatBufferBuilder builder;
   auto event_packet = steamrot::CreateEventPacketData(
       builder, 5, steamrot::EventType_EVENT_TEST);
-  auto event_data = steamrot::CreateEventTestData(builder, 0, event_packet);
+  auto event_data = steamrot::CreateEventTestData(builder, 1, event_packet);
   builder.Finish(event_data);
 
   const steamrot::EventTestData *test_data =
@@ -136,7 +136,7 @@ TEST_CASE("execute_events_for_tick processes only specified tick",
 
   // Execute only tick 1
   auto result =
-      steamrot::tests::ExecuteEventsForTick(event_sequence, 0, fixture);
+      steamrot::tests::ExecuteEventsForTick(event_sequence, 1, fixture);
   REQUIRE(result.has_value());
 
   // Process waiting room
@@ -149,8 +149,8 @@ TEST_CASE("execute_events_for_tick processes only specified tick",
   REQUIRE(bus_after_tick1.back().m_event_type ==
           steamrot::EventType_EVENT_TEST);
 
-  // Execute tick 1
-  result = steamrot::tests::ExecuteEventsForTick(event_sequence, 1, fixture);
+  // Execute tick 2
+  result = steamrot::tests::ExecuteEventsForTick(event_sequence, 2, fixture);
   REQUIRE(result.has_value());
 
   // Process waiting room
