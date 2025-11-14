@@ -10,16 +10,16 @@
     "description": "Sequence of test events added on different ticks",
     "events": [
       {
-        "tick": 0,
+        "tick": 1,
         "event_packet": {
           "event_lifetime": 5,
           "event_type": "EVENT_TEST",
           "event_data_data_type": "NONE"
         },
-        "description": "Initial test event at tick 0"
+        "description": "Initial test event at tick 1"
       },
       {
-        "tick": 1,
+        "tick": 2,
         "event_packet": {
           "event_lifetime": 3,
           "event_type": "EVENT_USER_INPUT",
@@ -29,16 +29,16 @@
             "mouse_pressed": ["LEFT_CLICK"]
           }
         },
-        "description": "User input event at tick 1"
+        "description": "User input event at tick 2"
       },
       {
-        "tick": 2,
+        "tick": 3,
         "event_packet": {
           "event_lifetime": 1,
           "event_type": "EVENT_TEST",
           "event_data_data_type": "NONE"
         },
-        "description": "Another test event at tick 2"
+        "description": "Another test event at tick 3"
       }
     ]
   },

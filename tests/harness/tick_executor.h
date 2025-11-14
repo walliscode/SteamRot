@@ -25,7 +25,10 @@ namespace steamrot::tests {
 /// creates an EntityMemoryPool from the snapshot's entity_collection
 /// and compares it with the actual pool.
 ///
-/// @param tick Tick number to check for snapshot
+/// Note: Tick numbering is 1-based. The setup phase (TestFixture::Initialize)
+/// occurs before tick 1. The first game loop tick is tick 1.
+///
+/// @param tick Tick number to check for snapshot (1-based)
 /// @param config Test data configuration containing snapshots
 /// @param fixture TestFixture containing the test environment
 /// @return std::monostate on success or match, FailInfo on error
@@ -40,7 +43,10 @@ CompareTickSnapshot(uint32_t tick, const TestDataConfig *config,
 /// Executes all inputs, events, and simulation steps scheduled for the
 /// specified tick, then performs per-tick maintenance (event bus ticking).
 ///
-/// @param tick The tick number to execute
+/// Note: Tick numbering is 1-based. The setup phase (TestFixture::Initialize)
+/// occurs before tick 1. The first game loop tick is tick 1.
+///
+/// @param tick The tick number to execute (1-based)
 /// @param config Test data configuration containing inputs/events/simulation
 /// @param fixture TestFixture containing the test environment
 /// @return std::monostate on success, FailInfo on error
@@ -69,6 +75,9 @@ uint32_t DetermineNumTicks(const TestDataConfig *config);
 ///
 /// Runs the test for the number of ticks specified by config->num_ticks(),
 /// executing inputs, events, and simulation steps at each tick.
+///
+/// Note: Tick numbering is 1-based to mimic the game loop. The setup phase
+/// (TestFixture::Initialize) occurs before tick 1. Ticks run from 1 to num_ticks.
 ///
 /// Execution order per tick:
 /// 1. Execute inputs scheduled for this tick

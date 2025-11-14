@@ -37,6 +37,9 @@ struct TestDataConfigBuilder;
 /// Represents a checkpoint during test execution where the
 /// actual entity state should match the expected state defined
 /// in the entity_collection field.
+///
+/// Note: Tick numbering is 1-based to mimic the game loop.
+/// The setup phase occurs before tick 1. Valid tick values start at 1.
 ////////////////////////////////////////////////////////////
 struct TickSnapshot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef TickSnapshotBuilder Builder;
@@ -46,9 +49,10 @@ struct TickSnapshot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_EVENT_BUS = 8,
     VT_DESCRIPTION = 10
   };
-  /// @brief Tick number when this snapshot should be compared (0-based)
+  /// @brief Tick number when this snapshot should be compared (1-based)
   /// The comparison happens AFTER simulation steps execute for this tick,
   /// but BEFORE the event bus is ticked.
+  /// Valid values: 1, 2, 3, ... (matching game loop tick numbers)
   uint32_t tick() const {
     return GetField<uint32_t>(VT_TICK, 0);
   }

@@ -497,7 +497,7 @@ ctest --preset Debug -R my_test
           "position": { "x": 100.0, "y": 100.0 },
           "button": 0
         },
-        "tick": 0,
+        "tick": 1,
         "description": "Initial mouse position"
       },
       {
@@ -583,13 +583,13 @@ ctest --preset Debug -R my_test
     "description": "Sequence of test events added on different ticks",
     "events": [
       {
-        "tick": 0,
+        "tick": 1,
         "event_packet": {
           "event_lifetime": 5,
           "event_type": "EVENT_TEST",
           "event_data_data_type": "NONE"
         },
-        "description": "Initial test event at tick 0"
+        "description": "Initial test event at tick 1"
       },
       {
         "tick": 1,
@@ -664,7 +664,7 @@ ctest --preset Debug -R my_test
           "position": { "x": 100.0, "y": 100.0 },
           "button": 0
         },
-        "tick": 0,
+        "tick": 1,
         "description": "Start position"
       },
       {
@@ -683,7 +683,7 @@ ctest --preset Debug -R my_test
     "description": "Events triggered at specific ticks",
     "events": [
       {
-        "tick": 0,
+        "tick": 1,
         "event_packet": {
           "event_lifetime": 5,
           "event_type": "EVENT_TEST",
@@ -955,7 +955,7 @@ ctest --preset Debug -R my_test
         "position": { "x": 100.0, "y": 100.0 },  // For mouse inputs
         "button": 0                               // For mouse inputs
       },
-      "tick": 0,
+      "tick": 1,
       "description": "What this input does"
     }
   ]
@@ -973,7 +973,7 @@ ctest --preset Debug -R my_test
   "description": "Event sequence description",
   "events": [
     {
-      "tick": 0,
+      "tick": 1,
       "event_packet": {
         "event_lifetime": 5,
         "event_type": "EVENT_TEST|EVENT_USER_INPUT|EVENT_SCENE_CHANGE",
@@ -1283,7 +1283,7 @@ File: `tests/integration/ui/data/button_click_sequence.test_data.json`
           "position": { "x": 50.0, "y": 50.0 },
           "button": 0
         },
-        "tick": 0,
+        "tick": 1,
         "description": "Mouse outside button"
       },
       {

@@ -102,19 +102,19 @@ TEST_CASE("execute_input_events_for_tick processes only specified tick",
   // Create input sequence with events on different ticks
   flatbuffers::FlatBufferBuilder builder;
 
-  // Event at tick 0
+  // Event at tick 1
   auto pos0 = steamrot::CreateVector2fData(builder, 100.0f, 100.0f);
   auto mouse0 = steamrot::CreateMouseInputData(builder, pos0, 0);
   auto event0 = steamrot::CreateInputEvent(
       builder, steamrot::InputType_MouseMove,
-      steamrot::InputEventData_MouseInputData, mouse0.Union(), 0);
+      steamrot::InputEventData_MouseInputData, mouse0.Union(), 1);
 
-  // Event at tick 1
+  // Event at tick 2
   auto pos1 = steamrot::CreateVector2fData(builder, 200.0f, 200.0f);
   auto mouse1 = steamrot::CreateMouseInputData(builder, pos1, 0);
   auto event1 = steamrot::CreateInputEvent(
       builder, steamrot::InputType_MouseMove,
-      steamrot::InputEventData_MouseInputData, mouse1.Union(), 1);
+      steamrot::InputEventData_MouseInputData, mouse1.Union(), 2);
 
   std::vector<flatbuffers::Offset<steamrot::InputEvent>> events;
   events.push_back(event0);
@@ -132,7 +132,7 @@ TEST_CASE("execute_input_events_for_tick processes only specified tick",
                                                                0, fixture);
   REQUIRE(result.has_value());
 
-  // Verify only tick 0 event was processed
+  // Verify only tick 1 event was processed
   auto &game_context = fixture.GetGameContext();
   REQUIRE(game_context.mouse_position.x == 100);
   REQUIRE(game_context.mouse_position.y == 100);
@@ -142,7 +142,7 @@ TEST_CASE("execute_input_events_for_tick processes only specified tick",
                                                           fixture);
   REQUIRE(result.has_value());
 
-  // Verify tick 1 event was processed
+  // Verify tick 2 event was processed
   REQUIRE(game_context.mouse_position.x == 200);
   REQUIRE(game_context.mouse_position.y == 200);
 }
