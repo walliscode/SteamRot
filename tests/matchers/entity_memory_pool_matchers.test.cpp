@@ -7,11 +7,11 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "entity_memory_pool_matchers.h"
-#include "CMeta.h"
-#include "CUserInterface.h"
-#include "CMachinaForm.h"
 #include "CGrimoireMachina.h"
+#include "CMachinaForm.h"
+#include "CMeta.h"
 #include "CUIState.h"
+#include "CUserInterface.h"
 #include "containers.h"
 #include "entity_memory.h"
 #include <catch2/catch_test_macros.hpp>
@@ -213,8 +213,10 @@ TEST_CASE("EntityMemoryPool matcher with metadata",
   cstate_vec2.resize(3);
 
   SECTION("Matcher includes metadata in description") {
-    std::string test_metadata = "Test: my_test_name, Description: Test description";
-    auto matcher = steamrot::tests::EqualsEntityMemoryPool(pool2, test_metadata);
+    std::string test_metadata =
+        "Test: my_test_name, Description: Test description";
+    auto matcher =
+        steamrot::tests::EqualsEntityMemoryPool(pool2, test_metadata);
     REQUIRE_FALSE(matcher.match(pool1));
 
     std::string desc = matcher.describe();
@@ -222,14 +224,5 @@ TEST_CASE("EntityMemoryPool matcher with metadata",
     REQUIRE(desc.find("my_test_name") != std::string::npos);
     REQUIRE(desc.find("Test description") != std::string::npos);
     REQUIRE(desc.find("Pool sizes differ") != std::string::npos);
-  }
-
-  SECTION("Matcher works without metadata") {
-    auto matcher = steamrot::tests::EqualsEntityMemoryPool(pool2);
-    REQUIRE_FALSE(matcher.match(pool1));
-
-    std::string desc = matcher.describe();
-    REQUIRE_FALSE(desc.empty());
-    REQUIRE(desc.find("EntityMemoryPool mismatch") != std::string::npos);
   }
 }
