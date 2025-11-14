@@ -11,6 +11,7 @@
 #include "EventHandler.h"
 #include "EventPacket.h"
 #include "UserInputBitset.h"
+#include "console_output.h"
 #include "test_context.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
@@ -213,19 +214,98 @@ public:
     
     std::ostringstream oss;
     
-    // Add error indicator
-    oss << "\n✗ EventBus Comparison Failed";
+    // Use colors if enabled
+    const bool use_colors = console::IsColorEnabled();
     
-    // Add context information
+    // Header with error indicator
+    if (use_colors) {
+      oss << "\n" << console::Color::BoldRed << "✗ EventBus Comparison Failed" 
+          << console::Color::Reset;
+    } else {
+      oss << "\n✗ EventBus Comparison Failed";
+    }
+    
+    // Add visual separator
+    if (use_colors) {
+      oss << "\n" << console::Color::Yellow << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" 
+          << console::Color::Reset;
+    } else {
+      oss << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+    }
+    
+    // Context section (hierarchical with bullet)
     if (m_context.has_value()) {
-      std::string context_str = m_context.value().ToString();
-      if (!context_str.empty()) {
-        oss << "\n  Context: " << context_str;
+      const TestContext &ctx = m_context.value();
+      
+      // Test name (primary context)
+      if (!ctx.test_name.empty()) {
+        if (use_colors) {
+          oss << "\n" << console::Color::BoldCyan << "│ Test: " 
+              << console::Color::Reset << console::Color::Bold << ctx.test_name 
+              << console::Color::Reset;
+        } else {
+          oss << "\n│ Test: " << ctx.test_name;
+        }
+      }
+      
+      // Tick information (secondary context)
+      if (ctx.current_tick.has_value()) {
+        if (use_colors) {
+          oss << "\n" << console::Color::BoldCyan << "│ Tick: " 
+              << console::Color::Reset << console::Color::Cyan << "[" 
+              << ctx.current_tick.value();
+          if (ctx.total_ticks.has_value()) {
+            oss << " of " << ctx.total_ticks.value();
+          }
+          oss << "]" << console::Color::Reset;
+        } else {
+          oss << "\n│ Tick: [" << ctx.current_tick.value();
+          if (ctx.total_ticks.has_value()) {
+            oss << " of " << ctx.total_ticks.value();
+          }
+          oss << "]";
+        }
+      }
+      
+      // Description (tertiary context)
+      if (!ctx.description.empty()) {
+        if (use_colors) {
+          oss << "\n" << console::Color::BoldCyan << "│ Description: " 
+              << console::Color::Reset << ctx.description;
+        } else {
+          oss << "\n│ Description: " << ctx.description;
+        }
       }
     }
     
-    // Add mismatch details
-    oss << "\n  Details: " << m_mismatch_description;
+    // Add separator before details
+    if (use_colors) {
+      oss << "\n" << console::Color::Yellow << "├─────────────────────────────────────────────────────" 
+          << console::Color::Reset;
+    } else {
+      oss << "\n├─────────────────────────────────────────────────────";
+    }
+    
+    // Mismatch details section (indented for hierarchy)
+    if (!m_mismatch_description.empty()) {
+      if (use_colors) {
+        oss << "\n" << console::Color::BoldYellow << "│ Differences:" 
+            << console::Color::Reset;
+        oss << "\n" << console::Color::Blue << "│   • " 
+            << console::Color::Reset << m_mismatch_description;
+      } else {
+        oss << "\n│ Differences:";
+        oss << "\n│   • " << m_mismatch_description;
+      }
+    }
+    
+    // Bottom border
+    if (use_colors) {
+      oss << "\n" << console::Color::Yellow << "└─────────────────────────────────────────────────────" 
+          << console::Color::Reset;
+    } else {
+      oss << "\n└─────────────────────────────────────────────────────";
+    }
     
     return oss.str();
   }
