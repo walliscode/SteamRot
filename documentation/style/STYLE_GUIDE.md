@@ -24,9 +24,10 @@ The project uses a cohesive naming system to distinguish between classes, free f
 
 **Quick Summary**:
 - **Classes**: `ClassName.h/cpp` (PascalCase) → `steamrot::ClassName`
-- **Free Functions**: `subsystem_category.h/cpp` (snake_case) → `steamrot::subsystem::category`
+- **Functions**: All functions use PascalCase (e.g., `GetComponent`, `ProcessUIActionsAndEvents`)
+- **Free Function Files**: `subsystem_category.h/cpp` (snake_case files) → `steamrot::subsystem::category`
 - **Template Utils**: `SubsystemUtils.h` (PascalCase, header-only) → `steamrot::subsystem`
-- **Test Helpers**: `subsystem_test_helpers.h/cpp` (snake_case) → `steamrot::tests::subsystem`
+- **Test Helpers**: `subsystem_test_helpers.h/cpp` (snake_case files) → `steamrot::tests::subsystem`
 - **Test Files**: `ModuleName.test.cpp` (matches module being tested)
 
 ### Formatting

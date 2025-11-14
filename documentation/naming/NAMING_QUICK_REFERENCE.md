@@ -37,12 +37,16 @@ What am I creating?
 ✅ CUserInterface.h/cpp (Component: C prefix)
 ```
 
-### Free Functions (snake_case with subsystem prefix)
+### Free Function Files (snake_case files containing PascalCase functions)
 ```
 ✅ logic_collision.h/cpp       → namespace steamrot::logic::collision
+                                  (contains CheckMouseOverBounds, etc.)
 ✅ logic_ui.h/cpp              → namespace steamrot::logic::ui
+                                  (contains GetAllFragmentNames, etc.)
 ✅ entity_memory.h/cpp         → namespace steamrot::entity::memory
+                                  (contains GetComponent, GetComponentVector)
 ✅ event_conversion.h/cpp      → namespace steamrot::event::conversion
+                                  (contains ConvertFBDataToUserInputBitset, etc.)
 ```
 
 ### Template Utilities (PascalCase with Utils suffix)

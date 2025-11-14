@@ -40,9 +40,12 @@ This document establishes a cohesive naming system for files in the SteamRot pro
 **When to use**: Files containing free functions grouped by subsystem/domain
 
 **File naming**: `{subsystem}_{purpose}.h/cpp`
-- Always snake_case
+- Files use snake_case naming
 - First part identifies the subsystem
 - Second part describes the category of functions
+
+**Function naming**: All functions within use PascalCase
+- Example: `GetComponent`, `ProcessUIActionsAndEvents`, `CheckMouseOverBounds`
 
 **Namespace**: `steamrot::{subsystem}` or `steamrot::{subsystem}::{purpose}`
 
@@ -51,17 +54,25 @@ This document establishes a cohesive naming system for files in the SteamRot pro
 **Current (to be standardized)**:
 ```
 src/logic/collision.h        → steamrot::collision
+                                (functions: CheckBounds, IsColliding)
 src/logic/ui_helpers.h        → steamrot::ui_helpers
+                                (functions: UpdateVisibility, GetFragmentNames)
 src/entity/emp_helpers.h      → steamrot::emp_helpers
+                                (functions: GetComponent, GetComponentVector)
 src/events/event_helpers.h    → steamrot::event_helpers
+                                (functions: ConvertEventData, ProcessEvents)
 ```
 
 **Proposed standardization**:
 ```
 src/logic/logic_collision.h   → steamrot::logic::collision
+                                (functions: CheckMouseOverBounds, etc.)
 src/logic/logic_ui.h          → steamrot::logic::ui
+                                (functions: GetAllFragmentNames, etc.)
 src/entity/entity_memory.h    → steamrot::entity::memory
+                                (functions: GetComponent, GetComponentVector)
 src/events/event_conversion.h → steamrot::event::conversion
+                                (functions: ConvertFBDataToUserInputBitset, etc.)
 ```
 
 **Benefits of new pattern**:
@@ -69,6 +80,7 @@ src/events/event_conversion.h → steamrot::event::conversion
 - Easy to add new function files to a subsystem
 - Namespace structure matches file structure
 - Avoids naming conflicts across subsystems
+- All functions use consistent PascalCase naming
 
 ---
 
