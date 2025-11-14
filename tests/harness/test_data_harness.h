@@ -33,7 +33,7 @@ namespace steamrot::tests {
 /// @return Vector of TestDataConfig pointers or FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::vector<const TestDataConfig *>, FailInfo>
-load_test_data_configs_impl(const char *source_file_path);
+LoadTestDataConfigsImpl(const char *source_file_path);
 
 /////////////////////////////////////////////////
 /// @brief Macro to load test data from adjacent data directory
@@ -49,7 +49,7 @@ load_test_data_configs_impl(const char *source_file_path);
 ///
 /// @return Vector of TestDataConfig pointers or FailInfo on error
 /////////////////////////////////////////////////
-#define load_test_data_configs() load_test_data_configs_impl(__FILE__)
+#define load_test_data_configs() LoadTestDataConfigsImpl(__FILE__)
 
 /////////////////////////////////////////////////
 /// @brief Wrapper function to run EMP comparison tests
@@ -65,9 +65,9 @@ load_test_data_configs_impl(const char *source_file_path);
 /// @param expected The expected EntityMemoryPool to compare against
 /// @param expected_to_pass If true, expects pools to match; if false, expects mismatch
 /////////////////////////////////////////////////
-void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
-                                            const EntityMemoryPool &expected,
-                                            bool expected_to_pass = true);
+void RunEntityMemoryPoolComparisonTest(const EntityMemoryPool &actual,
+                                       const EntityMemoryPool &expected,
+                                       bool expected_to_pass = true);
 
 /////////////////////////////////////////////////
 /// @brief Wrapper function to run EMP comparison tests with test metadata
@@ -81,10 +81,10 @@ void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
 /// @param test_metadata Test metadata string to include in error messages
 /// @param expected_to_pass If true, expects pools to match; if false, expects mismatch
 /////////////////////////////////////////////////
-void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
-                                            const EntityMemoryPool &expected,
-                                            const std::string &test_metadata,
-                                            bool expected_to_pass = true);
+void RunEntityMemoryPoolComparisonTest(const EntityMemoryPool &actual,
+                                       const EntityMemoryPool &expected,
+                                       const std::string &test_metadata,
+                                       bool expected_to_pass = true);
 
 /////////////////////////////////////////////////
 /// @brief Wrapper function to run EventBus comparison tests
@@ -97,9 +97,9 @@ void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
 /// @param expected The expected EventBus to compare against
 /// @param expected_to_pass If true, expects buses to match; if false, expects mismatch
 /////////////////////////////////////////////////
-void run_event_bus_comparison_test(const EventBus &actual,
-                                   const EventBus &expected,
-                                   bool expected_to_pass = true);
+void RunEventBusComparisonTest(const EventBus &actual,
+                               const EventBus &expected,
+                               bool expected_to_pass = true);
 
 /////////////////////////////////////////////////
 /// @brief Wrapper function to run EventBus comparison tests with test metadata
@@ -113,10 +113,10 @@ void run_event_bus_comparison_test(const EventBus &actual,
 /// @param test_metadata Test metadata string to include in error messages
 /// @param expected_to_pass If true, expects buses to match; if false, expects mismatch
 /////////////////////////////////////////////////
-void run_event_bus_comparison_test(const EventBus &actual,
-                                   const EventBus &expected,
-                                   const std::string &test_metadata,
-                                   bool expected_to_pass = true);
+void RunEventBusComparisonTest(const EventBus &actual,
+                               const EventBus &expected,
+                               const std::string &test_metadata,
+                               bool expected_to_pass = true);
 
 /////////////////////////////////////////////////
 /// @brief Create and configure TestFixture from test data configuration
@@ -129,7 +129,7 @@ void run_event_bus_comparison_test(const EventBus &actual,
 /// @param scene_type The scene type for the fixture (default: SceneType_TEST)
 /// @return Configured TestFixture or FailInfo on error
 /////////////////////////////////////////////////
-std::expected<TestFixture, FailInfo> create_fixture_from_test_data(
+std::expected<TestFixture, FailInfo> CreateFixtureFromTestData(
     const TestDataConfig *config,
     const SceneType &scene_type = SceneType::SceneType_TEST);
 
@@ -155,12 +155,12 @@ std::expected<TestFixture, FailInfo> create_fixture_from_test_data(
 ///
 ///   const auto *config = GENERATE_COPY(from_range(configs.value()));
 ///
-///   auto result = steamrot::tests::run_fixture_test(config);
+///   auto result = steamrot::tests::RunFixtureTest(config);
 ///   REQUIRE(result.has_value());
 /// }
 /// @endcode
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-run_fixture_test(const TestDataConfig *config);
+RunFixtureTest(const TestDataConfig *config);
 
 } // namespace steamrot::tests

@@ -29,7 +29,7 @@ namespace steamrot::tests {
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-execute_event_test_data(const EventTestData *event_data, TestFixture &fixture);
+ExecuteEventTestData(const EventTestData *event_data, TestFixture &fixture);
 
 /////////////////////////////////////////////////
 /// @brief Execute all events for a specific tick
@@ -44,15 +44,15 @@ execute_event_test_data(const EventTestData *event_data, TestFixture &fixture);
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-execute_events_for_tick(const EventSequence *event_sequence, uint32_t tick,
-                        TestFixture &fixture);
+ExecuteEventsForTick(const EventSequence *event_sequence, uint32_t tick,
+                     TestFixture &fixture);
 
 /////////////////////////////////////////////////
 /// @brief Execute a complete event sequence
 ///
 /// Processes all events in the sequence, adding them at the appropriate
 /// tick. This is a convenience function that iterates through all ticks and
-/// calls execute_events_for_tick for each unique tick value.
+/// calls ExecuteEventsForTick for each unique tick value.
 ///
 /// Note: This function does NOT process the waiting room or tick the event bus.
 /// It only adds events to the waiting room. The caller is responsible for
@@ -63,7 +63,7 @@ execute_events_for_tick(const EventSequence *event_sequence, uint32_t tick,
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-execute_event_sequence(const EventSequence *event_sequence,
-                       TestFixture &fixture);
+ExecuteEventSequence(const EventSequence *event_sequence,
+                     TestFixture &fixture);
 
 } // namespace steamrot::tests

@@ -27,7 +27,7 @@ namespace steamrot::tests {
 /// @brief Execute a free function based on FunctionType enum
 /////////////////////////////////////////////////
 static std::expected<std::monostate, FailInfo>
-execute_function(const FunctionType function_type,
+ExecuteFunction(const FunctionType function_type,
                  SceneContext &scene_context) {
 
   switch (function_type) {
@@ -137,7 +137,7 @@ execute_function(const FunctionType function_type,
 /// @brief Execute a Logic class based on LogicClassType enum
 /////////////////////////////////////////////////
 static std::expected<std::monostate, FailInfo>
-execute_logic_class(const LogicClassType logic_class_type,
+ExecuteLogicClass(const LogicClassType logic_class_type,
                     SceneContext &scene_context) {
 
   switch (logic_class_type) {
@@ -182,7 +182,7 @@ execute_logic_class(const LogicClassType logic_class_type,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-execute_simulation_step(const SimulationStep *step,
+ExecuteSimulationStep(const SimulationStep *step,
                         SceneContext &scene_context) {
 
   // Validate step
@@ -194,10 +194,10 @@ execute_simulation_step(const SimulationStep *step,
   // Dispatch based on execution mode
   switch (step->execution_mode()) {
   case ExecutionMode_Function:
-    return execute_function(step->function_type(), scene_context);
+    return ExecuteFunction(step->function_type(), scene_context);
 
   case ExecutionMode_LogicClass:
-    return execute_logic_class(step->logic_class_type(), scene_context);
+    return ExecuteLogicClass(step->logic_class_type(), scene_context);
 
   default:
     std::string error_msg = std::format(
@@ -208,7 +208,7 @@ execute_simulation_step(const SimulationStep *step,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-execute_simulation(const SimulationData *simulation_data,
+ExecuteSimulation(const SimulationData *simulation_data,
                    SceneContext &scene_context) {
 
   // Validate simulation data
@@ -225,7 +225,7 @@ execute_simulation(const SimulationData *simulation_data,
 
   // Execute each step in order
   for (const auto *step : *simulation_data->steps()) {
-    auto result = execute_simulation_step(step, scene_context);
+    auto result = ExecuteSimulationStep(step, scene_context);
     if (!result.has_value()) {
       return result; // Propagate error
     }
@@ -236,14 +236,14 @@ execute_simulation(const SimulationData *simulation_data,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-execute_simulation_with_fixture(const SimulationData *simulation_data,
+ExecuteSimulationWithFixture(const SimulationData *simulation_data,
                                 TestFixture &fixture) {
 
   // Get the SceneContext from the fixture
   SceneContext &scene_context = fixture.GetSceneContext();
 
   // Execute the simulation
-  return execute_simulation(simulation_data, scene_context);
+  return ExecuteSimulation(simulation_data, scene_context);
 }
 
 } // namespace steamrot::tests

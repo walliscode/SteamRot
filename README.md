@@ -177,6 +177,7 @@ ctest --preset Debug -L integration
 SteamRot follows the [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html) with specific conventions:
 
 - **Classes**: `PascalCase`
+- **Functions**: `PascalCase` (e.g., `GetComponent`, `ProcessLogic`)
 - **Components**: Prefix with `C` (e.g., `CUserInterface`)
 - **Member Variables**: Prefix with `m_` (e.g., `m_value`)
 - **Indentation**: 2 spaces (not tabs)

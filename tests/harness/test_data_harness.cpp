@@ -38,7 +38,7 @@ static char *load_binary_data(const std::filesystem::path &file_path) {
 /// @brief Helper to get adjacent data directory from source file path
 /////////////////////////////////////////////////
 static std::expected<std::filesystem::path, FailInfo>
-get_adjacent_data_directory(const char *source_file_path) {
+GetAdjacentDataDirectory(const char *source_file_path) {
   std::filesystem::path source_path = source_file_path;
   std::filesystem::path source_dir = source_path.parent_path();
   std::filesystem::path data_dir = source_dir / "data";
@@ -62,7 +62,7 @@ get_adjacent_data_directory(const char *source_file_path) {
 /// @brief Helper to discover and load test data from a directory
 /////////////////////////////////////////////////
 static std::expected<std::vector<const TestDataConfig *>, FailInfo>
-discover_and_load_from_directory(const std::filesystem::path &data_dir) {
+DiscoverAndLoadFromDirectory(const std::filesystem::path &data_dir) {
 
   std::vector<const TestDataConfig *> configs;
 
@@ -107,21 +107,21 @@ discover_and_load_from_directory(const std::filesystem::path &data_dir) {
 
 /////////////////////////////////////////////////
 std::expected<std::vector<const TestDataConfig *>, FailInfo>
-load_test_data_configs_impl(const char *source_file_path) {
+LoadTestDataConfigsImpl(const char *source_file_path) {
 
   // Get the adjacent data directory using the provided source file path
-  auto data_dir_result = get_adjacent_data_directory(source_file_path);
+  auto data_dir_result = GetAdjacentDataDirectory(source_file_path);
   if (!data_dir_result.has_value()) {
     return std::unexpected(data_dir_result.error());
   }
 
-  return discover_and_load_from_directory(data_dir_result.value());
+  return DiscoverAndLoadFromDirectory(data_dir_result.value());
 }
 
 /////////////////////////////////////////////////
-void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
-                                            const EntityMemoryPool &expected,
-                                            bool expected_to_pass) {
+void RunEntityMemoryPoolComparisonTest(const EntityMemoryPool &actual,
+                                       const EntityMemoryPool &expected,
+                                       bool expected_to_pass) {
   // Create matcher
   auto matcher = EqualsEntityMemoryPool(expected);
 
@@ -135,10 +135,10 @@ void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
 }
 
 /////////////////////////////////////////////////
-void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
-                                            const EntityMemoryPool &expected,
-                                            const std::string &test_metadata,
-                                            bool expected_to_pass) {
+void RunEntityMemoryPoolComparisonTest(const EntityMemoryPool &actual,
+                                       const EntityMemoryPool &expected,
+                                       const std::string &test_metadata,
+                                       bool expected_to_pass) {
   // Create matcher with metadata
   auto matcher = EqualsEntityMemoryPool(expected, test_metadata);
 
@@ -160,9 +160,9 @@ void run_entity_memory_pool_comparison_test(const EntityMemoryPool &actual,
 }
 
 /////////////////////////////////////////////////
-void run_event_bus_comparison_test(const EventBus &actual,
-                                   const EventBus &expected,
-                                   bool expected_to_pass) {
+void RunEventBusComparisonTest(const EventBus &actual,
+                               const EventBus &expected,
+                               bool expected_to_pass) {
   // Create matcher
   auto matcher = EqualsEventBus(expected);
 
@@ -176,10 +176,10 @@ void run_event_bus_comparison_test(const EventBus &actual,
 }
 
 /////////////////////////////////////////////////
-void run_event_bus_comparison_test(const EventBus &actual,
-                                   const EventBus &expected,
-                                   const std::string &test_metadata,
-                                   bool expected_to_pass) {
+void RunEventBusComparisonTest(const EventBus &actual,
+                               const EventBus &expected,
+                               const std::string &test_metadata,
+                               bool expected_to_pass) {
   // Create matcher (EventBusEqualsMatcher doesn't support metadata yet,
   // but we can add context to failure messages through INFO)
   auto matcher = EqualsEventBus(expected);
@@ -207,8 +207,8 @@ void run_event_bus_comparison_test(const EventBus &actual,
 
 /////////////////////////////////////////////////
 std::expected<TestFixture, FailInfo>
-create_fixture_from_test_data(const TestDataConfig *config,
-                              const SceneType &scene_type) {
+CreateFixtureFromTestData(const TestDataConfig *config,
+                          const SceneType &scene_type) {
 
   // Validate config
   if (!config) {
@@ -239,10 +239,10 @@ create_fixture_from_test_data(const TestDataConfig *config,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-run_fixture_test(const TestDataConfig *config) {
+RunFixtureTest(const TestDataConfig *config) {
 
   // Create fixture from test data
-  auto fixture_result = create_fixture_from_test_data(config);
+  auto fixture_result = CreateFixtureFromTestData(config);
   if (!fixture_result.has_value()) {
     return std::unexpected(fixture_result.error());
   }
@@ -252,7 +252,7 @@ run_fixture_test(const TestDataConfig *config) {
   // Execute the test using tick-based execution
   // This will process inputs, events, and simulation steps on a tick-by-tick
   // basis
-  auto tick_result = execute_tick_based_test(config, fixture);
+  auto tick_result = ExecuteTickBasedTest(config, fixture);
   if (!tick_result.has_value()) {
     return std::unexpected(tick_result.error());
   }
@@ -298,11 +298,11 @@ run_fixture_test(const TestDataConfig *config) {
 
     // Use overload with metadata if available, otherwise use simple version
     if (!test_metadata.empty()) {
-      run_entity_memory_pool_comparison_test(actual_pool, expected_pool,
-                                             test_metadata, expected_to_pass);
+      RunEntityMemoryPoolComparisonTest(actual_pool, expected_pool,
+                                        test_metadata, expected_to_pass);
     } else {
-      run_entity_memory_pool_comparison_test(actual_pool, expected_pool,
-                                             expected_to_pass);
+      RunEntityMemoryPoolComparisonTest(actual_pool, expected_pool,
+                                        expected_to_pass);
     }
   }
 
@@ -344,10 +344,10 @@ run_fixture_test(const TestDataConfig *config) {
 
     // Use overload with metadata if available, otherwise use simple version
     if (!test_metadata.empty()) {
-      run_event_bus_comparison_test(actual_event_bus, expected_event_bus,
-                                    test_metadata, expected_to_pass);
+      RunEventBusComparisonTest(actual_event_bus, expected_event_bus,
+                                test_metadata, expected_to_pass);
     } else {
-      run_event_bus_comparison_test(actual_event_bus, expected_event_bus,
+      RunEventBusComparisonTest(actual_event_bus, expected_event_bus,
                                     expected_to_pass);
     }
   }

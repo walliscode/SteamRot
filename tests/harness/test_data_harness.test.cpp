@@ -82,7 +82,7 @@ TEST_CASE("create_fixture_from_test_data creates initialized fixture",
   const auto *config = configs.value()[0];
 
   // Create fixture from test data
-  auto fixture_result = steamrot::tests::create_fixture_from_test_data(config);
+  auto fixture_result = steamrot::tests::CreateFixtureFromTestData(config);
 
   REQUIRE(fixture_result.has_value());
 
@@ -92,7 +92,7 @@ TEST_CASE("create_fixture_from_test_data creates initialized fixture",
 TEST_CASE("create_fixture_from_test_data rejects null config",
           "[unit][harness]") {
 
-  auto result = steamrot::tests::create_fixture_from_test_data(nullptr);
+  auto result = steamrot::tests::CreateFixtureFromTestData(nullptr);
 
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
@@ -118,7 +118,7 @@ TEST_CASE("create_fixture_from_test_data does not load default scene entities",
 
   // Create fixture from test data
   auto fixture_result =
-      steamrot::tests::create_fixture_from_test_data(test_config);
+      steamrot::tests::CreateFixtureFromTestData(test_config);
   REQUIRE(fixture_result.has_value());
 
   auto &fixture = fixture_result.value();
@@ -148,7 +148,7 @@ TEST_CASE("run_fixture_test executes comparison test", "[unit][harness]") {
   const auto *config = configs.value()[0];
 
   // Run fixture test with comparison
-  auto result = steamrot::tests::run_fixture_test(config);
+  auto result = steamrot::tests::RunFixtureTest(config);
 
   REQUIRE(result.has_value());
 }
@@ -164,7 +164,7 @@ TEST_CASE("run_fixture_test works with Catch2 generators", "[unit][harness]") {
   std::cout << "Running test: " << config->metadata()->test_name()->str()
             << std::endl;
   // This is the main wrapper function for data-driven testing
-  auto result = steamrot::tests::run_fixture_test(config);
+  auto result = steamrot::tests::RunFixtureTest(config);
 
   INFO("Test name: " << config->metadata()->test_name()->str());
   if (!result.has_value()) {
@@ -229,14 +229,14 @@ TEST_CASE("run_entity_memory_pool_comparison_test with metadata",
 
   SECTION("Comparison succeeds with equal pools") {
     // Pools are equal, test should pass
-    steamrot::tests::run_entity_memory_pool_comparison_test(
+    steamrot::tests::RunEntityMemoryPoolComparisonTest(
         pool1, pool2, "Test: metadata_test");
     SUCCEED("Comparison passed with metadata");
   }
 
   SECTION("Comparison can be done without metadata") {
     // Test backwards compatibility - should still work without metadata
-    steamrot::tests::run_entity_memory_pool_comparison_test(pool1, pool2);
+    steamrot::tests::RunEntityMemoryPoolComparisonTest(pool1, pool2);
     SUCCEED("Comparison passed without metadata");
   }
 }
@@ -299,7 +299,7 @@ TEST_CASE("run_entity_memory_pool_comparison_test respects expected_to_pass",
 
   SECTION("expected_to_pass=true succeeds when pools match") {
     // Pools are equal, test should pass
-    steamrot::tests::run_entity_memory_pool_comparison_test(pool1, pool2, true);
+    steamrot::tests::RunEntityMemoryPoolComparisonTest(pool1, pool2, true);
     SUCCEED("Comparison passed with expected_to_pass=true");
   }
 
@@ -309,7 +309,7 @@ TEST_CASE("run_entity_memory_pool_comparison_test respects expected_to_pass",
     cmeta_vec2[0].m_active = false;
 
     // Pools are different, expected_to_pass=false should succeed
-    steamrot::tests::run_entity_memory_pool_comparison_test(pool1, pool2,
+    steamrot::tests::RunEntityMemoryPoolComparisonTest(pool1, pool2,
                                                             false);
     SUCCEED("Comparison passed with expected_to_pass=false");
   }
@@ -320,7 +320,7 @@ TEST_CASE("run_entity_memory_pool_comparison_test respects expected_to_pass",
     cui_vec2[1].m_name = "original_name";
 
     // Pools are different, expected_to_pass=false should succeed
-    steamrot::tests::run_entity_memory_pool_comparison_test(
+    steamrot::tests::RunEntityMemoryPoolComparisonTest(
         pool1, pool2, "Test: mismatch_test", false);
     SUCCEED("Comparison passed with expected_to_pass=false and metadata");
   }
@@ -344,7 +344,7 @@ TEST_CASE("run_fixture_test handles expected_to_pass from config metadata",
     }
     REQUIRE(pass_config != nullptr);
 
-    auto result = steamrot::tests::run_fixture_test(pass_config);
+    auto result = steamrot::tests::RunFixtureTest(pass_config);
     REQUIRE(result.has_value());
   }
 
@@ -360,7 +360,7 @@ TEST_CASE("run_fixture_test handles expected_to_pass from config metadata",
     }
     REQUIRE(fail_config != nullptr);
 
-    auto result = steamrot::tests::run_fixture_test(fail_config);
+    auto result = steamrot::tests::RunFixtureTest(fail_config);
     REQUIRE(result.has_value());
   }
 }

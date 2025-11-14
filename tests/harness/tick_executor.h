@@ -34,8 +34,8 @@ namespace steamrot::tests {
 /// @return std::monostate on success or match, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-compare_tick_snapshot(uint32_t tick, const TestDataConfig *config,
-                     TestFixture &fixture);
+CompareTickSnapshot(uint32_t tick, const TestDataConfig *config,
+                    TestFixture &fixture);
 
 /////////////////////////////////////////////////
 /// @brief Execute test for a single tick
@@ -52,8 +52,8 @@ compare_tick_snapshot(uint32_t tick, const TestDataConfig *config,
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-execute_single_tick(uint32_t tick, const TestDataConfig *config,
-                    TestFixture &fixture);
+ExecuteSingleTick(uint32_t tick, const TestDataConfig *config,
+                  TestFixture &fixture);
 
 /////////////////////////////////////////////////
 /// @brief Determine the number of ticks to execute for a test
@@ -68,7 +68,7 @@ execute_single_tick(uint32_t tick, const TestDataConfig *config,
 /// @param config Test data configuration
 /// @return Number of ticks to execute (minimum 1)
 /////////////////////////////////////////////////
-uint32_t determine_num_ticks(const TestDataConfig *config);
+uint32_t DetermineNumTicks(const TestDataConfig *config);
 
 /////////////////////////////////////////////////
 /// @brief Execute a complete tick-based test
@@ -92,6 +92,6 @@ uint32_t determine_num_ticks(const TestDataConfig *config);
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-execute_tick_based_test(const TestDataConfig *config, TestFixture &fixture);
+ExecuteTickBasedTest(const TestDataConfig *config, TestFixture &fixture);
 
 } // namespace steamrot::tests
