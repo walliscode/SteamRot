@@ -13,11 +13,15 @@ namespace steamrot;
 /// Represents a checkpoint during test execution where the
 /// actual entity state should match the expected state defined
 /// in the entity_collection field.
+///
+/// Note: Tick numbering is 1-based to mimic the game loop.
+/// The setup phase occurs before tick 1. Valid tick values start at 1.
 ////////////////////////////////////////////////////////////
 table TickSnapshot {
-  /// @brief Tick number when this snapshot should be compared (0-based)
+  /// @brief Tick number when this snapshot should be compared (1-based)
   /// The comparison happens AFTER simulation steps execute for this tick,
   /// but BEFORE the event bus is ticked.
+  /// Valid values: 1, 2, 3, ... (matching game loop tick numbers)
   tick: uint32;
   
   /// @brief Expected entity state at this tick

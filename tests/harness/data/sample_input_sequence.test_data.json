@@ -16,7 +16,7 @@
           "position": { "x": 100.0, "y": 100.0 },
           "button": 0
         },
-        "tick": 0,
+        "tick": 1,
         "description": "Initial mouse position"
       },
       {
@@ -26,7 +26,7 @@
           "position": { "x": 150.0, "y": 125.0 },
           "button": 0
         },
-        "tick": 1,
+        "tick": 2,
         "description": "Move mouse to button center"
       },
       {
@@ -36,7 +36,7 @@
           "position": { "x": 150.0, "y": 125.0 },
           "button": 0
         },
-        "tick": 2,
+        "tick": 3,
         "description": "Click left mouse button"
       }
     ]

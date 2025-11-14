@@ -110,7 +110,7 @@ TEST_CASE("execute_single_tick handles null config",
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 
-  auto result = steamrot::tests::execute_single_tick(0, nullptr, fixture);
+  auto result = steamrot::tests::execute_single_tick(1, nullptr, fixture);
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
@@ -159,18 +159,18 @@ TEST_CASE("execute_tick_based_test executes specified num_ticks",
 
   flatbuffers::FlatBufferBuilder builder;
 
-  // Create input sequence with events on different ticks
+  // Create input sequence with events on different ticks (1-based)
   auto pos0 = steamrot::CreateVector2fData(builder, 100.0f, 100.0f);
   auto mouse0 = steamrot::CreateMouseInputData(builder, pos0, 0);
   auto input0 = steamrot::CreateInputEvent(
       builder, steamrot::InputType_MouseMove,
-      steamrot::InputEventData_MouseInputData, mouse0.Union(), 0);
+      steamrot::InputEventData_MouseInputData, mouse0.Union(), 1);
 
   auto pos1 = steamrot::CreateVector2fData(builder, 200.0f, 200.0f);
   auto mouse1 = steamrot::CreateMouseInputData(builder, pos1, 0);
   auto input1 = steamrot::CreateInputEvent(
       builder, steamrot::InputType_MouseMove,
-      steamrot::InputEventData_MouseInputData, mouse1.Union(), 1);
+      steamrot::InputEventData_MouseInputData, mouse1.Union(), 2);
 
   std::vector<flatbuffers::Offset<steamrot::InputEvent>> inputs;
   inputs.push_back(input0);
@@ -194,7 +194,7 @@ TEST_CASE("execute_tick_based_test executes specified num_ticks",
   auto result = steamrot::tests::execute_tick_based_test(test_config, fixture);
   REQUIRE(result.has_value());
 
-  // Verify mouse position reflects the last tick (tick 1)
+  // Verify mouse position reflects the last tick (tick 2)
   auto &game_context = fixture.GetGameContext();
   REQUIRE(game_context.mouse_position.x == 200);
   REQUIRE(game_context.mouse_position.y == 200);

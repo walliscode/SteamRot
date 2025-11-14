@@ -31,7 +31,7 @@
   },
   "tick_snapshots": [
     {
-      "tick": 0,
+      "tick": 1,
       "description": "Initial state after first tick",
       "entity_collection": {
         "entity_memory_pool_size": 2,
@@ -57,7 +57,7 @@
       }
     },
     {
-      "tick": 2,
+      "tick": 3,
       "description": "Final state after third tick",
       "entity_collection": {
         "entity_memory_pool_size": 2,
