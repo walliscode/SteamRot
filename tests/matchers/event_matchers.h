@@ -212,46 +212,23 @@ public:
       return oss.str();
     }
     
-    std::ostringstream oss;
-    
-    // Header with error indicator (simple ASCII)
-    oss << "\n[FAILED] EventBus Comparison";
-    oss << "\n" << std::string(60, '=');
-    
-    // Context section (hierarchical with indentation)
+    // Use TestContext formatting if available
     if (m_context.has_value()) {
-      const TestContext &ctx = m_context.value();
-      
-      // Test name (primary context)
-      if (!ctx.test_name.empty()) {
-        oss << "\n  Test: " << ctx.test_name;
-      }
-      
-      // Tick information (secondary context)
-      if (ctx.current_tick.has_value()) {
-        oss << "\n  Tick: [" << ctx.current_tick.value();
-        if (ctx.total_ticks.has_value()) {
-          oss << " of " << ctx.total_ticks.value();
-        }
-        oss << "]";
-      }
-      
-      // Description (tertiary context)
-      if (!ctx.description.empty()) {
-        oss << "\n  Description: " << ctx.description;
-      }
+      return m_context.value().FormatFailureMessage("EventBus", 
+                                                     m_mismatch_description);
     }
     
-    // Add separator before details
+    // Legacy support - manual formatting
+    std::ostringstream oss;
+    oss << "\n[FAILED] EventBus Comparison";
+    oss << "\n" << std::string(60, '=');
     oss << "\n" << std::string(60, '-');
     
-    // Mismatch details section (indented for hierarchy)
     if (!m_mismatch_description.empty()) {
       oss << "\n  Differences:";
       oss << "\n    * " << m_mismatch_description;
     }
     
-    // Bottom border
     oss << "\n" << std::string(60, '=');
     
     return oss.str();

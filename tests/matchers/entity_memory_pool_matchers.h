@@ -238,49 +238,28 @@ public:
   /// @return Description string with visual formatting (no ANSI codes)
   ////////////////////////////////////////////////////////////
   std::string describe() const override {
-    std::ostringstream oss;
+    // Use TestContext formatting if available
+    if (m_context.has_value()) {
+      return m_context.value().FormatFailureMessage("EntityMemoryPool", 
+                                                     m_mismatch_description);
+    }
     
-    // Header with error indicator (simple ASCII)
+    // Legacy support - manual formatting
+    std::ostringstream oss;
     oss << "\n[FAILED] EntityMemoryPool Comparison";
     oss << "\n" << std::string(60, '=');
     
-    // Context section (hierarchical with indentation)
-    if (m_context.has_value()) {
-      const TestContext &ctx = m_context.value();
-      
-      // Test name (primary context)
-      if (!ctx.test_name.empty()) {
-        oss << "\n  Test: " << ctx.test_name;
-      }
-      
-      // Tick information (secondary context)
-      if (ctx.current_tick.has_value()) {
-        oss << "\n  Tick: [" << ctx.current_tick.value();
-        if (ctx.total_ticks.has_value()) {
-          oss << " of " << ctx.total_ticks.value();
-        }
-        oss << "]";
-      }
-      
-      // Description (tertiary context)
-      if (!ctx.description.empty()) {
-        oss << "\n  Description: " << ctx.description;
-      }
-    } else if (!m_test_metadata.empty()) {
-      // Legacy support
+    if (!m_test_metadata.empty()) {
       oss << "\n  Context: " << m_test_metadata;
     }
     
-    // Add separator before details
     oss << "\n" << std::string(60, '-');
     
-    // Mismatch details section (indented for hierarchy)
     if (!m_mismatch_description.empty()) {
       oss << "\n  Differences:";
       oss << "\n    * " << m_mismatch_description;
     }
     
-    // Bottom border
     oss << "\n" << std::string(60, '=');
     
     return oss.str();
