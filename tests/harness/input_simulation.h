@@ -31,7 +31,7 @@ namespace steamrot::tests {
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-execute_input_event(const InputEvent *input_event, TestFixture &fixture);
+ExecuteInputEvent(const InputEvent *input_event, TestFixture &fixture);
 
 /////////////////////////////////////////////////
 /// @brief Execute all input events for a specific tick
@@ -46,15 +46,15 @@ execute_input_event(const InputEvent *input_event, TestFixture &fixture);
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-execute_input_events_for_tick(const InputSequence *input_sequence, uint32_t tick,
-                               TestFixture &fixture);
+ExecuteInputEventsForTick(const InputSequence *input_sequence, uint32_t tick,
+                          TestFixture &fixture);
 
 /////////////////////////////////////////////////
 /// @brief Execute a complete input sequence
 ///
 /// Processes all input events in the sequence, generating EventPackets at the
 /// appropriate tick. This is a convenience function that iterates through all
-/// ticks and calls execute_input_events_for_tick for each unique tick value.
+/// ticks and calls ExecuteInputEventsForTick for each unique tick value.
 ///
 /// Note: This function does NOT advance simulation ticks automatically or
 /// process the waiting room event bus. It only adds EventPackets to the
@@ -66,7 +66,7 @@ execute_input_events_for_tick(const InputSequence *input_sequence, uint32_t tick
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-execute_input_sequence(const InputSequence *input_sequence,
-                       TestFixture &fixture);
+ExecuteInputSequence(const InputSequence *input_sequence,
+                     TestFixture &fixture);
 
 } // namespace steamrot::tests

@@ -18,8 +18,8 @@ namespace steamrot::tests {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-compare_tick_snapshot(uint32_t tick, const TestDataConfig *config,
-                     TestFixture &fixture) {
+CompareTickSnapshot(uint32_t tick, const TestDataConfig *config,
+                    TestFixture &fixture) {
 
   // Return early if no snapshots defined
   if (!config->tick_snapshots()) {
@@ -68,8 +68,8 @@ compare_tick_snapshot(uint32_t tick, const TestDataConfig *config,
       }
 
       // Compare pools using existing infrastructure
-      run_entity_memory_pool_comparison_test(actual_pool, expected_pool,
-                                             snapshot_info, expected_to_pass);
+      RunEntityMemoryPoolComparisonTest(actual_pool, expected_pool,
+                                        snapshot_info, expected_to_pass);
 
       // Compare EventBus if present in snapshot
       if (snapshot->event_bus()) {
@@ -88,8 +88,8 @@ compare_tick_snapshot(uint32_t tick, const TestDataConfig *config,
             fixture.GetGameResources().event_handler.GetGlobalEventBus();
 
         // Compare event buses using existing infrastructure
-        run_event_bus_comparison_test(actual_event_bus, expected_event_bus,
-                                      snapshot_info, expected_to_pass);
+        RunEventBusComparisonTest(actual_event_bus, expected_event_bus,
+                                  snapshot_info, expected_to_pass);
       }
 
       // Only one snapshot per tick expected, so break after finding it
@@ -101,7 +101,7 @@ compare_tick_snapshot(uint32_t tick, const TestDataConfig *config,
 }
 
 /////////////////////////////////////////////////
-uint32_t determine_num_ticks(const TestDataConfig *config) {
+uint32_t DetermineNumTicks(const TestDataConfig *config) {
   // Only use TestDataConfig level num_ticks field
   // Do NOT auto-detect from input_sequence, event_sequence, or simulation_data
   if (config->num_ticks() > 0) {
@@ -113,8 +113,8 @@ uint32_t determine_num_ticks(const TestDataConfig *config) {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-execute_single_tick(uint32_t tick, const TestDataConfig *config,
-                    TestFixture &fixture) {
+ExecuteSingleTick(uint32_t tick, const TestDataConfig *config,
+                  TestFixture &fixture) {
 
   // Handles null config
   if (!config) {
@@ -125,7 +125,7 @@ execute_single_tick(uint32_t tick, const TestDataConfig *config,
   // 1. Execute inputs scheduled for this tick
   if (config->input_sequence()) {
     auto input_result =
-        execute_input_events_for_tick(config->input_sequence(), tick, fixture);
+        ExecuteInputEventsForTick(config->input_sequence(), tick, fixture);
     if (!input_result.has_value()) {
       return std::unexpected(input_result.error());
     }
@@ -134,7 +134,7 @@ execute_single_tick(uint32_t tick, const TestDataConfig *config,
   // 2. Execute events scheduled for this tick
   if (config->event_sequence()) {
     auto event_result =
-        execute_events_for_tick(config->event_sequence(), tick, fixture);
+        ExecuteEventsForTick(config->event_sequence(), tick, fixture);
     if (!event_result.has_value()) {
       return std::unexpected(event_result.error());
     }
@@ -148,7 +148,7 @@ execute_single_tick(uint32_t tick, const TestDataConfig *config,
     for (const SimulationStep *step : *config->simulation_data()->steps()) {
       if (step) {
         auto sim_result =
-            execute_simulation_step(step, fixture.GetSceneContext());
+            ExecuteSimulationStep(step, fixture.GetSceneContext());
         if (!sim_result.has_value()) {
           return std::unexpected(sim_result.error());
         }
@@ -157,7 +157,7 @@ execute_single_tick(uint32_t tick, const TestDataConfig *config,
   }
 
   // 5. Check for tick snapshot (compare after simulation, before event bus tick)
-  auto snapshot_result = compare_tick_snapshot(tick, config, fixture);
+  auto snapshot_result = CompareTickSnapshot(tick, config, fixture);
   if (!snapshot_result.has_value()) {
     return std::unexpected(snapshot_result.error());
   }
@@ -170,7 +170,7 @@ execute_single_tick(uint32_t tick, const TestDataConfig *config,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-execute_tick_based_test(const TestDataConfig *config, TestFixture &fixture) {
+ExecuteTickBasedTest(const TestDataConfig *config, TestFixture &fixture) {
 
   // Validate config
   if (!config) {
@@ -179,11 +179,11 @@ execute_tick_based_test(const TestDataConfig *config, TestFixture &fixture) {
   }
 
   // Determine number of ticks to execute
-  uint32_t num_ticks = determine_num_ticks(config);
+  uint32_t num_ticks = DetermineNumTicks(config);
 
   // Execute each tick in sequence
   for (uint32_t tick = 0; tick < num_ticks; ++tick) {
-    auto tick_result = execute_single_tick(tick, config, fixture);
+    auto tick_result = ExecuteSingleTick(tick, config, fixture);
     if (!tick_result.has_value()) {
       return std::unexpected(tick_result.error());
     }
