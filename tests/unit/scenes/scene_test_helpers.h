@@ -15,7 +15,7 @@ namespace steamrot::tests {
 /////////////////////////////////////////////////
 /// @brief Create a UUID for testing purposes
 /////////////////////////////////////////////////
-const uuids::uuid create_uuid();
+const uuids::uuid CreateUuid();
 
 /////////////////////////////////////////////////
 /// @brief Checks the full default configuration of a scene

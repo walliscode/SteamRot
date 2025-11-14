@@ -56,6 +56,6 @@ TEST_CASE("Data is configured correctly from default data",
   INFO("Running test: " << config->metadata()->test_name()->str());
 
   // Run standard fixture test for all configs
-  auto result = steamrot::tests::run_fixture_test(config);
+  auto result = steamrot::tests::RunFixtureTest(config);
   REQUIRE(result.has_value());
 }

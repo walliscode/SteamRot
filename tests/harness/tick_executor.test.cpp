@@ -46,7 +46,7 @@ TEST_CASE("determine_num_ticks uses explicit num_ticks from TestDataConfig",
           builder.GetBufferPointer());
 
   // Should return exactly 5, not based on input_sequence max tick
-  uint32_t num_ticks = steamrot::tests::determine_num_ticks(test_config);
+  uint32_t num_ticks = steamrot::tests::DetermineNumTicks(test_config);
   REQUIRE(num_ticks == 5);
 }
 
@@ -82,7 +82,7 @@ TEST_CASE("determine_num_ticks ignores event_sequence max tick",
           builder.GetBufferPointer());
 
   // Should be 1 (default), not based on event_sequence max tick
-  uint32_t num_ticks = steamrot::tests::determine_num_ticks(test_config);
+  uint32_t num_ticks = steamrot::tests::DetermineNumTicks(test_config);
   REQUIRE(num_ticks == 1);
 }
 
@@ -100,7 +100,7 @@ TEST_CASE("determine_num_ticks defaults to 1 when num_ticks not specified",
       flatbuffers::GetRoot<steamrot::TestDataConfig>(
           builder.GetBufferPointer());
 
-  uint32_t num_ticks = steamrot::tests::determine_num_ticks(test_config);
+  uint32_t num_ticks = steamrot::tests::DetermineNumTicks(test_config);
   REQUIRE(num_ticks == 1);
 }
 
@@ -110,7 +110,7 @@ TEST_CASE("execute_single_tick handles null config",
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 
-  auto result = steamrot::tests::execute_single_tick(0, nullptr, fixture);
+  auto result = steamrot::tests::ExecuteSingleTick(0, nullptr, fixture);
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
@@ -121,7 +121,7 @@ TEST_CASE("execute_tick_based_test handles null config",
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 
-  auto result = steamrot::tests::execute_tick_based_test(nullptr, fixture);
+  auto result = steamrot::tests::ExecuteTickBasedTest(nullptr, fixture);
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
@@ -146,7 +146,7 @@ TEST_CASE("determine_num_ticks ignores simulation_data num_ticks",
       flatbuffers::GetRoot<steamrot::TestDataConfig>(
           builder.GetBufferPointer());
 
-  uint32_t num_ticks = steamrot::tests::determine_num_ticks(test_config);
+  uint32_t num_ticks = steamrot::tests::DetermineNumTicks(test_config);
   // Should be 1 (default), not 10 from simulation_data
   REQUIRE(num_ticks == 1);
 }
@@ -191,7 +191,7 @@ TEST_CASE("execute_tick_based_test executes specified num_ticks",
           builder.GetBufferPointer());
 
   // Execute the test
-  auto result = steamrot::tests::execute_tick_based_test(test_config, fixture);
+  auto result = steamrot::tests::ExecuteTickBasedTest(test_config, fixture);
   REQUIRE(result.has_value());
 
   // Verify mouse position reflects the last tick (tick 1)

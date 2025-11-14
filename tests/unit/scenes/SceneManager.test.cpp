@@ -178,7 +178,7 @@ TEST_CASE("SceneManager's AddSceneFromDefault creates a configured "
   }
 
   // check AssetManger config
-  steamrot::tests::check_asset_configuration(scene_type,
+  steamrot::tests::CheckAssetConfiguration(scene_type,
                                              game_context.asset_manager);
 }
 
@@ -199,7 +199,7 @@ TEST_CASE("SceneManager's AddSceneFromDefault creates a configured "
          crafting_result.error().message);
   }
   // check AssetManger config
-  steamrot::tests::check_asset_configuration(
+  steamrot::tests::CheckAssetConfiguration(
       scene_type, test_context.GetGameContext().asset_manager);
 }
 
@@ -215,7 +215,7 @@ TEST_CASE("SceneManager LoadTitleScene returns monostate",
   }
 
   // check AssetManger config
-  steamrot::tests::check_asset_configuration(
+  steamrot::tests::CheckAssetConfiguration(
       steamrot::SceneType::SceneType_TITLE,
       test_context.GetGameContext().asset_manager);
 }
@@ -232,7 +232,7 @@ TEST_CASE("SceneManager LoadCraftingScene returns monostate",
   }
 
   // check AssetManger config
-  steamrot::tests::check_asset_configuration(
+  steamrot::tests::CheckAssetConfiguration(
       steamrot::SceneType::SceneType_CRAFTING,
       test_context.GetGameContext().asset_manager);
 }

@@ -53,6 +53,6 @@ TEST_CASE("AssetManager loads scene assets correctly", "[unit][AssetManager]") {
     FAIL(result.error().message);
 
   // check if the assets were loaded correctly
-  steamrot::tests::check_asset_configuration(steamrot::SceneType_TEST,
+  steamrot::tests::CheckAssetConfiguration(steamrot::SceneType_TEST,
                                              asset_manager);
 }

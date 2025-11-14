@@ -25,7 +25,7 @@ TEST_CASE("Logic classes data-driven tests", "[unit][logic][data-driven]") {
   }
 
   // Run the test using the test harness
-  auto result = steamrot::tests::run_fixture_test(config);
+  auto result = steamrot::tests::RunFixtureTest(config);
   if (!result.has_value()) {
     FAIL("Test execution failed: " << result.error().message);
   }

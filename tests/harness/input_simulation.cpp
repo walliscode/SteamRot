@@ -18,7 +18,7 @@ namespace steamrot::tests {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-execute_input_event(const InputEvent *input_event, TestFixture &fixture) {
+ExecuteInputEvent(const InputEvent *input_event, TestFixture &fixture) {
 
   // Validate input event
   if (!input_event) {
@@ -192,7 +192,7 @@ execute_input_event(const InputEvent *input_event, TestFixture &fixture) {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-execute_input_events_for_tick(const InputSequence *input_sequence,
+ExecuteInputEventsForTick(const InputSequence *input_sequence,
                               uint32_t tick, TestFixture &fixture) {
 
   // Validate input sequence
@@ -213,7 +213,7 @@ execute_input_events_for_tick(const InputSequence *input_sequence,
     }
 
     if (input_event->tick() == tick) {
-      auto result = execute_input_event(input_event, fixture);
+      auto result = ExecuteInputEvent(input_event, fixture);
       if (!result.has_value()) {
         return std::unexpected(result.error());
       }
@@ -225,7 +225,7 @@ execute_input_events_for_tick(const InputSequence *input_sequence,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-execute_input_sequence(const InputSequence *input_sequence,
+ExecuteInputSequence(const InputSequence *input_sequence,
                        TestFixture &fixture) {
 
   // Validate input sequence
@@ -249,7 +249,7 @@ execute_input_sequence(const InputSequence *input_sequence,
 
   // Process events for each tick in order
   for (uint32_t tick : ticks) {
-    auto result = execute_input_events_for_tick(input_sequence, tick, fixture);
+    auto result = ExecuteInputEventsForTick(input_sequence, tick, fixture);
     if (!result.has_value()) {
       return std::unexpected(result.error());
     }

@@ -18,7 +18,7 @@ TEST_CASE("execute_input_event handles null input",
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 
-  auto result = steamrot::tests::execute_input_event(nullptr, fixture);
+  auto result = steamrot::tests::ExecuteInputEvent(nullptr, fixture);
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
@@ -30,7 +30,7 @@ TEST_CASE("execute_input_events_for_tick handles null sequence",
   fixture.Intialize();
 
   auto result =
-      steamrot::tests::execute_input_events_for_tick(nullptr, 0, fixture);
+      steamrot::tests::ExecuteInputEventsForTick(nullptr, 0, fixture);
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
@@ -41,7 +41,7 @@ TEST_CASE("execute_input_sequence handles null sequence",
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 
-  auto result = steamrot::tests::execute_input_sequence(nullptr, fixture);
+  auto result = steamrot::tests::ExecuteInputSequence(nullptr, fixture);
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
@@ -61,7 +61,7 @@ TEST_CASE("execute_input_sequence handles empty sequence",
       flatbuffers::GetRoot<steamrot::InputSequence>(builder.GetBufferPointer());
 
   auto result =
-      steamrot::tests::execute_input_sequence(input_sequence, fixture);
+      steamrot::tests::ExecuteInputSequence(input_sequence, fixture);
   REQUIRE(result.has_value());
 }
 
@@ -84,7 +84,7 @@ TEST_CASE("execute_input_event updates mouse position for MouseMove",
       flatbuffers::GetRoot<steamrot::InputEvent>(builder.GetBufferPointer());
 
   // Execute the event
-  auto result = steamrot::tests::execute_input_event(event, fixture);
+  auto result = steamrot::tests::ExecuteInputEvent(event, fixture);
   REQUIRE(result.has_value());
 
   // Verify mouse position was updated
@@ -128,7 +128,7 @@ TEST_CASE("execute_input_events_for_tick processes only specified tick",
       flatbuffers::GetRoot<steamrot::InputSequence>(builder.GetBufferPointer());
 
   // Execute only tick 0
-  auto result = steamrot::tests::execute_input_events_for_tick(input_sequence,
+  auto result = steamrot::tests::ExecuteInputEventsForTick(input_sequence,
                                                                0, fixture);
   REQUIRE(result.has_value());
 
@@ -138,7 +138,7 @@ TEST_CASE("execute_input_events_for_tick processes only specified tick",
   REQUIRE(game_context.mouse_position.y == 100);
 
   // Execute tick 1
-  result = steamrot::tests::execute_input_events_for_tick(input_sequence, 1,
+  result = steamrot::tests::ExecuteInputEventsForTick(input_sequence, 1,
                                                           fixture);
   REQUIRE(result.has_value());
 
@@ -173,7 +173,7 @@ TEST_CASE("execute_input_event generates EventPacket for MouseClick",
   size_t initial_size = initial_bus.size();
 
   // Execute the event
-  auto result = steamrot::tests::execute_input_event(event, fixture);
+  auto result = steamrot::tests::ExecuteInputEvent(event, fixture);
   REQUIRE(result.has_value());
 
   // Process waiting room to move event to global bus
@@ -220,7 +220,7 @@ TEST_CASE("execute_input_event generates EventPacket for KeyPress",
   size_t initial_size = initial_bus.size();
 
   // Execute the event
-  auto result = steamrot::tests::execute_input_event(event, fixture);
+  auto result = steamrot::tests::ExecuteInputEvent(event, fixture);
   REQUIRE(result.has_value());
 
   // Process waiting room to move event to global bus
@@ -261,7 +261,7 @@ TEST_CASE("execute_input_event does not generate EventPacket for MouseMove",
   size_t initial_size = initial_bus.size();
 
   // Execute the event
-  auto result = steamrot::tests::execute_input_event(event, fixture);
+  auto result = steamrot::tests::ExecuteInputEvent(event, fixture);
   REQUIRE(result.has_value());
 
   // Process waiting room (should have nothing)
