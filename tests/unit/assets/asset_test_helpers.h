@@ -23,7 +23,7 @@ namespace steamrot::tests {
 /// @param scene_type Enumeration representing the scene type
 /// @param asset_manager Instance of AssetManager to check against
 /////////////////////////////////////////////////
-void check_asset_configuration(const SceneType &scene_type,
+void CheckAssetConfiguration(const SceneType &scene_type,
                                const AssetManager &asset_manager);
 
 /////////////////////////////////////////////////
@@ -33,7 +33,7 @@ void check_asset_configuration(const SceneType &scene_type,
 /// data
 /// @param fonts Map of sf::Font objects indexed by font names
 /////////////////////////////////////////////////
-void check_font_configuration(const AssetCollection &asset_collection,
+void CheckFontConfiguration(const AssetCollection &asset_collection,
                               const AssetManager &asset_manager);
 
 } // namespace steamrot::tests

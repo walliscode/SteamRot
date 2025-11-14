@@ -19,7 +19,7 @@
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
-const uuids::uuid create_uuid() {
+const uuids::uuid CreateUuid() {
   // taken straight from the uuid library example
   std::random_device rd;
   auto seed_data = std::array<int, std::mt19937::state_size>{};

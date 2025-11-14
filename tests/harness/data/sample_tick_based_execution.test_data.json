@@ -17,7 +17,7 @@
           "position": { "x": 100.0, "y": 100.0 },
           "button": 0
         },
-        "tick": 0,
+        "tick": 1,
         "description": "Start position"
       },
       {
@@ -27,7 +27,7 @@
           "position": { "x": 125.0, "y": 115.0 },
           "button": 0
         },
-        "tick": 2,
+        "tick": 3,
         "description": "Mid-way position"
       },
       {
@@ -37,7 +37,7 @@
           "position": { "x": 150.0, "y": 125.0 },
           "button": 0
         },
-        "tick": 4,
+        "tick": 5,
         "description": "Final position"
       }
     ]
@@ -46,31 +46,31 @@
     "description": "Events triggered at specific ticks",
     "events": [
       {
-        "tick": 0,
+        "tick": 1,
         "event_packet": {
           "event_lifetime": 5,
           "event_type": "EVENT_TEST",
           "event_data_data_type": "NONE"
         },
-        "description": "Start event at tick 0"
+        "description": "Start event at tick 1"
       },
       {
-        "tick": 2,
+        "tick": 3,
         "event_packet": {
           "event_lifetime": 3,
           "event_type": "EVENT_USER_INPUT",
           "event_data_data_type": "NONE"
         },
-        "description": "Mid event at tick 2"
+        "description": "Mid event at tick 3"
       },
       {
-        "tick": 4,
+        "tick": 5,
         "event_packet": {
           "event_lifetime": 1,
           "event_type": "EVENT_TEST",
           "event_data_data_type": "NONE"
         },
-        "description": "End event at tick 4"
+        "description": "End event at tick 5"
       }
     ]
   },

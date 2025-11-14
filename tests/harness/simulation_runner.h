@@ -32,8 +32,8 @@ namespace steamrot::tests {
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-execute_simulation_step(const SimulationStep *step,
-                       SceneContext &scene_context);
+ExecuteSimulationStep(const SimulationStep *step,
+                      SceneContext &scene_context);
 
 /////////////////////////////////////////////////
 /// @brief Execute a complete simulation sequence
@@ -46,7 +46,7 @@ execute_simulation_step(const SimulationStep *step,
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-execute_simulation(const SimulationData *simulation_data,
+ExecuteSimulation(const SimulationData *simulation_data,
                   SceneContext &scene_context);
 
 /////////////////////////////////////////////////
@@ -60,7 +60,7 @@ execute_simulation(const SimulationData *simulation_data,
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-execute_simulation_with_fixture(const SimulationData *simulation_data,
-                               TestFixture &fixture);
+ExecuteSimulationWithFixture(const SimulationData *simulation_data,
+                             TestFixture &fixture);
 
 } // namespace steamrot::tests

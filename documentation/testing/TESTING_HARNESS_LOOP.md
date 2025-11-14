@@ -76,14 +76,16 @@ The SteamRot testing harness provides a tick-based execution model for data-driv
                               ▼
 ╔═════════════════════════════════════════════════════════════════╗
 ║              TICK-BASED EXECUTION LOOP                          ║
-║  for (tick = 0; tick < num_ticks; ++tick)                      ║
+║  for (tick = 1; tick <= num_ticks; ++tick)                     ║
+║  Note: 1-based indexing to mimic game loop                     ║
 ╚═════════════════════════════════════════════════════════════════╝
          │
          │   (Details in Single Tick Execution section)
          ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │  execute_single_tick(tick, config, fixture)                    │
-│  🔢 CURRENT TICK: tick (0-indexed)                             │
+│  🔢 CURRENT TICK: tick (1-indexed: 1, 2, 3, ...)              │
+│  Setup phase occurs before tick 1 via TestFixture::Initialize │
 └─────────────────────────────────────────────────────────────────┘
          │
          │  (Loop continues for num_ticks iterations)
@@ -133,8 +135,9 @@ execute_tick_based_test(const TestDataConfig *config, TestFixture &fixture) {
   uint32_t num_ticks = determine_num_ticks(config);
   // Returns config->num_ticks() if > 0, else 1
 
-  // 2. Execute each tick in sequence
-  for (uint32_t tick = 0; tick < num_ticks; ++tick) {
+  // 2. Execute each tick in sequence (1-based to mimic game loop)
+  // Setup phase occurs before tick 1 via TestFixture::Initialize()
+  for (uint32_t tick = 1; tick <= num_ticks; ++tick) {
     auto tick_result = execute_single_tick(tick, config, fixture);
     if (!tick_result.has_value()) {
       return std::unexpected(tick_result.error());
@@ -154,7 +157,8 @@ Each tick follows this precise execution order:
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  execute_single_tick(tick, config, fixture)                    │
-│  🔢 TICK NUMBER: tick (0-indexed, e.g., 0, 1, 2, ...)         │
+│  🔢 TICK NUMBER: tick (1-indexed, e.g., 1, 2, 3, ...)         │
+│  Setup phase occurs before tick 1 via TestFixture::Initialize │
 └─────────────────────────────────────────────────────────────────┘
          │
          ├─→ Step 1: Execute Inputs for This Tick
@@ -254,41 +258,44 @@ logic.RunLogic();
 
 ### Tick Number
 
-Ticks are **0-indexed** in the testing harness:
+Ticks are **1-indexed** in the testing harness to mimic the game loop:
 
 ```
-Tick 0: First tick execution
-Tick 1: Second tick execution
-Tick 2: Third tick execution
+Setup Phase: TestFixture::Initialize() - NOT a tick
+Tick 1: First tick execution
+Tick 2: Second tick execution
+Tick 3: Third tick execution
 ...
-Tick N-1: Last tick (where N = num_ticks)
+Tick N: Last tick (where N = num_ticks)
 ```
+
+The setup phase is separate from tick 1, avoiding confusion about "tick 0".
 
 ### Tick Specification in Test Data
 
 ```json
 {
-  "num_ticks": 5,  // Execute 5 ticks (0, 1, 2, 3, 4)
+  "num_ticks": 5,  // Execute 5 ticks (1, 2, 3, 4, 5)
   
   "input_sequence": [
     {
-      "tick": 0,     // Input executes at tick 0
+      "tick": 1,     // Input executes at tick 1
       "inputs": [...]
     },
     {
-      "tick": 2,     // Input executes at tick 2
+      "tick": 3,     // Input executes at tick 3
       "inputs": [...]
     }
   ],
   
   "tick_snapshots": [
     {
-      "tick": 0,     // Validate state at tick 0
+      "tick": 1,     // Validate state at tick 1
       "description": "Initial state",
       "entity_collection": {...}
     },
     {
-      "tick": 4,     // Validate state at tick 4
+      "tick": 5,     // Validate state at tick 5
       "description": "Final state",
       "entity_collection": {...}
     }
@@ -308,10 +315,10 @@ fixture.GetGameResources().event_handler.TickGlobalEventBus();
 **Event Lifetime in Tests:**
 
 ```
-Tick 0: Event added with lifetime 3
-Tick 0 (end): Tick event bus → lifetime = 2
-Tick 1 (end): Tick event bus → lifetime = 1
-Tick 2 (end): Tick event bus → lifetime = 0 (removed)
+Tick 1: Event added with lifetime 3
+Tick 1 (end): Tick event bus → lifetime = 2
+Tick 2 (end): Tick event bus → lifetime = 1
+Tick 3 (end): Tick event bus → lifetime = 0 (removed)
 ```
 
 ### Simulation Steps Timing
@@ -331,7 +338,7 @@ Tick 2 (end): Tick event bus → lifetime = 0 (removed)
 }
 ```
 
-This configuration runs `UIActionLogic` on **every tick** (0, 1, 2, ... N-1).
+This configuration runs `UIActionLogic` on **every tick** (1, 2, 3, ... N).
 
 For tick-specific actions, use `input_sequence` or `event_sequence`.
 
@@ -352,7 +359,7 @@ For tick-specific actions, use `input_sequence` or `event_sequence`.
 
 | Aspect | Game Loop | Testing Harness |
 |--------|-----------|-----------------|
-| **Loop Counter** | `loop_number` (starts at 1, increments at end) | `tick` (starts at 0, loop variable) |
+| **Loop Counter** | `loop_number` (starts at 1, increments at end) | `tick` (starts at 1, loop variable, 1-indexed) |
 | **Loop Count** | Infinite (until window closes) | Finite (`num_ticks` from config) |
 | **Input Source** | Real user input via SFML | Simulated input from test data |
 | **Rendering** | Actual window rendering | No visual rendering |
@@ -436,7 +443,7 @@ Here's a complete example showing tick-based execution:
   },
   "input_sequence": [
     {
-      "tick": 0,
+      "tick": 1,
       "inputs": [
         {
           "input_type": "MouseMove",
@@ -445,7 +452,7 @@ Here's a complete example showing tick-based execution:
       ]
     },
     {
-      "tick": 1,
+      "tick": 2,
       "inputs": [
         {
           "input_type": "MouseButtonPress",
@@ -468,7 +475,7 @@ Here's a complete example showing tick-based execution:
   },
   "tick_snapshots": [
     {
-      "tick": 1,
+      "tick": 2,
       "description": "After click",
       "entity_collection": {...}
     }
@@ -479,25 +486,29 @@ Here's a complete example showing tick-based execution:
 **Execution Timeline:**
 
 ```
-TICK 0 (initial state):
+SETUP PHASE (before tick 1):
+  - TestFixture::Initialize() configures entities and resources
+  - NOT called "tick 0" to avoid confusion
+
+TICK 1 (first game loop tick):
   1. Execute Input: MouseMove(100, 200)
   2. Process waiting room → global bus
   3. Execute simulation: UICollisionLogic → UIActionLogic
-  4. No snapshot for tick 0
+  4. No snapshot for tick 1
   5. Tick event bus
 
-TICK 1:
+TICK 2:
   1. Execute Input: MouseButtonPress(Left)
   2. Process waiting room → global bus
   3. Execute simulation: UICollisionLogic → UIActionLogic
   4. Compare snapshot: Validate entity state after click
   5. Tick event bus
 
-TICK 2:
-  1. No inputs for tick 2
+TICK 3:
+  1. No inputs for tick 3
   2. Process waiting room → global bus (no new events)
   3. Execute simulation: UICollisionLogic → UIActionLogic
-  4. No snapshot for tick 2
+  4. No snapshot for tick 3
   5. Tick event bus
 
 Final: Compare final state with expected_entity_collection

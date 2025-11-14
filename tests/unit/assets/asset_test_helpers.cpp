@@ -14,7 +14,7 @@
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
-void check_asset_configuration(const SceneType &scene_type,
+void CheckAssetConfiguration(const SceneType &scene_type,
                                const AssetManager &asset_manager) {
 
   // intialise the pathprovider
@@ -29,11 +29,11 @@ void check_asset_configuration(const SceneType &scene_type,
   REQUIRE(asset_collection != nullptr);
 
   // check fonts
-  check_font_configuration(*asset_collection, asset_manager);
+  CheckFontConfiguration(*asset_collection, asset_manager);
 }
 
 /////////////////////////////////////////////////
-void check_font_configuration(const AssetCollection &asset_collection,
+void CheckFontConfiguration(const AssetCollection &asset_collection,
                               const AssetManager &asset_manager) {
 
   if (!asset_collection.fonts()) {

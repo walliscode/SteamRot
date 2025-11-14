@@ -16,7 +16,7 @@ namespace steamrot::tests {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-execute_event_test_data(const EventTestData *event_data, TestFixture &fixture) {
+ExecuteEventTestData(const EventTestData *event_data, TestFixture &fixture) {
 
   // Validate event data
   if (!event_data) {
@@ -80,8 +80,8 @@ execute_event_test_data(const EventTestData *event_data, TestFixture &fixture) {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-execute_events_for_tick(const EventSequence *event_sequence, uint32_t tick,
-                        TestFixture &fixture) {
+ExecuteEventsForTick(const EventSequence *event_sequence, uint32_t tick,
+                     TestFixture &fixture) {
 
   // Validate event sequence
   if (!event_sequence) {
@@ -101,7 +101,7 @@ execute_events_for_tick(const EventSequence *event_sequence, uint32_t tick,
     }
 
     if (event_data->tick() == tick) {
-      auto result = execute_event_test_data(event_data, fixture);
+      auto result = ExecuteEventTestData(event_data, fixture);
       if (!result.has_value()) {
         return std::unexpected(result.error());
       }
@@ -113,8 +113,8 @@ execute_events_for_tick(const EventSequence *event_sequence, uint32_t tick,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-execute_event_sequence(const EventSequence *event_sequence,
-                       TestFixture &fixture) {
+ExecuteEventSequence(const EventSequence *event_sequence,
+                     TestFixture &fixture) {
 
   // Validate event sequence
   if (!event_sequence) {
@@ -137,7 +137,7 @@ execute_event_sequence(const EventSequence *event_sequence,
 
   // Process events for each tick in order
   for (uint32_t tick : ticks) {
-    auto result = execute_events_for_tick(event_sequence, tick, fixture);
+    auto result = ExecuteEventsForTick(event_sequence, tick, fixture);
     if (!result.has_value()) {
       return std::unexpected(result.error());
     }
