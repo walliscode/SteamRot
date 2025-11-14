@@ -16,7 +16,7 @@
           "start_visible": true,
           "root_ui_element": {
             "base_data": {
-              "position": { "x": 50, "y": 100 },
+              "position": { "x": 55, "y": 100 },
               "size": { "x": 200, "y": 150 },
               "children_active": false,
               "children": [],
