@@ -11,12 +11,15 @@
 #include "cgrimoire_machina_matchers.h"
 #include "cmachina_form_matchers.h"
 #include "cmeta_matchers.h"
+#include "console_output.h"
 #include "containers.h"
 #include "cui_state_matchers.h"
 #include "cuser_interface_matchers.h"
 #include "entity_memory.h"
+#include "test_context.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
+#include <optional>
 #include <ostream>
 #include <sstream>
 #include <string>
@@ -37,7 +40,8 @@ private:
   const EntityMemoryPool &m_expected;
   mutable std::string m_mismatch_description;
   mutable bool do_components_match{true};
-  std::string m_test_metadata;
+  std::string m_test_metadata;  // Legacy support
+  std::optional<TestContext> m_context;  // New context-based approach
   ////////////////////////////////////////////////////////////
   /// @brief Helper to compare component vectors
   ///
@@ -175,17 +179,27 @@ private:
 
 public:
   explicit EntityMemoryPoolEqualsMatcher(const EntityMemoryPool &expected)
-      : m_expected(expected), m_test_metadata("") {}
+      : m_expected(expected), m_test_metadata(""), m_context(std::nullopt) {}
 
   ////////////////////////////////////////////////////////////
-  /// @brief Constructor with test metadata
+  /// @brief Constructor with test metadata (legacy)
   ///
   /// @param expected The expected EntityMemoryPool
   /// @param test_metadata Optional test metadata (e.g., test name)
   ////////////////////////////////////////////////////////////
   EntityMemoryPoolEqualsMatcher(const EntityMemoryPool &expected,
                                 const std::string &test_metadata)
-      : m_expected(expected), m_test_metadata(test_metadata) {}
+      : m_expected(expected), m_test_metadata(test_metadata), m_context(std::nullopt) {}
+
+  ////////////////////////////////////////////////////////////
+  /// @brief Constructor with TestContext
+  ///
+  /// @param expected The expected EntityMemoryPool
+  /// @param context Test context with metadata and tick information
+  ////////////////////////////////////////////////////////////
+  EntityMemoryPoolEqualsMatcher(const EntityMemoryPool &expected,
+                                const TestContext &context)
+      : m_expected(expected), m_test_metadata(""), m_context(context) {}
 
   ////////////////////////////////////////////////////////////
   /// @brief Check if the EntityMemoryPools match
@@ -219,20 +233,36 @@ public:
   }
 
   ////////////////////////////////////////////////////////////
-  /// @brief Describe the matcher
+  /// @brief Describe the matcher with formatted, hierarchical output
   ///
-  /// @return Description string
+  /// @return Description string with visual formatting (no ANSI codes)
   ////////////////////////////////////////////////////////////
   std::string describe() const override {
-    std::string description = "EntityMemoryPool mismatch";
-    
-    // Add test metadata if available
-    if (!m_test_metadata.empty()) {
-      description += " [" + m_test_metadata + "]";
+    // Use TestContext formatting if available
+    if (m_context.has_value()) {
+      return m_context.value().FormatFailureMessage("EntityMemoryPool", 
+                                                     m_mismatch_description);
     }
     
-    description += ": " + m_mismatch_description;
-    return description;
+    // Legacy support - manual formatting
+    std::ostringstream oss;
+    oss << "\n[FAILED] EntityMemoryPool Comparison";
+    oss << "\n" << std::string(60, '=');
+    
+    if (!m_test_metadata.empty()) {
+      oss << "\n  Context: " << m_test_metadata;
+    }
+    
+    oss << "\n" << std::string(60, '-');
+    
+    if (!m_mismatch_description.empty()) {
+      oss << "\n  Differences:";
+      oss << "\n    * " << m_mismatch_description;
+    }
+    
+    oss << "\n" << std::string(60, '=');
+    
+    return oss.str();
   }
 
   ////////////////////////////////////////////////////////////
@@ -267,6 +297,19 @@ inline EntityMemoryPoolEqualsMatcher
 EqualsEntityMemoryPool(const EntityMemoryPool &expected,
                        const std::string &test_metadata) {
   return EntityMemoryPoolEqualsMatcher(expected, test_metadata);
+}
+
+/////////////////////////////////////////////////
+/// @brief Helper function to create EntityMemoryPoolEqualsMatcher with context
+///
+/// @param expected The expected EntityMemoryPool
+/// @param context Test context with metadata and tick information
+/// @return EntityMemoryPoolEqualsMatcher instance
+/////////////////////////////////////////////////
+inline EntityMemoryPoolEqualsMatcher
+EqualsEntityMemoryPool(const EntityMemoryPool &expected,
+                       const TestContext &context) {
+  return EntityMemoryPoolEqualsMatcher(expected, context);
 }
 
 } // namespace steamrot::tests

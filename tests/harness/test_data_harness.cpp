@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "test_data_harness.h"
 #include "FlatbuffersConfigurator.h"
+#include "console_output.h"
 #include "entity_memory_pool_matchers.h"
 #include "event_bus_conversion.h"
 #include "event_matchers.h"
@@ -244,6 +245,8 @@ RunFixtureTest(const TestDataConfig *config) {
   // Create fixture from test data
   auto fixture_result = CreateFixtureFromTestData(config);
   if (!fixture_result.has_value()) {
+    // Errors are still logged for debugging
+    console::PrintError("Failed to create fixture from test data");
     return std::unexpected(fixture_result.error());
   }
 
@@ -272,6 +275,7 @@ RunFixtureTest(const TestDataConfig *config) {
         expected_pool, expected_collection);
 
     if (!configure_result.has_value()) {
+      console::PrintError("Failed to configure expected entity pool");
       return std::unexpected(configure_result.error());
     }
 
@@ -279,30 +283,27 @@ RunFixtureTest(const TestDataConfig *config) {
     const EntityMemoryPool &actual_pool =
         fixture.GetEntityManager().GetEntityMemoryPool();
 
-    // Build test metadata string from config
-    std::string test_metadata;
-    bool expected_to_pass = true; // default value
-
+    // Build test context from config
+    TestContext context;
     if (config->metadata()) {
       if (config->metadata()->test_name()) {
-        test_metadata +=
-            "Test: " + std::string(config->metadata()->test_name()->str());
+        context.test_name = config->metadata()->test_name()->str();
       }
       if (config->metadata()->description()) {
-        test_metadata += ", Description: " +
-                         std::string(config->metadata()->description()->str());
+        context.description = config->metadata()->description()->str();
       }
-      // Get expected_to_pass from metadata
+    }
+    
+    bool expected_to_pass = true;
+    if (config->metadata()) {
       expected_to_pass = config->metadata()->expected_to_pass();
     }
 
-    // Use overload with metadata if available, otherwise use simple version
-    if (!test_metadata.empty()) {
-      RunEntityMemoryPoolComparisonTest(actual_pool, expected_pool,
-                                        test_metadata, expected_to_pass);
+    // Use Catch2 matchers - they will format and display only on failure
+    if (expected_to_pass) {
+      REQUIRE_THAT(actual_pool, EqualsEntityMemoryPool(expected_pool, context));
     } else {
-      RunEntityMemoryPoolComparisonTest(actual_pool, expected_pool,
-                                        expected_to_pass);
+      REQUIRE_THAT(actual_pool, !EqualsEntityMemoryPool(expected_pool, context));
     }
   }
 
@@ -316,6 +317,7 @@ RunFixtureTest(const TestDataConfig *config) {
             expected_event_bus_data);
 
     if (!expected_event_bus_result.has_value()) {
+      console::PrintError("Failed to convert expected event bus data");
       return std::unexpected(expected_event_bus_result.error());
     }
 
@@ -325,30 +327,27 @@ RunFixtureTest(const TestDataConfig *config) {
     const EventBus &actual_event_bus =
         fixture.GetGameResources().event_handler.GetGlobalEventBus();
 
-    // Build test metadata string from config
-    std::string test_metadata;
-    bool expected_to_pass = true; // default value
-
+    // Build test context from config
+    TestContext context;
     if (config->metadata()) {
       if (config->metadata()->test_name()) {
-        test_metadata +=
-            "Test: " + std::string(config->metadata()->test_name()->str());
+        context.test_name = config->metadata()->test_name()->str();
       }
       if (config->metadata()->description()) {
-        test_metadata += ", Description: " +
-                         std::string(config->metadata()->description()->str());
+        context.description = config->metadata()->description()->str();
       }
-      // Get expected_to_pass from metadata
+    }
+    
+    bool expected_to_pass = true;
+    if (config->metadata()) {
       expected_to_pass = config->metadata()->expected_to_pass();
     }
 
-    // Use overload with metadata if available, otherwise use simple version
-    if (!test_metadata.empty()) {
-      RunEventBusComparisonTest(actual_event_bus, expected_event_bus,
-                                test_metadata, expected_to_pass);
+    // Use Catch2 matchers - they will format and display only on failure
+    if (expected_to_pass) {
+      REQUIRE_THAT(actual_event_bus, EqualsEventBus(expected_event_bus, context));
     } else {
-      RunEventBusComparisonTest(actual_event_bus, expected_event_bus,
-                                    expected_to_pass);
+      REQUIRE_THAT(actual_event_bus, !EqualsEventBus(expected_event_bus, context));
     }
   }
 

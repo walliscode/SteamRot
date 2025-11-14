@@ -11,8 +11,11 @@
 #include "EventHandler.h"
 #include "EventPacket.h"
 #include "UserInputBitset.h"
+#include "console_output.h"
+#include "test_context.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
+#include <optional>
 #include <sstream>
 #include <string>
 
@@ -162,10 +165,20 @@ class EventBusEqualsMatcher : public Catch::Matchers::MatcherBase<EventBus> {
 private:
   const EventBus &m_expected;
   mutable std::string m_mismatch_description;
+  std::optional<TestContext> m_context;
 
 public:
   explicit EventBusEqualsMatcher(const EventBus &expected)
-      : m_expected(expected) {}
+      : m_expected(expected), m_context(std::nullopt) {}
+
+  ////////////////////////////////////////////////////////////
+  /// @brief Constructor with TestContext
+  ///
+  /// @param expected The expected EventBus
+  /// @param context Test context with metadata and tick information
+  ////////////////////////////////////////////////////////////
+  EventBusEqualsMatcher(const EventBus &expected, const TestContext &context)
+      : m_expected(expected), m_context(context) {}
 
   bool match(const EventBus &actual) const override {
     m_mismatch_description.clear();
@@ -198,7 +211,27 @@ public:
       oss << "equals EventBus with " << m_expected.size() << " events";
       return oss.str();
     }
-    return "EventBus mismatch: " + m_mismatch_description;
+    
+    // Use TestContext formatting if available
+    if (m_context.has_value()) {
+      return m_context.value().FormatFailureMessage("EventBus", 
+                                                     m_mismatch_description);
+    }
+    
+    // Legacy support - manual formatting
+    std::ostringstream oss;
+    oss << "\n[FAILED] EventBus Comparison";
+    oss << "\n" << std::string(60, '=');
+    oss << "\n" << std::string(60, '-');
+    
+    if (!m_mismatch_description.empty()) {
+      oss << "\n  Differences:";
+      oss << "\n    * " << m_mismatch_description;
+    }
+    
+    oss << "\n" << std::string(60, '=');
+    
+    return oss.str();
   }
 };
 
@@ -210,6 +243,18 @@ public:
 /////////////////////////////////////////////////
 inline EventBusEqualsMatcher EqualsEventBus(const EventBus &expected) {
   return EventBusEqualsMatcher(expected);
+}
+
+/////////////////////////////////////////////////
+/// @brief Helper function to create EventBusEqualsMatcher with context
+///
+/// @param expected The expected EventBus
+/// @param context Test context with metadata and tick information
+/// @return EventBusEqualsMatcher instance
+/////////////////////////////////////////////////
+inline EventBusEqualsMatcher EqualsEventBus(const EventBus &expected,
+                                             const TestContext &context) {
+  return EventBusEqualsMatcher(expected, context);
 }
 
 } // namespace steamrot::tests
