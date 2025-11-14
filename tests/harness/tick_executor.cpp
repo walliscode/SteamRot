@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "tick_executor.h"
 #include "FlatbuffersConfigurator.h"
+#include "console_output.h"
 #include "event_bus_conversion.h"
 #include "event_simulation.h"
 #include "input_simulation.h"
@@ -30,6 +31,7 @@ CompareTickSnapshot(uint32_t tick, const TestDataConfig *config,
   for (const TickSnapshot *snapshot : *config->tick_snapshots()) {
     if (snapshot && snapshot->tick() == tick) {
       // Found snapshot for this tick
+      console::PrintInfo("Comparing snapshot", tick);
 
       // Validate snapshot has entity_collection
       if (!snapshot->entity_collection()) {
@@ -122,11 +124,14 @@ ExecuteSingleTick(uint32_t tick, const TestDataConfig *config,
         FailInfo(FailMode::NullPointer, "TestDataConfig is null"));
   }
 
+  console::PrintInfo("Executing tick", tick);
+
   // 1. Execute inputs scheduled for this tick
   if (config->input_sequence()) {
     auto input_result =
         ExecuteInputEventsForTick(config->input_sequence(), tick, fixture);
     if (!input_result.has_value()) {
+      console::PrintError("Input execution failed", tick);
       return std::unexpected(input_result.error());
     }
   }
@@ -136,6 +141,7 @@ ExecuteSingleTick(uint32_t tick, const TestDataConfig *config,
     auto event_result =
         ExecuteEventsForTick(config->event_sequence(), tick, fixture);
     if (!event_result.has_value()) {
+      console::PrintError("Event execution failed", tick);
       return std::unexpected(event_result.error());
     }
 
@@ -150,6 +156,7 @@ ExecuteSingleTick(uint32_t tick, const TestDataConfig *config,
         auto sim_result =
             ExecuteSimulationStep(step, fixture.GetSceneContext());
         if (!sim_result.has_value()) {
+          console::PrintError("Simulation step failed", tick);
           return std::unexpected(sim_result.error());
         }
       }
@@ -159,11 +166,14 @@ ExecuteSingleTick(uint32_t tick, const TestDataConfig *config,
   // 5. Check for tick snapshot (compare after simulation, before event bus tick)
   auto snapshot_result = CompareTickSnapshot(tick, config, fixture);
   if (!snapshot_result.has_value()) {
+    console::PrintError("Snapshot comparison failed", tick);
     return std::unexpected(snapshot_result.error());
   }
 
   // 6. Tick the global event bus
   fixture.GetGameResources().event_handler.TickGlobalEventBus();
+
+  console::PrintSuccess("Tick completed", tick);
 
   return std::monostate{};
 }
@@ -181,13 +191,21 @@ ExecuteTickBasedTest(const TestDataConfig *config, TestFixture &fixture) {
   // Determine number of ticks to execute
   uint32_t num_ticks = DetermineNumTicks(config);
 
+  console::PrintSectionHeader("Tick-Based Execution");
+  console::PrintInfo(std::format("Total ticks to execute: {}", num_ticks));
+
   // Execute each tick in sequence (1-based to match game loop)
   for (uint32_t tick = 1; tick <= num_ticks; ++tick) {
+    console::PrintTickProgress(tick, num_ticks);
+    
     auto tick_result = ExecuteSingleTick(tick, config, fixture);
     if (!tick_result.has_value()) {
+      console::PrintError("Tick execution failed", tick);
       return std::unexpected(tick_result.error());
     }
   }
+
+  console::PrintSuccess(std::format("All {} ticks executed successfully", num_ticks));
 
   return std::monostate{};
 }

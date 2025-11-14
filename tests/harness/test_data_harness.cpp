@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "test_data_harness.h"
 #include "FlatbuffersConfigurator.h"
+#include "console_output.h"
 #include "entity_memory_pool_matchers.h"
 #include "event_bus_conversion.h"
 #include "event_matchers.h"
@@ -244,10 +245,21 @@ RunFixtureTest(const TestDataConfig *config) {
   // Create fixture from test data
   auto fixture_result = CreateFixtureFromTestData(config);
   if (!fixture_result.has_value()) {
+    console::PrintError("Failed to create fixture from test data");
     return std::unexpected(fixture_result.error());
   }
 
   TestFixture &fixture = fixture_result.value();
+
+  // Print test start banner
+  if (config->metadata() && config->metadata()->test_name()) {
+    console::PrintTestStart(config->metadata()->test_name()->str());
+    
+    if (config->metadata()->description()) {
+      console::PrintInfo("Description: " + 
+                         std::string(config->metadata()->description()->str()));
+    }
+  }
 
   // Execute the test using tick-based execution
   // This will process inputs, events, and simulation steps on a tick-by-tick
@@ -259,6 +271,8 @@ RunFixtureTest(const TestDataConfig *config) {
 
   // If expected_entity_collection is provided, compare results
   if (config->expected_entity_collection()) {
+    console::PrintSectionHeader("Entity Pool Comparison");
+    
     const EntityCollection *expected_collection =
         config->expected_entity_collection();
 
@@ -272,6 +286,7 @@ RunFixtureTest(const TestDataConfig *config) {
         expected_pool, expected_collection);
 
     if (!configure_result.has_value()) {
+      console::PrintError("Failed to configure expected entity pool");
       return std::unexpected(configure_result.error());
     }
 
@@ -304,10 +319,14 @@ RunFixtureTest(const TestDataConfig *config) {
       RunEntityMemoryPoolComparisonTest(actual_pool, expected_pool,
                                         expected_to_pass);
     }
+    
+    console::PrintSuccess("Entity pool comparison completed");
   }
 
   // If expected_event_bus is provided, compare results
   if (config->expected_event_bus()) {
+    console::PrintSectionHeader("Event Bus Comparison");
+    
     const EventBusData *expected_event_bus_data = config->expected_event_bus();
 
     // Convert EventBusData to EventBus
@@ -316,6 +335,7 @@ RunFixtureTest(const TestDataConfig *config) {
             expected_event_bus_data);
 
     if (!expected_event_bus_result.has_value()) {
+      console::PrintError("Failed to convert expected event bus data");
       return std::unexpected(expected_event_bus_result.error());
     }
 
@@ -350,6 +370,8 @@ RunFixtureTest(const TestDataConfig *config) {
       RunEventBusComparisonTest(actual_event_bus, expected_event_bus,
                                     expected_to_pass);
     }
+    
+    console::PrintSuccess("Event bus comparison completed");
   }
 
   return std::monostate{};

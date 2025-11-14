@@ -12,6 +12,7 @@
 #include "CMeta.h"
 #include "CUIState.h"
 #include "CUserInterface.h"
+#include "console_output.h"
 #include "entity_memory.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
@@ -158,11 +159,15 @@ TEST_CASE("run_fixture_test works with Catch2 generators", "[unit][harness]") {
   auto configs = steamrot::tests::load_test_data_configs();
   REQUIRE(configs.has_value());
 
-  std::cout << "Total test configs loaded: " << configs->size() << std::endl;
+  steamrot::tests::console::PrintInfo(
+      std::format("Total test configs loaded: {}", configs->size()));
   const auto *config = GENERATE_COPY(from_range(configs.value()));
 
-  std::cout << "Running test: " << config->metadata()->test_name()->str()
-            << std::endl;
+  if (config->metadata() && config->metadata()->test_name()) {
+    steamrot::tests::console::PrintInfo(
+        "Running test: " + std::string(config->metadata()->test_name()->str()));
+  }
+  
   // This is the main wrapper function for data-driven testing
   auto result = steamrot::tests::RunFixtureTest(config);
 
