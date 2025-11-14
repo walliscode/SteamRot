@@ -11,8 +11,10 @@
 #include "EventHandler.h"
 #include "EventPacket.h"
 #include "UserInputBitset.h"
+#include "test_context.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
+#include <optional>
 #include <sstream>
 #include <string>
 
@@ -162,10 +164,20 @@ class EventBusEqualsMatcher : public Catch::Matchers::MatcherBase<EventBus> {
 private:
   const EventBus &m_expected;
   mutable std::string m_mismatch_description;
+  std::optional<TestContext> m_context;
 
 public:
   explicit EventBusEqualsMatcher(const EventBus &expected)
-      : m_expected(expected) {}
+      : m_expected(expected), m_context(std::nullopt) {}
+
+  ////////////////////////////////////////////////////////////
+  /// @brief Constructor with TestContext
+  ///
+  /// @param expected The expected EventBus
+  /// @param context Test context with metadata and tick information
+  ////////////////////////////////////////////////////////////
+  EventBusEqualsMatcher(const EventBus &expected, const TestContext &context)
+      : m_expected(expected), m_context(context) {}
 
   bool match(const EventBus &actual) const override {
     m_mismatch_description.clear();
@@ -198,7 +210,24 @@ public:
       oss << "equals EventBus with " << m_expected.size() << " events";
       return oss.str();
     }
-    return "EventBus mismatch: " + m_mismatch_description;
+    
+    std::ostringstream oss;
+    
+    // Add error indicator
+    oss << "\n✗ EventBus Comparison Failed";
+    
+    // Add context information
+    if (m_context.has_value()) {
+      std::string context_str = m_context.value().ToString();
+      if (!context_str.empty()) {
+        oss << "\n  Context: " << context_str;
+      }
+    }
+    
+    // Add mismatch details
+    oss << "\n  Details: " << m_mismatch_description;
+    
+    return oss.str();
   }
 };
 
@@ -210,6 +239,18 @@ public:
 /////////////////////////////////////////////////
 inline EventBusEqualsMatcher EqualsEventBus(const EventBus &expected) {
   return EventBusEqualsMatcher(expected);
+}
+
+/////////////////////////////////////////////////
+/// @brief Helper function to create EventBusEqualsMatcher with context
+///
+/// @param expected The expected EventBus
+/// @param context Test context with metadata and tick information
+/// @return EventBusEqualsMatcher instance
+/////////////////////////////////////////////////
+inline EventBusEqualsMatcher EqualsEventBus(const EventBus &expected,
+                                             const TestContext &context) {
+  return EventBusEqualsMatcher(expected, context);
 }
 
 } // namespace steamrot::tests

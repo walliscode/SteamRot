@@ -159,15 +159,9 @@ TEST_CASE("run_fixture_test works with Catch2 generators", "[unit][harness]") {
   auto configs = steamrot::tests::load_test_data_configs();
   REQUIRE(configs.has_value());
 
-  steamrot::tests::console::PrintInfo(
-      std::format("Total test configs loaded: {}", configs->size()));
+  // Removed console output - let Catch2 control verbosity
   const auto *config = GENERATE_COPY(from_range(configs.value()));
 
-  if (config->metadata() && config->metadata()->test_name()) {
-    steamrot::tests::console::PrintInfo(
-        "Running test: " + std::string(config->metadata()->test_name()->str()));
-  }
-  
   // This is the main wrapper function for data-driven testing
   auto result = steamrot::tests::RunFixtureTest(config);
 

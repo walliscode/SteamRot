@@ -64,28 +64,54 @@ harness/
     └── sample_tick_based_execution.test_data.json
 ```
 
-## Formatted Console Output
+## Formatted Console Output in Matchers
 
-The test harness provides formatted console output with visual indicators and **ANSI colors** for improved readability:
+The test harness uses **Catch2 matchers** with formatted output for test comparisons. This approach allows Catch2 to control when output is displayed (only on failures) while providing rich, formatted error messages.
 
-- **✓ Success messages** (green) - Indicate successful operations
-- **✗ Error messages** (red) - Highlight failures and errors
-- **• Info messages** (blue) - General information bullets
-- **➤ Tick progress** (magenta) - Show current tick execution
-- **━━━━ Section dividers** (yellow) - Organize output into logical sections
-- **[Tick N]** (cyan) - Tick numbers included in relevant messages
-- **Box-drawn banners** (bold cyan) - Test start indicators
+### Formatted Matcher Output
 
-### Output Verbosity
+When tests fail, matchers display:
+- **✗ Error indicator** - Clear failure marker
+- **Context information** - Test name, description, tick number
+- **Detailed mismatch** - Specific differences between actual and expected
 
-**By default, only failed test output is shown** to reduce console noise when running many data-driven tests. Passing tests run silently.
+### Test Context
 
-To see all test output (including passing tests):
-```bash
-export STEAMROT_VERBOSE_TESTS=1
+The `TestContext` struct enriches matcher output with:
+- `test_name` - Name of the test being run
+- `description` - Human-readable test description
+- `current_tick` - Current tick number (for tick-based tests)
+- `total_ticks` - Total number of ticks (for progress context)
+
+Example matcher usage:
+```cpp
+TestContext context;
+context.test_name = "my_test";
+context.current_tick = 5;
+context.total_ticks = 10;
+
+// Matchers format output with context
+REQUIRE_THAT(actual_pool, EqualsEntityMemoryPool(expected_pool, context));
 ```
 
-**Error messages are always displayed** regardless of verbosity setting.
+### Output Verbosity Control
+
+**Catch2 controls verbosity**, not the test harness:
+- Use `--success` or `-s` flag to see all test output
+- Use `--reporter` to change output format
+- By default, only failures are shown
+
+Example:
+```bash
+# Show only failures (default)
+ctest --preset Debug
+
+# Show all tests including successes
+ctest --preset Debug --output-on-failure --verbose
+
+# Catch2 verbose mode
+./test_executable --success
+```
 
 ### Color Control
 
@@ -95,7 +121,7 @@ See `CONSOLE_OUTPUT_EXAMPLES.md` for detailed examples of the formatted output.
 
 ### Console Output Functions
 
-Available in `console_output.h`:
+Error logging functions available in `console_output.h` (used for debugging, not test output):
 
 ```cpp
 #include "console_output.h"
@@ -103,31 +129,32 @@ Available in `console_output.h`:
 // Check if colors are enabled
 bool colors = steamrot::tests::console::IsColorEnabled();
 
-// Check if verbose output is enabled
-bool verbose = steamrot::tests::console::IsVerboseEnabled();
-
-// Success message with optional tick number (green with cyan tick)
-// Only shown if STEAMROT_VERBOSE_TESTS=1
-steamrot::tests::console::PrintSuccess("Operation completed", 5);
-// Output: ✓ [Tick 5] Operation completed
-
 // Error message with optional tick number (red with cyan tick)
-// Always shown regardless of verbosity
+// Used for logging errors during test execution
 steamrot::tests::console::PrintError("Operation failed", 3);
 // Output: ✗ [Tick 3] Operation failed
+```
 
-// Info message (blue bullet)
-// Only shown if STEAMROT_VERBOSE_TESTS=1
-steamrot::tests::console::PrintInfo("Processing data", 2);
-// Output: • [Tick 2] Processing data
+### Matcher Functions
 
-// Section header (yellow)
-// Only shown if STEAMROT_VERBOSE_TESTS=1
-steamrot::tests::console::PrintSectionHeader("Entity Pool Comparison");
-// Output: ━━━━ Entity Pool Comparison ━━━━
+Matchers with context support (available in respective matcher headers):
 
-// Test start banner (bold cyan)
-// Only shown if STEAMROT_VERBOSE_TESTS=1
+```cpp
+#include "entity_memory_pool_matchers.h"
+#include "event_matchers.h"
+#include "test_context.h"
+
+TestContext context;
+context.test_name = "sample_test";
+context.current_tick = 3;
+context.total_ticks = 10;
+
+// Entity memory pool comparison with context
+REQUIRE_THAT(actual_pool, EqualsEntityMemoryPool(expected_pool, context));
+
+// Event bus comparison with context
+REQUIRE_THAT(actual_bus, EqualsEventBus(expected_bus, context));
+```
 steamrot::tests::console::PrintTestStart("my_test_name");
 // Output: Box-drawn banner with test name
 

@@ -245,21 +245,12 @@ RunFixtureTest(const TestDataConfig *config) {
   // Create fixture from test data
   auto fixture_result = CreateFixtureFromTestData(config);
   if (!fixture_result.has_value()) {
+    // Errors are still logged for debugging
     console::PrintError("Failed to create fixture from test data");
     return std::unexpected(fixture_result.error());
   }
 
   TestFixture &fixture = fixture_result.value();
-
-  // Print test start banner
-  if (config->metadata() && config->metadata()->test_name()) {
-    console::PrintTestStart(config->metadata()->test_name()->str());
-    
-    if (config->metadata()->description()) {
-      console::PrintInfo("Description: " + 
-                         std::string(config->metadata()->description()->str()));
-    }
-  }
 
   // Execute the test using tick-based execution
   // This will process inputs, events, and simulation steps on a tick-by-tick
@@ -271,8 +262,6 @@ RunFixtureTest(const TestDataConfig *config) {
 
   // If expected_entity_collection is provided, compare results
   if (config->expected_entity_collection()) {
-    console::PrintSectionHeader("Entity Pool Comparison");
-    
     const EntityCollection *expected_collection =
         config->expected_entity_collection();
 
@@ -294,39 +283,32 @@ RunFixtureTest(const TestDataConfig *config) {
     const EntityMemoryPool &actual_pool =
         fixture.GetEntityManager().GetEntityMemoryPool();
 
-    // Build test metadata string from config
-    std::string test_metadata;
-    bool expected_to_pass = true; // default value
-
+    // Build test context from config
+    TestContext context;
     if (config->metadata()) {
       if (config->metadata()->test_name()) {
-        test_metadata +=
-            "Test: " + std::string(config->metadata()->test_name()->str());
+        context.test_name = config->metadata()->test_name()->str();
       }
       if (config->metadata()->description()) {
-        test_metadata += ", Description: " +
-                         std::string(config->metadata()->description()->str());
+        context.description = config->metadata()->description()->str();
       }
-      // Get expected_to_pass from metadata
+    }
+    
+    bool expected_to_pass = true;
+    if (config->metadata()) {
       expected_to_pass = config->metadata()->expected_to_pass();
     }
 
-    // Use overload with metadata if available, otherwise use simple version
-    if (!test_metadata.empty()) {
-      RunEntityMemoryPoolComparisonTest(actual_pool, expected_pool,
-                                        test_metadata, expected_to_pass);
+    // Use Catch2 matchers - they will format and display only on failure
+    if (expected_to_pass) {
+      REQUIRE_THAT(actual_pool, EqualsEntityMemoryPool(expected_pool, context));
     } else {
-      RunEntityMemoryPoolComparisonTest(actual_pool, expected_pool,
-                                        expected_to_pass);
+      REQUIRE_THAT(actual_pool, !EqualsEntityMemoryPool(expected_pool, context));
     }
-    
-    console::PrintSuccess("Entity pool comparison completed");
   }
 
   // If expected_event_bus is provided, compare results
   if (config->expected_event_bus()) {
-    console::PrintSectionHeader("Event Bus Comparison");
-    
     const EventBusData *expected_event_bus_data = config->expected_event_bus();
 
     // Convert EventBusData to EventBus
@@ -345,33 +327,28 @@ RunFixtureTest(const TestDataConfig *config) {
     const EventBus &actual_event_bus =
         fixture.GetGameResources().event_handler.GetGlobalEventBus();
 
-    // Build test metadata string from config
-    std::string test_metadata;
-    bool expected_to_pass = true; // default value
-
+    // Build test context from config
+    TestContext context;
     if (config->metadata()) {
       if (config->metadata()->test_name()) {
-        test_metadata +=
-            "Test: " + std::string(config->metadata()->test_name()->str());
+        context.test_name = config->metadata()->test_name()->str();
       }
       if (config->metadata()->description()) {
-        test_metadata += ", Description: " +
-                         std::string(config->metadata()->description()->str());
+        context.description = config->metadata()->description()->str();
       }
-      // Get expected_to_pass from metadata
+    }
+    
+    bool expected_to_pass = true;
+    if (config->metadata()) {
       expected_to_pass = config->metadata()->expected_to_pass();
     }
 
-    // Use overload with metadata if available, otherwise use simple version
-    if (!test_metadata.empty()) {
-      RunEventBusComparisonTest(actual_event_bus, expected_event_bus,
-                                test_metadata, expected_to_pass);
+    // Use Catch2 matchers - they will format and display only on failure
+    if (expected_to_pass) {
+      REQUIRE_THAT(actual_event_bus, EqualsEventBus(expected_event_bus, context));
     } else {
-      RunEventBusComparisonTest(actual_event_bus, expected_event_bus,
-                                    expected_to_pass);
+      REQUIRE_THAT(actual_event_bus, !EqualsEventBus(expected_event_bus, context));
     }
-    
-    console::PrintSuccess("Event bus comparison completed");
   }
 
   return std::monostate{};
