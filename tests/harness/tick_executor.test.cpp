@@ -19,7 +19,7 @@ TEST_CASE("determine_num_ticks uses explicit num_ticks from TestDataConfig",
   auto mouse0 = steamrot::CreateMouseInputData(builder, pos0, 0);
   auto event0 = steamrot::CreateInputEvent(
       builder, steamrot::InputType_MouseMove,
-      steamrot::InputEventData_MouseInputData, mouse0.Union(), 0);
+      steamrot::InputEventData_MouseInputData, mouse0.Union(), 1);
 
   auto pos1 = steamrot::CreateVector2fData(builder, 150.0f, 150.0f);
   auto mouse1 = steamrot::CreateMouseInputData(builder, pos1, 0);
@@ -57,7 +57,7 @@ TEST_CASE("determine_num_ticks ignores event_sequence max tick",
   // Create events with max tick = 2
   auto packet0 = steamrot::CreateEventPacketData(
       builder, 5, steamrot::EventType_EVENT_TEST);
-  auto event0 = steamrot::CreateEventTestData(builder, 0, packet0);
+  auto event0 = steamrot::CreateEventTestData(builder, 1, packet0);
 
   auto packet1 = steamrot::CreateEventPacketData(
       builder, 3, steamrot::EventType_EVENT_USER_INPUT);
@@ -110,7 +110,7 @@ TEST_CASE("execute_single_tick handles null config",
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 
-  auto result = steamrot::tests::ExecuteSingleTick(0, nullptr, fixture);
+  auto result = steamrot::tests::ExecuteSingleTick(1, nullptr, fixture);
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
