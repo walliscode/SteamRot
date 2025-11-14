@@ -34,7 +34,7 @@
         "entities": []
       },
       "event_bus": {
-        "description": "After tick 0, event lifetimes decremented",
+        "description": "After tick 1, event lifetimes decremented",
         "events": [
           {
             "event_lifetime": 2,
@@ -48,7 +48,7 @@
           }
         ]
       },
-      "description": "Tick 0 snapshot"
+      "description": "Tick 1 snapshot"
     },
     {
       "tick": 2,
@@ -57,7 +57,7 @@
         "entities": []
       },
       "event_bus": {
-        "description": "After tick 1, event lifetimes decremented again",
+        "description": "After tick 2, event lifetimes decremented again",
         "events": [
           {
             "event_lifetime": 1,
@@ -71,7 +71,7 @@
           }
         ]
       },
-      "description": "Tick 1 snapshot"
+      "description": "Tick 2 snapshot"
     }
   ],
   "expected_entity_collection": {
