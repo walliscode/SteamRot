@@ -24,11 +24,11 @@ echo "  Test Harness Console Output Demonstration (with Color)"
 echo "==================================================================="
 echo ""
 echo "This demonstrates the improved formatting with:"
-echo "  - ${BOLD_GREEN}Colored tick boxes (✓/✗)${RESET} for visual feedback"
-echo "  - ${BLUE}Colored bullet points (•)${RESET} for information"
-echo "  - ${CYAN}Tick numbers [Tick N]${RESET} for context"
-echo "  - ${BOLD_YELLOW}Section dividers${RESET} for organization"
-echo "  - ${MAGENTA}Progress indicators (➤)${RESET}"
+echo -e "  - ${BOLD_GREEN}Colored tick boxes (✓/✗)${RESET} for visual feedback"
+echo -e "  - ${BLUE}Colored bullet points (•)${RESET} for information"
+echo -e "  - ${CYAN}Tick numbers [Tick N]${RESET} for context"
+echo -e "  - ${BOLD_YELLOW}Section dividers${RESET} for organization"
+echo -e "  - ${MAGENTA}Progress indicators (➤)${RESET}"
 echo ""
 echo "Set NO_COLOR or STEAMROT_NO_COLOR environment variable to disable colors"
 echo ""
@@ -36,119 +36,114 @@ echo "==================================================================="
 echo ""
 
 # Simulate test harness output with colors
-cat << EOF
+echo ""
+echo -e "${BLUE}•${RESET} Total test configs loaded: 16"
+echo ""
+echo -e "${BLUE}•${RESET} Running test: sample_tick_based_execution"
+echo ""
+echo -e "${BOLD_CYAN}┌─────────────────────────────────────"
+echo -e "│ Running Test: ${RESET}${BOLD}sample_tick_based_execution${RESET}"
+echo -e "${BOLD_CYAN}└─────────────────────────────────────${RESET}"
+echo ""
+echo -e "${BLUE}•${RESET} Description: Demonstrates tick-based test execution with coordinated inputs, events, and simulation"
 
-${BLUE}•${RESET} Total test configs loaded: 16
-
-${BLUE}•${RESET} Running test: sample_tick_based_execution
-
-${BOLD_CYAN}┌─────────────────────────────────────
-│ Running Test: ${RESET}${BOLD}sample_tick_based_execution${RESET}
-${BOLD_CYAN}└─────────────────────────────────────${RESET}
-
-${BLUE}•${RESET} Description: Demonstrates tick-based test execution with coordinated inputs, events, and simulation
-
-${BOLD_YELLOW}━━━━ Tick-Based Execution ━━━━${RESET}
-
-${BLUE}•${RESET} Total ticks to execute: 5
-
-${MAGENTA}➤${RESET} Executing Tick ${BOLD_BLUE}1${RESET} of ${BOLD_BLUE}5${RESET}
-
-${BLUE}•${RESET} ${CYAN}[Tick 1]${RESET} Executing tick
-
-${BOLD_GREEN}✓${RESET} ${CYAN}[Tick 1]${RESET} Tick completed
-
-${MAGENTA}➤${RESET} Executing Tick ${BOLD_BLUE}2${RESET} of ${BOLD_BLUE}5${RESET}
-
-${BLUE}•${RESET} ${CYAN}[Tick 2]${RESET} Executing tick
-
-${BOLD_GREEN}✓${RESET} ${CYAN}[Tick 2]${RESET} Tick completed
-
-${MAGENTA}➤${RESET} Executing Tick ${BOLD_BLUE}3${RESET} of ${BOLD_BLUE}5${RESET}
-
-${BLUE}•${RESET} ${CYAN}[Tick 3]${RESET} Executing tick
-
-${BLUE}•${RESET} ${CYAN}[Tick 3]${RESET} Comparing snapshot
-
-${BOLD_GREEN}✓${RESET} ${CYAN}[Tick 3]${RESET} Tick completed
-
-${MAGENTA}➤${RESET} Executing Tick ${BOLD_BLUE}4${RESET} of ${BOLD_BLUE}5${RESET}
-
-${BLUE}•${RESET} ${CYAN}[Tick 4]${RESET} Executing tick
-
-${BOLD_GREEN}✓${RESET} ${CYAN}[Tick 4]${RESET} Tick completed
-
-${MAGENTA}➤${RESET} Executing Tick ${BOLD_BLUE}5${RESET} of ${BOLD_BLUE}5${RESET}
-
-${BLUE}•${RESET} ${CYAN}[Tick 5]${RESET} Executing tick
-
-${BOLD_GREEN}✓${RESET} ${CYAN}[Tick 5]${RESET} Tick completed
-
-${BOLD_GREEN}✓${RESET} All 5 ticks executed successfully
-
-${BOLD_YELLOW}━━━━ Entity Pool Comparison ━━━━${RESET}
-
-${BOLD_GREEN}✓${RESET} Entity pool comparison completed
-
-EOF
+echo ""
+echo -e "${BOLD_YELLOW}━━━━ Tick-Based Execution ━━━━${RESET}"
+echo ""
+echo -e "${BLUE}•${RESET} Total ticks to execute: 5"
+echo ""
+echo -e "${MAGENTA}➤${RESET} Executing Tick ${BOLD_BLUE}1${RESET} of ${BOLD_BLUE}5${RESET}"
+echo ""
+echo -e "${BLUE}•${RESET} ${CYAN}[Tick 1]${RESET} Executing tick"
+echo ""
+echo -e "${BOLD_GREEN}✓${RESET} ${CYAN}[Tick 1]${RESET} Tick completed"
+echo ""
+echo -e "${MAGENTA}➤${RESET} Executing Tick ${BOLD_BLUE}2${RESET} of ${BOLD_BLUE}5${RESET}"
+echo ""
+echo -e "${BLUE}•${RESET} ${CYAN}[Tick 2]${RESET} Executing tick"
+echo ""
+echo -e "${BOLD_GREEN}✓${RESET} ${CYAN}[Tick 2]${RESET} Tick completed"
+echo ""
+echo -e "${MAGENTA}➤${RESET} Executing Tick ${BOLD_BLUE}3${RESET} of ${BOLD_BLUE}5${RESET}"
+echo ""
+echo -e "${BLUE}•${RESET} ${CYAN}[Tick 3]${RESET} Executing tick"
+echo ""
+echo -e "${BLUE}•${RESET} ${CYAN}[Tick 3]${RESET} Comparing snapshot"
+echo ""
+echo -e "${BOLD_GREEN}✓${RESET} ${CYAN}[Tick 3]${RESET} Tick completed"
+echo ""
+echo -e "${MAGENTA}➤${RESET} Executing Tick ${BOLD_BLUE}4${RESET} of ${BOLD_BLUE}5${RESET}"
+echo ""
+echo -e "${BLUE}•${RESET} ${CYAN}[Tick 4]${RESET} Executing tick"
+echo ""
+echo -e "${BOLD_GREEN}✓${RESET} ${CYAN}[Tick 4]${RESET} Tick completed"
+echo ""
+echo -e "${MAGENTA}➤${RESET} Executing Tick ${BOLD_BLUE}5${RESET} of ${BOLD_BLUE}5${RESET}"
+echo ""
+echo -e "${BLUE}•${RESET} ${CYAN}[Tick 5]${RESET} Executing tick"
+echo ""
+echo -e "${BOLD_GREEN}✓${RESET} ${CYAN}[Tick 5]${RESET} Tick completed"
+echo ""
+echo -e "${BOLD_GREEN}✓${RESET} All 5 ticks executed successfully"
+echo ""
+echo -e "${BOLD_YELLOW}━━━━ Entity Pool Comparison ━━━━${RESET}"
+echo ""
+echo -e "${BOLD_GREEN}✓${RESET} Entity pool comparison completed"
+echo ""
 
 echo ""
 echo "==================================================================="
 echo ""
 echo "Example with Error (Tick 2 fails):"
 echo ""
+echo ""
+echo -e "${BOLD_CYAN}┌─────────────────────────────────────"
+echo -e "│ Running Test: ${RESET}${BOLD}failing_simulation_test${RESET}"
+echo -e "${BOLD_CYAN}└─────────────────────────────────────${RESET}"
+echo ""
+echo -e "${BOLD_YELLOW}━━━━ Tick-Based Execution ━━━━${RESET}"
+echo ""
+echo -e "${BLUE}•${RESET} Total ticks to execute: 5"
+echo ""
+echo -e "${MAGENTA}➤${RESET} Executing Tick ${BOLD_BLUE}1${RESET} of ${BOLD_BLUE}5${RESET}"
+echo ""
+echo -e "${BLUE}•${RESET} ${CYAN}[Tick 1]${RESET} Executing tick"
+echo ""
+echo -e "${BOLD_GREEN}✓${RESET} ${CYAN}[Tick 1]${RESET} Tick completed"
+echo ""
+echo -e "${MAGENTA}➤${RESET} Executing Tick ${BOLD_BLUE}2${RESET} of ${BOLD_BLUE}5${RESET}"
+echo ""
+echo -e "${BLUE}•${RESET} ${CYAN}[Tick 2]${RESET} Executing tick"
+echo ""
+echo -e "${BOLD_RED}✗${RESET} ${CYAN}[Tick 2]${RESET} Simulation step failed"
 
-cat << EOF
-${BOLD_CYAN}┌─────────────────────────────────────
-│ Running Test: ${RESET}${BOLD}failing_simulation_test${RESET}
-${BOLD_CYAN}└─────────────────────────────────────${RESET}
-
-${BOLD_YELLOW}━━━━ Tick-Based Execution ━━━━${RESET}
-
-${BLUE}•${RESET} Total ticks to execute: 5
-
-${MAGENTA}➤${RESET} Executing Tick ${BOLD_BLUE}1${RESET} of ${BOLD_BLUE}5${RESET}
-
-${BLUE}•${RESET} ${CYAN}[Tick 1]${RESET} Executing tick
-
-${BOLD_GREEN}✓${RESET} ${CYAN}[Tick 1]${RESET} Tick completed
-
-${MAGENTA}➤${RESET} Executing Tick ${BOLD_BLUE}2${RESET} of ${BOLD_BLUE}5${RESET}
-
-${BLUE}•${RESET} ${CYAN}[Tick 2]${RESET} Executing tick
-
-${BOLD_RED}✗${RESET} ${CYAN}[Tick 2]${RESET} Simulation step failed
-
-${BOLD_RED}✗${RESET} ${CYAN}[Tick 2]${RESET} Tick execution failed
-
-EOF
+echo ""
+echo -e "${BOLD_RED}✗${RESET} ${CYAN}[Tick 2]${RESET} Tick execution failed"
+echo ""
 
 echo ""
 echo "==================================================================="
 echo ""
 echo "Example of TestFixture Initialization Errors:"
 echo ""
-
-cat << EOF
-
-${BOLD_RED}✗${RESET} Error loading game resources data: Configuration file not found
-
-${BOLD_RED}✗${RESET} Error configuring entities: Invalid entity pool size
-
-${BOLD_RED}✗${RESET} Error generating archetypes: Duplicate archetype detected
-
-EOF
+echo ""
+echo -e "${BOLD_RED}✗${RESET} Error loading game resources data: Configuration file not found"
+echo ""
+echo -e "${BOLD_RED}✗${RESET} Error configuring entities: Invalid entity pool size"
+echo ""
+echo -e "${BOLD_RED}✗${RESET} Error generating archetypes: Duplicate archetype detected"
+echo ""
 
 echo ""
 echo "==================================================================="
 echo ""
 echo "Key Benefits:"
 echo ""
-echo "  1. ${BOLD_GREEN}Visual Clarity${RESET}    - Colored tick boxes provide instant feedback"
-echo "  2. ${CYAN}Tick Context${RESET}      - Always know which tick caused an issue"
-echo "  3. ${BOLD_YELLOW}Better Structure${RESET}  - Sections organize complex output"
-echo "  4. ${MAGENTA}Easy Debugging${RESET}    - Quick identification of failures"
-echo "  5. ${BOLD_CYAN}Professional Look${RESET} - Clean, organized terminal output"
+echo -e "  1. ${BOLD_GREEN}Visual Clarity${RESET}    - Colored tick boxes provide instant feedback"
+echo -e "  2. ${CYAN}Tick Context${RESET}      - Always know which tick caused an issue"
+echo -e "  3. ${BOLD_YELLOW}Better Structure${RESET}  - Sections organize complex output"
+echo -e "  4. ${MAGENTA}Easy Debugging${RESET}    - Quick identification of failures"
+echo -e "  5. ${BOLD_CYAN}Professional Look${RESET} - Clean, organized terminal output"
 echo ""
 echo "==================================================================="
 echo ""
