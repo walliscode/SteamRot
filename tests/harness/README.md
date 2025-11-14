@@ -66,15 +66,17 @@ harness/
 
 ## Formatted Console Output
 
-The test harness provides formatted console output with visual indicators for improved readability:
+The test harness provides formatted console output with visual indicators and **ANSI colors** for improved readability:
 
-- **✓ Success messages** - Indicate successful operations
-- **✗ Error messages** - Highlight failures and errors
-- **• Info messages** - General information bullets
-- **➤ Tick progress** - Show current tick execution
-- **━━━━ Section dividers** - Organize output into logical sections
-- **[Tick N]** - Tick numbers included in relevant messages
-- **Box-drawn banners** - Test start indicators
+- **✓ Success messages** (green) - Indicate successful operations
+- **✗ Error messages** (red) - Highlight failures and errors
+- **• Info messages** (blue) - General information bullets
+- **➤ Tick progress** (magenta) - Show current tick execution
+- **━━━━ Section dividers** (yellow) - Organize output into logical sections
+- **[Tick N]** (cyan) - Tick numbers included in relevant messages
+- **Box-drawn banners** (bold cyan) - Test start indicators
+
+Colors are enabled by default and can be disabled by setting the `NO_COLOR` or `STEAMROT_NO_COLOR` environment variable. This follows the [NO_COLOR standard](https://no-color.org/).
 
 See `CONSOLE_OUTPUT_EXAMPLES.md` for detailed examples of the formatted output.
 
@@ -85,32 +87,35 @@ Available in `console_output.h`:
 ```cpp
 #include "console_output.h"
 
-// Success message with optional tick number
+// Check if colors are enabled
+bool colors = steamrot::tests::console::IsColorEnabled();
+
+// Success message with optional tick number (green with cyan tick)
 steamrot::tests::console::PrintSuccess("Operation completed", 5);
 // Output: ✓ [Tick 5] Operation completed
 
-// Error message with optional tick number
+// Error message with optional tick number (red with cyan tick)
 steamrot::tests::console::PrintError("Operation failed", 3);
 // Output: ✗ [Tick 3] Operation failed
 
-// Info message
+// Info message (blue bullet)
 steamrot::tests::console::PrintInfo("Processing data", 2);
 // Output: • [Tick 2] Processing data
 
-// Section header
+// Section header (yellow)
 steamrot::tests::console::PrintSectionHeader("Entity Pool Comparison");
 // Output: ━━━━ Entity Pool Comparison ━━━━
 
-// Test start banner
+// Test start banner (bold cyan)
 steamrot::tests::console::PrintTestStart("my_test_name");
 // Output: Box-drawn banner with test name
 
-// Tick progress indicator
+// Tick progress indicator (magenta arrow, blue numbers)
 steamrot::tests::console::PrintTickProgress(3, 10);
 // Output: ➤ Executing Tick 3 of 10
 ```
 
-All console output functions automatically include newlines for proper spacing and support optional tick numbers for context.
+All console output functions automatically include newlines for proper spacing, support optional tick numbers for context, and use colors by default (unless disabled via environment variable).
 
 ## Usage
 
