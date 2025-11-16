@@ -20,6 +20,12 @@ endif()
 # Always enforce the language constraint
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Use libc++ with Clang for C++23 features like std::expected
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-stdlib=libc++)
+  add_link_options(-stdlib=libc++ -lc++abi)
+endif()
+
 # make sure the data output directory exists
 if (NOT EXISTS ${DATA_OUT_DIR})
   file(MAKE_DIRECTORY ${DATA_OUT_DIR})
