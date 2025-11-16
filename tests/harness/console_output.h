@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <optional>
+#include <sstream>
 #include <string>
 
 namespace steamrot::tests::console {
@@ -60,6 +61,28 @@ inline bool IsColorEnabled() {
   return enabled;
 }
 
+/////////////////////////////////////////////////
+/// @brief Return text wrapped in ANSI color codes if enabled
+///
+/// @param text Text to colorize
+/// @param color_code ANSI color code to apply
+/////////////////////////////////////////////////
+inline std::string AddColour(const std::string &text, const char *color_code) {
+  if (IsColorEnabled()) {
+    return std::string(color_code) + text + Color::Reset;
+  } else {
+    return text;
+  }
+}
+
+inline std::string PrintDivider() {
+  std::string divider = std::string(60, '=');
+  if (IsColorEnabled()) {
+    return "\n" + AddColour(divider, Color::BoldYellow);
+  } else {
+    return "\n" + divider;
+  }
+}
 /////////////////////////////////////////////////
 /// @brief Print a formatted success message with tick box
 ///
@@ -139,7 +162,8 @@ inline void PrintInfo(const std::string &message,
 /////////////////////////////////////////////////
 inline void PrintSectionHeader(const std::string &title) {
   if (IsColorEnabled()) {
-    std::cout << "\n" << Color::BoldYellow << "━━━━ " << title << " ━━━━"
+    std::cout << "\n"
+              << Color::BoldYellow << "━━━━ " << title << " ━━━━"
               << Color::Reset << std::endl;
   } else {
     std::cout << "\n━━━━ " << title << " ━━━━" << std::endl;
@@ -153,10 +177,11 @@ inline void PrintSectionHeader(const std::string &title) {
 /////////////////////////////////////////////////
 inline void PrintTestStart(const std::string &test_name) {
   if (IsColorEnabled()) {
-    std::cout << "\n" << Color::BoldCyan
-              << "┌─────────────────────────────────────" << std::endl;
-    std::cout << "│ Running Test: " << Color::Reset << Color::Bold
-              << test_name << Color::Reset << std::endl;
+    std::cout << "\n"
+              << Color::BoldCyan << "┌─────────────────────────────────────"
+              << std::endl;
+    std::cout << "│ Running Test: " << Color::Reset << Color::Bold << test_name
+              << Color::Reset << std::endl;
     std::cout << Color::BoldCyan << "└─────────────────────────────────────"
               << Color::Reset << std::endl;
   } else {
@@ -174,10 +199,10 @@ inline void PrintTestStart(const std::string &test_name) {
 /////////////////////////////////////////////////
 inline void PrintTickProgress(uint32_t current_tick, uint32_t total_ticks) {
   if (IsColorEnabled()) {
-    std::cout << "\n" << Color::Magenta << "➤ " << Color::Reset
-              << "Executing Tick " << Color::BoldBlue << current_tick
-              << Color::Reset << " of " << Color::BoldBlue << total_ticks
-              << Color::Reset << std::endl;
+    std::cout << "\n"
+              << Color::Magenta << "➤ " << Color::Reset << "Executing Tick "
+              << Color::BoldBlue << current_tick << Color::Reset << " of "
+              << Color::BoldBlue << total_ticks << Color::Reset << std::endl;
   } else {
     std::cout << "\n➤ Executing Tick " << current_tick << " of " << total_ticks
               << std::endl;
@@ -188,11 +213,12 @@ inline void PrintTickProgress(uint32_t current_tick, uint32_t total_ticks) {
 /// @brief Print a formatted comparison result
 ///
 /// @param success Whether the comparison succeeded
-/// @param context Context of the comparison (e.g., "Entity Pool", "Event Bus")
+/// @param context Context of the comparison (e.g., "Entity Pool", "Event
+/// Bus")
 /// @param tick Optional tick number
 /////////////////////////////////////////////////
 inline void PrintComparisonResult(bool success, const std::string &context,
-                                   std::optional<uint32_t> tick = std::nullopt) {
+                                  std::optional<uint32_t> tick = std::nullopt) {
   if (success) {
     PrintSuccess(context + " comparison passed", tick);
   } else {
