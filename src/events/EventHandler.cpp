@@ -100,9 +100,6 @@ void HandleSFMLEvents(sf::RenderWindow &window, EventHandler &event_handler) {
     // set the event data to the UserInputBitset
     event_packet.m_event_data = user_input_bitset;
 
-    std::cout << "User Input Event Packet Created " << std::endl;
-    std::cout << "UserInputBitset: " << user_input_bitset << std::endl;
-
     // add the event packet to the waiting room event bus
     event_handler.AddEvent(event_packet);
   }
@@ -121,8 +118,6 @@ void EventHandler::UpateSubscribersFromGlobalEventBus() {
   // go through each event in the global event bus
   for (const auto &event : m_global_event_bus) {
 
-    std::cout << "Processing Event of type "
-              << EnumNameEventType(event.m_event_type) << std::endl;
     if (m_subscriber_register.contains(event.m_event_type)) {
       // go through each subscriber registered for the event type
       for (auto &subscriber_weak :
@@ -177,8 +172,6 @@ void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
     // if they do not match, do not update the subscriber
     return;
 
-  std::cout << "Updating Subscriber of type "
-            << EnumNameEventType(locked_subscriber->GetEventType());
   // update any releveant information for the subscriber
   auto activate_result = locked_subscriber->SetActive();
 

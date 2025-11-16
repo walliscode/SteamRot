@@ -11,7 +11,6 @@ Tile::Tile() {}
 ////////////////////////////////////////////////////////////
 void Tile::SetSceneId(const uuids::uuid &scene_id) {
   m_scene_id = scene_id;
-  std::cout << "Tile: Scene ID set to " << m_scene_id << std::endl;
 }
 
 ////////////////////////////////////////////////////////////

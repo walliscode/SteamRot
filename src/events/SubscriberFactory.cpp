@@ -71,8 +71,6 @@ SubscriberFactory::CreateAndRegisterSubscriber(
 
     subscriber = std::make_shared<Subscriber>(event_type, trigger_data);
 
-    std::cout << "Created subscriber with trigger data for event type: "
-              << EnumNameEventType(event_type) << std::endl;
     // if no trigger data, create subscriber without it
   } else {
 

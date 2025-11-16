@@ -20,13 +20,6 @@ void Session::AddTile() {
 
   // default the active tile to the last added tile
   m_active_tile = new_tile;
-
-  // print whether the tiles are the same
-  if (m_tiles.back() == new_tile) {
-    std::cout << "Session: New tile added successfully." << std::endl;
-  } else {
-    std::cout << "Session: Failed to add new tile." << std::endl;
-  }
 };
 
 ////////////////////////////////////////////////////////////

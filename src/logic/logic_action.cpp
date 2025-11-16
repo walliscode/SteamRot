@@ -181,9 +181,7 @@ void ProcessDropDownListElementActions(
     // Already handled above
     break;
   default:
-    std::cout << "Warning: Unhandled DataPopulateFunction value: "
-              << static_cast<int>(dropdown_list_element.data_populate_function)
-              << std::endl;
+    // Unhandled DataPopulateFunction value - silently ignore
     break;
   }
 }

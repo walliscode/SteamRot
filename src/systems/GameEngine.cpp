@@ -13,7 +13,7 @@
 
 #include <cstddef>
 #include <expected>
-#include <iostream>
+#include <stdexcept>
 #include <variant>
 #include <vector>
 
@@ -67,66 +67,59 @@ void GameEngine::StartUp() {
   // Configure GameResources from resource data
   auto game_resources_result = data_loader.ProvideGameResourcesData();
   if (!game_resources_result) {
-    std::cerr << "Failed to load game resources data: "
-              << game_resources_result.error().message << "\n";
     if (m_game_resources.game_window.isOpen()) {
       m_game_resources.game_window.close();
     }
-    return;
+    throw std::runtime_error("Failed to load game resources data: " +
+                             game_resources_result.error().message);
   }
 
   auto configure_resources_result = resources::ConfigureGameResources(
       m_game_resources, game_resources_result.value());
   if (!configure_resources_result) {
-    std::cerr << "Failed to configure game resources: "
-              << configure_resources_result.error().message << "\n";
     if (m_game_resources.game_window.isOpen()) {
       m_game_resources.game_window.close();
     }
-    return;
+    throw std::runtime_error("Failed to configure game resources: " +
+                             configure_resources_result.error().message);
   }
 
   // configure the GameEngine from data
   auto load_data_result = data_loader.ProvideGameEngineData();
   if (!load_data_result) {
-    std::cerr << "Failed to load game engine data: "
-              << load_data_result.error().message << "\n";
     m_game_resources.game_window.close();
-    return;
+    throw std::runtime_error("Failed to load game engine data: " +
+                             load_data_result.error().message);
   }
   auto configure_result = ConfigureGameEngineFromData(load_data_result.value());
   if (!configure_result) {
-    std::cerr << "Failed to configure game engine: "
-              << configure_result.error().message << "\n";
     m_game_resources.game_window.close();
-    return;
+    throw std::runtime_error("Failed to configure game engine: " +
+                             configure_result.error().message);
   }
 
   // load default assets
   auto load_assets_result = m_game_resources.asset_manager.LoadDefaultAssets();
   if (!load_assets_result) {
-    std::cerr << "Failed to load default assets: "
-              << load_assets_result.error().message << "\n";
     m_game_resources.game_window.close();
-    return;
+    throw std::runtime_error("Failed to load default assets: " +
+                             load_assets_result.error().message);
   }
 
   // Configure the SceneManager from data
   auto configure_sm_result = m_scene_manager.ConfigureSceneManagerFromData(
       data_loader.ProvideSceneManagerData().value());
   if (!configure_sm_result) {
-    std::cerr << "Failed to configure scene manager: "
-              << configure_sm_result.error().message << "\n";
     m_game_resources.game_window.close();
-    return;
+    throw std::runtime_error("Failed to configure scene manager: " +
+                             configure_sm_result.error().message);
   }
   // load the title scene
   auto load_scene_result = m_scene_manager.LoadTitleScene();
   if (!load_scene_result) {
-    std::cerr << "Failed to load title scene: "
-              << load_scene_result.error().message << "\n";
     m_game_resources.game_window.close();
-    return;
+    throw std::runtime_error("Failed to load title scene: " +
+                             load_scene_result.error().message);
   }
 }
 
@@ -163,9 +156,9 @@ void GameEngine::UpdateSystems() {
   // Handle subscriptions for the GameEngine
   auto process_subscriptions_result = ProcessSubscriptions();
   if (!process_subscriptions_result.has_value()) {
-    std::cerr << "Failed to process subscriptions: "
-              << process_subscriptions_result.error().message << "\n";
     m_game_resources.game_window.close();
+    throw std::runtime_error("Failed to process subscriptions: " +
+                             process_subscriptions_result.error().message);
   }
   // Update EventHandler
 
