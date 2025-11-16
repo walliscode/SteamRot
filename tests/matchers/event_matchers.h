@@ -11,14 +11,13 @@
 #include "EventHandler.h"
 #include "EventPacket.h"
 #include "UserInputBitset.h"
-#include "console_output.h"
 #include "test_context.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
+#include <conmat.h>
 #include <optional>
 #include <sstream>
 #include <string>
-
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
@@ -65,7 +64,8 @@ private:
       const auto &expected_packet = std::get<SceneChangePacket>(expected_data);
 
       // Compare optional UUID
-      if (actual_packet.first.has_value() != expected_packet.first.has_value()) {
+      if (actual_packet.first.has_value() !=
+          expected_packet.first.has_value()) {
         oss << "m_event_data SceneChangePacket UUID presence differs; ";
         return false;
       }
@@ -79,7 +79,8 @@ private:
       if (actual_packet.second != expected_packet.second) {
         oss << "m_event_data SceneChangePacket SceneType differs: actual="
             << static_cast<int>(actual_packet.second)
-            << ", expected=" << static_cast<int>(expected_packet.second) << "; ";
+            << ", expected=" << static_cast<int>(expected_packet.second)
+            << "; ";
         return false;
       }
     } else if (std::holds_alternative<UIElementName>(actual_data)) {
@@ -105,8 +106,7 @@ public:
 
     // Compare m_event_type
     if (actual.m_event_type != m_expected.m_event_type) {
-      oss << "m_event_type: actual="
-          << static_cast<int>(actual.m_event_type)
+      oss << "m_event_type: actual=" << static_cast<int>(actual.m_event_type)
           << ", expected=" << static_cast<int>(m_expected.m_event_type) << "; ";
     }
 
@@ -127,7 +127,8 @@ public:
 
     // Compare event_lifetime
     if (actual.event_lifetime != m_expected.event_lifetime) {
-      oss << "event_lifetime: actual=" << static_cast<int>(actual.event_lifetime)
+      oss << "event_lifetime: actual="
+          << static_cast<int>(actual.event_lifetime)
           << ", expected=" << static_cast<int>(m_expected.event_lifetime)
           << "; ";
     }
@@ -141,7 +142,8 @@ public:
       std::ostringstream oss;
       oss << "equals EventPacket(event_type="
           << static_cast<int>(m_expected.m_event_type)
-          << ", lifetime=" << static_cast<int>(m_expected.event_lifetime) << ")";
+          << ", lifetime=" << static_cast<int>(m_expected.event_lifetime)
+          << ")";
       return oss.str();
     }
     return "EventPacket mismatch: " + m_mismatch_description;
@@ -196,8 +198,8 @@ public:
     for (size_t i = 0; i < actual.size(); ++i) {
       EventPacketEqualsMatcher packet_matcher(m_expected[i]);
       if (!packet_matcher.match(actual[i])) {
-        oss << "EventPacket at index " << i << " differs: "
-            << packet_matcher.describe() << "; ";
+        oss << "EventPacket at index " << i
+            << " differs: " << packet_matcher.describe() << "; ";
       }
     }
 
@@ -211,26 +213,26 @@ public:
       oss << "equals EventBus with " << m_expected.size() << " events";
       return oss.str();
     }
-    
+
     // Use TestContext formatting if available
     if (m_context.has_value()) {
-      return m_context.value().FormatFailureMessage("EventBus", 
-                                                     m_mismatch_description);
+      return m_context.value().FormatFailureMessage("EventBus",
+                                                    m_mismatch_description);
     }
-    
+
     // Legacy support - manual formatting
     std::ostringstream oss;
     oss << "\n[FAILED] EventBus Comparison";
     oss << "\n" << std::string(60, '=');
     oss << "\n" << std::string(60, '-');
-    
+
     if (!m_mismatch_description.empty()) {
       oss << "\n  Differences:";
       oss << "\n    * " << m_mismatch_description;
     }
-    
+
     oss << "\n" << std::string(60, '=');
-    
+
     return oss.str();
   }
 };
@@ -253,7 +255,7 @@ inline EventBusEqualsMatcher EqualsEventBus(const EventBus &expected) {
 /// @return EventBusEqualsMatcher instance
 /////////////////////////////////////////////////
 inline EventBusEqualsMatcher EqualsEventBus(const EventBus &expected,
-                                             const TestContext &context) {
+                                            const TestContext &context) {
   return EventBusEqualsMatcher(expected, context);
 }
 
