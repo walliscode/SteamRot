@@ -147,7 +147,6 @@ ExecuteSingleTick(uint32_t tick, const TestDataConfig *config,
     auto input_result =
         ExecuteInputEventsForTick(config->input_sequence(), tick, fixture);
     if (!input_result.has_value()) {
-      console::PrintError("Input execution failed", tick);
       return std::unexpected(input_result.error());
     }
   }
@@ -157,7 +156,6 @@ ExecuteSingleTick(uint32_t tick, const TestDataConfig *config,
     auto event_result =
         ExecuteEventsForTick(config->event_sequence(), tick, fixture);
     if (!event_result.has_value()) {
-      console::PrintError("Event execution failed", tick);
       return std::unexpected(event_result.error());
     }
 
@@ -172,7 +170,6 @@ ExecuteSingleTick(uint32_t tick, const TestDataConfig *config,
         auto sim_result =
             ExecuteSimulationStep(step, fixture.GetSceneContext());
         if (!sim_result.has_value()) {
-          console::PrintError("Simulation step failed", tick);
           return std::unexpected(sim_result.error());
         }
       }
@@ -182,7 +179,6 @@ ExecuteSingleTick(uint32_t tick, const TestDataConfig *config,
   // 5. Check for tick snapshot (compare after simulation, before event bus tick)
   auto snapshot_result = CompareTickSnapshot(tick, config, fixture);
   if (!snapshot_result.has_value()) {
-    console::PrintError("Snapshot comparison failed", tick);
     return std::unexpected(snapshot_result.error());
   }
 
@@ -215,7 +211,6 @@ ExecuteTickBasedTest(const TestDataConfig *config, TestFixture &fixture) {
     
     auto tick_result = ExecuteSingleTick(tick, config, fixture);
     if (!tick_result.has_value()) {
-      console::PrintError("Tick execution failed", tick);
       return std::unexpected(tick_result.error());
     }
   }

@@ -38,12 +38,12 @@ void TestFixture::ConfigureGameResourcesForTest() {
         m_game_resources, game_data_result.value());
 
     if (!config_result.has_value()) {
-      console::PrintError("Error configuring game resources: " +
-                          config_result.error().message);
+      throw std::runtime_error("Error configuring game resources: " +
+                               config_result.error().message);
     }
   } else {
-    console::PrintError("Error loading game resources data: " +
-                        game_data_result.error().message);
+    throw std::runtime_error("Error loading game resources data: " +
+                             game_data_result.error().message);
   }
 
   // Set environment type for test
@@ -53,7 +53,7 @@ void TestFixture::ConfigureGameResourcesForTest() {
   auto load_result = m_game_resources.asset_manager.LoadDefaultAssets();
   if (!load_result.has_value()) {
     const FailInfo &error = load_result.error();
-    console::PrintError("Error loading default assets: " + error.message);
+    throw std::runtime_error("Error loading default assets: " + error.message);
   }
 }
 
@@ -69,12 +69,12 @@ void TestFixture::ConfigureSceneLevelResources(
         m_scene_resources, scene_data_result.value());
 
     if (!config_result.has_value()) {
-      console::PrintError("Error configuring scene resources: " +
-                          config_result.error().message);
+      throw std::runtime_error("Error configuring scene resources: " +
+                               config_result.error().message);
     }
   } else {
-    console::PrintError("Error loading scene resources data: " +
-                        scene_data_result.error().message);
+    throw std::runtime_error("Error loading scene resources data: " +
+                             scene_data_result.error().message);
   }
 
   // Configure the EntityMemoryPool for the scene
@@ -93,14 +93,14 @@ void TestFixture::ConfigureSceneLevelResources(
   // Check the configuration was successful
   if (!configure_result.has_value()) {
     const FailInfo &error = configure_result.error();
-    console::PrintError("Error configuring entities: " + error.message);
+    throw std::runtime_error("Error configuring entities: " + error.message);
   }
 
   // Generate all archetypes for the scene
   auto archetype_result = m_entity_manager.GenerateAllArchetypes();
   if (!archetype_result.has_value()) {
     const FailInfo &error = archetype_result.error();
-    console::PrintError("Error generating archetypes: " + error.message);
+    throw std::runtime_error("Error generating archetypes: " + error.message);
   }
 }
 

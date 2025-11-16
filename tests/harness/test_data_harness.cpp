@@ -245,8 +245,6 @@ RunFixtureTest(const TestDataConfig *config) {
   // Create fixture from test data
   auto fixture_result = CreateFixtureFromTestData(config);
   if (!fixture_result.has_value()) {
-    // Errors are still logged for debugging
-    console::PrintError("Failed to create fixture from test data");
     return std::unexpected(fixture_result.error());
   }
 
@@ -275,7 +273,6 @@ RunFixtureTest(const TestDataConfig *config) {
         expected_pool, expected_collection);
 
     if (!configure_result.has_value()) {
-      console::PrintError("Failed to configure expected entity pool");
       return std::unexpected(configure_result.error());
     }
 
@@ -317,7 +314,6 @@ RunFixtureTest(const TestDataConfig *config) {
             expected_event_bus_data);
 
     if (!expected_event_bus_result.has_value()) {
-      console::PrintError("Failed to convert expected event bus data");
       return std::unexpected(expected_event_bus_result.error());
     }
 
