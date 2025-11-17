@@ -51,9 +51,16 @@ CompareTickSnapshot(uint32_t tick, const TestDataConfig *config,
         context.total_ticks = config->num_ticks();
       }
 
+      // Get expected_to_pass from test metadata (default true)
+      // Note: Tick snapshots typically always expect to pass
+      bool expected_to_pass = true;
+      if (config->metadata()) {
+        expected_to_pass = config->metadata()->expected_to_pass();
+      }
+
       // Use RunDataStructComparisonTest to compare all data structures
       auto comparison_result = RunDataStructComparisonTest(
-          snapshot->data_collection(), fixture, context);
+          snapshot->data_collection(), fixture, context, expected_to_pass);
       
       if (!comparison_result.has_value()) {
         return std::unexpected(comparison_result.error());

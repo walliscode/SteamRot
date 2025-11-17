@@ -92,6 +92,28 @@ void RunEntityMemoryPoolComparisonTest(const EntityMemoryPool &actual,
                                        bool expected_to_pass = true);
 
 /////////////////////////////////////////////////
+/// @brief Wrapper function for EntityMemoryPool comparison with EntityCollection
+///
+/// This function configures an expected EntityMemoryPool from an EntityCollection
+/// and compares it with the actual pool. This is a convenience function that
+/// handles the EMP setup internally.
+///
+/// @param actual_memory_pool The actual EntityMemoryPool to test
+/// @param expected_collection The EntityCollection to configure expected pool from
+/// @param fixture TestFixture containing resources for configuration
+/// @param context Test context information for enriched error messages
+/// @param expected_to_pass If true, expects pools to match; if false, expects
+/// mismatch
+/// @return std::monostate on success, FailInfo on error
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+RunEntityMemoryPoolComparisonTest(const EntityMemoryPool &actual_memory_pool,
+                                  const EntityCollection *expected_collection,
+                                  TestFixture &fixture,
+                                  const TestContext &context,
+                                  bool expected_to_pass = true);
+
+/////////////////////////////////////////////////
 /// @brief Wrapper function for EventBus comparison tests
 ///
 /// This function compares two EventBus instances using the
@@ -127,11 +149,14 @@ void RunEventBusComparisonTest(const EventBus &actual, const EventBus &expected,
 /// @param data_collection Expected data structure states for comparison
 /// @param fixture TestFixture containing actual state to compare
 /// @param context Test context information for enriched error messages
+/// @param expected_to_pass If true, expects data to match; if false, expects
+/// mismatch
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 RunDataStructComparisonTest(const DataCollection *data_collection,
-                            TestFixture &fixture, const TestContext &context);
+                            TestFixture &fixture, const TestContext &context,
+                            bool expected_to_pass = true);
 
 /////////////////////////////////////////////////
 /// @brief Wrapper function for data-driven testing with TestFixture
