@@ -466,5 +466,45 @@ TEST_CASE("Metadata-only test data can be used with generators",
   REQUIRE(config->expected_data_collection() == nullptr);
 }
 
+TEST_CASE("RunDataStructComparisonTest orchestrates all comparison tests",
+          "[unit][harness]") {
+  
+  // This test verifies that RunDataStructComparisonTest properly orchestrates
+  // comparisons for all data structures in a DataCollection
+  
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  
+  // Find simple_event_bus_test which has both entity and event bus data
+  const steamrot::TestDataConfig *test_config = nullptr;
+  for (const auto *config : configs.value()) {
+    if (config->metadata()->test_name()->str() == "simple_event_bus_test") {
+      test_config = config;
+      break;
+    }
+  }
+  REQUIRE(test_config != nullptr);
+  
+  // Create fixture and run one tick to get expected state
+  auto fixture_result = steamrot::tests::CreateFixtureFromTestData(test_config);
+  REQUIRE(fixture_result.has_value());
+  
+  auto &fixture = fixture_result.value();
+  
+  // Execute one tick
+  fixture.GetGameResources().event_handler.TickGlobalEventBus();
+  
+  // Now compare with expected state using RunDataStructComparisonTest
+  if (test_config->expected_data_collection()) {
+    steamrot::tests::TestContext context;
+    context.test_name = "RunDataStructComparisonTest_integration_test";
+    
+    auto result = steamrot::tests::RunDataStructComparisonTest(
+        test_config->expected_data_collection(), fixture, context);
+    
+    REQUIRE(result.has_value());
+  }
+}
+
 TEST_CASE("RunDataStructComparisonTest returns headers in error messages",
           "[unit][harness]") {}
