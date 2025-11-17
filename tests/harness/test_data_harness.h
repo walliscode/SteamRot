@@ -20,7 +20,6 @@
 #include "test_context.h"
 #include "test_data_generated.h"
 #include <expected>
-#include <string>
 #include <variant>
 #include <vector>
 
@@ -73,45 +72,26 @@ std::expected<TestFixture, FailInfo> CreateFixtureFromTestData(
     const SceneType &scene_type = SceneType::SceneType_TEST);
 
 /////////////////////////////////////////////////
-/// @brief Wrapper function for EntityMemoryPool comparison tests
+/// @brief Wrapper function for EntityMemoryPool comparison with
+/// EntityCollection
 ///
-/// This function compares two EntityMemoryPool instances using the
-/// EqualsEntityMemoryPool matcher, ensuring detailed error messages on
-/// mismatch. This is a low-level comparison function - prefer using
-/// RunDataStructComparisonTest for higher-level testing.
-///
-/// @param actual The actual EntityMemoryPool to test
-/// @param expected The expected EntityMemoryPool to compare against
-/// @param context Test context information for enriched error messages
-/// @param expected_to_pass If true, expects pools to match; if false, expects
-/// mismatch
-/////////////////////////////////////////////////
-void RunEntityMemoryPoolComparisonTest(const EntityMemoryPool &actual,
-                                       const EntityMemoryPool &expected,
-                                       const TestContext &context,
-                                       bool expected_to_pass = true);
-
-/////////////////////////////////////////////////
-/// @brief Wrapper function for EntityMemoryPool comparison with EntityCollection
-///
-/// This function configures an expected EntityMemoryPool from an EntityCollection
-/// and compares it with the actual pool. This is a convenience function that
-/// handles the EMP setup internally.
+/// This function configures an expected EntityMemoryPool from an
+/// EntityCollection and compares it with the actual pool. This is a convenience
+/// function that handles the EMP setup internally.
 ///
 /// @param actual_memory_pool The actual EntityMemoryPool to test
-/// @param expected_collection The EntityCollection to configure expected pool from
+/// @param expected_collection The EntityCollection to configure expected pool
+/// from
 /// @param fixture TestFixture containing resources for configuration
 /// @param context Test context information for enriched error messages
 /// @param expected_to_pass If true, expects pools to match; if false, expects
 /// mismatch
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-RunEntityMemoryPoolComparisonTest(const EntityMemoryPool &actual_memory_pool,
-                                  const EntityCollection *expected_collection,
-                                  TestFixture &fixture,
-                                  const TestContext &context,
-                                  bool expected_to_pass = true);
+std::expected<std::monostate, FailInfo> RunEntityMemoryPoolComparisonTest(
+    const EntityMemoryPool &actual_memory_pool,
+    const EntityCollection *expected_collection, TestFixture &fixture,
+    const TestContext &context, bool expected_to_pass = true);
 
 /////////////////////////////////////////////////
 /// @brief Wrapper function for EventBus comparison tests
@@ -167,7 +147,8 @@ RunDataStructComparisonTest(const DataCollection *data_collection,
 /// 3. Compares final state with expected_data_collection if present
 ///
 /// This is the top-level function for data-driven testing. It should be
-/// called from TEST_CASE blocks with configs loaded from load_test_data_configs().
+/// called from TEST_CASE blocks with configs loaded from
+/// load_test_data_configs().
 ///
 /// The function respects the expected_to_pass flag in test metadata, allowing
 /// tests to verify both successful matches and expected mismatches.

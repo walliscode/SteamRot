@@ -8,7 +8,6 @@
 /////////////////////////////////////////////////
 #include "test_data_harness.h"
 #include "FlatbuffersConfigurator.h"
-#include "catch2/catch_message.hpp"
 #include "catch2/matchers/catch_matchers.hpp"
 #include "console_output.h"
 #include "entity_memory_pool_matchers.h"
@@ -134,18 +133,19 @@ CreateFixtureFromTestData(const TestDataConfig *config,
 
   // Create and initialize the fixture with the scene type
   TestFixture fixture(scene_type);
-  
+
   // Initialize with entity collection if present in start_data_collection
   const EntityCollection *start_entities = nullptr;
-  if (config->start_data_collection() && 
+
+  if (config->start_data_collection() &&
       config->start_data_collection()->entity_collection()) {
     start_entities = config->start_data_collection()->entity_collection();
   }
-  
+
   fixture.Intialize(start_entities);
 
   // Configure EventBus from start_event_bus if present in start_data_collection
-  if (config->start_data_collection() && 
+  if (config->start_data_collection() &&
       config->start_data_collection()->event_bus()) {
     auto configure_result =
         event::conversion::ConfigureEventHandlerFromEventBusData(
@@ -161,43 +161,16 @@ CreateFixtureFromTestData(const TestDataConfig *config,
 }
 
 /////////////////////////////////////////////////
-void RunEntityMemoryPoolComparisonTest(const EntityMemoryPool &actual,
-                                       const EntityMemoryPool &expected,
-                                       const TestContext &context,
-                                       bool expected_to_pass) {
-  // Create matcher with context
-  auto matcher = EqualsEntityMemoryPool(expected, context);
-
-  if (expected_to_pass) {
-    // Test expects pools to match - use REQUIRE_THAT
-    REQUIRE_THAT(actual, matcher);
-  } else {
-    // Test expects pools to NOT match - verify mismatch
-    bool pools_match = matcher.match(actual);
-    if (pools_match) {
-      std::string error_msg =
-          "Expected pools to be different, but they matched";
-      if (context.HasContent()) {
-        error_msg += context.FormatContextSection();
-      }
-      FAIL(error_msg);
-    }
-  }
-}
-
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-RunEntityMemoryPoolComparisonTest(const EntityMemoryPool &actual_memory_pool,
-                                  const EntityCollection *expected_collection,
-                                  TestFixture &fixture,
-                                  const TestContext &context,
-                                  bool expected_to_pass) {
+std::expected<std::monostate, FailInfo> RunEntityMemoryPoolComparisonTest(
+    const EntityMemoryPool &actual_memory_pool,
+    const EntityCollection *expected_collection, TestFixture &fixture,
+    const TestContext &context, bool expected_to_pass) {
 
   // Configure expected EntityMemoryPool from expected_collection
   EntityMemoryPool expected_pool;
   FlatbuffersConfigurator configurator(
       fixture.GetGameResources().event_handler);
-  
+
   auto configure_result = configurator.ConfigureEntitiesFromCollection(
       expected_pool, expected_collection);
 
@@ -205,9 +178,8 @@ RunEntityMemoryPoolComparisonTest(const EntityMemoryPool &actual_memory_pool,
     return std::unexpected(configure_result.error());
   }
 
-  // Run comparison
-  RunEntityMemoryPoolComparisonTest(actual_memory_pool, expected_pool, context,
-                                    expected_to_pass);
+  // run comparison using matcher
+  CHECK_THAT(actual_memory_pool, EqualsEntityMemoryPool(expected_pool));
 
   return std::monostate{};
 }
@@ -247,6 +219,18 @@ RunDataStructComparisonTest(const DataCollection *data_collection,
     return std::unexpected(
         FailInfo(FailMode::NullPointer, "DataCollection is null"));
   }
+
+  // set up header for error messages
+  INFO(conmat::Divider());
+  INFO(std::format("\n=== Data Structure Comparison Tests: {} === ",
+                   context.test_name.empty() ? "<Unnamed Test>"
+                                             : context.test_name));
+  INFO("\n");
+  INFO(std::format("\n--- Tick: {} ---",
+                   context.current_tick.has_value()
+                       ? std::to_string(context.current_tick.value())
+                       : "<N/A>"));
+  INFO(conmat::Divider());
 
   // Check for entity collection comparison
   if (data_collection->entity_collection()) {
@@ -327,7 +311,7 @@ RunFixtureTest(const TestDataConfig *config) {
     // Use RunDataStructComparisonTest with expected_to_pass parameter
     auto comparison_result = RunDataStructComparisonTest(
         config->expected_data_collection(), fixture, context, expected_to_pass);
-    
+
     if (!comparison_result.has_value()) {
       return std::unexpected(comparison_result.error());
     }
