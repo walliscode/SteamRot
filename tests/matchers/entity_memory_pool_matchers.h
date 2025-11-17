@@ -11,7 +11,6 @@
 #include "cgrimoire_machina_matchers.h"
 #include "cmachina_form_matchers.h"
 #include "cmeta_matchers.h"
-#include "console_output.h"
 #include "containers.h"
 #include "cui_state_matchers.h"
 #include "cuser_interface_matchers.h"
@@ -40,8 +39,8 @@ private:
   const EntityMemoryPool &m_expected;
   mutable std::string m_mismatch_description;
   mutable bool do_components_match{true};
-  std::string m_test_metadata;  // Legacy support
-  std::optional<TestContext> m_context;  // New context-based approach
+  std::string m_test_metadata;          // Legacy support
+  std::optional<TestContext> m_context; // New context-based approach
   ////////////////////////////////////////////////////////////
   /// @brief Helper to compare component vectors
   ///
@@ -189,7 +188,8 @@ public:
   ////////////////////////////////////////////////////////////
   EntityMemoryPoolEqualsMatcher(const EntityMemoryPool &expected,
                                 const std::string &test_metadata)
-      : m_expected(expected), m_test_metadata(test_metadata), m_context(std::nullopt) {}
+      : m_expected(expected), m_test_metadata(test_metadata),
+        m_context(std::nullopt) {}
 
   ////////////////////////////////////////////////////////////
   /// @brief Constructor with TestContext
@@ -240,28 +240,28 @@ public:
   std::string describe() const override {
     // Use TestContext formatting if available
     if (m_context.has_value()) {
-      return m_context.value().FormatFailureMessage("EntityMemoryPool", 
-                                                     m_mismatch_description);
+      return m_context.value().FormatFailureMessage("EntityMemoryPool",
+                                                    m_mismatch_description);
     }
-    
+
     // Legacy support - manual formatting
     std::ostringstream oss;
     oss << "\n[FAILED] EntityMemoryPool Comparison";
     oss << "\n" << std::string(60, '=');
-    
+
     if (!m_test_metadata.empty()) {
       oss << "\n  Context: " << m_test_metadata;
     }
-    
+
     oss << "\n" << std::string(60, '-');
-    
+
     if (!m_mismatch_description.empty()) {
       oss << "\n  Differences:";
       oss << "\n    * " << m_mismatch_description;
     }
-    
+
     oss << "\n" << std::string(60, '=');
-    
+
     return oss.str();
   }
 

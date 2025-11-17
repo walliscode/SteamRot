@@ -9,10 +9,10 @@
 #include "TestFixture.h"
 #include "FlatbuffersConfigurator.h"
 #include "FlatbuffersDataLoader.h"
+#include "GameContext.h"
 #include "PathProvider.h"
 #include "console_output.h"
 #include "resources_configuration.h"
-#include <iostream>
 
 namespace steamrot::tests {
 

@@ -12,12 +12,10 @@
 #include "CMeta.h"
 #include "CUIState.h"
 #include "CUserInterface.h"
-#include "console_output.h"
 #include "entity_memory.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/generators/catch_generators_range.hpp>
-#include <iostream>
 
 TEST_CASE("load_test_data_configs loads from adjacent data directory",
           "[unit][harness]") {
@@ -118,8 +116,7 @@ TEST_CASE("create_fixture_from_test_data does not load default scene entities",
   REQUIRE(test_config != nullptr);
 
   // Create fixture from test data
-  auto fixture_result =
-      steamrot::tests::CreateFixtureFromTestData(test_config);
+  auto fixture_result = steamrot::tests::CreateFixtureFromTestData(test_config);
   REQUIRE(fixture_result.has_value());
 
   auto &fixture = fixture_result.value();
@@ -228,8 +225,8 @@ TEST_CASE("run_entity_memory_pool_comparison_test with metadata",
 
   SECTION("Comparison succeeds with equal pools") {
     // Pools are equal, test should pass
-    steamrot::tests::RunEntityMemoryPoolComparisonTest(
-        pool1, pool2, "Test: metadata_test");
+    steamrot::tests::RunEntityMemoryPoolComparisonTest(pool1, pool2,
+                                                       "Test: metadata_test");
     SUCCEED("Comparison passed with metadata");
   }
 
@@ -308,8 +305,7 @@ TEST_CASE("run_entity_memory_pool_comparison_test respects expected_to_pass",
     cmeta_vec2[0].m_active = false;
 
     // Pools are different, expected_to_pass=false should succeed
-    steamrot::tests::RunEntityMemoryPoolComparisonTest(pool1, pool2,
-                                                            false);
+    steamrot::tests::RunEntityMemoryPoolComparisonTest(pool1, pool2, false);
     SUCCEED("Comparison passed with expected_to_pass=false");
   }
 
@@ -463,3 +459,6 @@ TEST_CASE("Metadata-only test data can be used with generators",
   REQUIRE(config->start_entity_collection() == nullptr);
   REQUIRE(config->expected_entity_collection() == nullptr);
 }
+
+TEST_CASE("RunDataStructComparisonTest returns headers in error messages",
+          "[unit][harness]") {}

@@ -21,6 +21,7 @@ target_link_libraries(test_harness
   scenes
   logic
   Catch2::Catch2
+  conmat
 )
 
 # Create test executable for harness
