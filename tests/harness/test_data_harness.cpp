@@ -10,7 +10,6 @@
 #include "FlatbuffersConfigurator.h"
 #include "catch2/catch_message.hpp"
 #include "catch2/matchers/catch_matchers.hpp"
-#include "conmat.h"
 #include "console_output.h"
 #include "entity_memory_pool_matchers.h"
 #include "event_bus_conversion.h"
@@ -123,110 +122,6 @@ LoadTestDataConfigsImpl(const char *source_file_path) {
 }
 
 /////////////////////////////////////////////////
-void RunEntityMemoryPoolComparisonTest(const EntityMemoryPool &actual,
-                                       const EntityMemoryPool &expected,
-                                       bool expected_to_pass) {
-  // Create matcher
-  auto matcher = EqualsEntityMemoryPool(expected);
-
-  if (expected_to_pass) {
-    // Test expects pools to match - use REQUIRE_THAT
-    REQUIRE_THAT(actual, matcher);
-  } else {
-    // Test expects pools to NOT match - verify mismatch
-    REQUIRE_THAT(actual, !matcher);
-  }
-}
-
-/////////////////////////////////////////////////
-void RunEntityMemoryPoolComparisonTest(const EntityMemoryPool &actual,
-                                       const EntityMemoryPool &expected,
-                                       const std::string &test_metadata,
-                                       bool expected_to_pass) {
-  // Create matcher with metadata
-  auto matcher = EqualsEntityMemoryPool(expected, test_metadata);
-
-  if (expected_to_pass) {
-    // Test expects pools to match - use REQUIRE_THAT
-    REQUIRE_THAT(actual, matcher);
-  } else {
-    // Test expects pools to NOT match - verify mismatch
-    bool pools_match = matcher.match(actual);
-    if (pools_match) {
-      std::string error_msg =
-          "Expected pools to be different, but they matched";
-      if (!test_metadata.empty()) {
-        error_msg += " [" + test_metadata + "]";
-      }
-      FAIL(error_msg);
-    }
-  }
-}
-
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-RunEntityMemoryPoolComparisonTest(const EntityMemoryPool &actual_memory_pool,
-                                  const EntityCollection *expected_collection,
-                                  TestFixture &fixture,
-                                  const TestContext &context) {
-
-  // Configure expected EntityMemoryPool from expected_collection
-  EntityMemoryPool expected_pool;
-  FlatbuffersConfigurator configurator(
-      fixture.GetGameResources().event_handler);
-
-  // Run matcher
-  CHECK_THAT(actual_memory_pool, EqualsEntityMemoryPool(expected_pool));
-
-  return std::monostate{};
-}
-
-/////////////////////////////////////////////////
-void RunEventBusComparisonTest(const EventBus &actual, const EventBus &expected,
-                               bool expected_to_pass) {
-  // Create matcher
-  auto matcher = EqualsEventBus(expected);
-
-  if (expected_to_pass) {
-    // Test expects event buses to match - use REQUIRE_THAT
-    REQUIRE_THAT(actual, matcher);
-
-  } else {
-    // Test expects event buses to NOT match - verify mismatch
-    REQUIRE_THAT(actual, !matcher);
-  }
-}
-
-/////////////////////////////////////////////////
-void RunEventBusComparisonTest(const EventBus &actual, const EventBus &expected,
-                               const std::string &test_metadata,
-                               bool expected_to_pass) {
-  // Create matcher (EventBusEqualsMatcher doesn't support metadata yet,
-  // but we can add context to failure messages through INFO)
-  auto matcher = EqualsEventBus(expected);
-
-  if (!test_metadata.empty()) {
-    INFO(test_metadata);
-  }
-
-  if (expected_to_pass) {
-    // Test expects event buses to match - use REQUIRE_THAT
-    REQUIRE_THAT(actual, matcher);
-  } else {
-    // Test expects event buses to NOT match - verify mismatch
-    bool buses_match = matcher.match(actual);
-    if (buses_match) {
-      std::string error_msg =
-          "Expected event buses to be different, but they matched";
-      if (!test_metadata.empty()) {
-        error_msg += " [" + test_metadata + "]";
-      }
-      FAIL(error_msg);
-    }
-  }
-}
-
-/////////////////////////////////////////////////
 std::expected<TestFixture, FailInfo>
 CreateFixtureFromTestData(const TestDataConfig *config,
                           const SceneType &scene_type) {
@@ -238,16 +133,23 @@ CreateFixtureFromTestData(const TestDataConfig *config,
   }
 
   // Create and initialize the fixture with the scene type
-  // Pass entity_collection to Initialize so it configures entities from test
-  // data instead of loading default scene data
   TestFixture fixture(scene_type);
-  fixture.Intialize(config->start_entity_collection());
+  
+  // Initialize with entity collection if present in start_data_collection
+  const EntityCollection *start_entities = nullptr;
+  if (config->start_data_collection() && 
+      config->start_data_collection()->entity_collection()) {
+    start_entities = config->start_data_collection()->entity_collection();
+  }
+  
+  fixture.Intialize(start_entities);
 
-  // Configure EventBus from start_event_bus if present
-  if (config->start_event_bus()) {
+  // Configure EventBus from start_event_bus if present in start_data_collection
+  if (config->start_data_collection() && 
+      config->start_data_collection()->event_bus()) {
     auto configure_result =
         event::conversion::ConfigureEventHandlerFromEventBusData(
-            config->start_event_bus(),
+            config->start_data_collection()->event_bus(),
             fixture.GetGameResources().event_handler);
 
     if (!configure_result.has_value()) {
@@ -259,122 +161,52 @@ CreateFixtureFromTestData(const TestDataConfig *config,
 }
 
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-RunFixtureTest(const TestDataConfig *config) {
+void RunEntityMemoryPoolComparisonTest(const EntityMemoryPool &actual,
+                                       const EntityMemoryPool &expected,
+                                       const TestContext &context,
+                                       bool expected_to_pass) {
+  // Create matcher with context
+  auto matcher = EqualsEntityMemoryPool(expected, context);
 
-  // Create fixture from test data
-  auto fixture_result = CreateFixtureFromTestData(config);
-  if (!fixture_result.has_value()) {
-    // Errors are still logged for debugging
-    console::PrintError("Failed to create fixture from test data");
-    return std::unexpected(fixture_result.error());
-  }
-
-  TestFixture &fixture = fixture_result.value();
-
-  // Execute the test using tick-based execution
-  // This will process inputs, events, and simulation steps on a tick-by-tick
-  // basis
-  auto tick_result = ExecuteTickBasedTest(config, fixture);
-  if (!tick_result.has_value()) {
-    return std::unexpected(tick_result.error());
-  }
-
-  // If expected_entity_collection is provided, compare results
-  if (config->expected_entity_collection()) {
-    const EntityCollection *expected_collection =
-        config->expected_entity_collection();
-
-    // Create an expected EntityMemoryPool
-    EntityMemoryPool expected_pool;
-
-    // Configure expected pool from test data
-    FlatbuffersConfigurator configurator(
-        fixture.GetGameResources().event_handler);
-    auto configure_result = configurator.ConfigureEntitiesFromCollection(
-        expected_pool, expected_collection);
-
-    if (!configure_result.has_value()) {
-      console::PrintError("Failed to configure expected entity pool");
-      return std::unexpected(configure_result.error());
-    }
-
-    // Compare actual vs expected
-    const EntityMemoryPool &actual_pool =
-        fixture.GetEntityManager().GetEntityMemoryPool();
-
-    // Build test context from config
-    TestContext context;
-    if (config->metadata()) {
-      if (config->metadata()->test_name()) {
-        context.test_name = config->metadata()->test_name()->str();
+  if (expected_to_pass) {
+    // Test expects pools to match - use REQUIRE_THAT
+    REQUIRE_THAT(actual, matcher);
+  } else {
+    // Test expects pools to NOT match - verify mismatch
+    bool pools_match = matcher.match(actual);
+    if (pools_match) {
+      std::string error_msg =
+          "Expected pools to be different, but they matched";
+      if (context.HasContent()) {
+        error_msg += context.FormatContextSection();
       }
-      if (config->metadata()->description()) {
-        context.description = config->metadata()->description()->str();
-      }
-    }
-
-    bool expected_to_pass = true;
-    if (config->metadata()) {
-      expected_to_pass = config->metadata()->expected_to_pass();
-    }
-
-    // Use Catch2 matchers - they will format and display only on failure
-    if (expected_to_pass) {
-      REQUIRE_THAT(actual_pool, EqualsEntityMemoryPool(expected_pool, context));
-    } else {
-      REQUIRE_THAT(actual_pool,
-                   !EqualsEntityMemoryPool(expected_pool, context));
+      FAIL(error_msg);
     }
   }
+}
 
-  // If expected_event_bus is provided, compare results
-  if (config->expected_event_bus()) {
-    const EventBusData *expected_event_bus_data = config->expected_event_bus();
+/////////////////////////////////////////////////
+void RunEventBusComparisonTest(const EventBus &actual, const EventBus &expected,
+                               const TestContext &context,
+                               bool expected_to_pass) {
+  // Create matcher with context
+  auto matcher = EqualsEventBus(expected, context);
 
-    // Convert EventBusData to EventBus
-    auto expected_event_bus_result =
-        event::conversion::ConvertEventBusDataToEventBus(
-            expected_event_bus_data);
-
-    if (!expected_event_bus_result.has_value()) {
-      console::PrintError("Failed to convert expected event bus data");
-      return std::unexpected(expected_event_bus_result.error());
-    }
-
-    EventBus expected_event_bus = expected_event_bus_result.value();
-
-    // Get actual event bus from fixture
-    const EventBus &actual_event_bus =
-        fixture.GetGameResources().event_handler.GetGlobalEventBus();
-
-    // Build test context from config
-    TestContext context;
-    if (config->metadata()) {
-      if (config->metadata()->test_name()) {
-        context.test_name = config->metadata()->test_name()->str();
+  if (expected_to_pass) {
+    // Test expects event buses to match - use REQUIRE_THAT
+    REQUIRE_THAT(actual, matcher);
+  } else {
+    // Test expects event buses to NOT match - verify mismatch
+    bool buses_match = matcher.match(actual);
+    if (buses_match) {
+      std::string error_msg =
+          "Expected event buses to be different, but they matched";
+      if (context.HasContent()) {
+        error_msg += context.FormatContextSection();
       }
-      if (config->metadata()->description()) {
-        context.description = config->metadata()->description()->str();
-      }
-    }
-
-    bool expected_to_pass = true;
-    if (config->metadata()) {
-      expected_to_pass = config->metadata()->expected_to_pass();
-    }
-
-    // Use Catch2 matchers - they will format and display only on failure
-    if (expected_to_pass) {
-      REQUIRE_THAT(actual_event_bus,
-                   EqualsEventBus(expected_event_bus, context));
-    } else {
-      REQUIRE_THAT(actual_event_bus,
-                   !EqualsEventBus(expected_event_bus, context));
+      FAIL(error_msg);
     }
   }
-
-  return std::monostate{};
 }
 
 /////////////////////////////////////////////////
@@ -388,33 +220,134 @@ RunDataStructComparisonTest(const DataCollection *data_collection,
         FailInfo(FailMode::NullPointer, "DataCollection is null"));
   }
 
-  // set up header for error messages
-  INFO(conmat::Divider());
-  INFO(std::format("\n=== Data Structure Comparison Tests: {} === ",
-                   context.test_name.empty() ? "<Unnamed Test>"
-                                             : context.test_name));
-  INFO("\n");
-  INFO(std::format("\n--- Tick: {} ---",
-                   context.current_tick.has_value()
-                       ? std::to_string(context.current_tick.value())
-                       : "<N/A>"));
-  INFO(conmat::Divider());
+  // Get expected_to_pass from metadata (default true)
+  bool expected_to_pass = true;
+  // Note: Context doesn't carry metadata, so we assume expected_to_pass=true here
+  // The caller (RunFixtureTest or CompareTickSnapshot) should handle expected_to_pass
 
-  // check for entity collection
+  // Check for entity collection comparison
   if (data_collection->entity_collection()) {
+    // Create expected EntityMemoryPool from collection
+    EntityMemoryPool expected_pool;
+    FlatbuffersConfigurator configurator(
+        fixture.GetGameResources().event_handler);
+    
+    auto configure_result = configurator.ConfigureEntitiesFromCollection(
+        expected_pool, data_collection->entity_collection());
 
-    // if present, run entity memory pool comparison test
-    auto emp_comparison_result = RunEntityMemoryPoolComparisonTest(
-        fixture.GetEntityManager().GetEntityMemoryPool(),
-        data_collection->entity_collection(), fixture, context);
-
-    // capture result and propagate code errors
-    if (!emp_comparison_result.has_value()) {
-      return std::unexpected(emp_comparison_result.error());
+    if (!configure_result.has_value()) {
+      return std::unexpected(configure_result.error());
     }
+
+    // Get actual pool from fixture
+    const EntityMemoryPool &actual_pool =
+        fixture.GetEntityManager().GetEntityMemoryPool();
+
+    // Run comparison
+    RunEntityMemoryPoolComparisonTest(actual_pool, expected_pool, context,
+                                      expected_to_pass);
   }
 
-  // run event bus comparison test
+  // Check for event bus comparison
+  if (data_collection->event_bus()) {
+    // Convert EventBusData to EventBus
+    auto expected_event_bus_result =
+        event::conversion::ConvertEventBusDataToEventBus(
+            data_collection->event_bus());
+
+    if (!expected_event_bus_result.has_value()) {
+      return std::unexpected(expected_event_bus_result.error());
+    }
+
+    EventBus expected_event_bus = expected_event_bus_result.value();
+
+    // Get actual event bus from fixture
+    const EventBus &actual_event_bus =
+        fixture.GetGameResources().event_handler.GetGlobalEventBus();
+
+    // Run comparison
+    RunEventBusComparisonTest(actual_event_bus, expected_event_bus, context,
+                              expected_to_pass);
+  }
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+RunFixtureTest(const TestDataConfig *config) {
+
+  // Create fixture from test data
+  auto fixture_result = CreateFixtureFromTestData(config);
+  if (!fixture_result.has_value()) {
+    console::PrintError("Failed to create fixture from test data");
+    return std::unexpected(fixture_result.error());
+  }
+
+  TestFixture &fixture = fixture_result.value();
+
+  // Execute the test using tick-based execution
+  auto tick_result = ExecuteTickBasedTest(config, fixture);
+  if (!tick_result.has_value()) {
+    return std::unexpected(tick_result.error());
+  }
+
+  // If expected_data_collection is provided, compare results
+  if (config->expected_data_collection()) {
+    // Build test context from config
+    TestContext context;
+    if (config->metadata()) {
+      if (config->metadata()->test_name()) {
+        context.test_name = config->metadata()->test_name()->str();
+      }
+      if (config->metadata()->description()) {
+        context.description = config->metadata()->description()->str();
+      }
+    }
+
+    // Get expected_to_pass from test metadata (default true)
+    bool expected_to_pass = true;
+    if (config->metadata()) {
+      expected_to_pass = config->metadata()->expected_to_pass();
+    }
+
+    // For expected_to_pass=false, we need to handle the comparison differently
+    // We'll catch any exceptions from RunDataStructComparisonTest and verify
+    // that the test failed as expected
+    if (expected_to_pass) {
+      // Normal case - expect comparison to pass
+      auto comparison_result = RunDataStructComparisonTest(
+          config->expected_data_collection(), fixture, context);
+      
+      if (!comparison_result.has_value()) {
+        return std::unexpected(comparison_result.error());
+      }
+    } else {
+      // Negative test case - expect comparison to fail
+      // We need to verify that at least one data structure doesn't match
+      bool comparison_passed = false;
+      
+      try {
+        auto comparison_result = RunDataStructComparisonTest(
+            config->expected_data_collection(), fixture, context);
+        
+        // If we reach here, comparison passed (no exception thrown)
+        comparison_passed = true;
+      } catch (...) {
+        // Comparison failed as expected for negative test
+        comparison_passed = false;
+      }
+      
+      if (comparison_passed) {
+        std::string error_msg =
+            "Expected data structures to be different, but they matched";
+        if (!context.test_name.empty()) {
+          error_msg += " [Test: " + context.test_name + "]";
+        }
+        FAIL(error_msg);
+      }
+    }
+  }
 
   return std::monostate{};
 }

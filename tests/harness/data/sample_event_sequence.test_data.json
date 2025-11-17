@@ -2,7 +2,11 @@
   "metadata": {
     "test_name": "sample_event_sequence",
     "description": "Sample test demonstrating tick-by-tick event injection",
-    "tags": ["unit", "harness", "event"],
+    "tags": [
+      "unit",
+      "harness",
+      "event"
+    ],
     "expected_to_pass": true,
     "version": 1
   },
@@ -25,8 +29,13 @@
           "event_type": "EVENT_USER_INPUT",
           "event_data_data_type": "UserInputBitsetData",
           "event_data_data": {
-            "keyboard_pressed": ["A", "W"],
-            "mouse_pressed": ["LEFT_CLICK"]
+            "keyboard_pressed": [
+              "A",
+              "W"
+            ],
+            "mouse_pressed": [
+              "LEFT_CLICK"
+            ]
           }
         },
         "description": "User input event at tick 2"
@@ -42,8 +51,10 @@
       }
     ]
   },
-  "start_entity_collection": {
-    "entity_memory_pool_size": 1,
-    "entities": []
+  "start_data_collection": {
+    "entity_collection": {
+      "entity_memory_pool_size": 1,
+      "entities": []
+    }
   }
 }
