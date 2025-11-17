@@ -7,6 +7,14 @@ include "event_bus_data.fbs";
 
 namespace steamrot;
 
+table DataCollection {
+  /// @brief state of entities
+  entity_collection: EntityCollection (required);
+
+  /// @brief state of the global event bus
+  event_bus: EventBusData;
+
+  }
 ////////////////////////////////////////////////////////////
 /// @brief Snapshot of expected entity state at a specific tick
 ///

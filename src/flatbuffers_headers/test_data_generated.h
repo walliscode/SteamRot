@@ -22,6 +22,9 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
+struct DataCollection;
+struct DataCollectionBuilder;
+
 struct TickSnapshot;
 struct TickSnapshotBuilder;
 
@@ -30,6 +33,62 @@ struct TestMetadataBuilder;
 
 struct TestDataConfig;
 struct TestDataConfigBuilder;
+
+struct DataCollection FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef DataCollectionBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_ENTITY_COLLECTION = 4,
+    VT_EVENT_BUS = 6
+  };
+  /// @brief state of entities
+  const steamrot::EntityCollection *entity_collection() const {
+    return GetPointer<const steamrot::EntityCollection *>(VT_ENTITY_COLLECTION);
+  }
+  /// @brief state of the global event bus
+  const steamrot::EventBusData *event_bus() const {
+    return GetPointer<const steamrot::EventBusData *>(VT_EVENT_BUS);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_ENTITY_COLLECTION) &&
+           verifier.VerifyTable(entity_collection()) &&
+           VerifyOffset(verifier, VT_EVENT_BUS) &&
+           verifier.VerifyTable(event_bus()) &&
+           verifier.EndTable();
+  }
+};
+
+struct DataCollectionBuilder {
+  typedef DataCollection Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_entity_collection(::flatbuffers::Offset<steamrot::EntityCollection> entity_collection) {
+    fbb_.AddOffset(DataCollection::VT_ENTITY_COLLECTION, entity_collection);
+  }
+  void add_event_bus(::flatbuffers::Offset<steamrot::EventBusData> event_bus) {
+    fbb_.AddOffset(DataCollection::VT_EVENT_BUS, event_bus);
+  }
+  explicit DataCollectionBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<DataCollection> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<DataCollection>(end);
+    fbb_.Required(o, DataCollection::VT_ENTITY_COLLECTION);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<DataCollection> CreateDataCollection(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<steamrot::EntityCollection> entity_collection = 0,
+    ::flatbuffers::Offset<steamrot::EventBusData> event_bus = 0) {
+  DataCollectionBuilder builder_(_fbb);
+  builder_.add_event_bus(event_bus);
+  builder_.add_entity_collection(entity_collection);
+  return builder_.Finish();
+}
 
 ////////////////////////////////////////////////////////////
 /// @brief Snapshot of expected entity state at a specific tick

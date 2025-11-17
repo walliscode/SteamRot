@@ -84,8 +84,9 @@ private:
   /// @param scene_type Scene type to configure for
   /// @param entity_collection Optional entity collection for custom entity data
   ////////////////////////////////////////////////////////////
-  void ConfigureSceneLevelResources(const SceneType &scene_type,
-                                    const EntityCollection *entity_collection = nullptr);
+  void ConfigureSceneLevelResources(
+      const SceneType &scene_type,
+      const EntityCollection *entity_collection = nullptr);
 
 public:
   ////////////////////////////////////////////////////////////
