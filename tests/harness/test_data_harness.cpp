@@ -8,7 +8,6 @@
 /////////////////////////////////////////////////
 #include "test_data_harness.h"
 #include "FlatbuffersConfigurator.h"
-#include "catch2/internal/catch_test_run_info.hpp"
 #include "catch2/matchers/catch_matchers.hpp"
 #include "console_output.h"
 #include "entity_memory_pool_matchers.h"
