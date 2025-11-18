@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "test_data_harness.h"
 #include "FlatbuffersConfigurator.h"
+#include "catch2/internal/catch_test_run_info.hpp"
 #include "catch2/matchers/catch_matchers.hpp"
 #include "console_output.h"
 #include "entity_memory_pool_matchers.h"
@@ -221,16 +222,10 @@ RunDataStructComparisonTest(const DataCollection *data_collection,
   }
 
   // set up header for error messages
-  INFO(conmat::Divider());
-  INFO(std::format("\n=== Data Structure Comparison Tests: {} === ",
-                   context.test_name.empty() ? "<Unnamed Test>"
-                                             : context.test_name));
-  INFO("\n");
-  INFO(std::format("\n--- Tick: {} ---",
-                   context.current_tick.has_value()
-                       ? std::to_string(context.current_tick.value())
-                       : "<N/A>"));
-  INFO(conmat::Divider());
+
+  INFO(conmat::Divider("=", 40));
+  INFO("=== Data Structure Comparison Tests === ");
+  INFO(conmat::Divider("=", 40));
 
   // Check for entity collection comparison
   if (data_collection->entity_collection()) {

@@ -11,6 +11,7 @@
 #include "cgrimoire_machina_matchers.h"
 #include "cmachina_form_matchers.h"
 #include "cmeta_matchers.h"
+#include "conmat.h"
 #include "containers.h"
 #include "cui_state_matchers.h"
 #include "cuser_interface_matchers.h"
@@ -244,23 +245,14 @@ public:
                                                     m_mismatch_description);
     }
 
-    // Legacy support - manual formatting
     std::ostringstream oss;
-    oss << "\n[FAILED] EntityMemoryPool Comparison";
-    oss << "\n" << std::string(60, '=');
 
-    if (!m_test_metadata.empty()) {
-      oss << "\n  Context: " << m_test_metadata;
-    }
-
-    oss << "\n" << std::string(60, '-');
-
-    if (!m_mismatch_description.empty()) {
-      oss << "\n  Differences:";
-      oss << "\n    * " << m_mismatch_description;
-    }
-
-    oss << "\n" << std::string(60, '=');
+    oss << "\n"
+        << conmat::Colorize(conmat::Divider("=", 40), conmat::Color::Red);
+    oss << "\n"
+        << conmat::TestFailed() << " EntityMemoryPool comparison failed.";
+    oss << "\n"
+        << conmat::Colorize(conmat::Divider("=", 40), conmat::Color::Red);
 
     return oss.str();
   }
