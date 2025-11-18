@@ -8,10 +8,6 @@
 /////////////////////////////////////////////////
 #include "test_data_harness.h"
 #include "CGrimoireMachina.h"
-#include "CMachinaForm.h"
-#include "CMeta.h"
-#include "CUIState.h"
-#include "CUserInterface.h"
 #include "entity_memory.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
@@ -168,159 +164,6 @@ TEST_CASE("run_fixture_test works with Catch2 generators", "[unit][harness]") {
   }
 }
 
-TEST_CASE("run_entity_memory_pool_comparison_test with metadata",
-          "[unit][harness]") {
-
-  steamrot::EntityMemoryPool pool1;
-  steamrot::EntityMemoryPool pool2;
-
-  // Create pools with same structure
-  const size_t num_entities = 3;
-
-  auto &cmeta_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMeta>(pool1);
-  cmeta_vec1.resize(num_entities);
-
-  auto &cui_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CUserInterface>(
-          pool1);
-  cui_vec1.resize(num_entities);
-
-  auto &cform_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
-          pool1);
-  cform_vec1.resize(num_entities);
-
-  auto &cgrim_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
-          pool1);
-  cgrim_vec1.resize(num_entities);
-
-  auto &cstate_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(pool1);
-  cstate_vec1.resize(num_entities);
-
-  auto &cmeta_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMeta>(pool2);
-  cmeta_vec2.resize(num_entities);
-
-  auto &cui_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CUserInterface>(
-          pool2);
-  cui_vec2.resize(num_entities);
-
-  auto &cform_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
-          pool2);
-  cform_vec2.resize(num_entities);
-
-  auto &cgrim_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
-          pool2);
-  cgrim_vec2.resize(num_entities);
-
-  auto &cstate_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(pool2);
-  cstate_vec2.resize(num_entities);
-
-  SECTION("Comparison succeeds with equal pools") {
-    // Pools are equal, test should pass
-    steamrot::tests::RunEntityMemoryPoolComparisonTest(pool1, pool2,
-                                                       "Test: metadata_test");
-    SUCCEED("Comparison passed with metadata");
-  }
-
-  SECTION("Comparison can be done without metadata") {
-    // Test backwards compatibility - should still work without metadata
-    steamrot::tests::RunEntityMemoryPoolComparisonTest(pool1, pool2);
-    SUCCEED("Comparison passed without metadata");
-  }
-}
-
-TEST_CASE("run_entity_memory_pool_comparison_test respects expected_to_pass",
-          "[unit][harness]") {
-
-  steamrot::EntityMemoryPool pool1;
-  steamrot::EntityMemoryPool pool2;
-
-  const size_t num_entities = 3;
-
-  // Setup pool1
-  auto &cmeta_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMeta>(pool1);
-  cmeta_vec1.resize(num_entities);
-
-  auto &cui_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CUserInterface>(
-          pool1);
-  cui_vec1.resize(num_entities);
-
-  auto &cform_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
-          pool1);
-  cform_vec1.resize(num_entities);
-
-  auto &cgrim_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
-          pool1);
-  cgrim_vec1.resize(num_entities);
-
-  auto &cstate_vec1 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(pool1);
-  cstate_vec1.resize(num_entities);
-
-  // Setup pool2
-  auto &cmeta_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMeta>(pool2);
-  cmeta_vec2.resize(num_entities);
-
-  auto &cui_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CUserInterface>(
-          pool2);
-  cui_vec2.resize(num_entities);
-
-  auto &cform_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
-          pool2);
-  cform_vec2.resize(num_entities);
-
-  auto &cgrim_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
-          pool2);
-  cgrim_vec2.resize(num_entities);
-
-  auto &cstate_vec2 =
-      steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(pool2);
-  cstate_vec2.resize(num_entities);
-
-  SECTION("expected_to_pass=true succeeds when pools match") {
-    // Pools are equal, test should pass
-    steamrot::tests::RunEntityMemoryPoolComparisonTest(pool1, pool2, true);
-    SUCCEED("Comparison passed with expected_to_pass=true");
-  }
-
-  SECTION("expected_to_pass=false succeeds when pools differ") {
-    // Modify pool1 to make it different from pool2
-    cmeta_vec1[0].m_active = true;
-    cmeta_vec2[0].m_active = false;
-
-    // Pools are different, expected_to_pass=false should succeed
-    steamrot::tests::RunEntityMemoryPoolComparisonTest(pool1, pool2, false);
-    SUCCEED("Comparison passed with expected_to_pass=false");
-  }
-
-  SECTION("expected_to_pass=false with metadata succeeds when pools differ") {
-    // Modify pool1 to make it different from pool2
-    cui_vec1[1].m_name = "different_name";
-    cui_vec2[1].m_name = "original_name";
-
-    // Pools are different, expected_to_pass=false should succeed
-    steamrot::tests::RunEntityMemoryPoolComparisonTest(
-        pool1, pool2, "Test: mismatch_test", false);
-    SUCCEED("Comparison passed with expected_to_pass=false and metadata");
-  }
-}
-
 TEST_CASE("run_fixture_test handles expected_to_pass from config metadata",
           "[unit][harness]") {
 
@@ -399,7 +242,7 @@ TEST_CASE("Metadata-only test data loads successfully", "[unit][harness]") {
           "infrastructure");
 }
 
-TEST_CASE("Metadata-only test data has no entity collections",
+TEST_CASE("Metadata-only test data has no data collections",
           "[unit][harness]") {
 
   auto configs = steamrot::tests::load_test_data_configs();
@@ -416,9 +259,9 @@ TEST_CASE("Metadata-only test data has no entity collections",
 
   REQUIRE(metadata_config != nullptr);
 
-  // Verify that entity collections are not present (null)
-  REQUIRE(metadata_config->start_entity_collection() == nullptr);
-  REQUIRE(metadata_config->expected_entity_collection() == nullptr);
+  // Verify that data collections are not present (null)
+  REQUIRE(metadata_config->start_data_collection() == nullptr);
+  REQUIRE(metadata_config->expected_data_collection() == nullptr);
 
   // Verify other optional fields are also not present
   REQUIRE(metadata_config->game_resources() == nullptr);
@@ -437,8 +280,8 @@ TEST_CASE("Metadata-only test data can be used with generators",
   // Filter to only metadata-only tests
   std::vector<const steamrot::TestDataConfig *> metadata_only_configs;
   for (const auto *config : configs.value()) {
-    if (config->start_entity_collection() == nullptr &&
-        config->expected_entity_collection() == nullptr) {
+    if (config->start_data_collection() == nullptr &&
+        config->expected_data_collection() == nullptr) {
       metadata_only_configs.push_back(config);
     }
   }
@@ -456,8 +299,48 @@ TEST_CASE("Metadata-only test data can be used with generators",
   REQUIRE(config->metadata()->version() >= 1);
 
   // Verify no entity data is present
-  REQUIRE(config->start_entity_collection() == nullptr);
-  REQUIRE(config->expected_entity_collection() == nullptr);
+  REQUIRE(config->start_data_collection() == nullptr);
+  REQUIRE(config->expected_data_collection() == nullptr);
+}
+
+TEST_CASE("RunDataStructComparisonTest orchestrates all comparison tests",
+          "[unit][harness]") {
+
+  // This test verifies that RunDataStructComparisonTest properly orchestrates
+  // comparisons for all data structures in a DataCollection
+
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+
+  // Find simple_event_bus_test which has both entity and event bus data
+  const steamrot::TestDataConfig *test_config = nullptr;
+  for (const auto *config : configs.value()) {
+    if (config->metadata()->test_name()->str() == "simple_event_bus_test") {
+      test_config = config;
+      break;
+    }
+  }
+  REQUIRE(test_config != nullptr);
+
+  // Create fixture and run one tick to get expected state
+  auto fixture_result = steamrot::tests::CreateFixtureFromTestData(test_config);
+  REQUIRE(fixture_result.has_value());
+
+  auto &fixture = fixture_result.value();
+
+  // Execute one tick
+  fixture.GetGameResources().event_handler.TickGlobalEventBus();
+
+  // Now compare with expected state using RunDataStructComparisonTest
+  if (test_config->expected_data_collection()) {
+    steamrot::tests::TestContext context;
+    context.test_name = "RunDataStructComparisonTest_integration_test";
+
+    auto result = steamrot::tests::RunDataStructComparisonTest(
+        test_config->expected_data_collection(), fixture, context);
+
+    REQUIRE(result.has_value());
+  }
 }
 
 TEST_CASE("RunDataStructComparisonTest returns headers in error messages",

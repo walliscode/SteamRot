@@ -2,7 +2,11 @@
   "metadata": {
     "test_name": "sample_input_sequence",
     "description": "Sample test demonstrating tick-by-tick input injection",
-    "tags": ["unit", "harness", "input"],
+    "tags": [
+      "unit",
+      "harness",
+      "input"
+    ],
     "expected_to_pass": true,
     "version": 1
   },
@@ -13,7 +17,10 @@
         "input_type": "MouseMove",
         "input_data_type": "MouseInputData",
         "input_data": {
-          "position": { "x": 100.0, "y": 100.0 },
+          "position": {
+            "x": 100.0,
+            "y": 100.0
+          },
           "button": 0
         },
         "tick": 1,
@@ -23,7 +30,10 @@
         "input_type": "MouseMove",
         "input_data_type": "MouseInputData",
         "input_data": {
-          "position": { "x": 150.0, "y": 125.0 },
+          "position": {
+            "x": 150.0,
+            "y": 125.0
+          },
           "button": 0
         },
         "tick": 2,
@@ -33,7 +43,10 @@
         "input_type": "MouseClick",
         "input_data_type": "MouseInputData",
         "input_data": {
-          "position": { "x": 150.0, "y": 125.0 },
+          "position": {
+            "x": 150.0,
+            "y": 125.0
+          },
           "button": 0
         },
         "tick": 3,
@@ -41,26 +54,34 @@
       }
     ]
   },
-  "start_entity_collection": {
-    "entity_memory_pool_size": 2,
-    "entities": [
-      {
-        "index": 0,
-        "c_user_interface": {
-          "ui_name": "button_ui",
-          "start_visible": true,
-          "root_ui_element": {
-            "base_data": {
-              "position": { "x": 100, "y": 100 },
-              "size": { "x": 100, "y": 50 },
-              "children_active": false,
-              "children": [],
-              "layout": "Horizontal",
-              "spacing_strategy": "None"
+  "start_data_collection": {
+    "entity_collection": {
+      "entity_memory_pool_size": 2,
+      "entities": [
+        {
+          "index": 0,
+          "c_user_interface": {
+            "ui_name": "button_ui",
+            "start_visible": true,
+            "root_ui_element": {
+              "base_data": {
+                "position": {
+                  "x": 100,
+                  "y": 100
+                },
+                "size": {
+                  "x": 100,
+                  "y": 50
+                },
+                "children_active": false,
+                "children": [],
+                "layout": "Horizontal",
+                "spacing_strategy": "None"
+              }
             }
           }
         }
-      }
-    ]
+      ]
+    }
   }
 }

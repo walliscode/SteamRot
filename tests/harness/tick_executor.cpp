@@ -7,11 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "tick_executor.h"
-#include "FlatbuffersConfigurator.h"
 #include "console_output.h"
-#include "entity_memory_pool_matchers.h"
-#include "event_bus_conversion.h"
-#include "event_matchers.h"
 #include "event_simulation.h"
 #include "input_simulation.h"
 #include "simulation_runner.h"
@@ -34,31 +30,13 @@ CompareTickSnapshot(uint32_t tick, const TestDataConfig *config,
   for (const TickSnapshot *snapshot : *config->tick_snapshots()) {
     if (snapshot && snapshot->tick() == tick) {
       // Found snapshot for this tick
-      // Removed console output - let matchers handle formatting
 
-      // Validate snapshot has entity_collection
-      if (!snapshot->entity_collection()) {
+      // Validate snapshot has data_collection
+      if (!snapshot->data_collection()) {
         return std::unexpected(FailInfo(
             FailMode::NullPointer,
-            std::format("Snapshot at tick {} missing entity_collection", tick)));
+            std::format("Snapshot at tick {} missing data_collection", tick)));
       }
-
-      // Create expected pool from snapshot
-      EntityMemoryPool expected_pool;
-
-      // Configure expected pool from snapshot's entity_collection
-      FlatbuffersConfigurator configurator(
-          fixture.GetGameResources().event_handler);
-      auto configure_result = configurator.ConfigureEntitiesFromCollection(
-          expected_pool, snapshot->entity_collection());
-
-      if (!configure_result.has_value()) {
-        return std::unexpected(configure_result.error());
-      }
-
-      // Get actual pool from fixture
-      const EntityMemoryPool &actual_pool =
-          fixture.GetEntityManager().GetEntityMemoryPool();
 
       // Build test context with tick information
       TestContext context;
@@ -74,40 +52,18 @@ CompareTickSnapshot(uint32_t tick, const TestDataConfig *config,
       }
 
       // Get expected_to_pass from test metadata (default true)
+      // Note: Tick snapshots typically always expect to pass
       bool expected_to_pass = true;
       if (config->metadata()) {
         expected_to_pass = config->metadata()->expected_to_pass();
       }
 
-      // Use Catch2 matchers - they will format and display only on failure
-      if (expected_to_pass) {
-        REQUIRE_THAT(actual_pool, EqualsEntityMemoryPool(expected_pool, context));
-      } else {
-        REQUIRE_THAT(actual_pool, !EqualsEntityMemoryPool(expected_pool, context));
-      }
-
-      // Compare EventBus if present in snapshot
-      if (snapshot->event_bus()) {
-        // Convert EventBusData to EventBus
-        auto expected_event_bus_result =
-            event::conversion::ConvertEventBusDataToEventBus(snapshot->event_bus());
-
-        if (!expected_event_bus_result.has_value()) {
-          return std::unexpected(expected_event_bus_result.error());
-        }
-
-        EventBus expected_event_bus = expected_event_bus_result.value();
-
-        // Get actual event bus from fixture
-        const EventBus &actual_event_bus =
-            fixture.GetGameResources().event_handler.GetGlobalEventBus();
-
-        // Use Catch2 matchers - they will format and display only on failure
-        if (expected_to_pass) {
-          REQUIRE_THAT(actual_event_bus, EqualsEventBus(expected_event_bus, context));
-        } else {
-          REQUIRE_THAT(actual_event_bus, !EqualsEventBus(expected_event_bus, context));
-        }
+      // Use RunDataStructComparisonTest to compare all data structures
+      auto comparison_result = RunDataStructComparisonTest(
+          snapshot->data_collection(), fixture, context, expected_to_pass);
+      
+      if (!comparison_result.has_value()) {
+        return std::unexpected(comparison_result.error());
       }
 
       // Only one snapshot per tick expected, so break after finding it
@@ -139,8 +95,6 @@ ExecuteSingleTick(uint32_t tick, const TestDataConfig *config,
     return std::unexpected(
         FailInfo(FailMode::NullPointer, "TestDataConfig is null"));
   }
-
-  // Removed console output - let matchers handle formatting
 
   // 1. Execute inputs scheduled for this tick
   if (config->input_sequence()) {
@@ -189,8 +143,6 @@ ExecuteSingleTick(uint32_t tick, const TestDataConfig *config,
   // 6. Tick the global event bus
   fixture.GetGameResources().event_handler.TickGlobalEventBus();
 
-  // Removed console output - let Catch2 handle success messages
-
   return std::monostate{};
 }
 
@@ -207,20 +159,14 @@ ExecuteTickBasedTest(const TestDataConfig *config, TestFixture &fixture) {
   // Determine number of ticks to execute
   uint32_t num_ticks = DetermineNumTicks(config);
 
-  // Removed console output - let Catch2 control verbosity
-
   // Execute each tick in sequence (1-based to match game loop)
   for (uint32_t tick = 1; tick <= num_ticks; ++tick) {
-    // Removed console output - let matchers handle formatting
-    
     auto tick_result = ExecuteSingleTick(tick, config, fixture);
     if (!tick_result.has_value()) {
       console::PrintError("Tick execution failed", tick);
       return std::unexpected(tick_result.error());
     }
   }
-
-  // Removed console output - let Catch2 handle success messages
 
   return std::monostate{};
 }

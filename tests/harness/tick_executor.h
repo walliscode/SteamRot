@@ -19,11 +19,11 @@
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
-/// @brief Compare actual entity state with tick snapshot if present
+/// @brief Compare actual state with tick snapshot if present
 ///
 /// Checks if a snapshot exists for the given tick number. If found,
-/// creates an EntityMemoryPool from the snapshot's entity_collection
-/// and compares it with the actual pool.
+/// uses RunDataStructComparisonTest to compare actual state with expected
+/// state from the snapshot's data_collection.
 ///
 /// Note: Tick numbering is 1-based. The setup phase (TestFixture::Initialize)
 /// occurs before tick 1. The first game loop tick is tick 1.
@@ -84,7 +84,7 @@ uint32_t DetermineNumTicks(const TestDataConfig *config);
 /// 2. Execute events scheduled for this tick
 /// 3. Process event waiting room
 /// 4. Execute simulation steps scheduled for this tick
-/// 5. Compare tick snapshot if present
+/// 5. Compare tick snapshot if present (using RunDataStructComparisonTest)
 /// 6. Tick the global event bus
 ///
 /// @param config Test data configuration

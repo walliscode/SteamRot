@@ -2,31 +2,13 @@
   "metadata": {
     "test_name": "ui_collision_basic",
     "description": "Basic UICollisionLogic test - detects mouse over a simple UI panel element",
-    "tags": ["unit", "logic", "UICollisionLogic"],
+    "tags": [
+      "unit",
+      "logic",
+      "UICollisionLogic"
+    ],
     "expected_to_pass": true,
     "version": 1
-  },
-  "start_entity_collection": {
-    "entity_memory_pool_size": 3,
-    "entities": [
-      {
-        "index": 0,
-        "c_user_interface": {
-          "ui_name": "test_panel",
-          "start_visible": true,
-          "root_ui_element": {
-            "base_data": {
-              "position": { "x": 100, "y": 100 },
-              "size": { "x": 200, "y": 50 },
-              "children_active": false,
-              "children": [],
-              "layout": "Horizontal",
-              "spacing_strategy": "None"
-            }
-          }
-        }
-      }
-    ]
   },
   "simulation_data": {
     "description": "Execute collision detection with mouse at (150, 125) - inside panel bounds",
@@ -39,26 +21,64 @@
       }
     ]
   },
-  "expected_entity_collection": {
-    "entity_memory_pool_size": 3,
-    "entities": [
-      {
-        "index": 0,
-        "c_user_interface": {
-          "ui_name": "test_panel",
-          "start_visible": true,
-          "root_ui_element": {
-            "base_data": {
-              "position": { "x": 100, "y": 100 },
-              "size": { "x": 200, "y": 50 },
-              "children_active": false,
-              "children": [],
-              "layout": "Horizontal",
-              "spacing_strategy": "None"
+  "start_data_collection": {
+    "entity_collection": {
+      "entity_memory_pool_size": 3,
+      "entities": [
+        {
+          "index": 0,
+          "c_user_interface": {
+            "ui_name": "test_panel",
+            "start_visible": true,
+            "root_ui_element": {
+              "base_data": {
+                "position": {
+                  "x": 100,
+                  "y": 100
+                },
+                "size": {
+                  "x": 200,
+                  "y": 50
+                },
+                "children_active": false,
+                "children": [],
+                "layout": "Horizontal",
+                "spacing_strategy": "None"
+              }
             }
           }
         }
-      }
-    ]
+      ]
+    }
+  },
+  "expected_data_collection": {
+    "entity_collection": {
+      "entity_memory_pool_size": 3,
+      "entities": [
+        {
+          "index": 0,
+          "c_user_interface": {
+            "ui_name": "test_panel",
+            "start_visible": true,
+            "root_ui_element": {
+              "base_data": {
+                "position": {
+                  "x": 100,
+                  "y": 100
+                },
+                "size": {
+                  "x": 200,
+                  "y": 50
+                },
+                "children_active": false,
+                "children": [],
+                "layout": "Horizontal",
+                "spacing_strategy": "None"
+              }
+            }
+          }
+        }
+      ]
+    }
   }
 }

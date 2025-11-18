@@ -2,31 +2,13 @@
   "metadata": {
     "test_name": "sample_simulation_test",
     "description": "Sample test data demonstrating simulation functionality with both functions and Logic classes",
-    "tags": ["unit", "harness", "simulation"],
+    "tags": [
+      "unit",
+      "harness",
+      "simulation"
+    ],
     "expected_to_pass": true,
     "version": 1
-  },
-  "start_entity_collection": {
-    "entity_memory_pool_size": 3,
-    "entities": [
-      {
-        "index": 0,
-        "c_user_interface": {
-          "ui_name": "test_ui",
-          "start_visible": true,
-          "root_ui_element": {
-            "base_data": {
-              "position": { "x": 50, "y": 100 },
-              "size": { "x": 200, "y": 150 },
-              "children_active": false,
-              "children": [],
-              "layout": "Horizontal",
-              "spacing_strategy": "None"
-            }
-          }
-        }
-      }
-    ]
   },
   "simulation_data": {
     "description": "Execute UI collision detection, then render logic, then action processing",
@@ -51,26 +33,64 @@
       }
     ]
   },
-  "expected_entity_collection": {
-    "entity_memory_pool_size": 3,
-    "entities": [
-      {
-        "index": 0,
-        "c_user_interface": {
-          "ui_name": "test_ui",
-          "start_visible": true,
-          "root_ui_element": {
-            "base_data": {
-              "position": { "x": 50, "y": 100 },
-              "size": { "x": 200, "y": 150 },
-              "children_active": false,
-              "children": [],
-              "layout": "Horizontal",
-              "spacing_strategy": "None"
+  "start_data_collection": {
+    "entity_collection": {
+      "entity_memory_pool_size": 3,
+      "entities": [
+        {
+          "index": 0,
+          "c_user_interface": {
+            "ui_name": "test_ui",
+            "start_visible": true,
+            "root_ui_element": {
+              "base_data": {
+                "position": {
+                  "x": 50,
+                  "y": 100
+                },
+                "size": {
+                  "x": 200,
+                  "y": 150
+                },
+                "children_active": false,
+                "children": [],
+                "layout": "Horizontal",
+                "spacing_strategy": "None"
+              }
             }
           }
         }
-      }
-    ]
+      ]
+    }
+  },
+  "expected_data_collection": {
+    "entity_collection": {
+      "entity_memory_pool_size": 3,
+      "entities": [
+        {
+          "index": 0,
+          "c_user_interface": {
+            "ui_name": "test_ui",
+            "start_visible": true,
+            "root_ui_element": {
+              "base_data": {
+                "position": {
+                  "x": 50,
+                  "y": 100
+                },
+                "size": {
+                  "x": 200,
+                  "y": 150
+                },
+                "children_active": false,
+                "children": [],
+                "layout": "Horizontal",
+                "spacing_strategy": "None"
+              }
+            }
+          }
+        }
+      ]
+    }
   }
 }

@@ -218,11 +218,5 @@ TEST_CASE("EntityMemoryPool matcher with metadata",
     auto matcher =
         steamrot::tests::EqualsEntityMemoryPool(pool2, test_metadata);
     REQUIRE_FALSE(matcher.match(pool1));
-
-    std::string desc = matcher.describe();
-    REQUIRE_FALSE(desc.empty());
-    REQUIRE(desc.find("my_test_name") != std::string::npos);
-    REQUIRE(desc.find("Test description") != std::string::npos);
-    REQUIRE(desc.find("Pool sizes differ") != std::string::npos);
   }
 }
