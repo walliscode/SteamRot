@@ -11,13 +11,15 @@
 #include "cgrimoire_machina_matchers.h"
 #include "cmachina_form_matchers.h"
 #include "cmeta_matchers.h"
+#include "conmat.h"
 #include "containers.h"
 #include "cui_state_matchers.h"
 #include "cuser_interface_matchers.h"
 #include "entity_memory.h"
+#include "test_context.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
-#include <ostream>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -37,7 +39,8 @@ private:
   const EntityMemoryPool &m_expected;
   mutable std::string m_mismatch_description;
   mutable bool do_components_match{true};
-  std::string m_test_metadata;
+  std::string m_test_metadata;          // Legacy support
+  std::optional<TestContext> m_context; // New context-based approach
   ////////////////////////////////////////////////////////////
   /// @brief Helper to compare component vectors
   ///
@@ -64,7 +67,7 @@ private:
       CMetaEqualsMatcher matcher(expected_vec[i]);
       if (!matcher.match(actual_vec[i])) {
         // pass through the mismatch description from CMetaEqualsMatcher
-        oss << "CMeta at index " << i << ": " << matcher.describe() << "; ";
+        oss << matcher.describe() << "\n";
 
         // switch flag to false
         do_components_match = false;
@@ -82,8 +85,7 @@ private:
       if (!matcher.match(actual_vec[i])) {
         // pass through the mismatch description from
         // CUserInterfaceEqualsMatcher
-        oss << "CUserInterface at index " << i << ": " << matcher.describe()
-            << "; ";
+        oss << matcher.describe() << "\n";
         // switch flag to false
         do_components_match = false;
       }
@@ -99,9 +101,7 @@ private:
       if (!matcher.match(actual_vec[i])) {
 
         // pass through the mismatch description from CMachinaFormEqualsMatcher
-        oss << "CMachinaForm at index " << i << ": " << matcher.describe()
-            << "; ";
-
+        oss << matcher.describe() << "\n";
         // switch flag to false
         do_components_match = false;
       }
@@ -118,8 +118,7 @@ private:
       if (!matcher.match(actual_vec[i])) {
         // pass through the mismatch description from
         // CGrimoireMachinaEqualsMatcher
-        oss << "CGrimoireMachina at index " << i << ": " << matcher.describe()
-            << "; ";
+        oss << matcher.describe() << "\n";
         // switch flag to false
         do_components_match = false;
       }
@@ -135,7 +134,7 @@ private:
       if (!matcher.match(actual_vec[i])) {
 
         // pass through the mismatch description from CUIStateEqualsMatcher
-        oss << "CUIState at index " << i << ": " << matcher.describe() << "; ";
+        oss << matcher.describe() << "\n";
 
         // switch flag to false
         do_components_match = false;
@@ -175,17 +174,28 @@ private:
 
 public:
   explicit EntityMemoryPoolEqualsMatcher(const EntityMemoryPool &expected)
-      : m_expected(expected), m_test_metadata("") {}
+      : m_expected(expected), m_test_metadata(""), m_context(std::nullopt) {}
 
   ////////////////////////////////////////////////////////////
-  /// @brief Constructor with test metadata
+  /// @brief Constructor with test metadata (legacy)
   ///
   /// @param expected The expected EntityMemoryPool
   /// @param test_metadata Optional test metadata (e.g., test name)
   ////////////////////////////////////////////////////////////
   EntityMemoryPoolEqualsMatcher(const EntityMemoryPool &expected,
                                 const std::string &test_metadata)
-      : m_expected(expected), m_test_metadata(test_metadata) {}
+      : m_expected(expected), m_test_metadata(test_metadata),
+        m_context(std::nullopt) {}
+
+  ////////////////////////////////////////////////////////////
+  /// @brief Constructor with TestContext
+  ///
+  /// @param expected The expected EntityMemoryPool
+  /// @param context Test context with metadata and tick information
+  ////////////////////////////////////////////////////////////
+  EntityMemoryPoolEqualsMatcher(const EntityMemoryPool &expected,
+                                const TestContext &context)
+      : m_expected(expected), m_test_metadata(""), m_context(context) {}
 
   ////////////////////////////////////////////////////////////
   /// @brief Check if the EntityMemoryPools match
@@ -202,8 +212,17 @@ public:
     size_t expected_size = entity::memory::GetMemoryPoolSize(m_expected);
 
     if (actual_size != expected_size) {
-      oss << "Pool sizes differ: actual =" << actual_size
-          << ", expected =" << expected_size << "; ";
+
+      oss << conmat::Divider("-", 40) << "\n";
+      oss << conmat::TestFailed() << "EntityMemoryPool Size Mismatch:" << "\n";
+      oss << "\t"
+          << "actual size = "
+          << conmat::Colorize(actual_size, conmat::Color::Red) << "\n";
+      oss << "\t"
+          << "expected size = "
+          << conmat::Colorize(expected_size, conmat::Color::Blue) << "\n";
+      oss << conmat::Divider("-", 40) << "\n";
+
       m_mismatch_description = oss.str();
       return false;
     }
@@ -219,29 +238,31 @@ public:
   }
 
   ////////////////////////////////////////////////////////////
-  /// @brief Describe the matcher
+  /// @brief Describe the matcher with formatted, hierarchical output
   ///
-  /// @return Description string
+  /// @return Description string with visual formatting (no ANSI codes)
   ////////////////////////////////////////////////////////////
   std::string describe() const override {
-    std::string description = "EntityMemoryPool mismatch";
-    
-    // Add test metadata if available
-    if (!m_test_metadata.empty()) {
-      description += " [" + m_test_metadata + "]";
-    }
-    
-    description += ": " + m_mismatch_description;
-    return description;
-  }
 
-  ////////////////////////////////////////////////////////////
-  /// @brief Get the mismatch description
-  ///
-  /// @return Mismatch description string
-  ////////////////////////////////////////////////////////////
-  std::string get_mismatch_description() const {
-    return m_mismatch_description;
+    if (m_mismatch_description.empty()) {
+
+      std::ostringstream oss;
+      oss << conmat::Divider("=", 40) << "\n";
+      oss << conmat::Colorize("[PASSED] ", conmat::Color::Green)
+          << "EntityMemoryPool Match" << "\n";
+      oss << conmat::Divider("=", 40) << "\n";
+      return oss.str();
+    } else {
+
+      std::ostringstream oss;
+      oss << conmat::Divider("=", 40) << "\n";
+      oss << conmat::Colorize("[FAILED] ", conmat::Color::Red)
+          << "EntityMemoryPool Match " << "\n";
+      oss << m_mismatch_description << "\n";
+      oss << conmat::Divider("=", 40) << "\n";
+
+      return oss.str();
+    }
   }
 };
 
@@ -267,6 +288,19 @@ inline EntityMemoryPoolEqualsMatcher
 EqualsEntityMemoryPool(const EntityMemoryPool &expected,
                        const std::string &test_metadata) {
   return EntityMemoryPoolEqualsMatcher(expected, test_metadata);
+}
+
+/////////////////////////////////////////////////
+/// @brief Helper function to create EntityMemoryPoolEqualsMatcher with context
+///
+/// @param expected The expected EntityMemoryPool
+/// @param context Test context with metadata and tick information
+/// @return EntityMemoryPoolEqualsMatcher instance
+/////////////////////////////////////////////////
+inline EntityMemoryPoolEqualsMatcher
+EqualsEntityMemoryPool(const EntityMemoryPool &expected,
+                       const TestContext &context) {
+  return EntityMemoryPoolEqualsMatcher(expected, context);
 }
 
 } // namespace steamrot::tests

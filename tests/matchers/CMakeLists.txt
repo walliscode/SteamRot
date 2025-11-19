@@ -15,6 +15,8 @@ INTERFACE
   entity
   user_interface
   events
+  test_harness
+  conmat
 )
 
 # Test executable for component matchers

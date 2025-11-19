@@ -21,6 +21,7 @@ target_link_libraries(test_harness
   scenes
   logic
   Catch2::Catch2
+  conmat
 )
 
 # Create test executable for harness
@@ -36,9 +37,10 @@ target_link_libraries(test_harness_tests
   PRIVATE
   test_harness
   Catch2::Catch2WithMain
+  reporters_objects
 )
 
 catch_discover_tests(test_harness_tests
   TEST_PREFIX "harness."
-  PROPERTIES LABELS "unit"
+  REPORTER "harness"
 )

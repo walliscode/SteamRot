@@ -14,6 +14,7 @@
 #include "DropDownItemElement.h"
 #include "DropDownListElement.h"
 #include "UIElement.h"
+#include "conmat.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
 #include <cmath>
@@ -242,16 +243,23 @@ private:
   /// @return true if all fields match
   /////////////////////////////////////////////////
   bool CompareUIElements(const UIElement &actual, const UIElement &expected,
-                         std::ostringstream &oss, int depth = 0) const {
+                         std::ostringstream &output_oss, int depth = 0) const {
+
+    std::ostringstream oss;
     std::string prefix =
         depth > 0 ? "child[depth=" + std::to_string(depth) + "]." : "";
 
     // Compare position
     if (!VectorsEqual(actual.position, expected.position)) {
-      oss << prefix << "position: actual=(" << actual.position.x << ","
-          << actual.position.y << "), expected=(" << expected.position.x << ","
-          << expected.position.y << "); ";
-      return false;
+      oss << prefix << "position:" << "\n";
+      oss << "actual = ("
+          << conmat::Colorize(actual.position.x, conmat::Color::Red) << ","
+          << conmat::Colorize(actual.position.y, conmat::Color::Red) << ")"
+          << "\n";
+      oss << "expected = ("
+          << conmat::Colorize(expected.position.x, conmat::Color::Blue) << ","
+          << conmat::Colorize(expected.position.y, conmat::Color::Blue) << ")"
+          << "\n";
     }
 
     // Compare size
@@ -259,21 +267,17 @@ private:
       oss << prefix << "size: actual=(" << actual.size.x << "," << actual.size.y
           << "), expected=(" << expected.size.x << "," << expected.size.y
           << "); ";
-      return false;
     }
 
     // Compare is_mouse_over
     if (actual.is_mouse_over != expected.is_mouse_over) {
       oss << prefix << "is_mouse_over: actual=" << actual.is_mouse_over
           << ", expected=" << expected.is_mouse_over << "; ";
-      return false;
     }
 
-    // Compare children_active
     if (actual.children_active != expected.children_active) {
       oss << prefix << "children_active: actual=" << actual.children_active
           << ", expected=" << expected.children_active << "; ";
-      return false;
     }
 
     // Compare spacing_strategy
@@ -282,39 +286,38 @@ private:
           << static_cast<int>(actual.spacing_strategy)
           << ", expected=" << static_cast<int>(expected.spacing_strategy)
           << "; ";
-      return false;
     }
 
     // Compare layout
     if (actual.layout != expected.layout) {
       oss << prefix << "layout: actual=" << static_cast<int>(actual.layout)
           << ", expected=" << static_cast<int>(expected.layout) << "; ";
-      return false;
     }
 
     // Compare subscription
     if (!SubscriptionsEqual(actual.subscription, expected.subscription)) {
       oss << prefix << "subscription differs; ";
-      return false;
     }
 
     // Compare response_event
     if (!ResponseEventsEqual(actual.response_event, expected.response_event)) {
       oss << prefix << "response_event differs; ";
-      return false;
     }
 
     // Compare derived type fields
     if (!CompareDerivedFields(actual, expected, oss)) {
-      return false;
     }
 
     // Recursively compare children
     if (!CompareChildren(actual, expected, oss, depth)) {
-      return false;
     }
 
-    return true;
+    if (oss.str().empty()) {
+      return true;
+    } else {
+      output_oss << oss.str();
+      return false;
+    }
   }
 
 public:
@@ -343,10 +346,25 @@ public:
   /// @return Description string
   ////////////////////////////////////////////////////////////
   std::string describe() const override {
+
+    // if mismatch description is empty then we can assume the test passed
     if (m_mismatch_description.empty()) {
-      return "equals UIElement";
+
+      std::ostringstream oss;
+      oss << conmat::Divider("-", 40) << "\n";
+      oss << conmat::TestPassed() << "UIElement Match" << "\n";
+      oss << conmat::Divider("-", 40) << "\n";
+      return oss.str();
+    } else {
+
+      std::ostringstream oss;
+
+      oss << conmat::TestFailed() << "UIElement Match: " << "\n";
+      oss << m_mismatch_description << "\n";
+      oss << conmat::Divider("-", 40) << "\n";
+
+      return oss.str();
     }
-    return "UIElement mismatch: " + m_mismatch_description;
   }
 };
 

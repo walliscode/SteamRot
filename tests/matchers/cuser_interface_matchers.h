@@ -9,6 +9,7 @@
 #pragma once
 
 #include "CUserInterface.h"
+#include "conmat.h"
 #include "ui_element_matchers.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
@@ -35,18 +36,32 @@ public:
     std::ostringstream oss;
 
     if (actual.m_active != m_expected.m_active) {
-      oss << "m_active: actual=" << actual.m_active
-          << ", expected=" << m_expected.m_active << "; ";
+
+      oss << "\t" << conmat::TestFailed() << "m_active:" << "\n";
+      oss << "\t\t" << "actual = "
+          << conmat::Colorize(actual.m_active, conmat::Color::Red) << "\n";
+      oss << "\t\t" << "expected = "
+          << conmat::Colorize(m_expected.m_active, conmat::Color::Blue) << "\n";
     }
 
     if (actual.m_name != m_expected.m_name) {
-      oss << "m_name: actual='" << actual.m_name << "', expected='"
-          << m_expected.m_name << "'; ";
+      oss << "\t" << conmat::TestFailed() << "m_name:" << "\n";
+      oss << "\t\t"
+          << "actual = " << conmat::Colorize(actual.m_name, conmat::Color::Red)
+          << "\n";
+      oss << "\t\t" << "expected = "
+          << conmat::Colorize(m_expected.m_name, conmat::Color::Blue) << "\n";
     }
 
     if (actual.m_UI_visible != m_expected.m_UI_visible) {
-      oss << "m_UI_visible: actual=" << actual.m_UI_visible
-          << ", expected=" << m_expected.m_UI_visible << "; ";
+      oss << "\t" << conmat::TestFailed() << "m_UI_visible:" << "\n";
+      oss << "\t\t"
+          << "actual = "
+          << conmat::Colorize(actual.m_UI_visible, conmat::Color::Red) << "\n";
+      oss << "\t\t"
+          << "expected = "
+          << conmat::Colorize(m_expected.m_UI_visible, conmat::Color::Blue)
+          << "\n";
     }
 
     // Check root element pointers - both null or both non-null
@@ -56,12 +71,34 @@ public:
                           m_expected.m_root_element != nullptr);
 
     if (!both_null && !both_non_null) {
-      oss << "m_root_element: one is null, other is not; ";
+      oss << "\t" << conmat::TestFailed() << "m_root_element:" << "\n";
+      if (actual.m_root_element == nullptr) {
+        oss << "\t\t"
+            << "actual = " << conmat::Colorize("nullptr", conmat::Color::Red)
+            << "\n";
+        oss << "\t\t"
+            << "expected = "
+            << conmat::Colorize("non-nullptr", conmat::Color::Blue) << "\n";
+      } else {
+        oss << "\t\t"
+            << "actual = "
+            << conmat::Colorize("non-nullptr", conmat::Color::Red) << "\n";
+        oss << "\t\t"
+            << "expected = " << conmat::Colorize("nullptr", conmat::Color::Blue)
+            << "\n";
+      }
     } else if (both_non_null) {
       // Both are non-null, use UIElement matcher to compare them recursively
       UIElementEqualsMatcher element_matcher(*m_expected.m_root_element);
       if (!element_matcher.match(*actual.m_root_element)) {
-        oss << "m_root_element: " << element_matcher.describe();
+
+        oss << "  " << conmat::TestFailed() << "m_root_element differences:"
+            << "\n";
+        std::istringstream element_diff_stream(element_matcher.describe());
+        std::string line;
+        while (std::getline(element_diff_stream, line)) {
+          oss << line << "\n";
+        }
       }
     }
 
@@ -70,14 +107,25 @@ public:
   }
 
   std::string describe() const override {
+
+    // if mismatch description is empty then we can assume the test passed
     if (m_mismatch_description.empty()) {
+
       std::ostringstream oss;
-      oss << "equals CUserInterface(m_active=" << m_expected.m_active
-          << ", m_name='" << m_expected.m_name << "', m_UI_visible=" 
-          << m_expected.m_UI_visible << ")";
+      oss << conmat::Divider("-", 40) << "\n";
+      oss << conmat::TestPassed() << "CUserInterFace Match" << "\n";
+      oss << conmat::Divider("-", 40) << "\n";
+      return oss.str();
+    } else {
+
+      std::ostringstream oss;
+      oss << conmat::Divider("-", 40) << "\n";
+      oss << conmat::TestFailed() << "CUserInterFace Match: " << "\n";
+      oss << m_mismatch_description << "\n";
+      oss << conmat::Divider("-", 40) << "\n";
+
       return oss.str();
     }
-    return "CUserInterface mismatch: " + m_mismatch_description;
   }
 };
 

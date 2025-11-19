@@ -48,6 +48,8 @@ harness/
 ├── tick_executor.test.cpp         # Tick execution tests
 ├── TestFixture.h                  # Resource management for tests
 ├── TestFixture.cpp                # Implementation
+├── console_output.h               # Formatted console output utilities
+├── CONSOLE_OUTPUT_EXAMPLES.md     # Console output examples
 ├── CMakeLists.txt                 # Build configuration
 ├── README.md                      # This file
 └── data/                          # Sample test data files
@@ -61,6 +63,108 @@ harness/
     ├── sample_input_event_simulation.test_data.json
     └── sample_tick_based_execution.test_data.json
 ```
+
+## Formatted Console Output in Matchers
+
+The test harness uses **Catch2 matchers** with formatted output for test comparisons. This approach allows Catch2 to control when output is displayed (only on failures) while providing rich, formatted error messages.
+
+### Formatted Matcher Output
+
+When tests fail, matchers display:
+- **✗ Error indicator** - Clear failure marker
+- **Context information** - Test name, description, tick number
+- **Detailed mismatch** - Specific differences between actual and expected
+
+### Test Context
+
+The `TestContext` struct enriches matcher output with:
+- `test_name` - Name of the test being run
+- `description` - Human-readable test description
+- `current_tick` - Current tick number (for tick-based tests)
+- `total_ticks` - Total number of ticks (for progress context)
+
+Example matcher usage:
+```cpp
+TestContext context;
+context.test_name = "my_test";
+context.current_tick = 5;
+context.total_ticks = 10;
+
+// Matchers format output with context
+REQUIRE_THAT(actual_pool, EqualsEntityMemoryPool(expected_pool, context));
+```
+
+### Output Verbosity Control
+
+**Catch2 controls verbosity**, not the test harness:
+- Use `--success` or `-s` flag to see all test output
+- Use `--reporter` to change output format
+- By default, only failures are shown
+
+Example:
+```bash
+# Show only failures (default)
+ctest --preset Debug
+
+# Show all tests including successes
+ctest --preset Debug --output-on-failure --verbose
+
+# Catch2 verbose mode
+./test_executable --success
+```
+
+### Color Control
+
+Colors are enabled by default and can be disabled by setting the `NO_COLOR` or `STEAMROT_NO_COLOR` environment variable. This follows the [NO_COLOR standard](https://no-color.org/).
+
+See `CONSOLE_OUTPUT_EXAMPLES.md` for detailed examples of the formatted output.
+
+### Console Output Functions
+
+Error logging functions available in `console_output.h` (used for debugging, not test output):
+
+```cpp
+#include "console_output.h"
+
+// Check if colors are enabled
+bool colors = steamrot::tests::console::IsColorEnabled();
+
+// Error message with optional tick number (red with cyan tick)
+// Used for logging errors during test execution
+steamrot::tests::console::PrintError("Operation failed", 3);
+// Output: ✗ [Tick 3] Operation failed
+```
+
+### Matcher Functions
+
+Matchers with context support (available in respective matcher headers):
+
+```cpp
+#include "entity_memory_pool_matchers.h"
+#include "event_matchers.h"
+#include "test_context.h"
+
+TestContext context;
+context.test_name = "sample_test";
+context.current_tick = 3;
+context.total_ticks = 10;
+
+// Entity memory pool comparison with context
+REQUIRE_THAT(actual_pool, EqualsEntityMemoryPool(expected_pool, context));
+
+// Event bus comparison with context
+REQUIRE_THAT(actual_bus, EqualsEventBus(expected_bus, context));
+```
+steamrot::tests::console::PrintTestStart("my_test_name");
+// Output: Box-drawn banner with test name
+
+// Tick progress indicator (magenta arrow, blue numbers)
+// Only shown if STEAMROT_VERBOSE_TESTS=1
+steamrot::tests::console::PrintTickProgress(3, 10);
+// Output: ➤ Executing Tick 3 of 10
+```
+
+All console output functions automatically include newlines for proper spacing, support optional tick numbers for context, and use colors by default (unless disabled via environment variable).
 
 ## Usage
 

@@ -9,6 +9,7 @@ add_subdirectory(matchers)
 
 # Test harness - utilities for data-driven testing
 add_subdirectory(harness)
+add_subdirectory(reporters)
 
 # Test structure organized by test type
 add_subdirectory(unit)
