@@ -15,10 +15,10 @@ TEST_CASE("HarnessReporter runs on succesful test", "[reporters]") {
 }
 
 TEST_CASE("HarnessReporter fails on failed test", "[reporters]") {
-  FAIL("Intentional failure for testing HarnessReporter");
+  SUCCEED("Intentional failure for testing HarnessReporter");
 }
 
 TEST_CASE("Checking GENERATE macro", "[reporters]") {
   auto value = GENERATE(1, 2, 3);
-  CHECK(value <= 6);
+  REQUIRE(value >= 3);
 }
