@@ -1,0 +1,213 @@
+diff --git a/README.md b/README.md
+index 285e702..4ad3077 100644
+--- a/README.md
++++ b/README.md
+@@ -56,6 +56,37 @@ std::cout << Stylize("Italic text", Style::Italic) << std::endl;
+ std::cout << Stylize("Underline text", Style::Underline) << std::endl;
+ ```
+ 
++### Formatting Any Streamable Type
++
++The library now supports formatting any type that can be used with `std::cout <<`:
++
++```cpp
++// Format integers
++std::cout << Colorize(42, Color::Green) << std::endl;
++
++// Format booleans
++std::cout << Colorize(true, Color::Blue) << std::endl;
++
++// Format floating-point numbers
++std::cout << Colorize(3.14159, Color::Yellow) << std::endl;
++std::cout << Stylize(2.71828f, Style::Bold) << std::endl;
++
++// Format characters
++std::cout << Colorize('X', Color::Magenta) << std::endl;
++
++// Format with full options
++FormatOptions opts(Color::Red, Style::Bold);
++std::cout << Format(999, opts) << std::endl;
++```
++
++All functions (`Colorize`, `Stylize`, and `Format`) work with any type that supports the stream insertion operator (`<<`), including:
++- Integers (`int`, `long`, `short`, etc.)
++- Floating-point numbers (`float`, `double`)
++- Booleans (`bool`)
++- Characters (`char`)
++- Strings (`std::string`, `const char*`, `std::string_view`)
++- Any custom type with an overloaded `operator<<`
++
+ ### Combined Formatting
+ 
+ ```cpp
+@@ -112,14 +143,27 @@ std::string plain = StripAnsi(Colorize("colored", Color::Red));
+ 
+ ### Functions
+ 
+-- `Format(text, options)` - Format text with full options
+-- `Colorize(text, color)` - Apply foreground color
+-- `Stylize(text, style)` - Apply text style
++All formatting functions accept both string types and any type that supports stream insertion (`<<`):
++
++- `Format(value, options)` - Format any streamable value with full options
++  - `std::string Format(std::string_view text, const FormatOptions &options = {})`
++  - `template<Streamable T> std::string Format(const T &value, const FormatOptions &options = {})`
++  
++- `Colorize(value, color)` - Apply foreground color to any streamable value
++  - `std::string Colorize(std::string_view text, Color color)`
++  - `template<Streamable T> std::string Colorize(const T &value, Color color)`
++  
++- `Stylize(value, style)` - Apply text style to any streamable value
++  - `std::string Stylize(std::string_view text, Style style)`
++  - `template<Streamable T> std::string Stylize(const T &value, Style style)`
++
+ - `Divider(symbol, width, options)` - Create divider line with custom symbol (runtime override)
+ - `Divider(width, options)` - Create divider line with CMake-configured default symbol
+ - `Sanitize(text)` - Remove control characters
+ - `StripAnsi(text)` - Remove ANSI escape codes
+ 
++**Note**: The template versions work with any type that can be streamed to `std::ostream`, including integers, floats, booleans, characters, and custom types with overloaded `operator<<`.
++
+ ### CMake Options
+ 
+ - `CONMAT_DEFAULT_DIVIDER_SYMBOL` - Configure the default symbol for Divider function (default: "=")
+diff --git a/src/conmat.h b/src/conmat.h
+index 439449e..91b5f76 100644
+--- a/src/conmat.h
++++ b/src/conmat.h
+@@ -1,7 +1,10 @@
+ #pragma once
+ 
++#include <concepts>
++#include <sstream>
+ #include <string>
+ #include <string_view>
++#include <type_traits>
+ 
+ namespace conmat {
+ 
+@@ -141,4 +144,61 @@ std::string TestPassed();
+ /////////////////////////////////////////////////
+ std::string TestFailed();
+ 
++////////////////////////////////////////////////////////////
++/// \brief Concept to check if a type is streamable to ostream
++///
++////////////////////////////////////////////////////////////
++template <typename T>
++concept Streamable = requires(std::ostream &os, const T &value) {
++  { os << value } -> std::convertible_to<std::ostream &>;
++};
++
++////////////////////////////////////////////////////////////
++/// \brief Format any streamable value with ANSI codes
++/// \tparam T Any type that can be streamed to std::ostream
++/// \param value The value to format
++/// \param options Format options (default: no formatting)
++/// \return Formatted string with ANSI codes
++///
++////////////////////////////////////////////////////////////
++template <Streamable T>
++  requires(!std::convertible_to<T, std::string_view>)
++std::string Format(const T &value, const FormatOptions &options = {}) {
++  std::ostringstream oss;
++  oss << value;
++  return Format(oss.str(), options);
++}
++
++////////////////////////////////////////////////////////////
++/// \brief Format any streamable value with just a foreground color
++/// \tparam T Any type that can be streamed to std::ostream
++/// \param value The value to format
++/// \param color The foreground color
++/// \return Formatted string with color
++///
++////////////////////////////////////////////////////////////
++template <Streamable T>
++  requires(!std::convertible_to<T, std::string_view>)
++std::string Colorize(const T &value, Color color) {
++  std::ostringstream oss;
++  oss << value;
++  return Colorize(oss.str(), color);
++}
++
++////////////////////////////////////////////////////////////
++/// \brief Format any streamable value with a style
++/// \tparam T Any type that can be streamed to std::ostream
++/// \param value The value to format
++/// \param style The text style
++/// \return Formatted string with style
++///
++////////////////////////////////////////////////////////////
++template <Streamable T>
++  requires(!std::convertible_to<T, std::string_view>)
++std::string Stylize(const T &value, Style style) {
++  std::ostringstream oss;
++  oss << value;
++  return Stylize(oss.str(), style);
++}
++
+ } // namespace conmat
+diff --git a/tests/test_conmat.cpp b/tests/test_conmat.cpp
+index ef8b04d..0f06cf1 100644
+--- a/tests/test_conmat.cpp
++++ b/tests/test_conmat.cpp
+@@ -156,6 +156,50 @@ void test_divider_runtime_override() {
+   std::cout << "✓ Divider runtime override test passed" << std::endl;
+ }
+ 
++void test_streamable_types() {
++  using namespace conmat;
++  
++  // Test with int
++  std::string int_result = Colorize(42, Color::Green);
++  assert(int_result.find("42") != std::string::npos);
++  assert(int_result.find("\033[32m") != std::string::npos);
++  assert(int_result.find("\033[0m") != std::string::npos);
++  
++  // Test with bool
++  std::string bool_result = Colorize(true, Color::Blue);
++  assert(bool_result.find("1") != std::string::npos || bool_result.find("true") != std::string::npos);
++  assert(bool_result.find("\033[34m") != std::string::npos);
++  
++  // Test with double
++  std::string double_result = Colorize(3.14159, Color::Yellow);
++  assert(double_result.find("3.14159") != std::string::npos);
++  assert(double_result.find("\033[33m") != std::string::npos);
++  
++  // Test with float
++  std::string float_result = Stylize(2.71828f, Style::Bold);
++  assert(float_result.find("2.71828") != std::string::npos);
++  assert(float_result.find("\033[1m") != std::string::npos);
++  
++  // Test with char
++  std::string char_result = Colorize('X', Color::Magenta);
++  assert(char_result.find("X") != std::string::npos);
++  assert(char_result.find("\033[35m") != std::string::npos);
++  
++  // Test with long
++  std::string long_result = Colorize(1234567890L, Color::Cyan);
++  assert(long_result.find("1234567890") != std::string::npos);
++  assert(long_result.find("\033[36m") != std::string::npos);
++  
++  // Test Format with int and FormatOptions
++  FormatOptions opts(Color::Red, Style::Bold);
++  std::string format_result = Format(999, opts);
++  assert(format_result.find("999") != std::string::npos);
++  assert(format_result.find("\033[31m") != std::string::npos);
++  assert(format_result.find("\033[1m") != std::string::npos);
++  
++  std::cout << "✓ Streamable types test passed" << std::endl;
++}
++
+ int main() {
+   std::cout << "Running conmat tests..." << std::endl << std::endl;
+   
+@@ -170,6 +214,7 @@ int main() {
+   test_empty_divider();
+   test_default_divider();
+   test_divider_runtime_override();
++  test_streamable_types();
+   
+   std::cout << std::endl << "All tests passed! ✓" << std::endl;
+   
