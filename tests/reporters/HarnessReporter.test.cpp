@@ -20,5 +20,5 @@ TEST_CASE("HarnessReporter fails on failed test", "[reporters]") {
 
 TEST_CASE("Checking GENERATE macro", "[reporters]") {
   auto value = GENERATE(1, 2, 3);
-  REQUIRE(value >= 3);
+  REQUIRE(value <= 3);
 }

@@ -75,4 +75,13 @@ struct IndexOf<T, std::tuple<U, Ts...>> {
 template <typename T, typename Tuple>
 constexpr size_t TupleTypeIndex = IndexOf<T, Tuple>::value;
 
+////////////////////////////////////////////////////////////
+/// @brief Helper to print a tuple to an ostream
+////////////////////////////////////////////////////////////
+template <typename... Args>
+std::ostream &operator<<(std::ostream &os, const std::tuple<Args...> &) {
+  // Output nothing (or a simple placeholder if you prefer)
+  return os;
+}
+
 }; // namespace steamrot
