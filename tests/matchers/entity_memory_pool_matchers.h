@@ -20,7 +20,6 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
 #include <optional>
-#include <ostream>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -68,7 +67,7 @@ private:
       CMetaEqualsMatcher matcher(expected_vec[i]);
       if (!matcher.match(actual_vec[i])) {
         // pass through the mismatch description from CMetaEqualsMatcher
-        oss << "CMeta at index " << i << ": " << matcher.describe() << "; ";
+        oss << matcher.describe() << "\n";
 
         // switch flag to false
         do_components_match = false;
@@ -86,8 +85,7 @@ private:
       if (!matcher.match(actual_vec[i])) {
         // pass through the mismatch description from
         // CUserInterfaceEqualsMatcher
-        oss << "CUserInterface at index " << i << ": " << matcher.describe()
-            << "; ";
+        oss << matcher.describe() << "\n";
         // switch flag to false
         do_components_match = false;
       }
@@ -103,9 +101,7 @@ private:
       if (!matcher.match(actual_vec[i])) {
 
         // pass through the mismatch description from CMachinaFormEqualsMatcher
-        oss << "CMachinaForm at index " << i << ": " << matcher.describe()
-            << "; ";
-
+        oss << matcher.describe() << "\n";
         // switch flag to false
         do_components_match = false;
       }
@@ -122,8 +118,7 @@ private:
       if (!matcher.match(actual_vec[i])) {
         // pass through the mismatch description from
         // CGrimoireMachinaEqualsMatcher
-        oss << "CGrimoireMachina at index " << i << ": " << matcher.describe()
-            << "; ";
+        oss << matcher.describe() << "\n";
         // switch flag to false
         do_components_match = false;
       }
@@ -139,7 +134,7 @@ private:
       if (!matcher.match(actual_vec[i])) {
 
         // pass through the mismatch description from CUIStateEqualsMatcher
-        oss << "CUIState at index " << i << ": " << matcher.describe() << "; ";
+        oss << matcher.describe() << "\n";
 
         // switch flag to false
         do_components_match = false;
@@ -217,8 +212,17 @@ public:
     size_t expected_size = entity::memory::GetMemoryPoolSize(m_expected);
 
     if (actual_size != expected_size) {
-      oss << "Pool sizes differ: actual =" << actual_size
-          << ", expected =" << expected_size << "; ";
+
+      oss << conmat::Divider("-", 40) << "\n";
+      oss << conmat::TestFailed() << "EntityMemoryPool Size Mismatch:" << "\n";
+      oss << "\t"
+          << "actual size = "
+          << conmat::Colorize(actual_size, conmat::Color::Red) << "\n";
+      oss << "\t"
+          << "expected size = "
+          << conmat::Colorize(expected_size, conmat::Color::Blue) << "\n";
+      oss << conmat::Divider("-", 40) << "\n";
+
       m_mismatch_description = oss.str();
       return false;
     }
@@ -239,31 +243,26 @@ public:
   /// @return Description string with visual formatting (no ANSI codes)
   ////////////////////////////////////////////////////////////
   std::string describe() const override {
-    // Use TestContext formatting if available
-    if (m_context.has_value()) {
-      return m_context.value().FormatFailureMessage("EntityMemoryPool",
-                                                    m_mismatch_description);
+
+    if (m_mismatch_description.empty()) {
+
+      std::ostringstream oss;
+      oss << conmat::Divider("=", 40) << "\n";
+      oss << conmat::Colorize("[PASSED] ", conmat::Color::Green)
+          << "EntityMemoryPool Match" << "\n";
+      oss << conmat::Divider("=", 40) << "\n";
+      return oss.str();
+    } else {
+
+      std::ostringstream oss;
+      oss << conmat::Divider("=", 40) << "\n";
+      oss << conmat::Colorize("[FAILED] ", conmat::Color::Red)
+          << "EntityMemoryPool Match " << "\n";
+      oss << m_mismatch_description << "\n";
+      oss << conmat::Divider("=", 40) << "\n";
+
+      return oss.str();
     }
-
-    std::ostringstream oss;
-
-    oss << "\n"
-        << conmat::Colorize(conmat::Divider("=", 40), conmat::Color::Red);
-    oss << "\n"
-        << conmat::TestFailed() << " EntityMemoryPool comparison failed.";
-    oss << "\n"
-        << conmat::Colorize(conmat::Divider("=", 40), conmat::Color::Red);
-
-    return oss.str();
-  }
-
-  ////////////////////////////////////////////////////////////
-  /// @brief Get the mismatch description
-  ///
-  /// @return Mismatch description string
-  ////////////////////////////////////////////////////////////
-  std::string get_mismatch_description() const {
-    return m_mismatch_description;
   }
 };
 

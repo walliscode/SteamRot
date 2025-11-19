@@ -6,16 +6,15 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "component_matchers.h"
 #include "ButtonElement.h"
 #include "CMeta.h"
 #include "CUserInterface.h"
 #include "DropDownButtonElement.h"
-#include "DropDownContainerElement.h"
 #include "DropDownItemElement.h"
 #include "DropDownListElement.h"
 #include "PanelElement.h"
 #include "cmeta_matchers.h"
-#include "component_matchers.h"
 #include "cuser_interface_matchers.h"
 #include "ui_element_matchers.h"
 #include <catch2/catch_test_macros.hpp>

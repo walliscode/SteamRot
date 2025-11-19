@@ -2,10 +2,7 @@
   "metadata": {
     "test_name": "sample_test_1",
     "description": "Sample test data for testing the harness functionality",
-    "tags": [
-      "unit",
-      "harness"
-    ],
+    "tags": ["unit", "harness"],
     "expected_to_pass": true,
     "version": 1
   },

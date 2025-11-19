@@ -9,6 +9,7 @@
 #pragma once
 
 #include "CMachinaForm.h"
+#include "conmat.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
 #include <sstream>
@@ -34,18 +35,35 @@ public:
     std::ostringstream oss;
 
     if (actual.m_active != m_expected.m_active) {
-      oss << "m_active: actual=" << actual.m_active
-          << ", expected=" << m_expected.m_active << "; ";
+      oss << "\t" << conmat::TestFailed() << "m_active:" << "\n";
+
+      oss << "\t\t" << "actual = "
+          << conmat::Colorize(actual.m_active, conmat::Color::Red) << "\n";
+      oss << "\t\t" << "expected = "
+          << conmat::Colorize(m_expected.m_active, conmat::Color::Blue) << "\n";
     }
 
     if (actual.m_fragments.size() != m_expected.m_fragments.size()) {
-      oss << "m_fragments size: actual=" << actual.m_fragments.size()
-          << ", expected=" << m_expected.m_fragments.size() << "; ";
+      oss << "\t" << conmat::TestFailed()
+          << "m_fragments size mismatch:" << "\n";
+      oss << "\t\t" << "actual size = "
+          << conmat::Colorize(actual.m_fragments.size(), conmat::Color::Red)
+          << "\n";
+      oss << "\t\t" << "expected size = "
+          << conmat::Colorize(m_expected.m_fragments.size(),
+                              conmat::Color::Blue)
+          << "\n";
     }
 
     if (actual.m_joints.size() != m_expected.m_joints.size()) {
-      oss << "m_joints size: actual=" << actual.m_joints.size()
-          << ", expected=" << m_expected.m_joints.size() << "; ";
+      oss << "\t" << conmat::TestFailed() << "m_joints size mismatch:"
+          << "\n";
+      oss << "\t\t" << "actual size = "
+          << conmat::Colorize(actual.m_joints.size(), conmat::Color::Red)
+          << "\n";
+      oss << "\t\t" << "expected size = "
+          << conmat::Colorize(m_expected.m_joints.size(), conmat::Color::Blue)
+          << "\n";
     }
 
     m_mismatch_description = oss.str();
@@ -53,14 +71,29 @@ public:
   }
 
   std::string describe() const override {
+    // if mismatch description is empty then we can assume the test passed
     if (m_mismatch_description.empty()) {
-      return "equals CMachinaForm";
+
+      std::ostringstream oss;
+      oss << conmat::Divider("-", 40) << "\n";
+      oss << conmat::TestPassed() << "CMachinaForm Match" << "\n";
+      oss << conmat::Divider("-", 40) << "\n";
+      return oss.str();
+    } else {
+
+      std::ostringstream oss;
+      oss << conmat::Divider("-", 40) << "\n";
+      oss << conmat::TestFailed() << "CMachinaForm Match: " << "\n";
+      oss << m_mismatch_description << "\n";
+      oss << conmat::Divider("-", 40) << "\n";
+
+      return oss.str();
     }
-    return "CMachinaForm mismatch: " + m_mismatch_description;
   }
 };
 
-inline CMachinaFormEqualsMatcher EqualsCMachinaForm(const CMachinaForm &expected) {
+inline CMachinaFormEqualsMatcher
+EqualsCMachinaForm(const CMachinaForm &expected) {
   return CMachinaFormEqualsMatcher(expected);
 }
 

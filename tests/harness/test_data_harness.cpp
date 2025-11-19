@@ -9,6 +9,7 @@
 #include "test_data_harness.h"
 #include "FlatbuffersConfigurator.h"
 #include "catch2/matchers/catch_matchers.hpp"
+#include "conmat.h"
 #include "console_output.h"
 #include "entity_memory_pool_matchers.h"
 #include "event_bus_conversion.h"
@@ -18,6 +19,7 @@
 #include <filesystem>
 #include <format>
 #include <fstream>
+#include <sstream>
 
 namespace steamrot::tests {
 
@@ -179,7 +181,15 @@ std::expected<std::monostate, FailInfo> RunEntityMemoryPoolComparisonTest(
   }
 
   // run comparison using matcher
-  CHECK_THAT(actual_memory_pool, EqualsEntityMemoryPool(expected_pool));
+  if (expected_to_pass) {
+    // Test expects pools to match
+    CHECK_THAT(actual_memory_pool,
+               EqualsEntityMemoryPool(expected_pool, context));
+  } else {
+    //
+    CHECK_THAT(actual_memory_pool,
+               !EqualsEntityMemoryPool(expected_pool, context));
+  }
 
   return std::monostate{};
 }
@@ -222,9 +232,21 @@ RunDataStructComparisonTest(const DataCollection *data_collection,
 
   // set up header for error messages
 
-  INFO(conmat::Divider("=", 40));
-  INFO("=== Data Structure Comparison Tests === ");
-  INFO(conmat::Divider("=", 40));
+  std::ostringstream oss;
+
+  oss << conmat::Divider("=", 40) << "\n";
+  oss << conmat::Colorize("Data Structure Comparison Tests",
+                          conmat::Color::Blue)
+      << "\n";
+  // test/file name if available
+  oss << "\t" << context.FormatTestName() << "\n";
+  // tick info if available
+  oss << "\t" << context.FormatTickInfo() << "\n";
+
+  // finishing divider
+  oss << conmat::Divider("=", 40) << "\n";
+
+  INFO(oss.str());
 
   // Check for entity collection comparison
   if (data_collection->entity_collection()) {

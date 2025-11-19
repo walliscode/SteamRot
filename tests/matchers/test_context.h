@@ -32,10 +32,23 @@ struct TestContext {
   std::string FormatTestName() const {
 
     if (console::IsColorEnabled()) {
-      return "\n  Test: " + std::string(console::Color::Bold) + test_name +
+      return "test: " + std::string(console::Color::Bold) + test_name +
              std::string(console::Color::Reset);
     }
-    return "\n  Test: " + test_name;
+    return "test: " + test_name;
+  }
+
+  std::string FormatTickInfo() const {
+    if (current_tick.has_value()) {
+      std::ostringstream oss;
+      oss << "tick: [" << current_tick.value();
+      if (total_ticks.has_value()) {
+        oss << "/" << total_ticks.value();
+      }
+      oss << "]";
+      return oss.str();
+    }
+    return "tick: [N/A]";
   }
   ////////////////////////////////////////////////////////////
   /// @brief Format hierarchical context section for matcher output
