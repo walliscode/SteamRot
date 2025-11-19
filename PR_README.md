@@ -120,25 +120,16 @@ All types that work with `std::cout <<` now work with colorize functions:
 | String | `std::string`, `const char*`, `std::string_view` | ✅ Maintained |
 | Custom | Any type with `operator<<` overload | ✅ Supported |
 
-## 🚀 Next Steps for Integration
+## 🚀 Integration
 
-### Step 1: Apply Changes to conmat Repository
-```bash
-cd /path/to/conmat
-git apply /path/to/SteamRot/documentation/conmat_streamable_types.patch
-git commit -am "Add streamable type support to Colorize, Stylize, and Format"
-git push
-```
+The conmat library has been vendored directly into the SteamRot repository at `external/conmat/` with all enhancements already applied. No additional steps are needed - just rebuild and start using:
 
-### Step 2: Rebuild SteamRot
 ```bash
 cd /path/to/SteamRot
 cmake --build --preset Debug
 ```
 
-The CMake FetchContent will automatically pull the updated conmat version.
-
-### Step 3: Start Using Enhanced Functions
+### Usage Examples
 ```cpp
 // In your code, you can now do:
 std::cout << conmat::Colorize(42, conmat::Color::Green);

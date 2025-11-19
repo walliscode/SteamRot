@@ -194,24 +194,17 @@ std::cout << "Pi = " << conmat::Colorize(value, conmat::Color::Yellow) << std::e
 
 ## Files Modified
 
-### In conmat repository:
-1. `src/conmat.h` - Added template overloads and concept
-2. `tests/test_conmat.cpp` - Added streamable types test
-3. `README.md` - Updated documentation with examples
-
 ### In SteamRot repository:
-1. `tests/conmat_streamable_demo.cpp` - Demo file showing usage
-2. `documentation/CONMAT_ENHANCEMENT.md` - This documentation file
+1. `external/conmat/src/conmat.h` - Added template overloads and concept
+2. `external/conmat/tests/test_conmat.cpp` - Added streamable types test
+3. `external/conmat/README.md` - Updated documentation with examples
+4. `cmake/FetchContentModules/conmat.cmake` - Changed to use add_subdirectory
+5. `tests/conmat_streamable_demo.cpp` - Demo file showing usage
+6. `documentation/CONMAT_ENHANCEMENT.md` - This documentation file
 
-## Next Steps
+## Integration
 
-1. The changes have been implemented and tested in a local clone of the conmat repository
-2. All tests pass successfully
-3. The changes maintain backward compatibility
-4. To integrate into SteamRot:
-   - Update the conmat repository (requires repository maintainer)
-   - CMake FetchContent will automatically pull the updated version
-   - Rebuild SteamRot to use the enhanced functionality
+The conmat library has been vendored directly into the SteamRot repository at `external/conmat/` with all enhancements already applied. The library is built as part of the SteamRot build process. No additional steps are needed - just rebuild the project.
 
 ## Conclusion
 

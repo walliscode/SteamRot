@@ -151,29 +151,11 @@ std::cout << conmat::Format(999, opts);
 4. **Minimal Overhead**: Efficient string conversion using `std::ostringstream`
 5. **Easy to Use**: Same interface as existing functions, just works with more types
 
-## Next Steps to Apply Changes
-
-### Option 1: Apply the Patch (Recommended)
-```bash
-cd /path/to/conmat
-git apply /path/to/SteamRot/documentation/conmat_streamable_types.patch
-git commit -am "Add streamable type support to Colorize, Stylize, and Format"
-git push
-```
-
-### Option 2: Manual Update
-Copy the contents from `documentation/conmat_updated.h` to replace `src/conmat.h` in the conmat repository, then commit and push.
-
-### Option 3: Use the Modified Local Copy
-The changes have been tested locally in `/tmp/conmat` and are ready to be pushed to the repository.
-
 ## Integration with SteamRot
 
-Once the changes are pushed to the conmat repository:
+The conmat library has been vendored directly into the SteamRot repository at `external/conmat/` with all the streamable type enhancements already applied. The library is built as part of the SteamRot build process using `add_subdirectory`.
 
-1. SteamRot's CMake FetchContent will automatically pull the updated version
-2. Rebuild SteamRot: `cmake --build --preset Debug`
-3. The enhanced functionality will be available throughout the codebase
+No additional steps are needed - the enhanced functionality is immediately available throughout the codebase.
 
 ## Testing Checklist
 

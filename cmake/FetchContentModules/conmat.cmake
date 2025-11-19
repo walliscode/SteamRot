@@ -1,9 +1,2 @@
-include(FetchContent)
-
-FetchContent_Declare(
-  conmat
-  GIT_REPOSITORY https://github.com/walliscode/conmat.git
-  GIT_TAG main  # or specify a tag/commit
-)
-
-FetchContent_MakeAvailable(conmat)
+# conmat is vendored in external/conmat directory
+add_subdirectory(${CMAKE_SOURCE_DIR}/external/conmat)
