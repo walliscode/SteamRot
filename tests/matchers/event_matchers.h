@@ -186,10 +186,15 @@ public:
     m_mismatch_description.clear();
     std::ostringstream oss;
 
-    // Compare sizes
+    // Return early if sizes differ
     if (actual.size() != m_expected.size()) {
-      oss << "EventBus size differs: actual=" << actual.size()
-          << ", expected=" << m_expected.size() << "; ";
+      oss << conmat::TestFailed() << "EventBus size mismatch:" << "\n";
+      oss << "\t"
+          << "actual size = "
+          << conmat::Colorize(actual.size(), conmat::Color::Red) << "\n";
+      oss << "\t"
+          << "expected size = "
+          << conmat::Colorize(m_expected.size(), conmat::Color::Blue) << "\n";
       m_mismatch_description = oss.str();
       return false;
     }
@@ -209,31 +214,25 @@ public:
 
   std::string describe() const override {
     if (m_mismatch_description.empty()) {
+
       std::ostringstream oss;
-      oss << "equals EventBus with " << m_expected.size() << " events";
+      oss << conmat::Divider("=", 40) << "\n";
+      oss << conmat::Colorize("[PASSED] ", conmat::Color::Green)
+          << "EventBus Match" << "\n";
+      oss << conmat::Divider("=", 40) << "\n";
+      return oss.str();
+    } else {
+
+      std::ostringstream oss;
+      oss << conmat::Divider("=", 40) << "\n";
+      oss << conmat::Colorize("[FAILED] ", conmat::Color::Red)
+          << "EventBus Match " << "\n";
+      oss << conmat::Divider("-", 40) << "\n";
+      oss << m_mismatch_description << "\n";
+      oss << conmat::Divider("=", 40) << "\n";
+
       return oss.str();
     }
-
-    // Use TestContext formatting if available
-    if (m_context.has_value()) {
-      return m_context.value().FormatFailureMessage("EventBus",
-                                                    m_mismatch_description);
-    }
-
-    // Legacy support - manual formatting
-    std::ostringstream oss;
-    oss << "\n[FAILED] EventBus Comparison";
-    oss << "\n" << std::string(60, '=');
-    oss << "\n" << std::string(60, '-');
-
-    if (!m_mismatch_description.empty()) {
-      oss << "\n  Differences:";
-      oss << "\n    * " << m_mismatch_description;
-    }
-
-    oss << "\n" << std::string(60, '=');
-
-    return oss.str();
   }
 };
 

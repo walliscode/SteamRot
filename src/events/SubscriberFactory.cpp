@@ -10,7 +10,6 @@
 #include "Subscriber.h"
 #include "event_conversion.h"
 #include "subscriber_config_generated.h"
-#include <iostream>
 #include <memory>
 
 namespace steamrot {
@@ -62,8 +61,10 @@ SubscriberFactory::CreateAndRegisterSubscriber(
   if (subscriber_data.trigger_data()) {
 
     // convert flatbuffers data to EventData
-    auto convert_result = event::conversion::ConvertFlatbuffersEventDataDataToEventData(
-        subscriber_data.trigger_data_type(), subscriber_data.trigger_data());
+    auto convert_result =
+        event::conversion::ConvertFlatbuffersEventDataDataToEventData(
+            subscriber_data.trigger_data_type(),
+            subscriber_data.trigger_data());
     if (!convert_result.has_value()) {
       return std::unexpected(convert_result.error());
     }
@@ -71,8 +72,6 @@ SubscriberFactory::CreateAndRegisterSubscriber(
 
     subscriber = std::make_shared<Subscriber>(event_type, trigger_data);
 
-    std::cout << "Created subscriber with trigger data for event type: "
-              << EnumNameEventType(event_type) << std::endl;
     // if no trigger data, create subscriber without it
   } else {
 

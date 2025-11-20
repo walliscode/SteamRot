@@ -2,13 +2,7 @@
   "metadata": {
     "test_name": "process_ui_actions_button_click",
     "description": "Test ProcessUIActionsAndEvents adds EventPacket to EventBus when button has is_mouse_over=true and active subscription",
-    "tags": [
-      "unit",
-      "logic",
-      "action",
-      "ui",
-      "button"
-    ],
+    "tags": ["unit", "logic", "action", "ui", "button"],
     "expected_to_pass": true,
     "version": 1
   },
@@ -50,9 +44,7 @@
                           "event_type_data": "EVENT_USER_INPUT",
                           "trigger_data_type": "UserInputBitsetData",
                           "trigger_data": {
-                            "mouse_released": [
-                              "LEFT_CLICK"
-                            ]
+                            "mouse_released": ["LEFT_CLICK"]
                           }
                         },
                         "response_event_data": {
@@ -93,9 +85,7 @@
           "event_type": "EVENT_USER_INPUT",
           "event_data_data_type": "UserInputBitsetData",
           "event_data_data": {
-            "mouse_released": [
-              "LEFT_CLICK"
-            ]
+            "mouse_released": ["LEFT_CLICK"]
           }
         },
         "description": "USER_INPUT event for mouse released to trigger subscription"
@@ -153,9 +143,7 @@
                               "event_type_data": "EVENT_USER_INPUT",
                               "trigger_data_type": "UserInputBitsetData",
                               "trigger_data": {
-                                "mouse_released": [
-                                  "LEFT_CLICK"
-                                ]
+                                "mouse_released": ["LEFT_CLICK"]
                               }
                             },
                             "response_event_data": {
@@ -182,16 +170,14 @@
           ]
         },
         "event_bus": {
-          "description": "After tick 1: Both USER_INPUT and TEST events added, BEFORE EventHandler ticks them down",
+          "description": "After tick 1: USER_INPUT has been added to event bus, triggering button response event also added to waiting room but not EventBus",
           "events": [
             {
               "event_lifetime": 1,
               "event_type": "EVENT_USER_INPUT",
               "event_data_data_type": "UserInputBitsetData",
               "event_data_data": {
-                "mouse_released": [
-                  "LEFT_CLICK"
-                ]
+                "mouse_released": ["LEFT_CLICK"]
               }
             },
             {
@@ -242,9 +228,7 @@
                           "event_type_data": "EVENT_USER_INPUT",
                           "trigger_data_type": "UserInputBitsetData",
                           "trigger_data": {
-                            "mouse_released": [
-                              "LEFT_CLICK"
-                            ]
+                            "mouse_released": ["LEFT_CLICK"]
                           }
                         },
                         "response_event_data": {

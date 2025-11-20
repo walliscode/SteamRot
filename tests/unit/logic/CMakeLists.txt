@@ -19,7 +19,7 @@ target_link_libraries(test_logic
   test_logic_helpers
   context_test_helpers
   test_harness
-  reporter_objects
+  reporters_objects
 )
 
 catch_discover_tests(test_logic
@@ -28,8 +28,9 @@ catch_discover_tests(test_logic
 )
 
 add_library(test_logic_helpers
-draw_ui_elements_test_helpers.cpp
-logic_test_helpers.cpp
+  draw_ui_elements_test_helpers.cpp
+  logic_test_helpers.cpp
+
 )
 
 target_include_directories(test_logic_helpers
