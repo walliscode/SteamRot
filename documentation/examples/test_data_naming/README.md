@@ -2,7 +2,7 @@
 
 [← Back to Examples](../README.md) | [Test Data Naming Conventions](../../testing/TEST_DATA_NAMING_CONVENTIONS.md)
 
-This directory contains **examples** demonstrating the test data naming conventions and organizational patterns described in [Test Data Naming Conventions](../../testing/TEST_DATA_NAMING_CONVENTIONS.md).
+This directory contains examples demonstrating the test data naming conventions and organizational patterns.
 
 ---
 
@@ -11,7 +11,7 @@ This directory contains **examples** demonstrating the test data naming conventi
 ### 1. Integration Test Directory README
 **File**: [EXAMPLE_INTEGRATION_TEST_README.md](EXAMPLE_INTEGRATION_TEST_README.md)
 
-**Purpose**: Shows what a well-organized integration test directory looks like
+**Purpose**: Template for well-organized integration test directories
 
 **Contains**:
 - Test coverage matrix with IDs, files, scenarios, components, and status
@@ -20,7 +20,7 @@ This directory contains **examples** demonstrating the test data naming conventi
 - Test execution commands
 - Common patterns and debugging tips
 
-**Use Case**: Use this as a template when creating new integration test directories like:
+**Use as template for**:
 - `tests/integration/ui_workflows/README.md`
 - `tests/integration/scene_transitions/README.md`
 - `tests/integration/entity_lifecycle/README.md`
@@ -30,7 +30,7 @@ This directory contains **examples** demonstrating the test data naming conventi
 ### 2. Test Catalog
 **File**: [EXAMPLE_TEST_CATALOG.md](EXAMPLE_TEST_CATALOG.md)
 
-**Purpose**: Demonstrates a comprehensive catalog for large test suites (100+ tests)
+**Purpose**: Template for comprehensive catalog for large test suites (100+ tests)
 
 **Contains**:
 - Test statistics (pass/fail counts)
@@ -40,30 +40,24 @@ This directory contains **examples** demonstrating the test data naming conventi
 - Complexity distribution visualization
 - Maintenance tracking (recently added, failing, skipped)
 
-**Use Case**: Optional catalog for large projects. Can be:
-- Maintained manually (copy template)
-- Auto-generated from metadata (future tooling)
+**Use for**:
+- Central test visibility for large projects
+- Manual maintenance or auto-generation (future tooling)
 - Published at `documentation/testing/TEST_CATALOG.md`
 
 ---
 
-## When to Use These Examples
+## Using These Templates
 
 ### Integration Test Directory README
 
-**Use when**:
-- Creating a new integration test directory
-- You have 5+ tests in one category
-- Tests are complex (multi-tick, multi-component)
-- Team needs quick reference for test scenarios
+**Use for**:
+- New integration test directories
+- 5+ tests in one category
+- Complex tests (multi-tick, multi-component)
+- Team documentation needs
 
-**Benefits**:
-- Centralizes documentation per test area
-- Makes adding new tests easier (clear template)
-- Provides test execution commands
-- Documents common patterns
-
-**Template workflow**:
+**Workflow**:
 1. Copy EXAMPLE_INTEGRATION_TEST_README.md
 2. Rename to README.md in your test directory
 3. Update category name and description
@@ -75,18 +69,11 @@ This directory contains **examples** demonstrating the test data naming conventi
 
 ### Test Catalog
 
-**Use when**:
-- Test suite has 100+ integration/system tests
+**Use for**:
+- Test suites with 100+ integration/system tests
 - Multiple teams working on different areas
-- Need visibility into test coverage
-- Want to identify gaps systematically
-- Planning test strategy
-
-**Benefits**:
-- High-level view of entire test suite
-- Quick lookup by ID, component, or feature
-- Coverage analysis (what's tested, what's not)
-- Trend tracking (test count over time)
+- Coverage visibility needs
+- Test strategy planning
 
 **Options**:
 1. **Manual**: Copy template, update as tests added
