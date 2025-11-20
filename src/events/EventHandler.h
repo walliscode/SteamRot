@@ -21,6 +21,13 @@
 namespace steamrot {
 
 using EventBus = std::vector<EventPacket>;
+inline std::ostream &operator<<(std::ostream &os,
+                                const std::vector<EventPacket> &bus) {
+  os << "";
+  (void)bus;
+
+  return os;
+}
 
 class EventHandler {
 private:
@@ -33,6 +40,7 @@ private:
   /// @brief  EventBus for collating all generated Events
   /////////////////////////////////////////////////
   EventBus m_waiting_room_event_bus;
+
   /////////////////////////////////////////////////
   /// @brief Register of all subscribers
   /////////////////////////////////////////////////
@@ -74,13 +82,14 @@ public:
   void AddEvent(const EventPacket &event);
 
   /////////////////////////////////////////////////
-  /// @brief Add all events from the waiting room event bus to the global event
-  /// bus
+  /// @brief Add all events from the waiting room event bus to the global
+  /// event bus
   /////////////////////////////////////////////////
   void ProcessWaitingRoomEventBus();
 
   /////////////////////////////////////////////////
-  /// @brief Update all subscribers based on the events in the global event bus.
+  /// @brief Update all subscribers based on the events in the global event
+  /// bus.
   /////////////////////////////////////////////////
   void UpateSubscribersFromGlobalEventBus();
 
@@ -95,6 +104,13 @@ public:
   /// @return A reference to the global event bus.
   /////////////////////////////////////////////////
   const EventBus &GetGlobalEventBus();
+
+  /////////////////////////////////////////////////
+  /// @brief Get the waiting room event bus.
+  ///
+  /// @return A reference to the waiting room event bus.
+  /////////////////////////////////////////////////
+  const EventBus &GetWaitingRoomEventBus();
 
   /////////////////////////////////////////////////
   /// @brief Return the subscriber register.
