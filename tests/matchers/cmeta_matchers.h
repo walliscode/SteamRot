@@ -10,6 +10,7 @@
 
 #include "CMeta.h"
 #include "conmat.h"
+#include "indentation_helpers.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
 #include <sstream>
@@ -33,18 +34,27 @@ public:
     std::ostringstream oss;
 
     if (actual.m_active != m_expected.m_active) {
-      oss << "\t" << conmat::TestFailed() << "m_active:" << "\n";
-
-      oss << "\t\t" << "actual = "
-          << conmat::Colorize(actual.m_active, conmat::Color::Red) << "\n";
-      oss << "\t\t" << "expected = "
-          << conmat::Colorize(m_expected.m_active, conmat::Color::Blue) << "\n";
+      oss << formatting::IndentedLine(conmat::TestFailed() + "m_active", 1)
+          << "\n";
+      oss << formatting::IndentedKeyValue(
+                 "actual", conmat::Colorize(actual.m_active, conmat::Color::Red),
+                 2)
+          << "\n";
+      oss << formatting::IndentedKeyValue(
+                 "expected",
+                 conmat::Colorize(m_expected.m_active, conmat::Color::Blue), 2)
+          << "\n";
     }
 
     if (actual.m_entity_active != m_expected.m_entity_active) {
-      oss << "\t" << conmat::TestFailed() << "m_entity_active:" << "\n";
-      oss << "\t\t" << "actual = " << actual.m_entity_active << "\n";
-      oss << "\t\t" << "expected = " << m_expected.m_entity_active << "\n";
+      oss << formatting::IndentedLine(conmat::TestFailed() + "m_entity_active",
+                                      1)
+          << "\n";
+      oss << formatting::IndentedKeyValue("actual", actual.m_entity_active, 2)
+          << "\n";
+      oss << formatting::IndentedKeyValue("expected", m_expected.m_entity_active,
+                                          2)
+          << "\n";
     }
 
     m_mismatch_description = oss.str();
@@ -56,17 +66,17 @@ public:
     if (m_mismatch_description.empty()) {
 
       std::ostringstream oss;
-      oss << conmat::Divider("-", 40) << "\n";
+      oss << conmat::Divider("-", 60) << "\n";
       oss << conmat::TestPassed() << "CMeta Match" << "\n";
-      oss << conmat::Divider("-", 40) << "\n";
+      oss << conmat::Divider("-", 60) << "\n";
       return oss.str();
     } else {
 
       std::ostringstream oss;
-      oss << conmat::Divider("-", 40) << "\n";
-      oss << conmat::TestFailed() << "CMeta Match: " << "\n";
-      oss << m_mismatch_description << "\n";
-      oss << conmat::Divider("-", 40) << "\n";
+      oss << conmat::Divider("-", 60) << "\n";
+      oss << conmat::TestFailed() << "CMeta Match" << "\n";
+      oss << m_mismatch_description;
+      oss << conmat::Divider("-", 60) << "\n";
 
       return oss.str();
     }

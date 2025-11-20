@@ -31,6 +31,7 @@ add_executable(test_harness_tests
   input_simulation.test.cpp
   event_simulation.test.cpp
   tick_executor.test.cpp
+  indentation_helpers.test.cpp
 )
 
 target_link_libraries(test_harness_tests
