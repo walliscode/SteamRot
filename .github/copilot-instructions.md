@@ -1321,7 +1321,35 @@ TEST_CASE("Load and use test data", "[unit][data-driven]") {
 
 ### File Naming Convention
 
-- **JSON files**: `<test_name>.test_data.json`
+Test data files follow a hybrid naming strategy:
+
+**Unit Tests** - Descriptive short names:
+- **Pattern**: `{component}_{aspect}[_{variant}].test_data.json`
+- **Examples**: `ui_collision_basic.test_data.json`, `pool_comparison_equal.test_data.json`
+- **When**: Simple, focused tests (1-3 ticks, single concern)
+- **Guidelines**: Keep to 3-4 words max, use snake_case, component first
+
+**Integration Tests** - ID-based naming:
+- **Pattern**: `{test_area}_{ID}.test_data.json`
+- **Examples**: `ui_workflow_001.test_data.json`, `scene_transition_001.test_data.json`
+- **When**: Complex multi-component tests (4+ ticks, multiple systems)
+- **ID Format**: Zero-padded 3-digit numbers (001-999)
+- **With**: Directory README documenting each test
+
+**System Tests** - Scenario names with IDs:
+- **Pattern**: `{scenario_name}_{ID}.test_data.json`
+- **Examples**: `crafting_success_001.test_data.json`, `combat_player_death_001.test_data.json`
+- **When**: End-to-end gameplay scenarios
+
+**Test Infrastructure** - Harness prefix:
+- **Pattern**: `harness_{purpose}_{ID}.test_data.json`
+- **Examples**: `harness_workflow_001.test_data.json`, `harness_simulation_001.test_data.json`
+- **When**: Testing the test harness infrastructure itself
+
+**Key Principle**: Metadata is the source of truth. File names are convenient handles. Complete `metadata` fields (`test_name`, `description`, `tags`) contain the authoritative description.
+
+**Reference**: See `documentation/testing/TEST_DATA_NAMING_CONVENTIONS.md` for complete guidelines.
+
 - **Compiled binaries**: `<test_name>.test_data.bin` (auto-generated)
 - **Location**: `tests/<test_executable_dir>/data/`
 
@@ -1372,12 +1400,13 @@ table TestDataConfig {
 
 ### Best Practices
 
+- **Follow naming conventions**: Use the hybrid naming strategy (descriptive for unit tests, ID-based for integration/system tests)
 - **Organize by category**: Place test data in matching subdirectories
-- **Descriptive names**: Use clear names for test data files
-- **Include metadata**: Always fill out test metadata fields
+- **Complete metadata**: Always fill out all metadata fields with detailed descriptions
 - **Keep focused**: One scenario per test data file
 - **Reuse types**: Leverage existing FlatBuffers tables
-- **Follow schema**: Use `start_entity_collection` and `expected_entity_collection` as defined in `test_data.fbs`
+- **Follow schema**: Use `start_data_collection` and `expected_data_collection` as defined in `test_data.fbs`
+- **Reference documentation**: See `documentation/testing/TEST_DATA_NAMING_CONVENTIONS.md` for naming guidelines
 
 ### test_data_harness Functions
 

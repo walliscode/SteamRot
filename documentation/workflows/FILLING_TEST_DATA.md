@@ -24,7 +24,10 @@ Test data files (`*.test_data.json`) are JSON files that define test scenarios f
 
 **Location**: Place test data files in `tests/<test_executable_dir>/data/` directories.
 
-**Naming**: Use the pattern `<test_name>.test_data.json` (e.g., `ui_button_click.test_data.json`). For detailed naming conventions, see [Test Data Naming Conventions](../testing/TEST_DATA_NAMING_CONVENTIONS.md).
+**Naming**: Follow the hybrid naming conventions defined in [Test Data Naming Conventions](../testing/TEST_DATA_NAMING_CONVENTIONS.md):
+- **Unit tests**: Descriptive short names (e.g., `ui_collision_basic.test_data.json`)
+- **Integration tests**: ID-based (e.g., `ui_workflow_001.test_data.json`)
+- **System tests**: Scenario-based (e.g., `crafting_success_001.test_data.json`)
 
 **Compilation**: JSON files are automatically compiled to `.test_data.bin` during build.
 

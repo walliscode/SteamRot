@@ -2,73 +2,43 @@
 
 [← Back to Documentation](../README.md) | [Testing Overview](TESTING_OVERVIEW.md) | [Test Data Configuration](TEST_DATA_CONFIGURATION.md)
 
-This document establishes naming conventions for test data JSON files (`.test_data.json`) in the SteamRot project, addressing the growing complexity as testing expands from unit to integration and system testing.
+This document defines the naming conventions for test data JSON files (`.test_data.json`) in the SteamRot project. These conventions address the growing complexity as testing expands from unit to integration and system testing.
 
 ---
 
 ## Table of Contents
 
 - [Overview](#overview)
-- [The Challenge](#the-challenge)
-- [Recommended Approach: Hybrid System](#recommended-approach-hybrid-system)
 - [Naming Strategy by Test Level](#naming-strategy-by-test-level)
 - [ID-Based Catalog System (Optional)](#id-based-catalog-system-optional)
 - [Metadata Best Practices](#metadata-best-practices)
 - [Directory Organization](#directory-organization)
-- [Migration Strategy](#migration-strategy)
 - [Tooling Recommendations](#tooling-recommendations)
 
 ---
 
 ## Overview
 
-Test data files in SteamRot use the FlatBuffers schema defined in `test_data.fbs` and are stored as JSON files with the `.test_data.json` suffix. As the test suite grows in complexity, we need a sustainable naming and organization strategy.
+Test data files in SteamRot use the FlatBuffers schema defined in `test_data.fbs` and are stored as JSON files with the `.test_data.json` suffix. This naming system provides a sustainable approach for organizing tests as complexity grows.
 
-**Current State:**
+**System Architecture:**
 - 25+ test data files across multiple directories
-- Mix of descriptive and generic naming
+- Hybrid naming: descriptive for simple tests, ID-based for complex tests
 - Rich metadata support in schema (name, description, tags, author, version)
-- Growing complexity with multi-tick simulations, input sequences, and event testing
+- Supports multi-tick simulations, input sequences, and event testing
 
----
-
-## The Challenge
-
-As testing complexity increases, file names face these challenges:
-
-### Simple Descriptive Naming Issues
-```
-✗ ui_collision_basic.test_data.json
-  - What makes it "basic"? vs. intermediate or advanced?
-  
-✗ sample_input_event_simulation.test_data.json
-  - "sample" doesn't convey specifics
-  - What scenario does it test?
-  
-✗ process_ui_actions_button_click.test_data.json
-  - Name gets long but still incomplete
-  - Hard to distinguish from similar tests
-```
-
-### Integration Test Complexity
-```
-✗ ui_collision_logic_with_multiple_overlapping_panels_on_tick_5_with_mouse_movement.test_data.json
-  - Too long, still not capturing everything
-  - Hard to type and reference
-```
-
----
-
-## Recommended Approach: Hybrid System
-
-Use **descriptive names for simple tests** and **ID-based catalog for complex tests**, with **metadata as the source of truth**.
-
-### Core Principles
+**Core Principles:**
 
 1. **Metadata is King**: The metadata fields (`test_name`, `description`, `tags`) are the authoritative description
 2. **File Names are Handles**: File names are convenient identifiers, not complete descriptions
 3. **Discoverability**: Tooling and documentation make tests discoverable
 4. **Scale Gracefully**: System works for both 10 tests and 1000 tests
+
+---
+
+## Naming Strategy by Test Level
+
+Use **descriptive names for simple tests** and **ID-based catalog for complex tests**, with **metadata as the source of truth**.
 
 ---
 
@@ -375,52 +345,6 @@ action processing, event propagation, and state updates.
 ```
 
 ---
-
-## Migration Strategy
-
-### Phase 1: Keep Existing Names
-
-**Action**: No immediate renaming required
-
-**Rationale**: 
-- Existing test names are working
-- Don't break existing references
-- Focus on new test conventions
-
-**For existing tests**:
-- Improve metadata descriptions if vague
-- Add comprehensive tags
-- Document in directory READMEs
-
-### Phase 2: Adopt Conventions for New Tests
-
-**Action**: Apply conventions to all new tests created
-
-**Guidelines**:
-- Unit tests: Use descriptive short names
-- Integration tests: Use ID-based naming
-- Always fill complete metadata
-- Create directory READMEs for new test areas
-
-### Phase 3: Optional Refactoring
-
-**Action**: Refactor existing test names if beneficial
-
-**When to refactor**:
-- Test suite grows to 100+ files
-- Naming conflicts arise
-- Team agrees renaming adds value
-
-**Migration script approach**:
-```bash
-# Rename files
-mv old_name.test_data.json new_name.test_data.json
-
-# Update metadata.test_name field in JSON
-# Update any test references in code
-# Update CMakeLists.txt if needed
-# Git commit with clear migration message
-```
 
 ---
 
