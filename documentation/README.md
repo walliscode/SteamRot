@@ -109,6 +109,7 @@ Testing guides and infrastructure:
 | **[Testing Overview](testing/TESTING_OVERVIEW.md)** | Test structure, classification, and TDD workflow |
 | **[Testing Harness Loop](testing/TESTING_HARNESS_LOOP.md)** | Visual guide to tick-based test execution |
 | **[Test Data Configuration](testing/TEST_DATA_CONFIGURATION.md)** | Data-driven testing with FlatBuffers |
+| **[Test Data Naming](testing/TEST_DATA_NAMING_CONVENTIONS.md)** | Naming conventions for test data JSON files |
 
 ### Testing Quick Reference
 
