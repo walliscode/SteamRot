@@ -10,6 +10,7 @@
 
 #include "CUserInterface.h"
 #include "conmat.h"
+#include "indentation_helpers.h"
 #include "ui_element_matchers.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
@@ -36,31 +37,41 @@ public:
     std::ostringstream oss;
 
     if (actual.m_active != m_expected.m_active) {
-
-      oss << "\t" << conmat::TestFailed() << "m_active:" << "\n";
-      oss << "\t\t" << "actual = "
-          << conmat::Colorize(actual.m_active, conmat::Color::Red) << "\n";
-      oss << "\t\t" << "expected = "
-          << conmat::Colorize(m_expected.m_active, conmat::Color::Blue) << "\n";
+      oss << formatting::IndentedLine(conmat::TestFailed() + "m_active", 1)
+          << "\n";
+      oss << formatting::IndentedKeyValue(
+                 "actual", conmat::Colorize(actual.m_active, conmat::Color::Red),
+                 2)
+          << "\n";
+      oss << formatting::IndentedKeyValue(
+                 "expected",
+                 conmat::Colorize(m_expected.m_active, conmat::Color::Blue), 2)
+          << "\n";
     }
 
     if (actual.m_name != m_expected.m_name) {
-      oss << "\t" << conmat::TestFailed() << "m_name:" << "\n";
-      oss << "\t\t"
-          << "actual = " << conmat::Colorize(actual.m_name, conmat::Color::Red)
+      oss << formatting::IndentedLine(conmat::TestFailed() + "m_name", 1)
           << "\n";
-      oss << "\t\t" << "expected = "
-          << conmat::Colorize(m_expected.m_name, conmat::Color::Blue) << "\n";
+      oss << formatting::IndentedKeyValue(
+                 "actual", conmat::Colorize(actual.m_name, conmat::Color::Red), 2)
+          << "\n";
+      oss << formatting::IndentedKeyValue(
+                 "expected",
+                 conmat::Colorize(m_expected.m_name, conmat::Color::Blue), 2)
+          << "\n";
     }
 
     if (actual.m_UI_visible != m_expected.m_UI_visible) {
-      oss << "\t" << conmat::TestFailed() << "m_UI_visible:" << "\n";
-      oss << "\t\t"
-          << "actual = "
-          << conmat::Colorize(actual.m_UI_visible, conmat::Color::Red) << "\n";
-      oss << "\t\t"
-          << "expected = "
-          << conmat::Colorize(m_expected.m_UI_visible, conmat::Color::Blue)
+      oss << formatting::IndentedLine(conmat::TestFailed() + "m_UI_visible", 1)
+          << "\n";
+      oss << formatting::IndentedKeyValue(
+                 "actual",
+                 conmat::Colorize(actual.m_UI_visible, conmat::Color::Red), 2)
+          << "\n";
+      oss << formatting::IndentedKeyValue(
+                 "expected",
+                 conmat::Colorize(m_expected.m_UI_visible, conmat::Color::Blue),
+                 2)
           << "\n";
     }
 
@@ -71,20 +82,25 @@ public:
                           m_expected.m_root_element != nullptr);
 
     if (!both_null && !both_non_null) {
-      oss << "\t" << conmat::TestFailed() << "m_root_element:" << "\n";
+      oss << formatting::IndentedLine(conmat::TestFailed() + "m_root_element",
+                                      1)
+          << "\n";
       if (actual.m_root_element == nullptr) {
-        oss << "\t\t"
-            << "actual = " << conmat::Colorize("nullptr", conmat::Color::Red)
+        oss << formatting::IndentedKeyValue(
+                   "actual", conmat::Colorize("nullptr", conmat::Color::Red), 2)
             << "\n";
-        oss << "\t\t"
-            << "expected = "
-            << conmat::Colorize("non-nullptr", conmat::Color::Blue) << "\n";
+        oss << formatting::IndentedKeyValue(
+                   "expected",
+                   conmat::Colorize("non-nullptr", conmat::Color::Blue), 2)
+            << "\n";
       } else {
-        oss << "\t\t"
-            << "actual = "
-            << conmat::Colorize("non-nullptr", conmat::Color::Red) << "\n";
-        oss << "\t\t"
-            << "expected = " << conmat::Colorize("nullptr", conmat::Color::Blue)
+        oss << formatting::IndentedKeyValue(
+                   "actual",
+                   conmat::Colorize("non-nullptr", conmat::Color::Red), 2)
+            << "\n";
+        oss << formatting::IndentedKeyValue(
+                   "expected", conmat::Colorize("nullptr", conmat::Color::Blue),
+                   2)
             << "\n";
       }
     } else if (both_non_null) {
@@ -92,7 +108,8 @@ public:
       UIElementEqualsMatcher element_matcher(*m_expected.m_root_element);
       if (!element_matcher.match(*actual.m_root_element)) {
 
-        oss << "  " << conmat::TestFailed() << "m_root_element differences:"
+        oss << formatting::IndentedLine(
+                   conmat::TestFailed() + "m_root_element differences", 1)
             << "\n";
         std::istringstream element_diff_stream(element_matcher.describe());
         std::string line;
@@ -112,17 +129,17 @@ public:
     if (m_mismatch_description.empty()) {
 
       std::ostringstream oss;
-      oss << conmat::Divider("-", 40) << "\n";
-      oss << conmat::TestPassed() << "CUserInterFace Match" << "\n";
-      oss << conmat::Divider("-", 40) << "\n";
+      oss << conmat::Divider("-", 60) << "\n";
+      oss << conmat::TestPassed() << "CUserInterface Match" << "\n";
+      oss << conmat::Divider("-", 60) << "\n";
       return oss.str();
     } else {
 
       std::ostringstream oss;
-      oss << conmat::Divider("-", 40) << "\n";
-      oss << conmat::TestFailed() << "CUserInterFace Match: " << "\n";
-      oss << m_mismatch_description << "\n";
-      oss << conmat::Divider("-", 40) << "\n";
+      oss << conmat::Divider("-", 60) << "\n";
+      oss << conmat::TestFailed() << "CUserInterface Match" << "\n";
+      oss << m_mismatch_description;
+      oss << conmat::Divider("-", 60) << "\n";
 
       return oss.str();
     }
