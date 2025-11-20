@@ -16,7 +16,6 @@
 
 #include "user_interface_generated.h"
 #include <expected>
-#include <iostream>
 #include <variant>
 
 namespace steamrot {
@@ -219,8 +218,6 @@ FlatbuffersConfigurator::ConfigureComponent(
 
     // if starting state is provided, set it
     if (mapping->starting_state()) {
-      std::cout << "Setting starting state for key: " << state_key << " to "
-                << (mapping->starting_state() ? "true" : "false") << "\n";
       ui_state_component.m_state_values[state_key] = mapping->starting_state();
 
       // else Initialize state value to false

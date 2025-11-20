@@ -1,0 +1,262 @@
+{
+  "metadata": {
+    "test_name": "process_ui_actions_button_click",
+    "description": "Test ProcessUIActionsAndEvents adds EventPacket to EventBus when button has is_mouse_over=true and active subscription",
+    "tags": ["unit", "logic", "action", "ui", "button"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "num_ticks": 1,
+  "start_data_collection": {
+    "entity_collection": {
+      "entity_memory_pool_size": 5,
+      "entities": [
+        {
+          "index": 0,
+          "c_user_interface": {
+            "ui_name": "test_button_ui",
+            "start_visible": true,
+            "root_ui_element": {
+              "base_data": {
+                "position": {
+                  "x": 100,
+                  "y": 100
+                },
+                "size": {
+                  "x": 200,
+                  "y": 100
+                },
+                "children_active": true,
+                "children": [
+                  {
+                    "element_type": "ButtonData",
+                    "element": {
+                      "base_data": {
+                        "position": {
+                          "x": 100,
+                          "y": 100
+                        },
+                        "size": {
+                          "x": 100,
+                          "y": 50
+                        },
+                        "subscriber_data": {
+                          "event_type_data": "EVENT_USER_INPUT",
+                          "trigger_data_type": "UserInputBitsetData",
+                          "trigger_data": {
+                            "mouse_released": ["LEFT_CLICK"]
+                          }
+                        },
+                        "response_event_data": {
+                          "event_lifetime": 1,
+                          "event_type": "EVENT_TEST",
+                          "event_data_data_type": "NONE"
+                        },
+                        "children_active": false,
+                        "children": [],
+                        "is_mouse_over": true,
+                        "layout": "Horizontal",
+                        "spacing_strategy": "None"
+                      },
+                      "label": "Test Button"
+                    }
+                  }
+                ],
+                "layout": "Vertical",
+                "spacing_strategy": "None"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "event_bus": {
+      "description": "Empty event bus at start",
+      "events": []
+    }
+  },
+  "event_sequence": {
+    "description": "User input event to trigger button subscription",
+    "events": [
+      {
+        "tick": 1,
+        "event_packet": {
+          "event_lifetime": 1,
+          "event_type": "EVENT_USER_INPUT",
+          "event_data_data_type": "UserInputBitsetData",
+          "event_data_data": {
+            "mouse_released": ["LEFT_CLICK"]
+          }
+        },
+        "description": "USER_INPUT event for mouse released to trigger subscription"
+      }
+    ]
+  },
+  "simulation_data": {
+    "description": "Process UI actions to add event to EventBus",
+    "steps": [
+      {
+        "simulation_type": "Action",
+        "execution_mode": "Function",
+        "function_type": "ProcessNestedUIActionsAndEvents",
+        "description": "Process button actions and add response event to EventBus"
+      }
+    ]
+  },
+  "tick_snapshots": [
+    {
+      "tick": 1,
+      "data_collection": {
+        "entity_collection": {
+          "entity_memory_pool_size": 5,
+          "entities": [
+            {
+              "index": 0,
+              "c_user_interface": {
+                "ui_name": "test_button_ui",
+                "start_visible": true,
+                "root_ui_element": {
+                  "base_data": {
+                    "position": {
+                      "x": 100,
+                      "y": 100
+                    },
+                    "size": {
+                      "x": 200,
+                      "y": 100
+                    },
+                    "children_active": true,
+                    "children": [
+                      {
+                        "element_type": "ButtonData",
+                        "element": {
+                          "base_data": {
+                            "position": {
+                              "x": 100,
+                              "y": 100
+                            },
+                            "size": {
+                              "x": 100,
+                              "y": 50
+                            },
+                            "subscriber_data": {
+                              "event_type_data": "EVENT_USER_INPUT",
+                              "trigger_data_type": "UserInputBitsetData",
+                              "trigger_data": {
+                                "mouse_released": ["LEFT_CLICK"]
+                              }
+                            },
+                            "response_event_data": {
+                              "event_lifetime": 1,
+                              "event_type": "EVENT_TEST",
+                              "event_data_data_type": "NONE"
+                            },
+                            "children_active": false,
+                            "children": [],
+                            "is_mouse_over": true,
+                            "layout": "Horizontal",
+                            "spacing_strategy": "None"
+                          },
+                          "label": "Test Button"
+                        }
+                      }
+                    ],
+                    "layout": "Vertical",
+                    "spacing_strategy": "None"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "event_bus": {
+          "description": "After tick 1: USER_INPUT has been added to event bus, triggering button response event also added to waiting room but not EventBus",
+          "events": [
+            {
+              "event_lifetime": 1,
+              "event_type": "EVENT_USER_INPUT",
+              "event_data_data_type": "UserInputBitsetData",
+              "event_data_data": {
+                "mouse_released": ["LEFT_CLICK"]
+              }
+            },
+            {
+              "event_lifetime": 1,
+              "event_type": "EVENT_TEST",
+              "event_data_data_type": "NONE"
+            }
+          ]
+        }
+      },
+      "description": "After simulation step, before EventHandler ticks: both events present with lifetime=1"
+    }
+  ],
+  "expected_data_collection": {
+    "entity_collection": {
+      "entity_memory_pool_size": 5,
+      "entities": [
+        {
+          "index": 0,
+          "c_user_interface": {
+            "ui_name": "test_button_ui",
+            "start_visible": true,
+            "root_ui_element": {
+              "base_data": {
+                "position": {
+                  "x": 100,
+                  "y": 100
+                },
+                "size": {
+                  "x": 200,
+                  "y": 100
+                },
+                "children_active": true,
+                "children": [
+                  {
+                    "element_type": "ButtonData",
+                    "element": {
+                      "base_data": {
+                        "position": {
+                          "x": 100,
+                          "y": 100
+                        },
+                        "size": {
+                          "x": 100,
+                          "y": 50
+                        },
+                        "subscriber_data": {
+                          "event_type_data": "EVENT_USER_INPUT",
+                          "trigger_data_type": "UserInputBitsetData",
+                          "trigger_data": {
+                            "mouse_released": ["LEFT_CLICK"]
+                          }
+                        },
+                        "response_event_data": {
+                          "event_lifetime": 1,
+                          "event_type": "EVENT_TEST",
+                          "event_data_data_type": "NONE"
+                        },
+                        "children_active": false,
+                        "children": [],
+                        "is_mouse_over": true,
+                        "layout": "Horizontal",
+                        "spacing_strategy": "None"
+                      },
+                      "label": "Test Button"
+                    }
+                  }
+                ],
+                "layout": "Vertical",
+                "spacing_strategy": "None"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "event_bus": {
+      "description": "Final event bus state after EventHandler ticks - events with lifetime=1 are decremented to 0 and removed",
+      "events": []
+    }
+  }
+}
