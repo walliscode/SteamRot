@@ -45,7 +45,8 @@
                           "trigger_data_type": "UserInputBitsetData",
                           "trigger_data": {
                             "mouse_released": ["LEFT_CLICK"]
-                          }
+                          },
+                          "active": true
                         },
                         "response_event_data": {
                           "event_lifetime": 1,
@@ -74,23 +75,6 @@
       "description": "Empty event bus at start",
       "events": []
     }
-  },
-  "event_sequence": {
-    "description": "User input event to trigger button subscription",
-    "events": [
-      {
-        "tick": 1,
-        "event_packet": {
-          "event_lifetime": 1,
-          "event_type": "EVENT_USER_INPUT",
-          "event_data_data_type": "UserInputBitsetData",
-          "event_data_data": {
-            "mouse_released": ["LEFT_CLICK"]
-          }
-        },
-        "description": "USER_INPUT event for mouse released to trigger subscription"
-      }
-    ]
   },
   "simulation_data": {
     "description": "Process UI actions to add event to EventBus",
@@ -169,17 +153,9 @@
             }
           ]
         },
-        "event_bus": {
-          "description": "After tick 1: USER_INPUT has been added to event bus, triggering button response event also added to waiting room but not EventBus",
+        "waiting_room": {
+          "description": "After tick 1: the test button has been triggered and added EVENT_TEST to waiting room",
           "events": [
-            {
-              "event_lifetime": 1,
-              "event_type": "EVENT_USER_INPUT",
-              "event_data_data_type": "UserInputBitsetData",
-              "event_data_data": {
-                "mouse_released": ["LEFT_CLICK"]
-              }
-            },
             {
               "event_lifetime": 1,
               "event_type": "EVENT_TEST",
@@ -257,6 +233,16 @@
     "event_bus": {
       "description": "Final event bus state after EventHandler ticks - events with lifetime=1 are decremented to 0 and removed",
       "events": []
+    },
+    "waiting_room": {
+      "description": "After tick 1: the test button has been triggered and added EVENT_TEST to waiting room",
+      "events": [
+        {
+          "event_lifetime": 1,
+          "event_type": "EVENT_TEST",
+          "event_data_data_type": "NONE"
+        }
+      ]
     }
   }
 }

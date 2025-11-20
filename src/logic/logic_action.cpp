@@ -21,29 +21,29 @@ namespace action {
 void ProcessUIActionsAndEvents(UIElement &ui_element,
                                EventHandler &event_handler,
                                const SceneContext &scene_context) {
-  //
-  // // check the subscription first
-  // if (!ui_element.subscription) {
-  //
-  //   return;
-  // }
-  //
-  // // if there is a subscription, then it must be active
-  // if (!ui_element.subscription->IsActive()) {
-  //   return;
-  // }
-  //
-  // // use a dynamic cast to determine the type of UIElement
-  // if (ButtonElement *button_element =
-  //         dynamic_cast<ButtonElement *>(&ui_element)) {
-  //   ProcessButtonElementActions(*button_element, event_handler);
-  // } else if (DropDownListElement *dropdown_list_element =
-  //                dynamic_cast<DropDownListElement *>(&ui_element)) {
-  //   ProcessDropDownListElementActions(*dropdown_list_element, scene_context);
-  // }
-  //
-  // // FINALLY set the subscriber to inactive
-  // auto set_inactive_result = ui_element.subscription->SetInactive();
+
+  // check the subscription first
+  if (!ui_element.subscription) {
+    return;
+  }
+
+  // if there is a subscription, then it must be active
+  if (!ui_element.subscription->IsActive()) {
+    return;
+  }
+
+  // use a dynamic cast to determine the type of UIElement
+  if (ButtonElement *button_element =
+          dynamic_cast<ButtonElement *>(&ui_element)) {
+
+    ProcessButtonElementActions(*button_element, event_handler);
+  } else if (DropDownListElement *dropdown_list_element =
+                 dynamic_cast<DropDownListElement *>(&ui_element)) {
+    ProcessDropDownListElementActions(*dropdown_list_element, scene_context);
+  }
+
+  // FINALLY set the subscriber to inactive
+  auto set_inactive_result = ui_element.subscription->SetInactive();
 }
 
 /////////////////////////////////////////////////

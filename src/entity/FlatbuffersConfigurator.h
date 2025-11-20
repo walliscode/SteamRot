@@ -68,7 +68,8 @@ private:
   ///
   /// @param ui_state_data Flatbuffers table data for UIState
   /// @param ui_state_component CUIState instance to be configured
-  /// @param entity_memory_pool Reference to EntityMemoryPool to resolve UI names
+  /// @param entity_memory_pool Reference to EntityMemoryPool to resolve UI
+  /// names
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo>
   ConfigureComponent(const UIStateData *ui_state_data,

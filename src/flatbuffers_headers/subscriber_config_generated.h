@@ -25,7 +25,8 @@ struct SubscriberData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_EVENT_TYPE_DATA = 4,
     VT_TRIGGER_DATA_TYPE = 6,
-    VT_TRIGGER_DATA = 8
+    VT_TRIGGER_DATA = 8,
+    VT_ACTIVE = 10
   };
   steamrot::EventType event_type_data() const {
     return static_cast<steamrot::EventType>(GetField<uint64_t>(VT_EVENT_TYPE_DATA, 0));
@@ -43,12 +44,16 @@ struct SubscriberData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::SceneChangePacketData *trigger_data_as_SceneChangePacketData() const {
     return trigger_data_type() == steamrot::EventDataData_SceneChangePacketData ? static_cast<const steamrot::SceneChangePacketData *>(trigger_data()) : nullptr;
   }
+  bool active() const {
+    return GetField<uint8_t>(VT_ACTIVE, 0) != 0;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint64_t>(verifier, VT_EVENT_TYPE_DATA, 8) &&
            VerifyField<uint8_t>(verifier, VT_TRIGGER_DATA_TYPE, 1) &&
            VerifyOffset(verifier, VT_TRIGGER_DATA) &&
            VerifyEventDataData(verifier, trigger_data(), trigger_data_type()) &&
+           VerifyField<uint8_t>(verifier, VT_ACTIVE, 1) &&
            verifier.EndTable();
   }
 };
@@ -74,6 +79,9 @@ struct SubscriberDataBuilder {
   void add_trigger_data(::flatbuffers::Offset<void> trigger_data) {
     fbb_.AddOffset(SubscriberData::VT_TRIGGER_DATA, trigger_data);
   }
+  void add_active(bool active) {
+    fbb_.AddElement<uint8_t>(SubscriberData::VT_ACTIVE, static_cast<uint8_t>(active), 0);
+  }
   explicit SubscriberDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -89,10 +97,12 @@ inline ::flatbuffers::Offset<SubscriberData> CreateSubscriberData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     steamrot::EventType event_type_data = static_cast<steamrot::EventType>(0),
     steamrot::EventDataData trigger_data_type = steamrot::EventDataData_NONE,
-    ::flatbuffers::Offset<void> trigger_data = 0) {
+    ::flatbuffers::Offset<void> trigger_data = 0,
+    bool active = false) {
   SubscriberDataBuilder builder_(_fbb);
   builder_.add_event_type_data(event_type_data);
   builder_.add_trigger_data(trigger_data);
+  builder_.add_active(active);
   builder_.add_trigger_data_type(trigger_data_type);
   return builder_.Finish();
 }

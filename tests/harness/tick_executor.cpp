@@ -61,7 +61,7 @@ CompareTickSnapshot(uint32_t tick, const TestDataConfig *config,
       // Use RunDataStructComparisonTest to compare all data structures
       auto comparison_result = RunDataStructComparisonTest(
           snapshot->data_collection(), fixture, context, expected_to_pass);
-      
+
       if (!comparison_result.has_value()) {
         return std::unexpected(comparison_result.error());
       }
@@ -98,45 +98,50 @@ ExecuteSingleTick(uint32_t tick, const TestDataConfig *config,
 
   // 1. Execute inputs scheduled for this tick
   if (config->input_sequence()) {
+
     auto input_result =
         ExecuteInputEventsForTick(config->input_sequence(), tick, fixture);
+
     if (!input_result.has_value()) {
-      console::PrintError("Input execution failed", tick);
       return std::unexpected(input_result.error());
     }
   }
 
   // 2. Execute events scheduled for this tick
   if (config->event_sequence()) {
+
     auto event_result =
         ExecuteEventsForTick(config->event_sequence(), tick, fixture);
+
     if (!event_result.has_value()) {
-      console::PrintError("Event execution failed", tick);
       return std::unexpected(event_result.error());
     }
-
-    // 3. Process event waiting room
-    fixture.GetGameResources().event_handler.ProcessWaitingRoomEventBus();
   }
+
+  // 3. Process event waiting room
+  fixture.GetGameResources().event_handler.ProcessWaitingRoomEventBus();
 
   // 4. Execute simulation steps (all steps execute on every tick)
   if (config->simulation_data() && config->simulation_data()->steps()) {
+
     for (const SimulationStep *step : *config->simulation_data()->steps()) {
+
       if (step) {
+
         auto sim_result =
             ExecuteSimulationStep(step, fixture.GetSceneContext());
+
         if (!sim_result.has_value()) {
-          console::PrintError("Simulation step failed", tick);
           return std::unexpected(sim_result.error());
         }
       }
     }
   }
 
-  // 5. Check for tick snapshot (compare after simulation, before event bus tick)
+  // 5. Check for tick snapshot (compare after simulation, before event bus
+  // tick)
   auto snapshot_result = CompareTickSnapshot(tick, config, fixture);
   if (!snapshot_result.has_value()) {
-    console::PrintError("Snapshot comparison failed", tick);
     return std::unexpected(snapshot_result.error());
   }
 
@@ -161,7 +166,10 @@ ExecuteTickBasedTest(const TestDataConfig *config, TestFixture &fixture) {
 
   // Execute each tick in sequence (1-based to match game loop)
   for (uint32_t tick = 1; tick <= num_ticks; ++tick) {
+
+    // execute single tick and make sure it succeeds
     auto tick_result = ExecuteSingleTick(tick, config, fixture);
+
     if (!tick_result.has_value()) {
       console::PrintError("Tick execution failed", tick);
       return std::unexpected(tick_result.error());

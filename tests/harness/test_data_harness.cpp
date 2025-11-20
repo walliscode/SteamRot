@@ -198,23 +198,13 @@ std::expected<std::monostate, FailInfo> RunEntityMemoryPoolComparisonTest(
 void RunEventBusComparisonTest(const EventBus &actual, const EventBus &expected,
                                const TestContext &context,
                                bool expected_to_pass) {
-  // Create matcher with context
-  auto matcher = EqualsEventBus(expected, context);
 
   if (expected_to_pass) {
-    // Test expects event buses to match - use REQUIRE_THAT
-    REQUIRE_THAT(actual, matcher);
+    // Test expects event buses to match
+    CHECK_THAT(actual, EqualsEventBus(expected, context));
   } else {
-    // Test expects event buses to NOT match - verify mismatch
-    bool buses_match = matcher.match(actual);
-    if (buses_match) {
-      std::string error_msg =
-          "Expected event buses to be different, but they matched";
-      if (context.HasContent()) {
-        error_msg += context.FormatContextSection();
-      }
-      FAIL(error_msg);
-    }
+    // Test expects event buses to NOT match
+    CHECK_THAT(actual, !EqualsEventBus(expected, context));
   }
 }
 
@@ -263,6 +253,14 @@ RunDataStructComparisonTest(const DataCollection *data_collection,
 
   // Check for event bus comparison
   if (data_collection->event_bus()) {
+    // create headers for global event bus comparison
+    std::ostringstream eb_oss;
+    eb_oss << conmat::Divider("=", 40) << "\n";
+    eb_oss << conmat::Colorize("Global Event Bus Comparison",
+                               conmat::Color::Blue)
+           << "\n";
+    INFO(eb_oss.str());
+
     // Convert EventBusData to EventBus
     auto expected_event_bus_result =
         event::conversion::ConvertEventBusDataToEventBus(
@@ -277,6 +275,36 @@ RunDataStructComparisonTest(const DataCollection *data_collection,
     // Get actual event bus from fixture
     const EventBus &actual_event_bus =
         fixture.GetGameResources().event_handler.GetGlobalEventBus();
+
+    // Run comparison
+    RunEventBusComparisonTest(actual_event_bus, expected_event_bus, context,
+                              expected_to_pass);
+  }
+
+  // check for waiting room event bus comparison
+  if (data_collection->waiting_room()) {
+
+    // create headers for waiting room comparison
+    std::ostringstream wr_oss;
+    wr_oss << conmat::Divider("=", 40) << "\n";
+    wr_oss << conmat::Colorize("Waiting Room Event Bus Comparison",
+                               conmat::Color::Blue)
+           << "\n";
+    INFO(wr_oss.str());
+
+    // Convert EventBusData to EventBus
+    auto expected_event_bus_result =
+        event::conversion::ConvertEventBusDataToEventBus(
+            data_collection->waiting_room());
+
+    if (!expected_event_bus_result.has_value()) {
+      return std::unexpected(expected_event_bus_result.error());
+    }
+    EventBus expected_event_bus = expected_event_bus_result.value();
+
+    // Get actual waiting room event bus from fixture
+    const EventBus &actual_event_bus =
+        fixture.GetGameResources().event_handler.GetWaitingRoomEventBus();
 
     // Run comparison
     RunEventBusComparisonTest(actual_event_bus, expected_event_bus, context,
