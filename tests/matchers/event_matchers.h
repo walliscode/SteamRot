@@ -339,7 +339,6 @@ public:
     if (m_mismatch_description.empty()) {
 
       std::ostringstream oss;
-      oss << conmat::Divider("=", 40) << "\n";
       oss << conmat::Colorize("[PASSED] ", conmat::Color::Green)
           << "EventBus Match" << "\n";
       oss << conmat::Divider("=", 40) << "\n";
@@ -347,7 +346,6 @@ public:
     } else {
 
       std::ostringstream oss;
-      oss << conmat::Divider("=", 40) << "\n";
       oss << conmat::Colorize("[FAILED] ", conmat::Color::Red)
           << "EventBus Match " << "\n";
       oss << conmat::Divider("-", 40) << "\n";

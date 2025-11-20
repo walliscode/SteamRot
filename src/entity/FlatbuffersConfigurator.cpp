@@ -349,4 +349,5 @@ FlatbuffersConfigurator::ConfigureEntitiesFromCollection(
 
   return std::monostate{};
 }
+
 } // namespace steamrot

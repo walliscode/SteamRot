@@ -20,6 +20,7 @@
 #include "logic_ui.h"
 #include "simulation_generated.h"
 #include <format>
+#include <iostream>
 
 namespace steamrot::tests {
 
@@ -27,17 +28,19 @@ namespace steamrot::tests {
 /// @brief Execute a free function based on FunctionType enum
 /////////////////////////////////////////////////
 static std::expected<std::monostate, FailInfo>
-ExecuteFunction(const FunctionType function_type,
-                 SceneContext &scene_context) {
+ExecuteFunction(const FunctionType function_type, SceneContext &scene_context) {
 
   switch (function_type) {
   case FunctionType_ProcessUIActionsAndEvents: {
+
     // This function needs a UIElement - we need to iterate through
     // UI entities in the scene
     ArchetypeID ui_archetype = GenerateArchetypeIDfromTypes<CUserInterface>();
+
     const auto it = scene_context.archetypes.find(ui_archetype);
 
     if (it != scene_context.archetypes.end()) {
+
       const Archetype &archetype = it->second;
       for (size_t entity_id : archetype) {
         CUserInterface &ui_component =
@@ -50,6 +53,8 @@ ExecuteFunction(const FunctionType function_type,
               scene_context);
         }
       }
+    } else {
+      std::cout << "No CUserInterface archetype found in scene." << std::endl;
     }
     return std::monostate{};
   }
@@ -138,7 +143,7 @@ ExecuteFunction(const FunctionType function_type,
 /////////////////////////////////////////////////
 static std::expected<std::monostate, FailInfo>
 ExecuteLogicClass(const LogicClassType logic_class_type,
-                    SceneContext &scene_context) {
+                  SceneContext &scene_context) {
 
   switch (logic_class_type) {
   case LogicClassType_UIActionLogic: {
@@ -182,8 +187,7 @@ ExecuteLogicClass(const LogicClassType logic_class_type,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ExecuteSimulationStep(const SimulationStep *step,
-                        SceneContext &scene_context) {
+ExecuteSimulationStep(const SimulationStep *step, SceneContext &scene_context) {
 
   // Validate step
   if (!step) {
@@ -209,7 +213,7 @@ ExecuteSimulationStep(const SimulationStep *step,
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 ExecuteSimulation(const SimulationData *simulation_data,
-                   SceneContext &scene_context) {
+                  SceneContext &scene_context) {
 
   // Validate simulation data
   if (!simulation_data) {
@@ -237,7 +241,7 @@ ExecuteSimulation(const SimulationData *simulation_data,
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 ExecuteSimulationWithFixture(const SimulationData *simulation_data,
-                                TestFixture &fixture) {
+                             TestFixture &fixture) {
 
   // Get the SceneContext from the fixture
   SceneContext &scene_context = fixture.GetSceneContext();

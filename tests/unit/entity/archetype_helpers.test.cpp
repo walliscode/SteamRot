@@ -10,7 +10,6 @@
 #include "CGrimoireMachina.h"
 #include "CMeta.h"
 #include <catch2/catch_test_macros.hpp>
-#include <iostream>
 
 TEST_CASE("archetype_helpers::GenerateArchetypeIDfromTypes generates correct "
           "ArchetypeID",
@@ -75,7 +74,7 @@ TEST_CASE(
   steamrot::Archetype archetype_one;
   archetype_one = {1, 2, 3};
   mock_archetypes[archetype_id_one] = archetype_one;
-  std::cout << "Archetype ID One: " << archetype_id_one << std::endl;
+
   // Archetype with CMeta and CGrimoireMachina components
   steamrot::ArchetypeID archetype_id_two =
       steamrot::GenerateArchetypeIDfromTypes<steamrot::CMeta,
@@ -88,7 +87,7 @@ TEST_CASE(
   auto entity_indexes_one =
       steamrot::GenerateEntityIndexesFromComponents<steamrot::CMeta>(
           mock_archetypes, true);
-  std::cout << "Entity Indexes One: ";
+
   REQUIRE(entity_indexes_one.size() == 3);
   REQUIRE(entity_indexes_one.count(1) == 1);
   REQUIRE(entity_indexes_one.count(2) == 1);

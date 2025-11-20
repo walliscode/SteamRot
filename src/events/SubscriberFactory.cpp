@@ -77,6 +77,12 @@ SubscriberFactory::CreateAndRegisterSubscriber(
 
     subscriber = std::make_shared<Subscriber>(event_type);
   }
+  // check if subscriber should start active
+  if (subscriber_data.active()) {
+    auto activation_result = subscriber->SetActive();
+    if (!activation_result.has_value())
+      return std::unexpected(activation_result.error());
+  }
   // register subscriber
   auto result = m_event_handler.RegisterSubscriber(subscriber);
   if (!result.has_value())

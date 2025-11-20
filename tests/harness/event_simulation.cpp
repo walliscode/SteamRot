@@ -10,6 +10,7 @@
 #include "EventPacket.h"
 #include "event_conversion.h"
 #include "uuid.h"
+#include <iostream>
 #include <set>
 
 namespace steamrot::tests {
@@ -74,6 +75,9 @@ ExecuteEventTestData(const EventTestData *event_data, TestFixture &fixture) {
   // Add event to the event handler
   EventHandler &event_handler = fixture.GetGameResources().event_handler;
   event_handler.AddEvent(event_packet);
+  std::cout << "Added Event of type "
+            << EnumNameEventType(event_packet.m_event_type)
+            << " to EventHandler" << std::endl;
 
   return std::monostate{};
 }

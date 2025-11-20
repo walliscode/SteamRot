@@ -52,10 +52,15 @@ void EventHandler::TickGlobalEventBus() {
 }
 
 /////////////////////////////////////////////////
-
 const EventBus &EventHandler::GetGlobalEventBus() {
   // return the global event bus
   return m_global_event_bus;
+}
+
+/////////////////////////////////////////////////
+const EventBus &EventHandler::GetWaitingRoomEventBus() {
+  // return the waiting room event bus
+  return m_waiting_room_event_bus;
 }
 
 ////////////////////////////////////////////////////////////
