@@ -12,6 +12,7 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <optional>
+
 #include <variant>
 namespace steamrot {
 
@@ -19,8 +20,7 @@ using SceneChangePacket = std::pair<std::optional<uuids::uuid>, SceneType>;
 
 using UIElementName = std::string;
 
-// all data types that can be used in an event packet (monostate to represent no
-// data)
+// Your variant type
 using EventData = std::variant<std::monostate, UserInputBitset,
                                SceneChangePacket, UIElementName>;
 
