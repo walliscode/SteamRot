@@ -45,7 +45,8 @@ struct DataCollection FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef DataCollectionBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ENTITY_COLLECTION = 4,
-    VT_EVENT_BUS = 6
+    VT_EVENT_BUS = 6,
+    VT_WAITING_ROOM = 8
   };
   /// @brief state of entities
   const steamrot::EntityCollection *entity_collection() const {
@@ -55,12 +56,18 @@ struct DataCollection FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::EventBusData *event_bus() const {
     return GetPointer<const steamrot::EventBusData *>(VT_EVENT_BUS);
   }
+  /// @brief state of the waiting room event bus
+  const steamrot::EventBusData *waiting_room() const {
+    return GetPointer<const steamrot::EventBusData *>(VT_WAITING_ROOM);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_ENTITY_COLLECTION) &&
            verifier.VerifyTable(entity_collection()) &&
            VerifyOffset(verifier, VT_EVENT_BUS) &&
            verifier.VerifyTable(event_bus()) &&
+           VerifyOffset(verifier, VT_WAITING_ROOM) &&
+           verifier.VerifyTable(waiting_room()) &&
            verifier.EndTable();
   }
 };
@@ -74,6 +81,9 @@ struct DataCollectionBuilder {
   }
   void add_event_bus(::flatbuffers::Offset<steamrot::EventBusData> event_bus) {
     fbb_.AddOffset(DataCollection::VT_EVENT_BUS, event_bus);
+  }
+  void add_waiting_room(::flatbuffers::Offset<steamrot::EventBusData> waiting_room) {
+    fbb_.AddOffset(DataCollection::VT_WAITING_ROOM, waiting_room);
   }
   explicit DataCollectionBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -89,8 +99,10 @@ struct DataCollectionBuilder {
 inline ::flatbuffers::Offset<DataCollection> CreateDataCollection(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::EntityCollection> entity_collection = 0,
-    ::flatbuffers::Offset<steamrot::EventBusData> event_bus = 0) {
+    ::flatbuffers::Offset<steamrot::EventBusData> event_bus = 0,
+    ::flatbuffers::Offset<steamrot::EventBusData> waiting_room = 0) {
   DataCollectionBuilder builder_(_fbb);
+  builder_.add_waiting_room(waiting_room);
   builder_.add_event_bus(event_bus);
   builder_.add_entity_collection(entity_collection);
   return builder_.Finish();

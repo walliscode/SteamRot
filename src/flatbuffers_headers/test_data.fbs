@@ -20,7 +20,11 @@ table DataCollection {
 
   /// @brief state of the global event bus
   event_bus: EventBusData;
+
+  /// @brief state of the waiting room event bus
+  waiting_room: EventBusData;
 }
+
 ////////////////////////////////////////////////////////////
 /// @brief Snapshot of expected data structure state at a specific tick
 ///
