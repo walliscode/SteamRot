@@ -14,32 +14,10 @@
 #include "DropDownItemElement.h"
 #include "DropDownListElement.h"
 #include "PanelElement.h"
-#include "cmeta_matchers.h"
 #include "cuser_interface_matchers.h"
 #include "ui_element_matchers.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
-
-TEST_CASE("CMeta custom matcher works correctly",
-          "[unit][Components][CMeta][matcher]") {
-  steamrot::CMeta expected;
-  expected.m_active = true;
-  expected.m_entity_active = true;
-
-  steamrot::CMeta actual;
-
-  SECTION("Matcher detects differences") {
-    actual.m_active = false;
-    actual.m_entity_active = false;
-    REQUIRE_THAT(actual, !steamrot::tests::EqualsCMeta(expected));
-  }
-
-  SECTION("Matcher detects equality") {
-    actual.m_active = true;
-    actual.m_entity_active = true;
-    REQUIRE_THAT(actual, steamrot::tests::EqualsCMeta(expected));
-  }
-}
 
 TEST_CASE("CUserInterface custom matcher works correctly",
           "[unit][Components][CUserInterface][matcher]") {

@@ -1,15 +1,20 @@
 # Matchers library for test utilities
 # Provides custom Catch2 matchers for component and entity comparisons
 
-add_library(test_matchers INTERFACE)
+add_library(test_matchers
+  cmeta_matchers.cpp
+  cgrimoire_machina_matchers.cpp
+
+
+)
 
 target_include_directories(test_matchers
-INTERFACE
+PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_link_libraries(test_matchers
-INTERFACE
+PUBLIC
   Catch2::Catch2WithMain
   components
   entity
@@ -22,6 +27,7 @@ INTERFACE
 # Test executable for component matchers
 add_executable(test_component_matchers
   component_matchers.test.cpp
+  cmeta_matchers.test.cpp
 )
 
 target_link_libraries(test_component_matchers
