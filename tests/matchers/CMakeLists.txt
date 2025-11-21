@@ -132,101 +132,25 @@ PRIVATE
 
 catch_discover_tests(test_event_matchers)
 
-# Test executable for CMachinaFormEqualsMatcher
-add_executable(test_cmachina_form_equals_matcher
+# Test executable for all new matcher tests
+add_executable(test_new_matchers
   CMachinaFormEqualsMatcher.test.cpp
-)
-
-target_link_libraries(test_cmachina_form_equals_matcher
-PRIVATE
-  Catch2::Catch2WithMain
-  test_matchers
-  components
-)
-
-catch_discover_tests(test_cmachina_form_equals_matcher)
-
-# Test executable for EventPacketEqualsMatcher
-add_executable(test_event_packet_equals_matcher
   EventPacketEqualsMatcher.test.cpp
-)
-
-target_link_libraries(test_event_packet_equals_matcher
-PRIVATE
-  Catch2::Catch2WithMain
-  test_matchers
-  events
-)
-
-catch_discover_tests(test_event_packet_equals_matcher)
-
-# Test executable for EventBusEqualsMatcher
-add_executable(test_event_bus_equals_matcher
   EventBusEqualsMatcher.test.cpp
-)
-
-target_link_libraries(test_event_bus_equals_matcher
-PRIVATE
-  Catch2::Catch2WithMain
-  test_matchers
-  events
-)
-
-catch_discover_tests(test_event_bus_equals_matcher)
-
-# Test executable for FragmentEqualsMatcher
-add_executable(test_fragment_equals_matcher
   FragmentEqualsMatcher.test.cpp
-)
-
-target_link_libraries(test_fragment_equals_matcher
-PRIVATE
-  Catch2::Catch2WithMain
-  test_matchers
-  components
-)
-
-catch_discover_tests(test_fragment_equals_matcher)
-
-# Test executable for JointEqualsMatcher
-add_executable(test_joint_equals_matcher
   JointEqualsMatcher.test.cpp
-)
-
-target_link_libraries(test_joint_equals_matcher
-PRIVATE
-  Catch2::Catch2WithMain
-  test_matchers
-  components
-)
-
-catch_discover_tests(test_joint_equals_matcher)
-
-# Test executable for UIElementEqualsMatcher
-add_executable(test_ui_element_equals_matcher
   UIElementEqualsMatcher.test.cpp
-)
-
-target_link_libraries(test_ui_element_equals_matcher
-PRIVATE
-  Catch2::Catch2WithMain
-  test_matchers
-  user_interface
-)
-
-catch_discover_tests(test_ui_element_equals_matcher)
-
-# Test executable for EntityMemoryPoolEqualsMatcher
-add_executable(test_entity_memory_pool_equals_matcher
   EntityMemoryPoolEqualsMatcher.test.cpp
 )
 
-target_link_libraries(test_entity_memory_pool_equals_matcher
+target_link_libraries(test_new_matchers
 PRIVATE
   Catch2::Catch2WithMain
   test_matchers
   components
   entity
+  user_interface
+  events
 )
 
-catch_discover_tests(test_entity_memory_pool_equals_matcher)
+catch_discover_tests(test_new_matchers)
