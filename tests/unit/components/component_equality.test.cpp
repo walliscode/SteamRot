@@ -14,8 +14,8 @@
 #include "CGrimoireMachinaEqualsMatcher.h"
 #include "cmachina_form_matchers.h"
 #include "CMetaEqualsMatcher.h"
-#include "cui_state_matchers.h"
-#include "cuser_interface_matchers.h"
+#include "CUIStateEqualsMatcher.h"
+#include "CUserInterfaceEqualsMatcher.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
 

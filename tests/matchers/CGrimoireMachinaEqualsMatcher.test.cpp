@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "CGrimoireMachinaEqualsMatcher.h"
+#include "Fragment.h"
 #include "conmat.h"
 #include <catch2/catch_test_macros.hpp>
 
@@ -70,11 +71,17 @@ TEST_CASE(
     "[unit][Components][CGrimoireMachina][matcher]") {
   steamrot::CGrimoireMachina expected;
   expected.m_active = true;
-  expected.m_all_fragments.resize(5);
+  expected.m_all_fragments["frag1"] = steamrot::Fragment{};
+  expected.m_all_fragments["frag2"] = steamrot::Fragment{};
+  expected.m_all_fragments["frag3"] = steamrot::Fragment{};
+  expected.m_all_fragments["frag4"] = steamrot::Fragment{};
+  expected.m_all_fragments["frag5"] = steamrot::Fragment{};
 
   steamrot::CGrimoireMachina actual;
   actual.m_active = true;
-  actual.m_all_fragments.resize(3);
+  actual.m_all_fragments["frag1"] = steamrot::Fragment{};
+  actual.m_all_fragments["frag2"] = steamrot::Fragment{};
+  actual.m_all_fragments["frag3"] = steamrot::Fragment{};
 
   REQUIRE_THAT(actual, !steamrot::tests::EqualsCGrimoireMachina(expected));
 }
@@ -83,11 +90,15 @@ TEST_CASE("CGrimoireMachinaEqualsMatcher detects joint size differences",
           "[unit][Components][CGrimoireMachina][matcher]") {
   steamrot::CGrimoireMachina expected;
   expected.m_active = true;
-  expected.m_all_joints.resize(2);
+  expected.m_all_joints["joint1"] = steamrot::Joint{};
+  expected.m_all_joints["joint2"] = steamrot::Joint{};
 
   steamrot::CGrimoireMachina actual;
   actual.m_active = true;
-  actual.m_all_joints.resize(4);
+  actual.m_all_joints["joint1"] = steamrot::Joint{};
+  actual.m_all_joints["joint2"] = steamrot::Joint{};
+  actual.m_all_joints["joint3"] = steamrot::Joint{};
+  actual.m_all_joints["joint4"] = steamrot::Joint{};
 
   REQUIRE_THAT(actual, !steamrot::tests::EqualsCGrimoireMachina(expected));
 }

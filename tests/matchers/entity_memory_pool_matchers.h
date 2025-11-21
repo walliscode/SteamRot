@@ -13,8 +13,8 @@
 #include "CMetaEqualsMatcher.h"
 #include "conmat.h"
 #include "containers.h"
-#include "cui_state_matchers.h"
-#include "cuser_interface_matchers.h"
+#include "CUIStateEqualsMatcher.h"
+#include "CUserInterfaceEqualsMatcher.h"
 #include "entity_memory.h"
 #include "test_context.h"
 #include <catch2/catch_test_macros.hpp>
