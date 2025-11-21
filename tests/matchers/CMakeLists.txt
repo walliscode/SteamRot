@@ -91,3 +91,46 @@ PRIVATE
 )
 
 catch_discover_tests(test_entity_memory_pool_matchers_isolated)
+
+# Test executable for isolated CUserInterface matcher tests
+add_executable(test_cuser_interface_matchers_isolated
+  cuser_interface_matchers_isolated.test.cpp
+)
+
+target_link_libraries(test_cuser_interface_matchers_isolated
+PRIVATE
+  Catch2::Catch2WithMain
+  test_matchers
+  components
+  user_interface
+)
+
+catch_discover_tests(test_cuser_interface_matchers_isolated)
+
+# Test executable for isolated UIElement matcher tests
+add_executable(test_ui_element_matchers_isolated
+  ui_element_matchers_isolated.test.cpp
+)
+
+target_link_libraries(test_ui_element_matchers_isolated
+PRIVATE
+  Catch2::Catch2WithMain
+  test_matchers
+  user_interface
+)
+
+catch_discover_tests(test_ui_element_matchers_isolated)
+
+# Test executable for isolated Event matcher tests
+add_executable(test_event_matchers_isolated
+  event_matchers_isolated.test.cpp
+)
+
+target_link_libraries(test_event_matchers_isolated
+PRIVATE
+  Catch2::Catch2WithMain
+  test_matchers
+  events
+)
+
+catch_discover_tests(test_event_matchers_isolated)

@@ -267,5 +267,69 @@ Potential areas for expansion:
 
 - `tests/matchers/matcher_test_helpers.h` - Matcher testing utilities
 - `tests/reporters/reporter_test_helpers.h` - Reporter testing utilities
-- `tests/matchers/*_isolated.test.cpp` - Isolated matcher tests
-- `tests/reporters/*_isolated.test.cpp` - Isolated reporter tests
+
+### Isolated Matcher Test Files:
+- `tests/matchers/cmeta_matchers_isolated.test.cpp` - CMeta matcher tests
+- `tests/matchers/entity_memory_pool_matchers_isolated.test.cpp` - EntityMemoryPool matcher tests
+- `tests/matchers/cuser_interface_matchers_isolated.test.cpp` - CUserInterface matcher tests
+- `tests/matchers/ui_element_matchers_isolated.test.cpp` - UIElement matcher tests
+- `tests/matchers/event_matchers_isolated.test.cpp` - Event matcher tests
+
+### Isolated Reporter Test Files:
+- `tests/reporters/HarnessReporter_isolated.test.cpp` - HarnessReporter tests
+
+## Test Coverage Summary
+
+The isolated testing infrastructure provides comprehensive coverage for:
+
+### Component Matchers
+- **CMeta**: Base component matching, active flags
+- **CUserInterface**: UI component matching, name, visibility, root elements
+- **UIElement**: Hierarchical UI element matching (Panel, Button, DropDown variants)
+  - Base fields (position, size, mouse_over, children)
+  - Derived types (ButtonElement, DropDownButton, DropDownList, etc.)
+  - Recursive child element comparison
+
+### Container Matchers
+- **EntityMemoryPool**: Full entity pool comparison
+  - Size validation
+  - Component vector comparison
+  - Hierarchical error reporting
+
+### Event Matchers
+- **EventPacket**: Event comparison
+  - Event type matching
+  - Event data variant comparison
+  - UserInputBitset validation
+- **EventBus**: Event queue comparison
+  - Size validation
+  - Event sequence comparison
+
+### Reporters
+- **HarnessReporter**: Custom test output formatting
+  - Test run starting
+  - Test case starting
+  - Assertion output
+  - Format consistency
+
+## Running Isolated Tests
+
+Isolated tests are tagged with `[isolated]` and can be run separately:
+
+```bash
+# Run all isolated tests
+ctest --preset Debug -L isolated
+
+# Run isolated matcher tests only
+ctest --preset Debug -R matchers_isolated
+
+# Run isolated reporter tests only
+ctest --preset Debug -R reporter_isolated
+
+# Run specific matcher isolated tests
+ctest --preset Debug -R cmeta_matchers_isolated
+ctest --preset Debug -R entity_memory_pool_matchers_isolated
+ctest --preset Debug -R cuser_interface_matchers_isolated
+ctest --preset Debug -R ui_element_matchers_isolated
+ctest --preset Debug -R event_matchers_isolated
+```
