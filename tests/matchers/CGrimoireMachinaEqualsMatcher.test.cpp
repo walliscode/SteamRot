@@ -57,12 +57,13 @@ TEST_CASE("CGrimoireMachinaEqualsMatcher describe is as expected on failure",
   std::ostringstream oss;
   oss << conmat::Header(conmat::TestFailed() + "CGrimoireMachina Match:", 3)
       << "\n";
-  oss << "\t" << conmat::TestFailed() << "m_active:"
+  oss << conmat::Indent(1) << conmat::TestFailed() << "m_active:"
       << "\n";
-  oss << "\t\t"
-      << "actual = " << actual.m_active << "\n";
-  oss << "\t\t"
-      << "expected = " << expected.m_active << "\n";
+  oss << conmat::Indent(2)
+      << "actual: " << conmat::Colorize(actual.m_active, conmat::Color::Red)
+      << "\n";
+  oss << conmat::Indent(2) << "expected: "
+      << conmat::Colorize(expected.m_active, conmat::Color::Blue) << "\n";
   REQUIRE(matcher.describe() == oss.str());
 }
 
