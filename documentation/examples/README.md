@@ -95,3 +95,15 @@ For production examples, see:
 - `src/logic/CraftingRenderLogic.{h,cpp}` - Scene-specific rendering
 
 And their corresponding test files in `tests/logic/`.
+
+---
+
+## Test Data Naming Examples
+
+The [test_data_naming/](test_data_naming/) directory contains examples for organizing and naming test data JSON files:
+
+- **[Integration Test README Example](test_data_naming/EXAMPLE_INTEGRATION_TEST_README.md)** - Template for integration test directories
+- **[Test Catalog Example](test_data_naming/EXAMPLE_TEST_CATALOG.md)** - Comprehensive catalog for large test suites
+- **[Naming Examples Guide](test_data_naming/README.md)** - Overview and usage guide
+
+**See Also**: [Test Data Naming Conventions](../testing/TEST_DATA_NAMING_CONVENTIONS.md)
