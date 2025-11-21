@@ -11,36 +11,37 @@
 
 using namespace steamrot::tests::formatting;
 
-TEST_CASE("Indent generates correct number of spaces", "[unit][formatting]") {
+TEST_CASE("conmat::Indent generates correct number of spaces",
+          "[unit][formatting]") {
   SECTION("Level 0 produces no spaces") {
-    REQUIRE(Indent(0) == "");
-    REQUIRE(Indent(0).length() == 0);
+    REQUIRE(conmat::Indent(0) == "");
+    REQUIRE(conmat::Indent(0).length() == 0);
   }
 
   SECTION("Level 1 produces 2 spaces by default") {
-    REQUIRE(Indent(1) == "  ");
-    REQUIRE(Indent(1).length() == 2);
+    REQUIRE(conmat::Indent(1) == "  ");
+    REQUIRE(conmat::Indent(1).length() == 2);
   }
 
   SECTION("Level 2 produces 4 spaces by default") {
-    REQUIRE(Indent(2) == "    ");
-    REQUIRE(Indent(2).length() == 4);
+    REQUIRE(conmat::Indent(2) == "    ");
+    REQUIRE(conmat::Indent(2).length() == 4);
   }
 
   SECTION("Level 3 produces 6 spaces by default") {
-    REQUIRE(Indent(3) == "      ");
-    REQUIRE(Indent(3).length() == 6);
+    REQUIRE(conmat::Indent(3) == "      ");
+    REQUIRE(conmat::Indent(3).length() == 6);
   }
 
   SECTION("Custom spaces_per_level works") {
-    REQUIRE(Indent(1, 4) == "    ");
-    REQUIRE(Indent(2, 4) == "        ");
-    REQUIRE(Indent(1, 3) == "   ");
+    REQUIRE(conmat::Indent(1, 4) == "    ");
+    REQUIRE(conmat::Indent(2, 4) == "        ");
+    REQUIRE(conmat::Indent(1, 3) == "   ");
   }
 
   SECTION("Large indentation levels work") {
-    REQUIRE(Indent(10).length() == 20);
-    REQUIRE(Indent(100).length() == 200);
+    REQUIRE(conmat::Indent(10).length() == 20);
+    REQUIRE(conmat::Indent(100).length() == 200);
   }
 }
 
@@ -170,13 +171,13 @@ TEST_CASE("Indentation helpers work together", "[unit][formatting]") {
 
 TEST_CASE("Indentation helpers handle edge cases", "[unit][formatting]") {
   SECTION("Zero spaces_per_level results in no indentation") {
-    REQUIRE(Indent(5, 0) == "");
+    REQUIRE(conmat::Indent(5, 0) == "");
     REQUIRE(IndentedLine("Text", 5, 0) == "Text");
     REQUIRE(IndentedKeyValue("key", "value", 5, 0) == "key:   value");
   }
 
   SECTION("Single space per level works") {
-    REQUIRE(Indent(3, 1) == "   ");
+    REQUIRE(conmat::Indent(3, 1) == "   ");
     REQUIRE(IndentedLine("Text", 3, 1) == "   Text");
   }
 }

@@ -11,35 +11,17 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "conmat.h"
 #include <sstream>
 #include <string>
 
 namespace steamrot::tests::formatting {
 
 /////////////////////////////////////////////////
-/// @brief Generate indentation string for given level
-///
-/// Creates a string of spaces for the specified indentation level.
-/// Each level adds spaces_per_level spaces to the output.
-///
-/// @param level Indentation level (0 = no indent, 1 = one level, etc.)
-/// @param spaces_per_level Number of spaces per indentation level (default: 2)
-/// @return String containing appropriate number of spaces
-///
-/// @example
-/// std::string indent = Indent(0);  // "" (no spaces)
-/// std::string indent = Indent(1);  // "  " (2 spaces)
-/// std::string indent = Indent(2);  // "    " (4 spaces)
-/////////////////////////////////////////////////
-inline std::string Indent(size_t level, size_t spaces_per_level = 2) {
-  return std::string(level * spaces_per_level, ' ');
-}
-
-/////////////////////////////////////////////////
 /// @brief Format text with indentation
 ///
 /// Prepends the appropriate indentation to the given text based on
-/// the indentation level.
+/// the indentation level. Uses conmat::Indent for the indentation string.
 ///
 /// @param text Text to indent
 /// @param level Indentation level
@@ -53,7 +35,7 @@ inline std::string Indent(size_t level, size_t spaces_per_level = 2) {
 /////////////////////////////////////////////////
 inline std::string IndentedLine(const std::string &text, size_t level,
                                 size_t spaces_per_level = 2) {
-  return Indent(level, spaces_per_level) + text;
+  return conmat::Indent(level, spaces_per_level) + text;
 }
 
 /////////////////////////////////////////////////
@@ -62,6 +44,7 @@ inline std::string IndentedLine(const std::string &text, size_t level,
 /// Creates a formatted "key: value" string with appropriate indentation.
 /// The value is aligned after the colon with extra spacing for readability.
 /// Boolean values are formatted as "true"/"false" rather than 1/0.
+/// Uses conmat::Indent for the indentation string.
 ///
 /// @param key Key name
 /// @param value Value (will be converted to string via ostringstream)
@@ -80,7 +63,7 @@ std::string IndentedKeyValue(const std::string &key, const T &value,
                               size_t level, size_t spaces_per_level = 2) {
   std::ostringstream oss;
   oss << std::boolalpha;  // Format booleans as true/false
-  oss << Indent(level, spaces_per_level) << key << ":   " << value;
+  oss << conmat::Indent(level, spaces_per_level) << key << ":   " << value;
   return oss.str();
 }
 

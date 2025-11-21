@@ -1,2 +1,0 @@
-/usr/bin/ar qc libentity.a CMakeFiles/entity.dir/EntityManager.cpp.o CMakeFiles/entity.dir/EntityConfigurator.cpp.o CMakeFiles/entity.dir/FlatbuffersConfigurator.cpp.o CMakeFiles/entity.dir/ArchetypeManager.cpp.o CMakeFiles/entity.dir/entity_memory.cpp.o
-/usr/bin/ranlib libentity.a
