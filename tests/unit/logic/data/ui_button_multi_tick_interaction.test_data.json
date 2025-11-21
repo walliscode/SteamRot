@@ -89,9 +89,7 @@
                           "event_type_data": "EVENT_USER_INPUT",
                           "trigger_data_type": "UserInputBitsetData",
                           "trigger_data": {
-                            "mouse_released": [
-                              "LEFT_CLICK"
-                            ]
+                            "mouse_released": ["LEFT_CLICK"]
                           },
                           "active": true
                         },
@@ -168,9 +166,7 @@
                               "event_type_data": "EVENT_USER_INPUT",
                               "trigger_data_type": "UserInputBitsetData",
                               "trigger_data": {
-                                "mouse_released": [
-                                  "LEFT_CLICK"
-                                ]
+                                "mouse_released": ["LEFT_CLICK"]
                               },
                               "active": false
                             },
@@ -198,8 +194,17 @@
           ]
         },
         "event_bus": {
-          "description": "Empty EventBus after tick 1 (USER_INPUT was decremented and removed)",
-          "events": []
+          "description": "USER_INPUT event generated and not yet tick down",
+          "events": [
+            {
+              "event_lifetime": 1,
+              "event_type": "EVENT_USER_INPUT",
+              "event_data_data_type": "UserInputBitsetData",
+              "event_data_data": {
+                "mouse_released": ["LEFT_CLICK"]
+              }
+            }
+          ]
         },
         "waiting_room": {
           "description": "EVENT_TEST in waiting room with lifetime=2",
@@ -251,9 +256,7 @@
                           "event_type_data": "EVENT_USER_INPUT",
                           "trigger_data_type": "UserInputBitsetData",
                           "trigger_data": {
-                            "mouse_released": [
-                              "LEFT_CLICK"
-                            ]
+                            "mouse_released": ["LEFT_CLICK"]
                           },
                           "active": false
                         },
