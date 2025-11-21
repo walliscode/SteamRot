@@ -69,21 +69,19 @@ TEST_CASE("CUserInterfaceEqualsMatcher describe is as expected on failure",
   std::ostringstream oss;
   oss << conmat::Header(conmat::TestFailed() + "CUserInterface Match:", 3)
       << "\n";
-  oss << "\t" << conmat::TestFailed() << "m_active:"
+  oss << conmat::Indent(1) << conmat::TestFailed() << "m_active:"
       << "\n";
-  oss << "\t\t"
-      << "actual = " << conmat::Colorize(actual.m_active, conmat::Color::Red)
+  oss << conmat::Indent(2)
+      << "actual: " << conmat::Colorize(actual.m_active, conmat::Color::Red)
       << "\n";
-  oss << "\t\t"
-      << "expected = "
+  oss << conmat::Indent(2) << "expected: "
       << conmat::Colorize(expected.m_active, conmat::Color::Blue) << "\n";
-  oss << "\t" << conmat::TestFailed() << "m_name:"
+  oss << conmat::Indent(1) << conmat::TestFailed() << "m_name:"
       << "\n";
-  oss << "\t\t"
-      << "actual = " << conmat::Colorize(actual.m_name, conmat::Color::Red)
+  oss << conmat::Indent(2)
+      << "actual: " << conmat::Colorize(actual.m_name, conmat::Color::Red)
       << "\n";
-  oss << "\t\t"
-      << "expected = "
+  oss << conmat::Indent(2) << "expected: "
       << conmat::Colorize(expected.m_name, conmat::Color::Blue) << "\n";
   REQUIRE(matcher.describe() == oss.str());
 }

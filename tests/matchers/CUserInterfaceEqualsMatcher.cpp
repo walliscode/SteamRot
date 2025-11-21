@@ -28,36 +28,35 @@ bool CUserInterfaceEqualsMatcher::match(const CUserInterface &actual) const {
   std::ostringstream oss;
 
   if (actual.m_active != m_expected.m_active) {
+    oss << conmat::Indent(1) << conmat::TestFailed() << "m_active:"
+        << "\n";
 
-    oss << "\t" << conmat::TestFailed() << "m_active:"
+    oss << conmat::Indent(2)
+        << "actual: " << conmat::Colorize(actual.m_active, conmat::Color::Red)
         << "\n";
-    oss << "\t\t"
-        << "actual = " << conmat::Colorize(actual.m_active, conmat::Color::Red)
-        << "\n";
-    oss << "\t\t"
-        << "expected = "
+    oss << conmat::Indent(2) << "expected: "
         << conmat::Colorize(m_expected.m_active, conmat::Color::Blue) << "\n";
   }
 
   if (actual.m_name != m_expected.m_name) {
-    oss << "\t" << conmat::TestFailed() << "m_name:"
+    oss << conmat::Indent(1) << conmat::TestFailed() << "m_name:"
         << "\n";
-    oss << "\t\t"
-        << "actual = " << conmat::Colorize(actual.m_name, conmat::Color::Red)
+
+    oss << conmat::Indent(2)
+        << "actual: " << conmat::Colorize(actual.m_name, conmat::Color::Red)
         << "\n";
-    oss << "\t\t"
-        << "expected = "
+    oss << conmat::Indent(2) << "expected: "
         << conmat::Colorize(m_expected.m_name, conmat::Color::Blue) << "\n";
   }
 
   if (actual.m_UI_visible != m_expected.m_UI_visible) {
-    oss << "\t" << conmat::TestFailed() << "m_UI_visible:"
+    oss << conmat::Indent(1) << conmat::TestFailed() << "m_UI_visible:"
         << "\n";
-    oss << "\t\t"
-        << "actual = "
+
+    oss << conmat::Indent(2)
+        << "actual: "
         << conmat::Colorize(actual.m_UI_visible, conmat::Color::Red) << "\n";
-    oss << "\t\t"
-        << "expected = "
+    oss << conmat::Indent(2) << "expected: "
         << conmat::Colorize(m_expected.m_UI_visible, conmat::Color::Blue)
         << "\n";
   }
@@ -69,22 +68,21 @@ bool CUserInterfaceEqualsMatcher::match(const CUserInterface &actual) const {
                         m_expected.m_root_element != nullptr);
 
   if (!both_null && !both_non_null) {
-    oss << "\t" << conmat::TestFailed() << "m_root_element:"
+    oss << conmat::Indent(1) << conmat::TestFailed() << "m_root_element:"
         << "\n";
+
     if (actual.m_root_element == nullptr) {
-      oss << "\t\t"
-          << "actual = " << conmat::Colorize("nullptr", conmat::Color::Red)
+      oss << conmat::Indent(2)
+          << "actual: " << conmat::Colorize("nullptr", conmat::Color::Red)
           << "\n";
-      oss << "\t\t"
-          << "expected = "
+      oss << conmat::Indent(2) << "expected: "
           << conmat::Colorize("non-nullptr", conmat::Color::Blue) << "\n";
     } else {
-      oss << "\t\t"
-          << "actual = "
+      oss << conmat::Indent(2)
+          << "actual: "
           << conmat::Colorize("non-nullptr", conmat::Color::Red) << "\n";
-      oss << "\t\t"
-          << "expected = " << conmat::Colorize("nullptr", conmat::Color::Blue)
-          << "\n";
+      oss << conmat::Indent(2) << "expected: "
+          << conmat::Colorize("nullptr", conmat::Color::Blue) << "\n";
     }
   } else if (both_non_null) {
     // Both are non-null, use UIElement matcher to compare them recursively
