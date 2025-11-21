@@ -8,13 +8,13 @@
 /////////////////////////////////////////////////
 #pragma once
 
-#include "cgrimoire_machina_matchers.h"
+#include "CGrimoireMachinaEqualsMatcher.h"
 #include "cmachina_form_matchers.h"
-#include "cmeta_matchers.h"
+#include "CMetaEqualsMatcher.h"
 #include "conmat.h"
 #include "containers.h"
-#include "cui_state_matchers.h"
-#include "cuser_interface_matchers.h"
+#include "CUIStateEqualsMatcher.h"
+#include "CUserInterfaceEqualsMatcher.h"
 #include "entity_memory.h"
 #include "test_context.h"
 #include <catch2/catch_test_macros.hpp>

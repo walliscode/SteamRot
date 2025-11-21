@@ -2,10 +2,10 @@
 # Provides custom Catch2 matchers for component and entity comparisons
 
 add_library(test_matchers
-  cmeta_matchers.cpp
-  cgrimoire_machina_matchers.cpp
-
-
+  CMetaEqualsMatcher.cpp
+  CGrimoireMachinaEqualsMatcher.cpp
+  CUserInterfaceEqualsMatcher.cpp
+  CUIStateEqualsMatcher.cpp
 )
 
 target_include_directories(test_matchers
@@ -27,7 +27,6 @@ PUBLIC
 # Test executable for component matchers
 add_executable(test_component_matchers
   component_matchers.test.cpp
-  cmeta_matchers.test.cpp
 )
 
 target_link_libraries(test_component_matchers
@@ -39,6 +38,63 @@ PRIVATE
 )
 
 catch_discover_tests(test_component_matchers)
+
+# Test executable for CMetaEqualsMatcher
+add_executable(test_cmeta_equals_matcher
+  CMetaEqualsMatcher.test.cpp
+)
+
+target_link_libraries(test_cmeta_equals_matcher
+PRIVATE
+  Catch2::Catch2WithMain
+  test_matchers
+  components
+)
+
+catch_discover_tests(test_cmeta_equals_matcher)
+
+# Test executable for CGrimoireMachinaEqualsMatcher
+add_executable(test_cgrimoire_machina_equals_matcher
+  CGrimoireMachinaEqualsMatcher.test.cpp
+)
+
+target_link_libraries(test_cgrimoire_machina_equals_matcher
+PRIVATE
+  Catch2::Catch2WithMain
+  test_matchers
+  components
+)
+
+catch_discover_tests(test_cgrimoire_machina_equals_matcher)
+
+# Test executable for CUserInterfaceEqualsMatcher
+add_executable(test_cuser_interface_equals_matcher
+  CUserInterfaceEqualsMatcher.test.cpp
+)
+
+target_link_libraries(test_cuser_interface_equals_matcher
+PRIVATE
+  Catch2::Catch2WithMain
+  test_matchers
+  components
+  user_interface
+)
+
+catch_discover_tests(test_cuser_interface_equals_matcher)
+
+# Test executable for CUIStateEqualsMatcher
+add_executable(test_cui_state_equals_matcher
+  CUIStateEqualsMatcher.test.cpp
+)
+
+target_link_libraries(test_cui_state_equals_matcher
+PRIVATE
+  Catch2::Catch2WithMain
+  test_matchers
+  components
+)
+
+catch_discover_tests(test_cui_state_equals_matcher)
 
 # Test executable for entity memory pool matchers
 add_executable(test_entity_memory_pool_matchers

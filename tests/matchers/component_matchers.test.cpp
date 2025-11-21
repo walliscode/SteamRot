@@ -14,7 +14,7 @@
 #include "DropDownItemElement.h"
 #include "DropDownListElement.h"
 #include "PanelElement.h"
-#include "cuser_interface_matchers.h"
+#include "CUserInterfaceEqualsMatcher.h"
 #include "ui_element_matchers.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
