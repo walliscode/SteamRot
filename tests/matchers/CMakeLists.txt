@@ -62,3 +62,32 @@ PRIVATE
 )
 
 catch_discover_tests(test_event_matchers)
+
+# Test executable for isolated CMeta matcher tests
+add_executable(test_cmeta_matchers_isolated
+  cmeta_matchers_isolated.test.cpp
+)
+
+target_link_libraries(test_cmeta_matchers_isolated
+PRIVATE
+  Catch2::Catch2WithMain
+  test_matchers
+  components
+)
+
+catch_discover_tests(test_cmeta_matchers_isolated)
+
+# Test executable for isolated EntityMemoryPool matcher tests
+add_executable(test_entity_memory_pool_matchers_isolated
+  entity_memory_pool_matchers_isolated.test.cpp
+)
+
+target_link_libraries(test_entity_memory_pool_matchers_isolated
+PRIVATE
+  Catch2::Catch2WithMain
+  test_matchers
+  components
+  entity
+)
+
+catch_discover_tests(test_entity_memory_pool_matchers_isolated)

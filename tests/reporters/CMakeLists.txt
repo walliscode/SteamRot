@@ -36,3 +36,19 @@ catch_discover_tests(reporter_test
     "harness"
 
 )
+
+# Test executable for isolated reporter tests
+add_executable(reporter_isolated_test
+  HarnessReporter_isolated.test.cpp
+)
+
+target_link_libraries(reporter_isolated_test
+  PUBLIC
+    Catch2::Catch2WithMain
+    reporters_objects
+)
+
+catch_discover_tests(reporter_isolated_test
+  TEST_PREFIX
+    "reporters.isolated."
+)
