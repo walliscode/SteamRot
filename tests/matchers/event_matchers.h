@@ -207,9 +207,7 @@ public:
     }
 
     // Compare m_event_data
-    if (!CompareEventData(actual.m_event_data, m_expected.m_event_data, oss)) {
-      // Mismatch description already added by CompareEventData
-    }
+    CompareEventData(actual.m_event_data, m_expected.m_event_data, oss);
 
     // Compare event_id
     if (actual.event_id != m_expected.event_id) {

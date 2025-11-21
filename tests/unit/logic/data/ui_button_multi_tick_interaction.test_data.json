@@ -1,0 +1,301 @@
+{
+  "metadata": {
+    "test_name": "ui_button_multi_tick_interaction",
+    "description": "Multi-tick UI button interaction test that chains mouse over collision detection with action processing. Tests full subscriber activation workflow across 2 ticks: (1) Mouse release at (150,125) generates USER_INPUT event which activates subscriber and processes button action, adding response EVENT_TEST to waiting room; (2) Final validation shows EVENT_TEST moved to EventBus. Validates CUserInterface component state transitions and event flow through EventBus and waiting room.",
+    "tags": [
+      "unit",
+      "logic",
+      "ui",
+      "button",
+      "multi-tick",
+      "collision",
+      "action",
+      "subscriber",
+      "event-driven"
+    ],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "num_ticks": 2,
+  "input_sequence": {
+    "description": "Simulated mouse release at tick 1 which generates USER_INPUT event",
+    "inputs": [
+      {
+        "input_type": "MouseRelease",
+        "input_data_type": "MouseInputData",
+        "input_data": {
+          "position": {
+            "x": 150.0,
+            "y": 125.0
+          },
+          "button": 0
+        },
+        "tick": 1,
+        "description": "Release mouse button over button center (button at 100,100 with size 100x50) - generates USER_INPUT event with mouse_released LEFT_CLICK"
+      }
+    ]
+  },
+  "simulation_data": {
+    "description": "Simulation steps: collision detection and action processing on every tick",
+    "steps": [
+      {
+        "simulation_type": "Collision",
+        "execution_mode": "Function",
+        "function_type": "CheckMouseOverNestedUIElement",
+        "description": "Check mouse collision with UI elements (runs every tick)"
+      },
+      {
+        "simulation_type": "Action",
+        "execution_mode": "Function",
+        "function_type": "ProcessNestedUIActionsAndEvents",
+        "description": "Process UI actions and generate response events (runs every tick)"
+      }
+    ]
+  },
+  "start_data_collection": {
+    "entity_collection": {
+      "entity_memory_pool_size": 5,
+      "entities": [
+        {
+          "index": 0,
+          "c_user_interface": {
+            "ui_name": "test_button_ui",
+            "start_visible": true,
+            "root_ui_element": {
+              "base_data": {
+                "position": {
+                  "x": 100,
+                  "y": 100
+                },
+                "size": {
+                  "x": 100,
+                  "y": 50
+                },
+                "children_active": true,
+                "children": [
+                  {
+                    "element_type": "ButtonData",
+                    "element": {
+                      "base_data": {
+                        "position": {
+                          "x": 100,
+                          "y": 100
+                        },
+                        "size": {
+                          "x": 100,
+                          "y": 50
+                        },
+                        "subscriber_data": {
+                          "event_type_data": "EVENT_USER_INPUT",
+                          "trigger_data_type": "UserInputBitsetData",
+                          "trigger_data": {
+                            "mouse_released": ["LEFT_CLICK"]
+                          },
+                          "active": true
+                        },
+                        "response_event_data": {
+                          "event_lifetime": 2,
+                          "event_type": "EVENT_TEST",
+                          "event_data_data_type": "NONE"
+                        },
+                        "children_active": false,
+                        "children": [],
+                        "is_mouse_over": false,
+                        "layout": "Horizontal",
+                        "spacing_strategy": "None"
+                      },
+                      "label": "Test Button"
+                    }
+                  }
+                ],
+                "layout": "Vertical",
+                "spacing_strategy": "None"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "event_bus": {
+      "description": "Empty EventBus at start",
+      "events": []
+    },
+    "waiting_room": {
+      "description": "Empty waiting room at start",
+      "events": []
+    }
+  },
+  "tick_snapshots": [
+    {
+      "tick": 1,
+      "description": "After tick 1: Mouse release at (150,125) generates USER_INPUT event, collision sets is_mouse_over=true, subscriber is active, ProcessNestedUIActionsAndEvents adds EVENT_TEST to waiting room",
+      "data_collection": {
+        "entity_collection": {
+          "entity_memory_pool_size": 5,
+          "entities": [
+            {
+              "index": 0,
+              "c_user_interface": {
+                "ui_name": "test_button_ui",
+                "start_visible": true,
+                "root_ui_element": {
+                  "base_data": {
+                    "position": {
+                      "x": 100,
+                      "y": 100
+                    },
+                    "size": {
+                      "x": 100,
+                      "y": 50
+                    },
+                    "children_active": true,
+                    "children": [
+                      {
+                        "element_type": "ButtonData",
+                        "element": {
+                          "base_data": {
+                            "position": {
+                              "x": 100,
+                              "y": 100
+                            },
+                            "size": {
+                              "x": 100,
+                              "y": 50
+                            },
+                            "subscriber_data": {
+                              "event_type_data": "EVENT_USER_INPUT",
+                              "trigger_data_type": "UserInputBitsetData",
+                              "trigger_data": {
+                                "mouse_released": ["LEFT_CLICK"]
+                              },
+                              "active": false
+                            },
+                            "response_event_data": {
+                              "event_lifetime": 2,
+                              "event_type": "EVENT_TEST",
+                              "event_data_data_type": "NONE"
+                            },
+                            "children_active": false,
+                            "children": [],
+                            "is_mouse_over": true,
+                            "layout": "Horizontal",
+                            "spacing_strategy": "None"
+                          },
+                          "label": "Test Button"
+                        }
+                      }
+                    ],
+                    "layout": "Vertical",
+                    "spacing_strategy": "None"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "event_bus": {
+          "description": "USER_INPUT event generated and not yet tick down",
+          "events": [
+            {
+              "event_lifetime": 1,
+              "event_type": "EVENT_USER_INPUT",
+              "event_data_data_type": "UserInputBitsetData",
+              "event_data_data": {
+                "mouse_released": ["LEFT_CLICK"]
+              }
+            }
+          ]
+        },
+        "waiting_room": {
+          "description": "EVENT_TEST in waiting room with lifetime=2",
+          "events": [
+            {
+              "event_lifetime": 2,
+              "event_type": "EVENT_TEST",
+              "event_data_data_type": "NONE"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "expected_data_collection": {
+    "entity_collection": {
+      "entity_memory_pool_size": 5,
+      "entities": [
+        {
+          "index": 0,
+          "c_user_interface": {
+            "ui_name": "test_button_ui",
+            "start_visible": true,
+            "root_ui_element": {
+              "base_data": {
+                "position": {
+                  "x": 100,
+                  "y": 100
+                },
+                "size": {
+                  "x": 100,
+                  "y": 50
+                },
+                "children_active": true,
+                "children": [
+                  {
+                    "element_type": "ButtonData",
+                    "element": {
+                      "base_data": {
+                        "position": {
+                          "x": 100,
+                          "y": 100
+                        },
+                        "size": {
+                          "x": 100,
+                          "y": 50
+                        },
+                        "subscriber_data": {
+                          "event_type_data": "EVENT_USER_INPUT",
+                          "trigger_data_type": "UserInputBitsetData",
+                          "trigger_data": {
+                            "mouse_released": ["LEFT_CLICK"]
+                          },
+                          "active": false
+                        },
+                        "response_event_data": {
+                          "event_lifetime": 2,
+                          "event_type": "EVENT_TEST",
+                          "event_data_data_type": "NONE"
+                        },
+                        "children_active": false,
+                        "children": [],
+                        "is_mouse_over": true,
+                        "layout": "Horizontal",
+                        "spacing_strategy": "None"
+                      },
+                      "label": "Test Button"
+                    }
+                  }
+                ],
+                "layout": "Vertical",
+                "spacing_strategy": "None"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "event_bus": {
+      "description": "After tick 2: EVENT_TEST moved from waiting room to EventBus, lifetime decremented to 1",
+      "events": [
+        {
+          "event_lifetime": 1,
+          "event_type": "EVENT_TEST",
+          "event_data_data_type": "NONE"
+        }
+      ]
+    },
+    "waiting_room": {
+      "description": "Waiting room empty after events moved to EventBus",
+      "events": []
+    }
+  }
+}

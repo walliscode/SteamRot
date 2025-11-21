@@ -8,7 +8,9 @@
 /////////////////////////////////////////////////
 #include "event_bus_conversion.h"
 #include "event_conversion.h"
+#include "events_generated.h"
 #include "uuid.h"
+#include <iostream>
 
 namespace steamrot::event::conversion {
 
@@ -40,11 +42,13 @@ ConvertEventBusDataToEventBus(const EventBusData *event_bus_data) {
     EventPacket event_packet(packet_data->event_lifetime());
     event_packet.m_event_type = packet_data->event_type();
 
-    // Handle different event data types
     if (packet_data->event_data_data_type() ==
         EventDataData_UserInputBitsetData) {
+
+      // pull out flatbuffers data
       const UserInputBitsetData *input_data =
           packet_data->event_data_data_as_UserInputBitsetData();
+
       if (input_data) {
         // Use the existing conversion function from event_conversion.h
         auto input_bitset_result = ConvertFBDataToUserInputBitset(*input_data);
@@ -57,8 +61,10 @@ ConvertEventBusDataToEventBus(const EventBusData *event_bus_data) {
       }
     } else if (packet_data->event_data_data_type() ==
                EventDataData_SceneChangePacketData) {
+
       const SceneChangePacketData *scene_data =
           packet_data->event_data_data_as_SceneChangePacketData();
+
       if (scene_data) {
         // SceneChangePacket is std::pair<std::optional<uuids::uuid>, SceneType>
         std::optional<uuids::uuid> uuid_opt;
@@ -77,6 +83,9 @@ ConvertEventBusDataToEventBus(const EventBusData *event_bus_data) {
     // Note: If event_data_data_type is NONE or unhandled, m_event_data
     // remains as default (std::monostate)
 
+    if (std::holds_alternative<std::monostate>(event_packet.m_event_data)) {
+      std::cout << "EventPacket m_event_data is std::monostate\n";
+    }
     event_bus.push_back(event_packet);
   }
 
