@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Catch2 matcher for CMeta comparison
+/// @brief Declaration of Catch2 matcher for CMeta comparison
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -9,10 +9,7 @@
 #pragma once
 
 #include "CMeta.h"
-#include "conmat.h"
-#include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
-#include <sstream>
 #include <string>
 
 namespace steamrot::tests {
@@ -22,57 +19,46 @@ namespace steamrot::tests {
 /////////////////////////////////////////////////
 class CMetaEqualsMatcher : public Catch::Matchers::MatcherBase<CMeta> {
 private:
+  /////////////////////////////////////////////////
+  /// @brief Expected CMeta object to compare against
+  /////////////////////////////////////////////////
   const CMeta &m_expected;
+
+  /////////////////////////////////////////////////
+  /// @brief store mismatch description for reporting
+  ///
+  /// @note mutable to allow modification in const match method
+  /////////////////////////////////////////////////
   mutable std::string m_mismatch_description;
 
 public:
-  explicit CMetaEqualsMatcher(const CMeta &expected) : m_expected(expected) {}
+  /////////////////////////////////////////////////
+  /// @brief Constructor for CMetaEqualsMatcher
+  ///
+  /// @param expected Expected CMeta object to compare against
+  /////////////////////////////////////////////////
+  explicit CMetaEqualsMatcher(const CMeta &expected);
 
-  bool match(const CMeta &actual) const override {
-    m_mismatch_description.clear();
-    std::ostringstream oss;
+  /////////////////////////////////////////////////
+  /// @brief match method to compare actual CMeta with expected
+  ///
+  /// @param actual CMeta object to compare
+  /// @return Whether the actual CMeta matches the expected
+  /////////////////////////////////////////////////
+  bool match(const CMeta &actual) const override;
 
-    if (actual.m_active != m_expected.m_active) {
-      oss << "\t" << conmat::TestFailed() << "m_active:" << "\n";
-
-      oss << "\t\t" << "actual = "
-          << conmat::Colorize(actual.m_active, conmat::Color::Red) << "\n";
-      oss << "\t\t" << "expected = "
-          << conmat::Colorize(m_expected.m_active, conmat::Color::Blue) << "\n";
-    }
-
-    if (actual.m_entity_active != m_expected.m_entity_active) {
-      oss << "\t" << conmat::TestFailed() << "m_entity_active:" << "\n";
-      oss << "\t\t" << "actual = " << actual.m_entity_active << "\n";
-      oss << "\t\t" << "expected = " << m_expected.m_entity_active << "\n";
-    }
-
-    m_mismatch_description = oss.str();
-    return m_mismatch_description.empty();
-  }
-
-  std::string describe() const override {
-    // if mismatch description is empty then we can assume the test passed
-    if (m_mismatch_description.empty()) {
-
-      std::ostringstream oss;
-      oss << conmat::Divider("-", 40) << "\n";
-      oss << conmat::TestPassed() << "CMeta Match" << "\n";
-      oss << conmat::Divider("-", 40) << "\n";
-      return oss.str();
-    } else {
-
-      std::ostringstream oss;
-      oss << conmat::Divider("-", 40) << "\n";
-      oss << conmat::TestFailed() << "CMeta Match: " << "\n";
-      oss << m_mismatch_description << "\n";
-      oss << conmat::Divider("-", 40) << "\n";
-
-      return oss.str();
-    }
-  }
+  /////////////////////////////////////////////////
+  /// @brief describe method to provide detailed mismatch description.
+  /////////////////////////////////////////////////
+  std::string describe() const override;
 };
 
+/////////////////////////////////////////////////
+/// @brief Helper function to create CMetaEqualsMatcher
+///
+/// @param expected [TODO:parameter]
+/// @return [TODO:return]
+/////////////////////////////////////////////////
 inline CMetaEqualsMatcher EqualsCMeta(const CMeta &expected) {
   return CMetaEqualsMatcher(expected);
 }
