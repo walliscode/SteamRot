@@ -11,9 +11,9 @@
 #include "CMeta.h"
 #include "CUIState.h"
 #include "CUserInterface.h"
-#include "cgrimoire_machina_matchers.h"
+#include "CGrimoireMachinaEqualsMatcher.h"
 #include "cmachina_form_matchers.h"
-#include "cmeta_matchers.h"
+#include "CMetaEqualsMatcher.h"
 #include "cui_state_matchers.h"
 #include "cuser_interface_matchers.h"
 #include <catch2/catch_test_macros.hpp>

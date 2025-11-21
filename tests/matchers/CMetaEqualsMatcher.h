@@ -9,27 +9,23 @@
 #pragma once
 
 #include "CMeta.h"
-#include <catch2/matchers/catch_matchers.hpp>
+#include "ComponentMatcherBase.h"
 #include <string>
 
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
-/// @class CMeta specific matcher for detailed comparison
+/// @class CMetaEqualsMatcher
+/// @brief CMeta specific matcher for detailed comparison
 /////////////////////////////////////////////////
-class CMetaEqualsMatcher : public Catch::Matchers::MatcherBase<CMeta> {
+class CMetaEqualsMatcher : public ComponentMatcherBase<CMeta> {
 private:
   /////////////////////////////////////////////////
-  /// @brief Expected CMeta object to compare against
-  /////////////////////////////////////////////////
-  const CMeta &m_expected;
-
-  /////////////////////////////////////////////////
-  /// @brief store mismatch description for reporting
+  /// @brief Get the component type name for display
   ///
-  /// @note mutable to allow modification in const match method
+  /// @return "CMeta" string
   /////////////////////////////////////////////////
-  mutable std::string m_mismatch_description;
+  std::string GetComponentName() const override;
 
 public:
   /////////////////////////////////////////////////
@@ -40,24 +36,19 @@ public:
   explicit CMetaEqualsMatcher(const CMeta &expected);
 
   /////////////////////////////////////////////////
-  /// @brief match method to compare actual CMeta with expected
+  /// @brief Match method to compare actual CMeta with expected
   ///
   /// @param actual CMeta object to compare
   /// @return Whether the actual CMeta matches the expected
   /////////////////////////////////////////////////
   bool match(const CMeta &actual) const override;
-
-  /////////////////////////////////////////////////
-  /// @brief describe method to provide detailed mismatch description.
-  /////////////////////////////////////////////////
-  std::string describe() const override;
 };
 
 /////////////////////////////////////////////////
 /// @brief Helper function to create CMetaEqualsMatcher
 ///
-/// @param expected [TODO:parameter]
-/// @return [TODO:return]
+/// @param expected Expected CMeta object
+/// @return CMetaEqualsMatcher instance
 /////////////////////////////////////////////////
 inline CMetaEqualsMatcher EqualsCMeta(const CMeta &expected) {
   return CMetaEqualsMatcher(expected);

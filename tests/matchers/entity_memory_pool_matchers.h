@@ -8,9 +8,9 @@
 /////////////////////////////////////////////////
 #pragma once
 
-#include "cgrimoire_machina_matchers.h"
+#include "CGrimoireMachinaEqualsMatcher.h"
 #include "cmachina_form_matchers.h"
-#include "cmeta_matchers.h"
+#include "CMetaEqualsMatcher.h"
 #include "conmat.h"
 #include "containers.h"
 #include "cui_state_matchers.h"

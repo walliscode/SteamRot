@@ -1,16 +1,16 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Unit tests for Component custom matchers
+/// @brief Unit tests for CMetaEqualsMatcher
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "cmeta_matchers.h"
+#include "CMetaEqualsMatcher.h"
 #include "conmat.h"
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("CMeta custom matcher works correctly",
+TEST_CASE("CMetaEqualsMatcher works correctly",
           "[unit][Components][CMeta][matcher]") {
   steamrot::CMeta expected;
   expected.m_active = true;
@@ -30,7 +30,8 @@ TEST_CASE("CMeta custom matcher works correctly",
     REQUIRE_THAT(actual, steamrot::tests::EqualsCMeta(expected));
   }
 }
-TEST_CASE("Matcher describe is as expected on success",
+
+TEST_CASE("CMetaEqualsMatcher describe is as expected on success",
           "[unit][Components][CMeta][matcher]") {
   steamrot::CMeta expected;
   expected.m_active = true;
@@ -45,7 +46,8 @@ TEST_CASE("Matcher describe is as expected on success",
 
   REQUIRE(matcher.describe() == oss.str());
 }
-TEST_CASE("CMeta describe is as expected on failure",
+
+TEST_CASE("CMetaEqualsMatcher describe is as expected on failure",
           "[unit][Components][CMeta][matcher]") {
   steamrot::CMeta expected;
   expected.m_active = true;
@@ -59,15 +61,16 @@ TEST_CASE("CMeta describe is as expected on failure",
 
   std::ostringstream oss;
   oss << conmat::Header(conmat::TestFailed() + "CMeta Match:", 3) << "\n";
-  oss << conmat::Indent(1) << conmat::TestFailed() << "m_active:" << "\n";
+  oss << conmat::Indent(1) << conmat::TestFailed() << "m_active:"
+      << "\n";
   oss << conmat::Indent(2)
       << "actual: " << conmat::Colorize(actual.m_active, conmat::Color::Red)
       << "\n";
   oss << conmat::Indent(2) << "expected: "
       << conmat::Colorize(expected.m_active, conmat::Color::Blue) << "\n";
 
-  oss << conmat::Indent(1) << conmat::TestFailed()
-      << "m_entity_active:" << "\n";
+  oss << conmat::Indent(1) << conmat::TestFailed() << "m_entity_active:"
+      << "\n";
   oss << conmat::Indent(2) << "actual: "
       << conmat::Colorize(actual.m_entity_active, conmat::Color::Red) << "\n";
   oss << conmat::Indent(2) << "expected: "
