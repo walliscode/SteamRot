@@ -56,5 +56,31 @@
     ]
   },
 
-  "assets": {}
+  "assets": {},
+
+  "logic_collection_data": {
+    "collision_logic_data": [
+      {
+        "name": "UICollisionLogic",
+        "subscriber_data": []
+      }
+    ],
+    "render_logic_data": [
+      {
+        "name": "UIRenderLogic",
+        "subscriber_data": []
+      }
+    ],
+    "action_logic_data": [
+      {
+        "name": "UIStateLogic",
+        "subscriber_data": []
+      },
+      {
+        "name": "UIActionLogic",
+        "subscriber_data": []
+      }
+    ],
+    "movement_logic_data": []
+  }
 }

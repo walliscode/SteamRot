@@ -68,6 +68,13 @@ public:
   const std::vector<std::shared_ptr<Subscriber>> &GetSubscribers() const;
 
   /////////////////////////////////////////////////
+  /// @brief Add a subscriber to this Logic instance.
+  ///
+  /// @param subscriber Shared pointer to the Subscriber to add
+  /////////////////////////////////////////////////
+  void AddSubscriber(std::shared_ptr<Subscriber> subscriber);
+
+  /////////////////////////////////////////////////
   /// @brief  A contiainer function to process all subscribers on this logic
   /// object.
   /////////////////////////////////////////////////

@@ -12,6 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "Logic.h"
+#include "SubscriberFactory.h"
 #include "logic_data_generated.h"
 #include "scene_change_packet_generated.h"
 #include <expected>
@@ -46,20 +47,45 @@ private:
   SceneContext m_scene_context;
 
   /////////////////////////////////////////////////
+  /// @brief LogicCollectionData for configuring Logic instances
+  /////////////////////////////////////////////////
+  const LogicCollectionData *m_logic_collection_data;
+
+  /////////////////////////////////////////////////
   /// @brief Create a vector of logic objects specifically for collision
   ///
+  /// @param collision_logic_data Vector of LogicData for collision logics
   /////////////////////////////////////////////////
-  std::expected<LogicVector, FailInfo> CreateCollisionLogics();
+  std::expected<LogicVector, FailInfo>
+  CreateCollisionLogics(const flatbuffers::Vector<
+                        flatbuffers::Offset<LogicData>> *collision_logic_data);
 
   /////////////////////////////////////////////////
   /// @brief Create a vector of logic objects specifically for rendering
+  ///
+  /// @param render_logic_data Vector of LogicData for render logics
   /////////////////////////////////////////////////
-  std::expected<LogicVector, FailInfo> CreateRenderLogics();
+  std::expected<LogicVector, FailInfo>
+  CreateRenderLogics(const flatbuffers::Vector<
+                     flatbuffers::Offset<LogicData>> *render_logic_data);
 
   /////////////////////////////////////////////////
   /// @brief Create a vector of logic objects specifically for actions
+  ///
+  /// @param action_logic_data Vector of LogicData for action logics
   /////////////////////////////////////////////////
-  std::expected<LogicVector, FailInfo> CreateActionLogics();
+  std::expected<LogicVector, FailInfo>
+  CreateActionLogics(const flatbuffers::Vector<
+                     flatbuffers::Offset<LogicData>> *action_logic_data);
+
+  /////////////////////////////////////////////////
+  /// @brief Attach subscribers to a Logic instance based on LogicData
+  ///
+  /// @param logic Logic instance to attach subscribers to
+  /// @param logic_data LogicData containing subscriber configuration
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  AttachSubscribers(Logic &logic, const LogicData *logic_data);
 
 public:
   /////////////////////////////////////////////////
