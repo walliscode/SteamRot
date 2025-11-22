@@ -23,14 +23,16 @@ TEST_CASE("LogicFactory constructed without errors", "[unit][LogicFactory]") {
 
   // Load LogicCollectionData
   steamrot::FlatbuffersDataLoader data_loader;
-  auto logic_collection_data_result =
-      data_loader.ProvideLogicCollectionData(steamrot::SceneType::SceneType_TEST);
-  REQUIRE(logic_collection_data_result.has_value());
+  auto logic_collection_data_result = data_loader.ProvideLogicCollectionData(
+      steamrot::SceneType::SceneType_TEST);
+
+  if (!logic_collection_data_result.has_value()) {
+    FAIL(logic_collection_data_result.error().message);
+  }
 
   // create a LogicFactory instance
-  steamrot::LogicFactory logic_factory(
-      steamrot::SceneType::SceneType_TEST,
-      test_context.GetSceneContext());
+  steamrot::LogicFactory logic_factory(steamrot::SceneType::SceneType_TEST,
+                                       test_context.GetSceneContext());
 
   REQUIRE_NOTHROW(logic_factory);
 }
@@ -45,14 +47,13 @@ TEST_CASE("LogicFactory creates the correct Logic instances with a test Scene",
 
   // Load LogicCollectionData
   steamrot::FlatbuffersDataLoader data_loader;
-  auto logic_collection_data_result =
-      data_loader.ProvideLogicCollectionData(steamrot::SceneType::SceneType_TEST);
+  auto logic_collection_data_result = data_loader.ProvideLogicCollectionData(
+      steamrot::SceneType::SceneType_TEST);
   REQUIRE(logic_collection_data_result.has_value());
 
   // create a LogicFactory instance
-  steamrot::LogicFactory logic_factory(
-      steamrot::SceneType::SceneType_TEST,
-      test_context.GetSceneContext());
+  steamrot::LogicFactory logic_factory(steamrot::SceneType::SceneType_TEST,
+                                       test_context.GetSceneContext());
 
   auto logic_map_result =
       logic_factory.CreateLogicMap(*logic_collection_data_result.value());
@@ -76,14 +77,13 @@ TEST_CASE("LogicFactory creates correct Logic instances for TitleScene",
 
   // Load LogicCollectionData
   steamrot::FlatbuffersDataLoader data_loader;
-  auto logic_collection_data_result =
-      data_loader.ProvideLogicCollectionData(steamrot::SceneType::SceneType_TITLE);
+  auto logic_collection_data_result = data_loader.ProvideLogicCollectionData(
+      steamrot::SceneType::SceneType_TITLE);
   REQUIRE(logic_collection_data_result.has_value());
 
   // create a LogicFactory instance
-  steamrot::LogicFactory logic_factory(
-      steamrot::SceneType::SceneType_TITLE,
-      test_context.GetSceneContext());
+  steamrot::LogicFactory logic_factory(steamrot::SceneType::SceneType_TITLE,
+                                       test_context.GetSceneContext());
 
   auto logic_map_result =
       logic_factory.CreateLogicMap(*logic_collection_data_result.value());
@@ -106,14 +106,13 @@ TEST_CASE("LogicFactory creates correct Logic instances for CraftingScene",
 
   // Load LogicCollectionData
   steamrot::FlatbuffersDataLoader data_loader;
-  auto logic_collection_data_result =
-      data_loader.ProvideLogicCollectionData(steamrot::SceneType::SceneType_CRAFTING);
+  auto logic_collection_data_result = data_loader.ProvideLogicCollectionData(
+      steamrot::SceneType::SceneType_CRAFTING);
   REQUIRE(logic_collection_data_result.has_value());
 
   // create a LogicFactory instance
-  steamrot::LogicFactory logic_factory(
-      steamrot::SceneType::SceneType_CRAFTING,
-      test_context.GetSceneContext());
+  steamrot::LogicFactory logic_factory(steamrot::SceneType::SceneType_CRAFTING,
+                                       test_context.GetSceneContext());
 
   auto logic_map_result =
       logic_factory.CreateLogicMap(*logic_collection_data_result.value());
@@ -137,14 +136,13 @@ TEST_CASE("LogicFactory attaches subscribers to Logic instances",
 
   // Load LogicCollectionData
   steamrot::FlatbuffersDataLoader data_loader;
-  auto logic_collection_data_result =
-      data_loader.ProvideLogicCollectionData(steamrot::SceneType::SceneType_TEST);
+  auto logic_collection_data_result = data_loader.ProvideLogicCollectionData(
+      steamrot::SceneType::SceneType_TEST);
   REQUIRE(logic_collection_data_result.has_value());
 
   // create a LogicFactory instance
-  steamrot::LogicFactory logic_factory(
-      steamrot::SceneType::SceneType_TEST,
-      test_context.GetSceneContext());
+  steamrot::LogicFactory logic_factory(steamrot::SceneType::SceneType_TEST,
+                                       test_context.GetSceneContext());
 
   auto logic_map_result =
       logic_factory.CreateLogicMap(*logic_collection_data_result.value());
@@ -160,8 +158,10 @@ TEST_CASE("LogicFactory attaches subscribers to Logic instances",
   REQUIRE(logic_collection.find(steamrot::LogicType::Action) !=
           logic_collection.end());
 
-  // Verify subscribers can be accessed (they may be empty for default test data)
-  const auto &collision_logics = logic_collection.at(steamrot::LogicType::Collision);
+  // Verify subscribers can be accessed (they may be empty for default test
+  // data)
+  const auto &collision_logics =
+      logic_collection.at(steamrot::LogicType::Collision);
   REQUIRE(!collision_logics.empty());
   REQUIRE_NOTHROW(collision_logics[0]->GetSubscribers());
 
@@ -191,14 +191,13 @@ TEST_CASE("LogicFactory attaches subscribers from LogicData",
 
   // Load LogicCollectionData that includes subscribers
   steamrot::FlatbuffersDataLoader data_loader;
-  auto logic_collection_data_result =
-      data_loader.ProvideLogicCollectionData(steamrot::SceneType::SceneType_TEST);
+  auto logic_collection_data_result = data_loader.ProvideLogicCollectionData(
+      steamrot::SceneType::SceneType_TEST);
   REQUIRE(logic_collection_data_result.has_value());
 
   // create a LogicFactory instance
-  steamrot::LogicFactory logic_factory(
-      steamrot::SceneType::SceneType_TEST,
-      test_context.GetSceneContext());
+  steamrot::LogicFactory logic_factory(steamrot::SceneType::SceneType_TEST,
+                                       test_context.GetSceneContext());
 
   auto logic_map_result =
       logic_factory.CreateLogicMap(*logic_collection_data_result.value());
@@ -217,5 +216,6 @@ TEST_CASE("LogicFactory attaches subscribers from LogicData",
   // Test passes if no exceptions are thrown during creation
   // Even if there are no subscribers in the default test data,
   // the mechanism for attaching them should work without errors
-  SUCCEED("LogicFactory successfully processes LogicCollectionData with subscriber configuration");
+  SUCCEED("LogicFactory successfully processes LogicCollectionData with "
+          "subscriber configuration");
 }
