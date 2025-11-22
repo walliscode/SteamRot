@@ -15,6 +15,7 @@
 #include "FailInfo.h"
 #include "context_data_generated.h"
 #include "game_engine_generated.h"
+#include "logic_data_generated.h"
 #include "resource_data_generated.h"
 #include "scene_change_packet_generated.h"
 #include "scene_manager_generated.h"
@@ -105,6 +106,14 @@ public:
   /////////////////////////////////////////////////
   std::expected<const SceneResourcesData *, FailInfo>
   ProvideSceneResourcesData(const SceneType scene_type) const;
+
+  /////////////////////////////////////////////////
+  /// @brief Provides LogicCollectionData from SceneData for a specific scene
+  ///
+  /// @param scene_type SceneType enum representing the type of scene
+  /////////////////////////////////////////////////
+  std::expected<const LogicCollectionData *, FailInfo>
+  ProvideLogicCollectionData(const SceneType scene_type) const;
 };
 
 } // namespace steamrot

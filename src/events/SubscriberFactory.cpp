@@ -9,7 +9,7 @@
 #include "SubscriberFactory.h"
 #include "Subscriber.h"
 #include "event_conversion.h"
-#include "subscriber_config_generated.h"
+#include "subscriber_data_generated.h"
 #include <memory>
 
 namespace steamrot {

@@ -12,6 +12,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "SceneContext.h"
+#include "Subscriber.h"
+#include <memory>
 namespace steamrot {
 
 using EntityIndicies = std::vector<size_t>;
@@ -32,6 +34,11 @@ protected:
   /// @brief Contains an instance of the SceneContext struct.
   /////////////////////////////////////////////////
   SceneContext m_scene_context;
+
+  /////////////////////////////////////////////////
+  /// @brief A vector of shared pointers to Subscriber objects.
+  /////////////////////////////////////////////////
+  std::vector<std::shared_ptr<Subscriber>> m_subscribers;
 
 public:
   /////////////////////////////////////////////////
@@ -54,5 +61,16 @@ public:
   /// to be run
   /////////////////////////////////////////////////
   void RunLogic();
+
+  /////////////////////////////////////////////////
+  /// @brief A view accessor for the subscribers vector.
+  /////////////////////////////////////////////////
+  const std::vector<std::shared_ptr<Subscriber>> &GetSubscribers() const;
+
+  /////////////////////////////////////////////////
+  /// @brief  A contiainer function to process all subscribers on this logic
+  /// object.
+  /////////////////////////////////////////////////
+  // virtual void ProcessSubscribers() = 0;
 };
 } // namespace steamrot

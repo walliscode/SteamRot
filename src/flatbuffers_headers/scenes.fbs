@@ -1,6 +1,6 @@
 
 include "entities.fbs";
-
+include "logic_data.fbs";
 include "assets.fbs";
 
 include "resource_data.fbs";
@@ -9,6 +9,7 @@ namespace steamrot;
 
 table SceneData{
     entity_collection: EntityCollection;
+    logic_collection_data: LogicCollectionData;
     assets: AssetCollection;
     scene_resources: SceneResourcesData;
   }

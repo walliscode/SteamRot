@@ -17,4 +17,9 @@ Logic::Logic(const SceneContext scene_context)
 /////////////////////////////////////////////////
 void Logic::RunLogic() { ProcessLogic(); }
 
+/////////////////////////////////////////////////
+const std::vector<std::shared_ptr<Subscriber>> &Logic::GetSubscribers() const {
+  return m_subscribers;
+}
+
 } // namespace steamrot
