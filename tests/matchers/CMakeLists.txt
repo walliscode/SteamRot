@@ -1,7 +1,7 @@
 # Matchers library for test utilities
 # Provides custom Catch2 matchers for component and entity comparisons
 
-add_library(test_matchers
+add_library(matchers
   CMetaEqualsMatcher.cpp
   CGrimoireMachinaEqualsMatcher.cpp
   CUserInterfaceEqualsMatcher.cpp
@@ -15,12 +15,12 @@ add_library(test_matchers
   EntityMemoryPoolEqualsMatcher.cpp
 )
 
-target_include_directories(test_matchers
+target_include_directories(matchers
 PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-target_link_libraries(test_matchers
+target_link_libraries(matchers
 PUBLIC
   Catch2::Catch2WithMain
   components
@@ -31,109 +31,15 @@ PUBLIC
   conmat
 )
 
-# Test executable for component matchers
-add_executable(test_component_matchers
+# Test executable for all matcher tests
+add_executable(test_matchers
   component_matchers.test.cpp
-)
-
-target_link_libraries(test_component_matchers
-PRIVATE
-  Catch2::Catch2WithMain
-  test_matchers
-  components
-  user_interface
-)
-
-catch_discover_tests(test_component_matchers)
-
-# Test executable for CMetaEqualsMatcher
-add_executable(test_cmeta_equals_matcher
   CMetaEqualsMatcher.test.cpp
-)
-
-target_link_libraries(test_cmeta_equals_matcher
-PRIVATE
-  Catch2::Catch2WithMain
-  test_matchers
-  components
-)
-
-catch_discover_tests(test_cmeta_equals_matcher)
-
-# Test executable for CGrimoireMachinaEqualsMatcher
-add_executable(test_cgrimoire_machina_equals_matcher
   CGrimoireMachinaEqualsMatcher.test.cpp
-)
-
-target_link_libraries(test_cgrimoire_machina_equals_matcher
-PRIVATE
-  Catch2::Catch2WithMain
-  test_matchers
-  components
-)
-
-catch_discover_tests(test_cgrimoire_machina_equals_matcher)
-
-# Test executable for CUserInterfaceEqualsMatcher
-add_executable(test_cuser_interface_equals_matcher
   CUserInterfaceEqualsMatcher.test.cpp
-)
-
-target_link_libraries(test_cuser_interface_equals_matcher
-PRIVATE
-  Catch2::Catch2WithMain
-  test_matchers
-  components
-  user_interface
-)
-
-catch_discover_tests(test_cuser_interface_equals_matcher)
-
-# Test executable for CUIStateEqualsMatcher
-add_executable(test_cui_state_equals_matcher
   CUIStateEqualsMatcher.test.cpp
-)
-
-target_link_libraries(test_cui_state_equals_matcher
-PRIVATE
-  Catch2::Catch2WithMain
-  test_matchers
-  components
-)
-
-catch_discover_tests(test_cui_state_equals_matcher)
-
-# Test executable for entity memory pool matchers
-add_executable(test_entity_memory_pool_matchers
   entity_memory_pool_matchers.test.cpp
-)
-
-target_link_libraries(test_entity_memory_pool_matchers
-PRIVATE
-  Catch2::Catch2WithMain
-  test_matchers
-  components
-  entity
-)
-
-catch_discover_tests(test_entity_memory_pool_matchers)
-
-# Test executable for event matchers
-add_executable(test_event_matchers
   event_matchers.test.cpp
-)
-
-target_link_libraries(test_event_matchers
-PRIVATE
-  Catch2::Catch2WithMain
-  test_matchers
-  events
-)
-
-catch_discover_tests(test_event_matchers)
-
-# Test executable for all new matcher tests
-add_executable(test_new_matchers
   CMachinaFormEqualsMatcher.test.cpp
   EventPacketEqualsMatcher.test.cpp
   EventBusEqualsMatcher.test.cpp
@@ -143,14 +49,14 @@ add_executable(test_new_matchers
   EntityMemoryPoolEqualsMatcher.test.cpp
 )
 
-target_link_libraries(test_new_matchers
+target_link_libraries(test_matchers
 PRIVATE
   Catch2::Catch2WithMain
-  test_matchers
+  matchers
   components
   entity
   user_interface
   events
 )
 
-catch_discover_tests(test_new_matchers)
+catch_discover_tests(test_matchers)

@@ -36,5 +36,5 @@ target_link_libraries(entity_helpers
   Catch2::Catch2WithMain
   entity
   user_interface_helpers
-  test_matchers
+  matchers
 )
