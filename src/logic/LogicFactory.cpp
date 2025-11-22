@@ -21,7 +21,8 @@ LogicFactory::LogicFactory(const SceneType scene_type,
     : m_scene_type(scene_type), m_scene_context(scene_context) {}
 
 /////////////////////////////////////////////////
-std::expected<LogicCollection, FailInfo> LogicFactory::CreateLogicMap() {
+std::expected<LogicCollection, FailInfo>
+LogicFactory::CreateLogicMap(const LogicCollectionData &logic_collection_data) {
 
   // create return object
   LogicCollection logic_collection;

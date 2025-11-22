@@ -12,6 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "Logic.h"
+#include "logic_data_generated.h"
 #include "scene_change_packet_generated.h"
 #include <expected>
 #include <memory>
@@ -65,7 +66,8 @@ public:
   /// @brief Constructor for the LogicFactory class.
   ///
   /// @param scene_type SceneType of the scene for which logics are created
-  /// @param scene_context SceneContext object containing references to the scene
+  /// @param scene_context SceneContext object containing references to the
+  /// scene
   /////////////////////////////////////////////////
   LogicFactory(const SceneType scene_type, const SceneContext &scene_context);
 
@@ -73,6 +75,7 @@ public:
   /// @brief Create and return a map of logic objects.
   ///
   /////////////////////////////////////////////////
-  std::expected<LogicCollection, FailInfo> CreateLogicMap();
+  std::expected<LogicCollection, FailInfo>
+  CreateLogicMap(const LogicCollectionData &logic_collection_data);
 };
 } // namespace steamrot

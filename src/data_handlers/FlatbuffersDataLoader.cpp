@@ -379,10 +379,28 @@ FlatbuffersDataLoader::ProvideSceneResourcesData(
   }
 
   const SceneData *scene_data = scene_data_result.value();
-  
+
   // scene_resources is optional, so it's okay if it's not present
   // Return nullptr if not configured - caller should handle defaults
   return scene_data->scene_resources();
+}
+
+/////////////////////////////////////////////////
+std::expected<const LogicCollectionData *, FailInfo>
+FlatbuffersDataLoader::ProvideLogicCollectionData(
+    const SceneType scene_type) const {
+  // Load from SceneData for the specified scene type
+  auto scene_data_result = ProvideSceneData(scene_type);
+  if (!scene_data_result.has_value()) {
+    return std::unexpected(scene_data_result.error());
+  }
+  const SceneData *scene_data = scene_data_result.value();
+  if (!scene_data->logic_collection_data()) {
+    return std::unexpected(
+        FailInfo(FailMode::FlatbuffersDataNotFound,
+                 "LogicCollectionData not found in SceneData"));
+  }
+  return scene_data->logic_collection_data();
 }
 
 } // namespace steamrot

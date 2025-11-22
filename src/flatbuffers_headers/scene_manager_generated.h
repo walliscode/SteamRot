@@ -13,7 +13,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
-#include "subscriber_config_generated.h"
+#include "subscriber_data_generated.h"
 
 namespace steamrot {
 

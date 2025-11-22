@@ -15,6 +15,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 #include "assets_generated.h"
 #include "entities_generated.h"
+#include "logic_data_generated.h"
 #include "resource_data_generated.h"
 
 namespace steamrot {
@@ -26,11 +27,15 @@ struct SceneData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef SceneDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ENTITY_COLLECTION = 4,
-    VT_ASSETS = 6,
-    VT_SCENE_RESOURCES = 8
+    VT_LOGIC_COLLECTION_DATA = 6,
+    VT_ASSETS = 8,
+    VT_SCENE_RESOURCES = 10
   };
   const steamrot::EntityCollection *entity_collection() const {
     return GetPointer<const steamrot::EntityCollection *>(VT_ENTITY_COLLECTION);
+  }
+  const steamrot::LogicCollectionData *logic_collection_data() const {
+    return GetPointer<const steamrot::LogicCollectionData *>(VT_LOGIC_COLLECTION_DATA);
   }
   const steamrot::AssetCollection *assets() const {
     return GetPointer<const steamrot::AssetCollection *>(VT_ASSETS);
@@ -42,6 +47,8 @@ struct SceneData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_ENTITY_COLLECTION) &&
            verifier.VerifyTable(entity_collection()) &&
+           VerifyOffset(verifier, VT_LOGIC_COLLECTION_DATA) &&
+           verifier.VerifyTable(logic_collection_data()) &&
            VerifyOffset(verifier, VT_ASSETS) &&
            verifier.VerifyTable(assets()) &&
            VerifyOffset(verifier, VT_SCENE_RESOURCES) &&
@@ -56,6 +63,9 @@ struct SceneDataBuilder {
   ::flatbuffers::uoffset_t start_;
   void add_entity_collection(::flatbuffers::Offset<steamrot::EntityCollection> entity_collection) {
     fbb_.AddOffset(SceneData::VT_ENTITY_COLLECTION, entity_collection);
+  }
+  void add_logic_collection_data(::flatbuffers::Offset<steamrot::LogicCollectionData> logic_collection_data) {
+    fbb_.AddOffset(SceneData::VT_LOGIC_COLLECTION_DATA, logic_collection_data);
   }
   void add_assets(::flatbuffers::Offset<steamrot::AssetCollection> assets) {
     fbb_.AddOffset(SceneData::VT_ASSETS, assets);
@@ -77,11 +87,13 @@ struct SceneDataBuilder {
 inline ::flatbuffers::Offset<SceneData> CreateSceneData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::EntityCollection> entity_collection = 0,
+    ::flatbuffers::Offset<steamrot::LogicCollectionData> logic_collection_data = 0,
     ::flatbuffers::Offset<steamrot::AssetCollection> assets = 0,
     ::flatbuffers::Offset<steamrot::SceneResourcesData> scene_resources = 0) {
   SceneDataBuilder builder_(_fbb);
   builder_.add_scene_resources(scene_resources);
   builder_.add_assets(assets);
+  builder_.add_logic_collection_data(logic_collection_data);
   builder_.add_entity_collection(entity_collection);
   return builder_.Finish();
 }
