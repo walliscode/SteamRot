@@ -22,4 +22,9 @@ const std::vector<std::shared_ptr<Subscriber>> &Logic::GetSubscribers() const {
   return m_subscribers;
 }
 
+/////////////////////////////////////////////////
+void Logic::AddSubscriber(std::shared_ptr<Subscriber> subscriber) {
+  m_subscribers.push_back(subscriber);
+}
+
 } // namespace steamrot
