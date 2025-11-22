@@ -47,18 +47,12 @@ private:
   SceneContext m_scene_context;
 
   /////////////////////////////////////////////////
-  /// @brief LogicCollectionData for configuring Logic instances
-  /////////////////////////////////////////////////
-  const LogicCollectionData *m_logic_collection_data;
-
-  /////////////////////////////////////////////////
   /// @brief Create a vector of logic objects specifically for collision
   ///
   /// @param collision_logic_data Vector of LogicData for collision logics
   /////////////////////////////////////////////////
   std::expected<LogicVector, FailInfo>
-  CreateCollisionLogics(const flatbuffers::Vector<
-                        flatbuffers::Offset<LogicData>> *collision_logic_data);
+  CreateCollisionLogics(const flatbuffers::Vector<flatbuffers::Offset<LogicData>> *collision_logic_data);
 
   /////////////////////////////////////////////////
   /// @brief Create a vector of logic objects specifically for rendering
@@ -66,8 +60,7 @@ private:
   /// @param render_logic_data Vector of LogicData for render logics
   /////////////////////////////////////////////////
   std::expected<LogicVector, FailInfo>
-  CreateRenderLogics(const flatbuffers::Vector<
-                     flatbuffers::Offset<LogicData>> *render_logic_data);
+  CreateRenderLogics(const flatbuffers::Vector<flatbuffers::Offset<LogicData>> *render_logic_data);
 
   /////////////////////////////////////////////////
   /// @brief Create a vector of logic objects specifically for actions
@@ -75,8 +68,7 @@ private:
   /// @param action_logic_data Vector of LogicData for action logics
   /////////////////////////////////////////////////
   std::expected<LogicVector, FailInfo>
-  CreateActionLogics(const flatbuffers::Vector<
-                     flatbuffers::Offset<LogicData>> *action_logic_data);
+  CreateActionLogics(const flatbuffers::Vector<flatbuffers::Offset<LogicData>> *action_logic_data);
 
   /////////////////////////////////////////////////
   /// @brief Attach subscribers to a Logic instance based on LogicData

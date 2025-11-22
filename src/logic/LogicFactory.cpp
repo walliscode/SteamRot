@@ -19,15 +19,11 @@ namespace steamrot {
 /////////////////////////////////////////////////
 LogicFactory::LogicFactory(const SceneType scene_type,
                            const SceneContext &scene_context)
-    : m_scene_type(scene_type), m_scene_context(scene_context),
-      m_logic_collection_data(nullptr) {}
+    : m_scene_type(scene_type), m_scene_context(scene_context) {}
 
 /////////////////////////////////////////////////
 std::expected<LogicCollection, FailInfo>
 LogicFactory::CreateLogicMap(const LogicCollectionData &logic_collection_data) {
-
-  // Store the logic collection data
-  m_logic_collection_data = &logic_collection_data;
 
   // create return object
   LogicCollection logic_collection;
