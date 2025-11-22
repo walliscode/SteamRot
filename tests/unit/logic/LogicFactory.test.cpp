@@ -9,8 +9,6 @@
 #include "LogicFactory.h"
 #include "FlatbuffersDataLoader.h"
 #include "TestFixture.h"
-#include "UIActionLogic.h"
-#include "UICollisionLogic.h"
 #include "logic_test_helpers.h"
 #include "scene_change_packet_generated.h"
 #include <catch2/catch_test_macros.hpp>
@@ -56,7 +54,7 @@ TEST_CASE("LogicFactory creates the correct Logic instances with a test Scene",
                                        test_context.GetSceneContext());
 
   auto logic_map_result =
-      logic_factory.CreateLogicMap(*logic_collection_data_result.value());
+      logic_factory.CreateLogicMap(logic_collection_data_result.value());
   if (!logic_map_result.has_value()) {
     FAIL("LogicFactory failed to create logic map: " +
          logic_map_result.error().message);
@@ -79,14 +77,17 @@ TEST_CASE("LogicFactory creates correct Logic instances for TitleScene",
   steamrot::FlatbuffersDataLoader data_loader;
   auto logic_collection_data_result = data_loader.ProvideLogicCollectionData(
       steamrot::SceneType::SceneType_TITLE);
-  REQUIRE(logic_collection_data_result.has_value());
+
+  if (!logic_collection_data_result.has_value()) {
+    FAIL(logic_collection_data_result.error().message);
+  }
 
   // create a LogicFactory instance
   steamrot::LogicFactory logic_factory(steamrot::SceneType::SceneType_TITLE,
                                        test_context.GetSceneContext());
 
   auto logic_map_result =
-      logic_factory.CreateLogicMap(*logic_collection_data_result.value());
+      logic_factory.CreateLogicMap(logic_collection_data_result.value());
   if (!logic_map_result.has_value()) {
     FAIL("LogicFactory failed to create logic map: " +
          logic_map_result.error().message);
@@ -115,7 +116,7 @@ TEST_CASE("LogicFactory creates correct Logic instances for CraftingScene",
                                        test_context.GetSceneContext());
 
   auto logic_map_result =
-      logic_factory.CreateLogicMap(*logic_collection_data_result.value());
+      logic_factory.CreateLogicMap(logic_collection_data_result.value());
   if (!logic_map_result.has_value()) {
     FAIL("LogicFactory failed to create logic map: " +
          logic_map_result.error().message);
@@ -145,7 +146,7 @@ TEST_CASE("LogicFactory attaches subscribers to Logic instances",
                                        test_context.GetSceneContext());
 
   auto logic_map_result =
-      logic_factory.CreateLogicMap(*logic_collection_data_result.value());
+      logic_factory.CreateLogicMap(logic_collection_data_result.value());
   REQUIRE(logic_map_result.has_value());
 
   steamrot::LogicCollection &logic_collection = logic_map_result.value();
@@ -200,7 +201,7 @@ TEST_CASE("LogicFactory attaches subscribers from LogicData",
                                        test_context.GetSceneContext());
 
   auto logic_map_result =
-      logic_factory.CreateLogicMap(*logic_collection_data_result.value());
+      logic_factory.CreateLogicMap(logic_collection_data_result.value());
   REQUIRE(logic_map_result.has_value());
 
   steamrot::LogicCollection &logic_collection = logic_map_result.value();
@@ -218,4 +219,92 @@ TEST_CASE("LogicFactory attaches subscribers from LogicData",
   // the mechanism for attaching them should work without errors
   SUCCEED("LogicFactory successfully processes LogicCollectionData with "
           "subscriber configuration");
+}
+
+TEST_CASE("LogicFactory creates Logic instances without LogicCollectionData",
+          "[unit][LogicFactory]") {
+
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::tests::TestFixture test_context{
+      steamrot::SceneType::SceneType_TEST};
+
+  // create a LogicFactory instance
+  steamrot::LogicFactory logic_factory(steamrot::SceneType::SceneType_TEST,
+                                       test_context.GetSceneContext());
+
+  // Create logic map with nullptr (no configuration data)
+  auto logic_map_result = logic_factory.CreateLogicMap(nullptr);
+  REQUIRE(logic_map_result.has_value());
+
+  steamrot::LogicCollection &logic_collection = logic_map_result.value();
+
+  // Verify that all LogicTypes exist in the map
+  REQUIRE(logic_collection.find(steamrot::LogicType::Collision) !=
+          logic_collection.end());
+  REQUIRE(logic_collection.find(steamrot::LogicType::Render) !=
+          logic_collection.end());
+  REQUIRE(logic_collection.find(steamrot::LogicType::Action) !=
+          logic_collection.end());
+
+  // Verify Logic instances are created (using CheckStaticLogicCollections)
+  steamrot::tests::CheckStaticLogicCollections(
+      logic_collection, steamrot::SceneType::SceneType_TEST);
+
+  // Verify that Logic instances have no subscribers (since no data was
+  // provided)
+  const auto &collision_logics =
+      logic_collection.at(steamrot::LogicType::Collision);
+  REQUIRE(!collision_logics.empty());
+  REQUIRE(collision_logics[0]->GetSubscribers().empty());
+
+  const auto &render_logics = logic_collection.at(steamrot::LogicType::Render);
+  REQUIRE(!render_logics.empty());
+  REQUIRE(render_logics[0]->GetSubscribers().empty());
+
+  const auto &action_logics = logic_collection.at(steamrot::LogicType::Action);
+  REQUIRE(!action_logics.empty());
+  REQUIRE(action_logics[0]->GetSubscribers().empty());
+}
+
+TEST_CASE("LogicFactory works for all scene types without LogicCollectionData",
+          "[unit][LogicFactory]") {
+
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+
+  // Test for TEST scene
+  {
+    steamrot::tests::TestFixture test_context{
+        steamrot::SceneType::SceneType_TEST};
+    steamrot::LogicFactory logic_factory(steamrot::SceneType::SceneType_TEST,
+                                         test_context.GetSceneContext());
+    auto logic_map_result = logic_factory.CreateLogicMap(nullptr);
+    REQUIRE(logic_map_result.has_value());
+    steamrot::tests::CheckStaticLogicCollections(
+        logic_map_result.value(), steamrot::SceneType::SceneType_TEST);
+  }
+
+  // Test for TITLE scene
+  {
+    steamrot::tests::TestFixture test_context{
+        steamrot::SceneType::SceneType_TITLE};
+    steamrot::LogicFactory logic_factory(steamrot::SceneType::SceneType_TITLE,
+                                         test_context.GetSceneContext());
+    auto logic_map_result = logic_factory.CreateLogicMap(nullptr);
+    REQUIRE(logic_map_result.has_value());
+    steamrot::tests::CheckStaticLogicCollections(
+        logic_map_result.value(), steamrot::SceneType::SceneType_TITLE);
+  }
+
+  // Test for CRAFTING scene
+  {
+    steamrot::tests::TestFixture test_context{
+        steamrot::SceneType::SceneType_CRAFTING};
+    steamrot::LogicFactory logic_factory(
+        steamrot::SceneType::SceneType_CRAFTING,
+        test_context.GetSceneContext());
+    auto logic_map_result = logic_factory.CreateLogicMap(nullptr);
+    REQUIRE(logic_map_result.has_value());
+    steamrot::tests::CheckStaticLogicCollections(
+        logic_map_result.value(), steamrot::SceneType::SceneType_CRAFTING);
+  }
 }

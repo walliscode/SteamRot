@@ -183,11 +183,18 @@ private:
 
   template <typename T>
   void AddLogicToLogicVector(LogicVector &logic_vector,
-                             const LogicVectorData &logic_vector_data) {
+                             const LogicVectorData *logic_vector_data) {
+
+    // If no logic_vector_data is provided, create unconfigured Logic object
+    if (!logic_vector_data) {
+      auto logic_object = std::make_unique<T>(m_scene_context);
+      logic_vector.push_back(std::move(logic_object));
+      return;
+    }
 
     // create Logic object from type and add to vector
     auto logic_object_creation_result =
-        CreateAndConfigureLogicObject<T>(logic_vector_data, m_scene_context);
+        CreateAndConfigureLogicObject<T>(*logic_vector_data, m_scene_context);
     // UNEXPECTED PROPOGATION
     if (!logic_object_creation_result.has_value()) {
       throw std::runtime_error("Failed to create and configure Logic object");
@@ -207,15 +214,15 @@ private:
 
   std::expected<std::monostate, FailInfo> TitleSceneLogicConfiguration(
       LogicCollection &logic_collection,
-      const LogicCollectionData &logic_collection_data);
+      const LogicCollectionData *logic_collection_data);
 
   std::expected<std::monostate, FailInfo> CraftingSceneLogicConfiguration(
       LogicCollection &logic_collection,
-      const LogicCollectionData &logic_collection_data);
+      const LogicCollectionData *logic_collection_data);
 
   std::expected<std::monostate, FailInfo>
   TestSceneLogicConfiguration(LogicCollection &logic_collection,
-                              const LogicCollectionData &logic_collection_data);
+                              const LogicCollectionData *logic_collection_data);
 
 public:
   /////////////////////////////////////////////////
@@ -230,8 +237,10 @@ public:
   /////////////////////////////////////////////////
   /// @brief Create and return a map of logic objects.
   ///
+  /// @param logic_collection_data Optional pointer to LogicCollectionData. If
+  /// nullptr, Logic classes are still added but not configured.
   /////////////////////////////////////////////////
   std::expected<LogicCollection, FailInfo>
-  CreateLogicMap(const LogicCollectionData &logic_collection_data);
+  CreateLogicMap(const LogicCollectionData *logic_collection_data = nullptr);
 };
 } // namespace steamrot

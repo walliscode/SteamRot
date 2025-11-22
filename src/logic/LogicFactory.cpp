@@ -31,7 +31,6 @@ LogicCollection LogicFactory::CreateEmptyLogicCollection() {
   // emplace constructs the vector in-place (no copying of unique_ptrs)
   collection.emplace(LogicType::Collision, LogicVector{});
   collection.emplace(LogicType::Action, LogicVector{});
-  collection.emplace(LogicType::Movement, LogicVector{});
   collection.emplace(LogicType::Render, LogicVector{});
 
   return collection;
@@ -41,13 +40,14 @@ LogicCollection LogicFactory::CreateEmptyLogicCollection() {
 std::expected<std::monostate, FailInfo>
 LogicFactory::TitleSceneLogicConfiguration(
     LogicCollection &logic_collection,
-    const LogicCollectionData &logic_collection_data) {
+    const LogicCollectionData *logic_collection_data) {
 
   // Get Collision Logic Vector and Data
   LogicVector &collision_logics = logic_collection[LogicType::Collision];
 
-  const LogicVectorData &collision_logic_data =
-      *logic_collection_data.collision_logic_data();
+  const LogicVectorData *collision_logic_data =
+      logic_collection_data ? logic_collection_data->collision_logic_data()
+                            : nullptr;
 
   // Add CollisionLogics for Title Scene
   AddLogicToLogicVector<UICollisionLogic>(collision_logics,
@@ -55,23 +55,18 @@ LogicFactory::TitleSceneLogicConfiguration(
 
   // Get Action Logic Vector and Data
   LogicVector &action_logics = logic_collection[LogicType::Action];
-  const LogicVectorData &action_logic_data =
-      *logic_collection_data.action_logic_data();
+  const LogicVectorData *action_logic_data =
+      logic_collection_data ? logic_collection_data->action_logic_data()
+                            : nullptr;
   // Add ActionLogics for Title Scene
   AddLogicToLogicVector<UIStateLogic>(action_logics, action_logic_data);
   AddLogicToLogicVector<UIActionLogic>(action_logics, action_logic_data);
 
-  // Get Movement Logic Vector and Data
-  LogicVector &movement_logics = logic_collection[LogicType::Movement];
-  const LogicVectorData &movement_logic_data =
-      *logic_collection_data.movement_logic_data();
-  // Add MovementLogics for Title Scene
-  //(No movement logics for title scene currently)
-
   // Get Render Logic Vector and Data
   LogicVector &render_logics = logic_collection[LogicType::Render];
-  const LogicVectorData &render_logic_data =
-      *logic_collection_data.render_logic_data();
+  const LogicVectorData *render_logic_data =
+      logic_collection_data ? logic_collection_data->render_logic_data()
+                            : nullptr;
   // Add RenderLogics for Title Scene
   AddLogicToLogicVector<UIRenderLogic>(render_logics, render_logic_data);
 
@@ -82,12 +77,13 @@ LogicFactory::TitleSceneLogicConfiguration(
 std::expected<std::monostate, FailInfo>
 LogicFactory::CraftingSceneLogicConfiguration(
     LogicCollection &logic_collection,
-    const LogicCollectionData &logic_collection_data) {
+    const LogicCollectionData *logic_collection_data) {
 
   // Get Collision Logic Vector and Data
   LogicVector &collision_logics = logic_collection[LogicType::Collision];
-  const LogicVectorData &collision_logic_data =
-      *logic_collection_data.collision_logic_data();
+  const LogicVectorData *collision_logic_data =
+      logic_collection_data ? logic_collection_data->collision_logic_data()
+                            : nullptr;
 
   // Add CollisionLogics for Title Scene
   AddLogicToLogicVector<UICollisionLogic>(collision_logics,
@@ -95,24 +91,19 @@ LogicFactory::CraftingSceneLogicConfiguration(
 
   // Get Action Logic Vector and Data
   LogicVector &action_logics = logic_collection[LogicType::Action];
-  const LogicVectorData &action_logic_data =
-      *logic_collection_data.action_logic_data();
+  const LogicVectorData *action_logic_data =
+      logic_collection_data ? logic_collection_data->action_logic_data()
+                            : nullptr;
 
   // Add ActionLogics for Title Scene
   AddLogicToLogicVector<UIStateLogic>(action_logics, action_logic_data);
   AddLogicToLogicVector<UIActionLogic>(action_logics, action_logic_data);
 
-  // Get Movement Logic Vector and Data
-  LogicVector &movement_logics = logic_collection[LogicType::Movement];
-  const LogicVectorData &movement_logic_data =
-      *logic_collection_data.movement_logic_data();
-  // Add MovementLogics for Title Scene
-  //(No movement logics for title scene currently)
-
   // Get Render Logic Vector and Data
   LogicVector &render_logics = logic_collection[LogicType::Render];
-  const LogicVectorData &render_logic_data =
-      *logic_collection_data.render_logic_data();
+  const LogicVectorData *render_logic_data =
+      logic_collection_data ? logic_collection_data->render_logic_data()
+                            : nullptr;
 
   // Add RenderLogics for Title Scene
   AddLogicToLogicVector<CraftingRenderLogic>(render_logics, render_logic_data);
@@ -125,12 +116,13 @@ LogicFactory::CraftingSceneLogicConfiguration(
 std::expected<std::monostate, FailInfo>
 LogicFactory::TestSceneLogicConfiguration(
     LogicCollection &logic_collection,
-    const LogicCollectionData &logic_collection_data) {
+    const LogicCollectionData *logic_collection_data) {
 
   // Get Collision Logic Vector and Data
   LogicVector &collision_logics = logic_collection[LogicType::Collision];
-  const LogicVectorData &collision_logic_data =
-      *logic_collection_data.collision_logic_data();
+  const LogicVectorData *collision_logic_data =
+      logic_collection_data ? logic_collection_data->collision_logic_data()
+                            : nullptr;
 
   // Add CollisionLogics for Test Scene
   AddLogicToLogicVector<UICollisionLogic>(collision_logics,
@@ -138,25 +130,19 @@ LogicFactory::TestSceneLogicConfiguration(
 
   // Get Action Logic Vector and Data
   LogicVector &action_logics = logic_collection[LogicType::Action];
-  const LogicVectorData &action_logic_data =
-      *logic_collection_data.action_logic_data();
+  const LogicVectorData *action_logic_data =
+      logic_collection_data ? logic_collection_data->action_logic_data()
+                            : nullptr;
 
   // Add ActionLogics for Test Scene
   AddLogicToLogicVector<UIStateLogic>(action_logics, action_logic_data);
   AddLogicToLogicVector<UIActionLogic>(action_logics, action_logic_data);
 
-  // Get Movement Logic Vector and Data
-  LogicVector &movement_logics = logic_collection[LogicType::Movement];
-  const LogicVectorData &movement_logic_data =
-      *logic_collection_data.movement_logic_data();
-
-  // Add MovementLogics for Test Scene
-  //(No movement logics for test scene currently)
-
   // Get Render Logic Vector and Data
   LogicVector &render_logics = logic_collection[LogicType::Render];
-  const LogicVectorData &render_logic_data =
-      *logic_collection_data.render_logic_data();
+  const LogicVectorData *render_logic_data =
+      logic_collection_data ? logic_collection_data->render_logic_data()
+                            : nullptr;
 
   // Add RenderLogics for Test Scene
   AddLogicToLogicVector<UIRenderLogic>(render_logics, render_logic_data);
@@ -166,7 +152,7 @@ LogicFactory::TestSceneLogicConfiguration(
 
 /////////////////////////////////////////////////
 std::expected<LogicCollection, FailInfo>
-LogicFactory::CreateLogicMap(const LogicCollectionData &logic_collection_data) {
+LogicFactory::CreateLogicMap(const LogicCollectionData *logic_collection_data) {
 
   // create empty logic collection
   LogicCollection logic_collection = CreateEmptyLogicCollection();

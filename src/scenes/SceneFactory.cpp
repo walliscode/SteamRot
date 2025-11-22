@@ -103,8 +103,15 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type,
   LogicFactory logic_factory(scene_type, scene_ptr->GetSceneContext());
 
   // get logic collection data from data loader
-  auto create_map_result = logic_factory.CreateLogicMap(
-      *data_loader.ProvideLogicCollectionData(scene_type).value());
+  // if it fails, pass nullptr to create unconfigured logic instances
+  auto logic_collection_data_result =
+      data_loader.ProvideLogicCollectionData(scene_type);
+  const LogicCollectionData *logic_collection_data =
+      logic_collection_data_result.has_value()
+          ? logic_collection_data_result.value()
+          : nullptr;
+
+  auto create_map_result = logic_factory.CreateLogicMap(logic_collection_data);
   if (!create_map_result) {
     return std::unexpected(create_map_result.error());
   }
