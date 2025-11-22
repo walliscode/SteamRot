@@ -12,19 +12,21 @@
 #include "conmat.h"
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("UIElementEqualsMatcher works correctly",
-          "[unit][UIElement][matcher]") {
-  steamrot::UIElement expected;
+TEST_CASE("UIElementEqualsMatcher works correctly with ButtonElement",
+          "[unit][UIElement][ButtonElement][matcher]") {
+  steamrot::ButtonElement expected;
   expected.position = sf::Vector2f(100.0f, 200.0f);
   expected.size = sf::Vector2f(50.0f, 30.0f);
   expected.children_active = true;
+  expected.label = "Test";
 
-  steamrot::UIElement actual;
+  steamrot::ButtonElement actual;
 
   SECTION("Matcher detects differences in position") {
     actual.position = sf::Vector2f(150.0f, 250.0f);
     actual.size = sf::Vector2f(50.0f, 30.0f);
     actual.children_active = true;
+    actual.label = "Test";
     REQUIRE_THAT(actual, !steamrot::tests::EqualsUIElement(expected));
   }
 
@@ -32,6 +34,7 @@ TEST_CASE("UIElementEqualsMatcher works correctly",
     actual.position = sf::Vector2f(100.0f, 200.0f);
     actual.size = sf::Vector2f(60.0f, 40.0f);
     actual.children_active = true;
+    actual.label = "Test";
     REQUIRE_THAT(actual, !steamrot::tests::EqualsUIElement(expected));
   }
 
@@ -39,15 +42,16 @@ TEST_CASE("UIElementEqualsMatcher works correctly",
     actual.position = sf::Vector2f(100.0f, 200.0f);
     actual.size = sf::Vector2f(50.0f, 30.0f);
     actual.children_active = true;
+    actual.label = "Test";
     REQUIRE_THAT(actual, steamrot::tests::EqualsUIElement(expected));
   }
 }
 
 TEST_CASE("UIElementEqualsMatcher describe is as expected on success",
           "[unit][UIElement][matcher]") {
-  steamrot::UIElement expected;
+  steamrot::ButtonElement expected;
   expected.position = sf::Vector2f(100.0f, 200.0f);
-  steamrot::UIElement actual;
+  steamrot::ButtonElement actual;
   actual.position = sf::Vector2f(100.0f, 200.0f);
   auto matcher = steamrot::tests::EqualsUIElement(expected);
   matcher.match(actual);
@@ -62,11 +66,11 @@ TEST_CASE("UIElementEqualsMatcher describe is as expected on success",
 
 TEST_CASE("UIElementEqualsMatcher describe is as expected on failure",
           "[unit][UIElement][matcher]") {
-  steamrot::UIElement expected;
+  steamrot::ButtonElement expected;
   expected.position = sf::Vector2f(100.0f, 200.0f);
   expected.size = sf::Vector2f(50.0f, 30.0f);
 
-  steamrot::UIElement actual;
+  steamrot::ButtonElement actual;
   actual.position = sf::Vector2f(150.0f, 250.0f);
   actual.size = sf::Vector2f(60.0f, 40.0f);
 
@@ -79,7 +83,7 @@ TEST_CASE("UIElementEqualsMatcher describe is as expected on failure",
   REQUIRE(description.find("size:") != std::string::npos);
 }
 
-TEST_CASE("UIElementEqualsMatcher works with ButtonElement",
+TEST_CASE("UIElementEqualsMatcher works with different concrete types",
           "[unit][UIElement][ButtonElement][matcher]") {
   steamrot::ButtonElement expected;
   expected.position = sf::Vector2f(100.0f, 200.0f);
