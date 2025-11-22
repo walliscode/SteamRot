@@ -8,46 +8,58 @@
 /////////////////////////////////////////////////
 #include "EventPacketEqualsMatcher.h"
 #include "conmat.h"
+#include "uuid.h"
 #include <catch2/catch_test_macros.hpp>
+#include <random>
+
+static uuids::uuid GenerateTestUUID() {
+  std::random_device rd;
+  auto seed_data = std::array<int, std::mt19937::state_size>{};
+  std::generate(std::begin(seed_data), std::end(seed_data), std::ref(rd));
+  std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
+  std::mt19937 generator(seq);
+  uuids::uuid_random_generator gen{generator};
+  return gen();
+}
 
 TEST_CASE("EventPacketEqualsMatcher works correctly",
           "[unit][Events][EventPacket][matcher]") {
   steamrot::EventPacket expected;
   expected.m_event_type = steamrot::EventType::EventType_EVENT_USER_INPUT;
-  expected.event_id = 1;
-  expected.source_id = 100;
+  expected.event_id = GenerateTestUUID();
+  expected.source_id = GenerateTestUUID();
   expected.event_lifetime = 1;
 
   steamrot::EventPacket actual;
 
   SECTION("Matcher detects differences in m_event_type") {
     actual.m_event_type = steamrot::EventType::EventType_EVENT_TEST;
-    actual.event_id = 1;
-    actual.source_id = 100;
+    actual.event_id = expected.event_id;
+    actual.source_id = expected.source_id;
     actual.event_lifetime = 1;
     REQUIRE_THAT(actual, !steamrot::tests::EqualsEventPacket(expected));
   }
 
   SECTION("Matcher detects differences in event_id") {
     actual.m_event_type = steamrot::EventType::EventType_EVENT_USER_INPUT;
-    actual.event_id = 2;
-    actual.source_id = 100;
+    actual.event_id = GenerateTestUUID();
+    actual.source_id = expected.source_id;
     actual.event_lifetime = 1;
     REQUIRE_THAT(actual, !steamrot::tests::EqualsEventPacket(expected));
   }
 
   SECTION("Matcher detects differences in source_id") {
     actual.m_event_type = steamrot::EventType::EventType_EVENT_USER_INPUT;
-    actual.event_id = 1;
-    actual.source_id = 200;
+    actual.event_id = expected.event_id;
+    actual.source_id = GenerateTestUUID();
     actual.event_lifetime = 1;
     REQUIRE_THAT(actual, !steamrot::tests::EqualsEventPacket(expected));
   }
 
   SECTION("Matcher detects equality") {
     actual.m_event_type = steamrot::EventType::EventType_EVENT_USER_INPUT;
-    actual.event_id = 1;
-    actual.source_id = 100;
+    actual.event_id = expected.event_id;
+    actual.source_id = expected.source_id;
     actual.event_lifetime = 1;
     REQUIRE_THAT(actual, steamrot::tests::EqualsEventPacket(expected));
   }
@@ -74,11 +86,11 @@ TEST_CASE("EventPacketEqualsMatcher describe is as expected on failure",
           "[unit][Events][EventPacket][matcher]") {
   steamrot::EventPacket expected;
   expected.m_event_type = steamrot::EventType::EventType_EVENT_USER_INPUT;
-  expected.event_id = 1;
+  expected.event_id = GenerateTestUUID();
 
   steamrot::EventPacket actual;
   actual.m_event_type = steamrot::EventType::EventType_EVENT_TEST;
-  actual.event_id = 2;
+  actual.event_id = GenerateTestUUID();
 
   auto matcher = steamrot::tests::EqualsEventPacket(expected);
   matcher.match(actual);
