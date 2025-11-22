@@ -8,7 +8,6 @@
 /////////////////////////////////////////////////
 #include "UIElementEqualsMatcher.h"
 #include "ButtonElement.h"
-#include "PanelElement.h"
 #include "conmat.h"
 #include <catch2/catch_test_macros.hpp>
 
