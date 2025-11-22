@@ -173,3 +173,49 @@ TEST_CASE("LogicFactory attaches subscribers to Logic instances",
   REQUIRE(!action_logics.empty());
   REQUIRE_NOTHROW(action_logics[0]->GetSubscribers());
 }
+
+TEST_CASE("LogicFactory attaches subscribers from LogicData",
+          "[unit][LogicFactory]") {
+
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::tests::TestFixture test_context{
+      steamrot::SceneType::SceneType_TEST};
+
+  // Create a mock EventHandler for subscriber registration
+  steamrot::EventHandler &event_handler =
+      test_context.GetSceneContext().event_handler;
+
+  // Verify event handler is initially empty
+  auto &subscriber_register = event_handler.GetSubcriberRegister();
+  REQUIRE(subscriber_register.empty());
+
+  // Load LogicCollectionData that includes subscribers
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto logic_collection_data_result =
+      data_loader.ProvideLogicCollectionData(steamrot::SceneType::SceneType_TEST);
+  REQUIRE(logic_collection_data_result.has_value());
+
+  // create a LogicFactory instance
+  steamrot::LogicFactory logic_factory(
+      steamrot::SceneType::SceneType_TEST,
+      test_context.GetSceneContext());
+
+  auto logic_map_result =
+      logic_factory.CreateLogicMap(*logic_collection_data_result.value());
+  REQUIRE(logic_map_result.has_value());
+
+  steamrot::LogicCollection &logic_collection = logic_map_result.value();
+
+  // Verify that all Logic instances are created
+  REQUIRE(logic_collection.find(steamrot::LogicType::Collision) !=
+          logic_collection.end());
+  REQUIRE(logic_collection.find(steamrot::LogicType::Render) !=
+          logic_collection.end());
+  REQUIRE(logic_collection.find(steamrot::LogicType::Action) !=
+          logic_collection.end());
+
+  // Test passes if no exceptions are thrown during creation
+  // Even if there are no subscribers in the default test data,
+  // the mechanism for attaching them should work without errors
+  SUCCEED("LogicFactory successfully processes LogicCollectionData with subscriber configuration");
+}

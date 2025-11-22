@@ -6,6 +6,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "FlatbuffersDataLoader.h"
 #include "SceneFactory.h"
 #include "TestFixture.h"
 #include "draw_ui_elements_test_helpers.h"
@@ -34,10 +35,19 @@ TEST_CASE("TitleScene's call of sRender is correct", "[unit][TitleScene][.visual
     FAIL("Scene configuration failed: " + configure_result.error().message);
   }
   // add the LogicMap
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto logic_collection_data_result =
+      data_loader.ProvideLogicCollectionData(steamrot::SceneType::SceneType_TITLE);
+  if (!logic_collection_data_result.has_value()) {
+    FAIL("Failed to load LogicCollectionData: " +
+         logic_collection_data_result.error().message);
+  }
+
   steamrot::LogicFactory logic_factory(steamrot::SceneType::SceneType_TITLE,
                                        title_scene->GetSceneContext());
 
-  auto create_map_result = logic_factory.CreateLogicMap();
+  auto create_map_result =
+      logic_factory.CreateLogicMap(*logic_collection_data_result.value());
   if (!create_map_result) {
     FAIL("Logic map creation failed: " + create_map_result.error().message);
   }
