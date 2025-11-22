@@ -28,7 +28,7 @@ target_link_libraries(test_scenes
   test_harness
   user_interface
   test_logic_helpers
-  test_matchers
+  matchers
 )
 
 catch_discover_tests(test_scenes)

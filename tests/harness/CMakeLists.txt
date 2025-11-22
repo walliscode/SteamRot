@@ -16,7 +16,7 @@ target_link_libraries(test_harness
   PUBLIC
   context
   entity
-  test_matchers
+  matchers
   resources
   scenes
   logic
