@@ -9,8 +9,6 @@
 #include "LogicFactory.h"
 #include "FlatbuffersDataLoader.h"
 #include "TestFixture.h"
-#include "UIActionLogic.h"
-#include "UICollisionLogic.h"
 #include "logic_test_helpers.h"
 #include "scene_change_packet_generated.h"
 #include <catch2/catch_test_macros.hpp>
@@ -79,7 +77,10 @@ TEST_CASE("LogicFactory creates correct Logic instances for TitleScene",
   steamrot::FlatbuffersDataLoader data_loader;
   auto logic_collection_data_result = data_loader.ProvideLogicCollectionData(
       steamrot::SceneType::SceneType_TITLE);
-  REQUIRE(logic_collection_data_result.has_value());
+
+  if (!logic_collection_data_result.has_value()) {
+    FAIL(logic_collection_data_result.error().message);
+  }
 
   // create a LogicFactory instance
   steamrot::LogicFactory logic_factory(steamrot::SceneType::SceneType_TITLE,
@@ -243,8 +244,6 @@ TEST_CASE("LogicFactory creates Logic instances without LogicCollectionData",
   REQUIRE(logic_collection.find(steamrot::LogicType::Render) !=
           logic_collection.end());
   REQUIRE(logic_collection.find(steamrot::LogicType::Action) !=
-          logic_collection.end());
-  REQUIRE(logic_collection.find(steamrot::LogicType::Movement) !=
           logic_collection.end());
 
   // Verify Logic instances are created (using CheckStaticLogicCollections)

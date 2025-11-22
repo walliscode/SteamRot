@@ -31,7 +31,6 @@ LogicCollection LogicFactory::CreateEmptyLogicCollection() {
   // emplace constructs the vector in-place (no copying of unique_ptrs)
   collection.emplace(LogicType::Collision, LogicVector{});
   collection.emplace(LogicType::Action, LogicVector{});
-  collection.emplace(LogicType::Movement, LogicVector{});
   collection.emplace(LogicType::Render, LogicVector{});
 
   return collection;
@@ -62,14 +61,6 @@ LogicFactory::TitleSceneLogicConfiguration(
   // Add ActionLogics for Title Scene
   AddLogicToLogicVector<UIStateLogic>(action_logics, action_logic_data);
   AddLogicToLogicVector<UIActionLogic>(action_logics, action_logic_data);
-
-  // Get Movement Logic Vector and Data
-  LogicVector &movement_logics = logic_collection[LogicType::Movement];
-  const LogicVectorData *movement_logic_data =
-      logic_collection_data ? logic_collection_data->movement_logic_data()
-                            : nullptr;
-  // Add MovementLogics for Title Scene
-  //(No movement logics for title scene currently)
 
   // Get Render Logic Vector and Data
   LogicVector &render_logics = logic_collection[LogicType::Render];
@@ -107,14 +98,6 @@ LogicFactory::CraftingSceneLogicConfiguration(
   // Add ActionLogics for Title Scene
   AddLogicToLogicVector<UIStateLogic>(action_logics, action_logic_data);
   AddLogicToLogicVector<UIActionLogic>(action_logics, action_logic_data);
-
-  // Get Movement Logic Vector and Data
-  LogicVector &movement_logics = logic_collection[LogicType::Movement];
-  const LogicVectorData *movement_logic_data =
-      logic_collection_data ? logic_collection_data->movement_logic_data()
-                            : nullptr;
-  // Add MovementLogics for Title Scene
-  //(No movement logics for title scene currently)
 
   // Get Render Logic Vector and Data
   LogicVector &render_logics = logic_collection[LogicType::Render];
@@ -154,15 +137,6 @@ LogicFactory::TestSceneLogicConfiguration(
   // Add ActionLogics for Test Scene
   AddLogicToLogicVector<UIStateLogic>(action_logics, action_logic_data);
   AddLogicToLogicVector<UIActionLogic>(action_logics, action_logic_data);
-
-  // Get Movement Logic Vector and Data
-  LogicVector &movement_logics = logic_collection[LogicType::Movement];
-  const LogicVectorData *movement_logic_data =
-      logic_collection_data ? logic_collection_data->movement_logic_data()
-                            : nullptr;
-
-  // Add MovementLogics for Test Scene
-  //(No movement logics for test scene currently)
 
   // Get Render Logic Vector and Data
   LogicVector &render_logics = logic_collection[LogicType::Render];

@@ -12,7 +12,8 @@
 #include "draw_ui_elements_test_helpers.h"
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("TitleScene's call of sRender is correct", "[unit][TitleScene][.visual]") {
+TEST_CASE("TitleScene's call of sRender is correct",
+          "[unit][TitleScene][.visual]") {
 
   // arrange
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
@@ -36,8 +37,8 @@ TEST_CASE("TitleScene's call of sRender is correct", "[unit][TitleScene][.visual
   }
   // add the LogicMap
   steamrot::FlatbuffersDataLoader data_loader;
-  auto logic_collection_data_result =
-      data_loader.ProvideLogicCollectionData(steamrot::SceneType::SceneType_TITLE);
+  auto logic_collection_data_result = data_loader.ProvideLogicCollectionData(
+      steamrot::SceneType::SceneType_TITLE);
   if (!logic_collection_data_result.has_value()) {
     FAIL("Failed to load LogicCollectionData: " +
          logic_collection_data_result.error().message);
@@ -47,7 +48,7 @@ TEST_CASE("TitleScene's call of sRender is correct", "[unit][TitleScene][.visual
                                        title_scene->GetSceneContext());
 
   auto create_map_result =
-      logic_factory.CreateLogicMap(*logic_collection_data_result.value());
+      logic_factory.CreateLogicMap(logic_collection_data_result.value());
   if (!create_map_result) {
     FAIL("Logic map creation failed: " + create_map_result.error().message);
   }
