@@ -1,4 +1,4 @@
-include "subscriber_config.fbs";
+include "subscriber_data.fbs";
 
 
 namespace steamrot; 

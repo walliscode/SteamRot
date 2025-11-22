@@ -9,7 +9,7 @@
 #pragma once
 
 #include "events_generated.h"
-#include "subscriber_config_generated.h"
+#include "subscriber_data_generated.h"
 #include "user_input_generated.h"
 namespace steamrot::tests {
 

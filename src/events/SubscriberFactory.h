@@ -14,7 +14,7 @@
 #include "EventHandler.h"
 #include "FailInfo.h"
 #include "Subscriber.h"
-#include "subscriber_config_generated.h"
+#include "subscriber_data_generated.h"
 #include <expected>
 #include <memory>
 namespace steamrot {

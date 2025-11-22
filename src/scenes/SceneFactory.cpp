@@ -9,8 +9,8 @@
 #include "SceneFactory.h"
 #include "CraftingScene.h"
 #include "FlatbuffersDataLoader.h"
-#include "resources_configuration.h"
 #include "TitleScene.h"
+#include "resources_configuration.h"
 #include "uuid.h"
 #include <memory>
 #include <string>
@@ -75,7 +75,8 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type,
     return std::unexpected(game_resources_result.error());
   }
 
-  auto scene_resources_result = data_loader.ProvideSceneResourcesData(scene_type);
+  auto scene_resources_result =
+      data_loader.ProvideSceneResourcesData(scene_type);
   if (!scene_resources_result) {
     return std::unexpected(scene_resources_result.error());
   }
@@ -100,7 +101,10 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type,
 
   // configure LogicMap
   LogicFactory logic_factory(scene_type, scene_ptr->GetSceneContext());
-  auto create_map_result = logic_factory.CreateLogicMap();
+
+  // get logic collection data from data loader
+  auto create_map_result = logic_factory.CreateLogicMap(
+      *data_loader.ProvideLogicCollectionData(scene_type).value());
   if (!create_map_result) {
     return std::unexpected(create_map_result.error());
   }
