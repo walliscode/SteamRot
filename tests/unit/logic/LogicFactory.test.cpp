@@ -266,3 +266,46 @@ TEST_CASE("LogicFactory creates Logic instances without LogicCollectionData",
   REQUIRE(!action_logics.empty());
   REQUIRE(action_logics[0]->GetSubscribers().empty());
 }
+
+TEST_CASE("LogicFactory works for all scene types without LogicCollectionData",
+          "[unit][LogicFactory]") {
+
+  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+
+  // Test for TEST scene
+  {
+    steamrot::tests::TestFixture test_context{
+        steamrot::SceneType::SceneType_TEST};
+    steamrot::LogicFactory logic_factory(steamrot::SceneType::SceneType_TEST,
+                                         test_context.GetSceneContext());
+    auto logic_map_result = logic_factory.CreateLogicMap(nullptr);
+    REQUIRE(logic_map_result.has_value());
+    steamrot::tests::CheckStaticLogicCollections(
+        logic_map_result.value(), steamrot::SceneType::SceneType_TEST);
+  }
+
+  // Test for TITLE scene
+  {
+    steamrot::tests::TestFixture test_context{
+        steamrot::SceneType::SceneType_TITLE};
+    steamrot::LogicFactory logic_factory(steamrot::SceneType::SceneType_TITLE,
+                                         test_context.GetSceneContext());
+    auto logic_map_result = logic_factory.CreateLogicMap(nullptr);
+    REQUIRE(logic_map_result.has_value());
+    steamrot::tests::CheckStaticLogicCollections(
+        logic_map_result.value(), steamrot::SceneType::SceneType_TITLE);
+  }
+
+  // Test for CRAFTING scene
+  {
+    steamrot::tests::TestFixture test_context{
+        steamrot::SceneType::SceneType_CRAFTING};
+    steamrot::LogicFactory logic_factory(
+        steamrot::SceneType::SceneType_CRAFTING,
+        test_context.GetSceneContext());
+    auto logic_map_result = logic_factory.CreateLogicMap(nullptr);
+    REQUIRE(logic_map_result.has_value());
+    steamrot::tests::CheckStaticLogicCollections(
+        logic_map_result.value(), steamrot::SceneType::SceneType_CRAFTING);
+  }
+}
