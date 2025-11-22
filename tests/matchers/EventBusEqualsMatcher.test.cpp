@@ -7,7 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "EventBusEqualsMatcher.h"
-#include "conmat.h"
+
 #include "uuid.h"
 #include <catch2/catch_test_macros.hpp>
 #include <random>

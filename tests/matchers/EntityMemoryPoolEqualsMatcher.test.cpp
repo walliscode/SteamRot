@@ -12,9 +12,9 @@
 #include "CMeta.h"
 #include "CUIState.h"
 #include "CUserInterface.h"
-#include "conmat.h"
+
 #include "containers.h"
-#include "emp_helpers.h"
+
 #include "entity_memory.h"
 #include <catch2/catch_test_macros.hpp>
 
@@ -109,7 +109,8 @@ TEST_CASE("EntityMemoryPoolEqualsMatcher works correctly",
 
   SECTION("Matcher detects differences in component data") {
     // Activate a component in actual but not in expected
-    auto &meta = steamrot::emp_helpers::GetComponent<steamrot::CMeta>(0, actual);
+    auto &meta =
+        steamrot::entity::memory::GetComponent<steamrot::CMeta>(0, actual);
     meta.m_active = true;
     REQUIRE_THAT(actual, !steamrot::tests::EqualsEntityMemoryPool(expected));
   }
