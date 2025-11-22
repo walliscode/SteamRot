@@ -13,45 +13,204 @@
 #include "UICollisionLogic.h"
 #include "UIRenderLogic.h"
 #include "UIStateLogic.h"
+#include "logic_data_generated.h"
 #include <expected>
+#include <variant>
 
 namespace steamrot {
 /////////////////////////////////////////////////
 LogicFactory::LogicFactory(const SceneType scene_type,
                            const SceneContext &scene_context)
-    : m_scene_type(scene_type), m_scene_context(scene_context) {}
+    : m_scene_type(scene_type), m_scene_context(scene_context),
+      m_subscriber_factory(scene_context.event_handler) {}
+
+/////////////////////////////////////////////////
+LogicCollection LogicFactory::CreateEmptyLogicCollection() {
+
+  LogicCollection collection;
+  // emplace constructs the vector in-place (no copying of unique_ptrs)
+  collection.emplace(LogicType::Collision, LogicVector{});
+  collection.emplace(LogicType::Action, LogicVector{});
+  collection.emplace(LogicType::Movement, LogicVector{});
+  collection.emplace(LogicType::Render, LogicVector{});
+
+  return collection;
+};
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+LogicFactory::TitleSceneLogicConfiguration(
+    LogicCollection &logic_collection,
+    const LogicCollectionData &logic_collection_data) {
+
+  // Get Collision Logic Vector and Data
+  LogicVector &collision_logics = logic_collection[LogicType::Collision];
+
+  const LogicVectorData &collision_logic_data =
+      *logic_collection_data.collision_logic_data();
+
+  // Add CollisionLogics for Title Scene
+  AddLogicToLogicVector<UICollisionLogic>(collision_logics,
+                                          collision_logic_data);
+
+  // Get Action Logic Vector and Data
+  LogicVector &action_logics = logic_collection[LogicType::Action];
+  const LogicVectorData &action_logic_data =
+      *logic_collection_data.action_logic_data();
+  // Add ActionLogics for Title Scene
+  AddLogicToLogicVector<UIStateLogic>(action_logics, action_logic_data);
+  AddLogicToLogicVector<UIActionLogic>(action_logics, action_logic_data);
+
+  // Get Movement Logic Vector and Data
+  LogicVector &movement_logics = logic_collection[LogicType::Movement];
+  const LogicVectorData &movement_logic_data =
+      *logic_collection_data.movement_logic_data();
+  // Add MovementLogics for Title Scene
+  //(No movement logics for title scene currently)
+
+  // Get Render Logic Vector and Data
+  LogicVector &render_logics = logic_collection[LogicType::Render];
+  const LogicVectorData &render_logic_data =
+      *logic_collection_data.render_logic_data();
+  // Add RenderLogics for Title Scene
+  AddLogicToLogicVector<UIRenderLogic>(render_logics, render_logic_data);
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+LogicFactory::CraftingSceneLogicConfiguration(
+    LogicCollection &logic_collection,
+    const LogicCollectionData &logic_collection_data) {
+
+  // Get Collision Logic Vector and Data
+  LogicVector &collision_logics = logic_collection[LogicType::Collision];
+  const LogicVectorData &collision_logic_data =
+      *logic_collection_data.collision_logic_data();
+
+  // Add CollisionLogics for Title Scene
+  AddLogicToLogicVector<UICollisionLogic>(collision_logics,
+                                          collision_logic_data);
+
+  // Get Action Logic Vector and Data
+  LogicVector &action_logics = logic_collection[LogicType::Action];
+  const LogicVectorData &action_logic_data =
+      *logic_collection_data.action_logic_data();
+
+  // Add ActionLogics for Title Scene
+  AddLogicToLogicVector<UIStateLogic>(action_logics, action_logic_data);
+  AddLogicToLogicVector<UIActionLogic>(action_logics, action_logic_data);
+
+  // Get Movement Logic Vector and Data
+  LogicVector &movement_logics = logic_collection[LogicType::Movement];
+  const LogicVectorData &movement_logic_data =
+      *logic_collection_data.movement_logic_data();
+  // Add MovementLogics for Title Scene
+  //(No movement logics for title scene currently)
+
+  // Get Render Logic Vector and Data
+  LogicVector &render_logics = logic_collection[LogicType::Render];
+  const LogicVectorData &render_logic_data =
+      *logic_collection_data.render_logic_data();
+
+  // Add RenderLogics for Title Scene
+  AddLogicToLogicVector<CraftingRenderLogic>(render_logics, render_logic_data);
+  AddLogicToLogicVector<UIRenderLogic>(render_logics, render_logic_data);
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+LogicFactory::TestSceneLogicConfiguration(
+    LogicCollection &logic_collection,
+    const LogicCollectionData &logic_collection_data) {
+
+  // Get Collision Logic Vector and Data
+  LogicVector &collision_logics = logic_collection[LogicType::Collision];
+  const LogicVectorData &collision_logic_data =
+      *logic_collection_data.collision_logic_data();
+
+  // Add CollisionLogics for Test Scene
+  AddLogicToLogicVector<UICollisionLogic>(collision_logics,
+                                          collision_logic_data);
+
+  // Get Action Logic Vector and Data
+  LogicVector &action_logics = logic_collection[LogicType::Action];
+  const LogicVectorData &action_logic_data =
+      *logic_collection_data.action_logic_data();
+
+  // Add ActionLogics for Test Scene
+  AddLogicToLogicVector<UIStateLogic>(action_logics, action_logic_data);
+  AddLogicToLogicVector<UIActionLogic>(action_logics, action_logic_data);
+
+  // Get Movement Logic Vector and Data
+  LogicVector &movement_logics = logic_collection[LogicType::Movement];
+  const LogicVectorData &movement_logic_data =
+      *logic_collection_data.movement_logic_data();
+
+  // Add MovementLogics for Test Scene
+  //(No movement logics for test scene currently)
+
+  // Get Render Logic Vector and Data
+  LogicVector &render_logics = logic_collection[LogicType::Render];
+  const LogicVectorData &render_logic_data =
+      *logic_collection_data.render_logic_data();
+
+  // Add RenderLogics for Test Scene
+  AddLogicToLogicVector<UIRenderLogic>(render_logics, render_logic_data);
+
+  return std::monostate{};
+}
 
 /////////////////////////////////////////////////
 std::expected<LogicCollection, FailInfo>
 LogicFactory::CreateLogicMap(const LogicCollectionData &logic_collection_data) {
 
-  // create return object
-  LogicCollection logic_collection;
+  // create empty logic collection
+  LogicCollection logic_collection = CreateEmptyLogicCollection();
 
-  // create collision logics
-  auto collision_logics =
-      CreateCollisionLogics(logic_collection_data.collision_logic_data());
-  if (!collision_logics.has_value()) {
-    return std::unexpected(collision_logics.error());
+  // configure logic collection based on scene type
+  switch (m_scene_type) {
+  case SceneType::SceneType_TITLE: {
+
+    auto configuration_result =
+        TitleSceneLogicConfiguration(logic_collection, logic_collection_data);
+
+    // UNEXPECTED PROPOGATION
+    if (!configuration_result.has_value()) {
+      return std::unexpected(configuration_result.error());
+    }
+
+    break;
   }
-  logic_collection[LogicType::Collision] = std::move(collision_logics.value());
+  case SceneType::SceneType_CRAFTING: {
 
-  // create render logics
-  auto render_logics =
-      CreateRenderLogics(logic_collection_data.render_logic_data());
-  if (!render_logics.has_value()) {
-    return std::unexpected(render_logics.error());
+    auto configuration_result = CraftingSceneLogicConfiguration(
+        logic_collection, logic_collection_data);
+
+    // UNEXPECTED PROPOGATION
+    if (!configuration_result.has_value()) {
+      return std::unexpected(configuration_result.error());
+    }
+
+    break;
   }
-  logic_collection[LogicType::Render] = std::move(render_logics.value());
-
-  // create action logics
-  auto action_logics =
-      CreateActionLogics(logic_collection_data.action_logic_data());
-  if (!action_logics.has_value()) {
-    return std::unexpected(action_logics.error());
+  case SceneType::SceneType_TEST: {
+    auto configuration_result =
+        TestSceneLogicConfiguration(logic_collection, logic_collection_data);
+    // UNEXPECTED PROPOGATION
+    if (!configuration_result.has_value()) {
+      return std::unexpected(configuration_result.error());
+    }
+    break;
   }
-  logic_collection[LogicType::Action] = std::move(action_logics.value());
-
+  default:
+    return std::unexpected(
+        FailInfo{FailMode::NonExistentEnumValue,
+                 "Unsupported scene type for logic configuration"});
+  }
   return logic_collection;
 }
 
@@ -66,23 +225,20 @@ LogicFactory::AttachSubscribers(Logic &logic, const LogicData *logic_data) {
   }
 
   // Check if there are any subscribers to attach
-  if (!logic_data->subscriber_data()) {
+  if (!logic_data->all_subscriptions()) {
     // No subscribers to attach, return success
     return std::monostate{};
   }
 
-  // Create a SubscriberFactory to create and register subscribers
-  SubscriberFactory subscriber_factory(m_scene_context.event_handler);
-
   // Iterate through subscriber data and create subscribers
-  for (const auto *subscriber_data : *logic_data->subscriber_data()) {
+  for (const auto *subscriber_data : *logic_data->all_subscriptions()) {
     if (!subscriber_data) {
       continue; // Skip null subscriber data
     }
 
     // Create and register subscriber
     auto subscriber_result =
-        subscriber_factory.CreateAndRegisterSubscriber(*subscriber_data);
+        m_subscriber_factory.CreateAndRegisterSubscriber(*subscriber_data);
     if (!subscriber_result.has_value()) {
       return std::unexpected(subscriber_result.error());
     }
@@ -92,287 +248,6 @@ LogicFactory::AttachSubscribers(Logic &logic, const LogicData *logic_data) {
   }
 
   return std::monostate{};
-}
-
-/////////////////////////////////////////////////
-std::expected<LogicVector, FailInfo> LogicFactory::CreateRenderLogics(
-    const flatbuffers::Vector<flatbuffers::Offset<LogicData>>
-        *render_logic_data) {
-
-  LogicVector render_logics;
-
-  switch (m_scene_type) {
-  case SceneType::SceneType_TITLE: {
-    auto logic = std::make_unique<UIRenderLogic>(m_scene_context);
-
-    // Find and attach subscribers from logic data
-    if (render_logic_data) {
-      for (const auto *logic_data : *render_logic_data) {
-        if (logic_data && logic_data->name() &&
-            logic_data->name()->str() == "UIRenderLogic") {
-          auto attach_result = AttachSubscribers(*logic, logic_data);
-          if (!attach_result.has_value()) {
-            return std::unexpected(attach_result.error());
-          }
-          break;
-        }
-      }
-    }
-
-    render_logics.push_back(std::move(logic));
-    break;
-  }
-  case SceneType::SceneType_CRAFTING: {
-    // CraftingRenderLogic
-    auto crafting_logic =
-        std::make_unique<CraftingRenderLogic>(m_scene_context);
-    if (render_logic_data) {
-      for (const auto *logic_data : *render_logic_data) {
-        if (logic_data && logic_data->name() &&
-            logic_data->name()->str() == "CraftingRenderLogic") {
-          auto attach_result = AttachSubscribers(*crafting_logic, logic_data);
-          if (!attach_result.has_value()) {
-            return std::unexpected(attach_result.error());
-          }
-          break;
-        }
-      }
-    }
-    render_logics.push_back(std::move(crafting_logic));
-
-    // UIRenderLogic
-    auto ui_logic = std::make_unique<UIRenderLogic>(m_scene_context);
-    if (render_logic_data) {
-      for (const auto *logic_data : *render_logic_data) {
-        if (logic_data && logic_data->name() &&
-            logic_data->name()->str() == "UIRenderLogic") {
-          auto attach_result = AttachSubscribers(*ui_logic, logic_data);
-          if (!attach_result.has_value()) {
-            return std::unexpected(attach_result.error());
-          }
-          break;
-        }
-      }
-    }
-    render_logics.push_back(std::move(ui_logic));
-    break;
-  }
-  case SceneType::SceneType_TEST: {
-    // add render logics for test purposes
-    auto logic = std::make_unique<UIRenderLogic>(m_scene_context);
-    if (render_logic_data) {
-      for (const auto *logic_data : *render_logic_data) {
-        if (logic_data && logic_data->name() &&
-            logic_data->name()->str() == "UIRenderLogic") {
-          auto attach_result = AttachSubscribers(*logic, logic_data);
-          if (!attach_result.has_value()) {
-            return std::unexpected(attach_result.error());
-          }
-          break;
-        }
-      }
-    }
-    render_logics.push_back(std::move(logic));
-    break;
-  }
-  default:
-    return std::unexpected(FailInfo{FailMode::NonExistentEnumValue,
-                                    "Unsupported scene type for render logic"});
-  }
-  return render_logics;
-}
-/////////////////////////////////////////////////
-std::expected<LogicVector, FailInfo> LogicFactory::CreateCollisionLogics(
-    const flatbuffers::Vector<flatbuffers::Offset<LogicData>>
-        *collision_logic_data) {
-
-  LogicVector collision_logics;
-
-  switch (m_scene_type) {
-  case SceneType::SceneType_TITLE: {
-    auto logic = std::make_unique<UICollisionLogic>(m_scene_context);
-
-    // Find and attach subscribers from logic data
-    if (collision_logic_data) {
-      for (const auto *logic_data : *collision_logic_data) {
-        if (logic_data && logic_data->name() &&
-            logic_data->name()->str() == "UICollisionLogic") {
-          auto attach_result = AttachSubscribers(*logic, logic_data);
-          if (!attach_result.has_value()) {
-            return std::unexpected(attach_result.error());
-          }
-          break;
-        }
-      }
-    }
-
-    collision_logics.push_back(std::move(logic));
-    break;
-  }
-  case SceneType::SceneType_CRAFTING: {
-    auto logic = std::make_unique<UICollisionLogic>(m_scene_context);
-
-    if (collision_logic_data) {
-      for (const auto *logic_data : *collision_logic_data) {
-        if (logic_data && logic_data->name() &&
-            logic_data->name()->str() == "UICollisionLogic") {
-          auto attach_result = AttachSubscribers(*logic, logic_data);
-          if (!attach_result.has_value()) {
-            return std::unexpected(attach_result.error());
-          }
-          break;
-        }
-      }
-    }
-
-    collision_logics.push_back(std::move(logic));
-    break;
-  }
-  case SceneType::SceneType_TEST: {
-    // add collision logics for test purposes
-    auto logic = std::make_unique<UICollisionLogic>(m_scene_context);
-
-    if (collision_logic_data) {
-      for (const auto *logic_data : *collision_logic_data) {
-        if (logic_data && logic_data->name() &&
-            logic_data->name()->str() == "UICollisionLogic") {
-          auto attach_result = AttachSubscribers(*logic, logic_data);
-          if (!attach_result.has_value()) {
-            return std::unexpected(attach_result.error());
-          }
-          break;
-        }
-      }
-    }
-
-    collision_logics.push_back(std::move(logic));
-
-    break;
-  }
-  default:
-    return std::unexpected(
-        FailInfo{FailMode::NonExistentEnumValue,
-                 "Unsupported scene type for collision logic"});
-  }
-  return collision_logics;
-}
-
-/////////////////////////////////////////////////
-std::expected<LogicVector, FailInfo> LogicFactory::CreateActionLogics(
-    const flatbuffers::Vector<flatbuffers::Offset<LogicData>>
-        *action_logic_data) {
-
-  LogicVector action_logics;
-
-  switch (m_scene_type) {
-  case SceneType::SceneType_TITLE: {
-    // UIStateLogic
-    auto state_logic = std::make_unique<UIStateLogic>(m_scene_context);
-    if (action_logic_data) {
-      for (const auto *logic_data : *action_logic_data) {
-        if (logic_data && logic_data->name() &&
-            logic_data->name()->str() == "UIStateLogic") {
-          auto attach_result = AttachSubscribers(*state_logic, logic_data);
-          if (!attach_result.has_value()) {
-            return std::unexpected(attach_result.error());
-          }
-          break;
-        }
-      }
-    }
-    action_logics.push_back(std::move(state_logic));
-
-    // UIActionLogic
-    auto action_logic = std::make_unique<UIActionLogic>(m_scene_context);
-    if (action_logic_data) {
-      for (const auto *logic_data : *action_logic_data) {
-        if (logic_data && logic_data->name() &&
-            logic_data->name()->str() == "UIActionLogic") {
-          auto attach_result = AttachSubscribers(*action_logic, logic_data);
-          if (!attach_result.has_value()) {
-            return std::unexpected(attach_result.error());
-          }
-          break;
-        }
-      }
-    }
-    action_logics.push_back(std::move(action_logic));
-    break;
-  }
-  case SceneType::SceneType_CRAFTING: {
-    // UIStateLogic
-    auto state_logic = std::make_unique<UIStateLogic>(m_scene_context);
-    if (action_logic_data) {
-      for (const auto *logic_data : *action_logic_data) {
-        if (logic_data && logic_data->name() &&
-            logic_data->name()->str() == "UIStateLogic") {
-          auto attach_result = AttachSubscribers(*state_logic, logic_data);
-          if (!attach_result.has_value()) {
-            return std::unexpected(attach_result.error());
-          }
-          break;
-        }
-      }
-    }
-    action_logics.push_back(std::move(state_logic));
-
-    // UIActionLogic
-    auto action_logic = std::make_unique<UIActionLogic>(m_scene_context);
-    if (action_logic_data) {
-      for (const auto *logic_data : *action_logic_data) {
-        if (logic_data && logic_data->name() &&
-            logic_data->name()->str() == "UIActionLogic") {
-          auto attach_result = AttachSubscribers(*action_logic, logic_data);
-          if (!attach_result.has_value()) {
-            return std::unexpected(attach_result.error());
-          }
-          break;
-        }
-      }
-    }
-    action_logics.push_back(std::move(action_logic));
-    break;
-  }
-  case SceneType::SceneType_TEST: {
-    // add action logics for test purposes
-    // UIStateLogic
-    auto state_logic = std::make_unique<UIStateLogic>(m_scene_context);
-    if (action_logic_data) {
-      for (const auto *logic_data : *action_logic_data) {
-        if (logic_data && logic_data->name() &&
-            logic_data->name()->str() == "UIStateLogic") {
-          auto attach_result = AttachSubscribers(*state_logic, logic_data);
-          if (!attach_result.has_value()) {
-            return std::unexpected(attach_result.error());
-          }
-          break;
-        }
-      }
-    }
-    action_logics.push_back(std::move(state_logic));
-
-    // UIActionLogic
-    auto action_logic = std::make_unique<UIActionLogic>(m_scene_context);
-    if (action_logic_data) {
-      for (const auto *logic_data : *action_logic_data) {
-        if (logic_data && logic_data->name() &&
-            logic_data->name()->str() == "UIActionLogic") {
-          auto attach_result = AttachSubscribers(*action_logic, logic_data);
-          if (!attach_result.has_value()) {
-            return std::unexpected(attach_result.error());
-          }
-          break;
-        }
-      }
-    }
-    action_logics.push_back(std::move(action_logic));
-    break;
-  }
-  default:
-    return std::unexpected(FailInfo{FailMode::NonExistentEnumValue,
-                                    "Unsupported scene type for action logic"});
-  }
-  return action_logics;
 }
 
 } // namespace steamrot

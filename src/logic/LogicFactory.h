@@ -11,13 +11,19 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "CraftingRenderLogic.h"
 #include "Logic.h"
 #include "SubscriberFactory.h"
+#include "UIActionLogic.h"
+#include "UICollisionLogic.h"
+#include "UIRenderLogic.h"
+#include "UIStateLogic.h"
 #include "logic_data_generated.h"
 #include "scene_change_packet_generated.h"
 #include <expected>
 #include <memory>
 #include <unordered_map>
+#include <variant>
 namespace steamrot {
 
 enum class LogicType {
@@ -46,30 +52,7 @@ private:
   /////////////////////////////////////////////////
   SceneContext m_scene_context;
 
-  /////////////////////////////////////////////////
-  /// @brief Create a vector of logic objects specifically for collision
-  ///
-  /// @param collision_logic_data Vector of LogicData for collision logics
-  /////////////////////////////////////////////////
-  std::expected<LogicVector, FailInfo>
-  CreateCollisionLogics(const flatbuffers::Vector<flatbuffers::Offset<LogicData>> *collision_logic_data);
-
-  /////////////////////////////////////////////////
-  /// @brief Create a vector of logic objects specifically for rendering
-  ///
-  /// @param render_logic_data Vector of LogicData for render logics
-  /////////////////////////////////////////////////
-  std::expected<LogicVector, FailInfo>
-  CreateRenderLogics(const flatbuffers::Vector<flatbuffers::Offset<LogicData>> *render_logic_data);
-
-  /////////////////////////////////////////////////
-  /// @brief Create a vector of logic objects specifically for actions
-  ///
-  /// @param action_logic_data Vector of LogicData for action logics
-  /////////////////////////////////////////////////
-  std::expected<LogicVector, FailInfo>
-  CreateActionLogics(const flatbuffers::Vector<flatbuffers::Offset<LogicData>> *action_logic_data);
-
+  SubscriberFactory m_subscriber_factory;
   /////////////////////////////////////////////////
   /// @brief Attach subscribers to a Logic instance based on LogicData
   ///
@@ -78,6 +61,161 @@ private:
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo>
   AttachSubscribers(Logic &logic, const LogicData *logic_data);
+
+  template <typename T>
+  std::expected<std::monostate, FailInfo>
+  ConfigureLogicObject(T &, const LogicVectorData &) {
+
+    // throw error if type is not implemented
+    throw std::runtime_error(
+        "ConfigureLogicObject not implemented for this Logic type");
+  }
+
+  // Collision Logic Specializations
+  template <>
+  std::expected<std::monostate, FailInfo>
+  ConfigureLogicObject(UICollisionLogic &logic_object,
+                       const LogicVectorData &logic_vector_data) {
+    // if no ui_collision_logic_data present return early
+    if (!logic_vector_data.ui_collision_logic_data())
+      return std::monostate();
+    // Configure subcribers
+    auto attach_result = AttachSubscribers(
+        logic_object, logic_vector_data.ui_collision_logic_data());
+    // UNEXPECTED PROPOGATION
+    if (!attach_result.has_value()) {
+      return std::unexpected(attach_result.error());
+    }
+    return std::monostate{};
+  }
+
+  // Action Logic Specializations
+  template <>
+  std::expected<std::monostate, FailInfo>
+  ConfigureLogicObject(UIActionLogic &logic_object,
+                       const LogicVectorData &logic_vector_data) {
+    // if no ui_action_logic_data present return early
+    if (!logic_vector_data.ui_action_logic_data())
+      return std::monostate();
+    // Configure subcribers
+    auto attach_result = AttachSubscribers(
+        logic_object, logic_vector_data.ui_action_logic_data());
+    // UNEXPECTED PROPOGATION
+    if (!attach_result.has_value()) {
+      return std::unexpected(attach_result.error());
+    }
+    return std::monostate{};
+  }
+
+  template <>
+  std::expected<std::monostate, FailInfo>
+  ConfigureLogicObject(UIStateLogic &logic_object,
+                       const LogicVectorData &logic_vector_data) {
+    // if no ui_state_logic_data present return early
+    if (!logic_vector_data.ui_state_logic_data())
+      return std::monostate();
+    // Configure subcribers
+    auto attach_result = AttachSubscribers(
+        logic_object, logic_vector_data.ui_state_logic_data());
+    // UNEXPECTED PROPOGATION
+    if (!attach_result.has_value()) {
+      return std::unexpected(attach_result.error());
+    }
+    return std::monostate{};
+  }
+  // Render Logic Specializations
+  template <>
+  std::expected<std::monostate, FailInfo>
+  ConfigureLogicObject(UIRenderLogic &logic_object,
+                       const LogicVectorData &logic_vector_data) {
+
+    // if no ui_render_logic_data present return early
+    if (!logic_vector_data.ui_render_logic_data())
+      return std::monostate();
+
+    // Configure subcribers
+    auto attach_result = AttachSubscribers(
+        logic_object, logic_vector_data.ui_render_logic_data());
+    // UNEXPECTED PROPOGATION
+    if (!attach_result.has_value()) {
+      return std::unexpected(attach_result.error());
+    }
+
+    return std::monostate{};
+  }
+
+  template <>
+  std::expected<std::monostate, FailInfo>
+  ConfigureLogicObject(CraftingRenderLogic &logic_object,
+                       const LogicVectorData &logic_vector_data) {
+
+    // if no crafting_render_logic_data present return early
+    if (!logic_vector_data.crafting_render_logic_data())
+      return std::monostate();
+    // Configure subcribers
+    auto attach_result = AttachSubscribers(
+        logic_object, logic_vector_data.crafting_render_logic_data());
+    // UNEXPECTED PROPOGATION
+    if (!attach_result.has_value()) {
+      return std::unexpected(attach_result.error());
+    }
+    return std::monostate{};
+  }
+
+  template <typename LogicClass>
+  std::expected<std::unique_ptr<LogicClass>, FailInfo>
+  CreateAndConfigureLogicObject(const LogicVectorData &logic_vector_data,
+                                const SceneContext &scene_context) {
+
+    // create logic object
+    auto logic_object = std::make_unique<LogicClass>(scene_context);
+
+    // configure logic object
+    auto configuration_result =
+        ConfigureLogicObject(*logic_object, logic_vector_data);
+
+    // UNEXPECTED PROPOGATION
+    if (!configuration_result.has_value()) {
+      return std::unexpected(configuration_result.error());
+    }
+    return logic_object;
+  }
+
+  template <typename T>
+  void AddLogicToLogicVector(LogicVector &logic_vector,
+                             const LogicVectorData &logic_vector_data) {
+
+    // create Logic object from type and add to vector
+    auto logic_object_creation_result =
+        CreateAndConfigureLogicObject<T>(logic_vector_data, m_scene_context);
+    // UNEXPECTED PROPOGATION
+    if (!logic_object_creation_result.has_value()) {
+      throw std::runtime_error("Failed to create and configure Logic object");
+    }
+
+    // add to vector
+    logic_vector.push_back(std::move(logic_object_creation_result.value()));
+  }
+
+  /////////////////////////////////////////////////
+  /// @brief Createand return an empty LogicCollection configured with
+  /// LogicVectors
+  ///
+  /// @return LogicCollection
+  /////////////////////////////////////////////////
+  LogicCollection CreateEmptyLogicCollection();
+
+  std::expected<std::monostate, FailInfo> TitleSceneLogicConfiguration(
+      LogicCollection &logic_collection,
+      const LogicCollectionData &logic_collection_data);
+
+  std::expected<std::monostate, FailInfo> CraftingSceneLogicConfiguration(
+      LogicCollection &logic_collection,
+      const LogicCollectionData &logic_collection_data);
+
+  std::expected<std::monostate, FailInfo>
+  TestSceneLogicConfiguration(LogicCollection &logic_collection,
+                              const LogicCollectionData &logic_collection_data);
 
 public:
   /////////////////////////////////////////////////

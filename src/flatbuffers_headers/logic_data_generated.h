@@ -20,28 +20,25 @@ namespace steamrot {
 struct LogicData;
 struct LogicDataBuilder;
 
+struct LogicVectorData;
+struct LogicVectorDataBuilder;
+
 struct LogicCollectionData;
 struct LogicCollectionDataBuilder;
 
 struct LogicData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef LogicDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_SUBSCRIBER_DATA = 4,
-    VT_NAME = 6
+    VT_ALL_SUBSCRIPTIONS = 4
   };
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>> *subscriber_data() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>> *>(VT_SUBSCRIBER_DATA);
-  }
-  const ::flatbuffers::String *name() const {
-    return GetPointer<const ::flatbuffers::String *>(VT_NAME);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>> *all_subscriptions() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>> *>(VT_ALL_SUBSCRIPTIONS);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_SUBSCRIBER_DATA) &&
-           verifier.VerifyVector(subscriber_data()) &&
-           verifier.VerifyVectorOfTables(subscriber_data()) &&
-           VerifyOffset(verifier, VT_NAME) &&
-           verifier.VerifyString(name()) &&
+           VerifyOffset(verifier, VT_ALL_SUBSCRIPTIONS) &&
+           verifier.VerifyVector(all_subscriptions()) &&
+           verifier.VerifyVectorOfTables(all_subscriptions()) &&
            verifier.EndTable();
   }
 };
@@ -50,11 +47,8 @@ struct LogicDataBuilder {
   typedef LogicData Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_subscriber_data(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>>> subscriber_data) {
-    fbb_.AddOffset(LogicData::VT_SUBSCRIBER_DATA, subscriber_data);
-  }
-  void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
-    fbb_.AddOffset(LogicData::VT_NAME, name);
+  void add_all_subscriptions(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>>> all_subscriptions) {
+    fbb_.AddOffset(LogicData::VT_ALL_SUBSCRIPTIONS, all_subscriptions);
   }
   explicit LogicDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -69,24 +63,105 @@ struct LogicDataBuilder {
 
 inline ::flatbuffers::Offset<LogicData> CreateLogicData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>>> subscriber_data = 0,
-    ::flatbuffers::Offset<::flatbuffers::String> name = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>>> all_subscriptions = 0) {
   LogicDataBuilder builder_(_fbb);
-  builder_.add_name(name);
-  builder_.add_subscriber_data(subscriber_data);
+  builder_.add_all_subscriptions(all_subscriptions);
   return builder_.Finish();
 }
 
 inline ::flatbuffers::Offset<LogicData> CreateLogicDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<steamrot::SubscriberData>> *subscriber_data = nullptr,
-    const char *name = nullptr) {
-  auto subscriber_data__ = subscriber_data ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::SubscriberData>>(*subscriber_data) : 0;
-  auto name__ = name ? _fbb.CreateString(name) : 0;
+    const std::vector<::flatbuffers::Offset<steamrot::SubscriberData>> *all_subscriptions = nullptr) {
+  auto all_subscriptions__ = all_subscriptions ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::SubscriberData>>(*all_subscriptions) : 0;
   return steamrot::CreateLogicData(
       _fbb,
-      subscriber_data__,
-      name__);
+      all_subscriptions__);
+}
+
+struct LogicVectorData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef LogicVectorDataBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_UI_COLLISION_LOGIC_DATA = 4,
+    VT_UI_ACTION_LOGIC_DATA = 6,
+    VT_UI_STATE_LOGIC_DATA = 8,
+    VT_UI_RENDER_LOGIC_DATA = 10,
+    VT_CRAFTING_RENDER_LOGIC_DATA = 12
+  };
+  const steamrot::LogicData *ui_collision_logic_data() const {
+    return GetPointer<const steamrot::LogicData *>(VT_UI_COLLISION_LOGIC_DATA);
+  }
+  const steamrot::LogicData *ui_action_logic_data() const {
+    return GetPointer<const steamrot::LogicData *>(VT_UI_ACTION_LOGIC_DATA);
+  }
+  const steamrot::LogicData *ui_state_logic_data() const {
+    return GetPointer<const steamrot::LogicData *>(VT_UI_STATE_LOGIC_DATA);
+  }
+  const steamrot::LogicData *ui_render_logic_data() const {
+    return GetPointer<const steamrot::LogicData *>(VT_UI_RENDER_LOGIC_DATA);
+  }
+  const steamrot::LogicData *crafting_render_logic_data() const {
+    return GetPointer<const steamrot::LogicData *>(VT_CRAFTING_RENDER_LOGIC_DATA);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_UI_COLLISION_LOGIC_DATA) &&
+           verifier.VerifyTable(ui_collision_logic_data()) &&
+           VerifyOffset(verifier, VT_UI_ACTION_LOGIC_DATA) &&
+           verifier.VerifyTable(ui_action_logic_data()) &&
+           VerifyOffset(verifier, VT_UI_STATE_LOGIC_DATA) &&
+           verifier.VerifyTable(ui_state_logic_data()) &&
+           VerifyOffset(verifier, VT_UI_RENDER_LOGIC_DATA) &&
+           verifier.VerifyTable(ui_render_logic_data()) &&
+           VerifyOffset(verifier, VT_CRAFTING_RENDER_LOGIC_DATA) &&
+           verifier.VerifyTable(crafting_render_logic_data()) &&
+           verifier.EndTable();
+  }
+};
+
+struct LogicVectorDataBuilder {
+  typedef LogicVectorData Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_ui_collision_logic_data(::flatbuffers::Offset<steamrot::LogicData> ui_collision_logic_data) {
+    fbb_.AddOffset(LogicVectorData::VT_UI_COLLISION_LOGIC_DATA, ui_collision_logic_data);
+  }
+  void add_ui_action_logic_data(::flatbuffers::Offset<steamrot::LogicData> ui_action_logic_data) {
+    fbb_.AddOffset(LogicVectorData::VT_UI_ACTION_LOGIC_DATA, ui_action_logic_data);
+  }
+  void add_ui_state_logic_data(::flatbuffers::Offset<steamrot::LogicData> ui_state_logic_data) {
+    fbb_.AddOffset(LogicVectorData::VT_UI_STATE_LOGIC_DATA, ui_state_logic_data);
+  }
+  void add_ui_render_logic_data(::flatbuffers::Offset<steamrot::LogicData> ui_render_logic_data) {
+    fbb_.AddOffset(LogicVectorData::VT_UI_RENDER_LOGIC_DATA, ui_render_logic_data);
+  }
+  void add_crafting_render_logic_data(::flatbuffers::Offset<steamrot::LogicData> crafting_render_logic_data) {
+    fbb_.AddOffset(LogicVectorData::VT_CRAFTING_RENDER_LOGIC_DATA, crafting_render_logic_data);
+  }
+  explicit LogicVectorDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<LogicVectorData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<LogicVectorData>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<LogicVectorData> CreateLogicVectorData(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<steamrot::LogicData> ui_collision_logic_data = 0,
+    ::flatbuffers::Offset<steamrot::LogicData> ui_action_logic_data = 0,
+    ::flatbuffers::Offset<steamrot::LogicData> ui_state_logic_data = 0,
+    ::flatbuffers::Offset<steamrot::LogicData> ui_render_logic_data = 0,
+    ::flatbuffers::Offset<steamrot::LogicData> crafting_render_logic_data = 0) {
+  LogicVectorDataBuilder builder_(_fbb);
+  builder_.add_crafting_render_logic_data(crafting_render_logic_data);
+  builder_.add_ui_render_logic_data(ui_render_logic_data);
+  builder_.add_ui_state_logic_data(ui_state_logic_data);
+  builder_.add_ui_action_logic_data(ui_action_logic_data);
+  builder_.add_ui_collision_logic_data(ui_collision_logic_data);
+  return builder_.Finish();
 }
 
 struct LogicCollectionData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -97,32 +172,28 @@ struct LogicCollectionData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Tabl
     VT_MOVEMENT_LOGIC_DATA = 8,
     VT_RENDER_LOGIC_DATA = 10
   };
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::LogicData>> *action_logic_data() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::LogicData>> *>(VT_ACTION_LOGIC_DATA);
+  const steamrot::LogicVectorData *action_logic_data() const {
+    return GetPointer<const steamrot::LogicVectorData *>(VT_ACTION_LOGIC_DATA);
   }
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::LogicData>> *collision_logic_data() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::LogicData>> *>(VT_COLLISION_LOGIC_DATA);
+  const steamrot::LogicVectorData *collision_logic_data() const {
+    return GetPointer<const steamrot::LogicVectorData *>(VT_COLLISION_LOGIC_DATA);
   }
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::LogicData>> *movement_logic_data() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::LogicData>> *>(VT_MOVEMENT_LOGIC_DATA);
+  const steamrot::LogicVectorData *movement_logic_data() const {
+    return GetPointer<const steamrot::LogicVectorData *>(VT_MOVEMENT_LOGIC_DATA);
   }
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::LogicData>> *render_logic_data() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::LogicData>> *>(VT_RENDER_LOGIC_DATA);
+  const steamrot::LogicVectorData *render_logic_data() const {
+    return GetPointer<const steamrot::LogicVectorData *>(VT_RENDER_LOGIC_DATA);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_ACTION_LOGIC_DATA) &&
-           verifier.VerifyVector(action_logic_data()) &&
-           verifier.VerifyVectorOfTables(action_logic_data()) &&
+           verifier.VerifyTable(action_logic_data()) &&
            VerifyOffset(verifier, VT_COLLISION_LOGIC_DATA) &&
-           verifier.VerifyVector(collision_logic_data()) &&
-           verifier.VerifyVectorOfTables(collision_logic_data()) &&
+           verifier.VerifyTable(collision_logic_data()) &&
            VerifyOffset(verifier, VT_MOVEMENT_LOGIC_DATA) &&
-           verifier.VerifyVector(movement_logic_data()) &&
-           verifier.VerifyVectorOfTables(movement_logic_data()) &&
+           verifier.VerifyTable(movement_logic_data()) &&
            VerifyOffset(verifier, VT_RENDER_LOGIC_DATA) &&
-           verifier.VerifyVector(render_logic_data()) &&
-           verifier.VerifyVectorOfTables(render_logic_data()) &&
+           verifier.VerifyTable(render_logic_data()) &&
            verifier.EndTable();
   }
 };
@@ -131,16 +202,16 @@ struct LogicCollectionDataBuilder {
   typedef LogicCollectionData Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_action_logic_data(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::LogicData>>> action_logic_data) {
+  void add_action_logic_data(::flatbuffers::Offset<steamrot::LogicVectorData> action_logic_data) {
     fbb_.AddOffset(LogicCollectionData::VT_ACTION_LOGIC_DATA, action_logic_data);
   }
-  void add_collision_logic_data(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::LogicData>>> collision_logic_data) {
+  void add_collision_logic_data(::flatbuffers::Offset<steamrot::LogicVectorData> collision_logic_data) {
     fbb_.AddOffset(LogicCollectionData::VT_COLLISION_LOGIC_DATA, collision_logic_data);
   }
-  void add_movement_logic_data(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::LogicData>>> movement_logic_data) {
+  void add_movement_logic_data(::flatbuffers::Offset<steamrot::LogicVectorData> movement_logic_data) {
     fbb_.AddOffset(LogicCollectionData::VT_MOVEMENT_LOGIC_DATA, movement_logic_data);
   }
-  void add_render_logic_data(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::LogicData>>> render_logic_data) {
+  void add_render_logic_data(::flatbuffers::Offset<steamrot::LogicVectorData> render_logic_data) {
     fbb_.AddOffset(LogicCollectionData::VT_RENDER_LOGIC_DATA, render_logic_data);
   }
   explicit LogicCollectionDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
@@ -156,34 +227,16 @@ struct LogicCollectionDataBuilder {
 
 inline ::flatbuffers::Offset<LogicCollectionData> CreateLogicCollectionData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::LogicData>>> action_logic_data = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::LogicData>>> collision_logic_data = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::LogicData>>> movement_logic_data = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::LogicData>>> render_logic_data = 0) {
+    ::flatbuffers::Offset<steamrot::LogicVectorData> action_logic_data = 0,
+    ::flatbuffers::Offset<steamrot::LogicVectorData> collision_logic_data = 0,
+    ::flatbuffers::Offset<steamrot::LogicVectorData> movement_logic_data = 0,
+    ::flatbuffers::Offset<steamrot::LogicVectorData> render_logic_data = 0) {
   LogicCollectionDataBuilder builder_(_fbb);
   builder_.add_render_logic_data(render_logic_data);
   builder_.add_movement_logic_data(movement_logic_data);
   builder_.add_collision_logic_data(collision_logic_data);
   builder_.add_action_logic_data(action_logic_data);
   return builder_.Finish();
-}
-
-inline ::flatbuffers::Offset<LogicCollectionData> CreateLogicCollectionDataDirect(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<steamrot::LogicData>> *action_logic_data = nullptr,
-    const std::vector<::flatbuffers::Offset<steamrot::LogicData>> *collision_logic_data = nullptr,
-    const std::vector<::flatbuffers::Offset<steamrot::LogicData>> *movement_logic_data = nullptr,
-    const std::vector<::flatbuffers::Offset<steamrot::LogicData>> *render_logic_data = nullptr) {
-  auto action_logic_data__ = action_logic_data ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::LogicData>>(*action_logic_data) : 0;
-  auto collision_logic_data__ = collision_logic_data ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::LogicData>>(*collision_logic_data) : 0;
-  auto movement_logic_data__ = movement_logic_data ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::LogicData>>(*movement_logic_data) : 0;
-  auto render_logic_data__ = render_logic_data ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::LogicData>>(*render_logic_data) : 0;
-  return steamrot::CreateLogicCollectionData(
-      _fbb,
-      action_logic_data__,
-      collision_logic_data__,
-      movement_logic_data__,
-      render_logic_data__);
 }
 
 }  // namespace steamrot
