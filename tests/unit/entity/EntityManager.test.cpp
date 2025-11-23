@@ -7,9 +7,9 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "EntityManager.h"
+#include "EntityMemoryPoolEqualsMatcher.h"
 #include "PathProvider.h"
 #include "TestFixture.h"
-#include "entity_memory_pool_matchers.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
 
