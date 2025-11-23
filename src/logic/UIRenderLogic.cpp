@@ -37,9 +37,12 @@ void UIRenderLogic::DrawUIElements() {
     CUserInterface &ui_component = entity::memory::GetComponent<CUserInterface>(
         entity_id, m_scene_context.scene_entities);
 
-    draw_ui_elements::DrawNestedUIElements(
-        m_scene_context.scene_texture, *ui_component.m_root_element,
-        m_scene_context.asset_manager.GetDefaultUIStyle());
+    // only draw if the CUserInterface is visible
+    if (ui_component.m_UI_visible) {
+      draw_ui_elements::DrawNestedUIElements(
+          m_scene_context.scene_texture, *ui_component.m_root_element,
+          m_scene_context.asset_manager.GetDefaultUIStyle());
+    }
   }
 }
 

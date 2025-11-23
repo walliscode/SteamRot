@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "EventPacketEqualsMatcher.h"
+#include "EventPacket.h"
 #include "conmat.h"
 
 namespace steamrot::tests {
@@ -29,9 +30,9 @@ EventPacketEqualsMatcher::GetNameForEventDataIndex(size_t index) const {
 }
 
 /////////////////////////////////////////////////
-bool EventPacketEqualsMatcher::CompareEventData(
-    const EventData &actual_data, const EventData &expected_data,
-    std::ostringstream &oss) const {
+bool EventPacketEqualsMatcher::CompareEventData(const EventData &actual_data,
+                                                const EventData &expected_data,
+                                                std::ostringstream &oss) const {
 
   // Check if variant types match and return early if they don't
   if (actual_data.index() != expected_data.index()) {
@@ -70,8 +71,7 @@ bool EventPacketEqualsMatcher::CompareEventData(
           << "\n";
       oss << "\t"
           << "expected = "
-          << conmat::Colorize(expected_bitset.to_string(),
-                              conmat::Color::Blue)
+          << conmat::Colorize(expected_bitset.to_string(), conmat::Color::Blue)
           << "\n";
       return false;
     }
@@ -80,8 +80,7 @@ bool EventPacketEqualsMatcher::CompareEventData(
     const auto &expected_packet = std::get<SceneChangePacket>(expected_data);
 
     // UUID is optional, compare presence first
-    if (actual_packet.first.has_value() !=
-        expected_packet.first.has_value()) {
+    if (actual_packet.first.has_value() != expected_packet.first.has_value()) {
 
       oss << conmat::TestFailed()
           << "m_event_data SceneChangePacket UUID presence differs:" << "\n";
@@ -106,8 +105,7 @@ bool EventPacketEqualsMatcher::CompareEventData(
             << "m_event_data SceneChangePacket UUID differs:" << "\n";
         oss << "\t"
             << "actual = "
-            << conmat::Colorize(actual_packet.first.value(),
-                                conmat::Color::Red)
+            << conmat::Colorize(actual_packet.first.value(), conmat::Color::Red)
             << "\n";
         oss << "\t"
             << "expected = "
@@ -135,12 +133,12 @@ bool EventPacketEqualsMatcher::CompareEventData(
       return false;
     }
 
-  } else if (std::holds_alternative<UIElementName>(actual_data)) {
-    const auto &actual_name = std::get<UIElementName>(actual_data);
-    const auto &expected_name = std::get<UIElementName>(expected_data);
+  } else if (std::holds_alternative<UserInterfaceName>(actual_data)) {
+    const auto &actual_name = std::get<UserInterfaceName>(actual_data);
+    const auto &expected_name = std::get<UserInterfaceName>(expected_data);
 
     if (actual_name != expected_name) {
-      oss << conmat::TestFailed() << "m_event_data UIElementName differs:"
+      oss << conmat::TestFailed() << "m_event_data UserInterfaceName differs:"
           << "\n";
       oss << "\t"
           << "actual = " << conmat::Colorize(actual_name, conmat::Color::Red)

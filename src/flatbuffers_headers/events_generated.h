@@ -18,22 +18,27 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
+struct UserInterfaceNameData;
+struct UserInterfaceNameDataBuilder;
+
 enum EventType : uint64_t {
   EventType_EVENT_NONE = 1ULL,
   EventType_EVENT_TEST = 2ULL,
   EventType_EVENT_USER_INPUT = 4ULL,
-  EventType_EVENT_CHANGE_SCENE = 8ULL,
-  EventType_EVENT_QUIT_GAME = 16ULL,
-  EventType_EVENT_TOGGLE_DROPDOWN = 32ULL,
+  EventType_EVENT_TOGGLE_UI = 8ULL,
+  EventType_EVENT_CHANGE_SCENE = 16ULL,
+  EventType_EVENT_QUIT_GAME = 32ULL,
+  EventType_EVENT_TOGGLE_DROPDOWN = 64ULL,
   EventType_NONE = 0,
-  EventType_ANY = 63ULL
+  EventType_ANY = 127ULL
 };
 
-inline const EventType (&EnumValuesEventType())[6] {
+inline const EventType (&EnumValuesEventType())[7] {
   static const EventType values[] = {
     EventType_EVENT_NONE,
     EventType_EVENT_TEST,
     EventType_EVENT_USER_INPUT,
+    EventType_EVENT_TOGGLE_UI,
     EventType_EVENT_CHANGE_SCENE,
     EventType_EVENT_QUIT_GAME,
     EventType_EVENT_TOGGLE_DROPDOWN
@@ -46,6 +51,7 @@ inline const char *EnumNameEventType(EventType e) {
     case EventType_EVENT_NONE: return "EVENT_NONE";
     case EventType_EVENT_TEST: return "EVENT_TEST";
     case EventType_EVENT_USER_INPUT: return "EVENT_USER_INPUT";
+    case EventType_EVENT_TOGGLE_UI: return "EVENT_TOGGLE_UI";
     case EventType_EVENT_CHANGE_SCENE: return "EVENT_CHANGE_SCENE";
     case EventType_EVENT_QUIT_GAME: return "EVENT_QUIT_GAME";
     case EventType_EVENT_TOGGLE_DROPDOWN: return "EVENT_TOGGLE_DROPDOWN";
@@ -57,31 +63,34 @@ enum EventDataData : uint8_t {
   EventDataData_NONE = 0,
   EventDataData_UserInputBitsetData = 1,
   EventDataData_SceneChangePacketData = 2,
+  EventDataData_UserInterfaceNameData = 3,
   EventDataData_MIN = EventDataData_NONE,
-  EventDataData_MAX = EventDataData_SceneChangePacketData
+  EventDataData_MAX = EventDataData_UserInterfaceNameData
 };
 
-inline const EventDataData (&EnumValuesEventDataData())[3] {
+inline const EventDataData (&EnumValuesEventDataData())[4] {
   static const EventDataData values[] = {
     EventDataData_NONE,
     EventDataData_UserInputBitsetData,
-    EventDataData_SceneChangePacketData
+    EventDataData_SceneChangePacketData,
+    EventDataData_UserInterfaceNameData
   };
   return values;
 }
 
 inline const char * const *EnumNamesEventDataData() {
-  static const char * const names[4] = {
+  static const char * const names[5] = {
     "NONE",
     "UserInputBitsetData",
     "SceneChangePacketData",
+    "UserInterfaceNameData",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameEventDataData(EventDataData e) {
-  if (::flatbuffers::IsOutRange(e, EventDataData_NONE, EventDataData_SceneChangePacketData)) return "";
+  if (::flatbuffers::IsOutRange(e, EventDataData_NONE, EventDataData_UserInterfaceNameData)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesEventDataData()[index];
 }
@@ -98,8 +107,63 @@ template<> struct EventDataDataTraits<steamrot::SceneChangePacketData> {
   static const EventDataData enum_value = EventDataData_SceneChangePacketData;
 };
 
+template<> struct EventDataDataTraits<steamrot::UserInterfaceNameData> {
+  static const EventDataData enum_value = EventDataData_UserInterfaceNameData;
+};
+
 bool VerifyEventDataData(::flatbuffers::Verifier &verifier, const void *obj, EventDataData type);
 bool VerifyEventDataDataVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types);
+
+struct UserInterfaceNameData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UserInterfaceNameDataBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_ID = 4
+  };
+  const ::flatbuffers::String *id() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_ID);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_ID) &&
+           verifier.VerifyString(id()) &&
+           verifier.EndTable();
+  }
+};
+
+struct UserInterfaceNameDataBuilder {
+  typedef UserInterfaceNameData Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_id(::flatbuffers::Offset<::flatbuffers::String> id) {
+    fbb_.AddOffset(UserInterfaceNameData::VT_ID, id);
+  }
+  explicit UserInterfaceNameDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<UserInterfaceNameData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<UserInterfaceNameData>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<UserInterfaceNameData> CreateUserInterfaceNameData(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::String> id = 0) {
+  UserInterfaceNameDataBuilder builder_(_fbb);
+  builder_.add_id(id);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<UserInterfaceNameData> CreateUserInterfaceNameDataDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const char *id = nullptr) {
+  auto id__ = id ? _fbb.CreateString(id) : 0;
+  return steamrot::CreateUserInterfaceNameData(
+      _fbb,
+      id__);
+}
 
 inline bool VerifyEventDataData(::flatbuffers::Verifier &verifier, const void *obj, EventDataData type) {
   switch (type) {
@@ -112,6 +176,10 @@ inline bool VerifyEventDataData(::flatbuffers::Verifier &verifier, const void *o
     }
     case EventDataData_SceneChangePacketData: {
       auto ptr = reinterpret_cast<const steamrot::SceneChangePacketData *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case EventDataData_UserInterfaceNameData: {
+      auto ptr = reinterpret_cast<const steamrot::UserInterfaceNameData *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;

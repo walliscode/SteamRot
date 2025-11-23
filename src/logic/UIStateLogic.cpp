@@ -7,6 +7,7 @@
 #include "CUIState.h"
 #include "archetype_helpers.h"
 #include "entity_memory.h"
+#include "logic_ui.h"
 
 namespace steamrot {
 /////////////////////////////////////////////////
@@ -27,6 +28,10 @@ void UIStateLogic::ProcessLogic() {
     // grab the CUIState component
     CUIState &ui_state = entity::memory::GetComponent<CUIState>(
         entity_id, m_scene_context.scene_entities);
+
+    // update the UI state
+    logic::ui::UpdateCUserInterfaceVisibilityFromCUIState(
+        ui_state, m_scene_context.scene_entities);
   }
 }
 
