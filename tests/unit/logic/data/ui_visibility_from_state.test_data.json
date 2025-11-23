@@ -1,7 +1,7 @@
 {
   "metadata": {
     "test_name": "UpdateCUserInterfaceVisibilityFromCUIState_basic_test",
-    "description": "Test UpdateCUserInterfaceVisibilityFromCUIState function - 4 UI entities controlled by 1 CUIState entity that manages visibility of 2 of them",
+    "description": "Test UpdateCUserInterfaceVisibilityFromCUIState function - 4 UI entities controlled by 1 CUIState entity with active EVENT_TOGGLE_UI subscriber that toggles visibility of 2 UI components",
     "tags": [
       "unit",
       "logic",
@@ -11,13 +11,13 @@
     "version": 1
   },
   "simulation_data": {
-    "description": "Call UpdateCUserInterfaceVisibilityFromCUIState to update UI visibility based on CUIState mappings",
+    "description": "Call UpdateCUserInterfaceVisibilityFromCUIState to update UI visibility based on active CUIState with EVENT_TOGGLE_UI subscriber",
     "steps": [
       {
         "simulation_type": "Action",
         "execution_mode": "Function",
         "function_type": "UpdateCUserInterfaceVisibilityFromCUIState",
-        "description": "Step 1: Update UI visibility - main_menu and play_button should be visible, settings_panel and quit_button should be hidden"
+        "description": "Step 1: Process active menu_toggle_state to show main_menu and play_button, hide settings_panel and quit_button"
       }
     ]
   },
@@ -122,7 +122,7 @@
           "c_ui_state": {
             "mappings": [
               {
-                "state_key": "menu_state",
+                "state_key": "menu_toggle_state",
                 "ui_names_on": [
                   "main_menu",
                   "play_button"
@@ -131,7 +131,17 @@
                   "settings_panel",
                   "quit_button"
                 ],
-                "starting_state": "true"
+                "subscribers": [
+                  {
+                    "event_type_data": "EVENT_TOGGLE_UI",
+                    "trigger_data_type": "UserInterfaceNameData",
+                    "trigger_data": {
+                      "id": "menu_toggle"
+                    },
+                    "active": true
+                  }
+                ],
+                "starting_state": true
               }
             ]
           }
@@ -240,7 +250,7 @@
           "c_ui_state": {
             "mappings": [
               {
-                "state_key": "menu_state",
+                "state_key": "menu_toggle_state",
                 "ui_names_on": [
                   "main_menu",
                   "play_button"
@@ -249,7 +259,17 @@
                   "settings_panel",
                   "quit_button"
                 ],
-                "starting_state": "true"
+                "subscribers": [
+                  {
+                    "event_type_data": "EVENT_TOGGLE_UI",
+                    "trigger_data_type": "UserInterfaceNameData",
+                    "trigger_data": {
+                      "id": "menu_toggle"
+                    },
+                    "active": true
+                  }
+                ],
+                "starting_state": true
               }
             ]
           }
