@@ -7,13 +7,13 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "test_data_harness.h"
+#include "EntityMemoryPoolEqualsMatcher.h"
+#include "EventBusEqualsMatcher.h"
 #include "FlatbuffersConfigurator.h"
 #include "catch2/matchers/catch_matchers.hpp"
 #include "conmat.h"
 #include "console_output.h"
-#include "entity_memory_pool_matchers.h"
 #include "event_bus_conversion.h"
-#include "event_matchers.h"
 #include "tick_executor.h"
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>

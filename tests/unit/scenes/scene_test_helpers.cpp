@@ -7,9 +7,9 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "scene_test_helpers.h"
+#include "EntityMemoryPoolEqualsMatcher.h"
 #include "EventHandler.h"
 #include "FlatbuffersConfigurator.h"
-#include "entity_memory_pool_matchers.h"
 #include "entity_test_helpers.h"
 #include "logic_test_helpers.h"
 #include "uuid.h"
@@ -42,7 +42,9 @@ void CheckDefaultSceneConfiguration(const Scene &scene) {
   FlatbuffersConfigurator configurator(event_handler);
   auto result =
       configurator.ConfigureEntitiesFromDefaultData(expected_pool, scene_type);
-  REQUIRE(result.has_value());
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
 
   REQUIRE_THAT(scene.GetEntityMemoryPool(),
                EqualsEntityMemoryPool(expected_pool));
