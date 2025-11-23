@@ -13,6 +13,7 @@ add_library(matchers
   JointEqualsMatcher.cpp
   UIElementEqualsMatcher.cpp
   EntityMemoryPoolEqualsMatcher.cpp
+  SubscriberEqualsMatcher.cpp
 )
 
 target_include_directories(matchers
@@ -47,6 +48,7 @@ add_executable(test_matchers
   JointEqualsMatcher.test.cpp
   UIElementEqualsMatcher.test.cpp
   EntityMemoryPoolEqualsMatcher.test.cpp
+  SubscriberEqualsMatcher.test.cpp
 )
 
 target_link_libraries(test_matchers
