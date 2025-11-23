@@ -23,7 +23,7 @@ namespace steamrot {
 FlatbuffersConfigurator::FlatbuffersConfigurator(EventHandler &event_handler)
     : EntityConfigurator(event_handler) {}
 
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 FlatbuffersConfigurator::ConfigureEntitiesFromDefaultData(
     EntityMemoryPool &entity_memory_pool, const SceneType scene_type) {

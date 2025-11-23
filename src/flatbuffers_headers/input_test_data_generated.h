@@ -29,9 +29,9 @@ struct InputEventBuilder;
 struct InputSequence;
 struct InputSequenceBuilder;
 
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 /// @brief Types of input events that can be simulated
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 enum InputType : int8_t {
   InputType_MouseMove = 0,
   InputType_MouseClick = 1,
@@ -71,9 +71,9 @@ inline const char *EnumNameInputType(InputType e) {
   return EnumNamesInputType()[index];
 }
 
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 /// @brief Union of possible input data types
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 enum InputEventData : uint8_t {
   InputEventData_NONE = 0,
   InputEventData_MouseInputData = 1,
@@ -122,9 +122,9 @@ template<> struct InputEventDataTraits<steamrot::KeyboardInputData> {
 bool VerifyInputEventData(::flatbuffers::Verifier &verifier, const void *obj, InputEventData type);
 bool VerifyInputEventDataVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types);
 
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 /// @brief Mouse input data for simulation
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 struct MouseInputData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef MouseInputDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -177,9 +177,9 @@ inline ::flatbuffers::Offset<MouseInputData> CreateMouseInputData(
   return builder_.Finish();
 }
 
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 /// @brief Keyboard input data for simulation
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 struct KeyboardInputData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef KeyboardInputDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -251,12 +251,12 @@ inline ::flatbuffers::Offset<KeyboardInputData> CreateKeyboardInputData(
   return builder_.Finish();
 }
 
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 /// @brief A single input event to be simulated
 ///
 /// Each input event represents a discrete input action that can be
 /// injected into the test fixture at a specific tick/timestamp.
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 struct InputEvent FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef InputEventBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -377,12 +377,12 @@ inline ::flatbuffers::Offset<InputEvent> CreateInputEventDirect(
       description__);
 }
 
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 /// @brief Sequence of input events for simulation
 ///
 /// Represents a complete sequence of inputs that can be replayed
 /// during a test, allowing tick-by-tick input injection.
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 struct InputSequence FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef InputSequenceBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {

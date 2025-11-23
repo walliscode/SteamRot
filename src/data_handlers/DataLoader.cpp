@@ -10,7 +10,7 @@
 #include <fstream>
 namespace steamrot {
 
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 char *DataLoader::LoadBinaryData(const std::filesystem::path &file_path) const {
 
   // open file in binary mode

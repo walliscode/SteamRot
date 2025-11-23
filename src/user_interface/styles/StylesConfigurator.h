@@ -28,18 +28,18 @@ private:
 public:
   StylesConfigurator() = default;
 
-  /////////////////////////////////////////////////
+/////////////////////////////////////////////////
   /// @brief Configure a UIStyle object based on the provided flatbuffer
   ///
   /// @param style_data Flatbuffer data containing style configuration
-  /////////////////////////////////////////////////
+/////////////////////////////////////////////////
   std::expected<UIStyle, FailInfo>
   ConfigureStyle(const UIStyleData &style_data,
                  const AssetManager &asset_manager);
 
-  /////////////////////////////////////////////////
+/////////////////////////////////////////////////
   /// @brief Provide a map of all available UIStyles
-  /////////////////////////////////////////////////
+/////////////////////////////////////////////////
   std::expected<std::unordered_map<std::string, UIStyle>, FailInfo>
   ProvideUIStylesMap(const AssetManager &asset_manager,
                      std::vector<std::string> style_names = {});

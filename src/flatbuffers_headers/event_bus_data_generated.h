@@ -20,13 +20,13 @@ namespace steamrot {
 struct EventBusData;
 struct EventBusDataBuilder;
 
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 /// @brief Snapshot of EventBus state
 ///
 /// Represents the complete state of an EventBus (std::vector<EventPacket>)
 /// at a specific point in time. Used for testing to configure initial state
 /// or validate expected state.
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 struct EventBusData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef EventBusDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {

@@ -1,13 +1,13 @@
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 /// @file
 /// @brief Free functions for configuring resources from FlatBuffers data.
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 
 #pragma once
 
-////////////////////////////////////////////////////////////
-// Headers
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
 #include "FailInfo.h"
 #include "GameResources.h"
 #include "SceneResources.h"
@@ -19,7 +19,7 @@
 namespace steamrot {
 namespace resources {
 
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 /// @brief Configure GameResources from FlatBuffers data.
 ///
 /// Configures window settings (size, title, framerate) from the
@@ -28,12 +28,12 @@ namespace resources {
 /// @param resources GameResources instance to configure
 /// @param game_data Pointer to GameResourcesData configuration
 /// @return Expected containing monostate or FailInfo on error
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 ConfigureGameResources(GameResources &resources,
                        const GameResourcesData *game_data);
 
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 /// @brief Configure SceneResources from FlatBuffers data.
 ///
 /// Configures render texture dimensions from the scene data.
@@ -43,7 +43,7 @@ ConfigureGameResources(GameResources &resources,
 /// @param resources SceneResources instance to configure
 /// @param scene_data Scene resource data (can be null for defaults)
 /// @return Expected containing monostate or FailInfo on error
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 ConfigureSceneResources(SceneResources &resources,
                         const SceneResourcesData *scene_data);
