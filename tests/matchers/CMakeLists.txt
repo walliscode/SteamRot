@@ -8,6 +8,7 @@ add_library(matchers
   CUIStateEqualsMatcher.cpp
   CMachinaFormEqualsMatcher.cpp
   EventPacketEqualsMatcher.cpp
+  EventDataEqualsMatcher.cpp
   EventBusEqualsMatcher.cpp
   FragmentEqualsMatcher.cpp
   JointEqualsMatcher.cpp
@@ -34,15 +35,13 @@ PUBLIC
 
 # Test executable for all matcher tests
 add_executable(test_matchers
-
   CMetaEqualsMatcher.test.cpp
   CGrimoireMachinaEqualsMatcher.test.cpp
   CUserInterfaceEqualsMatcher.test.cpp
   CUIStateEqualsMatcher.test.cpp
-
-
   CMachinaFormEqualsMatcher.test.cpp
   EventPacketEqualsMatcher.test.cpp
+  EventDataEqualsMatcher.test.cpp
   EventBusEqualsMatcher.test.cpp
   FragmentEqualsMatcher.test.cpp
   JointEqualsMatcher.test.cpp
