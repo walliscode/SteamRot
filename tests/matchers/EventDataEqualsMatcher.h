@@ -59,4 +59,8 @@ public:
   /////////////////////////////////////////////////
   std::string describe() const override;
 };
+
+inline EventDataEqualsMatcher EqualsEventData(const EventData &expected) {
+  return EventDataEqualsMatcher(expected);
+}
 } // namespace steamrot::tests

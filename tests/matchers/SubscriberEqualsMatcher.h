@@ -10,7 +10,6 @@
 
 #include "Subscriber.h"
 #include <catch2/matchers/catch_matchers.hpp>
-#include <sstream>
 #include <string>
 
 namespace steamrot::tests {
@@ -32,18 +31,6 @@ private:
   /// @return Name of the variant type
   /////////////////////////////////////////////////
   std::string GetNameForEventDataIndex(size_t index) const;
-
-  /////////////////////////////////////////////////
-  /// @brief Compare EventData variants
-  ///
-  /// @param actual_data Actual event data
-  /// @param expected_data Expected event data
-  /// @param oss Output stream for mismatch description
-  /// @return true if data matches, false otherwise
-  /////////////////////////////////////////////////
-  bool CompareEventData(const EventData &actual_data,
-                        const EventData &expected_data,
-                        std::ostringstream &oss) const;
 
 public:
   /////////////////////////////////////////////////
