@@ -47,6 +47,9 @@ struct EventPacketData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::SceneChangePacketData *event_data_data_as_SceneChangePacketData() const {
     return event_data_data_type() == steamrot::EventDataData_SceneChangePacketData ? static_cast<const steamrot::SceneChangePacketData *>(event_data_data()) : nullptr;
   }
+  const steamrot::UserInterfaceNameData *event_data_data_as_UserInterfaceNameData() const {
+    return event_data_data_type() == steamrot::EventDataData_UserInterfaceNameData ? static_cast<const steamrot::UserInterfaceNameData *>(event_data_data()) : nullptr;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_EVENT_LIFETIME, 4) &&
@@ -64,6 +67,10 @@ template<> inline const steamrot::UserInputBitsetData *EventPacketData::event_da
 
 template<> inline const steamrot::SceneChangePacketData *EventPacketData::event_data_data_as<steamrot::SceneChangePacketData>() const {
   return event_data_data_as_SceneChangePacketData();
+}
+
+template<> inline const steamrot::UserInterfaceNameData *EventPacketData::event_data_data_as<steamrot::UserInterfaceNameData>() const {
+  return event_data_data_as_UserInterfaceNameData();
 }
 
 struct EventPacketDataBuilder {

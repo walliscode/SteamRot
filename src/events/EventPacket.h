@@ -17,12 +17,11 @@
 namespace steamrot {
 
 using SceneChangePacket = std::pair<std::optional<uuids::uuid>, SceneType>;
-
-using UIElementName = std::string;
+using UserInterfaceName = std::string;
 
 // Your variant type
 using EventData = std::variant<std::monostate, UserInputBitset,
-                               SceneChangePacket, UIElementName>;
+                               SceneChangePacket, UserInterfaceName>;
 
 struct EventPacket {
 

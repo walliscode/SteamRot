@@ -44,6 +44,9 @@ struct SubscriberData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::SceneChangePacketData *trigger_data_as_SceneChangePacketData() const {
     return trigger_data_type() == steamrot::EventDataData_SceneChangePacketData ? static_cast<const steamrot::SceneChangePacketData *>(trigger_data()) : nullptr;
   }
+  const steamrot::UserInterfaceNameData *trigger_data_as_UserInterfaceNameData() const {
+    return trigger_data_type() == steamrot::EventDataData_UserInterfaceNameData ? static_cast<const steamrot::UserInterfaceNameData *>(trigger_data()) : nullptr;
+  }
   bool active() const {
     return GetField<uint8_t>(VT_ACTIVE, 0) != 0;
   }
@@ -64,6 +67,10 @@ template<> inline const steamrot::UserInputBitsetData *SubscriberData::trigger_d
 
 template<> inline const steamrot::SceneChangePacketData *SubscriberData::trigger_data_as<steamrot::SceneChangePacketData>() const {
   return trigger_data_as_SceneChangePacketData();
+}
+
+template<> inline const steamrot::UserInterfaceNameData *SubscriberData::trigger_data_as<steamrot::UserInterfaceNameData>() const {
+  return trigger_data_as_UserInterfaceNameData();
 }
 
 struct SubscriberDataBuilder {

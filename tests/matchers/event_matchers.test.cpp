@@ -112,7 +112,8 @@ TEST_CASE("EventPacket matcher compares m_event_data with monostate",
     REQUIRE_THAT(actual, steamrot::tests::EqualsEventPacket(expected));
   }
 
-  SECTION("Matcher detects differences when actual has different variant type") {
+  SECTION(
+      "Matcher detects differences when actual has different variant type") {
     actual.m_event_data = steamrot::UserInputBitset{};
     REQUIRE_THAT(actual, !steamrot::tests::EqualsEventPacket(expected));
   }
@@ -154,8 +155,7 @@ TEST_CASE("EventPacket matcher compares m_event_data with SceneChangePacket",
   steamrot::SceneType scene_type = steamrot::SceneType_TITLE;
 
   steamrot::EventPacket expected{1};
-  expected.m_event_data =
-      steamrot::SceneChangePacket{test_uuid, scene_type};
+  expected.m_event_data = steamrot::SceneChangePacket{test_uuid, scene_type};
 
   steamrot::EventPacket actual{1};
 
@@ -172,8 +172,8 @@ TEST_CASE("EventPacket matcher compares m_event_data with SceneChangePacket",
   }
 
   SECTION("Matcher detects SceneChangePacket SceneType differences") {
-    actual.m_event_data = steamrot::SceneChangePacket{
-        test_uuid, steamrot::SceneType_CRAFTING};
+    actual.m_event_data =
+        steamrot::SceneChangePacket{test_uuid, steamrot::SceneType_CRAFTING};
     REQUIRE_THAT(actual, !steamrot::tests::EqualsEventPacket(expected));
   }
 
@@ -208,17 +208,17 @@ TEST_CASE("EventPacket matcher compares m_event_data with SceneChangePacket",
 TEST_CASE("EventPacket matcher compares m_event_data with UIElementName",
           "[unit][EventPacket][matcher]") {
   steamrot::EventPacket expected{1};
-  expected.m_event_data = steamrot::UIElementName{"TestElement"};
+  expected.m_event_data = steamrot::UserInterfaceName{"TestElement"};
 
   steamrot::EventPacket actual{1};
 
   SECTION("Matcher detects UIElementName equality") {
-    actual.m_event_data = steamrot::UIElementName{"TestElement"};
+    actual.m_event_data = steamrot::UserInterfaceName{"TestElement"};
     REQUIRE_THAT(actual, steamrot::tests::EqualsEventPacket(expected));
   }
 
   SECTION("Matcher detects UIElementName differences") {
-    actual.m_event_data = steamrot::UIElementName{"DifferentElement"};
+    actual.m_event_data = steamrot::UserInterfaceName{"DifferentElement"};
     REQUIRE_THAT(actual, !steamrot::tests::EqualsEventPacket(expected));
   }
 }
@@ -307,7 +307,7 @@ TEST_CASE("EventBus matcher compares single EventPacket correctly",
 TEST_CASE("EventBus matcher compares multiple EventPackets correctly",
           "[unit][EventBus][matcher]") {
   steamrot::EventBus expected;
-  
+
   steamrot::EventPacket packet1{1};
   packet1.m_event_type = steamrot::EventType::EventType_EVENT_USER_INPUT;
   expected.push_back(packet1);
@@ -324,7 +324,8 @@ TEST_CASE("EventBus matcher compares multiple EventPackets correctly",
 
   SECTION("Matcher detects equality with multiple packets") {
     steamrot::EventPacket actual_packet1{1};
-    actual_packet1.m_event_type = steamrot::EventType::EventType_EVENT_USER_INPUT;
+    actual_packet1.m_event_type =
+        steamrot::EventType::EventType_EVENT_USER_INPUT;
     actual.push_back(actual_packet1);
 
     steamrot::EventPacket actual_packet2{2};
@@ -332,7 +333,8 @@ TEST_CASE("EventBus matcher compares multiple EventPackets correctly",
     actual.push_back(actual_packet2);
 
     steamrot::EventPacket actual_packet3{3};
-    actual_packet3.m_event_type = steamrot::EventType::EventType_EVENT_QUIT_GAME;
+    actual_packet3.m_event_type =
+        steamrot::EventType::EventType_EVENT_QUIT_GAME;
     actual.push_back(actual_packet3);
 
     REQUIRE_THAT(actual, steamrot::tests::EqualsEventBus(expected));
@@ -340,15 +342,18 @@ TEST_CASE("EventBus matcher compares multiple EventPackets correctly",
 
   SECTION("Matcher detects differences in middle packet") {
     steamrot::EventPacket actual_packet1{1};
-    actual_packet1.m_event_type = steamrot::EventType::EventType_EVENT_USER_INPUT;
+    actual_packet1.m_event_type =
+        steamrot::EventType::EventType_EVENT_USER_INPUT;
     actual.push_back(actual_packet1);
 
     steamrot::EventPacket actual_packet2{2};
-    actual_packet2.m_event_type = steamrot::EventType::EventType_EVENT_QUIT_GAME; // Different
+    actual_packet2.m_event_type =
+        steamrot::EventType::EventType_EVENT_QUIT_GAME; // Different
     actual.push_back(actual_packet2);
 
     steamrot::EventPacket actual_packet3{3};
-    actual_packet3.m_event_type = steamrot::EventType::EventType_EVENT_QUIT_GAME;
+    actual_packet3.m_event_type =
+        steamrot::EventType::EventType_EVENT_QUIT_GAME;
     actual.push_back(actual_packet3);
 
     REQUIRE_THAT(actual, !steamrot::tests::EqualsEventBus(expected));
@@ -356,7 +361,8 @@ TEST_CASE("EventBus matcher compares multiple EventPackets correctly",
 
   SECTION("Matcher detects differences in last packet") {
     steamrot::EventPacket actual_packet1{1};
-    actual_packet1.m_event_type = steamrot::EventType::EventType_EVENT_USER_INPUT;
+    actual_packet1.m_event_type =
+        steamrot::EventType::EventType_EVENT_USER_INPUT;
     actual.push_back(actual_packet1);
 
     steamrot::EventPacket actual_packet2{2};
@@ -364,7 +370,8 @@ TEST_CASE("EventBus matcher compares multiple EventPackets correctly",
     actual.push_back(actual_packet2);
 
     steamrot::EventPacket actual_packet3{5}; // Different lifetime
-    actual_packet3.m_event_type = steamrot::EventType::EventType_EVENT_QUIT_GAME;
+    actual_packet3.m_event_type =
+        steamrot::EventType::EventType_EVENT_QUIT_GAME;
     actual.push_back(actual_packet3);
 
     REQUIRE_THAT(actual, !steamrot::tests::EqualsEventBus(expected));
@@ -378,19 +385,19 @@ TEST_CASE("EventBus matcher compares EventPackets with complex event data",
   sf::Event event{key_event};
 
   steamrot::EventBus expected;
-  
+
   steamrot::EventPacket packet1{1};
   packet1.m_event_data = steamrot::UserInputBitset{{event}};
   expected.push_back(packet1);
 
   steamrot::EventPacket packet2{2};
-  packet2.m_event_data = steamrot::UIElementName{"Button1"};
+  packet2.m_event_data = steamrot::UserInterfaceName{"Button1"};
   expected.push_back(packet2);
 
   uuids::uuid test_uuid = GenerateTestUUID();
   steamrot::EventPacket packet3{3};
-  packet3.m_event_data = steamrot::SceneChangePacket{
-      test_uuid, steamrot::SceneType_CRAFTING};
+  packet3.m_event_data =
+      steamrot::SceneChangePacket{test_uuid, steamrot::SceneType_CRAFTING};
   expected.push_back(packet3);
 
   steamrot::EventBus actual;
@@ -401,12 +408,12 @@ TEST_CASE("EventBus matcher compares EventPackets with complex event data",
     actual.push_back(actual_packet1);
 
     steamrot::EventPacket actual_packet2{2};
-    actual_packet2.m_event_data = steamrot::UIElementName{"Button1"};
+    actual_packet2.m_event_data = steamrot::UserInterfaceName{"Button1"};
     actual.push_back(actual_packet2);
 
     steamrot::EventPacket actual_packet3{3};
-    actual_packet3.m_event_data = steamrot::SceneChangePacket{
-        test_uuid, steamrot::SceneType_CRAFTING};
+    actual_packet3.m_event_data =
+        steamrot::SceneChangePacket{test_uuid, steamrot::SceneType_CRAFTING};
     actual.push_back(actual_packet3);
 
     REQUIRE_THAT(actual, steamrot::tests::EqualsEventBus(expected));
@@ -418,12 +425,13 @@ TEST_CASE("EventBus matcher compares EventPackets with complex event data",
     actual.push_back(actual_packet1);
 
     steamrot::EventPacket actual_packet2{2};
-    actual_packet2.m_event_data = steamrot::UIElementName{"Button2"}; // Different
+    actual_packet2.m_event_data =
+        steamrot::UserInterfaceName{"Button2"}; // Different
     actual.push_back(actual_packet2);
 
     steamrot::EventPacket actual_packet3{3};
-    actual_packet3.m_event_data = steamrot::SceneChangePacket{
-        test_uuid, steamrot::SceneType_CRAFTING};
+    actual_packet3.m_event_data =
+        steamrot::SceneChangePacket{test_uuid, steamrot::SceneType_CRAFTING};
     actual.push_back(actual_packet3);
 
     REQUIRE_THAT(actual, !steamrot::tests::EqualsEventBus(expected));

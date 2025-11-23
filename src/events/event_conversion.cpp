@@ -1,4 +1,5 @@
 #include "event_conversion.h"
+#include "EventPacket.h"
 #include "events_generated.h"
 #include "uuid.h"
 #include <cstddef>
@@ -108,6 +109,24 @@ ConvertFlatbuffersEventDataDataToEventData(const EventDataData data_type,
     scene_change_packet.second = scene_change_packet_data->scene_type();
 
     return scene_change_packet;
+  }
+
+  case EventDataData::EventDataData_UserInterfaceNameData: {
+
+    // cast data to UserInterfaceNameData
+    auto ui_name_data = static_cast<const UserInterfaceNameData *>(data);
+
+    // check if name exists
+    if (!ui_name_data->id()) {
+      return std::unexpected(FailInfo{
+          FailMode::FlatbuffersDataNotFound,
+          "ConvertFlatbuffersEventDataDataToEventData: UserInterfaceName "
+          "missing name."});
+    }
+
+    UserInterfaceName ui_name{ui_name_data->id()->str()};
+
+    return ui_name;
   }
 
   case EventDataData::EventDataData_NONE: {

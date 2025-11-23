@@ -11,14 +11,13 @@
 #include "PathProvider.h"
 #include "TestFixture.h"
 #include "TitleScene.h"
-#include "UIActionLogic.h"
-#include "UICollisionLogic.h"
 #include "scene_test_helpers.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 // create a GameContext object for use by all tests
-TEST_CASE("SceneFactory can be constructed without errors", "[unit][SceneFactory]") {
+TEST_CASE("SceneFactory can be constructed without errors",
+          "[unit][SceneFactory]") {
   steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
   steamrot::tests::TestFixture test_context;
   steamrot::SceneFactory scene_factory;
