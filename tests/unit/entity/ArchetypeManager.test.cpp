@@ -8,10 +8,11 @@
 /////////////////////////////////////////////////
 #include "ArchetypeManager.h"
 #include "EntityManager.h"
+#include "EntityMemoryPoolEqualsMatcher.h"
 #include "PathProvider.h"
 #include "TestFixture.h"
 #include "entity_test_helpers.h"
-#include "entity_memory_pool_matchers.h"
+
 #include "containers.h"
 #include "scene_change_packet_generated.h"
 #include <catch2/catch_test_macros.hpp>

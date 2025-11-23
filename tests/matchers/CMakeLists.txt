@@ -34,13 +34,13 @@ PUBLIC
 
 # Test executable for all matcher tests
 add_executable(test_matchers
-  component_matchers.test.cpp
+
   CMetaEqualsMatcher.test.cpp
   CGrimoireMachinaEqualsMatcher.test.cpp
   CUserInterfaceEqualsMatcher.test.cpp
   CUIStateEqualsMatcher.test.cpp
-  entity_memory_pool_matchers.test.cpp
-  event_matchers.test.cpp
+
+
   CMachinaFormEqualsMatcher.test.cpp
   EventPacketEqualsMatcher.test.cpp
   EventBusEqualsMatcher.test.cpp
