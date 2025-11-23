@@ -10,6 +10,7 @@
 
 #include "CUIState.h"
 #include "ComponentMatcherBase.h"
+#include <sstream>
 #include <string>
 
 namespace steamrot::tests {
@@ -54,4 +55,33 @@ inline CUIStateEqualsMatcher EqualsCUIState(const CUIState &expected) {
   return CUIStateEqualsMatcher(expected);
 }
 
+/////////////////////////////////////////////////
+/// @brief Takes in two UIVisibilityState objects adds any differences to the
+/// provided ostringstream
+///
+/// @param expected UIVisibilityState object
+/// @param actual UIVisibilityState object
+/// @param oss stream to append differences to
+/////////////////////////////////////////////////
+void CompareUIVisibilityState(const std::string &state_key,
+                              const UIVisibilityState &expected,
+                              const UIVisibilityState &actual,
+                              std::ostringstream &oss);
+
+void CompareMapStateToUIVisibility(
+    const std::unordered_map<std::string, UIVisibilityState> &expected,
+    const std::unordered_map<std::string, UIVisibilityState> &actual,
+    std::ostringstream &oss);
+
+void CompareMapStateValues(
+    const std::unordered_map<std::string, bool> &expected,
+    const std::unordered_map<std::string, bool> &actual,
+    std::ostringstream &oss);
+
+void CompareMapStateSubscribers(
+    const std::unordered_map<
+        std::string, std::vector<std::shared_ptr<Subscriber>>> &expected,
+    const std::unordered_map<std::string,
+                             std::vector<std::shared_ptr<Subscriber>>> &actual,
+    std::ostringstream &oss);
 } // namespace steamrot::tests
