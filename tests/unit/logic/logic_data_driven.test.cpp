@@ -19,7 +19,6 @@ TEST_CASE("Logic classes data-driven tests", "[unit][logic][data-driven]") {
   // Use Catch2 generator to iterate through all test configs
   const auto *config = GENERATE_COPY(from_range(configs.value()));
 
-  INFO("Running test: " << config->metadata()->test_name()->str());
   if (config->metadata()->description()) {
     INFO("Description: " << config->metadata()->description()->str());
   }

@@ -254,7 +254,7 @@ compare_tick_snapshot(uint32_t tick, const TestDataConfig *config,
         "index": 0,
         "c_user_interface": {
           "ui_name": "toggle_button",
-          "start_visible": false,
+          "is_visible": false,
           "root_ui_element": {
             "base_data": {
               "position": {"x": 100, "y": 100},
@@ -280,7 +280,7 @@ compare_tick_snapshot(uint32_t tick, const TestDataConfig *config,
             "index": 0,
             "c_user_interface": {
               "ui_name": "toggle_button",
-              "start_visible": true,
+              "is_visible": true,
               "root_ui_element": {
                 "base_data": {
                   "position": {"x": 100, "y": 100},
@@ -306,7 +306,7 @@ compare_tick_snapshot(uint32_t tick, const TestDataConfig *config,
             "index": 0,
             "c_user_interface": {
               "ui_name": "toggle_button",
-              "start_visible": false,
+              "is_visible": false,
               "root_ui_element": {
                 "base_data": {
                   "position": {"x": 100, "y": 100},
@@ -332,7 +332,7 @@ compare_tick_snapshot(uint32_t tick, const TestDataConfig *config,
             "index": 0,
             "c_user_interface": {
               "ui_name": "toggle_button",
-              "start_visible": true,
+              "is_visible": true,
               "root_ui_element": {
                 "base_data": {
                   "position": {"x": 100, "y": 100},
@@ -684,7 +684,7 @@ execute_single_tick(uint32_t tick, const TestDataConfig *config,
 ```
 EntityMemoryPool mismatch [Tick 2 (After toggle)]: 
 Component value differs at entity 0: 
-  CUserInterface.start_visible: actual=false, expected=true
+  CUserInterface.is_visible: actual=false, expected=true
 ```
 
 ### D. File Checklist

@@ -228,7 +228,7 @@ ctest --preset Debug -R logic
 {
   "c_user_interface": {
     "ui_name": "panel",
-    "start_visible": true,
+    "is_visible": true,
     "root_ui_element": {
       "base_data": {
         "position": { "x": 100, "y": 100 },

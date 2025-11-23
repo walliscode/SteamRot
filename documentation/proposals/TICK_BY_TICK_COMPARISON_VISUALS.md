@@ -158,7 +158,7 @@ Tick N Execution with Snapshot
 
 ```
 Entity: UI Button
-Initial State: Invisible (start_visible = false)
+Initial State: Invisible (is_visible = false)
 Action: User clicks button each tick to toggle visibility
 Expected: Button alternates between visible and invisible
 ```
@@ -172,28 +172,28 @@ Tick-by-Tick State Changes
 START:
 ┌─────────────────────────┐
 │ Button: Invisible       │
-│ (start_visible = false) │
+│ (is_visible = false) │
 └─────────────────────────┘
             ↓ user clicks
             ↓
 TICK 0: ⭐ SNAPSHOT 1 ⭐
 ┌─────────────────────────┐
 │ Button: Visible         │
-│ (start_visible = true)  │ ← Verify state after first click
+│ (is_visible = true)  │ ← Verify state after first click
 └─────────────────────────┘
             ↓ user clicks
             ↓
 TICK 1: ⭐ SNAPSHOT 2 ⭐
 ┌─────────────────────────┐
 │ Button: Invisible       │
-│ (start_visible = false) │ ← Verify state after second click
+│ (is_visible = false) │ ← Verify state after second click
 └─────────────────────────┘
             ↓ user clicks
             ↓
 TICK 2: ⭐ SNAPSHOT 3 ⭐
 ┌─────────────────────────┐
 │ Button: Visible         │
-│ (start_visible = true)  │ ← Verify state after third click
+│ (is_visible = true)  │ ← Verify state after third click
 └─────────────────────────┘
 
 Each snapshot verifies the state is correct at that specific tick!
@@ -267,7 +267,7 @@ TICK 1: ⭐ SNAPSHOT 2 ⭐
 Error Message:
 "EntityMemoryPool mismatch [Tick 1 (After second click - should be invisible)]:
  Component value differs at entity 0:
-   CUserInterface.start_visible: actual=true, expected=false"
+   CUserInterface.is_visible: actual=true, expected=false"
 
 With snapshots, we IMMEDIATELY know:
 - The failure happened at tick 1

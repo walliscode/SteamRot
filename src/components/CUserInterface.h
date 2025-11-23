@@ -36,7 +36,7 @@ struct CUserInterface : public Component {
   /////////////////////////////////////////////////
   /// @brief Is the this element of the user interface visible to Users.
   /////////////////////////////////////////////////
-  bool m_UI_visible{false};
+  bool m_is_visible{false};
 
   /////////////////////////////////////////////////
   /// @brief returns the index of the component in the component register

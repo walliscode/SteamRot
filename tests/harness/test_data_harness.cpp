@@ -7,13 +7,13 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "test_data_harness.h"
+#include "EntityMemoryPoolEqualsMatcher.h"
+#include "EventBusEqualsMatcher.h"
 #include "FlatbuffersConfigurator.h"
 #include "catch2/matchers/catch_matchers.hpp"
 #include "conmat.h"
 #include "console_output.h"
-#include "entity_memory_pool_matchers.h"
 #include "event_bus_conversion.h"
-#include "event_matchers.h"
 #include "tick_executor.h"
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
@@ -228,8 +228,6 @@ RunDataStructComparisonTest(const DataCollection *data_collection,
   oss << conmat::Colorize("Data Structure Comparison Tests",
                           conmat::Color::Blue)
       << "\n";
-  // test/file name if available
-  oss << "\t" << context.FormatTestName() << "\n";
   // tick info if available
   oss << "\t" << context.FormatTickInfo() << "\n";
 

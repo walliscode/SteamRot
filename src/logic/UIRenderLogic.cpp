@@ -38,7 +38,7 @@ void UIRenderLogic::DrawUIElements() {
         entity_id, m_scene_context.scene_entities);
 
     // only draw if the CUserInterface is visible
-    if (ui_component.m_UI_visible) {
+    if (ui_component.m_is_visible) {
       draw_ui_elements::DrawNestedUIElements(
           m_scene_context.scene_texture, *ui_component.m_root_element,
           m_scene_context.asset_manager.GetDefaultUIStyle());

@@ -81,8 +81,9 @@ TEST_CASE("CUserInterfaceEqualsMatcher describe is as expected on failure",
   oss << conmat::Indent(2)
       << "actual: " << conmat::Colorize(actual.m_name, conmat::Color::Red)
       << "\n";
-  oss << conmat::Indent(2) << "expected: "
-      << conmat::Colorize(expected.m_name, conmat::Color::Blue) << "\n";
+  oss << conmat::Indent(2)
+      << "expected: " << conmat::Colorize(expected.m_name, conmat::Color::Blue)
+      << "\n";
   REQUIRE(matcher.describe() == oss.str());
 }
 
@@ -91,12 +92,12 @@ TEST_CASE("CUserInterfaceEqualsMatcher detects UI visibility differences",
   steamrot::CUserInterface expected;
   expected.m_active = true;
   expected.m_name = "test_ui";
-  expected.m_UI_visible = true;
+  expected.m_is_visible = true;
 
   steamrot::CUserInterface actual;
   actual.m_active = true;
   actual.m_name = "test_ui";
-  actual.m_UI_visible = false;
+  actual.m_is_visible = false;
 
   REQUIRE_THAT(actual, !steamrot::tests::EqualsCUserInterface(expected));
 }

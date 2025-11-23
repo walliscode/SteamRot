@@ -7,8 +7,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "CUserInterfaceEqualsMatcher.h"
+#include "UIElementEqualsMatcher.h"
 #include "conmat.h"
-#include "ui_element_matchers.h"
 
 namespace steamrot::tests {
 
@@ -49,15 +49,14 @@ bool CUserInterfaceEqualsMatcher::match(const CUserInterface &actual) const {
         << conmat::Colorize(m_expected.m_name, conmat::Color::Blue) << "\n";
   }
 
-  if (actual.m_UI_visible != m_expected.m_UI_visible) {
+  if (actual.m_is_visible != m_expected.m_is_visible) {
     oss << conmat::Indent(1) << conmat::TestFailed() << "m_UI_visible:"
         << "\n";
 
-    oss << conmat::Indent(2)
-        << "actual: "
-        << conmat::Colorize(actual.m_UI_visible, conmat::Color::Red) << "\n";
+    oss << conmat::Indent(2) << "actual: "
+        << conmat::Colorize(actual.m_is_visible, conmat::Color::Red) << "\n";
     oss << conmat::Indent(2) << "expected: "
-        << conmat::Colorize(m_expected.m_UI_visible, conmat::Color::Blue)
+        << conmat::Colorize(m_expected.m_is_visible, conmat::Color::Blue)
         << "\n";
   }
 
@@ -79,10 +78,11 @@ bool CUserInterfaceEqualsMatcher::match(const CUserInterface &actual) const {
           << conmat::Colorize("non-nullptr", conmat::Color::Blue) << "\n";
     } else {
       oss << conmat::Indent(2)
-          << "actual: "
-          << conmat::Colorize("non-nullptr", conmat::Color::Red) << "\n";
-      oss << conmat::Indent(2) << "expected: "
-          << conmat::Colorize("nullptr", conmat::Color::Blue) << "\n";
+          << "actual: " << conmat::Colorize("non-nullptr", conmat::Color::Red)
+          << "\n";
+      oss << conmat::Indent(2)
+          << "expected: " << conmat::Colorize("nullptr", conmat::Color::Blue)
+          << "\n";
     }
   } else if (both_non_null) {
     // Both are non-null, use UIElement matcher to compare them recursively

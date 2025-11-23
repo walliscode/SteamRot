@@ -193,7 +193,7 @@ For comparison tests where you want to test transformations or state changes:
         "index": 0,
         "c_user_interface": {
           "ui_name": "test_ui",
-          "start_visible": false
+          "is_visible": false
         }
       }
     ]
@@ -205,7 +205,7 @@ For comparison tests where you want to test transformations or state changes:
         "index": 0,
         "c_user_interface": {
           "ui_name": "test_ui",
-          "start_visible": true
+          "is_visible": true
         }
       }
     ]
@@ -235,7 +235,7 @@ For negative testing or validation testing where you expect entities to differ:
         "index": 0,
         "c_user_interface": {
           "ui_name": "original_ui",
-          "start_visible": true
+          "is_visible": true
         }
       }
     ]
@@ -247,7 +247,7 @@ For negative testing or validation testing where you expect entities to differ:
         "index": 0,
         "c_user_interface": {
           "ui_name": "modified_ui",
-          "start_visible": false
+          "is_visible": false
         }
       }
     ]
@@ -700,7 +700,7 @@ table SimulationData {
         "index": 0,
         "c_user_interface": {
           "ui_name": "test_ui",
-          "start_visible": true,
+          "is_visible": true,
           "root_ui_element": { /* ... */ }
         }
       }

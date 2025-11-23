@@ -10,11 +10,11 @@
 #include "ButtonElement.h"
 #include "CMeta.h"
 #include "CUserInterface.h"
+#include "CUserInterfaceEqualsMatcher.h"
 #include "DropDownButtonElement.h"
 #include "DropDownItemElement.h"
 #include "DropDownListElement.h"
 #include "PanelElement.h"
-#include "CUserInterfaceEqualsMatcher.h"
 #include "ui_element_matchers.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
@@ -23,19 +23,19 @@ TEST_CASE("CUserInterface custom matcher works correctly",
           "[unit][Components][CUserInterface][matcher]") {
   steamrot::CUserInterface expected;
   expected.m_name = "TestUI";
-  expected.m_UI_visible = true;
+  expected.m_is_visible = true;
 
   steamrot::CUserInterface actual;
 
   SECTION("Matcher detects differences in m_name") {
     actual.m_name = "DifferentUI";
-    actual.m_UI_visible = true;
+    actual.m_is_visible = true;
     REQUIRE_THAT(actual, !steamrot::tests::EqualsCUserInterface(expected));
   }
 
   SECTION("Matcher detects equality") {
     actual.m_name = "TestUI";
-    actual.m_UI_visible = true;
+    actual.m_is_visible = true;
     REQUIRE_THAT(actual, steamrot::tests::EqualsCUserInterface(expected));
   }
 
@@ -43,7 +43,7 @@ TEST_CASE("CUserInterface custom matcher works correctly",
     expected.m_root_element = nullptr;
     actual.m_root_element = nullptr;
     actual.m_name = "TestUI";
-    actual.m_UI_visible = true;
+    actual.m_is_visible = true;
     REQUIRE_THAT(actual, steamrot::tests::EqualsCUserInterface(expected));
   }
 
@@ -51,7 +51,7 @@ TEST_CASE("CUserInterface custom matcher works correctly",
     expected.m_root_element = std::make_unique<steamrot::PanelElement>();
     actual.m_root_element = nullptr;
     actual.m_name = "TestUI";
-    actual.m_UI_visible = true;
+    actual.m_is_visible = true;
     REQUIRE_THAT(actual, !steamrot::tests::EqualsCUserInterface(expected));
   }
 
@@ -67,7 +67,7 @@ TEST_CASE("CUserInterface custom matcher works correctly",
     actual.m_root_element = std::move(actual_panel);
 
     actual.m_name = "TestUI";
-    actual.m_UI_visible = true;
+    actual.m_is_visible = true;
     REQUIRE_THAT(actual, steamrot::tests::EqualsCUserInterface(expected));
   }
 
@@ -81,7 +81,7 @@ TEST_CASE("CUserInterface custom matcher works correctly",
     actual.m_root_element = std::move(actual_panel);
 
     actual.m_name = "TestUI";
-    actual.m_UI_visible = true;
+    actual.m_is_visible = true;
     REQUIRE_THAT(actual, !steamrot::tests::EqualsCUserInterface(expected));
   }
 }

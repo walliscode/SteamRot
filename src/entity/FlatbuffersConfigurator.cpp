@@ -63,8 +63,8 @@ FlatbuffersConfigurator::ConfigureComponent(const UserInterfaceData *ui_data,
   if (ui_data->ui_name())
     ui_component.m_name = ui_data->ui_name()->str();
 
-  if (ui_data->start_visible())
-    ui_component.m_UI_visible = ui_data->start_visible();
+  if (ui_data->is_visible())
+    ui_component.m_is_visible = ui_data->is_visible();
 
   // data must contain a root element so throw unexpected if it is not set
   if (!ui_data->root_ui_element()) {

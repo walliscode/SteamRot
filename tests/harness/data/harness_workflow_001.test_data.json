@@ -55,7 +55,7 @@
           "index": 0,
           "c_user_interface": {
             "ui_name": "main_menu",
-            "start_visible": true,
+            "is_visible": true,
             "root_ui_element": {
               "base_data": {
                 "position": {
@@ -78,7 +78,7 @@
           "index": 1,
           "c_user_interface": {
             "ui_name": "button_panel",
-            "start_visible": true,
+            "is_visible": true,
             "root_ui_element": {
               "base_data": {
                 "position": {
@@ -108,7 +108,7 @@
           "index": 0,
           "c_user_interface": {
             "ui_name": "main_menu",
-            "start_visible": true,
+            "is_visible": true,
             "root_ui_element": {
               "base_data": {
                 "position": {
@@ -131,7 +131,7 @@
           "index": 1,
           "c_user_interface": {
             "ui_name": "button_panel",
-            "start_visible": true,
+            "is_visible": true,
             "root_ui_element": {
               "base_data": {
                 "position": {

@@ -1,35 +1,91 @@
 # Filling Out test_data.json Files - Workflow Guide
 
-[← Back to Documentation](../README.md) | [Testing Overview](../testing/TESTING_OVERVIEW.md) | [Test Data Configuration Reference](../testing/TEST_DATA_CONFIGURATION.md) | [Test Data Naming Conventions](../testing/TEST_DATA_NAMING_CONVENTIONS.md)
+<!--toc:start-->
 
-This guide provides practical workflows for creating test_data.json files for different testing scenarios in SteamRot.
+- [Filling Out test_data.json Files - Workflow Guide](#filling-out-testdatajson-files-workflow-guide)
+  - [What is test_data.json?](#what-is-testdatajson)
+  - [Basic Workflow](#basic-workflow)
+    - [Step 1: Decide on Test Scenario](#step-1-decide-on-test-scenario)
+    - [Step 2: Create JSON File](#step-2-create-json-file)
+    - [Step 3: Fill Out Required Fields](#step-3-fill-out-required-fields)
+    - [Step 4: Add Test-Specific Data](#step-4-add-test-specific-data)
+    - [Step 5: Build and Test](#step-5-build-and-test)
+  - [Testing Workflows by Scenario](#testing-workflows-by-scenario)
+    - [Workflow 1: Metadata-Only Test](#workflow-1-metadata-only-test)
+    - [Workflow 2: Simple Entity Comparison](#workflow-2-simple-entity-comparison)
+    - [Workflow 3: Entity State Transformation](#workflow-3-entity-state-transformation)
+    - [Workflow 4: Simulation with Logic Classes](#workflow-4-simulation-with-logic-classes)
+    - [Workflow 5: Simulation with Free Functions](#workflow-5-simulation-with-free-functions)
+    - [Workflow 6: Input Sequence Testing](#workflow-6-input-sequence-testing)
+    - [Workflow 7: Event Sequence Testing](#workflow-7-event-sequence-testing)
+    - [Workflow 8: Combined Testing (Input + Events + Simulation)](#workflow-8-combined-testing-input-events-simulation)
+    - [Workflow 9: Negative Testing (Expected to Fail)](#workflow-9-negative-testing-expected-to-fail)
+  - [Field Reference](#field-reference)
+    - [metadata (Required)](#metadata-required)
+    - [num_ticks (Optional)](#numticks-optional)
+    - [start_entity_collection (Optional)](#startentitycollection-optional)
+    - [expected_entity_collection (Optional)](#expectedentitycollection-optional)
+    - [simulation_data (Optional)](#simulationdata-optional)
+    - [input_sequence (Optional)](#inputsequence-optional)
+    - [event_sequence (Optional)](#eventsequence-optional)
+  - [Component Data Structures](#component-data-structures)
+    - [CUserInterface Component](#cuserinterface-component)
+    - [CGrimoireMachina Component](#cgrimoiremachina-component)
+  - [Tips and Best Practices](#tips-and-best-practices)
+    - [Organizing Test Data](#organizing-test-data)
+    - [Writing Entity Collections](#writing-entity-collections)
+    - [Working with Simulation Steps](#working-with-simulation-steps)
+    - [Tick-Based Testing](#tick-based-testing)
+    - [Using expected_to_pass](#using-expectedtopass)
+  - [Troubleshooting](#troubleshooting)
+    - [Common Issues](#common-issues)
+      - [1. File Not Found Error](#1-file-not-found-error)
+      - [2. JSON Parse Error](#2-json-parse-error)
+      - [3. Pool Size Mismatch](#3-pool-size-mismatch)
+      - [4. Component Not Found](#4-component-not-found)
+      - [5. Simulation Step Failed](#5-simulation-step-failed)
+      - [6. Unexpected Test Result](#6-unexpected-test-result)
+    - [Debugging Tips](#debugging-tips)
+  - [Example Test Data Files](#example-test-data-files)
+    - [Example 1: Simple Component Test](#example-1-simple-component-test)
+    - [Example 2: Multi-Tick Input Test](#example-2-multi-tick-input-test)
+  - [Additional Resources](#additional-resources)
+  - [Quick Reference Card](#quick-reference-card)
+  <!--toc:end-->
 
-**Quick Links:**
-- [What is test_data.json?](#what-is-testdatajson)
-- [Basic Workflow](#basic-workflow)
-- [Testing Workflows by Scenario](#testing-workflows-by-scenario)
-- [Field Reference](#field-reference)
-- [Troubleshooting](#troubleshooting)
+[← Back to Documentation](../README.md) |
+[Testing Overview](../testing/TESTING_OVERVIEW.md) |
+[Test Data Configuration Reference](../testing/TEST_DATA_CONFIGURATION.md) |
+[Test Data Naming Conventions](../testing/TEST_DATA_NAMING_CONVENTIONS.md)
+
+This guide provides practical workflows for creating test_data.json files for
+different testing scenarios in SteamRot.
 
 ---
 
 ## What is test_data.json?
 
-Test data files (`*.test_data.json`) are JSON files that define test scenarios for data-driven testing. They allow you to:
+Test data files (`*.test_data.json`) are JSON files that define test scenarios
+for data-driven testing. They allow you to:
 
 - Define test cases without writing C++ code
 - Specify entity states, inputs, events, and simulation steps
 - Run complex multi-step test scenarios
 - Easily add new test cases by creating new JSON files
 
-**Location**: Place test data files in `tests/<test_executable_dir>/data/` directories.
+**Location**: Place test data files in `tests/<test_executable_dir>/data/`
+directories.
 
-**Naming**: Follow the hybrid naming conventions defined in [Test Data Naming Conventions](../testing/TEST_DATA_NAMING_CONVENTIONS.md):
-- **Unit tests**: Descriptive short names (e.g., `ui_collision_basic.test_data.json`)
+**Naming**: Follow the hybrid naming conventions defined in
+[Test Data Naming Conventions](../testing/TEST_DATA_NAMING_CONVENTIONS.md):
+
+- **Unit tests**: Descriptive short names (e.g.,
+  `ui_collision_basic.test_data.json`)
 - **Integration tests**: ID-based (e.g., `ui_workflow_001.test_data.json`)
 - **System tests**: Scenario-based (e.g., `crafting_success_001.test_data.json`)
 
-**Compilation**: JSON files are automatically compiled to `.test_data.bin` during build.
+**Compilation**: JSON files are automatically compiled to `.test_data.bin`
+during build.
 
 ---
 
@@ -38,6 +94,7 @@ Test data files (`*.test_data.json`) are JSON files that define test scenarios f
 ### Step 1: Decide on Test Scenario
 
 Ask yourself:
+
 - What am I testing? (component, logic, workflow, integration)
 - Do I need to compare entity states? (start vs expected)
 - Do I need to simulate user inputs?
@@ -78,7 +135,8 @@ At minimum, every test data file needs metadata:
 
 ### Step 4: Add Test-Specific Data
 
-Add additional fields based on your test scenario (see [Testing Workflows](#testing-workflows-by-scenario)).
+Add additional fields based on your test scenario (see
+[Testing Workflows](#testing-workflows-by-scenario)).
 
 ### Step 5: Build and Test
 
@@ -96,9 +154,11 @@ ctest --preset Debug -R my_test
 
 ### Workflow 1: Metadata-Only Test
 
-**When to use:** Testing infrastructure, validation logic, or configuration without entities.
+**When to use:** Testing infrastructure, validation logic, or configuration
+without entities.
 
 **Example:**
+
 ```json
 {
   "metadata": {
@@ -112,17 +172,21 @@ ctest --preset Debug -R my_test
 ```
 
 **Fields used:**
+
 - `metadata` (required)
 
-**Use case:** Testing that your test harness correctly loads and validates configurations.
+**Use case:** Testing that your test harness correctly loads and validates
+configurations.
 
 ---
 
 ### Workflow 2: Simple Entity Comparison
 
-**When to use:** Testing that entities start and end in specific states (no simulation).
+**When to use:** Testing that entities start and end in specific states (no
+simulation).
 
 **Example:**
+
 ```json
 {
   "metadata": {
@@ -139,7 +203,7 @@ ctest --preset Debug -R my_test
         "index": 0,
         "c_user_interface": {
           "ui_name": "test_ui",
-          "start_visible": false,
+          "is_visible": false,
           "root_ui_element": {
             "base_data": {
               "position": { "x": 100, "y": 200 },
@@ -161,7 +225,7 @@ ctest --preset Debug -R my_test
         "index": 0,
         "c_user_interface": {
           "ui_name": "test_ui",
-          "start_visible": false,
+          "is_visible": false,
           "root_ui_element": {
             "base_data": {
               "position": { "x": 100, "y": 200 },
@@ -180,20 +244,24 @@ ctest --preset Debug -R my_test
 ```
 
 **Fields used:**
+
 - `metadata` (required)
 - `start_entity_collection` - Initial entity state
 - `expected_entity_collection` - Expected entity state after test
 - `num_ticks` (optional, defaults to 1)
 
-**Use case:** Verifying entity configuration, component default values, or that entities remain unchanged when they should.
+**Use case:** Verifying entity configuration, component default values, or that
+entities remain unchanged when they should.
 
 ---
 
 ### Workflow 3: Entity State Transformation
 
-**When to use:** Testing that entities change from one state to another (with simulation).
+**When to use:** Testing that entities change from one state to another (with
+simulation).
 
 **Example:**
+
 ```json
 {
   "metadata": {
@@ -210,7 +278,7 @@ ctest --preset Debug -R my_test
         "index": 0,
         "c_user_interface": {
           "ui_name": "toggle_button",
-          "start_visible": false,
+          "is_visible": false,
           "root_ui_element": {
             "base_data": {
               "position": { "x": 100, "y": 100 },
@@ -249,7 +317,7 @@ ctest --preset Debug -R my_test
         "index": 0,
         "c_user_interface": {
           "ui_name": "toggle_button",
-          "start_visible": true,
+          "is_visible": true,
           "root_ui_element": {
             "base_data": {
               "position": { "x": 100, "y": 100 },
@@ -268,21 +336,25 @@ ctest --preset Debug -R my_test
 ```
 
 **Fields used:**
+
 - `metadata` (required)
 - `start_entity_collection` - Initial state
 - `simulation_data` - Steps to execute
 - `expected_entity_collection` - Expected state after simulation
 - `num_ticks` (optional, defaults to 1)
 
-**Use case:** Testing that Logic classes or functions correctly transform entity state.
+**Use case:** Testing that Logic classes or functions correctly transform entity
+state.
 
 ---
 
 ### Workflow 4: Simulation with Logic Classes
 
-**When to use:** Testing complete workflows that require multiple Logic classes to execute.
+**When to use:** Testing complete workflows that require multiple Logic classes
+to execute.
 
 **Example:**
+
 ```json
 {
   "metadata": {
@@ -299,7 +371,7 @@ ctest --preset Debug -R my_test
         "index": 0,
         "c_user_interface": {
           "ui_name": "main_menu",
-          "start_visible": true,
+          "is_visible": true,
           "root_ui_element": {
             "base_data": {
               "position": { "x": 100, "y": 100 },
@@ -350,7 +422,7 @@ ctest --preset Debug -R my_test
         "index": 0,
         "c_user_interface": {
           "ui_name": "main_menu",
-          "start_visible": true,
+          "is_visible": true,
           "root_ui_element": {
             "base_data": {
               "position": { "x": 100, "y": 100 },
@@ -369,6 +441,7 @@ ctest --preset Debug -R my_test
 ```
 
 **Fields used:**
+
 - `metadata` (required)
 - `start_entity_collection`
 - `simulation_data` with `execution_mode: "LogicClass"`
@@ -376,6 +449,7 @@ ctest --preset Debug -R my_test
 - `num_ticks` (optional, defaults to 1)
 
 **Available Logic Classes:**
+
 - `UIActionLogic` - Process UI actions and events
 - `UICollisionLogic` - Check UI collision with mouse
 - `UIRenderLogic` - Render UI elements
@@ -388,9 +462,11 @@ ctest --preset Debug -R my_test
 
 ### Workflow 5: Simulation with Free Functions
 
-**When to use:** Testing specific free functions in isolation or mixed with Logic classes.
+**When to use:** Testing specific free functions in isolation or mixed with
+Logic classes.
 
 **Example:**
+
 ```json
 {
   "metadata": {
@@ -407,7 +483,7 @@ ctest --preset Debug -R my_test
         "index": 0,
         "c_user_interface": {
           "ui_name": "nested_panel",
-          "start_visible": true,
+          "is_visible": true,
           "root_ui_element": {
             "base_data": {
               "position": { "x": 0, "y": 0 },
@@ -440,7 +516,7 @@ ctest --preset Debug -R my_test
         "index": 0,
         "c_user_interface": {
           "ui_name": "nested_panel",
-          "start_visible": true,
+          "is_visible": true,
           "root_ui_element": {
             "base_data": {
               "position": { "x": 0, "y": 0 },
@@ -459,6 +535,7 @@ ctest --preset Debug -R my_test
 ```
 
 **Fields used:**
+
 - `metadata` (required)
 - `start_entity_collection`
 - `simulation_data` with `execution_mode: "Function"`
@@ -466,12 +543,14 @@ ctest --preset Debug -R my_test
 - `num_ticks` (optional, defaults to 1)
 
 **Available Free Functions:**
+
 - `ProcessUIActionsAndEvents` - Process UI actions for elements
 - `ProcessNestedUIActionsAndEvents` - Process UI actions recursively
 - `ProcessButtonElementActions` - Process button-specific actions
 - `ProcessDropDownListElementActions` - Process dropdown actions
 
-**Use case:** Unit testing of specific free functions or mixing function calls with Logic class execution.
+**Use case:** Unit testing of specific free functions or mixing function calls
+with Logic class execution.
 
 ---
 
@@ -480,6 +559,7 @@ ctest --preset Debug -R my_test
 **When to use:** Testing behavior with simulated user input over multiple ticks.
 
 **Example:**
+
 ```json
 {
   "metadata": {
@@ -532,7 +612,7 @@ ctest --preset Debug -R my_test
         "index": 0,
         "c_user_interface": {
           "ui_name": "button_ui",
-          "start_visible": true,
+          "is_visible": true,
           "root_ui_element": {
             "base_data": {
               "position": { "x": 100, "y": 100 },
@@ -551,6 +631,7 @@ ctest --preset Debug -R my_test
 ```
 
 **Fields used:**
+
 - `metadata` (required)
 - `num_ticks` - Total ticks to run
 - `input_sequence` - Tick-by-tick input injection
@@ -558,12 +639,14 @@ ctest --preset Debug -R my_test
 - `expected_entity_collection` (optional)
 
 **Input Types:**
+
 - `MouseMove` - Mouse movement
 - `MouseClick` - Mouse button click
 - `KeyPress` - Keyboard key press
 - `KeyRelease` - Keyboard key release
 
-**Use case:** Testing user input handling, mouse interactions, keyboard controls.
+**Use case:** Testing user input handling, mouse interactions, keyboard
+controls.
 
 ---
 
@@ -572,6 +655,7 @@ ctest --preset Debug -R my_test
 **When to use:** Testing behavior with events injected at specific ticks.
 
 **Example:**
+
 ```json
 {
   "metadata": {
@@ -626,6 +710,7 @@ ctest --preset Debug -R my_test
 ```
 
 **Fields used:**
+
 - `metadata` (required)
 - `num_ticks` - Total ticks to run
 - `event_sequence` - Tick-by-tick event injection
@@ -633,20 +718,24 @@ ctest --preset Debug -R my_test
 - `expected_entity_collection` (optional)
 
 **Event Types:**
+
 - `EVENT_TEST` - Test events
 - `EVENT_USER_INPUT` - User input events
 - `EVENT_SCENE_CHANGE` - Scene change events
 - Other event types defined in your system
 
-**Use case:** Testing event handling, event-driven behaviors, system responses to events.
+**Use case:** Testing event handling, event-driven behaviors, system responses
+to events.
 
 ---
 
 ### Workflow 8: Combined Testing (Input + Events + Simulation)
 
-**When to use:** Testing complex scenarios with coordinated inputs, events, and simulation.
+**When to use:** Testing complex scenarios with coordinated inputs, events, and
+simulation.
 
 **Example:**
+
 ```json
 {
   "metadata": {
@@ -720,7 +809,7 @@ ctest --preset Debug -R my_test
         "index": 0,
         "c_user_interface": {
           "ui_name": "button_ui",
-          "start_visible": true,
+          "is_visible": true,
           "root_ui_element": {
             "base_data": {
               "position": { "x": 100, "y": 100 },
@@ -742,7 +831,7 @@ ctest --preset Debug -R my_test
         "index": 0,
         "c_user_interface": {
           "ui_name": "button_ui",
-          "start_visible": true,
+          "is_visible": true,
           "root_ui_element": {
             "base_data": {
               "position": { "x": 100, "y": 100 },
@@ -761,6 +850,7 @@ ctest --preset Debug -R my_test
 ```
 
 **Fields used:**
+
 - `metadata` (required)
 - `num_ticks` - Total ticks to run
 - `input_sequence` - Inputs injected tick-by-tick
@@ -770,12 +860,14 @@ ctest --preset Debug -R my_test
 - `expected_entity_collection`
 
 **Execution order per tick:**
+
 1. Inject scheduled inputs for this tick
 2. Inject scheduled events for this tick
 3. Execute all simulation steps
 4. Advance to next tick
 
-**Use case:** Comprehensive integration testing, end-to-end workflows, realistic gameplay scenarios.
+**Use case:** Comprehensive integration testing, end-to-end workflows, realistic
+gameplay scenarios.
 
 ---
 
@@ -784,6 +876,7 @@ ctest --preset Debug -R my_test
 **When to use:** Testing that validation detects incorrect states or mismatches.
 
 **Example:**
+
 ```json
 {
   "metadata": {
@@ -800,7 +893,7 @@ ctest --preset Debug -R my_test
         "index": 0,
         "c_user_interface": {
           "ui_name": "original_ui",
-          "start_visible": true,
+          "is_visible": true,
           "root_ui_element": {
             "base_data": {
               "position": { "x": 100, "y": 200 },
@@ -822,7 +915,7 @@ ctest --preset Debug -R my_test
         "index": 0,
         "c_user_interface": {
           "ui_name": "different_ui",
-          "start_visible": false,
+          "is_visible": false,
           "root_ui_element": {
             "base_data": {
               "position": { "x": 200, "y": 300 },
@@ -841,6 +934,7 @@ ctest --preset Debug -R my_test
 ```
 
 **Key difference:**
+
 - `expected_to_pass: false` - Test expects pools to be **different**
 - If pools match when they shouldn't, test fails
 
@@ -864,6 +958,7 @@ ctest --preset Debug -R my_test
 ```
 
 **expected_to_pass:**
+
 - `true` (default): Test expects actual and expected entity pools to **match**
 - `false`: Test expects actual and expected entity pools to **NOT match**
 
@@ -934,12 +1029,14 @@ ctest --preset Debug -R my_test
 ```
 
 **simulation_type values:**
+
 - `Action` - UI actions, input processing
 - `Movement` - Entity movement, physics
 - `Render` - Drawing and rendering
 - `Collision` - Collision detection
 
 **execution_mode values:**
+
 - `LogicClass` - Execute entire Logic class
 - `Function` - Execute individual free function
 
@@ -1003,7 +1100,7 @@ ctest --preset Debug -R my_test
 ```json
 "c_user_interface": {
   "ui_name": "string",
-  "start_visible": bool,
+  "is_visible": bool,
   "root_ui_element": {
     "base_data": {
       "position": { "x": float, "y": float },
@@ -1027,7 +1124,8 @@ ctest --preset Debug -R my_test
 }
 ```
 
-**Note:** See `src/flatbuffers_headers/entities.fbs` for complete component schemas.
+**Note:** See `src/flatbuffers_headers/entities.fbs` for complete component
+schemas.
 
 ---
 
@@ -1094,17 +1192,21 @@ ctest --preset Debug -R my_test
 ### Using expected_to_pass
 
 1. **Default behavior (true):**
+
    ```json
    "expected_to_pass": true
    ```
+
    - Test expects pools to match
    - Most common use case
    - Validates correct behavior
 
 2. **Negative testing (false):**
+
    ```json
    "expected_to_pass": false
    ```
+
    - Test expects pools to be different
    - Useful for validation testing
    - Tests error detection
@@ -1120,6 +1222,7 @@ ctest --preset Debug -R my_test
 **Error:** `Test data file not found`
 
 **Solutions:**
+
 - Check filename ends with `.test_data.json`
 - Verify file is in correct `tests/<test_dir>/data/` directory
 - Rebuild project to compile JSON to binary
@@ -1130,6 +1233,7 @@ ctest --preset Debug -R my_test
 **Error:** `Failed to parse test data`
 
 **Solutions:**
+
 - Validate JSON syntax (use a JSON validator)
 - Check all required fields are present (especially `metadata`)
 - Verify field types match schema
@@ -1140,7 +1244,9 @@ ctest --preset Debug -R my_test
 **Error:** `Pool sizes differ`
 
 **Solutions:**
-- Ensure `start_entity_collection` and `expected_entity_collection` have same `entity_memory_pool_size`
+
+- Ensure `start_entity_collection` and `expected_entity_collection` have same
+  `entity_memory_pool_size`
 - Check that you specified the size in both collections
 
 #### 4. Component Not Found
@@ -1148,6 +1254,7 @@ ctest --preset Debug -R my_test
 **Error:** `Component not found on entity`
 
 **Solutions:**
+
 - Verify component name starts with `c_` prefix
 - Check component is registered in ComponentRegister
 - Ensure entity index exists in pool
@@ -1158,6 +1265,7 @@ ctest --preset Debug -R my_test
 **Error:** `Simulation step failed to execute`
 
 **Solutions:**
+
 - Check `logic_class_type` or `function_type` is spelled correctly
 - Verify Logic class or function is registered in simulation system
 - Check that required components exist on entities
@@ -1168,6 +1276,7 @@ ctest --preset Debug -R my_test
 **Symptom:** Test passes/fails when it shouldn't
 
 **Solutions:**
+
 - Check `expected_to_pass` value matches your intention
 - Verify entity states in start vs expected collections
 - Review simulation steps are in correct order
@@ -1222,7 +1331,7 @@ File: `tests/unit/components/data/ui_default_values.test_data.json`
         "index": 0,
         "c_user_interface": {
           "ui_name": "default_ui",
-          "start_visible": false,
+          "is_visible": false,
           "root_ui_element": {
             "base_data": {
               "position": { "x": 0, "y": 0 },
@@ -1244,7 +1353,7 @@ File: `tests/unit/components/data/ui_default_values.test_data.json`
         "index": 0,
         "c_user_interface": {
           "ui_name": "default_ui",
-          "start_visible": false,
+          "is_visible": false,
           "root_ui_element": {
             "base_data": {
               "position": { "x": 0, "y": 0 },
@@ -1335,7 +1444,7 @@ File: `tests/integration/ui/data/button_click_sequence.test_data.json`
         "index": 0,
         "c_user_interface": {
           "ui_name": "test_button",
-          "start_visible": true,
+          "is_visible": true,
           "root_ui_element": {
             "base_data": {
               "position": { "x": 100, "y": 100 },
@@ -1357,34 +1466,41 @@ File: `tests/integration/ui/data/button_click_sequence.test_data.json`
 
 ## Additional Resources
 
-- **[Test Data Configuration Reference](../testing/TEST_DATA_CONFIGURATION.md)** - Complete technical reference
-- **[Testing Overview](../testing/TESTING_OVERVIEW.md)** - Testing strategy and infrastructure
+- **[Test Data Configuration Reference](../testing/TEST_DATA_CONFIGURATION.md)** -
+  Complete technical reference
+- **[Testing Overview](../testing/TESTING_OVERVIEW.md)** - Testing strategy and
+  infrastructure
 - **Sample Test Data Files** - See `tests/harness/data/` for working examples
-- **FlatBuffers Schema** - See `src/flatbuffers_headers/test_data.fbs` for complete schema
+- **FlatBuffers Schema** - See `src/flatbuffers_headers/test_data.fbs` for
+  complete schema
 
 ---
 
 ## Quick Reference Card
 
-| Workflow | Required Fields | Optional Fields |
-|----------|----------------|-----------------|
-| Metadata Only | `metadata` | - |
-| Entity Comparison | `metadata`, `start_entity_collection`, `expected_entity_collection` | `num_ticks` |
-| Simulation | `metadata`, `start_entity_collection`, `simulation_data` | `expected_entity_collection`, `num_ticks` |
-| Input Sequence | `metadata`, `input_sequence`, `num_ticks` | `start_entity_collection`, `simulation_data` |
-| Event Sequence | `metadata`, `event_sequence`, `num_ticks` | `start_entity_collection`, `simulation_data` |
-| Combined | `metadata`, `num_ticks` | All others |
+| Workflow          | Required Fields                                                     | Optional Fields                              |
+| ----------------- | ------------------------------------------------------------------- | -------------------------------------------- |
+| Metadata Only     | `metadata`                                                          | -                                            |
+| Entity Comparison | `metadata`, `start_entity_collection`, `expected_entity_collection` | `num_ticks`                                  |
+| Simulation        | `metadata`, `start_entity_collection`, `simulation_data`            | `expected_entity_collection`, `num_ticks`    |
+| Input Sequence    | `metadata`, `input_sequence`, `num_ticks`                           | `start_entity_collection`, `simulation_data` |
+| Event Sequence    | `metadata`, `event_sequence`, `num_ticks`                           | `start_entity_collection`, `simulation_data` |
+| Combined          | `metadata`, `num_ticks`                                             | All others                                   |
 
 **Default Values:**
+
 - `expected_to_pass`: `true`
 - `num_ticks`: `1`
 - `version`: `1`
 
 **File Naming:**
+
 - Pattern: `<descriptive_name>.test_data.json`
 - Location: `tests/<test_dir>/data/`
 - Compiled: `<descriptive_name>.test_data.bin`
 
 ---
 
-[← Back to Documentation](../README.md) | [Testing Overview](../testing/TESTING_OVERVIEW.md) | [Test Data Configuration Reference](../testing/TEST_DATA_CONFIGURATION.md)
+[← Back to Documentation](../README.md) |
+[Testing Overview](../testing/TESTING_OVERVIEW.md) |
+[Test Data Configuration Reference](../testing/TEST_DATA_CONFIGURATION.md)

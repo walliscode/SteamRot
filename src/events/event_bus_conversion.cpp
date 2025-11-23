@@ -10,7 +10,6 @@
 #include "event_conversion.h"
 #include "events_generated.h"
 #include "uuid.h"
-#include <iostream>
 
 namespace steamrot::event::conversion {
 
@@ -83,9 +82,6 @@ ConvertEventBusDataToEventBus(const EventBusData *event_bus_data) {
     // Note: If event_data_data_type is NONE or unhandled, m_event_data
     // remains as default (std::monostate)
 
-    if (std::holds_alternative<std::monostate>(event_packet.m_event_data)) {
-      std::cout << "EventPacket m_event_data is std::monostate\n";
-    }
     event_bus.push_back(event_packet);
   }
 

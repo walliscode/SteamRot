@@ -1,13 +1,15 @@
 # Tick-by-Tick Comparison - Quick Reference
 
-This is a quick reference guide for the proposed tick-by-tick comparison feature.
+This is a quick reference guide for the proposed tick-by-tick comparison
+feature.
 
 ## At a Glance
 
-**Feature**: Verify entity states at intermediate ticks during multi-tick simulations  
+**Feature**: Verify entity states at intermediate ticks during multi-tick
+simulations  
 **Status**: Proposal (not yet implemented)  
 **Impact**: Test infrastructure enhancement  
-**Compatibility**: 100% backward compatible  
+**Compatibility**: 100% backward compatible
 
 ## Quick Syntax
 
@@ -75,24 +77,24 @@ This is a quick reference guide for the proposed tick-by-tick comparison feature
 
 ### TickSnapshot Table
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `tick` | uint32 | Yes | Tick number when to compare (0-based) |
-| `entity_collection` | EntityCollection | Yes | Expected entity state at this tick |
-| `description` | string | No | Human-readable description for this checkpoint |
+| Field               | Type             | Required | Description                                    |
+| ------------------- | ---------------- | -------- | ---------------------------------------------- |
+| `tick`              | uint32           | Yes      | Tick number when to compare (0-based)          |
+| `entity_collection` | EntityCollection | Yes      | Expected entity state at this tick             |
+| `description`       | string           | No       | Human-readable description for this checkpoint |
 
 ### TestDataConfig Addition
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `tick_snapshots` | [TickSnapshot] | No | Array of intermediate state checkpoints |
+| Field            | Type           | Required | Description                             |
+| ---------------- | -------------- | -------- | --------------------------------------- |
+| `tick_snapshots` | [TickSnapshot] | No       | Array of intermediate state checkpoints |
 
 ## Execution Timing
 
 ```
 Per Tick:
 1. Execute inputs
-2. Execute events  
+2. Execute events
 3. Process waiting room
 4. Execute simulation
 5. ⭐ Compare snapshot (if exists for this tick) ⭐
@@ -144,31 +146,34 @@ Verify before/after critical operations:
 ## Error Messages
 
 ### Success
+
 ```
 Test passes silently (no snapshot-related output)
 ```
 
 ### Failure
+
 ```
-EntityMemoryPool mismatch [Tick 2 (After toggle)]: 
-Component value differs at entity 0: 
-  CUserInterface.start_visible: actual=false, expected=true
+EntityMemoryPool mismatch [Tick 2 (After toggle)]:
+Component value differs at entity 0:
+  CUserInterface.is_visible: actual=false, expected=true
 ```
 
 Error includes:
+
 - Tick number where mismatch occurred
 - Snapshot description (if provided)
 - Detailed component differences
 
 ## Use Cases Cheat Sheet
 
-| Use Case | Pattern | Example |
-|----------|---------|---------|
-| Toggle verification | Every tick | Button visibility alternates |
-| State machine | Transition points | IDLE → PROCESSING → COMPLETE |
-| Accumulation | Every tick | Counter increments each tick |
-| Event lifetime | Every N ticks | Event expires after 5 ticks |
-| Complex workflow | Sparse snapshots | Check at steps 2, 5, 8 |
+| Use Case            | Pattern           | Example                      |
+| ------------------- | ----------------- | ---------------------------- |
+| Toggle verification | Every tick        | Button visibility alternates |
+| State machine       | Transition points | IDLE → PROCESSING → COMPLETE |
+| Accumulation        | Every tick        | Counter increments each tick |
+| Event lifetime      | Every N ticks     | Event expires after 5 ticks  |
+| Complex workflow    | Sparse snapshots  | Check at steps 2, 5, 8       |
 
 ## Best Practices
 
@@ -189,12 +194,12 @@ Error includes:
 
 ## Edge Cases
 
-| Scenario | Behavior |
-|----------|----------|
-| No `tick_snapshots` field | Test runs normally (backward compatible) |
-| Empty array `[]` | Test runs normally (no comparisons) |
-| Snapshot tick > num_ticks | Snapshot never checked (no error) |
-| Multiple snapshots same tick | Only first checked |
+| Scenario                     | Behavior                                 |
+| ---------------------------- | ---------------------------------------- |
+| No `tick_snapshots` field    | Test runs normally (backward compatible) |
+| Empty array `[]`             | Test runs normally (no comparisons)      |
+| Snapshot tick > num_ticks    | Snapshot never checked (no error)        |
+| Multiple snapshots same tick | Only first checked                       |
 | Snapshot without description | Works fine, just less informative errors |
 
 ## Decision Tree
@@ -221,10 +226,10 @@ Should I use tick snapshots?
 
 ## Performance Impact
 
-| Scenario | Overhead |
-|----------|----------|
-| No snapshots | ~0 (single null check per tick) |
-| With snapshots | Same as end comparison per snapshot |
+| Scenario       | Overhead                                  |
+| -------------- | ----------------------------------------- |
+| No snapshots   | ~0 (single null check per tick)           |
+| With snapshots | Same as end comparison per snapshot       |
 | Many snapshots | Linear O(n) where n = number of snapshots |
 
 **Optimization**: Pre-index snapshots by tick if >10 snapshots
@@ -280,8 +285,10 @@ Should I use tick snapshots?
 
 ## Related Documentation
 
-- **Full Design**: [TICK_BY_TICK_COMPARISON_DESIGN.md](TICK_BY_TICK_COMPARISON_DESIGN.md)
-- **Visual Examples**: [TICK_BY_TICK_COMPARISON_VISUALS.md](TICK_BY_TICK_COMPARISON_VISUALS.md)
+- **Full Design**:
+  [TICK_BY_TICK_COMPARISON_DESIGN.md](TICK_BY_TICK_COMPARISON_DESIGN.md)
+- **Visual Examples**:
+  [TICK_BY_TICK_COMPARISON_VISUALS.md](TICK_BY_TICK_COMPARISON_VISUALS.md)
 - **Proposals Index**: [README.md](README.md)
 
 ## FAQ
@@ -299,10 +306,12 @@ A: Test fails with detailed error showing tick, description, and differences.
 A: Yes! They all work together.
 
 **Q: How many snapshots is too many?**  
-A: Use as many as you need. For very long tests (>100 ticks), consider sparse snapshots.
+A: Use as many as you need. For very long tests (>100 ticks), consider sparse
+snapshots.
 
 **Q: Can I compare partial entity state?**  
-A: Not in initial version. Full EntityMemoryPool comparison only. (Partial snapshots could be future enhancement)
+A: Not in initial version. Full EntityMemoryPool comparison only. (Partial
+snapshots could be future enhancement)
 
 **Q: When is the snapshot comparison done?**  
 A: After simulation steps, before event bus tick.
@@ -311,11 +320,13 @@ A: After simulation steps, before event bus tick.
 A: Specify all entities you want to verify in the snapshot's entity_collection.
 
 **Q: Is there a performance penalty?**  
-A: Minimal. Only when snapshot exists for a tick, same cost as existing end comparison.
+A: Minimal. Only when snapshot exists for a tick, same cost as existing end
+comparison.
 
 ---
 
 **Document Version**: 1.0  
 **Date**: 2025-11-12  
 **Status**: Proposal  
-**Note**: This feature is not yet implemented. This is a reference for the proposed design.
+**Note**: This feature is not yet implemented. This is a reference for the
+proposed design.

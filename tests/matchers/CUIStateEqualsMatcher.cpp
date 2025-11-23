@@ -36,10 +36,9 @@ bool CUIStateEqualsMatcher::match(const CUIState &actual) const {
         << conmat::Colorize(m_expected.m_active, conmat::Color::Blue) << "\n";
   }
 
-  if (actual.m_state_to_ui_visibility.size() !=
-      m_expected.m_state_to_ui_visibility.size()) {
+  if (actual.m_state_to_ui_visibility != m_expected.m_state_to_ui_visibility) {
     oss << conmat::Indent(1) << conmat::TestFailed()
-        << "m_state_to_ui_visibility size mismatch:"
+        << "m_state_to_ui_visibility mismatch:"
         << "\n";
 
     oss << conmat::Indent(2) << "actual: "
