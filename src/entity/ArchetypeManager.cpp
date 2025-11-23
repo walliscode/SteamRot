@@ -15,7 +15,7 @@
 #include <variant>
 
 namespace steamrot {
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 ArchetypeManager::ArchetypeManager(const EntityMemoryPool &emp)
     : m_entity_memory_pool(emp) {}
 

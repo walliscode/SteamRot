@@ -23,8 +23,7 @@ struct GameResourcesDataBuilder;
 struct SceneResourcesData;
 struct SceneResourcesDataBuilder;
 
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 struct GameResourcesData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef GameResourcesDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -112,8 +111,7 @@ inline ::flatbuffers::Offset<GameResourcesData> CreateGameResourcesDataDirect(
       framerate_limit);
 }
 
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 struct SceneResourcesData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef SceneResourcesDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {

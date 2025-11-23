@@ -34,13 +34,13 @@ struct TestMetadataBuilder;
 struct TestDataConfig;
 struct TestDataConfigBuilder;
 
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 /// @brief Collection of data structures for comparison testing
 ///
 /// Represents the state of various game data structures (entity pool,
 /// event bus, etc.) at a specific point in time. Used for comparing
 /// actual vs expected states in tests.
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 struct DataCollection FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef DataCollectionBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -108,7 +108,7 @@ inline ::flatbuffers::Offset<DataCollection> CreateDataCollection(
   return builder_.Finish();
 }
 
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 /// @brief Snapshot of expected data structure state at a specific tick
 ///
 /// Represents a checkpoint during test execution where the
@@ -117,7 +117,7 @@ inline ::flatbuffers::Offset<DataCollection> CreateDataCollection(
 ///
 /// Note: Tick numbering is 1-based to mimic the game loop.
 /// The setup phase occurs before tick 1. Valid tick values start at 1.
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 struct TickSnapshot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef TickSnapshotBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -204,12 +204,12 @@ inline ::flatbuffers::Offset<TickSnapshot> CreateTickSnapshotDirect(
       description__);
 }
 
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 /// @brief Test metadata for data-driven testing
 ///
 /// This table contains metadata about a test case that can
 /// be extended in the future with additional fields.
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 struct TestMetadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef TestMetadataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -335,13 +335,13 @@ inline ::flatbuffers::Offset<TestMetadata> CreateTestMetadataDirect(
       version);
 }
 
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 /// @brief Root table for test data configuration
 ///
 /// This is the main container for test data. It's designed
 /// to be extensible - new data types can be added as optional
 /// fields without breaking existing tests.
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 struct TestDataConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef TestDataConfigBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {

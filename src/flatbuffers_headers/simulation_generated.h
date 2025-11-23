@@ -21,9 +21,9 @@ struct SimulationStepBuilder;
 struct SimulationData;
 struct SimulationDataBuilder;
 
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 /// @brief Types of simulation systems matching Scene logic organization
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 enum SimulationType : int8_t {
   SimulationType_Action = 0,
   SimulationType_Movement = 1,
@@ -60,12 +60,12 @@ inline const char *EnumNameSimulationType(SimulationType e) {
   return EnumNamesSimulationType()[index];
 }
 
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 /// @brief Types of individual functions that can be called during simulation
 ///
 /// This enum allows test data to specify which specific free functions
 /// to call during simulation execution.
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 enum FunctionType : int8_t {
   FunctionType_None = 0,
   FunctionType_ProcessUIActionsAndEvents = 1,
@@ -111,11 +111,11 @@ inline const char *EnumNameFunctionType(FunctionType e) {
   return EnumNamesFunctionType()[index];
 }
 
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 /// @brief Execution mode for a simulation step
 ///
 /// Determines whether to execute individual functions or entire Logic classes
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 enum ExecutionMode : int8_t {
   /// Execute individual free function specified by function_type
   ExecutionMode_Function = 0,
@@ -148,11 +148,11 @@ inline const char *EnumNameExecutionMode(ExecutionMode e) {
   return EnumNamesExecutionMode()[index];
 }
 
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 /// @brief Logic class types that can be executed
 ///
 /// Matches the Logic class hierarchy in the codebase
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 enum LogicClassType : int8_t {
   LogicClassType_None = 0,
   LogicClassType_UIActionLogic = 1,
@@ -195,12 +195,12 @@ inline const char *EnumNameLogicClassType(LogicClassType e) {
   return EnumNamesLogicClassType()[index];
 }
 
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 /// @brief A single step in a simulation sequence
 ///
 /// Each step specifies what to execute (function or Logic class)
 /// and which system category it belongs to.
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 struct SimulationStep FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef SimulationStepBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -305,12 +305,12 @@ inline ::flatbuffers::Offset<SimulationStep> CreateSimulationStepDirect(
       description__);
 }
 
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 /// @brief Complete simulation configuration
 ///
 /// Defines a sequence of steps to execute during testing.
 /// Steps are executed in the order they appear in the array.
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 struct SimulationData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef SimulationDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
