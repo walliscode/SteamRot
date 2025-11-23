@@ -1,7 +1,7 @@
 {
   "metadata": {
     "test_name": "UpdateCUserInterfaceVisibilityFromCUIState_basic_test",
-    "description": "Test UpdateCUserInterfaceVisibilityFromCUIState function - 4 UI entities controlled by 1 CUIState entity with active EVENT_TOGGLE_UI subscriber that toggles visibility of 2 UI components",
+    "description": "Test UpdateCUserInterfaceVisibilityFromCUIState function over 2 ticks - EVENT_TOGGLE_UI event on tick 1 activates CUIState subscriber, visibility update on tick 2",
     "tags": [
       "unit",
       "logic",
@@ -10,14 +10,32 @@
     "expected_to_pass": true,
     "version": 1
   },
+  "num_ticks": 2,
+  "event_sequence": {
+    "description": "EVENT_TOGGLE_UI event injected at tick 1 to activate the subscriber",
+    "events": [
+      {
+        "tick": 1,
+        "event_packet": {
+          "event_lifetime": 2,
+          "event_type": "EVENT_TOGGLE_UI",
+          "event_data_data_type": "UserInterfaceNameData",
+          "event_data_data": {
+            "id": "menu_toggle"
+          }
+        },
+        "description": "Toggle UI event at tick 1 to activate menu_toggle_state"
+      }
+    ]
+  },
   "simulation_data": {
-    "description": "Call UpdateCUserInterfaceVisibilityFromCUIState to update UI visibility based on active CUIState with EVENT_TOGGLE_UI subscriber",
+    "description": "Call UpdateCUserInterfaceVisibilityFromCUIState on each tick to update UI visibility based on CUIState",
     "steps": [
       {
         "simulation_type": "Action",
         "execution_mode": "Function",
         "function_type": "UpdateCUserInterfaceVisibilityFromCUIState",
-        "description": "Step 1: Process active menu_toggle_state to show main_menu and play_button, hide settings_panel and quit_button"
+        "description": "Update UI visibility based on active states (runs every tick)"
       }
     ]
   },
@@ -138,10 +156,10 @@
                     "trigger_data": {
                       "id": "menu_toggle"
                     },
-                    "active": true
+                    "active": false
                   }
                 ],
-                "starting_state": true
+                "starting_state": false
               }
             ]
           }
@@ -266,10 +284,10 @@
                     "trigger_data": {
                       "id": "menu_toggle"
                     },
-                    "active": true
+                    "active": false
                   }
                 ],
-                "starting_state": true
+                "starting_state": false
               }
             ]
           }
