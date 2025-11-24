@@ -47,7 +47,7 @@
           "index": 0,
           "c_user_interface": {
             "ui_name": "test_ui",
-            "start_visible": true,
+            "is_visible": true,
             "root_ui_element": {
               "base_data": {
                 "position": {
@@ -77,7 +77,7 @@
           "index": 0,
           "c_user_interface": {
             "ui_name": "test_ui",
-            "start_visible": true,
+            "is_visible": true,
             "root_ui_element": {
               "base_data": {
                 "position": {
