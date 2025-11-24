@@ -203,6 +203,16 @@ std::string EntityMemoryPoolEqualsMatcher::describe() const {
     oss << conmat::Divider("=", 40) << "\n";
     oss << conmat::Colorize("[PASSED] ", conmat::Color::Green)
         << "EntityMemoryPool Match" << "\n";
+    
+    // Include context information if available
+    if (m_context.has_value() && m_context->HasContent()) {
+      oss << m_context->FormatContextSection();
+      oss << "\n";
+    } else if (!m_test_metadata.empty()) {
+      // Legacy metadata support
+      oss << "\n  Test: " << m_test_metadata;
+    }
+    
     oss << conmat::Divider("=", 40) << "\n";
     return oss.str();
   } else {
@@ -211,6 +221,17 @@ std::string EntityMemoryPoolEqualsMatcher::describe() const {
     oss << conmat::Divider("=", 40) << "\n";
     oss << conmat::Colorize("[FAILED] ", conmat::Color::Red)
         << "EntityMemoryPool Match " << "\n";
+    
+    // Include context information if available
+    if (m_context.has_value() && m_context->HasContent()) {
+      oss << m_context->FormatContextSection();
+      oss << "\n" << conmat::Divider("-", 40) << "\n";
+    } else if (!m_test_metadata.empty()) {
+      // Legacy metadata support
+      oss << "\n  Test: " << m_test_metadata;
+      oss << "\n" << conmat::Divider("-", 40) << "\n";
+    }
+    
     oss << m_mismatch_description << "\n";
     oss << conmat::Divider("=", 40) << "\n";
 

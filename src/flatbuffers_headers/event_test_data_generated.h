@@ -23,12 +23,12 @@ struct EventTestDataBuilder;
 struct EventSequence;
 struct EventSequenceBuilder;
 
-/////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 /// @brief Test data for a single event
 ///
 /// Represents an event that should be added to the event system
 /// during testing. Can include expected subscribers for validation.
-/////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 struct EventTestData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef EventTestDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -108,12 +108,12 @@ inline ::flatbuffers::Offset<EventTestData> CreateEventTestDataDirect(
       description__);
 }
 
-/////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 /// @brief Sequence of events for simulation
 ///
 /// Represents a complete sequence of events that can be added
 /// to the event system during testing on a tick-by-tick basis.
-/////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 struct EventSequence FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef EventSequenceBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {

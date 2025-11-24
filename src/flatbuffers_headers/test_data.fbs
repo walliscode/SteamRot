@@ -49,7 +49,20 @@ table TickSnapshot {
   
   /// @brief Optional human-readable description of this checkpoint
   /// Used in failure messages to identify which snapshot failed.
+  /// DEPRECATED: Use given/when/then fields instead
   description: string;
+  
+  /// @brief GIVEN: Initial state or preconditions for this checkpoint
+  /// Describes what state the system is in before the action
+  given: string;
+  
+  /// @brief WHEN: The action or event that occurs at this checkpoint
+  /// Describes what happens during this tick
+  when: string;
+  
+  /// @brief THEN: Expected outcome or postconditions for this checkpoint
+  /// Describes what should be true after the action
+  then: string;
 }
 
 ////////////////////////////////////////////////////////////
@@ -63,7 +76,20 @@ table TestMetadata {
   test_name: string (required);
   
   /// @brief Optional description of what the test validates
+  /// DEPRECATED: Use given/when/then fields instead
   description: string;
+  
+  /// @brief GIVEN: Initial state or preconditions for the test
+  /// Describes what state the system is in before the test begins
+  given: string;
+  
+  /// @brief WHEN: The action or event that triggers the test scenario
+  /// Describes what action is being tested
+  when: string;
+  
+  /// @brief THEN: Expected outcome or postconditions after the test
+  /// Describes what should be true after the test executes
+  then: string;
   
   /// @brief Tags for categorizing tests (e.g., "unit", "integration")
   tags: [string];

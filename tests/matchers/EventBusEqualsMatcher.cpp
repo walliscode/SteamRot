@@ -59,6 +59,13 @@ std::string EventBusEqualsMatcher::describe() const {
     std::ostringstream oss;
     oss << conmat::Colorize("[PASSED] ", conmat::Color::Green)
         << "EventBus Match" << "\n";
+    
+    // Include context information if available
+    if (m_context.has_value() && m_context->HasContent()) {
+      oss << m_context->FormatContextSection();
+      oss << "\n";
+    }
+    
     oss << conmat::Divider("=", 40) << "\n";
     return oss.str();
   } else {
@@ -66,6 +73,13 @@ std::string EventBusEqualsMatcher::describe() const {
     std::ostringstream oss;
     oss << conmat::Colorize("[FAILED] ", conmat::Color::Red)
         << "EventBus Match " << "\n";
+    
+    // Include context information if available
+    if (m_context.has_value() && m_context->HasContent()) {
+      oss << m_context->FormatContextSection();
+      oss << "\n";
+    }
+    
     oss << conmat::Divider("-", 40) << "\n";
     oss << m_mismatch_description << "\n";
     oss << conmat::Divider("=", 40) << "\n";

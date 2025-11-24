@@ -26,7 +26,8 @@ struct SceneContextConfigBuilder;
 struct ContextData;
 struct ContextDataBuilder;
 
-/////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 struct GameContextConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef GameContextConfigBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -114,7 +115,8 @@ inline ::flatbuffers::Offset<GameContextConfig> CreateGameContextConfigDirect(
       framerate_limit);
 }
 
-/////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 struct SceneContextConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef SceneContextConfigBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -186,7 +188,8 @@ inline ::flatbuffers::Offset<SceneContextConfig> CreateSceneContextConfig(
   return builder_.Finish();
 }
 
-/////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 struct ContextData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef ContextDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {

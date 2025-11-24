@@ -34,13 +34,13 @@ struct TestMetadataBuilder;
 struct TestDataConfig;
 struct TestDataConfigBuilder;
 
-/////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 /// @brief Collection of data structures for comparison testing
 ///
 /// Represents the state of various game data structures (entity pool,
 /// event bus, etc.) at a specific point in time. Used for comparing
 /// actual vs expected states in tests.
-/////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 struct DataCollection FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef DataCollectionBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -108,7 +108,7 @@ inline ::flatbuffers::Offset<DataCollection> CreateDataCollection(
   return builder_.Finish();
 }
 
-/////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 /// @brief Snapshot of expected data structure state at a specific tick
 ///
 /// Represents a checkpoint during test execution where the
@@ -117,13 +117,16 @@ inline ::flatbuffers::Offset<DataCollection> CreateDataCollection(
 ///
 /// Note: Tick numbering is 1-based to mimic the game loop.
 /// The setup phase occurs before tick 1. Valid tick values start at 1.
-/////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 struct TickSnapshot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef TickSnapshotBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TICK = 4,
     VT_DATA_COLLECTION = 6,
-    VT_DESCRIPTION = 8
+    VT_DESCRIPTION = 8,
+    VT_GIVEN = 10,
+    VT_WHEN = 12,
+    VT_THEN = 14
   };
   /// @brief Tick number when this snapshot should be compared (1-based)
   /// The comparison happens AFTER simulation steps execute for this tick,
@@ -140,8 +143,24 @@ struct TickSnapshot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   /// @brief Optional human-readable description of this checkpoint
   /// Used in failure messages to identify which snapshot failed.
+  /// DEPRECATED: Use given/when/then fields instead
   const ::flatbuffers::String *description() const {
     return GetPointer<const ::flatbuffers::String *>(VT_DESCRIPTION);
+  }
+  /// @brief GIVEN: Initial state or preconditions for this checkpoint
+  /// Describes what state the system is in before the action
+  const ::flatbuffers::String *given() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_GIVEN);
+  }
+  /// @brief WHEN: The action or event that occurs at this checkpoint
+  /// Describes what happens during this tick
+  const ::flatbuffers::String *when() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_WHEN);
+  }
+  /// @brief THEN: Expected outcome or postconditions for this checkpoint
+  /// Describes what should be true after the action
+  const ::flatbuffers::String *then() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_THEN);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -150,6 +169,12 @@ struct TickSnapshot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyTable(data_collection()) &&
            VerifyOffset(verifier, VT_DESCRIPTION) &&
            verifier.VerifyString(description()) &&
+           VerifyOffset(verifier, VT_GIVEN) &&
+           verifier.VerifyString(given()) &&
+           VerifyOffset(verifier, VT_WHEN) &&
+           verifier.VerifyString(when()) &&
+           VerifyOffset(verifier, VT_THEN) &&
+           verifier.VerifyString(then()) &&
            verifier.EndTable();
   }
 };
@@ -167,6 +192,15 @@ struct TickSnapshotBuilder {
   void add_description(::flatbuffers::Offset<::flatbuffers::String> description) {
     fbb_.AddOffset(TickSnapshot::VT_DESCRIPTION, description);
   }
+  void add_given(::flatbuffers::Offset<::flatbuffers::String> given) {
+    fbb_.AddOffset(TickSnapshot::VT_GIVEN, given);
+  }
+  void add_when(::flatbuffers::Offset<::flatbuffers::String> when) {
+    fbb_.AddOffset(TickSnapshot::VT_WHEN, when);
+  }
+  void add_then(::flatbuffers::Offset<::flatbuffers::String> then) {
+    fbb_.AddOffset(TickSnapshot::VT_THEN, then);
+  }
   explicit TickSnapshotBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -183,8 +217,14 @@ inline ::flatbuffers::Offset<TickSnapshot> CreateTickSnapshot(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t tick = 0,
     ::flatbuffers::Offset<steamrot::DataCollection> data_collection = 0,
-    ::flatbuffers::Offset<::flatbuffers::String> description = 0) {
+    ::flatbuffers::Offset<::flatbuffers::String> description = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> given = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> when = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> then = 0) {
   TickSnapshotBuilder builder_(_fbb);
+  builder_.add_then(then);
+  builder_.add_when(when);
+  builder_.add_given(given);
   builder_.add_description(description);
   builder_.add_data_collection(data_collection);
   builder_.add_tick(tick);
@@ -195,38 +235,66 @@ inline ::flatbuffers::Offset<TickSnapshot> CreateTickSnapshotDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t tick = 0,
     ::flatbuffers::Offset<steamrot::DataCollection> data_collection = 0,
-    const char *description = nullptr) {
+    const char *description = nullptr,
+    const char *given = nullptr,
+    const char *when = nullptr,
+    const char *then = nullptr) {
   auto description__ = description ? _fbb.CreateString(description) : 0;
+  auto given__ = given ? _fbb.CreateString(given) : 0;
+  auto when__ = when ? _fbb.CreateString(when) : 0;
+  auto then__ = then ? _fbb.CreateString(then) : 0;
   return steamrot::CreateTickSnapshot(
       _fbb,
       tick,
       data_collection,
-      description__);
+      description__,
+      given__,
+      when__,
+      then__);
 }
 
-/////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 /// @brief Test metadata for data-driven testing
 ///
 /// This table contains metadata about a test case that can
 /// be extended in the future with additional fields.
-/////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 struct TestMetadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef TestMetadataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TEST_NAME = 4,
     VT_DESCRIPTION = 6,
-    VT_TAGS = 8,
-    VT_EXPECTED_TO_PASS = 10,
-    VT_AUTHOR = 12,
-    VT_VERSION = 14
+    VT_GIVEN = 8,
+    VT_WHEN = 10,
+    VT_THEN = 12,
+    VT_TAGS = 14,
+    VT_EXPECTED_TO_PASS = 16,
+    VT_AUTHOR = 18,
+    VT_VERSION = 20
   };
   /// @brief Human-readable name for the test case
   const ::flatbuffers::String *test_name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_TEST_NAME);
   }
   /// @brief Optional description of what the test validates
+  /// DEPRECATED: Use given/when/then fields instead
   const ::flatbuffers::String *description() const {
     return GetPointer<const ::flatbuffers::String *>(VT_DESCRIPTION);
+  }
+  /// @brief GIVEN: Initial state or preconditions for the test
+  /// Describes what state the system is in before the test begins
+  const ::flatbuffers::String *given() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_GIVEN);
+  }
+  /// @brief WHEN: The action or event that triggers the test scenario
+  /// Describes what action is being tested
+  const ::flatbuffers::String *when() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_WHEN);
+  }
+  /// @brief THEN: Expected outcome or postconditions after the test
+  /// Describes what should be true after the test executes
+  const ::flatbuffers::String *then() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_THEN);
   }
   /// @brief Tags for categorizing tests (e.g., "unit", "integration")
   const ::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>> *tags() const {
@@ -250,6 +318,12 @@ struct TestMetadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyString(test_name()) &&
            VerifyOffset(verifier, VT_DESCRIPTION) &&
            verifier.VerifyString(description()) &&
+           VerifyOffset(verifier, VT_GIVEN) &&
+           verifier.VerifyString(given()) &&
+           VerifyOffset(verifier, VT_WHEN) &&
+           verifier.VerifyString(when()) &&
+           VerifyOffset(verifier, VT_THEN) &&
+           verifier.VerifyString(then()) &&
            VerifyOffset(verifier, VT_TAGS) &&
            verifier.VerifyVector(tags()) &&
            verifier.VerifyVectorOfStrings(tags()) &&
@@ -270,6 +344,15 @@ struct TestMetadataBuilder {
   }
   void add_description(::flatbuffers::Offset<::flatbuffers::String> description) {
     fbb_.AddOffset(TestMetadata::VT_DESCRIPTION, description);
+  }
+  void add_given(::flatbuffers::Offset<::flatbuffers::String> given) {
+    fbb_.AddOffset(TestMetadata::VT_GIVEN, given);
+  }
+  void add_when(::flatbuffers::Offset<::flatbuffers::String> when) {
+    fbb_.AddOffset(TestMetadata::VT_WHEN, when);
+  }
+  void add_then(::flatbuffers::Offset<::flatbuffers::String> then) {
+    fbb_.AddOffset(TestMetadata::VT_THEN, then);
   }
   void add_tags(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>> tags) {
     fbb_.AddOffset(TestMetadata::VT_TAGS, tags);
@@ -299,6 +382,9 @@ inline ::flatbuffers::Offset<TestMetadata> CreateTestMetadata(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::String> test_name = 0,
     ::flatbuffers::Offset<::flatbuffers::String> description = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> given = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> when = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> then = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>> tags = 0,
     bool expected_to_pass = true,
     ::flatbuffers::Offset<::flatbuffers::String> author = 0,
@@ -307,6 +393,9 @@ inline ::flatbuffers::Offset<TestMetadata> CreateTestMetadata(
   builder_.add_version(version);
   builder_.add_author(author);
   builder_.add_tags(tags);
+  builder_.add_then(then);
+  builder_.add_when(when);
+  builder_.add_given(given);
   builder_.add_description(description);
   builder_.add_test_name(test_name);
   builder_.add_expected_to_pass(expected_to_pass);
@@ -317,31 +406,40 @@ inline ::flatbuffers::Offset<TestMetadata> CreateTestMetadataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const char *test_name = nullptr,
     const char *description = nullptr,
+    const char *given = nullptr,
+    const char *when = nullptr,
+    const char *then = nullptr,
     const std::vector<::flatbuffers::Offset<::flatbuffers::String>> *tags = nullptr,
     bool expected_to_pass = true,
     const char *author = nullptr,
     uint32_t version = 1) {
   auto test_name__ = test_name ? _fbb.CreateString(test_name) : 0;
   auto description__ = description ? _fbb.CreateString(description) : 0;
+  auto given__ = given ? _fbb.CreateString(given) : 0;
+  auto when__ = when ? _fbb.CreateString(when) : 0;
+  auto then__ = then ? _fbb.CreateString(then) : 0;
   auto tags__ = tags ? _fbb.CreateVector<::flatbuffers::Offset<::flatbuffers::String>>(*tags) : 0;
   auto author__ = author ? _fbb.CreateString(author) : 0;
   return steamrot::CreateTestMetadata(
       _fbb,
       test_name__,
       description__,
+      given__,
+      when__,
+      then__,
       tags__,
       expected_to_pass,
       author__,
       version);
 }
 
-/////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 /// @brief Root table for test data configuration
 ///
 /// This is the main container for test data. It's designed
 /// to be extensible - new data types can be added as optional
 /// fields without breaking existing tests.
-/////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 struct TestDataConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef TestDataConfigBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {

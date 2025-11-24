@@ -25,7 +25,10 @@ namespace steamrot::tests {
 /////////////////////////////////////////////////
 struct TestContext {
   std::string test_name;
-  std::string description;
+  std::string description;  // Deprecated: Use given/when/then instead
+  std::string given;        // GIVEN: Initial state/preconditions
+  std::string when;         // WHEN: Action/event being tested
+  std::string then;         // THEN: Expected outcome/postconditions
   std::optional<uint32_t> current_tick;
   std::optional<uint32_t> total_ticks;
 
@@ -54,7 +57,8 @@ struct TestContext {
   /// @brief Format hierarchical context section for matcher output
   ///
   /// Generates formatted, indented lines with test name, tick,
-  /// and description. Used by matchers to display context information.
+  /// GIVEN/WHEN/THEN, and legacy description. Used by matchers 
+  /// to display context information.
   ///
   /// @return Formatted context section (multi-line with indentation)
   ////////////////////////////////////////////////////////////
@@ -75,8 +79,22 @@ struct TestContext {
       oss << "]";
     }
 
-    // Description (tertiary context)
-    if (!description.empty()) {
+    // GIVEN/WHEN/THEN structure (preferred, tertiary context)
+    bool has_gwt = !given.empty() || !when.empty() || !then.empty();
+    if (has_gwt) {
+      if (!given.empty()) {
+        oss << "\n  GIVEN: " << given;
+      }
+      if (!when.empty()) {
+        oss << "\n  WHEN:  " << when;
+      }
+      if (!then.empty()) {
+        oss << "\n  THEN:  " << then;
+      }
+    }
+
+    // Legacy description (fallback if GIVEN/WHEN/THEN not provided)
+    if (!has_gwt && !description.empty()) {
       oss << "\n  Description: " << description;
     }
 
@@ -90,6 +108,7 @@ struct TestContext {
   ////////////////////////////////////////////////////////////
   bool HasContent() const {
     return !test_name.empty() || !description.empty() ||
+           !given.empty() || !when.empty() || !then.empty() ||
            current_tick.has_value();
   }
 
