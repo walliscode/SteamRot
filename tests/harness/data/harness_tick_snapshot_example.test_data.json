@@ -1,7 +1,9 @@
 {
   "metadata": {
     "test_name": "tick_snapshot_example",
-    "description": "Example demonstrating tick-by-tick state verification with snapshots",
+    "given": "UI button entity with specific position and visibility state",
+    "when": "System executes through multiple ticks",
+    "then": "Entity state matches expected snapshots at each tick",
     "tags": [
       "unit",
       "harness",
@@ -15,7 +17,9 @@
   "tick_snapshots": [
     {
       "tick": 1,
-      "description": "Initial state after first tick",
+      "given": "Button entity at initial position",
+      "when": "First tick completes",
+      "then": "Button visibility is false and position unchanged",
       "data_collection": {
         "entity_collection": {
           "entity_memory_pool_size": 2,
@@ -49,7 +53,9 @@
     },
     {
       "tick": 3,
-      "description": "Final state after third tick",
+      "given": "Button entity after multiple ticks",
+      "when": "Third tick completes",
+      "then": "Button visibility remains false and position still unchanged",
       "data_collection": {
         "entity_collection": {
           "entity_memory_pool_size": 2,

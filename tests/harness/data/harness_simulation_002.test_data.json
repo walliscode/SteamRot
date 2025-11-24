@@ -1,7 +1,9 @@
 {
   "metadata": {
     "test_name": "sample_simulation_test",
-    "description": "Sample test data demonstrating simulation functionality with both functions and Logic classes",
+    "given": "UI entity with collision detection enabled",
+    "when": "Simulation runs collision, render, and action logic",
+    "then": "UI state remains unchanged after processing",
     "tags": [
       "unit",
       "harness",
