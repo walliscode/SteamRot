@@ -229,6 +229,7 @@ FlatbuffersConfigurator::ConfigureComponent(
       std::vector<std::shared_ptr<Subscriber>> subscribers;
 
       for (const auto *subscriber_data : *ui_state_data->subscribers()) {
+
         if (!subscriber_data) {
           continue;
         }
