@@ -49,7 +49,7 @@ TEST_CASE("CUserInterfaceEqualsMatcher describe is as expected on success",
 
   std::ostringstream oss;
   oss << conmat::Header(
-             conmat::TestPassed() +
+             conmat::TestPassed() + " Entity [?] " +
                  std::format("CUserInterface ({}) Match:", expected.m_name),
              3)
       << "\n";
@@ -71,7 +71,7 @@ TEST_CASE("CUserInterfaceEqualsMatcher describe is as expected on failure",
 
   std::ostringstream oss;
   oss << conmat::Header(
-             conmat::TestFailed() +
+             conmat::TestFailed() + " Entity [?] " +
                  std::format("CUserInterface ({}) Match:", expected.m_name),
              3)
       << "\n";
