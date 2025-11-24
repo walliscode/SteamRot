@@ -78,3 +78,48 @@ TEST_CASE("CMetaEqualsMatcher describe is as expected on failure",
       << "\n";
   REQUIRE(matcher.describe() == oss.str());
 }
+
+TEST_CASE("CMetaEqualsMatcher with entity index shows index in output",
+          "[unit][Components][CMeta][matcher]") {
+  steamrot::CMeta expected;
+  expected.m_active = true;
+  expected.m_entity_active = true;
+  steamrot::CMeta actual;
+  actual.m_active = true;
+  actual.m_entity_active = true;
+
+  SECTION("Entity index 0") {
+    auto matcher = steamrot::tests::EqualsCMeta(expected, 0);
+    matcher.match(actual);
+
+    std::string description = matcher.describe();
+    REQUIRE(description.find("entity index: 0") != std::string::npos);
+    REQUIRE(description.find("CMeta") != std::string::npos);
+  }
+
+  SECTION("Entity index 42") {
+    auto matcher = steamrot::tests::EqualsCMeta(expected, 42);
+    matcher.match(actual);
+
+    std::string description = matcher.describe();
+    REQUIRE(description.find("entity index: 42") != std::string::npos);
+    REQUIRE(description.find("CMeta") != std::string::npos);
+  }
+}
+
+TEST_CASE("CMetaEqualsMatcher without entity index does not show index",
+          "[unit][Components][CMeta][matcher]") {
+  steamrot::CMeta expected;
+  expected.m_active = true;
+  expected.m_entity_active = true;
+  steamrot::CMeta actual;
+  actual.m_active = true;
+  actual.m_entity_active = true;
+
+  auto matcher = steamrot::tests::EqualsCMeta(expected);
+  matcher.match(actual);
+
+  std::string description = matcher.describe();
+  REQUIRE(description.find("entity index") == std::string::npos);
+  REQUIRE(description.find("CMeta") != std::string::npos);
+}

@@ -243,3 +243,72 @@ TEST_CASE("EntityMemoryPoolEqualsMatcher describe is as expected on failure",
   REQUIRE(description.find("EntityMemoryPool Match") != std::string::npos);
   REQUIRE(description.find("Size Mismatch:") != std::string::npos);
 }
+
+TEST_CASE("EntityMemoryPoolEqualsMatcher shows entity index in component errors",
+          "[unit][EntityMemoryPool][matcher]") {
+  const size_t pool_size = 5;
+  steamrot::EntityMemoryPool expected;
+  steamrot::EntityMemoryPool actual;
+
+  // Resize all component vectors for expected pool
+  auto &cmeta_vec_expected =
+      steamrot::entity::memory::GetComponentVector<steamrot::CMeta>(expected);
+  cmeta_vec_expected.resize(pool_size);
+
+  auto &cui_vec_expected =
+      steamrot::entity::memory::GetComponentVector<steamrot::CUserInterface>(
+          expected);
+  cui_vec_expected.resize(pool_size);
+
+  auto &cform_vec_expected =
+      steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
+          expected);
+  cform_vec_expected.resize(pool_size);
+
+  auto &cgrim_vec_expected =
+      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
+          expected);
+  cgrim_vec_expected.resize(pool_size);
+
+  auto &cstate_vec_expected =
+      steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(
+          expected);
+  cstate_vec_expected.resize(pool_size);
+
+  // Resize all component vectors for actual pool
+  auto &cmeta_vec_actual =
+      steamrot::entity::memory::GetComponentVector<steamrot::CMeta>(actual);
+  cmeta_vec_actual.resize(pool_size);
+
+  auto &cui_vec_actual =
+      steamrot::entity::memory::GetComponentVector<steamrot::CUserInterface>(
+          actual);
+  cui_vec_actual.resize(pool_size);
+
+  auto &cform_vec_actual =
+      steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
+          actual);
+  cform_vec_actual.resize(pool_size);
+
+  auto &cgrim_vec_actual =
+      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
+          actual);
+  cgrim_vec_actual.resize(pool_size);
+
+  auto &cstate_vec_actual =
+      steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(actual);
+  cstate_vec_actual.resize(pool_size);
+
+  // Modify entity at index 3 to create a mismatch
+  auto &meta_3 =
+      steamrot::entity::memory::GetComponent<steamrot::CMeta>(3, actual);
+  meta_3.m_active = true;
+
+  auto matcher = steamrot::tests::EqualsEntityMemoryPool(expected);
+  matcher.match(actual);
+
+  std::string description = matcher.describe();
+  REQUIRE(description.find("[FAILED]") != std::string::npos);
+  REQUIRE(description.find("entity index: 3") != std::string::npos);
+  REQUIRE(description.find("CMeta") != std::string::npos);
+}
