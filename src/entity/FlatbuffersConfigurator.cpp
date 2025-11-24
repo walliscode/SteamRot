@@ -63,8 +63,8 @@ FlatbuffersConfigurator::ConfigureComponent(const UserInterfaceData *ui_data,
   if (ui_data->ui_name())
     ui_component.m_name = ui_data->ui_name()->str();
 
-  if (ui_data->start_visible())
-    ui_component.m_UI_visible = ui_data->start_visible();
+  if (ui_data->is_visible())
+    ui_component.m_visible = ui_data->is_visible();
 
   // data must contain a root element so throw unexpected if it is not set
   if (!ui_data->root_ui_element()) {
@@ -150,9 +150,6 @@ FlatbuffersConfigurator::ConfigureComponent(
     }
   }
 
-  // Create SubscriberFactory for registering subscribers
-  SubscriberFactory subscriber_factory(m_event_handler);
-
   // Process each mapping
   for (const auto *mapping : *ui_state_data->mappings()) {
     if (!mapping) {
@@ -225,11 +222,13 @@ FlatbuffersConfigurator::ConfigureComponent(
       ui_state_component.m_state_values[state_key] = false;
     }
 
+    // Create SubscriberFactory for registering subscribers
+    SubscriberFactory subscriber_factory(m_event_handler);
     // Create and register subscribers if provided
-    if (mapping->subscribers()) {
+    if (ui_state_data->subscribers()) {
       std::vector<std::shared_ptr<Subscriber>> subscribers;
 
-      for (const auto *subscriber_data : *mapping->subscribers()) {
+      for (const auto *subscriber_data : *ui_state_data->subscribers()) {
         if (!subscriber_data) {
           continue;
         }
@@ -240,6 +239,9 @@ FlatbuffersConfigurator::ConfigureComponent(
         if (!subscriber_result.has_value()) {
           return std::unexpected(subscriber_result.error());
         }
+
+        if (subscriber_data->active())
+          auto active_result = subscriber_result.value()->SetActive();
 
         subscribers.push_back(subscriber_result.value());
       }

@@ -17,5 +17,5 @@ TEST_CASE("CUserInterface has correct default values",
   REQUIRE(ui.m_active == false);
   REQUIRE(ui.m_name == "Default UI");
   REQUIRE(ui.m_root_element == nullptr);
-  REQUIRE(ui.m_UI_visible == false);
+  REQUIRE(ui.m_visible == false);
 }

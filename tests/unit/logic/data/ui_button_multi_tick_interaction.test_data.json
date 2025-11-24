@@ -86,10 +86,10 @@
                           "y": 50
                         },
                         "subscriber_data": {
-                          "event_type_data": "EVENT_USER_INPUT",
-                          "trigger_data_type": "UserInputBitsetData",
+                          "event_type_data": "EVENT_TOGGLE_UI",
+                          "trigger_data_type": "UserInterfaceNameData",
                           "trigger_data": {
-                            "mouse_released": ["LEFT_CLICK"]
+                            "id": "test_button_ui"
                           },
                           "active": true
                         },

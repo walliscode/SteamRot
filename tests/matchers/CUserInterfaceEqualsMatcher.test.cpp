@@ -48,7 +48,10 @@ TEST_CASE("CUserInterfaceEqualsMatcher describe is as expected on success",
   auto matcher = steamrot::tests::EqualsCUserInterface(expected);
 
   std::ostringstream oss;
-  oss << conmat::Header(conmat::TestPassed() + "CUserInterface Match:", 3)
+  oss << conmat::Header(
+             conmat::TestPassed() +
+                 std::format("CUserInterface ({}) Match:", expected.m_name),
+             3)
       << "\n";
 
   REQUIRE(matcher.describe() == oss.str());
@@ -67,7 +70,10 @@ TEST_CASE("CUserInterfaceEqualsMatcher describe is as expected on failure",
   matcher.match(actual);
 
   std::ostringstream oss;
-  oss << conmat::Header(conmat::TestFailed() + "CUserInterface Match:", 3)
+  oss << conmat::Header(
+             conmat::TestFailed() +
+                 std::format("CUserInterface ({}) Match:", expected.m_name),
+             3)
       << "\n";
   oss << conmat::Indent(1) << conmat::TestFailed() << "m_active:"
       << "\n";
@@ -81,8 +87,9 @@ TEST_CASE("CUserInterfaceEqualsMatcher describe is as expected on failure",
   oss << conmat::Indent(2)
       << "actual: " << conmat::Colorize(actual.m_name, conmat::Color::Red)
       << "\n";
-  oss << conmat::Indent(2) << "expected: "
-      << conmat::Colorize(expected.m_name, conmat::Color::Blue) << "\n";
+  oss << conmat::Indent(2)
+      << "expected: " << conmat::Colorize(expected.m_name, conmat::Color::Blue)
+      << "\n";
   REQUIRE(matcher.describe() == oss.str());
 }
 
@@ -91,12 +98,12 @@ TEST_CASE("CUserInterfaceEqualsMatcher detects UI visibility differences",
   steamrot::CUserInterface expected;
   expected.m_active = true;
   expected.m_name = "test_ui";
-  expected.m_UI_visible = true;
+  expected.m_visible = true;
 
   steamrot::CUserInterface actual;
   actual.m_active = true;
   actual.m_name = "test_ui";
-  actual.m_UI_visible = false;
+  actual.m_visible = false;
 
   REQUIRE_THAT(actual, !steamrot::tests::EqualsCUserInterface(expected));
 }

@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "CUIStateEqualsMatcher.h"
+#include "SubscriberEqualsMatcher.h"
 #include "conmat.h"
 #include "matcher_helpers.h"
 
@@ -143,6 +144,23 @@ void CompareMapStateSubscribers(
       oss << conmat::Indent(2) << "expected: "
           << conmat::Colorize(expected_subscribers.size(), conmat::Color::Blue)
           << "\n";
+    }
+
+    // compare each subscriber
+
+    for (size_t i = 0; i < expected_subscribers.size(); ++i) {
+
+      const auto &expected_subscriber = expected_subscribers[i];
+      const auto &actual_subscriber = actual_subscribers[i];
+
+      SubscriberEqualsMatcher subscriber_matcher(*expected_subscriber);
+
+      if (!subscriber_matcher.match(*actual_subscriber)) {
+        oss << conmat::Indent(1) << conmat::TestFailed() << "Key: " << key
+            << " Subscriber index: " << i << " mismatch:"
+            << "\n";
+        oss << subscriber_matcher.describe();
+      }
     }
   }
 }

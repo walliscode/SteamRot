@@ -6,13 +6,12 @@ namespace steamrot;
 table UIStateMapping {
   state_key: string (required);
   ui_names_on: [string];
-  ui_names_off: [string];
-  subscribers: [SubscriberData];
+  ui_names_off: [string];  
   starting_state: bool;
 }
 
 table UIStateData {
   // Collection of state key to UI visibility mappings
   mappings: [UIStateMapping] (required);
-
+  subscribers: [SubscriberData];
 }
