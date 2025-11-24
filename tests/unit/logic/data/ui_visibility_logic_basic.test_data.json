@@ -1,0 +1,498 @@
+{
+  "metadata": {
+    "test_name": "UIStateLogic_visibility_update_basic_test",
+    "description": "Test UIStateLogic class to update UI visibility based on CUIState mappings - 4 UI entities controlled by 1 CUIState entity that manages visibility of 2 of them. Uses LogicClass execution mode with UIStateLogic instead of the free function. Starting state: main_menu visible, play_button invisible, settings_panel invisible, quit_button visible. After logic execution: main_menu visible, play_button visible, settings_panel invisible, quit_button invisible.",
+    "tags": ["unit", "logic", "ui", "UIStateLogic"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "simulation_data": {
+    "description": "Execute UIStateLogic class to update UI visibility based on CUIState mappings",
+    "steps": [
+      {
+        "simulation_type": "Action",
+        "execution_mode": "LogicClass",
+        "logic_class_type": "UIStateLogic",
+        "description": "Step 1: Execute UIStateLogic to update UI visibility - main_menu and play_button should toggle visible, settings_panel and quit_button should toggle invisible"
+      }
+    ]
+  },
+  "start_data_collection": {
+    "entity_collection": {
+      "entity_memory_pool_size": 5,
+      "entities": [
+        {
+          "c_user_interface": {
+            "ui_name": "main_menu",
+            "is_visible": true,
+            "root_ui_element": {
+              "base_data": {
+                "position": {
+                  "x": 100,
+                  "y": 100
+                },
+                "size": {
+                  "x": 200,
+                  "y": 150
+                },
+                "children_active": false,
+                "children": [],
+                "layout": "Vertical",
+                "spacing_strategy": "None"
+              }
+            }
+          }
+        },
+        {
+          "c_user_interface": {
+            "ui_name": "settings_panel",
+            "is_visible": false,
+            "root_ui_element": {
+              "base_data": {
+                "position": {
+                  "x": 350,
+                  "y": 100
+                },
+                "size": {
+                  "x": 200,
+                  "y": 150
+                },
+                "children_active": false,
+                "children": [],
+                "layout": "Vertical",
+                "spacing_strategy": "None"
+              }
+            }
+          }
+        },
+        {
+          "c_user_interface": {
+            "ui_name": "play_button",
+            "is_visible": false,
+            "root_ui_element": {
+              "base_data": {
+                "position": {
+                  "x": 100,
+                  "y": 300
+                },
+                "size": {
+                  "x": 150,
+                  "y": 50
+                },
+                "children_active": false,
+                "children": [],
+                "layout": "Horizontal",
+                "spacing_strategy": "None"
+              }
+            }
+          }
+        },
+        {
+          "c_user_interface": {
+            "ui_name": "quit_button",
+            "is_visible": true,
+            "root_ui_element": {
+              "base_data": {
+                "position": {
+                  "x": 100,
+                  "y": 400
+                },
+                "size": {
+                  "x": 150,
+                  "y": 50
+                },
+                "children_active": false,
+                "children": [],
+                "layout": "Horizontal",
+                "spacing_strategy": "None"
+              }
+            }
+          }
+        },
+        {
+          "c_ui_state": {
+            "mappings": [
+              {
+                "state_key": "menu_state",
+                "ui_names_on": ["main_menu", "play_button"],
+                "ui_names_off": ["settings_panel", "quit_button"],
+                "starting_state": "false"
+              }
+            ],
+            "subscribers": [
+              {
+                "event_type_data": "EVENT_TOGGLE_UI",
+                "trigger_data_type": "UserInterfaceNameData",
+                "trigger_data": {
+                  "id": "menu_state"
+                },
+                "active": true
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "tick_snapshots": [
+    {
+      "tick": 1,
+      "description": "At the end of step 1, the UI visibility should be updated based on the CUIState mappings.",
+      "data_collection": {
+        "entity_collection": {
+          "entity_memory_pool_size": 5,
+          "entities": [
+            {
+              "c_user_interface": {
+                "ui_name": "main_menu",
+                "is_visible": true,
+                "root_ui_element": {
+                  "base_data": {
+                    "position": {
+                      "x": 100,
+                      "y": 100
+                    },
+                    "size": {
+                      "x": 200,
+                      "y": 150
+                    },
+                    "children_active": false,
+                    "children": [],
+                    "layout": "Vertical",
+                    "spacing_strategy": "None"
+                  }
+                }
+              }
+            },
+            {
+              "c_user_interface": {
+                "ui_name": "settings_panel",
+                "is_visible": false,
+                "root_ui_element": {
+                  "base_data": {
+                    "position": {
+                      "x": 350,
+                      "y": 100
+                    },
+                    "size": {
+                      "x": 200,
+                      "y": 150
+                    },
+                    "children_active": false,
+                    "children": [],
+                    "layout": "Vertical",
+                    "spacing_strategy": "None"
+                  }
+                }
+              }
+            },
+            {
+              "c_user_interface": {
+                "ui_name": "play_button",
+                "is_visible": true,
+                "root_ui_element": {
+                  "base_data": {
+                    "position": {
+                      "x": 100,
+                      "y": 300
+                    },
+                    "size": {
+                      "x": 150,
+                      "y": 50
+                    },
+                    "children_active": false,
+                    "children": [],
+                    "layout": "Horizontal",
+                    "spacing_strategy": "None"
+                  }
+                }
+              }
+            },
+            {
+              "c_user_interface": {
+                "ui_name": "quit_button",
+                "is_visible": false,
+                "root_ui_element": {
+                  "base_data": {
+                    "position": {
+                      "x": 100,
+                      "y": 400
+                    },
+                    "size": {
+                      "x": 150,
+                      "y": 50
+                    },
+                    "children_active": false,
+                    "children": [],
+                    "layout": "Horizontal",
+                    "spacing_strategy": "None"
+                  }
+                }
+              }
+            },
+            {
+              "c_ui_state": {
+                "mappings": [
+                  {
+                    "state_key": "menu_state",
+                    "ui_names_on": ["main_menu", "play_button"],
+                    "ui_names_off": ["settings_panel", "quit_button"],
+                    "starting_state": "true"
+                  }
+                ],
+                "subscribers": [
+                  {
+                    "event_type_data": "EVENT_TOGGLE_UI",
+                    "trigger_data_type": "UserInterfaceNameData",
+                    "trigger_data": {
+                      "id": "menu_state"
+                    },
+                    "active": false
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "tick": 2,
+      "description": "At the end of step 1, the UI visibility should be updated based on the CUIState mappings.",
+      "data_collection": {
+        "entity_collection": {
+          "entity_memory_pool_size": 5,
+          "entities": [
+            {
+              "c_user_interface": {
+                "ui_name": "main_menu",
+                "is_visible": true,
+                "root_ui_element": {
+                  "base_data": {
+                    "position": {
+                      "x": 100,
+                      "y": 100
+                    },
+                    "size": {
+                      "x": 200,
+                      "y": 150
+                    },
+                    "children_active": false,
+                    "children": [],
+                    "layout": "Vertical",
+                    "spacing_strategy": "None"
+                  }
+                }
+              }
+            },
+            {
+              "c_user_interface": {
+                "ui_name": "settings_panel",
+                "is_visible": false,
+                "root_ui_element": {
+                  "base_data": {
+                    "position": {
+                      "x": 350,
+                      "y": 100
+                    },
+                    "size": {
+                      "x": 200,
+                      "y": 150
+                    },
+                    "children_active": false,
+                    "children": [],
+                    "layout": "Vertical",
+                    "spacing_strategy": "None"
+                  }
+                }
+              }
+            },
+            {
+              "c_user_interface": {
+                "ui_name": "play_button",
+                "is_visible": true,
+                "root_ui_element": {
+                  "base_data": {
+                    "position": {
+                      "x": 100,
+                      "y": 300
+                    },
+                    "size": {
+                      "x": 150,
+                      "y": 50
+                    },
+                    "children_active": false,
+                    "children": [],
+                    "layout": "Horizontal",
+                    "spacing_strategy": "None"
+                  }
+                }
+              }
+            },
+            {
+              "c_user_interface": {
+                "ui_name": "quit_button",
+                "is_visible": false,
+                "root_ui_element": {
+                  "base_data": {
+                    "position": {
+                      "x": 100,
+                      "y": 400
+                    },
+                    "size": {
+                      "x": 150,
+                      "y": 50
+                    },
+                    "children_active": false,
+                    "children": [],
+                    "layout": "Horizontal",
+                    "spacing_strategy": "None"
+                  }
+                }
+              }
+            },
+            {
+              "c_ui_state": {
+                "mappings": [
+                  {
+                    "state_key": "menu_state",
+                    "ui_names_on": ["main_menu", "play_button"],
+                    "ui_names_off": ["settings_panel", "quit_button"],
+                    "starting_state": "true"
+                  }
+                ],
+                "subscribers": [
+                  {
+                    "event_type_data": "EVENT_TOGGLE_UI",
+                    "trigger_data_type": "UserInterfaceNameData",
+                    "trigger_data": {
+                      "id": "menu_state"
+                    },
+                    "active": false
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "expected_data_collection": {
+    "entity_collection": {
+      "entity_memory_pool_size": 5,
+      "entities": [
+        {
+          "c_user_interface": {
+            "ui_name": "main_menu",
+            "is_visible": true,
+            "root_ui_element": {
+              "base_data": {
+                "position": {
+                  "x": 100,
+                  "y": 100
+                },
+                "size": {
+                  "x": 200,
+                  "y": 150
+                },
+                "children_active": false,
+                "children": [],
+                "layout": "Vertical",
+                "spacing_strategy": "None"
+              }
+            }
+          }
+        },
+        {
+          "c_user_interface": {
+            "ui_name": "settings_panel",
+            "is_visible": false,
+            "root_ui_element": {
+              "base_data": {
+                "position": {
+                  "x": 350,
+                  "y": 100
+                },
+                "size": {
+                  "x": 200,
+                  "y": 150
+                },
+                "children_active": false,
+                "children": [],
+                "layout": "Vertical",
+                "spacing_strategy": "None"
+              }
+            }
+          }
+        },
+        {
+          "c_user_interface": {
+            "ui_name": "play_button",
+            "is_visible": true,
+            "root_ui_element": {
+              "base_data": {
+                "position": {
+                  "x": 100,
+                  "y": 300
+                },
+                "size": {
+                  "x": 150,
+                  "y": 50
+                },
+                "children_active": false,
+                "children": [],
+                "layout": "Horizontal",
+                "spacing_strategy": "None"
+              }
+            }
+          }
+        },
+        {
+          "c_user_interface": {
+            "ui_name": "quit_button",
+            "is_visible": false,
+            "root_ui_element": {
+              "base_data": {
+                "position": {
+                  "x": 100,
+                  "y": 400
+                },
+                "size": {
+                  "x": 150,
+                  "y": 50
+                },
+                "children_active": false,
+                "children": [],
+                "layout": "Horizontal",
+                "spacing_strategy": "None"
+              }
+            }
+          }
+        },
+        {
+          "c_ui_state": {
+            "mappings": [
+              {
+                "state_key": "menu_state",
+                "ui_names_on": ["main_menu", "play_button"],
+                "ui_names_off": ["settings_panel", "quit_button"],
+                "starting_state": "true"
+              }
+            ],
+            "subscribers": [
+              {
+                "event_type_data": "EVENT_TOGGLE_UI",
+                "trigger_data_type": "UserInterfaceNameData",
+                "trigger_data": {
+                  "id": "menu_state"
+                },
+                "active": false
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
