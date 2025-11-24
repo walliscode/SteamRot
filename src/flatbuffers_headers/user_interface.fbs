@@ -88,5 +88,5 @@ table UserInterfaceData{
   // first structure must be a PanelElement
     root_ui_element: PanelData (required); 
     ui_name: string; 
-    start_visible: bool;
+    is_visible: bool;
   }

@@ -18,7 +18,7 @@
           "index": 0,
           "c_user_interface": {
             "ui_name": "test_ui_1",
-            "start_visible": true,
+            "is_visible": true,
             "root_ui_element": {
               "base_data": {
                 "position": {
@@ -48,7 +48,7 @@
           "index": 2,
           "c_user_interface": {
             "ui_name": "test_ui_2",
-            "start_visible": false,
+            "is_visible": false,
             "root_ui_element": {
               "base_data": {
                 "position": {
@@ -78,7 +78,7 @@
           "index": 0,
           "c_user_interface": {
             "ui_name": "test_ui_1",
-            "start_visible": true,
+            "is_visible": true,
             "root_ui_element": {
               "base_data": {
                 "position": {
@@ -108,7 +108,7 @@
           "index": 2,
           "c_user_interface": {
             "ui_name": "test_ui_2",
-            "start_visible": false,
+            "is_visible": false,
             "root_ui_element": {
               "base_data": {
                 "position": {

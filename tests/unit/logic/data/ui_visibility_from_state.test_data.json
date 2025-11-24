@@ -29,7 +29,7 @@
           "index": 0,
           "c_user_interface": {
             "ui_name": "main_menu",
-            "start_visible": true,
+            "is_visible": true,
             "root_ui_element": {
               "base_data": {
                 "position": {
@@ -52,7 +52,7 @@
           "index": 1,
           "c_user_interface": {
             "ui_name": "settings_panel",
-            "start_visible": false,
+            "is_visible": false,
             "root_ui_element": {
               "base_data": {
                 "position": {
@@ -75,7 +75,7 @@
           "index": 2,
           "c_user_interface": {
             "ui_name": "play_button",
-            "start_visible": false,
+            "is_visible": false,
             "root_ui_element": {
               "base_data": {
                 "position": {
@@ -98,7 +98,7 @@
           "index": 3,
           "c_user_interface": {
             "ui_name": "quit_button",
-            "start_visible": true,
+            "is_visible": true,
             "root_ui_element": {
               "base_data": {
                 "position": {
@@ -147,7 +147,7 @@
           "index": 0,
           "c_user_interface": {
             "ui_name": "main_menu",
-            "start_visible": true,
+            "is_visible": true,
             "root_ui_element": {
               "base_data": {
                 "position": {
@@ -170,7 +170,7 @@
           "index": 1,
           "c_user_interface": {
             "ui_name": "settings_panel",
-            "start_visible": false,
+            "is_visible": false,
             "root_ui_element": {
               "base_data": {
                 "position": {
@@ -193,7 +193,7 @@
           "index": 2,
           "c_user_interface": {
             "ui_name": "play_button",
-            "start_visible": true,
+            "is_visible": true,
             "root_ui_element": {
               "base_data": {
                 "position": {
@@ -216,7 +216,7 @@
           "index": 3,
           "c_user_interface": {
             "ui_name": "quit_button",
-            "start_visible": false,
+            "is_visible": false,
             "root_ui_element": {
               "base_data": {
                 "position": {

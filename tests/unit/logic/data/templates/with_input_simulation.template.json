@@ -50,7 +50,7 @@
         "index": 0,
         "c_user_interface": {
           "ui_name": "button_ui",
-          "start_visible": true,
+          "is_visible": true,
           "root_ui_element": {
             "button_data": {
               "position": { "x": 100, "y": 100 },
@@ -87,7 +87,7 @@
         "index": 0,
         "c_user_interface": {
           "ui_name": "button_ui",
-          "start_visible": true,
+          "is_visible": true,
           "root_ui_element": {
             "button_data": {
               "position": { "x": 100, "y": 100 },
