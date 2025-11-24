@@ -95,25 +95,31 @@ public:
   /// @return Formatted description string
   /////////////////////////////////////////////////
   std::string describe() const override {
+
+    std::string entity_index =
+        m_entity_index.has_value()
+            ? " Entity [" + std::to_string(m_entity_index.value()) + "]"
+            : " Entity [?]";
     // Build component name with optional entity index
-    std::string component_display_name = GetComponentName();
-    if (m_entity_index.has_value()) {
-      component_display_name += " (entity index: " + 
-                                std::to_string(m_entity_index.value()) + ")";
-    }
+    std::string component_display_name =
+        entity_index + " " + GetComponentName();
 
     // if mismatch description is empty then we can assume the test passed
     if (m_mismatch_description.empty()) {
 
       std::ostringstream oss;
-      oss << conmat::Header(conmat::TestPassed() + component_display_name + " Match:", 3) << "\n";
+      oss << conmat::Header(
+                 conmat::TestPassed() + component_display_name + " Match:", 3)
+          << "\n";
 
       return oss.str();
 
     } else {
 
       std::ostringstream oss;
-      oss << conmat::Header(conmat::TestFailed() + component_display_name + " Match:", 3) << "\n";
+      oss << conmat::Header(
+                 conmat::TestFailed() + component_display_name + " Match:", 3)
+          << "\n";
       oss << m_mismatch_description;
 
       return oss.str();
