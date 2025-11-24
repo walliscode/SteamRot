@@ -11,6 +11,7 @@
 #include "Component.h"
 #include "conmat.h"
 #include <catch2/matchers/catch_matchers.hpp>
+#include <optional>
 #include <sstream>
 #include <string>
 
@@ -44,6 +45,11 @@ protected:
   mutable std::string m_mismatch_description;
 
   /////////////////////////////////////////////////
+  /// @brief Optional entity index for the component being compared
+  /////////////////////////////////////////////////
+  std::optional<size_t> m_entity_index;
+
+  /////////////////////////////////////////////////
   /// @brief Get the component type name for display
   ///
   /// Override this in derived classes to provide specific component name
@@ -62,7 +68,16 @@ public:
   /// @param expected Expected component object to compare against
   /////////////////////////////////////////////////
   explicit ComponentMatcherBase(const TComponent &expected)
-      : m_expected(expected) {}
+      : m_expected(expected), m_entity_index(std::nullopt) {}
+
+  /////////////////////////////////////////////////
+  /// @brief Constructor for ComponentMatcherBase with entity index
+  ///
+  /// @param expected Expected component object to compare against
+  /// @param entity_index Index of the entity in the EntityMemoryPool
+  /////////////////////////////////////////////////
+  ComponentMatcherBase(const TComponent &expected, size_t entity_index)
+      : m_expected(expected), m_entity_index(entity_index) {}
 
   /////////////////////////////////////////////////
   /// @brief Virtual destructor for proper cleanup
@@ -75,22 +90,30 @@ public:
   /// Provides consistent formatting across all component matchers:
   /// - Success: Shows component name with TestPassed marker
   /// - Failure: Shows component name with TestFailed marker and details
+  /// - If entity index is set, includes it in the component name
   ///
   /// @return Formatted description string
   /////////////////////////////////////////////////
   std::string describe() const override {
+    // Build component name with optional entity index
+    std::string component_display_name = GetComponentName();
+    if (m_entity_index.has_value()) {
+      component_display_name += " (entity index: " + 
+                                std::to_string(m_entity_index.value()) + ")";
+    }
+
     // if mismatch description is empty then we can assume the test passed
     if (m_mismatch_description.empty()) {
 
       std::ostringstream oss;
-      oss << conmat::Header(conmat::TestPassed() + GetComponentName() + " Match:", 3) << "\n";
+      oss << conmat::Header(conmat::TestPassed() + component_display_name + " Match:", 3) << "\n";
 
       return oss.str();
 
     } else {
 
       std::ostringstream oss;
-      oss << conmat::Header(conmat::TestFailed() + GetComponentName() + " Match:", 3) << "\n";
+      oss << conmat::Header(conmat::TestFailed() + component_display_name + " Match:", 3) << "\n";
       oss << m_mismatch_description;
 
       return oss.str();

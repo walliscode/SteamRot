@@ -19,6 +19,11 @@ CMetaEqualsMatcher::CMetaEqualsMatcher(const CMeta &expected)
     : ComponentMatcherBase<CMeta>(expected) {}
 
 /////////////////////////////////////////////////
+CMetaEqualsMatcher::CMetaEqualsMatcher(const CMeta &expected, 
+                                       size_t entity_index)
+    : ComponentMatcherBase<CMeta>(expected, entity_index) {}
+
+/////////////////////////////////////////////////
 bool CMetaEqualsMatcher::match(const CMeta &actual) const {
   m_mismatch_description.clear();
   std::ostringstream oss;
