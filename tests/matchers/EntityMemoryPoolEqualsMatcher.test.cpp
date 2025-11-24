@@ -309,6 +309,6 @@ TEST_CASE("EntityMemoryPoolEqualsMatcher shows entity index in component errors"
 
   std::string description = matcher.describe();
   REQUIRE(description.find("[FAILED]") != std::string::npos);
-  REQUIRE(description.find("entity index: 3") != std::string::npos);
+  REQUIRE(description.find("Entity [3]") != std::string::npos);
   REQUIRE(description.find("CMeta") != std::string::npos);
 }

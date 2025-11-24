@@ -42,7 +42,7 @@ TEST_CASE("CMetaEqualsMatcher describe is as expected on success",
   auto matcher = steamrot::tests::EqualsCMeta(expected);
 
   std::ostringstream oss;
-  oss << conmat::Header(conmat::TestPassed() + "CMeta Match:", 3) << "\n";
+  oss << conmat::Header(conmat::TestPassed() + " Entity [?] CMeta Match:", 3) << "\n";
 
   REQUIRE(matcher.describe() == oss.str());
 }
@@ -60,7 +60,7 @@ TEST_CASE("CMetaEqualsMatcher describe is as expected on failure",
   matcher.match(actual);
 
   std::ostringstream oss;
-  oss << conmat::Header(conmat::TestFailed() + "CMeta Match:", 3) << "\n";
+  oss << conmat::Header(conmat::TestFailed() + " Entity [?] CMeta Match:", 3) << "\n";
   oss << conmat::Indent(1) << conmat::TestFailed() << "m_active:"
       << "\n";
   oss << conmat::Indent(2)
@@ -93,7 +93,7 @@ TEST_CASE("CMetaEqualsMatcher with entity index shows index in output",
     matcher.match(actual);
 
     std::string description = matcher.describe();
-    REQUIRE(description.find("entity index: 0") != std::string::npos);
+    REQUIRE(description.find("Entity [0]") != std::string::npos);
     REQUIRE(description.find("CMeta") != std::string::npos);
   }
 
@@ -102,12 +102,12 @@ TEST_CASE("CMetaEqualsMatcher with entity index shows index in output",
     matcher.match(actual);
 
     std::string description = matcher.describe();
-    REQUIRE(description.find("entity index: 42") != std::string::npos);
+    REQUIRE(description.find("Entity [42]") != std::string::npos);
     REQUIRE(description.find("CMeta") != std::string::npos);
   }
 }
 
-TEST_CASE("CMetaEqualsMatcher without entity index does not show index",
+TEST_CASE("CMetaEqualsMatcher without entity index shows unknown marker",
           "[unit][Components][CMeta][matcher]") {
   steamrot::CMeta expected;
   expected.m_active = true;
@@ -120,6 +120,6 @@ TEST_CASE("CMetaEqualsMatcher without entity index does not show index",
   matcher.match(actual);
 
   std::string description = matcher.describe();
-  REQUIRE(description.find("entity index") == std::string::npos);
+  REQUIRE(description.find("Entity [?]") != std::string::npos);
   REQUIRE(description.find("CMeta") != std::string::npos);
 }
