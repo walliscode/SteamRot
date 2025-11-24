@@ -40,39 +40,70 @@ GetAllJointNames(const CGrimoireMachina &grimoire_machina) {
 
 /////////////////////////////////////////////////
 void UpdateCUserInterfaceVisibilityFromCUIState(
-    const CUIState &ui_state, EntityMemoryPool &scene_entities) {
+    CUIState &ui_state, EntityMemoryPool &scene_entities) {
 
-  // find the states that are currently active
-  std::vector<std::string> active_states;
-  for (const auto &[state_key, is_active] : ui_state.m_state_values) {
-    if (is_active) {
-      active_states.push_back(state_key);
-    }
-  }
+  // cycle map of subscriber vectors, for a state to be considered, all
+  // subscribers must be active
+  for (const auto &[state_key, subscriber_vec] : ui_state.m_state_subscribers) {
 
-  // cycle through active states and update UI visibility
-  for (const std::string &state_key : active_states) {
-
-    const auto it = ui_state.m_state_to_ui_visibility.find(state_key);
-
-    if (it != ui_state.m_state_to_ui_visibility.end()) {
-      const UIVisibilityState &visibility_state = it->second;
-      // Update UI components to be visible (on)
-      for (size_t ui_index : visibility_state.m_ui_indices_on) {
-        auto &ui_component = entity::memory::GetComponent<CUserInterface>(
-            ui_index, scene_entities);
-        ui_component.m_UI_visible = true;
-      }
-      // Update UI components to be hidden (off)
-      for (size_t ui_index : visibility_state.m_ui_indices_off) {
-        auto &ui_component = entity::memory::GetComponent<CUserInterface>(
-            ui_index, scene_entities);
-        ui_component.m_UI_visible = false;
+    // bool to track if all subscribers are active
+    bool all_active = true;
+    for (const auto &subscriber : subscriber_vec) {
+      if (!subscriber->IsActive()) {
+        all_active = false;
+        // break early if any subscriber is inactive
+        break;
       }
     }
-  }
 
-  // Finally update
+    /////////////////////////////////////////////////
+    /// TOGGLE SYSTEM
+    /// The UI components are toggled on/off by a sinygle state key.
+    /// So we use the state_values map to gets the current value of the state
+    /// key and then use and logic to toggle it
+    /////////////////////////////////////////////////
+
+    // if all subscribers are active, set UI components on/off accordingly
+    if (all_active) {
+
+      // check state key exists in state_values map, if not, skip
+      auto state_value_it = ui_state.m_state_values.find(state_key);
+      if (state_value_it == ui_state.m_state_values.end()) {
+        continue;
+      }
+
+      // flip state value and use the new value to toggle UI components
+      bool &state_value = state_value_it->second;
+      state_value = !state_value;
+
+      // attempt to find UI visibility state for this state key, if not found,
+      // skip
+      auto ui_visibility_it = ui_state.m_state_to_ui_visibility.find(state_key);
+      if (ui_visibility_it == ui_state.m_state_to_ui_visibility.end())
+        continue;
+
+      const UIVisibilityState &ui_visibility_state = ui_visibility_it->second;
+      // toggle UI components
+      for (const size_t ui_index_on : ui_visibility_state.m_ui_indices_on) {
+        CUserInterface &ui_component =
+            entity::memory::GetComponent<CUserInterface>(ui_index_on,
+                                                         scene_entities);
+
+        ui_component.m_visible = state_value && true;
+      }
+      for (const size_t ui_index_off : ui_visibility_state.m_ui_indices_off) {
+        CUserInterface &ui_component =
+            entity::memory::GetComponent<CUserInterface>(ui_index_off,
+                                                         scene_entities);
+        ui_component.m_visible = state_value && false;
+      }
+    }
+
+    // finally, reset all subscribers to inactive for next check
+    for (const auto &subscriber : subscriber_vec) {
+      auto active_result = subscriber->SetInactive();
+    }
+  }
 }
 
 } // namespace steamrot::logic::ui

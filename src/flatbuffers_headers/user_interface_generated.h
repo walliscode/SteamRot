@@ -851,7 +851,7 @@ struct UserInterfaceData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ROOT_UI_ELEMENT = 4,
     VT_UI_NAME = 6,
-    VT_START_VISIBLE = 8
+    VT_IS_VISIBLE = 8
   };
   const steamrot::PanelData *root_ui_element() const {
     return GetPointer<const steamrot::PanelData *>(VT_ROOT_UI_ELEMENT);
@@ -859,8 +859,8 @@ struct UserInterfaceData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
   const ::flatbuffers::String *ui_name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_UI_NAME);
   }
-  bool start_visible() const {
-    return GetField<uint8_t>(VT_START_VISIBLE, 0) != 0;
+  bool is_visible() const {
+    return GetField<uint8_t>(VT_IS_VISIBLE, 0) != 0;
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -868,7 +868,7 @@ struct UserInterfaceData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
            verifier.VerifyTable(root_ui_element()) &&
            VerifyOffset(verifier, VT_UI_NAME) &&
            verifier.VerifyString(ui_name()) &&
-           VerifyField<uint8_t>(verifier, VT_START_VISIBLE, 1) &&
+           VerifyField<uint8_t>(verifier, VT_IS_VISIBLE, 1) &&
            verifier.EndTable();
   }
 };
@@ -883,8 +883,8 @@ struct UserInterfaceDataBuilder {
   void add_ui_name(::flatbuffers::Offset<::flatbuffers::String> ui_name) {
     fbb_.AddOffset(UserInterfaceData::VT_UI_NAME, ui_name);
   }
-  void add_start_visible(bool start_visible) {
-    fbb_.AddElement<uint8_t>(UserInterfaceData::VT_START_VISIBLE, static_cast<uint8_t>(start_visible), 0);
+  void add_is_visible(bool is_visible) {
+    fbb_.AddElement<uint8_t>(UserInterfaceData::VT_IS_VISIBLE, static_cast<uint8_t>(is_visible), 0);
   }
   explicit UserInterfaceDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -902,11 +902,11 @@ inline ::flatbuffers::Offset<UserInterfaceData> CreateUserInterfaceData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::PanelData> root_ui_element = 0,
     ::flatbuffers::Offset<::flatbuffers::String> ui_name = 0,
-    bool start_visible = false) {
+    bool is_visible = false) {
   UserInterfaceDataBuilder builder_(_fbb);
   builder_.add_ui_name(ui_name);
   builder_.add_root_ui_element(root_ui_element);
-  builder_.add_start_visible(start_visible);
+  builder_.add_is_visible(is_visible);
   return builder_.Finish();
 }
 
@@ -914,13 +914,13 @@ inline ::flatbuffers::Offset<UserInterfaceData> CreateUserInterfaceDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::PanelData> root_ui_element = 0,
     const char *ui_name = nullptr,
-    bool start_visible = false) {
+    bool is_visible = false) {
   auto ui_name__ = ui_name ? _fbb.CreateString(ui_name) : 0;
   return steamrot::CreateUserInterfaceData(
       _fbb,
       root_ui_element,
       ui_name__,
-      start_visible);
+      is_visible);
 }
 
 inline bool VerifyUIElementDataUnion(::flatbuffers::Verifier &verifier, const void *obj, UIElementDataUnion type) {

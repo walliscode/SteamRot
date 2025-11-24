@@ -45,6 +45,6 @@ GetAllJointNames(const CGrimoireMachina &grimoire_machina);
 /// @param scene_entities EntityMemoryPool containing scene entities
 /////////////////////////////////////////////////
 void UpdateCUserInterfaceVisibilityFromCUIState(
-    const CUIState &ui_state, EntityMemoryPool &scene_entities);
+    CUIState &ui_state, EntityMemoryPool &scene_entities);
 
 } // namespace steamrot::logic::ui

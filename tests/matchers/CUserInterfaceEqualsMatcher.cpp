@@ -9,12 +9,13 @@
 #include "CUserInterfaceEqualsMatcher.h"
 #include "UIElementEqualsMatcher.h"
 #include "conmat.h"
+#include <format>
 
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
 std::string CUserInterfaceEqualsMatcher::GetComponentName() const {
-  return "CUserInterface";
+  return std::format("CUserInterface ({})", m_expected.m_name);
 }
 
 /////////////////////////////////////////////////
@@ -49,15 +50,15 @@ bool CUserInterfaceEqualsMatcher::match(const CUserInterface &actual) const {
         << conmat::Colorize(m_expected.m_name, conmat::Color::Blue) << "\n";
   }
 
-  if (actual.m_UI_visible != m_expected.m_UI_visible) {
-    oss << conmat::Indent(1) << conmat::TestFailed() << "m_UI_visible:"
+  if (actual.m_visible != m_expected.m_visible) {
+    oss << conmat::Indent(1) << conmat::TestFailed() << "m_visible:"
         << "\n";
 
-    oss << conmat::Indent(2) << "actual: "
-        << conmat::Colorize(actual.m_UI_visible, conmat::Color::Red) << "\n";
-    oss << conmat::Indent(2) << "expected: "
-        << conmat::Colorize(m_expected.m_UI_visible, conmat::Color::Blue)
+    oss << conmat::Indent(2)
+        << "actual: " << conmat::Colorize(actual.m_visible, conmat::Color::Red)
         << "\n";
+    oss << conmat::Indent(2) << "expected: "
+        << conmat::Colorize(m_expected.m_visible, conmat::Color::Blue) << "\n";
   }
 
   // Check root element pointers - both null or both non-null
