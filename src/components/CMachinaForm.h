@@ -22,12 +22,12 @@ struct CMachinaForm : public Component {
 
   CMachinaForm() = default;
 
-  /////////////////////////////////////////////////
+/////////////////////////////////////////////////
   /// @brief Contains all Fragments for this Entity/MachinaForm
   ///
   /// Not designed to be modified once created, game mechanics is about making
   /// new designs. Modificaion would be copy then modify.
-  /////////////////////////////////////////////////
+/////////////////////////////////////////////////
   std::vector<Fragment> m_fragments;
 
   std::vector<Joint> m_joints;
