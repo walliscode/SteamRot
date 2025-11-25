@@ -1,2 +1,0 @@
-/usr/bin/ar qc libdata_handlers.a CMakeFiles/data_handlers.dir/DataLoader.cpp.o CMakeFiles/data_handlers.dir/FlatbuffersDataLoader.cpp.o CMakeFiles/data_handlers.dir/PathProvider.cpp.o
-/usr/bin/ranlib libdata_handlers.a
