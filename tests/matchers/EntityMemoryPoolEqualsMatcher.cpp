@@ -35,7 +35,7 @@ void EntityMemoryPoolEqualsMatcher::CompareComponentVector(
     const std::vector<CMeta> &expected_vec, std::ostringstream &oss) const {
 
   for (size_t i = 0; i < expected_vec.size(); ++i) {
-    CMetaEqualsMatcher matcher(expected_vec[i]);
+    CMetaEqualsMatcher matcher(expected_vec[i], i);
     if (!matcher.match(actual_vec[i])) {
       // pass through the mismatch description from CMetaEqualsMatcher
       oss << matcher.describe() << "\n";
@@ -54,7 +54,7 @@ void EntityMemoryPoolEqualsMatcher::CompareComponentVector(
     std::ostringstream &oss) const {
 
   for (size_t i = 0; i < expected_vec.size(); ++i) {
-    CUserInterfaceEqualsMatcher matcher(expected_vec[i]);
+    CUserInterfaceEqualsMatcher matcher(expected_vec[i], i);
     if (!matcher.match(actual_vec[i])) {
       // pass through the mismatch description from
       // CUserInterfaceEqualsMatcher
@@ -72,7 +72,7 @@ void EntityMemoryPoolEqualsMatcher::CompareComponentVector(
     const std::vector<CMachinaForm> &expected_vec,
     std::ostringstream &oss) const {
   for (size_t i = 0; i < expected_vec.size(); ++i) {
-    CMachinaFormEqualsMatcher matcher(expected_vec[i]);
+    CMachinaFormEqualsMatcher matcher(expected_vec[i], i);
     if (!matcher.match(actual_vec[i])) {
 
       // pass through the mismatch description from CMachinaFormEqualsMatcher
@@ -90,7 +90,7 @@ void EntityMemoryPoolEqualsMatcher::CompareComponentVector(
     const std::vector<CGrimoireMachina> &expected_vec,
     std::ostringstream &oss) const {
   for (size_t i = 0; i < expected_vec.size(); ++i) {
-    CGrimoireMachinaEqualsMatcher matcher(expected_vec[i]);
+    CGrimoireMachinaEqualsMatcher matcher(expected_vec[i], i);
     if (!matcher.match(actual_vec[i])) {
       // pass through the mismatch description from
       // CGrimoireMachinaEqualsMatcher
@@ -108,7 +108,7 @@ void EntityMemoryPoolEqualsMatcher::CompareComponentVector(
     const std::vector<CUIState> &expected_vec, std::ostringstream &oss) const {
 
   for (size_t i = 0; i < expected_vec.size(); ++i) {
-    CUIStateEqualsMatcher matcher(expected_vec[i]);
+    CUIStateEqualsMatcher matcher(expected_vec[i], i);
     if (!matcher.match(actual_vec[i])) {
 
       // pass through the mismatch description from CUIStateEqualsMatcher

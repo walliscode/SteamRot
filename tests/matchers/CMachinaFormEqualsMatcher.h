@@ -36,6 +36,14 @@ public:
   explicit CMachinaFormEqualsMatcher(const CMachinaForm &expected);
 
   /////////////////////////////////////////////////
+  /// @brief Constructor for CMachinaFormEqualsMatcher with entity index
+  ///
+  /// @param expected Expected CMachinaForm object to compare against
+  /// @param entity_index Index of the entity in the EntityMemoryPool
+  /////////////////////////////////////////////////
+  CMachinaFormEqualsMatcher(const CMachinaForm &expected, size_t entity_index);
+
+  /////////////////////////////////////////////////
   /// @brief Match method to compare actual CMachinaForm with expected
   ///
   /// @param actual CMachinaForm object to compare
@@ -53,6 +61,18 @@ public:
 inline CMachinaFormEqualsMatcher
 EqualsCMachinaForm(const CMachinaForm &expected) {
   return CMachinaFormEqualsMatcher(expected);
+}
+
+/////////////////////////////////////////////////
+/// @brief Helper function to create CMachinaFormEqualsMatcher with entity index
+///
+/// @param expected Expected CMachinaForm object
+/// @param entity_index Index of the entity in the EntityMemoryPool
+/// @return CMachinaFormEqualsMatcher instance
+/////////////////////////////////////////////////
+inline CMachinaFormEqualsMatcher
+EqualsCMachinaForm(const CMachinaForm &expected, size_t entity_index) {
+  return CMachinaFormEqualsMatcher(expected, entity_index);
 }
 
 } // namespace steamrot::tests

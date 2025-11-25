@@ -37,6 +37,15 @@ public:
   explicit CGrimoireMachinaEqualsMatcher(const CGrimoireMachina &expected);
 
   /////////////////////////////////////////////////
+  /// @brief Constructor for CGrimoireMachinaEqualsMatcher with entity index
+  ///
+  /// @param expected Expected CGrimoireMachina object to compare against
+  /// @param entity_index Index of the entity in the EntityMemoryPool
+  /////////////////////////////////////////////////
+  CGrimoireMachinaEqualsMatcher(const CGrimoireMachina &expected, 
+                                size_t entity_index);
+
+  /////////////////////////////////////////////////
   /// @brief Match method to compare actual CGrimoireMachina with expected
   ///
   /// @param actual CGrimoireMachina object to compare
@@ -54,6 +63,18 @@ public:
 inline CGrimoireMachinaEqualsMatcher
 EqualsCGrimoireMachina(const CGrimoireMachina &expected) {
   return CGrimoireMachinaEqualsMatcher(expected);
+}
+
+/////////////////////////////////////////////////
+/// @brief Helper function to create CGrimoireMachinaEqualsMatcher with entity index
+///
+/// @param expected Expected CGrimoireMachina object
+/// @param entity_index Index of the entity in the EntityMemoryPool
+/// @return CGrimoireMachinaEqualsMatcher instance
+/////////////////////////////////////////////////
+inline CGrimoireMachinaEqualsMatcher
+EqualsCGrimoireMachina(const CGrimoireMachina &expected, size_t entity_index) {
+  return CGrimoireMachinaEqualsMatcher(expected, entity_index);
 }
 
 } // namespace steamrot::tests

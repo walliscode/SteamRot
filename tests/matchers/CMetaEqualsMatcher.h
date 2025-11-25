@@ -36,6 +36,14 @@ public:
   explicit CMetaEqualsMatcher(const CMeta &expected);
 
   /////////////////////////////////////////////////
+  /// @brief Constructor for CMetaEqualsMatcher with entity index
+  ///
+  /// @param expected Expected CMeta object to compare against
+  /// @param entity_index Index of the entity in the EntityMemoryPool
+  /////////////////////////////////////////////////
+  CMetaEqualsMatcher(const CMeta &expected, size_t entity_index);
+
+  /////////////////////////////////////////////////
   /// @brief Match method to compare actual CMeta with expected
   ///
   /// @param actual CMeta object to compare
@@ -52,6 +60,18 @@ public:
 /////////////////////////////////////////////////
 inline CMetaEqualsMatcher EqualsCMeta(const CMeta &expected) {
   return CMetaEqualsMatcher(expected);
+}
+
+/////////////////////////////////////////////////
+/// @brief Helper function to create CMetaEqualsMatcher with entity index
+///
+/// @param expected Expected CMeta object
+/// @param entity_index Index of the entity in the EntityMemoryPool
+/// @return CMetaEqualsMatcher instance
+/////////////////////////////////////////////////
+inline CMetaEqualsMatcher EqualsCMeta(const CMeta &expected, 
+                                      size_t entity_index) {
+  return CMetaEqualsMatcher(expected, entity_index);
 }
 
 } // namespace steamrot::tests

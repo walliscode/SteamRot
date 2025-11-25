@@ -22,6 +22,11 @@ CMachinaFormEqualsMatcher::CMachinaFormEqualsMatcher(
     : ComponentMatcherBase<CMachinaForm>(expected) {}
 
 /////////////////////////////////////////////////
+CMachinaFormEqualsMatcher::CMachinaFormEqualsMatcher(
+    const CMachinaForm &expected, size_t entity_index)
+    : ComponentMatcherBase<CMachinaForm>(expected, entity_index) {}
+
+/////////////////////////////////////////////////
 bool CMachinaFormEqualsMatcher::match(const CMachinaForm &actual) const {
   m_mismatch_description.clear();
   std::ostringstream oss;
