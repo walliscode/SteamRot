@@ -1,19 +1,19 @@
 {
   "metadata": {
     "test_name": "UIStateLogic_visibility_update_basic_test",
-    "description": "Test UIStateLogic class to update UI visibility based on CUIState mappings - 4 UI entities controlled by 1 CUIState entity that manages visibility of 2 of them. Uses LogicClass execution mode with UIStateLogic instead of the free function. Starting state: main_menu visible, play_button invisible, settings_panel invisible, quit_button visible. After logic execution: main_menu visible, play_button visible, settings_panel invisible, quit_button invisible.",
+    "given": "4 UI entities (main_menu visible, play_button hidden, settings_panel hidden, quit_button visible) controlled by CUIState",
+    "when": "UIStateLogic class executes to update UI visibility based on CUIState mappings",
+    "then": "main_menu and play_button become visible, settings_panel and quit_button become hidden",
     "tags": ["unit", "logic", "ui", "UIStateLogic"],
     "expected_to_pass": true,
     "version": 1
   },
   "simulation_data": {
-    "description": "Execute UIStateLogic class to update UI visibility based on CUIState mappings",
     "steps": [
       {
         "simulation_type": "Action",
         "execution_mode": "LogicClass",
-        "logic_class_type": "UIStateLogic",
-        "description": "Step 1: Execute UIStateLogic to update UI visibility - main_menu and play_button should toggle visible, settings_panel and quit_button should toggle invisible"
+        "logic_class_type": "UIStateLogic"
       }
     ]
   },
@@ -137,7 +137,9 @@
   "tick_snapshots": [
     {
       "tick": 1,
-      "description": "At the end of step 1, the UI visibility should be updated based on the CUIState mappings.",
+      "given": "CUIState with menu_state mapping controlling 4 UI entities",
+      "when": "First tick completes with UIStateLogic",
+      "then": "main_menu visible, play_button visible, settings_panel hidden, quit_button hidden",
       "data_collection": {
         "entity_collection": {
           "entity_memory_pool_size": 5,
@@ -258,7 +260,9 @@
     },
     {
       "tick": 2,
-      "description": "At the end of step 1, the UI visibility should be updated based on the CUIState mappings.",
+      "given": "UI entities with visibility already updated from tick 1",
+      "when": "Second tick completes",
+      "then": "Visibility state remains unchanged",
       "data_collection": {
         "entity_collection": {
           "entity_memory_pool_size": 5,

@@ -1,7 +1,9 @@
 {
   "metadata": {
     "test_name": "process_ui_actions_button_click",
-    "description": "Test ProcessUIActionsAndEvents adds EventPacket to EventBus when button has is_mouse_over=true and active subscription",
+    "given": "A visible button with is_mouse_over=true and active subscription listening for LEFT_CLICK",
+    "when": "ProcessNestedUIActionsAndEvents processes the button action",
+    "then": "EVENT_TEST is added to waiting room",
     "tags": ["unit", "logic", "action", "ui", "button"],
     "expected_to_pass": true,
     "version": 1
@@ -72,24 +74,24 @@
       ]
     },
     "event_bus": {
-      "description": "Empty event bus at start",
       "events": []
     }
   },
   "simulation_data": {
-    "description": "Process UI actions to add event to EventBus",
     "steps": [
       {
         "simulation_type": "Action",
         "execution_mode": "Function",
-        "function_type": "ProcessNestedUIActionsAndEvents",
-        "description": "Process button actions and add response event to EventBus"
+        "function_type": "ProcessNestedUIActionsAndEvents"
       }
     ]
   },
   "tick_snapshots": [
     {
       "tick": 1,
+      "given": "Button with active subscriber and is_mouse_over=true",
+      "when": "ProcessNestedUIActionsAndEvents completes at tick 1",
+      "then": "EVENT_TEST is in waiting room with lifetime=1",
       "data_collection": {
         "entity_collection": {
           "entity_memory_pool_size": 5,
@@ -154,7 +156,6 @@
           ]
         },
         "waiting_room": {
-          "description": "After tick 1: the test button has been triggered and added EVENT_TEST to waiting room",
           "events": [
             {
               "event_lifetime": 1,
@@ -163,8 +164,7 @@
             }
           ]
         }
-      },
-      "description": "After simulation step, before EventHandler ticks: both events present with lifetime=1"
+      }
     }
   ],
   "expected_data_collection": {
@@ -231,11 +231,9 @@
       ]
     },
     "event_bus": {
-      "description": "Final event bus state after EventHandler ticks - events with lifetime=1 are decremented to 0 and removed",
       "events": []
     },
     "waiting_room": {
-      "description": "After tick 1: the test button has been triggered and added EVENT_TEST to waiting room",
       "events": [
         {
           "event_lifetime": 1,

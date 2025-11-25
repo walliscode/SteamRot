@@ -1,7 +1,9 @@
 {
   "metadata": {
     "test_name": "pool_comparison_different_size",
-    "description": "Entity memory pool with different size for comparison testing",
+    "given": "Entity memory pool with size 8 and 2 entities",
+    "when": "Comparing with expected pool of size 5 and 3 entities",
+    "then": "Size mismatch is detected (expected_to_pass is false)",
     "tags": [
       "unit",
       "entity",

@@ -1,7 +1,9 @@
 {
   "metadata": {
     "test_name": "sample_event_sequence",
-    "description": "Sample test demonstrating tick-by-tick event injection",
+    "given": "An empty entity pool with no initial events",
+    "when": "Events are injected tick-by-tick over 3 ticks",
+    "then": "Events are properly added to event bus at each tick",
     "tags": [
       "unit",
       "harness",
@@ -11,7 +13,6 @@
     "version": 1
   },
   "event_sequence": {
-    "description": "Sequence of test events added on different ticks",
     "events": [
       {
         "tick": 1,
@@ -19,8 +20,7 @@
           "event_lifetime": 5,
           "event_type": "EVENT_TEST",
           "event_data_data_type": "NONE"
-        },
-        "description": "Initial test event at tick 1"
+        }
       },
       {
         "tick": 2,
@@ -37,8 +37,7 @@
               "LEFT_CLICK"
             ]
           }
-        },
-        "description": "User input event at tick 2"
+        }
       },
       {
         "tick": 3,
@@ -46,8 +45,7 @@
           "event_lifetime": 1,
           "event_type": "EVENT_TEST",
           "event_data_data_type": "NONE"
-        },
-        "description": "Another test event at tick 3"
+        }
       }
     ]
   },

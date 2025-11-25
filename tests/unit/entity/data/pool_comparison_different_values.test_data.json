@@ -1,7 +1,9 @@
 {
   "metadata": {
     "test_name": "pool_comparison_different_values",
-    "description": "Entity memory pool with different component values for comparison testing",
+    "given": "Entity memory pool with UI entity named 'different_name' at position (99,88)",
+    "when": "Comparing with expected pool with UI entity named 'test_ui_1' at position (10,20)",
+    "then": "Value mismatch is detected (expected_to_pass is false)",
     "tags": [
       "unit",
       "entity",

@@ -1,7 +1,9 @@
 {
   "metadata": {
     "test_name": "sample_input_sequence",
-    "description": "Sample test demonstrating tick-by-tick input injection",
+    "given": "A visible button UI entity at position (100,100) with size (100,50)",
+    "when": "Mouse moves to button center and clicks over 3 ticks",
+    "then": "Input events are processed correctly each tick",
     "tags": [
       "unit",
       "harness",
@@ -11,7 +13,6 @@
     "version": 1
   },
   "input_sequence": {
-    "description": "Move mouse and click sequence",
     "inputs": [
       {
         "input_type": "MouseMove",
@@ -23,8 +24,7 @@
           },
           "button": 0
         },
-        "tick": 1,
-        "description": "Initial mouse position"
+        "tick": 1
       },
       {
         "input_type": "MouseMove",
@@ -36,8 +36,7 @@
           },
           "button": 0
         },
-        "tick": 2,
-        "description": "Move mouse to button center"
+        "tick": 2
       },
       {
         "input_type": "MouseClick",
@@ -49,8 +48,7 @@
           },
           "button": 0
         },
-        "tick": 3,
-        "description": "Click left mouse button"
+        "tick": 3
       }
     ]
   },

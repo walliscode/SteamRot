@@ -1,7 +1,9 @@
 {
   "metadata": {
     "test_name": "sample_pool_size_mismatch",
-    "description": "Test with different pool sizes - expected_to_pass is false",
+    "given": "Entity memory pool with size 2",
+    "when": "Comparing with expected pool of size 5",
+    "then": "Pool size mismatch is detected (expected_to_pass is false)",
     "tags": [
       "unit",
       "harness",

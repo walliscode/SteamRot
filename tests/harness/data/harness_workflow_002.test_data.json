@@ -1,7 +1,9 @@
 {
   "metadata": {
     "test_name": "sample_input_event_simulation",
-    "description": "Comprehensive sample combining input, events, and simulation with tick-based execution",
+    "given": "A visible button UI entity at position (100,100)",
+    "when": "Mouse moves over button at tick 1, clicks at tick 2, with collision and action processing",
+    "then": "Input events and simulation execute correctly over 3 ticks",
     "tags": [
       "unit",
       "harness",
@@ -13,7 +15,6 @@
     "version": 1
   },
   "input_sequence": {
-    "description": "User clicks a button",
     "inputs": [
       {
         "input_type": "MouseMove",
@@ -25,8 +26,7 @@
           },
           "button": 0
         },
-        "tick": 1,
-        "description": "Move mouse over button"
+        "tick": 1
       },
       {
         "input_type": "MouseClick",
@@ -38,13 +38,11 @@
           },
           "button": 0
         },
-        "tick": 2,
-        "description": "Click the button"
+        "tick": 2
       }
     ]
   },
   "event_sequence": {
-    "description": "Generate test events in response to input",
     "events": [
       {
         "tick": 1,
@@ -52,26 +50,22 @@
           "event_lifetime": 2,
           "event_type": "EVENT_TEST",
           "event_data_data_type": "NONE"
-        },
-        "description": "Initial test event"
+        }
       }
     ]
   },
   "simulation_data": {
-    "description": "Process UI collision and actions on every tick",
     "num_ticks": 3,
     "steps": [
       {
         "simulation_type": "Collision",
         "execution_mode": "LogicClass",
-        "logic_class_type": "UICollisionLogic",
-        "description": "Detect mouse collision with button"
+        "logic_class_type": "UICollisionLogic"
       },
       {
         "simulation_type": "Action",
         "execution_mode": "Function",
-        "function_type": "ProcessButtonElementActions",
-        "description": "Process button click actions"
+        "function_type": "ProcessButtonElementActions"
       }
     ]
   },

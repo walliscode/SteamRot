@@ -13,25 +13,21 @@
     "version": 1
   },
   "simulation_data": {
-    "description": "Execute UI collision detection, then render logic, then action processing",
     "steps": [
       {
         "simulation_type": "Collision",
         "execution_mode": "LogicClass",
-        "logic_class_type": "UICollisionLogic",
-        "description": "Check for UI collision with mouse"
+        "logic_class_type": "UICollisionLogic"
       },
       {
         "simulation_type": "Render",
         "execution_mode": "LogicClass",
-        "logic_class_type": "UIRenderLogic",
-        "description": "Render UI elements to scene texture"
+        "logic_class_type": "UIRenderLogic"
       },
       {
         "simulation_type": "Action",
         "execution_mode": "Function",
-        "function_type": "ProcessNestedUIActionsAndEvents",
-        "description": "Process UI actions and events recursively"
+        "function_type": "ProcessNestedUIActionsAndEvents"
       }
     ]
   },

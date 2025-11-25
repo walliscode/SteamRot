@@ -1,7 +1,9 @@
 {
   "metadata": {
     "test_name": "logic_collision_check_mouse_over",
-    "description": "given a UI element, when checking for mouse over collision, then the collision is detected correctly",
+    "given": "A visible UI element at position (50,100) with size (200,150)",
+    "when": "Mouse moves to position (150,125) inside element bounds and collision check runs",
+    "then": "is_mouse_over is set to true on the UI element",
     "tags": [
       "unit",
       "logic",
@@ -11,7 +13,6 @@
     "version": 1
   },
   "input_sequence": {
-    "description": "User moves mouse over UI element",
     "inputs": [
       {
         "input_type": "MouseMove",
@@ -23,19 +24,16 @@
           },
           "button": 0
         },
-        "tick": 1,
-        "description": "Move mouse over UI element"
+        "tick": 1
       }
     ]
   },
   "simulation_data": {
-    "description": "given a UI element, when checking for mouse over collision, then the collision is detected correctly",
     "steps": [
       {
         "simulation_type": "Collision",
         "execution_mode": "Function",
-        "function_type": "CheckMouseOverNestedUIElement",
-        "description": "Step 1: Detect mouse collision over UIElement"
+        "function_type": "CheckMouseOverNestedUIElement"
       }
     ]
   },

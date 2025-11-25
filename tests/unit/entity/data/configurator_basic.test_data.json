@@ -1,7 +1,9 @@
 {
   "metadata": {
     "test_name": "configurator_basic",
-    "description": "Basic entity configuration from FlatBuffers data for TEST scene",
+    "given": "FlatBuffers data for TEST scene with 2 entities (UI and grimoire machina)",
+    "when": "Entity configurator processes the data",
+    "then": "Entities are configured correctly with expected component values",
     "tags": [
       "unit",
       "entity",

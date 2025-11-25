@@ -25,7 +25,6 @@ namespace steamrot::tests {
 /////////////////////////////////////////////////
 struct TestContext {
   std::string test_name;
-  std::string description;  // Deprecated: Use given/when/then instead
   std::string given;        // GIVEN: Initial state/preconditions
   std::string when;         // WHEN: Action/event being tested
   std::string then;         // THEN: Expected outcome/postconditions
@@ -57,8 +56,7 @@ struct TestContext {
   /// @brief Format hierarchical context section for matcher output
   ///
   /// Generates formatted, indented lines with test name, tick,
-  /// GIVEN/WHEN/THEN, and legacy description. Used by matchers 
-  /// to display context information.
+  /// and GIVEN/WHEN/THEN. Used by matchers to display context information.
   ///
   /// @return Formatted context section (multi-line with indentation)
   ////////////////////////////////////////////////////////////
@@ -79,23 +77,15 @@ struct TestContext {
       oss << "]";
     }
 
-    // GIVEN/WHEN/THEN structure (preferred, tertiary context)
-    bool has_gwt = !given.empty() || !when.empty() || !then.empty();
-    if (has_gwt) {
-      if (!given.empty()) {
-        oss << "\n  GIVEN: " << given;
-      }
-      if (!when.empty()) {
-        oss << "\n  WHEN:  " << when;
-      }
-      if (!then.empty()) {
-        oss << "\n  THEN:  " << then;
-      }
+    // GIVEN/WHEN/THEN structure
+    if (!given.empty()) {
+      oss << "\n  GIVEN: " << given;
     }
-
-    // Legacy description (fallback if GIVEN/WHEN/THEN not provided)
-    if (!has_gwt && !description.empty()) {
-      oss << "\n  Description: " << description;
+    if (!when.empty()) {
+      oss << "\n  WHEN:  " << when;
+    }
+    if (!then.empty()) {
+      oss << "\n  THEN:  " << then;
     }
 
     return oss.str();
@@ -107,7 +97,7 @@ struct TestContext {
   /// @return true if any context field is populated
   ////////////////////////////////////////////////////////////
   bool HasContent() const {
-    return !test_name.empty() || !description.empty() ||
+    return !test_name.empty() ||
            !given.empty() || !when.empty() || !then.empty() ||
            current_tick.has_value();
   }

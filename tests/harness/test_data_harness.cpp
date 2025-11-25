@@ -341,7 +341,7 @@ RunFixtureTest(const TestDataConfig *config) {
       if (config->metadata()->test_name()) {
         context.test_name = config->metadata()->test_name()->str();
       }
-      // Prefer GIVEN/WHEN/THEN, fall back to description for legacy support
+      // Populate GIVEN/WHEN/THEN from metadata
       if (config->metadata()->given()) {
         context.given = config->metadata()->given()->str();
       }
@@ -350,10 +350,6 @@ RunFixtureTest(const TestDataConfig *config) {
       }
       if (config->metadata()->then()) {
         context.then = config->metadata()->then()->str();
-      }
-      // Legacy description support
-      if (config->metadata()->description()) {
-        context.description = config->metadata()->description()->str();
       }
     }
 

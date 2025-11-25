@@ -1,7 +1,9 @@
 {
   "metadata": {
     "test_name": "ui_collision_basic",
-    "description": "Basic UICollisionLogic test - detects mouse over a simple UI panel element",
+    "given": "A visible UI panel at position (100,100) with size (200,50)",
+    "when": "UICollisionLogic runs with mouse at position (150,125) inside panel bounds",
+    "then": "Collision detection executes successfully",
     "tags": [
       "unit",
       "logic",
@@ -11,13 +13,11 @@
     "version": 1
   },
   "simulation_data": {
-    "description": "Execute collision detection with mouse at (150, 125) - inside panel bounds",
     "steps": [
       {
         "simulation_type": "Collision",
         "execution_mode": "LogicClass",
-        "logic_class_type": "UICollisionLogic",
-        "description": "Detect UI collision - mouse should be over panel"
+        "logic_class_type": "UICollisionLogic"
       }
     ]
   },

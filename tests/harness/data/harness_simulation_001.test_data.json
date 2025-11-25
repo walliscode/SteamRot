@@ -1,7 +1,9 @@
 {
   "metadata": {
     "test_name": "sample_function_simulation",
-    "description": "Sample demonstrating simulation with individual free functions",
+    "given": "A visible UI entity with action processing enabled",
+    "when": "ProcessUIActionsAndEvents function is executed",
+    "then": "UI state remains unchanged after processing",
     "tags": [
       "unit",
       "harness",
@@ -12,13 +14,11 @@
     "version": 1
   },
   "simulation_data": {
-    "description": "Execute individual action processing functions",
     "steps": [
       {
         "simulation_type": "Action",
         "execution_mode": "Function",
-        "function_type": "ProcessUIActionsAndEvents",
-        "description": "Process UI actions without nesting"
+        "function_type": "ProcessUIActionsAndEvents"
       }
     ]
   },

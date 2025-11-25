@@ -1,7 +1,9 @@
 {
   "metadata": {
     "test_name": "sample_mismatch_test",
-    "description": "Test data with intentional mismatch - expected_to_pass is false",
+    "given": "A visible UI entity named 'initial_ui' at position (100,200)",
+    "when": "Comparing with expected entity named 'different_ui' at different position",
+    "then": "Mismatch is detected (expected_to_pass is false)",
     "tags": [
       "unit",
       "harness",

@@ -1,7 +1,9 @@
 {
   "metadata": {
     "test_name": "metadata_validation",
-    "description": "Validates test harness metadata loading without entity collections",
+    "given": "Test data file with only metadata, no entity collections",
+    "when": "Test harness loads and validates metadata",
+    "then": "Metadata is loaded successfully without errors",
     "tags": [
       "unit",
       "harness",

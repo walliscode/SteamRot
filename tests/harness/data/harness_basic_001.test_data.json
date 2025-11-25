@@ -1,7 +1,9 @@
 {
   "metadata": {
     "test_name": "sample_test_1",
-    "description": "Sample test data for testing the harness functionality",
+    "given": "A UI entity with specific position and visibility settings",
+    "when": "Test harness compares start and expected entity states",
+    "then": "Entity states match exactly",
     "tags": ["unit", "harness"],
     "expected_to_pass": true,
     "version": 1

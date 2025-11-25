@@ -1,7 +1,9 @@
 {
   "metadata": {
     "test_name": "sample_complete_workflow",
-    "description": "Complete workflow simulation demonstrating all simulation capabilities - combines multiple system types and execution modes",
+    "given": "Two visible UI entities: main_menu and button_panel",
+    "when": "Complete UI workflow runs: collision -> state update -> render -> action processing",
+    "then": "UI entity states remain unchanged after full workflow",
     "tags": [
       "integration",
       "simulation",
@@ -13,37 +15,31 @@
     "version": 1
   },
   "simulation_data": {
-    "description": "Complete UI interaction workflow: collision -> state update -> render -> action processing",
     "steps": [
       {
         "simulation_type": "Collision",
         "execution_mode": "LogicClass",
-        "logic_class_type": "UICollisionLogic",
-        "description": "Step 1: Detect mouse collision with all UI elements"
+        "logic_class_type": "UICollisionLogic"
       },
       {
         "simulation_type": "Action",
         "execution_mode": "LogicClass",
-        "logic_class_type": "UIStateLogic",
-        "description": "Step 2: Update UI element states based on collision"
+        "logic_class_type": "UIStateLogic"
       },
       {
         "simulation_type": "Render",
         "execution_mode": "LogicClass",
-        "logic_class_type": "UIRenderLogic",
-        "description": "Step 3: Render all UI elements to scene texture"
+        "logic_class_type": "UIRenderLogic"
       },
       {
         "simulation_type": "Action",
         "execution_mode": "Function",
-        "function_type": "ProcessNestedUIActionsAndEvents",
-        "description": "Step 4: Process UI actions recursively for nested elements"
+        "function_type": "ProcessNestedUIActionsAndEvents"
       },
       {
         "simulation_type": "Action",
         "execution_mode": "LogicClass",
-        "logic_class_type": "UIActionLogic",
-        "description": "Step 5: Complete action processing via UIActionLogic"
+        "logic_class_type": "UIActionLogic"
       }
     ]
   },

@@ -1,7 +1,9 @@
 {
   "metadata": {
     "test_name": "event_bus_snapshot_test",
-    "description": "Test EventBus state comparison at start, tick snapshots, and end",
+    "given": "An event bus with 2 events (EVENT_TEST lifetime 3, EVENT_QUIT_GAME lifetime 5)",
+    "when": "Two ticks pass with snapshot comparisons at each tick",
+    "then": "Event lifetimes decrement correctly at each snapshot",
     "tags": [
       "unit",
       "event_bus"
@@ -13,14 +15,15 @@
   "tick_snapshots": [
     {
       "tick": 1,
-      "description": "Tick 1 snapshot",
+      "given": "Event bus in initial state before tick processing",
+      "when": "First tick comparison occurs (before lifetime decrement)",
+      "then": "Event lifetimes remain at initial values (3 and 5)",
       "data_collection": {
         "entity_collection": {
           "entity_memory_pool_size": 1,
           "entities": []
         },
         "event_bus": {
-          "description": "Event bus is compared before lifetimes are decremented, so same as start",
           "events": [
             {
               "event_lifetime": 3,
@@ -38,14 +41,15 @@
     },
     {
       "tick": 2,
-      "description": "Tick 2 snapshot",
+      "given": "Event bus after first tick lifetime decrement",
+      "when": "Second tick comparison occurs",
+      "then": "Event lifetimes are decremented by 1 (now 2 and 4)",
       "data_collection": {
         "entity_collection": {
           "entity_memory_pool_size": 1,
           "entities": []
         },
         "event_bus": {
-          "description": "After tick 1, event lifetimes decremented by 1",
           "events": [
             {
               "event_lifetime": 2,
@@ -68,7 +72,6 @@
       "entities": []
     },
     "event_bus": {
-      "description": "Initial event bus with 2 events",
       "events": [
         {
           "event_lifetime": 3,
@@ -89,7 +92,6 @@
       "entities": []
     },
     "event_bus": {
-      "description": "Final event bus state after all ticks",
       "events": [
         {
           "event_lifetime": 1,

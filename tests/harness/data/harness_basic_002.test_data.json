@@ -1,7 +1,9 @@
 {
   "metadata": {
     "test_name": "sample_test_2",
-    "description": "Another sample test data with different configuration",
+    "given": "A grimoire machina entity with empty fragments and joints",
+    "when": "Test harness compares start and expected entity states",
+    "then": "Entity states match exactly",
     "tags": [
       "unit",
       "harness"

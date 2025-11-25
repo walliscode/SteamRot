@@ -43,7 +43,7 @@ CompareTickSnapshot(uint32_t tick, const TestDataConfig *config,
       if (config->metadata() && config->metadata()->test_name()) {
         context.test_name = config->metadata()->test_name()->str();
       }
-      // Prefer GIVEN/WHEN/THEN from snapshot, fall back to description
+      // Populate GIVEN/WHEN/THEN from snapshot
       if (snapshot->given()) {
         context.given = snapshot->given()->str();
       }
@@ -52,10 +52,6 @@ CompareTickSnapshot(uint32_t tick, const TestDataConfig *config,
       }
       if (snapshot->then()) {
         context.then = snapshot->then()->str();
-      }
-      // Legacy description support
-      if (snapshot->description()) {
-        context.description = snapshot->description()->c_str();
       }
       context.current_tick = tick;
       if (config->num_ticks() > 0) {

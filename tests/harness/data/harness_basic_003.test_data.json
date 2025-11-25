@@ -1,7 +1,9 @@
 {
   "metadata": {
     "test_name": "sample_test_3",
-    "description": "Third sample test for comprehensive harness testing",
+    "given": "A hidden UI entity with vertical layout and ratioed spacing",
+    "when": "Test harness compares start and expected entity states",
+    "then": "Entity states match exactly",
     "tags": [
       "unit",
       "harness",

@@ -1,7 +1,9 @@
 {
   "metadata": {
     "test_name": "sample_tick_based_execution",
-    "description": "Demonstrates tick-based test execution with coordinated inputs, events, and simulation",
+    "given": "A button UI entity at position (100,100) with collision and action logic",
+    "when": "Mouse moves from (100,100) to (150,125) over 5 ticks with events injected",
+    "then": "Coordinated inputs, events, and simulation execute correctly each tick",
     "tags": [
       "unit",
       "harness",
@@ -13,7 +15,6 @@
   },
   "num_ticks": 5,
   "input_sequence": {
-    "description": "Mouse movement over 5 ticks",
     "inputs": [
       {
         "input_type": "MouseMove",
@@ -25,8 +26,7 @@
           },
           "button": 0
         },
-        "tick": 1,
-        "description": "Start position"
+        "tick": 1
       },
       {
         "input_type": "MouseMove",
@@ -38,8 +38,7 @@
           },
           "button": 0
         },
-        "tick": 3,
-        "description": "Mid-way position"
+        "tick": 3
       },
       {
         "input_type": "MouseMove",
@@ -51,13 +50,11 @@
           },
           "button": 0
         },
-        "tick": 5,
-        "description": "Final position"
+        "tick": 5
       }
     ]
   },
   "event_sequence": {
-    "description": "Events triggered at specific ticks",
     "events": [
       {
         "tick": 1,
@@ -65,8 +62,7 @@
           "event_lifetime": 5,
           "event_type": "EVENT_TEST",
           "event_data_data_type": "NONE"
-        },
-        "description": "Start event at tick 1"
+        }
       },
       {
         "tick": 3,
@@ -74,8 +70,7 @@
           "event_lifetime": 3,
           "event_type": "EVENT_USER_INPUT",
           "event_data_data_type": "NONE"
-        },
-        "description": "Mid event at tick 3"
+        }
       },
       {
         "tick": 5,
@@ -83,26 +78,22 @@
           "event_lifetime": 1,
           "event_type": "EVENT_TEST",
           "event_data_data_type": "NONE"
-        },
-        "description": "End event at tick 5"
+        }
       }
     ]
   },
   "simulation_data": {
-    "description": "Simulation steps executed on every tick",
     "num_ticks": 5,
     "steps": [
       {
         "simulation_type": "Collision",
         "execution_mode": "LogicClass",
-        "logic_class_type": "UICollisionLogic",
-        "description": "Collision check (runs every tick)"
+        "logic_class_type": "UICollisionLogic"
       },
       {
         "simulation_type": "Action",
         "execution_mode": "Function",
-        "function_type": "ProcessButtonElementActions",
-        "description": "Process actions (runs every tick)"
+        "function_type": "ProcessButtonElementActions"
       }
     ]
   },

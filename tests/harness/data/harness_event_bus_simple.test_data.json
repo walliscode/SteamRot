@@ -1,7 +1,9 @@
 {
   "metadata": {
     "test_name": "simple_event_bus_test",
-    "description": "Test basic EventBus state initialization and final comparison",
+    "given": "An event bus with one EVENT_TEST event with lifetime 2",
+    "when": "One tick passes",
+    "then": "Event lifetime is decremented to 1",
     "tags": [
       "unit",
       "event_bus",
@@ -17,7 +19,6 @@
       "entities": []
     },
     "event_bus": {
-      "description": "Initial event bus with 1 event",
       "events": [
         {
           "event_lifetime": 2,
@@ -33,7 +34,6 @@
       "entities": []
     },
     "event_bus": {
-      "description": "Final event bus state after 1 tick (lifetime decremented)",
       "events": [
         {
           "event_lifetime": 1,

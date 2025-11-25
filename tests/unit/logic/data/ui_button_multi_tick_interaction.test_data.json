@@ -1,7 +1,9 @@
 {
   "metadata": {
     "test_name": "ui_button_multi_tick_interaction",
-    "description": "Multi-tick UI button interaction test that chains mouse over collision detection with action processing. Tests full subscriber activation workflow across 2 ticks: (1) Mouse release at (150,125) generates USER_INPUT event which activates subscriber and processes button action, adding response EVENT_TEST to waiting room; (2) Final validation shows EVENT_TEST moved to EventBus. Validates CUserInterface component state transitions and event flow through EventBus and waiting room.",
+    "given": "A visible button with is_mouse_over=false and subscriber listening for EVENT_TOGGLE_UI",
+    "when": "Mouse releases at (150,125) over button across 2 ticks with collision and action processing",
+    "then": "is_mouse_over becomes true, subscriber activates, EVENT_TEST moves from waiting room to EventBus",
     "tags": [
       "unit",
       "logic",
@@ -18,7 +20,6 @@
   },
   "num_ticks": 2,
   "input_sequence": {
-    "description": "Simulated mouse release at tick 1 which generates USER_INPUT event",
     "inputs": [
       {
         "input_type": "MouseRelease",
@@ -30,25 +31,21 @@
           },
           "button": 0
         },
-        "tick": 1,
-        "description": "Release mouse button over button center (button at 100,100 with size 100x50) - generates USER_INPUT event with mouse_released LEFT_CLICK"
+        "tick": 1
       }
     ]
   },
   "simulation_data": {
-    "description": "Simulation steps: collision detection and action processing on every tick",
     "steps": [
       {
         "simulation_type": "Collision",
         "execution_mode": "Function",
-        "function_type": "CheckMouseOverNestedUIElement",
-        "description": "Check mouse collision with UI elements (runs every tick)"
+        "function_type": "CheckMouseOverNestedUIElement"
       },
       {
         "simulation_type": "Action",
         "execution_mode": "Function",
-        "function_type": "ProcessNestedUIActionsAndEvents",
-        "description": "Process UI actions and generate response events (runs every tick)"
+        "function_type": "ProcessNestedUIActionsAndEvents"
       }
     ]
   },
@@ -117,18 +114,18 @@
       ]
     },
     "event_bus": {
-      "description": "Empty EventBus at start",
       "events": []
     },
     "waiting_room": {
-      "description": "Empty waiting room at start",
       "events": []
     }
   },
   "tick_snapshots": [
     {
       "tick": 1,
-      "description": "After tick 1: Mouse release at (150,125) generates USER_INPUT event, collision sets is_mouse_over=true, subscriber is active, ProcessNestedUIActionsAndEvents adds EVENT_TEST to waiting room",
+      "given": "Button with active subscriber and mouse at (150,125)",
+      "when": "Mouse release generates USER_INPUT event and collision sets is_mouse_over=true",
+      "then": "USER_INPUT in EventBus, EVENT_TEST in waiting room with lifetime=2",
       "data_collection": {
         "entity_collection": {
           "entity_memory_pool_size": 5,
@@ -194,7 +191,6 @@
           ]
         },
         "event_bus": {
-          "description": "USER_INPUT event generated and not yet tick down",
           "events": [
             {
               "event_lifetime": 1,
@@ -207,7 +203,6 @@
           ]
         },
         "waiting_room": {
-          "description": "EVENT_TEST in waiting room with lifetime=2",
           "events": [
             {
               "event_lifetime": 2,
@@ -284,7 +279,6 @@
       ]
     },
     "event_bus": {
-      "description": "After tick 2: EVENT_TEST moved from waiting room to EventBus, lifetime decremented to 1",
       "events": [
         {
           "event_lifetime": 1,
@@ -294,7 +288,6 @@
       ]
     },
     "waiting_room": {
-      "description": "Waiting room empty after events moved to EventBus",
       "events": []
     }
   }

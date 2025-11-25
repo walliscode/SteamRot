@@ -1,7 +1,9 @@
 {
   "metadata": {
     "test_name": "pool_comparison_equal",
-    "description": "Two identical entity memory pools for comparison testing",
+    "given": "Entity memory pool with 3 entities (2 UI, 1 grimoire machina)",
+    "when": "Comparing with identical entity memory pool",
+    "then": "Pools match exactly",
     "tags": [
       "unit",
       "entity",

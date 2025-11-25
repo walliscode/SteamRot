@@ -47,11 +47,6 @@ table TickSnapshot {
   /// Comparison happens AFTER simulation steps, BEFORE event bus tick.
   data_collection: DataCollection (required);
   
-  /// @brief Optional human-readable description of this checkpoint
-  /// Used in failure messages to identify which snapshot failed.
-  /// DEPRECATED: Use given/when/then fields instead
-  description: string;
-  
   /// @brief GIVEN: Initial state or preconditions for this checkpoint
   /// Describes what state the system is in before the action
   given: string;
@@ -74,10 +69,6 @@ table TickSnapshot {
 table TestMetadata {
   /// @brief Human-readable name for the test case
   test_name: string (required);
-  
-  /// @brief Optional description of what the test validates
-  /// DEPRECATED: Use given/when/then fields instead
-  description: string;
   
   /// @brief GIVEN: Initial state or preconditions for the test
   /// Describes what state the system is in before the test begins
