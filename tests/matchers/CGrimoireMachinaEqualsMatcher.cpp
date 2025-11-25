@@ -22,6 +22,11 @@ CGrimoireMachinaEqualsMatcher::CGrimoireMachinaEqualsMatcher(
     : ComponentMatcherBase<CGrimoireMachina>(expected) {}
 
 /////////////////////////////////////////////////
+CGrimoireMachinaEqualsMatcher::CGrimoireMachinaEqualsMatcher(
+    const CGrimoireMachina &expected, size_t entity_index)
+    : ComponentMatcherBase<CGrimoireMachina>(expected, entity_index) {}
+
+/////////////////////////////////////////////////
 bool CGrimoireMachinaEqualsMatcher::match(
     const CGrimoireMachina &actual) const {
   m_mismatch_description.clear();

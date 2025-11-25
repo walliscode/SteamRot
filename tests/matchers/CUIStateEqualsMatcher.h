@@ -37,6 +37,14 @@ public:
   explicit CUIStateEqualsMatcher(const CUIState &expected);
 
   /////////////////////////////////////////////////
+  /// @brief Constructor for CUIStateEqualsMatcher with entity index
+  ///
+  /// @param expected Expected CUIState object to compare against
+  /// @param entity_index Index of the entity in the EntityMemoryPool
+  /////////////////////////////////////////////////
+  CUIStateEqualsMatcher(const CUIState &expected, size_t entity_index);
+
+  /////////////////////////////////////////////////
   /// @brief Match method to compare actual CUIState with expected
   ///
   /// @param actual CUIState object to compare
@@ -53,6 +61,18 @@ public:
 /////////////////////////////////////////////////
 inline CUIStateEqualsMatcher EqualsCUIState(const CUIState &expected) {
   return CUIStateEqualsMatcher(expected);
+}
+
+/////////////////////////////////////////////////
+/// @brief Helper function to create CUIStateEqualsMatcher with entity index
+///
+/// @param expected Expected CUIState object
+/// @param entity_index Index of the entity in the EntityMemoryPool
+/// @return CUIStateEqualsMatcher instance
+/////////////////////////////////////////////////
+inline CUIStateEqualsMatcher EqualsCUIState(const CUIState &expected, 
+                                            size_t entity_index) {
+  return CUIStateEqualsMatcher(expected, entity_index);
 }
 
 /////////////////////////////////////////////////

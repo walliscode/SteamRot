@@ -24,6 +24,11 @@ CUserInterfaceEqualsMatcher::CUserInterfaceEqualsMatcher(
     : ComponentMatcherBase<CUserInterface>(expected) {}
 
 /////////////////////////////////////////////////
+CUserInterfaceEqualsMatcher::CUserInterfaceEqualsMatcher(
+    const CUserInterface &expected, size_t entity_index)
+    : ComponentMatcherBase<CUserInterface>(expected, entity_index) {}
+
+/////////////////////////////////////////////////
 bool CUserInterfaceEqualsMatcher::match(const CUserInterface &actual) const {
   m_mismatch_description.clear();
   std::ostringstream oss;

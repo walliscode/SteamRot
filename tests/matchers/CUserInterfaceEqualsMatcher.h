@@ -37,6 +37,15 @@ public:
   explicit CUserInterfaceEqualsMatcher(const CUserInterface &expected);
 
   /////////////////////////////////////////////////
+  /// @brief Constructor for CUserInterfaceEqualsMatcher with entity index
+  ///
+  /// @param expected Expected CUserInterface object to compare against
+  /// @param entity_index Index of the entity in the EntityMemoryPool
+  /////////////////////////////////////////////////
+  CUserInterfaceEqualsMatcher(const CUserInterface &expected, 
+                              size_t entity_index);
+
+  /////////////////////////////////////////////////
   /// @brief Match method to compare actual CUserInterface with expected
   ///
   /// @param actual CUserInterface object to compare
@@ -54,6 +63,18 @@ public:
 inline CUserInterfaceEqualsMatcher
 EqualsCUserInterface(const CUserInterface &expected) {
   return CUserInterfaceEqualsMatcher(expected);
+}
+
+/////////////////////////////////////////////////
+/// @brief Helper function to create CUserInterfaceEqualsMatcher with entity index
+///
+/// @param expected Expected CUserInterface object
+/// @param entity_index Index of the entity in the EntityMemoryPool
+/// @return CUserInterfaceEqualsMatcher instance
+/////////////////////////////////////////////////
+inline CUserInterfaceEqualsMatcher
+EqualsCUserInterface(const CUserInterface &expected, size_t entity_index) {
+  return CUserInterfaceEqualsMatcher(expected, entity_index);
 }
 
 } // namespace steamrot::tests

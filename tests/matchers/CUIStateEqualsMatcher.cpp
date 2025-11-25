@@ -23,6 +23,11 @@ CUIStateEqualsMatcher::CUIStateEqualsMatcher(const CUIState &expected)
     : ComponentMatcherBase<CUIState>(expected) {}
 
 /////////////////////////////////////////////////
+CUIStateEqualsMatcher::CUIStateEqualsMatcher(const CUIState &expected,
+                                             size_t entity_index)
+    : ComponentMatcherBase<CUIState>(expected, entity_index) {}
+
+/////////////////////////////////////////////////
 bool CUIStateEqualsMatcher::match(const CUIState &actual) const {
   m_mismatch_description.clear();
   std::ostringstream oss;

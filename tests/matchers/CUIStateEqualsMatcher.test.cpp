@@ -37,7 +37,7 @@ TEST_CASE("CUIStateEqualsMatcher describe is as expected on success",
   auto matcher = steamrot::tests::EqualsCUIState(expected);
 
   std::ostringstream oss;
-  oss << conmat::Header(conmat::TestPassed() + "CUIState Match:", 3) << "\n";
+  oss << conmat::Header(conmat::TestPassed() + " Entity [?] CUIState Match:", 3) << "\n";
 
   REQUIRE(matcher.describe() == oss.str());
 }
@@ -53,7 +53,7 @@ TEST_CASE("CUIStateEqualsMatcher describe is as expected on failure",
   matcher.match(actual);
 
   std::ostringstream oss;
-  oss << conmat::Header(conmat::TestFailed() + "CUIState Match:", 3) << "\n";
+  oss << conmat::Header(conmat::TestFailed() + " Entity [?] CUIState Match:", 3) << "\n";
   oss << conmat::Indent(1) << conmat::TestFailed() << "m_active:"
       << "\n";
   oss << conmat::Indent(2)
