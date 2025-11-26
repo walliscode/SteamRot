@@ -178,18 +178,22 @@
       },
       {
         "c_ui_state": {
-          "mappings": [
+          "ui_states": [
             {
               "state_key": "new_construct_menu_off",
-              "ui_names_on": ["initial_crafting_menu"],
-              "ui_names_off": ["new_construct_menu"],
-              "starting_state": "true"
+              "state_value": true,
+              "state_to_ui_visibility": {
+                "ui_names_on": ["initial_crafting_menu"],
+                "ui_names_off": ["new_construct_menu"]
+              }
             },
             {
               "state_key": "new_construct_menu_on",
-              "ui_names_on": ["new_construct_menu"],
-              "ui_names_off": ["initial_crafting_menu"],
-              "starting_state": "false"
+              "state_value": false,
+              "state_to_ui_visibility": {
+                "ui_names_on": ["new_construct_menu"],
+                "ui_names_off": ["initial_crafting_menu"]
+              }
             }
           ]
         }
