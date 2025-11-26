@@ -111,22 +111,24 @@
         },
         {
           "c_ui_state": {
-            "mappings": [
+            "ui_states": [
               {
                 "state_key": "menu_state",
-                "ui_names_on": ["main_menu", "play_button"],
-                "ui_names_off": ["settings_panel", "quit_button"],
-                "starting_state": "false"
-              }
-            ],
-            "subscribers": [
-              {
-                "event_type_data": "EVENT_TOGGLE_UI",
-                "trigger_data_type": "UserInterfaceNameData",
-                "trigger_data": {
-                  "id": "menu_state"
+                "state_value": "false",
+                "state_to_ui_visibility": {
+                  "ui_names_on": ["main_menu", "play_button"],
+                  "ui_names_off": ["settings_panel", "quit_button"]
                 },
-                "active": true
+                "subscribers": [
+                  {
+                    "event_type_data": "EVENT_TOGGLE_UI",
+                    "trigger_data_type": "UserInterfaceNameData",
+                    "trigger_data": {
+                      "id": "menu_state"
+                    },
+                    "active": true
+                  }
+                ]
               }
             ]
           }
@@ -232,22 +234,24 @@
             },
             {
               "c_ui_state": {
-                "mappings": [
+                "ui_states": [
                   {
                     "state_key": "menu_state",
-                    "ui_names_on": ["main_menu", "play_button"],
-                    "ui_names_off": ["settings_panel", "quit_button"],
-                    "starting_state": "true"
-                  }
-                ],
-                "subscribers": [
-                  {
-                    "event_type_data": "EVENT_TOGGLE_UI",
-                    "trigger_data_type": "UserInterfaceNameData",
-                    "trigger_data": {
-                      "id": "menu_state"
+                    "state_value": "true",
+                    "state_to_ui_visibility": {
+                      "ui_names_on": ["main_menu", "play_button"],
+                      "ui_names_off": ["settings_panel", "quit_button"]
                     },
-                    "active": false
+                    "subscribers": [
+                      {
+                        "event_type_data": "EVENT_TOGGLE_UI",
+                        "trigger_data_type": "UserInterfaceNameData",
+                        "trigger_data": {
+                          "id": "menu_state"
+                        },
+                        "active": false
+                      }
+                    ]
                   }
                 ]
               }
@@ -353,22 +357,24 @@
             },
             {
               "c_ui_state": {
-                "mappings": [
+                "ui_states": [
                   {
                     "state_key": "menu_state",
-                    "ui_names_on": ["main_menu", "play_button"],
-                    "ui_names_off": ["settings_panel", "quit_button"],
-                    "starting_state": "true"
-                  }
-                ],
-                "subscribers": [
-                  {
-                    "event_type_data": "EVENT_TOGGLE_UI",
-                    "trigger_data_type": "UserInterfaceNameData",
-                    "trigger_data": {
-                      "id": "menu_state"
+                    "state_value": "false",
+                    "state_to_ui_visibility": {
+                      "ui_names_on": ["main_menu", "play_button"],
+                      "ui_names_off": ["settings_panel", "quit_button"]
                     },
-                    "active": false
+                    "subscribers": [
+                      {
+                        "event_type_data": "EVENT_TOGGLE_UI",
+                        "trigger_data_type": "UserInterfaceNameData",
+                        "trigger_data": {
+                          "id": "menu_state"
+                        },
+                        "active": false
+                      }
+                    ]
                   }
                 ]
               }
@@ -472,22 +478,24 @@
         },
         {
           "c_ui_state": {
-            "mappings": [
+            "ui_states": [
               {
                 "state_key": "menu_state",
-                "ui_names_on": ["main_menu", "play_button"],
-                "ui_names_off": ["settings_panel", "quit_button"],
-                "starting_state": "true"
-              }
-            ],
-            "subscribers": [
-              {
-                "event_type_data": "EVENT_TOGGLE_UI",
-                "trigger_data_type": "UserInterfaceNameData",
-                "trigger_data": {
-                  "id": "menu_state"
+                "state_value": "true",
+                "state_to_ui_visibility": {
+                  "ui_names_on": ["main_menu", "play_button"],
+                  "ui_names_off": ["settings_panel", "quit_button"]
                 },
-                "active": false
+                "subscribers": [
+                  {
+                    "event_type_data": "EVENT_TOGGLE_UI",
+                    "trigger_data_type": "UserInterfaceNameData",
+                    "trigger_data": {
+                      "id": "menu_state"
+                    },
+                    "active": false
+                  }
+                ]
               }
             ]
           }

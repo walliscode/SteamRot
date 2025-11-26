@@ -17,6 +17,7 @@
 #include "user_interface_generated.h"
 #include <expected>
 #include <variant>
+#include <vector>
 
 namespace steamrot {
 /////////////////////////////////////////////////
@@ -122,8 +123,8 @@ FlatbuffersConfigurator::ConfigureComponent(
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 FlatbuffersConfigurator::ConfigureComponent(
-    const UIStateData *ui_state_data, CUIState &ui_state_component,
-    const EntityMemoryPool &entity_memory_pool) {
+    const UIStateCollectionData *ui_state_collection_data,
+    CUIState &ui_state_component, const EntityMemoryPool &entity_memory_pool) {
 
   // configure the underlying Component type
   auto configure_result =
@@ -132,81 +133,66 @@ FlatbuffersConfigurator::ConfigureComponent(
   if (!configure_result.has_value())
     return std::unexpected(configure_result.error());
 
-  // check that mappings exist
-  if (!ui_state_data->mappings()) {
-    FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
-                       "No mappings found in UIStateData."};
-    return std::unexpected(fail_info);
-  }
+  // cycle through each UIStateData in the collection
+  for (auto ui_state_data : *ui_state_collection_data->ui_states()) {
 
-  // Build a map of UI names to entity indices for quick lookup
-  std::unordered_map<std::string, size_t> ui_name_to_index;
-  const auto &ui_components =
-      std::get<std::vector<CUserInterface>>(entity_memory_pool);
+    // pull out state key
+    std::string state_key = ui_state_data->state_key()->str();
 
-  for (size_t i = 0; i < ui_components.size(); ++i) {
-    if (ui_components[i].m_active) {
-      ui_name_to_index[ui_components[i].m_name] = i;
-    }
-  }
-
-  // Process each mapping
-  for (const auto *mapping : *ui_state_data->mappings()) {
-    if (!mapping) {
-      continue;
-    }
-
-    // Check state_key exists
-    if (!mapping->state_key()) {
+    //
+    // check that data for mapping ui visi
+    if (!ui_state_data->state_to_ui_visibility()) {
       FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
-                         "State key not found in UIStateMapping."};
+                         "No mappings found in UIStateData for ui visibility."};
       return std::unexpected(fail_info);
     }
 
-    std::string state_key = mapping->state_key()->str();
+    // get all UI components from the entity memory pool
+    const auto &ui_components =
+        entity::memory::GetComponentVector<CUserInterface>(entity_memory_pool);
+
     UIVisibilityState visibility_state;
 
-    // Process ui_names_on (UIs that should be visible)
-    if (mapping->ui_names_on()) {
-      for (const auto *ui_name_fb : *mapping->ui_names_on()) {
-        if (!ui_name_fb) {
-          continue;
+    // check that there are ui names to map
+    if (ui_state_data->state_to_ui_visibility()->ui_names_on()) {
+
+      std::vector<std::string> ui_names_vec;
+      // create a vector of ui names for easier interaction
+      for (const auto &ui_name :
+           *ui_state_data->state_to_ui_visibility()->ui_names_on()) {
+
+        ui_names_vec.push_back(ui_name->str());
+      }
+
+      for (size_t i = 0; i < ui_components.size(); ++i) {
+        const auto &ui_component = ui_components[i];
+
+        // check if name exists in the ui names vector
+        if (std::find(ui_names_vec.begin(), ui_names_vec.end(),
+                      ui_component.m_name) != ui_names_vec.end()) {
+
+          // if it does, add the index to the on list
+          visibility_state.m_ui_indices_on.push_back(i);
         }
-
-        std::string ui_name = ui_name_fb->str();
-
-        // Look up the index for this UI name
-        auto it = ui_name_to_index.find(ui_name);
-        if (it == ui_name_to_index.end()) {
-          std::string error_msg = "UI component with name '" + ui_name +
-                                  "' not found in ui_names_on.";
-          FailInfo fail_info{FailMode::FlatbuffersDataNotFound, error_msg};
-          return std::unexpected(fail_info);
-        }
-
-        visibility_state.m_ui_indices_on.push_back(it->second);
       }
     }
 
-    // Process ui_names_off (UIs that should be hidden)
-    if (mapping->ui_names_off()) {
-      for (const auto *ui_name_fb : *mapping->ui_names_off()) {
-        if (!ui_name_fb) {
-          continue;
+    // repeat for ui names off
+    if (ui_state_data->state_to_ui_visibility()->ui_names_off()) {
+      std::vector<std::string> ui_names_vec;
+      // create a vector of ui names for easier interaction
+      for (const auto &ui_name :
+           *ui_state_data->state_to_ui_visibility()->ui_names_off()) {
+        ui_names_vec.push_back(ui_name->str());
+      }
+      for (size_t i = 0; i < ui_components.size(); ++i) {
+        const auto &ui_component = ui_components[i];
+        // check if name exists in the ui names vector
+        if (std::find(ui_names_vec.begin(), ui_names_vec.end(),
+                      ui_component.m_name) != ui_names_vec.end()) {
+          // if it does, add the index to the off list
+          visibility_state.m_ui_indices_off.push_back(i);
         }
-
-        std::string ui_name = ui_name_fb->str();
-
-        // Look up the index for this UI name
-        auto it = ui_name_to_index.find(ui_name);
-        if (it == ui_name_to_index.end()) {
-          std::string error_msg = "UI component with name '" + ui_name +
-                                  "' not found in ui_names_off.";
-          FailInfo fail_info{FailMode::FlatbuffersDataNotFound, error_msg};
-          return std::unexpected(fail_info);
-        }
-
-        visibility_state.m_ui_indices_off.push_back(it->second);
       }
     }
 
@@ -214,22 +200,23 @@ FlatbuffersConfigurator::ConfigureComponent(
     ui_state_component.m_state_to_ui_visibility[state_key] = visibility_state;
 
     // if starting state is provided, set it
-    if (mapping->starting_state()) {
-      ui_state_component.m_state_values[state_key] = mapping->starting_state();
-
-      // else Initialize state value to false
+    if (ui_state_data->state_value()) {
+      ui_state_component.m_state_values[state_key] =
+          ui_state_data->state_value();
     } else {
+      // default to false
       ui_state_component.m_state_values[state_key] = false;
     }
 
     // Create SubscriberFactory for registering subscribers
     SubscriberFactory subscriber_factory(m_event_handler);
+
     // Create and register subscribers if provided
     if (ui_state_data->subscribers()) {
-      std::vector<std::shared_ptr<Subscriber>> subscribers;
 
       for (const auto *subscriber_data : *ui_state_data->subscribers()) {
 
+        // skip null subscriber data
         if (!subscriber_data) {
           continue;
         }
@@ -241,18 +228,12 @@ FlatbuffersConfigurator::ConfigureComponent(
           return std::unexpected(subscriber_result.error());
         }
 
-        if (subscriber_data->active())
-          auto active_result = subscriber_result.value()->SetActive();
-
-        subscribers.push_back(subscriber_result.value());
+        // Store the subscriber
+        ui_state_component.m_state_subscribers[state_key].push_back(
+            subscriber_result.value());
       }
-
-      // Store all subscribers for this state key
-      ui_state_component.m_state_subscribers[state_key] =
-          std::move(subscribers);
     }
   }
-
   return std::monostate{};
 }
 

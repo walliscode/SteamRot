@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "test_name": "UpdateCUserInterfaceVisibilityFromCUIState reacts to EVENT_TOGGLE_UI - 4 UIs controlled by 1 CUIState",
+    "test_name": "UI_Visibility_From_Event_Toggle_UI",
     "description": "Test UpdateCUserInterfaceVisibilityFromCUIState function - 4 UI entities controlled by 1 CUIState entity that manages visibility of 2 of them",
     "tags": ["unit", "logic", "ui"],
     "expected_to_pass": true,
@@ -111,22 +111,24 @@
         },
         {
           "c_ui_state": {
-            "mappings": [
+            "ui_states": [
               {
                 "state_key": "menu_state",
-                "ui_names_on": ["main_menu", "play_button"],
-                "ui_names_off": ["settings_panel", "quit_button"],
-                "starting_state": "false"
-              }
-            ],
-            "subscribers": [
-              {
-                "event_type_data": "EVENT_TOGGLE_UI",
-                "trigger_data_type": "UserInterfaceNameData",
-                "trigger_data": {
-                  "id": "menu_state"
+                "state_value": "false",
+                "state_to_ui_visibility": {
+                  "ui_names_on": ["main_menu", "play_button"],
+                  "ui_names_off": ["settings_panel", "quit_button"]
                 },
-                "active": false
+                "subscribers": [
+                  {
+                    "event_type_data": "EVENT_TOGGLE_UI",
+                    "trigger_data_type": "UserInterfaceNameData",
+                    "trigger_data": {
+                      "id": "menu_state"
+                    },
+                    "active": false
+                  }
+                ]
               }
             ]
           }
@@ -246,22 +248,24 @@
             },
             {
               "c_ui_state": {
-                "mappings": [
+                "ui_states": [
                   {
                     "state_key": "menu_state",
-                    "ui_names_on": ["main_menu", "play_button"],
-                    "ui_names_off": ["settings_panel", "quit_button"],
-                    "starting_state": "true"
-                  }
-                ],
-                "subscribers": [
-                  {
-                    "event_type_data": "EVENT_TOGGLE_UI",
-                    "trigger_data_type": "UserInterfaceNameData",
-                    "trigger_data": {
-                      "id": "menu_state"
+                    "state_value": "false",
+                    "state_to_ui_visibility": {
+                      "ui_names_on": ["main_menu", "play_button"],
+                      "ui_names_off": ["settings_panel", "quit_button"]
                     },
-                    "active": false
+                    "subscribers": [
+                      {
+                        "event_type_data": "EVENT_TOGGLE_UI",
+                        "trigger_data_type": "UserInterfaceNameData",
+                        "trigger_data": {
+                          "id": "menu_state"
+                        },
+                        "active": false
+                      }
+                    ]
                   }
                 ]
               }
@@ -377,22 +381,24 @@
         },
         {
           "c_ui_state": {
-            "mappings": [
+            "ui_states": [
               {
                 "state_key": "menu_state",
-                "ui_names_on": ["main_menu", "play_button"],
-                "ui_names_off": ["settings_panel", "quit_button"],
-                "starting_state": "true"
-              }
-            ],
-            "subscribers": [
-              {
-                "event_type_data": "EVENT_TOGGLE_UI",
-                "trigger_data_type": "UserInterfaceNameData",
-                "trigger_data": {
-                  "id": "menu_state"
+                "state_value": "false",
+                "state_to_ui_visibility": {
+                  "ui_names_on": ["main_menu", "play_button"],
+                  "ui_names_off": ["settings_panel", "quit_button"]
                 },
-                "active": false
+                "subscribers": [
+                  {
+                    "event_type_data": "EVENT_TOGGLE_UI",
+                    "trigger_data_type": "UserInterfaceNameData",
+                    "trigger_data": {
+                      "id": "menu_state"
+                    },
+                    "active": false
+                  }
+                ]
               }
             ]
           }

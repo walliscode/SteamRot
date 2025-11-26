@@ -8,7 +8,7 @@ table EntityData{
   index: uint32;
   c_user_interface: UserInterfaceData;
   c_grimoire_machina: GrimoireMachinaData;
-  c_ui_state: UIStateData;
+  c_ui_state: UIStateCollectionData;
 
   }
 
