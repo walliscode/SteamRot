@@ -43,8 +43,7 @@ ExecuteEventTestData(const EventTestData *event_data, TestFixture &fixture) {
         packet_data->event_data_data_as_UserInputBitsetData();
     if (input_data) {
       // Use the existing factory function from event_factory.h
-      auto input_bitset_result =
-          event::CreateUserInputBitset(*input_data);
+      auto input_bitset_result = event::CreateUserInputBitset(*input_data);
 
       if (!input_bitset_result.has_value()) {
         return std::unexpected(input_bitset_result.error());
@@ -71,7 +70,6 @@ ExecuteEventTestData(const EventTestData *event_data, TestFixture &fixture) {
       event_packet.m_event_data = scene_packet;
     }
   }
-  bookmark of failure;
 
   // Add event to the event handler
   EventHandler &event_handler = fixture.GetGameResources().event_handler;
