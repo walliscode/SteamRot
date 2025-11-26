@@ -9,7 +9,8 @@
 #include "event_simulation.h"
 #include "EventPacket.h"
 #include "event_factory.h"
-#include "uuid.h"
+#include "event_packet_data_generated.h"
+#include "events_generated.h"
 #include <iostream>
 #include <set>
 
@@ -19,6 +20,8 @@ namespace steamrot::tests {
 std::expected<std::monostate, FailInfo>
 ExecuteEventTestData(const EventTestData *event_data, TestFixture &fixture) {
 
+  std::cout << "Executing EventTestData for tick " << event_data->tick()
+            << std::endl;
   // Validate event data
   if (!event_data) {
     return std::unexpected(
@@ -36,42 +39,18 @@ ExecuteEventTestData(const EventTestData *event_data, TestFixture &fixture) {
   EventPacket event_packet(packet_data->event_lifetime());
   event_packet.m_event_type = packet_data->event_type();
 
-  // Handle different event data types
-  if (packet_data->event_data_data_type() ==
-      EventDataData_UserInputBitsetData) {
-    const UserInputBitsetData *input_data =
-        packet_data->event_data_data_as_UserInputBitsetData();
-    if (input_data) {
-      // Use the existing factory function from event_factory.h
-      auto input_bitset_result =
-          event::CreateUserInputBitset(*input_data);
+  // Set EventData
+  auto event_data_creation_result = event::CreateEventData(
+      packet_data->event_data_data_type(), packet_data->event_data_data());
 
-      if (!input_bitset_result.has_value()) {
-        return std::unexpected(input_bitset_result.error());
-      }
-
-      event_packet.m_event_data = input_bitset_result.value();
-    }
-  } else if (packet_data->event_data_data_type() ==
-             EventDataData_SceneChangePacketData) {
-    const SceneChangePacketData *scene_data =
-        packet_data->event_data_data_as_SceneChangePacketData();
-    if (scene_data) {
-      // SceneChangePacket is std::pair<std::optional<uuids::uuid>, SceneType>
-      std::optional<uuids::uuid> uuid_opt;
-      if (scene_data->uuid()) {
-        // Parse UUID string if provided
-        std::string uuid_str = scene_data->uuid()->str();
-        if (uuids::uuid::is_valid_uuid(uuid_str.c_str())) {
-          uuid_opt = uuids::uuid::from_string(uuid_str.c_str());
-        }
-      }
-      SceneChangePacket scene_packet =
-          std::make_pair(uuid_opt, scene_data->scene_type());
-      event_packet.m_event_data = scene_packet;
-    }
+  // Check for errors during EventData creation, if not, set the EventData
+  if (!event_data_creation_result.has_value()) {
+    return std::unexpected(event_data_creation_result.error());
+  } else {
+    event_packet.m_event_data = event_data_creation_result.value();
+    std::cout << "Created EventData of type " << EnumNamesEventDataData()
+              << " for EventPacket" << std::endl;
   }
-  bookmark of failure;
 
   // Add event to the event handler
   EventHandler &event_handler = fixture.GetGameResources().event_handler;

@@ -25,7 +25,7 @@ EventDataEqualsMatcher::GetNameForEventDataIndex(size_t index) const {
   case 2:
     return "SceneChangePacket";
   case 3:
-    return "UserInterfaceElementName";
+    return "UserInterfaceName";
   default:
     return "Unknown";
   }

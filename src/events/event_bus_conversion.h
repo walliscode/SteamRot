@@ -12,7 +12,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "EventHandler.h"
-#include "EventPacket.h"
 #include "FailInfo.h"
 #include "event_bus_data_generated.h"
 #include <expected>

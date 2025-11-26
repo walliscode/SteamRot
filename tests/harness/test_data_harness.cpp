@@ -19,6 +19,7 @@
 #include <filesystem>
 #include <format>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 
 namespace steamrot::tests {
@@ -149,6 +150,9 @@ CreateFixtureFromTestData(const TestDataConfig *config,
   // Configure EventBus from start_event_bus if present in start_data_collection
   if (config->start_data_collection() &&
       config->start_data_collection()->event_bus()) {
+
+    std::cout << "Configuring EventHandler from start_data_collection event bus"
+              << std::endl;
     auto configure_result = event::ConfigureEventHandlerFromEventBusData(
         config->start_data_collection()->event_bus(),
         fixture.GetGameResources().event_handler);
