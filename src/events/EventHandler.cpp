@@ -18,7 +18,7 @@ EventHandler::RegisterSubscriber(std::shared_ptr<Subscriber> subscriber) {
 
   // get the event type the subscriber is interested in and add it to the
   // register
-  auto event_type = subscriber->GetRegistrationInfo().first;
+  auto event_type = subscriber->m_trigger_event_type;
   m_subscriber_register[event_type].push_back(subscriber);
 
   return std::monostate{};
@@ -181,14 +181,14 @@ void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
     return;
 
   // if the Subscriber has trigger data compare against the event data
-  if (locked_subscriber->GetTriggerData() &&
-      (locked_subscriber->GetTriggerData().value() != event_data)) {
+  if (locked_subscriber->m_trigger_event_data.has_value() &&
+      (locked_subscriber->m_trigger_event_data.value() != event_data)) {
     std::cout << "Subscriber Trigger Data does not match Event Data"
               << std::endl;
 
     std::cout << "Expected Event data is data from Subscriber" << std::endl;
     auto matcher =
-        tests::EqualsEventData(locked_subscriber->GetTriggerData().value());
+        tests::EqualsEventData(locked_subscriber->m_trigger_event_data.value());
 
     if (!matcher.match(event_data)) {
       std::cout << "Mismatch Description: " << matcher.describe() << std::endl;
@@ -197,11 +197,8 @@ void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
   }
 
   std::cout << "Updating Subscriber of type "
-            << EnumNameEventType(locked_subscriber->GetEventType());
-  // update any releveant information for the subscriber
-  auto activate_result = locked_subscriber->SetActive();
-
-  // copy the event data to the subscriber
-  locked_subscriber->SetEventData(event_data);
+            << EnumNameEventType(locked_subscriber->m_trigger_event_type);
+  // activate the subscriber
+  locked_subscriber->m_active = true;
 }
 } // namespace steamrot

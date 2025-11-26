@@ -28,7 +28,7 @@ void ProcessUIActionsAndEvents(UIElement &ui_element,
   }
 
   // if there is a subscription, then it must be active
-  if (!ui_element.subscription->IsActive()) {
+  if (!ui_element.subscription->m_active) {
     return;
   }
 
@@ -43,7 +43,7 @@ void ProcessUIActionsAndEvents(UIElement &ui_element,
   }
 
   // FINALLY set the subscriber to inactive
-  auto set_inactive_result = ui_element.subscription->SetInactive();
+  ui_element.subscription->m_active = false;
 }
 
 /////////////////////////////////////////////////
@@ -58,7 +58,7 @@ void ProcessNestedUIActionsAndEvents(UIElement &ui_element,
 
     // Check if this child has an active subscription before processing
     bool child_has_active_subscription =
-        child->subscription && child->subscription->IsActive();
+        child->subscription && child->subscription->m_active;
 
     // go as deep as possible first, this will stop when no children are
     // detected

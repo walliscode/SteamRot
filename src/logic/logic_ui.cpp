@@ -49,7 +49,7 @@ void UpdateCUserInterfaceVisibilityFromCUIState(
     // bool to track if all subscribers are active
     bool all_active = true;
     for (const auto &subscriber : subscriber_vec) {
-      if (!subscriber->IsActive()) {
+      if (!subscriber->m_active) {
         all_active = false;
         // break early if any subscriber is inactive
         break;
@@ -101,7 +101,7 @@ void UpdateCUserInterfaceVisibilityFromCUIState(
 
     // finally, reset all subscribers to inactive for next check
     for (const auto &subscriber : subscriber_vec) {
-      auto active_result = subscriber->SetInactive();
+      subscriber->m_active = false;
     }
   }
 }

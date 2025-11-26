@@ -324,9 +324,14 @@ TEST_CASE("SceneManager loads TitleScene when Subscriber is turned active",
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestFixture test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
-  // Create and register a Subscriber for EventType_EVENT_CHANGE_SCENE
+
+  // Create SceneChangeData for title scene
+  steamrot::SceneChangePacket scene_change_data{
+      uuids::uuid{}, steamrot::SceneType::SceneType_TITLE};
+
+  // Create and register a Subscriber with trigger data
   auto subscriber = std::make_shared<steamrot::Subscriber>(
-      steamrot::EventType_EVENT_CHANGE_SCENE);
+      steamrot::EventType_EVENT_CHANGE_SCENE, scene_change_data);
   auto register_result = scene_manager.RegisterSubscriber(subscriber);
   if (!register_result.has_value()) {
     FAIL("Failed to register subscriber: " + register_result.error().message);
@@ -335,14 +340,8 @@ TEST_CASE("SceneManager loads TitleScene when Subscriber is turned active",
   // check that no scenes are loaded initially
   REQUIRE(scene_manager.GetScenes().empty());
 
-  // Activate the Subscriber with SceneChangeData to load Title scene
-  steamrot::SceneChangePacket scene_change_data{
-      uuids::uuid{}, steamrot::SceneType::SceneType_TITLE};
-  auto set_active_result = subscriber->SetActive();
-  if (!set_active_result.has_value()) {
-    FAIL("Failed to activate subscriber: " + set_active_result.error().message);
-  }
-  subscriber->SetEventData(scene_change_data);
+  // Activate the subscriber
+  subscriber->m_active = true;
 
   // Process subscriptions in SceneManager
   auto process_result = scene_manager.ProcessSubscriptions();
@@ -361,23 +360,24 @@ TEST_CASE("SceneManager loads CraftingScene when Subscriber is turned active",
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestFixture test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
-  // Create and register a Subscriber for EventType_EVENT_CHANGE_SCENE
+
+  // Create SceneChangeData for crafting scene
+  steamrot::SceneChangePacket scene_change_data{
+      uuids::uuid{}, steamrot::SceneType::SceneType_CRAFTING};
+
+  // Create and register a Subscriber with trigger data
   auto subscriber = std::make_shared<steamrot::Subscriber>(
-      steamrot::EventType_EVENT_CHANGE_SCENE);
+      steamrot::EventType_EVENT_CHANGE_SCENE, scene_change_data);
   auto register_result = scene_manager.RegisterSubscriber(subscriber);
   if (!register_result.has_value()) {
     FAIL("Failed to register subscriber: " + register_result.error().message);
   }
   // check that no scenes are loaded initially
   REQUIRE(scene_manager.GetScenes().empty());
-  // Activate the Subscriber with SceneChangeData to load Crafting scene
-  steamrot::SceneChangePacket scene_change_data{
-      uuids::uuid{}, steamrot::SceneType::SceneType_CRAFTING};
-  auto set_active_result = subscriber->SetActive();
-  if (!set_active_result.has_value()) {
-    FAIL("Failed to activate subscriber: " + set_active_result.error().message);
-  }
-  subscriber->SetEventData(scene_change_data);
+
+  // Activate the subscriber
+  subscriber->m_active = true;
+
   // Process subscriptions in SceneManager
   auto process_result = scene_manager.ProcessSubscriptions();
   if (!process_result.has_value()) {
@@ -396,7 +396,8 @@ TEST_CASE("SceneManager provides error when Subscriber is active but no "
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestFixture test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
-  // Create and register a Subscriber for EventType_EVENT_CHANGE_SCENE
+  // Create and register a Subscriber for EventType_EVENT_CHANGE_SCENE without
+  // trigger data
   auto subscriber = std::make_shared<steamrot::Subscriber>(
       steamrot::EventType_EVENT_CHANGE_SCENE);
   auto register_result = scene_manager.RegisterSubscriber(subscriber);
@@ -405,11 +406,9 @@ TEST_CASE("SceneManager provides error when Subscriber is active but no "
   }
   // check that no scenes are loaded initially
   REQUIRE(scene_manager.GetScenes().empty());
-  // Activate the Subscriber without setting SceneChangeData
-  auto set_active_result = subscriber->SetActive();
-  if (!set_active_result.has_value()) {
-    FAIL("Failed to activate subscriber: " + set_active_result.error().message);
-  }
+  // Activate the Subscriber without setting trigger data
+  subscriber->m_active = true;
+
   // Process subscriptions in SceneManager
   auto process_result = scene_manager.ProcessSubscriptions();
   REQUIRE(!process_result.has_value());
@@ -425,9 +424,13 @@ TEST_CASE("SceneManager::UpdateSceneManager cause scene change via subscribers",
   test_context.Intialize();
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
 
-  // Create and register a Subscriber for EventType_EVENT_CHANGE_SCENE
+  // Create SceneChangeData for title scene
+  steamrot::SceneChangePacket scene_change_data{
+      uuids::uuid{}, steamrot::SceneType::SceneType_TITLE};
+
+  // Create and register a Subscriber with trigger data
   auto subscriber = std::make_shared<steamrot::Subscriber>(
-      steamrot::EventType_EVENT_CHANGE_SCENE);
+      steamrot::EventType_EVENT_CHANGE_SCENE, scene_change_data);
   auto register_result = scene_manager.RegisterSubscriber(subscriber);
   if (!register_result.has_value()) {
     FAIL("Failed to register subscriber: " + register_result.error().message);
@@ -436,14 +439,9 @@ TEST_CASE("SceneManager::UpdateSceneManager cause scene change via subscribers",
   // check that no scenes are loaded initially
   REQUIRE(scene_manager.GetScenes().empty());
 
-  // Activate the Subscriber with SceneChangeData to load Title scene
-  steamrot::SceneChangePacket scene_change_data{
-      uuids::uuid{}, steamrot::SceneType::SceneType_TITLE};
-  auto set_active_result = subscriber->SetActive();
-  if (!set_active_result.has_value()) {
-    FAIL("Failed to activate subscriber: " + set_active_result.error().message);
-  }
-  subscriber->SetEventData(scene_change_data);
+  // Activate the subscriber
+  subscriber->m_active = true;
+
   // Call UpdateSceneManager in SceneManager
   scene_manager.UpdateSceneManager();
   // Check that the Title scene was loaded
@@ -458,9 +456,14 @@ TEST_CASE("SceneManager processes Subscriber and sets it to inactive",
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestFixture test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
-  // Create and register a Subscriber for EventType_EVENT_CHANGE_SCENE
+
+  // Create SceneChangeData for title scene
+  steamrot::SceneChangePacket scene_change_data{
+      uuids::uuid{}, steamrot::SceneType::SceneType_TITLE};
+
+  // Create and register a Subscriber with trigger data
   auto subscriber = std::make_shared<steamrot::Subscriber>(
-      steamrot::EventType_EVENT_CHANGE_SCENE);
+      steamrot::EventType_EVENT_CHANGE_SCENE, scene_change_data);
   auto register_result = scene_manager.RegisterSubscriber(subscriber);
   if (!register_result.has_value()) {
     FAIL("Failed to register subscriber: " + register_result.error().message);
@@ -468,19 +471,14 @@ TEST_CASE("SceneManager processes Subscriber and sets it to inactive",
   // check that no scenes are loaded initially
   REQUIRE(scene_manager.GetScenes().empty());
 
-  // Activate the Subscriber with SceneChangeData to load Title scene
-  steamrot::SceneChangePacket scene_change_data{
-      uuids::uuid{}, steamrot::SceneType::SceneType_TITLE};
-  auto set_active_result = subscriber->SetActive();
-  if (!set_active_result.has_value()) {
-    FAIL("Failed to activate subscriber: " + set_active_result.error().message);
-  }
-  subscriber->SetEventData(scene_change_data);
+  // Activate the subscriber
+  subscriber->m_active = true;
+
   // Process subscriptions in SceneManager
   auto process_result = scene_manager.ProcessSubscriptions();
   if (!process_result.has_value()) {
     FAIL("Failed to process subscriptions: " + process_result.error().message);
   }
   // Check that the Subscriber is now inactive
-  REQUIRE(!subscriber->IsActive());
+  REQUIRE(!subscriber->m_active);
 }
