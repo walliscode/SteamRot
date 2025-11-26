@@ -40,58 +40,53 @@ bool SubscriberEqualsMatcher::match(const Subscriber &actual) const {
   std::ostringstream oss;
 
   // Compare m_active
-  if (actual.IsActive() != m_expected.IsActive()) {
-    oss << conmat::TestFailed() << "IsActive():" << "\n";
+  if (actual.m_active != m_expected.m_active) {
+    oss << conmat::TestFailed() << "m_active:" << "\n";
     oss << "\t"
         << "actual = "
-        << conmat::Colorize(actual.IsActive(), conmat::Color::Red) << "\n";
+        << conmat::Colorize(actual.m_active, conmat::Color::Red) << "\n";
     oss << "\t"
         << "expected = "
-        << conmat::Colorize(m_expected.IsActive(), conmat::Color::Blue) << "\n";
+        << conmat::Colorize(m_expected.m_active, conmat::Color::Blue) << "\n";
   }
 
-  // Compare m_event_type
-  if (actual.GetEventType() != m_expected.GetEventType()) {
-    oss << conmat::TestFailed() << "GetEventType():" << "\n";
+  // Compare m_trigger_event_type
+  if (actual.m_trigger_event_type != m_expected.m_trigger_event_type) {
+    oss << conmat::TestFailed() << "m_trigger_event_type:" << "\n";
     oss << "\t"
         << "actual = "
-        << conmat::Colorize(EnumNameEventType(actual.GetEventType()),
+        << conmat::Colorize(EnumNameEventType(actual.m_trigger_event_type),
                             conmat::Color::Red)
         << "\n";
     oss << "\t"
         << "expected = "
-        << conmat::Colorize(EnumNameEventType(m_expected.GetEventType()),
+        << conmat::Colorize(EnumNameEventType(m_expected.m_trigger_event_type),
                             conmat::Color::Blue)
         << "\n";
   }
 
-  // Compare m_event_data using EventData matcher
-  auto event_data_matcher = EventDataEqualsMatcher(m_expected.GetEventData());
-  if (!event_data_matcher.match(actual.GetEventData())) {
-    oss << conmat::TestFailed() << "m_event_data differs:" << "\n";
-    oss << event_data_matcher.describe();
-  }
-
-  // Compare m_trigger_data using EventData matcher but accountting for optional
-  if (m_expected.GetTriggerData().has_value() &&
-      actual.GetTriggerData().has_value()) {
+  // Compare m_trigger_event_data using EventData matcher but accounting for
+  // optional
+  if (m_expected.m_trigger_event_data.has_value() &&
+      actual.m_trigger_event_data.has_value()) {
     auto trigger_data_matcher =
-        EventDataEqualsMatcher(m_expected.GetTriggerData().value());
-    if (!trigger_data_matcher.match(actual.GetTriggerData().value())) {
-      oss << conmat::TestFailed() << "m_trigger_data differs:" << "\n";
+        EventDataEqualsMatcher(m_expected.m_trigger_event_data.value());
+    if (!trigger_data_matcher.match(actual.m_trigger_event_data.value())) {
+      oss << conmat::TestFailed() << "m_trigger_event_data differs:" << "\n";
       oss << trigger_data_matcher.describe();
     }
-  } else if (m_expected.GetTriggerData().has_value() !=
-             actual.GetTriggerData().has_value()) {
-    oss << conmat::TestFailed() << "m_trigger_data presence differs:" << "\n";
+  } else if (m_expected.m_trigger_event_data.has_value() !=
+             actual.m_trigger_event_data.has_value()) {
+    oss << conmat::TestFailed()
+        << "m_trigger_event_data presence differs:" << "\n";
     oss << "\t"
         << "actual has value = "
-        << conmat::Colorize(actual.GetTriggerData().has_value(),
+        << conmat::Colorize(actual.m_trigger_event_data.has_value(),
                             conmat::Color::Red)
         << "\n";
     oss << "\t"
         << "expected has value = "
-        << conmat::Colorize(m_expected.GetTriggerData().has_value(),
+        << conmat::Colorize(m_expected.m_trigger_event_data.has_value(),
                             conmat::Color::Blue)
         << "\n";
   }

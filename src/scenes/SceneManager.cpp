@@ -200,7 +200,8 @@ SceneManager::RegisterSubscriber(std::shared_ptr<Subscriber> subscriber) {
   }
 
   // attempt to add the subscriber to the map, fail if duplicate
-  auto result = m_subscriptions.emplace(subscriber->GetEventType(), subscriber);
+  auto result =
+      m_subscriptions.emplace(subscriber->m_trigger_event_type, subscriber);
   if (!result.second) {
     FailInfo fail_info(
         FailMode::NotAddedToMap,
@@ -257,23 +258,22 @@ std::expected<std::monostate, FailInfo> SceneManager::ProcessSubscriptions() {
   for (const auto &[event_type, subscriber] : m_subscriptions) {
 
     // only process active subscribers
-    if (subscriber->IsActive()) {
-
-      // get the event data
-      const EventData &event_data = subscriber->GetEventData();
+    if (subscriber->m_active) {
 
       switch (event_type) {
       case EventType::EventType_EVENT_CHANGE_SCENE: {
 
-        // make sure the data type is correct
-        if (!std::holds_alternative<SceneChangePacket>(event_data)) {
+        // make sure the data type is correct - use subscriber's trigger data
+        if (!subscriber->m_trigger_event_data.has_value() ||
+            !std::holds_alternative<SceneChangePacket>(
+                subscriber->m_trigger_event_data.value())) {
           FailInfo fail_info(FailMode::ParameterOutOfBounds,
                              "EventData type does not match EventType");
           return std::unexpected(fail_info);
         }
-        // case to SceneChangeData
+        // get SceneChangeData from trigger data
         const SceneChangePacket &scene_change_data =
-            std::get<SceneChangePacket>(event_data);
+            std::get<SceneChangePacket>(subscriber->m_trigger_event_data.value());
 
         // check for scene type
         switch (scene_change_data.second) {
@@ -304,7 +304,7 @@ std::expected<std::monostate, FailInfo> SceneManager::ProcessSubscriptions() {
         break;
       }
       // FINAL PART: set subscriber to inactive after processing.
-      auto set_inactive_result = subscriber->SetInactive();
+      subscriber->m_active = false;
     }
   }
   return std::monostate{};

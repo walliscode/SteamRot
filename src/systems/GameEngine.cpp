@@ -246,13 +246,10 @@ std::expected<std::monostate, FailInfo> GameEngine::ProcessSubscriptions() {
   for (const auto &subscriber : m_subscriptions) {
 
     // only process active subscribers
-    if (subscriber->IsActive()) {
-
-      // get the event data
-      const EventData &event_data = subscriber->GetEventData();
+    if (subscriber->m_active) {
 
       // switch on the EventType
-      switch (subscriber->GetEventType()) {
+      switch (subscriber->m_trigger_event_type) {
       case EventType::EventType_EVENT_QUIT_GAME: {
         // close the window to quit the game
         m_game_resources.game_window.close();
@@ -263,7 +260,7 @@ std::expected<std::monostate, FailInfo> GameEngine::ProcessSubscriptions() {
       }
 
       // FINALLY set the subscriber to inactive
-      auto set_inactive_result = subscriber->SetInactive();
+      subscriber->m_active = false;
     }
   }
   return std::monostate{};
