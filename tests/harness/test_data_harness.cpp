@@ -151,8 +151,6 @@ CreateFixtureFromTestData(const TestDataConfig *config,
   if (config->start_data_collection() &&
       config->start_data_collection()->event_bus()) {
 
-    std::cout << "Configuring EventHandler from start_data_collection event bus"
-              << std::endl;
     auto configure_result = event::ConfigureEventHandlerFromEventBusData(
         config->start_data_collection()->event_bus(),
         fixture.GetGameResources().event_handler);
