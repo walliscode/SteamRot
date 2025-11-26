@@ -267,13 +267,18 @@ std::expected<std::monostate, FailInfo> SceneManager::ProcessSubscriptions() {
         if (!subscriber->m_received_event_data.has_value() ||
             !std::holds_alternative<SceneChangePacket>(
                 subscriber->m_received_event_data.value())) {
-          FailInfo fail_info(FailMode::ParameterOutOfBounds,
-                             "EventData type does not match EventType");
-          return std::unexpected(fail_info);
+
+          // just continue if data is not valid, will need to log at some point
+          //[TODO: logging here]
+
+          // still need to set subscriber to inactive
+          subscriber->m_active = false;
+          continue;
         }
         // get SceneChangeData from received event data
         const SceneChangePacket &scene_change_data =
-            std::get<SceneChangePacket>(subscriber->m_received_event_data.value());
+            std::get<SceneChangePacket>(
+                subscriber->m_received_event_data.value());
 
         // check for scene type
         switch (scene_change_data.second) {
@@ -303,7 +308,8 @@ std::expected<std::monostate, FailInfo> SceneManager::ProcessSubscriptions() {
       default:
         break;
       }
-      // FINAL PART: set subscriber to inactive and clear received data after processing.
+      // FINAL PART: set subscriber to inactive and clear received data after
+      // processing.
       subscriber->m_active = false;
       subscriber->m_received_event_data.reset();
     }
