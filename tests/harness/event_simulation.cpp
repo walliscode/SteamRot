@@ -71,6 +71,7 @@ ExecuteEventTestData(const EventTestData *event_data, TestFixture &fixture) {
       event_packet.m_event_data = scene_packet;
     }
   }
+  bookmark of failure;
 
   // Add event to the event handler
   EventHandler &event_handler = fixture.GetGameResources().event_handler;

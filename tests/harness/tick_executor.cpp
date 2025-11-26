@@ -121,6 +121,9 @@ ExecuteSingleTick(uint32_t tick, const TestDataConfig *config,
   // 3. Process event waiting room
   fixture.GetGameResources().event_handler.ProcessWaitingRoomEventBus();
 
+  // 4 . Update subscribers from global event bus
+  fixture.GetGameResources().event_handler.UpateSubscribersFromGlobalEventBus();
+
   // 4. Execute simulation steps (all steps execute on every tick)
   if (config->simulation_data() && config->simulation_data()->steps()) {
 

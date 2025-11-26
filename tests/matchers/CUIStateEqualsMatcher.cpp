@@ -112,8 +112,8 @@ void CompareMapStateValues(
     }
     const auto &actual_value = actual_it->second;
     if (expected_value != actual_value) {
-      oss << conmat::Indent(1) << conmat::TestFailed() << "Key: " << key
-          << " value mismatch:"
+      oss << conmat::Indent(1) << conmat::TestFailed()
+          << std::format("m_state_values[{}]", key) << " value mismatch:"
           << "\n";
       oss << conmat::Indent(2)
           << "actual: " << conmat::Colorize(actual_value, conmat::Color::Red)

@@ -18,4 +18,5 @@ flatbuffers_headers
 stduuid
 magic_enum::magic_enum
 logger
+matchers
 )

@@ -205,11 +205,14 @@ bool EventPacketEqualsMatcher::match(const EventPacket &actual) const {
   if (actual.event_lifetime != m_expected.event_lifetime) {
     oss << conmat::TestFailed() << "event_lifetime:" << "\n";
     oss << "\t"
-        << "actual = "
-        << conmat::Colorize(actual.event_lifetime, conmat::Color::Red) << "\n";
+        << "actual: "
+        << conmat::Colorize(static_cast<int>(actual.event_lifetime),
+                            conmat::Color::Red)
+        << "\n";
     oss << "\t"
-        << "expected = "
-        << conmat::Colorize(m_expected.event_lifetime, conmat::Color::Blue)
+        << "expected: "
+        << conmat::Colorize(static_cast<int>(m_expected.event_lifetime),
+                            conmat::Color::Blue)
         << "\n";
   }
 
