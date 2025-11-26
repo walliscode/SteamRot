@@ -324,9 +324,14 @@ TEST_CASE("SceneManager loads TitleScene when Subscriber is turned active",
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestFixture test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
-  // Create and register a Subscriber for EventType_EVENT_CHANGE_SCENE
+
+  // Create SceneChangeData for title scene
+  steamrot::SceneChangePacket scene_change_data{
+      uuids::uuid{}, steamrot::SceneType::SceneType_TITLE};
+
+  // Create and register a Subscriber with trigger data
   auto subscriber = std::make_shared<steamrot::Subscriber>(
-      steamrot::EventType_EVENT_CHANGE_SCENE);
+      steamrot::EventType_EVENT_CHANGE_SCENE, scene_change_data);
   auto register_result = scene_manager.RegisterSubscriber(subscriber);
   if (!register_result.has_value()) {
     FAIL("Failed to register subscriber: " + register_result.error().message);
@@ -335,18 +340,7 @@ TEST_CASE("SceneManager loads TitleScene when Subscriber is turned active",
   // check that no scenes are loaded initially
   REQUIRE(scene_manager.GetScenes().empty());
 
-  // Create SceneChangeData and set it as trigger data on subscriber
-  steamrot::SceneChangePacket scene_change_data{
-      uuids::uuid{}, steamrot::SceneType::SceneType_TITLE};
-
-  // Create a new subscriber with trigger data
-  auto subscriber_with_trigger = std::make_shared<steamrot::Subscriber>(
-      steamrot::EventType_EVENT_CHANGE_SCENE, scene_change_data);
-  auto register_result2 =
-      scene_manager.RegisterSubscriber(subscriber_with_trigger);
-  // Note: This will fail because we already registered one with same event
-  // type So let's just activate the original subscriber with trigger data set
-  subscriber->m_trigger_event_data = scene_change_data;
+  // Activate the subscriber
   subscriber->m_active = true;
 
   // Process subscriptions in SceneManager
