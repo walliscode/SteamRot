@@ -859,3 +859,764 @@ This architecture enables:
    - No runtime guards needed
 
 The key insight is that both share the same execution primitives (free functions), but the game engine's configuration is locked while the test harness retains flexibility.
+
+---
+
+## Staged Implementation Plan
+
+This section provides a detailed, step-by-step implementation plan organized into stages. Each stage builds upon the previous one and can be completed independently with working code at each checkpoint.
+
+### Overview
+
+| Stage | Focus | Duration Estimate | Dependencies |
+|-------|-------|-------------------|--------------|
+| 1 | Core Extraction | 2-3 days | None |
+| 2 | Test Harness Restructure | 2-3 days | Stage 1 |
+| 3 | Execution Level Framework | 2-3 days | Stage 2 |
+| 4 | SceneManager & GameLoop Levels | 2-3 days | Stage 3 |
+| 5 | Compile-Time Configuration | 1-2 days | Stage 4 |
+| 6 | Documentation & Migration | 1-2 days | Stage 5 |
+
+**Total Estimated Duration**: 10-16 days
+
+---
+
+### Stage 1: Core Extraction
+
+**Goal**: Extract reusable execution logic from `GameEngine` and `Scene` into free functions.
+
+#### Step 1.1: Create Logic Execution Functions
+
+**Files to Create**:
+- `src/logic/logic_execution.h`
+- `src/logic/logic_execution.cpp`
+
+**Implementation**:
+
+```cpp
+// src/logic/logic_execution.h
+#pragma once
+
+#include "Logic.h"
+#include "SceneContext.h"
+#include <unordered_map>
+#include <vector>
+#include <memory>
+
+namespace steamrot::logic::execution {
+
+  /////////////////////////////////////////////////
+  /// @brief Execute all logics in a LogicVector
+  /////////////////////////////////////////////////
+  void ExecuteLogicVector(const std::vector<std::unique_ptr<Logic>> &logics);
+
+  /////////////////////////////////////////////////
+  /// @brief Execute all logics of a specific type from a LogicCollection
+  /////////////////////////////////////////////////
+  void ExecuteLogicsByType(const LogicCollection &logic_map, 
+                           LogicType type);
+
+  /////////////////////////////////////////////////
+  /// @brief Execute a complete scene tick (all systems in order)
+  ///
+  /// Order: Action -> Movement -> Collision -> Render
+  /////////////////////////////////////////////////
+  void ExecuteSceneTick(const LogicCollection &logic_map);
+
+} // namespace steamrot::logic::execution
+```
+
+**Tasks**:
+1. [ ] Create header file with function declarations
+2. [ ] Implement `ExecuteLogicVector` - iterates and calls `RunLogic()`
+3. [ ] Implement `ExecuteLogicsByType` - finds logics by type and executes
+4. [ ] Implement `ExecuteSceneTick` - calls system methods in order
+5. [ ] Add to `src/logic/CMakeLists.txt`
+6. [ ] Write unit tests in `tests/unit/logic/logic_execution.test.cpp`
+
+**Verification**:
+- [ ] All existing tests pass
+- [ ] New unit tests pass
+- [ ] No changes to existing behavior
+
+#### Step 1.2: Create Event Processing Functions
+
+**Files to Create**:
+- `src/events/event_processing.h`
+- `src/events/event_processing.cpp`
+
+**Implementation**:
+
+```cpp
+// src/events/event_processing.h
+#pragma once
+
+#include "EventHandler.h"
+#include <SFML/Graphics/RenderWindow.hpp>
+
+namespace steamrot::events::processing {
+
+  /////////////////////////////////////////////////
+  /// @brief Process events at the start of a tick
+  ///
+  /// Performs: PreloadEvents -> ProcessWaitingRoom -> UpdateSubscribers
+  /////////////////////////////////////////////////
+  void ProcessEventTickStart(EventHandler &event_handler, 
+                              sf::RenderWindow *window = nullptr);
+
+  /////////////////////////////////////////////////
+  /// @brief Complete an event tick (after logic execution)
+  ///
+  /// Performs: TickGlobalEventBus (decrement lifetimes, remove expired)
+  /////////////////////////////////////////////////
+  void ProcessEventTickEnd(EventHandler &event_handler);
+
+  /////////////////////////////////////////////////
+  /// @brief Execute a full event tick (start + end)
+  /////////////////////////////////////////////////
+  void ProcessFullEventTick(EventHandler &event_handler,
+                            sf::RenderWindow *window = nullptr);
+
+} // namespace steamrot::events::processing
+```
+
+**Tasks**:
+1. [ ] Create header file with function declarations
+2. [ ] Extract event processing logic from `GameEngine::UpdateSystems()`
+3. [ ] Implement free functions
+4. [ ] Add to `src/events/CMakeLists.txt`
+5. [ ] Write unit tests
+
+**Verification**:
+- [ ] Event processing works identically to before
+- [ ] Test harness event simulation still works
+
+#### Step 1.3: Create Game Loop Core Functions
+
+**Files to Create**:
+- `src/systems/game_loop.h`
+- `src/systems/game_loop.cpp`
+
+**Implementation**:
+
+```cpp
+// src/systems/game_loop.h
+#pragma once
+
+#include "GameResources.h"
+#include "SceneManager.h"
+#include "DisplayManager.h"
+
+namespace steamrot::game_loop {
+
+  /////////////////////////////////////////////////
+  /// @brief Update game resources each tick
+  /////////////////////////////////////////////////
+  void UpdateGameResources(GameResources &game_resources);
+
+  /////////////////////////////////////////////////
+  /// @brief Execute a single game loop iteration (no display)
+  /////////////////////////////////////////////////
+  void ExecuteHeadlessIteration(GameResources &game_resources,
+                                 SceneManager &scene_manager);
+
+  /////////////////////////////////////////////////
+  /// @brief Execute a single game loop iteration (with display)
+  /////////////////////////////////////////////////
+  void ExecuteFullIteration(GameResources &game_resources,
+                            SceneManager &scene_manager,
+                            DisplayManager &display_manager);
+
+} // namespace steamrot::game_loop
+```
+
+**Tasks**:
+1. [ ] Create header file with function declarations
+2. [ ] Extract loop iteration logic from `GameEngine::RunGameLoop()`
+3. [ ] Implement free functions
+4. [ ] Add to `src/systems/CMakeLists.txt`
+5. [ ] Write unit tests
+
+**Verification**:
+- [ ] Game runs identically to before
+- [ ] Headless iteration works for testing
+
+#### Step 1.4: Refactor GameEngine to Use Extracted Functions
+
+**Files to Modify**:
+- `src/systems/GameEngine.cpp`
+
+**Tasks**:
+1. [ ] Replace inline event processing with `events::processing::ProcessEventTickStart()`
+2. [ ] Replace inline loop logic with `game_loop::ExecuteFullIteration()`
+3. [ ] Replace `UpdateGameResources` implementation with call to `game_loop::UpdateGameResources()`
+4. [ ] Run all tests to verify no regression
+
+**Verification**:
+- [ ] Game behavior unchanged
+- [ ] All existing tests pass
+
+#### Step 1.5: Refactor Scene to Use Extracted Functions
+
+**Files to Modify**:
+- `src/scenes/Scene.cpp`
+- `src/scenes/TitleScene.cpp`
+- `src/scenes/CraftingScene.cpp`
+
+**Tasks**:
+1. [ ] Replace inline logic execution with `logic::execution::ExecuteLogicsByType()`
+2. [ ] Ensure derived scenes still work correctly
+3. [ ] Run scene-related tests
+
+**Verification**:
+- [ ] Scene updates work identically
+- [ ] All scene tests pass
+
+---
+
+### Stage 2: Test Harness Restructure
+
+**Goal**: Reorganize test harness to use the extracted functions and prepare for execution levels.
+
+#### Step 2.1: Update simulation_runner.cpp
+
+**Files to Modify**:
+- `tests/harness/simulation_runner.cpp`
+
+**Tasks**:
+1. [ ] Import new `logic::execution` functions
+2. [ ] Refactor `ExecuteLogicClass()` to use `logic::execution` where applicable
+3. [ ] Keep `ExecuteFunction()` for free function dispatch (test-specific)
+4. [ ] Update tests
+
+**Verification**:
+- [ ] All simulation tests pass
+- [ ] Data-driven tests still work
+
+#### Step 2.2: Update tick_executor.cpp
+
+**Files to Modify**:
+- `tests/harness/tick_executor.cpp`
+
+**Tasks**:
+1. [ ] Import `events::processing` functions
+2. [ ] Replace inline event processing with extracted functions
+3. [ ] Ensure tick execution matches game engine behavior exactly
+4. [ ] Update tests
+
+**Verification**:
+- [ ] All tick-based tests pass
+- [ ] Event lifetimes work correctly
+
+#### Step 2.3: Create Execution Directory Structure
+
+**Files to Create**:
+- `tests/harness/execution/` directory
+- `tests/harness/execution/CMakeLists.txt`
+
+**Tasks**:
+1. [ ] Create directory structure
+2. [ ] Add CMakeLists.txt with library definition
+3. [ ] Update parent `tests/harness/CMakeLists.txt` to include subdirectory
+
+**Verification**:
+- [ ] Project builds correctly
+
+---
+
+### Stage 3: Execution Level Framework
+
+**Goal**: Implement Level 1 (Logic) and Level 2 (Scene) executors.
+
+#### Step 3.1: Implement Level 1 - Logic Executor
+
+**Files to Create**:
+- `tests/harness/execution/logic_executor.h`
+- `tests/harness/execution/logic_executor.cpp`
+
+**Implementation**:
+
+```cpp
+// tests/harness/execution/logic_executor.h
+#pragma once
+
+#include "FailInfo.h"
+#include "Logic.h"
+#include "SceneContext.h"
+#include "TestFixture.h"
+#include "simulation_generated.h"
+#include <expected>
+
+namespace steamrot::tests::execution {
+
+  /////////////////////////////////////////////////
+  /// @brief Execute a single Logic class instance
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ExecuteLogic(Logic &logic);
+
+  /////////////////////////////////////////////////
+  /// @brief Execute a Logic class by type enum
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ExecuteLogicByType(LogicClassType type, SceneContext &scene_context);
+
+  /////////////////////////////////////////////////
+  /// @brief Execute a free function by type enum
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ExecuteFunction(FunctionType type, SceneContext &scene_context);
+
+  /////////////////////////////////////////////////
+  /// @brief Execute a custom workflow (sequence of steps)
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ExecuteWorkflow(const SimulationData *simulation_data,
+                  SceneContext &scene_context);
+
+} // namespace steamrot::tests::execution
+```
+
+**Tasks**:
+1. [ ] Create header with declarations
+2. [ ] Implement `ExecuteLogic` - wraps `logic.RunLogic()`
+3. [ ] Implement `ExecuteLogicByType` - creates Logic instance and executes
+4. [ ] Implement `ExecuteFunction` - dispatches to free functions
+5. [ ] Implement `ExecuteWorkflow` - iterates SimulationData steps
+6. [ ] Write comprehensive unit tests
+7. [ ] Add to CMakeLists.txt
+
+**Verification**:
+- [ ] Can execute individual Logic classes
+- [ ] Can execute free functions
+- [ ] Can execute custom workflows
+- [ ] All tests pass
+
+#### Step 3.2: Implement Level 2 - Scene Executor
+
+**Files to Create**:
+- `tests/harness/execution/scene_executor.h`
+- `tests/harness/execution/scene_executor.cpp`
+
+**Implementation**:
+
+```cpp
+// tests/harness/execution/scene_executor.h
+#pragma once
+
+#include "FailInfo.h"
+#include "Scene.h"
+#include "TestFixture.h"
+#include "entities_generated.h"
+#include "simulation_generated.h"
+#include <expected>
+
+namespace steamrot::tests::execution {
+
+  /////////////////////////////////////////////////
+  /// @brief Execute a single scene tick
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ExecuteSceneTick(Scene &scene);
+
+  /////////////////////////////////////////////////
+  /// @brief Execute a scene tick using TestFixture
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ExecuteSceneTickWithFixture(TestFixture &fixture);
+
+  /////////////////////////////////////////////////
+  /// @brief Configuration for scene tick execution
+  /////////////////////////////////////////////////
+  struct SceneTickConfig {
+    const EntityCollection *start_entities = nullptr;
+    const SimulationData *simulation = nullptr;
+    uint32_t num_ticks = 1;
+  };
+
+  /////////////////////////////////////////////////
+  /// @brief Execute configured scene ticks
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ExecuteConfiguredSceneTicks(TestFixture &fixture,
+                               const SceneTickConfig &config);
+
+} // namespace steamrot::tests::execution
+```
+
+**Tasks**:
+1. [ ] Create header with declarations
+2. [ ] Implement `ExecuteSceneTick` - calls scene systems in order
+3. [ ] Implement `ExecuteSceneTickWithFixture` - uses fixture's scene context
+4. [ ] Implement `ExecuteConfiguredSceneTicks` - handles entity injection and multi-tick
+5. [ ] Write unit tests
+6. [ ] Add to CMakeLists.txt
+
+**Verification**:
+- [ ] Can execute scene ticks
+- [ ] Multi-tick execution works
+- [ ] Entity injection works
+- [ ] All tests pass
+
+#### Step 3.3: Update Test Harness to Use Executors
+
+**Files to Modify**:
+- `tests/harness/simulation_runner.cpp`
+- `tests/harness/tick_executor.cpp`
+
+**Tasks**:
+1. [ ] Refactor `simulation_runner.cpp` to use `logic_executor`
+2. [ ] Refactor `tick_executor.cpp` to use `scene_executor` where applicable
+3. [ ] Ensure backward compatibility with existing test data
+4. [ ] Run all harness tests
+
+**Verification**:
+- [ ] All existing tests pass
+- [ ] New executors are used internally
+
+---
+
+### Stage 4: SceneManager & GameLoop Levels
+
+**Goal**: Implement Level 3 (SceneManager) and Level 4 (GameLoop) executors.
+
+#### Step 4.1: Implement Level 3 - SceneManager Executor
+
+**Files to Create**:
+- `tests/harness/execution/scene_manager_executor.h`
+- `tests/harness/execution/scene_manager_executor.cpp`
+
+**Implementation**:
+
+```cpp
+// tests/harness/execution/scene_manager_executor.h
+#pragma once
+
+#include "FailInfo.h"
+#include "GameResources.h"
+#include "SceneManager.h"
+#include "event_test_data_generated.h"
+#include "input_test_data_generated.h"
+#include <expected>
+
+namespace steamrot::tests::execution {
+
+  /////////////////////////////////////////////////
+  /// @brief Execute a SceneManager update cycle
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ExecuteSceneManagerUpdate(SceneManager &scene_manager);
+
+  /////////////////////////////////////////////////
+  /// @brief Configuration for SceneManager execution
+  /////////////////////////////////////////////////
+  struct SceneManagerConfig {
+    SceneType initial_scene = SceneType_TITLE;
+    const EventSequence *event_sequence = nullptr;
+    const InputSequence *input_sequence = nullptr;
+    uint32_t num_updates = 1;
+  };
+
+  /////////////////////////////////////////////////
+  /// @brief Execute configured SceneManager updates
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ExecuteConfiguredSceneManager(SceneManager &scene_manager,
+                                 GameResources &resources,
+                                 const SceneManagerConfig &config);
+
+} // namespace steamrot::tests::execution
+```
+
+**Tasks**:
+1. [ ] Create header with declarations
+2. [ ] Implement `ExecuteSceneManagerUpdate` - calls SceneManager's update cycle
+3. [ ] Implement `ExecuteConfiguredSceneManager` - handles scene loading and event injection
+4. [ ] Write unit tests for scene transitions
+5. [ ] Add to CMakeLists.txt
+
+**Verification**:
+- [ ] Can execute SceneManager updates
+- [ ] Scene transitions work
+- [ ] Event injection triggers correct behavior
+
+#### Step 4.2: Implement Level 4 - GameLoop Executor
+
+**Files to Create**:
+- `tests/harness/execution/game_loop_executor.h`
+- `tests/harness/execution/game_loop_executor.cpp`
+
+**Implementation**:
+
+```cpp
+// tests/harness/execution/game_loop_executor.h
+#pragma once
+
+#include "FailInfo.h"
+#include "GameEngine.h"
+#include "TestFixture.h"
+#include <expected>
+
+namespace steamrot::tests::execution {
+
+  /////////////////////////////////////////////////
+  /// @brief Configuration for game loop execution
+  /////////////////////////////////////////////////
+  struct GameLoopConfig {
+    size_t num_iterations = 1;
+    bool headless = true;
+    const EventSequence *events = nullptr;
+    const InputSequence *inputs = nullptr;
+  };
+
+  /////////////////////////////////////////////////
+  /// @brief Execute game loop iterations using GameEngine
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ExecuteGameLoop(GameEngine &engine, const GameLoopConfig &config);
+
+  /////////////////////////////////////////////////
+  /// @brief Execute game loop iterations using TestFixture
+  ///
+  /// Creates a lightweight game loop without full GameEngine
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ExecuteGameLoopWithFixture(TestFixture &fixture,
+                              const GameLoopConfig &config);
+
+} // namespace steamrot::tests::execution
+```
+
+**Tasks**:
+1. [ ] Create header with declarations
+2. [ ] Implement `ExecuteGameLoop` - runs actual GameEngine iterations
+3. [ ] Implement `ExecuteGameLoopWithFixture` - simulates game loop with fixture
+4. [ ] Write integration tests
+5. [ ] Add to CMakeLists.txt
+
+**Verification**:
+- [ ] Can run game loop iterations
+- [ ] Headless mode works
+- [ ] Event/input injection works at game loop level
+
+#### Step 4.3: Create Unified Execution Entry Point
+
+**Files to Create**:
+- `tests/harness/execution/execution_runner.h`
+- `tests/harness/execution/execution_runner.cpp`
+
+**Implementation**:
+
+```cpp
+// tests/harness/execution/execution_runner.h
+#pragma once
+
+#include "FailInfo.h"
+#include "TestFixture.h"
+#include "test_data_generated.h"
+#include <expected>
+
+namespace steamrot::tests::execution {
+
+  /////////////////////////////////////////////////
+  /// @brief Execution level enum
+  /////////////////////////////////////////////////
+  enum class ExecutionLevel {
+    Logic = 1,
+    Scene = 2,
+    SceneManager = 3,
+    GameLoop = 4
+  };
+
+  /////////////////////////////////////////////////
+  /// @brief Run test at specified execution level
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  RunTestAtLevel(const TestDataConfig *config,
+                 ExecutionLevel level,
+                 TestFixture &fixture);
+
+  /////////////////////////////////////////////////
+  /// @brief Auto-detect execution level from config
+  /////////////////////////////////////////////////
+  ExecutionLevel DetectExecutionLevel(const TestDataConfig *config);
+
+} // namespace steamrot::tests::execution
+```
+
+**Tasks**:
+1. [ ] Create header with declarations
+2. [ ] Implement `RunTestAtLevel` - dispatches to appropriate executor
+3. [ ] Implement `DetectExecutionLevel` - infers level from config
+4. [ ] Write tests for level detection
+5. [ ] Add to CMakeLists.txt
+
+**Verification**:
+- [ ] Can run tests at any level
+- [ ] Level detection works correctly
+
+---
+
+### Stage 5: Compile-Time Configuration
+
+**Goal**: Add compile-time configuration for production vs test builds.
+
+#### Step 5.1: Create Game Engine Config Header
+
+**Files to Create**:
+- `src/systems/game_engine_config.h`
+
+**Implementation**:
+
+```cpp
+// src/systems/game_engine_config.h
+#pragma once
+
+#include "PathProvider.h"
+
+namespace steamrot::config {
+
+#ifdef STEAMROT_TEST_MODE
+  struct GameEngineConfig {
+    static constexpr bool ENABLE_RUNTIME_LOGIC_INJECTION = true;
+    static constexpr bool ENABLE_DATA_INJECTION = true;
+    static constexpr bool ENABLE_HEADLESS_MODE = true;
+    static constexpr EnvironmentType DEFAULT_ENV_TYPE = EnvironmentType::Test;
+  };
+#else
+  struct GameEngineConfig {
+    static constexpr bool ENABLE_RUNTIME_LOGIC_INJECTION = false;
+    static constexpr bool ENABLE_DATA_INJECTION = false;
+    static constexpr bool ENABLE_HEADLESS_MODE = false;
+    static constexpr EnvironmentType DEFAULT_ENV_TYPE = EnvironmentType::Production;
+  };
+#endif
+
+} // namespace steamrot::config
+```
+
+**Tasks**:
+1. [ ] Create header file
+2. [ ] Add documentation for each config option
+3. [ ] No implementation file needed (header-only)
+
+#### Step 5.2: Update CMake for Test Mode
+
+**Files to Modify**:
+- `tests/CMakeLists.txt`
+
+**Tasks**:
+1. [ ] Add `STEAMROT_TEST_MODE` definition for test targets
+2. [ ] Ensure production builds don't have this definition
+3. [ ] Verify builds work correctly
+
+**Verification**:
+- [ ] Test builds have `STEAMROT_TEST_MODE` defined
+- [ ] Production builds do not
+- [ ] Config struct has correct values in each case
+
+#### Step 5.3: Use Config in GameEngine
+
+**Files to Modify**:
+- `src/systems/GameEngine.cpp`
+
+**Tasks**:
+1. [ ] Include `game_engine_config.h`
+2. [ ] Use config values where appropriate
+3. [ ] Add comments explaining compile-time behavior
+
+**Verification**:
+- [ ] GameEngine behavior unchanged
+- [ ] Config is correctly applied
+
+---
+
+### Stage 6: Documentation & Migration
+
+**Goal**: Document the new architecture and provide migration guidance.
+
+#### Step 6.1: Update Test Harness README
+
+**Files to Modify**:
+- `tests/harness/README.md`
+
+**Tasks**:
+1. [ ] Document new execution level framework
+2. [ ] Add examples for each execution level
+3. [ ] Explain when to use each level
+4. [ ] Document directory structure changes
+
+#### Step 6.2: Create Migration Guide
+
+**Files to Create**:
+- `documentation/workflows/TEST_HARNESS_MIGRATION.md`
+
+**Content**:
+1. [ ] Overview of changes
+2. [ ] Step-by-step migration for existing tests
+3. [ ] Before/after code examples
+4. [ ] FAQ section
+
+#### Step 6.3: Update COPILOT_INSTRUCTIONS.md
+
+**Files to Modify**:
+- `.github/copilot-instructions.md` (if exists)
+
+**Tasks**:
+1. [ ] Add section on execution levels
+2. [ ] Update test harness usage guidelines
+3. [ ] Add new file locations
+
+#### Step 6.4: Create Example Tests
+
+**Files to Create**:
+- `tests/harness/examples/level1_logic_test.test.cpp`
+- `tests/harness/examples/level2_scene_test.test.cpp`
+- `tests/harness/examples/level3_scene_manager_test.test.cpp`
+- `tests/harness/examples/level4_game_loop_test.test.cpp`
+
+**Tasks**:
+1. [ ] Create example test for each execution level
+2. [ ] Add comprehensive comments
+3. [ ] Include in test suite
+
+**Verification**:
+- [ ] All example tests pass
+- [ ] Examples are clear and instructive
+
+---
+
+### Post-Implementation Checklist
+
+After completing all stages:
+
+- [ ] All existing tests pass
+- [ ] New tests pass
+- [ ] Documentation is complete
+- [ ] No regressions in game behavior
+- [ ] Build times acceptable
+- [ ] Test execution times acceptable
+- [ ] Code review completed
+
+---
+
+### Risk Mitigation
+
+| Risk | Mitigation |
+|------|------------|
+| Breaking existing tests | Run tests after each step; revert if needed |
+| GameEngine behavior change | Careful extraction; extensive testing |
+| Build complexity increase | Keep CMake changes minimal |
+| Documentation gaps | Document as you go; review at end |
+
+---
+
+### Success Criteria
+
+The implementation is successful when:
+
+1. **Tests can run at any level**: Logic, Scene, SceneManager, or GameLoop
+2. **Code reuse is achieved**: Same execution functions used by game and tests
+3. **No runtime overhead in production**: Compile-time configuration works
+4. **Existing tests unaffected**: All current tests continue to pass
+5. **Clear documentation exists**: Developers can easily understand and use the framework
