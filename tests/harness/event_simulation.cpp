@@ -19,8 +19,6 @@ namespace steamrot::tests {
 std::expected<std::monostate, FailInfo>
 ExecuteEventTestData(const EventTestData *event_data, TestFixture &fixture) {
 
-  std::cout << "Executing EventTestData for tick " << event_data->tick()
-            << std::endl;
   // Validate event data
   if (!event_data) {
     return std::unexpected(
