@@ -72,6 +72,232 @@ The test harness (`TestFixture`) and `GameEngine` both:
 
 **Critical Difference**: The test harness operates at the scene/logic level without the full game loop, while GameEngine runs the complete loop.
 
+## FlatBuffers Schema Analysis
+
+### Current Schema Structure
+
+The FlatBuffers schemas are organized into two categories:
+
+#### 1. Production Schemas (Game Engine)
+
+```
+src/flatbuffers_headers/
+├── game_engine.fbs          # GameEngineData (subscriptions + resources)
+├── scene_manager.fbs        # SceneManagerData (subscriptions)
+├── scenes.fbs               # SceneData (entities + logic + assets + resources)
+├── entities.fbs             # EntityData + EntityCollection
+├── logic_data.fbs           # LogicData + LogicCollectionData
+├── resource_data.fbs        # GameResourcesData + SceneResourcesData
+├── context_data.fbs         # GameContextConfig + SceneContextConfig
+├── events.fbs               # Event types and definitions
+├── subscriber_data.fbs      # Subscriber configuration
+└── [component schemas]      # user_interface.fbs, grimoire_machina.fbs, etc.
+```
+
+#### 2. Test Schemas (Test Harness)
+
+```
+src/flatbuffers_headers/
+├── test_data.fbs            # TestDataConfig (root test configuration)
+├── simulation.fbs           # SimulationData + SimulationStep
+├── input_test_data.fbs      # InputSequence for input injection
+├── event_test_data.fbs      # EventSequence for event injection
+└── event_bus_data.fbs       # EventBusData for state comparison
+```
+
+### Schema Hierarchy
+
+```
+TestDataConfig (test_data.fbs)
+├── metadata: TestMetadata (required)
+├── start_data_collection: DataCollection
+│   ├── entity_collection: EntityCollection ──────► entities.fbs
+│   ├── event_bus: EventBusData ──────────────────► event_bus_data.fbs
+│   └── waiting_room: EventBusData
+├── expected_data_collection: DataCollection
+├── game_resources: GameResourcesData ────────────► resource_data.fbs
+├── scene_resources: SceneResourcesData
+├── simulation_data: SimulationData ──────────────► simulation.fbs
+│   └── steps: [SimulationStep]
+│       ├── execution_mode: Function | LogicClass
+│       ├── function_type: FunctionType
+│       └── logic_class_type: LogicClassType
+├── input_sequence: InputSequence ────────────────► input_test_data.fbs
+├── event_sequence: EventSequence ────────────────► event_test_data.fbs
+├── num_ticks: uint32
+└── tick_snapshots: [TickSnapshot]
+```
+
+### Analysis: Schema Design for Unified Architecture
+
+#### ✅ What Works Well
+
+1. **Shared Resource Schemas**: `resource_data.fbs` defines `GameResourcesData` and `SceneResourcesData` used by both production and test:
+   ```fbs
+   table GameResourcesData {
+     window_width: uint32 = 800;
+     window_height: uint32 = 600;
+     window_title: string;
+     framerate_limit: uint32 = 60;
+   }
+   ```
+
+2. **Shared Entity Schemas**: `entities.fbs` is used by both `SceneData` (production) and `TestDataConfig` (test):
+   ```fbs
+   table EntityCollection {
+     entities: [EntityData] (required);
+     entity_memory_pool_size: int;
+   }
+   ```
+
+3. **Simulation Schema**: `simulation.fbs` already maps to the execution levels:
+   - `FunctionType` enum → Level 1 (free function execution)
+   - `LogicClassType` enum → Level 1 (Logic class execution)
+   - `SimulationStep` → Supports both modes
+
+4. **DataCollection Pattern**: Groups related state for comparison:
+   ```fbs
+   table DataCollection {
+     entity_collection: EntityCollection;
+     event_bus: EventBusData;
+     waiting_room: EventBusData;
+   }
+   ```
+
+#### ⚠️ Potential Improvements
+
+1. **Logic Execution Schema Gap**
+
+   **Current**: `simulation.fbs` hardcodes specific Logic classes in `LogicClassType`:
+   ```fbs
+   enum LogicClassType : byte {
+     None = 0,
+     UIActionLogic = 1,
+     UICollisionLogic = 2,
+     UIRenderLogic = 3,
+     // ... must add each new Logic class manually
+   }
+   ```
+
+   **Issue**: Adding new Logic classes requires schema changes.
+
+   **Recommendation**: Keep as-is. The explicit enum provides type safety and documentation. When new Logic classes are added, update the enum. This is preferable to a string-based approach that loses compile-time validation.
+
+2. **Execution Level Schema**
+
+   **Current**: No explicit schema for execution level configuration.
+
+   **Proposed Addition** (`execution_config.fbs`):
+   ```fbs
+   namespace steamrot;
+   
+   enum ExecutionLevel : byte {
+     Logic = 1,       // Level 1: Single logic/function
+     Scene = 2,       // Level 2: Full scene tick
+     SceneManager = 3,// Level 3: SceneManager update
+     GameLoop = 4     // Level 4: Full game loop
+   }
+   
+   table ExecutionConfig {
+     level: ExecutionLevel = Logic;
+     num_iterations: uint32 = 1;
+     headless: bool = true;
+   }
+   ```
+
+   **Benefit**: Test data can specify execution level explicitly, making test intent clearer.
+
+3. **Scene-Level Configuration**
+
+   **Current**: `SceneData` (production) and `TestDataConfig` (test) have different structures.
+
+   **Observation**: They share `EntityCollection` and resource data but not logic configuration.
+
+   **Recommendation**: No change needed. The separation is intentional:
+   - Production (`SceneData`): Uses `LogicCollectionData` with full scene logic
+   - Test (`TestDataConfig`): Uses `SimulationData` for selective execution
+
+4. **Context Configuration Consolidation**
+
+   **Current**: Two similar schemas exist:
+   - `resource_data.fbs`: `GameResourcesData`, `SceneResourcesData`
+   - `context_data.fbs`: `GameContextConfig`, `SceneContextConfig`
+
+   **Observation**: These overlap but serve different purposes:
+   - `resource_data.fbs`: Runtime resource configuration
+   - `context_data.fbs`: Context builder configuration
+
+   **Recommendation**: Keep separate. The redundancy enables different configuration paths (direct resource config vs. context builder).
+
+### Schema Changes for Proposed Architecture
+
+#### Required Changes: None
+
+The current schema structure supports the proposed architecture without modification:
+
+| Execution Level | Schema Support |
+|-----------------|----------------|
+| Level 1: Logic | `simulation.fbs` (FunctionType, LogicClassType) |
+| Level 2: Scene | `entities.fbs` + `simulation.fbs` |
+| Level 3: SceneManager | Reuse `event_test_data.fbs` for event injection |
+| Level 4: GameLoop | `test_data.fbs` already supports full configuration |
+
+#### Optional Enhancements
+
+1. **Add `execution_config.fbs`** for explicit execution level specification:
+   ```fbs
+   table ExecutionConfig {
+     level: ExecutionLevel = Logic;
+     num_iterations: uint32 = 1;
+     headless: bool = true;
+   }
+   ```
+   Would be added to `TestDataConfig` as optional field.
+
+2. **Add scene type to SimulationData** for Scene-level testing:
+   ```fbs
+   table SimulationData {
+     steps: [SimulationStep];
+     description: string;
+     scene_type: SceneType;  // NEW: Which scene to test
+   }
+   ```
+
+3. **Add logic workflow schema** for custom logic sequences:
+   ```fbs
+   table LogicWorkflow {
+     name: string;
+     steps: [SimulationStep];
+     description: string;
+   }
+   
+   table TestDataConfig {
+     // ... existing fields ...
+     custom_workflows: [LogicWorkflow];  // NEW: Named workflows
+   }
+   ```
+
+### Schema Design Principles
+
+The current schema design follows good practices:
+
+1. **Separation of Concerns**: Test-specific schemas (`test_data.fbs`, `simulation.fbs`) are separate from production schemas (`game_engine.fbs`, `scenes.fbs`).
+
+2. **Composition**: Complex types are built from simpler ones (e.g., `DataCollection` composes `EntityCollection` and `EventBusData`).
+
+3. **Extensibility**: Optional fields allow adding new capabilities without breaking existing data files.
+
+4. **Type Safety**: Enums (`FunctionType`, `LogicClassType`, `SceneType`) provide compile-time validation.
+
+### Conclusion: Schema Compatibility
+
+**The current FlatBuffers schema structure is compatible with the proposed unified architecture.** No breaking changes are required. Optional enhancements (execution level config, scene type in simulation) can be added incrementally without affecting existing test data files.
+
+The key insight is that the schemas already follow a pattern of:
+- **Shared core types** (entities, resources) used by both production and test
+- **Specialized types** (SimulationData, TestDataConfig) for test-specific needs
+- **Enum-based dispatch** (FunctionType, LogicClassType) matching the execution model
+
 ## Proposed Architecture
 
 ### Core Principle: Composition Over Inheritance
