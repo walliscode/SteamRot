@@ -136,7 +136,7 @@ CreateSceneChangePacket(const SceneChangePacketData &data) {
     scene_change_packet.first =
         uuids::uuid::from_string(data.uuid()->c_str());
   }
-  if (!data.scene_type()) {
+  if (data.scene_type() == SceneType_UNKNOWN) {
     return std::unexpected(
         FailInfo{FailMode::FlatbuffersDataNotFound,
                  "CreateSceneChangePacket: SceneChangePacketData "

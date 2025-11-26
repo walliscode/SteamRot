@@ -151,7 +151,7 @@ TEST_CASE("CreateSceneChangePacket creates packet with valid scene type",
   auto data_offset = steamrot::CreateSceneChangePacketData(
       builder,
       0, // uuid
-      steamrot::SceneType_TITLE_SCENE);
+      steamrot::SceneType_TITLE);
   builder.Finish(data_offset);
 
   const steamrot::SceneChangePacketData *data =
@@ -161,7 +161,7 @@ TEST_CASE("CreateSceneChangePacket creates packet with valid scene type",
   auto result = steamrot::event::CreateSceneChangePacket(*data);
 
   REQUIRE(result.has_value());
-  REQUIRE(result.value().second == steamrot::SceneType_TITLE_SCENE);
+  REQUIRE(result.value().second == steamrot::SceneType_TITLE);
   REQUIRE_FALSE(result.value().first.has_value()); // No UUID
 }
 
@@ -172,7 +172,7 @@ TEST_CASE("CreateSceneChangePacket creates packet with valid UUID",
   // Create SceneChangePacketData with valid UUID and scene type
   auto uuid_str = builder.CreateString("550e8400-e29b-41d4-a716-446655440000");
   auto data_offset = steamrot::CreateSceneChangePacketData(
-      builder, uuid_str, steamrot::SceneType_TITLE_SCENE);
+      builder, uuid_str, steamrot::SceneType_TITLE);
   builder.Finish(data_offset);
 
   const steamrot::SceneChangePacketData *data =
@@ -182,7 +182,7 @@ TEST_CASE("CreateSceneChangePacket creates packet with valid UUID",
   auto result = steamrot::event::CreateSceneChangePacket(*data);
 
   REQUIRE(result.has_value());
-  REQUIRE(result.value().second == steamrot::SceneType_TITLE_SCENE);
+  REQUIRE(result.value().second == steamrot::SceneType_TITLE);
   REQUIRE(result.value().first.has_value());
 }
 
@@ -193,7 +193,7 @@ TEST_CASE("CreateSceneChangePacket fails with invalid UUID",
   // Create SceneChangePacketData with invalid UUID
   auto uuid_str = builder.CreateString("not-a-valid-uuid");
   auto data_offset = steamrot::CreateSceneChangePacketData(
-      builder, uuid_str, steamrot::SceneType_TITLE_SCENE);
+      builder, uuid_str, steamrot::SceneType_TITLE);
   builder.Finish(data_offset);
 
   const steamrot::SceneChangePacketData *data =
@@ -214,7 +214,7 @@ TEST_CASE("CreateSceneChangePacket fails with missing scene type",
   auto data_offset = steamrot::CreateSceneChangePacketData(
       builder,
       0, // uuid
-      steamrot::SceneType_NONE);
+      steamrot::SceneType_UNKNOWN);
   builder.Finish(data_offset);
 
   const steamrot::SceneChangePacketData *data =
@@ -301,7 +301,7 @@ TEST_CASE("CreateEventData creates EventData from SceneChangePacketData",
   auto data_offset = steamrot::CreateSceneChangePacketData(
       builder,
       0, // uuid
-      steamrot::SceneType_TITLE_SCENE);
+      steamrot::SceneType_TITLE);
   builder.Finish(data_offset);
 
   const steamrot::SceneChangePacketData *data =
@@ -364,7 +364,7 @@ TEST_CASE("CreateEventData propagates error from CreateSceneChangePacket",
   // Create SceneChangePacketData with invalid UUID
   auto uuid_str = builder.CreateString("invalid-uuid");
   auto data_offset = steamrot::CreateSceneChangePacketData(
-      builder, uuid_str, steamrot::SceneType_TITLE_SCENE);
+      builder, uuid_str, steamrot::SceneType_TITLE);
   builder.Finish(data_offset);
 
   const steamrot::SceneChangePacketData *data =
