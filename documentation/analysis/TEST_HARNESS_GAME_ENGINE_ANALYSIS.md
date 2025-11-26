@@ -476,23 +476,25 @@ namespace steamrot::config {
   /// These settings are fixed at compile time for production builds.
   /// Test builds may override these via preprocessor definitions.
   /////////////////////////////////////////////////
-  struct GameEngineConfig {
-    static constexpr bool ENABLE_RUNTIME_LOGIC_INJECTION = false;
-    static constexpr bool ENABLE_DATA_INJECTION = false;
-    static constexpr bool ENABLE_HEADLESS_MODE = false;
-    static constexpr EnvironmentType ENV_TYPE = EnvironmentType::Production;
-  };
-
-  // Test configuration can override
-  #ifdef STEAMROT_TEST_MODE
-  template<>
+  
+#ifdef STEAMROT_TEST_MODE
+  // Test configuration: enables all injection capabilities
   struct GameEngineConfig {
     static constexpr bool ENABLE_RUNTIME_LOGIC_INJECTION = true;
     static constexpr bool ENABLE_DATA_INJECTION = true;
     static constexpr bool ENABLE_HEADLESS_MODE = true;
     static constexpr EnvironmentType ENV_TYPE = EnvironmentType::Test;
   };
-  #endif
+#else
+  // Production configuration: all injection disabled
+  struct GameEngineConfig {
+    static constexpr bool ENABLE_RUNTIME_LOGIC_INJECTION = false;
+    static constexpr bool ENABLE_DATA_INJECTION = false;
+    static constexpr bool ENABLE_HEADLESS_MODE = false;
+    static constexpr EnvironmentType ENV_TYPE = EnvironmentType::Production;
+  };
+#endif
+
 }
 ```
 
@@ -512,7 +514,9 @@ TEST_CASE("UICollisionLogic detects mouse over", "[Logic]") {
   TestFixture fixture;
   fixture.Initialize(entity_collection);
   
-  auto result = execution::ExecuteLogic<UICollisionLogic>(fixture.GetSceneContext());
+  // Create and execute the logic
+  UICollisionLogic logic(fixture.GetSceneContext());
+  auto result = execution::ExecuteLogic(logic, fixture.GetSceneContext());
   REQUIRE(result.has_value());
 }
 
