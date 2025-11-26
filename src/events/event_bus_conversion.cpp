@@ -30,25 +30,11 @@ ConvertEventBusDataToEventBus(const EventBusData *event_bus_data) {
 
   // Convert each EventPacketData to EventPacket
   for (const EventPacketData *packet_data : *event_bus_data->events()) {
-    if (!packet_data) {
-      return std::unexpected(
-          FailInfo(FailMode::NullPointer, "EventPacketData is null"));
+    auto event_packet_result = CreateEventPacketFromData(packet_data);
+    if (!event_packet_result.has_value()) {
+      return std::unexpected(event_packet_result.error());
     }
-
-    // Create EventPacket from the data
-    EventPacket event_packet(packet_data->event_lifetime());
-    event_packet.m_event_type = packet_data->event_type();
-
-    // set EventData
-    auto event_data_creation_result = event::CreateEventData(
-        packet_data->event_data_data_type(), packet_data->event_data_data());
-    // Check for errors during EventData creation, if not, set the EventData
-    if (!event_data_creation_result.has_value()) {
-      return std::unexpected(event_data_creation_result.error());
-    } else {
-      event_packet.m_event_data = event_data_creation_result.value();
-    }
-    event_bus.push_back(event_packet);
+    event_bus.push_back(event_packet_result.value());
   }
 
   return event_bus;
