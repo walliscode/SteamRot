@@ -11,6 +11,7 @@
 #include "events_generated.h"
 #include "uuid.h"
 #include <cstddef>
+#include <unordered_map>
 #include <variant>
 
 namespace steamrot::event {
