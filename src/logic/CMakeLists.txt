@@ -9,6 +9,7 @@ add_library(logic
   logic_collision.cpp
   logic_action.cpp
   logic_ui.cpp
+  logic_execution.cpp
 )
 
 target_include_directories(logic

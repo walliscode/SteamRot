@@ -4,6 +4,7 @@ event_factory.cpp
 event_bus_conversion.cpp
 Subscriber.cpp
 SubscriberFactory.cpp
+event_processing.cpp
 )
 
 target_include_directories(events

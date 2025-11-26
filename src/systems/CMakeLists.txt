@@ -2,6 +2,7 @@
 add_library(systems
     GameEngine.cpp
     ActionManager.cpp
+    game_loop.cpp
 )
 
 # check if set definitions exist
