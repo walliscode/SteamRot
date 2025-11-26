@@ -1,13 +1,19 @@
-#include "event_conversion.h"
+/////////////////////////////////////////////////
+/// @file
+/// @brief Implementation of EventData factory functions
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include "event_factory.h"
 #include "EventPacket.h"
 #include "events_generated.h"
 #include "uuid.h"
 #include <cstddef>
 #include <variant>
 
-namespace steamrot {
-namespace event {
-namespace conversion {
+namespace steamrot::event {
 
 /////////////////////////////////////////////////
 static const std::unordered_map<KeyboardInput, sf::Keyboard::Key> &
@@ -59,90 +65,8 @@ GetFlatbuffersToSFMLMouseMap() {
 };
 
 /////////////////////////////////////////////////
-std::expected<EventData, FailInfo>
-ConvertFlatbuffersEventDataDataToEventData(const EventDataData data_type,
-                                           const void *data) {
-
-  switch (data_type) {
-  case EventDataData::EventDataData_UserInputBitsetData: {
-
-    // cast data to UserInputBitsetData
-    auto user_input_bitset_data =
-        static_cast<const UserInputBitsetData *>(data);
-
-    // convert to UserInputBitset
-    auto user_input_bitset_result =
-        ConvertFBDataToUserInputBitset(*user_input_bitset_data);
-    if (!user_input_bitset_result.has_value())
-      return std::unexpected(user_input_bitset_result.error());
-
-    return user_input_bitset_result.value();
-  }
-  case EventDataData::EventDataData_SceneChangePacketData: {
-    // cast data to SceneChangePacketData
-    auto scene_change_packet_data =
-        static_cast<const SceneChangePacketData *>(data);
-
-    // construct SceneChangePacket
-    SceneChangePacket scene_change_packet;
-
-    if (scene_change_packet_data->uuid()) {
-
-      // check if uuid is valid
-      if (!uuids::uuid::is_valid_uuid(
-              scene_change_packet_data->uuid()->c_str())) {
-        return std::unexpected(FailInfo{
-            FailMode::InvalidUUID,
-            "ConvertFlatbuffersEventDataDataToEventData: SceneChangePacketData "
-            "contains invalid UUID."});
-      }
-
-      scene_change_packet.first =
-          uuids::uuid::from_string(scene_change_packet_data->uuid()->c_str());
-    }
-    if (!scene_change_packet_data->scene_type()) {
-      return std::unexpected(FailInfo{
-          FailMode::FlatbuffersDataNotFound,
-          "ConvertFlatbuffersEventDataDataToEventData: SceneChangePacketData "
-          "missing scene_type."});
-    }
-    scene_change_packet.second = scene_change_packet_data->scene_type();
-
-    return scene_change_packet;
-  }
-
-  case EventDataData::EventDataData_UserInterfaceNameData: {
-
-    // cast data to UserInterfaceNameData
-    auto ui_name_data = static_cast<const UserInterfaceNameData *>(data);
-
-    // check if name exists
-    if (!ui_name_data->id()) {
-      return std::unexpected(FailInfo{
-          FailMode::FlatbuffersDataNotFound,
-          "ConvertFlatbuffersEventDataDataToEventData: UserInterfaceName "
-          "missing name."});
-    }
-
-    UserInterfaceName ui_name{ui_name_data->id()->str()};
-
-    return ui_name;
-  }
-
-  case EventDataData::EventDataData_NONE: {
-    return std::monostate();
-  }
-
-  default:
-    return std::unexpected(FailInfo{
-        FailMode::EnumValueNotHandled,
-        "ConvertFlatbuffersEventDataDataToEventData: EventDataData type not "
-        "handled."});
-  }
-}
-/////////////////////////////////////////////////
 std::expected<UserInputBitset, FailInfo>
-ConvertFBDataToUserInputBitset(const UserInputBitsetData &data) {
+CreateUserInputBitset(const UserInputBitsetData &data) {
 
   // create EventBitset that represents the keys for this action
   UserInputBitset event_bitset;
@@ -191,7 +115,110 @@ ConvertFBDataToUserInputBitset(const UserInputBitsetData &data) {
   }
 
   return event_bitset;
-};
-} // namespace conversion
-} // namespace event
-} // namespace steamrot
+}
+
+/////////////////////////////////////////////////
+std::expected<SceneChangePacket, FailInfo>
+CreateSceneChangePacket(const SceneChangePacketData &data) {
+
+  SceneChangePacket scene_change_packet;
+
+  if (data.uuid()) {
+
+    // check if uuid is valid
+    if (!uuids::uuid::is_valid_uuid(data.uuid()->c_str())) {
+      return std::unexpected(
+          FailInfo{FailMode::InvalidUUID,
+                   "CreateSceneChangePacket: SceneChangePacketData "
+                   "contains invalid UUID."});
+    }
+
+    scene_change_packet.first =
+        uuids::uuid::from_string(data.uuid()->c_str());
+  }
+  if (!data.scene_type()) {
+    return std::unexpected(
+        FailInfo{FailMode::FlatbuffersDataNotFound,
+                 "CreateSceneChangePacket: SceneChangePacketData "
+                 "missing scene_type."});
+  }
+  scene_change_packet.second = data.scene_type();
+
+  return scene_change_packet;
+}
+
+/////////////////////////////////////////////////
+std::expected<UserInterfaceName, FailInfo>
+CreateUserInterfaceName(const UserInterfaceNameData &data) {
+
+  // check if name exists
+  if (!data.id()) {
+    return std::unexpected(
+        FailInfo{FailMode::FlatbuffersDataNotFound,
+                 "CreateUserInterfaceName: UserInterfaceNameData "
+                 "missing id."});
+  }
+
+  UserInterfaceName ui_name{data.id()->str()};
+
+  return ui_name;
+}
+
+/////////////////////////////////////////////////
+std::expected<EventData, FailInfo>
+CreateEventData(const EventDataData data_type, const void *data) {
+
+  switch (data_type) {
+  case EventDataData::EventDataData_UserInputBitsetData: {
+
+    // cast data to UserInputBitsetData
+    auto user_input_bitset_data =
+        static_cast<const UserInputBitsetData *>(data);
+
+    // convert to UserInputBitset
+    auto user_input_bitset_result =
+        CreateUserInputBitset(*user_input_bitset_data);
+    if (!user_input_bitset_result.has_value())
+      return std::unexpected(user_input_bitset_result.error());
+
+    return user_input_bitset_result.value();
+  }
+  case EventDataData::EventDataData_SceneChangePacketData: {
+    // cast data to SceneChangePacketData
+    auto scene_change_packet_data =
+        static_cast<const SceneChangePacketData *>(data);
+
+    // convert to SceneChangePacket
+    auto scene_change_packet_result =
+        CreateSceneChangePacket(*scene_change_packet_data);
+    if (!scene_change_packet_result.has_value())
+      return std::unexpected(scene_change_packet_result.error());
+
+    return scene_change_packet_result.value();
+  }
+
+  case EventDataData::EventDataData_UserInterfaceNameData: {
+
+    // cast data to UserInterfaceNameData
+    auto ui_name_data = static_cast<const UserInterfaceNameData *>(data);
+
+    // convert to UserInterfaceName
+    auto ui_name_result = CreateUserInterfaceName(*ui_name_data);
+    if (!ui_name_result.has_value())
+      return std::unexpected(ui_name_result.error());
+
+    return ui_name_result.value();
+  }
+
+  case EventDataData::EventDataData_NONE: {
+    return std::monostate();
+  }
+
+  default:
+    return std::unexpected(
+        FailInfo{FailMode::EnumValueNotHandled,
+                 "CreateEventData: EventDataData type not handled."});
+  }
+}
+
+} // namespace steamrot::event

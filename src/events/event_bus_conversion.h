@@ -17,7 +17,7 @@
 #include "event_bus_data_generated.h"
 #include <expected>
 
-namespace steamrot::event::conversion {
+namespace steamrot::event {
 
 /////////////////////////////////////////////////
 /// @brief Convert EventBusData to EventBus
@@ -50,4 +50,4 @@ std::expected<std::monostate, FailInfo>
 ConfigureEventHandlerFromEventBusData(const EventBusData *event_bus_data,
                                       EventHandler &event_handler);
 
-} // namespace steamrot::event::conversion
+} // namespace steamrot::event

@@ -7,11 +7,11 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "event_bus_conversion.h"
-#include "event_conversion.h"
+#include "event_factory.h"
 #include "events_generated.h"
 #include "uuid.h"
 
-namespace steamrot::event::conversion {
+namespace steamrot::event {
 
 /////////////////////////////////////////////////
 std::expected<EventBus, FailInfo>
@@ -49,8 +49,8 @@ ConvertEventBusDataToEventBus(const EventBusData *event_bus_data) {
           packet_data->event_data_data_as_UserInputBitsetData();
 
       if (input_data) {
-        // Use the existing conversion function from event_conversion.h
-        auto input_bitset_result = ConvertFBDataToUserInputBitset(*input_data);
+        // Use the existing conversion function from event_factory.h
+        auto input_bitset_result = CreateUserInputBitset(*input_data);
 
         if (!input_bitset_result.has_value()) {
           return std::unexpected(input_bitset_result.error());
@@ -127,4 +127,4 @@ ConfigureEventHandlerFromEventBusData(const EventBusData *event_bus_data,
   return std::monostate{};
 }
 
-} // namespace steamrot::event::conversion
+} // namespace steamrot::event
