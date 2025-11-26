@@ -25,9 +25,6 @@ ExecuteEventTestData(const EventTestData *event_data, TestFixture &fixture) {
         FailInfo(FailMode::NullPointer, "EventTestData is null"));
   }
 
-  std::cout << "Executing EventTestData for tick " << event_data->tick()
-            << std::endl;
-
   if (!event_data->event_packet()) {
     return std::unexpected(
         FailInfo(FailMode::NullPointer, "EventPacketData is null"));
