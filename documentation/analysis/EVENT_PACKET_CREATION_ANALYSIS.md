@@ -79,20 +79,16 @@ Then both `event_bus_conversion.cpp` and `event_simulation.cpp` can call this fu
 Both files implement identical `GetNameForEventDataIndex()`:
 
 ```cpp
-std::string GetNameForEventDataIndex(size_t index) const {
-  switch (index) {
-  case 0: return "std::monostate";
-  case 1: return "UserInputBitset";
-  case 2: return "SceneChangePacket";
-  case 3: return "UIElementName";  // Note: inconsistency - should be "UserInterfaceName"
-  default: return "Unknown";
-  }
-}
+// In EventPacketEqualsMatcher.cpp (line 26):
+case 3: return "UIElementName";  // INCORRECT
+
+// In EventDataEqualsMatcher.cpp (line 28):
+case 3: return "UserInterfaceName";  // CORRECT
 ```
 
 **Impact:**
 - Minor code duplication
-- Note: `EventPacketEqualsMatcher` uses "UIElementName" while `EventDataEqualsMatcher` uses "UserInterfaceName"
+- **Naming inconsistency:** `EventPacketEqualsMatcher.cpp:26` returns "UIElementName" but should return "UserInterfaceName" to match `EventDataEqualsMatcher.cpp:28` and the actual type name in the codebase
 
 **Recommendation:**
 
