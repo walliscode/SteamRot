@@ -42,9 +42,10 @@ TEST_CASE("CreateUserInputBitset handles keyboard pressed",
   flatbuffers::FlatBufferBuilder builder;
 
   // Create UserInputBitsetData with A key pressed
-  std::vector<int8_t> keyboard_pressed = {steamrot::KeyboardInput_A};
+  std::vector<uint8_t> keyboard_pressed = {steamrot::KeyboardInput_A};
+  auto keyboard_pressed_vec = builder.CreateVector(keyboard_pressed);
   auto data_offset = steamrot::CreateUserInputBitsetData(
-      builder, builder.CreateVector(keyboard_pressed));
+      builder, keyboard_pressed_vec);
   builder.Finish(data_offset);
 
   const steamrot::UserInputBitsetData *data =
@@ -64,11 +65,12 @@ TEST_CASE("CreateUserInputBitset handles keyboard released",
   flatbuffers::FlatBufferBuilder builder;
 
   // Create UserInputBitsetData with A key released
-  std::vector<int8_t> keyboard_released = {steamrot::KeyboardInput_A};
+  std::vector<uint8_t> keyboard_released = {steamrot::KeyboardInput_A};
+  auto keyboard_released_vec = builder.CreateVector(keyboard_released);
   auto data_offset = steamrot::CreateUserInputBitsetData(
       builder,
       0, // keyboard_pressed
-      builder.CreateVector(keyboard_released));
+      keyboard_released_vec);
   builder.Finish(data_offset);
 
   const steamrot::UserInputBitsetData *data =
@@ -89,12 +91,13 @@ TEST_CASE("CreateUserInputBitset handles mouse pressed",
   flatbuffers::FlatBufferBuilder builder;
 
   // Create UserInputBitsetData with left click pressed
-  std::vector<int8_t> mouse_pressed = {steamrot::MouseInput_LEFT_CLICK};
+  std::vector<uint8_t> mouse_pressed = {steamrot::MouseInput_LEFT_CLICK};
+  auto mouse_pressed_vec = builder.CreateVector(mouse_pressed);
   auto data_offset = steamrot::CreateUserInputBitsetData(
       builder,
       0, // keyboard_pressed
       0, // keyboard_released
-      builder.CreateVector(mouse_pressed));
+      mouse_pressed_vec);
   builder.Finish(data_offset);
 
   const steamrot::UserInputBitsetData *data =
@@ -115,13 +118,14 @@ TEST_CASE("CreateUserInputBitset handles mouse released",
   flatbuffers::FlatBufferBuilder builder;
 
   // Create UserInputBitsetData with left click released
-  std::vector<int8_t> mouse_released = {steamrot::MouseInput_LEFT_CLICK};
+  std::vector<uint8_t> mouse_released = {steamrot::MouseInput_LEFT_CLICK};
+  auto mouse_released_vec = builder.CreateVector(mouse_released);
   auto data_offset = steamrot::CreateUserInputBitsetData(
       builder,
       0, // keyboard_pressed
       0, // keyboard_released
       0, // mouse_pressed
-      builder.CreateVector(mouse_released));
+      mouse_released_vec);
   builder.Finish(data_offset);
 
   const steamrot::UserInputBitsetData *data =
@@ -277,9 +281,10 @@ TEST_CASE("CreateEventData creates EventData from UserInputBitsetData",
   flatbuffers::FlatBufferBuilder builder;
 
   // Create UserInputBitsetData with A key pressed
-  std::vector<int8_t> keyboard_pressed = {steamrot::KeyboardInput_A};
+  std::vector<uint8_t> keyboard_pressed = {steamrot::KeyboardInput_A};
+  auto keyboard_pressed_vec = builder.CreateVector(keyboard_pressed);
   auto data_offset = steamrot::CreateUserInputBitsetData(
-      builder, builder.CreateVector(keyboard_pressed));
+      builder, keyboard_pressed_vec);
   builder.Finish(data_offset);
 
   const steamrot::UserInputBitsetData *data =
