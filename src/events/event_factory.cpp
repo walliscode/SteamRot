@@ -134,8 +134,7 @@ CreateSceneChangePacket(const SceneChangePacketData &data) {
                    "contains invalid UUID."});
     }
 
-    scene_change_packet.first =
-        uuids::uuid::from_string(data.uuid()->c_str());
+    scene_change_packet.first = uuids::uuid::from_string(data.uuid()->c_str());
   }
   if (data.scene_type() == SceneType_UNKNOWN) {
     return std::unexpected(

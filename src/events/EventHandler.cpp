@@ -186,6 +186,7 @@ void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
     std::cout << "Subscriber Trigger Data does not match Event Data"
               << std::endl;
 
+    std::cout << "Expected Event data is data from Subscriber" << std::endl;
     auto matcher =
         tests::EqualsEventData(locked_subscriber->m_trigger_event_data.value());
 
