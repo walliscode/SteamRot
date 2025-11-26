@@ -10,6 +10,7 @@
 
 #include "EventPacket.h"
 #include "FailInfo.h"
+#include "event_packet_data_generated.h"
 #include "events_generated.h"
 #include "scene_change_packet_generated.h"
 #include "user_input_generated.h"
@@ -55,5 +56,18 @@ CreateUserInterfaceName(const UserInterfaceNameData &data);
 /////////////////////////////////////////////////
 std::expected<EventData, FailInfo>
 CreateEventData(const EventDataData data_type, const void *data);
+
+/////////////////////////////////////////////////
+/// @brief Convert EventPacketData to EventPacket
+///
+/// Creates an EventPacket from FlatBuffers EventPacketData by:
+/// 1. Extracting event_lifetime and event_type
+/// 2. Converting event_data_data to EventData via CreateEventData
+///
+/// @param packet_data FlatBuffers EventPacketData to convert
+/// @return EventPacket on success, FailInfo on error
+/////////////////////////////////////////////////
+std::expected<EventPacket, FailInfo>
+CreateEventPacketFromData(const EventPacketData *packet_data);
 
 } // namespace steamrot::event

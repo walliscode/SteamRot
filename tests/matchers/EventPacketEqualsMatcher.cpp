@@ -23,7 +23,7 @@ EventPacketEqualsMatcher::GetNameForEventDataIndex(size_t index) const {
   case 2:
     return "SceneChangePacket";
   case 3:
-    return "UIElementName";
+    return "UserInterfaceName";
   default:
     return "Unknown";
   }

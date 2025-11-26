@@ -221,4 +221,28 @@ CreateEventData(const EventDataData data_type, const void *data) {
   }
 }
 
+/////////////////////////////////////////////////
+std::expected<EventPacket, FailInfo>
+CreateEventPacketFromData(const EventPacketData *packet_data) {
+
+  if (!packet_data) {
+    return std::unexpected(
+        FailInfo(FailMode::NullPointer, "EventPacketData is null"));
+  }
+
+  EventPacket event_packet(packet_data->event_lifetime());
+  event_packet.m_event_type = packet_data->event_type();
+
+  auto event_data_result = CreateEventData(packet_data->event_data_data_type(),
+                                           packet_data->event_data_data());
+
+  if (!event_data_result.has_value()) {
+    return std::unexpected(event_data_result.error());
+  }
+
+  event_packet.m_event_data = event_data_result.value();
+
+  return event_packet;
+}
+
 } // namespace steamrot::event

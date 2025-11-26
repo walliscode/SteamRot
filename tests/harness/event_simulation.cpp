@@ -9,7 +9,6 @@
 #include "event_simulation.h"
 #include "EventPacket.h"
 #include "event_factory.h"
-#include "event_packet_data_generated.h"
 #include "events_generated.h"
 #include <iostream>
 #include <set>
@@ -33,24 +32,17 @@ ExecuteEventTestData(const EventTestData *event_data, TestFixture &fixture) {
         FailInfo(FailMode::NullPointer, "EventPacketData is null"));
   }
 
-  const EventPacketData *packet_data = event_data->event_packet();
+  // Create EventPacket from the data using factory function
+  auto event_packet_result =
+      event::CreateEventPacketFromData(event_data->event_packet());
 
-  // Create EventPacket from the data
-  EventPacket event_packet(packet_data->event_lifetime());
-  event_packet.m_event_type = packet_data->event_type();
-
-  // Set EventData
-  auto event_data_creation_result = event::CreateEventData(
-      packet_data->event_data_data_type(), packet_data->event_data_data());
-
-  // Check for errors during EventData creation, if not, set the EventData
-  if (!event_data_creation_result.has_value()) {
-    return std::unexpected(event_data_creation_result.error());
-  } else {
-    event_packet.m_event_data = event_data_creation_result.value();
-    std::cout << "Created EventData of type " << EnumNamesEventDataData()
-              << " for EventPacket" << std::endl;
+  if (!event_packet_result.has_value()) {
+    return std::unexpected(event_packet_result.error());
   }
+
+  EventPacket event_packet = event_packet_result.value();
+  std::cout << "Created EventPacket with type "
+            << EnumNameEventType(event_packet.m_event_type) << std::endl;
 
   // Add event to the event handler
   EventHandler &event_handler = fixture.GetGameResources().event_handler;
