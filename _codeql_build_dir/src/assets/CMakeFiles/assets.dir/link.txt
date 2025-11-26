@@ -1,2 +1,0 @@
-/usr/bin/ar qc libassets.a CMakeFiles/assets.dir/AssetManager.cpp.o
-/usr/bin/ranlib libassets.a

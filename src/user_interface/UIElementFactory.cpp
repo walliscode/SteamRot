@@ -7,7 +7,7 @@
 #include "EventPacket.h"
 #include "FailInfo.h"
 #include "SubscriberFactory.h"
-#include "event_conversion.h"
+#include "event_factory.h"
 #include "user_interface_generated.h"
 #include <expected>
 #include <string>
@@ -150,9 +150,9 @@ ConfigureBaseUIElement(UIElement &element, const UIElementData &data,
     }
     EventType event_type = data.response_event_data()->event_type();
 
-    // create EventData by running the flatbuffers data through the converter
+    // create EventData by running the flatbuffers data through the factory
     auto event_data_conversion_result =
-        event::conversion::ConvertFlatbuffersEventDataDataToEventData(
+        event::CreateEventData(
             data.response_event_data()->event_data_data_type(),
             data.response_event_data()->event_data_data());
     if (!event_data_conversion_result.has_value())

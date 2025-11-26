@@ -149,10 +149,9 @@ CreateFixtureFromTestData(const TestDataConfig *config,
   // Configure EventBus from start_event_bus if present in start_data_collection
   if (config->start_data_collection() &&
       config->start_data_collection()->event_bus()) {
-    auto configure_result =
-        event::conversion::ConfigureEventHandlerFromEventBusData(
-            config->start_data_collection()->event_bus(),
-            fixture.GetGameResources().event_handler);
+    auto configure_result = event::ConfigureEventHandlerFromEventBusData(
+        config->start_data_collection()->event_bus(),
+        fixture.GetGameResources().event_handler);
 
     if (!configure_result.has_value()) {
       return std::unexpected(configure_result.error());
@@ -263,8 +262,7 @@ RunDataStructComparisonTest(const DataCollection *data_collection,
 
     // Convert EventBusData to EventBus
     auto expected_event_bus_result =
-        event::conversion::ConvertEventBusDataToEventBus(
-            data_collection->event_bus());
+        event::ConvertEventBusDataToEventBus(data_collection->event_bus());
 
     if (!expected_event_bus_result.has_value()) {
       return std::unexpected(expected_event_bus_result.error());
@@ -294,8 +292,7 @@ RunDataStructComparisonTest(const DataCollection *data_collection,
 
     // Convert EventBusData to EventBus
     auto expected_event_bus_result =
-        event::conversion::ConvertEventBusDataToEventBus(
-            data_collection->waiting_room());
+        event::ConvertEventBusDataToEventBus(data_collection->waiting_room());
 
     if (!expected_event_bus_result.has_value()) {
       return std::unexpected(expected_event_bus_result.error());

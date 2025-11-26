@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////
 #include "event_simulation.h"
 #include "EventPacket.h"
-#include "event_conversion.h"
+#include "event_factory.h"
 #include "uuid.h"
 #include <iostream>
 #include <set>
@@ -42,9 +42,9 @@ ExecuteEventTestData(const EventTestData *event_data, TestFixture &fixture) {
     const UserInputBitsetData *input_data =
         packet_data->event_data_data_as_UserInputBitsetData();
     if (input_data) {
-      // Use the existing conversion function from event_conversion.h
+      // Use the existing factory function from event_factory.h
       auto input_bitset_result =
-          event::conversion::ConvertFBDataToUserInputBitset(*input_data);
+          event::CreateUserInputBitset(*input_data);
 
       if (!input_bitset_result.has_value()) {
         return std::unexpected(input_bitset_result.error());
