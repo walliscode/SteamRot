@@ -14,7 +14,6 @@
 #include "catch2/catch_test_macros.hpp"
 #include "ui_element_factory_test_helpers.h"
 #include "user_interface_generated.h"
-#include <iostream>
 #include <memory>
 #include <string>
 
@@ -96,7 +95,7 @@ TEST_CASE("UIElementFactory::CreateUIElement - Button", "[UIElementFactory]") {
   const auto *button_data =
       TestUIElementDataFactory::CreateTestButtonData(builder, "TestButton");
   REQUIRE(button_data != nullptr);
-  std::cout << "Creating UI Element" << std::endl;
+
   auto element_result = CreateUIElement(
       steamrot::UIElementDataUnion::UIElementDataUnion_ButtonData, button_data,
       test_context.GetGameContext().event_handler);
@@ -104,8 +103,6 @@ TEST_CASE("UIElementFactory::CreateUIElement - Button", "[UIElementFactory]") {
   if (!element_result.has_value()) {
     FAIL(element_result.error().message);
   }
-
-  std::cout << "Attempting t o dynamic cast to ButtonElement" << std::endl;
 
   auto button_element =
       dynamic_cast<steamrot::ButtonElement *>(element_result.value().get());

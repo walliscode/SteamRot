@@ -106,9 +106,6 @@ void HandleSFMLEvents(sf::RenderWindow &window, EventHandler &event_handler) {
     // set the event data to the UserInputBitset
     event_packet.m_event_data = user_input_bitset;
 
-    std::cout << "User Input Event Packet Created " << std::endl;
-    std::cout << "UserInputBitset: " << user_input_bitset << std::endl;
-
     // add the event packet to the waiting room event bus
     event_handler.AddEvent(event_packet);
   }
@@ -127,11 +124,8 @@ void EventHandler::UpateSubscribersFromGlobalEventBus() {
   // go through each event in the global event bus
   for (const auto &event : m_global_event_bus) {
 
-    std::cout << "Processing Event of type "
-              << EnumNameEventType(event.m_event_type) << std::endl;
     if (m_subscriber_register.contains(event.m_event_type)) {
-      std::cout << "Found Subscribers for Event Type "
-                << EnumNameEventType(event.m_event_type) << std::endl;
+
       // go through each subscriber registered for the event type
       for (auto &subscriber_weak :
            m_subscriber_register.at(event.m_event_type)) {
@@ -174,7 +168,6 @@ void RemoveDeadEvents(EventBus &event_bus) {
 void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
                       const EventData &event_data) {
 
-  std::cout << "Updating Subscriber..." << std::endl;
   auto locked_subscriber = subscriber.lock();
   if (!locked_subscriber)
     // if the Subscriber has expired, do nothing
@@ -183,21 +176,13 @@ void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
   // if the Subscriber has trigger data compare against the event data
   if (locked_subscriber->m_trigger_event_data.has_value() &&
       (locked_subscriber->m_trigger_event_data.value() != event_data)) {
-    std::cout << "Subscriber Trigger Data does not match Event Data"
-              << std::endl;
 
-    std::cout << "Expected Event data is data from Subscriber" << std::endl;
     auto matcher =
         tests::EqualsEventData(locked_subscriber->m_trigger_event_data.value());
 
-    if (!matcher.match(event_data)) {
-      std::cout << "Mismatch Description: " << matcher.describe() << std::endl;
-    }
     return;
   }
 
-  std::cout << "Updating Subscriber of type "
-            << EnumNameEventType(locked_subscriber->m_trigger_event_type);
   // activate the subscriber
   locked_subscriber->m_active = true;
 }
