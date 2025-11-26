@@ -1,2 +1,0 @@
-/usr/bin/ar qc libui_styles.a CMakeFiles/ui_styles.dir/styles/StylesConfigurator.cpp.o
-/usr/bin/ranlib libui_styles.a
