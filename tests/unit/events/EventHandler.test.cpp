@@ -169,7 +169,7 @@ TEST_CASE("EventHandler::TickGlobalEventBus updates the global event bus",
   REQUIRE(global_event_bus.empty());
 }
 
-TEST_CASE("UpdateSubscribers turns on Subscribers and copies EventData",
+TEST_CASE("UpdateSubscribers turns on Subscribers",
           "[unit][EventHandler]") {
 
   // create Subscriber variables
@@ -180,12 +180,10 @@ TEST_CASE("UpdateSubscribers turns on Subscribers and copies EventData",
   std::shared_ptr<steamrot::Subscriber> subscriber =
       std::make_shared<steamrot::Subscriber>(event_type);
 
-  // check that the subscriber is not active and that the data is empty
-  REQUIRE(!subscriber->IsActive());
-  REQUIRE(std::holds_alternative<std::monostate>(
-      subscriber->GetRegistrationInfo().second));
+  // check that the subscriber is not active
+  REQUIRE(!subscriber->m_active);
 
-  // create Event Data to copy
+  // create Event Data to use
   sf::Event::KeyPressed event_sf;
   event_sf.code = sf::Keyboard::Key::A;
   sf::Event event{event_sf};
@@ -196,10 +194,7 @@ TEST_CASE("UpdateSubscribers turns on Subscribers and copies EventData",
   std::weak_ptr<steamrot::Subscriber> weak_subscriber = subscriber;
   steamrot::UpdateSubscriber(weak_subscriber, user_input_bitset);
 
-  REQUIRE(subscriber->IsActive());
-  REQUIRE(std::holds_alternative<steamrot::UserInputBitset>(
-      subscriber->GetEventData()));
-  REQUIRE(subscriber->GetEventData() == user_input_bitset);
+  REQUIRE(subscriber->m_active);
 }
 
 TEST_CASE("EventHandler::UpdateSubscribersFrom does not update Subscribers "
@@ -216,7 +211,7 @@ TEST_CASE("EventHandler::UpdateSubscribersFrom does not update Subscribers "
       std::make_shared<steamrot::Subscriber>(event_type);
 
   // check that the subscriber is not active
-  REQUIRE(!subscriber->IsActive());
+  REQUIRE(!subscriber->m_active);
   auto result = event_handler.RegisterSubscriber(subscriber);
   if (!result.has_value())
     FAIL(result.error().message);
@@ -234,7 +229,7 @@ TEST_CASE("EventHandler::UpdateSubscribersFrom does not update Subscribers "
   event_handler.UpateSubscribersFromGlobalEventBus();
 
   // check that the subscriber is still not active
-  REQUIRE(!subscriber->IsActive());
+  REQUIRE(!subscriber->m_active);
 }
 
 TEST_CASE("EventHandler::UpdateSubscribers does not update Subscriber if "
@@ -255,7 +250,7 @@ TEST_CASE("EventHandler::UpdateSubscribers does not update Subscriber if "
       std::make_shared<steamrot::Subscriber>(event_type, trigger_data);
 
   // check that the subscriber is not active
-  REQUIRE(!subscriber->IsActive());
+  REQUIRE(!subscriber->m_active);
 
   // create Event Data to copy that does not match the trigger data
   sf::Event::KeyPressed event_sf2;
@@ -270,7 +265,7 @@ TEST_CASE("EventHandler::UpdateSubscribers does not update Subscriber if "
   steamrot::UpdateSubscriber(weak_subscriber, user_input_bitset);
 
   // check that the subscriber is still not active
-  REQUIRE_FALSE(subscriber->IsActive());
+  REQUIRE_FALSE(subscriber->m_active);
 }
 
 TEST_CASE(
@@ -291,7 +286,7 @@ TEST_CASE(
       std::make_shared<steamrot::Subscriber>(event_type, trigger_data);
 
   // check that the subscriber is not active
-  REQUIRE(!subscriber->IsActive());
+  REQUIRE(!subscriber->m_active);
 
   // create Event Data to copy that matches the trigger data
   steamrot::EventData user_input_bitset;
@@ -303,7 +298,7 @@ TEST_CASE(
   steamrot::UpdateSubscriber(weak_subscriber, user_input_bitset);
 
   // check that the subscriber is now active
-  REQUIRE(subscriber->IsActive());
+  REQUIRE(subscriber->m_active);
 }
 TEST_CASE("EventHandler::UpdateSubscribersFromGlobalEventBus updates correct "
           "subscribers, with and without trigger data",
@@ -338,9 +333,9 @@ TEST_CASE("EventHandler::UpdateSubscribersFromGlobalEventBus updates correct "
                                              nonmatching_trigger_data);
 
   // All should be inactive to start
-  REQUIRE(!subscriber_no_trigger->IsActive());
-  REQUIRE(!subscriber_trigger_match->IsActive());
-  REQUIRE(!subscriber_trigger_no_match->IsActive());
+  REQUIRE(!subscriber_no_trigger->m_active);
+  REQUIRE(!subscriber_trigger_match->m_active);
+  REQUIRE(!subscriber_trigger_no_match->m_active);
 
   // Register all 3
   auto result_no_trigger =
@@ -369,9 +364,9 @@ TEST_CASE("EventHandler::UpdateSubscribersFromGlobalEventBus updates correct "
   event_handler.UpateSubscribersFromGlobalEventBus();
 
   // Subscriber with no trigger data should be active
-  REQUIRE(subscriber_no_trigger->IsActive());
+  REQUIRE(subscriber_no_trigger->m_active);
   // Subscriber with matching trigger data should be active
-  REQUIRE(subscriber_trigger_match->IsActive());
+  REQUIRE(subscriber_trigger_match->m_active);
   // Subscriber with non-matching trigger data should NOT be active
-  REQUIRE_FALSE(subscriber_trigger_no_match->IsActive());
+  REQUIRE_FALSE(subscriber_trigger_no_match->m_active);
 }

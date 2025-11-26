@@ -36,8 +36,8 @@ bool UIElementEqualsMatcher::SubscriptionsEqual(
   // One null, one not
   if (!actual || !expected)
     return false;
-  // Both non-null, compare IsActive state
-  return actual->IsActive() == expected->IsActive();
+  // Both non-null, compare m_active state
+  return actual->m_active == expected->m_active;
 }
 
 /////////////////////////////////////////////////

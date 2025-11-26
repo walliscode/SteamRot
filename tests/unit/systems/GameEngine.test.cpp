@@ -201,10 +201,8 @@ TEST_CASE("GameEngine::ProcessSubscribers quits game when correct Subscriber "
   }
 
   // Activate the Subscriber
-  auto set_active_result = subscriber->SetActive();
-  if (!set_active_result.has_value()) {
-    FAIL("Failed to activate subscriber: " + set_active_result.error().message);
-  }
+  subscriber->m_active = true;
+
   // Process subscriptions in GameEngine
   auto process_subscriptions_result = game_engine.ProcessSubscriptions();
   if (!process_subscriptions_result.has_value()) {
@@ -227,10 +225,8 @@ TEST_CASE("GameEngine::RunGameLoop processes subscribers and quits game",
     FAIL("Failed to register subscriber: " + register_result.error().message);
   }
   // Activate the Subscriber
-  auto set_active_result = subscriber->SetActive();
-  if (!set_active_result.has_value()) {
-    FAIL("Failed to activate subscriber: " + set_active_result.error().message);
-  }
+  subscriber->m_active = true;
+
   // Run the game loop in simulation mode to process subscriptions
   game_engine.RunGame(10, true);
 
@@ -254,10 +250,8 @@ TEST_CASE("GameEngine::ProcessSubscriptions does not quit if another "
     FAIL("Failed to register subscriber: " + register_result.error().message);
   }
   // Activate the Subscriber
-  auto set_active_result = subscriber->SetActive();
-  if (!set_active_result.has_value()) {
-    FAIL("Failed to activate subscriber: " + set_active_result.error().message);
-  }
+  subscriber->m_active = true;
+
   // Process subscriptions in GameEngine
   auto process_subscriptions_result = game_engine.ProcessSubscriptions();
   if (!process_subscriptions_result.has_value()) {
@@ -283,10 +277,8 @@ TEST_CASE("GameEngine::ProcessSubscriptions sets subscribers to inactive after "
   }
 
   // Activate the Subscriber
-  auto set_active_result = subscriber->SetActive();
-  if (!set_active_result.has_value()) {
-    FAIL("Failed to activate subscriber: " + set_active_result.error().message);
-  }
+  subscriber->m_active = true;
+
   // Process subscriptions in GameEngine
   auto process_subscriptions_result = game_engine.ProcessSubscriptions();
   if (!process_subscriptions_result.has_value()) {
@@ -294,7 +286,7 @@ TEST_CASE("GameEngine::ProcessSubscriptions sets subscribers to inactive after "
          process_subscriptions_result.error().message);
   }
   // check that the subscriber is now inactive
-  REQUIRE(!subscriber->IsActive());
+  REQUIRE(!subscriber->m_active);
 }
 
 TEST_CASE(

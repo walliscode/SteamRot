@@ -16,8 +16,7 @@ TEST_CASE("SubscriberEqualsMatcher works correctly",
 
   SECTION("Matcher detects differences in active state") {
     steamrot::Subscriber actual{steamrot::EventType::EventType_EVENT_TEST};
-    auto result = expected.SetActive();
-    REQUIRE(result.has_value());
+    expected.m_active = true;
     REQUIRE_THAT(actual, !steamrot::tests::EqualsSubscriber(expected));
   }
 
@@ -34,10 +33,8 @@ TEST_CASE("SubscriberEqualsMatcher works correctly",
 
   SECTION("Matcher detects equality with both active") {
     steamrot::Subscriber actual{steamrot::EventType::EventType_EVENT_TEST};
-    auto result1 = expected.SetActive();
-    auto result2 = actual.SetActive();
-    REQUIRE(result1.has_value());
-    REQUIRE(result2.has_value());
+    expected.m_active = true;
+    actual.m_active = true;
     REQUIRE_THAT(actual, steamrot::tests::EqualsSubscriber(expected));
   }
 }
@@ -88,14 +85,13 @@ TEST_CASE("SubscriberEqualsMatcher describe is as expected on failure",
   steamrot::Subscriber actual{
       steamrot::EventType::EventType_EVENT_USER_INPUT};
 
-  auto result = expected.SetActive();
-  REQUIRE(result.has_value());
+  expected.m_active = true;
 
   auto matcher = steamrot::tests::EqualsSubscriber(expected);
   matcher.match(actual);
 
   std::string description = matcher.describe();
   REQUIRE(description.find("Subscriber Match:") != std::string::npos);
-  REQUIRE(description.find("IsActive():") != std::string::npos);
-  REQUIRE(description.find("GetEventType():") != std::string::npos);
+  REQUIRE(description.find("m_active:") != std::string::npos);
+  REQUIRE(description.find("m_trigger_event_type:") != std::string::npos);
 }
