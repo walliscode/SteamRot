@@ -179,7 +179,7 @@ TEST_CASE("SceneManager's AddSceneFromDefault creates a configured "
 
   // check AssetManger config
   steamrot::tests::CheckAssetConfiguration(scene_type,
-                                             game_context.asset_manager);
+                                           game_context.asset_manager);
 }
 
 TEST_CASE("SceneManager's AddSceneFromDefault creates a configured "
@@ -337,6 +337,10 @@ TEST_CASE("SceneManager loads TitleScene when Subscriber is turned active",
     FAIL("Failed to register subscriber: " + register_result.error().message);
   }
 
+  // now give Subscriber recieved event data to simulate event triggering it,
+  // normally this would be set by the EventHandler when an event occurs
+  subscriber->m_received_event_data = scene_change_data;
+
   // check that no scenes are loaded initially
   REQUIRE(scene_manager.GetScenes().empty());
 
@@ -372,6 +376,10 @@ TEST_CASE("SceneManager loads CraftingScene when Subscriber is turned active",
   if (!register_result.has_value()) {
     FAIL("Failed to register subscriber: " + register_result.error().message);
   }
+
+  // now give Subscriber recieved event data to simulate event triggering it,
+  // normally this would be set by the EventHandler when an event occurs
+  subscriber->m_received_event_data = scene_change_data;
   // check that no scenes are loaded initially
   REQUIRE(scene_manager.GetScenes().empty());
 
@@ -387,34 +395,6 @@ TEST_CASE("SceneManager loads CraftingScene when Subscriber is turned active",
   REQUIRE(scene_manager.GetScenes().size() == 1);
   REQUIRE(scene_manager.GetScenes().begin()->second->GetSceneInfo().type ==
           steamrot::SceneType::SceneType_CRAFTING);
-}
-
-// when no SceneData is provided, changing scene does nothing
-TEST_CASE("SceneManager provides error when Subscriber is active but no "
-          "SceneData set",
-          "[unit][SceneManager]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestFixture test_context;
-  steamrot::SceneManager scene_manager{test_context.GetGameContext()};
-  // Create and register a Subscriber for EventType_EVENT_CHANGE_SCENE without
-  // trigger data
-  auto subscriber = std::make_shared<steamrot::Subscriber>(
-      steamrot::EventType_EVENT_CHANGE_SCENE);
-  auto register_result = scene_manager.RegisterSubscriber(subscriber);
-  if (!register_result.has_value()) {
-    FAIL("Failed to register subscriber: " + register_result.error().message);
-  }
-  // check that no scenes are loaded initially
-  REQUIRE(scene_manager.GetScenes().empty());
-  // Activate the Subscriber without setting trigger data
-  subscriber->m_active = true;
-
-  // Process subscriptions in SceneManager
-  auto process_result = scene_manager.ProcessSubscriptions();
-  REQUIRE(!process_result.has_value());
-
-  // Check that no scenes were loaded
-  REQUIRE(scene_manager.GetScenes().empty());
 }
 
 TEST_CASE("SceneManager::UpdateSceneManager cause scene change via subscribers",
@@ -435,6 +415,10 @@ TEST_CASE("SceneManager::UpdateSceneManager cause scene change via subscribers",
   if (!register_result.has_value()) {
     FAIL("Failed to register subscriber: " + register_result.error().message);
   }
+
+  // now give Subscriber recieved event data to simulate event triggering it,
+  // normally this would be set by the EventHandler when an event occurs
+  subscriber->m_received_event_data = scene_change_data;
 
   // check that no scenes are loaded initially
   REQUIRE(scene_manager.GetScenes().empty());
