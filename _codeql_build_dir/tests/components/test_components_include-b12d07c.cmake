@@ -1,5 +1,0 @@
-if(EXISTS "/home/runner/work/SteamRot/SteamRot/_codeql_build_dir/tests/components/test_components_tests-b12d07c.cmake")
-  include("/home/runner/work/SteamRot/SteamRot/_codeql_build_dir/tests/components/test_components_tests-b12d07c.cmake")
-else()
-  add_test(test_components_NOT_BUILT-b12d07c test_components_NOT_BUILT-b12d07c)
-endif()

@@ -1,5 +1,0 @@
-if(EXISTS "/home/runner/work/SteamRot/SteamRot/_codeql_build_dir/tests/display/test_display_tests-b12d07c.cmake")
-  include("/home/runner/work/SteamRot/SteamRot/_codeql_build_dir/tests/display/test_display_tests-b12d07c.cmake")
-else()
-  add_test(test_display_NOT_BUILT-b12d07c test_display_NOT_BUILT-b12d07c)
-endif()

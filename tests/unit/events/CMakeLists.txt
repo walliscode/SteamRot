@@ -4,6 +4,7 @@ SubscriberFactory.test.cpp
 UserInputBitset.test.cpp
 EventHandler.test.cpp
 event_bus_conversion.test.cpp
+event_factory.test.cpp
 )
 
 target_include_directories(test_events

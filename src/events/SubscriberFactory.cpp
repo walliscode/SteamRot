@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////
 #include "SubscriberFactory.h"
 #include "Subscriber.h"
-#include "event_conversion.h"
+#include "event_factory.h"
 #include "subscriber_data_generated.h"
 #include <memory>
 
@@ -62,7 +62,7 @@ SubscriberFactory::CreateAndRegisterSubscriber(
 
     // convert flatbuffers data to EventData
     auto convert_result =
-        event::conversion::ConvertFlatbuffersEventDataDataToEventData(
+        event::CreateEventData(
             subscriber_data.trigger_data_type(),
             subscriber_data.trigger_data());
     if (!convert_result.has_value()) {

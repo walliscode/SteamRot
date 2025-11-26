@@ -15,7 +15,7 @@
 TEST_CASE("ConvertEventBusDataToEventBus handles null input",
           "[unit][event_bus_conversion]") {
   auto result =
-      steamrot::event::conversion::ConvertEventBusDataToEventBus(nullptr);
+      steamrot::event::ConvertEventBusDataToEventBus(nullptr);
 
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
@@ -34,7 +34,7 @@ TEST_CASE("ConvertEventBusDataToEventBus handles empty EventBusData",
   const steamrot::EventBusData *event_bus_data =
       flatbuffers::GetRoot<steamrot::EventBusData>(&event_bus_data_offset);
 
-  auto result = steamrot::event::conversion::ConvertEventBusDataToEventBus(
+  auto result = steamrot::event::ConvertEventBusDataToEventBus(
       event_bus_data);
 
   REQUIRE(result.has_value());
@@ -63,7 +63,7 @@ TEST_CASE("ConvertEventBusDataToEventBus converts single event",
 
   REQUIRE(event_bus_data != nullptr);
   REQUIRE(event_bus_data->events() != nullptr);
-  auto result = steamrot::event::conversion::ConvertEventBusDataToEventBus(
+  auto result = steamrot::event::ConvertEventBusDataToEventBus(
       event_bus_data);
 
   REQUIRE(result.has_value());
@@ -100,7 +100,7 @@ TEST_CASE("ConvertEventBusDataToEventBus converts multiple events",
   const steamrot::EventBusData *event_bus_data =
       flatbuffers::GetRoot<steamrot::EventBusData>(builder.GetBufferPointer());
 
-  auto result = steamrot::event::conversion::ConvertEventBusDataToEventBus(
+  auto result = steamrot::event::ConvertEventBusDataToEventBus(
       event_bus_data);
 
   REQUIRE(result.has_value());
@@ -148,7 +148,7 @@ TEST_CASE("ConfigureEventHandlerFromEventBusData populates global event bus",
 
   // Configure from EventBusData
   auto result =
-      steamrot::event::conversion::ConfigureEventHandlerFromEventBusData(
+      steamrot::event::ConfigureEventHandlerFromEventBusData(
           event_bus_data, event_handler);
 
   REQUIRE(result.has_value());
@@ -169,7 +169,7 @@ TEST_CASE("ConfigureEventHandlerFromEventBusData handles null input",
   steamrot::EventHandler event_handler;
 
   auto result =
-      steamrot::event::conversion::ConfigureEventHandlerFromEventBusData(
+      steamrot::event::ConfigureEventHandlerFromEventBusData(
           nullptr, event_handler);
 
   REQUIRE_FALSE(result.has_value());
@@ -189,7 +189,7 @@ TEST_CASE("ConfigureEventHandlerFromEventBusData handles empty EventBusData",
   steamrot::EventHandler event_handler;
 
   auto result =
-      steamrot::event::conversion::ConfigureEventHandlerFromEventBusData(
+      steamrot::event::ConfigureEventHandlerFromEventBusData(
           event_bus_data, event_handler);
 
   REQUIRE(result.has_value());
