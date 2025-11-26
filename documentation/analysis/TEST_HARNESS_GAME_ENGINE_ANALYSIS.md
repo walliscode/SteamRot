@@ -132,7 +132,7 @@ TestDataConfig (test_data.fbs)
 
 #### ✅ What Works Well
 
-1. **Shared Resource Schemas**: `resource_data.fbs` defines `GameResourcesData` and `SceneResourcesData` used by both production and test:
+1. **Shared Resource Schemas**: `resource_data.fbs` defines `GameResourcesData` and `SceneResourcesData` used by both production (`GameEngine`, `Scene`) and test (`TestFixture`):
    ```fbs
    table GameResourcesData {
      window_width: uint32 = 800;
@@ -239,7 +239,7 @@ The current schema structure supports the proposed architecture without modifica
 |-----------------|----------------|
 | Level 1: Logic | `simulation.fbs` (FunctionType, LogicClassType) |
 | Level 2: Scene | `entities.fbs` + `simulation.fbs` |
-| Level 3: SceneManager | Reuse `event_test_data.fbs` for event injection |
+| Level 3: SceneManager | `event_test_data.fbs` provides `EventSequence` for injecting scene change events (e.g., `EVENT_CHANGE_SCENE`) that trigger SceneManager's `ProcessSubscriptions()` |
 | Level 4: GameLoop | `test_data.fbs` already supports full configuration |
 
 #### Optional Enhancements
