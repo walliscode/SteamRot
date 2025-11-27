@@ -4,12 +4,18 @@
 
 ## Executive Summary
 
-This report analyzes approaches for creating a visual UI to search, browse, and visualize the test_data.json files in the SteamRot project. As the test suite grows (currently 25+ test data files), manually searching through files to understand test coverage becomes increasingly difficult. A visualization tool would allow users to:
+This report analyzes **8 different approaches** for creating a visual UI to search, browse, and visualize the test_data.json files in the SteamRot project. As the test suite grows (currently 25+ test data files), manually searching through files to understand test coverage becomes increasingly difficult. A visualization tool would allow users to:
 
 1. **Search** - Find tests by function, logic class, tags, or any metadata field
 2. **Browse** - Navigate test data in a structured, hierarchical manner
 3. **Visualize** - See test coverage as graphs or matrices showing function/logic class permutations
 4. **Discover** - Identify gaps in testing and find related test cases
+
+**Key Finding**: The recommended approach is a **hybrid Python+HTML solution** that combines:
+- **Python** (like Option 4) for file scanning and data aggregation
+- **Browser-based JavaScript** (like Option 2) for rich interactive visualization
+
+This hybrid provides dropdown filters, clickable coverage matrices, and drill-down views without requiring a server. Tkinter (Option 8) is a viable pure-Python alternative if web technologies are undesired, though with less visual polish.
 
 ---
 
@@ -177,7 +183,7 @@ tests/
 
 ---
 
-### Option 2: Static HTML + JavaScript (Recommended)
+### Option 2: Static HTML + JavaScript
 
 **Overview**: Single HTML file with embedded JavaScript that loads and parses JSON files.
 
@@ -198,6 +204,78 @@ tests/
 **Best for**: Simplest possible solution, maximum portability.
 
 **Complexity**: Low
+
+#### User Navigation Capabilities
+
+A static HTML + JavaScript solution **fully supports interactive navigation**:
+
+1. **Navigation Features Available:**
+   - **Dropdown menus**: Select starting function/logic class to filter tests
+   - **Clickable coverage matrix**: Click any cell to see tests covering that combination
+   - **Searchable table**: Real-time filtering as user types
+   - **Tree navigation**: Expandable/collapsible test categories
+   - **Drill-down views**: Click any test to see full details
+   - **Back/forward browser navigation**: History API integration
+   - **Bookmarkable URLs**: Hash-based routing for sharing specific views
+
+2. **Visualization Libraries:**
+   - **D3.js**: Force-directed graphs showing function/logic relationships
+   - **Chart.js**: Bar charts, pie charts for coverage statistics
+   - **Vis.js**: Network graphs, timelines for simulation steps
+   - **DataTables**: Rich sortable, filterable tables
+
+3. **Key Limitation - File Loading:**
+   The main challenge is loading the JSON test data files. Options:
+   
+   - **Pre-embedded data**: Python script embeds all JSON as JavaScript objects (recommended)
+   - **File input dialog**: User selects files via `<input type="file">`
+   - **Fetch API**: Requires local server or CORS-enabled hosting
+   
+   The **hybrid approach** (Python generates HTML with embedded data) solves this limitation while keeping full interactivity.
+
+#### Sample Architecture for Interactive Navigation
+
+```html
+<!-- Navigation structure -->
+<nav id="main-nav">
+  <select id="function-filter">
+    <option value="">All Functions</option>
+    <option value="ProcessUIActionsAndEvents">ProcessUIActionsAndEvents</option>
+    <!-- ... -->
+  </select>
+  
+  <select id="logic-class-filter">
+    <option value="">All Logic Classes</option>
+    <option value="UICollisionLogic">UICollisionLogic</option>
+    <!-- ... -->
+  </select>
+</nav>
+
+<!-- Interactive coverage matrix -->
+<table id="coverage-matrix">
+  <tr onclick="showTestsForCell(this)">...</tr>
+</table>
+
+<!-- Drill-down panel -->
+<div id="test-details" class="panel">
+  <!-- Shows when user clicks a test -->
+</div>
+
+<script>
+// All test data embedded by Python generator
+const TEST_DATA = [/* generated */];
+
+// Interactive filtering
+function filterByFunction(funcName) {
+  return TEST_DATA.filter(t => t.functions.includes(funcName));
+}
+
+// Graph visualization
+function renderCoverageGraph() {
+  // D3.js force-directed graph
+}
+</script>
+```
 
 ---
 
@@ -310,6 +388,135 @@ tests/
 **Best for**: Teams heavily using VS Code.
 
 **Complexity**: Medium
+
+---
+
+### Option 8: Python + Tkinter Desktop Application
+
+**Overview**: Native desktop GUI application using Python's built-in Tkinter library.
+
+**Pros:**
+- ✅ **No external dependencies** - Tkinter is included with Python
+- ✅ **Full filesystem access** - can automatically scan directories
+- ✅ **Native desktop experience** - feels like a real application
+- ✅ **Already using Python** - if Python generator is needed anyway, why not use it for UI too
+- ✅ **Live updates** - can watch for file changes and auto-refresh
+- ✅ **Single script distribution** - just share the .py file
+- ✅ **Works offline** - no browser or server needed
+
+**Cons:**
+- ❌ **Dated visual appearance** - Tkinter looks less modern than web UIs
+- ❌ **Limited visualization libraries** - no D3.js, Chart.js equivalents built-in
+- ❌ **Requires Python runtime** - users must have Python installed
+- ❌ **Platform inconsistencies** - may look different on Windows/Mac/Linux
+- ❌ **Harder to create rich visualizations** - graphs and charts require matplotlib integration
+- ❌ **No easy sharing** - can't bookmark/share specific views via URL
+
+**Best for**: Simple tree/list navigation, when Python is already a requirement.
+
+**Complexity**: Low-Medium
+
+#### Tkinter vs Hybrid Python+HTML Comparison
+
+Since Python is already being used, here's a direct comparison:
+
+| Feature | Tkinter | Python + HTML (Recommended) |
+|---------|---------|---------------------------|
+| Dependency | Python only | Python + Browser |
+| File scanning | ✅ Native | ✅ Native |
+| Rich visualizations | ❌ Limited (matplotlib) | ✅ D3.js, Chart.js |
+| Modern look | ❌ Dated | ✅ Modern CSS |
+| Shareability | ❌ Script only | ✅ HTML file + URLs |
+| Development speed | Medium | Medium |
+| Coverage matrix | Basic table | Interactive clickable grid |
+| Graph views | Requires canvas work | D3.js force graphs |
+| Search/filter | TreeView + Entry | DataTables built-in |
+
+**Recommendation**: The hybrid approach (Python generates HTML) gives the best of both worlds:
+- Python handles file scanning and data aggregation
+- HTML/JavaScript provides rich, modern visualization
+- Output is a single portable HTML file
+
+#### Sample Tkinter Implementation
+
+```python
+#!/usr/bin/env python3
+"""
+test_explorer_tkinter.py - Tkinter-based test data explorer
+"""
+import tkinter as tk
+from tkinter import ttk
+import json
+from pathlib import Path
+
+class TestExplorer:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("SteamRot Test Data Explorer")
+        self.root.geometry("1200x800")
+        
+        # Left panel - Tree navigation
+        self.tree_frame = ttk.Frame(root)
+        self.tree_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=False)
+        
+        self.tree = ttk.Treeview(self.tree_frame, columns=("tags", "ticks"))
+        self.tree.heading("#0", text="Test Name")
+        self.tree.heading("tags", text="Tags")
+        self.tree.heading("ticks", text="Ticks")
+        self.tree.pack(fill=tk.BOTH, expand=True)
+        self.tree.bind("<<TreeviewSelect>>", self.on_select)
+        
+        # Right panel - Details
+        self.details_frame = ttk.Frame(root)
+        self.details_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        
+        self.details_text = tk.Text(self.details_frame, wrap=tk.WORD)
+        self.details_text.pack(fill=tk.BOTH, expand=True)
+        
+        # Filter controls
+        self.filter_frame = ttk.Frame(root)
+        self.filter_frame.pack(side=tk.TOP, fill=tk.X)
+        
+        ttk.Label(self.filter_frame, text="Function:").pack(side=tk.LEFT)
+        self.function_combo = ttk.Combobox(self.filter_frame, values=["All", "ProcessUIActionsAndEvents", "..."])
+        self.function_combo.pack(side=tk.LEFT)
+        self.function_combo.bind("<<ComboboxSelected>>", self.on_filter)
+        
+        # Load tests
+        self.load_tests()
+    
+    def load_tests(self):
+        """Scan and load all test_data.json files"""
+        tests_dir = Path("tests")
+        for file in tests_dir.rglob("*.test_data.json"):
+            with open(file) as f:
+                data = json.load(f)
+            name = data["metadata"]["test_name"]
+            tags = ", ".join(data["metadata"].get("tags", []))
+            ticks = data.get("num_ticks", 1)
+            self.tree.insert("", tk.END, text=name, values=(tags, ticks), tags=(str(file),))
+    
+    def on_select(self, event):
+        """Show details when test is selected"""
+        item = self.tree.selection()[0]
+        file_path = self.tree.item(item, "tags")[0]
+        with open(file_path) as f:
+            data = json.load(f)
+        self.details_text.delete(1.0, tk.END)
+        self.details_text.insert(tk.END, json.dumps(data, indent=2))
+    
+    def on_filter(self, event):
+        """Filter tree based on selected function"""
+        # Implement filtering logic
+        pass
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = TestExplorer(root)
+    root.mainloop()
+```
+
+**Verdict**: Tkinter is a viable option if you prefer a pure-Python solution and don't need rich visualizations. However, the hybrid Python+HTML approach provides better visualizations and shareability with similar development effort.
 
 ---
 
@@ -585,19 +792,28 @@ fig.show()
 
 ## Decision Matrix
 
-| Criteria | Flask | Static HTML (Rec.) | Streamlit | Electron | VS Code Ext |
-|----------|-------|-------------------|-----------|----------|-------------|
-| Setup Complexity | Medium | **Low** | Low | High | Medium |
-| Dependencies | Python, Flask | **None** | Python, Streamlit | Node, Electron | VS Code, Node |
-| Maintenance | Medium | **Low** | Low | High | Medium |
-| Offline Support | Partial | **Full** | Partial | Full | Full |
-| Development Speed | Fast | **Medium** | **Fast** | Slow | Medium |
-| Customization | High | **High** | Limited | High | Medium |
-| Distribution | Server | **File share** | Server | Installer | Marketplace |
-| Visualization | Good | **Good** | Excellent | Good | Limited |
-| Integration | Good | **Good** | Limited | Limited | Excellent |
+| Criteria | Flask | Static HTML | Streamlit | Electron | VS Code Ext | Tkinter |
+|----------|-------|-------------|-----------|----------|-------------|---------|
+| Setup Complexity | Medium | **Low** | Low | High | Medium | **Low** |
+| Dependencies | Python, Flask | **None** | Python, Streamlit | Node, Electron | VS Code, Node | Python |
+| Maintenance | Medium | **Low** | Low | High | Medium | **Low** |
+| Offline Support | Partial | **Full** | Partial | Full | Full | **Full** |
+| Development Speed | Fast | Medium | **Fast** | Slow | Medium | Medium |
+| Customization | High | **High** | Limited | High | Medium | Medium |
+| Distribution | Server | **File share** | Server | Installer | Marketplace | Script |
+| Visualization | Good | **Excellent** | Excellent | Good | Limited | Limited |
+| File Scanning | Good | None | Good | **Full** | Full | **Full** |
+| Integration | Good | **Good** | Limited | Limited | Excellent | Good |
 
 **Legend**: **Bold** = best in category
+
+### Recommendation Summary
+
+| Priority | Option | Why |
+|----------|--------|-----|
+| **1st** | Hybrid: Python Generator + Static HTML | Python scans files, generates interactive HTML with full navigation |
+| **2nd** | Tkinter (Option 8) | Pure Python if browser-based UI is undesired |
+| **3rd** | Streamlit (Option 6) | Quick prototype for immediate exploration |
 
 ---
 
