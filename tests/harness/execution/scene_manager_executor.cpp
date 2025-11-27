@@ -10,6 +10,7 @@
 #include "TestFixture.h"
 #include "event_processing.h"
 #include "game_loop.h"
+#include "scene_change_packet_generated.h"
 
 namespace steamrot::tests::execution {
 
@@ -29,7 +30,7 @@ ExecuteConfiguredSceneManager(SceneManager &scene_manager,
                               const SceneManagerConfig &config) {
 
   // Load the initial scene if specified
-  if (config.initial_scene != SceneType_NONE) {
+  if (config.initial_scene != SceneType::SceneType_UNKNOWN) {
     auto load_result = scene_manager.LoadStandAloneScene(config.initial_scene);
     if (!load_result.has_value()) {
       return std::unexpected(load_result.error());

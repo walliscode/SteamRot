@@ -15,6 +15,7 @@
 #include "FailInfo.h"
 #include "test_data_generated.h"
 #include <expected>
+#include <variant>
 
 // Forward declaration to avoid circular dependency
 namespace steamrot::tests {
@@ -33,10 +34,10 @@ namespace steamrot::tests::execution {
 /// - GameLoop: Complete game loop iteration
 /////////////////////////////////////////////////
 enum class ExecutionLevel {
-  Logic = 1,       ///< Level 1: Individual Logic/function execution
-  Scene = 2,       ///< Level 2: Full scene tick
+  Logic = 1,        ///< Level 1: Individual Logic/function execution
+  Scene = 2,        ///< Level 2: Full scene tick
   SceneManager = 3, ///< Level 3: SceneManager update cycle
-  GameLoop = 4     ///< Level 4: Complete game loop iteration
+  GameLoop = 4      ///< Level 4: Complete game loop iteration
 };
 
 /////////////////////////////////////////////////

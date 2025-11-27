@@ -17,7 +17,6 @@
 #include "SceneManager.h"
 #include "event_test_data_generated.h"
 #include "input_test_data_generated.h"
-#include "scene_type_generated.h"
 #include <expected>
 
 // Forward declaration to avoid circular dependency

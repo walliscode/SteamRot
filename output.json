@@ -1,0 +1,5653 @@
+{
+  "tests": [
+    {
+      "file_path": "tests/harness/data/harness_basic_001.test_data.json",
+      "relative_path": "harness/data/harness_basic_001.test_data.json",
+      "category": "harness",
+      "name": "sample_test_1",
+      "description": "Sample test data for testing the harness functionality",
+      "tags": [
+        "unit",
+        "harness"
+      ],
+      "expected_to_pass": true,
+      "author": "",
+      "version": 1,
+      "functions": [],
+      "logic_classes": [],
+      "num_ticks": 1,
+      "has_input_sequence": false,
+      "has_event_sequence": false,
+      "has_tick_snapshots": false,
+      "has_start_data": true,
+      "has_expected_data": true,
+      "simulation_steps": [],
+      "raw": {
+        "metadata": {
+          "test_name": "sample_test_1",
+          "description": "Sample test data for testing the harness functionality",
+          "tags": [
+            "unit",
+            "harness"
+          ],
+          "expected_to_pass": true,
+          "version": 1
+        },
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 3,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "sample_ui",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 50,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "expected_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 3,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "sample_ui",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 50,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/harness/data/harness_basic_002.test_data.json",
+      "relative_path": "harness/data/harness_basic_002.test_data.json",
+      "category": "harness",
+      "name": "sample_test_2",
+      "description": "Another sample test data with different configuration",
+      "tags": [
+        "unit",
+        "harness"
+      ],
+      "expected_to_pass": true,
+      "author": "",
+      "version": 1,
+      "functions": [],
+      "logic_classes": [],
+      "num_ticks": 1,
+      "has_input_sequence": false,
+      "has_event_sequence": false,
+      "has_tick_snapshots": false,
+      "has_start_data": true,
+      "has_expected_data": true,
+      "simulation_steps": [],
+      "raw": {
+        "metadata": {
+          "test_name": "sample_test_2",
+          "description": "Another sample test data with different configuration",
+          "tags": [
+            "unit",
+            "harness"
+          ],
+          "expected_to_pass": true,
+          "version": 1
+        },
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 2,
+            "entities": [
+              {
+                "index": 0,
+                "c_grimoire_machina": {
+                  "fragments": [],
+                  "joints": []
+                }
+              }
+            ]
+          }
+        },
+        "expected_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 2,
+            "entities": [
+              {
+                "index": 0,
+                "c_grimoire_machina": {
+                  "fragments": [],
+                  "joints": []
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/harness/data/harness_basic_003.test_data.json",
+      "relative_path": "harness/data/harness_basic_003.test_data.json",
+      "category": "harness",
+      "name": "sample_test_3",
+      "description": "Third sample test for comprehensive harness testing",
+      "tags": [
+        "unit",
+        "harness",
+        "multiple"
+      ],
+      "expected_to_pass": true,
+      "author": "",
+      "version": 1,
+      "functions": [],
+      "logic_classes": [],
+      "num_ticks": 1,
+      "has_input_sequence": false,
+      "has_event_sequence": false,
+      "has_tick_snapshots": false,
+      "has_start_data": true,
+      "has_expected_data": true,
+      "simulation_steps": [],
+      "raw": {
+        "metadata": {
+          "test_name": "sample_test_3",
+          "description": "Third sample test for comprehensive harness testing",
+          "tags": [
+            "unit",
+            "harness",
+            "multiple"
+          ],
+          "expected_to_pass": true,
+          "version": 1
+        },
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 5,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "start_ui",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 0,
+                        "y": 0
+                      },
+                      "size": {
+                        "x": 100,
+                        "y": 100
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "Ratioed"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "expected_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 5,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "start_ui",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 0,
+                        "y": 0
+                      },
+                      "size": {
+                        "x": 100,
+                        "y": 100
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "Ratioed"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/harness/data/harness_event_001.test_data.json",
+      "relative_path": "harness/data/harness_event_001.test_data.json",
+      "category": "harness",
+      "name": "sample_event_sequence",
+      "description": "Sample test demonstrating tick-by-tick event injection",
+      "tags": [
+        "unit",
+        "harness",
+        "event"
+      ],
+      "expected_to_pass": true,
+      "author": "",
+      "version": 1,
+      "functions": [],
+      "logic_classes": [],
+      "num_ticks": 1,
+      "has_input_sequence": false,
+      "has_event_sequence": true,
+      "has_tick_snapshots": false,
+      "has_start_data": true,
+      "has_expected_data": false,
+      "simulation_steps": [],
+      "raw": {
+        "metadata": {
+          "test_name": "sample_event_sequence",
+          "description": "Sample test demonstrating tick-by-tick event injection",
+          "tags": [
+            "unit",
+            "harness",
+            "event"
+          ],
+          "expected_to_pass": true,
+          "version": 1
+        },
+        "event_sequence": {
+          "description": "Sequence of test events added on different ticks",
+          "events": [
+            {
+              "tick": 1,
+              "event_packet": {
+                "event_lifetime": 5,
+                "event_type": "EVENT_TEST",
+                "event_data_data_type": "NONE"
+              },
+              "description": "Initial test event at tick 1"
+            },
+            {
+              "tick": 2,
+              "event_packet": {
+                "event_lifetime": 3,
+                "event_type": "EVENT_USER_INPUT",
+                "event_data_data_type": "UserInputBitsetData",
+                "event_data_data": {
+                  "keyboard_pressed": [
+                    "A",
+                    "W"
+                  ],
+                  "mouse_pressed": [
+                    "LEFT_CLICK"
+                  ]
+                }
+              },
+              "description": "User input event at tick 2"
+            },
+            {
+              "tick": 3,
+              "event_packet": {
+                "event_lifetime": 1,
+                "event_type": "EVENT_TEST",
+                "event_data_data_type": "NONE"
+              },
+              "description": "Another test event at tick 3"
+            }
+          ]
+        },
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 1,
+            "entities": []
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/harness/data/harness_event_bus_simple.test_data.json",
+      "relative_path": "harness/data/harness_event_bus_simple.test_data.json",
+      "category": "harness",
+      "name": "simple_event_bus_test",
+      "description": "Test basic EventBus state initialization and final comparison",
+      "tags": [
+        "unit",
+        "event_bus",
+        "simple"
+      ],
+      "expected_to_pass": true,
+      "author": "",
+      "version": 1,
+      "functions": [],
+      "logic_classes": [],
+      "num_ticks": 1,
+      "has_input_sequence": false,
+      "has_event_sequence": false,
+      "has_tick_snapshots": false,
+      "has_start_data": true,
+      "has_expected_data": true,
+      "simulation_steps": [],
+      "raw": {
+        "metadata": {
+          "test_name": "simple_event_bus_test",
+          "description": "Test basic EventBus state initialization and final comparison",
+          "tags": [
+            "unit",
+            "event_bus",
+            "simple"
+          ],
+          "expected_to_pass": true,
+          "version": 1
+        },
+        "num_ticks": 1,
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 1,
+            "entities": []
+          },
+          "event_bus": {
+            "description": "Initial event bus with 1 event",
+            "events": [
+              {
+                "event_lifetime": 2,
+                "event_type": "EVENT_TEST",
+                "event_data_data_type": "NONE"
+              }
+            ]
+          }
+        },
+        "expected_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 1,
+            "entities": []
+          },
+          "event_bus": {
+            "description": "Final event bus state after 1 tick (lifetime decremented)",
+            "events": [
+              {
+                "event_lifetime": 1,
+                "event_type": "EVENT_TEST",
+                "event_data_data_type": "NONE"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/harness/data/harness_event_bus_snapshot.test_data.json",
+      "relative_path": "harness/data/harness_event_bus_snapshot.test_data.json",
+      "category": "harness",
+      "name": "event_bus_snapshot_test",
+      "description": "Test EventBus state comparison at start, tick snapshots, and end",
+      "tags": [
+        "unit",
+        "event_bus"
+      ],
+      "expected_to_pass": true,
+      "author": "",
+      "version": 1,
+      "functions": [],
+      "logic_classes": [],
+      "num_ticks": 2,
+      "has_input_sequence": false,
+      "has_event_sequence": false,
+      "has_tick_snapshots": true,
+      "has_start_data": true,
+      "has_expected_data": true,
+      "simulation_steps": [],
+      "raw": {
+        "metadata": {
+          "test_name": "event_bus_snapshot_test",
+          "description": "Test EventBus state comparison at start, tick snapshots, and end",
+          "tags": [
+            "unit",
+            "event_bus"
+          ],
+          "expected_to_pass": true,
+          "version": 1
+        },
+        "num_ticks": 2,
+        "tick_snapshots": [
+          {
+            "tick": 1,
+            "description": "Tick 1 snapshot",
+            "data_collection": {
+              "entity_collection": {
+                "entity_memory_pool_size": 1,
+                "entities": []
+              },
+              "event_bus": {
+                "description": "Event bus is compared before lifetimes are decremented, so same as start",
+                "events": [
+                  {
+                    "event_lifetime": 3,
+                    "event_type": "EVENT_TEST",
+                    "event_data_data_type": "NONE"
+                  },
+                  {
+                    "event_lifetime": 5,
+                    "event_type": "EVENT_QUIT_GAME",
+                    "event_data_data_type": "NONE"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "tick": 2,
+            "description": "Tick 2 snapshot",
+            "data_collection": {
+              "entity_collection": {
+                "entity_memory_pool_size": 1,
+                "entities": []
+              },
+              "event_bus": {
+                "description": "After tick 1, event lifetimes decremented by 1",
+                "events": [
+                  {
+                    "event_lifetime": 2,
+                    "event_type": "EVENT_TEST",
+                    "event_data_data_type": "NONE"
+                  },
+                  {
+                    "event_lifetime": 4,
+                    "event_type": "EVENT_QUIT_GAME",
+                    "event_data_data_type": "NONE"
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 1,
+            "entities": []
+          },
+          "event_bus": {
+            "description": "Initial event bus with 2 events",
+            "events": [
+              {
+                "event_lifetime": 3,
+                "event_type": "EVENT_TEST",
+                "event_data_data_type": "NONE"
+              },
+              {
+                "event_lifetime": 5,
+                "event_type": "EVENT_QUIT_GAME",
+                "event_data_data_type": "NONE"
+              }
+            ]
+          }
+        },
+        "expected_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 1,
+            "entities": []
+          },
+          "event_bus": {
+            "description": "Final event bus state after all ticks",
+            "events": [
+              {
+                "event_lifetime": 1,
+                "event_type": "EVENT_TEST",
+                "event_data_data_type": "NONE"
+              },
+              {
+                "event_lifetime": 3,
+                "event_type": "EVENT_QUIT_GAME",
+                "event_data_data_type": "NONE"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/harness/data/harness_input_001.test_data.json",
+      "relative_path": "harness/data/harness_input_001.test_data.json",
+      "category": "harness",
+      "name": "sample_input_sequence",
+      "description": "Sample test demonstrating tick-by-tick input injection",
+      "tags": [
+        "unit",
+        "harness",
+        "input"
+      ],
+      "expected_to_pass": true,
+      "author": "",
+      "version": 1,
+      "functions": [],
+      "logic_classes": [],
+      "num_ticks": 1,
+      "has_input_sequence": true,
+      "has_event_sequence": false,
+      "has_tick_snapshots": false,
+      "has_start_data": true,
+      "has_expected_data": false,
+      "simulation_steps": [],
+      "raw": {
+        "metadata": {
+          "test_name": "sample_input_sequence",
+          "description": "Sample test demonstrating tick-by-tick input injection",
+          "tags": [
+            "unit",
+            "harness",
+            "input"
+          ],
+          "expected_to_pass": true,
+          "version": 1
+        },
+        "input_sequence": {
+          "description": "Move mouse and click sequence",
+          "inputs": [
+            {
+              "input_type": "MouseMove",
+              "input_data_type": "MouseInputData",
+              "input_data": {
+                "position": {
+                  "x": 100.0,
+                  "y": 100.0
+                },
+                "button": 0
+              },
+              "tick": 1,
+              "description": "Initial mouse position"
+            },
+            {
+              "input_type": "MouseMove",
+              "input_data_type": "MouseInputData",
+              "input_data": {
+                "position": {
+                  "x": 150.0,
+                  "y": 125.0
+                },
+                "button": 0
+              },
+              "tick": 2,
+              "description": "Move mouse to button center"
+            },
+            {
+              "input_type": "MouseClick",
+              "input_data_type": "MouseInputData",
+              "input_data": {
+                "position": {
+                  "x": 150.0,
+                  "y": 125.0
+                },
+                "button": 0
+              },
+              "tick": 3,
+              "description": "Click left mouse button"
+            }
+          ]
+        },
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 2,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "button_ui",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 100,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/harness/data/harness_metadata_validation.test_data.json",
+      "relative_path": "harness/data/harness_metadata_validation.test_data.json",
+      "category": "harness",
+      "name": "metadata_validation",
+      "description": "Validates test harness metadata loading without entity collections",
+      "tags": [
+        "unit",
+        "harness",
+        "infrastructure"
+      ],
+      "expected_to_pass": true,
+      "author": "Test Infrastructure Team",
+      "version": 1,
+      "functions": [],
+      "logic_classes": [],
+      "num_ticks": 1,
+      "has_input_sequence": false,
+      "has_event_sequence": false,
+      "has_tick_snapshots": false,
+      "has_start_data": false,
+      "has_expected_data": false,
+      "simulation_steps": [],
+      "raw": {
+        "metadata": {
+          "test_name": "metadata_validation",
+          "description": "Validates test harness metadata loading without entity collections",
+          "tags": [
+            "unit",
+            "harness",
+            "infrastructure"
+          ],
+          "expected_to_pass": true,
+          "author": "Test Infrastructure Team",
+          "version": 1
+        }
+      }
+    },
+    {
+      "file_path": "tests/harness/data/harness_negative_001.test_data.json",
+      "relative_path": "harness/data/harness_negative_001.test_data.json",
+      "category": "harness",
+      "name": "sample_mismatch_test",
+      "description": "Test data with intentional mismatch - expected_to_pass is false",
+      "tags": [
+        "unit",
+        "harness",
+        "mismatch"
+      ],
+      "expected_to_pass": false,
+      "author": "",
+      "version": 1,
+      "functions": [],
+      "logic_classes": [],
+      "num_ticks": 1,
+      "has_input_sequence": false,
+      "has_event_sequence": false,
+      "has_tick_snapshots": false,
+      "has_start_data": true,
+      "has_expected_data": true,
+      "simulation_steps": [],
+      "raw": {
+        "metadata": {
+          "test_name": "sample_mismatch_test",
+          "description": "Test data with intentional mismatch - expected_to_pass is false",
+          "tags": [
+            "unit",
+            "harness",
+            "mismatch"
+          ],
+          "expected_to_pass": false,
+          "version": 1
+        },
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 3,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "initial_ui",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 200
+                      },
+                      "size": {
+                        "x": 50,
+                        "y": 30
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "expected_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 3,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "different_ui",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 200,
+                        "y": 300
+                      },
+                      "size": {
+                        "x": 100,
+                        "y": 60
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/harness/data/harness_negative_002.test_data.json",
+      "relative_path": "harness/data/harness_negative_002.test_data.json",
+      "category": "harness",
+      "name": "sample_pool_size_mismatch",
+      "description": "Test with different pool sizes - expected_to_pass is false",
+      "tags": [
+        "unit",
+        "harness",
+        "mismatch"
+      ],
+      "expected_to_pass": false,
+      "author": "",
+      "version": 1,
+      "functions": [],
+      "logic_classes": [],
+      "num_ticks": 1,
+      "has_input_sequence": false,
+      "has_event_sequence": false,
+      "has_tick_snapshots": false,
+      "has_start_data": true,
+      "has_expected_data": true,
+      "simulation_steps": [],
+      "raw": {
+        "metadata": {
+          "test_name": "sample_pool_size_mismatch",
+          "description": "Test with different pool sizes - expected_to_pass is false",
+          "tags": [
+            "unit",
+            "harness",
+            "mismatch"
+          ],
+          "expected_to_pass": false,
+          "version": 1
+        },
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 2,
+            "entities": [
+              {
+                "index": 0,
+                "c_grimoire_machina": {
+                  "fragments": [],
+                  "joints": []
+                }
+              }
+            ]
+          }
+        },
+        "expected_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 5,
+            "entities": [
+              {
+                "index": 0,
+                "c_grimoire_machina": {
+                  "fragments": [],
+                  "joints": []
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/harness/data/harness_simulation_001.test_data.json",
+      "relative_path": "harness/data/harness_simulation_001.test_data.json",
+      "category": "harness",
+      "name": "sample_function_simulation",
+      "description": "Sample demonstrating simulation with individual free functions",
+      "tags": [
+        "unit",
+        "harness",
+        "simulation",
+        "function"
+      ],
+      "expected_to_pass": true,
+      "author": "",
+      "version": 1,
+      "functions": [
+        "ProcessUIActionsAndEvents"
+      ],
+      "logic_classes": [],
+      "num_ticks": 1,
+      "has_input_sequence": false,
+      "has_event_sequence": false,
+      "has_tick_snapshots": false,
+      "has_start_data": true,
+      "has_expected_data": true,
+      "simulation_steps": [
+        {
+          "simulation_type": "Action",
+          "execution_mode": "Function",
+          "function_type": "ProcessUIActionsAndEvents",
+          "logic_class_type": null,
+          "description": "Process UI actions without nesting"
+        }
+      ],
+      "raw": {
+        "metadata": {
+          "test_name": "sample_function_simulation",
+          "description": "Sample demonstrating simulation with individual free functions",
+          "tags": [
+            "unit",
+            "harness",
+            "simulation",
+            "function"
+          ],
+          "expected_to_pass": true,
+          "version": 1
+        },
+        "simulation_data": {
+          "description": "Execute individual action processing functions",
+          "steps": [
+            {
+              "simulation_type": "Action",
+              "execution_mode": "Function",
+              "function_type": "ProcessUIActionsAndEvents",
+              "description": "Process UI actions without nesting"
+            }
+          ]
+        },
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 2,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "action_test_ui",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 10,
+                        "y": 20
+                      },
+                      "size": {
+                        "x": 100,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "expected_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 2,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "action_test_ui",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 10,
+                        "y": 20
+                      },
+                      "size": {
+                        "x": 100,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/harness/data/harness_simulation_002.test_data.json",
+      "relative_path": "harness/data/harness_simulation_002.test_data.json",
+      "category": "harness",
+      "name": "sample_simulation_test",
+      "description": "Sample test data demonstrating simulation functionality with both functions and Logic classes",
+      "tags": [
+        "unit",
+        "harness",
+        "simulation"
+      ],
+      "expected_to_pass": true,
+      "author": "",
+      "version": 1,
+      "functions": [
+        "ProcessNestedUIActionsAndEvents"
+      ],
+      "logic_classes": [
+        "UICollisionLogic",
+        "UIRenderLogic"
+      ],
+      "num_ticks": 1,
+      "has_input_sequence": false,
+      "has_event_sequence": false,
+      "has_tick_snapshots": false,
+      "has_start_data": true,
+      "has_expected_data": true,
+      "simulation_steps": [
+        {
+          "simulation_type": "Collision",
+          "execution_mode": "LogicClass",
+          "function_type": null,
+          "logic_class_type": "UICollisionLogic",
+          "description": "Check for UI collision with mouse"
+        },
+        {
+          "simulation_type": "Render",
+          "execution_mode": "LogicClass",
+          "function_type": null,
+          "logic_class_type": "UIRenderLogic",
+          "description": "Render UI elements to scene texture"
+        },
+        {
+          "simulation_type": "Action",
+          "execution_mode": "Function",
+          "function_type": "ProcessNestedUIActionsAndEvents",
+          "logic_class_type": null,
+          "description": "Process UI actions and events recursively"
+        }
+      ],
+      "raw": {
+        "metadata": {
+          "test_name": "sample_simulation_test",
+          "description": "Sample test data demonstrating simulation functionality with both functions and Logic classes",
+          "tags": [
+            "unit",
+            "harness",
+            "simulation"
+          ],
+          "expected_to_pass": true,
+          "version": 1
+        },
+        "simulation_data": {
+          "description": "Execute UI collision detection, then render logic, then action processing",
+          "steps": [
+            {
+              "simulation_type": "Collision",
+              "execution_mode": "LogicClass",
+              "logic_class_type": "UICollisionLogic",
+              "description": "Check for UI collision with mouse"
+            },
+            {
+              "simulation_type": "Render",
+              "execution_mode": "LogicClass",
+              "logic_class_type": "UIRenderLogic",
+              "description": "Render UI elements to scene texture"
+            },
+            {
+              "simulation_type": "Action",
+              "execution_mode": "Function",
+              "function_type": "ProcessNestedUIActionsAndEvents",
+              "description": "Process UI actions and events recursively"
+            }
+          ]
+        },
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 3,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "test_ui",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 50,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "expected_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 3,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "test_ui",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 50,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/harness/data/harness_tick_001.test_data.json",
+      "relative_path": "harness/data/harness_tick_001.test_data.json",
+      "category": "harness",
+      "name": "sample_tick_based_execution",
+      "description": "Demonstrates tick-based test execution with coordinated inputs, events, and simulation",
+      "tags": [
+        "unit",
+        "harness",
+        "tick",
+        "simulation"
+      ],
+      "expected_to_pass": true,
+      "author": "",
+      "version": 1,
+      "functions": [
+        "ProcessButtonElementActions"
+      ],
+      "logic_classes": [
+        "UICollisionLogic"
+      ],
+      "num_ticks": 5,
+      "has_input_sequence": true,
+      "has_event_sequence": true,
+      "has_tick_snapshots": false,
+      "has_start_data": true,
+      "has_expected_data": false,
+      "simulation_steps": [
+        {
+          "simulation_type": "Collision",
+          "execution_mode": "LogicClass",
+          "function_type": null,
+          "logic_class_type": "UICollisionLogic",
+          "description": "Collision check (runs every tick)"
+        },
+        {
+          "simulation_type": "Action",
+          "execution_mode": "Function",
+          "function_type": "ProcessButtonElementActions",
+          "logic_class_type": null,
+          "description": "Process actions (runs every tick)"
+        }
+      ],
+      "raw": {
+        "metadata": {
+          "test_name": "sample_tick_based_execution",
+          "description": "Demonstrates tick-based test execution with coordinated inputs, events, and simulation",
+          "tags": [
+            "unit",
+            "harness",
+            "tick",
+            "simulation"
+          ],
+          "expected_to_pass": true,
+          "version": 1
+        },
+        "num_ticks": 5,
+        "input_sequence": {
+          "description": "Mouse movement over 5 ticks",
+          "inputs": [
+            {
+              "input_type": "MouseMove",
+              "input_data_type": "MouseInputData",
+              "input_data": {
+                "position": {
+                  "x": 100.0,
+                  "y": 100.0
+                },
+                "button": 0
+              },
+              "tick": 1,
+              "description": "Start position"
+            },
+            {
+              "input_type": "MouseMove",
+              "input_data_type": "MouseInputData",
+              "input_data": {
+                "position": {
+                  "x": 125.0,
+                  "y": 115.0
+                },
+                "button": 0
+              },
+              "tick": 3,
+              "description": "Mid-way position"
+            },
+            {
+              "input_type": "MouseMove",
+              "input_data_type": "MouseInputData",
+              "input_data": {
+                "position": {
+                  "x": 150.0,
+                  "y": 125.0
+                },
+                "button": 0
+              },
+              "tick": 5,
+              "description": "Final position"
+            }
+          ]
+        },
+        "event_sequence": {
+          "description": "Events triggered at specific ticks",
+          "events": [
+            {
+              "tick": 1,
+              "event_packet": {
+                "event_lifetime": 5,
+                "event_type": "EVENT_TEST",
+                "event_data_data_type": "NONE"
+              },
+              "description": "Start event at tick 1"
+            },
+            {
+              "tick": 3,
+              "event_packet": {
+                "event_lifetime": 3,
+                "event_type": "EVENT_USER_INPUT",
+                "event_data_data_type": "NONE"
+              },
+              "description": "Mid event at tick 3"
+            },
+            {
+              "tick": 5,
+              "event_packet": {
+                "event_lifetime": 1,
+                "event_type": "EVENT_TEST",
+                "event_data_data_type": "NONE"
+              },
+              "description": "End event at tick 5"
+            }
+          ]
+        },
+        "simulation_data": {
+          "description": "Simulation steps executed on every tick",
+          "num_ticks": 5,
+          "steps": [
+            {
+              "simulation_type": "Collision",
+              "execution_mode": "LogicClass",
+              "logic_class_type": "UICollisionLogic",
+              "description": "Collision check (runs every tick)"
+            },
+            {
+              "simulation_type": "Action",
+              "execution_mode": "Function",
+              "function_type": "ProcessButtonElementActions",
+              "description": "Process actions (runs every tick)"
+            }
+          ]
+        },
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 2,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "button_ui",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 100,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/harness/data/harness_tick_snapshot_example.test_data.json",
+      "relative_path": "harness/data/harness_tick_snapshot_example.test_data.json",
+      "category": "harness",
+      "name": "tick_snapshot_example",
+      "description": "Example demonstrating tick-by-tick state verification with snapshots",
+      "tags": [
+        "unit",
+        "harness",
+        "tick-snapshot",
+        "example"
+      ],
+      "expected_to_pass": true,
+      "author": "",
+      "version": 1,
+      "functions": [],
+      "logic_classes": [],
+      "num_ticks": 3,
+      "has_input_sequence": false,
+      "has_event_sequence": false,
+      "has_tick_snapshots": true,
+      "has_start_data": true,
+      "has_expected_data": true,
+      "simulation_steps": [],
+      "raw": {
+        "metadata": {
+          "test_name": "tick_snapshot_example",
+          "description": "Example demonstrating tick-by-tick state verification with snapshots",
+          "tags": [
+            "unit",
+            "harness",
+            "tick-snapshot",
+            "example"
+          ],
+          "expected_to_pass": true,
+          "version": 1
+        },
+        "num_ticks": 3,
+        "tick_snapshots": [
+          {
+            "tick": 1,
+            "description": "Initial state after first tick",
+            "data_collection": {
+              "entity_collection": {
+                "entity_memory_pool_size": 2,
+                "entities": [
+                  {
+                    "index": 0,
+                    "c_user_interface": {
+                      "ui_name": "example_button",
+                      "is_visible": false,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 100,
+                            "y": 100
+                          },
+                          "size": {
+                            "x": 100,
+                            "y": 50
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Horizontal",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "tick": 3,
+            "description": "Final state after third tick",
+            "data_collection": {
+              "entity_collection": {
+                "entity_memory_pool_size": 2,
+                "entities": [
+                  {
+                    "index": 0,
+                    "c_user_interface": {
+                      "ui_name": "example_button",
+                      "is_visible": false,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 100,
+                            "y": 100
+                          },
+                          "size": {
+                            "x": 100,
+                            "y": 50
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Horizontal",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 2,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "example_button",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 100,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "expected_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 2,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "example_button",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 100,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/harness/data/harness_workflow_001.test_data.json",
+      "relative_path": "harness/data/harness_workflow_001.test_data.json",
+      "category": "harness",
+      "name": "sample_complete_workflow",
+      "description": "Complete workflow simulation demonstrating all simulation capabilities - combines multiple system types and execution modes",
+      "tags": [
+        "integration",
+        "simulation",
+        "workflow",
+        "ui"
+      ],
+      "expected_to_pass": true,
+      "author": "SteamRot Test Harness",
+      "version": 1,
+      "functions": [
+        "ProcessNestedUIActionsAndEvents"
+      ],
+      "logic_classes": [
+        "UIActionLogic",
+        "UICollisionLogic",
+        "UIRenderLogic",
+        "UIStateLogic"
+      ],
+      "num_ticks": 1,
+      "has_input_sequence": false,
+      "has_event_sequence": false,
+      "has_tick_snapshots": false,
+      "has_start_data": true,
+      "has_expected_data": true,
+      "simulation_steps": [
+        {
+          "simulation_type": "Collision",
+          "execution_mode": "LogicClass",
+          "function_type": null,
+          "logic_class_type": "UICollisionLogic",
+          "description": "Step 1: Detect mouse collision with all UI elements"
+        },
+        {
+          "simulation_type": "Action",
+          "execution_mode": "LogicClass",
+          "function_type": null,
+          "logic_class_type": "UIStateLogic",
+          "description": "Step 2: Update UI element states based on collision"
+        },
+        {
+          "simulation_type": "Render",
+          "execution_mode": "LogicClass",
+          "function_type": null,
+          "logic_class_type": "UIRenderLogic",
+          "description": "Step 3: Render all UI elements to scene texture"
+        },
+        {
+          "simulation_type": "Action",
+          "execution_mode": "Function",
+          "function_type": "ProcessNestedUIActionsAndEvents",
+          "logic_class_type": null,
+          "description": "Step 4: Process UI actions recursively for nested elements"
+        },
+        {
+          "simulation_type": "Action",
+          "execution_mode": "LogicClass",
+          "function_type": null,
+          "logic_class_type": "UIActionLogic",
+          "description": "Step 5: Complete action processing via UIActionLogic"
+        }
+      ],
+      "raw": {
+        "metadata": {
+          "test_name": "sample_complete_workflow",
+          "description": "Complete workflow simulation demonstrating all simulation capabilities - combines multiple system types and execution modes",
+          "tags": [
+            "integration",
+            "simulation",
+            "workflow",
+            "ui"
+          ],
+          "expected_to_pass": true,
+          "author": "SteamRot Test Harness",
+          "version": 1
+        },
+        "simulation_data": {
+          "description": "Complete UI interaction workflow: collision -> state update -> render -> action processing",
+          "steps": [
+            {
+              "simulation_type": "Collision",
+              "execution_mode": "LogicClass",
+              "logic_class_type": "UICollisionLogic",
+              "description": "Step 1: Detect mouse collision with all UI elements"
+            },
+            {
+              "simulation_type": "Action",
+              "execution_mode": "LogicClass",
+              "logic_class_type": "UIStateLogic",
+              "description": "Step 2: Update UI element states based on collision"
+            },
+            {
+              "simulation_type": "Render",
+              "execution_mode": "LogicClass",
+              "logic_class_type": "UIRenderLogic",
+              "description": "Step 3: Render all UI elements to scene texture"
+            },
+            {
+              "simulation_type": "Action",
+              "execution_mode": "Function",
+              "function_type": "ProcessNestedUIActionsAndEvents",
+              "description": "Step 4: Process UI actions recursively for nested elements"
+            },
+            {
+              "simulation_type": "Action",
+              "execution_mode": "LogicClass",
+              "logic_class_type": "UIActionLogic",
+              "description": "Step 5: Complete action processing via UIActionLogic"
+            }
+          ]
+        },
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 5,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "main_menu",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 300,
+                        "y": 400
+                      },
+                      "children_active": true,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "Even"
+                    }
+                  }
+                }
+              },
+              {
+                "index": 1,
+                "c_user_interface": {
+                  "ui_name": "button_panel",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 420,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 300
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "expected_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 5,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "main_menu",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 300,
+                        "y": 400
+                      },
+                      "children_active": true,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "Even"
+                    }
+                  }
+                }
+              },
+              {
+                "index": 1,
+                "c_user_interface": {
+                  "ui_name": "button_panel",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 420,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 300
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/harness/data/harness_workflow_002.test_data.json",
+      "relative_path": "harness/data/harness_workflow_002.test_data.json",
+      "category": "harness",
+      "name": "sample_input_event_simulation",
+      "description": "Comprehensive sample combining input, events, and simulation with tick-based execution",
+      "tags": [
+        "unit",
+        "harness",
+        "input",
+        "event",
+        "simulation"
+      ],
+      "expected_to_pass": true,
+      "author": "",
+      "version": 1,
+      "functions": [
+        "ProcessButtonElementActions"
+      ],
+      "logic_classes": [
+        "UICollisionLogic"
+      ],
+      "num_ticks": 3,
+      "has_input_sequence": true,
+      "has_event_sequence": true,
+      "has_tick_snapshots": false,
+      "has_start_data": true,
+      "has_expected_data": false,
+      "simulation_steps": [
+        {
+          "simulation_type": "Collision",
+          "execution_mode": "LogicClass",
+          "function_type": null,
+          "logic_class_type": "UICollisionLogic",
+          "description": "Detect mouse collision with button"
+        },
+        {
+          "simulation_type": "Action",
+          "execution_mode": "Function",
+          "function_type": "ProcessButtonElementActions",
+          "logic_class_type": null,
+          "description": "Process button click actions"
+        }
+      ],
+      "raw": {
+        "metadata": {
+          "test_name": "sample_input_event_simulation",
+          "description": "Comprehensive sample combining input, events, and simulation with tick-based execution",
+          "tags": [
+            "unit",
+            "harness",
+            "input",
+            "event",
+            "simulation"
+          ],
+          "expected_to_pass": true,
+          "version": 1
+        },
+        "input_sequence": {
+          "description": "User clicks a button",
+          "inputs": [
+            {
+              "input_type": "MouseMove",
+              "input_data_type": "MouseInputData",
+              "input_data": {
+                "position": {
+                  "x": 150.0,
+                  "y": 125.0
+                },
+                "button": 0
+              },
+              "tick": 1,
+              "description": "Move mouse over button"
+            },
+            {
+              "input_type": "MouseClick",
+              "input_data_type": "MouseInputData",
+              "input_data": {
+                "position": {
+                  "x": 150.0,
+                  "y": 125.0
+                },
+                "button": 0
+              },
+              "tick": 2,
+              "description": "Click the button"
+            }
+          ]
+        },
+        "event_sequence": {
+          "description": "Generate test events in response to input",
+          "events": [
+            {
+              "tick": 1,
+              "event_packet": {
+                "event_lifetime": 2,
+                "event_type": "EVENT_TEST",
+                "event_data_data_type": "NONE"
+              },
+              "description": "Initial test event"
+            }
+          ]
+        },
+        "simulation_data": {
+          "description": "Process UI collision and actions on every tick",
+          "num_ticks": 3,
+          "steps": [
+            {
+              "simulation_type": "Collision",
+              "execution_mode": "LogicClass",
+              "logic_class_type": "UICollisionLogic",
+              "description": "Detect mouse collision with button"
+            },
+            {
+              "simulation_type": "Action",
+              "execution_mode": "Function",
+              "function_type": "ProcessButtonElementActions",
+              "description": "Process button click actions"
+            }
+          ]
+        },
+        "num_ticks": 3,
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 2,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "button_ui",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 100,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/unit/entity/data/configurator_basic.test_data.json",
+      "relative_path": "unit/entity/data/configurator_basic.test_data.json",
+      "category": "unit/entity",
+      "name": "configurator_basic",
+      "description": "Basic entity configuration from FlatBuffers data for TEST scene",
+      "tags": [
+        "unit",
+        "entity",
+        "configurator"
+      ],
+      "expected_to_pass": true,
+      "author": "",
+      "version": 1,
+      "functions": [],
+      "logic_classes": [],
+      "num_ticks": 1,
+      "has_input_sequence": false,
+      "has_event_sequence": false,
+      "has_tick_snapshots": false,
+      "has_start_data": true,
+      "has_expected_data": true,
+      "simulation_steps": [],
+      "raw": {
+        "metadata": {
+          "test_name": "configurator_basic",
+          "description": "Basic entity configuration from FlatBuffers data for TEST scene",
+          "tags": [
+            "unit",
+            "entity",
+            "configurator"
+          ],
+          "expected_to_pass": true,
+          "version": 1
+        },
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 100,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "test_menu",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 20,
+                        "y": 25
+                      },
+                      "size": {
+                        "x": 220,
+                        "y": 300
+                      },
+                      "children_active": true,
+                      "children": [
+                        {
+                          "element_type": "ButtonData",
+                          "element": {
+                            "base_data": {
+                              "position": {
+                                "x": 0,
+                                "y": 0
+                              },
+                              "size": {
+                                "x": 0,
+                                "y": 0
+                              },
+                              "children_active": false,
+                              "children": [],
+                              "layout": "Horizontal",
+                              "spacing_strategy": "None"
+                            },
+                            "label": "Return"
+                          }
+                        },
+                        {
+                          "element_type": "ButtonData",
+                          "element": {
+                            "base_data": {
+                              "position": {
+                                "x": 0,
+                                "y": 0
+                              },
+                              "size": {
+                                "x": 0,
+                                "y": 0
+                              },
+                              "children_active": false,
+                              "children": [],
+                              "layout": "Horizontal",
+                              "spacing_strategy": "None"
+                            },
+                            "label": "New Construct"
+                          }
+                        }
+                      ],
+                      "layout": "Vertical",
+                      "spacing_strategy": "Ratioed"
+                    }
+                  }
+                }
+              },
+              {
+                "index": 1,
+                "c_grimoire_machina": {
+                  "fragments": [
+                    "valid_fragment"
+                  ],
+                  "joints": []
+                }
+              }
+            ]
+          }
+        },
+        "expected_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 100,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "test_menu",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 20,
+                        "y": 25
+                      },
+                      "size": {
+                        "x": 220,
+                        "y": 300
+                      },
+                      "children_active": true,
+                      "children": [
+                        {
+                          "element_type": "ButtonData",
+                          "element": {
+                            "base_data": {
+                              "position": {
+                                "x": 0,
+                                "y": 0
+                              },
+                              "size": {
+                                "x": 0,
+                                "y": 0
+                              },
+                              "children_active": false,
+                              "children": [],
+                              "layout": "Horizontal",
+                              "spacing_strategy": "None"
+                            },
+                            "label": "Return"
+                          }
+                        },
+                        {
+                          "element_type": "ButtonData",
+                          "element": {
+                            "base_data": {
+                              "position": {
+                                "x": 0,
+                                "y": 0
+                              },
+                              "size": {
+                                "x": 0,
+                                "y": 0
+                              },
+                              "children_active": false,
+                              "children": [],
+                              "layout": "Horizontal",
+                              "spacing_strategy": "None"
+                            },
+                            "label": "New Construct"
+                          }
+                        }
+                      ],
+                      "layout": "Vertical",
+                      "spacing_strategy": "Ratioed"
+                    }
+                  }
+                }
+              },
+              {
+                "index": 1,
+                "c_grimoire_machina": {
+                  "fragments": [
+                    "valid_fragment"
+                  ],
+                  "joints": []
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/unit/entity/data/pool_comparison_different_size.test_data.json",
+      "relative_path": "unit/entity/data/pool_comparison_different_size.test_data.json",
+      "category": "unit/entity",
+      "name": "pool_comparison_different_size",
+      "description": "Entity memory pool with different size for comparison testing",
+      "tags": [
+        "unit",
+        "entity",
+        "memory_pool"
+      ],
+      "expected_to_pass": false,
+      "author": "",
+      "version": 1,
+      "functions": [],
+      "logic_classes": [],
+      "num_ticks": 1,
+      "has_input_sequence": false,
+      "has_event_sequence": false,
+      "has_tick_snapshots": false,
+      "has_start_data": true,
+      "has_expected_data": true,
+      "simulation_steps": [],
+      "raw": {
+        "metadata": {
+          "test_name": "pool_comparison_different_size",
+          "description": "Entity memory pool with different size for comparison testing",
+          "tags": [
+            "unit",
+            "entity",
+            "memory_pool"
+          ],
+          "expected_to_pass": false,
+          "version": 1
+        },
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 8,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "test_ui_1",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 10,
+                        "y": 20
+                      },
+                      "size": {
+                        "x": 100,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "index": 1,
+                "c_grimoire_machina": {
+                  "fragments": [],
+                  "joints": []
+                }
+              }
+            ]
+          }
+        },
+        "expected_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 5,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "test_ui_1",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 10,
+                        "y": 20
+                      },
+                      "size": {
+                        "x": 100,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "index": 1,
+                "c_grimoire_machina": {
+                  "fragments": [],
+                  "joints": []
+                }
+              },
+              {
+                "index": 2,
+                "c_user_interface": {
+                  "ui_name": "test_ui_2",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 30,
+                        "y": 40
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 100
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "Ratioed"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/unit/entity/data/pool_comparison_different_values.test_data.json",
+      "relative_path": "unit/entity/data/pool_comparison_different_values.test_data.json",
+      "category": "unit/entity",
+      "name": "pool_comparison_different_values",
+      "description": "Entity memory pool with different component values for comparison testing",
+      "tags": [
+        "unit",
+        "entity",
+        "memory_pool"
+      ],
+      "expected_to_pass": false,
+      "author": "",
+      "version": 1,
+      "functions": [],
+      "logic_classes": [],
+      "num_ticks": 1,
+      "has_input_sequence": false,
+      "has_event_sequence": false,
+      "has_tick_snapshots": false,
+      "has_start_data": true,
+      "has_expected_data": true,
+      "simulation_steps": [],
+      "raw": {
+        "metadata": {
+          "test_name": "pool_comparison_different_values",
+          "description": "Entity memory pool with different component values for comparison testing",
+          "tags": [
+            "unit",
+            "entity",
+            "memory_pool"
+          ],
+          "expected_to_pass": false,
+          "version": 1
+        },
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 5,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "different_name",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 99,
+                        "y": 88
+                      },
+                      "size": {
+                        "x": 100,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "index": 1,
+                "c_grimoire_machina": {
+                  "fragments": [],
+                  "joints": []
+                }
+              },
+              {
+                "index": 2,
+                "c_user_interface": {
+                  "ui_name": "test_ui_2",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 30,
+                        "y": 40
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 100
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "Ratioed"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "expected_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 5,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "test_ui_1",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 10,
+                        "y": 20
+                      },
+                      "size": {
+                        "x": 100,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "index": 1,
+                "c_grimoire_machina": {
+                  "fragments": [],
+                  "joints": []
+                }
+              },
+              {
+                "index": 2,
+                "c_user_interface": {
+                  "ui_name": "test_ui_2",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 30,
+                        "y": 40
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 100
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "Ratioed"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/unit/entity/data/pool_comparison_equal.test_data.json",
+      "relative_path": "unit/entity/data/pool_comparison_equal.test_data.json",
+      "category": "unit/entity",
+      "name": "pool_comparison_equal",
+      "description": "Two identical entity memory pools for comparison testing",
+      "tags": [
+        "unit",
+        "entity",
+        "memory_pool"
+      ],
+      "expected_to_pass": true,
+      "author": "",
+      "version": 1,
+      "functions": [],
+      "logic_classes": [],
+      "num_ticks": 1,
+      "has_input_sequence": false,
+      "has_event_sequence": false,
+      "has_tick_snapshots": false,
+      "has_start_data": true,
+      "has_expected_data": true,
+      "simulation_steps": [],
+      "raw": {
+        "metadata": {
+          "test_name": "pool_comparison_equal",
+          "description": "Two identical entity memory pools for comparison testing",
+          "tags": [
+            "unit",
+            "entity",
+            "memory_pool"
+          ],
+          "expected_to_pass": true,
+          "version": 1
+        },
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 5,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "test_ui_1",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 10,
+                        "y": 20
+                      },
+                      "size": {
+                        "x": 100,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "index": 1,
+                "c_grimoire_machina": {
+                  "fragments": [],
+                  "joints": []
+                }
+              },
+              {
+                "index": 2,
+                "c_user_interface": {
+                  "ui_name": "test_ui_2",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 30,
+                        "y": 40
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 100
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "Ratioed"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "expected_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 5,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "test_ui_1",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 10,
+                        "y": 20
+                      },
+                      "size": {
+                        "x": 100,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "index": 1,
+                "c_grimoire_machina": {
+                  "fragments": [],
+                  "joints": []
+                }
+              },
+              {
+                "index": 2,
+                "c_user_interface": {
+                  "ui_name": "test_ui_2",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 30,
+                        "y": 40
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 100
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "Ratioed"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/unit/logic/data/collision_check_mouse_over.test_data.json",
+      "relative_path": "unit/logic/data/collision_check_mouse_over.test_data.json",
+      "category": "unit/logic",
+      "name": "logic_collision_check_mouse_over",
+      "description": "given a UI element, when checking for mouse over collision, then the collision is detected correctly",
+      "tags": [
+        "unit",
+        "logic",
+        "collision"
+      ],
+      "expected_to_pass": true,
+      "author": "",
+      "version": 1,
+      "functions": [
+        "CheckMouseOverNestedUIElement"
+      ],
+      "logic_classes": [],
+      "num_ticks": 1,
+      "has_input_sequence": true,
+      "has_event_sequence": false,
+      "has_tick_snapshots": false,
+      "has_start_data": true,
+      "has_expected_data": true,
+      "simulation_steps": [
+        {
+          "simulation_type": "Collision",
+          "execution_mode": "Function",
+          "function_type": "CheckMouseOverNestedUIElement",
+          "logic_class_type": null,
+          "description": "Step 1: Detect mouse collision over UIElement"
+        }
+      ],
+      "raw": {
+        "metadata": {
+          "test_name": "logic_collision_check_mouse_over",
+          "description": "given a UI element, when checking for mouse over collision, then the collision is detected correctly",
+          "tags": [
+            "unit",
+            "logic",
+            "collision"
+          ],
+          "expected_to_pass": true,
+          "version": 1
+        },
+        "input_sequence": {
+          "description": "User moves mouse over UI element",
+          "inputs": [
+            {
+              "input_type": "MouseMove",
+              "input_data_type": "MouseInputData",
+              "input_data": {
+                "position": {
+                  "x": 150.0,
+                  "y": 125.0
+                },
+                "button": 0
+              },
+              "tick": 1,
+              "description": "Move mouse over UI element"
+            }
+          ]
+        },
+        "simulation_data": {
+          "description": "given a UI element, when checking for mouse over collision, then the collision is detected correctly",
+          "steps": [
+            {
+              "simulation_type": "Collision",
+              "execution_mode": "Function",
+              "function_type": "CheckMouseOverNestedUIElement",
+              "description": "Step 1: Detect mouse collision over UIElement"
+            }
+          ]
+        },
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 3,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "test_ui",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 50,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "expected_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 3,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "test_ui",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 50,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "is_mouse_over": true,
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/unit/logic/data/process_ui_actions_button_click.test_data.json",
+      "relative_path": "unit/logic/data/process_ui_actions_button_click.test_data.json",
+      "category": "unit/logic",
+      "name": "process_ui_actions_button_click",
+      "description": "Test ProcessUIActionsAndEvents adds EventPacket to EventBus when button has is_mouse_over=true and active subscription",
+      "tags": [
+        "unit",
+        "logic",
+        "action",
+        "ui",
+        "button"
+      ],
+      "expected_to_pass": true,
+      "author": "",
+      "version": 1,
+      "functions": [
+        "ProcessNestedUIActionsAndEvents"
+      ],
+      "logic_classes": [],
+      "num_ticks": 1,
+      "has_input_sequence": false,
+      "has_event_sequence": false,
+      "has_tick_snapshots": true,
+      "has_start_data": true,
+      "has_expected_data": true,
+      "simulation_steps": [
+        {
+          "simulation_type": "Action",
+          "execution_mode": "Function",
+          "function_type": "ProcessNestedUIActionsAndEvents",
+          "logic_class_type": null,
+          "description": "Process button actions and add response event to EventBus"
+        }
+      ],
+      "raw": {
+        "metadata": {
+          "test_name": "process_ui_actions_button_click",
+          "description": "Test ProcessUIActionsAndEvents adds EventPacket to EventBus when button has is_mouse_over=true and active subscription",
+          "tags": [
+            "unit",
+            "logic",
+            "action",
+            "ui",
+            "button"
+          ],
+          "expected_to_pass": true,
+          "version": 1
+        },
+        "num_ticks": 1,
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 5,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "test_button_ui",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 100
+                      },
+                      "children_active": true,
+                      "children": [
+                        {
+                          "element_type": "ButtonData",
+                          "element": {
+                            "base_data": {
+                              "position": {
+                                "x": 100,
+                                "y": 100
+                              },
+                              "size": {
+                                "x": 100,
+                                "y": 50
+                              },
+                              "subscriber_data": {
+                                "event_type_data": "EVENT_USER_INPUT",
+                                "trigger_data_type": "UserInputBitsetData",
+                                "trigger_data": {
+                                  "mouse_released": [
+                                    "LEFT_CLICK"
+                                  ]
+                                },
+                                "active": true
+                              },
+                              "response_event_data": {
+                                "event_lifetime": 1,
+                                "event_type": "EVENT_TEST",
+                                "event_data_data_type": "NONE"
+                              },
+                              "children_active": false,
+                              "children": [],
+                              "is_mouse_over": true,
+                              "layout": "Horizontal",
+                              "spacing_strategy": "None"
+                            },
+                            "label": "Test Button"
+                          }
+                        }
+                      ],
+                      "layout": "Vertical",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "event_bus": {
+            "description": "Empty event bus at start",
+            "events": []
+          }
+        },
+        "simulation_data": {
+          "description": "Process UI actions to add event to EventBus",
+          "steps": [
+            {
+              "simulation_type": "Action",
+              "execution_mode": "Function",
+              "function_type": "ProcessNestedUIActionsAndEvents",
+              "description": "Process button actions and add response event to EventBus"
+            }
+          ]
+        },
+        "tick_snapshots": [
+          {
+            "tick": 1,
+            "data_collection": {
+              "entity_collection": {
+                "entity_memory_pool_size": 5,
+                "entities": [
+                  {
+                    "index": 0,
+                    "c_user_interface": {
+                      "ui_name": "test_button_ui",
+                      "is_visible": true,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 100,
+                            "y": 100
+                          },
+                          "size": {
+                            "x": 200,
+                            "y": 100
+                          },
+                          "children_active": true,
+                          "children": [
+                            {
+                              "element_type": "ButtonData",
+                              "element": {
+                                "base_data": {
+                                  "position": {
+                                    "x": 100,
+                                    "y": 100
+                                  },
+                                  "size": {
+                                    "x": 100,
+                                    "y": 50
+                                  },
+                                  "subscriber_data": {
+                                    "event_type_data": "EVENT_USER_INPUT",
+                                    "trigger_data_type": "UserInputBitsetData",
+                                    "trigger_data": {
+                                      "mouse_released": [
+                                        "LEFT_CLICK"
+                                      ]
+                                    }
+                                  },
+                                  "response_event_data": {
+                                    "event_lifetime": 1,
+                                    "event_type": "EVENT_TEST",
+                                    "event_data_data_type": "NONE"
+                                  },
+                                  "children_active": false,
+                                  "children": [],
+                                  "is_mouse_over": true,
+                                  "layout": "Horizontal",
+                                  "spacing_strategy": "None"
+                                },
+                                "label": "Test Button"
+                              }
+                            }
+                          ],
+                          "layout": "Vertical",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              "waiting_room": {
+                "description": "After tick 1: the test button has been triggered and added EVENT_TEST to waiting room",
+                "events": [
+                  {
+                    "event_lifetime": 1,
+                    "event_type": "EVENT_TEST",
+                    "event_data_data_type": "NONE"
+                  }
+                ]
+              }
+            },
+            "description": "After simulation step, before EventHandler ticks: both events present with lifetime=1"
+          }
+        ],
+        "expected_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 5,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "test_button_ui",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 100
+                      },
+                      "children_active": true,
+                      "children": [
+                        {
+                          "element_type": "ButtonData",
+                          "element": {
+                            "base_data": {
+                              "position": {
+                                "x": 100,
+                                "y": 100
+                              },
+                              "size": {
+                                "x": 100,
+                                "y": 50
+                              },
+                              "subscriber_data": {
+                                "event_type_data": "EVENT_USER_INPUT",
+                                "trigger_data_type": "UserInputBitsetData",
+                                "trigger_data": {
+                                  "mouse_released": [
+                                    "LEFT_CLICK"
+                                  ]
+                                }
+                              },
+                              "response_event_data": {
+                                "event_lifetime": 1,
+                                "event_type": "EVENT_TEST",
+                                "event_data_data_type": "NONE"
+                              },
+                              "children_active": false,
+                              "children": [],
+                              "is_mouse_over": true,
+                              "layout": "Horizontal",
+                              "spacing_strategy": "None"
+                            },
+                            "label": "Test Button"
+                          }
+                        }
+                      ],
+                      "layout": "Vertical",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "event_bus": {
+            "description": "Final event bus state after EventHandler ticks - events with lifetime=1 are decremented to 0 and removed",
+            "events": []
+          },
+          "waiting_room": {
+            "description": "After tick 1: the test button has been triggered and added EVENT_TEST to waiting room",
+            "events": [
+              {
+                "event_lifetime": 1,
+                "event_type": "EVENT_TEST",
+                "event_data_data_type": "NONE"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/unit/logic/data/ui_button_multi_tick_interaction.test_data.json",
+      "relative_path": "unit/logic/data/ui_button_multi_tick_interaction.test_data.json",
+      "category": "unit/logic",
+      "name": "ui_button_multi_tick_interaction",
+      "description": "Multi-tick UI button interaction test that chains mouse over collision detection with action processing. Tests full subscriber activation workflow across 2 ticks: (1) Mouse release at (150,125) generates USER_INPUT event which activates subscriber and processes button action, adding response EVENT_TEST to waiting room; (2) Final validation shows EVENT_TEST moved to EventBus. Validates CUserInterface component state transitions and event flow through EventBus and waiting room.",
+      "tags": [
+        "unit",
+        "logic",
+        "ui",
+        "button",
+        "multi-tick",
+        "collision",
+        "action",
+        "subscriber",
+        "event-driven"
+      ],
+      "expected_to_pass": true,
+      "author": "",
+      "version": 1,
+      "functions": [
+        "CheckMouseOverNestedUIElement",
+        "ProcessNestedUIActionsAndEvents"
+      ],
+      "logic_classes": [],
+      "num_ticks": 2,
+      "has_input_sequence": true,
+      "has_event_sequence": false,
+      "has_tick_snapshots": true,
+      "has_start_data": true,
+      "has_expected_data": true,
+      "simulation_steps": [
+        {
+          "simulation_type": "Collision",
+          "execution_mode": "Function",
+          "function_type": "CheckMouseOverNestedUIElement",
+          "logic_class_type": null,
+          "description": "Check mouse collision with UI elements (runs every tick)"
+        },
+        {
+          "simulation_type": "Action",
+          "execution_mode": "Function",
+          "function_type": "ProcessNestedUIActionsAndEvents",
+          "logic_class_type": null,
+          "description": "Process UI actions and generate response events (runs every tick)"
+        }
+      ],
+      "raw": {
+        "metadata": {
+          "test_name": "ui_button_multi_tick_interaction",
+          "description": "Multi-tick UI button interaction test that chains mouse over collision detection with action processing. Tests full subscriber activation workflow across 2 ticks: (1) Mouse release at (150,125) generates USER_INPUT event which activates subscriber and processes button action, adding response EVENT_TEST to waiting room; (2) Final validation shows EVENT_TEST moved to EventBus. Validates CUserInterface component state transitions and event flow through EventBus and waiting room.",
+          "tags": [
+            "unit",
+            "logic",
+            "ui",
+            "button",
+            "multi-tick",
+            "collision",
+            "action",
+            "subscriber",
+            "event-driven"
+          ],
+          "expected_to_pass": true,
+          "version": 1
+        },
+        "num_ticks": 2,
+        "input_sequence": {
+          "description": "Simulated mouse release at tick 1 which generates USER_INPUT event",
+          "inputs": [
+            {
+              "input_type": "MouseRelease",
+              "input_data_type": "MouseInputData",
+              "input_data": {
+                "position": {
+                  "x": 150.0,
+                  "y": 125.0
+                },
+                "button": 0
+              },
+              "tick": 1,
+              "description": "Release mouse button over button center (button at 100,100 with size 100x50) - generates USER_INPUT event with mouse_released LEFT_CLICK"
+            }
+          ]
+        },
+        "simulation_data": {
+          "description": "Simulation steps: collision detection and action processing on every tick",
+          "steps": [
+            {
+              "simulation_type": "Collision",
+              "execution_mode": "Function",
+              "function_type": "CheckMouseOverNestedUIElement",
+              "description": "Check mouse collision with UI elements (runs every tick)"
+            },
+            {
+              "simulation_type": "Action",
+              "execution_mode": "Function",
+              "function_type": "ProcessNestedUIActionsAndEvents",
+              "description": "Process UI actions and generate response events (runs every tick)"
+            }
+          ]
+        },
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 5,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "test_button_ui",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 100,
+                        "y": 50
+                      },
+                      "children_active": true,
+                      "children": [
+                        {
+                          "element_type": "ButtonData",
+                          "element": {
+                            "base_data": {
+                              "position": {
+                                "x": 100,
+                                "y": 100
+                              },
+                              "size": {
+                                "x": 100,
+                                "y": 50
+                              },
+                              "subscriber_data": {
+                                "event_type_data": "EVENT_TOGGLE_UI",
+                                "trigger_data_type": "UserInterfaceNameData",
+                                "trigger_data": {
+                                  "id": "test_button_ui"
+                                },
+                                "active": true
+                              },
+                              "response_event_data": {
+                                "event_lifetime": 2,
+                                "event_type": "EVENT_TEST",
+                                "event_data_data_type": "NONE"
+                              },
+                              "children_active": false,
+                              "children": [],
+                              "is_mouse_over": false,
+                              "layout": "Horizontal",
+                              "spacing_strategy": "None"
+                            },
+                            "label": "Test Button"
+                          }
+                        }
+                      ],
+                      "layout": "Vertical",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "event_bus": {
+            "description": "Empty EventBus at start",
+            "events": []
+          },
+          "waiting_room": {
+            "description": "Empty waiting room at start",
+            "events": []
+          }
+        },
+        "tick_snapshots": [
+          {
+            "tick": 1,
+            "description": "After tick 1: Mouse release at (150,125) generates USER_INPUT event, collision sets is_mouse_over=true, subscriber is active, ProcessNestedUIActionsAndEvents adds EVENT_TEST to waiting room",
+            "data_collection": {
+              "entity_collection": {
+                "entity_memory_pool_size": 5,
+                "entities": [
+                  {
+                    "index": 0,
+                    "c_user_interface": {
+                      "ui_name": "test_button_ui",
+                      "is_visible": true,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 100,
+                            "y": 100
+                          },
+                          "size": {
+                            "x": 100,
+                            "y": 50
+                          },
+                          "children_active": true,
+                          "children": [
+                            {
+                              "element_type": "ButtonData",
+                              "element": {
+                                "base_data": {
+                                  "position": {
+                                    "x": 100,
+                                    "y": 100
+                                  },
+                                  "size": {
+                                    "x": 100,
+                                    "y": 50
+                                  },
+                                  "subscriber_data": {
+                                    "event_type_data": "EVENT_USER_INPUT",
+                                    "trigger_data_type": "UserInputBitsetData",
+                                    "trigger_data": {
+                                      "mouse_released": [
+                                        "LEFT_CLICK"
+                                      ]
+                                    },
+                                    "active": false
+                                  },
+                                  "response_event_data": {
+                                    "event_lifetime": 2,
+                                    "event_type": "EVENT_TEST",
+                                    "event_data_data_type": "NONE"
+                                  },
+                                  "children_active": false,
+                                  "children": [],
+                                  "is_mouse_over": true,
+                                  "layout": "Horizontal",
+                                  "spacing_strategy": "None"
+                                },
+                                "label": "Test Button"
+                              }
+                            }
+                          ],
+                          "layout": "Vertical",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              "event_bus": {
+                "description": "USER_INPUT event generated and not yet tick down",
+                "events": [
+                  {
+                    "event_lifetime": 1,
+                    "event_type": "EVENT_USER_INPUT",
+                    "event_data_data_type": "UserInputBitsetData",
+                    "event_data_data": {
+                      "mouse_released": [
+                        "LEFT_CLICK"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "waiting_room": {
+                "description": "EVENT_TEST in waiting room with lifetime=2",
+                "events": [
+                  {
+                    "event_lifetime": 2,
+                    "event_type": "EVENT_TEST",
+                    "event_data_data_type": "NONE"
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "expected_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 5,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "test_button_ui",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 100,
+                        "y": 50
+                      },
+                      "children_active": true,
+                      "children": [
+                        {
+                          "element_type": "ButtonData",
+                          "element": {
+                            "base_data": {
+                              "position": {
+                                "x": 100,
+                                "y": 100
+                              },
+                              "size": {
+                                "x": 100,
+                                "y": 50
+                              },
+                              "subscriber_data": {
+                                "event_type_data": "EVENT_USER_INPUT",
+                                "trigger_data_type": "UserInputBitsetData",
+                                "trigger_data": {
+                                  "mouse_released": [
+                                    "LEFT_CLICK"
+                                  ]
+                                },
+                                "active": false
+                              },
+                              "response_event_data": {
+                                "event_lifetime": 2,
+                                "event_type": "EVENT_TEST",
+                                "event_data_data_type": "NONE"
+                              },
+                              "children_active": false,
+                              "children": [],
+                              "is_mouse_over": true,
+                              "layout": "Horizontal",
+                              "spacing_strategy": "None"
+                            },
+                            "label": "Test Button"
+                          }
+                        }
+                      ],
+                      "layout": "Vertical",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "event_bus": {
+            "description": "After tick 2: EVENT_TEST moved from waiting room to EventBus, lifetime decremented to 1",
+            "events": [
+              {
+                "event_lifetime": 1,
+                "event_type": "EVENT_TEST",
+                "event_data_data_type": "NONE"
+              }
+            ]
+          },
+          "waiting_room": {
+            "description": "Waiting room empty after events moved to EventBus",
+            "events": []
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/unit/logic/data/ui_collision_basic.test_data.json",
+      "relative_path": "unit/logic/data/ui_collision_basic.test_data.json",
+      "category": "unit/logic",
+      "name": "ui_collision_basic",
+      "description": "Basic UICollisionLogic test - detects mouse over a simple UI panel element",
+      "tags": [
+        "unit",
+        "logic",
+        "UICollisionLogic"
+      ],
+      "expected_to_pass": true,
+      "author": "",
+      "version": 1,
+      "functions": [],
+      "logic_classes": [
+        "UICollisionLogic"
+      ],
+      "num_ticks": 1,
+      "has_input_sequence": false,
+      "has_event_sequence": false,
+      "has_tick_snapshots": false,
+      "has_start_data": true,
+      "has_expected_data": true,
+      "simulation_steps": [
+        {
+          "simulation_type": "Collision",
+          "execution_mode": "LogicClass",
+          "function_type": null,
+          "logic_class_type": "UICollisionLogic",
+          "description": "Detect UI collision - mouse should be over panel"
+        }
+      ],
+      "raw": {
+        "metadata": {
+          "test_name": "ui_collision_basic",
+          "description": "Basic UICollisionLogic test - detects mouse over a simple UI panel element",
+          "tags": [
+            "unit",
+            "logic",
+            "UICollisionLogic"
+          ],
+          "expected_to_pass": true,
+          "version": 1
+        },
+        "simulation_data": {
+          "description": "Execute collision detection with mouse at (150, 125) - inside panel bounds",
+          "steps": [
+            {
+              "simulation_type": "Collision",
+              "execution_mode": "LogicClass",
+              "logic_class_type": "UICollisionLogic",
+              "description": "Detect UI collision - mouse should be over panel"
+            }
+          ]
+        },
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 3,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "test_panel",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "expected_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 3,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "test_panel",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/unit/logic/data/ui_collision_logic_basic.test_data.json",
+      "relative_path": "unit/logic/data/ui_collision_logic_basic.test_data.json",
+      "category": "unit/logic",
+      "name": "Run UICollisionLogic::RunLogic() with config 001",
+      "description": "Given a UI element, when checking for mouse over collision, then the collision is detected correctly",
+      "tags": [
+        "unit",
+        "logic",
+        "collision"
+      ],
+      "expected_to_pass": true,
+      "author": "",
+      "version": 1,
+      "functions": [],
+      "logic_classes": [
+        "UICollisionLogic"
+      ],
+      "num_ticks": 1,
+      "has_input_sequence": true,
+      "has_event_sequence": false,
+      "has_tick_snapshots": false,
+      "has_start_data": true,
+      "has_expected_data": true,
+      "simulation_steps": [
+        {
+          "simulation_type": "Collision",
+          "execution_mode": "LogicClass",
+          "function_type": null,
+          "logic_class_type": "UICollisionLogic",
+          "description": "Step 1: Detect mouse collision with all UI elements"
+        }
+      ],
+      "raw": {
+        "metadata": {
+          "test_name": "Run UICollisionLogic::RunLogic() with config 001",
+          "description": "Given a UI element, when checking for mouse over collision, then the collision is detected correctly",
+          "tags": [
+            "unit",
+            "logic",
+            "collision"
+          ],
+          "expected_to_pass": true,
+          "version": 1
+        },
+        "input_sequence": {
+          "description": "User moves mouse over UI element",
+          "inputs": [
+            {
+              "input_type": "MouseMove",
+              "input_data_type": "MouseInputData",
+              "input_data": {
+                "position": {
+                  "x": 150.0,
+                  "y": 125.0
+                },
+                "button": 0
+              },
+              "tick": 1,
+              "description": "Move mouse over UI element"
+            }
+          ]
+        },
+        "simulation_data": {
+          "description": "given a UI element, when checking for mouse over collision, then the collision is detected correctly",
+          "steps": [
+            {
+              "simulation_type": "Collision",
+              "execution_mode": "LogicClass",
+              "logic_class_type": "UICollisionLogic",
+              "description": "Step 1: Detect mouse collision with all UI elements"
+            }
+          ]
+        },
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 3,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "test_ui",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 50,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "expected_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 3,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "test_ui",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 50,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "is_mouse_over": true,
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/unit/logic/data/ui_visibility_from_UIStateLogic.test_data.json",
+      "relative_path": "unit/logic/data/ui_visibility_from_UIStateLogic.test_data.json",
+      "category": "unit/logic",
+      "name": "UI_Visibility_from_UIStateLogic",
+      "description": "Test UIStateLogic RunLogic function - 4 UI entities controlled by 1 CUIState entity that manages visibility of 2 of them",
+      "tags": [
+        "unit",
+        "logic",
+        "ui"
+      ],
+      "expected_to_pass": true,
+      "author": "",
+      "version": 1,
+      "functions": [],
+      "logic_classes": [
+        "UIStateLogic"
+      ],
+      "num_ticks": 1,
+      "has_input_sequence": false,
+      "has_event_sequence": false,
+      "has_tick_snapshots": true,
+      "has_start_data": true,
+      "has_expected_data": true,
+      "simulation_steps": [
+        {
+          "simulation_type": "Action",
+          "execution_mode": "LogicClass",
+          "function_type": null,
+          "logic_class_type": "UIStateLogic",
+          "description": "Step 1: Execute UIStateLogic to update UI visibility - main_menu and play_button should toggle visible, settings_panel and quit_button should toggle invisible"
+        }
+      ],
+      "raw": {
+        "metadata": {
+          "test_name": "UI_Visibility_from_UIStateLogic",
+          "description": "Test UIStateLogic RunLogic function - 4 UI entities controlled by 1 CUIState entity that manages visibility of 2 of them",
+          "tags": [
+            "unit",
+            "logic",
+            "ui"
+          ],
+          "expected_to_pass": true,
+          "version": 1
+        },
+        "simulation_data": {
+          "description": "Call UpdateCUserInterfaceVisibilityFromCUIState to update UI visibility based on CUIState mappings",
+          "steps": [
+            {
+              "simulation_type": "Action",
+              "execution_mode": "LogicClass",
+              "logic_class_type": "UIStateLogic",
+              "description": "Step 1: Execute UIStateLogic to update UI visibility - main_menu and play_button should toggle visible, settings_panel and quit_button should toggle invisible"
+            }
+          ]
+        },
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 5,
+            "entities": [
+              {
+                "c_user_interface": {
+                  "ui_name": "main_menu",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_user_interface": {
+                  "ui_name": "settings_panel",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 350,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_user_interface": {
+                  "ui_name": "play_button",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 300
+                      },
+                      "size": {
+                        "x": 150,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_user_interface": {
+                  "ui_name": "quit_button",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 400
+                      },
+                      "size": {
+                        "x": 150,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_ui_state": {
+                  "ui_states": [
+                    {
+                      "state_key": "menu_state",
+                      "state_value": "false",
+                      "state_to_ui_visibility": {
+                        "ui_names_on": [
+                          "main_menu",
+                          "play_button"
+                        ],
+                        "ui_names_off": [
+                          "settings_panel",
+                          "quit_button"
+                        ]
+                      },
+                      "subscribers": [
+                        {
+                          "event_type_data": "EVENT_TOGGLE_UI",
+                          "trigger_data_type": "UserInterfaceNameData",
+                          "trigger_data": {
+                            "id": "menu_state"
+                          },
+                          "active": false
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "event_bus": {
+            "description": "EVENT_TOGGLE_UI event to trigger UI visibility update",
+            "events": [
+              {
+                "event_lifetime": 1,
+                "event_type": "EVENT_TOGGLE_UI",
+                "event_data_data_type": "UserInterfaceNameData",
+                "event_data_data": {
+                  "id": "menu_state"
+                }
+              }
+            ]
+          }
+        },
+        "tick_snapshots": [
+          {
+            "tick": 1,
+            "description": "At the end of step 1, the UI visibility should be updated based on the CUIState mappings.",
+            "data_collection": {
+              "entity_collection": {
+                "entity_memory_pool_size": 5,
+                "entities": [
+                  {
+                    "c_user_interface": {
+                      "ui_name": "main_menu",
+                      "is_visible": true,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 100,
+                            "y": 100
+                          },
+                          "size": {
+                            "x": 200,
+                            "y": 150
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Vertical",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "c_user_interface": {
+                      "ui_name": "settings_panel",
+                      "is_visible": false,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 350,
+                            "y": 100
+                          },
+                          "size": {
+                            "x": 200,
+                            "y": 150
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Vertical",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "c_user_interface": {
+                      "ui_name": "play_button",
+                      "is_visible": true,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 100,
+                            "y": 300
+                          },
+                          "size": {
+                            "x": 150,
+                            "y": 50
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Horizontal",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "c_user_interface": {
+                      "ui_name": "quit_button",
+                      "is_visible": false,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 100,
+                            "y": 400
+                          },
+                          "size": {
+                            "x": 150,
+                            "y": 50
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Horizontal",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "c_ui_state": {
+                      "ui_states": [
+                        {
+                          "state_key": "menu_state",
+                          "state_value": "true",
+                          "state_to_ui_visibility": {
+                            "ui_names_on": [
+                              "main_menu",
+                              "play_button"
+                            ],
+                            "ui_names_off": [
+                              "settings_panel",
+                              "quit_button"
+                            ]
+                          },
+                          "subscribers": [
+                            {
+                              "event_type_data": "EVENT_TOGGLE_UI",
+                              "trigger_data_type": "UserInterfaceNameData",
+                              "trigger_data": {
+                                "id": "menu_state"
+                              },
+                              "active": false
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "event_bus": {
+                "events": [
+                  {
+                    "event_lifetime": 1,
+                    "event_type": "EVENT_TOGGLE_UI",
+                    "event_data_data_type": "UserInterfaceNameData",
+                    "event_data_data": {
+                      "id": "menu_state"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "expected_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 5,
+            "entities": [
+              {
+                "c_user_interface": {
+                  "ui_name": "main_menu",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_user_interface": {
+                  "ui_name": "settings_panel",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 350,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_user_interface": {
+                  "ui_name": "play_button",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 300
+                      },
+                      "size": {
+                        "x": 150,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_user_interface": {
+                  "ui_name": "quit_button",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 400
+                      },
+                      "size": {
+                        "x": 150,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_ui_state": {
+                  "ui_states": [
+                    {
+                      "state_key": "menu_state",
+                      "state_value": "true",
+                      "state_to_ui_visibility": {
+                        "ui_names_on": [
+                          "main_menu",
+                          "play_button"
+                        ],
+                        "ui_names_off": [
+                          "settings_panel",
+                          "quit_button"
+                        ]
+                      },
+                      "subscribers": [
+                        {
+                          "event_type_data": "EVENT_TOGGLE_UI",
+                          "trigger_data_type": "UserInterfaceNameData",
+                          "trigger_data": {
+                            "id": "menu_state"
+                          },
+                          "active": false
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/unit/logic/data/ui_visibility_from_event_toggle_ui.test_data.json",
+      "relative_path": "unit/logic/data/ui_visibility_from_event_toggle_ui.test_data.json",
+      "category": "unit/logic",
+      "name": "UI_Visibility_From_Event_Toggle_UI",
+      "description": "Test UpdateCUserInterfaceVisibilityFromCUIState function - 4 UI entities controlled by 1 CUIState entity that manages visibility of 2 of them",
+      "tags": [
+        "unit",
+        "logic",
+        "ui"
+      ],
+      "expected_to_pass": true,
+      "author": "",
+      "version": 1,
+      "functions": [
+        "UpdateCUserInterfaceVisibilityFromCUIState"
+      ],
+      "logic_classes": [],
+      "num_ticks": 1,
+      "has_input_sequence": false,
+      "has_event_sequence": false,
+      "has_tick_snapshots": true,
+      "has_start_data": true,
+      "has_expected_data": true,
+      "simulation_steps": [
+        {
+          "simulation_type": "Action",
+          "execution_mode": "Function",
+          "function_type": "UpdateCUserInterfaceVisibilityFromCUIState",
+          "logic_class_type": null,
+          "description": "Step 1: Update UI visibility - main_menu and play_button should toggle visible, settings_panel and quit_button should toggle invisible"
+        }
+      ],
+      "raw": {
+        "metadata": {
+          "test_name": "UI_Visibility_From_Event_Toggle_UI",
+          "description": "Test UpdateCUserInterfaceVisibilityFromCUIState function - 4 UI entities controlled by 1 CUIState entity that manages visibility of 2 of them",
+          "tags": [
+            "unit",
+            "logic",
+            "ui"
+          ],
+          "expected_to_pass": true,
+          "version": 1
+        },
+        "simulation_data": {
+          "description": "Call UpdateCUserInterfaceVisibilityFromCUIState to update UI visibility based on CUIState mappings",
+          "steps": [
+            {
+              "simulation_type": "Action",
+              "execution_mode": "Function",
+              "function_type": "UpdateCUserInterfaceVisibilityFromCUIState",
+              "description": "Step 1: Update UI visibility - main_menu and play_button should toggle visible, settings_panel and quit_button should toggle invisible"
+            }
+          ]
+        },
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 5,
+            "entities": [
+              {
+                "c_user_interface": {
+                  "ui_name": "main_menu",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_user_interface": {
+                  "ui_name": "settings_panel",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 350,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_user_interface": {
+                  "ui_name": "play_button",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 300
+                      },
+                      "size": {
+                        "x": 150,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_user_interface": {
+                  "ui_name": "quit_button",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 400
+                      },
+                      "size": {
+                        "x": 150,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_ui_state": {
+                  "ui_states": [
+                    {
+                      "state_key": "menu_state",
+                      "state_value": "false",
+                      "state_to_ui_visibility": {
+                        "ui_names_on": [
+                          "main_menu",
+                          "play_button"
+                        ],
+                        "ui_names_off": [
+                          "settings_panel",
+                          "quit_button"
+                        ]
+                      },
+                      "subscribers": [
+                        {
+                          "event_type_data": "EVENT_TOGGLE_UI",
+                          "trigger_data_type": "UserInterfaceNameData",
+                          "trigger_data": {
+                            "id": "menu_state"
+                          },
+                          "active": false
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "event_bus": {
+            "description": "EVENT_TOGGLE_UI event to trigger UI visibility update",
+            "events": [
+              {
+                "event_lifetime": 1,
+                "event_type": "EVENT_TOGGLE_UI",
+                "event_data_data_type": "UserInterfaceNameData",
+                "event_data_data": {
+                  "id": "menu_state"
+                }
+              }
+            ]
+          }
+        },
+        "tick_snapshots": [
+          {
+            "tick": 1,
+            "description": "At the end of step 1, the UI visibility should be updated based on the CUIState mappings.",
+            "data_collection": {
+              "entity_collection": {
+                "entity_memory_pool_size": 5,
+                "entities": [
+                  {
+                    "c_user_interface": {
+                      "ui_name": "main_menu",
+                      "is_visible": true,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 100,
+                            "y": 100
+                          },
+                          "size": {
+                            "x": 200,
+                            "y": 150
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Vertical",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "c_user_interface": {
+                      "ui_name": "settings_panel",
+                      "is_visible": false,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 350,
+                            "y": 100
+                          },
+                          "size": {
+                            "x": 200,
+                            "y": 150
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Vertical",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "c_user_interface": {
+                      "ui_name": "play_button",
+                      "is_visible": true,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 100,
+                            "y": 300
+                          },
+                          "size": {
+                            "x": 150,
+                            "y": 50
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Horizontal",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "c_user_interface": {
+                      "ui_name": "quit_button",
+                      "is_visible": false,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 100,
+                            "y": 400
+                          },
+                          "size": {
+                            "x": 150,
+                            "y": 50
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Horizontal",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "c_ui_state": {
+                      "ui_states": [
+                        {
+                          "state_key": "menu_state",
+                          "state_value": "true",
+                          "state_to_ui_visibility": {
+                            "ui_names_on": [
+                              "main_menu",
+                              "play_button"
+                            ],
+                            "ui_names_off": [
+                              "settings_panel",
+                              "quit_button"
+                            ]
+                          },
+                          "subscribers": [
+                            {
+                              "event_type_data": "EVENT_TOGGLE_UI",
+                              "trigger_data_type": "UserInterfaceNameData",
+                              "trigger_data": {
+                                "id": "menu_state"
+                              },
+                              "active": false
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "event_bus": {
+                "events": [
+                  {
+                    "event_lifetime": 1,
+                    "event_type": "EVENT_TOGGLE_UI",
+                    "event_data_data_type": "UserInterfaceNameData",
+                    "event_data_data": {
+                      "id": "menu_state"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "expected_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 5,
+            "entities": [
+              {
+                "c_user_interface": {
+                  "ui_name": "main_menu",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_user_interface": {
+                  "ui_name": "settings_panel",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 350,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_user_interface": {
+                  "ui_name": "play_button",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 300
+                      },
+                      "size": {
+                        "x": 150,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_user_interface": {
+                  "ui_name": "quit_button",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 400
+                      },
+                      "size": {
+                        "x": 150,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_ui_state": {
+                  "ui_states": [
+                    {
+                      "state_key": "menu_state",
+                      "state_value": "true",
+                      "state_to_ui_visibility": {
+                        "ui_names_on": [
+                          "main_menu",
+                          "play_button"
+                        ],
+                        "ui_names_off": [
+                          "settings_panel",
+                          "quit_button"
+                        ]
+                      },
+                      "subscribers": [
+                        {
+                          "event_type_data": "EVENT_TOGGLE_UI",
+                          "trigger_data_type": "UserInterfaceNameData",
+                          "trigger_data": {
+                            "id": "menu_state"
+                          },
+                          "active": false
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/unit/logic/data/ui_visibility_from_state.test_data.json",
+      "relative_path": "unit/logic/data/ui_visibility_from_state.test_data.json",
+      "category": "unit/logic",
+      "name": "UpdateCUserInterfaceVisibilityFromCUIState_basic_test",
+      "description": "Test UpdateCUserInterfaceVisibilityFromCUIState function - 4 UI entities controlled by 1 CUIState entity that manages visibility of 2 of them",
+      "tags": [
+        "unit",
+        "logic",
+        "ui"
+      ],
+      "expected_to_pass": true,
+      "author": "",
+      "version": 1,
+      "functions": [
+        "UpdateCUserInterfaceVisibilityFromCUIState"
+      ],
+      "logic_classes": [],
+      "num_ticks": 1,
+      "has_input_sequence": false,
+      "has_event_sequence": false,
+      "has_tick_snapshots": true,
+      "has_start_data": true,
+      "has_expected_data": true,
+      "simulation_steps": [
+        {
+          "simulation_type": "Action",
+          "execution_mode": "Function",
+          "function_type": "UpdateCUserInterfaceVisibilityFromCUIState",
+          "logic_class_type": null,
+          "description": "Step 1: Update UI visibility - main_menu and play_button should toggle visible, settings_panel and quit_button should toggle invisible"
+        }
+      ],
+      "raw": {
+        "metadata": {
+          "test_name": "UpdateCUserInterfaceVisibilityFromCUIState_basic_test",
+          "description": "Test UpdateCUserInterfaceVisibilityFromCUIState function - 4 UI entities controlled by 1 CUIState entity that manages visibility of 2 of them",
+          "tags": [
+            "unit",
+            "logic",
+            "ui"
+          ],
+          "expected_to_pass": true,
+          "version": 1
+        },
+        "simulation_data": {
+          "description": "Call UpdateCUserInterfaceVisibilityFromCUIState to update UI visibility based on CUIState mappings",
+          "steps": [
+            {
+              "simulation_type": "Action",
+              "execution_mode": "Function",
+              "function_type": "UpdateCUserInterfaceVisibilityFromCUIState",
+              "description": "Step 1: Update UI visibility - main_menu and play_button should toggle visible, settings_panel and quit_button should toggle invisible"
+            }
+          ]
+        },
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 5,
+            "entities": [
+              {
+                "c_user_interface": {
+                  "ui_name": "main_menu",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_user_interface": {
+                  "ui_name": "settings_panel",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 350,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_user_interface": {
+                  "ui_name": "play_button",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 300
+                      },
+                      "size": {
+                        "x": 150,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_user_interface": {
+                  "ui_name": "quit_button",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 400
+                      },
+                      "size": {
+                        "x": 150,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_ui_state": {
+                  "ui_states": [
+                    {
+                      "state_key": "menu_state",
+                      "state_value": "false",
+                      "state_to_ui_visibility": {
+                        "ui_names_on": [
+                          "main_menu",
+                          "play_button"
+                        ],
+                        "ui_names_off": [
+                          "settings_panel",
+                          "quit_button"
+                        ]
+                      },
+                      "subscribers": [
+                        {
+                          "event_type_data": "EVENT_TOGGLE_UI",
+                          "trigger_data_type": "UserInterfaceNameData",
+                          "trigger_data": {
+                            "id": "menu_state"
+                          },
+                          "active": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "tick_snapshots": [
+          {
+            "tick": 1,
+            "description": "At the end of step 1, the UI visibility should be updated based on the CUIState mappings.",
+            "data_collection": {
+              "entity_collection": {
+                "entity_memory_pool_size": 5,
+                "entities": [
+                  {
+                    "c_user_interface": {
+                      "ui_name": "main_menu",
+                      "is_visible": true,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 100,
+                            "y": 100
+                          },
+                          "size": {
+                            "x": 200,
+                            "y": 150
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Vertical",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "c_user_interface": {
+                      "ui_name": "settings_panel",
+                      "is_visible": false,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 350,
+                            "y": 100
+                          },
+                          "size": {
+                            "x": 200,
+                            "y": 150
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Vertical",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "c_user_interface": {
+                      "ui_name": "play_button",
+                      "is_visible": true,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 100,
+                            "y": 300
+                          },
+                          "size": {
+                            "x": 150,
+                            "y": 50
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Horizontal",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "c_user_interface": {
+                      "ui_name": "quit_button",
+                      "is_visible": false,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 100,
+                            "y": 400
+                          },
+                          "size": {
+                            "x": 150,
+                            "y": 50
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Horizontal",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "c_ui_state": {
+                      "ui_states": [
+                        {
+                          "state_key": "menu_state",
+                          "state_value": "true",
+                          "state_to_ui_visibility": {
+                            "ui_names_on": [
+                              "main_menu",
+                              "play_button"
+                            ],
+                            "ui_names_off": [
+                              "settings_panel",
+                              "quit_button"
+                            ]
+                          },
+                          "subscribers": [
+                            {
+                              "event_type_data": "EVENT_TOGGLE_UI",
+                              "trigger_data_type": "UserInterfaceNameData",
+                              "trigger_data": {
+                                "id": "menu_state"
+                              },
+                              "active": false
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "tick": 2,
+            "description": "At the end of step 1, the UI visibility should be updated based on the CUIState mappings.",
+            "data_collection": {
+              "entity_collection": {
+                "entity_memory_pool_size": 5,
+                "entities": [
+                  {
+                    "c_user_interface": {
+                      "ui_name": "main_menu",
+                      "is_visible": true,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 100,
+                            "y": 100
+                          },
+                          "size": {
+                            "x": 200,
+                            "y": 150
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Vertical",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "c_user_interface": {
+                      "ui_name": "settings_panel",
+                      "is_visible": false,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 350,
+                            "y": 100
+                          },
+                          "size": {
+                            "x": 200,
+                            "y": 150
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Vertical",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "c_user_interface": {
+                      "ui_name": "play_button",
+                      "is_visible": true,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 100,
+                            "y": 300
+                          },
+                          "size": {
+                            "x": 150,
+                            "y": 50
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Horizontal",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "c_user_interface": {
+                      "ui_name": "quit_button",
+                      "is_visible": false,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 100,
+                            "y": 400
+                          },
+                          "size": {
+                            "x": 150,
+                            "y": 50
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Horizontal",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "c_ui_state": {
+                      "ui_states": [
+                        {
+                          "state_key": "menu_state",
+                          "state_value": "false",
+                          "state_to_ui_visibility": {
+                            "ui_names_on": [
+                              "main_menu",
+                              "play_button"
+                            ],
+                            "ui_names_off": [
+                              "settings_panel",
+                              "quit_button"
+                            ]
+                          },
+                          "subscribers": [
+                            {
+                              "event_type_data": "EVENT_TOGGLE_UI",
+                              "trigger_data_type": "UserInterfaceNameData",
+                              "trigger_data": {
+                                "id": "menu_state"
+                              },
+                              "active": false
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "expected_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 5,
+            "entities": [
+              {
+                "c_user_interface": {
+                  "ui_name": "main_menu",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_user_interface": {
+                  "ui_name": "settings_panel",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 350,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_user_interface": {
+                  "ui_name": "play_button",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 300
+                      },
+                      "size": {
+                        "x": 150,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_user_interface": {
+                  "ui_name": "quit_button",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 400
+                      },
+                      "size": {
+                        "x": 150,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_ui_state": {
+                  "ui_states": [
+                    {
+                      "state_key": "menu_state",
+                      "state_value": "true",
+                      "state_to_ui_visibility": {
+                        "ui_names_on": [
+                          "main_menu",
+                          "play_button"
+                        ],
+                        "ui_names_off": [
+                          "settings_panel",
+                          "quit_button"
+                        ]
+                      },
+                      "subscribers": [
+                        {
+                          "event_type_data": "EVENT_TOGGLE_UI",
+                          "trigger_data_type": "UserInterfaceNameData",
+                          "trigger_data": {
+                            "id": "menu_state"
+                          },
+                          "active": false
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_path": "tests/unit/logic/data/ui_visibility_logic_basic.test_data.json",
+      "relative_path": "unit/logic/data/ui_visibility_logic_basic.test_data.json",
+      "category": "unit/logic",
+      "name": "UIStateLogic_visibility_update_basic_test",
+      "description": "Test UIStateLogic class to update UI visibility based on CUIState mappings - 4 UI entities controlled by 1 CUIState entity that manages visibility of 2 of them. Uses LogicClass execution mode with UIStateLogic instead of the free function. Starting state: main_menu visible, play_button invisible, settings_panel invisible, quit_button visible. After logic execution: main_menu visible, play_button visible, settings_panel invisible, quit_button invisible.",
+      "tags": [
+        "unit",
+        "logic",
+        "ui",
+        "UIStateLogic"
+      ],
+      "expected_to_pass": true,
+      "author": "",
+      "version": 1,
+      "functions": [],
+      "logic_classes": [
+        "UIStateLogic"
+      ],
+      "num_ticks": 1,
+      "has_input_sequence": false,
+      "has_event_sequence": false,
+      "has_tick_snapshots": true,
+      "has_start_data": true,
+      "has_expected_data": true,
+      "simulation_steps": [
+        {
+          "simulation_type": "Action",
+          "execution_mode": "LogicClass",
+          "function_type": null,
+          "logic_class_type": "UIStateLogic",
+          "description": "Step 1: Execute UIStateLogic to update UI visibility - main_menu and play_button should toggle visible, settings_panel and quit_button should toggle invisible"
+        }
+      ],
+      "raw": {
+        "metadata": {
+          "test_name": "UIStateLogic_visibility_update_basic_test",
+          "description": "Test UIStateLogic class to update UI visibility based on CUIState mappings - 4 UI entities controlled by 1 CUIState entity that manages visibility of 2 of them. Uses LogicClass execution mode with UIStateLogic instead of the free function. Starting state: main_menu visible, play_button invisible, settings_panel invisible, quit_button visible. After logic execution: main_menu visible, play_button visible, settings_panel invisible, quit_button invisible.",
+          "tags": [
+            "unit",
+            "logic",
+            "ui",
+            "UIStateLogic"
+          ],
+          "expected_to_pass": true,
+          "version": 1
+        },
+        "simulation_data": {
+          "description": "Execute UIStateLogic class to update UI visibility based on CUIState mappings",
+          "steps": [
+            {
+              "simulation_type": "Action",
+              "execution_mode": "LogicClass",
+              "logic_class_type": "UIStateLogic",
+              "description": "Step 1: Execute UIStateLogic to update UI visibility - main_menu and play_button should toggle visible, settings_panel and quit_button should toggle invisible"
+            }
+          ]
+        },
+        "start_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 5,
+            "entities": [
+              {
+                "c_user_interface": {
+                  "ui_name": "main_menu",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_user_interface": {
+                  "ui_name": "settings_panel",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 350,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_user_interface": {
+                  "ui_name": "play_button",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 300
+                      },
+                      "size": {
+                        "x": 150,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_user_interface": {
+                  "ui_name": "quit_button",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 400
+                      },
+                      "size": {
+                        "x": 150,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_ui_state": {
+                  "ui_states": [
+                    {
+                      "state_key": "menu_state",
+                      "state_value": "false",
+                      "state_to_ui_visibility": {
+                        "ui_names_on": [
+                          "main_menu",
+                          "play_button"
+                        ],
+                        "ui_names_off": [
+                          "settings_panel",
+                          "quit_button"
+                        ]
+                      },
+                      "subscribers": [
+                        {
+                          "event_type_data": "EVENT_TOGGLE_UI",
+                          "trigger_data_type": "UserInterfaceNameData",
+                          "trigger_data": {
+                            "id": "menu_state"
+                          },
+                          "active": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "tick_snapshots": [
+          {
+            "tick": 1,
+            "description": "At the end of step 1, the UI visibility should be updated based on the CUIState mappings.",
+            "data_collection": {
+              "entity_collection": {
+                "entity_memory_pool_size": 5,
+                "entities": [
+                  {
+                    "c_user_interface": {
+                      "ui_name": "main_menu",
+                      "is_visible": true,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 100,
+                            "y": 100
+                          },
+                          "size": {
+                            "x": 200,
+                            "y": 150
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Vertical",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "c_user_interface": {
+                      "ui_name": "settings_panel",
+                      "is_visible": false,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 350,
+                            "y": 100
+                          },
+                          "size": {
+                            "x": 200,
+                            "y": 150
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Vertical",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "c_user_interface": {
+                      "ui_name": "play_button",
+                      "is_visible": true,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 100,
+                            "y": 300
+                          },
+                          "size": {
+                            "x": 150,
+                            "y": 50
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Horizontal",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "c_user_interface": {
+                      "ui_name": "quit_button",
+                      "is_visible": false,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 100,
+                            "y": 400
+                          },
+                          "size": {
+                            "x": 150,
+                            "y": 50
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Horizontal",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "c_ui_state": {
+                      "ui_states": [
+                        {
+                          "state_key": "menu_state",
+                          "state_value": "true",
+                          "state_to_ui_visibility": {
+                            "ui_names_on": [
+                              "main_menu",
+                              "play_button"
+                            ],
+                            "ui_names_off": [
+                              "settings_panel",
+                              "quit_button"
+                            ]
+                          },
+                          "subscribers": [
+                            {
+                              "event_type_data": "EVENT_TOGGLE_UI",
+                              "trigger_data_type": "UserInterfaceNameData",
+                              "trigger_data": {
+                                "id": "menu_state"
+                              },
+                              "active": false
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "tick": 2,
+            "description": "At the end of step 1, the UI visibility should be updated based on the CUIState mappings.",
+            "data_collection": {
+              "entity_collection": {
+                "entity_memory_pool_size": 5,
+                "entities": [
+                  {
+                    "c_user_interface": {
+                      "ui_name": "main_menu",
+                      "is_visible": true,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 100,
+                            "y": 100
+                          },
+                          "size": {
+                            "x": 200,
+                            "y": 150
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Vertical",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "c_user_interface": {
+                      "ui_name": "settings_panel",
+                      "is_visible": false,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 350,
+                            "y": 100
+                          },
+                          "size": {
+                            "x": 200,
+                            "y": 150
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Vertical",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "c_user_interface": {
+                      "ui_name": "play_button",
+                      "is_visible": true,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 100,
+                            "y": 300
+                          },
+                          "size": {
+                            "x": 150,
+                            "y": 50
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Horizontal",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "c_user_interface": {
+                      "ui_name": "quit_button",
+                      "is_visible": false,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 100,
+                            "y": 400
+                          },
+                          "size": {
+                            "x": 150,
+                            "y": 50
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Horizontal",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "c_ui_state": {
+                      "ui_states": [
+                        {
+                          "state_key": "menu_state",
+                          "state_value": "true",
+                          "state_to_ui_visibility": {
+                            "ui_names_on": [
+                              "main_menu",
+                              "play_button"
+                            ],
+                            "ui_names_off": [
+                              "settings_panel",
+                              "quit_button"
+                            ]
+                          },
+                          "subscribers": [
+                            {
+                              "event_type_data": "EVENT_TOGGLE_UI",
+                              "trigger_data_type": "UserInterfaceNameData",
+                              "trigger_data": {
+                                "id": "menu_state"
+                              },
+                              "active": false
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "expected_data_collection": {
+          "entity_collection": {
+            "entity_memory_pool_size": 5,
+            "entities": [
+              {
+                "c_user_interface": {
+                  "ui_name": "main_menu",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_user_interface": {
+                  "ui_name": "settings_panel",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 350,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Vertical",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_user_interface": {
+                  "ui_name": "play_button",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 300
+                      },
+                      "size": {
+                        "x": 150,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_user_interface": {
+                  "ui_name": "quit_button",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 400
+                      },
+                      "size": {
+                        "x": 150,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "c_ui_state": {
+                  "ui_states": [
+                    {
+                      "state_key": "menu_state",
+                      "state_value": "true",
+                      "state_to_ui_visibility": {
+                        "ui_names_on": [
+                          "main_menu",
+                          "play_button"
+                        ],
+                        "ui_names_off": [
+                          "settings_panel",
+                          "quit_button"
+                        ]
+                      },
+                      "subscribers": [
+                        {
+                          "event_type_data": "EVENT_TOGGLE_UI",
+                          "trigger_data_type": "UserInterfaceNameData",
+                          "trigger_data": {
+                            "id": "menu_state"
+                          },
+                          "active": false
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "summary": {
+    "total_tests": 29,
+    "tags": [
+      "UICollisionLogic",
+      "UIStateLogic",
+      "action",
+      "button",
+      "collision",
+      "configurator",
+      "entity",
+      "event",
+      "event-driven",
+      "event_bus",
+      "example",
+      "function",
+      "harness",
+      "infrastructure",
+      "input",
+      "integration",
+      "logic",
+      "memory_pool",
+      "mismatch",
+      "multi-tick",
+      "multiple",
+      "simple",
+      "simulation",
+      "subscriber",
+      "tick",
+      "tick-snapshot",
+      "ui",
+      "unit",
+      "workflow"
+    ],
+    "functions": [
+      "CheckMouseOverNestedUIElement",
+      "ProcessButtonElementActions",
+      "ProcessNestedUIActionsAndEvents",
+      "ProcessUIActionsAndEvents",
+      "UpdateCUserInterfaceVisibilityFromCUIState"
+    ],
+    "logic_classes": [
+      "UIActionLogic",
+      "UICollisionLogic",
+      "UIRenderLogic",
+      "UIStateLogic"
+    ]
+  }
+}
