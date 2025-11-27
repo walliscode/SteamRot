@@ -5,6 +5,9 @@ add_library(execution
   execution.cpp
   logic_executor.cpp
   scene_executor.cpp
+  scene_manager_executor.cpp
+  game_loop_executor.cpp
+  execution_runner.cpp
 )
 
 target_include_directories(execution
@@ -20,5 +23,7 @@ target_link_libraries(execution
   events
   context
   entity
+  scenes
+  systems
   flatbuffers_headers
 )

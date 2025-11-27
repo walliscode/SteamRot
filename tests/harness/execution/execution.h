@@ -20,7 +20,14 @@
 // Level 2: Scene Tick Execution
 #include "scene_executor.h"
 
-// Level 3 and Level 4 executors will be added in Stage 4
+// Level 3: SceneManager Update Execution
+#include "scene_manager_executor.h"
+
+// Level 4: Full Game Loop Execution
+#include "game_loop_executor.h"
+
+// Unified Execution Runner
+#include "execution_runner.h"
 
 namespace steamrot::tests::execution {
 
