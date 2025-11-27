@@ -30,10 +30,13 @@ void UIActionLogic::ProcessLogic() {
     CUserInterface &ui_component = entity::memory::GetComponent<CUserInterface>(
         entity_id, m_scene_context.scene_entities);
 
-    // Perform any aciton logic here, processing nested elements recursively
-    logic::action::ProcessNestedUIActionsAndEvents(
-        *ui_component.m_root_element, m_scene_context.event_handler,
-        m_scene_context);
+    // only process actions if the UI component is visible
+    if (ui_component.m_visible) {
+      // Perform any action logic here, processing nested elements recursively
+      logic::action::ProcessNestedUIActionsAndEvents(
+          *ui_component.m_root_element, m_scene_context.event_handler,
+          m_scene_context);
+    }
   }
 }
 
