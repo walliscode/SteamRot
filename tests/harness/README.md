@@ -5,12 +5,13 @@
 The test harness provides a unified, simplified interface for:
 1. Loading test data configurations for data-driven testing with Catch2 generators
 2. Creating and configuring TestFixture instances from test data
-3. **Tick-based test execution** - coordinated execution of inputs, events, and simulation per tick
-4. **Executing input sequences** - simulating user input (mouse/keyboard) on a tick-by-tick basis
-5. **Executing event sequences** - injecting engine events on a tick-by-tick basis
-6. **Executing simulations** - running sequences of Logic classes or free functions
-7. Running comparison tests between expected and actual entity states
-8. **EventBus state management and comparison** - initializing and validating EventBus state at start, during ticks, and at end
+3. **Execution Level Framework** - run tests at Logic, Scene, SceneManager, or GameLoop level
+4. **Tick-based test execution** - coordinated execution of inputs, events, and simulation per tick
+5. **Executing input sequences** - simulating user input (mouse/keyboard) on a tick-by-tick basis
+6. **Executing event sequences** - injecting engine events on a tick-by-tick basis
+7. **Executing simulations** - running sequences of Logic classes or free functions
+8. Running comparison tests between expected and actual entity states
+9. **EventBus state management and comparison** - initializing and validating EventBus state at start, during ticks, and at end
 
 This consolidates functionality for resource-based testing and data-driven test execution with support for complex simulation scenarios and tick-by-tick coordination of inputs, events, simulation steps, and EventBus state validation.
 
@@ -18,6 +19,7 @@ This consolidates functionality for resource-based testing and data-driven test 
 
 - Provide a single, simple API for loading test data
 - Integrate TestFixture for resource setup and management
+- **Execution Level Framework** - choose the right abstraction level for each test
 - **Tick-based execution** - coordinate inputs, events, and simulation per tick
 - **Execute input sequences** - simulate user input tick-by-tick
 - **Execute event sequences** - inject engine events tick-by-tick
@@ -26,6 +28,129 @@ This consolidates functionality for resource-based testing and data-driven test 
 - Enable data-driven testing with automatic fixture creation
 - Work seamlessly with Catch2 generators and matchers
 - Keep the interface minimal and easy to use
+
+## Execution Level Framework
+
+The test harness supports running tests at different levels of abstraction, matching how the game engine is structured:
+
+| Level | Scope | When to Use |
+|-------|-------|-------------|
+| **Level 1: Logic** | Single Logic class or free function | Unit testing individual logic classes |
+| **Level 2: Scene** | Full scene tick (Action → Movement → Collision → Render) | Testing scene behavior without scene transitions |
+| **Level 3: SceneManager** | SceneManager update cycle | Testing scene transitions and subscriptions |
+| **Level 4: GameLoop** | Complete game loop iteration | End-to-end integration tests |
+
+### Quick Start
+
+```cpp
+#include "test_data_harness.h"
+#include "execution/execution.h"
+
+TEST_CASE("Test with execution levels", "[unit]") {
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+
+  const auto *config = GENERATE_COPY(from_range(configs.value()));
+
+  // Create fixture from test data
+  auto fixture_result = steamrot::tests::CreateFixtureFromTestData(config);
+  REQUIRE(fixture_result.has_value());
+
+  // Option 1: Auto-detect level from config
+  auto result = steamrot::tests::execution::RunTestAutoLevel(
+      config, fixture_result.value());
+
+  // Option 2: Explicit level
+  // auto result = steamrot::tests::execution::RunTestAtLevel(
+  //     config, steamrot::tests::execution::ExecutionLevel::Scene,
+  //     fixture_result.value());
+
+  REQUIRE(result.has_value());
+}
+```
+
+### Level 1: Logic Execution
+
+Execute individual Logic classes or free functions:
+
+```cpp
+#include "execution/logic_executor.h"
+
+// Execute specific logic class
+auto result = steamrot::tests::execution::ExecuteLogicByType(
+    steamrot::LogicClassType::LogicClassType_UICollisionLogic,
+    scene_context);
+
+// Execute free function
+auto result = steamrot::tests::execution::ExecuteFunction(
+    steamrot::FunctionType::FunctionType_ProcessButtonElementActions,
+    scene_context);
+
+// Execute simulation workflow
+auto result = steamrot::tests::execution::ExecuteWorkflowWithFixture(
+    simulation_data, fixture);
+```
+
+### Level 2: Scene Execution
+
+Execute full scene ticks with all logic types in order:
+
+```cpp
+#include "execution/scene_executor.h"
+
+// Execute single scene tick
+auto result = steamrot::tests::execution::ExecuteSceneTick(
+    scene_context, logic_collection);
+
+// Execute multiple ticks with events
+auto result = steamrot::tests::execution::ExecuteSceneTicksWithEvents(
+    fixture, logic_collection, 5);  // 5 ticks
+```
+
+### Level 3: SceneManager Execution
+
+Execute SceneManager update cycles:
+
+```cpp
+#include "execution/scene_manager_executor.h"
+
+// Execute SceneManager updates
+auto result = steamrot::tests::execution::ExecuteSceneManagerWithFixture(
+    fixture, 10);  // 10 updates
+```
+
+### Level 4: GameLoop Execution
+
+Execute complete game loop iterations:
+
+```cpp
+#include "execution/game_loop_executor.h"
+
+steamrot::tests::execution::GameLoopConfig config;
+config.num_iterations = 100;
+config.headless = true;
+
+auto result = steamrot::tests::execution::ExecuteGameLoopWithFixture(
+    fixture, config);
+```
+
+### Unified Execution Runner
+
+The execution runner provides auto-detection and dispatch:
+
+```cpp
+#include "execution/execution_runner.h"
+
+// Auto-detect appropriate level from config
+ExecutionLevel level = steamrot::tests::execution::DetectExecutionLevel(config);
+
+// Run at detected level
+auto result = steamrot::tests::execution::RunTestAutoLevel(config, fixture);
+
+// Or run at specific level
+auto result = steamrot::tests::execution::RunTestAtLevel(
+    config, ExecutionLevel::Scene, fixture);
+```
 
 ## Directory Structure
 
@@ -52,6 +177,14 @@ harness/
 ├── CONSOLE_OUTPUT_EXAMPLES.md     # Console output examples
 ├── CMakeLists.txt                 # Build configuration
 ├── README.md                      # This file
+├── execution/                     # Execution Level Framework
+│   ├── execution.h                # Unified include for all executors
+│   ├── logic_executor.h/.cpp      # Level 1: Logic execution
+│   ├── scene_executor.h/.cpp      # Level 2: Scene tick execution
+│   ├── scene_manager_executor.h/.cpp  # Level 3: SceneManager execution
+│   ├── game_loop_executor.h/.cpp  # Level 4: GameLoop execution
+│   ├── execution_runner.h/.cpp    # Unified runner with auto-detection
+│   └── CMakeLists.txt             # Build configuration
 └── data/                          # Sample test data files
     ├── sample_test_1.test_data.json
     ├── sample_test_2.test_data.json

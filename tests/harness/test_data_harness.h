@@ -17,6 +17,7 @@
 #include "TestFixture.h"
 #include "containers.h"
 #include "entities_generated.h"
+#include "execution/execution_runner.h"
 #include "test_context.h"
 #include "test_data_generated.h"
 #include <expected>
@@ -171,5 +172,20 @@ RunDataStructComparisonTest(const DataCollection *data_collection,
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 RunFixtureTest(const TestDataConfig *config);
+
+/////////////////////////////////////////////////
+/// @brief Run fixture test at specific execution level
+///
+/// This function is the same as RunFixtureTest but allows specifying
+/// the execution level explicitly instead of using the default tick-based
+/// execution.
+///
+/// @param config The test data configuration
+/// @param level The execution level to use
+/// @return std::monostate on success, FailInfo on error
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+RunFixtureTestAtLevel(const TestDataConfig *config,
+                      execution::ExecutionLevel level);
 
 } // namespace steamrot::tests

@@ -14,6 +14,7 @@
 #include "conmat.h"
 #include "console_output.h"
 #include "event_bus_conversion.h"
+#include "execution/execution_runner.h"
 #include "tick_executor.h"
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
@@ -330,6 +331,57 @@ RunFixtureTest(const TestDataConfig *config) {
   auto tick_result = ExecuteTickBasedTest(config, fixture);
   if (!tick_result.has_value()) {
     return std::unexpected(tick_result.error());
+  }
+
+  // If expected_data_collection is provided, compare results
+  if (config->expected_data_collection()) {
+    // Build test context from config
+    TestContext context;
+    if (config->metadata()) {
+      if (config->metadata()->test_name()) {
+        context.test_name = config->metadata()->test_name()->str();
+      }
+      if (config->metadata()->description()) {
+        context.description = config->metadata()->description()->str();
+      }
+    }
+
+    // Get expected_to_pass from test metadata (default true)
+    bool expected_to_pass = true;
+    if (config->metadata()) {
+      expected_to_pass = config->metadata()->expected_to_pass();
+    }
+
+    // Use RunDataStructComparisonTest with expected_to_pass parameter
+    auto comparison_result = RunDataStructComparisonTest(
+        config->expected_data_collection(), fixture, context, expected_to_pass);
+
+    if (!comparison_result.has_value()) {
+      return std::unexpected(comparison_result.error());
+    }
+  }
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+RunFixtureTestAtLevel(const TestDataConfig *config,
+                      execution::ExecutionLevel level) {
+
+  // Create fixture from test data
+  auto fixture_result = CreateFixtureFromTestData(config);
+  if (!fixture_result.has_value()) {
+    console::PrintError("Failed to create fixture from test data");
+    return std::unexpected(fixture_result.error());
+  }
+
+  TestFixture &fixture = fixture_result.value();
+
+  // Execute the test using execution level framework
+  auto exec_result = execution::RunTestAtLevel(config, level, fixture);
+  if (!exec_result.has_value()) {
+    return std::unexpected(exec_result.error());
   }
 
   // If expected_data_collection is provided, compare results
