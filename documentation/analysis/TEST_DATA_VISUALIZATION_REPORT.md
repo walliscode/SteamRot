@@ -30,6 +30,7 @@ This hybrid provides dropdown filters, clickable coverage matrices, and drill-do
 - [Implementation Phases](#implementation-phases)
 - [Decision Matrix](#decision-matrix)
 - [Conclusion](#conclusion)
+- [Full Implementation Plan for Option 2](#full-implementation-plan-for-option-2-hybrid-python--static-html)
 
 ---
 
@@ -852,6 +853,875 @@ As the test suite grows beyond 100+ files, consider:
 - Full-text search indexing
 - CI-generated dashboard published to GitHub Pages
 - Integration with test execution for pass/fail status
+
+---
+
+## Full Implementation Plan for Option 2 (Hybrid Python + Static HTML)
+
+This section provides a complete, actionable implementation plan for building the test data visualization tool using the recommended hybrid approach.
+
+> **Note**: The code samples below are illustrative outlines. Production implementation should include:
+> - `__main__.py` for proper module execution with `python -m`
+> - HTML escaping via `html.escape()` for XSS prevention
+> - Absolute imports with conditional handling for direct script execution
+> - CMake-compatible glob patterns (without `**`)
+> - Error handling and input validation
+
+### Repository Location
+
+**Recommended placement:**
+
+```
+SteamRot/
+├── tools/                              # NEW: Developer tooling directory
+│   └── test_dashboard/                 # Dashboard generator package
+│       ├── __init__.py
+│       ├── __main__.py                 # Entry point for python -m execution
+│       ├── generate.py                 # Main generator logic
+│       ├── scanner.py                  # Test file scanner
+│       ├── parser.py                   # JSON parser & normalizer
+│       ├── templates/                  # HTML templates
+│       │   └── base.html               # Main dashboard template
+│       ├── static/                     # CSS and JS assets
+│       │   ├── styles.css
+│       │   └── dashboard.js
+│       └── requirements.txt            # Python dependencies (minimal)
+│
+├── documentation/
+│   └── generated/                      # Output location (gitignored or committed)
+│       └── test_dashboard.html
+│
+└── cmake/
+    └── GenerateTestDashboard.cmake     # CMake integration module
+```
+
+**Why `tools/` directory:**
+- Separates developer tooling from production source code
+- Follows common project conventions (similar to `docs/`, `tests/`)
+- Keeps build system clean
+- Easy to exclude from production deployments
+
+**Alternative: `scripts/` directory** - Some projects prefer `scripts/` for standalone tools
+
+### Detailed Task Breakdown
+
+#### Phase 1: Core Scanner & Parser (Day 1-2)
+
+**Task 1.1: Create directory structure**
+```bash
+mkdir -p tools/test_dashboard/templates
+mkdir -p tools/test_dashboard/static
+mkdir -p documentation/generated
+touch tools/test_dashboard/__init__.py
+```
+
+**Task 1.2: Implement file scanner (`scanner.py`)**
+
+```python
+#!/usr/bin/env python3
+"""
+scanner.py - Recursively find and load test_data.json files
+"""
+from pathlib import Path
+from typing import List
+import logging
+
+logger = logging.getLogger(__name__)
+
+class TestFileScanner:
+    def __init__(self, root_dir: Path):
+        self.root_dir = root_dir
+        
+    def find_test_files(self) -> List[Path]:
+        """Find all .test_data.json files recursively."""
+        pattern = "*.test_data.json"
+        files = list(self.root_dir.rglob(pattern))
+        logger.info(f"Found {len(files)} test data files")
+        return sorted(files)
+    
+    def get_relative_path(self, file_path: Path) -> str:
+        """Get path relative to root for display."""
+        return str(file_path.relative_to(self.root_dir))
+```
+
+**Task 1.3: Implement JSON parser (`parser.py`)**
+
+```python
+#!/usr/bin/env python3
+"""
+parser.py - Parse and normalize test_data.json files
+"""
+import json
+from pathlib import Path
+from dataclasses import dataclass, field
+from typing import List, Dict, Any, Optional
+
+@dataclass
+class TestMetadata:
+    test_name: str
+    description: str = ""
+    tags: List[str] = field(default_factory=list)
+    expected_to_pass: bool = True
+    author: str = ""
+    version: int = 1
+
+@dataclass
+class SimulationStep:
+    simulation_type: str  # Action, Movement, Render, Collision
+    execution_mode: str   # Function, LogicClass
+    function_type: Optional[str] = None
+    logic_class_type: Optional[str] = None
+    description: str = ""
+
+@dataclass
+class ParsedTest:
+    file_path: str
+    relative_path: str
+    metadata: TestMetadata
+    simulation_steps: List[SimulationStep] = field(default_factory=list)
+    functions_used: List[str] = field(default_factory=list)
+    logic_classes_used: List[str] = field(default_factory=list)
+    num_ticks: int = 1
+    has_input_sequence: bool = False
+    has_event_sequence: bool = False
+    has_tick_snapshots: bool = False
+    raw_data: Dict[str, Any] = field(default_factory=dict)
+
+class TestDataParser:
+    def parse_file(self, file_path: Path, relative_path: str) -> ParsedTest:
+        """Parse a single test_data.json file."""
+        with open(file_path, 'r') as f:
+            data = json.load(f)
+        
+        metadata = self._parse_metadata(data.get("metadata", {}))
+        steps = self._parse_simulation_steps(data.get("simulation_data", {}))
+        
+        return ParsedTest(
+            file_path=str(file_path),
+            relative_path=relative_path,
+            metadata=metadata,
+            simulation_steps=steps,
+            functions_used=self._extract_functions(steps),
+            logic_classes_used=self._extract_logic_classes(steps),
+            num_ticks=data.get("num_ticks", 1),
+            has_input_sequence="input_sequence" in data,
+            has_event_sequence="event_sequence" in data,
+            has_tick_snapshots="tick_snapshots" in data,
+            raw_data=data
+        )
+    
+    def _parse_metadata(self, data: Dict) -> TestMetadata:
+        return TestMetadata(
+            test_name=data.get("test_name", "Unknown"),
+            description=data.get("description", ""),
+            tags=data.get("tags", []),
+            expected_to_pass=data.get("expected_to_pass", True),
+            author=data.get("author", ""),
+            version=data.get("version", 1)
+        )
+    
+    def _parse_simulation_steps(self, data: Dict) -> List[SimulationStep]:
+        steps = []
+        for step_data in data.get("steps", []):
+            steps.append(SimulationStep(
+                simulation_type=step_data.get("simulation_type", ""),
+                execution_mode=step_data.get("execution_mode", ""),
+                function_type=step_data.get("function_type"),
+                logic_class_type=step_data.get("logic_class_type"),
+                description=step_data.get("description", "")
+            ))
+        return steps
+    
+    def _extract_functions(self, steps: List[SimulationStep]) -> List[str]:
+        functions = set()
+        for step in steps:
+            if step.execution_mode == "Function" and step.function_type:
+                functions.add(step.function_type)
+        return sorted(functions)
+    
+    def _extract_logic_classes(self, steps: List[SimulationStep]) -> List[str]:
+        classes = set()
+        for step in steps:
+            if step.execution_mode == "LogicClass" and step.logic_class_type:
+                classes.add(step.logic_class_type)
+        return sorted(classes)
+```
+
+#### Phase 2: HTML Generator (Day 2-3)
+
+**Task 2.1: Create HTML template structure**
+
+```html
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SteamRot Test Data Dashboard</title>
+    <link rel="stylesheet" href="data:text/css;base64,{{CSS_CONTENT}}">
+</head>
+<body>
+    <header>
+        <h1>🧪 Test Data Dashboard</h1>
+        <p class="subtitle">{{TOTAL_TESTS}} test configurations | Generated: {{TIMESTAMP}}</p>
+        <div class="search-bar">
+            <input type="text" id="search" placeholder="Search tests by name, description, tags...">
+        </div>
+    </header>
+    
+    <nav class="filter-panel">
+        <h3>Filters</h3>
+        <div class="filter-group">
+            <h4>Tags</h4>
+            <div id="tag-filters">{{TAG_CHECKBOXES}}</div>
+        </div>
+        <div class="filter-group">
+            <h4>Functions</h4>
+            <div id="function-filters">{{FUNCTION_CHECKBOXES}}</div>
+        </div>
+        <div class="filter-group">
+            <h4>Logic Classes</h4>
+            <div id="logic-class-filters">{{LOGIC_CLASS_CHECKBOXES}}</div>
+        </div>
+    </nav>
+    
+    <main>
+        <section id="coverage-matrix">
+            <h2>Coverage Matrix</h2>
+            <p>Click any cell to filter tests</p>
+            {{COVERAGE_MATRIX_HTML}}
+        </section>
+        
+        <section id="test-list">
+            <h2>All Tests</h2>
+            <table id="tests-table">
+                <thead>
+                    <tr>
+                        <th data-sort="name">Test Name ↕</th>
+                        <th data-sort="tags">Tags ↕</th>
+                        <th data-sort="functions">Functions ↕</th>
+                        <th data-sort="classes">Logic Classes ↕</th>
+                        <th data-sort="ticks">Ticks ↕</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{TEST_ROWS}}
+                </tbody>
+            </table>
+        </section>
+        
+        <aside id="test-details" class="hidden">
+            <button id="close-details">×</button>
+            <div id="details-content"></div>
+        </aside>
+    </main>
+    
+    <script>
+        const TEST_DATA = {{TEST_DATA_JSON}};
+        {{JAVASCRIPT_CODE}}
+    </script>
+</body>
+</html>
+```
+
+**Task 2.2: Create CSS styles (`static/styles.css`)**
+
+```css
+/* Modern, clean dashboard styles */
+:root {
+    --primary: #2563eb;
+    --secondary: #64748b;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --bg: #f8fafc;
+    --card-bg: #ffffff;
+    --text: #1e293b;
+    --border: #e2e8f0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.search-bar input {
+    width: 100%;
+    max-width: 500px;
+    padding: 12px 20px;
+    font-size: 16px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+}
+
+.filter-panel {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.filter-group {
+    margin-bottom: 15px;
+}
+
+.filter-group label {
+    display: inline-block;
+    margin: 4px 8px 4px 0;
+    padding: 4px 10px;
+    background: var(--bg);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.filter-group input:checked + span {
+    background: var(--primary);
+    color: white;
+}
+
+#coverage-matrix table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#coverage-matrix td, #coverage-matrix th {
+    border: 1px solid var(--border);
+    padding: 8px;
+    text-align: center;
+}
+
+#coverage-matrix td.has-tests {
+    background: var(--success);
+    color: white;
+    cursor: pointer;
+}
+
+#coverage-matrix td.has-tests:hover {
+    opacity: 0.8;
+}
+
+#tests-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card-bg);
+}
+
+#tests-table th, #tests-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+#tests-table tr:hover {
+    background: var(--bg);
+    cursor: pointer;
+}
+
+#test-details {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 50%;
+    height: 100vh;
+    background: var(--card-bg);
+    box-shadow: -5px 0 20px rgba(0,0,0,0.1);
+    padding: 20px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+#test-details.hidden {
+    display: none;
+}
+
+.tag {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--primary);
+    color: white;
+    border-radius: 4px;
+    font-size: 12px;
+    margin: 2px;
+}
+
+.simulation-step {
+    padding: 10px;
+    margin: 5px 0;
+    background: var(--bg);
+    border-left: 4px solid var(--primary);
+    border-radius: 0 4px 4px 0;
+}
+```
+
+**Task 2.3: Create JavaScript interactions (`static/dashboard.js`)**
+
+```javascript
+// Dashboard interactivity
+document.addEventListener('DOMContentLoaded', () => {
+    // Search functionality
+    const searchInput = document.getElementById('search');
+    searchInput.addEventListener('input', filterTests);
+    
+    // Filter checkboxes
+    document.querySelectorAll('.filter-group input').forEach(cb => {
+        cb.addEventListener('change', filterTests);
+    });
+    
+    // Table sorting
+    document.querySelectorAll('[data-sort]').forEach(th => {
+        th.addEventListener('click', () => sortTable(th.dataset.sort));
+    });
+    
+    // Row click for details
+    document.querySelectorAll('#tests-table tbody tr').forEach(row => {
+        row.addEventListener('click', () => showDetails(row.dataset.testId));
+    });
+    
+    // Coverage matrix cell click
+    document.querySelectorAll('#coverage-matrix td.has-tests').forEach(cell => {
+        cell.addEventListener('click', () => {
+            filterByCell(cell.dataset.function, cell.dataset.logicClass);
+        });
+    });
+    
+    // Close details panel
+    document.getElementById('close-details').addEventListener('click', hideDetails);
+});
+
+function filterTests() {
+    const searchTerm = document.getElementById('search').value.toLowerCase();
+    const selectedTags = getCheckedValues('tag-filters');
+    const selectedFunctions = getCheckedValues('function-filters');
+    const selectedClasses = getCheckedValues('logic-class-filters');
+    
+    document.querySelectorAll('#tests-table tbody tr').forEach(row => {
+        const test = TEST_DATA.find(t => t.name === row.dataset.testId);
+        const visible = matchesFilters(test, searchTerm, selectedTags, selectedFunctions, selectedClasses);
+        row.style.display = visible ? '' : 'none';
+    });
+    
+    updateCounts();
+}
+
+function matchesFilters(test, search, tags, functions, classes) {
+    // Search match
+    if (search) {
+        const searchable = `${test.name} ${test.description} ${test.tags.join(' ')}`.toLowerCase();
+        if (!searchable.includes(search)) return false;
+    }
+    
+    // Tag filter
+    if (tags.length && !tags.some(t => test.tags.includes(t))) return false;
+    
+    // Function filter
+    if (functions.length && !functions.some(f => test.functions.includes(f))) return false;
+    
+    // Logic class filter
+    if (classes.length && !classes.some(c => test.logic_classes.includes(c))) return false;
+    
+    return true;
+}
+
+function showDetails(testName) {
+    const test = TEST_DATA.find(t => t.name === testName);
+    if (!test) return;
+    
+    const content = document.getElementById('details-content');
+    content.innerHTML = `
+        <h2>${test.name}</h2>
+        <p><strong>File:</strong> ${test.file}</p>
+        <p><strong>Description:</strong> ${test.description || 'No description'}</p>
+        <p><strong>Tags:</strong> ${test.tags.map(t => `<span class="tag">${t}</span>`).join(' ') || 'None'}</p>
+        <p><strong>Ticks:</strong> ${test.num_ticks}</p>
+        
+        <h3>Simulation Steps</h3>
+        ${test.simulation_steps.map((step, i) => `
+            <div class="simulation-step">
+                <strong>Step ${i + 1}:</strong> ${step.simulation_type} 
+                (${step.execution_mode}: ${step.function_type || step.logic_class_type})
+                <br><em>${step.description}</em>
+            </div>
+        `).join('')}
+        
+        <h3>Raw JSON</h3>
+        <pre>${JSON.stringify(test.raw, null, 2)}</pre>
+    `;
+    
+    document.getElementById('test-details').classList.remove('hidden');
+}
+
+function hideDetails() {
+    document.getElementById('test-details').classList.add('hidden');
+}
+
+function getCheckedValues(containerId) {
+    return Array.from(document.querySelectorAll(`#${containerId} input:checked`))
+        .map(cb => cb.value);
+}
+
+function filterByCell(func, logicClass) {
+    // Clear other filters and set specific combination
+    document.querySelectorAll('.filter-group input').forEach(cb => cb.checked = false);
+    
+    if (func) {
+        document.querySelector(`#function-filters input[value="${func}"]`)?.click();
+    }
+    if (logicClass) {
+        document.querySelector(`#logic-class-filters input[value="${logicClass}"]`)?.click();
+    }
+    
+    filterTests();
+}
+```
+
+#### Phase 3: Main Generator Script (Day 3-4)
+
+**Task 3.1: Create main entry point (`generate.py`)**
+
+```python
+#!/usr/bin/env python3
+"""
+generate.py - Main entry point for test dashboard generation
+
+Usage:
+    python -m tools.test_dashboard.generate
+    python tools/test_dashboard/generate.py
+    
+Options:
+    --tests-dir PATH    Root directory for test files (default: tests/)
+    --output PATH       Output HTML file (default: documentation/generated/test_dashboard.html)
+    --verbose           Enable verbose logging
+"""
+import argparse
+import logging
+from pathlib import Path
+from datetime import datetime
+import json
+import base64
+
+from .scanner import TestFileScanner
+from .parser import TestDataParser, ParsedTest
+from typing import List, Dict, Set
+
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
+
+class DashboardGenerator:
+    def __init__(self, tests_dir: Path, output_path: Path):
+        self.tests_dir = tests_dir
+        self.output_path = output_path
+        self.scanner = TestFileScanner(tests_dir)
+        self.parser = TestDataParser()
+        
+    def generate(self) -> None:
+        """Main generation process."""
+        logger.info(f"Scanning {self.tests_dir} for test data files...")
+        
+        # Step 1: Find and parse all test files
+        files = self.scanner.find_test_files()
+        tests = self._parse_all_files(files)
+        
+        # Step 2: Collect all unique values for filters
+        all_tags = self._collect_all_tags(tests)
+        all_functions = self._collect_all_functions(tests)
+        all_logic_classes = self._collect_all_logic_classes(tests)
+        
+        # Step 3: Build coverage matrix
+        matrix = self._build_coverage_matrix(tests, all_functions, all_logic_classes)
+        
+        # Step 4: Generate HTML
+        html = self._generate_html(tests, all_tags, all_functions, all_logic_classes, matrix)
+        
+        # Step 5: Write output
+        self.output_path.parent.mkdir(parents=True, exist_ok=True)
+        self.output_path.write_text(html)
+        
+        logger.info(f"Generated dashboard with {len(tests)} tests: {self.output_path}")
+    
+    def _parse_all_files(self, files: List[Path]) -> List[ParsedTest]:
+        tests = []
+        for file_path in files:
+            try:
+                relative = self.scanner.get_relative_path(file_path)
+                test = self.parser.parse_file(file_path, relative)
+                tests.append(test)
+            except Exception as e:
+                logger.warning(f"Failed to parse {file_path}: {e}")
+        return tests
+    
+    def _collect_all_tags(self, tests: List[ParsedTest]) -> Set[str]:
+        tags = set()
+        for test in tests:
+            tags.update(test.metadata.tags)
+        return tags
+    
+    def _collect_all_functions(self, tests: List[ParsedTest]) -> Set[str]:
+        functions = set()
+        for test in tests:
+            functions.update(test.functions_used)
+        return functions
+    
+    def _collect_all_logic_classes(self, tests: List[ParsedTest]) -> Set[str]:
+        classes = set()
+        for test in tests:
+            classes.update(test.logic_classes_used)
+        return classes
+    
+    def _build_coverage_matrix(self, tests: List[ParsedTest], 
+                               functions: Set[str], 
+                               classes: Set[str]) -> Dict[str, Dict[str, List[str]]]:
+        matrix = {f: {c: [] for c in classes} for f in functions}
+        for test in tests:
+            for func in test.functions_used:
+                for cls in test.logic_classes_used:
+                    matrix[func][cls].append(test.metadata.test_name)
+        return matrix
+    
+    def _generate_html(self, tests: List[ParsedTest], 
+                       tags: Set[str], 
+                       functions: Set[str], 
+                       classes: Set[str],
+                       matrix: Dict) -> str:
+        # Load template and assets
+        template_dir = Path(__file__).parent / "templates"
+        static_dir = Path(__file__).parent / "static"
+        
+        template = (template_dir / "base.html").read_text()
+        css = (static_dir / "styles.css").read_text()
+        js = (static_dir / "dashboard.js").read_text()
+        
+        # Convert tests to JSON-serializable format
+        tests_json = [self._test_to_dict(t) for t in tests]
+        
+        # Generate filter checkboxes
+        tag_checkboxes = self._generate_checkboxes("tag", sorted(tags))
+        function_checkboxes = self._generate_checkboxes("function", sorted(functions))
+        class_checkboxes = self._generate_checkboxes("logic-class", sorted(classes))
+        
+        # Generate coverage matrix HTML
+        matrix_html = self._generate_matrix_html(matrix, functions, classes)
+        
+        # Generate test table rows
+        test_rows = self._generate_test_rows(tests)
+        
+        # Fill template
+        html = template.replace("{{CSS_CONTENT}}", base64.b64encode(css.encode()).decode())
+        html = html.replace("{{TOTAL_TESTS}}", str(len(tests)))
+        html = html.replace("{{TIMESTAMP}}", datetime.now().strftime("%Y-%m-%d %H:%M"))
+        html = html.replace("{{TAG_CHECKBOXES}}", tag_checkboxes)
+        html = html.replace("{{FUNCTION_CHECKBOXES}}", function_checkboxes)
+        html = html.replace("{{LOGIC_CLASS_CHECKBOXES}}", class_checkboxes)
+        html = html.replace("{{COVERAGE_MATRIX_HTML}}", matrix_html)
+        html = html.replace("{{TEST_ROWS}}", test_rows)
+        html = html.replace("{{TEST_DATA_JSON}}", json.dumps(tests_json, indent=2))
+        html = html.replace("{{JAVASCRIPT_CODE}}", js)
+        
+        return html
+    
+    def _test_to_dict(self, test: ParsedTest) -> Dict:
+        return {
+            "name": test.metadata.test_name,
+            "description": test.metadata.description,
+            "file": test.relative_path,
+            "tags": test.metadata.tags,
+            "functions": test.functions_used,
+            "logic_classes": test.logic_classes_used,
+            "num_ticks": test.num_ticks,
+            "simulation_steps": [
+                {
+                    "simulation_type": s.simulation_type,
+                    "execution_mode": s.execution_mode,
+                    "function_type": s.function_type,
+                    "logic_class_type": s.logic_class_type,
+                    "description": s.description
+                } for s in test.simulation_steps
+            ],
+            "raw": test.raw_data
+        }
+    
+    def _generate_checkboxes(self, prefix: str, values: List[str]) -> str:
+        return "\n".join([
+            f'<label><input type="checkbox" value="{v}"><span>{v}</span></label>'
+            for v in values
+        ])
+    
+    def _generate_matrix_html(self, matrix: Dict, functions: Set[str], classes: Set[str]) -> str:
+        # Build HTML table for coverage matrix
+        rows = ["<table>"]
+        rows.append("<tr><th></th>" + "".join(f"<th>{c}</th>" for c in sorted(classes)) + "</tr>")
+        
+        for func in sorted(functions):
+            cols = []
+            for cls in sorted(classes):
+                tests = matrix.get(func, {}).get(cls, [])
+                if tests:
+                    cols.append(f'<td class="has-tests" data-function="{func}" data-logic-class="{cls}">{len(tests)}</td>')
+                else:
+                    cols.append('<td>-</td>')
+            rows.append(f"<tr><th>{func}</th>{''.join(cols)}</tr>")
+        
+        rows.append("</table>")
+        return "\n".join(rows)
+    
+    def _generate_test_rows(self, tests: List[ParsedTest]) -> str:
+        rows = []
+        for test in tests:
+            tags_html = " ".join(f'<span class="tag">{t}</span>' for t in test.metadata.tags)
+            rows.append(f'''
+                <tr data-test-id="{test.metadata.test_name}">
+                    <td>{test.metadata.test_name}</td>
+                    <td>{tags_html}</td>
+                    <td>{", ".join(test.functions_used) or "-"}</td>
+                    <td>{", ".join(test.logic_classes_used) or "-"}</td>
+                    <td>{test.num_ticks}</td>
+                </tr>
+            ''')
+        return "\n".join(rows)
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Generate test data dashboard")
+    parser.add_argument("--tests-dir", type=Path, default=Path("tests"),
+                        help="Root directory for test files")
+    parser.add_argument("--output", type=Path, 
+                        default=Path("documentation/generated/test_dashboard.html"),
+                        help="Output HTML file path")
+    parser.add_argument("--verbose", "-v", action="store_true",
+                        help="Enable verbose logging")
+    
+    args = parser.parse_args()
+    
+    if args.verbose:
+        logging.getLogger().setLevel(logging.DEBUG)
+    
+    generator = DashboardGenerator(args.tests_dir, args.output)
+    generator.generate()
+
+
+if __name__ == "__main__":
+    main()
+```
+
+#### Phase 4: CMake Integration (Day 4-5)
+
+**Task 4.1: Create CMake module (`cmake/GenerateTestDashboard.cmake`)**
+
+```cmake
+# GenerateTestDashboard.cmake
+# Provides a target to generate the test data dashboard
+
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
+# Define the dashboard generation target
+add_custom_target(generate_test_dashboard
+    COMMAND ${Python3_EXECUTABLE} -m tools.test_dashboard.generate
+            --tests-dir ${CMAKE_SOURCE_DIR}/tests
+            --output ${CMAKE_SOURCE_DIR}/documentation/generated/test_dashboard.html
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMENT "Generating test data dashboard..."
+    VERBATIM
+)
+
+# Optional: Auto-regenerate when test files change
+file(GLOB_RECURSE TEST_DATA_FILES "${CMAKE_SOURCE_DIR}/tests/**/*.test_data.json")
+
+add_custom_command(
+    OUTPUT ${CMAKE_SOURCE_DIR}/documentation/generated/test_dashboard.html
+    COMMAND ${Python3_EXECUTABLE} -m tools.test_dashboard.generate
+            --tests-dir ${CMAKE_SOURCE_DIR}/tests
+            --output ${CMAKE_SOURCE_DIR}/documentation/generated/test_dashboard.html
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    DEPENDS ${TEST_DATA_FILES}
+    COMMENT "Regenerating test data dashboard (files changed)..."
+    VERBATIM
+)
+```
+
+**Task 4.2: Include in main CMakeLists.txt**
+
+```cmake
+# Add near the end of the root CMakeLists.txt
+include(cmake/GenerateTestDashboard.cmake)
+```
+
+#### Phase 5: Documentation & Polish (Day 5)
+
+**Task 5.1: Create README for the tool**
+
+```markdown
+# Test Data Dashboard Generator
+
+A Python tool that generates an interactive HTML dashboard for browsing and visualizing SteamRot test data files.
+
+## Quick Start
+
+```bash
+# Generate the dashboard
+python -m tools.test_dashboard.generate
+
+# View the dashboard
+open documentation/generated/test_dashboard.html
+```
+
+## CMake Integration
+
+```bash
+# Build target to generate dashboard
+cmake --build --preset Debug --target generate_test_dashboard
+```
+
+## Features
+
+- **Coverage Matrix**: Visual grid of function × logic class combinations
+- **Search**: Full-text search across test names, descriptions, tags
+- **Filters**: Filter by tags, functions, logic classes
+- **Details View**: Click any test to see full configuration
+
+## Options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--tests-dir` | `tests/` | Root directory containing test data files |
+| `--output` | `documentation/generated/test_dashboard.html` | Output HTML file |
+| `--verbose` | false | Enable detailed logging |
+```
+
+**Task 5.2: Update .gitignore**
+
+```
+# Add to .gitignore (optional - or commit the generated file)
+documentation/generated/
+```
+
+### Summary Timeline
+
+| Phase | Duration | Deliverables |
+|-------|----------|--------------|
+| Phase 1 | Day 1-2 | Scanner, Parser, data models |
+| Phase 2 | Day 2-3 | HTML template, CSS, basic JS |
+| Phase 3 | Day 3-4 | Main generator, all integrations |
+| Phase 4 | Day 4-5 | CMake module, build integration |
+| Phase 5 | Day 5 | README, polish, testing |
+
+**Total: ~5 working days for full implementation**
+
+### Next Steps
+
+1. Create the `tools/` directory structure
+2. Implement Phase 1 (scanner + parser) first
+3. Test with actual test_data.json files
+4. Iterate on HTML/CSS/JS for desired look
+5. Add CMake integration last
 
 ---
 
