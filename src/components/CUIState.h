@@ -61,14 +61,6 @@ struct CUIState : public Component {
   std::unordered_map<std::string, UIVisibilityState> m_state_to_ui_visibility;
 
 /////////////////////////////////////////////////
-  /// @brief Mapping of state keys to their current boolean values
-  ///
-  /// Tracks the current state for each registered state key.
-  /// States default to false until activated by their associated subscriber.
-/////////////////////////////////////////////////
-  std::unordered_map<std::string, bool> m_state_values;
-
-/////////////////////////////////////////////////
   /// @brief Mapping of state keys to their associated subscribers
   ///
   /// Each state key can have multiple subscribers. The state will only

@@ -74,7 +74,6 @@
             "ui_states": [
               {
                 "state_key": "show_panel_a",
-                "state_value": "false",
                 "state_to_ui_visibility": {
                   "ui_names_on": ["panel_a"],
                   "ui_names_off": ["panel_b"]
@@ -169,7 +168,6 @@
                 "ui_states": [
                   {
                     "state_key": "show_panel_a",
-                    "state_value": "true",
                     "state_to_ui_visibility": {
                       "ui_names_on": ["panel_a"],
                       "ui_names_off": ["panel_b"]
@@ -264,7 +262,6 @@
                 "ui_states": [
                   {
                     "state_key": "show_panel_a",
-                    "state_value": "false",
                     "state_to_ui_visibility": {
                       "ui_names_on": ["panel_a"],
                       "ui_names_off": ["panel_b"]
@@ -359,7 +356,6 @@
                 "ui_states": [
                   {
                     "state_key": "show_panel_a",
-                    "state_value": "true",
                     "state_to_ui_visibility": {
                       "ui_names_on": ["panel_a"],
                       "ui_names_off": ["panel_b"]
@@ -452,7 +448,6 @@
             "ui_states": [
               {
                 "state_key": "show_panel_a",
-                "state_value": "true",
                 "state_to_ui_visibility": {
                   "ui_names_on": ["panel_a"],
                   "ui_names_off": ["panel_b"]
