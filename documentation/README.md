@@ -181,6 +181,15 @@ Code examples and patterns:
 3. Adapt to your specific needs
 4. Follow established conventions
 
+## 📊 Analysis & Research
+
+Research documents and architectural analysis:
+
+| Document | Description |
+|----------|-------------|
+| **[Test Data Visualization Report](analysis/TEST_DATA_VISUALIZATION_REPORT.md)** | Analysis of approaches for visualizing test_data.json files |
+| **[Event Packet Creation Analysis](analysis/EVENT_PACKET_CREATION_ANALYSIS.md)** | Analysis of event packet creation patterns |
+
 ## 📑 Reference
 
 Feature and API references:
@@ -216,6 +225,7 @@ External resources:
 | Configure game/scene | [Context Configuration](configuration/CONTEXT_CONFIGURATION.md) |
 | Look up naming patterns | [Naming Quick Reference](naming/NAMING_QUICK_REFERENCE.md) |
 | See code examples | [Examples Directory](examples/) |
+| Visualize test coverage | [Test Data Visualization Report](analysis/TEST_DATA_VISUALIZATION_REPORT.md) |
 
 ### By Topic
 
@@ -223,7 +233,7 @@ External resources:
 |-------|-----------|
 | **Components** | [Adding Components](workflows/ADDING_COMPONENTS.md), [Examples](examples/) |
 | **Logic** | [Adding Logic](workflows/ADDING_LOGIC.md), [Logic System](architecture/LOGIC_SYSTEM.md) |
-| **Testing** | [Testing Overview](testing/TESTING_OVERVIEW.md), [Test Data Config](testing/TEST_DATA_CONFIGURATION.md) |
+| **Testing** | [Testing Overview](testing/TESTING_OVERVIEW.md), [Test Data Config](testing/TEST_DATA_CONFIGURATION.md), [Visualization](analysis/TEST_DATA_VISUALIZATION_REPORT.md) |
 | **Configuration** | [Context](configuration/CONTEXT_CONFIGURATION.md), [Resources](configuration/RESOURCE_CONFIGURATION.md) |
 | **Style** | [Style Guide](style/STYLE_GUIDE.md), [Naming](naming/FILE_NAMING_CONVENTIONS.md) |
 

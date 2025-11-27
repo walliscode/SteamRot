@@ -1,0 +1,6 @@
+# Test Dashboard Generator Dependencies
+# No external dependencies required for Phase 1
+# Python 3.7+ standard library only
+
+# Future phases may add:
+# jinja2>=3.0  # For HTML templating (Phase 2)
