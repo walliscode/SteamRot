@@ -2,12 +2,12 @@
 """
 generate.py - Main entry point for test dashboard generation
 
-This is a placeholder for Phase 2-3 implementation. Currently provides
-basic functionality to verify scanner and parser work correctly.
+Generates an interactive HTML dashboard from test_data.json files,
+providing search, filtering, and visualization capabilities.
 
 Usage:
     python -m tools.test_dashboard
-    python tools/test_dashboard/generate.py --tests-dir tests/
+    python -m tools.test_dashboard --tests-dir tests/ --output dashboard.html
 """
 import argparse
 import logging
@@ -17,6 +17,7 @@ from typing import List, Set
 
 from .scanner import TestFileScanner
 from .parser import TestDataParser, ParsedTest, parse_all_tests
+from .html_generator import HtmlGenerator
 
 logging.basicConfig(
     level=logging.INFO,
@@ -104,15 +105,13 @@ def print_summary(tests: List[ParsedTest]) -> None:
         if len(categories[cat]) > 5:
             print(f"    ... and {len(categories[cat]) - 5} more")
     
-    print(f"\n{'='*60}")
-    print("Phase 1 Complete - Scanner and Parser working!")
-    print(f"{'='*60}\n")
+    print(f"\n{'='*60}\n")
 
 
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
-        description="Generate test data dashboard (Phase 1: Scanner/Parser)"
+        description="Generate interactive HTML dashboard from test_data.json files"
     )
     parser.add_argument(
         "--tests-dir",
@@ -124,12 +123,17 @@ def main():
         "--output",
         type=Path,
         default=Path("documentation/generated/test_dashboard.html"),
-        help="Output HTML file path (not yet implemented)"
+        help="Output HTML file path"
     )
     parser.add_argument(
         "--json",
         type=Path,
         help="Export parsed data as JSON to this file"
+    )
+    parser.add_argument(
+        "--no-html",
+        action="store_true",
+        help="Skip HTML generation, only show summary"
     )
     parser.add_argument(
         "--verbose", "-v",
@@ -160,6 +164,18 @@ def main():
     
     # Print summary
     print_summary(tests)
+    
+    # Generate HTML dashboard
+    if not args.no_html:
+        try:
+            generator = HtmlGenerator()
+            generator.generate(tests, args.output)
+            logger.info(f"Generated HTML dashboard: {args.output}")
+            print(f"✅ Dashboard generated: {args.output}")
+            print(f"   Open in browser to view the interactive dashboard.")
+        except Exception as e:
+            logger.error(f"Failed to generate HTML: {e}")
+            return 1
     
     # Export JSON if requested
     if args.json:

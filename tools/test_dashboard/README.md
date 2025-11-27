@@ -5,71 +5,84 @@ A Python tool that generates an interactive HTML dashboard for browsing and visu
 ## Status
 
 - ✅ **Phase 1 Complete**: Scanner and Parser modules
-- ⬜ Phase 2: HTML template and CSS
-- ⬜ Phase 3: JavaScript interactions
-- ⬜ Phase 4: CMake integration
+- ✅ **Phase 2 Complete**: HTML template, CSS styles, JavaScript interactions
+- ⬜ Phase 3: Advanced features (CMake integration)
+- ⬜ Phase 4: Polish and documentation
 
 ## Quick Start
 
 ```bash
-# Run the scanner/parser (Phase 1)
+# Generate the HTML dashboard
+python -m tools.test_dashboard --tests-dir tests/
+
+# Open the generated dashboard in your browser
+# File: documentation/generated/test_dashboard.html
+```
+
+## Features
+
+### Interactive Dashboard
+- **Search**: Full-text search across test names, descriptions, and tags
+- **Filters**: Filter by tags, functions, logic classes, and categories
+- **Coverage Matrix**: Visual grid showing function × logic class combinations
+- **Test Details**: Click any test to view full details including simulation steps
+- **Sorting**: Click column headers to sort the test list
+
+### Coverage Matrix
+Click any cell in the coverage matrix to filter tests that use that specific function/logic class combination.
+
+## Usage
+
+```bash
+# Basic usage - generate HTML dashboard
 python -m tools.test_dashboard --tests-dir tests/
 
 # Export parsed data as JSON
 python -m tools.test_dashboard --tests-dir tests/ --json output.json
 
+# Custom output location
+python -m tools.test_dashboard --tests-dir tests/ --output my_dashboard.html
+
+# Skip HTML generation, only show summary
+python -m tools.test_dashboard --tests-dir tests/ --no-html
+
 # Verbose mode
-python -m tools.test_dashboard --tests-dir tests/ -v
+python -m tools.test_dashboard -v
 ```
-
-## Current Output (Phase 1)
-
-The tool currently scans all `*.test_data.json` files and displays:
-- Total test count
-- Unique tags, functions, and logic classes
-- Tests organized by category
-- Coverage statistics
 
 ## Directory Structure
 
 ```
 tools/test_dashboard/
-├── __init__.py      # Package initialization
-├── __main__.py      # Module entry point
-├── scanner.py       # File discovery
-├── parser.py        # JSON parsing and data models
-├── generate.py      # Main generator (Phase 2+)
-├── requirements.txt # Dependencies
-└── README.md        # This file
+├── __init__.py          # Package initialization
+├── __main__.py          # Module entry point
+├── scanner.py           # File discovery
+├── parser.py            # JSON parsing and data models
+├── html_generator.py    # HTML generation from templates
+├── generate.py          # Main generator
+├── templates/
+│   └── base.html        # Dashboard HTML template
+├── static/
+│   ├── styles.css       # Dashboard styles
+│   └── dashboard.js     # Interactive JavaScript
+├── requirements.txt     # Dependencies
+└── README.md            # This file
 ```
 
-## Features
+## Output
 
-### Implemented (Phase 1)
+The tool generates a single self-contained HTML file with embedded CSS and JavaScript.
 
-- **TestFileScanner**: Recursively finds `*.test_data.json` files
-- **TestDataParser**: Parses JSON and extracts:
-  - Metadata (name, description, tags, author, version)
-  - Simulation steps (function types, logic classes)
-  - Data presence flags (input sequences, events, tick snapshots)
-- **JSON Export**: Export all parsed data for external tools
-- **Category Detection**: Organizes tests by directory structure
-
-### Planned (Phase 2+)
-
-- Interactive HTML dashboard
-- Coverage matrix (function × logic class)
-- Search and filter functionality
-- Test detail drill-down views
-- CMake integration
+**Default output**: `documentation/generated/test_dashboard.html`
 
 ## Options
 
 | Option | Default | Description |
 |--------|---------|-------------|
 | `--tests-dir` | `tests/` | Root directory for test data files |
-| `--output` | `documentation/generated/test_dashboard.html` | Output HTML file (Phase 2) |
+| `--output` | `documentation/generated/test_dashboard.html` | Output HTML file |
 | `--json` | None | Export parsed data as JSON |
+| `--no-html` | false | Skip HTML generation |
 | `--verbose` | false | Enable detailed logging |
 
 ## Data Model
