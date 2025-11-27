@@ -6,7 +6,7 @@ A Python tool that generates an interactive HTML dashboard for browsing and visu
 
 - ✅ **Phase 1 Complete**: Scanner and Parser modules
 - ✅ **Phase 2 Complete**: HTML template, CSS styles, JavaScript interactions
-- ⬜ Phase 3: Advanced features (CMake integration)
+- ✅ **Phase 3 Complete**: CMake integration
 - ⬜ Phase 4: Polish and documentation
 
 ## Quick Start
@@ -17,6 +17,21 @@ python -m tools.test_dashboard --tests-dir tests/
 
 # Open the generated dashboard in your browser
 # File: documentation/generated/test_dashboard.html
+```
+
+## CMake Integration
+
+The dashboard generator is integrated with CMake as a custom target:
+
+```bash
+# Configure CMake first (if not already done)
+cmake --preset Debug
+
+# Generate the test dashboard
+cmake --build --preset Debug --target generate_test_dashboard
+
+# The dashboard will be generated at:
+# documentation/generated/test_dashboard.html
 ```
 
 ## Features
@@ -67,6 +82,9 @@ tools/test_dashboard/
 │   └── dashboard.js     # Interactive JavaScript
 ├── requirements.txt     # Dependencies
 └── README.md            # This file
+
+cmake/
+└── GenerateTestDashboard.cmake  # CMake integration module
 ```
 
 ## Output
