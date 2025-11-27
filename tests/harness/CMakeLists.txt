@@ -20,9 +20,13 @@ target_link_libraries(test_harness
   resources
   scenes
   logic
+  events
   Catch2::Catch2
   conmat
 )
+
+# Include execution subdirectory for level-based executors
+add_subdirectory(execution)
 
 # Create test executable for harness
 add_executable(test_harness_tests

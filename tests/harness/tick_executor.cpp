@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "tick_executor.h"
 #include "console_output.h"
+#include "event_processing.h"
 #include "event_simulation.h"
 #include "input_simulation.h"
 #include "simulation_runner.h"
@@ -118,11 +119,11 @@ ExecuteSingleTick(uint32_t tick, const TestDataConfig *config,
     }
   }
 
-  // 3. Process event waiting room
-  fixture.GetGameResources().event_handler.ProcessWaitingRoomEventBus();
-
-  // 4 . Update subscribers from global event bus
-  fixture.GetGameResources().event_handler.UpateSubscribersFromGlobalEventBus();
+  // 3. Process event tick start using extracted free function
+  // This handles: ProcessWaitingRoomEventBus and UpdateSubscribersFromGlobalEventBus
+  // Note: We pass nullptr for window since tests don't poll SFML events directly
+  events::processing::ProcessEventTickStart(
+      fixture.GetGameResources().event_handler, nullptr);
 
   // 4. Execute simulation steps (all steps execute on every tick)
   if (config->simulation_data() && config->simulation_data()->steps()) {
@@ -148,8 +149,10 @@ ExecuteSingleTick(uint32_t tick, const TestDataConfig *config,
     return std::unexpected(snapshot_result.error());
   }
 
-  // 6. Tick the global event bus
-  fixture.GetGameResources().event_handler.TickGlobalEventBus();
+  // 6. Process event tick end using extracted free function
+  // This handles: TickGlobalEventBus (decrement lifetimes, remove expired)
+  events::processing::ProcessEventTickEnd(
+      fixture.GetGameResources().event_handler);
 
   return std::monostate{};
 }

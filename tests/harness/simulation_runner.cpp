@@ -17,6 +17,7 @@
 #include "entity_memory.h"
 #include "logic_action.h"
 #include "logic_collision.h"
+#include "logic_execution.h"
 #include "logic_ui.h"
 #include "simulation_generated.h"
 #include <format>
