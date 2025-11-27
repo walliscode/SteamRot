@@ -89,13 +89,13 @@ void UpdateCUserInterfaceVisibilityFromCUIState(
             entity::memory::GetComponent<CUserInterface>(ui_index_on,
                                                          scene_entities);
 
-        ui_component.m_visible = state_value && true;
+        ui_component.m_visible = state_value;
       }
       for (const size_t ui_index_off : ui_visibility_state.m_ui_indices_off) {
         CUserInterface &ui_component =
             entity::memory::GetComponent<CUserInterface>(ui_index_off,
                                                          scene_entities);
-        ui_component.m_visible = state_value && false;
+        ui_component.m_visible = !state_value;
       }
     }
 
