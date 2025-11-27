@@ -136,58 +136,21 @@ TEST_CASE("CUIStateEqualsMatcher detects UIVisibilityState content "
   }
 }
 
-TEST_CASE("CUIStateEqualsMatcher detects state_values differences",
-          "[unit][Components][CUIState][matcher]") {
-  steamrot::CUIState expected;
-  expected.m_active = true;
-  expected.m_state_values["state1"] = true;
-  expected.m_state_values["state2"] = false;
-
-  SECTION("Matcher detects size differences in state_values") {
-    steamrot::CUIState actual;
-    actual.m_active = true;
-    actual.m_state_values["state1"] = true;
-
-    REQUIRE_THAT(actual, !steamrot::tests::EqualsCUIState(expected));
-  }
-
-  SECTION("Matcher detects value differences in state_values") {
-    steamrot::CUIState actual;
-    actual.m_active = true;
-    actual.m_state_values["state1"] = false;
-    actual.m_state_values["state2"] = false;
-
-    REQUIRE_THAT(actual, !steamrot::tests::EqualsCUIState(expected));
-  }
-
-  SECTION("Matcher detects equality with same state_values") {
-    steamrot::CUIState actual;
-    actual.m_active = true;
-    actual.m_state_values["state1"] = true;
-    actual.m_state_values["state2"] = false;
-
-    REQUIRE_THAT(actual, steamrot::tests::EqualsCUIState(expected));
-  }
-}
-
 TEST_CASE("CUIStateEqualsMatcher detects missing keys in actual maps",
           "[unit][Components][CUIState][matcher]") {
   steamrot::CUIState expected;
   expected.m_active = true;
   expected.m_state_to_ui_visibility["state1"] = steamrot::UIVisibilityState{};
   expected.m_state_to_ui_visibility["state2"] = steamrot::UIVisibilityState{};
-  expected.m_state_values["key1"] = true;
-  expected.m_state_values["key2"] = false;
   expected.m_state_subscribers["sub1"] = {};
   expected.m_state_subscribers["sub2"] = {};
 
   steamrot::CUIState actual;
   actual.m_active = true;
   actual.m_state_to_ui_visibility["state1"] = steamrot::UIVisibilityState{};
-  actual.m_state_values["key1"] = true;
   actual.m_state_subscribers["sub1"] = {};
 
-  // Should detect missing "state2", "key2", and "sub2"
+  // Should detect missing "state2" and "sub2"
   REQUIRE_THAT(actual, !steamrot::tests::EqualsCUIState(expected));
 }
 
@@ -200,16 +163,6 @@ TEST_CASE("CUIStateEqualsMatcher works with empty maps",
     steamrot::CUIState actual;
     actual.m_active = true;
 
-    REQUIRE_THAT(actual, steamrot::tests::EqualsCUIState(expected));
-  }
-
-  SECTION("Matcher allows extra keys in actual (subset matching)") {
-    steamrot::CUIState actual;
-    actual.m_active = true;
-    actual.m_state_values["key"] = true;
-
-    // Matcher is designed to check if actual contains all expected keys,
-    // extra keys in actual are allowed (subset matching behavior)
     REQUIRE_THAT(actual, steamrot::tests::EqualsCUIState(expected));
   }
 }
@@ -249,16 +202,12 @@ TEST_CASE("CUIStateEqualsMatcher handles multiple simultaneous differences",
   expected.m_active = true;
   expected.m_state_to_ui_visibility["state1"] = steamrot::UIVisibilityState{};
   expected.m_state_to_ui_visibility["state1"].m_ui_indices_on = {0, 1};
-  expected.m_state_values["key1"] = true;
-  expected.m_state_values["key2"] = false;
   expected.m_state_subscribers["sub1"] = {};
 
   steamrot::CUIState actual;
   actual.m_active = false; // Different
   actual.m_state_to_ui_visibility["state1"] = steamrot::UIVisibilityState{};
   actual.m_state_to_ui_visibility["state1"].m_ui_indices_on = {0}; // Different
-  actual.m_state_values["key1"] = false;                           // Different
-  actual.m_state_values["key2"] = false;
   // Missing "sub1"
 
   REQUIRE_THAT(actual, !steamrot::tests::EqualsCUIState(expected));
@@ -270,14 +219,12 @@ TEST_CASE("CUIStateEqualsMatcher comprehensive describe() test",
   expected.m_active = true;
   expected.m_state_to_ui_visibility["state1"] = steamrot::UIVisibilityState{};
   expected.m_state_to_ui_visibility["state1"].m_ui_indices_on = {0, 1};
-  expected.m_state_values["key1"] = true;
   expected.m_state_subscribers["sub1"] = {};
 
   steamrot::CUIState actual;
   actual.m_active = false;
   actual.m_state_to_ui_visibility["state1"] = steamrot::UIVisibilityState{};
   actual.m_state_to_ui_visibility["state1"].m_ui_indices_on = {0};
-  actual.m_state_values["key1"] = false;
   // Missing sub1
 
   auto matcher = steamrot::tests::EqualsCUIState(expected);
@@ -333,9 +280,6 @@ TEST_CASE("CUIStateEqualsMatcher handles multiple state keys",
   expected.m_state_to_ui_visibility["state1"] = steamrot::UIVisibilityState{};
   expected.m_state_to_ui_visibility["state2"] = steamrot::UIVisibilityState{};
   expected.m_state_to_ui_visibility["state3"] = steamrot::UIVisibilityState{};
-  expected.m_state_values["value1"] = true;
-  expected.m_state_values["value2"] = false;
-  expected.m_state_values["value3"] = true;
   expected.m_state_subscribers["sub1"] = {};
   expected.m_state_subscribers["sub2"] = {};
 
@@ -345,24 +289,19 @@ TEST_CASE("CUIStateEqualsMatcher handles multiple state keys",
     actual.m_state_to_ui_visibility["state1"] = steamrot::UIVisibilityState{};
     actual.m_state_to_ui_visibility["state2"] = steamrot::UIVisibilityState{};
     actual.m_state_to_ui_visibility["state3"] = steamrot::UIVisibilityState{};
-    actual.m_state_values["value1"] = true;
-    actual.m_state_values["value2"] = false;
-    actual.m_state_values["value3"] = true;
     actual.m_state_subscribers["sub1"] = {};
     actual.m_state_subscribers["sub2"] = {};
 
     REQUIRE_THAT(actual, steamrot::tests::EqualsCUIState(expected));
   }
 
-  SECTION("Matcher detects difference in one of many values") {
+  SECTION("Matcher detects difference in visibility state") {
     steamrot::CUIState actual;
     actual.m_active = true;
     actual.m_state_to_ui_visibility["state1"] = steamrot::UIVisibilityState{};
+    actual.m_state_to_ui_visibility["state1"].m_ui_indices_on = {1}; // Different!
     actual.m_state_to_ui_visibility["state2"] = steamrot::UIVisibilityState{};
     actual.m_state_to_ui_visibility["state3"] = steamrot::UIVisibilityState{};
-    actual.m_state_values["value1"] = true;
-    actual.m_state_values["value2"] = true; // Different!
-    actual.m_state_values["value3"] = true;
     actual.m_state_subscribers["sub1"] = {};
     actual.m_state_subscribers["sub2"] = {};
 

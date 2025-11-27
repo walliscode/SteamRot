@@ -97,15 +97,11 @@ struct UIStateData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef UIStateDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_STATE_KEY = 4,
-    VT_STATE_VALUE = 6,
-    VT_STATE_TO_UI_VISIBILITY = 8,
-    VT_SUBSCRIBERS = 10
+    VT_STATE_TO_UI_VISIBILITY = 6,
+    VT_SUBSCRIBERS = 8
   };
   const ::flatbuffers::String *state_key() const {
     return GetPointer<const ::flatbuffers::String *>(VT_STATE_KEY);
-  }
-  bool state_value() const {
-    return GetField<uint8_t>(VT_STATE_VALUE, 0) != 0;
   }
   const steamrot::UIStateMapping *state_to_ui_visibility() const {
     return GetPointer<const steamrot::UIStateMapping *>(VT_STATE_TO_UI_VISIBILITY);
@@ -117,7 +113,6 @@ struct UIStateData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_STATE_KEY) &&
            verifier.VerifyString(state_key()) &&
-           VerifyField<uint8_t>(verifier, VT_STATE_VALUE, 1) &&
            VerifyOffset(verifier, VT_STATE_TO_UI_VISIBILITY) &&
            verifier.VerifyTable(state_to_ui_visibility()) &&
            VerifyOffset(verifier, VT_SUBSCRIBERS) &&
@@ -133,9 +128,6 @@ struct UIStateDataBuilder {
   ::flatbuffers::uoffset_t start_;
   void add_state_key(::flatbuffers::Offset<::flatbuffers::String> state_key) {
     fbb_.AddOffset(UIStateData::VT_STATE_KEY, state_key);
-  }
-  void add_state_value(bool state_value) {
-    fbb_.AddElement<uint8_t>(UIStateData::VT_STATE_VALUE, static_cast<uint8_t>(state_value), 0);
   }
   void add_state_to_ui_visibility(::flatbuffers::Offset<steamrot::UIStateMapping> state_to_ui_visibility) {
     fbb_.AddOffset(UIStateData::VT_STATE_TO_UI_VISIBILITY, state_to_ui_visibility);
@@ -158,21 +150,18 @@ struct UIStateDataBuilder {
 inline ::flatbuffers::Offset<UIStateData> CreateUIStateData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::String> state_key = 0,
-    bool state_value = false,
     ::flatbuffers::Offset<steamrot::UIStateMapping> state_to_ui_visibility = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>>> subscribers = 0) {
   UIStateDataBuilder builder_(_fbb);
   builder_.add_subscribers(subscribers);
   builder_.add_state_to_ui_visibility(state_to_ui_visibility);
   builder_.add_state_key(state_key);
-  builder_.add_state_value(state_value);
   return builder_.Finish();
 }
 
 inline ::flatbuffers::Offset<UIStateData> CreateUIStateDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const char *state_key = nullptr,
-    bool state_value = false,
     ::flatbuffers::Offset<steamrot::UIStateMapping> state_to_ui_visibility = 0,
     const std::vector<::flatbuffers::Offset<steamrot::SubscriberData>> *subscribers = nullptr) {
   auto state_key__ = state_key ? _fbb.CreateString(state_key) : 0;
@@ -180,7 +169,6 @@ inline ::flatbuffers::Offset<UIStateData> CreateUIStateDataDirect(
   return steamrot::CreateUIStateData(
       _fbb,
       state_key__,
-      state_value,
       state_to_ui_visibility,
       subscribers__);
 }

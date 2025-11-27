@@ -93,11 +93,6 @@ void CompareMapStateToUIVisibility(
     const std::unordered_map<std::string, UIVisibilityState> &actual,
     std::ostringstream &oss);
 
-void CompareMapStateValues(
-    const std::unordered_map<std::string, bool> &expected,
-    const std::unordered_map<std::string, bool> &actual,
-    std::ostringstream &oss);
-
 void CompareMapStateSubscribers(
     const std::unordered_map<
         std::string, std::vector<std::shared_ptr<Subscriber>>> &expected,

@@ -16,6 +16,5 @@ TEST_CASE("CUIState has correct default values",
   // Test pre configuration state
   REQUIRE(ui_state.m_active == false);
   REQUIRE(ui_state.m_state_to_ui_visibility.empty());
-  REQUIRE(ui_state.m_state_values.empty());
   REQUIRE(ui_state.m_state_subscribers.empty());
 }
