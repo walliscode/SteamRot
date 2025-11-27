@@ -58,7 +58,7 @@
                         "event_lifetime": 1,
                         "event_type": "EVENT_TOGGLE_UI",
                         "event_data_data_type": "UserInterfaceNameData",
-                        "event_data_data": { "id": "new_construct_menu_toggle" }
+                        "event_data_data": { "id": "new_construct_menu_on" }
                       }
                     },
                     "label": "New Construct"
@@ -78,8 +78,8 @@
 
           "root_ui_element": {
             "base_data": {
-              "position": { "x": 100, "y": 0 },
-              "size": { "x": 220, "y": 600 },
+              "position": { "x": 0, "y": 0 },
+              "size": { "x": 300, "y": 150 },
               "children_active": true,
               "children": [
                 {
@@ -98,7 +98,7 @@
                         "event_lifetime": 1,
                         "event_type": "EVENT_TOGGLE_UI",
                         "event_data_data_type": "UserInterfaceNameData",
-                        "event_data_data": { "id": "new_construct_menu" }
+                        "event_data_data": { "id": "new_construct_menu_off" }
                       },
                       "children_active": false,
                       "children": [],
@@ -180,17 +180,40 @@
         "c_ui_state": {
           "ui_states": [
             {
-              "state_key": "new_construct_menu_toggle",
+              "state_key": "new_construct_menu_on",
               "state_to_ui_visibility": {
-                "ui_names_on": ["initial_crafting_menu"],
-                "ui_names_off": ["new_construct_menu"]
+                "ui_names_on": [
+                  "new_construct_menu",
+                  "fragment_selection_menu"
+                ],
+                "ui_names_off": ["initial_crafting_menu"]
               },
               "subscribers": [
                 {
                   "event_type_data": "EVENT_TOGGLE_UI",
                   "trigger_data_type": "UserInterfaceNameData",
                   "trigger_data": {
-                    "id": "new_construct_menu_toggle"
+                    "id": "new_construct_menu_on"
+                  },
+                  "active": false
+                }
+              ]
+            },
+            {
+              "state_key": "new_construct_menu_off",
+              "state_to_ui_visibility": {
+                "ui_names_on": ["initial_crafting_menu"],
+                "ui_names_off": [
+                  "new_construct_menu",
+                  "fragment_selection_menu"
+                ]
+              },
+              "subscribers": [
+                {
+                  "event_type_data": "EVENT_TOGGLE_UI",
+                  "trigger_data_type": "UserInterfaceNameData",
+                  "trigger_data": {
+                    "id": "new_construct_menu_off"
                   },
                   "active": false
                 }
