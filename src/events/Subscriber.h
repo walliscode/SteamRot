@@ -42,6 +42,13 @@ struct Subscriber {
   std::optional<EventData> m_trigger_event_data{std::nullopt};
 
 /////////////////////////////////////////////////
+  /// @brief Stores the actual event data that triggered the activation.
+  /// This is set when the subscriber is activated and can be used by
+  /// handlers to access the event data for processing.
+/////////////////////////////////////////////////
+  std::optional<EventData> m_received_event_data{std::nullopt};
+
+/////////////////////////////////////////////////
   /// @brief Constructor for the Subscriber class.
   ///
   /// @param trigger_event_type Event type to register for.

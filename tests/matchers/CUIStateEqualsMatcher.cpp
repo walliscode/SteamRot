@@ -46,7 +46,6 @@ bool CUIStateEqualsMatcher::match(const CUIState &actual) const {
   // run comparisons for custom CUIState members
   CompareMapStateToUIVisibility(m_expected.m_state_to_ui_visibility,
                                 actual.m_state_to_ui_visibility, oss);
-  CompareMapStateValues(m_expected.m_state_values, actual.m_state_values, oss);
   CompareMapStateSubscribers(m_expected.m_state_subscribers,
                              actual.m_state_subscribers, oss);
   m_mismatch_description = oss.str();
@@ -95,32 +94,6 @@ void CompareMapStateToUIVisibility(
     const auto &actual_state = actual_it->second;
     CompareUIVisibilityState(actual_it->first, expected_state, actual_state,
                              oss);
-  }
-}
-
-/////////////////////////////////////////////////
-void CompareMapStateValues(
-    const std::unordered_map<std::string, bool> &expected,
-    const std::unordered_map<std::string, bool> &actual,
-    std::ostringstream &oss) {
-  for (const auto &[key, expected_value] : expected) {
-    auto actual_it = actual.find(key);
-    if (actual_it == actual.end()) {
-      oss << conmat::Indent(1) << conmat::TestFailed()
-          << "Missing key in actual: " << key << "\n";
-      continue;
-    }
-    const auto &actual_value = actual_it->second;
-    if (expected_value != actual_value) {
-      oss << conmat::Indent(1) << conmat::TestFailed()
-          << std::format("m_state_values[{}]", key) << " value mismatch:"
-          << "\n";
-      oss << conmat::Indent(2)
-          << "actual: " << conmat::Colorize(actual_value, conmat::Color::Red)
-          << "\n";
-      oss << conmat::Indent(2) << "expected: "
-          << conmat::Colorize(expected_value, conmat::Color::Blue) << "\n";
-    }
   }
 }
 

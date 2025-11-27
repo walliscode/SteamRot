@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "test_name": "UI_Visibility_From_Event_Toggle_UI",
-    "description": "Test UpdateCUserInterfaceVisibilityFromCUIState function - 4 UI entities controlled by 1 CUIState entity that manages visibility of 2 of them",
+    "test_name": "UI_Visibility_from_UIStateLogic",
+    "description": "Test UIStateLogic RunLogic function - 4 UI entities controlled by 1 CUIState entity that manages visibility of 2 of them",
     "tags": ["unit", "logic", "ui"],
     "expected_to_pass": true,
     "version": 1
@@ -11,9 +11,9 @@
     "steps": [
       {
         "simulation_type": "Action",
-        "execution_mode": "Function",
-        "function_type": "UpdateCUserInterfaceVisibilityFromCUIState",
-        "description": "Step 1: Update UI visibility - main_menu and play_button should toggle visible, settings_panel and quit_button should toggle invisible"
+        "execution_mode": "LogicClass",
+        "logic_class_type": "UIStateLogic",
+        "description": "Step 1: Execute UIStateLogic to update UI visibility - main_menu and play_button should toggle visible, settings_panel and quit_button should toggle invisible"
       }
     ]
   },

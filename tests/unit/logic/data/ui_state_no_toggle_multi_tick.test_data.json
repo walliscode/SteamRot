@@ -1,19 +1,20 @@
 {
   "metadata": {
-    "test_name": "UpdateCUserInterfaceVisibilityFromCUIState_basic_test",
-    "description": "Test UpdateCUserInterfaceVisibilityFromCUIState function - 4 UI entities controlled by 1 CUIState entity that manages visibility of 2 of them",
-    "tags": ["unit", "logic", "ui"],
+    "test_name": "ui_state_no_toggle_multi_tick",
+    "description": "Test that UI state updates do NOT toggle visibility back and forth over multiple ticks. When a state key is set, the corresponding UI visibility should be SET (not toggled) and remain stable across ticks. This tests the desired behavior where each state is responsible for one specific UI visibility configuration, not toggling between states.",
+    "tags": ["unit", "logic", "ui", "state", "multi-tick", "no-toggle"],
     "expected_to_pass": true,
     "version": 1
   },
+  "num_ticks": 3,
   "simulation_data": {
-    "description": "Call UpdateCUserInterfaceVisibilityFromCUIState to update UI visibility based on CUIState mappings",
+    "description": "Run UpdateCUserInterfaceVisibilityFromCUIState on every tick to verify visibility does NOT toggle back and forth when state subscribers are active on multiple ticks",
     "steps": [
       {
         "simulation_type": "Action",
         "execution_mode": "Function",
         "function_type": "UpdateCUserInterfaceVisibilityFromCUIState",
-        "description": "Step 1: Update UI visibility - main_menu and play_button should toggle visible, settings_panel and quit_button should toggle invisible"
+        "description": "Update UI visibility based on CUIState - visibility should be SET consistently, not toggled"
       }
     ]
   },
@@ -22,9 +23,10 @@
       "entity_memory_pool_size": 5,
       "entities": [
         {
+          "index": 0,
           "c_user_interface": {
-            "ui_name": "main_menu",
-            "is_visible": true,
+            "ui_name": "panel_a",
+            "is_visible": false,
             "root_ui_element": {
               "base_data": {
                 "position": {
@@ -44,9 +46,10 @@
           }
         },
         {
+          "index": 1,
           "c_user_interface": {
-            "ui_name": "settings_panel",
-            "is_visible": false,
+            "ui_name": "panel_b",
+            "is_visible": true,
             "root_ui_element": {
               "base_data": {
                 "position": {
@@ -66,64 +69,21 @@
           }
         },
         {
-          "c_user_interface": {
-            "ui_name": "play_button",
-            "is_visible": false,
-            "root_ui_element": {
-              "base_data": {
-                "position": {
-                  "x": 100,
-                  "y": 300
-                },
-                "size": {
-                  "x": 150,
-                  "y": 50
-                },
-                "children_active": false,
-                "children": [],
-                "layout": "Horizontal",
-                "spacing_strategy": "None"
-              }
-            }
-          }
-        },
-        {
-          "c_user_interface": {
-            "ui_name": "quit_button",
-            "is_visible": true,
-            "root_ui_element": {
-              "base_data": {
-                "position": {
-                  "x": 100,
-                  "y": 400
-                },
-                "size": {
-                  "x": 150,
-                  "y": 50
-                },
-                "children_active": false,
-                "children": [],
-                "layout": "Horizontal",
-                "spacing_strategy": "None"
-              }
-            }
-          }
-        },
-        {
+          "index": 2,
           "c_ui_state": {
             "ui_states": [
               {
-                "state_key": "menu_state",
+                "state_key": "show_panel_a",
                 "state_to_ui_visibility": {
-                  "ui_names_on": ["main_menu", "play_button"],
-                  "ui_names_off": ["settings_panel", "quit_button"]
+                  "ui_names_on": ["panel_a"],
+                  "ui_names_off": ["panel_b"]
                 },
                 "subscribers": [
                   {
                     "event_type_data": "EVENT_TOGGLE_UI",
                     "trigger_data_type": "UserInterfaceNameData",
                     "trigger_data": {
-                      "id": "menu_state"
+                      "id": "show_panel_a"
                     },
                     "active": true
                   }
@@ -133,19 +93,33 @@
           }
         }
       ]
+    },
+    "event_bus": {
+      "description": "EVENT_TOGGLE_UI event with long lifetime to trigger subscriber on multiple ticks",
+      "events": [
+        {
+          "event_lifetime": 4,
+          "event_type": "EVENT_TOGGLE_UI",
+          "event_data_data_type": "UserInterfaceNameData",
+          "event_data_data": {
+            "id": "show_panel_a"
+          }
+        }
+      ]
     }
   },
   "tick_snapshots": [
     {
       "tick": 1,
-      "description": "At the end of step 1, the UI visibility should be updated based on the CUIState mappings.",
+      "description": "After tick 1: panel_a should be visible (on), panel_b should be hidden (off). State is now true.",
       "data_collection": {
         "entity_collection": {
           "entity_memory_pool_size": 5,
           "entities": [
             {
+              "index": 0,
               "c_user_interface": {
-                "ui_name": "main_menu",
+                "ui_name": "panel_a",
                 "is_visible": true,
                 "root_ui_element": {
                   "base_data": {
@@ -166,8 +140,9 @@
               }
             },
             {
+              "index": 1,
               "c_user_interface": {
-                "ui_name": "settings_panel",
+                "ui_name": "panel_b",
                 "is_visible": false,
                 "root_ui_element": {
                   "base_data": {
@@ -188,64 +163,21 @@
               }
             },
             {
-              "c_user_interface": {
-                "ui_name": "play_button",
-                "is_visible": true,
-                "root_ui_element": {
-                  "base_data": {
-                    "position": {
-                      "x": 100,
-                      "y": 300
-                    },
-                    "size": {
-                      "x": 150,
-                      "y": 50
-                    },
-                    "children_active": false,
-                    "children": [],
-                    "layout": "Horizontal",
-                    "spacing_strategy": "None"
-                  }
-                }
-              }
-            },
-            {
-              "c_user_interface": {
-                "ui_name": "quit_button",
-                "is_visible": false,
-                "root_ui_element": {
-                  "base_data": {
-                    "position": {
-                      "x": 100,
-                      "y": 400
-                    },
-                    "size": {
-                      "x": 150,
-                      "y": 50
-                    },
-                    "children_active": false,
-                    "children": [],
-                    "layout": "Horizontal",
-                    "spacing_strategy": "None"
-                  }
-                }
-              }
-            },
-            {
+              "index": 2,
               "c_ui_state": {
                 "ui_states": [
                   {
-                    "state_key": "menu_state",
+                    "state_key": "show_panel_a",
                     "state_to_ui_visibility": {
-                      "ui_names_on": ["main_menu", "play_button"],
-                      "ui_names_off": ["settings_panel", "quit_button"]
+                      "ui_names_on": ["panel_a"],
+                      "ui_names_off": ["panel_b"]
                     },
                     "subscribers": [
                       {
                         "event_type_data": "EVENT_TOGGLE_UI",
                         "trigger_data_type": "UserInterfaceNameData",
                         "trigger_data": {
-                          "id": "menu_state"
+                          "id": "show_panel_a"
                         },
                         "active": false
                       }
@@ -255,19 +187,33 @@
               }
             }
           ]
+        },
+        "event_bus": {
+          "description": "Event still active for next tick",
+          "events": [
+            {
+              "event_lifetime": 4,
+              "event_type": "EVENT_TOGGLE_UI",
+              "event_data_data_type": "UserInterfaceNameData",
+              "event_data_data": {
+                "id": "show_panel_a"
+              }
+            }
+          ]
         }
       }
     },
     {
       "tick": 2,
-      "description": "At the end of step 1, the UI visibility should be updated based on the CUIState mappings.",
+      "description": "After tick 2: Visibility should remain STABLE - panel_a still visible, panel_b still hidden. NO TOGGLING should occur even though the event is still active. This demonstrates the desired no-toggle behavior.",
       "data_collection": {
         "entity_collection": {
           "entity_memory_pool_size": 5,
           "entities": [
             {
+              "index": 0,
               "c_user_interface": {
-                "ui_name": "main_menu",
+                "ui_name": "panel_a",
                 "is_visible": true,
                 "root_ui_element": {
                   "base_data": {
@@ -288,8 +234,9 @@
               }
             },
             {
+              "index": 1,
               "c_user_interface": {
-                "ui_name": "settings_panel",
+                "ui_name": "panel_b",
                 "is_visible": false,
                 "root_ui_element": {
                   "base_data": {
@@ -310,70 +257,134 @@
               }
             },
             {
-              "c_user_interface": {
-                "ui_name": "play_button",
-                "is_visible": true,
-                "root_ui_element": {
-                  "base_data": {
-                    "position": {
-                      "x": 100,
-                      "y": 300
-                    },
-                    "size": {
-                      "x": 150,
-                      "y": 50
-                    },
-                    "children_active": false,
-                    "children": [],
-                    "layout": "Horizontal",
-                    "spacing_strategy": "None"
-                  }
-                }
-              }
-            },
-            {
-              "c_user_interface": {
-                "ui_name": "quit_button",
-                "is_visible": false,
-                "root_ui_element": {
-                  "base_data": {
-                    "position": {
-                      "x": 100,
-                      "y": 400
-                    },
-                    "size": {
-                      "x": 150,
-                      "y": 50
-                    },
-                    "children_active": false,
-                    "children": [],
-                    "layout": "Horizontal",
-                    "spacing_strategy": "None"
-                  }
-                }
-              }
-            },
-            {
+              "index": 2,
               "c_ui_state": {
                 "ui_states": [
                   {
-                    "state_key": "menu_state",
+                    "state_key": "show_panel_a",
                     "state_to_ui_visibility": {
-                      "ui_names_on": ["main_menu", "play_button"],
-                      "ui_names_off": ["settings_panel", "quit_button"]
+                      "ui_names_on": ["panel_a"],
+                      "ui_names_off": ["panel_b"]
                     },
                     "subscribers": [
                       {
                         "event_type_data": "EVENT_TOGGLE_UI",
                         "trigger_data_type": "UserInterfaceNameData",
                         "trigger_data": {
-                          "id": "menu_state"
+                          "id": "show_panel_a"
                         },
                         "active": false
                       }
                     ]
                   }
                 ]
+              }
+            }
+          ]
+        },
+        "event_bus": {
+          "description": "Event still active",
+          "events": [
+            {
+              "event_lifetime": 3,
+              "event_type": "EVENT_TOGGLE_UI",
+              "event_data_data_type": "UserInterfaceNameData",
+              "event_data_data": {
+                "id": "show_panel_a"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "tick": 3,
+      "description": "After tick 3: Visibility STILL remains stable - no toggling. panel_a visible, panel_b hidden. This confirms no toggle behavior across 3 ticks.",
+      "data_collection": {
+        "entity_collection": {
+          "entity_memory_pool_size": 5,
+          "entities": [
+            {
+              "index": 0,
+              "c_user_interface": {
+                "ui_name": "panel_a",
+                "is_visible": true,
+                "root_ui_element": {
+                  "base_data": {
+                    "position": {
+                      "x": 100,
+                      "y": 100
+                    },
+                    "size": {
+                      "x": 200,
+                      "y": 150
+                    },
+                    "children_active": false,
+                    "children": [],
+                    "layout": "Vertical",
+                    "spacing_strategy": "None"
+                  }
+                }
+              }
+            },
+            {
+              "index": 1,
+              "c_user_interface": {
+                "ui_name": "panel_b",
+                "is_visible": false,
+                "root_ui_element": {
+                  "base_data": {
+                    "position": {
+                      "x": 350,
+                      "y": 100
+                    },
+                    "size": {
+                      "x": 200,
+                      "y": 150
+                    },
+                    "children_active": false,
+                    "children": [],
+                    "layout": "Vertical",
+                    "spacing_strategy": "None"
+                  }
+                }
+              }
+            },
+            {
+              "index": 2,
+              "c_ui_state": {
+                "ui_states": [
+                  {
+                    "state_key": "show_panel_a",
+                    "state_to_ui_visibility": {
+                      "ui_names_on": ["panel_a"],
+                      "ui_names_off": ["panel_b"]
+                    },
+                    "subscribers": [
+                      {
+                        "event_type_data": "EVENT_TOGGLE_UI",
+                        "trigger_data_type": "UserInterfaceNameData",
+                        "trigger_data": {
+                          "id": "show_panel_a"
+                        },
+                        "active": false
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "event_bus": {
+          "description": "Event still active",
+          "events": [
+            {
+              "event_lifetime": 2,
+              "event_type": "EVENT_TOGGLE_UI",
+              "event_data_data_type": "UserInterfaceNameData",
+              "event_data_data": {
+                "id": "show_panel_a"
               }
             }
           ]
@@ -386,8 +397,9 @@
       "entity_memory_pool_size": 5,
       "entities": [
         {
+          "index": 0,
           "c_user_interface": {
-            "ui_name": "main_menu",
+            "ui_name": "panel_a",
             "is_visible": true,
             "root_ui_element": {
               "base_data": {
@@ -408,8 +420,9 @@
           }
         },
         {
+          "index": 1,
           "c_user_interface": {
-            "ui_name": "settings_panel",
+            "ui_name": "panel_b",
             "is_visible": false,
             "root_ui_element": {
               "base_data": {
@@ -430,70 +443,40 @@
           }
         },
         {
-          "c_user_interface": {
-            "ui_name": "play_button",
-            "is_visible": true,
-            "root_ui_element": {
-              "base_data": {
-                "position": {
-                  "x": 100,
-                  "y": 300
-                },
-                "size": {
-                  "x": 150,
-                  "y": 50
-                },
-                "children_active": false,
-                "children": [],
-                "layout": "Horizontal",
-                "spacing_strategy": "None"
-              }
-            }
-          }
-        },
-        {
-          "c_user_interface": {
-            "ui_name": "quit_button",
-            "is_visible": false,
-            "root_ui_element": {
-              "base_data": {
-                "position": {
-                  "x": 100,
-                  "y": 400
-                },
-                "size": {
-                  "x": 150,
-                  "y": 50
-                },
-                "children_active": false,
-                "children": [],
-                "layout": "Horizontal",
-                "spacing_strategy": "None"
-              }
-            }
-          }
-        },
-        {
+          "index": 2,
           "c_ui_state": {
             "ui_states": [
               {
-                "state_key": "menu_state",
+                "state_key": "show_panel_a",
                 "state_to_ui_visibility": {
-                  "ui_names_on": ["main_menu", "play_button"],
-                  "ui_names_off": ["settings_panel", "quit_button"]
+                  "ui_names_on": ["panel_a"],
+                  "ui_names_off": ["panel_b"]
                 },
                 "subscribers": [
                   {
                     "event_type_data": "EVENT_TOGGLE_UI",
                     "trigger_data_type": "UserInterfaceNameData",
                     "trigger_data": {
-                      "id": "menu_state"
+                      "id": "show_panel_a"
                     },
                     "active": false
                   }
                 ]
               }
             ]
+          }
+        }
+      ]
+    },
+    "event_bus": {
+      "description": "Event lifetime decremented but still active",
+      "events": [
+        {
+          "event_lifetime": 1,
+          "event_type": "EVENT_TOGGLE_UI",
+          "event_data_data_type": "UserInterfaceNameData",
+          "event_data_data": {
+            "id": "show_panel_a"
           }
         }
       ]

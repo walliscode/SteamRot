@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "entity_test_helpers.h"
 #include "CGrimoireMachina.h"
+#include "CUIState.h"
 #include "CUserInterface.h"
 #include "FlatbuffersDataLoader.h"
 #include "archetype_helpers.h"
@@ -64,6 +65,10 @@ void TestArchetypesOfConfiguredEMPfromDefaultData(
     if (entity_data->c_grimoire_machina()) {
       CGrimoireMachina c_grimoire_machina;
       archetype_id.set(c_grimoire_machina.GetComponentRegisterIndex());
+    }
+    if (entity_data->c_ui_state()) {
+      CUIState c_ui_state;
+      archetype_id.set(c_ui_state.GetComponentRegisterIndex());
     }
     // fill in further components as needed
 

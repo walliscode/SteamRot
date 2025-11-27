@@ -56,25 +56,8 @@ void UpdateCUserInterfaceVisibilityFromCUIState(
       }
     }
 
-    /////////////////////////////////////////////////
-    /// TOGGLE SYSTEM
-    /// The UI components are toggled on/off by a sinygle state key.
-    /// So we use the state_values map to gets the current value of the state
-    /// key and then use and logic to toggle it
-    /////////////////////////////////////////////////
-
     // if all subscribers are active, set UI components on/off accordingly
     if (all_active) {
-
-      // check state key exists in state_values map, if not, skip
-      auto state_value_it = ui_state.m_state_values.find(state_key);
-      if (state_value_it == ui_state.m_state_values.end()) {
-        continue;
-      }
-
-      // flip state value and use the new value to toggle UI components
-      bool &state_value = state_value_it->second;
-      state_value = !state_value;
 
       // attempt to find UI visibility state for this state key, if not found,
       // skip
@@ -89,13 +72,14 @@ void UpdateCUserInterfaceVisibilityFromCUIState(
             entity::memory::GetComponent<CUserInterface>(ui_index_on,
                                                          scene_entities);
 
-        ui_component.m_visible = state_value && true;
+        ui_component.m_visible = true;
       }
       for (const size_t ui_index_off : ui_visibility_state.m_ui_indices_off) {
         CUserInterface &ui_component =
             entity::memory::GetComponent<CUserInterface>(ui_index_off,
                                                          scene_entities);
-        ui_component.m_visible = state_value && false;
+
+        ui_component.m_visible = false;
       }
     }
 

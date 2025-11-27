@@ -13,7 +13,6 @@ table UIStateMapping {
 table UIStateData {
   // Collection of state key to UI visibility mappings
   state_key: string (required);
-  state_value: bool;
   state_to_ui_visibility: UIStateMapping;
   subscribers: [SubscriberData];
 }
