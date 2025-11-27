@@ -1,6 +1,13 @@
 include(CTest)
 include(Catch)
 
+# Define STEAMROT_TEST_MODE for all test targets
+# This enables test-specific features in the game engine:
+# - Runtime logic injection
+# - Data injection
+# - Headless mode
+add_compile_definitions(STEAMROT_TEST_MODE)
+
 # Test utilities and shared context
 add_subdirectory(context)
 

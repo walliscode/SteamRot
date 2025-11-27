@@ -1,5 +1,6 @@
 add_executable(test_systems
 GameEngine.test.cpp
+game_engine_config.test.cpp
 )
 
 target_include_directories(test_systems

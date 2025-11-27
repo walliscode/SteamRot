@@ -9,6 +9,7 @@
 #include "SubscriberFactory.h"
 #include "event_processing.h"
 #include "events_generated.h"
+#include "game_engine_config.h"
 #include "game_loop.h"
 #include "resources_configuration.h"
 #include <SFML/Graphics.hpp>
@@ -22,11 +23,20 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
+// Compile-time configuration check
+// In test builds: ENABLE_RUNTIME_LOGIC_INJECTION = true
+// In production builds: ENABLE_RUNTIME_LOGIC_INJECTION = false
+// This allows test-specific features without runtime overhead in production
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
 
 GameEngine::GameEngine(EnvironmentType env_type)
     : m_game_context(m_game_resources), m_scene_manager(m_game_context),
       m_display_manager(m_game_resources.game_window, m_scene_manager) {
   // Set initial environment type and loop number
+  // In production builds, env_type should be Production
+  // In test builds, env_type can be Test for test-specific behavior
   m_game_resources.env_type = env_type;
   m_game_resources.loop_number = 1;
 }
