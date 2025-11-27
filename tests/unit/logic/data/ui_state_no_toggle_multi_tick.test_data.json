@@ -2,14 +2,7 @@
   "metadata": {
     "test_name": "ui_state_no_toggle_multi_tick",
     "description": "Test that UI state updates do NOT toggle visibility back and forth over multiple ticks. When a state key is set, the corresponding UI visibility should be SET (not toggled) and remain stable across ticks. This tests the desired behavior where each state is responsible for one specific UI visibility configuration, not toggling between states.",
-    "tags": [
-      "unit",
-      "logic",
-      "ui",
-      "state",
-      "multi-tick",
-      "no-toggle"
-    ],
+    "tags": ["unit", "logic", "ui", "state", "multi-tick", "no-toggle"],
     "expected_to_pass": true,
     "version": 1
   },
@@ -106,7 +99,7 @@
       "description": "EVENT_TOGGLE_UI event with long lifetime to trigger subscriber on multiple ticks",
       "events": [
         {
-          "event_lifetime": 5,
+          "event_lifetime": 4,
           "event_type": "EVENT_TOGGLE_UI",
           "event_data_data_type": "UserInterfaceNameData",
           "event_data_data": {
@@ -271,7 +264,7 @@
                 "ui_states": [
                   {
                     "state_key": "show_panel_a",
-                    "state_value": "true",
+                    "state_value": "false",
                     "state_to_ui_visibility": {
                       "ui_names_on": ["panel_a"],
                       "ui_names_off": ["panel_b"]
@@ -484,7 +477,7 @@
       "description": "Event lifetime decremented but still active",
       "events": [
         {
-          "event_lifetime": 2,
+          "event_lifetime": 1,
           "event_type": "EVENT_TOGGLE_UI",
           "event_data_data_type": "UserInterfaceNameData",
           "event_data_data": {
