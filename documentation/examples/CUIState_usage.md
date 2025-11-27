@@ -6,7 +6,6 @@ The `CUIState` component manages UI visibility based on scene state. It maps sta
 
 ## Architecture
 
-- **State Storage**: `std::unordered_map<std::string, bool>` - Maps state keys to boolean values
 - **UI Visibility**: `std::unordered_map<std::string, UIVisibilityState>` - Maps state keys to UI configurations
 - **Subscribers**: `std::unordered_map<std::string, std::vector<std::shared_ptr<Subscriber>>>` - Maps state keys to multiple event subscribers
 
@@ -23,14 +22,14 @@ include "subscriber_config.fbs";
 namespace steamrot;
 
 table UIStateMapping {
-  state_key: string (required);
   ui_names_on: [string];
   ui_names_off: [string];
-  subscribers: [SubscriberData];  // Multiple subscriber configurations
 }
 
 table UIStateData {
-  mappings: [UIStateMapping] (required);
+  state_key: string (required);
+  state_to_ui_visibility: UIStateMapping;
+  subscribers: [SubscriberData];
 }
 ```
 
@@ -152,10 +151,9 @@ This activates "pause_menu_open" when Escape **OR** P is pressed.
 
 When `FlatbuffersConfigurator` processes a `CUIState` component:
 
-1. For each `UIStateMapping`:
+1. For each `UIStateData`:
    - Resolves UI component names to entity indices
    - Stores the visibility configuration
-   - Initializes the state value to `false`
    - Creates and registers all subscribers (if provided)
 
 ### 2. Runtime Phase
@@ -165,35 +163,14 @@ The `UIStateLogic` runs every frame as an Action logic:
 1. Finds all entities with active `CUIState` components
 2. For each state's subscribers:
    - Checks if **ALL** subscribers are active (AND logic)
-   - If all subscribers are active: Sets the state value to `true`
+   - If all subscribers are active: Sets UI visibility based on configuration
    - Deactivates all subscribers after processing
 
-### 3. State Usage
+### 3. UI Visibility
 
-Other logic classes can check state values:
-
-```cpp
-// Get the CUIState component
-CUIState &ui_state = emp_helpers::GetComponent<CUIState>(
-    entity_id, entity_memory_pool);
-
-// Check if a state is active
-if (ui_state.m_state_values["menu_open"]) {
-  // Menu is open - handle accordingly
-  
-  // Get the UI visibility configuration
-  const UIVisibilityState &visibility = 
-      ui_state.m_state_to_ui_visibility["menu_open"];
-  
-  // Show/hide UI elements based on configuration
-  for (size_t ui_index : visibility.m_ui_indices_on) {
-    // Show UI at ui_index
-  }
-  for (size_t ui_index : visibility.m_ui_indices_off) {
-    // Hide UI at ui_index
-  }
-}
-```
+When a state is triggered, the system:
+- Shows UI elements in `m_ui_indices_on`
+- Hides UI elements in `m_ui_indices_off`
 
 ## Event Flow Example
 
@@ -204,9 +181,8 @@ if (ui_state.m_state_values["menu_open"]) {
 3. EventHandler activates matching subscribers
 4. UIStateLogic runs and checks subscribers
 5. Finds the "menu_open" subscriber is active
-6. Sets `m_state_values["menu_open"] = true`
+6. Sets UI visibility based on the state's configuration
 7. Deactivates the subscriber
-8. Other logic can now check the state and respond
 
 ### Complex Example: Multiple Subscribers (AND Logic)
 
@@ -217,9 +193,8 @@ With multiple subscribers, **ALL** of them must be active to activate the state:
 3. User presses and holds **Ctrl** key - second subscriber activates
 4. User presses **S** key - third subscriber activates
 5. UIStateLogic runs and finds **ALL** three subscribers active
-6. Sets `m_state_values["secret_menu_unlock"] = true`
+6. Sets UI visibility for "secret_menu_unlock" state
 7. Deactivates all three subscribers
-8. The state remains true until explicitly reset
 
 This enables AND logic: the state activates only if Shift **AND** Ctrl **AND** S are all pressed.
 
@@ -244,9 +219,7 @@ For OR logic, repeat the state key in multiple mappings:
 
 4. **Subscriber Design**: Keep trigger conditions simple and specific. Complex logic should be in Logic classes, not in subscriber triggers.
 
-5. **State Reset**: States persist until explicitly changed. If you need a state to reset, create another subscriber or Logic that sets it back to false.
-
-6. **Testing**: Use the `SubscriberFactory` to create and register subscribers for testing:
+5. **Testing**: Use the `SubscriberFactory` to create and register subscribers for testing:
 
 ```cpp
 SubscriberFactory subscriber_factory(event_handler);
@@ -257,12 +230,11 @@ auto subscriber_result = subscriber_factory.CreateAndRegisterSubscriber(
 ## Component Members
 
 - `m_state_to_ui_visibility`: Maps state keys to UI visibility configurations
-- `m_state_values`: Maps state keys to their current boolean values (default: false)
 - `m_state_subscribers`: Maps state keys to a vector of subscribers (ALL must be active for AND logic)
 
 ## Related Classes
 
-- **UIStateLogic**: Processes subscriber activations and updates state values
+- **UIStateLogic**: Processes subscriber activations and updates UI visibility
 - **FlatbuffersConfigurator**: Configures CUIState from FlatBuffers data
 - **SubscriberFactory**: Creates and registers subscribers with EventHandler
 - **Subscriber**: Lightweight event listener that gets activated when events match

@@ -212,7 +212,6 @@
             "ui_states": [
               {
                 "state_key": "menu_state",
-                "state_value": "false",
                 "state_to_ui_visibility": {
                   "ui_names_on": ["main_menu", "play_button"],
                   "ui_names_off": ["settings_panel", "quit_button"]
@@ -409,7 +408,6 @@
                 "ui_states": [
                   {
                     "state_key": "menu_state",
-                    "state_value": "false",
                     "state_to_ui_visibility": {
                       "ui_names_on": ["main_menu", "play_button"],
                       "ui_names_off": ["settings_panel", "quit_button"]
@@ -624,7 +622,6 @@
                 "ui_states": [
                   {
                     "state_key": "menu_state",
-                    "state_value": "true",
                     "state_to_ui_visibility": {
                       "ui_names_on": ["main_menu", "play_button"],
                       "ui_names_off": ["settings_panel", "quit_button"]
@@ -825,7 +822,6 @@
             "ui_states": [
               {
                 "state_key": "menu_state",
-                "state_value": "true",
                 "state_to_ui_visibility": {
                   "ui_names_on": ["main_menu", "play_button"],
                   "ui_names_off": ["settings_panel", "quit_button"]

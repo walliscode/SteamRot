@@ -199,15 +199,6 @@ FlatbuffersConfigurator::ConfigureComponent(
     // Store the visibility state for this state key
     ui_state_component.m_state_to_ui_visibility[state_key] = visibility_state;
 
-    // if starting state is provided, set it
-    if (ui_state_data->state_value()) {
-      ui_state_component.m_state_values[state_key] =
-          ui_state_data->state_value();
-    } else {
-      // default to false
-      ui_state_component.m_state_values[state_key] = false;
-    }
-
     // Create SubscriberFactory for registering subscribers
     SubscriberFactory subscriber_factory(m_event_handler);
 

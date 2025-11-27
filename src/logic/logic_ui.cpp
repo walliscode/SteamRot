@@ -59,16 +59,6 @@ void UpdateCUserInterfaceVisibilityFromCUIState(
     // if all subscribers are active, set UI components on/off accordingly
     if (all_active) {
 
-      // check state key exists in state_values map, if not, skip
-      auto state_value_it = ui_state.m_state_values.find(state_key);
-      if (state_value_it == ui_state.m_state_values.end()) {
-        continue;
-      }
-
-      // flip state value and use the new value to toggle UI components
-      bool &state_value = state_value_it->second;
-      state_value = !state_value;
-
       // attempt to find UI visibility state for this state key, if not found,
       // skip
       auto ui_visibility_it = ui_state.m_state_to_ui_visibility.find(state_key);
