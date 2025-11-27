@@ -9,6 +9,7 @@
 #include "CraftingScene.h"
 #include "logic_execution.h"
 #include "scene_change_packet_generated.h"
+#include <SFML/Graphics/Color.hpp>
 
 namespace steamrot {
 /////////////////////////////////////////////////
@@ -36,7 +37,11 @@ void CraftingScene::sCollision() {
 
 /////////////////////////////////////////////////
 void CraftingScene::sRender() {
-  // Execute render logics using extracted free function
-  logic::execution::ExecuteRenderLogics(m_logic_map);
+  // clear the render texture
+  m_scene_resources.scene_texture.clear(sf::Color::Black);
+  // process render logic
+  for (auto &render_logic : m_logic_map[LogicType::Render]) {
+    render_logic->RunLogic();
+  }
 }
 } // namespace steamrot
