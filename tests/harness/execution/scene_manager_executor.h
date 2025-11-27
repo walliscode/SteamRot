@@ -15,8 +15,8 @@
 #include "FailInfo.h"
 #include "GameResources.h"
 #include "SceneManager.h"
-#include "event_sequence_generated.h"
-#include "input_sequence_generated.h"
+#include "event_test_data_generated.h"
+#include "input_test_data_generated.h"
 #include "scene_type_generated.h"
 #include <expected>
 
