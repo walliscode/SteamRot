@@ -4,6 +4,28 @@ This directory contains design proposals for new features or significant changes
 
 ## Active Proposals
 
+### [Unified Tick Architecture](UNIFIED_TICK_ARCHITECTURE.md)
+
+**Status**: Proposal  
+**Date**: 2025-11-27  
+**Type**: Architecture Unification
+
+**Summary**: Addresses the architectural divergence between the game engine's main loop and the test harness execution model. Creates a unified tick execution abstraction that both systems can use.
+
+**Key Points**:
+1. Common derivative for test harness and game engine loop ordering
+2. Logic provider interface for injectable logic configuration
+3. Unified data loading patterns for game and tests
+4. Clarification of expected_data_collection vs tick_snapshots
+5. Rename TestContext to reduce confusion with GameContext/SceneContext
+
+**Implementation Complexity**: Medium
+- Creates new abstractions (TickExecutor, ILogicProvider, IEntityDataSource)
+- Refactors game engine and test harness to use common base
+- Incremental migration path provided
+
+---
+
 ### [Tick-by-Tick Entity State Comparison](TICK_BY_TICK_COMPARISON_DESIGN.md)
 
 **Status**: Proposal  
