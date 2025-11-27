@@ -169,67 +169,6 @@ TEST_CASE("EventHandler::TickGlobalEventBus updates the global event bus",
   REQUIRE(global_event_bus.empty());
 }
 
-TEST_CASE("EventHandler::ResetAllSubscribers resets all subscribers to inactive",
-          "[unit][EventHandler]") {
-  // Create an EventHandler instance
-  steamrot::EventHandler event_handler;
-
-  // Create subscribers with different event types
-  const steamrot::EventType event_type1 =
-      steamrot::EventType::EventType_EVENT_USER_INPUT;
-  const steamrot::EventType event_type2 =
-      steamrot::EventType::EventType_EVENT_QUIT_GAME;
-
-  std::shared_ptr<steamrot::Subscriber> subscriber1 =
-      std::make_shared<steamrot::Subscriber>(event_type1);
-  std::shared_ptr<steamrot::Subscriber> subscriber2 =
-      std::make_shared<steamrot::Subscriber>(event_type2);
-
-  // Register subscribers
-  auto result1 = event_handler.RegisterSubscriber(subscriber1);
-  REQUIRE(result1.has_value());
-  auto result2 = event_handler.RegisterSubscriber(subscriber2);
-  REQUIRE(result2.has_value());
-
-  // Manually set subscribers to active
-  subscriber1->m_active = true;
-  subscriber2->m_active = true;
-  REQUIRE(subscriber1->m_active);
-  REQUIRE(subscriber2->m_active);
-
-  // Reset all subscribers
-  event_handler.ResetAllSubscribers();
-
-  // Check that all subscribers are now inactive
-  REQUIRE_FALSE(subscriber1->m_active);
-  REQUIRE_FALSE(subscriber2->m_active);
-}
-
-TEST_CASE("EventHandler::TickGlobalEventBus resets all subscribers",
-          "[unit][EventHandler]") {
-  // Create an EventHandler instance
-  steamrot::EventHandler event_handler;
-
-  // Create and register a subscriber
-  const steamrot::EventType event_type =
-      steamrot::EventType::EventType_EVENT_USER_INPUT;
-  std::shared_ptr<steamrot::Subscriber> subscriber =
-      std::make_shared<steamrot::Subscriber>(event_type);
-
-  auto result = event_handler.RegisterSubscriber(subscriber);
-  REQUIRE(result.has_value());
-
-  // Manually set subscriber to active
-  subscriber->m_active = true;
-  REQUIRE(subscriber->m_active);
-
-  // Tick the global event bus (which should also reset subscribers)
-  event_handler.TickGlobalEventBus();
-
-  // Check that the subscriber is now inactive
-  REQUIRE_FALSE(subscriber->m_active);
-}
-
 TEST_CASE("UpdateSubscribers turns on Subscribers",
           "[unit][EventHandler]") {
 

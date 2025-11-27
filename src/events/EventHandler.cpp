@@ -49,22 +49,6 @@ void EventHandler::TickGlobalEventBus() {
   DecrementEventLifetimes(m_global_event_bus);
   // remove all events with a lifetime of 0
   RemoveDeadEvents(m_global_event_bus);
-  // reset all subscribers to inactive state for the next frame
-  ResetAllSubscribers();
-}
-
-/////////////////////////////////////////////////
-void EventHandler::ResetAllSubscribers() {
-  // iterate through all event types in the subscriber register
-  for (auto &[event_type, subscribers] : m_subscriber_register) {
-    // reset each subscriber to inactive
-    for (auto &subscriber_weak : subscribers) {
-      auto locked_subscriber = subscriber_weak.lock();
-      if (locked_subscriber) {
-        locked_subscriber->m_active = false;
-      }
-    }
-  }
 }
 
 /////////////////////////////////////////////////

@@ -101,14 +101,6 @@ public:
   void TickGlobalEventBus();
 
   /////////////////////////////////////////////////
-  /// @brief Reset all subscribers to inactive state.
-  ///
-  /// This ensures subscription activation is frame-local and prevents
-  /// cross-frame subscription persistence issues.
-  /////////////////////////////////////////////////
-  void ResetAllSubscribers();
-
-  /////////////////////////////////////////////////
   /// @brief Get the global event bus.
   ///
   /// @return A reference to the global event bus.
