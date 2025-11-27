@@ -3,12 +3,15 @@
 
 add_library(execution
   execution.cpp
-  # Additional files will be added as they are created in future stages
+  logic_executor.cpp
+  scene_executor.cpp
 )
 
 target_include_directories(execution
   PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
+  # Include parent directory for TestFixture.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
 target_link_libraries(execution

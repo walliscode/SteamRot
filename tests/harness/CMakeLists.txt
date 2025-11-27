@@ -12,6 +12,9 @@ target_include_directories(test_harness
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+# Include execution subdirectory for level-based executors (must be before linking)
+add_subdirectory(execution)
+
 target_link_libraries(test_harness
   PUBLIC
   context
@@ -21,12 +24,10 @@ target_link_libraries(test_harness
   scenes
   logic
   events
+  execution
   Catch2::Catch2
   conmat
 )
-
-# Include execution subdirectory for level-based executors
-add_subdirectory(execution)
 
 # Create test executable for harness
 add_executable(test_harness_tests
