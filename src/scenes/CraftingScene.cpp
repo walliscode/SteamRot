@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "CraftingScene.h"
+#include "logic_execution.h"
 #include "scene_change_packet_generated.h"
 
 namespace steamrot {
@@ -17,31 +18,25 @@ CraftingScene::CraftingScene(const uuids::uuid &id,
 
 /////////////////////////////////////////////////
 void CraftingScene::sAction() {
-
-  // process action logic
-  for (auto &action_logic : m_logic_map[LogicType::Action]) {
-    action_logic->RunLogic();
-  }
+  // Execute action logics using extracted free function
+  logic::execution::ExecuteActionLogics(m_logic_map);
 }
 
 /////////////////////////////////////////////////
 void CraftingScene::sMovement() {
-  // process movement logic
+  // Execute movement logics using extracted free function
+  logic::execution::ExecuteMovementLogics(m_logic_map);
 }
 
 /////////////////////////////////////////////////
 void CraftingScene::sCollision() {
-  // process collision logic
-  for (auto &collision_logic : m_logic_map[LogicType::Collision]) {
-    collision_logic->RunLogic();
-  }
+  // Execute collision logics using extracted free function
+  logic::execution::ExecuteCollisionLogics(m_logic_map);
 }
 
 /////////////////////////////////////////////////
 void CraftingScene::sRender() {
-  // process render logic
-  for (auto &render_logic : m_logic_map[LogicType::Render]) {
-    render_logic->RunLogic();
-  }
+  // Execute render logics using extracted free function
+  logic::execution::ExecuteRenderLogics(m_logic_map);
 }
 } // namespace steamrot

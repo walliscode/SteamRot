@@ -7,7 +7,9 @@
 #include "FlatbuffersDataLoader.h"
 #include "GameContext.h"
 #include "SubscriberFactory.h"
+#include "event_processing.h"
 #include "events_generated.h"
+#include "game_loop.h"
 #include "resources_configuration.h"
 #include <SFML/Graphics.hpp>
 
@@ -149,16 +151,12 @@ void GameEngine::RunGameLoop(size_t number_of_loops, bool simulation) {
 
 /////////////////////////////////////////////////
 void GameEngine::UpdateSystems() {
-  // Update Game Resources
-  UpdateGameResources(m_game_resources);
+  // Update Game Resources using extracted free function
+  game_loop::UpdateGameResources(m_game_resources);
 
-  // Preload Events, namely any external events that need adding to the waiting
-  // room
-  m_game_resources.event_handler.PreloadEvents(m_game_resources.game_window);
-  // Process Waiting Room Event Bus into Global Event Bus
-  m_game_resources.event_handler.ProcessWaitingRoomEventBus();
-  // Update Subscribers from Global Event Bus
-  m_game_resources.event_handler.UpateSubscribersFromGlobalEventBus();
+  // Process event tick start using extracted free function
+  events::processing::ProcessEventTickStart(m_game_resources.event_handler,
+                                            &m_game_resources.game_window);
 
   // Handle subscriptions for the GameEngine
   auto process_subscriptions_result = ProcessSubscriptions();
@@ -167,7 +165,6 @@ void GameEngine::UpdateSystems() {
               << process_subscriptions_result.error().message << "\n";
     m_game_resources.game_window.close();
   }
-  // Update EventHandler
 
   // Update Scenes
   m_scene_manager.UpdateSceneManager();
@@ -175,8 +172,8 @@ void GameEngine::UpdateSystems() {
   // Call Render Cycle
   auto call_render_cycle_result = m_display_manager.CallRenderCycle();
 
-  // Tick the Global Event Bus
-  m_game_resources.event_handler.TickGlobalEventBus();
+  // Process event tick end using extracted free function
+  events::processing::ProcessEventTickEnd(m_game_resources.event_handler);
 }
 
 /////////////////////////////////////////////////
@@ -276,10 +273,8 @@ const GameContext &GameEngine::GetGameContext() const { return m_game_context; }
 
 /////////////////////////////////////////////////
 void GameEngine::UpdateGameResources(GameResources &game_resources) {
-
-  // update mouse position
-  game_resources.mouse_position =
-      sf::Mouse::getPosition(game_resources.game_window);
+  // Delegate to free function for consistency
+  game_loop::UpdateGameResources(game_resources);
 }
 
 } // namespace steamrot
