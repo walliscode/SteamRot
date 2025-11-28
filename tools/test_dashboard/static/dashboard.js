@@ -725,9 +725,8 @@ function renderNextStepsAndTests(container, nextSteps, matchingTests) {
             testItem.className = 'matching-test-item';
             testItem.textContent = testName;
             testItem.addEventListener('click', () => {
-                // Find and show test details
-                const test = TEST_DATA.find(t => t.name === testName);
-                if (test) showDetails(test);
+                // Show test details panel (showDetails expects test name string)
+                showDetails(testName);
             });
             testList.appendChild(testItem);
         });
