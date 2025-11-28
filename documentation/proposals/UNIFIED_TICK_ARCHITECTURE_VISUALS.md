@@ -105,7 +105,189 @@ Legend: == indicates identical operations
 
 ## Proposed Unified Architecture
 
-### TickExecutor Class Hierarchy
+### Hybrid Approach: Free Functions with TickContext
+
+The chosen approach uses free functions with compile-time conditionals, encapsulated by a `TickContext` resource class.
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    HYBRID FREE FUNCTION ARCHITECTURE                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+                              ┌─────────────────────────┐
+                              │      TickContext        │
+                              │   (Resource Container)  │
+                              ├─────────────────────────┤
+                              │ • game_resources        │
+                              │ • scene_context         │
+                              ├─────────────────────────┤
+                              │ #ifndef TEST_BUILD      │
+                              │ • scene_manager         │
+                              │ • display_manager       │
+                              ├─────────────────────────┤
+                              │ #ifdef TEST_BUILD       │
+                              │ • test_config           │
+                              │ • current_tick          │
+                              │ • test_fixture          │
+                              └───────────┬─────────────┘
+                                          │
+                                          │ passed to
+                                          ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         namespace tick                                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  void ExecuteTick(TickContext &ctx)  ◄── Main entry point          │   │
+│  │  {                                                                   │   │
+│  │      PreTick(ctx);              // Input capture/injection          │   │
+│  │      ProcessEventBuses(ctx);    // Shared - no conditionals         │   │
+│  │      ProcessSubscriptions(ctx); // Game-only subscriptions          │   │
+│  │      ExecuteLogic(ctx);         // Scene logic or simulation        │   │
+│  │      PostLogic(ctx);            // Render or validation             │   │
+│  │      TickEventBus(ctx);         // Shared - no conditionals         │   │
+│  │  }                                                                   │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  Individual functions (all take TickContext&):                              │
+│  ┌──────────────────────┐  ┌──────────────────────┐  ┌────────────────────┐│
+│  │ PreTick()            │  │ ProcessEventBuses()  │  │ ProcessSubs()      ││
+│  │ ─────────────────    │  │ ─────────────────    │  │ ───────────────    ││
+│  │ #ifdef TEST_BUILD    │  │ (no conditionals)    │  │ #ifndef TEST_BUILD ││
+│  │   InjectInputs       │  │ ProcessWaitingRoom   │  │   SceneManager     ││
+│  │   InjectEvents       │  │ UpdateSubscribers    │  │   subscriptions    ││
+│  │ #else                │  │                      │  │                    ││
+│  │   UpdateResources    │  │                      │  │                    ││
+│  │   PreloadEvents      │  │                      │  │                    ││
+│  │ #endif               │  │                      │  │                    ││
+│  └──────────────────────┘  └──────────────────────┘  └────────────────────┘│
+│                                                                             │
+│  ┌──────────────────────┐  ┌──────────────────────┐  ┌────────────────────┐│
+│  │ ExecuteLogic()       │  │ PostLogic()          │  │ TickEventBus()     ││
+│  │ ─────────────────    │  │ ─────────────────    │  │ ───────────────    ││
+│  │ #ifdef TEST_BUILD    │  │ #ifdef TEST_BUILD    │  │ (no conditionals)  ││
+│  │   SimulationSteps    │  │   CompareSnapshot    │  │ TickGlobalEventBus ││
+│  │ #else                │  │ #else                │  │                    ││
+│  │   UpdateScenes       │  │   CallRenderCycle    │  │                    ││
+│  │ #endif               │  │ #endif               │  │                    ││
+│  └──────────────────────┘  └──────────────────────┘  └────────────────────┘│
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Compile-Time Conditionals
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    COMPILE-TIME CONFIGURATION                                │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+CMakeLists.txt:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ # Game executable - no special defines                                      │
+│ add_executable(steamrot main.cpp ...)                                       │
+│                                                                             │
+│ # Test executables - define STEAMROT_TEST_BUILD                             │
+│ add_executable(test_harness ...)                                            │
+│ target_compile_definitions(test_harness PRIVATE STEAMROT_TEST_BUILD)        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Result:
+┌───────────────────────────────┐         ┌───────────────────────────────┐
+│    Game Build (steamrot)      │         │   Test Build (test_harness)   │
+├───────────────────────────────┤         ├───────────────────────────────┤
+│                               │         │                               │
+│  PreTick():                   │         │  PreTick():                   │
+│    UpdateGameResources()      │         │    ExecuteInputEventsForTick()│
+│    PreloadEvents()            │         │    ExecuteEventsForTick()     │
+│                               │         │                               │
+│  ExecuteLogic():              │         │  ExecuteLogic():              │
+│    UpdateScenes()             │         │    ExecuteSimulationSteps()   │
+│                               │         │                               │
+│  PostLogic():                 │         │  PostLogic():                 │
+│    CallRenderCycle()          │         │    CompareTickSnapshot()      │
+│                               │         │                               │
+│  ┌───────────────────────┐   │         │   ┌───────────────────────┐   │
+│  │ scene_manager member  │   │         │   │ test_config member    │   │
+│  │ display_manager member│   │         │   │ current_tick member   │   │
+│  │                       │   │         │   │ test_fixture member   │   │
+│  └───────────────────────┘   │         │   └───────────────────────┘   │
+│                               │         │                               │
+└───────────────────────────────┘         └───────────────────────────────┘
+
+Benefits:
+✓ Wrong code paths are never compiled
+✓ No runtime overhead for conditionals  
+✓ Compiler can optimize each build independently
+✓ Type-safe: test members don't exist in game build
+```
+
+### ExecuteTick() Flow (Both Builds)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    tick::ExecuteTick(TickContext &ctx)                       │
+│                    (Guaranteed Execution Order)                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+        ┌───────────────────────────────────────────────────────┐
+        │ 1. PreTick(ctx)                         [CONDITIONAL] │
+        │    ┌────────────────────┐  ┌────────────────────────┐ │
+        │    │ Game Build         │  │ Test Build             │ │
+        │    │ • UpdateResources  │  │ • InjectInputs         │ │
+        │    │ • PreloadEvents    │  │ • InjectEvents         │ │
+        │    └────────────────────┘  └────────────────────────┘ │
+        └───────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+        ┌───────────────────────────────────────────────────────┐
+        │ 2. ProcessEventBuses(ctx)                   [SHARED]  │
+        │    └─ ProcessWaitingRoomEventBus()                    │
+        │    └─ UpdateSubscribersFromGlobalEventBus()           │
+        └───────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+        ┌───────────────────────────────────────────────────────┐
+        │ 3. ProcessSubscriptions(ctx)            [CONDITIONAL] │
+        │    ┌────────────────────┐  ┌────────────────────────┐ │
+        │    │ Game Build         │  │ Test Build             │ │
+        │    │ • SceneManager     │  │ • (no-op)              │ │
+        │    │   subscriptions    │  │                        │ │
+        │    └────────────────────┘  └────────────────────────┘ │
+        └───────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+        ┌───────────────────────────────────────────────────────┐
+        │ 4. ExecuteLogic(ctx)                    [CONDITIONAL] │
+        │    ┌────────────────────┐  ┌────────────────────────┐ │
+        │    │ Game Build         │  │ Test Build             │ │
+        │    │ • UpdateScenes     │  │ • ExecuteSimulation    │ │
+        │    │   (LogicMap)       │  │   (SimulationData)     │ │
+        │    └────────────────────┘  └────────────────────────┘ │
+        └───────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+        ┌───────────────────────────────────────────────────────┐
+        │ 5. PostLogic(ctx)                       [CONDITIONAL] │
+        │    ┌────────────────────┐  ┌────────────────────────┐ │
+        │    │ Game Build         │  │ Test Build             │ │
+        │    │ • CallRenderCycle  │  │ • CompareSnapshot      │ │
+        │    └────────────────────┘  └────────────────────────┘ │
+        └───────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+        ┌───────────────────────────────────────────────────────┐
+        │ 6. TickEventBus(ctx)                          [SHARED]│
+        │    └─ TickGlobalEventBus()                            │
+        └───────────────────────────────────────────────────────┘
+```
+
+---
+
+### Original Inheritance Approach (Not Chosen)
+
+For reference, the originally proposed inheritance-based approach:
 
 ```
                     ┌─────────────────────────┐
@@ -116,7 +298,7 @@ Legend: == indicates identical operations
                     │ # m_game_resources      │
                     ├─────────────────────────┤
                     │ + ExecuteTick()         │◄─── Template Method Pattern
-                    │ # OnPreTick()           │     Defines execution order
+                    │ # OnPreTick()           │     (virtual methods)
                     │ # OnProcessEvents()     │
                     │ # OnExecuteLogic()      │
                     │ # OnPostLogic()         │
@@ -127,92 +309,13 @@ Legend: == indicates identical operations
                 ▼                               ▼
 ┌───────────────────────────────┐   ┌───────────────────────────────┐
 │     GameTickExecutor          │   │     TestTickExecutor          │
-├───────────────────────────────┤   ├───────────────────────────────┤
-│ - m_scene_manager             │   │ - m_config                    │
-│ - m_display_manager           │   │ - m_current_tick              │
-├───────────────────────────────┤   │ - m_fixture                   │
-│ # OnPreTick()                 │   ├───────────────────────────────┤
-│   └─ UpdateGameResources      │   │ # OnPreTick()                 │
-│   └─ PreloadEvents            │   │   └─ ExecuteInputEvents       │
-│                               │   │   └─ ExecuteEvents            │
-│ # OnProcessEvents()           │   │                               │
-│   └─ ProcessSubscriptions     │   │ # OnProcessEvents()           │
-│                               │   │   └─ (optional)               │
-│ # OnExecuteLogic()            │   │                               │
-│   └─ UpdateScenes             │   │ # OnExecuteLogic()            │
-│                               │   │   └─ ExecuteSimulation        │
-│ # OnPostLogic()               │   │                               │
-│   └─ CallRenderCycle          │   │ # OnPostLogic()               │
-└───────────────────────────────┘   │   └─ CompareTickSnapshot      │
-                                    └───────────────────────────────┘
-```
+│   (inherits TickExecutor)     │   │   (inherits TickExecutor)     │
+└───────────────────────────────┘   └───────────────────────────────┘
 
-### ExecuteTick() Method (Common for Both)
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                     TickExecutor::ExecuteTick()                             │
-│                     (Guaranteed Execution Order)                            │
-└─────────────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-        ┌───────────────────────────────────────────────────────┐
-        │ 1. OnPreTick()                              [VIRTUAL] │
-        │    ┌────────────────────┐  ┌────────────────────────┐ │
-        │    │ GameTickExecutor   │  │ TestTickExecutor       │ │
-        │    │ • UpdateResources  │  │ • InjectInputs         │ │
-        │    │ • PreloadEvents    │  │ • InjectEvents         │ │
-        │    └────────────────────┘  └────────────────────────┘ │
-        └───────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-        ┌───────────────────────────────────────────────────────┐
-        │ 2. ProcessWaitingRoomEventBus()           [CONCRETE]  │
-        │    └─ Shared implementation in base class             │
-        └───────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-        ┌───────────────────────────────────────────────────────┐
-        │ 3. UpdateSubscribersFromGlobalEventBus()  [CONCRETE]  │
-        │    └─ Shared implementation in base class             │
-        └───────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-        ┌───────────────────────────────────────────────────────┐
-        │ 4. OnProcessEvents()                        [VIRTUAL] │
-        │    ┌────────────────────┐  ┌────────────────────────┐ │
-        │    │ GameTickExecutor   │  │ TestTickExecutor       │ │
-        │    │ • ProcessSubs      │  │ • (optional)           │ │
-        │    │   (GameEngine)     │  │                        │ │
-        │    │ • ProcessSubs      │  │                        │ │
-        │    │   (SceneManager)   │  │                        │ │
-        │    └────────────────────┘  └────────────────────────┘ │
-        └───────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-        ┌───────────────────────────────────────────────────────┐
-        │ 5. OnExecuteLogic()                         [VIRTUAL] │
-        │    ┌────────────────────┐  ┌────────────────────────┐ │
-        │    │ GameTickExecutor   │  │ TestTickExecutor       │ │
-        │    │ • UpdateScenes     │  │ • ExecuteSimulation    │ │
-        │    │   (LogicMap)       │  │   (SimulationData)     │ │
-        │    └────────────────────┘  └────────────────────────┘ │
-        └───────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-        ┌───────────────────────────────────────────────────────┐
-        │ 6. OnPostLogic()                            [VIRTUAL] │
-        │    ┌────────────────────┐  ┌────────────────────────┐ │
-        │    │ GameTickExecutor   │  │ TestTickExecutor       │ │
-        │    │ • CallRenderCycle  │  │ • CompareSnapshot      │ │
-        │    └────────────────────┘  └────────────────────────┘ │
-        └───────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-        ┌───────────────────────────────────────────────────────┐
-        │ 7. TickGlobalEventBus()                   [CONCRETE]  │
-        │    └─ Shared implementation in base class             │
-        └───────────────────────────────────────────────────────┘
+Not chosen because:
+- Vtable overhead
+- Both game and test code compiled together
+- More boilerplate
 ```
 
 ---
@@ -455,39 +558,41 @@ METADATA CONTEXT (holds test information):
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                    UNIFIED TICK ARCHITECTURE OVERVIEW                        │
+│              UNIFIED TICK ARCHITECTURE OVERVIEW (Hybrid Approach)            │
 └─────────────────────────────────────────────────────────────────────────────┘
 
-                              ┌─────────────────┐
-                              │  TickExecutor   │
-                              │ (Abstract Base) │
-                              └────────┬────────┘
-                                       │
-            ┌──────────────────────────┼──────────────────────────┐
-            │                          │                          │
-            ▼                          │                          ▼
-  ┌─────────────────┐                  │               ┌─────────────────┐
-  │ GameTickExecutor│                  │               │ TestTickExecutor│
-  └────────┬────────┘                  │               └────────┬────────┘
-           │                           │                        │
-           │                           │                        │
-           ▼                           ▼                        ▼
-  ┌─────────────────┐         ┌─────────────────┐      ┌─────────────────┐
-  │ SceneLogic-     │         │ ILogicProvider  │      │ SimulationLogic-│
-  │ Provider        │◄────────│  (Interface)    │─────▶│ Provider        │
-  └─────────────────┘         └─────────────────┘      └─────────────────┘
-           │                                                    │
-           │                                                    │
-           ▼                                                    ▼
-  ┌─────────────────┐         ┌─────────────────┐      ┌─────────────────┐
-  │ DefaultScene-   │         │ IEntityData-    │      │ TestDataSource  │
-  │ DataSource      │◄────────│ Source          │─────▶│                 │
-  └─────────────────┘         └─────────────────┘      └─────────────────┘
+                              ┌─────────────────────────┐
+                              │      TickContext        │
+                              │  (Resource Container)   │
+                              └───────────┬─────────────┘
+                                          │
+                                          │ passed to
+                                          ▼
+                        ┌─────────────────────────────────────┐
+                        │       tick::ExecuteTick(ctx)        │
+                        │   (Free function with ordering)     │
+                        └───────────────┬─────────────────────┘
+                                        │
+                                        │ calls (in order)
+            ┌───────────┬───────────────┼───────────────┬───────────┐
+            ▼           ▼               ▼               ▼           ▼
+     ┌──────────┐ ┌──────────┐   ┌──────────┐   ┌──────────┐ ┌──────────┐
+     │ PreTick  │ │ Process- │   │ Process- │   │ Execute- │ │ PostLogic│
+     │          │ │ EventBus │   │ Subs     │   │ Logic    │ │          │
+     └────┬─────┘ └────┬─────┘   └────┬─────┘   └────┬─────┘ └────┬─────┘
+          │            │              │              │            │
+          │            │              │              │            │
+     [CONDITIONAL]  [SHARED]    [CONDITIONAL]  [CONDITIONAL] [CONDITIONAL]
+          │            │              │              │            │
+    ┌─────┴─────┐      │        ┌─────┴─────┐  ┌─────┴─────┐ ┌─────┴─────┐
+    │Game│Test │      │        │Game│(none)│  │Game│Test │ │Game│Test │
+    └────┴─────┘      │        └────┴──────┘  └────┴─────┘ └────┴─────┘
+
 
 Benefits:
-✓ Consistent execution order
-✓ Injectable logic configuration
-✓ Unified data loading
-✓ Clear naming conventions
-✓ Reduced code duplication
+✓ Free functions - simpler, no vtable overhead
+✓ Compile-time conditionals - wrong code never compiled
+✓ Resource class - prevents misuse
+✓ Guaranteed execution order via ExecuteTick()
+✓ Individual functions testable in isolation
 ```

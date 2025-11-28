@@ -134,136 +134,191 @@ ExecuteTickBasedTest(config, fixture)
 
 ## Proposed Solutions
 
-### Solution 1: Unified Tick Executor
+### Solution 1: Hybrid Free Function Approach with Resource Classes
 
-Create a common `TickExecutor` class that both the game engine and test harness can use:
+**Design Decision**: After discussion, a hybrid approach is preferred over pure inheritance:
+- **Free functions** for tick execution steps (simpler, more flexible)
+- **Compile-time conditionals** for game vs test differences
+- **Resource classes** to encapsulate required resources and prevent misuse
+
+The key insight is that misuse is prevented by requiring the appropriate resource class - you can't call a function without having the resources it needs.
+
+#### TickContext - Resource Container
 
 ```cpp
 /////////////////////////////////////////////////
-/// @class TickExecutor
-/// @brief Abstract base class for tick-based execution
+/// @struct TickContext
+/// @brief Container for resources needed during tick execution
 ///
-/// Provides a consistent execution order for game ticks.
-/// Derived classes can customize specific phases.
+/// Encapsulates all resources required for tick execution.
+/// Functions require this context, preventing misuse.
 /////////////////////////////////////////////////
-class TickExecutor {
-protected:
-  SceneContext &m_scene_context;
-  GameResources &m_game_resources;
+struct TickContext {
+  GameResources &game_resources;
+  SceneContext &scene_context;
+  
+  // Game-specific resources (only present in game builds)
+#ifndef STEAMROT_TEST_BUILD
+  SceneManager *scene_manager = nullptr;
+  DisplayManager *display_manager = nullptr;
+#endif
 
-  /////////////////////////////////////////////////
-  /// @brief Hook for pre-tick processing (input capture)
-  /////////////////////////////////////////////////
-  virtual void OnPreTick() = 0;
-
-  /////////////////////////////////////////////////
-  /// @brief Hook for event processing
-  /////////////////////////////////////////////////
-  virtual void OnProcessEvents() = 0;
-
-  /////////////////////////////////////////////////
-  /// @brief Hook for logic execution
-  /////////////////////////////////////////////////
-  virtual void OnExecuteLogic() = 0;
-
-  /////////////////////////////////////////////////
-  /// @brief Hook for post-logic processing (rendering, validation)
-  /////////////////////////////////////////////////
-  virtual void OnPostLogic() = 0;
-
-public:
-  /////////////////////////////////////////////////
-  /// @brief Execute a single tick with consistent ordering
-  /////////////////////////////////////////////////
-  void ExecuteTick() {
-    // 1. Pre-tick (input capture/injection)
-    OnPreTick();
-    
-    // 2. Event processing (consistent order)
-    m_game_resources.event_handler.ProcessWaitingRoomEventBus();
-    m_game_resources.event_handler.UpdateSubscribersFromGlobalEventBus();
-    
-    // 3. Process events
-    OnProcessEvents();
-    
-    // 4. Execute logic
-    OnExecuteLogic();
-    
-    // 5. Post-logic (rendering, validation)
-    OnPostLogic();
-    
-    // 6. Tick event bus (consistent)
-    m_game_resources.event_handler.TickGlobalEventBus();
-  }
+  // Test-specific resources (only present in test builds)
+#ifdef STEAMROT_TEST_BUILD
+  const TestDataConfig *test_config = nullptr;
+  uint32_t current_tick = 0;
+  TestFixture *test_fixture = nullptr;
+#endif
 };
 ```
 
-#### Game Engine Implementation
+#### Free Functions for Tick Execution
 
 ```cpp
-class GameTickExecutor : public TickExecutor {
-  SceneManager &m_scene_manager;
-  DisplayManager &m_display_manager;
-  
-protected:
-  void OnPreTick() override {
-    UpdateGameResources(m_game_resources);
-    m_game_resources.event_handler.PreloadEvents(m_game_resources.game_window);
-  }
-  
-  void OnProcessEvents() override {
-    // Process game-engine level subscriptions
-    ProcessSubscriptions();
-    // Process scene-manager level subscriptions
-    m_scene_manager.ProcessSubscriptions();
-  }
-  
-  void OnExecuteLogic() override {
-    // Execute scene logic (sAction → sCollision → sRender)
-    m_scene_manager.UpdateScenes();
-  }
-  
-  void OnPostLogic() override {
-    m_display_manager.CallRenderCycle();
-  }
-};
-```
+namespace tick {
 
-#### Test Harness Implementation
+/////////////////////////////////////////////////
+/// @brief Execute pre-tick phase (input capture/injection)
+/////////////////////////////////////////////////
+void PreTick(TickContext &ctx) {
+#ifdef STEAMROT_TEST_BUILD
+  // Test: Inject simulated inputs and events
+  ExecuteInputEventsForTick(ctx.test_config->input_sequence(), 
+                            ctx.current_tick, *ctx.test_fixture);
+  ExecuteEventsForTick(ctx.test_config->event_sequence(), 
+                       ctx.current_tick, *ctx.test_fixture);
+#else
+  // Game: Capture real SFML events
+  UpdateGameResources(ctx.game_resources);
+  ctx.game_resources.event_handler.PreloadEvents(ctx.game_resources.game_window);
+#endif
+}
 
-```cpp
-class TestTickExecutor : public TickExecutor {
-  const TestDataConfig *m_config;
-  uint32_t m_current_tick;
-  TestFixture &m_fixture;
-  
-protected:
-  void OnPreTick() override {
-    // Inject simulated inputs
-    ExecuteInputEventsForTick(m_config->input_sequence(), m_current_tick, m_fixture);
-    // Inject simulated events  
-    ExecuteEventsForTick(m_config->event_sequence(), m_current_tick, m_fixture);
-  }
-  
-  void OnProcessEvents() override {
-    // Test harness may not have scene-manager subscriptions
-    // This could be empty or configurable
-  }
-  
-  void OnExecuteLogic() override {
-    // Execute simulation steps (custom logic configuration)
-    if (m_config->simulation_data() && m_config->simulation_data()->steps()) {
-      for (const SimulationStep *step : *m_config->simulation_data()->steps()) {
-        ExecuteSimulationStep(step, m_scene_context);
-      }
+/////////////////////////////////////////////////
+/// @brief Process event buses (shared - no conditional needed)
+/////////////////////////////////////////////////
+void ProcessEventBuses(TickContext &ctx) {
+  ctx.game_resources.event_handler.ProcessWaitingRoomEventBus();
+  ctx.game_resources.event_handler.UpdateSubscribersFromGlobalEventBus();
+}
+
+/////////////////////////////////////////////////
+/// @brief Process subscriptions
+/////////////////////////////////////////////////
+void ProcessSubscriptions(TickContext &ctx) {
+#ifndef STEAMROT_TEST_BUILD
+  // Game: Process engine and scene-manager subscriptions
+  ctx.scene_manager->ProcessSubscriptions();
+#endif
+  // Test harness typically doesn't have subscriptions to process
+}
+
+/////////////////////////////////////////////////
+/// @brief Execute game logic
+/////////////////////////////////////////////////
+void ExecuteLogic(TickContext &ctx) {
+#ifdef STEAMROT_TEST_BUILD
+  // Test: Execute simulation steps from config
+  if (ctx.test_config->simulation_data() && 
+      ctx.test_config->simulation_data()->steps()) {
+    for (const SimulationStep *step : *ctx.test_config->simulation_data()->steps()) {
+      ExecuteSimulationStep(step, ctx.scene_context);
     }
   }
+#else
+  // Game: Execute scene logic via SceneManager
+  ctx.scene_manager->UpdateScenes();
+#endif
+}
+
+/////////////////////////////////////////////////
+/// @brief Post-logic phase (rendering or validation)
+/////////////////////////////////////////////////
+void PostLogic(TickContext &ctx) {
+#ifdef STEAMROT_TEST_BUILD
+  // Test: Compare tick snapshot if present
+  CompareTickSnapshot(ctx.current_tick, ctx.test_config, *ctx.test_fixture);
+#else
+  // Game: Render to window
+  ctx.display_manager->CallRenderCycle();
+#endif
+}
+
+/////////////////////////////////////////////////
+/// @brief Tick the event bus (shared - no conditional needed)
+/////////////////////////////////////////////////
+void TickEventBus(TickContext &ctx) {
+  ctx.game_resources.event_handler.TickGlobalEventBus();
+}
+
+/////////////////////////////////////////////////
+/// @brief Execute a complete tick with guaranteed ordering
+///
+/// This is the main entry point that enforces execution order.
+/// All the individual functions can also be called separately
+/// for more granular control in tests.
+/////////////////////////////////////////////////
+void ExecuteTick(TickContext &ctx) {
+  PreTick(ctx);
+  ProcessEventBuses(ctx);
+  ProcessSubscriptions(ctx);
+  ExecuteLogic(ctx);
+  PostLogic(ctx);
+  TickEventBus(ctx);
+}
+
+} // namespace tick
+```
+
+#### Benefits of This Approach
+
+1. **Enforced ordering**: `ExecuteTick()` guarantees the correct sequence
+2. **No vtable overhead**: Free functions are simpler and faster
+3. **Compile-time safety**: Wrong code paths are compiled out entirely
+4. **Resource encapsulation**: `TickContext` ensures functions have what they need
+5. **Flexibility**: Individual functions can be called for granular testing
+6. **Simpler testing**: Individual functions easier to unit test in isolation
+
+#### Usage Examples
+
+**Game Engine (compiled without STEAMROT_TEST_BUILD):**
+```cpp
+// This code only compiles in game builds where scene_manager and 
+// display_manager members exist in TickContext
+void GameEngine::RunGameLoop() {
+  tick::TickContext ctx{
+    .game_resources = m_game_resources,
+    .scene_context = GetSceneContext(),
+    .scene_manager = &m_scene_manager,      // Only in game builds
+    .display_manager = &m_display_manager   // Only in game builds
+  };
   
-  void OnPostLogic() override {
-    // Compare tick snapshot if present
-    CompareTickSnapshot(m_current_tick, m_config, m_fixture);
+  while (m_game_resources.game_window.isOpen()) {
+    tick::ExecuteTick(ctx);
+    m_game_resources.loop_number++;
   }
-};
+}
+```
+
+**Test Harness (compiled with STEAMROT_TEST_BUILD defined):**
+```cpp
+// This code only compiles in test builds where test_config, current_tick,
+// and test_fixture members exist in TickContext
+void ExecuteTickBasedTest(const TestDataConfig *config, TestFixture &fixture) {
+  tick::TickContext ctx{
+    .game_resources = fixture.GetGameResources(),
+    .scene_context = fixture.GetSceneContext(),
+    .test_config = config,       // Only in test builds
+    .current_tick = 0,           // Only in test builds
+    .test_fixture = &fixture     // Only in test builds
+  };
+  
+  uint32_t num_ticks = DetermineNumTicks(config);
+  for (uint32_t tick = 1; tick <= num_ticks; ++tick) {
+    ctx.current_tick = tick;
+    tick::ExecuteTick(ctx);
+  }
+}
 ```
 
 ### Solution 2: Logic Provider Interface
@@ -449,15 +504,22 @@ struct TestMetadataContext {
 
 ## Implementation Plan
 
-### Phase 1: Create Unified Tick Executor (Point 1)
+### Phase 1: Create Hybrid Tick Execution System (Point 1)
 
 **Files to create:**
-- `src/systems/TickExecutor.h` - Abstract base class
-- `src/systems/GameTickExecutor.h/cpp` - Game-specific implementation
+- `src/systems/tick_execution.h` - TickContext struct and free function declarations
+- `src/systems/tick_execution.cpp` - Free function implementations
 
 **Files to modify:**
-- `src/systems/GameEngine.cpp` - Refactor to use GameTickExecutor
-- `tests/harness/tick_executor.h/cpp` - Refactor to use base class
+- `src/systems/GameEngine.cpp` - Refactor to use tick::ExecuteTick()
+- `tests/harness/tick_executor.cpp` - Refactor to use tick::ExecuteTick()
+- `CMakeLists.txt` - Add `STEAMROT_TEST_BUILD` compile definition for test targets
+
+**Compile-time configuration:**
+```cmake
+# In test CMakeLists.txt
+target_compile_definitions(test_target PRIVATE STEAMROT_TEST_BUILD)
+```
 
 **Estimated effort:** Medium
 
@@ -549,26 +611,59 @@ struct TestMetadataContext {
 
 ## Alternative Approaches Considered
 
-### Alternative A: Keep Separate Implementations
+### Alternative A: Pure Inheritance (Template Method Pattern)
+
+**Description**: Abstract `TickExecutor` base class with virtual hook methods.
+
+```cpp
+class TickExecutor {
+protected:
+  virtual void OnPreTick() = 0;
+  virtual void OnExecuteLogic() = 0;
+  // ...
+public:
+  void ExecuteTick() { /* calls virtuals in order */ }
+};
+```
+
+**Pros**: 
+- Guarantees execution order via template method
+- Natural state encapsulation in derived classes
+
+**Cons**: 
+- Vtable overhead
+- Tighter coupling
+- More boilerplate
+
+**Decision**: Not chosen - hybrid approach with free functions and compile-time conditionals preferred.
+
+### Alternative B: Keep Separate Implementations
 
 **Pros**: Less refactoring, simpler implementation
 **Cons**: Continued code duplication, potential for drift
 
-### Alternative B: Generate Test Harness from Game Code
+### Alternative C: Generate Test Harness from Game Code
 
 **Pros**: Single source of truth
 **Cons**: Complex code generation, less flexibility for tests
 
-### Alternative C: Full Dependency Injection
+### Alternative D: Full Runtime Dependency Injection
 
 **Pros**: Maximum flexibility
-**Cons**: Over-engineering, complexity overhead
+**Cons**: Over-engineering, runtime overhead, complexity
 
 ---
 
 ## Decision
 
-*To be filled in after review*
+**Chosen Approach**: Hybrid free function approach with compile-time conditionals (Solution 1 - Updated)
+
+**Rationale**:
+1. Free functions are simpler and have no vtable overhead
+2. Compile-time conditionals ensure wrong code paths are never compiled
+3. `TickContext` resource class prevents misuse - you can't call a function without the required resources
+4. `tick::ExecuteTick()` still enforces the correct execution order
+5. Individual functions remain testable in isolation
 
 ---
 
@@ -578,8 +673,8 @@ struct TestMetadataContext {
 
 | File | Purpose |
 |------|---------|
-| `src/systems/TickExecutor.h` | Abstract tick executor base class |
-| `src/systems/GameTickExecutor.h/cpp` | Game engine tick executor |
+| `src/systems/tick_execution.h` | TickContext struct and free function declarations |
+| `src/systems/tick_execution.cpp` | Free function implementations with compile-time conditionals |
 | `src/logic/ILogicProvider.h` | Logic provider interface |
 | `src/logic/SceneLogicProvider.h/cpp` | Scene-based logic provider |
 | `src/data_handlers/IEntityDataSource.h` | Entity data source interface |
@@ -588,15 +683,16 @@ struct TestMetadataContext {
 
 | File | Changes |
 |------|---------|
-| `src/systems/GameEngine.cpp` | Use GameTickExecutor |
+| `src/systems/GameEngine.cpp` | Use tick::ExecuteTick() with TickContext |
 | `src/scenes/Scene.h/cpp` | Use ILogicProvider |
-| `tests/harness/tick_executor.h/cpp` | Derive from TickExecutor |
+| `tests/harness/tick_executor.cpp` | Use tick::ExecuteTick() with TickContext |
 | `tests/harness/test_context.h` | Rename to TestMetadataContext |
+| `CMakeLists.txt` | Add STEAMROT_TEST_BUILD definition for test targets |
 
 ### Documentation Updates
 
 | File | Changes |
 |------|---------|
-| `documentation/architecture/GAME_LOOP.md` | Add TickExecutor section |
+| `documentation/architecture/GAME_LOOP.md` | Add tick execution section |
 | `documentation/testing/TESTING_HARNESS_LOOP.md` | Update architecture |
 | `documentation/testing/TEST_DATA_CONFIGURATION.md` | Clarify expected_data usage |
