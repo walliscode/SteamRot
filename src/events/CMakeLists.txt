@@ -2,6 +2,7 @@ add_library(events
 EventHandler.cpp
 event_factory.cpp
 event_bus_conversion.cpp
+event_handler_tick.cpp
 Subscriber.cpp
 SubscriberFactory.cpp
 )
