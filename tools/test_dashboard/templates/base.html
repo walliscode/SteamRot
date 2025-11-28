@@ -71,6 +71,28 @@
                 </div>
             </section>
             
+            <section id="graph-explorer">
+                <h2>Simulation Path Explorer <span class="section-info">(Step-by-Step)</span></h2>
+                <p class="hint">Explore simulation sequences step by step. Click a step to see what follows, find matching tests when you complete a path.</p>
+                <div class="graph-controls">
+                    <button id="graph-reset" class="graph-btn">Reset Path</button>
+                </div>
+                <div id="graph-container">
+                    <div id="graph-canvas">
+                        <div id="graph-center-node" class="graph-node center-node hidden"></div>
+                        <div id="graph-connections"></div>
+                    </div>
+                    <div id="graph-empty-state">
+                        <span class="empty-icon">🔍</span>
+                        <p>Select a starting step to explore simulation paths</p>
+                    </div>
+                </div>
+                <div id="graph-breadcrumb" class="hidden">
+                    <span class="breadcrumb-label">Path:</span>
+                    <div id="breadcrumb-trail"></div>
+                </div>
+            </section>
+            
             <section id="coverage-matrix">
                 <h2>Coverage Matrix <span class="section-info">(Function × Logic Class)</span></h2>
                 <p class="hint">Click any cell to filter tests covering that combination</p>
