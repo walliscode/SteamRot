@@ -7,12 +7,14 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "TestEngine.h"
+#include "PathProvider.h"
 #include <catch2/catch_test_macros.hpp>
 
 namespace steamrot::tests {
 
 TEST_CASE("TestEngine construction", "[unit][TestEngine]") {
   SECTION("Can be constructed with null config") {
+    PathProvider path_provider{EnvironmentType::Test};
     TestEngine engine(nullptr);
     REQUIRE(engine.GetTickLevel() == TickLevel::Custom);
     REQUIRE(engine.GetCurrentTick() == 0);
@@ -20,6 +22,7 @@ TEST_CASE("TestEngine construction", "[unit][TestEngine]") {
 }
 
 TEST_CASE("TestEngine tick level switching", "[unit][TestEngine]") {
+  PathProvider path_provider{EnvironmentType::Test};
   TestEngine engine(nullptr);
 
   SECTION("Default tick level is Custom") {
@@ -52,6 +55,7 @@ TEST_CASE("TestEngine tick level switching", "[unit][TestEngine]") {
 }
 
 TEST_CASE("TestEngine SetTicks", "[unit][TestEngine]") {
+  PathProvider path_provider{EnvironmentType::Test};
   TestEngine engine(nullptr);
 
   SECTION("SetTicks returns self for chaining") {
@@ -61,6 +65,7 @@ TEST_CASE("TestEngine SetTicks", "[unit][TestEngine]") {
 }
 
 TEST_CASE("TestEngine UseFullScene", "[unit][TestEngine]") {
+  PathProvider path_provider{EnvironmentType::Test};
   TestEngine engine(nullptr);
 
   SECTION("UseFullScene returns self for chaining") {
@@ -70,6 +75,7 @@ TEST_CASE("TestEngine UseFullScene", "[unit][TestEngine]") {
 }
 
 TEST_CASE("TestEngine UseTickLevel", "[unit][TestEngine]") {
+  PathProvider path_provider{EnvironmentType::Test};
   TestEngine engine(nullptr);
 
   SECTION("UseTickLevel returns self for chaining") {
@@ -79,6 +85,7 @@ TEST_CASE("TestEngine UseTickLevel", "[unit][TestEngine]") {
 }
 
 TEST_CASE("TestEngine SetSceneType", "[unit][TestEngine]") {
+  PathProvider path_provider{EnvironmentType::Test};
   TestEngine engine(nullptr);
 
   SECTION("SetSceneType returns self for chaining") {
@@ -88,6 +95,7 @@ TEST_CASE("TestEngine SetSceneType", "[unit][TestEngine]") {
 }
 
 TEST_CASE("TestEngine AddFunction", "[unit][TestEngine]") {
+  PathProvider path_provider{EnvironmentType::Test};
   TestEngine engine(nullptr);
 
   SECTION("AddFunction returns self for chaining") {
@@ -99,6 +107,7 @@ TEST_CASE("TestEngine AddFunction", "[unit][TestEngine]") {
 
 TEST_CASE("TestEngine has same architecture as GameEngine",
           "[unit][TestEngine]") {
+  PathProvider path_provider{EnvironmentType::Test};
   TestEngine engine(nullptr);
 
   SECTION("Has SceneManager member") {
