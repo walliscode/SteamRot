@@ -1151,71 +1151,81 @@ TEST_CASE("Custom collision edge case", "[unit][collision]") {
 
 ### Solution 7: TestEngine Execution Granularity
 
-The TestEngine should support testing at different levels of the game stack, from individual functions up to full scenes. The key design principle is:
-- **Custom Mode**: Mix and match Logic classes + free functions for incremental testing
-- **Standard Mode**: Uses SAME execution path as GameEngine (hard-baked into Engine base class)
+The TestEngine uses the **SAME architecture as GameEngine** (SceneManager, DisplayManager, etc.) and supports testing at different tick execution levels:
 
-#### Two Execution Modes
+#### Four Tick Execution Levels
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                       TESTENGINE EXECUTION MODES                             │
-│                    (Configure once, run specific parts)                      │
+│                       TESTENGINE TICK LEVELS                                 │
+│     (Uses same architecture as GameEngine - SceneManager, DisplayManager)    │
 └─────────────────────────────────────────────────────────────────────────────┘
 
-CUSTOM MODE (For incremental testing - flexible):
-──────────────────────────────────────────────────
+TickLevel::FullEngine (Mirrors GameEngine::UpdateSystems EXACTLY):
+─────────────────────────────────────────────────────────────────
+├─ UpdateGameResources → PreloadEvents → ProcessWaitingRoom
+├─ UpdateSubscribers → ProcessSubscriptions → UpdateSceneManager
+├─ CallRenderCycle → TickGlobalEventBus
+├─ Use case: Full integration tests identical to game behavior
+├─ API: engine.UseTickLevel(TickLevel::FullEngine)
+├─ API: engine.UseFullScene(SceneType::Title) (convenience)
+
+TickLevel::SceneManager (Mirrors SceneManager::UpdateSceneManager):
+────────────────────────────────────────────────────────────────
+├─ Events → UpdateScenes → ProcessSubscriptions
+├─ Use case: Testing scene management without rendering
+├─ API: engine.UseTickLevel(TickLevel::SceneManager)
+
+TickLevel::SceneLogic (Runs sAction, sCollision, sRender):
+───────────────────────────────────────────────────────────
+├─ Events → sAction → sCollision → sRender (current scene)
+├─ Use case: Testing scene logic in isolation
+├─ API: engine.UseTickLevel(TickLevel::SceneLogic)
+
+TickLevel::Custom (Mix and match - flexible):
+────────────────────────────────────────────────
 ├─ Entity Only: Just load entities, no logic execution
 ├─ Mixed Steps: Combine Logic classes + free functions in any order
 ├─ Use case: Unit tests, building up logic incrementally
 ├─ API: engine.AddLogic<T>(), engine.AddFunction(f)
-
-STANDARD MODE (Uses Engine base class - IDENTICAL to GameEngine):
-───────────────────────────────────────────────────────────────────
-├─ Logic Collection: Run Action/Collision/Render logic categories
-├─ Full Scene: Complete scene tick with all Logic
-├─ Use case: Integration tests that MUST match game behavior
-├─ API: engine.UseLogicCollection(...), engine.UseFullScene(...)
-├─ ** Uses Engine::ExecuteStandardLogicTick() - SAME code as GameEngine **
 ```
 
-#### Why Standard Mode on Engine Base Class?
+#### Why Same Architecture as GameEngine?
 
 ```cpp
-// Both GameEngine and TestEngine call the SAME method for standard execution
-class Engine {
-protected:
-  void ExecuteStandardLogicTick() {
-    // Event handling
-    ProcessWaitingRoomEventBus();
-    ClearSubscribers();
-    UpdateSubscribersFromGlobalEventBus();
-    TickGlobalEventBus();
-    
-    // Logic: Action → Collision → Render
-    ExecuteLogicOfType(LogicType::Action);
-    ExecuteLogicOfType(LogicType::Collision);
-    ExecuteLogicOfType(LogicType::Render);
-  }
-};
-
-class GameEngine : public Engine {
-  void ExecuteTick() override {
-    CaptureInput();
-    ExecuteStandardLogicTick();  // ← SAME
-    Render();
-  }
+// TestEngine has SAME members as GameEngine
+class GameEngine {
+  GameResources m_game_resources;
+  GameContext m_game_context;
+  SceneManager m_scene_manager;    // ← SAME
+  DisplayManager m_display_manager; // ← SAME
 };
 
 class TestEngine : public Engine {
-  void ExecuteTick() override {
-    if (standard_mode) {
-      InjectTestInput();
-      ExecuteStandardLogicTick();  // ← SAME (hard-baked, not customizable)
-      ValidateState();
-    } else {
-      ExecuteCustomSteps();        // ← Flexible for unit tests
-    }
+  SceneManager m_scene_manager;    // ← SAME as GameEngine
+  DisplayManager m_display_manager; // ← SAME as GameEngine
+  
+  void TickFullEngine() {
+    // Mirrors GameEngine::UpdateSystems() EXACTLY
+    m_game_resources.mouse_position = ...;
+    m_game_resources.event_handler.PreloadEvents(...);
+    m_game_resources.event_handler.ProcessWaitingRoomEventBus();
+    m_game_resources.event_handler.UpateSubscribersFromGlobalEventBus();
+    m_scene_manager.UpdateSceneManager();
+    m_display_manager.CallRenderCycle();
+    m_game_resources.event_handler.TickGlobalEventBus();
+  }
+  
+  void TickSceneManagerLevel() {
+    // Mirrors SceneManager::UpdateSceneManager()
+    events::ProcessEventBusCycle(...);
+    m_scene_manager.UpdateSceneManager();
+  }
+  
+  void TickSceneLogicLevel() {
+    // Just runs scene logic
+    events::ProcessEventBusCycle(...);
+    m_scene_manager.UpdateScenes();
   }
 };
 ```
