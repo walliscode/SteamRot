@@ -19,10 +19,10 @@ TEST_CASE("DisplayManager Initializes with SceneManager", "[unit][DisplayManager
   steamrot::tests::TestEngine test_engine(nullptr);
   auto init_result = test_engine.Initialize();
   REQUIRE(init_result.has_value());
-  std::cout << "TestFixture initialized successfully" << std::endl;
+  std::cout << "TestEngine initialized successfully" << std::endl;
   steamrot::GameContext &game_context =
       test_engine
-          .GetGameContext(); // Get the game context from the test context
+          .GetGameContext(); // Get the game context from the test engine
   steamrot::SceneManager scene_manager{test_engine.GetGameContext()};
 
   std::cout << "SceneManager initialized successfully" << std::endl;
