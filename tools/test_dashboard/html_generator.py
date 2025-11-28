@@ -55,7 +55,7 @@ class HtmlGenerator:
         )
         test_rows_html = self._generate_test_rows(tests)
         
-        # Convert tests to JSON for JavaScript
+        # Convert tests to JSON for JavaScript (includes simulation_steps)
         tests_json = json.dumps([t.to_dict() for t in tests], indent=2)
         
         # Fill template
