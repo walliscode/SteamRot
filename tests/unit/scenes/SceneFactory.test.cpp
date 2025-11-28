@@ -9,7 +9,7 @@
 #include "SceneFactory.h"
 #include "CraftingScene.h"
 #include "PathProvider.h"
-#include "TestFixture.h"
+#include "TestEngine.h"
 #include "TitleScene.h"
 #include "scene_test_helpers.h"
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -19,7 +19,9 @@
 TEST_CASE("SceneFactory can be constructed without errors",
           "[unit][SceneFactory]") {
   steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  steamrot::tests::TestFixture test_context;
+  steamrot::tests::TestEngine test_engine(nullptr);
+  auto init_result = test_engine.Initialize();
+  REQUIRE(init_result.has_value());
   steamrot::SceneFactory scene_factory;
   REQUIRE_NOTHROW(scene_factory);
 }
@@ -27,7 +29,9 @@ TEST_CASE("SceneFactory can be constructed without errors",
 TEST_CASE("SceneFactory can create a TitleScene from default",
           "[unit][SceneFactory]") {
   steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  steamrot::tests::TestFixture test_context;
+  steamrot::tests::TestEngine test_engine(nullptr);
+  auto init_result = test_engine.Initialize();
+  REQUIRE(init_result.has_value());
   steamrot::SceneFactory scene_factory;
 
   // define SceneType for the test
@@ -35,7 +39,7 @@ TEST_CASE("SceneFactory can create a TitleScene from default",
 
   // create a TitleScene
   auto scene_creation_result = scene_factory.CreateDefaultScene(
-      scene_type, test_context.GetGameContext());
+      scene_type, test_engine.GetGameContext());
   ;
 
   if (!scene_creation_result.has_value()) {
@@ -55,11 +59,13 @@ TEST_CASE("SceneFactory can create a TitleScene from default",
 TEST_CASE("SceneFactory can create a CraftingScene from default",
           "[unit][SceneFactory]") {
   steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  steamrot::tests::TestFixture test_context;
+  steamrot::tests::TestEngine test_engine(nullptr);
+  auto init_result = test_engine.Initialize();
+  REQUIRE(init_result.has_value());
   steamrot::SceneFactory scene_factory;
   // create a CraftingScene
   auto scene_creation_result = scene_factory.CreateDefaultScene(
-      steamrot::SceneType::SceneType_CRAFTING, test_context.GetGameContext());
+      steamrot::SceneType::SceneType_CRAFTING, test_engine.GetGameContext());
   ;
   if (!scene_creation_result.has_value()) {
     FAIL("Scene creation failed: " + scene_creation_result.error().message);

@@ -10,7 +10,7 @@
 #include "EntityManager.h"
 #include "EntityMemoryPoolEqualsMatcher.h"
 #include "PathProvider.h"
-#include "TestFixture.h"
+#include "TestEngine.h"
 #include "entity_test_helpers.h"
 
 #include "containers.h"
@@ -30,13 +30,15 @@ TEST_CASE("ArchetypeManager is constructed without errors",
 TEST_CASE("ArchetypeManager archetype map is empty with a non configured EMP",
           "[unit][ArchetypeManager]") {
 
-  // create text context
+  // create test context
   steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  steamrot::tests::TestFixture test_context;
+  steamrot::tests::TestEngine test_engine(nullptr);
+  auto init_result = test_engine.Initialize();
+  REQUIRE(init_result.has_value());
   // create an instance of the entity manager but don't configure it
   size_t pool_size = 100;
   steamrot::EntityManager entity_manager{
-      pool_size, test_context.GetGameContext().event_handler};
+      pool_size, test_engine.GetGameContext().event_handler};
   // check that the EMP is default constructed by comparing to a new EMP
   steamrot::EntityMemoryPool expected_default_pool;
   std::apply(

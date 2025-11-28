@@ -9,7 +9,7 @@
 #include "UIElementFactory.h"
 #include "ButtonElement.h"
 #include "PanelElement.h"
-#include "TestFixture.h"
+#include "TestEngine.h"
 #include "TestUIElementDataProvider.h"
 #include "catch2/catch_test_macros.hpp"
 #include "ui_element_factory_test_helpers.h"
@@ -38,9 +38,11 @@ TEST_CASE("UIElementFactory::CreateUIElement - Panel", "[UIElementFactory]") {
 
   // create test context
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestFixture test_context;
+  steamrot::tests::TestEngine test_engine(nullptr);
+  auto init_result = test_engine.Initialize();
+  REQUIRE(init_result.has_value());
   // check that the map from the EventHandler is empty
-  REQUIRE(test_context.GetGameContext()
+  REQUIRE(test_engine.GetGameContext()
               .event_handler.GetSubcriberRegister()
               .size() == 0);
 
@@ -52,12 +54,12 @@ TEST_CASE("UIElementFactory::CreateUIElement - Panel", "[UIElementFactory]") {
   // act
   auto element_result = CreateUIElement(
       steamrot::UIElementDataUnion::UIElementDataUnion_PanelData, panel_data,
-      test_context.GetGameContext().event_handler);
+      test_engine.GetGameContext().event_handler);
   if (!element_result.has_value()) {
     FAIL(element_result.error().message);
   }
   // assert
-  REQUIRE(test_context.GetGameContext()
+  REQUIRE(test_engine.GetGameContext()
               .event_handler.GetSubcriberRegister()
               .size() == 1);
 
@@ -90,7 +92,9 @@ TEST_CASE("UIElementFactory::ConfigureButtonElement", "[UIElementFactory]") {
 TEST_CASE("UIElementFactory::CreateUIElement - Button", "[UIElementFactory]") {
 
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestFixture test_context;
+  steamrot::tests::TestEngine test_engine(nullptr);
+  auto init_result = test_engine.Initialize();
+  REQUIRE(init_result.has_value());
   flatbuffers::FlatBufferBuilder builder{1024};
   const auto *button_data =
       TestUIElementDataFactory::CreateTestButtonData(builder, "TestButton");
@@ -98,7 +102,7 @@ TEST_CASE("UIElementFactory::CreateUIElement - Button", "[UIElementFactory]") {
 
   auto element_result = CreateUIElement(
       steamrot::UIElementDataUnion::UIElementDataUnion_ButtonData, button_data,
-      test_context.GetGameContext().event_handler);
+      test_engine.GetGameContext().event_handler);
 
   if (!element_result.has_value()) {
     FAIL(element_result.error().message);
@@ -135,7 +139,9 @@ TEST_CASE("UIElementFactory::ConfigureDropDownListElement",
 TEST_CASE("UIElementFactory::CreateUIElement - DropDownList",
           "[UIElementFactory]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestFixture test_context;
+  steamrot::tests::TestEngine test_engine(nullptr);
+  auto init_result = test_engine.Initialize();
+  REQUIRE(init_result.has_value());
   flatbuffers::FlatBufferBuilder builder{1024};
   const auto *ddlist_data =
       TestUIElementDataFactory::CreateTestDropDownListData(builder, "TestList",
@@ -144,7 +150,7 @@ TEST_CASE("UIElementFactory::CreateUIElement - DropDownList",
 
   auto element_result = CreateUIElement(
       steamrot::UIElementDataUnion::UIElementDataUnion_DropDownListData,
-      ddlist_data, test_context.GetGameContext().event_handler);
+      ddlist_data, test_engine.GetGameContext().event_handler);
   if (!element_result.has_value()) {
     FAIL(element_result.error().message);
   }
@@ -179,7 +185,9 @@ TEST_CASE("UIElementFactory::ConfigureDropDownContainerElement",
 TEST_CASE("UIElementFactory::CreateUIElement - DropDownContainer",
           "[UIElementFactory]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestFixture test_context;
+  steamrot::tests::TestEngine test_engine(nullptr);
+  auto init_result = test_engine.Initialize();
+  REQUIRE(init_result.has_value());
   flatbuffers::FlatBufferBuilder builder{1024};
   const auto *ddcontainer_data =
       TestUIElementDataFactory::CreateTestDropDownContainerData(builder);
@@ -187,7 +195,7 @@ TEST_CASE("UIElementFactory::CreateUIElement - DropDownContainer",
 
   auto element_result = CreateUIElement(
       steamrot::UIElementDataUnion::UIElementDataUnion_DropDownContainerData,
-      ddcontainer_data, test_context.GetGameContext().event_handler);
+      ddcontainer_data, test_engine.GetGameContext().event_handler);
   if (!element_result.has_value()) {
     FAIL(element_result.error().message);
   }
@@ -223,7 +231,9 @@ TEST_CASE("UIElementFactory::ConfigureDropDownItemElement",
 TEST_CASE("UIElementFactory::CreateUIElement - DropDownItem",
           "[UIElementFactory]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestFixture test_context;
+  steamrot::tests::TestEngine test_engine(nullptr);
+  auto init_result = test_engine.Initialize();
+  REQUIRE(init_result.has_value());
   flatbuffers::FlatBufferBuilder builder{1024};
   const auto *dditem_data =
       TestUIElementDataFactory::CreateTestDropDownItemData(builder, "TestItem");
@@ -231,7 +241,7 @@ TEST_CASE("UIElementFactory::CreateUIElement - DropDownItem",
 
   auto element_result = CreateUIElement(
       steamrot::UIElementDataUnion::UIElementDataUnion_DropDownItemData,
-      dditem_data, test_context.GetGameContext().event_handler);
+      dditem_data, test_engine.GetGameContext().event_handler);
   if (!element_result.has_value()) {
     FAIL(element_result.error().message);
   }
@@ -265,7 +275,9 @@ TEST_CASE("UIElementFactory::ConfigureDropDownButtonElement",
 TEST_CASE("UIElementFactory::CreateUIElement - DropDownButton",
           "[UIElementFactory]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestFixture test_context;
+  steamrot::tests::TestEngine test_engine(nullptr);
+  auto init_result = test_engine.Initialize();
+  REQUIRE(init_result.has_value());
   flatbuffers::FlatBufferBuilder builder{1024};
   const auto *ddbutton_data =
       TestUIElementDataFactory::CreateTestDropDownButtonData(builder, true);
@@ -273,7 +285,7 @@ TEST_CASE("UIElementFactory::CreateUIElement - DropDownButton",
 
   auto element_result = CreateUIElement(
       steamrot::UIElementDataUnion::UIElementDataUnion_DropDownButtonData,
-      ddbutton_data, test_context.GetGameContext().event_handler);
+      ddbutton_data, test_engine.GetGameContext().event_handler);
   if (!element_result.has_value()) {
     FAIL(element_result.error().message);
   }
@@ -289,7 +301,9 @@ TEST_CASE("UIElementFactory::CreateUIElement - DropDownButton",
 TEST_CASE("UIElementFactory::CreateUIElement - Deeply Nested Panel",
           "[UIElementFactory][nested]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestFixture test_context;
+  steamrot::tests::TestEngine test_engine(nullptr);
+  auto init_result = test_engine.Initialize();
+  REQUIRE(init_result.has_value());
   flatbuffers::FlatBufferBuilder builder{4096};
 
   // Create deeply nested PanelData (with DropDownContainer, DropDownList,
@@ -301,7 +315,7 @@ TEST_CASE("UIElementFactory::CreateUIElement - Deeply Nested Panel",
   // act: create the element using the factory
   auto element_result = CreateUIElement(
       steamrot::UIElementDataUnion::UIElementDataUnion_PanelData,
-      nested_panel_data, test_context.GetGameContext().event_handler);
+      nested_panel_data, test_engine.GetGameContext().event_handler);
   if (!element_result.has_value()) {
     FAIL(element_result.error().message);
   }

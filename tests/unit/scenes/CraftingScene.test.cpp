@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////
 #include "FlatbuffersDataLoader.h"
 #include "SceneFactory.h"
-#include "TestFixture.h"
+#include "TestEngine.h"
 #include "draw_ui_elements_test_helpers.h"
 #include <catch2/catch_test_macros.hpp>
 
@@ -16,11 +16,13 @@ TEST_CASE("CraftingScene's call to sRender is correct",
           "[unit][CraftingScene][.visual]") {
   // arrange
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestFixture test_context;
+  steamrot::tests::TestEngine test_engine(nullptr);
+  auto init_result = test_engine.Initialize();
+  REQUIRE(init_result.has_value());
   steamrot::SceneFactory scene_factory;
   // create a CraftingScene
   auto scene_creation_result = scene_factory.CreateDefaultScene(
-      steamrot::SceneType::SceneType_CRAFTING, test_context.GetGameContext());
+      steamrot::SceneType::SceneType_CRAFTING, test_engine.GetGameContext());
   ;
   if (!scene_creation_result.has_value()) {
     FAIL("Scene creation failed: " + scene_creation_result.error().message);
