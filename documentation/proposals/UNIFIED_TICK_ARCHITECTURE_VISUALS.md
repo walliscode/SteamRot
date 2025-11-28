@@ -105,189 +105,185 @@ Legend: == indicates identical operations
 
 ## Proposed Unified Architecture
 
-### Hybrid Approach: Free Functions with TickContext
+### Abstract Engine Base Class
 
-The chosen approach uses free functions with compile-time conditionals, encapsulated by a `TickContext` resource class.
+The chosen approach uses an abstract `Engine` base class with derived `GameEngine` and `TestEngine` classes. This keeps resource management identical while allowing different tick execution behaviors.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                    HYBRID FREE FUNCTION ARCHITECTURE                         │
+│                    ABSTRACT ENGINE ARCHITECTURE                              │
 └─────────────────────────────────────────────────────────────────────────────┘
 
-                              ┌─────────────────────────┐
-                              │      TickContext        │
-                              │   (Resource Container)  │
-                              ├─────────────────────────┤
-                              │ • game_resources        │
-                              │ • scene_context         │
-                              ├─────────────────────────┤
-                              │ #ifndef TEST_BUILD      │
-                              │ • scene_manager         │
-                              │ • display_manager       │
-                              ├─────────────────────────┤
-                              │ #ifdef TEST_BUILD       │
-                              │ • test_config           │
-                              │ • current_tick          │
-                              │ • test_fixture          │
-                              └───────────┬─────────────┘
-                                          │
-                                          │ passed to
-                                          ▼
+                              ┌─────────────────────────────────────┐
+                              │             Engine                   │
+                              │         (Abstract Base)              │
+                              ├─────────────────────────────────────┤
+                              │ # m_game_resources: GameResources   │
+                              │ # m_game_context: GameContext       │
+                              ├─────────────────────────────────────┤
+                              │ + StartUp() → shared                │
+                              │ + Run(num_ticks) → shared loop      │
+                              │ + GetLoopNumber() → shared          │
+                              │ + GetGameResources() → shared       │
+                              ├─────────────────────────────────────┤
+                              │ # ConfigureFromData() = 0           │ ◄── Override
+                              │ # ExecuteTick() = 0                 │ ◄── Override
+                              └───────────────┬─────────────────────┘
+                                              │
+                      ┌───────────────────────┴───────────────────────┐
+                      │                                               │
+                      ▼                                               ▼
+┌─────────────────────────────────────┐   ┌─────────────────────────────────────┐
+│           GameEngine                │   │           TestEngine                │
+│    (Production Implementation)      │   │    (Testing Implementation)         │
+├─────────────────────────────────────┤   ├─────────────────────────────────────┤
+│ - m_scene_manager                   │   │ - m_test_config                     │
+│ - m_display_manager                 │   │ - m_entity_manager                  │
+├─────────────────────────────────────┤   │ - m_scene_context                   │
+│ # ConfigureFromData() override      │   │ - m_current_tick                    │
+│   └─ Load from game data files      │   ├─────────────────────────────────────┤
+│                                     │   │ # ConfigureFromData() override      │
+│ # ExecuteTick() override            │   │   └─ Load from TestDataConfig       │
+│   ├─ UpdateGameResources()          │   │                                     │
+│   ├─ PreloadEvents()                │   │ # ExecuteTick() override            │
+│   ├─ ProcessWaitingRoom() ◄─SHARED  │   │   ├─ ExecuteInputEventsForTick()    │
+│   ├─ UpdateSubscribers()  ◄─SHARED  │   │   ├─ ExecuteEventsForTick()         │
+│   ├─ ProcessSubscriptions()         │   │   ├─ ProcessWaitingRoom() ◄─SHARED  │
+│   ├─ UpdateSceneManager()           │   │   ├─ UpdateSubscribers()  ◄─SHARED  │
+│   ├─ CallRenderCycle()              │   │   ├─ ExecuteSimulationSteps()       │
+│   └─ TickGlobalEventBus() ◄─SHARED  │   │   ├─ CompareTickSnapshot()          │
+└─────────────────────────────────────┘   │   └─ TickGlobalEventBus() ◄─SHARED  │
+                                          ├─────────────────────────────────────┤
+                                          │ + GetEntityManager()                │
+                                          └─────────────────────────────────────┘
+
+Legend:
+◄─SHARED = Identical implementation in both derived classes
+           (could be extracted to shared free functions)
+```
+
+### Engine::Run() - Shared Loop Structure
+
+```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                         namespace tick                                       │
+│                    Engine::Run(size_t num_ticks)                            │
+│                    (Shared by GameEngine and TestEngine)                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+        ┌───────────────────────────────────────────────────────┐
+        │ 1. StartUp()                                          │
+        │    ├─ Configure resources from data                   │
+        │    └─ Load initial scene/entities                     │
+        └───────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+        ┌───────────────────────────────────────────────────────┐
+        │ 2. Determine loop condition                           │
+        │    ├─ num_ticks == 0 → while(window.isOpen())        │
+        │    └─ num_ticks > 0  → for(i=0; i<num_ticks; i++)    │
+        └───────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+        ┌───────────────────────────────────────────────────────┐
+        │ 3. Loop body (each iteration):                        │
+        │    ├─ ExecuteTick()  ◄── Virtual - different per type │
+        │    └─ m_game_resources.loop_number++                  │
+        └───────────────────────────────────────────────────────┘
+```
+
+### ExecuteTick() Comparison
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    ExecuteTick() Implementations                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────┐   ┌─────────────────────────────────────┐
+│     GameEngine::ExecuteTick()       │   │     TestEngine::ExecuteTick()       │
+├─────────────────────────────────────┤   ├─────────────────────────────────────┤
+│                                     │   │                                     │
+│ 1. UpdateGameResources()            │   │ 1. ++m_current_tick                 │
+│    └─ Update mouse position         │   │                                     │
+│                                     │   │ 2. ExecuteInputEventsForTick()      │
+│ 2. PreloadEvents()                  │   │    └─ Inject simulated inputs       │
+│    └─ Capture SFML window events    │   │                                     │
+│                                     │   │ 3. ExecuteEventsForTick()           │
+│                                     │   │    └─ Inject simulated events       │
+├─────────────────────────────────────┼───┼─────────────────────────────────────┤
+│ 3. ProcessWaitingRoomEventBus()     │ = │ 4. ProcessWaitingRoomEventBus()     │
+│    └─ Move to global bus            │   │    └─ Move to global bus            │
+├─────────────────────────────────────┼───┼─────────────────────────────────────┤
+│ 4. UpdateSubscribersFromGlobalBus() │ = │ 5. UpdateSubscribersFromGlobalBus() │
+│    └─ Notify all subscribers        │   │    └─ Notify all subscribers        │
+├─────────────────────────────────────┼───┼─────────────────────────────────────┤
+│ 5. ProcessSubscriptions()           │   │ (No subscription processing)        │
+│    └─ GameEngine level              │   │                                     │
+│                                     │   │                                     │
+│ 6. UpdateSceneManager()             │   │ 6. ExecuteSimulationSteps()         │
+│    └─ sAction→sCollision→sRender    │   │    └─ Run SimulationData steps      │
+│                                     │   │                                     │
+│ 7. CallRenderCycle()                │   │ 7. CompareTickSnapshot()            │
+│    └─ Render to window              │   │    └─ Validate entity state         │
+├─────────────────────────────────────┼───┼─────────────────────────────────────┤
+│ 8. TickGlobalEventBus()             │ = │ 8. TickGlobalEventBus()             │
+│    └─ Decrement event lifetimes     │   │    └─ Decrement event lifetimes     │
+└─────────────────────────────────────┘   └─────────────────────────────────────┘
+
+Legend: = indicates identical operations
+```
+
+### Benefits of Abstract Engine Approach
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         BENEFITS                                             │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
-│  ┌─────────────────────────────────────────────────────────────────────┐   │
-│  │  void ExecuteTick(TickContext &ctx)  ◄── Main entry point          │   │
-│  │  {                                                                   │   │
-│  │      PreTick(ctx);              // Input capture/injection          │   │
-│  │      ProcessEventBuses(ctx);    // Shared - no conditionals         │   │
-│  │      ProcessSubscriptions(ctx); // Game-only subscriptions          │   │
-│  │      ExecuteLogic(ctx);         // Scene logic or simulation        │   │
-│  │      PostLogic(ctx);            // Render or validation             │   │
-│  │      TickEventBus(ctx);         // Shared - no conditionals         │   │
-│  │  }                                                                   │   │
-│  └─────────────────────────────────────────────────────────────────────┘   │
+│  ✓ UNIFIED RESOURCE MANAGEMENT                                              │
+│    ┌─────────────────────────────────────────────────────────────────────┐  │
+│    │ GameResources, GameContext handled identically in Engine base      │  │
+│    │ No duplication between GameEngine and TestEngine                   │  │
+│    └─────────────────────────────────────────────────────────────────────┘  │
 │                                                                             │
-│  Individual functions (all take TickContext&):                              │
-│  ┌──────────────────────┐  ┌──────────────────────┐  ┌────────────────────┐│
-│  │ PreTick()            │  │ ProcessEventBuses()  │  │ ProcessSubs()      ││
-│  │ ─────────────────    │  │ ─────────────────    │  │ ───────────────    ││
-│  │ #ifdef TEST_BUILD    │  │ (no conditionals)    │  │ #ifndef TEST_BUILD ││
-│  │   InjectInputs       │  │ ProcessWaitingRoom   │  │   SceneManager     ││
-│  │   InjectEvents       │  │ UpdateSubscribers    │  │   subscriptions    ││
-│  │ #else                │  │                      │  │                    ││
-│  │   UpdateResources    │  │                      │  │                    ││
-│  │   PreloadEvents      │  │                      │  │                    ││
-│  │ #endif               │  │                      │  │                    ││
-│  └──────────────────────┘  └──────────────────────┘  └────────────────────┘│
+│  ✓ CONSISTENT LOOP STRUCTURE                                                │
+│    ┌─────────────────────────────────────────────────────────────────────┐  │
+│    │ Engine::Run() shared by both derived classes                       │  │
+│    │ Loop number management in one place                                │  │
+│    └─────────────────────────────────────────────────────────────────────┘  │
 │                                                                             │
-│  ┌──────────────────────┐  ┌──────────────────────┐  ┌────────────────────┐│
-│  │ ExecuteLogic()       │  │ PostLogic()          │  │ TickEventBus()     ││
-│  │ ─────────────────    │  │ ─────────────────    │  │ ───────────────    ││
-│  │ #ifdef TEST_BUILD    │  │ #ifdef TEST_BUILD    │  │ (no conditionals)  ││
-│  │   SimulationSteps    │  │   CompareSnapshot    │  │ TickGlobalEventBus ││
-│  │ #else                │  │ #else                │  │                    ││
-│  │   UpdateScenes       │  │   CallRenderCycle    │  │                    ││
-│  │ #endif               │  │ #endif               │  │                    ││
-│  └──────────────────────┘  └──────────────────────┘  └────────────────────┘│
+│  ✓ CLEAR EXTENSION POINTS                                                   │
+│    ┌─────────────────────────────────────────────────────────────────────┐  │
+│    │ Only ConfigureFromData() and ExecuteTick() differ                  │  │
+│    │ Easy to see what's different between game and test                 │  │
+│    └─────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+│  ✓ TYPE-SAFE                                                                │
+│    ┌─────────────────────────────────────────────────────────────────────┐  │
+│    │ Can't accidentally use GameEngine behaviors in TestEngine          │  │
+│    │ Compile-time checking via class hierarchy                          │  │
+│    └─────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+│  ✓ TESTABLE                                                                 │
+│    ┌─────────────────────────────────────────────────────────────────────┐  │
+│    │ TestEngine can be instantiated directly in unit tests              │  │
+│    │ No need for separate test harness infrastructure                   │  │
+│    └─────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+│  ✓ NO COMPILE-TIME CONDITIONALS                                             │
+│    ┌─────────────────────────────────────────────────────────────────────┐  │
+│    │ No #ifdef STEAMROT_TEST_BUILD needed                               │  │
+│    │ Polymorphism handles the differences cleanly                       │  │
+│    └─────────────────────────────────────────────────────────────────────┘  │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
-```
-
-### Compile-Time Conditionals
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                    COMPILE-TIME CONFIGURATION                                │
-└─────────────────────────────────────────────────────────────────────────────┘
-
-CMakeLists.txt:
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ # Game executable - no special defines                                      │
-│ add_executable(steamrot main.cpp ...)                                       │
-│                                                                             │
-│ # Test executables - define STEAMROT_TEST_BUILD                             │
-│ add_executable(test_harness ...)                                            │
-│ target_compile_definitions(test_harness PRIVATE STEAMROT_TEST_BUILD)        │
-└─────────────────────────────────────────────────────────────────────────────┘
-
-Result:
-┌───────────────────────────────┐         ┌───────────────────────────────┐
-│    Game Build (steamrot)      │         │   Test Build (test_harness)   │
-├───────────────────────────────┤         ├───────────────────────────────┤
-│                               │         │                               │
-│  PreTick():                   │         │  PreTick():                   │
-│    UpdateGameResources()      │         │    ExecuteInputEventsForTick()│
-│    PreloadEvents()            │         │    ExecuteEventsForTick()     │
-│                               │         │                               │
-│  ExecuteLogic():              │         │  ExecuteLogic():              │
-│    UpdateScenes()             │         │    ExecuteSimulationSteps()   │
-│                               │         │                               │
-│  PostLogic():                 │         │  PostLogic():                 │
-│    CallRenderCycle()          │         │    CompareTickSnapshot()      │
-│                               │         │                               │
-│  ┌───────────────────────┐   │         │   ┌───────────────────────┐   │
-│  │ scene_manager member  │   │         │   │ test_config member    │   │
-│  │ display_manager member│   │         │   │ current_tick member   │   │
-│  │                       │   │         │   │ test_fixture member   │   │
-│  └───────────────────────┘   │         │   └───────────────────────┘   │
-│                               │         │                               │
-└───────────────────────────────┘         └───────────────────────────────┘
-
-Benefits:
-✓ Wrong code paths are never compiled
-✓ No runtime overhead for conditionals  
-✓ Compiler can optimize each build independently
-✓ Type-safe: test members don't exist in game build
-```
-
-### ExecuteTick() Flow (Both Builds)
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                    tick::ExecuteTick(TickContext &ctx)                       │
-│                    (Guaranteed Execution Order)                              │
-└─────────────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-        ┌───────────────────────────────────────────────────────┐
-        │ 1. PreTick(ctx)                         [CONDITIONAL] │
-        │    ┌────────────────────┐  ┌────────────────────────┐ │
-        │    │ Game Build         │  │ Test Build             │ │
-        │    │ • UpdateResources  │  │ • InjectInputs         │ │
-        │    │ • PreloadEvents    │  │ • InjectEvents         │ │
-        │    └────────────────────┘  └────────────────────────┘ │
-        └───────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-        ┌───────────────────────────────────────────────────────┐
-        │ 2. ProcessEventBuses(ctx)                   [SHARED]  │
-        │    └─ ProcessWaitingRoomEventBus()                    │
-        │    └─ UpdateSubscribersFromGlobalEventBus()           │
-        └───────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-        ┌───────────────────────────────────────────────────────┐
-        │ 3. ProcessSubscriptions(ctx)            [CONDITIONAL] │
-        │    ┌────────────────────┐  ┌────────────────────────┐ │
-        │    │ Game Build         │  │ Test Build             │ │
-        │    │ • SceneManager     │  │ • (no-op)              │ │
-        │    │   subscriptions    │  │                        │ │
-        │    └────────────────────┘  └────────────────────────┘ │
-        └───────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-        ┌───────────────────────────────────────────────────────┐
-        │ 4. ExecuteLogic(ctx)                    [CONDITIONAL] │
-        │    ┌────────────────────┐  ┌────────────────────────┐ │
-        │    │ Game Build         │  │ Test Build             │ │
-        │    │ • UpdateScenes     │  │ • ExecuteSimulation    │ │
-        │    │   (LogicMap)       │  │   (SimulationData)     │ │
-        │    └────────────────────┘  └────────────────────────┘ │
-        └───────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-        ┌───────────────────────────────────────────────────────┐
-        │ 5. PostLogic(ctx)                       [CONDITIONAL] │
-        │    ┌────────────────────┐  ┌────────────────────────┐ │
-        │    │ Game Build         │  │ Test Build             │ │
-        │    │ • CallRenderCycle  │  │ • CompareSnapshot      │ │
-        │    └────────────────────┘  └────────────────────────┘ │
-        └───────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-        ┌───────────────────────────────────────────────────────┐
-        │ 6. TickEventBus(ctx)                          [SHARED]│
-        │    └─ TickGlobalEventBus()                            │
-        └───────────────────────────────────────────────────────┘
 ```
 
 ---
 
-### Original Inheritance Approach (Not Chosen)
+### TickContext (Supplementary Approach)
 
-For reference, the originally proposed inheritance-based approach:
+The `TickContext` approach remains available for cases where you want to share individual tick execution steps as free functions:
 
 ```
                     ┌─────────────────────────┐
@@ -558,41 +554,44 @@ METADATA CONTEXT (holds test information):
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│              UNIFIED TICK ARCHITECTURE OVERVIEW (Hybrid Approach)            │
+│           UNIFIED TICK ARCHITECTURE OVERVIEW (Abstract Engine)              │
 └─────────────────────────────────────────────────────────────────────────────┘
 
                               ┌─────────────────────────┐
-                              │      TickContext        │
-                              │  (Resource Container)   │
+                              │         Engine          │
+                              │    (Abstract Base)      │
+                              ├─────────────────────────┤
+                              │ # m_game_resources      │
+                              │ # m_game_context        │
+                              ├─────────────────────────┤
+                              │ + StartUp()             │
+                              │ + Run(num_ticks)        │
+                              │ # ConfigureFromData()   │ ◄── virtual
+                              │ # ExecuteTick()         │ ◄── virtual
                               └───────────┬─────────────┘
                                           │
-                                          │ passed to
-                                          ▼
-                        ┌─────────────────────────────────────┐
-                        │       tick::ExecuteTick(ctx)        │
-                        │   (Free function with ordering)     │
-                        └───────────────┬─────────────────────┘
-                                        │
-                                        │ calls (in order)
-            ┌───────────┬───────────────┼───────────────┬───────────┐
-            ▼           ▼               ▼               ▼           ▼
-     ┌──────────┐ ┌──────────┐   ┌──────────┐   ┌──────────┐ ┌──────────┐
-     │ PreTick  │ │ Process- │   │ Process- │   │ Execute- │ │ PostLogic│
-     │          │ │ EventBus │   │ Subs     │   │ Logic    │ │          │
-     └────┬─────┘ └────┬─────┘   └────┬─────┘   └────┬─────┘ └────┬─────┘
-          │            │              │              │            │
-          │            │              │              │            │
-     [CONDITIONAL]  [SHARED]    [CONDITIONAL]  [CONDITIONAL] [CONDITIONAL]
-          │            │              │              │            │
-    ┌─────┴─────┐      │        ┌─────┴─────┐  ┌─────┴─────┐ ┌─────┴─────┐
-    │Game│Test │      │        │Game│(none)│  │Game│Test │ │Game│Test │
-    └────┴─────┘      │        └────┴──────┘  └────┴─────┘ └────┴─────┘
+                     ┌────────────────────┴────────────────────┐
+                     │                                         │
+                     ▼                                         ▼
+          ┌─────────────────────┐                 ┌─────────────────────┐
+          │     GameEngine      │                 │     TestEngine      │
+          ├─────────────────────┤                 ├─────────────────────┤
+          │ - m_scene_manager   │                 │ - m_test_config     │
+          │ - m_display_manager │                 │ - m_entity_manager  │
+          ├─────────────────────┤                 │ - m_current_tick    │
+          │ ExecuteTick():      │                 ├─────────────────────┤
+          │  • Real SFML input  │                 │ ExecuteTick():      │
+          │  • Scene logic      │                 │  • Simulated input  │
+          │  • Render to window │                 │  • Simulation steps │
+          └─────────────────────┘                 │  • State validation │
+                                                  └─────────────────────┘
 
 
 Benefits:
-✓ Free functions - simpler, no vtable overhead
-✓ Compile-time conditionals - wrong code never compiled
-✓ Resource class - prevents misuse
-✓ Guaranteed execution order via ExecuteTick()
-✓ Individual functions testable in isolation
+✓ Unified resource management in Engine base class
+✓ Consistent loop structure via Engine::Run()
+✓ Clear extension points (ConfigureFromData, ExecuteTick)
+✓ Type-safe through polymorphism
+✓ TestEngine usable directly in unit tests
+✓ No compile-time conditionals needed
 ```

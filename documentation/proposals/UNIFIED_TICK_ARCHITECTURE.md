@@ -134,14 +134,251 @@ ExecuteTickBasedTest(config, fixture)
 
 ## Proposed Solutions
 
-### Solution 1: Hybrid Free Function Approach with Resource Classes
+### Solution 1: Abstract Engine Base Class with Unified Resource Management
 
-**Design Decision**: After discussion, a hybrid approach is preferred over pure inheritance:
-- **Free functions** for tick execution steps (simpler, more flexible)
-- **Compile-time conditionals** for game vs test differences
-- **Resource classes** to encapsulate required resources and prevent misuse
+**Design Decision**: After discussion, a hybrid approach combines:
+- **Abstract Engine base class** for unified resource management
+- **Derived GameEngine and TestEngine** for specific behaviors
+- **Free functions with TickContext** for tick execution steps
+- **Virtual methods** only for the divergent behavior points
 
-The key insight is that misuse is prevented by requiring the appropriate resource class - you can't call a function without having the resources it needs.
+The key insight is that resource management should be identical between game and test, with only the tick execution behavior differing.
+
+#### Engine Class Hierarchy
+
+```cpp
+/////////////////////////////////////////////////
+/// @class Engine
+/// @brief Abstract base class for game and test engines
+///
+/// Provides unified resource management. Both GameEngine and
+/// TestEngine derive from this, ensuring consistent resource
+/// handling while allowing different tick execution behaviors.
+/////////////////////////////////////////////////
+class Engine {
+protected:
+  /////////////////////////////////////////////////
+  /// @brief Game-level resources (window, event handler, assets, etc.)
+  /////////////////////////////////////////////////
+  GameResources m_game_resources;
+
+  /////////////////////////////////////////////////
+  /// @brief Game context providing references to resources
+  /////////////////////////////////////////////////
+  GameContext m_game_context;
+
+  /////////////////////////////////////////////////
+  /// @brief Constructor initializes resources
+  /////////////////////////////////////////////////
+  Engine(EnvironmentType env_type = EnvironmentType::None);
+
+  /////////////////////////////////////////////////
+  /// @brief Configure engine from FlatBuffers data
+  /////////////////////////////////////////////////
+  virtual std::expected<std::monostate, FailInfo>
+  ConfigureFromData() = 0;
+
+  /////////////////////////////////////////////////
+  /// @brief Run a single tick - implemented differently by derived classes
+  /////////////////////////////////////////////////
+  virtual void ExecuteTick() = 0;
+
+public:
+  virtual ~Engine() = default;
+
+  /////////////////////////////////////////////////
+  /// @brief Start up the engine (load resources, configure)
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> StartUp();
+
+  /////////////////////////////////////////////////
+  /// @brief Run the main loop
+  /// @param num_ticks Number of ticks to run (0 = infinite for game)
+  /////////////////////////////////////////////////
+  void Run(size_t num_ticks = 0);
+
+  /////////////////////////////////////////////////
+  /// @brief Get current loop number
+  /////////////////////////////////////////////////
+  size_t GetLoopNumber() const { return m_game_resources.loop_number; }
+
+  /////////////////////////////////////////////////
+  /// @brief Access game resources
+  /////////////////////////////////////////////////
+  GameResources& GetGameResources() { return m_game_resources; }
+  const GameResources& GetGameResources() const { return m_game_resources; }
+};
+```
+
+#### GameEngine - Production Implementation
+
+```cpp
+/////////////////////////////////////////////////
+/// @class GameEngine
+/// @brief Production game engine with window, rendering, etc.
+/////////////////////////////////////////////////
+class GameEngine : public Engine {
+private:
+  SceneManager m_scene_manager;
+  DisplayManager m_display_manager;
+
+protected:
+  std::expected<std::monostate, FailInfo> ConfigureFromData() override {
+    // Load game engine data, configure scene manager, etc.
+    FlatbuffersDataLoader data_loader;
+    auto game_data = data_loader.ProvideGameEngineData();
+    // ... configuration
+    return std::monostate{};
+  }
+
+  void ExecuteTick() override {
+    // Game-specific tick execution
+    UpdateGameResources(m_game_resources);
+    m_game_resources.event_handler.PreloadEvents(m_game_resources.game_window);
+    
+    // Shared event bus processing
+    m_game_resources.event_handler.ProcessWaitingRoomEventBus();
+    m_game_resources.event_handler.UpdateSubscribersFromGlobalEventBus();
+    
+    // Game-specific logic
+    ProcessSubscriptions();
+    m_scene_manager.UpdateSceneManager();
+    m_display_manager.CallRenderCycle();
+    
+    // Shared event bus tick
+    m_game_resources.event_handler.TickGlobalEventBus();
+  }
+
+public:
+  GameEngine(EnvironmentType env_type = EnvironmentType::Production)
+    : Engine(env_type),
+      m_scene_manager(m_game_context),
+      m_display_manager(m_game_resources.game_window, m_scene_manager) {}
+};
+```
+
+#### TestEngine - Testing Implementation
+
+```cpp
+/////////////////////////////////////////////////
+/// @class TestEngine
+/// @brief Test engine for data-driven testing
+///
+/// Uses same resource management as GameEngine but with
+/// simulated inputs and validation instead of rendering.
+/////////////////////////////////////////////////
+class TestEngine : public Engine {
+private:
+  const TestDataConfig *m_test_config = nullptr;
+  EntityManager m_entity_manager;
+  SceneContext m_scene_context;
+  uint32_t m_current_tick = 0;
+
+protected:
+  std::expected<std::monostate, FailInfo> ConfigureFromData() override {
+    // Configure from test data instead of game data files
+    if (!m_test_config) {
+      return std::unexpected(FailInfo{FailMode::NullPointer, "TestDataConfig is null"});
+    }
+    
+    // Configure entities from test data
+    if (m_test_config->start_data_collection() && 
+        m_test_config->start_data_collection()->entity_collection()) {
+      FlatbuffersConfigurator configurator(m_game_resources.event_handler);
+      auto result = configurator.ConfigureEntitiesFromCollection(
+          m_entity_manager.GetEntityMemoryPool(),
+          m_test_config->start_data_collection()->entity_collection());
+      if (!result.has_value()) return std::unexpected(result.error());
+    }
+    
+    return std::monostate{};
+  }
+
+  void ExecuteTick() override {
+    ++m_current_tick;
+    
+    // Test-specific: Inject simulated inputs and events
+    ExecuteInputEventsForTick(m_test_config->input_sequence(), 
+                               m_current_tick, m_game_resources);
+    ExecuteEventsForTick(m_test_config->event_sequence(), 
+                         m_current_tick, m_game_resources);
+    
+    // Shared event bus processing (identical to GameEngine)
+    m_game_resources.event_handler.ProcessWaitingRoomEventBus();
+    m_game_resources.event_handler.UpdateSubscribersFromGlobalEventBus();
+    
+    // Test-specific: Execute simulation steps
+    if (m_test_config->simulation_data() && 
+        m_test_config->simulation_data()->steps()) {
+      for (const SimulationStep *step : *m_test_config->simulation_data()->steps()) {
+        ExecuteSimulationStep(step, m_scene_context);
+      }
+    }
+    
+    // Test-specific: Validate tick snapshot
+    CompareTickSnapshot(m_current_tick, m_test_config, *this);
+    
+    // Shared event bus tick (identical to GameEngine)
+    m_game_resources.event_handler.TickGlobalEventBus();
+  }
+
+public:
+  TestEngine(const TestDataConfig *config)
+    : Engine(EnvironmentType::Test),
+      m_test_config(config),
+      m_entity_manager(m_game_resources.event_handler),
+      m_scene_context(m_entity_manager.GetEntityMemoryPool(),
+                      m_entity_manager.GetArchetypeManager(),
+                      m_scene_resources,
+                      m_game_resources) {}
+      
+  /////////////////////////////////////////////////
+  /// @brief Access entity manager for test assertions
+  /////////////////////////////////////////////////
+  EntityManager& GetEntityManager() { return m_entity_manager; }
+};
+```
+
+#### Shared Run Loop in Base Class
+
+```cpp
+void Engine::Run(size_t num_ticks) {
+  // Start up and configure
+  auto startup_result = StartUp();
+  if (!startup_result.has_value()) {
+    // Handle error
+    return;
+  }
+  
+  // Run the loop
+  if (num_ticks == 0) {
+    // Infinite loop (for game)
+    while (m_game_resources.game_window.isOpen()) {
+      ExecuteTick();
+      m_game_resources.loop_number++;
+    }
+  } else {
+    // Fixed number of ticks (for tests)
+    for (size_t i = 0; i < num_ticks; ++i) {
+      ExecuteTick();
+      m_game_resources.loop_number++;
+    }
+  }
+}
+```
+
+#### Benefits of Abstract Engine Approach
+
+1. **Unified resource management**: `GameResources`, `GameContext` handled identically
+2. **Consistent loop structure**: `Run()` method shared between game and test
+3. **Clear extension points**: Only `ConfigureFromData()` and `ExecuteTick()` differ
+4. **Type-safe**: Can't accidentally mix game and test behaviors
+5. **Testable**: `TestEngine` can be used in unit tests directly
+6. **No compile-time conditionals needed**: Polymorphism handles the differences
+
+#### TickContext Still Available for Fine-Grained Control
+
+The `TickContext` approach remains available for cases where you want to share individual tick execution steps:
 
 #### TickContext - Resource Container
 
@@ -504,21 +741,49 @@ struct TestMetadataContext {
 
 ## Implementation Plan
 
-### Phase 1: Create Hybrid Tick Execution System (Point 1)
+### Phase 1: Create Abstract Engine Base Class (Point 1)
 
 **Files to create:**
-- `src/systems/tick_execution.h` - TickContext struct and free function declarations
-- `src/systems/tick_execution.cpp` - Free function implementations
+- `src/systems/Engine.h` - Abstract Engine base class
+- `src/systems/Engine.cpp` - Base class implementation (StartUp, Run)
+- `tests/harness/TestEngine.h` - TestEngine derived class
+- `tests/harness/TestEngine.cpp` - TestEngine implementation
 
 **Files to modify:**
-- `src/systems/GameEngine.cpp` - Refactor to use tick::ExecuteTick()
-- `tests/harness/tick_executor.cpp` - Refactor to use tick::ExecuteTick()
-- `CMakeLists.txt` - Add `STEAMROT_TEST_BUILD` compile definition for test targets
+- `src/systems/GameEngine.h` - Derive from Engine
+- `src/systems/GameEngine.cpp` - Refactor to override virtual methods
 
-**Compile-time configuration:**
-```cmake
-# In test CMakeLists.txt
-target_compile_definitions(test_target PRIVATE STEAMROT_TEST_BUILD)
+**Key changes:**
+```cpp
+// Engine.h - Abstract base class
+class Engine {
+protected:
+  GameResources m_game_resources;
+  GameContext m_game_context;
+  
+  virtual std::expected<std::monostate, FailInfo> ConfigureFromData() = 0;
+  virtual void ExecuteTick() = 0;
+  
+public:
+  std::expected<std::monostate, FailInfo> StartUp();
+  void Run(size_t num_ticks = 0);
+};
+
+// GameEngine.h - Production implementation
+class GameEngine : public Engine {
+  SceneManager m_scene_manager;
+  DisplayManager m_display_manager;
+protected:
+  void ExecuteTick() override;
+};
+
+// TestEngine.h - Test implementation  
+class TestEngine : public Engine {
+  const TestDataConfig *m_test_config;
+  EntityManager m_entity_manager;
+protected:
+  void ExecuteTick() override;
+};
 ```
 
 **Estimated effort:** Medium
@@ -544,7 +809,7 @@ target_compile_definitions(test_target PRIVATE STEAMROT_TEST_BUILD)
 
 **Files to modify:**
 - `src/entity/EntityManager.h/cpp` - Accept IEntityDataSource
-- `tests/harness/TestFixture.cpp` - Use TestDataSource
+- `tests/harness/TestEngine.cpp` - Use TestDataSource
 
 **Estimated effort:** Low-Medium
 
@@ -656,14 +921,15 @@ public:
 
 ## Decision
 
-**Chosen Approach**: Hybrid free function approach with compile-time conditionals (Solution 1 - Updated)
+**Chosen Approach**: Abstract Engine base class with derived GameEngine and TestEngine (Solution 1 - Updated)
 
 **Rationale**:
-1. Free functions are simpler and have no vtable overhead
-2. Compile-time conditionals ensure wrong code paths are never compiled
-3. `TickContext` resource class prevents misuse - you can't call a function without the required resources
-4. `tick::ExecuteTick()` still enforces the correct execution order
-5. Individual functions remain testable in isolation
+1. Abstract Engine provides unified resource management
+2. Both GameEngine and TestEngine share the same resource handling
+3. Virtual `ExecuteTick()` method allows different behaviors without compile-time conditionals
+4. `Run()` method in base class ensures consistent loop structure
+5. Clear separation of concerns: resource management in base, behavior in derived
+6. TestEngine can be used directly in unit tests
 
 ---
 
@@ -673,8 +939,10 @@ public:
 
 | File | Purpose |
 |------|---------|
-| `src/systems/tick_execution.h` | TickContext struct and free function declarations |
-| `src/systems/tick_execution.cpp` | Free function implementations with compile-time conditionals |
+| `src/systems/Engine.h` | Abstract Engine base class with unified resource management |
+| `src/systems/Engine.cpp` | Base class implementation (StartUp, Run) |
+| `tests/harness/TestEngine.h` | TestEngine derived class for testing |
+| `tests/harness/TestEngine.cpp` | TestEngine implementation with simulated inputs |
 | `src/logic/ILogicProvider.h` | Logic provider interface |
 | `src/logic/SceneLogicProvider.h/cpp` | Scene-based logic provider |
 | `src/data_handlers/IEntityDataSource.h` | Entity data source interface |
@@ -683,11 +951,11 @@ public:
 
 | File | Changes |
 |------|---------|
-| `src/systems/GameEngine.cpp` | Use tick::ExecuteTick() with TickContext |
+| `src/systems/GameEngine.h` | Derive from Engine, override virtual methods |
+| `src/systems/GameEngine.cpp` | Refactor to use Engine base class |
 | `src/scenes/Scene.h/cpp` | Use ILogicProvider |
-| `tests/harness/tick_executor.cpp` | Use tick::ExecuteTick() with TickContext |
+| `tests/harness/TestFixture.cpp` | Refactor to use TestEngine internally for resource management |
 | `tests/harness/test_context.h` | Rename to TestMetadataContext |
-| `CMakeLists.txt` | Add STEAMROT_TEST_BUILD definition for test targets |
 
 ### Documentation Updates
 
