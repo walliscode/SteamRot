@@ -799,6 +799,29 @@ main {
     margin-bottom: 4px;
 }
 
+/* No connections message */
+.graph-no-connections {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, 80px);
+    text-align: center;
+    color: var(--text-light);
+}
+
+/* Connection line between center and stack */
+.graph-connection-line {
+    position: absolute;
+    left: calc(50% + 60px);
+    top: 50%;
+    width: calc(8% - 10px);
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary) 50%, transparent 50%);
+    background-size: 10px 100%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
 /* Connection lines using SVG */
 .graph-line {
     stroke: var(--border);

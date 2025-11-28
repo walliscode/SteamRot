@@ -578,22 +578,21 @@ function findConnectedNodes(nodeName, nodeType) {
 }
 
 function renderConnections(connectedNodes, container) {
-    // Create left group (for the opposite type connections)
+    // Get connected nodes of the opposite type
     const targetType = graphState.currentType === 'function' ? 'logic-class' : 'function';
     const targetNodes = graphState.currentType === 'function' 
         ? connectedNodes.logicClasses 
         : connectedNodes.functions;
     
     if (targetNodes.size === 0) {
-        container.innerHTML = `
-            <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, 80px); text-align: center; color: var(--text-light);">
-                <p>No connections found for this ${graphState.currentType === 'function' ? 'function' : 'logic class'}</p>
-            </div>
-        `;
+        const emptyMsg = document.createElement('div');
+        emptyMsg.className = 'graph-no-connections';
+        emptyMsg.innerHTML = `<p>No connections found for this ${graphState.currentType === 'function' ? 'function' : 'logic class'}</p>`;
+        container.appendChild(emptyMsg);
         return;
     }
     
-    // Create a stack for the connected nodes
+    // Create a stack for the connected nodes (positioned to the right of center)
     const stackContainer = document.createElement('div');
     stackContainer.className = 'graph-connection-group right';
     
@@ -639,19 +638,9 @@ function renderConnections(connectedNodes, container) {
 }
 
 function renderConnectionLines(container, nodeCount) {
-    // Simple CSS-based connection line instead of SVG to avoid percentage issues
+    // Add a dashed connection line from center to the node stack
     const connectionLine = document.createElement('div');
-    connectionLine.style.cssText = `
-        position: absolute;
-        left: calc(50% + 60px);
-        top: 50%;
-        width: calc(8% - 10px);
-        height: 3px;
-        background: linear-gradient(90deg, #2563eb 50%, transparent 50%);
-        background-size: 10px 100%;
-        transform: translateY(-50%);
-        pointer-events: none;
-    `;
+    connectionLine.className = 'graph-connection-line';
     container.insertBefore(connectionLine, container.firstChild);
 }
 
