@@ -54,9 +54,8 @@ class HtmlGenerator:
             coverage_matrix, sorted(all_functions), sorted(all_logic_classes)
         )
         test_rows_html = self._generate_test_rows(tests)
-        graph_start_options = self._generate_graph_start_options(sorted(all_functions))
         
-        # Convert tests to JSON for JavaScript
+        # Convert tests to JSON for JavaScript (includes simulation_steps)
         tests_json = json.dumps([t.to_dict() for t in tests], indent=2)
         
         # Fill template
@@ -74,7 +73,6 @@ class HtmlGenerator:
         html_content = html_content.replace("{{CATEGORY_CHECKBOXES}}", category_checkboxes)
         html_content = html_content.replace("{{COVERAGE_MATRIX_HTML}}", coverage_matrix_html)
         html_content = html_content.replace("{{TEST_ROWS}}", test_rows_html)
-        html_content = html_content.replace("{{GRAPH_START_OPTIONS}}", graph_start_options)
         
         # Write output
         output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -136,21 +134,6 @@ class HtmlGenerator:
                 f'<label><input type="checkbox" value="{escaped_value}" id="{html.escape(safe_id)}"><span>{escaped_value}</span></label>'
             )
         return '\n                    '.join(lines)
-    
-    def _generate_graph_start_options(self, functions: List[str]) -> str:
-        """Generate the initial options for the graph explorer dropdown.
-        
-        Note: The JavaScript dynamically updates options based on the selected type.
-        This just provides the initial function options when the page loads.
-        """
-        if not functions:
-            return ''
-        
-        lines = []
-        for func in functions:
-            escaped_func = html.escape(func)
-            lines.append(f'<option value="{escaped_func}">{escaped_func}</option>')
-        return '\n                        '.join(lines)
     
     def _generate_coverage_matrix_html(
         self, 

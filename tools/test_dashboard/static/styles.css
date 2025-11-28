@@ -906,3 +906,104 @@ main {
     min-width: 18px;
     text-align: center;
 }
+
+/* Step end indicator (checkmark) */
+.step-end-indicator {
+    position: absolute;
+    bottom: -8px;
+    right: -8px;
+    background: var(--success);
+    color: white;
+    font-size: 0.65rem;
+    padding: 2px 5px;
+    border-radius: 8px;
+}
+
+/* Clickable step styling */
+.graph-node.clickable-step {
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.graph-node.clickable-step:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Matching tests section */
+.graph-matching-tests {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--card-bg);
+    border: 2px solid var(--success);
+    border-radius: 8px;
+    padding: 12px 16px;
+    max-width: 90%;
+    box-shadow: var(--shadow-lg);
+}
+
+.matching-tests-header {
+    font-weight: 600;
+    color: var(--success);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tests-icon {
+    font-size: 1.1rem;
+}
+
+.matching-tests-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.matching-test-item {
+    background: var(--bg);
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.matching-test-item:hover {
+    background: var(--primary);
+    color: white;
+}
+
+/* End of path message */
+.graph-end-of-path {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, 80px);
+    text-align: center;
+    color: var(--text-light);
+    background: var(--card-bg);
+    padding: 15px 25px;
+    border-radius: 8px;
+    border: 2px dashed var(--border);
+}
+
+.graph-end-of-path .end-icon {
+    font-size: 1.5rem;
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Start breadcrumb item */
+.breadcrumb-item.breadcrumb-start {
+    background: var(--primary);
+    color: white;
+    border-left: none;
+}
+
+.breadcrumb-item.breadcrumb-start:hover {
+    background: var(--primary-dark);
+}

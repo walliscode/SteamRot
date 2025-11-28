@@ -13,11 +13,18 @@ let activeFilters = {
     categories: []
 };
 
-// Graph explorer state
+// Graph explorer state - Simulation Path Explorer
+// Allows step-by-step exploration of simulation sequences from test data.
+// pathTree is a prefix tree (trie) where:
+// - Each node represents a step in a simulation sequence
+// - children: Map<stepName, childNode> maps step names to child nodes
+// - tests: Array of test names that end at this exact step
+// - isEnd: Boolean indicating if any test ends at this node
+// - isFunction: Boolean true if step is a Function, false if LogicClass
 let graphState = {
-    currentNode: null,
-    currentType: null,
-    breadcrumb: []
+    selectedPath: [],      // Array of selected step names in order
+    pathTree: null,        // Prefix tree structure of all simulation paths
+    matchingTests: []      // Tests that match the current path
 };
 
 // Initialize dashboard
@@ -410,101 +417,143 @@ function hideDetails() {
 }
 
 // ============================================
-// Graph Explorer Functions
+// Graph Explorer Functions - Simulation Path Explorer
 // ============================================
 
 function initializeGraphExplorer() {
-    const startTypeSelect = document.getElementById('graph-start-type');
-    const startNodeSelect = document.getElementById('graph-start-node');
     const resetBtn = document.getElementById('graph-reset');
-    
-    if (startTypeSelect) {
-        startTypeSelect.addEventListener('change', () => {
-            updateStartNodeOptions();
-            resetGraph();
-        });
-    }
-    
-    if (startNodeSelect) {
-        startNodeSelect.addEventListener('change', () => {
-            const selectedNode = startNodeSelect.value;
-            if (selectedNode) {
-                const nodeType = startTypeSelect.value;
-                selectGraphNode(selectedNode, nodeType);
-            }
-        });
-    }
     
     if (resetBtn) {
         resetBtn.addEventListener('click', resetGraph);
     }
     
-    // Initialize options
-    updateStartNodeOptions();
-}
-
-function updateStartNodeOptions() {
-    const startTypeSelect = document.getElementById('graph-start-type');
-    const startNodeSelect = document.getElementById('graph-start-node');
+    // Build the simulation path tree from test data
+    buildPathTree();
     
-    if (!startTypeSelect || !startNodeSelect) return;
-    
-    const nodeType = startTypeSelect.value;
-    
-    // Clear current options except the placeholder
-    startNodeSelect.innerHTML = '<option value="">-- Select to begin --</option>';
-    
-    // Get unique values based on selected type
-    const values = new Set();
-    TEST_DATA.forEach(test => {
-        if (nodeType === 'function') {
-            test.functions.forEach(f => values.add(f));
-        } else {
-            test.logic_classes.forEach(c => values.add(c));
-        }
-    });
-    
-    // Add options sorted alphabetically
-    const sortedValues = Array.from(values).sort();
-    sortedValues.forEach(value => {
-        const option = document.createElement('option');
-        option.value = value;
-        option.textContent = value;
-        startNodeSelect.appendChild(option);
-    });
-}
-
-function selectGraphNode(nodeName, nodeType) {
-    graphState.currentNode = nodeName;
-    graphState.currentType = nodeType;
-    graphState.breadcrumb.push({ name: nodeName, type: nodeType });
-    
+    // Render the initial state (first steps only)
     renderGraph();
-    updateBreadcrumb();
+}
+
+/**
+ * Build a trie/tree structure from all simulation step sequences.
+ * Each node has: { children: Map<stepName, node>, tests: [testName], isFunction: bool }
+ */
+function buildPathTree() {
+    graphState.pathTree = {
+        children: new Map(),
+        tests: [],
+        isEnd: false
+    };
+    
+    TEST_DATA.forEach(test => {
+        // Get simulation steps for this test
+        const steps = test.simulation_steps || [];
+        if (steps.length === 0) return;
+        
+        let currentNode = graphState.pathTree;
+        
+        steps.forEach((step, index) => {
+            // Use execution_mode to determine which field to use for step name
+            const isFunction = step.execution_mode === 'Function';
+            const stepName = isFunction ? step.function_type : step.logic_class_type;
+            if (!stepName) return;
+            
+            if (!currentNode.children.has(stepName)) {
+                currentNode.children.set(stepName, {
+                    children: new Map(),
+                    tests: [],
+                    isEnd: false,
+                    isFunction: isFunction,
+                    description: step.description || ''
+                });
+            }
+            
+            currentNode = currentNode.children.get(stepName);
+            
+            // If this is the last step, mark as end and add test
+            if (index === steps.length - 1) {
+                currentNode.isEnd = true;
+                currentNode.tests.push(test.name);
+            }
+        });
+    });
+}
+
+/**
+ * Get the current node in the path tree based on selected path
+ */
+function getCurrentPathNode() {
+    let currentNode = graphState.pathTree;
+    
+    for (const stepName of graphState.selectedPath) {
+        if (currentNode.children.has(stepName)) {
+            currentNode = currentNode.children.get(stepName);
+        } else {
+            return null; // Path not found
+        }
+    }
+    
+    return currentNode;
+}
+
+/**
+ * Get available next steps from the current position
+ */
+function getAvailableNextSteps() {
+    const currentNode = getCurrentPathNode();
+    if (!currentNode) return [];
+    
+    const nextSteps = [];
+    currentNode.children.forEach((node, stepName) => {
+        // Count how many tests are reachable from this step
+        const testCount = countReachableTests(node);
+        nextSteps.push({
+            name: stepName,
+            isFunction: node.isFunction,
+            description: node.description,
+            testCount: testCount,
+            isEnd: node.isEnd
+        });
+    });
+    
+    return nextSteps.sort((a, b) => b.testCount - a.testCount);
+}
+
+/**
+ * Count total reachable tests from a node (recursively)
+ */
+function countReachableTests(node) {
+    let count = node.tests.length;
+    node.children.forEach(child => {
+        count += countReachableTests(child);
+    });
+    return count;
+}
+
+/**
+ * Get tests that match the exact current path
+ */
+function getMatchingTests() {
+    const currentNode = getCurrentPathNode();
+    if (!currentNode) return [];
+    return currentNode.tests || [];
+}
+
+function selectStep(stepName) {
+    graphState.selectedPath.push(stepName);
+    renderGraph();
 }
 
 function resetGraph() {
-    graphState.currentNode = null;
-    graphState.currentType = null;
-    graphState.breadcrumb = [];
-    
-    const canvas = document.getElementById('graph-canvas');
-    const emptyState = document.getElementById('graph-empty-state');
-    const breadcrumb = document.getElementById('graph-breadcrumb');
-    const startNodeSelect = document.getElementById('graph-start-node');
-    
-    if (canvas) canvas.classList.remove('active');
-    if (emptyState) emptyState.classList.remove('hidden');
-    if (breadcrumb) breadcrumb.classList.add('hidden');
-    if (startNodeSelect) startNodeSelect.value = '';
-    
-    // Clear connections
-    const connections = document.getElementById('graph-connections');
-    if (connections) connections.innerHTML = '';
-    
-    // Hide center node
-    const centerNode = document.getElementById('graph-center-node');
-    if (centerNode) centerNode.classList.add('hidden');
+    graphState.selectedPath = [];
+    graphState.matchingTests = [];
+    renderGraph();
+}
+
+function goToStep(index) {
+    // Navigate to a specific step in the path (remove everything after)
+    graphState.selectedPath = graphState.selectedPath.slice(0, index);
+    renderGraph();
 }
 
 function renderGraph() {
@@ -512,179 +561,66 @@ function renderGraph() {
     const emptyState = document.getElementById('graph-empty-state');
     const connections = document.getElementById('graph-connections');
     const centerNode = document.getElementById('graph-center-node');
+    const breadcrumb = document.getElementById('graph-breadcrumb');
     
-    if (!canvas || !emptyState || !connections || !centerNode) return;
+    if (!canvas || !connections) return;
     
-    // Show canvas, hide empty state
-    canvas.classList.add('active');
-    emptyState.classList.add('hidden');
+    // Get available next steps
+    const nextSteps = getAvailableNextSteps();
+    const matchingTests = getMatchingTests();
     
-    // Set center node
-    centerNode.textContent = graphState.currentNode;
-    centerNode.classList.remove('hidden');
-    centerNode.className = `graph-node center-node ${graphState.currentType === 'function' ? 'function-node' : 'logic-class-node'}`;
-    
-    // Find connected nodes
-    const connectedNodes = findConnectedNodes(graphState.currentNode, graphState.currentType);
+    // Update state
+    graphState.matchingTests = matchingTests;
     
     // Clear previous connections
     connections.innerHTML = '';
     
-    // Render connections
-    renderConnections(connectedNodes, connections);
-}
-
-function findConnectedNodes(nodeName, nodeType) {
-    const connected = {
-        functions: new Map(),
-        logicClasses: new Map()
-    };
+    // Always show canvas
+    if (canvas) canvas.classList.add('active');
+    if (emptyState) emptyState.classList.add('hidden');
     
-    TEST_DATA.forEach(test => {
-        let isMatch = false;
-        
-        if (nodeType === 'function') {
-            isMatch = test.functions.includes(nodeName);
-        } else {
-            isMatch = test.logic_classes.includes(nodeName);
+    // Handle empty state - no steps available and no path selected
+    if (nextSteps.length === 0 && graphState.selectedPath.length === 0) {
+        if (emptyState) {
+            emptyState.classList.remove('hidden');
+            emptyState.innerHTML = `
+                <span class="empty-icon">📊</span>
+                <p>No simulation sequences found in test data</p>
+            `;
         }
-        
-        if (isMatch) {
-            // Add connected functions (if we're starting from a logic class)
-            if (nodeType === 'logic-class') {
-                test.functions.forEach(func => {
-                    if (!connected.functions.has(func)) {
-                        connected.functions.set(func, { tests: [], count: 0 });
-                    }
-                    connected.functions.get(func).tests.push(test.name);
-                    connected.functions.get(func).count++;
-                });
-            }
-            
-            // Add connected logic classes (if we're starting from a function)
-            if (nodeType === 'function') {
-                test.logic_classes.forEach(cls => {
-                    if (!connected.logicClasses.has(cls)) {
-                        connected.logicClasses.set(cls, { tests: [], count: 0 });
-                    }
-                    connected.logicClasses.get(cls).tests.push(test.name);
-                    connected.logicClasses.get(cls).count++;
-                });
-            }
-        }
-    });
-    
-    return connected;
-}
-
-function renderConnections(connectedNodes, container) {
-    // Get connected nodes of the opposite type
-    const targetType = graphState.currentType === 'function' ? 'logic-class' : 'function';
-    const targetNodes = graphState.currentType === 'function' 
-        ? connectedNodes.logicClasses 
-        : connectedNodes.functions;
-    
-    if (targetNodes.size === 0) {
-        const emptyMsg = document.createElement('div');
-        emptyMsg.className = 'graph-no-connections';
-        emptyMsg.innerHTML = `<p>No connections found for this ${graphState.currentType === 'function' ? 'function' : 'logic class'}</p>`;
-        container.appendChild(emptyMsg);
+        if (canvas) canvas.classList.remove('active');
+        if (centerNode) centerNode.classList.add('hidden');
+        if (breadcrumb) breadcrumb.classList.add('hidden');
         return;
     }
     
-    // Create a stack for the connected nodes (positioned to the right of center)
-    const stackContainer = document.createElement('div');
-    stackContainer.className = 'graph-connection-group right';
+    // Render the current path as breadcrumb
+    renderPathBreadcrumb();
     
-    const nodeStack = document.createElement('div');
-    nodeStack.className = 'graph-node-stack';
-    
-    // Add label showing count
-    const label = document.createElement('div');
-    label.className = 'graph-node-stack-label';
-    label.textContent = `${targetNodes.size} ${targetType === 'function' ? 'Functions' : 'Logic Classes'} (scroll to see more)`;
-    nodeStack.appendChild(label);
-    
-    // Sort nodes by test count (most tests first)
-    const sortedNodes = Array.from(targetNodes.entries())
-        .sort((a, b) => b[1].count - a[1].count);
-    
-    sortedNodes.forEach(([nodeName, nodeData]) => {
-        const nodeEl = document.createElement('div');
-        nodeEl.className = `graph-node ${targetType === 'function' ? 'function-node' : 'logic-class-node'}`;
-        nodeEl.textContent = nodeName;
-        nodeEl.style.position = 'relative';
-        
-        // Add test count badge
-        const badge = document.createElement('span');
-        badge.className = 'node-test-count';
-        badge.textContent = nodeData.count;
-        badge.title = `${nodeData.count} test(s): ${nodeData.tests.slice(0, 3).join(', ')}${nodeData.count > 3 ? '...' : ''}`;
-        nodeEl.appendChild(badge);
-        
-        // Click handler to navigate to this node
-        nodeEl.addEventListener('click', () => {
-            navigateToNode(nodeName, targetType);
-        });
-        
-        nodeStack.appendChild(nodeEl);
-    });
-    
-    stackContainer.appendChild(nodeStack);
-    container.appendChild(stackContainer);
-    
-    // Add SVG for connection lines
-    renderConnectionLines(container, sortedNodes.length);
-}
-
-function renderConnectionLines(container, nodeCount) {
-    // Add a dashed connection line from center to the node stack
-    const connectionLine = document.createElement('div');
-    connectionLine.className = 'graph-connection-line';
-    container.insertBefore(connectionLine, container.firstChild);
-}
-
-function navigateToNode(nodeName, nodeType) {
-    // Check if we're going back to a previous node in breadcrumb
-    const existingIndex = graphState.breadcrumb.findIndex(
-        item => item.name === nodeName && item.type === nodeType
-    );
-    
-    if (existingIndex >= 0) {
-        // Trim breadcrumb to this point
-        graphState.breadcrumb = graphState.breadcrumb.slice(0, existingIndex + 1);
-    } else {
-        // Add to breadcrumb
-        graphState.breadcrumb.push({ name: nodeName, type: nodeType });
+    // Render the center node (current position)
+    if (centerNode) {
+        if (graphState.selectedPath.length > 0) {
+            const currentStep = graphState.selectedPath[graphState.selectedPath.length - 1];
+            const currentNode = getCurrentPathNode();
+            centerNode.textContent = currentStep;
+            centerNode.classList.remove('hidden');
+            centerNode.className = `graph-node center-node ${currentNode && currentNode.isFunction ? 'function-node' : 'logic-class-node'}`;
+        } else {
+            centerNode.classList.add('hidden');
+        }
     }
     
-    graphState.currentNode = nodeName;
-    graphState.currentType = nodeType;
-    
-    // Update dropdown to match
-    const startTypeSelect = document.getElementById('graph-start-type');
-    const startNodeSelect = document.getElementById('graph-start-node');
-    
-    if (startTypeSelect) {
-        startTypeSelect.value = nodeType;
-        updateStartNodeOptions();
-    }
-    
-    if (startNodeSelect) {
-        startNodeSelect.value = nodeName;
-    }
-    
-    renderGraph();
-    updateBreadcrumb();
+    // Render next steps and matching tests
+    renderNextStepsAndTests(connections, nextSteps, matchingTests);
 }
 
-function updateBreadcrumb() {
+function renderPathBreadcrumb() {
     const breadcrumb = document.getElementById('graph-breadcrumb');
     const trail = document.getElementById('breadcrumb-trail');
     
     if (!breadcrumb || !trail) return;
     
-    if (graphState.breadcrumb.length === 0) {
+    if (graphState.selectedPath.length === 0) {
         breadcrumb.classList.add('hidden');
         return;
     }
@@ -692,22 +628,137 @@ function updateBreadcrumb() {
     breadcrumb.classList.remove('hidden');
     trail.innerHTML = '';
     
-    graphState.breadcrumb.forEach((item, index) => {
+    // Add "Start" at the beginning
+    const startCrumb = document.createElement('span');
+    startCrumb.className = 'breadcrumb-item breadcrumb-start';
+    startCrumb.textContent = '🏁 Start';
+    startCrumb.addEventListener('click', () => goToStep(0));
+    trail.appendChild(startCrumb);
+    
+    // Build path to each step
+    let pathNode = graphState.pathTree;
+    graphState.selectedPath.forEach((stepName, index) => {
+        // Add separator
+        const separator = document.createElement('span');
+        separator.className = 'breadcrumb-separator';
+        separator.textContent = '→';
+        trail.appendChild(separator);
+        
+        // Get node info
+        pathNode = pathNode.children.get(stepName);
+        const isFunction = pathNode ? pathNode.isFunction : false;
+        
         // Add breadcrumb item
         const crumb = document.createElement('span');
-        crumb.className = `breadcrumb-item ${item.type === 'function' ? 'function-type' : 'logic-class-type'}`;
-        crumb.textContent = item.name;
-        crumb.addEventListener('click', () => {
-            navigateToNode(item.name, item.type);
-        });
+        crumb.className = `breadcrumb-item ${isFunction ? 'function-type' : 'logic-class-type'}`;
+        crumb.textContent = stepName;
+        crumb.addEventListener('click', () => goToStep(index + 1));
         trail.appendChild(crumb);
-        
-        // Add separator if not last
-        if (index < graphState.breadcrumb.length - 1) {
-            const separator = document.createElement('span');
-            separator.className = 'breadcrumb-separator';
-            separator.textContent = '→';
-            trail.appendChild(separator);
-        }
     });
+}
+
+function renderNextStepsAndTests(container, nextSteps, matchingTests) {
+    // Create wrapper for next steps
+    if (nextSteps.length > 0) {
+        const stackContainer = document.createElement('div');
+        stackContainer.className = 'graph-connection-group right';
+        
+        const nodeStack = document.createElement('div');
+        nodeStack.className = 'graph-node-stack';
+        
+        // Add label
+        const label = document.createElement('div');
+        label.className = 'graph-node-stack-label';
+        label.textContent = `${nextSteps.length} next step${nextSteps.length === 1 ? '' : 's'} (click to select)`;
+        nodeStack.appendChild(label);
+        
+        // Add each possible next step
+        nextSteps.forEach(step => {
+            const nodeEl = document.createElement('div');
+            nodeEl.className = `graph-node clickable-step ${step.isFunction ? 'function-node' : 'logic-class-node'}`;
+            nodeEl.textContent = step.name;
+            
+            // Add test count badge
+            const badge = document.createElement('span');
+            badge.className = 'node-test-count';
+            badge.textContent = step.testCount;
+            badge.title = `${step.testCount} test(s) reachable from this step`;
+            nodeEl.appendChild(badge);
+            
+            // If this step is an endpoint, add indicator
+            if (step.isEnd) {
+                const endIndicator = document.createElement('span');
+                endIndicator.className = 'step-end-indicator';
+                endIndicator.textContent = '✓';
+                endIndicator.title = 'This step completes a test sequence';
+                nodeEl.appendChild(endIndicator);
+            }
+            
+            nodeEl.addEventListener('click', () => selectStep(step.name));
+            nodeStack.appendChild(nodeEl);
+        });
+        
+        stackContainer.appendChild(nodeStack);
+        container.appendChild(stackContainer);
+        
+        // Add connection line
+        if (graphState.selectedPath.length > 0) {
+            renderConnectionLines(container, nextSteps.length);
+        }
+    }
+    
+    // Show matching tests if we have them
+    if (matchingTests.length > 0) {
+        const testContainer = document.createElement('div');
+        testContainer.className = 'graph-matching-tests';
+        
+        const testHeader = document.createElement('div');
+        testHeader.className = 'matching-tests-header';
+        testHeader.innerHTML = `<span class="tests-icon">✅</span> ${matchingTests.length} test${matchingTests.length === 1 ? '' : 's'} available at this path:`;
+        testContainer.appendChild(testHeader);
+        
+        const testList = document.createElement('div');
+        testList.className = 'matching-tests-list';
+        
+        matchingTests.forEach(testName => {
+            const testItem = document.createElement('div');
+            testItem.className = 'matching-test-item';
+            testItem.textContent = testName;
+            testItem.addEventListener('click', () => {
+                // Find and show test details
+                const test = TEST_DATA.find(t => t.name === testName);
+                if (test) showDetails(test);
+            });
+            testList.appendChild(testItem);
+        });
+        
+        testContainer.appendChild(testList);
+        container.appendChild(testContainer);
+    }
+    
+    // If no next steps and no matching tests at root, show instruction
+    if (nextSteps.length === 0 && matchingTests.length === 0 && graphState.selectedPath.length === 0) {
+        const msg = document.createElement('div');
+        msg.className = 'graph-no-connections';
+        msg.innerHTML = '<p>No simulation paths available</p>';
+        container.appendChild(msg);
+    }
+    
+    // If path selected but dead end (no next steps, no matching tests at this exact point)
+    if (nextSteps.length === 0 && matchingTests.length === 0 && graphState.selectedPath.length > 0) {
+        const msg = document.createElement('div');
+        msg.className = 'graph-end-of-path';
+        msg.innerHTML = `
+            <span class="end-icon">🏁</span>
+            <p>End of path - no further steps available</p>
+        `;
+        container.appendChild(msg);
+    }
+}
+
+function renderConnectionLines(container, nodeCount) {
+    // Add a dashed connection line from center to the node stack
+    const connectionLine = document.createElement('div');
+    connectionLine.className = 'graph-connection-line';
+    container.insertBefore(connectionLine, container.firstChild);
 }
