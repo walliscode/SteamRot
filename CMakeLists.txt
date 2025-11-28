@@ -45,4 +45,6 @@ add_subdirectory(src)
 add_subdirectory(tests)
 add_subdirectory(docs)
 
+# Include test dashboard generator target (Python tool for visualizing test data)
+include(${CMAKE_SOURCE_DIR}/cmake/GenerateTestDashboard.cmake)
 

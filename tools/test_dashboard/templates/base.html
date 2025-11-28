@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SteamRot Test Data Dashboard</title>
+    <style>
+{{CSS_CONTENT}}
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🧪 Test Data Dashboard</h1>
+        <p class="subtitle">{{TOTAL_TESTS}} test configurations | Generated: {{TIMESTAMP}}</p>
+        <div class="search-bar">
+            <input type="text" id="search" placeholder="Search tests by name, description, tags...">
+        </div>
+    </header>
+    
+    <div class="main-container">
+        <nav class="filter-panel">
+            <h3>Filters</h3>
+            <button id="clear-filters" class="clear-btn">Clear All Filters</button>
+            
+            <div class="filter-group">
+                <h4>Tags <span class="filter-count" id="tag-count"></span></h4>
+                <div id="tag-filters" class="filter-options">
+{{TAG_CHECKBOXES}}
+                </div>
+            </div>
+            
+            <div class="filter-group">
+                <h4>Functions <span class="filter-count" id="function-count"></span></h4>
+                <div id="function-filters" class="filter-options">
+{{FUNCTION_CHECKBOXES}}
+                </div>
+            </div>
+            
+            <div class="filter-group">
+                <h4>Logic Classes <span class="filter-count" id="logic-class-count"></span></h4>
+                <div id="logic-class-filters" class="filter-options">
+{{LOGIC_CLASS_CHECKBOXES}}
+                </div>
+            </div>
+            
+            <div class="filter-group">
+                <h4>Categories <span class="filter-count" id="category-count"></span></h4>
+                <div id="category-filters" class="filter-options">
+{{CATEGORY_CHECKBOXES}}
+                </div>
+            </div>
+        </nav>
+        
+        <main>
+            <section id="stats-summary" class="stats-panel">
+                <div class="stat-card">
+                    <span class="stat-number" id="visible-count">{{TOTAL_TESTS}}</span>
+                    <span class="stat-label">Tests Shown</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">{{TOTAL_FUNCTIONS}}</span>
+                    <span class="stat-label">Functions</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">{{TOTAL_LOGIC_CLASSES}}</span>
+                    <span class="stat-label">Logic Classes</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">{{TOTAL_TAGS}}</span>
+                    <span class="stat-label">Tags</span>
+                </div>
+            </section>
+            
+            <section id="coverage-matrix">
+                <h2>Coverage Matrix <span class="section-info">(Function × Logic Class)</span></h2>
+                <p class="hint">Click any cell to filter tests covering that combination</p>
+                <div class="matrix-container">
+{{COVERAGE_MATRIX_HTML}}
+                </div>
+            </section>
+            
+            <section id="test-list">
+                <h2>All Tests <span class="results-count">(<span id="results-count">{{TOTAL_TESTS}}</span> results)</span></h2>
+                <table id="tests-table">
+                    <thead>
+                        <tr>
+                            <th data-sort="name" class="sortable">Test Name <span class="sort-icon">↕</span></th>
+                            <th data-sort="category" class="sortable">Category <span class="sort-icon">↕</span></th>
+                            <th data-sort="tags">Tags</th>
+                            <th data-sort="functions">Functions</th>
+                            <th data-sort="classes">Logic Classes</th>
+                            <th data-sort="ticks" class="sortable">Ticks <span class="sort-icon">↕</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+{{TEST_ROWS}}
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+    
+    <aside id="test-details" class="hidden">
+        <div class="details-header">
+            <h2 id="details-title">Test Details</h2>
+            <button id="close-details" class="close-btn">×</button>
+        </div>
+        <div id="details-content"></div>
+    </aside>
+    
+    <div id="overlay" class="hidden"></div>
+    
+    <script>
+        const TEST_DATA = {{TEST_DATA_JSON}};
+        
+{{JAVASCRIPT_CODE}}
+    </script>
+</body>
+</html>
