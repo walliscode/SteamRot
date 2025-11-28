@@ -36,12 +36,10 @@ TEST_CASE("LoadTestDataConfigFromFile returns error for non-existent file",
 
 TEST_CASE("DiscoverTestDataFiles returns empty vector for empty directory",
           "[unit][test_data_loader]") {
-  // Use /tmp as a directory that exists but shouldn't have .test_data.bin files
-  auto result = steamrot::tests::DiscoverTestDataFiles("/tmp");
-  // Should succeed but may or may not be empty depending on /tmp contents
-  // Just check that it succeeds for an existing directory
-  if (std::filesystem::exists("/tmp") && std::filesystem::is_directory("/tmp")) {
-    REQUIRE(result.has_value());
-    // Note: We can't guarantee /tmp is empty, so we just verify it returns
-  }
+  // Use temp_directory_path for cross-platform compatibility
+  auto temp_dir = std::filesystem::temp_directory_path();
+  auto result = steamrot::tests::DiscoverTestDataFiles(temp_dir);
+  // Should succeed for an existing directory
+  REQUIRE(result.has_value());
+  // Note: We can't guarantee temp dir is empty, so we just verify it returns
 }
