@@ -969,12 +969,16 @@ main {
     border-radius: 4px;
     font-size: 0.85rem;
     cursor: pointer;
-    transition: background 0.2s, color 0.2s;
+    transition: background 0.2s, color 0.2s, text-decoration 0.2s;
+    color: var(--primary);
+    text-decoration: underline;
+    border: 1px solid var(--primary);
 }
 
 .matching-test-item:hover {
     background: var(--primary);
     color: white;
+    text-decoration: none;
 }
 
 /* End of path message */
