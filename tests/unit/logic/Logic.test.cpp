@@ -9,7 +9,7 @@
 #include "Logic.h"
 #include "EventHandler.h"
 #include "Subscriber.h"
-#include "TestFixture.h"
+#include "TestEngine.h"
 #include "UIRenderLogic.h"
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
@@ -18,10 +18,12 @@ TEST_CASE("Logic::GetSubscribers returns empty vector initially",
           "[unit][Logic]") {
 
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestFixture test_context;
+  steamrot::tests::TestEngine test_engine(nullptr);
+  auto init_result = test_engine.Initialize();
+  REQUIRE(init_result.has_value());
 
   // Create a concrete Logic instance (using UIRenderLogic as an example)
-  steamrot::UIRenderLogic logic(test_context.GetSceneContext());
+  steamrot::UIRenderLogic logic(test_engine.GetSceneContext());
 
   // Verify subscribers vector is empty initially
   const auto &subscribers = logic.GetSubscribers();
@@ -32,10 +34,12 @@ TEST_CASE("Logic::AddSubscriber adds a subscriber to the vector",
           "[unit][Logic]") {
 
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestFixture test_context;
+  steamrot::tests::TestEngine test_engine(nullptr);
+  auto init_result = test_engine.Initialize();
+  REQUIRE(init_result.has_value());
 
   // Create a concrete Logic instance
-  steamrot::UIRenderLogic logic(test_context.GetSceneContext());
+  steamrot::UIRenderLogic logic(test_engine.GetSceneContext());
 
   // Create a subscriber
   auto subscriber = std::make_shared<steamrot::Subscriber>(
@@ -54,10 +58,12 @@ TEST_CASE("Logic::AddSubscriber can add multiple subscribers",
           "[unit][Logic]") {
 
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestFixture test_context;
+  steamrot::tests::TestEngine test_engine(nullptr);
+  auto init_result = test_engine.Initialize();
+  REQUIRE(init_result.has_value());
 
   // Create a concrete Logic instance
-  steamrot::UIRenderLogic logic(test_context.GetSceneContext());
+  steamrot::UIRenderLogic logic(test_engine.GetSceneContext());
 
   // Create multiple subscribers
   auto subscriber1 = std::make_shared<steamrot::Subscriber>(
@@ -84,10 +90,12 @@ TEST_CASE("Logic::RunLogic can be called on Logic with subscribers",
           "[unit][Logic]") {
 
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestFixture test_context;
+  steamrot::tests::TestEngine test_engine(nullptr);
+  auto init_result = test_engine.Initialize();
+  REQUIRE(init_result.has_value());
 
   // Create a concrete Logic instance
-  steamrot::UIRenderLogic logic(test_context.GetSceneContext());
+  steamrot::UIRenderLogic logic(test_engine.GetSceneContext());
 
   // Create and add a subscriber
   auto subscriber = std::make_shared<steamrot::Subscriber>(

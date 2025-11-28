@@ -22,12 +22,8 @@ namespace steamrot {
 /////////////////////////////////////////////////
 
 GameEngine::GameEngine(EnvironmentType env_type)
-    : m_game_context(m_game_resources), m_scene_manager(m_game_context),
-      m_display_manager(m_game_resources.game_window, m_scene_manager) {
-  // Set initial environment type and loop number
-  m_game_resources.env_type = env_type;
-  m_game_resources.loop_number = 1;
-}
+    : Engine(env_type), m_scene_manager(m_game_context),
+      m_display_manager(m_game_resources.game_window, m_scene_manager) {}
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> GameEngine::ConfigureGameEngineFromData(
@@ -47,87 +43,80 @@ std::expected<std::monostate, FailInfo> GameEngine::ConfigureGameEngineFromData(
   }
   return std::monostate{};
 }
-/////////////////////////////////////////////////
-void GameEngine::RunGame(size_t number_of_loops, bool simulation) {
-
-  // set up resources for the game engine
-  StartUp();
-  //
-  // Start the game loop
-  RunGameLoop(number_of_loops, simulation);
-  //
-  // // Shut down the game engine
-  // ShutDown();
-};
 
 /////////////////////////////////////////////////
-void GameEngine::StartUp() {
+std::expected<std::monostate, FailInfo> GameEngine::ConfigureFromData() {
   FlatbuffersDataLoader data_loader;
 
   // Configure GameResources from resource data
   auto game_resources_result = data_loader.ProvideGameResourcesData();
   if (!game_resources_result) {
-    std::cerr << "Failed to load game resources data: "
-              << game_resources_result.error().message << "\n";
-    if (m_game_resources.game_window.isOpen()) {
-      m_game_resources.game_window.close();
-    }
-    return;
+    return std::unexpected(game_resources_result.error());
   }
 
   auto configure_resources_result = resources::ConfigureGameResources(
       m_game_resources, game_resources_result.value());
   if (!configure_resources_result) {
-    std::cerr << "Failed to configure game resources: "
-              << configure_resources_result.error().message << "\n";
+    return std::unexpected(configure_resources_result.error());
+  }
+
+  // configure the GameEngine from data
+  auto load_data_result = data_loader.ProvideGameEngineData();
+  if (!load_data_result) {
+    return std::unexpected(load_data_result.error());
+  }
+  auto configure_result = ConfigureGameEngineFromData(load_data_result.value());
+  if (!configure_result) {
+    return std::unexpected(configure_result.error());
+  }
+
+  // load default assets
+  auto load_assets_result = m_game_resources.asset_manager.LoadDefaultAssets();
+  if (!load_assets_result) {
+    return std::unexpected(load_assets_result.error());
+  }
+
+  // Configure the SceneManager from data
+  auto scene_manager_data_result = data_loader.ProvideSceneManagerData();
+  if (!scene_manager_data_result) {
+    return std::unexpected(scene_manager_data_result.error());
+  }
+  auto configure_sm_result =
+      m_scene_manager.ConfigureSceneManagerFromData(scene_manager_data_result.value());
+  if (!configure_sm_result) {
+    return std::unexpected(configure_sm_result.error());
+  }
+
+  // load the title scene
+  auto load_scene_result = m_scene_manager.LoadTitleScene();
+  if (!load_scene_result) {
+    return std::unexpected(load_scene_result.error());
+  }
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+void GameEngine::ExecuteTick() {
+  UpdateSystems();
+}
+
+/////////////////////////////////////////////////
+void GameEngine::RunGame(size_t number_of_loops, bool simulation) {
+
+  // set up resources for the game engine using base class StartUp
+  auto startup_result = StartUp();
+  if (!startup_result.has_value()) {
+    std::cerr << "Failed to start up game engine: "
+              << startup_result.error().message << "\n";
     if (m_game_resources.game_window.isOpen()) {
       m_game_resources.game_window.close();
     }
     return;
   }
 
-  // configure the GameEngine from data
-  auto load_data_result = data_loader.ProvideGameEngineData();
-  if (!load_data_result) {
-    std::cerr << "Failed to load game engine data: "
-              << load_data_result.error().message << "\n";
-    m_game_resources.game_window.close();
-    return;
-  }
-  auto configure_result = ConfigureGameEngineFromData(load_data_result.value());
-  if (!configure_result) {
-    std::cerr << "Failed to configure game engine: "
-              << configure_result.error().message << "\n";
-    m_game_resources.game_window.close();
-    return;
-  }
-
-  // load default assets
-  auto load_assets_result = m_game_resources.asset_manager.LoadDefaultAssets();
-  if (!load_assets_result) {
-    std::cerr << "Failed to load default assets: "
-              << load_assets_result.error().message << "\n";
-    m_game_resources.game_window.close();
-    return;
-  }
-
-  // Configure the SceneManager from data
-  auto configure_sm_result = m_scene_manager.ConfigureSceneManagerFromData(
-      data_loader.ProvideSceneManagerData().value());
-  if (!configure_sm_result) {
-    std::cerr << "Failed to configure scene manager: "
-              << configure_sm_result.error().message << "\n";
-    m_game_resources.game_window.close();
-    return;
-  }
-  // load the title scene
-  auto load_scene_result = m_scene_manager.LoadTitleScene();
-  if (!load_scene_result) {
-    std::cerr << "Failed to load title scene: "
-              << load_scene_result.error().message << "\n";
-    m_game_resources.game_window.close();
-    return;
-  }
+  // Start the game loop
+  RunGameLoop(number_of_loops, simulation);
 }
 
 void GameEngine::RunGameLoop(size_t number_of_loops, bool simulation) {

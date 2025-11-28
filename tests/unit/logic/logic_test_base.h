@@ -10,7 +10,7 @@
 
 #include "Logic.h"
 #include "SceneContext.h"
-#include "TestFixture.h"
+#include "TestEngine.h"
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
 #include <type_traits>
@@ -51,9 +51,9 @@ class LogicTestBase {
 
 protected:
   /////////////////////////////////////////////////
-  /// @brief Test fixture providing mock dependencies
+  /// @brief Test engine providing mock dependencies
   /////////////////////////////////////////////////
-  std::unique_ptr<TestFixture> test_fixture;
+  std::unique_ptr<TestEngine> test_engine;
 
   /////////////////////////////////////////////////
   /// @brief The Logic instance under test
@@ -75,17 +75,21 @@ protected:
   /////////////////////////////////////////////////
   virtual void SetUp(SceneType test_scene_type = SceneType::SceneType_TEST) {
     scene_type = test_scene_type;
-    test_fixture = std::make_unique<TestFixture>(scene_type);
+    test_engine = std::make_unique<TestEngine>(nullptr);
+    test_engine->SetSceneType(scene_type);
+    auto init_result = test_engine->Initialize();
+    if (!init_result.has_value()) {
+      FAIL("Failed to initialize TestEngine: " + init_result.error().message);
+    }
   }
 
   /////////////////////////////////////////////////
-  /// @brief Create Logic instance with TestFixture
+  /// @brief Create Logic instance with TestEngine
   ///
   /// @return Unique pointer to Logic instance
   /////////////////////////////////////////////////
   std::unique_ptr<TLogic> CreateLogic() {
-    return std::make_unique<TLogic>(
-        test_fixture->GetSceneContext());
+    return std::make_unique<TLogic>(test_engine->GetSceneContext());
   }
 
   /////////////////////////////////////////////////
@@ -118,7 +122,7 @@ public:
   void TestProcessWithEmptyArchetype() {
     SetUp();
     logic = CreateLogic();
-    
+
     // Run logic with no entities
     REQUIRE_NOTHROW(logic->RunLogic());
     SUCCEED("Logic processed empty archetype without errors");
@@ -132,7 +136,7 @@ public:
   virtual void TestProcessWithSingleEntity() {
     SetUp();
     logic = CreateLogic();
-    
+
     // Subclasses should override to add entity setup
     REQUIRE_NOTHROW(logic->RunLogic());
   }
@@ -147,7 +151,7 @@ public:
   virtual void TestProcessWithMultipleEntities(size_t entity_count = 10) {
     SetUp();
     logic = CreateLogic();
-    
+
     // Subclasses should override to add entity setup
     (void)entity_count; // Suppress unused parameter warning
     REQUIRE_NOTHROW(logic->RunLogic());

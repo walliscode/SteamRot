@@ -9,7 +9,7 @@
 #include "GameEngine.h"
 #include "FlatbuffersDataLoader.h"
 #include "PathProvider.h"
-#include "TestFixture.h"
+#include "TestEngine.h"
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -295,15 +295,17 @@ TEST_CASE(
 
   // create and pre-initialize PathProvider
   steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  // get game context genereted from TextContext
-  steamrot::tests::TestFixture test_context;
-  steamrot::GameContext &game_context = test_context.GetGameContext();
+  // get game context generated from TestEngine
+  steamrot::tests::TestEngine test_engine(nullptr);
+  auto init_result = test_engine.Initialize();
+  REQUIRE(init_result.has_value());
+  steamrot::GameContext &game_context = test_engine.GetGameContext();
 
   // create GameEngine object
   steamrot::GameEngine game_engine(steamrot::EnvironmentType::Test);
 
   // check current variables
-  REQUIRE(game_context.loop_number == 0);
+  REQUIRE(game_context.loop_number == 1);
   REQUIRE(game_context.mouse_position == sf::Vector2i(0, 0));
 
   // simulate some changes

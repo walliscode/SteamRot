@@ -12,7 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FailInfo.h"
-#include "TestFixture.h"
+#include "TestEngine.h"
 #include "event_test_data_generated.h"
 #include <expected>
 
@@ -25,11 +25,11 @@ namespace steamrot::tests {
 /// event handler's waiting room event bus.
 ///
 /// @param event_data The event test data to execute
-/// @param fixture TestFixture containing the test environment
+/// @param engine TestEngine containing the test environment
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ExecuteEventTestData(const EventTestData *event_data, TestFixture &fixture);
+ExecuteEventTestData(const EventTestData *event_data, TestEngine &engine);
 
 /////////////////////////////////////////////////
 /// @brief Execute all events for a specific tick
@@ -40,12 +40,12 @@ ExecuteEventTestData(const EventTestData *event_data, TestFixture &fixture);
 ///
 /// @param event_sequence The event sequence containing all events
 /// @param tick The tick number to process
-/// @param fixture TestFixture containing the test environment
+/// @param engine TestEngine containing the test environment
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 ExecuteEventsForTick(const EventSequence *event_sequence, uint32_t tick,
-                     TestFixture &fixture);
+                     TestEngine &engine);
 
 /////////////////////////////////////////////////
 /// @brief Execute a complete event sequence
@@ -59,11 +59,10 @@ ExecuteEventsForTick(const EventSequence *event_sequence, uint32_t tick,
 /// calling ProcessWaitingRoomEventBus() and TickGlobalEventBus() as needed.
 ///
 /// @param event_sequence The event sequence to execute
-/// @param fixture TestFixture containing the test environment
+/// @param engine TestEngine containing the test environment
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ExecuteEventSequence(const EventSequence *event_sequence,
-                     TestFixture &fixture);
+ExecuteEventSequence(const EventSequence *event_sequence, TestEngine &engine);
 
 } // namespace steamrot::tests

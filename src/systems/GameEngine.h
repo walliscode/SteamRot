@@ -3,11 +3,13 @@
 /// @brief GameEngine class declaration.
 /////////////////////////////////////////////////
 
+#pragma once
+
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
 #include "DisplayManager.h"
-#include "GameResources.h"
+#include "Engine.h"
 #include "SceneManager.h"
 #include "Subscriber.h"
 #include "game_engine_generated.h"
@@ -20,24 +22,14 @@
 namespace steamrot {
 /////////////////////////////////////////////////
 /// @class GameEngine
-/// @brief Methods for managing the game loop, user input and object
-/// communication.
-/////////////////////////////////////////////////
-/// @class GameEngine
-/// @brief 19H
+/// @brief Production game engine with window, rendering, and game loop.
 ///
+/// GameEngine derives from Engine to share resource management with
+/// TestEngine. It implements the production game loop with real input
+/// handling and rendering.
 /////////////////////////////////////////////////
-class GameEngine {
+class GameEngine : public Engine {
 private:
-/////////////////////////////////////////////////
-  /// @brief Game-level resources (window, event handler, asset manager, etc.)
-/////////////////////////////////////////////////
-  GameResources m_game_resources;
-
-/////////////////////////////////////////////////
-  /// @brief GameContext for the game
-/////////////////////////////////////////////////
-  GameContext m_game_context;
 
 /////////////////////////////////////////////////
   /// @brief SceneManager for managing game scenes, this should be the only
@@ -56,11 +48,6 @@ private:
   void UpdateSystems();
 
 /////////////////////////////////////////////////
-  /// @brief Start up the game engine and load any resources
-/////////////////////////////////////////////////
-  void StartUp();
-
-/////////////////////////////////////////////////
   /// @brief Run the game loop until exit condition is met
 /////////////////////////////////////////////////
   void RunGameLoop(size_t number_of_loops = 0, bool simulation = false);
@@ -75,6 +62,23 @@ private:
   /// @brief All subscribers registered to the GameEngine
 /////////////////////////////////////////////////
   std::vector<std::shared_ptr<Subscriber>> m_subscriptions;
+
+protected:
+/////////////////////////////////////////////////
+  /// @brief Configure the engine from game data files.
+  ///
+  /// Loads game resources, GameEngine data, and scene manager configuration.
+  ///
+  /// @return Success or failure information
+/////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> ConfigureFromData() override;
+
+/////////////////////////////////////////////////
+  /// @brief Execute a single tick of the game loop.
+  ///
+  /// Processes input, events, subscriptions, scenes, and rendering.
+/////////////////////////////////////////////////
+  void ExecuteTick() override;
 
 public:
 /////////////////////////////////////////////////

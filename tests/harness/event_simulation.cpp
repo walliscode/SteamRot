@@ -17,7 +17,7 @@ namespace steamrot::tests {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ExecuteEventTestData(const EventTestData *event_data, TestFixture &fixture) {
+ExecuteEventTestData(const EventTestData *event_data, TestEngine &engine) {
 
   // Validate event data
   if (!event_data) {
@@ -43,7 +43,7 @@ ExecuteEventTestData(const EventTestData *event_data, TestFixture &fixture) {
             << EnumNameEventType(event_packet.m_event_type) << std::endl;
 
   // Add event to the event handler
-  EventHandler &event_handler = fixture.GetGameResources().event_handler;
+  EventHandler &event_handler = engine.GetGameResources().event_handler;
   event_handler.AddEvent(event_packet);
   std::cout << "Added Event of type "
             << EnumNameEventType(event_packet.m_event_type)
@@ -55,7 +55,7 @@ ExecuteEventTestData(const EventTestData *event_data, TestFixture &fixture) {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 ExecuteEventsForTick(const EventSequence *event_sequence, uint32_t tick,
-                     TestFixture &fixture) {
+                     TestEngine &engine) {
 
   // Validate event sequence
   if (!event_sequence) {
@@ -75,7 +75,7 @@ ExecuteEventsForTick(const EventSequence *event_sequence, uint32_t tick,
     }
 
     if (event_data->tick() == tick) {
-      auto result = ExecuteEventTestData(event_data, fixture);
+      auto result = ExecuteEventTestData(event_data, engine);
       if (!result.has_value()) {
         return std::unexpected(result.error());
       }
@@ -87,8 +87,7 @@ ExecuteEventsForTick(const EventSequence *event_sequence, uint32_t tick,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ExecuteEventSequence(const EventSequence *event_sequence,
-                     TestFixture &fixture) {
+ExecuteEventSequence(const EventSequence *event_sequence, TestEngine &engine) {
 
   // Validate event sequence
   if (!event_sequence) {
@@ -111,7 +110,7 @@ ExecuteEventSequence(const EventSequence *event_sequence,
 
   // Process events for each tick in order
   for (uint32_t tick : ticks) {
-    auto result = ExecuteEventsForTick(event_sequence, tick, fixture);
+    auto result = ExecuteEventsForTick(event_sequence, tick, engine);
     if (!result.has_value()) {
       return std::unexpected(result.error());
     }

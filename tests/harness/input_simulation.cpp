@@ -18,7 +18,7 @@ namespace steamrot::tests {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ExecuteInputEvent(const InputEvent *input_event, TestFixture &fixture) {
+ExecuteInputEvent(const InputEvent *input_event, TestEngine &engine) {
 
   // Validate input event
   if (!input_event) {
@@ -27,8 +27,8 @@ ExecuteInputEvent(const InputEvent *input_event, TestFixture &fixture) {
   }
 
   // Get game context for accessing mouse position and event handler
-  GameContext &game_context = fixture.GetGameContext();
-  EventHandler &event_handler = fixture.GetGameResources().event_handler;
+  GameContext &game_context = engine.GetGameContext();
+  EventHandler &event_handler = engine.GetGameResources().event_handler;
 
   // Create UserInputBitset for the event (if applicable)
   UserInputBitset user_input_bitset;
@@ -192,8 +192,8 @@ ExecuteInputEvent(const InputEvent *input_event, TestFixture &fixture) {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ExecuteInputEventsForTick(const InputSequence *input_sequence,
-                              uint32_t tick, TestFixture &fixture) {
+ExecuteInputEventsForTick(const InputSequence *input_sequence, uint32_t tick,
+                          TestEngine &engine) {
 
   // Validate input sequence
   if (!input_sequence) {
@@ -213,7 +213,7 @@ ExecuteInputEventsForTick(const InputSequence *input_sequence,
     }
 
     if (input_event->tick() == tick) {
-      auto result = ExecuteInputEvent(input_event, fixture);
+      auto result = ExecuteInputEvent(input_event, engine);
       if (!result.has_value()) {
         return std::unexpected(result.error());
       }
@@ -225,8 +225,7 @@ ExecuteInputEventsForTick(const InputSequence *input_sequence,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ExecuteInputSequence(const InputSequence *input_sequence,
-                       TestFixture &fixture) {
+ExecuteInputSequence(const InputSequence *input_sequence, TestEngine &engine) {
 
   // Validate input sequence
   if (!input_sequence) {
@@ -249,7 +248,7 @@ ExecuteInputSequence(const InputSequence *input_sequence,
 
   // Process events for each tick in order
   for (uint32_t tick : ticks) {
-    auto result = ExecuteInputEventsForTick(input_sequence, tick, fixture);
+    auto result = ExecuteInputEventsForTick(input_sequence, tick, engine);
     if (!result.has_value()) {
       return std::unexpected(result.error());
     }

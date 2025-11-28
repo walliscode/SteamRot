@@ -240,11 +240,11 @@ ExecuteSimulation(const SimulationData *simulation_data,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ExecuteSimulationWithFixture(const SimulationData *simulation_data,
-                             TestFixture &fixture) {
+ExecuteSimulationWithEngine(const SimulationData *simulation_data,
+                            TestEngine &engine) {
 
-  // Get the SceneContext from the fixture
-  SceneContext &scene_context = fixture.GetSceneContext();
+  // Get the SceneContext from the engine
+  SceneContext &scene_context = engine.GetSceneContext();
 
   // Execute the simulation
   return ExecuteSimulation(simulation_data, scene_context);

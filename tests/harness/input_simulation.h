@@ -12,7 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FailInfo.h"
-#include "TestFixture.h"
+#include "TestEngine.h"
 #include "input_test_data_generated.h"
 #include <expected>
 
@@ -27,11 +27,11 @@ namespace steamrot::tests {
 /// MouseMove events only update position without generating EventPackets.
 ///
 /// @param input_event The input event to execute
-/// @param fixture TestFixture containing the test environment
+/// @param engine TestEngine containing the test environment
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ExecuteInputEvent(const InputEvent *input_event, TestFixture &fixture);
+ExecuteInputEvent(const InputEvent *input_event, TestEngine &engine);
 
 /////////////////////////////////////////////////
 /// @brief Execute all input events for a specific tick
@@ -42,12 +42,12 @@ ExecuteInputEvent(const InputEvent *input_event, TestFixture &fixture);
 ///
 /// @param input_sequence The input sequence containing all events
 /// @param tick The tick number to process
-/// @param fixture TestFixture containing the test environment
+/// @param engine TestEngine containing the test environment
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 ExecuteInputEventsForTick(const InputSequence *input_sequence, uint32_t tick,
-                          TestFixture &fixture);
+                          TestEngine &engine);
 
 /////////////////////////////////////////////////
 /// @brief Execute a complete input sequence
@@ -62,11 +62,10 @@ ExecuteInputEventsForTick(const InputSequence *input_sequence, uint32_t tick,
 /// ProcessWaitingRoomEventBus() and running simulations between ticks.
 ///
 /// @param input_sequence The input sequence to execute
-/// @param fixture TestFixture containing the test environment
+/// @param engine TestEngine containing the test environment
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ExecuteInputSequence(const InputSequence *input_sequence,
-                     TestFixture &fixture);
+ExecuteInputSequence(const InputSequence *input_sequence, TestEngine &engine);
 
 } // namespace steamrot::tests

@@ -14,7 +14,7 @@
 /////////////////////////////////////////////////
 #include "EventHandler.h"
 #include "FailInfo.h"
-#include "TestFixture.h"
+#include "TestEngine.h"
 #include "containers.h"
 #include "entities_generated.h"
 #include "test_context.h"
@@ -55,19 +55,19 @@ LoadTestDataConfigsImpl(const char *source_file_path);
 #define load_test_data_configs() LoadTestDataConfigsImpl(__FILE__)
 
 /////////////////////////////////////////////////
-/// @brief Create and configure TestFixture from test data configuration
+/// @brief Create and configure TestEngine from test data configuration
 ///
-/// This function creates a TestFixture and configures it based on the
-/// test data configuration. The fixture will have entities populated from
+/// This function creates a TestEngine and configures it based on the
+/// test data configuration. The engine will have entities populated from
 /// start_data_collection if present.
 ///
 /// This is called at the beginning of test execution, before any ticks run.
 ///
 /// @param config The test data configuration
-/// @param scene_type The scene type for the fixture (default: SceneType_TEST)
-/// @return Configured TestFixture or FailInfo on error
+/// @param scene_type The scene type for the engine (default: SceneType_TEST)
+/// @return Configured TestEngine or FailInfo on error
 /////////////////////////////////////////////////
-std::expected<TestFixture, FailInfo> CreateFixtureFromTestData(
+std::expected<TestEngine, FailInfo> CreateEngineFromTestData(
     const TestDataConfig *config,
     const SceneType &scene_type = SceneType::SceneType_TEST);
 
@@ -82,7 +82,7 @@ std::expected<TestFixture, FailInfo> CreateFixtureFromTestData(
 /// @param actual_memory_pool The actual EntityMemoryPool to test
 /// @param expected_collection The EntityCollection to configure expected pool
 /// from
-/// @param fixture TestFixture containing resources for configuration
+/// @param engine TestEngine containing resources for configuration
 /// @param context Test context information for enriched error messages
 /// @param expected_to_pass If true, expects pools to match; if false, expects
 /// mismatch
@@ -90,7 +90,7 @@ std::expected<TestFixture, FailInfo> CreateFixtureFromTestData(
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> RunEntityMemoryPoolComparisonTest(
     const EntityMemoryPool &actual_memory_pool,
-    const EntityCollection *expected_collection, TestFixture &fixture,
+    const EntityCollection *expected_collection, TestEngine &engine,
     const TestContext &context, bool expected_to_pass = true);
 
 /////////////////////////////////////////////////
@@ -118,7 +118,7 @@ void RunEventBusComparisonTest(const EventBus &actual, const EventBus &expected,
 /// in the DataCollection (EntityMemoryPool, EventBus, etc.). It serves as
 /// the primary entry point for data structure comparison in the test harness.
 ///
-/// The function compares actual state from the fixture against expected state
+/// The function compares actual state from the engine against expected state
 /// from the data_collection parameter. Each data structure is compared if
 /// present in the collection.
 ///
@@ -127,7 +127,7 @@ void RunEventBusComparisonTest(const EventBus &actual, const EventBus &expected,
 /// - CompareTickSnapshot (for intermediate state comparison during ticks)
 ///
 /// @param data_collection Expected data structure states for comparison
-/// @param fixture TestFixture containing actual state to compare
+/// @param engine TestEngine containing actual state to compare
 /// @param context Test context information for enriched error messages
 /// @param expected_to_pass If true, expects data to match; if false, expects
 /// mismatch
@@ -135,14 +135,14 @@ void RunEventBusComparisonTest(const EventBus &actual, const EventBus &expected,
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 RunDataStructComparisonTest(const DataCollection *data_collection,
-                            TestFixture &fixture, const TestContext &context,
+                            TestEngine &engine, const TestContext &context,
                             bool expected_to_pass = true);
 
 /////////////////////////////////////////////////
-/// @brief Wrapper function for data-driven testing with TestFixture
+/// @brief Wrapper function for data-driven testing with TestEngine
 ///
 /// This function orchestrates a complete test workflow:
-/// 1. Creates a TestFixture from test data configuration
+/// 1. Creates a TestEngine from test data configuration
 /// 2. Executes tick-based test logic (inputs, events, simulation)
 /// 3. Compares final state with expected_data_collection if present
 ///
@@ -158,7 +158,7 @@ RunDataStructComparisonTest(const DataCollection *data_collection,
 ///
 /// Example usage:
 /// @code
-/// TEST_CASE("Data-driven test with fixture", "[unit]") {
+/// TEST_CASE("Data-driven test with TestEngine", "[unit]") {
 ///   auto configs = steamrot::tests::load_test_data_configs();
 ///   REQUIRE(configs.has_value());
 ///
