@@ -10,12 +10,13 @@
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
 
-TEST_CASE("LoadTestDataConfigsFromPath returns error for non-existent directory",
-          "[unit][test_data_loader]") {
+TEST_CASE(
+    "LoadTestDataConfigsFromPath returns error for non-existent directory",
+    "[unit][test_data_loader]") {
   auto result = steamrot::tests::LoadTestDataConfigsFromPath(
       "/non/existent/path/that/should/not/exist");
   REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().fail_mode == steamrot::FailMode::FileNotFound);
+  REQUIRE(result.error().mode == steamrot::FailMode::FileNotFound);
 }
 
 TEST_CASE("DiscoverTestDataFiles returns error for non-existent directory",
@@ -23,7 +24,7 @@ TEST_CASE("DiscoverTestDataFiles returns error for non-existent directory",
   auto result = steamrot::tests::DiscoverTestDataFiles(
       "/non/existent/path/that/should/not/exist");
   REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().fail_mode == steamrot::FailMode::FileNotFound);
+  REQUIRE(result.error().mode == steamrot::FailMode::FileNotFound);
 }
 
 TEST_CASE("LoadTestDataConfigFromFile returns error for non-existent file",
@@ -31,7 +32,7 @@ TEST_CASE("LoadTestDataConfigFromFile returns error for non-existent file",
   auto result = steamrot::tests::LoadTestDataConfigFromFile(
       "/non/existent/file.test_data.bin");
   REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().fail_mode == steamrot::FailMode::FileNotFound);
+  REQUIRE(result.error().mode == steamrot::FailMode::FileNotFound);
 }
 
 TEST_CASE("DiscoverTestDataFiles returns empty vector for empty directory",
