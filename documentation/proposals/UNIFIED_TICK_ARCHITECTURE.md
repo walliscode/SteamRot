@@ -648,39 +648,64 @@ private:
 
 ### Solution 3: Unified Data Loading
 
-Create a common data loading abstraction:
+The data loading architecture consists of three layers that work together:
+
+#### Layer 1: Data Sources (IEntityDataSource)
+
+The `IEntityDataSource` interface abstracts **where** entity data comes from. This determines data paths and provides raw entity collection data:
 
 ```cpp
 /////////////////////////////////////////////////
 /// @interface IEntityDataSource
-/// @brief Interface for entity data sources
+/// @brief Interface for entity data sources - determines data paths
 /////////////////////////////////////////////////
 class IEntityDataSource {
 public:
   virtual ~IEntityDataSource() = default;
   
   /////////////////////////////////////////////////
-  /// @brief Get entity collection data
+  /// @brief Get entity collection data from this source
   /////////////////////////////////////////////////
   virtual const EntityCollection* GetEntityCollection() const = 0;
+  
+  /////////////////////////////////////////////////
+  /// @brief Get the source identifier (for logging/debugging)
+  /////////////////////////////////////////////////
+  virtual std::string GetSourceIdentifier() const = 0;
 };
 
 /////////////////////////////////////////////////
 /// @class DefaultSceneDataSource
 /// @brief Loads entities from default scene data files
+///
+/// Uses PathProvider and FlatbuffersDataLoader internally to
+/// determine and load from the correct data paths.
 /////////////////////////////////////////////////
 class DefaultSceneDataSource : public IEntityDataSource {
   SceneType m_scene_type;
-  const EntityCollection *m_cached_data = nullptr;
+  FlatbuffersDataLoader m_data_loader;
+  const SceneData *m_scene_data = nullptr;
   
 public:
   explicit DefaultSceneDataSource(SceneType scene_type) 
     : m_scene_type(scene_type) {
-    // Load from FlatbuffersDataLoader
+    // FlatbuffersDataLoader uses PathProvider internally
+    // to determine data file paths based on EnvironmentType
+    auto scene_data_result = m_data_loader.ProvideSceneData(scene_type);
+    if (scene_data_result.has_value()) {
+      m_scene_data = scene_data_result.value();
+    }
   }
   
   const EntityCollection* GetEntityCollection() const override {
-    return m_cached_data;
+    if (m_scene_data && m_scene_data->entity_collection()) {
+      return m_scene_data->entity_collection();
+    }
+    return nullptr;
+  }
+  
+  std::string GetSourceIdentifier() const override {
+    return "DefaultSceneData[" + std::to_string(static_cast<int>(m_scene_type)) + "]";
   }
 };
 
@@ -696,13 +721,222 @@ public:
     : m_config(config) {}
   
   const EntityCollection* GetEntityCollection() const override {
-    if (m_config && m_config->start_data_collection()) {
+    if (m_config && m_config->start_data_collection() &&
+        m_config->start_data_collection()->entity_collection()) {
       return m_config->start_data_collection()->entity_collection();
     }
     return nullptr;
   }
+  
+  std::string GetSourceIdentifier() const override {
+    if (m_config && m_config->metadata() && m_config->metadata()->test_name()) {
+      return "TestData[" + m_config->metadata()->test_name()->str() + "]";
+    }
+    return "TestData[unknown]";
+  }
 };
 ```
+
+#### Layer 2: Entity Configurators (EntityConfigurator hierarchy)
+
+The `EntityConfigurator` hierarchy handles **how** entity data is interpreted and applied. The existing `FlatbuffersConfigurator` remains as a derived class for FlatBuffers data:
+
+```cpp
+/////////////////////////////////////////////////
+/// @class EntityConfigurator
+/// @brief Abstract base for configuring entities from data
+///
+/// Different data formats (FlatBuffers, JSON, etc.) can have
+/// their own derived configurator classes.
+/////////////////////////////////////////////////
+class EntityConfigurator {
+protected:
+  EventHandler &m_event_handler;
+  
+public:
+  EntityConfigurator(EventHandler &event_handler);
+  virtual ~EntityConfigurator() = default;
+  
+  /////////////////////////////////////////////////
+  /// @brief Configure entities from a data source
+  ///
+  /// @param entity_memory_pool Pool to configure
+  /// @param data_source Source providing entity data
+  /////////////////////////////////////////////////
+  virtual std::expected<std::monostate, FailInfo>
+  ConfigureEntities(EntityMemoryPool &entity_memory_pool,
+                    const IEntityDataSource &data_source) = 0;
+};
+
+/////////////////////////////////////////////////
+/// @class FlatbuffersConfigurator
+/// @brief Configures entities from FlatBuffers data
+///
+/// This is the primary configurator used for both game and tests
+/// since both use FlatBuffers as the data format.
+/////////////////////////////////////////////////
+class FlatbuffersConfigurator : public EntityConfigurator {
+  // ... existing implementation ...
+  
+public:
+  /////////////////////////////////////////////////
+  /// @brief Configure entities from any IEntityDataSource
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ConfigureEntities(EntityMemoryPool &entity_memory_pool,
+                    const IEntityDataSource &data_source) override {
+    const EntityCollection *collection = data_source.GetEntityCollection();
+    if (!collection) {
+      return std::unexpected(FailInfo{FailMode::NullPointer, 
+        "No entity collection from " + data_source.GetSourceIdentifier()});
+    }
+    return ConfigureEntitiesFromCollection(entity_memory_pool, collection);
+  }
+  
+  // Existing methods remain for backwards compatibility:
+  // - ConfigureEntitiesFromDefaultData(pool, scene_type)
+  // - ConfigureEntitiesFromCollection(pool, collection)
+};
+
+/////////////////////////////////////////////////
+/// @class JsonConfigurator (future)
+/// @brief Example: Could support JSON data format if needed
+/////////////////////////////////////////////////
+// class JsonConfigurator : public EntityConfigurator { ... };
+```
+
+#### Layer 3: Usage in Engine Classes
+
+The `Engine` base class uses these abstractions:
+
+```cpp
+class Engine {
+protected:
+  GameResources m_game_resources;
+  FlatbuffersConfigurator m_configurator;  // Primary configurator
+  
+  /////////////////////////////////////////////////
+  /// @brief Configure entities from a data source
+  /// 
+  /// Can be overridden to use different configurators if needed.
+  /////////////////////////////////////////////////
+  virtual std::expected<std::monostate, FailInfo>
+  ConfigureEntitiesFrom(EntityMemoryPool &pool, 
+                        const IEntityDataSource &source) {
+    return m_configurator.ConfigureEntities(pool, source);
+  }
+  
+public:
+  Engine(EventHandler &event_handler) 
+    : m_configurator(event_handler) {}
+};
+
+class GameEngine : public Engine {
+  void LoadScene(SceneType scene_type) {
+    DefaultSceneDataSource source(scene_type);
+    auto result = ConfigureEntitiesFrom(m_entity_pool, source);
+    // ...
+  }
+};
+
+class TestEngine : public Engine {
+  const TestDataConfig *m_test_config;
+  
+  std::expected<std::monostate, FailInfo> ConfigureFromData() override {
+    TestDataSource source(m_test_config);
+    return ConfigureEntitiesFrom(m_entity_pool, source);
+  }
+};
+```
+
+#### Data Path Determination
+
+Data paths are determined by `PathProvider` (unchanged) and used internally by `FlatbuffersDataLoader`:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         DATA PATH DETERMINATION                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+PathProvider (already exists - determines base paths):
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ PathProvider::PathProvider(EnvironmentType env_type)                        │
+│                                                                             │
+│   EnvironmentType::Production → data_dir (from CMake)                       │
+│   EnvironmentType::Test       → test_data_dir (from CMake)                  │
+│                                                                             │
+│ PathProvider::GetSceneDataPath(SceneType) → full path to scene .bin file    │
+│ PathProvider::GetAssetPath(asset_name) → full path to asset file            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+FlatbuffersDataLoader uses PathProvider internally:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ FlatbuffersDataLoader::ProvideSceneData(SceneType scene_type)               │
+│   │                                                                         │
+│   └─► PathProvider::GetSceneDataPath(scene_type)                            │
+│       │                                                                     │
+│       └─► Load and verify FlatBuffers binary                                │
+│           │                                                                 │
+│           └─► Return const SceneData*                                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### Summary: Three Layers
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         DATA LOADING ARCHITECTURE                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Layer 1: DATA SOURCES (IEntityDataSource)
+─────────────────────────────────────────
+Determines WHERE data comes from and provides raw EntityCollection.
+
+  ┌─────────────────────────┐    ┌─────────────────────────┐
+  │  DefaultSceneDataSource │    │    TestDataSource       │
+  ├─────────────────────────┤    ├─────────────────────────┤
+  │ • Uses PathProvider     │    │ • Uses TestDataConfig   │
+  │ • Uses FlatbuffersData- │    │ • Extracts entity data  │
+  │   Loader internally     │    │   from test config      │
+  └─────────────────────────┘    └─────────────────────────┘
+              │                              │
+              └──────────┬───────────────────┘
+                         ▼
+Layer 2: CONFIGURATORS (EntityConfigurator hierarchy)
+─────────────────────────────────────────────────────
+Determines HOW data is interpreted and applied to entities.
+
+  ┌─────────────────────────────────────────────────────────┐
+  │             FlatbuffersConfigurator                      │
+  │        (primary - both game and tests use this)          │
+  ├─────────────────────────────────────────────────────────┤
+  │ • ConfigureComponent(UserInterfaceData*, CUserInterface)│
+  │ • ConfigureComponent(GrimoireMachinaData*, CGrimoire...)│
+  │ • ConfigureEntitiesFromCollection(pool, collection)      │
+  └─────────────────────────────────────────────────────────┘
+                         │
+                         ▼
+Layer 3: ENGINE CLASSES
+───────────────────────
+Uses data sources and configurators to load entities.
+
+  ┌─────────────────────────┐    ┌─────────────────────────┐
+  │       GameEngine        │    │       TestEngine        │
+  ├─────────────────────────┤    ├─────────────────────────┤
+  │ DefaultSceneDataSource  │    │ TestDataSource          │
+  │         +               │    │         +               │
+  │ FlatbuffersConfigurator │    │ FlatbuffersConfigurator │
+  └─────────────────────────┘    └─────────────────────────┘
+```
+
+#### Future Extensibility
+
+This architecture allows for:
+
+1. **New data sources**: Add `JsonDataSource`, `DatabaseDataSource`, etc.
+2. **New configurators**: Add `JsonConfigurator` if using JSON entity format
+3. **Mixing sources**: A scene could load base entities from default + override from test
+4. **Caching**: Data sources can cache loaded data internally
 
 ### Solution 4: Remove expected_data_collection
 

@@ -423,15 +423,147 @@ Proposed Implementation:
 │   DefaultSceneDataSource      │   │      TestDataSource           │
 ├───────────────────────────────┤   ├───────────────────────────────┤
 │ - m_scene_type                │   │ - m_config: TestDataConfig*   │
-│ - m_cached_data               │   ├───────────────────────────────┤
+│ - m_data_loader               │   ├───────────────────────────────┤
 ├───────────────────────────────┤   │ + GetEntityCollection()       │
 │ + GetEntityCollection()       │   │   └─ return config->          │
-│   └─ Load from data file      │   │      start_data_collection    │
-│   └─ Return cached data       │   │      ->entity_collection()    │
+│   └─ Uses FlatbuffersData-    │   │      start_data_collection    │
+│      Loader + PathProvider    │   │      ->entity_collection()    │
+│   └─ Return entity collection │   │                               │
+│ + GetSourceIdentifier()       │   │ + GetSourceIdentifier()       │
 └───────────────────────────────┘   └───────────────────────────────┘
 ```
 
-### Data Flow Comparison
+### Data Loading Architecture (Three Layers)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    UNIFIED DATA LOADING ARCHITECTURE                         │
+│                         (Three Layer Design)                                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+LAYER 1: DATA SOURCES (IEntityDataSource)
+═════════════════════════════════════════
+Determines WHERE data comes from. Handles paths and raw data access.
+
+  ┌─────────────────────────────────────┐   ┌─────────────────────────────────┐
+  │     DefaultSceneDataSource          │   │        TestDataSource           │
+  ├─────────────────────────────────────┤   ├─────────────────────────────────┤
+  │ • Uses PathProvider for data paths  │   │ • Uses TestDataConfig directly  │
+  │ • Uses FlatbuffersDataLoader        │   │ • Extracts entity collection    │
+  │   internally to load scene data     │   │   from test configuration       │
+  │ • Caches loaded scene data          │   │                                 │
+  └────────────────────┬────────────────┘   └────────────────┬────────────────┘
+                       │                                      │
+                       └──────────────┬───────────────────────┘
+                                      │
+                                      ▼ provides EntityCollection*
+                                      
+LAYER 2: CONFIGURATORS (EntityConfigurator hierarchy)
+═════════════════════════════════════════════════════
+Determines HOW data is interpreted. FlatbuffersConfigurator is primary.
+
+  ┌─────────────────────────────────────────────────────────────────────────────┐
+  │                          EntityConfigurator                                  │
+  │                           (Abstract Base)                                    │
+  ├─────────────────────────────────────────────────────────────────────────────┤
+  │ # m_event_handler: EventHandler&                                            │
+  │ + ConfigureEntities(pool, data_source) = 0  ◄── NEW unified method         │
+  └─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+  ┌─────────────────────────────────────────────────────────────────────────────┐
+  │                       FlatbuffersConfigurator                                │
+  │                    (Primary - used by both game and tests)                   │
+  ├─────────────────────────────────────────────────────────────────────────────┤
+  │ EXISTING (kept for compatibility):                                          │
+  │ • ConfigureEntitiesFromDefaultData(pool, scene_type)                        │
+  │ • ConfigureEntitiesFromCollection(pool, collection)                         │
+  │ • ConfigureComponent(UserInterfaceData*, CUserInterface&)                   │
+  │ • ConfigureComponent(GrimoireMachinaData*, CGrimoireMachina&)               │
+  │                                                                             │
+  │ NEW (uses IEntityDataSource):                                               │
+  │ • ConfigureEntities(pool, data_source) override                             │
+  │   └─ Calls GetEntityCollection() then ConfigureEntitiesFromCollection()    │
+  └─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼ configures
+                                      
+LAYER 3: ENGINE CLASSES
+═══════════════════════
+Uses data sources and configurators together.
+
+  ┌─────────────────────────────┐       ┌─────────────────────────────┐
+  │         GameEngine          │       │        TestEngine           │
+  ├─────────────────────────────┤       ├─────────────────────────────┤
+  │ Load scene:                 │       │ Load test data:             │
+  │ 1. Create DefaultSceneData- │       │ 1. Create TestDataSource    │
+  │    Source(scene_type)       │       │    (test_config)            │
+  │ 2. m_configurator.Configure-│       │ 2. m_configurator.Configure-│
+  │    Entities(pool, source)   │       │    Entities(pool, source)   │
+  └─────────────────────────────┘       └─────────────────────────────┘
+```
+
+### Data Path Flow (Unchanged - PathProvider)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         DATA PATH DETERMINATION                              │
+│                   (PathProvider - existing, unchanged)                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+PathProvider::PathProvider(EnvironmentType)
+  │
+  ├─► EnvironmentType::Production
+  │     └─► m_data_dir = data_dir (from CMake: ${CMAKE_SOURCE_DIR}/data)
+  │
+  └─► EnvironmentType::Test
+        └─► m_data_dir = test_data_dir (from CMake: ${CMAKE_SOURCE_DIR}/tests/data)
+
+PathProvider methods:
+  │
+  ├─► GetSceneDataPath(SceneType) → "${data_dir}/scene/{scene_name}.bin"
+  ├─► GetAssetPath(asset_name) → "${data_dir}/assets/{asset_name}"
+  └─► GetContextDataPath() → "${data_dir}/context/context_data.bin"
+
+
+Data Loading Flow:
+┌────────────────┐     ┌────────────────┐     ┌────────────────────────┐
+│  PathProvider  │────▶│ Flatbuffers-   │────▶│ DefaultSceneDataSource │
+│                │     │ DataLoader     │     │                        │
+│ (determines    │     │ (loads binary  │     │ (wraps for unified     │
+│  file paths)   │     │  data files)   │     │  IEntityDataSource)    │
+└────────────────┘     └────────────────┘     └────────────────────────┘
+```
+
+### Future Extensibility
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        FUTURE EXTENSION POINTS                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+New Data Sources (add IEntityDataSource implementations):
+  ┌───────────────────┐  ┌───────────────────┐  ┌───────────────────┐
+  │ JsonDataSource    │  │ DatabaseData-     │  │ NetworkDataSource │
+  │ (JSON files)      │  │ Source (SQL)      │  │ (remote API)      │
+  └───────────────────┘  └───────────────────┘  └───────────────────┘
+
+New Configurators (add EntityConfigurator implementations):
+  ┌───────────────────┐  ┌───────────────────┐
+  │ JsonConfigurator  │  │ ProtobufConfig-   │
+  │ (if JSON format)  │  │ urator            │
+  └───────────────────┘  └───────────────────┘
+
+Composite Sources (combine multiple):
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ CompositeDataSource                                             │
+  │   └─ Base: DefaultSceneDataSource(SceneType_TITLE)              │
+  │   └─ Override: TestDataSource(test_config)                      │
+  │   └─ Result: merged entity collection                           │
+  └─────────────────────────────────────────────────────────────────┘
+```
+
+### Data Flow Comparison (Current vs Proposed)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -459,7 +591,7 @@ Test Harness:
 └─────────────────────────────────────────────────────────────────────────────┘
 
                               ┌──────────────────┐
-                              │ IEntityDataSource│
+                              │ IEntityDataSource│  ◄── Unified interface
                               └────────┬─────────┘
                                        │
                    ┌───────────────────┴───────────────────┐
@@ -468,6 +600,8 @@ Test Harness:
         ┌──────────────────┐                    ┌──────────────────┐
         │ DefaultSceneData-│                    │ TestDataSource   │
         │ Source           │                    │                  │
+        │ (uses PathProvider│                    │ (wraps TestData- │
+        │  + DataLoader)   │                    │  Config)         │
         └────────┬─────────┘                    └────────┬─────────┘
                  │                                       │
                  │                                       │
@@ -475,8 +609,9 @@ Test Harness:
                                  │
                                  ▼
                       ┌──────────────────┐
-                      │ EntityConfigurer │  ◄── Single configuration point
-                      │ (unified)        │
+                      │ FlatbuffersCon-  │  ◄── Existing configurator
+                      │ figurator        │      (kept as-is, just used
+                      │ (via interface)  │       through new interface)
                       └────────┬─────────┘
                                │
                                ▼
