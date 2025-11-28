@@ -1616,21 +1616,220 @@ Shared Loading Path:
 
 ## Implementation Plan
 
-### Phase 1: Create Abstract Engine Base Class (Point 1)
+### Overview: Three-Stage Approach
+
+The implementation follows a three-stage approach to minimize disruption:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    STAGED IMPLEMENTATION APPROACH                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+STAGE 1: NON-DISRUPTIVE ADDITIONS
+─────────────────────────────────
+│ Add new code that doesn't touch existing implementations
+│ - New interfaces (IEntityDataSource, ILogicStep)
+│ - New helper functions
+│ - New FlatBuffers fields (additive)
+│ - Documentation and tests for new code
+│
+│ ✓ Existing code compiles and works unchanged
+│ ✓ New code can be developed and tested in isolation
+│ ✓ Zero risk to production
+
+STAGE 2: SIDE-BY-SIDE IMPLEMENTATION
+───────────────────────────────────
+│ Add new Engine hierarchy alongside existing GameEngine
+│ - Engine base class (new)
+│ - TestEngine (new, uses Engine)
+│ - GameEngine updated to derive from Engine (minimal changes)
+│ - New tick infrastructure exists alongside old test harness
+│
+│ ✓ Both old and new approaches work simultaneously
+│ ✓ Can A/B test behavior
+│ ✓ Gradual migration possible
+
+STAGE 3: MIGRATION
+──────────────────
+│ Remove old implementations, keep only new approach
+│ - Remove TestFixture, tick_executor, simulation_runner
+│ - Remove duplicate code paths
+│ - Consolidate to single implementation
+│ - Update all documentation
+│
+│ ✓ Clean, unified codebase
+│ ✓ Single source of truth
+```
+
+---
+
+### Stage 1: Non-Disruptive Additions (4-5 tasks)
+
+These changes can be made without affecting any existing code. They introduce new concepts that will be used later.
+
+#### Task 1.1: Create IEntityDataSource Interface
 
 **Files to create:**
-- `src/systems/Engine.h` - Abstract Engine base class
-- `src/systems/Engine.cpp` - Base class implementation (StartUp, Run)
-- `tests/harness/TestEngine.h` - TestEngine derived class
-- `tests/harness/TestEngine.cpp` - TestEngine implementation
+- `src/data_handlers/IEntityDataSource.h`
+
+**Purpose:** Define interface for entity data loading that both game and test can use.
+
+```cpp
+// IEntityDataSource.h
+class IEntityDataSource {
+public:
+  virtual ~IEntityDataSource() = default;
+  virtual const EntityCollection* GetEntityCollection() const = 0;
+  virtual size_t GetEntityCount() const = 0;
+};
+```
+
+**Why non-disruptive:** 
+- New file, doesn't modify anything
+- Pure interface with no implementation
+
+**Dependencies:** None
+
+**Estimated effort:** 1-2 hours
+
+---
+
+#### Task 1.2: Create ILogicStep Interface
+
+**Files to create:**
+- `src/logic/ILogicStep.h`
+
+**Purpose:** Define interface for execution steps (Logic classes, free functions, lambdas).
+
+```cpp
+// ILogicStep.h
+class ILogicStep {
+public:
+  virtual ~ILogicStep() = default;
+  virtual void Execute(SceneContext& ctx) = 0;
+  virtual std::string GetName() const = 0;
+};
+
+// Implementations
+template<typename TLogic>
+class LogicClassStep : public ILogicStep { ... };
+
+class FunctionStep : public ILogicStep { ... };
+```
+
+**Why non-disruptive:**
+- New files only
+- Doesn't touch existing Logic class hierarchy
+
+**Dependencies:** None
+
+**Estimated effort:** 2-3 hours
+
+---
+
+#### Task 1.3: Add EntityCollection to Game Data Schema (Additive)
 
 **Files to modify:**
-- `src/systems/GameEngine.h` - Derive from Engine
-- `src/systems/GameEngine.cpp` - Refactor to override virtual methods
+- `src/flatbuffers_headers/scene_data.fbs` - Add EntityCollection field if not present
 
-**Key changes:**
+**Purpose:** Ensure game scene data uses same EntityCollection structure as test data.
+
+```fbs
+// scene_data.fbs - Additive change only
+table SceneData {
+  scene_type: SceneType;
+  entities: [EntityData];  // Existing
+  entity_collection: EntityCollection;  // New (optional, for unified loading)
+}
+```
+
+**Why non-disruptive:**
+- Additive FlatBuffers change (optional field)
+- Existing code ignores new field
+- New code can use either path
+
+**Dependencies:** None
+
+**Estimated effort:** 1 hour
+
+---
+
+#### Task 1.4: Create EventHandlerTick Free Function
+
+**Files to create:**
+- `src/events/event_handler_tick.h`
+- `src/events/event_handler_tick.cpp`
+
+**Purpose:** Extract consolidated event handling into a reusable free function.
+
 ```cpp
-// Engine.h - Abstract base class
+// event_handler_tick.h
+namespace steamrot::events {
+
+void ProcessEventBusCycle(EventHandler& handler);
+// Calls in order:
+//   ProcessWaitingRoomEventBus()
+//   ClearSubscribers()
+//   UpdateSubscribersFromGlobalEventBus()
+//   TickGlobalEventBus()
+
+}
+```
+
+**Why non-disruptive:**
+- New files only
+- Wraps existing EventHandler methods
+- Existing code doesn't need to use this yet
+
+**Dependencies:** None
+
+**Estimated effort:** 1-2 hours
+
+---
+
+#### Task 1.5: Create Test Data Loading Helpers
+
+**Files to create:**
+- `tests/harness/test_data_loader.h`
+- `tests/harness/test_data_loader.cpp`
+
+**Purpose:** Provide path-based test data loading for CMake template approach.
+
+```cpp
+// test_data_loader.h
+namespace steamrot::tests {
+
+std::expected<std::vector<const TestDataConfig*>, FailInfo>
+LoadTestDataConfigsFromPath(const std::filesystem::path& data_dir);
+
+}
+```
+
+**Why non-disruptive:**
+- New files only
+- Existing test_data_harness.cpp unchanged
+- Tests can use either old or new loading approach
+
+**Dependencies:** None
+
+**Estimated effort:** 2-3 hours
+
+---
+
+### Stage 2: Side-by-Side Implementation (5-6 tasks)
+
+These changes add new implementations alongside existing code. Both old and new approaches work during this stage.
+
+#### Task 2.1: Create Abstract Engine Base Class
+
+**Files to create:**
+- `src/systems/Engine.h`
+- `src/systems/Engine.cpp`
+
+**Purpose:** Abstract base class for unified resource management.
+
+```cpp
+// Engine.h
 class Engine {
 protected:
   GameResources m_game_resources;
@@ -1639,133 +1838,408 @@ protected:
   virtual std::expected<std::monostate, FailInfo> ConfigureFromData() = 0;
   virtual void ExecuteTick() = 0;
   
+  // Standard logic tick - shared by GameEngine and TestEngine (Standard Mode)
+  void ExecuteStandardLogicTick();
+  
 public:
+  virtual ~Engine() = default;
   std::expected<std::monostate, FailInfo> StartUp();
   void Run(size_t num_ticks = 0);
+  
+  GameResources& GetGameResources() { return m_game_resources; }
+  GameContext& GetGameContext() { return m_game_context; }
+};
+```
+
+**Why side-by-side:**
+- New files, doesn't modify GameEngine yet
+- Can be developed and tested in isolation
+
+**Dependencies:** Task 1.4 (EventHandlerTick)
+
+**Estimated effort:** 4-6 hours
+
+---
+
+#### Task 2.2: Modify GameEngine to Derive from Engine
+
+**Files to modify:**
+- `src/systems/GameEngine.h`
+- `src/systems/GameEngine.cpp`
+
+**Purpose:** GameEngine becomes a derived class while maintaining all existing behavior.
+
+```cpp
+// GameEngine.h - Before
+class GameEngine {
+  GameResources m_game_resources;
+  GameContext m_game_context;
+  SceneManager m_scene_manager;
+  // ...
 };
 
-// GameEngine.h - Production implementation
+// GameEngine.h - After
 class GameEngine : public Engine {
   SceneManager m_scene_manager;
   DisplayManager m_display_manager;
 protected:
   void ExecuteTick() override;
-};
-
-// TestEngine.h - Test implementation  
-class TestEngine : public Engine {
-  const TestDataConfig *m_test_config;
-  EntityManager m_entity_manager;
-protected:
-  void ExecuteTick() override;
+  std::expected<std::monostate, FailInfo> ConfigureFromData() override;
 };
 ```
 
-**Estimated effort:** Medium
+**Why side-by-side:**
+- Minimal changes to GameEngine (just inheritance + remove duplicated members)
+- Behavior unchanged - same methods called in same order
+- All existing game code continues to work
 
-### Phase 2: Create Logic Provider Interface (Point 2)
+**Key principle:** Move members to Engine base, keep behavior identical.
 
-**Files to create:**
-- `src/logic/ILogicProvider.h` - Interface
-- `src/logic/SceneLogicProvider.h/cpp` - Scene-based implementation
-- `tests/harness/SimulationLogicProvider.h` - Test-based implementation
+**Dependencies:** Task 2.1 (Engine base class)
 
-**Files to modify:**
-- `src/scenes/Scene.h/cpp` - Use ILogicProvider
+**Estimated effort:** 3-4 hours
 
-**Estimated effort:** Medium
+---
 
-### Phase 3: Unify Data Loading (Point 3)
-
-**Files to create:**
-- `src/data_handlers/IEntityDataSource.h` - Interface
-- `src/data_handlers/DefaultSceneDataSource.h/cpp` - Default data source
-- `tests/harness/TestDataSource.h` - Test data source
-
-**Files to modify:**
-- `src/entity/EntityManager.h/cpp` - Accept IEntityDataSource
-- `tests/harness/TestEngine.cpp` - Use TestDataSource
-
-**Estimated effort:** Low-Medium
-
-### Phase 4: Document expected_data_collection Usage (Point 4)
-
-**Files to modify:**
-- `documentation/testing/TEST_DATA_CONFIGURATION.md` - Clarify usage
-- `src/flatbuffers_headers/test_data.fbs` - Add deprecation comment if needed
-
-**Estimated effort:** Low
-
-### Phase 5: Rename TestContext (Point 5)
-
-**Files to modify:**
-- `tests/harness/test_context.h` - Rename struct
-- All files using TestContext - Update references
-
-**Estimated effort:** Low
-
-### Phase 6: Test Data Loading Infrastructure (Solution 6)
+#### Task 2.3: Create TestEngine Derived Class
 
 **Files to create:**
-- `tests/cmake/data_driven_test.cpp.in` - CMake template for auto-generated test runners
-- `tests/cmake/DataDrivenTests.cmake` - CMake function to configure test runners
-- `tests/harness/test_data_harness.h` additions - `STEAMROT_DATA_DRIVEN_TESTS` macro
+- `tests/harness/TestEngine.h`
+- `tests/harness/TestEngine.cpp`
 
-**Files to modify:**
-- `tests/harness/test_data_harness.h` - Add `LoadTestDataConfigsFromPath()` function
-- `tests/harness/test_data_harness.cpp` - Implement path-based loading
-- Various test CMakeLists.txt - Use `add_data_driven_test()` function
-
-**Key changes:**
-```cmake
-# CMake function for easy test setup
-add_data_driven_test(
-  NAME logic_collision
-  DATA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/data
-  TAG collision
-)
-```
+**Purpose:** New test engine that derives from Engine base class.
 
 ```cpp
-// Macro for one-line test setup in custom files
-STEAMROT_DATA_DRIVEN_TESTS("Collision tests", "[unit][collision]")
-```
-
-**Estimated effort:** Low-Medium
-
-### Phase 7: TestEngine Execution Levels (Solution 7)
-
-**Files to modify:**
-- `tests/harness/TestEngine.h` - Add ExecutionLevel enum and level-specific methods
-- `tests/harness/TestEngine.cpp` - Implement level-based ExecuteTick()
-
-**Key changes:**
-```cpp
-// TestEngine with execution levels
+// TestEngine.h
 class TestEngine : public Engine {
 public:
-  enum class ExecutionLevel {
-    EntityOnly, Function, SingleLogic, LogicCollection, FullScene
-  };
+  enum class Mode { Custom, Standard };
   
-  void SetExecutionLevel(ExecutionLevel level);
+  // Custom mode: mix and match
+  TestEngine& AddLogic(std::unique_ptr<ILogicStep> step);
+  template<typename TLogic> TestEngine& AddLogic();
+  TestEngine& AddFunction(std::function<void(SceneContext&)> func);
   
-  template<typename TLogic>
-  void SetSingleLogic();
+  // Standard mode: uses Engine base
+  void UseLogicCollection(std::vector<LogicType> types);
+  void UseFullScene(SceneType scene_type);
   
-  void SetFunction(std::function<void(SceneContext&)> func);
+  // Results access
+  EntityMemoryPool& GetEntityPool();
   
 protected:
-  void ExecuteTick() override;  // Behavior based on m_execution_level
+  void ExecuteTick() override;
+  std::expected<std::monostate, FailInfo> ConfigureFromData() override;
+
+private:
+  const TestDataConfig* m_test_config;
+  std::vector<std::unique_ptr<ILogicStep>> m_custom_steps;
+  Mode m_mode = Mode::Custom;
 };
 ```
 
-**Key benefits:**
-- Configure engine once, run at different levels
-- Same FlatBuffers structures for all test types
-- Single `FlatbuffersConfigurator` path for game and test data
+**Why side-by-side:**
+- New files only
+- TestFixture continues to work with old test harness
+- New tests can use TestEngine, old tests use TestFixture
 
-**Estimated effort:** Medium
+**Dependencies:** Task 2.1, Task 1.2, Task 1.1
+
+**Estimated effort:** 6-8 hours
+
+---
+
+#### Task 2.4: Create Data Source Implementations
+
+**Files to create:**
+- `src/data_handlers/DefaultSceneDataSource.h`
+- `src/data_handlers/DefaultSceneDataSource.cpp`
+- `tests/harness/TestDataSource.h`
+
+**Purpose:** Implement IEntityDataSource for game and test contexts.
+
+```cpp
+// DefaultSceneDataSource.h
+class DefaultSceneDataSource : public IEntityDataSource {
+public:
+  explicit DefaultSceneDataSource(SceneType scene_type);
+  const EntityCollection* GetEntityCollection() const override;
+  size_t GetEntityCount() const override;
+private:
+  FlatbuffersDataLoader m_loader;
+  SceneType m_scene_type;
+};
+
+// TestDataSource.h
+class TestDataSource : public IEntityDataSource {
+public:
+  explicit TestDataSource(const TestDataConfig* config);
+  const EntityCollection* GetEntityCollection() const override;
+  size_t GetEntityCount() const override;
+private:
+  const TestDataConfig* m_config;
+};
+```
+
+**Why side-by-side:**
+- New implementations of IEntityDataSource
+- FlatbuffersConfigurator can accept either implementation
+- Existing loading code unchanged
+
+**Dependencies:** Task 1.1 (IEntityDataSource), Task 1.3 (EntityCollection schema)
+
+**Estimated effort:** 3-4 hours
+
+---
+
+#### Task 2.5: Add CMake Template for Data-Driven Tests
+
+**Files to create:**
+- `tests/cmake/data_driven_test.cpp.in`
+- `tests/cmake/DataDrivenTests.cmake`
+
+**Purpose:** CMake infrastructure for auto-generated test runners.
+
+```cmake
+# DataDrivenTests.cmake
+function(add_data_driven_test)
+  cmake_parse_arguments(ARG "" "NAME;DATA_DIR;TAG" "" ${ARGN})
+  configure_file(
+    ${CMAKE_SOURCE_DIR}/tests/cmake/data_driven_test.cpp.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${ARG_NAME}_test.cpp
+    @ONLY
+  )
+  add_executable(test_${ARG_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${ARG_NAME}_test.cpp)
+  # ...
+endfunction()
+```
+
+**Why side-by-side:**
+- New CMake infrastructure
+- Existing tests unchanged
+- New tests can use add_data_driven_test()
+
+**Dependencies:** Task 1.5 (test_data_loader)
+
+**Estimated effort:** 2-3 hours
+
+---
+
+#### Task 2.6: Write Migration Tests
+
+**Files to create:**
+- `tests/migration/engine_comparison.test.cpp`
+- `tests/migration/data_loading_comparison.test.cpp`
+
+**Purpose:** Tests that verify old and new approaches produce identical results.
+
+```cpp
+// engine_comparison.test.cpp
+TEST_CASE("GameEngine via Engine base matches direct GameEngine", "[migration]") {
+  // Run same scenario through both paths
+  // Assert identical results
+}
+
+TEST_CASE("TestEngine matches TestFixture results", "[migration]") {
+  // Run same test data through both
+  // Assert entity pool states match
+}
+```
+
+**Why side-by-side:**
+- Proves behavioral equivalence before migration
+- Catches regressions early
+- Documents expected behavior
+
+**Dependencies:** Task 2.2, Task 2.3
+
+**Estimated effort:** 4-6 hours
+
+---
+
+### Stage 3: Migration (5-6 tasks)
+
+These changes remove old implementations and consolidate to the new approach.
+
+#### Task 3.1: Migrate Existing Tests to TestEngine
+
+**Files to modify:**
+- All files in `tests/` that use TestFixture
+
+**Purpose:** Update existing tests to use TestEngine instead of TestFixture.
+
+```cpp
+// Before
+TestFixture fixture(config);
+fixture.Run();
+auto result = fixture.GetResult();
+
+// After
+TestEngine engine(config);
+engine.ConfigureFromData();
+engine.Run(1);
+auto& pool = engine.GetEntityPool();
+```
+
+**Migration strategy:**
+1. Start with simple tests (entity-only)
+2. Progress to logic tests
+3. End with complex integration tests
+
+**Dependencies:** Stage 2 complete, Task 2.6 passing
+
+**Estimated effort:** 8-12 hours (depends on test count)
+
+---
+
+#### Task 3.2: Remove TestFixture and Old Test Harness
+
+**Files to delete:**
+- `tests/harness/TestFixture.h`
+- `tests/harness/TestFixture.cpp`
+- `tests/harness/tick_executor.h`
+- `tests/harness/tick_executor.cpp`
+- `tests/harness/simulation_runner.h`
+- `tests/harness/simulation_runner.cpp`
+
+**Purpose:** Remove deprecated test infrastructure.
+
+**Dependencies:** Task 3.1 complete (all tests migrated)
+
+**Estimated effort:** 1-2 hours
+
+---
+
+#### Task 3.3: Consolidate FlatbuffersConfigurator
+
+**Files to modify:**
+- `src/entity/FlatbuffersConfigurator.h`
+- `src/entity/FlatbuffersConfigurator.cpp`
+
+**Purpose:** Remove duplicate loading paths, use only IEntityDataSource.
+
+```cpp
+// Before: Multiple loading methods
+ConfigureEntitiesFromDefaultData(pool);
+ConfigureEntitiesFromTestData(pool, config);
+
+// After: Single unified method
+ConfigureEntities(pool, IEntityDataSource& source);
+```
+
+**Dependencies:** Task 3.1 (all code using new data sources)
+
+**Estimated effort:** 2-3 hours
+
+---
+
+#### Task 3.4: Rename TestContext to TestMetadataContext
+
+**Files to modify:**
+- `tests/harness/test_context.h` (rename)
+- All files referencing TestContext
+
+**Purpose:** Eliminate naming confusion with GameContext/SceneContext.
+
+**Migration strategy:**
+1. Create TestMetadataContext as alias
+2. Mark TestContext as deprecated
+3. Update all references
+4. Remove alias
+
+**Dependencies:** None (can be done anytime in Stage 3)
+
+**Estimated effort:** 1-2 hours
+
+---
+
+#### Task 3.5: Update Documentation
+
+**Files to modify:**
+- `documentation/testing/TEST_DATA_CONFIGURATION.md`
+- `documentation/architecture/GAME_LOOP.md`
+- `documentation/testing/TESTING_HARNESS_LOOP.md`
+- `.github/copilot-instructions.md`
+- `README.md`
+
+**Purpose:** Document new unified architecture.
+
+**Key updates:**
+- Remove TestFixture documentation
+- Add TestEngine documentation
+- Update architecture diagrams
+- Add migration guide for existing tests
+
+**Dependencies:** Stage 3 changes complete
+
+**Estimated effort:** 3-4 hours
+
+---
+
+#### Task 3.6: Final Cleanup
+
+**Purpose:** Remove any remaining deprecated code, update comments, clean up.
+
+**Tasks:**
+- Remove TODO comments referencing old approach
+- Clean up unused includes
+- Update CMakeLists.txt files
+- Run full test suite
+- Update copilot-instructions.md workflows
+
+**Dependencies:** All other Stage 3 tasks
+
+**Estimated effort:** 2-3 hours
+
+---
+
+### Implementation Timeline
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         IMPLEMENTATION TIMELINE                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Week 1-2: Stage 1 (Non-Disruptive Additions)
+──────────────────────────────────────────────
+├─ Task 1.1: IEntityDataSource interface
+├─ Task 1.2: ILogicStep interface
+├─ Task 1.3: EntityCollection schema (additive)
+├─ Task 1.4: EventHandlerTick free function
+└─ Task 1.5: Test data loading helpers
+
+Week 3-4: Stage 2 (Side-by-Side Implementation)
+──────────────────────────────────────────────────
+├─ Task 2.1: Engine base class
+├─ Task 2.2: GameEngine derives from Engine
+├─ Task 2.3: TestEngine derived class
+├─ Task 2.4: Data source implementations
+├─ Task 2.5: CMake template for tests
+└─ Task 2.6: Migration tests (prove equivalence)
+
+Week 5-6: Stage 3 (Migration)
+─────────────────────────────
+├─ Task 3.1: Migrate tests to TestEngine
+├─ Task 3.2: Remove TestFixture and old harness
+├─ Task 3.3: Consolidate FlatbuffersConfigurator
+├─ Task 3.4: Rename TestContext
+├─ Task 3.5: Update documentation
+└─ Task 3.6: Final cleanup
+
+Total estimated effort: ~50-70 hours over 6 weeks
+```
+
+---
+
+### Rollback Strategy
+
+If issues are discovered at any stage:
+
+**Stage 1:** Simply delete new files - no existing code affected.
+
+**Stage 2:** GameEngine continues to work. TestFixture continues to work. New code can be disabled or removed.
+
+**Stage 3:** Rollback by reverting commits. Migration tests in Task 2.6 ensure we catch issues before removal.
 
 ---
 
