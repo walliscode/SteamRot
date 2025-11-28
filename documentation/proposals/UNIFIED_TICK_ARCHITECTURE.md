@@ -236,17 +236,16 @@ protected:
     UpdateGameResources(m_game_resources);
     m_game_resources.event_handler.PreloadEvents(m_game_resources.game_window);
     
-    // Shared event bus processing
+    // Event bus processing (consolidated - all event handling together)
     m_game_resources.event_handler.ProcessWaitingRoomEventBus();
+    m_game_resources.event_handler.ClearSubscribers();
     m_game_resources.event_handler.UpdateSubscribersFromGlobalEventBus();
+    m_game_resources.event_handler.TickGlobalEventBus();
     
-    // Game-specific logic
+    // Game-specific logic (after all event handling complete)
     ProcessSubscriptions();
     m_scene_manager.UpdateSceneManager();
     m_display_manager.CallRenderCycle();
-    
-    // Shared event bus tick
-    m_game_resources.event_handler.TickGlobalEventBus();
   }
 
 public:
@@ -303,11 +302,13 @@ protected:
     ExecuteEventsForTick(m_test_config->event_sequence(), 
                          m_current_tick, m_game_resources);
     
-    // Shared event bus processing (identical to GameEngine)
+    // Event bus processing (consolidated - all event handling together)
     m_game_resources.event_handler.ProcessWaitingRoomEventBus();
+    m_game_resources.event_handler.ClearSubscribers();
     m_game_resources.event_handler.UpdateSubscribersFromGlobalEventBus();
+    m_game_resources.event_handler.TickGlobalEventBus();
     
-    // Test-specific: Execute simulation steps
+    // Test-specific: Execute simulation steps (after all event handling)
     if (m_test_config->simulation_data() && 
         m_test_config->simulation_data()->steps()) {
       for (const SimulationStep *step : *m_test_config->simulation_data()->steps()) {
@@ -317,9 +318,6 @@ protected:
     
     // Test-specific: Validate tick snapshot
     CompareTickSnapshot(m_current_tick, m_test_config, *this);
-    
-    // Shared event bus tick (identical to GameEngine)
-    m_game_resources.event_handler.TickGlobalEventBus();
   }
 
 public:

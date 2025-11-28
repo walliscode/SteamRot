@@ -146,13 +146,17 @@ The chosen approach uses an abstract `Engine` base class with derived `GameEngin
 │ # ExecuteTick() override            │   │   └─ Load from TestDataConfig       │
 │   ├─ UpdateGameResources()          │   │                                     │
 │   ├─ PreloadEvents()                │   │ # ExecuteTick() override            │
-│   ├─ ProcessWaitingRoom() ◄─SHARED  │   │   ├─ ExecuteInputEventsForTick()    │
-│   ├─ UpdateSubscribers()  ◄─SHARED  │   │   ├─ ExecuteEventsForTick()         │
-│   ├─ ProcessSubscriptions()         │   │   ├─ ProcessWaitingRoom() ◄─SHARED  │
-│   ├─ UpdateSceneManager()           │   │   ├─ UpdateSubscribers()  ◄─SHARED  │
-│   ├─ CallRenderCycle()              │   │   ├─ ExecuteSimulationSteps()       │
-│   └─ TickGlobalEventBus() ◄─SHARED  │   │   ├─ CompareTickSnapshot()          │
-└─────────────────────────────────────┘   │   └─ TickGlobalEventBus() ◄─SHARED  │
+│   │                                 │   │   ├─ ExecuteInputEventsForTick()    │
+│   ├─ ProcessWaitingRoom() ◄─────────┼───┼───┤─ ExecuteEventsForTick()         │
+│   ├─ ClearSubscribers()   ◄─────────┼───┼───┤                                 │
+│   ├─ UpdateSubscribers()  ◄─SHARED──┼───┼───┤─ ProcessWaitingRoom() ◄─SHARED  │
+│   ├─ TickGlobalEventBus() ◄─────────┼───┼───┤─ ClearSubscribers()   ◄─SHARED  │
+│   │  (all event handling together)  │   │   ├─ UpdateSubscribers()  ◄─SHARED  │
+│   │                                 │   │   ├─ TickGlobalEventBus() ◄─SHARED  │
+│   ├─ ProcessSubscriptions()         │   │   │  (all event handling together)  │
+│   ├─ UpdateSceneManager()           │   │   │                                 │
+│   └─ CallRenderCycle()              │   │   ├─ ExecuteSimulationSteps()       │
+└─────────────────────────────────────┘   │   └─ CompareTickSnapshot()          │
                                           ├─────────────────────────────────────┤
                                           │ + GetEntityManager()                │
                                           └─────────────────────────────────────┘
@@ -211,26 +215,33 @@ Legend:
 │                                     │   │ 3. ExecuteEventsForTick()           │
 │                                     │   │    └─ Inject simulated events       │
 ├─────────────────────────────────────┼───┼─────────────────────────────────────┤
+│ EVENT HANDLING BLOCK (consolidated) │   │ EVENT HANDLING BLOCK (consolidated) │
+├─────────────────────────────────────┼───┼─────────────────────────────────────┤
 │ 3. ProcessWaitingRoomEventBus()     │ = │ 4. ProcessWaitingRoomEventBus()     │
 │    └─ Move to global bus            │   │    └─ Move to global bus            │
-├─────────────────────────────────────┼───┼─────────────────────────────────────┤
-│ 4. UpdateSubscribersFromGlobalBus() │ = │ 5. UpdateSubscribersFromGlobalBus() │
+│                                     │   │                                     │
+│ 4. ClearSubscribers()               │ = │ 5. ClearSubscribers()               │
+│    └─ Clear old subscriber state    │   │    └─ Clear old subscriber state    │
+│                                     │   │                                     │
+│ 5. UpdateSubscribersFromGlobalBus() │ = │ 6. UpdateSubscribersFromGlobalBus() │
 │    └─ Notify all subscribers        │   │    └─ Notify all subscribers        │
-├─────────────────────────────────────┼───┼─────────────────────────────────────┤
-│ 5. ProcessSubscriptions()           │   │ (No subscription processing)        │
-│    └─ GameEngine level              │   │                                     │
 │                                     │   │                                     │
-│ 6. UpdateSceneManager()             │   │ 6. ExecuteSimulationSteps()         │
-│    └─ sAction→sCollision→sRender    │   │    └─ Run SimulationData steps      │
-│                                     │   │                                     │
-│ 7. CallRenderCycle()                │   │ 7. CompareTickSnapshot()            │
-│    └─ Render to window              │   │    └─ Validate entity state         │
-├─────────────────────────────────────┼───┼─────────────────────────────────────┤
-│ 8. TickGlobalEventBus()             │ = │ 8. TickGlobalEventBus()             │
+│ 6. TickGlobalEventBus()             │ = │ 7. TickGlobalEventBus()             │
 │    └─ Decrement event lifetimes     │   │    └─ Decrement event lifetimes     │
+├─────────────────────────────────────┼───┼─────────────────────────────────────┤
+│ LOGIC EXECUTION (after events)      │   │ LOGIC EXECUTION (after events)      │
+├─────────────────────────────────────┼───┼─────────────────────────────────────┤
+│ 7. ProcessSubscriptions()           │   │ (No subscription processing)        │
+│    └─ GameEngine level              │   │                                     │
+│                                     │   │ 8. ExecuteSimulationSteps()         │
+│ 8. UpdateSceneManager()             │   │    └─ Run SimulationData steps      │
+│    └─ sAction→sCollision→sRender    │   │                                     │
+│                                     │   │ 9. CompareTickSnapshot()            │
+│ 9. CallRenderCycle()                │   │    └─ Validate entity state         │
+│    └─ Render to window              │   │                                     │
 └─────────────────────────────────────┘   └─────────────────────────────────────┘
 
-Legend: = indicates identical operations
+Legend: = indicates identical operations (shared event handling block)
 ```
 
 ### Benefits of Abstract Engine Approach
