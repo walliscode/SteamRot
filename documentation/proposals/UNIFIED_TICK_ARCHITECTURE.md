@@ -1151,40 +1151,73 @@ TEST_CASE("Custom collision edge case", "[unit][collision]") {
 
 ### Solution 7: TestEngine Execution Granularity
 
-The TestEngine should support testing at different levels of the game stack, from individual functions up to full scenes. Configure the engine once, then run only the specific parts needed for each test.
+The TestEngine should support testing at different levels of the game stack, from individual functions up to full scenes. The key design principle is:
+- **Custom Mode**: Mix and match Logic classes + free functions for incremental testing
+- **Standard Mode**: Uses SAME execution path as GameEngine (hard-baked into Engine base class)
 
-#### Test Granularity Levels
+#### Two Execution Modes
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                       TEST GRANULARITY LEVELS                                │
+│                       TESTENGINE EXECUTION MODES                             │
 │                    (Configure once, run specific parts)                      │
 └─────────────────────────────────────────────────────────────────────────────┘
 
-Level 5: Full Scene Test
-├─ TestEngine configured with SceneType + TestDataConfig
-├─ Runs: Scene initialization → Logic execution → Tick loop
-├─ Use case: Integration tests, scene workflow validation
-│
-Level 4: Logic Collection Test
-├─ TestEngine configured with LogicCollection + EntityData
-├─ Runs: All Logic classes in a category (Action, Collision, Render)
-├─ Use case: Testing logic ordering, inter-logic dependencies
-│
-Level 3: Single Logic Class Test
-├─ TestEngine configured with single Logic + EntityData
-├─ Runs: One specific Logic class
-├─ Use case: Unit testing individual Logic classes
-│
-Level 2: Free Function Test
-├─ TestEngine configured with function pointer + EntityData
-├─ Runs: Arbitrary free function with entity access
-├─ Use case: Testing utility functions, component helpers
-│
-Level 1: Direct Entity Manipulation
-├─ TestEngine configured with EntityData only
-├─ Runs: No logic - just loads entities for direct inspection
-├─ Use case: Testing FlatBuffers loading, entity configuration
+CUSTOM MODE (For incremental testing - flexible):
+──────────────────────────────────────────────────
+├─ Entity Only: Just load entities, no logic execution
+├─ Mixed Steps: Combine Logic classes + free functions in any order
+├─ Use case: Unit tests, building up logic incrementally
+├─ API: engine.AddLogic<T>(), engine.AddFunction(f)
+
+STANDARD MODE (Uses Engine base class - IDENTICAL to GameEngine):
+───────────────────────────────────────────────────────────────────
+├─ Logic Collection: Run Action/Collision/Render logic categories
+├─ Full Scene: Complete scene tick with all Logic
+├─ Use case: Integration tests that MUST match game behavior
+├─ API: engine.UseLogicCollection(...), engine.UseFullScene(...)
+├─ ** Uses Engine::ExecuteStandardLogicTick() - SAME code as GameEngine **
+```
+
+#### Why Standard Mode on Engine Base Class?
+
+```cpp
+// Both GameEngine and TestEngine call the SAME method for standard execution
+class Engine {
+protected:
+  void ExecuteStandardLogicTick() {
+    // Event handling
+    ProcessWaitingRoomEventBus();
+    ClearSubscribers();
+    UpdateSubscribersFromGlobalEventBus();
+    TickGlobalEventBus();
+    
+    // Logic: Action → Collision → Render
+    ExecuteLogicOfType(LogicType::Action);
+    ExecuteLogicOfType(LogicType::Collision);
+    ExecuteLogicOfType(LogicType::Render);
+  }
+};
+
+class GameEngine : public Engine {
+  void ExecuteTick() override {
+    CaptureInput();
+    ExecuteStandardLogicTick();  // ← SAME
+    Render();
+  }
+};
+
+class TestEngine : public Engine {
+  void ExecuteTick() override {
+    if (standard_mode) {
+      InjectTestInput();
+      ExecuteStandardLogicTick();  // ← SAME (hard-baked, not customizable)
+      ValidateState();
+    } else {
+      ExecuteCustomSteps();        // ← Flexible for unit tests
+    }
+  }
+};
 ```
 
 #### Unified FlatBuffers Structure for All Levels
@@ -1234,13 +1267,83 @@ table DataCollection {
 
 #### TestEngine Design
 
+The TestEngine allows two modes of logic execution:
+1. **Custom Mode (Levels 1-3)**: Mix and match Logic classes and free functions for incremental testing
+2. **Standard Mode (Levels 4-5)**: Use the **same execution path as GameEngine** - hard-baked into the abstract Engine base class
+
 ```cpp
 /////////////////////////////////////////////////
-/// @class TestEngine
-/// @brief Engine for running tests at different granularity levels
+/// @class Engine
+/// @brief Abstract base class with standard execution methods
 ///
-/// Fully configures once from TestDataConfig, then allows running
-/// at specific levels. Reuses same FlatBuffers structures as game.
+/// Standard execution (LogicCollection, FullScene) is defined here
+/// so both GameEngine and TestEngine use identical paths.
+/////////////////////////////////////////////////
+class Engine {
+protected:
+  GameResources m_game_resources;
+  GameContext m_game_context;
+  LogicCollection m_logic_collection;
+  
+  /////////////////////////////////////////////////
+  /// @brief Standard logic execution - SAME for game and test
+  /// @note This is on the base class so it's identical for both
+  /////////////////////////////////////////////////
+  void ExecuteStandardLogicTick() {
+    // Event handling (standard - always same order)
+    m_game_resources.event_handler.ProcessWaitingRoomEventBus();
+    m_game_resources.event_handler.ClearSubscribers();
+    m_game_resources.event_handler.UpdateSubscribersFromGlobalEventBus();
+    m_game_resources.event_handler.TickGlobalEventBus();
+    
+    // Logic execution (standard - Action → Collision → Render)
+    ExecuteLogicOfType(LogicType::Action);
+    ExecuteLogicOfType(LogicType::Collision);
+    ExecuteLogicOfType(LogicType::Render);
+  }
+  
+  /////////////////////////////////////////////////
+  /// @brief Execute all Logic of a specific type
+  /////////////////////////////////////////////////
+  void ExecuteLogicOfType(LogicType type) {
+    if (m_logic_collection.find(type) != m_logic_collection.end()) {
+      for (auto& logic : m_logic_collection[type]) {
+        logic->RunLogic();
+      }
+    }
+  }
+  
+  virtual void ExecuteTick() = 0;
+  
+public:
+  void Run(size_t num_ticks = 0);
+};
+
+/////////////////////////////////////////////////
+/// @class GameEngine
+/// @brief Production game engine - uses standard execution
+/////////////////////////////////////////////////
+class GameEngine : public Engine {
+protected:
+  void ExecuteTick() override {
+    // Capture real SFML input...
+    UpdateGameResources(m_game_resources);
+    m_game_resources.event_handler.PreloadEvents(m_game_resources.game_window);
+    
+    // Use STANDARD execution from base class
+    ExecuteStandardLogicTick();
+    
+    // Render
+    m_display_manager.CallRenderCycle();
+  }
+};
+
+/////////////////////////////////////////////////
+/// @class TestEngine
+/// @brief Test engine with custom and standard execution modes
+///
+/// Custom Mode: Mix and match Logic classes + free functions
+/// Standard Mode: Uses identical path as GameEngine
 /////////////////////////////////////////////////
 class TestEngine : public Engine {
 public:
@@ -1248,102 +1351,102 @@ public:
   /// @brief Execution level for this test run
   /////////////////////////////////////////////////
   enum class ExecutionLevel {
-    EntityOnly,     // Level 1: Just load entities
-    Function,       // Level 2: Run a free function
-    SingleLogic,    // Level 3: Run one Logic class
-    LogicCollection,// Level 4: Run a category of Logic classes
-    FullScene       // Level 5: Run complete scene
+    EntityOnly,      // Level 1: Just load entities (no logic)
+    Custom,          // Level 2-3: Mix Logic classes + free functions
+    LogicCollection, // Level 4: Uses STANDARD path from Engine base
+    FullScene        // Level 5: Uses STANDARD path from Engine base
   };
 
 private:
   const TestDataConfig *m_test_config;
   ExecutionLevel m_execution_level = ExecutionLevel::FullScene;
   
-  // Optional: Single logic instance for Level 3
-  std::unique_ptr<Logic> m_single_logic;
-  
-  // Optional: Logic collection for Level 4-5
-  LogicCollection m_logic_collection;
-  
-  // Optional: Custom function for Level 2
-  std::function<void(SceneContext&)> m_custom_function;
+  /////////////////////////////////////////////////
+  /// @brief Custom execution steps - mix Logic classes and free functions
+  ///
+  /// For incremental testing, you can add any combination:
+  /// - Logic class instances
+  /// - Free functions
+  /// - Lambdas
+  /// Steps execute in order added.
+  /////////////////////////////////////////////////
+  std::vector<std::variant<
+    std::unique_ptr<Logic>,
+    std::function<void(SceneContext&)>
+  >> m_custom_steps;
   
 public:
   /////////////////////////////////////////////////
-  /// @brief Configure engine from test data (called once)
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo> ConfigureFromData() override {
-    // Uses SAME data loading as GameEngine:
-    TestDataSource source(m_test_config);
-    auto result = m_configurator.ConfigureEntities(m_entity_pool, source);
-    if (!result.has_value()) return result;
-    
-    // Configure logic based on execution level
-    ConfigureLogicForLevel();
-    
-    return std::monostate{};
-  }
-  
-  /////////////////////////////////////////////////
-  /// @brief Set execution level and optionally configure specific logic
-  /////////////////////////////////////////////////
-  void SetExecutionLevel(ExecutionLevel level);
-  
-  /////////////////////////////////////////////////
-  /// @brief Set a single Logic class for Level 3 testing
+  /// @brief Add a Logic class to custom execution
   /////////////////////////////////////////////////
   template<typename TLogic>
-  void SetSingleLogic() {
-    m_execution_level = ExecutionLevel::SingleLogic;
-    m_single_logic = std::make_unique<TLogic>(GetLogicContext());
+  TestEngine& AddLogic() {
+    m_execution_level = ExecutionLevel::Custom;
+    m_custom_steps.push_back(std::make_unique<TLogic>(GetLogicContext()));
+    return *this;
   }
   
   /////////////////////////////////////////////////
-  /// @brief Set custom function for Level 2 testing
+  /// @brief Add a free function to custom execution
   /////////////////////////////////////////////////
-  void SetFunction(std::function<void(SceneContext&)> func) {
-    m_execution_level = ExecutionLevel::Function;
-    m_custom_function = std::move(func);
+  TestEngine& AddFunction(std::function<void(SceneContext&)> func) {
+    m_execution_level = ExecutionLevel::Custom;
+    m_custom_steps.push_back(std::move(func));
+    return *this;
+  }
+  
+  /////////////////////////////////////////////////
+  /// @brief Set to standard LogicCollection mode (uses Engine base path)
+  /////////////////////////////////////////////////
+  void UseLogicCollection(std::vector<LogicType> types) {
+    m_execution_level = ExecutionLevel::LogicCollection;
+    // Configure m_logic_collection from scene...
+  }
+  
+  /////////////////////////////////////////////////
+  /// @brief Set to full scene mode (uses Engine base path)
+  /////////////////////////////////////////////////
+  void UseFullScene(SceneType scene_type) {
+    m_execution_level = ExecutionLevel::FullScene;
+    // Configure m_logic_collection from scene...
   }
   
 protected:
-  /////////////////////////////////////////////////
-  /// @brief Execute tick at configured level
-  /////////////////////////////////////////////////
   void ExecuteTick() override {
-    // Event handling (same as game - always runs)
-    m_game_resources.event_handler.ProcessWaitingRoomEventBus();
-    m_game_resources.event_handler.ClearSubscribers();
-    m_game_resources.event_handler.UpdateSubscribersFromGlobalEventBus();
-    m_game_resources.event_handler.TickGlobalEventBus();
-    
-    // Execute based on level
     switch (m_execution_level) {
       case ExecutionLevel::EntityOnly:
-        // No logic execution
+        // No logic execution - just event handling
+        m_game_resources.event_handler.ProcessWaitingRoomEventBus();
+        m_game_resources.event_handler.ClearSubscribers();
+        m_game_resources.event_handler.UpdateSubscribersFromGlobalEventBus();
+        m_game_resources.event_handler.TickGlobalEventBus();
         break;
         
-      case ExecutionLevel::Function:
-        m_custom_function(m_scene_context);
-        break;
+      case ExecutionLevel::Custom:
+        // Event handling
+        m_game_resources.event_handler.ProcessWaitingRoomEventBus();
+        m_game_resources.event_handler.ClearSubscribers();
+        m_game_resources.event_handler.UpdateSubscribersFromGlobalEventBus();
+        m_game_resources.event_handler.TickGlobalEventBus();
         
-      case ExecutionLevel::SingleLogic:
-        m_single_logic->RunLogic();
-        break;
-        
-      case ExecutionLevel::LogicCollection:
-        for (auto& [type, logics] : m_logic_collection) {
-          for (auto& logic : logics) {
-            logic->RunLogic();
-          }
+        // Execute custom steps (mixed Logic + functions)
+        for (auto& step : m_custom_steps) {
+          std::visit([this](auto& s) {
+            using T = std::decay_t<decltype(s)>;
+            if constexpr (std::is_same_v<T, std::unique_ptr<Logic>>) {
+              s->RunLogic();
+            } else {
+              s(m_scene_context);
+            }
+          }, step);
         }
         break;
         
+      case ExecutionLevel::LogicCollection:
       case ExecutionLevel::FullScene:
-        // Same as game - Action → Collision → Render
-        ExecuteLogicOfType(LogicType::Action);
-        ExecuteLogicOfType(LogicType::Collision);
-        ExecuteLogicOfType(LogicType::Render);
+        // Use STANDARD execution from Engine base class
+        // Identical to GameEngine path!
+        ExecuteStandardLogicTick();
         break;
     }
   }
@@ -1359,7 +1462,7 @@ TEST_CASE("Entity configuration loads correctly", "[unit][entity]") {
   const auto *config = GENERATE_COPY(from_range(configs.value()));
   
   TestEngine engine(config);
-  engine.SetExecutionLevel(TestEngine::ExecutionLevel::EntityOnly);
+  // Default is EntityOnly when no logic is configured
   engine.ConfigureFromData();
   
   // Run 0 ticks - just inspect loaded entities
@@ -1371,26 +1474,32 @@ TEST_CASE("Entity configuration loads correctly", "[unit][entity]") {
 }
 ```
 
-**Level 2: Free Function Test**
+**Custom Mode: Mix Logic Classes and Free Functions (Incremental Testing)**
 ```cpp
-TEST_CASE("Custom component helper function", "[unit][function]") {
+TEST_CASE("Building up logic incrementally", "[unit][custom]") {
   TestEngine engine(config);
-  engine.SetFunction([](SceneContext& ctx) {
-    // Test a specific helper function
-    auto result = CalculateComponentBounds(ctx);
-    REQUIRE(result.width > 0);
-  });
   
+  // Mix and match - fluent API allows chaining
+  engine
+    .AddLogic<UICollisionLogic>()           // Logic class
+    .AddFunction([](SceneContext& ctx) {    // Free function
+      // Custom validation between logics
+      auto& pool = ctx.entity_pool;
+      // ... assertions ...
+    })
+    .AddLogic<UIActionLogic>()              // Another Logic class
+    .AddFunction(ValidateActionResults);    // Named function
+    
   engine.ConfigureFromData();
-  engine.Run(1);
+  engine.Run(1);  // All steps execute in order
 }
 ```
 
-**Level 3: Single Logic Class Test**
+**Custom Mode: Single Logic Class Test**
 ```cpp
 TEST_CASE("UICollisionLogic detects overlap", "[unit][logic]") {
   TestEngine engine(config);
-  engine.SetSingleLogic<UICollisionLogic>();
+  engine.AddLogic<UICollisionLogic>();  // Single logic - still custom mode
   
   engine.ConfigureFromData();
   engine.Run(1);
@@ -1402,31 +1511,66 @@ TEST_CASE("UICollisionLogic detects overlap", "[unit][logic]") {
 }
 ```
 
-**Level 4: Logic Collection Test**
+**Standard Mode: Logic Collection (Uses Engine Base Class Path)**
 ```cpp
 TEST_CASE("Action logics process input correctly", "[integration][logic]") {
   TestEngine engine(config);
-  engine.SetExecutionLevel(TestEngine::ExecutionLevel::LogicCollection);
-  engine.SetLogicTypes({LogicType::Action});  // Only action logics
+  // UseLogicCollection switches to STANDARD mode
+  // This uses ExecuteStandardLogicTick() from Engine base class
+  engine.UseLogicCollection({LogicType::Action});
   
   engine.ConfigureFromData();
-  engine.Run(3);  // 3 ticks
+  engine.Run(3);  // 3 ticks - IDENTICAL to GameEngine path
   
   // Assert cumulative state
 }
 ```
 
-**Level 5: Full Scene Test**
+**Standard Mode: Full Scene (Uses Engine Base Class Path)**
 ```cpp
 TEST_CASE("Title scene workflow", "[integration][scene]") {
   TestEngine engine(config);
-  engine.SetExecutionLevel(TestEngine::ExecutionLevel::FullScene);
+  // UseFullScene switches to STANDARD mode
+  // This uses ExecuteStandardLogicTick() from Engine base class
+  engine.UseFullScene(SceneType::SceneType_TITLE);
   
   engine.ConfigureFromData();
-  engine.Run(10);  // Full scene for 10 ticks
+  engine.Run(10);  // IDENTICAL execution path to GameEngine
   
   // Assert final scene state
 }
+```
+
+#### Key Design Principles
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                  EXECUTION MODES: CUSTOM vs STANDARD                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+CUSTOM MODE (TestEngine only - for incremental testing):
+┌───────────────────────────────────────────────────────────────────────────┐
+│ engine.AddLogic<A>().AddFunction(f).AddLogic<B>()                         │
+│                                                                            │
+│   Execution order: A → f → B (in order added)                              │
+│   Flexibility: Mix Logic classes, free functions, lambdas                  │
+│   Use case: Building up tests incrementally                                │
+└───────────────────────────────────────────────────────────────────────────┘
+
+STANDARD MODE (Uses Engine base class - IDENTICAL to GameEngine):
+┌───────────────────────────────────────────────────────────────────────────┐
+│ engine.UseLogicCollection({Action, Collision})                            │
+│ engine.UseFullScene(SceneType::Title)                                     │
+│                                                                            │
+│   Calls: Engine::ExecuteStandardLogicTick()                                │
+│   Execution order: Action → Collision → Render (always)                    │
+│   Use case: Integration tests that MUST match game behavior                │
+│                                                                            │
+│   ┌────────────────────────────────────────────────────────────────────┐  │
+│   │ GameEngine::ExecuteTick() and TestEngine::ExecuteTick() both call  │  │
+│   │ Engine::ExecuteStandardLogicTick() - SAME CODE PATH!               │  │
+│   └────────────────────────────────────────────────────────────────────┘  │
+└───────────────────────────────────────────────────────────────────────────┘
 ```
 
 #### Data Reuse Across Levels
