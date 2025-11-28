@@ -1149,6 +1149,325 @@ TEST_CASE("Custom collision edge case", "[unit][collision]") {
 - **CMake Template** for standardized test directories where all tests are data-driven
 - **Macro** for directories mixing data-driven and custom tests
 
+### Solution 7: TestEngine Execution Granularity
+
+The TestEngine should support testing at different levels of the game stack, from individual functions up to full scenes. Configure the engine once, then run only the specific parts needed for each test.
+
+#### Test Granularity Levels
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       TEST GRANULARITY LEVELS                                │
+│                    (Configure once, run specific parts)                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Level 5: Full Scene Test
+├─ TestEngine configured with SceneType + TestDataConfig
+├─ Runs: Scene initialization → Logic execution → Tick loop
+├─ Use case: Integration tests, scene workflow validation
+│
+Level 4: Logic Collection Test
+├─ TestEngine configured with LogicCollection + EntityData
+├─ Runs: All Logic classes in a category (Action, Collision, Render)
+├─ Use case: Testing logic ordering, inter-logic dependencies
+│
+Level 3: Single Logic Class Test
+├─ TestEngine configured with single Logic + EntityData
+├─ Runs: One specific Logic class
+├─ Use case: Unit testing individual Logic classes
+│
+Level 2: Free Function Test
+├─ TestEngine configured with function pointer + EntityData
+├─ Runs: Arbitrary free function with entity access
+├─ Use case: Testing utility functions, component helpers
+│
+Level 1: Direct Entity Manipulation
+├─ TestEngine configured with EntityData only
+├─ Runs: No logic - just loads entities for direct inspection
+├─ Use case: Testing FlatBuffers loading, entity configuration
+```
+
+#### Unified FlatBuffers Structure for All Levels
+
+All test levels use the **same FlatBuffers structures** for consistent data loading:
+
+```fbs
+// test_data.fbs - Unified structure for all test levels
+table TestDataConfig {
+  metadata: TestMetadata (required);
+  
+  // Level 1+: Entity data (shared with game SceneData)
+  start_data_collection: DataCollection;
+  expected_data_collection: DataCollection;
+  
+  // Level 2+: Simulation configuration
+  simulation_data: SimulationData;
+  
+  // Level 3-5: Scene and logic configuration
+  scene_type: SceneType;
+  logic_config: LogicConfig;
+  
+  // Event/input sequences (all levels)
+  event_sequence: [EventPacketData];
+  input_sequence: [InputEventData];
+  tick_snapshots: [TickSnapshot];
+}
+
+// LogicConfig - specifies which logic to run
+table LogicConfig {
+  // Level 3: Single logic class
+  logic_class_name: string;      // e.g., "UICollisionLogic"
+  
+  // Level 4: Logic collection
+  logic_types: [LogicType];      // e.g., [Action, Collision]
+  
+  // Level 5: Full scene - use SceneType above
+}
+
+// DataCollection - identical to game's SceneData entity structure
+table DataCollection {
+  entity_collection: EntityCollection;   // Same as SceneData
+  event_bus: EventBusData;
+  waiting_room: EventBusData;
+}
+```
+
+#### TestEngine Design
+
+```cpp
+/////////////////////////////////////////////////
+/// @class TestEngine
+/// @brief Engine for running tests at different granularity levels
+///
+/// Fully configures once from TestDataConfig, then allows running
+/// at specific levels. Reuses same FlatBuffers structures as game.
+/////////////////////////////////////////////////
+class TestEngine : public Engine {
+public:
+  /////////////////////////////////////////////////
+  /// @brief Execution level for this test run
+  /////////////////////////////////////////////////
+  enum class ExecutionLevel {
+    EntityOnly,     // Level 1: Just load entities
+    Function,       // Level 2: Run a free function
+    SingleLogic,    // Level 3: Run one Logic class
+    LogicCollection,// Level 4: Run a category of Logic classes
+    FullScene       // Level 5: Run complete scene
+  };
+
+private:
+  const TestDataConfig *m_test_config;
+  ExecutionLevel m_execution_level = ExecutionLevel::FullScene;
+  
+  // Optional: Single logic instance for Level 3
+  std::unique_ptr<Logic> m_single_logic;
+  
+  // Optional: Logic collection for Level 4-5
+  LogicCollection m_logic_collection;
+  
+  // Optional: Custom function for Level 2
+  std::function<void(SceneContext&)> m_custom_function;
+  
+public:
+  /////////////////////////////////////////////////
+  /// @brief Configure engine from test data (called once)
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> ConfigureFromData() override {
+    // Uses SAME data loading as GameEngine:
+    TestDataSource source(m_test_config);
+    auto result = m_configurator.ConfigureEntities(m_entity_pool, source);
+    if (!result.has_value()) return result;
+    
+    // Configure logic based on execution level
+    ConfigureLogicForLevel();
+    
+    return std::monostate{};
+  }
+  
+  /////////////////////////////////////////////////
+  /// @brief Set execution level and optionally configure specific logic
+  /////////////////////////////////////////////////
+  void SetExecutionLevel(ExecutionLevel level);
+  
+  /////////////////////////////////////////////////
+  /// @brief Set a single Logic class for Level 3 testing
+  /////////////////////////////////////////////////
+  template<typename TLogic>
+  void SetSingleLogic() {
+    m_execution_level = ExecutionLevel::SingleLogic;
+    m_single_logic = std::make_unique<TLogic>(GetLogicContext());
+  }
+  
+  /////////////////////////////////////////////////
+  /// @brief Set custom function for Level 2 testing
+  /////////////////////////////////////////////////
+  void SetFunction(std::function<void(SceneContext&)> func) {
+    m_execution_level = ExecutionLevel::Function;
+    m_custom_function = std::move(func);
+  }
+  
+protected:
+  /////////////////////////////////////////////////
+  /// @brief Execute tick at configured level
+  /////////////////////////////////////////////////
+  void ExecuteTick() override {
+    // Event handling (same as game - always runs)
+    m_game_resources.event_handler.ProcessWaitingRoomEventBus();
+    m_game_resources.event_handler.ClearSubscribers();
+    m_game_resources.event_handler.UpdateSubscribersFromGlobalEventBus();
+    m_game_resources.event_handler.TickGlobalEventBus();
+    
+    // Execute based on level
+    switch (m_execution_level) {
+      case ExecutionLevel::EntityOnly:
+        // No logic execution
+        break;
+        
+      case ExecutionLevel::Function:
+        m_custom_function(m_scene_context);
+        break;
+        
+      case ExecutionLevel::SingleLogic:
+        m_single_logic->RunLogic();
+        break;
+        
+      case ExecutionLevel::LogicCollection:
+        for (auto& [type, logics] : m_logic_collection) {
+          for (auto& logic : logics) {
+            logic->RunLogic();
+          }
+        }
+        break;
+        
+      case ExecutionLevel::FullScene:
+        // Same as game - Action → Collision → Render
+        ExecuteLogicOfType(LogicType::Action);
+        ExecuteLogicOfType(LogicType::Collision);
+        ExecuteLogicOfType(LogicType::Render);
+        break;
+    }
+  }
+};
+```
+
+#### Usage Examples
+
+**Level 1: Entity-Only Test (Just Load Data)**
+```cpp
+TEST_CASE("Entity configuration loads correctly", "[unit][entity]") {
+  auto configs = load_test_data_configs();
+  const auto *config = GENERATE_COPY(from_range(configs.value()));
+  
+  TestEngine engine(config);
+  engine.SetExecutionLevel(TestEngine::ExecutionLevel::EntityOnly);
+  engine.ConfigureFromData();
+  
+  // Run 0 ticks - just inspect loaded entities
+  engine.Run(0);
+  
+  // Assert entity state
+  auto& pool = engine.GetEntityManager().GetEntityMemoryPool();
+  REQUIRE(pool.size() == 10);
+}
+```
+
+**Level 2: Free Function Test**
+```cpp
+TEST_CASE("Custom component helper function", "[unit][function]") {
+  TestEngine engine(config);
+  engine.SetFunction([](SceneContext& ctx) {
+    // Test a specific helper function
+    auto result = CalculateComponentBounds(ctx);
+    REQUIRE(result.width > 0);
+  });
+  
+  engine.ConfigureFromData();
+  engine.Run(1);
+}
+```
+
+**Level 3: Single Logic Class Test**
+```cpp
+TEST_CASE("UICollisionLogic detects overlap", "[unit][logic]") {
+  TestEngine engine(config);
+  engine.SetSingleLogic<UICollisionLogic>();
+  
+  engine.ConfigureFromData();
+  engine.Run(1);
+  
+  // Assert collision results
+  auto& pool = engine.GetEntityManager().GetEntityMemoryPool();
+  auto& ui = emp_helpers::GetComponent<CUserInterface>(0, pool);
+  REQUIRE(ui.m_collision_detected == true);
+}
+```
+
+**Level 4: Logic Collection Test**
+```cpp
+TEST_CASE("Action logics process input correctly", "[integration][logic]") {
+  TestEngine engine(config);
+  engine.SetExecutionLevel(TestEngine::ExecutionLevel::LogicCollection);
+  engine.SetLogicTypes({LogicType::Action});  // Only action logics
+  
+  engine.ConfigureFromData();
+  engine.Run(3);  // 3 ticks
+  
+  // Assert cumulative state
+}
+```
+
+**Level 5: Full Scene Test**
+```cpp
+TEST_CASE("Title scene workflow", "[integration][scene]") {
+  TestEngine engine(config);
+  engine.SetExecutionLevel(TestEngine::ExecutionLevel::FullScene);
+  
+  engine.ConfigureFromData();
+  engine.Run(10);  // Full scene for 10 ticks
+  
+  // Assert final scene state
+}
+```
+
+#### Data Reuse Across Levels
+
+The key benefit is that **all levels use identical FlatBuffers structures**:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     FLATBUFFERS STRUCTURE REUSE                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Game Loading:
+  SceneData (from data/scene/{scene}.bin)
+    └─► entity_collection: EntityCollection
+        └─► entities: [EntityData]
+            └─► c_user_interface: UserInterfaceData
+            └─► c_grimoire_machina: GrimoireMachinaData
+            
+Test Loading (ALL LEVELS):
+  TestDataConfig (from tests/*/data/*.test_data.bin)
+    └─► start_data_collection: DataCollection
+        └─► entity_collection: EntityCollection   ◄── SAME STRUCTURE!
+            └─► entities: [EntityData]
+                └─► c_user_interface: UserInterfaceData
+                └─► c_grimoire_machina: GrimoireMachinaData
+                
+Shared Loading Path:
+  ┌──────────────────────────┐
+  │    FlatbuffersConfigurator    │
+  ├──────────────────────────┤
+  │ ConfigureEntitiesFromCollection(pool, collection)  │
+  │   └─ Works identically for game and test data!     │
+  └──────────────────────────┘
+```
+
+**Benefits:**
+1. **Consistent data format**: Game and test JSON/binary use identical schemas
+2. **Single configuration path**: `FlatbuffersConfigurator` handles both
+3. **Easy test data creation**: Copy game data, modify for test scenario
+4. **Validation at all levels**: Same data → same loading → predictable behavior
+
 ---
 
 ## Implementation Plan
@@ -1270,6 +1589,40 @@ STEAMROT_DATA_DRIVEN_TESTS("Collision tests", "[unit][collision]")
 
 **Estimated effort:** Low-Medium
 
+### Phase 7: TestEngine Execution Levels (Solution 7)
+
+**Files to modify:**
+- `tests/harness/TestEngine.h` - Add ExecutionLevel enum and level-specific methods
+- `tests/harness/TestEngine.cpp` - Implement level-based ExecuteTick()
+
+**Key changes:**
+```cpp
+// TestEngine with execution levels
+class TestEngine : public Engine {
+public:
+  enum class ExecutionLevel {
+    EntityOnly, Function, SingleLogic, LogicCollection, FullScene
+  };
+  
+  void SetExecutionLevel(ExecutionLevel level);
+  
+  template<typename TLogic>
+  void SetSingleLogic();
+  
+  void SetFunction(std::function<void(SceneContext&)> func);
+  
+protected:
+  void ExecuteTick() override;  // Behavior based on m_execution_level
+};
+```
+
+**Key benefits:**
+- Configure engine once, run at different levels
+- Same FlatBuffers structures for all test types
+- Single `FlatbuffersConfigurator` path for game and test data
+
+**Estimated effort:** Medium
+
 ---
 
 ## Benefits
@@ -1279,6 +1632,8 @@ STEAMROT_DATA_DRIVEN_TESTS("Collision tests", "[unit][collision]")
 3. **Flexibility**: Logic provider interface allows custom logic injection
 4. **Clarity**: Renamed TestMetadataContext removes confusion
 5. **Testability**: Tests can more accurately simulate game behavior
+6. **Granular Testing**: TestEngine supports 5 levels from entity-only to full scene
+7. **Data Reuse**: Identical FlatBuffers structures for game and all test levels
 
 ---
 
