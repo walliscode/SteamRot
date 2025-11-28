@@ -7,6 +7,7 @@ PathProvider.cpp
 
 add_library(data_handlers
   DataLoader.cpp
+  DefaultSceneDataSource.cpp
   FlatbuffersDataLoader.cpp
   PathProvider.cpp
 )
@@ -22,4 +23,5 @@ target_link_libraries(data_handlers
   flatbuffers
   flatbuffers_headers
   logger
+  magic_enum
 )

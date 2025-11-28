@@ -1,5 +1,6 @@
 
 add_library(systems
+    Engine.cpp
     GameEngine.cpp
     ActionManager.cpp
 )
