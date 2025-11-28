@@ -590,3 +590,296 @@ main {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--secondary);
 }
+
+/* Graph Explorer Styles */
+#graph-explorer {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+}
+
+#graph-explorer h2 {
+    margin: 0 0 5px 0;
+    font-size: 1.2rem;
+}
+
+.graph-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.graph-controls label {
+    font-weight: 600;
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.graph-controls select {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    background: var(--card-bg);
+    color: var(--text);
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.graph-controls select:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.graph-btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 6px;
+    background: var(--secondary);
+    color: white;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.graph-btn:hover {
+    background: var(--text);
+}
+
+#graph-container {
+    position: relative;
+    min-height: 350px;
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#graph-canvas {
+    position: relative;
+    width: 100%;
+    height: 350px;
+    display: none;
+}
+
+#graph-canvas.active {
+    display: block;
+}
+
+#graph-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 350px;
+    color: var(--text-light);
+}
+
+#graph-empty-state .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+#graph-empty-state.hidden {
+    display: none;
+}
+
+#graph-center-node {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+.graph-node {
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    transition: all 0.2s;
+    white-space: nowrap;
+    text-align: center;
+    user-select: none;
+}
+
+.graph-node.hidden {
+    display: none;
+}
+
+.graph-node.center-node {
+    background: var(--primary);
+    color: white;
+    font-size: 1rem;
+    padding: 14px 22px;
+}
+
+.graph-node.function-node {
+    background: var(--success);
+    color: white;
+}
+
+.graph-node.logic-class-node {
+    background: var(--warning);
+    color: var(--text);
+}
+
+.graph-node:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.graph-node.center-node:hover {
+    transform: translate(-50%, -50%) scale(1.05);
+}
+
+#graph-connections {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.graph-connection-group {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: auto;
+}
+
+.graph-connection-group.left {
+    right: calc(50% + 100px);
+    top: 50%;
+    transform: translateY(-50%);
+    align-items: flex-end;
+}
+
+.graph-connection-group.right {
+    left: calc(50% + 100px);
+    top: 50%;
+    transform: translateY(-50%);
+    align-items: flex-start;
+}
+
+/* Scrollable stacked nodes for many options */
+.graph-node-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 280px;
+    overflow-y: hidden;
+    padding: 8px;
+    background: rgba(255,255,255,0.9);
+    border-radius: 8px;
+    transition: max-height 0.3s, overflow-y 0.3s;
+}
+
+.graph-node-stack:hover {
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+}
+
+.graph-node-stack .graph-node {
+    flex-shrink: 0;
+}
+
+.graph-node-stack-label {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    text-align: center;
+    padding: 4px 8px;
+    background: var(--bg);
+    border-radius: 4px;
+    margin-bottom: 4px;
+}
+
+/* Connection lines using SVG */
+.graph-line {
+    stroke: var(--border);
+    stroke-width: 2;
+    fill: none;
+}
+
+.graph-line.active {
+    stroke: var(--primary);
+    stroke-width: 3;
+}
+
+/* Breadcrumb trail */
+#graph-breadcrumb {
+    margin-top: 15px;
+    padding: 10px 15px;
+    background: var(--bg);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+#graph-breadcrumb.hidden {
+    display: none;
+}
+
+.breadcrumb-label {
+    font-weight: 600;
+    color: var(--text-light);
+    font-size: 0.85rem;
+}
+
+#breadcrumb-trail {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.breadcrumb-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    background: var(--card-bg);
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.breadcrumb-item:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.breadcrumb-item.function-type {
+    border-left: 3px solid var(--success);
+}
+
+.breadcrumb-item.logic-class-type {
+    border-left: 3px solid var(--warning);
+}
+
+.breadcrumb-separator {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+/* Test count badge on nodes */
+.node-test-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: var(--danger);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+}

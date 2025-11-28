@@ -71,6 +71,37 @@
                 </div>
             </section>
             
+            <section id="graph-explorer">
+                <h2>Graph Explorer <span class="section-info">(Interactive Visualization)</span></h2>
+                <p class="hint">Select a starting Function or Logic Class, then click nodes to explore connections</p>
+                <div class="graph-controls">
+                    <label for="graph-start-type">Start with:</label>
+                    <select id="graph-start-type">
+                        <option value="function">Function</option>
+                        <option value="logic-class">Logic Class</option>
+                    </select>
+                    <select id="graph-start-node">
+                        <option value="">-- Select to begin --</option>
+{{GRAPH_START_OPTIONS}}
+                    </select>
+                    <button id="graph-reset" class="graph-btn">Reset Graph</button>
+                </div>
+                <div id="graph-container">
+                    <div id="graph-canvas">
+                        <div id="graph-center-node" class="graph-node center-node hidden"></div>
+                        <div id="graph-connections"></div>
+                    </div>
+                    <div id="graph-empty-state">
+                        <span class="empty-icon">🔍</span>
+                        <p>Select a starting point above to explore connections</p>
+                    </div>
+                </div>
+                <div id="graph-breadcrumb" class="hidden">
+                    <span class="breadcrumb-label">Path:</span>
+                    <div id="breadcrumb-trail"></div>
+                </div>
+            </section>
+            
             <section id="coverage-matrix">
                 <h2>Coverage Matrix <span class="section-info">(Function × Logic Class)</span></h2>
                 <p class="hint">Click any cell to filter tests covering that combination</p>

@@ -13,9 +13,17 @@ let activeFilters = {
     categories: []
 };
 
+// Graph explorer state
+let graphState = {
+    currentNode: null,
+    currentType: null,
+    breadcrumb: []
+};
+
 // Initialize dashboard
 document.addEventListener('DOMContentLoaded', () => {
     initializeEventListeners();
+    initializeGraphExplorer();
     updateVisibleCount();
 });
 
@@ -399,4 +407,318 @@ function hideDetails() {
     document.getElementById('test-details').classList.add('hidden');
     document.getElementById('overlay').classList.add('hidden');
     document.body.style.overflow = '';
+}
+
+// ============================================
+// Graph Explorer Functions
+// ============================================
+
+function initializeGraphExplorer() {
+    const startTypeSelect = document.getElementById('graph-start-type');
+    const startNodeSelect = document.getElementById('graph-start-node');
+    const resetBtn = document.getElementById('graph-reset');
+    
+    if (startTypeSelect) {
+        startTypeSelect.addEventListener('change', () => {
+            updateStartNodeOptions();
+            resetGraph();
+        });
+    }
+    
+    if (startNodeSelect) {
+        startNodeSelect.addEventListener('change', () => {
+            const selectedNode = startNodeSelect.value;
+            if (selectedNode) {
+                const nodeType = startTypeSelect.value;
+                selectGraphNode(selectedNode, nodeType);
+            }
+        });
+    }
+    
+    if (resetBtn) {
+        resetBtn.addEventListener('click', resetGraph);
+    }
+    
+    // Initialize options
+    updateStartNodeOptions();
+}
+
+function updateStartNodeOptions() {
+    const startTypeSelect = document.getElementById('graph-start-type');
+    const startNodeSelect = document.getElementById('graph-start-node');
+    
+    if (!startTypeSelect || !startNodeSelect) return;
+    
+    const nodeType = startTypeSelect.value;
+    
+    // Clear current options except the placeholder
+    startNodeSelect.innerHTML = '<option value="">-- Select to begin --</option>';
+    
+    // Get unique values based on selected type
+    const values = new Set();
+    TEST_DATA.forEach(test => {
+        if (nodeType === 'function') {
+            test.functions.forEach(f => values.add(f));
+        } else {
+            test.logic_classes.forEach(c => values.add(c));
+        }
+    });
+    
+    // Add options sorted alphabetically
+    const sortedValues = Array.from(values).sort();
+    sortedValues.forEach(value => {
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = value;
+        startNodeSelect.appendChild(option);
+    });
+}
+
+function selectGraphNode(nodeName, nodeType) {
+    graphState.currentNode = nodeName;
+    graphState.currentType = nodeType;
+    graphState.breadcrumb.push({ name: nodeName, type: nodeType });
+    
+    renderGraph();
+    updateBreadcrumb();
+}
+
+function resetGraph() {
+    graphState.currentNode = null;
+    graphState.currentType = null;
+    graphState.breadcrumb = [];
+    
+    const canvas = document.getElementById('graph-canvas');
+    const emptyState = document.getElementById('graph-empty-state');
+    const breadcrumb = document.getElementById('graph-breadcrumb');
+    const startNodeSelect = document.getElementById('graph-start-node');
+    
+    if (canvas) canvas.classList.remove('active');
+    if (emptyState) emptyState.classList.remove('hidden');
+    if (breadcrumb) breadcrumb.classList.add('hidden');
+    if (startNodeSelect) startNodeSelect.value = '';
+    
+    // Clear connections
+    const connections = document.getElementById('graph-connections');
+    if (connections) connections.innerHTML = '';
+    
+    // Hide center node
+    const centerNode = document.getElementById('graph-center-node');
+    if (centerNode) centerNode.classList.add('hidden');
+}
+
+function renderGraph() {
+    const canvas = document.getElementById('graph-canvas');
+    const emptyState = document.getElementById('graph-empty-state');
+    const connections = document.getElementById('graph-connections');
+    const centerNode = document.getElementById('graph-center-node');
+    
+    if (!canvas || !emptyState || !connections || !centerNode) return;
+    
+    // Show canvas, hide empty state
+    canvas.classList.add('active');
+    emptyState.classList.add('hidden');
+    
+    // Set center node
+    centerNode.textContent = graphState.currentNode;
+    centerNode.classList.remove('hidden');
+    centerNode.className = `graph-node center-node ${graphState.currentType === 'function' ? 'function-node' : 'logic-class-node'}`;
+    
+    // Find connected nodes
+    const connectedNodes = findConnectedNodes(graphState.currentNode, graphState.currentType);
+    
+    // Clear previous connections
+    connections.innerHTML = '';
+    
+    // Render connections
+    renderConnections(connectedNodes, connections);
+}
+
+function findConnectedNodes(nodeName, nodeType) {
+    const connected = {
+        functions: new Map(),
+        logicClasses: new Map()
+    };
+    
+    TEST_DATA.forEach(test => {
+        let isMatch = false;
+        
+        if (nodeType === 'function') {
+            isMatch = test.functions.includes(nodeName);
+        } else {
+            isMatch = test.logic_classes.includes(nodeName);
+        }
+        
+        if (isMatch) {
+            // Add connected functions (if we're starting from a logic class)
+            if (nodeType === 'logic-class') {
+                test.functions.forEach(func => {
+                    if (!connected.functions.has(func)) {
+                        connected.functions.set(func, { tests: [], count: 0 });
+                    }
+                    connected.functions.get(func).tests.push(test.name);
+                    connected.functions.get(func).count++;
+                });
+            }
+            
+            // Add connected logic classes (if we're starting from a function)
+            if (nodeType === 'function') {
+                test.logic_classes.forEach(cls => {
+                    if (!connected.logicClasses.has(cls)) {
+                        connected.logicClasses.set(cls, { tests: [], count: 0 });
+                    }
+                    connected.logicClasses.get(cls).tests.push(test.name);
+                    connected.logicClasses.get(cls).count++;
+                });
+            }
+        }
+    });
+    
+    return connected;
+}
+
+function renderConnections(connectedNodes, container) {
+    // Create left group (for the opposite type connections)
+    const targetType = graphState.currentType === 'function' ? 'logic-class' : 'function';
+    const targetNodes = graphState.currentType === 'function' 
+        ? connectedNodes.logicClasses 
+        : connectedNodes.functions;
+    
+    if (targetNodes.size === 0) {
+        container.innerHTML = `
+            <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, 80px); text-align: center; color: var(--text-light);">
+                <p>No connections found for this ${graphState.currentType === 'function' ? 'function' : 'logic class'}</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Create a stack for the connected nodes
+    const stackContainer = document.createElement('div');
+    stackContainer.className = 'graph-connection-group right';
+    
+    const nodeStack = document.createElement('div');
+    nodeStack.className = 'graph-node-stack';
+    
+    // Add label showing count
+    const label = document.createElement('div');
+    label.className = 'graph-node-stack-label';
+    label.textContent = `${targetNodes.size} ${targetType === 'function' ? 'Functions' : 'Logic Classes'} (scroll to see more)`;
+    nodeStack.appendChild(label);
+    
+    // Sort nodes by test count (most tests first)
+    const sortedNodes = Array.from(targetNodes.entries())
+        .sort((a, b) => b[1].count - a[1].count);
+    
+    sortedNodes.forEach(([nodeName, nodeData]) => {
+        const nodeEl = document.createElement('div');
+        nodeEl.className = `graph-node ${targetType === 'function' ? 'function-node' : 'logic-class-node'}`;
+        nodeEl.textContent = nodeName;
+        nodeEl.style.position = 'relative';
+        
+        // Add test count badge
+        const badge = document.createElement('span');
+        badge.className = 'node-test-count';
+        badge.textContent = nodeData.count;
+        badge.title = `${nodeData.count} test(s): ${nodeData.tests.slice(0, 3).join(', ')}${nodeData.count > 3 ? '...' : ''}`;
+        nodeEl.appendChild(badge);
+        
+        // Click handler to navigate to this node
+        nodeEl.addEventListener('click', () => {
+            navigateToNode(nodeName, targetType);
+        });
+        
+        nodeStack.appendChild(nodeEl);
+    });
+    
+    stackContainer.appendChild(nodeStack);
+    container.appendChild(stackContainer);
+    
+    // Add SVG for connection lines
+    renderConnectionLines(container, sortedNodes.length);
+}
+
+function renderConnectionLines(container, nodeCount) {
+    // Simple CSS-based connection line instead of SVG to avoid percentage issues
+    const connectionLine = document.createElement('div');
+    connectionLine.style.cssText = `
+        position: absolute;
+        left: calc(50% + 60px);
+        top: 50%;
+        width: calc(8% - 10px);
+        height: 3px;
+        background: linear-gradient(90deg, #2563eb 50%, transparent 50%);
+        background-size: 10px 100%;
+        transform: translateY(-50%);
+        pointer-events: none;
+    `;
+    container.insertBefore(connectionLine, container.firstChild);
+}
+
+function navigateToNode(nodeName, nodeType) {
+    // Check if we're going back to a previous node in breadcrumb
+    const existingIndex = graphState.breadcrumb.findIndex(
+        item => item.name === nodeName && item.type === nodeType
+    );
+    
+    if (existingIndex >= 0) {
+        // Trim breadcrumb to this point
+        graphState.breadcrumb = graphState.breadcrumb.slice(0, existingIndex + 1);
+    } else {
+        // Add to breadcrumb
+        graphState.breadcrumb.push({ name: nodeName, type: nodeType });
+    }
+    
+    graphState.currentNode = nodeName;
+    graphState.currentType = nodeType;
+    
+    // Update dropdown to match
+    const startTypeSelect = document.getElementById('graph-start-type');
+    const startNodeSelect = document.getElementById('graph-start-node');
+    
+    if (startTypeSelect) {
+        startTypeSelect.value = nodeType;
+        updateStartNodeOptions();
+    }
+    
+    if (startNodeSelect) {
+        startNodeSelect.value = nodeName;
+    }
+    
+    renderGraph();
+    updateBreadcrumb();
+}
+
+function updateBreadcrumb() {
+    const breadcrumb = document.getElementById('graph-breadcrumb');
+    const trail = document.getElementById('breadcrumb-trail');
+    
+    if (!breadcrumb || !trail) return;
+    
+    if (graphState.breadcrumb.length === 0) {
+        breadcrumb.classList.add('hidden');
+        return;
+    }
+    
+    breadcrumb.classList.remove('hidden');
+    trail.innerHTML = '';
+    
+    graphState.breadcrumb.forEach((item, index) => {
+        // Add breadcrumb item
+        const crumb = document.createElement('span');
+        crumb.className = `breadcrumb-item ${item.type === 'function' ? 'function-type' : 'logic-class-type'}`;
+        crumb.textContent = item.name;
+        crumb.addEventListener('click', () => {
+            navigateToNode(item.name, item.type);
+        });
+        trail.appendChild(crumb);
+        
+        // Add separator if not last
+        if (index < graphState.breadcrumb.length - 1) {
+            const separator = document.createElement('span');
+            separator.className = 'breadcrumb-separator';
+            separator.textContent = '→';
+            trail.appendChild(separator);
+        }
+    });
 }
