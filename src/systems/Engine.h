@@ -16,7 +16,7 @@
 /////////////////////////////////////////////////
 #include "GameContext.h"
 #include "GameResources.h"
-#include <cstddef>
+#include "SceneManager.h"
 #include <expected>
 #include <variant>
 
@@ -47,6 +47,11 @@ protected:
   GameContext m_game_context;
 
   /////////////////////////////////////////////////
+  /// @brief SceneManager instance for the Game
+  /////////////////////////////////////////////////
+  SceneManager m_scene_manager;
+
+  /////////////////////////////////////////////////
   /// @brief Flag indicating if the engine should continue running
   /////////////////////////////////////////////////
   bool m_running = false;
@@ -60,7 +65,7 @@ protected:
   ///
   /// @return Success or failure information
   /////////////////////////////////////////////////
-  virtual std::expected<std::monostate, FailInfo> ConfigureFromData() = 0;
+  virtual std::expected<std::monostate, FailInfo> ConfigureEngineFromData() = 0;
 
   /////////////////////////////////////////////////
   /// @brief Execute a single tick of the game loop.
@@ -69,25 +74,15 @@ protected:
   /// Derived classes implement tick logic specific to their context
   /// (real input/rendering vs simulated input/validation).
   /////////////////////////////////////////////////
-  virtual void ExecuteTick() = 0;
+  void ExecuteSystemsTick();
 
-  /////////////////////////////////////////////////
-  /// @brief Check if the engine should continue running.
-  ///
-  /// Default implementation checks if the window is open.
-  /// TestEngine can override to run for a fixed number of ticks.
-  ///
-  /// @return true if the engine should continue running
-  /////////////////////////////////////////////////
-  virtual bool ShouldContinueRunning() const;
+  void ExecuteEngineLevelLogic();
 
-  /////////////////////////////////////////////////
-  /// @brief Post-tick processing.
-  ///
-  /// Called after ExecuteTick() completes. Default increments loop number.
-  /// Derived classes can add additional post-tick processing.
-  /////////////////////////////////////////////////
-  virtual void OnPostTick();
+  virtual void ExecuteSceneLevelLogic() = 0;
+
+  virtual void ExecuteDisplayManagerTick() = 0;
+
+  virtual void RunGameLoop() = 0;
 
 public:
   /////////////////////////////////////////////////
@@ -95,7 +90,7 @@ public:
   ///
   /// @param env_type Environment type for resource configuration
   /////////////////////////////////////////////////
-  explicit Engine(EnvironmentType env_type = EnvironmentType::None);
+  explicit Engine();
 
   /////////////////////////////////////////////////
   /// @brief Virtual destructor for proper cleanup.
@@ -105,63 +100,14 @@ public:
   /////////////////////////////////////////////////
   /// @brief Start up the engine and configure resources.
   ///
-  /// Calls ConfigureFromData() to load configuration.
-  ///
   /// @return Success or failure information
   /////////////////////////////////////////////////
-  virtual std::expected<std::monostate, FailInfo> StartUp();
+  std::expected<std::monostate, FailInfo> StartUp();
 
   /////////////////////////////////////////////////
-  /// @brief Run the game loop.
-  ///
-  /// Runs for the specified number of ticks, or indefinitely if num_ticks is 0.
-  /// Each iteration calls ExecuteTick() and OnPostTick().
-  ///
-  /// @param num_ticks Number of ticks to run (0 = run until stopped)
+  /// @brief A simple wrapper function to indicate running the game
   /////////////////////////////////////////////////
-  void Run(size_t num_ticks = 0);
-
-  /////////////////////////////////////////////////
-  /// @brief Stop the engine.
-  ///
-  /// Sets the running flag to false, causing Run() to exit.
-  /////////////////////////////////////////////////
-  void Stop();
-
-  /////////////////////////////////////////////////
-  /// @brief Get the current loop number.
-  ///
-  /// @return Current loop/tick number
-  /////////////////////////////////////////////////
-  size_t GetLoopNumber() const;
-
-  /////////////////////////////////////////////////
-  /// @brief Get a reference to the game resources.
-  ///
-  /// @return Reference to GameResources
-  /////////////////////////////////////////////////
-  GameResources &GetGameResources();
-
-  /////////////////////////////////////////////////
-  /// @brief Get a const reference to the game resources.
-  ///
-  /// @return Const reference to GameResources
-  /////////////////////////////////////////////////
-  const GameResources &GetGameResources() const;
-
-  /////////////////////////////////////////////////
-  /// @brief Get a reference to the game context.
-  ///
-  /// @return Reference to GameContext
-  /////////////////////////////////////////////////
-  GameContext &GetGameContext();
-
-  /////////////////////////////////////////////////
-  /// @brief Get a const reference to the game context.
-  ///
-  /// @return Const reference to GameContext
-  /////////////////////////////////////////////////
-  const GameContext &GetGameContext() const;
+  void Run();
 };
 
 } // namespace steamrot
