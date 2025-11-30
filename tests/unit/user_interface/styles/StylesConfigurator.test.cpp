@@ -25,7 +25,7 @@ TEST_CASE("StylesConfigurator ConfigureStyle returns expected result for "
           "[StylesConfigurator][Fields]") {
 
   steamrot::TestPaths test_paths;
-  steamrot::FlatbuffersDataLoader data_loader;
+  steamrot::FlatbuffersDataLoader data_loader(test_paths);
   steamrot::StylesConfigurator styles_configurator;
 
   steamrot::AssetManager asset_manager;
@@ -191,7 +191,7 @@ TEST_CASE("StylesConfigurator returns a map of all available styles",
           "[unit][StylesConfigurator]") {
   // Arrange
   steamrot::TestPaths test_paths;
-  steamrot::FlatbuffersDataLoader data_loader;
+  steamrot::FlatbuffersDataLoader data_loader(test_paths);
   steamrot::StylesConfigurator styles_configurator;
   steamrot::AssetManager asset_manager;
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();

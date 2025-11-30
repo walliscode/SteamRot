@@ -70,8 +70,8 @@ SceneManager::AddSceneFromDefault(const SceneType &scene_type) {
   // create SceneFactory object
   SceneFactory scene_factory;
 
-  auto scene_creation_result =
-      scene_factory.CreateDefaultScene(scene_type, m_game_context);
+  auto scene_creation_result = scene_factory.CreateDefaultScene(
+      scene_type, m_game_context, m_game_context.path_provider);
   if (!scene_creation_result.has_value()) {
     return std::unexpected(scene_creation_result.error());
   }

@@ -13,9 +13,10 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "ExampleLogic.h"
-#include "TestContext.h"
-#include "CYourComponent.h"
 #include "ArchetypeUtils.h"
+#include "CYourComponent.h"
+#include "TestContext.h"
+#include "TestPaths.h"
 #include "entity_memory.h"
 #include <catch2/catch_test_macros.hpp>
 

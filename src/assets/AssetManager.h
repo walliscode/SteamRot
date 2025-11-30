@@ -39,9 +39,9 @@ private:
   std::unordered_map<std::string, UIStyle> m_ui_styles;
 
 /////////////////////////////////////////////////
-  /// @brief PathProvider for getting asset paths
+  /// @brief Pointer to PathProvider for getting asset paths (may be null)
 /////////////////////////////////////////////////
-  PathProvider m_path_provider;
+  const PathProvider *m_path_provider{nullptr};
 
 /////////////////////////////////////////////////
   /// @brief Adds a single font to the Font map in the AssetManager
@@ -55,6 +55,13 @@ public:
   /// @brief Default constructor
 /////////////////////////////////////////////////
   AssetManager() = default;
+
+/////////////////////////////////////////////////
+  /// @brief Set the PathProvider for the AssetManager
+  ///
+  /// @param path_provider Reference to a PathProvider implementation
+/////////////////////////////////////////////////
+  void SetPathProvider(const PathProvider &path_provider);
 
 /////////////////////////////////////////////////
   /// @brief Load all the default assets for the game, independent of scene

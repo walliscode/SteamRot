@@ -45,6 +45,9 @@ void TestFixture::ConfigureGameResourcesForTest() {
                         game_data_result.error().message);
   }
 
+  // Set the PathProvider for the AssetManager before loading assets
+  m_game_resources.asset_manager.SetPathProvider(m_test_paths);
+
   // Load default assets into the asset manager
   auto load_result = m_game_resources.asset_manager.LoadDefaultAssets();
   if (!load_result.has_value()) {
@@ -113,7 +116,8 @@ EntityManager &TestFixture::GetEntityManager() { return m_entity_manager; }
 ////////////////////////////////////////////////////////////
 GameContext &TestFixture::GetGameContext() {
   if (!m_game_context) {
-    m_game_context = std::make_unique<GameContext>(m_game_resources);
+    m_game_context =
+        std::make_unique<GameContext>(m_game_resources, m_test_paths);
   }
   return *m_game_context;
 }

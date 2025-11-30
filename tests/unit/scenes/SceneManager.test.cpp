@@ -88,7 +88,7 @@ TEST_CASE("SceneManager::ConfigureSubscribersFromData configures subscribers",
   steamrot::tests::TestFixture test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
   // Load SceneManagerData
-  steamrot::FlatbuffersDataLoader data_loader;
+  steamrot::FlatbuffersDataLoader data_loader(test_paths);
   auto load_sm_data_result = data_loader.ProvideSceneManagerData();
   if (!load_sm_data_result.has_value()) {
     FAIL("Failed to load SceneManager data: " +
@@ -138,7 +138,7 @@ TEST_CASE("SceneManager::ConfigureSceneManagerFromData configures without "
   steamrot::tests::TestFixture test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
   // Load SceneManagerData
-  steamrot::FlatbuffersDataLoader data_loader;
+  steamrot::FlatbuffersDataLoader data_loader(test_paths);
   auto load_sm_data_result = data_loader.ProvideSceneManagerData();
   if (!load_sm_data_result.has_value()) {
     FAIL("Failed to load SceneManager data: " +
