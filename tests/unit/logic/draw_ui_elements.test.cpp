@@ -61,7 +61,7 @@ TEST_CASE("Determine whether pixels can be tested on a RenderTexture",
 }
 TEST_CASE("drawn text can be detected", "[unit][draw_ui_elements]") {
   std::cout << "Starting DrawText test..." << std::endl;
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   // create a RenderTexture
   size_t width = 200;
   size_t height = 100;
@@ -98,7 +98,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawBorderAndBackground draws the hover "
 
           "[unit][draw_ui_elements]") {
 
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   // create a RenderTexture
   size_t width = 100;
   size_t height = 100;
@@ -133,7 +133,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIELement draws a panel on a "
           "RenderTexture",
           "[unit][draw_ui_elements][.visual]") {
 
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   // create a RenderTexture
   size_t width = 100;
   size_t height = 100;
@@ -172,7 +172,7 @@ TEST_CASE(
     "RenderTexture",
     "[unit][draw_ui_elements][.visual]") {
 
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   // create a RenderTexture
   size_t width = 200;
   size_t height = 200;
@@ -211,7 +211,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws a "
           "on a RenderTexture",
           "[unit][draw_ui_elements][.visual]") {
 
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   // create a RenderTexture
   size_t width = 200;
   size_t height = 200;
@@ -247,7 +247,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an unexpanded "
           "DropDownListElement "
           "on a RenderTexture",
           "[unit][draw_ui_elements][.visual]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   // create a RenderTexture
   size_t width = 200;
   size_t height = 200;
@@ -278,7 +278,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an expanded "
           "DropDownListElement "
           "on a RenderTexture",
           "[unit][draw_ui_elements][.visual]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   // create a RenderTexture
   size_t width = 200;
   size_t height = 200;
@@ -308,7 +308,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an expanded "
 TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an unexpanded "
           "DropDownButtonElement on a RenderTexture",
           "[unit][draw_ui_elements][.visual]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   // create a RenderTexture
   size_t width = 200;
   size_t height = 200;
@@ -339,7 +339,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an expanded "
           "DropdownButtonElement "
           "on a RenderTexture",
           "[unit][draw_ui_elements][.visual]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   // create a RenderTexture
   size_t width = 200;
   size_t height = 200;
@@ -370,7 +370,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an expanded "
 TEST_CASE("steamrot::draw_ui_elements::DrawNestedUIElements draws a unexpanded "
           "drop down setup",
           "[unit][draw_ui_elements][.visual]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   // create a RenderTexture
   size_t width = 200;
   size_t height = 200;
@@ -421,7 +421,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawNestedUIElements draws a unexpanded "
 TEST_CASE("steamrot::draw_ui_elements::DrawNestedUIElements draws an expanded "
           "drop down setup",
           "[unit][draw_ui_elements][.visual]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   // create a RenderTexture
   size_t width = 200;
   size_t height = 200;

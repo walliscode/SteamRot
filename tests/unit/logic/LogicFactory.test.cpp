@@ -16,7 +16,7 @@
 TEST_CASE("LogicFactory constructed without errors", "[unit][LogicFactory]") {
 
   // create a Testcontext to provide mock dependencies
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
 
   // Load LogicCollectionData
@@ -39,7 +39,7 @@ TEST_CASE("LogicFactory creates the correct Logic instances with a test Scene",
           "[unit][LogicFactory]") {
 
   // create a SceneContext with mock dependencies
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context{
       steamrot::SceneType::SceneType_TEST};
 
@@ -69,7 +69,7 @@ TEST_CASE("LogicFactory creates the correct Logic instances with a test Scene",
 TEST_CASE("LogicFactory creates correct Logic instances for TitleScene",
           "[unit][LogicFactory]") {
 
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context{
       steamrot::SceneType::SceneType_TITLE};
 
@@ -101,7 +101,7 @@ TEST_CASE("LogicFactory creates correct Logic instances for TitleScene",
 TEST_CASE("LogicFactory creates correct Logic instances for CraftingScene",
           "[unit][LogicFactory]") {
 
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context{
       steamrot::SceneType::SceneType_CRAFTING};
 
@@ -131,7 +131,7 @@ TEST_CASE("LogicFactory creates correct Logic instances for CraftingScene",
 TEST_CASE("LogicFactory attaches subscribers to Logic instances",
           "[unit][LogicFactory]") {
 
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context{
       steamrot::SceneType::SceneType_TEST};
 
@@ -178,7 +178,7 @@ TEST_CASE("LogicFactory attaches subscribers to Logic instances",
 TEST_CASE("LogicFactory attaches subscribers from LogicData",
           "[unit][LogicFactory]") {
 
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context{
       steamrot::SceneType::SceneType_TEST};
 
@@ -224,7 +224,7 @@ TEST_CASE("LogicFactory attaches subscribers from LogicData",
 TEST_CASE("LogicFactory creates Logic instances without LogicCollectionData",
           "[unit][LogicFactory]") {
 
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context{
       steamrot::SceneType::SceneType_TEST};
 
@@ -269,7 +269,7 @@ TEST_CASE("LogicFactory creates Logic instances without LogicCollectionData",
 TEST_CASE("LogicFactory works for all scene types without LogicCollectionData",
           "[unit][LogicFactory]") {
 
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
 
   // Test for TEST scene
   {

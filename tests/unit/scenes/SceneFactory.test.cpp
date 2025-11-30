@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////
 #include "SceneFactory.h"
 #include "CraftingScene.h"
-#include "PathProvider.h"
+#include "TestPaths.h"
 #include "TestFixture.h"
 #include "TitleScene.h"
 #include "scene_test_helpers.h"
@@ -18,7 +18,7 @@
 // create a GameContext object for use by all tests
 TEST_CASE("SceneFactory can be constructed without errors",
           "[unit][SceneFactory]") {
-  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   steamrot::SceneFactory scene_factory;
   REQUIRE_NOTHROW(scene_factory);
@@ -26,7 +26,7 @@ TEST_CASE("SceneFactory can be constructed without errors",
 
 TEST_CASE("SceneFactory can create a TitleScene from default",
           "[unit][SceneFactory]") {
-  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   steamrot::SceneFactory scene_factory;
 
@@ -54,7 +54,7 @@ TEST_CASE("SceneFactory can create a TitleScene from default",
 
 TEST_CASE("SceneFactory can create a CraftingScene from default",
           "[unit][SceneFactory]") {
-  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   steamrot::SceneFactory scene_factory;
   // create a CraftingScene

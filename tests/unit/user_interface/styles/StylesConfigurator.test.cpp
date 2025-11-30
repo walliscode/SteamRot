@@ -9,7 +9,7 @@
 #include "StylesConfigurator.h"
 #include "AssetManager.h"
 #include "FlatbuffersDataLoader.h"
-#include "PathProvider.h"
+#include "TestPaths.h"
 #include <catch2/catch_test_macros.hpp>
 #include <vector>
 
@@ -24,7 +24,7 @@ TEST_CASE("StylesConfigurator ConfigureStyle returns expected result for "
           "default style (all fields checked)",
           "[StylesConfigurator][Fields]") {
 
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::FlatbuffersDataLoader data_loader;
   steamrot::StylesConfigurator styles_configurator;
 
@@ -190,7 +190,7 @@ TEST_CASE("StylesConfigurator ConfigureStyle returns expected result for "
 TEST_CASE("StylesConfigurator returns a map of all available styles",
           "[unit][StylesConfigurator]") {
   // Arrange
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::FlatbuffersDataLoader data_loader;
   steamrot::StylesConfigurator styles_configurator;
   steamrot::AssetManager asset_manager;

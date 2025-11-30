@@ -7,20 +7,20 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "AssetManager.h"
-#include "PathProvider.h"
+#include "TestPaths.h"
 #include "asset_test_helpers.h"
 #include "scene_change_packet_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("AssetManager is constructed correctly", "[unit][AssetManager]") {
 
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::AssetManager asset_manager;
   REQUIRE_NOTHROW(asset_manager);
 }
 
 TEST_CASE("AssetManager::LoadDefaultAssets works correctly", "[unit][AssetManager]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::AssetManager asset_manager;
 
   auto load_result = asset_manager.LoadDefaultAssets();
@@ -44,7 +44,7 @@ TEST_CASE("AssetManager::LoadDefaultAssets works correctly", "[unit][AssetManage
 }
 TEST_CASE("AssetManager loads scene assets correctly", "[unit][AssetManager]") {
 
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::AssetManager asset_manager;
 
   auto result = asset_manager.LoadSceneAssets(steamrot::SceneType_TEST);

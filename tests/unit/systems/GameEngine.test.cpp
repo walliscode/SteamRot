@@ -8,63 +8,37 @@
 /////////////////////////////////////////////////
 #include "GameEngine.h"
 #include "FlatbuffersDataLoader.h"
-#include "PathProvider.h"
+#include "GamePaths.h"
 #include "TestFixture.h"
+#include "TestPaths.h"
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-TEST_CASE("GameEngine fails when EnviromentType is None",
-          "[unit][GameEngine]") {
-  // Attempt to create a GameEngine instance with EnvironmentType::None
-  try {
-    steamrot::GameEngine game_engine(steamrot::EnvironmentType::None);
-    FAIL("GameEngine should not be created with EnvironmentType::None");
-  } catch (const std::exception &e) {
-    SUCCEED(
-        "GameEngine creation failed as expected with EnvironmentType::None");
-  }
-}
-TEST_CASE("GameEngine fails if PathProvider has not been pre initialized",
-          "[unit][GameEngine]") {
-  // Attempt to create a GameEngine instance with EnvironmentType::None
-  try {
-    steamrot::GameEngine game_engine(steamrot::EnvironmentType::None);
-    FAIL("PathProvider should not be used with EnvironmentType::None");
-  } catch (const std::exception &e) {
-    SUCCEED("PathProvider usage failed as expected with EnvironmentType::None");
-  }
+TEST_CASE("GameEngine initializes correctly with TestPaths", "[unit][GameEngine]") {
+  // Create TestPaths and pass to GameEngine
+  steamrot::TestPaths test_paths;
+  steamrot::GameEngine game_engine(test_paths);
+
+  SUCCEED("GameEngine initialized correctly with TestPaths");
 }
 
-TEST_CASE("GameEngine initializes correctly in test enviroment when "
-          "PathProvide is pre initialized",
-          "[unit][GameEngine]") {
-  // Pre-initialize PathProvider
-  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  // Create a GameEngine instance
-  steamrot::GameEngine game_engine(steamrot::EnvironmentType::Test);
-
-  SUCCEED("GameEngine initialized correctly in test enviroment");
+TEST_CASE("GameEngine initializes correctly with GamePaths", "[unit][GameEngine]") {
+  // Create GamePaths and pass to GameEngine
+  steamrot::GamePaths game_paths;
+  steamrot::GameEngine game_engine(game_paths);
+  SUCCEED("GameEngine initialized correctly with GamePaths");
 }
 
-TEST_CASE("GameEngine initializes correctly in production enviroment",
-          "[unit][GameEngine]") {
-  // pre-initialize PathProvider
-  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Production);
-  // Create a GameEngine instance
-  steamrot::GameEngine game_engine(steamrot::EnvironmentType::Production);
-  SUCCEED("GameEngine initialized correctly in production enviroment");
-}
-TEST_CASE("GameEngine runs for a set number of frames in test enviroment",
+TEST_CASE("GameEngine runs for a set number of frames with TestPaths",
           "[unit][GameEngine]") {
   // set a few different frame counts to test using Catch2's GENERATE
   size_t frame_count = GENERATE(1, 5, 10);
 
-  // create and pre-initialize PathProvider
-  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  // Create a GameEngine instance
-  steamrot::GameEngine game_engine(steamrot::EnvironmentType::Test);
+  // Create TestPaths and GameEngine
+  steamrot::TestPaths test_paths;
+  steamrot::GameEngine game_engine(test_paths);
 
   // run in simulation mode to limit the number of frames
   game_engine.RunGame(frame_count, true);
@@ -73,13 +47,12 @@ TEST_CASE("GameEngine runs for a set number of frames in test enviroment",
   SUCCEED("GameEngine ran for the specified number of frames");
 }
 
-TEST_CASE("GameEngine runs for a set number of frames in production enviroment",
+TEST_CASE("GameEngine runs for a set number of frames with GamePaths",
           "[unit][GameEngine]") {
 
-  // create and pre-initialize PathProvider
-  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Production);
-  // Create a GameEngine instance
-  steamrot::GameEngine game_engine(steamrot::EnvironmentType::Production);
+  // Create GamePaths and GameEngine
+  steamrot::GamePaths game_paths;
+  steamrot::GameEngine game_engine(game_paths);
 
   // run in simulation mode to limit the number of frames
   int frame_count{5};
@@ -91,10 +64,9 @@ TEST_CASE("GameEngine runs for a set number of frames in production enviroment",
 
 TEST_CASE("GameEngine::RegisterSubscriber adds a subscriber",
           "[unit][GameEngine]") {
-  // create and pre-initialize PathProvider
-  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  // Create a GameEngine instance
-  steamrot::GameEngine game_engine(steamrot::EnvironmentType::Test);
+  // Create TestPaths and GameEngine
+  steamrot::TestPaths test_paths;
+  steamrot::GameEngine game_engine(test_paths);
   // Create a Subscriber
   steamrot::Subscriber subscriber{steamrot::EventType_EVENT_QUIT_GAME};
 
@@ -110,10 +82,9 @@ TEST_CASE("GameEngine::RegisterSubscriber adds a subscriber",
 
 TEST_CASE("GameEngine::RegisterSubscriber fails to add null subscriber",
           "[unit][GameEngine]") {
-  // create and pre-initialize PathProvider
-  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  // Create a GameEngine instance
-  steamrot::GameEngine game_engine(steamrot::EnvironmentType::Test);
+  // Create TestPaths and GameEngine
+  steamrot::TestPaths test_paths;
+  steamrot::GameEngine game_engine(test_paths);
   // Attempt to register a null Subscriber
   std::shared_ptr<steamrot::Subscriber> null_subscriber = nullptr;
   auto register_result = game_engine.RegisterSubscriber(null_subscriber);
@@ -124,10 +95,9 @@ TEST_CASE("GameEngine::RegisterSubscriber fails to add null subscriber",
 
 TEST_CASE("GameEngine::ConfigureSubscribersFromData fails on null data",
           "[unit][GameEngine]") {
-  // create and pre-initialize PathProvider
-  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  // Create a GameEngine instance
-  steamrot::GameEngine game_engine(steamrot::EnvironmentType::Test);
+  // Create TestPaths and GameEngine
+  steamrot::TestPaths test_paths;
+  steamrot::GameEngine game_engine(test_paths);
   // Attempt to configure subscribers from null data
   auto configure_result = game_engine.ConfigureSubscribersFromData(nullptr);
   // Check that the configuration failed
@@ -138,12 +108,11 @@ TEST_CASE("GameEngine::ConfigureSubscribersFromData fails on null data",
 
 TEST_CASE("GameEngine::ConfigureSubscribersFromData configures subscribers",
           "[unit][GameEngine]") {
-  // create and pre-initialize PathProvider
-  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  // Create a GameEngine instance
-  steamrot::GameEngine game_engine(steamrot::EnvironmentType::Test);
+  // Create TestPaths and GameEngine
+  steamrot::TestPaths test_paths;
+  steamrot::GameEngine game_engine(test_paths);
   // Load SubscriberData
-  steamrot::FlatbuffersDataLoader data_loader;
+  steamrot::FlatbuffersDataLoader data_loader(test_paths);
   auto load_sub_data_result = data_loader.ProvideEngineData();
   if (!load_sub_data_result.has_value()) {
     FAIL("Failed to load Subscriber data: " +
@@ -163,12 +132,11 @@ TEST_CASE("GameEngine::ConfigureSubscribersFromData configures subscribers",
 
 TEST_CASE("GameEngine::ConfigureGameEngineFromData configures without errors",
           "[unit][GameEngine]") {
-  // create and pre-initialize PathProvider
-  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  // Create a GameEngine instance
-  steamrot::GameEngine game_engine(steamrot::EnvironmentType::Test);
+  // Create TestPaths and GameEngine
+  steamrot::TestPaths test_paths;
+  steamrot::GameEngine game_engine(test_paths);
   // Load GameEngineData
-  steamrot::FlatbuffersDataLoader data_loader;
+  steamrot::FlatbuffersDataLoader data_loader(test_paths);
   auto load_ge_data_result = data_loader.ProvideEngineData();
   if (!load_ge_data_result.has_value()) {
     FAIL("Failed to load GameEngine data: " +
@@ -188,10 +156,9 @@ TEST_CASE("GameEngine::ConfigureGameEngineFromData configures without errors",
 TEST_CASE("GameEngine::ProcessSubscribers quits game when correct Subscriber "
           "is active",
           "[unit][GameEngine]") {
-  // create and pre-initialize PathProvider
-  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  // Create a GameEngine instance
-  steamrot::GameEngine game_engine(steamrot::EnvironmentType::Test);
+  // Create TestPaths and GameEngine
+  steamrot::TestPaths test_paths;
+  steamrot::GameEngine game_engine(test_paths);
   // Create and register a Subscriber for EventType_EVENT_QUIT_GAME
   auto subscriber = std::make_shared<steamrot::Subscriber>(
       steamrot::EventType_EVENT_QUIT_GAME);
@@ -213,10 +180,9 @@ TEST_CASE("GameEngine::ProcessSubscribers quits game when correct Subscriber "
 
 TEST_CASE("GameEngine::RunGameLoop processes subscribers and quits game",
           "[unit][GameEngine]") {
-  // create and pre-initialize PathProvider
-  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  // Create a GameEngine instance
-  steamrot::GameEngine game_engine(steamrot::EnvironmentType::Test);
+  // Create TestPaths and GameEngine
+  steamrot::TestPaths test_paths;
+  steamrot::GameEngine game_engine(test_paths);
   // Create and register a Subscriber for EventType_EVENT_QUIT_GAME
   auto subscriber = std::make_shared<steamrot::Subscriber>(
       steamrot::EventType_EVENT_QUIT_GAME);
@@ -238,10 +204,9 @@ TEST_CASE("GameEngine::RunGameLoop processes subscribers and quits game",
 TEST_CASE("GameEngine::ProcessSubscriptions does not quit if another "
           "subscriber type is present",
           "[unit][GameEngine]") {
-  // create and pre-initialize PathProvider
-  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  // Create a GameEngine instance
-  steamrot::GameEngine game_engine(steamrot::EnvironmentType::Test);
+  // Create TestPaths and GameEngine
+  steamrot::TestPaths test_paths;
+  steamrot::GameEngine game_engine(test_paths);
   // Create and register a Subscriber for EventType_EVENT_CHANGE_SCENE
   auto subscriber = std::make_shared<steamrot::Subscriber>(
       steamrot::EventType_EVENT_CHANGE_SCENE);
@@ -264,10 +229,9 @@ TEST_CASE("GameEngine::ProcessSubscriptions does not quit if another "
 TEST_CASE("GameEngine::ProcessSubscriptions sets subscribers to inactive after "
           "processing",
           "[unit][GameEngine]") {
-  // create and pre-initialize PathProvider
-  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  // Create a GameEngine instance
-  steamrot::GameEngine game_engine(steamrot::EnvironmentType::Test);
+  // Create TestPaths and GameEngine
+  steamrot::TestPaths test_paths;
+  steamrot::GameEngine game_engine(test_paths);
   // Create and register a Subscriber for EventType_EVENT_CHANGE_SCENE
   auto subscriber = std::make_shared<steamrot::Subscriber>(
       steamrot::EventType_EVENT_CHANGE_SCENE);
@@ -293,17 +257,17 @@ TEST_CASE(
     "GameEngine::UpdateGameContext updates members of GameContext correctly",
     "[unit][GameEngine]") {
 
-  // create and pre-initialize PathProvider
-  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  // get game context genereted from TextContext
-  steamrot::tests::TestFixture test_context;
-  steamrot::GameContext &game_context = test_context.GetGameContext();
+  // get game context generated from TestFixture
+  steamrot::tests::TestFixture test_fixture;
+  test_fixture.Intialize();
+  steamrot::GameContext &game_context = test_fixture.GetGameContext();
 
-  // create GameEngine object
-  steamrot::GameEngine game_engine(steamrot::EnvironmentType::Test);
+  // create TestPaths and GameEngine object
+  steamrot::TestPaths test_paths;
+  steamrot::GameEngine game_engine(test_paths);
 
   // check current variables
-  REQUIRE(game_context.loop_number == 0);
+  REQUIRE(game_context.loop_number == 1);
   REQUIRE(game_context.mouse_position == sf::Vector2i(0, 0));
 
   // simulate some changes

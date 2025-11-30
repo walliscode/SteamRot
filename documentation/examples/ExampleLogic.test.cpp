@@ -25,7 +25,7 @@
 ////////////////////////////////////////////////////////////
 TEST_CASE("ExampleLogic::ExampleLogic Constructor", "[ExampleLogic]") {
   // Arrange - Create test context
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestContext test_context;
   
   // Act & Assert - Instantiate Logic
@@ -42,7 +42,7 @@ TEST_CASE("ExampleLogic::ExampleLogic Constructor", "[ExampleLogic]") {
 TEST_CASE("ExampleLogic::ProcessLogic modifies component state", 
           "[ExampleLogic]") {
   // Arrange
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestContext test_context;
   
   // Get context references
@@ -85,7 +85,7 @@ TEST_CASE("ExampleLogic::ProcessLogic modifies component state",
 TEST_CASE("ExampleLogic::ProcessLogic handles empty archetype", 
           "[ExampleLogic][EdgeCase]") {
   // Arrange
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestContext test_context;
   
   auto logic_context = test_context.GetLogicContextForTestScene();
@@ -105,7 +105,7 @@ TEST_CASE("ExampleLogic::ProcessLogic handles empty archetype",
 TEST_CASE("ExampleLogic::ProcessLogic triggers event", 
           "[ExampleLogic][Integration]") {
   // Arrange
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestContext test_context;
   
   auto &game_context = test_context.GetGameContext();
@@ -139,7 +139,7 @@ TEST_CASE("ExampleLogic::ProcessLogic triggers event",
 TEST_CASE("ExampleLogic::ProcessLogic handles multiple entities", 
           "[ExampleLogic]") {
   // Arrange
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestContext test_context;
   
   auto logic_context = test_context.GetLogicContextForTestScene();
@@ -176,7 +176,7 @@ TEST_CASE("ExampleLogic::ProcessLogic handles multiple entities",
 TEST_CASE("ExampleLogic::ProcessLogic respects conditions", 
           "[ExampleLogic]") {
   // Arrange
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestContext test_context;
   
   auto logic_context = test_context.GetLogicContextForTestScene();
@@ -212,7 +212,7 @@ TEST_CASE("ExampleLogic::ProcessLogic respects conditions",
 TEST_CASE("ExampleLogic::ProcessLogic responds to mouse position", 
           "[ExampleLogic][Input]") {
   // Arrange
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestContext test_context;
   
   auto &game_context = test_context.GetGameContext();
@@ -240,7 +240,7 @@ TEST_CASE("ExampleLogic::ProcessLogic responds to mouse position",
 TEST_CASE("ExampleLogic::ProcessLogic draws to render texture", 
           "[ExampleLogic][Render]") {
   // Arrange
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestContext test_context;
   
   auto logic_context = test_context.GetLogicContextForTestScene();

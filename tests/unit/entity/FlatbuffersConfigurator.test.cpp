@@ -19,7 +19,7 @@
 TEST_CASE("Data is configured correctly from default data",
           "[unit][FlatbuffersConfigurator]") {
 
-  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::TestPaths test_paths;
 
   // Load test data configs from adjacent data directory
   auto configs_result = steamrot::tests::load_test_data_configs();

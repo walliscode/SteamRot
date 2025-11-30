@@ -15,7 +15,7 @@
 TEST_CASE("CraftingScene's call to sRender is correct",
           "[unit][CraftingScene][.visual]") {
   // arrange
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   steamrot::SceneFactory scene_factory;
   // create a CraftingScene
