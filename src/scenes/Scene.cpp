@@ -8,10 +8,10 @@
 /////////////////////////////////////////////////
 #include "Scene.h"
 #include "EntityManager.h"
-#include "GameResources.h"
 #include "LogicFactory.h"
 #include "SceneContext.h"
 #include "SceneResources.h"
+#include "containers.h"
 #include "scene_change_packet_generated.h"
 
 namespace steamrot {
@@ -67,7 +67,14 @@ void Scene::SetLogicMap(
   }
 }
 /////////////////////////////////////////////////
-const SceneInfo &Scene::GetSceneInfo() const { return m_scene_info; }
+const SceneInfo Scene::GetSceneInfo() const {
+  SceneInfo scene_info;
+
+  scene_info.id = m_scene_info.id;
+  scene_info.type = m_scene_info.type;
+
+  return scene_info;
+}
 
 /////////////////////////////////////////////////
 SceneContext Scene::GetSceneContext() {

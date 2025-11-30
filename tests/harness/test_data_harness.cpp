@@ -211,7 +211,7 @@ void RunEventBusComparisonTest(const EventBus &actual, const EventBus &expected,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-RunDataStructComparisonTest(const DataCollection *data_collection,
+RunDataStructComparisonTest(const DataCollectionData *data_collection,
                             TestFixture &fixture, const TestContext &context,
                             bool expected_to_pass) {
 

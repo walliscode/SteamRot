@@ -144,7 +144,7 @@ TEST_CASE("GameEngine::ConfigureSubscribersFromData configures subscribers",
   steamrot::GameEngine game_engine(steamrot::EnvironmentType::Test);
   // Load SubscriberData
   steamrot::FlatbuffersDataLoader data_loader;
-  auto load_sub_data_result = data_loader.ProvideGameEngineData();
+  auto load_sub_data_result = data_loader.ProvideEngineData();
   if (!load_sub_data_result.has_value()) {
     FAIL("Failed to load Subscriber data: " +
          load_sub_data_result.error().message);
@@ -169,7 +169,7 @@ TEST_CASE("GameEngine::ConfigureGameEngineFromData configures without errors",
   steamrot::GameEngine game_engine(steamrot::EnvironmentType::Test);
   // Load GameEngineData
   steamrot::FlatbuffersDataLoader data_loader;
-  auto load_ge_data_result = data_loader.ProvideGameEngineData();
+  auto load_ge_data_result = data_loader.ProvideEngineData();
   if (!load_ge_data_result.has_value()) {
     FAIL("Failed to load GameEngine data: " +
          load_ge_data_result.error().message);
