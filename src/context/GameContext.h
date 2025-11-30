@@ -15,7 +15,7 @@ namespace steamrot {
 struct GameContext {
   GameContext() = delete;
 
-  explicit GameContext(GameResources &resources);
+  GameContext(GameResources &resources, const PathProvider &path_provider);
 
 /////////////////////////////////////////////////
   /// @brief Reference to the GameResources this context was created from.
@@ -51,8 +51,8 @@ struct GameContext {
   AssetManager &asset_manager;
 
 /////////////////////////////////////////////////
-  /// @brief Environment type for the game.
+  /// @brief Reference to the PathProvider for data loading.
 /////////////////////////////////////////////////
-  EnvironmentType &env_type;
+  const PathProvider &path_provider;
 };
 } // namespace steamrot

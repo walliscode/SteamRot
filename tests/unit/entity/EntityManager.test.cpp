@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////
 #include "EntityManager.h"
 #include "EntityMemoryPoolEqualsMatcher.h"
-#include "PathProvider.h"
+#include "TestPaths.h"
 #include "TestFixture.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
@@ -17,7 +17,7 @@ TEST_CASE("EntityManager calls configurator with no errors",
           "[unit][EntityManager]") {
 
   // create text context
-  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   steamrot::EntityManager entity_manager{
       test_context.GetGameContext().event_handler};

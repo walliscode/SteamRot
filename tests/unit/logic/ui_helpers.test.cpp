@@ -10,12 +10,12 @@
 #include "CGrimoireMachina.h"
 #include "Fragment.h"
 #include "Joint.h"
-#include "PathProvider.h"
+#include "TestPaths.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("GetAllFragmentNames returns empty vector for empty fragments map",
           "[unit][ui_helpers]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::CGrimoireMachina grimoire;
 
   std::vector<std::string> fragment_names =
@@ -26,7 +26,7 @@ TEST_CASE("GetAllFragmentNames returns empty vector for empty fragments map",
 
 TEST_CASE("GetAllFragmentNames returns all fragment names",
           "[unit][ui_helpers]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::CGrimoireMachina grimoire;
 
   // Add some fragments
@@ -56,7 +56,7 @@ TEST_CASE("GetAllFragmentNames returns all fragment names",
 
 TEST_CASE("GetAllJointNames returns empty vector for empty joints map",
           "[unit][ui_helpers]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::CGrimoireMachina grimoire;
 
   std::vector<std::string> joint_names =
@@ -66,7 +66,7 @@ TEST_CASE("GetAllJointNames returns empty vector for empty joints map",
 }
 
 TEST_CASE("GetAllJointNames returns all joint names", "[unit][ui_helpers]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::CGrimoireMachina grimoire;
 
   // Add some joints

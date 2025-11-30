@@ -9,13 +9,13 @@
 #include "resources_configuration.h"
 #include "FlatbuffersDataLoader.h"
 #include "GameResources.h"
-#include "PathProvider.h"
+#include "TestPaths.h"
 #include "SceneResources.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("ConfigureGameResources with null game data",
           "[unit][resources][resources_configuration]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::GameResources resources;
 
   auto result = steamrot::resources::ConfigureGameResources(resources, nullptr);
@@ -25,8 +25,8 @@ TEST_CASE("ConfigureGameResources with null game data",
 
 TEST_CASE("ConfigureGameResources loads game resources data successfully",
           "[unit][resources][resources_configuration]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::FlatbuffersDataLoader loader;
+  steamrot::TestPaths test_paths;
+  steamrot::FlatbuffersDataLoader loader(test_paths);
 
   auto game_resources_result = loader.ProvideGameResourcesData();
   REQUIRE(game_resources_result.has_value());
@@ -38,8 +38,8 @@ TEST_CASE("ConfigureGameResources loads game resources data successfully",
 
 TEST_CASE("ConfigureGameResources configures GameResources with environment type",
           "[unit][resources][resources_configuration]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::FlatbuffersDataLoader loader;
+  steamrot::TestPaths test_paths;
+  steamrot::FlatbuffersDataLoader loader(test_paths);
 
   auto game_resources_result = loader.ProvideGameResourcesData();
   REQUIRE(game_resources_result.has_value());
@@ -54,8 +54,8 @@ TEST_CASE("ConfigureGameResources configures GameResources with environment type
 
 TEST_CASE("ConfigureSceneResources from scene data",
           "[unit][resources][resources_configuration]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::FlatbuffersDataLoader loader;
+  steamrot::TestPaths test_paths;
+  steamrot::FlatbuffersDataLoader loader(test_paths);
 
   auto scene_resources_result =
       loader.ProvideSceneResourcesData(steamrot::SceneType::SceneType_TEST);
@@ -73,7 +73,7 @@ TEST_CASE("ConfigureSceneResources from scene data",
 
 TEST_CASE("ConfigureSceneResources uses defaults when scene data is null",
           "[unit][resources][resources_configuration]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::SceneResources resources;
 
   // Configure with null scene data - should use defaults
@@ -87,8 +87,8 @@ TEST_CASE("ConfigureSceneResources uses defaults when scene data is null",
 
 TEST_CASE("ConfigureSceneResources configures resources for multiple scene types",
           "[unit][resources][resources_configuration]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::FlatbuffersDataLoader loader;
+  steamrot::TestPaths test_paths;
+  steamrot::FlatbuffersDataLoader loader(test_paths);
 
   // Test multiple scene types
   auto test_scene_data =
@@ -112,7 +112,7 @@ TEST_CASE("ConfigureSceneResources configures resources for multiple scene types
 
 TEST_CASE("ConfigureSceneResources with custom scene resource data",
           "[unit][resources][resources_configuration]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
 
   // Create custom scene resources
   flatbuffers::FlatBufferBuilder fbb;

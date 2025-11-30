@@ -17,7 +17,7 @@
 TEST_CASE("Logic::GetSubscribers returns empty vector initially",
           "[unit][Logic]") {
 
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
 
   // Create a concrete Logic instance (using UIRenderLogic as an example)
@@ -31,7 +31,7 @@ TEST_CASE("Logic::GetSubscribers returns empty vector initially",
 TEST_CASE("Logic::AddSubscriber adds a subscriber to the vector",
           "[unit][Logic]") {
 
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
 
   // Create a concrete Logic instance
@@ -53,7 +53,7 @@ TEST_CASE("Logic::AddSubscriber adds a subscriber to the vector",
 TEST_CASE("Logic::AddSubscriber can add multiple subscribers",
           "[unit][Logic]") {
 
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
 
   // Create a concrete Logic instance
@@ -83,7 +83,7 @@ TEST_CASE("Logic::AddSubscriber can add multiple subscribers",
 TEST_CASE("Logic::RunLogic can be called on Logic with subscribers",
           "[unit][Logic]") {
 
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
 
   // Create a concrete Logic instance

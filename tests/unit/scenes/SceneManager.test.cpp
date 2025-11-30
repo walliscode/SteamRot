@@ -9,7 +9,7 @@
 #include "SceneManager.h"
 #include "FlatbuffersDataLoader.h"
 #include "GameContext.h"
-#include "PathProvider.h"
+#include "TestPaths.h"
 #include "TestFixture.h"
 
 #include "asset_test_helpers.h"
@@ -20,7 +20,7 @@
 TEST_CASE("SceneManager is constructed without any errors",
           "[unit][SceneManager]") {
 
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   steamrot::GameContext game_context =
       test_context
@@ -31,7 +31,7 @@ TEST_CASE("SceneManager is constructed without any errors",
 
 TEST_CASE("SceneManager::RegistersSubscriber  adds a subscriber",
           "[unit][SceneManager]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
   // Create a Subscriber
@@ -48,7 +48,7 @@ TEST_CASE("SceneManager::RegistersSubscriber  adds a subscriber",
 
 TEST_CASE("SceneManager::RegistersSubscriber fails to add duplicate subscriber",
           "[unit][SceneManager]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
   // Create a Subscriber
@@ -70,7 +70,7 @@ TEST_CASE("SceneManager::RegistersSubscriber fails to add duplicate subscriber",
 
 TEST_CASE("SceneManager::RegistersSubscriber fails to add null subscriber",
           "[unit][SceneManager]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
   // Attempt to register a null Subscriber
@@ -84,11 +84,11 @@ TEST_CASE("SceneManager::RegistersSubscriber fails to add null subscriber",
 
 TEST_CASE("SceneManager::ConfigureSubscribersFromData configures subscribers",
           "[unit][SceneManager]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
   // Load SceneManagerData
-  steamrot::FlatbuffersDataLoader data_loader;
+  steamrot::FlatbuffersDataLoader data_loader(test_paths);
   auto load_sm_data_result = data_loader.ProvideSceneManagerData();
   if (!load_sm_data_result.has_value()) {
     FAIL("Failed to load SceneManager data: " +
@@ -120,7 +120,7 @@ TEST_CASE("SceneManager::ConfigureSubscribersFromData configures subscribers",
 
 TEST_CASE("SceneManager::ConfigureSubscribersFromData fails on null data",
           "[unit][SceneManager]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
   // Attempt to configure subscribers from null data
@@ -134,11 +134,11 @@ TEST_CASE("SceneManager::ConfigureSubscribersFromData fails on null data",
 TEST_CASE("SceneManager::ConfigureSceneManagerFromData configures without "
           "errors",
           "[unit][SceneManager]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
   // Load SceneManagerData
-  steamrot::FlatbuffersDataLoader data_loader;
+  steamrot::FlatbuffersDataLoader data_loader(test_paths);
   auto load_sm_data_result = data_loader.ProvideSceneManagerData();
   if (!load_sm_data_result.has_value()) {
     FAIL("Failed to load SceneManager data: " +
@@ -158,7 +158,7 @@ TEST_CASE("SceneManager::ConfigureSceneManagerFromData configures without "
 TEST_CASE("SceneManager's AddSceneFromDefault creates a configured "
           "TitleScene",
           "[unit][SceneManager]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
 
   steamrot::GameContext game_context =
@@ -185,7 +185,7 @@ TEST_CASE("SceneManager's AddSceneFromDefault creates a configured "
 TEST_CASE("SceneManager's AddSceneFromDefault creates a configured "
           "CraftingScene",
           "[unit][SceneManager]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
 
@@ -205,7 +205,7 @@ TEST_CASE("SceneManager's AddSceneFromDefault creates a configured "
 
 TEST_CASE("SceneManager LoadTitleScene returns monostate",
           "[unit][SceneManager]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
   auto load_title_result = scene_manager.LoadTitleScene();
@@ -222,7 +222,7 @@ TEST_CASE("SceneManager LoadTitleScene returns monostate",
 
 TEST_CASE("SceneManager LoadCraftingScene returns monostate",
           "[unit][SceneManager]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
   auto load_crafting_result = scene_manager.LoadCraftingScene();
@@ -240,7 +240,7 @@ TEST_CASE("SceneManager LoadCraftingScene returns monostate",
 TEST_CASE("SceneManager::ProvideTextures returns empty map for no "
           "scene IDs",
           "[unit][SceneManager]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
   // create an empty vector of scene IDs
@@ -257,7 +257,7 @@ TEST_CASE("SceneManager::ProvideTextures returns empty map for no "
 TEST_CASE("SceneManager::ProvideTextures returns FailInfo for "
           "invalid scene ID",
           "[unit][SceneManager]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
   // create a vector with an invalid scene ID
@@ -273,7 +273,7 @@ TEST_CASE("SceneManager::ProvideTextures returns FailInfo for "
 TEST_CASE("SceneManager::ProvideTextures returns textures for valid "
           "scene IDs",
           "[unit][SceneManager]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
   // Add a Title scene and a Crafting scene to the SceneManager
@@ -297,7 +297,7 @@ TEST_CASE("SceneManager::ProvideTextures returns textures for valid "
 TEST_CASE("SceneManager::ProvideAvailableSceneInfo returns available "
           "SceneInfo",
           "[unit][SceneManager]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
   // add a Title scene
@@ -321,7 +321,7 @@ TEST_CASE("SceneManager::ProvideAvailableSceneInfo returns available "
 
 TEST_CASE("SceneManager loads TitleScene when Subscriber is turned active",
           "[unit][SceneManager]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
 
@@ -361,7 +361,7 @@ TEST_CASE("SceneManager loads TitleScene when Subscriber is turned active",
 // attempt to load crafting scene via subscriber
 TEST_CASE("SceneManager loads CraftingScene when Subscriber is turned active",
           "[unit][SceneManager]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
 
@@ -399,7 +399,7 @@ TEST_CASE("SceneManager loads CraftingScene when Subscriber is turned active",
 
 TEST_CASE("SceneManager::UpdateSceneManager cause scene change via subscribers",
           "[unit][SceneManager]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   test_context.Intialize();
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
@@ -437,7 +437,7 @@ TEST_CASE("SceneManager::UpdateSceneManager cause scene change via subscribers",
 // Subscribers return to inactive after processing
 TEST_CASE("SceneManager processes Subscriber and sets it to inactive",
           "[unit][SceneManager]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
+  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
 

@@ -23,10 +23,14 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
+AssetManager::AssetManager(const PathProvider &path_provider)
+    : m_path_provider(path_provider) {}
+
+/////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> AssetManager::LoadDefaultAssets() {
 
   // provide Asset configuration data (not the Assets themselves)
-  FlatbuffersDataLoader fb_data_loader;
+  FlatbuffersDataLoader fb_data_loader(m_path_provider);
 
   auto asset_config_result = fb_data_loader.ProvideAssetData();
   if (!asset_config_result.has_value())
@@ -74,7 +78,7 @@ std::expected<std::monostate, FailInfo>
 AssetManager::LoadSceneAssets(const SceneType &scene_type) {
 
   // provide Asset configuration data (not the Assets themselves)
-  FlatbuffersDataLoader fb_data_loader;
+  FlatbuffersDataLoader fb_data_loader(m_path_provider);
 
   auto asset_config_result = fb_data_loader.ProvideAssetData(scene_type);
   if (!asset_config_result.has_value())
@@ -92,17 +96,14 @@ AssetManager::LoadSceneAssets(const SceneType &scene_type) {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 AssetManager::AddFont(const std::string &font_name) {
-  // check get font function
-  auto font_dir_result = m_path_provider.GetFontsDirectory();
-  if (!font_dir_result.has_value()) {
-    return std::unexpected<FailInfo>(font_dir_result.error());
-  }
+
+  // get font directory
+  std::filesystem::path font_dir = m_path_provider.GetFontsDirectory();
 
   // generate full font file name, we are baking in .tff files here. can be
   // changed
   std::string font_file_name = font_name + ".ttf";
-  std::filesystem::path font_path =
-      m_path_provider.GetFontsDirectory().value() / font_file_name;
+  std::filesystem::path font_path = font_dir / font_file_name;
 
   // check if files exists
   if (!std::filesystem::exists(font_path)) {
@@ -145,8 +146,9 @@ AssetManager::LoadUIStyles(std::vector<std::string> &style_names) {
   // create StylesConfigurator object
   StylesConfigurator styles_configurator;
   // provide map of UIStyles
-  auto ui_styles_map_result =
-      styles_configurator.ProvideUIStylesMap(*this, style_names);
+  auto ui_styles_map_result = styles_configurator.ProvideUIStylesMap(
+      *this, m_path_provider, style_names);
+
   if (!ui_styles_map_result.has_value()) {
     return std::unexpected<FailInfo>(ui_styles_map_result.error());
   }

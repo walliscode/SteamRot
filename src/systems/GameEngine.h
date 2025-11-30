@@ -49,6 +49,8 @@ private:
 public:
   /////////////////////////////////////////////////
   /// @brief Constructor for the GameEngine class
+  ///
+  /// @param path_provider Reference to a PathProvider implementation
   /////////////////////////////////////////////////
   GameEngine();
 };

@@ -18,7 +18,6 @@ enum class FailMode {
   None = 0,
   NotImplemented,
   FileNotFound,
-  EnvironmentNotSet,
   FlatbuffersDataNotFound,
   ParameterOutOfBounds,
   IndexOutOfBounds,

@@ -1,5 +1,5 @@
 #include "GameEngine.h"
-#include "PathProvider.h"
+#include "GamePaths.h"
 #include "spdlog/spdlog.h"
 #include <iostream>
 int main() {
@@ -7,8 +7,8 @@ int main() {
 
   // wrap the whole game engine in a try-catch block to catch any exceptions
   try {
-    steamrot::PathProvider path_provider{steamrot::EnvironmentType::Production};
-    steamrot::GameEngine steam_rot;
+    steamrot::GamePaths game_paths;
+    steamrot::GameEngine steam_rot(game_paths);
     steam_rot.RunGame();
 
   } catch (const std::exception &e) {

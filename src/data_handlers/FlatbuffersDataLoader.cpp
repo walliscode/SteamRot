@@ -21,11 +21,15 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
+FlatbuffersDataLoader::FlatbuffersDataLoader(const PathProvider &path_provider)
+    : DataLoader(path_provider) {}
+
+/////////////////////////////////////////////////
 std::expected<Fragment, FailInfo>
 FlatbuffersDataLoader::ProvideFragment(const std::string &fragment_name) const {
   // check if the bin file exists
   std::filesystem::path fragment_path =
-      m_path_provider.GetFragmentDirectory().value() /
+      m_path_provider.GetFragmentDirectory() /
       (fragment_name + ".fragment.bin");
 
   if (!std::filesystem::exists(fragment_path)) {
@@ -137,13 +141,11 @@ FlatbuffersDataLoader::ProvideAllFragments(
 std::expected<const GameEngineData *, FailInfo>
 FlatbuffersDataLoader::ProvideEngineData() const {
   // get data directory
-  auto data_dir_result = m_path_provider.GetDataDirectory();
-  if (!data_dir_result.has_value()) {
-    return std::unexpected(data_dir_result.error());
-  }
+  std::filesystem::path data_dir = m_path_provider.GetDataDirectory();
+
   // construct the file path
   std::filesystem::path game_engine_path =
-      data_dir_result.value() / "game_engine" / "game_engine.bin";
+      data_dir / "game_engine" / "game_engine.bin";
   // check if the file exists
   if (!std::filesystem::exists(game_engine_path)) {
     std::string error_message = std::format("Game Engine file not found: {}",
@@ -160,14 +162,11 @@ FlatbuffersDataLoader::ProvideEngineData() const {
 std::expected<const SceneManagerData *, FailInfo>
 FlatbuffersDataLoader::ProvideSceneManagerData() const {
   // get data directory
-  auto data_dir_result = m_path_provider.GetDataDirectory();
+  std::filesystem::path data_dir = m_path_provider.GetDataDirectory();
 
-  if (!data_dir_result.has_value()) {
-    return std::unexpected(data_dir_result.error());
-  }
   // construct the file path
   std::filesystem::path scene_manager_path =
-      data_dir_result.value() / "scene_manager" / "scene_manager.bin";
+      data_dir / "scene_manager" / "scene_manager.bin";
   // check if the file exists
   if (!std::filesystem::exists(scene_manager_path)) {
     std::string error_message = std::format("Scene Manager file not found: {}",
@@ -179,11 +178,8 @@ FlatbuffersDataLoader::ProvideSceneManagerData() const {
       GetSceneManagerData(LoadBinaryData(scene_manager_path));
 
   return scene_manager_data;
-
-  return std::unexpected(FailInfo(
-      FailMode::NotImplemented,
-      "FlatbuffersDataLoader::ProvideSceneManagerData not implemented"));
 }
+
 /////////////////////////////////////////////////
 std::expected<const SceneData *, FailInfo>
 FlatbuffersDataLoader::ProvideSceneData(const SceneType scene_type) const {
@@ -212,14 +208,12 @@ FlatbuffersDataLoader::ProvideSceneData(const SceneType scene_type) const {
         FailInfo(FailMode::SceneTypeNotFound, "Invalid SceneType provided"));
   }
 
-  // check the SceneDirectory is error free
-  auto scene_dir_result = m_path_provider.GetSceneDirectory();
-  if (!scene_dir_result.has_value()) {
-    return std::unexpected(scene_dir_result.error());
-  }
+  // get the SceneDirectory
+  std::filesystem::path scene_dir = m_path_provider.GetSceneDirectory();
+
   // construct the file path
   std::filesystem::path scene_path =
-      scene_dir_result.value() / (scene_file_prefix + ".scenes.bin");
+      scene_dir / (scene_file_prefix + ".scenes.bin");
 
   // check if the file exists
   if (!std::filesystem::exists(scene_path)) {
@@ -240,15 +234,12 @@ FlatbuffersDataLoader::ProvideSceneData(const SceneType scene_type) const {
 std::expected<const AssetCollection *, FailInfo>
 FlatbuffersDataLoader::ProvideAssetData() const {
 
-  // get the  data directory
-  auto result = m_path_provider.GetDataDirectory();
-  if (!result.has_value()) {
-    return std::unexpected(result.error());
-  }
+  // get the data directory
+  std::filesystem::path data_dir = m_path_provider.GetDataDirectory();
 
   // construct the file path
   std::filesystem::path asset_path =
-      result.value() / "asset_manager" / "asset_manager.bin";
+      data_dir / "asset_manager" / "asset_manager.bin";
 
   // check if the file exists
   if (!std::filesystem::exists(asset_path)) {
@@ -265,6 +256,7 @@ FlatbuffersDataLoader::ProvideAssetData() const {
   }
   return asset_data;
 }
+
 /////////////////////////////////////////////////
 std::expected<const AssetCollection *, FailInfo>
 FlatbuffersDataLoader::ProvideAssetData(const SceneType scene_type) const {
@@ -292,14 +284,12 @@ FlatbuffersDataLoader::ProvideAssetData(const SceneType scene_type) const {
 std::expected<const UIStyleData *, FailInfo>
 FlatbuffersDataLoader::ProvideUIStylesData(
     const std::string &style_name) const {
-  // check the UIStyleDirectory is error free
-  auto ui_style_dir_result = m_path_provider.GetUIStylesDirectory();
-  if (!ui_style_dir_result.has_value()) {
-    return std::unexpected(ui_style_dir_result.error());
-  }
+  // get the UIStyleDirectory
+  std::filesystem::path ui_style_dir = m_path_provider.GetUIStylesDirectory();
+
   // construct the file path
   std::filesystem::path ui_style_path =
-      ui_style_dir_result.value() / (style_name + ".styles.bin");
+      ui_style_dir / (style_name + ".styles.bin");
   // check if the file exists
   if (!std::filesystem::exists(ui_style_path)) {
     std::string error_message =
@@ -321,14 +311,11 @@ FlatbuffersDataLoader::ProvideUIStylesData(
 std::expected<const ContextData *, FailInfo>
 FlatbuffersDataLoader::ProvideContextData() const {
   // get data directory
-  auto data_dir_result = m_path_provider.GetDataDirectory();
-  if (!data_dir_result.has_value()) {
-    return std::unexpected(data_dir_result.error());
-  }
+  std::filesystem::path data_dir = m_path_provider.GetDataDirectory();
 
   // construct the file path
   std::filesystem::path context_path =
-      data_dir_result.value() / "context" / "context_data.bin";
+      data_dir / "context" / "context_data.bin";
 
   // check if the file exists
   if (!std::filesystem::exists(context_path)) {

@@ -371,13 +371,14 @@ StylesConfigurator::ConfigureStyle(const UIStyleData &style_data,
 /////////////////////////////////////////////////
 std::expected<std::unordered_map<std::string, UIStyle>, FailInfo>
 StylesConfigurator::ProvideUIStylesMap(const AssetManager &asset_manager,
+                                       const PathProvider &path_provider,
                                        std::vector<std::string> style_names) {
   {
     // create map to return
     std::unordered_map<std::string, UIStyle> styles_map;
 
     // set up data loader
-    FlatbuffersDataLoader data_loader;
+    FlatbuffersDataLoader data_loader(path_provider);
 
     // go through all style names, load their data and configure the styles
     for (const auto &style_name : style_names) {
