@@ -69,6 +69,7 @@ TEST_CASE("drawn text can be detected", "[unit][draw_ui_elements]") {
       {static_cast<unsigned int>(width), static_cast<unsigned int>(height)})};
   // load a font
   steamrot::AssetManager asset_manager;
+  asset_manager.SetPathProvider(test_paths);
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result) {
     FAIL(load_default_assets_result.error().message);
@@ -111,6 +112,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawBorderAndBackground draws the hover "
   button.is_mouse_over = true;
   // load the default UIStyle
   steamrot::AssetManager asset_manager;
+  asset_manager.SetPathProvider(test_paths);
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result) {
     FAIL(load_default_assets_result.error().message);
@@ -147,6 +149,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIELement draws a panel on a "
 
   // load the default UIStyle
   steamrot::AssetManager asset_manager;
+  asset_manager.SetPathProvider(test_paths);
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result) {
     FAIL(load_default_assets_result.error().message);
@@ -186,6 +189,7 @@ TEST_CASE(
 
   // load the default UIStyle
   steamrot::AssetManager asset_manager;
+  asset_manager.SetPathProvider(test_paths);
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result) {
     FAIL(load_default_assets_result.error().message);
@@ -226,6 +230,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws a "
 
   // load the default UIStyle
   steamrot::AssetManager asset_manager;
+  asset_manager.SetPathProvider(test_paths);
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result) {
     FAIL(load_default_assets_result.error().message);
@@ -262,6 +267,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an unexpanded "
   dd_list.expanded_label = "...select";
   // load the default UIStyle
   steamrot::AssetManager asset_manager;
+  asset_manager.SetPathProvider(test_paths);
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result) {
     FAIL(load_default_assets_result.error().message);
@@ -293,6 +299,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an expanded "
   dd_list.expanded_label = "...select";
   // load the default UIStyle
   steamrot::AssetManager asset_manager;
+  asset_manager.SetPathProvider(test_paths);
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result) {
     FAIL(load_default_assets_result.error().message);
@@ -321,6 +328,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an unexpanded "
   dd_button.size = {100.0f, 100.0f};
   // load the default UIStyle
   steamrot::AssetManager asset_manager;
+  asset_manager.SetPathProvider(test_paths);
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result) {
     FAIL(load_default_assets_result.error().message);
@@ -352,6 +360,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an expanded "
   dd_button.is_expanded = true;
   // load the default UIStyle
   steamrot::AssetManager asset_manager;
+  asset_manager.SetPathProvider(test_paths);
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result) {
     FAIL(load_default_assets_result.error().message);
@@ -404,6 +413,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawNestedUIElements draws a unexpanded "
   dd_container.child_elements.push_back(std::move(dd_button));
   // load the default UIStyle
   steamrot::AssetManager asset_manager;
+  asset_manager.SetPathProvider(test_paths);
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result) {
     FAIL(load_default_assets_result.error().message);
@@ -456,6 +466,7 @@ TEST_CASE("steamrot::draw_ui_elements::DrawNestedUIElements draws an expanded "
   // add three DropDownL
   // load the default UIStyle
   steamrot::AssetManager asset_manager;
+  asset_manager.SetPathProvider(test_paths);
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result) {
     FAIL(load_default_assets_result.error().message);

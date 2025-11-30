@@ -14,7 +14,6 @@
 
 TEST_CASE("AssetManager is constructed correctly", "[unit][AssetManager]") {
 
-  steamrot::TestPaths test_paths;
   steamrot::AssetManager asset_manager;
   REQUIRE_NOTHROW(asset_manager);
 }
@@ -22,6 +21,7 @@ TEST_CASE("AssetManager is constructed correctly", "[unit][AssetManager]") {
 TEST_CASE("AssetManager::LoadDefaultAssets works correctly", "[unit][AssetManager]") {
   steamrot::TestPaths test_paths;
   steamrot::AssetManager asset_manager;
+  asset_manager.SetPathProvider(test_paths);
 
   auto load_result = asset_manager.LoadDefaultAssets();
   if (!load_result.has_value())
@@ -46,6 +46,7 @@ TEST_CASE("AssetManager loads scene assets correctly", "[unit][AssetManager]") {
 
   steamrot::TestPaths test_paths;
   steamrot::AssetManager asset_manager;
+  asset_manager.SetPathProvider(test_paths);
 
   auto result = asset_manager.LoadSceneAssets(steamrot::SceneType_TEST);
 

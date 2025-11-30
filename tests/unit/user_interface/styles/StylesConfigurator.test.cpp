@@ -29,6 +29,7 @@ TEST_CASE("StylesConfigurator ConfigureStyle returns expected result for "
   steamrot::StylesConfigurator styles_configurator;
 
   steamrot::AssetManager asset_manager;
+  asset_manager.SetPathProvider(test_paths);
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result)
     FAIL(load_default_assets_result.error().message);
@@ -194,6 +195,7 @@ TEST_CASE("StylesConfigurator returns a map of all available styles",
   steamrot::FlatbuffersDataLoader data_loader(test_paths);
   steamrot::StylesConfigurator styles_configurator;
   steamrot::AssetManager asset_manager;
+  asset_manager.SetPathProvider(test_paths);
   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result)
     FAIL(load_default_assets_result.error().message);
@@ -202,7 +204,7 @@ TEST_CASE("StylesConfigurator returns a map of all available styles",
 
   // Act
   auto styles_map_result = styles_configurator.ProvideUIStylesMap(
-      asset_manager, expected_style_names);
+      asset_manager, test_paths, expected_style_names);
   if (!styles_map_result)
     FAIL(styles_map_result.error().message);
   const auto &styles_map = styles_map_result.value();

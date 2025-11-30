@@ -16,14 +16,14 @@ TEST_CASE("TitleScene's call of sRender is correct",
           "[unit][TitleScene][.visual]") {
 
   // arrange
-  steamrot::TestPaths test_paths;
-  steamrot::tests::TestFixture test_context;
+  steamrot::tests::TestFixture test_fixture;
+  test_fixture.Intialize();
   steamrot::SceneFactory scene_factory;
 
   // create a TitleScene
   auto scene_creation_result = scene_factory.CreateDefaultScene(
-      steamrot::SceneType::SceneType_TITLE, test_context.GetGameContext());
-  ;
+      steamrot::SceneType::SceneType_TITLE, test_fixture.GetGameContext(),
+      test_fixture.GetTestPaths());
 
   if (!scene_creation_result.has_value()) {
     FAIL("Scene creation failed: " + scene_creation_result.error().message);
@@ -36,7 +36,7 @@ TEST_CASE("TitleScene's call of sRender is correct",
     FAIL("Scene configuration failed: " + configure_result.error().message);
   }
   // add the LogicMap
-  steamrot::FlatbuffersDataLoader data_loader(test_paths);
+  steamrot::FlatbuffersDataLoader data_loader(test_fixture.GetTestPaths());
   auto logic_collection_data_result = data_loader.ProvideLogicCollectionData(
       steamrot::SceneType::SceneType_TITLE);
   if (!logic_collection_data_result.has_value()) {
