@@ -15,8 +15,10 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "DataCollection.h"
+#include "EventHandler.h"
+#include "containers.h"
 #include "entity_types.h"
+#include "scene_change_packet_generated.h"
 #include "uuid.h"
 #include <optional>
 #include <unordered_map>
