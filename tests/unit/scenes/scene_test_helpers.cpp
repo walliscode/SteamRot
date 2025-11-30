@@ -34,7 +34,7 @@ const uuids::uuid CreateUuid() {
 /////////////////////////////////////////////////
 void CheckDefaultSceneConfiguration(const Scene &scene) {
 
-  const SceneType scene_type = scene.GetSceneInfo().type;
+  const SceneType scene_type = scene.GetSceneData().type;
 
   // check entity memory pool default configuration by creating expected pool
   EntityMemoryPool expected_pool;

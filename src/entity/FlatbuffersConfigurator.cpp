@@ -30,7 +30,7 @@ FlatbuffersConfigurator::ConfigureEntitiesFromDefaultData(
     EntityMemoryPool &entity_memory_pool, const SceneType scene_type) {
 
   // get the entity collection from the flatbuffers data loader
-  const SceneData *scene_data =
+  const SceneFileData *scene_data =
       m_data_loader.ProvideSceneData(scene_type).value();
 
   // delegate to ConfigureEntitiesFromCollection

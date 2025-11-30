@@ -64,11 +64,11 @@ public:
   ProvideSceneManagerData() const;
 
   /////////////////////////////////////////////////
-  /// @brief Provides SceneData based on the SceneType
+  /// @brief Provides SceneFileData based on the SceneType
   ///
   /// @param scene_type Enum representing the type of scene
   /////////////////////////////////////////////////
-  std::expected<const SceneData *, FailInfo>
+  std::expected<const SceneFileData *, FailInfo>
   ProvideSceneData(const SceneType scene_type) const;
 
   /////////////////////////////////////////////////
@@ -77,7 +77,7 @@ public:
   std::expected<const AssetCollection *, FailInfo> ProvideAssetData() const;
 
   /////////////////////////////////////////////////
-  /// @brief Provides AssetCollection data as a subset of SceneData
+  /// @brief Provides AssetCollection data as a subset of SceneFileData
   ///
   /// @param scene_type An enum representing the type of scene
   /////////////////////////////////////////////////
@@ -102,13 +102,13 @@ public:
   ProvideGameResourcesData() const;
 
   /////////////////////////////////////////////////
-  /// @brief Provides SceneResourcesData from SceneData for a specific scene
+  /// @brief Provides SceneResourcesData from SceneFileData for a specific scene
   /////////////////////////////////////////////////
   std::expected<const SceneResourcesData *, FailInfo>
   ProvideSceneResourcesData(const SceneType scene_type) const;
 
   /////////////////////////////////////////////////
-  /// @brief Provides LogicCollectionData from SceneData for a specific scene
+  /// @brief Provides LogicCollectionData from SceneFileData for a specific scene
   ///
   /// @param scene_type SceneType enum representing the type of scene
   /////////////////////////////////////////////////

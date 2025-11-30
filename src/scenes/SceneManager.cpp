@@ -77,7 +77,7 @@ SceneManager::AddSceneFromDefault(const SceneType &scene_type) {
   }
   // add to m_scenes maps
   auto adding_result =
-      m_scenes.emplace(scene_creation_result.value()->GetSceneInfo().id,
+      m_scenes.emplace(scene_creation_result.value()->GetSceneData().id,
                        std::move(scene_creation_result.value()));
 
   if (!adding_result.second) {
@@ -159,13 +159,13 @@ SceneManager::ProvideTextures(std::vector<uuids::uuid> &scene_ids) const {
 }
 
 /////////////////////////////////////////////////
-const std::expected<std::vector<SceneInfo>, FailInfo>
-SceneManager::ProvideAvailableSceneInfo() const {
-  std::vector<SceneInfo> scene_info_list;
+const std::expected<std::vector<SceneData>, FailInfo>
+SceneManager::ProvideAvailableSceneData() const {
+  std::vector<SceneData> scene_data_list;
   for (const auto &pair : m_scenes) {
-    scene_info_list.push_back(pair.second->GetSceneInfo());
+    scene_data_list.push_back(pair.second->GetSceneData());
   }
-  return scene_info_list;
+  return scene_data_list;
 }
 
 /////////////////////////////////////////////////

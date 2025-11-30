@@ -13,7 +13,7 @@
 /////////////////////////////////////////////////
 #include "GameContext.h"
 #include "Scene.h"
-#include "SceneInfoProvider.h"
+#include "SceneDataProvider.h"
 #include "Subscriber.h"
 #include "events_generated.h"
 #include "scene_manager_generated.h"
@@ -34,7 +34,7 @@ namespace steamrot {
 /// providing textures
 ///
 /////////////////////////////////////////////////
-class SceneManager : public SceneInfoProvider {
+class SceneManager : public SceneDataProvider {
 private:
   /////////////////////////////////////////////////
   /// @brief Context from GameEngine, providing access to game-wide resources
@@ -137,8 +137,8 @@ public:
   /////////////////////////////////////////////////
   /// @brief Provides information about all available scenes.
   /////////////////////////////////////////////////
-  const std::expected<std::vector<SceneInfo>, FailInfo>
-  ProvideAvailableSceneInfo() const override;
+  const std::expected<std::vector<SceneData>, FailInfo>
+  ProvideAvailableSceneData() const override;
 
   /////////////////////////////////////////////////
   /// @brief Returns a constant reference to the subscriptions map. for

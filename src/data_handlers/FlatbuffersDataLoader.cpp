@@ -185,7 +185,7 @@ FlatbuffersDataLoader::ProvideSceneManagerData() const {
       "FlatbuffersDataLoader::ProvideSceneManagerData not implemented"));
 }
 /////////////////////////////////////////////////
-std::expected<const SceneData *, FailInfo>
+std::expected<const SceneFileData *, FailInfo>
 FlatbuffersDataLoader::ProvideSceneData(const SceneType scene_type) const {
 
   // get file prefix from scene type
@@ -229,8 +229,8 @@ FlatbuffersDataLoader::ProvideSceneData(const SceneType scene_type) const {
   }
 
   // load the scene data
-  const steamrot::SceneData *scene_data =
-      GetSceneData(LoadBinaryData(scene_path));
+  const steamrot::SceneFileData *scene_data =
+      GetSceneFileData(LoadBinaryData(scene_path));
 
   return scene_data;
 }
@@ -275,10 +275,10 @@ FlatbuffersDataLoader::ProvideAssetData(const SceneType scene_type) const {
     return std::unexpected(scene_data_result.error());
   }
 
-  const SceneData *scene_data = scene_data_result.value();
+  const SceneFileData *scene_data = scene_data_result.value();
   if (!scene_data) {
     return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
-                                    "SceneData pointer is null"));
+                                    "SceneFileData pointer is null"));
   }
 
   if (!scene_data->assets()) {
@@ -372,13 +372,13 @@ FlatbuffersDataLoader::ProvideGameResourcesData() const {
 std::expected<const SceneResourcesData *, FailInfo>
 FlatbuffersDataLoader::ProvideSceneResourcesData(
     const SceneType scene_type) const {
-  // Load from SceneData for the specified scene type
+  // Load from SceneFileData for the specified scene type
   auto scene_data_result = ProvideSceneData(scene_type);
   if (!scene_data_result.has_value()) {
     return std::unexpected(scene_data_result.error());
   }
 
-  const SceneData *scene_data = scene_data_result.value();
+  const SceneFileData *scene_data = scene_data_result.value();
 
   // scene_resources is optional, so it's okay if it's not present
   // Return nullptr if not configured - caller should handle defaults
@@ -389,16 +389,16 @@ FlatbuffersDataLoader::ProvideSceneResourcesData(
 std::expected<const LogicCollectionData *, FailInfo>
 FlatbuffersDataLoader::ProvideLogicCollectionData(
     const SceneType scene_type) const {
-  // Load from SceneData for the specified scene type
+  // Load from SceneFileData for the specified scene type
   auto scene_data_result = ProvideSceneData(scene_type);
   if (!scene_data_result.has_value()) {
     return std::unexpected(scene_data_result.error());
   }
-  const SceneData *scene_data = scene_data_result.value();
+  const SceneFileData *scene_data = scene_data_result.value();
   if (!scene_data->logic_collection_data()) {
     return std::unexpected(
         FailInfo(FailMode::FlatbuffersDataNotFound,
-                 "LogicCollectionData not found in SceneData"));
+                 "LogicCollectionData not found in SceneFileData"));
   }
   return scene_data->logic_collection_data();
 }

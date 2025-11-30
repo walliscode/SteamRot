@@ -46,7 +46,7 @@ private:
   /////////////////////////////////////////////////
   /// @brief Cached scene data pointer.
   /////////////////////////////////////////////////
-  mutable const SceneData *m_scene_data = nullptr;
+  mutable const SceneFileData *m_scene_data = nullptr;
 
   /////////////////////////////////////////////////
   /// @brief Flag indicating if data has been loaded.

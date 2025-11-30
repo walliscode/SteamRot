@@ -13,7 +13,7 @@
 /////////////////////////////////////////////////
 
 #include "FailInfo.h"
-#include "SceneInfoProvider.h"
+#include "SceneDataProvider.h"
 #include "Session.h"
 #include <SFML/Graphics.hpp>
 #include <expected>
@@ -34,9 +34,9 @@ private:
   sf::RenderWindow &m_window;
 
 /////////////////////////////////////////////////
-  /// @brief Reference to the SceneInfoProvider for scene data
+  /// @brief Reference to the SceneDataProvider for scene data
 /////////////////////////////////////////////////
-  const SceneInfoProvider &m_scene_manager_interface;
+  const SceneDataProvider &m_scene_manager_interface;
 
 /////////////////////////////////////////////////
   /// @brief Potential Sessions to choose from
@@ -63,7 +63,7 @@ public:
   /// @param window RenderWindow reference
 /////////////////////////////////////////////////
   DisplayManager(sf::RenderWindow &window,
-                 const SceneInfoProvider &scene_manager_interface);
+                 const SceneDataProvider &scene_manager_interface);
 
 /////////////////////////////////////////////////
   /// @brief Calls clear, draw, and display on the RenderWindow

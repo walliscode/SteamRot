@@ -1,0 +1,37 @@
+include "entities.fbs";
+include "event_bus_data.fbs";
+include "scene_change_packet.fbs";
+
+namespace steamrot;
+
+////////////////////////////////////////////////////////////
+/// @brief FlatBuffers representation of scene data
+///
+/// Contains all information about a Scene including required identifiers
+/// (UUID, SceneType) and optional data containers for state snapshots.
+/// The struct is named SceneDataData to follow FlatBuffers naming convention
+/// where the Data suffix is added to the C++ struct name.
+////////////////////////////////////////////////////////////
+table SceneDataData {
+  /// @brief Unique identifier for the Scene (UUID as string)
+  /// Required field that uniquely identifies this scene instance.
+  id: string (required);
+
+  /// @brief Scene type identifier
+  /// Required field that specifies the type of scene (TITLE, CRAFTING, etc.)
+  scene_type: SceneType (required);
+
+  /// @brief Optional snapshot of EntityMemoryPool
+  /// Contains entity data when a state snapshot is needed.
+  entity_collection: EntityCollection;
+
+  /// @brief Optional snapshot of the global_event_bus
+  /// Contains event bus state when a snapshot is needed.
+  global_event_bus: EventBusData;
+
+  /// @brief Optional snapshot of the waiting_room event bus
+  /// Contains waiting room state when a snapshot is needed.
+  waiting_room: EventBusData;
+}
+
+root_type SceneDataData;

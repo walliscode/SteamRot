@@ -294,8 +294,8 @@ TEST_CASE("SceneManager::ProvideTextures returns textures for valid "
   REQUIRE(textures_result->size() == scene_ids.size());
 }
 
-TEST_CASE("SceneManager::ProvideAvailableSceneInfo returns available "
-          "SceneInfo",
+TEST_CASE("SceneManager::ProvideAvailableSceneData returns available "
+          "SceneData",
           "[unit][SceneManager]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestFixture test_context;
@@ -305,18 +305,18 @@ TEST_CASE("SceneManager::ProvideAvailableSceneInfo returns available "
   if (!title_result.has_value()) {
     FAIL("Failed to add Title scene: " + title_result.error().message);
   }
-  // call ProvideSceneInfo
-  auto scene_info_result = scene_manager.ProvideAvailableSceneInfo();
-  if (!scene_info_result.has_value()) {
-    FAIL("Failed to provide scene info: " + scene_info_result.error().message);
+  // call ProvideSceneData
+  auto scene_data_result = scene_manager.ProvideAvailableSceneData();
+  if (!scene_data_result.has_value()) {
+    FAIL("Failed to provide scene data: " + scene_data_result.error().message);
   }
   // check that the returned vector has the correct number of
-  // SceneInfo entries
-  REQUIRE(!scene_info_result->empty());
-  REQUIRE(scene_info_result->size() == 1);
-  REQUIRE(scene_info_result->at(0).type ==
+  // SceneData entries
+  REQUIRE(!scene_data_result->empty());
+  REQUIRE(scene_data_result->size() == 1);
+  REQUIRE(scene_data_result->at(0).type ==
           steamrot::SceneType::SceneType_TITLE);
-  REQUIRE(scene_info_result->at(0).id == title_result.value());
+  REQUIRE(scene_data_result->at(0).id == title_result.value());
 }
 
 TEST_CASE("SceneManager loads TitleScene when Subscriber is turned active",
@@ -354,7 +354,7 @@ TEST_CASE("SceneManager loads TitleScene when Subscriber is turned active",
   }
   // Check that the Title scene was loaded
   REQUIRE(scene_manager.GetScenes().size() == 1);
-  REQUIRE(scene_manager.GetScenes().begin()->second->GetSceneInfo().type ==
+  REQUIRE(scene_manager.GetScenes().begin()->second->GetSceneData().type ==
           steamrot::SceneType::SceneType_TITLE);
 }
 
@@ -393,7 +393,7 @@ TEST_CASE("SceneManager loads CraftingScene when Subscriber is turned active",
   }
   // Check that the Crafting scene was loaded
   REQUIRE(scene_manager.GetScenes().size() == 1);
-  REQUIRE(scene_manager.GetScenes().begin()->second->GetSceneInfo().type ==
+  REQUIRE(scene_manager.GetScenes().begin()->second->GetSceneData().type ==
           steamrot::SceneType::SceneType_CRAFTING);
 }
 
@@ -430,7 +430,7 @@ TEST_CASE("SceneManager::UpdateSceneManager cause scene change via subscribers",
   scene_manager.UpdateSceneManager();
   // Check that the Title scene was loaded
   REQUIRE(scene_manager.GetScenes().size() == 1);
-  REQUIRE(scene_manager.GetScenes().begin()->second->GetSceneInfo().type ==
+  REQUIRE(scene_manager.GetScenes().begin()->second->GetSceneData().type ==
           steamrot::SceneType::SceneType_TITLE);
 }
 

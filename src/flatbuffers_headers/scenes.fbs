@@ -7,11 +7,11 @@ include "resource_data.fbs";
 
 namespace steamrot; 
 
-table SceneData{
+table SceneFileData{
     entity_collection: EntityCollection;
     logic_collection_data: LogicCollectionData;
     assets: AssetCollection;
     scene_resources: SceneResourcesData;
   }
 
-root_type SceneData;
+root_type SceneFileData;

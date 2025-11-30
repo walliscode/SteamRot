@@ -15,7 +15,7 @@ namespace steamrot {
 
 /////////////////////////////////////////////////
 DisplayManager::DisplayManager(sf::RenderWindow &window,
-                               const SceneInfoProvider &scene_manager_interface)
+                               const SceneDataProvider &scene_manager_interface)
     : m_active_session(std::make_shared<Session>()), m_window(window),
       m_scene_manager_interface(scene_manager_interface) {};
 
@@ -36,15 +36,15 @@ std::expected<std::monostate, FailInfo> DisplayManager::CallRenderCycle() {
 
 /////////////////////////////////////////////////
 void DisplayManager::DrawTextures() {
-  // get all available scene info
-  auto scene_info_result =
-      m_scene_manager_interface.ProvideAvailableSceneInfo();
+  // get all available scene data
+  auto scene_data_result =
+      m_scene_manager_interface.ProvideAvailableSceneData();
 
   // generate a vector of scene ids
   std::vector<uuids::uuid> scene_ids;
-  if (scene_info_result) {
-    for (const auto &scene_info : scene_info_result.value()) {
-      scene_ids.push_back(scene_info.id);
+  if (scene_data_result) {
+    for (const auto &scene_data : scene_data_result.value()) {
+      scene_ids.push_back(scene_data.id);
     }
   }
 

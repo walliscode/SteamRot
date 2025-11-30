@@ -19,7 +19,7 @@ namespace steamrot {
 /////////////////////////////////////////////////
 Scene::Scene(const SceneType scene_type, const uuids::uuid &id,
              const GameContext &game_context)
-    : m_scene_info{id, scene_type},
+    : m_scene_data{id, scene_type},
       m_entity_manager(game_context.event_handler),
       m_game_context(game_context) {}
 
@@ -47,7 +47,7 @@ Scene::ConfigureFromDefault(const DataType &data_type) {
 
   // configure the entity memory pool
   auto emp_configure_result = m_entity_manager.ConfigureEntitiesFromDefaultData(
-      m_scene_info.type, data_type);
+      m_scene_data.type, data_type);
   if (!emp_configure_result)
     return std::unexpected(emp_configure_result.error());
 
@@ -67,13 +67,13 @@ void Scene::SetLogicMap(
   }
 }
 /////////////////////////////////////////////////
-const SceneInfo Scene::GetSceneInfo() const {
-  SceneInfo scene_info;
+const SceneData Scene::GetSceneData() const {
+  SceneData scene_data;
 
-  scene_info.id = m_scene_info.id;
-  scene_info.type = m_scene_info.type;
+  scene_data.id = m_scene_data.id;
+  scene_data.type = m_scene_data.type;
 
-  return scene_info;
+  return scene_data;
 }
 
 /////////////////////////////////////////////////
