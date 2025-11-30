@@ -18,6 +18,7 @@ target_include_directories(test_harness
 target_link_libraries(test_harness
   PUBLIC
   context
+  components
   entity
   matchers
   resources

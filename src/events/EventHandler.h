@@ -119,6 +119,8 @@ public:
   /////////////////////////////////////////////////
   const std::unordered_map<EventType, std::vector<std::weak_ptr<Subscriber>>> &
   GetSubcriberRegister() const;
+
+  void ExecuteEventHandlerLevelLogic(sf::RenderWindow &window);
 };
 
 /////////////////////////////////////////////////
@@ -155,4 +157,5 @@ void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
 /// @param event_bus Reference to the event bus to add events to.
 /////////////////////////////////////////////////
 void HandleSFMLEvents(sf::RenderWindow &window, EventHandler &event_handler);
+
 } // namespace steamrot

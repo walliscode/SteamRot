@@ -7,67 +7,65 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "Engine.h"
+#include "FlatbuffersDataLoader.h"
+#include "resources_configuration.h"
 
 namespace steamrot {
 
 /////////////////////////////////////////////////
-Engine::Engine(EnvironmentType env_type)
-    : m_game_context(m_game_resources), m_running(false) {
-  m_game_resources.env_type = env_type;
-  m_game_resources.loop_number = 1;
-}
+Engine::Engine()
+    : m_game_context(m_game_resources), m_scene_manager(m_game_context) {}
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> Engine::StartUp() {
-  // Derived classes implement ConfigureFromData()
-  return ConfigureFromData();
-}
+  // Load resource data via FlatbuffersDataLoader
+  FlatbuffersDataLoader data_loader;
 
-/////////////////////////////////////////////////
-void Engine::Run(size_t num_ticks) {
-  m_running = true;
-  size_t ticks_executed = 0;
-
-  while (m_running && ShouldContinueRunning()) {
-    ExecuteTick();
-    OnPostTick();
-
-    ticks_executed++;
-
-    // If num_ticks is specified, stop after that many ticks
-    if (num_ticks > 0 && ticks_executed >= num_ticks) {
-      break;
-    }
+  // Get GameResourcesData from data loader
+  auto engine_resource_result = data_loader.ProvideGameResourcesData();
+  if (!engine_resource_result) {
+    return std::unexpected(engine_resource_result.error());
   }
+
+  // Use resource data to configure GameResources
+  auto configure_resources_result = resources::ConfigureGameResources(
+      m_game_resources, engine_resource_result.value());
+  if (!configure_resources_result) {
+    return std::unexpected(configure_resources_result.error());
+  }
+
+  auto load_engine_data_result = data_loader.ProvideEngineData();
+  if (!load_engine_data_result) {
+  }
+
+  return std::monostate{};
 }
 
 /////////////////////////////////////////////////
-bool Engine::ShouldContinueRunning() const {
-  // Default implementation checks if the window is open
-  return m_game_resources.game_window.isOpen();
+void Engine::RunGame() {
+
+  auto start_up_result = StartUp();
+  RunGameLoop();
 }
 
 /////////////////////////////////////////////////
-void Engine::OnPostTick() { m_game_resources.loop_number++; }
+void Engine::ExecuteSystemsTick() {
 
-/////////////////////////////////////////////////
-void Engine::Stop() { m_running = false; }
+  // let EventHandler process sfml events and update bus and subscribers
+  m_game_context.event_handler.ExecuteEventHandlerLevelLogic(
+      m_game_resources.game_window);
 
-/////////////////////////////////////////////////
-size_t Engine::GetLoopNumber() const { return m_game_resources.loop_number; }
+  // Update Engine level logic
+  ExecuteEngineLevelLogic();
 
-/////////////////////////////////////////////////
-GameResources &Engine::GetGameResources() { return m_game_resources; }
+  // Update SceneManager level logic, such as any subscriptions it owns. It
+  // does not update scenes.
+  m_scene_manager.ExecuteSceneManagerLevelLogic();
 
-/////////////////////////////////////////////////
-const GameResources &Engine::GetGameResources() const {
-  return m_game_resources;
+  // Update Scene Level Logic, this is configurable per engine type
+  ExecuteSceneLevelLogic();
+
+  // Update DisplayManager level logic, this is configurable per engine type
+  ExecuteDisplayManagerTick();
 }
-
-/////////////////////////////////////////////////
-GameContext &Engine::GetGameContext() { return m_game_context; }
-
-/////////////////////////////////////////////////
-const GameContext &Engine::GetGameContext() const { return m_game_context; }
-
 } // namespace steamrot

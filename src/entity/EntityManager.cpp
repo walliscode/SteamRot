@@ -11,6 +11,7 @@
 #include "FailInfo.h"
 #include "FlatbuffersConfigurator.h"
 #include "PathProvider.h"
+#include "containers.h"
 #include "entity_memory.h"
 #include <expected>
 #include <variant>
