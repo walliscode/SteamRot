@@ -22,6 +22,34 @@ struct CUserInterface : public Component {
   CUserInterface() = default;
 
   /////////////////////////////////////////////////
+  /// @brief Copy constructor for deep copying
+  ///
+  /// @param other The CUserInterface to copy from
+  /////////////////////////////////////////////////
+  CUserInterface(const CUserInterface &other)
+      : Component(other), m_name(other.m_name),
+        m_root_element(other.m_root_element ? other.m_root_element->Clone()
+                                            : nullptr),
+        m_visible(other.m_visible) {}
+
+  /////////////////////////////////////////////////
+  /// @brief Copy assignment operator for deep copying
+  ///
+  /// @param other The CUserInterface to copy from
+  /// @return Reference to this CUserInterface
+  /////////////////////////////////////////////////
+  CUserInterface &operator=(const CUserInterface &other) {
+    if (this != &other) {
+      Component::operator=(other);
+      m_name = other.m_name;
+      m_root_element =
+          other.m_root_element ? other.m_root_element->Clone() : nullptr;
+      m_visible = other.m_visible;
+    }
+    return *this;
+  }
+
+  /////////////////////////////////////////////////
   /// @brief String tag for the user interface component
   ///
   /// UI components should be few enough that manual unique naming is viable.

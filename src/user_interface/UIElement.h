@@ -80,6 +80,20 @@ struct UIElement {
   virtual void DrawUIElement(sf::RenderTexture &texture,
                              const UIStyle &style) const = 0;
 
+/////////////////////////////////////////////////
+  /// @brief Create a deep copy of this UI element and its children
+  ///
+  /// @return A new unique_ptr to a cloned UIElement
+/////////////////////////////////////////////////
+  virtual std::unique_ptr<UIElement> Clone() const = 0;
+
+/////////////////////////////////////////////////
+  /// @brief Helper to copy base UIElement data to a target element
+  ///
+  /// @param target The target UIElement to copy data into
+/////////////////////////////////////////////////
+  void CloneBaseUIElementData(UIElement &target) const;
+
   virtual ~UIElement() = default;
 };
 } // namespace steamrot

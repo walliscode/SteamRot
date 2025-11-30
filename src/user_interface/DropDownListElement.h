@@ -39,6 +39,21 @@ struct DropDownListElement : public UIElement {
       DataPopulateFunction::DataPopulateFunction_None};
 
 /////////////////////////////////////////////////
+  /// @brief Create a deep copy of this DropDownListElement
+  ///
+  /// @return A new unique_ptr to a cloned DropDownListElement
+/////////////////////////////////////////////////
+  std::unique_ptr<UIElement> Clone() const override {
+    auto cloned = std::make_unique<DropDownListElement>();
+    CloneBaseUIElementData(*cloned);
+    cloned->is_expanded = is_expanded;
+    cloned->unexpanded_label = unexpanded_label;
+    cloned->expanded_label = expanded_label;
+    cloned->data_populate_function = data_populate_function;
+    return cloned;
+  }
+
+/////////////////////////////////////////////////
   /// @brief Draws the DropDownListElement on a RenderTexture
   ///
   /// @param texture Reference to the RenderTexture to draw on
