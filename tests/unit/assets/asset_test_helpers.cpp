@@ -20,7 +20,7 @@ void CheckAssetConfiguration(const SceneType &scene_type,
   // intialise the pathprovider
   TestPaths test_paths;
   // get flatbuffer asset collection
-  FlatbuffersDataLoader loader;
+  FlatbuffersDataLoader loader(test_paths);
   auto asset_get_result = loader.ProvideAssetData(scene_type);
   if (!asset_get_result.has_value()) {
     FAIL(asset_get_result.error().message);

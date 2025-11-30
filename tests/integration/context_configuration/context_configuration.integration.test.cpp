@@ -16,7 +16,7 @@
 TEST_CASE("Load resource configuration and configure resources",
           "[integration][resources][configuration]") {
   steamrot::TestPaths test_paths;
-  steamrot::FlatbuffersDataLoader loader;
+  steamrot::FlatbuffersDataLoader loader(test_paths);
 
   // Load game resources data
   auto game_resources_result = loader.ProvideGameResourcesData();
@@ -50,7 +50,7 @@ TEST_CASE("Load resource configuration and configure resources",
 TEST_CASE("Configuration supports all required scene types",
           "[integration][resources][configuration]") {
   steamrot::TestPaths test_paths;
-  steamrot::FlatbuffersDataLoader loader;
+  steamrot::FlatbuffersDataLoader loader(test_paths);
 
   // Verify TEST scene is configured
   auto test_scene_data =
@@ -76,7 +76,7 @@ TEST_CASE("Configuration supports all required scene types",
 TEST_CASE("Configuration values are properly loaded",
           "[integration][resources][configuration]") {
   steamrot::TestPaths test_paths;
-  steamrot::FlatbuffersDataLoader loader;
+  steamrot::FlatbuffersDataLoader loader(test_paths);
 
   auto game_resources_result = loader.ProvideGameResourcesData();
   REQUIRE(game_resources_result.has_value());
@@ -104,7 +104,7 @@ TEST_CASE("Configuration values are properly loaded",
 TEST_CASE("Resources can be configured from resource data",
           "[integration][resources][configuration]") {
   steamrot::TestPaths test_paths;
-  steamrot::FlatbuffersDataLoader loader;
+  steamrot::FlatbuffersDataLoader loader(test_paths);
 
   auto game_resources_result = loader.ProvideGameResourcesData();
   REQUIRE(game_resources_result.has_value());
