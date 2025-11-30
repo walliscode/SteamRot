@@ -16,8 +16,12 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+
 #include "Engine.h"
+#include "SceneInfo.h"
 #include "test_data_generated.h"
+#include <unordered_map>
+#include <vector>
 
 namespace steamrot::tests {
 
@@ -37,42 +41,6 @@ enum class TickLevel {
   Custom        ///< Mix and match Logic classes and functions
 };
 
-/////////////////////////////////////////////////
-/// @class TestEngine
-/// @brief Test engine for data-driven testing.
-///
-/// TestEngine derives from Engine to share resource management with
-/// GameEngine. It uses the SAME architecture as GameEngine with
-/// SceneManager and DisplayManager members, enabling testing at
-/// different execution levels:
-///
-/// **TickLevel::FullEngine**: Identical to GameEngine::UpdateSystems
-/// **TickLevel::SceneManager**: Identical to SceneManager::UpdateSceneManager
-/// **TickLevel::SceneLogic**: Runs scene logic (sAction, sCollision, sRender)
-/// **TickLevel::Custom**: Mix and match Logic classes and free functions
-///
-/// Example usage:
-/// @code
-/// TestEngine engine(config);
-///
-/// // Test at full engine level (identical to GameEngine)
-/// engine.UseTickLevel(TickLevel::FullEngine);
-/// engine.Initialize();
-/// engine.Run(5);
-///
-/// // Test at scene manager level
-/// engine.UseTickLevel(TickLevel::SceneManager);
-/// engine.Initialize();
-/// engine.Run(5);
-///
-/// // Custom mode - mix and match
-/// engine.UseTickLevel(TickLevel::Custom);
-/// engine.AddLogic<UICollisionLogic>()
-///       .AddFunction([](SceneContext& ctx) { /* validate */ });
-/// engine.Initialize();
-/// engine.Run(5);
-/// @endcode
-/////////////////////////////////////////////////
 class TestEngine : public Engine {
 private:
   /////////////////////////////////////////////////
@@ -88,12 +56,45 @@ private:
   /////////////////////////////////////////////////
   /// @brief Number of ticks to run.
   /////////////////////////////////////////////////
-  size_t m_target_ticks = 0;
+  size_t m_target_ticks{};
 
   /////////////////////////////////////////////////
   /// @brief Current tick number.
   /////////////////////////////////////////////////
-  size_t m_current_tick = 0;
+  size_t m_current_tick{1};
+
+  /////////////////////////////////////////////////
+  /// @brief Stores the tick number and data at that point
+  /////////////////////////////////////////////////
+  std::unordered_map<size_t, std::vector<SceneInfo>> m_data_bank;
+
+  /////////////////////////////////////////////////
+  /// @brief Currently, this will be left blank for the TestEngine
+  /////////////////////////////////////////////////
+  void ExecuteDisplayManagerTick() override {};
+
+  /////////////////////////////////////////////////
+  /// @brief For the TestEngine this will execute 1 tick then export data before
+  /// proceeding onto the next tick
+  /////////////////////////////////////////////////
+  void RunGameLoop() override;
+
+  /////////////////////////////////////////////////
+  /// @brief Takes a snapshot of the current scenes and adds to the data bank
+  /////////////////////////////////////////////////
+  void AddToDataBank(size_t tick);
+
+  /////////////////////////////////////////////////
+  /// @brief uses simulation data to put data through functions
+  /////////////////////////////////////////////////
+  void ExecuteSceneLevelLogic() override;
+
+  /////////////////////////////////////////////////
+  /// @brief Currently no need to run Engine level subscription logic
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> ProcessSubscriptions() override {
+    return std::monostate{};
+  };
 
 public:
   /////////////////////////////////////////////////
@@ -102,5 +103,10 @@ public:
   /// @param config Test data configuration (must remain valid)
   /////////////////////////////////////////////////
   explicit TestEngine(const TestDataConfig *config);
+
+  /////////////////////////////////////////////////
+  /// @brief Returns data bank for inspection and testing
+  /////////////////////////////////////////////////
+  const std::unordered_map<size_t, std::vector<SceneInfo>> &GetDataBank() const;
 };
 } // namespace steamrot::tests

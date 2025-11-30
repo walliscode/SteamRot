@@ -57,6 +57,11 @@ protected:
   bool m_running = false;
 
   /////////////////////////////////////////////////
+  /// @brief All subscribers registered to the GameEngine
+  /////////////////////////////////////////////////
+  std::vector<std::shared_ptr<Subscriber>> m_subscriptions;
+
+  /////////////////////////////////////////////////
   /// @brief Configure the engine from data sources.
   ///
   /// Called by StartUp() to load configuration data.
@@ -65,7 +70,7 @@ protected:
   ///
   /// @return Success or failure information
   /////////////////////////////////////////////////
-  virtual std::expected<std::monostate, FailInfo> ConfigureEngineFromData() = 0;
+  std::expected<std::monostate, FailInfo> ConfigureEngineFromData();
 
   /////////////////////////////////////////////////
   /// @brief Execute a single tick of the game loop.
@@ -76,13 +81,45 @@ protected:
   /////////////////////////////////////////////////
   void ExecuteSystemsTick();
 
+  /////////////////////////////////////////////////
+  /// @brief Executre engine-level logic for the engine, such as updating
+  /// ssubcribers, quitting conditions, etc.
+  /////////////////////////////////////////////////
   void ExecuteEngineLevelLogic();
 
+  /////////////////////////////////////////////////
+  /// @brief Execute scene-level logic for the engine.
+  ///
+  /// For the GameEngine, this will be a compile time constant but tfor the test
+  /// engine we want to be able to configure this.
+  ///
+  /////////////////////////////////////////////////
   virtual void ExecuteSceneLevelLogic() = 0;
 
+  /////////////////////////////////////////////////
+  /// @brief Calls on any DisplayManager tick execution.
+  ///
+  /// This may not be relevant, for example in a TestEngine there is no
+  /// DisplayManager.
+  /////////////////////////////////////////////////
   virtual void ExecuteDisplayManagerTick() = 0;
 
+  /////////////////////////////////////////////////
+  /// @brief Virtual method capturing the game loop structure.
+  /////////////////////////////////////////////////
   virtual void RunGameLoop() = 0;
+
+  /////////////////////////////////////////////////
+  /// @brief Start up the engine and configure resources.
+  ///
+  /// @return Success or failure information
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> StartUp();
+
+  /////////////////////////////////////////////////
+  /// @brief Go through all subscriptions, if active call relevant Logic
+  /////////////////////////////////////////////////
+  virtual std::expected<std::monostate, FailInfo> ProcessSubscriptions() = 0;
 
 public:
   /////////////////////////////////////////////////
@@ -98,16 +135,24 @@ public:
   virtual ~Engine() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Start up the engine and configure resources.
-  ///
-  /// @return Success or failure information
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo> StartUp();
-
-  /////////////////////////////////////////////////
   /// @brief A simple wrapper function to indicate running the game
   /////////////////////////////////////////////////
-  void Run();
+  void RunGame();
+
+  /////////////////////////////////////////////////
+  /// @brief Add the Subscriber to the subscriptions vector.
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+      RegisterSubscriber(std::shared_ptr<Subscriber>);
+
+  /////////////////////////////////////////////////
+  /// @brief Configure subscribers from flatbuffers data
+  ///
+  /// @param subscriptions Flatbuffers vector of SubscriberData objects
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> ConfigureSubscribersFromData(
+      const ::flatbuffers::Vector<
+          ::flatbuffers::Offset<steamrot::SubscriberData>> *subscriptions);
 };
 
 } // namespace steamrot

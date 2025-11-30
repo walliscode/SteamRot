@@ -7,6 +7,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "Engine.h"
+#include "FlatbuffersDataLoader.h"
+#include "resources_configuration.h"
 
 namespace steamrot {
 
@@ -16,19 +18,31 @@ Engine::Engine()
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> Engine::StartUp() {
-  // Derived classes implement ConfigureFromData()
-  auto configure_result = ConfigureEngineFromData();
+  // Load resource data via FlatbuffersDataLoader
+  FlatbuffersDataLoader data_loader;
 
-  // Propagate any configuration errors
-  if (!configure_result.has_value()) {
-    return std::unexpected(configure_result.error());
+  // Get GameResourcesData from data loader
+  auto engine_resource_result = data_loader.ProvideGameResourcesData();
+  if (!engine_resource_result) {
+    return std::unexpected(engine_resource_result.error());
+  }
+
+  // Use resource data to configure GameResources
+  auto configure_resources_result = resources::ConfigureGameResources(
+      m_game_resources, engine_resource_result.value());
+  if (!configure_resources_result) {
+    return std::unexpected(configure_resources_result.error());
+  }
+
+  auto load_engine_data_result = data_loader.ProvideEngineData();
+  if (!load_engine_data_result) {
   }
 
   return std::monostate{};
 }
 
 /////////////////////////////////////////////////
-void Engine::Run() {
+void Engine::RunGame() {
 
   auto start_up_result = StartUp();
   RunGameLoop();
@@ -44,8 +58,8 @@ void Engine::ExecuteSystemsTick() {
   // Update Engine level logic
   ExecuteEngineLevelLogic();
 
-  // Update SceneManager level logic, such as any subscriptions it owns. It does
-  // not update scenes yet.
+  // Update SceneManager level logic, such as any subscriptions it owns. It
+  // does not update scenes.
   m_scene_manager.ExecuteSceneManagerLevelLogic();
 
   // Update Scene Level Logic, this is configurable per engine type

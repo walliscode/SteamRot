@@ -14,7 +14,7 @@ namespace steamrot;
 /// event bus, etc.) at a specific point in time. Used for comparing
 /// actual vs expected states in tests.
 ////////////////////////////////////////////////////////////
-table DataCollection {
+table DataCollectionData {
   /// @brief state of entities
   entity_collection: EntityCollection;
 
@@ -45,7 +45,7 @@ table TickSnapshot {
   /// @brief Expected data structure state at this tick
   /// Contains entity collection and event bus state.
   /// Comparison happens AFTER simulation steps, BEFORE event bus tick.
-  data_collection: DataCollection (required);
+  data_collection: DataCollectionData (required);
   
   /// @brief Optional human-readable description of this checkpoint
   /// Used in failure messages to identify which snapshot failed.
@@ -92,12 +92,12 @@ table TestDataConfig {
   /// @brief Starting state data collection for comparison tests
   /// Contains entity collection and event bus state at test start.
   /// If not provided, defaults to default-constructed data structures.
-  start_data_collection: DataCollection;
+  start_data_collection: DataCollectionData;
   
   /// @brief Expected state data collection for comparison tests
   /// Contains expected entity collection and event bus state after test execution.
   /// If present, the test harness will compare actual state with expected state.
-  expected_data_collection: DataCollection;
+  expected_data_collection: DataCollectionData;
   
   /// @brief Resource data for test fixtures
   game_resources: GameResourcesData;

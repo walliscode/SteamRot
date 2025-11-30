@@ -10,7 +10,6 @@
 /////////////////////////////////////////////////
 #include "AssetManager.h"
 #include "EventHandler.h"
-#include "PathProvider.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Vector2.hpp>
 
@@ -58,11 +57,6 @@ struct GameResources {
   /// There should only be one instance of this.
   /////////////////////////////////////////////////
   AssetManager asset_manager;
-
-  /////////////////////////////////////////////////
-  /// @brief Environment type for the game.
-  /////////////////////////////////////////////////
-  EnvironmentType env_type{EnvironmentType::None};
 };
 
 } // namespace steamrot

@@ -135,7 +135,7 @@ FlatbuffersDataLoader::ProvideAllFragments(
 
 /////////////////////////////////////////////////
 std::expected<const GameEngineData *, FailInfo>
-FlatbuffersDataLoader::ProvideGameEngineData() const {
+FlatbuffersDataLoader::ProvideEngineData() const {
   // get data directory
   auto data_dir_result = m_path_provider.GetDataDirectory();
   if (!data_dir_result.has_value()) {
@@ -353,7 +353,7 @@ FlatbuffersDataLoader::ProvideContextData() const {
 std::expected<const GameResourcesData *, FailInfo>
 FlatbuffersDataLoader::ProvideGameResourcesData() const {
   // Load from GameEngineData
-  auto game_engine_result = ProvideGameEngineData();
+  auto game_engine_result = ProvideEngineData();
   if (!game_engine_result.has_value()) {
     return std::unexpected(game_engine_result.error());
   }
