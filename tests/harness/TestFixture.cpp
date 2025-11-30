@@ -10,7 +10,6 @@
 #include "FlatbuffersConfigurator.h"
 #include "FlatbuffersDataLoader.h"
 #include "GameContext.h"
-#include "PathProvider.h"
 #include "console_output.h"
 #include "resources_configuration.h"
 
@@ -30,7 +29,7 @@ void TestFixture::Intialize(const EntityCollection *entity_collection) {
 ////////////////////////////////////////////////////////////
 void TestFixture::ConfigureGameResourcesForTest() {
   // Use the reusable configuration function to set up GameResources
-  FlatbuffersDataLoader loader;
+  FlatbuffersDataLoader loader(m_test_paths);
   auto game_data_result = loader.ProvideGameResourcesData();
 
   if (game_data_result.has_value()) {
@@ -46,9 +45,6 @@ void TestFixture::ConfigureGameResourcesForTest() {
                         game_data_result.error().message);
   }
 
-  // Set environment type for test
-  m_game_resources.env_type = EnvironmentType::Test;
-
   // Load default assets into the asset manager
   auto load_result = m_game_resources.asset_manager.LoadDefaultAssets();
   if (!load_result.has_value()) {
@@ -61,7 +57,7 @@ void TestFixture::ConfigureGameResourcesForTest() {
 void TestFixture::ConfigureSceneLevelResources(
     const SceneType &scene_type, const EntityCollection *entity_collection) {
   // Use the reusable configuration function to set up SceneResources
-  FlatbuffersDataLoader loader;
+  FlatbuffersDataLoader loader(m_test_paths);
   auto scene_data_result = loader.ProvideSceneResourcesData(scene_type);
 
   if (scene_data_result.has_value()) {
@@ -78,7 +74,8 @@ void TestFixture::ConfigureSceneLevelResources(
   }
 
   // Configure the EntityMemoryPool for the scene
-  FlatbuffersConfigurator configurator(m_game_resources.event_handler);
+  FlatbuffersConfigurator configurator(m_game_resources.event_handler,
+                                       m_test_paths);
 
   // If entity_collection is provided, use it; otherwise load from default data
   std::expected<std::monostate, FailInfo> configure_result;
@@ -129,5 +126,8 @@ SceneContext &TestFixture::GetSceneContext() {
   }
   return *m_scene_context;
 }
+
+////////////////////////////////////////////////////////////
+const TestPaths &TestFixture::GetTestPaths() const { return m_test_paths; }
 
 } // namespace steamrot::tests

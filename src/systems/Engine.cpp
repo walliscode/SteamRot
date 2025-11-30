@@ -13,13 +13,14 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-Engine::Engine()
-    : m_game_context(m_game_resources), m_scene_manager(m_game_context) {}
+Engine::Engine(const PathProvider &path_provider)
+    : m_path_provider(path_provider), m_game_context(m_game_resources),
+      m_scene_manager(m_game_context) {}
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> Engine::StartUp() {
   // Load resource data via FlatbuffersDataLoader
-  FlatbuffersDataLoader data_loader;
+  FlatbuffersDataLoader data_loader(m_path_provider);
 
   // Get GameResourcesData from data loader
   auto engine_resource_result = data_loader.ProvideGameResourcesData();

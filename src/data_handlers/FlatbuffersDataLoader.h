@@ -30,9 +30,11 @@ class FlatbuffersDataLoader : public DataLoader {
 
 public:
   /////////////////////////////////////////////////
-  /// @brief Default constructor for FlatbuffersDataLoader
+  /// @brief Constructor taking a PathProvider reference
+  ///
+  /// @param path_provider Reference to a PathProvider implementation
   /////////////////////////////////////////////////
-  FlatbuffersDataLoader() = default;
+  explicit FlatbuffersDataLoader(const PathProvider &path_provider);
 
   /////////////////////////////////////////////////
   /// @brief Provides Fragment object based on the fragment name

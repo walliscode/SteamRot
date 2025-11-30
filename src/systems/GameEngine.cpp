@@ -7,8 +7,8 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-GameEngine::GameEngine()
-    : Engine(),
+GameEngine::GameEngine(const PathProvider &path_provider)
+    : Engine(path_provider),
       m_display_manager(m_game_resources.game_window, m_scene_manager) {}
 
 /////////////////////////////////////////////////

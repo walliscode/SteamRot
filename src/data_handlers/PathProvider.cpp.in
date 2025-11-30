@@ -1,110 +1,37 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Implementation of PathProvider class using std::expected and FailInfo
+/// @brief Implementation of PathProvider abstract class helper methods
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
 #include "PathProvider.h"
-#include <stdexcept>
 
 namespace steamrot {
 
 /////////////////////////////////////////////////
-EnvironmentType PathProvider::m_environment = EnvironmentType::None;
-
-/////////////////////////////////////////////////
-PathProvider::PathProvider(EnvironmentType env_type) {
-  // only allow None environment if it has already been set
-  if (env_type == EnvironmentType::None &&
-      m_environment == EnvironmentType::None) {
-    throw std::invalid_argument(
-        "Environment type cannot be None if environment has not been set. "
-        "Please intialise the PathProvider with a valid EnvironmentType.");
-
-    // allow for Test environment to be set multiple times, this allows for
-    // catch2 to run the GENERATE macro
-  } else if (env_type == EnvironmentType::Test &&
-             m_environment == EnvironmentType::Test) {
-    // DO NOTHING
-
-  } else if (env_type == EnvironmentType::Production &&
-             m_environment == EnvironmentType::None) {
-    // do nothing, this is the first time setting the environment
-  } else if (env_type != EnvironmentType::None &&
-             m_environment != EnvironmentType::None) {
-    throw std::runtime_error("PathProvider can only be initiated once.");
-  }
-  // dont overwrite the environment if it has already been set with None type
-  if (env_type != EnvironmentType::None)
-    m_environment = env_type;
+std::filesystem::path PathProvider::GetFragmentDirectory() const {
+  return GetDataDirectory() / "fragments";
 }
 
 /////////////////////////////////////////////////
-EnvironmentType PathProvider::GetEnvironment() const { return m_environment; }
-
-/////////////////////////////////////////////////
-std::expected<std::filesystem::path, FailInfo>
-PathProvider::GetDataDirectory() const {
-  switch (m_environment) {
-  case EnvironmentType::Test:
-    return std::filesystem::path{"@CMAKE_SOURCE_DIR@"} / "tests" / "data";
-  case EnvironmentType::Production:
-    return std::filesystem::path{"@CMAKE_SOURCE_DIR@"} / "data";
-  default:
-    return std::unexpected(
-        FailInfo(FailMode::EnvironmentNotSet, "Environment has not been set."));
-  }
+std::filesystem::path PathProvider::GetSceneDirectory() const {
+  return GetDataDirectory() / "scenes";
 }
 
 /////////////////////////////////////////////////
-std::expected<std::filesystem::path, FailInfo>
-PathProvider::GetFragmentDirectory() const {
-  auto dataDirResult = GetDataDirectory();
-  if (!dataDirResult.has_value()) {
-    return std::unexpected(dataDirResult.error());
-  }
-  return dataDirResult.value() / "fragments";
+std::filesystem::path PathProvider::GetAssetsDirectory() const {
+  return GetDataDirectory() / "assets";
 }
 
 /////////////////////////////////////////////////
-std::expected<std::filesystem::path, FailInfo>
-PathProvider::GetSceneDirectory() const {
-  auto data_dir_result = GetDataDirectory();
-  if (!data_dir_result.has_value()) {
-    return std::unexpected(data_dir_result.error());
-  }
-  return data_dir_result.value() / "scenes";
+std::filesystem::path PathProvider::GetFontsDirectory() const {
+  return GetAssetsDirectory() / "fonts";
 }
 
 /////////////////////////////////////////////////
-std::expected<std::filesystem::path, FailInfo>
-PathProvider::GetAssetsDirectory() const {
-  auto dataDirResult = GetDataDirectory();
-  if (!dataDirResult.has_value()) {
-    return std::unexpected(dataDirResult.error());
-  }
-  return dataDirResult.value() / "assets";
-}
-
-/////////////////////////////////////////////////
-std::expected<std::filesystem::path, FailInfo>
-PathProvider::GetFontsDirectory() const {
-  auto assetsDirResult = GetAssetsDirectory();
-  if (!assetsDirResult.has_value()) {
-    return std::unexpected(assetsDirResult.error());
-  }
-  return assetsDirResult.value() / "fonts";
-}
-
-/////////////////////////////////////////////////
-std::expected<std::filesystem::path, FailInfo>
-PathProvider::GetUIStylesDirectory() const {
-  auto dataDirResult = GetDataDirectory();
-  if (!dataDirResult.has_value()) {
-    return std::unexpected(dataDirResult.error());
-  }
-  return dataDirResult.value() / "ui_styles";
+std::filesystem::path PathProvider::GetUIStylesDirectory() const {
+  return GetDataDirectory() / "ui_styles";
 }
 } // namespace steamrot

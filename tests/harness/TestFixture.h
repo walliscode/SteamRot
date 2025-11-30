@@ -13,6 +13,7 @@
 #include "GameResources.h"
 #include "SceneContext.h"
 #include "SceneResources.h"
+#include "TestPaths.h"
 #include "entities_generated.h"
 #include "scene_change_packet_generated.h"
 #include <memory>
@@ -34,7 +35,7 @@ private:
   /////////////////////////////////////////////////
   /// @brief Preconfigured PathProvider for test environment.
   /////////////////////////////////////////////////
-  PathProvider path_provider{EnvironmentType::Test};
+  TestPaths m_test_paths;
 
   ////////////////////////////////////////////////////////////
   /// @brief Game-level resources owned by the fixture.
@@ -141,6 +142,13 @@ public:
   /// @return Reference to SceneContext
   ////////////////////////////////////////////////////////////
   SceneContext &GetSceneContext();
+
+  ////////////////////////////////////////////////////////////
+  /// @brief Get reference to TestPaths instance.
+  ///
+  /// @return Reference to TestPaths
+  ////////////////////////////////////////////////////////////
+  const TestPaths &GetTestPaths() const;
 };
 
 } // namespace steamrot::tests

@@ -7,5 +7,5 @@ GameContext::GameContext(GameResources &resources)
       event_handler(resources.event_handler),
       loop_number(resources.loop_number),
       mouse_position(resources.mouse_position),
-      asset_manager(resources.asset_manager), env_type(resources.env_type) {}
+      asset_manager(resources.asset_manager) {}
 } // namespace steamrot

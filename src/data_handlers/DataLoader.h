@@ -37,9 +37,9 @@ class DataLoader {
 
 protected:
 /////////////////////////////////////////////////
-  /// @brief member variable to hold the path provider instance
+  /// @brief Reference to the path provider instance
 /////////////////////////////////////////////////
-  PathProvider m_path_provider;
+  const PathProvider &m_path_provider;
 
 /////////////////////////////////////////////////
   /// \brief load binary data from file and return as vector of chars
@@ -51,9 +51,11 @@ public:
   virtual ~DataLoader() = default;
 
 /////////////////////////////////////////////////
-  /// @brief Default constructor
+  /// @brief Constructor taking a PathProvider reference
+  ///
+  /// @param path_provider Reference to a PathProvider implementation
 /////////////////////////////////////////////////
-  DataLoader() = default;
+  explicit DataLoader(const PathProvider &path_provider);
 
 /////////////////////////////////////////////////
   /// @brief Provide a Fragment object given its name

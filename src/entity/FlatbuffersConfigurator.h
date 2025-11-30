@@ -17,6 +17,7 @@
 #include "EventHandler.h"
 #include "FailInfo.h"
 #include "FlatbuffersDataLoader.h"
+#include "PathProvider.h"
 #include "containers.h"
 #include "grimoire_machina_generated.h"
 #include "ui_state_generated.h"
@@ -81,8 +82,10 @@ public:
   /// @brief Constructor for FlatbuffersConfigurator
   ///
   /// @param event_handler Gamewide EventHandler reference
+  /// @param path_provider Reference to PathProvider for data loading
   /////////////////////////////////////////////////
-  FlatbuffersConfigurator(EventHandler &event_handler);
+  FlatbuffersConfigurator(EventHandler &event_handler,
+                          const PathProvider &path_provider);
 
   /////////////////////////////////////////////////
   /// @brief Configure the default entities based on the SceneType

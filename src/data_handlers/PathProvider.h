@@ -1,6 +1,7 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of PathProvider class with std::expected and FailInfo
+/// @brief Declaration of PathProvider abstract class with std::expected and
+/// FailInfo
 /////////////////////////////////////////////////
 
 #pragma once
@@ -11,75 +12,59 @@
 
 namespace steamrot {
 
-enum class EnvironmentType {
-  None = 0,
-  Test,
-  Production,
-};
-
 /////////////////////////////////////////////////
 /// @class PathProvider
-/// @brief Provide paths for data files, with error handling via std::expected
+/// @brief Abstract base class to provide paths for data files, with error
+/// handling via std::expected
 ///
+/// Derived classes (TestPaths and GamePaths) implement GetDataDirectory()
+/// to return the appropriate base path for test or production environments.
 /////////////////////////////////////////////////
 class PathProvider {
 
-private:
-/////////////////////////////////////////////////
-  /// @brief Environment type to determine the base path
-/////////////////////////////////////////////////
-  static EnvironmentType m_environment;
-
 public:
-/////////////////////////////////////////////////
-  /// @brief Constructor for PathProvider taking an environment type
-  ///
-  /// @param env_type Environment type enum to determine the base path
-/////////////////////////////////////////////////
-  PathProvider(EnvironmentType env_type = EnvironmentType::None);
+  /////////////////////////////////////////////////
+  /// @brief Virtual destructor for proper cleanup of derived classes
+  /////////////////////////////////////////////////
+  virtual ~PathProvider() = default;
 
-/////////////////////////////////////////////////
-  /// @brief Gets the current environment type
-  ///
-  /// @return EnvironmentType
-/////////////////////////////////////////////////
-  EnvironmentType GetEnvironment() const;
-
-/////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   /// @brief Provides top level data directory path
   ///
-  /// @return std::expected<std::filesystem::path, FailInfo>
-/////////////////////////////////////////////////
-  std::expected<std::filesystem::path, FailInfo> GetDataDirectory() const;
+  /// Pure virtual method - must be implemented by derived classes
+  ///
+  /// @return std::filesystem::path The base data directory path
+  /////////////////////////////////////////////////
+  virtual std::filesystem::path GetDataDirectory() const = 0;
 
-/////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   /// @brief Provides the path to the fragments directory
   ///
-  /// @return std::expected<std::filesystem::path, FailInfo>
-/////////////////////////////////////////////////
-  std::expected<std::filesystem::path, FailInfo> GetFragmentDirectory() const;
+  /// @return std::filesystem::path
+  /////////////////////////////////////////////////
+  std::filesystem::path GetFragmentDirectory() const;
 
-/////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   /// @brief Provides the path to the scenes directory
   ///
-  /// @return std::expected<std::filesystem::path, FailInfo>
-/////////////////////////////////////////////////
-  std::expected<std::filesystem::path, FailInfo> GetSceneDirectory() const;
+  /// @return std::filesystem::path
+  /////////////////////////////////////////////////
+  std::filesystem::path GetSceneDirectory() const;
 
-/////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   /// @brief Provides the path to the assets directory
-/////////////////////////////////////////////////
-  std::expected<std::filesystem::path, FailInfo> GetAssetsDirectory() const;
+  /////////////////////////////////////////////////
+  std::filesystem::path GetAssetsDirectory() const;
 
-/////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   /// @brief Provides the path to the fonts directory
-/////////////////////////////////////////////////
-  std::expected<std::filesystem::path, FailInfo> GetFontsDirectory() const;
+  /////////////////////////////////////////////////
+  std::filesystem::path GetFontsDirectory() const;
 
-/////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   /// @brief Provides the path to the ui_styles directory
-/////////////////////////////////////////////////
-  std::expected<std::filesystem::path, FailInfo> GetUIStylesDirectory() const;
+  /////////////////////////////////////////////////
+  std::filesystem::path GetUIStylesDirectory() const;
 };
 
 } // namespace steamrot

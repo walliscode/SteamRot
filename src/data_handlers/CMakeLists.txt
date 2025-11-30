@@ -5,11 +5,23 @@ PathProvider.cpp.in
 PathProvider.cpp
 @ONLY)
 
+configure_file(
+TestPaths.cpp.in
+TestPaths.cpp
+@ONLY)
+
+configure_file(
+GamePaths.cpp.in
+GamePaths.cpp
+@ONLY)
+
 add_library(data_handlers
   DataLoader.cpp
   DefaultSceneDataSource.cpp
   FlatbuffersDataLoader.cpp
   PathProvider.cpp
+  TestPaths.cpp
+  GamePaths.cpp
 )
 
 target_include_directories(data_handlers
