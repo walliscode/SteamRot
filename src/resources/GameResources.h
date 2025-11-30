@@ -27,6 +27,8 @@ namespace steamrot {
 /// be configured via ConfigureGameResources free function.
 /////////////////////////////////////////////////
 struct GameResources {
+  GameResources(const PathProvider &path_provider)
+      : asset_manager(path_provider) {}
   /////////////////////////////////////////////////
   /// @brief The game window.
   ///

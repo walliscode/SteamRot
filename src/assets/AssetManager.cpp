@@ -23,19 +23,14 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-void AssetManager::SetPathProvider(const PathProvider &path_provider) {
-  m_path_provider = &path_provider;
-}
+AssetManager::AssetManager(const PathProvider &path_provider)
+    : m_path_provider(path_provider) {}
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> AssetManager::LoadDefaultAssets() {
-  if (!m_path_provider) {
-    return std::unexpected<FailInfo>(
-        {FailMode::NullPointer, "PathProvider not set in AssetManager"});
-  }
 
   // provide Asset configuration data (not the Assets themselves)
-  FlatbuffersDataLoader fb_data_loader(*m_path_provider);
+  FlatbuffersDataLoader fb_data_loader(m_path_provider);
 
   auto asset_config_result = fb_data_loader.ProvideAssetData();
   if (!asset_config_result.has_value())
@@ -81,13 +76,9 @@ std::expected<std::monostate, FailInfo> AssetManager::LoadDefaultAssets() {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 AssetManager::LoadSceneAssets(const SceneType &scene_type) {
-  if (!m_path_provider) {
-    return std::unexpected<FailInfo>(
-        {FailMode::NullPointer, "PathProvider not set in AssetManager"});
-  }
 
   // provide Asset configuration data (not the Assets themselves)
-  FlatbuffersDataLoader fb_data_loader(*m_path_provider);
+  FlatbuffersDataLoader fb_data_loader(m_path_provider);
 
   auto asset_config_result = fb_data_loader.ProvideAssetData(scene_type);
   if (!asset_config_result.has_value())
@@ -105,13 +96,9 @@ AssetManager::LoadSceneAssets(const SceneType &scene_type) {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 AssetManager::AddFont(const std::string &font_name) {
-  if (!m_path_provider) {
-    return std::unexpected<FailInfo>(
-        {FailMode::NullPointer, "PathProvider not set in AssetManager"});
-  }
 
   // get font directory
-  std::filesystem::path font_dir = m_path_provider->GetFontsDirectory();
+  std::filesystem::path font_dir = m_path_provider.GetFontsDirectory();
 
   // generate full font file name, we are baking in .tff files here. can be
   // changed
@@ -155,16 +142,13 @@ AssetManager::AddFont(const std::string &font_name) {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 AssetManager::LoadUIStyles(std::vector<std::string> &style_names) {
-  if (!m_path_provider) {
-    return std::unexpected<FailInfo>(
-        {FailMode::NullPointer, "PathProvider not set in AssetManager"});
-  }
 
   // create StylesConfigurator object
   StylesConfigurator styles_configurator;
   // provide map of UIStyles
-  auto ui_styles_map_result =
-      styles_configurator.ProvideUIStylesMap(*this, *m_path_provider, style_names);
+  auto ui_styles_map_result = styles_configurator.ProvideUIStylesMap(
+      *this, m_path_provider, style_names);
+
   if (!ui_styles_map_result.has_value()) {
     return std::unexpected<FailInfo>(ui_styles_map_result.error());
   }

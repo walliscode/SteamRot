@@ -3,13 +3,17 @@
 /////////////////////////////////////////////////
 
 #include "GameEngine.h"
+#include "GamePaths.h"
 
 namespace steamrot {
 
 /////////////////////////////////////////////////
-GameEngine::GameEngine(const PathProvider &path_provider)
-    : Engine(path_provider),
-      m_display_manager(m_game_resources.game_window, m_scene_manager) {}
+GameEngine::GameEngine()
+    : m_display_manager(m_game_resources.game_window, m_scene_manager) {
+
+  // set the PathProvider to the Game one
+  m_path_provider_ptr = std::make_unique<GamePaths>();
+}
 
 /////////////////////////////////////////////////
 void GameEngine::ExecuteSceneLevelLogic() {

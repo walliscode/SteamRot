@@ -13,15 +13,15 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-Engine::Engine(const PathProvider &path_provider)
-    : m_path_provider(path_provider),
-      m_game_context(m_game_resources, m_path_provider),
+Engine::Engine()
+    : m_game_resources(*m_path_provider_ptr),
+      m_game_context(m_game_resources, *m_path_provider_ptr),
       m_scene_manager(m_game_context) {}
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> Engine::StartUp() {
   // Load resource data via FlatbuffersDataLoader
-  FlatbuffersDataLoader data_loader(m_path_provider);
+  FlatbuffersDataLoader data_loader(*m_path_provider_ptr);
 
   // Get GameResourcesData from data loader
   auto engine_resource_result = data_loader.ProvideGameResourcesData();
@@ -35,9 +35,6 @@ std::expected<std::monostate, FailInfo> Engine::StartUp() {
   if (!configure_resources_result) {
     return std::unexpected(configure_resources_result.error());
   }
-
-  // Set the PathProvider for the AssetManager before loading assets
-  m_game_resources.asset_manager.SetPathProvider(m_path_provider);
 
   auto load_engine_data_result = data_loader.ProvideEngineData();
   if (!load_engine_data_result) {

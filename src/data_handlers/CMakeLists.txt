@@ -17,7 +17,6 @@ GamePaths.cpp
 
 add_library(data_handlers
   DataLoader.cpp
-  DefaultSceneDataSource.cpp
   FlatbuffersDataLoader.cpp
   PathProvider.cpp
   TestPaths.cpp

@@ -19,6 +19,7 @@
 #include "PathProvider.h"
 #include "SceneManager.h"
 #include <expected>
+#include <memory>
 #include <variant>
 
 namespace steamrot {
@@ -38,9 +39,9 @@ namespace steamrot {
 class Engine {
 protected:
   /////////////////////////////////////////////////
-  /// @brief Reference to the path provider for data loading
+  /// @brief
   /////////////////////////////////////////////////
-  const PathProvider &m_path_provider;
+  std::unique_ptr<PathProvider> m_path_provider_ptr;
 
   /////////////////////////////////////////////////
   /// @brief Game-level resources (window, event handler, asset manager, etc.)
@@ -133,7 +134,7 @@ public:
   ///
   /// @param path_provider Reference to a PathProvider implementation
   /////////////////////////////////////////////////
-  explicit Engine(const PathProvider &path_provider);
+  explicit Engine();
 
   /////////////////////////////////////////////////
   /// @brief Virtual destructor for proper cleanup.

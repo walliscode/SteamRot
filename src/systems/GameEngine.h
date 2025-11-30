@@ -52,7 +52,7 @@ public:
   ///
   /// @param path_provider Reference to a PathProvider implementation
   /////////////////////////////////////////////////
-  explicit GameEngine(const PathProvider &path_provider);
+  GameEngine();
 };
 
 } // namespace steamrot
