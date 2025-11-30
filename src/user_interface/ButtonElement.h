@@ -30,6 +30,18 @@ struct ButtonElement : public UIElement {
   std::string label{"unlabelled"};
 
 /////////////////////////////////////////////////
+  /// @brief Create a deep copy of this ButtonElement
+  ///
+  /// @return A new unique_ptr to a cloned ButtonElement
+/////////////////////////////////////////////////
+  std::unique_ptr<UIElement> Clone() const override {
+    auto cloned = std::make_unique<ButtonElement>();
+    CloneBaseUIElementData(*cloned);
+    cloned->label = label;
+    return cloned;
+  }
+
+/////////////////////////////////////////////////
   /// @brief Draws the ButtonElement on a RenderTexture
   ///
   /// @param texture Reference to the RenderTexture to draw on

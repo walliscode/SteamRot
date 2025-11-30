@@ -28,6 +28,19 @@ struct DropDownItemElement : public UIElement {
   std::string value{"value..."};
 
 /////////////////////////////////////////////////
+  /// @brief Create a deep copy of this DropDownItemElement
+  ///
+  /// @return A new unique_ptr to a cloned DropDownItemElement
+/////////////////////////////////////////////////
+  std::unique_ptr<UIElement> Clone() const override {
+    auto cloned = std::make_unique<DropDownItemElement>();
+    CloneBaseUIElementData(*cloned);
+    cloned->label = label;
+    cloned->value = value;
+    return cloned;
+  }
+
+/////////////////////////////////////////////////
   /// @brief Draws the DropDownItemElement on a RenderTexture
   ///
   /// @param texture Reference to the RenderTexture to draw on
