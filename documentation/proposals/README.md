@@ -4,6 +4,27 @@ This directory contains design proposals for new features or significant changes
 
 ## Active Proposals
 
+### [EntityMemoryPool Copyability](ENTITY_MEMORY_POOL_COPYABILITY.md)
+
+**Status**: Proposal  
+**Date**: 2025-11-30  
+**Type**: Design Decision
+
+**Summary**: Addresses the non-copyability of EntityMemoryPool due to `std::unique_ptr` members in CUserInterface and CGrimoireMachina. Proposes implementing the Clone method pattern to enable deep copying of the polymorphic UIElement hierarchy.
+
+**Key Points**:
+1. UIElement and derived types need Clone() method for polymorphic copying
+2. CUserInterface and CGrimoireMachina need copy constructor/assignment operators
+3. Enables tick-by-tick comparison testing
+4. Prepares codebase for future state snapshot features
+
+**Implementation Complexity**: Low to Medium
+- Add Clone() to 7 UIElement types
+- Add copy semantics to 2 components
+- ~6 hours estimated effort
+
+---
+
 ### [Unified Tick Architecture](UNIFIED_TICK_ARCHITECTURE.md)
 
 **Status**: Proposal  

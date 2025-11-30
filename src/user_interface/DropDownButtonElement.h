@@ -22,6 +22,18 @@ struct DropDownButtonElement : public UIElement {
   bool is_expanded{false};
 
 /////////////////////////////////////////////////
+  /// @brief Create a deep copy of this DropDownButtonElement
+  ///
+  /// @return A new unique_ptr to a cloned DropDownButtonElement
+/////////////////////////////////////////////////
+  std::unique_ptr<UIElement> Clone() const override {
+    auto cloned = std::make_unique<DropDownButtonElement>();
+    CloneBaseUIElementData(*cloned);
+    cloned->is_expanded = is_expanded;
+    return cloned;
+  }
+
+/////////////////////////////////////////////////
   /// @brief Draws the DropDownButtonElement on a RenderTexture
   ///
   /// @param texture Reference to the RenderTexture to draw on
