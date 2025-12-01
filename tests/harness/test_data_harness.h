@@ -14,10 +14,8 @@
 /////////////////////////////////////////////////
 #include "EventHandler.h"
 #include "FailInfo.h"
-#include "TestFixture.h"
 #include "containers.h"
 #include "entities_generated.h"
-#include "test_context.h"
 #include "test_data_generated.h"
 #include <expected>
 #include <variant>
@@ -53,23 +51,6 @@ LoadTestDataConfigsImpl(const char *source_file_path);
 /// @return Vector of TestDataConfig pointers or FailInfo on error
 /////////////////////////////////////////////////
 #define load_test_data_configs() LoadTestDataConfigsImpl(__FILE__)
-
-/////////////////////////////////////////////////
-/// @brief Create and configure TestFixture from test data configuration
-///
-/// This function creates a TestFixture and configures it based on the
-/// test data configuration. The fixture will have entities populated from
-/// start_data_collection if present.
-///
-/// This is called at the beginning of test execution, before any ticks run.
-///
-/// @param config The test data configuration
-/// @param scene_type The scene type for the fixture (default: SceneType_TEST)
-/// @return Configured TestFixture or FailInfo on error
-/////////////////////////////////////////////////
-std::expected<TestFixture, FailInfo> CreateFixtureFromTestData(
-    const TestDataConfig *config,
-    const SceneType &scene_type = SceneType::SceneType_TEST);
 
 /////////////////////////////////////////////////
 /// @brief Wrapper function for EntityMemoryPool comparison with

@@ -12,7 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FailInfo.h"
-#include "TestFixture.h"
+
 #include "test_data_generated.h"
 #include <expected>
 
@@ -62,7 +62,7 @@ ExecuteSingleTick(uint32_t tick, const TestDataConfig *config,
 /// Otherwise, returns 1 (single tick execution).
 ///
 /// Note: This function ONLY uses the TestDataConfig level num_ticks field.
-/// It does NOT auto-detect from input_sequence, event_sequence, or 
+/// It does NOT auto-detect from input_sequence, event_sequence, or
 /// simulation_data()->num_ticks(). Those fields are not consulted.
 ///
 /// @param config Test data configuration
@@ -77,7 +77,8 @@ uint32_t DetermineNumTicks(const TestDataConfig *config);
 /// executing inputs, events, and simulation steps at each tick.
 ///
 /// Note: Tick numbering is 1-based to mimic the game loop. The setup phase
-/// (TestFixture::Initialize) occurs before tick 1. Ticks run from 1 to num_ticks.
+/// (TestFixture::Initialize) occurs before tick 1. Ticks run from 1 to
+/// num_ticks.
 ///
 /// Execution order per tick:
 /// 1. Execute inputs scheduled for this tick

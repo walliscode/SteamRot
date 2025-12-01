@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "TestEngine.h"
-#include "TestPaths.h"
 #include "simulation_runner.h"
 #include <iostream>
 
@@ -15,8 +14,7 @@ namespace steamrot::tests {
 
 /////////////////////////////////////////////////
 TestEngine::TestEngine(const TestDataConfig *config)
-    : Engine(), m_test_config(config) {
-}
+    : Engine(), m_test_config(config) {}
 
 /////////////////////////////////////////////////
 void TestEngine::RunGameLoop() {
