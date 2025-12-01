@@ -79,12 +79,18 @@ The `@CMAKE_SOURCE_DIR@` placeholder is substituted at configure time.
    };
    ```
 
+4. **Test-Time Setter** (used in tests)
+   ```cpp
+   // Tests use a setter pattern to inject TestPaths after construction
+   asset_manager.SetPathProvider(test_paths);
+   ```
+
 ## Current Bug Identified
 
 In `Engine.cpp`:
 ```cpp
 Engine::Engine()
-    : m_game_resources(*m_path_provider_ptr),       // ← m_path_provider_ptr is nullptr here!
+    : m_game_resources(*m_path_provider_ptr),       // <- m_path_provider_ptr is nullptr here!
       m_game_context(m_game_resources, *m_path_provider_ptr),
       m_scene_manager(m_game_context) {}
 ```
