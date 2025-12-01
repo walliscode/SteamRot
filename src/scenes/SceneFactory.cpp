@@ -69,11 +69,9 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type,
   }
 
   // Configure SceneResources from FlatBuffers data
+  // Note: GameResourcesData is already loaded in Engine::StartUp() - we only
+  // need scene-specific resources here
   FlatbuffersDataLoader data_loader;
-  auto game_resources_result = data_loader.ProvideGameResourcesData();
-  if (!game_resources_result) {
-    return std::unexpected(game_resources_result.error());
-  }
 
   auto scene_resources_result =
       data_loader.ProvideSceneResourcesData(scene_type);

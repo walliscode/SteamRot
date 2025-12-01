@@ -10,10 +10,11 @@
 #include "CGrimoireMachinaEqualsMatcher.h"
 #include "CMachinaFormEqualsMatcher.h"
 #include "CMetaEqualsMatcher.h"
-#include "conmat.h"
-#include "containers.h"
 #include "CUIStateEqualsMatcher.h"
 #include "CUserInterfaceEqualsMatcher.h"
+#include "conmat.h"
+#include "containers.h"
+#include "entity_memory.h"
 #include <catch2/catch_test_macros.hpp>
 
 namespace steamrot::tests {
@@ -160,7 +161,8 @@ EntityMemoryPoolEqualsMatcher::EntityMemoryPoolEqualsMatcher(
     : m_expected(expected), m_test_metadata(""), m_context(context) {}
 
 /////////////////////////////////////////////////
-bool EntityMemoryPoolEqualsMatcher::match(const EntityMemoryPool &actual) const {
+bool EntityMemoryPoolEqualsMatcher::match(
+    const EntityMemoryPool &actual) const {
   m_mismatch_description.clear();
   std::ostringstream oss;
 
