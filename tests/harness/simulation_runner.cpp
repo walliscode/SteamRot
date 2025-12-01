@@ -238,16 +238,4 @@ ExecuteSimulation(const SimulationData *simulation_data,
   return std::monostate{};
 }
 
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-ExecuteSimulationWithFixture(const SimulationData *simulation_data,
-                             TestFixture &fixture) {
-
-  // Get the SceneContext from the fixture
-  SceneContext &scene_context = fixture.GetSceneContext();
-
-  // Execute the simulation
-  return ExecuteSimulation(simulation_data, scene_context);
-}
-
 } // namespace steamrot::tests

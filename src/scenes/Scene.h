@@ -162,8 +162,9 @@ public:
   const SceneInfo GetSceneInfo() const;
 
   /////////////////////////////////////////////////
-  /// @brief Create and return a SceneContext for the Scene.
+  /// @brief Create and return a SceneContext object for the Scene.
   ///
+  /// This contains all the references needed for logic processing.
   /// @return a Scene specific SceneContext object
   /////////////////////////////////////////////////
   SceneContext GetSceneContext();

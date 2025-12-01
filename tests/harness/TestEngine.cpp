@@ -8,6 +8,8 @@
 /////////////////////////////////////////////////
 #include "TestEngine.h"
 #include "TestPaths.h"
+#include "simulation_runner.h"
+#include <iostream>
 
 namespace steamrot::tests {
 
@@ -41,5 +43,26 @@ void TestEngine::AddToDataBank(size_t tick) {}
 const std::unordered_map<size_t, std::vector<SceneInfo>> &
 TestEngine::GetDataBank() const {
   return m_data_bank;
+}
+
+/////////////////////////////////////////////////
+void TestEngine::ExecuteSceneLevelLogic() {
+
+  // cycle through scenes from SceneManager
+  for (auto &scene_pair : m_scene_manager.GetScenes()) {
+
+    // get scene
+    Scene &scene = *scene_pair.second;
+    // create SceneContext object, this only needs to live as long as the sim
+    // runner
+    SceneContext scene_context = scene.GetSceneContext();
+    // execute simulation using simulation runner
+    auto sim_result = ExecuteSimulation(m_simulation_data, scene_context);
+    if (!sim_result.has_value()) {
+      // log error
+      std::cerr << "Simulation execution failed: " << sim_result.error().message
+                << std::endl;
+    }
+  }
 }
 } // namespace steamrot::tests
