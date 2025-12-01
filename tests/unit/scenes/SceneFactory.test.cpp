@@ -9,7 +9,6 @@
 #include "SceneFactory.h"
 #include "CraftingScene.h"
 #include "TestFixture.h"
-#include "TestPaths.h"
 #include "TitleScene.h"
 #include "scene_test_helpers.h"
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -35,8 +34,7 @@ TEST_CASE("SceneFactory can create a TitleScene from default",
 
   // create a TitleScene
   auto scene_creation_result = scene_factory.CreateDefaultScene(
-      scene_type, test_fixture.GetGameContext(),
-      test_fixture.GetTestPaths());
+      scene_type, test_fixture.GetGameContext());
 
   if (!scene_creation_result.has_value()) {
     FAIL("Scene creation failed: " + scene_creation_result.error().message);
@@ -59,8 +57,7 @@ TEST_CASE("SceneFactory can create a CraftingScene from default",
   steamrot::SceneFactory scene_factory;
   // create a CraftingScene
   auto scene_creation_result = scene_factory.CreateDefaultScene(
-      steamrot::SceneType::SceneType_CRAFTING, test_fixture.GetGameContext(),
-      test_fixture.GetTestPaths());
+      steamrot::SceneType::SceneType_CRAFTING, test_fixture.GetGameContext());
   if (!scene_creation_result.has_value()) {
     FAIL("Scene creation failed: " + scene_creation_result.error().message);
   }

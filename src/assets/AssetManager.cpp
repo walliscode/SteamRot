@@ -9,9 +9,9 @@
 #include "AssetManager.h"
 #include "FailInfo.h"
 #include "FlatbuffersDataLoader.h"
-#include "PathProvider.h"
 #include "StylesConfigurator.h"
 #include "assets_generated.h"
+#include "paths.h"
 #include <SFML/Graphics/Font.hpp>
 #include <expected>
 #include <filesystem>
@@ -23,14 +23,10 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-AssetManager::AssetManager(const PathProvider &path_provider)
-    : m_path_provider(path_provider) {}
-
-/////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> AssetManager::LoadDefaultAssets() {
 
   // provide Asset configuration data (not the Assets themselves)
-  FlatbuffersDataLoader fb_data_loader(m_path_provider);
+  FlatbuffersDataLoader fb_data_loader;
 
   auto asset_config_result = fb_data_loader.ProvideAssetData();
   if (!asset_config_result.has_value())
@@ -78,7 +74,7 @@ std::expected<std::monostate, FailInfo>
 AssetManager::LoadSceneAssets(const SceneType &scene_type) {
 
   // provide Asset configuration data (not the Assets themselves)
-  FlatbuffersDataLoader fb_data_loader(m_path_provider);
+  FlatbuffersDataLoader fb_data_loader;
 
   auto asset_config_result = fb_data_loader.ProvideAssetData(scene_type);
   if (!asset_config_result.has_value())
@@ -98,7 +94,7 @@ std::expected<std::monostate, FailInfo>
 AssetManager::AddFont(const std::string &font_name) {
 
   // get font directory
-  std::filesystem::path font_dir = m_path_provider.GetFontsDirectory();
+  std::filesystem::path font_dir = paths::GetFontsDirectory();
 
   // generate full font file name, we are baking in .tff files here. can be
   // changed
@@ -147,7 +143,7 @@ AssetManager::LoadUIStyles(std::vector<std::string> &style_names) {
   StylesConfigurator styles_configurator;
   // provide map of UIStyles
   auto ui_styles_map_result = styles_configurator.ProvideUIStylesMap(
-      *this, m_path_provider, style_names);
+      *this, style_names);
 
   if (!ui_styles_map_result.has_value()) {
     return std::unexpected<FailInfo>(ui_styles_map_result.error());

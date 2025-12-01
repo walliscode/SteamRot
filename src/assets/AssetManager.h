@@ -12,7 +12,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FailInfo.h"
-#include "PathProvider.h"
 #include "UIStyle.h"
 #include "scene_change_packet_generated.h"
 #include <SFML/Graphics.hpp>
@@ -38,8 +37,6 @@ private:
   /////////////////////////////////////////////////
   std::unordered_map<std::string, UIStyle> m_ui_styles;
 
-  const PathProvider &m_path_provider;
-
   /////////////////////////////////////////////////
   /// @brief Adds a single font to the Font map in the AssetManager
   ///
@@ -48,7 +45,7 @@ private:
   std::expected<std::monostate, FailInfo> AddFont(const std::string &font_name);
 
 public:
-  AssetManager(const PathProvider &path_provider);
+  AssetManager() = default;
 
   /////////////////////////////////////////////////
   /// @brief Load all the default assets for the game, independent of scene

@@ -10,7 +10,6 @@
 #include "EventHandler.h"
 #include "FailInfo.h"
 #include "FlatbuffersConfigurator.h"
-#include "PathProvider.h"
 #include "containers.h"
 #include "entity_memory.h"
 #include <expected>
@@ -63,13 +62,12 @@ void EntityManager::ResizeEntityMemoryPool(const size_t pool_size) {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 EntityManager::ConfigureEntitiesFromDefaultData(
-    const SceneType scene_type, const DataType data_type,
-    const PathProvider &path_provider) {
+    const SceneType scene_type, const DataType data_type) {
 
   switch (data_type) {
   case DataType::Flatbuffers: {
 
-    FlatbuffersConfigurator configurator{m_event_handler, path_provider};
+    FlatbuffersConfigurator configurator{m_event_handler};
     auto configure_result = configurator.ConfigureEntitiesFromDefaultData(
         m_entity_memory_pool, scene_type);
     if (!configure_result.has_value())

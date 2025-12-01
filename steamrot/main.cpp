@@ -1,5 +1,4 @@
 #include "GameEngine.h"
-#include "GamePaths.h"
 #include "spdlog/spdlog.h"
 #include <iostream>
 int main() {
@@ -7,8 +6,7 @@ int main() {
 
   // wrap the whole game engine in a try-catch block to catch any exceptions
   try {
-    steamrot::GamePaths game_paths;
-    steamrot::GameEngine steam_rot(game_paths);
+    steamrot::GameEngine steam_rot;
     steam_rot.RunGame();
 
   } catch (const std::exception &e) {

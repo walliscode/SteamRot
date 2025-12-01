@@ -7,7 +7,6 @@
 #include "AssetManager.h"
 #include "EventHandler.h"
 #include "GameResources.h"
-#include "PathProvider.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Vector2.hpp>
 
@@ -15,7 +14,7 @@ namespace steamrot {
 struct GameContext {
   GameContext() = delete;
 
-  GameContext(GameResources &resources, const PathProvider &path_provider);
+  GameContext(GameResources &resources);
 
 /////////////////////////////////////////////////
   /// @brief Reference to the GameResources this context was created from.
@@ -49,10 +48,5 @@ struct GameContext {
   /// should only be one instance of this.
 /////////////////////////////////////////////////
   AssetManager &asset_manager;
-
-/////////////////////////////////////////////////
-  /// @brief Reference to the PathProvider for data loading.
-/////////////////////////////////////////////////
-  const PathProvider &path_provider;
 };
 } // namespace steamrot

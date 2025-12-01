@@ -12,10 +12,6 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-DataLoader::DataLoader(const PathProvider &path_provider)
-    : m_path_provider(path_provider) {}
-
-/////////////////////////////////////////////////
 char *DataLoader::LoadBinaryData(const std::filesystem::path &file_path) const {
 
   // open file in binary mode

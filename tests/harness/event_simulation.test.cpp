@@ -12,7 +12,6 @@
 
 TEST_CASE("execute_event_test_data handles null event data",
           "[unit][harness][event_simulation]") {
-  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 
@@ -23,7 +22,6 @@ TEST_CASE("execute_event_test_data handles null event data",
 
 TEST_CASE("execute_events_for_tick handles null sequence",
           "[unit][harness][event_simulation]") {
-  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 
@@ -36,7 +34,6 @@ TEST_CASE("execute_events_for_tick handles null sequence",
 
 TEST_CASE("execute_event_sequence handles null sequence",
           "[unit][harness][event_simulation]") {
-  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 
@@ -47,7 +44,6 @@ TEST_CASE("execute_event_sequence handles null sequence",
 
 TEST_CASE("execute_event_sequence handles empty sequence",
           "[unit][harness][event_simulation]") {
-  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 
@@ -66,7 +62,6 @@ TEST_CASE("execute_event_sequence handles empty sequence",
 
 TEST_CASE("execute_event_test_data adds event to waiting room",
           "[unit][harness][event_simulation]") {
-  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 
@@ -104,7 +99,6 @@ TEST_CASE("execute_event_test_data adds event to waiting room",
 
 TEST_CASE("execute_events_for_tick processes only specified tick",
           "[unit][harness][event_simulation]") {
-  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 
@@ -165,7 +159,6 @@ TEST_CASE("execute_events_for_tick processes only specified tick",
 
 TEST_CASE("execute_event_sequence processes all ticks in order",
           "[unit][harness][event_simulation]") {
-  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 

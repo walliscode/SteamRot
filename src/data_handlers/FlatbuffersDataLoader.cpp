@@ -11,6 +11,7 @@
 #include "Fragment.h"
 #include "assets_generated.h"
 #include "fragments_generated.h"
+#include "paths.h"
 #include "scenes_generated.h"
 #include "ui_style_generated.h"
 #include <SFML/Graphics/PrimitiveType.hpp>
@@ -21,15 +22,11 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-FlatbuffersDataLoader::FlatbuffersDataLoader(const PathProvider &path_provider)
-    : DataLoader(path_provider) {}
-
-/////////////////////////////////////////////////
 std::expected<Fragment, FailInfo>
 FlatbuffersDataLoader::ProvideFragment(const std::string &fragment_name) const {
   // check if the bin file exists
   std::filesystem::path fragment_path =
-      m_path_provider.GetFragmentDirectory() /
+      paths::GetFragmentDirectory() /
       (fragment_name + ".fragment.bin");
 
   if (!std::filesystem::exists(fragment_path)) {
@@ -141,7 +138,7 @@ FlatbuffersDataLoader::ProvideAllFragments(
 std::expected<const GameEngineData *, FailInfo>
 FlatbuffersDataLoader::ProvideEngineData() const {
   // get data directory
-  std::filesystem::path data_dir = m_path_provider.GetDataDirectory();
+  std::filesystem::path data_dir = paths::GetDataDirectory();
 
   // construct the file path
   std::filesystem::path game_engine_path =
@@ -162,7 +159,7 @@ FlatbuffersDataLoader::ProvideEngineData() const {
 std::expected<const SceneManagerData *, FailInfo>
 FlatbuffersDataLoader::ProvideSceneManagerData() const {
   // get data directory
-  std::filesystem::path data_dir = m_path_provider.GetDataDirectory();
+  std::filesystem::path data_dir = paths::GetDataDirectory();
 
   // construct the file path
   std::filesystem::path scene_manager_path =
@@ -209,7 +206,7 @@ FlatbuffersDataLoader::ProvideSceneData(const SceneType scene_type) const {
   }
 
   // get the SceneDirectory
-  std::filesystem::path scene_dir = m_path_provider.GetSceneDirectory();
+  std::filesystem::path scene_dir = paths::GetSceneDirectory();
 
   // construct the file path
   std::filesystem::path scene_path =
@@ -235,7 +232,7 @@ std::expected<const AssetCollection *, FailInfo>
 FlatbuffersDataLoader::ProvideAssetData() const {
 
   // get the data directory
-  std::filesystem::path data_dir = m_path_provider.GetDataDirectory();
+  std::filesystem::path data_dir = paths::GetDataDirectory();
 
   // construct the file path
   std::filesystem::path asset_path =
@@ -285,7 +282,7 @@ std::expected<const UIStyleData *, FailInfo>
 FlatbuffersDataLoader::ProvideUIStylesData(
     const std::string &style_name) const {
   // get the UIStyleDirectory
-  std::filesystem::path ui_style_dir = m_path_provider.GetUIStylesDirectory();
+  std::filesystem::path ui_style_dir = paths::GetUIStylesDirectory();
 
   // construct the file path
   std::filesystem::path ui_style_path =
@@ -311,7 +308,7 @@ FlatbuffersDataLoader::ProvideUIStylesData(
 std::expected<const ContextData *, FailInfo>
 FlatbuffersDataLoader::ProvideContextData() const {
   // get data directory
-  std::filesystem::path data_dir = m_path_provider.GetDataDirectory();
+  std::filesystem::path data_dir = paths::GetDataDirectory();
 
   // construct the file path
   std::filesystem::path context_path =

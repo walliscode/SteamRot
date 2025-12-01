@@ -35,8 +35,7 @@ const uuids::uuid SceneFactory::CreateUUID() {
 /////////////////////////////////////////////////
 std::expected<std::unique_ptr<Scene>, FailInfo>
 SceneFactory::CreateDefaultScene(const SceneType &scene_type,
-                                 const GameContext &game_context,
-                                 const PathProvider &path_provider) {
+                                 const GameContext &game_context) {
 
   // generate UUID for the scene
   uuids::uuid scene_uuid = CreateUUID();
@@ -70,7 +69,7 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type,
   }
 
   // Configure SceneResources from FlatBuffers data
-  FlatbuffersDataLoader data_loader(path_provider);
+  FlatbuffersDataLoader data_loader;
   auto game_resources_result = data_loader.ProvideGameResourcesData();
   if (!game_resources_result) {
     return std::unexpected(game_resources_result.error());

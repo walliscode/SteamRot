@@ -7,16 +7,12 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "TestEngine.h"
-#include "TestPaths.h"
 
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
 TestEngine::TestEngine(const TestDataConfig *config)
     : Engine(), m_test_config(config) {
-
-  // set the PathProvider to the test one
-  m_path_provider_ptr = std::make_unique<TestPaths>();
 }
 
 /////////////////////////////////////////////////

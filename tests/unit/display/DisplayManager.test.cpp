@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "DisplayManager.h"
-#include "TestPaths.h"
 #include "SceneManager.h"
 #include "TestFixture.h"
 #include <catch2/catch_test_macros.hpp>
@@ -15,7 +14,6 @@
 
 TEST_CASE("DisplayManager Initializes with SceneManager", "[unit][DisplayManager]") {
 
-  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   std::cout << "TestFixture initialized successfully" << std::endl;
   steamrot::GameContext &game_context =
@@ -31,7 +29,6 @@ TEST_CASE("DisplayManager Initializes with SceneManager", "[unit][DisplayManager
 }
 
 TEST_CASE("DisplayManager Render Cycle", "[unit][DisplayManager]") {
-  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture test_context;
   steamrot::GameContext game_context =
       test_context
