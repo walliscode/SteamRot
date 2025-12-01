@@ -1,8 +1,4 @@
-
-
 namespace steamrot;
-
-
 
 table FontData {
     name: string (required);

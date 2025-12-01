@@ -1,10 +1,11 @@
 include "subscriber_data.fbs";
-
+include "scene_data.fbs";
 
 namespace steamrot; 
 
 table SceneManagerData {
 subscriptions: [SubscriberData];
+scene_data: [SceneData];
   }
 
 root_type SceneManagerData;

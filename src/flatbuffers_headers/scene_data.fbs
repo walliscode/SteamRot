@@ -1,17 +1,28 @@
 
 include "entities.fbs";
-include "logic_data.fbs";
 include "assets.fbs";
-
 include "resource_data.fbs";
 
 namespace steamrot; 
 
+enum SceneType: byte {
+  UNKNOWN = 0,
+  TEST = 1,
+  TITLE = 2,
+  CRAFTING = 3
+  }
+
+table SceneChangePacketData {
+  uuid: string ;
+  scene_type: SceneType ;
+}
+
 table SceneData{
     entity_collection: EntityCollection;
-    logic_collection_data: LogicCollectionData;
     assets: AssetCollection;
     scene_resources: SceneResourcesData;
+    scene_id: string;
+    scene_type: SceneType;
   }
 
 root_type SceneData;
