@@ -18,7 +18,7 @@
 #include "UICollisionLogic.h"
 #include "UIRenderLogic.h"
 #include "UIStateLogic.h"
-#include "scene_change_packet_generated.h"
+#include "logic_data_generated.h"
 #include <expected>
 #include <memory>
 #include <unordered_map>

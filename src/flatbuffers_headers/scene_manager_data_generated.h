@@ -30,8 +30,8 @@ struct SceneManagerData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>> *subscriptions() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>> *>(VT_SUBSCRIPTIONS);
   }
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SceneData>> *scene_data() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SceneData>> *>(VT_SCENE_DATA);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SceneDataData>> *scene_data() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SceneDataData>> *>(VT_SCENE_DATA);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -52,7 +52,7 @@ struct SceneManagerDataBuilder {
   void add_subscriptions(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>>> subscriptions) {
     fbb_.AddOffset(SceneManagerData::VT_SUBSCRIPTIONS, subscriptions);
   }
-  void add_scene_data(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SceneData>>> scene_data) {
+  void add_scene_data(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SceneDataData>>> scene_data) {
     fbb_.AddOffset(SceneManagerData::VT_SCENE_DATA, scene_data);
   }
   explicit SceneManagerDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
@@ -69,7 +69,7 @@ struct SceneManagerDataBuilder {
 inline ::flatbuffers::Offset<SceneManagerData> CreateSceneManagerData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>>> subscriptions = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SceneData>>> scene_data = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SceneDataData>>> scene_data = 0) {
   SceneManagerDataBuilder builder_(_fbb);
   builder_.add_scene_data(scene_data);
   builder_.add_subscriptions(subscriptions);
@@ -79,9 +79,9 @@ inline ::flatbuffers::Offset<SceneManagerData> CreateSceneManagerData(
 inline ::flatbuffers::Offset<SceneManagerData> CreateSceneManagerDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<::flatbuffers::Offset<steamrot::SubscriberData>> *subscriptions = nullptr,
-    const std::vector<::flatbuffers::Offset<steamrot::SceneData>> *scene_data = nullptr) {
+    const std::vector<::flatbuffers::Offset<steamrot::SceneDataData>> *scene_data = nullptr) {
   auto subscriptions__ = subscriptions ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::SubscriberData>>(*subscriptions) : 0;
-  auto scene_data__ = scene_data ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::SceneData>>(*scene_data) : 0;
+  auto scene_data__ = scene_data ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::SceneDataData>>(*scene_data) : 0;
   return steamrot::CreateSceneManagerData(
       _fbb,
       subscriptions__,

@@ -16,7 +16,7 @@
 #include "SceneInfoProvider.h"
 #include "Subscriber.h"
 #include "events_generated.h"
-#include "scene_manager_generated.h"
+#include "scene_manager_data_generated.h"
 #include "subscriber_data_generated.h"
 #include "uuid.h"
 #include <SFML/Graphics.hpp>

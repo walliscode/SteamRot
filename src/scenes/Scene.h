@@ -16,9 +16,8 @@
 #include "GameContext.h"
 #include "Logic.h"
 #include "LogicFactory.h"
-#include "SceneInfo.h"
+#include "SceneData.h"
 #include "SceneResources.h"
-#include "scene_change_packet_generated.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <unordered_map>

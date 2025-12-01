@@ -12,7 +12,6 @@
 #include "SceneContext.h"
 #include "SceneResources.h"
 #include "containers.h"
-#include "scene_change_packet_generated.h"
 
 namespace steamrot {
 

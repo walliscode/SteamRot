@@ -69,10 +69,10 @@ LoadTestDataConfigsImpl(const char *source_file_path);
 /// mismatch
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo> RunEntityMemoryPoolComparisonTest(
-    const EntityMemoryPool &actual_memory_pool,
-    const EntityCollection *expected_collection, TestFixture &fixture,
-    const TestContext &context, bool expected_to_pass = true);
+std::expected<std::monostate, FailInfo>
+RunEntityMemoryPoolComparisonTest(const EntityMemoryPool &actual_memory_pool,
+                                  const EntityCollection *expected_collection,
+                                  bool expected_to_pass = true);
 
 /////////////////////////////////////////////////
 /// @brief Wrapper function for EventBus comparison tests
@@ -89,7 +89,6 @@ std::expected<std::monostate, FailInfo> RunEntityMemoryPoolComparisonTest(
 /// mismatch
 /////////////////////////////////////////////////
 void RunEventBusComparisonTest(const EventBus &actual, const EventBus &expected,
-                               const TestContext &context,
                                bool expected_to_pass = true);
 
 /////////////////////////////////////////////////
@@ -114,10 +113,9 @@ void RunEventBusComparisonTest(const EventBus &actual, const EventBus &expected,
 /// mismatch
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-RunDataStructComparisonTest(const DataCollectionData *data_collection,
-                            TestFixture &fixture, const TestContext &context,
-                            bool expected_to_pass = true);
+std::expected<std::monostate, FailInfo> RunDataStructComparisonTest(
+
+    bool expected_to_pass = true);
 
 /////////////////////////////////////////////////
 /// @brief Wrapper function for data-driven testing with TestFixture

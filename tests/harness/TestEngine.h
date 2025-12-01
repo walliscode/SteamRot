@@ -18,7 +18,6 @@
 /////////////////////////////////////////////////
 
 #include "Engine.h"
-#include "SceneInfo.h"
 #include "simulation_generated.h"
 #include "test_data_generated.h"
 #include <unordered_map>

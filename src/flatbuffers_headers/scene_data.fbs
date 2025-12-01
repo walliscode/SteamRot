@@ -5,7 +5,7 @@ include "scene_types.fbs";
 
 namespace steamrot;
 
-table SceneData{
+table SceneDataData{
     entity_collection: EntityCollection;
     assets: AssetCollection;
     scene_resources: SceneResourcesData;
@@ -13,4 +13,4 @@ table SceneData{
     scene_type: SceneType;
   }
 
-root_type SceneData;
+root_type SceneDataData;
