@@ -232,7 +232,7 @@ auto scene_resources_result = data_loader.ProvideSceneResourcesData(scene_type);
 // Then FlatbuffersConfigurator loads the same file again:
 const SceneDataData *scene_data = 
     m_data_loader.ProvideDefaultSceneData(scene_type).value();
-// ❌ ProvideSceneResourcesData() internally calls ProvideDefaultSceneData()!
+// Note: ProvideSceneResourcesData() internally calls ProvideDefaultSceneData().
 ```
 
 ---
@@ -821,10 +821,12 @@ auto load_engine_data_result = data_loader.ProvideEngineData();
 if (!load_engine_data_result) {
   return std::unexpected(load_engine_data_result.error());
 }
-// Result is never used!
+// Result is never used.
 
-// FIX: Either use the data for something, or remove the call
-// If keeping, use it to configure subscriptions:
+// FIX OPTION 1: Remove the call entirely if data isn't needed
+
+// FIX OPTION 2: Use the data to configure Engine subscriptions
+// Note: Engine already has ConfigureSubscribersFromData() method (inherited)
 auto engine_data = load_engine_data_result.value();
 if (engine_data->subscriptions()) {
   auto sub_result = ConfigureSubscribersFromData(engine_data->subscriptions());
@@ -857,7 +859,10 @@ if (!game_resources_result) {
 auto scene_resources_result = data_loader.ProvideSceneResourcesData(scene_type);
 // Later, FlatbuffersConfigurator loads scene_data again
 
-// FIX: Load once and pass to configurator
+// PROPOSED FIX: Load once and pass to configurator
+// This would require adding a new overload to Scene::ConfigureFromDefault()
+// that accepts pre-loaded SceneDataData*
+
 auto scene_data_result = data_loader.ProvideDefaultSceneData(scene_type);
 if (!scene_data_result) {
   return std::unexpected(scene_data_result.error());
@@ -868,7 +873,9 @@ const SceneDataData* scene_data = scene_data_result.value();
 auto configure_resources_result = resources::ConfigureSceneResources(
     scene_ptr->m_scene_resources, scene_data->scene_resources());
 
-// Pass scene_data to entity configuration instead of reloading
+// PROPOSED: Add new method Scene::ConfigureFromData(const SceneDataData*)
+// that passes pre-loaded data to FlatbuffersConfigurator
+// Currently, ConfigureFromDefault() reloads the same file internally
 auto configure_result = scene_ptr->ConfigureFromData(scene_data);
 ```
 
