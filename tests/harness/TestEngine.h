@@ -19,6 +19,7 @@
 
 #include "Engine.h"
 #include "SceneInfo.h"
+#include "simulation_generated.h"
 #include "test_data_generated.h"
 #include <unordered_map>
 #include <vector>
@@ -47,6 +48,11 @@ private:
   /// @brief Test data configuration.
   /////////////////////////////////////////////////
   const TestDataConfig *m_test_config;
+
+  ////////////////////////////////////////////////
+  /// @brief Simulation data extracted from test configuration.
+  /////////////////////////////////////////////////
+  const SimulationData *m_simulation_data;
 
   /////////////////////////////////////////////////
   /// @brief Current tick execution level.

@@ -13,10 +13,8 @@
 /////////////////////////////////////////////////
 #include "FailInfo.h"
 #include "SceneContext.h"
-#include "TestFixture.h"
 #include "simulation_generated.h"
 #include <expected>
-#include <memory>
 
 namespace steamrot::tests {
 
@@ -32,8 +30,7 @@ namespace steamrot::tests {
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ExecuteSimulationStep(const SimulationStep *step,
-                      SceneContext &scene_context);
+ExecuteSimulationStep(const SimulationStep *step, SceneContext &scene_context);
 
 /////////////////////////////////////////////////
 /// @brief Execute a complete simulation sequence
@@ -48,19 +45,5 @@ ExecuteSimulationStep(const SimulationStep *step,
 std::expected<std::monostate, FailInfo>
 ExecuteSimulation(const SimulationData *simulation_data,
                   SceneContext &scene_context);
-
-/////////////////////////////////////////////////
-/// @brief Execute a complete simulation using a TestFixture
-///
-/// Convenience wrapper that extracts the SceneContext from a TestFixture
-/// and executes the simulation.
-///
-/// @param simulation_data The simulation configuration with steps
-/// @param fixture TestFixture containing the test environment
-/// @return std::monostate on success, FailInfo on error
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-ExecuteSimulationWithFixture(const SimulationData *simulation_data,
-                             TestFixture &fixture);
 
 } // namespace steamrot::tests
