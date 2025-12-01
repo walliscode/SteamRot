@@ -1,4 +1,6 @@
 {
+  "scene_id": "crafting",
+  "scene_type": "CRAFTING",
   "entity_collection": {
     "entity_memory_pool_size": 100,
     "entities": [
@@ -232,8 +234,6 @@
   },
 
   "assets": {},
-
-  "logic_collection_data": {},
 
   "scene_resources": {
     "render_texture_width": 800,

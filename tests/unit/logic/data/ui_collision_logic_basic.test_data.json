@@ -10,24 +10,6 @@
     "expected_to_pass": true,
     "version": 1
   },
-  "input_sequence": {
-    "description": "User moves mouse over UI element",
-    "inputs": [
-      {
-        "input_type": "MouseMove",
-        "input_data_type": "MouseInputData",
-        "input_data": {
-          "position": {
-            "x": 150.0,
-            "y": 125.0
-          },
-          "button": 0
-        },
-        "tick": 1,
-        "description": "Move mouse over UI element"
-      }
-    ]
-  },
   "simulation_data": {
     "description": "given a UI element, when checking for mouse over collision, then the collision is detected correctly",
     "steps": [
@@ -39,65 +21,105 @@
       }
     ]
   },
-  "start_data_collection": {
-    "entity_collection": {
-      "entity_memory_pool_size": 3,
-      "entities": [
+  "starting_engine_state": {
+    "scene_manager_data": {
+      "scene_data": [
         {
-          "index": 0,
-          "c_user_interface": {
-            "ui_name": "test_ui",
-            "is_visible": true,
-            "root_ui_element": {
-              "base_data": {
-                "position": {
-                  "x": 50,
-                  "y": 100
-                },
-                "size": {
-                  "x": 200,
-                  "y": 150
-                },
-                "children_active": false,
-                "children": [],
-                "layout": "Horizontal",
-                "spacing_strategy": "None"
+          "entity_collection": {
+            "entity_memory_pool_size": 3,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "test_ui",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 50,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 200,
+                        "y": 150
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
               }
-            }
-          }
+            ]
+          },
+          "scene_id": "test",
+          "scene_type": "TEST"
         }
       ]
     }
   },
-  "expected_data_collection": {
-    "entity_collection": {
-      "entity_memory_pool_size": 3,
-      "entities": [
+  "tick_snapshots": [
+    {
+      "tick": 1,
+      "input_sequence": [
         {
-          "index": 0,
-          "c_user_interface": {
-            "ui_name": "test_ui",
-            "is_visible": true,
-            "root_ui_element": {
-              "base_data": {
-                "position": {
-                  "x": 50,
-                  "y": 100
-                },
-                "size": {
-                  "x": 200,
-                  "y": 150
-                },
-                "children_active": false,
-                "children": [],
-                "is_mouse_over": true,
-                "layout": "Horizontal",
-                "spacing_strategy": "None"
-              }
-            }
-          }
+          "input_type": "MouseMove",
+          "input_data_type": "MouseInputData",
+          "input_data": {
+            "position": {
+              "x": 150.0,
+              "y": 125.0
+            },
+            "button": 0
+          },
+          "tick": 1,
+          "description": "Move mouse over UI element"
         }
       ]
+    },
+    {
+      "tick": 1,
+      "description": "Final expected state",
+      "engine_state": {
+        "scene_manager_data": {
+          "scene_data": [
+            {
+              "entity_collection": {
+                "entity_memory_pool_size": 3,
+                "entities": [
+                  {
+                    "index": 0,
+                    "c_user_interface": {
+                      "ui_name": "test_ui",
+                      "is_visible": true,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 50,
+                            "y": 100
+                          },
+                          "size": {
+                            "x": 200,
+                            "y": 150
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "is_mouse_over": true,
+                          "layout": "Horizontal",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              "scene_id": "test",
+              "scene_type": "TEST"
+            }
+          ]
+        }
+      }
     }
-  }
+  ]
 }

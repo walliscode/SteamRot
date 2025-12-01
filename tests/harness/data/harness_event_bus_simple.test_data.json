@@ -11,12 +11,20 @@
     "version": 1
   },
   "num_ticks": 1,
-  "start_data_collection": {
-    "entity_collection": {
-      "entity_memory_pool_size": 1,
-      "entities": []
+  "starting_engine_state": {
+    "scene_manager_data": {
+      "scene_data": [
+        {
+          "entity_collection": {
+            "entity_memory_pool_size": 1,
+            "entities": []
+          },
+          "scene_id": "test",
+          "scene_type": "TEST"
+        }
+      ]
     },
-    "event_bus": {
+    "global_event_bus_data": {
       "description": "Initial event bus with 1 event",
       "events": [
         {
@@ -27,20 +35,34 @@
       ]
     }
   },
-  "expected_data_collection": {
-    "entity_collection": {
-      "entity_memory_pool_size": 1,
-      "entities": []
-    },
-    "event_bus": {
-      "description": "Final event bus state after 1 tick (lifetime decremented)",
-      "events": [
-        {
-          "event_lifetime": 1,
-          "event_type": "EVENT_TEST",
-          "event_data_data_type": "NONE"
+  "tick_snapshots": [
+    {
+      "tick": 1,
+      "description": "Final expected state",
+      "engine_state": {
+        "scene_manager_data": {
+          "scene_data": [
+            {
+              "entity_collection": {
+                "entity_memory_pool_size": 1,
+                "entities": []
+              },
+              "scene_id": "test",
+              "scene_type": "TEST"
+            }
+          ]
+        },
+        "global_event_bus_data": {
+          "description": "Final event bus state after 1 tick (lifetime decremented)",
+          "events": [
+            {
+              "event_lifetime": 1,
+              "event_type": "EVENT_TEST",
+              "event_data_data_type": "NONE"
+            }
+          ]
         }
-      ]
+      }
     }
-  }
+  ]
 }

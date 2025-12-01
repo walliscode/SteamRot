@@ -10,16 +10,53 @@
     "version": 1
   },
   "num_ticks": 2,
+  "starting_engine_state": {
+    "scene_manager_data": {
+      "scene_data": [
+        {
+          "entity_collection": {
+            "entity_memory_pool_size": 1,
+            "entities": []
+          },
+          "scene_id": "test",
+          "scene_type": "TEST"
+        }
+      ]
+    },
+    "global_event_bus_data": {
+      "description": "Initial event bus with 2 events",
+      "events": [
+        {
+          "event_lifetime": 3,
+          "event_type": "EVENT_TEST",
+          "event_data_data_type": "NONE"
+        },
+        {
+          "event_lifetime": 5,
+          "event_type": "EVENT_QUIT_GAME",
+          "event_data_data_type": "NONE"
+        }
+      ]
+    }
+  },
   "tick_snapshots": [
     {
       "tick": 1,
       "description": "Tick 1 snapshot",
-      "data_collection": {
-        "entity_collection": {
-          "entity_memory_pool_size": 1,
-          "entities": []
+      "engine_state": {
+        "scene_manager_data": {
+          "scene_data": [
+            {
+              "entity_collection": {
+                "entity_memory_pool_size": 1,
+                "entities": []
+              },
+              "scene_id": "test",
+              "scene_type": "TEST"
+            }
+          ]
         },
-        "event_bus": {
+        "global_event_bus_data": {
           "description": "Event bus is compared before lifetimes are decremented, so same as start",
           "events": [
             {
@@ -39,12 +76,20 @@
     {
       "tick": 2,
       "description": "Tick 2 snapshot",
-      "data_collection": {
-        "entity_collection": {
-          "entity_memory_pool_size": 1,
-          "entities": []
+      "engine_state": {
+        "scene_manager_data": {
+          "scene_data": [
+            {
+              "entity_collection": {
+                "entity_memory_pool_size": 1,
+                "entities": []
+              },
+              "scene_id": "test",
+              "scene_type": "TEST"
+            }
+          ]
         },
-        "event_bus": {
+        "global_event_bus_data": {
           "description": "After tick 1, event lifetimes decremented by 1",
           "events": [
             {
@@ -61,47 +106,5 @@
         }
       }
     }
-  ],
-  "start_data_collection": {
-    "entity_collection": {
-      "entity_memory_pool_size": 1,
-      "entities": []
-    },
-    "event_bus": {
-      "description": "Initial event bus with 2 events",
-      "events": [
-        {
-          "event_lifetime": 3,
-          "event_type": "EVENT_TEST",
-          "event_data_data_type": "NONE"
-        },
-        {
-          "event_lifetime": 5,
-          "event_type": "EVENT_QUIT_GAME",
-          "event_data_data_type": "NONE"
-        }
-      ]
-    }
-  },
-  "expected_data_collection": {
-    "entity_collection": {
-      "entity_memory_pool_size": 1,
-      "entities": []
-    },
-    "event_bus": {
-      "description": "Final event bus state after all ticks",
-      "events": [
-        {
-          "event_lifetime": 1,
-          "event_type": "EVENT_TEST",
-          "event_data_data_type": "NONE"
-        },
-        {
-          "event_lifetime": 3,
-          "event_type": "EVENT_QUIT_GAME",
-          "event_data_data_type": "NONE"
-        }
-      ]
-    }
-  }
+  ]
 }

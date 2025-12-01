@@ -12,36 +12,82 @@
     "version": 1
   },
   "num_ticks": 3,
+  "starting_engine_state": {
+    "scene_manager_data": {
+      "scene_data": [
+        {
+          "entity_collection": {
+            "entity_memory_pool_size": 2,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "example_button",
+                  "is_visible": false,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 100
+                      },
+                      "size": {
+                        "x": 100,
+                        "y": 50
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "scene_id": "test",
+          "scene_type": "TEST"
+        }
+      ]
+    }
+  },
   "tick_snapshots": [
     {
       "tick": 1,
       "description": "Initial state after first tick",
-      "data_collection": {
-        "entity_collection": {
-          "entity_memory_pool_size": 2,
-          "entities": [
+      "engine_state": {
+        "scene_manager_data": {
+          "scene_data": [
             {
-              "index": 0,
-              "c_user_interface": {
-                "ui_name": "example_button",
-                "is_visible": false,
-                "root_ui_element": {
-                  "base_data": {
-                    "position": {
-                      "x": 100,
-                      "y": 100
-                    },
-                    "size": {
-                      "x": 100,
-                      "y": 50
-                    },
-                    "children_active": false,
-                    "children": [],
-                    "layout": "Horizontal",
-                    "spacing_strategy": "None"
+              "entity_collection": {
+                "entity_memory_pool_size": 2,
+                "entities": [
+                  {
+                    "index": 0,
+                    "c_user_interface": {
+                      "ui_name": "example_button",
+                      "is_visible": false,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 100,
+                            "y": 100
+                          },
+                          "size": {
+                            "x": 100,
+                            "y": 50
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Horizontal",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
                   }
-                }
-              }
+                ]
+              },
+              "scene_id": "test",
+              "scene_type": "TEST"
             }
           ]
         }
@@ -50,96 +96,44 @@
     {
       "tick": 3,
       "description": "Final state after third tick",
-      "data_collection": {
-        "entity_collection": {
-          "entity_memory_pool_size": 2,
-          "entities": [
+      "engine_state": {
+        "scene_manager_data": {
+          "scene_data": [
             {
-              "index": 0,
-              "c_user_interface": {
-                "ui_name": "example_button",
-                "is_visible": false,
-                "root_ui_element": {
-                  "base_data": {
-                    "position": {
-                      "x": 100,
-                      "y": 100
-                    },
-                    "size": {
-                      "x": 100,
-                      "y": 50
-                    },
-                    "children_active": false,
-                    "children": [],
-                    "layout": "Horizontal",
-                    "spacing_strategy": "None"
+              "entity_collection": {
+                "entity_memory_pool_size": 2,
+                "entities": [
+                  {
+                    "index": 0,
+                    "c_user_interface": {
+                      "ui_name": "example_button",
+                      "is_visible": false,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 100,
+                            "y": 100
+                          },
+                          "size": {
+                            "x": 100,
+                            "y": 50
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Horizontal",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
                   }
-                }
-              }
+                ]
+              },
+              "scene_id": "test",
+              "scene_type": "TEST"
             }
           ]
         }
       }
     }
-  ],
-  "start_data_collection": {
-    "entity_collection": {
-      "entity_memory_pool_size": 2,
-      "entities": [
-        {
-          "index": 0,
-          "c_user_interface": {
-            "ui_name": "example_button",
-            "is_visible": false,
-            "root_ui_element": {
-              "base_data": {
-                "position": {
-                  "x": 100,
-                  "y": 100
-                },
-                "size": {
-                  "x": 100,
-                  "y": 50
-                },
-                "children_active": false,
-                "children": [],
-                "layout": "Horizontal",
-                "spacing_strategy": "None"
-              }
-            }
-          }
-        }
-      ]
-    }
-  },
-  "expected_data_collection": {
-    "entity_collection": {
-      "entity_memory_pool_size": 2,
-      "entities": [
-        {
-          "index": 0,
-          "c_user_interface": {
-            "ui_name": "example_button",
-            "is_visible": false,
-            "root_ui_element": {
-              "base_data": {
-                "position": {
-                  "x": 100,
-                  "y": 100
-                },
-                "size": {
-                  "x": 100,
-                  "y": 50
-                },
-                "children_active": false,
-                "children": [],
-                "layout": "Horizontal",
-                "spacing_strategy": "None"
-              }
-            }
-          }
-        }
-      ]
-    }
-  }
+  ]
 }
