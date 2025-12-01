@@ -68,7 +68,7 @@ public:
   /// @param scene_type Enum representing the type of scene
   /////////////////////////////////////////////////
   std::expected<const SceneDataData *, FailInfo>
-  ProvideSceneData(const SceneType scene_type) const;
+  ProvideDefaultSceneData(const SceneType scene_type) const;
 
   /////////////////////////////////////////////////
   /// @brief Provide default AssetCollection data

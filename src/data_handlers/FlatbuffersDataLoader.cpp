@@ -9,10 +9,12 @@
 #include "FlatbuffersDataLoader.h"
 #include "FailInfo.h"
 #include "Fragment.h"
+#include "SceneData.h"
 #include "assets_generated.h"
+#include "engine_data_generated.h"
 #include "fragments_generated.h"
 #include "paths.h"
-#include "scenes_generated.h"
+#include "scene_data_generated.h"
 #include "ui_style_generated.h"
 #include <SFML/Graphics/PrimitiveType.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
@@ -26,8 +28,7 @@ std::expected<Fragment, FailInfo>
 FlatbuffersDataLoader::ProvideFragment(const std::string &fragment_name) const {
   // check if the bin file exists
   std::filesystem::path fragment_path =
-      paths::GetFragmentDirectory() /
-      (fragment_name + ".fragment.bin");
+      paths::GetFragmentDirectory() / (fragment_name + ".fragment.bin");
 
   if (!std::filesystem::exists(fragment_path)) {
     FailInfo fail_info(
@@ -135,7 +136,7 @@ FlatbuffersDataLoader::ProvideAllFragments(
 }
 
 /////////////////////////////////////////////////
-std::expected<const GameEngineData *, FailInfo>
+std::expected<const EngineData *, FailInfo>
 FlatbuffersDataLoader::ProvideEngineData() const {
   // get data directory
   std::filesystem::path data_dir = paths::GetDataDirectory();
@@ -150,8 +151,8 @@ FlatbuffersDataLoader::ProvideEngineData() const {
     return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
   }
   // load the game engine data
-  const steamrot::GameEngineData *game_engine_data =
-      GetGameEngineData(LoadBinaryData(game_engine_path));
+  const steamrot::EngineData *game_engine_data =
+      GetEngineData(LoadBinaryData(game_engine_path));
   return game_engine_data;
 }
 
@@ -178,8 +179,9 @@ FlatbuffersDataLoader::ProvideSceneManagerData() const {
 }
 
 /////////////////////////////////////////////////
-std::expected<const SceneData *, FailInfo>
-FlatbuffersDataLoader::ProvideSceneData(const SceneType scene_type) const {
+std::expected<const SceneDataData *, FailInfo>
+FlatbuffersDataLoader::ProvideDefaultSceneData(
+    const SceneType scene_type) const {
 
   // get file prefix from scene type
   std::string scene_file_prefix;
@@ -220,8 +222,8 @@ FlatbuffersDataLoader::ProvideSceneData(const SceneType scene_type) const {
   }
 
   // load the scene data
-  const steamrot::SceneData *scene_data =
-      GetSceneData(LoadBinaryData(scene_path));
+  const steamrot::SceneDataData *scene_data =
+      GetSceneDataData(LoadBinaryData(scene_path));
 
   return scene_data;
 }
@@ -259,12 +261,12 @@ std::expected<const AssetCollection *, FailInfo>
 FlatbuffersDataLoader::ProvideAssetData(const SceneType scene_type) const {
 
   // get scene data
-  auto scene_data_result = ProvideSceneData(scene_type);
+  auto scene_data_result = ProvideDefaultSceneData(scene_type);
   if (!scene_data_result.has_value()) {
     return std::unexpected(scene_data_result.error());
   }
 
-  const SceneData *scene_data = scene_data_result.value();
+  const SceneDataData *scene_data = scene_data_result.value();
   if (!scene_data) {
     return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
                                     "SceneData pointer is null"));
@@ -342,7 +344,7 @@ FlatbuffersDataLoader::ProvideGameResourcesData() const {
     return std::unexpected(game_engine_result.error());
   }
 
-  const GameEngineData *game_engine_data = game_engine_result.value();
+  const EngineData *game_engine_data = game_engine_result.value();
   if (!game_engine_data->game_resources()) {
     return std::unexpected(
         FailInfo(FailMode::FlatbuffersDataNotFound,
@@ -357,7 +359,7 @@ std::expected<const SceneResourcesData *, FailInfo>
 FlatbuffersDataLoader::ProvideSceneResourcesData(
     const SceneType scene_type) const {
   // Load from SceneData for the specified scene type
-  auto scene_data_result = ProvideSceneData(scene_type);
+  auto scene_data_result = ProvideDefaultSceneData(scene_type);
   if (!scene_data_result.has_value()) {
     return std::unexpected(scene_data_result.error());
   }
@@ -374,7 +376,7 @@ std::expected<const LogicCollectionData *, FailInfo>
 FlatbuffersDataLoader::ProvideLogicCollectionData(
     const SceneType scene_type) const {
   // Load from SceneData for the specified scene type
-  auto scene_data_result = ProvideSceneData(scene_type);
+  auto scene_data_result = ProvideDefaultSceneData(scene_type);
   if (!scene_data_result.has_value()) {
     return std::unexpected(scene_data_result.error());
   }

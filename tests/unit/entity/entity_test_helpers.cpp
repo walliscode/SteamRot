@@ -13,7 +13,6 @@
 #include "FlatbuffersDataLoader.h"
 #include "archetype_helpers.h"
 #include "catch2/catch_test_macros.hpp"
-#include "scenes_generated.h"
 
 namespace steamrot::tests {
 
@@ -36,8 +35,8 @@ void TestArchetypesOfConfiguredEMPfromDefaultData(
 
   // load the scene data
   FlatbuffersDataLoader flatbuffers_data_loader;
-  const SceneData &scene_data =
-      *flatbuffers_data_loader.ProvideSceneData(scene_type).value();
+  const SceneDataData &scene_data =
+      *flatbuffers_data_loader.ProvideDefaultSceneData(scene_type).value();
   const EntityCollection &entity_collection = *scene_data.entity_collection();
 
   // create a vector of all possible positions from entity memory pool size

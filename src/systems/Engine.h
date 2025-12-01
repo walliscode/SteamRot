@@ -71,7 +71,8 @@ protected:
   ///
   /// @return Success or failure information
   /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo> ConfigureEngineFromData();
+  virtual std::expected<std::monostate, FailInfo>
+  ConfigureEngineStateFromData() = 0;
 
   /////////////////////////////////////////////////
   /// @brief Execute a single tick of the game loop.

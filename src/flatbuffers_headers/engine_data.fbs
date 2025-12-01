@@ -7,7 +7,6 @@ namespace steamrot;
 
 table EngineData {
   subscriptions: [SubscriberData];
-  game_resources: GameResourcesData;
   scene_manager_data: SceneManagerData;
   global_event_bus_data: EventBusData;
   waiting_room_event_bus_data: EventBusData;

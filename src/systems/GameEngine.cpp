@@ -7,9 +7,8 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-GameEngine::GameEngine()
-    : m_display_manager(m_game_resources.game_window, m_scene_manager) {
-}
+GameEngine::GameEngine(const EngineData engine_data)
+    : m_display_manager(m_game_resources.game_window, m_scene_manager) {}
 
 /////////////////////////////////////////////////
 void GameEngine::ExecuteSceneLevelLogic() {

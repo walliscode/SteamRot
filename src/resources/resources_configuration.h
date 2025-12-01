@@ -12,9 +12,7 @@
 #include "GameResources.h"
 #include "SceneResources.h"
 #include "resource_data_generated.h"
-#include "scene_change_packet_generated.h"
 #include <expected>
-#include <string>
 
 namespace steamrot {
 namespace resources {

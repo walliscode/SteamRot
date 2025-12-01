@@ -21,8 +21,7 @@
 
 namespace steamrot {
 /////////////////////////////////////////////////
-FlatbuffersConfigurator::FlatbuffersConfigurator(
-    EventHandler &event_handler)
+FlatbuffersConfigurator::FlatbuffersConfigurator(EventHandler &event_handler)
     : EntityConfigurator(event_handler), m_data_loader() {}
 
 /////////////////////////////////////////////////
@@ -31,8 +30,8 @@ FlatbuffersConfigurator::ConfigureEntitiesFromDefaultData(
     EntityMemoryPool &entity_memory_pool, const SceneType scene_type) {
 
   // get the entity collection from the flatbuffers data loader
-  const SceneData *scene_data =
-      m_data_loader.ProvideSceneData(scene_type).value();
+  const SceneDataData *scene_data =
+      m_data_loader.ProvideDefaultSceneData(scene_type).value();
 
   // delegate to ConfigureEntitiesFromCollection
   return ConfigureEntitiesFromCollection(entity_memory_pool,
