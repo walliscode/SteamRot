@@ -83,11 +83,11 @@ endmacro()
 
 # Call macro for each supported type
 flatbuffers_generate_for_type(ui_style ".styles.json" "ui_styles")
-flatbuffers_generate_for_type(scenes ".scenes.json" "scenes")
+flatbuffers_generate_for_type(scene_data ".scene_data.json" "scene_data")
 flatbuffers_generate_for_type(fragments ".fragment.json" "fragments")
 flatbuffers_generate_for_type(assets ".json" "asset_manager")
-flatbuffers_generate_for_type(scene_manager ".json" "scene_manager")
-flatbuffers_generate_for_type(game_engine ".json" "game_engine")
+flatbuffers_generate_for_type(scene_manager_data ".json" "scene_manager_data")
+flatbuffers_generate_for_type(engine_data ".json" "engine_data")
 flatbuffers_generate_for_type(context_data ".json" "context")
 # This target will actually trigger all the binary generation
 add_custom_target(flatbuffers_generate_binaries ALL

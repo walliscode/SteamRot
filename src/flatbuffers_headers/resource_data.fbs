@@ -1,4 +1,4 @@
-include "scene_change_packet.fbs";
+include "scene_data.fbs";
 
 namespace steamrot;
 
