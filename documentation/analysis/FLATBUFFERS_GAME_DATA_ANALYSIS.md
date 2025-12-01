@@ -171,6 +171,123 @@ Engine (owns GameResources)
 
 ---
 
+## Default vs Saved Data Routes
+
+### Current Architecture Assessment
+
+**Question:** Is there a clear route from default and saved data? Will this system allow starting with defaults and then loading saved/cached data when needed?
+
+### ✅ YES - The System is Well-Positioned for Default + Saved Data
+
+The current architecture provides clear separation points that support both default and saved data routes:
+
+```
+                        ┌─────────────────────────────────────────┐
+                        │            DATA SOURCE LAYER            │
+                        └─────────────────────────────────────────┘
+                                          │
+                    ┌─────────────────────┼─────────────────────┐
+                    ▼                     ▼                     ▼
+          ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐
+          │ Default Data    │   │ Saved Data      │   │ Test Data       │
+          │ (scene_data.json)│  │ (save_slot.bin) │   │ (test_data.bin) │
+          └─────────────────┘   └─────────────────┘   └─────────────────┘
+                    │                     │                     │
+                    └─────────────────────┼─────────────────────┘
+                                          ▼
+          ┌─────────────────────────────────────────────────────────────────┐
+          │                  FlatbuffersDataLoader                          │
+          ├─────────────────────────────────────────────────────────────────┤
+          │ ProvideDefaultSceneData(SceneType)  ← Default route             │
+          │ ProvideSaveData(slot) [PROPOSED]    ← Saved route               │
+          │ ProvideTestData(name) [EXISTS]      ← Test route                │
+          └─────────────────────────────────────────────────────────────────┘
+                                          │
+                                          ▼
+          ┌─────────────────────────────────────────────────────────────────┐
+          │                  FlatbuffersConfigurator                        │
+          ├─────────────────────────────────────────────────────────────────┤
+          │ ConfigureEntitiesFromDefaultData()  ← Default route             │
+          │ ConfigureEntitiesFromCollection()   ← Universal route (reusable)│
+          └─────────────────────────────────────────────────────────────────┘
+                                          │
+                                          ▼
+          ┌─────────────────────────────────────────────────────────────────┐
+          │                  EntityMemoryPool                               │
+          │        (Same destination regardless of data source)             │
+          └─────────────────────────────────────────────────────────────────┘
+```
+
+### Key Architectural Strengths for Default + Saved Data
+
+| Aspect | How It Supports Dual Routes |
+|--------|----------------------------|
+| **EntityCollection** | Already reusable - same format works for default, saved, and test data |
+| **ConfigureEntitiesFromCollection()** | Universal method that takes any EntityCollection regardless of source |
+| **SceneType routing** | Clean dispatch based on scene type - easily extensible |
+| **FlatbuffersDataLoader** | Central data provider - just add new `ProvideSaveData()` method |
+| **Test data infrastructure** | Proves the pattern works - tests already load EntityCollections from different sources |
+
+### Current Default Data Route (Working)
+
+```cpp
+// SceneFactory.cpp - CreateDefaultScene()
+Scene::ConfigureFromDefault()
+    └─▶ EntityManager::ConfigureEntitiesFromDefaultData(scene_type, DataType::Flatbuffers)
+            └─▶ FlatbuffersConfigurator::ConfigureEntitiesFromDefaultData(pool, scene_type)
+                    └─▶ m_data_loader.ProvideDefaultSceneData(scene_type)  // Loads scene_data.json
+                    └─▶ ConfigureEntitiesFromCollection(pool, entity_collection)
+```
+
+### Proposed Saved Data Route (Easy to Add)
+
+```cpp
+// Proposed: SceneFactory.cpp - CreateSceneFromSave()
+Scene::ConfigureFromSaveData(save_data)
+    └─▶ EntityManager::ConfigureEntitiesFromSaveData(save_data)
+            └─▶ FlatbuffersConfigurator::ConfigureEntitiesFromCollection(pool, save_data->entity_collection())
+                    // ✅ Reuses same ConfigureEntitiesFromCollection() - no duplication!
+```
+
+### What Already Exists That Enables This
+
+1. **`ConfigureEntitiesFromCollection(EntityMemoryPool&, const EntityCollection*)`**
+   - Location: `FlatbuffersConfigurator.h:103-105`
+   - This method takes ANY EntityCollection - it doesn't care about the source
+   - Both default and saved data can use this same code path
+
+2. **`EntityCollection` schema is already save-ready**
+   - Contains: `entities: [EntityData]` and `entity_memory_pool_size: int`
+   - All component data is already serializable
+   - Test data system proves this works
+
+3. **Clear DataType enum in EntityManager**
+   - Location: `EntityManager.h:25-28`
+   - Currently just has `Flatbuffers`, but designed to be extensible
+   - Could add `SavedFlatbuffers` or similar if needed
+
+### What Would Need to be Added for Save Data
+
+| Component | Status | What's Needed |
+|-----------|--------|---------------|
+| `SaveData` schema | ❌ Missing | Create `save_data.fbs` with SaveMetadata + EntityCollections |
+| `ProvideSaveData()` | ❌ Missing | Add to FlatbuffersDataLoader |
+| `ConfigureFromSaveData()` | ❌ Missing | Add to Scene class (calls existing `ConfigureEntitiesFromCollection`) |
+| File I/O for saves | ❌ Missing | Save/load binary files to user data directory |
+| UI for save/load | ❌ Missing | Menu integration |
+
+### Conclusion
+
+**The current system naturally supports the default + saved data pattern.** The key insight is that `ConfigureEntitiesFromCollection()` is already data-source-agnostic. You can:
+
+1. ✅ Start with defaults: `ProvideDefaultSceneData()` → `ConfigureEntitiesFromCollection()`
+2. ✅ Load saved data later: `ProvideSaveData()` [new] → `ConfigureEntitiesFromCollection()` [same method]
+3. ✅ Test data also works: `ProvideTestData()` → `ConfigureEntitiesFromCollection()` [same method]
+
+The architecture is sound for this use case - you just need to add the save data loading path.
+
+---
+
 ## What Works Well vs What Needs Improvement
 
 ### ✅ What Works Well
