@@ -518,12 +518,12 @@ This helps debugging and ensures proper handling of different data sources.
            │                    SHARED SCHEMAS                           │
            ├─────────────────────────────────────────────────────────────┤
            │                                                             │
-           │  ┌─────────────┐  ┌─────────────┐  ┌───────────────────┐   │
-           │  │ entities.fbs│  │ events.fbs  │  │ subscriber_data   │   │
-           │  ├─────────────┤  ├─────────────┤  │      .fbs         │   │
-           │  │EntityData   │  │EventType    │  ├───────────────────┤   │
-           │  │EntityCollect│  │EventDataData│  │SubscriberData     │   │
-           │  └─────────────┘  └─────────────┘  └───────────────────┘   │
+           │  ┌───────────────┐  ┌─────────────┐  ┌───────────────────┐ │
+           │  │ entities.fbs  │  │ events.fbs  │  │ subscriber_data   │ │
+           │  ├───────────────┤  ├─────────────┤  │      .fbs         │ │
+           │  │EntityData     │  │EventType    │  ├───────────────────┤ │
+           │  │EntityCollection│ │EventDataData│  │SubscriberData     │ │
+           │  └───────────────┘  └─────────────┘  └───────────────────┘ │
            │         │                │                   │             │
            │         ▼                ▼                   │             │
            │  ┌─────────────────────────────┐             │             │
