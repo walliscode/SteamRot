@@ -1,0 +1,22 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Implementation of paths namespace source directory function.
+///
+/// This file is configured by CMake to substitute @CMAKE_SOURCE_DIR@
+/// with the actual source directory path at configure time.
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include "paths.h"
+
+namespace steamrot::paths {
+
+/////////////////////////////////////////////////
+std::filesystem::path GetSourceDirectory() {
+  static const std::filesystem::path source_dir{"@CMAKE_SOURCE_DIR@"};
+  return source_dir;
+}
+
+} // namespace steamrot::paths

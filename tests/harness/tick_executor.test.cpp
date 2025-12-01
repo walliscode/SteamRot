@@ -112,7 +112,6 @@ TEST_CASE("determine_num_ticks defaults to 1 when num_ticks not specified",
 
 TEST_CASE("execute_single_tick handles null config",
           "[unit][harness][tick_executor]") {
-  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 
@@ -123,7 +122,6 @@ TEST_CASE("execute_single_tick handles null config",
 
 TEST_CASE("execute_tick_based_test handles null config",
           "[unit][harness][tick_executor]") {
-  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 
@@ -162,7 +160,6 @@ TEST_CASE("determine_num_ticks ignores simulation_data num_ticks",
 
 TEST_CASE("execute_tick_based_test executes specified num_ticks",
           "[unit][harness][tick_executor]") {
-  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 

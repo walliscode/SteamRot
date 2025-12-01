@@ -13,7 +13,6 @@
 /////////////////////////////////////////////////
 
 #include "GameContext.h"
-#include "PathProvider.h"
 #include "Scene.h"
 #include "uuid.h"
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -47,11 +46,9 @@ public:
   ///
   /// @param scene_type SceneType enum indicating which scene to create
   /// @param game_context Reference to the game context
-  /// @param path_provider Reference to PathProvider for data loading
 /////////////////////////////////////////////////
   std::expected<std::unique_ptr<Scene>, FailInfo>
   CreateDefaultScene(const SceneType &scene_type,
-                     const GameContext &game_context,
-                     const PathProvider &path_provider);
+                     const GameContext &game_context);
 };
 } // namespace steamrot

@@ -14,7 +14,6 @@
 
 TEST_CASE("execute_input_event handles null input",
           "[unit][harness][input_simulation]") {
-  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 
@@ -25,7 +24,6 @@ TEST_CASE("execute_input_event handles null input",
 
 TEST_CASE("execute_input_events_for_tick handles null sequence",
           "[unit][harness][input_simulation]") {
-  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 
@@ -37,7 +35,6 @@ TEST_CASE("execute_input_events_for_tick handles null sequence",
 
 TEST_CASE("execute_input_sequence handles null sequence",
           "[unit][harness][input_simulation]") {
-  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 
@@ -48,7 +45,6 @@ TEST_CASE("execute_input_sequence handles null sequence",
 
 TEST_CASE("execute_input_sequence handles empty sequence",
           "[unit][harness][input_simulation]") {
-  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 
@@ -67,7 +63,6 @@ TEST_CASE("execute_input_sequence handles empty sequence",
 
 TEST_CASE("execute_input_event updates mouse position for MouseMove",
           "[unit][harness][input_simulation]") {
-  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 
@@ -95,7 +90,6 @@ TEST_CASE("execute_input_event updates mouse position for MouseMove",
 
 TEST_CASE("execute_input_events_for_tick processes only specified tick",
           "[unit][harness][input_simulation]") {
-  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 
@@ -149,7 +143,6 @@ TEST_CASE("execute_input_events_for_tick processes only specified tick",
 
 TEST_CASE("execute_input_event generates EventPacket for MouseClick",
           "[unit][harness][input_simulation]") {
-  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 
@@ -196,7 +189,6 @@ TEST_CASE("execute_input_event generates EventPacket for MouseClick",
 
 TEST_CASE("execute_input_event generates EventPacket for KeyPress",
           "[unit][harness][input_simulation]") {
-  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 
@@ -238,7 +230,6 @@ TEST_CASE("execute_input_event generates EventPacket for KeyPress",
 
 TEST_CASE("execute_input_event does not generate EventPacket for MouseMove",
           "[unit][harness][input_simulation]") {
-  steamrot::TestPaths test_paths;
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
 

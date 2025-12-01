@@ -8,7 +8,6 @@
 /////////////////////////////////////////////////
 #include "asset_test_helpers.h"
 #include "FlatbuffersDataLoader.h"
-#include "TestPaths.h"
 #include "catch2/catch_test_macros.hpp"
 
 namespace steamrot::tests {
@@ -17,10 +16,8 @@ namespace steamrot::tests {
 void CheckAssetConfiguration(const SceneType &scene_type,
                                const AssetManager &asset_manager) {
 
-  // intialise the pathprovider
-  TestPaths test_paths;
   // get flatbuffer asset collection
-  FlatbuffersDataLoader loader(test_paths);
+  FlatbuffersDataLoader loader;
   auto asset_get_result = loader.ProvideAssetData(scene_type);
   if (!asset_get_result.has_value()) {
     FAIL(asset_get_result.error().message);

@@ -20,8 +20,7 @@ TEST_CASE("CraftingScene's call to sRender is correct",
   steamrot::SceneFactory scene_factory;
   // create a CraftingScene
   auto scene_creation_result = scene_factory.CreateDefaultScene(
-      steamrot::SceneType::SceneType_CRAFTING, test_fixture.GetGameContext(),
-      test_fixture.GetTestPaths());
+      steamrot::SceneType::SceneType_CRAFTING, test_fixture.GetGameContext());
   if (!scene_creation_result.has_value()) {
     FAIL("Scene creation failed: " + scene_creation_result.error().message);
   }
@@ -32,7 +31,7 @@ TEST_CASE("CraftingScene's call to sRender is correct",
     FAIL("Scene configuration failed: " + configure_result.error().message);
   }
   // add the LogicMap
-  steamrot::FlatbuffersDataLoader data_loader(test_fixture.GetTestPaths());
+  steamrot::FlatbuffersDataLoader data_loader;
   auto logic_collection_data_result = data_loader.ProvideLogicCollectionData(
       steamrot::SceneType::SceneType_CRAFTING);
   if (!logic_collection_data_result.has_value()) {

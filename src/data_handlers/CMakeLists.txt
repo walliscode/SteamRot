@@ -1,26 +1,14 @@
 
-
+# New namespace-based paths (compile-time environment selection)
 configure_file(
-PathProvider.cpp.in
-PathProvider.cpp
-@ONLY)
-
-configure_file(
-TestPaths.cpp.in
-TestPaths.cpp
-@ONLY)
-
-configure_file(
-GamePaths.cpp.in
-GamePaths.cpp
+paths.cpp.in
+paths.cpp
 @ONLY)
 
 add_library(data_handlers
   DataLoader.cpp
   FlatbuffersDataLoader.cpp
-  PathProvider.cpp
-  TestPaths.cpp
-  GamePaths.cpp
+  paths.cpp
 )
 
 target_include_directories(data_handlers

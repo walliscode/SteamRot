@@ -13,8 +13,8 @@
 /////////////////////////////////////////////////
 #include "FailInfo.h"
 #include "Fragment.h"
-#include "PathProvider.h"
 #include <expected>
+#include <filesystem>
 #include <map>
 #include <string>
 
@@ -36,11 +36,6 @@ class DataLoader {
 
 protected:
   /////////////////////////////////////////////////
-  /// @brief Reference to the path provider instance
-  /////////////////////////////////////////////////
-  const PathProvider &m_path_provider;
-
-  /////////////////////////////////////////////////
   /// \brief load binary data from file and return as vector of chars
   /////////////////////////////////////////////////
   char *LoadBinaryData(const std::filesystem::path &file_path) const;
@@ -50,11 +45,9 @@ public:
   virtual ~DataLoader() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Constructor taking a PathProvider reference
-  ///
-  /// @param path_provider Reference to a PathProvider implementation
+  /// @brief Default constructor
   /////////////////////////////////////////////////
-  explicit DataLoader(const PathProvider &path_provider);
+  DataLoader() = default;
 
   /////////////////////////////////////////////////
   /// @brief Provide a Fragment object given its name

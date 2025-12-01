@@ -15,7 +15,6 @@
 #include "ArchetypeManager.h"
 #include "EventHandler.h"
 #include "FailInfo.h"
-#include "PathProvider.h"
 #include "containers.h"
 #include <cstddef>
 #include <expected>
@@ -118,12 +117,10 @@ public:
   ///
   /// @param scene_type SceneType to configure entities for
   /// @param data_type DataType to configure entities from
-  /// @param path_provider Reference to PathProvider for data loading
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo>
   ConfigureEntitiesFromDefaultData(const SceneType scene_type,
-                                   const DataType data_type,
-                                   const PathProvider &path_provider);
+                                   const DataType data_type);
 
   /////////////////////////////////////////////////
   /// @brief Calls the ArchetypeManager to generate all archetypes from the
