@@ -95,28 +95,19 @@ void RunEventBusComparisonTest(const EventBus &actual, const EventBus &expected,
 /////////////////////////////////////////////////
 /// @brief Primary function for comparing data structures from DataCollection
 ///
+/// DEPRECATED: This function is part of the old TestFixture workflow.
+/// For new tests, use RunTestEngineTest which provides tick-based comparison.
+///
 /// This function orchestrates comparison of all data structures specified
 /// in the DataCollection (EntityMemoryPool, EventBus, etc.). It serves as
 /// the primary entry point for data structure comparison in the test harness.
 ///
-/// The function compares actual state from the fixture against expected state
-/// from the data_collection parameter. Each data structure is compared if
-/// present in the collection.
-///
-/// This function is used by both:
-/// - RunFixtureTest (for final state comparison after all ticks)
-/// - CompareTickSnapshot (for intermediate state comparison during ticks)
-///
-/// @param data_collection Expected data structure states for comparison
-/// @param fixture TestFixture containing actual state to compare
-/// @param context Test context information for enriched error messages
 /// @param expected_to_pass If true, expects data to match; if false, expects
 /// mismatch
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo> RunDataStructComparisonTest(
-
-    bool expected_to_pass = true);
+std::expected<std::monostate, FailInfo>
+RunDataStructComparisonTest(bool expected_to_pass = true);
 
 /////////////////////////////////////////////////
 /// @brief Wrapper function for data-driven testing with TestEngine
