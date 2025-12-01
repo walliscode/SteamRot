@@ -4,26 +4,10 @@ include "simulation.fbs";
 include "input_test_data.fbs";
 include "event_test_data.fbs";
 include "event_bus_data.fbs";
+include "engine_data.fbs";
 
 namespace steamrot;
 
-////////////////////////////////////////////////////////////
-/// @brief Collection of data structures for comparison testing
-///
-/// Represents the state of various game data structures (entity pool,
-/// event bus, etc.) at a specific point in time. Used for comparing
-/// actual vs expected states in tests.
-////////////////////////////////////////////////////////////
-table DataCollectionData {
-  /// @brief state of entities
-  entity_collection: EntityCollection;
-
-  /// @brief state of the global event bus
-  event_bus: EventBusData;
-
-  /// @brief state of the waiting room event bus
-  waiting_room: EventBusData;
-}
 
 ////////////////////////////////////////////////////////////
 /// @brief Snapshot of expected data structure state at a specific tick
@@ -41,15 +25,19 @@ table TickSnapshot {
   /// but BEFORE the event bus is ticked.
   /// Valid values: 1, 2, 3, ... (matching game loop tick numbers)
   tick: uint32;
-  
-  /// @brief Expected data structure state at this tick
-  /// Contains entity collection and event bus state.
-  /// Comparison happens AFTER simulation steps, BEFORE event bus tick.
-  data_collection: DataCollectionData (required);
-  
+
+  engine_state: EngineData;
+ 
   /// @brief Optional human-readable description of this checkpoint
   /// Used in failure messages to identify which snapshot failed.
   description: string;
+
+
+  /// @brief Inputs to inject at specific tick
+  input_sequence: InputSequence;
+  
+  /// @brief Events to inject at specific tick
+  event_sequence: EventSequence;
 }
 
 ////////////////////////////////////////////////////////////
@@ -88,30 +76,12 @@ table TestMetadata {
 table TestDataConfig {
   /// @brief Metadata about this test case
   metadata: TestMetadata (required);
-    
-  /// @brief Starting state data collection for comparison tests
-  /// Contains entity collection and event bus state at test start.
-  /// If not provided, defaults to default-constructed data structures.
-  start_data_collection: DataCollectionData;
-  
-  /// @brief Expected state data collection for comparison tests
-  /// Contains expected entity collection and event bus state after test execution.
-  /// If present, the test harness will compare actual state with expected state.
-  expected_data_collection: DataCollectionData;
-  
-  /// @brief Resource data for test fixtures
-  game_resources: GameResourcesData;
-  scene_resources: SceneResourcesData;
-  
+ 
+  starting_engine_state: EngineData;
+   
   /// @brief Simulation data for executing logic steps during tests
   simulation_data: SimulationData;
-  
-  /// @brief Input sequence for simulating user input tick-by-tick
-  input_sequence: InputSequence;
-  
-  /// @brief Event sequence for adding events tick-by-tick
-  event_sequence: EventSequence;
-  
+    
   /// @brief Number of ticks to run the test for (default: 1)
   /// This is the ONLY field consulted to determine tick count. The test will execute for exactly
   /// this many ticks, processing inputs, events, and simulation steps scheduled for each tick.
@@ -126,11 +96,6 @@ table TestDataConfig {
   /// Snapshots are compared AFTER simulation steps but BEFORE event bus tick.
   tick_snapshots: [TickSnapshot];
   
-  /// @brief Reserved for future test data types
-  /// Can be extended with additional fields like:
-  /// - ui_data: UITestData;
-  /// - scene_transitions: SceneTransitionSequence;
-  /// etc.
 }
 
 root_type TestDataConfig;

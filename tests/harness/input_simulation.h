@@ -12,9 +12,9 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FailInfo.h"
-#include "TestFixture.h"
 #include "input_test_data_generated.h"
 #include <expected>
+#include <variant>
 
 namespace steamrot::tests {
 
@@ -66,7 +66,6 @@ ExecuteInputEventsForTick(const InputSequence *input_sequence, uint32_t tick,
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ExecuteInputSequence(const InputSequence *input_sequence,
-                     TestFixture &fixture);
+ExecuteInputSequence(const InputSequence *input_sequence, TestFixture &fixture);
 
 } // namespace steamrot::tests

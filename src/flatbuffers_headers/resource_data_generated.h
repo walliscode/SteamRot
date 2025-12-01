@@ -13,8 +13,6 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
-#include "scene_data_generated.h"
-
 namespace steamrot {
 
 struct GameResourcesData;
