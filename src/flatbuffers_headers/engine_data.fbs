@@ -1,11 +1,17 @@
 include "subscriber_data.fbs";
+include "scene_manager_data.fbs";
 include "resource_data.fbs";
+include "event_bus_data.fbs";
 
 namespace steamrot; 
 
-table GameEngineData {
+table EngineData {
   subscriptions: [SubscriberData];
   game_resources: GameResourcesData;
+  scene_manager_data: SceneManagerData;
+  global_event_bus_data: EventBusData;
+  waiting_room_event_bus_data: EventBusData;
+
 }
 
-root_type GameEngineData;
+root_type EngineData;
