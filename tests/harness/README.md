@@ -212,8 +212,8 @@ TEST_CASE("Data-driven test with TestEngine", "[unit][my_component]") {
 This pattern:
 - Loads test data from adjacent `data/` directory
 - Creates a TestEngine for each configuration
-- Runs the engine for the configured number of ticks
-- Captures scene state in the data bank at each tick
+- Runs the engine simulation via `Engine::RunGame()`
+- Pulls out the data bank containing scene state at each tick  
 - Compares data bank entries with `tick_snapshots` from config
 - Uses purely tick-based comparison (not `expected_entity_collection`)
 
@@ -231,23 +231,17 @@ TEST_CASE("Manual TestEngine usage", "[unit]") {
   
   const auto *config = configs.value()[0];
   
-  // Create TestEngine with config
+  // Create TestEngine with config - it will simulate based on the config
   steamrot::tests::TestEngine engine(config);
   
-  // Configure via fluent API
-  engine.SetTicks(5)
-        .SetSceneType(steamrot::SceneType::SceneType_TITLE);
-  
-  // Run the engine
-  engine.Run();
+  // Run the engine simulation via base class Engine::RunGame()
+  engine.RunGame();
   
   // Access the data bank (scene state at each tick)
   const auto &data_bank = engine.GetDataBank();
   
-  // Verify tick 3 state
-  REQUIRE(data_bank.find(3) != data_bank.end());
-  const auto &tick3_scenes = data_bank.at(3);
-  // ... custom assertions on tick3_scenes ...
+  // The data bank contains snapshots at each tick for comparison
+  // Use namespace functions to run comparison tests on this data
 }
 ```
 
@@ -493,50 +487,12 @@ TEST_CASE("Data-driven test with TestEngine", "[unit]") {
 
 **Behavior:**
 1. Creates TestEngine from test data configuration
-2. Configures simulation data and tick count from config
-3. Runs the engine for the configured number of ticks
-4. Captures scene state in data bank at each tick
-5. Compares data bank entries with `tick_snapshots` from config
-6. Uses purely tick-based comparison (ignores `expected_entity_collection`)
+2. Runs the engine simulation via `Engine::RunGame()`
+3. Pulls out the data bank containing scene state at each tick
+4. Compares data bank entries with `tick_snapshots` from config
+5. Uses purely tick-based comparison (ignores `expected_entity_collection`)
 
 **This is the recommended function for data-driven testing.**
-
-### TestEngine Class
-
-TestEngine provides a flexible testing framework that extends the Engine base class.
-
-#### Constructor
-
-```cpp
-explicit TestEngine(const TestDataConfig *config);
-```
-
-Creates a TestEngine with the given test configuration.
-
-#### Fluent Configuration Methods
-
-```cpp
-TestEngine& SetTicks(size_t num_ticks);      // Set number of ticks to run
-TestEngine& UseFullScene(SceneType type);     // Use full scene execution level
-TestEngine& UseTickLevel(TickLevel level);    // Set execution level
-TestEngine& SetSceneType(SceneType type);     // Set scene type
-TestEngine& AddFunction(TestFunction func, const std::string& name = "");  // Add custom function
-```
-
-#### Execution
-
-```cpp
-void Run();  // Start up and run the engine for configured ticks
-```
-
-#### Accessors
-
-```cpp
-TickLevel GetTickLevel() const;              // Get current tick level
-size_t GetCurrentTick() const;               // Get current tick number
-SceneManager& GetSceneManager();             // Access SceneManager
-const std::unordered_map<size_t, std::vector<SceneData>>& GetDataBank() const;  // Get data bank
-```
 
 ## Simulations
 

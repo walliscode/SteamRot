@@ -224,23 +224,20 @@ RunTestEngineTest(const TestDataConfig *config) {
         FailInfo(FailMode::NullPointer, "TestDataConfig is null"));
   }
 
-  // Create and run TestEngine
+  // Create TestEngine - it simulates the Engine based on the config
   TestEngine engine(config);
 
-  // Determine number of ticks from config
+  // Run the engine simulation using base Engine::RunGame()
+  engine.RunGame();
+
+  // Get the data bank output from the engine simulation
+  const auto &data_bank = engine.GetDataBank();
+
+  // Determine number of ticks from config for context building
   size_t num_ticks = 1;
   if (config->num_ticks() > 0) {
     num_ticks = config->num_ticks();
   }
-
-  // Set the number of ticks
-  engine.SetTicks(num_ticks);
-
-  // Run the engine
-  engine.Run();
-
-  // Get the data bank
-  const auto &data_bank = engine.GetDataBank();
 
   // Build base test context from config
   TestContext base_context;

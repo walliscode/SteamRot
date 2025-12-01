@@ -14,7 +14,6 @@
 /////////////////////////////////////////////////
 #include "EventHandler.h"
 #include "FailInfo.h"
-#include "TestEngine.h"
 #include "containers.h"
 #include "entities_generated.h"
 #include "test_data_generated.h"
