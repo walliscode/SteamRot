@@ -2,7 +2,240 @@
 
 ## Overview
 
-This document analyzes the FlatBuffers schema organization and data loading patterns in SteamRot, focusing on identifying potential redundancies and ensuring the architecture properly supports both **configuration data** and **save data** use cases.
+This document analyzes the FlatBuffers schema organization and data loading patterns in SteamRot, focusing on:
+1. **Schema organization** and potential redundancies
+2. **Code-level data flow** - how configuration cascades through the system
+3. **Identifying what works** and what could be improved
+4. **Configuration vs save data** architecture (for future implementation)
+
+---
+
+## Code Flow Analysis
+
+### Engine Startup Flow
+
+The data flows naturally from `main.cpp` through a clear cascade:
+
+```
+main.cpp
+    │
+    └─▶ GameEngine::RunGame()
+            │
+            └─▶ Engine::StartUp()
+                    │
+                    ├─▶ FlatbuffersDataLoader::ProvideGameResourcesData()
+                    │       └─▶ Loads from: engine_data.json → game_resources
+                    │
+                    ├─▶ resources::ConfigureGameResources()
+                    │       └─▶ Configures: GameResources.game_window, framerate
+                    │
+                    ├─▶ FlatbuffersDataLoader::ProvideEngineData()
+                    │       └─▶ Loads: subscriptions, scene_manager_data
+                    │
+                    └─▶ ConfigureEngineStateFromData() [virtual - not called in base]
+                            └─▶ Would configure: Engine subscriptions
+```
+
+**✅ What Works:**
+- Clear separation between data loading (`FlatbuffersDataLoader`) and configuration (`resources::ConfigureGameResources`)
+- Engine initialization happens in one place (`StartUp()`)
+- Error handling via `std::expected` propagates correctly
+
+**⚠️ Issues Identified:**
+- `ConfigureEngineStateFromData()` is pure virtual but `StartUp()` calls it - this works but the result isn't used in `Engine.cpp:44-47`
+- `ProvideEngineData()` result (line 38-41) is loaded but never used in `Engine::StartUp()`!
+
+### Scene Creation Flow
+
+When a scene is created (e.g., via `SceneManager::AddSceneFromDefault`):
+
+```
+SceneManager::AddSceneFromDefault(SceneType)
+    │
+    └─▶ SceneFactory::CreateDefaultScene(SceneType, GameContext)
+            │
+            ├─▶ Create Scene Object (TitleScene/CraftingScene)
+            │       └─▶ Passes: scene_uuid, game_context
+            │
+            ├─▶ FlatbuffersDataLoader::ProvideGameResourcesData()  [REDUNDANT!]
+            │       └─▶ Already loaded in Engine::StartUp()
+            │
+            ├─▶ FlatbuffersDataLoader::ProvideSceneResourcesData(SceneType)
+            │       └─▶ Loads: scene_data.json → scene_resources
+            │
+            ├─▶ resources::ConfigureSceneResources()
+            │       └─▶ Configures: SceneResources.scene_texture
+            │
+            ├─▶ Scene::ConfigureFromDefault()
+            │       │
+            │       └─▶ EntityManager::ConfigureEntitiesFromDefaultData()
+            │               │
+            │               └─▶ FlatbuffersConfigurator::ConfigureEntitiesFromDefaultData()
+            │                       │
+            │                       ├─▶ ProvideDefaultSceneData(SceneType)
+            │                       │       └─▶ Loads: scene_data.json → entity_collection
+            │                       │
+            │                       └─▶ ConfigureEntitiesFromCollection()
+            │                               └─▶ Configures each component
+            │
+            ├─▶ EntityManager::GenerateAllArchetypes()
+            │       └─▶ Creates: ArchetypeManager mappings
+            │
+            └─▶ LogicFactory::CreateLogicMap()
+                    │
+                    ├─▶ ProvideLogicCollectionData(SceneType)  [Optional]
+                    │       └─▶ Loads: scene_data.json → logic_collection_data
+                    │
+                    └─▶ Creates Logic objects per scene type
+```
+
+**✅ What Works:**
+- Scene creation is centralized in `SceneFactory`
+- Entity configuration is delegated to `FlatbuffersConfigurator`
+- Logic creation handles null data gracefully (unconfigured but functional)
+- Scene type drives which data files are loaded
+
+**⚠️ Issues Identified:**
+1. **Redundant Data Loading**: `ProvideGameResourcesData()` called in both `Engine::StartUp()` AND `SceneFactory::CreateDefaultScene()` (line 72-77 in SceneFactory.cpp) - the result isn't even used!
+2. **Multiple ProvideDefaultSceneData calls**: Called in `SceneFactory` for resources, then again in `FlatbuffersConfigurator` for entities - could cache.
+
+### Data Flow During Gameplay
+
+```
+GameEngine::RunGameLoop()
+    │
+    └─▶ ExecuteSystemsTick() [per frame]
+            │
+            ├─▶ EventHandler::ExecuteEventHandlerLevelLogic()
+            │       └─▶ Processes SFML events, updates EventBus
+            │
+            ├─▶ Engine::ExecuteEngineLevelLogic()
+            │       └─▶ ProcessSubscriptions() - handles quit events
+            │
+            ├─▶ SceneManager::ExecuteSceneManagerLevelLogic()
+            │       └─▶ ProcessSubscriptions() - handles scene changes
+            │
+            ├─▶ ExecuteSceneLevelLogic() [virtual]
+            │       │
+            │       └─▶ SceneManager::UpdateScenes()
+            │               │
+            │               └─▶ For each Scene:
+            │                       ├─▶ sAction()
+            │                       ├─▶ sCollision()
+            │                       └─▶ sRender()
+            │
+            └─▶ ExecuteDisplayManagerTick()
+                    └─▶ DisplayManager::CallRenderCycle()
+```
+
+**✅ What Works:**
+- Clear tick execution order: Events → Engine → SceneManager → Scenes → Display
+- Subscription-based architecture for engine/scene-level events
+- Logic classes execute in defined order per scene
+
+**✅ Natural Cascade:**
+The system properly cascades from Engine → SceneManager → Scene → Logic:
+- GameContext created from GameResources (owned by Engine)
+- SceneContext created from SceneResources + GameResources + EntityManager
+- Logic classes receive SceneContext with all necessary references
+
+### Context Propagation
+
+```
+Engine (owns GameResources)
+    │
+    └─▶ GameContext(GameResources&)
+            │     Contains refs to: game_window, event_handler, 
+            │                        mouse_position, loop_number, asset_manager
+            │
+            └─▶ SceneManager receives GameContext
+                    │
+                    └─▶ Scene::GetSceneContext()
+                            │     Creates SceneContext from:
+                            │     - SceneResources (owned by Scene)
+                            │     - GameResources (via GameContext)
+                            │     - EntityManager (owned by Scene)
+                            │
+                            └─▶ Logic classes receive SceneContext
+                                    Contains refs to: scene_entities, archetypes,
+                                                       scene_texture, game_window,
+                                                       asset_manager, event_handler,
+                                                       mouse_position
+```
+
+**✅ What Works Excellently:**
+- Context objects are lightweight (references only)
+- Clear ownership: GameResources→Engine, SceneResources→Scene
+- No circular dependencies
+- Easy to trace data flow
+
+---
+
+## What Works Well vs What Needs Improvement
+
+### ✅ What Works Well
+
+| Area | Why It Works | Code Location |
+|------|--------------|---------------|
+| **Context Cascade** | GameContext→SceneContext provides clean reference propagation | `GameContext.cpp`, `SceneContext.cpp` |
+| **Resource/Context Separation** | Resources own objects, Contexts hold references | `GameResources.h`, `SceneResources.h` |
+| **FlatbuffersDataLoader Design** | Single class for all data loading, clear method naming | `FlatbuffersDataLoader.h` |
+| **Entity Configuration** | `FlatbuffersConfigurator` handles all component setup | `FlatbuffersConfigurator.cpp` |
+| **Scene Type Routing** | SceneType enum drives which files load | `ProvideDefaultSceneData()` |
+| **Error Propagation** | `std::expected` used consistently throughout | All loader/configurator code |
+| **Tick Execution Order** | Clear sequence: Events→Engine→SceneManager→Scenes | `Engine::ExecuteSystemsTick()` |
+| **Logic Factory Pattern** | Scene-specific logic configuration per SceneType | `LogicFactory::CreateLogicMap()` |
+
+### ⚠️ What Needs Improvement
+
+| Issue | Location | Impact | Suggested Fix |
+|-------|----------|--------|---------------|
+| **Unused ProvideEngineData result** | `Engine.cpp:38-41` | Dead code, wasted data load | Remove call or use the data |
+| **Redundant ProvideGameResourcesData** | `SceneFactory.cpp:72-77` | Loads data already in Engine, result unused | Remove the call |
+| **Multiple SceneData loads** | `SceneFactory` + `FlatbuffersConfigurator` | Same file loaded twice per scene creation | Cache the result or pass it down |
+| **Duplicate GameResourcesData schemas** | `engine_data.fbs` vs `context_data.fbs` | Confusion about source of truth | Pick one source |
+| **Duplicate SceneResourcesData** | `scene_data.fbs` vs `context_data.fbs` | Risk of inconsistency | Use scene_data.json only |
+| **No data caching** | Throughout `FlatbuffersDataLoader` | Reloads same files multiple times | Add optional caching |
+
+### Code Issues Identified
+
+#### Issue 1: Dead Code in Engine::StartUp()
+
+```cpp
+// Engine.cpp lines 38-47
+auto load_engine_data_result = data_loader.ProvideEngineData();
+if (!load_engine_data_result) {
+  return std::unexpected(load_engine_data_result.error());
+}
+// ❌ Result is never used! load_engine_data_result.value() goes unused
+```
+
+#### Issue 2: Unused Data Load in SceneFactory
+
+```cpp
+// SceneFactory.cpp lines 72-77
+FlatbuffersDataLoader data_loader;
+auto game_resources_result = data_loader.ProvideGameResourcesData();
+if (!game_resources_result) {
+  return std::unexpected(game_resources_result.error());
+}
+// ❌ game_resources_result.value() is never used!
+// This data was already loaded in Engine::StartUp()
+```
+
+#### Issue 3: Duplicate Scene Data Loads
+
+```cpp
+// SceneFactory.cpp loads scene resources:
+auto scene_resources_result = data_loader.ProvideSceneResourcesData(scene_type);
+
+// Then FlatbuffersConfigurator loads the same file again:
+const SceneDataData *scene_data = 
+    m_data_loader.ProvideDefaultSceneData(scene_type).value();
+// ❌ ProvideSceneResourcesData() internally calls ProvideDefaultSceneData()!
+```
+
+---
 
 ## Summary of Findings
 
@@ -571,6 +804,111 @@ This helps debugging and ensures proper handling of different data sources.
 6. **Add Data Source Tracking**
    - Add `DataSourceType` enum to EntityCollection
    - Helps debugging and ensures proper data handling
+
+---
+
+## Code-Level Recommendations
+
+### Immediate Code Fixes
+
+#### 1. Remove Dead Code in Engine::StartUp()
+
+**File:** `src/systems/Engine.cpp`
+
+```cpp
+// Current (lines 38-47):
+auto load_engine_data_result = data_loader.ProvideEngineData();
+if (!load_engine_data_result) {
+  return std::unexpected(load_engine_data_result.error());
+}
+// Result is never used!
+
+// FIX: Either use the data for something, or remove the call
+// If keeping, use it to configure subscriptions:
+auto engine_data = load_engine_data_result.value();
+if (engine_data->subscriptions()) {
+  auto sub_result = ConfigureSubscribersFromData(engine_data->subscriptions());
+  if (!sub_result) return std::unexpected(sub_result.error());
+}
+```
+
+#### 2. Remove Redundant Data Load in SceneFactory
+
+**File:** `src/scenes/SceneFactory.cpp`
+
+```cpp
+// Current (lines 72-77):
+FlatbuffersDataLoader data_loader;
+auto game_resources_result = data_loader.ProvideGameResourcesData();
+if (!game_resources_result) {
+  return std::unexpected(game_resources_result.error());
+}
+// ❌ Result unused and already loaded in Engine::StartUp()
+
+// FIX: Simply remove these lines - they serve no purpose
+```
+
+#### 3. Cache Scene Data to Avoid Duplicate Loads
+
+**File:** `src/scenes/SceneFactory.cpp`
+
+```cpp
+// Current: Scene data loaded multiple times
+auto scene_resources_result = data_loader.ProvideSceneResourcesData(scene_type);
+// Later, FlatbuffersConfigurator loads scene_data again
+
+// FIX: Load once and pass to configurator
+auto scene_data_result = data_loader.ProvideDefaultSceneData(scene_type);
+if (!scene_data_result) {
+  return std::unexpected(scene_data_result.error());
+}
+const SceneDataData* scene_data = scene_data_result.value();
+
+// Use scene_data->scene_resources() for configuration
+auto configure_resources_result = resources::ConfigureSceneResources(
+    scene_ptr->m_scene_resources, scene_data->scene_resources());
+
+// Pass scene_data to entity configuration instead of reloading
+auto configure_result = scene_ptr->ConfigureFromData(scene_data);
+```
+
+### Data Flow Improvements
+
+#### Option A: Pass Data Down the Chain
+
+Instead of each layer loading its own data, pass loaded data through the configuration chain:
+
+```
+Engine::StartUp()
+    │
+    └─▶ Load EngineData once
+            │
+            └─▶ Pass to SceneManager::ConfigureFromData(EngineData)
+                    │
+                    └─▶ SceneFactory receives required data
+                            │
+                            └─▶ Scene receives its data subset
+```
+
+#### Option B: Add Data Caching to FlatbuffersDataLoader
+
+```cpp
+class FlatbuffersDataLoader {
+private:
+  mutable std::unordered_map<SceneType, const SceneDataData*> m_scene_data_cache;
+  mutable const EngineData* m_engine_data_cache = nullptr;
+  
+public:
+  // Returns cached data if available
+  std::expected<const SceneDataData*, FailInfo>
+  ProvideDefaultSceneData(const SceneType scene_type) const {
+    if (m_scene_data_cache.contains(scene_type)) {
+      return m_scene_data_cache[scene_type];
+    }
+    // Load and cache...
+  }
+};
+```
 
 ---
 
