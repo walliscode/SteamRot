@@ -1,10 +1,9 @@
-
 include "entities.fbs";
 include "assets.fbs";
 include "resource_data.fbs";
 include "scene_types.fbs";
 
-namespace steamrot; 
+namespace steamrot;
 
 table SceneData{
     entity_collection: EntityCollection;
