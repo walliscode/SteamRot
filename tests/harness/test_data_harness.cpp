@@ -8,21 +8,17 @@
 /////////////////////////////////////////////////
 #include "test_data_harness.h"
 #include "EntityMemoryPoolEqualsMatcher.h"
-#include "EventBusEqualsMatcher.h"
 #include "FlatbuffersConfigurator.h"
 #include "TestEngine.h"
 #include "catch2/matchers/catch_matchers.hpp"
-#include "conmat.h"
-#include "console_output.h"
 #include "engine_data_generated.h"
-#include "event_bus_conversion.h"
+
 #include "test_context.h"
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
 #include <format>
 #include <fstream>
 #include <iostream>
-#include <sstream>
 
 namespace steamrot::tests {
 
@@ -128,11 +124,9 @@ LoadTestDataConfigsImpl(const char *source_file_path) {
 /////////////////////////////////////////////////
 /// @brief Helper to compare EntityMemoryPool with EngineData from tick snapshot
 /////////////////////////////////////////////////
-static std::expected<std::monostate, FailInfo>
-CompareTickSnapshotEntityPool(const SceneData &actual_scene_data,
-                              const EngineData *expected_engine_state,
-                              const TestContext &context,
-                              bool expected_to_pass) {
+static std::expected<std::monostate, FailInfo> CompareTickSnapshotEntityPool(
+    const SceneData &actual_scene_data, const EngineData *expected_engine_state,
+    const TestContext &context, bool expected_to_pass) {
 
   // If no engine state in snapshot, skip comparison
   if (!expected_engine_state) {
@@ -190,8 +184,7 @@ CompareTickSnapshotEntityPool(const SceneData &actual_scene_data,
 /////////////////////////////////////////////////
 /// @brief Compare data bank entry with tick snapshot
 /////////////////////////////////////////////////
-static std::expected<std::monostate, FailInfo>
-CompareDataBankWithTickSnapshot(
+static std::expected<std::monostate, FailInfo> CompareDataBankWithTickSnapshot(
     const std::vector<SceneData> &actual_scene_snapshots,
     const TickSnapshot *tick_snapshot, const TestContext &context,
     bool expected_to_pass) {
@@ -265,10 +258,10 @@ RunTestEngineTest(const TestDataConfig *config) {
       // Find the corresponding data bank entry
       auto it = data_bank.find(tick_num);
       if (it == data_bank.end()) {
-        std::string error_message = std::format(
-            "No data bank entry found for tick {}", tick_num);
+        std::string error_message =
+            std::format("No data bank entry found for tick {}", tick_num);
         return std::unexpected(
-            FailInfo(FailMode::InvalidData, error_message));
+            FailInfo(FailMode::FlatbuffersDataNotFound, error_message));
       }
 
       // Build context for this tick
@@ -280,9 +273,8 @@ RunTestEngineTest(const TestDataConfig *config) {
       }
 
       // Compare the data bank entry with the snapshot
-      auto result = CompareDataBankWithTickSnapshot(it->second, tick_snapshot,
-                                                    tick_context,
-                                                    expected_to_pass);
+      auto result = CompareDataBankWithTickSnapshot(
+          it->second, tick_snapshot, tick_context, expected_to_pass);
 
       if (!result.has_value()) {
         return std::unexpected(result.error());
@@ -301,9 +293,9 @@ RunTestEngineTest(const TestDataConfig *config) {
 
 std::expected<std::monostate, FailInfo>
 RunFixtureTest(const TestDataConfig * /*config*/) {
-  return std::unexpected(FailInfo(
-      FailMode::NotImplemented,
-      "RunFixtureTest is deprecated. Use RunTestEngineTest instead."));
+  return std::unexpected(
+      FailInfo(FailMode::NotImplemented,
+               "RunFixtureTest is deprecated. Use RunTestEngineTest instead."));
 }
 
 } // namespace steamrot::tests

@@ -14,12 +14,11 @@
 #include "DataLoader.h"
 #include "FailInfo.h"
 #include "context_data_generated.h"
-#include "game_engine_generated.h"
+#include "engine_data_generated.h"
 #include "logic_data_generated.h"
 #include "resource_data_generated.h"
-#include "scene_change_packet_generated.h"
-#include "scene_manager_generated.h"
-#include "scenes_generated.h"
+#include "scene_data_generated.h"
+#include "scene_manager_data_generated.h"
 #include "ui_style_generated.h"
 #include <expected>
 #include <map>
@@ -55,7 +54,7 @@ public:
   /////////////////////////////////////////////////
   /// @brief Provides GameEngineData from binary file
   /////////////////////////////////////////////////
-  std::expected<const GameEngineData *, FailInfo> ProvideEngineData() const;
+  std::expected<const EngineData *, FailInfo> ProvideEngineData() const;
 
   /////////////////////////////////////////////////
   /// @brief Provides SceneManagerData from binary file
@@ -68,7 +67,7 @@ public:
   ///
   /// @param scene_type Enum representing the type of scene
   /////////////////////////////////////////////////
-  std::expected<const SceneData *, FailInfo>
+  std::expected<const SceneDataData *, FailInfo>
   ProvideSceneData(const SceneType scene_type) const;
 
   /////////////////////////////////////////////////
