@@ -1,28 +1,29 @@
 # List your schema files
 set(schema_files
-    ${CMAKE_CURRENT_SOURCE_DIR}/ui_style.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/scene_data.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/user_input.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/entities.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/types.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/user_interface.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/grimoire_machina.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/ui_state.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/user_input.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/assets.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/grimoire_machina.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/fragments.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/ui_style.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/simulation.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/resource_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/scene_types.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/input_test_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/joints.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/events.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/subscriber_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/event_packet_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/subscriber_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/event_bus_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/event_test_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/user_interface.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/ui_state.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/entities.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/scene_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/scene_manager_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/context_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/engine_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/test_data.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/context_data.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/resource_data.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/simulation.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/input_test_data.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/event_test_data.fbs
 )
 
 set(generated_headers)
