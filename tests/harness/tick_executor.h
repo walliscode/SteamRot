@@ -15,6 +15,7 @@
 
 #include "test_data_generated.h"
 #include <expected>
+#include <variant>
 
 namespace steamrot::tests {
 
@@ -34,8 +35,7 @@ namespace steamrot::tests {
 /// @return std::monostate on success or match, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-CompareTickSnapshot(uint32_t tick, const TestDataConfig *config,
-                    TestFixture &fixture);
+CompareTickSnapshot(uint32_t tick, const TestDataConfig *config);
 
 /////////////////////////////////////////////////
 /// @brief Execute test for a single tick
@@ -52,8 +52,7 @@ CompareTickSnapshot(uint32_t tick, const TestDataConfig *config,
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ExecuteSingleTick(uint32_t tick, const TestDataConfig *config,
-                  TestFixture &fixture);
+ExecuteSingleTick(uint32_t tick, const TestDataConfig *config);
 
 /////////////////////////////////////////////////
 /// @brief Determine the number of ticks to execute for a test
@@ -93,6 +92,6 @@ uint32_t DetermineNumTicks(const TestDataConfig *config);
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ExecuteTickBasedTest(const TestDataConfig *config, TestFixture &fixture);
+ExecuteTickBasedTest(const TestDataConfig *config);
 
 } // namespace steamrot::tests

@@ -11,7 +11,9 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "EventHandler.h"
 #include "FailInfo.h"
+#include "GameContext.h"
 #include "input_test_data_generated.h"
 #include <expected>
 #include <variant>
@@ -31,7 +33,8 @@ namespace steamrot::tests {
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ExecuteInputEvent(const InputEvent *input_event, TestFixture &fixture);
+InjectInput(const InputEvent *input_event, EventHandler &event_handler,
+            GameContext &game_context);
 
 /////////////////////////////////////////////////
 /// @brief Execute all input events for a specific tick
@@ -40,32 +43,10 @@ ExecuteInputEvent(const InputEvent *input_event, TestFixture &fixture);
 /// Events with the same tick are processed in the order they appear in the
 /// input sequence.
 ///
-/// @param input_sequence The input sequence containing all events
-/// @param tick The tick number to process
-/// @param fixture TestFixture containing the test environment
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-ExecuteInputEventsForTick(const InputSequence *input_sequence, uint32_t tick,
-                          TestFixture &fixture);
-
-/////////////////////////////////////////////////
-/// @brief Execute a complete input sequence
-///
-/// Processes all input events in the sequence, generating EventPackets at the
-/// appropriate tick. This is a convenience function that iterates through all
-/// ticks and calls ExecuteInputEventsForTick for each unique tick value.
-///
-/// Note: This function does NOT advance simulation ticks automatically or
-/// process the waiting room event bus. It only adds EventPackets to the
-/// waiting room. The caller is responsible for calling
-/// ProcessWaitingRoomEventBus() and running simulations between ticks.
-///
-/// @param input_sequence The input sequence to execute
-/// @param fixture TestFixture containing the test environment
-/// @return std::monostate on success, FailInfo on error
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-ExecuteInputSequence(const InputSequence *input_sequence, TestFixture &fixture);
+std::expected<std::monostate, FailInfo> InjectInputsForTick(
+    const flatbuffers::Vector<flatbuffers::Offset<InputEvent>> *input_events,
+    EventHandler &event_handler, GameContext &game_context);
 
 } // namespace steamrot::tests

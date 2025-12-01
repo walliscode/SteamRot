@@ -12,7 +12,6 @@
 #include "FailInfo.h"
 #include "event_packet_data_generated.h"
 #include "events_generated.h"
-#include "scene_change_packet_generated.h"
 #include "user_input_generated.h"
 #include <SFML/Graphics.hpp>
 #include <expected>

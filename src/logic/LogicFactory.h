@@ -18,7 +18,6 @@
 #include "UICollisionLogic.h"
 #include "UIRenderLogic.h"
 #include "UIStateLogic.h"
-#include "logic_data_generated.h"
 #include "scene_change_packet_generated.h"
 #include <expected>
 #include <memory>
@@ -42,23 +41,23 @@ using LogicCollection = std::unordered_map<LogicType, LogicVector>;
 class LogicFactory {
 
 private:
-/////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   /// @brief SceneType of the scene for which logics are created.
-/////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   const SceneType m_scene_type;
 
-/////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   /// @brief member variable that holds the SceneContext
-/////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   SceneContext m_scene_context;
 
   SubscriberFactory m_subscriber_factory;
-/////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   /// @brief Attach subscribers to a Logic instance based on LogicData
   ///
   /// @param logic Logic instance to attach subscribers to
   /// @param logic_data LogicData containing subscriber configuration
-/////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo>
   AttachSubscribers(Logic &logic, const LogicData *logic_data);
 
@@ -204,12 +203,12 @@ private:
     logic_vector.push_back(std::move(logic_object_creation_result.value()));
   }
 
-/////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   /// @brief Createand return an empty LogicCollection configured with
   /// LogicVectors
   ///
   /// @return LogicCollection
-/////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   LogicCollection CreateEmptyLogicCollection();
 
   std::expected<std::monostate, FailInfo> TitleSceneLogicConfiguration(
@@ -225,21 +224,21 @@ private:
                               const LogicCollectionData *logic_collection_data);
 
 public:
-/////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   /// @brief Constructor for the LogicFactory class.
   ///
   /// @param scene_type SceneType of the scene for which logics are created
   /// @param scene_context SceneContext object containing references to the
   /// scene
-/////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   LogicFactory(const SceneType scene_type, const SceneContext &scene_context);
 
-/////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   /// @brief Create and return a map of logic objects.
   ///
   /// @param logic_collection_data Optional pointer to LogicCollectionData. If
   /// nullptr, Logic classes are still added but not configured.
-/////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   std::expected<LogicCollection, FailInfo>
   CreateLogicMap(const LogicCollectionData *logic_collection_data = nullptr);
 };
