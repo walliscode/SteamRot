@@ -2,7 +2,7 @@ include "entities.fbs";
 include "resource_data.fbs";
 include "simulation.fbs";
 include "input_test_data.fbs";
-include "event_test_data.fbs";
+include "event_packet_data.fbs";
 include "event_bus_data.fbs";
 include "engine_data.fbs";
 
@@ -34,10 +34,10 @@ table TickSnapshot {
 
 
   /// @brief Inputs to inject at specific tick
-  input_sequence: InputSequence;
+  input_sequence: [InputEvent];
   
   /// @brief Events to inject at specific tick
-  event_sequence: EventSequence;
+  injection_events:[EventPacketData];
 }
 
 ////////////////////////////////////////////////////////////

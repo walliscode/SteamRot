@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "event_simulation.h"
-#include "TestFixture.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("execute_event_test_data handles null event data",
@@ -24,7 +23,6 @@ TEST_CASE("execute_events_for_tick handles null sequence",
           "[unit][harness][event_simulation]") {
   steamrot::tests::TestFixture fixture;
   fixture.Intialize();
-
 
   auto result = steamrot::tests::ExecuteEventsForTick(nullptr, 1, fixture);
 
@@ -55,8 +53,7 @@ TEST_CASE("execute_event_sequence handles empty sequence",
   const steamrot::EventSequence *event_sequence =
       flatbuffers::GetRoot<steamrot::EventSequence>(builder.GetBufferPointer());
 
-  auto result =
-      steamrot::tests::ExecuteEventSequence(event_sequence, fixture);
+  auto result = steamrot::tests::ExecuteEventSequence(event_sequence, fixture);
   REQUIRE(result.has_value());
 }
 
@@ -190,8 +187,7 @@ TEST_CASE("execute_event_sequence processes all ticks in order",
       flatbuffers::GetRoot<steamrot::EventSequence>(builder.GetBufferPointer());
 
   // Execute entire sequence
-  auto result =
-      steamrot::tests::ExecuteEventSequence(event_sequence, fixture);
+  auto result = steamrot::tests::ExecuteEventSequence(event_sequence, fixture);
   REQUIRE(result.has_value());
 
   // Process waiting room to move all events to global bus

@@ -18,7 +18,6 @@
 /////////////////////////////////////////////////
 
 #include "Engine.h"
-#include "SceneInfo.h"
 #include "simulation_generated.h"
 #include "test_data_generated.h"
 #include <unordered_map>
@@ -72,7 +71,7 @@ private:
   /////////////////////////////////////////////////
   /// @brief Stores the tick number and data at that point
   /////////////////////////////////////////////////
-  std::unordered_map<size_t, std::vector<SceneInfo>> m_data_bank;
+  std::unordered_map<size_t, std::vector<SceneData>> m_data_bank;
 
   /////////////////////////////////////////////////
   /// @brief Currently, this will be left blank for the TestEngine
@@ -113,6 +112,6 @@ public:
   /////////////////////////////////////////////////
   /// @brief Returns data bank for inspection and testing
   /////////////////////////////////////////////////
-  const std::unordered_map<size_t, std::vector<SceneInfo>> &GetDataBank() const;
+  const std::unordered_map<size_t, std::vector<SceneData>> &GetDataBank() const;
 };
 } // namespace steamrot::tests

@@ -12,6 +12,7 @@ set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/input_test_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/joints.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/events.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/logic_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/event_packet_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/subscriber_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/event_bus_data.fbs

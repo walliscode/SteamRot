@@ -20,11 +20,11 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
-struct SceneData;
-struct SceneDataBuilder;
+struct SceneDataData;
+struct SceneDataDataBuilder;
 
-struct SceneData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef SceneDataBuilder Builder;
+struct SceneDataData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SceneDataDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ENTITY_COLLECTION = 4,
     VT_ASSETS = 6,
@@ -62,44 +62,44 @@ struct SceneData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct SceneDataBuilder {
-  typedef SceneData Table;
+struct SceneDataDataBuilder {
+  typedef SceneDataData Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_entity_collection(::flatbuffers::Offset<steamrot::EntityCollection> entity_collection) {
-    fbb_.AddOffset(SceneData::VT_ENTITY_COLLECTION, entity_collection);
+    fbb_.AddOffset(SceneDataData::VT_ENTITY_COLLECTION, entity_collection);
   }
   void add_assets(::flatbuffers::Offset<steamrot::AssetCollection> assets) {
-    fbb_.AddOffset(SceneData::VT_ASSETS, assets);
+    fbb_.AddOffset(SceneDataData::VT_ASSETS, assets);
   }
   void add_scene_resources(::flatbuffers::Offset<steamrot::SceneResourcesData> scene_resources) {
-    fbb_.AddOffset(SceneData::VT_SCENE_RESOURCES, scene_resources);
+    fbb_.AddOffset(SceneDataData::VT_SCENE_RESOURCES, scene_resources);
   }
   void add_scene_id(::flatbuffers::Offset<::flatbuffers::String> scene_id) {
-    fbb_.AddOffset(SceneData::VT_SCENE_ID, scene_id);
+    fbb_.AddOffset(SceneDataData::VT_SCENE_ID, scene_id);
   }
   void add_scene_type(steamrot::SceneType scene_type) {
-    fbb_.AddElement<int8_t>(SceneData::VT_SCENE_TYPE, static_cast<int8_t>(scene_type), 0);
+    fbb_.AddElement<int8_t>(SceneDataData::VT_SCENE_TYPE, static_cast<int8_t>(scene_type), 0);
   }
-  explicit SceneDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit SceneDataDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<SceneData> Finish() {
+  ::flatbuffers::Offset<SceneDataData> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<SceneData>(end);
+    auto o = ::flatbuffers::Offset<SceneDataData>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<SceneData> CreateSceneData(
+inline ::flatbuffers::Offset<SceneDataData> CreateSceneDataData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::EntityCollection> entity_collection = 0,
     ::flatbuffers::Offset<steamrot::AssetCollection> assets = 0,
     ::flatbuffers::Offset<steamrot::SceneResourcesData> scene_resources = 0,
     ::flatbuffers::Offset<::flatbuffers::String> scene_id = 0,
     steamrot::SceneType scene_type = steamrot::SceneType_UNKNOWN) {
-  SceneDataBuilder builder_(_fbb);
+  SceneDataDataBuilder builder_(_fbb);
   builder_.add_scene_id(scene_id);
   builder_.add_scene_resources(scene_resources);
   builder_.add_assets(assets);
@@ -108,7 +108,7 @@ inline ::flatbuffers::Offset<SceneData> CreateSceneData(
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<SceneData> CreateSceneDataDirect(
+inline ::flatbuffers::Offset<SceneDataData> CreateSceneDataDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::EntityCollection> entity_collection = 0,
     ::flatbuffers::Offset<steamrot::AssetCollection> assets = 0,
@@ -116,7 +116,7 @@ inline ::flatbuffers::Offset<SceneData> CreateSceneDataDirect(
     const char *scene_id = nullptr,
     steamrot::SceneType scene_type = steamrot::SceneType_UNKNOWN) {
   auto scene_id__ = scene_id ? _fbb.CreateString(scene_id) : 0;
-  return steamrot::CreateSceneData(
+  return steamrot::CreateSceneDataData(
       _fbb,
       entity_collection,
       assets,
@@ -125,33 +125,33 @@ inline ::flatbuffers::Offset<SceneData> CreateSceneDataDirect(
       scene_type);
 }
 
-inline const steamrot::SceneData *GetSceneData(const void *buf) {
-  return ::flatbuffers::GetRoot<steamrot::SceneData>(buf);
+inline const steamrot::SceneDataData *GetSceneDataData(const void *buf) {
+  return ::flatbuffers::GetRoot<steamrot::SceneDataData>(buf);
 }
 
-inline const steamrot::SceneData *GetSizePrefixedSceneData(const void *buf) {
-  return ::flatbuffers::GetSizePrefixedRoot<steamrot::SceneData>(buf);
+inline const steamrot::SceneDataData *GetSizePrefixedSceneDataData(const void *buf) {
+  return ::flatbuffers::GetSizePrefixedRoot<steamrot::SceneDataData>(buf);
 }
 
-inline bool VerifySceneDataBuffer(
+inline bool VerifySceneDataDataBuffer(
     ::flatbuffers::Verifier &verifier) {
-  return verifier.VerifyBuffer<steamrot::SceneData>(nullptr);
+  return verifier.VerifyBuffer<steamrot::SceneDataData>(nullptr);
 }
 
-inline bool VerifySizePrefixedSceneDataBuffer(
+inline bool VerifySizePrefixedSceneDataDataBuffer(
     ::flatbuffers::Verifier &verifier) {
-  return verifier.VerifySizePrefixedBuffer<steamrot::SceneData>(nullptr);
+  return verifier.VerifySizePrefixedBuffer<steamrot::SceneDataData>(nullptr);
 }
 
-inline void FinishSceneDataBuffer(
+inline void FinishSceneDataDataBuffer(
     ::flatbuffers::FlatBufferBuilder &fbb,
-    ::flatbuffers::Offset<steamrot::SceneData> root) {
+    ::flatbuffers::Offset<steamrot::SceneDataData> root) {
   fbb.Finish(root);
 }
 
-inline void FinishSizePrefixedSceneDataBuffer(
+inline void FinishSizePrefixedSceneDataDataBuffer(
     ::flatbuffers::FlatBufferBuilder &fbb,
-    ::flatbuffers::Offset<steamrot::SceneData> root) {
+    ::flatbuffers::Offset<steamrot::SceneDataData> root) {
   fbb.FinishSizePrefixed(root);
 }
 

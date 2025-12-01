@@ -1,0 +1,37 @@
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+include "subscriber_data.fbs";
+
+namespace steamrot;
+
+
+// Contains information about all subscriber data for the Logic instance
+table LogicData{ 
+  all_subscriptions: [SubscriberData]; 
+  }
+
+
+// Each logic class is specified by name and contains its own LogicData, all possible Logic classes are added here but may not be used
+table LogicVectorData {
+
+  // Collision LogicData
+  ui_collision_logic_data : LogicData;
+
+  // Action LogicData
+  ui_action_logic_data : LogicData;
+  ui_state_logic_data : LogicData;
+
+  // Render LogicData
+  ui_render_logic_data : LogicData;
+  crafting_render_logic_data : LogicData;
+  }
+
+
+// Contains a collection of LogicData for each logic type
+table LogicCollectionData {
+  action_logic_data : LogicVectorData;
+  collision_logic_data : LogicVectorData;
+  movement_logic_data : LogicVectorData;
+  render_logic_data :  LogicVectorData;
+  }

@@ -16,7 +16,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 #include "engine_data_generated.h"
 #include "entities_generated.h"
 #include "event_bus_data_generated.h"
-#include "event_test_data_generated.h"
+#include "event_packet_data_generated.h"
 #include "input_test_data_generated.h"
 #include "resource_data_generated.h"
 #include "simulation_generated.h"
@@ -49,7 +49,7 @@ struct TickSnapshot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_ENGINE_STATE = 6,
     VT_DESCRIPTION = 8,
     VT_INPUT_SEQUENCE = 10,
-    VT_EVENT_SEQUENCE = 12
+    VT_INJECTION_EVENTS = 12
   };
   /// @brief Tick number when this snapshot should be compared (1-based)
   /// The comparison happens AFTER simulation steps execute for this tick,
@@ -67,12 +67,12 @@ struct TickSnapshot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     return GetPointer<const ::flatbuffers::String *>(VT_DESCRIPTION);
   }
   /// @brief Inputs to inject at specific tick
-  const steamrot::InputSequence *input_sequence() const {
-    return GetPointer<const steamrot::InputSequence *>(VT_INPUT_SEQUENCE);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::InputEvent>> *input_sequence() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::InputEvent>> *>(VT_INPUT_SEQUENCE);
   }
   /// @brief Events to inject at specific tick
-  const steamrot::EventSequence *event_sequence() const {
-    return GetPointer<const steamrot::EventSequence *>(VT_EVENT_SEQUENCE);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketData>> *injection_events() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketData>> *>(VT_INJECTION_EVENTS);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -82,9 +82,11 @@ struct TickSnapshot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_DESCRIPTION) &&
            verifier.VerifyString(description()) &&
            VerifyOffset(verifier, VT_INPUT_SEQUENCE) &&
-           verifier.VerifyTable(input_sequence()) &&
-           VerifyOffset(verifier, VT_EVENT_SEQUENCE) &&
-           verifier.VerifyTable(event_sequence()) &&
+           verifier.VerifyVector(input_sequence()) &&
+           verifier.VerifyVectorOfTables(input_sequence()) &&
+           VerifyOffset(verifier, VT_INJECTION_EVENTS) &&
+           verifier.VerifyVector(injection_events()) &&
+           verifier.VerifyVectorOfTables(injection_events()) &&
            verifier.EndTable();
   }
 };
@@ -102,11 +104,11 @@ struct TickSnapshotBuilder {
   void add_description(::flatbuffers::Offset<::flatbuffers::String> description) {
     fbb_.AddOffset(TickSnapshot::VT_DESCRIPTION, description);
   }
-  void add_input_sequence(::flatbuffers::Offset<steamrot::InputSequence> input_sequence) {
+  void add_input_sequence(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::InputEvent>>> input_sequence) {
     fbb_.AddOffset(TickSnapshot::VT_INPUT_SEQUENCE, input_sequence);
   }
-  void add_event_sequence(::flatbuffers::Offset<steamrot::EventSequence> event_sequence) {
-    fbb_.AddOffset(TickSnapshot::VT_EVENT_SEQUENCE, event_sequence);
+  void add_injection_events(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketData>>> injection_events) {
+    fbb_.AddOffset(TickSnapshot::VT_INJECTION_EVENTS, injection_events);
   }
   explicit TickSnapshotBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -124,10 +126,10 @@ inline ::flatbuffers::Offset<TickSnapshot> CreateTickSnapshot(
     uint32_t tick = 0,
     ::flatbuffers::Offset<steamrot::EngineData> engine_state = 0,
     ::flatbuffers::Offset<::flatbuffers::String> description = 0,
-    ::flatbuffers::Offset<steamrot::InputSequence> input_sequence = 0,
-    ::flatbuffers::Offset<steamrot::EventSequence> event_sequence = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::InputEvent>>> input_sequence = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketData>>> injection_events = 0) {
   TickSnapshotBuilder builder_(_fbb);
-  builder_.add_event_sequence(event_sequence);
+  builder_.add_injection_events(injection_events);
   builder_.add_input_sequence(input_sequence);
   builder_.add_description(description);
   builder_.add_engine_state(engine_state);
@@ -140,16 +142,18 @@ inline ::flatbuffers::Offset<TickSnapshot> CreateTickSnapshotDirect(
     uint32_t tick = 0,
     ::flatbuffers::Offset<steamrot::EngineData> engine_state = 0,
     const char *description = nullptr,
-    ::flatbuffers::Offset<steamrot::InputSequence> input_sequence = 0,
-    ::flatbuffers::Offset<steamrot::EventSequence> event_sequence = 0) {
+    const std::vector<::flatbuffers::Offset<steamrot::InputEvent>> *input_sequence = nullptr,
+    const std::vector<::flatbuffers::Offset<steamrot::EventPacketData>> *injection_events = nullptr) {
   auto description__ = description ? _fbb.CreateString(description) : 0;
+  auto input_sequence__ = input_sequence ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::InputEvent>>(*input_sequence) : 0;
+  auto injection_events__ = injection_events ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::EventPacketData>>(*injection_events) : 0;
   return steamrot::CreateTickSnapshot(
       _fbb,
       tick,
       engine_state,
       description__,
-      input_sequence,
-      event_sequence);
+      input_sequence__,
+      injection_events__);
 }
 
 ////////////////////////////////////////////////////////////

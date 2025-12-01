@@ -16,7 +16,7 @@
 #include "SceneInfoProvider.h"
 #include "Subscriber.h"
 #include "events_generated.h"
-#include "scene_manager_generated.h"
+#include "scene_manager_data_generated.h"
 #include "subscriber_data_generated.h"
 #include "uuid.h"
 #include <SFML/Graphics.hpp>
@@ -137,7 +137,7 @@ public:
   /////////////////////////////////////////////////
   /// @brief Provides information about all available scenes.
   /////////////////////////////////////////////////
-  const std::expected<std::vector<SceneInfo>, FailInfo>
+  const std::expected<std::vector<SceneData>, FailInfo>
   ProvideAvailableSceneInfo() const override;
 
   /////////////////////////////////////////////////

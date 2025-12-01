@@ -35,7 +35,7 @@ void TestEngine::RunGameLoop() {
 void TestEngine::AddToDataBank(size_t tick) {}
 
 /////////////////////////////////////////////////
-const std::unordered_map<size_t, std::vector<SceneInfo>> &
+const std::unordered_map<size_t, std::vector<SceneData>> &
 TestEngine::GetDataBank() const {
   return m_data_bank;
 }

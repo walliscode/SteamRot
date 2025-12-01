@@ -11,10 +11,12 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "EventHandler.h"
 #include "FailInfo.h"
-#include "TestFixture.h"
-#include "event_test_data_generated.h"
+#include "event_packet_data_generated.h"
+#include "flatbuffers/vector.h"
 #include <expected>
+#include <variant>
 
 namespace steamrot::tests {
 
@@ -25,11 +27,11 @@ namespace steamrot::tests {
 /// event handler's waiting room event bus.
 ///
 /// @param event_data The event test data to execute
-/// @param fixture TestFixture containing the test environment
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ExecuteEventTestData(const EventTestData *event_data, TestFixture &fixture);
+InjectEvent(const EventPacketData *event_packet_data,
+            EventHandler &event_handler);
 
 /////////////////////////////////////////////////
 /// @brief Execute all events for a specific tick
@@ -44,26 +46,7 @@ ExecuteEventTestData(const EventTestData *event_data, TestFixture &fixture);
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ExecuteEventsForTick(const EventSequence *event_sequence, uint32_t tick,
-                     TestFixture &fixture);
-
-/////////////////////////////////////////////////
-/// @brief Execute a complete event sequence
-///
-/// Processes all events in the sequence, adding them at the appropriate
-/// tick. This is a convenience function that iterates through all ticks and
-/// calls ExecuteEventsForTick for each unique tick value.
-///
-/// Note: This function does NOT process the waiting room or tick the event bus.
-/// It only adds events to the waiting room. The caller is responsible for
-/// calling ProcessWaitingRoomEventBus() and TickGlobalEventBus() as needed.
-///
-/// @param event_sequence The event sequence to execute
-/// @param fixture TestFixture containing the test environment
-/// @return std::monostate on success, FailInfo on error
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-ExecuteEventSequence(const EventSequence *event_sequence,
-                     TestFixture &fixture);
+InjectEventsForTick(const flatbuffers::Vector<EventPacketData *> *events,
+                    EventHandler &event_handler);
 
 } // namespace steamrot::tests

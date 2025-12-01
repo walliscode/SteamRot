@@ -9,7 +9,7 @@
 #pragma once
 
 #include "FailInfo.h"
-#include "Scene.h"
+#include "SceneData.h"
 #include "uuid.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -26,23 +26,23 @@ namespace steamrot {
 class SceneInfoProvider {
 protected:
 public:
-/////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   /// @brief Virtual destructor
-/////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   virtual ~SceneInfoProvider() = default;
 
-/////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   /// @brief Provides a map of textures based on given scene IDs
   ///
   /// @param scene_ids Scene IDs to fetch textures for
-/////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   virtual const std::expected<
       std::unordered_map<uuids::uuid,
                          std::reference_wrapper<sf::RenderTexture>>,
       FailInfo>
   ProvideTextures(std::vector<uuids::uuid> &scene_ids) const = 0;
 
-  virtual const std::expected<std::vector<SceneInfo>, FailInfo>
+  virtual const std::expected<std::vector<SceneData>, FailInfo>
   ProvideAvailableSceneInfo() const = 0;
 };
 } // namespace steamrot
