@@ -4,36 +4,68 @@
 
 The test harness provides a unified, simplified interface for:
 1. Loading test data configurations for data-driven testing with Catch2 generators
-2. Creating and configuring TestFixture instances from test data
+2. Creating and running TestEngine instances from test data configurations
 3. **Tick-based test execution** - coordinated execution of inputs, events, and simulation per tick
 4. **Executing input sequences** - simulating user input (mouse/keyboard) on a tick-by-tick basis
 5. **Executing event sequences** - injecting engine events on a tick-by-tick basis
 6. **Executing simulations** - running sequences of Logic classes or free functions
-7. Running comparison tests between expected and actual entity states
-8. **EventBus state management and comparison** - initializing and validating EventBus state at start, during ticks, and at end
+7. **Data bank capture** - collecting scene state snapshots at each tick
+8. **Tick snapshot comparison** - comparing data bank entries with expected tick snapshots
 
-This consolidates functionality for resource-based testing and data-driven test execution with support for complex simulation scenarios and tick-by-tick coordination of inputs, events, simulation steps, and EventBus state validation.
+This consolidates functionality for resource-based testing and data-driven test execution with support for complex simulation scenarios and tick-by-tick state validation.
+
+## Primary Workflow
+
+The recommended workflow uses the `RunTestEngineTest` function:
+
+```cpp
+#include "test_data_harness.h"
+#include <catch2/generators/catch_generators_range.hpp>
+
+TEST_CASE("Data-driven test with TestEngine", "[unit]") {
+  // 1. Load test data from adjacent data/ directory
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  
+  // 2. Use Catch2 GENERATE to iterate through configs
+  const auto *config = GENERATE_COPY(from_range(configs.value()));
+  
+  // 3. Run test - creates TestEngine, runs it, compares with tick_snapshots
+  auto result = steamrot::tests::RunTestEngineTest(config);
+  REQUIRE(result.has_value());
+}
+```
+
+This workflow:
+1. Finds the adjacent `data/` directory
+2. Loads all `TestDataConfig` objects from `.test_data.bin` files
+3. Uses Catch2's GENERATE to run the test for each config
+4. Passes each config to TestEngine
+5. Runs TestEngine for the configured number of ticks
+6. Pulls out the data bank (scene state at each tick)
+7. Compares data bank entries with `tick_snapshots` from the config
+8. Uses purely tick-based comparison (no `expected_entity_collection`)
 
 ## Purpose
 
 - Provide a single, simple API for loading test data
-- Integrate TestFixture for resource setup and management
+- Use TestEngine for unified resource management (shares Engine base with GameEngine)
 - **Tick-based execution** - coordinate inputs, events, and simulation per tick
-- **Execute input sequences** - simulate user input tick-by-tick
-- **Execute event sequences** - inject engine events tick-by-tick
-- **Execute simulations** - run sequences of Logic classes or free functions defined in test data
-- **EventBus testing** - configure initial EventBus state, validate state at tick snapshots, and compare final state
-- Enable data-driven testing with automatic fixture creation
-- Work seamlessly with Catch2 generators and matchers
+- **Data bank** - capture scene state at each tick for comparison
+- **Tick snapshot validation** - compare captured state with expected snapshots
+- Enable data-driven testing with Catch2 generators
 - Keep the interface minimal and easy to use
 
 ## Directory Structure
 
 ```
 harness/
-├── test_data_harness.h            # Unified API for loading test data
+├── test_data_harness.h            # Unified API for loading and running tests
 ├── test_data_harness.cpp          # Implementation
 ├── test_data_harness.test.cpp     # Unit tests
+├── TestEngine.h                   # TestEngine class (extends Engine)
+├── TestEngine.cpp                 # Implementation
+├── TestEngine.test.cpp            # TestEngine tests
 ├── simulation_runner.h            # Simulation execution engine
 ├── simulation_runner.cpp          # Implementation
 ├── simulation_runner.test.cpp     # Simulation tests
@@ -43,25 +75,12 @@ harness/
 ├── event_simulation.h             # Event sequence simulation
 ├── event_simulation.cpp           # Implementation
 ├── event_simulation.test.cpp      # Event simulation tests
-├── tick_executor.h                # Tick-based test execution
-├── tick_executor.cpp              # Implementation
-├── tick_executor.test.cpp         # Tick execution tests
-├── TestFixture.h                  # Resource management for tests
-├── TestFixture.cpp                # Implementation
-├── console_output.h               # Formatted console output utilities
-├── CONSOLE_OUTPUT_EXAMPLES.md     # Console output examples
 ├── CMakeLists.txt                 # Build configuration
 ├── README.md                      # This file
 └── data/                          # Sample test data files
-    ├── sample_test_1.test_data.json
-    ├── sample_test_2.test_data.json
-    ├── sample_test_3.test_data.json
-    ├── sample_simulation_test.test_data.json
-    ├── sample_function_simulation.test_data.json
-    ├── sample_input_sequence.test_data.json
-    ├── sample_event_sequence.test_data.json
-    ├── sample_input_event_simulation.test_data.json
-    └── sample_tick_based_execution.test_data.json
+    ├── harness_basic_001.test_data.json
+    ├── harness_simulation_001.test_data.json
+    └── ...
 ```
 
 ## Formatted Console Output in Matchers
@@ -168,64 +187,67 @@ All console output functions automatically include newlines for proper spacing, 
 
 ## Usage
 
-### TestFixture Integration (Recommended)
+### TestEngine Integration (Recommended)
 
-The main wrapper function for data-driven testing with TestFixture:
+The primary wrapper function for data-driven testing with TestEngine:
 
 ```cpp
 #include "test_data_harness.h"
 #include <catch2/generators/catch_generators_range.hpp>
 
-TEST_CASE("Data-driven test with TestFixture", "[unit][my_component]") {
-  // Load test configurations
+TEST_CASE("Data-driven test with TestEngine", "[unit][my_component]") {
+  // Load test configurations from adjacent data/ directory
   auto configs = steamrot::tests::load_test_data_configs();
   REQUIRE(configs.has_value());
   
   // Use Catch2 generator to iterate through configs
   const auto *config = GENERATE_COPY(from_range(configs.value()));
   
-  // Create fixture, configure entities, and run comparisons
-  auto result = steamrot::tests::run_fixture_test(config);
+  // Run TestEngine and compare with tick_snapshots
+  auto result = steamrot::tests::RunTestEngineTest(config);
   REQUIRE(result.has_value());
 }
 ```
 
 This pattern:
 - Loads test data from adjacent `data/` directory
-- Creates a TestFixture for each configuration
-- Configures entities from `start_entity_collection`
-- Compares with `expected_entity_collection` automatically
-- Ready for future simulation functionality
+- Creates a TestEngine for each configuration
+- Runs the engine simulation via `Engine::RunGame()`
+- Pulls out the data bank containing scene state at each tick  
+- Compares data bank entries with `tick_snapshots` from config
+- Uses purely tick-based comparison (not `expected_entity_collection`)
 
-### Manual Fixture Creation
+### Manual TestEngine Usage
 
-For more control, create the fixture manually:
+For more control, use TestEngine directly:
 
 ```cpp
+#include "TestEngine.h"
 #include "test_data_harness.h"
 
-TEST_CASE("Manual fixture creation", "[unit]") {
+TEST_CASE("Manual TestEngine usage", "[unit]") {
   auto configs = steamrot::tests::load_test_data_configs();
   REQUIRE(configs.has_value());
   
   const auto *config = configs.value()[0];
   
-  // Create and configure fixture from test data
-  auto fixture_result = steamrot::tests::create_fixture_from_test_data(config);
-  REQUIRE(fixture_result.has_value());
+  // Create TestEngine with config - it will simulate based on the config
+  steamrot::tests::TestEngine engine(config);
   
-  auto &fixture = fixture_result.value();
+  // Run the engine simulation via base class Engine::RunGame()
+  engine.RunGame();
   
-  // Access resources and entity manager
-  auto &entity_mgr = fixture.GetEntityManager();
-  auto &game_resources = fixture.GetGameResources();
-  // ... test logic ...
+  // Access the data bank (scene state at each tick)
+  const auto &data_bank = engine.GetDataBank();
+  
+  // The data bank contains snapshots at each tick for comparison
+  // Use namespace functions to run comparison tests on this data
 }
 ```
 
 ### Basic Usage - Adjacent Data Directory
 
-The simplest and recommended approach - load test data from an adjacent `data/` directory:
+The simplest approach - load test data from an adjacent `data/` directory:
 
 ```cpp
 #include "test_data_harness.h"
@@ -411,7 +433,9 @@ auto &fixture = fixture_result.value();
 - Configures entities from `start_entity_collection` if present
 - Generates archetypes automatically
 
-### `run_fixture_test(config)`
+### `run_fixture_test(config)` (DEPRECATED)
+
+**DEPRECATED**: Use `RunTestEngineTest(config)` instead for purely tick-based testing.
 
 Wrapper function for data-driven testing with TestFixture and Catch2 generators.
 
@@ -439,7 +463,36 @@ TEST_CASE("Data-driven test with fixture", "[unit]") {
 3. **Executes simulation if `simulation_data` is present**
 4. If `expected_entity_collection` is present, compares entity states automatically
 
-**This is the main wrapper function for data-driven testing with TestFixture.**
+### `RunTestEngineTest(config)` (Recommended)
+
+Primary wrapper function for data-driven testing with TestEngine. Uses purely tick-based comparison with tick_snapshots.
+
+**Parameters:**
+- `config`: Pointer to TestDataConfig containing all test parameters
+
+**Returns:** `std::expected<std::monostate, FailInfo>`
+
+**Example:**
+```cpp
+TEST_CASE("Data-driven test with TestEngine", "[unit]") {
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  
+  const auto *config = GENERATE_COPY(from_range(configs.value()));
+  
+  auto result = steamrot::tests::RunTestEngineTest(config);
+  REQUIRE(result.has_value());
+}
+```
+
+**Behavior:**
+1. Creates TestEngine from test data configuration
+2. Runs the engine simulation via `Engine::RunGame()`
+3. Pulls out the data bank containing scene state at each tick
+4. Compares data bank entries with `tick_snapshots` from config
+5. Uses purely tick-based comparison (ignores `expected_entity_collection`)
+
+**This is the recommended function for data-driven testing.**
 
 ## Simulations
 

@@ -8,19 +8,17 @@
 /////////////////////////////////////////////////
 #include "test_data_harness.h"
 #include "EntityMemoryPoolEqualsMatcher.h"
-#include "EventBusEqualsMatcher.h"
 #include "FlatbuffersConfigurator.h"
+#include "TestEngine.h"
 #include "catch2/matchers/catch_matchers.hpp"
-#include "conmat.h"
-#include "console_output.h"
-#include "event_bus_conversion.h"
-#include "tick_executor.h"
+#include "engine_data_generated.h"
+
+#include "test_context.h"
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
 #include <format>
 #include <fstream>
 #include <iostream>
-#include <sstream>
 
 namespace steamrot::tests {
 
@@ -124,9 +122,94 @@ LoadTestDataConfigsImpl(const char *source_file_path) {
 }
 
 /////////////////////////////////////////////////
-std::expected<TestFixture, FailInfo>
-CreateFixtureFromTestData(const TestDataConfig *config,
-                          const SceneType &scene_type) {
+/// @brief Helper to compare EntityMemoryPool with EngineData from tick snapshot
+/////////////////////////////////////////////////
+static std::expected<std::monostate, FailInfo> CompareTickSnapshotEntityPool(
+    const SceneData &actual_scene_data, const EngineData *expected_engine_state,
+    const TestContext &context, bool expected_to_pass) {
+
+  // If no engine state in snapshot, skip comparison
+  if (!expected_engine_state) {
+    return std::monostate{};
+  }
+
+  // Get the scene manager data from engine state
+  if (!expected_engine_state->scene_manager_data()) {
+    return std::monostate{};
+  }
+
+  // Get scene data from scene manager
+  const auto *scene_data_list =
+      expected_engine_state->scene_manager_data()->scene_data();
+  if (!scene_data_list || scene_data_list->size() == 0) {
+    return std::monostate{};
+  }
+
+  // Find matching scene by type
+  for (const auto *expected_scene_data : *scene_data_list) {
+    if (!expected_scene_data || !expected_scene_data->entity_collection()) {
+      continue;
+    }
+
+    // Check if scene types match
+    if (expected_scene_data->scene_type() != actual_scene_data.type) {
+      continue;
+    }
+
+    // Configure expected EntityMemoryPool from EntityCollection
+    EntityMemoryPool expected_pool;
+    EventHandler temp_handler;
+    FlatbuffersConfigurator configurator(temp_handler);
+
+    auto configure_result = configurator.ConfigureEntitiesFromCollection(
+        expected_pool, expected_scene_data->entity_collection());
+
+    if (!configure_result.has_value()) {
+      return std::unexpected(configure_result.error());
+    }
+
+    // Run comparison using matcher
+    if (expected_to_pass) {
+      CHECK_THAT(actual_scene_data.entity_memory_pool,
+                 EqualsEntityMemoryPool(expected_pool, context));
+    } else {
+      CHECK_THAT(actual_scene_data.entity_memory_pool,
+                 !EqualsEntityMemoryPool(expected_pool, context));
+    }
+  }
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+/// @brief Compare data bank entry with tick snapshot
+/////////////////////////////////////////////////
+static std::expected<std::monostate, FailInfo> CompareDataBankWithTickSnapshot(
+    const std::vector<SceneData> &actual_scene_snapshots,
+    const TickSnapshot *tick_snapshot, const TestContext &context,
+    bool expected_to_pass) {
+
+  if (!tick_snapshot) {
+    return std::unexpected(
+        FailInfo(FailMode::NullPointer, "TickSnapshot is null"));
+  }
+
+  // Compare each scene in the data bank with expected engine state
+  for (const auto &actual_scene : actual_scene_snapshots) {
+    auto result = CompareTickSnapshotEntityPool(
+        actual_scene, tick_snapshot->engine_state(), context, expected_to_pass);
+
+    if (!result.has_value()) {
+      return std::unexpected(result.error());
+    }
+  }
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+RunTestEngineTest(const TestDataConfig *config) {
 
   // Validate config
   if (!config) {
@@ -134,233 +217,85 @@ CreateFixtureFromTestData(const TestDataConfig *config,
         FailInfo(FailMode::NullPointer, "TestDataConfig is null"));
   }
 
-  // Create and initialize the fixture with the scene type
-  TestFixture fixture(scene_type);
+  // Create TestEngine - it simulates the Engine based on the config
+  TestEngine engine(config);
 
-  // Initialize with entity collection if present in start_data_collection
-  const EntityCollection *start_entities = nullptr;
+  // Run the engine simulation using base Engine::RunGame()
+  engine.RunGame();
 
-  if (config->start_data_collection() &&
-      config->start_data_collection()->entity_collection()) {
-    start_entities = config->start_data_collection()->entity_collection();
+  // Get the data bank output from the engine simulation
+  const auto &data_bank = engine.GetDataBank();
+
+  // Determine number of ticks from config for context building
+  size_t num_ticks = 1;
+  if (config->num_ticks() > 0) {
+    num_ticks = config->num_ticks();
   }
 
-  fixture.Intialize(start_entities);
+  // Build base test context from config
+  TestContext base_context;
+  bool expected_to_pass = true;
 
-  // Configure EventBus from start_event_bus if present in start_data_collection
-  if (config->start_data_collection() &&
-      config->start_data_collection()->event_bus()) {
-
-    auto configure_result = event::ConfigureEventHandlerFromEventBusData(
-        config->start_data_collection()->event_bus(),
-        fixture.GetGameResources().event_handler);
-
-    if (!configure_result.has_value()) {
-      return std::unexpected(configure_result.error());
+  if (config->metadata()) {
+    if (config->metadata()->test_name()) {
+      base_context.test_name = config->metadata()->test_name()->str();
     }
-  }
-
-  return fixture;
-}
-
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo> RunEntityMemoryPoolComparisonTest(
-    const EntityMemoryPool &actual_memory_pool,
-    const EntityCollection *expected_collection, TestFixture &fixture,
-    const TestContext &context, bool expected_to_pass) {
-
-  // Configure expected EntityMemoryPool from expected_collection
-  EntityMemoryPool expected_pool;
-  FlatbuffersConfigurator configurator(
-      fixture.GetGameResources().event_handler);
-
-  auto configure_result = configurator.ConfigureEntitiesFromCollection(
-      expected_pool, expected_collection);
-
-  if (!configure_result.has_value()) {
-    return std::unexpected(configure_result.error());
-  }
-
-  // run comparison using matcher
-  if (expected_to_pass) {
-    // Test expects pools to match
-    CHECK_THAT(actual_memory_pool,
-               EqualsEntityMemoryPool(expected_pool, context));
-  } else {
-    //
-    CHECK_THAT(actual_memory_pool,
-               !EqualsEntityMemoryPool(expected_pool, context));
-  }
-
-  return std::monostate{};
-}
-
-/////////////////////////////////////////////////
-void RunEventBusComparisonTest(const EventBus &actual, const EventBus &expected,
-                               const TestContext &context,
-                               bool expected_to_pass) {
-
-  if (expected_to_pass) {
-    // Test expects event buses to match
-    CHECK_THAT(actual, EqualsEventBus(expected, context));
-  } else {
-    // Test expects event buses to NOT match
-    CHECK_THAT(actual, !EqualsEventBus(expected, context));
-  }
-}
-
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-RunDataStructComparisonTest(const DataCollectionData *data_collection,
-                            TestFixture &fixture, const TestContext &context,
-                            bool expected_to_pass) {
-
-  // Validate input
-  if (!data_collection) {
-    return std::unexpected(
-        FailInfo(FailMode::NullPointer, "DataCollection is null"));
-  }
-
-  // set up header for error messages
-
-  std::ostringstream oss;
-
-  oss << conmat::Divider("=", 40) << "\n";
-  oss << conmat::Colorize("Data Structure Comparison Tests",
-                          conmat::Color::Blue)
-      << "\n";
-  // test/file name if available
-  oss << "\t" << context.FormatTestName() << "\n";
-  // tick info if available
-  oss << "\t" << context.FormatTickInfo() << "\n";
-
-  // finishing divider
-  oss << conmat::Divider("=", 40) << "\n";
-
-  INFO(oss.str());
-
-  // Check for entity collection comparison
-  if (data_collection->entity_collection()) {
-    // Use the convenience overload that handles EMP setup
-    auto emp_comparison_result = RunEntityMemoryPoolComparisonTest(
-        fixture.GetEntityManager().GetEntityMemoryPool(),
-        data_collection->entity_collection(), fixture, context,
-        expected_to_pass);
-
-    if (!emp_comparison_result.has_value()) {
-      return std::unexpected(emp_comparison_result.error());
+    if (config->metadata()->description()) {
+      base_context.description = config->metadata()->description()->str();
     }
+    expected_to_pass = config->metadata()->expected_to_pass();
   }
 
-  // Check for event bus comparison
-  if (data_collection->event_bus()) {
-    // create headers for global event bus comparison
-    std::ostringstream eb_oss;
-    eb_oss << conmat::Divider("=", 40) << "\n";
-    eb_oss << conmat::Colorize("Global Event Bus Comparison",
-                               conmat::Color::Blue)
-           << "\n";
-    INFO(eb_oss.str());
-
-    // Convert EventBusData to EventBus
-    auto expected_event_bus_result =
-        event::ConvertEventBusDataToEventBus(data_collection->event_bus());
-
-    if (!expected_event_bus_result.has_value()) {
-      return std::unexpected(expected_event_bus_result.error());
-    }
-
-    EventBus expected_event_bus = expected_event_bus_result.value();
-
-    // Get actual event bus from fixture
-    const EventBus &actual_event_bus =
-        fixture.GetGameResources().event_handler.GetGlobalEventBus();
-
-    // Run comparison
-    RunEventBusComparisonTest(actual_event_bus, expected_event_bus, context,
-                              expected_to_pass);
-  }
-
-  // check for waiting room event bus comparison
-  if (data_collection->waiting_room()) {
-
-    // create headers for waiting room comparison
-    std::ostringstream wr_oss;
-    wr_oss << conmat::Divider("=", 40) << "\n";
-    wr_oss << conmat::Colorize("Waiting Room Event Bus Comparison",
-                               conmat::Color::Blue)
-           << "\n";
-    INFO(wr_oss.str());
-
-    // Convert EventBusData to EventBus
-    auto expected_event_bus_result =
-        event::ConvertEventBusDataToEventBus(data_collection->waiting_room());
-
-    if (!expected_event_bus_result.has_value()) {
-      return std::unexpected(expected_event_bus_result.error());
-    }
-    EventBus expected_event_bus = expected_event_bus_result.value();
-
-    // Get actual waiting room event bus from fixture
-    const EventBus &actual_event_bus =
-        fixture.GetGameResources().event_handler.GetWaitingRoomEventBus();
-
-    // Run comparison
-    RunEventBusComparisonTest(actual_event_bus, expected_event_bus, context,
-                              expected_to_pass);
-  }
-
-  return std::monostate{};
-}
-
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-RunFixtureTest(const TestDataConfig *config) {
-
-  // Create fixture from test data
-  auto fixture_result = CreateFixtureFromTestData(config);
-  if (!fixture_result.has_value()) {
-    console::PrintError("Failed to create fixture from test data");
-    return std::unexpected(fixture_result.error());
-  }
-
-  TestFixture &fixture = fixture_result.value();
-
-  // Execute the test using tick-based execution
-  auto tick_result = ExecuteTickBasedTest(config, fixture);
-  if (!tick_result.has_value()) {
-    return std::unexpected(tick_result.error());
-  }
-
-  // If expected_data_collection is provided, compare results
-  if (config->expected_data_collection()) {
-    // Build test context from config
-    TestContext context;
-    if (config->metadata()) {
-      if (config->metadata()->test_name()) {
-        context.test_name = config->metadata()->test_name()->str();
+  // Compare data bank with tick_snapshots (purely tick-based comparison)
+  if (config->tick_snapshots() && config->tick_snapshots()->size() > 0) {
+    for (const auto *tick_snapshot : *config->tick_snapshots()) {
+      if (!tick_snapshot) {
+        continue;
       }
-      if (config->metadata()->description()) {
-        context.description = config->metadata()->description()->str();
+
+      size_t tick_num = tick_snapshot->tick();
+
+      // Find the corresponding data bank entry
+      auto it = data_bank.find(tick_num);
+      if (it == data_bank.end()) {
+        std::string error_message =
+            std::format("No data bank entry found for tick {}", tick_num);
+        return std::unexpected(
+            FailInfo(FailMode::FlatbuffersDataNotFound, error_message));
+      }
+
+      // Build context for this tick
+      TestContext tick_context = base_context;
+      tick_context.current_tick = tick_num;
+      tick_context.total_ticks = num_ticks;
+      if (tick_snapshot->description()) {
+        tick_context.description = tick_snapshot->description()->str();
+      }
+
+      // Compare the data bank entry with the snapshot
+      auto result = CompareDataBankWithTickSnapshot(
+          it->second, tick_snapshot, tick_context, expected_to_pass);
+
+      if (!result.has_value()) {
+        return std::unexpected(result.error());
       }
     }
-
-    // Get expected_to_pass from test metadata (default true)
-    bool expected_to_pass = true;
-    if (config->metadata()) {
-      expected_to_pass = config->metadata()->expected_to_pass();
-    }
-
-    // Use RunDataStructComparisonTest with expected_to_pass parameter
-    auto comparison_result = RunDataStructComparisonTest(
-        config->expected_data_collection(), fixture, context, expected_to_pass);
-
-    if (!comparison_result.has_value()) {
-      return std::unexpected(comparison_result.error());
-    }
   }
 
   return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+/// DEPRECATED FUNCTIONS
+/// These functions depend on TestFixture which no longer exists.
+/// Use RunTestEngineTest instead for tick-based testing.
+/////////////////////////////////////////////////
+
+std::expected<std::monostate, FailInfo>
+RunFixtureTest(const TestDataConfig * /*config*/) {
+  return std::unexpected(
+      FailInfo(FailMode::NotImplemented,
+               "RunFixtureTest is deprecated. Use RunTestEngineTest instead."));
 }
 
 } // namespace steamrot::tests
