@@ -288,6 +288,175 @@ The architecture is sound for this use case - you just need to add the save data
 
 ---
 
+## Engine Data Provisioning Options
+
+### Current Situation
+
+**Question:** Should Engine data routes be baked into `StartUp()`, or should data be provided externally (e.g., passed from `main()`)?
+
+### Current Implementation
+
+```cpp
+// Engine.cpp - StartUp() bakes in the data source
+std::expected<std::monostate, FailInfo> Engine::StartUp() {
+  FlatbuffersDataLoader data_loader;  // Creates loader internally
+  auto result = data_loader.ProvideGameResourcesData();  // Hardcoded source
+  // ...
+}
+
+// GameEngine.h - Constructor takes EngineData but doesn't use it
+GameEngine(const EngineData engine_data);  // Parameter is unused!
+
+// main.cpp - Currently creates GameEngine without providing data
+steamrot::GameEngine steam_rot;  // No data passed
+steam_rot.RunGame();
+```
+
+### The Problem
+
+1. **GameEngine/TestEngine must share the same route** - Both inherit `Engine::StartUp()` which internally creates `FlatbuffersDataLoader`
+2. **TestEngine needs different data source** - It uses `TestDataConfig*` instead of default files
+3. **GameEngine constructor takes `EngineData` but ignores it** - Dead parameter
+4. **No flexibility for user configuration cache** - Can't override defaults
+
+### Architectural Options
+
+#### Option A: Pass Data from main() (Dependency Injection)
+
+```cpp
+// main.cpp provides the data
+FlatbuffersDataLoader loader;
+auto engine_data = loader.ProvideEngineData().value();
+steamrot::GameEngine steam_rot(engine_data);
+steam_rot.RunGame();
+
+// Engine uses provided data (no internal loading)
+class Engine {
+  virtual void StartUp(const EngineData& data) = 0;  // Data comes from outside
+};
+```
+
+**Pros:**
+- ✅ Clear separation: main() handles data loading, Engine handles logic
+- ✅ Easy to test: can inject mock data
+- ✅ Flexible: main() can load from defaults, cache, or command-line override
+
+**Cons:**
+- ❌ More boilerplate in main()
+- ❌ Caller must understand what data Engine needs
+
+#### Option B: Keep StartUp() Self-Contained, Use Virtual Method for Data Source
+
+```cpp
+// Engine base class
+class Engine {
+protected:
+  virtual const EngineData* GetEngineData() = 0;  // Derived classes provide data
+  
+  std::expected<std::monostate, FailInfo> StartUp() {
+    const EngineData* data = GetEngineData();  // Call virtual method
+    // Configure using data...
+  }
+};
+
+// GameEngine - loads from default files
+class GameEngine : public Engine {
+  FlatbuffersDataLoader m_data_loader;
+  const EngineData* GetEngineData() override {
+    return m_data_loader.ProvideEngineData().value();
+  }
+};
+
+// TestEngine - uses injected test config
+class TestEngine : public Engine {
+  TestDataConfig* m_config;
+  const EngineData* GetEngineData() override {
+    return m_config->starting_engine_state();  // Already doing this!
+  }
+};
+```
+
+**Pros:**
+- ✅ StartUp() stays clean - doesn't need parameters
+- ✅ Each Engine type owns its data source strategy
+- ✅ Consistent with current TestEngine approach
+
+**Cons:**
+- ❌ Data loading is scattered (each derived class loads differently)
+- ❌ Harder to share caching logic
+
+#### Option C: Keep Engine Data Separate, Cache User Changes
+
+```cpp
+// GameEngine always loads from engine_data.json (static defaults)
+// User preferences/cache stored separately
+
+// Two data sources:
+// 1. engine_data.json → Static game config (never changes)
+// 2. user_prefs.json → User overrides (window size, volume, etc.)
+
+class GameEngine {
+  void StartUp() override {
+    auto defaults = m_loader.ProvideEngineData();  // Static defaults
+    auto user_prefs = m_loader.ProvideUserPrefs(); // User overrides
+    MergeAndConfigure(defaults, user_prefs);       // Apply overrides
+  }
+};
+```
+
+**Pros:**
+- ✅ Clear separation: game defaults vs user preferences
+- ✅ Defaults always work (user can reset)
+- ✅ User changes don't affect base game
+
+**Cons:**
+- ❌ Two data sources to manage
+- ❌ Need merge logic
+
+### Recommendation
+
+**Option B (Virtual Method)** is the cleanest fit for the current architecture because:
+
+1. **TestEngine already does this** - It overrides `ConfigureEngineStateFromData()` to use `m_test_config`
+2. **Minimal change** - Just move data loading into a virtual method
+3. **Each Engine owns its strategy** - GameEngine loads from files, TestEngine from config
+4. **StartUp() stays consistent** - Same flow in base class, just different data sources
+
+### Proposed Refactor
+
+```cpp
+// Engine.h - Add virtual data provider
+class Engine {
+protected:
+  // NEW: Each derived class provides its data
+  virtual std::expected<const EngineData*, FailInfo> ProvideEngineConfiguration() = 0;
+  
+  std::expected<std::monostate, FailInfo> StartUp() {
+    auto engine_data_result = ProvideEngineConfiguration();  // Virtual call
+    if (!engine_data_result) return std::unexpected(engine_data_result.error());
+    
+    // Use the data...
+    const EngineData* engine_data = engine_data_result.value();
+    // Configure from engine_data...
+  }
+};
+
+// GameEngine.cpp - Loads from default files
+std::expected<const EngineData*, FailInfo> GameEngine::ProvideEngineConfiguration() {
+  FlatbuffersDataLoader loader;
+  return loader.ProvideEngineData();  // Default files
+}
+
+// TestEngine.cpp - Uses injected config
+std::expected<const EngineData*, FailInfo> TestEngine::ProvideEngineConfiguration() {
+  return m_test_config->starting_engine_state();  // Injected test data
+}
+```
+
+This matches the existing pattern where `ConfigureEngineStateFromData()` is virtual and each Engine implements its own strategy.
+
+---
+
 ## What Works Well vs What Needs Improvement
 
 ### ✅ What Works Well
