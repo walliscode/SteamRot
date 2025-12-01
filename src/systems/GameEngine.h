@@ -21,8 +21,10 @@
 /// main.cpp
 ///   └─▶ GameEngine() [default constructor]
 ///   └─▶ RunGame()
-///         └─▶ StartUp() [loads GameResourcesData, calls ConfigureEngineStateFromData]
-///               └─▶ ConfigureEngineStateFromData() [loads EngineData from files]
+///         └─▶ StartUp() [loads GameResourcesData, calls
+///         ConfigureEngineStateFromData]
+///               └─▶ ConfigureEngineStateFromData() [loads EngineData from
+///               files]
 ///                     └─▶ ConfigureSubscribersFromData()
 ///                     └─▶ SceneManager::ConfigureSceneManagerFromData()
 ///         └─▶ RunGameLoop()
@@ -37,7 +39,6 @@
 /////////////////////////////////////////////////
 #include "DisplayManager.h"
 #include "Engine.h"
-#include "engine_data_generated.h"
 
 namespace steamrot {
 /////////////////////////////////////////////////
