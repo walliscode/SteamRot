@@ -4,6 +4,34 @@
 ///
 /// Engine provides a common foundation for both GameEngine and TestEngine,
 /// ensuring consistent resource management and tick execution order.
+///
+/// ## Data Requirements (Engine Level)
+///
+/// The Engine base class handles common startup configuration. Each derived
+/// Engine provides its own data source via the virtual method pattern:
+///
+/// ### GameResourcesData (loaded in Engine::StartUp):
+///   - window_width, window_height: Window dimensions
+///   - window_title: Window title string
+///   - framerate_limit: Target FPS
+///   Source: Loaded from engine_data.json via FlatbuffersDataLoader
+///
+/// ### EngineData (provided by derived classes via ConfigureEngineStateFromData):
+///   - subscriptions: Engine-level event subscriptions (e.g., quit game)
+///   - scene_manager_data: SceneManager configuration
+///   Source: Depends on Engine type:
+///     - GameEngine: Loads from engine_data.json
+///     - TestEngine: Uses injected TestDataConfig
+///
+/// ## Data Flow
+/// ```
+/// StartUp()
+///   └─▶ ProvideGameResourcesData() [loads window config]
+///   └─▶ ConfigureGameResources() [applies to m_game_resources]
+///   └─▶ ConfigureEngineStateFromData() [virtual - derived class provides data]
+///         ├─▶ GameEngine: Loads subscriptions + scene_manager from files
+///         └─▶ TestEngine: Uses m_test_config->starting_engine_state()
+/// ```
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -34,6 +62,10 @@ namespace steamrot {
 ///
 /// Both GameEngine and TestEngine derive from this base class,
 /// ensuring consistent behavior between production and test environments.
+///
+/// @note Derived classes must implement ConfigureEngineStateFromData() to
+/// provide their specific data source (files for GameEngine, injected config
+/// for TestEngine).
 /////////////////////////////////////////////////
 class Engine {
 protected:

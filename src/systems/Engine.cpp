@@ -23,6 +23,7 @@ std::expected<std::monostate, FailInfo> Engine::StartUp() {
   FlatbuffersDataLoader data_loader;
 
   // Get GameResourcesData from data loader
+  // This loads window configuration (size, title, framerate)
   auto engine_resource_result = data_loader.ProvideGameResourcesData();
   if (!engine_resource_result) {
     return std::unexpected(engine_resource_result.error());
@@ -35,12 +36,8 @@ std::expected<std::monostate, FailInfo> Engine::StartUp() {
     return std::unexpected(configure_resources_result.error());
   }
 
-  auto load_engine_data_result = data_loader.ProvideEngineData();
-  if (!load_engine_data_result) {
-    return std::unexpected(load_engine_data_result.error());
-  }
-
-  // configure Engine state from data
+  // Configure Engine state from data - this is virtual, so derived classes
+  // (GameEngine/TestEngine) provide their own data source strategy
   auto configure_engine_result = ConfigureEngineStateFromData();
   if (!configure_engine_result.has_value()) {
     return std::unexpected(configure_engine_result.error());

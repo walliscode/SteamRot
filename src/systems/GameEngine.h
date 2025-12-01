@@ -1,6 +1,35 @@
 /////////////////////////////////////////////////
 /// @file
 /// @brief GameEngine class declaration.
+///
+/// ## Data Requirements (GameEngine)
+///
+/// GameEngine loads its configuration from default FlatBuffers files.
+/// The data loading happens in two phases:
+///
+/// ### Phase 1: Engine::StartUp() (inherited)
+///   - GameResourcesData: Window size, title, framerate
+///   - Source: engine_data.json → game_resources
+///
+/// ### Phase 2: ConfigureEngineStateFromData() (GameEngine override)
+///   - EngineData.subscriptions: Engine-level event handlers (quit game, etc.)
+///   - EngineData.scene_manager_data: SceneManager subscriptions
+///   - Source: engine_data.json
+///
+/// ## Data Flow
+/// ```
+/// main.cpp
+///   └─▶ GameEngine() [default constructor]
+///   └─▶ RunGame()
+///         └─▶ StartUp() [loads GameResourcesData, calls ConfigureEngineStateFromData]
+///               └─▶ ConfigureEngineStateFromData() [loads EngineData from files]
+///                     └─▶ ConfigureSubscribersFromData()
+///                     └─▶ SceneManager::ConfigureSceneManagerFromData()
+///         └─▶ RunGameLoop()
+/// ```
+///
+/// @note GameEngine uses file-based configuration. For injected/mock data,
+/// use TestEngine instead.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -13,8 +42,14 @@
 namespace steamrot {
 /////////////////////////////////////////////////
 /// @class GameEngine
-/// @brief Methods for managing the game loop, user input and object
-/// communication.
+/// @brief Production game engine that loads configuration from default files.
+///
+/// GameEngine is the standard game execution environment:
+/// - Loads EngineData from engine_data.json
+/// - Creates and manages the game window via DisplayManager
+/// - Runs the standard SFML game loop
+///
+/// For testing, use TestEngine which accepts injected TestDataConfig.
 /////////////////////////////////////////////////
 class GameEngine : public Engine {
 
@@ -47,11 +82,25 @@ private:
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo> ProcessSubscriptions() override;
 
+  /////////////////////////////////////////////////
+  /// @brief Configure engine state from EngineData loaded from files.
+  ///
+  /// Loads EngineData from engine_data.json and configures:
+  /// - Engine-level subscriptions (e.g., quit game handler)
+  /// - SceneManager subscriptions (e.g., scene change handler)
+  ///
+  /// @return Success or failure information
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ConfigureEngineStateFromData() override;
+
 public:
   /////////////////////////////////////////////////
-  /// @brief Construct taking in EngineData for configuration
+  /// @brief Default constructor for production use.
+  ///
+  /// GameEngine loads all configuration from default files during StartUp().
   /////////////////////////////////////////////////
-  GameEngine(const EngineData engine_data);
+  GameEngine();
 };
 
 } // namespace steamrot

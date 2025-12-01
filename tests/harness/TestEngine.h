@@ -6,6 +6,40 @@
 /// Engine base class with GameEngine for consistent resource management.
 /// It uses the same architecture as GameEngine (SceneManager, DisplayManager)
 /// to enable testing at different execution levels.
+///
+/// ## Data Requirements (TestEngine)
+///
+/// TestEngine receives its configuration via constructor injection, NOT from
+/// files. This allows tests to provide custom configurations.
+///
+/// ### TestDataConfig (injected via constructor):
+///   - starting_engine_state: EngineData containing:
+///     - subscriptions: Engine-level event subscriptions
+///     - scene_manager_data: SceneManager configuration
+///   - simulation_data: SimulationData for tick execution
+///   - num_ticks: Number of ticks to run
+///   - metadata: Test identification
+///   Source: Loaded from test_data.json files and parsed by test harness
+///
+/// ### GameResourcesData (inherited from Engine::StartUp):
+///   - window_width, window_height, framerate_limit
+///   - Source: Still loaded from engine_data.json (shared window config)
+///
+/// ## Data Flow
+/// ```
+/// test_file.cpp
+///   └─▶ Load test_data.json → TestDataConfig
+///   └─▶ TestEngine(config) [stores pointer to injected config]
+///   └─▶ RunGame()
+///         └─▶ StartUp() [loads GameResourcesData, calls ConfigureEngineStateFromData]
+///               └─▶ ConfigureEngineStateFromData() [uses m_test_config]
+///                     └─▶ m_test_config->starting_engine_state()->subscriptions()
+///                     └─▶ m_test_config->starting_engine_state()->scene_manager_data()
+///         └─▶ RunGameLoop() [executes m_target_ticks iterations]
+/// ```
+///
+/// @note TestEngine uses injected configuration (TestDataConfig*) rather than
+/// loading from files. For file-based configuration, use GameEngine.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -42,6 +76,21 @@ enum class TickLevel {
   Custom        ///< Mix and match Logic classes and functions
 };
 
+/////////////////////////////////////////////////
+/// @class TestEngine
+/// @brief Testing engine that uses injected configuration.
+///
+/// Unlike GameEngine which loads EngineData from files, TestEngine receives
+/// its configuration via constructor injection (TestDataConfig*). This enables:
+/// - Custom test configurations without file I/O
+/// - Deterministic test scenarios
+/// - Simulation-based testing with tick snapshots
+///
+/// Both GameEngine and TestEngine share the same Engine::StartUp() flow for
+/// GameResources, but differ in how they obtain EngineData:
+/// - GameEngine: Loads from engine_data.json
+/// - TestEngine: Uses m_test_config->starting_engine_state()
+/////////////////////////////////////////////////
 class TestEngine : public Engine {
 private:
   /////////////////////////////////////////////////
