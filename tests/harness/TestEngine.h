@@ -80,7 +80,7 @@ private:
   size_t m_target_ticks{};
 
   /////////////////////////////////////////////////
-  /// @brief Current tick number (0-based, 0 = before first tick).
+  /// @brief Current tick number (1-based, starts at 0 before first tick).
   /////////////////////////////////////////////////
   size_t m_current_tick{0};
 

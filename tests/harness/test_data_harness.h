@@ -54,60 +54,14 @@ LoadTestDataConfigsImpl(const char *source_file_path);
 #define load_test_data_configs() LoadTestDataConfigsImpl(__FILE__)
 
 /////////////////////////////////////////////////
-/// @brief Wrapper function for EntityMemoryPool comparison with
-/// EntityCollection
-///
-/// This function configures an expected EntityMemoryPool from an
-/// EntityCollection and compares it with the actual pool. This is a convenience
-/// function that handles the EMP setup internally.
-///
-/// @param actual_memory_pool The actual EntityMemoryPool to test
-/// @param expected_collection The EntityCollection to configure expected pool
-/// from
-/// @param fixture TestFixture containing resources for configuration
-/// @param context Test context information for enriched error messages
-/// @param expected_to_pass If true, expects pools to match; if false, expects
-/// mismatch
-/// @return std::monostate on success, FailInfo on error
+/// DEPRECATED DECLARATIONS
+/// These functions are deprecated. Use RunTestEngineTest instead.
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-RunEntityMemoryPoolComparisonTest(const EntityMemoryPool &actual_memory_pool,
-                                  const EntityCollection *expected_collection,
-                                  bool expected_to_pass = true);
 
-/////////////////////////////////////////////////
-/// @brief Wrapper function for EventBus comparison tests
-///
-/// This function compares two EventBus instances using the
-/// EqualsEventBus matcher, ensuring detailed error messages on
-/// mismatch. This is a low-level comparison function - prefer using
-/// RunDataStructComparisonTest for higher-level testing.
-///
-/// @param actual The actual EventBus to test
-/// @param expected The expected EventBus to compare against
-/// @param context Test context information for enriched error messages
-/// @param expected_to_pass If true, expects buses to match; if false, expects
-/// mismatch
-/////////////////////////////////////////////////
-void RunEventBusComparisonTest(const EventBus &actual, const EventBus &expected,
-                               bool expected_to_pass = true);
-
-/////////////////////////////////////////////////
-/// @brief Primary function for comparing data structures from DataCollection
-///
-/// DEPRECATED: This function is part of the old TestFixture workflow.
-/// For new tests, use RunTestEngineTest which provides tick-based comparison.
-///
-/// This function orchestrates comparison of all data structures specified
-/// in the DataCollection (EntityMemoryPool, EventBus, etc.). It serves as
-/// the primary entry point for data structure comparison in the test harness.
-///
-/// @param expected_to_pass If true, expects data to match; if false, expects
-/// mismatch
-/// @return std::monostate on success, FailInfo on error
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-RunDataStructComparisonTest(bool expected_to_pass = true);
+// std::expected<std::monostate, FailInfo>
+// RunEntityMemoryPoolComparisonTest(...);
+// void RunEventBusComparisonTest(...);
+// std::expected<std::monostate, FailInfo> RunDataStructComparisonTest(...);
 
 /////////////////////////////////////////////////
 /// @brief Wrapper function for data-driven testing with TestEngine
