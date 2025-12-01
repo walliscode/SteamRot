@@ -10,11 +10,13 @@
 #include "EntityMemoryPoolEqualsMatcher.h"
 #include "EventBusEqualsMatcher.h"
 #include "FlatbuffersConfigurator.h"
+#include "TestEngine.h"
 #include "catch2/matchers/catch_matchers.hpp"
 #include "conmat.h"
 #include "console_output.h"
+#include "engine_data_generated.h"
 #include "event_bus_conversion.h"
-#include "tick_executor.h"
+#include "test_context.h"
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
 #include <format>
@@ -357,6 +359,177 @@ RunFixtureTest(const TestDataConfig *config) {
 
     if (!comparison_result.has_value()) {
       return std::unexpected(comparison_result.error());
+    }
+  }
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+/// @brief Helper to compare EntityMemoryPool with EngineData from tick snapshot
+/////////////////////////////////////////////////
+static std::expected<std::monostate, FailInfo>
+CompareTickSnapshotEntityPool(const SceneData &actual_scene_data,
+                              const EngineData *expected_engine_state,
+                              const TestContext &context,
+                              bool expected_to_pass) {
+
+  // If no engine state in snapshot, skip comparison
+  if (!expected_engine_state) {
+    return std::monostate{};
+  }
+
+  // Get the scene manager data from engine state
+  if (!expected_engine_state->scene_manager_data()) {
+    return std::monostate{};
+  }
+
+  // Get scene data from scene manager
+  const auto *scene_data_list =
+      expected_engine_state->scene_manager_data()->scene_data();
+  if (!scene_data_list || scene_data_list->size() == 0) {
+    return std::monostate{};
+  }
+
+  // Find matching scene by type
+  for (const auto *expected_scene_data : *scene_data_list) {
+    if (!expected_scene_data || !expected_scene_data->entity_collection()) {
+      continue;
+    }
+
+    // Check if scene types match
+    if (expected_scene_data->scene_type() != actual_scene_data.type) {
+      continue;
+    }
+
+    // Configure expected EntityMemoryPool from EntityCollection
+    EntityMemoryPool expected_pool;
+    EventHandler temp_handler;
+    FlatbuffersConfigurator configurator(temp_handler);
+
+    auto configure_result = configurator.ConfigureEntitiesFromCollection(
+        expected_pool, expected_scene_data->entity_collection());
+
+    if (!configure_result.has_value()) {
+      return std::unexpected(configure_result.error());
+    }
+
+    // Run comparison using matcher
+    if (expected_to_pass) {
+      CHECK_THAT(actual_scene_data.entity_memory_pool,
+                 EqualsEntityMemoryPool(expected_pool, context));
+    } else {
+      CHECK_THAT(actual_scene_data.entity_memory_pool,
+                 !EqualsEntityMemoryPool(expected_pool, context));
+    }
+  }
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+/// @brief Compare data bank entry with tick snapshot
+/////////////////////////////////////////////////
+static std::expected<std::monostate, FailInfo>
+CompareDataBankWithTickSnapshot(
+    const std::vector<SceneData> &actual_scene_snapshots,
+    const TickSnapshot *tick_snapshot, const TestContext &context,
+    bool expected_to_pass) {
+
+  if (!tick_snapshot) {
+    return std::unexpected(
+        FailInfo(FailMode::NullPointer, "TickSnapshot is null"));
+  }
+
+  // Compare each scene in the data bank with expected engine state
+  for (const auto &actual_scene : actual_scene_snapshots) {
+    auto result = CompareTickSnapshotEntityPool(
+        actual_scene, tick_snapshot->engine_state(), context, expected_to_pass);
+
+    if (!result.has_value()) {
+      return std::unexpected(result.error());
+    }
+  }
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+RunTestEngineTest(const TestDataConfig *config) {
+
+  // Validate config
+  if (!config) {
+    return std::unexpected(
+        FailInfo(FailMode::NullPointer, "TestDataConfig is null"));
+  }
+
+  // Create and run TestEngine
+  TestEngine engine(config);
+
+  // Determine number of ticks from config
+  size_t num_ticks = 1;
+  if (config->num_ticks() > 0) {
+    num_ticks = config->num_ticks();
+  }
+
+  // Set the number of ticks
+  engine.SetTicks(num_ticks);
+
+  // Run the engine
+  engine.Run();
+
+  // Get the data bank
+  const auto &data_bank = engine.GetDataBank();
+
+  // Build base test context from config
+  TestContext base_context;
+  bool expected_to_pass = true;
+
+  if (config->metadata()) {
+    if (config->metadata()->test_name()) {
+      base_context.test_name = config->metadata()->test_name()->str();
+    }
+    if (config->metadata()->description()) {
+      base_context.description = config->metadata()->description()->str();
+    }
+    expected_to_pass = config->metadata()->expected_to_pass();
+  }
+
+  // Compare data bank with tick_snapshots (purely tick-based comparison)
+  if (config->tick_snapshots() && config->tick_snapshots()->size() > 0) {
+    for (const auto *tick_snapshot : *config->tick_snapshots()) {
+      if (!tick_snapshot) {
+        continue;
+      }
+
+      size_t tick_num = tick_snapshot->tick();
+
+      // Find the corresponding data bank entry
+      auto it = data_bank.find(tick_num);
+      if (it == data_bank.end()) {
+        std::string error_message = std::format(
+            "No data bank entry found for tick {}", tick_num);
+        return std::unexpected(
+            FailInfo(FailMode::InvalidData, error_message));
+      }
+
+      // Build context for this tick
+      TestContext tick_context = base_context;
+      tick_context.current_tick = tick_num;
+      tick_context.total_ticks = num_ticks;
+      if (tick_snapshot->description()) {
+        tick_context.description = tick_snapshot->description()->str();
+      }
+
+      // Compare the data bank entry with the snapshot
+      auto result = CompareDataBankWithTickSnapshot(it->second, tick_snapshot,
+                                                    tick_context,
+                                                    expected_to_pass);
+
+      if (!result.has_value()) {
+        return std::unexpected(result.error());
+      }
     }
   }
 

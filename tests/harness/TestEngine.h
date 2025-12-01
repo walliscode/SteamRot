@@ -18,8 +18,11 @@
 /////////////////////////////////////////////////
 
 #include "Engine.h"
+#include "SceneContext.h"
 #include "simulation_generated.h"
 #include "test_data_generated.h"
+#include <functional>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -41,6 +44,19 @@ enum class TickLevel {
   Custom        ///< Mix and match Logic classes and functions
 };
 
+/////////////////////////////////////////////////
+/// @brief Custom function type for TestEngine
+/////////////////////////////////////////////////
+using TestFunction = std::function<void(SceneContext &)>;
+
+/////////////////////////////////////////////////
+/// @brief Named custom function with description
+/////////////////////////////////////////////////
+struct NamedTestFunction {
+  TestFunction function;
+  std::string name;
+};
+
 class TestEngine : public Engine {
 private:
   /////////////////////////////////////////////////
@@ -51,7 +67,7 @@ private:
   ////////////////////////////////////////////////
   /// @brief Simulation data extracted from test configuration.
   /////////////////////////////////////////////////
-  const SimulationData *m_simulation_data;
+  const SimulationData *m_simulation_data{nullptr};
 
   /////////////////////////////////////////////////
   /// @brief Current tick execution level.
@@ -64,9 +80,19 @@ private:
   size_t m_target_ticks{};
 
   /////////////////////////////////////////////////
-  /// @brief Current tick number.
+  /// @brief Current tick number (0-based, 0 = before first tick).
   /////////////////////////////////////////////////
-  size_t m_current_tick{1};
+  size_t m_current_tick{0};
+
+  /////////////////////////////////////////////////
+  /// @brief Scene type for the test.
+  /////////////////////////////////////////////////
+  SceneType m_scene_type{SceneType::SceneType_TEST};
+
+  /////////////////////////////////////////////////
+  /// @brief Custom functions to execute during each tick.
+  /////////////////////////////////////////////////
+  std::vector<NamedTestFunction> m_custom_functions;
 
   /////////////////////////////////////////////////
   /// @brief Stores the tick number and data at that point
@@ -113,5 +139,72 @@ public:
   /// @brief Returns data bank for inspection and testing
   /////////////////////////////////////////////////
   const std::unordered_map<size_t, std::vector<SceneData>> &GetDataBank() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Get current tick level
+  /////////////////////////////////////////////////
+  TickLevel GetTickLevel() const { return m_tick_level; }
+
+  /////////////////////////////////////////////////
+  /// @brief Get current tick number
+  /////////////////////////////////////////////////
+  size_t GetCurrentTick() const { return m_current_tick; }
+
+  /////////////////////////////////////////////////
+  /// @brief Set the number of ticks to run
+  ///
+  /// @param num_ticks Number of ticks
+  /// @return Reference to this for chaining
+  /////////////////////////////////////////////////
+  TestEngine &SetTicks(size_t num_ticks);
+
+  /////////////////////////////////////////////////
+  /// @brief Configure to run a full scene execution
+  ///
+  /// Sets tick level to FullEngine and configures the scene type.
+  ///
+  /// @param scene_type Scene type to use
+  /// @return Reference to this for chaining
+  /////////////////////////////////////////////////
+  TestEngine &UseFullScene(SceneType scene_type);
+
+  /////////////////////////////////////////////////
+  /// @brief Set the tick execution level
+  ///
+  /// @param level Execution level
+  /// @return Reference to this for chaining
+  /////////////////////////////////////////////////
+  TestEngine &UseTickLevel(TickLevel level);
+
+  /////////////////////////////////////////////////
+  /// @brief Set the scene type
+  ///
+  /// @param scene_type Scene type to use
+  /// @return Reference to this for chaining
+  /////////////////////////////////////////////////
+  TestEngine &SetSceneType(SceneType scene_type);
+
+  /////////////////////////////////////////////////
+  /// @brief Add a custom function to execute during ticks
+  ///
+  /// @param func Function to execute
+  /// @param name Optional name for debugging
+  /// @return Reference to this for chaining
+  /////////////////////////////////////////////////
+  TestEngine &AddFunction(TestFunction func, const std::string &name = "");
+
+  /////////////////////////////////////////////////
+  /// @brief Access the SceneManager
+  /////////////////////////////////////////////////
+  SceneManager &GetSceneManager() { return m_scene_manager; }
+  const SceneManager &GetSceneManager() const { return m_scene_manager; }
+
+  /////////////////////////////////////////////////
+  /// @brief Run the test engine
+  ///
+  /// This method starts up the engine and runs for the configured
+  /// number of ticks, populating the data bank at each tick.
+  /////////////////////////////////////////////////
+  void Run();
 };
 } // namespace steamrot::tests
