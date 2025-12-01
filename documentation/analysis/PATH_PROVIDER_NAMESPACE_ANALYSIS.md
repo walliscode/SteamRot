@@ -4,13 +4,54 @@
 
 **Recommendation: YES, this refactoring is feasible and beneficial.**
 
-Replacing the `PathProvider` class hierarchy with namespace-based static functions and CMake-selected headers would:
+Replacing the `PathProvider` class hierarchy with namespace-based static functions and compile-time environment selection would:
 - Eliminate runtime polymorphism overhead
 - Simplify the API (no more passing PathProvider references)
 - Fix the current constructor ordering bug in the Engine class
 - Reduce code complexity and memory footprint
 
-## Current Architecture Analysis
+## Implementation Status
+
+**IMPLEMENTED**: Pure compile-time approach with Test as default environment.
+
+### New Files Created
+| File | Purpose |
+|------|---------|
+| `paths.h` | Namespace-based path functions with compile-time environment selection |
+| `paths.cpp.in` | CMake-configured source directory implementation |
+
+### How to Use
+
+```cpp
+// Default: Test environment (tests/data)
+#include "paths.h"
+auto path = steamrot::paths::GetDataDirectory();  // -> ${SOURCE_DIR}/tests/data
+
+// For Debug environment (data)
+#define STEAMROT_ENV_DEBUG
+#include "paths.h"
+auto path = steamrot::paths::GetDataDirectory();  // -> ${SOURCE_DIR}/data
+
+// For Production environment (data)
+#define STEAMROT_ENV_PROD
+#include "paths.h"
+auto path = steamrot::paths::GetDataDirectory();  // -> ${SOURCE_DIR}/data
+```
+
+### Available Functions
+- `GetSourceDirectory()` - Returns CMake source directory
+- `GetDataDirectory()` - Returns environment-specific data directory
+- `GetFragmentDirectory()` - Returns `GetDataDirectory() / "fragments"`
+- `GetSceneDirectory()` - Returns `GetDataDirectory() / "scenes"`
+- `GetAssetsDirectory()` - Returns `GetDataDirectory() / "assets"`
+- `GetFontsDirectory()` - Returns `GetAssetsDirectory() / "fonts"`
+- `GetUIStylesDirectory()` - Returns `GetDataDirectory() / "ui_styles"`
+
+---
+
+## Original Analysis (Historical)
+
+### Current Architecture Analysis
 
 ### Class Hierarchy
 ```
@@ -339,22 +380,28 @@ This was rejected because:
 
 **Replacing PathProvider with a namespace-based approach is recommended.**
 
-The hybrid approach (Option C) provides:
-- Cleaner, simpler API
-- Elimination of virtual dispatch overhead
-- Fix for the current constructor ordering bug
-- Easy migration path
-- Backward compatibility
+## Implementation Complete
 
-The estimated effort is 2-4 hours for a careful migration, with low risk due to the mechanical nature of the changes.
+The pure compile-time approach has been implemented with:
+- Test environment as the default
+- `STEAMROT_ENV_DEBUG` macro for debug builds
+- `STEAMROT_ENV_PROD` macro for production builds
 
-## Next Steps
+### Files Added
+- `src/data_handlers/paths.h` - Header with inline functions and compile-time selection
+- `src/data_handlers/paths.cpp.in` - CMake-configured source directory
 
-If you decide to proceed with this refactoring:
-1. Create the new `paths` namespace files
-2. Migrate one class (e.g., `DataLoader`) as a proof of concept
-3. Migrate remaining classes incrementally
-4. Remove old PathProvider class hierarchy
-5. Update documentation
+### Files Modified
+- `src/data_handlers/CMakeLists.txt` - Added paths.cpp configuration
 
-This is a **recommended refactoring** that will improve code quality and fix existing bugs.
+## Next Steps for Migration
+
+1. **Migrate dependent classes** to use `steamrot::paths::` namespace functions
+2. **Add compile definitions** in CMake for non-test builds:
+   ```cmake
+   target_compile_definitions(steamrot PRIVATE STEAMROT_ENV_PROD)
+   ```
+3. **Remove old PathProvider classes** after full migration
+4. **Update documentation**
+
+This refactoring will improve code quality and fix existing bugs.
