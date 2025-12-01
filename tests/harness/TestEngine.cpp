@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "TestEngine.h"
+#include "SceneContext.h"
 #include "simulation_runner.h"
 #include <iostream>
 
@@ -14,7 +15,17 @@ namespace steamrot::tests {
 
 /////////////////////////////////////////////////
 TestEngine::TestEngine(const TestDataConfig *config)
-    : Engine(), m_test_config(config) {}
+    : Engine(), m_test_config(config) {
+  // Extract simulation data from config if present
+  if (m_test_config && m_test_config->simulation_data()) {
+    m_simulation_data = m_test_config->simulation_data();
+  }
+
+  // Extract num_ticks from config if present
+  if (m_test_config && m_test_config->num_ticks() > 0) {
+    m_target_ticks = m_test_config->num_ticks();
+  }
+}
 
 /////////////////////////////////////////////////
 void TestEngine::RunGameLoop() {
@@ -32,7 +43,32 @@ void TestEngine::RunGameLoop() {
 }
 
 /////////////////////////////////////////////////
-void TestEngine::AddToDataBank(size_t tick) {}
+void TestEngine::AddToDataBank(size_t tick) {
+  std::vector<SceneData> scene_snapshots;
+
+  // Iterate through all scenes in the SceneManager
+  for (auto &scene_pair : m_scene_manager.GetScenes()) {
+    Scene &scene = *scene_pair.second;
+
+    // Get SceneInfo which has id and type
+    const SceneData scene_info = scene.GetSceneInfo();
+
+    // Create a SceneData snapshot
+    SceneData snapshot;
+    snapshot.id = scene_info.id;
+    snapshot.type = scene_info.type;
+
+    // Get SceneContext to access the EntityMemoryPool
+    SceneContext context = scene.GetSceneContext();
+    // Copy the entity memory pool from the scene context
+    snapshot.entity_memory_pool = context.scene_entities;
+
+    scene_snapshots.push_back(std::move(snapshot));
+  }
+
+  // Store the snapshots in the data bank
+  m_data_bank[tick] = std::move(scene_snapshots);
+}
 
 /////////////////////////////////////////////////
 const std::unordered_map<size_t, std::vector<SceneData>> &

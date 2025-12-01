@@ -51,7 +51,7 @@ private:
   ////////////////////////////////////////////////
   /// @brief Simulation data extracted from test configuration.
   /////////////////////////////////////////////////
-  const SimulationData *m_simulation_data;
+  const SimulationData *m_simulation_data{nullptr};
 
   /////////////////////////////////////////////////
   /// @brief Current tick execution level.
