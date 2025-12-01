@@ -7,14 +7,17 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "TestEngine.h"
+#include "FailInfo.h"
 #include "SceneContext.h"
 #include "simulation_runner.h"
+#include <expected>
 #include <iostream>
+#include <variant>
 
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
-TestEngine::TestEngine(const TestDataConfig *config)
+TestEngine::TestEngine(TestDataConfig *config)
     : Engine(), m_test_config(config) {
   // Extract simulation data from config if present
   if (m_test_config && m_test_config->simulation_data()) {
@@ -27,6 +30,28 @@ TestEngine::TestEngine(const TestDataConfig *config)
   }
 }
 
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+TestEngine::ConfigureEngineStateFromData() {
+
+  // configure Engine subscribers from test data
+  auto configure_subs_result = ConfigureSubscribersFromData(
+      m_test_config->starting_engine_state()->subscriptions());
+  if (!configure_subs_result.has_value()) {
+    return std::unexpected(configure_subs_result.error());
+  }
+
+  // configure GameResources from test data
+
+  // configure SceneManager from test data
+  auto configure_result = m_scene_manager.ConfigureSceneManagerFromData(
+      m_test_config->starting_engine_state()->scene_manager_data());
+  if (!configure_result.has_value()) {
+    return std::unexpected(configure_result.error());
+  }
+
+  return std::monostate{};
+}
 /////////////////////////////////////////////////
 void TestEngine::RunGameLoop() {
 
@@ -96,4 +121,5 @@ void TestEngine::ExecuteSceneLevelLogic() {
     }
   }
 }
+
 } // namespace steamrot::tests

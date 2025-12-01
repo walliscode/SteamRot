@@ -93,22 +93,6 @@ LoadTestDataConfigsImpl(const char *source_file_path);
 /// @endcode
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-RunTestEngineTest(const TestDataConfig *config);
-
-/////////////////////////////////////////////////
-/// @brief DEPRECATED: Wrapper function for data-driven testing with TestFixture
-///
-/// @deprecated Use RunTestEngineTest instead for purely tick-based testing.
-///
-/// This function orchestrates a complete test workflow:
-/// 1. Creates a TestFixture from test data configuration
-/// 2. Executes tick-based test logic (inputs, events, simulation)
-/// 3. Compares final state with expected_data_collection if present
-///
-/// @param config The test data configuration containing all test parameters
-/// @return std::monostate on success, FailInfo on error
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-RunFixtureTest(const TestDataConfig *config);
+RunTestEngineTest(TestDataConfig *config);
 
 } // namespace steamrot::tests

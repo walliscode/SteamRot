@@ -27,16 +27,12 @@ struct EngineData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef EngineDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_SUBSCRIPTIONS = 4,
-    VT_GAME_RESOURCES = 6,
-    VT_SCENE_MANAGER_DATA = 8,
-    VT_GLOBAL_EVENT_BUS_DATA = 10,
-    VT_WAITING_ROOM_EVENT_BUS_DATA = 12
+    VT_SCENE_MANAGER_DATA = 6,
+    VT_GLOBAL_EVENT_BUS_DATA = 8,
+    VT_WAITING_ROOM_EVENT_BUS_DATA = 10
   };
   const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>> *subscriptions() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>> *>(VT_SUBSCRIPTIONS);
-  }
-  const steamrot::GameResourcesData *game_resources() const {
-    return GetPointer<const steamrot::GameResourcesData *>(VT_GAME_RESOURCES);
   }
   const steamrot::SceneManagerData *scene_manager_data() const {
     return GetPointer<const steamrot::SceneManagerData *>(VT_SCENE_MANAGER_DATA);
@@ -52,8 +48,6 @@ struct EngineData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_SUBSCRIPTIONS) &&
            verifier.VerifyVector(subscriptions()) &&
            verifier.VerifyVectorOfTables(subscriptions()) &&
-           VerifyOffset(verifier, VT_GAME_RESOURCES) &&
-           verifier.VerifyTable(game_resources()) &&
            VerifyOffset(verifier, VT_SCENE_MANAGER_DATA) &&
            verifier.VerifyTable(scene_manager_data()) &&
            VerifyOffset(verifier, VT_GLOBAL_EVENT_BUS_DATA) &&
@@ -70,9 +64,6 @@ struct EngineDataBuilder {
   ::flatbuffers::uoffset_t start_;
   void add_subscriptions(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>>> subscriptions) {
     fbb_.AddOffset(EngineData::VT_SUBSCRIPTIONS, subscriptions);
-  }
-  void add_game_resources(::flatbuffers::Offset<steamrot::GameResourcesData> game_resources) {
-    fbb_.AddOffset(EngineData::VT_GAME_RESOURCES, game_resources);
   }
   void add_scene_manager_data(::flatbuffers::Offset<steamrot::SceneManagerData> scene_manager_data) {
     fbb_.AddOffset(EngineData::VT_SCENE_MANAGER_DATA, scene_manager_data);
@@ -97,7 +88,6 @@ struct EngineDataBuilder {
 inline ::flatbuffers::Offset<EngineData> CreateEngineData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>>> subscriptions = 0,
-    ::flatbuffers::Offset<steamrot::GameResourcesData> game_resources = 0,
     ::flatbuffers::Offset<steamrot::SceneManagerData> scene_manager_data = 0,
     ::flatbuffers::Offset<steamrot::EventBusData> global_event_bus_data = 0,
     ::flatbuffers::Offset<steamrot::EventBusData> waiting_room_event_bus_data = 0) {
@@ -105,7 +95,6 @@ inline ::flatbuffers::Offset<EngineData> CreateEngineData(
   builder_.add_waiting_room_event_bus_data(waiting_room_event_bus_data);
   builder_.add_global_event_bus_data(global_event_bus_data);
   builder_.add_scene_manager_data(scene_manager_data);
-  builder_.add_game_resources(game_resources);
   builder_.add_subscriptions(subscriptions);
   return builder_.Finish();
 }
@@ -113,7 +102,6 @@ inline ::flatbuffers::Offset<EngineData> CreateEngineData(
 inline ::flatbuffers::Offset<EngineData> CreateEngineDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<::flatbuffers::Offset<steamrot::SubscriberData>> *subscriptions = nullptr,
-    ::flatbuffers::Offset<steamrot::GameResourcesData> game_resources = 0,
     ::flatbuffers::Offset<steamrot::SceneManagerData> scene_manager_data = 0,
     ::flatbuffers::Offset<steamrot::EventBusData> global_event_bus_data = 0,
     ::flatbuffers::Offset<steamrot::EventBusData> waiting_room_event_bus_data = 0) {
@@ -121,7 +109,6 @@ inline ::flatbuffers::Offset<EngineData> CreateEngineDataDirect(
   return steamrot::CreateEngineData(
       _fbb,
       subscriptions__,
-      game_resources,
       scene_manager_data,
       global_event_bus_data,
       waiting_room_event_bus_data);

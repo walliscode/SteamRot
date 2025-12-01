@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "DisplayManager.h"
 #include "Engine.h"
+#include "engine_data_generated.h"
 
 namespace steamrot {
 /////////////////////////////////////////////////
@@ -48,9 +49,9 @@ private:
 
 public:
   /////////////////////////////////////////////////
-  /// @brief Default constructor for the GameEngine class
+  /// @brief Construct taking in EngineData for configuration
   /////////////////////////////////////////////////
-  GameEngine();
+  GameEngine(const EngineData engine_data);
 };
 
 } // namespace steamrot

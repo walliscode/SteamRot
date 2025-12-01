@@ -20,6 +20,7 @@
 #include "Engine.h"
 #include "simulation_generated.h"
 #include "test_data_generated.h"
+#include <expected>
 #include <unordered_map>
 #include <vector>
 
@@ -46,7 +47,7 @@ private:
   /////////////////////////////////////////////////
   /// @brief Test data configuration.
   /////////////////////////////////////////////////
-  const TestDataConfig *m_test_config;
+  TestDataConfig *m_test_config;
 
   ////////////////////////////////////////////////
   /// @brief Simulation data extracted from test configuration.
@@ -101,13 +102,16 @@ private:
     return std::monostate{};
   };
 
+  std::expected<std::monostate, FailInfo>
+  ConfigureEngineStateFromData() override;
+
 public:
   /////////////////////////////////////////////////
   /// @brief Constructor taking test data configuration.
   ///
   /// @param config Test data configuration (must remain valid)
   /////////////////////////////////////////////////
-  explicit TestEngine(const TestDataConfig *config);
+  explicit TestEngine(TestDataConfig *config);
 
   /////////////////////////////////////////////////
   /// @brief Returns data bank for inspection and testing

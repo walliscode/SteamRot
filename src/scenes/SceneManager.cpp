@@ -10,11 +10,11 @@
 #include "EventPacket.h"
 #include "FailInfo.h"
 #include "Scene.h"
+#include "SceneData.h"
 #include "SceneFactory.h"
 #include "Subscriber.h"
 #include "SubscriberFactory.h"
 #include "events_generated.h"
-#include "scene_change_packet_generated.h"
 #include "uuid.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <expected>
@@ -70,8 +70,8 @@ SceneManager::AddSceneFromDefault(const SceneType &scene_type) {
   // create SceneFactory object
   SceneFactory scene_factory;
 
-  auto scene_creation_result = scene_factory.CreateDefaultScene(
-      scene_type, m_game_context);
+  auto scene_creation_result =
+      scene_factory.CreateDefaultScene(scene_type, m_game_context);
   if (!scene_creation_result.has_value()) {
     return std::unexpected(scene_creation_result.error());
   }
@@ -159,9 +159,9 @@ SceneManager::ProvideTextures(std::vector<uuids::uuid> &scene_ids) const {
 }
 
 /////////////////////////////////////////////////
-const std::expected<std::vector<SceneInfo>, FailInfo>
+const std::expected<std::vector<SceneData>, FailInfo>
 SceneManager::ProvideAvailableSceneInfo() const {
-  std::vector<SceneInfo> scene_info_list;
+  std::vector<SceneData> scene_info_list;
   for (const auto &pair : m_scenes) {
     scene_info_list.push_back(pair.second->GetSceneInfo());
   }

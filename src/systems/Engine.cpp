@@ -14,8 +14,7 @@ namespace steamrot {
 
 /////////////////////////////////////////////////
 Engine::Engine()
-    : m_game_resources(),
-      m_game_context(m_game_resources),
+    : m_game_resources(), m_game_context(m_game_resources),
       m_scene_manager(m_game_context) {}
 
 /////////////////////////////////////////////////
@@ -38,6 +37,13 @@ std::expected<std::monostate, FailInfo> Engine::StartUp() {
 
   auto load_engine_data_result = data_loader.ProvideEngineData();
   if (!load_engine_data_result) {
+    return std::unexpected(load_engine_data_result.error());
+  }
+
+  // configure Engine state from data
+  auto configure_engine_result = ConfigureEngineStateFromData();
+  if (!configure_engine_result.has_value()) {
+    return std::unexpected(configure_engine_result.error());
   }
 
   return std::monostate{};

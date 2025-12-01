@@ -209,7 +209,7 @@ static std::expected<std::monostate, FailInfo> CompareDataBankWithTickSnapshot(
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-RunTestEngineTest(const TestDataConfig *config) {
+RunTestEngineTest(TestDataConfig *config) {
 
   // Validate config
   if (!config) {
@@ -283,19 +283,6 @@ RunTestEngineTest(const TestDataConfig *config) {
   }
 
   return std::monostate{};
-}
-
-/////////////////////////////////////////////////
-/// DEPRECATED FUNCTIONS
-/// These functions depend on TestFixture which no longer exists.
-/// Use RunTestEngineTest instead for tick-based testing.
-/////////////////////////////////////////////////
-
-std::expected<std::monostate, FailInfo>
-RunFixtureTest(const TestDataConfig * /*config*/) {
-  return std::unexpected(
-      FailInfo(FailMode::NotImplemented,
-               "RunFixtureTest is deprecated. Use RunTestEngineTest instead."));
 }
 
 } // namespace steamrot::tests
