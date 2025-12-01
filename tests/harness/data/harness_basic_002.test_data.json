@@ -9,32 +9,54 @@
     "expected_to_pass": true,
     "version": 1
   },
-  "start_data_collection": {
-    "entity_collection": {
-      "entity_memory_pool_size": 2,
-      "entities": [
+  "starting_engine_state": {
+    "scene_manager_data": {
+      "scene_data": [
         {
-          "index": 0,
-          "c_grimoire_machina": {
-            "fragments": [],
-            "joints": []
-          }
+          "entity_collection": {
+            "entity_memory_pool_size": 2,
+            "entities": [
+              {
+                "index": 0,
+                "c_grimoire_machina": {
+                  "fragments": [],
+                  "joints": []
+                }
+              }
+            ]
+          },
+          "scene_id": "test",
+          "scene_type": "TEST"
         }
       ]
     }
   },
-  "expected_data_collection": {
-    "entity_collection": {
-      "entity_memory_pool_size": 2,
-      "entities": [
-        {
-          "index": 0,
-          "c_grimoire_machina": {
-            "fragments": [],
-            "joints": []
-          }
+  "tick_snapshots": [
+    {
+      "tick": 1,
+      "description": "Final expected state",
+      "engine_state": {
+        "scene_manager_data": {
+          "scene_data": [
+            {
+              "entity_collection": {
+                "entity_memory_pool_size": 2,
+                "entities": [
+                  {
+                    "index": 0,
+                    "c_grimoire_machina": {
+                      "fragments": [],
+                      "joints": []
+                    }
+                  }
+                ]
+              },
+              "scene_id": "test",
+              "scene_type": "TEST"
+            }
+          ]
         }
-      ]
+      }
     }
-  }
+  ]
 }

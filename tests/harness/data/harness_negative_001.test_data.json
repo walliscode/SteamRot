@@ -10,64 +10,86 @@
     "expected_to_pass": false,
     "version": 1
   },
-  "start_data_collection": {
-    "entity_collection": {
-      "entity_memory_pool_size": 3,
-      "entities": [
+  "starting_engine_state": {
+    "scene_manager_data": {
+      "scene_data": [
         {
-          "index": 0,
-          "c_user_interface": {
-            "ui_name": "initial_ui",
-            "is_visible": true,
-            "root_ui_element": {
-              "base_data": {
-                "position": {
-                  "x": 100,
-                  "y": 200
-                },
-                "size": {
-                  "x": 50,
-                  "y": 30
-                },
-                "children_active": false,
-                "children": [],
-                "layout": "Horizontal",
-                "spacing_strategy": "None"
+          "entity_collection": {
+            "entity_memory_pool_size": 3,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "initial_ui",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": {
+                        "x": 100,
+                        "y": 200
+                      },
+                      "size": {
+                        "x": 50,
+                        "y": 30
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
               }
-            }
-          }
+            ]
+          },
+          "scene_id": "test",
+          "scene_type": "TEST"
         }
       ]
     }
   },
-  "expected_data_collection": {
-    "entity_collection": {
-      "entity_memory_pool_size": 3,
-      "entities": [
-        {
-          "index": 0,
-          "c_user_interface": {
-            "ui_name": "different_ui",
-            "is_visible": false,
-            "root_ui_element": {
-              "base_data": {
-                "position": {
-                  "x": 200,
-                  "y": 300
-                },
-                "size": {
-                  "x": 100,
-                  "y": 60
-                },
-                "children_active": false,
-                "children": [],
-                "layout": "Vertical",
-                "spacing_strategy": "None"
-              }
+  "tick_snapshots": [
+    {
+      "tick": 1,
+      "description": "Final expected state",
+      "engine_state": {
+        "scene_manager_data": {
+          "scene_data": [
+            {
+              "entity_collection": {
+                "entity_memory_pool_size": 3,
+                "entities": [
+                  {
+                    "index": 0,
+                    "c_user_interface": {
+                      "ui_name": "different_ui",
+                      "is_visible": false,
+                      "root_ui_element": {
+                        "base_data": {
+                          "position": {
+                            "x": 200,
+                            "y": 300
+                          },
+                          "size": {
+                            "x": 100,
+                            "y": 60
+                          },
+                          "children_active": false,
+                          "children": [],
+                          "layout": "Vertical",
+                          "spacing_strategy": "None"
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              "scene_id": "test",
+              "scene_type": "TEST"
             }
-          }
+          ]
         }
-      ]
+      }
     }
-  }
+  ]
 }
