@@ -5,12 +5,12 @@
 /// FlatbuffersUserPreferencesProvider loads and saves user preferences
 /// using FlatBuffers binary files. It supports:
 /// - Loading from user-specific preferences file
-/// - Falling back to defaults if no user file exists
+/// - Falling back to defaults from binary file if no user file exists
 /// - Saving preferences to user-specific file
 ///
 /// ## File Locations
-/// - Default preferences: Built into the application
-/// - User preferences: {user_data_dir}/preferences/user_preferences.bin
+/// - Default preferences: {data_dir}/preferences/default.preferences.bin
+/// - User preferences: {data_dir}/preferences/user_preferences.bin
 ///
 /// ## Usage
 /// ```cpp
@@ -37,9 +37,9 @@ namespace steamrot {
 /// @brief FlatBuffers file-based user preferences provider.
 ///
 /// This implementation:
-/// - Loads user preferences from binary FlatBuffers files
-/// - Returns defaults if no user file exists
-/// - Saves preferences to user-specific location
+/// - Loads default preferences from default.preferences.bin
+/// - Loads user overrides from user_preferences.bin if it exists
+/// - Saves user preferences to user_preferences.bin
 /////////////////////////////////////////////////
 class FlatbuffersUserPreferencesProvider : public IUserPreferencesProvider {
 private:
@@ -49,6 +49,13 @@ private:
   /// @return Path to user preferences file
   /////////////////////////////////////////////////
   std::filesystem::path GetUserPreferencesPath() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Load default preferences from binary file.
+  ///
+  /// @return Default user preferences or failure information
+  /////////////////////////////////////////////////
+  std::expected<UserPreferences, FailInfo> LoadDefaultPreferences() const;
 
 public:
   /////////////////////////////////////////////////
@@ -60,7 +67,7 @@ public:
   /// @brief Load user preferences.
   ///
   /// Loads from user preferences file if it exists,
-  /// otherwise returns default preferences.
+  /// otherwise returns default preferences from binary file.
   ///
   /// @return User preferences or failure information
   /////////////////////////////////////////////////
@@ -81,13 +88,6 @@ public:
   /// @return true if user preferences file exists
   /////////////////////////////////////////////////
   bool HasUserPreferences() const override;
-
-  /////////////////////////////////////////////////
-  /// @brief Get default preferences.
-  ///
-  /// @return Default user preferences
-  /////////////////////////////////////////////////
-  UserPreferences GetDefaultPreferences() const override;
 };
 
 } // namespace steamrot

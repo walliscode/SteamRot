@@ -39,4 +39,5 @@ logic
 flatbuffers
 flatbuffers_headers
 assets
+configuration
 )

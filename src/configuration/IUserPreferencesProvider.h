@@ -13,7 +13,7 @@
 /// - Gameplay data (save files with entity states)
 ///
 /// This allows:
-/// - Defaults to work without any user files
+/// - Defaults loaded from a separate binary file (not baked into code)
 /// - User overrides to persist across sessions
 /// - Clean separation of concerns
 ///
@@ -89,7 +89,7 @@ struct UserPreferences {
 ///
 /// Implementations handle the actual storage mechanism (files, databases, etc.)
 /// The interface supports:
-/// - Loading preferences (returns defaults if no user file exists)
+/// - Loading preferences (returns defaults from file if no user overrides)
 /// - Saving preferences to persistent storage
 /// - Checking if user preferences exist
 /////////////////////////////////////////////////
@@ -103,8 +103,8 @@ public:
   /////////////////////////////////////////////////
   /// @brief Load user preferences.
   ///
-  /// If no user preferences file exists, returns default preferences.
-  /// This ensures the engine always has valid preferences to work with.
+  /// If no user preferences file exists, returns default preferences
+  /// from the default preferences binary file.
   ///
   /// @return User preferences or failure information
   /////////////////////////////////////////////////
@@ -125,15 +125,6 @@ public:
   /// @return true if user preferences file exists, false otherwise
   /////////////////////////////////////////////////
   virtual bool HasUserPreferences() const = 0;
-
-  /////////////////////////////////////////////////
-  /// @brief Get default preferences.
-  ///
-  /// Returns the built-in defaults without loading from files.
-  ///
-  /// @return Default user preferences
-  /////////////////////////////////////////////////
-  virtual UserPreferences GetDefaultPreferences() const = 0;
 };
 
 } // namespace steamrot

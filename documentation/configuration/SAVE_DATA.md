@@ -180,6 +180,18 @@ See `src/flatbuffers_headers/save_data.fbs` for the complete schema.
 | Persist across all games | Specific to save slot |
 | Single file | Multiple slots |
 
+### vs. TestEngine
+
+**Important**: The save data system is only used by `GameEngine`. The `TestEngine`
+does NOT interact with save files - it uses injected `TestDataConfig` for all
+its starting state. This keeps tests isolated and reproducible.
+
+| GameEngine | TestEngine |
+|------------|------------|
+| Loads/saves to files | Uses injected config |
+| Supports save slots | No save functionality |
+| Persists between runs | Ephemeral per test |
+
 ## Save Slot Management
 
 - **Maximum slots**: 10 (configurable via `kMaxSaveSlots`)

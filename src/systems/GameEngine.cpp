@@ -9,6 +9,7 @@
 
 #include "GameEngine.h"
 #include "FlatbuffersDataLoader.h"
+#include "FlatbuffersUserPreferencesProvider.h"
 
 namespace steamrot {
 
@@ -47,6 +48,15 @@ GameEngine::ConfigureEngineStateFromData() {
       return std::unexpected(configure_result.error());
     }
   }
+
+  // Load user preferences from file
+  // GameEngine loads from default.preferences.bin (and user overrides if present)
+  FlatbuffersUserPreferencesProvider preferences_provider;
+  auto preferences_result = preferences_provider.LoadPreferences();
+  if (!preferences_result.has_value()) {
+    return std::unexpected(preferences_result.error());
+  }
+  m_user_preferences = preferences_result.value();
 
   return std::monostate{};
 }

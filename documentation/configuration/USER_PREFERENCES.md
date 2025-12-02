@@ -19,8 +19,16 @@ separately from gameplay data (saves) and engine configuration (static defaults)
 │              │                                                               │
 │              ▼                                                               │
 │  ┌───────────────────────┐                                                  │
-│  │   User Preferences    │  User-adjustable settings                        │
-│  │   (user_preferences)  │  Audio, display, accessibility                   │
+│  │   Default Preferences │  Default user preferences from binary file      │
+│  │   (default.preferences│  Audio, display, accessibility defaults         │
+│  │        .bin)          │  NOT baked into code                             │
+│  └───────────────────────┘                                                  │
+│              │                                                               │
+│              ▼                                                               │
+│  ┌───────────────────────┐                                                  │
+│  │   User Preferences    │  User-adjustable settings (overrides defaults)  │
+│  │   (user_preferences   │  Persisted when user changes settings            │
+│  │        .bin)          │                                                  │
 │  └───────────────────────┘                                                  │
 │              │                                                               │
 │              │   Overrides engine defaults where applicable                  │
@@ -62,8 +70,37 @@ separately from gameplay data (saves) and engine configuration (static defaults)
 
 ## File Locations
 
-- **Default preferences**: Built into application code
+- **Default preferences**: `{data_dir}/preferences/default.preferences.bin`
+  - Generated from `default.preferences.json` via FlatBuffers
+  - Provides initial values, NOT baked into code
 - **User preferences**: `{data_dir}/preferences/user_preferences.bin`
+  - Created when user modifies preferences
+  - Overrides default preferences
+
+## Engine Integration
+
+User preferences are loaded during GameEngine startup:
+
+```cpp
+// In GameEngine::ConfigureEngineStateFromData()
+FlatbuffersUserPreferencesProvider preferences_provider;
+auto preferences_result = preferences_provider.LoadPreferences();
+if (!preferences_result.has_value()) {
+  return std::unexpected(preferences_result.error());
+}
+m_user_preferences = preferences_result.value();
+```
+
+The `LoadPreferences()` method:
+1. Checks for user preferences file (user overrides)
+2. Falls back to default preferences from `default.preferences.bin`
+3. Returns the loaded preferences
+
+### TestEngine
+
+TestEngine does NOT load user preferences from files. It uses injected
+configuration via `TestDataConfig`, keeping tests isolated from file-based
+preferences.
 
 ## Usage
 
@@ -74,7 +111,7 @@ separately from gameplay data (saves) and engine configuration (static defaults)
 
 steamrot::FlatbuffersUserPreferencesProvider provider;
 
-// Load preferences (returns defaults if no user file)
+// Load preferences (returns defaults from file if no user overrides)
 auto result = provider.LoadPreferences();
 if (result.has_value()) {
     const auto& prefs = result.value();
@@ -104,16 +141,12 @@ if (!result.has_value()) {
 }
 ```
 
-### Checking for User Preferences
+### Accessing Preferences in GameEngine
 
 ```cpp
-steamrot::FlatbuffersUserPreferencesProvider provider;
-
-if (provider.HasUserPreferences()) {
-    // User has saved preferences
-} else {
-    // Using defaults
-}
+// After GameEngine startup
+const auto& prefs = game_engine.GetUserPreferences();
+float master_volume = prefs.audio.master_volume;
 ```
 
 ## Interface Design
@@ -127,7 +160,6 @@ public:
     virtual std::expected<UserPreferences, FailInfo> LoadPreferences() const = 0;
     virtual std::expected<std::monostate, FailInfo> SavePreferences(const UserPreferences&) = 0;
     virtual bool HasUserPreferences() const = 0;
-    virtual UserPreferences GetDefaultPreferences() const = 0;
 };
 ```
 
@@ -140,22 +172,38 @@ This allows:
 
 See `src/flatbuffers_headers/user_preferences.fbs` for the complete schema.
 
+## Build System
+
+The default preferences JSON is converted to binary during build:
+
+```cmake
+# In convert_json_to_binary.cmake
+flatbuffers_generate_for_type(user_preferences ".preferences.json" "preferences")
+```
+
+This generates `default.preferences.bin` from `default.preferences.json`.
+
 ## Relationship to Other Systems
 
 ### vs. Context Configuration (context_data.json)
 
 - **Context data**: Engine-level static configuration (scene pool sizes, etc.)
-- **User preferences**: User-adjustable settings that may override context data
+- **User preferences**: User-adjustable settings loaded from binary files
 
 ### vs. Save Data
 
 - **User preferences**: Settings (audio, display) - persist across all games
 - **Save data**: Gameplay progress - specific to a save slot
 
+### vs. TestEngine
+
+- **GameEngine**: Loads preferences from files during startup
+- **TestEngine**: Uses injected config, does NOT load from preference files
+
 ## Best Practices
 
-1. **Always provide defaults**: Ensure the engine works without any user files
-2. **Graceful degradation**: If loading fails, fall back to defaults
+1. **Defaults from file**: Default preferences come from `default.preferences.bin`, not code
+2. **Graceful degradation**: If loading fails, return error (don't silently use hardcoded defaults)
 3. **Version migration**: Use the `version` field for future schema updates
 4. **Validate values**: Check ranges (e.g., volume 0.0-1.0) when loading
 

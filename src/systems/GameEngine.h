@@ -14,7 +14,8 @@
 /// ### Phase 2: ConfigureEngineStateFromData() (GameEngine override)
 ///   - EngineData.subscriptions: Engine-level event handlers (quit game, etc.)
 ///   - EngineData.scene_manager_data: SceneManager subscriptions
-///   - Source: engine_data.json
+///   - UserPreferences: User-level settings (audio, display, accessibility)
+///   - Source: engine_data.json, default.preferences.bin
 ///
 /// ## Data Flow
 /// ```
@@ -23,10 +24,10 @@
 ///   └─▶ RunGame()
 ///         └─▶ StartUp() [loads GameResourcesData, calls
 ///         ConfigureEngineStateFromData]
-///               └─▶ ConfigureEngineStateFromData() [loads EngineData from
-///               files]
+///               └─▶ ConfigureEngineStateFromData() [loads EngineData + UserPreferences]
 ///                     └─▶ ConfigureSubscribersFromData()
 ///                     └─▶ SceneManager::ConfigureSceneManagerFromData()
+///                     └─▶ LoadUserPreferences()
 ///         └─▶ RunGameLoop()
 /// ```
 ///
@@ -39,6 +40,7 @@
 /////////////////////////////////////////////////
 #include "DisplayManager.h"
 #include "Engine.h"
+#include "IUserPreferencesProvider.h"
 
 namespace steamrot {
 /////////////////////////////////////////////////
@@ -47,6 +49,7 @@ namespace steamrot {
 ///
 /// GameEngine is the standard game execution environment:
 /// - Loads EngineData from engine_data.json
+/// - Loads UserPreferences from default.preferences.bin (and user overrides)
 /// - Creates and manages the game window via DisplayManager
 /// - Runs the standard SFML game loop
 ///
@@ -59,6 +62,11 @@ private:
   /// @brief DisplayManager for rendering and display management
   /////////////////////////////////////////////////
   DisplayManager m_display_manager;
+
+  /////////////////////////////////////////////////
+  /// @brief User preferences (loaded from file)
+  /////////////////////////////////////////////////
+  UserPreferences m_user_preferences;
 
   /////////////////////////////////////////////////
   /// @brief Execute scene-level logic for the GameEngine
@@ -89,6 +97,7 @@ private:
   /// Loads EngineData from engine_data.json and configures:
   /// - Engine-level subscriptions (e.g., quit game handler)
   /// - SceneManager subscriptions (e.g., scene change handler)
+  /// - User preferences from default.preferences.bin
   ///
   /// @return Success or failure information
   /////////////////////////////////////////////////
@@ -102,6 +111,13 @@ public:
   /// GameEngine loads all configuration from default files during StartUp().
   /////////////////////////////////////////////////
   GameEngine();
+
+  /////////////////////////////////////////////////
+  /// @brief Get the current user preferences.
+  ///
+  /// @return Const reference to user preferences
+  /////////////////////////////////////////////////
+  const UserPreferences &GetUserPreferences() const { return m_user_preferences; }
 };
 
 } // namespace steamrot
