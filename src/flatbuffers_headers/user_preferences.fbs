@@ -3,36 +3,32 @@
 /// @brief FlatBuffers schema for user-level preferences.
 ///
 /// User preferences are settings that can be adjusted by the user
-/// and persisted across sessions. These are distinct from gameplay
-/// data (save files) and engine configuration (static defaults).
+/// and persisted across sessions. These are distinct from:
+/// - Engine configuration (GameResourcesData) - static window/framerate settings
+/// - Gameplay data (save files) - game progress and state
 ///
 /// Categories:
-/// - Display: Window mode, resolution, vsync
+/// - Display: Fullscreen, vsync (user-adjustable display options)
 /// - Audio: Volume levels, mute states
-/// - Controls: Key bindings (future)
-/// - Accessibility: Font scaling, color options (future)
+/// - Accessibility: Font scaling, UI options (future)
+///
+/// Note: Window size and framerate are configured via GameResourcesData,
+/// not user preferences. User preferences only control runtime-adjustable
+/// settings like fullscreen mode, vsync, and audio levels.
 ////////////////////////////////////////////////////////////
 
 namespace steamrot;
 
 ////////////////////////////////////////////////////////////
 /// Display-related user preferences
+/// Note: Window size/framerate are in GameResourcesData, not here
 ////////////////////////////////////////////////////////////
 table DisplayPreferences {
-  /// Window width preference (0 = use default)
-  window_width: uint32 = 0;
-  
-  /// Window height preference (0 = use default)
-  window_height: uint32 = 0;
-  
   /// Fullscreen mode enabled
   fullscreen: bool = false;
   
   /// VSync enabled
   vsync: bool = true;
-  
-  /// Target framerate (0 = unlimited)
-  target_framerate: uint32 = 60;
 }
 
 ////////////////////////////////////////////////////////////

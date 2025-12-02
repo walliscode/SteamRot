@@ -9,13 +9,13 @@
 /// ## Design Rationale
 ///
 /// User preferences are separate from:
-/// - Engine configuration (static, compile-time defaults in context_data.json)
+/// - Engine configuration (GameResourcesData - window size, framerate)
 /// - Gameplay data (save files with entity states)
 ///
-/// This allows:
-/// - Defaults loaded from a separate binary file (not baked into code)
-/// - User overrides to persist across sessions
-/// - Clean separation of concerns
+/// User preferences contain runtime-adjustable settings:
+/// - Display: fullscreen, vsync (NOT window size - that's in GameResourcesData)
+/// - Audio: volume levels, mute states
+/// - Accessibility: UI scale, font preferences
 ///
 /// ## Usage
 /// ```cpp
@@ -46,17 +46,18 @@ namespace steamrot {
 /// This is the C++ representation of UserPreferencesData from FlatBuffers.
 /// It provides a convenient, mutable structure for working with preferences
 /// at runtime.
+///
+/// Note: Window size and framerate are in GameResourcesData, not here.
+/// User preferences only contain runtime-adjustable settings.
 /////////////////////////////////////////////////
 struct UserPreferences {
   /////////////////////////////////////////////////
-  /// @brief Display preferences
+  /// @brief Display preferences (runtime-adjustable only)
+  /// Note: Window size is in GameResourcesData, not here
   /////////////////////////////////////////////////
   struct Display {
-    uint32_t window_width{0};
-    uint32_t window_height{0};
     bool fullscreen{false};
     bool vsync{true};
-    uint32_t target_framerate{60};
   } display;
 
   /////////////////////////////////////////////////

@@ -13,15 +13,15 @@ separately from gameplay data (saves) and engine configuration (static defaults)
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
 │  ┌───────────────────────┐                                                  │
-│  │   Engine Defaults     │  Static, compile-time configuration              │
-│  │   (context_data.json) │  Window size, framerate, scene pools             │
+│  │   GameResourcesData   │  Engine-level configuration                      │
+│  │   (resource_data.fbs) │  Window size, title, framerate (static)          │
 │  └───────────────────────┘                                                  │
 │              │                                                               │
 │              ▼                                                               │
 │  ┌───────────────────────┐                                                  │
 │  │   Default Preferences │  Default user preferences from binary file      │
-│  │   (default.preferences│  Audio, display, accessibility defaults         │
-│  │        .bin)          │  NOT baked into code                             │
+│  │   (default.preferences│  Audio, fullscreen, vsync defaults              │
+│  │        .bin)          │  Runtime-adjustable settings only                │
 │  └───────────────────────┘                                                  │
 │              │                                                               │
 │              ▼                                                               │
@@ -40,17 +40,28 @@ separately from gameplay data (saves) and engine configuration (static defaults)
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
+## Data Separation
+
+User preferences contain **only runtime-adjustable settings**. Engine-level
+configuration (window size, framerate) is in GameResourcesData, not user preferences.
+
+| Data | Source | Contents |
+|------|--------|----------|
+| GameResourcesData | resource_data.fbs | Window size, title, framerate (static) |
+| UserPreferencesData | user_preferences.fbs | Fullscreen, vsync, audio (adjustable) |
+| SceneDataData | scene_data.fbs | Scene definition (assets, logic, entities) |
+| SceneState | save_data.fbs | Minimal save state (scene_type + entities only) |
+
 ## User Preferences Categories
 
-### Display Preferences
+### Display Preferences (Runtime-Adjustable Only)
 
 | Setting | Type | Default | Description |
 |---------|------|---------|-------------|
-| `window_width` | uint32 | 0 | Window width (0 = use engine default) |
-| `window_height` | uint32 | 0 | Window height (0 = use engine default) |
 | `fullscreen` | bool | false | Fullscreen mode |
 | `vsync` | bool | true | Vertical sync enabled |
-| `target_framerate` | uint32 | 60 | Target frames per second |
+
+Note: Window size and framerate are in GameResourcesData, not user preferences.
 
 ### Audio Preferences
 

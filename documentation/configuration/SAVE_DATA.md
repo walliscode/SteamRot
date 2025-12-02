@@ -56,16 +56,27 @@ allowing players to save and resume their game across sessions.
 |-------|------|-------------|
 | `metadata` | SaveMetadata | Save file metadata (required) |
 | `current_scene_type` | SceneType | Scene player was in when saving |
-| `scene_states` | [SceneStateData] | Entity states per scene |
+| `scene_states` | [SceneState] | Entity states per scene |
 | `global_event_bus` | EventBusData | Persistent event data |
 | `version` | uint32 | Save format version |
 
-### SceneStateData
+### SceneState
+
+Minimal save data for a scene. Distinct from `SceneDataData` which includes
+full scene definition (assets, logic, resources, etc.).
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `scene_type` | SceneType | Scene identifier |
 | `entity_collection` | EntityCollection | All entity data for the scene |
+
+## SceneState vs SceneDataData
+
+| SceneState (save_data.fbs) | SceneDataData (scene_data.fbs) |
+|----------------------------|--------------------------------|
+| Minimal: scene_type + entities | Full: assets, logic, resources, entities |
+| For save files | For scene definitions |
+| Runtime-captured state | Default scene template |
 
 ## File Locations
 

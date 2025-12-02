@@ -68,14 +68,11 @@ FlatbuffersUserPreferencesProvider::LoadDefaultPreferences() const {
   // Convert FlatBuffers data to UserPreferences struct
   UserPreferences preferences;
 
-  // Display preferences
+  // Display preferences (only runtime-adjustable settings)
+  // Note: Window size and framerate are in GameResourcesData, not here
   if (prefs_data->display()) {
-    preferences.display.window_width = prefs_data->display()->window_width();
-    preferences.display.window_height = prefs_data->display()->window_height();
     preferences.display.fullscreen = prefs_data->display()->fullscreen();
     preferences.display.vsync = prefs_data->display()->vsync();
-    preferences.display.target_framerate =
-        prefs_data->display()->target_framerate();
   }
 
   // Audio preferences

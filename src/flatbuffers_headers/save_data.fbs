@@ -10,6 +10,10 @@
 ///
 /// The design reuses EntityCollection from entities.fbs to
 /// ensure compatibility with the existing entity system.
+///
+/// Note: SceneState is distinct from SceneDataData:
+/// - SceneState: Minimal save data (scene_type + entities only)
+/// - SceneDataData: Full scene definition (assets, logic, resources, etc.)
 ////////////////////////////////////////////////////////////
 
 include "entities.fbs";
@@ -42,9 +46,10 @@ table SaveMetadata {
 }
 
 ////////////////////////////////////////////////////////////
-/// State data for a single scene
+/// Entity state for a single scene (minimal save data)
+/// Distinct from SceneDataData which includes assets, logic, etc.
 ////////////////////////////////////////////////////////////
-table SceneStateData {
+table SceneState {
   /// The type of scene this state represents
   scene_type: SceneType;
   
@@ -62,8 +67,8 @@ table SaveData {
   /// The scene the player was in when saving
   current_scene_type: SceneType;
   
-  /// State data for all populated scenes
-  scene_states: [SceneStateData];
+  /// Entity state for all populated scenes
+  scene_states: [SceneState];
   
   /// Global event bus state (for persistent events)
   global_event_bus: EventBusData;
