@@ -14,9 +14,8 @@ namespace steamrot {
 
 /////////////////////////////////////////////////
 std::filesystem::path FlatbuffersSaveDataProvider::GetSavesDirectory() const {
-  // For now, use the data directory. In a full implementation,
-  // this would use a user-specific directory (e.g., ~/.local/share/steamrot/)
-  return paths::GetDataDirectory() / "saves";
+  // Use the saves directory path helper
+  return paths::GetSavesDirectory();
 }
 
 /////////////////////////////////////////////////

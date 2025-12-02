@@ -35,6 +35,7 @@
 /////////////////////////////////////////////////
 #include "FailInfo.h"
 #include <expected>
+#include <string>
 
 namespace steamrot {
 
