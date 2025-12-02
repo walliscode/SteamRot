@@ -9,9 +9,8 @@
 #include "event_factory.h"
 #include "EventPacket.h"
 #include "events_generated.h"
-#include "scene_change_packet_generated.h"
-#include "user_input_generated.h"
 #include "flatbuffers/buffer.h"
+#include "user_input_generated.h"
 #include <catch2/catch_test_macros.hpp>
 #include <variant>
 
@@ -44,8 +43,8 @@ TEST_CASE("CreateUserInputBitset handles keyboard pressed",
   // Create UserInputBitsetData with A key pressed
   std::vector<uint8_t> keyboard_pressed = {steamrot::KeyboardInput_A};
   auto keyboard_pressed_vec = builder.CreateVector(keyboard_pressed);
-  auto data_offset = steamrot::CreateUserInputBitsetData(
-      builder, keyboard_pressed_vec);
+  auto data_offset =
+      steamrot::CreateUserInputBitsetData(builder, keyboard_pressed_vec);
   builder.Finish(data_offset);
 
   const steamrot::UserInputBitsetData *data =
@@ -67,10 +66,9 @@ TEST_CASE("CreateUserInputBitset handles keyboard released",
   // Create UserInputBitsetData with A key released
   std::vector<uint8_t> keyboard_released = {steamrot::KeyboardInput_A};
   auto keyboard_released_vec = builder.CreateVector(keyboard_released);
-  auto data_offset = steamrot::CreateUserInputBitsetData(
-      builder,
-      0, // keyboard_pressed
-      keyboard_released_vec);
+  auto data_offset = steamrot::CreateUserInputBitsetData(builder,
+                                                         0, // keyboard_pressed
+                                                         keyboard_released_vec);
   builder.Finish(data_offset);
 
   const steamrot::UserInputBitsetData *data =
@@ -93,11 +91,10 @@ TEST_CASE("CreateUserInputBitset handles mouse pressed",
   // Create UserInputBitsetData with left click pressed
   std::vector<uint8_t> mouse_pressed = {steamrot::MouseInput_LEFT_CLICK};
   auto mouse_pressed_vec = builder.CreateVector(mouse_pressed);
-  auto data_offset = steamrot::CreateUserInputBitsetData(
-      builder,
-      0, // keyboard_pressed
-      0, // keyboard_released
-      mouse_pressed_vec);
+  auto data_offset = steamrot::CreateUserInputBitsetData(builder,
+                                                         0, // keyboard_pressed
+                                                         0, // keyboard_released
+                                                         mouse_pressed_vec);
   builder.Finish(data_offset);
 
   const steamrot::UserInputBitsetData *data =
@@ -120,12 +117,11 @@ TEST_CASE("CreateUserInputBitset handles mouse released",
   // Create UserInputBitsetData with left click released
   std::vector<uint8_t> mouse_released = {steamrot::MouseInput_LEFT_CLICK};
   auto mouse_released_vec = builder.CreateVector(mouse_released);
-  auto data_offset = steamrot::CreateUserInputBitsetData(
-      builder,
-      0, // keyboard_pressed
-      0, // keyboard_released
-      0, // mouse_pressed
-      mouse_released_vec);
+  auto data_offset = steamrot::CreateUserInputBitsetData(builder,
+                                                         0, // keyboard_pressed
+                                                         0, // keyboard_released
+                                                         0, // mouse_pressed
+                                                         mouse_released_vec);
   builder.Finish(data_offset);
 
   const steamrot::UserInputBitsetData *data =
@@ -152,10 +148,10 @@ TEST_CASE("CreateSceneChangePacket creates packet with valid scene type",
   flatbuffers::FlatBufferBuilder builder;
 
   // Create SceneChangePacketData with just scene type
-  auto data_offset = steamrot::CreateSceneChangePacketData(
-      builder,
-      0, // uuid
-      steamrot::SceneType_TITLE);
+  auto data_offset =
+      steamrot::CreateSceneChangePacketData(builder,
+                                            0, // uuid
+                                            steamrot::SceneType_TITLE);
   builder.Finish(data_offset);
 
   const steamrot::SceneChangePacketData *data =
@@ -215,10 +211,10 @@ TEST_CASE("CreateSceneChangePacket fails with missing scene type",
   flatbuffers::FlatBufferBuilder builder;
 
   // Create SceneChangePacketData with scene type NONE (invalid)
-  auto data_offset = steamrot::CreateSceneChangePacketData(
-      builder,
-      0, // uuid
-      steamrot::SceneType_UNKNOWN);
+  auto data_offset =
+      steamrot::CreateSceneChangePacketData(builder,
+                                            0, // uuid
+                                            steamrot::SceneType_UNKNOWN);
   builder.Finish(data_offset);
 
   const steamrot::SceneChangePacketData *data =
@@ -283,8 +279,8 @@ TEST_CASE("CreateEventData creates EventData from UserInputBitsetData",
   // Create UserInputBitsetData with A key pressed
   std::vector<uint8_t> keyboard_pressed = {steamrot::KeyboardInput_A};
   auto keyboard_pressed_vec = builder.CreateVector(keyboard_pressed);
-  auto data_offset = steamrot::CreateUserInputBitsetData(
-      builder, keyboard_pressed_vec);
+  auto data_offset =
+      steamrot::CreateUserInputBitsetData(builder, keyboard_pressed_vec);
   builder.Finish(data_offset);
 
   const steamrot::UserInputBitsetData *data =
@@ -303,10 +299,10 @@ TEST_CASE("CreateEventData creates EventData from SceneChangePacketData",
   flatbuffers::FlatBufferBuilder builder;
 
   // Create SceneChangePacketData
-  auto data_offset = steamrot::CreateSceneChangePacketData(
-      builder,
-      0, // uuid
-      steamrot::SceneType_TITLE);
+  auto data_offset =
+      steamrot::CreateSceneChangePacketData(builder,
+                                            0, // uuid
+                                            steamrot::SceneType_TITLE);
   builder.Finish(data_offset);
 
   const steamrot::SceneChangePacketData *data =
@@ -353,8 +349,7 @@ TEST_CASE("CreateEventData creates monostate from NONE type",
 TEST_CASE("CreateEventData fails for unhandled enum value",
           "[unit][event_factory]") {
   // Use an invalid enum value by casting
-  auto invalid_type =
-      static_cast<steamrot::EventDataData>(999);
+  auto invalid_type = static_cast<steamrot::EventDataData>(999);
 
   auto result = steamrot::event::CreateEventData(invalid_type, nullptr);
 

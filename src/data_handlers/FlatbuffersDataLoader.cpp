@@ -9,7 +9,6 @@
 #include "FlatbuffersDataLoader.h"
 #include "FailInfo.h"
 #include "Fragment.h"
-#include "SceneData.h"
 #include "assets_generated.h"
 #include "core_data_generated.h"
 #include "engine_config_generated.h"
@@ -348,9 +347,8 @@ FlatbuffersDataLoader::ProvideEngineCoreData() const {
 
   const EngineData *engine_data = engine_result.value();
   if (!engine_data->engine_core()) {
-    return std::unexpected(
-        FailInfo(FailMode::FlatbuffersDataNotFound,
-                 "EngineCoreData not found in EngineData"));
+    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
+                                    "EngineCoreData not found in EngineData"));
   }
 
   return engine_data->engine_core();
@@ -423,8 +421,7 @@ FlatbuffersDataLoader::ProvideDefaultUserPreferencesData() const {
 std::expected<const EngineConfigData *, FailInfo>
 FlatbuffersDataLoader::ProvideEngineConfigData() const {
   // First check for user-specific engine config
-  std::filesystem::path user_engine_dir =
-      paths::GetUserDirectory() / "engine";
+  std::filesystem::path user_engine_dir = paths::GetUserDirectory() / "engine";
   std::filesystem::path user_config_path =
       user_engine_dir / "engine_config.bin";
 
@@ -445,8 +442,8 @@ FlatbuffersDataLoader::ProvideEngineConfigData() const {
       default_engine_dir / "engine_config.bin";
 
   if (!std::filesystem::exists(default_config_path)) {
-    std::string error_message = std::format(
-        "Engine config file not found: {}", default_config_path.string());
+    std::string error_message = std::format("Engine config file not found: {}",
+                                            default_config_path.string());
     return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
   }
 

@@ -16,7 +16,6 @@
 #include "GameCore.h"
 #include "SceneContext.h"
 #include "SceneCore.h"
-#include "scene_type_generated.h"
 #include <memory>
 
 namespace steamrot::tests {
