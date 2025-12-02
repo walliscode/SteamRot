@@ -79,10 +79,10 @@ separately from gameplay data (saves) and engine configuration (static defaults)
 
 ## Engine Integration
 
-User preferences are loaded during GameEngine startup:
+User preferences are loaded during Engine startup (both GameEngine and TestEngine):
 
 ```cpp
-// In GameEngine::ConfigureEngineStateFromData()
+// In Engine::StartUp() - base class
 FlatbuffersUserPreferencesProvider preferences_provider;
 auto preferences_result = preferences_provider.LoadPreferences();
 if (!preferences_result.has_value()) {
@@ -96,11 +96,27 @@ The `LoadPreferences()` method:
 2. Falls back to default preferences from `default.preferences.bin`
 3. Returns the loaded preferences
 
+### GameEngine
+
+GameEngine overrides `StartUp()` to:
+1. Call `Engine::StartUp()` (loads default preferences)
+2. Check for saved user preferences and load them (overrides defaults)
+3. Call `SceneManager::LoadTitleScene()` to start the game
+
+```cpp
+// In GameEngine::StartUp()
+auto base_result = Engine::StartUp();  // Loads default preferences
+if (preferences_provider.HasUserPreferences()) {
+  m_user_preferences = preferences_provider.LoadPreferences().value();
+}
+m_scene_manager.LoadTitleScene();
+```
+
 ### TestEngine
 
-TestEngine does NOT load user preferences from files. It uses injected
-configuration via `TestDataConfig`, keeping tests isolated from file-based
-preferences.
+TestEngine uses the base `Engine::StartUp()` which loads default preferences.
+It does NOT check for saved user preferences - this ensures consistent test
+behavior. Game state configuration comes from injected `TestDataConfig`.
 
 ## Usage
 
