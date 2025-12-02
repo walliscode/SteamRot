@@ -17,7 +17,7 @@
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
-TestEngine::TestEngine(TestDataConfig *config)
+TestEngine::TestEngine(const TestDataConfig *config)
     : Engine(), m_test_config(config) {
   // Extract simulation data from config if present
   if (m_test_config && m_test_config->simulation_data()) {

@@ -56,11 +56,10 @@ TEST_CASE("RunTestHarness with simulation test data configs",
   REQUIRE(configs.has_value());
 
   // Filter to only configs with simulation_data
-  std::vector<steamrot::TestDataConfig *> simulation_configs;
+  std::vector<const steamrot::TestDataConfig *> simulation_configs;
   for (const auto *config : configs.value()) {
     if (config->simulation_data()) {
-      simulation_configs.push_back(
-          const_cast<steamrot::TestDataConfig *>(config));
+      simulation_configs.push_back(config);
     }
   }
 
@@ -68,7 +67,7 @@ TEST_CASE("RunTestHarness with simulation test data configs",
   REQUIRE(simulation_configs.size() >= 2);
 
   // Test each simulation config using TestEngine via RunTestHarness
-  for (auto *config : simulation_configs) {
+  for (const auto *config : simulation_configs) {
     INFO("Testing simulation: " << config->metadata()->test_name()->str());
 
     auto result = steamrot::tests::RunTestHarness(config);
@@ -84,17 +83,17 @@ TEST_CASE("Simulation with Catch2 generators", "[unit][harness][simulation]") {
   REQUIRE(configs_result.has_value());
 
   // Filter to configs with simulation data
-  std::vector<steamrot::TestDataConfig *> sim_configs;
+  std::vector<const steamrot::TestDataConfig *> sim_configs;
   for (const auto *config : configs_result.value()) {
     if (config->simulation_data()) {
-      sim_configs.push_back(const_cast<steamrot::TestDataConfig *>(config));
+      sim_configs.push_back(config);
     }
   }
 
   REQUIRE(sim_configs.size() >= 1);
 
   // Use generator
-  auto *config = GENERATE_COPY(from_range(sim_configs));
+  const auto *config = GENERATE_COPY(from_range(sim_configs));
 
   INFO("Running simulation test: " << config->metadata()->test_name()->str());
 

@@ -108,7 +108,7 @@ private:
   /////////////////////////////////////////////////
   /// @brief Test data configuration.
   /////////////////////////////////////////////////
-  TestDataConfig *m_test_config;
+  const TestDataConfig *m_test_config;
 
   ////////////////////////////////////////////////
   /// @brief Simulation data extracted from test configuration.
@@ -172,7 +172,7 @@ public:
   ///
   /// @param config Test data configuration (must remain valid)
   /////////////////////////////////////////////////
-  explicit TestEngine(TestDataConfig *config);
+  explicit TestEngine(const TestDataConfig *config);
 
   /////////////////////////////////////////////////
   /// @brief Returns data bank for inspection and testing

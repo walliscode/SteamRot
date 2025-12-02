@@ -15,7 +15,8 @@
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo> RunTestHarness(TestDataConfig *config) {
+std::expected<std::monostate, FailInfo>
+RunTestHarness(const TestDataConfig *config) {
 
   // Validate config
   if (!config) {
