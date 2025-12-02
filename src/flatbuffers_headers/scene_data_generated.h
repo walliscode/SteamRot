@@ -14,9 +14,9 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
              "Non-compatible flatbuffers version included");
 
 #include "assets_generated.h"
+#include "core_data_generated.h"
 #include "entities_generated.h"
 #include "logic_data_generated.h"
-#include "resource_data_generated.h"
 #include "scene_types_generated.h"
 
 namespace steamrot {
@@ -29,7 +29,7 @@ struct SceneDataData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ENTITY_COLLECTION = 4,
     VT_ASSETS = 6,
-    VT_SCENE_RESOURCES = 8,
+    VT_SCENE_CORE = 8,
     VT_SCENE_ID = 10,
     VT_SCENE_TYPE = 12,
     VT_LOGIC_COLLECTION_DATA = 14
@@ -40,8 +40,8 @@ struct SceneDataData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::AssetCollection *assets() const {
     return GetPointer<const steamrot::AssetCollection *>(VT_ASSETS);
   }
-  const steamrot::SceneResourcesData *scene_resources() const {
-    return GetPointer<const steamrot::SceneResourcesData *>(VT_SCENE_RESOURCES);
+  const steamrot::SceneCoreData *scene_core() const {
+    return GetPointer<const steamrot::SceneCoreData *>(VT_SCENE_CORE);
   }
   const ::flatbuffers::String *scene_id() const {
     return GetPointer<const ::flatbuffers::String *>(VT_SCENE_ID);
@@ -58,8 +58,8 @@ struct SceneDataData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyTable(entity_collection()) &&
            VerifyOffset(verifier, VT_ASSETS) &&
            verifier.VerifyTable(assets()) &&
-           VerifyOffset(verifier, VT_SCENE_RESOURCES) &&
-           verifier.VerifyTable(scene_resources()) &&
+           VerifyOffset(verifier, VT_SCENE_CORE) &&
+           verifier.VerifyTable(scene_core()) &&
            VerifyOffset(verifier, VT_SCENE_ID) &&
            verifier.VerifyString(scene_id()) &&
            VerifyField<int8_t>(verifier, VT_SCENE_TYPE, 1) &&
@@ -79,8 +79,8 @@ struct SceneDataDataBuilder {
   void add_assets(::flatbuffers::Offset<steamrot::AssetCollection> assets) {
     fbb_.AddOffset(SceneDataData::VT_ASSETS, assets);
   }
-  void add_scene_resources(::flatbuffers::Offset<steamrot::SceneResourcesData> scene_resources) {
-    fbb_.AddOffset(SceneDataData::VT_SCENE_RESOURCES, scene_resources);
+  void add_scene_core(::flatbuffers::Offset<steamrot::SceneCoreData> scene_core) {
+    fbb_.AddOffset(SceneDataData::VT_SCENE_CORE, scene_core);
   }
   void add_scene_id(::flatbuffers::Offset<::flatbuffers::String> scene_id) {
     fbb_.AddOffset(SceneDataData::VT_SCENE_ID, scene_id);
@@ -106,14 +106,14 @@ inline ::flatbuffers::Offset<SceneDataData> CreateSceneDataData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::EntityCollection> entity_collection = 0,
     ::flatbuffers::Offset<steamrot::AssetCollection> assets = 0,
-    ::flatbuffers::Offset<steamrot::SceneResourcesData> scene_resources = 0,
+    ::flatbuffers::Offset<steamrot::SceneCoreData> scene_core = 0,
     ::flatbuffers::Offset<::flatbuffers::String> scene_id = 0,
     steamrot::SceneType scene_type = steamrot::SceneType_UNKNOWN,
     ::flatbuffers::Offset<steamrot::LogicCollectionData> logic_collection_data = 0) {
   SceneDataDataBuilder builder_(_fbb);
   builder_.add_logic_collection_data(logic_collection_data);
   builder_.add_scene_id(scene_id);
-  builder_.add_scene_resources(scene_resources);
+  builder_.add_scene_core(scene_core);
   builder_.add_assets(assets);
   builder_.add_entity_collection(entity_collection);
   builder_.add_scene_type(scene_type);
@@ -124,7 +124,7 @@ inline ::flatbuffers::Offset<SceneDataData> CreateSceneDataDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::EntityCollection> entity_collection = 0,
     ::flatbuffers::Offset<steamrot::AssetCollection> assets = 0,
-    ::flatbuffers::Offset<steamrot::SceneResourcesData> scene_resources = 0,
+    ::flatbuffers::Offset<steamrot::SceneCoreData> scene_core = 0,
     const char *scene_id = nullptr,
     steamrot::SceneType scene_type = steamrot::SceneType_UNKNOWN,
     ::flatbuffers::Offset<steamrot::LogicCollectionData> logic_collection_data = 0) {
@@ -133,7 +133,7 @@ inline ::flatbuffers::Offset<SceneDataData> CreateSceneDataDataDirect(
       _fbb,
       entity_collection,
       assets,
-      scene_resources,
+      scene_core,
       scene_id__,
       scene_type,
       logic_collection_data);

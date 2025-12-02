@@ -29,7 +29,7 @@ struct UserPreferencesDataBuilder;
 
 ////////////////////////////////////////////////////////////
 /// Display-related user preferences
-/// Note: Window size/framerate are in GameResourcesData, not here
+/// Note: Window size/framerate are in EngineCoreData, not here
 ////////////////////////////////////////////////////////////
 struct DisplayPreferences FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef DisplayPreferencesBuilder Builder;

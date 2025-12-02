@@ -15,12 +15,12 @@ namespace steamrot {
 
 /////////////////////////////////////////////////
 GameEngine::GameEngine()
-    : m_display_manager(m_game_resources.game_window, m_scene_manager) {}
+    : m_display_manager(m_game_core.game_window, m_scene_manager) {}
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> GameEngine::StartUp() {
   // Call base StartUp() which loads:
-  // - GameResourcesData (window config)
+  // - EngineCoreData (window config)
   // - Default user preferences from default.preferences.bin
   // - Calls ConfigureEngineStateFromData() (subscriptions, scene manager)
   auto base_startup_result = Engine::StartUp();
@@ -102,11 +102,11 @@ void GameEngine::ExecuteDisplayManagerTick() {
 void GameEngine::RunGameLoop() {
   m_running = true;
   // main game loop
-  while (m_running && m_game_resources.game_window.isOpen()) {
+  while (m_running && m_game_core.game_window.isOpen()) {
     // execute a single tick of all systems
     ExecuteSystemsTick();
     // increment loop number
-    m_game_resources.loop_number++;
+    m_game_core.loop_number++;
   }
 }
 
@@ -122,7 +122,7 @@ std::expected<std::monostate, FailInfo> GameEngine::ProcessSubscriptions() {
       switch (subscriber->m_trigger_event_type) {
       case EventType::EventType_EVENT_QUIT_GAME: {
         // close the window to quit the game
-        m_game_resources.game_window.close();
+        m_game_core.game_window.close();
         break;
       }
       default:

@@ -14,7 +14,7 @@ namespace steamrot::tests {
 
 /////////////////////////////////////////////////
 void CheckAssetConfiguration(const SceneType &scene_type,
-                               const AssetManager &asset_manager) {
+                             const AssetManager &asset_manager) {
 
   // get flatbuffer asset collection
   FlatbuffersDataLoader loader;
@@ -31,7 +31,7 @@ void CheckAssetConfiguration(const SceneType &scene_type,
 
 /////////////////////////////////////////////////
 void CheckFontConfiguration(const AssetCollection &asset_collection,
-                              const AssetManager &asset_manager) {
+                            const AssetManager &asset_manager) {
 
   if (!asset_collection.fonts()) {
     // no fonts to check

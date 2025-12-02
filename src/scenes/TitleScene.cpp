@@ -19,7 +19,7 @@ void TitleScene::sMovement() {};
 /////////////////////////////////////////////////
 void TitleScene::sRender() {
   // clear the render texture and the start of each Scene render step
-  m_scene_resources.scene_texture.clear(sf::Color::Black);
+  m_scene_core.scene_texture.clear(sf::Color::Black);
 
   if (m_logic_map.find(LogicType::Render) == m_logic_map.end()) {
   }

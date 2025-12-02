@@ -13,8 +13,8 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
+#include "core_data_generated.h"
 #include "event_bus_data_generated.h"
-#include "resource_data_generated.h"
 #include "scene_manager_data_generated.h"
 #include "subscriber_data_generated.h"
 
@@ -29,7 +29,8 @@ struct EngineData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_SUBSCRIPTIONS = 4,
     VT_SCENE_MANAGER_DATA = 6,
     VT_GLOBAL_EVENT_BUS_DATA = 8,
-    VT_WAITING_ROOM_EVENT_BUS_DATA = 10
+    VT_WAITING_ROOM_EVENT_BUS_DATA = 10,
+    VT_ENGINE_CORE = 12
   };
   const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>> *subscriptions() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>> *>(VT_SUBSCRIPTIONS);
@@ -43,6 +44,9 @@ struct EngineData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::EventBusData *waiting_room_event_bus_data() const {
     return GetPointer<const steamrot::EventBusData *>(VT_WAITING_ROOM_EVENT_BUS_DATA);
   }
+  const steamrot::EngineCoreData *engine_core() const {
+    return GetPointer<const steamrot::EngineCoreData *>(VT_ENGINE_CORE);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_SUBSCRIPTIONS) &&
@@ -54,6 +58,8 @@ struct EngineData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyTable(global_event_bus_data()) &&
            VerifyOffset(verifier, VT_WAITING_ROOM_EVENT_BUS_DATA) &&
            verifier.VerifyTable(waiting_room_event_bus_data()) &&
+           VerifyOffset(verifier, VT_ENGINE_CORE) &&
+           verifier.VerifyTable(engine_core()) &&
            verifier.EndTable();
   }
 };
@@ -74,6 +80,9 @@ struct EngineDataBuilder {
   void add_waiting_room_event_bus_data(::flatbuffers::Offset<steamrot::EventBusData> waiting_room_event_bus_data) {
     fbb_.AddOffset(EngineData::VT_WAITING_ROOM_EVENT_BUS_DATA, waiting_room_event_bus_data);
   }
+  void add_engine_core(::flatbuffers::Offset<steamrot::EngineCoreData> engine_core) {
+    fbb_.AddOffset(EngineData::VT_ENGINE_CORE, engine_core);
+  }
   explicit EngineDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -90,8 +99,10 @@ inline ::flatbuffers::Offset<EngineData> CreateEngineData(
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>>> subscriptions = 0,
     ::flatbuffers::Offset<steamrot::SceneManagerData> scene_manager_data = 0,
     ::flatbuffers::Offset<steamrot::EventBusData> global_event_bus_data = 0,
-    ::flatbuffers::Offset<steamrot::EventBusData> waiting_room_event_bus_data = 0) {
+    ::flatbuffers::Offset<steamrot::EventBusData> waiting_room_event_bus_data = 0,
+    ::flatbuffers::Offset<steamrot::EngineCoreData> engine_core = 0) {
   EngineDataBuilder builder_(_fbb);
+  builder_.add_engine_core(engine_core);
   builder_.add_waiting_room_event_bus_data(waiting_room_event_bus_data);
   builder_.add_global_event_bus_data(global_event_bus_data);
   builder_.add_scene_manager_data(scene_manager_data);
@@ -104,14 +115,16 @@ inline ::flatbuffers::Offset<EngineData> CreateEngineDataDirect(
     const std::vector<::flatbuffers::Offset<steamrot::SubscriberData>> *subscriptions = nullptr,
     ::flatbuffers::Offset<steamrot::SceneManagerData> scene_manager_data = 0,
     ::flatbuffers::Offset<steamrot::EventBusData> global_event_bus_data = 0,
-    ::flatbuffers::Offset<steamrot::EventBusData> waiting_room_event_bus_data = 0) {
+    ::flatbuffers::Offset<steamrot::EventBusData> waiting_room_event_bus_data = 0,
+    ::flatbuffers::Offset<steamrot::EngineCoreData> engine_core = 0) {
   auto subscriptions__ = subscriptions ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::SubscriberData>>(*subscriptions) : 0;
   return steamrot::CreateEngineData(
       _fbb,
       subscriptions__,
       scene_manager_data,
       global_event_bus_data,
-      waiting_room_event_bus_data);
+      waiting_room_event_bus_data,
+      engine_core);
 }
 
 inline const steamrot::EngineData *GetEngineData(const void *buf) {

@@ -1,46 +1,44 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Free functions for configuring resources from FlatBuffers data.
+/// @brief Free functions for configuring core objects from FlatBuffers data.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "resources_configuration.h"
+#include "core_configuration.h"
 
 namespace steamrot {
-namespace resources {
+namespace core {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigureGameResources(GameResources &resources,
-                       const GameResourcesData *game_data) {
-  if (!game_data) {
+ConfigureGameCore(GameCore &game_core, const EngineCoreData *core_data) {
+  if (!core_data) {
     return std::unexpected(
-        FailInfo{FailMode::NullPointer, "GameResourcesData is null"});
+        FailInfo{FailMode::NullPointer, "EngineCoreData is null"});
   }
 
   // Create the window with configured settings (SFML 3.0 API)
-  sf::Vector2u window_size(game_data->window_width(),
-                           game_data->window_height());
+  sf::Vector2u window_size(core_data->window_width(),
+                           core_data->window_height());
 
   std::string window_title = "SteamRot"; // Default title
-  if (game_data->window_title()) {
-    window_title = game_data->window_title()->str();
+  if (core_data->window_title()) {
+    window_title = core_data->window_title()->str();
   }
 
-  resources.game_window.create(sf::VideoMode(window_size), window_title);
+  game_core.game_window.create(sf::VideoMode(window_size), window_title);
 
   // Set framerate limit
-  resources.game_window.setFramerateLimit(game_data->framerate_limit());
+  game_core.game_window.setFramerateLimit(core_data->framerate_limit());
 
   return std::monostate{};
 }
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigureSceneResources(SceneResources &resources,
-                        const SceneResourcesData *scene_data) {
+ConfigureSceneCore(SceneCore &scene_core, const SceneCoreData *scene_data) {
 
   // Default dimensions
   uint32_t texture_width = 800;
@@ -54,10 +52,10 @@ ConfigureSceneResources(SceneResources &resources,
 
   // Create the render texture with configured or default dimensions (SFML 3.0 API)
   sf::Vector2u texture_size(texture_width, texture_height);
-  resources.scene_texture = sf::RenderTexture(texture_size);
+  scene_core.scene_texture = sf::RenderTexture(texture_size);
 
   return std::monostate{};
 }
 
-} // namespace resources
+} // namespace core
 } // namespace steamrot

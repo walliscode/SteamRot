@@ -28,7 +28,6 @@
 /////////////////////////////////////////////////
 #include "IUserPreferencesProvider.h"
 #include <filesystem>
-#include <string>
 
 namespace steamrot {
 

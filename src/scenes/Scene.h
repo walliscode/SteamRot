@@ -16,8 +16,8 @@
 #include "GameContext.h"
 #include "Logic.h"
 #include "LogicFactory.h"
+#include "SceneCore.h"
 #include "SceneData.h"
-#include "SceneResources.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <unordered_map>
@@ -63,9 +63,9 @@ protected:
       m_logic_map;
 
   /////////////////////////////////////////////////
-  /// @brief Scene-level resources (render texture, etc.).
+  /// @brief Scene-level core objects (render texture, etc.).
   /////////////////////////////////////////////////
-  SceneResources m_scene_resources;
+  SceneCore m_scene_core;
 
   /////////////////////////////////////////////////
   /// @brief Is the Scene active? Should update logic and render texture

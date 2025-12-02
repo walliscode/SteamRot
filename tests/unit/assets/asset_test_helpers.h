@@ -10,7 +10,6 @@
 
 #include "AssetManager.h"
 #include "assets_generated.h"
-#include "scene_change_packet_generated.h"
 
 namespace steamrot::tests {
 /////////////////////////////////////////////////
@@ -24,7 +23,7 @@ namespace steamrot::tests {
 /// @param asset_manager Instance of AssetManager to check against
 /////////////////////////////////////////////////
 void CheckAssetConfiguration(const SceneType &scene_type,
-                               const AssetManager &asset_manager);
+                             const AssetManager &asset_manager);
 
 /////////////////////////////////////////////////
 /// @brief Checks that the default fonts have been configured correctly
@@ -34,6 +33,6 @@ void CheckAssetConfiguration(const SceneType &scene_type,
 /// @param fonts Map of sf::Font objects indexed by font names
 /////////////////////////////////////////////////
 void CheckFontConfiguration(const AssetCollection &asset_collection,
-                              const AssetManager &asset_manager);
+                            const AssetManager &asset_manager);
 
 } // namespace steamrot::tests

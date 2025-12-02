@@ -9,11 +9,11 @@
 /// ## Design Rationale
 ///
 /// User preferences are separate from:
-/// - Engine configuration (GameResourcesData - window size, framerate)
+/// - Engine configuration (EngineCoreData - window size, framerate)
 /// - Gameplay data (save files with entity states)
 ///
 /// User preferences contain runtime-adjustable settings:
-/// - Display: fullscreen, vsync (NOT window size - that's in GameResourcesData)
+/// - Display: fullscreen, vsync (NOT window size - that's in EngineCoreData)
 /// - Audio: volume levels, mute states
 /// - Accessibility: UI scale, font preferences
 ///
@@ -34,8 +34,10 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FailInfo.h"
+#include <cstdint>
 #include <expected>
 #include <string>
+#include <variant>
 
 namespace steamrot {
 
@@ -47,13 +49,13 @@ namespace steamrot {
 /// It provides a convenient, mutable structure for working with preferences
 /// at runtime.
 ///
-/// Note: Window size and framerate are in GameResourcesData, not here.
+/// Note: Window size and framerate are in EngineCoreData, not here.
 /// User preferences only contain runtime-adjustable settings.
 /////////////////////////////////////////////////
 struct UserPreferences {
   /////////////////////////////////////////////////
   /// @brief Display preferences (runtime-adjustable only)
-  /// Note: Window size is in GameResourcesData, not here
+  /// Note: Window size is in EngineCoreData, not here
   /////////////////////////////////////////////////
   struct Display {
     bool fullscreen{false};

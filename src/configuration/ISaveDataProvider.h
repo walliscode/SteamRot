@@ -47,6 +47,7 @@
 #include "scene_types_generated.h"
 #include <expected>
 #include <string>
+#include <variant>
 #include <vector>
 
 namespace steamrot {
@@ -122,8 +123,9 @@ struct SaveData {
   /////////////////////////////////////////////////
   uint32_t version{1};
 
-  // Note: Scene state data will be added when entity serialization is implemented
-  // For now, this interface provides the structure for future implementation
+  // Note: Scene state data will be added when entity serialization is
+  // implemented For now, this interface provides the structure for future
+  // implementation
 };
 
 /////////////////////////////////////////////////

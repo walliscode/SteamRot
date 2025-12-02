@@ -7,7 +7,8 @@ set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/fragments.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/ui_style.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/simulation.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/resource_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/core_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/engine_config.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/scene_types.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/input_test_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/joints.fbs

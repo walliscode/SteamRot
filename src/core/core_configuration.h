@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Free functions for configuring resources from FlatBuffers data.
+/// @brief Free functions for configuring core objects from FlatBuffers data.
 /////////////////////////////////////////////////
 
 #pragma once
@@ -9,42 +9,40 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FailInfo.h"
-#include "GameResources.h"
-#include "SceneResources.h"
-#include "resource_data_generated.h"
+#include "GameCore.h"
+#include "SceneCore.h"
+#include "core_data_generated.h"
 #include <expected>
 
 namespace steamrot {
-namespace resources {
+namespace core {
 
 /////////////////////////////////////////////////
-/// @brief Configure GameResources from FlatBuffers data.
+/// @brief Configure GameCore from FlatBuffers data.
 ///
 /// Configures window settings (size, title, framerate) from the
 /// configuration data. The window is created directly during configuration.
 ///
-/// @param resources GameResources instance to configure
-/// @param game_data Pointer to GameResourcesData configuration
+/// @param game_core GameCore instance to configure
+/// @param core_data Pointer to EngineCoreData configuration
 /// @return Expected containing monostate or FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigureGameResources(GameResources &resources,
-                       const GameResourcesData *game_data);
+ConfigureGameCore(GameCore &game_core, const EngineCoreData *core_data);
 
 /////////////////////////////////////////////////
-/// @brief Configure SceneResources from FlatBuffers data.
+/// @brief Configure SceneCore from FlatBuffers data.
 ///
 /// Configures render texture dimensions from the scene data.
 /// If scene_data is null, uses default dimensions (800x600).
 /// The render texture is created directly during configuration.
 ///
-/// @param resources SceneResources instance to configure
-/// @param scene_data Scene resource data (can be null for defaults)
+/// @param scene_core SceneCore instance to configure
+/// @param scene_data Scene core data (can be null for defaults)
 /// @return Expected containing monostate or FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigureSceneResources(SceneResources &resources,
-                        const SceneResourcesData *scene_data);
+ConfigureSceneCore(SceneCore &scene_core, const SceneCoreData *scene_data);
 
-} // namespace resources
+} // namespace core
 } // namespace steamrot

@@ -8,7 +8,6 @@
 /////////////////////////////////////////////////
 #include "AssetManager.h"
 #include "asset_test_helpers.h"
-#include "scene_change_packet_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("AssetManager is constructed correctly", "[unit][AssetManager]") {
@@ -17,7 +16,8 @@ TEST_CASE("AssetManager is constructed correctly", "[unit][AssetManager]") {
   REQUIRE_NOTHROW(asset_manager);
 }
 
-TEST_CASE("AssetManager::LoadDefaultAssets works correctly", "[unit][AssetManager]") {
+TEST_CASE("AssetManager::LoadDefaultAssets works correctly",
+          "[unit][AssetManager]") {
   steamrot::AssetManager asset_manager;
 
   auto load_result = asset_manager.LoadDefaultAssets();
@@ -50,5 +50,5 @@ TEST_CASE("AssetManager loads scene assets correctly", "[unit][AssetManager]") {
 
   // check if the assets were loaded correctly
   steamrot::tests::CheckAssetConfiguration(steamrot::SceneType_TEST,
-                                             asset_manager);
+                                           asset_manager);
 }

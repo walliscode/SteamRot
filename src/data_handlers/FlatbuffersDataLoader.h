@@ -14,9 +14,10 @@
 #include "DataLoader.h"
 #include "FailInfo.h"
 #include "context_data_generated.h"
+#include "core_data_generated.h"
+#include "engine_config_generated.h"
 #include "engine_data_generated.h"
 #include "logic_data_generated.h"
-#include "resource_data_generated.h"
 #include "scene_data_generated.h"
 #include "scene_manager_data_generated.h"
 #include "ui_style_generated.h"
@@ -53,7 +54,7 @@ public:
   ProvideAllFragments(std::vector<std::string> fragment_names) const override;
 
   /////////////////////////////////////////////////
-  /// @brief Provides GameEngineData from binary file
+  /// @brief Provides EngineData from binary file
   /////////////////////////////////////////////////
   std::expected<const EngineData *, FailInfo> ProvideEngineData() const;
 
@@ -96,16 +97,16 @@ public:
   std::expected<const ContextData *, FailInfo> ProvideContextData() const;
 
   /////////////////////////////////////////////////
-  /// @brief Provides GameResourcesData from binary file
+  /// @brief Provides EngineCoreData from EngineData
   /////////////////////////////////////////////////
-  std::expected<const EngineResourcesData *, FailInfo>
-  ProvideEngineResourcesData() const;
+  std::expected<const EngineCoreData *, FailInfo>
+  ProvideEngineCoreData() const;
 
   /////////////////////////////////////////////////
-  /// @brief Provides SceneResourcesData from SceneData for a specific scene
+  /// @brief Provides SceneCoreData from SceneData for a specific scene
   /////////////////////////////////////////////////
-  std::expected<const SceneResourcesData *, FailInfo>
-  ProvideSceneResourcesData(const SceneType scene_type) const;
+  std::expected<const SceneCoreData *, FailInfo>
+  ProvideSceneCoreData(const SceneType scene_type) const;
 
   /////////////////////////////////////////////////
   /// @brief Provides LogicCollectionData from SceneData for a specific scene
@@ -123,6 +124,16 @@ public:
   /////////////////////////////////////////////////
   std::expected<const UserPreferencesData *, FailInfo>
   ProvideDefaultUserPreferencesData() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Provides EngineConfigData from binary file
+  ///
+  /// Loads engine configuration from defaults/engine/engine_config.bin.
+  /// If user configuration exists at user/engine/engine_config.bin, it
+  /// will be loaded instead.
+  /////////////////////////////////////////////////
+  std::expected<const EngineConfigData *, FailInfo>
+  ProvideEngineConfigData() const;
 };
 
 } // namespace steamrot

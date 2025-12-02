@@ -15,8 +15,8 @@ namespace steamrot {
 /////////////////////////////////////////////////
 std::filesystem::path
 FlatbuffersUserPreferencesProvider::GetUserPreferencesPath() const {
-  // Use the preferences directory path helper
-  return paths::GetPreferencesDirectory() / "user_preferences.bin";
+  // Use the user preferences directory path helper
+  return paths::GetUserPreferencesDirectory() / "user_preferences.bin";
 }
 
 /////////////////////////////////////////////////
@@ -69,7 +69,7 @@ FlatbuffersUserPreferencesProvider::LoadDefaultPreferences() const {
   UserPreferences preferences;
 
   // Display preferences (only runtime-adjustable settings)
-  // Note: Window size and framerate are in GameResourcesData, not here
+  // Note: Window size and framerate are in EngineCoreData, not here
   if (prefs_data->display()) {
     preferences.display.fullscreen = prefs_data->display()->fullscreen();
     preferences.display.vsync = prefs_data->display()->vsync();

@@ -10,7 +10,7 @@
 #include "CraftingScene.h"
 #include "FlatbuffersDataLoader.h"
 #include "TitleScene.h"
-#include "resources_configuration.h"
+#include "core_configuration.h"
 #include "uuid.h"
 #include <memory>
 #include <string>
@@ -68,21 +68,20 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type,
     return std::unexpected(fail_info);
   }
 
-  // Configure SceneResources from FlatBuffers data
-  // Note: GameResourcesData is already loaded in Engine::StartUp() - we only
-  // need scene-specific resources here
+  // Configure SceneCore from FlatBuffers data
+  // Note: EngineCoreData is already loaded in Engine::StartUp() - we only
+  // need scene-specific core data here
   FlatbuffersDataLoader data_loader;
 
-  auto scene_resources_result =
-      data_loader.ProvideSceneResourcesData(scene_type);
-  if (!scene_resources_result) {
-    return std::unexpected(scene_resources_result.error());
+  auto scene_core_result = data_loader.ProvideSceneCoreData(scene_type);
+  if (!scene_core_result) {
+    return std::unexpected(scene_core_result.error());
   }
 
-  auto configure_resources_result = resources::ConfigureSceneResources(
-      scene_ptr->m_scene_resources, scene_resources_result.value());
-  if (!configure_resources_result) {
-    return std::unexpected(configure_resources_result.error());
+  auto configure_core_result =
+      core::ConfigureSceneCore(scene_ptr->m_scene_core, scene_core_result.value());
+  if (!configure_core_result) {
+    return std::unexpected(configure_core_result.error());
   }
 
   // configure scene entities from default data

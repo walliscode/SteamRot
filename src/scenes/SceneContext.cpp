@@ -11,14 +11,14 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-SceneContext::SceneContext(SceneResources &scene_res, GameResources &game_res,
+SceneContext::SceneContext(SceneCore &scene_core, GameCore &game_core,
                            EntityManager &entity_manager)
     : scene_entities(entity_manager.GetEntityMemoryPool()),
       archetypes(entity_manager.GetArchetypeManager().GetArchetypes()),
-      scene_texture(scene_res.scene_texture),
-      game_window(game_res.game_window),
-      asset_manager(game_res.asset_manager),
-      event_handler(game_res.event_handler),
-      mouse_position(game_res.mouse_position) {}
+      scene_texture(scene_core.scene_texture),
+      game_window(game_core.game_window),
+      asset_manager(game_core.asset_manager),
+      event_handler(game_core.event_handler),
+      mouse_position(game_core.mouse_position) {}
 
 } // namespace steamrot
