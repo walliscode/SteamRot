@@ -1,9 +1,12 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of path-based test data loader utilities
+/// @brief Declaration of test data loader utilities
 ///
-/// Provides alternative test data loading that accepts explicit
-/// paths, enabling CMake-configured test templates.
+/// Provides all test data loading functionality for the test harness.
+/// This includes:
+/// - Loading test data from explicit paths (for CMake templates)
+/// - Loading test data from adjacent directories (using __FILE__ macro)
+/// - Discovering and loading .test_data.bin files
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -65,5 +68,34 @@ DiscoverTestDataFiles(const std::filesystem::path &data_dir_path);
 /////////////////////////////////////////////////
 std::expected<const TestDataConfig *, FailInfo>
 LoadTestDataConfigFromFile(const std::filesystem::path &file_path);
+
+/////////////////////////////////////////////////
+/// @brief Load test data configurations from an adjacent data directory
+///
+/// Internal function that takes the calling source file path to determine
+/// the adjacent data directory. Use the LOAD_TEST_DATA_CONFIGS() macro instead.
+///
+/// @param source_file_path Path to the calling source file (__FILE__)
+/// @return Vector of TestDataConfig pointers or FailInfo on error
+/////////////////////////////////////////////////
+std::expected<std::vector<const TestDataConfig *>, FailInfo>
+LoadTestDataConfigsImpl(const char *source_file_path);
+
+/////////////////////////////////////////////////
+/// @brief Macro to load test data from adjacent data directory
+///
+/// This macro uses __FILE__ from the call site to determine the adjacent
+/// data/ directory. It automatically:
+/// - Discovers all .test_data.bin files in the adjacent data/ directory
+/// - Loads them as TestDataConfig objects
+/// - Returns a vector suitable for use with Catch2 generators
+///
+/// The adjacent data/ directory is determined relative to where this macro
+/// is invoked. An error is returned if the adjacent data/ directory does not
+/// exist.
+///
+/// @return Vector of TestDataConfig pointers or FailInfo on error
+/////////////////////////////////////////////////
+#define load_test_data_configs() LoadTestDataConfigsImpl(__FILE__)
 
 } // namespace steamrot::tests
