@@ -59,6 +59,7 @@ namespace steamrot::tests {
 /// }
 /// @endcode
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo> RunTestHarness(TestDataConfig *config);
+std::expected<std::monostate, FailInfo>
+RunTestHarness(const TestDataConfig *config);
 
 } // namespace steamrot::tests

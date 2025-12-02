@@ -8,9 +8,7 @@
 /////////////////////////////////////////////////
 #include "LogicFactory.h"
 #include "FlatbuffersDataLoader.h"
-#include "TestFixture.h"
 #include "logic_test_helpers.h"
-#include "scene_change_packet_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("LogicFactory constructed without errors", "[unit][LogicFactory]") {
@@ -261,7 +259,6 @@ TEST_CASE("LogicFactory creates Logic instances without LogicCollectionData",
 
 TEST_CASE("LogicFactory works for all scene types without LogicCollectionData",
           "[unit][LogicFactory]") {
-
 
   // Test for TEST scene
   {

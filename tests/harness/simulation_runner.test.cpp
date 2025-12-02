@@ -7,50 +7,54 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "simulation_runner.h"
-#include "TestFixture.h"
+#include "EntityManager.h"
+#include "GameCore.h"
+#include "SceneContext.h"
+#include "SceneCore.h"
+#include "test_data_loader.h"
 #include "test_harness.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators_range.hpp>
 
-TEST_CASE("execute_simulation_step validates null step", "[unit][harness][simulation]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Intialize();
-  
-  auto &scene_context = fixture.GetSceneContext();
-  
-  auto result = steamrot::tests::ExecuteSimulationStep(nullptr, scene_context);
-  
+TEST_CASE("ExecuteSimulationStep validates null step",
+          "[unit][harness][simulation]") {
+  // Create minimal mock SceneContext components
+  steamrot::EntityManager entity_manager;
+  steamrot::GameCore game_core;
+  steamrot::SceneCore scene_core;
+
+  // Note: This test verifies null handling at the API level
+  // The SceneContext won't be used if step is null
+  steamrot::SceneContext scene_context(scene_core, game_core, entity_manager);
+
+  auto result =
+      steamrot::tests::ExecuteSimulationStep(nullptr, scene_context);
+
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
 
-TEST_CASE("execute_simulation validates null simulation data", "[unit][harness][simulation]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Intialize();
-  
-  auto &scene_context = fixture.GetSceneContext();
-  
+TEST_CASE("ExecuteSimulation validates null simulation data",
+          "[unit][harness][simulation]") {
+  // Create minimal mock SceneContext components
+  steamrot::EntityManager entity_manager;
+  steamrot::GameCore game_core;
+  steamrot::SceneCore scene_core;
+
+  steamrot::SceneContext scene_context(scene_core, game_core, entity_manager);
+
   auto result = steamrot::tests::ExecuteSimulation(nullptr, scene_context);
-  
+
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
 
-TEST_CASE("execute_simulation_with_fixture validates null simulation data", "[unit][harness][simulation]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Intialize();
-  
-  auto result = steamrot::tests::ExecuteSimulationWithFixture(nullptr, fixture);
-  
-  REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
-}
-
-TEST_CASE("Simulation execution with test data configs", "[unit][harness][simulation]") {
+TEST_CASE("RunTestHarness with simulation test data configs",
+          "[unit][harness][simulation]") {
   // Load test data that includes simulation_data
   auto configs = steamrot::tests::load_test_data_configs();
   REQUIRE(configs.has_value());
-  
+
   // Filter to only configs with simulation_data
   std::vector<const steamrot::TestDataConfig *> simulation_configs;
   for (const auto *config : configs.value()) {
@@ -58,57 +62,26 @@ TEST_CASE("Simulation execution with test data configs", "[unit][harness][simula
       simulation_configs.push_back(config);
     }
   }
-  
+
   // Should have at least our sample simulation test
   REQUIRE(simulation_configs.size() >= 2);
-  
-  // Test each simulation config
+
+  // Test each simulation config using TestEngine via RunTestHarness
   for (const auto *config : simulation_configs) {
     INFO("Testing simulation: " << config->metadata()->test_name()->str());
-    
-    // Create fixture from test data
-    auto fixture_result = steamrot::tests::CreateFixtureFromTestData(config);
-    REQUIRE(fixture_result.has_value());
-    
-    auto &fixture = fixture_result.value();
-    
-    // Execute simulation
-    auto sim_result = steamrot::tests::ExecuteSimulationWithFixture(
-        config->simulation_data(), fixture);
-    
-    // Simulation should complete successfully
-    REQUIRE(sim_result.has_value());
-  }
-}
 
-TEST_CASE("run_fixture_test executes simulations when present", "[unit][harness][simulation]") {
-  // Load all test data
-  auto configs = steamrot::tests::load_test_data_configs();
-  REQUIRE(configs.has_value());
-  
-  // Find a config with simulation_data
-  const steamrot::TestDataConfig *sim_config = nullptr;
-  for (const auto *config : configs.value()) {
-    if (config->simulation_data()) {
-      sim_config = config;
-      break;
-    }
+    auto result = steamrot::tests::RunTestHarness(config);
+
+    // Simulation should complete successfully
+    REQUIRE(result.has_value());
   }
-  
-  REQUIRE(sim_config != nullptr);
-  
-  // run_fixture_test should execute the simulation
-  auto result = steamrot::tests::RunFixtureTest(sim_config);
-  
-  INFO("Test name: " << sim_config->metadata()->test_name()->str());
-  REQUIRE(result.has_value());
 }
 
 TEST_CASE("Simulation with Catch2 generators", "[unit][harness][simulation]") {
   // Load all test data
   auto configs_result = steamrot::tests::load_test_data_configs();
   REQUIRE(configs_result.has_value());
-  
+
   // Filter to configs with simulation data
   std::vector<const steamrot::TestDataConfig *> sim_configs;
   for (const auto *config : configs_result.value()) {
@@ -116,61 +89,15 @@ TEST_CASE("Simulation with Catch2 generators", "[unit][harness][simulation]") {
       sim_configs.push_back(config);
     }
   }
-  
+
   REQUIRE(sim_configs.size() >= 1);
-  
+
   // Use generator
   const auto *config = GENERATE_COPY(from_range(sim_configs));
-  
-  INFO("Running simulation test: " << config->metadata()->test_name()->str());
-  
-  // Execute via run_fixture_test
-  auto result = steamrot::tests::RunFixtureTest(config);
-  REQUIRE(result.has_value());
-}
 
-TEST_CASE("Simulation execution modes work correctly", "[unit][harness][simulation]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Intialize();
-  
-  auto &scene_context = fixture.GetSceneContext();
-  
-  SECTION("Function execution mode") {
-    // Create a simple simulation step with function execution
-    flatbuffers::FlatBufferBuilder builder;
-    
-    auto step_offset = steamrot::CreateSimulationStep(
-        builder,
-        steamrot::SimulationType_Action,
-        steamrot::ExecutionMode_Function,
-        steamrot::FunctionType_ProcessNestedUIActionsAndEvents);
-    
-    builder.Finish(step_offset);
-    
-    const steamrot::SimulationStep *step =
-        flatbuffers::GetRoot<steamrot::SimulationStep>(builder.GetBufferPointer());
-    
-    auto result = steamrot::tests::ExecuteSimulationStep(step, scene_context);
-    REQUIRE(result.has_value());
-  }
-  
-  SECTION("LogicClass execution mode") {
-    // Create a simple simulation step with LogicClass execution
-    flatbuffers::FlatBufferBuilder builder;
-    
-    auto step_offset = steamrot::CreateSimulationStep(
-        builder,
-        steamrot::SimulationType_Action,
-        steamrot::ExecutionMode_LogicClass,
-        steamrot::FunctionType_None,
-        steamrot::LogicClassType_UIActionLogic);
-    
-    builder.Finish(step_offset);
-    
-    const steamrot::SimulationStep *step =
-        flatbuffers::GetRoot<steamrot::SimulationStep>(builder.GetBufferPointer());
-    
-    auto result = steamrot::tests::ExecuteSimulationStep(step, scene_context);
-    REQUIRE(result.has_value());
-  }
+  INFO("Running simulation test: " << config->metadata()->test_name()->str());
+
+  // Execute via RunTestHarness
+  auto result = steamrot::tests::RunTestHarness(config);
+  REQUIRE(result.has_value());
 }

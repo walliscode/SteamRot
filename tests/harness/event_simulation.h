@@ -34,15 +34,13 @@ InjectEvent(const EventPacketData *event_packet_data,
             EventHandler &event_handler);
 
 /////////////////////////////////////////////////
-/// @brief Execute all events for a specific tick
+/// @brief Execute all events in a vector
 ///
-/// Processes all events that are scheduled for the given tick number.
-/// Events with the same tick are processed in the order they appear in the
-/// event sequence.
+/// Processes all events that are in the provided vector.
+/// Events are processed in the order they appear in the vector.
 ///
-/// @param event_sequence The event sequence containing all events
-/// @param tick The tick number to process
-/// @param fixture TestFixture containing the test environment
+/// @param events The vector of EventPacketData to process
+/// @param event_handler EventHandler to add events to
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
