@@ -41,8 +41,8 @@ InjectEvent(const EventPacketData *event_packet_data,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-InjectAllEventsForTick(const flatbuffers::Vector<EventPacketData *> *events,
-                       EventHandler &event_handler) {
+InjectEventsForTick(const flatbuffers::Vector<EventPacketData *> *events,
+                    EventHandler &event_handler) {
 
   if (!events) {
     return std::unexpected(

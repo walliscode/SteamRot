@@ -7,64 +7,39 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "input_simulation.h"
-#include "TestFixture.h"
+#include "EventHandler.h"
+#include "GameContext.h"
+#include "input_test_data_generated.h"
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("execute_input_event handles null input",
+TEST_CASE("InjectInput handles null input",
           "[unit][harness][input_simulation]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Intialize();
-
-  auto result = steamrot::tests::ExecuteInputEvent(nullptr, fixture);
-  REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
-}
-
-TEST_CASE("execute_input_events_for_tick handles null sequence",
-          "[unit][harness][input_simulation]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Intialize();
+  steamrot::EventHandler event_handler;
+  steamrot::GameContext game_context;
 
   auto result =
-      steamrot::tests::ExecuteInputEventsForTick(nullptr, 1, fixture);
+      steamrot::tests::InjectInput(nullptr, event_handler, game_context);
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
 
-TEST_CASE("execute_input_sequence handles null sequence",
+TEST_CASE("InjectInputsForTick handles null inputs vector",
           "[unit][harness][input_simulation]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Intialize();
-
-  auto result = steamrot::tests::ExecuteInputSequence(nullptr, fixture);
-  REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
-}
-
-TEST_CASE("execute_input_sequence handles empty sequence",
-          "[unit][harness][input_simulation]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Intialize();
-
-  // Create empty input sequence
-  flatbuffers::FlatBufferBuilder builder;
-  auto sequence = steamrot::CreateInputSequence(builder);
-  builder.Finish(sequence);
-
-  const steamrot::InputSequence *input_sequence =
-      flatbuffers::GetRoot<steamrot::InputSequence>(builder.GetBufferPointer());
+  steamrot::EventHandler event_handler;
+  steamrot::GameContext game_context;
 
   auto result =
-      steamrot::tests::ExecuteInputSequence(input_sequence, fixture);
-  REQUIRE(result.has_value());
+      steamrot::tests::InjectInputsForTick(nullptr, event_handler, game_context);
+  REQUIRE_FALSE(result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
 
-TEST_CASE("execute_input_event updates mouse position for MouseMove",
+TEST_CASE("InjectInput updates mouse position for MouseMove",
           "[unit][harness][input_simulation]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Intialize();
+  steamrot::EventHandler event_handler;
+  steamrot::GameContext game_context;
 
   // Create mouse move event
   flatbuffers::FlatBufferBuilder builder;
@@ -79,72 +54,19 @@ TEST_CASE("execute_input_event updates mouse position for MouseMove",
       flatbuffers::GetRoot<steamrot::InputEvent>(builder.GetBufferPointer());
 
   // Execute the event
-  auto result = steamrot::tests::ExecuteInputEvent(event, fixture);
+  auto result =
+      steamrot::tests::InjectInput(event, event_handler, game_context);
   REQUIRE(result.has_value());
 
   // Verify mouse position was updated
-  auto &game_context = fixture.GetGameContext();
   REQUIRE(game_context.mouse_position.x == 150);
   REQUIRE(game_context.mouse_position.y == 200);
 }
 
-TEST_CASE("execute_input_events_for_tick processes only specified tick",
+TEST_CASE("InjectInput generates EventPacket for MouseClick",
           "[unit][harness][input_simulation]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Intialize();
-
-  // Create input sequence with events on different ticks
-  flatbuffers::FlatBufferBuilder builder;
-
-  // Event at tick 1
-  auto pos0 = steamrot::CreateVector2fData(builder, 100.0f, 100.0f);
-  auto mouse0 = steamrot::CreateMouseInputData(builder, pos0, 0);
-  auto event0 = steamrot::CreateInputEvent(
-      builder, steamrot::InputType_MouseMove,
-      steamrot::InputEventData_MouseInputData, mouse0.Union(), 1);
-
-  // Event at tick 2
-  auto pos1 = steamrot::CreateVector2fData(builder, 200.0f, 200.0f);
-  auto mouse1 = steamrot::CreateMouseInputData(builder, pos1, 0);
-  auto event1 = steamrot::CreateInputEvent(
-      builder, steamrot::InputType_MouseMove,
-      steamrot::InputEventData_MouseInputData, mouse1.Union(), 2);
-
-  std::vector<flatbuffers::Offset<steamrot::InputEvent>> events;
-  events.push_back(event0);
-  events.push_back(event1);
-
-  auto events_vec = builder.CreateVector(events);
-  auto sequence = steamrot::CreateInputSequence(builder, events_vec);
-  builder.Finish(sequence);
-
-  const steamrot::InputSequence *input_sequence =
-      flatbuffers::GetRoot<steamrot::InputSequence>(builder.GetBufferPointer());
-
-  // Execute only tick 1
-  auto result = steamrot::tests::ExecuteInputEventsForTick(input_sequence,
-                                                               1, fixture);
-  REQUIRE(result.has_value());
-
-  // Verify only tick 1 event was processed
-  auto &game_context = fixture.GetGameContext();
-  REQUIRE(game_context.mouse_position.x == 100);
-  REQUIRE(game_context.mouse_position.y == 100);
-
-  // Execute tick 2
-  result = steamrot::tests::ExecuteInputEventsForTick(input_sequence, 2,
-                                                          fixture);
-  REQUIRE(result.has_value());
-
-  // Verify tick 2 event was processed
-  REQUIRE(game_context.mouse_position.x == 200);
-  REQUIRE(game_context.mouse_position.y == 200);
-}
-
-TEST_CASE("execute_input_event generates EventPacket for MouseClick",
-          "[unit][harness][input_simulation]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Intialize();
+  steamrot::EventHandler event_handler;
+  steamrot::GameContext game_context;
 
   // Create mouse click event
   flatbuffers::FlatBufferBuilder builder;
@@ -159,14 +81,13 @@ TEST_CASE("execute_input_event generates EventPacket for MouseClick",
   const steamrot::InputEvent *event =
       flatbuffers::GetRoot<steamrot::InputEvent>(builder.GetBufferPointer());
 
-  auto &event_handler = fixture.GetGameResources().event_handler;
-
   // Get initial event bus state
   const auto &initial_bus = event_handler.GetGlobalEventBus();
   size_t initial_size = initial_bus.size();
 
   // Execute the event
-  auto result = steamrot::tests::ExecuteInputEvent(event, fixture);
+  auto result =
+      steamrot::tests::InjectInput(event, event_handler, game_context);
   REQUIRE(result.has_value());
 
   // Process waiting room to move event to global bus
@@ -182,15 +103,14 @@ TEST_CASE("execute_input_event generates EventPacket for MouseClick",
   REQUIRE(last_event.event_lifetime == 1);
 
   // Verify mouse position was also updated
-  auto &game_context = fixture.GetGameContext();
   REQUIRE(game_context.mouse_position.x == 100);
   REQUIRE(game_context.mouse_position.y == 150);
 }
 
-TEST_CASE("execute_input_event generates EventPacket for KeyPress",
+TEST_CASE("InjectInput generates EventPacket for KeyPress",
           "[unit][harness][input_simulation]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Intialize();
+  steamrot::EventHandler event_handler;
+  steamrot::GameContext game_context;
 
   // Create key press event (A key)
   flatbuffers::FlatBufferBuilder builder;
@@ -205,14 +125,13 @@ TEST_CASE("execute_input_event generates EventPacket for KeyPress",
   const steamrot::InputEvent *event =
       flatbuffers::GetRoot<steamrot::InputEvent>(builder.GetBufferPointer());
 
-  auto &event_handler = fixture.GetGameResources().event_handler;
-
   // Get initial event bus state
   const auto &initial_bus = event_handler.GetGlobalEventBus();
   size_t initial_size = initial_bus.size();
 
   // Execute the event
-  auto result = steamrot::tests::ExecuteInputEvent(event, fixture);
+  auto result =
+      steamrot::tests::InjectInput(event, event_handler, game_context);
   REQUIRE(result.has_value());
 
   // Process waiting room to move event to global bus
@@ -228,10 +147,10 @@ TEST_CASE("execute_input_event generates EventPacket for KeyPress",
   REQUIRE(last_event.event_lifetime == 1);
 }
 
-TEST_CASE("execute_input_event does not generate EventPacket for MouseMove",
+TEST_CASE("InjectInput does not generate EventPacket for MouseMove",
           "[unit][harness][input_simulation]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Intialize();
+  steamrot::EventHandler event_handler;
+  steamrot::GameContext game_context;
 
   // Create mouse move event
   flatbuffers::FlatBufferBuilder builder;
@@ -245,14 +164,13 @@ TEST_CASE("execute_input_event does not generate EventPacket for MouseMove",
   const steamrot::InputEvent *event =
       flatbuffers::GetRoot<steamrot::InputEvent>(builder.GetBufferPointer());
 
-  auto &event_handler = fixture.GetGameResources().event_handler;
-
   // Get initial event bus state
   const auto &initial_bus = event_handler.GetGlobalEventBus();
   size_t initial_size = initial_bus.size();
 
   // Execute the event
-  auto result = steamrot::tests::ExecuteInputEvent(event, fixture);
+  auto result =
+      steamrot::tests::InjectInput(event, event_handler, game_context);
   REQUIRE(result.has_value());
 
   // Process waiting room (should have nothing)
@@ -263,7 +181,60 @@ TEST_CASE("execute_input_event does not generate EventPacket for MouseMove",
   REQUIRE(updated_bus.size() == initial_size);
 
   // Verify mouse position was still updated
-  auto &game_context = fixture.GetGameContext();
   REQUIRE(game_context.mouse_position.x == 250);
   REQUIRE(game_context.mouse_position.y == 300);
+}
+
+TEST_CASE("InjectInputsForTick processes all inputs in vector",
+          "[unit][harness][input_simulation]") {
+  steamrot::EventHandler event_handler;
+  steamrot::GameContext game_context;
+
+  // Create input events
+  flatbuffers::FlatBufferBuilder builder;
+
+  // First event - mouse move
+  auto pos0 = steamrot::CreateVector2fData(builder, 100.0f, 100.0f);
+  auto mouse0 = steamrot::CreateMouseInputData(builder, pos0, 0);
+  auto event0 = steamrot::CreateInputEvent(
+      builder, steamrot::InputType_MouseMove,
+      steamrot::InputEventData_MouseInputData, mouse0.Union(), 1);
+
+  // Second event - mouse click
+  auto pos1 = steamrot::CreateVector2fData(builder, 200.0f, 200.0f);
+  auto mouse1 = steamrot::CreateMouseInputData(
+      builder, pos1, static_cast<uint8_t>(sf::Mouse::Button::Left));
+  auto event1 = steamrot::CreateInputEvent(
+      builder, steamrot::InputType_MouseClick,
+      steamrot::InputEventData_MouseInputData, mouse1.Union(), 2);
+
+  std::vector<flatbuffers::Offset<steamrot::InputEvent>> events;
+  events.push_back(event0);
+  events.push_back(event1);
+
+  auto events_vec = builder.CreateVector(events);
+  builder.Finish(events_vec);
+
+  // Get the vector from the buffer
+  const auto *input_vector =
+      flatbuffers::GetRoot<
+          flatbuffers::Vector<flatbuffers::Offset<steamrot::InputEvent>>>(
+          builder.GetBufferPointer());
+
+  // Execute all inputs
+  auto result = steamrot::tests::InjectInputsForTick(input_vector, event_handler,
+                                                     game_context);
+  REQUIRE(result.has_value());
+
+  // Process waiting room to move event to global bus
+  event_handler.ProcessWaitingRoomEventBus();
+
+  // Verify mouse click generated an event (mouse move does not)
+  const auto &bus = event_handler.GetGlobalEventBus();
+  REQUIRE(bus.size() == 1);
+  REQUIRE(bus[0].m_event_type == steamrot::EventType_EVENT_USER_INPUT);
+
+  // Verify final mouse position (last event position)
+  REQUIRE(game_context.mouse_position.x == 200);
+  REQUIRE(game_context.mouse_position.y == 200);
 }
