@@ -15,8 +15,7 @@
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-RunTestEngineTest(TestDataConfig *config) {
+std::expected<std::monostate, FailInfo> RunTestHarness(TestDataConfig *config) {
 
   // Validate config
   if (!config) {
@@ -33,15 +32,17 @@ RunTestEngineTest(TestDataConfig *config) {
   // Get the data bank output from the engine simulation
   const auto &data_bank = engine.GetDataBank();
 
-  // Determine number of ticks from config for context building
-  size_t num_ticks = 1;
-  if (config->num_ticks() > 0) {
-    num_ticks = config->num_ticks();
-  }
-
   // Build base test context from config
   TestContext base_context;
   bool expected_to_pass = true;
+
+  // error out if num_ticks is zero or not set
+  if (!config->num_ticks() || config->num_ticks() == 0) {
+    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
+                                    "num_ticks is zero or not set"));
+  }
+  // Get number of ticks from config
+  base_context.total_ticks = config->num_ticks();
 
   if (config->metadata()) {
     if (config->metadata()->test_name()) {
@@ -66,7 +67,9 @@ RunTestEngineTest(TestDataConfig *config) {
       auto it = data_bank.find(tick_num);
       if (it == data_bank.end()) {
         std::string error_message =
-            std::format("No data bank entry found for tick {}", tick_num);
+            std::format("No data bank entry found for tick {}, number of ticks "
+                        "may not be greater than tick data",
+                        tick_num);
         return std::unexpected(
             FailInfo(FailMode::FlatbuffersDataNotFound, error_message));
       }
@@ -74,7 +77,6 @@ RunTestEngineTest(TestDataConfig *config) {
       // Build context for this tick
       TestContext tick_context = base_context;
       tick_context.current_tick = tick_num;
-      tick_context.total_ticks = num_ticks;
       if (tick_snapshot->description()) {
         tick_context.description = tick_snapshot->description()->str();
       }

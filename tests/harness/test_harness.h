@@ -21,7 +21,6 @@
 /////////////////////////////////////////////////
 #include "FailInfo.h"
 #include "test_data_generated.h"
-#include "test_data_loader.h"
 #include <expected>
 #include <variant>
 
@@ -60,7 +59,6 @@ namespace steamrot::tests {
 /// }
 /// @endcode
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-RunTestEngineTest(TestDataConfig *config);
+std::expected<std::monostate, FailInfo> RunTestHarness(TestDataConfig *config);
 
 } // namespace steamrot::tests
