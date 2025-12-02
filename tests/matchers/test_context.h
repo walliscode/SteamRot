@@ -13,7 +13,6 @@
 /////////////////////////////////////////////////
 
 #include <cstdint>
-#include <optional>
 #include <string>
 namespace steamrot::tests {
 
@@ -26,8 +25,8 @@ namespace steamrot::tests {
 struct TestContext {
   std::string test_name;
   std::string description;
-  std::optional<uint32_t> current_tick;
-  std::optional<uint32_t> total_ticks;
+  uint32_t current_tick{1};
+  uint32_t total_ticks{1};
 };
 
 } // namespace steamrot::tests

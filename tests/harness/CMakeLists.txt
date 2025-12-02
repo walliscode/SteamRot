@@ -1,6 +1,7 @@
 add_library(test_harness
-  test_data_harness.cpp
+  test_harness.cpp
   test_data_loader.cpp
+  test_data_comparison.cpp
   TestEngine.cpp
   simulation_runner.cpp
   input_simulation.cpp
@@ -30,7 +31,7 @@ target_link_libraries(test_harness
 
 # Create test executable for harness
 add_executable(test_harness_tests
-  test_data_harness.test.cpp
+  test_harness.test.cpp
   test_data_loader.test.cpp
   TestEngine.test.cpp
   simulation_runner.test.cpp

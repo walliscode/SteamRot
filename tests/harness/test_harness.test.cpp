@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Unit tests for test data harness utilities
+/// @brief Unit tests for test harness utilities
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "test_data_harness.h"
+#include "test_harness.h"
 #include "CGrimoireMachina.h"
 #include "entity_memory.h"
 #include <catch2/catch_test_macros.hpp>
