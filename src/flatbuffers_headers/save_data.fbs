@@ -1,20 +1,3 @@
-////////////////////////////////////////////////////////////
-/// @file
-/// @brief FlatBuffers schema for gameplay save data.
-///
-/// Save data captures the game state at a point in time,
-/// allowing players to resume their progress. This includes:
-/// - Current scene and entity states
-/// - Player progress metadata
-/// - Timestamps for save management
-///
-/// The design reuses EntityCollection from entities.fbs to
-/// ensure compatibility with the existing entity system.
-///
-/// Note: SceneState is distinct from SceneDataData:
-/// - SceneState: Minimal save data (scene_type + entities only)
-/// - SceneDataData: Full scene definition (assets, logic, resources, etc.)
-////////////////////////////////////////////////////////////
 
 include "entities.fbs";
 include "scene_types.fbs";
@@ -45,36 +28,11 @@ table SaveMetadata {
   slot_index: uint32 = 0;
 }
 
-////////////////////////////////////////////////////////////
-/// Entity state for a single scene (minimal save data)
-/// Distinct from SceneDataData which includes assets, logic, etc.
-////////////////////////////////////////////////////////////
-table SceneState {
-  /// The type of scene this state represents
-  scene_type: SceneType;
-  
-  /// All entity data for this scene
-  entity_collection: EntityCollection;
-}
 
 ////////////////////////////////////////////////////////////
 /// Root table containing complete save game data
 ////////////////////////////////////////////////////////////
 table SaveData {
-  /// Save file metadata (required for valid saves)
-  metadata: SaveMetadata (required);
-  
-  /// The scene the player was in when saving
-  current_scene_type: SceneType;
-  
-  /// Entity state for all populated scenes
-  scene_states: [SceneState];
-  
-  /// Global event bus state (for persistent events)
-  global_event_bus: EventBusData;
-  
-  /// Save data format version (for migration support)
-  version: uint32 = 1;
 }
 
 root_type SaveData;

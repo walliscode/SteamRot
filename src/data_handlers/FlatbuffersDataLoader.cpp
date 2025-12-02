@@ -14,6 +14,7 @@
 #include "engine_data_generated.h"
 #include "fragments_generated.h"
 #include "paths.h"
+#include "resource_data_generated.h"
 #include "scene_data_generated.h"
 #include "ui_style_generated.h"
 #include "user_preferences_generated.h"
@@ -143,18 +144,19 @@ FlatbuffersDataLoader::ProvideEngineData() const {
   std::filesystem::path data_dir = paths::GetDataDirectory();
 
   // construct the file path
-  std::filesystem::path game_engine_path =
-      data_dir / "game_engine" / "game_engine.bin";
+  std::filesystem::path engine_data_path =
+      data_dir / "engine" / "engine_data.bin";
+
   // check if the file exists
-  if (!std::filesystem::exists(game_engine_path)) {
-    std::string error_message = std::format("Game Engine file not found: {}",
-                                            game_engine_path.string());
+  if (!std::filesystem::exists(engine_data_path)) {
+    std::string error_message = std::format(
+        "Engine resources data not found: {}", engine_data_path.string());
     return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
   }
   // load the game engine data
-  const steamrot::EngineData *game_engine_data =
-      GetEngineData(LoadBinaryData(game_engine_path));
-  return game_engine_data;
+  const steamrot::EngineData *engine_data =
+      GetEngineData(LoadBinaryData(engine_data_path));
+  return engine_data;
 }
 
 /////////////////////////////////////////////////
@@ -337,8 +339,8 @@ FlatbuffersDataLoader::ProvideContextData() const {
 }
 
 /////////////////////////////////////////////////
-std::expected<const GameResourcesData *, FailInfo>
-FlatbuffersDataLoader::ProvideGameResourcesData() const {
+std::expected<const EngineResourcesData *, FailInfo>
+FlatbuffersDataLoader::ProvideEngineResourcesData() const {
   // Load from GameEngineData
   auto game_engine_result = ProvideEngineData();
   if (!game_engine_result.has_value()) {

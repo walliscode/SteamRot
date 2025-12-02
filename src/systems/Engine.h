@@ -5,41 +5,6 @@
 /// Engine provides a common foundation for both GameEngine and TestEngine,
 /// ensuring consistent resource management and tick execution order.
 ///
-/// ## Data Requirements (Engine Level)
-///
-/// The Engine base class handles common startup configuration. Each derived
-/// Engine provides its own data source via the virtual method pattern:
-///
-/// ### GameResourcesData (loaded in Engine::StartUp):
-///   - window_width, window_height: Window dimensions
-///   - window_title: Window title string
-///   - framerate_limit: Target FPS
-///   Source: Loaded from engine_data.json via FlatbuffersDataLoader
-///
-/// ### UserPreferences (loaded in Engine::StartUp):
-///   - Display settings (window size, fullscreen, vsync, framerate)
-///   - Audio settings (volume levels, mute state)
-///   - Accessibility settings (UI scale, preferred font)
-///   Source: Loaded from default.preferences.bin
-///   Note: Both GameEngine and TestEngine load default user preferences
-///
-/// ### EngineData (provided by derived classes via ConfigureEngineStateFromData):
-///   - subscriptions: Engine-level event subscriptions (e.g., quit game)
-///   - scene_manager_data: SceneManager configuration
-///   Source: Depends on Engine type:
-///     - GameEngine: Loads from engine_data.json
-///     - TestEngine: Uses injected TestDataConfig
-///
-/// ## Data Flow
-/// ```
-/// StartUp() [virtual - derived classes can customize]
-///   └─▶ ProvideGameResourcesData() [loads window config]
-///   └─▶ ConfigureGameResources() [applies to m_game_resources]
-///   └─▶ LoadDefaultUserPreferences() [loads from default.preferences.bin]
-///   └─▶ ConfigureEngineStateFromData() [virtual - derived class provides data]
-///         ├─▶ GameEngine: Loads subscriptions + scene_manager from files
-///         └─▶ TestEngine: Uses m_test_config->starting_engine_state()
-/// ```
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -215,7 +180,9 @@ public:
   ///
   /// @return Const reference to user preferences
   /////////////////////////////////////////////////
-  const UserPreferences &GetUserPreferences() const { return m_user_preferences; }
+  const UserPreferences &GetUserPreferences() const {
+    return m_user_preferences;
+  }
 };
 
 } // namespace steamrot
