@@ -29,7 +29,8 @@ namespace steamrot::tests {
 /// MouseMove events only update position without generating EventPackets.
 ///
 /// @param input_event The input event to execute
-/// @param fixture TestFixture containing the test environment
+/// @param event_handler EventHandler to add events to
+/// @param game_context GameContext for updating mouse position
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
@@ -37,12 +38,14 @@ InjectInput(const InputEvent *input_event, EventHandler &event_handler,
             GameContext &game_context);
 
 /////////////////////////////////////////////////
-/// @brief Execute all input events for a specific tick
+/// @brief Execute all input events in a vector
 ///
-/// Processes all input events that are scheduled for the given tick number.
-/// Events with the same tick are processed in the order they appear in the
-/// input sequence.
+/// Processes all input events that are in the provided vector.
+/// Events are processed in the order they appear in the vector.
 ///
+/// @param input_events The vector of InputEvent to process
+/// @param event_handler EventHandler to add events to
+/// @param game_context GameContext for updating mouse position
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> InjectInputsForTick(
