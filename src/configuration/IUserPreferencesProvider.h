@@ -34,8 +34,10 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FailInfo.h"
+#include <cstdint>
 #include <expected>
 #include <string>
+#include <variant>
 
 namespace steamrot {
 

@@ -10,7 +10,6 @@
 #include "EventPacket.h"
 #include "catch2/catch_test_macros.hpp"
 #include "conmat.h"
-#include "scene_change_packet_generated.h"
 #include "uuid.h"
 #include <SFML/Window/Keyboard.hpp>
 

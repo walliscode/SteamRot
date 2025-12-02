@@ -18,7 +18,6 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 #include "event_bus_data_generated.h"
 #include "event_packet_data_generated.h"
 #include "input_test_data_generated.h"
-#include "resource_data_generated.h"
 #include "simulation_generated.h"
 
 namespace steamrot {

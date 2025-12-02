@@ -11,4 +11,5 @@ target_link_libraries(context PUBLIC
   systems
   resources
   flatbuffers_headers
+  core
 )
