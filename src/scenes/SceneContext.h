@@ -11,8 +11,8 @@
 #include "AssetManager.h"
 #include "EntityManager.h"
 #include "EventHandler.h"
-#include "GameResources.h"
-#include "SceneResources.h"
+#include "GameCore.h"
+#include "SceneCore.h"
 #include "containers.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -22,10 +22,10 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-/// @brief Lightweight reference container for scene and game resources.
+/// @brief Lightweight reference container for scene and game core objects.
 ///
 /// SceneContext provides convenient access to scene-level and game-level
-/// resources, as well as entity/archetype data from EntityManager.
+/// core objects, as well as entity/archetype data from EntityManager.
 /// It is designed to be passed around the codebase and is cheap to copy
 /// (contains only references).
 ///
@@ -34,15 +34,14 @@ namespace steamrot {
 /////////////////////////////////////////////////
 struct SceneContext {
 /////////////////////////////////////////////////
-  /// @brief Constructor taking SceneResources, GameResources, and
-  /// EntityManager.
+  /// @brief Constructor taking SceneCore, GameCore, and EntityManager.
   ///
-  /// @param scene_res Reference to SceneResources (contains render texture)
-  /// @param game_res Reference to GameResources (contains window, assets, etc.)
+  /// @param scene_core Reference to SceneCore (contains render texture)
+  /// @param game_core Reference to GameCore (contains window, assets, etc.)
   /// @param entity_manager Reference to EntityManager (contains
   /// entities/archetypes)
 /////////////////////////////////////////////////
-  SceneContext(SceneResources &scene_res, GameResources &game_res,
+  SceneContext(SceneCore &scene_core, GameCore &game_core,
                EntityManager &entity_manager);
 
 /////////////////////////////////////////////////

@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of the SceneResources struct.
+/// @brief Declaration of the SceneCore struct.
 /////////////////////////////////////////////////
 
 #pragma once
@@ -13,17 +13,17 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-/// @brief Resource struct containing scene-level resources.
+/// @brief Core struct containing scene-level core objects.
 ///
-/// SceneResources owns all scene-level resources. Currently this only
+/// SceneCore owns all scene-level core objects. Currently this only
 /// includes the render texture for the scene. EntityMemoryPool and
 /// ArchetypeManager remain in EntityManager.
 ///
 /// All members are concrete objects (no references/pointers to other
-/// resource members). This struct is default-constructible and should
-/// be configured via ConfigureSceneResources free function.
+/// core members). This struct is default-constructible and should
+/// be configured via ConfigureSceneCore free function.
 /////////////////////////////////////////////////
-struct SceneResources {
+struct SceneCore {
 /////////////////////////////////////////////////
   /// @brief Render texture for the scene.
   ///

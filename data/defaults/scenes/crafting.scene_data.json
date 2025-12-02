@@ -235,7 +235,7 @@
 
   "assets": {},
 
-  "scene_resources": {
+  "scene_core": {
     "render_texture_width": 800,
     "render_texture_height": 600
   }

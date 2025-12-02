@@ -1,6 +1,6 @@
 {
   "subscriptions": [{ "event_type_data": "EVENT_QUIT_GAME" }],
-  "game_resources": {
+  "engine_core": {
     "window_width": 800,
     "window_height": 600,
     "window_title": "SteamRot",

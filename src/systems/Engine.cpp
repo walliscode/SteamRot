@@ -9,32 +9,32 @@
 #include "Engine.h"
 #include "FlatbuffersDataLoader.h"
 #include "FlatbuffersUserPreferencesProvider.h"
-#include "resources_configuration.h"
+#include "core_configuration.h"
 
 namespace steamrot {
 
 /////////////////////////////////////////////////
 Engine::Engine()
-    : m_game_resources(), m_game_context(m_game_resources),
+    : m_game_core(), m_game_context(m_game_core),
       m_scene_manager(m_game_context) {}
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> Engine::StartUp() {
-  // Load resource data via FlatbuffersDataLoader
+  // Load core data via FlatbuffersDataLoader
   FlatbuffersDataLoader data_loader;
 
-  // Get GameResourcesData from data loader
+  // Get EngineCoreData from data loader
   // This loads window configuration (size, title, framerate)
-  auto engine_resource_result = data_loader.ProvideGameResourcesData();
-  if (!engine_resource_result) {
-    return std::unexpected(engine_resource_result.error());
+  auto engine_core_result = data_loader.ProvideEngineCoreData();
+  if (!engine_core_result) {
+    return std::unexpected(engine_core_result.error());
   }
 
-  // Use resource data to configure GameResources
-  auto configure_resources_result = resources::ConfigureGameResources(
-      m_game_resources, engine_resource_result.value());
-  if (!configure_resources_result) {
-    return std::unexpected(configure_resources_result.error());
+  // Use core data to configure GameCore
+  auto configure_core_result =
+      core::ConfigureGameCore(m_game_core, engine_core_result.value());
+  if (!configure_core_result) {
+    return std::unexpected(configure_core_result.error());
   }
 
   // Load default user preferences from default.preferences.bin
@@ -68,7 +68,7 @@ void Engine::ExecuteSystemsTick() {
 
   // let EventHandler process sfml events and update bus and subscribers
   m_game_context.event_handler.ExecuteEventHandlerLevelLogic(
-      m_game_resources.game_window);
+      m_game_core.game_window);
 
   // Update Engine level logic
   ExecuteEngineLevelLogic();

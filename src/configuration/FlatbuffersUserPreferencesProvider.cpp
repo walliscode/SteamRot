@@ -15,8 +15,8 @@ namespace steamrot {
 /////////////////////////////////////////////////
 std::filesystem::path
 FlatbuffersUserPreferencesProvider::GetUserPreferencesPath() const {
-  // Use the preferences directory path helper
-  return paths::GetPreferencesDirectory() / "user_preferences.bin";
+  // Use the user preferences directory path helper
+  return paths::GetUserPreferencesDirectory() / "user_preferences.bin";
 }
 
 /////////////////////////////////////////////////

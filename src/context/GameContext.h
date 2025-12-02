@@ -6,7 +6,7 @@
 #pragma once
 #include "AssetManager.h"
 #include "EventHandler.h"
-#include "GameResources.h"
+#include "GameCore.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Vector2.hpp>
 
@@ -14,12 +14,12 @@ namespace steamrot {
 struct GameContext {
   GameContext() = delete;
 
-  GameContext(GameResources &resources);
+  GameContext(GameCore &game_core);
 
 /////////////////////////////////////////////////
-  /// @brief Reference to the GameResources this context was created from.
+  /// @brief Reference to the GameCore this context was created from.
 /////////////////////////////////////////////////
-  GameResources &game_resources;
+  GameCore &game_core;
 
 /////////////////////////////////////////////////
   /// @brief Reference to the game window.

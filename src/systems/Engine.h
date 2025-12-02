@@ -3,7 +3,7 @@
 /// @brief Declaration of the abstract Engine base class.
 ///
 /// Engine provides a common foundation for both GameEngine and TestEngine,
-/// ensuring consistent resource management and tick execution order.
+/// ensuring consistent core management and tick execution order.
 ///
 /////////////////////////////////////////////////
 
@@ -16,7 +16,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "GameContext.h"
-#include "GameResources.h"
+#include "GameCore.h"
 #include "IUserPreferencesProvider.h"
 #include "SceneManager.h"
 #include <expected>
@@ -30,7 +30,7 @@ namespace steamrot {
 /// @brief Abstract base class for unified game/test execution.
 ///
 /// Engine provides:
-/// - Shared resource management (GameResources, GameContext)
+/// - Shared core management (GameCore, GameContext)
 /// - Common Run() loop structure
 /// - Virtual hooks for configuration and tick execution
 ///
@@ -44,12 +44,12 @@ namespace steamrot {
 class Engine {
 protected:
   /////////////////////////////////////////////////
-  /// @brief Game-level resources (window, event handler, asset manager, etc.)
+  /// @brief Game-level core objects (window, event handler, asset manager, etc.)
   /////////////////////////////////////////////////
-  GameResources m_game_resources;
+  GameCore m_game_core;
 
   /////////////////////////////////////////////////
-  /// @brief GameContext for accessing resources
+  /// @brief GameContext for accessing core objects
   /////////////////////////////////////////////////
   GameContext m_game_context;
 
@@ -95,15 +95,15 @@ protected:
   void ExecuteSystemsTick();
 
   /////////////////////////////////////////////////
-  /// @brief Executre engine-level logic for the engine, such as updating
-  /// ssubcribers, quitting conditions, etc.
+  /// @brief Execute engine-level logic for the engine, such as updating
+  /// subscribers, quitting conditions, etc.
   /////////////////////////////////////////////////
   void ExecuteEngineLevelLogic();
 
   /////////////////////////////////////////////////
   /// @brief Execute scene-level logic for the engine.
   ///
-  /// For the GameEngine, this will be a compile time constant but tfor the test
+  /// For the GameEngine, this will be a compile time constant but for the test
   /// engine we want to be able to configure this.
   ///
   /////////////////////////////////////////////////
@@ -123,12 +123,12 @@ protected:
   virtual void RunGameLoop() = 0;
 
   /////////////////////////////////////////////////
-  /// @brief Start up the engine and configure resources.
+  /// @brief Start up the engine and configure core objects.
   ///
   /// This is virtual to allow derived classes to customize startup.
   /// Base implementation:
-  /// 1. Loads GameResourcesData from engine_data.json
-  /// 2. Configures GameResources (window, etc.)
+  /// 1. Loads EngineCoreData from engine_data.json
+  /// 2. Configures GameCore (window, etc.)
   /// 3. Loads default user preferences from default.preferences.bin
   /// 4. Calls ConfigureEngineStateFromData() (virtual)
   ///
@@ -146,7 +146,7 @@ protected:
 
 public:
   /////////////////////////////////////////////////
-  /// @brief Constructor initializing resources and context.
+  /// @brief Constructor initializing core objects and context.
   /////////////////////////////////////////////////
   explicit Engine();
 

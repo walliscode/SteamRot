@@ -7,6 +7,10 @@
 /// - STEAMROT_ENV_DEBUG: Debug environment (data) - same as production
 /// - STEAMROT_ENV_PROD: Production environment (data)
 ///
+/// Directory Structure:
+/// - defaults/: Default configuration data (read-only)
+/// - user/: User-specific data and saves (read-write)
+///
 /// Usage:
 ///   #define STEAMROT_ENV_PROD  // Before including paths.h for production
 ///   #include "paths.h"
@@ -53,6 +57,28 @@ inline std::filesystem::path GetDataDirectory() {
 }
 
 /////////////////////////////////////////////////
+/// @brief Provides the path to the defaults directory.
+///
+/// Contains read-only default configuration data.
+///
+/// @return std::filesystem::path
+/////////////////////////////////////////////////
+inline std::filesystem::path GetDefaultsDirectory() {
+  return GetDataDirectory() / "defaults";
+}
+
+/////////////////////////////////////////////////
+/// @brief Provides the path to the user directory.
+///
+/// Contains user-specific data including saves and preferences.
+///
+/// @return std::filesystem::path
+/////////////////////////////////////////////////
+inline std::filesystem::path GetUserDirectory() {
+  return GetDataDirectory() / "user";
+}
+
+/////////////////////////////////////////////////
 /// @brief Provides the path to the fragments directory.
 ///
 /// @return std::filesystem::path
@@ -62,12 +88,21 @@ inline std::filesystem::path GetFragmentDirectory() {
 }
 
 /////////////////////////////////////////////////
-/// @brief Provides the path to the scenes directory.
+/// @brief Provides the path to the default scenes directory.
+///
+/// @return std::filesystem::path
+/////////////////////////////////////////////////
+inline std::filesystem::path GetDefaultScenesDirectory() {
+  return GetDefaultsDirectory() / "scenes";
+}
+
+/////////////////////////////////////////////////
+/// @brief Provides the path to the scenes directory (defaults).
 ///
 /// @return std::filesystem::path
 /////////////////////////////////////////////////
 inline std::filesystem::path GetSceneDirectory() {
-  return GetDataDirectory() / "scenes";
+  return GetDefaultScenesDirectory();
 }
 
 /////////////////////////////////////////////////
@@ -98,21 +133,79 @@ inline std::filesystem::path GetUIStylesDirectory() {
 }
 
 /////////////////////////////////////////////////
+/// @brief Provides the path to the default preferences directory.
+///
+/// @return std::filesystem::path
+/////////////////////////////////////////////////
+inline std::filesystem::path GetDefaultPreferencesDirectory() {
+  return GetDefaultsDirectory() / "preferences";
+}
+
+/////////////////////////////////////////////////
+/// @brief Provides the path to the user preferences directory.
+///
+/// @return std::filesystem::path
+/////////////////////////////////////////////////
+inline std::filesystem::path GetUserPreferencesDirectory() {
+  return GetUserDirectory() / "preferences";
+}
+
+/////////////////////////////////////////////////
 /// @brief Provides the path to the preferences directory.
+///
+/// Returns the default preferences directory for backwards compatibility.
 ///
 /// @return std::filesystem::path
 /////////////////////////////////////////////////
 inline std::filesystem::path GetPreferencesDirectory() {
-  return GetDataDirectory() / "preferences";
+  return GetDefaultPreferencesDirectory();
 }
 
 /////////////////////////////////////////////////
-/// @brief Provides the path to the saves directory.
+/// @brief Provides the path to the user saves directory.
 ///
 /// @return std::filesystem::path
 /////////////////////////////////////////////////
 inline std::filesystem::path GetSavesDirectory() {
-  return GetDataDirectory() / "saves";
+  return GetUserDirectory() / "saves";
+}
+
+/////////////////////////////////////////////////
+/// @brief Provides the path to the default engine directory.
+///
+/// Contains default engine configuration data.
+///
+/// @return std::filesystem::path
+/////////////////////////////////////////////////
+inline std::filesystem::path GetDefaultEngineDirectory() {
+  return GetDefaultsDirectory() / "engine";
+}
+
+/////////////////////////////////////////////////
+/// @brief Provides the path to the default context directory.
+///
+/// @return std::filesystem::path
+/////////////////////////////////////////////////
+inline std::filesystem::path GetDefaultContextDirectory() {
+  return GetDefaultsDirectory() / "context";
+}
+
+/////////////////////////////////////////////////
+/// @brief Provides the path to the default scene manager directory.
+///
+/// @return std::filesystem::path
+/////////////////////////////////////////////////
+inline std::filesystem::path GetDefaultSceneManagerDirectory() {
+  return GetDefaultsDirectory() / "scene_manager";
+}
+
+/////////////////////////////////////////////////
+/// @brief Provides the path to the default asset manager directory.
+///
+/// @return std::filesystem::path
+/////////////////////////////////////////////////
+inline std::filesystem::path GetDefaultAssetManagerDirectory() {
+  return GetDefaultsDirectory() / "asset_manager";
 }
 
 } // namespace steamrot::paths
