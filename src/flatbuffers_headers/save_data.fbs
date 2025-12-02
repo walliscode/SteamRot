@@ -1,0 +1,75 @@
+////////////////////////////////////////////////////////////
+/// @file
+/// @brief FlatBuffers schema for gameplay save data.
+///
+/// Save data captures the game state at a point in time,
+/// allowing players to resume their progress. This includes:
+/// - Current scene and entity states
+/// - Player progress metadata
+/// - Timestamps for save management
+///
+/// The design reuses EntityCollection from entities.fbs to
+/// ensure compatibility with the existing entity system.
+////////////////////////////////////////////////////////////
+
+include "entities.fbs";
+include "scene_types.fbs";
+include "event_bus_data.fbs";
+
+namespace steamrot;
+
+////////////////////////////////////////////////////////////
+/// Metadata for save file management
+////////////////////////////////////////////////////////////
+table SaveMetadata {
+  /// Display name for the save slot
+  save_name: string;
+  
+  /// Timestamp when save was created (ISO 8601 format)
+  created_at: string;
+  
+  /// Timestamp when save was last modified (ISO 8601 format)
+  last_modified: string;
+  
+  /// Game version that created this save
+  game_version: string;
+  
+  /// Total play time in seconds
+  play_time_seconds: uint64 = 0;
+  
+  /// Save slot identifier (0-based index)
+  slot_index: uint32 = 0;
+}
+
+////////////////////////////////////////////////////////////
+/// State data for a single scene
+////////////////////////////////////////////////////////////
+table SceneStateData {
+  /// The type of scene this state represents
+  scene_type: SceneType;
+  
+  /// All entity data for this scene
+  entity_collection: EntityCollection;
+}
+
+////////////////////////////////////////////////////////////
+/// Root table containing complete save game data
+////////////////////////////////////////////////////////////
+table SaveData {
+  /// Save file metadata (required for valid saves)
+  metadata: SaveMetadata (required);
+  
+  /// The scene the player was in when saving
+  current_scene_type: SceneType;
+  
+  /// State data for all populated scenes
+  scene_states: [SceneStateData];
+  
+  /// Global event bus state (for persistent events)
+  global_event_bus: EventBusData;
+  
+  /// Save data format version (for migration support)
+  version: uint32 = 1;
+}
+
+root_type SaveData;

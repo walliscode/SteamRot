@@ -1,0 +1,20 @@
+{
+  "display": {
+    "window_width": 0,
+    "window_height": 0,
+    "fullscreen": false,
+    "vsync": true,
+    "target_framerate": 60
+  },
+  "audio": {
+    "master_volume": 1.0,
+    "music_volume": 0.8,
+    "sfx_volume": 1.0,
+    "muted": false
+  },
+  "accessibility": {
+    "ui_scale": 1.0,
+    "preferred_font": ""
+  },
+  "version": 1
+}
