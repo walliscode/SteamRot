@@ -62,8 +62,26 @@ Tests were evaluated based on these criteria:
 ### Criteria for Data-Driven Testing
 
 1. **State Validation**: Tests that verify entity/component states before and after operations
+   ```cpp
+   // CANDIDATE: Validates component default values
+   REQUIRE(component.m_active == false);
+   REQUIRE(component.m_name == "default");
+   ```
+
 2. **Configuration Testing**: Tests that validate proper configuration from data
+   ```cpp
+   // CANDIDATE: Entity configured from FlatBuffers matches expected state
+   auto result = configurator.Configure(entity, flatbuffers_data);
+   REQUIRE(entity.m_property == expected_value);
+   ```
+
 3. **Input/Output Mapping**: Tests with clear input states and expected output states
+   ```cpp
+   // CANDIDATE: Parameterized tests with input -> expected output
+   auto cases = GENERATE(TestCase{{50, 50}, bounds, true}, ...);
+   REQUIRE(IsMouseOver(cases.input) == cases.expected);
+   ```
+
 4. **Parameterizable Values**: Tests that vary only in input/expected values
 5. **Simulation Scenarios**: Tests that can be expressed as simulation steps
 6. **Repeatable Patterns**: Tests that follow similar patterns across different data
@@ -71,7 +89,18 @@ Tests were evaluated based on these criteria:
 ### Criteria for Code-Embedded Testing
 
 1. **Complex Logic Flow**: Tests requiring programmatic control flow
+   ```cpp
+   // KEEP CODE: Tests pointer lifecycle and weak_ptr behavior
+   subscriber.reset();
+   REQUIRE(weak_ptr.expired());
+   ```
+
 2. **Dynamic Dependencies**: Tests with runtime-determined dependencies
+   ```cpp
+   // KEEP CODE: Factory behavior with dynamic_cast verification
+   REQUIRE(dynamic_cast<TitleScene*>(scene.get()) != nullptr);
+   ```
+
 3. **Mock/Stub Requirements**: Tests needing mock objects or behavior verification
 4. **Error Path Testing**: Tests verifying exception handling and error modes
 5. **API Contract Testing**: Tests validating method signatures and return types
