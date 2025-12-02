@@ -19,7 +19,7 @@ This consolidates functionality for resource-based testing and data-driven test 
 The recommended workflow uses the `RunTestEngineTest` function:
 
 ```cpp
-#include "test_data_harness.h"
+#include "test_harness.h"
 #include <catch2/generators/catch_generators_range.hpp>
 
 TEST_CASE("Data-driven test with TestEngine", "[unit]") {
@@ -60,9 +60,14 @@ This workflow:
 
 ```
 harness/
-├── test_data_harness.h            # Unified API for loading and running tests
-├── test_data_harness.cpp          # Implementation
-├── test_data_harness.test.cpp     # Unit tests
+├── test_harness.h                 # Test orchestration API (Catch2 wrapper, TestEngine, test execution)
+├── test_harness.cpp               # Implementation
+├── test_harness.test.cpp          # Unit tests
+├── test_data_loader.h             # Data loading API (file discovery, loading, macro)
+├── test_data_loader.cpp           # Implementation
+├── test_data_loader.test.cpp      # Unit tests
+├── test_data_comparison.h         # Data comparison functions
+├── test_data_comparison.cpp       # Implementation
 ├── TestEngine.h                   # TestEngine class (extends Engine)
 ├── TestEngine.cpp                 # Implementation
 ├── TestEngine.test.cpp            # TestEngine tests
@@ -83,7 +88,26 @@ harness/
     └── ...
 ```
 
-## Formatted Console Output in Matchers
+## Separation of Concerns
+
+The test harness is organized into three main modules:
+
+### test_harness (Orchestration)
+- Provides wrapper for Catch2 generators
+- Calls data loading functions
+- Calls TestEngine
+- Runs tests and orchestrates the test workflow
+
+### test_data_loader (Data Loading)
+- Discovers `.test_data.bin` files in directories
+- Loads binary data from files
+- Parses FlatBuffers data
+- Provides `load_test_data_configs()` macro and related functions
+
+### test_data_comparison (Data Comparison)
+- Compares actual data (from TestEngine data bank) with expected data (from tick snapshots)
+- `CompareTickSnapshotEntityPool` - compares entity pools
+- `CompareDataBankWithTickSnapshot` - compares data bank entries
 
 The test harness uses **Catch2 matchers** with formatted output for test comparisons. This approach allows Catch2 to control when output is displayed (only on failures) while providing rich, formatted error messages.
 
@@ -192,7 +216,7 @@ All console output functions automatically include newlines for proper spacing, 
 The primary wrapper function for data-driven testing with TestEngine:
 
 ```cpp
-#include "test_data_harness.h"
+#include "test_harness.h"
 #include <catch2/generators/catch_generators_range.hpp>
 
 TEST_CASE("Data-driven test with TestEngine", "[unit][my_component]") {
@@ -223,7 +247,7 @@ For more control, use TestEngine directly:
 
 ```cpp
 #include "TestEngine.h"
-#include "test_data_harness.h"
+#include "test_harness.h"
 
 TEST_CASE("Manual TestEngine usage", "[unit]") {
   auto configs = steamrot::tests::load_test_data_configs();
@@ -250,7 +274,7 @@ TEST_CASE("Manual TestEngine usage", "[unit]") {
 The simplest approach - load test data from an adjacent `data/` directory:
 
 ```cpp
-#include "test_data_harness.h"
+#include "test_harness.h"
 #include <catch2/generators/catch_generators_range.hpp>
 
 TEST_CASE("Parameterized test with test data", "[unit][my_component]") {
@@ -272,7 +296,7 @@ TEST_CASE("Parameterized test with test data", "[unit][my_component]") {
 When you need to load test data from a specific test directory:
 
 ```cpp
-#include "test_data_harness.h"
+#include "test_harness.h"
 
 TEST_CASE("Load from subdirectory", "[unit]") {
   // Load from tests/entity/data/
@@ -290,7 +314,7 @@ TEST_CASE("Load from subdirectory", "[unit]") {
 The `run_test_data_config()` wrapper validates that test data is properly structured:
 
 ```cpp
-#include "test_data_harness.h"
+#include "test_harness.h"
 
 TEST_CASE("Validate test data configuration", "[unit]") {
   auto configs = steamrot::tests::load_test_data_configs();
@@ -311,7 +335,7 @@ TEST_CASE("Validate test data configuration", "[unit]") {
 The `run_entity_memory_pool_comparison_test()` function compares two EntityMemoryPool instances directly:
 
 ```cpp
-#include "test_data_harness.h"
+#include "test_harness.h"
 
 TEST_CASE("Entity memory pool comparison test", "[unit]") {
   // Create and configure pools
@@ -1294,7 +1318,7 @@ TEST_CASE("Data-driven EventBus test", "[unit][event_bus]") {
 The test harness is designed to work seamlessly with the existing matcher infrastructure in `tests/matchers/`. The `run_entity_memory_pool_comparison_test()` function uses the `EqualsEntityMemoryPool` matcher internally:
 
 ```cpp
-#include "test_data_harness.h"
+#include "test_harness.h"
 
 TEST_CASE("Test entity pools with matcher", "[unit]") {
   EntityMemoryPool actual_pool;

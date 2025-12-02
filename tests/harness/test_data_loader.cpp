@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Implementation of path-based test data loader utilities
+/// @brief Implementation of test data loader utilities
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -31,6 +31,30 @@ static char *LoadBinaryData(const std::filesystem::path &file_path) {
   infile.read(data, length);
   infile.close();
   return data;
+}
+
+/////////////////////////////////////////////////
+/// @brief Helper to get adjacent data directory from source file path
+/////////////////////////////////////////////////
+static std::expected<std::filesystem::path, FailInfo>
+GetAdjacentDataDirectory(const char *source_file_path) {
+  std::filesystem::path source_path = source_file_path;
+  std::filesystem::path source_dir = source_path.parent_path();
+  std::filesystem::path data_dir = source_dir / "data";
+
+  if (!std::filesystem::exists(data_dir)) {
+    std::string error_message =
+        std::format("Adjacent data directory not found: {}", data_dir.string());
+    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
+  }
+
+  if (!std::filesystem::is_directory(data_dir)) {
+    std::string error_message = std::format(
+        "Adjacent data path is not a directory: {}", data_dir.string());
+    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
+  }
+
+  return data_dir;
 }
 
 /////////////////////////////////////////////////
@@ -134,6 +158,19 @@ LoadTestDataConfigsFromPath(const std::filesystem::path &data_dir_path) {
   }
 
   return configs;
+}
+
+/////////////////////////////////////////////////
+std::expected<std::vector<const TestDataConfig *>, FailInfo>
+LoadTestDataConfigsImpl(const char *source_file_path) {
+
+  // Get the adjacent data directory using the provided source file path
+  auto data_dir_result = GetAdjacentDataDirectory(source_file_path);
+  if (!data_dir_result.has_value()) {
+    return std::unexpected(data_dir_result.error());
+  }
+
+  return LoadTestDataConfigsFromPath(data_dir_result.value());
 }
 
 } // namespace steamrot::tests

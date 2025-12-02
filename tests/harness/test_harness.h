@@ -1,7 +1,14 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of test data harness utilities for loading test
-/// configurations
+/// @brief Declaration of test harness utilities for orchestrating tests
+///
+/// The test harness provides:
+/// - Wrapper functions for Catch2 generators
+/// - TestEngine orchestration
+/// - Test execution functions
+///
+/// For data loading, use test_data_loader.h
+/// For data comparison, use test_data_comparison.h
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -14,50 +21,11 @@
 /////////////////////////////////////////////////
 #include "FailInfo.h"
 #include "test_data_generated.h"
+#include "test_data_loader.h"
 #include <expected>
 #include <variant>
-#include <vector>
 
 namespace steamrot::tests {
-
-/////////////////////////////////////////////////
-/// @brief Load test data configurations from an adjacent data directory
-///
-/// Internal function that takes the calling source file path to determine
-/// the adjacent data directory. Use the LOAD_TEST_DATA_CONFIGS() macro instead.
-///
-/// @param source_file_path Path to the calling source file (__FILE__)
-/// @return Vector of TestDataConfig pointers or FailInfo on error
-/////////////////////////////////////////////////
-std::expected<std::vector<const TestDataConfig *>, FailInfo>
-LoadTestDataConfigsImpl(const char *source_file_path);
-
-/////////////////////////////////////////////////
-/// @brief Macro to load test data from adjacent data directory
-///
-/// This macro uses __FILE__ from the call site to determine the adjacent
-/// data/ directory. It automatically:
-/// - Discovers all .test_data.bin files in the adjacent data/ directory
-/// - Loads them as TestDataConfig objects
-/// - Returns a vector suitable for use with Catch2 generators
-///
-/// The adjacent data/ directory is determined relative to where this macro
-/// is invoked. An error is returned if the adjacent data/ directory does not
-/// exist.
-///
-/// @return Vector of TestDataConfig pointers or FailInfo on error
-/////////////////////////////////////////////////
-#define load_test_data_configs() LoadTestDataConfigsImpl(__FILE__)
-
-/////////////////////////////////////////////////
-/// DEPRECATED DECLARATIONS
-/// These functions are deprecated. Use RunTestEngineTest instead.
-/////////////////////////////////////////////////
-
-// std::expected<std::monostate, FailInfo>
-// RunEntityMemoryPoolComparisonTest(...);
-// void RunEventBusComparisonTest(...);
-// std::expected<std::monostate, FailInfo> RunDataStructComparisonTest(...);
 
 /////////////////////////////////////////////////
 /// @brief Wrapper function for data-driven testing with TestEngine
