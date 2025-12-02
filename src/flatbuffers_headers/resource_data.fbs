@@ -1,9 +1,9 @@
 namespace steamrot;
 
 ////////////////////////////////////////////////////////////
-// Configuration for GameResources
+// Configuration for Engine resources
 ////////////////////////////////////////////////////////////
-table GameResourcesData {
+table EngineResourcesData {
   window_width: uint32 = 800;
   window_height: uint32 = 600;
   window_title: string;

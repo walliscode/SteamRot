@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "Engine.h"
 #include "FlatbuffersDataLoader.h"
+#include "FlatbuffersUserPreferencesProvider.h"
 #include "resources_configuration.h"
 
 namespace steamrot {
@@ -35,6 +36,15 @@ std::expected<std::monostate, FailInfo> Engine::StartUp() {
   if (!configure_resources_result) {
     return std::unexpected(configure_resources_result.error());
   }
+
+  // Load default user preferences from default.preferences.bin
+  // Both GameEngine and TestEngine load default preferences
+  FlatbuffersUserPreferencesProvider preferences_provider;
+  auto preferences_result = preferences_provider.LoadPreferences();
+  if (!preferences_result.has_value()) {
+    return std::unexpected(preferences_result.error());
+  }
+  m_user_preferences = preferences_result.value();
 
   // Configure Engine state from data - this is virtual, so derived classes
   // (GameEngine/TestEngine) provide their own data source strategy

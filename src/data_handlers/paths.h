@@ -97,4 +97,22 @@ inline std::filesystem::path GetUIStylesDirectory() {
   return GetDataDirectory() / "ui_styles";
 }
 
+/////////////////////////////////////////////////
+/// @brief Provides the path to the preferences directory.
+///
+/// @return std::filesystem::path
+/////////////////////////////////////////////////
+inline std::filesystem::path GetPreferencesDirectory() {
+  return GetDataDirectory() / "preferences";
+}
+
+/////////////////////////////////////////////////
+/// @brief Provides the path to the saves directory.
+///
+/// @return std::filesystem::path
+/////////////////////////////////////////////////
+inline std::filesystem::path GetSavesDirectory() {
+  return GetDataDirectory() / "saves";
+}
+
 } // namespace steamrot::paths

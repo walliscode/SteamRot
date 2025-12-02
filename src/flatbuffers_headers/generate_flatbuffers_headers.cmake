@@ -25,6 +25,8 @@ set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/context_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/engine_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/test_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/user_preferences.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/save_data.fbs
 )
 
 set(generated_headers)

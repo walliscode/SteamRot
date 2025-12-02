@@ -15,16 +15,16 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
-struct GameResourcesData;
-struct GameResourcesDataBuilder;
+struct EngineResourcesData;
+struct EngineResourcesDataBuilder;
 
 struct SceneResourcesData;
 struct SceneResourcesDataBuilder;
 
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
-struct GameResourcesData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef GameResourcesDataBuilder Builder;
+struct EngineResourcesData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef EngineResourcesDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_WINDOW_WIDTH = 4,
     VT_WINDOW_HEIGHT = 6,
@@ -54,40 +54,40 @@ struct GameResourcesData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
   }
 };
 
-struct GameResourcesDataBuilder {
-  typedef GameResourcesData Table;
+struct EngineResourcesDataBuilder {
+  typedef EngineResourcesData Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_window_width(uint32_t window_width) {
-    fbb_.AddElement<uint32_t>(GameResourcesData::VT_WINDOW_WIDTH, window_width, 800);
+    fbb_.AddElement<uint32_t>(EngineResourcesData::VT_WINDOW_WIDTH, window_width, 800);
   }
   void add_window_height(uint32_t window_height) {
-    fbb_.AddElement<uint32_t>(GameResourcesData::VT_WINDOW_HEIGHT, window_height, 600);
+    fbb_.AddElement<uint32_t>(EngineResourcesData::VT_WINDOW_HEIGHT, window_height, 600);
   }
   void add_window_title(::flatbuffers::Offset<::flatbuffers::String> window_title) {
-    fbb_.AddOffset(GameResourcesData::VT_WINDOW_TITLE, window_title);
+    fbb_.AddOffset(EngineResourcesData::VT_WINDOW_TITLE, window_title);
   }
   void add_framerate_limit(uint32_t framerate_limit) {
-    fbb_.AddElement<uint32_t>(GameResourcesData::VT_FRAMERATE_LIMIT, framerate_limit, 60);
+    fbb_.AddElement<uint32_t>(EngineResourcesData::VT_FRAMERATE_LIMIT, framerate_limit, 60);
   }
-  explicit GameResourcesDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit EngineResourcesDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<GameResourcesData> Finish() {
+  ::flatbuffers::Offset<EngineResourcesData> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<GameResourcesData>(end);
+    auto o = ::flatbuffers::Offset<EngineResourcesData>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<GameResourcesData> CreateGameResourcesData(
+inline ::flatbuffers::Offset<EngineResourcesData> CreateEngineResourcesData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t window_width = 800,
     uint32_t window_height = 600,
     ::flatbuffers::Offset<::flatbuffers::String> window_title = 0,
     uint32_t framerate_limit = 60) {
-  GameResourcesDataBuilder builder_(_fbb);
+  EngineResourcesDataBuilder builder_(_fbb);
   builder_.add_framerate_limit(framerate_limit);
   builder_.add_window_title(window_title);
   builder_.add_window_height(window_height);
@@ -95,14 +95,14 @@ inline ::flatbuffers::Offset<GameResourcesData> CreateGameResourcesData(
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<GameResourcesData> CreateGameResourcesDataDirect(
+inline ::flatbuffers::Offset<EngineResourcesData> CreateEngineResourcesDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t window_width = 800,
     uint32_t window_height = 600,
     const char *window_title = nullptr,
     uint32_t framerate_limit = 60) {
   auto window_title__ = window_title ? _fbb.CreateString(window_title) : 0;
-  return steamrot::CreateGameResourcesData(
+  return steamrot::CreateEngineResourcesData(
       _fbb,
       window_width,
       window_height,

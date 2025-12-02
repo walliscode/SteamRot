@@ -1,0 +1,79 @@
+////////////////////////////////////////////////////////////
+/// @file
+/// @brief FlatBuffers schema for user-level preferences.
+///
+/// User preferences are settings that can be adjusted by the user
+/// and persisted across sessions. These are distinct from:
+/// - Engine configuration (GameResourcesData) - static window/framerate settings
+/// - Gameplay data (save files) - game progress and state
+///
+/// Categories:
+/// - Display: Fullscreen, vsync (user-adjustable display options)
+/// - Audio: Volume levels, mute states
+/// - Accessibility: Font scaling, UI options (future)
+///
+/// Note: Window size and framerate are configured via GameResourcesData,
+/// not user preferences. User preferences only control runtime-adjustable
+/// settings like fullscreen mode, vsync, and audio levels.
+////////////////////////////////////////////////////////////
+
+namespace steamrot;
+
+////////////////////////////////////////////////////////////
+/// Display-related user preferences
+/// Note: Window size/framerate are in GameResourcesData, not here
+////////////////////////////////////////////////////////////
+table DisplayPreferences {
+  /// Fullscreen mode enabled
+  fullscreen: bool = false;
+  
+  /// VSync enabled
+  vsync: bool = true;
+}
+
+////////////////////////////////////////////////////////////
+/// Audio-related user preferences
+////////////////////////////////////////////////////////////
+table AudioPreferences {
+  /// Master volume (0.0 - 1.0)
+  master_volume: float = 1.0;
+  
+  /// Music volume (0.0 - 1.0)
+  music_volume: float = 0.8;
+  
+  /// Sound effects volume (0.0 - 1.0)
+  sfx_volume: float = 1.0;
+  
+  /// Master mute state
+  muted: bool = false;
+}
+
+////////////////////////////////////////////////////////////
+/// Accessibility-related user preferences (extensible)
+////////////////////////////////////////////////////////////
+table AccessibilityPreferences {
+  /// UI scale factor (1.0 = default)
+  ui_scale: float = 1.0;
+  
+  /// Preferred font name (empty = use default)
+  preferred_font: string;
+}
+
+////////////////////////////////////////////////////////////
+/// Root table containing all user preferences
+////////////////////////////////////////////////////////////
+table UserPreferencesData {
+  /// Display settings
+  display: DisplayPreferences;
+  
+  /// Audio settings
+  audio: AudioPreferences;
+  
+  /// Accessibility settings
+  accessibility: AccessibilityPreferences;
+  
+  /// Version number for migration support
+  version: uint32 = 1;
+}
+
+root_type UserPreferencesData;

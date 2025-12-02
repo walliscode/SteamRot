@@ -29,7 +29,9 @@ enum class FailMode {
   NullPointer,
   InvalidUUID,
   MissingRequiredField,
-  ResourceCreationFailure
+  ResourceCreationFailure,
+  InvalidInput,
+  FileOperationFailed
 };
 
 struct FailInfo {

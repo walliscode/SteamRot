@@ -25,23 +25,26 @@ TEST_CASE("ConfigureGameResources loads game resources data successfully",
           "[unit][resources][resources_configuration]") {
   steamrot::FlatbuffersDataLoader loader;
 
-  auto game_resources_result = loader.ProvideGameResourcesData();
+  auto game_resources_result = loader.ProvideEngineResourcesData();
   REQUIRE(game_resources_result.has_value());
 
   steamrot::GameResources resources;
-  auto config_result = steamrot::resources::ConfigureGameResources(resources, game_resources_result.value());
+  auto config_result = steamrot::resources::ConfigureGameResources(
+      resources, game_resources_result.value());
   REQUIRE(config_result.has_value());
 }
 
-TEST_CASE("ConfigureGameResources configures GameResources with environment type",
-          "[unit][resources][resources_configuration]") {
+TEST_CASE(
+    "ConfigureGameResources configures GameResources with environment type",
+    "[unit][resources][resources_configuration]") {
   steamrot::FlatbuffersDataLoader loader;
 
-  auto game_resources_result = loader.ProvideGameResourcesData();
+  auto game_resources_result = loader.ProvideEngineResourcesData();
   REQUIRE(game_resources_result.has_value());
 
   steamrot::GameResources resources;
-  auto config_result = steamrot::resources::ConfigureGameResources(resources, game_resources_result.value());
+  auto config_result = steamrot::resources::ConfigureGameResources(
+      resources, game_resources_result.value());
   REQUIRE(config_result.has_value());
 
   // Verify window was created
@@ -71,7 +74,8 @@ TEST_CASE("ConfigureSceneResources uses defaults when scene data is null",
   steamrot::SceneResources resources;
 
   // Configure with null scene data - should use defaults
-  auto result = steamrot::resources::ConfigureSceneResources(resources, nullptr);
+  auto result =
+      steamrot::resources::ConfigureSceneResources(resources, nullptr);
   REQUIRE(result.has_value());
 
   // Verify default dimensions were used (800x600)
@@ -79,8 +83,9 @@ TEST_CASE("ConfigureSceneResources uses defaults when scene data is null",
   REQUIRE(resources.scene_texture.getSize().y == 600);
 }
 
-TEST_CASE("ConfigureSceneResources configures resources for multiple scene types",
-          "[unit][resources][resources_configuration]") {
+TEST_CASE(
+    "ConfigureSceneResources configures resources for multiple scene types",
+    "[unit][resources][resources_configuration]") {
   steamrot::FlatbuffersDataLoader loader;
 
   // Test multiple scene types
@@ -117,8 +122,8 @@ TEST_CASE("ConfigureSceneResources with custom scene resource data",
 
   steamrot::SceneResources resources;
 
-  auto result =
-      steamrot::resources::ConfigureSceneResources(resources, custom_scene_data);
+  auto result = steamrot::resources::ConfigureSceneResources(resources,
+                                                             custom_scene_data);
   REQUIRE(result.has_value());
   REQUIRE(resources.scene_texture.getSize().x == 1024);
   REQUIRE(resources.scene_texture.getSize().y == 768);

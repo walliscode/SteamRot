@@ -20,6 +20,7 @@
 #include "scene_data_generated.h"
 #include "scene_manager_data_generated.h"
 #include "ui_style_generated.h"
+#include "user_preferences_generated.h"
 #include <expected>
 #include <map>
 #include <string>
@@ -97,8 +98,8 @@ public:
   /////////////////////////////////////////////////
   /// @brief Provides GameResourcesData from binary file
   /////////////////////////////////////////////////
-  std::expected<const GameResourcesData *, FailInfo>
-  ProvideGameResourcesData() const;
+  std::expected<const EngineResourcesData *, FailInfo>
+  ProvideEngineResourcesData() const;
 
   /////////////////////////////////////////////////
   /// @brief Provides SceneResourcesData from SceneData for a specific scene
@@ -113,6 +114,15 @@ public:
   /////////////////////////////////////////////////
   std::expected<const LogicCollectionData *, FailInfo>
   ProvideLogicCollectionData(const SceneType scene_type) const;
+
+  /////////////////////////////////////////////////
+  /// @brief Provides default UserPreferencesData from binary file
+  ///
+  /// This loads the default preferences from the binary file generated
+  /// from the default.preferences.json file.
+  /////////////////////////////////////////////////
+  std::expected<const UserPreferencesData *, FailInfo>
+  ProvideDefaultUserPreferencesData() const;
 };
 
 } // namespace steamrot

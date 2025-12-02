@@ -5,33 +5,6 @@
 /// Engine provides a common foundation for both GameEngine and TestEngine,
 /// ensuring consistent resource management and tick execution order.
 ///
-/// ## Data Requirements (Engine Level)
-///
-/// The Engine base class handles common startup configuration. Each derived
-/// Engine provides its own data source via the virtual method pattern:
-///
-/// ### GameResourcesData (loaded in Engine::StartUp):
-///   - window_width, window_height: Window dimensions
-///   - window_title: Window title string
-///   - framerate_limit: Target FPS
-///   Source: Loaded from engine_data.json via FlatbuffersDataLoader
-///
-/// ### EngineData (provided by derived classes via ConfigureEngineStateFromData):
-///   - subscriptions: Engine-level event subscriptions (e.g., quit game)
-///   - scene_manager_data: SceneManager configuration
-///   Source: Depends on Engine type:
-///     - GameEngine: Loads from engine_data.json
-///     - TestEngine: Uses injected TestDataConfig
-///
-/// ## Data Flow
-/// ```
-/// StartUp()
-///   └─▶ ProvideGameResourcesData() [loads window config]
-///   └─▶ ConfigureGameResources() [applies to m_game_resources]
-///   └─▶ ConfigureEngineStateFromData() [virtual - derived class provides data]
-///         ├─▶ GameEngine: Loads subscriptions + scene_manager from files
-///         └─▶ TestEngine: Uses m_test_config->starting_engine_state()
-/// ```
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -44,6 +17,7 @@
 /////////////////////////////////////////////////
 #include "GameContext.h"
 #include "GameResources.h"
+#include "IUserPreferencesProvider.h"
 #include "SceneManager.h"
 #include <expected>
 #include <memory>
@@ -83,6 +57,11 @@ protected:
   /// @brief SceneManager instance for the Game
   /////////////////////////////////////////////////
   SceneManager m_scene_manager;
+
+  /////////////////////////////////////////////////
+  /// @brief User preferences (loaded from default.preferences.bin)
+  /////////////////////////////////////////////////
+  UserPreferences m_user_preferences;
 
   /////////////////////////////////////////////////
   /// @brief Flag indicating if the engine should continue running
@@ -146,9 +125,19 @@ protected:
   /////////////////////////////////////////////////
   /// @brief Start up the engine and configure resources.
   ///
+  /// This is virtual to allow derived classes to customize startup.
+  /// Base implementation:
+  /// 1. Loads GameResourcesData from engine_data.json
+  /// 2. Configures GameResources (window, etc.)
+  /// 3. Loads default user preferences from default.preferences.bin
+  /// 4. Calls ConfigureEngineStateFromData() (virtual)
+  ///
+  /// GameEngine overrides to also load user-saved preferences.
+  /// TestEngine uses base implementation (default preferences only).
+  ///
   /// @return Success or failure information
   /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo> StartUp();
+  virtual std::expected<std::monostate, FailInfo> StartUp();
 
   /////////////////////////////////////////////////
   /// @brief Go through all subscriptions, if active call relevant Logic
@@ -185,6 +174,15 @@ public:
   std::expected<std::monostate, FailInfo> ConfigureSubscribersFromData(
       const ::flatbuffers::Vector<
           ::flatbuffers::Offset<steamrot::SubscriberData>> *subscriptions);
+
+  /////////////////////////////////////////////////
+  /// @brief Get the current user preferences.
+  ///
+  /// @return Const reference to user preferences
+  /////////////////////////////////////////////////
+  const UserPreferences &GetUserPreferences() const {
+    return m_user_preferences;
+  }
 };
 
 } // namespace steamrot

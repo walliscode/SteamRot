@@ -9,12 +9,46 @@
 
 #include "GameEngine.h"
 #include "FlatbuffersDataLoader.h"
+#include "FlatbuffersUserPreferencesProvider.h"
 
 namespace steamrot {
 
 /////////////////////////////////////////////////
 GameEngine::GameEngine()
     : m_display_manager(m_game_resources.game_window, m_scene_manager) {}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo> GameEngine::StartUp() {
+  // Call base StartUp() which loads:
+  // - GameResourcesData (window config)
+  // - Default user preferences from default.preferences.bin
+  // - Calls ConfigureEngineStateFromData() (subscriptions, scene manager)
+  auto base_startup_result = Engine::StartUp();
+  if (!base_startup_result.has_value()) {
+    return std::unexpected(base_startup_result.error());
+  }
+
+  // GameEngine-specific: Check for saved user preferences
+  // If user has saved preferences, load them to override defaults
+  FlatbuffersUserPreferencesProvider preferences_provider;
+  if (preferences_provider.HasUserPreferences()) {
+    auto saved_prefs_result = preferences_provider.LoadPreferences();
+    if (saved_prefs_result.has_value()) {
+      m_user_preferences = saved_prefs_result.value();
+    }
+    // If loading saved preferences fails, continue with defaults
+    // (already loaded by Engine::StartUp)
+  }
+
+  // GameEngine-specific: Load the title scene to start the game
+  // This does NOT automatically load save game data - user must select a save
+  auto load_title_result = m_scene_manager.LoadTitleScene();
+  if (!load_title_result.has_value()) {
+    return std::unexpected(load_title_result.error());
+  }
+
+  return std::monostate{};
+}
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>

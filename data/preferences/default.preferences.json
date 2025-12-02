@@ -1,0 +1,17 @@
+{
+  "display": {
+    "fullscreen": false,
+    "vsync": true
+  },
+  "audio": {
+    "master_volume": 1.0,
+    "music_volume": 0.8,
+    "sfx_volume": 1.0,
+    "muted": false
+  },
+  "accessibility": {
+    "ui_scale": 1.0,
+    "preferred_font": ""
+  },
+  "version": 1
+}
