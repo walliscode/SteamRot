@@ -2,6 +2,7 @@ include "entities.fbs";
 include "assets.fbs";
 include "resource_data.fbs";
 include "scene_types.fbs";
+include "logic_data.fbs";
 
 namespace steamrot;
 
@@ -11,6 +12,7 @@ table SceneDataData{
     scene_resources: SceneResourcesData;
     scene_id: string;
     scene_type: SceneType;
+    logic_collection_data: LogicCollectionData;
   }
 
 root_type SceneDataData;

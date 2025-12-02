@@ -364,7 +364,7 @@ FlatbuffersDataLoader::ProvideSceneResourcesData(
     return std::unexpected(scene_data_result.error());
   }
 
-  const SceneData *scene_data = scene_data_result.value();
+  const SceneDataData *scene_data = scene_data_result.value();
 
   // scene_resources is optional, so it's okay if it's not present
   // Return nullptr if not configured - caller should handle defaults
@@ -380,7 +380,7 @@ FlatbuffersDataLoader::ProvideLogicCollectionData(
   if (!scene_data_result.has_value()) {
     return std::unexpected(scene_data_result.error());
   }
-  const SceneData *scene_data = scene_data_result.value();
+  const SceneDataData *scene_data = scene_data_result.value();
   if (!scene_data->logic_collection_data()) {
     return std::unexpected(
         FailInfo(FailMode::FlatbuffersDataNotFound,

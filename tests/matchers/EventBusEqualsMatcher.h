@@ -9,6 +9,7 @@
 #pragma once
 
 #include "EventHandler.h"
+#include "test_context.h"
 #include <catch2/matchers/catch_matchers.hpp>
 #include <optional>
 #include <string>

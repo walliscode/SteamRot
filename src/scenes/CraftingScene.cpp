@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "CraftingScene.h"
-#include "scene_change_packet_generated.h"
 #include <SFML/Graphics/Color.hpp>
 
 namespace steamrot {
