@@ -65,54 +65,49 @@ TEST_CASE("InjectEvent adds event to waiting room",
   REQUIRE(last_event.event_lifetime == 5);
 }
 
-TEST_CASE("InjectEventsForTick processes all events in vector",
+TEST_CASE("InjectEvent works with different event types",
           "[unit][harness][event_simulation]") {
   steamrot::EventHandler event_handler;
 
-  // Create event packet data vector with multiple events
-  flatbuffers::FlatBufferBuilder builder;
+  SECTION("EVENT_USER_INPUT") {
+    flatbuffers::FlatBufferBuilder builder;
+    auto event_packet = steamrot::CreateEventPacketData(
+        builder, 3, steamrot::EventType_EVENT_USER_INPUT);
+    builder.Finish(event_packet);
 
-  auto packet0 = steamrot::CreateEventPacketData(
-      builder, 5, steamrot::EventType_EVENT_TEST);
-  auto packet1 = steamrot::CreateEventPacketData(
-      builder, 3, steamrot::EventType_EVENT_USER_INPUT);
-  auto packet2 = steamrot::CreateEventPacketData(
-      builder, 1, steamrot::EventType_EVENT_QUIT_GAME);
+    const steamrot::EventPacketData *event_data =
+        flatbuffers::GetRoot<steamrot::EventPacketData>(
+            builder.GetBufferPointer());
 
-  std::vector<flatbuffers::Offset<steamrot::EventPacketData>> events;
-  events.push_back(packet0);
-  events.push_back(packet1);
-  events.push_back(packet2);
+    auto result = steamrot::tests::InjectEvent(event_data, event_handler);
+    REQUIRE(result.has_value());
 
-  auto events_vec = builder.CreateVector(events);
-  builder.Finish(events_vec);
+    event_handler.ProcessWaitingRoomEventBus();
 
-  // Get the vector from the buffer
-  const auto *event_vector =
-      flatbuffers::GetRoot<flatbuffers::Vector<
-          flatbuffers::Offset<steamrot::EventPacketData>>>(
-          builder.GetBufferPointer());
+    const auto &bus = event_handler.GetGlobalEventBus();
+    REQUIRE(bus.size() == 1);
+    REQUIRE(bus.back().m_event_type == steamrot::EventType_EVENT_USER_INPUT);
+    REQUIRE(bus.back().event_lifetime == 3);
+  }
 
-  // Cast to the expected type
-  const flatbuffers::Vector<steamrot::EventPacketData *> *typed_vector =
-      reinterpret_cast<
-          const flatbuffers::Vector<steamrot::EventPacketData *> *>(
-          event_vector);
+  SECTION("EVENT_QUIT_GAME") {
+    flatbuffers::FlatBufferBuilder builder;
+    auto event_packet = steamrot::CreateEventPacketData(
+        builder, 1, steamrot::EventType_EVENT_QUIT_GAME);
+    builder.Finish(event_packet);
 
-  // Execute all events
-  auto result =
-      steamrot::tests::InjectEventsForTick(typed_vector, event_handler);
-  REQUIRE(result.has_value());
+    const steamrot::EventPacketData *event_data =
+        flatbuffers::GetRoot<steamrot::EventPacketData>(
+            builder.GetBufferPointer());
 
-  // Process waiting room to move all events to global bus
-  event_handler.ProcessWaitingRoomEventBus();
+    auto result = steamrot::tests::InjectEvent(event_data, event_handler);
+    REQUIRE(result.has_value());
 
-  // Verify all events were added
-  const auto &bus = event_handler.GetGlobalEventBus();
-  REQUIRE(bus.size() == 3);
+    event_handler.ProcessWaitingRoomEventBus();
 
-  // Verify events in order
-  REQUIRE(bus[0].m_event_type == steamrot::EventType_EVENT_TEST);
-  REQUIRE(bus[1].m_event_type == steamrot::EventType_EVENT_USER_INPUT);
-  REQUIRE(bus[2].m_event_type == steamrot::EventType_EVENT_QUIT_GAME);
+    const auto &bus = event_handler.GetGlobalEventBus();
+    REQUIRE(bus.size() == 1);
+    REQUIRE(bus.back().m_event_type == steamrot::EventType_EVENT_QUIT_GAME);
+    REQUIRE(bus.back().event_lifetime == 1);
+  }
 }
