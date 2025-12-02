@@ -43,10 +43,10 @@ The SteamRot test suite consists of approximately:
 | Category | Can Switch to Data-Driven | Keep Code-Embedded | Already Data-Driven |
 |----------|---------------------------|--------------------|--------------------|
 | Components | 5 files | 0 files | 0 files |
-| Logic | 5 files | 5 files | 1 file |
-| Entity | 3 files | 2 files | 1 file |
-| Events | 5 files | 3 files | 0 files |
-| User Interface | 1 file | 1 file | 0 files |
+| Logic | 1 file | 5 files | 1 file |
+| Entity | 0 files | 4 files | 1 file |
+| Events | 2 files | 4 files | 0 files |
+| User Interface | 1 file | 0 files | 0 files |
 | Scenes | 2 files | 2 files | 0 files |
 | Assets | 0 files | 1 file | 0 files |
 | Systems | 0 files | 1 file | 0 files |
@@ -150,7 +150,7 @@ TEST_CASE("CGrimoireMachina has correct default values", "[unit][Components]") {
 | `Logic.test.cpp` | Code-embedded | **Keep Code-Embedded** | Tests API contracts, mock dependencies |
 | `LogicFactory.test.cpp` | Code-embedded | **Keep Code-Embedded** | Tests factory behavior, dynamic_cast checks |
 | `draw_ui_elements.test.cpp` | Code-embedded | **Keep Code-Embedded** | Visual tests, pixel validation |
-| `ui_helpers.test.cpp` | Code-embedded | **Evaluate** | May be convertible to data-driven |
+| `ui_helpers.test.cpp` | Code-embedded | **Keep Code-Embedded** | Tests utility function return values, requires programmatic verification |
 
 #### Already Data-Driven Example
 
@@ -205,7 +205,7 @@ TEST_CASE("Logic::AddSubscriber adds a subscriber", "[unit][Logic]") {
 | File | Current Approach | Recommendation | Rationale |
 |------|------------------|----------------|-----------|
 | `FlatbuffersConfigurator.test.cpp` | Data-driven | **Keep Data-Driven** | Already uses test harness |
-| `ArchetypeManager.test.cpp` | Code-embedded | **Partial Switch** | State validation parts can be data-driven |
+| `ArchetypeManager.test.cpp` | Code-embedded | **Keep Code-Embedded** | Tests archetype generation API; state validation helper already abstracts complexity |
 | `EntityManager.test.cpp` | Code-embedded | **Keep Code-Embedded** | API testing, error handling |
 | `archetype_helpers.test.cpp` | Code-embedded | **Keep Code-Embedded** | Utility function testing |
 | `entity_test_helpers.test.cpp` | Code-embedded | **Keep Code-Embedded** | Test helper verification |
@@ -218,19 +218,25 @@ The `data/` subdirectory already contains test data files:
 - `pool_comparison_different_size.test_data.json`
 - `pool_comparison_different_values.test_data.json`
 
-#### Should Convert to Data-Driven (Partial)
+#### ArchetypeManager Tests (Keep Code-Embedded)
 
 ```cpp
-// ArchetypeManager.test.cpp - CONVERT STATE VALIDATION PARTS
+// ArchetypeManager.test.cpp - KEEP CODE-EMBEDDED
 TEST_CASE("ArchetypeManager generates archetype IDs correctly", "[unit]") {
-  // Setup code - keep in code
-  // State validation - convert to data-driven
+  // Setup code requires runtime context
+  steamrot::tests::TestFixture test_context;
+  steamrot::EntityManager entity_manager{...};
+  
+  // API behavior verification requires programmatic control
+  auto generate_result = archetype_manager.GenerateAllArchetypes();
+  
+  // State validation uses existing test helper
   steamrot::tests::TestArchetypesOfConfiguredEMPfromDefaultData(
       archetypes, steamrot::SceneType_TEST);
 }
 ```
 
-**Recommendation**: Keep test setup in code but move expected archetype state validation to JSON files.
+**Rationale**: The ArchetypeManager tests verify API behavior (archetype generation), not just state validation. The existing test helper (`TestArchetypesOfConfiguredEMPfromDefaultData`) already abstracts the validation logic, making data-driven conversion unnecessary.
 
 ---
 
@@ -242,12 +248,22 @@ TEST_CASE("ArchetypeManager generates archetype IDs correctly", "[unit]") {
 
 | File | Current Approach | Recommendation | Rationale |
 |------|------------------|----------------|-----------|
-| `EventHandler.test.cpp` | Code-embedded | **Partial Switch** | Event bus state tests can be data-driven |
+| `EventHandler.test.cpp` | Code-embedded | **Keep Code-Embedded** | Tests subscriber registration, pointer lifetime, API contracts |
 | `Subscriber.test.cpp` | Code-embedded | **Keep Code-Embedded** | API contract testing |
 | `SubscriberFactory.test.cpp` | Code-embedded | **Keep Code-Embedded** | Factory pattern testing |
 | `UserInputBitset.test.cpp` | Code-embedded | **Switch to Data-Driven** | State validation tests |
 | `event_bus_conversion.test.cpp` | Code-embedded | **Switch to Data-Driven** | Conversion tests are parameterizable |
 | `event_factory.test.cpp` | Code-embedded | **Keep Code-Embedded** | Factory behavior testing |
+
+#### EventHandler Tests (Keep Code-Embedded)
+
+Most EventHandler tests verify API behavior rather than state:
+- `RegisterSubscriber` - Tests pointer management and weak_ptr behavior
+- `DecrementEventLifetimes` - Tests event bus mutation
+- `UpdateSubscribers` - Tests subscriber activation logic
+- Shared pointer lifetime verification
+
+These require programmatic control and cannot be expressed as state comparisons.
 
 #### Should Convert to Data-Driven
 
@@ -318,11 +334,29 @@ TEST_CASE("UIElementFactory::CreateUIElement - Panel", "[UIElementFactory]") {
 
 | File | Current Approach | Recommendation | Rationale |
 |------|------------------|----------------|-----------|
-| `SceneFactory.test.cpp` | Code-embedded | **Partial Switch** | Scene state validation can be data-driven |
+| `SceneFactory.test.cpp` | Code-embedded | **Keep Code-Embedded** | Tests factory creation, uses dynamic_cast for type verification |
 | `SceneManager.test.cpp` | Code-embedded | **Keep Code-Embedded** | Manager behavior testing |
 | `TitleScene.test.cpp` | Code-embedded | **Switch to Data-Driven** | Scene configuration validation |
 | `CraftingScene.test.cpp` | Code-embedded | **Switch to Data-Driven** | Scene configuration validation |
 | Test helpers (*.cpp, *.h) | N/A | **Keep as helpers** | Support code |
+
+#### SceneFactory Tests (Keep Code-Embedded)
+
+```cpp
+// SceneFactory.test.cpp - KEEP CODE-EMBEDDED
+TEST_CASE("SceneFactory can create a TitleScene", "[unit][SceneFactory]") {
+  // Factory behavior verification
+  auto scene_creation_result = scene_factory.CreateDefaultScene(...);
+  
+  // Type verification requires dynamic_cast
+  REQUIRE(dynamic_cast<steamrot::TitleScene *>(title_scene.get()));
+  
+  // Configuration check delegated to helper
+  steamrot::tests::CheckDefaultSceneConfiguration(*title_scene);
+}
+```
+
+**Rationale**: Factory tests verify runtime type creation using dynamic_cast, which cannot be expressed in JSON.
 
 #### Scene Tests Suitable for Data-Driven
 
@@ -459,17 +493,17 @@ The harness already has comprehensive test data:
    - Already uses GENERATE pattern
    - Parameterized data fits JSON format perfectly
 
-3. **UI Element Factory Tests**
+3. **UI Element Factory Tests** (`UIElementFactory.test.cpp`)
    - Configuration-based testing
    - Entity state validation
 
 ### Medium Priority Conversions
 
-4. **Event Handler Tests** (Partial)
-   - Event bus state validation
-   - Event sequence testing
+4. **Event Conversion Tests** (`UserInputBitset.test.cpp`, `event_bus_conversion.test.cpp`)
+   - State validation tests
+   - Conversion tests are parameterizable
 
-5. **Scene Tests** (TitleScene, CraftingScene)
+5. **Scene Tests** (`TitleScene.test.cpp`, `CraftingScene.test.cpp`)
    - Scene configuration validation
    - Entity state verification
 
@@ -485,6 +519,7 @@ These test categories should remain code-embedded:
    - Logic.test.cpp (subscriber management)
    - EntityManager.test.cpp (API behavior)
    - SubscriberFactory.test.cpp (factory pattern)
+   - EventHandler.test.cpp (pointer lifecycle, registration)
 
 2. **Factory Behavior Tests**
    - LogicFactory.test.cpp (dynamic_cast verification)
@@ -505,6 +540,7 @@ These test categories should remain code-embedded:
 6. **Helper/Utility Tests**
    - Test infrastructure validation
    - Helper function verification
+   - ui_helpers.test.cpp (utility function return values)
 
 ---
 
@@ -522,16 +558,16 @@ These test categories should remain code-embedded:
 | Test File | Effort | Impact |
 |-----------|--------|--------|
 | UIElementFactory.test.cpp | Medium | High |
-| EventHandler.test.cpp (partial) | Medium | Medium |
-| Scene configuration tests | Medium | Medium |
+| UserInputBitset.test.cpp | Medium | Medium |
+| event_bus_conversion.test.cpp | Medium | Medium |
+| TitleScene.test.cpp | Medium | Medium |
+| CraftingScene.test.cpp | Medium | Medium |
 
 ### Phase 3: Longer Term (1-2 weeks)
 
 | Test File | Effort | Impact |
 |-----------|--------|--------|
 | Scene change integration | High | High |
-| Additional event tests | Medium | Medium |
-| ArchetypeManager (partial) | Medium | Low |
 
 ---
 
@@ -596,13 +632,13 @@ tests/unit/
 ├── display/
 │   └── DisplayManager.test.cpp [KEEP CODE]
 ├── entity/
-│   ├── ArchetypeManager.test.cpp [PARTIAL CONVERT]
+│   ├── ArchetypeManager.test.cpp [KEEP CODE]
 │   ├── EntityManager.test.cpp [KEEP CODE]
 │   ├── FlatbuffersConfigurator.test.cpp [ALREADY DATA-DRIVEN]
 │   ├── archetype_helpers.test.cpp [KEEP CODE]
 │   └── entity_test_helpers.test.cpp [KEEP CODE]
 ├── events/
-│   ├── EventHandler.test.cpp [PARTIAL CONVERT]
+│   ├── EventHandler.test.cpp [KEEP CODE]
 │   ├── Subscriber.test.cpp [KEEP CODE]
 │   ├── SubscriberFactory.test.cpp [KEEP CODE]
 │   ├── UserInputBitset.test.cpp [CONVERT]
@@ -614,10 +650,10 @@ tests/unit/
 │   ├── collision.test.cpp [CONVERT]
 │   ├── draw_ui_elements.test.cpp [KEEP CODE - VISUAL]
 │   ├── logic_data_driven.test.cpp [ALREADY DATA-DRIVEN]
-│   └── ui_helpers.test.cpp [EVALUATE]
+│   └── ui_helpers.test.cpp [KEEP CODE]
 ├── scenes/
 │   ├── CraftingScene.test.cpp [CONVERT]
-│   ├── SceneFactory.test.cpp [PARTIAL CONVERT]
+│   ├── SceneFactory.test.cpp [KEEP CODE]
 │   ├── SceneManager.test.cpp [KEEP CODE]
 │   └── TitleScene.test.cpp [CONVERT]
 ├── systems/
