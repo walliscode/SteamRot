@@ -9,6 +9,7 @@
 #include "event_simulation.h"
 #include "EventHandler.h"
 #include "event_packet_data_generated.h"
+#include "flatbuffers/flatbuffer_builder.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("InjectEvent handles null event data",

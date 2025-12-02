@@ -14,7 +14,7 @@
 #include "UIRenderLogic.h"
 #include "UIStateLogic.h"
 #include "catch2/catch_test_macros.hpp"
-#include "scene_change_packet_generated.h"
+
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
