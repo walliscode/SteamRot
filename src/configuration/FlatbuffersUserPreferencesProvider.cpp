@@ -69,7 +69,7 @@ FlatbuffersUserPreferencesProvider::LoadDefaultPreferences() const {
   UserPreferences preferences;
 
   // Display preferences (only runtime-adjustable settings)
-  // Note: Window size and framerate are in GameResourcesData, not here
+  // Note: Window size and framerate are in EngineCoreData, not here
   if (prefs_data->display()) {
     preferences.display.fullscreen = prefs_data->display()->fullscreen();
     preferences.display.vsync = prefs_data->display()->vsync();
