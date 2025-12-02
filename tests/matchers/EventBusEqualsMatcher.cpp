@@ -9,6 +9,7 @@
 #include "EventBusEqualsMatcher.h"
 #include "EventPacketEqualsMatcher.h"
 #include "conmat.h"
+#include "test_context.h"
 
 namespace steamrot::tests {
 
