@@ -44,7 +44,8 @@ namespace steamrot {
 class Engine {
 protected:
   /////////////////////////////////////////////////
-  /// @brief Game-level core objects (window, event handler, asset manager, etc.)
+  /// @brief Game-level core objects (window, event handler, asset manager,
+  /// etc.)
   /////////////////////////////////////////////////
   GameCore m_game_core;
 
@@ -183,6 +184,8 @@ public:
   const UserPreferences &GetUserPreferences() const {
     return m_user_preferences;
   }
+
+  std::vector<std::shared_ptr<Subscriber>> &GetSubscriptions();
 };
 
 } // namespace steamrot

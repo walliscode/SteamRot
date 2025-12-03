@@ -10,6 +10,7 @@
 #include "FlatbuffersDataLoader.h"
 #include "FlatbuffersUserPreferencesProvider.h"
 #include "core_configuration.h"
+#include <vector>
 
 namespace steamrot {
 
@@ -82,5 +83,10 @@ void Engine::ExecuteSystemsTick() {
 
   // Update DisplayManager level logic, this is configurable per engine type
   ExecuteDisplayManagerTick();
+}
+
+/////////////////////////////////////////////////
+std::vector<std::shared_ptr<Subscriber>> &Engine::GetSubscriptions() {
+  return m_subscriptions;
 }
 } // namespace steamrot

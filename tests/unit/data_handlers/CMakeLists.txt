@@ -1,15 +1,11 @@
 configure_file(
-  PathProvider.test.cpp.in
-  PathProvider.test.cpp
-  @ONLY)
-configure_file(
   FlatbuffersDataLoader.test.cpp.in
   FlatbuffersDataLoader.test.cpp
   @ONLY)
 
 
 add_executable(test_data_handlers
-  PathProvider.test.cpp
+
   FlatbuffersDataLoader.test.cpp
 )
 

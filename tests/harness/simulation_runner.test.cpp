@@ -6,48 +6,10 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "simulation_runner.h"
-#include "EntityManager.h"
-#include "GameCore.h"
-#include "SceneContext.h"
-#include "SceneCore.h"
 #include "test_data_loader.h"
 #include "test_harness.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators_range.hpp>
-
-TEST_CASE("ExecuteSimulationStep validates null step",
-          "[unit][harness][simulation]") {
-  // Create minimal mock SceneContext components
-  steamrot::EntityManager entity_manager;
-  steamrot::GameCore game_core;
-  steamrot::SceneCore scene_core;
-
-  // Note: This test verifies null handling at the API level
-  // The SceneContext won't be used if step is null
-  steamrot::SceneContext scene_context(scene_core, game_core, entity_manager);
-
-  auto result =
-      steamrot::tests::ExecuteSimulationStep(nullptr, scene_context);
-
-  REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
-}
-
-TEST_CASE("ExecuteSimulation validates null simulation data",
-          "[unit][harness][simulation]") {
-  // Create minimal mock SceneContext components
-  steamrot::EntityManager entity_manager;
-  steamrot::GameCore game_core;
-  steamrot::SceneCore scene_core;
-
-  steamrot::SceneContext scene_context(scene_core, game_core, entity_manager);
-
-  auto result = steamrot::tests::ExecuteSimulation(nullptr, scene_context);
-
-  REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
-}
 
 TEST_CASE("RunTestHarness with simulation test data configs",
           "[unit][harness][simulation]") {

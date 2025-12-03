@@ -45,6 +45,7 @@ target_link_libraries(test_harness_tests
   test_harness
   Catch2::Catch2WithMain
   reporters_objects
+  context_test_helpers
 )
 
 catch_discover_tests(test_harness_tests
