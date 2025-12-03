@@ -9,6 +9,7 @@
 #include "Engine.h"
 #include "FlatbuffersDataLoader.h"
 #include "FlatbuffersUserPreferencesProvider.h"
+#include "SubscriberFactory.h"
 #include "core_configuration.h"
 #include <vector>
 
@@ -85,6 +86,32 @@ void Engine::ExecuteSystemsTick() {
   ExecuteDisplayManagerTick();
 }
 
+/////////////////////////////////////////////////
+void Engine::ExecuteEngineLevelLogic() {
+  // Check all subscriptions for activation and process
+  auto process_subs_result = ProcessSubscriptions();
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo> Engine::ConfigureSubscribersFromData(
+    const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>>
+        *subscriptions) {
+
+  // call SubscriberFactory to create and register subscribers
+  SubscriberFactory subscriber_factory(m_game_context.event_handler);
+  ;
+  for (auto subscription_data : *subscriptions) {
+
+    auto subscriber_result =
+        subscriber_factory.CreateAndRegisterSubscriber(*subscription_data);
+    if (!subscriber_result.has_value()) {
+      return std::unexpected(subscriber_result.error());
+    }
+    m_subscriptions.push_back(subscriber_result.value());
+  };
+
+  return std::monostate{};
+}
 /////////////////////////////////////////////////
 std::vector<std::shared_ptr<Subscriber>> &Engine::GetSubscriptions() {
   return m_subscriptions;

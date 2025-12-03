@@ -55,15 +55,6 @@ SceneManager::GetScenes() const {
 }
 
 /////////////////////////////////////////////////
-void SceneManager::UpdateSceneManager() {
-
-  // process subscriptions, [TODO: handle potential failure]
-  auto process_result = ProcessSubscriptions();
-
-  // update all scenes
-  UpdateScenes();
-}
-/////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 SceneManager::AddSceneFromDefault(const SceneType &scene_type) {
 
@@ -315,5 +306,14 @@ std::expected<std::monostate, FailInfo> SceneManager::ProcessSubscriptions() {
     }
   }
   return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+void SceneManager::ExecuteSceneManagerLevelLogic() {
+  // process subscriptions, [TODO: handle potential failure]
+  auto process_result = ProcessSubscriptions();
+
+  // update all scenes
+  UpdateScenes();
 }
 } // namespace steamrot

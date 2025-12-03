@@ -403,7 +403,7 @@ TEST_CASE("SceneManager::UpdateSceneManager cause scene change via subscribers",
   subscriber->m_active = true;
 
   // Call UpdateSceneManager in SceneManager
-  scene_manager.UpdateSceneManager();
+  scene_manager.ExecuteSceneManagerLevelLogic();
   // Check that the Title scene was loaded
   REQUIRE(scene_manager.GetScenes().size() == 1);
   REQUIRE(scene_manager.GetScenes().begin()->second->GetSceneInfo().type ==
