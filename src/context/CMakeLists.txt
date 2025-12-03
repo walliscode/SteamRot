@@ -9,7 +9,6 @@ target_include_directories(context
 target_link_libraries(context PUBLIC
   SFML::Graphics
   systems
-  resources
   flatbuffers_headers
   core
 )

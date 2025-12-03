@@ -13,7 +13,6 @@ target_link_libraries(context_test_helpers
   context
   scenes
   entity
-  resources
   Catch2::Catch2
 )
 

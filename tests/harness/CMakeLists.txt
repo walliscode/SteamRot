@@ -20,7 +20,6 @@ target_link_libraries(test_harness
   components
   entity
   matchers
-  resources
   scenes
   logic
   systems

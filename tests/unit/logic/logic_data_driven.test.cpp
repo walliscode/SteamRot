@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "test_harness.h"
+#include "test_data_loader.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators_range.hpp>
 
@@ -20,7 +21,7 @@ TEST_CASE("Logic classes data-driven tests", "[unit][logic][data-driven]") {
   const auto *config = GENERATE_COPY(from_range(configs.value()));
 
   // Run the test using the test harness
-  auto result = steamrot::tests::RunFixtureTest(config);
+  auto result = steamrot::tests::RunTestHarness(config);
   if (!result.has_value()) {
     FAIL("Test execution failed: " << result.error().message);
   }
