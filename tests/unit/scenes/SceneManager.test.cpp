@@ -18,9 +18,7 @@ TEST_CASE("SceneManager is constructed without any errors",
           "[unit][SceneManager]") {
 
   steamrot::tests::TestFixture test_context;
-  steamrot::GameContext game_context =
-      test_context
-          .GetGameContext(); // Get the game context from the test context
+  // Get the game context reference from the test context
   steamrot::SceneManager scene_manager{test_context.GetGameContext()};
   REQUIRE_NOTHROW(scene_manager);
 }
@@ -150,9 +148,8 @@ TEST_CASE("SceneManager's AddSceneFromDefault creates a configured "
           "[unit][SceneManager]") {
   steamrot::tests::TestFixture test_context;
 
-  steamrot::GameContext game_context =
-      test_context.GetGameContext(); // Get the game context from the
-                                     // test context
+  // Get the game context reference from the test context
+  steamrot::GameContext &game_context = test_context.GetGameContext();
   steamrot::SceneManager scene_manager{game_context};
 
   // define the scene type
