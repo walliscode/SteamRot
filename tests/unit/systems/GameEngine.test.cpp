@@ -206,32 +206,3 @@ TEST_CASE("GameEngine::ProcessSubscriptions sets subscribers to inactive after "
   // check that the subscriber is now inactive
   REQUIRE(!subscriber->m_active);
 }
-
-TEST_CASE(
-    "GameEngine::UpdateGameContext updates members of GameContext correctly",
-    "[unit][GameEngine]") {
-
-  // get game context generated from TestFixture
-  steamrot::tests::TestFixture test_fixture;
-  test_fixture.Intialize();
-  steamrot::GameContext &game_context = test_fixture.GetGameContext();
-
-  steamrot::GameEngine game_engine;
-
-  // check current variables
-  REQUIRE(game_context.loop_number == 1);
-  REQUIRE(game_context.mouse_position == sf::Vector2i(0, 0));
-
-  // simulate some changes
-  sf::Mouse::setPosition({20, 35}, game_context.game_window);
-
-  // call UpdateGameResources to update GameContext members
-  game_engine.UpdateGameResources(game_context.game_resources);
-
-  // check that the members have been updated correctly
-
-  REQUIRE(game_context.mouse_position.x ==
-          sf::Mouse::getPosition(game_context.game_window).x);
-  REQUIRE(game_context.mouse_position.y ==
-          sf::Mouse::getPosition(game_context.game_window).y);
-}

@@ -41,7 +41,7 @@ TestEngine::ConfigureEngineStateFromData() {
     return std::unexpected(configure_subs_result.error());
   }
 
-  // configure GameResources from test data
+  // configure GameCore from test data
 
   // configure SceneManager from test data
   auto configure_result = m_scene_manager.ConfigureSceneManagerFromData(
