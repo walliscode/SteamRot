@@ -27,7 +27,7 @@
 ///   - metadata: Test identification
 ///   Source: Loaded from test_data.json files and parsed by test harness
 ///
-/// ### GameResourcesData (loaded via Engine::StartUp):
+/// ### EngineCoreData (loaded via Engine::StartUp):
 ///   - window_width, window_height, framerate_limit
 ///   - Source: Still loaded from engine_data.json (shared window config)
 ///
@@ -37,7 +37,7 @@
 ///   └─▶ Load test_data.json → TestDataConfig
 ///   └─▶ TestEngine(config) [stores pointer to injected config]
 ///   └─▶ RunGame()
-///         └─▶ Engine::StartUp() [loads GameResourcesData, UserPreferences, calls ConfigureEngineStateFromData]
+///         └─▶ Engine::StartUp() [loads EngineCoreData, UserPreferences, calls ConfigureEngineStateFromData]
 ///               └─▶ ConfigureEngineStateFromData() [uses m_test_config]
 ///                     └─▶ m_test_config->starting_engine_state()->subscriptions()
 ///                     └─▶ m_test_config->starting_engine_state()->scene_manager_data()
@@ -96,7 +96,7 @@ enum class TickLevel {
 /// - Consistent user preferences between GameEngine and TestEngine
 ///
 /// Both GameEngine and TestEngine share the same Engine::StartUp() flow for:
-/// - GameResources (window config)
+/// - GameCore (window config)
 /// - UserPreferences (from default.preferences.bin)
 ///
 /// They differ in how they obtain EngineData (subscriptions, scene manager):

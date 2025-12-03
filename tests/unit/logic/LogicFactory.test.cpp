@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "LogicFactory.h"
 #include "FlatbuffersDataLoader.h"
+#include "TestFixture.h"
 #include "logic_test_helpers.h"
 #include <catch2/catch_test_macros.hpp>
 

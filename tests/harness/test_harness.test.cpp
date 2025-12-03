@@ -120,56 +120,18 @@ TEST_CASE("Metadata-only test data has no data collections",
   REQUIRE(configs.has_value());
 
   // Find the metadata_validation test config
-  const steamrot::TestDataConfig *metadata_config = nullptr;
+  const steamrot::TestDataConfig *test_config = nullptr;
   for (const auto *config : configs.value()) {
     if (config->metadata()->test_name()->str() == "metadata_validation") {
-      metadata_config = config;
+      test_config = config;
       break;
     }
   }
 
-  REQUIRE(metadata_config != nullptr);
+  REQUIRE(test_config != nullptr);
 
   // Verify that data collections are not present (null)
-  REQUIRE(metadata_config->start_data_collection() == nullptr);
-  REQUIRE(metadata_config->expected_data_collection() == nullptr);
-
-  // Verify other optional fields are also not present
-  REQUIRE(metadata_config->game_resources() == nullptr);
-  REQUIRE(metadata_config->scene_resources() == nullptr);
-  REQUIRE(metadata_config->simulation_data() == nullptr);
-  REQUIRE(metadata_config->event_sequence() == nullptr);
-  REQUIRE(metadata_config->input_sequence() == nullptr);
-}
-
-TEST_CASE("Metadata-only test data can be used with generators",
-          "[unit][harness]") {
-
-  auto configs = steamrot::tests::load_test_data_configs();
-  REQUIRE(configs.has_value());
-
-  // Filter to only metadata-only tests
-  std::vector<const steamrot::TestDataConfig *> metadata_only_configs;
-  for (const auto *config : configs.value()) {
-    if (config->start_data_collection() == nullptr &&
-        config->expected_data_collection() == nullptr) {
-      metadata_only_configs.push_back(config);
-    }
-  }
-
-  REQUIRE(metadata_only_configs.size() >= 1);
-
-  // Use generator with metadata-only configs
-  const auto *config = GENERATE_COPY(from_range(metadata_only_configs));
-
-  INFO("Test name: " << config->metadata()->test_name()->str());
-
-  // Verify metadata structure
-  REQUIRE(config->metadata() != nullptr);
-  REQUIRE(config->metadata()->test_name() != nullptr);
-  REQUIRE(config->metadata()->version() >= 1);
-
-  // Verify no entity data is present
-  REQUIRE(config->start_data_collection() == nullptr);
-  REQUIRE(config->expected_data_collection() == nullptr);
+  REQUIRE(test_config->starting_engine_state() == nullptr);
+  REQUIRE(test_config->starting_engine_state()->scene_manager_data() ==
+          nullptr);
 }

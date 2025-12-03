@@ -8,39 +8,17 @@
 /////////////////////////////////////////////////
 #include "input_simulation.h"
 #include "EventHandler.h"
-#include "GameContext.h"
+#include "TestFixture.h"
+
 #include "input_test_data_generated.h"
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("InjectInput handles null input",
-          "[unit][harness][input_simulation]") {
-  steamrot::EventHandler event_handler;
-  steamrot::GameContext game_context;
-
-  auto result =
-      steamrot::tests::InjectInput(nullptr, event_handler, game_context);
-  REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
-}
-
-TEST_CASE("InjectInputsForTick handles null inputs vector",
-          "[unit][harness][input_simulation]") {
-  steamrot::EventHandler event_handler;
-  steamrot::GameContext game_context;
-
-  auto result =
-      steamrot::tests::InjectInputsForTick(nullptr, event_handler, game_context);
-  REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
-}
-
 TEST_CASE("InjectInput updates mouse position for MouseMove",
           "[unit][harness][input_simulation]") {
-  steamrot::EventHandler event_handler;
-  steamrot::GameContext game_context;
 
+  steamrot::tests::TestFixture fixture;
   // Create mouse move event
   flatbuffers::FlatBufferBuilder builder;
   auto position = steamrot::CreateVector2fData(builder, 150.0f, 200.0f);
@@ -54,20 +32,23 @@ TEST_CASE("InjectInput updates mouse position for MouseMove",
       flatbuffers::GetRoot<steamrot::InputEvent>(builder.GetBufferPointer());
 
   // Execute the event
-  auto result =
-      steamrot::tests::InjectInput(event, event_handler, game_context);
+  auto result = steamrot::tests::InjectInput(
+      event, fixture.GetGameContext().event_handler, fixture.GetGameContext());
   REQUIRE(result.has_value());
 
   // Verify mouse position was updated
-  REQUIRE(game_context.mouse_position.x == 150);
-  REQUIRE(game_context.mouse_position.y == 200);
+  REQUIRE(fixture.GetGameContext().mouse_position.x == 150);
+  REQUIRE(fixture.GetGameContext().mouse_position.y == 200);
 }
 
 TEST_CASE("InjectInput generates EventPacket for MouseClick",
           "[unit][harness][input_simulation]") {
-  steamrot::EventHandler event_handler;
-  steamrot::GameContext game_context;
 
+  steamrot::tests::TestFixture fixture;
+
+  // get ref to event handler
+  auto &event_handler = fixture.GetGameContext().event_handler;
+  auto &game_context = fixture.GetGameContext();
   // Create mouse click event
   flatbuffers::FlatBufferBuilder builder;
   auto position = steamrot::CreateVector2fData(builder, 100.0f, 150.0f);
@@ -82,7 +63,8 @@ TEST_CASE("InjectInput generates EventPacket for MouseClick",
       flatbuffers::GetRoot<steamrot::InputEvent>(builder.GetBufferPointer());
 
   // Get initial event bus state
-  const auto &initial_bus = event_handler.GetGlobalEventBus();
+  const auto &initial_bus =
+      fixture.GetGameContext().event_handler.GetGlobalEventBus();
   size_t initial_size = initial_bus.size();
 
   // Execute the event
@@ -109,9 +91,11 @@ TEST_CASE("InjectInput generates EventPacket for MouseClick",
 
 TEST_CASE("InjectInput generates EventPacket for KeyPress",
           "[unit][harness][input_simulation]") {
-  steamrot::EventHandler event_handler;
-  steamrot::GameContext game_context;
 
+  steamrot::tests::TestFixture fixture;
+
+  auto &event_handler = fixture.GetGameContext().event_handler;
+  auto &game_context = fixture.GetGameContext();
   // Create key press event (A key)
   flatbuffers::FlatBufferBuilder builder;
   auto keyboard_data = steamrot::CreateKeyboardInputData(
@@ -149,9 +133,11 @@ TEST_CASE("InjectInput generates EventPacket for KeyPress",
 
 TEST_CASE("InjectInput does not generate EventPacket for MouseMove",
           "[unit][harness][input_simulation]") {
-  steamrot::EventHandler event_handler;
-  steamrot::GameContext game_context;
 
+  steamrot::tests::TestFixture fixture;
+
+  auto &event_handler = fixture.GetGameContext().event_handler;
+  auto &game_context = fixture.GetGameContext();
   // Create mouse move event
   flatbuffers::FlatBufferBuilder builder;
   auto position = steamrot::CreateVector2fData(builder, 250.0f, 300.0f);

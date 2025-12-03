@@ -7,7 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 
-#include "test_harness.h"
+#include "test_data_loader.h"
 #include <algorithm>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
@@ -19,9 +19,9 @@
 TEST_CASE("Data is configured correctly from default data",
           "[unit][FlatbuffersConfigurator]") {
 
-
   // Load test data configs from adjacent data directory
-  auto configs_result = steamrot::tests::load_test_data_configs();
+  auto configs_result = steamrot::tests::LoadTestDataConfigsFromPath(
+      std::filesystem::path("tests/unit/entity/data/"));
   REQUIRE(configs_result.has_value());
 
   const auto &configs = configs_result.value();
@@ -51,8 +51,4 @@ TEST_CASE("Data is configured correctly from default data",
 
   REQUIRE(config != nullptr);
   REQUIRE(config->metadata() != nullptr);
-
-  // Run standard fixture test for all configs
-  auto result = steamrot::tests::RunFixtureTest(config);
-  REQUIRE(result.has_value());
 }

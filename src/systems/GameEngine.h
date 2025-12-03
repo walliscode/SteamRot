@@ -8,9 +8,9 @@
 /// The data loading happens in two phases:
 ///
 /// ### Phase 1: Engine::StartUp() (base implementation)
-///   - GameResourcesData: Window size, title, framerate
+///   - EngineCoreData: Window size, title, framerate
 ///   - UserPreferences: Default preferences from default.preferences.bin
-///   - Source: engine_data.json → game_resources
+///   - Source: engine_data.json → engine_core
 ///
 /// ### Phase 2: GameEngine::StartUp() (override)
 ///   - Loads saved user preferences if they exist (overrides defaults)
