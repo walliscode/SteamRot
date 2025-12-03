@@ -7,9 +7,10 @@
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <expected>
-#include <iostream>
 #include <optional>
 namespace steamrot {
+
+/////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
@@ -197,5 +198,17 @@ void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
   // activate the subscriber and store the received event data
   locked_subscriber->m_active = true;
   locked_subscriber->m_received_event_data = event_data;
+}
+
+/////////////////////////////////////////////////
+void EventHandler::ExecuteEventHandlerLevelLogic(sf::RenderWindow &window) {
+  // Preload events from the window into the waiting room event bus
+  PreloadEvents(window);
+  // Process the waiting room event bus into the global event bus
+  ProcessWaitingRoomEventBus();
+  // Update subscribers based on the global event bus
+  UpateSubscribersFromGlobalEventBus();
+  // Tick the global event bus to manage event lifetimes
+  TickGlobalEventBus();
 }
 } // namespace steamrot

@@ -110,12 +110,6 @@ public:
   void UpdateScenes();
 
   /////////////////////////////////////////////////
-  /// @brief Container function for all other functions required for each update
-  /// cycle
-  /////////////////////////////////////////////////
-  void UpdateSceneManager();
-
-  /////////////////////////////////////////////////
   /// @brief Cause the cascade of events that will add a scene from default
   /// data.
   ///

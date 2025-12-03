@@ -162,12 +162,6 @@ public:
   void RunGame();
 
   /////////////////////////////////////////////////
-  /// @brief Add the Subscriber to the subscriptions vector.
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-      RegisterSubscriber(std::shared_ptr<Subscriber>);
-
-  /////////////////////////////////////////////////
   /// @brief Configure subscribers from flatbuffers data
   ///
   /// @param subscriptions Flatbuffers vector of SubscriberData objects
