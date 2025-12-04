@@ -20,8 +20,12 @@ TEST_CASE("FlatBuffersGameDataProvider::LoadEngineData returns expected data",
   steamrot::FlatBuffersGameDataProvider provider;
   auto result = provider.LoadEngineData();
 
-  REQUIRE(result.has_value());
-  REQUIRE(result.value() != nullptr);
+  if (!result.has_value()) {
+    FAIL("LoadEngineData failed: " << result.error().message);
+  }
+  if (result.value() == nullptr) {
+    FAIL("LoadEngineData returned nullptr");
+  }
 }
 
 TEST_CASE(
@@ -30,8 +34,12 @@ TEST_CASE(
   steamrot::FlatBuffersGameDataProvider provider;
   auto result = provider.LoadSceneManagerData();
 
-  REQUIRE(result.has_value());
-  REQUIRE(result.value() != nullptr);
+  if (!result.has_value()) {
+    FAIL("LoadSceneManagerData failed: " << result.error().message);
+  }
+  if (result.value() == nullptr) {
+    FAIL("LoadSceneManagerData returned nullptr");
+  }
 }
 
 TEST_CASE("FlatBuffersGameDataProvider::LoadSceneData for TITLE scene returns "
@@ -40,8 +48,12 @@ TEST_CASE("FlatBuffersGameDataProvider::LoadSceneData for TITLE scene returns "
   steamrot::FlatBuffersGameDataProvider provider;
   auto result = provider.LoadSceneData(steamrot::SceneType::SceneType_TITLE);
 
-  REQUIRE(result.has_value());
-  REQUIRE(result.value() != nullptr);
+  if (!result.has_value()) {
+    FAIL("LoadSceneData(TITLE) failed: " << result.error().message);
+  }
+  if (result.value() == nullptr) {
+    FAIL("LoadSceneData(TITLE) returned nullptr");
+  }
 }
 
 TEST_CASE("FlatBuffersGameDataProvider::LoadSceneData for CRAFTING scene "
@@ -50,8 +62,12 @@ TEST_CASE("FlatBuffersGameDataProvider::LoadSceneData for CRAFTING scene "
   steamrot::FlatBuffersGameDataProvider provider;
   auto result = provider.LoadSceneData(steamrot::SceneType::SceneType_CRAFTING);
 
-  REQUIRE(result.has_value());
-  REQUIRE(result.value() != nullptr);
+  if (!result.has_value()) {
+    FAIL("LoadSceneData(CRAFTING) failed: " << result.error().message);
+  }
+  if (result.value() == nullptr) {
+    FAIL("LoadSceneData(CRAFTING) returned nullptr");
+  }
 }
 
 TEST_CASE(
@@ -60,8 +76,12 @@ TEST_CASE(
   steamrot::FlatBuffersGameDataProvider provider;
   auto result = provider.LoadUserPreferences();
 
-  REQUIRE(result.has_value());
-  REQUIRE(result.value() != nullptr);
+  if (!result.has_value()) {
+    FAIL("LoadUserPreferences failed: " << result.error().message);
+  }
+  if (result.value() == nullptr) {
+    FAIL("LoadUserPreferences returned nullptr");
+  }
 }
 
 TEST_CASE("FlatBuffersGameDataProvider::LoadEngineConfig returns expected data",
@@ -69,8 +89,12 @@ TEST_CASE("FlatBuffersGameDataProvider::LoadEngineConfig returns expected data",
   steamrot::FlatBuffersGameDataProvider provider;
   auto result = provider.LoadEngineConfig();
 
-  REQUIRE(result.has_value());
-  REQUIRE(result.value() != nullptr);
+  if (!result.has_value()) {
+    FAIL("LoadEngineConfig failed: " << result.error().message);
+  }
+  if (result.value() == nullptr) {
+    FAIL("LoadEngineConfig returned nullptr");
+  }
 }
 
 TEST_CASE("FlatBuffersGameDataProvider::LoadUIStyle returns expected data for "
@@ -79,8 +103,12 @@ TEST_CASE("FlatBuffersGameDataProvider::LoadUIStyle returns expected data for "
   steamrot::FlatBuffersGameDataProvider provider;
   auto result = provider.LoadUIStyle("default");
 
-  REQUIRE(result.has_value());
-  REQUIRE(result.value() != nullptr);
+  if (!result.has_value()) {
+    FAIL("LoadUIStyle(default) failed: " << result.error().message);
+  }
+  if (result.value() == nullptr) {
+    FAIL("LoadUIStyle(default) returned nullptr");
+  }
 }
 
 TEST_CASE(
@@ -89,8 +117,12 @@ TEST_CASE(
   steamrot::FlatBuffersGameDataProvider provider;
   auto result = provider.LoadEngineCoreData();
 
-  REQUIRE(result.has_value());
-  REQUIRE(result.value() != nullptr);
+  if (!result.has_value()) {
+    FAIL("LoadEngineCoreData failed: " << result.error().message);
+  }
+  if (result.value() == nullptr) {
+    FAIL("LoadEngineCoreData returned nullptr");
+  }
 }
 
 TEST_CASE("FlatBuffersGameDataProvider::LoadSceneCoreData for TITLE scene "
@@ -100,8 +132,12 @@ TEST_CASE("FlatBuffersGameDataProvider::LoadSceneCoreData for TITLE scene "
   auto result =
       provider.LoadSceneCoreData(steamrot::SceneType::SceneType_TITLE);
 
-  REQUIRE(result.has_value());
-  REQUIRE(result.value() != nullptr);
+  if (!result.has_value()) {
+    FAIL("LoadSceneCoreData(TITLE) failed: " << result.error().message);
+  }
+  if (result.value() == nullptr) {
+    FAIL("LoadSceneCoreData(TITLE) returned nullptr");
+  }
 }
 
 TEST_CASE("data::file::FileExists returns true for existing file",
