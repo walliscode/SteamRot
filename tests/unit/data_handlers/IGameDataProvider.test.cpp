@@ -87,7 +87,7 @@ TEST_CASE("FlatBuffersGameDataProvider::LoadSceneCoreData for TITLE scene return
 
 TEST_CASE("data::file::FileExists returns true for existing file", "[unit][data_file_utils]") {
   // Test with a file we know exists
-  auto engine_data_path = steamrot::paths::GetDefaultEngineDataFilePath();
+  auto engine_data_path = steamrot::paths::GetDefaultEngineDirectory() / "engine_data.bin";
   
   bool exists = steamrot::data::file::FileExists(engine_data_path);
   REQUIRE(exists == true);
@@ -101,7 +101,7 @@ TEST_CASE("data::file::FileExists returns false for non-existent file", "[unit][
 }
 
 TEST_CASE("data::file::LoadBinaryFile successfully loads existing file", "[unit][data_file_utils]") {
-  auto engine_data_path = steamrot::paths::GetDefaultEngineDataFilePath();
+  auto engine_data_path = steamrot::paths::GetDefaultEngineDirectory() / "engine_data.bin";
   
   auto result = steamrot::data::file::LoadBinaryFile(engine_data_path);
   
@@ -119,7 +119,7 @@ TEST_CASE("data::file::LoadBinaryFile returns error for non-existent file", "[un
 }
 
 TEST_CASE("data::file::GetFileSize returns correct size for existing file", "[unit][data_file_utils]") {
-  auto engine_data_path = steamrot::paths::GetDefaultEngineDataFilePath();
+  auto engine_data_path = steamrot::paths::GetDefaultEngineDirectory() / "engine_data.bin";
   
   auto result = steamrot::data::file::GetFileSize(engine_data_path);
   
