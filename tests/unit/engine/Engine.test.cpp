@@ -10,7 +10,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "Engine.h"
-#include "PathProvider.h"
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
 
@@ -65,6 +64,11 @@ protected:
   }
 
 public:
+  /////////////////////////////////////////////////
+  /// @brief Constructor - properly initialize base Engine
+  /////////////////////////////////////////////////
+  TestableEngine() : steamrot::Engine() {}
+
   void TickEvents() override {
     steamrot::Engine::TickEvents();
     m_tick_events_called = true;
@@ -135,7 +139,6 @@ public:
 
 TEST_CASE("Engine ExecuteTick calls all tick phases in correct order",
           "[unit][Engine]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   TestableEngine engine;
 
   engine.ExecuteTick();
@@ -160,7 +163,6 @@ TEST_CASE("Engine ExecuteTick calls all tick phases in correct order",
 }
 
 TEST_CASE("Engine TickEvents can be called independently", "[unit][Engine]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   TestableEngine engine;
 
   engine.TickEvents();
@@ -177,7 +179,6 @@ TEST_CASE("Engine TickEvents can be called independently", "[unit][Engine]") {
 
 TEST_CASE("Engine TickEngineLogic can be called independently",
           "[unit][Engine]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   TestableEngine engine;
 
   engine.TickEngineLogic();
@@ -194,7 +195,6 @@ TEST_CASE("Engine TickEngineLogic can be called independently",
 
 TEST_CASE("Engine TickSceneManager can be called independently",
           "[unit][Engine]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   TestableEngine engine;
 
   engine.TickSceneManager();
@@ -211,7 +211,6 @@ TEST_CASE("Engine TickSceneManager can be called independently",
 
 TEST_CASE("Engine TickSceneLogic can be called independently",
           "[unit][Engine]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   TestableEngine engine;
 
   engine.TickSceneLogic();
@@ -228,7 +227,6 @@ TEST_CASE("Engine TickSceneLogic can be called independently",
 
 TEST_CASE("Engine TickRendering can be called independently",
           "[unit][Engine]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   TestableEngine engine;
 
   engine.TickRendering();
@@ -245,7 +243,6 @@ TEST_CASE("Engine TickRendering can be called independently",
 
 TEST_CASE("Engine tick methods can be called in custom order",
           "[unit][Engine]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   TestableEngine engine;
 
   // Call only specific phases in a custom order
@@ -261,7 +258,6 @@ TEST_CASE("Engine tick methods can be called in custom order",
 }
 
 TEST_CASE("Engine tick methods can be called multiple times", "[unit][Engine]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   TestableEngine engine;
 
   // Call TickSceneLogic multiple times
@@ -277,8 +273,6 @@ TEST_CASE("Engine tick methods can be called multiple times", "[unit][Engine]") 
 
 TEST_CASE("Engine OnTickBegin and OnTickEnd hooks are optional",
           "[unit][Engine]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  
   // TestableEngine overrides the hooks, but they should be optional
   // This test verifies the hooks are called when overridden
   TestableEngine engine;
@@ -291,7 +285,6 @@ TEST_CASE("Engine OnTickBegin and OnTickEnd hooks are optional",
 
 TEST_CASE("Engine ExecuteSystemsTick uses ExecuteTick internally",
           "[unit][Engine]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   TestableEngine engine;
 
   // ExecuteSystemsTick should call ExecuteTick
