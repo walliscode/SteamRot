@@ -4,12 +4,10 @@
 /////////////////////////////////////////////////
 
 #include "FlatbuffersSceneDataProvider.h"
-#include "PathProvider.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("FlatbuffersSceneDataProvider loads scene core data",
           "[unit][data_providers][FlatbuffersSceneDataProvider]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::FlatbuffersSceneDataProvider provider;
 
   auto result = provider.LoadSceneCoreData(steamrot::SceneType::SceneType_TEST);
@@ -22,7 +20,6 @@ TEST_CASE("FlatbuffersSceneDataProvider loads scene core data",
 
 TEST_CASE("FlatbuffersSceneDataProvider returns mutable native struct",
           "[unit][data_providers][FlatbuffersSceneDataProvider]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::FlatbuffersSceneDataProvider provider;
 
   auto result = provider.LoadSceneCoreData(steamrot::SceneType::SceneType_TEST);
@@ -38,7 +35,6 @@ TEST_CASE("FlatbuffersSceneDataProvider returns mutable native struct",
 
 TEST_CASE("FlatbuffersSceneDataProvider loads complete scene data",
           "[unit][data_providers][FlatbuffersSceneDataProvider]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::FlatbuffersSceneDataProvider provider;
 
   auto result = provider.LoadSceneData(steamrot::SceneType::SceneType_TEST);

@@ -8,10 +8,9 @@
 /////////////////////////////////////////////////
 #include "AssetManager.h"
 #include "FailInfo.h"
-#include "FlatbuffersDataLoader.h"
 #include "StylesConfigurator.h"
-#include "assets_generated.h"
 #include "paths.h"
+#include "provider_factory.h"
 #include <SFML/Graphics/Font.hpp>
 #include <expected>
 #include <filesystem>
@@ -25,45 +24,32 @@ namespace steamrot {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> AssetManager::LoadDefaultAssets() {
 
-  // provide Asset configuration data (not the Assets themselves)
-  FlatbuffersDataLoader fb_data_loader;
+  // Load Asset configuration data via provider interface
+  IAssetDataProvider &asset_provider = GetAssetDataProvider();
 
-  auto asset_config_result = fb_data_loader.ProvideAssetData();
-  if (!asset_config_result.has_value())
-    return std::unexpected<FailInfo>(asset_config_result.error());
+  auto asset_data_result = asset_provider.LoadAssetData();
+  if (!asset_data_result.has_value())
+    return std::unexpected<FailInfo>(asset_data_result.error());
 
-  const AssetCollection *asset_config = asset_config_result.value();
+  const AssetData &asset_data = asset_data_result.value();
 
   ////// Load Fonts //////
-  // check if there are any fonts to load
-  if (asset_config->fonts()) {
+  // Load fonts if any exist
+  for (const auto &font_data : asset_data.fonts) {
+    // attempt to add font
+    auto add_font_result = AddFont(font_data.name);
 
-    // Load Scene Fonts
-    for (auto const &font_data : *asset_config->fonts()) {
-
-      // attempt to add font
-      auto add_font_result = AddFont(font_data->name()->str());
-
-      if (!add_font_result.has_value())
-        return std::unexpected<FailInfo>(add_font_result.error());
-    }
+    if (!add_font_result.has_value())
+      return std::unexpected<FailInfo>(add_font_result.error());
   }
 
   ////// Load UI Styles //////
-  // create a vector of style names to load and pass to LoadUIStyles
-  std::vector<std::string> style_names;
-  if (asset_config->ui_styles()->empty())
+  if (asset_data.ui_styles.empty())
     return std::unexpected<FailInfo>(
         {FailMode::FlatbuffersDataNotFound,
-         "No UI styles defined in AssetCollection"});
+         "No UI styles defined in AssetData"});
 
-  else {
-    for (auto const &style_name : *asset_config->ui_styles()) {
-      style_names.push_back(style_name->str());
-    }
-  }
-
-  auto load_ui_style_result = LoadUIStyles(style_names);
+  auto load_ui_style_result = LoadUIStyles(asset_data.ui_styles);
   if (!load_ui_style_result.has_value())
     return std::unexpected<FailInfo>(load_ui_style_result.error());
 
@@ -73,19 +59,14 @@ std::expected<std::monostate, FailInfo> AssetManager::LoadDefaultAssets() {
 std::expected<std::monostate, FailInfo>
 AssetManager::LoadSceneAssets(const SceneType &scene_type) {
 
-  // provide Asset configuration data (not the Assets themselves)
-  FlatbuffersDataLoader fb_data_loader;
+  // Load Asset configuration data via provider interface
+  IAssetDataProvider &asset_provider = GetAssetDataProvider();
 
-  auto asset_config_result = fb_data_loader.ProvideAssetData(scene_type);
-  if (!asset_config_result.has_value())
-    return std::unexpected<FailInfo>(asset_config_result.error());
+  auto asset_data_result = asset_provider.LoadSceneAssetData(scene_type);
+  if (!asset_data_result.has_value())
+    return std::unexpected<FailInfo>(asset_data_result.error());
 
-  const AssetCollection *asset_config = asset_config_result.value();
-
-  // return early if no data is in the AssetCollection
-  if (!asset_config)
-    return std::monostate();
-
+  // Scene assets are loaded on demand, return success
   return std::monostate();
 }
 

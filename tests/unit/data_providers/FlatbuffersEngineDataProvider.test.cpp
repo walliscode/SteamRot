@@ -4,12 +4,10 @@
 /////////////////////////////////////////////////
 
 #include "FlatbuffersEngineDataProvider.h"
-#include "PathProvider.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("FlatbuffersEngineDataProvider loads engine core data",
           "[unit][data_providers][FlatbuffersEngineDataProvider]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::FlatbuffersEngineDataProvider provider;
 
   auto result = provider.LoadEngineCoreData();
@@ -24,7 +22,6 @@ TEST_CASE("FlatbuffersEngineDataProvider loads engine core data",
 
 TEST_CASE("FlatbuffersEngineDataProvider returns native struct",
           "[unit][data_providers][FlatbuffersEngineDataProvider]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::FlatbuffersEngineDataProvider provider;
 
   auto result = provider.LoadEngineCoreData();
@@ -40,7 +37,6 @@ TEST_CASE("FlatbuffersEngineDataProvider returns native struct",
 
 TEST_CASE("FlatbuffersEngineDataProvider loads complete engine data",
           "[unit][data_providers][FlatbuffersEngineDataProvider]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::FlatbuffersEngineDataProvider provider;
 
   auto result = provider.LoadEngineData();
