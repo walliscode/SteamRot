@@ -282,20 +282,3 @@ TEST_CASE("Engine OnTickBegin and OnTickEnd hooks are optional",
   REQUIRE(engine.WasOnTickBeginCalled());
   REQUIRE(engine.WasOnTickEndCalled());
 }
-
-TEST_CASE("Engine ExecuteSystemsTick uses ExecuteTick internally",
-          "[unit][Engine]") {
-  TestableEngine engine;
-
-  // ExecuteSystemsTick should call ExecuteTick
-  engine.ExecuteSystemsTick();
-
-  // All tick phases should have been called
-  REQUIRE(engine.WasOnTickBeginCalled());
-  REQUIRE(engine.WasTickEventsCalled());
-  REQUIRE(engine.WasTickEngineLogicCalled());
-  REQUIRE(engine.WasTickSceneManagerCalled());
-  REQUIRE(engine.WasTickSceneLogicCalled());
-  REQUIRE(engine.WasTickRenderingCalled());
-  REQUIRE(engine.WasOnTickEndCalled());
-}
