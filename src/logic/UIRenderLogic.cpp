@@ -4,7 +4,7 @@
 #include "UIRenderLogic.h"
 #include "Logic.h"
 #include "archetype_helpers.h"
-#include "draw_ui_elements.h"
+#include "logic_render.h"
 #include "entity_memory.h"
 #include <SFML/Graphics.hpp>
 
@@ -39,7 +39,7 @@ void UIRenderLogic::DrawUIElements() {
 
     // only draw if the CUserInterface is visible
     if (ui_component.m_visible) {
-      draw_ui_elements::DrawNestedUIElements(
+      logic::render::DrawNestedUIElements(
           m_scene_context.scene_texture, *ui_component.m_root_element,
           m_scene_context.asset_manager.GetDefaultUIStyle());
     }

@@ -22,7 +22,7 @@ target_link_libraries(test_harness
   matchers
   scenes
   logic
-  systems
+  engine
   events
   Catch2::Catch2
   conmat

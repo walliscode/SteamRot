@@ -2,6 +2,21 @@
 
 Welcome to the SteamRot game engine documentation hub. This directory contains comprehensive guides, references, and examples for developing with SteamRot.
 
+## 🎯 NEW: Comprehensive Codebase Analysis (Dec 2025)
+
+A complete analysis of the codebase has been completed! This analysis identifies:
+- 📝 **Outdated documentation** that needs updating
+- 🧪 **Missing unit tests** (5 Logic classes)
+- 🏗️ **Architecture patterns** and recommendations
+- ✅ **8-week implementation plan** with detailed steps
+
+**📖 Start Here**: [Analysis Directory README](analysis/README.md)  
+**⚡ Quick Lookup**: [Quick Reference Guide](analysis/ANALYSIS_QUICK_REFERENCE.md)  
+**📊 Full Report**: [Comprehensive Analysis](analysis/COMPREHENSIVE_CODEBASE_ANALYSIS.md)  
+**🏗️ Diagrams**: [Architecture Diagrams](analysis/ARCHITECTURE_DIAGRAMS.md)
+
+---
+
 ## 📚 Documentation Structure
 
 The documentation is organized into logical categories to help you find what you need quickly:
@@ -185,10 +200,25 @@ Code examples and patterns:
 
 Research documents and architectural analysis:
 
+### Comprehensive Codebase Analysis (December 2025)
+
+**📖 Start Here**: [Analysis Directory README](analysis/README.md)
+
+| Document | Description |
+|----------|-------------|
+| **[Comprehensive Analysis](analysis/COMPREHENSIVE_CODEBASE_ANALYSIS.md)** | ⭐ **Main analysis**: Documentation gaps, testing coverage, architecture review, 8-week implementation plan |
+| **[Architecture Diagrams](analysis/ARCHITECTURE_DIAGRAMS.md)** | Visual architecture documentation with detailed system diagrams |
+| **[Quick Reference](analysis/ANALYSIS_QUICK_REFERENCE.md)** | Fast lookup for critical issues, test coverage, and action items |
+
+### Historical Analysis Reports
+
 | Document | Description |
 |----------|-------------|
 | **[Test Data Visualization Report](analysis/TEST_DATA_VISUALIZATION_REPORT.md)** | Analysis of approaches for visualizing test_data.json files |
 | **[Event Packet Creation Analysis](analysis/EVENT_PACKET_CREATION_ANALYSIS.md)** | Analysis of event packet creation patterns |
+| **[Test Fixture Analysis](analysis/TEST_FIXTURE_ANALYSIS.md)** | Analysis of TestFixture implementation and usage |
+| **[Path Provider Namespace Analysis](analysis/PATH_PROVIDER_NAMESPACE_ANALYSIS.md)** | PathProvider implementation analysis |
+| **[FlatBuffers Game Data Analysis](analysis/FLATBUFFERS_GAME_DATA_ANALYSIS.md)** | FlatBuffers data structure analysis |
 
 ## 📑 Reference
 

@@ -1,7 +1,7 @@
 add_executable(test_logic
 LogicFactory.test.cpp
-draw_ui_elements.test.cpp
-draw_ui_elements_test_helpers.cpp
+logic_render.test.cpp
+logic_render_test_helpers.cpp
 collision.test.cpp
 ui_helpers.test.cpp
 
@@ -48,7 +48,7 @@ catch_discover_tests(dd_logic_tests
   REPORTER "harness"
 )
 add_library(test_logic_helpers
-  draw_ui_elements_test_helpers.cpp
+  logic_render_test_helpers.cpp
   logic_test_helpers.cpp
 
 )

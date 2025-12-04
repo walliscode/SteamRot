@@ -1,27 +1,27 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief unit tests for draw_ui_elements namespace
+/// @brief unit tests for logic_render namespace
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
 
-#include "draw_ui_elements.h"
+#include "logic_render.h"
 #include "AssetManager.h"
 #include "ButtonElement.h"
 #include "DropDownButtonElement.h"
 #include "DropDownContainerElement.h"
 #include "DropDownListElement.h"
 #include "PanelElement.h"
-#include "draw_ui_elements_test_helpers.h"
+#include "logic_render_test_helpers.h"
 #include <SFML/Graphics.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <iostream>
 #include <memory>
 
 TEST_CASE("Determine whether pixels can be tested on a RenderTexture",
-          "[unit][draw_ui_elements]") {
+          "[unit][logic_render]") {
 
   size_t width = 100;
   size_t height = 100;
@@ -59,7 +59,7 @@ TEST_CASE("Determine whether pixels can be tested on a RenderTexture",
     }
   }
 }
-TEST_CASE("drawn text can be detected", "[unit][draw_ui_elements]") {
+TEST_CASE("drawn text can be detected", "[unit][logic_render]") {
   std::cout << "Starting DrawText test..." << std::endl;
   // create a RenderTexture
   size_t width = 200;
@@ -83,8 +83,8 @@ TEST_CASE("drawn text can be detected", "[unit][draw_ui_elements]") {
   sf::Vector2f position = {50.0f, 25.0f};
   uint8_t font_size = 24;
   sf::Color color = sf::Color::White;
-  steamrot::draw_ui_elements::DrawText(render_texture, text, position,
-                                       {50.f, 50.f}, *font, font_size, color);
+  steamrot::logic::render::DrawText(render_texture, text, position,
+                                    {50.f, 50.f}, *font, font_size, color);
   // get the image from the RenderTexture
   sf::Image image = render_texture.getTexture().copyToImage();
   // test that some pixels in the area where the text was drawn are not black
@@ -92,10 +92,10 @@ TEST_CASE("drawn text can be detected", "[unit][draw_ui_elements]") {
                                      sf::Color::White);
 }
 
-TEST_CASE("steamrot::draw_ui_elements::DrawBorderAndBackground draws the hover "
+TEST_CASE("steamrot::logic_render::DrawBorderAndBackground draws the hover "
           "color for a button",
 
-          "[unit][draw_ui_elements]") {
+          "[unit][logic_render]") {
 
   // create a RenderTexture
   size_t width = 100;
@@ -117,8 +117,8 @@ TEST_CASE("steamrot::draw_ui_elements::DrawBorderAndBackground draws the hover "
   // clear the RenderTexture
   render_texture.clear(sf::Color::Black);
   // draw the button on the RenderTexture
-  steamrot::draw_ui_elements::DrawBorderAndBackground(render_texture, button,
-                                                      style.button_style);
+  steamrot::logic::render::DrawBorderAndBackground(render_texture, button,
+                                                   style.button_style);
 
   // get the image from the RenderTexture
   sf::Image image = render_texture.getTexture().copyToImage();
@@ -127,9 +127,9 @@ TEST_CASE("steamrot::draw_ui_elements::DrawBorderAndBackground draws the hover "
   REQUIRE(pixel_color == style.button_style.hover_color);
 }
 
-TEST_CASE("steamrot::draw_ui_elements::DrawUIELement draws a panel on a "
+TEST_CASE("steamrot::logic_render::DrawUIELement draws a panel on a "
           "RenderTexture",
-          "[unit][draw_ui_elements][.visual]") {
+          "[unit][logic_render][.visual]") {
 
   // create a RenderTexture
   size_t width = 100;
@@ -164,10 +164,9 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIELement draws a panel on a "
   steamrot::tests::TestDrawPanel(image, panel, style);
 }
 
-TEST_CASE(
-    "steamrot::draw_ui_elements::DrawUIELement draws a ButtonElement on a "
-    "RenderTexture",
-    "[unit][draw_ui_elements][.visual]") {
+TEST_CASE("steamrot::logic_render::DrawUIELement draws a ButtonElement on a "
+          "RenderTexture",
+          "[unit][logic_render][.visual]") {
 
   // create a RenderTexture
   size_t width = 200;
@@ -202,10 +201,10 @@ TEST_CASE(
   // steamrot::tests::TestDrawButton(image, button, style);
 }
 
-TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws a "
+TEST_CASE("steamrot::logic_render::DrawUIElement draws a "
           "DropdownContainerElement "
           "on a RenderTexture",
-          "[unit][draw_ui_elements][.visual]") {
+          "[unit][logic_render][.visual]") {
 
   // create a RenderTexture
   size_t width = 200;
@@ -238,10 +237,10 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws a "
   // inspection
   steamrot::tests::DisplayRenderTexture(render_texture);
 }
-TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an unexpanded "
+TEST_CASE("steamrot::logic_render::DrawUIElement draws an unexpanded "
           "DropDownListElement "
           "on a RenderTexture",
-          "[unit][draw_ui_elements][.visual]") {
+          "[unit][logic_render][.visual]") {
   // create a RenderTexture
   size_t width = 200;
   size_t height = 200;
@@ -268,10 +267,10 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an unexpanded "
   // display the button for visual inspection
   steamrot::tests::DisplayRenderTexture(render_texture);
 }
-TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an expanded "
+TEST_CASE("steamrot::logic_render::DrawUIElement draws an expanded "
           "DropDownListElement "
           "on a RenderTexture",
-          "[unit][draw_ui_elements][.visual]") {
+          "[unit][logic_render][.visual]") {
   // create a RenderTexture
   size_t width = 200;
   size_t height = 200;
@@ -298,9 +297,9 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an expanded "
   // display the button for visual inspection
   steamrot::tests::DisplayRenderTexture(render_texture);
 }
-TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an unexpanded "
+TEST_CASE("steamrot::logic_render::DrawUIElement draws an unexpanded "
           "DropDownButtonElement on a RenderTexture",
-          "[unit][draw_ui_elements][.visual]") {
+          "[unit][logic_render][.visual]") {
   // create a RenderTexture
   size_t width = 200;
   size_t height = 200;
@@ -327,10 +326,10 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an unexpanded "
   steamrot::tests::DisplayRenderTexture(render_texture);
 }
 
-TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an expanded "
+TEST_CASE("steamrot::logic_render::DrawUIElement draws an expanded "
           "DropdownButtonElement "
           "on a RenderTexture",
-          "[unit][draw_ui_elements][.visual]") {
+          "[unit][logic_render][.visual]") {
   // create a RenderTexture
   size_t width = 200;
   size_t height = 200;
@@ -358,9 +357,9 @@ TEST_CASE("steamrot::draw_ui_elements::DrawUIElement draws an expanded "
   steamrot::tests::DisplayRenderTexture(render_texture);
 }
 
-TEST_CASE("steamrot::draw_ui_elements::DrawNestedUIElements draws a unexpanded "
+TEST_CASE("steamrot::logic_render::DrawNestedUIElements draws a unexpanded "
           "drop down setup",
-          "[unit][draw_ui_elements][.visual]") {
+          "[unit][logic_render][.visual]") {
   // create a RenderTexture
   size_t width = 200;
   size_t height = 200;
@@ -402,15 +401,15 @@ TEST_CASE("steamrot::draw_ui_elements::DrawNestedUIElements draws a unexpanded "
   // clear the RenderTexture
   render_texture.clear(sf::Color::Black);
   // draw the DropDownContainerElement and its children on the RenderTexture
-  steamrot::draw_ui_elements::DrawNestedUIElements(render_texture, dd_container,
-                                                   style);
+  steamrot::logic::render::DrawNestedUIElements(render_texture, dd_container,
+                                                style);
   // display the button for visual inspection
   steamrot::tests::DisplayRenderTexture(render_texture);
 }
 
-TEST_CASE("steamrot::draw_ui_elements::DrawNestedUIElements draws an expanded "
+TEST_CASE("steamrot::logic_render::DrawNestedUIElements draws an expanded "
           "drop down setup",
-          "[unit][draw_ui_elements][.visual]") {
+          "[unit][logic_render][.visual]") {
   // create a RenderTexture
   size_t width = 200;
   size_t height = 200;

@@ -102,22 +102,30 @@ TestEngine::GetDataBank() const {
 }
 
 /////////////////////////////////////////////////
-void TestEngine::ExecuteSceneLevelLogic() {
-
-  // cycle through scenes from SceneManager
+void TestEngine::TickSceneLogic() {
+  // Cycle through scenes from SceneManager
   for (auto &scene_pair : m_scene_manager.GetScenes()) {
 
-    // get scene
+    // Get scene
     Scene &scene = *scene_pair.second;
-    // create SceneContext object, this only needs to live as long as the sim
+    // Create SceneContext object, this only needs to live as long as the sim
     // runner
     SceneContext scene_context = scene.GetSceneContext();
-    // execute simulation using simulation runner
-    auto sim_result = ExecuteSimulation(m_simulation_data, scene_context);
-    if (!sim_result.has_value()) {
-      // log error
-      std::cerr << "Simulation execution failed: " << sim_result.error().message
-                << std::endl;
+
+    // If simulation data is available, use it; otherwise fall back to normal
+    // scene updates
+    if (m_simulation_data) {
+      // Execute simulation using simulation runner
+      auto sim_result = ExecuteSimulation(m_simulation_data, scene_context);
+      if (!sim_result.has_value()) {
+        // Log error
+        std::cerr << "Simulation execution failed: "
+                  << sim_result.error().message << std::endl;
+      }
+    } else {
+      // Fall back to normal scene updates for simple tests
+      m_scene_manager.UpdateScenes();
+      break; // UpdateScenes handles all scenes, so we can break
     }
   }
 }

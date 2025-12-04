@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "draw_ui_elements.h"
+#include "logic_render.h"
 #include "DropDownContainerElement.h"
 #include "user_interface_generated.h"
 #include <SFML/Graphics/Rect.hpp>
@@ -17,7 +17,8 @@
 #include <cstdint>
 
 namespace steamrot {
-namespace draw_ui_elements {
+namespace logic {
+namespace render {
 /////////////////////////////////////////////////
 void DrawNestedUIElements(sf::RenderTexture &texture, const UIElement &element,
                           const UIStyle &style) {
@@ -236,5 +237,6 @@ void UpdateSizeAndPositionOfChildElements(const UIElement &element,
   }
   }
 }
-} // namespace draw_ui_elements
+} // namespace render
+} // namespace logic
 } // namespace steamrot

@@ -12,7 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "UIElement.h"
-#include "draw_ui_elements.h"
+#include "logic_render.h"
 #include <string>
 
 namespace steamrot {
@@ -51,7 +51,7 @@ struct ButtonElement : public UIElement {
                      const UIStyle &style) const override {
 
     // Draw the border and background
-    draw_ui_elements::DrawBorderAndBackground(texture, *this,
+    logic::render::DrawBorderAndBackground(texture, *this,
                                               style.button_style);
 
     // Draw the button text
@@ -61,7 +61,7 @@ struct ButtonElement : public UIElement {
         position.y + style.button_style.border_thickness +
             style.button_style.inner_margin.y};
 
-    draw_ui_elements::DrawText(
+    logic::render::DrawText(
         texture, label, text_position, size, style.button_style.font,
         style.button_style.font_size, style.button_style.text_color);
   }

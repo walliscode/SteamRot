@@ -12,7 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "UIElement.h"
-#include "draw_ui_elements.h"
+#include "logic_render.h"
 
 namespace steamrot {
 struct DropDownButtonElement : public UIElement {
@@ -42,7 +42,7 @@ struct DropDownButtonElement : public UIElement {
   void DrawUIElement(sf::RenderTexture &texture,
                      const UIStyle &style) const override {
 
-    draw_ui_elements::DrawBorderAndBackground(texture, *this,
+    logic::render::DrawBorderAndBackground(texture, *this,
                                               style.drop_down_button_style);
 
     // calculate the radius of the triangle using the size, border thickness,

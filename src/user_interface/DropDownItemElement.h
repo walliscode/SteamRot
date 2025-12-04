@@ -12,7 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "UIElement.h"
-#include "draw_ui_elements.h"
+#include "logic_render.h"
 
 namespace steamrot {
 
@@ -48,7 +48,7 @@ struct DropDownItemElement : public UIElement {
 /////////////////////////////////////////////////
   void DrawUIElement(sf::RenderTexture &texture,
                      const UIStyle &style) const override {
-    draw_ui_elements::DrawBorderAndBackground(texture, *this,
+    logic::render::DrawBorderAndBackground(texture, *this,
                                               style.drop_down_item_style);
   }
 };

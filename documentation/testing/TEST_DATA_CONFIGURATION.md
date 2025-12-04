@@ -303,16 +303,16 @@ For entity memory pool comparison tests, use the `RunEMPComparisonTest` wrapper 
 #include "TestDataLoader.h"
 #include "entity_test_helpers.h"
 #include "FlatbuffersConfigurator.h"
-#include "TestContext.h"
+#include "TestFixture.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Run EMP comparison from test data", "[unit][entity][data-driven]") {
-  steamrot::PathProvider path_provider(steamrot::EnvironmentType::Test);
-  steamrot::tests::TestContext test_context;
+  steamrot::tests::TestFixture fixture;
+  fixture.Initialize();
   
   // Create configurator
   steamrot::FlatbuffersConfigurator configurator{
-      test_context.GetGameContext().event_handler};
+      fixture.GetGameContext().event_handler};
   
   // Load test data
   steamrot::tests::TestDataLoader loader;

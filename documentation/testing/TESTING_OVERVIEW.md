@@ -23,7 +23,7 @@ This document provides a comprehensive overview of testing in SteamRot, includin
    - Verify correct LogicType assignment
 
 3. **System Tests**: Test Logic with full game context
-   - Use TestContext for realistic scenarios
+   - Use TestFixture with appropriate SceneType for realistic scenarios
    - Test interaction with other Logic classes
    - Test component state changes
 
@@ -135,7 +135,7 @@ tests/
 ├── perf/                    # Performance tests (future)
 │   └── benchmarks/
 ├── data/                    # Test data files
-└── context/                 # Test utilities (TestContext, helpers)
+└── context/                 # Test utilities (TestFixture, helpers)
 ```
 
 **Note**: All unit tests have been migrated to the `unit/` directory and organized by subsystem. Integration tests are in `integration/` directory. System tests and performance tests directories are ready for future use.

@@ -20,7 +20,7 @@ target_link_libraries(test_scenes
   SFML::Graphics
   scenes
   logic
-  systems
+  engine
   entity
   entity_helpers
   asset_test_helpers

@@ -9,7 +9,7 @@
 #include "FlatbuffersDataLoader.h"
 #include "SceneFactory.h"
 #include "TestFixture.h"
-#include "draw_ui_elements_test_helpers.h"
+
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("CraftingScene's call to sRender is correct",
@@ -51,5 +51,4 @@ TEST_CASE("CraftingScene's call to sRender is correct",
   // call sRender
   REQUIRE_NOTHROW(crafting_scene->sRender());
   // evaluate render texture visually
-  steamrot::tests::DisplayRenderTexture(crafting_scene->GetRenderTexture());
 }

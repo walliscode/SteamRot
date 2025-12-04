@@ -135,10 +135,15 @@ private:
   /////////////////////////////////////////////////
   std::unordered_map<size_t, std::vector<SceneData>> m_data_bank;
 
+
+
   /////////////////////////////////////////////////
-  /// @brief Currently, this will be left blank for the TestEngine
+  /// @brief No rendering for TestEngine (new Tick_() pipeline method)
+  ///
+  /// TestEngine doesn't render to display, but scenes still render
+  /// to their texture for validation.
   /////////////////////////////////////////////////
-  void ExecuteDisplayManagerTick() override {};
+  void TickRendering() override {};
 
   /////////////////////////////////////////////////
   /// @brief For the TestEngine this will execute 1 tick then export data before
@@ -151,10 +156,15 @@ private:
   /////////////////////////////////////////////////
   void AddToDataBank(size_t tick);
 
+
+
   /////////////////////////////////////////////////
-  /// @brief uses simulation data to put data through functions
+  /// @brief Process scene-specific logic (new Tick_() pipeline method)
+  ///
+  /// For TestEngine, uses simulation data if available, otherwise
+  /// falls back to normal scene updates.
   /////////////////////////////////////////////////
-  void ExecuteSceneLevelLogic() override;
+  void TickSceneLogic() override;
 
   /////////////////////////////////////////////////
   /// @brief Currently no need to run Engine level subscription logic

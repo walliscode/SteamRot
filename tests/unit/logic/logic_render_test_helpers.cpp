@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Implementation of helper functions for testing draw_ui_elements
+/// @brief Implementation of helper functions for testing logic_render
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "draw_ui_elements_test_helpers.h"
+#include "logic_render_test_helpers.h"
 
 #include "catch2/catch_test_macros.hpp"
 #include <SFML/Graphics/Image.hpp>

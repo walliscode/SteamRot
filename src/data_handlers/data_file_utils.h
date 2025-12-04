@@ -1,0 +1,53 @@
+////////////////////////////////////////////////////////////
+/// @file
+/// @brief Declaration of data file utility free functions
+////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////
+/// Preprocessor Directives
+////////////////////////////////////////////////////////////
+#pragma once
+
+////////////////////////////////////////////////////////////
+/// Headers
+////////////////////////////////////////////////////////////
+#include "FailInfo.h"
+#include <expected>
+#include <filesystem>
+#include <vector>
+
+namespace steamrot {
+namespace data {
+namespace file {
+
+////////////////////////////////////////////////////////////
+/// @brief Check if a file exists at the given path
+///
+/// @param file_path Path to check for file existence
+/// @return true if file exists and is a regular file, false otherwise
+////////////////////////////////////////////////////////////
+bool FileExists(const std::filesystem::path &file_path);
+
+////////////////////////////////////////////////////////////
+/// @brief Load binary data from file
+///
+/// Reads entire file contents into a byte vector.
+///
+/// @param file_path Path to binary file to load
+/// @return Expected containing vector of bytes or FailInfo on error
+////////////////////////////////////////////////////////////
+std::expected<std::vector<char>, FailInfo>
+LoadBinaryFile(const std::filesystem::path &file_path);
+
+////////////////////////////////////////////////////////////
+/// @brief Get size of file in bytes
+///
+/// @param file_path Path to file
+/// @return Expected containing file size in bytes or FailInfo on error
+////////////////////////////////////////////////////////////
+std::expected<size_t, FailInfo>
+GetFileSize(const std::filesystem::path &file_path);
+
+} // namespace file
+} // namespace data
+} // namespace steamrot

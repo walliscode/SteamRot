@@ -9,6 +9,7 @@ add_library(logic
   logic_collision.cpp
   logic_action.cpp
   logic_ui.cpp
+  logic_render.cpp
 )
 
 target_include_directories(logic
@@ -21,7 +22,7 @@ target_link_libraries(logic PUBLIC
   entity
   flatbuffers
   flatbuffers_headers
-  systems
+  engine
   ui_styles
   user_interface
 )

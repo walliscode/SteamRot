@@ -8,6 +8,6 @@ target_include_directories(core
 
 target_link_libraries(core PUBLIC
   SFML::Graphics
-  systems
+  engine
   flatbuffers_headers
 )

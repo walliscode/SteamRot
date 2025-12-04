@@ -66,7 +66,7 @@ These files are **examples only** and are not compiled as part of the project. T
 - Access game systems via `m_logic_context` members
 
 ### Testing Patterns
-- Use `TestContext` for mock dependencies
+- Use `TestFixture` for mock dependencies
 - Test construction, execution, edge cases, and integration
 - Use `CAPTURE()` for debugging
 - Verify state changes with `REQUIRE()`
