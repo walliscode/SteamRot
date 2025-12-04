@@ -156,34 +156,33 @@ Create or update test file in `tests/logic/`:
 /// Headers
 /////////////////////////////////////////////////
 #include "NewLogic.h"
-#include "TestContext.h"
+#include "TestFixture.h"
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("NewLogic::NewLogic Constructor", "[NewLogic]") {
-  // Arrange - Create test context
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestContext test_context;
+TEST_CASE("NewLogic::NewLogic Constructor", "[unit][NewLogic]") {
+  // Arrange - Create test fixture
+  steamrot::tests::TestFixture fixture;
+  fixture.Initialize();
   
   // Act & Assert - Instantiate NewLogic
-  steamrot::NewLogic new_logic(
-      test_context.GetLogicContextForTestScene());
+  steamrot::NewLogic new_logic(fixture.GetSceneContext());
   SUCCEED("NewLogic instantiated successfully");
 }
 
-TEST_CASE("NewLogic::ProcessLogic performs expected logic", "[NewLogic]") {
+TEST_CASE("NewLogic::ProcessLogic performs expected logic", "[unit][NewLogic]") {
   // Arrange
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestContext test_context;
+  steamrot::tests::TestFixture fixture;
+  fixture.Initialize();
   
   // Get context references
-  auto &game_context = test_context.GetGameContext();
-  auto logic_context = test_context.GetLogicContextForTestScene();
+  auto &scene_context = fixture.GetSceneContext();
+  auto &game_context = fixture.GetGameContext();
   
   // Set up test data (entities, components, etc.)
   // ...
   
   // Create Logic instance
-  steamrot::NewLogic new_logic(logic_context);
+  steamrot::NewLogic new_logic(scene_context);
   
   // Act - Run the logic
   new_logic.RunLogic();
@@ -209,7 +208,7 @@ add_executable(test_logic
 - Test logic execution with valid data
 - Test edge cases (empty archetypes, null components, etc.)
 - Test interaction with other systems (events, rendering, etc.)
-- Use `TestContext` to provide mock dependencies
+- Use `TestFixture` to provide mock dependencies
 - Use `CAPTURE()` macro to debug test failures
 
 #### Step 4: Update LogicFactory Tests (TDD)
@@ -218,15 +217,15 @@ Update `tests/logic/LogicFactory.test.cpp` to expect the new Logic class:
 
 ```cpp
 TEST_CASE("LogicFactory creates correct Logic instances for YourScene",
-          "[LogicFactory]") {
+          "[unit][LogicFactory]") {
 
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
-  steamrot::tests::TestContext test_context{
-      steamrot::SceneType::SceneType_YOUR_SCENE};
+  steamrot::tests::TestFixture fixture(
+      steamrot::SceneType::SceneType_YOUR_SCENE);
+  fixture.Initialize();
   
   steamrot::LogicFactory logic_factory(
       steamrot::SceneType::SceneType_YOUR_SCENE,
-      test_context.GetLogicContextForYourScene());
+      fixture.GetSceneContext());
 
   auto logic_map_result = logic_factory.CreateLogicMap();
   if (!logic_map_result.has_value()) {
@@ -323,37 +322,7 @@ void CheckStaticLogicCollections(const steamrot::LogicCollection &collection,
 - Verify correct order of Logic instances
 - Add a case for each SceneType that uses the Logic class
 
-#### Step 7: Add TestContext Support (if new scene)
-
-If adding a new scene type, update `tests/context/TestContext.h` and `.cpp`:
-
-**In TestContext.h:**
-```cpp
-private:
-  std::unique_ptr<LogicContext> logic_context_for_your_scene{nullptr};
-  void ConfigureLogicContextForYourScene();
-
-public:
-  const steamrot::LogicContext &GetLogicContextForYourScene() const;
-```
-
-**In TestContext.cpp:**
-```cpp
-void TestContext::ConfigureLogicContextForYourScene() {
-  logic_context_for_your_scene = std::make_unique<LogicContext>(
-      LogicContext{entity_memory_pool, archetype_manager.GetArchetypes(),
-                   render_texture, game_context_ptr->window,
-                   game_context_ptr->asset_manager,
-                   game_context_ptr->event_handler,
-                   game_context_ptr->mouse_position});
-}
-
-const LogicContext &TestContext::GetLogicContextForYourScene() const {
-  return *logic_context_for_your_scene;
-}
-```
-
-#### Step 8: Build and Test
+#### Step 7: Build and Test
 
 ```bash
 # Configure the project (if not already done)
@@ -443,7 +412,7 @@ splitting it into multiple smaller Logic classes within the same LogicType.
    - Verify correct LogicType assignment
 
 3. **System Tests**: Test Logic with full game context
-   - Use TestContext for realistic scenarios
+   - Use TestFixture with appropriate SceneType for realistic scenarios
    - Test interaction with other Logic classes
    - Test component state changes
 
