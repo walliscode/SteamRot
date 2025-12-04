@@ -92,12 +92,16 @@ protected:
   /// Called by Run() for each iteration of the game loop.
   /// Derived classes implement tick logic specific to their context
   /// (real input/rendering vs simulated input/validation).
+  ///
+  /// @note This method calls ExecuteTick() which uses the new Tick_() pipeline.
   /////////////////////////////////////////////////
   void ExecuteSystemsTick();
 
   /////////////////////////////////////////////////
   /// @brief Execute engine-level logic for the engine, such as updating
   /// subscribers, quitting conditions, etc.
+  ///
+  /// @deprecated Use TickEngineLogic() instead
   /////////////////////////////////////////////////
   void ExecuteEngineLevelLogic();
 
@@ -107,6 +111,7 @@ protected:
   /// For the GameEngine, this will be a compile time constant but for the test
   /// engine we want to be able to configure this.
   ///
+  /// @deprecated Use TickSceneLogic() instead
   /////////////////////////////////////////////////
   virtual void ExecuteSceneLevelLogic() = 0;
 
@@ -115,8 +120,26 @@ protected:
   ///
   /// This may not be relevant, for example in a TestEngine there is no
   /// DisplayManager.
+  ///
+  /// @deprecated Use TickRendering() instead
   /////////////////////////////////////////////////
   virtual void ExecuteDisplayManagerTick() = 0;
+
+  /////////////////////////////////////////////////
+  /// @brief Hook called at the beginning of each tick (before any processing).
+  ///
+  /// Override to add custom logic at tick start (logging, profiling, etc.).
+  /// Base implementation does nothing.
+  /////////////////////////////////////////////////
+  virtual void OnTickBegin() {}
+
+  /////////////////////////////////////////////////
+  /// @brief Hook called at the end of each tick (after all processing).
+  ///
+  /// Override to add custom logic at tick end (data capture, metrics, etc.).
+  /// Base implementation does nothing.
+  /////////////////////////////////////////////////
+  virtual void OnTickEnd() {}
 
   /////////////////////////////////////////////////
   /// @brief Virtual method capturing the game loop structure.
@@ -144,6 +167,67 @@ protected:
   /// @brief Go through all subscriptions, if active call relevant Logic
   /////////////////////////////////////////////////
   virtual std::expected<std::monostate, FailInfo> ProcessSubscriptions() = 0;
+
+public:
+  /////////////////////////////////////////////////
+  /// @brief Process SFML events and update event bus.
+  ///
+  /// This method handles window events, keyboard/mouse input, and updates
+  /// the event bus with new events. Can be called individually for testing
+  /// event processing in isolation.
+  /////////////////////////////////////////////////
+  virtual void TickEvents();
+
+  /////////////////////////////////////////////////
+  /// @brief Process engine-level subscriptions and logic.
+  ///
+  /// This method updates engine-level subscribers (e.g., quit game handler).
+  /// Can be called individually for testing engine logic in isolation.
+  /////////////////////////////////////////////////
+  virtual void TickEngineLogic();
+
+  /////////////////////////////////////////////////
+  /// @brief Process scene manager subscriptions and logic.
+  ///
+  /// This method updates scene manager level logic such as scene change
+  /// subscriptions. Can be called individually for testing scene manager
+  /// logic in isolation.
+  /////////////////////////////////////////////////
+  virtual void TickSceneManager();
+
+  /////////////////////////////////////////////////
+  /// @brief Process scene-specific logic.
+  ///
+  /// Must be implemented by derived classes to define scene update behavior.
+  /// GameEngine updates all active scenes, TestEngine may use simulation data.
+  /// Can be called individually for testing scene logic in isolation.
+  /////////////////////////////////////////////////
+  virtual void TickSceneLogic() = 0;
+
+  /////////////////////////////////////////////////
+  /// @brief Process rendering logic.
+  ///
+  /// GameEngine renders to the display via DisplayManager.
+  /// TestEngine may skip rendering or render for validation only.
+  /// Can be called individually for testing rendering in isolation.
+  /////////////////////////////////////////////////
+  virtual void TickRendering() = 0;
+
+  /////////////////////////////////////////////////
+  /// @brief Execute a complete tick using the unified tick pipeline.
+  ///
+  /// Calls all tick phases in order:
+  /// 1. OnTickBegin() - Pre-tick hook
+  /// 2. TickEvents() - Event processing
+  /// 3. TickEngineLogic() - Engine subscriptions
+  /// 4. TickSceneManager() - Scene manager subscriptions
+  /// 5. TickSceneLogic() - Scene updates
+  /// 6. TickRendering() - Display rendering
+  /// 7. OnTickEnd() - Post-tick hook
+  ///
+  /// This method can be used for integration testing of the full tick cycle.
+  /////////////////////////////////////////////////
+  void ExecuteTick();
 
 public:
   /////////////////////////////////////////////////

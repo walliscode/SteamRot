@@ -68,28 +68,45 @@ void Engine::RunGame() {
 /////////////////////////////////////////////////
 void Engine::ExecuteSystemsTick() {
 
-  // let EventHandler process sfml events and update bus and subscribers
+  // Use the new unified tick pipeline
+  ExecuteTick();
+}
+
+/////////////////////////////////////////////////
+void Engine::ExecuteTick() {
+  OnTickBegin();
+  TickEvents();
+  TickEngineLogic();
+  TickSceneManager();
+  TickSceneLogic();
+  TickRendering();
+  OnTickEnd();
+}
+
+/////////////////////////////////////////////////
+void Engine::TickEvents() {
+  // Let EventHandler process SFML events and update bus and subscribers
   m_game_context.event_handler.ExecuteEventHandlerLevelLogic(
       m_game_core.game_window);
+}
 
-  // Update Engine level logic
-  ExecuteEngineLevelLogic();
+/////////////////////////////////////////////////
+void Engine::TickEngineLogic() {
+  // Check all subscriptions for activation and process
+  auto process_subs_result = ProcessSubscriptions();
+}
 
-  // Update SceneManager level logic, such as any subscriptions it owns. It
-  // does not update scenes.
+/////////////////////////////////////////////////
+void Engine::TickSceneManager() {
+  // Update SceneManager level logic, such as any subscriptions it owns.
+  // It does not update scenes (that's done in TickSceneLogic).
   m_scene_manager.ExecuteSceneManagerLevelLogic();
-
-  // Update Scene Level Logic, this is configurable per engine type
-  ExecuteSceneLevelLogic();
-
-  // Update DisplayManager level logic, this is configurable per engine type
-  ExecuteDisplayManagerTick();
 }
 
 /////////////////////////////////////////////////
 void Engine::ExecuteEngineLevelLogic() {
-  // Check all subscriptions for activation and process
-  auto process_subs_result = ProcessSubscriptions();
+  // Deprecated: Use TickEngineLogic() instead
+  TickEngineLogic();
 }
 
 /////////////////////////////////////////////////

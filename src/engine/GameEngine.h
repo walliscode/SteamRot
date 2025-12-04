@@ -72,13 +72,31 @@ private:
   ///
   /// For the GameEngine, we want this logic to be fixed in the code and not
   /// configurable unlike the TestEngine.
+  ///
+  /// @deprecated Use TickSceneLogic() instead
   /////////////////////////////////////////////////
   void ExecuteSceneLevelLogic() override;
 
   /////////////////////////////////////////////////
   /// @brief Call DisplayManager tick execution
+  ///
+  /// @deprecated Use TickRendering() instead
   /////////////////////////////////////////////////
   void ExecuteDisplayManagerTick() override;
+
+  /////////////////////////////////////////////////
+  /// @brief Process scene-specific logic (new Tick_() pipeline method)
+  ///
+  /// For GameEngine, updates all active scenes via SceneManager.
+  /////////////////////////////////////////////////
+  void TickSceneLogic() override;
+
+  /////////////////////////////////////////////////
+  /// @brief Process rendering logic (new Tick_() pipeline method)
+  ///
+  /// For GameEngine, renders to display via DisplayManager.
+  /////////////////////////////////////////////////
+  void TickRendering() override;
 
   /////////////////////////////////////////////////
   /// @brief For the GameEngine, run the typical SFML game loop

@@ -87,14 +87,25 @@ GameEngine::ConfigureEngineStateFromData() {
 
 /////////////////////////////////////////////////
 void GameEngine::ExecuteSceneLevelLogic() {
+  // Deprecated: Use TickSceneLogic() instead
+  TickSceneLogic();
+}
 
-  // update all scenes via SceneManager
+/////////////////////////////////////////////////
+void GameEngine::TickSceneLogic() {
+  // Update all scenes via SceneManager
   m_scene_manager.UpdateScenes();
 }
 
 /////////////////////////////////////////////////
 void GameEngine::ExecuteDisplayManagerTick() {
-  // let DisplayManager handle rendering
+  // Deprecated: Use TickRendering() instead
+  TickRendering();
+}
+
+/////////////////////////////////////////////////
+void GameEngine::TickRendering() {
+  // Let DisplayManager handle rendering
   auto call_render_cycle_result = m_display_manager.CallRenderCycle();
 }
 

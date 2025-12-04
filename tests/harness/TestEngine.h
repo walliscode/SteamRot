@@ -137,8 +137,18 @@ private:
 
   /////////////////////////////////////////////////
   /// @brief Currently, this will be left blank for the TestEngine
+  ///
+  /// @deprecated Use TickRendering() instead
   /////////////////////////////////////////////////
   void ExecuteDisplayManagerTick() override {};
+
+  /////////////////////////////////////////////////
+  /// @brief No rendering for TestEngine (new Tick_() pipeline method)
+  ///
+  /// TestEngine doesn't render to display, but scenes still render
+  /// to their texture for validation.
+  /////////////////////////////////////////////////
+  void TickRendering() override {};
 
   /////////////////////////////////////////////////
   /// @brief For the TestEngine this will execute 1 tick then export data before
@@ -153,8 +163,18 @@ private:
 
   /////////////////////////////////////////////////
   /// @brief uses simulation data to put data through functions
+  ///
+  /// @deprecated Use TickSceneLogic() instead
   /////////////////////////////////////////////////
   void ExecuteSceneLevelLogic() override;
+
+  /////////////////////////////////////////////////
+  /// @brief Process scene-specific logic (new Tick_() pipeline method)
+  ///
+  /// For TestEngine, uses simulation data if available, otherwise
+  /// falls back to normal scene updates.
+  /////////////////////////////////////////////////
+  void TickSceneLogic() override;
 
   /////////////////////////////////////////////////
   /// @brief Currently no need to run Engine level subscription logic
