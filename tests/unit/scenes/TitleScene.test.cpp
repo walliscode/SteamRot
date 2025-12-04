@@ -9,7 +9,6 @@
 #include "FlatbuffersDataLoader.h"
 #include "SceneFactory.h"
 #include "TestFixture.h"
-#include "draw_ui_elements_test_helpers.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("TitleScene's call of sRender is correct",
@@ -56,7 +55,4 @@ TEST_CASE("TitleScene's call of sRender is correct",
   // call sRender
 
   REQUIRE_NOTHROW(title_scene->sRender());
-
-  // evaluate render texture visually
-  steamrot::tests::DisplayRenderTexture(title_scene->GetRenderTexture());
 }

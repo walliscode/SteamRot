@@ -83,8 +83,8 @@ TEST_CASE("drawn text can be detected", "[unit][logic_render]") {
   sf::Vector2f position = {50.0f, 25.0f};
   uint8_t font_size = 24;
   sf::Color color = sf::Color::White;
-  steamrot::logic_render::DrawText(render_texture, text, position,
-                                       {50.f, 50.f}, *font, font_size, color);
+  steamrot::logic::render::DrawText(render_texture, text, position,
+                                    {50.f, 50.f}, *font, font_size, color);
   // get the image from the RenderTexture
   sf::Image image = render_texture.getTexture().copyToImage();
   // test that some pixels in the area where the text was drawn are not black
@@ -117,8 +117,8 @@ TEST_CASE("steamrot::logic_render::DrawBorderAndBackground draws the hover "
   // clear the RenderTexture
   render_texture.clear(sf::Color::Black);
   // draw the button on the RenderTexture
-  steamrot::logic_render::DrawBorderAndBackground(render_texture, button,
-                                                      style.button_style);
+  steamrot::logic::render::DrawBorderAndBackground(render_texture, button,
+                                                   style.button_style);
 
   // get the image from the RenderTexture
   sf::Image image = render_texture.getTexture().copyToImage();
@@ -164,10 +164,9 @@ TEST_CASE("steamrot::logic_render::DrawUIELement draws a panel on a "
   steamrot::tests::TestDrawPanel(image, panel, style);
 }
 
-TEST_CASE(
-    "steamrot::logic_render::DrawUIELement draws a ButtonElement on a "
-    "RenderTexture",
-    "[unit][logic_render][.visual]") {
+TEST_CASE("steamrot::logic_render::DrawUIELement draws a ButtonElement on a "
+          "RenderTexture",
+          "[unit][logic_render][.visual]") {
 
   // create a RenderTexture
   size_t width = 200;
@@ -402,8 +401,8 @@ TEST_CASE("steamrot::logic_render::DrawNestedUIElements draws a unexpanded "
   // clear the RenderTexture
   render_texture.clear(sf::Color::Black);
   // draw the DropDownContainerElement and its children on the RenderTexture
-  steamrot::logic_render::DrawNestedUIElements(render_texture, dd_container,
-                                                   style);
+  steamrot::logic::render::DrawNestedUIElements(render_texture, dd_container,
+                                                style);
   // display the button for visual inspection
   steamrot::tests::DisplayRenderTexture(render_texture);
 }
