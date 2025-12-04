@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "SceneFactory.h"
 #include "CraftingScene.h"
+#include "FlatbuffersDataLoader.h"
 #include "TitleScene.h"
 #include "core_configuration.h"
 #include "provider_factory.h"
@@ -101,7 +102,9 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type,
   LogicFactory logic_factory(scene_type, scene_ptr->GetSceneContext());
 
   // get logic collection data from data loader
+  // LogicCollectionData not yet migrated to provider pattern
   // if it fails, pass nullptr to create unconfigured logic instances
+  FlatbuffersDataLoader data_loader;
   auto logic_collection_data_result =
       data_loader.ProvideLogicCollectionData(scene_type);
   const LogicCollectionData *logic_collection_data =
