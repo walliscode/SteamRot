@@ -16,7 +16,7 @@ target_link_libraries(display PUBLIC
     SFML::Graphics
     scenes
     magic_enum
-    systems
+    engine
     stduuid
     logic
 )

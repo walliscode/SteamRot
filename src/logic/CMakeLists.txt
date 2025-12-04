@@ -22,7 +22,7 @@ target_link_libraries(logic PUBLIC
   entity
   flatbuffers
   flatbuffers_headers
-  systems
+  engine
   ui_styles
   user_interface
 )

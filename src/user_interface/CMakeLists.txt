@@ -11,7 +11,7 @@ target_include_directories(user_interface
 target_link_libraries(user_interface
   PUBLIC
   SFML::Graphics
-  systems
+  engine
   flatbuffers
   flatbuffers_headers
   events

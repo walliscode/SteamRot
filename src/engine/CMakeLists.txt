@@ -1,5 +1,5 @@
 
-add_library(systems
+add_library(engine
     Engine.cpp
     GameEngine.cpp
     ActionManager.cpp
@@ -12,7 +12,7 @@ DATA_OUT_DIR
 )
 
 
-target_include_directories(systems
+target_include_directories(engine
   PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_SOURCE_DIR}/include/
@@ -23,7 +23,7 @@ target_include_directories(systems
 
 
 
-target_link_libraries(systems PUBLIC
+target_link_libraries(engine PUBLIC
 SFML::Graphics
 scenes
 display

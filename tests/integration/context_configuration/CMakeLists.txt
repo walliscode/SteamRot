@@ -6,7 +6,7 @@ target_link_libraries(test_context_configuration
 PRIVATE
   Catch2::Catch2WithMain
   data_handlers
-  systems
+  engine
   flatbuffers_headers
 )
 
