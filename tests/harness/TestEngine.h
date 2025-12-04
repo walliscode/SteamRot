@@ -135,12 +135,7 @@ private:
   /////////////////////////////////////////////////
   std::unordered_map<size_t, std::vector<SceneData>> m_data_bank;
 
-  /////////////////////////////////////////////////
-  /// @brief Currently, this will be left blank for the TestEngine
-  ///
-  /// @deprecated Use TickRendering() instead
-  /////////////////////////////////////////////////
-  void ExecuteDisplayManagerTick() override {};
+
 
   /////////////////////////////////////////////////
   /// @brief No rendering for TestEngine (new Tick_() pipeline method)
@@ -161,12 +156,7 @@ private:
   /////////////////////////////////////////////////
   void AddToDataBank(size_t tick);
 
-  /////////////////////////////////////////////////
-  /// @brief uses simulation data to put data through functions
-  ///
-  /// @deprecated Use TickSceneLogic() instead
-  /////////////////////////////////////////////////
-  void ExecuteSceneLevelLogic() override;
+
 
   /////////////////////////////////////////////////
   /// @brief Process scene-specific logic (new Tick_() pipeline method)

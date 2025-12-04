@@ -97,33 +97,7 @@ protected:
   /////////////////////////////////////////////////
   void ExecuteSystemsTick();
 
-  /////////////////////////////////////////////////
-  /// @brief Execute engine-level logic for the engine, such as updating
-  /// subscribers, quitting conditions, etc.
-  ///
-  /// @deprecated Use TickEngineLogic() instead
-  /////////////////////////////////////////////////
-  void ExecuteEngineLevelLogic();
 
-  /////////////////////////////////////////////////
-  /// @brief Execute scene-level logic for the engine.
-  ///
-  /// For the GameEngine, this will be a compile time constant but for the test
-  /// engine we want to be able to configure this.
-  ///
-  /// @deprecated Use TickSceneLogic() instead
-  /////////////////////////////////////////////////
-  virtual void ExecuteSceneLevelLogic() = 0;
-
-  /////////////////////////////////////////////////
-  /// @brief Calls on any DisplayManager tick execution.
-  ///
-  /// This may not be relevant, for example in a TestEngine there is no
-  /// DisplayManager.
-  ///
-  /// @deprecated Use TickRendering() instead
-  /////////////////////////////////////////////////
-  virtual void ExecuteDisplayManagerTick() = 0;
 
   /////////////////////////////////////////////////
   /// @brief Hook called at the beginning of each tick (before any processing).

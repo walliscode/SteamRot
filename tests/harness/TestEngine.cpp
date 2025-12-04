@@ -102,12 +102,6 @@ TestEngine::GetDataBank() const {
 }
 
 /////////////////////////////////////////////////
-void TestEngine::ExecuteSceneLevelLogic() {
-  // Deprecated: Use TickSceneLogic() instead
-  TickSceneLogic();
-}
-
-/////////////////////////////////////////////////
 void TestEngine::TickSceneLogic() {
   // Cycle through scenes from SceneManager
   for (auto &scene_pair : m_scene_manager.GetScenes()) {

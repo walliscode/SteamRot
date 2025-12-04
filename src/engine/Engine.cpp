@@ -103,11 +103,7 @@ void Engine::TickSceneManager() {
   m_scene_manager.ExecuteSceneManagerLevelLogic();
 }
 
-/////////////////////////////////////////////////
-void Engine::ExecuteEngineLevelLogic() {
-  // Deprecated: Use TickEngineLogic() instead
-  TickEngineLogic();
-}
+
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> Engine::ConfigureSubscribersFromData(

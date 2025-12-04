@@ -86,21 +86,9 @@ GameEngine::ConfigureEngineStateFromData() {
 }
 
 /////////////////////////////////////////////////
-void GameEngine::ExecuteSceneLevelLogic() {
-  // Deprecated: Use TickSceneLogic() instead
-  TickSceneLogic();
-}
-
-/////////////////////////////////////////////////
 void GameEngine::TickSceneLogic() {
   // Update all scenes via SceneManager
   m_scene_manager.UpdateScenes();
-}
-
-/////////////////////////////////////////////////
-void GameEngine::ExecuteDisplayManagerTick() {
-  // Deprecated: Use TickRendering() instead
-  TickRendering();
 }
 
 /////////////////////////////////////////////////
