@@ -12,7 +12,6 @@
 /// Headers
 ////////////////////////////////////////////////////////////
 #include "FailInfo.h"
-#include "SceneType.h"
 #include "core_data_generated.h"
 #include "engine_config_generated.h"
 #include "engine_data_generated.h"
