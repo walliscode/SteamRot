@@ -8,6 +8,8 @@ paths.cpp
 add_library(data_handlers
   DataLoader.cpp
   FlatbuffersDataLoader.cpp
+  FlatBuffersGameDataProvider.cpp
+  data_file_utils.cpp
   paths.cpp
 )
 
