@@ -12,7 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "UIElement.h"
-#include "draw_ui_elements.h"
+#include "logic_render.h"
 
 namespace steamrot {
 
@@ -45,7 +45,7 @@ struct DropDownContainerElement : public UIElement {
                      const UIStyle &style) const override {
 
     // Draw the border and background for the container
-    draw_ui_elements::DrawBorderAndBackground(texture, *this,
+    logic::render::DrawBorderAndBackground(texture, *this,
                                               style.drop_down_container_style);
   }
 };

@@ -12,7 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "UIElement.h"
-#include "draw_ui_elements.h"
+#include "logic_render.h"
 
 namespace steamrot {
 struct DropDownListElement : public UIElement {
@@ -61,7 +61,7 @@ struct DropDownListElement : public UIElement {
 /////////////////////////////////////////////////
   void DrawUIElement(sf::RenderTexture &texture,
                      const UIStyle &style) const override {
-    draw_ui_elements::DrawBorderAndBackground(texture, *this,
+    logic::render::DrawBorderAndBackground(texture, *this,
                                               style.drop_down_list_style);
 
     // calculate the position for the text
@@ -74,7 +74,7 @@ struct DropDownListElement : public UIElement {
     // set the label based on whether the dropdown is expanded
     std::string label = is_expanded ? expanded_label : unexpanded_label;
 
-    draw_ui_elements::DrawText(texture, label, text_position, size,
+    logic::render::DrawText(texture, label, text_position, size,
                                style.drop_down_list_style.font,
                                style.drop_down_list_style.font_size,
                                style.drop_down_list_style.text_color);

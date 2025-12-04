@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of draw_ui_elements namespace
+/// @brief Declaration of UI rendering functions
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -22,7 +22,8 @@
 #include <sys/types.h>
 
 namespace steamrot {
-namespace draw_ui_elements {
+namespace logic {
+namespace render {
 
 /////////////////////////////////////////////////
 /// @brief Draw nested UI elements recursively to a render texture
@@ -63,5 +64,6 @@ void DrawText(sf::RenderTexture &texture, const std::string &text,
 void UpdateSizeAndPositionOfChildElements(const UIElement &element,
                                           const UIStyle &style);
 
-} // namespace draw_ui_elements
+} // namespace render
+} // namespace logic
 } // namespace steamrot
