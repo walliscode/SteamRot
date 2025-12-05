@@ -8,8 +8,8 @@
 /////////////////////////////////////////////////
 
 #include "GameEngine.h"
-#include "FlatbuffersDataLoader.h"
 #include "FlatbuffersUserPreferencesProvider.h"
+#include "provider_factory.h"
 
 namespace steamrot {
 
@@ -53,10 +53,10 @@ std::expected<std::monostate, FailInfo> GameEngine::StartUp() {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 GameEngine::ConfigureEngineStateFromData() {
-  // GameEngine loads EngineData from default files
-  FlatbuffersDataLoader data_loader;
+  // GameEngine loads EngineData from default files via provider
+  IGameConfigProvider &config_provider = GetGameConfigProvider();
 
-  auto engine_data_result = data_loader.ProvideEngineData();
+  auto engine_data_result = config_provider.LoadEngineConfig();
   if (!engine_data_result.has_value()) {
     return std::unexpected(engine_data_result.error());
   }

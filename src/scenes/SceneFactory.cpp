@@ -79,9 +79,8 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type,
     return std::unexpected(scene_core_result.error());
   }
 
-  auto configure_core_result =
-      core::ConfigureSceneCore(scene_ptr->m_scene_core,
-                              scene_core_result.value());
+  auto configure_core_result = core::ConfigureSceneCore(
+      scene_ptr->m_scene_core, scene_core_result.value());
   if (!configure_core_result) {
     return std::unexpected(configure_core_result.error());
   }
