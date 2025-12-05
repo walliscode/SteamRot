@@ -17,7 +17,7 @@
 #include "Logic.h"
 #include "LogicFactory.h"
 #include "SceneCore.h"
-#include "SceneData.h"
+#include "SceneInfo.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <unordered_map>
@@ -39,7 +39,7 @@ protected:
   /////////////////////////////////////////////////
   /// @brief Identifying information about the Scene.
   /////////////////////////////////////////////////
-  const SceneData m_scene_info;
+  const SceneInfo m_scene_info;
 
   /////////////////////////////////////////////////
   // Member: Entity Manager instance
@@ -158,7 +158,7 @@ public:
   /////////////////////////////////////////////////
   /// @brief Returns the SceneInfo of the Scene.
   /////////////////////////////////////////////////
-  const SceneData GetSceneInfo() const;
+  const SceneInfo GetSceneInfo() const;
 
   /////////////////////////////////////////////////
   /// @brief Create and return a SceneContext object for the Scene.

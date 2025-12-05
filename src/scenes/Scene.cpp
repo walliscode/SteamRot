@@ -66,8 +66,8 @@ void Scene::SetLogicMap(
   }
 }
 /////////////////////////////////////////////////
-const SceneData Scene::GetSceneInfo() const {
-  SceneData scene_info;
+const SceneInfo Scene::GetSceneInfo() const {
+  SceneInfo scene_info;
 
   scene_info.id = m_scene_info.id;
   scene_info.type = m_scene_info.type;

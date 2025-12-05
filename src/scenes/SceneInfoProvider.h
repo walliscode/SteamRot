@@ -9,7 +9,7 @@
 #pragma once
 
 #include "FailInfo.h"
-#include "SceneData.h"
+#include "SceneInfo.h"
 #include "uuid.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -42,7 +42,7 @@ public:
       FailInfo>
   ProvideTextures(std::vector<uuids::uuid> &scene_ids) const = 0;
 
-  virtual const std::expected<std::vector<SceneData>, FailInfo>
+  virtual const std::expected<std::vector<SceneInfo>, FailInfo>
   ProvideAvailableSceneInfo() const = 0;
 };
 } // namespace steamrot

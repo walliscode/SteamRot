@@ -10,7 +10,7 @@
 #include "EventPacket.h"
 #include "FailInfo.h"
 #include "Scene.h"
-#include "SceneData.h"
+#include "SceneInfo.h"
 #include "SceneFactory.h"
 #include "Subscriber.h"
 #include "SubscriberFactory.h"
@@ -150,9 +150,9 @@ SceneManager::ProvideTextures(std::vector<uuids::uuid> &scene_ids) const {
 }
 
 /////////////////////////////////////////////////
-const std::expected<std::vector<SceneData>, FailInfo>
+const std::expected<std::vector<SceneInfo>, FailInfo>
 SceneManager::ProvideAvailableSceneInfo() const {
-  std::vector<SceneData> scene_info_list;
+  std::vector<SceneInfo> scene_info_list;
   for (const auto &pair : m_scenes) {
     scene_info_list.push_back(pair.second->GetSceneInfo());
   }
