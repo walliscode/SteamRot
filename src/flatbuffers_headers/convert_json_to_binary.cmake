@@ -1,7 +1,7 @@
 # Set data directory types (root dirs)
 set(DIRECTORY_ROOTS
-    ${CMAKE_SOURCE_DIR}/data
-    ${CMAKE_SOURCE_DIR}/tests/data
+    ${CMAKE_SOURCE_DIR}/data/defaults
+    ${CMAKE_SOURCE_DIR}/tests/data/defaults
 )
 
 # Clear the global binary list at configure time
