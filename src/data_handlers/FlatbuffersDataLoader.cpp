@@ -167,7 +167,7 @@ FlatbuffersDataLoader::ProvideSceneManagerData() const {
 
   // construct the file path
   std::filesystem::path scene_manager_path =
-      scene_manager_dir / "scene_manager.bin";
+      scene_manager_dir / "default.scene_manager_data.bin";
   // check if the file exists
   if (!std::filesystem::exists(scene_manager_path)) {
     std::string error_message = std::format("Scene Manager file not found: {}",
