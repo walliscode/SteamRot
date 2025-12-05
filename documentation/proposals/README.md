@@ -4,6 +4,44 @@ This directory contains design proposals for new features or significant changes
 
 ## Active Proposals
 
+### [Entity View Pattern Implementation](ENTITY_VIEW_PATTERN_IMPLEMENTATION.md)
+
+**Status**: Proposal - Planning Phase  
+**Date**: 2025-12-05  
+**Type**: Architecture Enhancement  
+**Priority**: MEDIUM
+
+**Summary**: Completes the data loading provider pattern migration by implementing a view/iterator pattern for entity/component configuration. Eliminates the remaining FlatBuffers coupling in `FlatbuffersConfigurator` by introducing format-independent view interfaces for navigating nested entity data.
+
+**Key Points**:
+1. Zero-copy navigation of nested entity/component data
+2. Format-independent interfaces (`IEntityCollectionView`, `IEntityView`, `IComponentView`)
+3. Complete decoupling from FlatBuffers (final piece of provider pattern)
+4. Mock providers for testing without file dependencies
+5. Handles complex polymorphic UIElement hierarchies
+
+**Implementation Complexity**: Medium (9 weeks)
+- Phase 1-2: Foundation and UIElement views (4 weeks, Medium Risk)
+- Phase 3-4: Remaining components and new configurator (3 weeks, Medium Risk)
+- Phase 5-6: Migration and mock provider (2 weeks, Low Risk)
+
+**Benefits**:
+- ✅ Completes architectural consistency (6/6 systems using provider pattern)
+- ✅ Superior testing (no file dependencies, easy mocking)
+- ✅ Zero-copy performance for nested data
+- ✅ Format flexibility (ready for JSON/XML/database providers)
+
+**Documents**:
+- [Full Implementation Plan](ENTITY_VIEW_PATTERN_IMPLEMENTATION.md) - Complete design and phasing
+- [Quick Reference](ENTITY_VIEW_PATTERN_QUICK_REF.md) - Patterns and examples
+
+**Related Analysis**:
+- [Current State Analysis](../analysis/CURRENT_STATE_ANALYSIS_2025.md) - Context and motivation
+- [View Pattern Diagrams](../analysis/VIEW_PATTERN_DIAGRAMS_AND_EXAMPLES.md) - Pattern examples
+- [Configuration vs Data Structs](../analysis/CONFIGURATION_VS_DATA_STRUCTS_ANALYSIS.md) - Design rationale
+
+---
+
 ### [Data Loading Interface System](DATA_LOADING_INTERFACE_EXECUTIVE_SUMMARY.md)
 
 **Status**: Proposal  
