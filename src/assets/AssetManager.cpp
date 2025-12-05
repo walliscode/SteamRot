@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "AssetManager.h"
 #include "FailInfo.h"
+#include "FlatbuffersDataLoader.h"
 #include "StylesConfigurator.h"
 #include "paths.h"
 #include "provider_factory.h"
@@ -119,11 +120,14 @@ AssetManager::AddFont(const std::string &font_name) {
 std::expected<std::monostate, FailInfo>
 AssetManager::LoadUIStyles(std::vector<std::string> &style_names) {
 
+  // create FlatbuffersDataLoader for StylesConfigurator
+  FlatbuffersDataLoader data_loader;
+
   // create StylesConfigurator object
   StylesConfigurator styles_configurator;
   // provide map of UIStyles
   auto ui_styles_map_result =
-      styles_configurator.ProvideUIStylesMap(*this, style_names);
+      styles_configurator.ProvideUIStylesMap(*this, data_loader, style_names);
 
   if (!ui_styles_map_result.has_value()) {
     return std::unexpected<FailInfo>(ui_styles_map_result.error());

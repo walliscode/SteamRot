@@ -17,6 +17,9 @@
 #include <vector>
 namespace steamrot {
 
+// Forward declaration
+class FlatbuffersDataLoader;
+
 /////////////////////////////////////////////////
 /// @class StylesConfigurator
 /// @brief Responsible for providing UI styles configured from external data
@@ -41,10 +44,12 @@ public:
   /// @brief Provide a map of all available UIStyles
   ///
   /// @param asset_manager Reference to the AssetManager for font loading
+  /// @param data_loader Reference to FlatbuffersDataLoader for loading style data
   /// @param style_names Vector of style names to load
 /////////////////////////////////////////////////
   std::expected<std::unordered_map<std::string, UIStyle>, FailInfo>
   ProvideUIStylesMap(const AssetManager &asset_manager,
+                     const FlatbuffersDataLoader &data_loader,
                      std::vector<std::string> style_names = {});
 };
 } // namespace steamrot

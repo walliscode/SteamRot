@@ -74,20 +74,26 @@ public:
 
   /////////////////////////////////////////////////
   /// @brief Provide default AssetCollection data
+  /// @deprecated Use IAssetDataProvider::LoadAssetData() instead
   /////////////////////////////////////////////////
+  [[deprecated("Use IAssetDataProvider::LoadAssetData() instead")]]
   std::expected<const AssetCollection *, FailInfo> ProvideAssetData() const;
 
   /////////////////////////////////////////////////
   /// @brief Provides AssetCollection data as a subset of SceneData
   ///
   /// @param scene_type An enum representing the type of scene
+  /// @deprecated Use IAssetDataProvider::LoadSceneAssetData() instead
   /////////////////////////////////////////////////
+  [[deprecated("Use IAssetDataProvider::LoadSceneAssetData() instead")]]
   std::expected<const AssetCollection *, FailInfo>
   ProvideAssetData(const SceneType scene_type) const;
 
   /////////////////////////////////////////////////
   /// @brief Provide a single UIStyleData object
+  /// @deprecated Use StylesConfigurator::ProvideUIStylesMap() instead (which uses this internally)
   /////////////////////////////////////////////////
+  [[deprecated("Use StylesConfigurator::ProvideUIStylesMap() instead")]]
   std::expected<const UIStyleData *, FailInfo>
   ProvideUIStylesData(const std::string &style_name) const;
 
@@ -98,13 +104,17 @@ public:
 
   /////////////////////////////////////////////////
   /// @brief Provides EngineCoreDataFbs from EngineData
+  /// @deprecated Use IEngineDataProvider::LoadEngineCoreData() instead
   /////////////////////////////////////////////////
+  [[deprecated("Use IEngineDataProvider::LoadEngineCoreData() instead")]]
   std::expected<const EngineCoreDataFbs *, FailInfo>
   ProvideEngineCoreData() const;
 
   /////////////////////////////////////////////////
   /// @brief Provides SceneCoreDataFbs from SceneData for a specific scene
+  /// @deprecated Use ISceneDataProvider::LoadSceneCoreData() instead
   /////////////////////////////////////////////////
+  [[deprecated("Use ISceneDataProvider::LoadSceneCoreData() instead")]]
   std::expected<const SceneCoreDataFbs *, FailInfo>
   ProvideSceneCoreData(const SceneType scene_type) const;
 
