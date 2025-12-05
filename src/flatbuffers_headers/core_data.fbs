@@ -2,8 +2,9 @@ namespace steamrot;
 
 ////////////////////////////////////////////////////////////
 // Configuration for Engine core settings
+// Note: Fbs suffix distinguishes FlatBuffers type from native C++ struct
 ////////////////////////////////////////////////////////////
-table EngineCoreData {
+table EngineCoreDataFbs {
   window_width: uint32 = 800;
   window_height: uint32 = 600;
   window_title: string;
@@ -12,8 +13,9 @@ table EngineCoreData {
 
 ////////////////////////////////////////////////////////////
 // Configuration for a scene's core settings
+// Note: Fbs suffix distinguishes FlatBuffers type from native C++ struct
 ////////////////////////////////////////////////////////////
-table SceneCoreData {
+table SceneCoreDataFbs {
   render_texture_width: uint32 = 800;
   render_texture_height: uint32 = 600;
 }

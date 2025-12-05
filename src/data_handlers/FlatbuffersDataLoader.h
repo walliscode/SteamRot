@@ -97,15 +97,15 @@ public:
   std::expected<const ContextData *, FailInfo> ProvideContextData() const;
 
   /////////////////////////////////////////////////
-  /// @brief Provides EngineCoreData from EngineData
+  /// @brief Provides EngineCoreDataFbs from EngineData
   /////////////////////////////////////////////////
-  std::expected<const EngineCoreData *, FailInfo>
+  std::expected<const EngineCoreDataFbs *, FailInfo>
   ProvideEngineCoreData() const;
 
   /////////////////////////////////////////////////
-  /// @brief Provides SceneCoreData from SceneData for a specific scene
+  /// @brief Provides SceneCoreDataFbs from SceneData for a specific scene
   /////////////////////////////////////////////////
-  std::expected<const SceneCoreData *, FailInfo>
+  std::expected<const SceneCoreDataFbs *, FailInfo>
   ProvideSceneCoreData(const SceneType scene_type) const;
 
   /////////////////////////////////////////////////

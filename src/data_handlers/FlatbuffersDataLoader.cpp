@@ -337,7 +337,7 @@ FlatbuffersDataLoader::ProvideContextData() const {
 }
 
 /////////////////////////////////////////////////
-std::expected<const EngineCoreData *, FailInfo>
+std::expected<const EngineCoreDataFbs *, FailInfo>
 FlatbuffersDataLoader::ProvideEngineCoreData() const {
   // Load from EngineData
   auto engine_result = ProvideEngineData();
@@ -348,14 +348,14 @@ FlatbuffersDataLoader::ProvideEngineCoreData() const {
   const EngineData *engine_data = engine_result.value();
   if (!engine_data->engine_core()) {
     return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
-                                    "EngineCoreData not found in EngineData"));
+                                    "EngineCoreDataFbs not found in EngineData"));
   }
 
   return engine_data->engine_core();
 }
 
 /////////////////////////////////////////////////
-std::expected<const SceneCoreData *, FailInfo>
+std::expected<const SceneCoreDataFbs *, FailInfo>
 FlatbuffersDataLoader::ProvideSceneCoreData(const SceneType scene_type) const {
   // Load from SceneData for the specified scene type
   auto scene_data_result = ProvideDefaultSceneData(scene_type);

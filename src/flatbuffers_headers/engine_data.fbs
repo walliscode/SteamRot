@@ -10,7 +10,7 @@ table EngineData {
   scene_manager_data: SceneManagerData;
   global_event_bus_data: EventBusData;
   waiting_room_event_bus_data: EventBusData;
-  engine_core: EngineCoreData;
+  engine_core: EngineCoreDataFbs;
 }
 
 root_type EngineData;

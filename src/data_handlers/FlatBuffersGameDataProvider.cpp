@@ -45,13 +45,13 @@ FlatBuffersGameDataProvider::LoadUIStyle(const std::string &style_name) const {
 }
 
 ////////////////////////////////////////////////////////////
-std::expected<const EngineCoreData *, FailInfo>
+std::expected<const EngineCoreDataFbs *, FailInfo>
 FlatBuffersGameDataProvider::LoadEngineCoreData() const {
   return m_loader.ProvideEngineCoreData();
 }
 
 ////////////////////////////////////////////////////////////
-std::expected<const SceneCoreData *, FailInfo>
+std::expected<const SceneCoreDataFbs *, FailInfo>
 FlatBuffersGameDataProvider::LoadSceneCoreData(
     const SceneType scene_type) const {
   return m_loader.ProvideSceneCoreData(scene_type);
