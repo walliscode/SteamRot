@@ -60,7 +60,7 @@ GameEngine::ConfigureEngineStateFromData() {
   if (!engine_data_result.has_value()) {
     return std::unexpected(engine_data_result.error());
   }
-  const EngineData *engine_data = engine_data_result.value();
+  const EngineDataFbs *engine_data = engine_data_result.value();
 
   // Configure Engine-level subscriptions from EngineData
   // These handle engine-level events like quit game

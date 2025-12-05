@@ -11,6 +11,7 @@
 #include "FlatbuffersDataLoader.h"
 #include "TitleScene.h"
 #include "core_configuration.h"
+#include "provider_factory.h"
 #include "uuid.h"
 #include <memory>
 #include <string>
@@ -68,18 +69,19 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type,
     return std::unexpected(fail_info);
   }
 
-  // Configure SceneCore from FlatBuffers data
+  // Configure SceneCore from provider interface
   // Note: EngineCoreData is already loaded in Engine::StartUp() - we only
   // need scene-specific core data here
-  FlatbuffersDataLoader data_loader;
+  ISceneDataProvider &data_provider = GetSceneDataProvider();
 
-  auto scene_core_result = data_loader.ProvideSceneCoreData(scene_type);
+  auto scene_core_result = data_provider.LoadSceneCoreData(scene_type);
   if (!scene_core_result) {
     return std::unexpected(scene_core_result.error());
   }
 
   auto configure_core_result =
-      core::ConfigureSceneCore(scene_ptr->m_scene_core, scene_core_result.value());
+      core::ConfigureSceneCore(scene_ptr->m_scene_core,
+                              scene_core_result.value());
   if (!configure_core_result) {
     return std::unexpected(configure_core_result.error());
   }
@@ -100,7 +102,9 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type,
   LogicFactory logic_factory(scene_type, scene_ptr->GetSceneContext());
 
   // get logic collection data from data loader
+  // LogicCollectionData not yet migrated to provider pattern
   // if it fails, pass nullptr to create unconfigured logic instances
+  FlatbuffersDataLoader data_loader;
   auto logic_collection_data_result =
       data_loader.ProvideLogicCollectionData(scene_type);
   const LogicCollectionData *logic_collection_data =

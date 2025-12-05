@@ -37,15 +37,18 @@
 ///   └─▶ Load test_data.json → TestDataConfig
 ///   └─▶ TestEngine(config) [stores pointer to injected config]
 ///   └─▶ RunGame()
-///         └─▶ Engine::StartUp() [loads EngineCoreData, UserPreferences, calls ConfigureEngineStateFromData]
+///         └─▶ Engine::StartUp() [loads EngineCoreData, UserPreferences, calls
+///         ConfigureEngineStateFromData]
 ///               └─▶ ConfigureEngineStateFromData() [uses m_test_config]
-///                     └─▶ m_test_config->starting_engine_state()->subscriptions()
-///                     └─▶ m_test_config->starting_engine_state()->scene_manager_data()
+///                     └─▶
+///                     m_test_config->starting_engine_state()->subscriptions()
+///                     └─▶
+///                     m_test_config->starting_engine_state()->scene_manager_data()
 ///         └─▶ RunGameLoop() [executes m_target_ticks iterations]
 /// ```
 ///
-/// @note TestEngine uses injected configuration (TestDataConfig*) for game state
-/// but loads default user preferences from files. This ensures tests have
+/// @note TestEngine uses injected configuration (TestDataConfig*) for game
+/// state but loads default user preferences from files. This ensures tests have
 /// consistent preference settings.
 /////////////////////////////////////////////////
 
@@ -59,6 +62,7 @@
 /////////////////////////////////////////////////
 
 #include "Engine.h"
+#include "SceneInfo.h"
 #include "simulation_generated.h"
 #include "test_data_generated.h"
 #include <expected>
@@ -133,9 +137,7 @@ private:
   /////////////////////////////////////////////////
   /// @brief Stores the tick number and data at that point
   /////////////////////////////////////////////////
-  std::unordered_map<size_t, std::vector<SceneData>> m_data_bank;
-
-
+  std::unordered_map<size_t, std::vector<SceneInfo>> m_data_bank;
 
   /////////////////////////////////////////////////
   /// @brief No rendering for TestEngine (new Tick_() pipeline method)
@@ -155,8 +157,6 @@ private:
   /// @brief Takes a snapshot of the current scenes and adds to the data bank
   /////////////////////////////////////////////////
   void AddToDataBank(size_t tick);
-
-
 
   /////////////////////////////////////////////////
   /// @brief Process scene-specific logic (new Tick_() pipeline method)
@@ -187,6 +187,6 @@ public:
   /////////////////////////////////////////////////
   /// @brief Returns data bank for inspection and testing
   /////////////////////////////////////////////////
-  const std::unordered_map<size_t, std::vector<SceneData>> &GetDataBank() const;
+  const std::unordered_map<size_t, std::vector<SceneInfo>> &GetDataBank() const;
 };
 } // namespace steamrot::tests

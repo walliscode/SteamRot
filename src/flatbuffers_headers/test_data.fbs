@@ -25,7 +25,7 @@ table TickSnapshot {
   /// Valid values: 1, 2, 3, ... (matching game loop tick numbers)
   tick: uint32;
 
-  engine_state: EngineData;
+  engine_state: EngineDataFbs;
  
   /// @brief Optional human-readable description of this checkpoint
   /// Used in failure messages to identify which snapshot failed.
@@ -76,7 +76,7 @@ table TestDataConfig {
   /// @brief Metadata about this test case
   metadata: TestMetadata (required);
  
-  starting_engine_state: EngineData;
+  starting_engine_state: EngineDataFbs;
    
   /// @brief Simulation data for executing logic steps during tests
   simulation_data: SimulationData;

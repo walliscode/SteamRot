@@ -20,11 +20,11 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
-struct EngineData;
-struct EngineDataBuilder;
+struct EngineDataFbs;
+struct EngineDataFbsBuilder;
 
-struct EngineData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef EngineDataBuilder Builder;
+struct EngineDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef EngineDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_SUBSCRIPTIONS = 4,
     VT_SCENE_MANAGER_DATA = 6,
@@ -44,8 +44,8 @@ struct EngineData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::EventBusData *waiting_room_event_bus_data() const {
     return GetPointer<const steamrot::EventBusData *>(VT_WAITING_ROOM_EVENT_BUS_DATA);
   }
-  const steamrot::EngineCoreData *engine_core() const {
-    return GetPointer<const steamrot::EngineCoreData *>(VT_ENGINE_CORE);
+  const steamrot::EngineCoreDataFbs *engine_core() const {
+    return GetPointer<const steamrot::EngineCoreDataFbs *>(VT_ENGINE_CORE);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -64,44 +64,44 @@ struct EngineData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct EngineDataBuilder {
-  typedef EngineData Table;
+struct EngineDataFbsBuilder {
+  typedef EngineDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_subscriptions(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>>> subscriptions) {
-    fbb_.AddOffset(EngineData::VT_SUBSCRIPTIONS, subscriptions);
+    fbb_.AddOffset(EngineDataFbs::VT_SUBSCRIPTIONS, subscriptions);
   }
   void add_scene_manager_data(::flatbuffers::Offset<steamrot::SceneManagerData> scene_manager_data) {
-    fbb_.AddOffset(EngineData::VT_SCENE_MANAGER_DATA, scene_manager_data);
+    fbb_.AddOffset(EngineDataFbs::VT_SCENE_MANAGER_DATA, scene_manager_data);
   }
   void add_global_event_bus_data(::flatbuffers::Offset<steamrot::EventBusData> global_event_bus_data) {
-    fbb_.AddOffset(EngineData::VT_GLOBAL_EVENT_BUS_DATA, global_event_bus_data);
+    fbb_.AddOffset(EngineDataFbs::VT_GLOBAL_EVENT_BUS_DATA, global_event_bus_data);
   }
   void add_waiting_room_event_bus_data(::flatbuffers::Offset<steamrot::EventBusData> waiting_room_event_bus_data) {
-    fbb_.AddOffset(EngineData::VT_WAITING_ROOM_EVENT_BUS_DATA, waiting_room_event_bus_data);
+    fbb_.AddOffset(EngineDataFbs::VT_WAITING_ROOM_EVENT_BUS_DATA, waiting_room_event_bus_data);
   }
-  void add_engine_core(::flatbuffers::Offset<steamrot::EngineCoreData> engine_core) {
-    fbb_.AddOffset(EngineData::VT_ENGINE_CORE, engine_core);
+  void add_engine_core(::flatbuffers::Offset<steamrot::EngineCoreDataFbs> engine_core) {
+    fbb_.AddOffset(EngineDataFbs::VT_ENGINE_CORE, engine_core);
   }
-  explicit EngineDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit EngineDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<EngineData> Finish() {
+  ::flatbuffers::Offset<EngineDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<EngineData>(end);
+    auto o = ::flatbuffers::Offset<EngineDataFbs>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<EngineData> CreateEngineData(
+inline ::flatbuffers::Offset<EngineDataFbs> CreateEngineDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>>> subscriptions = 0,
     ::flatbuffers::Offset<steamrot::SceneManagerData> scene_manager_data = 0,
     ::flatbuffers::Offset<steamrot::EventBusData> global_event_bus_data = 0,
     ::flatbuffers::Offset<steamrot::EventBusData> waiting_room_event_bus_data = 0,
-    ::flatbuffers::Offset<steamrot::EngineCoreData> engine_core = 0) {
-  EngineDataBuilder builder_(_fbb);
+    ::flatbuffers::Offset<steamrot::EngineCoreDataFbs> engine_core = 0) {
+  EngineDataFbsBuilder builder_(_fbb);
   builder_.add_engine_core(engine_core);
   builder_.add_waiting_room_event_bus_data(waiting_room_event_bus_data);
   builder_.add_global_event_bus_data(global_event_bus_data);
@@ -110,15 +110,15 @@ inline ::flatbuffers::Offset<EngineData> CreateEngineData(
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<EngineData> CreateEngineDataDirect(
+inline ::flatbuffers::Offset<EngineDataFbs> CreateEngineDataFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<::flatbuffers::Offset<steamrot::SubscriberData>> *subscriptions = nullptr,
     ::flatbuffers::Offset<steamrot::SceneManagerData> scene_manager_data = 0,
     ::flatbuffers::Offset<steamrot::EventBusData> global_event_bus_data = 0,
     ::flatbuffers::Offset<steamrot::EventBusData> waiting_room_event_bus_data = 0,
-    ::flatbuffers::Offset<steamrot::EngineCoreData> engine_core = 0) {
+    ::flatbuffers::Offset<steamrot::EngineCoreDataFbs> engine_core = 0) {
   auto subscriptions__ = subscriptions ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::SubscriberData>>(*subscriptions) : 0;
-  return steamrot::CreateEngineData(
+  return steamrot::CreateEngineDataFbs(
       _fbb,
       subscriptions__,
       scene_manager_data,
@@ -127,33 +127,33 @@ inline ::flatbuffers::Offset<EngineData> CreateEngineDataDirect(
       engine_core);
 }
 
-inline const steamrot::EngineData *GetEngineData(const void *buf) {
-  return ::flatbuffers::GetRoot<steamrot::EngineData>(buf);
+inline const steamrot::EngineDataFbs *GetEngineDataFbs(const void *buf) {
+  return ::flatbuffers::GetRoot<steamrot::EngineDataFbs>(buf);
 }
 
-inline const steamrot::EngineData *GetSizePrefixedEngineData(const void *buf) {
-  return ::flatbuffers::GetSizePrefixedRoot<steamrot::EngineData>(buf);
+inline const steamrot::EngineDataFbs *GetSizePrefixedEngineDataFbs(const void *buf) {
+  return ::flatbuffers::GetSizePrefixedRoot<steamrot::EngineDataFbs>(buf);
 }
 
-inline bool VerifyEngineDataBuffer(
+inline bool VerifyEngineDataFbsBuffer(
     ::flatbuffers::Verifier &verifier) {
-  return verifier.VerifyBuffer<steamrot::EngineData>(nullptr);
+  return verifier.VerifyBuffer<steamrot::EngineDataFbs>(nullptr);
 }
 
-inline bool VerifySizePrefixedEngineDataBuffer(
+inline bool VerifySizePrefixedEngineDataFbsBuffer(
     ::flatbuffers::Verifier &verifier) {
-  return verifier.VerifySizePrefixedBuffer<steamrot::EngineData>(nullptr);
+  return verifier.VerifySizePrefixedBuffer<steamrot::EngineDataFbs>(nullptr);
 }
 
-inline void FinishEngineDataBuffer(
+inline void FinishEngineDataFbsBuffer(
     ::flatbuffers::FlatBufferBuilder &fbb,
-    ::flatbuffers::Offset<steamrot::EngineData> root) {
+    ::flatbuffers::Offset<steamrot::EngineDataFbs> root) {
   fbb.Finish(root);
 }
 
-inline void FinishSizePrefixedEngineDataBuffer(
+inline void FinishSizePrefixedEngineDataFbsBuffer(
     ::flatbuffers::FlatBufferBuilder &fbb,
-    ::flatbuffers::Offset<steamrot::EngineData> root) {
+    ::flatbuffers::Offset<steamrot::EngineDataFbs> root) {
   fbb.FinishSizePrefixed(root);
 }
 

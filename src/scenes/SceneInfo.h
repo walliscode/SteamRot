@@ -1,8 +1,10 @@
 
 /////////////////////////////////////////////////
-/// @class SceneInfo
-/// @brief Captures essential information about a Scene.
+/// @file
+/// @brief Declaration of SceneInfo struct for runtime scene metadata.
 ///
+/// Note: This represents runtime scene information (ID, type, entity pool).
+/// For loading scene configuration data, use ISceneDataProvider instead.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -17,7 +19,15 @@
 #include "uuid.h"
 
 namespace steamrot {
-struct SceneData {
+
+/////////////////////////////////////////////////
+/// @struct SceneInfo
+/// @brief Runtime metadata about a Scene instance.
+///
+/// Contains the unique identifier, type, and entity pool for an active scene.
+/// This is different from scene configuration data loaded via ISceneDataProvider.
+/////////////////////////////////////////////////
+struct SceneInfo {
   /////////////////////////////////////////////////
   /// @brief Unique identifier for the Scene
   /////////////////////////////////////////////////
@@ -28,6 +38,10 @@ struct SceneData {
   /////////////////////////////////////////////////
   SceneType type;
 
+  /////////////////////////////////////////////////
+  /// @brief Entity memory pool for this scene
+  /////////////////////////////////////////////////
   EntityMemoryPool entity_memory_pool;
 };
+
 } // namespace steamrot

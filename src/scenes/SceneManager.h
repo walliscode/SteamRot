@@ -131,7 +131,7 @@ public:
   /////////////////////////////////////////////////
   /// @brief Provides information about all available scenes.
   /////////////////////////////////////////////////
-  const std::expected<std::vector<SceneData>, FailInfo>
+  const std::expected<std::vector<SceneInfo>, FailInfo>
   ProvideAvailableSceneInfo() const override;
 
   /////////////////////////////////////////////////

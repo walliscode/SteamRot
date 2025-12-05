@@ -15,16 +15,16 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
-struct EngineCoreData;
-struct EngineCoreDataBuilder;
+struct EngineCoreDataFbs;
+struct EngineCoreDataFbsBuilder;
 
-struct SceneCoreData;
-struct SceneCoreDataBuilder;
+struct SceneCoreDataFbs;
+struct SceneCoreDataFbsBuilder;
 
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
-struct EngineCoreData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef EngineCoreDataBuilder Builder;
+struct EngineCoreDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef EngineCoreDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_WINDOW_WIDTH = 4,
     VT_WINDOW_HEIGHT = 6,
@@ -54,40 +54,40 @@ struct EngineCoreData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct EngineCoreDataBuilder {
-  typedef EngineCoreData Table;
+struct EngineCoreDataFbsBuilder {
+  typedef EngineCoreDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_window_width(uint32_t window_width) {
-    fbb_.AddElement<uint32_t>(EngineCoreData::VT_WINDOW_WIDTH, window_width, 800);
+    fbb_.AddElement<uint32_t>(EngineCoreDataFbs::VT_WINDOW_WIDTH, window_width, 800);
   }
   void add_window_height(uint32_t window_height) {
-    fbb_.AddElement<uint32_t>(EngineCoreData::VT_WINDOW_HEIGHT, window_height, 600);
+    fbb_.AddElement<uint32_t>(EngineCoreDataFbs::VT_WINDOW_HEIGHT, window_height, 600);
   }
   void add_window_title(::flatbuffers::Offset<::flatbuffers::String> window_title) {
-    fbb_.AddOffset(EngineCoreData::VT_WINDOW_TITLE, window_title);
+    fbb_.AddOffset(EngineCoreDataFbs::VT_WINDOW_TITLE, window_title);
   }
   void add_framerate_limit(uint32_t framerate_limit) {
-    fbb_.AddElement<uint32_t>(EngineCoreData::VT_FRAMERATE_LIMIT, framerate_limit, 60);
+    fbb_.AddElement<uint32_t>(EngineCoreDataFbs::VT_FRAMERATE_LIMIT, framerate_limit, 60);
   }
-  explicit EngineCoreDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit EngineCoreDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<EngineCoreData> Finish() {
+  ::flatbuffers::Offset<EngineCoreDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<EngineCoreData>(end);
+    auto o = ::flatbuffers::Offset<EngineCoreDataFbs>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<EngineCoreData> CreateEngineCoreData(
+inline ::flatbuffers::Offset<EngineCoreDataFbs> CreateEngineCoreDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t window_width = 800,
     uint32_t window_height = 600,
     ::flatbuffers::Offset<::flatbuffers::String> window_title = 0,
     uint32_t framerate_limit = 60) {
-  EngineCoreDataBuilder builder_(_fbb);
+  EngineCoreDataFbsBuilder builder_(_fbb);
   builder_.add_framerate_limit(framerate_limit);
   builder_.add_window_title(window_title);
   builder_.add_window_height(window_height);
@@ -95,14 +95,14 @@ inline ::flatbuffers::Offset<EngineCoreData> CreateEngineCoreData(
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<EngineCoreData> CreateEngineCoreDataDirect(
+inline ::flatbuffers::Offset<EngineCoreDataFbs> CreateEngineCoreDataFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t window_width = 800,
     uint32_t window_height = 600,
     const char *window_title = nullptr,
     uint32_t framerate_limit = 60) {
   auto window_title__ = window_title ? _fbb.CreateString(window_title) : 0;
-  return steamrot::CreateEngineCoreData(
+  return steamrot::CreateEngineCoreDataFbs(
       _fbb,
       window_width,
       window_height,
@@ -112,8 +112,8 @@ inline ::flatbuffers::Offset<EngineCoreData> CreateEngineCoreDataDirect(
 
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
-struct SceneCoreData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef SceneCoreDataBuilder Builder;
+struct SceneCoreDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SceneCoreDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_RENDER_TEXTURE_WIDTH = 4,
     VT_RENDER_TEXTURE_HEIGHT = 6
@@ -132,32 +132,32 @@ struct SceneCoreData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct SceneCoreDataBuilder {
-  typedef SceneCoreData Table;
+struct SceneCoreDataFbsBuilder {
+  typedef SceneCoreDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_render_texture_width(uint32_t render_texture_width) {
-    fbb_.AddElement<uint32_t>(SceneCoreData::VT_RENDER_TEXTURE_WIDTH, render_texture_width, 800);
+    fbb_.AddElement<uint32_t>(SceneCoreDataFbs::VT_RENDER_TEXTURE_WIDTH, render_texture_width, 800);
   }
   void add_render_texture_height(uint32_t render_texture_height) {
-    fbb_.AddElement<uint32_t>(SceneCoreData::VT_RENDER_TEXTURE_HEIGHT, render_texture_height, 600);
+    fbb_.AddElement<uint32_t>(SceneCoreDataFbs::VT_RENDER_TEXTURE_HEIGHT, render_texture_height, 600);
   }
-  explicit SceneCoreDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit SceneCoreDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<SceneCoreData> Finish() {
+  ::flatbuffers::Offset<SceneCoreDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<SceneCoreData>(end);
+    auto o = ::flatbuffers::Offset<SceneCoreDataFbs>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<SceneCoreData> CreateSceneCoreData(
+inline ::flatbuffers::Offset<SceneCoreDataFbs> CreateSceneCoreDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t render_texture_width = 800,
     uint32_t render_texture_height = 600) {
-  SceneCoreDataBuilder builder_(_fbb);
+  SceneCoreDataFbsBuilder builder_(_fbb);
   builder_.add_render_texture_height(render_texture_height);
   builder_.add_render_texture_width(render_texture_width);
   return builder_.Finish();

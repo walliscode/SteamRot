@@ -15,14 +15,14 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
-struct FontData;
-struct FontDataBuilder;
+struct FontDataFbs;
+struct FontDataFbsBuilder;
 
 struct AssetCollection;
 struct AssetCollectionBuilder;
 
-struct FontData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef FontDataBuilder Builder;
+struct FontDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef FontDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_NAME = 4
   };
@@ -37,38 +37,38 @@ struct FontData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct FontDataBuilder {
-  typedef FontData Table;
+struct FontDataFbsBuilder {
+  typedef FontDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
-    fbb_.AddOffset(FontData::VT_NAME, name);
+    fbb_.AddOffset(FontDataFbs::VT_NAME, name);
   }
-  explicit FontDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit FontDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<FontData> Finish() {
+  ::flatbuffers::Offset<FontDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<FontData>(end);
-    fbb_.Required(o, FontData::VT_NAME);
+    auto o = ::flatbuffers::Offset<FontDataFbs>(end);
+    fbb_.Required(o, FontDataFbs::VT_NAME);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<FontData> CreateFontData(
+inline ::flatbuffers::Offset<FontDataFbs> CreateFontDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::String> name = 0) {
-  FontDataBuilder builder_(_fbb);
+  FontDataFbsBuilder builder_(_fbb);
   builder_.add_name(name);
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<FontData> CreateFontDataDirect(
+inline ::flatbuffers::Offset<FontDataFbs> CreateFontDataFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const char *name = nullptr) {
   auto name__ = name ? _fbb.CreateString(name) : 0;
-  return steamrot::CreateFontData(
+  return steamrot::CreateFontDataFbs(
       _fbb,
       name__);
 }
@@ -79,8 +79,8 @@ struct AssetCollection FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_FONTS = 4,
     VT_UI_STYLES = 6
   };
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::FontData>> *fonts() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::FontData>> *>(VT_FONTS);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::FontDataFbs>> *fonts() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::FontDataFbs>> *>(VT_FONTS);
   }
   const ::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>> *ui_styles() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>> *>(VT_UI_STYLES);
@@ -101,7 +101,7 @@ struct AssetCollectionBuilder {
   typedef AssetCollection Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_fonts(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::FontData>>> fonts) {
+  void add_fonts(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::FontDataFbs>>> fonts) {
     fbb_.AddOffset(AssetCollection::VT_FONTS, fonts);
   }
   void add_ui_styles(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>> ui_styles) {
@@ -120,7 +120,7 @@ struct AssetCollectionBuilder {
 
 inline ::flatbuffers::Offset<AssetCollection> CreateAssetCollection(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::FontData>>> fonts = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::FontDataFbs>>> fonts = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>> ui_styles = 0) {
   AssetCollectionBuilder builder_(_fbb);
   builder_.add_ui_styles(ui_styles);
@@ -130,9 +130,9 @@ inline ::flatbuffers::Offset<AssetCollection> CreateAssetCollection(
 
 inline ::flatbuffers::Offset<AssetCollection> CreateAssetCollectionDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<steamrot::FontData>> *fonts = nullptr,
+    const std::vector<::flatbuffers::Offset<steamrot::FontDataFbs>> *fonts = nullptr,
     const std::vector<::flatbuffers::Offset<::flatbuffers::String>> *ui_styles = nullptr) {
-  auto fonts__ = fonts ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::FontData>>(*fonts) : 0;
+  auto fonts__ = fonts ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::FontDataFbs>>(*fonts) : 0;
   auto ui_styles__ = ui_styles ? _fbb.CreateVector<::flatbuffers::Offset<::flatbuffers::String>>(*ui_styles) : 0;
   return steamrot::CreateAssetCollection(
       _fbb,

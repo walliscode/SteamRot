@@ -9,7 +9,7 @@ namespace steamrot;
 table SceneDataData{
     entity_collection: EntityCollection;
     assets: AssetCollection;
-    scene_core: SceneCoreData;
+    scene_core: SceneCoreDataFbs;
     scene_id: string;
     scene_type: SceneType;
     logic_collection_data: LogicCollectionData;

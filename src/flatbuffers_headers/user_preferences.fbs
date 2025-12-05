@@ -4,7 +4,7 @@
 ///
 /// User preferences are settings that can be adjusted by the user
 /// and persisted across sessions. These are distinct from:
-/// - Engine configuration (EngineCoreData) - static window/framerate settings
+/// - Engine configuration (EngineCoreDataFbs) - static window/framerate settings
 /// - Gameplay data (save files) - game progress and state
 ///
 /// Categories:
@@ -12,7 +12,7 @@
 /// - Audio: Volume levels, mute states
 /// - Accessibility: Font scaling, UI options (future)
 ///
-/// Note: Window size and framerate are configured via EngineCoreData,
+/// Note: Window size and framerate are configured via EngineCoreDataFbs,
 /// not user preferences. User preferences only control runtime-adjustable
 /// settings like fullscreen mode, vsync, and audio levels.
 ////////////////////////////////////////////////////////////
@@ -21,7 +21,7 @@ namespace steamrot;
 
 ////////////////////////////////////////////////////////////
 /// Display-related user preferences
-/// Note: Window size/framerate are in EngineCoreData, not here
+/// Note: Window size/framerate are in EngineCoreDataFbs, not here
 ////////////////////////////////////////////////////////////
 table DisplayPreferences {
   /// Fullscreen mode enabled

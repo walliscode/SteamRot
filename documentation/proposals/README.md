@@ -4,6 +4,35 @@ This directory contains design proposals for new features or significant changes
 
 ## Active Proposals
 
+### [Data Loading Interface System](DATA_LOADING_INTERFACE_EXECUTIVE_SUMMARY.md)
+
+**Status**: Proposal  
+**Date**: 2024-12-04  
+**Type**: Architecture Enhancement
+
+**Summary**: Proposes implementing an interface-based data loading system to abstract serialization formats (FlatBuffers, JSON, XML, Lua) from game code. Game code would work exclusively with native C++ structs, while providers handle format-specific loading.
+
+**Key Points**:
+1. Pattern already proven with `ISaveDataProvider` and `IUserPreferencesProvider`
+2. Native structs for game code (e.g., `EngineData`, `SceneData`)
+3. Format-agnostic interfaces (e.g., `IEngineDataProvider`)
+4. Format-specific implementations (e.g., `FlatbuffersEngineDataProvider`, `JsonSceneDataProvider`)
+5. Three-layer architecture: Game Code → Interfaces → Implementations
+
+**Implementation Complexity**: Medium
+- Phase 1: Create interfaces (1-2 weeks, Low Risk)
+- Phase 2: Migrate integration points (2-3 weeks, Moderate Risk)
+- Phase 3: Cleanup (1 week, Low Risk)
+- Phase 4: Entity system (4-6 weeks, High Risk - DEFERRED)
+
+**Documents**:
+- [Executive Summary](DATA_LOADING_INTERFACE_EXECUTIVE_SUMMARY.md) - Start here!
+- [Full Analysis](DATA_LOADING_INTERFACE_SYSTEM.md) - Complete 40+ page analysis
+- [Quick Reference](DATA_LOADING_INTERFACE_QUICK_REF.md) - Patterns and templates
+- [Architecture Diagrams](DATA_LOADING_INTERFACE_DIAGRAMS.md) - Visual representations
+
+---
+
 ### [EntityMemoryPool Copyability](ENTITY_MEMORY_POOL_COPYABILITY.md)
 
 **Status**: Proposal  

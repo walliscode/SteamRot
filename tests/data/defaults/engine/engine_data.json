@@ -1,9 +1,0 @@
-{
-  "subscriptions": [{ "event_type_data": "EVENT_QUIT_GAME" }],
-  "engine_core": {
-    "window_width": 800,
-    "window_height": 600,
-    "window_title": "SteamRot Test",
-    "framerate_limit": 60
-  }
-}

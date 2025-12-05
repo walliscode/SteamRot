@@ -9,15 +9,18 @@
 #include "test_data_comparison.h"
 #include "EntityMemoryPoolEqualsMatcher.h"
 #include "FlatbuffersConfigurator.h"
+#include "SceneInfo.h"
 #include "catch2/matchers/catch_matchers.hpp"
 #include <catch2/catch_test_macros.hpp>
 
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo> CompareTickSnapshotEntityPool(
-    const SceneData &actual_scene_data, const EngineData *expected_engine_state,
-    const TestContext &context, bool expected_to_pass) {
+std::expected<std::monostate, FailInfo>
+CompareTickSnapshotEntityPool(const SceneInfo &actual_scene_data,
+                              const EngineDataFbs *expected_engine_state,
+                              const TestContext &context,
+                              bool expected_to_pass) {
 
   // If no engine state in snapshot, skip comparison
   if (!expected_engine_state) {
@@ -74,7 +77,7 @@ std::expected<std::monostate, FailInfo> CompareTickSnapshotEntityPool(
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> CompareDataBankWithTickSnapshot(
-    const std::vector<SceneData> &actual_scene_snapshots,
+    const std::vector<SceneInfo> &actual_scene_snapshots,
     const TickSnapshot *tick_snapshot, const TestContext &context,
     bool expected_to_pass) {
 

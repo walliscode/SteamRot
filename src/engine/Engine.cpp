@@ -7,10 +7,10 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "Engine.h"
-#include "FlatbuffersDataLoader.h"
 #include "FlatbuffersUserPreferencesProvider.h"
 #include "SubscriberFactory.h"
 #include "core_configuration.h"
+#include "provider_factory.h"
 #include <vector>
 
 namespace steamrot {
@@ -22,12 +22,12 @@ Engine::Engine()
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> Engine::StartUp() {
-  // Load core data via FlatbuffersDataLoader
-  FlatbuffersDataLoader data_loader;
+  // Load core data via provider interface
+  IEngineDataProvider &data_provider = GetEngineDataProvider();
 
-  // Get EngineCoreData from data loader
+  // Get EngineCoreData from provider
   // This loads window configuration (size, title, framerate)
-  auto engine_core_result = data_loader.ProvideEngineCoreData();
+  auto engine_core_result = data_provider.LoadEngineCoreData();
   if (!engine_core_result) {
     return std::unexpected(engine_core_result.error());
   }

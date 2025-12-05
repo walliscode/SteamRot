@@ -41,7 +41,7 @@ public:
   ///
   /// @return Expected containing EngineData pointer or FailInfo
   ////////////////////////////////////////////////////////////
-  std::expected<const EngineData *, FailInfo>
+  std::expected<const EngineDataFbs *, FailInfo>
   LoadEngineData() const override;
 
   ////////////////////////////////////////////////////////////
@@ -91,18 +91,18 @@ public:
   ////////////////////////////////////////////////////////////
   /// @brief Load engine core data from engine data
   ///
-  /// @return Expected containing EngineCoreData pointer or FailInfo
+  /// @return Expected containing EngineCoreDataFbs pointer or FailInfo
   ////////////////////////////////////////////////////////////
-  std::expected<const EngineCoreData *, FailInfo>
+  std::expected<const EngineCoreDataFbs *, FailInfo>
   LoadEngineCoreData() const override;
 
   ////////////////////////////////////////////////////////////
   /// @brief Load scene core data for specific scene type
   ///
   /// @param scene_type Type of scene to load core data for
-  /// @return Expected containing SceneCoreData pointer or FailInfo
+  /// @return Expected containing SceneCoreDataFbs pointer or FailInfo
   ////////////////////////////////////////////////////////////
-  std::expected<const SceneCoreData *, FailInfo>
+  std::expected<const SceneCoreDataFbs *, FailInfo>
   LoadSceneCoreData(const SceneType scene_type) const override;
 };
 
