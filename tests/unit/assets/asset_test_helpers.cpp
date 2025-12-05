@@ -7,8 +7,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "asset_test_helpers.h"
-#include "FlatbuffersDataLoader.h"
 #include "catch2/catch_test_macros.hpp"
+#include "provider_factory.h"
 
 namespace steamrot::tests {
 
@@ -16,31 +16,26 @@ namespace steamrot::tests {
 void CheckAssetConfiguration(const SceneType &scene_type,
                              const AssetManager &asset_manager) {
 
-  // get flatbuffer asset collection
-  FlatbuffersDataLoader loader;
-  auto asset_get_result = loader.ProvideAssetData(scene_type);
-  if (!asset_get_result.has_value()) {
-    FAIL(asset_get_result.error().message);
+  // get asset data using provider interface
+  IAssetDataProvider &provider = GetAssetDataProvider();
+  auto asset_data_result = provider.LoadSceneAssetData(scene_type);
+  if (!asset_data_result.has_value()) {
+    FAIL(asset_data_result.error().message);
   }
-  const AssetCollection *asset_collection = asset_get_result.value();
-  REQUIRE(asset_collection != nullptr);
+  const AssetData &asset_data = asset_data_result.value();
 
   // check fonts
-  CheckFontConfiguration(*asset_collection, asset_manager);
+  CheckFontConfiguration(asset_data, asset_manager);
 }
 
 /////////////////////////////////////////////////
-void CheckFontConfiguration(const AssetCollection &asset_collection,
+void CheckFontConfiguration(const AssetData &asset_data,
                             const AssetManager &asset_manager) {
 
-  if (!asset_collection.fonts()) {
-    // no fonts to check
-    return;
-  }
-  // cycle through the fonts required by the Scene
-  for (const auto &font : *asset_collection.fonts()) {
+  // cycle through the fonts required
+  for (const auto &font_data : asset_data.fonts) {
 
-    const std::string font_name = font->name()->str();
+    const std::string &font_name = font_data.name;
 
     // check if the font is in the AssetManager
     auto font_result = asset_manager.GetFont(font_name);

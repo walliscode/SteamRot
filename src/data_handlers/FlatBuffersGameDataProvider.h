@@ -20,9 +20,17 @@ namespace steamrot {
 /// @class FlatBuffersGameDataProvider
 /// @brief Concrete implementation of IGameDataProvider using FlatBuffers
 ///
+/// @deprecated This class has been replaced by domain-specific providers:
+/// - FlatbuffersEngineDataProvider for engine data
+/// - FlatbuffersSceneDataProvider for scene data
+/// - FlatbuffersAssetDataProvider for asset data
+/// - FlatbuffersFragmentDataProvider for fragment data
+/// Use the new provider classes from data_providers/ instead.
+///
 /// Wraps FlatbuffersDataLoader and implements the IGameDataProvider
 /// interface, hiding FlatBuffers implementation details from consuming code.
 ////////////////////////////////////////////////////////////
+[[deprecated("Use domain-specific providers (FlatbuffersEngineDataProvider, FlatbuffersSceneDataProvider, etc.) instead")]]
 class FlatBuffersGameDataProvider : public IGameDataProvider {
 private:
   ////////////////////////////////////////////////////////////

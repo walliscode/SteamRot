@@ -28,6 +28,13 @@ namespace steamrot {
 /// @class IGameDataProvider
 /// @brief Abstract interface for loading game data
 ///
+/// @deprecated This interface has been replaced by domain-specific providers:
+/// - IEngineDataProvider for engine data
+/// - ISceneDataProvider for scene data  
+/// - IAssetDataProvider for asset data
+/// - IFragmentDataProvider for fragment data
+/// Use the new provider interfaces from data_providers/ instead.
+///
 /// This interface abstracts away the underlying data source
 /// (FlatBuffers, Lua, JSON, etc.) and provides a consistent
 /// API for loading game configuration and runtime data.
@@ -35,6 +42,7 @@ namespace steamrot {
 /// Future implementations can swap FlatBuffers for alternative
 /// data formats without changing consuming code.
 ////////////////////////////////////////////////////////////
+[[deprecated("Use domain-specific providers (IEngineDataProvider, ISceneDataProvider, etc.) instead")]]
 class IGameDataProvider {
 public:
   ////////////////////////////////////////////////////////////

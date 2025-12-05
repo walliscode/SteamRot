@@ -9,7 +9,7 @@
 #pragma once
 
 #include "AssetManager.h"
-#include "assets_generated.h"
+#include "IAssetDataProvider.h"
 
 namespace steamrot::tests {
 /////////////////////////////////////////////////
@@ -28,11 +28,10 @@ void CheckAssetConfiguration(const SceneType &scene_type,
 /////////////////////////////////////////////////
 /// @brief Checks that the default fonts have been configured correctly
 ///
-/// @param asset_collection Flatbuffer asset collection containing font config
-/// data
-/// @param fonts Map of sf::Font objects indexed by font names
+/// @param asset_data Native asset data structure containing font config
+/// @param asset_manager AssetManager instance to check against
 /////////////////////////////////////////////////
-void CheckFontConfiguration(const AssetCollection &asset_collection,
+void CheckFontConfiguration(const AssetData &asset_data,
                             const AssetManager &asset_manager);
 
 } // namespace steamrot::tests
