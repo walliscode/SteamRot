@@ -10,6 +10,7 @@
 #include "FlatbuffersAssetDataProvider.h"
 #include "FlatbuffersEngineDataProvider.h"
 #include "FlatbuffersFragmentDataProvider.h"
+#include "FlatbuffersGameConfigProvider.h"
 #include "FlatbuffersSceneDataProvider.h"
 
 namespace steamrot {
@@ -35,6 +36,12 @@ IAssetDataProvider &GetAssetDataProvider() {
 /////////////////////////////////////////////////
 IFragmentDataProvider &GetFragmentDataProvider() {
   static FlatbuffersFragmentDataProvider provider;
+  return provider;
+}
+
+/////////////////////////////////////////////////
+IGameConfigProvider &GetGameConfigProvider() {
+  static FlatbuffersGameConfigProvider provider;
   return provider;
 }
 

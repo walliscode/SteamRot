@@ -8,7 +8,6 @@
 /////////////////////////////////////////////////
 #include "SceneFactory.h"
 #include "CraftingScene.h"
-#include "FlatbuffersDataLoader.h"
 #include "TitleScene.h"
 #include "core_configuration.h"
 #include "provider_factory.h"
