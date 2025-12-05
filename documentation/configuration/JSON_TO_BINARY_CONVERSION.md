@@ -127,11 +127,13 @@ cmake --build --preset Debug --target flatbuffers_generate_binaries
 1. **Wrong subdirectory in CMake**: Subdirectory parameter doesn't match actual directory name
 2. **Wrong extension**: JSON file doesn't end with registered extension
 3. **Multiple files with same extension**: Using `.json` for multiple files in same directory
+4. **Wrong DIRECTORY_ROOTS**: CMake not searching in correct root directories (should be `data/defaults/` not `data/`)
 
 **Solutions**:
 1. Check CMake subdirectory matches actual directory: `"engine"` not `"engine_data"`
 2. Rename file to use custom extension: `default.engine_config.json` not `engine_config.json`
 3. Use unique extensions for each file type in the directory
+4. Verify DIRECTORY_ROOTS in convert_json_to_binary.cmake points to `data/defaults/` and `tests/data/defaults/`
 
 ### Issue: Binary copied to wrong test location
 
@@ -159,6 +161,7 @@ cmake --build --preset Debug --target flatbuffers_generate_binaries
 ### Recent Changes (December 2024)
 
 Fixed directory mismatches and file naming:
+- **Fixed DIRECTORY_ROOTS**: Changed from `data/` and `tests/data/` to `data/defaults/` and `tests/data/defaults/` to match actual file locations
 - Changed subdirectories to match actual structure (`"scenes"` not `"scene_data"`)
 - Renamed engine files to use specific extensions:
   - `engine_config.json` → `default.engine_config.json`
