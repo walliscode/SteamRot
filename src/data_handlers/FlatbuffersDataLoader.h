@@ -56,7 +56,7 @@ public:
   /////////////////////////////////////////////////
   /// @brief Provides EngineData from binary file
   /////////////////////////////////////////////////
-  std::expected<const EngineData *, FailInfo> ProvideEngineData() const;
+  std::expected<const EngineDataFbs *, FailInfo> ProvideEngineData() const;
 
   /////////////////////////////////////////////////
   /// @brief Provides SceneManagerData from binary file

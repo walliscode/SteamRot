@@ -138,7 +138,7 @@ FlatbuffersDataLoader::ProvideAllFragments(
 }
 
 /////////////////////////////////////////////////
-std::expected<const EngineData *, FailInfo>
+std::expected<const EngineDataFbs *, FailInfo>
 FlatbuffersDataLoader::ProvideEngineData() const {
   // get engine directory from defaults
   std::filesystem::path engine_dir = paths::GetDefaultEngineDirectory();
@@ -153,8 +153,8 @@ FlatbuffersDataLoader::ProvideEngineData() const {
     return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
   }
   // load the game engine data
-  const steamrot::EngineData *engine_data =
-      GetEngineData(LoadBinaryData(engine_data_path));
+  const steamrot::EngineDataFbs *engine_data =
+      GetEngineDataFbs(LoadBinaryData(engine_data_path));
   return engine_data;
 }
 
@@ -345,10 +345,11 @@ FlatbuffersDataLoader::ProvideEngineCoreData() const {
     return std::unexpected(engine_result.error());
   }
 
-  const EngineData *engine_data = engine_result.value();
+  const EngineDataFbs *engine_data = engine_result.value();
   if (!engine_data->engine_core()) {
-    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
-                                    "EngineCoreDataFbs not found in EngineData"));
+    return std::unexpected(
+        FailInfo(FailMode::FlatbuffersDataNotFound,
+                 "EngineCoreDataFbs not found in EngineData"));
   }
 
   return engine_data->engine_core();

@@ -40,8 +40,8 @@ struct SceneDataData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::AssetCollection *assets() const {
     return GetPointer<const steamrot::AssetCollection *>(VT_ASSETS);
   }
-  const steamrot::SceneCoreData *scene_core() const {
-    return GetPointer<const steamrot::SceneCoreData *>(VT_SCENE_CORE);
+  const steamrot::SceneCoreDataFbs *scene_core() const {
+    return GetPointer<const steamrot::SceneCoreDataFbs *>(VT_SCENE_CORE);
   }
   const ::flatbuffers::String *scene_id() const {
     return GetPointer<const ::flatbuffers::String *>(VT_SCENE_ID);
@@ -79,7 +79,7 @@ struct SceneDataDataBuilder {
   void add_assets(::flatbuffers::Offset<steamrot::AssetCollection> assets) {
     fbb_.AddOffset(SceneDataData::VT_ASSETS, assets);
   }
-  void add_scene_core(::flatbuffers::Offset<steamrot::SceneCoreData> scene_core) {
+  void add_scene_core(::flatbuffers::Offset<steamrot::SceneCoreDataFbs> scene_core) {
     fbb_.AddOffset(SceneDataData::VT_SCENE_CORE, scene_core);
   }
   void add_scene_id(::flatbuffers::Offset<::flatbuffers::String> scene_id) {
@@ -106,7 +106,7 @@ inline ::flatbuffers::Offset<SceneDataData> CreateSceneDataData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::EntityCollection> entity_collection = 0,
     ::flatbuffers::Offset<steamrot::AssetCollection> assets = 0,
-    ::flatbuffers::Offset<steamrot::SceneCoreData> scene_core = 0,
+    ::flatbuffers::Offset<steamrot::SceneCoreDataFbs> scene_core = 0,
     ::flatbuffers::Offset<::flatbuffers::String> scene_id = 0,
     steamrot::SceneType scene_type = steamrot::SceneType_UNKNOWN,
     ::flatbuffers::Offset<steamrot::LogicCollectionData> logic_collection_data = 0) {
@@ -124,7 +124,7 @@ inline ::flatbuffers::Offset<SceneDataData> CreateSceneDataDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::EntityCollection> entity_collection = 0,
     ::flatbuffers::Offset<steamrot::AssetCollection> assets = 0,
-    ::flatbuffers::Offset<steamrot::SceneCoreData> scene_core = 0,
+    ::flatbuffers::Offset<steamrot::SceneCoreDataFbs> scene_core = 0,
     const char *scene_id = nullptr,
     steamrot::SceneType scene_type = steamrot::SceneType_UNKNOWN,
     ::flatbuffers::Offset<steamrot::LogicCollectionData> logic_collection_data = 0) {

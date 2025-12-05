@@ -24,12 +24,12 @@ FlatbuffersEngineDataProvider::LoadEngineCoreData() const {
 
   // Convert FlatBuffers type to native struct
   EngineCoreData native_data;
-  native_data.window_width = fb_data->window_width();
-  native_data.window_height = fb_data->window_height();
+  native_data.window_width = fb_data->window_width;
+  native_data.window_height = fb_data->window_height;
   if (fb_data->window_title()) {
     native_data.window_title = fb_data->window_title()->str();
   }
-  native_data.framerate_limit = fb_data->framerate_limit();
+  native_data.framerate_limit = fb_data->framerate_limit;
 
   return native_data;
 }

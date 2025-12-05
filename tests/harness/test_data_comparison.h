@@ -16,11 +16,12 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FailInfo.h"
-#include "Scene.h"
+#include "SceneData.h"
 #include "engine_data_generated.h"
 #include "test_context.h"
 #include "test_data_generated.h"
 #include <expected>
+#include <variant>
 #include <vector>
 
 namespace steamrot::tests {
@@ -40,9 +41,11 @@ namespace steamrot::tests {
 /// @param expected_to_pass Whether the comparison is expected to pass
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo> CompareTickSnapshotEntityPool(
-    const SceneData &actual_scene_data, const EngineData *expected_engine_state,
-    const TestContext &context, bool expected_to_pass);
+std::expected<std::monostate, FailInfo>
+CompareTickSnapshotEntityPool(const SceneData &actual_scene_data,
+                              const EngineDataFbs *expected_engine_state,
+                              const TestContext &context,
+                              bool expected_to_pass);
 
 /////////////////////////////////////////////////
 /// @brief Compare data bank entry with tick snapshot

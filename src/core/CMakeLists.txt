@@ -10,4 +10,5 @@ target_link_libraries(core PUBLIC
   SFML::Graphics
   engine
   flatbuffers_headers
+  data_providers
 )

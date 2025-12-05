@@ -5,7 +5,7 @@ include "event_bus_data.fbs";
 
 namespace steamrot; 
 
-table EngineData {
+table EngineDataFbs {
   subscriptions: [SubscriberData];
   scene_manager_data: SceneManagerData;
   global_event_bus_data: EventBusData;
@@ -13,4 +13,4 @@ table EngineData {
   engine_core: EngineCoreDataFbs;
 }
 
-root_type EngineData;
+root_type EngineDataFbs;

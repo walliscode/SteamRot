@@ -1,12 +1,12 @@
 namespace steamrot;
 
-table FontData {
+table FontDataFbs{
     name: string (required);
 }
 
 
 table AssetCollection {
-    fonts: [FontData];
+    fonts: [FontDataFbs];
     ui_styles :[string];
   }
 

@@ -47,7 +47,7 @@ public:
   ///
   /// @return Expected containing EngineData pointer or FailInfo
   ////////////////////////////////////////////////////////////
-  virtual std::expected<const EngineData *, FailInfo>
+  virtual std::expected<const EngineDataFbs *, FailInfo>
   LoadEngineData() const = 0;
 
   ////////////////////////////////////////////////////////////
