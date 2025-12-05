@@ -11,7 +11,9 @@ TEST_CASE("FlatbuffersEngineDataProvider loads engine core data",
   steamrot::FlatbuffersEngineDataProvider provider;
 
   auto result = provider.LoadEngineCoreData();
-  REQUIRE(result.has_value());
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
 
   const auto &data = result.value();
   REQUIRE(data.window_width > 0);

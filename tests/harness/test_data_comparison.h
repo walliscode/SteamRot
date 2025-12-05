@@ -16,7 +16,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FailInfo.h"
-#include "SceneData.h"
+#include "SceneInfo.h"
 #include "engine_data_generated.h"
 #include "test_context.h"
 #include "test_data_generated.h"
@@ -42,7 +42,7 @@ namespace steamrot::tests {
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-CompareTickSnapshotEntityPool(const SceneData &actual_scene_data,
+CompareTickSnapshotEntityPool(const SceneInfo &actual_scene_data,
                               const EngineDataFbs *expected_engine_state,
                               const TestContext &context,
                               bool expected_to_pass);
@@ -61,7 +61,7 @@ CompareTickSnapshotEntityPool(const SceneData &actual_scene_data,
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> CompareDataBankWithTickSnapshot(
-    const std::vector<SceneData> &actual_scene_snapshots,
+    const std::vector<SceneInfo> &actual_scene_snapshots,
     const TickSnapshot *tick_snapshot, const TestContext &context,
     bool expected_to_pass);
 

@@ -9,6 +9,7 @@
 #include "TestEngine.h"
 #include "FailInfo.h"
 #include "SceneContext.h"
+#include "SceneInfo.h"
 #include "simulation_runner.h"
 #include <expected>
 #include <iostream>
@@ -69,17 +70,17 @@ void TestEngine::RunGameLoop() {
 
 /////////////////////////////////////////////////
 void TestEngine::AddToDataBank(size_t tick) {
-  std::vector<SceneData> scene_snapshots;
+  std::vector<SceneInfo> scene_snapshots;
 
   // Iterate through all scenes in the SceneManager
   for (auto &scene_pair : m_scene_manager.GetScenes()) {
     Scene &scene = *scene_pair.second;
 
     // Get SceneInfo which has id and type
-    const SceneData scene_info = scene.GetSceneInfo();
+    const SceneInfo scene_info = scene.GetSceneInfo();
 
     // Create a SceneData snapshot
-    SceneData snapshot;
+    SceneInfo snapshot;
     snapshot.id = scene_info.id;
     snapshot.type = scene_info.type;
 
@@ -96,7 +97,7 @@ void TestEngine::AddToDataBank(size_t tick) {
 }
 
 /////////////////////////////////////////////////
-const std::unordered_map<size_t, std::vector<SceneData>> &
+const std::unordered_map<size_t, std::vector<SceneInfo>> &
 TestEngine::GetDataBank() const {
   return m_data_bank;
 }

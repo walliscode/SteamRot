@@ -8,7 +8,7 @@
 namespace steamrot {
 
 ////////////////////////////////////////////////////////////
-std::expected<const EngineData *, FailInfo>
+std::expected<const EngineDataFbs *, FailInfo>
 FlatBuffersGameDataProvider::LoadEngineData() const {
   return m_loader.ProvideEngineData();
 }
@@ -21,8 +21,7 @@ FlatBuffersGameDataProvider::LoadSceneManagerData() const {
 
 ////////////////////////////////////////////////////////////
 std::expected<const SceneDataData *, FailInfo>
-FlatBuffersGameDataProvider::LoadSceneData(
-    const SceneType scene_type) const {
+FlatBuffersGameDataProvider::LoadSceneData(const SceneType scene_type) const {
   return m_loader.ProvideDefaultSceneData(scene_type);
 }
 

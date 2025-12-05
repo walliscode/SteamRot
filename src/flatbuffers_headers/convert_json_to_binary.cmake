@@ -37,8 +37,8 @@ macro(flatbuffers_generate_for_type schema_name json_ext subdir)
       set(bin_file "${data_dir}/${bin_base}.bin")
 
       # Main prod directory path
-      set(prod_dir "${CMAKE_SOURCE_DIR}/data")
-      set(test_dir "${CMAKE_SOURCE_DIR}/tests/data")
+      set(prod_dir "${CMAKE_SOURCE_DIR}/data/defaults")
+      set(test_dir "${CMAKE_SOURCE_DIR}/tests/data/defaults")
       set(prod_subdir "${prod_dir}/${subdir}")
       set(test_subdir "${test_dir}/${subdir}")
 

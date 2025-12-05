@@ -31,7 +31,7 @@ std::expected<std::monostate, FailInfo> AssetManager::LoadDefaultAssets() {
   if (!asset_data_result.has_value())
     return std::unexpected<FailInfo>(asset_data_result.error());
 
-  const AssetData &asset_data = asset_data_result.value();
+  AssetData &asset_data = asset_data_result.value();
 
   ////// Load Fonts //////
   // Load fonts if any exist
@@ -45,9 +45,8 @@ std::expected<std::monostate, FailInfo> AssetManager::LoadDefaultAssets() {
 
   ////// Load UI Styles //////
   if (asset_data.ui_styles.empty())
-    return std::unexpected<FailInfo>(
-        {FailMode::FlatbuffersDataNotFound,
-         "No UI styles defined in AssetData"});
+    return std::unexpected<FailInfo>({FailMode::FlatbuffersDataNotFound,
+                                      "No UI styles defined in AssetData"});
 
   auto load_ui_style_result = LoadUIStyles(asset_data.ui_styles);
   if (!load_ui_style_result.has_value())
@@ -123,8 +122,8 @@ AssetManager::LoadUIStyles(std::vector<std::string> &style_names) {
   // create StylesConfigurator object
   StylesConfigurator styles_configurator;
   // provide map of UIStyles
-  auto ui_styles_map_result = styles_configurator.ProvideUIStylesMap(
-      *this, style_names);
+  auto ui_styles_map_result =
+      styles_configurator.ProvideUIStylesMap(*this, style_names);
 
   if (!ui_styles_map_result.has_value()) {
     return std::unexpected<FailInfo>(ui_styles_map_result.error());

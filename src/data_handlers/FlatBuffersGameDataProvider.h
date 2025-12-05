@@ -41,7 +41,7 @@ public:
   ///
   /// @return Expected containing EngineData pointer or FailInfo
   ////////////////////////////////////////////////////////////
-  std::expected<const EngineData *, FailInfo>
+  std::expected<const EngineDataFbs *, FailInfo>
   LoadEngineData() const override;
 
   ////////////////////////////////////////////////////////////
