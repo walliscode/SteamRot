@@ -32,8 +32,10 @@ This directory contains design proposals for new features or significant changes
 - ✅ Format flexibility (ready for JSON/XML/database providers)
 
 **Documents**:
+- [Implementation Roadmap](ENTITY_VIEW_PATTERN_ROADMAP.md) - **START HERE** - Executive summary and timeline
 - [Full Implementation Plan](ENTITY_VIEW_PATTERN_IMPLEMENTATION.md) - Complete design and phasing
 - [Quick Reference](ENTITY_VIEW_PATTERN_QUICK_REF.md) - Patterns and examples
+- [Migration Guide](ENTITY_VIEW_PATTERN_MIGRATION_GUIDE.md) - How to migrate existing code
 
 **Related Analysis**:
 - [Current State Analysis](../analysis/CURRENT_STATE_ANALYSIS_2025.md) - Context and motivation
