@@ -128,8 +128,8 @@ public:
   /////////////////////////////////////////////////
   /// @brief Provides EngineConfigData from binary file
   ///
-  /// Loads engine configuration from defaults/engine/engine_config.bin.
-  /// If user configuration exists at user/engine/engine_config.bin, it
+  /// Loads engine configuration from defaults/engine/default.engine_config.bin.
+  /// If user configuration exists at user/engine/default.engine_config.bin, it
   /// will be loaded instead.
   /////////////////////////////////////////////////
   std::expected<const EngineConfigData *, FailInfo>

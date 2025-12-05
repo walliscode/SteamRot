@@ -144,7 +144,7 @@ FlatbuffersDataLoader::ProvideEngineData() const {
   std::filesystem::path engine_dir = paths::GetDefaultEngineDirectory();
 
   // construct the file path
-  std::filesystem::path engine_data_path = engine_dir / "engine_data.bin";
+  std::filesystem::path engine_data_path = engine_dir / "default.engine_data.bin";
 
   // check if the file exists
   if (!std::filesystem::exists(engine_data_path)) {
@@ -424,7 +424,7 @@ FlatbuffersDataLoader::ProvideEngineConfigData() const {
   // First check for user-specific engine config
   std::filesystem::path user_engine_dir = paths::GetUserDirectory() / "engine";
   std::filesystem::path user_config_path =
-      user_engine_dir / "engine_config.bin";
+      user_engine_dir / "default.engine_config.bin";
 
   // If user config exists, load it
   if (std::filesystem::exists(user_config_path)) {
@@ -440,7 +440,7 @@ FlatbuffersDataLoader::ProvideEngineConfigData() const {
   // Load default engine config
   std::filesystem::path default_engine_dir = paths::GetDefaultEngineDirectory();
   std::filesystem::path default_config_path =
-      default_engine_dir / "engine_config.bin";
+      default_engine_dir / "default.engine_config.bin";
 
   if (!std::filesystem::exists(default_config_path)) {
     std::string error_message = std::format("Engine config file not found: {}",
