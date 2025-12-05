@@ -4,10 +4,47 @@ This directory contains comprehensive analysis reports and architectural documen
 
 ---
 
+## 🎯 Start Here
+
+### ⚡ Quick Reference (3 minutes)
+👉 [**ANALYSIS_SUMMARY.md**](../ANALYSIS_SUMMARY.md) - Executive summary with TL;DR
+
+### 📋 Full Analysis (30 minutes)
+👉 [**CURRENT_STATE_ANALYSIS_2025.md**](./CURRENT_STATE_ANALYSIS_2025.md) - Most recent complete analysis
+
+### ✅ Action Items (5 minutes)
+👉 [**QUICK_ACTION_PLAN.md**](../QUICK_ACTION_PLAN.md) - Step-by-step improvement plan
+
+### 🗺️ Visual Guides (10 minutes)
+👉 [**WORKFLOW_DIAGRAMS.md**](../WORKFLOW_DIAGRAMS.md) - Current system workflows
+
+---
+
 ## 📋 Analysis Reports
 
+### 🆕 [CURRENT_STATE_ANALYSIS_2025.md](./CURRENT_STATE_ANALYSIS_2025.md)
+**Latest comprehensive analysis** (Created: Dec 5, 2025)
+
+Complete state assessment covering:
+- Mixed/incomplete system migrations (provider pattern 80% done)
+- Data loading rigidity issues (entity config deferred)
+- Testing infrastructure gaps (5 Logic classes need tests)
+- Documentation state (250+ KB proposals need cleanup)
+- Workflow diagrams (visual reference)
+- Step-by-step improvement plans (Plans A-F)
+
+**Key Findings**:
+- Provider pattern 80% complete (intentional)
+- Documentation confusion (TestContext → TestFixture)
+- Test coverage gaps (17% Logic classes, 29% components)
+- Two test approaches need guidance (TestFixture vs TestEngine)
+
+**Start here for**: Most current analysis and recommendations
+
+---
+
 ### 🔍 [COMPREHENSIVE_CODEBASE_ANALYSIS.md](./COMPREHENSIVE_CODEBASE_ANALYSIS.md)
-**Main comprehensive analysis document** (Created: Dec 3, 2025)
+**Previous comprehensive analysis** (Created: Dec 3, 2025)
 
 Complete codebase analysis covering:
 - Documentation gaps and outdated content
@@ -22,7 +59,7 @@ Complete codebase analysis covering:
 - 3 free function modules need expanded test coverage
 - Clear path to data-driven testing readiness
 
-**Start here for**: Complete understanding of codebase state and improvement plan
+**Use this for**: Historical context and detailed test infrastructure analysis
 
 ---
 
