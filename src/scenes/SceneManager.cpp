@@ -178,7 +178,7 @@ void SceneManager::UpdateScenes() {
 /////////////////////////////////////////////////
 const std::unordered_map<EventType, std::shared_ptr<Subscriber>> &
 SceneManager::GetSubscriptions() const {
-  return m_subscriptions;
+  return m_scene_manager_state.subscriptions;
 }
 
 /////////////////////////////////////////////////
@@ -192,7 +192,7 @@ SceneManager::RegisterSubscriber(std::shared_ptr<Subscriber> subscriber) {
 
   // attempt to add the subscriber to the map, fail if duplicate
   auto result =
-      m_subscriptions.emplace(subscriber->m_trigger_event_type, subscriber);
+      m_scene_manager_state.subscriptions.emplace(subscriber->m_trigger_event_type, subscriber);
   if (!result.second) {
     FailInfo fail_info(
         FailMode::NotAddedToMap,
@@ -246,7 +246,7 @@ SceneManager::LoadStandAloneScene(const SceneType &scene_type) {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> SceneManager::ProcessSubscriptions() {
 
-  for (const auto &[event_type, subscriber] : m_subscriptions) {
+  for (const auto &[event_type, subscriber] : m_scene_manager_state.subscriptions) {
 
     // only process active subscribers
     if (subscriber->m_active) {
