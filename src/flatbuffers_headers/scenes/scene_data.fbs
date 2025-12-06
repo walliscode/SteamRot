@@ -1,18 +1,22 @@
-include "entities.fbs";
+include "../entities/entities.fbs";
 include "assets.fbs";
 include "scene_types.fbs";
 include "logic_data.fbs";
+include "scene_resources.fbs";
 
 namespace steamrot;
 
-table SceneDataData{
-    entity_collection: EntityCollection;
-    assets: AssetCollection;
-    render_texture_width: uint32 = 800;
-    render_texture_height: uint32 = 600;
+table SceneInfoFbs{
     scene_id: string;
     scene_type: SceneType;
+  }
+
+table SceneDataFbs{
+    scene_info: SceneInfoFbs;
+    scene_resources: SceneResourcesFbs;
+    assets: AssetCollection;
+    entity_collection: EntityCollection;
     logic_collection_data: LogicCollectionData;
   }
 
-root_type SceneDataData;
+root_type SceneDataFbs;

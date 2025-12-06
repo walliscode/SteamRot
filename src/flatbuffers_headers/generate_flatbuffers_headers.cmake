@@ -5,17 +5,17 @@ set(schema_files
     # Core types
     ${CMAKE_CURRENT_SOURCE_DIR}/core/types.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/core/scene_types.fbs
-    
+
     # Engine (already organized)
     ${CMAKE_CURRENT_SOURCE_DIR}/engine/engine_resources_config.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/engine/engine_config.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/engine/engine_state.fbs
-    
+
     # Scenes
     ${CMAKE_CURRENT_SOURCE_DIR}/scenes/scene_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/scenes/scene_manager_data.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/scenes/fragments.fbs
-    
+
+
     # Entities and components
     ${CMAKE_CURRENT_SOURCE_DIR}/entities/entities.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/entities/user_interface.fbs
@@ -23,25 +23,26 @@ set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/entities/ui_state.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/entities/ui_style.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/entities/joints.fbs
-    
+    ${CMAKE_CURRENT_SOURCE_DIR}/entities/fragments.fbs
+
     # Events
     ${CMAKE_CURRENT_SOURCE_DIR}/events/events.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/events/event_packet_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/events/event_bus_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/events/subscriber_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/events/user_input.fbs
-    
+
     # Logic
     ${CMAKE_CURRENT_SOURCE_DIR}/logic/logic_data.fbs
-    
+
     # Assets
     ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets.fbs
-    
+
     # Configuration
     ${CMAKE_CURRENT_SOURCE_DIR}/configuration/context_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/configuration/user_preferences.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/configuration/save_data.fbs
-    
+
     # Testing
     ${CMAKE_CURRENT_SOURCE_DIR}/testing/test_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/testing/simulation.fbs

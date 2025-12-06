@@ -12,8 +12,6 @@ namespace steamrot;
 /// Display configuration
 ////////////////////////////////////////////////////////////
 table DisplayConfigFbs {
-  window_width: uint32 = 800;
-  window_height: uint32 = 600;
   window_title: string;
   framerate_limit: uint32 = 60;
   fullscreen: bool = false;

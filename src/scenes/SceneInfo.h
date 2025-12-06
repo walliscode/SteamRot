@@ -16,7 +16,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "containers.h"
+#include "scene_types_generated.h"
 #include "uuid.h"
 
 namespace steamrot {
@@ -26,7 +26,8 @@ namespace steamrot {
 /// @brief Runtime metadata about a Scene instance.
 ///
 /// Contains the unique identifier and type for an active scene.
-/// This is different from scene configuration data loaded via ISceneDataProvider.
+/// This is different from scene configuration data loaded via
+/// ISceneDataProvider.
 ///
 /// Note: EntityMemoryPool is managed by EntityManager, not stored here.
 /////////////////////////////////////////////////

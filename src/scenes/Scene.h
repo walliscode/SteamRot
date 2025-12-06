@@ -12,6 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "GameContext.h"
+#include "LogicFactory.h"
 #include "SceneConfig.h"
 #include "SceneInfo.h"
 #include "SceneResources.h"
@@ -23,14 +24,6 @@
 typedef std::vector<std::shared_ptr<sf::Drawable>> SceneDrawables;
 
 namespace steamrot {
-
-// Forward declarations
-class SceneContext;
-struct FailInfo;
-enum class DataType;
-class EntityMemoryPool;
-class Archetype;
-typedef uint64_t ArchetypeID;
 
 /////////////////////////////////////////////////
 /// @class Scene
@@ -45,11 +38,6 @@ protected:
   /// @brief Identifying information about the Scene.
   /////////////////////////////////////////////////
   const SceneInfo m_scene_info;
-
-  /////////////////////////////////////////////////
-  /// @brief GameContext object passed down from the GameEngine.
-  /////////////////////////////////////////////////
-  const GameContext &m_game_context;
 
   /////////////////////////////////////////////////
   /// @brief Scene-level resources (managers, logic, render texture).
@@ -125,8 +113,8 @@ public:
   /////////////////////////////////////////////////
   /// @brief Sets LogicCollection for the scene (only if the map is empty)
   ///
-  /// @param logic_map Logic collection to set for the scene, passed by value and
-  /// moved.
+  /// @param logic_map Logic collection to set for the scene, passed by value
+  /// and moved.
   /////////////////////////////////////////////////
   void SetLogicMap(LogicCollection logic_map);
   /////////////////////////////////////////////////

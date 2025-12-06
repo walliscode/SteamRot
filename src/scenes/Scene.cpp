@@ -17,10 +17,10 @@ namespace steamrot {
 /////////////////////////////////////////////////
 Scene::Scene(const SceneType scene_type, const uuids::uuid &id,
              const GameContext &game_context)
-    : m_scene_info{id, scene_type}, m_game_context(game_context) {
-  // Initialize EntityManager with event handler
-  m_scene_resources.entity_manager =
-      EntityManager(game_context.event_handler);
+    : m_scene_info{id, scene_type},
+      m_scene_resources(game_context, game_context.event_handler) {
+
+  // may need to intialize other members here in the future
 }
 
 /////////////////////////////////////////////////
@@ -81,7 +81,7 @@ const SceneInfo Scene::GetSceneInfo() const {
 SceneContext Scene::GetSceneContext() {
 
   SceneContext scene_context{m_scene_resources.scene_texture,
-                             m_game_context.engine_resources,
+                             m_scene_resources.game_context.engine_resources,
                              m_scene_resources.entity_manager};
 
   return scene_context;

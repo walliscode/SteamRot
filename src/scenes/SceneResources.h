@@ -8,42 +8,33 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "ActionManager.h"
 #include "EntityManager.h"
-#include "Logic.h"
+#include "GameContext.h"
+#include "LogicFactory.h"
 #include <SFML/Graphics/RenderTexture.hpp>
-#include <memory>
-#include <unordered_map>
-#include <vector>
 
 namespace steamrot {
-
-// Forward declarations - LogicCollection is defined in LogicFactory.h
-using LogicVector = std::vector<std::unique_ptr<Logic>>;
-using LogicCollection = std::unordered_map<LogicType, LogicVector>;
 
 /////////////////////////////////////////////////
 /// @struct SceneResources
 /// @brief Scene-level resources struct containing long-lived objects.
 ///
 /// SceneResources owns all scene-level resources (managers, logic systems,
-/// render texture). These resources have a lifetime matching the Scene instance.
+/// render texture). These resources have a lifetime matching the Scene
+/// instance.
 ///
 /// All members are concrete objects (no references/pointers to other
 /// scene members). This struct is default-constructible.
 /////////////////////////////////////////////////
 struct SceneResources {
-  SceneResources() = default;
+  SceneResources(const GameContext &game_context, EventHandler &event_handler)
+      : game_context(game_context),
+        entity_manager(EntityManager{event_handler}) {}
 
   /////////////////////////////////////////////////
   /// @brief Entity Manager instance for this scene
   /////////////////////////////////////////////////
   EntityManager entity_manager;
-
-  /////////////////////////////////////////////////
-  /// @brief Action Manager instance for this scene
-  /////////////////////////////////////////////////
-  ActionManager action_manager;
 
   /////////////////////////////////////////////////
   /// @brief Map of all logic objects needed by the scene
@@ -57,6 +48,11 @@ struct SceneResources {
   /// drawn to the game window.
   /////////////////////////////////////////////////
   sf::RenderTexture scene_texture;
+
+  /////////////////////////////////////////////////
+  /// @brief GameContext object passed down from the GameEngine.
+  /////////////////////////////////////////////////
+  const GameContext &game_context;
 };
 
 } // namespace steamrot
