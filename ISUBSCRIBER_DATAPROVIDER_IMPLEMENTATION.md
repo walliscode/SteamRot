@@ -49,28 +49,37 @@ Concrete implementation that converts FlatBuffers `SubscriberConfigFbs` vectors 
 - Converts FlatBuffers EventData to native EventData using `event::CreateEventData()`
 - Returns empty vector if no data present
 
-### 5. ISubscriberDataViewer Mixin Interface
-**File:** `src/data_providers/ISubscriberDataViewer.h`
+### 5. SubscriberDataViewer Concrete Class
+**Files:** 
+- `src/data_providers/SubscriberDataViewer.h`
+- `src/data_providers/SubscriberDataViewer.cpp`
 
-A mixin interface that enables any data provider to expose subscriber configuration data in a standard way.
+A concrete viewer class that provides a composition-based approach to accessing subscriber configuration data.
 
 **Purpose:**
-- Enables layered data access from multiple sources
-- Provides common interface for accessing subscriber data
-- Can be inherited alongside other data provider interfaces
+- Wraps FlatbuffersSubscriberDataProvider for convenient access
+- Provides composition over inheritance pattern
+- Can be used as a member in data providers that need to expose subscriber data
 
 **Methods:**
 - `GetSubscriberConfigs()` - Returns `std::expected<std::vector<SubscriberConfig>, FailInfo>`
+
+**Note:** This replaces the previous ISubscriberDataViewer mixin interface approach, following the principle of "composition over inheritance."
 
 ### 6. Updated FlatbuffersEngineDataProvider
 **Files:**
 - `src/data_providers/FlatbuffersEngineDataProvider.h`
 - `src/data_providers/FlatbuffersEngineDataProvider.cpp`
 
-Now implements both `IEngineDataProvider` and `ISubscriberDataViewer`.
+Now contains a SubscriberDataViewer member (composition) instead of inheriting from ISubscriberDataViewer (mixin).
 
-**New Method:**
-- `GetSubscriberConfigs()` - Loads and returns subscriber configs from EngineState
+**New Methods:**
+- `GetSubscriberViewer()` - Returns pointer to the internal SubscriberDataViewer
+- `GetSubscriberConfigs()` - Convenience method that delegates to the viewer
+
+**Architecture:**
+- Uses lazy initialization for the viewer (created on first access)
+- Member is `mutable std::unique_ptr<SubscriberDataViewer>` to allow const methods
 
 ### 7. Updated SubscriberFactory
 **Files:**
@@ -104,13 +113,23 @@ Updated `ConfigureSubscribersFromData()` to use `SubscriberConfigFbs` instead of
 - Multiple subscriber configs conversion
 - Null entry skipping
 
-### ISubscriberDataViewer Tests
+### SubscriberDataViewer Tests
+**File:** `tests/unit/data_providers/SubscriberDataViewer.test.cpp`
+
+- Null pointer handling
+- Empty vector handling
+- Single subscriber config conversion
+- Multiple subscriber configs conversion
+
+### ISubscriberDataViewer Tests (Legacy)
 **File:** `tests/unit/data_providers/ISubscriberDataViewer.test.cpp`
 
-- Mixin interface usage
+- Mixin interface usage (legacy pattern - kept for reference)
 - Layered data access pattern
 - Empty result handling
 - Mock implementation example
+
+**Note:** These tests remain for the legacy ISubscriberDataViewer interface, which is still available but no longer the recommended pattern.
 
 ### SubscriberFactory Tests
 **File:** `tests/unit/events/SubscriberFactory.test.cpp`
@@ -122,8 +141,9 @@ Updated `ConfigureSubscribersFromData()` to use `SubscriberConfigFbs` instead of
 ### FlatbuffersEngineDataProvider Tests
 **File:** `tests/unit/data_providers/FlatbuffersEngineDataProvider.test.cpp`
 
-- Test for ISubscriberDataViewer implementation
-- Interface polymorphism verification
+- Test for SubscriberDataViewer composition
+- GetSubscriberViewer() method verification
+- GetSubscriberConfigs() convenience method verification
 
 ### Mock Data Updated
 **File:** `tests/unit/events/mock_fb_subscriber_data.h`
@@ -140,7 +160,8 @@ Updated `ConfigureSubscribersFromData()` to use `SubscriberConfigFbs` instead of
 
 ### 2. Flexibility
 - Can add new data sources without changing SubscriberFactory
-- ISubscriberDataViewer enables composition
+- Composition pattern (SubscriberDataViewer) provides cleaner architecture
+- Follows "composition over inheritance" principle
 - Layered data access supports complex configurations
 
 ### 3. Testability
@@ -168,36 +189,48 @@ for (const auto& config : configs.value()) {
 }
 ```
 
-### Pattern 2: Layered Data Access
+### Pattern 2: Layered Data Access (Composition-based)
 ```cpp
-// Multiple data sources with subscribers
-std::vector<ISubscriberDataViewer*> viewers = {
-    &engine_provider,
-    &scene_provider,
-    &ui_provider
+// Multiple data sources with subscriber viewers
+std::vector<const SubscriberDataViewer*> viewers = {
+    engine_provider.GetSubscriberViewer(),
+    scene_provider.GetSubscriberViewer(),
+    ui_provider.GetSubscriberViewer()
 };
 
 // Collect all subscriber configs
 std::vector<SubscriberConfig> all_configs;
 for (auto* viewer : viewers) {
-    auto result = viewer->GetSubscriberConfigs();
-    if (result.has_value()) {
-        all_configs.insert(all_configs.end(), 
-                          result.value().begin(), 
-                          result.value().end());
+    if (viewer) {
+        auto result = viewer->GetSubscriberConfigs();
+        if (result.has_value()) {
+            all_configs.insert(all_configs.end(), 
+                              result.value().begin(), 
+                              result.value().end());
+        }
     }
 }
 ```
 
-### Pattern 3: Data Provider with Multiple Interfaces
+### Pattern 3: Data Provider with Subscriber Viewer
 ```cpp
-class MyDataProvider : public IMyData, 
-                      public ISubscriberDataViewer {
+class MyDataProvider : public IMyDataProvider {
+private:
+    mutable std::unique_ptr<SubscriberDataViewer> m_subscriber_viewer;
+    
 public:
-    // Implement both interfaces
+    // Implement data provider interface
     std::expected<MyData, FailInfo> LoadMyData() const override;
-    std::expected<std::vector<SubscriberConfig>, FailInfo> 
-    GetSubscriberConfigs() const override;
+    
+    // Provide access to subscriber viewer
+    const SubscriberDataViewer* GetSubscriberViewer() const override {
+        if (!m_subscriber_viewer) {
+            // Lazy initialization
+            m_subscriber_viewer = std::make_unique<SubscriberDataViewer>(
+                GetFlatBuffersSubscriberData());
+        }
+        return m_subscriber_viewer.get();
+    }
 };
 ```
 
@@ -216,11 +249,14 @@ public:
 ### Potential Additions
 1. **SubscriberConfigValidator** - Validate configs before use
 2. **SubscriberConfigBuilder** - Fluent API for creating configs
-3. **Additional Viewers** - Implement ISubscriberDataViewer in:
+3. **Additional Data Providers** - Add SubscriberDataViewer composition in:
    - FlatbuffersSceneDataProvider
    - FlatbuffersLogicDataProvider (when created)
-4. **Composite Viewer** - Aggregate multiple viewers into one
+4. **Composite Viewer** - Aggregate multiple SubscriberDataViewers into one
 5. **Config Merging** - Merge configs from multiple sources with conflict resolution
+
+### Completed Enhancements
+- ✅ **Composition over Inheritance** - Replaced ISubscriberDataViewer mixin with SubscriberDataViewer composition pattern
 
 ## Migration Notes
 
