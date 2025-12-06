@@ -3,8 +3,9 @@
 /// @file
 /// @brief Declaration of SceneInfo struct for runtime scene metadata.
 ///
-/// Note: This represents runtime scene information (ID, type, entity pool).
+/// Note: This represents runtime scene information (ID and type).
 /// For loading scene configuration data, use ISceneDataProvider instead.
+/// For accessing the entity pool, use EntityManager.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -24,8 +25,10 @@ namespace steamrot {
 /// @struct SceneInfo
 /// @brief Runtime metadata about a Scene instance.
 ///
-/// Contains the unique identifier, type, and entity pool for an active scene.
+/// Contains the unique identifier and type for an active scene.
 /// This is different from scene configuration data loaded via ISceneDataProvider.
+///
+/// Note: EntityMemoryPool is managed by EntityManager, not stored here.
 /////////////////////////////////////////////////
 struct SceneInfo {
   /////////////////////////////////////////////////
@@ -37,11 +40,6 @@ struct SceneInfo {
   /// @brief Scene type identifier
   /////////////////////////////////////////////////
   SceneType type;
-
-  /////////////////////////////////////////////////
-  /// @brief Entity memory pool for this scene
-  /////////////////////////////////////////////////
-  EntityMemoryPool entity_memory_pool;
 };
 
 } // namespace steamrot

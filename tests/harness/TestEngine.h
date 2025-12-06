@@ -62,7 +62,7 @@
 /////////////////////////////////////////////////
 
 #include "Engine.h"
-#include "SceneInfo.h"
+#include "SceneSnapshot.h"
 #include "simulation_generated.h"
 #include "test_data_generated.h"
 #include <expected>
@@ -135,9 +135,9 @@ private:
   size_t m_current_tick{1};
 
   /////////////////////////////////////////////////
-  /// @brief Stores the tick number and data at that point
+  /// @brief Stores the tick number and scene snapshots at that point
   /////////////////////////////////////////////////
-  std::unordered_map<size_t, std::vector<SceneInfo>> m_data_bank;
+  std::unordered_map<size_t, std::vector<SceneSnapshot>> m_data_bank;
 
   /////////////////////////////////////////////////
   /// @brief No rendering for TestEngine (new Tick_() pipeline method)
@@ -187,6 +187,6 @@ public:
   /////////////////////////////////////////////////
   /// @brief Returns data bank for inspection and testing
   /////////////////////////////////////////////////
-  const std::unordered_map<size_t, std::vector<SceneInfo>> &GetDataBank() const;
+  const std::unordered_map<size_t, std::vector<SceneSnapshot>> &GetDataBank() const;
 };
 } // namespace steamrot::tests

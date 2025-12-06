@@ -73,11 +73,6 @@ protected:
   bool m_active = true;
 
   /////////////////////////////////////////////////
-  /// @brief contains all event types that the Scene is interested in
-  /////////////////////////////////////////////////
-  std::unordered_set<EventType> m_scene_event_types;
-
-  /////////////////////////////////////////////////
   /// @brief Constructor for Scene class.
   ///
   /// @param id Generated UUID for the Scene.

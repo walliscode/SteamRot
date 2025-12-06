@@ -9,7 +9,7 @@
 #include "test_data_comparison.h"
 #include "EntityMemoryPoolEqualsMatcher.h"
 #include "FlatbuffersConfigurator.h"
-#include "SceneInfo.h"
+#include "SceneSnapshot.h"
 #include "catch2/matchers/catch_matchers.hpp"
 #include <catch2/catch_test_macros.hpp>
 
@@ -77,7 +77,7 @@ CompareTickSnapshotEntityPool(const SceneInfo &actual_scene_data,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> CompareDataBankWithTickSnapshot(
-    const std::vector<SceneInfo> &actual_scene_snapshots,
+    const std::vector<SceneSnapshot> &actual_scene_snapshots,
     const TickSnapshot *tick_snapshot, const TestContext &context,
     bool expected_to_pass) {
 
