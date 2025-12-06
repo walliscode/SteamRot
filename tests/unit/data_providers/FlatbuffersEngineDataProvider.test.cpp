@@ -49,18 +49,19 @@ TEST_CASE("FlatbuffersEngineDataProvider loads complete engine data",
   REQUIRE(data.core.window_height > 0);
 }
 
-TEST_CASE("FlatbuffersEngineDataProvider implements ISubscriberDataViewer",
+TEST_CASE("FlatbuffersEngineDataProvider provides SubscriberDataViewer",
           "[unit][data_providers][FlatbuffersEngineDataProvider]") {
   steamrot::FlatbuffersEngineDataProvider provider;
 
-  // Should be able to call GetSubscriberConfigs through the viewer interface
-  auto result = provider.GetSubscriberConfigs();
+  // Should be able to get viewer from the provider
+  const steamrot::SubscriberDataViewer* viewer = provider.GetSubscriberViewer();
+  REQUIRE(viewer != nullptr);
   
-  // Result should be valid (may be empty vector, that's fine)
-  REQUIRE(result.has_value());
-  
-  // Can access through interface pointer
-  steamrot::ISubscriberDataViewer* viewer = &provider;
+  // Should be able to call GetSubscriberConfigs through the viewer
   auto viewer_result = viewer->GetSubscriberConfigs();
   REQUIRE(viewer_result.has_value());
+  
+  // Convenience method should also work
+  auto result = provider.GetSubscriberConfigs();
+  REQUIRE(result.has_value());
 }

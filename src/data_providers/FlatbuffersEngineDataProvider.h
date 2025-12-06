@@ -9,8 +9,9 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "IEngineDataProvider.h"
-#include "ISubscriberDataViewer.h"
+#include "SubscriberDataViewer.h"
 #include "FlatbuffersDataLoader.h"
+#include <memory>
 
 namespace steamrot {
 
@@ -19,13 +20,14 @@ namespace steamrot {
 /// @brief FlatBuffers implementation of IEngineDataProvider.
 ///
 /// Loads engine data from FlatBuffers binary files and converts
-/// to native C++ structs for use by game code. Also implements
-/// ISubscriberDataViewer to provide access to subscriber configurations.
+/// to native C++ structs for use by game code. Contains a
+/// SubscriberDataViewer member to provide access to subscriber
+/// configurations.
 /////////////////////////////////////////////////
-class FlatbuffersEngineDataProvider : public IEngineDataProvider,
-                                      public ISubscriberDataViewer {
+class FlatbuffersEngineDataProvider : public IEngineDataProvider {
 private:
   FlatbuffersDataLoader m_loader;
+  mutable std::unique_ptr<SubscriberDataViewer> m_subscriber_viewer;
 
 public:
   FlatbuffersEngineDataProvider() = default;
@@ -40,12 +42,23 @@ public:
   LoadEngineState() const override;
 
   /////////////////////////////////////////////////
+  /// @brief Get subscriber data viewer for this provider.
+  ///
+  /// Lazily creates and returns the subscriber data viewer.
+  ///
+  /// @return Pointer to SubscriberDataViewer or nullptr if not available
+  /////////////////////////////////////////////////
+  const SubscriberDataViewer* GetSubscriberViewer() const override;
+
+  /////////////////////////////////////////////////
   /// @brief Get subscriber configurations from EngineState data.
+  ///
+  /// Convenience method that delegates to the subscriber viewer.
   ///
   /// @return Vector of SubscriberConfig objects or failure information
   /////////////////////////////////////////////////
   std::expected<std::vector<SubscriberConfig>, FailInfo>
-  GetSubscriberConfigs() const override;
+  GetSubscriberConfigs() const;
 };
 
 } // namespace steamrot

@@ -15,6 +15,11 @@
 #include <expected>
 #include <string>
 
+// Forward declaration
+namespace steamrot {
+class SubscriberDataViewer;
+}
+
 namespace steamrot {
 
 /////////////////////////////////////////////////
@@ -84,6 +89,16 @@ public:
   /////////////////////////////////////////////////
   virtual std::expected<EngineState, FailInfo>
   LoadEngineState() const = 0;
+
+  /////////////////////////////////////////////////
+  /// @brief Get subscriber data viewer for this provider.
+  ///
+  /// Returns a pointer to the subscriber data viewer that can be used
+  /// to access subscriber configurations from this data provider.
+  ///
+  /// @return Pointer to SubscriberDataViewer or nullptr if not available
+  /////////////////////////////////////////////////
+  virtual const SubscriberDataViewer* GetSubscriberViewer() const = 0;
 };
 
 } // namespace steamrot

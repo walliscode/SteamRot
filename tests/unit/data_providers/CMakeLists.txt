@@ -3,6 +3,7 @@ add_executable(test_data_providers
   FlatbuffersSceneDataProvider.test.cpp
   FlatbuffersSubscriberDataProvider.test.cpp
   ISubscriberDataViewer.test.cpp
+  SubscriberDataViewer.test.cpp
 )
 
 target_link_libraries(test_data_providers
