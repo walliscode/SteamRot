@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersEngineDataProvider.h"
+#include "FlatbuffersSubscriberDataProvider.h"
 #include "SubscriberFactory.h"
 
 namespace steamrot {
@@ -93,3 +94,22 @@ FlatbuffersEngineDataProvider::LoadEngineState() const {
 }
 
 } // namespace steamrot
+
+/////////////////////////////////////////////////
+std::expected<std::vector<SubscriberConfig>, FailInfo>
+FlatbuffersEngineDataProvider::GetSubscriberConfigs() const {
+  // Load engine data for subscriptions
+  auto fb_result = m_loader.ProvideEngineData();
+  if (!fb_result.has_value()) {
+    return std::unexpected(fb_result.error());
+  }
+
+  const auto *fb_data = fb_result.value();
+
+  // Use FlatbuffersSubscriberDataProvider to convert
+  FlatbuffersSubscriberDataProvider subscriber_provider(
+      fb_data->subscriptions());
+  
+  return subscriber_provider.LoadSubscriberConfigs();
+}
+

@@ -9,6 +9,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "IEngineDataProvider.h"
+#include "ISubscriberDataViewer.h"
 #include "FlatbuffersDataLoader.h"
 
 namespace steamrot {
@@ -18,9 +19,11 @@ namespace steamrot {
 /// @brief FlatBuffers implementation of IEngineDataProvider.
 ///
 /// Loads engine data from FlatBuffers binary files and converts
-/// to native C++ structs for use by game code.
+/// to native C++ structs for use by game code. Also implements
+/// ISubscriberDataViewer to provide access to subscriber configurations.
 /////////////////////////////////////////////////
-class FlatbuffersEngineDataProvider : public IEngineDataProvider {
+class FlatbuffersEngineDataProvider : public IEngineDataProvider,
+                                      public ISubscriberDataViewer {
 private:
   FlatbuffersDataLoader m_loader;
 
@@ -35,6 +38,14 @@ public:
 
   std::expected<EngineState, FailInfo>
   LoadEngineState() const override;
+
+  /////////////////////////////////////////////////
+  /// @brief Get subscriber configurations from EngineState data.
+  ///
+  /// @return Vector of SubscriberConfig objects or failure information
+  /////////////////////////////////////////////////
+  std::expected<std::vector<SubscriberConfig>, FailInfo>
+  GetSubscriberConfigs() const override;
 };
 
 } // namespace steamrot
