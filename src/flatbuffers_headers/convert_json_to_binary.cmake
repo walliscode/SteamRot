@@ -10,12 +10,13 @@ set(FLATBUFFERS_ALL_GENERATED_BINARIES)
 # Macro to define FlatBuffers generation for a given schema/json type
 # Arguments:
 #   1 - schema name without extension (e.g. themes, scenes, fragments)
-#   2 - json file extension pattern (e.g. .themes.json, .scenes.json, .fragment.json)
-#   3 - subdirectory under root (e.g. themes, scenes, fragments)
-macro(flatbuffers_generate_for_type schema_name json_ext subdir)
-  set(schema "${CMAKE_CURRENT_SOURCE_DIR}/${schema_name}.fbs")
+#   2 - schema subdirectory (e.g. entities, scenes, configuration)
+#   3 - json file extension pattern (e.g. .themes.json, .scenes.json, .fragment.json)
+#   4 - data subdirectory under root (e.g. themes, scenes, fragments)
+macro(flatbuffers_generate_for_type schema_name schema_subdir json_ext data_subdir)
+  set(schema "${CMAKE_CURRENT_SOURCE_DIR}/${schema_subdir}/${schema_name}.fbs")
   foreach(root_dir ${DIRECTORY_ROOTS})
-    set(data_dir "${root_dir}/${subdir}")
+    set(data_dir "${root_dir}/${data_subdir}")
     file(GLOB json_candidates "${data_dir}/*${json_ext}")  # Only files with your custom extension
 
     # Filter files to exactly match pattern
@@ -39,8 +40,8 @@ macro(flatbuffers_generate_for_type schema_name json_ext subdir)
       # Main prod directory path
       set(prod_dir "${CMAKE_SOURCE_DIR}/data/defaults")
       set(test_dir "${CMAKE_SOURCE_DIR}/tests/data/defaults")
-      set(prod_subdir "${prod_dir}/${subdir}")
-      set(test_subdir "${test_dir}/${subdir}")
+      set(prod_subdir "${prod_dir}/${data_subdir}")
+      set(test_subdir "${test_dir}/${data_subdir}")
 
       # If this is the prod dir, also copy to test dir after generation
       if("${root_dir}" STREQUAL "${prod_dir}")
@@ -81,20 +82,24 @@ macro(flatbuffers_generate_for_type schema_name json_ext subdir)
   endforeach()
 endmacro()
 
-# Call macro for each supported type
-flatbuffers_generate_for_type(ui_style ".styles.json" "ui_styles")
-flatbuffers_generate_for_type(scene_data ".scene_data.json" "scenes")
-flatbuffers_generate_for_type(fragments ".fragment.json" "fragments")
-flatbuffers_generate_for_type(assets ".json" "asset_manager")
-flatbuffers_generate_for_type(scene_manager_data ".scene_manager_data.json" "scene_manager")
-flatbuffers_generate_for_type(context_data ".json" "context")
-flatbuffers_generate_for_type(user_preferences ".preferences.json" "preferences")
+# Call macro for each supported type (now with schema subdirectory parameter)
+flatbuffers_generate_for_type(ui_style "entities" ".styles.json" "ui_styles")
+flatbuffers_generate_for_type(scene_data "scenes" ".scene_data.json" "scenes")
+flatbuffers_generate_for_type(fragments "scenes" ".fragment.json" "fragments")
+flatbuffers_generate_for_type(assets "assets" ".json" "asset_manager")
+flatbuffers_generate_for_type(scene_manager_data "scenes" ".scene_manager_data.json" "scene_manager")
+flatbuffers_generate_for_type(context_data "configuration" ".json" "context")
+flatbuffers_generate_for_type(user_preferences "configuration" ".preferences.json" "preferences")
 
-# Engine schemas - using new engine subdirectory schemas
-macro(flatbuffers_generate_for_engine_type schema_name json_ext subdir)
+# Macro for engine-specific types (to handle engine subdirectory)
+# Arguments:
+#   1 - schema name without extension
+#   2 - json file extension pattern
+#   3 - data subdirectory under root
+macro(flatbuffers_generate_for_engine_type schema_name json_ext data_subdir)
   set(schema "${CMAKE_CURRENT_SOURCE_DIR}/engine/${schema_name}.fbs")
   foreach(root_dir ${DIRECTORY_ROOTS})
-    set(data_dir "${root_dir}/${subdir}")
+    set(data_dir "${root_dir}/${data_subdir}")
     file(GLOB json_candidates "${data_dir}/*${json_ext}")  # Only files with your custom extension
 
     # Filter files to exactly match pattern
@@ -118,8 +123,8 @@ macro(flatbuffers_generate_for_engine_type schema_name json_ext subdir)
       # Main prod directory path
       set(prod_dir "${CMAKE_SOURCE_DIR}/data/defaults")
       set(test_dir "${CMAKE_SOURCE_DIR}/tests/data/defaults")
-      set(prod_subdir "${prod_dir}/${subdir}")
-      set(test_subdir "${test_dir}/${subdir}")
+      set(prod_subdir "${prod_dir}/${data_subdir}")
+      set(test_subdir "${test_dir}/${data_subdir}")
 
       # If this is the prod dir, also copy to test dir after generation
       if("${root_dir}" STREQUAL "${prod_dir}")

@@ -2,23 +2,15 @@
 add_library(engine
     Engine.cpp
     GameEngine.cpp
-    ActionManager.cpp
+    engine_configuration.cpp
 )
 
-# check if set definitions exist
-set(definition_list
-RESOURCES_DIR
-DATA_OUT_DIR
-)
+
 
 
 target_include_directories(engine
   PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_SOURCE_DIR}/include/
-  ${CMAKE_SOURCE_DIR}/include/utils
-  ${CMAKE_SOURCE_DIR}/include/constants
-  ${CMAKE_SOURCE_DIR}/include/enums
 )
 
 
@@ -31,7 +23,6 @@ magic_enum
 entity
 events
 config
-
 logger
 stduuid
 context

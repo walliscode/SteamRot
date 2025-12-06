@@ -30,19 +30,11 @@ struct EngineConfigFbsBuilder;
 struct DisplayConfigFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef DisplayConfigFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_WINDOW_WIDTH = 4,
-    VT_WINDOW_HEIGHT = 6,
-    VT_WINDOW_TITLE = 8,
-    VT_FRAMERATE_LIMIT = 10,
-    VT_FULLSCREEN = 12,
-    VT_VSYNC = 14
+    VT_WINDOW_TITLE = 4,
+    VT_FRAMERATE_LIMIT = 6,
+    VT_FULLSCREEN = 8,
+    VT_VSYNC = 10
   };
-  uint32_t window_width() const {
-    return GetField<uint32_t>(VT_WINDOW_WIDTH, 800);
-  }
-  uint32_t window_height() const {
-    return GetField<uint32_t>(VT_WINDOW_HEIGHT, 600);
-  }
   const ::flatbuffers::String *window_title() const {
     return GetPointer<const ::flatbuffers::String *>(VT_WINDOW_TITLE);
   }
@@ -57,8 +49,6 @@ struct DisplayConfigFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<uint32_t>(verifier, VT_WINDOW_WIDTH, 4) &&
-           VerifyField<uint32_t>(verifier, VT_WINDOW_HEIGHT, 4) &&
            VerifyOffset(verifier, VT_WINDOW_TITLE) &&
            verifier.VerifyString(window_title()) &&
            VerifyField<uint32_t>(verifier, VT_FRAMERATE_LIMIT, 4) &&
@@ -72,12 +62,6 @@ struct DisplayConfigFbsBuilder {
   typedef DisplayConfigFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_window_width(uint32_t window_width) {
-    fbb_.AddElement<uint32_t>(DisplayConfigFbs::VT_WINDOW_WIDTH, window_width, 800);
-  }
-  void add_window_height(uint32_t window_height) {
-    fbb_.AddElement<uint32_t>(DisplayConfigFbs::VT_WINDOW_HEIGHT, window_height, 600);
-  }
   void add_window_title(::flatbuffers::Offset<::flatbuffers::String> window_title) {
     fbb_.AddOffset(DisplayConfigFbs::VT_WINDOW_TITLE, window_title);
   }
@@ -103,8 +87,6 @@ struct DisplayConfigFbsBuilder {
 
 inline ::flatbuffers::Offset<DisplayConfigFbs> CreateDisplayConfigFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    uint32_t window_width = 800,
-    uint32_t window_height = 600,
     ::flatbuffers::Offset<::flatbuffers::String> window_title = 0,
     uint32_t framerate_limit = 60,
     bool fullscreen = false,
@@ -112,8 +94,6 @@ inline ::flatbuffers::Offset<DisplayConfigFbs> CreateDisplayConfigFbs(
   DisplayConfigFbsBuilder builder_(_fbb);
   builder_.add_framerate_limit(framerate_limit);
   builder_.add_window_title(window_title);
-  builder_.add_window_height(window_height);
-  builder_.add_window_width(window_width);
   builder_.add_vsync(vsync);
   builder_.add_fullscreen(fullscreen);
   return builder_.Finish();
@@ -121,8 +101,6 @@ inline ::flatbuffers::Offset<DisplayConfigFbs> CreateDisplayConfigFbs(
 
 inline ::flatbuffers::Offset<DisplayConfigFbs> CreateDisplayConfigFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    uint32_t window_width = 800,
-    uint32_t window_height = 600,
     const char *window_title = nullptr,
     uint32_t framerate_limit = 60,
     bool fullscreen = false,
@@ -130,8 +108,6 @@ inline ::flatbuffers::Offset<DisplayConfigFbs> CreateDisplayConfigFbsDirect(
   auto window_title__ = window_title ? _fbb.CreateString(window_title) : 0;
   return steamrot::CreateDisplayConfigFbs(
       _fbb,
-      window_width,
-      window_height,
       window_title__,
       framerate_limit,
       fullscreen,

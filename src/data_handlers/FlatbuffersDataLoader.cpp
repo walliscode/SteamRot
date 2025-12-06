@@ -10,9 +10,8 @@
 #include "FailInfo.h"
 #include "Fragment.h"
 #include "assets_generated.h"
-#include "core_data_generated.h"
 #include "engine_config_generated.h"
-#include "engine_data_generated.h"
+#include "engine_resources_config_generated.h"
 #include "fragments_generated.h"
 #include "paths.h"
 #include "scene_data_generated.h"
@@ -138,51 +137,7 @@ FlatbuffersDataLoader::ProvideAllFragments(
 }
 
 /////////////////////////////////////////////////
-std::expected<const EngineDataFbs *, FailInfo>
-FlatbuffersDataLoader::ProvideEngineData() const {
-  // get engine directory from defaults
-  std::filesystem::path engine_dir = paths::GetDefaultEngineDirectory();
-
-  // construct the file path
-  std::filesystem::path engine_data_path = engine_dir / "default.engine_data.bin";
-
-  // check if the file exists
-  if (!std::filesystem::exists(engine_data_path)) {
-    std::string error_message = std::format(
-        "Engine resources data not found: {}", engine_data_path.string());
-    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
-  }
-  // load the game engine data
-  const steamrot::EngineDataFbs *engine_data =
-      GetEngineDataFbs(LoadBinaryData(engine_data_path));
-  return engine_data;
-}
-
-/////////////////////////////////////////////////
-std::expected<const SceneManagerData *, FailInfo>
-FlatbuffersDataLoader::ProvideSceneManagerData() const {
-  // get scene manager directory from defaults
-  std::filesystem::path scene_manager_dir =
-      paths::GetDefaultSceneManagerDirectory();
-
-  // construct the file path
-  std::filesystem::path scene_manager_path =
-      scene_manager_dir / "default.scene_manager_data.bin";
-  // check if the file exists
-  if (!std::filesystem::exists(scene_manager_path)) {
-    std::string error_message = std::format("Scene Manager file not found: {}",
-                                            scene_manager_path.string());
-    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
-  }
-  // load the scene manager data
-  const steamrot::SceneManagerData *scene_manager_data =
-      GetSceneManagerData(LoadBinaryData(scene_manager_path));
-
-  return scene_manager_data;
-}
-
-/////////////////////////////////////////////////
-std::expected<const SceneDataData *, FailInfo>
+std::expected<const SceneDataFbs *, FailInfo>
 FlatbuffersDataLoader::ProvideDefaultSceneData(
     const SceneType scene_type) const {
 
@@ -215,18 +170,18 @@ FlatbuffersDataLoader::ProvideDefaultSceneData(
 
   // construct the file path
   std::filesystem::path scene_path =
-      scene_dir / (scene_file_prefix + ".scenes.bin");
+      scene_dir / (scene_file_prefix + ".scene_data.bin");
 
   // check if the file exists
   if (!std::filesystem::exists(scene_path)) {
     std::string error_message =
-        std::format("Scene file not found: {}", scene_file_prefix);
+        std::format("Scene file not found: {}", scene_path.string());
     return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
   }
 
   // load the scene data
-  const steamrot::SceneDataData *scene_data =
-      GetSceneDataData(LoadBinaryData(scene_path));
+  const steamrot::SceneDataFbs *scene_data =
+      GetSceneDataFbs(LoadBinaryData(scene_path));
 
   return scene_data;
 }
@@ -268,7 +223,7 @@ FlatbuffersDataLoader::ProvideAssetData(const SceneType scene_type) const {
     return std::unexpected(scene_data_result.error());
   }
 
-  const SceneDataData *scene_data = scene_data_result.value();
+  const SceneDataFbs *scene_data = scene_data_result.value();
   if (!scene_data) {
     return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
                                     "SceneData pointer is null"));
@@ -337,38 +292,65 @@ FlatbuffersDataLoader::ProvideContextData() const {
 }
 
 /////////////////////////////////////////////////
-std::expected<const EngineCoreDataFbs *, FailInfo>
-FlatbuffersDataLoader::ProvideEngineCoreData() const {
-  // Load from EngineData
-  auto engine_result = ProvideEngineData();
-  if (!engine_result.has_value()) {
-    return std::unexpected(engine_result.error());
-  }
+std::expected<const EngineResourcesConfigFbs *, FailInfo>
+FlatbuffersDataLoader::ProvideEngineResourcesConfig() const {
+  // get engine directory from defaults
+  std::filesystem::path engine_dir = paths::GetDefaultEngineDirectory();
 
-  const EngineDataFbs *engine_data = engine_result.value();
-  if (!engine_data->engine_core()) {
-    return std::unexpected(
-        FailInfo(FailMode::FlatbuffersDataNotFound,
-                 "EngineCoreDataFbs not found in EngineData"));
-  }
+  // construct the file path
+  std::filesystem::path engine_resources_path = engine_dir / "engine_resources_config.bin";
 
-  return engine_data->engine_core();
+  // check if the file exists
+  if (!std::filesystem::exists(engine_resources_path)) {
+    std::string error_message = std::format(
+        "Engine resources config not found: {}", engine_resources_path.string());
+    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
+  }
+  // load the engine resources config
+  const steamrot::EngineResourcesConfigFbs *engine_resources_config =
+      GetEngineResourcesConfigFbs(LoadBinaryData(engine_resources_path));
+  return engine_resources_config;
 }
 
 /////////////////////////////////////////////////
-std::expected<const SceneCoreDataFbs *, FailInfo>
-FlatbuffersDataLoader::ProvideSceneCoreData(const SceneType scene_type) const {
-  // Load from SceneData for the specified scene type
-  auto scene_data_result = ProvideDefaultSceneData(scene_type);
-  if (!scene_data_result.has_value()) {
-    return std::unexpected(scene_data_result.error());
+std::expected<const EngineConfigFbs *, FailInfo>
+FlatbuffersDataLoader::ProvideEngineConfig() const {
+  // First check for user-specific engine config
+  std::filesystem::path user_engine_dir = paths::GetUserDirectory() / "engine";
+  std::filesystem::path user_config_path =
+      user_engine_dir / "engine_config.bin";
+
+  // If user config exists, load it
+  if (std::filesystem::exists(user_config_path)) {
+    const steamrot::EngineConfigFbs *config_data =
+        GetEngineConfigFbs(LoadBinaryData(user_config_path));
+
+    if (config_data) {
+      return config_data;
+    }
+    // If user config exists but failed to load, fall through to defaults
   }
 
-  const SceneDataData *scene_data = scene_data_result.value();
+  // Load default engine config
+  std::filesystem::path default_engine_dir = paths::GetDefaultEngineDirectory();
+  std::filesystem::path default_config_path =
+      default_engine_dir / "engine_config.bin";
 
-  // scene_core is optional, so it's okay if it's not present
-  // Return nullptr if not configured - caller should handle defaults
-  return scene_data->scene_core();
+  if (!std::filesystem::exists(default_config_path)) {
+    std::string error_message = std::format("Engine config file not found: {}",
+                                            default_config_path.string());
+    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
+  }
+
+  const steamrot::EngineConfigFbs *config_data =
+      GetEngineConfigFbs(LoadBinaryData(default_config_path));
+
+  if (!config_data) {
+    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
+                                    "EngineConfigFbs pointer is null"));
+  }
+
+  return config_data;
 }
 
 /////////////////////////////////////////////////
@@ -380,7 +362,7 @@ FlatbuffersDataLoader::ProvideLogicCollectionData(
   if (!scene_data_result.has_value()) {
     return std::unexpected(scene_data_result.error());
   }
-  const SceneDataData *scene_data = scene_data_result.value();
+  const SceneDataFbs *scene_data = scene_data_result.value();
   if (!scene_data->logic_collection_data()) {
     return std::unexpected(
         FailInfo(FailMode::FlatbuffersDataNotFound,
@@ -388,7 +370,6 @@ FlatbuffersDataLoader::ProvideLogicCollectionData(
   }
   return scene_data->logic_collection_data();
 }
-
 /////////////////////////////////////////////////
 std::expected<const UserPreferencesData *, FailInfo>
 FlatbuffersDataLoader::ProvideDefaultUserPreferencesData() const {
@@ -416,47 +397,6 @@ FlatbuffersDataLoader::ProvideDefaultUserPreferencesData() const {
   }
 
   return preferences_data;
-}
-
-/////////////////////////////////////////////////
-std::expected<const EngineConfigData *, FailInfo>
-FlatbuffersDataLoader::ProvideEngineConfigData() const {
-  // First check for user-specific engine config
-  std::filesystem::path user_engine_dir = paths::GetUserDirectory() / "engine";
-  std::filesystem::path user_config_path =
-      user_engine_dir / "default.engine_config.bin";
-
-  // If user config exists, load it
-  if (std::filesystem::exists(user_config_path)) {
-    const steamrot::EngineConfigData *config_data =
-        GetEngineConfigData(LoadBinaryData(user_config_path));
-
-    if (config_data) {
-      return config_data;
-    }
-    // If user config exists but failed to load, fall through to defaults
-  }
-
-  // Load default engine config
-  std::filesystem::path default_engine_dir = paths::GetDefaultEngineDirectory();
-  std::filesystem::path default_config_path =
-      default_engine_dir / "default.engine_config.bin";
-
-  if (!std::filesystem::exists(default_config_path)) {
-    std::string error_message = std::format("Engine config file not found: {}",
-                                            default_config_path.string());
-    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
-  }
-
-  const steamrot::EngineConfigData *config_data =
-      GetEngineConfigData(LoadBinaryData(default_config_path));
-
-  if (!config_data) {
-    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
-                                    "EngineConfigData pointer is null"));
-  }
-
-  return config_data;
 }
 
 } // namespace steamrot

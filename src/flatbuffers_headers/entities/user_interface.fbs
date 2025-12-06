@@ -1,0 +1,91 @@
+include "../core/types.fbs";
+include "../events/subscriber_data.fbs";
+include "../events/event_packet_data.fbs";
+namespace steamrot;
+
+
+enum LayoutType: byte{ 
+  None = 0,
+  Horizontal = 1,
+  Vertical = 2,
+  Grid = 3,
+  DropDown = 4,
+
+  }
+
+enum SpacingAndSizingType: byte {
+    None = 0,
+    Even = 1,
+    Ratioed = 2,
+    DropDownList = 3,
+  }
+
+
+union UIElementDataUnion {
+  PanelData,
+  ButtonData,
+  DropDownListData,
+  DropDownContainerData,
+  DropDownItemData,
+  DropDownButtonData
+}
+
+table child {
+  element: UIElementDataUnion (required);
+}
+
+table UIElementData{
+    position: Vector2fData (required);
+    size: Vector2fData (required);
+    subscriber_data: SubscriberData;
+    response_event_data: EventPacketData;
+    children_active: bool ;
+    children: [child] (required);
+    is_mouse_over: bool;
+    layout: LayoutType;
+    spacing_strategy: SpacingAndSizingType;
+  }
+table PanelData{  base_data: UIElementData(required);}
+
+table ButtonData {
+  base_data: UIElementData(required);
+ label: string (required);
+}
+
+table DropDownContainerData{
+  base_data: UIElementData(required);
+
+  }
+
+enum DataPopulateFunction: byte {
+    None = 0,
+    PopulateWithFragmentData = 1,
+    PopulateWithJointData = 2,
+  }
+table DropDownListData{
+  base_data: UIElementData(required);
+    label: string (required);
+    expanded_label: string (required);
+    data_populate_function: DataPopulateFunction;
+  }
+
+table DropDownItemData {
+  base_data: UIElementData(required);
+    label: string (required);
+
+  }
+
+table DropDownButtonData {
+  base_data: UIElementData(required);
+    is_expanded: bool;
+  }
+
+
+
+
+table UserInterfaceData{
+  // first structure must be a PanelElement
+    root_ui_element: PanelData (required); 
+    ui_name: string; 
+    is_visible: bool;
+  }

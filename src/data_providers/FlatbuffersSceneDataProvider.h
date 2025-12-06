@@ -29,9 +29,6 @@ public:
 
   std::expected<SceneData, FailInfo>
   LoadSceneData(SceneType scene_type) const override;
-
-  std::expected<SceneCoreData, FailInfo>
-  LoadSceneCoreData(SceneType scene_type) const override;
 };
 
 } // namespace steamrot

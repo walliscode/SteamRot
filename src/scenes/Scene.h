@@ -11,22 +11,20 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "ActionManager.h"
-#include "EntityManager.h"
 #include "GameContext.h"
-#include "Logic.h"
 #include "LogicFactory.h"
-#include "SceneCore.h"
+#include "SceneConfig.h"
 #include "SceneInfo.h"
+#include "SceneResources.h"
+#include "SceneState.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
-#include <unordered_map>
-#include <unordered_set>
 
 #include <uuid.h>
 typedef std::vector<std::shared_ptr<sf::Drawable>> SceneDrawables;
 
 namespace steamrot {
+
 /////////////////////////////////////////////////
 /// @class Scene
 /// @brief Abstract base class for all Scenes in the game.
@@ -42,40 +40,19 @@ protected:
   const SceneInfo m_scene_info;
 
   /////////////////////////////////////////////////
-  // Member: Entity Manager instance
+  /// @brief Scene-level resources (managers, logic, render texture).
   /////////////////////////////////////////////////
-  EntityManager m_entity_manager;
+  SceneResources m_scene_resources;
 
   /////////////////////////////////////////////////
-  // Member: Action Manager instance
+  /// @brief Scene configuration loaded from data files.
   /////////////////////////////////////////////////
-  ActionManager m_action_manager;
+  SceneConfig m_scene_config;
 
   /////////////////////////////////////////////////
-  /// @brief GameContext object passed down from the GameEngine.
+  /// @brief Scene runtime state (active flag, etc.).
   /////////////////////////////////////////////////
-  const GameContext &m_game_context;
-
-  /////////////////////////////////////////////////
-  /// @brief Map of all logic objects needed by the Scene.
-  /////////////////////////////////////////////////
-  std::unordered_map<LogicType, std::vector<std::unique_ptr<Logic>>>
-      m_logic_map;
-
-  /////////////////////////////////////////////////
-  /// @brief Scene-level core objects (render texture, etc.).
-  /////////////////////////////////////////////////
-  SceneCore m_scene_core;
-
-  /////////////////////////////////////////////////
-  /// @brief Is the Scene active? Should update logic and render texture
-  /////////////////////////////////////////////////
-  bool m_active = true;
-
-  /////////////////////////////////////////////////
-  /// @brief contains all event types that the Scene is interested in
-  /////////////////////////////////////////////////
-  std::unordered_set<EventType> m_scene_event_types;
+  SceneState m_scene_state;
 
   /////////////////////////////////////////////////
   /// @brief Constructor for Scene class.
@@ -127,21 +104,19 @@ public:
   sf::RenderTexture &GetRenderTexture();
 
   /////////////////////////////////////////////////
-  /// @brief Returns a const reference to the LogicMap of the Scene.
+  /// @brief Returns a const reference to the LogicCollection of the Scene.
   ///
-  /// @return The LogicMap of the Scene.
+  /// @return The LogicCollection of the Scene.
   /////////////////////////////////////////////////
   const LogicCollection &GetLogicMap() const;
 
   /////////////////////////////////////////////////
-  /// @brief Sets LogicMap for the scene (only if the map is empty)
+  /// @brief Sets LogicCollection for the scene (only if the map is empty)
   ///
-  /// @param logic_map Logic map to set for the scene, passed by value and
-  /// moved.
+  /// @param logic_map Logic collection to set for the scene, passed by value
+  /// and moved.
   /////////////////////////////////////////////////
-  void
-  SetLogicMap(std::unordered_map<LogicType, std::vector<std::unique_ptr<Logic>>>
-                  logic_map);
+  void SetLogicMap(LogicCollection logic_map);
   /////////////////////////////////////////////////
   /// @brief Returns the active state of the Scene.
   ///

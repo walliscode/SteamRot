@@ -14,9 +14,8 @@
 #include "DataLoader.h"
 #include "FailInfo.h"
 #include "context_data_generated.h"
-#include "core_data_generated.h"
 #include "engine_config_generated.h"
-#include "engine_data_generated.h"
+#include "engine_resources_config_generated.h"
 #include "logic_data_generated.h"
 #include "scene_data_generated.h"
 #include "scene_manager_data_generated.h"
@@ -54,11 +53,6 @@ public:
   ProvideAllFragments(std::vector<std::string> fragment_names) const override;
 
   /////////////////////////////////////////////////
-  /// @brief Provides EngineData from binary file
-  /////////////////////////////////////////////////
-  std::expected<const EngineDataFbs *, FailInfo> ProvideEngineData() const;
-
-  /////////////////////////////////////////////////
   /// @brief Provides SceneManagerData from binary file
   /////////////////////////////////////////////////
   std::expected<const SceneManagerData *, FailInfo>
@@ -69,7 +63,7 @@ public:
   ///
   /// @param scene_type Enum representing the type of scene
   /////////////////////////////////////////////////
-  std::expected<const SceneDataData *, FailInfo>
+  std::expected<const SceneDataFbs *, FailInfo>
   ProvideDefaultSceneData(const SceneType scene_type) const;
 
   /////////////////////////////////////////////////
@@ -97,16 +91,22 @@ public:
   std::expected<const ContextData *, FailInfo> ProvideContextData() const;
 
   /////////////////////////////////////////////////
-  /// @brief Provides EngineCoreDataFbs from EngineData
+  /// @brief Provides EngineResourcesConfigFbs from binary file
+  ///
+  /// Loads engine resources configuration from
+  /// defaults/engine/engine_resources_config.bin
   /////////////////////////////////////////////////
-  std::expected<const EngineCoreDataFbs *, FailInfo>
-  ProvideEngineCoreData() const;
+  std::expected<const EngineResourcesConfigFbs *, FailInfo>
+  ProvideEngineResourcesConfig() const;
 
   /////////////////////////////////////////////////
-  /// @brief Provides SceneCoreDataFbs from SceneData for a specific scene
+  /// @brief Provides EngineConfigFbs from binary file
+  ///
+  /// Loads engine configuration from defaults/engine/engine_config.bin.
+  /// If user configuration exists at user/engine/engine_config.bin, it
+  /// will be loaded instead.
   /////////////////////////////////////////////////
-  std::expected<const SceneCoreDataFbs *, FailInfo>
-  ProvideSceneCoreData(const SceneType scene_type) const;
+  std::expected<const EngineConfigFbs *, FailInfo> ProvideEngineConfig() const;
 
   /////////////////////////////////////////////////
   /// @brief Provides LogicCollectionData from SceneData for a specific scene
@@ -124,16 +124,6 @@ public:
   /////////////////////////////////////////////////
   std::expected<const UserPreferencesData *, FailInfo>
   ProvideDefaultUserPreferencesData() const;
-
-  /////////////////////////////////////////////////
-  /// @brief Provides EngineConfigData from binary file
-  ///
-  /// Loads engine configuration from defaults/engine/default.engine_config.bin.
-  /// If user configuration exists at user/engine/default.engine_config.bin, it
-  /// will be loaded instead.
-  /////////////////////////////////////////////////
-  std::expected<const EngineConfigData *, FailInfo>
-  ProvideEngineConfigData() const;
 };
 
 } // namespace steamrot

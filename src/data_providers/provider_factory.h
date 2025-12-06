@@ -11,7 +11,6 @@
 #include "IAssetDataProvider.h"
 #include "IEngineDataProvider.h"
 #include "IFragmentDataProvider.h"
-#include "IGameConfigProvider.h"
 #include "ISceneDataProvider.h"
 
 namespace steamrot {
@@ -38,14 +37,5 @@ IAssetDataProvider &GetAssetDataProvider();
 /// @brief Get the fragment data provider instance.
 /////////////////////////////////////////////////
 IFragmentDataProvider &GetFragmentDataProvider();
-
-/////////////////////////////////////////////////
-/// @brief Get the game config provider instance.
-///
-/// This provider returns FlatBuffers types for complex configuration
-/// (subscriptions, event buses, scene manager) that hasn't yet been
-/// converted to native C++ structs. Temporary until Phase 4.
-/////////////////////////////////////////////////
-IGameConfigProvider &GetGameConfigProvider();
 
 } // namespace steamrot

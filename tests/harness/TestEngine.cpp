@@ -9,7 +9,7 @@
 #include "TestEngine.h"
 #include "FailInfo.h"
 #include "SceneContext.h"
-#include "SceneInfo.h"
+#include "SceneSnapshot.h"
 #include "simulation_runner.h"
 #include <expected>
 #include <iostream>
@@ -70,7 +70,7 @@ void TestEngine::RunGameLoop() {
 
 /////////////////////////////////////////////////
 void TestEngine::AddToDataBank(size_t tick) {
-  std::vector<SceneInfo> scene_snapshots;
+  std::vector<SceneSnapshot> scene_snapshots;
 
   // Iterate through all scenes in the SceneManager
   for (auto &scene_pair : m_scene_manager.GetScenes()) {
@@ -79,14 +79,13 @@ void TestEngine::AddToDataBank(size_t tick) {
     // Get SceneInfo which has id and type
     const SceneInfo scene_info = scene.GetSceneInfo();
 
-    // Create a SceneData snapshot
-    SceneInfo snapshot;
-    snapshot.id = scene_info.id;
-    snapshot.type = scene_info.type;
-
     // Get SceneContext to access the EntityMemoryPool
     SceneContext context = scene.GetSceneContext();
-    // Copy the entity memory pool from the scene context
+
+    // Create a SceneSnapshot with both metadata and entity pool
+    SceneSnapshot snapshot;
+    snapshot.scene_info.id = scene_info.id;
+    snapshot.scene_info.type = scene_info.type;
     snapshot.entity_memory_pool = context.scene_entities;
 
     scene_snapshots.push_back(std::move(snapshot));
@@ -97,7 +96,7 @@ void TestEngine::AddToDataBank(size_t tick) {
 }
 
 /////////////////////////////////////////////////
-const std::unordered_map<size_t, std::vector<SceneInfo>> &
+const std::unordered_map<size_t, std::vector<SceneSnapshot>> &
 TestEngine::GetDataBank() const {
   return m_data_bank;
 }

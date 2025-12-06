@@ -12,7 +12,6 @@
 #include "EngineResources.h"
 #include "EntityManager.h"
 #include "EventHandler.h"
-#include "SceneCore.h"
 #include "containers.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -34,14 +33,15 @@ namespace steamrot {
 /////////////////////////////////////////////////
 struct SceneContext {
   /////////////////////////////////////////////////
-  /// @brief Constructor taking SceneCore, GameCore, and EntityManager.
+  /// @brief Constructor taking scene_texture, engine_resources, and EntityManager.
   ///
-  /// @param scene_core Reference to SceneCore (contains render texture)
-  /// @param game_core Reference to GameCore (contains window, assets, etc.)
+  /// @param scene_texture Reference to scene render texture
+  /// @param engine_resources Reference to EngineResources (contains window, assets, etc.)
   /// @param entity_manager Reference to EntityManager (contains
   /// entities/archetypes)
   /////////////////////////////////////////////////
-  SceneContext(SceneCore &scene_core, EngineResources &engine_resources,
+  SceneContext(sf::RenderTexture &scene_texture,
+               EngineResources &engine_resources,
                EntityManager &entity_manager);
 
   /////////////////////////////////////////////////

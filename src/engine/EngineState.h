@@ -11,7 +11,6 @@
 #include "Subscriber.h"
 #include <chrono>
 #include <memory>
-#include <optional>
 #include <vector>
 
 namespace steamrot {

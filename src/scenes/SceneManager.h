@@ -14,8 +14,9 @@
 #include "GameContext.h"
 #include "Scene.h"
 #include "SceneInfoProvider.h"
-#include "Subscriber.h"
-#include "events_generated.h"
+#include "SceneManagerConfig.h"
+#include "SceneManagerResources.h"
+#include "SceneManagerState.h"
 #include "scene_manager_data_generated.h"
 #include "subscriber_data_generated.h"
 #include "uuid.h"
@@ -43,13 +44,26 @@ private:
 
   /////////////////////////////////////////////////
   /// @brief Map of scenes, keyed by their unique UUIDs.
+  ///
+  /// Note: Kept at top level (not in SceneManagerResources) per user request
+  /// to make it obvious and easy to access.
   /////////////////////////////////////////////////
   std::unordered_map<uuids::uuid, std::unique_ptr<Scene>> m_scenes;
 
   /////////////////////////////////////////////////
-  /// @brief Map of all event subscriptions, stored by event type.
+  /// @brief SceneManager-level resources (managers, systems)
   /////////////////////////////////////////////////
-  std::unordered_map<EventType, std::shared_ptr<Subscriber>> m_subscriptions;
+  SceneManagerResources m_scene_manager_resources;
+
+  /////////////////////////////////////////////////
+  /// @brief SceneManager configuration loaded from data files
+  /////////////////////////////////////////////////
+  SceneManagerConfig m_scene_manager_config;
+
+  /////////////////////////////////////////////////
+  /// @brief SceneManager runtime state (subscriptions, etc.)
+  /////////////////////////////////////////////////
+  SceneManagerState m_scene_manager_state;
 
 public:
   /////////////////////////////////////////////////
@@ -135,7 +149,7 @@ public:
   ProvideAvailableSceneInfo() const override;
 
   /////////////////////////////////////////////////
-  /// @brief Returns a constant reference to the subscriptions map. for
+  /// @brief Returns a constant reference to the subscriptions map for
   /// inspection
   /////////////////////////////////////////////////
   const std::unordered_map<EventType, std::shared_ptr<Subscriber>> &
