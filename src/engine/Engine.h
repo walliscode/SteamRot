@@ -15,9 +15,10 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "EngineConfig.h"
+#include "EngineResources.h"
+#include "EngineState.h"
 #include "GameContext.h"
-#include "GameCore.h"
-#include "IUserPreferencesProvider.h"
 #include "SceneManager.h"
 #include <expected>
 #include <memory>
@@ -30,7 +31,7 @@ namespace steamrot {
 /// @brief Abstract base class for unified game/test execution.
 ///
 /// Engine provides:
-/// - Shared core management (GameCore, GameContext)
+/// - Shared resource management (EngineResources, EngineConfig, EngineState)
 /// - Common Run() loop structure
 /// - Virtual hooks for configuration and tick execution
 ///
@@ -44,10 +45,10 @@ namespace steamrot {
 class Engine {
 protected:
   /////////////////////////////////////////////////
-  /// @brief Game-level core objects (window, event handler, asset manager,
-  /// etc.)
+  /// @brief Engine-level global resources (window, event handler, asset
+  /// manager, etc.)
   /////////////////////////////////////////////////
-  GameCore m_game_core;
+  EngineResources m_engine_resources;
 
   /////////////////////////////////////////////////
   /// @brief GameContext for accessing core objects
@@ -60,19 +61,14 @@ protected:
   SceneManager m_scene_manager;
 
   /////////////////////////////////////////////////
-  /// @brief User preferences (loaded from default.preferences.bin)
+  /// @brief Engine configuration (display settings, user preferences)
   /////////////////////////////////////////////////
-  UserPreferences m_user_preferences;
+  EngineConfig m_engine_config;
 
   /////////////////////////////////////////////////
-  /// @brief Flag indicating if the engine should continue running
+  /// @brief Engine runtime state (subscriptions, flags, performance metrics)
   /////////////////////////////////////////////////
-  bool m_running = false;
-
-  /////////////////////////////////////////////////
-  /// @brief All subscribers registered to the GameEngine
-  /////////////////////////////////////////////////
-  std::vector<std::shared_ptr<Subscriber>> m_subscriptions;
+  EngineState m_engine_state;
 
   /////////////////////////////////////////////////
   /// @brief Configure the engine from data sources.
@@ -229,12 +225,12 @@ public:
           ::flatbuffers::Offset<steamrot::SubscriberData>> *subscriptions);
 
   /////////////////////////////////////////////////
-  /// @brief Get the current user preferences.
+  /// @brief Get the engine configuration (includes user preferences).
   ///
-  /// @return Const reference to user preferences
+  /// @return Const reference to engine configuration
   /////////////////////////////////////////////////
-  const UserPreferences &GetUserPreferences() const {
-    return m_user_preferences;
+  const EngineConfig &GetEngineConfig() const {
+    return m_engine_config;
   }
 
   std::vector<std::shared_ptr<Subscriber>> &GetSubscriptions();

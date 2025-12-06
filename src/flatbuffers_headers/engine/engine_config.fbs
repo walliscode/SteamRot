@@ -1,0 +1,40 @@
+////////////////////////////////////////////////////////////
+/// @file
+/// @brief FlatBuffers schema for EngineConfig.
+///
+/// EngineConfigFbs contains all configuration settings including
+/// display configuration and user preferences.
+////////////////////////////////////////////////////////////
+
+namespace steamrot;
+
+////////////////////////////////////////////////////////////
+/// Display configuration
+////////////////////////////////////////////////////////////
+table DisplayConfigFbs {
+  window_width: uint32 = 800;
+  window_height: uint32 = 600;
+  window_title: string;
+  framerate_limit: uint32 = 60;
+  fullscreen: bool = false;
+  vsync: bool = true;
+}
+
+////////////////////////////////////////////////////////////
+/// User preferences configuration
+////////////////////////////////////////////////////////////
+table UserPreferencesConfigFbs {
+  master_volume: float = 1.0;
+  show_fps: bool = false;
+  preferred_language: string;
+}
+
+////////////////////////////////////////////////////////////
+/// Complete engine configuration
+////////////////////////////////////////////////////////////
+table EngineConfigFbs {
+  display: DisplayConfigFbs;
+  user_preferences: UserPreferencesConfigFbs;
+}
+
+root_type EngineConfigFbs;

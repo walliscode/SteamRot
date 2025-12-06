@@ -5,8 +5,8 @@
 
 #pragma once
 #include "AssetManager.h"
+#include "EngineResources.h"
 #include "EventHandler.h"
-#include "GameCore.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Vector2.hpp>
 
@@ -14,12 +14,12 @@ namespace steamrot {
 struct GameContext {
   GameContext() = delete;
 
-  GameContext(GameCore &game_core);
+  GameContext(EngineResources &engine_resources);
 
   /////////////////////////////////////////////////
-  /// @brief Reference to the GameCore this context was created from.
+  /// @brief Reference to the EngineResources this context was created from.
   /////////////////////////////////////////////////
-  GameCore &game_core;
+  EngineResources &engine_resources;
 
   /////////////////////////////////////////////////
   /// @brief Reference to the game window.
@@ -39,12 +39,12 @@ struct GameContext {
   sf::Vector2i &mouse_position;
 
   /////////////////////////////////////////////////
-  /// @brief Loop number for the current game loop. Lives on the GameEngine
+  /// @brief Loop number for the current game loop. Lives on the Engine
   /////////////////////////////////////////////////
   size_t &loop_number;
 
   /////////////////////////////////////////////////
-  /// @brief Reference to the AssetManager living on the GameEngine, there
+  /// @brief Reference to the AssetManager living on the Engine, there
   /// should only be one instance of this.
   /////////////////////////////////////////////////
   AssetManager &asset_manager;

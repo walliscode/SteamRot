@@ -1,0 +1,28 @@
+////////////////////////////////////////////////////////////
+/// @file
+/// @brief FlatBuffers schema for EngineResources configuration.
+///
+/// EngineResourcesConfigFbs contains the configuration data needed
+/// to set up global engine resources (window, event system, etc.).
+////////////////////////////////////////////////////////////
+
+namespace steamrot;
+
+////////////////////////////////////////////////////////////
+/// Configuration for EngineResources
+////////////////////////////////////////////////////////////
+table EngineResourcesConfigFbs {
+  /// Window width in pixels
+  window_width: uint32 = 800;
+  
+  /// Window height in pixels
+  window_height: uint32 = 600;
+  
+  /// Window title
+  window_title: string;
+  
+  /// Target framerate limit
+  framerate_limit: uint32 = 60;
+}
+
+root_type EngineResourcesConfigFbs;

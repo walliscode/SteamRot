@@ -13,17 +13,18 @@ namespace core {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigureGameCore(GameCore &game_core, const EngineCoreData &core_data) {
+ConfigureEngineResources(EngineResources &engine_resources,
+                         const EngineResourcesConfigData &config_data) {
   // Create the window with configured settings (SFML 3.0 API)
-  sf::Vector2u window_size(core_data.window_width, core_data.window_height);
+  sf::Vector2u window_size(config_data.window_width, config_data.window_height);
 
   std::string window_title =
-      core_data.window_title.empty() ? "SteamRot" : core_data.window_title;
+      config_data.window_title.empty() ? "SteamRot" : config_data.window_title;
 
-  game_core.game_window.create(sf::VideoMode(window_size), window_title);
+  engine_resources.game_window.create(sf::VideoMode(window_size), window_title);
 
   // Set framerate limit
-  game_core.game_window.setFramerateLimit(core_data.framerate_limit);
+  engine_resources.game_window.setFramerateLimit(config_data.framerate_limit);
 
   return std::monostate{};
 }

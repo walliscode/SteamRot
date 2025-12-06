@@ -17,36 +17,41 @@ namespace steamrot {
 
 /////////////////////////////////////////////////
 Engine::Engine()
-    : m_game_core(), m_game_context(m_game_core),
+    : m_engine_resources(), m_game_context(m_engine_resources),
       m_scene_manager(m_game_context) {}
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> Engine::StartUp() {
-  // Load core data via provider interface
+  // Load all engine data via provider interface
   IEngineDataProvider &data_provider = GetEngineDataProvider();
 
-  // Get EngineCoreData from provider
-  // This loads window configuration (size, title, framerate)
-  auto engine_core_result = data_provider.LoadEngineCoreData();
-  if (!engine_core_result) {
-    return std::unexpected(engine_core_result.error());
+  // Load EngineResources configuration
+  auto resources_config_result = data_provider.LoadEngineResourcesConfig();
+  if (!resources_config_result) {
+    return std::unexpected(resources_config_result.error());
   }
 
-  // Use core data to configure GameCore
-  auto configure_core_result =
-      core::ConfigureGameCore(m_game_core, engine_core_result.value());
-  if (!configure_core_result) {
-    return std::unexpected(configure_core_result.error());
+  // Configure EngineResources
+  auto configure_resources_result =
+      core::ConfigureEngineResources(m_engine_resources,
+                                     resources_config_result.value());
+  if (!configure_resources_result) {
+    return std::unexpected(configure_resources_result.error());
   }
 
-  // Load default user preferences from default.preferences.bin
-  // Both GameEngine and TestEngine load default preferences
-  FlatbuffersUserPreferencesProvider preferences_provider;
-  auto preferences_result = preferences_provider.LoadPreferences();
-  if (!preferences_result.has_value()) {
-    return std::unexpected(preferences_result.error());
+  // Load EngineConfig
+  auto engine_config_result = data_provider.LoadEngineConfig();
+  if (!engine_config_result) {
+    return std::unexpected(engine_config_result.error());
   }
-  m_user_preferences = preferences_result.value();
+  m_engine_config = engine_config_result.value();
+
+  // Load EngineState
+  auto engine_state_result = data_provider.LoadEngineState();
+  if (!engine_state_result) {
+    return std::unexpected(engine_state_result.error());
+  }
+  m_engine_state = engine_state_result.value();
 
   // Configure Engine state from data - this is virtual, so derived classes
   // (GameEngine/TestEngine) provide their own data source strategy
@@ -120,13 +125,13 @@ std::expected<std::monostate, FailInfo> Engine::ConfigureSubscribersFromData(
     if (!subscriber_result.has_value()) {
       return std::unexpected(subscriber_result.error());
     }
-    m_subscriptions.push_back(subscriber_result.value());
+    m_engine_state.subscriptions.push_back(subscriber_result.value());
   };
 
   return std::monostate{};
 }
 /////////////////////////////////////////////////
 std::vector<std::shared_ptr<Subscriber>> &Engine::GetSubscriptions() {
-  return m_subscriptions;
+  return m_engine_state.subscriptions;
 }
 } // namespace steamrot
