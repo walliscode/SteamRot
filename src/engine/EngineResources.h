@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of the GameCore struct.
+/// @brief Declaration of the EngineResources struct.
 /////////////////////////////////////////////////
 
 #pragma once
@@ -16,18 +16,18 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-/// @brief Core struct containing game-level core objects.
+/// @brief Engine resources struct containing global core objects.
 ///
-/// GameCore owns all game-level core objects (window, event handler,
-/// asset manager, etc.). These resources have a lifetime matching the
-/// GameEngine instance.
+/// EngineResources owns all engine-level global resources (window, event
+/// handler, asset manager, etc.). These resources have a lifetime matching
+/// the Engine instance.
 ///
 /// All members are concrete objects (no references/pointers to other
 /// core members). This struct is default-constructible and should
-/// be configured via ConfigureGameCore free function.
+/// be configured via ConfigureEngineResources free function.
 /////////////////////////////////////////////////
-struct GameCore {
-  GameCore() = default;
+struct EngineResources {
+  EngineResources() = default;
   /////////////////////////////////////////////////
   /// @brief The game window.
   ///

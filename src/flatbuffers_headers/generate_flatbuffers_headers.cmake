@@ -7,8 +7,6 @@ set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/fragments.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/ui_style.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/simulation.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/core_data.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/engine_config.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/scene_types.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/input_test_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/joints.fbs
@@ -24,10 +22,12 @@ set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/scene_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/scene_manager_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/context_data.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/engine_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/test_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/user_preferences.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/save_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/engine/engine_resources_config.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/engine/engine_config.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/engine/engine_state.fbs
 )
 
 set(generated_headers)

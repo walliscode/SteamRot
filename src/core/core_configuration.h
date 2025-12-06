@@ -8,8 +8,8 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "EngineResources.h"
 #include "FailInfo.h"
-#include "GameCore.h"
 #include "IEngineDataProvider.h"
 #include "ISceneDataProvider.h"
 #include "SceneCore.h"
@@ -19,17 +19,18 @@ namespace steamrot {
 namespace core {
 
 /////////////////////////////////////////////////
-/// @brief Configure GameCore from native EngineCoreData struct.
+/// @brief Configure EngineResources from config data.
 ///
 /// Configures window settings (size, title, framerate) from the
 /// configuration data. The window is created directly during configuration.
 ///
-/// @param game_core GameCore instance to configure
-/// @param core_data Reference to native EngineCoreData configuration
+/// @param engine_resources EngineResources instance to configure
+/// @param config_data Reference to EngineResourcesConfigData
 /// @return Expected containing monostate or FailInfo on error
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigureGameCore(GameCore &game_core, const EngineCoreData &core_data);
+ConfigureEngineResources(EngineResources &engine_resources,
+                         const EngineResourcesConfigData &config_data);
 
 /////////////////////////////////////////////////
 /// @brief Configure SceneCore from native SceneCoreData struct.

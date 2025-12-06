@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Interface for loading engine configuration data.
+/// @brief Interface for loading engine data.
 /////////////////////////////////////////////////
 
 #pragma once
@@ -8,6 +8,8 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "EngineConfig.h"
+#include "EngineState.h"
 #include "FailInfo.h"
 #include <cstdint>
 #include <expected>
@@ -16,13 +18,12 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-/// @struct EngineCoreData
-/// @brief Native C++ struct for engine core configuration.
+/// @brief Native C++ struct for EngineResources configuration data.
 ///
-/// This replaces the FlatBuffers EngineCoreData type in game code.
-/// Provides a simple, mutable structure for engine configuration.
+/// This data is used to configure the EngineResources struct
+/// (window, event handler, asset manager, etc.).
 /////////////////////////////////////////////////
-struct EngineCoreData {
+struct EngineResourcesConfigData {
   uint32_t window_width{800};
   uint32_t window_height{600};
   std::string window_title{"SteamRot"};
@@ -30,29 +31,21 @@ struct EngineCoreData {
 };
 
 /////////////////////////////////////////////////
-/// @struct EngineData
-/// @brief Complete engine data including core and other subsystems.
-/////////////////////////////////////////////////
-struct EngineData {
-  EngineCoreData core;
-  // Future: Add other engine-level configuration
-};
-
-/////////////////////////////////////////////////
 /// @class IEngineDataProvider
-/// @brief Interface for loading engine configuration data.
+/// @brief Interface for loading all engine data types.
 ///
-/// Implementations handle the actual data source (files, network, etc.)
-/// and format (FlatBuffers, JSON, XML, Lua, etc.).
+/// Provides separate methods for loading each of the three engine
+/// data categories: EngineResources configuration, EngineConfig,
+/// and EngineState. Implementations handle the actual data source
+/// (files, network, etc.) and format (FlatBuffers, JSON, XML, etc.).
 ///
 /// Usage:
 /// ```cpp
 /// IEngineDataProvider& provider = GetEngineDataProvider();
-/// auto result = provider.LoadEngineCoreData();
-/// if (result.has_value()) {
-///   const EngineCoreData& data = result.value();
-///   // Use native C++ struct
-/// }
+/// 
+/// auto resources_config = provider.LoadEngineResourcesConfig();
+/// auto engine_config = provider.LoadEngineConfig();
+/// auto engine_state = provider.LoadEngineState();
 /// ```
 /////////////////////////////////////////////////
 class IEngineDataProvider {
@@ -60,19 +53,37 @@ public:
   virtual ~IEngineDataProvider() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Load engine core configuration.
+  /// @brief Load EngineResources configuration data.
   ///
-  /// @return Engine core data or failure information
+  /// Returns data needed to configure global resources like
+  /// the game window, event system, etc.
+  ///
+  /// @return EngineResources config data or failure information
   /////////////////////////////////////////////////
-  virtual std::expected<EngineCoreData, FailInfo>
-  LoadEngineCoreData() const = 0;
+  virtual std::expected<EngineResourcesConfigData, FailInfo>
+  LoadEngineResourcesConfig() const = 0;
 
   /////////////////////////////////////////////////
-  /// @brief Load complete engine data.
+  /// @brief Load EngineConfig data.
   ///
-  /// @return Engine data or failure information
+  /// Returns complete engine configuration including display
+  /// settings and user preferences.
+  ///
+  /// @return EngineConfig or failure information
   /////////////////////////////////////////////////
-  virtual std::expected<EngineData, FailInfo> LoadEngineData() const = 0;
+  virtual std::expected<EngineConfig, FailInfo>
+  LoadEngineConfig() const = 0;
+
+  /////////////////////////////////////////////////
+  /// @brief Load EngineState data.
+  ///
+  /// Returns initial engine state including subscriptions
+  /// and runtime flags.
+  ///
+  /// @return EngineState or failure information
+  /////////////////////////////////////////////////
+  virtual std::expected<EngineState, FailInfo>
+  LoadEngineState() const = 0;
 };
 
 } // namespace steamrot

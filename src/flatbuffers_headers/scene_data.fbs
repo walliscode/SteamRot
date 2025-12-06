@@ -1,6 +1,5 @@
 include "entities.fbs";
 include "assets.fbs";
-include "core_data.fbs";
 include "scene_types.fbs";
 include "logic_data.fbs";
 

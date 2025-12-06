@@ -15,7 +15,7 @@ namespace steamrot {
 
 /////////////////////////////////////////////////
 GameEngine::GameEngine()
-    : m_display_manager(m_game_core.game_window, m_scene_manager) {}
+    : m_display_manager(m_engine_resources.game_window, m_scene_manager) {}
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> GameEngine::StartUp() {
@@ -34,7 +34,7 @@ std::expected<std::monostate, FailInfo> GameEngine::StartUp() {
   if (preferences_provider.HasUserPreferences()) {
     auto saved_prefs_result = preferences_provider.LoadPreferences();
     if (saved_prefs_result.has_value()) {
-      m_user_preferences = saved_prefs_result.value();
+      m_engine_config.user_preferences = saved_prefs_result.value();
     }
     // If loading saved preferences fails, continue with defaults
     // (already loaded by Engine::StartUp)
@@ -99,20 +99,20 @@ void GameEngine::TickRendering() {
 
 /////////////////////////////////////////////////
 void GameEngine::RunGameLoop() {
-  m_running = true;
+  m_engine_state.running = true;
   // main game loop
-  while (m_running && m_game_core.game_window.isOpen()) {
+  while (m_engine_state.running && m_engine_resources.game_window.isOpen()) {
     // execute a single tick of all systems
     ExecuteSystemsTick();
     // increment loop number
-    m_game_core.loop_number++;
+    m_engine_resources.loop_number++;
   }
 }
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> GameEngine::ProcessSubscriptions() {
   // cycle through all subscribers and process active ones
-  for (const auto &subscriber : m_subscriptions) {
+  for (const auto &subscriber : m_engine_state.subscriptions) {
 
     // only process active subscribers
     if (subscriber->m_active) {
@@ -121,7 +121,7 @@ std::expected<std::monostate, FailInfo> GameEngine::ProcessSubscriptions() {
       switch (subscriber->m_trigger_event_type) {
       case EventType::EventType_EVENT_QUIT_GAME: {
         // close the window to quit the game
-        m_game_core.game_window.close();
+        m_engine_resources.game_window.close();
         break;
       }
       default:

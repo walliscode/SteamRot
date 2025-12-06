@@ -27,10 +27,14 @@ private:
 public:
   FlatbuffersEngineDataProvider() = default;
 
-  std::expected<EngineCoreData, FailInfo>
-  LoadEngineCoreData() const override;
+  std::expected<EngineResourcesConfigData, FailInfo>
+  LoadEngineResourcesConfig() const override;
 
-  std::expected<EngineData, FailInfo> LoadEngineData() const override;
+  std::expected<EngineConfig, FailInfo>
+  LoadEngineConfig() const override;
+
+  std::expected<EngineState, FailInfo>
+  LoadEngineState() const override;
 };
 
 } // namespace steamrot

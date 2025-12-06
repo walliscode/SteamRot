@@ -15,15 +15,20 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
-struct EngineConfigData;
-struct EngineConfigDataBuilder;
+struct DisplayConfigFbs;
+struct DisplayConfigFbsBuilder;
+
+struct UserPreferencesConfigFbs;
+struct UserPreferencesConfigFbsBuilder;
+
+struct EngineConfigFbs;
+struct EngineConfigFbsBuilder;
 
 ////////////////////////////////////////////////////////////
-/// Engine configuration settings
-/// Contains user-configurable settings like window preferences
+/// Display configuration
 ////////////////////////////////////////////////////////////
-struct EngineConfigData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef EngineConfigDataBuilder Builder;
+struct DisplayConfigFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef DisplayConfigFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_WINDOW_WIDTH = 4,
     VT_WINDOW_HEIGHT = 6,
@@ -32,27 +37,21 @@ struct EngineConfigData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_FULLSCREEN = 12,
     VT_VSYNC = 14
   };
-  /// Window width in pixels
   uint32_t window_width() const {
     return GetField<uint32_t>(VT_WINDOW_WIDTH, 800);
   }
-  /// Window height in pixels
   uint32_t window_height() const {
     return GetField<uint32_t>(VT_WINDOW_HEIGHT, 600);
   }
-  /// Window title
   const ::flatbuffers::String *window_title() const {
     return GetPointer<const ::flatbuffers::String *>(VT_WINDOW_TITLE);
   }
-  /// Target framerate limit
   uint32_t framerate_limit() const {
     return GetField<uint32_t>(VT_FRAMERATE_LIMIT, 60);
   }
-  /// Fullscreen mode enabled
   bool fullscreen() const {
     return GetField<uint8_t>(VT_FULLSCREEN, 0) != 0;
   }
-  /// VSync enabled
   bool vsync() const {
     return GetField<uint8_t>(VT_VSYNC, 1) != 0;
   }
@@ -69,40 +68,40 @@ struct EngineConfigData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct EngineConfigDataBuilder {
-  typedef EngineConfigData Table;
+struct DisplayConfigFbsBuilder {
+  typedef DisplayConfigFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_window_width(uint32_t window_width) {
-    fbb_.AddElement<uint32_t>(EngineConfigData::VT_WINDOW_WIDTH, window_width, 800);
+    fbb_.AddElement<uint32_t>(DisplayConfigFbs::VT_WINDOW_WIDTH, window_width, 800);
   }
   void add_window_height(uint32_t window_height) {
-    fbb_.AddElement<uint32_t>(EngineConfigData::VT_WINDOW_HEIGHT, window_height, 600);
+    fbb_.AddElement<uint32_t>(DisplayConfigFbs::VT_WINDOW_HEIGHT, window_height, 600);
   }
   void add_window_title(::flatbuffers::Offset<::flatbuffers::String> window_title) {
-    fbb_.AddOffset(EngineConfigData::VT_WINDOW_TITLE, window_title);
+    fbb_.AddOffset(DisplayConfigFbs::VT_WINDOW_TITLE, window_title);
   }
   void add_framerate_limit(uint32_t framerate_limit) {
-    fbb_.AddElement<uint32_t>(EngineConfigData::VT_FRAMERATE_LIMIT, framerate_limit, 60);
+    fbb_.AddElement<uint32_t>(DisplayConfigFbs::VT_FRAMERATE_LIMIT, framerate_limit, 60);
   }
   void add_fullscreen(bool fullscreen) {
-    fbb_.AddElement<uint8_t>(EngineConfigData::VT_FULLSCREEN, static_cast<uint8_t>(fullscreen), 0);
+    fbb_.AddElement<uint8_t>(DisplayConfigFbs::VT_FULLSCREEN, static_cast<uint8_t>(fullscreen), 0);
   }
   void add_vsync(bool vsync) {
-    fbb_.AddElement<uint8_t>(EngineConfigData::VT_VSYNC, static_cast<uint8_t>(vsync), 1);
+    fbb_.AddElement<uint8_t>(DisplayConfigFbs::VT_VSYNC, static_cast<uint8_t>(vsync), 1);
   }
-  explicit EngineConfigDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit DisplayConfigFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<EngineConfigData> Finish() {
+  ::flatbuffers::Offset<DisplayConfigFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<EngineConfigData>(end);
+    auto o = ::flatbuffers::Offset<DisplayConfigFbs>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<EngineConfigData> CreateEngineConfigData(
+inline ::flatbuffers::Offset<DisplayConfigFbs> CreateDisplayConfigFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t window_width = 800,
     uint32_t window_height = 600,
@@ -110,7 +109,7 @@ inline ::flatbuffers::Offset<EngineConfigData> CreateEngineConfigData(
     uint32_t framerate_limit = 60,
     bool fullscreen = false,
     bool vsync = true) {
-  EngineConfigDataBuilder builder_(_fbb);
+  DisplayConfigFbsBuilder builder_(_fbb);
   builder_.add_framerate_limit(framerate_limit);
   builder_.add_window_title(window_title);
   builder_.add_window_height(window_height);
@@ -120,7 +119,7 @@ inline ::flatbuffers::Offset<EngineConfigData> CreateEngineConfigData(
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<EngineConfigData> CreateEngineConfigDataDirect(
+inline ::flatbuffers::Offset<DisplayConfigFbs> CreateDisplayConfigFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t window_width = 800,
     uint32_t window_height = 600,
@@ -129,7 +128,7 @@ inline ::flatbuffers::Offset<EngineConfigData> CreateEngineConfigDataDirect(
     bool fullscreen = false,
     bool vsync = true) {
   auto window_title__ = window_title ? _fbb.CreateString(window_title) : 0;
-  return steamrot::CreateEngineConfigData(
+  return steamrot::CreateDisplayConfigFbs(
       _fbb,
       window_width,
       window_height,
@@ -139,33 +138,167 @@ inline ::flatbuffers::Offset<EngineConfigData> CreateEngineConfigDataDirect(
       vsync);
 }
 
-inline const steamrot::EngineConfigData *GetEngineConfigData(const void *buf) {
-  return ::flatbuffers::GetRoot<steamrot::EngineConfigData>(buf);
+////////////////////////////////////////////////////////////
+/// User preferences configuration
+////////////////////////////////////////////////////////////
+struct UserPreferencesConfigFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UserPreferencesConfigFbsBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_MASTER_VOLUME = 4,
+    VT_SHOW_FPS = 6,
+    VT_PREFERRED_LANGUAGE = 8
+  };
+  float master_volume() const {
+    return GetField<float>(VT_MASTER_VOLUME, 1.0f);
+  }
+  bool show_fps() const {
+    return GetField<uint8_t>(VT_SHOW_FPS, 0) != 0;
+  }
+  const ::flatbuffers::String *preferred_language() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_PREFERRED_LANGUAGE);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<float>(verifier, VT_MASTER_VOLUME, 4) &&
+           VerifyField<uint8_t>(verifier, VT_SHOW_FPS, 1) &&
+           VerifyOffset(verifier, VT_PREFERRED_LANGUAGE) &&
+           verifier.VerifyString(preferred_language()) &&
+           verifier.EndTable();
+  }
+};
+
+struct UserPreferencesConfigFbsBuilder {
+  typedef UserPreferencesConfigFbs Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_master_volume(float master_volume) {
+    fbb_.AddElement<float>(UserPreferencesConfigFbs::VT_MASTER_VOLUME, master_volume, 1.0f);
+  }
+  void add_show_fps(bool show_fps) {
+    fbb_.AddElement<uint8_t>(UserPreferencesConfigFbs::VT_SHOW_FPS, static_cast<uint8_t>(show_fps), 0);
+  }
+  void add_preferred_language(::flatbuffers::Offset<::flatbuffers::String> preferred_language) {
+    fbb_.AddOffset(UserPreferencesConfigFbs::VT_PREFERRED_LANGUAGE, preferred_language);
+  }
+  explicit UserPreferencesConfigFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<UserPreferencesConfigFbs> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<UserPreferencesConfigFbs>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<UserPreferencesConfigFbs> CreateUserPreferencesConfigFbs(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    float master_volume = 1.0f,
+    bool show_fps = false,
+    ::flatbuffers::Offset<::flatbuffers::String> preferred_language = 0) {
+  UserPreferencesConfigFbsBuilder builder_(_fbb);
+  builder_.add_preferred_language(preferred_language);
+  builder_.add_master_volume(master_volume);
+  builder_.add_show_fps(show_fps);
+  return builder_.Finish();
 }
 
-inline const steamrot::EngineConfigData *GetSizePrefixedEngineConfigData(const void *buf) {
-  return ::flatbuffers::GetSizePrefixedRoot<steamrot::EngineConfigData>(buf);
+inline ::flatbuffers::Offset<UserPreferencesConfigFbs> CreateUserPreferencesConfigFbsDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    float master_volume = 1.0f,
+    bool show_fps = false,
+    const char *preferred_language = nullptr) {
+  auto preferred_language__ = preferred_language ? _fbb.CreateString(preferred_language) : 0;
+  return steamrot::CreateUserPreferencesConfigFbs(
+      _fbb,
+      master_volume,
+      show_fps,
+      preferred_language__);
 }
 
-inline bool VerifyEngineConfigDataBuffer(
+////////////////////////////////////////////////////////////
+/// Complete engine configuration
+////////////////////////////////////////////////////////////
+struct EngineConfigFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef EngineConfigFbsBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_DISPLAY = 4,
+    VT_USER_PREFERENCES = 6
+  };
+  const steamrot::DisplayConfigFbs *display() const {
+    return GetPointer<const steamrot::DisplayConfigFbs *>(VT_DISPLAY);
+  }
+  const steamrot::UserPreferencesConfigFbs *user_preferences() const {
+    return GetPointer<const steamrot::UserPreferencesConfigFbs *>(VT_USER_PREFERENCES);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_DISPLAY) &&
+           verifier.VerifyTable(display()) &&
+           VerifyOffset(verifier, VT_USER_PREFERENCES) &&
+           verifier.VerifyTable(user_preferences()) &&
+           verifier.EndTable();
+  }
+};
+
+struct EngineConfigFbsBuilder {
+  typedef EngineConfigFbs Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_display(::flatbuffers::Offset<steamrot::DisplayConfigFbs> display) {
+    fbb_.AddOffset(EngineConfigFbs::VT_DISPLAY, display);
+  }
+  void add_user_preferences(::flatbuffers::Offset<steamrot::UserPreferencesConfigFbs> user_preferences) {
+    fbb_.AddOffset(EngineConfigFbs::VT_USER_PREFERENCES, user_preferences);
+  }
+  explicit EngineConfigFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<EngineConfigFbs> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<EngineConfigFbs>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<EngineConfigFbs> CreateEngineConfigFbs(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<steamrot::DisplayConfigFbs> display = 0,
+    ::flatbuffers::Offset<steamrot::UserPreferencesConfigFbs> user_preferences = 0) {
+  EngineConfigFbsBuilder builder_(_fbb);
+  builder_.add_user_preferences(user_preferences);
+  builder_.add_display(display);
+  return builder_.Finish();
+}
+
+inline const steamrot::EngineConfigFbs *GetEngineConfigFbs(const void *buf) {
+  return ::flatbuffers::GetRoot<steamrot::EngineConfigFbs>(buf);
+}
+
+inline const steamrot::EngineConfigFbs *GetSizePrefixedEngineConfigFbs(const void *buf) {
+  return ::flatbuffers::GetSizePrefixedRoot<steamrot::EngineConfigFbs>(buf);
+}
+
+inline bool VerifyEngineConfigFbsBuffer(
     ::flatbuffers::Verifier &verifier) {
-  return verifier.VerifyBuffer<steamrot::EngineConfigData>(nullptr);
+  return verifier.VerifyBuffer<steamrot::EngineConfigFbs>(nullptr);
 }
 
-inline bool VerifySizePrefixedEngineConfigDataBuffer(
+inline bool VerifySizePrefixedEngineConfigFbsBuffer(
     ::flatbuffers::Verifier &verifier) {
-  return verifier.VerifySizePrefixedBuffer<steamrot::EngineConfigData>(nullptr);
+  return verifier.VerifySizePrefixedBuffer<steamrot::EngineConfigFbs>(nullptr);
 }
 
-inline void FinishEngineConfigDataBuffer(
+inline void FinishEngineConfigFbsBuffer(
     ::flatbuffers::FlatBufferBuilder &fbb,
-    ::flatbuffers::Offset<steamrot::EngineConfigData> root) {
+    ::flatbuffers::Offset<steamrot::EngineConfigFbs> root) {
   fbb.Finish(root);
 }
 
-inline void FinishSizePrefixedEngineConfigDataBuffer(
+inline void FinishSizePrefixedEngineConfigFbsBuffer(
     ::flatbuffers::FlatBufferBuilder &fbb,
-    ::flatbuffers::Offset<steamrot::EngineConfigData> root) {
+    ::flatbuffers::Offset<steamrot::EngineConfigFbs> root) {
   fbb.FinishSizePrefixed(root);
 }
 

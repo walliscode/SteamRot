@@ -4,6 +4,37 @@ This directory contains design proposals for new features or significant changes
 
 ## Active Proposals
 
+### [Engine Data Organization](ENGINE_DATA_ORGANIZATION.md)
+
+**Status**: Proposal  
+**Date**: 2025-12-06  
+**Type**: Architecture - Data Organization
+
+**Summary**: Proposes a clear, intuitive organization strategy for data and resources in the Engine class. Addresses the current lack of clear categorization between global resources, configuration data, and engine-specific runtime state.
+
+**Key Points**:
+1. Three distinct categories: Core Resources, Configuration, Engine State
+2. Clear naming conventions that indicate category and purpose
+3. Decision tree for categorizing new data
+4. Gradual migration path without breaking changes
+5. Future-proof pattern that scales with engine growth
+
+**Implementation Complexity**: Low to Medium
+- Non-breaking addition of new structs alongside existing members
+- Gradual migration member by member
+- Compatibility accessors during transition
+- Clear patterns for future extensions
+
+**Benefits**:
+- Intuitive understanding of data ownership and lifetime
+- Easy to determine where new data should go
+- Better testability through category-based mocking
+- Improved maintainability and code organization
+
+**Related**: [ENGINE_ARCHITECTURE_IMPROVEMENTS.md](ENGINE_ARCHITECTURE_IMPROVEMENTS.md)
+
+---
+
 ### [Data Loading Interface System](DATA_LOADING_INTERFACE_EXECUTIVE_SUMMARY.md)
 
 **Status**: Proposal  
