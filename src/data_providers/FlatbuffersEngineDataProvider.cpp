@@ -94,13 +94,13 @@ FlatbuffersEngineDataProvider::LoadEngineState() const {
 }
 
 /////////////////////////////////////////////////
-const SubscriberDataViewer*
+std::expected<std::reference_wrapper<const SubscriberDataViewer>, FailInfo>
 FlatbuffersEngineDataProvider::GetSubscriberViewer() const {
   // Lazily create the viewer if it doesn't exist
   if (!m_subscriber_viewer) {
     auto fb_result = m_loader.ProvideEngineData();
     if (!fb_result.has_value()) {
-      return nullptr;
+      return std::unexpected(fb_result.error());
     }
 
     const auto *fb_data = fb_result.value();
@@ -108,19 +108,18 @@ FlatbuffersEngineDataProvider::GetSubscriberViewer() const {
         std::make_unique<SubscriberDataViewer>(fb_data->subscriptions());
   }
 
-  return m_subscriber_viewer.get();
+  return std::cref(*m_subscriber_viewer);
 }
 
 /////////////////////////////////////////////////
 std::expected<std::vector<SubscriberConfig>, FailInfo>
 FlatbuffersEngineDataProvider::GetSubscriberConfigs() const {
-  const auto *viewer = GetSubscriberViewer();
-  if (!viewer) {
-    return std::unexpected(
-        FailInfo{FailMode::NullPointer, "Failed to get subscriber viewer"});
+  auto viewer_result = GetSubscriberViewer();
+  if (!viewer_result.has_value()) {
+    return std::unexpected(viewer_result.error());
   }
 
-  return viewer->GetSubscriberConfigs();
+  return viewer_result.value().get().GetSubscriberConfigs();
 }
 
 } // namespace steamrot

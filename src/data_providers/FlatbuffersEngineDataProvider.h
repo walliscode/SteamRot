@@ -46,9 +46,10 @@ public:
   ///
   /// Lazily creates and returns the subscriber data viewer.
   ///
-  /// @return Pointer to SubscriberDataViewer or nullptr if not available
+  /// @return Reference to SubscriberDataViewer or failure information
   /////////////////////////////////////////////////
-  const SubscriberDataViewer* GetSubscriberViewer() const override;
+  std::expected<std::reference_wrapper<const SubscriberDataViewer>, FailInfo>
+  GetSubscriberViewer() const override;
 
   /////////////////////////////////////////////////
   /// @brief Get subscriber configurations from EngineState data.

@@ -13,6 +13,7 @@
 #include "FailInfo.h"
 #include <cstdint>
 #include <expected>
+#include <functional>
 #include <string>
 
 // Forward declaration
@@ -93,12 +94,14 @@ public:
   /////////////////////////////////////////////////
   /// @brief Get subscriber data viewer for this provider.
   ///
-  /// Returns a pointer to the subscriber data viewer that can be used
+  /// Returns a reference to the subscriber data viewer that can be used
   /// to access subscriber configurations from this data provider.
   ///
-  /// @return Pointer to SubscriberDataViewer or nullptr if not available
+  /// @return Reference to SubscriberDataViewer or failure information
   /////////////////////////////////////////////////
-  virtual const SubscriberDataViewer* GetSubscriberViewer() const = 0;
+  virtual std::expected<std::reference_wrapper<const SubscriberDataViewer>,
+                        FailInfo>
+  GetSubscriberViewer() const = 0;
 };
 
 } // namespace steamrot

@@ -192,7 +192,8 @@ for (const auto& config : configs.value()) {
 ### Pattern 2: Layered Data Access (Composition-based)
 ```cpp
 // Multiple data sources with subscriber viewers
-std::vector<const SubscriberDataViewer*> viewers = {
+std::vector<std::expected<std::reference_wrapper<const SubscriberDataViewer>,
+                          FailInfo>> viewer_results = {
     engine_provider.GetSubscriberViewer(),
     scene_provider.GetSubscriberViewer(),
     ui_provider.GetSubscriberViewer()
@@ -200,9 +201,10 @@ std::vector<const SubscriberDataViewer*> viewers = {
 
 // Collect all subscriber configs
 std::vector<SubscriberConfig> all_configs;
-for (auto* viewer : viewers) {
-    if (viewer) {
-        auto result = viewer->GetSubscriberConfigs();
+for (auto& viewer_result : viewer_results) {
+    if (viewer_result.has_value()) {
+        const auto& viewer = viewer_result.value().get();
+        auto result = viewer.GetSubscriberConfigs();
         if (result.has_value()) {
             all_configs.insert(all_configs.end(), 
                               result.value().begin(), 
@@ -223,13 +225,18 @@ public:
     std::expected<MyData, FailInfo> LoadMyData() const override;
     
     // Provide access to subscriber viewer
-    const SubscriberDataViewer* GetSubscriberViewer() const override {
+    std::expected<std::reference_wrapper<const SubscriberDataViewer>, FailInfo>
+    GetSubscriberViewer() const override {
         if (!m_subscriber_viewer) {
             // Lazy initialization
+            auto fb_result = GetFlatBuffersSubscriberData();
+            if (!fb_result.has_value()) {
+                return std::unexpected(fb_result.error());
+            }
             m_subscriber_viewer = std::make_unique<SubscriberDataViewer>(
-                GetFlatBuffersSubscriberData());
+                fb_result.value());
         }
-        return m_subscriber_viewer.get();
+        return std::cref(*m_subscriber_viewer);
     }
 };
 ```
