@@ -53,12 +53,6 @@ public:
   ProvideAllFragments(std::vector<std::string> fragment_names) const override;
 
   /////////////////////////////////////////////////
-  /// @brief Provides SceneManagerData from binary file
-  /////////////////////////////////////////////////
-  std::expected<const SceneManagerData *, FailInfo>
-  ProvideSceneManagerData() const;
-
-  /////////////////////////////////////////////////
   /// @brief Provides SceneData based on the SceneType
   ///
   /// @param scene_type Enum representing the type of scene
@@ -109,7 +103,14 @@ public:
   std::expected<const EngineConfigFbs *, FailInfo> ProvideEngineConfig() const;
 
   /////////////////////////////////////////////////
-  /// @brief Provides LogicCollectionData from SceneData for a specific scene
+  /// @brief Retrieves SceneManagerDataFbs from binary file
+  /////////////////////////////////////////////////
+  std::expected<const SceneManagerDataFbs *, FailInfo>
+  ProvideSceneManagerData() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Provides LogicCollectionData from SceneData for a specific
+  /// scene
   ///
   /// @param scene_type SceneType enum representing the type of scene
   /////////////////////////////////////////////////

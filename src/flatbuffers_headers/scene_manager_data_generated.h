@@ -13,108 +13,82 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
-#include "subscriber_data_generated.h"
-#include "scene_data_generated.h"
+#include "scene_manager_state_generated.h"
 
 namespace steamrot {
 
-struct SceneManagerData;
-struct SceneManagerDataBuilder;
+struct SceneManagerDataFbs;
+struct SceneManagerDataFbsBuilder;
 
-struct SceneManagerData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef SceneManagerDataBuilder Builder;
+struct SceneManagerDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SceneManagerDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_SUBSCRIPTIONS = 4,
-    VT_SCENE_DATA = 6
+    VT_STATE = 4
   };
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>> *subscriptions() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>> *>(VT_SUBSCRIPTIONS);
-  }
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SceneDataFbs>> *scene_data() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SceneDataFbs>> *>(VT_SCENE_DATA);
+  const steamrot::SceneManagerStateFbs *state() const {
+    return GetPointer<const steamrot::SceneManagerStateFbs *>(VT_STATE);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_SUBSCRIPTIONS) &&
-           verifier.VerifyVector(subscriptions()) &&
-           verifier.VerifyVectorOfTables(subscriptions()) &&
-           VerifyOffset(verifier, VT_SCENE_DATA) &&
-           verifier.VerifyVector(scene_data()) &&
-           verifier.VerifyVectorOfTables(scene_data()) &&
+           VerifyOffset(verifier, VT_STATE) &&
+           verifier.VerifyTable(state()) &&
            verifier.EndTable();
   }
 };
 
-struct SceneManagerDataBuilder {
-  typedef SceneManagerData Table;
+struct SceneManagerDataFbsBuilder {
+  typedef SceneManagerDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_subscriptions(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>>> subscriptions) {
-    fbb_.AddOffset(SceneManagerData::VT_SUBSCRIPTIONS, subscriptions);
+  void add_state(::flatbuffers::Offset<steamrot::SceneManagerStateFbs> state) {
+    fbb_.AddOffset(SceneManagerDataFbs::VT_STATE, state);
   }
-  void add_scene_data(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SceneDataFbs>>> scene_data) {
-    fbb_.AddOffset(SceneManagerData::VT_SCENE_DATA, scene_data);
-  }
-  explicit SceneManagerDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit SceneManagerDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<SceneManagerData> Finish() {
+  ::flatbuffers::Offset<SceneManagerDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<SceneManagerData>(end);
+    auto o = ::flatbuffers::Offset<SceneManagerDataFbs>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<SceneManagerData> CreateSceneManagerData(
+inline ::flatbuffers::Offset<SceneManagerDataFbs> CreateSceneManagerDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>>> subscriptions = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SceneDataFbs>>> scene_data = 0) {
-  SceneManagerDataBuilder builder_(_fbb);
-  builder_.add_scene_data(scene_data);
-  builder_.add_subscriptions(subscriptions);
+    ::flatbuffers::Offset<steamrot::SceneManagerStateFbs> state = 0) {
+  SceneManagerDataFbsBuilder builder_(_fbb);
+  builder_.add_state(state);
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<SceneManagerData> CreateSceneManagerDataDirect(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<steamrot::SubscriberData>> *subscriptions = nullptr,
-    const std::vector<::flatbuffers::Offset<steamrot::SceneDataFbs>> *scene_data = nullptr) {
-  auto subscriptions__ = subscriptions ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::SubscriberData>>(*subscriptions) : 0;
-  auto scene_data__ = scene_data ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::SceneDataFbs>>(*scene_data) : 0;
-  return steamrot::CreateSceneManagerData(
-      _fbb,
-      subscriptions__,
-      scene_data__);
+inline const steamrot::SceneManagerDataFbs *GetSceneManagerDataFbs(const void *buf) {
+  return ::flatbuffers::GetRoot<steamrot::SceneManagerDataFbs>(buf);
 }
 
-inline const steamrot::SceneManagerData *GetSceneManagerData(const void *buf) {
-  return ::flatbuffers::GetRoot<steamrot::SceneManagerData>(buf);
+inline const steamrot::SceneManagerDataFbs *GetSizePrefixedSceneManagerDataFbs(const void *buf) {
+  return ::flatbuffers::GetSizePrefixedRoot<steamrot::SceneManagerDataFbs>(buf);
 }
 
-inline const steamrot::SceneManagerData *GetSizePrefixedSceneManagerData(const void *buf) {
-  return ::flatbuffers::GetSizePrefixedRoot<steamrot::SceneManagerData>(buf);
-}
-
-inline bool VerifySceneManagerDataBuffer(
+inline bool VerifySceneManagerDataFbsBuffer(
     ::flatbuffers::Verifier &verifier) {
-  return verifier.VerifyBuffer<steamrot::SceneManagerData>(nullptr);
+  return verifier.VerifyBuffer<steamrot::SceneManagerDataFbs>(nullptr);
 }
 
-inline bool VerifySizePrefixedSceneManagerDataBuffer(
+inline bool VerifySizePrefixedSceneManagerDataFbsBuffer(
     ::flatbuffers::Verifier &verifier) {
-  return verifier.VerifySizePrefixedBuffer<steamrot::SceneManagerData>(nullptr);
+  return verifier.VerifySizePrefixedBuffer<steamrot::SceneManagerDataFbs>(nullptr);
 }
 
-inline void FinishSceneManagerDataBuffer(
+inline void FinishSceneManagerDataFbsBuffer(
     ::flatbuffers::FlatBufferBuilder &fbb,
-    ::flatbuffers::Offset<steamrot::SceneManagerData> root) {
+    ::flatbuffers::Offset<steamrot::SceneManagerDataFbs> root) {
   fbb.Finish(root);
 }
 
-inline void FinishSizePrefixedSceneManagerDataBuffer(
+inline void FinishSizePrefixedSceneManagerDataFbsBuffer(
     ::flatbuffers::FlatBufferBuilder &fbb,
-    ::flatbuffers::Offset<steamrot::SceneManagerData> root) {
+    ::flatbuffers::Offset<steamrot::SceneManagerDataFbs> root) {
   fbb.FinishSizePrefixed(root);
 }
 

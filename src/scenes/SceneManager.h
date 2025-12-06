@@ -17,8 +17,6 @@
 #include "SceneManagerConfig.h"
 #include "SceneManagerResources.h"
 #include "SceneManagerState.h"
-#include "scene_manager_data_generated.h"
-#include "subscriber_data_generated.h"
 #include "uuid.h"
 #include <SFML/Graphics.hpp>
 #include <expected>
@@ -72,32 +70,6 @@ public:
   /// @param game_context GameContext object
   /////////////////////////////////////////////////
   SceneManager(const GameContext &game_context);
-
-  /////////////////////////////////////////////////
-  /// @brief Container function for configuring the SceneManager from
-  /// flatbuffers data
-  ///
-  /// @param scene_manager_data Flatbuffers SceneManagerData object to configure
-  /// from
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  ConfigureSceneManagerFromData(const SceneManagerData *scene_manager_data);
-
-  /////////////////////////////////////////////////
-  /// @brief Add the Subscriber to the subscriptions map.
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-      RegisterSubscriber(std::shared_ptr<Subscriber>);
-
-  /////////////////////////////////////////////////
-  /// @brief Given multiple subscription data, configure the subscribers for the
-  /// SceneManager.
-  ///
-  /// @param subscriptions A flatbuffers vector of SubscriberData objects.
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo> ConfigureSubscribersFromData(
-      const ::flatbuffers::Vector<
-          ::flatbuffers::Offset<steamrot::SubscriberData>> *subscriptions);
 
   /////////////////////////////////////////////////
   /// @brief A convenience function to load the title scene.

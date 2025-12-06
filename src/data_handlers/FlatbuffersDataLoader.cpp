@@ -298,12 +298,14 @@ FlatbuffersDataLoader::ProvideEngineResourcesConfig() const {
   std::filesystem::path engine_dir = paths::GetDefaultEngineDirectory();
 
   // construct the file path
-  std::filesystem::path engine_resources_path = engine_dir / "engine_resources_config.bin";
+  std::filesystem::path engine_resources_path =
+      engine_dir / "engine_resources_config.bin";
 
   // check if the file exists
   if (!std::filesystem::exists(engine_resources_path)) {
-    std::string error_message = std::format(
-        "Engine resources config not found: {}", engine_resources_path.string());
+    std::string error_message =
+        std::format("Engine resources config not found: {}",
+                    engine_resources_path.string());
     return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
   }
   // load the engine resources config
@@ -352,7 +354,30 @@ FlatbuffersDataLoader::ProvideEngineConfig() const {
 
   return config_data;
 }
-
+/////////////////////////////////////////////////
+std::expected<const SceneManagerDataFbs *, FailInfo>
+FlatbuffersDataLoader::ProvideSceneManagerData() const {
+  // get scene manager directory from defaults
+  std::filesystem::path scene_manager_dir =
+      paths::GetDefaultSceneManagerDirectory();
+  // construct the file path
+  std::filesystem::path scene_manager_path =
+      scene_manager_dir / "scene_manager_data.bin";
+  // check if the file exists
+  if (!std::filesystem::exists(scene_manager_path)) {
+    std::string error_message = std::format(
+        "Scene manager data file not found: {}", scene_manager_path.string());
+    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
+  }
+  // load the scene manager data
+  const steamrot::SceneManagerDataFbs *scene_manager_data =
+      GetSceneManagerDataFbs(LoadBinaryData(scene_manager_path));
+  if (!scene_manager_data) {
+    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
+                                    "SceneManagerDataFbs pointer is null"));
+  }
+  return scene_manager_data;
+}
 /////////////////////////////////////////////////
 std::expected<const LogicCollectionData *, FailInfo>
 FlatbuffersDataLoader::ProvideLogicCollectionData(
