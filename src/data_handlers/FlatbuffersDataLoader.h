@@ -14,9 +14,7 @@
 #include "DataLoader.h"
 #include "FailInfo.h"
 #include "context_data_generated.h"
-#include "core_data_generated.h"
 #include "engine_config_generated.h"
-#include "engine_data_generated.h"
 #include "logic_data_generated.h"
 #include "scene_data_generated.h"
 #include "scene_manager_data_generated.h"
@@ -54,9 +52,10 @@ public:
   ProvideAllFragments(std::vector<std::string> fragment_names) const override;
 
   /////////////////////////////////////////////////
-  /// @brief Provides EngineData from binary file
+  /// @brief Provides EngineConfigfrom binary file
   /////////////////////////////////////////////////
-  std::expected<const EngineDataFbs *, FailInfo> ProvideEngineData() const;
+  std::expected<const EngineConfigFbs *, FailInfo>
+  ProvideEngineConfigFbs() const;
 
   /////////////////////////////////////////////////
   /// @brief Provides SceneManagerData from binary file
@@ -69,7 +68,7 @@ public:
   ///
   /// @param scene_type Enum representing the type of scene
   /////////////////////////////////////////////////
-  std::expected<const SceneDataData *, FailInfo>
+  std::expected<const SceneDataFbs *, FailInfo>
   ProvideDefaultSceneData(const SceneType scene_type) const;
 
   /////////////////////////////////////////////////

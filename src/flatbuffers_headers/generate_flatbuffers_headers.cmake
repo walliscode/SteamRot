@@ -13,6 +13,9 @@ set(schema_files
 
     # Scenes
     ${CMAKE_CURRENT_SOURCE_DIR}/scenes/scene_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/scenes/scene_resources.fbs
+    # ${CMAKE_CURRENT_SOURCE_DIR}/scenes/scene_state.fbs
+    # ${CMAKE_CURRENT_SOURCE_DIR}/scenes/scene_config.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/scenes/scene_manager_data.fbs
 
 

@@ -13,9 +13,9 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
+#include "scene_types_generated.h"
 #include "entities_generated.h"
 #include "event_bus_data_generated.h"
-#include "scene_types_generated.h"
 
 namespace steamrot {
 

@@ -5,7 +5,7 @@ namespace steamrot;
 
 table SceneManagerData {
 subscriptions: [SubscriberData];
-scene_data: [SceneDataData];
+scene_data: [SceneDataFbs];
   }
 
 root_type SceneManagerData;
