@@ -1,11 +1,9 @@
-include "../events/subscriber_data.fbs";
-include "scene_data.fbs";
+include "scene_manager_state.fbs";
 
-namespace steamrot; 
+namespace steamrot;
 
-table SceneManagerData {
-subscriptions: [SubscriberData];
-scene_data: [SceneDataFbs];
-  }
+table SceneManagerDataFbs{
+  state: SceneManagerStateFbs;
+}
 
-root_type SceneManagerData;
+root_type SceneManagerDataFbs;
