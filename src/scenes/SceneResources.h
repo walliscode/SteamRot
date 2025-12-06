@@ -11,7 +11,7 @@
 #include "ActionManager.h"
 #include "EntityManager.h"
 #include "Logic.h"
-#include "SceneCore.h"
+#include <SFML/Graphics/RenderTexture.hpp>
 #include <memory>
 #include <unordered_map>
 #include <vector>
@@ -51,9 +51,12 @@ struct SceneResources {
   LogicCollection logic_map;
 
   /////////////////////////////////////////////////
-  /// @brief Scene-level core objects (render texture, etc.)
+  /// @brief Render texture for the scene
+  ///
+  /// All scene rendering is done to this texture, which is then
+  /// drawn to the game window.
   /////////////////////////////////////////////////
-  SceneCore scene_core;
+  sf::RenderTexture scene_texture;
 };
 
 } // namespace steamrot

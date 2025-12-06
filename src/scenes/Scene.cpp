@@ -10,7 +10,6 @@
 #include "EntityManager.h"
 #include "LogicFactory.h"
 #include "SceneContext.h"
-#include "SceneCore.h"
 #include "containers.h"
 
 namespace steamrot {
@@ -39,7 +38,7 @@ const EntityMemoryPool &Scene::GetEntityMemoryPool() const {
 
 /////////////////////////////////////////////////
 sf::RenderTexture &Scene::GetRenderTexture() {
-  return m_scene_resources.scene_core.scene_texture;
+  return m_scene_resources.scene_texture;
 }
 
 /////////////////////////////////////////////////
@@ -81,8 +80,8 @@ const SceneInfo Scene::GetSceneInfo() const {
 /////////////////////////////////////////////////
 SceneContext Scene::GetSceneContext() {
 
-  SceneContext scene_context{m_scene_resources.scene_core,
-                             m_game_context.game_core,
+  SceneContext scene_context{m_scene_resources.scene_texture,
+                             m_game_context.engine_resources,
                              m_scene_resources.entity_manager};
 
   return scene_context;

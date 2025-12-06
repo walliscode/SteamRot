@@ -356,22 +356,6 @@ FlatbuffersDataLoader::ProvideEngineCoreData() const {
 }
 
 /////////////////////////////////////////////////
-std::expected<const SceneCoreDataFbs *, FailInfo>
-FlatbuffersDataLoader::ProvideSceneCoreData(const SceneType scene_type) const {
-  // Load from SceneData for the specified scene type
-  auto scene_data_result = ProvideDefaultSceneData(scene_type);
-  if (!scene_data_result.has_value()) {
-    return std::unexpected(scene_data_result.error());
-  }
-
-  const SceneDataData *scene_data = scene_data_result.value();
-
-  // scene_core is optional, so it's okay if it's not present
-  // Return nullptr if not configured - caller should handle defaults
-  return scene_data->scene_core();
-}
-
-/////////////////////////////////////////////////
 std::expected<const LogicCollectionData *, FailInfo>
 FlatbuffersDataLoader::ProvideLogicCollectionData(
     const SceneType scene_type) const {

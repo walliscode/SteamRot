@@ -29,16 +29,5 @@ ConfigureEngineResources(EngineResources &engine_resources,
   return std::monostate{};
 }
 
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-ConfigureSceneCore(SceneCore &scene_core, const SceneCoreData &core_data) {
-  // Create the render texture with configured dimensions (SFML 3.0 API)
-  sf::Vector2u texture_size(core_data.render_texture_width,
-                            core_data.render_texture_height);
-  scene_core.scene_texture = sf::RenderTexture(texture_size);
-
-  return std::monostate{};
-}
-
 } // namespace core
 } // namespace steamrot

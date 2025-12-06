@@ -10,7 +10,6 @@
 #include "CraftingScene.h"
 #include "FlatbuffersDataLoader.h"
 #include "TitleScene.h"
-#include "core_configuration.h"
 #include "provider_factory.h"
 #include "uuid.h"
 #include <memory>
@@ -69,21 +68,19 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type,
     return std::unexpected(fail_info);
   }
 
-  // Configure SceneCore from provider interface
-  // Note: EngineCoreData is already loaded in Engine::StartUp() - we only
-  // need scene-specific core data here
+  // Configure scene render texture from provider interface
   ISceneDataProvider &data_provider = GetSceneDataProvider();
 
-  auto scene_core_result = data_provider.LoadSceneCoreData(scene_type);
-  if (!scene_core_result) {
-    return std::unexpected(scene_core_result.error());
+  auto scene_data_result = data_provider.LoadSceneData(scene_type);
+  if (!scene_data_result) {
+    return std::unexpected(scene_data_result.error());
   }
 
-  auto configure_core_result = core::ConfigureSceneCore(
-      scene_ptr->m_scene_resources.scene_core, scene_core_result.value());
-  if (!configure_core_result) {
-    return std::unexpected(configure_core_result.error());
-  }
+  // Configure render texture with dimensions from scene data
+  const auto &scene_data = scene_data_result.value();
+  sf::Vector2u texture_size(scene_data.render_texture_width,
+                            scene_data.render_texture_height);
+  scene_ptr->m_scene_resources.scene_texture = sf::RenderTexture(texture_size);
 
   // configure scene entities from default data
   auto configure_result = scene_ptr->ConfigureFromDefault();

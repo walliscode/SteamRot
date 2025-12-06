@@ -8,7 +8,8 @@ namespace steamrot;
 table SceneDataData{
     entity_collection: EntityCollection;
     assets: AssetCollection;
-    scene_core: SceneCoreDataFbs;
+    render_texture_width: uint32 = 800;
+    render_texture_height: uint32 = 600;
     scene_id: string;
     scene_type: SceneType;
     logic_collection_data: LogicCollectionData;

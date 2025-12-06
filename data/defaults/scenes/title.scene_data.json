@@ -1,6 +1,8 @@
 {
   "scene_id": "title",
   "scene_type": "TITLE",
+  "render_texture_width": 800,
+  "render_texture_height": 600,
   "entity_collection": {
     "entity_memory_pool_size": 100,
     "entities": [
@@ -93,10 +95,5 @@
     ]
   },
 
-  "assets": {},
-
-  "scene_core": {
-    "render_texture_width": 800,
-    "render_texture_height": 600
-  }
+  "assets": {}
 }

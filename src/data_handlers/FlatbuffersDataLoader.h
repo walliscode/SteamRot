@@ -103,12 +103,6 @@ public:
   ProvideEngineCoreData() const;
 
   /////////////////////////////////////////////////
-  /// @brief Provides SceneCoreDataFbs from SceneData for a specific scene
-  /////////////////////////////////////////////////
-  std::expected<const SceneCoreDataFbs *, FailInfo>
-  ProvideSceneCoreData(const SceneType scene_type) const;
-
-  /////////////////////////////////////////////////
   /// @brief Provides LogicCollectionData from SceneData for a specific scene
   ///
   /// @param scene_type SceneType enum representing the type of scene

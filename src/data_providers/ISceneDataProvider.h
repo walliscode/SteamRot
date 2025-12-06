@@ -17,20 +17,8 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-/// @struct SceneCoreData
-/// @brief Native C++ struct for scene core configuration.
-///
-/// This replaces the FlatBuffers SceneCoreData type in game code.
-/// Provides a simple, mutable structure for scene configuration.
-/////////////////////////////////////////////////
-struct SceneCoreData {
-  uint32_t render_texture_width{800};
-  uint32_t render_texture_height{600};
-};
-
-/////////////////////////////////////////////////
 /// @struct SceneData
-/// @brief Complete scene data including core and metadata.
+/// @brief Complete scene data including metadata and render configuration.
 ///
 /// Note: Entity data is handled by EntityConfigurator
 /// Note: Logic data is handled by LogicFactory
@@ -39,7 +27,8 @@ struct SceneCoreData {
 struct SceneData {
   SceneType scene_type{SceneType::SceneType_UNKNOWN};
   std::string scene_id;
-  SceneCoreData core;
+  uint32_t render_texture_width{800};
+  uint32_t render_texture_height{600};
 };
 
 /////////////////////////////////////////////////
@@ -52,9 +41,9 @@ struct SceneData {
 /// Usage:
 /// ```cpp
 /// ISceneDataProvider& provider = GetSceneDataProvider();
-/// auto result = provider.LoadSceneCoreData(SceneType::SceneType_TITLE);
+/// auto result = provider.LoadSceneData(SceneType::SceneType_TITLE);
 /// if (result.has_value()) {
-///   const SceneCoreData& data = result.value();
+///   const SceneData& data = result.value();
 ///   // Use native C++ struct
 /// }
 /// ```
@@ -71,15 +60,6 @@ public:
   /////////////////////////////////////////////////
   virtual std::expected<SceneData, FailInfo>
   LoadSceneData(SceneType scene_type) const = 0;
-
-  /////////////////////////////////////////////////
-  /// @brief Load scene core configuration for a specific scene type.
-  ///
-  /// @param scene_type The type of scene to load
-  /// @return Scene core data or failure information
-  /////////////////////////////////////////////////
-  virtual std::expected<SceneCoreData, FailInfo>
-  LoadSceneCoreData(SceneType scene_type) const = 0;
 };
 
 } // namespace steamrot
