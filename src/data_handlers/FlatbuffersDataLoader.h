@@ -52,12 +52,6 @@ public:
   ProvideAllFragments(std::vector<std::string> fragment_names) const override;
 
   /////////////////////////////////////////////////
-  /// @brief Provides EngineConfigfrom binary file
-  /////////////////////////////////////////////////
-  std::expected<const EngineConfigFbs *, FailInfo>
-  ProvideEngineConfigFbs() const;
-
-  /////////////////////////////////////////////////
   /// @brief Provides SceneManagerData from binary file
   /////////////////////////////////////////////////
   std::expected<const SceneManagerData *, FailInfo>
@@ -96,10 +90,22 @@ public:
   std::expected<const ContextData *, FailInfo> ProvideContextData() const;
 
   /////////////////////////////////////////////////
-  /// @brief Provides EngineCoreDataFbs from EngineData
+  /// @brief Provides EngineResourcesConfigFbs from binary file
+  ///
+  /// Loads engine resources configuration from defaults/engine/engine_resources_config.bin
   /////////////////////////////////////////////////
-  std::expected<const EngineCoreDataFbs *, FailInfo>
-  ProvideEngineCoreData() const;
+  std::expected<const EngineResourcesConfigFbs *, FailInfo>
+  ProvideEngineResourcesConfig() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Provides EngineConfigFbs from binary file
+  ///
+  /// Loads engine configuration from defaults/engine/engine_config.bin.
+  /// If user configuration exists at user/engine/engine_config.bin, it
+  /// will be loaded instead.
+  /////////////////////////////////////////////////
+  std::expected<const EngineConfigFbs *, FailInfo>
+  ProvideEngineConfig() const;
 
   /////////////////////////////////////////////////
   /// @brief Provides LogicCollectionData from SceneData for a specific scene
@@ -117,16 +123,6 @@ public:
   /////////////////////////////////////////////////
   std::expected<const UserPreferencesData *, FailInfo>
   ProvideDefaultUserPreferencesData() const;
-
-  /////////////////////////////////////////////////
-  /// @brief Provides EngineConfigData from binary file
-  ///
-  /// Loads engine configuration from defaults/engine/default.engine_config.bin.
-  /// If user configuration exists at user/engine/default.engine_config.bin, it
-  /// will be loaded instead.
-  /////////////////////////////////////////////////
-  std::expected<const EngineConfigData *, FailInfo>
-  ProvideEngineConfigData() const;
 };
 
 } // namespace steamrot
