@@ -15,9 +15,9 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "EngineState.h"
 #include "FailInfo.h"
 #include "SceneInfo.h"
-#include "engine_data_generated.h"
 #include "test_context.h"
 #include "test_data_generated.h"
 #include <expected>
@@ -43,7 +43,7 @@ namespace steamrot::tests {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 CompareTickSnapshotEntityPool(const SceneInfo &actual_scene_data,
-                              const EngineDataFbs *expected_engine_state,
+                              const EngineStateFbs *expected_engine_state,
                               const TestContext &context,
                               bool expected_to_pass);
 

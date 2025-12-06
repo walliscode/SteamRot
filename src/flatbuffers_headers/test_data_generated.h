@@ -13,7 +13,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
-#include "engine_data_generated.h"
+#include "engine_state_generated.h"
 #include "entities_generated.h"
 #include "event_bus_data_generated.h"
 #include "event_packet_data_generated.h"
@@ -57,8 +57,8 @@ struct TickSnapshot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   uint32_t tick() const {
     return GetField<uint32_t>(VT_TICK, 0);
   }
-  const steamrot::EngineDataFbs *engine_state() const {
-    return GetPointer<const steamrot::EngineDataFbs *>(VT_ENGINE_STATE);
+  const steamrot::EngineStateFbs *engine_state() const {
+    return GetPointer<const steamrot::EngineStateFbs *>(VT_ENGINE_STATE);
   }
   /// @brief Optional human-readable description of this checkpoint
   /// Used in failure messages to identify which snapshot failed.
@@ -97,7 +97,7 @@ struct TickSnapshotBuilder {
   void add_tick(uint32_t tick) {
     fbb_.AddElement<uint32_t>(TickSnapshot::VT_TICK, tick, 0);
   }
-  void add_engine_state(::flatbuffers::Offset<steamrot::EngineDataFbs> engine_state) {
+  void add_engine_state(::flatbuffers::Offset<steamrot::EngineStateFbs> engine_state) {
     fbb_.AddOffset(TickSnapshot::VT_ENGINE_STATE, engine_state);
   }
   void add_description(::flatbuffers::Offset<::flatbuffers::String> description) {
@@ -123,7 +123,7 @@ struct TickSnapshotBuilder {
 inline ::flatbuffers::Offset<TickSnapshot> CreateTickSnapshot(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t tick = 0,
-    ::flatbuffers::Offset<steamrot::EngineDataFbs> engine_state = 0,
+    ::flatbuffers::Offset<steamrot::EngineStateFbs> engine_state = 0,
     ::flatbuffers::Offset<::flatbuffers::String> description = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::InputEvent>>> input_sequence = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketData>>> injection_events = 0) {
@@ -139,7 +139,7 @@ inline ::flatbuffers::Offset<TickSnapshot> CreateTickSnapshot(
 inline ::flatbuffers::Offset<TickSnapshot> CreateTickSnapshotDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t tick = 0,
-    ::flatbuffers::Offset<steamrot::EngineDataFbs> engine_state = 0,
+    ::flatbuffers::Offset<steamrot::EngineStateFbs> engine_state = 0,
     const char *description = nullptr,
     const std::vector<::flatbuffers::Offset<steamrot::InputEvent>> *input_sequence = nullptr,
     const std::vector<::flatbuffers::Offset<steamrot::EventPacketData>> *injection_events = nullptr) {
@@ -306,8 +306,8 @@ struct TestDataConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::TestMetadata *metadata() const {
     return GetPointer<const steamrot::TestMetadata *>(VT_METADATA);
   }
-  const steamrot::EngineDataFbs *starting_engine_state() const {
-    return GetPointer<const steamrot::EngineDataFbs *>(VT_STARTING_ENGINE_STATE);
+  const steamrot::EngineStateFbs *starting_engine_state() const {
+    return GetPointer<const steamrot::EngineStateFbs *>(VT_STARTING_ENGINE_STATE);
   }
   /// @brief Simulation data for executing logic steps during tests
   const steamrot::SimulationData *simulation_data() const {
@@ -352,7 +352,7 @@ struct TestDataConfigBuilder {
   void add_metadata(::flatbuffers::Offset<steamrot::TestMetadata> metadata) {
     fbb_.AddOffset(TestDataConfig::VT_METADATA, metadata);
   }
-  void add_starting_engine_state(::flatbuffers::Offset<steamrot::EngineDataFbs> starting_engine_state) {
+  void add_starting_engine_state(::flatbuffers::Offset<steamrot::EngineStateFbs> starting_engine_state) {
     fbb_.AddOffset(TestDataConfig::VT_STARTING_ENGINE_STATE, starting_engine_state);
   }
   void add_simulation_data(::flatbuffers::Offset<steamrot::SimulationData> simulation_data) {
@@ -379,7 +379,7 @@ struct TestDataConfigBuilder {
 inline ::flatbuffers::Offset<TestDataConfig> CreateTestDataConfig(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::TestMetadata> metadata = 0,
-    ::flatbuffers::Offset<steamrot::EngineDataFbs> starting_engine_state = 0,
+    ::flatbuffers::Offset<steamrot::EngineStateFbs> starting_engine_state = 0,
     ::flatbuffers::Offset<steamrot::SimulationData> simulation_data = 0,
     uint32_t num_ticks = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::TickSnapshot>>> tick_snapshots = 0) {
@@ -395,7 +395,7 @@ inline ::flatbuffers::Offset<TestDataConfig> CreateTestDataConfig(
 inline ::flatbuffers::Offset<TestDataConfig> CreateTestDataConfigDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::TestMetadata> metadata = 0,
-    ::flatbuffers::Offset<steamrot::EngineDataFbs> starting_engine_state = 0,
+    ::flatbuffers::Offset<steamrot::EngineStateFbs> starting_engine_state = 0,
     ::flatbuffers::Offset<steamrot::SimulationData> simulation_data = 0,
     uint32_t num_ticks = 0,
     const std::vector<::flatbuffers::Offset<steamrot::TickSnapshot>> *tick_snapshots = nullptr) {
