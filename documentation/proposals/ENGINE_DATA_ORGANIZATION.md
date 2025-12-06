@@ -35,8 +35,8 @@ This document proposes a clear, intuitive organization strategy for data and res
 
 **Proposed Solution**: Organize Engine data into **three distinct categories** with clear naming conventions:
 
-1. **Core Resources** (`GameCore`) - Global, long-lived resources shared across the engine
-2. **Configuration** (`EngineConfig`, `UserPreferences`) - Settings and preferences loaded at startup
+1. **Core Resources** (`EngineResources`) - Global, long-lived resources shared across the engine
+2. **Configuration** (`EngineConfig`) - Settings and preferences loaded at startup from data files
 3. **Engine State** (`EngineState`) - Engine-specific runtime state and operational data
 
 This organization provides:
@@ -56,11 +56,11 @@ The Engine class currently contains a mix of different types of data without cle
 ```cpp
 class Engine {
 protected:
-  GameCore m_game_core;              // Global resources
-  GameContext m_game_context;        // References to core
-  SceneManager m_scene_manager;      // Scene management subsystem
-  UserPreferences m_user_preferences; // Configuration data
-  bool m_running;                    // Engine state
+  EngineResources m_engine_resources;    // Global resources
+  GameContext m_game_context;            // References to core
+  SceneManager m_scene_manager;          // Scene management subsystem
+  EngineConfig m_engine_config;          // Configuration (includes user prefs)
+  bool m_running;                        // Engine state
   std::vector<std::shared_ptr<Subscriber>> m_subscriptions; // Engine state
 };
 ```
@@ -93,12 +93,12 @@ The user identifies three types of data:
 class Engine {
 protected:
   // Category: Core Resources (but not clearly named as such)
-  GameCore m_game_core;              
+  EngineResources m_engine_resources;              
   GameContext m_game_context;        
   SceneManager m_scene_manager;      
   
-  // Category: Configuration (but mixed with state)
-  UserPreferences m_user_preferences;
+  // Category: Configuration (but separate from user prefs)
+  EngineConfig m_engine_config;  // Should contain all config including user prefs
   
   // Category: Engine State (but not grouped)
   bool m_running;
@@ -106,9 +106,9 @@ protected:
 };
 ```
 
-#### In GameCore
+#### In EngineResources
 ```cpp
-struct GameCore {
+struct EngineResources {
   // All resources stored flat without categorization
   sf::RenderWindow game_window;
   EventHandler event_handler;
@@ -128,7 +128,7 @@ private:
 
 ### Current Strengths
 
-1. **GameCore exists** - Already groups some resources together
+1. **EngineResources exists** - Already groups some resources together
 2. **GameContext provides references** - Convenient access pattern established
 3. **Subsystems are separate** - SceneManager, DisplayManager are not mixed into core
 4. **Base Engine pattern works** - Inheritance structure is sound
@@ -151,7 +151,7 @@ Organize all Engine data into **three clear categories** with distinct purposes,
 
 ```
 Engine Data
-├── 1. Core Resources (GameCore)
+├── 1. Core Resources (EngineResources)
 │   ├── Long-lived, global scope
 │   ├── Shared across entire engine
 │   └── Initialized once at startup
@@ -186,7 +186,7 @@ When adding new data to Engine, ask:
 └────────┬───────────────┬────────────┘
          │ YES           │ NO
          ▼               ▼
-    GameCore        ┌────────────────────────────┐
+    EngineResources        ┌────────────────────────────┐
                     │ Is this loaded from files   │
                     │ and configures behavior?    │
                     └───────┬──────────┬─────────┘
@@ -199,7 +199,7 @@ When adding new data to Engine, ask:
 
 ## Detailed Categories
 
-### Category 1: Core Resources (GameCore)
+### Category 1: Core Resources (EngineResources)
 
 **Purpose**: Long-lived, global resources shared across the entire engine lifetime.
 
@@ -209,12 +209,12 @@ When adding new data to Engine, ask:
 - Accessed via references throughout the codebase
 - Provides core infrastructure (windowing, events, assets)
 
-**Current Implementation**: `GameCore`
+**Current Implementation**: `EngineResources`
 
-**Suggested Enhancement**: Organize into logical subcategories within GameCore
+**Suggested Enhancement**: Organize into logical subcategories within EngineResources
 
 ```cpp
-struct GameCore {
+struct EngineResources {
   // Rendering & Display
   sf::RenderWindow game_window;
   
@@ -240,7 +240,7 @@ struct GameCore {
 - ❌ Subscriptions - This is engine state, not a core resource
 - ❌ Scene-specific data - Belongs in SceneManager
 
-**Naming Convention**: `GameCore` (already good), internal members use descriptive names
+**Naming Convention**: `EngineResources` (already good), internal members use descriptive names
 
 **Access Pattern**: 
 ```cpp
@@ -262,11 +262,11 @@ context.asset_manager.GetFont("main");
 - Persists between sessions
 
 **Current Implementation**: 
-- `EngineCoreData` (loaded, then used to configure GameCore)
-- `UserPreferences` (stored on Engine)
+- `EngineCoreData` (loaded, then used to configure EngineResources)
+- `UserPreferences` (separate struct, stored on Engine)
 - `EngineConfig` (struct definition, not clearly used)
 
-**Suggested Organization**: Group all configuration into clear structs
+**Suggested Organization**: Group all configuration into EngineConfig, including user preferences as a subcategory
 
 ```cpp
 // Window and display settings
@@ -280,16 +280,17 @@ struct DisplayConfig {
 };
 
 // User preferences (gameplay, audio, etc.)
-struct UserPreferences {
+struct UserPreferencesConfig {
   float master_volume{1.0f};
   bool show_fps{false};
   std::string preferred_language{"en"};
   // ... other user settings
 };
 
-// Engine behavior configuration
+// Engine behavior configuration - all config in one place
 struct EngineConfig {
   DisplayConfig display;
+  UserPreferencesConfig user_preferences;
   // Future: Add other config categories
   // - InputConfig
   // - AudioConfig
@@ -307,7 +308,7 @@ struct EngineConfig {
 - ❌ Loop number - This is runtime state
 - ❌ Subscriptions - This is engine state
 
-**Naming Convention**: `*Config` for engine settings, `*Preferences` for user settings
+**Naming Convention**: `*Config` for all configuration subcategories (DisplayConfig, UserPreferencesConfig, InputConfig, etc.)
 
 **Access Pattern**:
 ```cpp
@@ -398,7 +399,7 @@ Group related data into cohesive structs with clear names:
 
 ```cpp
 // GOOD: Clear category and contents
-struct GameCore {
+struct EngineResources {
   sf::RenderWindow game_window;
   EventHandler event_handler;
   AssetManager asset_manager;
@@ -431,7 +432,7 @@ Provide lightweight reference wrappers for convenient access:
 ```cpp
 // Already implemented well
 struct GameContext {
-  GameCore& game_core;
+  EngineResources& game_core;
   sf::RenderWindow& game_window;
   EventHandler& event_handler;
   // ... references to core resources
@@ -453,19 +454,19 @@ Keep subsystems as separate managers rather than embedding in categories:
 // GOOD: Subsystem remains separate
 class Engine {
 protected:
-  GameCore m_game_core;
+  EngineResources m_game_core;
   SceneManager m_scene_manager;
   // SceneManager is complex enough to be its own manager
 };
 
 // BAD: Embedding complex logic in data struct
-struct GameCore {
+struct EngineResources {
   // Don't put SceneManager here - it's too complex
 };
 ```
 
 **Rule of Thumb**: 
-- Simple resources → Go in GameCore
+- Simple resources → Go in EngineResources
 - Complex subsystems with logic → Separate manager classes
 
 ### Pattern 4: Configuration Cascade
@@ -520,15 +521,14 @@ Add new structs alongside existing members:
 class Engine {
 protected:
   // Existing (keep for now)
-  GameCore m_game_core;
+  EngineResources m_engine_resources;
   GameContext m_game_context;
   SceneManager m_scene_manager;
-  UserPreferences m_user_preferences;
   bool m_running;
   std::vector<std::shared_ptr<Subscriber>> m_subscriptions;
   
   // NEW: Add category structs
-  EngineConfig m_engine_config;  // Will hold display config, etc.
+  EngineConfig m_engine_config;  // Will hold display config, user prefs, etc.
   EngineState m_engine_state;    // Will hold running, subscriptions, etc.
 };
 ```
@@ -593,7 +593,7 @@ If state needs to be accessed in subsystems, add to GameContext:
 
 ```cpp
 struct GameContext {
-  GameCore& game_core;
+  EngineResources& game_core;
   EngineState& engine_state;  // NEW: Add reference to state
   
   // Convenience references (existing)
@@ -612,7 +612,7 @@ Update documentation to reflect new organization:
 ///
 /// This struct contains runtime state that changes during engine operation.
 /// It is distinct from:
-/// - GameCore: Long-lived global resources
+/// - EngineResources: Long-lived global resources
 /// - EngineConfig: Configuration loaded at startup
 struct EngineState {
   // ...
@@ -629,7 +629,7 @@ struct EngineState {
 
 **Decision Tree**:
 1. Is it a long-lived, global infrastructure component?
-   - **YES** → Add to `GameCore`
+   - **YES** → Add to `EngineResources`
    - **NO** → Continue to next question
 
 2. Is it a scene-specific resource?
@@ -643,15 +643,15 @@ struct EngineState {
 **Example**: Adding a networking system
 
 ```cpp
-// Option A: Simple socket → Add to GameCore
-struct GameCore {
+// Option A: Simple socket → Add to EngineResources
+struct EngineResources {
   sf::TcpSocket network_socket;
 };
 
 // Option B: Complex networking → Separate manager
 class Engine {
 private:
-  GameCore m_game_core;
+  EngineResources m_game_core;
   NetworkManager m_network_manager;  // Complex, gets its own manager
 };
 ```
@@ -715,11 +715,10 @@ As the engine grows, consider additional categories:
 class Engine {
 protected:
   // Core: Long-lived global resources
-  GameCore m_game_core;
+  EngineResources m_engine_resources;
   
-  // Configuration: Loaded settings
+  // Configuration: Loaded settings (includes user preferences)
   EngineConfig m_engine_config;
-  UserPreferences m_user_preferences;
   
   // State: Runtime operational data
   EngineState m_engine_state;
@@ -745,18 +744,18 @@ protected:
 ```cpp
 // Configuration scattered across multiple places
 class Engine {
-  GameCore m_game_core;  // Contains window
-  UserPreferences m_user_preferences;  // No window settings here
+  EngineResources m_engine_resources;  // Contains window
+  // Configuration not clearly organized
 };
 
-struct GameCore {
+struct EngineResources {
   sf::RenderWindow game_window;  // Resource
   // Window size not stored anywhere accessible
 };
 
 // Loading during StartUp
 auto engine_core_data = provider.LoadEngineCoreData();
-core::ConfigureGameCore(m_game_core, engine_core_data);  // What's in here?
+core::ConfigureEngineResources(m_engine_resources, engine_core_data);  // What's in here?
 ```
 
 **Proposed (Clear Categories)**:
@@ -771,19 +770,25 @@ struct DisplayConfig {
   bool vsync{true};
 };
 
+struct UserPreferencesConfig {
+  float master_volume{1.0f};
+  // ... other user preferences
+};
+
 struct EngineConfig {
   DisplayConfig display;
+  UserPreferencesConfig user_preferences;
 };
 
 class Engine {
-  GameCore m_game_core;           // Resources
-  EngineConfig m_engine_config;   // Configuration
+  EngineResources m_engine_resources;  // Resources
+  EngineConfig m_engine_config;        // Configuration
 };
 
 // Loading during StartUp
 auto config = LoadEngineConfig();
 m_engine_config = config;
-ConfigureWindow(m_game_core.game_window, m_engine_config.display);
+ConfigureWindow(m_engine_resources.game_window, m_engine_config.display);
 
 // Later access
 if (m_engine_config.display.fullscreen) {
@@ -856,14 +861,14 @@ public:
 
 class Engine {
 protected:
-  GameCore m_game_core;
+  EngineResources m_game_core;
   SceneManager m_scene_manager;
   AudioManager m_audio_manager;  // NEW: Complex subsystem
 };
 
 // If AudioManager needs to be accessed by scenes
 struct GameContext {
-  GameCore& game_core;
+  EngineResources& game_core;
   AudioManager& audio_manager;  // NEW: Add reference
   // ...
 };
@@ -963,8 +968,8 @@ void Engine::OnTickEnd() {
 
 | Category | Struct Name | Member Prefix | Example |
 |----------|-------------|---------------|---------|
-| Core Resources | `GameCore` | `m_game_core` | `m_game_core.game_window` |
-| Configuration | `*Config`, `*Preferences` | `m_engine_config` | `m_engine_config.display.width` |
+| Core Resources | `EngineResources` | `m_engine_resources` | `m_engine_resources.game_window` |
+| Configuration | `*Config` | `m_engine_config` | `m_engine_config.display.width` |
 | Engine State | `*State`, `*Status` | `m_engine_state` | `m_engine_state.running` |
 | Subsystems | `*Manager` | `m_*_manager` | `m_scene_manager` |
 
@@ -986,7 +991,7 @@ void Engine::OnTickEnd() {
 
 - **Current Implementation**:
   - `src/engine/Engine.h` - Base engine class
-  - `src/core/GameCore.h` - Core resources struct
+  - `src/core/EngineResources.h` - Core resources struct
   - `src/context/GameContext.h` - Reference wrapper
   - `src/configuration/EngineConfig.h` - Configuration struct (underutilized)
 

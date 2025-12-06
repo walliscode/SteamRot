@@ -9,7 +9,7 @@ This is a quick reference guide for developers working with Engine data organiza
 
 ## The Three Categories
 
-### 1. Core Resources (`GameCore`)
+### 1. Core Resources (`EngineResources`)
 
 **What**: Long-lived, global infrastructure resources
 
@@ -23,9 +23,9 @@ This is a quick reference guide for developers working with Engine data organiza
 
 ---
 
-### 2. Configuration (`EngineConfig`, `UserPreferences`)
+### 2. Configuration (`EngineConfig`)
 
-**What**: Settings loaded from files that configure behavior
+**What**: Settings loaded from files that configure behavior (includes user preferences)
 
 **Examples**: Window size, framerate, vsync, user volume
 
@@ -59,7 +59,7 @@ This is a quick reference guide for developers working with Engine data organiza
 ┌─ Is it long-lived and global?
 │  ├─ YES → Is it complex with logic?
 │  │        ├─ YES → Separate Manager (SceneManager-style)
-│  │        └─ NO  → GameCore
+│  │        └─ NO  → EngineResources
 │  └─ NO  → Is it loaded from files?
 │           ├─ YES → EngineConfig
 │           └─ NO  → EngineState
@@ -69,10 +69,10 @@ This is a quick reference guide for developers working with Engine data organiza
 
 ## Common Patterns
 
-### Pattern: Adding a Simple Resource to GameCore
+### Pattern: Adding a Simple Resource to EngineResources
 
 ```cpp
-struct GameCore {
+struct EngineResources {
   sf::RenderWindow game_window;
   EventHandler event_handler;
   AssetManager asset_manager;
@@ -123,7 +123,7 @@ if (m_engine_state.my_new_flag) {
 ```cpp
 class Engine {
 protected:
-  GameCore m_game_core;
+  EngineResources m_engine_resources;
   SceneManager m_scene_manager;
   AudioManager m_audio_manager;  // NEW: Complex subsystem
 };
@@ -140,9 +140,9 @@ struct GameContext {
 
 | Category | Struct Name | Member Prefix | Example Access |
 |----------|-------------|---------------|----------------|
-| Core Resources | `GameCore` | `m_game_core` | `m_game_core.game_window` |
+| Core Resources | `EngineResources` | `m_engine_resources` | `m_engine_resources.game_window` |
 | Configuration | `*Config` | `m_engine_config` | `m_engine_config.display.width` |
-| User Settings | `*Preferences` | `m_user_preferences` | `m_user_preferences.volume` |
+| User Preferences | `UserPreferencesConfig` | (inside config) | `m_engine_config.user_preferences.volume` |
 | Engine State | `*State` | `m_engine_state` | `m_engine_state.running` |
 | Subsystems | `*Manager` | `m_*_manager` | `m_scene_manager` |
 
@@ -150,7 +150,7 @@ struct GameContext {
 
 ## What Belongs Where?
 
-### ✅ GameCore (Core Resources)
+### ✅ EngineResources (Core Resources)
 
 - ✅ RenderWindow
 - ✅ EventHandler
@@ -170,8 +170,8 @@ struct GameContext {
 - ✅ User volume, language
 - ✅ Key bindings
 - ✅ Debug flags
-- ❌ Current mouse position (→ GameCore, it's state)
-- ❌ Loop number (→ GameCore, it's a counter resource)
+- ❌ Current mouse position (→ EngineResources, it's state)
+- ❌ Loop number (→ EngineResources, it's a counter resource)
 - ❌ Running flag (→ EngineState)
 
 ### ✅ EngineState (Engine State)
@@ -183,7 +183,7 @@ struct GameContext {
 - ✅ Performance metrics (FPS, frame time)
 - ✅ Engine-level error state
 - ❌ Scene entities (→ Scene)
-- ❌ Window object (→ GameCore)
+- ❌ Window object (→ EngineResources)
 - ❌ Configuration (→ EngineConfig)
 
 ### ✅ Separate Manager (Subsystems)
@@ -192,7 +192,7 @@ struct GameContext {
 - ✅ DisplayManager (complex rendering)
 - ✅ AudioManager (complex audio mixing)
 - ✅ NetworkManager (complex networking)
-- ❌ Simple resources (→ GameCore)
+- ❌ Simple resources (→ EngineResources)
 - ❌ Configuration data (→ EngineConfig)
 
 ---
@@ -222,18 +222,23 @@ When migrating existing data to new organization:
 
 **Why**: Loaded from files, user-configurable, mostly read-only
 
-**Location**: `UserPreferences` or `EngineConfig.audio`
+**Location**: `EngineConfig.user_preferences` (as subcategory)
 
 ```cpp
-struct AudioConfig {
+struct UserPreferencesConfig {
   float master_volume{1.0f};
+  // ... other user preferences
+};
+
+struct AudioConfig {
   float music_volume{0.8f};
   float sfx_volume{1.0f};
 };
 
 struct EngineConfig {
   DisplayConfig display;
-  AudioConfig audio;  // Add here
+  UserPreferencesConfig user_preferences;  // Add here
+  AudioConfig audio;
 };
 ```
 
@@ -265,11 +270,11 @@ struct EngineState {
 
 **Category**: Core Resource (if simple) OR Subsystem (if complex)
 
-**Decision**: If just a socket → GameCore. If managing connections, sessions, protocols → NetworkManager
+**Decision**: If just a socket → EngineResources. If managing connections, sessions, protocols → NetworkManager
 
 ```cpp
 // Simple case
-struct GameCore {
+struct EngineResources {
   sf::TcpSocket network_socket;  // Add here
 };
 
@@ -291,13 +296,13 @@ class Engine {
 
 ```cpp
 // BAD: Mixing resources and state
-struct GameCore {
+struct EngineResources {
   sf::RenderWindow window;  // Resource
   bool running;             // State - doesn't belong here!
 };
 
 // GOOD: Separate by category
-struct GameCore {
+struct EngineResources {
   sf::RenderWindow window;
 };
 struct EngineState {
@@ -309,7 +314,7 @@ struct EngineState {
 
 ```cpp
 // BAD: Logic in data struct
-struct GameCore {
+struct EngineResources {
   void UpdateAllSystems() { /* complex logic */ }
 };
 

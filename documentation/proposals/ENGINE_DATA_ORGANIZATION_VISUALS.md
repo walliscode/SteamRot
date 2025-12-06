@@ -79,7 +79,7 @@ This document provides visual diagrams and flowcharts to illustrate the proposed
 ├───────────────────────────────────────────────────────────────┤
 │                                                                │
 │  ┌──────────────────────┐                                     │
-│  │     GameCore         │  ← Resource container               │
+│  │     EngineResources         │  ← Resource container               │
 │  │  - game_window       │                                     │
 │  │  - event_handler     │                                     │
 │  │  - mouse_position    │  ⚠️ Mixed: resources + runtime state│
@@ -88,14 +88,14 @@ This document provides visual diagrams and flowcharts to illustrate the proposed
 │  └──────────────────────┘                                     │
 │                                                                │
 │  ┌──────────────────────┐                                     │
-│  │    GameContext       │  ← References to GameCore           │
+│  │    GameContext       │  ← References to EngineResources           │
 │  │  (references only)   │                                     │
 │  └──────────────────────┘                                     │
 │                                                                │
 │  ┌──────────────────────┐                                     │
-│  │   UserPreferences    │  ← Configuration                    │
+│  │   EngineConfig       │  ← Configuration                    │
 │  │  (some config data)  │                                     │
-│  └──────────────────────┘  ⚠️ But not all config here        │
+│  └──────────────────────┘  ⚠️ But user prefs separate        │
 │                                                                │
 │  bool m_running;          ← Engine state (scattered)          │
 │                              ⚠️ Not grouped                    │
@@ -126,7 +126,7 @@ Problems:
 ├────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │  ┌──────────────────────────────────────────────────┐          │
-│  │              CORE RESOURCES (GameCore)           │          │
+│  │              CORE RESOURCES (EngineResources)           │          │
 │  ├──────────────────────────────────────────────────┤          │
 │  │  // Rendering & Display                          │          │
 │  │  sf::RenderWindow game_window;                   │          │
@@ -212,10 +212,10 @@ Benefits:
                          │ YES          │ NO
                          ▼              ▼
                   ┌─────────────┐  ┌──────────────────────┐
-                  │  GameCore   │  │ Is it loaded from    │
+                  │  EngineResources   │  │ Is it loaded from    │
                   │             │  │ files and configures │
                   │ Add to      │  │ behavior?            │
-                  │ GameCore    │  └────┬───────────┬─────┘
+                  │ EngineResources    │  └────┬───────────┬─────┘
                   │ struct      │       │ YES       │ NO
                   └─────────────┘       ▼           ▼
                                  ┌─────────────┐  ┌──────────────┐
@@ -249,7 +249,7 @@ Benefits:
                   ┌─────────────┐  ┌──────────────────┐
                   │  Subsystem  │  │  Simple Resource │
                   │  Manager    │  │                  │
-                  │             │  │  Add to GameCore │
+                  │             │  │  Add to EngineResources │
                   │ Create      │  │  struct          │
                   │ separate    │  │                  │
                   │ *Manager    │  │  Example:        │
@@ -307,7 +307,7 @@ Benefits:
 │  Logic)    │        │  ??? What    │
 └────────────┘        │  members?    │
                       │              │
-                      │  m_game_core?│
+                      │  m_engine_resources?│
                       │  m_running?  │
                       │  m_user_pref?│
                       └──────────────┘
@@ -323,7 +323,7 @@ Problem: No clear interface, must know internal structure
 │            │        │  (Reference Wrapper)           │
 │            │        │                                │
 │            │        │  // Core Resources             │
-│            │        │  GameCore& game_core;          │
+│            │        │  EngineResources& game_core;          │
 │            │        │  RenderWindow& game_window;    │
 │            │        │  EventHandler& event_handler;  │
 │            │        │  AssetManager& asset_manager;  │
@@ -336,7 +336,7 @@ Problem: No clear interface, must know internal structure
                       ┌────────────────────────┐
                       │       Engine           │
                       │                        │
-                      │  m_game_core           │
+                      │  m_engine_resources           │
                       │  m_engine_config       │
                       │  m_engine_state        │
                       └────────────────────────┘
@@ -359,7 +359,7 @@ Startup Flow:
                                             │ Configure
                                             ▼
                                      ┌──────────────┐
-                                     │  GameCore    │
+                                     │  EngineResources    │
                                      │              │
                                      │ Setup window │
                                      │ Set framerate│
@@ -387,7 +387,7 @@ Phase 1: Add New Structs (Non-Breaking)
 │             Engine                      │
 ├────────────────────────────────────────┤
 │  // OLD (keep)                          │
-│  GameCore m_game_core;                  │
+│  EngineResources m_engine_resources;                  │
 │  bool m_running;                        │
 │  vector<Subscriber> m_subscriptions;    │
 │                                         │
@@ -472,7 +472,7 @@ Implementation:
 ┌──────────────────────────────────────┐
 │           Engine                      │
 ├──────────────────────────────────────┤
-│  GameCore m_game_core;                │
+│  EngineResources m_engine_resources;                │
 │  EngineConfig m_engine_config;        │
 │  EngineState m_engine_state;          │
 │                                       │
@@ -485,7 +485,7 @@ Access:
 ┌──────────────────────────────────────┐
 │         GameContext                   │
 ├──────────────────────────────────────┤
-│  GameCore& game_core;                 │
+│  EngineResources& game_core;                 │
 │  AudioManager& audio_manager;  ←──────┼── Add reference
 └──────────────────────────────────────┘
 ```
@@ -595,7 +595,7 @@ void Engine::OnTickEnd() {
 │  ╔═══════════════════════════════════════════════════════════╗   │
 │  ║               CATEGORY 1: CORE RESOURCES                   ║   │
 │  ╠═══════════════════════════════════════════════════════════╣   │
-│  ║  GameCore m_game_core {                                    ║   │
+│  ║  EngineResources m_engine_resources {                                    ║   │
 │  ║    - RenderWindow game_window                              ║   │
 │  ║    - EventHandler event_handler                            ║   │
 │  ║    - AssetManager asset_manager                            ║   │
@@ -617,10 +617,7 @@ void Engine::OnTickEnd() {
 │  │    }                                                        │   │
 │  │    InputConfig input { /* future */ }                      │   │
 │  │    AudioConfig audio { /* future */ }                      │   │
-│  │  }                                                          │   │
-│  │                                                             │   │
-│  │  UserPreferences m_user_preferences {                      │   │
-│  │    /* user settings */                                     │   │
+│  │    UserPreferencesConfig user_preferences { /* user */ }   │   │
 │  │  }                                                          │   │
 │  │                                                             │   │
 │  │  Purpose: Loaded settings, mostly read-only                │   │
