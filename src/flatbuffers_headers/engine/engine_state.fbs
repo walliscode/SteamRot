@@ -6,7 +6,7 @@
 /// from data, such as subscribers and initial flags.
 ////////////////////////////////////////////////////////////
 
-include "../subscriber_data.fbs";
+include "../events/subscriber_data.fbs";
 
 namespace steamrot;
 

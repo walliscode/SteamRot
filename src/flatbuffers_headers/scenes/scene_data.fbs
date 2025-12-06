@@ -1,7 +1,7 @@
 include "../entities/entities.fbs";
-include "assets.fbs";
-include "scene_types.fbs";
-include "logic_data.fbs";
+include "../assets/assets.fbs";
+include "../core/scene_types.fbs";
+include "../logic/logic_data.fbs";
 include "scene_resources.fbs";
 
 namespace steamrot;

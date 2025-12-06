@@ -1,5 +1,5 @@
-include "event_packet_data.fbs";
-include "events.fbs";
+include "../events/event_packet_data.fbs";
+include "../events/events.fbs";
 namespace steamrot;
 
 ////////////////////////////////////////////////////////////

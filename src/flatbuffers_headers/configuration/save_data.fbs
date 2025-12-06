@@ -1,7 +1,7 @@
 
-include "entities.fbs";
-include "scene_types.fbs";
-include "event_bus_data.fbs";
+include "../entities/entities.fbs";
+include "../core/scene_types.fbs";
+include "../events/event_bus_data.fbs";
 
 namespace steamrot;
 

@@ -1,4 +1,4 @@
-include "subscriber_data.fbs";
+include "../events/subscriber_data.fbs";
 
 namespace steamrot;
 

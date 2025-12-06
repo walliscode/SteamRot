@@ -1,6 +1,6 @@
-include "types.fbs";
-include "subscriber_data.fbs";
-include "event_packet_data.fbs";
+include "../core/types.fbs";
+include "../events/subscriber_data.fbs";
+include "../events/event_packet_data.fbs";
 namespace steamrot;
 
 

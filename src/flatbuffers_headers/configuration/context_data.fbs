@@ -1,4 +1,4 @@
-include "scene_types.fbs";
+include "../core/scene_types.fbs";
 
 namespace steamrot;
 
