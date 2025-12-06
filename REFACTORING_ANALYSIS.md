@@ -13,14 +13,14 @@
 class Scene {
 protected:
   // Mixed data - no clear organization
-  const SceneInfo m_scene_info;          // Metadata
+  const SceneInfo m_scene_info;          // Metadata (contains EntityMemoryPool - to be removed)
   EntityManager m_entity_manager;         // Resource/Manager
   ActionManager m_action_manager;         // Resource/Manager
   const GameContext &m_game_context;      // Reference to engine
   std::unordered_map<LogicType, std::vector<std::unique_ptr<Logic>>> m_logic_map; // Resource
   SceneCore m_scene_core;                 // Resource (contains render texture)
   bool m_active;                          // State
-  std::unordered_set<EventType> m_scene_event_types; // State/Config
+  std::unordered_set<EventType> m_scene_event_types; // NOT USED - to be removed
 };
 ```
 
@@ -29,6 +29,7 @@ protected:
 - **Unclear ownership**: What's a resource vs state vs config?
 - **Hard to extend**: Where to add new scene data?
 - **Testing difficulty**: Can't mock/inject categories independently
+- **Dead code**: EntityMemoryPool in SceneInfo and m_scene_event_types are unused
 
 ---
 
@@ -78,11 +79,12 @@ struct SceneResources {
 ```cpp
 struct SceneConfig {
   // Configuration loaded from data files
-  std::unordered_set<EventType> event_types;  // Events this scene handles
   // Future: scene-specific settings
   // - render settings
   // - gameplay parameters
   // - AI difficulty
+  
+  // Note: Event handling is done via Subscribers, not a config set
 };
 ```
 
@@ -92,6 +94,8 @@ struct SceneConfig {
 - Immutable or rarely changing data
 
 **Lifetime**: Loaded at scene creation from data files
+
+**Note**: Initially this may be empty or minimal. Created for consistency and future extensibility.
 
 ### SceneState (new struct)
 ```cpp
@@ -379,62 +383,63 @@ All files with `#include "*_generated.h"` including:
 
 ---
 
-## Migration Strategy Options
+## Migration Strategy (APPROVED ✅)
 
-### Option A: Big Bang (All at Once)
-**Approach**: Implement all phases in one PR
+**Approach**: Incremental with review checkpoints after each phase  
+**Decision**: User approved incremental approach with checkpoints in single PR
 
-**Pros**:
-- ✅ Complete and consistent when done
-- ✅ No intermediate inconsistent state
-- ✅ Easier to reason about final state
+### Phase Breakdown with Checkpoints
 
-**Cons**:
-- ❌ High risk if something breaks
-- ❌ Difficult to review
-- ❌ Hard to roll back partially
-- ❌ Long time before any testing possible
+**Phase 0: Cleanup** (0.5 days)
+- Remove EntityMemoryPool from SceneInfo (unused, lives in EntityManager)
+- Remove m_scene_event_types from Scene (unused, superseded by Subscribers)
+- Update related code and tests
+- Verify no functionality loss
+- **CHECKPOINT**: User review & approval before Phase 1
 
-### Option B: Incremental (Phase by Phase)
-**Approach**: One phase at a time, each independently testable
+**Phase 1: Scene Organization** (2-3 days)
+- Create SceneResources, SceneConfig, SceneState structs
+- Update Scene.h/cpp
+- Update derived scenes (TitleScene, CraftingScene)
+- Update SceneContext, SceneFactory
+- Update all references
+- Update tests
+- **CHECKPOINT**: User review & approval before Phase 2
 
-**Phase Order**:
-1. Scene data organization (test independently)
-2. SceneManager data organization (test independently)
-3. Flatbuffers reorganization (test independently)
-4. Data loading hierarchy (test independently)
+**Phase 2: SceneManager Organization** (1-2 days)
+- Create SceneManagerResources, SceneManagerConfig, SceneManagerState structs
+- Update SceneManager.h/cpp
+- Keep m_scenes at top level (per user request)
+- Update Engine integration
+- Update tests
+- **CHECKPOINT**: User review & approval before Phase 3
 
-**Pros**:
-- ✅ Lower risk per change
-- ✅ Easier to review
-- ✅ Can test after each phase
-- ✅ Can roll back individual phases
-- ✅ Can pause between phases
+**Phase 3: Flatbuffers Reorganization** (3-4 days)
+- Create 8 subdirectories
+- Move 25 .fbs files to new locations
+- Update CMake build system
+- Keep generated headers in root (per user decision)
+- Test header generation
+- Test JSON→binary conversion
+- **CHECKPOINT**: User review & approval before Phase 4
 
-**Cons**:
-- ❌ More PRs to manage
-- ❌ Temporary inconsistency between phases
-- ❌ Longer overall timeline
+**Phase 4: Data Loading Hierarchy** (2-3 days)
+- Implement cascading configuration
+- Update data providers
+- Update scene loading
+- Document per-component rules
+- Update tests
+- **CHECKPOINT**: Final user review
 
-### Option C: Hybrid (Group Related Phases)
-**Approach**: Group related changes together
+**Total Timeline**: 8-12 days with checkpoints
 
-**Groups**:
-1. Scene + SceneManager organization (closely related)
-2. Flatbuffers reorganization (independent)
-3. Data loading hierarchy (builds on 1 & 2)
-
-**Pros**:
-- ✅ Balances risk and progress
-- ✅ Related changes together
-- ✅ Fewer PRs than full incremental
-
-**Cons**:
-- ❌ Still some complexity per PR
-- ❌ Some temporary inconsistency
-
-### Recommendation
-**Option B (Incremental)** or **Option C (Hybrid)** depending on time constraints and risk tolerance.
+### Key Decisions (APPROVED)
+1. ✅ **Access Pattern**: Direct access (not getters/setters)
+2. ✅ **SceneManagerResources**: Create even if empty (for consistency)
+3. ✅ **Generated Headers**: Keep in root (zero include changes)
+4. ✅ **Scene Vector**: Keep m_scenes at top level in SceneManager
+5. ✅ **TitleScene Data**: Defaults only for now
+6. ✅ **Cleanup**: Remove EntityMemoryPool from SceneInfo and m_scene_event_types from Scene
 
 ---
 

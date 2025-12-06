@@ -33,7 +33,7 @@ Engine:             Scene:              SceneManager:
 - EntityManager, ActionManager, LogicMap, SceneCore
 
 **SceneConfig** → Loaded from files
-- Event types, scene settings
+- Scene-specific settings (future: render settings, gameplay parameters)
 
 **SceneState** → Runtime flags
 - Active flag, pause state
@@ -127,29 +127,51 @@ Final Config
 
 ---
 
-## Key Decisions Needed
+## Key Decisions (APPROVED ✅)
 
-1. **Migration Strategy**: Incremental (recommended), Big Bang, or Hybrid?
-2. **Generated Headers**: Keep in root (recommended) or move to subdirs?
-3. **SceneManagerResources**: Create now or later?
-4. **TitleScene**: Defaults only (recommended) or allow prefs?
-5. **Priority**: High, Medium, or Low?
+1. **Migration Strategy**: ✅ Incremental (phased approach with review checkpoints)
+2. **Generated Headers**: ✅ Keep in root (no include changes)
+3. **SceneManagerResources**: ✅ Create now (even if empty, for consistency)
+4. **Scene Vector Location**: ✅ Keep at top level (not nested in resources)
+5. **TitleScene Data**: ✅ Defaults only for now (can revisit later)
+6. **Access Pattern**: ✅ Direct access (not getters/setters)
+
+## Cleanup Items (APPROVED ✅)
+
+- ✅ Remove EntityMemoryPool from SceneInfo (lives in EntityManager)
+- ✅ Remove m_scene_event_types from Scene (unused, superseded by Subscribers)
 
 ---
 
-## Phase Order (If Incremental)
+## Phase Order (Incremental with Review Checkpoints)
 
-1. **Scene organization** (2-3 days)
-   - Create structs, update Scene class
+**Phase 0: Cleanup** (0.5 days)
+- Remove EntityMemoryPool from SceneInfo
+- Remove m_scene_event_types from Scene
+- Update tests, verify no functionality loss
+- **CHECKPOINT**: Review & approve before Phase 1
 
-2. **SceneManager organization** (1-2 days)
-   - Create structs, update SceneManager
+**Phase 1: Scene organization** (2-3 days)
+- Create SceneResources, SceneConfig, SceneState structs
+- Update Scene class, derived scenes
+- Update all Scene-related code
+- **CHECKPOINT**: Review & approve before Phase 2
 
-3. **Flatbuffers reorganization** (3-4 days)
-   - Move files, update CMake, test builds
+**Phase 2: SceneManager organization** (1-2 days)
+- Create SceneManager structs
+- Update SceneManager class
+- Keep m_scenes at top level
+- **CHECKPOINT**: Review & approve before Phase 3
 
-4. **Data loading hierarchy** (2-3 days)
-   - Implement cascade, update providers
+**Phase 3: Flatbuffers reorganization** (3-4 days)
+- Move files, update CMake
+- Test builds, verify generation
+- **CHECKPOINT**: Review & approve before Phase 4
+
+**Phase 4: Data loading hierarchy** (2-3 days)
+- Implement cascade, update providers
+- Document per-component rules
+- **CHECKPOINT**: Final review
 
 ---
 

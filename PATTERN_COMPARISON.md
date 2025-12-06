@@ -80,8 +80,13 @@ protected:
   SceneConfig m_scene_config;
   
   struct SceneConfig {
-    std::unordered_set<EventType> event_types; // Events handled
+    // Configuration loaded from data files
     // Future: scene-specific settings
+    // - render settings
+    // - gameplay parameters
+    
+    // Note: Event handling done via Subscribers, not a config set
+    // Note: May be empty initially, created for consistency
   };
   
   // ════════════════════════════════════════

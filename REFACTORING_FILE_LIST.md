@@ -1,10 +1,54 @@
 # Refactoring: Detailed File Change List
 
 **Date**: December 6, 2025  
-**Status**: Planning document  
+**Status**: Planning document (APPROVED with checkpoints)  
 **Related**: REFACTORING_ANALYSIS.md, REFACTORING_VISUALS.md, REFACTORING_QUICK_REF.md
 
 This document lists all files that will need to be created or modified for the refactoring.
+
+**Migration Approach**: Incremental with review checkpoints in single PR
+
+---
+
+## Phase 0: Cleanup (Before Main Refactoring)
+
+### Files to Modify
+
+#### 1. Remove EntityMemoryPool from SceneInfo
+**File**: `src/scenes/SceneInfo.h`
+- Remove `EntityMemoryPool entity_memory_pool;` member
+- Update documentation to clarify SceneInfo is just metadata (ID and type)
+- Note: EntityMemoryPool lives in EntityManager, not SceneInfo
+
+#### 2. Remove m_scene_event_types from Scene
+**File**: `src/scenes/Scene.h`
+- Remove `std::unordered_set<EventType> m_scene_event_types;` member
+- Remove documentation comment about event types
+- Note: Event handling is done via Subscribers, not this unused set
+
+#### 3. Update Tests (if any reference these)
+Check and update:
+- `tests/unit/scenes/Scene.test.cpp` (if exists)
+- `tests/unit/scenes/TitleScene.test.cpp`
+- `tests/unit/scenes/CraftingScene.test.cpp`
+- `tests/unit/scenes/SceneManager.test.cpp`
+
+#### 4. Verify No Usage
+Run searches to confirm:
+```bash
+grep -r "entity_memory_pool" src/ tests/
+grep -r "scene_event_types" src/ tests/
+```
+Both should only show the declarations being removed.
+
+### Estimated Impact
+- **Modified files**: 2-4
+- **Lines changed**: ~10-15 (removals)
+- **Risk**: Very low (removing unused code)
+- **Effort**: 0.5 days
+
+### Checkpoint
+**User reviews Phase 0 changes before proceeding to Phase 1**
 
 ---
 
