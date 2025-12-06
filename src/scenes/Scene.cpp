@@ -18,26 +18,28 @@ namespace steamrot {
 /////////////////////////////////////////////////
 Scene::Scene(const SceneType scene_type, const uuids::uuid &id,
              const GameContext &game_context)
-    : m_scene_info{id, scene_type},
-      m_entity_manager(game_context.event_handler),
-      m_game_context(game_context) {}
+    : m_scene_info{id, scene_type}, m_game_context(game_context) {
+  // Initialize EntityManager with event handler
+  m_scene_resources.entity_manager =
+      EntityManager(game_context.event_handler);
+}
 
 /////////////////////////////////////////////////
-bool Scene::GetActive() const { return m_active; }
+bool Scene::GetActive() const { return m_scene_state.active; }
 
 /////////////////////////////////////////////////
-void Scene::SetActive(bool active) { m_active = active; }
+void Scene::SetActive(bool active) { m_scene_state.active = active; }
 
 /////////////////////////////////////////////////
 #ifdef DEBUG
 const EntityMemoryPool &Scene::GetEntityMemoryPool() const {
-  return m_entity_manager.GetEntityMemoryPool();
+  return m_scene_resources.entity_manager.GetEntityMemoryPool();
 }
 #endif
 
 /////////////////////////////////////////////////
 sf::RenderTexture &Scene::GetRenderTexture() {
-  return m_scene_core.scene_texture;
+  return m_scene_resources.scene_core.scene_texture;
 }
 
 /////////////////////////////////////////////////
@@ -45,8 +47,9 @@ std::expected<std::monostate, FailInfo>
 Scene::ConfigureFromDefault(const DataType &data_type) {
 
   // configure the entity memory pool
-  auto emp_configure_result = m_entity_manager.ConfigureEntitiesFromDefaultData(
-      m_scene_info.type, data_type);
+  auto emp_configure_result =
+      m_scene_resources.entity_manager.ConfigureEntitiesFromDefaultData(
+          m_scene_info.type, data_type);
   if (!emp_configure_result)
     return std::unexpected(emp_configure_result.error());
 
@@ -54,15 +57,15 @@ Scene::ConfigureFromDefault(const DataType &data_type) {
 }
 
 /////////////////////////////////////////////////
-const LogicCollection &Scene::GetLogicMap() const { return m_logic_map; }
+const LogicCollection &Scene::GetLogicMap() const {
+  return m_scene_resources.logic_map;
+}
 
 /////////////////////////////////////////////////
-void Scene::SetLogicMap(
-    std::unordered_map<LogicType, std::vector<std::unique_ptr<Logic>>>
-        logic_map) {
+void Scene::SetLogicMap(LogicCollection logic_map) {
   // only set the logic map if it is empty
-  if (m_logic_map.empty()) {
-    m_logic_map = std::move(logic_map);
+  if (m_scene_resources.logic_map.empty()) {
+    m_scene_resources.logic_map = std::move(logic_map);
   }
 }
 /////////////////////////////////////////////////
@@ -78,15 +81,16 @@ const SceneInfo Scene::GetSceneInfo() const {
 /////////////////////////////////////////////////
 SceneContext Scene::GetSceneContext() {
 
-  SceneContext scene_context{m_scene_core, m_game_context.game_core,
-                             m_entity_manager};
+  SceneContext scene_context{m_scene_resources.scene_core,
+                             m_game_context.game_core,
+                             m_scene_resources.entity_manager};
 
   return scene_context;
 }
 #ifdef DEBUG
 /////////////////////////////////////////////////
 const std::unordered_map<ArchetypeID, Archetype> &Scene::GetArchetypes() const {
-  return m_entity_manager.GetArchetypeManager().GetArchetypes();
+  return m_scene_resources.entity_manager.GetArchetypeManager().GetArchetypes();
 }
 #endif
 } // namespace steamrot

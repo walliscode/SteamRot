@@ -80,7 +80,7 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type,
   }
 
   auto configure_core_result = core::ConfigureSceneCore(
-      scene_ptr->m_scene_core, scene_core_result.value());
+      scene_ptr->m_scene_resources.scene_core, scene_core_result.value());
   if (!configure_core_result) {
     return std::unexpected(configure_core_result.error());
   }
@@ -92,7 +92,8 @@ SceneFactory::CreateDefaultScene(const SceneType &scene_type,
   }
 
   // Get ArchetypeManager to gerenate all archetypes
-  auto archetype_result = scene_ptr->m_entity_manager.GenerateAllArchetypes();
+  auto archetype_result =
+      scene_ptr->m_scene_resources.entity_manager.GenerateAllArchetypes();
   if (!archetype_result) {
     return std::unexpected(archetype_result.error());
   }

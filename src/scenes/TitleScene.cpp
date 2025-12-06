@@ -19,11 +19,12 @@ void TitleScene::sMovement() {};
 /////////////////////////////////////////////////
 void TitleScene::sRender() {
   // clear the render texture and the start of each Scene render step
-  m_scene_core.scene_texture.clear(sf::Color::Black);
+  m_scene_resources.scene_core.scene_texture.clear(sf::Color::Black);
 
-  if (m_logic_map.find(LogicType::Render) == m_logic_map.end()) {
+  if (m_scene_resources.logic_map.find(LogicType::Render) ==
+      m_scene_resources.logic_map.end()) {
   }
-  for (auto &render_logic : m_logic_map[LogicType::Render]) {
+  for (auto &render_logic : m_scene_resources.logic_map[LogicType::Render]) {
 
     render_logic->RunLogic();
   }
@@ -33,7 +34,8 @@ void TitleScene::sRender() {
 void TitleScene::sCollision() {
 
   // process collision logick
-  for (auto &collision_logic : m_logic_map[LogicType::Collision]) {
+  for (auto &collision_logic :
+       m_scene_resources.logic_map[LogicType::Collision]) {
     collision_logic->RunLogic();
   }
 }
@@ -41,7 +43,7 @@ void TitleScene::sCollision() {
 /////////////////////////////////////////////////
 void TitleScene::sAction() {
   // process action logic
-  for (auto &action_logic : m_logic_map[LogicType::Action]) {
+  for (auto &action_logic : m_scene_resources.logic_map[LogicType::Action]) {
     action_logic->RunLogic();
   }
 }
