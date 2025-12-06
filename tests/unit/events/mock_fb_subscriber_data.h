@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Create static data for mocking flatbuffer SubscriberData objects
+/// @brief Create static data for mocking flatbuffer SubscriberConfigFbs objects
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -9,12 +9,12 @@
 #pragma once
 
 #include "events_generated.h"
-#include "subscriber_data_generated.h"
+#include "subscriber_config_generated.h"
 #include "user_input_generated.h"
 namespace steamrot::tests {
 
-static flatbuffers::Offset<SubscriberData>
-CreateTestUserInputSubscriberData(flatbuffers::FlatBufferBuilder &builder) {
+static flatbuffers::Offset<SubscriberConfigFbs>
+CreateTestUserInputSubscriberConfig(flatbuffers::FlatBufferBuilder &builder) {
 
   // create UserInputBitsetData with some keys pressed and released
 
@@ -31,6 +31,6 @@ CreateTestUserInputSubscriberData(flatbuffers::FlatBufferBuilder &builder) {
       CreateUserInputBitsetData(builder, key_press_vec, key_release_vec,
                                 mouse_press_vec, mouse_release_vec);
 
-  return CreateSubscriberData(builder, EventType_EVENT_USER_INPUT);
+  return CreateSubscriberConfigFbs(builder, EventType_EVENT_USER_INPUT);
 }
 } // namespace steamrot::tests

@@ -215,11 +215,11 @@ public:
   /////////////////////////////////////////////////
   /// @brief Configure subscribers from flatbuffers data
   ///
-  /// @param subscriptions Flatbuffers vector of SubscriberData objects
+  /// @param subscriptions Flatbuffers vector of SubscriberConfigFbs objects
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo> ConfigureSubscribersFromData(
       const ::flatbuffers::Vector<
-          ::flatbuffers::Offset<steamrot::SubscriberData>> *subscriptions);
+          ::flatbuffers::Offset<steamrot::SubscriberConfigFbs>> *subscriptions);
 
   /////////////////////////////////////////////////
   /// @brief Get the engine configuration (includes user preferences).

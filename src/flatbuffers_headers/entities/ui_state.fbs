@@ -1,4 +1,4 @@
-include "../events/subscriber_data.fbs";
+include "../events/subscriber_config.fbs";
 
 namespace steamrot;
 
@@ -14,7 +14,7 @@ table UIStateData {
   // Collection of state key to UI visibility mappings
   state_key: string (required);
   state_to_ui_visibility: UIStateMapping;
-  subscribers: [SubscriberData];
+  subscribers: [SubscriberConfigFbs];
 }
 
 table UIStateCollectionData {

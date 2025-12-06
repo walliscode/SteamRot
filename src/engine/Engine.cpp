@@ -102,7 +102,7 @@ void Engine::TickSceneManager() {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> Engine::ConfigureSubscribersFromData(
-    const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>>
+    const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>>
         *subscriptions) {
 
   // call SubscriberFactory to create and register subscribers
