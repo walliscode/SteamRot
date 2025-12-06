@@ -1,5 +1,5 @@
 include "../core/types.fbs";
-include "../events/subscriber_data.fbs";
+include "../events/subscriber_config.fbs";
 include "../events/event_packet_data.fbs";
 namespace steamrot;
 
@@ -37,7 +37,7 @@ table child {
 table UIElementData{
     position: Vector2fData (required);
     size: Vector2fData (required);
-    subscriber_data: SubscriberData;
+    subscriber_data: SubscriberConfigFbs;
     response_event_data: EventPacketData;
     children_active: bool ;
     children: [child] (required);

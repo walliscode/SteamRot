@@ -2,7 +2,7 @@ include "events.fbs";
 
 namespace steamrot;
 
-table SubscriberData{
+table SubscriberConfigFbs{
 
   event_type_data: EventType;
   trigger_data: EventDataData;

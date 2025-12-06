@@ -4,6 +4,7 @@ add_library(data_providers
   FlatbuffersAssetDataProvider.cpp
   FlatbuffersFragmentDataProvider.cpp
   FlatbuffersSceneManagerDataProvider.cpp
+  FlatbuffersSubscriberDataProvider.cpp
   provider_factory.cpp
 )
 
@@ -17,4 +18,5 @@ target_link_libraries(data_providers
   data_handlers
   components
   flatbuffers_headers
+  events
 )

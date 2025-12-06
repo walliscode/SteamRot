@@ -14,7 +14,8 @@
 #include "EventHandler.h"
 #include "FailInfo.h"
 #include "Subscriber.h"
-#include "subscriber_data_generated.h"
+#include "SubscriberConfig.h"
+#include "subscriber_config_generated.h"
 #include <expected>
 #include <memory>
 namespace steamrot {
@@ -43,13 +44,21 @@ public:
   SubscriberFactory(EventHandler &event_handler);
 
 /////////////////////////////////////////////////
-  /// @brief Create a Subscriber from flatbuffers data
+  /// @brief Create a Subscriber from SubscriberConfig
   ///
-  /// @param subscriber_data Flatbuffers SubscriberData to create the subscriber
-  /// from.
+  /// @param config SubscriberConfig to create the subscriber from.
 /////////////////////////////////////////////////
   std::expected<std::shared_ptr<Subscriber>, FailInfo>
-  CreateAndRegisterSubscriber(const SubscriberData &subscriber_data);
+  CreateAndRegisterSubscriber(const SubscriberConfig &config);
+
+/////////////////////////////////////////////////
+  /// @brief Create a Subscriber from flatbuffers data
+  ///
+  /// @param subscriber_config_fbs Flatbuffers SubscriberConfigFbs to create the
+  /// subscriber from.
+/////////////////////////////////////////////////
+  std::expected<std::shared_ptr<Subscriber>, FailInfo>
+  CreateAndRegisterSubscriber(const SubscriberConfigFbs &subscriber_config_fbs);
 
 /////////////////////////////////////////////////
   /// @brief Given event type and data, create and register a subscriber.
