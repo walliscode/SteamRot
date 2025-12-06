@@ -48,7 +48,7 @@ public:
   ///
   /// @return Reference to SubscriberDataViewer or failure information
   /////////////////////////////////////////////////
-  std::expected<std::reference_wrapper<const SubscriberDataViewer>, FailInfo>
+  std::expected<const SubscriberDataViewer&, FailInfo>
   GetSubscriberViewer() const override;
 
   /////////////////////////////////////////////////

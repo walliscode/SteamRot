@@ -94,7 +94,7 @@ FlatbuffersEngineDataProvider::LoadEngineState() const {
 }
 
 /////////////////////////////////////////////////
-std::expected<std::reference_wrapper<const SubscriberDataViewer>, FailInfo>
+std::expected<const SubscriberDataViewer&, FailInfo>
 FlatbuffersEngineDataProvider::GetSubscriberViewer() const {
   // Lazily create the viewer if it doesn't exist
   if (!m_subscriber_viewer) {
@@ -108,7 +108,7 @@ FlatbuffersEngineDataProvider::GetSubscriberViewer() const {
         std::make_unique<SubscriberDataViewer>(fb_data->subscriptions());
   }
 
-  return std::cref(*m_subscriber_viewer);
+  return *m_subscriber_viewer;
 }
 
 /////////////////////////////////////////////////
@@ -119,7 +119,7 @@ FlatbuffersEngineDataProvider::GetSubscriberConfigs() const {
     return std::unexpected(viewer_result.error());
   }
 
-  return viewer_result.value().get().GetSubscriberConfigs();
+  return viewer_result.value().GetSubscriberConfigs();
 }
 
 } // namespace steamrot

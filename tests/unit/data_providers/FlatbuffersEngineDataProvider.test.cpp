@@ -58,7 +58,7 @@ TEST_CASE("FlatbuffersEngineDataProvider provides SubscriberDataViewer",
   REQUIRE(viewer_result.has_value());
   
   // Should be able to call GetSubscriberConfigs through the viewer
-  const auto& viewer = viewer_result.value().get();
+  const auto& viewer = viewer_result.value();
   auto configs_result = viewer.GetSubscriberConfigs();
   REQUIRE(configs_result.has_value());
   

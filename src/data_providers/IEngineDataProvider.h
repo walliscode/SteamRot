@@ -13,7 +13,6 @@
 #include "FailInfo.h"
 #include <cstdint>
 #include <expected>
-#include <functional>
 #include <string>
 
 // Forward declaration
@@ -99,8 +98,7 @@ public:
   ///
   /// @return Reference to SubscriberDataViewer or failure information
   /////////////////////////////////////////////////
-  virtual std::expected<std::reference_wrapper<const SubscriberDataViewer>,
-                        FailInfo>
+  virtual std::expected<const SubscriberDataViewer&, FailInfo>
   GetSubscriberViewer() const = 0;
 };
 
