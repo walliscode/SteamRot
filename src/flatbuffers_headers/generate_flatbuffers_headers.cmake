@@ -1,33 +1,52 @@
-# List your schema files
+# List your schema files organized by directory
+# Note: Schema files are organized into subdirectories for clarity,
+# but generated headers remain in root for zero include changes
 set(schema_files
-    ${CMAKE_CURRENT_SOURCE_DIR}/types.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/user_input.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/assets.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/grimoire_machina.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/fragments.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/ui_style.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/simulation.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/scene_types.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/input_test_data.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/joints.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/events.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/logic_data.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/event_packet_data.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/subscriber_data.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/event_bus_data.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/event_test_data.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/user_interface.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/ui_state.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/entities.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/scene_data.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/scene_manager_data.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/context_data.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/test_data.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/user_preferences.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/save_data.fbs
+    # Core types
+    ${CMAKE_CURRENT_SOURCE_DIR}/core/types.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/core/scene_types.fbs
+    
+    # Engine (already organized)
     ${CMAKE_CURRENT_SOURCE_DIR}/engine/engine_resources_config.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/engine/engine_config.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/engine/engine_state.fbs
+    
+    # Scenes
+    ${CMAKE_CURRENT_SOURCE_DIR}/scenes/scene_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/scenes/scene_manager_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/scenes/fragments.fbs
+    
+    # Entities and components
+    ${CMAKE_CURRENT_SOURCE_DIR}/entities/entities.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/entities/user_interface.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/entities/grimoire_machina.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/entities/ui_state.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/entities/ui_style.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/entities/joints.fbs
+    
+    # Events
+    ${CMAKE_CURRENT_SOURCE_DIR}/events/events.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/events/event_packet_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/events/event_bus_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/events/subscriber_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/events/user_input.fbs
+    
+    # Logic
+    ${CMAKE_CURRENT_SOURCE_DIR}/logic/logic_data.fbs
+    
+    # Assets
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets.fbs
+    
+    # Configuration
+    ${CMAKE_CURRENT_SOURCE_DIR}/configuration/context_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/configuration/user_preferences.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/configuration/save_data.fbs
+    
+    # Testing
+    ${CMAKE_CURRENT_SOURCE_DIR}/testing/test_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/testing/simulation.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/testing/event_test_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/testing/input_test_data.fbs
 )
 
 set(generated_headers)
