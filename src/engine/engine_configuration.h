@@ -14,7 +14,7 @@
 #include <expected>
 
 namespace steamrot {
-namespace core {
+namespace engine {
 
 /////////////////////////////////////////////////
 /// @brief Configure EngineResources from config data.
@@ -30,5 +30,5 @@ std::expected<std::monostate, FailInfo>
 ConfigureEngineResources(EngineResources &engine_resources,
                          const EngineResourcesConfigData &config_data);
 
-} // namespace core
+} // namespace engine
 } // namespace steamrot

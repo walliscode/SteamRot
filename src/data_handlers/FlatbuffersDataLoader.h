@@ -15,6 +15,7 @@
 #include "FailInfo.h"
 #include "context_data_generated.h"
 #include "engine_config_generated.h"
+#include "engine_resources_config_generated.h"
 #include "logic_data_generated.h"
 #include "scene_data_generated.h"
 #include "scene_manager_data_generated.h"
@@ -92,7 +93,8 @@ public:
   /////////////////////////////////////////////////
   /// @brief Provides EngineResourcesConfigFbs from binary file
   ///
-  /// Loads engine resources configuration from defaults/engine/engine_resources_config.bin
+  /// Loads engine resources configuration from
+  /// defaults/engine/engine_resources_config.bin
   /////////////////////////////////////////////////
   std::expected<const EngineResourcesConfigFbs *, FailInfo>
   ProvideEngineResourcesConfig() const;
@@ -104,8 +106,7 @@ public:
   /// If user configuration exists at user/engine/engine_config.bin, it
   /// will be loaded instead.
   /////////////////////////////////////////////////
-  std::expected<const EngineConfigFbs *, FailInfo>
-  ProvideEngineConfig() const;
+  std::expected<const EngineConfigFbs *, FailInfo> ProvideEngineConfig() const;
 
   /////////////////////////////////////////////////
   /// @brief Provides LogicCollectionData from SceneData for a specific scene

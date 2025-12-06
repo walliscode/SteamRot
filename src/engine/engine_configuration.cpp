@@ -6,10 +6,10 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "core_configuration.h"
+#include "engine_configuration.h"
 
 namespace steamrot {
-namespace core {
+namespace engine {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
@@ -29,5 +29,5 @@ ConfigureEngineResources(EngineResources &engine_resources,
   return std::monostate{};
 }
 
-} // namespace core
+} // namespace engine
 } // namespace steamrot

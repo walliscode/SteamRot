@@ -7,9 +7,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "Engine.h"
-#include "FlatbuffersUserPreferencesProvider.h"
 #include "SubscriberFactory.h"
-#include "core_configuration.h"
+#include "engine_configuration.h"
 #include "provider_factory.h"
 #include <vector>
 
@@ -32,9 +31,8 @@ std::expected<std::monostate, FailInfo> Engine::StartUp() {
   }
 
   // Configure EngineResources
-  auto configure_resources_result =
-      core::ConfigureEngineResources(m_engine_resources,
-                                     resources_config_result.value());
+  auto configure_resources_result = engine::ConfigureEngineResources(
+      m_engine_resources, resources_config_result.value());
   if (!configure_resources_result) {
     return std::unexpected(configure_resources_result.error());
   }
@@ -44,6 +42,7 @@ std::expected<std::monostate, FailInfo> Engine::StartUp() {
   if (!engine_config_result) {
     return std::unexpected(engine_config_result.error());
   }
+  // assign straight to member
   m_engine_config = engine_config_result.value();
 
   // Load EngineState
@@ -52,13 +51,6 @@ std::expected<std::monostate, FailInfo> Engine::StartUp() {
     return std::unexpected(engine_state_result.error());
   }
   m_engine_state = engine_state_result.value();
-
-  // Configure Engine state from data - this is virtual, so derived classes
-  // (GameEngine/TestEngine) provide their own data source strategy
-  auto configure_engine_result = ConfigureEngineStateFromData();
-  if (!configure_engine_result.has_value()) {
-    return std::unexpected(configure_engine_result.error());
-  }
 
   return std::monostate{};
 }
@@ -92,7 +84,7 @@ void Engine::ExecuteTick() {
 void Engine::TickEvents() {
   // Let EventHandler process SFML events and update bus and subscribers
   m_game_context.event_handler.ExecuteEventHandlerLevelLogic(
-      m_game_core.game_window);
+      m_engine_resources.game_window);
 }
 
 /////////////////////////////////////////////////
@@ -107,8 +99,6 @@ void Engine::TickSceneManager() {
   // It does not update scenes (that's done in TickSceneLogic).
   m_scene_manager.ExecuteSceneManagerLevelLogic();
 }
-
-
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> Engine::ConfigureSubscribersFromData(

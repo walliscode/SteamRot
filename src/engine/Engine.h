@@ -79,8 +79,7 @@ protected:
   ///
   /// @return Success or failure information
   /////////////////////////////////////////////////
-  virtual std::expected<std::monostate, FailInfo>
-  ConfigureEngineStateFromData() = 0;
+  std::expected<std::monostate, FailInfo> ConfigureEngineStateFromData();
 
   /////////////////////////////////////////////////
   /// @brief Execute a single tick of the game loop.
@@ -92,8 +91,6 @@ protected:
   /// @note This method calls ExecuteTick() which uses the new Tick_() pipeline.
   /////////////////////////////////////////////////
   void ExecuteSystemsTick();
-
-
 
   /////////////////////////////////////////////////
   /// @brief Hook called at the beginning of each tick (before any processing).
@@ -229,9 +226,7 @@ public:
   ///
   /// @return Const reference to engine configuration
   /////////////////////////////////////////////////
-  const EngineConfig &GetEngineConfig() const {
-    return m_engine_config;
-  }
+  const EngineConfig &GetEngineConfig() const { return m_engine_config; }
 
   std::vector<std::shared_ptr<Subscriber>> &GetSubscriptions();
 };

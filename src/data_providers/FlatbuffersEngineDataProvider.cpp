@@ -44,13 +44,14 @@ FlatbuffersEngineDataProvider::LoadEngineConfig() const {
   }
 
   EngineConfig engine_config;
-  
+
   // Populate display config from resources config
   engine_config.display.window_width = resources_config.value().window_width;
   engine_config.display.window_height = resources_config.value().window_height;
   engine_config.display.window_title = resources_config.value().window_title;
-  engine_config.display.framerate_limit = resources_config.value().framerate_limit;
-  
+  engine_config.display.framerate_limit =
+      resources_config.value().framerate_limit;
+
   // Set defaults for user preferences (can be loaded from separate file later)
   engine_config.user_preferences.master_volume = 1.0f;
   engine_config.user_preferences.show_fps = false;
@@ -71,7 +72,7 @@ FlatbuffersEngineDataProvider::LoadEngineState() const {
   const auto *fb_data = fb_result.value();
 
   EngineState engine_state;
-  
+
   // Initialize flags
   engine_state.running = false;
   engine_state.paused = false;
