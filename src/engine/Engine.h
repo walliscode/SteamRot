@@ -71,17 +71,6 @@ protected:
   EngineState m_engine_state;
 
   /////////////////////////////////////////////////
-  /// @brief Configure the engine from data sources.
-  ///
-  /// Called by StartUp() to load configuration data.
-  /// Derived classes implement data loading specific to their context
-  /// (game data files vs test data configs).
-  ///
-  /// @return Success or failure information
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo> ConfigureEngineStateFromData();
-
-  /////////////////////////////////////////////////
   /// @brief Execute a single tick of the game loop.
   ///
   /// Called by Run() for each iteration of the game loop.

@@ -10,8 +10,6 @@
 #include "FailInfo.h"
 #include "Fragment.h"
 #include "assets_generated.h"
-#include "engine_config_generated.h"
-#include "engine_resources_config_generated.h"
 #include "fragments_generated.h"
 #include "paths.h"
 #include "scene_data_generated.h"
@@ -293,7 +291,7 @@ FlatbuffersDataLoader::ProvideContextData() const {
 
 /////////////////////////////////////////////////
 std::expected<const EngineResourcesConfigFbs *, FailInfo>
-FlatbuffersDataLoader::ProvideEngineResourcesConfig() const {
+FlatbuffersDataLoader::ProvideEngineResourcesConfigFbs() const {
   // get engine directory from defaults
   std::filesystem::path engine_dir = paths::GetDefaultEngineDirectory();
 
@@ -316,7 +314,7 @@ FlatbuffersDataLoader::ProvideEngineResourcesConfig() const {
 
 /////////////////////////////////////////////////
 std::expected<const EngineConfigFbs *, FailInfo>
-FlatbuffersDataLoader::ProvideEngineConfig() const {
+FlatbuffersDataLoader::ProvideEngineConfigFbs() const {
   // First check for user-specific engine config
   std::filesystem::path user_engine_dir = paths::GetUserDirectory() / "engine";
   std::filesystem::path user_config_path =
@@ -336,7 +334,7 @@ FlatbuffersDataLoader::ProvideEngineConfig() const {
   // Load default engine config
   std::filesystem::path default_engine_dir = paths::GetDefaultEngineDirectory();
   std::filesystem::path default_config_path =
-      default_engine_dir / "engine_config.bin";
+      default_engine_dir / "default.engine_config.bin";
 
   if (!std::filesystem::exists(default_config_path)) {
     std::string error_message = std::format("Engine config file not found: {}",
@@ -353,6 +351,32 @@ FlatbuffersDataLoader::ProvideEngineConfig() const {
   }
 
   return config_data;
+}
+
+/////////////////////////////////////////////////
+std::expected<const EngineStateFbs *, FailInfo>
+FlatbuffersDataLoader::ProvideEngineStateFbs() const {
+  // get engine directory from defaults
+  std::filesystem::path engine_dir = paths::GetDefaultEngineDirectory();
+
+  // construct the file path
+  std::filesystem::path engine_state_path =
+      engine_dir / "default.engine_state.bin";
+
+  // check if the file exists
+  if (!std::filesystem::exists(engine_state_path)) {
+    std::string error_message = std::format("Engine state file not found: {}",
+                                            engine_state_path.string());
+    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
+  }
+  // load the engine state data
+  const steamrot::EngineStateFbs *engine_state_data =
+      GetEngineStateFbs(LoadBinaryData(engine_state_path));
+  if (!engine_state_data) {
+    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
+                                    "EngineStateFbs pointer is null"));
+  }
+  return engine_state_data;
 }
 /////////////////////////////////////////////////
 std::expected<const SceneManagerDataFbs *, FailInfo>

@@ -6,20 +6,21 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "SubscriberDataViewer.h"
+
+#include "FlatbuffersSubscriberViewer.h"
 #include "event_factory.h"
 
 namespace steamrot {
 
 /////////////////////////////////////////////////
-SubscriberDataViewer::SubscriberDataViewer(
+FlatbuffersSubscriberViewer::FlatbuffersSubscriberViewer(
     const flatbuffers::Vector<flatbuffers::Offset<SubscriberConfigFbs>>
         *subscriber_configs_fbs)
     : m_subscriber_configs_fbs(subscriber_configs_fbs) {}
 
 /////////////////////////////////////////////////
 std::expected<std::vector<SubscriberConfig>, FailInfo>
-SubscriberDataViewer::GetSubscriberConfigs() const {
+FlatbuffersSubscriberViewer::GetSubscriberConfigs() const {
   std::vector<SubscriberConfig> configs;
 
   // Handle null case

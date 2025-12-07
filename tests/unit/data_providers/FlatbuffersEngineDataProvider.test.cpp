@@ -54,14 +54,14 @@ TEST_CASE("FlatbuffersEngineDataProvider provides SubscriberDataViewer",
   steamrot::FlatbuffersEngineDataProvider provider;
 
   // Should be able to get viewer from the provider
-  auto viewer_result = provider.GetSubscriberViewer();
+  auto viewer_result = provider.GetSubscriptions();
   REQUIRE(viewer_result.has_value());
-  
+
   // Should be able to call GetSubscriberConfigs through the viewer
-  const auto& viewer = viewer_result.value();
+  const auto &viewer = viewer_result.value();
   auto configs_result = viewer.GetSubscriberConfigs();
   REQUIRE(configs_result.has_value());
-  
+
   // Convenience method should also work
   auto result = provider.GetSubscriberConfigs();
   REQUIRE(result.has_value());

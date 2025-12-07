@@ -52,6 +52,9 @@ std::expected<std::monostate, FailInfo> Engine::StartUp() {
   }
   m_engine_state = engine_state_result.value();
 
+  // Configure Subscribers of EngineState from loaded data
+  // [TODO: Add SUbscriber configuration to EngineState data]
+
   return std::monostate{};
 }
 
@@ -102,8 +105,8 @@ void Engine::TickSceneManager() {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> Engine::ConfigureSubscribersFromData(
-    const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>>
-        *subscriptions) {
+    const ::flatbuffers::Vector<
+        ::flatbuffers::Offset<steamrot::SubscriberConfigFbs>> *subscriptions) {
 
   // call SubscriberFactory to create and register subscribers
   SubscriberFactory subscriber_factory(m_game_context.event_handler);

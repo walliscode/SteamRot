@@ -17,8 +17,6 @@ namespace steamrot {
 /// @brief Display configuration settings.
 /////////////////////////////////////////////////
 struct DisplayConfig {
-  uint32_t window_width{800};
-  uint32_t window_height{600};
   std::string window_title{"SteamRot"};
   uint32_t framerate_limit{60};
   bool fullscreen{false};

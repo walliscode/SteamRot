@@ -7,7 +7,9 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersEngineDataProvider.h"
-#include "SubscriberFactory.h"
+#include "FlatbuffersSubscriberViewer.h"
+#include "ISubscriberViewer.h"
+#include <memory>
 
 namespace steamrot {
 
@@ -15,7 +17,7 @@ namespace steamrot {
 std::expected<EngineResourcesConfigData, FailInfo>
 FlatbuffersEngineDataProvider::LoadEngineResourcesConfig() const {
   // Use existing loader
-  auto fb_result = m_loader.ProvideEngineCoreData();
+  auto fb_result = m_loader.ProvideEngineResourcesConfigFbs();
   if (!fb_result.has_value()) {
     return std::unexpected(fb_result.error());
   }
@@ -37,20 +39,20 @@ FlatbuffersEngineDataProvider::LoadEngineResourcesConfig() const {
 /////////////////////////////////////////////////
 std::expected<EngineConfig, FailInfo>
 FlatbuffersEngineDataProvider::LoadEngineConfig() const {
-  // Load display config from engine core data
-  auto resources_config = LoadEngineResourcesConfig();
-  if (!resources_config.has_value()) {
-    return std::unexpected(resources_config.error());
-  }
 
+  // Load engine config data from FlatBuffers
+  auto fb_result = m_loader.ProvideEngineConfigFbs();
+  if (!fb_result.has_value()) {
+    return std::unexpected(fb_result.error());
+  }
+  const auto *fb_data = fb_result.value();
   EngineConfig engine_config;
 
   // Populate display config from resources config
-  engine_config.display.window_width = resources_config.value().window_width;
-  engine_config.display.window_height = resources_config.value().window_height;
-  engine_config.display.window_title = resources_config.value().window_title;
-  engine_config.display.framerate_limit =
-      resources_config.value().framerate_limit;
+
+  engine_config.display.window_title =
+      fb_data->display()->window_title()->str();
+  engine_config.display.framerate_limit = fb_data->display()->framerate_limit();
 
   // Set defaults for user preferences (can be loaded from separate file later)
   engine_config.user_preferences.master_volume = 1.0f;
@@ -64,7 +66,7 @@ FlatbuffersEngineDataProvider::LoadEngineConfig() const {
 std::expected<EngineState, FailInfo>
 FlatbuffersEngineDataProvider::LoadEngineState() const {
   // Load engine data for subscriptions
-  auto fb_result = m_loader.ProvideEngineData();
+  auto fb_result = m_loader.ProvideEngineStateFbs();
   if (!fb_result.has_value()) {
     return std::unexpected(fb_result.error());
   }
@@ -78,47 +80,27 @@ FlatbuffersEngineDataProvider::LoadEngineState() const {
   engine_state.paused = false;
   engine_state.quit_requested = false;
 
-  // Load subscriptions
-  if (fb_data->subscriptions()) {
-    SubscriberFactory subscriber_factory;
-    for (const auto *sub_data : *fb_data->subscriptions()) {
-      auto subscriber_result = subscriber_factory.CreateSubscriber(sub_data);
-      if (subscriber_result.has_value()) {
-        engine_state.subscriptions.push_back(subscriber_result.value());
-      }
-    }
-  }
-
   return engine_state;
 }
 
 /////////////////////////////////////////////////
-std::expected<const SubscriberDataViewer&, FailInfo>
-FlatbuffersEngineDataProvider::GetSubscriberViewer() const {
-  // Lazily create the viewer if it doesn't exist
-  if (!m_subscriber_viewer) {
-    auto fb_result = m_loader.ProvideEngineData();
-    if (!fb_result.has_value()) {
-      return std::unexpected(fb_result.error());
-    }
+std::expected<std::unique_ptr<ISubscriberViewer>, FailInfo>
+FlatbuffersEngineDataProvider::GetSubscriptions() const {
 
-    const auto *fb_data = fb_result.value();
-    m_subscriber_viewer =
-        std::make_unique<SubscriberDataViewer>(fb_data->subscriptions());
+  // load engine state for subscriptions
+  // [TODO] Consider caching this if performance becomes an issue as we are
+  // loading this twice
+  auto fb_result = m_loader.ProvideEngineStateFbs();
+  if (!fb_result.has_value()) {
+    return std::unexpected(fb_result.error());
   }
 
-  return *m_subscriber_viewer;
-}
+  // pull out subscription data
+  const auto *fb_data = fb_result.value();
 
-/////////////////////////////////////////////////
-std::expected<std::vector<SubscriberConfig>, FailInfo>
-FlatbuffersEngineDataProvider::GetSubscriberConfigs() const {
-  auto viewer_result = GetSubscriberViewer();
-  if (!viewer_result.has_value()) {
-    return std::unexpected(viewer_result.error());
-  }
-
-  return viewer_result.value().GetSubscriberConfigs();
+  // create and return FlatbuffersSubscriberViewer as a unique_ptr
+  return std::make_unique<FlatbuffersSubscriberViewer>(
+      fb_data->subscriptions());
 }
 
 } // namespace steamrot

@@ -9,6 +9,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FailInfo.h"
+#include "ISubscriberViewer.h"
 #include "SubscriberConfig.h"
 #include "subscriber_config_generated.h"
 #include <expected>
@@ -31,7 +32,7 @@ namespace steamrot {
 /// auto configs = viewer.GetSubscriberConfigs();
 /// ```
 /////////////////////////////////////////////////
-class SubscriberDataViewer {
+class FlatbuffersSubscriberViewer : public ISubscriberViewer {
 private:
   const flatbuffers::Vector<flatbuffers::Offset<SubscriberConfigFbs>>
       *m_subscriber_configs_fbs;
@@ -43,14 +44,15 @@ public:
   /// @param subscriber_configs_fbs Pointer to FlatBuffers vector of
   /// SubscriberConfigFbs
   /////////////////////////////////////////////////
-  SubscriberDataViewer(
+  FlatbuffersSubscriberViewer(
       const flatbuffers::Vector<flatbuffers::Offset<SubscriberConfigFbs>>
           *subscriber_configs_fbs);
 
   /////////////////////////////////////////////////
   /// @brief Get subscriber configurations from this data source.
   ///
-  /// Converts FlatBuffers SubscriberConfigFbs objects to SubscriberConfig structs.
+  /// Converts FlatBuffers SubscriberConfigFbs objects to SubscriberConfig
+  /// structs.
   ///
   /// @return Vector of SubscriberConfig objects or failure information
   /////////////////////////////////////////////////
