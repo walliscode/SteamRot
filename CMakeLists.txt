@@ -20,12 +20,6 @@ endif()
 # Always enforce the language constraint
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Use libc++ with clang for C++23 features like std::expected
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-stdlib=libc++)
-  add_link_options(-stdlib=libc++)
-endif()
-
 # make sure the data output directory exists
 if (NOT EXISTS ${DATA_OUT_DIR})
   file(MAKE_DIRECTORY ${DATA_OUT_DIR})
@@ -45,6 +39,13 @@ include(flatbuffers_compilation)
 
 # fetch_content_modules.cmake contains a menu list of all fetch content
 include(fetch_content_modules)
+
+# Set compile and link options for our project targets only (not dependencies)
+# Use libc++ with clang for C++23 features like std::expected
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  set(PROJECT_COMPILE_OPTIONS -stdlib=libc++)
+  set(PROJECT_LINK_OPTIONS -stdlib=libc++)
+endif()
 
 add_subdirectory(steamrot)
 add_subdirectory(src)

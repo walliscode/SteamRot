@@ -4,7 +4,7 @@ event_factory.cpp
 event_bus_conversion.cpp
 event_handler_tick.cpp
 Subscriber.cpp
-SubscriberFactory.cpp
+subscriber_factory.cpp
 )
 
 target_include_directories(events
@@ -21,3 +21,11 @@ magic_enum::magic_enum
 logger
 matchers
 )
+
+# Apply project-specific compile and link options
+if(DEFINED PROJECT_COMPILE_OPTIONS)
+  target_compile_options(events PRIVATE ${PROJECT_COMPILE_OPTIONS})
+endif()
+if(DEFINED PROJECT_LINK_OPTIONS)
+  target_link_options(events PRIVATE ${PROJECT_LINK_OPTIONS})
+endif()

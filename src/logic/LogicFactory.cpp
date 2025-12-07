@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////
 #include "LogicFactory.h"
 #include "CraftingRenderLogic.h"
-#include "SubscriberFactory.h"
+#include "subscriber_factory.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
 #include "UIRenderLogic.h"
@@ -215,21 +215,27 @@ LogicFactory::AttachSubscribers(Logic &logic, const LogicData *logic_data) {
     return std::monostate{};
   }
 
-  // Iterate through subscriber data and create subscribers
+  // Collect all subscriber configs into a vector
+  std::vector<const SubscriberConfigFbs *> configs;
   for (const auto *subscriber_data : *logic_data->all_subscriptions()) {
-    if (!subscriber_data) {
-      continue; // Skip null subscriber data
+    if (subscriber_data) {
+      configs.push_back(subscriber_data);
     }
+  }
 
-    // Create and register subscriber using namespace functions
-    auto subscriber_result = subscriber_factory::CreateAndRegisterSubscriber(
-        *subscriber_data, m_scene_context.event_handler);
-    if (!subscriber_result.has_value()) {
-      return std::unexpected(subscriber_result.error());
-    }
+  // Get logic's subscriber vector
+  std::vector<std::shared_ptr<Subscriber>> temp_subscribers;
 
-    // Add subscriber to the logic instance
-    logic.AddSubscriber(subscriber_result.value());
+  // Create and register all subscribers at once
+  auto result = subscriber_factory::CreateAndRegisterSubscribers(
+      configs, temp_subscribers, m_scene_context.event_handler);
+  if (!result.has_value()) {
+    return std::unexpected(result.error());
+  }
+
+  // Add all created subscribers to the logic instance
+  for (auto &subscriber : temp_subscribers) {
+    logic.AddSubscriber(subscriber);
   }
 
   return std::monostate{};
