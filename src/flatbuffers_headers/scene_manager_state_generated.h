@@ -13,7 +13,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
-#include "subscriber_config_generated.h"
+#include "subscriber_generated.h"
 
 namespace steamrot {
 
@@ -25,8 +25,8 @@ struct SceneManagerStateFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Tab
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_SUBSCRIPTIONS = 4
   };
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>> *subscriptions() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>> *>(VT_SUBSCRIPTIONS);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberFbs>> *subscriptions() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberFbs>> *>(VT_SUBSCRIPTIONS);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -41,7 +41,7 @@ struct SceneManagerStateFbsBuilder {
   typedef SceneManagerStateFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_subscriptions(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>>> subscriptions) {
+  void add_subscriptions(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberFbs>>> subscriptions) {
     fbb_.AddOffset(SceneManagerStateFbs::VT_SUBSCRIPTIONS, subscriptions);
   }
   explicit SceneManagerStateFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
@@ -57,7 +57,7 @@ struct SceneManagerStateFbsBuilder {
 
 inline ::flatbuffers::Offset<SceneManagerStateFbs> CreateSceneManagerStateFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>>> subscriptions = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberFbs>>> subscriptions = 0) {
   SceneManagerStateFbsBuilder builder_(_fbb);
   builder_.add_subscriptions(subscriptions);
   return builder_.Finish();
@@ -65,8 +65,8 @@ inline ::flatbuffers::Offset<SceneManagerStateFbs> CreateSceneManagerStateFbs(
 
 inline ::flatbuffers::Offset<SceneManagerStateFbs> CreateSceneManagerStateFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>> *subscriptions = nullptr) {
-  auto subscriptions__ = subscriptions ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>>(*subscriptions) : 0;
+    const std::vector<::flatbuffers::Offset<steamrot::SubscriberFbs>> *subscriptions = nullptr) {
+  auto subscriptions__ = subscriptions ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::SubscriberFbs>>(*subscriptions) : 0;
   return steamrot::CreateSceneManagerStateFbs(
       _fbb,
       subscriptions__);

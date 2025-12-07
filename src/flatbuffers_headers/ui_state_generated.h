@@ -13,7 +13,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
-#include "subscriber_config_generated.h"
+#include "subscriber_generated.h"
 
 namespace steamrot {
 
@@ -106,8 +106,8 @@ struct UIStateData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::UIStateMapping *state_to_ui_visibility() const {
     return GetPointer<const steamrot::UIStateMapping *>(VT_STATE_TO_UI_VISIBILITY);
   }
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>> *subscribers() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>> *>(VT_SUBSCRIBERS);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberFbs>> *subscribers() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberFbs>> *>(VT_SUBSCRIBERS);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -132,7 +132,7 @@ struct UIStateDataBuilder {
   void add_state_to_ui_visibility(::flatbuffers::Offset<steamrot::UIStateMapping> state_to_ui_visibility) {
     fbb_.AddOffset(UIStateData::VT_STATE_TO_UI_VISIBILITY, state_to_ui_visibility);
   }
-  void add_subscribers(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>>> subscribers) {
+  void add_subscribers(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberFbs>>> subscribers) {
     fbb_.AddOffset(UIStateData::VT_SUBSCRIBERS, subscribers);
   }
   explicit UIStateDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
@@ -151,7 +151,7 @@ inline ::flatbuffers::Offset<UIStateData> CreateUIStateData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::String> state_key = 0,
     ::flatbuffers::Offset<steamrot::UIStateMapping> state_to_ui_visibility = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>>> subscribers = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberFbs>>> subscribers = 0) {
   UIStateDataBuilder builder_(_fbb);
   builder_.add_subscribers(subscribers);
   builder_.add_state_to_ui_visibility(state_to_ui_visibility);
@@ -163,9 +163,9 @@ inline ::flatbuffers::Offset<UIStateData> CreateUIStateDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const char *state_key = nullptr,
     ::flatbuffers::Offset<steamrot::UIStateMapping> state_to_ui_visibility = 0,
-    const std::vector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>> *subscribers = nullptr) {
+    const std::vector<::flatbuffers::Offset<steamrot::SubscriberFbs>> *subscribers = nullptr) {
   auto state_key__ = state_key ? _fbb.CreateString(state_key) : 0;
-  auto subscribers__ = subscribers ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>>(*subscribers) : 0;
+  auto subscribers__ = subscribers ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::SubscriberFbs>>(*subscribers) : 0;
   return steamrot::CreateUIStateData(
       _fbb,
       state_key__,

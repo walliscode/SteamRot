@@ -15,7 +15,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 #include "types_generated.h"
 #include "event_packet_data_generated.h"
-#include "subscriber_config_generated.h"
+#include "subscriber_generated.h"
 
 namespace steamrot {
 
@@ -345,8 +345,8 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::Vector2fData *size() const {
     return GetPointer<const steamrot::Vector2fData *>(VT_SIZE);
   }
-  const steamrot::SubscriberConfigFbs *subscriber_data() const {
-    return GetPointer<const steamrot::SubscriberConfigFbs *>(VT_SUBSCRIBER_DATA);
+  const steamrot::SubscriberFbs *subscriber_data() const {
+    return GetPointer<const steamrot::SubscriberFbs *>(VT_SUBSCRIBER_DATA);
   }
   const steamrot::EventPacketData *response_event_data() const {
     return GetPointer<const steamrot::EventPacketData *>(VT_RESPONSE_EVENT_DATA);
@@ -397,7 +397,7 @@ struct UIElementDataBuilder {
   void add_size(::flatbuffers::Offset<steamrot::Vector2fData> size) {
     fbb_.AddOffset(UIElementData::VT_SIZE, size);
   }
-  void add_subscriber_data(::flatbuffers::Offset<steamrot::SubscriberConfigFbs> subscriber_data) {
+  void add_subscriber_data(::flatbuffers::Offset<steamrot::SubscriberFbs> subscriber_data) {
     fbb_.AddOffset(UIElementData::VT_SUBSCRIBER_DATA, subscriber_data);
   }
   void add_response_event_data(::flatbuffers::Offset<steamrot::EventPacketData> response_event_data) {
@@ -436,7 +436,7 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::Vector2fData> position = 0,
     ::flatbuffers::Offset<steamrot::Vector2fData> size = 0,
-    ::flatbuffers::Offset<steamrot::SubscriberConfigFbs> subscriber_data = 0,
+    ::flatbuffers::Offset<steamrot::SubscriberFbs> subscriber_data = 0,
     ::flatbuffers::Offset<steamrot::EventPacketData> response_event_data = 0,
     bool children_active = false,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::child>>> children = 0,
@@ -460,7 +460,7 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::Vector2fData> position = 0,
     ::flatbuffers::Offset<steamrot::Vector2fData> size = 0,
-    ::flatbuffers::Offset<steamrot::SubscriberConfigFbs> subscriber_data = 0,
+    ::flatbuffers::Offset<steamrot::SubscriberFbs> subscriber_data = 0,
     ::flatbuffers::Offset<steamrot::EventPacketData> response_event_data = 0,
     bool children_active = false,
     const std::vector<::flatbuffers::Offset<steamrot::child>> *children = nullptr,
