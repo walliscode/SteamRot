@@ -6,9 +6,7 @@
 #pragma once
 
 #include "Subscriber.h"
-#include "events_generated.h"
 #include <memory>
-#include <unordered_map>
 
 namespace steamrot {
 
@@ -25,9 +23,9 @@ struct SceneManagerState {
   SceneManagerState() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Map of all event subscriptions, stored by event type
+  /// @brief vector of shared pointers to Subscribers for the SceneManager
   /////////////////////////////////////////////////
-  std::unordered_map<EventType, std::shared_ptr<Subscriber>> subscriptions;
+  std::vector<std::shared_ptr<Subscriber>> subscriptions;
 
   // Future: additional runtime state
   // - active scene tracking

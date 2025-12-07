@@ -36,5 +36,11 @@ public:
   /////////////////////////////////////////////////
   std::expected<SceneManagerState, FailInfo>
   LoadSceneManagerState() const override;
+
+  /////////////////////////////////////////////////
+  /// @brief Implementation of GetSubscriberViewer
+  /////////////////////////////////////////////////
+  std::expected<std::unique_ptr<ISubscriberViewer>, FailInfo>
+  GetSubscriberViewer() const override;
 };
 } // namespace steamrot

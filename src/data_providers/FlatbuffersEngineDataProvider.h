@@ -39,7 +39,7 @@ public:
   std::expected<EngineState, FailInfo> LoadEngineState() const override;
 
   std::expected<std::unique_ptr<ISubscriberViewer>, FailInfo>
-  GetSubscriptions() const override;
+  GetSubscriberViewer() const override;
 };
 
 } // namespace steamrot

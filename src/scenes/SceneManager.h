@@ -63,6 +63,11 @@ private:
   /////////////////////////////////////////////////
   SceneManagerState m_scene_manager_state;
 
+  /////////////////////////////////////////////////
+  /// @brief Go through all subscriptions, if active call relevant Logic
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> ProcessSubscriptions();
+
 public:
   /////////////////////////////////////////////////
   /// @brief Constructor taking a GameContext object.
@@ -70,6 +75,8 @@ public:
   /// @param game_context GameContext object
   /////////////////////////////////////////////////
   SceneManager(const GameContext &game_context);
+
+  void StartUp();
 
   /////////////////////////////////////////////////
   /// @brief A convenience function to load the title scene.
@@ -124,21 +131,7 @@ public:
   /// @brief Returns a constant reference to the subscriptions map for
   /// inspection
   /////////////////////////////////////////////////
-  const std::unordered_map<EventType, std::shared_ptr<Subscriber>> &
-  GetSubscriptions() const;
-
-  /////////////////////////////////////////////////
-  /// @brief Loads unique scenes that run by themselves,
-  ///
-  /// @param scene_type Enum pointing to the type of scene to load
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  LoadStandAloneScene(const SceneType &scene_type);
-
-  /////////////////////////////////////////////////
-  /// @brief Go through all subscriptions, if active call relevant Logic
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo> ProcessSubscriptions();
+  const std::vector<std::shared_ptr<Subscriber>> &GetSubscriptions() const;
 
   /////////////////////////////////////////////////
   /// @brief Returns all available Scenes for inspection

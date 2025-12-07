@@ -9,11 +9,13 @@
 #include "SceneManager.h"
 #include "EventPacket.h"
 #include "FailInfo.h"
+#include "ISceneManagerDataProvider.h"
 #include "Scene.h"
 #include "SceneFactory.h"
 #include "SceneInfo.h"
 #include "Subscriber.h"
 #include "events_generated.h"
+#include "provider_factory.h"
 #include "uuid.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <expected>
@@ -29,6 +31,12 @@ namespace steamrot {
 SceneManager::SceneManager(const GameContext &game_context)
     : m_scenes(), m_game_context(game_context) {}
 
+/////////////////////////////////////////////////
+void SceneManager::StartUp() {
+
+  // create data provider for SceneManager configuration
+  ISceneManagerDataProvider &data_provider = GetSceneManagerDataProvider();
+}
 /////////////////////////////////////////////////
 const std::unordered_map<uuids::uuid, std::unique_ptr<Scene>> &
 SceneManager::GetScenes() const {
@@ -157,30 +165,20 @@ void SceneManager::UpdateScenes() {
   }
 }
 /////////////////////////////////////////////////
-const std::unordered_map<EventType, std::shared_ptr<Subscriber>> &
+const std::vector<std::shared_ptr<Subscriber>> &
 SceneManager::GetSubscriptions() const {
   return m_scene_manager_state.subscriptions;
 }
 
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-SceneManager::LoadStandAloneScene(const SceneType &scene_type) {
-  // clear existing scenes
-  m_scenes.clear();
-
-  return std::monostate{};
-}
-
-/////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> SceneManager::ProcessSubscriptions() {
 
-  for (const auto &[event_type, subscriber] :
-       m_scene_manager_state.subscriptions) {
+  for (auto &subscriber : m_scene_manager_state.subscriptions) {
 
     // only process active subscribers
     if (subscriber->m_active) {
 
-      switch (event_type) {
+      switch (subscriber->m_trigger_event_type) {
       case EventType::EventType_EVENT_CHANGE_SCENE: {
 
         // make sure the data type is correct - use received event data
@@ -228,10 +226,6 @@ std::expected<std::monostate, FailInfo> SceneManager::ProcessSubscriptions() {
       default:
         break;
       }
-      // FINAL PART: set subscriber to inactive and clear received data after
-      // processing.
-      subscriber->m_active = false;
-      subscriber->m_received_event_data.reset();
     }
   }
   return std::monostate{};

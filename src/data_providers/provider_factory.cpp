@@ -11,12 +11,20 @@
 #include "FlatbuffersEngineDataProvider.h"
 #include "FlatbuffersFragmentDataProvider.h"
 #include "FlatbuffersSceneDataProvider.h"
+#include "FlatbuffersSceneManagerDataProvider.h"
+#include "ISceneManagerDataProvider.h"
 
 namespace steamrot {
 
 /////////////////////////////////////////////////
 IEngineDataProvider &GetEngineDataProvider() {
   static FlatbuffersEngineDataProvider provider;
+  return provider;
+}
+
+/////////////////////////////////////////////////
+ISceneManagerDataProvider &GetSceneManagerDataProvider() {
+  static FlatbuffersSceneManagerDataProvider provider;
   return provider;
 }
 
