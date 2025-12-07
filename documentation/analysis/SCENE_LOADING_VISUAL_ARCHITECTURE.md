@@ -74,9 +74,97 @@
 
 ---
 
-## The Two Access Patterns
+## The Unified Access Pattern
 
-### Pattern 1: Default Scene (New Game)
+**Key Insight**: SceneManager decides data source; Factory/Configurator are source-agnostic
+
+### Overview Flow (Both Default and Save)
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│              Unified Scene Loading Flow                      │
+└──────────────────────────────────────────────────────────────┘
+
+User Action: "Start New Game" OR "Load Game"
+        │
+        ↓
+┌───────────────────────────────────────────┐
+│ SceneManager::LoadScene(type, from_save)  │
+│                                           │
+│ Single Decision Point                     │
+└───────────────────────────────────────────┘
+        │
+        │ Decides which provider
+        ↓
+    ┌───────────────┴───────────────┐
+    ↓                               ↓
+┌────────────────┐          ┌────────────────┐
+│ from_save =    │          │ from_save =    │
+│ false          │          │ true           │
+└────────────────┘          └────────────────┘
+    │                               │
+    ↓                               ↓
+┌────────────────┐          ┌────────────────┐
+│ISceneData      │          │ISaveData       │
+│Provider        │          │Provider        │
+│::LoadSceneData │          │::LoadSave      │
+└────────────────┘          └────────────────┘
+    │                               │
+    │ SceneConfigurationData        │ SaveData
+    ↓                               ↓
+                            ┌────────────────┐
+                            │SceneData       │
+                            │Extractor       │
+                            │::Extract       │
+                            └────────────────┘
+                                    │
+                                    │ SceneConfigurationData
+                                    ↓
+        └───────────────┬───────────────┘
+                        ↓
+            ┌───────────────────────┐
+            │SceneConfigurationData │
+            │ (unified from either  │
+            │  source)              │
+            └───────────────────────┘
+                        │
+                        │ Pass to factory
+                        ↓
+            ┌───────────────────────┐
+            │ SceneFactory          │
+            │ CreateScene(config)   │
+            │                       │
+            │ (source-agnostic!)    │
+            └───────────────────────┘
+                        │
+                        │ Create Scene
+                        ↓
+            ┌───────────────────────┐
+            │ Scene                 │
+            │ (created, empty)      │
+            └───────────────────────┘
+                        │
+                        │ Configure(config)
+                        ↓
+            ┌───────────────────────┐
+            │ EntityConfigurator    │
+            │ ConfigureEntities()   │
+            │                       │
+            │ (source-agnostic!)    │
+            └───────────────────────┘
+                        │
+                        │ Populate
+                        ↓
+            ┌───────────────────────┐
+            │ EntityMemoryPool      │
+            │ (fully configured)    │
+            └───────────────────────┘
+                        │
+                        ↓
+            Scene Ready for Game Loop
+```
+
+### For Default Scenes (New Game)
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
@@ -86,83 +174,48 @@
 User Action: "Start New Game"
         │
         ↓
-┌───────────────────────┐
-│ ISceneDataProvider    │
-│ GetSceneDataProvider()│
-└───────────────────────┘
+SceneManager::LoadScene(SceneType::TITLE, from_save = false)
         │
-        │ LoadSceneData(SceneType::TITLE)
+        │ Decides: use default provider
         ↓
 ┌───────────────────────────────────┐
-│ FlatbuffersSceneDataProvider      │
+│ ISceneDataProvider                │
+│ ::LoadSceneData(SceneType::TITLE) │
 │                                   │
 │ 1. Load: title.scene_data.bin    │
 │ 2. Parse FlatBuffers              │
 │ 3. Convert to native struct       │
 └───────────────────────────────────┘
         │
-        │ Returns SceneData
+        │ Returns SceneConfigurationData
         ↓
 ┌───────────────────────┐
-│ SceneData             │
+│SceneConfigurationData │
 │ ├─ scene_type         │
 │ ├─ scene_id           │
 │ ├─ texture_width      │
-│ └─ texture_height     │
+│ ├─ texture_height     │
+│ └─ entity_data        │
 └───────────────────────┘
         │
-        │ Pass to factory
+        │ Pass to factory (agnostic!)
         ↓
 ┌───────────────────────┐
 │ SceneFactory          │
-│ CreateDefaultScene()  │
+│ CreateScene(config)   │
 └───────────────────────┘
         │
-        │ Create Scene
         ↓
 ┌───────────────────────┐
 │ Scene                 │
-│ (created, empty)      │
-└───────────────────────┘
-        │
-        │ ConfigureFromDefault()
-        ↓
-┌───────────────────────┐
-│ IEntityDataProvider   │
-│ LoadDefaultEntities() │
-└───────────────────────┘
-        │
-        │ EntityCollectionData
-        ↓
-┌───────────────────────┐
-│ EntityConfigurator    │
-│ ConfigureEntities()   │
-└───────────────────────┘
-        │
-        │ Populate
-        ↓
-┌───────────────────────┐
-│ EntityMemoryPool      │
-│ (fully configured)    │
-└───────────────────────┘
-        │
-        │ Generate
-        ↓
-┌───────────────────────┐
-│ Archetypes            │
-└───────────────────────┘
-        │
-        │ Create
-        ↓
-┌───────────────────────┐
-│ LogicCollection       │
+│ Configure(config)     │
 └───────────────────────┘
         │
         ↓
-Scene Ready for Game Loop
+Scene Ready
 ```
 
-### Pattern 2: Saved Scene (Load Game)
+### For Saved Scenes (Load Game)
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
@@ -172,15 +225,13 @@ Scene Ready for Game Loop
 User Action: "Load Game (Slot 1)"
         │
         ↓
-┌───────────────────────┐
-│ ISaveDataProvider     │
-│ GetSaveDataProvider() │
-└───────────────────────┘
+SceneManager::LoadScene(SceneType::CRAFTING, from_save = true, slot = 1)
         │
-        │ LoadSave(1)
+        │ Decides: use save provider + extractor
         ↓
 ┌───────────────────────────────────┐
-│ FlatbuffersSaveDataProvider       │
+│ ISaveDataProvider                 │
+│ ::LoadSave(1)                     │
 │                                   │
 │ 1. Load: slot_1.save.bin         │
 │ 2. Parse FlatBuffers              │
@@ -194,79 +245,53 @@ User Action: "Load Game (Slot 1)"
 │ ├─ metadata           │
 │ ├─ current_scene_type │
 │ └─ scene_states[]     │
-│    ├─ SceneStateData  │
-│    │  ├─ scene_type   │
-│    │  ├─ scene_id     │
-│    │  ├─ dimensions   │
-│    │  └─ entity_data  │
-│    └─ ...             │
 └───────────────────────┘
         │
-        │ Extract scene data
+        │ Extract configuration
         ↓
-┌───────────────────────┐
-│ SceneDataExtractor    │
-│ ExtractSceneMetadata()│
-└───────────────────────┘
+┌───────────────────────────────────┐
+│ SceneDataExtractor                │
+│ ::ExtractConfiguration(save, type)│
+│                                   │
+│ 1. Find scene in scene_states[]  │
+│ 2. Extract to flat structure      │
+└───────────────────────────────────┘
         │
-        │ Returns flat SceneData
+        │ Returns SceneConfigurationData
         ↓
 ┌───────────────────────┐
-│ SceneData             │
-│ (metadata only)       │
-└───────────────────────┘
-        │
-        │ Extract scene state
-        ↓
-┌───────────────────────┐
-│ SceneDataExtractor    │
-│ ExtractSceneState(0)  │
-└───────────────────────┘
-        │
-        │ Returns SceneStateData
-        ↓
-┌───────────────────────┐
-│ SceneStateData        │
-│ ├─ scene metadata     │
+│SceneConfigurationData │
+│ ├─ scene_type         │
+│ ├─ scene_id           │
+│ ├─ texture_width      │
+│ ├─ texture_height     │
 │ └─ entity_data        │
 └───────────────────────┘
         │
-        │ Pass both to factory
+        │ Pass to factory (agnostic!)
         ↓
 ┌───────────────────────┐
 │ SceneFactory          │
-│ CreateSceneFromSave() │
+│ CreateScene(config)   │
+│                       │
+│ (SAME CODE AS         │
+│  DEFAULT!)            │
 └───────────────────────┘
         │
-        │ Create Scene
         ↓
 ┌───────────────────────┐
 │ Scene                 │
-│ (created, empty)      │
+│ Configure(config)     │
+│                       │
+│ (SAME CODE AS         │
+│  DEFAULT!)            │
 └───────────────────────┘
         │
-        │ ConfigureFromSave(scene_state)
         ↓
-┌───────────────────────┐
-│ EntityConfigurator    │
-│ ConfigureEntities()   │
-│ (from saved data)     │
-└───────────────────────┘
-        │
-        │ Populate with saved state
-        ↓
-┌───────────────────────┐
-│ EntityMemoryPool      │
-│ (restored from save)  │
-└───────────────────────┘
-        │
-        │ Generate
-        ↓
-┌───────────────────────┐
-│ Archetypes            │
-└───────────────────────┘
-        │
-        │ Create
+Scene Ready (Restored State)
+```
+
+---
         ↓
 ┌───────────────────────┐
 │ LogicCollection       │
@@ -555,14 +580,14 @@ Scene Ready (Restored State)
 │                                                                  │
 │  SceneManager::LoadTitleScene()                                 │
 │    ↓                                                             │
-│  AddSceneFromDefault(SceneType::SceneType_TITLE)                │
+│  LoadScene(SceneType::SceneType_TITLE, from_save = false)      │
 │    ↓                                                             │
-│  SceneFactory::CreateDefaultScene()                             │
+│  [SceneManager decides: use default provider]                   │
 └─────────────────────────────────────────────────────────────────┘
                         │
                         ↓
 ┌─────────────────────────────────────────────────────────────────┐
-│ 4. Scene Metadata Loading                                       │
+│ 4. Scene Configuration Loading                                  │
 │                                                                  │
 │  ISceneDataProvider& provider = GetSceneDataProvider();         │
 │    ↓                                                             │
@@ -571,10 +596,10 @@ Scene Ready (Restored State)
 │  FlatbuffersSceneDataProvider:                                  │
 │    ├─ Load: data/scenes/title.scene_data.bin                   │
 │    ├─ Parse FlatBuffers                                         │
-│    ├─ Convert to SceneData struct                               │
-│    └─ Return SceneData                                          │
+│    ├─ Convert to SceneConfigurationData struct                  │
+│    └─ Return SceneConfigurationData                             │
 │    ↓                                                             │
-│  SceneData { type, id, width, height } ✅                      │
+│  SceneConfigurationData { type, id, width, height, entities } ✅│
 └─────────────────────────────────────────────────────────────────┘
                         │
                         ↓
@@ -582,8 +607,9 @@ Scene Ready (Restored State)
 │ 5. Scene Creation                                               │
 │                                                                  │
 │  SceneFactory:                                                   │
+│    ├─ CreateScene(config) [source-agnostic]                    │
 │    ├─ Create Scene object (TitleScene)                          │
-│    ├─ Configure render texture dimensions                       │
+│    ├─ Configure render texture dimensions from config           │
 │    └─ Return scene_ptr                                          │
 │    ↓                                                             │
 │  Scene object created ✅                                        │
@@ -591,15 +617,13 @@ Scene Ready (Restored State)
                         │
                         ↓
 ┌─────────────────────────────────────────────────────────────────┐
-│ 6. Entity Configuration [⚠️ NEEDS IMPROVEMENT]                  │
+│ 6. Entity Configuration                                         │
 │                                                                  │
-│  scene->ConfigureFromDefault()                                  │
+│  scene->Configure(config) [source-agnostic]                    │
 │    ↓                                                             │
-│  EntityManager::ConfigureEntitiesFromDefaultData()              │
+│  EntityManager::ConfigureEntities(config.entity_data)           │
 │    ↓                                                             │
-│  FlatbuffersConfigurator::ConfigureEntities()                   │
-│    ├─ [Currently uses FlatBuffers directly ❌]                 │
-│    ├─ [FUTURE: IEntityDataProvider interface ✅]               │
+│  [Configuration happens same way for default and save]          │
 │    ↓                                                             │
 │  EntityMemoryPool configured ✅                                 │
 └─────────────────────────────────────────────────────────────────┘
