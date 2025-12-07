@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersEngineDataProvider.h"
-#include "FlatbuffersSubscriberDataProvider.h"
 #include "SubscriberFactory.h"
 
 namespace steamrot {
@@ -93,23 +92,33 @@ FlatbuffersEngineDataProvider::LoadEngineState() const {
   return engine_state;
 }
 
-} // namespace steamrot
+/////////////////////////////////////////////////
+std::expected<const SubscriberDataViewer&, FailInfo>
+FlatbuffersEngineDataProvider::GetSubscriberViewer() const {
+  // Lazily create the viewer if it doesn't exist
+  if (!m_subscriber_viewer) {
+    auto fb_result = m_loader.ProvideEngineData();
+    if (!fb_result.has_value()) {
+      return std::unexpected(fb_result.error());
+    }
+
+    const auto *fb_data = fb_result.value();
+    m_subscriber_viewer =
+        std::make_unique<SubscriberDataViewer>(fb_data->subscriptions());
+  }
+
+  return *m_subscriber_viewer;
+}
 
 /////////////////////////////////////////////////
 std::expected<std::vector<SubscriberConfig>, FailInfo>
 FlatbuffersEngineDataProvider::GetSubscriberConfigs() const {
-  // Load engine data for subscriptions
-  auto fb_result = m_loader.ProvideEngineData();
-  if (!fb_result.has_value()) {
-    return std::unexpected(fb_result.error());
+  auto viewer_result = GetSubscriberViewer();
+  if (!viewer_result.has_value()) {
+    return std::unexpected(viewer_result.error());
   }
 
-  const auto *fb_data = fb_result.value();
-
-  // Use FlatbuffersSubscriberDataProvider to convert
-  FlatbuffersSubscriberDataProvider subscriber_provider(
-      fb_data->subscriptions());
-  
-  return subscriber_provider.LoadSubscriberConfigs();
+  return viewer_result.value().GetSubscriberConfigs();
 }
 
+} // namespace steamrot

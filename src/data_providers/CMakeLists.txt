@@ -4,7 +4,7 @@ add_library(data_providers
   FlatbuffersAssetDataProvider.cpp
   FlatbuffersFragmentDataProvider.cpp
   FlatbuffersSceneManagerDataProvider.cpp
-  FlatbuffersSubscriberDataProvider.cpp
+  SubscriberDataViewer.cpp
   provider_factory.cpp
 )
 

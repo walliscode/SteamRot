@@ -1,29 +1,27 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Unit tests for FlatbuffersSubscriberDataProvider
+/// @brief Unit tests for SubscriberDataViewer
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "FlatbuffersSubscriberDataProvider.h"
+#include "SubscriberDataViewer.h"
 #include "subscriber_config_generated.h"
 #include <catch2/catch_test_macros.hpp>
 #include <flatbuffers/flatbuffers.h>
 
-TEST_CASE("FlatbuffersSubscriberDataProvider with null pointer returns empty "
-          "vector",
-          "[unit][data_providers][FlatbuffersSubscriberDataProvider]") {
-  steamrot::FlatbuffersSubscriberDataProvider provider(nullptr);
+TEST_CASE("SubscriberDataViewer with null pointer returns empty vector",
+          "[unit][data_providers][SubscriberDataViewer]") {
+  steamrot::SubscriberDataViewer viewer(nullptr);
 
-  auto result = provider.LoadSubscriberConfigs();
+  auto result = viewer.GetSubscriberConfigs();
   REQUIRE(result.has_value());
   REQUIRE(result.value().empty());
 }
 
-TEST_CASE("FlatbuffersSubscriberDataProvider with empty vector returns empty "
-          "result",
-          "[unit][data_providers][FlatbuffersSubscriberDataProvider]") {
+TEST_CASE("SubscriberDataViewer with empty vector returns empty result",
+          "[unit][data_providers][SubscriberDataViewer]") {
   flatbuffers::FlatBufferBuilder builder;
 
   // Create empty vector
@@ -39,15 +37,15 @@ TEST_CASE("FlatbuffersSubscriberDataProvider with empty vector returns empty "
           flatbuffers::Offset<steamrot::SubscriberConfigFbs>>>(
           builder.GetBufferPointer());
 
-  steamrot::FlatbuffersSubscriberDataProvider provider(configs);
+  steamrot::SubscriberDataViewer viewer(configs);
 
-  auto result = provider.LoadSubscriberConfigs();
+  auto result = viewer.GetSubscriberConfigs();
   REQUIRE(result.has_value());
   REQUIRE(result.value().empty());
 }
 
-TEST_CASE("FlatbuffersSubscriberDataProvider converts single subscriber config",
-          "[unit][data_providers][FlatbuffersSubscriberDataProvider]") {
+TEST_CASE("SubscriberDataViewer converts single subscriber config",
+          "[unit][data_providers][SubscriberDataViewer]") {
   flatbuffers::FlatBufferBuilder builder;
 
   // Create a single subscriber config
@@ -66,9 +64,9 @@ TEST_CASE("FlatbuffersSubscriberDataProvider converts single subscriber config",
           flatbuffers::Offset<steamrot::SubscriberConfigFbs>>>(
           builder.GetBufferPointer());
 
-  steamrot::FlatbuffersSubscriberDataProvider provider(configs);
+  steamrot::SubscriberDataViewer viewer(configs);
 
-  auto result = provider.LoadSubscriberConfigs();
+  auto result = viewer.GetSubscriberConfigs();
   REQUIRE(result.has_value());
   REQUIRE(result.value().size() == 1);
 
@@ -79,9 +77,8 @@ TEST_CASE("FlatbuffersSubscriberDataProvider converts single subscriber config",
   REQUIRE(!config_result.trigger_event_data.has_value());
 }
 
-TEST_CASE("FlatbuffersSubscriberDataProvider converts multiple subscriber "
-          "configs",
-          "[unit][data_providers][FlatbuffersSubscriberDataProvider]") {
+TEST_CASE("SubscriberDataViewer converts multiple subscriber configs",
+          "[unit][data_providers][SubscriberDataViewer]") {
   flatbuffers::FlatBufferBuilder builder;
 
   // Create multiple subscriber configs
@@ -105,9 +102,9 @@ TEST_CASE("FlatbuffersSubscriberDataProvider converts multiple subscriber "
           flatbuffers::Offset<steamrot::SubscriberConfigFbs>>>(
           builder.GetBufferPointer());
 
-  steamrot::FlatbuffersSubscriberDataProvider provider(configs);
+  steamrot::SubscriberDataViewer viewer(configs);
 
-  auto result = provider.LoadSubscriberConfigs();
+  auto result = viewer.GetSubscriberConfigs();
   REQUIRE(result.has_value());
   REQUIRE(result.value().size() == 2);
 
@@ -120,33 +117,4 @@ TEST_CASE("FlatbuffersSubscriberDataProvider converts multiple subscriber "
   REQUIRE(config2_result.trigger_event_type ==
           steamrot::EventType::EventType_EVENT_TOGGLE_UI);
   REQUIRE(config2_result.active == false);
-}
-
-TEST_CASE("FlatbuffersSubscriberDataProvider skips null entries in vector",
-          "[unit][data_providers][FlatbuffersSubscriberDataProvider]") {
-  flatbuffers::FlatBufferBuilder builder;
-
-  // Create configs with a null entry (by creating offset 0)
-  auto config1 = steamrot::CreateSubscriberConfigFbs(
-      builder, steamrot::EventType::EventType_EVENT_USER_INPUT,
-      steamrot::EventDataData::EventDataData_NONE, 0, true);
-
-  std::vector<flatbuffers::Offset<steamrot::SubscriberConfigFbs>> configs_vec;
-  configs_vec.push_back(config1);
-  // Note: We can't easily create a null entry in a vector, so this test
-  // verifies the implementation handles the null check properly
-
-  auto configs_offset = builder.CreateVector(configs_vec);
-  builder.Finish(configs_offset);
-
-  const auto *configs =
-      flatbuffers::GetRoot<flatbuffers::Vector<
-          flatbuffers::Offset<steamrot::SubscriberConfigFbs>>>(
-          builder.GetBufferPointer());
-
-  steamrot::FlatbuffersSubscriberDataProvider provider(configs);
-
-  auto result = provider.LoadSubscriberConfigs();
-  REQUIRE(result.has_value());
-  REQUIRE(result.value().size() == 1);
 }

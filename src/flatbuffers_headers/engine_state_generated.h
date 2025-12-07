@@ -13,7 +13,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
-#include "subscriber_data_generated.h"
+#include "subscriber_config_generated.h"
 
 namespace steamrot {
 
@@ -40,8 +40,8 @@ struct EngineStateFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     return GetField<uint8_t>(VT_PAUSED, 0) != 0;
   }
   /// Engine-level subscribers (e.g., quit game handler)
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>> *subscriptions() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>> *>(VT_SUBSCRIPTIONS);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>> *subscriptions() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>> *>(VT_SUBSCRIPTIONS);
   }
   /// Initial quit requested state
   bool quit_requested() const {
@@ -69,7 +69,7 @@ struct EngineStateFbsBuilder {
   void add_paused(bool paused) {
     fbb_.AddElement<uint8_t>(EngineStateFbs::VT_PAUSED, static_cast<uint8_t>(paused), 0);
   }
-  void add_subscriptions(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>>> subscriptions) {
+  void add_subscriptions(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>>> subscriptions) {
     fbb_.AddOffset(EngineStateFbs::VT_SUBSCRIPTIONS, subscriptions);
   }
   void add_quit_requested(bool quit_requested) {
@@ -90,7 +90,7 @@ inline ::flatbuffers::Offset<EngineStateFbs> CreateEngineStateFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     bool running = false,
     bool paused = false,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberData>>> subscriptions = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>>> subscriptions = 0,
     bool quit_requested = false) {
   EngineStateFbsBuilder builder_(_fbb);
   builder_.add_subscriptions(subscriptions);
@@ -104,9 +104,9 @@ inline ::flatbuffers::Offset<EngineStateFbs> CreateEngineStateFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     bool running = false,
     bool paused = false,
-    const std::vector<::flatbuffers::Offset<steamrot::SubscriberData>> *subscriptions = nullptr,
+    const std::vector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>> *subscriptions = nullptr,
     bool quit_requested = false) {
-  auto subscriptions__ = subscriptions ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::SubscriberData>>(*subscriptions) : 0;
+  auto subscriptions__ = subscriptions ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>>(*subscriptions) : 0;
   return steamrot::CreateEngineStateFbs(
       _fbb,
       running,
