@@ -295,6 +295,7 @@ Key insights:
 - **Quick Reference**: SCENE_DATA_ACCESS_PATTERNS_QUICK_REF.md
 - **Visual Guide**: SCENE_DATA_ACCESS_PATTERNS_VISUALS.md
 - **Provider vs Viewer Pattern**: PROVIDER_VS_VIEWER_PATTERN.md
+- **Abstract Factory Pattern**: ABSTRACT_SCENE_FACTORY_PATTERN.md
 - **View Pattern Details**: SAVE_LOAD_WORKFLOW_ANALYSIS.md
 - **Provider System**: ../DATA_PROVIDER_SYSTEM.md
 - **Save Data**: ../configuration/SAVE_DATA.md

@@ -277,8 +277,9 @@ void LoadScene(const SceneData& data) {
 
 ## Related Documentation
 
-- **Full Analysis**: SCENE_DATA_PROVIDER_ARCHITECTURE_ANALYSIS.md
 - **Provider vs Viewer**: PROVIDER_VS_VIEWER_PATTERN.md
+- **Abstract Factory Pattern**: ABSTRACT_SCENE_FACTORY_PATTERN.md
+- **Full Analysis**: SCENE_DATA_PROVIDER_ARCHITECTURE_ANALYSIS.md
 - **View Pattern**: SAVE_LOAD_WORKFLOW_ANALYSIS.md
 - **Provider System**: ../DATA_PROVIDER_SYSTEM.md
 - **Save Data**: ../configuration/SAVE_DATA.md

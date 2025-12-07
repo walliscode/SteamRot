@@ -663,6 +663,7 @@ When implementing scene state saving:
 
 ## Related Documentation
 
+- [Abstract Factory Pattern](ABSTRACT_SCENE_FACTORY_PATTERN.md) - Analysis of AbstractSceneFactory approach
 - [Provider vs Viewer Pattern](PROVIDER_VS_VIEWER_PATTERN.md) - Why Provider pattern chosen over Viewer
 - [Save/Load Workflow Analysis](SAVE_LOAD_WORKFLOW_ANALYSIS.md) - View pattern details
 - [Data Provider System](../DATA_PROVIDER_SYSTEM.md) - Current provider architecture

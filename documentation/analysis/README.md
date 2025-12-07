@@ -111,6 +111,7 @@ Executive summary covering:
 - [SCENE_DATA_ACCESS_PATTERNS_QUICK_REF.md](./SCENE_DATA_ACCESS_PATTERNS_QUICK_REF.md) - Quick reference guide (7KB)
 - [SCENE_DATA_ACCESS_PATTERNS_VISUALS.md](./SCENE_DATA_ACCESS_PATTERNS_VISUALS.md) - Visual diagrams (16KB)
 - [PROVIDER_VS_VIEWER_PATTERN.md](./PROVIDER_VS_VIEWER_PATTERN.md) - Provider vs Viewer pattern comparison (13KB)
+- [ABSTRACT_SCENE_FACTORY_PATTERN.md](./ABSTRACT_SCENE_FACTORY_PATTERN.md) - Abstract factory pattern analysis (19KB)
 
 **Key Findings**:
 - Current architecture is correct - keep providers separate
@@ -169,6 +170,7 @@ Diagrams and examples for the view pattern architecture.
 | How do I handle default vs. saved scene data? | [SCENE_DATA_PROVIDER_EXECUTIVE_SUMMARY.md](./SCENE_DATA_PROVIDER_EXECUTIVE_SUMMARY.md) |
 | Which scene data provider should I use? | [SCENE_DATA_ACCESS_PATTERNS_QUICK_REF.md](./SCENE_DATA_ACCESS_PATTERNS_QUICK_REF.md) |
 | Why not use ISceneViewer instead of ISceneDataProvider? | [PROVIDER_VS_VIEWER_PATTERN.md](./PROVIDER_VS_VIEWER_PATTERN.md) |
+| Why not use AbstractSceneFactory pattern? | [ABSTRACT_SCENE_FACTORY_PATTERN.md](./ABSTRACT_SCENE_FACTORY_PATTERN.md) |
 | What should I work on this week? | [ANALYSIS_QUICK_REFERENCE.md](./ANALYSIS_QUICK_REFERENCE.md) → Action Items |
 | How do I test a Logic class? | [ANALYSIS_QUICK_REFERENCE.md](./ANALYSIS_QUICK_REFERENCE.md) → Test Infrastructure |
 | What's the implementation plan? | [COMPREHENSIVE_CODEBASE_ANALYSIS.md](./COMPREHENSIVE_CODEBASE_ANALYSIS.md) → Implementation Plan |
