@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Delcaration of the Component struct
+/// @brief Forward header for Component - actual definition in core library
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -11,36 +11,9 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include <nlohmann/json.hpp>
+#include "../core/Component.h"
 
-namespace steamrot {
-/////////////////////////////////////////////////
-/// @class Component
-/// @brief [TODO:description]
-///
-/////////////////////////////////////////////////
-struct Component {
-
-/////////////////////////////////////////////////
-  /// @brief Destrcutor for the abstract Component struct
-/////////////////////////////////////////////////
-  virtual ~Component() = default;
-
-/////////////////////////////////////////////////
-  /// @brief Virtual method to find the Component's position in the component
-  /// register
-  ///
-  /// @return Size_t representing the index of the component in the register
-/////////////////////////////////////////////////
-  virtual size_t GetComponentRegisterIndex() const = 0;
-
-/////////////////////////////////////////////////
-  /// @brief Is this Component active?
-  ///
-  /// This is used to determine whether the Component is included in archetype
-  /// calculations. Not use to dictate whether the Entity is "alive" in game
-  /// sense.
-/////////////////////////////////////////////////
-  bool m_active{false};
-};
-} // namespace steamrot
+// This file exists for backward compatibility
+// The actual Component definition is now in core/Component.h
+// This allows component implementations to remain unchanged
+// while the base interface lives in the core library

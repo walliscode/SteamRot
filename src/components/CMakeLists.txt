@@ -19,6 +19,7 @@ target_include_directories(components
 
 target_link_libraries(components
   PUBLIC
+  core
   nlohmann_json::nlohmann_json
   SFML::Graphics
   magic_enum::magic_enum

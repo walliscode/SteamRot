@@ -9,7 +9,7 @@
       "name": "default",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_CXX_COMPILER": "g++-14",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "CMAKE_BUILD_WITH_INSTALL_RPATH": "ON"
       }

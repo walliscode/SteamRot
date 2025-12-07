@@ -11,23 +11,11 @@
 #include "CMeta.h"
 #include "CUIState.h"
 #include "CUserInterface.h"
+#include "type_traits.h"
 #include <magic_enum/magic_enum.hpp>
 
 namespace steamrot {
 
-/////////////////////////////////////////////////
-/// @brief template helper struct
-/////////////////////////////////////////////////
-template <typename... Components> struct ComponentContainer;
-
-/////////////////////////////////////////////////
-/// @brief template specialistion for ComponentContainer. Tuples
-/////////////////////////////////////////////////
-template <typename... Components>
-struct ComponentContainer<std::tuple<Components...>> {
-
-  using ComponentVectorTuple = std::tuple<std::vector<Components>...>;
-};
 /////////////////////////////////////////////////
 /// @brief ComponentRegister is a tuple of all the components for the game
 /// "One source of truth"
@@ -47,33 +35,6 @@ constexpr size_t kComponentRegisterSize =
 /////////////////////////////////////////////////
 using EntityMemoryPool =
     ComponentContainer<ComponentRegister>::ComponentVectorTuple;
-
-/////////////////////////////////////////////////
-/// @brief template helper for type indexing
-/////////////////////////////////////////////////
-template <typename T, typename... Ts> struct IndexOf;
-
-/////////////////////////////////////////////////
-/// @brief template specialisation for tuples for base case recursion
-/////////////////////////////////////////////////
-template <typename T, typename... Ts> struct IndexOf<T, std::tuple<T, Ts...>> {
-  // base case where T is the first type in the tuple
-  static constexpr size_t value = 0;
-};
-/////////////////////////////////////////////////
-/// @brief template specialisation for tuples for recursive case
-/////////////////////////////////////////////////
-template <typename T, typename U, typename... Ts>
-struct IndexOf<T, std::tuple<U, Ts...>> {
-  // recursive case where T is not the first type in the tuple
-  static constexpr size_t value = 1 + IndexOf<T, std::tuple<Ts...>>::value;
-};
-
-/////////////////////////////////////////////////
-/// @brief helper type alias for getting the index of a type in a tuple
-/////////////////////////////////////////////////
-template <typename T, typename Tuple>
-constexpr size_t TupleTypeIndex = IndexOf<T, Tuple>::value;
 
 /////////////////////////////////////////////////
 /// @brief Helper to print a tuple to an ostream

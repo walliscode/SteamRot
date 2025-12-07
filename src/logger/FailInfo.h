@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief decleration of FailInfo struct
+/// @brief Forward header for FailInfo - actual definition in core library
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -11,55 +11,9 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include <string>
-namespace steamrot {
+#include "../core/FailInfo.h"
 
-enum class FailMode {
-  None = 0,
-  NotImplemented,
-  FileNotFound,
-  FileOpenFailure,
-  FileReadFailure,
-  FileSystemError,
-  FlatbuffersDataNotFound,
-  ParameterOutOfBounds,
-  IndexOutOfBounds,
-  NonExistentEnumValue,
-  SceneTypeNotFound,
-  NotAddedToMap,
-  EnumValueNotHandled,
-  VariantTypeMismatch,
-  NullPointer,
-  InvalidUUID,
-  MissingRequiredField,
-  ResourceCreationFailure,
-  InvalidInput,
-  FileOperationFailed
-};
-
-struct FailInfo {
-  /////////////////////////////////////////////////
-  /// @brief Member variable capturing the fail mode as an enum
-  /////////////////////////////////////////////////
-  FailMode mode;
-
-  /////////////////////////////////////////////////
-  /// @brief Message describing the failure
-  /////////////////////////////////////////////////
-  std::string message;
-
-  /////////////////////////////////////////////////
-  /// @brief Default constructor for FailInfo
-  ///
-  /// @param fail_mode Enum representing the fail mode
-  /// @param msg Message describing the failure
-  /////////////////////////////////////////////////
-  FailInfo(FailMode fail_mode, const std::string &msg)
-      : mode(fail_mode), message(msg) {}
-
-  /////////////////////////////////////////////////
-  /// @brief Delete
-  /////////////////////////////////////////////////
-  FailInfo() = delete;
-};
-} // namespace steamrot
+// This file exists for backward compatibility
+// The actual FailInfo definition is now in core/FailInfo.h
+// This allows existing code to remain unchanged while the
+// fundamental error types live in the core library
