@@ -81,7 +81,7 @@ FlatbuffersEngineDataProvider::LoadEngineState() const {
   engine_state.quit_requested = false;
 
   // Set up subscriber viewer
-  auto subscriber_viewer_result = GetSubscriptions();
+  auto subscriber_viewer_result = GetSubscriberViewer();
   if (!subscriber_viewer_result.has_value()) {
     return std::unexpected(subscriber_viewer_result.error());
   }
@@ -100,7 +100,7 @@ FlatbuffersEngineDataProvider::LoadEngineState() const {
 
 /////////////////////////////////////////////////
 std::expected<std::unique_ptr<ISubscriberViewer>, FailInfo>
-FlatbuffersEngineDataProvider::GetSubscriptions() const {
+FlatbuffersEngineDataProvider::GetSubscriberViewer() const {
 
   // load engine state for subscriptions
   // [TODO] Consider caching this if performance becomes an issue as we are

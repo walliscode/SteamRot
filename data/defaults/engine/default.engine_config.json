@@ -1,7 +1,5 @@
 {
   "display": {
-    "window_width": 800,
-    "window_height": 600,
     "window_title": "SteamRot",
     "framerate_limit": 60,
     "fullscreen": false,

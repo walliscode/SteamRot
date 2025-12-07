@@ -1,3 +1,5 @@
 {
-  "subscriptions": [{ "event_type_data": "EVENT_CHANGE_SCENE" }]
+  "state": {
+    "subscriptions": [{ "event_type_data": "EVENT_CHANGE_SCENE" }]
+  }
 }

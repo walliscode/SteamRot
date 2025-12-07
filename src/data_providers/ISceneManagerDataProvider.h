@@ -13,8 +13,10 @@
 /////////////////////////////////////////////////
 
 #include "FailInfo.h"
+#include "ISubscriberViewer.h"
 #include "SceneManagerState.h"
 #include <expected>
+#include <memory>
 namespace steamrot {
 
 class ISceneManagerDataProvider {
@@ -31,5 +33,8 @@ public:
   /////////////////////////////////////////////////
   virtual std::expected<SceneManagerState, FailInfo>
   LoadSceneManagerState() const = 0;
+
+  virtual std::expected<std::unique_ptr<ISubscriberViewer>, FailInfo>
+  GetSubscriberViewer() const = 0;
 };
 } // namespace steamrot

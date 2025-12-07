@@ -94,7 +94,7 @@ public:
   /// @brief Return subscriber data viewer for this provider.
   /////////////////////////////////////////////////
   virtual std::expected<std::unique_ptr<ISubscriberViewer>, FailInfo>
-  GetSubscriptions() const = 0;
+  GetSubscriberViewer() const = 0;
 };
 
 } // namespace steamrot

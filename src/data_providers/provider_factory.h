@@ -12,16 +12,22 @@
 #include "IEngineDataProvider.h"
 #include "IFragmentDataProvider.h"
 #include "ISceneDataProvider.h"
+#include "ISceneManagerDataProvider.h"
 
 namespace steamrot {
 
 /////////////////////////////////////////////////
 /// @brief Get the engine data provider instance.
 ///
-/// Returns a singleton instance of the FlatBuffers engine provider.
+/// Returns a static instance of the FlatBuffers engine provider.
 /// Future: Could be made configurable to return different implementations.
 /////////////////////////////////////////////////
 IEngineDataProvider &GetEngineDataProvider();
+
+/////////////////////////////////////////////////
+//// @brief Get the scene manager data provider instance.
+/////////////////////////////////////////////////
+ISceneManagerDataProvider &GetSceneManagerDataProvider();
 
 /////////////////////////////////////////////////
 /// @brief Get the scene data provider instance.
