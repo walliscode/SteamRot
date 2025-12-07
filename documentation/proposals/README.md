@@ -4,6 +4,42 @@ This directory contains design proposals for new features or significant changes
 
 ## Active Proposals
 
+### [Scene Configuration Decoupling](SCENE_CONFIGURATION_DECOUPLING.md)
+
+**Status**: Proposal  
+**Date**: 2025-12-07  
+**Type**: Architecture - Data Source Abstraction  
+**Related PR**: #882
+
+**Summary**: Decouples Scene and SceneFactory from hardcoded "default" data sources by introducing IEntityConfigurator abstraction and moving data source decisions to SceneManager. Enables save/load workflows, alternative data formats, and direct EntityMemoryPool configuration without intermediate copying.
+
+**Key Points**:
+1. Create IEntityConfigurator interface for format-agnostic entity configuration
+2. Remove "default" assumptions from Scene/SceneFactory
+3. SceneManager controls data source (ISceneDataProvider vs ISaveDataProvider)
+4. Pass EntityMemoryPool& by reference (no intermediate copies)
+5. FlatBuffers types isolated to FlatbuffersConfigurator
+
+**Implementation Complexity**: Moderate
+- 6 phases over 2-3 weeks
+- Backward compatible during migration
+- Low to moderate risk per phase
+- High value: enables save/load and format flexibility
+
+**Benefits**:
+- Separation of concerns (SceneManager decides, Scene executes)
+- Save/load support enabled
+- Easy to add new formats (JSON, XML, network)
+- No FlatBuffers coupling in Scene/SceneFactory
+- Performance improvement (direct EMP configuration)
+
+**Documents**:
+- [Full Proposal](SCENE_CONFIGURATION_DECOUPLING.md) - Complete design (30+ pages)
+- [Quick Reference](SCENE_CONFIGURATION_DECOUPLING_QUICK_REF.md) - Implementation patterns
+- [Architecture Diagrams](SCENE_CONFIGURATION_DECOUPLING_DIAGRAMS.md) - Visual representations
+
+---
+
 ### [Engine Data Organization](ENGINE_DATA_ORGANIZATION.md)
 
 **Status**: Proposal  
