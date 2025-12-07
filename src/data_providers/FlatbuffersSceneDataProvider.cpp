@@ -20,18 +20,10 @@ FlatbuffersSceneDataProvider::LoadSceneData(SceneType scene_type) const {
     return std::unexpected(fb_result.error());
   }
 
-  const auto *fb_data = fb_result.value();
+  const SceneDataFbs *scene_data = fb_result.value();
 
   // Convert FlatBuffers type to native struct
   SceneData native_data;
-  native_data.scene_type = fb_data->scene_type();
-  if (fb_data->scene_id()) {
-    native_data.scene_id = fb_data->scene_id()->str();
-  }
-
-  // Extract render texture dimensions directly from scene data
-  native_data.render_texture_width = fb_data->render_texture_width();
-  native_data.render_texture_height = fb_data->render_texture_height();
 
   return native_data;
 }

@@ -1,55 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
 /// @brief Declaration of the TestEngine class.
-///
-/// TestEngine provides a flexible testing framework that shares the
-/// Engine base class with GameEngine for consistent resource management.
-/// It uses the same architecture as GameEngine (SceneManager, DisplayManager)
-/// to enable testing at different execution levels.
-///
-/// ## Data Requirements (TestEngine)
-///
-/// TestEngine receives its game state configuration via constructor injection,
-/// but loads default user preferences from files like GameEngine.
-///
-/// ### UserPreferences (loaded via Engine::StartUp):
-///   - Display settings (window size, fullscreen, vsync, framerate)
-///   - Audio settings (volume levels, mute state)
-///   - Accessibility settings (UI scale, preferred font)
-///   - Source: Loaded from default.preferences.bin (same as GameEngine)
-///
-/// ### TestDataConfig (injected via constructor):
-///   - starting_engine_state: EngineData containing:
-///     - subscriptions: Engine-level event subscriptions
-///     - scene_manager_data: SceneManager configuration
-///   - simulation_data: SimulationData for tick execution
-///   - num_ticks: Number of ticks to run
-///   - metadata: Test identification
-///   Source: Loaded from test_data.json files and parsed by test harness
-///
-/// ### EngineCoreData (loaded via Engine::StartUp):
-///   - window_width, window_height, framerate_limit
-///   - Source: Still loaded from engine_data.json (shared window config)
-///
-/// ## Data Flow
-/// ```
-/// test_file.cpp
-///   └─▶ Load test_data.json → TestDataConfig
-///   └─▶ TestEngine(config) [stores pointer to injected config]
-///   └─▶ RunGame()
-///         └─▶ Engine::StartUp() [loads EngineCoreData, UserPreferences, calls
-///         ConfigureEngineStateFromData]
-///               └─▶ ConfigureEngineStateFromData() [uses m_test_config]
-///                     └─▶
-///                     m_test_config->starting_engine_state()->subscriptions()
-///                     └─▶
-///                     m_test_config->starting_engine_state()->scene_manager_data()
-///         └─▶ RunGameLoop() [executes m_target_ticks iterations]
-/// ```
-///
-/// @note TestEngine uses injected configuration (TestDataConfig*) for game
-/// state but loads default user preferences from files. This ensures tests have
-/// consistent preference settings.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -90,22 +41,6 @@ enum class TickLevel {
 /////////////////////////////////////////////////
 /// @class TestEngine
 /// @brief Testing engine that uses injected configuration for game state.
-///
-/// TestEngine receives game state configuration via constructor injection
-/// (TestDataConfig*), but loads default user preferences from files like
-/// GameEngine. This enables:
-/// - Custom test configurations for game state
-/// - Deterministic test scenarios
-/// - Simulation-based testing with tick snapshots
-/// - Consistent user preferences between GameEngine and TestEngine
-///
-/// Both GameEngine and TestEngine share the same Engine::StartUp() flow for:
-/// - GameCore (window config)
-/// - UserPreferences (from default.preferences.bin)
-///
-/// They differ in how they obtain EngineData (subscriptions, scene manager):
-/// - GameEngine: Loads from engine_data.json, calls LoadTitleScene()
-/// - TestEngine: Uses m_test_config->starting_engine_state()
 /////////////////////////////////////////////////
 class TestEngine : public Engine {
 private:
@@ -173,9 +108,6 @@ private:
     return std::monostate{};
   };
 
-  std::expected<std::monostate, FailInfo>
-  ConfigureEngineStateFromData() override;
-
 public:
   /////////////////////////////////////////////////
   /// @brief Constructor taking test data configuration.
@@ -187,6 +119,7 @@ public:
   /////////////////////////////////////////////////
   /// @brief Returns data bank for inspection and testing
   /////////////////////////////////////////////////
-  const std::unordered_map<size_t, std::vector<SceneSnapshot>> &GetDataBank() const;
+  const std::unordered_map<size_t, std::vector<SceneSnapshot>> &
+  GetDataBank() const;
 };
 } // namespace steamrot::tests
