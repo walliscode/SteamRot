@@ -68,26 +68,31 @@ class JsonSceneDataProvider : public ISceneDataProvider { /*...*/ };  // Future
 
 ### 3. Use Function Overloads for Source Differentiation
 
-**Decision**: Different methods for default vs save
+**Decision**: SceneManager decides data source; Factory is source-agnostic
 
 ```cpp
+// SceneManager - single decision point
+class SceneManager {
+  std::expected<uuids::uuid, FailInfo> LoadScene(SceneType type, bool from_save);
+};
+
+// SceneFactory - source-agnostic
 class SceneFactory {
   std::expected<std::unique_ptr<Scene>, FailInfo>
-  CreateDefaultScene(const SceneType& scene_type, 
-                    const GameContext& game_context);
-  
-  std::expected<std::unique_ptr<Scene>, FailInfo>
-  CreateSceneFromSave(const SceneData& scene_metadata,
-                     const SceneStateData& scene_state,
-                     const GameContext& game_context);
+  CreateScene(const SceneConfigurationData& config,
+             const GameContext& game_context);
 };
 ```
 
-**Rationale**: Clear intent at call site, different parameter types
+**Rationale**: 
+- Simpler API (one method instead of two)
+- No code duplication
+- Clear separation (source decision vs scene creation)
+- Easier testing
 
 ### 4. Use Extractor Pattern for Nested Data
 
-**Decision**: SceneDataExtractor converts SaveData → SceneData
+**Decision**: SceneDataExtractor converts SaveData → SceneConfigurationData
 
 ```cpp
 class SceneDataExtractor {
@@ -119,63 +124,55 @@ const SceneDataFbs* LoadSceneData();
 
 ---
 
-## The Two Access Patterns
+## The Unified Access Pattern
 
-### Pattern 1: Default Scene (New Game)
+### Single Flow (SceneManager Decides Source)
 
 ```
-User Starts New Game
+User Action (New Game OR Load Game)
         ↓
-ISceneDataProvider::LoadSceneData(SceneType)
+SceneManager::LoadScene(scene_type, from_save)
         ↓
-SceneData (metadata)
-        ↓
-SceneFactory::CreateDefaultScene()
-        ↓
-Scene::ConfigureFromDefault()
-        ↓
-Fully Configured Scene
+    ┌───────────────┴───────────────┐
+    ↓ (default)              ↓ (save)
+ISceneDataProvider      ISaveDataProvider
+::LoadSceneData()      ::LoadSave() → Extractor
+        └───────────────┬───────────────┘
+                        ↓
+        SceneConfigurationData (unified)
+                        ↓
+        SceneFactory::CreateScene()
+                        ↓
+        Scene::Configure()
+                        ↓
+        Fully Configured Scene
 ```
+
+### For Default Scenes
 
 **Code**:
 ```cpp
-ISceneDataProvider& provider = GetSceneDataProvider();
-auto scene_data = provider.LoadSceneData(SceneType::SceneType_TITLE);
+// SceneManager - decides to use default provider
+auto config = scene_provider.LoadSceneData(scene_type);
+
+// Factory - source-agnostic
 SceneFactory factory;
-auto scene = factory.CreateDefaultScene(scene_type, game_context);
-scene->ConfigureFromDefault();
+auto scene = factory.CreateScene(config, game_context);
+scene->Configure(config);
 ```
 
-### Pattern 2: Saved Scene (Load Game)
-
-```
-User Loads Save File
-        ↓
-ISaveDataProvider::LoadSave(slot_index)
-        ↓
-SaveData (nested, complete state)
-        ↓
-SceneDataExtractor::ExtractSceneData()
-        ↓
-SceneData + SceneStateData
-        ↓
-SceneFactory::CreateSceneFromSave()
-        ↓
-Scene::ConfigureFromSave()
-        ↓
-Fully Configured Scene
-```
+### For Saved Scenes
 
 **Code**:
 ```cpp
-ISaveDataProvider& save_provider = GetSaveDataProvider();
+// SceneManager - decides to use save provider + extractor
 auto save_data = save_provider.LoadSave(slot_index);
-SceneDataExtractor extractor;
-SceneData scene_data = extractor.ExtractSceneMetadata(save_data);
-SceneStateData scene_state = extractor.ExtractSceneState(save_data, 0);
+auto config = extractor.ExtractConfiguration(save_data, scene_type);
+
+// Factory - source-agnostic (same code!)
 SceneFactory factory;
-auto scene = factory.CreateSceneFromSave(scene_data, scene_state, game_context);
-scene->ConfigureFromSave(scene_state);
+auto scene = factory.CreateScene(config, game_context);
+scene->Configure(config);
 ```
 
 ---
@@ -401,20 +398,21 @@ Q: Loading a saved game?
 └─ NO → ISceneDataProvider
 ```
 
-### Which Factory Method?
+### SceneManager Decision
 
 ```
-Q: Scene from save file?
-├─ YES → CreateSceneFromSave()
-└─ NO → CreateDefaultScene()
+Q: Which data source?
+├─ New Game → Call ISceneDataProvider
+└─ Load Game → Call ISaveDataProvider + Extractor
 ```
 
-### Which Configuration Method?
+### Factory/Configurator (Always Same)
 
 ```
-Q: Scene from save file?
-├─ YES → ConfigureFromSave()
-└─ NO → ConfigureFromDefault()
+SceneFactory::CreateScene(config)
+Scene::Configure(config)
+
+(No decision needed - source-agnostic!)
 ```
 
 ### Which Data Structure?

@@ -34,11 +34,12 @@ Create a cohesive, extensible architecture for loading and configuring Scenes th
 
 ### The Solution
 
-**Two-Provider Strategy with View Pattern**:
+**Two-Provider Strategy with SceneManager Orchestration**:
 - `ISceneDataProvider` → Loads default/template scene data
 - `ISaveDataProvider` → Loads saved game data (including scene states)
-- **View/Extractor Pattern** → Converts nested save data to flat scene data
-- **Factory + Configurator Pattern** → Creates and configures Scene objects
+- **SceneDataExtractor** → Converts nested save data to flat configuration data
+- **SceneManager** → Single decision point for data source (default vs save)
+- **Factory + Configurator** → Source-agnostic, receive unified configuration data
 
 ### Key Insight
 
@@ -266,101 +267,136 @@ class SceneDataExtractor {
 
 ---
 
-## The Two Access Patterns
+## The Unified Access Pattern
 
-### Pattern 1: Default Scene Data (New Game)
+### Single Flow for Both Default and Save Scenes
 
-**Flow**: Load default scene template → Create Scene → Configure from default
+**Key Insight**: SceneManager decides data source; Factory/Configurator remain agnostic
 
 ```
-User Starts New Game
+User Action (New Game OR Load Game)
         ↓
-ISceneDataProvider::LoadSceneData(SceneType)
+SceneManager::LoadScene(scene_type, from_save)
         ↓
-Returns SceneData (metadata: type, dimensions, id)
+SceneManager decides: default or save?
         ↓
-SceneFactory::CreateDefaultScene()
-        ↓
-Scene::ConfigureFromDefault()
-        ↓
-[Entity Configurator loads default entities]
-        ↓
-Fully Configured Scene Ready
+    ┌───────────────┴───────────────┐
+    ↓ (from_save=false)       ↓ (from_save=true)
+ISceneDataProvider        ISaveDataProvider
+::LoadSceneData()        ::LoadSave()
+        ↓                        ↓
+SceneConfigurationData    SaveData → SceneDataExtractor
+                                  → SceneConfigurationData
+        └───────────────┬───────────────┘
+                        ↓
+        Unified SceneConfigurationData
+                        ↓
+        SceneFactory::CreateScene(config)
+                        ↓
+        Scene::Configure(config)
+                        ↓
+        Fully Configured Scene Ready
 ```
 
-**Key Files**:
+### Pattern Details
+
+#### For Default Scenes (New Game)
+
+**Data Source**: `ISceneDataProvider`
+
+**Files**: 
 - `data/scenes/title.scene_data.bin` (default scene template)
 - `data/scenes/crafting.scene_data.bin` (default scene template)
 
-**Implementation**:
+**SceneManager Implementation**:
 ```cpp
-// 1. Get provider
-ISceneDataProvider& provider = GetSceneDataProvider();
-
-// 2. Load scene metadata
-auto scene_data_result = provider.LoadSceneData(SceneType::SceneType_TITLE);
-const SceneData& scene_data = scene_data_result.value();
-
-// 3. Create scene
-SceneFactory factory;
-auto scene_result = factory.CreateDefaultScene(scene_type, game_context);
-std::unique_ptr<Scene> scene = std::move(scene_result.value());
-
-// 4. Configure from default
-scene->ConfigureFromDefault();
+// SceneManager - handles default scenes
+std::expected<uuids::uuid, FailInfo> LoadScene(SceneType type, bool from_save = false) {
+  SceneConfigurationData config;
+  
+  if (!from_save) {
+    // Load from default template
+    ISceneDataProvider& provider = GetSceneDataProvider();
+    config = provider.LoadSceneData(type).value();
+  }
+  
+  // Factory is source-agnostic
+  return CreateAndConfigureScene(config);
+}
 ```
 
-### Pattern 2: Saved Scene Data (Continue Game)
+#### For Saved Scenes (Load Game)
 
-**Flow**: Load save file → Extract scene data → Create Scene → Configure from save
+**Data Source**: `ISaveDataProvider` + `SceneDataExtractor`
 
-```
-User Loads Save File
-        ↓
-ISaveDataProvider::LoadSave(slot_index)
-        ↓
-Returns SaveData (includes scene states)
-        ↓
-SceneDataExtractor::ExtractSceneData(save, scene_index)
-        ↓
-Returns SceneData (extracted from save)
-        ↓
-SceneFactory::CreateSceneFromSave()
-        ↓
-Scene::ConfigureFromSave(scene_state)
-        ↓
-[Entity Configurator loads saved entities]
-        ↓
-Fully Configured Scene Ready
-```
-
-**Key Files**:
+**Files**:
 - `saves/slot_0.save.bin` (saved game state)
 - `saves/slot_1.save.bin` (saved game state)
 
-**Implementation** (Future):
+**SceneManager Implementation**:
 ```cpp
-// 1. Get save provider
-ISaveDataProvider& save_provider = GetSaveDataProvider();
-
-// 2. Load save file
-auto save_result = save_provider.LoadSave(slot_index);
-const SaveData& save_data = save_result.value();
-
-// 3. Extract scene data for current scene
-SceneDataExtractor extractor;
-SceneData scene_data = extractor.ExtractSceneData(
-    save_data, save_data.current_scene_type);
-
-// 4. Create scene
-SceneFactory factory;
-auto scene_result = factory.CreateSceneFromSave(
-    scene_data, save_data.scene_states[0], game_context);
-std::unique_ptr<Scene> scene = std::move(scene_result.value());
-
-// 5. Configure from save data
-scene->ConfigureFromSave(save_data.scene_states[0]);
+// SceneManager - handles saved scenes
+std::expected<uuids::uuid, FailInfo> LoadScene(SceneType type, bool from_save, 
+                                                 uint32_t save_slot = 0) {
+  SceneConfigurationData config;
+  
+  if (from_save) {
+    // Load from save file
+    ISaveDataProvider& save_provider = GetSaveDataProvider();
+    auto save_data = save_provider.LoadSave(save_slot).value();
+    
+    // Extract configuration for this scene
+    SceneDataExtractor extractor;
+    config = extractor.ExtractConfiguration(save_data, type);
+  }
+  
+  // Factory is source-agnostic (same code path!)
+  return CreateAndConfigureScene(config);
+}
 ```
+
+#### Factory & Configurator (Source-Agnostic)
+
+**Same code for both paths**:
+
+```cpp
+// SceneFactory - doesn't know about default vs save
+class SceneFactory {
+public:
+  std::expected<std::unique_ptr<Scene>, FailInfo>
+  CreateScene(const SceneConfigurationData& config, 
+             const GameContext& game_context) {
+    // Create scene based on type
+    auto scene = CreateSceneByType(config.scene_type, game_context);
+    
+    // Configure dimensions
+    scene->SetRenderTextureDimensions(config.width, config.height);
+    
+    return scene;
+  }
+};
+
+// Scene - doesn't know about default vs save
+class Scene {
+public:
+  void Configure(const SceneConfigurationData& config) {
+    // Configure entities (same whether from default or save)
+    m_scene_resources.entity_manager.ConfigureEntities(config.entity_data);
+    
+    // Other configuration...
+  }
+};
+```
+
+### Key Benefits of Unified Approach
+
+1. ✅ **SceneManager is single decision point** - source logic isolated
+2. ✅ **Factory has one method** - `CreateScene(config)` 
+3. ✅ **Scene has one method** - `Configure(config)`
+4. ✅ **No code duplication** - same logic for both paths
+5. ✅ **Easier to test** - mock `SceneConfigurationData` directly
+6. ✅ **Simpler API** - fewer methods to understand
+7. ✅ **Clear separation** - source decision vs scene creation
 
 ---
 
@@ -533,42 +569,39 @@ class JsonSceneDataProvider : public ISceneDataProvider {
 
 **Why**: Allows swapping implementations at runtime without changing game code
 
-#### Use Function Overloads For:
+#### DON'T Use Function Overloads For:
 
-**2. Data Source Differentiation**
+**2. Data Source Differentiation** ❌
 
 ```cpp
-// SceneFactory - Different configuration sources
+// ❌ BAD - Don't create separate methods for default vs save
 class SceneFactory {
 public:
-  // Create from default data (new game)
   std::expected<std::unique_ptr<Scene>, FailInfo>
   CreateDefaultScene(const SceneType& scene_type, 
                     const GameContext& game_context);
   
-  // Create from save data (loaded game)
   std::expected<std::unique_ptr<Scene>, FailInfo>
   CreateSceneFromSave(const SceneData& scene_metadata,
                      const SceneStateData& scene_state,
                      const GameContext& game_context);
 };
 
-// EntityConfigurator - Different entity sources
-class EntityConfigurator {
+// ✅ GOOD - Single method, source-agnostic
+class SceneFactory {
 public:
-  // Configure from default entity data
-  std::expected<std::monostate, FailInfo>
-  ConfigureEntities(EntityMemoryPool& pool,
-                   const EntityCollectionData& default_entities);
-  
-  // Configure from saved entity data
-  std::expected<std::monostate, FailInfo>
-  ConfigureEntities(EntityMemoryPool& pool,
-                   const SavedEntityCollectionData& saved_entities);
+  std::expected<std::unique_ptr<Scene>, FailInfo>
+  CreateScene(const SceneConfigurationData& config,
+             const GameContext& game_context);
 };
 ```
 
-**Why**: Makes intent clear at call site, allows different parameter types
+**Why Not**: 
+- ❌ Duplicates logic
+- ❌ Source decision leaks into Factory/Configurator
+- ❌ More methods to maintain
+
+**Better**: Let SceneManager decide source, pass unified data to Factory
 
 #### Use Templates For:
 
@@ -591,7 +624,7 @@ auto& save_provider = GetProvider<ISaveDataProvider>();
 | Concern | Solution | Example |
 |---------|----------|---------|
 | **Data Format** (FlatBuffers vs JSON) | Polymorphism (interfaces) | `ISceneDataProvider` |
-| **Data Source** (default vs save) | Function Overloads | `CreateDefaultScene()` vs `CreateSceneFromSave()` |
+| **Data Source** (default vs save) | SceneManager Decision | `GetSceneConfiguration()` |
 | **Provider Access** | Templates + Factory | `GetProvider<T>()` |
 | **Configuration Logic** | Classes (Configurator) | `EntityConfigurator` |
 | **Simple Conversions** | Free Functions | `ConvertFbToNative()` |
@@ -710,51 +743,91 @@ public:
 
 ### Solution 3: Unified Configuration Pipeline (Recommended ✅)
 
-**Principle**: Same configuration flow regardless of data source
+**Principle**: SceneManager decides data source; Factory/Configurator are source-agnostic
 
 ```cpp
-// Unified pipeline for default scene
-std::unique_ptr<Scene> LoadDefaultScene(SceneType scene_type) {
-  // 1. Load metadata
-  ISceneDataProvider& provider = GetSceneDataProvider();
-  auto scene_data = provider.LoadSceneData(scene_type).value();
-  
-  // 2. Create scene
-  SceneFactory factory;
-  auto scene = factory.CreateDefaultScene(scene_type, game_context).value();
-  
-  // 3. Configure from default
-  scene->ConfigureFromDefault();
-  
-  return scene;
-}
+// SceneManager - Single decision point for data source
+class SceneManager {
+private:
+  // Helper to get scene configuration from appropriate source
+  SceneConfigurationData GetSceneConfiguration(SceneType type, bool from_save, 
+                                                uint32_t save_slot = 0) {
+    if (from_save) {
+      // Load from save file
+      ISaveDataProvider& save_provider = GetSaveDataProvider();
+      auto save_data = save_provider.LoadSave(save_slot).value();
+      
+      // Extract configuration for this scene
+      SceneDataExtractor extractor;
+      return extractor.ExtractConfiguration(save_data, type);
+    } else {
+      // Load from default template
+      ISceneDataProvider& provider = GetSceneDataProvider();
+      return provider.LoadSceneData(type).value();
+    }
+  }
 
-// Unified pipeline for saved scene
-std::unique_ptr<Scene> LoadSavedScene(uint32_t slot_index) {
-  // 1. Load save data
-  ISaveDataProvider& save_provider = GetSaveDataProvider();
-  auto save_data = save_provider.LoadSave(slot_index).value();
-  
-  // 2. Extract scene metadata
-  SceneDataExtractor extractor;
-  SceneData scene_data = extractor.ExtractSceneMetadata(save_data);
-  
-  // 3. Extract scene state
-  SceneStateData scene_state = extractor.ExtractSceneState(save_data, 0);
-  
-  // 4. Create scene
-  SceneFactory factory;
-  auto scene = factory.CreateSceneFromSave(
-      scene_data, scene_state, game_context).value();
-  
-  // 5. Configure from save
-  scene->ConfigureFromSave(scene_state);
-  
-  return scene;
-}
+public:
+  // Single method for loading - agnostic to source
+  std::expected<uuids::uuid, FailInfo> LoadScene(SceneType type, bool from_save = false) {
+    // 1. Get configuration (SceneManager decides source)
+    SceneConfigurationData config = GetSceneConfiguration(type, from_save);
+    
+    // 2. Create scene (Factory doesn't know or care about source)
+    SceneFactory factory;
+    auto scene = factory.CreateScene(config, m_game_context).value();
+    
+    // 3. Configure scene (Configurator doesn't know or care about source)
+    scene->Configure(config);
+    
+    // 4. Store and return
+    uuids::uuid scene_id = scene->GetSceneInfo().id;
+    m_scenes[scene_id] = std::move(scene);
+    return scene_id;
+  }
+};
 ```
 
-**Key Insight**: Both paths converge at Scene creation, just with different data sources
+**Factory - Source Agnostic**:
+```cpp
+// SceneFactory - Single method, doesn't know about default vs save
+class SceneFactory {
+public:
+  std::expected<std::unique_ptr<Scene>, FailInfo>
+  CreateScene(const SceneConfigurationData& config, 
+             const GameContext& game_context) {
+    // Create appropriate scene type based on config
+    std::unique_ptr<Scene> scene = CreateSceneByType(config.scene_type, game_context);
+    
+    // Configure render texture from config
+    scene->SetRenderTextureDimensions(config.render_texture_width, 
+                                     config.render_texture_height);
+    
+    return scene;
+  }
+};
+```
+
+**Scene - Source Agnostic**:
+```cpp
+// Scene - Single configuration method
+class Scene {
+public:
+  void Configure(const SceneConfigurationData& config) {
+    // Configure entities (doesn't know if from default or save)
+    m_scene_resources.entity_manager.ConfigureEntities(config.entity_data);
+    
+    // Other configuration...
+  }
+};
+```
+
+**Key Benefits**:
+- ✅ **Single responsibility**: SceneManager handles source decision
+- ✅ **Simplified API**: Factory/Configurator have one method each
+- ✅ **No duplication**: Same code path for default and save
+- ✅ **Clear separation**: Source logic isolated to SceneManager
+- ✅ **Easier testing**: Mock `SceneConfigurationData` instead of provider logic
 
 ### Solution 4: Avoid Intermediate Structs (Recommended ✅)
 

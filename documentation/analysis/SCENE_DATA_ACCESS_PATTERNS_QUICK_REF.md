@@ -1,37 +1,42 @@
 # Scene Data Access Patterns - Quick Reference
 
-**Date**: December 7, 2025  
+**Date**: December 7, 2025 (Updated)  
 **Context**: Quick reference for accessing scene data from default files vs save files  
 **Related**: SCENE_DATA_PROVIDER_ARCHITECTURE_ANALYSIS.md
 
 ---
 
-## The Two Access Patterns
+## The Unified Access Pattern
 
-### Pattern 1: Default Scene Data (New Game)
+**Key Insight**: SceneManager decides data source; Factory/Configurator are source-agnostic
+
+### Overview
+
+```
+User Action (New Game OR Load Game)
+        ↓
+SceneManager::LoadScene(scene_type, from_save)
+        ↓
+    ┌───────────────┴───────────────┐
+    ↓ (default)              ↓ (save)
+ISceneDataProvider      ISaveDataProvider
+::LoadSceneData()      ::LoadSave() + Extractor
+        └───────────────┬───────────────┘
+                        ↓
+        SceneConfigurationData (unified)
+                        ↓
+        SceneFactory::CreateScene() (source-agnostic)
+                        ↓
+        Scene::Configure() (source-agnostic)
+                        ↓
+        Fully Configured Scene
+```
+
+---
+
+### For Default Scenes (New Game)
 
 **When**: Starting a new game, loading template scene
-
-**Flow**: File → Provider → Native Struct → Configuration
-
-```cpp
-// 1. Get provider (interface)
-ISceneDataProvider& provider = GetSceneDataProvider();
-
-// 2. Load scene metadata
-auto scene_data_result = provider.LoadSceneData(SceneType::SceneType_TITLE);
-if (!scene_data_result) {
-  return std::unexpected(scene_data_result.error());
-}
-const SceneData& scene_data = scene_data_result.value();
-
-// 3. Create scene with metadata
-SceneFactory factory;
-auto scene = factory.CreateDefaultScene(scene_type, game_context);
-
-// 4. Configure entities from default data
-scene->ConfigureFromDefault();
-```
 
 **Data File Location**:
 ```
@@ -39,46 +44,37 @@ data/scenes/title.scene_data.bin
 data/scenes/crafting.scene_data.bin
 ```
 
+**SceneManager Code**:
+```cpp
+// SceneManager - decides to use default provider
+std::expected<uuids::uuid, FailInfo> LoadScene(SceneType type, bool from_save = false) {
+  SceneConfigurationData config;
+  
+  if (!from_save) {
+    // Load from default template
+    ISceneDataProvider& provider = GetSceneDataProvider();
+    auto result = provider.LoadSceneData(type);
+    if (!result) return std::unexpected(result.error());
+    config = result.value();
+  }
+  
+  // Create and configure (source-agnostic)
+  return CreateAndConfigureScene(config);
+}
+```
+
 **Key Types**:
 - `ISceneDataProvider` - Interface for loading default scenes
-- `SceneData` - Native C++ struct (metadata only)
-- `SceneFactory::CreateDefaultScene()` - Creates scene from defaults
-- `Scene::ConfigureFromDefault()` - Loads default entities
+- `SceneConfigurationData` - Unified configuration struct
+- `SceneManager::LoadScene()` - Single entry point
+- `SceneFactory::CreateScene()` - Source-agnostic creation
+- `Scene::Configure()` - Source-agnostic configuration
 
 ---
 
-### Pattern 2: Saved Scene Data (Load Game)
+### For Saved Scenes (Load Game)
 
 **When**: Loading a saved game, continuing from save file
-
-**Flow**: Save File → Provider → Extractor → Native Struct → Configuration
-
-```cpp
-// 1. Get save provider (interface)
-ISaveDataProvider& save_provider = GetSaveDataProvider();
-
-// 2. Load save file (contains all game state)
-auto save_result = save_provider.LoadSave(slot_index);
-if (!save_result) {
-  return std::unexpected(save_result.error());
-}
-const SaveData& save_data = save_result.value();
-
-// 3. Extract scene metadata from save
-SceneDataExtractor extractor;
-SceneData scene_data = extractor.ExtractSceneMetadata(save_data);
-
-// 4. Extract scene state from save
-SceneStateData scene_state = extractor.ExtractSceneState(save_data, 0);
-
-// 5. Create scene with saved metadata
-SceneFactory factory;
-auto scene = factory.CreateSceneFromSave(
-    scene_data, scene_state, game_context);
-
-// 6. Configure entities from saved state
-scene->ConfigureFromSave(scene_state);
-```
 
 **Data File Location**:
 ```
@@ -87,13 +83,37 @@ saves/slot_1.save.bin
 saves/slot_2.save.bin
 ```
 
+**SceneManager Code**:
+```cpp
+// SceneManager - decides to use save provider + extractor
+std::expected<uuids::uuid, FailInfo> LoadScene(SceneType type, bool from_save, 
+                                                 uint32_t save_slot = 0) {
+  SceneConfigurationData config;
+  
+  if (from_save) {
+    // Load from save file
+    ISaveDataProvider& save_provider = GetSaveDataProvider();
+    auto save_result = save_provider.LoadSave(save_slot);
+    if (!save_result) return std::unexpected(save_result.error());
+    
+    // Extract configuration for this scene
+    SceneDataExtractor extractor;
+    config = extractor.ExtractConfiguration(save_result.value(), type);
+  }
+  
+  // Create and configure (source-agnostic - same code as default!)
+  return CreateAndConfigureScene(config);
+}
+```
+
 **Key Types**:
 - `ISaveDataProvider` - Interface for loading save files
 - `SaveData` - Complete saved game state (includes scene states)
-- `SceneDataExtractor` - Converts nested save data to flat scene data
-- `SceneStateData` - Full scene state (entities, logic, etc.)
-- `SceneFactory::CreateSceneFromSave()` - Creates scene from save
-- `Scene::ConfigureFromSave()` - Loads saved entities
+- `SceneDataExtractor` - Converts nested save data to flat configuration
+- `SceneConfigurationData` - Unified configuration struct (same as default!)
+- `SceneManager::LoadScene()` - Single entry point
+- `SceneFactory::CreateScene()` - Source-agnostic creation (same as default!)
+- `Scene::Configure()` - Source-agnostic configuration (same as default!)
 
 ---
 
