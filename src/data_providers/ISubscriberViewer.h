@@ -12,8 +12,9 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FailInfo.h"
-#include "SubscriberConfig.h"
+#include "Subscriber.h"
 #include <expected>
+#include <memory>
 #include <vector>
 
 namespace steamrot {
@@ -23,12 +24,12 @@ public:
   virtual ~ISubscriberViewer() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Get subscriber configurations from this data source.
+  /// @brief Get subscribers from this data source.
   ///
-  /// @return Vector of SubscriberConfig objects or failure information
+  /// @return Vector of shared pointers to Subscriber objects or failure information
   /////////////////////////////////////////////////
-  virtual std::expected<std::vector<SubscriberConfig>, FailInfo>
-  GetSubscriberConfigs() const = 0;
+  virtual std::expected<std::vector<std::shared_ptr<Subscriber>>, FailInfo>
+  GetSubscribers() const = 0;
 };
 
 } // namespace steamrot

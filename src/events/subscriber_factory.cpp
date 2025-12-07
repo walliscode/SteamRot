@@ -9,40 +9,63 @@
 #include "subscriber_factory.h"
 #include "Subscriber.h"
 #include "event_factory.h"
-#include "subscriber_config_generated.h"
+#include "subscriber_generated.h"
 #include <memory>
 
 namespace steamrot {
 namespace subscriber_factory {
 
 /////////////////////////////////////////////////
+std::expected<Subscriber, FailInfo>
+CreateSubscriber(const SubscriberFbs *subscriber_fbs) {
+  
+  // Validate input
+  if (!subscriber_fbs) {
+    return std::unexpected(FailInfo{FailMode::NullPointer,
+                                    "SubscriberFbs pointer is null"});
+  }
+
+  // Skip if EventType is NONE
+  if (subscriber_fbs->event_type_data() == EventType::EventType_NONE) {
+    return std::unexpected(FailInfo{FailMode::InvalidValue,
+                                    "EventType is NONE"});
+  }
+
+  Subscriber subscriber;
+  subscriber.m_trigger_event_type = subscriber_fbs->event_type_data();
+  subscriber.m_active = subscriber_fbs->active();
+
+  // Check for trigger data
+  if (subscriber_fbs->trigger_data()) {
+    // Convert flatbuffers data to EventData
+    auto convert_result =
+        event::CreateEventData(subscriber_fbs->trigger_data_type(),
+                               subscriber_fbs->trigger_data());
+    if (!convert_result.has_value()) {
+      return std::unexpected(convert_result.error());
+    }
+    subscriber.m_trigger_event_data = convert_result.value();
+  }
+
+  return subscriber;
+}
+
+/////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 CreateAndRegisterSubscribers(
-    const std::vector<SubscriberConfig> &configs,
-    std::vector<std::shared_ptr<Subscriber>> &subscribers,
+    const std::vector<Subscriber> &subscribers_input,
+    std::vector<std::shared_ptr<Subscriber>> &subscribers_output,
     EventHandler &event_handler) {
 
-  // Iterate through each config
-  for (const auto &config : configs) {
+  // Iterate through each subscriber
+  for (const auto &subscriber_input : subscribers_input) {
 
     // Skip if EventType is NONE
-    if (config.trigger_event_type == EventType::EventType_NONE)
+    if (subscriber_input.m_trigger_event_type == EventType::EventType_NONE)
       continue;
 
-    // Create subscriber based on config
-    std::shared_ptr<Subscriber> subscriber{nullptr};
-
-    if (config.trigger_event_data.has_value()) {
-      subscriber = std::make_shared<Subscriber>(config.trigger_event_type,
-                                                 config.trigger_event_data.value());
-    } else {
-      subscriber = std::make_shared<Subscriber>(config.trigger_event_type);
-    }
-
-    // Set active state if needed
-    if (config.active) {
-      subscriber->m_active = true;
-    }
+    // Create shared pointer to subscriber
+    auto subscriber = std::make_shared<Subscriber>(subscriber_input);
 
     // Register subscriber with EventHandler
     auto result = event_handler.RegisterSubscriber(subscriber);
@@ -50,7 +73,7 @@ CreateAndRegisterSubscribers(
       return std::unexpected(result.error());
 
     // Add subscriber to the provided vector
-    subscribers.push_back(subscriber);
+    subscribers_output.push_back(subscriber);
   }
 
   return std::monostate{};
@@ -59,44 +82,28 @@ CreateAndRegisterSubscribers(
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 CreateAndRegisterSubscribers(
-    const std::vector<const SubscriberConfigFbs *> &configs,
-    std::vector<std::shared_ptr<Subscriber>> &subscribers,
+    const std::vector<const SubscriberFbs *> &subscribers_fbs,
+    std::vector<std::shared_ptr<Subscriber>> &subscribers_output,
     EventHandler &event_handler) {
 
-  // Iterate through each config
-  for (const auto *subscriber_config_fbs : configs) {
+  // Iterate through each SubscriberFbs
+  for (const auto *subscriber_fbs : subscribers_fbs) {
 
-    // Skip null configs
-    if (!subscriber_config_fbs)
+    // Skip null entries
+    if (!subscriber_fbs)
       continue;
 
-    // Skip if EventType is NONE
-    if (subscriber_config_fbs->event_type_data() == EventType::EventType_NONE)
-      continue;
-
-    // Create subscriber based on config
-    std::shared_ptr<Subscriber> subscriber{nullptr};
-    EventType event_type = subscriber_config_fbs->event_type_data();
-
-    // Check for trigger data
-    if (subscriber_config_fbs->trigger_data()) {
-      // Convert flatbuffers data to EventData
-      auto convert_result =
-          event::CreateEventData(subscriber_config_fbs->trigger_data_type(),
-                                 subscriber_config_fbs->trigger_data());
-      if (!convert_result.has_value()) {
-        return std::unexpected(convert_result.error());
-      }
-      EventData trigger_data = convert_result.value();
-      subscriber = std::make_shared<Subscriber>(event_type, trigger_data);
-    } else {
-      subscriber = std::make_shared<Subscriber>(event_type);
+    // Convert SubscriberFbs to Subscriber
+    auto convert_result = CreateSubscriber(subscriber_fbs);
+    if (!convert_result.has_value()) {
+      // Skip entries that fail to convert (e.g., NONE event types)
+      if (convert_result.error().mode == FailMode::InvalidValue)
+        continue;
+      return std::unexpected(convert_result.error());
     }
 
-    // Set active state if needed
-    if (subscriber_config_fbs->active()) {
-      subscriber->m_active = true;
-    }
+    // Create shared pointer to subscriber
+    auto subscriber = std::make_shared<Subscriber>(convert_result.value());
 
     // Register subscriber with EventHandler
     auto result = event_handler.RegisterSubscriber(subscriber);
@@ -104,7 +111,7 @@ CreateAndRegisterSubscribers(
       return std::unexpected(result.error());
 
     // Add subscriber to the provided vector
-    subscribers.push_back(subscriber);
+    subscribers_output.push_back(subscriber);
   }
 
   return std::monostate{};

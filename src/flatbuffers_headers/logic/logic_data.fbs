@@ -1,14 +1,14 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-include "../events/subscriber_config.fbs";
+include "../events/subscriber.fbs";
 
 namespace steamrot;
 
 
 // Contains information about all subscriber data for the Logic instance
 table LogicData{ 
-  all_subscriptions: [SubscriberConfigFbs]; 
+  all_subscriptions: [SubscriberFbs]; 
   }
 
 

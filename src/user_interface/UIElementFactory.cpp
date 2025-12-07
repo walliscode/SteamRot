@@ -125,13 +125,13 @@ ConfigureBaseUIElement(UIElement &element, const UIElementData &data,
   if (data.subscriber_data() && (data.subscriber_data()->event_type_data() !=
                                  EventType::EventType_NONE)) {
 
-    // Create config vector with single subscriber
-    std::vector<const SubscriberConfigFbs *> configs{data.subscriber_data()};
+    // Create vector with single subscriber
+    std::vector<const SubscriberFbs *> subscribers_fbs{data.subscriber_data()};
     std::vector<std::shared_ptr<Subscriber>> subscribers;
 
     // Create and register subscriber
     auto result = subscriber_factory::CreateAndRegisterSubscribers(
-        configs, subscribers, event_handler);
+        subscribers_fbs, subscribers, event_handler);
 
     if (!result.has_value())
       return std::unexpected(result.error());

@@ -6,7 +6,7 @@
 /// from data, such as subscribers and initial flags.
 ////////////////////////////////////////////////////////////
 
-include "../events/subscriber_config.fbs";
+include "../events/subscriber.fbs";
 
 namespace steamrot;
 
@@ -21,7 +21,7 @@ table EngineStateFbs {
   paused: bool = false;
   
   /// Engine-level subscribers (e.g., quit game handler)
-  subscriptions: [SubscriberConfigFbs];
+  subscriptions: [SubscriberFbs];
   
   /// Initial quit requested state
   quit_requested: bool = false;
