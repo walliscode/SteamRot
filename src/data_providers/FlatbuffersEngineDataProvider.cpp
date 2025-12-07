@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersEngineDataProvider.h"
-#include "FlatbuffersSubscriberDataProvider.h"
 #include "SubscriberFactory.h"
 
 namespace steamrot {

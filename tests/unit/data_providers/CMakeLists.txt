@@ -1,7 +1,6 @@
 add_executable(test_data_providers
   FlatbuffersEngineDataProvider.test.cpp
   FlatbuffersSceneDataProvider.test.cpp
-  FlatbuffersSubscriberDataProvider.test.cpp
   ISubscriberDataViewer.test.cpp
   SubscriberDataViewer.test.cpp
 )

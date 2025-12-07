@@ -28,20 +28,50 @@ An intermediate configuration struct that serves as the bridge between data sour
   - `scenes/scene_manager_state.fbs`
 - Updated `generate_flatbuffers_headers.cmake`
 
-### 3. ISubscriberDataProvider Interface
-**File:** `src/data_providers/ISubscriberDataProvider.h`
+# Subscriber Data Viewer Implementation Summary
 
-Abstract interface for loading subscriber configuration data from any data source.
+## Overview
+This document summarizes the implementation of subscriber configuration data handling using a simplified viewer pattern.
+
+## Components Implemented
+
+### 1. SubscriberConfig Struct
+**File:** `src/events/SubscriberConfig.h`
+
+An intermediate configuration struct that serves as the bridge between data sources (FlatBuffers) and the SubscriberFactory.
+
+**Fields:**
+- `bool active` - Whether the subscriber starts active
+- `EventType trigger_event_type` - Event type to listen for
+- `std::optional<EventData> trigger_event_data` - Optional trigger data
+
+### 2. FlatBuffers Schema Changes
+**File:** `src/flatbuffers_headers/events/subscriber_config.fbs` (renamed from subscriber_data.fbs)
+
+**Changes:**
+- Renamed `SubscriberData` table to `SubscriberConfigFbs`
+- Updated all referencing schemas:
+  - `logic/logic_data.fbs`
+  - `engine/engine_state.fbs`
+  - `entities/ui_state.fbs`
+  - `entities/user_interface.fbs`
+  - `scenes/scene_manager_state.fbs`
+- Updated `generate_flatbuffers_headers.cmake`
+
+### 3. SubscriberDataViewer Concrete Class
+**Files:** 
+- `src/data_providers/SubscriberDataViewer.h`
+- `src/data_providers/SubscriberDataViewer.cpp`
+
+A concrete viewer class that directly handles FlatBuffers conversion to provide access to subscriber configuration data.
+
+**Purpose:**
+- Directly converts FlatBuffers SubscriberConfigFbs to SubscriberConfig structs
+- Provides a simple, single-responsibility class for viewing subscriber data
+- Can be used as a member in data providers that need to expose subscriber data
 
 **Methods:**
-- `LoadSubscriberConfigs()` - Returns `std::expected<std::vector<SubscriberConfig>, FailInfo>`
-
-### 4. FlatbuffersSubscriberDataProvider Implementation
-**Files:** 
-- `src/data_providers/FlatbuffersSubscriberDataProvider.h`
-- `src/data_providers/FlatbuffersSubscriberDataProvider.cpp`
-
-Concrete implementation that converts FlatBuffers `SubscriberConfigFbs` vectors to `SubscriberConfig` vectors.
+- `GetSubscriberConfigs()` - Returns `std::expected<std::vector<SubscriberConfig>, FailInfo>`
 
 **Features:**
 - Handles null FlatBuffers pointers gracefully
@@ -49,39 +79,24 @@ Concrete implementation that converts FlatBuffers `SubscriberConfigFbs` vectors 
 - Converts FlatBuffers EventData to native EventData using `event::CreateEventData()`
 - Returns empty vector if no data present
 
-### 5. SubscriberDataViewer Concrete Class
-**Files:** 
-- `src/data_providers/SubscriberDataViewer.h`
-- `src/data_providers/SubscriberDataViewer.cpp`
+**Note:** This class directly handles the conversion logic without intermediate provider layers, following the principle of simplicity.
 
-A concrete viewer class that provides a composition-based approach to accessing subscriber configuration data.
-
-**Purpose:**
-- Wraps FlatbuffersSubscriberDataProvider for convenient access
-- Provides composition over inheritance pattern
-- Can be used as a member in data providers that need to expose subscriber data
-
-**Methods:**
-- `GetSubscriberConfigs()` - Returns `std::expected<std::vector<SubscriberConfig>, FailInfo>`
-
-**Note:** This replaces the previous ISubscriberDataViewer mixin interface approach, following the principle of "composition over inheritance."
-
-### 6. Updated FlatbuffersEngineDataProvider
+### 4. Updated FlatbuffersEngineDataProvider
 **Files:**
 - `src/data_providers/FlatbuffersEngineDataProvider.h`
 - `src/data_providers/FlatbuffersEngineDataProvider.cpp`
 
-Now contains a SubscriberDataViewer member (composition) instead of inheriting from ISubscriberDataViewer (mixin).
+Now contains a SubscriberDataViewer member (composition).
 
 **New Methods:**
-- `GetSubscriberViewer()` - Returns pointer to the internal SubscriberDataViewer
+- `GetSubscriberViewer()` - Returns `std::expected<const SubscriberDataViewer&, FailInfo>`
 - `GetSubscriberConfigs()` - Convenience method that delegates to the viewer
 
 **Architecture:**
 - Uses lazy initialization for the viewer (created on first access)
 - Member is `mutable std::unique_ptr<SubscriberDataViewer>` to allow const methods
 
-### 7. Updated SubscriberFactory
+### 5. Updated SubscriberFactory
 **Files:**
 - `src/events/SubscriberFactory.h`
 - `src/events/SubscriberFactory.cpp`
@@ -95,7 +110,7 @@ Now contains a SubscriberDataViewer member (composition) instead of inheriting f
 - Support trigger data (optional)
 - Handle NONE event types by returning nullptr
 
-### 8. Updated Engine
+### 6. Updated Engine
 **Files:**
 - `src/engine/Engine.h`
 - `src/engine/Engine.cpp`
@@ -103,15 +118,6 @@ Now contains a SubscriberDataViewer member (composition) instead of inheriting f
 Updated `ConfigureSubscribersFromData()` to use `SubscriberConfigFbs` instead of `SubscriberData`.
 
 ## Tests Implemented
-
-### FlatbuffersSubscriberDataProvider Tests
-**File:** `tests/unit/data_providers/FlatbuffersSubscriberDataProvider.test.cpp`
-
-- Null pointer handling
-- Empty vector handling
-- Single subscriber config conversion
-- Multiple subscriber configs conversion
-- Null entry skipping
 
 ### SubscriberDataViewer Tests
 **File:** `tests/unit/data_providers/SubscriberDataViewer.test.cpp`
@@ -178,9 +184,9 @@ Updated `ConfigureSubscribersFromData()` to use `SubscriberConfigFbs` instead of
 
 ### Pattern 1: Direct Data Loading
 ```cpp
-// Load from FlatBuffers
-FlatbuffersSubscriberDataProvider provider(flatbuffers_vector);
-auto configs = provider.LoadSubscriberConfigs();
+// Load from FlatBuffers using SubscriberDataViewer
+SubscriberDataViewer viewer(flatbuffers_vector);
+auto configs = viewer.GetSubscriberConfigs();
 
 // Create subscribers
 SubscriberFactory factory(event_handler);

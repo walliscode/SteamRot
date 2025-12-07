@@ -8,11 +8,10 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "FlatbuffersSubscriberDataProvider.h"
 #include "FailInfo.h"
 #include "SubscriberConfig.h"
+#include "subscriber_config_generated.h"
 #include <expected>
-#include <memory>
 #include <vector>
 
 namespace steamrot {
@@ -21,9 +20,9 @@ namespace steamrot {
 /// @class SubscriberDataViewer
 /// @brief Concrete viewer class for accessing subscriber data.
 ///
-/// This class provides a composition-based approach to viewing subscriber
-/// data from various data sources. It wraps a FlatbuffersSubscriberDataProvider
-/// to provide access to subscriber configurations.
+/// This class provides direct access to subscriber configuration data
+/// from FlatBuffers sources. It handles the conversion from FlatBuffers
+/// SubscriberConfigFbs to native SubscriberConfig structs.
 ///
 /// Usage:
 /// ```cpp
@@ -34,7 +33,8 @@ namespace steamrot {
 /////////////////////////////////////////////////
 class SubscriberDataViewer {
 private:
-  std::unique_ptr<FlatbuffersSubscriberDataProvider> m_provider;
+  const flatbuffers::Vector<flatbuffers::Offset<SubscriberConfigFbs>>
+      *m_subscriber_configs_fbs;
 
 public:
   /////////////////////////////////////////////////
@@ -49,6 +49,8 @@ public:
 
   /////////////////////////////////////////////////
   /// @brief Get subscriber configurations from this data source.
+  ///
+  /// Converts FlatBuffers SubscriberConfigFbs objects to SubscriberConfig structs.
   ///
   /// @return Vector of SubscriberConfig objects or failure information
   /////////////////////////////////////////////////

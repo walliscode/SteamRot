@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "ISubscriberDataViewer.h"
-#include "FlatbuffersSubscriberDataProvider.h"
 #include "subscriber_config_generated.h"
 #include <catch2/catch_test_macros.hpp>
 #include <flatbuffers/flatbuffers.h>
