@@ -49,6 +49,11 @@ struct Subscriber {
   std::optional<EventData> m_received_event_data{std::nullopt};
 
 /////////////////////////////////////////////////
+  /// @brief Default constructor for the Subscriber class.
+/////////////////////////////////////////////////
+  Subscriber() = default;
+
+/////////////////////////////////////////////////
   /// @brief Constructor for the Subscriber class.
   ///
   /// @param trigger_event_type Event type to register for.
@@ -63,11 +68,5 @@ struct Subscriber {
 /////////////////////////////////////////////////
   Subscriber(const EventType trigger_event_type,
              const EventData &trigger_event_data);
-
-/////////////////////////////////////////////////
-  /// @brief Delete the default constructor to prevent instantiation without
-  /// parameters.
-/////////////////////////////////////////////////
-  Subscriber() = delete;
 };
 } // namespace steamrot

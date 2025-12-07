@@ -202,15 +202,6 @@ public:
   void RunGame();
 
   /////////////////////////////////////////////////
-  /// @brief Configure subscribers from flatbuffers data
-  ///
-  /// @param subscriptions Flatbuffers vector of SubscriberConfigFbs objects
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo> ConfigureSubscribersFromData(
-      const ::flatbuffers::Vector<
-          ::flatbuffers::Offset<steamrot::SubscriberConfigFbs>> *subscriptions);
-
-  /////////////////////////////////////////////////
   /// @brief Get the engine configuration (includes user preferences).
   ///
   /// @return Const reference to engine configuration

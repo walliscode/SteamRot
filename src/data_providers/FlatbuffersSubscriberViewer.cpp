@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Implementation of SubscriberDataViewer.
+/// @brief Implementation of FlatbuffersSubscriberViewer.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -8,55 +8,46 @@
 /////////////////////////////////////////////////
 
 #include "FlatbuffersSubscriberViewer.h"
-#include "event_factory.h"
+#include "subscriber_factory.h"
 
 namespace steamrot {
 
 /////////////////////////////////////////////////
 FlatbuffersSubscriberViewer::FlatbuffersSubscriberViewer(
-    const flatbuffers::Vector<flatbuffers::Offset<SubscriberConfigFbs>>
-        *subscriber_configs_fbs)
-    : m_subscriber_configs_fbs(subscriber_configs_fbs) {}
+    const flatbuffers::Vector<flatbuffers::Offset<SubscriberFbs>>
+        *subscribers_fbs)
+    : m_subscribers_fbs(subscribers_fbs) {}
 
 /////////////////////////////////////////////////
-std::expected<std::vector<SubscriberConfig>, FailInfo>
-FlatbuffersSubscriberViewer::GetSubscriberConfigs() const {
-  std::vector<SubscriberConfig> configs;
+std::expected<std::vector<std::shared_ptr<Subscriber>>, FailInfo>
+FlatbuffersSubscriberViewer::GetSubscribers() const {
+  std::vector<std::shared_ptr<Subscriber>> subscribers;
 
   // Handle null case
-  if (!m_subscriber_configs_fbs) {
-    return configs; // Return empty vector if no data
+  if (!m_subscribers_fbs) {
+    return subscribers; // Return empty vector if no data
   }
 
-  // Convert each FlatBuffers SubscriberConfigFbs to SubscriberConfig
-  for (const auto *subscriber_config_fbs : *m_subscriber_configs_fbs) {
-    if (!subscriber_config_fbs) {
+  // Convert each FlatBuffers SubscriberFbs to Subscriber
+  for (const auto *subscriber_fbs : *m_subscribers_fbs) {
+    if (!subscriber_fbs) {
       continue; // Skip null entries
     }
 
-    SubscriberConfig config;
-
-    // Set event type
-    config.trigger_event_type = subscriber_config_fbs->event_type_data();
-
-    // Set active flag
-    config.active = subscriber_config_fbs->active();
-
-    // Convert trigger data if present
-    if (subscriber_config_fbs->trigger_data()) {
-      auto convert_result =
-          event::CreateEventData(subscriber_config_fbs->trigger_data_type(),
-                                 subscriber_config_fbs->trigger_data());
-      if (!convert_result.has_value()) {
-        return std::unexpected(convert_result.error());
-      }
-      config.trigger_event_data = convert_result.value();
+    // Use subscriber_factory to convert SubscriberFbs to Subscriber
+    auto convert_result = subscriber_factory::CreateSubscriber(subscriber_fbs);
+    if (!convert_result.has_value()) {
+      // Skip entries with NONE event type
+      if (convert_result.error().mode == FailMode::EnumValueNotHandled)
+        continue;
+      return std::unexpected(convert_result.error());
     }
 
-    configs.push_back(config);
+    // Create shared pointer and add to vector
+    subscribers.push_back(std::make_shared<Subscriber>(convert_result.value()));
   }
 
-  return configs;
+  return subscribers;
 }
 
 } // namespace steamrot

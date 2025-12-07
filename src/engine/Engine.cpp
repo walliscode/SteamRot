@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "Engine.h"
-#include "subscriber_factory.h"
 #include "engine_configuration.h"
 #include "provider_factory.h"
 #include <vector>
@@ -52,8 +51,14 @@ std::expected<std::monostate, FailInfo> Engine::StartUp() {
   }
   m_engine_state = engine_state_result.value();
 
-  // Configure Subscribers of EngineState from loaded data
-  // [TODO: Add SUbscriber configuration to EngineState data]
+  // [TODO: Register Subscribers with EventHandler here for now]
+  for (auto &subscriber : m_engine_state.subscriptions) {
+    auto register_result =
+        m_game_context.event_handler.RegisterSubscriber(subscriber);
+    if (!register_result.has_value()) {
+      return std::unexpected(register_result.error());
+    }
+  }
 
   return std::monostate{};
 }
@@ -103,26 +108,6 @@ void Engine::TickSceneManager() {
   m_scene_manager.ExecuteSceneManagerLevelLogic();
 }
 
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo> Engine::ConfigureSubscribersFromData(
-    const ::flatbuffers::Vector<
-        ::flatbuffers::Offset<steamrot::SubscriberConfigFbs>> *subscriptions) {
-
-  // Collect all subscriber configs into a vector
-  std::vector<const SubscriberConfigFbs *> configs;
-  for (auto subscription_data : *subscriptions) {
-    configs.push_back(&subscription_data);
-  }
-
-  // Create and register all subscribers at once
-  auto result = subscriber_factory::CreateAndRegisterSubscribers(
-      configs, m_engine_state.subscriptions, m_game_context.event_handler);
-  if (!result.has_value()) {
-    return std::unexpected(result.error());
-  }
-
-  return std::monostate{};
-}
 /////////////////////////////////////////////////
 std::vector<std::shared_ptr<Subscriber>> &Engine::GetSubscriptions() {
   return m_engine_state.subscriptions;

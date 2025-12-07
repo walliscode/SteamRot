@@ -13,7 +13,7 @@
 /////////////////////////////////////////////////
 #include "CraftingRenderLogic.h"
 #include "Logic.h"
-#include "SubscriberFactory.h"
+#include "subscriber_factory.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
 #include "UIRenderLogic.h"

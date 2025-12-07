@@ -203,16 +203,16 @@ FlatbuffersConfigurator::ConfigureComponent(
     if (ui_state_data->subscribers()) {
 
       // Collect all subscriber configs into a vector
-      std::vector<const SubscriberConfigFbs *> configs;
+      std::vector<const SubscriberFbs *> subscribers_fbs;
       for (const auto *subscriber_data : *ui_state_data->subscribers()) {
         if (subscriber_data) {
-          configs.push_back(subscriber_data);
+          subscribers_fbs.push_back(subscriber_data);
         }
       }
 
       // Create and register all subscribers at once
       auto result = subscriber_factory::CreateAndRegisterSubscribers(
-          configs, ui_state_component.m_state_subscribers[state_key],
+          subscribers_fbs, ui_state_component.m_state_subscribers[state_key],
           m_event_handler);
 
       if (!result.has_value()) {

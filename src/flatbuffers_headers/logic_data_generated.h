@@ -13,7 +13,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
-#include "subscriber_config_generated.h"
+#include "subscriber_generated.h"
 
 namespace steamrot {
 
@@ -31,8 +31,8 @@ struct LogicData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ALL_SUBSCRIPTIONS = 4
   };
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>> *all_subscriptions() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>> *>(VT_ALL_SUBSCRIPTIONS);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberFbs>> *all_subscriptions() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberFbs>> *>(VT_ALL_SUBSCRIPTIONS);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -47,7 +47,7 @@ struct LogicDataBuilder {
   typedef LogicData Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_all_subscriptions(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>>> all_subscriptions) {
+  void add_all_subscriptions(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberFbs>>> all_subscriptions) {
     fbb_.AddOffset(LogicData::VT_ALL_SUBSCRIPTIONS, all_subscriptions);
   }
   explicit LogicDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
@@ -63,7 +63,7 @@ struct LogicDataBuilder {
 
 inline ::flatbuffers::Offset<LogicData> CreateLogicData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>>> all_subscriptions = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberFbs>>> all_subscriptions = 0) {
   LogicDataBuilder builder_(_fbb);
   builder_.add_all_subscriptions(all_subscriptions);
   return builder_.Finish();
@@ -71,8 +71,8 @@ inline ::flatbuffers::Offset<LogicData> CreateLogicData(
 
 inline ::flatbuffers::Offset<LogicData> CreateLogicDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>> *all_subscriptions = nullptr) {
-  auto all_subscriptions__ = all_subscriptions ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::SubscriberConfigFbs>>(*all_subscriptions) : 0;
+    const std::vector<::flatbuffers::Offset<steamrot::SubscriberFbs>> *all_subscriptions = nullptr) {
+  auto all_subscriptions__ = all_subscriptions ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::SubscriberFbs>>(*all_subscriptions) : 0;
   return steamrot::CreateLogicData(
       _fbb,
       all_subscriptions__);

@@ -80,6 +80,21 @@ FlatbuffersEngineDataProvider::LoadEngineState() const {
   engine_state.paused = false;
   engine_state.quit_requested = false;
 
+  // Set up subscriber viewer
+  auto subscriber_viewer_result = GetSubscriptions();
+  if (!subscriber_viewer_result.has_value()) {
+    return std::unexpected(subscriber_viewer_result.error());
+  }
+
+  // attempte to generate container of Subscribers from data
+  auto subscribers_result = subscriber_viewer_result.value()->GetSubscribers();
+  if (!subscribers_result.has_value()) {
+    return std::unexpected(subscribers_result.error());
+  }
+
+  // assign to engine state
+  engine_state.subscriptions = subscribers_result.value();
+
   return engine_state;
 }
 
