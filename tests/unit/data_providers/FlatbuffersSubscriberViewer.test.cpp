@@ -6,14 +6,14 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "SubscriberDataViewer.h"
-#include "subscriber_config_generated.h"
+
+#include "FlatbuffersSubscriberViewer.h"
 #include <catch2/catch_test_macros.hpp>
 #include <flatbuffers/flatbuffers.h>
 
 TEST_CASE("SubscriberDataViewer with null pointer returns empty vector",
           "[unit][data_providers][SubscriberDataViewer]") {
-  steamrot::SubscriberDataViewer viewer(nullptr);
+  steamrot::FlatbuffersSubscriberViewer viewer(nullptr);
 
   auto result = viewer.GetSubscriberConfigs();
   REQUIRE(result.has_value());
@@ -32,12 +32,11 @@ TEST_CASE("SubscriberDataViewer with empty vector returns empty result",
   builder.Finish(configs_offset);
 
   // Get the vector from the buffer
-  const auto *configs =
-      flatbuffers::GetRoot<flatbuffers::Vector<
-          flatbuffers::Offset<steamrot::SubscriberConfigFbs>>>(
-          builder.GetBufferPointer());
+  const auto *configs = flatbuffers::GetRoot<
+      flatbuffers::Vector<flatbuffers::Offset<steamrot::SubscriberConfigFbs>>>(
+      builder.GetBufferPointer());
 
-  steamrot::SubscriberDataViewer viewer(configs);
+  steamrot::FlatbuffersSubscriberViewer viewer(configs);
 
   auto result = viewer.GetSubscriberConfigs();
   REQUIRE(result.has_value());
@@ -59,12 +58,11 @@ TEST_CASE("SubscriberDataViewer converts single subscriber config",
 
   builder.Finish(configs_offset);
 
-  const auto *configs =
-      flatbuffers::GetRoot<flatbuffers::Vector<
-          flatbuffers::Offset<steamrot::SubscriberConfigFbs>>>(
-          builder.GetBufferPointer());
+  const auto *configs = flatbuffers::GetRoot<
+      flatbuffers::Vector<flatbuffers::Offset<steamrot::SubscriberConfigFbs>>>(
+      builder.GetBufferPointer());
 
-  steamrot::SubscriberDataViewer viewer(configs);
+  steamrot::FlatbuffersSubscriberViewer viewer(configs);
 
   auto result = viewer.GetSubscriberConfigs();
   REQUIRE(result.has_value());
@@ -97,12 +95,11 @@ TEST_CASE("SubscriberDataViewer converts multiple subscriber configs",
 
   builder.Finish(configs_offset);
 
-  const auto *configs =
-      flatbuffers::GetRoot<flatbuffers::Vector<
-          flatbuffers::Offset<steamrot::SubscriberConfigFbs>>>(
-          builder.GetBufferPointer());
+  const auto *configs = flatbuffers::GetRoot<
+      flatbuffers::Vector<flatbuffers::Offset<steamrot::SubscriberConfigFbs>>>(
+      builder.GetBufferPointer());
 
-  steamrot::SubscriberDataViewer viewer(configs);
+  steamrot::FlatbuffersSubscriberViewer viewer(configs);
 
   auto result = viewer.GetSubscriberConfigs();
   REQUIRE(result.has_value());

@@ -52,6 +52,9 @@ std::expected<std::monostate, FailInfo> Engine::StartUp() {
   }
   m_engine_state = engine_state_result.value();
 
+  // Configure Subscribers of EngineState from loaded data
+  // [TODO: Add SUbscriber configuration to EngineState data]
+
   return std::monostate{};
 }
 
