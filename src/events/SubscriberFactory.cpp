@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Implementation of the SubscriberFactory class
+/// @brief Implementation of the subscriber_factory namespace
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -13,18 +13,17 @@
 #include <memory>
 
 namespace steamrot {
-/////////////////////////////////////////////////
-SubscriberFactory::SubscriberFactory(EventHandler &event_handler)
-    : m_event_handler(event_handler) {}
+namespace subscriber_factory {
 
 /////////////////////////////////////////////////
 std::expected<std::shared_ptr<Subscriber>, FailInfo>
-SubscriberFactory::CreateAndRegisterSubscriber(const EventType &event_type) {
+CreateAndRegisterSubscriber(const EventType &event_type,
+                            EventHandler &event_handler) {
 
   std::shared_ptr<Subscriber> subscriber =
       std::make_shared<Subscriber>(event_type);
 
-  auto result = m_event_handler.RegisterSubscriber(subscriber);
+  auto result = event_handler.RegisterSubscriber(subscriber);
   if (!result.has_value())
     return std::unexpected(result.error());
 
@@ -33,20 +32,23 @@ SubscriberFactory::CreateAndRegisterSubscriber(const EventType &event_type) {
 
 /////////////////////////////////////////////////
 std::expected<std::shared_ptr<Subscriber>, FailInfo>
-SubscriberFactory::CreateAndRegisterSubscriber(const EventType &event_type,
-                                               const EventData &trigger_data) {
+CreateAndRegisterSubscriber(const EventType &event_type,
+                            const EventData &trigger_data,
+                            EventHandler &event_handler) {
   std::shared_ptr<Subscriber> subscriber =
       std::make_shared<Subscriber>(event_type, trigger_data);
-  auto result = m_event_handler.RegisterSubscriber(subscriber);
+  
+  auto result = event_handler.RegisterSubscriber(subscriber);
   if (!result.has_value())
     return std::unexpected(result.error());
+  
   return subscriber;
 }
 
 /////////////////////////////////////////////////
 std::expected<std::shared_ptr<Subscriber>, FailInfo>
-SubscriberFactory::CreateAndRegisterSubscriber(
-    const SubscriberConfig &config) {
+CreateAndRegisterSubscriber(const SubscriberConfig &config,
+                            EventHandler &event_handler) {
 
   // create subscriber pointer
   std::shared_ptr<Subscriber> subscriber{nullptr};
@@ -69,7 +71,7 @@ SubscriberFactory::CreateAndRegisterSubscriber(
   }
 
   // register subscriber
-  auto result = m_event_handler.RegisterSubscriber(subscriber);
+  auto result = event_handler.RegisterSubscriber(subscriber);
   if (!result.has_value())
     return std::unexpected(result.error());
 
@@ -78,8 +80,8 @@ SubscriberFactory::CreateAndRegisterSubscriber(
 
 /////////////////////////////////////////////////
 std::expected<std::shared_ptr<Subscriber>, FailInfo>
-SubscriberFactory::CreateAndRegisterSubscriber(
-    const SubscriberConfigFbs &subscriber_config_fbs) {
+CreateAndRegisterSubscriber(const SubscriberConfigFbs &subscriber_config_fbs,
+                            EventHandler &event_handler) {
 
   // create subscriber pointer
   std::shared_ptr<Subscriber> subscriber{nullptr};
@@ -115,10 +117,12 @@ SubscriberFactory::CreateAndRegisterSubscriber(
     subscriber->m_active = true;
   }
   // register subscriber
-  auto result = m_event_handler.RegisterSubscriber(subscriber);
+  auto result = event_handler.RegisterSubscriber(subscriber);
   if (!result.has_value())
     return std::unexpected(result.error());
 
   return subscriber;
 }
+
+} // namespace subscriber_factory
 } // namespace steamrot

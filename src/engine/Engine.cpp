@@ -108,13 +108,12 @@ std::expected<std::monostate, FailInfo> Engine::ConfigureSubscribersFromData(
     const ::flatbuffers::Vector<
         ::flatbuffers::Offset<steamrot::SubscriberConfigFbs>> *subscriptions) {
 
-  // call SubscriberFactory to create and register subscribers
-  SubscriberFactory subscriber_factory(m_game_context.event_handler);
-  ;
+  // call subscriber_factory to create and register subscribers
   for (auto subscription_data : *subscriptions) {
 
     auto subscriber_result =
-        subscriber_factory.CreateAndRegisterSubscriber(*subscription_data);
+        subscriber_factory::CreateAndRegisterSubscriber(*subscription_data,
+                                                        m_game_context.event_handler);
     if (!subscriber_result.has_value()) {
       return std::unexpected(subscriber_result.error());
     }

@@ -21,8 +21,7 @@ namespace steamrot {
 /////////////////////////////////////////////////
 LogicFactory::LogicFactory(const SceneType scene_type,
                            const SceneContext &scene_context)
-    : m_scene_type(scene_type), m_scene_context(scene_context),
-      m_subscriber_factory(scene_context.event_handler) {}
+    : m_scene_type(scene_type), m_scene_context(scene_context) {}
 
 /////////////////////////////////////////////////
 LogicCollection LogicFactory::CreateEmptyLogicCollection() {
@@ -222,9 +221,9 @@ LogicFactory::AttachSubscribers(Logic &logic, const LogicData *logic_data) {
       continue; // Skip null subscriber data
     }
 
-    // Create and register subscriber
-    auto subscriber_result =
-        m_subscriber_factory.CreateAndRegisterSubscriber(*subscriber_data);
+    // Create and register subscriber using namespace functions
+    auto subscriber_result = subscriber_factory::CreateAndRegisterSubscriber(
+        *subscriber_data, m_scene_context.event_handler);
     if (!subscriber_result.has_value()) {
       return std::unexpected(subscriber_result.error());
     }

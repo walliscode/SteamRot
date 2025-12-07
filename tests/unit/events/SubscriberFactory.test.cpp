@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Unit tests for the SubscriberFactory class
+/// @brief Unit tests for the subscriber_factory namespace
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -12,14 +12,11 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("SubscriberFactory::CreateAndRegisterSubscriber creates a subscriber "
+TEST_CASE("subscriber_factory::CreateAndRegisterSubscriber creates a subscriber "
           "with no trigger data",
-          "[unit][SubscriberFactory]") {
+          "[unit][subscriber_factory]") {
   // create a mock EventHandler
   steamrot::EventHandler mock_event_handler;
-
-  // create a SubscriberFactory with the mock EventHandler
-  steamrot::SubscriberFactory factory(mock_event_handler);
 
   // set up variables for the test
   const steamrot::EventType event_type =
@@ -30,7 +27,8 @@ TEST_CASE("SubscriberFactory::CreateAndRegisterSubscriber creates a subscriber "
   REQUIRE(subscriber_register.empty());
 
   // create and register a Subscriber
-  auto create_result = factory.CreateAndRegisterSubscriber(event_type);
+  auto create_result = steamrot::subscriber_factory::CreateAndRegisterSubscriber(
+      event_type, mock_event_handler);
   if (!create_result.has_value())
     FAIL(create_result.error().message);
 
@@ -43,13 +41,12 @@ TEST_CASE("SubscriberFactory::CreateAndRegisterSubscriber creates a subscriber "
 }
 
 TEST_CASE(
-    "SubscriberFactory::CreateAndRegisterSubscriber creates a subscriber with "
+    "subscriber_factory::CreateAndRegisterSubscriber creates a subscriber with "
     "trigger data",
-    "[unit][SubscriberFactory]") {
+    "[unit][subscriber_factory]") {
   // create a mock EventHandler
   steamrot::EventHandler mock_event_handler;
-  // create a SubscriberFactory with the mock EventHandler
-  steamrot::SubscriberFactory factory(mock_event_handler);
+
   // set up variables for the test
   const steamrot::EventType event_type =
       steamrot::EventType::EventType_EVENT_USER_INPUT;
@@ -63,8 +60,8 @@ TEST_CASE(
   auto &subscriber_register = mock_event_handler.GetSubcriberRegister();
   REQUIRE(subscriber_register.empty());
   // create and register a Subscriber
-  auto create_result =
-      factory.CreateAndRegisterSubscriber(event_type, trigger_data);
+  auto create_result = steamrot::subscriber_factory::CreateAndRegisterSubscriber(
+      event_type, trigger_data, mock_event_handler);
   if (!create_result.has_value())
     FAIL(create_result.error().message);
   // check that the Subscriber was created successfully
@@ -75,14 +72,11 @@ TEST_CASE(
           subscriber_register.at(event_type)[0].lock());
 }
 
-TEST_CASE("SubscriberFactory::CreateAndRegisterSubscriber creates a subscriber "
+TEST_CASE("subscriber_factory::CreateAndRegisterSubscriber creates a subscriber "
           "from SubscriberConfig with no trigger data",
-          "[unit][SubscriberFactory]") {
+          "[unit][subscriber_factory]") {
   // create a mock EventHandler
   steamrot::EventHandler mock_event_handler;
-
-  // create a SubscriberFactory with the mock EventHandler
-  steamrot::SubscriberFactory factory(mock_event_handler);
 
   // set up SubscriberConfig
   steamrot::SubscriberConfig config;
@@ -94,7 +88,8 @@ TEST_CASE("SubscriberFactory::CreateAndRegisterSubscriber creates a subscriber "
   REQUIRE(subscriber_register.empty());
 
   // create and register a Subscriber from config
-  auto create_result = factory.CreateAndRegisterSubscriber(config);
+  auto create_result = steamrot::subscriber_factory::CreateAndRegisterSubscriber(
+      config, mock_event_handler);
   if (!create_result.has_value())
     FAIL(create_result.error().message);
 
@@ -107,14 +102,11 @@ TEST_CASE("SubscriberFactory::CreateAndRegisterSubscriber creates a subscriber "
   REQUIRE(create_result.value()->m_active == false);
 }
 
-TEST_CASE("SubscriberFactory::CreateAndRegisterSubscriber creates a subscriber "
+TEST_CASE("subscriber_factory::CreateAndRegisterSubscriber creates a subscriber "
           "from SubscriberConfig with trigger data and active flag",
-          "[unit][SubscriberFactory]") {
+          "[unit][subscriber_factory]") {
   // create a mock EventHandler
   steamrot::EventHandler mock_event_handler;
-
-  // create a SubscriberFactory with the mock EventHandler
-  steamrot::SubscriberFactory factory(mock_event_handler);
 
   // set up SubscriberConfig with trigger data
   sf::Event::KeyPressed key_event;
@@ -131,7 +123,8 @@ TEST_CASE("SubscriberFactory::CreateAndRegisterSubscriber creates a subscriber "
   REQUIRE(subscriber_register.empty());
 
   // create and register a Subscriber from config
-  auto create_result = factory.CreateAndRegisterSubscriber(config);
+  auto create_result = steamrot::subscriber_factory::CreateAndRegisterSubscriber(
+      config, mock_event_handler);
   if (!create_result.has_value())
     FAIL(create_result.error().message);
 

@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Definition of the SubscriberFactory class
+/// @brief Definition of the subscriber_factory namespace
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -18,65 +18,59 @@
 #include "subscriber_config_generated.h"
 #include <expected>
 #include <memory>
+
 namespace steamrot {
+namespace subscriber_factory {
 
 /////////////////////////////////////////////////
-/// @class SubscriberFactory
-/// @brief Creates and Registers Subscribers for various event types.
+/// @brief Create a Subscriber from SubscriberConfig and register it with
+/// EventHandler.
 ///
+/// @param config SubscriberConfig to create the subscriber from.
+/// @param event_handler Reference to the EventHandler for registering
+/// subscribers.
 /////////////////////////////////////////////////
-class SubscriberFactory {
-
-private:
-/////////////////////////////////////////////////
-  /// @brief Reference to the EventHandler for registering subscribers.
-/////////////////////////////////////////////////
-  EventHandler &m_event_handler;
-
-public:
-/////////////////////////////////////////////////
-  /// @brief Constructor for the SubscriberFactory class taking an EventHandler
-  /// reference.
-  ///
-  /// @param event_handler Reference to the EventHandler for registering
-  /// subscribers.
-/////////////////////////////////////////////////
-  SubscriberFactory(EventHandler &event_handler);
+std::expected<std::shared_ptr<Subscriber>, FailInfo>
+CreateAndRegisterSubscriber(const SubscriberConfig &config,
+                            EventHandler &event_handler);
 
 /////////////////////////////////////////////////
-  /// @brief Create a Subscriber from SubscriberConfig
-  ///
-  /// @param config SubscriberConfig to create the subscriber from.
+/// @brief Create a Subscriber from flatbuffers data and register it with
+/// EventHandler.
+///
+/// @param subscriber_config_fbs Flatbuffers SubscriberConfigFbs to create the
+/// subscriber from.
+/// @param event_handler Reference to the EventHandler for registering
+/// subscribers.
 /////////////////////////////////////////////////
-  std::expected<std::shared_ptr<Subscriber>, FailInfo>
-  CreateAndRegisterSubscriber(const SubscriberConfig &config);
+std::expected<std::shared_ptr<Subscriber>, FailInfo>
+CreateAndRegisterSubscriber(const SubscriberConfigFbs &subscriber_config_fbs,
+                            EventHandler &event_handler);
 
 /////////////////////////////////////////////////
-  /// @brief Create a Subscriber from flatbuffers data
-  ///
-  /// @param subscriber_config_fbs Flatbuffers SubscriberConfigFbs to create the
-  /// subscriber from.
+/// @brief Given event type, create and register a subscriber.
+///
+/// @param event_type Reference to the EventType for the subscriber
+/// @param event_handler Reference to the EventHandler for registering
+/// subscribers.
 /////////////////////////////////////////////////
-  std::expected<std::shared_ptr<Subscriber>, FailInfo>
-  CreateAndRegisterSubscriber(const SubscriberConfigFbs &subscriber_config_fbs);
+std::expected<std::shared_ptr<Subscriber>, FailInfo>
+CreateAndRegisterSubscriber(const EventType &event_type,
+                            EventHandler &event_handler);
 
 /////////////////////////////////////////////////
-  /// @brief Given event type and data, create and register a subscriber.
-  ///
-  /// @param event_type Reference to the EventType for the subscriber
+/// @brief Given event type and trigger data, create and register a
+/// subscriber.
+///
+/// @param event_type Reference to the EventType for the subscriber
+/// @param trigger_data Reference to the EventData for the subscriber trigger
+/// @param event_handler Reference to the EventHandler for registering
+/// subscribers.
 /////////////////////////////////////////////////
-  std::expected<std::shared_ptr<Subscriber>, FailInfo>
-  CreateAndRegisterSubscriber(const EventType &event_type);
+std::expected<std::shared_ptr<Subscriber>, FailInfo>
+CreateAndRegisterSubscriber(const EventType &event_type,
+                            const EventData &trigger_data,
+                            EventHandler &event_handler);
 
-/////////////////////////////////////////////////
-  /// @brief Given event type and trigger data, create and register a
-  /// subscriber.
-  ///
-  /// @param event_type Reference to the EventType for the subscriber
-  /// @param trigger_data Reference to the EventData for the subscriber trigger
-/////////////////////////////////////////////////
-  std::expected<std::shared_ptr<Subscriber>, FailInfo>
-  CreateAndRegisterSubscriber(const EventType &event_type,
-                              const EventData &trigger_data);
-};
+} // namespace subscriber_factory
 } // namespace steamrot

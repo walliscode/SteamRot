@@ -199,9 +199,6 @@ FlatbuffersConfigurator::ConfigureComponent(
     // Store the visibility state for this state key
     ui_state_component.m_state_to_ui_visibility[state_key] = visibility_state;
 
-    // Create SubscriberFactory for registering subscribers
-    SubscriberFactory subscriber_factory(m_event_handler);
-
     // Create and register subscribers if provided
     if (ui_state_data->subscribers()) {
 
@@ -213,7 +210,8 @@ FlatbuffersConfigurator::ConfigureComponent(
         }
 
         auto subscriber_result =
-            subscriber_factory.CreateAndRegisterSubscriber(*subscriber_data);
+            subscriber_factory::CreateAndRegisterSubscriber(*subscriber_data,
+                                                            m_event_handler);
 
         if (!subscriber_result.has_value()) {
           return std::unexpected(subscriber_result.error());
