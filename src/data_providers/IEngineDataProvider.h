@@ -11,13 +11,15 @@
 #include "EngineConfig.h"
 #include "EngineState.h"
 #include "FailInfo.h"
+#include "ISubscriberViewer.h"
 #include <cstdint>
 #include <expected>
+#include <memory>
 #include <string>
 
 // Forward declaration
 namespace steamrot {
-class SubscriberDataViewer;
+class FlatbuffersSubscriberViewer;
 }
 
 namespace steamrot {
@@ -47,7 +49,7 @@ struct EngineResourcesConfigData {
 /// Usage:
 /// ```cpp
 /// IEngineDataProvider& provider = GetEngineDataProvider();
-/// 
+///
 /// auto resources_config = provider.LoadEngineResourcesConfig();
 /// auto engine_config = provider.LoadEngineConfig();
 /// auto engine_state = provider.LoadEngineState();
@@ -76,8 +78,7 @@ public:
   ///
   /// @return EngineConfig or failure information
   /////////////////////////////////////////////////
-  virtual std::expected<EngineConfig, FailInfo>
-  LoadEngineConfig() const = 0;
+  virtual std::expected<EngineConfig, FailInfo> LoadEngineConfig() const = 0;
 
   /////////////////////////////////////////////////
   /// @brief Load EngineState data.
@@ -87,19 +88,13 @@ public:
   ///
   /// @return EngineState or failure information
   /////////////////////////////////////////////////
-  virtual std::expected<EngineState, FailInfo>
-  LoadEngineState() const = 0;
+  virtual std::expected<EngineState, FailInfo> LoadEngineState() const = 0;
 
   /////////////////////////////////////////////////
-  /// @brief Get subscriber data viewer for this provider.
-  ///
-  /// Returns a reference to the subscriber data viewer that can be used
-  /// to access subscriber configurations from this data provider.
-  ///
-  /// @return Reference to SubscriberDataViewer or failure information
+  /// @brief Return subscriber data viewer for this provider.
   /////////////////////////////////////////////////
-  virtual std::expected<const SubscriberDataViewer&, FailInfo>
-  GetSubscriberViewer() const = 0;
+  virtual std::expected<std::unique_ptr<ISubscriberViewer>, FailInfo>
+  GetSubscriptions() const = 0;
 };
 
 } // namespace steamrot

@@ -6,20 +6,14 @@ add_library(engine
 )
 
 
-
-
 target_include_directories(engine
   PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-
-
 target_link_libraries(engine PUBLIC
 SFML::Graphics
-scenes
 display
-magic_enum
 entity
 events
 config
@@ -31,4 +25,5 @@ flatbuffers
 flatbuffers_headers
 assets
 configuration
+data_providers
 )
