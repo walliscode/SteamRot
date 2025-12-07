@@ -7,7 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "Engine.h"
-#include "SubscriberFactory.h"
+#include "subscriber_factory.h"
 #include "engine_configuration.h"
 #include "provider_factory.h"
 #include <vector>
@@ -108,18 +108,18 @@ std::expected<std::monostate, FailInfo> Engine::ConfigureSubscribersFromData(
     const ::flatbuffers::Vector<
         ::flatbuffers::Offset<steamrot::SubscriberConfigFbs>> *subscriptions) {
 
-  // call SubscriberFactory to create and register subscribers
-  SubscriberFactory subscriber_factory(m_game_context.event_handler);
-  ;
+  // Collect all subscriber configs into a vector
+  std::vector<const SubscriberConfigFbs *> configs;
   for (auto subscription_data : *subscriptions) {
+    configs.push_back(&subscription_data);
+  }
 
-    auto subscriber_result =
-        subscriber_factory.CreateAndRegisterSubscriber(*subscription_data);
-    if (!subscriber_result.has_value()) {
-      return std::unexpected(subscriber_result.error());
-    }
-    m_engine_state.subscriptions.push_back(subscriber_result.value());
-  };
+  // Create and register all subscribers at once
+  auto result = subscriber_factory::CreateAndRegisterSubscribers(
+      configs, m_engine_state.subscriptions, m_game_context.event_handler);
+  if (!result.has_value()) {
+    return std::unexpected(result.error());
+  }
 
   return std::monostate{};
 }

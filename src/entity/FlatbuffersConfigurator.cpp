@@ -10,7 +10,7 @@
 #include "CUIState.h"
 #include "CUserInterface.h"
 #include "EntityConfigurator.h"
-#include "SubscriberFactory.h"
+#include "subscriber_factory.h"
 #include "UIElementFactory.h"
 #include "entity_memory.h"
 
@@ -199,29 +199,24 @@ FlatbuffersConfigurator::ConfigureComponent(
     // Store the visibility state for this state key
     ui_state_component.m_state_to_ui_visibility[state_key] = visibility_state;
 
-    // Create SubscriberFactory for registering subscribers
-    SubscriberFactory subscriber_factory(m_event_handler);
-
     // Create and register subscribers if provided
     if (ui_state_data->subscribers()) {
 
+      // Collect all subscriber configs into a vector
+      std::vector<const SubscriberConfigFbs *> configs;
       for (const auto *subscriber_data : *ui_state_data->subscribers()) {
-
-        // skip null subscriber data
-        if (!subscriber_data) {
-          continue;
+        if (subscriber_data) {
+          configs.push_back(subscriber_data);
         }
+      }
 
-        auto subscriber_result =
-            subscriber_factory.CreateAndRegisterSubscriber(*subscriber_data);
+      // Create and register all subscribers at once
+      auto result = subscriber_factory::CreateAndRegisterSubscribers(
+          configs, ui_state_component.m_state_subscribers[state_key],
+          m_event_handler);
 
-        if (!subscriber_result.has_value()) {
-          return std::unexpected(subscriber_result.error());
-        }
-
-        // Store the subscriber
-        ui_state_component.m_state_subscribers[state_key].push_back(
-            subscriber_result.value());
+      if (!result.has_value()) {
+        return std::unexpected(result.error());
       }
     }
   }

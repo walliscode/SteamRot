@@ -6,7 +6,7 @@
 #include "EventHandler.h"
 #include "EventPacket.h"
 #include "FailInfo.h"
-#include "SubscriberFactory.h"
+#include "subscriber_factory.h"
 #include "event_factory.h"
 #include "user_interface_generated.h"
 #include <expected>
@@ -125,17 +125,22 @@ ConfigureBaseUIElement(UIElement &element, const UIElementData &data,
   if (data.subscriber_data() && (data.subscriber_data()->event_type_data() !=
                                  EventType::EventType_NONE)) {
 
-    // create and register subscriber
-    SubscriberFactory factory{event_handler};
-    auto create_subscriber_result =
-        factory.CreateAndRegisterSubscriber(*data.subscriber_data());
+    // Create config vector with single subscriber
+    std::vector<const SubscriberConfigFbs *> configs{data.subscriber_data()};
+    std::vector<std::shared_ptr<Subscriber>> subscribers;
 
-    if (!create_subscriber_result.has_value())
-      return std::unexpected(create_subscriber_result.error());
+    // Create and register subscriber
+    auto result = subscriber_factory::CreateAndRegisterSubscribers(
+        configs, subscribers, event_handler);
 
-    // reset the element's subscription to be sure
-    element.subscription.reset();
-    element.subscription = std::move(create_subscriber_result.value());
+    if (!result.has_value())
+      return std::unexpected(result.error());
+
+    // Set the subscription if one was created
+    if (!subscribers.empty()) {
+      element.subscription.reset();
+      element.subscription = std::move(subscribers[0]);
+    }
   }
 
   // set ResponseEvent if response_event_data exists and EventType is not none

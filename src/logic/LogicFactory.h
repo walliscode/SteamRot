@@ -51,7 +51,6 @@ private:
   /////////////////////////////////////////////////
   SceneContext m_scene_context;
 
-  SubscriberFactory m_subscriber_factory;
   /////////////////////////////////////////////////
   /// @brief Attach subscribers to a Logic instance based on LogicData
   ///

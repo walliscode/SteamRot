@@ -1,146 +1,116 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Unit tests for the SubscriberFactory class
+/// @brief Unit tests for the subscriber_factory namespace
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "SubscriberFactory.h"
+#include "subscriber_factory.h"
 #include "EventHandler.h"
 #include "UserInputBitset.h"
 #include <SFML/Window/Keyboard.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("SubscriberFactory::CreateAndRegisterSubscriber creates a subscriber "
-          "with no trigger data",
-          "[unit][SubscriberFactory]") {
+TEST_CASE("subscriber_factory::CreateAndRegisterSubscribers creates subscribers "
+          "from SubscriberConfig vector",
+          "[unit][subscriber_factory]") {
   // create a mock EventHandler
   steamrot::EventHandler mock_event_handler;
 
-  // create a SubscriberFactory with the mock EventHandler
-  steamrot::SubscriberFactory factory(mock_event_handler);
+  // set up SubscriberConfig vector
+  std::vector<steamrot::SubscriberConfig> configs;
+  
+  steamrot::SubscriberConfig config1;
+  config1.trigger_event_type = steamrot::EventType::EventType_EVENT_USER_INPUT;
+  config1.active = false;
+  configs.push_back(config1);
 
-  // set up variables for the test
-  const steamrot::EventType event_type =
-      steamrot::EventType::EventType_EVENT_USER_INPUT;
-
-  // check that the EventHandler UserInput register is empty initially
-  auto &subscriber_register = mock_event_handler.GetSubcriberRegister();
-  REQUIRE(subscriber_register.empty());
-
-  // create and register a Subscriber
-  auto create_result = factory.CreateAndRegisterSubscriber(event_type);
-  if (!create_result.has_value())
-    FAIL(create_result.error().message);
-
-  // check that the Subscriber was created successfully
-  REQUIRE(!subscriber_register.empty());
-  REQUIRE(subscriber_register.size() == 1);
-  REQUIRE(subscriber_register.at(event_type).size() == 1);
-  REQUIRE(create_result.value() ==
-          subscriber_register.at(event_type)[0].lock());
-}
-
-TEST_CASE(
-    "SubscriberFactory::CreateAndRegisterSubscriber creates a subscriber with "
-    "trigger data",
-    "[unit][SubscriberFactory]") {
-  // create a mock EventHandler
-  steamrot::EventHandler mock_event_handler;
-  // create a SubscriberFactory with the mock EventHandler
-  steamrot::SubscriberFactory factory(mock_event_handler);
-  // set up variables for the test
-  const steamrot::EventType event_type =
-      steamrot::EventType::EventType_EVENT_USER_INPUT;
-
+  steamrot::SubscriberConfig config2;
+  config2.trigger_event_type = steamrot::EventType::EventType_EVENT_USER_INPUT;
   sf::Event::KeyPressed key_event;
   key_event.code = sf::Keyboard::Key::W;
-  const steamrot::EventData trigger_data =
-      steamrot::UserInputBitset{{key_event}};
-
-  // check that the EventHandler UserInput register is empty initially
-  auto &subscriber_register = mock_event_handler.GetSubcriberRegister();
-  REQUIRE(subscriber_register.empty());
-  // create and register a Subscriber
-  auto create_result =
-      factory.CreateAndRegisterSubscriber(event_type, trigger_data);
-  if (!create_result.has_value())
-    FAIL(create_result.error().message);
-  // check that the Subscriber was created successfully
-  REQUIRE(!subscriber_register.empty());
-  REQUIRE(subscriber_register.size() == 1);
-  REQUIRE(subscriber_register.at(event_type).size() == 1);
-  REQUIRE(create_result.value() ==
-          subscriber_register.at(event_type)[0].lock());
-}
-
-TEST_CASE("SubscriberFactory::CreateAndRegisterSubscriber creates a subscriber "
-          "from SubscriberConfig with no trigger data",
-          "[unit][SubscriberFactory]") {
-  // create a mock EventHandler
-  steamrot::EventHandler mock_event_handler;
-
-  // create a SubscriberFactory with the mock EventHandler
-  steamrot::SubscriberFactory factory(mock_event_handler);
-
-  // set up SubscriberConfig
-  steamrot::SubscriberConfig config;
-  config.trigger_event_type = steamrot::EventType::EventType_EVENT_USER_INPUT;
-  config.active = false;
+  config2.trigger_event_data = steamrot::UserInputBitset{{key_event}};
+  config2.active = true;
+  configs.push_back(config2);
 
   // check that the EventHandler register is empty initially
   auto &subscriber_register = mock_event_handler.GetSubcriberRegister();
   REQUIRE(subscriber_register.empty());
 
-  // create and register a Subscriber from config
-  auto create_result = factory.CreateAndRegisterSubscriber(config);
-  if (!create_result.has_value())
-    FAIL(create_result.error().message);
+  // Vector to store created subscribers
+  std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers;
 
-  // check that the Subscriber was created successfully
+  // create and register subscribers
+  auto result = steamrot::subscriber_factory::CreateAndRegisterSubscribers(
+      configs, subscribers, mock_event_handler);
+  
+  if (!result.has_value())
+    FAIL(result.error().message);
+
+  // check that the Subscribers were created successfully
   REQUIRE(!subscriber_register.empty());
   REQUIRE(subscriber_register.size() == 1);
-  REQUIRE(subscriber_register.at(config.trigger_event_type).size() == 1);
-  REQUIRE(create_result.value() ==
-          subscriber_register.at(config.trigger_event_type)[0].lock());
-  REQUIRE(create_result.value()->m_active == false);
+  REQUIRE(subscriber_register.at(config1.trigger_event_type).size() == 2);
+  REQUIRE(subscribers.size() == 2);
+  REQUIRE(subscribers[0]->m_active == false);
+  REQUIRE(subscribers[1]->m_active == true);
+  REQUIRE(subscribers[1]->m_trigger_event_data.has_value());
 }
 
-TEST_CASE("SubscriberFactory::CreateAndRegisterSubscriber creates a subscriber "
-          "from SubscriberConfig with trigger data and active flag",
-          "[unit][SubscriberFactory]") {
+TEST_CASE("subscriber_factory::CreateAndRegisterSubscribers skips NONE event types",
+          "[unit][subscriber_factory]") {
   // create a mock EventHandler
   steamrot::EventHandler mock_event_handler;
 
-  // create a SubscriberFactory with the mock EventHandler
-  steamrot::SubscriberFactory factory(mock_event_handler);
+  // set up SubscriberConfig vector with NONE type
+  std::vector<steamrot::SubscriberConfig> configs;
+  
+  steamrot::SubscriberConfig config1;
+  config1.trigger_event_type = steamrot::EventType::EventType_NONE;
+  configs.push_back(config1);
 
-  // set up SubscriberConfig with trigger data
-  sf::Event::KeyPressed key_event;
-  key_event.code = sf::Keyboard::Key::W;
-  steamrot::EventData trigger_data = steamrot::UserInputBitset{{key_event}};
-
-  steamrot::SubscriberConfig config;
-  config.trigger_event_type = steamrot::EventType::EventType_EVENT_USER_INPUT;
-  config.trigger_event_data = trigger_data;
-  config.active = true;
+  steamrot::SubscriberConfig config2;
+  config2.trigger_event_type = steamrot::EventType::EventType_EVENT_USER_INPUT;
+  configs.push_back(config2);
 
   // check that the EventHandler register is empty initially
   auto &subscriber_register = mock_event_handler.GetSubcriberRegister();
   REQUIRE(subscriber_register.empty());
 
-  // create and register a Subscriber from config
-  auto create_result = factory.CreateAndRegisterSubscriber(config);
-  if (!create_result.has_value())
-    FAIL(create_result.error().message);
+  // Vector to store created subscribers
+  std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers;
 
-  // check that the Subscriber was created successfully
+  // create and register subscribers
+  auto result = steamrot::subscriber_factory::CreateAndRegisterSubscribers(
+      configs, subscribers, mock_event_handler);
+  
+  if (!result.has_value())
+    FAIL(result.error().message);
+
+  // check that only one subscriber was created (the NONE was skipped)
   REQUIRE(!subscriber_register.empty());
-  REQUIRE(subscriber_register.size() == 1);
-  REQUIRE(subscriber_register.at(config.trigger_event_type).size() == 1);
-  REQUIRE(create_result.value() ==
-          subscriber_register.at(config.trigger_event_type)[0].lock());
-  REQUIRE(create_result.value()->m_active == true);
-  REQUIRE(create_result.value()->m_trigger_event_data.has_value());
+  REQUIRE(subscribers.size() == 1);
+}
+
+TEST_CASE("subscriber_factory::CreateAndRegisterSubscribers handles empty vector",
+          "[unit][subscriber_factory]") {
+  // create a mock EventHandler
+  steamrot::EventHandler mock_event_handler;
+
+  // empty config vector
+  std::vector<steamrot::SubscriberConfig> configs;
+
+  // Vector to store created subscribers
+  std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers;
+
+  // create and register subscribers
+  auto result = steamrot::subscriber_factory::CreateAndRegisterSubscribers(
+      configs, subscribers, mock_event_handler);
+  
+  if (!result.has_value())
+    FAIL(result.error().message);
+
+  // check that no subscribers were created
+  REQUIRE(subscribers.empty());
 }

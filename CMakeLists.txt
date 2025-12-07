@@ -40,6 +40,13 @@ include(flatbuffers_compilation)
 # fetch_content_modules.cmake contains a menu list of all fetch content
 include(fetch_content_modules)
 
+# Set compile and link options for our project targets only (not dependencies)
+# Use libc++ with clang for C++23 features like std::expected
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  set(PROJECT_COMPILE_OPTIONS -stdlib=libc++)
+  set(PROJECT_LINK_OPTIONS -stdlib=libc++)
+endif()
+
 add_subdirectory(steamrot)
 add_subdirectory(src)
 add_subdirectory(tests)
