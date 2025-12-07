@@ -269,11 +269,16 @@ void LoadScene(const SceneData& data) {
 
 **A**: No. Keep them independent. Use extractors or adapters to convert between formats.
 
+### Q: Why not use ISceneViewer instead of ISceneDataProvider?
+
+**A**: Provider pattern is adequate for current small SceneData (64 bytes). Viewer pattern would be beneficial when scene data grows to include entities/assets (10KB+). See PROVIDER_VS_VIEWER_PATTERN.md for detailed comparison.
+
 ---
 
 ## Related Documentation
 
 - **Full Analysis**: SCENE_DATA_PROVIDER_ARCHITECTURE_ANALYSIS.md
+- **Provider vs Viewer**: PROVIDER_VS_VIEWER_PATTERN.md
 - **View Pattern**: SAVE_LOAD_WORKFLOW_ANALYSIS.md
 - **Provider System**: ../DATA_PROVIDER_SYSTEM.md
 - **Save Data**: ../configuration/SAVE_DATA.md

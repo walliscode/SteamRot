@@ -2,7 +2,15 @@
 
 **Date**: December 7, 2025  
 **Context**: Analysis of scene data access patterns for default vs. saved data  
-**Related**: SAVE_LOAD_WORKFLOW_ANALYSIS.md, DATA_PROVIDER_SYSTEM.md
+**Related**: SAVE_LOAD_WORKFLOW_ANALYSIS.md, DATA_PROVIDER_SYSTEM.md, PROVIDER_VS_VIEWER_PATTERN.md
+
+---
+
+## Note on Provider vs. Viewer Pattern
+
+**Q: "Why not use ISceneViewer instead of ISceneDataProvider?"**
+
+**Short answer**: Current SceneData is small (64 bytes), so Provider pattern is adequate and simpler. Viewer pattern would be beneficial when scene data grows to include entities/assets (10KB+). See **PROVIDER_VS_VIEWER_PATTERN.md** for detailed comparison.
 
 ---
 
@@ -655,6 +663,7 @@ When implementing scene state saving:
 
 ## Related Documentation
 
+- [Provider vs Viewer Pattern](PROVIDER_VS_VIEWER_PATTERN.md) - Why Provider pattern chosen over Viewer
 - [Save/Load Workflow Analysis](SAVE_LOAD_WORKFLOW_ANALYSIS.md) - View pattern details
 - [Data Provider System](../DATA_PROVIDER_SYSTEM.md) - Current provider architecture
 - [Save Data Configuration](../configuration/SAVE_DATA.md) - Save file structure
