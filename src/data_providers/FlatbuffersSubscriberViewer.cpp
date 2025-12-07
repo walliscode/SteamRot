@@ -38,14 +38,13 @@ FlatbuffersSubscriberViewer::GetSubscribers() const {
     auto convert_result = subscriber_factory::CreateSubscriber(subscriber_fbs);
     if (!convert_result.has_value()) {
       // Skip entries with NONE event type
-      if (convert_result.error().mode == FailMode::InvalidValue)
+      if (convert_result.error().mode == FailMode::EnumValueNotHandled)
         continue;
       return std::unexpected(convert_result.error());
     }
 
     // Create shared pointer and add to vector
-    subscribers.push_back(
-        std::make_shared<Subscriber>(convert_result.value()));
+    subscribers.push_back(std::make_shared<Subscriber>(convert_result.value()));
   }
 
   return subscribers;
