@@ -94,6 +94,46 @@ Quick reference for:
 
 ---
 
+## 📊 Architectural Analysis Reports
+
+### 🆕 [SCENE_DATA_PROVIDER_EXECUTIVE_SUMMARY.md](./SCENE_DATA_PROVIDER_EXECUTIVE_SUMMARY.md)
+**Scene data access patterns analysis** (Created: Dec 7, 2025)
+
+Executive summary covering:
+- Two access patterns: direct (default) vs. nested (saved)
+- Provider architecture recommendations
+- Current implementation validation
+- Future enhancement roadmap
+- Code examples and decision matrix
+
+**Supporting Documents**:
+- [SCENE_DATA_PROVIDER_ARCHITECTURE_ANALYSIS.md](./SCENE_DATA_PROVIDER_ARCHITECTURE_ANALYSIS.md) - Full technical analysis (18KB)
+- [SCENE_DATA_ACCESS_PATTERNS_QUICK_REF.md](./SCENE_DATA_ACCESS_PATTERNS_QUICK_REF.md) - Quick reference guide (7KB)
+- [SCENE_DATA_ACCESS_PATTERNS_VISUALS.md](./SCENE_DATA_ACCESS_PATTERNS_VISUALS.md) - Visual diagrams (16KB)
+
+**Key Findings**:
+- Current architecture is correct - keep providers separate
+- No changes needed now
+- Clear migration path for future scene state saving
+- Extractor pattern recommended when save states added
+
+**Start here for**: Understanding scene data loading from default files vs. save files
+
+---
+
+### [SAVE_LOAD_WORKFLOW_ANALYSIS.md](./SAVE_LOAD_WORKFLOW_ANALYSIS.md)
+**Save/load workflow with nested data** (Created: Dec 5, 2025)
+
+Analysis of view pattern for handling nested data structures in save files.
+Explains how to avoid copying large nested structures while maintaining clean architecture.
+
+---
+
+### [CONFIGURATION_VS_DATA_STRUCTS_ANALYSIS.md](./CONFIGURATION_VS_DATA_STRUCTS_ANALYSIS.md)
+Analysis of configuration vs. data struct patterns and when to use each.
+
+---
+
 ## 📊 Historical Analysis Reports
 
 ### [EVENT_PACKET_CREATION_ANALYSIS.md](./EVENT_PACKET_CREATION_ANALYSIS.md)
@@ -111,6 +151,9 @@ Analysis of test data visualization tools and approaches.
 ### [TEST_FIXTURE_ANALYSIS.md](./TEST_FIXTURE_ANALYSIS.md)
 Analysis of TestFixture implementation and usage patterns.
 
+### [VIEW_PATTERN_DIAGRAMS_AND_EXAMPLES.md](./VIEW_PATTERN_DIAGRAMS_AND_EXAMPLES.md)
+Diagrams and examples for the view pattern architecture.
+
 ---
 
 ## 🎯 Which Document Should I Read?
@@ -122,6 +165,8 @@ Analysis of TestFixture implementation and usage patterns.
 | What's wrong with the codebase? | [ANALYSIS_QUICK_REFERENCE.md](./ANALYSIS_QUICK_REFERENCE.md) |
 | What needs to be fixed? | [COMPREHENSIVE_CODEBASE_ANALYSIS.md](./COMPREHENSIVE_CODEBASE_ANALYSIS.md) |
 | How does the architecture work? | [ARCHITECTURE_DIAGRAMS.md](./ARCHITECTURE_DIAGRAMS.md) |
+| How do I handle default vs. saved scene data? | [SCENE_DATA_PROVIDER_EXECUTIVE_SUMMARY.md](./SCENE_DATA_PROVIDER_EXECUTIVE_SUMMARY.md) |
+| Which scene data provider should I use? | [SCENE_DATA_ACCESS_PATTERNS_QUICK_REF.md](./SCENE_DATA_ACCESS_PATTERNS_QUICK_REF.md) |
 | What should I work on this week? | [ANALYSIS_QUICK_REFERENCE.md](./ANALYSIS_QUICK_REFERENCE.md) → Action Items |
 | How do I test a Logic class? | [ANALYSIS_QUICK_REFERENCE.md](./ANALYSIS_QUICK_REFERENCE.md) → Test Infrastructure |
 | What's the implementation plan? | [COMPREHENSIVE_CODEBASE_ANALYSIS.md](./COMPREHENSIVE_CODEBASE_ANALYSIS.md) → Implementation Plan |
@@ -225,6 +270,6 @@ For questions about:
 
 ---
 
-**Last Updated**: December 3, 2025  
-**Analysis Version**: 1.0  
-**Total Documents**: 3 new + 5 historical
+**Last Updated**: December 7, 2025  
+**Analysis Version**: 1.1  
+**Total Documents**: 7 new (4 scene data analysis) + 6 historical
