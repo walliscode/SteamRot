@@ -362,13 +362,14 @@ Use this checklist when implementing the architecture:
 - [ ] Add comprehensive tests
 - [ ] Reference **Quick Reference** → "Save current game" example
 
-### Phase 5: Add SceneFactory Overloads (3-5 days) ⬜
-- [ ] Read **Full Analysis** → "Phase 5: Add SceneFactory Overloads"
-- [ ] Add `SceneFactory::CreateSceneFromSave()`
-- [ ] Add `Scene::ConfigureFromSave()`
-- [ ] Wire up in SceneManager
-- [ ] Add tests for save scene loading
-- [ ] Reference **Visual Architecture** → "Pattern 2 Flow"
+### Phase 5: Implement Unified Scene Loading in SceneManager (3-5 days) ⬜
+- [ ] Read **Full Analysis** → "Solution 3: Unified Configuration Pipeline"
+- [ ] Implement `SceneManager::LoadScene(type, from_save)`
+- [ ] Implement unified `SceneFactory::CreateScene(config)`
+- [ ] Implement unified `Scene::Configure(config)`
+- [ ] Wire up in SceneManager for both default and save scenes
+- [ ] Add tests for both loading paths
+- [ ] Reference **Visual Architecture** → "Unified Access Pattern"
 
 ---
 
