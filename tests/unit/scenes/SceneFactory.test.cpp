@@ -19,7 +19,7 @@ TEST_CASE("SceneFactory can be constructed without errors",
           "[unit][SceneFactory]") {
   steamrot::tests::TestFixture test_fixture;
   test_fixture.Intialize();
-  steamrot::SceneFactory scene_factory;
+  steamrot::ISceneFactory scene_factory;
   REQUIRE_NOTHROW(scene_factory);
 }
 
@@ -27,7 +27,7 @@ TEST_CASE("SceneFactory can create a TitleScene from default",
           "[unit][SceneFactory]") {
   steamrot::tests::TestFixture test_fixture;
   test_fixture.Intialize();
-  steamrot::SceneFactory scene_factory;
+  steamrot::ISceneFactory scene_factory;
 
   // define SceneType for the test
   const steamrot::SceneType scene_type = steamrot::SceneType::SceneType_TITLE;
@@ -54,7 +54,7 @@ TEST_CASE("SceneFactory can create a CraftingScene from default",
           "[unit][SceneFactory]") {
   steamrot::tests::TestFixture test_fixture;
   test_fixture.Intialize();
-  steamrot::SceneFactory scene_factory;
+  steamrot::ISceneFactory scene_factory;
   // create a CraftingScene
   auto scene_creation_result = scene_factory.CreateDefaultScene(
       steamrot::SceneType::SceneType_CRAFTING, test_fixture.GetGameContext());

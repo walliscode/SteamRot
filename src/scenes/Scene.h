@@ -12,7 +12,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "GameContext.h"
-#include "LogicFactory.h"
 #include "SceneConfig.h"
 #include "SceneInfo.h"
 #include "SceneResources.h"
@@ -31,13 +30,13 @@ namespace steamrot {
 ///
 /////////////////////////////////////////////////
 class Scene {
-  friend class SceneFactory;
+  friend class ISceneFactory;
 
 protected:
   /////////////////////////////////////////////////
   /// @brief Identifying information about the Scene.
   /////////////////////////////////////////////////
-  const SceneInfo m_scene_info;
+  SceneInfo m_scene_info;
 
   /////////////////////////////////////////////////
   /// @brief Scene-level resources (managers, logic, render texture).
@@ -60,22 +59,13 @@ protected:
   /// @param id Generated UUID for the Scene.
   /// @param game_context GameContext object passed down from the GameEngine.
   /////////////////////////////////////////////////
-  Scene(const SceneType scene_type, const uuids::uuid &id,
-        const GameContext &game_context);
+  Scene(const GameContext &game_context);
 
 public:
   /////////////////////////////////////////////////
   /// @brief Destructor for Scene class.
   /////////////////////////////////////////////////
   virtual ~Scene() = default;
-
-  /////////////////////////////////////////////////
-  /// @brief wrapper function for any Scene configuration that needs to be done
-  ///
-  /// @param data_type Which data type to use for configuration.
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  ConfigureFromDefault(const DataType &data_type = DataType::Flatbuffers);
 
   /////////////////////////////////////////////////
   /// \brief function container for all movement related logic
@@ -103,20 +93,6 @@ public:
   /////////////////////////////////////////////////
   sf::RenderTexture &GetRenderTexture();
 
-  /////////////////////////////////////////////////
-  /// @brief Returns a const reference to the LogicCollection of the Scene.
-  ///
-  /// @return The LogicCollection of the Scene.
-  /////////////////////////////////////////////////
-  const LogicCollection &GetLogicMap() const;
-
-  /////////////////////////////////////////////////
-  /// @brief Sets LogicCollection for the scene (only if the map is empty)
-  ///
-  /// @param logic_map Logic collection to set for the scene, passed by value
-  /// and moved.
-  /////////////////////////////////////////////////
-  void SetLogicMap(LogicCollection logic_map);
   /////////////////////////////////////////////////
   /// @brief Returns the active state of the Scene.
   ///

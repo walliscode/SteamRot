@@ -17,7 +17,7 @@ TEST_CASE("CraftingScene's call to sRender is correct",
   // arrange
   steamrot::tests::TestFixture test_fixture;
   test_fixture.Intialize();
-  steamrot::SceneFactory scene_factory;
+  steamrot::ISceneFactory scene_factory;
   // create a CraftingScene
   auto scene_creation_result = scene_factory.CreateDefaultScene(
       steamrot::SceneType::SceneType_CRAFTING, test_fixture.GetGameContext());

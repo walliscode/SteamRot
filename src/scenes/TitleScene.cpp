@@ -10,8 +10,7 @@
 
 namespace steamrot {
 /////////////////////////////////////////////////
-TitleScene::TitleScene(const uuids::uuid &id, const GameContext &game_context)
-    : Scene(SceneType::SceneType_TITLE, id, game_context) {}
+TitleScene::TitleScene(const GameContext &game_context) : Scene(game_context) {}
 
 /////////////////////////////////////////////////
 void TitleScene::sMovement() {};

@@ -7,9 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "EntityManager.h"
-#include "EventHandler.h"
 #include "FailInfo.h"
-#include "FlatbuffersConfigurator.h"
 #include "containers.h"
 #include "entity_memory.h"
 #include <expected>
@@ -18,18 +16,8 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-EntityManager::EntityManager(EventHandler &event_handler)
-    : m_archetype_manager(m_entity_memory_pool),
-      m_event_handler(event_handler) {}
+EntityManager::EntityManager() : m_archetype_manager(m_entity_memory_pool) {}
 
-/////////////////////////////////////////////////
-EntityManager::EntityManager(const size_t pool_size,
-                             EventHandler &event_handler)
-    : m_archetype_manager(m_entity_memory_pool),
-      m_event_handler(event_handler) {
-  // resize the entity memory pool to the given size
-  ResizeEntityMemoryPool(pool_size);
-}
 /////////////////////////////////////////////////
 EntityMemoryPool &EntityManager::GetEntityMemoryPool() {
   // return a reference to the memory pool
@@ -48,40 +36,6 @@ const ArchetypeManager &EntityManager::GetArchetypeManager() const {
   return m_archetype_manager;
 }
 
-/////////////////////////////////////////////////
-void EntityManager::ResizeEntityMemoryPool(const size_t pool_size) {
-
-  // use std::apply to resize the memory pool with lambda function
-  std::apply(
-      [pool_size](auto &...component_vector) {
-        (component_vector.resize(pool_size), ...);
-      },
-      m_entity_memory_pool);
-}
-
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-EntityManager::ConfigureEntitiesFromDefaultData(
-    const SceneType scene_type, const DataType data_type) {
-
-  switch (data_type) {
-  case DataType::Flatbuffers: {
-
-    FlatbuffersConfigurator configurator{m_event_handler};
-    auto configure_result = configurator.ConfigureEntitiesFromDefaultData(
-        m_entity_memory_pool, scene_type);
-    if (!configure_result.has_value())
-      return std::unexpected<FailInfo>(configure_result.error());
-
-    break;
-  }
-  default:
-    return std::unexpected(
-        FailInfo{FailMode::NonExistentEnumValue, "Invalid enum value"});
-  }
-
-  return std::monostate();
-}
 /////////////////////////////////////////////////
 size_t EntityManager::GetNextFreeEntityIndex() {
 
