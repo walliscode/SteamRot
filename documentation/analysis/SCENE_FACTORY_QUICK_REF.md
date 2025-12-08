@@ -7,10 +7,12 @@
 
 ## TL;DR Recommendations
 
-✅ **Use Abstract Factory Pattern** for Scene configuration  
-✅ **SceneManager orchestrates** data source selection  
+✅ **Single path through SceneFactory** - No branching for default vs saved  
+✅ **SceneManager orchestrates** data source selection and provides unified SceneData  
+✅ **Self-contained configurators** - Each manages its own data loading  
 ✅ **IEntityConfigurator** with virtual methods (not overloads)  
-✅ **Remove Scene::Configure()** - configuration happens externally
+✅ **Remove Scene::Configure()** - configuration happens externally  
+✅ **Data-agnostic Scene** - No intermediate struct copying
 
 ---
 
@@ -35,38 +37,58 @@ class SceneManager {
 **Flow:**
 ```
 LoadSceneFromDefault:
-  ISceneDataProvider → SceneData → SceneFactory → Scene
+  ISceneDataProvider → SceneData → SceneFactory::CreateScene() → Scene
 
 LoadSceneFromSave:
-  ISaveDataProvider → SaveData → SceneDataExtractor → SceneData → SceneFactory → Scene
+  ISaveDataProvider → SaveData → SceneDataExtractor → SceneData → SceneFactory::CreateScene() → Scene
 ```
 
-### 2. Abstract Factory Pattern
+**Key insight:** Both paths converge to the same SceneData → SceneFactory::CreateScene() method.
+
+### 2. Simplified SceneFactory (Single Path)
 
 ```cpp
-// Interface for Scene configuration strategies
-class ISceneConfigurator {
-  virtual ConfigureRenderTexture(Scene&, const SceneData&) = 0;
-  virtual ConfigureEntities(Scene&, const SceneData&) = 0;
-  virtual ConfigureLogic(Scene&, const SceneData&) = 0;
-};
-
-// Implementation for default scenes
-class DefaultSceneConfigurator : public ISceneConfigurator { ... };
-
-// Implementation for saved scenes
-class SavedSceneConfigurator : public ISceneConfigurator { ... };
-
-// SceneFactory uses configurator
+// No abstract configurator hierarchy needed
+// SceneFactory has ONE CreateScene() method that works the same for all
 class SceneFactory {
-  SceneFactory(std::unique_ptr<ISceneConfigurator> configurator);
+  SceneFactory() = default;
   
+  // Single method that works the same for default and saved
   std::expected<std::unique_ptr<Scene>, FailInfo>
   CreateScene(const SceneData &scene_data, const GameContext &game_context);
 };
+
+// Implementation
+std::expected<std::unique_ptr<Scene>, FailInfo>
+SceneFactory::CreateScene(const SceneData &scene_data,
+                         const GameContext &game_context) {
+  // 1. Create Scene instance
+  auto scene = CreateSceneInstance(scene_data.scene_type, ...);
+  
+  // 2. Configure render texture
+  scene->m_scene_resources.scene_texture = RenderTexture(scene_data.width, scene_data.height);
+  
+  // 3. Self-contained configurators handle their own data loading
+  auto entity_config = std::make_unique<FlatbuffersEntityConfigurator>(event_handler);
+  entity_config->Configure(scene->entity_manager, scene_data.scene_type);
+  
+  // 4. Generate archetypes
+  scene->entity_manager.GenerateAllArchetypes();
+  
+  // 5. Self-contained logic factory
+  LogicFactory logic_factory(scene_data.scene_type, scene->GetSceneContext());
+  scene->SetLogicMap(logic_factory.CreateLogicMap());
+  
+  return scene;
+}
 ```
 
-### 3. Abstract EntityConfigurator
+**Benefits:**
+- ✅ Single path - no branching
+- ✅ No configurator selection logic
+- ✅ Simple and direct
+
+### 3. Self-Contained EntityConfigurator
 
 ```cpp
 // OLD (current): Overloaded methods - NOT polymorphic
@@ -75,20 +97,29 @@ class FlatbuffersConfigurator : public EntityConfigurator {
   ConfigureComponent(const UserInterfaceData*, CUserInterface&);  // Overload
 };
 
-// NEW: Virtual methods - Polymorphic
+// NEW: Virtual methods - Polymorphic and self-contained
 class IEntityConfigurator {
-  virtual ConfigureFromDefault(EntityManager&, SceneType) = 0;
-  virtual ConfigureFromSave(EntityManager&, const SceneData&) = 0;
-  virtual ConfigureFromTest(EntityManager&, const TestEntityConfig&) = 0;
+  virtual Configure(EntityManager&, SceneType) = 0;
 };
 
 class FlatbuffersEntityConfigurator : public IEntityConfigurator {
-  // Implement virtual methods
-  ConfigureFromDefault(...) override { ... }
-  ConfigureFromSave(...) override { ... }
-  ConfigureFromTest(...) override { ... }
+private:
+  FlatbuffersDataLoader m_data_loader;  // Self-contained data loading
+  
+public:
+  // Configurator handles its own data loading internally
+  Configure(EntityManager &entity_manager, SceneType scene_type) override {
+    // Load data internally - no external data passing needed
+    const SceneDataData *scene_data =
+        m_data_loader.ProvideDefaultSceneData(scene_type).value();
+    
+    // Configure entities
+    // ...
+  }
 };
 ```
+
+**Key principle:** Configurators are self-contained and manage their own data loading.
 
 ---
 
@@ -96,54 +127,45 @@ class FlatbuffersEntityConfigurator : public IEntityConfigurator {
 
 ### Phase 1: Abstract EntityConfigurator ⭐ START HERE
 
-**Goal**: Make EntityConfigurator properly abstract
+**Goal**: Make EntityConfigurator properly abstract and self-contained
 
 **Changes**:
 - `EntityConfigurator.h` → `IEntityConfigurator.h` (interface)
 - `FlatbuffersConfigurator` → `FlatbuffersEntityConfigurator`
-- Add virtual methods: `ConfigureFromDefault`, `ConfigureFromSave`, `ConfigureFromTest`
+- Add virtual `Configure()` method
+- Add `m_data_loader` member for self-contained data loading
 - Keep existing overloaded methods as private helpers
 
 **Impact**: Low risk, internal refactor only
 
-### Phase 2: Remove Scene::ConfigureFromDefault()
+### Phase 2: Simplify SceneFactory
 
-**Goal**: Move configuration out of Scene
+**Goal**: Remove Scene::Configure() and make SceneFactory single-path
 
 **Changes**:
 - Remove `Scene::ConfigureFromDefault()` method
-- SceneFactory calls IEntityConfigurator directly
+- SceneFactory has single `CreateScene()` method
+- No branching for default vs saved
+- Directly calls self-contained configurators
 - Scene becomes pure structural container
 
-**Impact**: Medium risk, changes Scene API
+**Impact**: Medium risk, changes Scene and SceneFactory APIs
 
-### Phase 3: Add ISceneConfigurator
+### Phase 3: SceneManager Data Sourcing
 
-**Goal**: Introduce configuration strategies
-
-**Changes**:
-- Create `ISceneConfigurator.h` interface
-- Create `DefaultSceneConfigurator` implementation
-- Create `SavedSceneConfigurator` stub
-- Update SceneFactory to use configurator
-
-**Impact**: Low risk, adds new classes
-
-### Phase 4: SceneManager Data Sourcing
-
-**Goal**: Handle default vs saved data sources
+**Goal**: Handle default vs saved data sources with unified SceneData
 
 **Changes**:
 - Add `LoadSceneFromDefault()` method
 - Add `LoadSceneFromSave()` method
+- Both provide same SceneData interface to SceneFactory
 - Refactor existing methods to use new methods
 
 **Impact**: Medium risk, changes SceneManager behavior
 
-### Phase 5: Future Enhancements
+### Phase 4: Future Enhancements
 
 - SceneDataExtractor (when SaveData has scene_states)
-- Additional configurators (Network, Procedural, Test)
 - Additional EntityConfigurators (Json, Xml, Lua)
 
 ---

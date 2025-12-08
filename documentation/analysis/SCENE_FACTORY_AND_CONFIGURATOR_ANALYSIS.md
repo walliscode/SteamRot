@@ -15,10 +15,12 @@ This analysis addresses the architecture for:
 
 ### Key Recommendations
 
-- ✅ **SceneManager as orchestrator**: SceneManager determines data source and delegates to appropriate provider
-- ✅ **Abstract Factory Pattern**: Use abstract factory for Scene configuration with abstract configurators
+- ✅ **SceneManager as orchestrator**: SceneManager determines data source and provides unified SceneData to SceneFactory
+- ✅ **Single SceneFactory path**: SceneFactory has one CreateScene() method that works the same regardless of data source
+- ✅ **Self-contained configurators**: Configurators manage their own data loading and abstractions
 - ✅ **Abstract EntityConfigurator**: Define virtual methods instead of overloaded ConfigureComponent methods
 - ✅ **Avoid Scene::Configure()**: Keep Scene as pure structural container, configuration happens externally
+- ✅ **Data-agnostic Scene**: Scene doesn't know about data format, no intermediate struct copying
 
 ---
 
@@ -195,9 +197,11 @@ Scene::ConfigureFromDefault(const DataType &data_type) {
 ### Design Goals
 
 1. **SceneManager orchestrates data source selection**
-2. **Unified SceneData format** for downstream code
-3. **No conditional logic** in Scene or SceneFactory
-4. **Support both default and saved scenes** without code duplication
+2. **Unified SceneData format** - SceneManager provides same interface regardless of source
+3. **Single path through SceneFactory** - No branching based on default vs saved
+4. **No conditional logic** in Scene or SceneFactory
+5. **Self-contained configurators** - Each configurator manages its own data loading
+6. **Data-agnostic Scene** - No intermediate struct copying, Scene contains lots of data
 
 ### Proposed Architecture
 
@@ -394,190 +398,35 @@ SceneManager::LoadSceneFromSave(uint32_t slot_index) {
 
 ## Scene Factory Pattern Analysis
 
-### Option 1: Overloaded Configure Function
+### Simplified Approach (RECOMMENDED)
+
+The key insight: **SceneManager provides the same SceneData interface regardless of source**, so SceneFactory doesn't need multiple paths.
 
 **Approach:**
 ```cpp
-class SceneFactory {
-public:
-  // Configure from ISceneDataProvider (default)
-  std::expected<std::unique_ptr<Scene>, FailInfo>
-  CreateScene(const SceneType &scene_type,
-              const GameContext &game_context,
-              ISceneDataProvider &scene_data_provider);
-  
-  // Configure from SceneData (extracted from save)
-  std::expected<std::unique_ptr<Scene>, FailInfo>
-  CreateScene(const SceneData &scene_data,
-              const GameContext &game_context);
-};
-```
-
-**Pros:**
-- ✅ Simple to understand
-- ✅ Direct - no intermediate objects
-
-**Cons:**
-- ❌ Not polymorphic - overloads resolved at compile time
-- ❌ Duplicated configuration logic in each overload
-- ❌ Can't swap configuration strategies at runtime
-- ❌ Hard to test - requires specific parameter types
-- ❌ Violates Open/Closed Principle
-
-### Option 2: Abstract Factory Pattern (RECOMMENDED)
-
-**Approach:**
-```cpp
-/////////////////////////////////////////////////
-/// @class ISceneConfigurator
-/// @brief Abstract interface for configuring Scene components
-/////////////////////////////////////////////////
-class ISceneConfigurator {
-public:
-  virtual ~ISceneConfigurator() = default;
-  
-  /////////////////////////////////////////////////
-  /// @brief Configure render texture dimensions
-  /////////////////////////////////////////////////
-  virtual std::expected<std::monostate, FailInfo>
-  ConfigureRenderTexture(Scene &scene, const SceneData &scene_data) = 0;
-  
-  /////////////////////////////////////////////////
-  /// @brief Configure entities in the scene
-  /////////////////////////////////////////////////
-  virtual std::expected<std::monostate, FailInfo>
-  ConfigureEntities(Scene &scene, const SceneData &scene_data) = 0;
-  
-  /////////////////////////////////////////////////
-  /// @brief Configure logic for the scene
-  /////////////////////////////////////////////////
-  virtual std::expected<std::monostate, FailInfo>
-  ConfigureLogic(Scene &scene, const SceneData &scene_data) = 0;
-};
-
-/////////////////////////////////////////////////
-/// @class DefaultSceneConfigurator
-/// @brief Configurator for scenes loaded from default data
-/////////////////////////////////////////////////
-class DefaultSceneConfigurator : public ISceneConfigurator {
-private:
-  std::unique_ptr<IEntityConfigurator> m_entity_configurator;
-  
-public:
-  DefaultSceneConfigurator(std::unique_ptr<IEntityConfigurator> entity_configurator)
-      : m_entity_configurator(std::move(entity_configurator)) {}
-  
-  std::expected<std::monostate, FailInfo>
-  ConfigureRenderTexture(Scene &scene, const SceneData &scene_data) override {
-    sf::Vector2u texture_size(scene_data.render_texture_width,
-                             scene_data.render_texture_height);
-    scene.m_scene_resources.scene_texture = sf::RenderTexture(texture_size);
-    return std::monostate{};
-  }
-  
-  std::expected<std::monostate, FailInfo>
-  ConfigureEntities(Scene &scene, const SceneData &scene_data) override {
-    // Delegate to IEntityConfigurator
-    return m_entity_configurator->ConfigureFromDefault(
-        scene.m_scene_resources.entity_manager,
-        scene_data.scene_type);
-  }
-  
-  std::expected<std::monostate, FailInfo>
-  ConfigureLogic(Scene &scene, const SceneData &scene_data) override {
-    LogicFactory logic_factory(scene_data.scene_type, scene.GetSceneContext());
-    
-    FlatbuffersDataLoader data_loader;
-    auto logic_data_result =
-        data_loader.ProvideLogicCollectionData(scene_data.scene_type);
-    
-    auto logic_map_result = logic_factory.CreateLogicMap(
-        logic_data_result.has_value() ? logic_data_result.value() : nullptr);
-    
-    if (!logic_map_result) {
-      return std::unexpected(logic_map_result.error());
-    }
-    
-    scene.SetLogicMap(std::move(logic_map_result.value()));
-    return std::monostate{};
-  }
-};
-
-/////////////////////////////////////////////////
-/// @class SavedSceneConfigurator
-/// @brief Configurator for scenes loaded from saved games
-/////////////////////////////////////////////////
-class SavedSceneConfigurator : public ISceneConfigurator {
-private:
-  std::unique_ptr<IEntityConfigurator> m_entity_configurator;
-  
-public:
-  SavedSceneConfigurator(std::unique_ptr<IEntityConfigurator> entity_configurator)
-      : m_entity_configurator(std::move(entity_configurator)) {}
-  
-  std::expected<std::monostate, FailInfo>
-  ConfigureRenderTexture(Scene &scene, const SceneData &scene_data) override {
-    // Same implementation as default
-    sf::Vector2u texture_size(scene_data.render_texture_width,
-                             scene_data.render_texture_height);
-    scene.m_scene_resources.scene_texture = sf::RenderTexture(texture_size);
-    return std::monostate{};
-  }
-  
-  std::expected<std::monostate, FailInfo>
-  ConfigureEntities(Scene &scene, const SceneData &scene_data) override {
-    // Future: Different logic for restoring from save
-    // For now, similar to default
-    return m_entity_configurator->ConfigureFromSave(
-        scene.m_scene_resources.entity_manager,
-        scene_data);
-  }
-  
-  std::expected<std::monostate, FailInfo>
-  ConfigureLogic(Scene &scene, const SceneData &scene_data) override {
-    // Future: Logic state restoration from save
-    // For now, create fresh logic (same as default)
-    LogicFactory logic_factory(scene_data.scene_type, scene.GetSceneContext());
-    
-    FlatbuffersDataLoader data_loader;
-    auto logic_data_result =
-        data_loader.ProvideLogicCollectionData(scene_data.scene_type);
-    
-    auto logic_map_result = logic_factory.CreateLogicMap(
-        logic_data_result.has_value() ? logic_data_result.value() : nullptr);
-    
-    if (!logic_map_result) {
-      return std::unexpected(logic_map_result.error());
-    }
-    
-    scene.SetLogicMap(std::move(logic_map_result.value()));
-    return std::monostate{};
-  }
-};
-
 /////////////////////////////////////////////////
 /// @class SceneFactory
-/// @brief Factory for creating Scene objects with configurable strategies
+/// @brief Factory for creating Scene objects
+///
+/// SceneFactory has a single CreateScene() method that works the same
+/// way regardless of whether the scene is from default data or a save.
+/// SceneManager handles data source selection and provides SceneData.
 /////////////////////////////////////////////////
 class SceneFactory {
 private:
-  std::unique_ptr<ISceneConfigurator> m_configurator;
-  
   uuids::uuid CreateUUID();
   
 public:
-  /////////////////////////////////////////////////
-  /// @brief Constructor taking a configurator strategy
-  ///
-  /// @param configurator The configuration strategy to use
-  /////////////////////////////////////////////////
-  SceneFactory(std::unique_ptr<ISceneConfigurator> configurator)
-      : m_configurator(std::move(configurator)) {}
+  SceneFactory() = default;
   
   /////////////////////////////////////////////////
-  /// @brief Create a Scene from SceneData using configured strategy
+  /// @brief Create a Scene from SceneData
   ///
-  /// @param scene_data The scene data to configure from
+  /// This method works the same for both default and saved scenes.
+  /// SceneManager has already determined the data source and
+  /// provides SceneData in a unified format.
+  ///
+  /// @param scene_data The scene metadata (type, texture dimensions)
   /// @param game_context Reference to game-wide context
   /// @return Created and configured Scene or failure
   /////////////////////////////////////////////////
@@ -611,14 +460,20 @@ SceneFactory::CreateScene(const SceneData &scene_data,
                                      "Unknown SceneType"});
   }
   
-  // 3. Configure render texture using strategy
-  auto texture_result = m_configurator->ConfigureRenderTexture(*scene_ptr, scene_data);
-  if (!texture_result) {
-    return std::unexpected(texture_result.error());
-  }
+  // 3. Configure render texture from SceneData
+  sf::Vector2u texture_size(scene_data.render_texture_width,
+                           scene_data.render_texture_height);
+  scene_ptr->m_scene_resources.scene_texture = sf::RenderTexture(texture_size);
   
-  // 4. Configure entities using strategy
-  auto entities_result = m_configurator->ConfigureEntities(*scene_ptr, scene_data);
+  // 4. Configure entities
+  // EntityConfigurator is self-contained and manages its own data loading
+  auto entity_configurator = std::make_unique<FlatbuffersEntityConfigurator>(
+      game_context.event_handler);
+  
+  auto entities_result = entity_configurator->Configure(
+      scene_ptr->m_scene_resources.entity_manager,
+      scene_data.scene_type);
+  
   if (!entities_result) {
     return std::unexpected(entities_result.error());
   }
@@ -630,11 +485,16 @@ SceneFactory::CreateScene(const SceneData &scene_data,
     return std::unexpected(archetype_result.error());
   }
   
-  // 6. Configure logic using strategy
-  auto logic_result = m_configurator->ConfigureLogic(*scene_ptr, scene_data);
-  if (!logic_result) {
-    return std::unexpected(logic_result.error());
+  // 6. Configure logic
+  LogicFactory logic_factory(scene_data.scene_type, scene_ptr->GetSceneContext());
+  
+  // LogicFactory is self-contained and manages its own data loading
+  auto logic_map_result = logic_factory.CreateLogicMap();
+  if (!logic_map_result) {
+    return std::unexpected(logic_map_result.error());
   }
+  
+  scene_ptr->SetLogicMap(std::move(logic_map_result.value()));
   
   return scene_ptr;
 }
@@ -647,25 +507,28 @@ SceneManager::LoadSceneFromDefault(const SceneType &scene_type) {
   
   // 1. Get SceneData from provider
   auto scene_data_result = m_scene_data_provider->LoadSceneData(scene_type);
+  if (!scene_data_result) {
+    return std::unexpected(scene_data_result.error());
+  }
   
-  // 2. Create configurator for default scenes
-  auto entity_configurator = std::make_unique<FlatbuffersEntityConfigurator>(
-      m_game_context.event_handler);
+  // 2. Create factory (no configurator needed - single path)
+  SceneFactory scene_factory;
   
-  auto scene_configurator = std::make_unique<DefaultSceneConfigurator>(
-      std::move(entity_configurator));
-  
-  // 3. Create factory with configurator
-  SceneFactory scene_factory(std::move(scene_configurator));
-  
-  // 4. Create scene
+  // 3. Create scene (same method for default and saved)
   auto scene_result = scene_factory.CreateScene(
       scene_data_result.value(),
       m_game_context);
   
-  // 5. Add to map
+  if (!scene_result) {
+    return std::unexpected(scene_result.error());
+  }
+  
+  // 4. Add to map
   auto scene_id = scene_result.value()->GetSceneInfo().id;
   m_scenes.emplace(scene_id, std::move(scene_result.value()));
+  
+  // 5. Load assets
+  m_game_context.asset_manager.LoadSceneAssets(scene_type);
   
   return scene_id;
 }
@@ -675,29 +538,60 @@ SceneManager::LoadSceneFromSave(uint32_t slot_index) {
   
   // 1. Load SaveData
   auto save_data_result = m_save_data_provider->LoadSave(slot_index);
+  if (!save_data_result) {
+    return std::unexpected(save_data_result.error());
+  }
   
-  // 2. Extract SceneData
+  // 2. Extract SceneData from SaveData
   SceneDataExtractor extractor;
   auto scene_data_result = extractor.ExtractSceneData(save_data_result.value());
+  if (!scene_data_result) {
+    return std::unexpected(scene_data_result.error());
+  }
   
-  // 3. Create configurator for saved scenes
-  auto entity_configurator = std::make_unique<SavedEntityConfigurator>(
-      m_game_context.event_handler);
+  // 3. Create factory (same factory, no configurator needed)
+  SceneFactory scene_factory;
   
-  auto scene_configurator = std::make_unique<SavedSceneConfigurator>(
-      std::move(entity_configurator));
-  
-  // 4. Create factory with configurator
-  SceneFactory scene_factory(std::move(scene_configurator));
-  
-  // 5. Create scene
+  // 4. Create scene (SAME METHOD as default)
   auto scene_result = scene_factory.CreateScene(
       scene_data_result.value(),
       m_game_context);
   
-  // 6. Add to map
+  if (!scene_result) {
+    return std::unexpected(scene_result.error());
+  }
+  
+  // 5. Add to map
   auto scene_id = scene_result.value()->GetSceneInfo().id;
   m_scenes.emplace(scene_id, std::move(scene_result.value()));
+  
+  // 6. Load assets
+  m_game_context.asset_manager.LoadSceneAssets(scene_data_result.value().scene_type);
+  
+  return scene_id;
+}
+```
+
+**Benefits:**
+- ✅ **Single path** - No branching in SceneFactory
+- ✅ **No intermediate copying** - Scene contains data directly
+- ✅ **Self-contained configurators** - EntityConfigurator and LogicFactory manage their own data
+- ✅ **Simple** - No abstract configurator hierarchy needed
+- ✅ **Testable** - Can mock EntityConfigurator via abstraction
+- ✅ **Data-agnostic** - Scene doesn't know about FlatBuffers or JSON
+
+**Key Insight:** The abstraction is in the **data providers** (ISceneDataProvider, ISaveDataProvider) and in the **configurators** (IEntityConfigurator), NOT in the SceneFactory. SceneFactory is just a simple factory that takes SceneData and creates a Scene.
+
+### Why Not Abstract Factory with Multiple Configurators?
+
+The original analysis proposed ISceneConfigurator with DefaultSceneConfigurator and SavedSceneConfigurator. This was **over-engineered** because:
+
+- ❌ Creates multiple paths through SceneFactory (defeats the goal)
+- ❌ Requires configurator selection logic (branching)
+- ❌ More classes and complexity
+- ❌ Scene ends up with lots of data - copying to intermediate structs is wasteful
+
+The simpler approach: **SceneManager provides the same SceneData regardless of source, SceneFactory has one path.**
   
   return scene_id;
 }
@@ -961,6 +855,39 @@ public:
 ✅ **Extensible** - easy to add JsonEntityConfigurator, XmlEntityConfigurator  
 ✅ **Clear contract** - base class defines what derived classes must implement  
 ✅ **Decoupled** - game code depends on IEntityConfigurator, not FlatBuffers types
+✅ **Self-contained** - EntityConfigurator manages its own data loading (m_data_loader member)
+
+### Self-Contained Configurator Pattern
+
+**Key principle:** Each configurator is responsible for its own data loading and management. The configurator has its own data loader and abstractions.
+
+```cpp
+class FlatbuffersEntityConfigurator : public IEntityConfigurator {
+private:
+  // Configurator owns its own data loader
+  FlatbuffersDataLoader m_data_loader;
+  
+public:
+  // Configurator handles its own data loading internally
+  std::expected<std::monostate, FailInfo>
+  Configure(EntityManager &entity_manager, SceneType scene_type) override {
+    
+    // Load data internally - no external data passing needed
+    const SceneDataData *scene_data =
+        m_data_loader.ProvideDefaultSceneData(scene_type).value();
+    
+    // Configure entities
+    // ...
+  }
+};
+```
+
+**Benefits of self-contained approach:**
+- ✅ No intermediate struct copying
+- ✅ Data stays in FlatBuffers format (zero-copy)
+- ✅ Scene doesn't know about data format
+- ✅ Configurator manages its own abstractions
+- ✅ Clean separation of concerns
 
 ### Migration Path from Current Overloads
 
@@ -1031,7 +958,7 @@ public:
 │                                        │                         │
 │                                        ▼                         │
 │                               SceneFactory                       │
-│                          (with ISceneConfigurator)               │
+│                          (single path - no configurator)         │
 └─────────────────────────────────────────────────────────────────┘
                                          │
                                          ▼
@@ -1041,7 +968,8 @@ public:
                │                         │                         │
                ▼                         ▼                         ▼
       RenderTexture               EntityManager              LogicMap
-      (configured)                (via IEntityConfigurator)  (configured)
+      (configured)              (via IEntityConfigurator)  (configured)
+                               (self-contained)          (self-contained)
 ```
 
 ### Key Responsibilities
@@ -1049,37 +977,34 @@ public:
 #### SceneManager
 - **Orchestrates** scene lifecycle (create, load, update, destroy)
 - **Determines data source** (default vs saved)
-- **Provides SceneData** to SceneFactory
+- **Provides unified SceneData** to SceneFactory (same interface regardless of source)
 - **Manages scene map** (m_scenes)
 - **Does NOT** configure scenes directly
 
 #### SceneFactory
 - **Creates Scene instances** (polymorphic: TitleScene, CraftingScene)
-- **Delegates configuration** to ISceneConfigurator
+- **Single CreateScene() method** - works the same for default and saved
 - **Coordinates** render texture, entities, logic setup
-- **Does NOT** know about data sources (works with SceneData)
-
-#### ISceneConfigurator
-- **Defines configuration strategy** (default vs saved)
-- **Configures Scene components** (render texture, entities, logic)
-- **Composes IEntityConfigurator** for entity configuration
-- **Can be swapped** at runtime (polymorphic)
+- **Does NOT** know about data sources (only works with SceneData)
+- **Does NOT** branch on default vs saved (unified path)
 
 #### IEntityConfigurator
-- **Defines entity configuration strategy**
+- **Self-contained** - manages its own data loading (m_data_loader)
 - **Virtual methods** for override (not overloads)
 - **Polymorphic** - can swap implementations
+- **Data-agnostic** - Scene doesn't know about FlatBuffers format
 - **Examples**: FlatbuffersEntityConfigurator, JsonEntityConfigurator, MockEntityConfigurator
 
 #### Scene
 - **Structural container** for scene components
 - **No configuration methods** (ConfigureFromDefault removed)
-- **Provides access** to resources, managers, state
+- **Contains data directly** (no intermediate copying)
+- **Data-agnostic** - doesn't know about data format
 - **Polymorphic** for scene-specific logic (sMovement, sCollision, sAction, sRender)
 
 ### Data Flow
 
-#### Default Scene Load
+#### Default Scene Load (Single Path)
 ```
 User Action (new game, scene transition)
     ↓
@@ -1091,18 +1016,19 @@ SceneData (struct)
     ↓
 SceneFactory::CreateScene(SceneData, GameContext)
     ├─ Create Scene instance (TitleScene, CraftingScene)
-    ├─ ISceneConfigurator::ConfigureRenderTexture()
-    ├─ ISceneConfigurator::ConfigureEntities()
-    │   └─ IEntityConfigurator::ConfigureFromDefault()
+    ├─ Configure render texture (from SceneData)
+    ├─ IEntityConfigurator::Configure()
+    │   └─ Configurator loads its own data internally
     ├─ Generate Archetypes
-    └─ ISceneConfigurator::ConfigureLogic()
+    └─ LogicFactory::CreateLogicMap()
+        └─ Factory loads its own data internally
     ↓
 Configured Scene
     ↓
 SceneManager::m_scenes.emplace(id, scene)
 ```
 
-#### Saved Scene Load
+#### Saved Scene Load (SAME Path)
 ```
 User Action (load game)
     ↓
@@ -1116,18 +1042,21 @@ SceneDataExtractor::ExtractSceneData(SaveData)
     ↓
 SceneData (struct)
     ↓
-SceneFactory::CreateScene(SceneData, GameContext)
+SceneFactory::CreateScene(SceneData, GameContext)  ← SAME METHOD
     ├─ Create Scene instance (TitleScene, CraftingScene)
-    ├─ ISceneConfigurator::ConfigureRenderTexture()
-    ├─ ISceneConfigurator::ConfigureEntities()
-    │   └─ IEntityConfigurator::ConfigureFromSave()
+    ├─ Configure render texture (from SceneData)
+    ├─ IEntityConfigurator::Configure()
+    │   └─ Configurator loads its own data internally
     ├─ Generate Archetypes
-    └─ ISceneConfigurator::ConfigureLogic()
+    └─ LogicFactory::CreateLogicMap()
+        └─ Factory loads its own data internally
     ↓
 Configured Scene (restored state)
     ↓
 SceneManager::m_scenes.emplace(id, scene)
 ```
+
+**Key Insight:** Both flows converge to the same SceneData → SceneFactory::CreateScene() path. No branching, no separate configurators.
 
 ---
 
@@ -1168,9 +1097,9 @@ SceneManager::m_scenes.emplace(id, scene)
 - `src/entity/EntityManager.cpp` (update implementation)
 - `tests/entity/FlatbuffersConfigurator.test.cpp` → update
 
-### Phase 2: Scene Configuration Removal
+### Phase 2: Scene Configuration Removal and SceneFactory Simplification
 
-**Goal**: Remove Scene::ConfigureFromDefault() method
+**Goal**: Remove Scene::ConfigureFromDefault() and simplify SceneFactory to single path
 
 **Steps**:
 
@@ -1178,10 +1107,12 @@ SceneManager::m_scenes.emplace(id, scene)
    - Delete method from Scene.h and Scene.cpp
    - Configuration now happens externally in SceneFactory
 
-2. **Update SceneFactory**
-   - SceneFactory now handles all configuration
-   - Directly calls IEntityConfigurator::ConfigureFromDefault()
-   - No delegation to Scene::ConfigureFromDefault()
+2. **Update SceneFactory to single CreateScene() method**
+   - Single CreateScene(SceneData, GameContext) method
+   - Works the same for default and saved scenes
+   - No branching or configurator selection
+   - Directly calls IEntityConfigurator::Configure()
+   - Directly calls LogicFactory::CreateLogicMap()
 
 3. **Update tests**
    - Test configuration happens in SceneFactory tests
@@ -1190,46 +1121,14 @@ SceneManager::m_scenes.emplace(id, scene)
 **Files to change**:
 - `src/scenes/Scene.h` (remove ConfigureFromDefault)
 - `src/scenes/Scene.cpp` (remove implementation)
-- `src/scenes/SceneFactory.cpp` (update to configure directly)
+- `src/scenes/SceneFactory.h` (simplified interface)
+- `src/scenes/SceneFactory.cpp` (single CreateScene method)
 - `tests/scenes/Scene.test.cpp` (update tests)
-
-### Phase 3: Abstract Scene Configurator
-
-**Goal**: Introduce ISceneConfigurator interface and implementations
-
-**Steps**:
-
-1. **Create ISceneConfigurator interface**
-   - Define virtual methods: ConfigureRenderTexture, ConfigureEntities, ConfigureLogic
-   - Create DefaultSceneConfigurator implementation
-   - Create SavedSceneConfigurator implementation (stub for now)
-
-2. **Update SceneFactory**
-   - Accept ISceneConfigurator in constructor
-   - Use configurator for all configuration steps
-   - Remove direct configuration code
-
-3. **Write tests**
-   - Test ISceneConfigurator interface
-   - Test DefaultSceneConfigurator
-   - Test MockSceneConfigurator
-
-**Files to create**:
-- `src/scenes/ISceneConfigurator.h`
-- `src/scenes/DefaultSceneConfigurator.h`
-- `src/scenes/DefaultSceneConfigurator.cpp`
-- `src/scenes/SavedSceneConfigurator.h`
-- `src/scenes/SavedSceneConfigurator.cpp`
-- `tests/scenes/ISceneConfigurator.test.cpp`
-
-**Files to change**:
-- `src/scenes/SceneFactory.h` (accept ISceneConfigurator)
-- `src/scenes/SceneFactory.cpp` (use configurator)
 - `tests/scenes/SceneFactory.test.cpp` (update tests)
 
-### Phase 4: SceneManager Data Sourcing
+### Phase 3: SceneManager Data Sourcing
 
-**Goal**: Update SceneManager to handle data source selection
+**Goal**: Update SceneManager to handle data source selection with unified SceneData
 
 **Steps**:
 
@@ -1239,16 +1138,14 @@ SceneManager::m_scenes.emplace(id, scene)
 
 2. **Implement LoadSceneFromDefault()**
    - Get SceneData from ISceneDataProvider
-   - Create DefaultSceneConfigurator
-   - Create SceneFactory with configurator
-   - Delegate to CreateSceneFromData()
+   - Create SceneFactory (no configurator needed)
+   - Call SceneFactory::CreateScene() - same method for all
 
 3. **Implement LoadSceneFromSave()**
    - Get SaveData from ISaveDataProvider
-   - Extract SceneData (simple for now, SceneDataExtractor in future)
-   - Create SavedSceneConfigurator
-   - Create SceneFactory with configurator
-   - Delegate to CreateSceneFromData()
+   - Extract SceneData (SceneDataExtractor)
+   - Create SceneFactory (same factory as default)
+   - Call SceneFactory::CreateScene() - SAME METHOD
 
 4. **Refactor existing methods**
    - AddSceneFromDefault() calls LoadSceneFromDefault()
@@ -1260,17 +1157,12 @@ SceneManager::m_scenes.emplace(id, scene)
 - `src/scenes/SceneManager.cpp` (implement new methods)
 - `tests/scenes/SceneManager.test.cpp` (update tests)
 
-### Phase 5: Future Enhancements
+### Phase 4: Future Enhancements
 
 **SceneDataExtractor** (when SaveData has scene_states):
 - Create SceneDataExtractor class
 - Implement ExtractSceneData() method
 - Use in LoadSceneFromSave()
-
-**Additional Configurators**:
-- NetworkSceneConfigurator (for multiplayer)
-- ProceduralSceneConfigurator (for procedural generation)
-- TestSceneConfigurator (for advanced testing)
 
 **Additional EntityConfigurators**:
 - JsonEntityConfigurator (JSON data source)
@@ -1288,22 +1180,19 @@ SceneManager::m_scenes.emplace(id, scene)
    - No external API changes
    - Can be tested independently
 
-2. ✅ **Phase 2: Remove Scene::ConfigureFromDefault()**
-   - Medium risk - changes Scene API
-   - But Scene API is internal to engine
+2. ✅ **Phase 2: Simplify SceneFactory**
+   - Medium risk - changes Scene and SceneFactory APIs
+   - But both are internal to engine
+   - Single path through factory - no branching
    - Tests verify correctness
 
-3. ✅ **Phase 3: Abstract Scene Configurator**
-   - Low risk - adds new classes
-   - Doesn't remove existing functionality
-   - Fully backwards compatible initially
-
-4. ✅ **Phase 4: SceneManager Data Sourcing**
+3. ✅ **Phase 3: SceneManager Data Sourcing**
    - Medium risk - changes SceneManager behavior
    - But maintains existing public API
    - LoadTitleScene(), LoadCraftingScene() still work
+   - SceneManager provides unified SceneData
 
-5. ⏳ **Phase 5: Future Enhancements**
+4. ⏳ **Phase 4: Future Enhancements**
    - Low risk - adds new capabilities
    - Doesn't change existing code
    - Opt-in functionality
@@ -1313,9 +1202,8 @@ SceneManager::m_scenes.emplace(id, scene)
 Each phase can be rolled back independently:
 
 - **Phase 1**: Revert EntityConfigurator changes, restore overloaded methods
-- **Phase 2**: Re-add Scene::ConfigureFromDefault() wrapper
-- **Phase 3**: Remove ISceneConfigurator, revert SceneFactory
-- **Phase 4**: Revert SceneManager, keep old AddSceneFromDefault()
+- **Phase 2**: Re-add Scene::ConfigureFromDefault() wrapper, revert SceneFactory
+- **Phase 3**: Revert SceneManager, keep old AddSceneFromDefault()
 
 ### Testing Strategy
 
@@ -1472,33 +1360,46 @@ SceneData scene_data = extractor.ExtractSceneData(save_data);
 
 1. **SceneManager as Orchestrator**
    - ✅ SceneManager determines data source (default vs save)
-   - ✅ Provides unified SceneData to SceneFactory
+   - ✅ Provides unified SceneData to SceneFactory (same interface regardless of source)
    - ✅ Delegates to appropriate providers (ISceneDataProvider, ISaveDataProvider)
 
-2. **Abstract Factory Pattern for Scenes**
-   - ✅ Use ISceneConfigurator interface
-   - ✅ DefaultSceneConfigurator for new games
-   - ✅ SavedSceneConfigurator for loaded games
-   - ✅ SceneFactory accepts configurator strategy
+2. **Single Path Through SceneFactory**
+   - ✅ One CreateScene() method that works the same for default and saved
+   - ✅ No branching or configurator selection
+   - ✅ No ISceneConfigurator hierarchy needed
+   - ✅ Simple and direct
 
-3. **Abstract EntityConfigurator**
+3. **Self-Contained Configurators**
+   - ✅ Each configurator manages its own data loading
+   - ✅ IEntityConfigurator with m_data_loader member
+   - ✅ LogicFactory with its own data loading
+   - ✅ No intermediate struct copying
+
+4. **Abstract EntityConfigurator**
    - ✅ Define virtual methods (not overloads)
    - ✅ IEntityConfigurator interface
    - ✅ FlatbuffersEntityConfigurator implementation
-   - ✅ Support for ConfigureFromDefault, ConfigureFromSave, ConfigureFromTest
+   - ✅ Configure() method handles its own data loading
 
-4. **Remove Scene::Configure()**
+5. **Remove Scene::Configure()**
    - ✅ Scene is structural container only
    - ✅ Configuration happens externally in SceneFactory
    - ✅ Cleaner separation of concerns
 
+6. **Data-Agnostic Scene**
+   - ✅ Scene contains data directly (no intermediate copying)
+   - ✅ Scene doesn't know about FlatBuffers or JSON formats
+   - ✅ Configurators handle format-specific details
+
 ### Benefits of This Architecture
 
-✅ **Flexibility**: Runtime strategy selection via abstract factory  
+✅ **Simplicity**: Single path through SceneFactory, no branching  
+✅ **No intermediate copying**: Scene contains data directly  
+✅ **Self-contained**: Each configurator manages its own data loading  
 ✅ **Testability**: All components mockable via interfaces  
-✅ **Extensibility**: Easy to add new data sources and configurators  
+✅ **Extensibility**: Easy to add new data sources (JSON, XML, Lua)  
 ✅ **Maintainability**: Clear responsibilities, single purpose classes  
-✅ **Type Safety**: Working with C++ structs, not FlatBuffers types  
+✅ **Data-agnostic**: Scene doesn't know about data format  
 ✅ **Future-Proof**: Ready for save/load, multiplayer, procedural generation
 
 ### Next Steps
@@ -1526,18 +1427,10 @@ SceneManager::LoadSceneFromDefault(const SceneType &scene_type) {
     return std::unexpected(scene_data_result.error());
   }
   
-  // 2. Create entity configurator
-  auto entity_configurator = std::make_unique<FlatbuffersEntityConfigurator>(
-      m_game_context.event_handler);
+  // 2. Create factory (no configurator needed - single path)
+  SceneFactory scene_factory;
   
-  // 3. Create scene configurator
-  auto scene_configurator = std::make_unique<DefaultSceneConfigurator>(
-      std::move(entity_configurator));
-  
-  // 4. Create factory with configurator
-  SceneFactory scene_factory(std::move(scene_configurator));
-  
-  // 5. Create scene
+  // 3. Create scene (same method for default and saved)
   auto scene_result = scene_factory.CreateScene(
       scene_data_result.value(),
       m_game_context);
@@ -1546,11 +1439,11 @@ SceneManager::LoadSceneFromDefault(const SceneType &scene_type) {
     return std::unexpected(scene_result.error());
   }
   
-  // 6. Add to map
+  // 4. Add to map
   auto scene_id = scene_result.value()->GetSceneInfo().id;
   m_scenes.emplace(scene_id, std::move(scene_result.value()));
   
-  // 7. Load assets
+  // 5. Load assets
   auto asset_result = m_game_context.asset_manager.LoadSceneAssets(scene_type);
   if (!asset_result) {
     return std::unexpected(asset_result.error());
@@ -1580,18 +1473,10 @@ SceneManager::LoadSceneFromSave(uint32_t slot_index) {
     return std::unexpected(scene_data_result.error());
   }
   
-  // 3. Create entity configurator for saved data
-  auto entity_configurator = std::make_unique<FlatbuffersEntityConfigurator>(
-      m_game_context.event_handler);
+  // 3. Create factory (same factory, no configurator needed)
+  SceneFactory scene_factory;
   
-  // 4. Create scene configurator for saved data
-  auto scene_configurator = std::make_unique<SavedSceneConfigurator>(
-      std::move(entity_configurator));
-  
-  // 5. Create factory with configurator
-  SceneFactory scene_factory(std::move(scene_configurator));
-  
-  // 6. Create scene
+  // 4. Create scene (SAME METHOD as default)
   auto scene_result = scene_factory.CreateScene(
       scene_data_result.value(),
       m_game_context);
@@ -1600,11 +1485,11 @@ SceneManager::LoadSceneFromSave(uint32_t slot_index) {
     return std::unexpected(scene_result.error());
   }
   
-  // 7. Add to map
+  // 5. Add to map
   auto scene_id = scene_result.value()->GetSceneInfo().id;
   m_scenes.emplace(scene_id, std::move(scene_result.value()));
   
-  // 8. Load assets
+  // 6. Load assets
   auto asset_result = m_game_context.asset_manager.LoadSceneAssets(
       scene_data_result.value().scene_type);
   if (!asset_result) {
@@ -1615,7 +1500,7 @@ SceneManager::LoadSceneFromSave(uint32_t slot_index) {
 }
 ```
 
-### Complete Example: SceneFactory with Configurator
+### Complete Example: SceneFactory Single Path
 
 ```cpp
 // In SceneFactory
@@ -1641,13 +1526,25 @@ SceneFactory::CreateScene(const SceneData &scene_data,
                                      "Unknown SceneType"});
   }
   
-  // 3. Configure render texture using strategy
-  auto texture_result = m_configurator->ConfigureRenderTexture(*scene_ptr, scene_data);
-  if (!texture_result) {
-    return std::unexpected(texture_result.error());
+  // 3. Configure render texture from SceneData
+  sf::Vector2u texture_size(scene_data.render_texture_width,
+                           scene_data.render_texture_height);
+  scene_ptr->m_scene_resources.scene_texture = sf::RenderTexture(texture_size);
+  
+  // 4. Configure entities
+  // EntityConfigurator is self-contained and manages its own data loading
+  auto entity_configurator = std::make_unique<FlatbuffersEntityConfigurator>(
+      game_context.event_handler);
+  
+  auto entities_result = entity_configurator->Configure(
+      scene_ptr->m_scene_resources.entity_manager,
+      scene_data.scene_type);
+  
+  if (!entities_result) {
+    return std::unexpected(entities_result.error());
   }
   
-  // 4. Configure entities using strategy
+  // 5. Generate archetypes
   auto entities_result = m_configurator->ConfigureEntities(*scene_ptr, scene_data);
   if (!entities_result) {
     return std::unexpected(entities_result.error());
@@ -1660,15 +1557,26 @@ SceneFactory::CreateScene(const SceneData &scene_data,
     return std::unexpected(archetype_result.error());
   }
   
-  // 6. Configure logic using strategy
-  auto logic_result = m_configurator->ConfigureLogic(*scene_ptr, scene_data);
-  if (!logic_result) {
-    return std::unexpected(logic_result.error());
+  // 6. Configure logic
+  // LogicFactory is self-contained and manages its own data loading
+  LogicFactory logic_factory(scene_data.scene_type, scene_ptr->GetSceneContext());
+  
+  auto logic_map_result = logic_factory.CreateLogicMap();
+  if (!logic_map_result) {
+    return std::unexpected(logic_map_result.error());
   }
+  
+  scene_ptr->SetLogicMap(std::move(logic_map_result.value()));
   
   return scene_ptr;
 }
 ```
+
+**Key Points:**
+- Single CreateScene() method works the same for default and saved scenes
+- No branching or configurator selection
+- Configurators (EntityConfigurator, LogicFactory) are self-contained
+- Scene doesn't know about data format
 
 ---
 
