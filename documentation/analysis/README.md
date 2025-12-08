@@ -22,8 +22,34 @@ This directory contains comprehensive analysis reports and architectural documen
 
 ## 📋 Analysis Reports
 
-### 🆕 [CURRENT_STATE_ANALYSIS_2025.md](./CURRENT_STATE_ANALYSIS_2025.md)
-**Latest comprehensive analysis** (Created: Dec 5, 2025)
+### 🆕 [SCENE_FACTORY_AND_CONFIGURATOR_ANALYSIS.md](./SCENE_FACTORY_AND_CONFIGURATOR_ANALYSIS.md)
+**Latest architectural analysis** (Created: Dec 8, 2025)
+
+Complete architectural analysis for Scene data sourcing and factory patterns covering:
+- SceneManager data sourcing strategy (default vs saved scenes)
+- Abstract factory pattern evaluation vs overloaded configuration
+- EntityConfigurator abstraction design (virtual methods vs overloads)
+- Removal of Scene::Configure() method
+- 5-phase implementation strategy with migration path
+- Detailed code examples for all patterns
+
+**Key Recommendations**:
+- ✅ Use Abstract Factory Pattern for Scene configuration
+- ✅ SceneManager orchestrates data source selection
+- ✅ Abstract EntityConfigurator with virtual methods (replace overloads)
+- ✅ Remove Scene::Configure() - configuration happens externally
+- ✅ 5-phase migration with low-risk incremental changes
+
+**Companion Documents**:
+- [SCENE_FACTORY_QUICK_REF.md](./SCENE_FACTORY_QUICK_REF.md) - Quick reference guide
+- [SCENE_FACTORY_VISUALS.md](./SCENE_FACTORY_VISUALS.md) - Visual diagrams
+
+**Start here for**: Scene factory architecture and configuration patterns
+
+---
+
+### [CURRENT_STATE_ANALYSIS_2025.md](./CURRENT_STATE_ANALYSIS_2025.md)
+**Previous comprehensive analysis** (Created: Dec 5, 2025)
 
 Complete state assessment covering:
 - Mixed/incomplete system migrations (provider pattern 80% done)
@@ -39,7 +65,7 @@ Complete state assessment covering:
 - Test coverage gaps (17% Logic classes, 29% components)
 - Two test approaches need guidance (TestFixture vs TestEngine)
 
-**Start here for**: Most current analysis and recommendations
+**Use this for**: General codebase state and improvement plans
 
 ---
 
@@ -122,6 +148,8 @@ Analysis of TestFixture implementation and usage patterns.
 | What's wrong with the codebase? | [ANALYSIS_QUICK_REFERENCE.md](./ANALYSIS_QUICK_REFERENCE.md) |
 | What needs to be fixed? | [COMPREHENSIVE_CODEBASE_ANALYSIS.md](./COMPREHENSIVE_CODEBASE_ANALYSIS.md) |
 | How does the architecture work? | [ARCHITECTURE_DIAGRAMS.md](./ARCHITECTURE_DIAGRAMS.md) |
+| How should Scene factory be designed? | [SCENE_FACTORY_AND_CONFIGURATOR_ANALYSIS.md](./SCENE_FACTORY_AND_CONFIGURATOR_ANALYSIS.md) |
+| What's the Scene configuration strategy? | [SCENE_FACTORY_QUICK_REF.md](./SCENE_FACTORY_QUICK_REF.md) |
 | What should I work on this week? | [ANALYSIS_QUICK_REFERENCE.md](./ANALYSIS_QUICK_REFERENCE.md) → Action Items |
 | How do I test a Logic class? | [ANALYSIS_QUICK_REFERENCE.md](./ANALYSIS_QUICK_REFERENCE.md) → Test Infrastructure |
 | What's the implementation plan? | [COMPREHENSIVE_CODEBASE_ANALYSIS.md](./COMPREHENSIVE_CODEBASE_ANALYSIS.md) → Implementation Plan |
@@ -132,15 +160,23 @@ Analysis of TestFixture implementation and usage patterns.
 
 ### For New Contributors
 
-1. **Read**: [ANALYSIS_QUICK_REFERENCE.md](./ANALYSIS_QUICK_REFERENCE.md) (10 minutes)
+1. **Read**: [SCENE_FACTORY_QUICK_REF.md](./SCENE_FACTORY_QUICK_REF.md) (10 minutes)
+   - If working on Scene architecture
+   - Understand factory patterns and configuration strategies
+
+2. **Read**: [ANALYSIS_QUICK_REFERENCE.md](./ANALYSIS_QUICK_REFERENCE.md) (10 minutes)
    - Get overview of current issues
    - Understand priorities
 
-2. **Review**: [ARCHITECTURE_DIAGRAMS.md](./ARCHITECTURE_DIAGRAMS.md) (20 minutes)
+3. **Review**: [ARCHITECTURE_DIAGRAMS.md](./ARCHITECTURE_DIAGRAMS.md) (20 minutes)
    - Understand system design
    - See component relationships
 
-3. **Deep Dive**: [COMPREHENSIVE_CODEBASE_ANALYSIS.md](./COMPREHENSIVE_CODEBASE_ANALYSIS.md) (60 minutes)
+4. **Deep Dive**: [SCENE_FACTORY_AND_CONFIGURATOR_ANALYSIS.md](./SCENE_FACTORY_AND_CONFIGURATOR_ANALYSIS.md) (60 minutes)
+   - For Scene factory implementation
+   - See detailed patterns and examples
+
+5. **Deep Dive**: [COMPREHENSIVE_CODEBASE_ANALYSIS.md](./COMPREHENSIVE_CODEBASE_ANALYSIS.md) (60 minutes)
    - Understand full context
    - See detailed recommendations
 
@@ -225,6 +261,6 @@ For questions about:
 
 ---
 
-**Last Updated**: December 3, 2025  
-**Analysis Version**: 1.0  
-**Total Documents**: 3 new + 5 historical
+**Last Updated**: December 8, 2025  
+**Analysis Version**: 2.0  
+**Total Documents**: 6 new + 5 historical
