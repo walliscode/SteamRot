@@ -4,7 +4,7 @@ include "ui_state.fbs";
 namespace steamrot;
 
 
-table EntityData{
+table EntityDataFbs{
   index: uint32;
   c_user_interface: UserInterfaceData;
   c_grimoire_machina: GrimoireMachinaData;
@@ -13,8 +13,8 @@ table EntityData{
   }
 
 // wrapper table to allow for metadata in the future
-table EntityCollection {
-  entities: [EntityData] (required);
+table EntityCollectionFbs {
+  entities: [EntityDataFbs] (required);
   entity_memory_pool_size: int;
 }
 

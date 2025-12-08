@@ -13,7 +13,7 @@
 #include "containers.h"
 
 namespace steamrot {
-class FlatbuffersConfigurator;
+class FlatbuffersEntityConfigurator;
 }
 
 namespace steamrot::tests {

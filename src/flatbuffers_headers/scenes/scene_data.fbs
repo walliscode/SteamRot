@@ -15,7 +15,7 @@ table SceneDataFbs{
     scene_info: SceneInfoFbs;
     scene_resources: SceneResourcesFbs;
     assets: AssetCollection;
-    entity_collection: EntityCollection;
+    entity_collection: EntityCollectionFbs;
     logic_collection_data: LogicCollectionData;
   }
 

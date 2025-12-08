@@ -1,7 +1,7 @@
 add_executable(test_entity
   EntityManager.test.cpp
   ArchetypeManager.test.cpp
-  FlatbuffersConfigurator.test.cpp
+  FlatbuffersEntityConfigurator.test.cpp
   entity_test_helpers.test.cpp
   archetype_helpers.test.cpp
 )

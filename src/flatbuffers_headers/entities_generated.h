@@ -19,14 +19,14 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
-struct EntityData;
-struct EntityDataBuilder;
+struct EntityDataFbs;
+struct EntityDataFbsBuilder;
 
-struct EntityCollection;
-struct EntityCollectionBuilder;
+struct EntityCollectionFbs;
+struct EntityCollectionFbsBuilder;
 
-struct EntityData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef EntityDataBuilder Builder;
+struct EntityDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef EntityDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_INDEX = 4,
     VT_C_USER_INTERFACE = 6,
@@ -58,40 +58,40 @@ struct EntityData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct EntityDataBuilder {
-  typedef EntityData Table;
+struct EntityDataFbsBuilder {
+  typedef EntityDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_index(uint32_t index) {
-    fbb_.AddElement<uint32_t>(EntityData::VT_INDEX, index, 0);
+    fbb_.AddElement<uint32_t>(EntityDataFbs::VT_INDEX, index, 0);
   }
   void add_c_user_interface(::flatbuffers::Offset<steamrot::UserInterfaceData> c_user_interface) {
-    fbb_.AddOffset(EntityData::VT_C_USER_INTERFACE, c_user_interface);
+    fbb_.AddOffset(EntityDataFbs::VT_C_USER_INTERFACE, c_user_interface);
   }
   void add_c_grimoire_machina(::flatbuffers::Offset<steamrot::GrimoireMachinaData> c_grimoire_machina) {
-    fbb_.AddOffset(EntityData::VT_C_GRIMOIRE_MACHINA, c_grimoire_machina);
+    fbb_.AddOffset(EntityDataFbs::VT_C_GRIMOIRE_MACHINA, c_grimoire_machina);
   }
   void add_c_ui_state(::flatbuffers::Offset<steamrot::UIStateCollectionData> c_ui_state) {
-    fbb_.AddOffset(EntityData::VT_C_UI_STATE, c_ui_state);
+    fbb_.AddOffset(EntityDataFbs::VT_C_UI_STATE, c_ui_state);
   }
-  explicit EntityDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit EntityDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<EntityData> Finish() {
+  ::flatbuffers::Offset<EntityDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<EntityData>(end);
+    auto o = ::flatbuffers::Offset<EntityDataFbs>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<EntityData> CreateEntityData(
+inline ::flatbuffers::Offset<EntityDataFbs> CreateEntityDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t index = 0,
     ::flatbuffers::Offset<steamrot::UserInterfaceData> c_user_interface = 0,
     ::flatbuffers::Offset<steamrot::GrimoireMachinaData> c_grimoire_machina = 0,
     ::flatbuffers::Offset<steamrot::UIStateCollectionData> c_ui_state = 0) {
-  EntityDataBuilder builder_(_fbb);
+  EntityDataFbsBuilder builder_(_fbb);
   builder_.add_c_ui_state(c_ui_state);
   builder_.add_c_grimoire_machina(c_grimoire_machina);
   builder_.add_c_user_interface(c_user_interface);
@@ -99,14 +99,14 @@ inline ::flatbuffers::Offset<EntityData> CreateEntityData(
   return builder_.Finish();
 }
 
-struct EntityCollection FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef EntityCollectionBuilder Builder;
+struct EntityCollectionFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef EntityCollectionFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ENTITIES = 4,
     VT_ENTITY_MEMORY_POOL_SIZE = 6
   };
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EntityData>> *entities() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EntityData>> *>(VT_ENTITIES);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EntityDataFbs>> *entities() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EntityDataFbs>> *>(VT_ENTITIES);
   }
   int32_t entity_memory_pool_size() const {
     return GetField<int32_t>(VT_ENTITY_MEMORY_POOL_SIZE, 0);
@@ -121,44 +121,44 @@ struct EntityCollection FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct EntityCollectionBuilder {
-  typedef EntityCollection Table;
+struct EntityCollectionFbsBuilder {
+  typedef EntityCollectionFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_entities(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EntityData>>> entities) {
-    fbb_.AddOffset(EntityCollection::VT_ENTITIES, entities);
+  void add_entities(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EntityDataFbs>>> entities) {
+    fbb_.AddOffset(EntityCollectionFbs::VT_ENTITIES, entities);
   }
   void add_entity_memory_pool_size(int32_t entity_memory_pool_size) {
-    fbb_.AddElement<int32_t>(EntityCollection::VT_ENTITY_MEMORY_POOL_SIZE, entity_memory_pool_size, 0);
+    fbb_.AddElement<int32_t>(EntityCollectionFbs::VT_ENTITY_MEMORY_POOL_SIZE, entity_memory_pool_size, 0);
   }
-  explicit EntityCollectionBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit EntityCollectionFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<EntityCollection> Finish() {
+  ::flatbuffers::Offset<EntityCollectionFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<EntityCollection>(end);
-    fbb_.Required(o, EntityCollection::VT_ENTITIES);
+    auto o = ::flatbuffers::Offset<EntityCollectionFbs>(end);
+    fbb_.Required(o, EntityCollectionFbs::VT_ENTITIES);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<EntityCollection> CreateEntityCollection(
+inline ::flatbuffers::Offset<EntityCollectionFbs> CreateEntityCollectionFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EntityData>>> entities = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EntityDataFbs>>> entities = 0,
     int32_t entity_memory_pool_size = 0) {
-  EntityCollectionBuilder builder_(_fbb);
+  EntityCollectionFbsBuilder builder_(_fbb);
   builder_.add_entity_memory_pool_size(entity_memory_pool_size);
   builder_.add_entities(entities);
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<EntityCollection> CreateEntityCollectionDirect(
+inline ::flatbuffers::Offset<EntityCollectionFbs> CreateEntityCollectionFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<steamrot::EntityData>> *entities = nullptr,
+    const std::vector<::flatbuffers::Offset<steamrot::EntityDataFbs>> *entities = nullptr,
     int32_t entity_memory_pool_size = 0) {
-  auto entities__ = entities ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::EntityData>>(*entities) : 0;
-  return steamrot::CreateEntityCollection(
+  auto entities__ = entities ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::EntityDataFbs>>(*entities) : 0;
+  return steamrot::CreateEntityCollectionFbs(
       _fbb,
       entities__,
       entity_memory_pool_size);

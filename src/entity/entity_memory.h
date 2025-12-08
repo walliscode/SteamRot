@@ -46,6 +46,14 @@ const T &GetComponent(size_t entity_id,
 }
 
 /////////////////////////////////////////////////
+/// @brief Resize the entity memory pool
+///
+/// @param entity_memory_pool EntityMemoryPool instance to resize
+/// @param new_size New size for the memory pool
+/////////////////////////////////////////////////
+void ResizeEntityMemoryPool(EntityMemoryPool &entity_memory_pool,
+                            const size_t new_size);
+/////////////////////////////////////////////////
 /// @brief Getter for the component vector of a given type
 ///
 /// @param entity_memory_pool Instance of EntityMemoryPool

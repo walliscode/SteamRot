@@ -6,41 +6,83 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "FlatbuffersConfigurator.h"
-#include "CUIState.h"
-#include "CUserInterface.h"
-#include "EntityConfigurator.h"
-#include "subscriber_factory.h"
+#include "FlatbuffersEntityConfigurator.h"
+#include "FailInfo.h"
+#include "FlatbuffersDataLoader.h"
+#include "FlatbuffersSubscriberViewer.h"
 #include "UIElementFactory.h"
 #include "entity_memory.h"
-
-#include "user_interface_generated.h"
+#include "ui_state_generated.h"
 #include <expected>
 #include <variant>
-#include <vector>
 
 namespace steamrot {
 /////////////////////////////////////////////////
-FlatbuffersConfigurator::FlatbuffersConfigurator(EventHandler &event_handler)
-    : EntityConfigurator(event_handler), m_data_loader() {}
+FlatbuffersEntityConfigurator::FlatbuffersEntityConfigurator(
+    EventHandler &event_handler,
+    const EntityCollectionFbs &entity_collection_data)
+    : m_entity_collection_data(entity_collection_data),
+      IEntityConfigurator(event_handler) {}
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-FlatbuffersConfigurator::ConfigureEntitiesFromDefaultData(
-    EntityMemoryPool &entity_memory_pool, const SceneType scene_type) {
+FlatbuffersEntityConfigurator::ConfigureEntityMemoryPool(
+    EntityMemoryPool &emp) {
 
-  // get the entity collection from the flatbuffers data loader
-  const SceneDataData *scene_data =
-      m_data_loader.ProvideDefaultSceneData(scene_type).value();
+  // resize the entity memory pool based on the flatbuffers data
+  entity::memory::ResizeEntityMemoryPool(
+      emp, m_entity_collection_data.entity_memory_pool_size());
 
-  // delegate to ConfigureEntitiesFromCollection
-  return ConfigureEntitiesFromCollection(entity_memory_pool,
-                                         scene_data->entity_collection());
+  // configure first layer components
+  auto first_layer_result = ConfigureFirstLayerComponents(emp);
+  if (!first_layer_result.has_value())
+    return std::unexpected(first_layer_result.error());
+
+  // configure second layer components
+  auto second_layer_result = ConfigureSecondLayerComponents(emp);
+  if (!second_layer_result.has_value())
+    return std::unexpected(second_layer_result.error());
+
+  return std::monostate();
+};
+
+/////////////////////////////////////////////////
+
+std::expected<std::monostate, FailInfo>
+FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents(
+    EntityMemoryPool &emp) {
+
+  ///// JUST FOR FIRST LAYER COMPONENTS /////
+
+  // cycle through each entity in the collection and configure it
+  for (const auto &entity_data : *m_entity_collection_data.entities()) {
+
+    //  upate the current EntityDataFbs pointer
+    m_current_entity_data = entity_data;
+
+    // check the data and configure compoenent if data exists
+    if (entity_data->c_user_interface()) {
+      auto configure_result =
+          ConfigureComponent(entity::memory::GetComponent<CUserInterface>(
+              entity_data->index(), emp));
+      if (!configure_result.has_value())
+        return std::unexpected(configure_result.error());
+    }
+
+    if (entity_data->c_grimoire_machina()) {
+      auto configure_result =
+          ConfigureComponent(entity::memory::GetComponent<CGrimoireMachina>(
+              entity_data->index(), emp));
+      if (!configure_result.has_value())
+        return std::unexpected(configure_result.error());
+    }
+  }
+  return std::monostate();
 };
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-FlatbuffersConfigurator::ConfigureComponent(Component &component) {
+FlatbuffersEntityConfigurator::ConfigureComponent(Component &component) {
   // any general configuration logic for the base Component class
   // can be added here if needed
   component.m_active = true;
@@ -50,14 +92,17 @@ FlatbuffersConfigurator::ConfigureComponent(Component &component) {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-FlatbuffersConfigurator::ConfigureComponent(const UserInterfaceData *ui_data,
-                                            CUserInterface &ui_component) {
+FlatbuffersEntityConfigurator::ConfigureCUserInterface(
+    CUserInterface &ui_component) {
   // configure the underlying Component type
   auto configure_result =
       ConfigureComponent(static_cast<Component &>(ui_component));
 
   if (!configure_result.has_value())
     return std::unexpected(configure_result.error());
+
+  // ge thte UserInterfaceData from the current entity data
+  const UserInterfaceData *ui_data = m_current_entity_data->c_user_interface();
 
   // configure the CUserInterface specific data, wrap in if statements to avoid
   // any segfaults
@@ -83,13 +128,13 @@ FlatbuffersConfigurator::ConfigureComponent(const UserInterfaceData *ui_data,
     return std::unexpected(root_element_result.error());
 
   ui_component.m_root_element = std::move(root_element_result.value());
+
   return std::monostate{};
 }
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-FlatbuffersConfigurator::ConfigureComponent(
-    const GrimoireMachinaData *grimoire_data,
+FlatbuffersEntityConfigurator::ConfigureCGrimoireMachina(
     CGrimoireMachina &grimoire_component) {
 
   // configure the underlying Component type
@@ -99,6 +144,10 @@ FlatbuffersConfigurator::ConfigureComponent(
   if (!configure_result.has_value())
     return std::unexpected(configure_result.error());
 
+  // get the GrimoireMachinaData from the current entity data
+  const GrimoireMachinaData *grimoire_data =
+      m_current_entity_data->c_grimoire_machina();
+
   // configure the CGrimoireMachina specific data
   std::vector<std::string> fragment_names;
   if (grimoire_data->fragments()) {
@@ -106,8 +155,10 @@ FlatbuffersConfigurator::ConfigureComponent(
       fragment_names.push_back(name->str());
     }
   }
+
   // attempt to load the fragments
-  auto fragment_load_result = m_data_loader.ProvideAllFragments(fragment_names);
+  FlatbuffersDataLoader data_loader;
+  auto fragment_load_result = data_loader.ProvideAllFragments(fragment_names);
 
   if (!fragment_load_result.has_value()) {
     FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
@@ -122,9 +173,8 @@ FlatbuffersConfigurator::ConfigureComponent(
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-FlatbuffersConfigurator::ConfigureComponent(
-    const UIStateCollectionData *ui_state_collection_data,
-    CUIState &ui_state_component, const EntityMemoryPool &entity_memory_pool) {
+FlatbuffersEntityConfigurator::ConfigureCUIState(CUIState &ui_state_component,
+                                                 EntityMemoryPool &emp) {
 
   // configure the underlying Component type
   auto configure_result =
@@ -132,6 +182,10 @@ FlatbuffersConfigurator::ConfigureComponent(
 
   if (!configure_result.has_value())
     return std::unexpected(configure_result.error());
+
+  // get the collection of UIStateData from the current entity data
+  const UIStateCollectionData *ui_state_collection_data =
+      m_current_entity_data->c_ui_state();
 
   // cycle through each UIStateData in the collection
   for (auto ui_state_data : *ui_state_collection_data->ui_states()) {
@@ -149,7 +203,7 @@ FlatbuffersConfigurator::ConfigureComponent(
 
     // get all UI components from the entity memory pool
     const auto &ui_components =
-        entity::memory::GetComponentVector<CUserInterface>(entity_memory_pool);
+        entity::memory::GetComponentVector<CUserInterface>(emp);
 
     UIVisibilityState visibility_state;
 
@@ -180,6 +234,7 @@ FlatbuffersConfigurator::ConfigureComponent(
     // repeat for ui names off
     if (ui_state_data->state_to_ui_visibility()->ui_names_off()) {
       std::vector<std::string> ui_names_vec;
+
       // create a vector of ui names for easier interaction
       for (const auto &ui_name :
            *ui_state_data->state_to_ui_visibility()->ui_names_off()) {
@@ -202,121 +257,28 @@ FlatbuffersConfigurator::ConfigureComponent(
     // Create and register subscribers if provided
     if (ui_state_data->subscribers()) {
 
-      // Collect all subscriber configs into a vector
-      std::vector<const SubscriberFbs *> subscribers_fbs;
-      for (const auto *subscriber_data : *ui_state_data->subscribers()) {
-        if (subscriber_data) {
-          subscribers_fbs.push_back(subscriber_data);
+      // create a FlatbuffersSubscriberViewer instance
+      FlatbuffersSubscriberViewer subscriber_viewer(
+          ui_state_data->subscribers());
+
+      // get the subscribers from the viewer
+      auto subscribers_result = subscriber_viewer.GetSubscribers();
+      if (!subscribers_result.has_value()) {
+        return std::unexpected(subscribers_result.error());
+      }
+      // assign the subscribers to the ui state component for this state key
+      ui_state_component.m_state_subscribers[state_key] =
+          subscribers_result.value();
+
+      // register each subscriber with the event handler
+      for (const auto &subscriber : subscribers_result.value()) {
+        auto reg_result = m_event_handler.RegisterSubscriber(subscriber);
+        if (!reg_result.has_value()) {
+          return std::unexpected(reg_result.error());
         }
       }
-
-      // Create and register all subscribers at once
-      auto result = subscriber_factory::CreateAndRegisterSubscribers(
-          subscribers_fbs, ui_state_component.m_state_subscribers[state_key],
-          m_event_handler);
-
-      if (!result.has_value()) {
-        return std::unexpected(result.error());
-      }
     }
   }
-  return std::monostate{};
-}
-
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-FlatbuffersConfigurator::ConfigureEntitiesFromCollection(
-    EntityMemoryPool &entity_memory_pool,
-    const EntityCollection *entity_collection) {
-
-  // check the list of entities is not empty
-  if (!entity_collection) {
-    FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
-                       "Entity data not found in the collection."};
-    return std::unexpected(fail_info);
-  }
-
-  // check that the entity memory pool size has been added
-  if (!entity_collection->entity_memory_pool_size()) {
-    FailInfo fail_info{
-        FailMode::FlatbuffersDataNotFound,
-        "No entity memory pool size found in the entity collection."};
-    return std::unexpected(fail_info);
-  }
-
-  // resize the entity memory pool to the size specified in the flatbuffers
-  size_t pool_size = entity_collection->entity_memory_pool_size();
-
-  std::apply(
-      [pool_size](auto &...component_vector) {
-        (component_vector.resize(pool_size), ...);
-      },
-      entity_memory_pool);
-
-  // some helper values
-  size_t entity_count = entity_collection->entities()->size();
-  // check the entity memory pool is big enough
-  if (entity::memory::GetMemoryPoolSize(entity_memory_pool) < entity_count) {
-    std::string fail_msg = std::format(
-        "Entity memory pool size: {}, required size: {}",
-        entity::memory::GetMemoryPoolSize(entity_memory_pool), entity_count);
-
-    FailInfo fail_info{FailMode::ParameterOutOfBounds, fail_msg};
-    return std::unexpected(fail_info);
-  }
-
-  // configure entities from the flatbuffers data
-  for (size_t i = 0; i < entity_count; ++i) {
-    const EntityData *entity_data = entity_collection->entities()->Get(i);
-
-    if (entity_data == nullptr) {
-      continue; // Skip null entities
-    }
-
-    // CUserInterface component configuration
-    if (entity_data->c_user_interface()) {
-      auto configure_result = ConfigureComponent(
-          entity_data->c_user_interface(),
-          entity::memory::GetComponent<CUserInterface>(i, entity_memory_pool));
-
-      if (!configure_result.has_value())
-        return std::unexpected(configure_result.error());
-    }
-
-    // CGrimoireMachina component configuration
-    if (entity_data->c_grimoire_machina()) {
-      auto configure_result =
-          ConfigureComponent(entity_data->c_grimoire_machina(),
-                             entity::memory::GetComponent<CGrimoireMachina>(
-                                 i, entity_memory_pool));
-
-      if (!configure_result.has_value())
-        return std::unexpected(configure_result.error());
-    }
-  }
-
-  // Configure compound components after simpler components
-  // CUIState needs to reference CUserInterface components by name
-  for (size_t i = 0; i < entity_count; ++i) {
-    const EntityData *entity_data = entity_collection->entities()->Get(i);
-
-    if (entity_data == nullptr) {
-      continue; // Skip null entities
-    }
-
-    // CUIState component configuration (compound component)
-    if (entity_data->c_ui_state()) {
-
-      auto configure_result = ConfigureComponent(
-          entity_data->c_ui_state(),
-          entity::memory::GetComponent<CUIState>(i, entity_memory_pool),
-          entity_memory_pool);
-
-      if (!configure_result.has_value())
-        return std::unexpected(configure_result.error());
-    }
-  }
-
   return std::monostate{};
 }
 

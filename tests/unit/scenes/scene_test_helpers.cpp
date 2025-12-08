@@ -39,7 +39,7 @@ void CheckDefaultSceneConfiguration(const Scene &scene) {
   // check entity memory pool default configuration by creating expected pool
   EntityMemoryPool expected_pool;
   steamrot::EventHandler event_handler;
-  FlatbuffersConfigurator configurator(event_handler);
+  FlatbuffersEntityConfigurator configurator(event_handler);
   auto result =
       configurator.ConfigureEntitiesFromDefaultData(expected_pool, scene_type);
   if (!result.has_value()) {
