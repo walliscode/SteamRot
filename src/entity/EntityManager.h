@@ -13,7 +13,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "ArchetypeManager.h"
-#include "EventHandler.h"
 #include "FailInfo.h"
 #include "containers.h"
 #include <cstddef>
@@ -45,11 +44,6 @@ private:
   /// this Scene
   /////////////////////////////////////////////////
   ArchetypeManager m_archetype_manager;
-
-  /////////////////////////////////////////////////
-  /// @brief Reference to the EventHandler for the game
-  /////////////////////////////////////////////////
-  EventHandler &m_event_handler;
 
   /////////////////////////////////////////////////
   /// @brief reset a component at a given index to default values
@@ -98,29 +92,12 @@ private:
 
 public:
   /////////////////////////////////////////////////
-  /// @brief Constructor for EntityManager
-  ///
-  /// @param event_handler Reference to the EventHandler for the game
-  /////////////////////////////////////////////////
-  EntityManager(EventHandler &event_handler);
-
-  /////////////////////////////////////////////////
   /// @brief Constructor for EntityManager with a specified pool size
   ///
   /// @param pool_size Size of the entity memory pool to be created
   /// @param event_handler Reference to the EventHandler for the game
   /////////////////////////////////////////////////
-  EntityManager(const size_t pool_size, EventHandler &event_handler);
-
-  /////////////////////////////////////////////////
-  /// @brief Call correct configurator to configure entities from default data
-  ///
-  /// @param scene_type SceneType to configure entities for
-  /// @param data_type DataType to configure entities from
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  ConfigureEntitiesFromDefaultData(const SceneType scene_type,
-                                   const DataType data_type);
+  EntityManager();
 
   /////////////////////////////////////////////////
   /// @brief Calls the ArchetypeManager to generate all archetypes from the

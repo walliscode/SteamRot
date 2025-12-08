@@ -38,6 +38,11 @@ public:
       : m_event_handler(event_handler) {}
 
   /////////////////////////////////////////////////
+  /// @brief Virtual destructor
+  /////////////////////////////////////////////////
+  virtual ~IEntityConfigurator() = default;
+
+  /////////////////////////////////////////////////
   /// @brief Configure the whole EntityMemoryPool with data
   ///
   /// @param emp EntityMemoryPool to configure

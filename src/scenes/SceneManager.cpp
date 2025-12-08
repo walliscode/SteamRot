@@ -48,7 +48,7 @@ std::expected<std::monostate, FailInfo>
 SceneManager::AddSceneFromDefault(const SceneType &scene_type) {
 
   // create SceneFactory object
-  SceneFactory scene_factory;
+  ISceneFactory scene_factory;
 
   auto scene_creation_result =
       scene_factory.CreateDefaultScene(scene_type, m_game_context);

@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////
 #include "LogicFactory.h"
 #include "CraftingRenderLogic.h"
-#include "subscriber_factory.h"
+
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
 #include "UIRenderLogic.h"

@@ -17,7 +17,7 @@ TEST_CASE("TitleScene's call of sRender is correct",
   // arrange
   steamrot::tests::TestFixture test_fixture;
   test_fixture.Intialize();
-  steamrot::SceneFactory scene_factory;
+  steamrot::ISceneFactory scene_factory;
 
   // create a TitleScene
   auto scene_creation_result = scene_factory.CreateDefaultScene(

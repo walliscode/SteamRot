@@ -27,9 +27,8 @@ namespace steamrot {
 /// scene members). This struct is default-constructible.
 /////////////////////////////////////////////////
 struct SceneResources {
-  SceneResources(const GameContext &game_context, EventHandler &event_handler)
-      : game_context(game_context),
-        entity_manager(EntityManager{event_handler}) {}
+  SceneResources(const GameContext &game_context)
+      : game_context(game_context), entity_manager() {}
 
   /////////////////////////////////////////////////
   /// @brief Entity Manager instance for this scene
