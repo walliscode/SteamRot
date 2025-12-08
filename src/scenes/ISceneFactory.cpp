@@ -7,6 +7,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "ISceneFactory.h"
+#include "CraftingScene.h"
+#include "TitleScene.h"
 #include <memory>
 
 namespace steamrot {
@@ -27,12 +29,6 @@ std::expected<std::unique_ptr<Scene>, FailInfo> ISceneFactory::CreateScene() {
     return std::unexpected(
         FailInfo{FailMode::NullPointer,
                  "IEntityConfigurator is not set in ISceneFactory"});
-  }
-  // if SceneType has not been set, return error
-  if (scene_type == SceneType::SceneType_UNKNOWN) {
-    return std::unexpected(
-        FailInfo{FailMode::EnumValueNotHandled,
-                 "SceneType has not been set in ISceneFactory"});
   }
 
   // Create a unique pointer to a Scene object
@@ -63,4 +59,33 @@ std::expected<std::unique_ptr<Scene>, FailInfo> ISceneFactory::CreateScene() {
   return scene_ptr;
 }
 
+/////////////////////////////////////////////////
+std::expected<std::unique_ptr<Scene>, FailInfo>
+ISceneFactory::CreateSceneByType() {
+  // guard statement if scene_type is unknown
+  if (scene_type == SceneType::SceneType_UNKNOWN) {
+    return std::unexpected(FailInfo{FailMode::EnumValueNotHandled,
+                                    "SceneType is UNKNOWN in ISceneFactory"});
+  }
+
+  std::unique_ptr<Scene> scene_ptr{nullptr};
+
+  switch (scene_type) {
+
+  case SceneType::SceneType_TITLE: {
+    auto title_ptr = new TitleScene(m_game_context);
+    scene_ptr = std::unique_ptr<TitleScene>(title_ptr);
+    return scene_ptr;
+  }
+  case SceneType::SceneType_CRAFTING: {
+    auto crafting_ptr = new CraftingScene(m_game_context);
+    scene_ptr = std::unique_ptr<CraftingScene>(crafting_ptr);
+    return scene_ptr;
+  }
+  default: {
+    return std::unexpected(FailInfo{FailMode::EnumValueNotHandled,
+                                    "SceneType not handled in ISceneFactory"});
+  }
+  }
+}
 } // namespace steamrot

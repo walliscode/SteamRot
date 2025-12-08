@@ -43,9 +43,6 @@ public:
   std::expected<std::unique_ptr<Scene>, FailInfo> CreateScene();
 
   virtual std::expected<std::monostate, FailInfo>
-  ConfigureSceneInfo(Scene &scene) = 0;
-
-  virtual std::expected<std::monostate, FailInfo>
   ConfigureSceneResources(Scene &scene) = 0;
 
   virtual std::expected<std::monostate, FailInfo>
