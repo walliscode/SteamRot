@@ -5,7 +5,6 @@
 
 namespace steamrot::entity::memory {
 /////////////////////////////////////////////////
-
 void ResizeEntityMemoryPool(EntityMemoryPool &entity_memory_pool,
                             const size_t new_size) {
   // Use std::apply to resize the memory pool with a lambda function

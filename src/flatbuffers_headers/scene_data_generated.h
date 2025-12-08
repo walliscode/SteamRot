@@ -108,8 +108,8 @@ struct SceneDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::AssetCollection *assets() const {
     return GetPointer<const steamrot::AssetCollection *>(VT_ASSETS);
   }
-  const steamrot::EntityCollection *entity_collection() const {
-    return GetPointer<const steamrot::EntityCollection *>(VT_ENTITY_COLLECTION);
+  const steamrot::EntityCollectionFbs *entity_collection() const {
+    return GetPointer<const steamrot::EntityCollectionFbs *>(VT_ENTITY_COLLECTION);
   }
   const steamrot::LogicCollectionData *logic_collection_data() const {
     return GetPointer<const steamrot::LogicCollectionData *>(VT_LOGIC_COLLECTION_DATA);
@@ -143,7 +143,7 @@ struct SceneDataFbsBuilder {
   void add_assets(::flatbuffers::Offset<steamrot::AssetCollection> assets) {
     fbb_.AddOffset(SceneDataFbs::VT_ASSETS, assets);
   }
-  void add_entity_collection(::flatbuffers::Offset<steamrot::EntityCollection> entity_collection) {
+  void add_entity_collection(::flatbuffers::Offset<steamrot::EntityCollectionFbs> entity_collection) {
     fbb_.AddOffset(SceneDataFbs::VT_ENTITY_COLLECTION, entity_collection);
   }
   void add_logic_collection_data(::flatbuffers::Offset<steamrot::LogicCollectionData> logic_collection_data) {
@@ -165,7 +165,7 @@ inline ::flatbuffers::Offset<SceneDataFbs> CreateSceneDataFbs(
     ::flatbuffers::Offset<steamrot::SceneInfoFbs> scene_info = 0,
     ::flatbuffers::Offset<SceneResourcesFbs> scene_resources = 0,
     ::flatbuffers::Offset<steamrot::AssetCollection> assets = 0,
-    ::flatbuffers::Offset<steamrot::EntityCollection> entity_collection = 0,
+    ::flatbuffers::Offset<steamrot::EntityCollectionFbs> entity_collection = 0,
     ::flatbuffers::Offset<steamrot::LogicCollectionData> logic_collection_data = 0) {
   SceneDataFbsBuilder builder_(_fbb);
   builder_.add_logic_collection_data(logic_collection_data);
