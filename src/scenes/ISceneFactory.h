@@ -15,7 +15,6 @@
 #include "FailInfo.h"
 #include "GameContext.h"
 #include "IEntityConfigurator.h"
-#include "ISceneDataProvider.h"
 #include "Scene.h"
 #include "scene_types_generated.h"
 #include <expected>
@@ -24,9 +23,8 @@
 namespace steamrot {
 
 class ISceneFactory {
-private:
+protected:
   std::unique_ptr<IEntityConfigurator> m_entity_configurator{nullptr};
-  std::unique_ptr<ISceneDataProvider> m_scene_data_provider{nullptr};
 
   const GameContext &m_game_context;
 
@@ -42,6 +40,8 @@ public:
 
   std::expected<std::unique_ptr<Scene>, FailInfo> CreateScene();
 
+  std::expected<std::monostate, FailInfo> ConfigureSceneInfo(Scene &scene);
+
   virtual std::expected<std::monostate, FailInfo>
   ConfigureSceneResources(Scene &scene) = 0;
 
@@ -51,5 +51,7 @@ public:
   // SceneState currently has no configuration needs, ready for future use
   // virtual std::expected<std::monostate, FailInfo>
   // ConfigureSceneState(Scene &scene) = 0;
+
+  std::expected<std::monostate, FailInfo> ConfigureLogicMap(Scene &scene);
 };
 } // namespace steamrot

@@ -54,6 +54,11 @@ SceneContext Scene::GetSceneContext() {
 
   return scene_context;
 }
+
+/////////////////////////////////////////////////
+EntityManager &Scene::GetEntityManager() {
+  return m_scene_resources.entity_manager;
+}
 #ifdef DEBUG
 /////////////////////////////////////////////////
 const std::unordered_map<ArchetypeID, Archetype> &Scene::GetArchetypes() const {

@@ -119,6 +119,8 @@ public:
   /////////////////////////////////////////////////
   SceneContext GetSceneContext();
 
+  EntityManager &GetEntityManager();
+
 #ifdef DEBUG
   const EntityMemoryPool &GetEntityMemoryPool() const;
 

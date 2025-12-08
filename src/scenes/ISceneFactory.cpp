@@ -20,11 +20,6 @@ ISceneFactory::ISceneFactory(const GameContext &game_context)
 /////////////////////////////////////////////////
 std::expected<std::unique_ptr<Scene>, FailInfo> ISceneFactory::CreateScene() {
   // guard statements
-  if (!m_scene_data_provider) {
-    return std::unexpected(
-        FailInfo{FailMode::NullPointer,
-                 "ISceneDataProvider is not set in ISceneFactory"});
-  }
   if (!m_entity_configurator) {
     return std::unexpected(
         FailInfo{FailMode::NullPointer,
@@ -42,13 +37,10 @@ std::expected<std::unique_ptr<Scene>, FailInfo> ISceneFactory::CreateScene() {
     scene_ptr = std::move(scene_ptr_result.value());
   }
 
-  // Provide and set SceneInfo
-  if (auto scene_info_result = m_scene_data_provider->LoadSceneInfo();
+  // Configure SceneInfo
+  if (auto scene_info_result = ConfigureSceneInfo(*scene_ptr);
       !scene_info_result) {
     return std::unexpected(scene_info_result.error());
-  } else {
-    // set the scene_info member of the Scene
-    scene_ptr->m_scene_info = scene_info_result.value();
   }
 
   // Configures SceneResources
@@ -87,5 +79,11 @@ ISceneFactory::CreateSceneByType() {
                                     "SceneType not handled in ISceneFactory"});
   }
   }
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ISceneFactory::ConfigureSceneInfo(Scene &scene) {
+  return std::monostate{};
 }
 } // namespace steamrot

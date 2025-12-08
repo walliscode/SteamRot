@@ -9,7 +9,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FailInfo.h"
-#include "SceneInfo.h"
 #include "scene_types_generated.h"
 #include <cstdint>
 #include <expected>
@@ -61,8 +60,6 @@ public:
   /////////////////////////////////////////////////
   virtual std::expected<SceneData, FailInfo>
   LoadSceneData(SceneType scene_type) const = 0;
-
-  virtual std::expected<SceneInfo, FailInfo> LoadSceneInfo() const = 0;
 };
 
 } // namespace steamrot
