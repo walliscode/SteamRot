@@ -150,9 +150,11 @@ FlatbuffersEntityConfigurator
 │                             │    │                                 │
 │  - m_scene_data_provider    │    │  - m_save_data_provider         │
 │  - m_scene_type             │    │  - m_slot_index                 │
-│  - m_cached_scene_data      │    │  - m_cached_scene_data          │
+│  - m_cached_native_data     │    │  - m_cached_native_data         │
+│  - m_cached_fbs_data        │    │  - m_cached_fbs_data            │
 │                             │    │                                 │
 │  GetSceneData()             │    │  GetSceneData()                 │
+│  GetSceneDataFbs()          │    │  GetSceneDataFbs()              │
 │  CreateEntityConfigurator() │    │  CreateEntityConfigurator()     │
 │  GetSceneType()             │    │  GetSceneType()                 │
 └─────────────────────────────┘    └─────────────────────────────────┘
@@ -161,15 +163,20 @@ FlatbuffersEntityConfigurator
                                ↓
                         implements interface
                                ↓
-                    ┌───────────────────────┐
-                    │  ISceneConfigurator   │
-                    │     (interface)       │
-                    │                       │
-                    │  GetSceneData()       │
-                    │  CreateEntity-        │
-                    │    Configurator()     │
-                    │  GetSceneType()       │
-                    └───────────────────────┘
+                    ┌──────────────────────────────┐
+                    │  ISceneConfigurator          │
+                    │     (interface)              │
+                    │  DUAL-FORMAT DESIGN:         │
+                    │                              │
+                    │  GetSceneData()              │
+                    │    → SceneData (native)      │
+                    │                              │
+                    │  GetSceneDataFbs()           │
+                    │    → SceneDataFbs* (FlatBuf) │
+                    │                              │
+                    │  CreateEntityConfigurator()  │
+                    │  GetSceneType()              │
+                    └──────────────────────────────┘
                                ↑
                                ↑ passed to
                                ↑
@@ -192,8 +199,10 @@ FlatbuffersEntityConfigurator
 │                                                                    │
 │  ConfigureSceneResources(Scene&):                                  │
 │    {                                                               │
+│      // Uses NATIVE format (format-agnostic!)                     │
 │      auto data = m_scene_configurator->GetSceneData();             │
-│      // Use data...                                                │
+│      const SceneData& native = data.value();                       │
+│      // Configure using native struct...                           │
 │    }                                                               │
 │                                                                    │
 │  ConfigureSceneConfig(Scene&):                                     │
@@ -709,6 +718,155 @@ Phase 4: Integration
 
 ---
 
+## Dual-Format Interface Design
+
+### Why Two Methods?
+
+The interface provides **both** native C++ structs AND FlatBuffers pointers:
+
+```
+╔══════════════════════════════════════════════════════════════╗
+║              ISceneConfigurator Interface                    ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  GetSceneData() → SceneData                                  ║
+║  ┌────────────────────────────────────────────────────┐     ║
+║  │ • Returns native C++ struct                        │     ║
+║  │ • Format-agnostic (works with JSON, Lua, etc.)     │     ║
+║  │ • PRIMARY interface                                │     ║
+║  │ • Used by SceneFactory                             │     ║
+║  └────────────────────────────────────────────────────┘     ║
+║                                                              ║
+║  GetSceneDataFbs() → const SceneDataFbs*                     ║
+║  ┌────────────────────────────────────────────────────┐     ║
+║  │ • Returns FlatBuffers pointer                      │     ║
+║  │ • For EntityConfigurator compatibility             │     ║
+║  │ • SECONDARY interface (internal use only)          │     ║
+║  │ • Used by CreateEntityConfigurator()               │     ║
+║  └────────────────────────────────────────────────────┘     ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+```
+
+### Data Flow with Dual Formats
+
+```
+┌──────────────────────┐
+│   Data Source        │
+│   (Files/Save/etc)   │
+└──────────┬───────────┘
+           │
+           │ Load once
+           ↓
+┌──────────────────────────────────┐
+│   Configurator                   │
+│                                  │
+│   Cache BOTH formats:            │
+│   ┌──────────────────────────┐   │
+│   │ m_cached_native_data     │   │  ← SceneData struct
+│   └──────────────────────────┘   │
+│   ┌──────────────────────────┐   │
+│   │ m_cached_fbs_data        │   │  ← SceneDataFbs* pointer
+│   └──────────────────────────┘   │
+└──────────────────────────────────┘
+           │              │
+           │              │
+           │              │ GetSceneDataFbs()
+           │              │ (for EntityConfig)
+           │              ↓
+           │      ┌────────────────────┐
+           │      │EntityConfigurator  │
+           │      └────────────────────┘
+           │
+           │ GetSceneData()
+           │ (for Factory)
+           ↓
+   ┌────────────────────┐
+   │  SceneFactory      │
+   │  (format-agnostic) │
+   └────────────────────┘
+```
+
+### Benefits
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│              BENEFIT: Format-Agnostic Factory               │
+│                                                             │
+│  SceneFactory code uses native SceneData:                   │
+│                                                             │
+│  const SceneData& data = configurator->GetSceneData();      │
+│                                                             │
+│  scene.GetRenderTexture().create(                           │
+│      data.render_texture_width,                             │
+│      data.render_texture_height                             │
+│  );                                                         │
+│                                                             │
+│  ✓ No FlatBuffers types in factory code                    │
+│  ✓ Works with any data format                              │
+│  ✓ Follows Data Loading Interface pattern                  │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│              BENEFIT: EntityConfigurator Compatibility      │
+│                                                             │
+│  CreateEntityConfigurator() uses FlatBuffers pointer:       │
+│                                                             │
+│  auto fbs = configurator->GetSceneDataFbs();                │
+│                                                             │
+│  return make_unique<FlatbuffersEntityConfigurator>(         │
+│      event_handler,                                         │
+│      *fbs.value()->entity_collection()                      │
+│  );                                                         │
+│                                                             │
+│  ✓ Maintains compatibility with existing code              │
+│  ✓ No changes to EntityConfigurator needed                 │
+│  ✓ Smooth migration path                                   │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│              BENEFIT: No Performance Penalty                │
+│                                                             │
+│  Both formats cached from single data load:                 │
+│                                                             │
+│  void LoadData() const {                                    │
+│      // Load once                                           │
+│      auto native = provider.LoadSceneData(type);            │
+│      m_cached_native_data = native;                         │
+│                                                             │
+│      auto fbs = loader.ProvideSceneData(type);              │
+│      m_cached_fbs_data = fbs;                               │
+│  }                                                          │
+│                                                             │
+│  ✓ Data loaded once, not on every call                     │
+│  ✓ FlatBuffers buffer persists (zero copy)                 │
+│  ✓ Native struct is small (scene metadata only)            │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│              BENEFIT: Future-Proof Design                   │
+│                                                             │
+│  Migration Path:                                            │
+│                                                             │
+│  Phase 1 (Now): Dual interface                             │
+│    • SceneFactory uses GetSceneData()                       │
+│    • EntityConfigurator uses GetSceneDataFbs()              │
+│                                                             │
+│  Phase 2 (Future): Refactor EntityConfigurator             │
+│    • Update EntityConfigurator to use native structs        │
+│                                                             │
+│  Phase 3 (Future): Remove FlatBuffers method               │
+│    • Remove GetSceneDataFbs() from interface                │
+│    • Interface becomes 100% format-agnostic                 │
+│                                                             │
+│  ✓ Smooth migration without breaking changes               │
+│  ✓ Each phase independently testable                       │
+│  ✓ Clear path to full abstraction                          │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
 ## Summary Diagram
 
 ```
@@ -716,14 +874,16 @@ Phase 4: Integration
 ║            SCENE FACTORY DATA SOURCING ARCHITECTURE           ║
 ╠═══════════════════════════════════════════════════════════════╣
 ║                                                               ║
-║  PATTERN:  Strategy Pattern + Abstract Factory Pattern       ║
+║  PATTERN:  Strategy Pattern + Dual-Format Interface          ║
 ║                                                               ║
 ║  KEY IDEA: Configurator encapsulates data source logic       ║
+║            AND provides both native and FlatBuffers formats  ║
 ║                                                               ║
 ║  ┌────────────┐                                              ║
 ║  │SceneManager│──decides source──>┌────────────────┐         ║
 ║  └────────────┘                   │ ISceneConfig   │         ║
 ║                                   │  (strategy)    │         ║
+║                                   │  DUAL FORMAT   │         ║
 ║                                   └────────────────┘         ║
 ║                                          │                   ║
 ║                         ┌────────────────┴────────────────┐  ║
@@ -739,7 +899,8 @@ Phase 4: Integration
 ║                                          │                   ║
 ║                            ┌─────────────▼────────────┐      ║
 ║                            │FlatbuffersSceneFactory   │      ║
-║                            │  (source-agnostic!)      │      ║
+║                            │  (format-agnostic!)      │      ║
+║                            │  uses native SceneData   │      ║
 ║                            └──────────────────────────┘      ║
 ║                                                               ║
 ║  BENEFITS:                                                    ║
@@ -749,6 +910,8 @@ Phase 4: Integration
 ║    ✓ Extensible (new source = new configurator)              ║
 ║    ✓ Type-safe                                               ║
 ║    ✓ SOLID principles                                        ║
+║    ✓ Format-agnostic primary interface                       ║
+║    ✓ FlatBuffers compatibility maintained                    ║
 ║                                                               ║
 ╚═══════════════════════════════════════════════════════════════╝
 ```
