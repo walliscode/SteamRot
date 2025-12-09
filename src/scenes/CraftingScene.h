@@ -21,7 +21,7 @@ namespace steamrot {
 ///
 /////////////////////////////////////////////////
 class CraftingScene : public Scene {
-  friend class ISceneFactory;
+  friend class SceneFactory;
 
 private:
   /////////////////////////////////////////////////

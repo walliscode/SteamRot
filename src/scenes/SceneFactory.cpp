@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "ISceneFactory.h"
+#include "SceneFactory.h"
 #include "CraftingScene.h"
 #include "TitleScene.h"
 #include <memory>
@@ -14,17 +14,14 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-ISceneFactory::ISceneFactory(const GameContext &game_context)
-    : m_game_context(game_context) {};
+SceneFactory::SceneFactory(const GameContext &game_context,
+                           ISceneConfigurator &scene_configurator,
+                           SceneType type)
+    : m_game_context(game_context), m_scene_configurator(scene_configurator) {};
 
 /////////////////////////////////////////////////
-std::expected<std::unique_ptr<Scene>, FailInfo> ISceneFactory::CreateScene() {
-  // guard statements
-  if (!m_entity_configurator) {
-    return std::unexpected(
-        FailInfo{FailMode::NullPointer,
-                 "IEntityConfigurator is not set in ISceneFactory"});
-  }
+std::expected<std::unique_ptr<Scene>, FailInfo>
+SceneFactory::CreateAndConfigureScene() {
 
   // Create a unique pointer to a Scene object
   std::unique_ptr<Scene> scene_ptr{nullptr};
@@ -37,15 +34,10 @@ std::expected<std::unique_ptr<Scene>, FailInfo> ISceneFactory::CreateScene() {
     scene_ptr = std::move(scene_ptr_result.value());
   }
 
-  // Configure SceneInfo
-  if (auto scene_info_result = ConfigureSceneInfo(*scene_ptr);
-      !scene_info_result) {
-    return std::unexpected(scene_info_result.error());
-  }
-
-  // Configures SceneResources
-  if (auto result = ConfigureSceneResources(*scene_ptr); !result) {
-    return std::unexpected(result.error());
+  // Configure the Scene using the configurator
+  if (auto config_result = m_scene_configurator.ConfigureScene(*scene_ptr);
+      !config_result) {
+    return std::unexpected(config_result.error());
   }
 
   return scene_ptr;
@@ -53,7 +45,7 @@ std::expected<std::unique_ptr<Scene>, FailInfo> ISceneFactory::CreateScene() {
 
 /////////////////////////////////////////////////
 std::expected<std::unique_ptr<Scene>, FailInfo>
-ISceneFactory::CreateSceneByType() {
+SceneFactory::CreateSceneByType() {
   // guard statement if scene_type is unknown
   if (scene_type == SceneType::SceneType_UNKNOWN) {
     return std::unexpected(FailInfo{FailMode::EnumValueNotHandled,
@@ -81,9 +73,4 @@ ISceneFactory::CreateSceneByType() {
   }
 }
 
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-ISceneFactory::ConfigureSceneInfo(Scene &scene) {
-  return std::monostate{};
-}
 } // namespace steamrot
