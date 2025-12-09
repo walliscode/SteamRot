@@ -481,37 +481,72 @@ Providers return data, configurators use it internally, factory NEVER sees FlatB
 
 ### ✅ Extensible
 
-Easy to add new data sources:
+Easy to add new data sources and formats:
+
+#### Single Format (Current Documentation)
+
+When using only one format (e.g., FlatBuffers):
 
 ```cpp
-class NetworkSceneConfigurator : public ISceneConfigurator {
+class DefaultSceneConfigurator : public ISceneConfigurator {
+  // FlatBuffers internally, source is "default files"
+};
+
+class SavedSceneConfigurator : public ISceneConfigurator {
+  // FlatBuffers internally, source is "save files"
+};
+```
+
+#### Multiple Formats (Format-Prefixed Naming)
+
+When supporting multiple formats, prefix with format name:
+
+```cpp
+// FlatBuffers format
+class FlatbuffersDefaultSceneConfigurator : public ISceneConfigurator {
 private:
-  INetworkProvider &m_network_provider;
-  // FlatBuffers conversion internal
+  ISceneDataProvider &m_provider;
+  const SceneDataFbs *m_cached_data{nullptr};  // FlatBuffers-specific
   
 public:
   std::expected<std::monostate, FailInfo>
   ConfigureScene(Scene &scene, const GameContext &game_context) override {
-    // Load from network, convert to FlatBuffers internally
-    // Configure Scene directly
-    // NO FlatBuffers exposed!
+    // Load FlatBuffers, configure Scene
   }
 };
 
-class LuaSceneConfigurator : public ISceneConfigurator {
+class FlatbuffersSavedSceneConfigurator : public ISceneConfigurator {
+  // Same pattern for saved games with FlatBuffers
+};
+
+// XML format
+class XmlDefaultSceneConfigurator : public ISceneConfigurator {
 private:
-  ILuaProvider &m_lua_provider;
-  // FlatBuffers conversion internal
+  ISceneDataProvider &m_provider;
+  XmlDocument *m_cached_doc{nullptr};  // XML-specific
   
 public:
   std::expected<std::monostate, FailInfo>
   ConfigureScene(Scene &scene, const GameContext &game_context) override {
-    // Load from Lua, convert to FlatBuffers internally
-    // Configure Scene directly
-    // NO FlatBuffers exposed!
+    // Load XML, configure Scene
   }
 };
+
+class XmlSavedSceneConfigurator : public ISceneConfigurator {
+  // Same pattern for saved games with XML
+};
+
+// JSON format
+class JsonDefaultSceneConfigurator : public ISceneConfigurator {
+  // JSON from default files
+};
+
+class JsonSavedSceneConfigurator : public ISceneConfigurator {
+  // JSON from save files
+};
 ```
+
+**Key Point**: Factory/SceneManager only see `ISceneConfigurator&` - they're format-agnostic. The concrete class name indicates both format (FlatBuffers/XML/JSON) and source (Default/Saved).
 
 ### ✅ Testable
 
@@ -549,8 +584,9 @@ public:
 - [ ] Write interface tests (with mocks)
 
 ### Phase 2: Configurators (New Components)
-- [ ] Implement `DefaultSceneConfigurator`
-- [ ] Implement `SavedSceneConfigurator`
+- [ ] Implement `DefaultSceneConfigurator` (or `FlatbuffersDefaultSceneConfigurator` for multi-format)
+- [ ] Implement `SavedSceneConfigurator` (or `FlatbuffersSavedSceneConfigurator` for multi-format)
+- [ ] **Note**: Use format-prefixed names (e.g., `FlatbuffersDefaultSceneConfigurator`) when supporting multiple formats
 - [ ] Write configurator unit tests
 - [ ] Write configurator integration tests
 

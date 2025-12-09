@@ -78,6 +78,8 @@ Configured Scene
 | `FlatbuffersSceneFactory` | FlatBuffers config (updated) | `src/scenes/FlatbuffersSceneFactory.{h,cpp}` |
 | `SceneManager` | Orchestration (updated) | `src/scenes/SceneManager.{h,cpp}` |
 
+**Note**: For multiple data formats, use format-prefixed names (e.g., `FlatbuffersDefaultSceneConfigurator`, `XmlDefaultSceneConfigurator`). See [Architecture Analysis](SCENE_FACTORY_AND_CONFIGURATOR_ANALYSIS.md#multi-format-naming-pattern) for details.
+
 ---
 
 ## Architecture at a Glance

@@ -300,6 +300,200 @@ public:
 } // namespace steamrot
 ```
 
+---
+
+## Multi-Format Naming Pattern
+
+### Supporting Multiple Data Formats
+
+The architecture supports multiple data formats (FlatBuffers, XML, JSON, etc.) through naming conventions. The configurator class name indicates **both** the data format AND the data source.
+
+#### Current Naming (Single Format - FlatBuffers)
+
+When only FlatBuffers is used, configurators are named by source:
+
+```cpp
+// Naming reflects data SOURCE only (format is implicit)
+class DefaultSceneConfigurator : public ISceneConfigurator {
+  // Internally uses FlatBuffers from ISceneDataProvider
+};
+
+class SavedSceneConfigurator : public ISceneConfigurator {
+  // Internally uses FlatBuffers from ISaveDataProvider
+};
+```
+
+#### Multi-Format Naming Convention
+
+When multiple formats are needed, prefix with the format name:
+
+```cpp
+// Format-prefixed naming for FlatBuffers
+class FlatbuffersDefaultSceneConfigurator : public ISceneConfigurator {
+private:
+  ISceneDataProvider &m_scene_data_provider;
+  const SceneDataFbs *m_cached_scene_data{nullptr};  // FlatBuffers-specific
+  
+public:
+  std::expected<std::monostate, FailInfo>
+  ConfigureScene(Scene &scene, const GameContext &game_context) override;
+};
+
+class FlatbuffersSavedSceneConfigurator : public ISceneConfigurator {
+private:
+  ISaveDataProvider &m_save_data_provider;
+  const SceneDataFbs *m_cached_scene_data{nullptr};  // FlatBuffers-specific
+  
+public:
+  std::expected<std::monostate, FailInfo>
+  ConfigureScene(Scene &scene, const GameContext &game_context) override;
+};
+
+// Format-prefixed naming for XML
+class XmlDefaultSceneConfigurator : public ISceneConfigurator {
+private:
+  ISceneDataProvider &m_scene_data_provider;
+  XmlDocument *m_cached_xml_doc{nullptr};  // XML-specific
+  
+public:
+  std::expected<std::monostate, FailInfo>
+  ConfigureScene(Scene &scene, const GameContext &game_context) override;
+};
+
+class XmlSavedSceneConfigurator : public ISceneConfigurator {
+private:
+  ISaveDataProvider &m_save_data_provider;
+  XmlDocument *m_cached_xml_doc{nullptr};  // XML-specific
+  
+public:
+  std::expected<std::monostate, FailInfo>
+  ConfigureScene(Scene &scene, const GameContext &game_context) override;
+};
+```
+
+#### Optional: Format-Specific Base Classes
+
+For shared logic within a format, add format-specific base classes:
+
+```cpp
+/////////////////////////////////////////////////
+/// @class FlatbuffersSceneConfiguratorBase
+/// @brief Base class for FlatBuffers-based Scene configurators.
+///
+/// Provides shared FlatBuffers loading and configuration logic.
+/// Derived classes specify the data source (default vs saved).
+/////////////////////////////////////////////////
+class FlatbuffersSceneConfiguratorBase : public ISceneConfigurator {
+protected:
+  mutable const SceneDataFbs *m_cached_scene_data{nullptr};
+  
+  /////////////////////////////////////////////////
+  /// @brief Load SceneDataFbs from specific source (implemented by derived)
+  /////////////////////////////////////////////////
+  virtual const SceneDataFbs* LoadSceneData() const = 0;
+  
+  /////////////////////////////////////////////////
+  /// @brief Shared FlatBuffers configuration logic
+  /////////////////////////////////////////////////
+  void ConfigureSceneFromFlatBuffers(Scene &scene, 
+                                     const SceneDataFbs *scene_data,
+                                     const GameContext &game_context);
+
+public:
+  /////////////////////////////////////////////////
+  /// @brief Configure Scene (calls LoadSceneData then ConfigureSceneFromFlatBuffers)
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ConfigureScene(Scene &scene, const GameContext &game_context) final override;
+};
+
+// Derived configurators specify data source
+class FlatbuffersDefaultSceneConfigurator 
+    : public FlatbuffersSceneConfiguratorBase {
+private:
+  SceneType m_scene_type;
+  ISceneDataProvider &m_scene_data_provider;
+  
+protected:
+  const SceneDataFbs* LoadSceneData() const override;
+  
+public:
+  FlatbuffersDefaultSceneConfigurator(SceneType scene_type,
+                                      ISceneDataProvider &provider);
+  SceneType GetSceneType() const override;
+};
+
+class FlatbuffersSavedSceneConfigurator 
+    : public FlatbuffersSceneConfiguratorBase {
+private:
+  uint32_t m_save_slot_index;
+  ISaveDataProvider &m_save_data_provider;
+  
+protected:
+  const SceneDataFbs* LoadSceneData() const override;
+  
+public:
+  FlatbuffersSavedSceneConfigurator(uint32_t slot_index,
+                                    ISaveDataProvider &provider);
+  SceneType GetSceneType() const override;
+};
+```
+
+#### Key Principles
+
+1. **Factory/SceneManager Agnostic**: They only see `ISceneConfigurator&` - format is irrelevant to them
+2. **Concrete Class Selection**: The specific configurator instantiated determines both format and source
+3. **Format Encapsulation**: All format-specific types remain private to configurator implementations
+4. **Naming Convention**: `<Format><Source>SceneConfigurator` (e.g., `FlatbuffersDefaultSceneConfigurator`)
+
+#### Usage Example
+
+```cpp
+// In SceneManager
+std::expected<std::monostate, FailInfo>
+SceneManager::LoadSceneFromDefault(SceneType scene_type) {
+  ISceneDataProvider &provider = GetSceneDataProvider();
+  
+  // Choose format-specific configurator (FlatBuffers vs XML vs JSON)
+  #ifdef USE_FLATBUFFERS
+    FlatbuffersDefaultSceneConfigurator config(scene_type, provider);
+  #elif defined(USE_XML)
+    XmlDefaultSceneConfigurator config(scene_type, provider);
+  #endif
+  
+  // Factory doesn't know or care about the format
+  FlatbuffersSceneFactory factory(m_game_context, config);
+  auto scene_result = factory.CreateScene();
+  
+  // ... store scene
+  return std::monostate{};
+}
+```
+
+Or with runtime selection:
+
+```cpp
+std::unique_ptr<ISceneConfigurator> CreateConfigurator(
+    DataFormat format, SceneType scene_type, 
+    ISceneDataProvider &provider) {
+  switch (format) {
+    case DataFormat::FlatBuffers:
+      return std::make_unique<FlatbuffersDefaultSceneConfigurator>(
+          scene_type, provider);
+    case DataFormat::XML:
+      return std::make_unique<XmlDefaultSceneConfigurator>(
+          scene_type, provider);
+    case DataFormat::JSON:
+      return std::make_unique<JsonDefaultSceneConfigurator>(
+          scene_type, provider);
+    default:
+      return nullptr;
+  }
+}
+```
+
+---
+
 ### 4. Updated SceneFactory
 
 ```cpp
