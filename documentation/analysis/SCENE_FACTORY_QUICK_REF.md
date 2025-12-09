@@ -1,18 +1,26 @@
 # Scene Factory Data Sourcing - Quick Reference
 
-**Last Updated**: December 8, 2025
+**Last Updated**: December 9, 2025
 
 ---
 
 ## TL;DR
 
-**Problem**: SceneFactory needs to support two data sources (default OR save).
+**Problem**: SceneFactory needs to support multiple data sources (default OR save) and formats (FlatBuffers, XML, JSON, etc.).
 
-**Solution**: Use Strategy Pattern - create `ISceneConfigurator` interface with two implementations:
-- `DefaultSceneConfigurator` (wraps ISceneDataProvider)
-- `SavedSceneConfigurator` (wraps ISaveDataProvider)
+**Solution**: Use Strategy Pattern - create `ISceneConfigurator` interface with format-specific implementations:
+- `FlatbuffersSceneConfigurator` (for default scenes with FlatBuffers)
+- `SavedFlatbuffersSceneConfigurator` (for saved scenes with FlatBuffers)
+- `XmlSceneConfigurator` (future - for XML format)
+- `JsonSceneConfigurator` (future - for JSON format)
 
-**Key Benefit**: SceneFactory has NO conditionals, NO null-checks, clean separation of concerns.
+**Key Architectural Decision**: **NO intermediate `SceneData` struct** - format-specific data directly configures Scene's internal structures (`SceneInfo`, `SceneResources`, `SceneConfig`, `SceneState`).
+
+**Key Benefits**: 
+- Factory has NO conditionals, NO null-checks
+- Interface is 100% format-agnostic
+- Direct configuration, no duplication
+- Handles large data efficiently
 
 ---
 
@@ -20,19 +28,27 @@
 
 ```
 SceneManager (Orchestrator)
-  ↓ decides source
-  ↓ creates appropriate configurator
+  ↓ loads format-specific data (e.g., SceneDataFbs)
+  ↓ creates format-specific configurator
   ↓
 ISceneConfigurator (Strategy)
-  ├── DefaultSceneConfigurator  → ISceneDataProvider
-  └── SavedSceneConfigurator    → ISaveDataProvider
+  ├── FlatbuffersSceneConfigurator     → works with SceneDataFbs
+  ├── SavedFlatbuffersSceneConfigurator → works with SceneDataFbs from save
+  ├── XmlSceneConfigurator             → works with SceneDataXml (future)
+  └── JsonSceneConfigurator            → works with SceneDataJson (future)
   ↓ passed to
   ↓
 FlatbuffersSceneFactory
-  ↓ uses configurator.GetSceneData()
-  ↓ uses configurator.CreateEntityConfigurator()
+  ↓ delegates to configurator
+  ↓
+ISceneConfigurator
+  ↓ directly configures Scene
   ↓
 Scene (configured)
+  ├── m_scene_info (directly populated)
+  ├── m_scene_resources (directly populated)
+  ├── m_scene_config (directly populated)
+  └── m_scene_state (directly populated)
 ```
 
 ---
@@ -40,14 +56,16 @@ Scene (configured)
 ## Key Architectural Patterns
 
 ### 1. Strategy Pattern
-**Purpose**: Encapsulate data sourcing strategies  
-**Benefit**: SceneFactory doesn't know about data sources
+**Purpose**: Encapsulate format-specific configuration logic
+**Benefit**: Factory and interface are format-agnostic
 
 ### 2. Abstract Factory Pattern
 **Purpose**: Configurator creates EntityConfigurator  
 **Benefit**: Configurator controls entire data flow
 
-### 3. Caching Pattern
+### 3. Direct Configuration Pattern
+**Purpose**: No intermediate structs, direct Scene population
+**Benefit**: Efficient, no duplication, handles large data volumes
 **Purpose**: Configurators cache FlatBuffers data  
 **Benefit**: Avoid repeated provider calls
 
@@ -62,17 +80,25 @@ Scene (configured)
 std::expected<std::monostate, FailInfo>
 SceneManager::AddSceneFromDefault(const SceneType& scene_type) {
     
-    ISceneDataProvider& provider = GetSceneDataProvider();
+    // Load format-specific data
+    FlatbuffersDataLoader loader;
+    auto scene_data_fbs = loader.ProvideDefaultSceneData(scene_type);
+    if (!scene_data_fbs.has_value()) {
+        return std::unexpected(scene_data_fbs.error());
+    }
     
-    auto configurator = std::make_unique<DefaultSceneConfigurator>(
-        provider, scene_type
+    // Create format-specific configurator
+    auto configurator = std::make_unique<FlatbuffersSceneConfigurator>(
+        scene_data_fbs.value()
     );
     
+    // Create factory (format-agnostic!)
     auto factory = FlatbuffersSceneFactory(
         m_game_context,
         std::move(configurator)
     );
     
+    // Create scene (configurator directly configures Scene)
     auto scene = factory.CreateScene();
     // ...
 }
@@ -85,50 +111,71 @@ SceneManager::AddSceneFromDefault(const SceneType& scene_type) {
 std::expected<std::monostate, FailInfo>
 SceneManager::AddSceneFromSave(uint32_t slot_index) {
     
+    // Load save data
     ISaveDataProvider& provider = GetSaveDataProvider();
+    auto save_data = provider.LoadSave(slot_index);
+    if (!save_data.has_value()) {
+        return std::unexpected(save_data.error());
+    }
     
-    auto configurator = std::make_unique<SavedSceneConfigurator>(
-        provider, slot_index
+    // Extract format-specific data from save
+    const SceneDataFbs* scene_data_fbs = /* extract from save_data */;
+    
+    // Create format-specific configurator
+    auto configurator = std::make_unique<SavedFlatbuffersSceneConfigurator>(
+        scene_data_fbs
     );
     
+    // Create factory (format-agnostic!)
     auto factory = FlatbuffersSceneFactory(
         m_game_context,
         std::move(configurator)
     );
     
+    // Create scene (configurator directly configures Scene)
     auto scene = factory.CreateScene();
     // ...
 }
 ```
 
-### Pattern 3: Using Configurator in Factory
+### Pattern 3: Configurator Directly Configures Scene
 
 ```cpp
-// In FlatbuffersSceneFactory
+// In FlatbuffersSceneConfigurator
 std::expected<std::monostate, FailInfo>
-FlatbuffersSceneFactory::ConfigureSceneResources(Scene& scene) {
+FlatbuffersSceneConfigurator::ConfigureSceneResources(Scene& scene) {
     
-    // Get native data from configurator (format-agnostic!)
-    auto scene_data = m_scene_configurator->GetSceneData();
-    if (!scene_data.has_value()) {
-        return std::unexpected(scene_data.error());
+    // Direct configuration - no intermediate struct!
+    if (!m_scene_data_fbs || !m_scene_data_fbs->scene_resources()) {
+        return std::unexpected(FailInfo{/* ... */});
     }
     
-    // Use native SceneData struct
-    const SceneData& data = scene_data.value();
+    const SceneResourcesFbs* resources = m_scene_data_fbs->scene_resources();
     
-    // Configure render texture from native data
+    // Directly populate Scene's internal structures
     scene.GetRenderTexture().create(
-        data.render_texture_width,
-        data.render_texture_height
+        resources->render_texture_width(),
+        resources->render_texture_height()
     );
     
-    // Configure entities (using entity configurator)
-    auto result = m_entity_configurator->ConfigureEntityMemoryPool(
+    // Configure entities through entity configurator
+    auto entity_config = CreateEntityConfigurator(/* ... */);
+    auto result = entity_config.value()->ConfigureEntityMemoryPool(
         scene.GetEntityManager().GetEntityMemoryPool()
     );
     
     return result;
+}
+```
+
+### Pattern 4: Factory Delegates to Configurator
+
+```cpp
+// In FlatbuffersSceneFactory
+std::expected<std::monostate, FailInfo>
+FlatbuffersSceneFactory::ConfigureSceneResources(Scene& scene) override {
+    // Simply delegate - configurator does all the work
+    return m_scene_configurator->ConfigureSceneResources(scene);
 }
 ```
 
@@ -143,13 +190,15 @@ class ISceneConfigurator {
 public:
     virtual ~ISceneConfigurator() = default;
     
-    // Returns native C++ struct (format-agnostic)
-    virtual std::expected<SceneData, FailInfo> 
-    GetSceneData() = 0;
+    // Direct configuration methods - NO intermediate structs!
+    virtual std::expected<std::monostate, FailInfo>
+    ConfigureSceneInfo(Scene& scene) = 0;
     
-    // Returns FlatBuffers pointer (for internal use by EntityConfigurator)
-    virtual std::expected<const SceneDataFbs*, FailInfo>
-    GetSceneDataFbs() = 0;
+    virtual std::expected<std::monostate, FailInfo>
+    ConfigureSceneResources(Scene& scene) = 0;
+    
+    virtual std::expected<std::monostate, FailInfo>
+    ConfigureSceneConfig(Scene& scene) = 0;
     
     virtual std::expected<std::unique_ptr<IEntityConfigurator>, FailInfo>
     CreateEntityConfigurator(EventHandler& event_handler) = 0;
@@ -158,47 +207,63 @@ public:
 };
 ```
 
-**Design Note**: The interface provides both native (`GetSceneData()`) and FlatBuffers (`GetSceneDataFbs()`) accessors. Factory uses native format for configuration. FlatBuffers pointer is only for EntityConfigurator internal use.
+**Key Point**: Interface has NO format-specific types. Each implementation handles its own format internally.
 
-### DefaultSceneConfigurator
+### FlatbuffersSceneConfigurator
 
 ```cpp
-class DefaultSceneConfigurator : public ISceneConfigurator {
+class FlatbuffersSceneConfigurator : public ISceneConfigurator {
 private:
-    ISceneDataProvider& m_scene_data_provider;
-    SceneType m_scene_type;
-    
-    // Cache both formats
-    mutable std::optional<SceneData> m_cached_native_data;
-    mutable const SceneDataFbs* m_cached_fbs_data{nullptr};
-    mutable bool m_data_loaded{false};
+    const SceneDataFbs* m_scene_data_fbs;  // Format-specific, internal only
     
 public:
-    DefaultSceneConfigurator(
-        ISceneDataProvider& provider,
-        SceneType scene_type);
+    FlatbuffersSceneConfigurator(const SceneDataFbs* scene_data_fbs);
     
-    // Implement interface methods
+    // Directly configures Scene from FlatBuffers data
+    std::expected<std::monostate, FailInfo>
+    ConfigureSceneInfo(Scene& scene) override;
+    
+    std::expected<std::monostate, FailInfo>
+    ConfigureSceneResources(Scene& scene) override;
+    
+    std::expected<std::monostate, FailInfo>
+    ConfigureSceneConfig(Scene& scene) override;
+    
+    std::expected<std::unique_ptr<IEntityConfigurator>, FailInfo>
+    CreateEntityConfigurator(EventHandler& event_handler) override;
+    
+    SceneType GetSceneType() const override;
 };
 ```
 
-### SavedSceneConfigurator
+### SavedFlatbuffersSceneConfigurator
 
 ```cpp
-class SavedSceneConfigurator : public ISceneConfigurator {
+class SavedFlatbuffersSceneConfigurator : public ISceneConfigurator {
 private:
-    ISaveDataProvider& m_save_data_provider;
-    uint32_t m_slot_index;
-    
-    // Cache both formats
-    mutable std::optional<SceneData> m_cached_native_data;
-    mutable const SceneDataFbs* m_cached_fbs_data{nullptr};
-    mutable bool m_data_loaded{false};
+    const SceneDataFbs* m_scene_data_fbs;  // Extracted from SaveData
     
 public:
-    SavedSceneConfigurator(
-        ISaveDataProvider& provider,
-        uint32_t slot_index);
+    SavedFlatbuffersSceneConfigurator(const SceneDataFbs* scene_data_fbs);
+    
+    // Same implementation as FlatbuffersSceneConfigurator
+    // Only difference is source of SceneDataFbs (from save instead of default)
+};
+```
+
+### XmlSceneConfigurator (Future)
+
+```cpp
+class XmlSceneConfigurator : public ISceneConfigurator {
+private:
+    const SceneDataXml* m_scene_data_xml;  // Format-specific, internal only
+    
+public:
+    XmlSceneConfigurator(const SceneDataXml* scene_data_xml);
+    
+    // Parses XML and directly configures Scene
+    // Implementation details hidden from interface
+};
     
     // Implement interface methods
 };
