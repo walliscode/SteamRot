@@ -1,11 +1,11 @@
 
 add_library(scenes
     SceneManager.cpp
-    ISceneFactory.cpp
     SceneFactory.cpp
     Scene.cpp
     CraftingScene.cpp
     TitleScene.cpp
+    FlatbuffersDefaultSceneConfigurator.cpp
     SceneContext.cpp
 )
 
