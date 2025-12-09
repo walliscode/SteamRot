@@ -108,15 +108,27 @@ SceneManager::AddSceneFromSave(uint32_t slot_index) {
 std::expected<std::monostate, FailInfo>
 FlatbuffersSceneFactory::ConfigureSceneResources(Scene& scene) {
     
-    // Get data from configurator (source-agnostic)
+    // Get native data from configurator (format-agnostic!)
     auto scene_data = m_scene_configurator->GetSceneData();
     if (!scene_data.has_value()) {
         return std::unexpected(scene_data.error());
     }
     
-    // Use the data
-    const SceneDataFbs* data = scene_data.value();
-    // ...
+    // Use native SceneData struct
+    const SceneData& data = scene_data.value();
+    
+    // Configure render texture from native data
+    scene.GetRenderTexture().create(
+        data.render_texture_width,
+        data.render_texture_height
+    );
+    
+    // Configure entities (using entity configurator)
+    auto result = m_entity_configurator->ConfigureEntityMemoryPool(
+        scene.GetEntityManager().GetEntityMemoryPool()
+    );
+    
+    return result;
 }
 ```
 
@@ -131,8 +143,13 @@ class ISceneConfigurator {
 public:
     virtual ~ISceneConfigurator() = default;
     
-    virtual std::expected<const SceneDataFbs*, FailInfo> 
+    // Returns native C++ struct (format-agnostic)
+    virtual std::expected<SceneData, FailInfo> 
     GetSceneData() = 0;
+    
+    // Returns FlatBuffers pointer (for internal use by EntityConfigurator)
+    virtual std::expected<const SceneDataFbs*, FailInfo>
+    GetSceneDataFbs() = 0;
     
     virtual std::expected<std::unique_ptr<IEntityConfigurator>, FailInfo>
     CreateEntityConfigurator(EventHandler& event_handler) = 0;
@@ -141,6 +158,8 @@ public:
 };
 ```
 
+**Design Note**: The interface provides both native (`GetSceneData()`) and FlatBuffers (`GetSceneDataFbs()`) accessors. Factory uses native format for configuration. FlatBuffers pointer is only for EntityConfigurator internal use.
+
 ### DefaultSceneConfigurator
 
 ```cpp
@@ -148,7 +167,10 @@ class DefaultSceneConfigurator : public ISceneConfigurator {
 private:
     ISceneDataProvider& m_scene_data_provider;
     SceneType m_scene_type;
-    mutable const SceneDataFbs* m_cached_scene_data{nullptr};
+    
+    // Cache both formats
+    mutable std::optional<SceneData> m_cached_native_data;
+    mutable const SceneDataFbs* m_cached_fbs_data{nullptr};
     mutable bool m_data_loaded{false};
     
 public:
@@ -167,7 +189,10 @@ class SavedSceneConfigurator : public ISceneConfigurator {
 private:
     ISaveDataProvider& m_save_data_provider;
     uint32_t m_slot_index;
-    mutable const SceneDataFbs* m_cached_scene_data{nullptr};
+    
+    // Cache both formats
+    mutable std::optional<SceneData> m_cached_native_data;
+    mutable const SceneDataFbs* m_cached_fbs_data{nullptr};
     mutable bool m_data_loaded{false};
     
 public:

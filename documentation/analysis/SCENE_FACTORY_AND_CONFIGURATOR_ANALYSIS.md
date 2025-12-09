@@ -31,9 +31,10 @@ Currently, both receive FlatBuffers pointers directly. The challenge is to suppo
 - Creating intermediate copying structs
 - Adding complex conditional logic
 - Violating SOLID principles
+- Baking FlatBuffers types into abstract interfaces
 
 ### The Solution
-**Use the Strategy Pattern with Abstract Factory Pattern**
+**Use the Strategy Pattern with Dual-Format Interface**
 
 Create `ISceneConfigurator` interface with two implementations:
 - `DefaultSceneConfigurator`: Works with ISceneDataProvider
@@ -41,12 +42,18 @@ Create `ISceneConfigurator` interface with two implementations:
 
 SceneFactory receives a configurator (not data providers), and the configurator encapsulates all data source logic.
 
+The interface provides **both** native C++ structs (for format-agnostic code) **and** FlatBuffers pointers (for EntityConfigurator compatibility):
+- `GetSceneData()` → Returns `SceneData` (native struct) - **Primary interface**
+- `GetSceneDataFbs()` → Returns `const SceneDataFbs*` - **Internal use only**
+
 **Key Benefits**:
 - ✅ No null-check conditionals in SceneFactory
 - ✅ Clean separation of concerns
 - ✅ Easy to test and extend
 - ✅ Follows SOLID principles
 - ✅ Direct FlatBuffers access (no copying)
+- ✅ Format-agnostic primary interface (native C++ structs)
+- ✅ FlatBuffers compatibility for EntityConfigurator
 
 ---
 
@@ -301,12 +308,37 @@ FlatbuffersSceneFactory(const GameContext& game_context, DataSource source);
 
 ## Recommended Solution
 
-### Architecture: Strategy Pattern + Abstract Factory Pattern
+### Architecture: Strategy Pattern + Dual-Format Interface
 
 The solution combines two design patterns:
 
 1. **Strategy Pattern**: ISceneConfigurator abstracts the "how to get scene data" strategy
 2. **Abstract Factory Pattern**: Configurator creates appropriate EntityConfigurator
+
+### Dual-Format Interface Rationale
+
+**Problem**: The codebase uses both native C++ structs (Data Loading Interface pattern) AND FlatBuffers pointers (for EntityConfigurator).
+
+**Solution**: Provide both formats through the interface:
+
+```cpp
+class ISceneConfigurator {
+    // PRIMARY: Format-agnostic native struct
+    virtual std::expected<SceneData, FailInfo> GetSceneData() = 0;
+    
+    // SECONDARY: FlatBuffers pointer for EntityConfigurator
+    virtual std::expected<const SceneDataFbs*, FailInfo> GetSceneDataFbs() = 0;
+};
+```
+
+**Why Both?**
+1. **SceneFactory** should use native `SceneData` struct (follows Data Loading Interface pattern)
+2. **EntityConfigurator** currently requires `EntityCollectionFbs&` (from FlatBuffers data)
+3. Configurator caches both formats internally (loaded once, no duplication)
+4. Factory code becomes format-agnostic (can work with JSON, Lua, etc. in future)
+5. Maintains compatibility with existing EntityConfigurator
+
+**Future Migration Path**: When EntityConfigurator is refactored to use native structs, remove `GetSceneDataFbs()` from the interface. For now, it provides necessary bridge between old and new patterns.
 
 ### Key Components
 
@@ -320,15 +352,27 @@ public:
     virtual ~ISceneConfigurator() = default;
     
     /////////////////////////////////////////////////
-    /// @brief Get the scene data FlatBuffers pointer
+    /// @brief Get the scene data as native C++ struct
     ///
-    /// Configurator handles fetching from appropriate source.
+    /// Configurator handles fetching from appropriate source
+    /// and converting to native format.
     /// May cache internally to avoid repeated lookups.
     ///
-    /// @return FlatBuffers scene data or failure info
+    /// @return Native SceneData struct or failure info
     /////////////////////////////////////////////////
-    virtual std::expected<const SceneDataFbs*, FailInfo> 
+    virtual std::expected<SceneData, FailInfo> 
     GetSceneData() = 0;
+    
+    /////////////////////////////////////////////////
+    /// @brief Get the FlatBuffers pointer for internal use
+    ///
+    /// This is needed for EntityConfigurator and direct FlatBuffers access.
+    /// Configurator caches the FlatBuffers data internally.
+    ///
+    /// @return FlatBuffers scene data pointer or failure info
+    /////////////////////////////////////////////////
+    virtual std::expected<const SceneDataFbs*, FailInfo>
+    GetSceneDataFbs() = 0;
     
     /////////////////////////////////////////////////
     /// @brief Create entity configurator for this scene
@@ -361,8 +405,9 @@ private:
     ISceneDataProvider& m_scene_data_provider;
     SceneType m_scene_type;
     
-    // Cache to avoid repeated provider calls
-    mutable const SceneDataFbs* m_cached_scene_data{nullptr};
+    // Cache native and FlatBuffers data
+    mutable std::optional<SceneData> m_cached_native_data;
+    mutable const SceneDataFbs* m_cached_fbs_data{nullptr};
     mutable bool m_data_loaded{false};
     
 public:
@@ -372,33 +417,44 @@ public:
         : m_scene_data_provider(provider)
         , m_scene_type(scene_type) {}
     
-    std::expected<const SceneDataFbs*, FailInfo> GetSceneData() override {
+    std::expected<SceneData, FailInfo> GetSceneData() override {
         if (!m_data_loaded) {
-            // Load scene data from provider
-            auto scene_data_result = 
-                m_scene_data_provider.LoadSceneData(m_scene_type);
-            
-            if (!scene_data_result.has_value()) {
-                return std::unexpected(scene_data_result.error());
-            }
-            
-            // Note: Assumes FlatbuffersSceneDataProvider returns pointer
-            // to persistent FlatBuffers data (not copied)
-            m_cached_scene_data = /* convert SceneData to SceneDataFbs* */;
-            m_data_loaded = true;
+            LoadData();
         }
         
-        return m_cached_scene_data;
+        if (!m_cached_native_data.has_value()) {
+            return std::unexpected(FailInfo{
+                FailMode::NullPointer,
+                "Scene data failed to load"
+            });
+        }
+        
+        return m_cached_native_data.value();
+    }
+    
+    std::expected<const SceneDataFbs*, FailInfo> GetSceneDataFbs() override {
+        if (!m_data_loaded) {
+            LoadData();
+        }
+        
+        if (!m_cached_fbs_data) {
+            return std::unexpected(FailInfo{
+                FailMode::NullPointer,
+                "FlatBuffers scene data failed to load"
+            });
+        }
+        
+        return m_cached_fbs_data;
     }
     
     std::expected<std::unique_ptr<IEntityConfigurator>, FailInfo>
     CreateEntityConfigurator(EventHandler& event_handler) override {
-        auto scene_data = GetSceneData();
-        if (!scene_data.has_value()) {
-            return std::unexpected(scene_data.error());
+        auto scene_data_fbs = GetSceneDataFbs();
+        if (!scene_data_fbs.has_value()) {
+            return std::unexpected(scene_data_fbs.error());
         }
         
-        if (!scene_data.value()->entity_collection()) {
+        if (!scene_data_fbs.value()->entity_collection()) {
             return std::unexpected(FailInfo{
                 FailMode::NullPointer,
                 "EntityCollection is null in scene data"
@@ -407,12 +463,34 @@ public:
         
         return std::make_unique<FlatbuffersEntityConfigurator>(
             event_handler,
-            *scene_data.value()->entity_collection()
+            *scene_data_fbs.value()->entity_collection()
         );
     }
     
     SceneType GetSceneType() const override {
         return m_scene_type;
+    }
+
+private:
+    void LoadData() const {
+        if (m_data_loaded) return;
+        
+        // Get native data from provider (follows Data Loading Interface pattern)
+        auto native_result = m_scene_data_provider.LoadSceneData(m_scene_type);
+        if (native_result.has_value()) {
+            m_cached_native_data = native_result.value();
+        }
+        
+        // Also need FlatBuffers pointer for EntityConfigurator
+        // This requires access to FlatbuffersDataLoader internally
+        // TODO: Refactor to use a common cache or loader that provides both
+        FlatbuffersDataLoader loader;
+        auto fbs_result = loader.ProvideDefaultSceneData(m_scene_type);
+        if (fbs_result.has_value()) {
+            m_cached_fbs_data = fbs_result.value();
+        }
+        
+        m_data_loaded = true;
     }
 };
 ```
@@ -425,8 +503,9 @@ private:
     ISaveDataProvider& m_save_data_provider;
     uint32_t m_slot_index;
     
-    // Cache
-    mutable const SceneDataFbs* m_cached_scene_data{nullptr};
+    // Cache native and FlatBuffers data
+    mutable std::optional<SceneData> m_cached_native_data;
+    mutable const SceneDataFbs* m_cached_fbs_data{nullptr};
     mutable bool m_data_loaded{false};
     
 public:
@@ -436,35 +515,44 @@ public:
         : m_save_data_provider(provider)
         , m_slot_index(slot_index) {}
     
-    std::expected<const SceneDataFbs*, FailInfo> GetSceneData() override {
+    std::expected<SceneData, FailInfo> GetSceneData() override {
         if (!m_data_loaded) {
-            // Load save data
-            auto save_data_result = 
-                m_save_data_provider.LoadSave(m_slot_index);
-            
-            if (!save_data_result.has_value()) {
-                return std::unexpected(save_data_result.error());
-            }
-            
-            // Note: When SaveData is extended with scene_states field,
-            // use SceneDataExtractor to convert nested SaveData to flat SceneDataFbs
-            // For now, this is a placeholder
-            
-            m_cached_scene_data = /* extract scene data from save */;
-            m_data_loaded = true;
+            LoadData();
         }
         
-        return m_cached_scene_data;
+        if (!m_cached_native_data.has_value()) {
+            return std::unexpected(FailInfo{
+                FailMode::NullPointer,
+                "Scene data failed to load from save"
+            });
+        }
+        
+        return m_cached_native_data.value();
+    }
+    
+    std::expected<const SceneDataFbs*, FailInfo> GetSceneDataFbs() override {
+        if (!m_data_loaded) {
+            LoadData();
+        }
+        
+        if (!m_cached_fbs_data) {
+            return std::unexpected(FailInfo{
+                FailMode::NullPointer,
+                "FlatBuffers scene data failed to load from save"
+            });
+        }
+        
+        return m_cached_fbs_data;
     }
     
     std::expected<std::unique_ptr<IEntityConfigurator>, FailInfo>
     CreateEntityConfigurator(EventHandler& event_handler) override {
-        auto scene_data = GetSceneData();
-        if (!scene_data.has_value()) {
-            return std::unexpected(scene_data.error());
+        auto scene_data_fbs = GetSceneDataFbs();
+        if (!scene_data_fbs.has_value()) {
+            return std::unexpected(scene_data_fbs.error());
         }
         
-        if (!scene_data.value()->entity_collection()) {
+        if (!scene_data_fbs.value()->entity_collection()) {
             return std::unexpected(FailInfo{
                 FailMode::NullPointer,
                 "EntityCollection is null in save data"
@@ -473,15 +561,49 @@ public:
         
         return std::make_unique<FlatbuffersEntityConfigurator>(
             event_handler,
-            *scene_data.value()->entity_collection()
+            *scene_data_fbs.value()->entity_collection()
         );
     }
     
     SceneType GetSceneType() const override {
-        if (m_data_loaded && m_cached_scene_data) {
-            return m_cached_scene_data->scene_info()->scene_type();
+        if (m_data_loaded && m_cached_native_data.has_value()) {
+            return m_cached_native_data.value().scene_type;
         }
         return SceneType::SceneType_UNKNOWN;
+    }
+
+private:
+    void LoadData() const {
+        if (m_data_loaded) return;
+        
+        // Load save data
+        auto save_data_result = m_save_data_provider.LoadSave(m_slot_index);
+        if (!save_data_result.has_value()) {
+            m_data_loaded = true;
+            return;
+        }
+        
+        const SaveData& save_data = save_data_result.value();
+        
+        // Extract native SceneData from SaveData
+        // Note: When SaveData is extended with scene_states field,
+        // use SceneDataExtractor to convert nested SaveData to flat SceneData
+        // For now, extract from current_scene_type
+        SceneData native_data;
+        native_data.scene_type = save_data.current_scene_type;
+        // TODO: Extract other fields when SaveData includes scene state
+        m_cached_native_data = native_data;
+        
+        // Also need FlatBuffers pointer for EntityConfigurator
+        // TODO: When SaveData includes scene_states, extract SceneDataFbs from there
+        // For now, load from default as fallback
+        FlatbuffersDataLoader loader;
+        auto fbs_result = loader.ProvideDefaultSceneData(save_data.current_scene_type);
+        if (fbs_result.has_value()) {
+            m_cached_fbs_data = fbs_result.value();
+        }
+        
+        m_data_loaded = true;
     }
 };
 ```
@@ -516,31 +638,55 @@ public:
     
     std::expected<std::monostate, FailInfo>
     ConfigureSceneResources(Scene& scene) override {
+        // Use native SceneData struct (format-agnostic!)
         auto scene_data = m_scene_configurator->GetSceneData();
         if (!scene_data.has_value()) {
             return std::unexpected(scene_data.error());
         }
         
-        // Use scene_data.value() for configuration
-        // ...
+        // Configure using native struct
+        const SceneData& data = scene_data.value();
+        
+        // Configure render texture size from native data
+        scene.GetRenderTexture().create(
+            data.render_texture_width,
+            data.render_texture_height
+        );
+        
+        // Configure entities using entity configurator (already created)
+        auto configure_emp_result = 
+            m_entity_configurator->ConfigureEntityMemoryPool(
+                scene.GetEntityManager().GetEntityMemoryPool()
+            );
+        
+        if (!configure_emp_result.has_value()) {
+            return std::unexpected(configure_emp_result.error());
+        }
         
         return std::monostate{};
     }
     
     std::expected<std::monostate, FailInfo>
     ConfigureSceneConfig(Scene& scene) override {
+        // Use native SceneData struct (format-agnostic!)
         auto scene_data = m_scene_configurator->GetSceneData();
         if (!scene_data.has_value()) {
             return std::unexpected(scene_data.error());
         }
         
-        // Use scene_data.value() for configuration
-        // ...
+        // Configure using native struct
+        const SceneData& data = scene_data.value();
+        
+        // Set scene ID and type from native data
+        scene.GetSceneInfo().scene_id = data.scene_id;
+        scene.GetSceneInfo().scene_type = data.scene_type;
         
         return std::monostate{};
     }
 };
 ```
+
+**Key Point**: Factory uses `GetSceneData()` which returns native `SceneData` struct, making it format-agnostic. The FlatBuffers-specific `GetSceneDataFbs()` is only used internally by the configurator to create EntityConfigurator.
 
 ### Usage Examples
 
