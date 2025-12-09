@@ -192,27 +192,24 @@ namespace steamrot {
 /// @brief Strategy interface for Scene configuration from different data sources.
 ///
 /// Implementations handle specific data sources (default data, save data, etc.)
-/// and provide unified access to FlatBuffers data structures.
+/// and configure Scene objects directly, keeping FlatBuffers encapsulated.
 /////////////////////////////////////////////////
 class ISceneConfigurator {
 public:
   virtual ~ISceneConfigurator() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Get the FlatBuffers scene data for configuration.
+  /// @brief Configure a Scene object from the data source.
   ///
-  /// @return Pointer to const SceneDataFbs, or nullptr on error
-  /////////////////////////////////////////////////
-  virtual const SceneDataFbs* GetSceneData() const = 0;
-
-  /////////////////////////////////////////////////
-  /// @brief Create an appropriate entity configurator for this data source.
+  /// Configures SceneInfo, SceneResources, SceneConfig, and entities
+  /// directly from the data source (default files, save files, etc.)
   ///
-  /// @param event_handler Reference to the EventHandler
-  /// @return Unique pointer to entity configurator
+  /// @param scene Reference to Scene to configure
+  /// @param game_context GameContext for access to managers and handlers
+  /// @return Success or failure information
   /////////////////////////////////////////////////
-  virtual std::unique_ptr<IEntityConfigurator> 
-  CreateEntityConfigurator(EventHandler &event_handler) const = 0;
+  virtual std::expected<std::monostate, FailInfo>
+  ConfigureScene(Scene &scene, const GameContext &game_context) = 0;
 
   /////////////////////////////////////////////////
   /// @brief Get the scene type being configured.
@@ -234,24 +231,29 @@ namespace steamrot {
 /// @class DefaultSceneConfigurator
 /// @brief Configurator for loading Scenes from default data files.
 ///
-/// Uses ISceneDataProvider internally to access default scene data.
+/// Uses ISceneDataProvider and FlatbuffersDataLoader internally to load
+/// default scene data and configure Scene objects. FlatBuffers types
+/// are completely encapsulated within this implementation.
 /////////////////////////////////////////////////
 class DefaultSceneConfigurator : public ISceneConfigurator {
 private:
   SceneType m_scene_type;
   ISceneDataProvider &m_scene_data_provider;
   
-  // Cache FlatBuffers data after first load
+  // Internal FlatBuffers data loaded from provider (encapsulated)
   mutable const SceneDataFbs *m_cached_scene_data{nullptr};
+  
+  /////////////////////////////////////////////////
+  /// @brief Load FlatBuffers data from provider (internal helper)
+  /////////////////////////////////////////////////
+  const SceneDataFbs* LoadSceneData() const;
 
 public:
   DefaultSceneConfigurator(SceneType scene_type,
                           ISceneDataProvider &scene_data_provider);
 
-  const SceneDataFbs* GetSceneData() const override;
-
-  std::unique_ptr<IEntityConfigurator> 
-  CreateEntityConfigurator(EventHandler &event_handler) const override;
+  std::expected<std::monostate, FailInfo>
+  ConfigureScene(Scene &scene, const GameContext &game_context) override;
 
   SceneType GetSceneType() const override;
 };
@@ -268,25 +270,29 @@ namespace steamrot {
 /// @class SavedSceneConfigurator
 /// @brief Configurator for loading Scenes from save data files.
 ///
-/// Uses ISaveDataProvider internally to access saved game data.
-/// Extracts SceneDataFbs from SaveDataFbs.
+/// Uses ISaveDataProvider internally to load saved game data and
+/// configure Scene objects. Extracts SceneDataFbs from SaveDataFbs
+/// internally - FlatBuffers types are completely encapsulated.
 /////////////////////////////////////////////////
 class SavedSceneConfigurator : public ISceneConfigurator {
 private:
   uint32_t m_save_slot_index;
   ISaveDataProvider &m_save_data_provider;
   
-  // Cache FlatBuffers data after first load
+  // Internal FlatBuffers data extracted from save (encapsulated)
   mutable const SceneDataFbs *m_cached_scene_data{nullptr};
+  
+  /////////////////////////////////////////////////
+  /// @brief Load and extract FlatBuffers data from save (internal helper)
+  /////////////////////////////////////////////////
+  const SceneDataFbs* LoadSceneData() const;
 
 public:
   SavedSceneConfigurator(uint32_t save_slot_index,
                         ISaveDataProvider &save_data_provider);
 
-  const SceneDataFbs* GetSceneData() const override;
-
-  std::unique_ptr<IEntityConfigurator> 
-  CreateEntityConfigurator(EventHandler &event_handler) const override;
+  std::expected<std::monostate, FailInfo>
+  ConfigureScene(Scene &scene, const GameContext &game_context) override;
 
   SceneType GetSceneType() const override;
 };
@@ -303,37 +309,36 @@ class ISceneFactory {
 protected:
   const GameContext &m_game_context;
   
-  // Strategy: configurator provides data access
+  // Strategy: configurator handles all data access and configuration
   const ISceneConfigurator &m_scene_configurator;
-  
-  std::unique_ptr<IEntityConfigurator> m_entity_configurator{nullptr};
   
   SceneType scene_type{SceneType::SceneType_UNKNOWN};
 
   std::expected<std::unique_ptr<Scene>, FailInfo> CreateSceneByType();
 
 public:
-  // Constructor now takes configurator instead of data
+  // Constructor takes configurator - no data pointers!
   ISceneFactory(const GameContext &game_context,
                 const ISceneConfigurator &scene_configurator);
 
   virtual ~ISceneFactory() = default;
 
+  /////////////////////////////////////////////////
+  /// @brief Create and fully configure a Scene.
+  ///
+  /// Uses configurator to handle all configuration internally.
+  /////////////////////////////////////////////////
   std::expected<std::unique_ptr<Scene>, FailInfo> CreateScene();
-
-  std::expected<std::monostate, FailInfo> ConfigureSceneInfo(Scene &scene);
-
-  virtual std::expected<std::monostate, FailInfo>
-  ConfigureSceneResources(Scene &scene) = 0;
-
-  virtual std::expected<std::monostate, FailInfo>
-  ConfigureSceneConfig(Scene &scene) = 0;
-
-  std::expected<std::monostate, FailInfo> ConfigureLogicMap(Scene &scene);
 };
 
 } // namespace steamrot
 ```
+
+**Key Changes:**
+1. Factory no longer has `m_entity_configurator` - configurator handles entities internally
+2. Factory constructor takes only `GameContext` and `ISceneConfigurator`
+3. No FlatBuffers types anywhere in factory interface
+4. Configurator does all the work via `ConfigureScene()`
 
 ---
 

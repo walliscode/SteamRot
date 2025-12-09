@@ -90,11 +90,11 @@ Scene ConfigureFromNative(const SceneData&);  // ❌ Extra step
 
 **We DO this:**
 ```cpp
-// Factory gets FlatBuffers data directly from configurator
-const SceneDataFbs *scene_data = m_scene_configurator.GetSceneData();
+// Configurator configures Scene directly - FlatBuffers encapsulated inside
+m_scene_configurator.ConfigureScene(scene, game_context);
 
-// Configure Scene directly from FlatBuffers
-scene.m_scene_info.scene_id = scene_data->scene_info()->scene_id()->str();
+// NO FlatBuffers types visible to factory!
+// Configurator handles all FlatBuffers access internally
 ```
 
 #### 3. Two Data Sources
@@ -106,11 +106,13 @@ Both sources work through the same interface:
 ISceneDataProvider &provider = GetSceneDataProvider();
 DefaultSceneConfigurator config(SceneType::TITLE, provider);
 SceneFactory factory(game_context, config);  // Same factory!
+auto scene = factory.CreateScene();  // Configurator.ConfigureScene() called internally
 
 // Saved scene loading  
 ISaveDataProvider &save_provider = GetSaveDataProvider();
 SavedSceneConfigurator config(0, save_provider);
 SceneFactory factory(game_context, config);  // Same factory!
+auto scene = factory.CreateScene();  // Configurator.ConfigureScene() called internally
 ```
 
 #### 4. Strategy Pattern
@@ -119,15 +121,17 @@ Configurators ARE the strategy:
 
 ```cpp
 class ISceneConfigurator {  // Strategy interface
-  virtual const SceneDataFbs* GetSceneData() const = 0;
+  virtual std::expected<std::monostate, FailInfo>
+  ConfigureScene(Scene &scene, const GameContext &game_context) = 0;
+  // NO FlatBuffers types in interface!
 };
 
 class DefaultSceneConfigurator : public ISceneConfigurator {
-  // Strategy for default data
+  // Strategy for default data - FlatBuffers encapsulated internally
 };
 
 class SavedSceneConfigurator : public ISceneConfigurator {
-  // Strategy for save data
+  // Strategy for save data - FlatBuffers encapsulated internally
 };
 ```
 
@@ -137,9 +141,12 @@ SceneFactory uses the strategy without knowing which concrete implementation:
 class ISceneFactory {
   const ISceneConfigurator &m_scene_configurator;  // Strategy reference
   
-  void Configure() {
-    const SceneDataFbs *data = m_scene_configurator.GetSceneData();
-    // Works with ANY configurator!
+  std::expected<std::unique_ptr<Scene>, FailInfo> CreateScene() {
+    auto scene = CreateSceneByType();
+    // Configurator does all the configuration work
+    m_scene_configurator.ConfigureScene(*scene, m_game_context);
+    return scene;
+    // Factory never sees FlatBuffers!
   }
 };
 ```
@@ -148,14 +155,14 @@ class ISceneFactory {
 
 The configurator pattern naturally handles this:
 
-| Data Source | Provider Type | Configurator | Factory Gets |
-|-------------|---------------|--------------|--------------|
-| Default files | ISceneDataProvider | DefaultSceneConfigurator | SceneDataFbs* |
-| Save files | ISaveDataProvider | SavedSceneConfigurator | SceneDataFbs* |
-| Test data | (Mock providers) | (Test configurator) | SceneDataFbs* |
-| JSON (future) | IJSONSceneProvider | JSONSceneConfigurator | SceneDataFbs* |
+| Data Source | Provider Type | Configurator | Configurator Calls |
+|-------------|---------------|--------------|-------------------|
+| Default files | ISceneDataProvider | DefaultSceneConfigurator | ConfigureScene(Scene&, GameContext&) |
+| Save files | ISaveDataProvider | SavedSceneConfigurator | ConfigureScene(Scene&, GameContext&) |
+| Test data | (Mock providers) | (Test configurator) | ConfigureScene(Scene&, GameContext&) |
+| JSON (future) | IJSONSceneProvider | JSONSceneConfigurator | ConfigureScene(Scene&, GameContext&) |
 
-All sources → All configurators → Same factory interface
+All sources → All configurators → Same factory interface → NO FlatBuffers exposure
 
 ---
 
@@ -188,31 +195,23 @@ All sources → All configurators → Same factory interface
                       │
                       ↓
 ┌──────────────────────────────────────────────────────┐
-│ 5. Factory calls config.GetSceneData()               │
-│    • Configurator loads from provider                │
-│    • Configurator caches SceneDataFbs*               │
-│    • Configurator returns SceneDataFbs*              │
+│ 5. Factory.CreateScene() creates Scene by type       │
+│    auto scene = CreateSceneByType();                  │
 └─────────────────────┬────────────────────────────────┘
                       │
                       ↓
 ┌──────────────────────────────────────────────────────┐
-│ 6. Factory calls config.CreateEntityConfigurator()   │
-│    • Configurator extracts EntityCollectionFbs       │
-│    • Configurator creates FlatbuffersEntity          │
-│      Configurator with entity data                   │
+│ 6. Factory calls configurator.ConfigureScene()       │
+│    config.ConfigureScene(*scene, game_context);      │
+│    • Configurator loads FlatBuffers internally       │
+│    • Configurator creates entity configurator        │
+│    • Configurator configures all Scene aspects       │
+│    • NO FlatBuffers visible to factory!              │
 └─────────────────────┬────────────────────────────────┘
                       │
                       ↓
 ┌──────────────────────────────────────────────────────┐
-│ 7. Factory creates and configures Scene              │
-│    • Uses SceneDataFbs* from configurator            │
-│    • Uses EntityConfigurator from configurator       │
-│    • Directly populates Scene members                │
-└─────────────────────┬────────────────────────────────┘
-                      │
-                      ↓
-┌──────────────────────────────────────────────────────┐
-│ 8. SceneManager stores configured Scene              │
+│ 7. SceneManager stores configured Scene              │
 │    m_scenes.emplace(scene_id, std::move(scene));     │
 └──────────────────────────────────────────────────────┘
 ```
@@ -244,26 +243,24 @@ All sources → All configurators → Same factory interface
                       │
                       ↓
 ┌──────────────────────────────────────────────────────┐
-│ 5. Factory calls config.GetSceneData()               │
-│    • Configurator loads SaveDataFbs from provider    │
-│    • Configurator extracts SceneDataFbs field        │
-│    • Configurator caches SceneDataFbs*               │
-│    • Configurator returns SceneDataFbs*              │
-└─────────────────────┬────────────────────────────────┘
-                      │
-                      ↓ (REST IS IDENTICAL TO DEFAULT LOADING)
-┌──────────────────────────────────────────────────────┐
-│ 6. Factory calls config.CreateEntityConfigurator()   │
+│ 5. Factory.CreateScene() creates Scene by type       │
+│    auto scene = CreateSceneByType();                  │
 └─────────────────────┬────────────────────────────────┘
                       │
                       ↓
 ┌──────────────────────────────────────────────────────┐
-│ 7. Factory creates and configures Scene              │
+│ 6. Factory calls configurator.ConfigureScene()       │
+│    config.ConfigureScene(*scene, game_context);      │
+│    • Configurator loads SaveDataFbs internally       │
+│    • Configurator extracts SceneDataFbs internally   │
+│    • Configurator creates entity configurator        │
+│    • Configurator configures all Scene aspects       │
+│    • NO FlatBuffers visible to factory!              │
 └─────────────────────┬────────────────────────────────┘
                       │
                       ↓
 ┌──────────────────────────────────────────────────────┐
-│ 8. SceneManager stores configured Scene              │
+│ 7. SceneManager stores configured Scene              │
 └──────────────────────────────────────────────────────┘
 ```
 
@@ -271,25 +268,54 @@ All sources → All configurators → Same factory interface
 
 ## Key Design Decisions
 
-### 1. Configurators Cache Data
+### 1. Configurators Encapsulate FlatBuffers
 
 ```cpp
 class DefaultSceneConfigurator {
+private:
+  // FlatBuffers data is PRIVATE - not exposed
   mutable const SceneDataFbs *m_cached_scene_data{nullptr};
   
-  const SceneDataFbs* GetSceneData() const override {
+  // Internal helper to load data
+  const SceneDataFbs* LoadSceneData() const {
     if (m_cached_scene_data) {
       return m_cached_scene_data;  // Return cached
     }
     // Load and cache
-    auto result = m_scene_data_provider.LoadSceneData(m_scene_type);
-    m_cached_scene_data = ExtractFlatBuffers(result);
+    FlatbuffersDataLoader loader;
+    auto result = loader.LoadSceneData(m_scene_type);
+    m_cached_scene_data = result.value();
     return m_cached_scene_data;
+  }
+
+public:
+  // Public interface - NO FlatBuffers types!
+  std::expected<std::monostate, FailInfo>
+  ConfigureScene(Scene &scene, const GameContext &game_context) override {
+    const SceneDataFbs *scene_data = LoadSceneData();
+    if (!scene_data) {
+      return std::unexpected(FailInfo{FailMode::NullPointer, "No scene data"});
+    }
+    
+    // Configure scene directly from FlatBuffers
+    // All FlatBuffers access happens inside configurator
+    if (scene_data->scene_info()) {
+      scene.m_scene_info.scene_id = scene_data->scene_info()->scene_id()->str();
+      scene.m_scene_info.scene_type = scene_data->scene_info()->scene_type();
+    }
+    
+    // Configure entities using internal entity configurator
+    FlatbuffersEntityConfigurator entity_config(
+        game_context.event_handler, 
+        *scene_data->entity_collection());
+    entity_config.ConfigureEntityMemoryPool(scene.GetEntityManager().GetEntityMemoryPool());
+    
+    return std::monostate{};
   }
 };
 ```
 
-**Reason**: Avoid repeated provider calls during Scene configuration
+**Reason**: Complete encapsulation - factory never sees FlatBuffers types
 
 ### 2. SceneManager Owns Configurators
 
@@ -311,46 +337,69 @@ SceneManager::LoadSceneFromDefault(SceneType scene_type) {
 
 **Reason**: Configurator lifetime matches Scene creation, no need to persist
 
-### 3. Factory References Configurator (Doesn't Own)
+### 3. Factory Simplified - No Configuration Logic
 
 ```cpp
 class ISceneFactory {
 protected:
-  const ISceneConfigurator &m_scene_configurator;  // Reference, not ownership
+  const ISceneConfigurator &m_scene_configurator;  // Reference
+  const GameContext &m_game_context;
   
 public:
   ISceneFactory(const GameContext &game_context,
                 const ISceneConfigurator &configurator)
       : m_game_context(game_context),
         m_scene_configurator(configurator) {}
+  
+  std::expected<std::unique_ptr<Scene>, FailInfo> CreateScene() {
+    // 1. Create Scene by type (TitleScene, CraftingScene, etc.)
+    auto scene = CreateSceneByType();
+    if (!scene.has_value()) {
+      return std::unexpected(scene.error());
+    }
+    
+    // 2. Let configurator do ALL the work
+    auto config_result = m_scene_configurator.ConfigureScene(
+        *scene.value(), m_game_context);
+    if (!config_result.has_value()) {
+      return std::unexpected(config_result.error());
+    }
+    
+    return scene;
+  }
 };
 ```
 
-**Reason**: Factory only needs configurator during CreateScene(), doesn't outlive it
+**Reason**: Factory's ONLY job is to create the Scene object and delegate configuration to configurator
 
-### 4. SavedSceneConfigurator Extracts SceneDataFbs
+### 4. SavedSceneConfigurator Extracts Internally
 
 ```cpp
-const SceneDataFbs* SavedSceneConfigurator::GetSceneData() const {
-  if (m_cached_scene_data) {
-    return m_cached_scene_data;
-  }
-  
-  // Load SaveDataFbs
+std::expected<std::monostate, FailInfo>
+SavedSceneConfigurator::ConfigureScene(Scene &scene, const GameContext &game_context) {
+  // Load SaveDataFbs internally
   auto save_result = m_save_data_provider.LoadSave(m_save_slot_index);
   if (!save_result.has_value()) {
-    return nullptr;
+    return std::unexpected(save_result.error());
   }
   
-  // Extract scene_data field
+  // Extract SceneDataFbs internally - NOT exposed!
   const SaveDataFbs *save_data = GetSaveDataFbs(save_result.value());
-  m_cached_scene_data = save_data->scene_data();
+  const SceneDataFbs *scene_data = save_data->scene_data();
   
-  return m_cached_scene_data;
+  if (!scene_data) {
+    return std::unexpected(FailInfo{FailMode::NullPointer, "No scene data in save"});
+  }
+  
+  // Configure scene from extracted data
+  // All happens inside configurator - factory never sees this!
+  // ... (same configuration logic as DefaultSceneConfigurator)
+  
+  return std::monostate{};
 }
 ```
 
-**Reason**: Factory only needs SceneDataFbs, doesn't care about SaveDataFbs wrapper
+**Reason**: Save data extraction is encapsulated - factory only sees ConfigureScene() interface
 
 ---
 
@@ -358,25 +407,29 @@ const SceneDataFbs* SavedSceneConfigurator::GetSceneData() const {
 
 ### Original Concern: "How we marry multiple data types with multiple data sources"
 
-**Solution**: Configurators bridge the gap
+**Solution**: Configurators bridge the gap and encapsulate everything
 
 ```
 Data Type 1: SceneDataFbs (in default files)
-    ↓ accessed by
+    ↓ loaded internally by
 DefaultSceneConfigurator
-    ↓ provides
-SceneDataFbs* → SceneFactory
+    ↓ calls
+ConfigureScene(Scene&) → Configures Scene directly
+    ↓ NO FlatBuffers exposed!
 
 Data Type 2: SaveDataFbs (contains SceneDataFbs)
-    ↓ accessed by
+    ↓ loaded and extracted internally by
 SavedSceneConfigurator
-    ↓ extracts and provides
-SceneDataFbs* → SceneFactory (same interface!)
+    ↓ calls
+ConfigureScene(Scene&) → Configures Scene directly (same interface!)
+    ↓ NO FlatBuffers exposed!
 ```
+
+Factory only sees: `configurator.ConfigureScene(scene, game_context)`
 
 ### Original Concern: "Cannot use IDataProvider if no structure to provide"
 
-**Clarification**: Providers DO provide structures, but configurators translate them:
+**Clarification**: Providers DO provide structures, configurators use them internally:
 
 ```cpp
 // Provider provides its native format
@@ -385,26 +438,40 @@ class ISceneDataProvider {
   LoadSceneData(SceneType) const = 0;
 };
 
-// Configurator extracts FlatBuffers from provider result
+// Configurator uses provider internally and configures Scene directly
 class DefaultSceneConfigurator {
-  const SceneDataFbs* GetSceneData() const {
-    auto result = m_provider.LoadSceneData(m_scene_type);
-    return ExtractFlatBuffers(result);  // Get FlatBuffers from result
+private:
+  const SceneDataFbs* LoadSceneData() const {
+    // Load from provider, extract FlatBuffers
+    FlatbuffersDataLoader loader;
+    auto result = loader.LoadSceneData(m_scene_type);
+    return result.value();  // FlatBuffers data
+  }
+
+public:
+  std::expected<std::monostate, FailInfo>
+  ConfigureScene(Scene &scene, const GameContext &game_context) override {
+    // Load data internally
+    const SceneDataFbs *scene_data = LoadSceneData();
+    // Configure Scene directly
+    // Factory NEVER sees FlatBuffers!
+    return std::monostate{};
   }
 };
 ```
 
-The provider returns what it loads (including FlatBuffers data), the configurator extracts what the factory needs.
+Providers return data, configurators use it internally, factory NEVER sees FlatBuffers.
 
 ---
 
 ## Benefits Summary
 
-### ✅ Decoupling Achieved
+### ✅ Complete Decoupling Achieved
 
 - Factory never sees provider types
-- Factory never stores FlatBuffers pointers
-- Game code works with interfaces
+- Factory never sees FlatBuffers types (not even in parameters!)
+- Configurator encapsulates ALL data access
+- Game code works purely with interfaces
 
 ### ✅ No Duplication
 
@@ -418,13 +485,31 @@ Easy to add new data sources:
 
 ```cpp
 class NetworkSceneConfigurator : public ISceneConfigurator {
-  // Network provider internally
-  // Same GetSceneData() interface
+private:
+  INetworkProvider &m_network_provider;
+  // FlatBuffers conversion internal
+  
+public:
+  std::expected<std::monostate, FailInfo>
+  ConfigureScene(Scene &scene, const GameContext &game_context) override {
+    // Load from network, convert to FlatBuffers internally
+    // Configure Scene directly
+    // NO FlatBuffers exposed!
+  }
 };
 
 class LuaSceneConfigurator : public ISceneConfigurator {
-  // Lua provider internally
-  // Same GetSceneData() interface
+private:
+  ILuaProvider &m_lua_provider;
+  // FlatBuffers conversion internal
+  
+public:
+  std::expected<std::monostate, FailInfo>
+  ConfigureScene(Scene &scene, const GameContext &game_context) override {
+    // Load from Lua, convert to FlatBuffers internally
+    // Configure Scene directly
+    // NO FlatBuffers exposed!
+  }
 };
 ```
 
@@ -434,8 +519,22 @@ Mock configurators for testing:
 
 ```cpp
 class MockSceneConfigurator : public ISceneConfigurator {
-  const SceneDataFbs* GetSceneData() const override {
-    return m_test_scene_data;
+private:
+  SceneType m_test_scene_type;
+  
+public:
+  MockSceneConfigurator(SceneType type) : m_test_scene_type(type) {}
+  
+  std::expected<std::monostate, FailInfo>
+  ConfigureScene(Scene &scene, const GameContext &game_context) override {
+    // Configure with test data
+    scene.m_scene_info.scene_type = m_test_scene_type;
+    // ...
+    return std::monostate{};
+  }
+  
+  SceneType GetSceneType() const override {
+    return m_test_scene_type;
   }
 };
 ```
@@ -580,19 +679,19 @@ SceneManager::LoadSceneFromSave(uint32_t save_slot_index) {
 
 ### Q: How do we avoid intermediate structs?
 
-**A**: Configurators return FlatBuffers pointers directly. Factory configures from FlatBuffers.
+**A**: Configurators encapsulate FlatBuffers internally and configure Scene directly. Factory never sees FlatBuffers.
 
 ### Q: How do we handle save data differently from default data?
 
-**A**: Different configurators for different sources. SavedSceneConfigurator extracts SceneDataFbs from SaveDataFbs.
+**A**: Different configurators for different sources. SavedSceneConfigurator loads SaveDataFbs and extracts SceneDataFbs internally. Both call ConfigureScene(Scene&).
 
 ### Q: Where does the strategy pattern fit?
 
-**A**: Configurators ARE the strategy. SceneFactory receives ISceneConfigurator (strategy interface).
+**A**: Configurators ARE the strategy. SceneFactory receives ISceneConfigurator (strategy interface) and calls ConfigureScene(Scene&).
 
 ### Q: How do we marry multiple data types with sources?
 
-**A**: Configurators bridge the gap. Each configurator knows its provider, returns unified SceneDataFbs* to factory.
+**A**: Configurators bridge the gap. Each configurator knows its provider and calls ConfigureScene(Scene&) - same interface for all sources. Factory never sees data types.
 
 ---
 
