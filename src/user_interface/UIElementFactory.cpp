@@ -6,8 +6,8 @@
 #include "EventHandler.h"
 #include "EventPacket.h"
 #include "FailInfo.h"
-#include "subscriber_factory.h"
 #include "event_factory.h"
+#include "subscriber_factory.h"
 #include "user_interface_generated.h"
 #include <expected>
 #include <string>
@@ -129,9 +129,8 @@ ConfigureBaseUIElement(UIElement &element, const UIElementData &data,
     std::vector<const SubscriberFbs *> subscribers_fbs{data.subscriber_data()};
     std::vector<std::shared_ptr<Subscriber>> subscribers;
 
-    // Create and register subscriber
-    auto result = subscriber_factory::CreateAndRegisterSubscribers(
-        subscribers_fbs, subscribers, event_handler);
+    // Create Subscriber via factory
+    auto result = subscriber_factory::CreateSubscriber(subscribers_fbs);
 
     if (!result.has_value())
       return std::unexpected(result.error());
@@ -156,10 +155,9 @@ ConfigureBaseUIElement(UIElement &element, const UIElementData &data,
     EventType event_type = data.response_event_data()->event_type();
 
     // create EventData by running the flatbuffers data through the factory
-    auto event_data_conversion_result =
-        event::CreateEventData(
-            data.response_event_data()->event_data_data_type(),
-            data.response_event_data()->event_data_data());
+    auto event_data_conversion_result = event::CreateEventData(
+        data.response_event_data()->event_data_data_type(),
+        data.response_event_data()->event_data_data());
     if (!event_data_conversion_result.has_value())
       return std::unexpected(event_data_conversion_result.error());
 

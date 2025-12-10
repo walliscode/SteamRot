@@ -10,6 +10,7 @@
 #include "Subscriber.h"
 #include "event_factory.h"
 #include "subscriber_generated.h"
+#include <expected>
 
 namespace steamrot {
 namespace subscriber_factory {

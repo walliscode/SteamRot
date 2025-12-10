@@ -34,11 +34,6 @@ protected:
   /////////////////////////////////////////////////
   const GameContext &m_game_context;
 
-  /////////////////////////////////////////////////
-  /// @brief Scene type to create
-  /////////////////////////////////////////////////
-  SceneType scene_type{SceneType::SceneType_UNKNOWN};
-
 public:
   /////////////////////////////////////////////////
   /// @brief Constructor for SceneFactory
@@ -48,16 +43,18 @@ public:
   /// @param type [TODO:parameter]
   /////////////////////////////////////////////////
   SceneFactory(const GameContext &game_context,
-               ISceneConfigurator &scene_configurator, SceneType type);
+               ISceneConfigurator &scene_configurator);
 
   /////////////////////////////////////////////////
   /// @brief Use the factory to create and configure a scene
   /////////////////////////////////////////////////
-  std::expected<std::unique_ptr<Scene>, FailInfo> CreateSceneByType();
+  std::expected<std::unique_ptr<Scene>, FailInfo>
+  CreateSceneByType(const SceneType scene_type);
 
   /////////////////////////////////////////////////
   /// @brief Use the configurator to create and configure a scene
   /////////////////////////////////////////////////
-  std::expected<std::unique_ptr<Scene>, FailInfo> CreateAndConfigureScene();
+  std::expected<std::unique_ptr<Scene>, FailInfo>
+  CreateAndConfigureScene(const SceneType scene_type);
 };
 } // namespace steamrot

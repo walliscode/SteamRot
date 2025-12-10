@@ -13,18 +13,25 @@
 #include <variant>
 
 namespace steamrot {
+/////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-FlatbuffersDefaultSceneConfigurator::ConfigureSceneInfo(Scene &scene) {
+FlatbuffersDefaultSceneConfigurator::ConfigureSceneInfo(
+    Scene &scene, const SceneType scene_type) {
 
+  // load in SceneDataFbs
+
+  auto load_result = m_data_loader.ProvideDefaultSceneData(scene_type);
+  if (!load_result)
+    return std::unexpected(load_result.error());
   // guard statements
-  if (!m_scene_data->scene_info())
+  if (!load_result.value()->scene_info())
     return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
                                     "SceneDataFbs missing SceneInfo"));
 
   // pull out scene info
-  auto &scene_info_fbs = *(m_scene_data->scene_info());
+  auto &scene_info_fbs = *(load_result.value()->scene_info());
 
   // if no scene id, generate one
   // TODO: implement uuid generation
@@ -40,13 +47,20 @@ FlatbuffersDefaultSceneConfigurator::ConfigureSceneInfo(Scene &scene) {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-FlatbuffersDefaultSceneConfigurator::ConfigureSceneResources(Scene &scene) {
+FlatbuffersDefaultSceneConfigurator::ConfigureSceneResources(
+    Scene &scene, const SceneType scene_type) {
+
+  // load in SceneResources data from Flatbuffers
+  auto load_result = m_data_loader.ProvideDefaultSceneData(scene_type);
+  if (!load_result)
+    return std::unexpected(load_result.error());
+
   // guard statements
-  if (!m_scene_data->scene_resources())
+  if (!load_result.value()->scene_resources())
     return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
                                     "SceneDataFbs missing SceneResources"));
   // pull out scene resources
-  auto &scene_resources_fbs = *(m_scene_data->scene_resources());
+  auto &scene_resources_fbs = *(load_result.value()->scene_resources());
 
   // set resources from fbs data
   // [TODO: implement resource loading]
@@ -55,7 +69,8 @@ FlatbuffersDefaultSceneConfigurator::ConfigureSceneResources(Scene &scene) {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-FlatbuffersDefaultSceneConfigurator::ConfigureSceneConfig(Scene &scene) {
+FlatbuffersDefaultSceneConfigurator::ConfigureSceneConfig(
+    Scene &scene, const SceneType scene_type) {
 
   // SceneConfig not active at the moment
   return std::monostate{};

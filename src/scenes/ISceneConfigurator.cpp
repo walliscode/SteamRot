@@ -7,13 +7,14 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "ISceneConfigurator.h"
+#include "scene_types_generated.h"
 #include <variant>
 
 namespace steamrot {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ISceneConfigurator::ConfigureScene(Scene &scene) {
+ISceneConfigurator::ConfigureScene(Scene &scene, const SceneType scene_type) {
 
   return std::monostate();
 }
