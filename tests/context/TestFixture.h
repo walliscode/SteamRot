@@ -13,9 +13,8 @@
 /////////////////////////////////////////////////
 #include "EntityManager.h"
 #include "GameContext.h"
-#include "GameCore.h"
 #include "SceneContext.h"
-#include "SceneCore.h"
+
 #include <memory>
 
 namespace steamrot::tests {
@@ -108,16 +107,6 @@ private:
   /// @brief Flag indicating if Initialize() has been called
   /////////////////////////////////////////////////
   bool m_initialized{false};
-
-  /////////////////////////////////////////////////
-  /// @brief Game-level core objects (window, event handler, assets)
-  /////////////////////////////////////////////////
-  std::unique_ptr<GameCore> m_game_core;
-
-  /////////////////////////////////////////////////
-  /// @brief Scene-level core objects (render texture)
-  /////////////////////////////////////////////////
-  std::unique_ptr<SceneCore> m_scene_core;
 
   /////////////////////////////////////////////////
   /// @brief Entity manager with entity pool and archetypes

@@ -14,6 +14,7 @@
 #include "UIRenderLogic.h"
 #include "UIStateLogic.h"
 #include "logic_data_generated.h"
+#include "subscriber_factory.h"
 #include <expected>
 #include <variant>
 
@@ -216,25 +217,34 @@ LogicFactory::AttachSubscribers(Logic &logic, const LogicData *logic_data) {
   }
 
   // Collect all subscriber configs into a vector
-  std::vector<const SubscriberConfigFbs *> configs;
+  std::vector<const SubscriberFbs *> configs;
   for (const auto *subscriber_data : *logic_data->all_subscriptions()) {
     if (subscriber_data) {
       configs.push_back(subscriber_data);
     }
   }
 
-  // Get logic's subscriber vector
-  std::vector<std::shared_ptr<Subscriber>> temp_subscribers;
+  // for each SubscriberFbs, create Subscriber, register with EventBus, and add
+  // to Logic
+  for (const auto *subscriber_config : configs) {
+    // Create Subscriber using SubscriberFactory
+    auto subscriber_creation_result =
+        subscriber_factory::CreateSubscriber(subscriber_config);
+    // UNEXPECTED PROPOGATION
+    if (!subscriber_creation_result.has_value()) {
+      return std::unexpected(subscriber_creation_result.error());
+    }
 
-  // Create and register all subscribers at once
-  auto result = subscriber_factory::CreateAndRegisterSubscribers(
-      configs, temp_subscribers, m_scene_context.event_handler);
-  if (!result.has_value()) {
-    return std::unexpected(result.error());
-  }
+    const auto subscriber =
+        std::make_shared<Subscriber>(subscriber_creation_result.value());
 
-  // Add all created subscribers to the logic instance
-  for (auto &subscriber : temp_subscribers) {
+    // register Subscriber with EventBus
+    auto registration_result =
+        m_scene_context.event_handler.RegisterSubscriber(subscriber);
+    if (!registration_result.has_value()) {
+      return std::unexpected(registration_result.error());
+    }
+    // add Subscriber to Logic
     logic.AddSubscriber(subscriber);
   }
 

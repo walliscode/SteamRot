@@ -51,7 +51,7 @@ std::expected<std::monostate, FailInfo> Engine::StartUp() {
   }
   m_engine_state = engine_state_result.value();
 
-  // [TODO: Register Subscribers with EventHandler here for now]
+  // Register subscriptions with EventHandler
   for (auto &subscriber : m_engine_state.subscriptions) {
     auto register_result =
         m_game_context.event_handler.RegisterSubscriber(subscriber);

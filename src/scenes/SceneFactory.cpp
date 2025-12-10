@@ -36,7 +36,8 @@ SceneFactory::CreateAndConfigureScene(const SceneType scene_type) {
   }
 
   // Configure the Scene using the configurator
-  if (auto config_result = m_scene_configurator.ConfigureScene(*scene_ptr);
+  if (auto config_result =
+          m_scene_configurator.ConfigureScene(*scene_ptr, scene_type);
       !config_result) {
     return std::unexpected(config_result.error());
   }

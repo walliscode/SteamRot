@@ -31,6 +31,11 @@ struct SceneResources {
       : game_context(game_context), entity_manager() {}
 
   /////////////////////////////////////////////////
+  /// @brief GameContext object passed down from the GameEngine.
+  /////////////////////////////////////////////////
+  const GameContext &game_context;
+
+  /////////////////////////////////////////////////
   /// @brief Entity Manager instance for this scene
   /////////////////////////////////////////////////
   EntityManager entity_manager;
@@ -47,11 +52,6 @@ struct SceneResources {
   /// drawn to the game window.
   /////////////////////////////////////////////////
   sf::RenderTexture scene_texture;
-
-  /////////////////////////////////////////////////
-  /// @brief GameContext object passed down from the GameEngine.
-  /////////////////////////////////////////////////
-  const GameContext &game_context;
 };
 
 } // namespace steamrot

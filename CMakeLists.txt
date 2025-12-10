@@ -34,7 +34,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/FlatbuffersCompilation"
 cmake_path(SET data_dir ${CMAKE_SOURCE_DIR}/data)
 cmake_path(SET test_data_dir ${CMAKE_SOURCE_DIR}/tests/data)
 
-# Include flatbuffers compilation scripts
+
 include(flatbuffers_compilation)
 
 # fetch_content_modules.cmake contains a menu list of all fetch content
