@@ -46,6 +46,9 @@ const SceneInfo Scene::GetSceneInfo() const {
 }
 
 /////////////////////////////////////////////////
+SceneInfo &Scene::GetSceneInfo() { return m_scene_info; }
+
+/////////////////////////////////////////////////
 SceneContext Scene::GetSceneContext() {
 
   SceneContext scene_context{m_scene_resources.scene_texture,

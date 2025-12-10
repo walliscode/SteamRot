@@ -15,19 +15,20 @@ namespace steamrot {
 
 /////////////////////////////////////////////////
 SceneFactory::SceneFactory(const GameContext &game_context,
-                           ISceneConfigurator &scene_configurator,
-                           SceneType type)
-    : m_game_context(game_context), m_scene_configurator(scene_configurator) {};
+                           ISceneConfigurator &scene_configurator)
+
+    : m_game_context(game_context), m_scene_configurator(scene_configurator) {}
 
 /////////////////////////////////////////////////
 std::expected<std::unique_ptr<Scene>, FailInfo>
-SceneFactory::CreateAndConfigureScene() {
+SceneFactory::CreateAndConfigureScene(const SceneType scene_type) {
 
   // Create a unique pointer to a Scene object
   std::unique_ptr<Scene> scene_ptr{nullptr};
 
   // Create Scene by type
-  if (auto scene_ptr_result = CreateSceneByType(); !scene_ptr_result) {
+  if (auto scene_ptr_result = CreateSceneByType(scene_type);
+      !scene_ptr_result) {
     return std::unexpected(scene_ptr_result.error());
   } else {
     // set the scene_ptr to the created Scene
@@ -45,7 +46,7 @@ SceneFactory::CreateAndConfigureScene() {
 
 /////////////////////////////////////////////////
 std::expected<std::unique_ptr<Scene>, FailInfo>
-SceneFactory::CreateSceneByType() {
+SceneFactory::CreateSceneByType(const SceneType scene_type) {
   // guard statement if scene_type is unknown
   if (scene_type == SceneType::SceneType_UNKNOWN) {
     return std::unexpected(FailInfo{FailMode::EnumValueNotHandled,

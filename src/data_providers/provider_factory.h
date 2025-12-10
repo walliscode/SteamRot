@@ -11,6 +11,7 @@
 #include "IAssetDataProvider.h"
 #include "IEngineDataProvider.h"
 #include "IFragmentDataProvider.h"
+#include "ISceneConfigurator.h"
 #include "ISceneDataProvider.h"
 #include "ISceneManagerDataProvider.h"
 
@@ -43,5 +44,12 @@ IAssetDataProvider &GetAssetDataProvider();
 /// @brief Get the fragment data provider instance.
 /////////////////////////////////////////////////
 IFragmentDataProvider &GetFragmentDataProvider();
+
+/////////////////////////////////////////////////
+/// @brief Returns
+///
+/// @return Reference to default scene configurator
+/////////////////////////////////////////////////
+ISceneConfigurator &GetDefaultSceneConfigurator();
 
 } // namespace steamrot

@@ -111,6 +111,8 @@ public:
   /////////////////////////////////////////////////
   const SceneInfo GetSceneInfo() const;
 
+  SceneInfo &GetSceneInfo();
+
   /////////////////////////////////////////////////
   /// @brief Create and return a SceneContext object for the Scene.
   ///

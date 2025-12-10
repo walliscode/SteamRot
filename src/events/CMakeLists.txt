@@ -22,10 +22,10 @@ logger
 matchers
 )
 
-# Apply project-specific compile and link options
-if(DEFINED PROJECT_COMPILE_OPTIONS)
-  target_compile_options(events PRIVATE ${PROJECT_COMPILE_OPTIONS})
-endif()
-if(DEFINED PROJECT_LINK_OPTIONS)
-  target_link_options(events PRIVATE ${PROJECT_LINK_OPTIONS})
-endif()
+# # Apply project-specific compile and link options
+# if(DEFINED PROJECT_COMPILE_OPTIONS)
+#   target_compile_options(events PRIVATE ${PROJECT_COMPILE_OPTIONS})
+# endif()
+# if(DEFINED PROJECT_LINK_OPTIONS)
+#   target_link_options(events PRIVATE ${PROJECT_LINK_OPTIONS})
+# endif()
