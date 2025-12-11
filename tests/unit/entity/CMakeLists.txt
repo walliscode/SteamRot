@@ -1,9 +1,10 @@
 add_executable(test_entity
   entity_memory.test.cpp
+  archetypes.test.cpp
   EntityManager.test.cpp
   ArchetypeManager.test.cpp
   FlatbuffersEntityConfigurator.test.cpp
-  archetype_helpers.test.cpp
+
 )
 
 target_include_directories(test_entity

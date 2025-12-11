@@ -13,7 +13,7 @@
 #include "UICollisionLogic.h"
 #include "UIRenderLogic.h"
 #include "UIStateLogic.h"
-#include "archetype_helpers.h"
+#include "archetypes.h"
 #include "entity_memory.h"
 #include "logic_action.h"
 #include "logic_collision.h"
@@ -35,7 +35,8 @@ ExecuteFunction(const FunctionType function_type, SceneContext &scene_context) {
 
     // This function needs a UIElement - we need to iterate through
     // UI entities in the scene
-    ArchetypeID ui_archetype = GenerateArchetypeIDfromTypes<CUserInterface>();
+    ArchetypeID ui_archetype =
+        archetypes::GenerateArchetypeIDfromTypes<CUserInterface>();
 
     const auto it = scene_context.archetypes.find(ui_archetype);
 
@@ -61,7 +62,8 @@ ExecuteFunction(const FunctionType function_type, SceneContext &scene_context) {
 
   case FunctionType_ProcessNestedUIActionsAndEvents: {
     // Similar to above but processes nested elements
-    ArchetypeID ui_archetype = GenerateArchetypeIDfromTypes<CUserInterface>();
+    ArchetypeID ui_archetype =
+        archetypes::GenerateArchetypeIDfromTypes<CUserInterface>();
     const auto it = scene_context.archetypes.find(ui_archetype);
 
     if (it != scene_context.archetypes.end()) {
@@ -98,8 +100,9 @@ ExecuteFunction(const FunctionType function_type, SceneContext &scene_context) {
   case FunctionType_CheckMouseOverNestedUIElement: {
 
     // grab the relvant entity ids
-    auto entity_indexes = GenerateEntityIndexesFromComponents<CUserInterface>(
-        scene_context.archetypes);
+    auto entity_indexes =
+        archetypes::GenerateEntityIndexesFromComponents<CUserInterface>(
+            scene_context.archetypes);
 
     for (size_t entity_id : entity_indexes) {
       CUserInterface &ui_component =
@@ -116,7 +119,8 @@ ExecuteFunction(const FunctionType function_type, SceneContext &scene_context) {
   case FunctionType_UpdateCUserInterfaceVisibilityFromCUIState: {
     // grab the relevant entity ids
     auto entity_indexes =
-        GenerateEntityIndexesFromComponents<CUIState>(scene_context.archetypes);
+        archetypes::GenerateEntityIndexesFromComponents<CUIState>(
+            scene_context.archetypes);
 
     for (size_t entity_id : entity_indexes) {
 

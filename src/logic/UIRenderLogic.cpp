@@ -3,9 +3,9 @@
 /////////////////////////////////////////////////
 #include "UIRenderLogic.h"
 #include "Logic.h"
-#include "archetype_helpers.h"
-#include "logic_render.h"
+#include "archetypes.h"
 #include "entity_memory.h"
+#include "logic_render.h"
 #include <SFML/Graphics.hpp>
 
 namespace steamrot {
@@ -27,8 +27,10 @@ void UIRenderLogic::ProcessLogic() {
 void UIRenderLogic::DrawUIElements() {
 
   // Generate entity indexes for entities with only CUserInterface component
-  auto entity_indexes = GenerateEntityIndexesFromComponents<CUserInterface>(
-      m_scene_context.archetypes, true);
+  auto entity_indexes =
+      archetypes::GenerateEntityIndexesFromComponents<CUserInterface>(
+
+          m_scene_context.archetypes, true);
 
   // cycle through all the entity indexs in the archetype
   for (size_t entity_id : entity_indexes) {
