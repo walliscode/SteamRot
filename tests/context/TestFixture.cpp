@@ -38,8 +38,9 @@ void TestFixture::CreateCores() {
 void TestFixture::CreateContexts() {
   // Create GameContext from engine resources
   m_game_context = std::make_unique<GameContext>(m_engine_resources);
-  
-  // Create SceneContext from scene texture, engine resources, and entity manager
+
+  // Create SceneContext from scene texture, engine resources, and entity
+  // manager
   m_scene_context = std::make_unique<SceneContext>(
       m_scene_texture, m_engine_resources, *m_entity_manager);
 }
@@ -56,11 +57,11 @@ void TestFixture::Initialize() {
   constexpr unsigned int window_height = 600;
 
   // Initialize the game window in engine resources
-  m_engine_resources.game_window.create(sf::VideoMode(window_width, window_height),
-                                        "Test Window");
+  m_engine_resources.game_window.create(
+      sf::VideoMode({window_width, window_height}), "Test Window");
 
-  // Initialize the scene render texture
-  m_scene_texture.create(window_width, window_height);
+  // Resize the render texture to match window size
+  auto resize_result = m_scene_texture.resize({window_width, window_height});
 
   m_initialized = true;
 }

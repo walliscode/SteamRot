@@ -66,6 +66,9 @@ TEST_CASE(
   auto &game_context = fixture.GetGameContext();
   auto &scene_context = fixture.GetSceneContext();
 
+  REQUIRE(steamrot::entity::memory::GetMemoryPoolSize(
+              scene_context.scene_entities) == 0);
+
   // Create minimal entity collection data
   flatbuffers::FlatBufferBuilder builder;
 
