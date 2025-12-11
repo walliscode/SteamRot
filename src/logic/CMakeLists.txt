@@ -24,4 +24,5 @@ target_link_libraries(logic PUBLIC
   flatbuffers_headers
   engine
   user_interface
+  types
 )

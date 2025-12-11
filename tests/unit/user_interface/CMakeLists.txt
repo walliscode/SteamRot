@@ -33,7 +33,7 @@ target_include_directories(user_interface_helpers
 target_link_libraries(user_interface_helpers
   PUBLIC
   Catch2::Catch2WithMain
-  ui_styles
+  types
   mock_subscriber_data
 )
 
