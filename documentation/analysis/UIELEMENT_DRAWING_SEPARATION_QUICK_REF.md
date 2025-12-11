@@ -1,7 +1,8 @@
 # UIElement Drawing Separation - Quick Reference
 
 **Date**: December 11, 2025  
-**Full Analysis**: [UIELEMENT_DRAWING_SEPARATION_ANALYSIS.md](./UIELEMENT_DRAWING_SEPARATION_ANALYSIS.md)
+**Full Analysis**: [UIELEMENT_DRAWING_SEPARATION_ANALYSIS.md](./UIELEMENT_DRAWING_SEPARATION_ANALYSIS.md)  
+**Free Function Alternative**: [UIELEMENT_DRAWING_SEPARATION_FREE_FUNCTION_ALTERNATIVE.md](./UIELEMENT_DRAWING_SEPARATION_FREE_FUNCTION_ALTERNATIVE.md)
 
 ---
 
@@ -9,8 +10,10 @@
 
 **Problem**: UIElement data types have drawing methods, creating dependency on logic layer  
 **Goal**: Pure data types with zero logic dependencies  
-**Solution**: Move drawing to UIElementRenderer class  
+**Solution**: Move drawing to logic layer (renderer class OR free functions)  
 **Status**: Analysis complete, awaiting implementation decision
+
+**Update**: Free function implementation may be better fit for this codebase - see [Free Function Alternative](./UIELEMENT_DRAWING_SEPARATION_FREE_FUNCTION_ALTERNATIVE.md)
 
 ---
 
@@ -53,10 +56,13 @@ src/logic/
 | 4. Strategy | ⚠️ | ⚠️ Runtime | ❌ Heap alloc | Medium | Low | No |
 | 5. Function Ptr | ⚠️ | ⚠️ Weak | ✅ Good | Low | Low | No |
 | 6. Renderer | ✅ | ⚠️ Runtime | ⚠️ RTTI | Low | Low | ⭐ **YES** |
+| 6a. Free Funcs | ✅ | ⚠️ Runtime | ⚠️ RTTI | Low | Low | ⭐ **BETTER** |
+
+**Note**: Option 6a (Free Functions) may be better fit - aligns with existing `logic::render` pattern. See [Free Function Alternative](./UIELEMENT_DRAWING_SEPARATION_FREE_FUNCTION_ALTERNATIVE.md).
 
 ---
 
-## Recommended: Option 6 (Renderer Class)
+## Recommended: Option 6 (Renderer Class) or 6a (Free Functions)
 
 ### Why This Option?
 
@@ -230,6 +236,56 @@ void UIRenderLogic::DrawUIElements() {
     }
 }
 ```
+
+---
+
+## Alternative: Free Functions (Option 6a) - May Be Better
+
+See [complete details](./UIELEMENT_DRAWING_SEPARATION_FREE_FUNCTION_ALTERNATIVE.md)
+
+**Why better than class**:
+- ✅ Aligns with existing `logic::render` namespace pattern
+- ✅ Less boilerplate (no class definition needed)
+- ✅ Simpler implementation (extend existing logic_render.cpp)
+- ✅ Easier to test (pure functions)
+
+**Structure**:
+```cpp
+// In src/logic/logic_render.h (extend existing)
+namespace steamrot::logic::render {
+    void DrawButtonElement(sf::RenderTexture&, const ButtonElement&, const UIStyle&);
+    void DrawPanelElement(sf::RenderTexture&, const PanelElement&, const UIStyle&);
+    // ... all element types
+    
+    void DrawUIElementDispatch(sf::RenderTexture&, const UIElement&, const UIStyle&);
+}
+
+// In src/logic/logic_render.cpp (extend existing)
+void DrawUIElementDispatch(sf::RenderTexture& texture,
+                          const UIElement& element,
+                          const UIStyle& style) {
+    if (auto* btn = dynamic_cast<const ButtonElement*>(&element))
+        DrawButtonElement(texture, *btn, style);
+    // ... all types
+}
+
+void DrawNestedUIElements(sf::RenderTexture& texture,
+                         const UIElement& element,
+                         const UIStyle& style) {
+    DrawUIElementDispatch(texture, element, style);  // ← Changed line
+    UpdateSizeAndPositionOfChildElements(element, style);
+    if (element.children_active) {
+        for (const auto& child : element.child_elements) {
+            DrawNestedUIElements(texture, *child, style);
+        }
+    }
+}
+```
+
+**Benefits**:
+- Same goal achieved (zero-dependency data types)
+- Better alignment with existing code style
+- Slightly simpler implementation (3-5 hours vs 4-6 hours)
 
 ---
 
