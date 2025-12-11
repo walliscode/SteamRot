@@ -2,7 +2,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "CUIState.h"
-
 #include "containers.h"
 
 namespace steamrot {

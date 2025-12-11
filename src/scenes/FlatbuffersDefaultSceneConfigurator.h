@@ -23,7 +23,7 @@ private:
   FlatbuffersDataLoader m_data_loader;
 
 public:
-  FlatbuffersDefaultSceneConfigurator();
+  FlatbuffersDefaultSceneConfigurator() = default;
 
   /////////////////////////////////////////////////
   /// @brief  function to configure SceneInfo struct

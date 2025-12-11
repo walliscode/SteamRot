@@ -1,8 +1,12 @@
 {
-  "scene_id": "crafting",
-  "scene_type": "CRAFTING",
-  "render_texture_width": 800,
-  "render_texture_height": 600,
+  "scene_info": {
+    "scene_id": "crafting",
+    "scene_type": "CRAFTING"
+  },
+  "scene_resources": {
+    "texture_width": 800,
+    "texture_height": 600
+  },
   "entity_collection": {
     "entity_memory_pool_size": 100,
     "entities": [

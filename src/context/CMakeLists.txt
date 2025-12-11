@@ -10,5 +10,4 @@ target_link_libraries(context PUBLIC
   SFML::Graphics
   engine
   flatbuffers_headers
-  core
 )

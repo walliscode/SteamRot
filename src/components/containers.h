@@ -11,7 +11,6 @@
 #include "CMeta.h"
 #include "CUIState.h"
 #include "CUserInterface.h"
-#include <magic_enum/magic_enum.hpp>
 
 namespace steamrot {
 

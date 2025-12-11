@@ -3,7 +3,7 @@ add_library(entity
     FlatbuffersEntityConfigurator.cpp
     ArchetypeManager.cpp
     entity_memory.cpp
-  )
+)
 
 target_include_directories(entity
   PUBLIC

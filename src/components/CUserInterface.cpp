@@ -2,7 +2,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "CUserInterface.h"
-
 #include "containers.h"
 
 namespace steamrot {

@@ -9,7 +9,6 @@
 /////////////////////////////////////////////////
 #include "Component.h"
 #include "UIElement.h"
-#include <SFML/System/Vector2.hpp>
 #include <memory>
 
 namespace steamrot {

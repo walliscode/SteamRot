@@ -7,9 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "Component.h"
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
 
 namespace steamrot {
 struct CMeta : public Component {

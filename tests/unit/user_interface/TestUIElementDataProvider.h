@@ -30,7 +30,7 @@ public:
 
     auto position = CreateVector2fData(builder, x, y);
     auto size = CreateVector2fData(builder, w, h);
-    auto subscriber_data = CreateTestUserInputSubscriberData(builder);
+    auto subscriber_data = CreateTestUserInputSubscriber(builder);
     auto response_event = CreateTestQuitGameEventPacketData(builder);
     if (!children.o) {
       children = builder.CreateVector<flatbuffers::Offset<child>>({});

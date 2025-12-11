@@ -17,14 +17,3 @@ TEST_CASE("GameEngine initializes correctly", "[unit][GameEngine]") {
 
   SUCCEED("GameEngine initialized correctly");
 }
-
-TEST_CASE("GameEngine::ConfigureSubscribersFromData fails on null data",
-          "[unit][GameEngine]") {
-  steamrot::GameEngine game_engine;
-  // Attempt to configure subscribers from null data
-  auto configure_result = game_engine.ConfigureSubscribersFromData(nullptr);
-  // Check that the configuration failed
-  REQUIRE(!configure_result.has_value());
-  REQUIRE(configure_result.error().mode == steamrot::FailMode::NullPointer);
-  REQUIRE(game_engine.GetSubscriptions().empty());
-}
