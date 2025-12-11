@@ -19,8 +19,7 @@
 // CreateSubscriber tests
 /////////////////////////////////////////////////
 
-TEST_CASE("CreateSubscriber fails with null pointer",
-          "[unit][subscriber_factory]") {
+TEST_CASE("CreateSubscriber fails with null pointer", "[subscriber_factory]") {
   auto result = steamrot::subscriber_factory::CreateSubscriber(nullptr);
 
   REQUIRE_FALSE(result.has_value());
@@ -28,7 +27,7 @@ TEST_CASE("CreateSubscriber fails with null pointer",
 }
 
 TEST_CASE("CreateSubscriber fails with EventType NONE",
-          "[unit][subscriber_factory]") {
+          "[subscriber_factory]") {
   flatbuffers::FlatBufferBuilder builder;
 
   // Create SubscriberFbs with EventType_NONE
@@ -52,7 +51,8 @@ TEST_CASE("CreateSubscriber creates subscriber without trigger data",
   // Create SubscriberFbs with just event type, no trigger data
   auto subscriber_offset = steamrot::CreateSubscriberFbs(
       builder, steamrot::EventType::EventType_EVENT_TEST,
-      steamrot::EventDataData::EventDataData_NONE, 0, // trigger_data_type and data
+      steamrot::EventDataData::EventDataData_NONE,
+      0,      // trigger_data_type and data
       false); // active
   builder.Finish(subscriber_offset);
 
@@ -75,7 +75,8 @@ TEST_CASE("CreateSubscriber creates active subscriber without trigger data",
   // Create SubscriberFbs with active flag set
   auto subscriber_offset = steamrot::CreateSubscriberFbs(
       builder, steamrot::EventType::EventType_EVENT_TEST,
-      steamrot::EventDataData::EventDataData_NONE, 0, // trigger_data_type and data
+      steamrot::EventDataData::EventDataData_NONE,
+      0,     // trigger_data_type and data
       true); // active
   builder.Finish(subscriber_offset);
 
@@ -123,8 +124,8 @@ TEST_CASE("CreateSubscriber creates subscriber with UserInputBitset trigger "
       result.value().m_trigger_event_data.value()));
 
   // Verify the bitset has A key pressed
-  const auto &bitset =
-      std::get<steamrot::UserInputBitset>(result.value().m_trigger_event_data.value());
+  const auto &bitset = std::get<steamrot::UserInputBitset>(
+      result.value().m_trigger_event_data.value());
   REQUIRE(bitset.test(static_cast<size_t>(sf::Keyboard::Key::A)));
 }
 
@@ -134,9 +135,9 @@ TEST_CASE("CreateSubscriber creates subscriber with SceneChangePacket trigger "
   flatbuffers::FlatBufferBuilder builder;
 
   // Create SceneChangePacketData
-  auto trigger_data_offset = steamrot::CreateSceneChangePacketData(
-      builder, 0, // uuid
-      steamrot::SceneType_TITLE);
+  auto trigger_data_offset =
+      steamrot::CreateSceneChangePacketData(builder, 0, // uuid
+                                            steamrot::SceneType_TITLE);
 
   // Create SubscriberFbs with trigger data
   auto subscriber_offset = steamrot::CreateSubscriberFbs(
@@ -196,8 +197,8 @@ TEST_CASE("CreateSubscriber creates subscriber with UserInterfaceName trigger "
       result.value().m_trigger_event_data.value()));
 
   // Verify the UI name
-  const auto &ui_name =
-      std::get<steamrot::UserInterfaceName>(result.value().m_trigger_event_data.value());
+  const auto &ui_name = std::get<steamrot::UserInterfaceName>(
+      result.value().m_trigger_event_data.value());
   REQUIRE(ui_name == "test_ui_element");
 }
 
