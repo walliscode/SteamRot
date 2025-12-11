@@ -75,9 +75,6 @@ struct UIElement {
   /////////////////////////////////////////////////
   LayoutType layout{LayoutType::LayoutType_Vertical};
 
-  virtual void DrawUIElement(sf::RenderTexture &texture,
-                             const UIStyle &style) const = 0;
-
   /////////////////////////////////////////////////
   /// @brief Create a deep copy of this UI element and its children
   ///

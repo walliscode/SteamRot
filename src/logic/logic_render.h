@@ -22,6 +22,15 @@
 #include <sys/types.h>
 
 namespace steamrot {
+
+// Forward declarations for element types
+struct ButtonElement;
+struct PanelElement;
+struct DropDownListElement;
+struct DropDownItemElement;
+struct DropDownButtonElement;
+struct DropDownContainerElement;
+
 namespace logic {
 namespace render {
 
@@ -34,6 +43,80 @@ namespace render {
 /////////////////////////////////////////////////
 void DrawNestedUIElements(sf::RenderTexture &texture, const UIElement &element,
                           const UIStyle &style);
+
+/////////////////////////////////////////////////
+/// @brief Internal dispatcher that dispatches to type-specific drawing functions
+///
+/// @param texture Render texture to draw to
+/// @param element Element to draw
+/// @param style Style to use for drawing
+/////////////////////////////////////////////////
+void DrawUIElementDispatch(sf::RenderTexture &texture,
+                           const UIElement &element, const UIStyle &style);
+
+/////////////////////////////////////////////////
+/// @brief Draw a ButtonElement
+///
+/// @param texture Render texture to draw to
+/// @param button Button element to draw
+/// @param style Style to use for drawing
+/////////////////////////////////////////////////
+void DrawButtonElement(sf::RenderTexture &texture,
+                      const ButtonElement &button, const UIStyle &style);
+
+/////////////////////////////////////////////////
+/// @brief Draw a PanelElement
+///
+/// @param texture Render texture to draw to
+/// @param panel Panel element to draw
+/// @param style Style to use for drawing
+/////////////////////////////////////////////////
+void DrawPanelElement(sf::RenderTexture &texture, const PanelElement &panel,
+                     const UIStyle &style);
+
+/////////////////////////////////////////////////
+/// @brief Draw a DropDownListElement
+///
+/// @param texture Render texture to draw to
+/// @param list DropDown list element to draw
+/// @param style Style to use for drawing
+/////////////////////////////////////////////////
+void DrawDropDownListElement(sf::RenderTexture &texture,
+                             const DropDownListElement &list,
+                             const UIStyle &style);
+
+/////////////////////////////////////////////////
+/// @brief Draw a DropDownItemElement
+///
+/// @param texture Render texture to draw to
+/// @param item DropDown item element to draw
+/// @param style Style to use for drawing
+/////////////////////////////////////////////////
+void DrawDropDownItemElement(sf::RenderTexture &texture,
+                             const DropDownItemElement &item,
+                             const UIStyle &style);
+
+/////////////////////////////////////////////////
+/// @brief Draw a DropDownButtonElement
+///
+/// @param texture Render texture to draw to
+/// @param button DropDown button element to draw
+/// @param style Style to use for drawing
+/////////////////////////////////////////////////
+void DrawDropDownButtonElement(sf::RenderTexture &texture,
+                               const DropDownButtonElement &button,
+                               const UIStyle &style);
+
+/////////////////////////////////////////////////
+/// @brief Draw a DropDownContainerElement
+///
+/// @param texture Render texture to draw to
+/// @param container DropDown container element to draw
+/// @param style Style to use for drawing
+/////////////////////////////////////////////////
+void DrawDropDownContainerElement(sf::RenderTexture &texture,
+                                 const DropDownContainerElement &container,
+                                 const UIStyle &style);
 
 /////////////////////////////////////////////////
 /// @brief Draw the border and background of a general UI element

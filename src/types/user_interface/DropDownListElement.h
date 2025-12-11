@@ -12,7 +12,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "UIElement.h"
-#include "logic_render.h"
 
 namespace steamrot {
 struct DropDownListElement : public UIElement {
@@ -51,34 +50,6 @@ struct DropDownListElement : public UIElement {
     cloned->expanded_label = expanded_label;
     cloned->data_populate_function = data_populate_function;
     return cloned;
-  }
-
-/////////////////////////////////////////////////
-  /// @brief Draws the DropDownListElement on a RenderTexture
-  ///
-  /// @param texture Reference to the RenderTexture to draw on
-  /// @param style UIStyle providing values for drawing
-/////////////////////////////////////////////////
-  void DrawUIElement(sf::RenderTexture &texture,
-                     const UIStyle &style) const override {
-    logic::render::DrawBorderAndBackground(texture, *this,
-                                              style.drop_down_list_style);
-
-    // calculate the position for the text
-    sf::Vector2f text_position{
-        position.x + style.drop_down_list_style.border_thickness +
-            style.drop_down_list_style.inner_margin.x,
-        position.y + style.drop_down_list_style.border_thickness +
-            style.drop_down_list_style.inner_margin.y};
-
-    // set the label based on whether the dropdown is expanded
-    std::string label = is_expanded ? expanded_label : unexpanded_label;
-
-    logic::render::DrawText(texture, label, text_position, size,
-                               style.drop_down_list_style.font,
-                               style.drop_down_list_style.font_size,
-                               style.drop_down_list_style.text_color);
-    ;
   }
 };
 } // namespace steamrot
