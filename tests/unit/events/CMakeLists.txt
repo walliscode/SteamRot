@@ -1,6 +1,6 @@
 add_executable(test_events
 Subscriber.test.cpp
-SubscriberFactory.test.cpp
+subscriber_factory.test.cpp
 UserInputBitset.test.cpp
 EventHandler.test.cpp
 event_bus_conversion.test.cpp
