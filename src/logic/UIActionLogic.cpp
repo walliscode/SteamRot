@@ -8,6 +8,7 @@
 #include "entity_memory.h"
 #include "logic_action.h"
 #include <SFML/Window/Mouse.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 using namespace magic_enum::bitwise_operators;
 namespace steamrot {

@@ -15,7 +15,6 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "EngineState.h"
 #include "FailInfo.h"
 #include "SceneSnapshot.h"
 #include "test_context.h"
@@ -35,7 +34,8 @@ namespace steamrot::tests {
 /// 2. Configures an expected EntityMemoryPool from the snapshot
 /// 3. Uses the EntityMemoryPoolEqualsMatcher for comparison
 ///
-/// @param actual_scene_snapshot The actual scene snapshot containing entity pool
+/// @param actual_scene_snapshot The actual scene snapshot containing entity
+/// pool
 /// @param expected_engine_state The expected engine state from tick snapshot
 /// @param context Test context for enhanced error messages
 /// @param expected_to_pass Whether the comparison is expected to pass
@@ -54,7 +54,8 @@ CompareTickSnapshotEntityPool(const SceneSnapshot &actual_scene_snapshot,
 /// from a tick snapshot. Iterates through each scene and calls
 /// CompareTickSnapshotEntityPool for the entity pool comparison.
 ///
-/// @param actual_scene_snapshots Vector of actual scene snapshots from data bank
+/// @param actual_scene_snapshots Vector of actual scene snapshots from data
+/// bank
 /// @param tick_snapshot The tick snapshot containing expected state
 /// @param context Test context for enhanced error messages
 /// @param expected_to_pass Whether the comparison is expected to pass

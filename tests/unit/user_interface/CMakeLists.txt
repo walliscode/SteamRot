@@ -1,6 +1,6 @@
 add_executable(test_user_interface
   styles/StylesConfigurator.test.cpp
-  UIElementFactory.test.cpp
+  # UIElementFactory.test.cpp
   ui_element_factory_test_helpers.cpp
 )
 

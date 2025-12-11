@@ -28,9 +28,10 @@
 ///   └─▶ GameEngine() [default constructor]
 ///   └─▶ RunGame()
 ///         └─▶ StartUp() [GameEngine override]
-///               └─▶ Engine::StartUp() [loads defaults + calls ConfigureEngineStateFromData]
-///               └─▶ LoadSavedUserPreferences() [overrides defaults if file exists]
-///               └─▶ SceneManager::LoadTitleScene() [starts the game]
+///               └─▶ Engine::StartUp() [loads defaults + calls
+///               ConfigureEngineStateFromData] └─▶ LoadSavedUserPreferences()
+///               [overrides defaults if file exists] └─▶
+///               SceneManager::LoadTitleScene() [starts the game]
 ///         └─▶ RunGameLoop()
 /// ```
 ///
@@ -67,8 +68,6 @@ private:
   /////////////////////////////////////////////////
   DisplayManager m_display_manager;
 
-
-
   /////////////////////////////////////////////////
   /// @brief Process scene-specific logic (new Tick_() pipeline method)
   ///
@@ -92,18 +91,6 @@ private:
   /// @brief Execute logic for any active subscriptions at the GameEngine level
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo> ProcessSubscriptions() override;
-
-  /////////////////////////////////////////////////
-  /// @brief Configure engine state from EngineData loaded from files.
-  ///
-  /// Loads EngineData from engine_data.json and configures:
-  /// - Engine-level subscriptions (e.g., quit game handler)
-  /// - SceneManager subscriptions (e.g., scene change handler)
-  ///
-  /// @return Success or failure information
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  ConfigureEngineStateFromData() override;
 
   /////////////////////////////////////////////////
   /// @brief Start up the GameEngine.

@@ -1,4 +1,5 @@
 add_library(components
+Component.cpp
 CMeta.cpp
 CUserInterface.cpp
 CMachinaForm.cpp
@@ -19,13 +20,10 @@ target_include_directories(components
 
 target_link_libraries(components
   PUBLIC
-  nlohmann_json::nlohmann_json
   SFML::Graphics
-  magic_enum::magic_enum
   flatbuffers
   flatbuffers_headers
   logger
-  engine
   user_interface
 )
 

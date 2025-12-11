@@ -130,7 +130,7 @@ ConfigureBaseUIElement(UIElement &element, const UIElementData &data,
     std::vector<std::shared_ptr<Subscriber>> subscribers;
 
     // Create Subscriber via factory
-    auto result = subscriber_factory::CreateSubscriber(subscribers_fbs);
+    auto result = subscriber_factory::CreateSubscriber(subscribers_fbs[0]);
 
     if (!result.has_value())
       return std::unexpected(result.error());

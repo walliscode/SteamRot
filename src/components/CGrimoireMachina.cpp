@@ -5,9 +5,6 @@
 
 #include "CGrimoireMachina.h"
 #include "containers.h"
-#include <SFML/Graphics/Color.hpp>
-#include <SFML/Graphics/PrimitiveType.hpp>
-#include <SFML/System/Vector2.hpp>
 
 namespace steamrot {
 

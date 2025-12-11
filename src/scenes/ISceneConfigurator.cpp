@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "ISceneConfigurator.h"
 #include "scene_types_generated.h"
+#include <expected>
 #include <variant>
 
 namespace steamrot {
@@ -18,4 +19,5 @@ ISceneConfigurator::ConfigureScene(Scene &scene, const SceneType scene_type) {
 
   return std::monostate();
 }
+
 } // namespace steamrot

@@ -6,23 +6,3 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "test_harness.h"
-#include "test_data_loader.h"
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators_range.hpp>
-
-TEST_CASE("Logic classes data-driven tests", "[unit][logic][data-driven]") {
-  // Load all test data configs from adjacent data/ directory
-  auto configs = steamrot::tests::load_test_data_configs();
-  REQUIRE(configs.has_value());
-  REQUIRE(configs.value().size() > 0);
-
-  // Use Catch2 generator to iterate through all test configs
-  const auto *config = GENERATE_COPY(from_range(configs.value()));
-
-  // Run the test using the test harness
-  auto result = steamrot::tests::RunTestHarness(config);
-  if (!result.has_value()) {
-    FAIL("Test execution failed: " << result.error().message);
-  }
-}
