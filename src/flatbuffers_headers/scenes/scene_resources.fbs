@@ -1,6 +1,0 @@
-
-
-table SceneResourcesFbs {
-  texture_height: uint32;
-  texture_width: uint32;
-}

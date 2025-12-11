@@ -1,6 +1,0 @@
-namespace steamrot;
-
-table GrimoireMachinaData {
-  fragments : [string] (required);
-  joints : [string] (required);
-  }

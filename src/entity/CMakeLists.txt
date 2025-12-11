@@ -18,4 +18,5 @@ target_link_libraries(entity
   components
   flatbuffers
   flatbuffers_headers
+  types
 )

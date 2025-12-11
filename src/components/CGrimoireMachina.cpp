@@ -5,7 +5,6 @@
 
 #include "CGrimoireMachina.h"
 #include "containers.h"
-
 namespace steamrot {
 
 /////////////////////////////////////////////////

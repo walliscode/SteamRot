@@ -1,0 +1,17 @@
+# This will be an interface library for type definitions
+
+add_library(types INTERFACE)
+
+target_include_directories(types
+  INTERFACE
+  ${CMAKE_CURRENT_SOURCE_DIR}/user_interface/
+  ${CMAKE_CURRENT_SOURCE_DIR}/user_interface/styles/
+  ${CMAKE_CURRENT_SOURCE_DIR}/core/
+  ${CMAKE_CURRENT_SOURCE_DIR}/events/
+)
+
+target_link_libraries(types
+  INTERFACE
+  stduuid
+
+)
