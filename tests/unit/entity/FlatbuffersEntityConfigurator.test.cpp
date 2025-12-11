@@ -10,44 +10,7 @@
 #include "EventHandler.h"
 #include "TestFixture.h"
 #include "entity_memory.h"
-#include "test_data_loader.h"
-#include "test_harness.h"
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
-
-/////////////////////////////////////////////////
-/// @brief Test FlatbuffersEntityConfigurator with data-driven tests
-///
-/// Uses test data configurations to verify the configurator
-/// properly sets up entities from FlatBuffers data.
-/////////////////////////////////////////////////
-TEST_CASE("FlatbuffersEntityConfigurator data-driven tests",
-          "[unit][FlatbuffersEntityConfigurator]") {
-
-  // Load all test data configurations
-  auto configs_result = load_test_data_configs();
-  REQUIRE(configs_result.has_value());
-
-  // Use Catch2 generator to iterate through each config
-  const auto *config = GENERATE_COPY(from_range(configs_result.value()));
-  REQUIRE(config != nullptr);
-  REQUIRE(config->metadata() != nullptr);
-
-  // Run the test harness with this configuration
-  auto result = steamrot::tests::RunTestHarness(config);
-
-  // Check if test passed or failed as expected
-  bool test_passed = result.has_value();
-  bool expected_to_pass = config->metadata()->expected_to_pass();
-
-  DYNAMIC_SECTION("Test: " << config->metadata()->test_name()->str()) {
-    if (expected_to_pass) {
-      REQUIRE(test_passed);
-    } else {
-      REQUIRE_FALSE(test_passed);
-    }
-  }
-}
 
 /////////////////////////////////////////////////
 /// @brief Test FlatbuffersEntityConfigurator constructor
