@@ -8,7 +8,6 @@
 /////////////////////////////////////////////////
 #include "ui_element_factory_test_helpers.h"
 #include <string>
-#include <variant>
 
 namespace steamrot {
 namespace tests {

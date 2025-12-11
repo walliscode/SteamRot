@@ -3,7 +3,6 @@ EventHandler.cpp
 event_factory.cpp
 event_bus_conversion.cpp
 event_handler_tick.cpp
-Subscriber.cpp
 subscriber_factory.cpp
 )
 
@@ -18,6 +17,7 @@ flatbuffers
 flatbuffers_headers
 stduuid
 logger
+types
 
 )
 

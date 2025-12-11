@@ -1,4 +1,4 @@
-#include "config.cpp"
+
 #include "directory_paths.h"
 #include <filesystem>
 
@@ -18,7 +18,7 @@ const std::filesystem::path getSchemaFolder() {
 
 ////////////////////////////////////////////////////////////
 const std::filesystem::path getThemesFolder() {
-  config::CanIAccessThis();
+
   return getDataFolder() / "themes";
 }
 

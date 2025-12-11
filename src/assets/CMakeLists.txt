@@ -15,6 +15,9 @@ target_link_libraries(assets
   flatbuffers_headers
   flatbuffers
   logger
+  types
+  data_providers
+  user_interface
 )
 
 

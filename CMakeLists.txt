@@ -20,10 +20,6 @@ endif()
 # Always enforce the language constraint
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# make sure the data output directory exists
-if (NOT EXISTS ${DATA_OUT_DIR})
-  file(MAKE_DIRECTORY ${DATA_OUT_DIR})
-endif()
 
 
 # set the cmake module path (for import libraries and other cmake files)

@@ -5,9 +5,6 @@ CUserInterface.cpp
 CMachinaForm.cpp
 CGrimoireMachina.cpp
 CUIState.cpp
-Fragment.cpp
-Joint.cpp
-
 )
 
 target_include_directories(components
@@ -15,15 +12,14 @@ target_include_directories(components
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-
-
-
 target_link_libraries(components
   PUBLIC
   SFML::Graphics
   flatbuffers
   flatbuffers_headers
   logger
-  user_interface
+  types
+
+
 )
 
