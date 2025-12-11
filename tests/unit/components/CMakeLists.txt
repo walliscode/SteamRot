@@ -9,15 +9,13 @@ add_executable(test_components
 
 target_include_directories(test_components
 PRIVATE
-  ${CMAKE_SOURCE_DIR}/tests/unit/components
+  ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_link_libraries(test_components
 PRIVATE
   Catch2::Catch2WithMain
   components
-  entity
-  entity_helpers
 
 )
 
