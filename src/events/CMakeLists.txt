@@ -17,9 +17,8 @@ SFML::Graphics
 flatbuffers
 flatbuffers_headers
 stduuid
-magic_enum::magic_enum
 logger
-matchers
+
 )
 
 # # Apply project-specific compile and link options
