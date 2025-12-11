@@ -1,0 +1,10 @@
+include "events.fbs";
+
+namespace steamrot;
+
+table SubscriberFbs{
+
+  event_type_data: EventType;
+  trigger_data: EventDataData;
+  active: bool;
+  }

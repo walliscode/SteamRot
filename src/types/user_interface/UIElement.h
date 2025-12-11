@@ -12,6 +12,9 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "Subscriber.h"
+#include "UIStyle.h"
+#include "user_interface_generated.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <vector>

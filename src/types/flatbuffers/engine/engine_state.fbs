@@ -1,0 +1,30 @@
+////////////////////////////////////////////////////////////
+/// @file
+/// @brief FlatBuffers schema for EngineState.
+///
+/// EngineStateFbs contains runtime state that can be configured
+/// from data, such as subscribers and initial flags.
+////////////////////////////////////////////////////////////
+
+include "../events/subscriber.fbs";
+
+namespace steamrot;
+
+////////////////////////////////////////////////////////////
+/// Engine runtime state configuration
+////////////////////////////////////////////////////////////
+table EngineStateFbs {
+  /// Initial running state
+  running: bool = false;
+  
+  /// Initial paused state
+  paused: bool = false;
+  
+  /// Engine-level subscribers (e.g., quit game handler)
+  subscriptions: [SubscriberFbs];
+  
+  /// Initial quit requested state
+  quit_requested: bool = false;
+}
+
+root_type EngineStateFbs;

@@ -8,6 +8,8 @@ target_include_directories(types
   ${CMAKE_CURRENT_SOURCE_DIR}/user_interface/styles/
   ${CMAKE_CURRENT_SOURCE_DIR}/core/
   ${CMAKE_CURRENT_SOURCE_DIR}/events/
+  ${CMAKE_CURRENT_SOURCE_DIR}/flatbuffers/generated/
+
 )
 
 target_link_libraries(types
@@ -15,3 +17,5 @@ target_link_libraries(types
   stduuid
 
 )
+
+add_subdirectory(flatbuffers)

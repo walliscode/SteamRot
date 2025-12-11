@@ -25,16 +25,7 @@ namespace steamrot {
 /////////////////////////////////////////////////
 struct Subscriber {
 
-  /////////////////////////////////////////////////
-  Subscriber(const EventType trigger_event_type)
-      : m_trigger_event_type(trigger_event_type) {};
-
-  /////////////////////////////////////////////////
-  Subscriber(const EventType trigger_event_type,
-             const EventData &trigger_event_data)
-      : m_trigger_event_type(trigger_event_type),
-        m_trigger_event_data(trigger_event_data) {};
-
+  Subscriber() = default;
   /////////////////////////////////////////////////
   /// @brief Indicates whether the subscriber is active or not.
   /////////////////////////////////////////////////

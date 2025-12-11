@@ -1,0 +1,11 @@
+include "events.fbs";
+
+namespace steamrot;
+
+
+table EventPacketData{
+
+  event_lifetime: int;
+  event_type: EventType;
+  event_data_data: EventDataData;
+  }

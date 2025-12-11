@@ -1,0 +1,10 @@
+include "../events/subscriber.fbs";
+
+
+namespace steamrot; 
+
+table SceneManagerStateFbs{
+subscriptions: [SubscriberFbs];
+  }
+
+

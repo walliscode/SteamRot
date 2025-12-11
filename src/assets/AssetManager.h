@@ -12,6 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FailInfo.h"
+#include "UIStyle.h"
 #include "scene_types_generated.h"
 #include <SFML/Graphics.hpp>
 

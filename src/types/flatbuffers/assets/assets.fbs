@@ -1,0 +1,13 @@
+namespace steamrot;
+
+table FontDataFbs{
+    name: string (required);
+}
+
+
+table AssetCollection {
+    fonts: [FontDataFbs];
+    ui_styles :[string];
+  }
+
+root_type AssetCollection;

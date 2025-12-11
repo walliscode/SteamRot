@@ -1,0 +1,15 @@
+// Scene-related types that are used across multiple schemas
+// This file exists to break circular dependencies between events and scene_data
+namespace steamrot;
+
+enum SceneType: byte {
+  UNKNOWN = 0,
+  TEST = 1,
+  TITLE = 2,
+  CRAFTING = 3
+}
+
+table SceneChangePacketData {
+  uuid: string;
+  scene_type: SceneType;
+}

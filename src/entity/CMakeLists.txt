@@ -16,7 +16,7 @@ target_link_libraries(entity
   SFML::Graphics
   data_handlers
   components
-  flatbuffers
-  flatbuffers_headers
   types
+  events
+  data_providers
 )

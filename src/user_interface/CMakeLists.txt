@@ -14,5 +14,6 @@ target_link_libraries(user_interface
   flatbuffers
   flatbuffers_headers
   events
+  assets
 )
 
