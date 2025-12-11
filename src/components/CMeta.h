@@ -11,7 +11,7 @@
 namespace steamrot {
 struct CMeta : public Component {
   CMeta() = default;
-  bool m_entity_active = false;
+  bool m_entity_alive = false;
 
   /////////////////////////////////////////////////
   /// @brief Generates a unique index for the CMeta component based on its

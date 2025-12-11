@@ -14,7 +14,6 @@
 
 #include "CGrimoireMachina.h"
 #include "CMachinaForm.h"
-#include "CMeta.h"
 #include "CUIState.h"
 #include "CUserInterface.h"
 #include "EventHandler.h"
@@ -77,15 +76,6 @@ public:
   ConfigureComponent(Component &component) = 0;
 
   /////////////////////////////////////////////////
-  /// @brief Configure CMeta component
-  ///
-  /// @param c_meta_component Reference to CMeta component to configure
-  /// @returns std::expected<std::monostate, FailInfo>
-  /////////////////////////////////////////////////
-  virtual std::expected<std::monostate, FailInfo>
-  ConfigureCMeta(CMeta &c_meta_component) = 0;
-
-  /////////////////////////////////////////////////
   /// @brief Configure CUserInterface component
   ///
   /// @param c_ui_component Reference to CUserInterface component to configure
@@ -121,7 +111,7 @@ public:
   /// @returns std::expected<std::monostate, FailInfo>
   /////////////////////////////////////////////////
   virtual std::expected<std::monostate, FailInfo>
-  ConfigureCMachineForm(CMachinaForm &c_machina_form_component) = 0;
+  ConfigureCMachinaForm(CMachinaForm &c_machina_form_component) = 0;
 };
 } // namespace steamrot
 // namespace steamrot

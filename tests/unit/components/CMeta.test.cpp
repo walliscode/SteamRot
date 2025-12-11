@@ -14,5 +14,5 @@ TEST_CASE("CMeta has correct default values", "[unit][Components][CMeta]") {
 
   // Test pre configuration state
   REQUIRE(meta.m_active == false);
-  REQUIRE(meta.m_entity_active == false);
+  REQUIRE(meta.m_entity_alive == false);
 }

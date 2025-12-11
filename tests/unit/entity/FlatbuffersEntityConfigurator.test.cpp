@@ -7,10 +7,12 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersEntityConfigurator.h"
-#include "EventHandler.h"
 #include "TestFixture.h"
 #include "entity_memory.h"
+#include "types_generated.h"
+#include "user_interface_generated.h"
 #include <catch2/catch_test_macros.hpp>
+#include <iostream>
 
 /////////////////////////////////////////////////
 /// @brief Test FlatbuffersEntityConfigurator constructor
@@ -21,6 +23,8 @@ TEST_CASE("FlatbuffersEntityConfigurator constructor",
   steamrot::tests::TestFixture fixture;
   fixture.Initialize();
 
+  std::cout << "Running FlatbuffersEntityConfigurator constructor test"
+            << std::endl;
   auto &game_context = fixture.GetGameContext();
   auto &scene_context = fixture.GetSceneContext();
 
@@ -84,18 +88,20 @@ TEST_CASE(
       game_context.event_handler, *entity_collection);
 
   // Configure the pool
-  auto result = configurator.ConfigureEntityMemoryPool(scene_context.entities);
+  auto result =
+      configurator.ConfigureEntityMemoryPool(scene_context.scene_entities);
 
   REQUIRE(result.has_value());
-  REQUIRE(steamrot::entity::memory::GetMemoryPoolSize(scene_context.entities) ==
-          expected_size);
+  REQUIRE(steamrot::entity::memory::GetMemoryPoolSize(
+              scene_context.scene_entities) == expected_size);
 }
 
 /////////////////////////////////////////////////
 /// @brief Test ConfigureComponent sets component active
 /////////////////////////////////////////////////
-TEST_CASE("FlatbuffersEntityConfigurator::ConfigureComponent activates component",
-          "[unit][FlatbuffersEntityConfigurator]") {
+TEST_CASE(
+    "FlatbuffersEntityConfigurator::ConfigureComponent activates component",
+    "[unit][FlatbuffersEntityConfigurator]") {
 
   steamrot::tests::TestFixture fixture;
   fixture.Initialize();
@@ -123,11 +129,12 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureComponent activates component
       game_context.event_handler, *entity_collection);
 
   // Resize pool
-  steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.entities, 5);
+  steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.scene_entities,
+                                                   5);
 
   // Get a component to configure
-  auto &component =
-      steamrot::entity::memory::GetComponent<steamrot::CMeta>(0, scene_context.entities);
+  auto &component = steamrot::entity::memory::GetComponent<steamrot::CMeta>(
+      0, scene_context.scene_entities);
   REQUIRE(component.m_active == false); // Should be inactive by default
 
   // Configure the component
@@ -140,9 +147,10 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureComponent activates component
 /////////////////////////////////////////////////
 /// @brief Test ConfigureCUserInterface without root element fails
 /////////////////////////////////////////////////
-TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCUserInterface fails without "
-          "root element",
-          "[unit][FlatbuffersEntityConfigurator]") {
+TEST_CASE(
+    "FlatbuffersEntityConfigurator::ConfigureCUserInterface fails without "
+    "root element",
+    "[unit][FlatbuffersEntityConfigurator]") {
 
   steamrot::tests::TestFixture fixture;
   fixture.Initialize();
@@ -186,10 +194,12 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCUserInterface fails without 
       game_context.event_handler, *entity_collection);
 
   // Resize pool and configure
-  steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.entities, 5);
+  steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.scene_entities,
+                                                   5);
 
   // This should fail because root element is missing
-  auto result = configurator.ConfigureEntityMemoryPool(scene_context.entities);
+  auto result =
+      configurator.ConfigureEntityMemoryPool(scene_context.scene_entities);
 
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
@@ -198,9 +208,10 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCUserInterface fails without 
 /////////////////////////////////////////////////
 /// @brief Test ConfigureCUserInterface with valid root element succeeds
 /////////////////////////////////////////////////
-TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCUserInterface succeeds with "
-          "root element",
-          "[unit][FlatbuffersEntityConfigurator]") {
+TEST_CASE(
+    "FlatbuffersEntityConfigurator::ConfigureCUserInterface succeeds with "
+    "root element",
+    "[unit][FlatbuffersEntityConfigurator]") {
 
   steamrot::tests::TestFixture fixture;
   fixture.Initialize();
@@ -212,27 +223,27 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCUserInterface succeeds with 
   flatbuffers::FlatBufferBuilder builder;
 
   // Create root UI element (Panel)
-  steamrot::Vec2fBuilder position_builder(builder);
+  steamrot::Vector2fDataBuilder position_builder(builder);
   position_builder.add_x(100.0f);
   position_builder.add_y(200.0f);
   auto position = position_builder.Finish();
 
-  steamrot::Vec2fBuilder size_builder(builder);
+  steamrot::Vector2fDataBuilder size_builder(builder);
   size_builder.add_x(300.0f);
   size_builder.add_y(400.0f);
   auto size = size_builder.Finish();
 
-  std::vector<flatbuffers::Offset<steamrot::UIElementContainerData>> children;
+  std::vector<flatbuffers::Offset<steamrot::child>> children;
   auto children_vec = builder.CreateVector(children);
 
-  steamrot::UIElementBaseDataBuilder base_data_builder(builder);
+  steamrot::UIElementDataBuilder base_data_builder(builder);
   base_data_builder.add_position(position);
   base_data_builder.add_size(size);
   base_data_builder.add_children_active(false);
   base_data_builder.add_children(children_vec);
-  base_data_builder.add_layout(steamrot::Layout::Layout_Horizontal);
+  base_data_builder.add_layout(steamrot::LayoutType::LayoutType_Horizontal);
   base_data_builder.add_spacing_strategy(
-      steamrot::SpacingStrategy::SpacingStrategy_None);
+      steamrot::SpacingAndSizingType::SpacingAndSizingType_None);
   auto base_data = base_data_builder.Finish();
 
   steamrot::PanelDataBuilder panel_builder(builder);
@@ -272,16 +283,20 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCUserInterface succeeds with 
       game_context.event_handler, *entity_collection);
 
   // Resize pool and configure
-  steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.entities, 5);
 
-  auto result = configurator.ConfigureEntityMemoryPool(scene_context.entities);
+  steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.scene_entities,
+                                                   5);
+
+  auto result =
+      configurator.ConfigureFirstLayerComponents(scene_context.scene_entities);
 
   REQUIRE(result.has_value());
 
   // Verify the component was configured
   auto &ui_component =
       steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(
-          0, scene_context.entities);
+          0, scene_context.scene_entities);
+
   REQUIRE(ui_component.m_active == true);
   REQUIRE(ui_component.m_name == "test_ui");
   REQUIRE(ui_component.m_visible == true);
@@ -291,10 +306,9 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCUserInterface succeeds with 
 /////////////////////////////////////////////////
 /// @brief Test ConfigureCGrimoireMachina with invalid fragments fails
 /////////////////////////////////////////////////
-TEST_CASE(
-    "FlatbuffersEntityConfigurator::ConfigureCGrimoireMachina fails with "
-    "invalid fragments",
-    "[unit][FlatbuffersEntityConfigurator]") {
+TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCGrimoireMachina fails with "
+          "invalid fragments",
+          "[unit][FlatbuffersEntityConfigurator]") {
 
   steamrot::tests::TestFixture fixture;
   fixture.Initialize();
@@ -342,10 +356,12 @@ TEST_CASE(
       game_context.event_handler, *entity_collection);
 
   // Resize pool and configure
-  steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.entities, 5);
+  steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.scene_entities,
+                                                   5);
 
   // This should fail because fragment doesn't exist
-  auto result = configurator.ConfigureEntityMemoryPool(scene_context.entities);
+  auto result =
+      configurator.ConfigureFirstLayerComponents(scene_context.scene_entities);
 
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
@@ -385,10 +401,12 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents with "
       game_context.event_handler, *entity_collection);
 
   // Resize pool
-  steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.entities, 10);
+  steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.scene_entities,
+                                                   10);
 
   // Configure first layer - should succeed even with no entities
-  auto result = configurator.ConfigureFirstLayerComponents(scene_context.entities);
+  auto result =
+      configurator.ConfigureFirstLayerComponents(scene_context.scene_entities);
 
   REQUIRE(result.has_value());
 }
@@ -433,21 +451,23 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents skips "
       game_context.event_handler, *entity_collection);
 
   // Resize pool
-  steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.entities, 5);
+  steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.scene_entities,
+                                                   5);
 
   // Configure first layer - should succeed and skip entity without components
-  auto result = configurator.ConfigureFirstLayerComponents(scene_context.entities);
+  auto result =
+      configurator.ConfigureFirstLayerComponents(scene_context.scene_entities);
 
   REQUIRE(result.has_value());
 
   // Verify that no components were activated
   auto &ui_component =
       steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(
-          0, scene_context.entities);
+          0, scene_context.scene_entities);
   REQUIRE(ui_component.m_active == false);
 
   auto &grimoire_component =
       steamrot::entity::memory::GetComponent<steamrot::CGrimoireMachina>(
-          0, scene_context.entities);
+          0, scene_context.scene_entities);
   REQUIRE(grimoire_component.m_active == false);
 }

@@ -78,15 +78,6 @@ public:
   ConfigureComponent(Component &component) override;
 
   /////////////////////////////////////////////////
-  /// @brief Configure CMeta component
-  ///
-  /// @param c_meta_component Reference to CMeta component to configure
-  /// @returns std::expected<std::monostate, FailInfo>
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  ConfigureCMeta(CMeta &c_meta_component) override;
-
-  /////////////////////////////////////////////////
   /// @brief Configure CUserInterface component
   ///
   /// @param c_ui_component Reference to CUserInterface component to configure
@@ -123,7 +114,7 @@ public:
   /// @returns std::expected<std::monostate, FailInfo>
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo>
-  ConfigureCMachineForm(CMachinaForm &c_machina_form_component) override;
+  ConfigureCMachinaForm(CMachinaForm &c_machina_form_component) override;
 };
 
 } // namespace steamrot
