@@ -45,7 +45,7 @@ size_t EntityManager::GetNextFreeEntityIndex() {
 
   // find next inactive entity index
   for (size_t i = 0; i < meta_data.size(); ++i) {
-    if (!meta_data[i].m_entity_active) {
+    if (!meta_data[i].m_entity_alive) {
       return i;
     }
   }

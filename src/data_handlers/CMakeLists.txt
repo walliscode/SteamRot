@@ -23,5 +23,5 @@ target_link_libraries(data_handlers
   flatbuffers
   flatbuffers_headers
   logger
-  magic_enum
+
 )

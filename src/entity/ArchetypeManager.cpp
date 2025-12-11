@@ -11,7 +11,6 @@
 #include "entity_memory.h"
 #include <cstddef>
 #include <expected>
-#include <magic_enum/magic_enum.hpp>
 #include <variant>
 
 namespace steamrot {

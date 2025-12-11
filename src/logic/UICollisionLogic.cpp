@@ -1,6 +1,6 @@
 #include "UICollisionLogic.h"
 #include "CUserInterface.h"
-#include "archetype_helpers.h"
+#include "archetypes.h"
 #include "entity_memory.h"
 #include "logic_collision.h"
 #include <SFML/Window/Mouse.hpp>
@@ -15,7 +15,7 @@ void UICollisionLogic::ProcessLogic() {
 
   // get all entity indexes with CUserInterface component
   std::set<size_t> entity_indexes =
-      GenerateEntityIndexesFromComponents<CUserInterface>(
+      archetypes::GenerateEntityIndexesFromComponents<CUserInterface>(
           m_scene_context.archetypes, true);
 
   // cycle through all the entity indexs in the archetype

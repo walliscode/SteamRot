@@ -7,10 +7,12 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersEntityConfigurator.h"
+#include "CMachinaForm.h"
 #include "FailInfo.h"
 #include "FlatbuffersDataLoader.h"
 #include "FlatbuffersSubscriberViewer.h"
 #include "UIElementFactory.h"
+#include "containers.h"
 #include "entity_memory.h"
 #include "ui_state_generated.h"
 #include <expected>
@@ -82,6 +84,14 @@ FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents(
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
+FlatbuffersEntityConfigurator::ConfigureSecondLayerComponents(
+    EntityMemoryPool &emp) {
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
 FlatbuffersEntityConfigurator::ConfigureComponent(Component &component) {
   // any general configuration logic for the base Component class
   // can be added here if needed
@@ -128,6 +138,14 @@ FlatbuffersEntityConfigurator::ConfigureCUserInterface(
     return std::unexpected(root_element_result.error());
 
   ui_component.m_root_element = std::move(root_element_result.value());
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+FlatbuffersEntityConfigurator::ConfigureCMachinaForm(
+    CMachinaForm &machina_form_component) {
 
   return std::monostate{};
 }

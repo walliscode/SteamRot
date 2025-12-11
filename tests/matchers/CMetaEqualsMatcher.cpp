@@ -19,7 +19,7 @@ CMetaEqualsMatcher::CMetaEqualsMatcher(const CMeta &expected)
     : ComponentMatcherBase<CMeta>(expected) {}
 
 /////////////////////////////////////////////////
-CMetaEqualsMatcher::CMetaEqualsMatcher(const CMeta &expected, 
+CMetaEqualsMatcher::CMetaEqualsMatcher(const CMeta &expected,
                                        size_t entity_index)
     : ComponentMatcherBase<CMeta>(expected, entity_index) {}
 
@@ -39,15 +39,14 @@ bool CMetaEqualsMatcher::match(const CMeta &actual) const {
         << conmat::Colorize(m_expected.m_active, conmat::Color::Blue) << "\n";
   }
 
-  if (actual.m_entity_active != m_expected.m_entity_active) {
+  if (actual.m_entity_alive != m_expected.m_entity_alive) {
 
     oss << conmat::Indent(1) << conmat::TestFailed() << "m_entity_active:"
         << "\n";
     oss << conmat::Indent(2) << "actual: "
-        << conmat::Colorize(actual.m_entity_active, conmat::Color::Red)
-        << "\n";
+        << conmat::Colorize(actual.m_entity_alive, conmat::Color::Red) << "\n";
     oss << conmat::Indent(2) << "expected: "
-        << conmat::Colorize(m_expected.m_entity_active, conmat::Color::Blue)
+        << conmat::Colorize(m_expected.m_entity_alive, conmat::Color::Blue)
         << "\n";
   }
 

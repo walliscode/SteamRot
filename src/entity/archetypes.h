@@ -5,7 +5,7 @@
 #include <bitset>
 #include <cstddef>
 
-namespace steamrot {
+namespace steamrot::archetypes {
 
 /////////////////////////////////////////////////
 // typedefs
@@ -88,4 +88,4 @@ std::set<size_t> GenerateEntityIndexesFromComponents(
   }
   return entity_indexes;
 }
-} // namespace steamrot
+} // namespace steamrot::archetypes
