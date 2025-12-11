@@ -7,6 +7,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "TestFixture.h"
+#include "GameContext.h"
+#include "SceneContext.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/VideoMode.hpp>
 
@@ -27,13 +29,20 @@ TestFixture::~TestFixture() = default;
 /////////////////////////////////////////////////
 void TestFixture::CreateCores() {
 
-  // Create EntityManager with reference to event handler
-  // Use a reasonable default pool size for testing
-  constexpr size_t default_pool_size = 100;
+  // Create EntityManager with default pool size for testing
+  // The entity manager will create its own internal entity memory pool
+  m_entity_manager = std::make_unique<EntityManager>();
 }
 
 /////////////////////////////////////////////////
-void TestFixture::CreateContexts() {}
+void TestFixture::CreateContexts() {
+  // Create GameContext from engine resources
+  m_game_context = std::make_unique<GameContext>(m_engine_resources);
+  
+  // Create SceneContext from scene texture, engine resources, and entity manager
+  m_scene_context = std::make_unique<SceneContext>(
+      m_scene_texture, m_engine_resources, *m_entity_manager);
+}
 
 /////////////////////////////////////////////////
 void TestFixture::Initialize() {
@@ -45,6 +54,13 @@ void TestFixture::Initialize() {
   // Window is created but not displayed in headless test environments
   constexpr unsigned int window_width = 800;
   constexpr unsigned int window_height = 600;
+
+  // Initialize the game window in engine resources
+  m_engine_resources.game_window.create(sf::VideoMode(window_width, window_height),
+                                        "Test Window");
+
+  // Initialize the scene render texture
+  m_scene_texture.create(window_width, window_height);
 
   m_initialized = true;
 }

@@ -11,10 +11,11 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "EngineResources.h"
 #include "EntityManager.h"
 #include "GameContext.h"
 #include "SceneContext.h"
-
+#include <SFML/Graphics/RenderTexture.hpp>
 #include <memory>
 
 namespace steamrot::tests {
@@ -109,12 +110,22 @@ private:
   bool m_initialized{false};
 
   /////////////////////////////////////////////////
+  /// @brief Engine resources containing window, event handler, etc.
+  /////////////////////////////////////////////////
+  EngineResources m_engine_resources;
+
+  /////////////////////////////////////////////////
+  /// @brief Scene render texture
+  /////////////////////////////////////////////////
+  sf::RenderTexture m_scene_texture;
+
+  /////////////////////////////////////////////////
   /// @brief Entity manager with entity pool and archetypes
   /////////////////////////////////////////////////
   std::unique_ptr<EntityManager> m_entity_manager;
 
   /////////////////////////////////////////////////
-  /// @brief GameContext created from cores
+  /// @brief GameContext created from engine resources
   /////////////////////////////////////////////////
   std::unique_ptr<GameContext> m_game_context;
 
