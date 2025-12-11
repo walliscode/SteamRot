@@ -281,3 +281,60 @@ The fix restores the correct dependency direction.
 - Removing `matchers` from `events` does not affect test executables
 - The matchers library is still available to all test code that needs it
 - This change makes the build system more efficient and architecturally sound
+
+## Secondary Issue: Test Library Circular Dependency
+
+While investigating the primary issue, a second circular dependency was discovered between two test libraries:
+
+```
+test_harness → matchers → test_harness (CYCLE!)
+```
+
+### Evidence
+
+**File:** `tests/harness/CMakeLists.txt` (line 22)
+```cmake
+target_link_libraries(test_harness
+  PUBLIC
+  ...
+  matchers    # ← links to matchers
+)
+```
+
+**File:** `tests/matchers/CMakeLists.txt` (line 32)
+```cmake
+target_link_libraries(matchers
+  PUBLIC
+  ...
+  test_harness    # ← links to test_harness (completes cycle!)
+)
+```
+
+### Impact
+
+- Both are test libraries, so this doesn't create the "production depends on tests" architectural violation
+- However, it still creates a circular dependency that:
+  * May slow down builds
+  * Could cause issues with incremental compilation
+  * Makes dependency graph unclear
+  * Increases coupling between test utilities
+
+### Severity
+
+**Medium** - Less critical than the production → test issue, but should still be addressed.
+
+### Recommendations for Secondary Issue
+
+Review whether `test_harness` and `matchers` truly need to depend on each other. Consider:
+
+1. **Moving shared utilities to a third library** (e.g., `test_common`)
+2. **Making dependency unidirectional** - One library depends on the other, but not both ways
+3. **Splitting functionality** to break the cycle
+4. **Analyzing actual usage** to determine if the dependencies are necessary
+
+This should be addressed separately from the primary issue.
+
+## Summary of All Issues Found
+
+1. **PRIMARY ISSUE (High Priority):** `src/events` → `tests/matchers` creates circular dependency and architectural violation
+2. **SECONDARY ISSUE (Medium Priority):** `test_harness` ↔ `matchers` creates circular dependency between test libraries
