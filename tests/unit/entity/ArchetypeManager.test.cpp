@@ -7,10 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "ArchetypeManager.h"
-#include "EntityManager.h"
-#include "EntityMemoryPoolEqualsMatcher.h"
 #include "containers.h"
-#include "entity_test_helpers.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
 

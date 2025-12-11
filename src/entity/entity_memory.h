@@ -1,4 +1,9 @@
 /////////////////////////////////////////////////
+/// @file
+/// @brief Declaration of functions that deal with the EntityMemoryPool
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
 /// Preprocessor Directives
 /////////////////////////////////////////////////
 #pragma once
@@ -39,6 +44,14 @@ T &GetComponent(size_t entity_id, EntityMemoryPool &entity_memory_pool) {
   return GetComponentVector<T>(entity_memory_pool)[entity_id];
 }
 
+/////////////////////////////////////////////////
+/// @brief Get a const component at a given index
+///
+/// @tparam T Component type
+/// @param entity_id Index of the entity
+/// @param entity_memory_pool EntityMemoryPool instance
+/// @return Reference to the component of type T at the given index
+/////////////////////////////////////////////////
 template <typename T>
 const T &GetComponent(size_t entity_id,
                       const EntityMemoryPool &entity_memory_pool) {
