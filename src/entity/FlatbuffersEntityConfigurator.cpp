@@ -58,7 +58,7 @@ FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents(
   // cycle through each entity in the collection and configure it
   for (const auto &entity_data : *m_entity_collection_data.entities()) {
 
-    //  upate the current EntityDataFbs pointer
+    //  update the current EntityDataFbs pointer
     m_current_entity_data = entity_data;
 
     // check the data and configure component if data exists
@@ -110,7 +110,7 @@ FlatbuffersEntityConfigurator::ConfigureCUserInterface(
   if (!configure_result.has_value())
     return std::unexpected(configure_result.error());
 
-  // ge thte UserInterfaceData from the current entity data
+  // get the UserInterfaceData from the current entity data
   const UserInterfaceData *ui_data = m_current_entity_data->c_user_interface();
 
   // configure the CUserInterface specific data, wrap in if statements to avoid
