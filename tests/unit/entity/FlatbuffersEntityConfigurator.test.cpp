@@ -11,7 +11,6 @@
 #include "entity_memory.h"
 #include "grimoire_machina_generated.h"
 #include "types_generated.h"
-#include "ui_state_generated.h"
 #include "user_interface_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
