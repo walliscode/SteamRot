@@ -13,6 +13,7 @@
 #include "types_generated.h"
 #include "user_interface_generated.h"
 #include <catch2/catch_test_macros.hpp>
+#include <iostream>
 
 /////////////////////////////////////////////////
 /// Helper Functions
@@ -151,22 +152,26 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCUserInterface with valid "
   auto panel_data = CreateValidPanelData(builder);
   auto ui_name = builder.CreateString("test_ui");
 
+  std::cout << "Panel Data created." << std::endl;
   steamrot::UserInterfaceDataBuilder ui_builder(builder);
   ui_builder.add_ui_name(ui_name);
   ui_builder.add_is_visible(true);
   ui_builder.add_root_ui_element(panel_data);
   auto ui_data = ui_builder.Finish();
 
+  std::cout << "UI Data created." << std::endl;
   // Create entity with this UI data
   steamrot::EntityDataFbsBuilder entity_builder(builder);
   entity_builder.add_index(0);
   entity_builder.add_c_user_interface(ui_data);
   auto entity = entity_builder.Finish();
 
+  std::cout << "Entity created." << std::endl;
   std::vector<flatbuffers::Offset<steamrot::EntityDataFbs>> entities;
   entities.push_back(entity);
   auto entities_vec = builder.CreateVector(entities);
 
+  std::cout << "Entities vector created." << std::endl;
   steamrot::EntityCollectionFbsBuilder collection_builder(builder);
   collection_builder.add_entity_memory_pool_size(5);
   collection_builder.add_entities(entities_vec);
@@ -178,6 +183,7 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCUserInterface with valid "
       flatbuffers::GetRoot<steamrot::EntityCollectionFbs>(
           builder.GetBufferPointer());
 
+  REQUIRE(entity_collection != nullptr);
   steamrot::FlatbuffersEntityConfigurator configurator(
       game_context.event_handler, *entity_collection);
 
@@ -691,8 +697,8 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureSecondLayerComponents with "
                                                    10);
 
   // Configure second layer - should succeed even with no entities
-  auto result = configurator.ConfigureSecondLayerComponents(
-      scene_context.scene_entities);
+  auto result =
+      configurator.ConfigureSecondLayerComponents(scene_context.scene_entities);
 
   REQUIRE(result.has_value());
 }
