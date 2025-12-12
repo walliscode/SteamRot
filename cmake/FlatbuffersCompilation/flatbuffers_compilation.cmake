@@ -1,1 +1,2 @@
-# include(CompileTestData)
+include(CompileTestData)
+include(CompileEntityTestData)

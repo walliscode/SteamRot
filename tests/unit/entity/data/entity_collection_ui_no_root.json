@@ -1,0 +1,12 @@
+{
+  "entity_memory_pool_size": 5,
+  "entities": [
+    {
+      "index": 0,
+      "c_user_interface": {
+        "ui_name": "test_ui",
+        "is_visible": true
+      }
+    }
+  ]
+}
