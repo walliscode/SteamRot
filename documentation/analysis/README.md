@@ -18,9 +18,33 @@ This directory contains comprehensive analysis reports and architectural documen
 ### 🗺️ Visual Guides (10 minutes)
 👉 [**WORKFLOW_DIAGRAMS.md**](../WORKFLOW_DIAGRAMS.md) - Current system workflows
 
+### 🆕 Data Handling Architecture (20 minutes)
+👉 [**DATA_HANDLING_INDEX.md**](./DATA_HANDLING_INDEX.md) - Guide to Scene/Provider/Configurator pattern analysis
+
 ---
 
 ## 📋 Analysis Reports
+
+### 🆕 [DATA_HANDLING_INDEX.md](./DATA_HANDLING_INDEX.md)
+**Latest architectural analysis** (Created: Dec 12, 2025)
+
+Navigation guide for comprehensive data handling architecture analysis:
+- Addresses concerns about SceneFactory/Configurator responsibilities
+- Provider pattern for data abstraction (FlatBuffers/XML/Save)
+- How to handle nested data (EntityCollectionFbs in SceneDataFbs)
+- Three-component pattern: Provider → Factory → Configurator
+- Answers 3 specific user questions with recommendations
+- 4 documents: Executive Summary, Full Analysis, Quick Ref, Diagrams
+
+**Related Documents**:
+- [DATA_HANDLING_EXECUTIVE_SUMMARY.md](./DATA_HANDLING_EXECUTIVE_SUMMARY.md) - Direct answers (10 min)
+- [DATA_HANDLING_ABSTRACTION_ANALYSIS.md](./DATA_HANDLING_ABSTRACTION_ANALYSIS.md) - Full details (30 min)
+- [DATA_HANDLING_QUICK_REF.md](./DATA_HANDLING_QUICK_REF.md) - Cheat sheet (5 min)
+- [DATA_HANDLING_DIAGRAMS.md](./DATA_HANDLING_DIAGRAMS.md) - Visual flow (15 min)
+
+**Key Recommendation**: Create ISceneDataProvider, keep Factory/Configurator separate, pass native C++ data
+
+**Start here for**: Understanding data provider pattern and Scene configuration architecture
 
 ### 🆕 [UIELEMENT_DRAWING_SEPARATION_ANALYSIS.md](./UIELEMENT_DRAWING_SEPARATION_ANALYSIS.md)
 **Latest architectural analysis** (Created: Dec 11, 2025)
