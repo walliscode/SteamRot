@@ -13,7 +13,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "Subscriber.h"
-#include "UIStyle.h"
 #include "user_interface_generated.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
@@ -26,7 +25,7 @@ namespace steamrot {
 /// @brief Base struct for all UI elements, contains common properties
 /////////////////////////////////////////////////
 struct UIElement {
-
+  virtual ~UIElement() {};
   /////////////////////////////////////////////////
   /// @brief Position of the UI element in the window
   /////////////////////////////////////////////////
@@ -75,9 +74,6 @@ struct UIElement {
   /////////////////////////////////////////////////
   LayoutType layout{LayoutType::LayoutType_Vertical};
 
-  virtual void DrawUIElement(sf::RenderTexture &texture,
-                             const UIStyle &style) const = 0;
-
   /////////////////////////////////////////////////
   /// @brief Create a deep copy of this UI element and its children
   ///
@@ -91,7 +87,5 @@ struct UIElement {
   /// @param target The target UIElement to copy data into
   /////////////////////////////////////////////////
   void CloneBaseUIElementData(UIElement &target) const;
-
-  virtual ~UIElement() = default;
 };
 } // namespace steamrot
