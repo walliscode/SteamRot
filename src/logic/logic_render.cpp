@@ -14,11 +14,6 @@
 #include "DropDownListElement.h"
 #include "PanelElement.h"
 #include "user_interface_generated.h"
-#include <SFML/Graphics/Rect.hpp>
-#include <SFML/Graphics/RenderTexture.hpp>
-#include <SFML/Graphics/Text.hpp>
-#include <SFML/System/Angle.hpp>
-#include <SFML/System/Vector2.hpp>
 #include <cstdint>
 
 namespace steamrot {
@@ -26,8 +21,8 @@ namespace logic {
 namespace render {
 
 /////////////////////////////////////////////////
-void DrawUIElementDispatch(sf::RenderTexture &texture,
-                           const UIElement &element, const UIStyle &style) {
+void DrawUIElementDispatch(sf::RenderTexture &texture, const UIElement &element,
+                           const UIStyle &style) {
   // Type dispatch using dynamic_cast
   if (const auto *button = dynamic_cast<const ButtonElement *>(&element)) {
     DrawButtonElement(texture, *button, style);
@@ -67,7 +62,7 @@ void DrawNestedUIElements(sf::RenderTexture &texture, const UIElement &element,
 
 /////////////////////////////////////////////////
 void DrawButtonElement(sf::RenderTexture &texture, const ButtonElement &button,
-                      const UIStyle &style) {
+                       const UIStyle &style) {
   // Draw the border and background
   DrawBorderAndBackground(texture, button, style.button_style);
 
@@ -85,7 +80,7 @@ void DrawButtonElement(sf::RenderTexture &texture, const ButtonElement &button,
 
 /////////////////////////////////////////////////
 void DrawPanelElement(sf::RenderTexture &texture, const PanelElement &panel,
-                     const UIStyle &style) {
+                      const UIStyle &style) {
   DrawBorderAndBackground(texture, panel, style.panel_style);
 }
 
@@ -103,7 +98,8 @@ void DrawDropDownListElement(sf::RenderTexture &texture,
           style.drop_down_list_style.inner_margin.y};
 
   // set the label based on whether the dropdown is expanded
-  std::string label = list.is_expanded ? list.expanded_label : list.unexpanded_label;
+  std::string label =
+      list.is_expanded ? list.expanded_label : list.unexpanded_label;
 
   DrawText(texture, label, text_position, list.size,
            style.drop_down_list_style.font,
@@ -152,8 +148,8 @@ void DrawDropDownButtonElement(sf::RenderTexture &texture,
 
 /////////////////////////////////////////////////
 void DrawDropDownContainerElement(sf::RenderTexture &texture,
-                                 const DropDownContainerElement &container,
-                                 const UIStyle &style) {
+                                  const DropDownContainerElement &container,
+                                  const UIStyle &style) {
   // Draw the border and background for the container
   DrawBorderAndBackground(texture, container, style.drop_down_container_style);
 }

@@ -12,7 +12,13 @@
 /// Headers
 /////////////////////////////////////////////////
 
+#include "ButtonElement.h"
 #include "ButtonStyle.h"
+#include "DropDownButtonElement.h"
+#include "DropDownContainerElement.h"
+#include "DropDownItemElement.h"
+#include "DropDownListElement.h"
+#include "PanelElement.h"
 #include "UIElement.h"
 #include "UIStyle.h"
 #include <SFML/Graphics/RenderTexture.hpp>
@@ -22,14 +28,6 @@
 #include <sys/types.h>
 
 namespace steamrot {
-
-// Forward declarations for element types
-struct ButtonElement;
-struct PanelElement;
-struct DropDownListElement;
-struct DropDownItemElement;
-struct DropDownButtonElement;
-struct DropDownContainerElement;
 
 namespace logic {
 namespace render {
@@ -45,14 +43,15 @@ void DrawNestedUIElements(sf::RenderTexture &texture, const UIElement &element,
                           const UIStyle &style);
 
 /////////////////////////////////////////////////
-/// @brief Internal dispatcher that dispatches to type-specific drawing functions
+/// @brief Internal dispatcher that dispatches to type-specific drawing
+/// functions
 ///
 /// @param texture Render texture to draw to
 /// @param element Element to draw
 /// @param style Style to use for drawing
 /////////////////////////////////////////////////
-void DrawUIElementDispatch(sf::RenderTexture &texture,
-                           const UIElement &element, const UIStyle &style);
+void DrawUIElementDispatch(sf::RenderTexture &texture, const UIElement &element,
+                           const UIStyle &style);
 
 /////////////////////////////////////////////////
 /// @brief Draw a ButtonElement
@@ -61,8 +60,8 @@ void DrawUIElementDispatch(sf::RenderTexture &texture,
 /// @param button Button element to draw
 /// @param style Style to use for drawing
 /////////////////////////////////////////////////
-void DrawButtonElement(sf::RenderTexture &texture,
-                      const ButtonElement &button, const UIStyle &style);
+void DrawButtonElement(sf::RenderTexture &texture, const ButtonElement &button,
+                       const UIStyle &style);
 
 /////////////////////////////////////////////////
 /// @brief Draw a PanelElement
@@ -72,7 +71,7 @@ void DrawButtonElement(sf::RenderTexture &texture,
 /// @param style Style to use for drawing
 /////////////////////////////////////////////////
 void DrawPanelElement(sf::RenderTexture &texture, const PanelElement &panel,
-                     const UIStyle &style);
+                      const UIStyle &style);
 
 /////////////////////////////////////////////////
 /// @brief Draw a DropDownListElement
@@ -115,8 +114,8 @@ void DrawDropDownButtonElement(sf::RenderTexture &texture,
 /// @param style Style to use for drawing
 /////////////////////////////////////////////////
 void DrawDropDownContainerElement(sf::RenderTexture &texture,
-                                 const DropDownContainerElement &container,
-                                 const UIStyle &style);
+                                  const DropDownContainerElement &container,
+                                  const UIStyle &style);
 
 /////////////////////////////////////////////////
 /// @brief Draw the border and background of a general UI element
