@@ -8,6 +8,7 @@ target_include_directories(configuration PUBLIC
 )
 
 target_link_libraries(configuration PUBLIC
-  data_handlers
-  flatbuffers_headers
+  types
+  data_providers
+
 )

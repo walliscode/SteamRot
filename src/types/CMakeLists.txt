@@ -15,6 +15,7 @@ target_include_directories(types
 target_link_libraries(types
   INTERFACE
   stduuid
+  flatbuffers
 
 )
 
