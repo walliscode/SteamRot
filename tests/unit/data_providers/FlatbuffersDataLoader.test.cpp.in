@@ -1,0 +1,58 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Unit tests for FlatbuffersDataLoader
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include "FailInfo.h"
+#include "FlatbuffersDataLoader.h"
+#include "scene_types_generated.h"
+#include <catch2/catch_test_macros.hpp>
+#include <magic_enum/magic_enum.hpp>
+
+TEST_CASE("FlatbuffersDataLoader provides scene data",
+          "[unit][FlatbuffersDataLoader]") {
+
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideDefaultSceneData(steamrot::SceneType_TITLE);
+
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+  const auto &scene_data = result.value();
+  REQUIRE(scene_data != nullptr);
+  REQUIRE(!scene_data->entity_collection()->entities()->empty());
+}
+TEST_CASE("FlatbuffersDataLoader::ProvideAssetData returns default data",
+          "[unit][FlatbuffersDataLoader]") {
+
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideAssetData();
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+  REQUIRE(result.value() != nullptr);
+  REQUIRE(!result.value()->fonts()->empty());
+}
+
+TEST_CASE("FlatbuffersDataLoader provides ui_styles data",
+          "[unit][FlatbuffersDataLoader]") {
+
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideUIStylesData("default");
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+  REQUIRE(result.value() != nullptr);
+}
+
+TEST_CASE("FlatbuffersDataLoader provides scene_manager data",
+          "[unit][FlatbuffersDataLoader]") {
+
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideSceneManagerData();
+  REQUIRE(result.has_value());
+  ;
+}

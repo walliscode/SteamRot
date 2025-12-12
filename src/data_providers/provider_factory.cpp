@@ -10,8 +10,6 @@
 #include "FlatbuffersAssetDataProvider.h"
 #include "FlatbuffersDefaultSceneConfigurator.h"
 #include "FlatbuffersEngineDataProvider.h"
-#include "FlatbuffersFragmentDataProvider.h"
-#include "FlatbuffersSceneDataProvider.h"
 #include "FlatbuffersSceneManagerDataProvider.h"
 #include "ISceneManagerDataProvider.h"
 
@@ -30,20 +28,8 @@ ISceneManagerDataProvider &GetSceneManagerDataProvider() {
 }
 
 /////////////////////////////////////////////////
-ISceneDataProvider &GetSceneDataProvider() {
-  static FlatbuffersSceneDataProvider provider;
-  return provider;
-}
-
-/////////////////////////////////////////////////
 IAssetDataProvider &GetAssetDataProvider() {
   static FlatbuffersAssetDataProvider provider;
-  return provider;
-}
-
-/////////////////////////////////////////////////
-IFragmentDataProvider &GetFragmentDataProvider() {
-  static FlatbuffersFragmentDataProvider provider;
   return provider;
 }
 

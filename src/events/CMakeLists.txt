@@ -13,8 +13,6 @@ target_include_directories(events
 
 target_link_libraries(events PUBLIC
 SFML::Graphics
-flatbuffers
-flatbuffers_headers
 stduuid
 logger
 types

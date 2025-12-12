@@ -13,8 +13,6 @@
 #include <variant>
 
 namespace steamrot {
-/////////////////////////////////////////////////
-ISceneConfigurator::ISceneConfigurator() {};
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>

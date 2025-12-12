@@ -9,13 +9,12 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "EngineConfig.h"
+#include "EngineResourcesConfig.h"
 #include "EngineState.h"
 #include "FailInfo.h"
 #include "ISubscriberViewer.h"
-#include <cstdint>
 #include <expected>
 #include <memory>
-#include <string>
 
 // Forward declaration
 namespace steamrot {
@@ -23,19 +22,6 @@ class FlatbuffersSubscriberViewer;
 }
 
 namespace steamrot {
-
-/////////////////////////////////////////////////
-/// @brief Native C++ struct for EngineResources configuration data.
-///
-/// This data is used to configure the EngineResources struct
-/// (window, event handler, asset manager, etc.).
-/////////////////////////////////////////////////
-struct EngineResourcesConfigData {
-  uint32_t window_width{800};
-  uint32_t window_height{600};
-  std::string window_title{"SteamRot"};
-  uint32_t framerate_limit{60};
-};
 
 /////////////////////////////////////////////////
 /// @class IEngineDataProvider
@@ -67,7 +53,7 @@ public:
   ///
   /// @return EngineResources config data or failure information
   /////////////////////////////////////////////////
-  virtual std::expected<EngineResourcesConfigData, FailInfo>
+  virtual std::expected<EngineResourcesConfig, FailInfo>
   LoadEngineResourcesConfig() const = 0;
 
   /////////////////////////////////////////////////
