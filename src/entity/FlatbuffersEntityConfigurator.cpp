@@ -61,19 +61,19 @@ FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents(
     //  upate the current EntityDataFbs pointer
     m_current_entity_data = entity_data;
 
-    // check the data and configure compoenent if data exists
+    // check the data and configure component if data exists
     if (entity_data->c_user_interface()) {
-      auto configure_result =
-          ConfigureComponent(entity::memory::GetComponent<CUserInterface>(
-              entity_data->index(), emp));
+      auto configure_result = ConfigureCUserInterface(
+          entity::memory::GetComponent<CUserInterface>(entity_data->index(),
+                                                        emp));
       if (!configure_result.has_value())
         return std::unexpected(configure_result.error());
     }
 
     if (entity_data->c_grimoire_machina()) {
-      auto configure_result =
-          ConfigureComponent(entity::memory::GetComponent<CGrimoireMachina>(
-              entity_data->index(), emp));
+      auto configure_result = ConfigureCGrimoireMachina(
+          entity::memory::GetComponent<CGrimoireMachina>(entity_data->index(),
+                                                          emp));
       if (!configure_result.has_value())
         return std::unexpected(configure_result.error());
     }
