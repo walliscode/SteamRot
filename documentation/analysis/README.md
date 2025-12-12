@@ -22,6 +22,30 @@ This directory contains comprehensive analysis reports and architectural documen
 
 ## 📋 Analysis Reports
 
+### 🆕 [TEST_HARNESS_ORGANIZATION_ANALYSIS.md](./TEST_HARNESS_ORGANIZATION_ANALYSIS.md)
+**Test harness architectural analysis** (Created: Dec 12, 2025)
+
+Comprehensive analysis of test harness organization and FlatBuffers abstraction strategy:
+- Current architecture with direct FlatBuffers dependencies
+- Proposed three-layer architecture (Test Logic → Providers → Implementations)
+- FlatBuffers dependency analysis (7 of 8 files have direct dependencies)
+- Component classification and reorganization strategy
+- Migration phases with implementation plan
+- Directory restructuring proposal
+
+**Quick Reference**: [TEST_HARNESS_ORGANIZATION_QUICK_REF.md](./TEST_HARNESS_ORGANIZATION_QUICK_REF.md)  
+**Visual Diagrams**: [TEST_HARNESS_ORGANIZATION_DIAGRAMS.md](./TEST_HARNESS_ORGANIZATION_DIAGRAMS.md)
+
+**Key Findings**:
+- Test harness violates repository's FlatBuffers abstraction principles
+- Direct FlatBuffers exposure in test logic headers
+- No provider interfaces for test data loading
+- Recommended solution: Mirror main codebase architecture with provider pattern
+
+**Start here for**: Understanding test harness refactoring needs and abstraction strategy
+
+---
+
 ### 🆕 [UIELEMENT_DRAWING_SEPARATION_ANALYSIS.md](./UIELEMENT_DRAWING_SEPARATION_ANALYSIS.md)
 **Latest architectural analysis** (Created: Dec 11, 2025)
 
@@ -142,6 +166,8 @@ Analysis of TestFixture implementation and usage patterns.
 
 | Question | Document |
 |----------|----------|
+| How to organize the test harness? | [TEST_HARNESS_ORGANIZATION_QUICK_REF.md](./TEST_HARNESS_ORGANIZATION_QUICK_REF.md) |
+| How to abstract FlatBuffers in tests? | [TEST_HARNESS_ORGANIZATION_ANALYSIS.md](./TEST_HARNESS_ORGANIZATION_ANALYSIS.md) |
 | How to remove UIElement drawing methods? | [UIELEMENT_DRAWING_SEPARATION_QUICK_REF.md](./UIELEMENT_DRAWING_SEPARATION_QUICK_REF.md) |
 | What are the options for data layer separation? | [UIELEMENT_DRAWING_SEPARATION_ANALYSIS.md](./UIELEMENT_DRAWING_SEPARATION_ANALYSIS.md) |
 | What's wrong with the codebase? | [ANALYSIS_QUICK_REFERENCE.md](./ANALYSIS_QUICK_REFERENCE.md) |
