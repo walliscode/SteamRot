@@ -23,8 +23,6 @@ TEST_CASE("FlatbuffersEntityConfigurator constructor",
   steamrot::tests::TestFixture fixture;
   fixture.Initialize();
 
-  std::cout << "Running FlatbuffersEntityConfigurator constructor test"
-            << std::endl;
   auto &game_context = fixture.GetGameContext();
   auto &scene_context = fixture.GetSceneContext();
 
@@ -53,9 +51,9 @@ TEST_CASE("FlatbuffersEntityConfigurator constructor",
       game_context.event_handler, *entity_collection));
 }
 
-/////////////////////////////////////////////////
-/// @brief Test ConfigureEntityMemoryPool resizes pool correctly
-/////////////////////////////////////////////////
+////////////////////////////////////////////////////
+////// @brief Test ConfigureEntityMemoryPool resizes pool correctly
+////////////////////////////////////////////////////
 TEST_CASE(
     "FlatbuffersEntityConfigurator::ConfigureEntityMemoryPool resizes pool",
     "[unit][FlatbuffersEntityConfigurator]") {
@@ -99,9 +97,9 @@ TEST_CASE(
               scene_context.scene_entities) == expected_size);
 }
 
-/////////////////////////////////////////////////
-/// @brief Test ConfigureComponent sets component active
-/////////////////////////////////////////////////
+////////////////////////////////////////////////////
+////// @brief Test ConfigureComponent sets component active
+////////////////////////////////////////////////////
 TEST_CASE(
     "FlatbuffersEntityConfigurator::ConfigureComponent activates component",
     "[unit][FlatbuffersEntityConfigurator]") {
@@ -140,11 +138,19 @@ TEST_CASE(
       0, scene_context.scene_entities);
   REQUIRE(component.m_active == false); // Should be inactive by default
 
+  auto &component_two =
+      steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(
+          1, scene_context.scene_entities);
+  REQUIRE(component_two.m_active == false); // Should be inactive by default
+
   // Configure the component
   auto result = configurator.ConfigureComponent(component);
 
   REQUIRE(result.has_value());
   REQUIRE(component.m_active == true);
+
+  // check that the second component is still inactive
+  REQUIRE(component_two.m_active == false);
 }
 
 /////////////////////////////////////////////////
@@ -309,7 +315,8 @@ TEST_CASE(
 /////////////////////////////////////////////////
 /// @brief Test ConfigureCGrimoireMachina with invalid fragments fails
 /////////////////////////////////////////////////
-TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCGrimoireMachina fails with "
+TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCGrimoireMachina fails
+          with "
           "invalid fragments",
           "[unit][FlatbuffersEntityConfigurator]") {
 
@@ -373,7 +380,8 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCGrimoireMachina fails with "
 /////////////////////////////////////////////////
 /// @brief Test ConfigureFirstLayerComponents with empty entities
 /////////////////////////////////////////////////
-TEST_CASE("FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents with "
+TEST_CASE("FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents with
+          "
           "empty entities",
           "[unit][FlatbuffersEntityConfigurator]") {
 
@@ -415,9 +423,11 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents with "
 }
 
 /////////////////////////////////////////////////
-/// @brief Test ConfigureFirstLayerComponents skips entities without components
+/// @brief Test ConfigureFirstLayerComponents skips entities without
+components
 /////////////////////////////////////////////////
-TEST_CASE("FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents skips "
+TEST_CASE("FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents
+          skips "
           "entities without first-layer components",
           "[unit][FlatbuffersEntityConfigurator]") {
 
@@ -457,8 +467,8 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents skips "
   steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.scene_entities,
                                                    5);
 
-  // Configure first layer - should succeed and skip entity without components
-  auto result =
+  // Configure first layer - should succeed and skip entity without
+  components auto result =
       configurator.ConfigureFirstLayerComponents(scene_context.scene_entities);
 
   REQUIRE(result.has_value());
