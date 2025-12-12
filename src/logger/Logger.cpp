@@ -2,7 +2,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "Logger.h"
-#include "directory_paths.h"
 #include "spdlog/common.h"
 #include "spdlog/logger.h"
 #include "spdlog/sinks/basic_file_sink.h"
@@ -59,8 +58,8 @@ void Logger::CloseLogger() {
 void Logger::CreateInfoSink() {
 
   // info sink output file
-  std::string info_log_path =
-      config::getLogsFolder().string() + "/" + "info.json";
+  std::string info_log_path = "";
+  // [TODO: Make this configurable]
 
   // create info sink, boolean is for file truncation (reset file)
   auto info_sink{
@@ -76,8 +75,8 @@ void Logger::CreateInfoSink() {
 void Logger::CreateErrorSink() {
 
   // error sink output file
-  std::string error_log_path =
-      config::getLogsFolder().string() + "/" + "error.json";
+  std::string error_log_path = "";
+  // [TODO: Make this configurable]
 
   // create error sink, boolean is for file truncation (reset file)
   auto error_sink{std::make_shared<spdlog::sinks::basic_file_sink_st>(
