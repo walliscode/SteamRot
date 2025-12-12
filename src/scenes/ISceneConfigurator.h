@@ -26,7 +26,13 @@ public:
   /////////////////////////////////////////////////
   /// @brief Default constructor for ISceneConfigurator
   /////////////////////////////////////////////////
-  ISceneConfigurator();
+  ISceneConfigurator() = default;
+
+  /////////////////////////////////////////////////
+  /// @brief Virtual destructor for ISceneConfigurator to ensure derived classes
+  /// implement a destructor
+  /////////////////////////////////////////////////
+  virtual ~ISceneConfigurator() = default;
 
   /////////////////////////////////////////////////
   /// @brief Wrapper function for all scene configuration

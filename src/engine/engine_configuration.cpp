@@ -14,7 +14,7 @@ namespace engine {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 ConfigureEngineResources(EngineResources &engine_resources,
-                         const EngineResourcesConfigData &config_data) {
+                         const EngineResourcesConfig &config_data) {
   // Create the window with configured settings (SFML 3.0 API)
   sf::Vector2u window_size(config_data.window_width, config_data.window_height);
 

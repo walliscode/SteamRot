@@ -11,9 +11,6 @@ target_include_directories(assets
 target_link_libraries(assets
     PUBLIC
   SFML::Graphics
-  data_handlers
-  flatbuffers_headers
-  flatbuffers
   logger
   types
   data_providers

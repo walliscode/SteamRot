@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersEngineDataProvider.h"
+#include "events_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("FlatbuffersEngineDataProvider is constructed correctly",
@@ -28,29 +29,10 @@ TEST_CASE(
   }
 
   const auto &config = result.value();
-  REQUIRE(config.window_width > 0);
-  REQUIRE(config.window_height > 0);
-  REQUIRE(!config.window_title.empty());
-  REQUIRE(config.framerate_limit > 0);
-}
-
-TEST_CASE(
-    "FlatbuffersEngineDataProvider::LoadEngineResourcesConfig validates data",
-    "[unit][FlatbuffersEngineDataProvider]") {
-
-  steamrot::FlatbuffersEngineDataProvider provider;
-  auto result = provider.LoadEngineResourcesConfig();
-
-  REQUIRE(result.has_value());
-
-  const auto &config = result.value();
-  // Verify reasonable window dimensions
-  REQUIRE(config.window_width >= 800);
-  REQUIRE(config.window_height >= 600);
-  // Verify title is not empty
-  REQUIRE(config.window_title.length() > 0);
-  // Verify framerate limit is reasonable
-  REQUIRE(config.framerate_limit >= 30);
+  REQUIRE(config.window_width == 800);
+  REQUIRE(config.window_height == 600);
+  REQUIRE(config.window_title == "SteamRot");
+  REQUIRE(config.framerate_limit == 60);
 }
 
 TEST_CASE("FlatbuffersEngineDataProvider::LoadEngineConfig loads correctly",
@@ -64,13 +46,16 @@ TEST_CASE("FlatbuffersEngineDataProvider::LoadEngineConfig loads correctly",
   }
 
   const auto &config = result.value();
-  REQUIRE(!config.display.window_title.empty());
-  REQUIRE(config.display.framerate_limit > 0);
+  REQUIRE(config.display.window_title == "SteamRot");
+  REQUIRE(config.display.framerate_limit == 60);
+  REQUIRE(config.display.fullscreen == false);
+  REQUIRE(config.display.vsync == true);
 
   // Check user preferences defaults
   REQUIRE(config.user_preferences.master_volume >= 0.0f);
   REQUIRE(config.user_preferences.master_volume <= 1.0f);
   REQUIRE(!config.user_preferences.preferred_language.empty());
+  REQUIRE(config.user_preferences.show_fps == false);
 }
 
 TEST_CASE("FlatbuffersEngineDataProvider::LoadEngineState loads correctly",
@@ -90,10 +75,12 @@ TEST_CASE("FlatbuffersEngineDataProvider::LoadEngineState loads correctly",
   REQUIRE(state.quit_requested == false);
 
   // Subscriptions should be loaded
-  REQUIRE_NOTHROW(state.subscriptions);
+  REQUIRE(state.subscriptions.size() == 1);
+  REQUIRE(state.subscriptions[0]->m_trigger_event_type ==
+          steamrot::EventType_EVENT_QUIT_GAME);
 }
 
-TEST_CASE("FlatbuffersEngineDataProvider::GetSubscriberViewer returns viewer",
+TEST_CASE("FlatbuffersEngineDataProvider::GetSubscriberViewer returns viewer ",
           "[unit][FlatbuffersEngineDataProvider]") {
 
   steamrot::FlatbuffersEngineDataProvider provider;
@@ -112,37 +99,9 @@ TEST_CASE("FlatbuffersEngineDataProvider::GetSubscriberViewer returns viewer",
     FAIL(subscribers_result.error().message);
   }
 
-  // Subscribers should be a valid vector (may be empty)
-  const auto &subscribers = subscribers_result.value();
-  REQUIRE_NOTHROW(subscribers.size());
-}
-
-TEST_CASE("FlatbuffersEngineDataProvider loads subscriptions into EngineState",
-          "[unit][FlatbuffersEngineDataProvider]") {
-
-  steamrot::FlatbuffersEngineDataProvider provider;
-  auto result = provider.LoadEngineState();
-
-  REQUIRE(result.has_value());
-
-  const auto &state = result.value();
-  // Verify subscriptions are loaded
-  // They may be empty, but the vector should be valid
-  REQUIRE_NOTHROW(state.subscriptions.size());
-}
-
-TEST_CASE(
-    "FlatbuffersEngineDataProvider::LoadEngineConfig has valid user preferences",
-    "[unit][FlatbuffersEngineDataProvider]") {
-
-  steamrot::FlatbuffersEngineDataProvider provider;
-  auto result = provider.LoadEngineConfig();
-
-  REQUIRE(result.has_value());
-
-  const auto &config = result.value();
-  // Verify user preferences structure
-  REQUIRE(config.user_preferences.master_volume == 1.0f);
-  REQUIRE(config.user_preferences.show_fps == false);
-  REQUIRE(config.user_preferences.preferred_language == "en");
+  // check subscribers for size and specific data. the Engine should have a
+  // specific set of subscribers
+  REQUIRE(subscribers_result.value().size() == 1);
+  REQUIRE(subscribers_result.value()[0]->m_trigger_event_type ==
+          steamrot::EventType_EVENT_QUIT_GAME);
 }

@@ -14,7 +14,6 @@ target_include_directories(entity
 target_link_libraries(entity
   PUBLIC
   SFML::Graphics
-  data_handlers
   components
   types
   events

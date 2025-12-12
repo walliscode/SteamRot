@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "FlatbuffersSubscriberViewer.h"
 #include "FlatbuffersDataLoader.h"
+#include "events_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("FlatbuffersSubscriberViewer handles null subscriber data",
@@ -94,32 +95,6 @@ TEST_CASE("FlatbuffersSubscriberViewer::GetSubscribers returns valid "
   }
 }
 
-TEST_CASE("FlatbuffersSubscriberViewer converts FlatBuffers data to Subscriber "
-          "structs",
-          "[unit][FlatbuffersSubscriberViewer]") {
-
-  // Load data and create viewer
-  steamrot::FlatbuffersDataLoader loader;
-  auto engine_state_result = loader.ProvideEngineStateFbs();
-
-  REQUIRE(engine_state_result.has_value());
-  const auto *engine_state = engine_state_result.value();
-
-  steamrot::FlatbuffersSubscriberViewer viewer(engine_state->subscriptions());
-
-  auto result = viewer.GetSubscribers();
-  REQUIRE(result.has_value());
-
-  const auto &subscribers = result.value();
-
-  // If there are subscribers, verify their structure
-  for (const auto &subscriber : subscribers) {
-    REQUIRE(subscriber != nullptr);
-    // Verify Subscriber struct has valid data
-    REQUIRE_NOTHROW(subscriber->event_type);
-  }
-}
-
 TEST_CASE("FlatbuffersSubscriberViewer skips entries with NONE event type",
           "[unit][FlatbuffersSubscriberViewer]") {
 
@@ -141,6 +116,6 @@ TEST_CASE("FlatbuffersSubscriberViewer skips entries with NONE event type",
   // All returned subscribers should be valid (no NONE event types)
   for (const auto &subscriber : subscribers) {
     REQUIRE(subscriber != nullptr);
-    REQUIRE(subscriber->event_type != steamrot::EventType::EventType_NONE);
+    REQUIRE(subscriber->m_trigger_event_type != steamrot::EventType_NONE);
   }
 }

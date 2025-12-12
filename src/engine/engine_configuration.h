@@ -28,7 +28,7 @@ namespace engine {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 ConfigureEngineResources(EngineResources &engine_resources,
-                         const EngineResourcesConfigData &config_data);
+                         const EngineResourcesConfig &config_data);
 
 } // namespace engine
 } // namespace steamrot

@@ -14,7 +14,7 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-std::expected<EngineResourcesConfigData, FailInfo>
+std::expected<EngineResourcesConfig, FailInfo>
 FlatbuffersEngineDataProvider::LoadEngineResourcesConfig() const {
   // Use existing loader
   auto fb_result = m_loader.ProvideEngineResourcesConfigFbs();
@@ -25,7 +25,7 @@ FlatbuffersEngineDataProvider::LoadEngineResourcesConfig() const {
   const auto *fb_data = fb_result.value();
 
   // Convert FlatBuffers type to native struct
-  EngineResourcesConfigData config_data;
+  EngineResourcesConfig config_data;
   config_data.window_width = fb_data->window_width();
   config_data.window_height = fb_data->window_height();
   if (fb_data->window_title()) {

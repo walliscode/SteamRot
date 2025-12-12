@@ -8,9 +8,7 @@
 /////////////////////////////////////////////////
 #include "FlatbuffersDataLoader.h"
 #include "FailInfo.h"
-#include "Fragment.h"
 #include "assets_generated.h"
-#include "fragments_generated.h"
 #include "paths.h"
 #include "scene_data_generated.h"
 #include "ui_style_generated.h"
@@ -21,118 +19,6 @@
 #include <format>
 
 namespace steamrot {
-
-/////////////////////////////////////////////////
-std::expected<Fragment, FailInfo>
-FlatbuffersDataLoader::ProvideFragment(const std::string &fragment_name) const {
-  // check if the bin file exists
-  std::filesystem::path fragment_path =
-      paths::GetFragmentDirectory() / (fragment_name + ".fragment.bin");
-
-  if (!std::filesystem::exists(fragment_path)) {
-    FailInfo fail_info(
-        FailMode::FlatbuffersDataNotFound,
-        std::format("Fragment file not found: {}", fragment_path.string()));
-    return std::unexpected(fail_info);
-  }
-
-  const steamrot::FragmentData *fragment_data =
-      GetFragmentData(LoadBinaryData(fragment_path));
-
-  Fragment fragment;
-
-  // check every possible field, not all flatbuffers data types are required
-  // as this operation is not frequent we shall make it belts and braces
-  if (!fragment_data->name()) {
-    FailInfo fail_info(FailMode::FlatbuffersDataNotFound,
-                       "Fragment name not found in fragment data");
-    return std::unexpected(fail_info);
-  }
-
-  fragment.m_name = fragment_data->name()->str();
-
-  // handle socket data
-  if (!fragment_data->socket_data())
-    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
-                                    "fragment socket data not found"));
-
-  // handle socket data vertices
-  if (fragment_data->socket_data()->vertices()->size() == 0)
-    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
-                                    "fragment socket data vertices not found"));
-
-  for (const auto &vertex : *fragment_data->socket_data()->vertices()) {
-    if (!vertex->x() || !vertex->y())
-      return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
-                                      "vertex from socket data is incomplete"));
-
-    // add vector data to fragment sockets
-    fragment.m_sockets.emplace_back(vertex->x(), vertex->y());
-  }
-
-  // handle render overlays
-  if (fragment_data->render_overlay_data()->views()->empty())
-    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
-                                    "fragment render views not found"));
-
-  // handle view triangles
-  for (const auto &view : *fragment_data->render_overlay_data()->views()) {
-    if (view->triangles()->empty()) {
-      return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
-                                      "view triangles not found"));
-    }
-    // handle triangle vertices
-    for (const auto &triangle : *view->triangles()) {
-      if (triangle->vertices()->size() != 3) {
-        return std::unexpected(
-            FailInfo(FailMode::FlatbuffersDataNotFound,
-                     "fragment triangles must have 3 vertices"));
-      }
-    }
-
-    // handle view direction
-    if (!view->direction()) {
-      return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
-                                      "view direction not found"));
-    }
-
-    // add view to fragment
-    sf::VertexArray view_to_add(sf::PrimitiveType::Triangles);
-    for (const auto &triangle : *view->triangles()) {
-      for (const auto &vertex : *triangle->vertices()) {
-        // create a vertex with position and color
-        sf::Vertex vertex_to_add(
-            sf::Vector2f(vertex->position()->x(), vertex->position()->y()),
-            sf::Color(vertex->color()->r(), vertex->color()->g(),
-                      vertex->color()->b(), vertex->color()->a()));
-        view_to_add.append(vertex_to_add);
-      }
-    }
-
-    // add to m_overlays
-    fragment.m_overlays[view->direction()] = view_to_add;
-  }
-
-  return fragment;
-}
-
-/////////////////////////////////////////////////
-std::expected<std::map<std::string, Fragment>, FailInfo>
-FlatbuffersDataLoader::ProvideAllFragments(
-    std::vector<std::string> fragment_names) const {
-
-  std::map<std::string, Fragment> fragments;
-
-  for (const auto &fragment_name : fragment_names) {
-    auto fragment_result = ProvideFragment(fragment_name);
-    // pass up any errors
-    if (!fragment_result.has_value()) {
-      return std::unexpected(fragment_result.error());
-    }
-    fragments[fragment_name] = fragment_result.value();
-  }
-  return fragments;
-}
 
 /////////////////////////////////////////////////
 std::expected<const SceneDataFbs *, FailInfo>
@@ -297,7 +183,7 @@ FlatbuffersDataLoader::ProvideEngineResourcesConfigFbs() const {
 
   // construct the file path
   std::filesystem::path engine_resources_path =
-      engine_dir / "engine_resources_config.bin";
+      engine_dir / "default.engine_resources_config.bin";
 
   // check if the file exists
   if (!std::filesystem::exists(engine_resources_path)) {
@@ -318,7 +204,7 @@ FlatbuffersDataLoader::ProvideEngineConfigFbs() const {
   // First check for user-specific engine config
   std::filesystem::path user_engine_dir = paths::GetUserDirectory() / "engine";
   std::filesystem::path user_config_path =
-      user_engine_dir / "engine_config.bin";
+      user_engine_dir / "default.engine_config.bin";
 
   // If user config exists, load it
   if (std::filesystem::exists(user_config_path)) {

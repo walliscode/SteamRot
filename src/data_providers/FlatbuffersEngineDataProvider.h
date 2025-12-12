@@ -31,7 +31,7 @@ private:
 public:
   FlatbuffersEngineDataProvider() = default;
 
-  std::expected<EngineResourcesConfigData, FailInfo>
+  std::expected<EngineResourcesConfig, FailInfo>
   LoadEngineResourcesConfig() const override;
 
   std::expected<EngineConfig, FailInfo> LoadEngineConfig() const override;

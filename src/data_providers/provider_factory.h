@@ -10,7 +10,6 @@
 /////////////////////////////////////////////////
 #include "IAssetDataProvider.h"
 #include "IEngineDataProvider.h"
-#include "IFragmentDataProvider.h"
 #include "ISceneConfigurator.h"
 #include "ISceneManagerDataProvider.h"
 
@@ -33,11 +32,6 @@ ISceneManagerDataProvider &GetSceneManagerDataProvider();
 /// @brief Get the asset data provider instance.
 /////////////////////////////////////////////////
 IAssetDataProvider &GetAssetDataProvider();
-
-/////////////////////////////////////////////////
-/// @brief Get the fragment data provider instance.
-/////////////////////////////////////////////////
-IFragmentDataProvider &GetFragmentDataProvider();
 
 /////////////////////////////////////////////////
 /// @brief Returns

@@ -5,10 +5,9 @@ configure_file(
 )
 
 add_executable(test_data_providers
-  ${CMAKE_CURRENT_BINARY_DIR}/FlatbuffersDataLoader.test.cpp
+  FlatbuffersDataLoader.test.cpp
   FlatbuffersAssetDataProvider.test.cpp
   FlatbuffersEngineDataProvider.test.cpp
-  FlatbuffersFragmentDataProvider.test.cpp
   FlatbuffersSceneManagerDataProvider.test.cpp
   FlatbuffersSubscriberViewer.test.cpp
 )

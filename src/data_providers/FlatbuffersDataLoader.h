@@ -23,7 +23,7 @@
 #include "ui_style_generated.h"
 #include "user_preferences_generated.h"
 #include <expected>
-#include <map>
+
 #include <string>
 
 namespace steamrot {
@@ -34,24 +34,6 @@ public:
   /// @brief Default constructor
   /////////////////////////////////////////////////
   FlatbuffersDataLoader() = default;
-
-  /////////////////////////////////////////////////
-  /// @brief Provides Fragment object based on the fragment name
-  ///
-  /// Any fail modes are provided through std::expected as the error type
-  /// @param fragment_name String representing the name of the fragment
-  /////////////////////////////////////////////////
-  std::expected<Fragment, FailInfo>
-  ProvideFragment(const std::string &fragment_name) const override;
-
-  /////////////////////////////////////////////////
-  /// @brief Provides all Fragments based on the provided names
-  ///
-  /// @param fragment_names Vector of strings representing the names of the
-  /// fragments
-  /////////////////////////////////////////////////
-  std::expected<std::map<std::string, Fragment>, FailInfo>
-  ProvideAllFragments(std::vector<std::string> fragment_names) const override;
 
   /////////////////////////////////////////////////
   /// @brief Provides SceneData based on the SceneType

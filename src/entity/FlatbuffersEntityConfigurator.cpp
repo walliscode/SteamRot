@@ -9,7 +9,6 @@
 #include "FlatbuffersEntityConfigurator.h"
 #include "CMachinaForm.h"
 #include "FailInfo.h"
-#include "FlatbuffersDataLoader.h"
 #include "FlatbuffersSubscriberViewer.h"
 #include "UIElementFactory.h"
 #include "containers.h"
@@ -173,18 +172,6 @@ FlatbuffersEntityConfigurator::ConfigureCGrimoireMachina(
       fragment_names.push_back(name->str());
     }
   }
-
-  // attempt to load the fragments
-  FlatbuffersDataLoader data_loader;
-  auto fragment_load_result = data_loader.ProvideAllFragments(fragment_names);
-
-  if (!fragment_load_result.has_value()) {
-    FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
-                       "Failed to load fragments for CGrimoireMachina."};
-    return std::unexpected(fail_info);
-  }
-  // assign the loaded fragments to the CGrimoireMachina component
-  grimoire_component.m_all_fragments = fragment_load_result.value();
 
   return std::monostate{};
 }
