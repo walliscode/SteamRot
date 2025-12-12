@@ -51,21 +51,25 @@ Based on recent commits, significant progress has been made:
 1. **Missing Providers** (2)
    - ❌ `IUIStyleProvider` / `FlatbuffersUIStyleProvider`
    - ❌ `ILogicDataProvider` / `FlatbuffersLogicDataProvider`
-   - ~~`IContextDataProvider`~~ - **REMOVED** (context_data.fbs unused, will be deleted)
 
-2. **Refactor FlatbuffersDataLoader**
+2. **Providers to Remove** (2)
+   - ❌ ~~`IContextDataProvider`~~ - **NEVER CREATE** (context_data.fbs unused, will be deleted)
+   - ❌ ~~`ISceneDataProvider`~~ - **REMOVE EXISTING** (Scene configured directly from FlatBuffers, no intermediate struct needed)
+
+3. **Refactor FlatbuffersDataLoader**
    - Currently has 13+ Provide* methods
    - Should be reduced to low-level file loading only
    - Methods should migrate to respective providers
 
-3. **Configurator-Provider Integration**
-   - Configurators still directly use `FlatbuffersDataLoader`
-   - Should use provider interfaces instead
+4. **Configurator-Provider Integration**
+   - Configurators work directly with FlatBuffers for complex data (Scene, Entity)
+   - Configurators use providers for simple data types (Engine config, Assets, Fragments)
 
-4. **Remove Unused Context Data**
+5. **Remove Unused/Unnecessary Code**
    - ❌ Delete `context_data.fbs` - not currently used
    - ❌ Remove `ProvideContextData()` from FlatbuffersDataLoader
-   - ❌ Remove context_data_generated.h include
+   - ❌ Delete `ISceneDataProvider` interface and implementation
+   - ❌ Remove SceneData struct (if exists)
 
 ---
 
@@ -187,21 +191,20 @@ class ISceneConfigurator {
 **Example:**
 ```cpp
 // Provider constructs and returns new data
-class ISceneDataProvider {
-  virtual std::expected<SceneData, FailInfo>
-    LoadSceneData(SceneType scene_type) const = 0;
+class IEngineDataProvider {
+  virtual std::expected<EngineConfig, FailInfo>
+    LoadEngineConfig() const = 0;
 };
 
 // Implementation
-std::expected<SceneData, FailInfo>
-FlatbuffersSceneDataProvider::LoadSceneData(SceneType scene_type) const {
-  auto fb_data = m_loader.LoadFlatBuffers<SceneDataFbs>("scenes/title.bin");
+std::expected<EngineConfig, FailInfo>
+FlatbuffersEngineDataProvider::LoadEngineConfig() const {
+  auto fb_data = m_loader.LoadFlatBuffers<EngineConfigFbs>("engine/config.bin");
   
-  // CONSTRUCT new SceneData object
-  SceneData data;
-  data.scene_type = scene_type;
-  data.scene_id = fb_data->scene_id()->str();
-  data.render_texture_width = fb_data->width();
+  // CONSTRUCT new EngineConfig object
+  EngineConfig data;
+  data.display.window_title = fb_data->display()->window_title()->str();
+  data.display.framerate_limit = fb_data->display()->framerate_limit();
   
   return data;  // Returns NEW object
 }
@@ -226,19 +229,26 @@ FlatbuffersSceneDataProvider::LoadSceneData(SceneType scene_type) const {
 // Configurator modifies existing object
 class FlatbuffersDefaultSceneConfigurator : public ISceneConfigurator {
 private:
-  ISceneDataProvider& m_scene_data_provider;
+  FlatbuffersDataLoader& m_loader;  // Works directly with FlatBuffers
   
 public:
   std::expected<std::monostate, FailInfo>
   ConfigureScene(Scene& scene, SceneType scene_type) override {
-    // Get NEW data from provider
-    auto scene_data = m_scene_data_provider.LoadSceneData(scene_type);
+    // Load FlatBuffers data directly (no intermediate struct)
+    auto fb_result = m_loader.ProvideDefaultSceneData(scene_type);
+    if (!fb_result.has_value()) {
+      return std::unexpected(fb_result.error());
+    }
     
-    // MODIFY existing scene object
-    scene.m_scene_info.scene_type = scene_data->scene_type;
-    scene.m_scene_info.scene_id = scene_data->scene_id;
-    scene.m_scene_resources.render_texture_width = 
-      scene_data->render_texture_width;
+    const SceneDataFbs* fb_data = fb_result.value();
+    
+    // MODIFY existing scene object directly from FlatBuffers
+    scene.m_scene_info.scene_type = scene_type;
+    if (fb_data->scene_id()) {
+      scene.m_scene_info.scene_id = fb_data->scene_id()->str();
+    }
+    scene.m_scene_resources.render_texture_width = fb_data->width();
+    scene.m_scene_resources.render_texture_height = fb_data->height();
     
     return std::monostate{};  // Returns success, not object
   }
@@ -266,6 +276,40 @@ public:
 5. **Reduced Coupling**
    - Providers create native types (no game object dependencies)
    - Configurators use interfaces (no data format dependencies)
+
+### When to Use Providers vs Direct FlatBuffers
+
+**Use Providers (construct native types) when:**
+- Data is simple configuration (window size, colors, limits)
+- Data needs transformation or aggregation
+- Multiple consumers need the same data in native form
+- The native type has value beyond immediate configuration
+- Examples: EngineConfig, UIStyleData, Fragment
+
+**Use Direct FlatBuffers (no intermediate struct) when:**
+- Data is complex/nested with many fields
+- Data is immediately unpacked into game objects
+- Creating intermediate struct adds no value (just FlatBuffers → struct → object)
+- Data is only used once for configuration
+- Examples: Scene configuration, Entity hierarchies
+
+**Scene Configuration (Direct FlatBuffers):**
+```cpp
+// SceneDataFbs has many fields: entities, logic, render settings, etc.
+// Creating SceneData struct would just duplicate the FlatBuffers structure
+// Scene is configured once at load time
+// → Configure Scene directly from SceneDataFbs
+FlatbuffersDefaultSceneConfigurator works with SceneDataFbs directly
+```
+
+**Engine Configuration (Provider):**
+```cpp
+// EngineConfig is simple: window size, title, framerate
+// Multiple systems might need EngineConfig (not just one-time configuration)
+// Native struct is clean and useful
+// → Create EngineConfig provider
+IEngineDataProvider::LoadEngineConfig() returns EngineConfig struct
+```
 
 ---
 
@@ -983,10 +1027,10 @@ With our refined definitions (Providers construct/return, Configurators modify),
    - Returns new objects through `IEngineDataProvider` interface
    - **Correct:** This is a true Provider
 
-2. **FlatbuffersSceneDataProvider** ✅
-   - Loads FlatBuffers → Constructs `SceneData` struct
-   - Returns new `SceneData` object
-   - **Correct:** This is a true Provider
+2. ~~**FlatbuffersSceneDataProvider**~~ ❌ **TO REMOVE**
+   - Currently constructs `SceneData` struct from FlatBuffers
+   - **Not needed:** Scene will be configured directly from `SceneDataFbs`
+   - **Action:** Delete interface, implementation, and SceneData struct
 
 3. **FlatbuffersAssetDataProvider** ⚠️
    - Currently returns `const AssetCollection*` (FlatBuffers type)
@@ -1023,8 +1067,8 @@ With our refined definitions (Providers construct/return, Configurators modify),
    - Takes `Scene&` as parameter
    - Modifies existing Scene object
    - **Correct:** This is a true Configurator
-   - **Current issue:** Uses FlatbuffersDataLoader directly instead of providers
-   - **Action needed:** Inject ISceneDataProvider, IAssetDataProvider
+   - **Current approach:** Works directly with FlatBuffers (no provider needed)
+   - **Action:** Keep direct FlatBuffers usage, Scene data is complex/nested
 
 **In `src/entity/`:**
 
@@ -1238,9 +1282,9 @@ grep -r "ProvideContextData\|context_data" src --exclude-dir=flatbuffers
 
 ### Current State Classification
 
-**True Providers (7):**
+**True Providers (6 valid, 1 to remove):**
 - ✅ FlatbuffersEngineDataProvider
-- ✅ FlatbuffersSceneDataProvider
+- ❌ ~~FlatbuffersSceneDataProvider~~ (TO REMOVE - Scene configured directly from FlatBuffers)
 - ⚠️ FlatbuffersAssetDataProvider (needs native type conversion)
 - ✅ FlatbuffersFragmentDataProvider
 - ⚠️ FlatbuffersSceneManagerDataProvider (needs native type conversion)
@@ -1248,9 +1292,9 @@ grep -r "ProvideContextData\|context_data" src --exclude-dir=flatbuffers
 - ⚠️ FlatbuffersSaveDataProvider (needs native type conversion)
 
 **True Configurators (3):**
-- ✅ FlatbuffersDefaultSceneConfigurator (needs provider injection)
-- ✅ FlatbuffersEntityConfigurator (needs provider or PIMPL)
-- ✅ StylesConfigurator (needs provider injection)
+- ✅ FlatbuffersDefaultSceneConfigurator (works directly with FlatBuffers - correct approach)
+- ✅ FlatbuffersEntityConfigurator (works directly with FlatBuffers - correct approach)
+- ✅ StylesConfigurator (needs IUIStyleProvider injection)
 
 **Missing Providers (2):**
 - ❌ IUIStyleProvider
