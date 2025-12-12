@@ -16,13 +16,10 @@ SFML::Graphics
 display
 entity
 events
-config
 logger
 stduuid
 context
 logic
-flatbuffers
-flatbuffers_headers
 assets
 configuration
 data_providers

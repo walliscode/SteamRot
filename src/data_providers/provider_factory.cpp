@@ -11,7 +11,6 @@
 #include "FlatbuffersDefaultSceneConfigurator.h"
 #include "FlatbuffersEngineDataProvider.h"
 #include "FlatbuffersFragmentDataProvider.h"
-#include "FlatbuffersSceneDataProvider.h"
 #include "FlatbuffersSceneManagerDataProvider.h"
 #include "ISceneManagerDataProvider.h"
 
@@ -26,12 +25,6 @@ IEngineDataProvider &GetEngineDataProvider() {
 /////////////////////////////////////////////////
 ISceneManagerDataProvider &GetSceneManagerDataProvider() {
   static FlatbuffersSceneManagerDataProvider provider;
-  return provider;
-}
-
-/////////////////////////////////////////////////
-ISceneDataProvider &GetSceneDataProvider() {
-  static FlatbuffersSceneDataProvider provider;
   return provider;
 }
 

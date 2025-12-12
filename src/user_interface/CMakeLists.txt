@@ -12,8 +12,7 @@ target_link_libraries(user_interface
   PUBLIC
   SFML::Graphics
   engine
-  flatbuffers
-  flatbuffers_headers
+  types
   events
   assets
 )

@@ -12,7 +12,6 @@
 #include "IEngineDataProvider.h"
 #include "IFragmentDataProvider.h"
 #include "ISceneConfigurator.h"
-#include "ISceneDataProvider.h"
 #include "ISceneManagerDataProvider.h"
 
 namespace steamrot {
@@ -29,11 +28,6 @@ IEngineDataProvider &GetEngineDataProvider();
 //// @brief Get the scene manager data provider instance.
 /////////////////////////////////////////////////
 ISceneManagerDataProvider &GetSceneManagerDataProvider();
-
-/////////////////////////////////////////////////
-/// @brief Get the scene data provider instance.
-/////////////////////////////////////////////////
-ISceneDataProvider &GetSceneDataProvider();
 
 /////////////////////////////////////////////////
 /// @brief Get the asset data provider instance.

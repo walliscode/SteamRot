@@ -24,13 +24,13 @@ target_include_directories(scenes
 target_link_libraries(scenes PUBLIC
 SFML::Graphics
 display
-magic_enum
 entity
 config
 logger
 stduuid
 context
 logic
-flatbuffers
-flatbuffers_headers
+types
+data_providers
+
 )
