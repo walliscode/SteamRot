@@ -11,6 +11,8 @@
 2. **Layer 2**: Provider interfaces (abstract data loading)
 3. **Layer 3**: FlatBuffers implementations (.cpp files only)
 
+**Critical Requirement**: TestConfig must align with SaveData structure. TestEngine loads SceneData collections exactly like Engine/GameEngine. Only differences: simulation data (test execution) and data extraction (validation snapshots).
+
 ---
 
 ## Current vs. Proposed Architecture
@@ -183,20 +185,29 @@ tests/harness/
 
 ## Key Native Structs to Create
 
-### TestConfig.h
+### TestConfig.h (Aligns with SaveData)
 
 ```cpp
+// TestConfig mirrors SaveData structure
+// TestEngine loads SceneData like GameEngine
 struct TestConfig {
-  TestMetadata metadata;
-  std::optional<EntityCollectionConfig> start_entity_collection;
-  std::optional<EntityCollectionConfig> expected_entity_collection;
-  std::optional<SimulationConfig> simulation_data;
-  std::optional<InputSequence> input_sequence;
-  std::optional<EventSequence> event_sequence;
+  TestMetadata metadata;  // Similar to SaveData::Metadata
+  
+  // SAME AS PRODUCTION: Scene data collection
+  std::vector<SceneData> scenes;  // TestEngine loads like GameEngine
+  
+  // TEST-SPECIFIC (only differences):
+  std::optional<SimulationConfig> simulation_data;  // How to execute
+  std::optional<InputSequence> input_sequence;      // Input simulation
+  std::optional<EventSequence> event_sequence;      // Event injection
+  
+  // TEST VALIDATION (extraction at end):
   uint32_t num_ticks{1};
-  std::vector<SnapshotConfig> tick_snapshots;
+  std::vector<SnapshotConfig> tick_snapshots;  // Expected states
 };
 ```
+
+**Key Architectural Requirement**: TestConfig must align with SaveData. The only differences are simulation data (how to run test) and data extraction (validation). Entity data lives in SceneData (same as production).
 
 ### SimulationConfig.h
 

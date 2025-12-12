@@ -6,6 +6,8 @@
 
 This document provides visual diagrams to illustrate the proposed test harness reorganization.
 
+**Critical Architectural Requirement**: TestConfig must align with SaveData structure. TestEngine loads SceneData collections exactly like Engine/GameEngine. Only differences: simulation data (test execution) and data extraction (validation snapshots).
+
 ---
 
 ## Current Architecture Problems
@@ -131,6 +133,127 @@ This document provides visual diagrams to illustrate the proposed test harness r
 ✅ Benefit: FlatBuffers isolated to implementations
 ✅ Benefit: Can swap serialization formats
 ✅ Benefit: Minimal recompilation on schema changes
+```
+
+---
+
+## TestConfig and SaveData Alignment
+
+### Architectural Consistency
+
+```
+┌────────────────────────────────────────────────────────┐
+│              PRODUCTION: SaveData                      │
+│  ────────────────────────────────────────────────      │
+│                                                         │
+│  struct SaveData {                                     │
+│    Metadata metadata;                                  │
+│    SceneType current_scene_type;                       │
+│    uint32_t version;                                   │
+│                                                         │
+│    // Scene state added later:                         │
+│    // std::vector<SceneData> scenes;                   │
+│  }                                                      │
+│                                                         │
+│  GameEngine loads scenes via SceneManager              │
+│  ↓                                                      │
+│  std::vector<SceneData>                                │
+└────────────────────────────────────────────────────────┘
+                        ║
+                        ║ ALIGNS WITH
+                        ║
+                        ▼
+┌────────────────────────────────────────────────────────┐
+│              TESTING: TestConfig                       │
+│  ────────────────────────────────────────────────      │
+│                                                         │
+│  struct TestConfig {                                   │
+│    TestMetadata metadata;                              │
+│                                                         │
+│    // SAME: Scene data collection                      │
+│    std::vector<SceneData> scenes;  ✓                   │
+│                                                         │
+│    // TEST-SPECIFIC (only differences):                │
+│    SimulationConfig simulation_data;                   │
+│    InputSequence input_sequence;                       │
+│    EventSequence event_sequence;                       │
+│                                                         │
+│    // VALIDATION (extraction at end):                  │
+│    std::vector<SnapshotConfig> tick_snapshots;         │
+│  }                                                      │
+│                                                         │
+│  TestEngine loads scenes identically to GameEngine     │
+│  ↓                                                      │
+│  std::vector<SceneData>                                │
+└────────────────────────────────────────────────────────┘
+```
+
+### SceneData Structure (Both Production and Testing)
+
+```
+┌────────────────────────────────────────────────────────┐
+│              SceneData (Shared)                        │
+│  ────────────────────────────────────────────────      │
+│                                                         │
+│  struct SceneData {                                    │
+│    SceneInfo scene_info;         // id, type           │
+│    SceneResources scene_resources;  // texture, etc.   │
+│    AssetCollection assets;       // fonts, styles      │
+│    EntityCollection entity_collection;  // entities    │
+│    LogicCollectionData logic_collection_data;          │
+│  }                                                      │
+│                                                         │
+│  ✓ Used by GameEngine                                  │
+│  ✓ Used by TestEngine                                  │
+│  ✓ Loaded via SceneManager in both                     │
+└────────────────────────────────────────────────────────┘
+```
+
+### Data Loading Comparison
+
+```
+PRODUCTION (GameEngine):
+  main.cpp
+    └─▶ GameEngine()
+          └─▶ StartUp()
+                ├─▶ Load EngineCoreData
+                ├─▶ Load UserPreferences
+                └─▶ SceneManager::LoadTitleScene()
+                      └─▶ Load SceneData from files
+                            └─▶ std::vector<SceneData> scenes
+
+TESTING (TestEngine):
+  test.cpp
+    └─▶ TestEngine(TestConfig)
+          └─▶ StartUp()
+                ├─▶ Load EngineCoreData (from TestConfig)
+                ├─▶ Load UserPreferences (from TestConfig)
+                └─▶ SceneManager::LoadScenes()
+                      └─▶ Load SceneData from TestConfig
+                            └─▶ std::vector<SceneData> scenes
+                            
+✓ Same data flow
+✓ Same SceneData structure
+✓ Same SceneManager usage
+✓ Only source differs (files vs TestConfig)
+```
+
+### Key Differences Highlighted
+
+```
+┌─────────────────┬──────────────────┬────────────────────┐
+│     Aspect      │    SaveData      │    TestConfig      │
+├─────────────────┼──────────────────┼────────────────────┤
+│ Core Data       │ SceneData[]      │ SceneData[]     ✓  │
+│ Loading         │ GameEngine       │ TestEngine      ✓  │
+│ Scene Manager   │ Yes              │ Yes             ✓  │
+│ Simulation      │ N/A              │ SimulationConfig   │
+│ Input           │ Real SFML input  │ InputSequence      │
+│ Events          │ Real game events │ EventSequence      │
+│ Validation      │ N/A              │ SnapshotConfig     │
+└─────────────────┴──────────────────┴────────────────────┘
+
+✓ = Same as production
 ```
 
 ---

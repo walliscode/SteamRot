@@ -10,6 +10,8 @@ This document analyzes the SteamRot test harness architecture and provides recom
 
 **Primary Recommendation**: Create a **three-layer test harness architecture** that mirrors the main codebase structure.
 
+**Critical Architectural Requirement**: TestConfig must align with SaveData structure - TestEngine should load a collection of SceneData (exactly like Engine/GameEngine). The only differences are: simulation data (how to execute the test) and data extraction at the end (validation via snapshots).
+
 ---
 
 ## Table of Contents
@@ -370,6 +372,92 @@ tests/
 
 ---
 
+## TestConfig and SaveData Alignment
+
+### Architectural Requirement
+
+**TestConfig must mirror SaveData structure** to ensure TestEngine operates identically to Engine/GameEngine. This alignment is critical for:
+
+1. **Consistent data loading** - Both engines load SceneData collections
+2. **Realistic testing** - Tests validate production data flow patterns
+3. **Easy migration** - Test data can be converted to/from save data
+4. **Shared validation** - Same scene configuration patterns
+
+### SaveData Structure (Production)
+
+```cpp
+struct SaveData {
+  struct Metadata {
+    std::string save_name;
+    std::string created_at;
+    std::string last_modified;
+    std::string game_version;
+    uint64_t play_time_seconds{0};
+    uint32_t slot_index{0};
+  } metadata;
+  
+  SceneType current_scene_type{SceneType::SceneType_UNKNOWN};
+  uint32_t version{1};
+  
+  // Note: Scene state data will be added when implemented
+  // For now, SceneData loaded separately by Engine/SceneManager
+};
+```
+
+### SceneData Structure (Production)
+
+```cpp
+// From scene_data.fbs
+table SceneDataFbs {
+  scene_info: SceneInfoFbs;
+  scene_resources: SceneResourcesFbs;
+  assets: AssetCollection;
+  entity_collection: EntityCollectionFbs;
+  logic_collection_data: LogicCollectionData;
+}
+```
+
+### TestConfig Structure (Proposed)
+
+```cpp
+struct TestConfig {
+  TestMetadata metadata;  // Similar to SaveData::Metadata
+  
+  // SAME AS PRODUCTION: Scene data collection
+  std::vector<SceneData> scenes;  // TestEngine loads these like GameEngine
+  
+  // TEST-SPECIFIC ADDITIONS (only differences):
+  std::optional<SimulationConfig> simulation_data;  // How to execute test
+  std::optional<InputSequence> input_sequence;      // User input simulation
+  std::optional<EventSequence> event_sequence;      // Event injection
+  
+  // TEST VALIDATION (extraction at the end):
+  uint32_t num_ticks{1};
+  std::vector<SnapshotConfig> tick_snapshots;  // Expected states at ticks
+};
+```
+
+### Key Differences (TestConfig vs SaveData)
+
+| Aspect | SaveData | TestConfig |
+|--------|----------|------------|
+| **Core Data** | SceneData collection | SceneData collection ✓ (SAME) |
+| **Loading Pattern** | Loaded by GameEngine | Loaded by TestEngine ✓ (SAME) |
+| **Simulation** | N/A | SimulationConfig (test execution) |
+| **Input** | Real user input | InputSequence (simulated) |
+| **Events** | Real game events | EventSequence (injected) |
+| **Validation** | N/A | SnapshotConfig (expected states) |
+
+### Benefits of Alignment
+
+1. **Architectural Consistency**: TestEngine operates like GameEngine
+2. **Data Reuse**: Test data can become save data and vice versa
+3. **Validation**: Tests validate production data patterns
+4. **Migration Path**: Easy to add scene state to SaveData later
+5. **Learning Curve**: Understanding one system helps understand the other
+
+---
+
 ## Migration Strategy
 
 ### Phase 1: Create Native Data Structures
@@ -386,6 +474,7 @@ tests/
 **Example - TestConfig.h**:
 ```cpp
 #pragma once
+#include "SceneData.h"  // Production SceneData struct
 #include <string>
 #include <vector>
 #include <optional>
@@ -402,23 +491,26 @@ struct TestMetadata {
   uint32_t version{1};
 };
 
-struct EntityCollectionConfig {
-  uint32_t entity_memory_pool_size;
-  // ... entity data ...
-};
-
+// TestConfig aligns with SaveData structure
+// The key difference: adds simulation_data for test execution
 struct TestConfig {
   TestMetadata metadata;
   
-  std::optional<EntityCollectionConfig> start_entity_collection;
-  std::optional<EntityCollectionConfig> expected_entity_collection;
+  // Scene data collection (mirrors SaveData/GameEngine pattern)
+  // TestEngine loads scenes just like Engine/GameEngine
+  std::vector<SceneData> scenes;
   
-  std::optional<SimulationConfig> simulation_data;
-  std::optional<InputSequence> input_sequence;
-  std::optional<EventSequence> event_sequence;
+  // Test-specific additions:
+  std::optional<SimulationConfig> simulation_data;  // How to execute test
+  std::optional<InputSequence> input_sequence;      // User input simulation
+  std::optional<EventSequence> event_sequence;      // Event injection
   
+  // Test validation:
   uint32_t num_ticks{1};
-  std::vector<SnapshotConfig> tick_snapshots;
+  std::vector<SnapshotConfig> tick_snapshots;  // Expected states at ticks
+  
+  // Note: start_entity_collection and expected_entity_collection removed
+  // Entity data now lives in SceneData (same as production code)
 };
 
 } // namespace steamrot::tests
