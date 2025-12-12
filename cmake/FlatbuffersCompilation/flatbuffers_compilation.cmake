@@ -1,2 +1,1 @@
 include(CompileTestData)
-include(CompileEntityTestData)

@@ -2,52 +2,32 @@
 
 This directory contains test data for the entity subsystem tests.
 
-## Entity Collection Files
+## entity_test_data.json
 
-Entity collection files use the `EntityCollectionFbs` schema and follow the naming pattern `entity_collection_*.json`. These are automatically compiled to `.bin` files during the build process.
+This JSON file contains simple test configuration data that can be referenced when adding new test scenarios. The test code uses helper functions to build FlatBuffers entity collections in-memory based on these configurations.
 
-### Available Entity Collections
+### Helper Functions
 
-- `entity_collection_empty.json` - Empty entity collection with pool size 10
-- `entity_collection_size_25.json` - Empty entity collection with pool size 25
-- `entity_collection_no_components.json` - Single entity with no components
-- `entity_collection_ui_basic.json` - Single entity with CUserInterface (with root element)
-- `entity_collection_ui_no_root.json` - Single entity with CUserInterface (without root element - for failure testing)
-- `entity_collection_grimoire_basic.json` - Single entity with CGrimoireMachina
-- `entity_collection_multi_component.json` - Multiple entities with different components
+The test file provides helper functions for creating common entity collection scenarios:
 
-### Adding New Entity Collections
+- `CreateEmptyCollection(pool_size)` - Empty entity collection
+- `CreateUIEntity(ui_name, visible, with_root, pool_size)` - Entity with CUserInterface
+- `CreateGrimoireEntity(pool_size)` - Entity with CGrimoireMachina  
+- `CreateEntityNoComponents(pool_size)` - Entity with no components
+- `CreateMultiComponentCollection()` - Multiple entities with different components
 
-1. Create a new JSON file following the naming pattern `entity_collection_*.json`
-2. Define your entity collection using the EntityCollectionFbs schema:
-   ```json
-   {
-     "entity_memory_pool_size": 10,
-     "entities": [
-       {
-         "index": 0,
-         "c_user_interface": { ... },
-         "c_grimoire_machina": { ... }
-       }
-     ]
-   }
-   ```
-3. The CMake build system will automatically compile it to a `.bin` file
-4. In your test, load it using:
-   ```cpp
-   auto collection_data = GetFreshEntityCollection("entity_collection_yourname.bin");
-   ```
+### Adding New Test Scenarios
 
-### Schema Location
+To add a new test scenario:
 
-The entity collection schema is defined in `src/types/flatbuffers/entities/entities.fbs`.
+1. Add an entry to `entity_test_data.json` for documentation purposes
+2. Create a new helper function in the test file if needed, or use existing helpers
+3. Use the helper function in your test case
 
-### Build Integration
-
-Entity collection JSON files are compiled by `cmake/FlatbuffersCompilation/CompileEntityTestData.cmake`, which is included in the build process.
+This approach keeps the tests simple and focused on unit testing without the complexity of external binary file compilation.
 
 ## Test Data Files
 
-Test data files use the `TestDataConfig` schema and follow the naming pattern `*.test_data.json`. These are used for more complex data-driven testing scenarios.
+Other test data files (`.test_data.json`) use the TestDataConfig schema for more complex data-driven testing scenarios.
 
 See `documentation/testing/TEST_DATA_CONFIGURATION.md` for details on the test data system.

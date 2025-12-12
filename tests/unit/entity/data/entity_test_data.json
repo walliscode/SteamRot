@@ -1,0 +1,66 @@
+{
+  "test_collections": {
+    "empty": {
+      "pool_size": 10,
+      "entities": []
+    },
+    "size_25": {
+      "pool_size": 25,
+      "entities": []
+    },
+    "no_components": {
+      "pool_size": 5,
+      "entities": [
+        {
+          "index": 0
+        }
+      ]
+    },
+    "ui_basic": {
+      "pool_size": 5,
+      "entities": [
+        {
+          "index": 0,
+          "ui_name": "test_ui",
+          "ui_visible": true,
+          "ui_has_root": true
+        }
+      ]
+    },
+    "ui_no_root": {
+      "pool_size": 5,
+      "entities": [
+        {
+          "index": 0,
+          "ui_name": "test_ui",
+          "ui_visible": true,
+          "ui_has_root": false
+        }
+      ]
+    },
+    "grimoire_basic": {
+      "pool_size": 5,
+      "entities": [
+        {
+          "index": 0,
+          "grimoire": true
+        }
+      ]
+    },
+    "multi_component": {
+      "pool_size": 5,
+      "entities": [
+        {
+          "index": 0,
+          "ui_name": "ui_entity",
+          "ui_visible": true,
+          "ui_has_root": true
+        },
+        {
+          "index": 1,
+          "grimoire": true
+        }
+      ]
+    }
+  }
+}
