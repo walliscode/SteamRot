@@ -16,7 +16,6 @@ target_link_libraries(components
   PUBLIC
   SFML::Graphics
   flatbuffers
-  flatbuffers_headers
   logger
   types
 

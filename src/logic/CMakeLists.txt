@@ -20,8 +20,6 @@ target_include_directories(logic
 target_link_libraries(logic PUBLIC
   components
   entity
-  flatbuffers
-  flatbuffers_headers
   engine
   user_interface
 )
