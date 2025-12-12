@@ -38,7 +38,7 @@ typedef std::tuple<CMeta, CUserInterface, CMachinaForm, CGrimoireMachina,
 /////////////////////////////////////////////////
 /// @brief size of the component register
 /////////////////////////////////////////////////
-constexpr size_t kComponentRegisterSize =
+constexpr size_t ComponentRegisterSize =
     std::tuple_size<ComponentRegister>::value;
 
 /////////////////////////////////////////////////

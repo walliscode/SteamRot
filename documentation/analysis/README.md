@@ -22,8 +22,31 @@ This directory contains comprehensive analysis reports and architectural documen
 
 ## 📋 Analysis Reports
 
-### 🆕 [CURRENT_STATE_ANALYSIS_2025.md](./CURRENT_STATE_ANALYSIS_2025.md)
-**Latest comprehensive analysis** (Created: Dec 5, 2025)
+### 🆕 [UIELEMENT_DRAWING_SEPARATION_ANALYSIS.md](./UIELEMENT_DRAWING_SEPARATION_ANALYSIS.md)
+**Latest architectural analysis** (Created: Dec 11, 2025)
+
+Comprehensive analysis of removing drawing methods from UIElement types to create zero-dependency data layer:
+- 6 architectural options evaluated
+- Detailed pros/cons for each approach
+- Performance and maintainability analysis
+- **Recommended**: Renderer Class pattern (Option 6)
+- Complete implementation guide
+- Migration checklist and code examples
+
+**Quick Reference**: [UIELEMENT_DRAWING_SEPARATION_QUICK_REF.md](./UIELEMENT_DRAWING_SEPARATION_QUICK_REF.md)
+
+**Key Findings**:
+- Current architecture has data types (UIElement) depending on logic layer
+- Violates clean layer separation (types → logic dependency)
+- Recommended solution: Move drawing to UIElementRenderer class
+- Minimal breaking changes, aligns with existing patterns
+
+**Start here for**: Understanding UIElement refactoring options
+
+---
+
+### 🔍 [CURRENT_STATE_ANALYSIS_2025.md](./CURRENT_STATE_ANALYSIS_2025.md)
+**Comprehensive state analysis** (Created: Dec 5, 2025)
 
 Complete state assessment covering:
 - Mixed/incomplete system migrations (provider pattern 80% done)
@@ -119,6 +142,8 @@ Analysis of TestFixture implementation and usage patterns.
 
 | Question | Document |
 |----------|----------|
+| How to remove UIElement drawing methods? | [UIELEMENT_DRAWING_SEPARATION_QUICK_REF.md](./UIELEMENT_DRAWING_SEPARATION_QUICK_REF.md) |
+| What are the options for data layer separation? | [UIELEMENT_DRAWING_SEPARATION_ANALYSIS.md](./UIELEMENT_DRAWING_SEPARATION_ANALYSIS.md) |
 | What's wrong with the codebase? | [ANALYSIS_QUICK_REFERENCE.md](./ANALYSIS_QUICK_REFERENCE.md) |
 | What needs to be fixed? | [COMPREHENSIVE_CODEBASE_ANALYSIS.md](./COMPREHENSIVE_CODEBASE_ANALYSIS.md) |
 | How does the architecture work? | [ARCHITECTURE_DIAGRAMS.md](./ARCHITECTURE_DIAGRAMS.md) |

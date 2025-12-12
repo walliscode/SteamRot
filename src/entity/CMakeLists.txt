@@ -13,11 +13,10 @@ target_include_directories(entity
 
 target_link_libraries(entity
   PUBLIC
-  nlohmann_json::nlohmann_json
   SFML::Graphics
   data_handlers
   components
-  logger
-  flatbuffers
-  flatbuffers_headers
+  types
+  events
+  data_providers
 )

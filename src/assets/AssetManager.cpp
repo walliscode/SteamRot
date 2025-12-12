@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "AssetManager.h"
 #include "FailInfo.h"
+#include "IAssetDataProvider.h"
 #include "StylesConfigurator.h"
 #include "paths.h"
 #include "provider_factory.h"

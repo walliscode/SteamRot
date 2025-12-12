@@ -7,23 +7,47 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "logic_render.h"
+#include "ButtonElement.h"
+#include "DropDownButtonElement.h"
 #include "DropDownContainerElement.h"
+#include "DropDownItemElement.h"
+#include "DropDownListElement.h"
+#include "PanelElement.h"
 #include "user_interface_generated.h"
-#include <SFML/Graphics/Rect.hpp>
-#include <SFML/Graphics/RenderTexture.hpp>
-#include <SFML/Graphics/Text.hpp>
-#include <SFML/System/Angle.hpp>
-#include <SFML/System/Vector2.hpp>
 #include <cstdint>
 
 namespace steamrot {
 namespace logic {
 namespace render {
+
+/////////////////////////////////////////////////
+void DrawUIElementDispatch(sf::RenderTexture &texture, const UIElement &element,
+                           const UIStyle &style) {
+  // Type dispatch using dynamic_cast
+  if (const auto *button = dynamic_cast<const ButtonElement *>(&element)) {
+    DrawButtonElement(texture, *button, style);
+  } else if (const auto *panel = dynamic_cast<const PanelElement *>(&element)) {
+    DrawPanelElement(texture, *panel, style);
+  } else if (const auto *list =
+                 dynamic_cast<const DropDownListElement *>(&element)) {
+    DrawDropDownListElement(texture, *list, style);
+  } else if (const auto *item =
+                 dynamic_cast<const DropDownItemElement *>(&element)) {
+    DrawDropDownItemElement(texture, *item, style);
+  } else if (const auto *dd_button =
+                 dynamic_cast<const DropDownButtonElement *>(&element)) {
+    DrawDropDownButtonElement(texture, *dd_button, style);
+  } else if (const auto *container =
+                 dynamic_cast<const DropDownContainerElement *>(&element)) {
+    DrawDropDownContainerElement(texture, *container, style);
+  }
+}
+
 /////////////////////////////////////////////////
 void DrawNestedUIElements(sf::RenderTexture &texture, const UIElement &element,
                           const UIStyle &style) {
-  // draw the parent element first
-  element.DrawUIElement(texture, style);
+  // Draw the parent element first using dispatcher
+  DrawUIElementDispatch(texture, element, style);
 
   // update the size and position of the child elements
   UpdateSizeAndPositionOfChildElements(element, style);
@@ -34,6 +58,100 @@ void DrawNestedUIElements(sf::RenderTexture &texture, const UIElement &element,
       DrawNestedUIElements(texture, *child, style);
     }
   }
+}
+
+/////////////////////////////////////////////////
+void DrawButtonElement(sf::RenderTexture &texture, const ButtonElement &button,
+                       const UIStyle &style) {
+  // Draw the border and background
+  DrawBorderAndBackground(texture, button, style.button_style);
+
+  // Draw the button text
+  sf::Vector2f text_position{
+      button.position.x + style.button_style.border_thickness +
+          style.button_style.inner_margin.x,
+      button.position.y + style.button_style.border_thickness +
+          style.button_style.inner_margin.y};
+
+  DrawText(texture, button.label, text_position, button.size,
+           style.button_style.font, style.button_style.font_size,
+           style.button_style.text_color);
+}
+
+/////////////////////////////////////////////////
+void DrawPanelElement(sf::RenderTexture &texture, const PanelElement &panel,
+                      const UIStyle &style) {
+  DrawBorderAndBackground(texture, panel, style.panel_style);
+}
+
+/////////////////////////////////////////////////
+void DrawDropDownListElement(sf::RenderTexture &texture,
+                             const DropDownListElement &list,
+                             const UIStyle &style) {
+  DrawBorderAndBackground(texture, list, style.drop_down_list_style);
+
+  // calculate the position for the text
+  sf::Vector2f text_position{
+      list.position.x + style.drop_down_list_style.border_thickness +
+          style.drop_down_list_style.inner_margin.x,
+      list.position.y + style.drop_down_list_style.border_thickness +
+          style.drop_down_list_style.inner_margin.y};
+
+  // set the label based on whether the dropdown is expanded
+  std::string label =
+      list.is_expanded ? list.expanded_label : list.unexpanded_label;
+
+  DrawText(texture, label, text_position, list.size,
+           style.drop_down_list_style.font,
+           style.drop_down_list_style.font_size,
+           style.drop_down_list_style.text_color);
+}
+
+/////////////////////////////////////////////////
+void DrawDropDownItemElement(sf::RenderTexture &texture,
+                             const DropDownItemElement &item,
+                             const UIStyle &style) {
+  DrawBorderAndBackground(texture, item, style.drop_down_item_style);
+}
+
+/////////////////////////////////////////////////
+void DrawDropDownButtonElement(sf::RenderTexture &texture,
+                               const DropDownButtonElement &button,
+                               const UIStyle &style) {
+  DrawBorderAndBackground(texture, button, style.drop_down_button_style);
+
+  // calculate the radius of the triangle using the size, border thickness,
+  // and inner margin of the button
+  float triangle_radius =
+      (button.size.x - 2 * style.drop_down_button_style.border_thickness -
+       2 * style.drop_down_button_style.inner_margin.x) /
+      2.0f;
+
+  // create a triangle shape for the dropdown indicator
+  sf::CircleShape triangle{triangle_radius, 3};
+  triangle.setFillColor(style.drop_down_button_style.triangle_color);
+
+  // set the origin to the center of the triangle
+  triangle.setOrigin(triangle.getLocalBounds().getCenter());
+  if (!button.is_expanded) {
+    // rotate the triangle 180 degrees to point downwards if the dropdown is
+    // not expanded
+    triangle.setRotation(sf::degrees(180.0f));
+  }
+  // position the triangle in the centre of the button
+  sf::FloatRect button_bounds{button.position, button.size};
+  triangle.setPosition(button_bounds.getCenter());
+
+  // draw the triangle on the texture
+  texture.draw(triangle);
+}
+
+/////////////////////////////////////////////////
+void DrawDropDownContainerElement(sf::RenderTexture &texture,
+                                  const DropDownContainerElement &container,
+                                  const UIStyle &style) {
+  // Draw the border and background for the container
+  DrawBorderAndBackground(texture, container, style.drop_down_container_style);
 }
 
 /////////////////////////////////////////////////

@@ -3,7 +3,6 @@ EventHandler.cpp
 event_factory.cpp
 event_bus_conversion.cpp
 event_handler_tick.cpp
-Subscriber.cpp
 subscriber_factory.cpp
 )
 
@@ -17,9 +16,9 @@ SFML::Graphics
 flatbuffers
 flatbuffers_headers
 stduuid
-magic_enum::magic_enum
 logger
-matchers
+types
+
 )
 
 # # Apply project-specific compile and link options

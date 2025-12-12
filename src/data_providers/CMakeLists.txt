@@ -19,4 +19,5 @@ target_link_libraries(data_providers
   components
   flatbuffers_headers
   events
+  scenes
 )

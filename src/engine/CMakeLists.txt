@@ -26,4 +26,5 @@ flatbuffers_headers
 assets
 configuration
 data_providers
+types
 )

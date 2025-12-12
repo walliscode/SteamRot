@@ -12,7 +12,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "UIElement.h"
-#include "logic_render.h"
 
 namespace steamrot {
 
@@ -33,20 +32,6 @@ struct DropDownContainerElement : public UIElement {
     CloneBaseUIElementData(*cloned);
     cloned->is_expanded = is_expanded;
     return cloned;
-  }
-
-/////////////////////////////////////////////////
-  /// @brief Draws the DropDownContainerElement on a RenderTexture
-  ///
-  /// @param texture Reference to the RenderTexture to draw on
-  /// @param style UIStyle providing values for drawing
-/////////////////////////////////////////////////
-  void DrawUIElement(sf::RenderTexture &texture,
-                     const UIStyle &style) const override {
-
-    // Draw the border and background for the container
-    logic::render::DrawBorderAndBackground(texture, *this,
-                                              style.drop_down_container_style);
   }
 };
 

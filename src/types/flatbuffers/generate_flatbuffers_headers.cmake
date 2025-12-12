@@ -65,7 +65,7 @@ foreach(schema_file ${schema_files})
         OUTPUT "${schema_header}"
         COMMAND flatc
         ARGS --cpp
-        ARGS -o "${CMAKE_CURRENT_SOURCE_DIR}"  "${schema_file}"
+        ARGS -o "${CMAKE_CURRENT_SOURCE_DIR}/generated/"  "${schema_file}"
         DEPENDS "${schema_file}"
         COMMAND ${CMAKE_COMMAND}
         ARGS -E echo "Generating FlatBuffers header for ${schema_name}"

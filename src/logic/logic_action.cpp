@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////
 #include "logic_action.h"
 #include "DropDownItemElement.h"
-#include "archetype_helpers.h"
+#include "archetypes.h"
 #include "entity_memory.h"
 #include "logic_ui.h"
 #include <iostream>
@@ -112,7 +112,7 @@ void ProcessDropDownListElementActions(
   case DataPopulateFunction::DataPopulateFunction_PopulateWithFragmentData: {
     // Find CGrimoireMachina in the scene
     ArchetypeID grimoire_archetype_id =
-        GenerateArchetypeIDfromTypes<CGrimoireMachina>();
+        archetypes::GenerateArchetypeIDfromTypes<CGrimoireMachina>();
 
     const auto it = scene_context.archetypes.find(grimoire_archetype_id);
     if (it != scene_context.archetypes.end()) {
@@ -146,7 +146,7 @@ void ProcessDropDownListElementActions(
   case DataPopulateFunction::DataPopulateFunction_PopulateWithJointData: {
     // Find CGrimoireMachina in the scene
     ArchetypeID grimoire_archetype_id =
-        GenerateArchetypeIDfromTypes<CGrimoireMachina>();
+        archetypes::GenerateArchetypeIDfromTypes<CGrimoireMachina>();
 
     const auto it = scene_context.archetypes.find(grimoire_archetype_id);
     if (it != scene_context.archetypes.end()) {

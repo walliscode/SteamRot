@@ -12,7 +12,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "UIElement.h"
-#include "logic_render.h"
 
 namespace steamrot {
 
@@ -27,18 +26,6 @@ struct PanelElement : public UIElement {
     auto cloned = std::make_unique<PanelElement>();
     CloneBaseUIElementData(*cloned);
     return cloned;
-  }
-
-/////////////////////////////////////////////////
-  /// @brief Draws the PanelElement on a RenderTexture
-  ///
-  /// @param texture Reference to the RenderTexture to draw on
-  /// @param style UIStyle providing values for drawing
-/////////////////////////////////////////////////
-  void DrawUIElement(sf::RenderTexture &texture,
-                     const UIStyle &style) const override {
-    logic::render::DrawBorderAndBackground(texture, *this,
-                                              style.panel_style);
   }
 };
 

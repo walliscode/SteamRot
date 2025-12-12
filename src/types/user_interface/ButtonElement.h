@@ -12,7 +12,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "UIElement.h"
-#include "logic_render.h"
 #include <string>
 
 namespace steamrot {
@@ -39,31 +38,6 @@ struct ButtonElement : public UIElement {
     CloneBaseUIElementData(*cloned);
     cloned->label = label;
     return cloned;
-  }
-
-/////////////////////////////////////////////////
-  /// @brief Draws the ButtonElement on a RenderTexture
-  ///
-  /// @param texture Reference to the RenderTexture to draw on
-  /// @param style UIStyle providing values for drawing
-/////////////////////////////////////////////////
-  void DrawUIElement(sf::RenderTexture &texture,
-                     const UIStyle &style) const override {
-
-    // Draw the border and background
-    logic::render::DrawBorderAndBackground(texture, *this,
-                                              style.button_style);
-
-    // Draw the button text
-    sf::Vector2f text_position{
-        position.x + style.button_style.border_thickness +
-            style.button_style.inner_margin.x,
-        position.y + style.button_style.border_thickness +
-            style.button_style.inner_margin.y};
-
-    logic::render::DrawText(
-        texture, label, text_position, size, style.button_style.font,
-        style.button_style.font_size, style.button_style.text_color);
   }
 };
 } // namespace steamrot

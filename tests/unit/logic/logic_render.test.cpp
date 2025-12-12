@@ -154,7 +154,7 @@ TEST_CASE("steamrot::logic_render::DrawUIELement draws a panel on a "
   render_texture.clear(sf::Color::Black);
 
   // draw the panel on the RenderTexture
-  panel.DrawUIElement(render_texture, style);
+  steamrot::logic::render::DrawPanelElement(render_texture, panel, style);
 
   // display the Panel for visual inspection
   steamrot::tests::DisplayRenderTexture(render_texture);
@@ -191,7 +191,7 @@ TEST_CASE("steamrot::logic_render::DrawUIELement draws a ButtonElement on a "
   render_texture.clear(sf::Color::Black);
 
   // draw the button on the RenderTexture
-  button.DrawUIElement(render_texture, style);
+  steamrot::logic::render::DrawButtonElement(render_texture, button, style);
 
   // display the button for visual inspection
   steamrot::tests::DisplayRenderTexture(render_texture);
@@ -231,7 +231,7 @@ TEST_CASE("steamrot::logic_render::DrawUIElement draws a "
   render_texture.clear(sf::Color::Black);
 
   // draw the DropDownContainerElement on the RenderTexture
-  dd_container.DrawUIElement(render_texture, style);
+  steamrot::logic::render::DrawDropDownContainerElement(render_texture, dd_container, style);
 
   // display the button for visual
   // inspection
@@ -263,7 +263,7 @@ TEST_CASE("steamrot::logic_render::DrawUIElement draws an unexpanded "
   // clear the RenderTexture
   render_texture.clear(sf::Color::Black);
   // draw the DropDownListElement on the RenderTexture
-  dd_list.DrawUIElement(render_texture, style);
+  steamrot::logic::render::DrawDropDownListElement(render_texture, dd_list, style);
   // display the button for visual inspection
   steamrot::tests::DisplayRenderTexture(render_texture);
 }
@@ -293,7 +293,7 @@ TEST_CASE("steamrot::logic_render::DrawUIElement draws an expanded "
   // clear the RenderTexture
   render_texture.clear(sf::Color::Black);
   // draw the DropDownListElement on the RenderTexture
-  dd_list.DrawUIElement(render_texture, style);
+  steamrot::logic::render::DrawDropDownListElement(render_texture, dd_list, style);
   // display the button for visual inspection
   steamrot::tests::DisplayRenderTexture(render_texture);
 }
@@ -321,7 +321,7 @@ TEST_CASE("steamrot::logic_render::DrawUIElement draws an unexpanded "
   render_texture.clear(sf::Color::Black);
 
   // draw the button on the RenderTexture
-  dd_button.DrawUIElement(render_texture, style);
+  steamrot::logic::render::DrawDropDownButtonElement(render_texture, dd_button, style);
   // display the button for visual inspection
   steamrot::tests::DisplayRenderTexture(render_texture);
 }
@@ -351,7 +351,7 @@ TEST_CASE("steamrot::logic_render::DrawUIElement draws an expanded "
   render_texture.clear(sf::Color::Black);
 
   // draw the button on the RenderTexture
-  dd_button.DrawUIElement(render_texture, style);
+  steamrot::logic::render::DrawDropDownButtonElement(render_texture, dd_button, style);
 
   // display the button for visual inspection
   steamrot::tests::DisplayRenderTexture(render_texture);

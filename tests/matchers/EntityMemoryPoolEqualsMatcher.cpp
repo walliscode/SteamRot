@@ -141,7 +141,7 @@ void EntityMemoryPoolEqualsMatcher::CompareAllComponentVectors(
   // Generate an index sequence for the number of components
   CompareAllComponentVectorsImpl(
       actual_pool, expected_pool, oss,
-      std::make_index_sequence<kComponentRegisterSize>{});
+      std::make_index_sequence<ComponentRegisterSize>{});
 }
 
 /////////////////////////////////////////////////

@@ -5,7 +5,7 @@
 
 #include "UIStateLogic.h"
 #include "CUIState.h"
-#include "archetype_helpers.h"
+#include "archetypes.h"
 #include "entity_memory.h"
 #include "logic_ui.h"
 
@@ -19,8 +19,8 @@ void UIStateLogic::ProcessLogic() {
 
   // get all entity indexes with CUIState component
   std::set<size_t> entity_indexes =
-      GenerateEntityIndexesFromComponents<CUIState>(m_scene_context.archetypes,
-                                                    true);
+      archetypes::GenerateEntityIndexesFromComponents<CUIState>(
+          m_scene_context.archetypes, true);
 
   // cycle through all the entity indexs in the archetype
   for (size_t entity_id : entity_indexes) {

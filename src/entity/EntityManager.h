@@ -21,10 +21,6 @@
 
 namespace steamrot {
 
-enum class DataType {
-  Flatbuffers,
-
-};
 /////////////////////////////////////////////////
 /// @class EntityManager
 /// @brief The EntityManager class is responsiblle for managing entity lifetimes
