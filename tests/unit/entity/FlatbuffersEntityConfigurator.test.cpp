@@ -25,62 +25,6 @@
 namespace {
 
 ////////////////////////////////////////////////////////////
-/// @brief Helper to create a minimal empty entity collection
-////////////////////////////////////////////////////////////
-flatbuffers::FlatBufferBuilder CreateEmptyCollection(size_t pool_size = 10) {
-  flatbuffers::FlatBufferBuilder builder;
-
-  std::vector<flatbuffers::Offset<steamrot::EntityDataFbs>> entities;
-  auto entities_vec = builder.CreateVector(entities);
-
-  steamrot::EntityCollectionFbsBuilder collection_builder(builder);
-  collection_builder.add_entity_memory_pool_size(pool_size);
-  collection_builder.add_entities(entities_vec);
-  auto collection = collection_builder.Finish();
-
-  builder.Finish(collection);
-  return builder;
-}
-
-////////////////////////////////////////////////////////////
-/// @brief Helper to create a valid Panel UIElement
-////////////////////////////////////////////////////////////
-flatbuffers::Offset<steamrot::PanelData>
-CreateValidPanelData(flatbuffers::FlatBufferBuilder &builder) {
-  // Create position
-  steamrot::Vector2fDataBuilder position_builder(builder);
-  position_builder.add_x(100.0f);
-  position_builder.add_y(200.0f);
-  auto position = position_builder.Finish();
-
-  // Create size
-  steamrot::Vector2fDataBuilder size_builder(builder);
-  size_builder.add_x(300.0f);
-  size_builder.add_y(400.0f);
-  auto size = size_builder.Finish();
-
-  // Create empty children vector
-  std::vector<flatbuffers::Offset<steamrot::child>> children;
-  auto children_vec = builder.CreateVector(children);
-
-  // Create base UI element data
-  steamrot::UIElementDataBuilder base_data_builder(builder);
-  base_data_builder.add_position(position);
-  base_data_builder.add_size(size);
-  base_data_builder.add_children_active(false);
-  base_data_builder.add_children(children_vec);
-  base_data_builder.add_layout(steamrot::LayoutType::LayoutType_Horizontal);
-  base_data_builder.add_spacing_strategy(
-      steamrot::SpacingAndSizingType::SpacingAndSizingType_None);
-  auto base_data = base_data_builder.Finish();
-
-  // Create panel data
-  steamrot::PanelDataBuilder panel_builder(builder);
-  panel_builder.add_base_data(base_data);
-  return panel_builder.Finish();
-}
-
-////////////////////////////////////////////////////////////
 /// @brief Storage for loaded binary data to keep it alive
 ////////////////////////////////////////////////////////////
 struct EntityCollectionData {
@@ -405,43 +349,11 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents with "
   auto &game_context = fixture.GetGameContext();
   auto &scene_context = fixture.GetSceneContext();
 
-  // Create GrimoireMachina data
-  flatbuffers::FlatBufferBuilder builder;
-
-  std::vector<flatbuffers::Offset<flatbuffers::String>> fragment_names;
-  auto fragments_vec = builder.CreateVector(fragment_names);
-
-  std::vector<flatbuffers::Offset<flatbuffers::String>> joint_names;
-  auto joints_vec = builder.CreateVector(joint_names);
-
-  steamrot::GrimoireMachinaDataBuilder grimoire_builder(builder);
-  grimoire_builder.add_fragments(fragments_vec);
-  grimoire_builder.add_joints(joints_vec);
-  auto grimoire_data = grimoire_builder.Finish();
-
-  // Create entity with this data
-  steamrot::EntityDataFbsBuilder entity_builder(builder);
-  entity_builder.add_index(0);
-  entity_builder.add_c_grimoire_machina(grimoire_data);
-  auto entity = entity_builder.Finish();
-
-  std::vector<flatbuffers::Offset<steamrot::EntityDataFbs>> entities;
-  entities.push_back(entity);
-  auto entities_vec = builder.CreateVector(entities);
-
-  steamrot::EntityCollectionFbsBuilder collection_builder(builder);
-  collection_builder.add_entity_memory_pool_size(5);
-  collection_builder.add_entities(entities_vec);
-  auto collection = collection_builder.Finish();
-
-  builder.Finish(collection);
-
-  const steamrot::EntityCollectionFbs *entity_collection =
-      flatbuffers::GetRoot<steamrot::EntityCollectionFbs>(
-          builder.GetBufferPointer());
+  // Load entity collection from file
+  auto collection_data = GetFreshEntityCollection("entity_collection_grimoire_basic.bin");
 
   steamrot::FlatbuffersEntityConfigurator configurator(
-      game_context.event_handler, *entity_collection);
+      game_context.event_handler, *collection_data.entity_collection);
 
   // Resize pool
   steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.scene_entities,
@@ -508,31 +420,11 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents skips "
   auto &game_context = fixture.GetGameContext();
   auto &scene_context = fixture.GetSceneContext();
 
-  // Create entity with no first-layer components (just an index)
-  flatbuffers::FlatBufferBuilder builder;
-
-  steamrot::EntityDataFbsBuilder entity_builder(builder);
-  entity_builder.add_index(0);
-  // Not adding any component data
-  auto entity = entity_builder.Finish();
-
-  std::vector<flatbuffers::Offset<steamrot::EntityDataFbs>> entities;
-  entities.push_back(entity);
-  auto entities_vec = builder.CreateVector(entities);
-
-  steamrot::EntityCollectionFbsBuilder collection_builder(builder);
-  collection_builder.add_entity_memory_pool_size(5);
-  collection_builder.add_entities(entities_vec);
-  auto collection = collection_builder.Finish();
-
-  builder.Finish(collection);
-
-  const steamrot::EntityCollectionFbs *entity_collection =
-      flatbuffers::GetRoot<steamrot::EntityCollectionFbs>(
-          builder.GetBufferPointer());
+  // Load entity collection from file (entity with no components)
+  auto collection_data = GetFreshEntityCollection("entity_collection_no_components.bin");
 
   steamrot::FlatbuffersEntityConfigurator configurator(
-      game_context.event_handler, *entity_collection);
+      game_context.event_handler, *collection_data.entity_collection);
 
   // Resize pool
   steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.scene_entities,
@@ -569,13 +461,11 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureSecondLayerComponents with "
   auto &game_context = fixture.GetGameContext();
   auto &scene_context = fixture.GetSceneContext();
 
-  auto builder = CreateEmptyCollection(10);
-  const steamrot::EntityCollectionFbs *entity_collection =
-      flatbuffers::GetRoot<steamrot::EntityCollectionFbs>(
-          builder.GetBufferPointer());
+  // Load entity collection from file
+  auto collection_data = GetFreshEntityCollection("entity_collection_empty.bin");
 
   steamrot::FlatbuffersEntityConfigurator configurator(
-      game_context.event_handler, *entity_collection);
+      game_context.event_handler, *collection_data.entity_collection);
 
   // Resize pool
   steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.scene_entities,
@@ -608,14 +498,12 @@ TEST_CASE(
   REQUIRE(steamrot::entity::memory::GetMemoryPoolSize(
               scene_context.scene_entities) == 0);
 
+  // Load entity collection from file
   const size_t expected_size = 25;
-  auto builder = CreateEmptyCollection(expected_size);
-  const steamrot::EntityCollectionFbs *entity_collection =
-      flatbuffers::GetRoot<steamrot::EntityCollectionFbs>(
-          builder.GetBufferPointer());
+  auto collection_data = GetFreshEntityCollection("entity_collection_size_25.bin");
 
   steamrot::FlatbuffersEntityConfigurator configurator(
-      game_context.event_handler, *entity_collection);
+      game_context.event_handler, *collection_data.entity_collection);
 
   // Configure the pool
   auto result =
@@ -635,40 +523,11 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureEntityMemoryPool with "
   auto &game_context = fixture.GetGameContext();
   auto &scene_context = fixture.GetSceneContext();
 
-  // Create entity with CUserInterface
-  flatbuffers::FlatBufferBuilder builder;
-
-  auto panel_data = CreateValidPanelData(builder);
-  auto ui_name = builder.CreateString("test_ui");
-
-  steamrot::UserInterfaceDataBuilder ui_builder(builder);
-  ui_builder.add_ui_name(ui_name);
-  ui_builder.add_is_visible(true);
-  ui_builder.add_root_ui_element(panel_data);
-  auto ui_data = ui_builder.Finish();
-
-  steamrot::EntityDataFbsBuilder entity_builder(builder);
-  entity_builder.add_index(0);
-  entity_builder.add_c_user_interface(ui_data);
-  auto entity = entity_builder.Finish();
-
-  std::vector<flatbuffers::Offset<steamrot::EntityDataFbs>> entities;
-  entities.push_back(entity);
-  auto entities_vec = builder.CreateVector(entities);
-
-  steamrot::EntityCollectionFbsBuilder collection_builder(builder);
-  collection_builder.add_entity_memory_pool_size(5);
-  collection_builder.add_entities(entities_vec);
-  auto collection = collection_builder.Finish();
-
-  builder.Finish(collection);
-
-  const steamrot::EntityCollectionFbs *entity_collection =
-      flatbuffers::GetRoot<steamrot::EntityCollectionFbs>(
-          builder.GetBufferPointer());
+  // Load entity collection from file
+  auto collection_data = GetFreshEntityCollection("entity_collection_ui_basic.bin");
 
   steamrot::FlatbuffersEntityConfigurator configurator(
-      game_context.event_handler, *entity_collection);
+      game_context.event_handler, *collection_data.entity_collection);
 
   // Configure the entire pool
   auto result =
@@ -697,60 +556,11 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureEntityMemoryPool with "
   auto &game_context = fixture.GetGameContext();
   auto &scene_context = fixture.GetSceneContext();
 
-  // Create entities with different first-layer components
-  flatbuffers::FlatBufferBuilder builder;
-
-  // Entity 0: CUserInterface
-  auto panel_data = CreateValidPanelData(builder);
-  auto ui_name = builder.CreateString("ui_entity");
-
-  steamrot::UserInterfaceDataBuilder ui_builder(builder);
-  ui_builder.add_ui_name(ui_name);
-  ui_builder.add_is_visible(true);
-  ui_builder.add_root_ui_element(panel_data);
-  auto ui_data = ui_builder.Finish();
-
-  steamrot::EntityDataFbsBuilder entity_builder_0(builder);
-  entity_builder_0.add_index(0);
-  entity_builder_0.add_c_user_interface(ui_data);
-  auto entity_0 = entity_builder_0.Finish();
-
-  // Entity 1: CGrimoireMachina
-  std::vector<flatbuffers::Offset<flatbuffers::String>> fragment_names;
-  auto fragments_vec = builder.CreateVector(fragment_names);
-
-  std::vector<flatbuffers::Offset<flatbuffers::String>> joint_names;
-  auto joints_vec = builder.CreateVector(joint_names);
-
-  steamrot::GrimoireMachinaDataBuilder grimoire_builder(builder);
-  grimoire_builder.add_fragments(fragments_vec);
-  grimoire_builder.add_joints(joints_vec);
-  auto grimoire_data = grimoire_builder.Finish();
-
-  steamrot::EntityDataFbsBuilder entity_builder_1(builder);
-  entity_builder_1.add_index(1);
-  entity_builder_1.add_c_grimoire_machina(grimoire_data);
-  auto entity_1 = entity_builder_1.Finish();
-
-  // Create collection
-  std::vector<flatbuffers::Offset<steamrot::EntityDataFbs>> entities;
-  entities.push_back(entity_0);
-  entities.push_back(entity_1);
-  auto entities_vec = builder.CreateVector(entities);
-
-  steamrot::EntityCollectionFbsBuilder collection_builder(builder);
-  collection_builder.add_entity_memory_pool_size(5);
-  collection_builder.add_entities(entities_vec);
-  auto collection = collection_builder.Finish();
-
-  builder.Finish(collection);
-
-  const steamrot::EntityCollectionFbs *entity_collection =
-      flatbuffers::GetRoot<steamrot::EntityCollectionFbs>(
-          builder.GetBufferPointer());
+  // Load entity collection from file
+  auto collection_data = GetFreshEntityCollection("entity_collection_multi_component.bin");
 
   steamrot::FlatbuffersEntityConfigurator configurator(
-      game_context.event_handler, *entity_collection);
+      game_context.event_handler, *collection_data.entity_collection);
 
   // Configure the entire pool
   auto result =
@@ -780,39 +590,11 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureEntityMemoryPool fails "
   auto &game_context = fixture.GetGameContext();
   auto &scene_context = fixture.GetSceneContext();
 
-  // Create UserInterface data without root element (invalid)
-  flatbuffers::FlatBufferBuilder builder;
-
-  auto ui_name = builder.CreateString("test_ui");
-
-  steamrot::UserInterfaceDataBuilder ui_builder(builder);
-  ui_builder.add_ui_name(ui_name);
-  ui_builder.add_is_visible(true);
-  // Intentionally NOT adding root_ui_element
-  auto ui_data = ui_builder.Finish();
-
-  steamrot::EntityDataFbsBuilder entity_builder(builder);
-  entity_builder.add_index(0);
-  entity_builder.add_c_user_interface(ui_data);
-  auto entity = entity_builder.Finish();
-
-  std::vector<flatbuffers::Offset<steamrot::EntityDataFbs>> entities;
-  entities.push_back(entity);
-  auto entities_vec = builder.CreateVector(entities);
-
-  steamrot::EntityCollectionFbsBuilder collection_builder(builder);
-  collection_builder.add_entity_memory_pool_size(5);
-  collection_builder.add_entities(entities_vec);
-  auto collection = collection_builder.Finish();
-
-  builder.Finish(collection);
-
-  const steamrot::EntityCollectionFbs *entity_collection =
-      flatbuffers::GetRoot<steamrot::EntityCollectionFbs>(
-          builder.GetBufferPointer());
+  // Load entity collection from file (without root element - invalid)
+  auto collection_data = GetFreshEntityCollection("entity_collection_ui_no_root.bin");
 
   steamrot::FlatbuffersEntityConfigurator configurator(
-      game_context.event_handler, *entity_collection);
+      game_context.event_handler, *collection_data.entity_collection);
 
   // This should fail during first-layer configuration
   auto result =
