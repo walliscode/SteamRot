@@ -8,6 +8,7 @@ add_library(data_providers
   FlatbuffersEngineDataProvider.cpp
   FlatbuffersAssetDataProvider.cpp
   FlatbuffersSceneManagerDataProvider.cpp
+  FlatbuffersSceneDataProvider.cpp
   FlatbuffersSubscriberViewer.cpp
   provider_factory.cpp
   DataLoader.cpp

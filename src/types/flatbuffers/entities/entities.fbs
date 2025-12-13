@@ -18,3 +18,5 @@ table EntityCollectionFbs {
   entity_memory_pool_size: int;
 }
 
+root_type EntityCollectionFbs;
+

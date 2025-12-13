@@ -30,6 +30,10 @@ std::expected<std::monostate, FailInfo>
 FlatbuffersEntityConfigurator::ConfigureEntityMemoryPool(
     EntityMemoryPool &emp) {
 
+  if (!m_entity_collection_data.entity_memory_pool_size())
+    return std::unexpected(
+        FailInfo{FailMode::FlatbuffersDataNotFound,
+                 "Entity memory pool size not found in EntityCollectionFbs."});
   // resize the entity memory pool based on the flatbuffers data
   entity::memory::ResizeEntityMemoryPool(
       emp, m_entity_collection_data.entity_memory_pool_size());
@@ -58,22 +62,22 @@ FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents(
   // cycle through each entity in the collection and configure it
   for (const auto &entity_data : *m_entity_collection_data.entities()) {
 
-    //  upate the current EntityDataFbs pointer
+    //  update the current EntityDataFbs pointer
     m_current_entity_data = entity_data;
 
-    // check the data and configure compoenent if data exists
+    // check the data and configure component if data exists
     if (entity_data->c_user_interface()) {
       auto configure_result =
-          ConfigureComponent(entity::memory::GetComponent<CUserInterface>(
+          ConfigureCUserInterface(entity::memory::GetComponent<CUserInterface>(
               entity_data->index(), emp));
       if (!configure_result.has_value())
         return std::unexpected(configure_result.error());
     }
 
     if (entity_data->c_grimoire_machina()) {
-      auto configure_result =
-          ConfigureComponent(entity::memory::GetComponent<CGrimoireMachina>(
-              entity_data->index(), emp));
+      auto configure_result = ConfigureCGrimoireMachina(
+          entity::memory::GetComponent<CGrimoireMachina>(entity_data->index(),
+                                                         emp));
       if (!configure_result.has_value())
         return std::unexpected(configure_result.error());
     }
@@ -110,7 +114,7 @@ FlatbuffersEntityConfigurator::ConfigureCUserInterface(
   if (!configure_result.has_value())
     return std::unexpected(configure_result.error());
 
-  // ge thte UserInterfaceData from the current entity data
+  // get the UserInterfaceData from the current entity data
   const UserInterfaceData *ui_data = m_current_entity_data->c_user_interface();
 
   // configure the CUserInterface specific data, wrap in if statements to avoid

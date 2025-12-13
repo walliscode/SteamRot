@@ -18,7 +18,8 @@ namespace steamrot {
 ///
 /// Note: Event handling is done via Subscribers, not stored as a config set.
 /// This struct may be empty initially but is created for consistency and
-/// future extensibility (render settings, gameplay parameters, AI difficulty, etc.).
+/// future extensibility (render settings, gameplay parameters, AI difficulty,
+/// etc.).
 /////////////////////////////////////////////////
 struct SceneConfig {
   SceneConfig() = default;

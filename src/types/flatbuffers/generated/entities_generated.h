@@ -164,6 +164,36 @@ inline ::flatbuffers::Offset<EntityCollectionFbs> CreateEntityCollectionFbsDirec
       entity_memory_pool_size);
 }
 
+inline const steamrot::EntityCollectionFbs *GetEntityCollectionFbs(const void *buf) {
+  return ::flatbuffers::GetRoot<steamrot::EntityCollectionFbs>(buf);
+}
+
+inline const steamrot::EntityCollectionFbs *GetSizePrefixedEntityCollectionFbs(const void *buf) {
+  return ::flatbuffers::GetSizePrefixedRoot<steamrot::EntityCollectionFbs>(buf);
+}
+
+inline bool VerifyEntityCollectionFbsBuffer(
+    ::flatbuffers::Verifier &verifier) {
+  return verifier.VerifyBuffer<steamrot::EntityCollectionFbs>(nullptr);
+}
+
+inline bool VerifySizePrefixedEntityCollectionFbsBuffer(
+    ::flatbuffers::Verifier &verifier) {
+  return verifier.VerifySizePrefixedBuffer<steamrot::EntityCollectionFbs>(nullptr);
+}
+
+inline void FinishEntityCollectionFbsBuffer(
+    ::flatbuffers::FlatBufferBuilder &fbb,
+    ::flatbuffers::Offset<steamrot::EntityCollectionFbs> root) {
+  fbb.Finish(root);
+}
+
+inline void FinishSizePrefixedEntityCollectionFbsBuffer(
+    ::flatbuffers::FlatBufferBuilder &fbb,
+    ::flatbuffers::Offset<steamrot::EntityCollectionFbs> root) {
+  fbb.FinishSizePrefixed(root);
+}
+
 }  // namespace steamrot
 
 #endif  // FLATBUFFERS_GENERATED_ENTITIES_STEAMROT_H_

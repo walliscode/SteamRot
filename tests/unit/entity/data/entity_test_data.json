@@ -1,0 +1,68 @@
+{
+  "entity_memory_pool_size": 100,
+  "entities": [
+    {
+      "index": 0
+    },
+    {
+      "index": 1,
+      "c_user_interface": {
+        "ui_name": "test_ui",
+        "is_visible": true,
+        "root_ui_element": {
+          "base_data": {
+            "position": {
+              "x": 100.0,
+              "y": 200.0
+            },
+            "size": {
+              "x": 300.0,
+              "y": 400.0
+            },
+            "children_active": false,
+            "children": [],
+            "layout": "Horizontal",
+            "spacing_strategy": "None"
+          }
+        }
+      }
+    },
+    {
+      "index": 3,
+      "c_grimoire_machina": {
+        "fragments": [],
+        "joints": []
+      }
+    },
+    {
+      "index": 4,
+      "c_user_interface": {
+        "ui_name": "ui_entity",
+        "is_visible": true,
+        "root_ui_element": {
+          "base_data": {
+            "position": {
+              "x": 100.0,
+              "y": 200.0
+            },
+            "size": {
+              "x": 300.0,
+              "y": 400.0
+            },
+            "children_active": false,
+            "children": [],
+            "layout": "Horizontal",
+            "spacing_strategy": "None"
+          }
+        }
+      }
+    },
+    {
+      "index": 5,
+      "c_grimoire_machina": {
+        "fragments": [],
+        "joints": []
+      }
+    }
+  ]
+}
