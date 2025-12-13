@@ -4,27 +4,48 @@ This directory contains test data for the entity subsystem tests.
 
 ## entity_test_data.json
 
-This JSON file contains simple test configuration data that can be referenced when adding new test scenarios. The test code uses helper functions to build FlatBuffers entity collections in-memory based on these configurations.
+This JSON file contains a single `EntityCollectionFbs` with multiple test entities covering various test scenarios. The file is compiled to `entity_test_data.bin` during the build process.
 
-### Helper Functions
+### Entity Index Reference
 
-The test file provides helper functions for creating common entity collection scenarios:
+- **Entity 0**: No components
+- **Entity 1**: CUserInterface with root element (ui_name: "test_ui")
+- **Entity 2**: CUserInterface without root element (ui_name: "test_ui_no_root") - for failure testing
+- **Entity 3**: CGrimoireMachina (empty fragments/joints)
+- **Entity 4**: CUserInterface with root element (ui_name: "ui_entity")
+- **Entity 5**: CGrimoireMachina (empty fragments/joints)
 
-- `CreateEmptyCollection(pool_size)` - Empty entity collection
-- `CreateUIEntity(ui_name, visible, with_root, pool_size)` - Entity with CUserInterface
-- `CreateGrimoireEntity(pool_size)` - Entity with CGrimoireMachina  
-- `CreateEntityNoComponents(pool_size)` - Entity with no components
-- `CreateMultiComponentCollection()` - Multiple entities with different components
+Pool size: 100
+
+### Using in Tests
+
+All tests share the same entity collection loaded via `LoadEntityTestData()`:
+
+```cpp
+// Load shared entity test data
+auto test_data = LoadEntityTestData();
+const steamrot::EntityCollectionFbs *entity_collection = test_data.entity_collection;
+
+// Create configurator
+steamrot::FlatbuffersEntityConfigurator configurator(
+    game_context.event_handler, *entity_collection);
+
+// Create fresh EMP for test
+steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.scene_entities, 100);
+
+// Test with entity at index 1 (UI with root)
+auto &ui_component = steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(
+    1, scene_context.scene_entities);
+```
 
 ### Adding New Test Scenarios
 
 To add a new test scenario:
 
-1. Add an entry to `entity_test_data.json` for documentation purposes
-2. Create a new helper function in the test file if needed, or use existing helpers
-3. Use the helper function in your test case
-
-This approach keeps the tests simple and focused on unit testing without the complexity of external binary file compilation.
+1. Add a new entity to `entity_test_data.json`
+2. Update the entity index reference above
+3. The JSON will be automatically compiled to binary during build
+4. Use the new entity index in your test
 
 ## Test Data Files
 
