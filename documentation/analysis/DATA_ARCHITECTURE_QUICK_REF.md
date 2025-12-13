@@ -7,7 +7,8 @@
 
 ## TL;DR
 
-✅ **Use polymorphic structs** (SceneData → FbsSceneData, SaveSceneData)  
+✅ **Use polymorphic structs** (SceneData → FbsSceneData, TestSceneData)  
+✅ **SaveData is a container** with `vector<SceneData>` - not a polymorphic type  
 ✅ **Provider loads data** → returns `std::unique_ptr<SceneData>`  
 ✅ **Configurator receives data** → `ConfigureScene(Scene&, SceneData*)`  
 ✅ **Three layers**: Data/Types → Logic/Providers → Orchestration  
@@ -21,9 +22,9 @@
 
 ```
 What's the data source?
-├─ Default (.bin files) → Use FlatbuffersSceneDataProvider
-├─ Save file → Use SaveSceneDataProvider  
-└─ Test → Use TestSceneDataProvider
+├─ Default (.bin files) → Use FlatbuffersSceneDataProvider.ProvideDefaultSceneData()
+├─ Save file → Use FlatbuffersSceneDataProvider.ProvideSceneDataFromSave()  
+└─ Test → Use TestSceneDataProvider.ProvideTestSceneData()
 ```
 
 ### "I need to configure a scene..."
@@ -31,16 +32,16 @@ What's the data source?
 ```
 What's the data type?
 ├─ FbsSceneData → Use FlatbuffersSceneConfigurator
-├─ SaveSceneData → Use SaveSceneConfigurator
-└─ TestSceneData → Use TestSceneConfigurator
+├─ TestSceneData → Use TestSceneConfigurator
+└─ Save data → Use FlatbuffersSceneConfigurator (same as default!)
 ```
 
 ### "I'm creating a new data source..."
 
 ```
-1. Create derived SceneData struct
-2. Implement ISceneDataProvider
-3. Implement ISceneConfigurator
+1. Create derived SceneData struct (if needed)
+2. Implement ISceneDataProvider method
+3. Implement ISceneConfigurator (or reuse existing)
 4. Register in provider factory
 ```
 
@@ -56,20 +57,25 @@ struct SceneData {
   SceneInfo scene_info;
 };
 
-// FlatBuffers implementation
+// FlatBuffers implementation (for default and save data)
 struct FbsSceneData : public SceneData {
   const SceneDataFbs *scene_data_fbs;
 };
 
-// Save file implementation
-struct SaveSceneData : public SceneData {
-  const SavedSceneDataFbs *saved_scene_data_fbs;
-  uint64_t play_time_seconds;
-  std::string last_modified;
+// Test data implementation
+struct TestSceneData : public SceneData {
+  const TestSceneDataFbs *test_scene_data_fbs;
+};
+
+// SaveData is a CONTAINER, not a polymorphic type
+struct SaveData {
+  Metadata metadata;
+  SceneType current_scene_type;
+  std::vector<std::unique_ptr<SceneData>> scenes;  // Holds SceneData objects
 };
 ```
 
-**Purpose**: Support multiple data sources with single interface
+**Purpose**: Support multiple data sources with single interface. SaveData is just a container.
 
 ### Provider Pattern
 
@@ -134,8 +140,8 @@ public:
 **Cannot depend on**: Layer 3, other Layer 2 peers
 
 **Contains**:
-- FlatbuffersSceneDataProvider
-- SaveSceneDataProvider
+- FlatbuffersSceneDataProvider (handles both default and save data)
+- TestSceneDataProvider
 - FlatbuffersSceneConfigurator
 - SaveSceneConfigurator
 - Logic classes (UIRenderLogic, etc.)
@@ -180,12 +186,12 @@ std::unique_ptr<Scene> CreateScene(SceneType type) {
 
 ### Creating a Scene (Save File) - Two-Step Process
 
-**Key Concept**: SaveData contains SceneData. You must first load SaveData, then extract SceneData from it.
+**Key Concept**: SaveData contains a vector of SceneData. Load SaveData, then extract desired SceneData from vector.
 
 ```cpp
 // In SceneFactory
 std::unique_ptr<Scene> CreateSceneFromSave(uint32_t save_slot) {
-  // STEP 1: Load SaveData (contains metadata + scene data)
+  // STEP 1: Load SaveData (container with scenes vector)
   ISaveDataProvider& save_provider = GetSaveDataProvider();
   auto save_result = save_provider.LoadSave(save_slot);
   if (!save_result.has_value()) {
@@ -194,8 +200,8 @@ std::unique_ptr<Scene> CreateSceneFromSave(uint32_t save_slot) {
   
   const SaveData& save = save_result.value();
   
-  // STEP 2: Extract SceneData from SaveData
-  ISceneDataProvider& scene_provider = GetSaveSceneDataProvider();
+  // STEP 2: Extract SceneData from SaveData.scenes vector
+  ISceneDataProvider& scene_provider = GetFlatbuffersSceneDataProvider();
   std::unique_ptr<SceneData> scene_data = 
       scene_provider.ProvideSceneDataFromSave(save, save.current_scene_type);
   
@@ -203,8 +209,8 @@ std::unique_ptr<Scene> CreateSceneFromSave(uint32_t save_slot) {
     return nullptr;
   }
   
-  // STEP 3: Configure scene
-  ISceneConfigurator& configurator = GetSaveSceneConfigurator();
+  // STEP 3: Configure scene (same configurator as default!)
+  ISceneConfigurator& configurator = GetFlatbuffersSceneConfigurator();
   std::unique_ptr<Scene> scene = CreateEmptyScene(save.current_scene_type);
   
   auto result = configurator.ConfigureScene(*scene, scene_data.get());
@@ -217,10 +223,10 @@ std::unique_ptr<Scene> CreateSceneFromSave(uint32_t save_slot) {
 ```
 
 **Why Two Steps?**
-- SaveData = metadata (save name, time) + scene data
+- SaveData = metadata + scenes vector (container)
 - ISaveDataProvider handles save file I/O
-- ISceneDataProvider extracts scene-specific data
-- Separation enables reuse and testing
+- ISceneDataProvider extracts SceneData from vector
+- Same configurator works for both default and save data
 ```
 
 ### Implementing a Provider
@@ -391,11 +397,11 @@ When adding a new scene type, update:
 
 ### Phase 3: Implement Save Infrastructure ⏳
 
-- [ ] Create `SaveSceneData` struct
-- [ ] Implement `SaveSceneDataProvider`
-- [ ] Implement `SaveSceneConfigurator`
-- [ ] Implement `EntitySerializer`
-- [ ] Update `ISaveDataProvider` with scene methods
+- [ ] Update `SaveData` struct with `std::vector<std::unique_ptr<SceneData>> scenes`
+- [ ] Implement `EntitySerializer` to serialize EntityMemoryPool
+- [ ] Implement `FlatbuffersSceneDataProvider::ProvideSceneDataFromSave()` to extract from vector
+- [ ] Update `ISaveDataProvider` with scene capture methods
+- [ ] Reuse `FlatbuffersSceneConfigurator` (no new configurator needed!)
 - [ ] Test save/load round-trip
 
 ### Phase 4: Break Circular Dependencies ⏳
