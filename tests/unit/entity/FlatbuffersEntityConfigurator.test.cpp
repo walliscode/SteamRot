@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersEntityConfigurator.h"
+#include "Component.h"
 #include "EventHandler.h"
 #include "containers.h"
 #include "entities_generated.h"
@@ -75,5 +76,18 @@ TEST_CASE("FlatbuffersEntityConfigurator::Constructor",
     }
 
     REQUIRE(steamrot::entity::memory::GetMemoryPoolSize(emp) == 100);
+  }
+
+  SECTION("Base Component is activated correctly") {
+
+    // create CMeta component to test
+    steamrot::CMeta meta_component;
+    REQUIRE(meta_component.m_active == false);
+
+    auto config_result = configurator.ConfigureComponent(meta_component);
+    if (!config_result.has_value()) {
+      FAIL("ConfigureComponent failed: " + config_result.error().message);
+    }
+    REQUIRE(meta_component.m_active == true);
   }
 }
