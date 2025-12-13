@@ -7,7 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersEntityConfigurator.h"
-#include "TestFixture.h"
+#include "EventHandler.h"
 #include "entity_memory.h"
 #include "entities_generated.h"
 #include <catch2/catch_test_macros.hpp>
@@ -31,6 +31,23 @@ struct EntityTestData {
   EntityTestData(std::unique_ptr<char[]> data,
                  const steamrot::EntityCollectionFbs *collection)
       : binary_data(std::move(data)), entity_collection(collection) {}
+};
+
+////////////////////////////////////////////////////////////
+/// @brief Minimal test fixture for entity configurator tests
+///
+/// Provides only the minimal dependencies needed for testing
+/// FlatbuffersEntityConfigurator without pulling in heavy dependencies
+/// like scenes, logic, display, etc.
+////////////////////////////////////////////////////////////
+struct MinimalTestFixture {
+  steamrot::EventHandler event_handler;
+  steamrot::EntityMemoryPool entity_pool;
+
+  MinimalTestFixture() {
+    // Initialize with a reasonable default size
+    steamrot::entity::memory::ResizeEntityMemoryPool(entity_pool, 10);
+  }
 };
 
 ////////////////////////////////////////////////////////////
@@ -89,10 +106,7 @@ EntityTestData LoadEntityTestData() {
 
 TEST_CASE("FlatbuffersEntityConfigurator::Constructor",
           "[unit][FlatbuffersEntityConfigurator]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Initialize();
-
-  auto &game_context = fixture.GetGameContext();
+  MinimalTestFixture fixture;
 
   // Load shared entity test data
   auto test_data = LoadEntityTestData();
@@ -100,7 +114,7 @@ TEST_CASE("FlatbuffersEntityConfigurator::Constructor",
 
   REQUIRE(entity_collection != nullptr);
   REQUIRE_NOTHROW(steamrot::FlatbuffersEntityConfigurator(
-      game_context.event_handler, *entity_collection));
+      fixture.event_handler, *entity_collection));
 }
 
 /////////////////////////////////////////////////
@@ -110,26 +124,18 @@ TEST_CASE("FlatbuffersEntityConfigurator::Constructor",
 TEST_CASE("FlatbuffersEntityConfigurator::ConfigureComponent activates base "
           "component",
           "[unit][FlatbuffersEntityConfigurator]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Initialize();
-
-  auto &game_context = fixture.GetGameContext();
-  auto &scene_context = fixture.GetSceneContext();
+  MinimalTestFixture fixture;
 
   // Load shared entity test data
   auto test_data = LoadEntityTestData();
   const steamrot::EntityCollectionFbs *entity_collection = test_data.entity_collection;
 
   steamrot::FlatbuffersEntityConfigurator configurator(
-      game_context.event_handler, *entity_collection);
-
-  // Resize pool
-  steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.scene_entities,
-                                                   5);
+      fixture.event_handler, *entity_collection);
 
   // Get a component to configure
   auto &component = steamrot::entity::memory::GetComponent<steamrot::CMeta>(
-      0, scene_context.scene_entities);
+      0, fixture.entity_pool);
   REQUIRE(component.m_active == false);
 
   // Configure the component
@@ -142,11 +148,7 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureComponent activates base "
 TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCUserInterface with valid "
           "data",
           "[unit][FlatbuffersEntityConfigurator]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Initialize();
-
-  auto &game_context = fixture.GetGameContext();
-  auto &scene_context = fixture.GetSceneContext();
+  MinimalTestFixture fixture;
 
   // Load shared entity test data
   auto test_data = LoadEntityTestData();
@@ -154,16 +156,12 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCUserInterface with valid "
 
   REQUIRE(entity_collection != nullptr);
   steamrot::FlatbuffersEntityConfigurator configurator(
-      game_context.event_handler, **flatbuffers::GetRoot<steamrot::EntityCollectionFbs>(builder.GetBufferPointer()));
-
-  // Resize pool
-  steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.scene_entities,
-                                                   5);
+      fixture.event_handler, *entity_collection);
 
   // Get the component to configure
   auto &ui_component =
       steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(
-          1, scene_context.scene_entities);
+          1, fixture.entity_pool);
 
   REQUIRE(ui_component.m_active == false);
 
@@ -180,26 +178,18 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCUserInterface with valid "
 TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCUserInterface without "
           "root element fails",
           "[unit][FlatbuffersEntityConfigurator]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Initialize();
-
-  auto &game_context = fixture.GetGameContext();
-  auto &scene_context = fixture.GetSceneContext();
+  MinimalTestFixture fixture;
 
   // Load shared entity test data
   auto test_data = LoadEntityTestData();
   const steamrot::EntityCollectionFbs *entity_collection = test_data.entity_collection;
 
   steamrot::FlatbuffersEntityConfigurator configurator(
-      game_context.event_handler, *entity_collection);
-
-  // Resize pool
-  steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.scene_entities,
-                                                   100);
+      fixture.event_handler, *entity_collection);
 
   auto &ui_component =
       steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(
-          2, scene_context.scene_entities);
+          2, fixture.entity_pool);
 
   // This should fail because root element is missing
   auto result = configurator.ConfigureCUserInterface(ui_component);
@@ -211,26 +201,18 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCUserInterface without "
 TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCGrimoireMachina with "
           "valid data",
           "[unit][FlatbuffersEntityConfigurator]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Initialize();
-
-  auto &game_context = fixture.GetGameContext();
-  auto &scene_context = fixture.GetSceneContext();
+  MinimalTestFixture fixture;
 
   // Load shared entity test data
   auto test_data = LoadEntityTestData();
   const steamrot::EntityCollectionFbs *entity_collection = test_data.entity_collection;
 
   steamrot::FlatbuffersEntityConfigurator configurator(
-      game_context.event_handler, *entity_collection);
-
-  // Resize pool
-  steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.scene_entities,
-                                                   5);
+      fixture.event_handler, *entity_collection);
 
   auto &grimoire_component =
       steamrot::entity::memory::GetComponent<steamrot::CGrimoireMachina>(
-          3, scene_context.scene_entities);
+          3, fixture.entity_pool);
 
   REQUIRE(grimoire_component.m_active == false);
 
@@ -244,26 +226,18 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCGrimoireMachina with "
 TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCMachinaForm with valid "
           "data",
           "[unit][FlatbuffersEntityConfigurator]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Initialize();
-
-  auto &game_context = fixture.GetGameContext();
-  auto &scene_context = fixture.GetSceneContext();
+  MinimalTestFixture fixture;
 
   // Load shared entity test data
   auto test_data = LoadEntityTestData();
   const steamrot::EntityCollectionFbs *entity_collection = test_data.entity_collection;
 
   steamrot::FlatbuffersEntityConfigurator configurator(
-      game_context.event_handler, *entity_collection);
-
-  // Resize pool
-  steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.scene_entities,
-                                                   5);
+      fixture.event_handler, *entity_collection);
 
   auto &machina_form_component =
       steamrot::entity::memory::GetComponent<steamrot::CMachinaForm>(
-          0, scene_context.scene_entities);
+          0, fixture.entity_pool);
 
   // Configure the component directly (currently a no-op but should succeed)
   auto result = configurator.ConfigureCMachinaForm(machina_form_component);
@@ -278,26 +252,18 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCMachinaForm with valid "
 TEST_CASE("FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents with "
           "empty entities",
           "[unit][FlatbuffersEntityConfigurator]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Initialize();
-
-  auto &game_context = fixture.GetGameContext();
-  auto &scene_context = fixture.GetSceneContext();
+  MinimalTestFixture fixture;
 
   // Load shared entity test data
   auto test_data = LoadEntityTestData();
   const steamrot::EntityCollectionFbs *entity_collection = test_data.entity_collection;
 
   steamrot::FlatbuffersEntityConfigurator configurator(
-      game_context.event_handler, *entity_collection);
-
-  // Resize pool
-  steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.scene_entities,
-                                                   10);
+      fixture.event_handler, *entity_collection);
 
   // Configure first layer - should succeed even with no entities
   auto result =
-      configurator.ConfigureFirstLayerComponents(scene_context.scene_entities);
+      configurator.ConfigureFirstLayerComponents(fixture.entity_pool);
 
   REQUIRE(result.has_value());
 }
@@ -305,33 +271,25 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents with "
 TEST_CASE("FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents with "
           "CUserInterface",
           "[unit][FlatbuffersEntityConfigurator]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Initialize();
-
-  auto &game_context = fixture.GetGameContext();
-  auto &scene_context = fixture.GetSceneContext();
+  MinimalTestFixture fixture;
 
   // Load shared entity test data
   auto test_data = LoadEntityTestData();
   const steamrot::EntityCollectionFbs *entity_collection = test_data.entity_collection;
 
   steamrot::FlatbuffersEntityConfigurator configurator(
-      game_context.event_handler, *entity_collection);
-
-  // Resize pool
-  steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.scene_entities,
-                                                   5);
+      fixture.event_handler, *entity_collection);
 
   // Configure first layer
   auto result =
-      configurator.ConfigureFirstLayerComponents(scene_context.scene_entities);
+      configurator.ConfigureFirstLayerComponents(fixture.entity_pool);
 
   REQUIRE(result.has_value());
 
   // Verify the component was configured
   auto &ui_component =
       steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(
-          2, scene_context.scene_entities);
+          2, fixture.entity_pool);
 
   REQUIRE(ui_component.m_active == true);
   REQUIRE(ui_component.m_name == "test_ui");
@@ -342,33 +300,25 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents with "
 TEST_CASE("FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents with "
           "CGrimoireMachina",
           "[unit][FlatbuffersEntityConfigurator]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Initialize();
-
-  auto &game_context = fixture.GetGameContext();
-  auto &scene_context = fixture.GetSceneContext();
+  MinimalTestFixture fixture;
 
   // Load shared entity test data
   auto test_data = LoadEntityTestData();
   const steamrot::EntityCollectionFbs *entity_collection = test_data.entity_collection;
 
   steamrot::FlatbuffersEntityConfigurator configurator(
-      game_context.event_handler, *entity_collection);
-
-  // Resize pool
-  steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.scene_entities,
-                                                   5);
+      fixture.event_handler, *entity_collection);
 
   // Configure first layer
   auto result =
-      configurator.ConfigureFirstLayerComponents(scene_context.scene_entities);
+      configurator.ConfigureFirstLayerComponents(fixture.entity_pool);
 
   REQUIRE(result.has_value());
 
   // Verify the component was configured
   auto &grimoire_component =
       steamrot::entity::memory::GetComponent<steamrot::CGrimoireMachina>(
-          3, scene_context.scene_entities);
+          3, fixture.entity_pool);
 
   REQUIRE(grimoire_component.m_active == true);
 }
@@ -376,77 +326,61 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents with "
 TEST_CASE("FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents with "
           "multiple components",
           "[unit][FlatbuffersEntityConfigurator]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Initialize();
-
-  auto &game_context = fixture.GetGameContext();
-  auto &scene_context = fixture.GetSceneContext();
+  MinimalTestFixture fixture;
 
   // Load shared entity test data
   auto test_data = LoadEntityTestData();
   const steamrot::EntityCollectionFbs *entity_collection = test_data.entity_collection;
 
   steamrot::FlatbuffersEntityConfigurator configurator(
-      game_context.event_handler, *entity_collection);
-
-  // Resize pool
-  steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.scene_entities,
-                                                   5);
+      fixture.event_handler, *entity_collection);
 
   // Configure first layer
   auto result =
-      configurator.ConfigureFirstLayerComponents(scene_context.scene_entities);
+      configurator.ConfigureFirstLayerComponents(fixture.entity_pool);
 
   REQUIRE(result.has_value());
 
   // Verify both components were configured
   auto &ui_component =
       steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(
-          1, scene_context.scene_entities);
+          1, fixture.entity_pool);
   REQUIRE(ui_component.m_active == true);
   REQUIRE(ui_component.m_name == "ui_entity");
 
   auto &grimoire_component =
       steamrot::entity::memory::GetComponent<steamrot::CGrimoireMachina>(
-          1, scene_context.scene_entities);
+          1, fixture.entity_pool);
   REQUIRE(grimoire_component.m_active == true);
 }
 
 TEST_CASE("FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents skips "
           "entities without first-layer components",
           "[unit][FlatbuffersEntityConfigurator]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Initialize();
-
-  auto &game_context = fixture.GetGameContext();
-  auto &scene_context = fixture.GetSceneContext();
+  MinimalTestFixture fixture;
 
   // Load shared entity test data
   auto test_data = LoadEntityTestData();
   const steamrot::EntityCollectionFbs *entity_collection = test_data.entity_collection;
 
   steamrot::FlatbuffersEntityConfigurator configurator(
-      game_context.event_handler, *entity_collection);
-
-  // Resize pool
-  steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.scene_entities,
-                                                   100);
+      fixture.event_handler, *entity_collection);
 
   // Configure first layer - should succeed and skip entity without components
   auto result =
-      configurator.ConfigureFirstLayerComponents(scene_context.scene_entities);
+      configurator.ConfigureFirstLayerComponents(fixture.entity_pool);
 
   REQUIRE(result.has_value());
 
   // Verify that no components were activated
   auto &ui_component =
       steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(
-          4, scene_context.scene_entities);
+          4, fixture.entity_pool);
   REQUIRE(ui_component.m_active == false);
 
   auto &grimoire_component =
       steamrot::entity::memory::GetComponent<steamrot::CGrimoireMachina>(
-          0, scene_context.scene_entities);
+          0, fixture.entity_pool);
   REQUIRE(grimoire_component.m_active == false);
 }
 
@@ -457,26 +391,18 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents skips "
 TEST_CASE("FlatbuffersEntityConfigurator::ConfigureSecondLayerComponents with "
           "empty entities",
           "[unit][FlatbuffersEntityConfigurator]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Initialize();
-
-  auto &game_context = fixture.GetGameContext();
-  auto &scene_context = fixture.GetSceneContext();
+  MinimalTestFixture fixture;
 
   // Load shared entity test data
   auto test_data = LoadEntityTestData();
   const steamrot::EntityCollectionFbs *entity_collection = test_data.entity_collection;
 
   steamrot::FlatbuffersEntityConfigurator configurator(
-      game_context.event_handler, *entity_collection);
-
-  // Resize pool
-  steamrot::entity::memory::ResizeEntityMemoryPool(scene_context.scene_entities,
-                                                   10);
+      fixture.event_handler, *entity_collection);
 
   // Configure second layer - should succeed even with no entities
   auto result =
-      configurator.ConfigureSecondLayerComponents(scene_context.scene_entities);
+      configurator.ConfigureSecondLayerComponents(fixture.entity_pool);
 
   REQUIRE(result.has_value());
 }
@@ -492,14 +418,11 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureSecondLayerComponents with "
 TEST_CASE(
     "FlatbuffersEntityConfigurator::ConfigureEntityMemoryPool resizes pool",
     "[unit][FlatbuffersEntityConfigurator]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Initialize();
+  // Create fixture with size 0 initially
+  steamrot::EventHandler event_handler;
+  steamrot::EntityMemoryPool entity_pool;
 
-  auto &game_context = fixture.GetGameContext();
-  auto &scene_context = fixture.GetSceneContext();
-
-  REQUIRE(steamrot::entity::memory::GetMemoryPoolSize(
-              scene_context.scene_entities) == 0);
+  REQUIRE(steamrot::entity::memory::GetMemoryPoolSize(entity_pool) == 0);
 
   // Load shared entity test data
   auto test_data = LoadEntityTestData();
@@ -507,47 +430,40 @@ TEST_CASE(
   const size_t expected_size = 100; // Pool size from entity_test_data.json
 
   steamrot::FlatbuffersEntityConfigurator configurator(
-      game_context.event_handler, *entity_collection);
+      event_handler, *entity_collection);
 
   // Configure the pool
-  auto result =
-      configurator.ConfigureEntityMemoryPool(scene_context.scene_entities);
+  auto result = configurator.ConfigureEntityMemoryPool(entity_pool);
 
   REQUIRE(result.has_value());
-  REQUIRE(steamrot::entity::memory::GetMemoryPoolSize(
-              scene_context.scene_entities) == expected_size);
+  REQUIRE(steamrot::entity::memory::GetMemoryPoolSize(entity_pool) == expected_size);
 }
 
 TEST_CASE("FlatbuffersEntityConfigurator::ConfigureEntityMemoryPool with "
           "first-layer components",
           "[unit][FlatbuffersEntityConfigurator]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Initialize();
-
-  auto &game_context = fixture.GetGameContext();
-  auto &scene_context = fixture.GetSceneContext();
+  steamrot::EventHandler event_handler;
+  steamrot::EntityMemoryPool entity_pool;
 
   // Load shared entity test data
   auto test_data = LoadEntityTestData();
   const steamrot::EntityCollectionFbs *entity_collection = test_data.entity_collection;
 
   steamrot::FlatbuffersEntityConfigurator configurator(
-      game_context.event_handler, *entity_collection);
+      event_handler, *entity_collection);
 
   // Configure the entire pool
-  auto result =
-      configurator.ConfigureEntityMemoryPool(scene_context.scene_entities);
+  auto result = configurator.ConfigureEntityMemoryPool(entity_pool);
 
   REQUIRE(result.has_value());
 
   // Verify pool was resized
-  REQUIRE(steamrot::entity::memory::GetMemoryPoolSize(
-              scene_context.scene_entities) == 5);
+  REQUIRE(steamrot::entity::memory::GetMemoryPoolSize(entity_pool) == 5);
 
   // Verify component was configured
   auto &ui_component =
       steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(
-          1, scene_context.scene_entities);
+          1, entity_pool);
   REQUIRE(ui_component.m_active == true);
   REQUIRE(ui_component.m_name == "test_ui");
 }
@@ -555,57 +471,49 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureEntityMemoryPool with "
 TEST_CASE("FlatbuffersEntityConfigurator::ConfigureEntityMemoryPool with "
           "multiple first-layer components",
           "[unit][FlatbuffersEntityConfigurator]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Initialize();
-
-  auto &game_context = fixture.GetGameContext();
-  auto &scene_context = fixture.GetSceneContext();
+  steamrot::EventHandler event_handler;
+  steamrot::EntityMemoryPool entity_pool;
 
   // Load shared entity test data
   auto test_data = LoadEntityTestData();
   const steamrot::EntityCollectionFbs *entity_collection = test_data.entity_collection;
 
   steamrot::FlatbuffersEntityConfigurator configurator(
-      game_context.event_handler, *entity_collection);
+      event_handler, *entity_collection);
 
   // Configure the entire pool
-  auto result =
-      configurator.ConfigureEntityMemoryPool(scene_context.scene_entities);
+  auto result = configurator.ConfigureEntityMemoryPool(entity_pool);
 
   REQUIRE(result.has_value());
 
   // Verify both components were configured
   auto &ui_component =
       steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(
-          0, scene_context.scene_entities);
+          0, entity_pool);
   REQUIRE(ui_component.m_active == true);
   REQUIRE(ui_component.m_name == "ui_entity");
 
   auto &grimoire_component =
       steamrot::entity::memory::GetComponent<steamrot::CGrimoireMachina>(
-          5, scene_context.scene_entities);
+          5, entity_pool);
   REQUIRE(grimoire_component.m_active == true);
 }
 
 TEST_CASE("FlatbuffersEntityConfigurator::ConfigureEntityMemoryPool fails "
           "with invalid data",
           "[unit][FlatbuffersEntityConfigurator]") {
-  steamrot::tests::TestFixture fixture;
-  fixture.Initialize();
-
-  auto &game_context = fixture.GetGameContext();
-  auto &scene_context = fixture.GetSceneContext();
+  steamrot::EventHandler event_handler;
+  steamrot::EntityMemoryPool entity_pool;
 
   // Load shared entity test data
   auto test_data = LoadEntityTestData();
   const steamrot::EntityCollectionFbs *entity_collection = test_data.entity_collection;
 
   steamrot::FlatbuffersEntityConfigurator configurator(
-      game_context.event_handler, *entity_collection);
+      event_handler, *entity_collection);
 
   // This should fail during first-layer configuration (entity 2 has no root element)
-  auto result =
-      configurator.ConfigureEntityMemoryPool(scene_context.scene_entities);
+  auto result = configurator.ConfigureEntityMemoryPool(entity_pool);
 
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);

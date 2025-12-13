@@ -19,8 +19,8 @@ target_link_libraries(test_entity
   PUBLIC
   Catch2::Catch2WithMain
   entity
-  context_test_helpers
-  test_harness
+  events
+  components
 )
 
 # Ensure test data is compiled before building tests
