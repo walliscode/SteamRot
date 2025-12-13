@@ -185,28 +185,39 @@ FlatbuffersSceneConfigurator
 Scene configured ✅
 ```
 
-### Example: Save File Loading
+### Example: Save File Loading (Two-Step Process)
+
+**Key**: SaveData contains SceneData. Must load SaveData first, then extract SceneData.
 
 ```
+STEP 1: Load SaveData
+SceneFactory::CreateSceneFromSave(slot)
+    ↓
 ISaveDataProvider.LoadSave(slot)
     ↓ (loads save_slot.save)
-    ↓ (returns SaveData struct)
-SceneFactory
+    ↓ (returns SaveData: metadata + scene data)
+    
+STEP 2: Extract SceneData from SaveData
+SceneFactory (continued)
     ↓
-SaveSceneDataProvider
-    ↓ (extracts saved scene from SaveData)
-    ↓ (creates SaveSceneData with UUID)
+SaveSceneDataProvider.ProvideSceneDataFromSave(SaveData&, SceneType)
+    ↓ (extracts scene data from SaveData)
+    ↓ (creates SaveSceneData polymorphic struct)
     ↓ (returns std::unique_ptr<SceneData>)
-SceneFactory
+    
+STEP 3: Configure Scene
+SceneFactory (continued)
     ↓ (creates empty Scene)
     ↓
-SaveSceneConfigurator
+SaveSceneConfigurator.ConfigureScene(Scene&, SceneData*)
     ↓ (dynamic_cast to SaveSceneData*)
     ↓ (restores Scene UUID and state)
     ↓ (restores EntityMemoryPool)
     ↓
 Scene restored ✅
 ```
+
+**Why two steps?** SaveData = metadata + scene data. ISaveDataProvider handles file I/O, ISceneDataProvider extracts scene-specific data.
 
 ---
 

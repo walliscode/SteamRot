@@ -760,44 +760,30 @@ public:
 
 ### Usage in SceneFactory
 
+#### Pattern 1: Default Scene Loading
+
 ```cpp
 // Location: src/scene_management/SceneFactory.cpp
 namespace steamrot {
 
-std::unique_ptr<Scene> SceneFactory::CreateScene(
-    const SceneType scene_type,
-    DataSource source,
-    const void *source_data) {
+std::unique_ptr<Scene> SceneFactory::CreateSceneFromDefault(
+    const SceneType scene_type) {
   
-  // Get appropriate provider and configurator
-  ISceneDataProvider *provider = nullptr;
-  ISceneConfigurator *configurator = nullptr;
+  // Get provider and configurator for default data
+  ISceneDataProvider& provider = GetFlatbuffersSceneDataProvider();
+  ISceneConfigurator& configurator = GetFlatbuffersSceneConfigurator();
   
-  switch (source) {
-    case DataSource::Default:
-      provider = &GetFlatbuffersSceneDataProvider();
-      configurator = &GetFlatbuffersSceneConfigurator();
-      break;
-      
-    case DataSource::SaveFile:
-      provider = &GetSaveSceneDataProvider();
-      configurator = &GetSaveSceneConfigurator();
-      break;
-      
-    case DataSource::Test:
-      provider = &GetTestSceneDataProvider();
-      configurator = &GetTestSceneConfigurator();
-      break;
+  // Provider loads default data
+  std::unique_ptr<SceneData> data = provider.ProvideDefaultSceneData(scene_type);
+  if (!data) {
+    return nullptr;
   }
   
-  // Load data (polymorphic SceneData*)
-  std::unique_ptr<SceneData> data = provider->ProvideData(scene_type, source_data);
-  
-  // Create scene
+  // Create empty scene
   std::unique_ptr<Scene> scene = CreateEmptyScene(scene_type);
   
-  // Configure scene (uses dynamic_cast internally)
-  auto config_result = configurator->ConfigureScene(*scene, data.get());
+  // Configurator applies data
+  auto config_result = configurator.ConfigureScene(*scene, data.get());
   if (!config_result.has_value()) {
     return nullptr;
   }
@@ -807,6 +793,99 @@ std::unique_ptr<Scene> SceneFactory::CreateScene(
 
 } // namespace steamrot
 ```
+
+#### Pattern 2: Save File Loading (Two-Step Process)
+
+**Key Insight**: SaveData is a container that holds scene data. The process requires:
+1. Load `SaveData` (contains metadata + scene data)
+2. Extract `SceneData` from `SaveData`
+3. Configure scene from `SceneData`
+
+```cpp
+// Location: src/scene_management/SceneFactory.cpp
+namespace steamrot {
+
+std::unique_ptr<Scene> SceneFactory::CreateSceneFromSave(
+    uint32_t save_slot) {
+  
+  // STEP 1: Load SaveData (contains scene data)
+  ISaveDataProvider& save_provider = GetSaveDataProvider();
+  auto save_result = save_provider.LoadSave(save_slot);
+  if (!save_result.has_value()) {
+    return nullptr;
+  }
+  
+  const SaveData& save_data = save_result.value();
+  SceneType scene_type = save_data.current_scene_type;
+  
+  // STEP 2: Extract SceneData from SaveData
+  ISceneDataProvider& scene_provider = GetSaveSceneDataProvider();
+  std::unique_ptr<SceneData> scene_data = 
+      scene_provider.ProvideSceneDataFromSave(save_data, scene_type);
+  if (!scene_data) {
+    return nullptr;
+  }
+  
+  // STEP 3: Configure scene from SceneData
+  ISceneConfigurator& configurator = GetSaveSceneConfigurator();
+  std::unique_ptr<Scene> scene = CreateEmptyScene(scene_type);
+  
+  auto config_result = configurator.ConfigureScene(*scene, scene_data.get());
+  if (!config_result.has_value()) {
+    return nullptr;
+  }
+  
+  return scene;
+}
+
+} // namespace steamrot
+```
+
+**Why Two Steps?**
+
+1. **SaveData is broader than SceneData**: SaveData contains metadata (save name, timestamp, play time) + scene data
+2. **Separation of concerns**: 
+   - `ISaveDataProvider` handles save file I/O and metadata
+   - `ISceneDataProvider` extracts/converts scene data
+   - `ISceneConfigurator` applies scene data to Scene objects
+3. **Reusability**: Same `ISceneDataProvider` and `ISceneConfigurator` work regardless of how SaveData was loaded (file, network, etc.)
+
+#### Pattern 3: Alternative - Unified Interface (Optional)
+
+If you prefer a single-step API, you can create a convenience method:
+
+```cpp
+// Location: src/scene_management/SceneFactory.cpp
+namespace steamrot {
+
+std::unique_ptr<Scene> SceneFactory::CreateScene(
+    DataSource source,
+    const void *source_data) {
+  
+  switch (source) {
+    case DataSource::Default: {
+      const SceneType* type = static_cast<const SceneType*>(source_data);
+      return CreateSceneFromDefault(*type);
+    }
+      
+    case DataSource::SaveFile: {
+      const uint32_t* slot = static_cast<const uint32_t*>(source_data);
+      return CreateSceneFromSave(*slot);
+    }
+      
+    case DataSource::Test: {
+      const std::string* test_name = static_cast<const std::string*>(source_data);
+      return CreateSceneFromTest(*test_name);
+    }
+  }
+  
+  return nullptr;
+}
+
+} // namespace steamrot
+```
+
+**Recommended**: Use the explicit methods (`CreateSceneFromDefault`, `CreateSceneFromSave`) for clarity.
 
 ---
 

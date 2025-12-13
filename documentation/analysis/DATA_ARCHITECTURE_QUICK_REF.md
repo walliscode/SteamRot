@@ -178,27 +178,49 @@ std::unique_ptr<Scene> CreateScene(SceneType type) {
 }
 ```
 
-### Creating a Scene (Save File)
+### Creating a Scene (Save File) - Two-Step Process
+
+**Key Concept**: SaveData contains SceneData. You must first load SaveData, then extract SceneData from it.
 
 ```cpp
 // In SceneFactory
-std::unique_ptr<Scene> CreateSceneFromSave(const SaveData& save) {
-  // Get provider and configurator for save data
-  ISceneDataProvider& provider = GetSaveSceneDataProvider();
+std::unique_ptr<Scene> CreateSceneFromSave(uint32_t save_slot) {
+  // STEP 1: Load SaveData (contains metadata + scene data)
+  ISaveDataProvider& save_provider = GetSaveDataProvider();
+  auto save_result = save_provider.LoadSave(save_slot);
+  if (!save_result.has_value()) {
+    return nullptr;
+  }
+  
+  const SaveData& save = save_result.value();
+  
+  // STEP 2: Extract SceneData from SaveData
+  ISceneDataProvider& scene_provider = GetSaveSceneDataProvider();
+  std::unique_ptr<SceneData> scene_data = 
+      scene_provider.ProvideSceneDataFromSave(save, save.current_scene_type);
+  
+  if (!scene_data) {
+    return nullptr;
+  }
+  
+  // STEP 3: Configure scene
   ISceneConfigurator& configurator = GetSaveSceneConfigurator();
-  
-  // Load data from save
-  std::unique_ptr<SceneData> data = 
-      provider.ProvideSceneDataFromSave(save, save.current_scene_type);
-  
-  // Create empty scene
   std::unique_ptr<Scene> scene = CreateEmptyScene(save.current_scene_type);
   
-  // Configure from save data
-  auto result = configurator.ConfigureScene(*scene, data.get());
+  auto result = configurator.ConfigureScene(*scene, scene_data.get());
+  if (!result.has_value()) {
+    return nullptr;
+  }
   
   return scene;
 }
+```
+
+**Why Two Steps?**
+- SaveData = metadata (save name, time) + scene data
+- ISaveDataProvider handles save file I/O
+- ISceneDataProvider extracts scene-specific data
+- Separation enables reuse and testing
 ```
 
 ### Implementing a Provider
@@ -475,6 +497,16 @@ A: Don't! Scene should only work with configured data. Provider is for SceneFact
 
 **Q: How do I test without real .bin files?**  
 A: Create TestSceneDataProvider that returns TestSceneData with mocked values.
+
+**Q: SaveData contains SceneData. How does SceneFactory handle this?**  
+A: Two-step process:
+1. Load SaveData via `ISaveDataProvider::LoadSave(slot)` - gets metadata + scene data container
+2. Extract SceneData via `ISceneDataProvider::ProvideSceneDataFromSave(SaveData&, SceneType)` - extracts scene-specific data
+3. Configure Scene via `ISceneConfigurator::ConfigureScene(Scene&, SceneData*)`
+
+SceneFactory orchestrates all three steps in `CreateSceneFromSave(slot)`.
+
+**Why not load SceneData directly?** SaveData is broader (metadata + multiple scenes in future). Separating concerns makes each component reusable and testable.
 
 ---
 

@@ -501,10 +501,25 @@ Scene configured ✅
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│                    SAVE FILE LOADING FLOW                        │
+│            SAVE FILE LOADING FLOW (Two-Step Process)             │
 └──────────────────────────────────────────────────────────────────┘
 
+KEY CONCEPT:
+  SaveData is a CONTAINER that holds metadata + scene data.
+  The flow requires TWO steps:
+    1. Load SaveData (ISaveDataProvider)
+    2. Extract SceneData from SaveData (ISceneDataProvider)
+
+┌─────────────────────────────────────────────────────────────────┐
+│                   STEP 1: Load SaveData                         │
+└─────────────────────────────────────────────────────────────────┘
+
 User clicks "Load Game" (slot 2)
+    │
+    ▼
+SceneFactory::CreateSceneFromSave(slot_index=2)
+    │
+    ├─ Get ISaveDataProvider
     │
     ▼
 ISaveDataProvider::LoadSave(2)
@@ -522,29 +537,53 @@ FlatbuffersSaveDataProvider
     ├─ 6. Return std::expected<SaveData, FailInfo>
     │
     ▼
-SceneFactory::CreateScene(SceneType, DataSource::SaveFile, &SaveData)
+SceneFactory receives SaveData
     │
-    ├─ Get SaveSceneDataProvider
-    ├─ Get SaveSceneConfigurator
+    ├─ SaveData contains:
+    │   ├─ metadata (save name, timestamp, play time)
+    │   ├─ current_scene_type (which scene to restore)
+    │   ├─ version (for migration)
+    │   └─ [future] scene state data (entity pools, etc.)
+
+┌─────────────────────────────────────────────────────────────────┐
+│              STEP 2: Extract SceneData from SaveData            │
+└─────────────────────────────────────────────────────────────────┘
+
+SceneFactory (continued)
+    │
+    ├─ Get ISceneDataProvider (SaveSceneDataProvider)
+    ├─ Get ISceneConfigurator (SaveSceneConfigurator)
     │
     ▼
-SaveSceneDataProvider::ProvideSceneDataFromSave(SaveData, SceneType)
+ISceneDataProvider::ProvideSceneDataFromSave(SaveData, SceneType)
     │
-    ├─ 1. Extract scene UUID from SaveData
-    ├─ 2. Load SavedSceneDataFbs for this scene
-    ├─ 3. Create SaveSceneData (polymorphic)
-    ├─ 4. Set saved_scene_data_fbs pointer
-    ├─ 5. Set play_time_seconds
-    ├─ 6. Set last_modified
-    ├─ 7. Return std::unique_ptr<SceneData>
+    ├─ Implementation: SaveSceneDataProvider
+    │
+    ▼
+SaveSceneDataProvider
+    │
+    ├─ 1. Receive SaveData reference
+    ├─ 2. Extract scene UUID from SaveData
+    ├─ 3. Extract SavedSceneDataFbs from SaveData
+    ├─ 4. Create SaveSceneData (polymorphic struct)
+    ├─ 5. Set saved_scene_data_fbs pointer
+    ├─ 6. Set play_time_seconds from SaveData.metadata
+    ├─ 7. Set last_modified from SaveData.metadata
+    ├─ 8. Return std::unique_ptr<SceneData>
     │
     ▼
 SceneFactory receives SceneData* (base pointer)
     │
+    ├─ SceneData is polymorphic (actually SaveSceneData)
     ├─ Creates empty Scene
     │
     ▼
-SaveSceneConfigurator::ConfigureScene(Scene&, SceneData*)
+ISceneConfigurator::ConfigureScene(Scene&, SceneData*)
+    │
+    ├─ Implementation: SaveSceneConfigurator
+    │
+    ▼
+SaveSceneConfigurator
     │
     ├─ 1. dynamic_cast<SaveSceneData*>(data)
     ├─ 2. Validate cast succeeded
@@ -564,11 +603,36 @@ SaveSceneConfigurator::ConfigureScene(Scene&, SceneData*)
     ▼
 Scene restored to saved state ✅
 
+┌─────────────────────────────────────────────────────────────────┐
+│                    WHY TWO STEPS?                               │
+└─────────────────────────────────────────────────────────────────┘
+
+1. SaveData is BROADER than SceneData
+   - Contains: metadata, scene data, [future] multiple scenes
+   - SceneData is just ONE part of SaveData
+
+2. Separation of Concerns
+   - ISaveDataProvider: Handles save file I/O, metadata extraction
+   - ISceneDataProvider: Extracts/converts scene-specific data
+   - ISceneConfigurator: Applies scene data to Scene objects
+
+3. Reusability
+   - Same SceneDataProvider/Configurator works regardless of:
+     * How SaveData was loaded (file, network, memory)
+     * Which save slot
+     * Save file format changes
+
+4. SceneFactory Strategy Pattern
+   - SceneFactory orchestrates both steps
+   - Hides complexity from caller
+   - Caller just does: CreateSceneFromSave(slot_index)
+
 NOTES:
   - Scene UUID preserved (essential for save files)
   - Entity indices preserved (for references)
   - Component states fully restored
   - Logic recreated (not serialized)
+  - SaveData → SceneData conversion is explicit and testable
 ```
 
 ---
