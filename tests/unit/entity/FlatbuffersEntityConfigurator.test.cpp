@@ -51,6 +51,25 @@ LoadEntityTestData() {
   return {std::move(data), entity_collection};
 }
 
+/// @brief Find entity data by index in the entity collection
+/// @param entity_collection Pointer to EntityCollectionFbs
+/// @param index Entity index to find
+/// @return Pointer to EntityDataFbs or nullptr if not found
+const steamrot::EntityDataFbs *
+FindEntityByIndex(const steamrot::EntityCollectionFbs *entity_collection,
+                  uint32_t index) {
+  if (!entity_collection || !entity_collection->entities()) {
+    return nullptr;
+  }
+
+  for (const auto &entity_data : *entity_collection->entities()) {
+    if (entity_data->index() == index) {
+      return entity_data;
+    }
+  }
+  return nullptr;
+}
+
 /////////////////////////////////////////////////
 /// Constructor Tests
 /////////////////////////////////////////////////
@@ -101,16 +120,10 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCUserInterface",
     auto [data, entity_collection] = LoadEntityTestData();
 
     REQUIRE(entity_collection != nullptr);
-    REQUIRE(entity_collection->entities() != nullptr);
 
     // Verify entity data exists
-    const steamrot::EntityDataFbs *entity_data = nullptr;
-    for (const auto &ed : *entity_collection->entities()) {
-      if (ed->index() == 1) {
-        entity_data = ed;
-        break;
-      }
-    }
+    const steamrot::EntityDataFbs *entity_data =
+        FindEntityByIndex(entity_collection, 1);
     REQUIRE(entity_data != nullptr);
     REQUIRE(entity_data->c_user_interface() != nullptr);
 
@@ -149,13 +162,8 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCUserInterface",
     auto [data, entity_collection] = LoadEntityTestData();
 
     // Verify entity data exists
-    const steamrot::EntityDataFbs *entity_data = nullptr;
-    for (const auto &ed : *entity_collection->entities()) {
-      if (ed->index() == 4) {
-        entity_data = ed;
-        break;
-      }
-    }
+    const steamrot::EntityDataFbs *entity_data =
+        FindEntityByIndex(entity_collection, 4);
     REQUIRE(entity_data != nullptr);
     REQUIRE(entity_data->c_user_interface() != nullptr);
 
@@ -195,13 +203,8 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCGrimoireMachina",
     auto [data, entity_collection] = LoadEntityTestData();
 
     // Verify entity data exists
-    const steamrot::EntityDataFbs *entity_data = nullptr;
-    for (const auto &ed : *entity_collection->entities()) {
-      if (ed->index() == 3) {
-        entity_data = ed;
-        break;
-      }
-    }
+    const steamrot::EntityDataFbs *entity_data =
+        FindEntityByIndex(entity_collection, 3);
     REQUIRE(entity_data != nullptr);
     REQUIRE(entity_data->c_grimoire_machina() != nullptr);
 
@@ -234,13 +237,8 @@ TEST_CASE("FlatbuffersEntityConfigurator::ConfigureCGrimoireMachina",
     auto [data, entity_collection] = LoadEntityTestData();
 
     // Verify entity data exists
-    const steamrot::EntityDataFbs *entity_data = nullptr;
-    for (const auto &ed : *entity_collection->entities()) {
-      if (ed->index() == 5) {
-        entity_data = ed;
-        break;
-      }
-    }
+    const steamrot::EntityDataFbs *entity_data =
+        FindEntityByIndex(entity_collection, 5);
     REQUIRE(entity_data != nullptr);
     REQUIRE(entity_data->c_grimoire_machina() != nullptr);
 
