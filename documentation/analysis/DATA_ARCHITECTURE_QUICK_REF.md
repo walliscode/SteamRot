@@ -81,6 +81,8 @@ public:
 };
 ```
 
+**Note**: Provider returns `std::unique_ptr<SceneData>` for ownership transfer. Configurator receives raw `SceneData*` pointer (ownership remains with caller).
+
 **Responsibilities**:
 - Load raw data from storage
 - Convert FlatBuffers → native structs

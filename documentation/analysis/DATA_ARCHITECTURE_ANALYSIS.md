@@ -13,6 +13,7 @@ This document provides a comprehensive analysis of the SteamRot data architectur
 - **Layer stratification** to eliminate circular dependencies
 - **Abstract interfaces** for scene loading, save data, and configuration
 - **Concrete implementations** for default data, save files, and test data
+- **Visualizations** for architecture and data flow
 
 ### Key Findings
 
