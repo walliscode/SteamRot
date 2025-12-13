@@ -28,13 +28,6 @@
       }
     },
     {
-      "index": 2,
-      "c_user_interface": {
-        "ui_name": "test_ui_no_root",
-        "is_visible": true
-      }
-    },
-    {
       "index": 3,
       "c_grimoire_machina": {
         "fragments": [],

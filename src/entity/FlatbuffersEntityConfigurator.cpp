@@ -30,6 +30,10 @@ std::expected<std::monostate, FailInfo>
 FlatbuffersEntityConfigurator::ConfigureEntityMemoryPool(
     EntityMemoryPool &emp) {
 
+  if (!m_entity_collection_data.entity_memory_pool_size())
+    return std::unexpected(
+        FailInfo{FailMode::FlatbuffersDataNotFound,
+                 "Entity memory pool size not found in EntityCollectionFbs."});
   // resize the entity memory pool based on the flatbuffers data
   entity::memory::ResizeEntityMemoryPool(
       emp, m_entity_collection_data.entity_memory_pool_size());
@@ -63,9 +67,9 @@ FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents(
 
     // check the data and configure component if data exists
     if (entity_data->c_user_interface()) {
-      auto configure_result = ConfigureCUserInterface(
-          entity::memory::GetComponent<CUserInterface>(entity_data->index(),
-                                                        emp));
+      auto configure_result =
+          ConfigureCUserInterface(entity::memory::GetComponent<CUserInterface>(
+              entity_data->index(), emp));
       if (!configure_result.has_value())
         return std::unexpected(configure_result.error());
     }
@@ -73,7 +77,7 @@ FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents(
     if (entity_data->c_grimoire_machina()) {
       auto configure_result = ConfigureCGrimoireMachina(
           entity::memory::GetComponent<CGrimoireMachina>(entity_data->index(),
-                                                          emp));
+                                                         emp));
       if (!configure_result.has_value())
         return std::unexpected(configure_result.error());
     }
