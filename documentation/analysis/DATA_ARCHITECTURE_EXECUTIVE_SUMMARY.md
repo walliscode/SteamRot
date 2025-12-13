@@ -78,22 +78,22 @@ struct SceneData {
   SceneInfo scene_info;
 };
 
-// FlatBuffers implementation (default data)
+// FlatBuffers implementation (default data from .bin files)
 struct FbsSceneData : public SceneData {
   const SceneDataFbs *scene_data_fbs;
-};
-
-// Save file implementation (player progress)
-struct SaveSceneData : public SceneData {
-  const SavedSceneDataFbs *saved_scene_data_fbs;
-  uint64_t play_time_seconds;
-  std::string last_modified;
 };
 
 // Test data implementation (unit tests)
 struct TestSceneData : public SceneData {
   const TestSceneDataFbs *test_scene_data_fbs;
   std::string test_name;
+};
+
+// SaveData is a CONTAINER, not a polymorphic type
+struct SaveData {
+  Metadata metadata;
+  SceneType current_scene_type;
+  std::vector<std::unique_ptr<SceneData>> scenes;  // Contains SceneData objects
 };
 ```
 
@@ -161,10 +161,12 @@ class ISceneConfigurator {
 | Data Source | Provider | Configurator | Status |
 |-------------|----------|--------------|--------|
 | **Default (.bin)** | FlatbuffersSceneDataProvider | FlatbuffersSceneConfigurator | ✅ Exists (refactor needed) |
-| **Save File** | SaveSceneDataProvider | SaveSceneConfigurator | ❌ Need to create |
+| **Save File** | FlatbuffersSceneDataProvider (same!) | FlatbuffersSceneConfigurator (same!) | ✅ Reuse existing |
 | **Test Data** | TestSceneDataProvider | TestSceneConfigurator | ❌ Need to create |
 | **Engine Config** | FlatbuffersEngineDataProvider | N/A | ✅ Exists |
 | **Asset Data** | FlatbuffersAssetDataProvider | N/A | ✅ Exists |
+
+**Note**: Save data reuses the same provider/configurator because SaveData.scenes contains regular SceneData objects.
 
 ### Example: Default Scene Loading
 
@@ -187,37 +189,36 @@ Scene configured ✅
 
 ### Example: Save File Loading (Two-Step Process)
 
-**Key**: SaveData contains SceneData. Must load SaveData first, then extract SceneData.
+**Key**: SaveData contains a vector of SceneData. Must load SaveData first, then extract desired SceneData from vector.
 
 ```
-STEP 1: Load SaveData
+STEP 1: Load SaveData (container)
 SceneFactory::CreateSceneFromSave(slot)
     ↓
 ISaveDataProvider.LoadSave(slot)
     ↓ (loads save_slot.save)
-    ↓ (returns SaveData: metadata + scene data)
+    ↓ (returns SaveData with scenes vector)
     
-STEP 2: Extract SceneData from SaveData
+STEP 2: Extract SceneData from SaveData.scenes vector
 SceneFactory (continued)
     ↓
-SaveSceneDataProvider.ProvideSceneDataFromSave(SaveData&, SceneType)
-    ↓ (extracts scene data from SaveData)
-    ↓ (creates SaveSceneData polymorphic struct)
-    ↓ (returns std::unique_ptr<SceneData>)
+FlatbuffersSceneDataProvider.ProvideSceneDataFromSave(SaveData&, SceneType)
+    ↓ (finds scene in SaveData.scenes vector)
+    ↓ (returns std::unique_ptr<SceneData> from vector)
     
-STEP 3: Configure Scene
+STEP 3: Configure Scene (same as default!)
 SceneFactory (continued)
     ↓ (creates empty Scene)
     ↓
-SaveSceneConfigurator.ConfigureScene(Scene&, SceneData*)
-    ↓ (dynamic_cast to SaveSceneData*)
-    ↓ (restores Scene UUID and state)
+FlatbuffersSceneConfigurator.ConfigureScene(Scene&, SceneData*)
+    ↓ (dynamic_cast to FbsSceneData*)
+    ↓ (configures Scene from SceneData)
     ↓ (restores EntityMemoryPool)
     ↓
 Scene restored ✅
 ```
 
-**Why two steps?** SaveData = metadata + scene data. ISaveDataProvider handles file I/O, ISceneDataProvider extracts scene-specific data.
+**Why two steps?** SaveData is a container with metadata + scenes vector. ISaveDataProvider handles file I/O, ISceneDataProvider extracts SceneData from vector. Same configurator works for both default and save data!
 
 ---
 
@@ -269,11 +270,11 @@ Scene restored ✅
 
 **Goal**: Complete save/load workflow
 
-- Create `SaveSceneData` struct
-- Implement `SaveSceneDataProvider`
-- Implement `SaveSceneConfigurator`
+- Update `SaveData` struct to include `std::vector<std::unique_ptr<SceneData>> scenes`
 - Implement `EntitySerializer` (serialize EntityMemoryPool to FlatBuffers)
 - Update `ISaveDataProvider` with scene capture methods
+- Update `FlatbuffersSceneDataProvider::ProvideSceneDataFromSave()` to extract from vector
+- Reuse `FlatbuffersSceneConfigurator` (no new configurator needed!)
 - Test save/load round-trip
 
 **Validation**: Can save and load game state

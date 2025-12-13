@@ -61,15 +61,17 @@ struct SceneData {
   SceneInfo scene_info;
 };
 
-// FlatBuffers implementation
+// FlatBuffers implementation (for default data from .bin files)
 struct FbsSceneData : public SceneData {
   const SceneDataFbs *scene_data_fbs;
 };
 
-// Future: SaveSceneData implementation
-struct SaveSceneData : public SceneData {
-  const SavedSceneDataFbs *saved_scene_data_fbs;
-  // Additional save-specific fields
+// Note: SaveData contains a vector of SceneData objects
+// No separate SaveSceneData type needed - SaveData is the container
+struct SaveData {
+  Metadata metadata;
+  SceneType current_scene_type;
+  std::vector<std::unique_ptr<SceneData>> scenes;  // Can hold multiple scenes
 };
 ```
 
@@ -244,16 +246,9 @@ struct SceneData {
   SceneInfo scene_info;  // Common to all sources
 };
 
-// FlatBuffers implementation (default/initial data)
+// FlatBuffers implementation (default/initial data from .bin files)
 struct FbsSceneData : public SceneData {
   const SceneDataFbs *scene_data_fbs;
-};
-
-// Save file implementation (player progress)
-struct SaveSceneData : public SceneData {
-  const SavedSceneDataFbs *saved_scene_data_fbs;
-  uint64_t play_time_seconds;
-  std::string last_modified;
 };
 
 // Test data implementation (for unit tests)
@@ -261,11 +256,25 @@ struct TestSceneData : public SceneData {
   const TestSceneDataFbs *test_scene_data_fbs;
   std::string test_name;
 };
+
+// SaveData is a CONTAINER, not a polymorphic SceneData type
+struct SaveData {
+  struct Metadata {
+    std::string save_name;
+    std::string created_at;
+    std::string last_modified;
+    uint64_t play_time_seconds{0};
+  } metadata;
+  
+  SceneType current_scene_type;
+  std::vector<std::unique_ptr<SceneData>> scenes;  // Contains scene data
+  uint32_t version{1};
+};
 ```
 
 ### Usage in Configurators
 
-Configurators work with the base `SceneData*` type:
+Configurators work with the base `SceneData*` type (regardless of source):
 
 ```cpp
 class ISceneConfigurator {
@@ -292,22 +301,9 @@ public:
   }
 };
 
-// Save configurator (for saved games)
-class SaveSceneConfigurator : public ISceneConfigurator {
-public:
-  std::expected<std::monostate, FailInfo>
-  ConfigureScene(Scene &scene, const SceneData *data) override {
-    // Downcast to SaveSceneData
-    const SaveSceneData *save_data = dynamic_cast<const SaveSceneData*>(data);
-    if (!save_data) {
-      return std::unexpected(FailInfo{"Not SaveSceneData"});
-    }
-    
-    // Use save file data
-    const SavedSceneDataFbs *fb = save_data->saved_scene_data_fbs;
-    // ... configure from save file
-  }
-};
+// Note: For save data, use the SAME configurator (FlatbuffersSceneConfigurator)
+// because SaveData.scenes contains SceneData objects loaded from FlatBuffers
+// No separate SaveSceneConfigurator needed!
 ```
 
 ### Benefits
@@ -315,7 +311,8 @@ public:
 ✅ **Single interface** for SceneFactory (doesn't need to know about data sources)  
 ✅ **Type-safe** (dynamic_cast ensures correct type)  
 ✅ **Extensible** (add new data sources without changing existing code)  
-✅ **Testable** (TestSceneData for mocking)
+✅ **Testable** (TestSceneData for mocking)  
+✅ **Simpler** (SaveData is just a container, not a polymorphic type)
 
 ---
 
@@ -654,76 +651,58 @@ FlatbuffersSceneConfigurator::ConfigureScene(Scene &scene,
 
 **Provider**: `SaveSceneDataProvider` (NEW)
 ```cpp
-// Location: src/providers/SaveSceneDataProvider.h
+// Location: src/providers/FlatbuffersSceneDataProvider.h
 namespace steamrot {
 
-class SaveSceneDataProvider : public ISceneDataProvider {
+class FlatbuffersSceneDataProvider : public ISceneDataProvider {
 public:
+  // For save data: Extract SceneData from SaveData's vector
   std::unique_ptr<SceneData>
   ProvideSceneDataFromSave(const SaveData &save, 
                           const SceneType scene_type) const override {
     
-    // Load saved scene FlatBuffers data
-    FlatbuffersDataLoader loader;
-    auto fb_result = loader.LoadSceneFromSave(save, scene_type);
-    if (!fb_result.has_value()) {
-      return nullptr;
+    // SaveData already contains SceneData objects in its vector
+    // Find the matching scene
+    for (const auto& scene_data : save.scenes) {
+      if (scene_data->scene_info.type == scene_type) {
+        // Return a copy (or clone) of the SceneData
+        // The SceneData in save.scenes is already in FlatBuffers format
+        return std::make_unique<SceneData>(*scene_data);
+      }
     }
     
-    // Create SaveSceneData (polymorphic)
-    auto save_data = std::make_unique<SaveSceneData>();
-    save_data->scene_info.type = scene_type;
-    save_data->scene_info.uuid = save.scene_uuid;
-    save_data->saved_scene_data_fbs = fb_result.value();
-    save_data->play_time_seconds = save.metadata.play_time_seconds;
-    save_data->last_modified = save.metadata.last_modified;
-    
-    return save_data;
+    return nullptr;  // Scene not found in save
   }
 };
 
 } // namespace steamrot
 ```
 
-**Configurator**: `SaveSceneConfigurator` (NEW)
-```cpp
-// Location: src/configurators/SaveSceneConfigurator.h
-namespace steamrot {
+**Configurator**: Use the same `FlatbuffersSceneConfigurator`!
 
-class SaveSceneConfigurator : public ISceneConfigurator {
+No separate SaveSceneConfigurator needed because SaveData.scenes contains regular SceneData objects (likely FbsSceneData from FlatBuffers). The configurator doesn't care whether the data came from a .bin file or a .save file - it just configures from SceneData.
+
+```cpp
+// The SAME configurator works for both default and save data
+class FlatbuffersSceneConfigurator : public ISceneConfigurator {
 public:
   std::expected<std::monostate, FailInfo>
   ConfigureScene(Scene &scene, const SceneData *data) override {
-    // Downcast to SaveSceneData
-    const SaveSceneData *save_data = dynamic_cast<const SaveSceneData*>(data);
-    if (!save_data) {
-      return std::unexpected(FailInfo{"Expected SaveSceneData"});
+    // Works for data from .bin files OR save files
+    const FbsSceneData *fbs_data = dynamic_cast<const FbsSceneData*>(data);
+    if (!fbs_data) {
+      return std::unexpected(FailInfo{"Expected FbsSceneData"});
     }
     
-    // Configure from saved FlatBuffers
-    const SavedSceneDataFbs *fb = save_data->saved_scene_data_fbs;
+    // Configure from FlatBuffers (same logic regardless of source)
+    const SceneDataFbs *fb = fbs_data->scene_data_fbs;
     
-    // Restore scene UUID (important for save files!)
-    scene.m_scene_info.uuid = save_data->scene_info.uuid;
-    scene.m_scene_info.type = save_data->scene_info.type;
-    
-    // Restore entity states
-    auto entity_config = RestoreEntityPool(scene, fb->entity_collection());
-    if (!entity_config.has_value()) {
-      return std::unexpected(entity_config.error());
-    }
-    
-    // Recreate logic map (same as default)
-    auto logic_config = ConfigureLogicMap(scene);
-    if (!logic_config.has_value()) {
-      return std::unexpected(logic_config.error());
-    }
+    // Configure scene info, resources, config, logic
+    // ... implementation
     
     return std::monostate{};
   }
 };
-
-} // namespace steamrot
 ```
 
 ### 3. Test Data (NEW)
@@ -818,16 +797,16 @@ std::unique_ptr<Scene> SceneFactory::CreateSceneFromSave(
   const SaveData& save_data = save_result.value();
   SceneType scene_type = save_data.current_scene_type;
   
-  // STEP 2: Extract SceneData from SaveData
-  ISceneDataProvider& scene_provider = GetSaveSceneDataProvider();
+  // STEP 2: Extract SceneData from SaveData.scenes vector
+  ISceneDataProvider& scene_provider = GetFlatbuffersSceneDataProvider();
   std::unique_ptr<SceneData> scene_data = 
       scene_provider.ProvideSceneDataFromSave(save_data, scene_type);
   if (!scene_data) {
     return nullptr;
   }
   
-  // STEP 3: Configure scene from SceneData
-  ISceneConfigurator& configurator = GetSaveSceneConfigurator();
+  // STEP 3: Configure scene from SceneData (same configurator as default!)
+  ISceneConfigurator& configurator = GetFlatbuffersSceneConfigurator();
   std::unique_ptr<Scene> scene = CreateEmptyScene(scene_type);
   
   auto config_result = configurator.ConfigureScene(*scene, scene_data.get());
@@ -843,12 +822,12 @@ std::unique_ptr<Scene> SceneFactory::CreateSceneFromSave(
 
 **Why Two Steps?**
 
-1. **SaveData is broader than SceneData**: SaveData contains metadata (save name, timestamp, play time) + scene data
+1. **SaveData is a container**: SaveData contains metadata + vector of SceneData objects
 2. **Separation of concerns**: 
    - `ISaveDataProvider` handles save file I/O and metadata
-   - `ISceneDataProvider` extracts/converts scene data
-   - `ISceneConfigurator` applies scene data to Scene objects
-3. **Reusability**: Same `ISceneDataProvider` and `ISceneConfigurator` work regardless of how SaveData was loaded (file, network, etc.)
+   - `ISceneDataProvider` extracts SceneData from SaveData.scenes vector
+   - `ISceneConfigurator` applies scene data to Scene objects (same as default!)
+3. **Reusability**: Same `FlatbuffersSceneDataProvider` and `FlatbuffersSceneConfigurator` work for both default and save data
 
 #### Pattern 3: Alternative - Unified Interface (Optional)
 
