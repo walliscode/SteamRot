@@ -2,7 +2,22 @@
 
 **Date**: December 13, 2025  
 **Purpose**: Practical guide for implementing the three-layer data architecture  
-**Estimated Total Time**: 8 weeks (can be done incrementally)
+**Estimated Total Time**: 6-8 weeks (can be done incrementally)  
+**Status**: ⚠️ Being updated to reflect simplified SaveData approach
+
+---
+
+## ⚠️ Important Note
+
+**SaveData Structure Simplified**: SaveData is now a simple container with `std::vector<std::unique_ptr<SceneData>> scenes`. This simplifies Phase 3 significantly!
+
+**Key Changes from Original Plan**:
+- ✅ No separate SaveSceneData polymorphic type
+- ✅ Reuse FlatbuffersSceneDataProvider (add ProvideSceneDataFromSave method)
+- ✅ Reuse FlatbuffersSceneConfigurator (same logic for default and save)
+- ✅ Phase 3 is simpler and faster (1-2 weeks instead of 2-4 weeks)
+
+**Below references to "SaveSceneData" should be understood as "SceneData from SaveData.scenes vector".**
 
 ---
 
@@ -13,7 +28,7 @@ This guide provides detailed, step-by-step instructions for migrating the SteamR
 **What you'll achieve**:
 - ✅ Break circular dependencies (scenes ↔ data_providers)
 - ✅ Clean three-layer architecture
-- ✅ Complete save/load infrastructure
+- ✅ Complete save/load infrastructure (simplified approach)
 - ✅ Extensible data source system (default, save, test)
 
 **Prerequisites**:
@@ -431,85 +446,45 @@ git commit -m "Phase 2: Refactor configurators to accept SceneData*
 **Duration**: 2 weeks (20-30 hours)  
 **Priority**: MEDIUM - Feature enablement
 
-### Step 3.1: Create SaveSceneData struct
+### Step 3.1: Update SaveData struct
 
-Create `src/types/core/SaveSceneData.h`:
+Edit `src/configuration/ISaveDataProvider.h`:
 
+**Add to SaveData struct**:
 ```cpp
-#pragma once
+struct SaveData {
+  struct Metadata {
+    std::string save_name;
+    std::string created_at;
+    std::string last_modified;
+    std::string game_version;
+    uint64_t play_time_seconds{0};
+    uint32_t slot_index{0};
+  } metadata;
 
-#include "SceneData.h"
-#include "saved_scene_data_generated.h"  // FlatBuffers schema (create this)
-
-namespace steamrot {
-
-struct SaveSceneData : public SceneData {
-  /////////////////////////////////////////////////
-  /// @brief Pointer to FlatBuffers saved scene data
-  /////////////////////////////////////////////////
-  const SavedSceneDataFbs *saved_scene_data_fbs{nullptr};
+  SceneType current_scene_type{SceneType::SceneType_UNKNOWN};
+  uint32_t version{1};
   
-  /////////////////////////////////////////////////
-  /// @brief Total play time in seconds
-  /////////////////////////////////////////////////
-  uint64_t play_time_seconds{0};
-  
-  /////////////////////////////////////////////////
-  /// @brief When this save was last modified
-  /////////////////////////////////////////////////
-  std::string last_modified;
+  // NEW: Add vector to hold scene data
+  std::vector<std::unique_ptr<SceneData>> scenes;  // Holds multiple scenes
 };
-
-} // namespace steamrot
 ```
 
-### Step 3.2: Create FlatBuffers schema for saved scenes
+**Key insight**: SaveData is just a container. No new polymorphic type needed!
 
-Create `src/types/flatbuffers/saved_scene_data.fbs`:
+### Step 3.2: Update FlatbuffersSceneDataProvider
 
-```fbs
-namespace steamrot;
+Edit `src/data_providers/FlatbuffersSceneDataProvider.h`:
 
-include "entities.fbs";
-
-// Saved scene data (for save files)
-table SavedSceneDataFbs {
-  scene_uuid: string;
-  scene_type: SceneType;
-  entity_collection: EntityCollection;
-  // Add other fields as needed
-}
-```
-
-Add to FlatBuffers compilation in CMakeLists.txt.
-
-### Step 3.3: Implement SaveSceneDataProvider
-
-Create `src/data_providers/SaveSceneDataProvider.h`:
-
+**Add method to extract from SaveData**:
 ```cpp
-#pragma once
-
-#include "ISceneDataProvider.h"
-#include "SaveData.h"
-
-namespace steamrot {
-
-class SaveSceneDataProvider : public ISceneDataProvider {
+class FlatbuffersSceneDataProvider : public ISceneDataProvider {
 public:
+  // Existing method for default data
   std::unique_ptr<SceneData>
-  ProvideDefaultSceneData(const SceneType scene_type) const override {
-    // Not used for save provider
-    return nullptr;
-  }
+  ProvideDefaultSceneData(const SceneType scene_type) const override;
   
-  /////////////////////////////////////////////////
-  /// @brief Extract SceneData from SaveData
-  ///
-  /// @param save_data The loaded SaveData container
-  /// @param scene_type Which scene to extract
-  /// @return SaveSceneData polymorphic struct
-  /////////////////////////////////////////////////
+  // NEW: Extract SceneData from SaveData.scenes vector
   std::unique_ptr<SceneData>
   ProvideSceneDataFromSave(const SaveData &save_data,
                           const SceneType scene_type) const;
@@ -553,93 +528,37 @@ SaveSceneDataProvider::ProvideSceneDataFromSave(
 } // namespace steamrot
 ```
 
-### Step 3.4: Implement SaveSceneConfigurator
-
-Create `src/scenes/SaveSceneConfigurator.h`:
+Edit `src/data_providers/FlatbuffersSceneDataProvider.cpp`:
 
 ```cpp
-#pragma once
-
-#include "ISceneConfigurator.h"
-
-namespace steamrot {
-
-class SaveSceneConfigurator : public ISceneConfigurator {
-public:
-  std::expected<std::monostate, FailInfo>
-  ConfigureScene(Scene &scene, const SceneData *data) override;
-
-  std::expected<std::monostate, FailInfo>
-  ConfigureSceneInfo(Scene &scene, const SceneData *data) override;
+std::unique_ptr<SceneData>
+FlatbuffersSceneDataProvider::ProvideSceneDataFromSave(
+    const SaveData &save_data,
+    const SceneType scene_type) const {
   
-  std::expected<std::monostate, FailInfo>
-  ConfigureSceneResources(Scene &scene, const SceneData *data) override;
+  // SaveData.scenes already contains SceneData objects
+  // Find the matching scene in the vector
+  for (const auto& scene : save_data.scenes) {
+    if (scene->scene_info.type == scene_type) {
+      // Return a copy (or move if possible)
+      // The scene data is already in the correct format (likely FbsSceneData)
+      return std::make_unique<SceneData>(*scene);
+    }
+  }
   
-  std::expected<std::monostate, FailInfo>
-  ConfigureSceneConfig(Scene &scene, const SceneData *data) override;
-  
-  std::expected<std::monostate, FailInfo>
-  ConfigureLogicMap(Scene &scene) override;
-};
-
-} // namespace steamrot
+  return nullptr;  // Scene not found in save
+}
 ```
 
-Create `src/scenes/SaveSceneConfigurator.cpp`:
+**Key insight**: SaveData.scenes already contains SceneData objects (loaded from FlatBuffers). We just extract the one we need!
 
-```cpp
-#include "SaveSceneConfigurator.h"
-#include "SaveSceneData.h"
+### Step 3.3: No separate configurator needed!
 
-namespace steamrot {
+**Important**: Reuse `FlatbuffersSceneConfigurator` for save data!
 
-std::expected<std::monostate, FailInfo>
-SaveSceneConfigurator::ConfigureScene(
-    Scene &scene, const SceneData *data) {
-  
-  // Downcast to SaveSceneData
-  const SaveSceneData *save_data = dynamic_cast<const SaveSceneData*>(data);
-  if (!save_data) {
-    return std::unexpected(FailInfo{
-      FailMode::InvalidData,
-      "Expected SaveSceneData"
-    });
-  }
-  
-  // Configure all components (same as FlatBuffers configurator)
-  auto info_result = ConfigureSceneInfo(scene, data);
-  if (!info_result.has_value()) {
-    return std::unexpected(info_result.error());
-  }
-  
-  // Similar for other components
-  
-  return std::monostate{};
-}
+The SceneData in SaveData.scenes is in FlatBuffers format (FbsSceneData), so the same configurator that handles default data will work for save data. No new configurator needed!
 
-std::expected<std::monostate, FailInfo>
-SaveSceneConfigurator::ConfigureSceneInfo(
-    Scene &scene, const SceneData *data) {
-  
-  const SaveSceneData *save_data = dynamic_cast<const SaveSceneData*>(data);
-  const SavedSceneDataFbs *fb = save_data->saved_scene_data_fbs;
-  
-  // IMPORTANT: Restore UUID from save (don't generate new one!)
-  if (fb->scene_uuid()) {
-    scene.m_scene_info.uuid = ParseUUID(fb->scene_uuid()->str());
-  }
-  
-  scene.m_scene_info.type = data->scene_info.type;
-  
-  return std::monostate{};
-}
-
-// Similar for ConfigureSceneResources - restore entities from save
-
-} // namespace steamrot
-```
-
-### Step 3.5: Implement EntitySerializer
+### Step 3.4: Implement EntitySerializer
 
 Create `src/entity/EntitySerializer.h`:
 

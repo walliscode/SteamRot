@@ -1,7 +1,22 @@
 # Data Architecture Diagrams
 
 **Date**: December 13, 2025  
-**Related**: DATA_ARCHITECTURE_ANALYSIS.md
+**Related**: DATA_ARCHITECTURE_ANALYSIS.md  
+**Status**: ⚠️ Being updated to reflect simplified SaveData approach
+
+---
+
+## ⚠️ Important Note
+
+**SaveData Structure Simplified**: SaveData is now a simple container with `std::vector<std::unique_ptr<SceneData>> scenes`. There is **no separate SaveSceneData polymorphic type**.
+
+**Key Changes**:
+- SaveData contains a vector of SceneData objects
+- Reuses FlatbuffersSceneDataProvider.ProvideSceneDataFromSave()
+- Reuses FlatbuffersSceneConfigurator (same as default)
+- No SaveSceneData, SaveSceneDataProvider, or SaveSceneConfigurator
+
+**Diagrams below reference "SaveSceneData" but should be interpreted as "SceneData extracted from SaveData.scenes vector".**
 
 ---
 
