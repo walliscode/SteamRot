@@ -1,1 +1,1 @@
-# include(CompileTestData)
+include(CompileTestData)
