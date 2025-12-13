@@ -21,7 +21,6 @@ stduuid
 context
 logic
 assets
-configuration
 data_providers
 types
 )

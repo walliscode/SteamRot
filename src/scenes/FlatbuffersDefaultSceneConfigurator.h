@@ -25,6 +25,8 @@ private:
 public:
   FlatbuffersDefaultSceneConfigurator() = default;
 
+  ~FlatbuffersDefaultSceneConfigurator() override = default;
+
   /////////////////////////////////////////////////
   /// @brief  function to configure SceneInfo struct
   ///
