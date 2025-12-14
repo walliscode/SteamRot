@@ -9,6 +9,7 @@
 #pragma once
 
 #include "FailInfo.h"
+#include "LogicFactory.h"
 #include "Scene.h"
 #include "SceneData.h"
 #include <expected>
@@ -26,7 +27,7 @@ public:
   /////////////////////////////////////////////////
   /// @brief Default constructor for ISceneConfigurator
   /////////////////////////////////////////////////
-  ISceneConfigurator() = default;
+  ISceneConfigurator() {};
 
   /////////////////////////////////////////////////
   /// @brief Virtual destructor for ISceneConfigurator to ensure derived classes

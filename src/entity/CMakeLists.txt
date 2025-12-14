@@ -18,4 +18,5 @@ target_link_libraries(entity
   types
   events
   data_providers
+  user_interface
 )

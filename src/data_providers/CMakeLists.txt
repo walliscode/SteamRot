@@ -27,6 +27,5 @@ target_link_libraries(data_providers
   types
   SFML::Graphics
   events
-  scenes
   interfaces
 )
