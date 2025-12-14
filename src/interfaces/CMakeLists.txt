@@ -1,14 +1,17 @@
 add_library(interfaces
-INTERFACE
+  ISceneConfigurator.cpp
 )
 
 target_include_directories(interfaces
-  INTERFACE
+  PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_link_libraries(interfaces
-  INTERFACE
+  PUBLIC
   types
+  PRIVATE
+  logic
+  scenes
 )
 
