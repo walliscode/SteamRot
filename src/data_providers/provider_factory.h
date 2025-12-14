@@ -11,6 +11,7 @@
 #include "IAssetDataProvider.h"
 #include "IEngineDataProvider.h"
 #include "ISceneConfigurator.h"
+#include "ISceneDataProvider.h"
 #include "ISceneManagerDataProvider.h"
 
 namespace steamrot {
@@ -33,11 +34,6 @@ ISceneManagerDataProvider &GetSceneManagerDataProvider();
 /////////////////////////////////////////////////
 IAssetDataProvider &GetAssetDataProvider();
 
-/////////////////////////////////////////////////
-/// @brief Returns
-///
-/// @return Reference to default scene configurator
-/////////////////////////////////////////////////
-ISceneConfigurator &GetDefaultSceneConfigurator();
-
+ISceneDataProvider &GetSceneDataProvider();
+ISceneConfigurator &GetSceneConfigurator();
 } // namespace steamrot

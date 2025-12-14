@@ -7,24 +7,9 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "SceneManager.h"
-#include "EventPacket.h"
-#include "FailInfo.h"
-#include "ISceneConfigurator.h"
 #include "ISceneManagerDataProvider.h"
-#include "Scene.h"
 #include "SceneFactory.h"
-#include "SceneInfo.h"
-#include "Subscriber.h"
-#include "events_generated.h"
 #include "provider_factory.h"
-#include "uuid.h"
-#include <SFML/Graphics/RenderTexture.hpp>
-#include <expected>
-#include <memory>
-#include <unordered_map>
-#include <utility>
-#include <variant>
-#include <vector>
 
 namespace steamrot {
 
@@ -48,15 +33,11 @@ SceneManager::GetScenes() const {
 std::expected<std::monostate, FailInfo>
 SceneManager::AddSceneFromDefault(const SceneType &scene_type) {
 
-  // get the ISceneConfigurator
-  ISceneConfigurator &scene_configurator = GetDefaultSceneConfigurator();
-
   // create SceneFactory object
-  SceneFactory scene_factory(m_game_context, scene_configurator);
+  SceneFactory scene_factory(m_game_context);
 
   // create and configure scene
-  auto scene_creation_result =
-      scene_factory.CreateAndConfigureScene(scene_type);
+  auto scene_creation_result = scene_factory.CreateSceneFromDefault(scene_type);
   if (!scene_creation_result.has_value()) {
     return std::unexpected(scene_creation_result.error());
   }

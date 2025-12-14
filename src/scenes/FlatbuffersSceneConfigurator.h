@@ -11,19 +11,18 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "FlatbuffersDataLoader.h"
 #include "ISceneConfigurator.h"
-#include "scene_types_generated.h"
+#include "SceneData.h"
 
 namespace steamrot {
 
-class FlatbuffersDefaultSceneConfigurator : public ISceneConfigurator {
+class FlatbuffersSceneConfigurator : public ISceneConfigurator {
 
 private:
-  FlatbuffersDataLoader m_data_loader;
-
 public:
-  FlatbuffersDefaultSceneConfigurator() = default;
+  FlatbuffersSceneConfigurator() = default;
+
+  ~FlatbuffersSceneConfigurator() override = default;
 
   /////////////////////////////////////////////////
   /// @brief  function to configure SceneInfo struct
@@ -31,7 +30,7 @@ public:
   /// @param scene Scene to configure
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo>
-  ConfigureSceneInfo(Scene &scene, const SceneType scene_type) override;
+  ConfigureSceneInfo(Scene &scene, const SceneData *scene_data) override;
 
   /////////////////////////////////////////////////
   /// @brief  function to configure SceneResources struct
@@ -39,7 +38,7 @@ public:
   /// @param scene Scene to configure
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo>
-  ConfigureSceneResources(Scene &scene, const SceneType scene_type) override;
+  ConfigureSceneResources(Scene &scene, const SceneData *scene_data) override;
 
   /////////////////////////////////////////////////
   /// @brief  function to configure SceneConfig struct
@@ -47,6 +46,6 @@ public:
   /// @param scene Scene to configure
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo>
-  ConfigureSceneConfig(Scene &scene, const SceneType scene_type) override;
+  ConfigureSceneConfig(Scene &scene, const SceneData *scene_data) override;
 };
 } // namespace steamrot
