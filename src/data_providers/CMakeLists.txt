@@ -24,12 +24,9 @@ target_include_directories(data_providers
 
 target_link_libraries(data_providers
   PUBLIC
-  types
   SFML::Graphics
   events
-  scenes
   interfaces
-
-
+  types
 
 )

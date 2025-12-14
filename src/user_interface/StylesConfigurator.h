@@ -7,7 +7,7 @@
 /// Preprocessor Directives
 /////////////////////////////////////////////////
 #pragma once
-#include "AssetManager.h"
+
 #include "FailInfo.h"
 #include "UIStyle.h"
 #include "ui_style_generated.h"
@@ -17,6 +17,7 @@
 #include <vector>
 namespace steamrot {
 
+class AssetManager;
 /////////////////////////////////////////////////
 /// @class StylesConfigurator
 /// @brief Responsible for providing UI styles configured from external data

@@ -30,6 +30,7 @@ enum class FailMode {
   EnumValueNotHandled,
   VariantTypeMismatch,
   NullPointer,
+  InvalidCast,
   InvalidUUID,
   MissingRequiredField,
   ResourceCreationFailure,
