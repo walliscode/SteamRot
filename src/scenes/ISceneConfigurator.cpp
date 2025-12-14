@@ -16,20 +16,20 @@ namespace steamrot {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ISceneConfigurator::ConfigureScene(Scene &scene, const SceneType scene_type) {
+ISceneConfigurator::ConfigureScene(Scene &scene, const SceneData *scene_data) {
 
   // Configure SceneInfo
-  auto info_result = ConfigureSceneInfo(scene, scene_type);
+  auto info_result = ConfigureSceneInfo(scene, scene_data);
   if (!info_result.has_value())
     return std::unexpected(info_result.error());
 
   // Configure SceneResources
-  auto resources_result = ConfigureSceneResources(scene, scene_type);
+  auto resources_result = ConfigureSceneResources(scene, scene_data);
   if (!resources_result.has_value())
     return std::unexpected(resources_result.error());
 
   // Configure SceneConfig
-  auto config_result = ConfigureSceneConfig(scene, scene_type);
+  auto config_result = ConfigureSceneConfig(scene, scene_data);
   if (!config_result.has_value())
     return std::unexpected(config_result.error());
 

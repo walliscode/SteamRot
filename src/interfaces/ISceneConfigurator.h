@@ -10,7 +10,7 @@
 
 #include "FailInfo.h"
 #include "Scene.h"
-#include "scene_types_generated.h"
+#include "SceneData.h"
 #include <expected>
 #include <variant>
 namespace steamrot {
@@ -40,7 +40,7 @@ public:
   /// @param scene Scene to configure
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo>
-  ConfigureScene(Scene &scene, const SceneType scene_type);
+  ConfigureScene(Scene &scene, const SceneData *scene_data);
 
   /////////////////////////////////////////////////
   /// @brief Virtual function to configure SceneInfo struct
@@ -48,7 +48,7 @@ public:
   /// @param scene Scene to configure
   /////////////////////////////////////////////////
   virtual std::expected<std::monostate, FailInfo>
-  ConfigureSceneInfo(Scene &scene, const SceneType scene_type) = 0;
+  ConfigureSceneInfo(Scene &scene, const SceneData *scene_data) = 0;
 
   /////////////////////////////////////////////////
   /// @brief Virtual function to configure SceneResources struct
@@ -56,7 +56,7 @@ public:
   /// @param scene Scene to configure
   /////////////////////////////////////////////////
   virtual std::expected<std::monostate, FailInfo>
-  ConfigureSceneResources(Scene &scene, const SceneType scene_type) = 0;
+  ConfigureSceneResources(Scene &scene, const SceneData *scene_data) = 0;
 
   /////////////////////////////////////////////////
   /// @brief Virtual function to configure SceneConfig struct
@@ -64,7 +64,7 @@ public:
   /// @param scene Scene to configure
   /////////////////////////////////////////////////
   virtual std::expected<std::monostate, FailInfo>
-  ConfigureSceneConfig(Scene &scene, const SceneType scene_type) = 0;
+  ConfigureSceneConfig(Scene &scene, const SceneData *scene_data) = 0;
 
   /////////////////////////////////////////////////
   /// @brief Configure the logic map for the scene

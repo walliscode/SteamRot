@@ -29,7 +29,4 @@ target_link_libraries(data_providers
   events
   scenes
   interfaces
-
-
-
 )
