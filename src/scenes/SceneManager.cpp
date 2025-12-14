@@ -9,6 +9,7 @@
 #include "SceneManager.h"
 #include "EventPacket.h"
 #include "FailInfo.h"
+#include "FlatbuffersDefaultSceneConfigurator.h"
 #include "ISceneConfigurator.h"
 #include "ISceneManagerDataProvider.h"
 #include "Scene.h"
@@ -28,6 +29,11 @@
 
 namespace steamrot {
 
+/////////////////////////////////////////////////
+ISceneConfigurator &GetDefaultSceneConfigurator() {
+  static FlatbuffersDefaultSceneConfigurator configurator;
+  return configurator;
+}
 /////////////////////////////////////////////////
 SceneManager::SceneManager(const GameContext &game_context)
     : m_scenes(), m_game_context(game_context) {}
