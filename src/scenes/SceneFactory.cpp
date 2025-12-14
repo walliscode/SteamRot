@@ -12,7 +12,6 @@
 #include <memory>
 
 namespace steamrot {
-
 /////////////////////////////////////////////////
 SceneFactory::SceneFactory(const GameContext &game_context,
                            ISceneConfigurator &scene_configurator)

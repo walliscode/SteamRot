@@ -8,7 +8,6 @@
 /////////////////////////////////////////////////
 #include "provider_factory.h"
 #include "FlatbuffersAssetDataProvider.h"
-#include "FlatbuffersDefaultSceneConfigurator.h"
 #include "FlatbuffersEngineDataProvider.h"
 #include "FlatbuffersSceneManagerDataProvider.h"
 #include "ISceneManagerDataProvider.h"
@@ -31,12 +30,6 @@ ISceneManagerDataProvider &GetSceneManagerDataProvider() {
 IAssetDataProvider &GetAssetDataProvider() {
   static FlatbuffersAssetDataProvider provider;
   return provider;
-}
-
-/////////////////////////////////////////////////
-ISceneConfigurator &GetDefaultSceneConfigurator() {
-  static FlatbuffersDefaultSceneConfigurator configurator;
-  return configurator;
 }
 
 } // namespace steamrot

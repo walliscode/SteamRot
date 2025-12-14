@@ -32,7 +32,7 @@ public:
   /// @brief Virtual destructor for ISceneConfigurator to ensure derived classes
   /// implement a destructor
   /////////////////////////////////////////////////
-  virtual ~ISceneConfigurator() = default;
+  virtual ~ISceneConfigurator() {};
 
   /////////////////////////////////////////////////
   /// @brief Wrapper function for all scene configuration

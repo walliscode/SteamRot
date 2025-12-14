@@ -6,8 +6,6 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "Logic.h"
-#include "EventHandler.h"
 #include "Subscriber.h"
 #include "TestFixture.h"
 #include "UIRenderLogic.h"
@@ -60,9 +58,9 @@ TEST_CASE("Logic::AddSubscriber can add multiple subscribers",
   auto subscriber1 = std::make_shared<steamrot::Subscriber>(
       steamrot::EventType::EventType_EVENT_USER_INPUT);
   auto subscriber2 = std::make_shared<steamrot::Subscriber>(
-      steamrot::EventType::EventType_CHANGE_SCENE);
+      steamrot::EventType::EventType_EVENT_CHANGE_SCENE);
   auto subscriber3 = std::make_shared<steamrot::Subscriber>(
-      steamrot::EventType::EventType_QUIT_GAME);
+      steamrot::EventType::EventType_EVENT_QUIT_GAME);
 
   // Add subscribers to logic
   logic.AddSubscriber(subscriber1);
