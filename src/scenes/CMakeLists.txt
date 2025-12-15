@@ -23,7 +23,6 @@ target_include_directories(scenes
 
 target_link_libraries(scenes PUBLIC
 SFML::Graphics
-display
 entity
 logger
 stduuid

@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "SceneFactory.h"
 #include "CraftingScene.h"
+#include "FlatbuffersSceneConfigurator.h"
 #include "ISceneDataProvider.h"
 #include "TitleScene.h"
 #include "provider_factory.h"
@@ -47,6 +48,12 @@ SceneFactory::CreateEmptyScene(const SceneType scene_type) {
                                     "SceneType not handled in ISceneFactory"});
   }
   }
+}
+
+/////////////////////////////////////////////////
+ISceneConfigurator &GetSceneConfigurator() {
+  static FlatbuffersSceneConfigurator configurator;
+  return configurator;
 }
 
 /////////////////////////////////////////////////
