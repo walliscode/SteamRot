@@ -68,6 +68,14 @@ private:
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo> ProcessSubscriptions();
 
+  /////////////////////////////////////////////////
+  /// @brief Updates all scennes by calling their various system methods.
+  ///
+  /// This encapsulation method means that all scenes have their systems/logic
+  /// called in the same order.
+  /////////////////////////////////////////////////
+  void UpdateScenes();
+
 public:
   /////////////////////////////////////////////////
   /// @brief Constructor taking a GameContext object.
@@ -93,14 +101,6 @@ public:
   /// create a new one.
   /////////////////////////////////////////////////
   std::expected<uuids::uuid, FailInfo> LoadCraftingScene();
-
-  /////////////////////////////////////////////////
-  /// @brief Updates all scennes by calling their various system methods.
-  ///
-  /// This encapsulation method means that all scenes have their systems/logic
-  /// called in the same order.
-  /////////////////////////////////////////////////
-  void UpdateScenes();
 
   /////////////////////////////////////////////////
   /// @brief Cause the cascade of events that will add a scene from default

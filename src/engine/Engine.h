@@ -71,38 +71,6 @@ protected:
   EngineState m_engine_state;
 
   /////////////////////////////////////////////////
-  /// @brief Execute a single tick of the game loop.
-  ///
-  /// Called by Run() for each iteration of the game loop.
-  /// Derived classes implement tick logic specific to their context
-  /// (real input/rendering vs simulated input/validation).
-  ///
-  /// @note This method calls ExecuteTick() which uses the new Tick_() pipeline.
-  /////////////////////////////////////////////////
-  void ExecuteSystemsTick();
-
-  /////////////////////////////////////////////////
-  /// @brief Hook called at the beginning of each tick (before any processing).
-  ///
-  /// Override to add custom logic at tick start (logging, profiling, etc.).
-  /// Base implementation does nothing.
-  /////////////////////////////////////////////////
-  virtual void OnTickBegin() {}
-
-  /////////////////////////////////////////////////
-  /// @brief Hook called at the end of each tick (after all processing).
-  ///
-  /// Override to add custom logic at tick end (data capture, metrics, etc.).
-  /// Base implementation does nothing.
-  /////////////////////////////////////////////////
-  virtual void OnTickEnd() {}
-
-  /////////////////////////////////////////////////
-  /// @brief Virtual method capturing the game loop structure.
-  /////////////////////////////////////////////////
-  virtual void RunGameLoop() = 0;
-
-  /////////////////////////////////////////////////
   /// @brief Start up the engine and configure core objects.
   ///
   /// This is virtual to allow derived classes to customize startup.
@@ -120,11 +88,34 @@ protected:
   virtual std::expected<std::monostate, FailInfo> StartUp();
 
   /////////////////////////////////////////////////
-  /// @brief Go through all subscriptions, if active call relevant Logic
+  /// @brief Virtual method capturing the game loop structure.
   /////////////////////////////////////////////////
-  virtual std::expected<std::monostate, FailInfo> ProcessSubscriptions() = 0;
+  virtual void RunGameLoop() = 0;
 
-public:
+  /////////////////////////////////////////////////
+  /// @brief Execute a complete tick using the unified tick pipeline.
+  ///
+  /// Calls all tick phases in order:
+  /// 1. OnTickBegin() - Pre-tick hook
+  /// 2. TickEvents() - Event processing
+  /// 3. TickEngineLogic() - Engine subscriptions
+  /// 4. TickSceneManager() - Scene manager subscriptions
+  /// 5. TickSceneLogic() - Scene updates
+  /// 6. TickRendering() - Display rendering
+  /// 7. OnTickEnd() - Post-tick hook
+  ///
+  /// This method can be used for integration testing of the full tick cycle.
+  /////////////////////////////////////////////////
+  void ExecuteTick();
+
+  /////////////////////////////////////////////////
+  /// @brief Hook called at the beginning of each tick (before any processing).
+  ///
+  /// Override to add custom logic at tick start (logging, profiling, etc.).
+  /// Base implementation does nothing.
+  /////////////////////////////////////////////////
+  virtual void OnTickBegin() {}
+
   /////////////////////////////////////////////////
   /// @brief Process SFML events and update event bus.
   ///
@@ -170,20 +161,17 @@ public:
   virtual void TickRendering() = 0;
 
   /////////////////////////////////////////////////
-  /// @brief Execute a complete tick using the unified tick pipeline.
+  /// @brief Hook called at the end of each tick (after all processing).
   ///
-  /// Calls all tick phases in order:
-  /// 1. OnTickBegin() - Pre-tick hook
-  /// 2. TickEvents() - Event processing
-  /// 3. TickEngineLogic() - Engine subscriptions
-  /// 4. TickSceneManager() - Scene manager subscriptions
-  /// 5. TickSceneLogic() - Scene updates
-  /// 6. TickRendering() - Display rendering
-  /// 7. OnTickEnd() - Post-tick hook
-  ///
-  /// This method can be used for integration testing of the full tick cycle.
+  /// Override to add custom logic at tick end (data capture, metrics, etc.).
+  /// Base implementation does nothing.
   /////////////////////////////////////////////////
-  void ExecuteTick();
+  virtual void OnTickEnd() {}
+
+  /////////////////////////////////////////////////
+  /// @brief Go through all subscriptions, if active call relevant Logic
+  /////////////////////////////////////////////////
+  virtual std::expected<std::monostate, FailInfo> ProcessSubscriptions() = 0;
 
 public:
   /////////////////////////////////////////////////
