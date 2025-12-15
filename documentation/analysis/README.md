@@ -6,6 +6,9 @@ This directory contains comprehensive analysis reports and architectural documen
 
 ## 🎯 Start Here
 
+### 🏛️ Layering Architecture (NEW - Dec 15, 2025)
+👉 [**LAYERING_EXECUTIVE_SUMMARY.md**](./LAYERING_EXECUTIVE_SUMMARY.md) - Overview of codebase layering and EngineResources solution (5 minutes)
+
 ### ⚡ Quick Reference (3 minutes)
 👉 [**ANALYSIS_SUMMARY.md**](../ANALYSIS_SUMMARY.md) - Executive summary with TL;DR
 
@@ -22,8 +25,58 @@ This directory contains comprehensive analysis reports and architectural documen
 
 ## 📋 Analysis Reports
 
-### 🆕 [UIELEMENT_DRAWING_SEPARATION_ANALYSIS.md](./UIELEMENT_DRAWING_SEPARATION_ANALYSIS.md)
-**Latest architectural analysis** (Created: Dec 11, 2025)
+### 🆕 [LAYERING_AND_ARCHITECTURE_ANALYSIS.md](./LAYERING_AND_ARCHITECTURE_ANALYSIS.md)
+**Latest architectural analysis** (Created: Dec 15, 2025)
+
+Comprehensive analysis of codebase layering architecture and EngineResources construction problem:
+- Three-layer architecture model (Data → Logic → Orchestration)
+- Complete package dependency analysis
+- EngineResources problem statement and solutions
+- Recommended migration path with implementation guide
+- Architectural principles and patterns
+
+**Quick Reference**: [LAYERING_QUICK_REFERENCE.md](./LAYERING_QUICK_REFERENCE.md)  
+**Visual Diagrams**: [LAYERING_DIAGRAMS.md](./LAYERING_DIAGRAMS.md)
+
+**Key Findings**:
+- EngineResources currently in types/ (Layer 1) violates zero-dependency rule
+- Contains EventHandler and AssetManager (Layer 2 classes)
+- Recommended solution: Move to new resources/ package in Layer 2
+- Migration is straightforward (2-3 hours estimated)
+
+**Start here for**: Understanding layering architecture and EngineResources issue
+
+---
+
+### 🏛️ [LAYERING_AND_ARCHITECTURE_ANALYSIS.md](./LAYERING_AND_ARCHITECTURE_ANALYSIS.md)
+**Layering architecture analysis** (Created: Dec 15, 2025)
+
+Comprehensive analysis of codebase layering architecture and EngineResources construction problem:
+- Three-layer architecture model (Data → Logic → Orchestration)
+- Complete package dependency analysis with visualization
+- EngineResources problem statement: Layer 1 depending on Layer 2
+- Multiple solutions evaluated with pros/cons
+- Recommended: Move EngineResources to new resources/ package
+- Step-by-step migration path with risk assessment
+- Architectural principles and best practices
+
+**Quick Reference**: [LAYERING_QUICK_REFERENCE.md](./LAYERING_QUICK_REFERENCE.md)  
+**Visual Diagrams**: [LAYERING_DIAGRAMS.md](./LAYERING_DIAGRAMS.md)
+
+**Key Findings**:
+- EngineResources currently in types/core/ (Layer 1) violates zero-dependency rule
+- Contains EventHandler and AssetManager (Layer 2 classes)
+- Creates layering violation: Layer 1 includes Layer 2 headers
+- Solution: Create resources/ package in Layer 2, move EngineResources there
+- EngineResourcesConfig (pure data) stays in Layer 1
+- Migration is low-risk, mechanical refactor (2-3 hours)
+
+**Start here for**: Understanding layering architecture, solving EngineResources dependency issue
+
+---
+
+### 🔍 [UIELEMENT_DRAWING_SEPARATION_ANALYSIS.md](./UIELEMENT_DRAWING_SEPARATION_ANALYSIS.md)
+**UI drawing separation analysis** (Created: Dec 11, 2025)
 
 Comprehensive analysis of removing drawing methods from UIElement types to create zero-dependency data layer:
 - 6 architectural options evaluated
@@ -142,6 +195,10 @@ Analysis of TestFixture implementation and usage patterns.
 
 | Question | Document |
 |----------|----------|
+| What is the layering architecture? | [LAYERING_QUICK_REFERENCE.md](./LAYERING_QUICK_REFERENCE.md) |
+| How do we fix EngineResources? | [LAYERING_AND_ARCHITECTURE_ANALYSIS.md](./LAYERING_AND_ARCHITECTURE_ANALYSIS.md) |
+| What are the layer rules? | [LAYERING_QUICK_REFERENCE.md](./LAYERING_QUICK_REFERENCE.md) |
+| How are packages organized? | [LAYERING_DIAGRAMS.md](./LAYERING_DIAGRAMS.md) |
 | How to remove UIElement drawing methods? | [UIELEMENT_DRAWING_SEPARATION_QUICK_REF.md](./UIELEMENT_DRAWING_SEPARATION_QUICK_REF.md) |
 | What are the options for data layer separation? | [UIELEMENT_DRAWING_SEPARATION_ANALYSIS.md](./UIELEMENT_DRAWING_SEPARATION_ANALYSIS.md) |
 | What's wrong with the codebase? | [ANALYSIS_QUICK_REFERENCE.md](./ANALYSIS_QUICK_REFERENCE.md) |
