@@ -17,12 +17,14 @@ target_include_directories(logic
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-target_link_libraries(logic PUBLIC
+target_link_libraries(logic
+  PRIVATE
   components
   entity
   user_interface
   types
   magic_enum
   context
+  resources
 
 )

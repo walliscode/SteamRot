@@ -1,49 +1,11 @@
-/////////////////////////////////////////////////
-/// @file
-/// @brief GameEngine class declaration.
-///
-/// ## Data Requirements (GameEngine)
-///
-/// GameEngine loads its configuration from default FlatBuffers files.
-/// The data loading happens in two phases:
-///
-/// ### Phase 1: Engine::StartUp() (base implementation)
-///   - EngineCoreData: Window size, title, framerate
-///   - UserPreferences: Default preferences from default.preferences.bin
-///   - Source: engine_data.json → engine_core
-///
-/// ### Phase 2: GameEngine::StartUp() (override)
-///   - Loads saved user preferences if they exist (overrides defaults)
-///   - Calls base StartUp() for common initialization
-///   - Calls SceneManager::LoadTitleScene() to start the game
-///
-/// ### Phase 3: ConfigureEngineStateFromData() (GameEngine override)
-///   - EngineData.subscriptions: Engine-level event handlers (quit game, etc.)
-///   - EngineData.scene_manager_data: SceneManager subscriptions
-///   - Source: engine_data.json
-///
-/// ## Data Flow
-/// ```
-/// main.cpp
-///   └─▶ GameEngine() [default constructor]
-///   └─▶ RunGame()
-///         └─▶ StartUp() [GameEngine override]
-///               └─▶ Engine::StartUp() [loads defaults + calls
-///               ConfigureEngineStateFromData] └─▶ LoadSavedUserPreferences()
-///               [overrides defaults if file exists] └─▶
-///               SceneManager::LoadTitleScene() [starts the game]
-///         └─▶ RunGameLoop()
-/// ```
-///
-/// @note GameEngine uses file-based configuration. For injected/mock data,
-/// use TestEngine instead.
-/////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+
 #include "DisplayManager.h"
 #include "Engine.h"
+#include "FailInfo.h"
 
 namespace steamrot {
 /////////////////////////////////////////////////

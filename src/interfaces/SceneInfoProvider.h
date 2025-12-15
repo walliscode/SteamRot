@@ -10,11 +10,11 @@
 
 #include "FailInfo.h"
 #include "SceneInfo.h"
-#include "uuid.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <expected>
 #include <unordered_map>
+#include <uuid/uuid.h>
 #include <vector>
 namespace steamrot {
 

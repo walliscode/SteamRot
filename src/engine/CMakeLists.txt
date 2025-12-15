@@ -11,9 +11,12 @@ target_include_directories(engine
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-target_link_libraries(engine PUBLIC
+target_link_libraries(engine
+PRIVATE
 SFML::Graphics
 display
+scenes
+components
 entity
 events
 logger
@@ -23,4 +26,6 @@ logic
 assets
 data_providers
 types
+resources
+interfaces
 )

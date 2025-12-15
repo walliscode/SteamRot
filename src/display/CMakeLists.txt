@@ -2,7 +2,6 @@ add_library(display
     DisplayManager.cpp
     Tile.cpp
     Session.cpp
-
 )
 
 target_include_directories(display
@@ -12,10 +11,8 @@ target_include_directories(display
   ${CMAKE_SOURCE_DIR}/include/constants
   ${CMAKE_SOURCE_DIR}/include/enums
 )
-target_link_libraries(display PUBLIC
+target_link_libraries(display PRIVATE
     SFML::Graphics
-    scenes
-    magic_enum
-    stduuid
-    logic
+    interfaces
+    types
 )
