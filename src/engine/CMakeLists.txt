@@ -12,9 +12,10 @@ target_include_directories(engine
 )
 
 target_link_libraries(engine
+PUBLIC
+resources
 PRIVATE
 types
-resources
 interfaces
 SFML::Graphics
 display
