@@ -71,13 +71,6 @@ void Engine::RunGame() {
 }
 
 /////////////////////////////////////////////////
-void Engine::ExecuteSystemsTick() {
-
-  // Use the new unified tick pipeline
-  ExecuteTick();
-}
-
-/////////////////////////////////////////////////
 void Engine::ExecuteTick() {
   OnTickBegin();
   TickEvents();

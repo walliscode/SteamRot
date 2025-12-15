@@ -8,10 +8,12 @@
 /////////////////////////////////////////////////
 #pragma once
 
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
 #include "FailInfo.h"
 #include "SceneInfo.h"
 #include <SFML/Graphics/RenderTexture.hpp>
-#include <SFML/Graphics/Texture.hpp>
 #include <expected>
 #include <unordered_map>
 #include <uuid/uuid.h>

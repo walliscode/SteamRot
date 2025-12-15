@@ -9,6 +9,7 @@ target_include_directories(interfaces
 
 target_link_libraries(interfaces
   INTERFACE
+  SFML::Graphics
   types
   stduuid
 )

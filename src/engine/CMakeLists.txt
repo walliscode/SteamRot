@@ -13,6 +13,9 @@ target_include_directories(engine
 
 target_link_libraries(engine
 PRIVATE
+types
+resources
+interfaces
 SFML::Graphics
 display
 scenes
@@ -25,7 +28,4 @@ context
 logic
 assets
 data_providers
-types
-resources
-interfaces
 )

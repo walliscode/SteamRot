@@ -17,26 +17,11 @@ GameEngine::GameEngine()
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> GameEngine::StartUp() {
-  // Call base StartUp() which loads:
-  // - EngineCoreData (window config)
-  // - Default user preferences from default.preferences.bin
-  // - Calls ConfigureEngineStateFromData() (subscriptions, scene manager)
+  // Call base StartUp() which loads common engine data
   auto base_startup_result = Engine::StartUp();
   if (!base_startup_result.has_value()) {
     return std::unexpected(base_startup_result.error());
   }
-
-  // GameEngine-specific: Check for saved user preferences
-  // If user has saved preferences, load them to override defaults
-  // FlatbuffersUserPreferencesProvider preferences_provider;
-  // if (preferences_provider.HasUserPreferences()) {
-  //   auto saved_prefs_result = preferences_provider.LoadPreferences();
-  //   if (saved_prefs_result.has_value()) {
-  //     m_engine_config.user_preferences = saved_prefs_result.value();
-  //   }
-  //   // If loading saved preferences fails, continue with defaults
-  //   // (already loaded by Engine::StartUp)
-  // }
 
   // GameEngine-specific: Load the title scene to start the game
   // This does NOT automatically load save game data - user must select a save
@@ -49,27 +34,29 @@ std::expected<std::monostate, FailInfo> GameEngine::StartUp() {
 }
 
 /////////////////////////////////////////////////
+void GameEngine::RunGameLoop() {
+  m_engine_state.running = true;
+  // main game loop
+  while (m_engine_state.running && m_engine_resources.game_window.isOpen()) {
+    // execute a single tick of all systems
+    ExecuteTick();
+    // increment loop number
+    m_engine_resources.loop_number++;
+  }
+}
+
+/////////////////////////////////////////////////
 void GameEngine::TickSceneLogic() {
-  // Update all scenes via SceneManager
-  m_scene_manager.UpdateScenes();
+
+  ///// LEFT BLANK INTENTIONALLY /////
+  /// For GameEngine, all scene logic is handled by SceneManager internally
+  /// This is to provide granularity for the TestEngine to simulate scene logic
 }
 
 /////////////////////////////////////////////////
 void GameEngine::TickRendering() {
   // Let DisplayManager handle rendering
   auto call_render_cycle_result = m_display_manager.CallRenderCycle();
-}
-
-/////////////////////////////////////////////////
-void GameEngine::RunGameLoop() {
-  m_engine_state.running = true;
-  // main game loop
-  while (m_engine_state.running && m_engine_resources.game_window.isOpen()) {
-    // execute a single tick of all systems
-    ExecuteSystemsTick();
-    // increment loop number
-    m_engine_resources.loop_number++;
-  }
 }
 
 /////////////////////////////////////////////////
