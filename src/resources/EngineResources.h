@@ -8,14 +8,13 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "AssetManager.h"
+#include "EventHandler.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Vector2.hpp>
 
 namespace steamrot {
 
-// forward declarations
-class EventHandler;
-class AssetManager;
 /////////////////////////////////////////////////
 /// @brief Engine resources struct containing global core objects.
 ///

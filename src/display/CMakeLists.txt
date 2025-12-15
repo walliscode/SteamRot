@@ -12,10 +12,8 @@ target_include_directories(display
   ${CMAKE_SOURCE_DIR}/include/constants
   ${CMAKE_SOURCE_DIR}/include/enums
 )
-target_link_libraries(display PUBLIC
+target_link_libraries(display PRIVATE
     SFML::Graphics
     scenes
-    magic_enum
-    stduuid
-    logic
+    types
 )

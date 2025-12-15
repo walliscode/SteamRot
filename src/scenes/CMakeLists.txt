@@ -18,12 +18,16 @@ target_include_directories(scenes
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-target_link_libraries(scenes PUBLIC
+target_link_libraries(scenes
+PRIVATE
 SFML::Graphics
 entity
+components
 context
 logic
 types
 data_providers
 interfaces
+assets
+resources
 )

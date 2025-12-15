@@ -11,6 +11,7 @@ target_link_libraries(context
   PRIVATE
   SFML::Graphics
   types
+  resources
   assets
   events
   entity
