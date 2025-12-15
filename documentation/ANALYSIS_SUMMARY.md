@@ -1,20 +1,38 @@
 # SteamRot Codebase Analysis - Executive Summary
 
-**Date**: December 5, 2025  
+**Date**: December 5, 2025 (Updated: December 15, 2025)  
 **Analysis Type**: Comprehensive State Assessment (No Code Changes)  
 **Status**: ✅ Complete
 
 ---
 
-## TL;DR
+## 🆕 NEW: Layering Architecture Analysis (Dec 15, 2025)
 
-The SteamRot codebase is **in good shape** with well-designed architecture. Main issues are **documentation confusion** and **test coverage gaps**. Focus on cleaning up documentation first (highest ROI).
+**Latest Addition**: Comprehensive analysis of codebase layering architecture
 
-**Recommendation**: Start with [Quick Action Plan](QUICK_ACTION_PLAN.md) Week 1 actions.
+👉 **Start Here**: [Layering Executive Summary](analysis/LAYERING_EXECUTIVE_SUMMARY.md) (5 minutes)
+
+**Problem Identified**: EngineResources lives in types/core/ (Layer 1 - data) but contains EventHandler and AssetManager (Layer 2 - services), violating the zero-dependency rule for the data layer.
+
+**Solution**: Move EngineResources to new resources/ package in Layer 2. Migration is 2-3 hours, low risk.
+
+**Full Documentation**:
+- [Executive Summary](analysis/LAYERING_EXECUTIVE_SUMMARY.md) - Decision makers (5 min)
+- [Quick Reference](analysis/LAYERING_QUICK_REFERENCE.md) - Developers (quick lookup)
+- [Comprehensive Analysis](analysis/LAYERING_AND_ARCHITECTURE_ANALYSIS.md) - Architects (30 min)
+- [Visual Diagrams](analysis/LAYERING_DIAGRAMS.md) - Visual learners (diagrams)
 
 ---
 
-## Three Essential Documents
+## TL;DR
+
+The SteamRot codebase is **in good shape** with well-designed architecture. Main issues are **documentation confusion**, **test coverage gaps**, and **one layering violation** (EngineResources). Focus on cleaning up documentation first (highest ROI), then address layering.
+
+**Recommendation**: Start with [Quick Action Plan](QUICK_ACTION_PLAN.md) Week 1 actions, then consider layering migration.
+
+---
+
+## Four Essential Documents
 
 ### 1. [Current State Analysis](analysis/CURRENT_STATE_ANALYSIS_2025.md) (40KB)
 **Read this for**: Complete understanding of all issues
@@ -61,6 +79,20 @@ The SteamRot codebase is **in good shape** with well-designed architecture. Main
 
 ---
 
+### 4. [Layering Architecture Analysis](analysis/LAYERING_EXECUTIVE_SUMMARY.md) (NEW - Dec 15, 2025)
+**Read this for**: Understanding layering and EngineResources issue
+
+**Contents**:
+- Three-layer architecture model
+- EngineResources dependency problem
+- Recommended solution (move to resources/ package)
+- Migration steps and risk assessment
+- Architectural principles
+
+**Key Finding**: EngineResources in wrong layer, simple fix available
+
+---
+
 ## Quick Findings
 
 ### 🎯 Core Issues (Prioritized)
@@ -89,6 +121,12 @@ The SteamRot codebase is **in good shape** with well-designed architecture. Main
 - **Impact**: Developers unsure when to use TestFixture vs TestEngine
 - **Fix**: 3 hours (create decision guide)
 - **See**: [Quick Action Plan](QUICK_ACTION_PLAN.md) Action 4
+
+#### 5. Layering Violation (MEDIUM PRIORITY) 🆕
+- **Problem**: EngineResources in Layer 1 (types/) contains Layer 2 classes (EventHandler, AssetManager)
+- **Impact**: Violates zero-dependency rule, makes testing harder, confuses architecture
+- **Fix**: 2-3 hours (create resources/ package, move EngineResources)
+- **See**: [Layering Executive Summary](analysis/LAYERING_EXECUTIVE_SUMMARY.md)
 
 ---
 
