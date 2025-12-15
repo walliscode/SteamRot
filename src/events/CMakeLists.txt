@@ -11,18 +11,13 @@ target_include_directories(events
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-target_link_libraries(events PUBLIC
-SFML::Graphics
-stduuid
-logger
-types
+target_link_libraries(events
+  PRIVATE
+  SFML::Graphics
+  stduuid
+  logger
+  types
 
 )
 
-# # Apply project-specific compile and link options
-# if(DEFINED PROJECT_COMPILE_OPTIONS)
-#   target_compile_options(events PRIVATE ${PROJECT_COMPILE_OPTIONS})
-# endif()
-# if(DEFINED PROJECT_LINK_OPTIONS)
-#   target_link_options(events PRIVATE ${PROJECT_LINK_OPTIONS})
-# endif()
+

@@ -9,7 +9,6 @@
 #pragma once
 
 #include "FailInfo.h"
-
 #include "SceneData.h"
 #include <expected>
 #include <variant>
