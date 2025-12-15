@@ -12,20 +12,16 @@ target_include_directories(engine
 )
 
 target_link_libraries(engine
-PRIVATE
+PUBLIC
 types
 resources
 interfaces
 SFML::Graphics
 display
 scenes
-components
 entity
-events
 logger
 stduuid
 context
-logic
-assets
 data_providers
 )

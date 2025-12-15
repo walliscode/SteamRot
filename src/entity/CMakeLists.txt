@@ -12,7 +12,7 @@ target_include_directories(entity
 )
 
 target_link_libraries(entity
-  PRIVATE
+  PUBLIC
   SFML::Graphics
   components
   types

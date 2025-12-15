@@ -13,10 +13,8 @@ target_include_directories(components
 )
 
 target_link_libraries(components
-  PRIVATE
+  PUBLIC
   SFML::Graphics
   types
-
-
 )
 
