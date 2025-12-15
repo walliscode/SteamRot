@@ -13,6 +13,7 @@ target_link_libraries(user_interface
   SFML::Graphics
   types
   events
-
+  data_providers
+  assets
 )
 

@@ -10,6 +10,7 @@
 #include "FlatbuffersSceneConfigurator.h"
 #include "FailInfo.h"
 #include "FbsSceneData.h"
+#include "Scene.h"
 #include <expected>
 #include <variant>
 
