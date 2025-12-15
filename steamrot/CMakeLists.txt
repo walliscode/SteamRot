@@ -16,5 +16,7 @@ target_include_directories(SteamRot PUBLIC
 target_link_libraries(SteamRot PRIVATE
     engine
     display
+    types
+    logger
 )
 

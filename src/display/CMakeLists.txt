@@ -2,7 +2,6 @@ add_library(display
     DisplayManager.cpp
     Tile.cpp
     Session.cpp
-
 )
 
 target_include_directories(display
@@ -14,6 +13,6 @@ target_include_directories(display
 )
 target_link_libraries(display PRIVATE
     SFML::Graphics
-    scenes
+    interfaces
     types
 )

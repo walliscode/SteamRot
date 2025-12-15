@@ -27,4 +27,5 @@ assets
 data_providers
 types
 resources
+interfaces
 )
