@@ -9,6 +9,7 @@
 #include "FlatbuffersEntityConfigurator.h"
 #include "CMachinaForm.h"
 #include "FailInfo.h"
+#include "FlatbuffersSubscriberViewer.h"
 #include "UIElementFactory.h"
 #include "containers.h"
 #include "entity_memory.h"

@@ -12,6 +12,7 @@ target_link_libraries(test_assets
   Catch2::Catch2WithMain
   assets
   asset_test_helpers
+  types
 )
 
 catch_discover_tests(test_assets)

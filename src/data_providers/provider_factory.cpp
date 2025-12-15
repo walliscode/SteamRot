@@ -9,12 +9,13 @@
 #include "provider_factory.h"
 #include "FlatbuffersAssetDataProvider.h"
 #include "FlatbuffersEngineDataProvider.h"
-#include "FlatbuffersSceneConfigurator.h"
 #include "FlatbuffersSceneDataProvider.h"
 #include "FlatbuffersSceneManagerDataProvider.h"
 
 namespace steamrot {
 
+// forward declaration
+class FlatbuffersSceneConfigurator;
 /////////////////////////////////////////////////
 IEngineDataProvider &GetEngineDataProvider() {
   static FlatbuffersEngineDataProvider provider;
@@ -31,11 +32,6 @@ ISceneManagerDataProvider &GetSceneManagerDataProvider() {
 IAssetDataProvider &GetAssetDataProvider() {
   static FlatbuffersAssetDataProvider provider;
   return provider;
-}
-/////////////////////////////////////////////////
-ISceneConfigurator &GetSceneConfigurator() {
-  static FlatbuffersSceneConfigurator configurator;
-  return configurator;
 }
 
 /////////////////////////////////////////////////

@@ -21,4 +21,7 @@ target_link_libraries(logic PUBLIC
   components
   entity
   user_interface
+  types
+  magic_enum
+  scenes
 )

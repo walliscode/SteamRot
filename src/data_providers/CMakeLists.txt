@@ -28,5 +28,4 @@ target_link_libraries(data_providers
   events
   interfaces
   types
-
 )

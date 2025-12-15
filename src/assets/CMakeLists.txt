@@ -9,10 +9,11 @@ target_include_directories(assets
 )
 
 target_link_libraries(assets
-    PRIVATE
+    PUBLIC
   SFML::Graphics
   types
   interfaces
+  types
   user_interface
   data_providers
 )
