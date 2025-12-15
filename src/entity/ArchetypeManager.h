@@ -15,6 +15,7 @@
 #include "containers.h"
 #include "entity_types.h"
 #include <expected>
+#include <unordered_map>
 
 namespace steamrot {
 

@@ -5,6 +5,7 @@
 
 #include "containers.h"
 #include <bitset>
+#include <vector>
 namespace steamrot {
 
 //////////////////////////////////////////////////
