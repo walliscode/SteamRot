@@ -20,6 +20,11 @@ endif()
 # Always enforce the language constraint
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Disable C++20 module scanning since this project uses traditional headers
+# CMake 3.31+ with Ninja + Clang enables module scanning by default
+# This project does not use C++20 modules, only traditional #pragma once headers
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
+
 
 
 # set the cmake module path (for import libraries and other cmake files)
