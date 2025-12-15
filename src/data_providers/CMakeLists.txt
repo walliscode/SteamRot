@@ -23,7 +23,7 @@ target_include_directories(data_providers
 )
 
 target_link_libraries(data_providers
-  PUBLIC
+  PRIVATE
   SFML::Graphics
   events
   interfaces

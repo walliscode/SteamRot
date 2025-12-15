@@ -23,5 +23,6 @@ target_link_libraries(logic PUBLIC
   user_interface
   types
   magic_enum
-  scenes
+  context
+
 )

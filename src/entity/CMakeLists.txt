@@ -12,10 +12,11 @@ target_include_directories(entity
 )
 
 target_link_libraries(entity
-  PUBLIC
+  PRIVATE
   SFML::Graphics
   components
   types
+  interfaces
   events
   data_providers
   user_interface

@@ -13,7 +13,6 @@ target_link_libraries(assets
   SFML::Graphics
   types
   interfaces
-  types
   user_interface
   data_providers
 )

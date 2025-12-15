@@ -8,14 +8,12 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "AssetManager.h"
+
 #include "EngineResources.h"
 #include "EntityManager.h"
 #include "EventHandler.h"
 #include "containers.h"
-#include <SFML/Graphics/RenderTexture.hpp>
-#include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics.hpp>
 #include <unordered_map>
 
 namespace steamrot {
@@ -33,10 +31,12 @@ namespace steamrot {
 /////////////////////////////////////////////////
 struct SceneContext {
   /////////////////////////////////////////////////
-  /// @brief Constructor taking scene_texture, engine_resources, and EntityManager.
+  /// @brief Constructor taking scene_texture, engine_resources, and
+  /// EntityManager.
   ///
   /// @param scene_texture Reference to scene render texture
-  /// @param engine_resources Reference to EngineResources (contains window, assets, etc.)
+  /// @param engine_resources Reference to EngineResources (contains window,
+  /// assets, etc.)
   /// @param entity_manager Reference to EntityManager (contains
   /// entities/archetypes)
   /////////////////////////////////////////////////

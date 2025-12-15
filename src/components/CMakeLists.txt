@@ -13,10 +13,8 @@ target_include_directories(components
 )
 
 target_link_libraries(components
-  PUBLIC
+  PRIVATE
   SFML::Graphics
-  flatbuffers
-  logger
   types
 
 

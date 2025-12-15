@@ -7,7 +7,6 @@ add_library(scenes
     TitleScene.cpp
     ISceneConfigurator.cpp
     FlatbuffersSceneConfigurator.cpp
-    SceneContext.cpp
 )
 
 target_compile_definitions(scenes PRIVATE
@@ -19,17 +18,12 @@ target_include_directories(scenes
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-
-
 target_link_libraries(scenes PUBLIC
 SFML::Graphics
 entity
-logger
-stduuid
 context
 logic
 types
 data_providers
 interfaces
-
 )
