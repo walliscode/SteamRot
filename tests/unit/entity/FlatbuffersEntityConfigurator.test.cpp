@@ -7,11 +7,14 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersEntityConfigurator.h"
-#include "Component.h"
+#include "ButtonElement.h"
 #include "EventHandler.h"
+#include "PanelElement.h"
+#include "Subscriber.h"
 #include "containers.h"
 #include "entities_generated.h"
 #include "entity_memory.h"
+#include "user_interface_generated.h"
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
 #include <fstream>
@@ -67,27 +70,50 @@ TEST_CASE("FlatbuffersEntityConfigurator::Constructor",
   steamrot::FlatbuffersEntityConfigurator configurator(event_handler,
                                                        *entity_collection);
 
-  SECTION("EntityMemoryPool is resized correctly") {
+  // run configuration of emp
+  auto config_result = configurator.ConfigureEntityMemoryPool(emp);
 
-    auto config_result = configurator.ConfigureEntityMemoryPool(emp);
-    if (!config_result.has_value()) {
-      FAIL("ConfigureEntityMemoryPool failed: " +
-           config_result.error().message);
-    }
+  // tests
 
-    REQUIRE(steamrot::entity::memory::GetMemoryPoolSize(emp) == 100);
-  }
+  // emp size is set
+  REQUIRE(steamrot::entity::memory::GetMemoryPoolSize(emp) == 100);
 
-  SECTION("Base Component is activated correctly") {
+  // check configuration result
 
-    // create CMeta component to test
-    steamrot::CMeta meta_component;
-    REQUIRE(meta_component.m_active == false);
+  ///// CUserInterface component of entity 1 /////
+  const steamrot::CUserInterface &c_ui_component =
+      steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(1, emp);
+  REQUIRE(c_ui_component.m_name == "test_ui");
+  REQUIRE(c_ui_component.m_visible == true);
+  REQUIRE(c_ui_component.m_root_element != nullptr);
+  // check that root element is PanelElement
+  REQUIRE(dynamic_cast<steamrot::PanelElement *>(
+      c_ui_component.m_root_element.get()));
 
-    auto config_result = configurator.ConfigureComponent(meta_component);
-    if (!config_result.has_value()) {
-      FAIL("ConfigureComponent failed: " + config_result.error().message);
-    }
-    REQUIRE(meta_component.m_active == true);
-  }
+  const steamrot::PanelElement &root_panel =
+      static_cast<const steamrot::PanelElement &>(
+          *c_ui_component.m_root_element);
+
+  REQUIRE(root_panel.size == sf::Vector2f(300.0f, 400.0f));
+  REQUIRE(root_panel.position == sf::Vector2f(100.0f, 200.0f));
+  REQUIRE(root_panel.layout == steamrot::LayoutType_Horizontal);
+  REQUIRE(root_panel.spacing_strategy == steamrot::SpacingAndSizingType_None);
+  REQUIRE(root_panel.child_elements.size() == 1);
+
+  // check thet child element is ButtonElement and assign it
+  REQUIRE(dynamic_cast<steamrot::ButtonElement *>(
+      root_panel.child_elements[0].get()));
+  const steamrot::ButtonElement &child_button =
+      static_cast<const steamrot::ButtonElement &>(
+          *root_panel.child_elements[0]);
+
+  REQUIRE(child_button.size == sf::Vector2f(0.f, 0.f));
+  REQUIRE(child_button.position == sf::Vector2f(0.f, 0.f));
+  REQUIRE(child_button.label == "Start Game");
+  REQUIRE(child_button.subscription != nullptr);
+  const steamrot::Subscriber &button_sub = *child_button.subscription;
+
+  REQUIRE(button_sub.m_trigger_event_data.has_value());
+
+  /////
 }
