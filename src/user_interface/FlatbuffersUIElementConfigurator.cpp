@@ -16,13 +16,13 @@
 #include "PanelElement.h"
 #include "event_factory.h"
 #include "subscriber_factory.h"
+#include "user_interface_generated.h"
 #include <string>
 
 namespace steamrot {
 
 ////////////////////////////////////////////////////////////
-Layout
-FlatbuffersUIElementConfigurator::ConvertLayout(int8_t fbs_layout) {
+Layout FlatbuffersUIElementConfigurator::ConvertLayout(int8_t fbs_layout) {
   switch (fbs_layout) {
   case LayoutFbs_None:
     return Layout::None;
@@ -40,8 +40,8 @@ FlatbuffersUIElementConfigurator::ConvertLayout(int8_t fbs_layout) {
 }
 
 ////////////////////////////////////////////////////////////
-SpacingAndSizing FlatbuffersUIElementConfigurator::ConvertSpacingAndSizing(
-    int8_t fbs_spacing) {
+SpacingAndSizing
+FlatbuffersUIElementConfigurator::ConvertSpacingAndSizing(int8_t fbs_spacing) {
   switch (fbs_spacing) {
   case SpacingAndSizingFbs_None:
     return SpacingAndSizing::None;

@@ -8,7 +8,13 @@
 ////////////////////////////////////////////////////////////
 /// Headers
 ////////////////////////////////////////////////////////////
+#include "ButtonElement.h"
+#include "DropDownButtonElement.h"
+#include "DropDownContainerElement.h"
+#include "DropDownItemElement.h"
+#include "DropDownListElement.h"
 #include "IUIElementConfigurator.h"
+#include "PanelElement.h"
 #include "user_interface_generated.h"
 
 namespace steamrot {
@@ -59,9 +65,9 @@ private:
   ////////////////////////////////////////////////////////////
   /// @brief Configure a DropDownList UIElement from FlatBuffers data
   ////////////////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo> ConfigureDropDownListElement(
-      DropDownListElement &dropdown_list_element,
-      const DropDownListData &data);
+  std::expected<std::monostate, FailInfo>
+  ConfigureDropDownListElement(DropDownListElement &dropdown_list_element,
+                               const DropDownListData &data);
 
   ////////////////////////////////////////////////////////////
   /// @brief Configure a DropDownContainer UIElement from FlatBuffers data
@@ -73,16 +79,16 @@ private:
   ////////////////////////////////////////////////////////////
   /// @brief Configure a DropDownItem UIElement from FlatBuffers data
   ////////////////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo> ConfigureDropDownItemElement(
-      DropDownItemElement &dropdown_item_element,
-      const DropDownItemData &data);
+  std::expected<std::monostate, FailInfo>
+  ConfigureDropDownItemElement(DropDownItemElement &dropdown_item_element,
+                               const DropDownItemData &data);
 
   ////////////////////////////////////////////////////////////
   /// @brief Configure a DropDownButton UIElement from FlatBuffers data
   ////////////////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo> ConfigureDropDownButtonElement(
-      DropDownButtonElement &dropdown_button_element,
-      const DropDownButtonData &data);
+  std::expected<std::monostate, FailInfo>
+  ConfigureDropDownButtonElement(DropDownButtonElement &dropdown_button_element,
+                                 const DropDownButtonData &data);
 
   ////////////////////////////////////////////////////////////
   /// @brief Convert FlatBuffers LayoutFbs to native Layout

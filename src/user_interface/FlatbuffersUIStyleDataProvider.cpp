@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "StylesConfigurator.h"
+#include "FlatbuffersUIStyleDataProvider.h"
 #include "FlatbuffersDataLoader.h"
 #include "IFontProvider.h"
 #include "UIStyle.h"

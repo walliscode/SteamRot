@@ -10,6 +10,7 @@
 
 #include "FailInfo.h"
 #include "IFontProvider.h"
+#include "IUIStyleDataProvider.h"
 #include "UIStyle.h"
 #include "ui_style_generated.h"
 #include <expected>
@@ -23,11 +24,11 @@ namespace steamrot {
 /// @brief Responsible for providing UI styles configured from external data
 ///
 /////////////////////////////////////////////////
-class StylesConfigurator {
+class FlatbuffersUIStyleDataProvider : IUIStyleDataProvider {
 
 private:
 public:
-  StylesConfigurator() = default;
+  FlatbuffersUIStyleDataProvider() = default;
 
   /////////////////////////////////////////////////
   /// @brief Configure a UIStyle object based on the provided flatbuffer
