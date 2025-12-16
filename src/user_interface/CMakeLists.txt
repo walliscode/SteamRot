@@ -1,5 +1,4 @@
 add_library(user_interface
-UIElementFactory.cpp
 StylesConfigurator.cpp
 )
 
