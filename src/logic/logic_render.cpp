@@ -261,7 +261,7 @@ void UpdateSizeAndPositionOfChildElements(const UIElement &element,
 
   // add generic handling for any UIElement with children
   switch (element.layout) {
-  case LayoutType::Vertical: {
+  case Layout::Vertical: {
     // calculate the available size for the children
     float available_width = element.size.x -
                             2 * style.panel_style.border_thickness -
@@ -294,7 +294,7 @@ void UpdateSizeAndPositionOfChildElements(const UIElement &element,
     }
     break;
   }
-  case LayoutType::Horizontal: {
+  case Layout::Horizontal: {
     // calculate the available size for the children
     float available_width = element.size.x -
                             2 * style.panel_style.border_thickness -
@@ -326,7 +326,7 @@ void UpdateSizeAndPositionOfChildElements(const UIElement &element,
     }
     break;
   }
-  case LayoutType::DropDown: {
+  case Layout::DropDown: {
     // for a dropdown, they are ordered vertically, inner margins are ignored
     // and the avaiable space is a multiple of the parent inner size (e.g the
     // more children the more space they take up)

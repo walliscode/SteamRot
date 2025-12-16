@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of SpacingAndSizingType enum
+/// @brief Declaration of SpacingAndSizing enum
 ////////////////////////////////////////////////////////////
 
 #pragma once
@@ -12,7 +12,7 @@ namespace steamrot {
 ////////////////////////////////////////////////////////////
 /// @brief Spacing and sizing strategy for UI element children
 ////////////////////////////////////////////////////////////
-enum class SpacingAndSizingType : int8_t {
+enum class SpacingAndSizing : int8_t {
   None = 0,
   Even = 1,
   Ratioed = 2,

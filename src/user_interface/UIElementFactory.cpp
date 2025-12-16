@@ -16,41 +16,41 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-/// @brief Convert FlatBuffers LayoutType to native LayoutType
+/// @brief Convert FlatBuffers LayoutFbs to native Layout
 /////////////////////////////////////////////////
-static LayoutType ConvertLayoutType(int8_t fbs_layout) {
+static Layout ConvertLayout(int8_t fbs_layout) {
   switch (fbs_layout) {
-  case LayoutType_None:
-    return LayoutType::None;
-  case LayoutType_Horizontal:
-    return LayoutType::Horizontal;
-  case LayoutType_Vertical:
-    return LayoutType::Vertical;
-  case LayoutType_Grid:
-    return LayoutType::Grid;
-  case LayoutType_DropDown:
-    return LayoutType::DropDown;
+  case LayoutFbs_None:
+    return Layout::None;
+  case LayoutFbs_Horizontal:
+    return Layout::Horizontal;
+  case LayoutFbs_Vertical:
+    return Layout::Vertical;
+  case LayoutFbs_Grid:
+    return Layout::Grid;
+  case LayoutFbs_DropDown:
+    return Layout::DropDown;
   default:
-    return LayoutType::None;
+    return Layout::None;
   }
 }
 
 /////////////////////////////////////////////////
-/// @brief Convert FlatBuffers SpacingAndSizingType to native type
+/// @brief Convert FlatBuffers SpacingAndSizingFbs to native SpacingAndSizing
 /////////////////////////////////////////////////
-static SpacingAndSizingType
-ConvertSpacingAndSizingType(int8_t fbs_spacing) {
+static SpacingAndSizing
+ConvertSpacingAndSizing(int8_t fbs_spacing) {
   switch (fbs_spacing) {
-  case SpacingAndSizingType_None:
-    return SpacingAndSizingType::None;
-  case SpacingAndSizingType_Even:
-    return SpacingAndSizingType::Even;
-  case SpacingAndSizingType_Ratioed:
-    return SpacingAndSizingType::Ratioed;
-  case SpacingAndSizingType_DropDownList:
-    return SpacingAndSizingType::DropDownList;
+  case SpacingAndSizingFbs_None:
+    return SpacingAndSizing::None;
+  case SpacingAndSizingFbs_Even:
+    return SpacingAndSizing::Even;
+  case SpacingAndSizingFbs_Ratioed:
+    return SpacingAndSizing::Ratioed;
+  case SpacingAndSizingFbs_DropDownList:
+    return SpacingAndSizing::DropDownList;
   default:
-    return SpacingAndSizingType::None;
+    return SpacingAndSizing::None;
   }
 }
 
@@ -208,8 +208,8 @@ ConfigureBaseUIElement(UIElement &element, const UIElementData &data,
     element.response_event = event_packet;
   }
 
-  element.spacing_strategy = ConvertSpacingAndSizingType(data.spacing_strategy());
-  element.layout = ConvertLayoutType(data.layout());
+  element.spacing_strategy = ConvertSpacingAndSizing(data.spacing_strategy());
+  element.layout = ConvertLayout(data.layout());
   element.children_active = data.children_active();
 
   // Recursively create and attach children
