@@ -24,12 +24,9 @@ namespace steamrot {
 /// @brief Responsible for providing UI styles configured from external data
 ///
 /////////////////////////////////////////////////
-class FlatbuffersUIStyleDataProvider : IUIStyleDataProvider {
+class FlatbuffersUIStyleDataProvider : public IUIStyleDataProvider {
 
 private:
-public:
-  FlatbuffersUIStyleDataProvider() = default;
-
   /////////////////////////////////////////////////
   /// @brief Configure a UIStyle object based on the provided flatbuffer
   ///
@@ -40,14 +37,18 @@ public:
   ConfigureStyle(const UIStyleData &style_data,
                  const IFontProvider &font_provider);
 
+public:
+  FlatbuffersUIStyleDataProvider() = default;
+
   /////////////////////////////////////////////////
-  /// @brief Provide a map of all available UIStyles
+  /// @brief Provide a map of all available UIStyles (implements interface)
   ///
   /// @param font_provider Reference to IFontProvider for font loading
   /// @param style_names Vector of style names to load
+  /// @return Map of style name to configured UIStyle, or error
   /////////////////////////////////////////////////
   std::expected<std::unordered_map<std::string, UIStyle>, FailInfo>
   ProvideUIStylesMap(const IFontProvider &font_provider,
-                     std::vector<std::string> style_names = {});
+                     const std::vector<std::string> &style_names) override;
 };
 } // namespace steamrot

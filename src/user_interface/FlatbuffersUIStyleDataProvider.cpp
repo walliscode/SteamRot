@@ -33,8 +33,8 @@ static sf::Vector2f ToVec2f(const Vector2fData *vec_fb) {
 
 /////////////////////////////////////////////////
 std::expected<UIStyle, FailInfo>
-StylesConfigurator::ConfigureStyle(const UIStyleData &style_data,
-                                   const IFontProvider &font_provider) {
+FlatbuffersUIStyleDataProvider::ConfigureStyle(const UIStyleData &style_data,
+                                               const IFontProvider &font_provider) {
   UIStyle ui_style;
 
   // ----- PanelStyle -----
@@ -371,8 +371,9 @@ StylesConfigurator::ConfigureStyle(const UIStyleData &style_data,
 
 /////////////////////////////////////////////////
 std::expected<std::unordered_map<std::string, UIStyle>, FailInfo>
-StylesConfigurator::ProvideUIStylesMap(const IFontProvider &font_provider,
-                                       std::vector<std::string> style_names) {
+FlatbuffersUIStyleDataProvider::ProvideUIStylesMap(
+    const IFontProvider &font_provider,
+    const std::vector<std::string> &style_names) {
   {
     // create map to return
     std::unordered_map<std::string, UIStyle> styles_map;
