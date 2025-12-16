@@ -14,6 +14,7 @@ target_include_directories(types
 
 target_link_libraries(types
   INTERFACE
+  SFML::Graphics
   stduuid
   flatbuffers
 
