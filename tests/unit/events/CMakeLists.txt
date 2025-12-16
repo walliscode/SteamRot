@@ -3,8 +3,6 @@ Subscriber.test.cpp
 subscriber_factory.test.cpp
 UserInputBitset.test.cpp
 EventHandler.test.cpp
-event_bus_conversion.test.cpp
-event_factory.test.cpp
 )
 
 target_include_directories(test_events
@@ -16,16 +14,8 @@ target_link_libraries(test_events
   PRIVATE
   Catch2::Catch2WithMain
   events
-  matchers
+  types
 )
 
 catch_discover_tests(test_events)
 
-add_library(mock_subscriber_data
-INTERFACE
-)
-
-target_include_directories(mock_subscriber_data
-INTERFACE
-  ${CMAKE_CURRENT_SOURCE_DIR}
-)
