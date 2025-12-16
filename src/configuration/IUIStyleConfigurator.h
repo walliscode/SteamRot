@@ -8,8 +8,8 @@
 ////////////////////////////////////////////////////////////
 /// Headers
 ////////////////////////////////////////////////////////////
-#include "AssetManager.h"
 #include "FailInfo.h"
+#include "IFontProvider.h"
 #include "UIStyle.h"
 #include <expected>
 #include <string>
@@ -28,18 +28,18 @@ struct UIStyleData;
 class IUIStyleConfigurator {
 protected:
   ////////////////////////////////////////////////////////////
-  /// @brief Reference to AssetManager for font loading
+  /// @brief Reference to IFontProvider for font loading
   ////////////////////////////////////////////////////////////
-  const AssetManager &m_asset_manager;
+  const IFontProvider &m_font_provider;
 
 public:
   ////////////////////////////////////////////////////////////
   /// @brief Constructor
   ///
-  /// @param asset_manager Reference to AssetManager
+  /// @param font_provider Reference to IFontProvider for font access
   ////////////////////////////////////////////////////////////
-  IUIStyleConfigurator(const AssetManager &asset_manager)
-      : m_asset_manager(asset_manager) {}
+  IUIStyleConfigurator(const IFontProvider &font_provider)
+      : m_font_provider(font_provider) {}
 
   ////////////////////////////////////////////////////////////
   /// @brief Virtual destructor

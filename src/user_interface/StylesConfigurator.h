@@ -8,8 +8,8 @@
 /////////////////////////////////////////////////
 #pragma once
 
-#include "AssetManager.h"
 #include "FailInfo.h"
+#include "IFontProvider.h"
 #include "UIStyle.h"
 #include "ui_style_generated.h"
 #include <expected>
@@ -33,19 +33,20 @@ public:
   /// @brief Configure a UIStyle object based on the provided flatbuffer
   ///
   /// @param style_data Flatbuffer data containing style configuration
+  /// @param font_provider Reference to IFontProvider for font loading
   /////////////////////////////////////////////////
   std::expected<UIStyle, FailInfo>
   ConfigureStyle(const UIStyleData &style_data,
-                 const AssetManager &asset_manager);
+                 const IFontProvider &font_provider);
 
   /////////////////////////////////////////////////
   /// @brief Provide a map of all available UIStyles
   ///
-  /// @param asset_manager Reference to the AssetManager for font loading
+  /// @param font_provider Reference to IFontProvider for font loading
   /// @param style_names Vector of style names to load
   /////////////////////////////////////////////////
   std::expected<std::unordered_map<std::string, UIStyle>, FailInfo>
-  ProvideUIStylesMap(const AssetManager &asset_manager,
+  ProvideUIStylesMap(const IFontProvider &font_provider,
                      std::vector<std::string> style_names = {});
 };
 } // namespace steamrot

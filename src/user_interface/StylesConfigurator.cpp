@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "StylesConfigurator.h"
 #include "FlatbuffersDataLoader.h"
+#include "IFontProvider.h"
 #include "UIStyle.h"
 #include "types_generated.h"
 #include <expected>
@@ -33,7 +34,7 @@ static sf::Vector2f ToVec2f(const Vector2fData *vec_fb) {
 /////////////////////////////////////////////////
 std::expected<UIStyle, FailInfo>
 StylesConfigurator::ConfigureStyle(const UIStyleData &style_data,
-                                   const AssetManager &asset_manager) {
+                                   const IFontProvider &font_provider) {
   UIStyle ui_style;
 
   // ----- PanelStyle -----
@@ -121,7 +122,7 @@ StylesConfigurator::ConfigureStyle(const UIStyleData &style_data,
   ui_style.button_style.maximum_size = ToVec2f(button_style_fb->maximum_size());
   ui_style.button_style.text_color = ToColor(button_fb->text_color());
   ui_style.button_style.hover_color = ToColor(button_fb->hover_color());
-  auto get_font_result = asset_manager.GetFont(button_fb->font()->str());
+  auto get_font_result = font_provider.GetFont(button_fb->font()->str());
   if (!get_font_result.has_value())
     return std::unexpected(get_font_result.error());
   ui_style.button_style.font = get_font_result.value();
@@ -232,7 +233,7 @@ StylesConfigurator::ConfigureStyle(const UIStyleData &style_data,
   ui_style.drop_down_list_style.hover_color =
       ToColor(dd_list_fb->hover_color());
   auto get_dd_list_font_result =
-      asset_manager.GetFont(dd_list_fb->font()->str());
+      font_provider.GetFont(dd_list_fb->font()->str());
   if (!get_dd_list_font_result.has_value())
     return std::unexpected(get_dd_list_font_result.error());
   ui_style.drop_down_list_style.font = get_dd_list_font_result.value();
@@ -296,7 +297,7 @@ StylesConfigurator::ConfigureStyle(const UIStyleData &style_data,
   ui_style.drop_down_item_style.hover_color =
       ToColor(dd_item_fb->hover_color());
   auto get_dd_item_font_result =
-      asset_manager.GetFont(dd_item_fb->font()->str());
+      font_provider.GetFont(dd_item_fb->font()->str());
   if (!get_dd_item_font_result.has_value())
     return std::unexpected(get_dd_item_font_result.error());
   ui_style.drop_down_item_style.font = get_dd_item_font_result.value();
@@ -370,7 +371,7 @@ StylesConfigurator::ConfigureStyle(const UIStyleData &style_data,
 
 /////////////////////////////////////////////////
 std::expected<std::unordered_map<std::string, UIStyle>, FailInfo>
-StylesConfigurator::ProvideUIStylesMap(const AssetManager &asset_manager,
+StylesConfigurator::ProvideUIStylesMap(const IFontProvider &font_provider,
                                        std::vector<std::string> style_names) {
   {
     // create map to return
@@ -386,7 +387,7 @@ StylesConfigurator::ProvideUIStylesMap(const AssetManager &asset_manager,
         return std::unexpected(style_data_result.error());
       }
       auto ui_style_result =
-          ConfigureStyle(*style_data_result.value(), asset_manager);
+          ConfigureStyle(*style_data_result.value(), font_provider);
       if (!ui_style_result) {
         return std::unexpected(ui_style_result.error());
       }
