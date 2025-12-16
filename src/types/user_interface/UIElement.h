@@ -12,8 +12,9 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "LayoutType.h"
+#include "SpacingAndSizingType.h"
 #include "Subscriber.h"
-#include "user_interface_generated.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <vector>
@@ -66,13 +67,12 @@ struct UIElement {
   /// @brief Spacing and sizing strategy for the children elements defaulting to
   /// Even
   /////////////////////////////////////////////////
-  SpacingAndSizingType spacing_strategy{
-      SpacingAndSizingType::SpacingAndSizingType_Even};
+  SpacingAndSizingType spacing_strategy{SpacingAndSizingType::Even};
 
   /////////////////////////////////////////////////
   /// @brief Layout type of the children elements
   /////////////////////////////////////////////////
-  LayoutType layout{LayoutType::LayoutType_Vertical};
+  LayoutType layout{LayoutType::Vertical};
 
   /////////////////////////////////////////////////
   /// @brief Create a deep copy of this UI element and its children

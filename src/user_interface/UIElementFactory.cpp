@@ -16,6 +16,45 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
+/// @brief Convert FlatBuffers LayoutType to native LayoutType
+/////////////////////////////////////////////////
+static LayoutType ConvertLayoutType(int8_t fbs_layout) {
+  switch (fbs_layout) {
+  case LayoutType_None:
+    return LayoutType::None;
+  case LayoutType_Horizontal:
+    return LayoutType::Horizontal;
+  case LayoutType_Vertical:
+    return LayoutType::Vertical;
+  case LayoutType_Grid:
+    return LayoutType::Grid;
+  case LayoutType_DropDown:
+    return LayoutType::DropDown;
+  default:
+    return LayoutType::None;
+  }
+}
+
+/////////////////////////////////////////////////
+/// @brief Convert FlatBuffers SpacingAndSizingType to native type
+/////////////////////////////////////////////////
+static SpacingAndSizingType
+ConvertSpacingAndSizingType(int8_t fbs_spacing) {
+  switch (fbs_spacing) {
+  case SpacingAndSizingType_None:
+    return SpacingAndSizingType::None;
+  case SpacingAndSizingType_Even:
+    return SpacingAndSizingType::Even;
+  case SpacingAndSizingType_Ratioed:
+    return SpacingAndSizingType::Ratioed;
+  case SpacingAndSizingType_DropDownList:
+    return SpacingAndSizingType::DropDownList;
+  default:
+    return SpacingAndSizingType::None;
+  }
+}
+
+/////////////////////////////////////////////////
 std::expected<std::unique_ptr<UIElement>, FailInfo>
 CreateUIElement(const UIElementDataUnion &data_type, const void *data,
                 EventHandler &event_hanlder) {
@@ -169,8 +208,8 @@ ConfigureBaseUIElement(UIElement &element, const UIElementData &data,
     element.response_event = event_packet;
   }
 
-  element.spacing_strategy = data.spacing_strategy();
-  element.layout = data.layout();
+  element.spacing_strategy = ConvertSpacingAndSizingType(data.spacing_strategy());
+  element.layout = ConvertLayoutType(data.layout());
   element.children_active = data.children_active();
 
   // Recursively create and attach children
