@@ -1,7 +1,5 @@
 add_executable(test_events
-Subscriber.test.cpp
 subscriber_factory.test.cpp
-UserInputBitset.test.cpp
 EventHandler.test.cpp
 )
 

@@ -15,9 +15,8 @@ using namespace steamrot;
 TEST_CASE("UserInputBitset default constructor resets all bits",
           "[unit][UserInputBitset]") {
   UserInputBitset input;
-  for (size_t i = 0; i < kTotalBits; ++i) {
-    REQUIRE_FALSE(input.test(i));
-  }
+
+  REQUIRE(input.none());
 }
 
 TEST_CASE("UserInputBitset sets key pressed and released bits correctly",
@@ -47,9 +46,8 @@ TEST_CASE("UserInputBitset resets all bits", "[unit][UserInputBitset]") {
   input.setKeyPressed(sf::Keyboard::Key::A);
   input.setMousePressed(sf::Mouse::Button::Left);
   input.reset();
-  for (size_t i = 0; i < kTotalBits; ++i) {
-    REQUIRE_FALSE(input.test(i));
-  }
+
+  REQUIRE(input.none());
 }
 
 TEST_CASE(

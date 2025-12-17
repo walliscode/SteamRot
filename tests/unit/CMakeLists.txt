@@ -13,4 +13,4 @@ add_subdirectory(events)
 # add_subdirectory(logic)
 # add_subdirectory(scenes)
 # add_subdirectory(engine)
-
+add_subdirectory(types)

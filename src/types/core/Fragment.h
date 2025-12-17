@@ -20,22 +20,22 @@ struct Fragment {
   /////////////////////////////////////////////////
   /// @brief Fragment name
   /////////////////////////////////////////////////
-  std::string m_name{"unnamed fragment"};
+  std::string name{"unnamed fragment"};
 
   /////////////////////////////////////////////////
   /// @brief Local positions of the Fragment's sockets
   /////////////////////////////////////////////////
-  std::vector<sf::Vector2f> m_sockets;
+  std::vector<sf::Vector2f> sockets;
 
   /////////////////////////////////////////////////
   /// @brief Global transform of the fragment
   /////////////////////////////////////////////////
-  sf::Transform m_transform;
+  sf::Transform transform;
 
   /////////////////////////////////////////////////
   /// @brief Contains all the render overlays for this fragment, describing each
   /// possible view.
   /////////////////////////////////////////////////
-  std::unordered_map<ViewDirection, sf::VertexArray> m_overlays;
+  std::unordered_map<ViewDirection, sf::VertexArray> render_overlays;
 };
 } // namespace steamrot

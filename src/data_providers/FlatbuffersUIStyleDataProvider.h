@@ -11,6 +11,7 @@
 #include "FailInfo.h"
 #include "IUIStyleDataProvider.h"
 #include "UIStyle.h"
+#include "ui_style_generated.h"
 #include <expected>
 #include <vector>
 namespace steamrot {
@@ -31,7 +32,8 @@ public:
 
 private:
   /////////////////////////////////////////////////
-  /// @brief Validates and configures base Style properties from FlatBuffers data
+  /// @brief Validates and configures base Style properties from FlatBuffers
+  /// data
   ///
   /// @param style_fb FlatBuffers StyleData to read from
   /// @param style Style object to configure
@@ -50,8 +52,7 @@ private:
   /// @return monostate on success, FailInfo on error
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo>
-  ConfigurePanelStyle(const PanelStyleData *panel_fb,
-                      PanelStyle &panel_style);
+  ConfigurePanelStyle(const PanelStyleData *panel_fb, PanelStyle &panel_style);
 
   /////////////////////////////////////////////////
   /// @brief Configures ButtonStyle from FlatBuffers data
@@ -71,8 +72,7 @@ private:
   /// @param dd_container_style DropDownContainerStyle object to configure
   /// @return monostate on success, FailInfo on error
   /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  ConfigureDropDownContainerStyle(
+  std::expected<std::monostate, FailInfo> ConfigureDropDownContainerStyle(
       const DropDownContainerStyleData *dd_container_fb,
       DropDownContainerStyle &dd_container_style);
 

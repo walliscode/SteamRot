@@ -231,7 +231,7 @@ CreateEventPacketFromData(const EventPacketData *packet_data) {
   }
 
   EventPacket event_packet(packet_data->event_lifetime());
-  event_packet.m_event_type = packet_data->event_type();
+  event_packet.event_type = packet_data->event_type();
 
   auto event_data_result = CreateEventData(packet_data->event_data_data_type(),
                                            packet_data->event_data_data());
@@ -240,7 +240,7 @@ CreateEventPacketFromData(const EventPacketData *packet_data) {
     return std::unexpected(event_data_result.error());
   }
 
-  event_packet.m_event_data = event_data_result.value();
+  event_packet.event_data = event_data_result.value();
 
   return event_packet;
 }

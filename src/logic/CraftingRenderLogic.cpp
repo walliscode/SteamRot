@@ -59,7 +59,7 @@ void CraftingRenderLogic::DrawMachinaForm() {
 void CraftingRenderLogic::RenderJoint(Joint &joint) {
 
   // should be as simple as applying the transform to the render overlay
-  m_scene_context.scene_texture.draw(joint.m_render_overlay, joint.m_transform);
+  m_scene_context.scene_texture.draw(joint.render_overlay, joint.transform);
 }
 
 /////////////////////////////////////////////////
@@ -67,7 +67,7 @@ void CraftingRenderLogic::RenderFragment(Fragment &fragment) {
 
   // should be as simple as applying the transform to the render overlay
   m_scene_context.scene_texture.draw(
-      fragment.m_overlays[ViewDirection::ViewDirection_FRONT],
-      fragment.m_transform);
+      fragment.render_overlays[ViewDirection::ViewDirection_FRONT],
+      fragment.transform);
 }
 } // namespace steamrot

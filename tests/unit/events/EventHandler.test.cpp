@@ -169,8 +169,7 @@ TEST_CASE("EventHandler::TickGlobalEventBus updates the global event bus",
   REQUIRE(global_event_bus.empty());
 }
 
-TEST_CASE("UpdateSubscribers turns on Subscribers",
-          "[unit][EventHandler]") {
+TEST_CASE("UpdateSubscribers turns on Subscribers", "[unit][EventHandler]") {
 
   // create Subscriber variables
   const steamrot::EventType event_type =
@@ -218,7 +217,7 @@ TEST_CASE("EventHandler::UpdateSubscribersFrom does not update Subscribers "
 
   // Create some EventPackets to add that do not match the subscriber
   steamrot::EventPacket event1{2};
-  event1.m_event_type = steamrot::EventType::EventType_EVENT_TEST;
+  event1.event_type = steamrot::EventType::EventType_EVENT_TEST;
   std::vector<steamrot::EventPacket> events_to_add = {event1};
 
   // Add events to the global event bus
@@ -353,8 +352,8 @@ TEST_CASE("EventHandler::UpdateSubscribersFromGlobalEventBus updates correct "
 
   // Add one EventPacket with matching event data
   steamrot::EventPacket event1{2};
-  event1.m_event_type = event_type;
-  event1.m_event_data = user_input_bitset;
+  event1.event_type = event_type;
+  event1.event_data = user_input_bitset;
   std::vector<steamrot::EventPacket> events_to_add = {event1};
   for (const auto &event : events_to_add)
     event_handler.AddEvent(event);
