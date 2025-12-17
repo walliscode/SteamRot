@@ -39,4 +39,5 @@ ISceneDataProvider &GetSceneDataProvider() {
   static FlatbuffersSceneDataProvider provider;
   return provider;
 }
+
 } // namespace steamrot
