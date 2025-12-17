@@ -11,12 +11,6 @@
 #include "FailInfo.h"
 #include "UIStyle.h"
 #include <expected>
-<<<<<<< HEAD
-#include <memory>
-#include <string>
-#include <unordered_map>
-=======
->>>>>>> a7787f7 (builds successfully)
 #include <vector>
 
 namespace steamrot {
@@ -26,7 +20,8 @@ class IFontProvider;
 
 ////////////////////////////////////////////////////////////
 /// @class IUIStyleDataProvider
-/// @brief Interface for loading and configuring UI style data from various sources
+/// @brief Interface for loading and configuring UI style data from various
+/// sources
 ///
 /// Providers load raw style data and configure UIStyle objects using the
 /// provided IFontProvider for font resources.
@@ -55,19 +50,9 @@ public:
   ////////////////////////////////////////////////////////////
   /// @brief Load and configure multiple UI styles by name
   ///
-<<<<<<< HEAD
-  /// @param font_provider Reference to IFontProvider for loading fonts
-  /// @param style_names Vector of style names to load
-  /// @return Map of style name to configured UIStyle, or error
-  ////////////////////////////////////////////////////////////
-  virtual std::expected<std::unordered_map<std::string, UIStyle>, FailInfo>
-  ProvideUIStylesMap(const IFontProvider &font_provider,
-                     const std::vector<std::string> &style_names) = 0;
-=======
   /// @return Vector of style data wrappers, or error
   ////////////////////////////////////////////////////////////
   virtual std::expected<std::vector<UIStyle>, FailInfo> ProvideUIStyles() = 0;
->>>>>>> a7787f7 (builds successfully)
 };
 
 } // namespace steamrot

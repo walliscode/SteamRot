@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "AssetManager.h"
 #include "FailInfo.h"
+
 #include "FlatbuffersUIStyleDataProvider.h"
 #include "IAssetDataProvider.h"
 #include "paths.h"
@@ -49,7 +50,7 @@ std::expected<std::monostate, FailInfo> AssetManager::LoadDefaultAssets() {
     return std::unexpected<FailInfo>({FailMode::FlatbuffersDataNotFound,
                                       "No UI styles defined in AssetData"});
 
-  auto load_ui_style_result = LoadUIStyles(asset_data.ui_styles);
+  auto load_ui_style_result = LoadUIStyles();
   if (!load_ui_style_result.has_value())
     return std::unexpected<FailInfo>(load_ui_style_result.error());
 
@@ -117,8 +118,7 @@ AssetManager::AddFont(const std::string &font_name) {
   return std::monostate{};
 }
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-AssetManager::LoadUIStyles(std::vector<std::string> &style_names) {
+std::expected<std::monostate, FailInfo> AssetManager::LoadUIStyles() {
 
   // create UIStyleDataProivder
   FlatbuffersUIStyleDataProvider ui_style_provider(m_fonts);
