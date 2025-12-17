@@ -24,7 +24,8 @@ TEST_CASE("DropDownListElement: Default Constructor", "[types]") {
   REQUIRE(dropdown.is_expanded == false);
   REQUIRE(dropdown.unexpanded_label == "items...");
   REQUIRE(dropdown.expanded_label == "items...");
-  REQUIRE(dropdown.data_populate_function == steamrot::DataPopulateFunction::DataPopulateFunction_None);
+  REQUIRE(dropdown.data_populate_function ==
+          steamrot::DataPopulateFunction::DataPopulateFunction_None);
 }
 
 TEST_CASE("DropDownListElement: Clone Method", "[types]") {
@@ -38,10 +39,12 @@ TEST_CASE("DropDownListElement: Clone Method", "[types]") {
   original.is_expanded = true;
   original.unexpanded_label = "Select item";
   original.expanded_label = "Hide items";
-  original.data_populate_function = steamrot::DataPopulateFunction::DataPopulateFunction_GrimoireAttackTypes;
+  original.data_populate_function = steamrot::DataPopulateFunction::
+      DataPopulateFunction_PopulateWithFragmentData;
 
   auto cloned_ptr = original.Clone();
-  auto *cloned = dynamic_cast<steamrot::DropDownListElement *>(cloned_ptr.get());
+  auto *cloned =
+      dynamic_cast<steamrot::DropDownListElement *>(cloned_ptr.get());
 
   REQUIRE(cloned != nullptr);
   REQUIRE(cloned->position == sf::Vector2f{10.f, 20.f});
@@ -53,5 +56,7 @@ TEST_CASE("DropDownListElement: Clone Method", "[types]") {
   REQUIRE(cloned->is_expanded == true);
   REQUIRE(cloned->unexpanded_label == "Select item");
   REQUIRE(cloned->expanded_label == "Hide items");
-  REQUIRE(cloned->data_populate_function == steamrot::DataPopulateFunction::DataPopulateFunction_GrimoireAttackTypes);
+  REQUIRE(cloned->data_populate_function ==
+          steamrot::DataPopulateFunction::
+              DataPopulateFunction_PopulateWithFragmentData);
 }

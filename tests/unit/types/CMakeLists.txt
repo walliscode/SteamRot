@@ -16,6 +16,9 @@ add_executable(test_types
   user_interface/DropDownContainerElement.test.cpp
   user_interface/DropDownButtonElement.test.cpp
   user_interface/DropDownItemElement.test.cpp
+
+  user_interface/styles/Style.test.cpp
+  user_interface/styles/ButtonStyle.test.cpp
 )
 
 target_link_libraries(test_types PRIVATE
