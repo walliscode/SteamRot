@@ -10,7 +10,7 @@
 #include "CMachinaForm.h"
 #include "FailInfo.h"
 #include "FlatbuffersSubscriberViewer.h"
-#include "UIElementFactory.h"
+#include "FlatbuffersUIElementConfigurator.h"
 #include "containers.h"
 #include "entity_memory.h"
 #include "ui_state_generated.h"
@@ -131,11 +131,10 @@ FlatbuffersEntityConfigurator::ConfigureCUserInterface(
     return std::unexpected(fail_info);
   }
 
-  // create the root UI element using the factory function, this will
+  // create the root UI element using the configurator, this will
   // recursively create the nested structure
-  auto root_element_result =
-      CreateUIElement(UIElementDataUnion::UIElementDataUnion_PanelData,
-                      ui_data->root_ui_element(), m_event_handler);
+  FlatbuffersUIElementConfigurator ui_configurator(m_event_handler, *ui_data);
+  auto root_element_result = ui_configurator.CreateRootUIElement();
   if (!root_element_result.has_value())
     return std::unexpected(root_element_result.error());
 

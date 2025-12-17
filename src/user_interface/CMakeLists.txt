@@ -1,6 +1,6 @@
 add_library(user_interface
-UIElementFactory.cpp
-StylesConfigurator.cpp
+FlatbuffersStylesConfigurator.cpp
+FlatbuffersUIElementConfigurator.cpp
 )
 
 target_include_directories(user_interface
@@ -15,5 +15,7 @@ target_link_libraries(user_interface
   events
   data_providers
   assets
+  interfaces
+  configuration
 )
 
