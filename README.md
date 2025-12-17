@@ -100,7 +100,8 @@ The `documentation/` directory contains comprehensive guides organized by topic:
 - **[Resource Configuration](documentation/configuration/RESOURCE_CONFIGURATION.md)** - Resource management
 
 ### 🧪 Testing
-- **[Testing Overview](documentation/testing/TESTING_OVERVIEW.md)** - Test structure and classification
+- **[Unit Testing Guide](documentation/testing/UNIT_TESTING_GUIDE.md)** - Complete layer-by-layer testing guide
+- **[Testing Quick Reference](documentation/testing/TESTING_QUICK_REFERENCE.md)** - Quick testing patterns and checklists
 - **[Test Data Configuration](documentation/testing/TEST_DATA_CONFIGURATION.md)** - Data-driven testing
 
 ### 📝 Style & Conventions
