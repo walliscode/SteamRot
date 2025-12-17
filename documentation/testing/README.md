@@ -43,6 +43,18 @@ Full working examples demonstrating:
 
 **Use this when**: You want to see complete examples or need a template to adapt.
 
+#### [Architecture Layers](ARCHITECTURE_LAYERS.md)
+**Visual architecture diagram and layer dependencies**
+
+Comprehensive architecture overview:
+- Visual layer diagram with dependencies
+- Detailed layer descriptions
+- Directory mapping (src/ to tests/)
+- Coverage status by layer
+- Testing strategy and priorities
+
+**Use this when**: You need to understand the architecture or identify which layer a class belongs to.
+
 #### [Test Data Configuration](TEST_DATA_CONFIGURATION.md)
 **Guide for data-driven testing with FlatBuffers**
 
