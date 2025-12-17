@@ -1,5 +1,6 @@
 add_library(user_interface
 FlatbuffersUIElementConfigurator.cpp
+StylesConfigurator.cpp
 )
 
 target_include_directories(user_interface
