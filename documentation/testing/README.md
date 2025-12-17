@@ -55,6 +55,18 @@ Comprehensive architecture overview:
 
 **Use this when**: You need to understand the architecture or identify which layer a class belongs to.
 
+#### [Testing To-Do List](TESTING_TODO_LIST.md)
+**Comprehensive actionable checklist for all testing tasks**
+
+Complete work list with:
+- 66 specific tasks organized by layer
+- Detailed test requirements for each file
+- Checkboxes to track progress
+- Recommended work order and phases
+- Daily work plan template
+
+**Use this when**: You need a specific task list to work through systematically.
+
 #### [Test Data Configuration](TEST_DATA_CONFIGURATION.md)
 **Guide for data-driven testing with FlatBuffers**
 

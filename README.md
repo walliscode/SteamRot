@@ -101,6 +101,7 @@ The `documentation/` directory contains comprehensive guides organized by topic:
 
 ### 🧪 Testing
 - **[Unit Testing Guide](documentation/testing/UNIT_TESTING_GUIDE.md)** - Complete layer-by-layer testing guide
+- **[Testing To-Do List](documentation/testing/TESTING_TODO_LIST.md)** - Comprehensive actionable task list (66 items)
 - **[Testing Quick Reference](documentation/testing/TESTING_QUICK_REFERENCE.md)** - Quick testing patterns and checklists
 - **[Testing Examples](documentation/testing/TESTING_EXAMPLES.md)** - Real-world examples for each layer
 - **[Architecture Layers](documentation/testing/ARCHITECTURE_LAYERS.md)** - Visual architecture and dependencies
