@@ -102,6 +102,7 @@ The `documentation/` directory contains comprehensive guides organized by topic:
 ### 🧪 Testing
 - **[Unit Testing Guide](documentation/testing/UNIT_TESTING_GUIDE.md)** - Complete layer-by-layer testing guide
 - **[Testing Quick Reference](documentation/testing/TESTING_QUICK_REFERENCE.md)** - Quick testing patterns and checklists
+- **[Testing Examples](documentation/testing/TESTING_EXAMPLES.md)** - Real-world examples for each layer
 - **[Test Data Configuration](documentation/testing/TEST_DATA_CONFIGURATION.md)** - Data-driven testing
 
 ### 📝 Style & Conventions

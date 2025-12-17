@@ -31,6 +31,18 @@ A concise reference guide with:
 
 **Use this when**: You need a quick reminder of testing patterns or want a checklist.
 
+#### [Testing Examples](TESTING_EXAMPLES.md)
+**Complete real-world testing examples for each layer**
+
+Full working examples demonstrating:
+- Complete test files for each layer (0-6)
+- Real code that can be adapted
+- Edge cases and error handling
+- CMakeLists.txt integration
+- Common patterns in practice
+
+**Use this when**: You want to see complete examples or need a template to adapt.
+
 #### [Test Data Configuration](TEST_DATA_CONFIGURATION.md)
 **Guide for data-driven testing with FlatBuffers**
 
