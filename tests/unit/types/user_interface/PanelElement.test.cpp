@@ -1,0 +1,45 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Unit tests for PanelElement type
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include "PanelElement.h"
+#include <catch2/catch_test_macros.hpp>
+
+TEST_CASE("PanelElement: Default Constructor", "[types]") {
+  steamrot::PanelElement panel;
+
+  REQUIRE(panel.position == sf::Vector2f{0.f, 0.f});
+  REQUIRE(panel.size == sf::Vector2f{0.f, 0.f});
+  REQUIRE(panel.is_mouse_over == false);
+  REQUIRE(panel.subscription == nullptr);
+  REQUIRE(panel.response_event == std::nullopt);
+  REQUIRE(panel.children_active == false);
+  REQUIRE(panel.child_elements.empty());
+  REQUIRE(panel.layout == steamrot::Layout::Vertical);
+  REQUIRE(panel.spacing_strategy == steamrot::SpacingAndSizing::Even);
+}
+
+TEST_CASE("PanelElement: Clone Method", "[types]") {
+  steamrot::PanelElement original;
+  original.position = sf::Vector2f{10.f, 20.f};
+  original.size = sf::Vector2f{100.f, 50.f};
+  original.is_mouse_over = true;
+  original.children_active = true;
+  original.layout = steamrot::Layout::Horizontal;
+  original.spacing_strategy = steamrot::SpacingAndSizing::Even;
+
+  auto cloned_ptr = original.Clone();
+  auto *cloned = dynamic_cast<steamrot::PanelElement *>(cloned_ptr.get());
+
+  REQUIRE(cloned != nullptr);
+  REQUIRE(cloned->position == sf::Vector2f{10.f, 20.f});
+  REQUIRE(cloned->size == sf::Vector2f{100.f, 50.f});
+  REQUIRE(cloned->is_mouse_over == true);
+  REQUIRE(cloned->children_active == true);
+  REQUIRE(cloned->layout == steamrot::Layout::Horizontal);
+  REQUIRE(cloned->spacing_strategy == steamrot::SpacingAndSizing::Even);
+}
