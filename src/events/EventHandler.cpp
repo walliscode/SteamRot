@@ -98,13 +98,13 @@ void HandleSFMLEvents(sf::RenderWindow &window, EventHandler &event_handler) {
     EventPacket event_packet(1);
 
     // set the event type to UserInputEvent
-    event_packet.m_event_type = EventType::EventType_EVENT_USER_INPUT;
+    event_packet.event_type = EventType::EventType_EVENT_USER_INPUT;
 
     // create a UserInputBitset from the vector of hardware events
     auto user_input_bitset = UserInputBitset{user_input_events};
 
     // set the event data to the UserInputBitset
-    event_packet.m_event_data = user_input_bitset;
+    event_packet.event_data = user_input_bitset;
 
     // add the event packet to the waiting room event bus
     event_handler.AddEvent(event_packet);
@@ -124,14 +124,13 @@ void EventHandler::UpateSubscribersFromGlobalEventBus() {
   // go through each event in the global event bus
   for (const auto &event : m_global_event_bus) {
 
-    if (m_subscriber_register.contains(event.m_event_type)) {
+    if (m_subscriber_register.contains(event.event_type)) {
 
       // go through each subscriber registered for the event type
-      for (auto &subscriber_weak :
-           m_subscriber_register.at(event.m_event_type)) {
+      for (auto &subscriber_weak : m_subscriber_register.at(event.event_type)) {
 
         // pass to the UpdateSubscriber function
-        UpdateSubscriber(subscriber_weak, event.m_event_data);
+        UpdateSubscriber(subscriber_weak, event.event_data);
       }
     }
   }

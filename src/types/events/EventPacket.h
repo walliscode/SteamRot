@@ -33,17 +33,17 @@ struct EventPacket {
   EventPacket(uint8_t lifetime) : event_lifetime(lifetime) {}
 
   EventPacket(EventType event_type, EventData event_data, uint8_t lifetime = 1)
-      : m_event_type(event_type), m_event_data(event_data),
+      : event_type(event_type), event_data(event_data),
         event_lifetime(lifetime) {}
   /////////////////////////////////////////////////
   /// @brief Enum based name for the event type
   /////////////////////////////////////////////////
-  EventType m_event_type{EventType::EventType_NONE};
+  EventType event_type{EventType::EventType_NONE};
 
   /////////////////////////////////////////////////
   /// @brief Specific data for the event
   /////////////////////////////////////////////////
-  EventData m_event_data{std::monostate{}};
+  EventData event_data{std::monostate{}};
 
   /////////////////////////////////////////////////
   /// @brief Unique identifier for the event
