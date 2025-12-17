@@ -28,6 +28,8 @@ public:
           &fonts_map);
 
   std::expected<std::vector<UIStyle>, FailInfo> ProvideUIStyles() override;
+
+private:
   /////////////////////////////////////////////////
   /// @brief Validates and configures base Style properties from FlatBuffers data
   ///
