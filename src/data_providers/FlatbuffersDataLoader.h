@@ -24,8 +24,6 @@
 #include "user_preferences_generated.h"
 #include <expected>
 
-#include <string>
-
 namespace steamrot {
 class FlatbuffersDataLoader : public DataLoader {
 
@@ -57,10 +55,10 @@ public:
   ProvideAssetData(const SceneType scene_type) const;
 
   /////////////////////////////////////////////////
-  /// @brief Provide a single UIStyleData object
+  /// @brief find and load all ui styles from flatbuffers data
   /////////////////////////////////////////////////
-  std::expected<const UIStyleData *, FailInfo>
-  ProvideUIStylesData(const std::string &style_name) const;
+  std::expected<std::vector<const UIStyleData *>, FailInfo>
+  ProvideUIStylesData() const;
 
   /////////////////////////////////////////////////
   /// @brief Provides ContextData from binary file

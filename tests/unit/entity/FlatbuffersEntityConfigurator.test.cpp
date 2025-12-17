@@ -10,6 +10,7 @@
 #include "ButtonElement.h"
 #include "EventHandler.h"
 #include "PanelElement.h"
+#include "SpacingAndSizing.h"
 #include "Subscriber.h"
 #include "containers.h"
 #include "entities_generated.h"
@@ -96,8 +97,8 @@ TEST_CASE("FlatbuffersEntityConfigurator::Constructor",
 
   REQUIRE(root_panel.size == sf::Vector2f(300.0f, 400.0f));
   REQUIRE(root_panel.position == sf::Vector2f(100.0f, 200.0f));
-  REQUIRE(root_panel.layout == steamrot::LayoutType_Horizontal);
-  REQUIRE(root_panel.spacing_strategy == steamrot::SpacingAndSizingType_None);
+  REQUIRE(root_panel.layout == steamrot::Layout::Horizontal);
+  REQUIRE(root_panel.spacing_strategy == steamrot::SpacingAndSizing::Even);
   REQUIRE(root_panel.child_elements.size() == 1);
 
   // check thet child element is ButtonElement and assign it

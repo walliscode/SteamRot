@@ -8,8 +8,8 @@
 /////////////////////////////////////////////////
 #include "AssetManager.h"
 #include "FailInfo.h"
+#include "FlatbuffersUIStyleDataProvider.h"
 #include "IAssetDataProvider.h"
-#include "StylesConfigurator.h"
 #include "paths.h"
 #include "provider_factory.h"
 #include <SFML/Graphics/Font.hpp>
@@ -120,36 +120,23 @@ AssetManager::AddFont(const std::string &font_name) {
 std::expected<std::monostate, FailInfo>
 AssetManager::LoadUIStyles(std::vector<std::string> &style_names) {
 
-  // create StylesConfigurator object
-  StylesConfigurator styles_configurator;
-  // provide map of UIStyles
-  auto ui_styles_map_result =
-      styles_configurator.ProvideUIStylesMap(*this, style_names);
+  // create UIStyleDataProivder
+  FlatbuffersUIStyleDataProvider ui_style_provider(m_fonts);
 
-  if (!ui_styles_map_result.has_value()) {
-    return std::unexpected<FailInfo>(ui_styles_map_result.error());
+  auto ui_style_data_result = ui_style_provider.ProvideUIStyles();
+  if (!ui_style_data_result.has_value())
+    return std::unexpected<FailInfo>(ui_style_data_result.error());
+
+  // for each UIStyle object, add to map
+  for (const auto &ui_style : ui_style_data_result.value()) {
+    auto insert_result = m_ui_styles.insert({ui_style.name, ui_style});
+    if (!insert_result.second)
+      return std::unexpected<FailInfo>(
+          {FailMode::NotAddedToMap,
+           std::format("Failed to insert UIStyle: {}", ui_style.name)});
   }
-  m_ui_styles = ui_styles_map_result.value();
 
   return std::monostate();
-}
-/////////////////////////////////////////////////
-std::expected<std::shared_ptr<const sf::Font>, FailInfo>
-AssetManager::GetFont(const std::string &font_name) const {
-
-  // check if font exists in the map
-  auto it = m_fonts.find(font_name);
-
-  if (it != m_fonts.end()) {
-    // have to use cref to create a reference wrapper
-    return it->second;
-  }
-  // construct error message
-  std::string error_message =
-      std::format("Font not found in font map: {}", font_name);
-  FailInfo fail_info{FailMode::FileNotFound, error_message};
-  // return early with FileNotFound error
-  return std::unexpected<FailInfo>(fail_info);
 }
 
 /////////////////////////////////////////////////

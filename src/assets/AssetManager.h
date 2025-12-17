@@ -73,16 +73,6 @@ public:
   LoadUIStyles(std::vector<std::string> &style_names);
 
   /////////////////////////////////////////////////
-  /// @brief Return a shared_ptr to a font from the AssetManager
-  ///
-  /// Implements IFontProvider interface
-  ///
-  /// @param font_name String representing the name of the font to retrieve.
-  /////////////////////////////////////////////////
-  std::expected<std::shared_ptr<const sf::Font>, FailInfo>
-  GetFont(const std::string &font_name) const override;
-
-  /////////////////////////////////////////////////
   /// @brief Returns a const reference to the entire font map.
   /////////////////////////////////////////////////
   const std::unordered_map<std::string, std::shared_ptr<const sf::Font>> &
