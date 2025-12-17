@@ -8,6 +8,7 @@ add_executable(test_types
 
   events/Subscriber.test.cpp
   events/UserInputBitset.test.cpp
+  events/EventPacket.test.cpp
 
   user_interface/ButtonElement.test.cpp
   user_interface/PanelElement.test.cpp
