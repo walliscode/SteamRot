@@ -17,29 +17,36 @@ using FragmentIndex = uint8_t;
 using SocketIndex = uint8_t;
 
 struct Joint {
-  std::string m_joint_name{"base"};
+  /////////////////////////////////////////////////
+  /// @brief Name of the joint
+  /////////////////////////////////////////////////
+  std::string name{"unnamed"};
+
   /////////////////////////////////////////////////
   /// @brief The number of connections this joint can maintain
   /////////////////////////////////////////////////
-  uint8_t m_number_of_connections;
+  uint8_t connection_number;
 
   /////////////////////////////////////////////////
   /// @brief The posiiton of the middle of the joint in the RenderTexture
   /////////////////////////////////////////////////
-  sf::Vector2f m_global_position;
+  sf::Vector2f global_position;
 
   /////////////////////////////////////////////////
   /// @brief Connects joint to fragments
   ///
   /// The index is the connection point in the joint and the value is the index
   /////////////////////////////////////////////////
-  std::vector<std::pair<FragmentIndex, SocketIndex>> m_connected_fragments;
+  std::vector<std::pair<FragmentIndex, SocketIndex>> connected_fragments;
 
   /////////////////////////////////////////////////
   /// @brief Constructed vertex array for the visual solution of the joint
   /////////////////////////////////////////////////
-  sf::VertexArray m_render_overlay;
+  sf::VertexArray render_overlay;
 
-  sf::Transform m_transform;
+  /////////////////////////////////////////////////
+  /// @brief Total transform of the joint
+  /////////////////////////////////////////////////
+  sf::Transform transform;
 };
 } // namespace steamrot
