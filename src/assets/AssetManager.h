@@ -15,13 +15,11 @@
 #include "UIStyle.h"
 #include "scene_types_generated.h"
 #include <SFML/Graphics.hpp>
-
 #include <expected>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <variant>
-#include <vector>
 
 namespace steamrot {
 
@@ -65,20 +63,10 @@ public:
   LoadSceneAssets(const SceneType &scene_type);
 
   /////////////////////////////////////////////////
-  /// @brief Load UIStyle data to UIStyle map.
+  /// @brief Load all UI styles
   ///
-  /// @param style_data Flabuffer data containging UIStyle configuration data.
   /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  LoadUIStyles(std::vector<std::string> &style_names);
-
-  /////////////////////////////////////////////////
-  /// @brief Return a shared_ptr to a font from the AssetManager
-  ///
-  /// @param font_name String representing the name of the font to retrieve.
-  /////////////////////////////////////////////////
-  std::expected<std::shared_ptr<const sf::Font>, FailInfo>
-  GetFont(const std::string &font_name) const;
+  std::expected<std::monostate, FailInfo> LoadUIStyles();
 
   /////////////////////////////////////////////////
   /// @brief Returns a const reference to the entire font map.

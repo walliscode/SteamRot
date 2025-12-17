@@ -17,6 +17,7 @@
 #include <SFML/Graphics/VertexArray.hpp>
 #include <expected>
 #include <format>
+#include <vector>
 
 namespace steamrot {
 
@@ -121,30 +122,36 @@ FlatbuffersDataLoader::ProvideAssetData(const SceneType scene_type) const {
 }
 
 /////////////////////////////////////////////////
-std::expected<const UIStyleData *, FailInfo>
-FlatbuffersDataLoader::ProvideUIStylesData(
-    const std::string &style_name) const {
+std::expected<std::vector<const UIStyleData *>, FailInfo>
+FlatbuffersDataLoader::ProvideUIStylesData() const {
   // get the UIStyleDirectory
   std::filesystem::path ui_style_dir = paths::GetUIStylesDirectory();
 
-  // construct the file path
-  std::filesystem::path ui_style_path =
-      ui_style_dir / (style_name + ".styles.bin");
-  // check if the file exists
-  if (!std::filesystem::exists(ui_style_path)) {
-    std::string error_message =
-        std::format("UI Style file not found: {}", ui_style_path.string());
-    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
-  }
-  // load the UI style data
-  const steamrot::UIStyleData *ui_style_data =
-      GetUIStyleData(LoadBinaryData(ui_style_path));
-  if (!ui_style_data) {
-    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
-                                    "UIStyleData pointer is null"));
+  // find all fles in the directiry with styles.bin extension
+  std::vector<const UIStyleData *> ui_styles;
+
+  for (const auto &entry : std::filesystem::directory_iterator(ui_style_dir)) {
+
+    // check for .bin files ending with .styles.bin
+    if (entry.path().extension() == ".bin" &&
+        entry.path().filename().string().ends_with(".styles.bin")) {
+
+      // load the style data using the generated function from flatbuffers
+      const steamrot::UIStyleData *style_data =
+          GetUIStyleData(LoadBinaryData(entry.path()));
+      if (style_data) {
+        ui_styles.push_back(style_data);
+      } else {
+        // unexpected error if style data is null
+        std::string error_message = std::format(
+            "UIStyleData pointer is null for file: {}", entry.path().string());
+        return std::unexpected(
+            FailInfo(FailMode::FlatbuffersDataNotFound, error_message));
+      }
+    }
   }
 
-  return ui_style_data;
+  return ui_styles;
 }
 
 /////////////////////////////////////////////////

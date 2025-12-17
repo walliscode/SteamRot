@@ -4,7 +4,7 @@ include "../events/event_packet_data.fbs";
 namespace steamrot;
 
 
-enum LayoutType: byte{ 
+enum LayoutFbs: byte{ 
   None = 0,
   Horizontal = 1,
   Vertical = 2,
@@ -13,7 +13,7 @@ enum LayoutType: byte{
 
   }
 
-enum SpacingAndSizingType: byte {
+enum SpacingAndSizingFbs: byte {
     None = 0,
     Even = 1,
     Ratioed = 2,
@@ -42,8 +42,8 @@ table UIElementData{
     children_active: bool ;
     children: [child] (required);
     is_mouse_over: bool;
-    layout: LayoutType;
-    spacing_strategy: SpacingAndSizingType;
+    layout: LayoutFbs;
+    spacing_strategy: SpacingAndSizingFbs;
   }
 table PanelData{  base_data: UIElementData(required);}
 

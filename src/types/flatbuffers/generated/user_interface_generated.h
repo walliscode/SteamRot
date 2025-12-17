@@ -46,28 +46,28 @@ struct DropDownButtonDataBuilder;
 struct UserInterfaceData;
 struct UserInterfaceDataBuilder;
 
-enum LayoutType : int8_t {
-  LayoutType_None = 0,
-  LayoutType_Horizontal = 1,
-  LayoutType_Vertical = 2,
-  LayoutType_Grid = 3,
-  LayoutType_DropDown = 4,
-  LayoutType_MIN = LayoutType_None,
-  LayoutType_MAX = LayoutType_DropDown
+enum LayoutFbs : int8_t {
+  LayoutFbs_None = 0,
+  LayoutFbs_Horizontal = 1,
+  LayoutFbs_Vertical = 2,
+  LayoutFbs_Grid = 3,
+  LayoutFbs_DropDown = 4,
+  LayoutFbs_MIN = LayoutFbs_None,
+  LayoutFbs_MAX = LayoutFbs_DropDown
 };
 
-inline const LayoutType (&EnumValuesLayoutType())[5] {
-  static const LayoutType values[] = {
-    LayoutType_None,
-    LayoutType_Horizontal,
-    LayoutType_Vertical,
-    LayoutType_Grid,
-    LayoutType_DropDown
+inline const LayoutFbs (&EnumValuesLayoutFbs())[5] {
+  static const LayoutFbs values[] = {
+    LayoutFbs_None,
+    LayoutFbs_Horizontal,
+    LayoutFbs_Vertical,
+    LayoutFbs_Grid,
+    LayoutFbs_DropDown
   };
   return values;
 }
 
-inline const char * const *EnumNamesLayoutType() {
+inline const char * const *EnumNamesLayoutFbs() {
   static const char * const names[6] = {
     "None",
     "Horizontal",
@@ -79,32 +79,32 @@ inline const char * const *EnumNamesLayoutType() {
   return names;
 }
 
-inline const char *EnumNameLayoutType(LayoutType e) {
-  if (::flatbuffers::IsOutRange(e, LayoutType_None, LayoutType_DropDown)) return "";
+inline const char *EnumNameLayoutFbs(LayoutFbs e) {
+  if (::flatbuffers::IsOutRange(e, LayoutFbs_None, LayoutFbs_DropDown)) return "";
   const size_t index = static_cast<size_t>(e);
-  return EnumNamesLayoutType()[index];
+  return EnumNamesLayoutFbs()[index];
 }
 
-enum SpacingAndSizingType : int8_t {
-  SpacingAndSizingType_None = 0,
-  SpacingAndSizingType_Even = 1,
-  SpacingAndSizingType_Ratioed = 2,
-  SpacingAndSizingType_DropDownList = 3,
-  SpacingAndSizingType_MIN = SpacingAndSizingType_None,
-  SpacingAndSizingType_MAX = SpacingAndSizingType_DropDownList
+enum SpacingAndSizingFbs : int8_t {
+  SpacingAndSizingFbs_None = 0,
+  SpacingAndSizingFbs_Even = 1,
+  SpacingAndSizingFbs_Ratioed = 2,
+  SpacingAndSizingFbs_DropDownList = 3,
+  SpacingAndSizingFbs_MIN = SpacingAndSizingFbs_None,
+  SpacingAndSizingFbs_MAX = SpacingAndSizingFbs_DropDownList
 };
 
-inline const SpacingAndSizingType (&EnumValuesSpacingAndSizingType())[4] {
-  static const SpacingAndSizingType values[] = {
-    SpacingAndSizingType_None,
-    SpacingAndSizingType_Even,
-    SpacingAndSizingType_Ratioed,
-    SpacingAndSizingType_DropDownList
+inline const SpacingAndSizingFbs (&EnumValuesSpacingAndSizingFbs())[4] {
+  static const SpacingAndSizingFbs values[] = {
+    SpacingAndSizingFbs_None,
+    SpacingAndSizingFbs_Even,
+    SpacingAndSizingFbs_Ratioed,
+    SpacingAndSizingFbs_DropDownList
   };
   return values;
 }
 
-inline const char * const *EnumNamesSpacingAndSizingType() {
+inline const char * const *EnumNamesSpacingAndSizingFbs() {
   static const char * const names[5] = {
     "None",
     "Even",
@@ -115,10 +115,10 @@ inline const char * const *EnumNamesSpacingAndSizingType() {
   return names;
 }
 
-inline const char *EnumNameSpacingAndSizingType(SpacingAndSizingType e) {
-  if (::flatbuffers::IsOutRange(e, SpacingAndSizingType_None, SpacingAndSizingType_DropDownList)) return "";
+inline const char *EnumNameSpacingAndSizingFbs(SpacingAndSizingFbs e) {
+  if (::flatbuffers::IsOutRange(e, SpacingAndSizingFbs_None, SpacingAndSizingFbs_DropDownList)) return "";
   const size_t index = static_cast<size_t>(e);
-  return EnumNamesSpacingAndSizingType()[index];
+  return EnumNamesSpacingAndSizingFbs()[index];
 }
 
 enum UIElementDataUnion : uint8_t {
@@ -360,11 +360,11 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   bool is_mouse_over() const {
     return GetField<uint8_t>(VT_IS_MOUSE_OVER, 0) != 0;
   }
-  steamrot::LayoutType layout() const {
-    return static_cast<steamrot::LayoutType>(GetField<int8_t>(VT_LAYOUT, 0));
+  steamrot::LayoutFbs layout() const {
+    return static_cast<steamrot::LayoutFbs>(GetField<int8_t>(VT_LAYOUT, 0));
   }
-  steamrot::SpacingAndSizingType spacing_strategy() const {
-    return static_cast<steamrot::SpacingAndSizingType>(GetField<int8_t>(VT_SPACING_STRATEGY, 0));
+  steamrot::SpacingAndSizingFbs spacing_strategy() const {
+    return static_cast<steamrot::SpacingAndSizingFbs>(GetField<int8_t>(VT_SPACING_STRATEGY, 0));
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -412,10 +412,10 @@ struct UIElementDataBuilder {
   void add_is_mouse_over(bool is_mouse_over) {
     fbb_.AddElement<uint8_t>(UIElementData::VT_IS_MOUSE_OVER, static_cast<uint8_t>(is_mouse_over), 0);
   }
-  void add_layout(steamrot::LayoutType layout) {
+  void add_layout(steamrot::LayoutFbs layout) {
     fbb_.AddElement<int8_t>(UIElementData::VT_LAYOUT, static_cast<int8_t>(layout), 0);
   }
-  void add_spacing_strategy(steamrot::SpacingAndSizingType spacing_strategy) {
+  void add_spacing_strategy(steamrot::SpacingAndSizingFbs spacing_strategy) {
     fbb_.AddElement<int8_t>(UIElementData::VT_SPACING_STRATEGY, static_cast<int8_t>(spacing_strategy), 0);
   }
   explicit UIElementDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
@@ -441,8 +441,8 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementData(
     bool children_active = false,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::child>>> children = 0,
     bool is_mouse_over = false,
-    steamrot::LayoutType layout = steamrot::LayoutType_None,
-    steamrot::SpacingAndSizingType spacing_strategy = steamrot::SpacingAndSizingType_None) {
+    steamrot::LayoutFbs layout = steamrot::LayoutFbs_None,
+    steamrot::SpacingAndSizingFbs spacing_strategy = steamrot::SpacingAndSizingFbs_None) {
   UIElementDataBuilder builder_(_fbb);
   builder_.add_children(children);
   builder_.add_response_event_data(response_event_data);
@@ -465,8 +465,8 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
     bool children_active = false,
     const std::vector<::flatbuffers::Offset<steamrot::child>> *children = nullptr,
     bool is_mouse_over = false,
-    steamrot::LayoutType layout = steamrot::LayoutType_None,
-    steamrot::SpacingAndSizingType spacing_strategy = steamrot::SpacingAndSizingType_None) {
+    steamrot::LayoutFbs layout = steamrot::LayoutFbs_None,
+    steamrot::SpacingAndSizingFbs spacing_strategy = steamrot::SpacingAndSizingFbs_None) {
   auto children__ = children ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::child>>(*children) : 0;
   return steamrot::CreateUIElementData(
       _fbb,
