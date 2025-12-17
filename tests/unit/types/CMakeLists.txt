@@ -19,6 +19,12 @@ add_executable(test_types
 
   user_interface/styles/Style.test.cpp
   user_interface/styles/ButtonStyle.test.cpp
+  user_interface/styles/DropDownItemStyle.test.cpp
+  user_interface/styles/DropDownButtonStyle.test.cpp
+  user_interface/styles/PanelStyle.test.cpp
+  user_interface/styles/DropDownListStyle.test.cpp
+  user_interface/styles/DropDownContainerStyle.test.cpp
+  user_interface/styles/UIStyle.test.cpp
 )
 
 target_link_libraries(test_types PRIVATE
