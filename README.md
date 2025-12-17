@@ -112,8 +112,10 @@ The `documentation/` directory contains comprehensive guides organized by topic:
 - **[Examples Directory](documentation/examples/)** - Code examples and patterns
 
 ### 📊 Analysis & Design Documents
-- **[Switching Strategies Analysis](documentation/analysis/SWITCHING_STRATEGIES_ANALYSIS.md)** - Comprehensive analysis of type-switching strategies
+- **[Switching Strategies Analysis](documentation/analysis/SWITCHING_STRATEGIES_ANALYSIS.md)** - Comprehensive analysis of type-switching strategies (static_cast, dynamic_cast, switch-case, visitor, std::variant)
 - **[Switching Strategies Quick Reference](documentation/analysis/SWITCHING_STRATEGIES_QUICK_REFERENCE.md)** - Decision guide for choosing switching strategies
+- **[Factory Selection Strategies Analysis](documentation/analysis/FACTORY_SELECTION_STRATEGIES_ANALYSIS.md)** - Comprehensive analysis of provider/configurator factory selection strategies
+- **[Factory Selection Quick Reference](documentation/analysis/FACTORY_SELECTION_QUICK_REFERENCE.md)** - Decision guide for selecting concrete provider implementations
 
 ### 📑 Reference
 - **[Dropdown Data](documentation/reference/dropdown_data_population.md)** - Dropdown implementation
