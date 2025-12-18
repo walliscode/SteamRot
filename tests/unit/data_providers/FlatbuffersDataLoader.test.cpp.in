@@ -11,18 +11,51 @@
 #include "scene_types_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
+TEST_CASE("FlatbuffersDataLoader provides error if scene type is invalid",
+          "[unit][FlatbuffersDataLoader]") {
+
+  steamrot::FlatbuffersDataLoader data_loader;
+
+  // Use an invalid scene type
+  steamrot::SceneType invalid_scene_type =
+      static_cast<steamrot::SceneType>(999);
+
+  auto result = data_loader.ProvideDefaultSceneData(invalid_scene_type);
+
+  REQUIRE(!result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::SceneTypeNotFound);
+  REQUIRE(result.error().message == "Invalid SceneType provided");
+}
 TEST_CASE("FlatbuffersDataLoader provides scene data",
           "[unit][FlatbuffersDataLoader]") {
 
   steamrot::FlatbuffersDataLoader data_loader;
-  auto result = data_loader.ProvideDefaultSceneData(steamrot::SceneType_TITLE);
 
-  if (!result.has_value()) {
-    FAIL(result.error().message);
+  // Test all Title scene data
+  auto title_scene_result =
+      data_loader.ProvideDefaultSceneData(steamrot::SceneType_TITLE);
+
+  if (!title_scene_result.has_value()) {
+    FAIL(title_scene_result.error().message);
   }
-  const auto &scene_data = result.value();
+  const auto &scene_data = title_scene_result.value();
   REQUIRE(scene_data != nullptr);
+  REQUIRE(scene_data->scene_info()->scene_type() == steamrot::SceneType_TITLE);
   REQUIRE(!scene_data->entity_collection()->entities()->empty());
+  //.... Additional checks can be added here
+
+  // Test all Crafting scene data
+  auto crafting_scene_result =
+      data_loader.ProvideDefaultSceneData(steamrot::SceneType_CRAFTING);
+  if (!crafting_scene_result.has_value()) {
+    FAIL(crafting_scene_result.error().message);
+  }
+  const auto &crafting_scene_data = crafting_scene_result.value();
+  REQUIRE(crafting_scene_data != nullptr);
+  REQUIRE(crafting_scene_data->scene_info()->scene_type() ==
+          steamrot::SceneType_CRAFTING);
+  REQUIRE(!crafting_scene_data->entity_collection()->entities()->empty());
+  //.... Additional checks can be added here
 }
 TEST_CASE("FlatbuffersDataLoader::ProvideAssetData returns default data",
           "[unit][FlatbuffersDataLoader]") {
@@ -40,11 +73,24 @@ TEST_CASE("FlatbuffersDataLoader provides ui_styles data",
           "[unit][FlatbuffersDataLoader]") {
 
   steamrot::FlatbuffersDataLoader data_loader;
-  auto result = data_loader.ProvideUIStylesData("default");
+  auto result = data_loader.ProvideUIStylesData();
   if (!result.has_value()) {
     FAIL(result.error().message);
   }
-  REQUIRE(result.value() != nullptr);
+
+  std::vector<const steamrot::UIStyleData *> ui_styles = result.value();
+  // check number of styles loaded
+  REQUIRE(ui_styles.size() == 1);
+
+  // expected style names. Add more as more styles are added
+  std::vector<std::string> expected_style_names = {"default"};
+
+  // check each style name is in the vector
+  for (const auto &style : ui_styles) {
+    REQUIRE(style != nullptr);
+    REQUIRE(std::find(expected_style_names.begin(), expected_style_names.end(),
+                      style->name()->str()) != expected_style_names.end());
+  }
 }
 
 TEST_CASE("FlatbuffersDataLoader provides scene_manager data",
