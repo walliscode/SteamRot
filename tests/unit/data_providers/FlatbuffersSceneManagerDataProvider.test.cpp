@@ -34,3 +34,30 @@ TEST_CASE("FlatbuffersSceneManagerDataProvider::LoadSceneManagerState loads "
   REQUIRE(state.subscriptions[0]->m_trigger_event_type ==
           steamrot::EventType_EVENT_CHANGE_SCENE);
 }
+
+TEST_CASE(
+    "FlatbuffersSceneManagerDataProvider::GetSubscriberViewer returns viewer ",
+    "[unit][FlatbuffersEngineDataProvider]") {
+
+  steamrot::FlatbuffersSceneManagerDataProvider provider;
+  auto result = provider.GetSubscriberViewer();
+
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+
+  const auto &viewer = result.value();
+  REQUIRE(viewer != nullptr);
+
+  // Test that viewer can get subscribers
+  auto subscribers_result = viewer->GetSubscribers();
+  if (!subscribers_result.has_value()) {
+    FAIL(subscribers_result.error().message);
+  }
+
+  // check subscribers for size and specific data. the Engine should have a
+  // specific set of subscribers
+  REQUIRE(subscribers_result.value().size() == 1);
+  REQUIRE(subscribers_result.value()[0]->m_trigger_event_type ==
+          steamrot::EventType_EVENT_CHANGE_SCENE);
+}
