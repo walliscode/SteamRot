@@ -99,5 +99,226 @@ TEST_CASE("FlatbuffersDataLoader provides scene_manager data",
   steamrot::FlatbuffersDataLoader data_loader;
   auto result = data_loader.ProvideSceneManagerData();
   REQUIRE(result.has_value());
-  ;
+  REQUIRE(result.value() != nullptr);
+}
+
+TEST_CASE("FlatbuffersDataLoader::ProvideEngineConfigFbs returns config data "
+          "with correct values",
+          "[unit][FlatbuffersDataLoader]") {
+
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideEngineConfigFbs();
+
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+
+  const auto *config = result.value();
+  REQUIRE(config != nullptr);
+
+  // Test display config
+  REQUIRE(config->display() != nullptr);
+  REQUIRE(config->display()->window_title() != nullptr);
+  REQUIRE(config->display()->window_title()->str() == "SteamRot");
+  REQUIRE(config->display()->framerate_limit() == 60);
+  REQUIRE(config->display()->fullscreen() == false);
+  REQUIRE(config->display()->vsync() == true);
+
+  // Test user preferences config
+  REQUIRE(config->user_preferences() != nullptr);
+  REQUIRE(config->user_preferences()->master_volume() == 1.0f);
+  REQUIRE(config->user_preferences()->show_fps() == false);
+  REQUIRE(config->user_preferences()->preferred_language() != nullptr);
+  REQUIRE(config->user_preferences()->preferred_language()->str() == "en");
+}
+
+TEST_CASE("FlatbuffersDataLoader::ProvideEngineResourcesConfigFbs returns "
+          "config data with correct values",
+          "[unit][FlatbuffersDataLoader]") {
+
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideEngineResourcesConfigFbs();
+
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+
+  const auto *config = result.value();
+  REQUIRE(config != nullptr);
+
+  // Test resource config values
+  REQUIRE(config->window_width() == 800);
+  REQUIRE(config->window_height() == 600);
+  REQUIRE(config->window_title() != nullptr);
+  REQUIRE(config->window_title()->str() == "SteamRot");
+  REQUIRE(config->framerate_limit() == 60);
+}
+
+TEST_CASE("FlatbuffersDataLoader::ProvideEngineStateFbs returns state data "
+          "with correct values",
+          "[unit][FlatbuffersDataLoader]") {
+
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideEngineStateFbs();
+
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+
+  const auto *state = result.value();
+  REQUIRE(state != nullptr);
+
+  // Test engine state values
+  REQUIRE(state->running() == false);
+  REQUIRE(state->paused() == false);
+  REQUIRE(state->quit_requested() == false);
+
+  // Test subscriptions exist
+  REQUIRE(state->subscriptions() != nullptr);
+  REQUIRE(state->subscriptions()->size() == 1);
+
+  // Verify the subscription is for EVENT_QUIT_GAME
+  const auto *subscription = state->subscriptions()->Get(0);
+  REQUIRE(subscription != nullptr);
+  REQUIRE(subscription->event_type_data() != nullptr);
+  REQUIRE(subscription->event_type_data()->str() == "EVENT_QUIT_GAME");
+}
+
+TEST_CASE("FlatbuffersDataLoader::ProvideDefaultUserPreferencesData returns "
+          "preferences with correct values",
+          "[unit][FlatbuffersDataLoader]") {
+
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideDefaultUserPreferencesData();
+
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+
+  const auto *preferences = result.value();
+  REQUIRE(preferences != nullptr);
+
+  // Test display preferences
+  REQUIRE(preferences->display() != nullptr);
+  REQUIRE(preferences->display()->fullscreen() == false);
+  REQUIRE(preferences->display()->vsync() == true);
+
+  // Test audio preferences
+  REQUIRE(preferences->audio() != nullptr);
+  REQUIRE(preferences->audio()->master_volume() == 1.0f);
+  REQUIRE(preferences->audio()->music_volume() == 0.8f);
+  REQUIRE(preferences->audio()->sfx_volume() == 1.0f);
+  REQUIRE(preferences->audio()->muted() == false);
+
+  // Test accessibility preferences
+  REQUIRE(preferences->accessibility() != nullptr);
+  REQUIRE(preferences->accessibility()->ui_scale() == 1.0f);
+
+  // Test version
+  REQUIRE(preferences->version() == 1);
+}
+
+TEST_CASE("FlatbuffersDataLoader::ProvideContextData returns valid context "
+          "data",
+          "[unit][FlatbuffersDataLoader]") {
+
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideContextData();
+
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+
+  const auto *context_data = result.value();
+  REQUIRE(context_data != nullptr);
+
+  // Verify game context config exists
+  REQUIRE(context_data->game_context_config() != nullptr);
+
+  // Verify scene context configs exist
+  REQUIRE(context_data->scene_context_configs() != nullptr);
+  REQUIRE(!context_data->scene_context_configs()->empty());
+}
+
+TEST_CASE("FlatbuffersDataLoader::ProvideLogicCollectionData returns logic "
+          "data for Title scene",
+          "[unit][FlatbuffersDataLoader]") {
+
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result =
+      data_loader.ProvideLogicCollectionData(steamrot::SceneType_TITLE);
+
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+
+  const auto *logic_data = result.value();
+  REQUIRE(logic_data != nullptr);
+}
+
+TEST_CASE("FlatbuffersDataLoader::ProvideLogicCollectionData returns logic "
+          "data for Crafting scene",
+          "[unit][FlatbuffersDataLoader]") {
+
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result =
+      data_loader.ProvideLogicCollectionData(steamrot::SceneType_CRAFTING);
+
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+
+  const auto *logic_data = result.value();
+  REQUIRE(logic_data != nullptr);
+}
+
+TEST_CASE("FlatbuffersDataLoader::ProvideLogicCollectionData returns error "
+          "for invalid scene",
+          "[unit][FlatbuffersDataLoader]") {
+
+  steamrot::FlatbuffersDataLoader data_loader;
+  steamrot::SceneType invalid_scene_type =
+      static_cast<steamrot::SceneType>(999);
+
+  auto result = data_loader.ProvideLogicCollectionData(invalid_scene_type);
+
+  REQUIRE(!result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::SceneTypeNotFound);
+}
+
+TEST_CASE("FlatbuffersDataLoader::ProvideAssetData with scene type returns "
+          "asset data",
+          "[unit][FlatbuffersDataLoader]") {
+
+  steamrot::FlatbuffersDataLoader data_loader;
+
+  // Test for Title scene
+  auto title_result =
+      data_loader.ProvideAssetData(steamrot::SceneType_TITLE);
+  if (!title_result.has_value()) {
+    FAIL(title_result.error().message);
+  }
+  REQUIRE(title_result.value() != nullptr);
+
+  // Test for Crafting scene
+  auto crafting_result =
+      data_loader.ProvideAssetData(steamrot::SceneType_CRAFTING);
+  if (!crafting_result.has_value()) {
+    FAIL(crafting_result.error().message);
+  }
+  REQUIRE(crafting_result.value() != nullptr);
+}
+
+TEST_CASE("FlatbuffersDataLoader::ProvideAssetData with invalid scene returns "
+          "error",
+          "[unit][FlatbuffersDataLoader]") {
+
+  steamrot::FlatbuffersDataLoader data_loader;
+  steamrot::SceneType invalid_scene_type =
+      static_cast<steamrot::SceneType>(999);
+
+  auto result = data_loader.ProvideAssetData(invalid_scene_type);
+
+  REQUIRE(!result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::SceneTypeNotFound);
 }
