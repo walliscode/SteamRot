@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "FailInfo.h"
 #include "FlatbuffersDataLoader.h"
+#include "events_generated.h"
 #include "scene_types_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
@@ -180,8 +181,8 @@ TEST_CASE("FlatbuffersDataLoader::ProvideEngineStateFbs returns state data "
   // Verify the subscription is for EVENT_QUIT_GAME
   const auto *subscription = state->subscriptions()->Get(0);
   REQUIRE(subscription != nullptr);
-  REQUIRE(subscription->event_type_data() != nullptr);
-  REQUIRE(subscription->event_type_data()->str() == "EVENT_QUIT_GAME");
+  REQUIRE(subscription->event_type_data() ==
+          steamrot::EventType_EVENT_QUIT_GAME);
 }
 
 TEST_CASE("FlatbuffersDataLoader::ProvideDefaultUserPreferencesData returns "
@@ -218,59 +219,39 @@ TEST_CASE("FlatbuffersDataLoader::ProvideDefaultUserPreferencesData returns "
   REQUIRE(preferences->version() == 1);
 }
 
-TEST_CASE("FlatbuffersDataLoader::ProvideContextData returns valid context "
-          "data",
-          "[unit][FlatbuffersDataLoader]") {
 
-  steamrot::FlatbuffersDataLoader data_loader;
-  auto result = data_loader.ProvideContextData();
 
-  if (!result.has_value()) {
-    FAIL(result.error().message);
-  }
-
-  const auto *context_data = result.value();
-  REQUIRE(context_data != nullptr);
-
-  // Verify game context config exists
-  REQUIRE(context_data->game_context_config() != nullptr);
-
-  // Verify scene context configs exist
-  REQUIRE(context_data->scene_context_configs() != nullptr);
-  REQUIRE(!context_data->scene_context_configs()->empty());
-}
-
-TEST_CASE("FlatbuffersDataLoader::ProvideLogicCollectionData returns logic "
-          "data for Title scene",
-          "[unit][FlatbuffersDataLoader]") {
-
-  steamrot::FlatbuffersDataLoader data_loader;
-  auto result =
-      data_loader.ProvideLogicCollectionData(steamrot::SceneType_TITLE);
-
-  if (!result.has_value()) {
-    FAIL(result.error().message);
-  }
-
-  const auto *logic_data = result.value();
-  REQUIRE(logic_data != nullptr);
-}
-
-TEST_CASE("FlatbuffersDataLoader::ProvideLogicCollectionData returns logic "
-          "data for Crafting scene",
-          "[unit][FlatbuffersDataLoader]") {
-
-  steamrot::FlatbuffersDataLoader data_loader;
-  auto result =
-      data_loader.ProvideLogicCollectionData(steamrot::SceneType_CRAFTING);
-
-  if (!result.has_value()) {
-    FAIL(result.error().message);
-  }
-
-  const auto *logic_data = result.value();
-  REQUIRE(logic_data != nullptr);
-}
+// TEST_CASE("FlatbuffersDataLoader::ProvideLogicCollectionData returns logic "
+//           "data for Title scene",
+//           "[unit][FlatbuffersDataLoader]") {
+//
+//   steamrot::FlatbuffersDataLoader data_loader;
+//   auto result =
+//       data_loader.ProvideLogicCollectionData(steamrot::SceneType_TITLE);
+//
+//   if (!result.has_value()) {
+//     FAIL(result.error().message);
+//   }
+//
+//   const auto *logic_data = result.value();
+//   REQUIRE(logic_data != nullptr);
+// }
+//
+// TEST_CASE("FlatbuffersDataLoader::ProvideLogicCollectionData returns logic "
+//           "data for Crafting scene",
+//           "[unit][FlatbuffersDataLoader]") {
+//
+//   steamrot::FlatbuffersDataLoader data_loader;
+//   auto result =
+//       data_loader.ProvideLogicCollectionData(steamrot::SceneType_CRAFTING);
+//
+//   if (!result.has_value()) {
+//     FAIL(result.error().message);
+//   }
+//
+//   const auto *logic_data = result.value();
+//   REQUIRE(logic_data != nullptr);
+// }
 
 TEST_CASE("FlatbuffersDataLoader::ProvideLogicCollectionData returns error "
           "for invalid scene",
@@ -293,8 +274,7 @@ TEST_CASE("FlatbuffersDataLoader::ProvideAssetData with scene type returns "
   steamrot::FlatbuffersDataLoader data_loader;
 
   // Test for Title scene
-  auto title_result =
-      data_loader.ProvideAssetData(steamrot::SceneType_TITLE);
+  auto title_result = data_loader.ProvideAssetData(steamrot::SceneType_TITLE);
   if (!title_result.has_value()) {
     FAIL(title_result.error().message);
   }

@@ -44,7 +44,7 @@ set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets.fbs
 
     # Configuration
-    ${CMAKE_CURRENT_SOURCE_DIR}/configuration/context_data.fbs
+
     ${CMAKE_CURRENT_SOURCE_DIR}/configuration/user_preferences.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/configuration/save_data.fbs
 
