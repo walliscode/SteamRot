@@ -29,10 +29,6 @@ FlatbuffersDataLoader::ProvideDefaultSceneData(
   // get file prefix from scene type
   std::string scene_file_prefix;
   switch (scene_type) {
-  case SceneType::SceneType_UNKNOWN: {
-    scene_file_prefix = "unknown";
-    break;
-  }
   case SceneType::SceneType_TEST: {
     scene_file_prefix = "test";
     break;
@@ -154,33 +150,7 @@ FlatbuffersDataLoader::ProvideUIStylesData() const {
   return ui_styles;
 }
 
-/////////////////////////////////////////////////
-std::expected<const ContextData *, FailInfo>
-FlatbuffersDataLoader::ProvideContextData() const {
-  // get context directory from defaults
-  std::filesystem::path context_dir = paths::GetDefaultContextDirectory();
 
-  // construct the file path
-  std::filesystem::path context_path = context_dir / "context_data.bin";
-
-  // check if the file exists
-  if (!std::filesystem::exists(context_path)) {
-    std::string error_message =
-        std::format("Context data file not found: {}", context_path.string());
-    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
-  }
-
-  // load the context data
-  const steamrot::ContextData *context_data =
-      GetContextData(LoadBinaryData(context_path));
-
-  if (!context_data) {
-    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
-                                    "ContextData pointer is null"));
-  }
-
-  return context_data;
-}
 
 /////////////////////////////////////////////////
 std::expected<const EngineResourcesConfigFbs *, FailInfo>

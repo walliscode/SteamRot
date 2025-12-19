@@ -8,21 +8,55 @@
 /////////////////////////////////////////////////
 #include "FailInfo.h"
 #include "FlatbuffersDataLoader.h"
+#include "events_generated.h"
 #include "scene_types_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
+TEST_CASE("FlatbuffersDataLoader provides error if scene type is invalid",
+          "[unit][FlatbuffersDataLoader]") {
+
+  steamrot::FlatbuffersDataLoader data_loader;
+
+  // Use an invalid scene type
+  steamrot::SceneType invalid_scene_type =
+      static_cast<steamrot::SceneType>(999);
+
+  auto result = data_loader.ProvideDefaultSceneData(invalid_scene_type);
+
+  REQUIRE(!result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::SceneTypeNotFound);
+  REQUIRE(result.error().message == "Invalid SceneType provided");
+}
 TEST_CASE("FlatbuffersDataLoader provides scene data",
           "[unit][FlatbuffersDataLoader]") {
 
   steamrot::FlatbuffersDataLoader data_loader;
-  auto result = data_loader.ProvideDefaultSceneData(steamrot::SceneType_TITLE);
 
-  if (!result.has_value()) {
-    FAIL(result.error().message);
+  // Test all Title scene data
+  auto title_scene_result =
+      data_loader.ProvideDefaultSceneData(steamrot::SceneType_TITLE);
+
+  if (!title_scene_result.has_value()) {
+    FAIL(title_scene_result.error().message);
   }
-  const auto &scene_data = result.value();
+  const auto &scene_data = title_scene_result.value();
   REQUIRE(scene_data != nullptr);
+  REQUIRE(scene_data->scene_info()->scene_type() == steamrot::SceneType_TITLE);
   REQUIRE(!scene_data->entity_collection()->entities()->empty());
+  //.... Additional checks can be added here
+
+  // Test all Crafting scene data
+  auto crafting_scene_result =
+      data_loader.ProvideDefaultSceneData(steamrot::SceneType_CRAFTING);
+  if (!crafting_scene_result.has_value()) {
+    FAIL(crafting_scene_result.error().message);
+  }
+  const auto &crafting_scene_data = crafting_scene_result.value();
+  REQUIRE(crafting_scene_data != nullptr);
+  REQUIRE(crafting_scene_data->scene_info()->scene_type() ==
+          steamrot::SceneType_CRAFTING);
+  REQUIRE(!crafting_scene_data->entity_collection()->entities()->empty());
+  //.... Additional checks can be added here
 }
 TEST_CASE("FlatbuffersDataLoader::ProvideAssetData returns default data",
           "[unit][FlatbuffersDataLoader]") {
@@ -40,11 +74,24 @@ TEST_CASE("FlatbuffersDataLoader provides ui_styles data",
           "[unit][FlatbuffersDataLoader]") {
 
   steamrot::FlatbuffersDataLoader data_loader;
-  auto result = data_loader.ProvideUIStylesData("default");
+  auto result = data_loader.ProvideUIStylesData();
   if (!result.has_value()) {
     FAIL(result.error().message);
   }
-  REQUIRE(result.value() != nullptr);
+
+  std::vector<const steamrot::UIStyleData *> ui_styles = result.value();
+  // check number of styles loaded
+  REQUIRE(ui_styles.size() == 1);
+
+  // expected style names. Add more as more styles are added
+  std::vector<std::string> expected_style_names = {"default"};
+
+  // check each style name is in the vector
+  for (const auto &style : ui_styles) {
+    REQUIRE(style != nullptr);
+    REQUIRE(std::find(expected_style_names.begin(), expected_style_names.end(),
+                      style->name()->str()) != expected_style_names.end());
+  }
 }
 
 TEST_CASE("FlatbuffersDataLoader provides scene_manager data",
@@ -53,5 +100,205 @@ TEST_CASE("FlatbuffersDataLoader provides scene_manager data",
   steamrot::FlatbuffersDataLoader data_loader;
   auto result = data_loader.ProvideSceneManagerData();
   REQUIRE(result.has_value());
-  ;
+  REQUIRE(result.value() != nullptr);
+}
+
+TEST_CASE("FlatbuffersDataLoader::ProvideEngineConfigFbs returns config data "
+          "with correct values",
+          "[unit][FlatbuffersDataLoader]") {
+
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideEngineConfigFbs();
+
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+
+  const auto *config = result.value();
+  REQUIRE(config != nullptr);
+
+  // Test display config
+  REQUIRE(config->display() != nullptr);
+  REQUIRE(config->display()->window_title() != nullptr);
+  REQUIRE(config->display()->window_title()->str() == "SteamRot");
+  REQUIRE(config->display()->framerate_limit() == 60);
+  REQUIRE(config->display()->fullscreen() == false);
+  REQUIRE(config->display()->vsync() == true);
+
+  // Test user preferences config
+  REQUIRE(config->user_preferences() != nullptr);
+  REQUIRE(config->user_preferences()->master_volume() == 1.0f);
+  REQUIRE(config->user_preferences()->show_fps() == false);
+  REQUIRE(config->user_preferences()->preferred_language() != nullptr);
+  REQUIRE(config->user_preferences()->preferred_language()->str() == "en");
+}
+
+TEST_CASE("FlatbuffersDataLoader::ProvideEngineResourcesConfigFbs returns "
+          "config data with correct values",
+          "[unit][FlatbuffersDataLoader]") {
+
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideEngineResourcesConfigFbs();
+
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+
+  const auto *config = result.value();
+  REQUIRE(config != nullptr);
+
+  // Test resource config values
+  REQUIRE(config->window_width() == 800);
+  REQUIRE(config->window_height() == 600);
+  REQUIRE(config->window_title() != nullptr);
+  REQUIRE(config->window_title()->str() == "SteamRot");
+  REQUIRE(config->framerate_limit() == 60);
+}
+
+TEST_CASE("FlatbuffersDataLoader::ProvideEngineStateFbs returns state data "
+          "with correct values",
+          "[unit][FlatbuffersDataLoader]") {
+
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideEngineStateFbs();
+
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+
+  const auto *state = result.value();
+  REQUIRE(state != nullptr);
+
+  // Test engine state values
+  REQUIRE(state->running() == false);
+  REQUIRE(state->paused() == false);
+  REQUIRE(state->quit_requested() == false);
+
+  // Test subscriptions exist
+  REQUIRE(state->subscriptions() != nullptr);
+  REQUIRE(state->subscriptions()->size() == 1);
+
+  // Verify the subscription is for EVENT_QUIT_GAME
+  const auto *subscription = state->subscriptions()->Get(0);
+  REQUIRE(subscription != nullptr);
+  REQUIRE(subscription->event_type_data() ==
+          steamrot::EventType_EVENT_QUIT_GAME);
+}
+
+TEST_CASE("FlatbuffersDataLoader::ProvideDefaultUserPreferencesData returns "
+          "preferences with correct values",
+          "[unit][FlatbuffersDataLoader]") {
+
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideDefaultUserPreferencesData();
+
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+
+  const auto *preferences = result.value();
+  REQUIRE(preferences != nullptr);
+
+  // Test display preferences
+  REQUIRE(preferences->display() != nullptr);
+  REQUIRE(preferences->display()->fullscreen() == false);
+  REQUIRE(preferences->display()->vsync() == true);
+
+  // Test audio preferences
+  REQUIRE(preferences->audio() != nullptr);
+  REQUIRE(preferences->audio()->master_volume() == 1.0f);
+  REQUIRE(preferences->audio()->music_volume() == 0.8f);
+  REQUIRE(preferences->audio()->sfx_volume() == 1.0f);
+  REQUIRE(preferences->audio()->muted() == false);
+
+  // Test accessibility preferences
+  REQUIRE(preferences->accessibility() != nullptr);
+  REQUIRE(preferences->accessibility()->ui_scale() == 1.0f);
+
+  // Test version
+  REQUIRE(preferences->version() == 1);
+}
+
+
+
+// TEST_CASE("FlatbuffersDataLoader::ProvideLogicCollectionData returns logic "
+//           "data for Title scene",
+//           "[unit][FlatbuffersDataLoader]") {
+//
+//   steamrot::FlatbuffersDataLoader data_loader;
+//   auto result =
+//       data_loader.ProvideLogicCollectionData(steamrot::SceneType_TITLE);
+//
+//   if (!result.has_value()) {
+//     FAIL(result.error().message);
+//   }
+//
+//   const auto *logic_data = result.value();
+//   REQUIRE(logic_data != nullptr);
+// }
+//
+// TEST_CASE("FlatbuffersDataLoader::ProvideLogicCollectionData returns logic "
+//           "data for Crafting scene",
+//           "[unit][FlatbuffersDataLoader]") {
+//
+//   steamrot::FlatbuffersDataLoader data_loader;
+//   auto result =
+//       data_loader.ProvideLogicCollectionData(steamrot::SceneType_CRAFTING);
+//
+//   if (!result.has_value()) {
+//     FAIL(result.error().message);
+//   }
+//
+//   const auto *logic_data = result.value();
+//   REQUIRE(logic_data != nullptr);
+// }
+
+TEST_CASE("FlatbuffersDataLoader::ProvideLogicCollectionData returns error "
+          "for invalid scene",
+          "[unit][FlatbuffersDataLoader]") {
+
+  steamrot::FlatbuffersDataLoader data_loader;
+  steamrot::SceneType invalid_scene_type =
+      static_cast<steamrot::SceneType>(999);
+
+  auto result = data_loader.ProvideLogicCollectionData(invalid_scene_type);
+
+  REQUIRE(!result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::SceneTypeNotFound);
+}
+
+TEST_CASE("FlatbuffersDataLoader::ProvideAssetData with scene type returns "
+          "asset data",
+          "[unit][FlatbuffersDataLoader]") {
+
+  steamrot::FlatbuffersDataLoader data_loader;
+
+  // Test for Title scene
+  auto title_result = data_loader.ProvideAssetData(steamrot::SceneType_TITLE);
+  if (!title_result.has_value()) {
+    FAIL(title_result.error().message);
+  }
+  REQUIRE(title_result.value() != nullptr);
+
+  // Test for Crafting scene
+  auto crafting_result =
+      data_loader.ProvideAssetData(steamrot::SceneType_CRAFTING);
+  if (!crafting_result.has_value()) {
+    FAIL(crafting_result.error().message);
+  }
+  REQUIRE(crafting_result.value() != nullptr);
+}
+
+TEST_CASE("FlatbuffersDataLoader::ProvideAssetData with invalid scene returns "
+          "error",
+          "[unit][FlatbuffersDataLoader]") {
+
+  steamrot::FlatbuffersDataLoader data_loader;
+  steamrot::SceneType invalid_scene_type =
+      static_cast<steamrot::SceneType>(999);
+
+  auto result = data_loader.ProvideAssetData(invalid_scene_type);
+
+  REQUIRE(!result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::SceneTypeNotFound);
 }

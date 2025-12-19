@@ -13,7 +13,6 @@
 /////////////////////////////////////////////////
 #include "DataLoader.h"
 #include "FailInfo.h"
-#include "context_data_generated.h"
 #include "engine_config_generated.h"
 #include "engine_resources_config_generated.h"
 #include "engine_state_generated.h"
@@ -59,11 +58,6 @@ public:
   /////////////////////////////////////////////////
   std::expected<std::vector<const UIStyleData *>, FailInfo>
   ProvideUIStylesData() const;
-
-  /////////////////////////////////////////////////
-  /// @brief Provides ContextData from binary file
-  /////////////////////////////////////////////////
-  std::expected<const ContextData *, FailInfo> ProvideContextData() const;
 
   /////////////////////////////////////////////////
   /// @brief Provides EngineResourcesConfigFbs from binary file

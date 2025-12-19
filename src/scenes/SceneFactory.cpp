@@ -65,10 +65,16 @@ SceneFactory::CreateSceneFromDefault(SceneType type) {
   ISceneConfigurator &configurator = GetSceneConfigurator();
 
   // Step 2: Provider loads data
-  std::unique_ptr<SceneData> data = provider.ProvideDefaultSceneData(type);
+  auto get_data_result = provider.ProvideDefaultSceneData(type);
+  if (!get_data_result.has_value()) {
+    return std::unexpected(get_data_result.error());
+  }
+  std::unique_ptr<SceneData> data =
+      provider.ProvideDefaultSceneData(type).value();
   if (!data) {
-    // Log error
-    return nullptr;
+    return std::unexpected(FailInfo{
+        FailMode::NullPointer,
+        "SceneData pointer is null in SceneFactory::CreateSceneFromDefault"});
   }
 
   // Step 3: Create empty scene

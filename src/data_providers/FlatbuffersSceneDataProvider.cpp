@@ -10,11 +10,12 @@
 #include "FbsSceneData.h"
 #include "FlatbuffersDataLoader.h"
 #include "scene_data_generated.h"
+#include <expected>
 
 namespace steamrot {
 
 /////////////////////////////////////////////////
-std::unique_ptr<SceneData>
+std::expected<std::unique_ptr<SceneData>, FailInfo>
 FlatbuffersSceneDataProvider::ProvideDefaultSceneData(
     const SceneType scene_type) const {
 
@@ -22,6 +23,7 @@ FlatbuffersSceneDataProvider::ProvideDefaultSceneData(
   FlatbuffersDataLoader data_loader;
   auto load_data_result = data_loader.ProvideDefaultSceneData(scene_type);
   if (!load_data_result.has_value()) {
+    return std::unexpected(load_data_result.error());
   }
   const SceneDataFbs &fb_data = *load_data_result.value();
 
@@ -34,6 +36,6 @@ FlatbuffersSceneDataProvider::ProvideDefaultSceneData(
   scene_data.scene_info.type = scene_type;
   scene_data.scene_data_fbs = load_data_result.value();
 
-  return std::make_unique<SceneData>(scene_data);
+  return std::make_unique<FbsSceneData>(scene_data);
 }
 } // namespace steamrot

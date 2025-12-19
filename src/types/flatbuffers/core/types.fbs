@@ -7,7 +7,7 @@ table Vector2fData {
   }
 
 
-struct ColorData{
+table ColorData{
     r:uint8;
     g:uint8;
     b:uint8;

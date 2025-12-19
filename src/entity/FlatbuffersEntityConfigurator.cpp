@@ -107,9 +107,9 @@ FlatbuffersEntityConfigurator::ConfigureComponent(Component &component) {
 std::expected<std::monostate, FailInfo>
 FlatbuffersEntityConfigurator::ConfigureCUserInterface(
     CUserInterface &ui_component) {
+
   // configure the underlying Component type
   auto configure_result = ConfigureComponent(ui_component);
-
   if (!configure_result.has_value())
     return std::unexpected(configure_result.error());
 

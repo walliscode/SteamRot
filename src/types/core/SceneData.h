@@ -16,6 +16,7 @@
 namespace steamrot {
 struct SceneData {
 
+  virtual ~SceneData() = default;
   SceneInfo scene_info;
 };
 } // namespace steamrot
