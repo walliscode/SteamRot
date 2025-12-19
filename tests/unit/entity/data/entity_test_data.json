@@ -51,6 +51,22 @@
         "fragments": ["fragment_a", "fragment_b"],
         "joints": ["joint_x", "joint_y"]
       }
+    },
+    {
+      "index": 5,
+      "c_user_interface": {
+        "is_visible": true,
+        "root_ui_element": {
+          "base_data": {
+            "position": { "x": 0.0, "y": 0.0 },
+            "size": { "x": 30.0, "y": 30.0 },
+            "children_active": false,
+            "children": [],
+            "layout": "Horizontal",
+            "spacing_strategy": "None"
+          }
+        }
+      }
     }
   ]
 }

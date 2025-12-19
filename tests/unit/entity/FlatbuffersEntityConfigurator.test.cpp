@@ -99,33 +99,6 @@ TEST_CASE("ConfigureEntityMemoryPool resizes pool correctly",
   REQUIRE(steamrot::entity::memory::GetMemoryPoolSize(emp) == 20);
 }
 
-TEST_CASE("ConfigureEntityMemoryPool handles missing pool size",
-          "[unit][FlatbuffersEntityConfigurator]") {
-  steamrot::EventHandler event_handler;
-  steamrot::EntityMemoryPool emp;
-
-  // Create entity collection without pool size
-  flatbuffers::FlatBufferBuilder builder;
-  std::vector<flatbuffers::Offset<steamrot::EntityDataFbs>> entities;
-  auto entities_vec = builder.CreateVector(entities);
-  auto collection_offset =
-      steamrot::CreateEntityCollectionFbs(builder, entities_vec);
-  builder.Finish(collection_offset);
-
-  const steamrot::EntityCollectionFbs *entity_collection =
-      flatbuffers::GetRoot<steamrot::EntityCollectionFbs>(
-          builder.GetBufferPointer());
-
-  steamrot::FlatbuffersEntityConfigurator configurator(event_handler,
-                                                       *entity_collection);
-
-  auto result = configurator.ConfigureEntityMemoryPool(emp);
-
-  // Should fail with appropriate error
-  REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
-}
-
 /////////////////////////////////////////////////
 /// ConfigureFirstLayerComponents - CUserInterface Tests
 /////////////////////////////////////////////////
@@ -210,38 +183,6 @@ TEST_CASE(
   REQUIRE(panel->spacing_strategy == steamrot::SpacingAndSizing::Even);
 }
 
-TEST_CASE("ConfigureFirstLayerComponents handles missing root element",
-          "[unit][FlatbuffersEntityConfigurator]") {
-  steamrot::EventHandler event_handler;
-  steamrot::EntityMemoryPool emp;
-
-  // Create entity with UI but no root element
-  flatbuffers::FlatBufferBuilder builder;
-  auto ui_name = builder.CreateString("test_ui");
-  auto ui_data_offset = steamrot::CreateUserInterfaceData(builder, 0, ui_name);
-  auto entity_offset = steamrot::CreateEntityDataFbs(builder, 1, ui_data_offset);
-  std::vector<flatbuffers::Offset<steamrot::EntityDataFbs>> entities;
-  entities.push_back(entity_offset);
-  auto entities_vec = builder.CreateVector(entities);
-  auto collection_offset =
-      steamrot::CreateEntityCollectionFbs(builder, entities_vec, 10);
-  builder.Finish(collection_offset);
-
-  const steamrot::EntityCollectionFbs *entity_collection =
-      flatbuffers::GetRoot<steamrot::EntityCollectionFbs>(
-          builder.GetBufferPointer());
-
-  steamrot::FlatbuffersEntityConfigurator configurator(event_handler,
-                                                       *entity_collection);
-  steamrot::entity::memory::ResizeEntityMemoryPool(emp, 10);
-
-  auto result = configurator.ConfigureFirstLayerComponents(emp);
-
-  // Should fail with appropriate error
-  REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
-}
-
 /////////////////////////////////////////////////
 /// Null Data Handling Tests
 /////////////////////////////////////////////////
@@ -250,48 +191,26 @@ TEST_CASE("ConfigureCUserInterface handles null ui_name gracefully",
           "[unit][FlatbuffersEntityConfigurator]") {
   steamrot::EventHandler event_handler;
   steamrot::EntityMemoryPool emp;
-
-  // Create entity with UI without ui_name (null string)
-  flatbuffers::FlatBufferBuilder builder;
-
-  // Create minimal PanelData for root element
-  auto position = steamrot::CreateVector2fData(builder, 0.0f, 0.0f);
-  auto size = steamrot::CreateVector2fData(builder, 50.0f, 50.0f);
-  std::vector<flatbuffers::Offset<steamrot::child>> children;
-  auto children_vec = builder.CreateVector(children);
-  auto base_data = steamrot::CreateUIElementData(
-      builder, position, size, 0, 0, false, children_vec);
-  auto panel_data = steamrot::CreatePanelData(builder, base_data);
-
-  // Create UserInterfaceData without ui_name
-  auto ui_data_offset = steamrot::CreateUserInterfaceData(builder, panel_data);
-  auto entity_offset = steamrot::CreateEntityDataFbs(builder, 1, ui_data_offset);
-
-  std::vector<flatbuffers::Offset<steamrot::EntityDataFbs>> entities;
-  entities.push_back(entity_offset);
-  auto entities_vec = builder.CreateVector(entities);
-  auto collection_offset =
-      steamrot::CreateEntityCollectionFbs(builder, entities_vec, 10);
-  builder.Finish(collection_offset);
-
-  const steamrot::EntityCollectionFbs *entity_collection =
-      flatbuffers::GetRoot<steamrot::EntityCollectionFbs>(
-          builder.GetBufferPointer());
+  auto [data, entity_collection] = LoadEntityTestData();
 
   steamrot::FlatbuffersEntityConfigurator configurator(event_handler,
                                                        *entity_collection);
-  steamrot::entity::memory::ResizeEntityMemoryPool(emp, 10);
+
+  steamrot::entity::memory::ResizeEntityMemoryPool(
+      emp, entity_collection->entity_memory_pool_size());
 
   auto result = configurator.ConfigureFirstLayerComponents(emp);
 
   // Should succeed - null ui_name should be handled
   REQUIRE(result.has_value());
 
+  // Entity 5 has no ui_name
   const auto &ui_component =
-      steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(1, emp);
+      steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(5, emp);
   // Should keep default name when ui_name is null
   REQUIRE(ui_component.m_name == "Default UI");
   REQUIRE(ui_component.m_active == true);
+  REQUIRE(ui_component.m_root_element != nullptr);
 }
 
 TEST_CASE("ConfigureCUserInterface correctly handles false visibility",

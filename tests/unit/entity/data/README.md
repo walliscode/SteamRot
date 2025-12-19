@@ -13,6 +13,7 @@ This JSON file contains a single `EntityCollectionFbs` with multiple test entiti
 - **Entity 2**: CUserInterface (ui_name: "hidden_ui", visible: false, simple panel)
 - **Entity 3**: CGrimoireMachina (empty fragments/joints)
 - **Entity 4**: CGrimoireMachina (with fragments: ["fragment_a", "fragment_b"], joints: ["joint_x", "joint_y"])
+- **Entity 5**: CUserInterface (no ui_name, visible: true, simple panel) - tests null ui_name handling
 
 Pool size: 20
 
