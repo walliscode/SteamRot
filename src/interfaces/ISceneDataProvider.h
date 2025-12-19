@@ -12,8 +12,10 @@
 /// Headers
 /////////////////////////////////////////////////
 
+#include "FailInfo.h"
 #include "SceneData.h"
 #include "scene_types_generated.h"
+#include <expected>
 #include <memory>
 namespace steamrot {
 
@@ -28,7 +30,7 @@ public:
   /////////////////////////////////////////////////
   /// @brief Provides pointer to SceneData object.
   /////////////////////////////////////////////////
-  virtual std::unique_ptr<SceneData>
+  virtual std::expected<std::unique_ptr<SceneData>, FailInfo>
   ProvideDefaultSceneData(const SceneType scene_type) const = 0;
 };
 } // namespace steamrot

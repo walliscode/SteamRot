@@ -23,7 +23,7 @@ public:
   ///
   /// @return Unique pointer to SceneData object.
   /////////////////////////////////////////////////
-  std::unique_ptr<SceneData>
+  std::expected<std::unique_ptr<SceneData>, FailInfo>
   ProvideDefaultSceneData(const SceneType scene_type) const override;
 };
 } // namespace steamrot
