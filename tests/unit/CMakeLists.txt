@@ -6,7 +6,7 @@
 # add_subdirectory(assets)
 # add_subdirectory(user_interface)
 add_subdirectory(components)
-# add_subdirectory(data_providers)
+add_subdirectory(data_providers)
 # add_subdirectory(display)
 add_subdirectory(entity)
 add_subdirectory(events)

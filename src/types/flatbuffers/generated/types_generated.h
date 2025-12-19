@@ -19,47 +19,13 @@ struct Vector2fData;
 struct Vector2fDataBuilder;
 
 struct ColorData;
+struct ColorDataBuilder;
 
 struct Vertex;
 struct VertexBuilder;
 
 struct Triangle;
 struct TriangleBuilder;
-
-FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(1) ColorData FLATBUFFERS_FINAL_CLASS {
- private:
-  uint8_t r_;
-  uint8_t g_;
-  uint8_t b_;
-  uint8_t a_;
-
- public:
-  ColorData()
-      : r_(0),
-        g_(0),
-        b_(0),
-        a_(0) {
-  }
-  ColorData(uint8_t _r, uint8_t _g, uint8_t _b, uint8_t _a)
-      : r_(::flatbuffers::EndianScalar(_r)),
-        g_(::flatbuffers::EndianScalar(_g)),
-        b_(::flatbuffers::EndianScalar(_b)),
-        a_(::flatbuffers::EndianScalar(_a)) {
-  }
-  uint8_t r() const {
-    return ::flatbuffers::EndianScalar(r_);
-  }
-  uint8_t g() const {
-    return ::flatbuffers::EndianScalar(g_);
-  }
-  uint8_t b() const {
-    return ::flatbuffers::EndianScalar(b_);
-  }
-  uint8_t a() const {
-    return ::flatbuffers::EndianScalar(a_);
-  }
-};
-FLATBUFFERS_STRUCT_END(ColorData, 4);
 
 struct Vector2fData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef Vector2fDataBuilder Builder;
@@ -112,6 +78,77 @@ inline ::flatbuffers::Offset<Vector2fData> CreateVector2fData(
   return builder_.Finish();
 }
 
+struct ColorData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef ColorDataBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_R = 4,
+    VT_G = 6,
+    VT_B = 8,
+    VT_A = 10
+  };
+  uint8_t r() const {
+    return GetField<uint8_t>(VT_R, 0);
+  }
+  uint8_t g() const {
+    return GetField<uint8_t>(VT_G, 0);
+  }
+  uint8_t b() const {
+    return GetField<uint8_t>(VT_B, 0);
+  }
+  uint8_t a() const {
+    return GetField<uint8_t>(VT_A, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_R, 1) &&
+           VerifyField<uint8_t>(verifier, VT_G, 1) &&
+           VerifyField<uint8_t>(verifier, VT_B, 1) &&
+           VerifyField<uint8_t>(verifier, VT_A, 1) &&
+           verifier.EndTable();
+  }
+};
+
+struct ColorDataBuilder {
+  typedef ColorData Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_r(uint8_t r) {
+    fbb_.AddElement<uint8_t>(ColorData::VT_R, r, 0);
+  }
+  void add_g(uint8_t g) {
+    fbb_.AddElement<uint8_t>(ColorData::VT_G, g, 0);
+  }
+  void add_b(uint8_t b) {
+    fbb_.AddElement<uint8_t>(ColorData::VT_B, b, 0);
+  }
+  void add_a(uint8_t a) {
+    fbb_.AddElement<uint8_t>(ColorData::VT_A, a, 0);
+  }
+  explicit ColorDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<ColorData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<ColorData>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<ColorData> CreateColorData(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint8_t r = 0,
+    uint8_t g = 0,
+    uint8_t b = 0,
+    uint8_t a = 0) {
+  ColorDataBuilder builder_(_fbb);
+  builder_.add_a(a);
+  builder_.add_b(b);
+  builder_.add_g(g);
+  builder_.add_r(r);
+  return builder_.Finish();
+}
+
 struct Vertex FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef VertexBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -122,13 +159,14 @@ struct Vertex FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     return GetPointer<const steamrot::Vector2fData *>(VT_POSITION);
   }
   const steamrot::ColorData *color() const {
-    return GetStruct<const steamrot::ColorData *>(VT_COLOR);
+    return GetPointer<const steamrot::ColorData *>(VT_COLOR);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_POSITION) &&
            verifier.VerifyTable(position()) &&
-           VerifyFieldRequired<steamrot::ColorData>(verifier, VT_COLOR, 1) &&
+           VerifyOffsetRequired(verifier, VT_COLOR) &&
+           verifier.VerifyTable(color()) &&
            verifier.EndTable();
   }
 };
@@ -140,8 +178,8 @@ struct VertexBuilder {
   void add_position(::flatbuffers::Offset<steamrot::Vector2fData> position) {
     fbb_.AddOffset(Vertex::VT_POSITION, position);
   }
-  void add_color(const steamrot::ColorData *color) {
-    fbb_.AddStruct(Vertex::VT_COLOR, color);
+  void add_color(::flatbuffers::Offset<steamrot::ColorData> color) {
+    fbb_.AddOffset(Vertex::VT_COLOR, color);
   }
   explicit VertexBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -159,7 +197,7 @@ struct VertexBuilder {
 inline ::flatbuffers::Offset<Vertex> CreateVertex(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::Vector2fData> position = 0,
-    const steamrot::ColorData *color = nullptr) {
+    ::flatbuffers::Offset<steamrot::ColorData> color = 0) {
   VertexBuilder builder_(_fbb);
   builder_.add_color(color);
   builder_.add_position(position);
