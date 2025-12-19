@@ -33,8 +33,7 @@ static sf::Vector2f ToVec2f(const Vector2fData *vec_fb) {
 
 /////////////////////////////////////////////////
 FlatbuffersUIStyleDataProvider::FlatbuffersUIStyleDataProvider(
-    const std::unordered_map<std::string, std::shared_ptr<const sf::Font>>
-        &fonts_map)
+    std::unordered_map<std::string, std::shared_ptr<const sf::Font>> &fonts_map)
     : IUIStyleDataProvider(fonts_map) {};
 
 /////////////////////////////////////////////////
@@ -125,19 +124,16 @@ FlatbuffersUIStyleDataProvider::ConfigureButtonStyle(
                                     "button_style.font missing"});
 
   if (!button_fb->font_size())
-    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    "button_style.font_size missing"});
-
-  if (button_fb->font_size() == 0)
-    return std::unexpected(FailInfo{FailMode::ParameterOutOfBounds,
-                                    "button_style.font_size is 0"});
+    return std::unexpected(
+        FailInfo{FailMode::FlatbuffersDataNotFound,
+                 "button_style.font_size missing or set to 0"});
 
   button_style.text_color = ToColor(button_fb->text_color());
   button_style.hover_color = ToColor(button_fb->hover_color());
 
   // Search for the font in the map
-  auto it = m_fonts_map.find(button_fb->font()->str());
-  if (it == m_fonts_map.end())
+  auto it = fonts_map.find(button_fb->font()->str());
+  if (it == fonts_map.end())
     return std::unexpected(
         FailInfo{FailMode::FlatbuffersDataNotFound,
                  "button_style.font not found: " + button_fb->font()->str()});
@@ -159,9 +155,9 @@ FlatbuffersUIStyleDataProvider::ConfigureDropDownContainerStyle(
                                     "drop_down_container_style missing"});
 
   const auto *dd_container_style_fb = dd_container_fb->style();
-  auto base_result = ConfigureBaseStyle(dd_container_style_fb,
-                                        dd_container_style,
-                                        "drop_down_container_style.style");
+  auto base_result =
+      ConfigureBaseStyle(dd_container_style_fb, dd_container_style,
+                         "drop_down_container_style.style");
 
   if (!base_result.has_value())
     return std::unexpected(base_result.error());
@@ -174,8 +170,7 @@ FlatbuffersUIStyleDataProvider::ConfigureDropDownContainerStyle(
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 FlatbuffersUIStyleDataProvider::ConfigureDropDownListStyle(
-    const DropDownListStyleData *dd_list_fb,
-    DropDownListStyle &dd_list_style) {
+    const DropDownListStyleData *dd_list_fb, DropDownListStyle &dd_list_style) {
 
   if (!dd_list_fb)
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
@@ -189,9 +184,8 @@ FlatbuffersUIStyleDataProvider::ConfigureDropDownListStyle(
     return std::unexpected(base_result.error());
 
   if (!dd_list_fb->text_color())
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound,
-                 "drop_down_list_style.text_color missing"});
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    "drop_down_list_style.text_color missing"});
 
   if (!dd_list_fb->hover_color())
     return std::unexpected(
@@ -205,8 +199,8 @@ FlatbuffersUIStyleDataProvider::ConfigureDropDownListStyle(
   dd_list_style.text_color = ToColor(dd_list_fb->text_color());
   dd_list_style.hover_color = ToColor(dd_list_fb->hover_color());
 
-  auto get_dd_list_font_result = m_fonts_map.find(dd_list_fb->font()->str());
-  if (get_dd_list_font_result == m_fonts_map.end())
+  auto get_dd_list_font_result = fonts_map.find(dd_list_fb->font()->str());
+  if (get_dd_list_font_result == fonts_map.end())
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     "drop_down_list_style.font not found: " +
                                         dd_list_fb->font()->str()});
@@ -220,8 +214,7 @@ FlatbuffersUIStyleDataProvider::ConfigureDropDownListStyle(
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 FlatbuffersUIStyleDataProvider::ConfigureDropDownItemStyle(
-    const DropDownItemStyleData *dd_item_fb,
-    DropDownItemStyle &dd_item_style) {
+    const DropDownItemStyleData *dd_item_fb, DropDownItemStyle &dd_item_style) {
 
   if (!dd_item_fb)
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
@@ -235,9 +228,8 @@ FlatbuffersUIStyleDataProvider::ConfigureDropDownItemStyle(
     return std::unexpected(base_result.error());
 
   if (!dd_item_fb->text_color())
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound,
-                 "drop_down_item_style.text_color missing"});
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    "drop_down_item_style.text_color missing"});
 
   if (!dd_item_fb->hover_color())
     return std::unexpected(
@@ -251,8 +243,8 @@ FlatbuffersUIStyleDataProvider::ConfigureDropDownItemStyle(
   dd_item_style.text_color = ToColor(dd_item_fb->text_color());
   dd_item_style.hover_color = ToColor(dd_item_fb->hover_color());
 
-  auto get_dd_item_font_result = m_fonts_map.find(dd_item_fb->font()->str());
-  if (get_dd_item_font_result == m_fonts_map.end())
+  auto get_dd_item_font_result = fonts_map.find(dd_item_fb->font()->str());
+  if (get_dd_item_font_result == fonts_map.end())
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     "drop_down_item_style.font not found: " +
                                         dd_item_fb->font()->str()});
@@ -330,15 +322,15 @@ FlatbuffersUIStyleDataProvider::ProvideUIStyles() {
       return std::unexpected(panel_result.error());
 
     // Configure ButtonStyle
-    auto button_result = ConfigureButtonStyle(style_data->button_style(),
-                                              ui_style.button_style);
+    auto button_result =
+        ConfigureButtonStyle(style_data->button_style(), ui_style.button_style);
     if (!button_result.has_value())
       return std::unexpected(button_result.error());
 
     // Configure DropDownContainerStyle
-    auto dd_container_result = ConfigureDropDownContainerStyle(
-        style_data->drop_down_container_style(),
-        ui_style.drop_down_container_style);
+    auto dd_container_result =
+        ConfigureDropDownContainerStyle(style_data->drop_down_container_style(),
+                                        ui_style.drop_down_container_style);
     if (!dd_container_result.has_value())
       return std::unexpected(dd_container_result.error());
 

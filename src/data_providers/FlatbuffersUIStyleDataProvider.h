@@ -25,7 +25,7 @@ class FlatbuffersUIStyleDataProvider : public IUIStyleDataProvider {
 
 public:
   FlatbuffersUIStyleDataProvider(
-      const std::unordered_map<std::string, std::shared_ptr<const sf::Font>>
+      std::unordered_map<std::string, std::shared_ptr<const sf::Font>>
           &fonts_map);
 
   std::expected<std::vector<UIStyle>, FailInfo> ProvideUIStyles() override;

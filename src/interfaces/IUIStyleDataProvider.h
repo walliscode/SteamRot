@@ -28,8 +28,7 @@ class IFontProvider;
 ////////////////////////////////////////////////////////////
 class IUIStyleDataProvider {
 protected:
-  const std::unordered_map<std::string, std::shared_ptr<const sf::Font>>
-      &m_fonts_map;
+  std::unordered_map<std::string, std::shared_ptr<const sf::Font>> &fonts_map;
 
 public:
   /////////////////////////////////////////////////
@@ -38,9 +37,9 @@ public:
   /// @param fonts_map Font map to use for loading styles
   /////////////////////////////////////////////////
   IUIStyleDataProvider(
-      const std::unordered_map<std::string, std::shared_ptr<const sf::Font>>
+      std::unordered_map<std::string, std::shared_ptr<const sf::Font>>
           &fonts_map)
-      : m_fonts_map(fonts_map) {};
+      : fonts_map(fonts_map) {};
 
   ////////////////////////////////////////////////////////////
   /// @brief Virtual destructor
