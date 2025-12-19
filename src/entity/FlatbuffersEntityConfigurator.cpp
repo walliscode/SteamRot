@@ -116,13 +116,20 @@ FlatbuffersEntityConfigurator::ConfigureCUserInterface(
   // get the UserInterfaceData from the current entity data
   const UserInterfaceData *ui_data = m_current_entity_data->c_user_interface();
 
+  // null check for ui_data
+  if (!ui_data) {
+    FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
+                       "UserInterfaceData not found in entity data."};
+    return std::unexpected(fail_info);
+  }
+
   // configure the CUserInterface specific data, wrap in if statements to avoid
   // any segfaults
   if (ui_data->ui_name())
     ui_component.m_name = ui_data->ui_name()->str();
 
-  if (ui_data->is_visible())
-    ui_component.m_visible = ui_data->is_visible();
+  // Always read the boolean value, not just when it's true
+  ui_component.m_visible = ui_data->is_visible();
 
   // data must contain a root element so throw unexpected if it is not set
   if (!ui_data->root_ui_element()) {
@@ -167,11 +174,32 @@ FlatbuffersEntityConfigurator::ConfigureCGrimoireMachina(
   const GrimoireMachinaData *grimoire_data =
       m_current_entity_data->c_grimoire_machina();
 
+  // null check for grimoire_data
+  if (!grimoire_data) {
+    FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
+                       "GrimoireMachinaData not found in entity data."};
+    return std::unexpected(fail_info);
+  }
+
   // configure the CGrimoireMachina specific data
-  std::vector<std::string> fragment_names;
+  // Note: Currently not populating m_all_fragments or m_all_joints from
+  // FlatBuffers data. This would require Fragment and Joint object creation
+  // which is not implemented yet.
   if (grimoire_data->fragments()) {
     for (const auto &name : *grimoire_data->fragments()) {
-      fragment_names.push_back(name->str());
+      if (name) {
+        // Fragment names are present but not yet used
+        // Future implementation would create Fragment objects here
+      }
+    }
+  }
+
+  if (grimoire_data->joints()) {
+    for (const auto &name : *grimoire_data->joints()) {
+      if (name) {
+        // Joint names are present but not yet used
+        // Future implementation would create Joint objects here
+      }
     }
   }
 

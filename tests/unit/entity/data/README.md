@@ -8,14 +8,13 @@ This JSON file contains a single `EntityCollectionFbs` with multiple test entiti
 
 ### Entity Index Reference
 
-- **Entity 0**: No components
-- **Entity 1**: CUserInterface with root element (ui_name: "test_ui")
-- **Entity 2**: CUserInterface without root element (ui_name: "test_ui_no_root") - for failure testing
+- **Entity 0**: No components (empty entity)
+- **Entity 1**: CUserInterface (ui_name: "simple_ui", visible: true, simple panel)
+- **Entity 2**: CUserInterface (ui_name: "hidden_ui", visible: false, simple panel)
 - **Entity 3**: CGrimoireMachina (empty fragments/joints)
-- **Entity 4**: CUserInterface with root element (ui_name: "ui_entity")
-- **Entity 5**: CGrimoireMachina (empty fragments/joints)
+- **Entity 4**: CGrimoireMachina (with fragments: ["fragment_a", "fragment_b"], joints: ["joint_x", "joint_y"])
 
-Pool size: 100
+Pool size: 20
 
 ### Using in Tests
 
