@@ -25,9 +25,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # This project does not use C++20 modules, only traditional #pragma once headers
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
+
+# other variables [TODO: break this up into a separate files]
+set(UUID_SYSTEM_GENERATOR ON) # use system uuid generator if available
+
 # set the cmake module path (for import libraries and other cmake files)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/FetchContentModules")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/FlatbuffersCompilation")
+list(APPEND CMAKE_MODULE_PATH "${stduuid_SOURCE_DIR}/cmake")
+
 
 # set project wide variables
 cmake_path(SET data_dir ${CMAKE_SOURCE_DIR}/data)
