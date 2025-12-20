@@ -24,11 +24,28 @@ namespace steamrot {
 /// @brief Configures UIElement instances from FlatBuffers data
 ////////////////////////////////////////////////////////////
 class FlatbuffersUIElementConfigurator : public IUIElementConfigurator {
+
 private:
   ////////////////////////////////////////////////////////////
   /// @brief Reference to the UserInterfaceData FlatBuffers data
   ////////////////////////////////////////////////////////////
-  const UserInterfaceData &m_ui_data;
+  const UserInterfaceFbs &m_ui_data;
+
+public:
+  ////////////////////////////////////////////////////////////
+  /// @brief Constructor
+  ///
+  /// @param event_handler Reference to the EventHandler
+  /// @param ui_data Reference to the UserInterfaceData to configure from
+  ////////////////////////////////////////////////////////////
+  FlatbuffersUIElementConfigurator(EventHandler &event_handler,
+                                   const UserInterfaceFbs &ui_data);
+
+  ////////////////////////////////////////////////////////////
+  /// @brief Create a root UIElement from FlatBuffers data
+  ////////////////////////////////////////////////////////////
+  std::expected<std::unique_ptr<UIElement>, FailInfo>
+  CreateRootUIElement() override;
 
   ////////////////////////////////////////////////////////////
   /// @brief Create a UIElement from FlatBuffers data
@@ -99,22 +116,6 @@ private:
   /// @brief Convert FlatBuffers SpacingAndSizingFbs to native SpacingAndSizing
   ////////////////////////////////////////////////////////////
   static SpacingAndSizing ConvertSpacingAndSizing(int8_t fbs_spacing);
-
-public:
-  ////////////////////////////////////////////////////////////
-  /// @brief Constructor
-  ///
-  /// @param event_handler Reference to the EventHandler
-  /// @param ui_data Reference to the UserInterfaceData to configure from
-  ////////////////////////////////////////////////////////////
-  FlatbuffersUIElementConfigurator(EventHandler &event_handler,
-                                   const UserInterfaceData &ui_data);
-
-  ////////////////////////////////////////////////////////////
-  /// @brief Create a root UIElement from FlatBuffers data
-  ////////////////////////////////////////////////////////////
-  std::expected<std::unique_ptr<UIElement>, FailInfo>
-  CreateRootUIElement() override;
 };
 
 } // namespace steamrot

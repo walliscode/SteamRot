@@ -58,7 +58,7 @@ FlatbuffersUIElementConfigurator::ConvertSpacingAndSizing(int8_t fbs_spacing) {
 
 ////////////////////////////////////////////////////////////
 FlatbuffersUIElementConfigurator::FlatbuffersUIElementConfigurator(
-    EventHandler &event_handler, const UserInterfaceData &ui_data)
+    EventHandler &event_handler, const UserInterfaceFbs &ui_data)
     : IUIElementConfigurator(event_handler), m_ui_data(ui_data) {}
 
 ////////////////////////////////////////////////////////////
@@ -185,19 +185,21 @@ FlatbuffersUIElementConfigurator::ConfigureBaseUIElement(
 
     // Create vector with single subscriber
     std::vector<const SubscriberFbs *> subscribers_fbs{data.subscriber_data()};
-    std::vector<std::shared_ptr<Subscriber>> subscribers;
 
     // Create Subscriber via factory
     auto result = subscriber_factory::CreateSubscriber(subscribers_fbs[0]);
 
+    // propogate errors
     if (!result.has_value())
       return std::unexpected(result.error());
 
-    // Set the subscription if one was created
-    if (!subscribers.empty()) {
-      element.subscription.reset();
-      element.subscription = std::move(subscribers[0]);
-    }
+    // create shared_ptr, add to element and register with event handler
+    std::shared_ptr<Subscriber> subscriber =
+        std::make_shared<Subscriber>(result.value());
+    element.subscription = subscriber;
+    auto register_result = m_event_handler.RegisterSubscriber(subscriber);
+    if (!register_result.has_value())
+      return std::unexpected(register_result.error());
   }
 
   // set ResponseEvent if response_event_data exists and EventType is not none
