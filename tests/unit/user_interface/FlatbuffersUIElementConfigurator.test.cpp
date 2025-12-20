@@ -7,10 +7,14 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersUIElementConfigurator.h"
+#include "EventPacket.h"
+#include "Subscriber.h"
 #include "TestFixture.h"
+#include "UserInputBitset.h"
 #include "user_interface_generated.h"
 #include <catch2/catch_test_macros.hpp>
 #include <fstream>
+#include <variant>
 
 std::pair<std::unique_ptr<char[]>, const steamrot::UserInterfaceFbs *>
 LoadUIElementTestData() {
@@ -131,9 +135,9 @@ TEST_CASE("FlatbuffersUIElementConfigurator configures elements correctly",
     // Get DropDownContainerData from FlatBuffers data and check validity
     auto container_fb = children->Get(2);
     REQUIRE(container_fb != nullptr);
-    REQUIRE(container_fb->element_type() ==
-            steamrot::UIElementDataUnion::
-                UIElementDataUnion_DropDownContainerData);
+    REQUIRE(
+        container_fb->element_type() ==
+        steamrot::UIElementDataUnion::UIElementDataUnion_DropDownContainerData);
     auto container_data = static_cast<const steamrot::DropDownContainerData *>(
         container_fb->element());
     REQUIRE(container_data != nullptr);
@@ -173,11 +177,11 @@ TEST_CASE("FlatbuffersUIElementConfigurator configures elements correctly",
     // Get DropDownButtonData from FlatBuffers data and check validity
     auto button_fb = children->Get(4);
     REQUIRE(button_fb != nullptr);
-    REQUIRE(button_fb->element_type() ==
-            steamrot::UIElementDataUnion::
-                UIElementDataUnion_DropDownButtonData);
-    auto button_data = static_cast<const steamrot::DropDownButtonData *>(
-        button_fb->element());
+    REQUIRE(
+        button_fb->element_type() ==
+        steamrot::UIElementDataUnion::UIElementDataUnion_DropDownButtonData);
+    auto button_data =
+        static_cast<const steamrot::DropDownButtonData *>(button_fb->element());
     REQUIRE(button_data != nullptr);
 
     // create DropDownButtonElement and configure using flatbuffers data
@@ -241,7 +245,11 @@ TEST_CASE("FlatbuffersUIElementConfigurator CreateUIElement creates correct "
 
     auto result = configurator.CreateUIElement(button_fb->element_type(),
                                                button_fb->element());
-    REQUIRE(result.has_value());
+
+    if (!result.has_value()) {
+      auto error = result.error();
+      FAIL(error.message);
+    }
 
     auto element = std::move(result.value());
     REQUIRE(element != nullptr);
@@ -259,6 +267,48 @@ TEST_CASE("FlatbuffersUIElementConfigurator CreateUIElement creates correct "
     REQUIRE(element->children_active == false);
     REQUIRE(element->layout == steamrot::Layout::Horizontal);
     REQUIRE(element->spacing_strategy == steamrot::SpacingAndSizing::None);
+
+    // check response event
+    REQUIRE(element->response_event.has_value());
+    const steamrot::EventPacket &event_packet = element->response_event.value();
+    REQUIRE(event_packet.event_type ==
+            steamrot::EventType::EventType_EVENT_CHANGE_SCENE);
+    REQUIRE(std::holds_alternative<steamrot::SceneChangePacket>(
+        event_packet.event_data));
+    const auto &scene_change =
+        std::get<steamrot::SceneChangePacket>(event_packet.event_data);
+    REQUIRE(scene_change.second == steamrot::SceneType::SceneType_TEST);
+
+    // check Subscriber
+    REQUIRE(element->subscription != nullptr);
+    const steamrot::Subscriber &subscriber = *element->subscription;
+    REQUIRE(subscriber.m_trigger_event_type ==
+            steamrot::EventType::EventType_EVENT_USER_INPUT);
+
+    REQUIRE(subscriber.m_trigger_event_data.has_value());
+    const steamrot::EventData &event_data =
+        subscriber.m_trigger_event_data.value();
+    REQUIRE(std::holds_alternative<steamrot::UserInputBitset>(event_data));
+
+    // check its been registered with the event handler
+    auto &event_handler = fixture.GetGameContext().event_handler;
+    auto &subscriber_register = event_handler.GetSubcriberRegister();
+    auto it =
+        subscriber_register.find(element->subscription->m_trigger_event_type);
+    REQUIRE(it != subscriber_register.end());
+    auto &subscribers = it->second;
+    auto found = std::any_of(
+        subscribers.begin(), subscribers.end(),
+
+        // pass in element to lambda capture
+        [&element](const std::weak_ptr<steamrot::Subscriber> &sub_ptr) {
+          // check if weak_ptr can be locked and matches element's subscription
+          auto shared_ptr = sub_ptr.lock();
+          return shared_ptr && (shared_ptr == element->subscription);
+        });
+
+    // check that we found the subscriber
+    REQUIRE(found);
 
     // Check element-specific data
     REQUIRE(button_element->label == "Test Tab");
@@ -300,9 +350,9 @@ TEST_CASE("FlatbuffersUIElementConfigurator CreateUIElement creates correct "
   SECTION("CreateUIElement creates DropDownContainerElement") {
     auto container_fb = children->Get(2);
     REQUIRE(container_fb != nullptr);
-    REQUIRE(container_fb->element_type() ==
-            steamrot::UIElementDataUnion::
-                UIElementDataUnion_DropDownContainerData);
+    REQUIRE(
+        container_fb->element_type() ==
+        steamrot::UIElementDataUnion::UIElementDataUnion_DropDownContainerData);
 
     auto result = configurator.CreateUIElement(container_fb->element_type(),
                                                container_fb->element());
@@ -363,9 +413,9 @@ TEST_CASE("FlatbuffersUIElementConfigurator CreateUIElement creates correct "
   SECTION("CreateUIElement creates DropDownButtonElement") {
     auto button_fb = children->Get(4);
     REQUIRE(button_fb != nullptr);
-    REQUIRE(button_fb->element_type() ==
-            steamrot::UIElementDataUnion::
-                UIElementDataUnion_DropDownButtonData);
+    REQUIRE(
+        button_fb->element_type() ==
+        steamrot::UIElementDataUnion::UIElementDataUnion_DropDownButtonData);
 
     auto result = configurator.CreateUIElement(button_fb->element_type(),
                                                button_fb->element());
