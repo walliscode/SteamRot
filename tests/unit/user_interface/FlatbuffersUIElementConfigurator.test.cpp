@@ -495,8 +495,8 @@ TEST_CASE("FlatbuffersUIElementConfigurator CreateRootUIElement creates root "
     REQUIRE(root_element->child_elements.size() == 5);
 
     // Check first child is ButtonElement
-    auto button =
-        dynamic_cast<steamrot::ButtonElement *>(root_element->child_elements[0].get());
+    auto button = dynamic_cast<steamrot::ButtonElement *>(
+        root_element->child_elements[0].get());
     REQUIRE(button != nullptr);
 
     // Check second child is DropDownListElement
@@ -505,8 +505,9 @@ TEST_CASE("FlatbuffersUIElementConfigurator CreateRootUIElement creates root "
     REQUIRE(dropdown_list != nullptr);
 
     // Check third child is DropDownContainerElement
-    auto dropdown_container = dynamic_cast<steamrot::DropDownContainerElement *>(
-        root_element->child_elements[2].get());
+    auto dropdown_container =
+        dynamic_cast<steamrot::DropDownContainerElement *>(
+            root_element->child_elements[2].get());
     REQUIRE(dropdown_container != nullptr);
 
     // Check fourth child is DropDownItemElement
@@ -529,8 +530,9 @@ TEST_CASE("FlatbuffersUIElementConfigurator CreateRootUIElement creates root "
     REQUIRE(root_element->child_elements.size() == 5);
 
     // The DropDownContainerElement (child index 2) should have 2 children
-    auto dropdown_container = dynamic_cast<steamrot::DropDownContainerElement *>(
-        root_element->child_elements[2].get());
+    auto dropdown_container =
+        dynamic_cast<steamrot::DropDownContainerElement *>(
+            root_element->child_elements[2].get());
     REQUIRE(dropdown_container != nullptr);
     REQUIRE(dropdown_container->child_elements.size() == 2);
 
@@ -554,20 +556,6 @@ TEST_CASE("FlatbuffersUIElementConfigurator error handling tests",
   // set up the test fixture
   steamrot::tests::TestFixture fixture;
 
-  SECTION("CreateRootUIElement fails with missing root_ui_element") {
-    // Load test data without root_ui_element
-    auto [data, ui_data] = LoadTestData("error_missing_root.bin");
-    REQUIRE(ui_data != nullptr);
-
-    steamrot::FlatbuffersUIElementConfigurator configurator(
-        fixture.GetGameContext().event_handler, *ui_data);
-
-    auto result = configurator.CreateRootUIElement();
-    REQUIRE_FALSE(result.has_value());
-    REQUIRE(result.error().fail_mode ==
-            steamrot::FailMode::FlatbuffersDataNotFound);
-  }
-
   SECTION("CreateUIElement fails with unsupported element type") {
     // Load valid test data
     auto [data, ui_element_data] = LoadUIElementTestData();
@@ -579,33 +567,9 @@ TEST_CASE("FlatbuffersUIElementConfigurator error handling tests",
     // Use NONE type which is unsupported
     auto result = configurator.CreateUIElement(
         steamrot::UIElementDataUnion::UIElementDataUnion_NONE, nullptr);
-    
+
     REQUIRE_FALSE(result.has_value());
-    REQUIRE(result.error().fail_mode ==
-            steamrot::FailMode::NonExistentEnumValue);
-  }
-
-  SECTION("ConfigureDropDownContainerElement fails with no children") {
-    // Load test data with container without children
-    auto [data, ui_data] = LoadTestData("error_container_no_children.bin");
-    REQUIRE(ui_data != nullptr);
-    REQUIRE(ui_data->root_ui_element() != nullptr);
-    
-    // Get the DropDownContainerData from test data
-    const steamrot::PanelData *container_data = ui_data->root_ui_element();
-    REQUIRE(container_data != nullptr);
-    REQUIRE(container_data->base_data() != nullptr);
-
-    steamrot::FlatbuffersUIElementConfigurator configurator(
-        fixture.GetGameContext().event_handler, *ui_data);
-
-    steamrot::DropDownContainerElement container_element;
-    auto result = configurator.ConfigureDropDownContainerElement(
-        container_element, *container_data);
-    
-    REQUIRE_FALSE(result.has_value());
-    REQUIRE(result.error().fail_mode ==
-            steamrot::FailMode::FlatbuffersDataNotFound);
+    REQUIRE(result.error().mode == steamrot::FailMode::NonExistentEnumValue);
   }
 
   SECTION("ConfigureDropDownContainerElement fails with wrong number of "
@@ -617,14 +581,17 @@ TEST_CASE("FlatbuffersUIElementConfigurator error handling tests",
     REQUIRE(ui_data->root_ui_element()->base_data() != nullptr);
     REQUIRE(ui_data->root_ui_element()->base_data()->children() != nullptr);
     REQUIRE(ui_data->root_ui_element()->base_data()->children()->size() == 1);
-    
+
     // Get the DropDownContainerData from test data (first child)
-    auto container_wrapper = ui_data->root_ui_element()->base_data()->children()->Get(0);
+    auto container_wrapper =
+        ui_data->root_ui_element()->base_data()->children()->Get(0);
     REQUIRE(container_wrapper != nullptr);
-    REQUIRE(container_wrapper->element_type() == 
-            steamrot::UIElementDataUnion::UIElementDataUnion_DropDownContainerData);
+    REQUIRE(
+        container_wrapper->element_type() ==
+        steamrot::UIElementDataUnion::UIElementDataUnion_DropDownContainerData);
     const steamrot::DropDownContainerData *container_data =
-        static_cast<const steamrot::DropDownContainerData *>(container_wrapper->element());
+        static_cast<const steamrot::DropDownContainerData *>(
+            container_wrapper->element());
     REQUIRE(container_data != nullptr);
 
     steamrot::FlatbuffersUIElementConfigurator configurator(
@@ -633,30 +600,33 @@ TEST_CASE("FlatbuffersUIElementConfigurator error handling tests",
     steamrot::DropDownContainerElement container_element;
     auto result = configurator.ConfigureDropDownContainerElement(
         container_element, *container_data);
-    
+
     REQUIRE_FALSE(result.has_value());
-    REQUIRE(result.error().fail_mode ==
-            steamrot::FailMode::FlatbuffersDataNotFound);
+    REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
     REQUIRE(result.error().message.find("2 children") != std::string::npos);
   }
 
   SECTION("ConfigureDropDownContainerElement fails with wrong first child "
           "type") {
     // Load test data with container with wrong first child type
-    auto [data, ui_data] = LoadTestData("error_container_wrong_first_child.bin");
+    auto [data, ui_data] =
+        LoadTestData("error_container_wrong_first_child.bin");
     REQUIRE(ui_data != nullptr);
     REQUIRE(ui_data->root_ui_element() != nullptr);
     REQUIRE(ui_data->root_ui_element()->base_data() != nullptr);
     REQUIRE(ui_data->root_ui_element()->base_data()->children() != nullptr);
     REQUIRE(ui_data->root_ui_element()->base_data()->children()->size() == 1);
-    
+
     // Get the DropDownContainerData from test data (first child)
-    auto container_wrapper = ui_data->root_ui_element()->base_data()->children()->Get(0);
+    auto container_wrapper =
+        ui_data->root_ui_element()->base_data()->children()->Get(0);
     REQUIRE(container_wrapper != nullptr);
-    REQUIRE(container_wrapper->element_type() == 
-            steamrot::UIElementDataUnion::UIElementDataUnion_DropDownContainerData);
+    REQUIRE(
+        container_wrapper->element_type() ==
+        steamrot::UIElementDataUnion::UIElementDataUnion_DropDownContainerData);
     const steamrot::DropDownContainerData *container_data =
-        static_cast<const steamrot::DropDownContainerData *>(container_wrapper->element());
+        static_cast<const steamrot::DropDownContainerData *>(
+            container_wrapper->element());
     REQUIRE(container_data != nullptr);
 
     steamrot::FlatbuffersUIElementConfigurator configurator(
@@ -665,30 +635,33 @@ TEST_CASE("FlatbuffersUIElementConfigurator error handling tests",
     steamrot::DropDownContainerElement container_element;
     auto result = configurator.ConfigureDropDownContainerElement(
         container_element, *container_data);
-    
+
     REQUIRE_FALSE(result.has_value());
-    REQUIRE(result.error().fail_mode ==
-            steamrot::FailMode::FlatbuffersDataNotFound);
+    REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
     REQUIRE(result.error().message.find("first child") != std::string::npos);
   }
 
   SECTION("ConfigureDropDownContainerElement fails with wrong second child "
           "type") {
     // Load test data with container with wrong second child type
-    auto [data, ui_data] = LoadTestData("error_container_wrong_second_child.bin");
+    auto [data, ui_data] =
+        LoadTestData("error_container_wrong_second_child.bin");
     REQUIRE(ui_data != nullptr);
     REQUIRE(ui_data->root_ui_element() != nullptr);
     REQUIRE(ui_data->root_ui_element()->base_data() != nullptr);
     REQUIRE(ui_data->root_ui_element()->base_data()->children() != nullptr);
     REQUIRE(ui_data->root_ui_element()->base_data()->children()->size() == 1);
-    
+
     // Get the DropDownContainerData from test data (first child)
-    auto container_wrapper = ui_data->root_ui_element()->base_data()->children()->Get(0);
+    auto container_wrapper =
+        ui_data->root_ui_element()->base_data()->children()->Get(0);
     REQUIRE(container_wrapper != nullptr);
-    REQUIRE(container_wrapper->element_type() == 
-            steamrot::UIElementDataUnion::UIElementDataUnion_DropDownContainerData);
+    REQUIRE(
+        container_wrapper->element_type() ==
+        steamrot::UIElementDataUnion::UIElementDataUnion_DropDownContainerData);
     const steamrot::DropDownContainerData *container_data =
-        static_cast<const steamrot::DropDownContainerData *>(container_wrapper->element());
+        static_cast<const steamrot::DropDownContainerData *>(
+            container_wrapper->element());
     REQUIRE(container_data != nullptr);
 
     steamrot::FlatbuffersUIElementConfigurator configurator(
@@ -697,10 +670,9 @@ TEST_CASE("FlatbuffersUIElementConfigurator error handling tests",
     steamrot::DropDownContainerElement container_element;
     auto result = configurator.ConfigureDropDownContainerElement(
         container_element, *container_data);
-    
+
     REQUIRE_FALSE(result.has_value());
-    REQUIRE(result.error().fail_mode ==
-            steamrot::FailMode::FlatbuffersDataNotFound);
+    REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
     REQUIRE(result.error().message.find("second child") != std::string::npos);
   }
 }

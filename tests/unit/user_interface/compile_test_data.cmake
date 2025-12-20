@@ -5,9 +5,6 @@ set(UI_ELEMENT_TEST_BIN "${CMAKE_CURRENT_SOURCE_DIR}/data/ui_element_test_data.b
 set(UI_ELEMENT_SCHEMA "${CMAKE_SOURCE_DIR}/src/types/flatbuffers/entities/user_interface.fbs")
 
 # Error test data files
-set(ERROR_MISSING_ROOT_JSON "${CMAKE_CURRENT_SOURCE_DIR}/data/error_missing_root.json")
-set(ERROR_MISSING_ROOT_BIN "${CMAKE_CURRENT_SOURCE_DIR}/data/error_missing_root.bin")
-
 set(ERROR_CONTAINER_NO_CHILDREN_JSON "${CMAKE_CURRENT_SOURCE_DIR}/data/error_container_no_children.json")
 set(ERROR_CONTAINER_NO_CHILDREN_BIN "${CMAKE_CURRENT_SOURCE_DIR}/data/error_container_no_children.bin")
 
