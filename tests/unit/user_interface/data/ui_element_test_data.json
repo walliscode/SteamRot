@@ -22,14 +22,30 @@
                 "event_lifetime": 1,
                 "event_type": "EVENT_CHANGE_SCENE",
                 "event_data_data_type": "SceneChangePacketData",
-                "event_data_data": { "scene_type": "CRAFTING" }
+                "event_data_data": { "scene_type": "TEST" }
               },
               "children_active": false,
               "children": [],
               "layout": "Horizontal",
               "spacing_strategy": "None"
             },
-            "label": "Crafting Table"
+            "label": "Test Tab"
+          }
+        },
+        {
+          "element_type": "DropDownListData",
+          "element": {
+            "base_data": {
+              "position": { "x": 0, "y": 0 },
+              "size": { "x": 0, "y": 0 },
+              "children_active": false,
+              "children": [],
+              "layout": "DropDown",
+              "spacing_strategy": "DropDownList"
+            },
+            "label": "Select Option",
+            "expanded_label": "Options:",
+            "data_populate_function": "PopulateWithFragmentData"
           }
         }
       ],
