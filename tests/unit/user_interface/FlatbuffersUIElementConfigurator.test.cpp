@@ -622,18 +622,12 @@ TEST_CASE("FlatbuffersUIElementConfigurator error handling tests",
             builder.GetBufferPointer());
     REQUIRE(container_data != nullptr);
 
-    auto ui_name = builder.CreateString("test_ui");
-    steamrot::UserInterfaceFbsBuilder ui_builder(builder);
-    ui_builder.add_ui_name(ui_name);
-    ui_builder.add_is_visible(true);
-    auto ui_data_offset = ui_builder.Finish();
-    builder.Finish(ui_data_offset);
-    
-    const steamrot::UserInterfaceFbs *ui_data =
-        steamrot::GetUserInterfaceFbs(builder.GetBufferPointer());
+    // Load valid test data for the configurator
+    auto [data, ui_element_data] = LoadUIElementTestData();
+    REQUIRE(ui_element_data != nullptr);
 
     steamrot::FlatbuffersUIElementConfigurator configurator(
-        fixture.GetGameContext().event_handler, *ui_data);
+        fixture.GetGameContext().event_handler, *ui_element_data);
 
     steamrot::DropDownContainerElement container_element;
     auto result = configurator.ConfigureDropDownContainerElement(
@@ -701,18 +695,12 @@ TEST_CASE("FlatbuffersUIElementConfigurator error handling tests",
             builder.GetBufferPointer());
     REQUIRE(container_data != nullptr);
 
-    auto ui_name = builder.CreateString("test_ui");
-    steamrot::UserInterfaceFbsBuilder ui_builder(builder);
-    ui_builder.add_ui_name(ui_name);
-    ui_builder.add_is_visible(true);
-    auto ui_data_offset = ui_builder.Finish();
-    builder.Finish(ui_data_offset);
-    
-    const steamrot::UserInterfaceFbs *ui_data =
-        steamrot::GetUserInterfaceFbs(builder.GetBufferPointer());
+    // Load valid test data for the configurator
+    auto [data, ui_element_data] = LoadUIElementTestData();
+    REQUIRE(ui_element_data != nullptr);
 
     steamrot::FlatbuffersUIElementConfigurator configurator(
-        fixture.GetGameContext().event_handler, *ui_data);
+        fixture.GetGameContext().event_handler, *ui_element_data);
 
     steamrot::DropDownContainerElement container_element;
     auto result = configurator.ConfigureDropDownContainerElement(
@@ -806,18 +794,12 @@ TEST_CASE("FlatbuffersUIElementConfigurator error handling tests",
             builder.GetBufferPointer());
     REQUIRE(container_data != nullptr);
 
-    auto ui_name = builder.CreateString("test_ui");
-    steamrot::UserInterfaceFbsBuilder ui_builder(builder);
-    ui_builder.add_ui_name(ui_name);
-    ui_builder.add_is_visible(true);
-    auto ui_data_offset = ui_builder.Finish();
-    builder.Finish(ui_data_offset);
-    
-    const steamrot::UserInterfaceFbs *ui_data =
-        steamrot::GetUserInterfaceFbs(builder.GetBufferPointer());
+    // Load valid test data for the configurator
+    auto [data, ui_element_data] = LoadUIElementTestData();
+    REQUIRE(ui_element_data != nullptr);
 
     steamrot::FlatbuffersUIElementConfigurator configurator(
-        fixture.GetGameContext().event_handler, *ui_data);
+        fixture.GetGameContext().event_handler, *ui_element_data);
 
     steamrot::DropDownContainerElement container_element;
     auto result = configurator.ConfigureDropDownContainerElement(
@@ -917,18 +899,12 @@ TEST_CASE("FlatbuffersUIElementConfigurator error handling tests",
             builder.GetBufferPointer());
     REQUIRE(container_data != nullptr);
 
-    auto ui_name = builder.CreateString("test_ui");
-    steamrot::UserInterfaceFbsBuilder ui_builder(builder);
-    ui_builder.add_ui_name(ui_name);
-    ui_builder.add_is_visible(true);
-    auto ui_data_offset = ui_builder.Finish();
-    builder.Finish(ui_data_offset);
-    
-    const steamrot::UserInterfaceFbs *ui_data =
-        steamrot::GetUserInterfaceFbs(builder.GetBufferPointer());
+    // Load valid test data for the configurator
+    auto [data, ui_element_data] = LoadUIElementTestData();
+    REQUIRE(ui_element_data != nullptr);
 
     steamrot::FlatbuffersUIElementConfigurator configurator(
-        fixture.GetGameContext().event_handler, *ui_data);
+        fixture.GetGameContext().event_handler, *ui_element_data);
 
     steamrot::DropDownContainerElement container_element;
     auto result = configurator.ConfigureDropDownContainerElement(
