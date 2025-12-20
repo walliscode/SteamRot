@@ -22,7 +22,7 @@
 namespace steamrot {
 
 ////////////////////////////////////////////////////////////
-Layout ConvertLayout(int8_t fbs_layout) {
+Layout FlatbuffersUIElementConfigurator::ConvertLayout(int8_t fbs_layout) {
   switch (fbs_layout) {
   case LayoutFbs_None:
     return Layout::None;
@@ -40,7 +40,8 @@ Layout ConvertLayout(int8_t fbs_layout) {
 }
 
 ////////////////////////////////////////////////////////////
-SpacingAndSizing ConvertSpacingAndSizing(int8_t fbs_spacing) {
+SpacingAndSizing
+FlatbuffersUIElementConfigurator::ConvertSpacingAndSizing(int8_t fbs_spacing) {
   switch (fbs_spacing) {
   case SpacingAndSizingFbs_None:
     return SpacingAndSizing::None;
@@ -168,7 +169,8 @@ FlatbuffersUIElementConfigurator::CreateUIElement(
 
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigureBaseUIElement(UIElement &element, const UIElementData &data) {
+FlatbuffersUIElementConfigurator::ConfigureBaseUIElement(
+    UIElement &element, const UIElementData &data) {
 
   element.position = sf::Vector2f({data.position()->x(), data.position()->y()});
   element.size = sf::Vector2f({data.size()->x(), data.size()->y()});
@@ -250,14 +252,16 @@ ConfigureBaseUIElement(UIElement &element, const UIElementData &data) {
 
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigurePanelElement(PanelElement &panel_element, const PanelData &data) {
+FlatbuffersUIElementConfigurator::ConfigurePanelElement(
+    PanelElement &panel_element, const PanelData &data) {
   // No extra fields for panel
   return std::monostate{};
 }
 
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigureButtonElement(ButtonElement &button_element, const ButtonData &data) {
+FlatbuffersUIElementConfigurator::ConfigureButtonElement(
+    ButtonElement &button_element, const ButtonData &data) {
   if (data.label()) {
     button_element.label = data.label()->str();
   }
@@ -266,8 +270,8 @@ ConfigureButtonElement(ButtonElement &button_element, const ButtonData &data) {
 
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigureDropDownListElement(DropDownListElement &dropdown_list_element,
-                             const DropDownListData &data) {
+FlatbuffersUIElementConfigurator::ConfigureDropDownListElement(
+    DropDownListElement &dropdown_list_element, const DropDownListData &data) {
   if (data.label()) {
     dropdown_list_element.unexpanded_label = data.label()->str();
   }
@@ -281,7 +285,8 @@ ConfigureDropDownListElement(DropDownListElement &dropdown_list_element,
 }
 
 ////////////////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo> ConfigureDropDownContainerElement(
+std::expected<std::monostate, FailInfo>
+FlatbuffersUIElementConfigurator::ConfigureDropDownContainerElement(
     DropDownContainerElement &dropdown_container_element,
     const DropDownContainerData &data) {
 
@@ -325,8 +330,8 @@ std::expected<std::monostate, FailInfo> ConfigureDropDownContainerElement(
 
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigureDropDownItemElement(DropDownItemElement &dropdown_item_element,
-                             const DropDownItemData &data) {
+FlatbuffersUIElementConfigurator::ConfigureDropDownItemElement(
+    DropDownItemElement &dropdown_item_element, const DropDownItemData &data) {
   if (data.label()) {
     dropdown_item_element.label = data.label()->str();
   }
@@ -335,8 +340,9 @@ ConfigureDropDownItemElement(DropDownItemElement &dropdown_item_element,
 
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigureDropDownButtonElement(DropDownButtonElement &dropdown_button_element,
-                               const DropDownButtonData &data) {
+FlatbuffersUIElementConfigurator::ConfigureDropDownButtonElement(
+    DropDownButtonElement &dropdown_button_element,
+    const DropDownButtonData &data) {
   dropdown_button_element.is_expanded = data.is_expanded();
   return std::monostate{};
 }
