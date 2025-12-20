@@ -114,7 +114,7 @@ FlatbuffersEntityConfigurator::ConfigureCUserInterface(
     return std::unexpected(configure_result.error());
 
   // get the UserInterfaceData from the current entity data
-  const UserInterfaceData *ui_data = m_current_entity_data->c_user_interface();
+  const UserInterfaceFbs *ui_data = m_current_entity_data->c_user_interface();
 
   // null check for ui_data
   if (!ui_data) {

@@ -43,8 +43,8 @@ struct DropDownItemDataBuilder;
 struct DropDownButtonData;
 struct DropDownButtonDataBuilder;
 
-struct UserInterfaceData;
-struct UserInterfaceDataBuilder;
+struct UserInterfaceFbs;
+struct UserInterfaceFbsBuilder;
 
 enum LayoutFbs : int8_t {
   LayoutFbs_None = 0,
@@ -845,8 +845,8 @@ inline ::flatbuffers::Offset<DropDownButtonData> CreateDropDownButtonData(
   return builder_.Finish();
 }
 
-struct UserInterfaceData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef UserInterfaceDataBuilder Builder;
+struct UserInterfaceFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UserInterfaceFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ROOT_UI_ELEMENT = 4,
     VT_UI_NAME = 6,
@@ -872,50 +872,50 @@ struct UserInterfaceData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
   }
 };
 
-struct UserInterfaceDataBuilder {
-  typedef UserInterfaceData Table;
+struct UserInterfaceFbsBuilder {
+  typedef UserInterfaceFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_root_ui_element(::flatbuffers::Offset<steamrot::PanelData> root_ui_element) {
-    fbb_.AddOffset(UserInterfaceData::VT_ROOT_UI_ELEMENT, root_ui_element);
+    fbb_.AddOffset(UserInterfaceFbs::VT_ROOT_UI_ELEMENT, root_ui_element);
   }
   void add_ui_name(::flatbuffers::Offset<::flatbuffers::String> ui_name) {
-    fbb_.AddOffset(UserInterfaceData::VT_UI_NAME, ui_name);
+    fbb_.AddOffset(UserInterfaceFbs::VT_UI_NAME, ui_name);
   }
   void add_is_visible(bool is_visible) {
-    fbb_.AddElement<uint8_t>(UserInterfaceData::VT_IS_VISIBLE, static_cast<uint8_t>(is_visible), 0);
+    fbb_.AddElement<uint8_t>(UserInterfaceFbs::VT_IS_VISIBLE, static_cast<uint8_t>(is_visible), 0);
   }
-  explicit UserInterfaceDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit UserInterfaceFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<UserInterfaceData> Finish() {
+  ::flatbuffers::Offset<UserInterfaceFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<UserInterfaceData>(end);
-    fbb_.Required(o, UserInterfaceData::VT_ROOT_UI_ELEMENT);
+    auto o = ::flatbuffers::Offset<UserInterfaceFbs>(end);
+    fbb_.Required(o, UserInterfaceFbs::VT_ROOT_UI_ELEMENT);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<UserInterfaceData> CreateUserInterfaceData(
+inline ::flatbuffers::Offset<UserInterfaceFbs> CreateUserInterfaceFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::PanelData> root_ui_element = 0,
     ::flatbuffers::Offset<::flatbuffers::String> ui_name = 0,
     bool is_visible = false) {
-  UserInterfaceDataBuilder builder_(_fbb);
+  UserInterfaceFbsBuilder builder_(_fbb);
   builder_.add_ui_name(ui_name);
   builder_.add_root_ui_element(root_ui_element);
   builder_.add_is_visible(is_visible);
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<UserInterfaceData> CreateUserInterfaceDataDirect(
+inline ::flatbuffers::Offset<UserInterfaceFbs> CreateUserInterfaceFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::PanelData> root_ui_element = 0,
     const char *ui_name = nullptr,
     bool is_visible = false) {
   auto ui_name__ = ui_name ? _fbb.CreateString(ui_name) : 0;
-  return steamrot::CreateUserInterfaceData(
+  return steamrot::CreateUserInterfaceFbs(
       _fbb,
       root_ui_element,
       ui_name__,
@@ -965,6 +965,36 @@ inline bool VerifyUIElementDataUnionVector(::flatbuffers::Verifier &verifier, co
     }
   }
   return true;
+}
+
+inline const steamrot::UserInterfaceFbs *GetUserInterfaceFbs(const void *buf) {
+  return ::flatbuffers::GetRoot<steamrot::UserInterfaceFbs>(buf);
+}
+
+inline const steamrot::UserInterfaceFbs *GetSizePrefixedUserInterfaceFbs(const void *buf) {
+  return ::flatbuffers::GetSizePrefixedRoot<steamrot::UserInterfaceFbs>(buf);
+}
+
+inline bool VerifyUserInterfaceFbsBuffer(
+    ::flatbuffers::Verifier &verifier) {
+  return verifier.VerifyBuffer<steamrot::UserInterfaceFbs>(nullptr);
+}
+
+inline bool VerifySizePrefixedUserInterfaceFbsBuffer(
+    ::flatbuffers::Verifier &verifier) {
+  return verifier.VerifySizePrefixedBuffer<steamrot::UserInterfaceFbs>(nullptr);
+}
+
+inline void FinishUserInterfaceFbsBuffer(
+    ::flatbuffers::FlatBufferBuilder &fbb,
+    ::flatbuffers::Offset<steamrot::UserInterfaceFbs> root) {
+  fbb.Finish(root);
+}
+
+inline void FinishSizePrefixedUserInterfaceFbsBuffer(
+    ::flatbuffers::FlatBufferBuilder &fbb,
+    ::flatbuffers::Offset<steamrot::UserInterfaceFbs> root) {
+  fbb.FinishSizePrefixed(root);
 }
 
 }  // namespace steamrot
