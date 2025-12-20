@@ -69,7 +69,7 @@ TEST_CASE("FlatbuffersUIElementConfigurator configures elements correctly",
 
   // check fbs data and extract
   REQUIRE(ui_element_data->root_ui_element()->base_data()->children()->size() ==
-          2);
+          5);
 
   auto children = ui_element_data->root_ui_element()->base_data()->children();
 
@@ -125,5 +125,270 @@ TEST_CASE("FlatbuffersUIElementConfigurator configures elements correctly",
     REQUIRE(dropdown_element.data_populate_function ==
             steamrot::DataPopulateFunction::
                 DataPopulateFunction_PopulateWithFragmentData);
+  }
+
+  SECTION("Configure DropDownContainerElement") {
+    // Get DropDownContainerData from FlatBuffers data and check validity
+    auto container_fb = children->Get(2);
+    REQUIRE(container_fb != nullptr);
+    REQUIRE(container_fb->element_type() ==
+            steamrot::UIElementDataUnion::
+                UIElementDataUnion_DropDownContainerData);
+    auto container_data = static_cast<const steamrot::DropDownContainerData *>(
+        container_fb->element());
+    REQUIRE(container_data != nullptr);
+
+    // create DropDownContainerElement and configure using flatbuffers data
+    steamrot::DropDownContainerElement container_element;
+    auto result = configurator.ConfigureDropDownContainerElement(
+        container_element, *container_data);
+    REQUIRE(result.has_value());
+
+    // DropDownContainerElement specific checks
+    // The configurator validates that it has exactly 2 children
+    REQUIRE(container_data->base_data()->children()->size() == 2);
+  }
+
+  SECTION("Configure DropDownItemElement") {
+    // Get DropDownItemData from FlatBuffers data and check validity
+    auto item_fb = children->Get(3);
+    REQUIRE(item_fb != nullptr);
+    REQUIRE(item_fb->element_type() ==
+            steamrot::UIElementDataUnion::UIElementDataUnion_DropDownItemData);
+    auto item_data =
+        static_cast<const steamrot::DropDownItemData *>(item_fb->element());
+    REQUIRE(item_data != nullptr);
+
+    // create DropDownItemElement and configure using flatbuffers data
+    steamrot::DropDownItemElement item_element;
+    auto result =
+        configurator.ConfigureDropDownItemElement(item_element, *item_data);
+    REQUIRE(result.has_value());
+
+    // DropDownItemElement specific checks
+    REQUIRE(item_element.label == "Item Label");
+  }
+
+  SECTION("Configure DropDownButtonElement") {
+    // Get DropDownButtonData from FlatBuffers data and check validity
+    auto button_fb = children->Get(4);
+    REQUIRE(button_fb != nullptr);
+    REQUIRE(button_fb->element_type() ==
+            steamrot::UIElementDataUnion::
+                UIElementDataUnion_DropDownButtonData);
+    auto button_data = static_cast<const steamrot::DropDownButtonData *>(
+        button_fb->element());
+    REQUIRE(button_data != nullptr);
+
+    // create DropDownButtonElement and configure using flatbuffers data
+    steamrot::DropDownButtonElement button_element;
+    auto result = configurator.ConfigureDropDownButtonElement(button_element,
+                                                              *button_data);
+    REQUIRE(result.has_value());
+
+    // DropDownButtonElement specific checks
+    REQUIRE(button_element.is_expanded == true);
+  }
+}
+
+TEST_CASE("FlatbuffersUIElementConfigurator CreateUIElement creates correct "
+          "element types",
+          "[FlatbuffersUIElementConfigurator]") {
+  // set up the test fixture
+  steamrot::tests::TestFixture fixture;
+  // Load UI element test data
+  auto [data, ui_element_data] = LoadUIElementTestData();
+  REQUIRE(ui_element_data != nullptr);
+
+  // Initialize configurator
+  steamrot::FlatbuffersUIElementConfigurator configurator(
+      fixture.GetGameContext().event_handler, *ui_element_data);
+
+  REQUIRE(ui_element_data->root_ui_element()->base_data()->children()->size() ==
+          5);
+  auto children = ui_element_data->root_ui_element()->base_data()->children();
+
+  SECTION("CreateUIElement creates PanelElement") {
+    auto panel_fb = ui_element_data->root_ui_element();
+    REQUIRE(panel_fb != nullptr);
+
+    auto result = configurator.CreateUIElement(
+        steamrot::UIElementDataUnion::UIElementDataUnion_PanelData, panel_fb);
+    REQUIRE(result.has_value());
+
+    auto element = std::move(result.value());
+    REQUIRE(element != nullptr);
+
+    // Check correct type was created
+    auto panel_element = dynamic_cast<steamrot::PanelElement *>(element.get());
+    REQUIRE(panel_element != nullptr);
+
+    // Check base data configured correctly
+    REQUIRE(element->position.x == 10.0f);
+    REQUIRE(element->position.y == 20.0f);
+    REQUIRE(element->size.x == 100.0f);
+    REQUIRE(element->size.y == 50.0f);
+    REQUIRE(element->children_active == false);
+    REQUIRE(element->layout == steamrot::Layout::Horizontal);
+    REQUIRE(element->spacing_strategy == steamrot::SpacingAndSizing::None);
+  }
+
+  SECTION("CreateUIElement creates ButtonElement") {
+    auto button_fb = children->Get(0);
+    REQUIRE(button_fb != nullptr);
+    REQUIRE(button_fb->element_type() ==
+            steamrot::UIElementDataUnion::UIElementDataUnion_ButtonData);
+
+    auto result = configurator.CreateUIElement(button_fb->element_type(),
+                                               button_fb->element());
+    REQUIRE(result.has_value());
+
+    auto element = std::move(result.value());
+    REQUIRE(element != nullptr);
+
+    // Check correct type was created
+    auto button_element =
+        dynamic_cast<steamrot::ButtonElement *>(element.get());
+    REQUIRE(button_element != nullptr);
+
+    // Check base data configured correctly
+    REQUIRE(element->position.x == 0.0f);
+    REQUIRE(element->position.y == 0.0f);
+    REQUIRE(element->size.x == 0.0f);
+    REQUIRE(element->size.y == 0.0f);
+    REQUIRE(element->children_active == false);
+    REQUIRE(element->layout == steamrot::Layout::Horizontal);
+    REQUIRE(element->spacing_strategy == steamrot::SpacingAndSizing::None);
+
+    // Check element-specific data
+    REQUIRE(button_element->label == "Test Tab");
+  }
+
+  SECTION("CreateUIElement creates DropDownListElement") {
+    auto dropdown_fb = children->Get(1);
+    REQUIRE(dropdown_fb != nullptr);
+    REQUIRE(dropdown_fb->element_type() ==
+            steamrot::UIElementDataUnion::UIElementDataUnion_DropDownListData);
+
+    auto result = configurator.CreateUIElement(dropdown_fb->element_type(),
+                                               dropdown_fb->element());
+    REQUIRE(result.has_value());
+
+    auto element = std::move(result.value());
+    REQUIRE(element != nullptr);
+
+    // Check correct type was created
+    auto dropdown_element =
+        dynamic_cast<steamrot::DropDownListElement *>(element.get());
+    REQUIRE(dropdown_element != nullptr);
+
+    // Check base data configured correctly
+    REQUIRE(element->position.x == 0.0f);
+    REQUIRE(element->position.y == 0.0f);
+    REQUIRE(element->size.x == 0.0f);
+    REQUIRE(element->size.y == 0.0f);
+    REQUIRE(element->children_active == false);
+    REQUIRE(element->layout == steamrot::Layout::DropDown);
+    REQUIRE(element->spacing_strategy ==
+            steamrot::SpacingAndSizing::DropDownList);
+
+    // Check element-specific data
+    REQUIRE(dropdown_element->unexpanded_label == "Select Option");
+    REQUIRE(dropdown_element->expanded_label == "Options:");
+  }
+
+  SECTION("CreateUIElement creates DropDownContainerElement") {
+    auto container_fb = children->Get(2);
+    REQUIRE(container_fb != nullptr);
+    REQUIRE(container_fb->element_type() ==
+            steamrot::UIElementDataUnion::
+                UIElementDataUnion_DropDownContainerData);
+
+    auto result = configurator.CreateUIElement(container_fb->element_type(),
+                                               container_fb->element());
+    REQUIRE(result.has_value());
+
+    auto element = std::move(result.value());
+    REQUIRE(element != nullptr);
+
+    // Check correct type was created
+    auto container_element =
+        dynamic_cast<steamrot::DropDownContainerElement *>(element.get());
+    REQUIRE(container_element != nullptr);
+
+    // Check base data configured correctly
+    REQUIRE(element->position.x == 10.0f);
+    REQUIRE(element->position.y == 10.0f);
+    REQUIRE(element->size.x == 200.0f);
+    REQUIRE(element->size.y == 30.0f);
+    REQUIRE(element->children_active == true);
+    REQUIRE(element->layout == steamrot::Layout::Horizontal);
+    REQUIRE(element->spacing_strategy == steamrot::SpacingAndSizing::None);
+
+    // Check that children were created (should be 2: list and button)
+    REQUIRE(element->child_elements.size() == 2);
+  }
+
+  SECTION("CreateUIElement creates DropDownItemElement") {
+    auto item_fb = children->Get(3);
+    REQUIRE(item_fb != nullptr);
+    REQUIRE(item_fb->element_type() ==
+            steamrot::UIElementDataUnion::UIElementDataUnion_DropDownItemData);
+
+    auto result = configurator.CreateUIElement(item_fb->element_type(),
+                                               item_fb->element());
+    REQUIRE(result.has_value());
+
+    auto element = std::move(result.value());
+    REQUIRE(element != nullptr);
+
+    // Check correct type was created
+    auto item_element =
+        dynamic_cast<steamrot::DropDownItemElement *>(element.get());
+    REQUIRE(item_element != nullptr);
+
+    // Check base data configured correctly
+    REQUIRE(element->position.x == 5.0f);
+    REQUIRE(element->position.y == 5.0f);
+    REQUIRE(element->size.x == 100.0f);
+    REQUIRE(element->size.y == 20.0f);
+    REQUIRE(element->children_active == false);
+    REQUIRE(element->layout == steamrot::Layout::None);
+    REQUIRE(element->spacing_strategy == steamrot::SpacingAndSizing::None);
+
+    // Check element-specific data
+    REQUIRE(item_element->label == "Item Label");
+  }
+
+  SECTION("CreateUIElement creates DropDownButtonElement") {
+    auto button_fb = children->Get(4);
+    REQUIRE(button_fb != nullptr);
+    REQUIRE(button_fb->element_type() ==
+            steamrot::UIElementDataUnion::
+                UIElementDataUnion_DropDownButtonData);
+
+    auto result = configurator.CreateUIElement(button_fb->element_type(),
+                                               button_fb->element());
+    REQUIRE(result.has_value());
+
+    auto element = std::move(result.value());
+    REQUIRE(element != nullptr);
+
+    // Check correct type was created
+    auto button_element =
+        dynamic_cast<steamrot::DropDownButtonElement *>(element.get());
+    REQUIRE(button_element != nullptr);
+
+    // Check base data configured correctly
+    REQUIRE(element->position.x == 15.0f);
+    REQUIRE(element->position.y == 15.0f);
+    REQUIRE(element->size.x == 50.0f);
+    REQUIRE(element->size.y == 50.0f);
+    REQUIRE(element->children_active == false);
+    REQUIRE(element->layout == steamrot::Layout::None);
+    REQUIRE(element->spacing_strategy == steamrot::SpacingAndSizing::None);
+
+    // Check element-specific data
+    REQUIRE(button_element->is_expanded == true);
   }
 }
