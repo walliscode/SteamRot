@@ -13,15 +13,14 @@
 #include "UserInputBitset.h"
 #include "user_interface_generated.h"
 #include <catch2/catch_test_macros.hpp>
-#include <flatbuffers/flatbuffers.h>
 #include <fstream>
 #include <variant>
 
 std::pair<std::unique_ptr<char[]>, const steamrot::UserInterfaceFbs *>
-LoadUIElementTestData() {
+LoadTestData(const std::string &filename) {
   std::filesystem::path test_file_path = __FILE__;
   std::filesystem::path data_dir = test_file_path.parent_path() / "data";
-  std::filesystem::path bin_file_path = data_dir / "ui_element_test_data.bin";
+  std::filesystem::path bin_file_path = data_dir / filename;
 
   std::ifstream infile(bin_file_path, std::ios::binary | std::ios::in);
   if (!infile.is_open()) {
@@ -44,6 +43,11 @@ LoadUIElementTestData() {
       steamrot::GetUserInterfaceFbs(data.get());
 
   return {std::move(data), ui_element_data};
+}
+
+std::pair<std::unique_ptr<char[]>, const steamrot::UserInterfaceFbs *>
+LoadUIElementTestData() {
+  return LoadTestData("ui_element_test_data.bin");
 }
 
 TEST_CASE("FlatbuffersUIElementConfigurator error handling",
@@ -551,20 +555,8 @@ TEST_CASE("FlatbuffersUIElementConfigurator error handling tests",
   steamrot::tests::TestFixture fixture;
 
   SECTION("CreateRootUIElement fails with missing root_ui_element") {
-    // Create minimal FlatBuffers data without root_ui_element
-    flatbuffers::FlatBufferBuilder builder(1024);
-    auto ui_name = builder.CreateString("test_ui");
-    
-    steamrot::UserInterfaceFbsBuilder ui_builder(builder);
-    ui_builder.add_ui_name(ui_name);
-    ui_builder.add_is_visible(true);
-    // Note: not adding root_ui_element
-    
-    auto ui_data_offset = ui_builder.Finish();
-    builder.Finish(ui_data_offset);
-    
-    const steamrot::UserInterfaceFbs *ui_data =
-        steamrot::GetUserInterfaceFbs(builder.GetBufferPointer());
+    // Load test data without root_ui_element
+    auto [data, ui_data] = LoadTestData("error_missing_root.bin");
     REQUIRE(ui_data != nullptr);
 
     steamrot::FlatbuffersUIElementConfigurator configurator(
@@ -594,40 +586,18 @@ TEST_CASE("FlatbuffersUIElementConfigurator error handling tests",
   }
 
   SECTION("ConfigureDropDownContainerElement fails with no children") {
-    // Create DropDownContainerData without children
-    flatbuffers::FlatBufferBuilder builder(1024);
+    // Load test data with container without children
+    auto [data, ui_data] = LoadTestData("error_container_no_children.bin");
+    REQUIRE(ui_data != nullptr);
+    REQUIRE(ui_data->root_ui_element() != nullptr);
     
-    // Create base_data with no children
-    auto position = steamrot::CreateVec2f(builder, 0.0f, 0.0f);
-    auto size = steamrot::CreateVec2f(builder, 100.0f, 50.0f);
-    
-    steamrot::UIElementDataBuilder base_builder(builder);
-    base_builder.add_position(position);
-    base_builder.add_size(size);
-    base_builder.add_children_active(true);
-    base_builder.add_layout(steamrot::LayoutFbs_Horizontal);
-    base_builder.add_spacing_strategy(steamrot::SpacingAndSizingFbs_None);
-    // Note: not adding children vector
-    
-    auto base_data_offset = base_builder.Finish();
-    
-    steamrot::DropDownContainerDataBuilder container_builder(builder);
-    container_builder.add_base_data(base_data_offset);
-    auto container_data_offset = container_builder.Finish();
-    
-    builder.Finish(container_data_offset);
-    
-    const steamrot::DropDownContainerData *container_data =
-        flatbuffers::GetRoot<steamrot::DropDownContainerData>(
-            builder.GetBufferPointer());
+    // Get the DropDownContainerData from test data
+    const steamrot::PanelData *container_data = ui_data->root_ui_element();
     REQUIRE(container_data != nullptr);
-
-    // Load valid test data for the configurator
-    auto [data, ui_element_data] = LoadUIElementTestData();
-    REQUIRE(ui_element_data != nullptr);
+    REQUIRE(container_data->base_data() != nullptr);
 
     steamrot::FlatbuffersUIElementConfigurator configurator(
-        fixture.GetGameContext().event_handler, *ui_element_data);
+        fixture.GetGameContext().event_handler, *ui_data);
 
     steamrot::DropDownContainerElement container_element;
     auto result = configurator.ConfigureDropDownContainerElement(
@@ -640,67 +610,25 @@ TEST_CASE("FlatbuffersUIElementConfigurator error handling tests",
 
   SECTION("ConfigureDropDownContainerElement fails with wrong number of "
           "children") {
-    // Create DropDownContainerData with 1 child instead of 2
-    flatbuffers::FlatBufferBuilder builder(1024);
+    // Load test data with container with 1 child instead of 2
+    auto [data, ui_data] = LoadTestData("error_container_one_child.bin");
+    REQUIRE(ui_data != nullptr);
+    REQUIRE(ui_data->root_ui_element() != nullptr);
+    REQUIRE(ui_data->root_ui_element()->base_data() != nullptr);
+    REQUIRE(ui_data->root_ui_element()->base_data()->children() != nullptr);
+    REQUIRE(ui_data->root_ui_element()->base_data()->children()->size() == 1);
     
-    // Create a single child (ButtonData)
-    auto child_position = steamrot::CreateVec2f(builder, 0.0f, 0.0f);
-    auto child_size = steamrot::CreateVec2f(builder, 50.0f, 50.0f);
-    
-    steamrot::UIElementDataBuilder child_base_builder(builder);
-    child_base_builder.add_position(child_position);
-    child_base_builder.add_size(child_size);
-    child_base_builder.add_children_active(false);
-    child_base_builder.add_layout(steamrot::LayoutFbs_None);
-    child_base_builder.add_spacing_strategy(steamrot::SpacingAndSizingFbs_None);
-    auto child_base_data = child_base_builder.Finish();
-    
-    auto button_label = builder.CreateString("Button");
-    steamrot::ButtonDataBuilder button_builder(builder);
-    button_builder.add_base_data(child_base_data);
-    button_builder.add_label(button_label);
-    auto button_data = button_builder.Finish();
-    
-    steamrot::UIElementDataWrapperBuilder wrapper_builder(builder);
-    wrapper_builder.add_element_type(
-        steamrot::UIElementDataUnion::UIElementDataUnion_ButtonData);
-    wrapper_builder.add_element(button_data.Union());
-    auto wrapper = wrapper_builder.Finish();
-    
-    std::vector<flatbuffers::Offset<steamrot::UIElementDataWrapper>> children_vec;
-    children_vec.push_back(wrapper);
-    auto children = builder.CreateVector(children_vec);
-    
-    // Create base_data with 1 child
-    auto position = steamrot::CreateVec2f(builder, 0.0f, 0.0f);
-    auto size = steamrot::CreateVec2f(builder, 100.0f, 50.0f);
-    
-    steamrot::UIElementDataBuilder base_builder(builder);
-    base_builder.add_position(position);
-    base_builder.add_size(size);
-    base_builder.add_children_active(true);
-    base_builder.add_children(children);
-    base_builder.add_layout(steamrot::LayoutFbs_Horizontal);
-    base_builder.add_spacing_strategy(steamrot::SpacingAndSizingFbs_None);
-    auto base_data_offset = base_builder.Finish();
-    
-    steamrot::DropDownContainerDataBuilder container_builder(builder);
-    container_builder.add_base_data(base_data_offset);
-    auto container_data_offset = container_builder.Finish();
-    
-    builder.Finish(container_data_offset);
-    
+    // Get the DropDownContainerData from test data (first child)
+    auto container_wrapper = ui_data->root_ui_element()->base_data()->children()->Get(0);
+    REQUIRE(container_wrapper != nullptr);
+    REQUIRE(container_wrapper->element_type() == 
+            steamrot::UIElementDataUnion::UIElementDataUnion_DropDownContainerData);
     const steamrot::DropDownContainerData *container_data =
-        flatbuffers::GetRoot<steamrot::DropDownContainerData>(
-            builder.GetBufferPointer());
+        static_cast<const steamrot::DropDownContainerData *>(container_wrapper->element());
     REQUIRE(container_data != nullptr);
 
-    // Load valid test data for the configurator
-    auto [data, ui_element_data] = LoadUIElementTestData();
-    REQUIRE(ui_element_data != nullptr);
-
     steamrot::FlatbuffersUIElementConfigurator configurator(
-        fixture.GetGameContext().event_handler, *ui_element_data);
+        fixture.GetGameContext().event_handler, *ui_data);
 
     steamrot::DropDownContainerElement container_element;
     auto result = configurator.ConfigureDropDownContainerElement(
@@ -714,92 +642,25 @@ TEST_CASE("FlatbuffersUIElementConfigurator error handling tests",
 
   SECTION("ConfigureDropDownContainerElement fails with wrong first child "
           "type") {
-    // Create DropDownContainerData with 2 children but first is not
-    // DropDownListData
-    flatbuffers::FlatBufferBuilder builder(1024);
+    // Load test data with container with wrong first child type
+    auto [data, ui_data] = LoadTestData("error_container_wrong_first_child.bin");
+    REQUIRE(ui_data != nullptr);
+    REQUIRE(ui_data->root_ui_element() != nullptr);
+    REQUIRE(ui_data->root_ui_element()->base_data() != nullptr);
+    REQUIRE(ui_data->root_ui_element()->base_data()->children() != nullptr);
+    REQUIRE(ui_data->root_ui_element()->base_data()->children()->size() == 1);
     
-    // Create first child (ButtonData instead of DropDownListData)
-    auto child1_position = steamrot::CreateVec2f(builder, 0.0f, 0.0f);
-    auto child1_size = steamrot::CreateVec2f(builder, 50.0f, 50.0f);
-    
-    steamrot::UIElementDataBuilder child1_base_builder(builder);
-    child1_base_builder.add_position(child1_position);
-    child1_base_builder.add_size(child1_size);
-    child1_base_builder.add_children_active(false);
-    child1_base_builder.add_layout(steamrot::LayoutFbs_None);
-    child1_base_builder.add_spacing_strategy(steamrot::SpacingAndSizingFbs_None);
-    auto child1_base_data = child1_base_builder.Finish();
-    
-    auto button_label = builder.CreateString("Button");
-    steamrot::ButtonDataBuilder button_builder(builder);
-    button_builder.add_base_data(child1_base_data);
-    button_builder.add_label(button_label);
-    auto button_data = button_builder.Finish();
-    
-    steamrot::UIElementDataWrapperBuilder wrapper1_builder(builder);
-    wrapper1_builder.add_element_type(
-        steamrot::UIElementDataUnion::UIElementDataUnion_ButtonData);
-    wrapper1_builder.add_element(button_data.Union());
-    auto wrapper1 = wrapper1_builder.Finish();
-    
-    // Create second child (DropDownButtonData)
-    auto child2_position = steamrot::CreateVec2f(builder, 0.0f, 0.0f);
-    auto child2_size = steamrot::CreateVec2f(builder, 50.0f, 50.0f);
-    
-    steamrot::UIElementDataBuilder child2_base_builder(builder);
-    child2_base_builder.add_position(child2_position);
-    child2_base_builder.add_size(child2_size);
-    child2_base_builder.add_children_active(false);
-    child2_base_builder.add_layout(steamrot::LayoutFbs_None);
-    child2_base_builder.add_spacing_strategy(steamrot::SpacingAndSizingFbs_None);
-    auto child2_base_data = child2_base_builder.Finish();
-    
-    steamrot::DropDownButtonDataBuilder ddbtn_builder(builder);
-    ddbtn_builder.add_base_data(child2_base_data);
-    ddbtn_builder.add_is_expanded(false);
-    auto ddbtn_data = ddbtn_builder.Finish();
-    
-    steamrot::UIElementDataWrapperBuilder wrapper2_builder(builder);
-    wrapper2_builder.add_element_type(
-        steamrot::UIElementDataUnion::UIElementDataUnion_DropDownButtonData);
-    wrapper2_builder.add_element(ddbtn_data.Union());
-    auto wrapper2 = wrapper2_builder.Finish();
-    
-    std::vector<flatbuffers::Offset<steamrot::UIElementDataWrapper>> children_vec;
-    children_vec.push_back(wrapper1);
-    children_vec.push_back(wrapper2);
-    auto children = builder.CreateVector(children_vec);
-    
-    // Create base_data with 2 children
-    auto position = steamrot::CreateVec2f(builder, 0.0f, 0.0f);
-    auto size = steamrot::CreateVec2f(builder, 100.0f, 50.0f);
-    
-    steamrot::UIElementDataBuilder base_builder(builder);
-    base_builder.add_position(position);
-    base_builder.add_size(size);
-    base_builder.add_children_active(true);
-    base_builder.add_children(children);
-    base_builder.add_layout(steamrot::LayoutFbs_Horizontal);
-    base_builder.add_spacing_strategy(steamrot::SpacingAndSizingFbs_None);
-    auto base_data_offset = base_builder.Finish();
-    
-    steamrot::DropDownContainerDataBuilder container_builder(builder);
-    container_builder.add_base_data(base_data_offset);
-    auto container_data_offset = container_builder.Finish();
-    
-    builder.Finish(container_data_offset);
-    
+    // Get the DropDownContainerData from test data (first child)
+    auto container_wrapper = ui_data->root_ui_element()->base_data()->children()->Get(0);
+    REQUIRE(container_wrapper != nullptr);
+    REQUIRE(container_wrapper->element_type() == 
+            steamrot::UIElementDataUnion::UIElementDataUnion_DropDownContainerData);
     const steamrot::DropDownContainerData *container_data =
-        flatbuffers::GetRoot<steamrot::DropDownContainerData>(
-            builder.GetBufferPointer());
+        static_cast<const steamrot::DropDownContainerData *>(container_wrapper->element());
     REQUIRE(container_data != nullptr);
 
-    // Load valid test data for the configurator
-    auto [data, ui_element_data] = LoadUIElementTestData();
-    REQUIRE(ui_element_data != nullptr);
-
     steamrot::FlatbuffersUIElementConfigurator configurator(
-        fixture.GetGameContext().event_handler, *ui_element_data);
+        fixture.GetGameContext().event_handler, *ui_data);
 
     steamrot::DropDownContainerElement container_element;
     auto result = configurator.ConfigureDropDownContainerElement(
@@ -813,98 +674,25 @@ TEST_CASE("FlatbuffersUIElementConfigurator error handling tests",
 
   SECTION("ConfigureDropDownContainerElement fails with wrong second child "
           "type") {
-    // Create DropDownContainerData with 2 children but second is not
-    // DropDownButtonData
-    flatbuffers::FlatBufferBuilder builder(1024);
+    // Load test data with container with wrong second child type
+    auto [data, ui_data] = LoadTestData("error_container_wrong_second_child.bin");
+    REQUIRE(ui_data != nullptr);
+    REQUIRE(ui_data->root_ui_element() != nullptr);
+    REQUIRE(ui_data->root_ui_element()->base_data() != nullptr);
+    REQUIRE(ui_data->root_ui_element()->base_data()->children() != nullptr);
+    REQUIRE(ui_data->root_ui_element()->base_data()->children()->size() == 1);
     
-    // Create first child (DropDownListData - correct)
-    auto child1_position = steamrot::CreateVec2f(builder, 0.0f, 0.0f);
-    auto child1_size = steamrot::CreateVec2f(builder, 50.0f, 50.0f);
-    
-    steamrot::UIElementDataBuilder child1_base_builder(builder);
-    child1_base_builder.add_position(child1_position);
-    child1_base_builder.add_size(child1_size);
-    child1_base_builder.add_children_active(false);
-    child1_base_builder.add_layout(steamrot::LayoutFbs_DropDown);
-    child1_base_builder.add_spacing_strategy(
-        steamrot::SpacingAndSizingFbs_DropDownList);
-    auto child1_base_data = child1_base_builder.Finish();
-    
-    auto list_label = builder.CreateString("List");
-    auto expanded_label = builder.CreateString("Expanded");
-    steamrot::DropDownListDataBuilder list_builder(builder);
-    list_builder.add_base_data(child1_base_data);
-    list_builder.add_label(list_label);
-    list_builder.add_expanded_label(expanded_label);
-    list_builder.add_data_populate_function(
-        steamrot::DataPopulateFunction::DataPopulateFunction_PopulateWithFragmentData);
-    auto list_data = list_builder.Finish();
-    
-    steamrot::UIElementDataWrapperBuilder wrapper1_builder(builder);
-    wrapper1_builder.add_element_type(
-        steamrot::UIElementDataUnion::UIElementDataUnion_DropDownListData);
-    wrapper1_builder.add_element(list_data.Union());
-    auto wrapper1 = wrapper1_builder.Finish();
-    
-    // Create second child (ButtonData instead of DropDownButtonData)
-    auto child2_position = steamrot::CreateVec2f(builder, 0.0f, 0.0f);
-    auto child2_size = steamrot::CreateVec2f(builder, 50.0f, 50.0f);
-    
-    steamrot::UIElementDataBuilder child2_base_builder(builder);
-    child2_base_builder.add_position(child2_position);
-    child2_base_builder.add_size(child2_size);
-    child2_base_builder.add_children_active(false);
-    child2_base_builder.add_layout(steamrot::LayoutFbs_None);
-    child2_base_builder.add_spacing_strategy(steamrot::SpacingAndSizingFbs_None);
-    auto child2_base_data = child2_base_builder.Finish();
-    
-    auto button_label = builder.CreateString("Button");
-    steamrot::ButtonDataBuilder button_builder(builder);
-    button_builder.add_base_data(child2_base_data);
-    button_builder.add_label(button_label);
-    auto button_data = button_builder.Finish();
-    
-    steamrot::UIElementDataWrapperBuilder wrapper2_builder(builder);
-    wrapper2_builder.add_element_type(
-        steamrot::UIElementDataUnion::UIElementDataUnion_ButtonData);
-    wrapper2_builder.add_element(button_data.Union());
-    auto wrapper2 = wrapper2_builder.Finish();
-    
-    std::vector<flatbuffers::Offset<steamrot::UIElementDataWrapper>> children_vec;
-    children_vec.push_back(wrapper1);
-    children_vec.push_back(wrapper2);
-    auto children = builder.CreateVector(children_vec);
-    
-    // Create base_data with 2 children
-    auto position = steamrot::CreateVec2f(builder, 0.0f, 0.0f);
-    auto size = steamrot::CreateVec2f(builder, 100.0f, 50.0f);
-    
-    steamrot::UIElementDataBuilder base_builder(builder);
-    base_builder.add_position(position);
-    base_builder.add_size(size);
-    base_builder.add_children_active(true);
-    base_builder.add_children(children);
-    base_builder.add_layout(steamrot::LayoutFbs_Horizontal);
-    base_builder.add_spacing_strategy(steamrot::SpacingAndSizingFbs_None);
-    auto base_data_offset = base_builder.Finish();
-    
-    steamrot::DropDownContainerDataBuilder container_builder(builder);
-    container_builder.add_base_data(base_data_offset);
-    auto container_data_offset = container_builder.Finish();
-    
-    builder.Finish(container_data_offset);
-    
+    // Get the DropDownContainerData from test data (first child)
+    auto container_wrapper = ui_data->root_ui_element()->base_data()->children()->Get(0);
+    REQUIRE(container_wrapper != nullptr);
+    REQUIRE(container_wrapper->element_type() == 
+            steamrot::UIElementDataUnion::UIElementDataUnion_DropDownContainerData);
     const steamrot::DropDownContainerData *container_data =
-        flatbuffers::GetRoot<steamrot::DropDownContainerData>(
-            builder.GetBufferPointer());
+        static_cast<const steamrot::DropDownContainerData *>(container_wrapper->element());
     REQUIRE(container_data != nullptr);
 
-    // Load valid test data for the configurator
-    auto [data, ui_element_data] = LoadUIElementTestData();
-    REQUIRE(ui_element_data != nullptr);
-
     steamrot::FlatbuffersUIElementConfigurator configurator(
-        fixture.GetGameContext().event_handler, *ui_element_data);
+        fixture.GetGameContext().event_handler, *ui_data);
 
     steamrot::DropDownContainerElement container_element;
     auto result = configurator.ConfigureDropDownContainerElement(
