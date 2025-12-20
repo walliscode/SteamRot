@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of the TitleScene class.
+/// @brief Declaration of TestScene for unit tests
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -11,27 +11,12 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "GameContext.h"
 #include "Scene.h"
 
-namespace steamrot {
-
-/////////////////////////////////////////////////
-/// @class TitleScene
-/// @brief Designed to handle the title screen of the game.
-///
-/////////////////////////////////////////////////
-class TitleScene : public Scene {
-  friend class SceneFactory;
+namespace steamrot::tests {
+class TestScene : public Scene {
 
 private:
-  /////////////////////////////////////////////////
-  /// @brief Constructor for the TitleScene class.
-  ///
-  /// @param game_context GameContext containing game-wide data for the scene.
-  /////////////////////////////////////////////////
-  TitleScene(const GameContext &game_context);
-
   /////////////////////////////////////////////////
   /// @brief Call rendering Logic for TitleScene
   /////////////////////////////////////////////////
@@ -51,5 +36,13 @@ private:
   /// @brief Call action Logic for TitleScene
   /////////////////////////////////////////////////
   void sAction() override;
+
+public:
+  /////////////////////////////////////////////////
+  /// @brief Constructor for the TitleScene class.
+  ///
+  /// @param game_context GameContext containing game-wide data for the scene.
+  /////////////////////////////////////////////////
+  TestScene(const GameContext &game_context);
 };
-} // namespace steamrot
+} // namespace steamrot::tests

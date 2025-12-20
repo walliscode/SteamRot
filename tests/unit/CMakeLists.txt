@@ -1,6 +1,3 @@
-# Unit tests directory
-# Unit tests test individual classes/functions in isolation with mocked dependencies
-
 
 # Unit tests organized by subsystem
 # add_subdirectory(assets)
@@ -11,6 +8,6 @@ add_subdirectory(data_providers)
 add_subdirectory(entity)
 add_subdirectory(events)
 # add_subdirectory(logic)
-# add_subdirectory(scenes)
+add_subdirectory(scenes)
 # add_subdirectory(engine)
 add_subdirectory(types)
