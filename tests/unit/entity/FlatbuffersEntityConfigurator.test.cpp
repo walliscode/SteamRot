@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersEntityConfigurator.h"
+#include "ButtonElement.h"
 #include "EventHandler.h"
 #include "PanelElement.h"
 #include "SpacingAndSizing.h"
@@ -72,8 +73,8 @@ TEST_CASE("FlatbuffersEntityConfigurator constructor succeeds with valid data",
   REQUIRE(entity_collection != nullptr);
 
   // Constructor should succeed
-  REQUIRE_NOTHROW(steamrot::FlatbuffersEntityConfigurator(
-      event_handler, *entity_collection));
+  REQUIRE_NOTHROW(steamrot::FlatbuffersEntityConfigurator(event_handler,
+                                                          *entity_collection));
 }
 
 /////////////////////////////////////////////////
@@ -137,8 +138,8 @@ TEST_CASE("ConfigureFirstLayerComponents configures CUserInterface correctly",
   REQUIRE(ui_component.m_root_element != nullptr);
 
   // Verify root element details
-  auto *panel = dynamic_cast<steamrot::PanelElement *>(
-      ui_component.m_root_element.get());
+  auto *panel =
+      dynamic_cast<steamrot::PanelElement *>(ui_component.m_root_element.get());
   REQUIRE(panel != nullptr);
   REQUIRE(panel->position == sf::Vector2f(10.0f, 20.0f));
   REQUIRE(panel->size == sf::Vector2f(100.0f, 50.0f));
@@ -147,9 +148,8 @@ TEST_CASE("ConfigureFirstLayerComponents configures CUserInterface correctly",
   REQUIRE(panel->child_elements.empty());
 }
 
-TEST_CASE(
-    "ConfigureFirstLayerComponents configures hidden UI correctly",
-    "[unit][FlatbuffersEntityConfigurator]") {
+TEST_CASE("ConfigureFirstLayerComponents configures hidden UI correctly",
+          "[unit][FlatbuffersEntityConfigurator]") {
   steamrot::EventHandler event_handler;
   steamrot::EntityMemoryPool emp;
   auto [data, entity_collection] = LoadEntityTestData();
@@ -176,8 +176,8 @@ TEST_CASE(
   REQUIRE(ui_component.m_visible == false);
   REQUIRE(ui_component.m_root_element != nullptr);
 
-  auto *panel = dynamic_cast<steamrot::PanelElement *>(
-      ui_component.m_root_element.get());
+  auto *panel =
+      dynamic_cast<steamrot::PanelElement *>(ui_component.m_root_element.get());
   REQUIRE(panel != nullptr);
   REQUIRE(panel->layout == steamrot::Layout::Vertical);
   REQUIRE(panel->spacing_strategy == steamrot::SpacingAndSizing::Even);
@@ -251,7 +251,7 @@ TEST_CASE("ConfigureCGrimoireMachina handles null fragments/joints",
   // Entity 3 has empty fragments/joints arrays
   steamrot::CGrimoireMachina &grimoire_component =
       steamrot::entity::memory::GetComponent<steamrot::CGrimoireMachina>(3,
-                                                                          emp);
+                                                                         emp);
 
   auto result = configurator.ConfigureFirstLayerComponents(emp);
 
@@ -279,7 +279,7 @@ TEST_CASE(
 
   steamrot::CGrimoireMachina &grimoire_component =
       steamrot::entity::memory::GetComponent<steamrot::CGrimoireMachina>(3,
-                                                                          emp);
+                                                                         emp);
 
   // Before
   REQUIRE(grimoire_component.m_active == false);
@@ -305,7 +305,7 @@ TEST_CASE("ConfigureFirstLayerComponents configures CGrimoireMachina with data",
 
   steamrot::CGrimoireMachina &grimoire_component =
       steamrot::entity::memory::GetComponent<steamrot::CGrimoireMachina>(4,
-                                                                          emp);
+                                                                         emp);
 
   // Before
   REQUIRE(grimoire_component.m_active == false);
@@ -393,26 +393,26 @@ TEST_CASE("Full configuration flow works correctly",
   REQUIRE(steamrot::entity::memory::GetMemoryPoolSize(emp) == 20);
 
   // Verify entity 0 is unconfigured (no components)
-  const auto &meta_0 =
+  const auto &meta_zero =
       steamrot::entity::memory::GetComponent<steamrot::CMeta>(0, emp);
-  REQUIRE(meta_0.m_active == false);
+  REQUIRE(meta_zero.m_active == false);
 
   // Verify entity 1 (CUserInterface) is configured
-  const auto &ui_1 =
+  const auto &ui_one =
       steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(1, emp);
-  REQUIRE(c_ui_component.m_name == "test_ui");
-  REQUIRE(c_ui_component.m_visible == true);
-  REQUIRE(c_ui_component.m_root_element != nullptr);
+  REQUIRE(ui_one.m_name == "simple_ui");
+  REQUIRE(ui_one.m_visible == true);
+  REQUIRE(ui_one.m_root_element != nullptr);
   // check that root element is PanelElement
-  REQUIRE(dynamic_cast<steamrot::PanelElement *>(
-      c_ui_component.m_root_element.get()));
+  REQUIRE(dynamic_cast<steamrot::PanelElement *>(ui_one.m_root_element.get()));
 
   const steamrot::PanelElement &root_panel =
-      static_cast<const steamrot::PanelElement &>(
-          *c_ui_component.m_root_element);
+      static_cast<const steamrot::PanelElement &>(*ui_one.m_root_element);
 
-  REQUIRE(root_panel.size == sf::Vector2f(300.0f, 400.0f));
-  REQUIRE(root_panel.position == sf::Vector2f(100.0f, 200.0f));
+  REQUIRE(root_panel.size.x == 100.0f);
+  REQUIRE(root_panel.size.y == 50.0f);
+  REQUIRE(root_panel.position.x == 10.0f);
+  REQUIRE(root_panel.position.y == 20.0f);
   REQUIRE(root_panel.layout == steamrot::Layout::Horizontal);
   REQUIRE(root_panel.spacing_strategy == steamrot::SpacingAndSizing::None);
   REQUIRE(root_panel.child_elements.size() == 1);
@@ -426,7 +426,7 @@ TEST_CASE("Full configuration flow works correctly",
 
   REQUIRE(child_button.size == sf::Vector2f(0.f, 0.f));
   REQUIRE(child_button.position == sf::Vector2f(0.f, 0.f));
-  REQUIRE(child_button.label == "Start Game");
+  REQUIRE(child_button.label == "Crafting Table");
   REQUIRE(child_button.subscription != nullptr);
   const steamrot::Subscriber &button_sub = *child_button.subscription;
 
