@@ -247,7 +247,156 @@ FlatbuffersSceneConfigurator::ConfigureEntities(
 }
 ```
 
-## Benefits of This Approach
+## Alternative Approach: Non-Virtual Implementation in ISceneConfigurator
+
+### The User's Suggestion
+
+Instead of making `ConfigureEntities()` a pure virtual method, implement it directly in `ISceneConfigurator.cpp`:
+
+**Benefits:**
+- ✅ **Absolute guarantee** - Entities ALWAYS configured in the correct order
+- ✅ **No implementation burden** - Concrete classes don't need to implement it
+- ✅ **Simpler for derived classes** - Less code to write
+- ✅ **Stronger enforcement** - Cannot be overridden or skipped
+
+**Implementation:**
+
+```cpp
+// In ISceneConfigurator.cpp
+std::expected<std::monostate, FailInfo>
+ISceneConfigurator::ConfigureScene(Scene &scene, const SceneData *scene_data) {
+  
+  // 1. Configure SceneInfo
+  auto info_result = ConfigureSceneInfo(scene, scene_data);
+  if (!info_result.has_value())
+    return std::unexpected(info_result.error());
+
+  // 2. Configure SceneResources
+  auto resources_result = ConfigureSceneResources(scene, scene_data);
+  if (!resources_result.has_value())
+    return std::unexpected(resources_result.error());
+
+  // 3. Configure SceneConfig
+  auto config_result = ConfigureSceneConfig(scene, scene_data);
+  if (!config_result.has_value())
+    return std::unexpected(config_result.error());
+
+  // 4. Configure Entities (NON-VIRTUAL - directly in base class)
+  auto entities_result = ConfigureEntities(scene, scene_data);
+  if (!entities_result.has_value())
+    return std::unexpected(entities_result.error());
+
+  // 5. Configure LogicMap
+  auto logic_result = ConfigureLogicMap(scene);
+  if (!logic_result.has_value())
+    return std::unexpected(logic_result.error());
+
+  return std::monostate();
+}
+
+// Non-virtual implementation
+std::expected<std::monostate, FailInfo>
+ISceneConfigurator::ConfigureEntities(Scene &scene, const SceneData *scene_data) {
+  
+  // 1. Check for null SceneData
+  if (!scene_data)
+    return std::unexpected(
+        FailInfo(FailMode::NullPointer, "SceneData pointer is null"));
+
+  // 2. Cast to FbsSceneData (works for Flatbuffers scenes)
+  FbsSceneData *fbs_scene_data =
+      dynamic_cast<FbsSceneData *>(const_cast<SceneData *>(scene_data));
+
+  if (!fbs_scene_data)
+    return std::unexpected(
+        FailInfo(FailMode::InvalidCast, 
+                 "SceneData is not FbsSceneData - entity config not supported"));
+
+  // 3. Get entity collection from scene data
+  if (!fbs_scene_data->scene_data_fbs)
+    return std::unexpected(
+        FailInfo(FailMode::NullPointer, "FlatBuffers SceneData is null"));
+
+  if (!fbs_scene_data->scene_data_fbs->entity_collection())
+    return std::unexpected(
+        FailInfo(FailMode::NullPointer, 
+                 "SceneData has no entity collection"));
+
+  // 4. Get EventHandler from scene
+  EventHandler &event_handler = 
+      scene.GetSceneResources().game_context.event_handler;
+
+  // 5. Create FlatbuffersEntityConfigurator
+  FlatbuffersEntityConfigurator entity_configurator(
+      event_handler, 
+      *fbs_scene_data->scene_data_fbs->entity_collection());
+
+  // 6. Get EntityMemoryPool from scene's EntityManager
+  EntityMemoryPool &emp = 
+      scene.GetEntityManager().GetEntityMemoryPool();
+
+  // 7. Configure the entity memory pool
+  auto config_result = entity_configurator.ConfigureEntityMemoryPool(emp);
+  if (!config_result.has_value())
+    return std::unexpected(config_result.error());
+
+  // 8. Generate archetypes after configuration
+  auto archetype_result = scene.GetEntityManager().GenerateAllArchetypes();
+  if (!archetype_result.has_value())
+    return std::unexpected(archetype_result.error());
+
+  return std::monostate();
+}
+```
+
+### Comparison: Virtual vs Non-Virtual Approaches
+
+| Aspect | Pure Virtual Method | Non-Virtual Implementation |
+|--------|---------------------|----------------------------|
+| **Enforcement** | Compile-time (must implement) | Runtime (always executes) |
+| **Flexibility** | Each derived class chooses EntityConfigurator | Fixed to FlatbuffersEntityConfigurator |
+| **Extensibility** | Easy to add new configurator types | Requires modification to base class |
+| **Simplicity** | More code in derived classes | Less code in derived classes |
+| **Type Coupling** | Loose (interface-based) | Tight (knows about FbsSceneData) |
+| **Future-Proof** | Yes (supports JSON, XML, etc.) | No (assumes FlatBuffers only) |
+
+### Critical Issue with Non-Virtual Approach
+
+❌ **Tight Coupling to FlatBuffers**: The base class would need to know about:
+- `FbsSceneData` (derived type)
+- `FlatbuffersEntityConfigurator` (concrete implementation)
+- FlatBuffers-specific error handling
+
+This violates the **Dependency Inversion Principle** - high-level modules should not depend on low-level modules.
+
+❌ **No Support for Future Configurators**: If you add:
+- `JsonSceneConfigurator` with `JsonEntityConfigurator`
+- `XmlSceneConfigurator` with `XmlEntityConfigurator`
+- `DatabaseSceneConfigurator` with `DatabaseEntityConfigurator`
+
+You'd need to modify `ISceneConfigurator.cpp` with type-checking logic:
+```cpp
+if (auto* fbs_data = dynamic_cast<FbsSceneData*>(scene_data)) {
+  // Use FlatbuffersEntityConfigurator
+} else if (auto* json_data = dynamic_cast<JsonSceneData*>(scene_data)) {
+  // Use JsonEntityConfigurator
+} else if (auto* xml_data = dynamic_cast<XmlSceneData*>(scene_data)) {
+  // Use XmlEntityConfigurator
+}
+```
+
+### Recommendation
+
+**Use the pure virtual approach** for better architecture:
+
+✅ **Separation of Concerns**: Each concrete SceneConfigurator knows which EntityConfigurator to use  
+✅ **Open/Closed Principle**: Can add new configurators without modifying base class  
+✅ **Testability**: Can mock EntityConfigurator behavior per configurator type  
+✅ **Type Safety**: No dynamic_cast in base class  
+
+The pure virtual approach trades a small amount of derived class code for much better architectural properties.
+
+## Benefits of Pure Virtual Approach
 
 ### ✅ Consistent Logic Path
 
