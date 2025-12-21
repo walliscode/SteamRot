@@ -4,16 +4,101 @@
 
 **Yes, there is a robust system in place for directing tests to look in the test directory for data instead of the source directory.**
 
-## System Overview
+The system uses **compile-time macros** to select between production data (`data/`) and test data (`tests/data/`).
 
-The SteamRot codebase has two distinct data directory systems:
+## System Overview: The `paths` Library
+
+### Compile-Time Environment Selection
+
+The `steamrot::paths` namespace (`src/data_providers/paths.h`) provides a **compile-time configurable** path system:
+
+**Three Environments:**
+1. **Test (Default)**: Uses `tests/data/` directory
+2. **Debug**: Uses `data/` directory (same as production)  
+3. **Production**: Uses `data/` directory
+
+**Selection via Preprocessor Macros:**
+```cpp
+// In paths.h
+inline std::filesystem::path GetDataDirectory() {
+#if defined(STEAMROT_ENV_PROD) || defined(STEAMROT_ENV_DEBUG)
+  return GetSourceDirectory() / "data";          // Production/Debug: data/
+#else
+  return GetSourceDirectory() / "tests" / "data"; // Test (default): tests/data/
+#endif
+}
+```
+
+**How to Use:**
+```cpp
+// Default behavior (test environment) - no macro needed
+#include "paths.h"
+auto path = steamrot::paths::GetDataDirectory();  // Returns: tests/data
+
+// Production build - define macro before including
+#define STEAMROT_ENV_PROD
+#include "paths.h"
+auto path = steamrot::paths::GetDataDirectory();  // Returns: data/
+```
+
+### CMake Configuration
+
+The source directory path is configured at CMake time via template substitution:
+
+**Template file** (`src/data_providers/paths.cpp.in`):
+```cpp
+std::filesystem::path GetSourceDirectory() {
+  static const std::filesystem::path source_dir{"@CMAKE_SOURCE_DIR@"};
+  return source_dir;
+}
+```
+
+CMake's `configure_file()` substitutes `@CMAKE_SOURCE_DIR@` with the actual build path.
+
+### Available Path Functions
+
+All paths are built on top of `GetDataDirectory()`:
+
+```cpp
+steamrot::paths::GetDataDirectory()              // Base: tests/data or data/
+steamrot::paths::GetDefaultsDirectory()          // {data}/defaults
+steamrot::paths::GetUserDirectory()              // {data}/user
+steamrot::paths::GetAssetsDirectory()            // {data}/assets
+steamrot::paths::GetSceneDirectory()             // {data}/defaults/scenes
+steamrot::paths::GetUIStylesDirectory()          // {data}/ui_styles
+steamrot::paths::GetFontsDirectory()             // {data}/assets/fonts
+// ... and more
+```
+
+## Additional Data Directory Systems
+
+The SteamRot codebase also has CMake variables for direct access:
 
 1. **Production Data Directory**: `data/` (CMake variable: `data_dir`)
 2. **Test Data Directory**: `tests/data/` (CMake variable: `test_data_dir`)
 
-## How Tests Access Test Data
+## How to Select Test vs Production Data
 
-### Method 1: Adjacent `data/` Directory Pattern (Recommended)
+### Method 1: Use the `paths` Library (Recommended for Code)
+
+**For application code that needs to work in both test and production:**
+
+```cpp
+#include "paths.h"
+
+// No macro needed - defaults to test environment
+auto scene_path = steamrot::paths::GetSceneDirectory();
+// Returns: {source_dir}/tests/data/defaults/scenes (in tests)
+// Returns: {source_dir}/data/defaults/scenes (in production builds)
+```
+
+**For production builds**, the build system defines the macro:
+```cmake
+# In CMakeLists.txt (for production)
+target_compile_definitions(my_target PRIVATE STEAMROT_ENV_PROD)
+```
+
+### Method 2: Adjacent `data/` Directory Pattern (For Unit Tests)
 
 Tests use the `__FILE__` macro to locate an adjacent `data/` directory:
 
@@ -33,8 +118,9 @@ This pattern ensures:
 - No hardcoded paths
 - Works regardless of where CMake is run
 - Test data is organized alongside test code
+- Useful when you need test-specific fixtures that aren't part of the main data directories
 
-### Method 2: Test Data Loader Harness
+### Method 3: Test Data Loader Harness
 
 The project includes a sophisticated test data loading system (`tests/harness/test_data_loader.h`):
 
@@ -53,8 +139,9 @@ auto configs = LoadTestDataConfigsFromPath("/path/to/test/data");
 - Uses `__FILE__` macro via `load_test_data_configs()` macro
 - Supports explicit paths via `LoadTestDataConfigsFromPath()`
 - Returns `std::expected` for error handling
+- Complements the `paths` library for structured test data
 
-### Method 3: CMake-Configured Paths (for special cases)
+### Method 4: CMake Variables (For Build System)
 
 CMake sets project-wide variables:
 
@@ -69,6 +156,45 @@ These can be used in CMake template files:
 constexpr const char* TEST_DATA_DIR = "@TEST_DATA_DIR@";
 auto configs = LoadTestDataConfigsFromPath(TEST_DATA_DIR);
 ```
+
+## Key Concepts: Compile-Time vs Runtime Selection
+
+### The `paths` Library: Compile-Time Selection
+
+The `paths` library uses **preprocessor macros** to select directories at **compile time**:
+
+**Advantages:**
+- ✅ Zero runtime overhead (path is determined at compile time)
+- ✅ No need to pass environment flags at runtime
+- ✅ Single codebase works for both test and production
+- ✅ Type-safe and inline functions
+
+**How It Works:**
+1. By default (no macros defined), code uses `tests/data/`
+2. When `STEAMROT_ENV_PROD` or `STEAMROT_ENV_DEBUG` is defined, code uses `data/`
+3. The macro is typically set via CMake build configuration
+4. The same source code compiles to different paths based on build type
+
+**Example:**
+```cpp
+// Same code, different behavior based on build configuration
+#include "paths.h"
+
+void LoadSceneData() {
+  auto scene_dir = steamrot::paths::GetSceneDirectory();
+  // Test build: scene_dir = "{source}/tests/data/defaults/scenes"
+  // Prod build:  scene_dir = "{source}/data/defaults/scenes"
+}
+```
+
+### When to Use Each Method
+
+| Method | Use Case | Selection Time | Overhead |
+|--------|----------|----------------|----------|
+| `paths` library | Production code, data providers | Compile-time | None |
+| Adjacent `data/` | Test-specific fixtures | Runtime | Minimal |
+| Test data loader | Structured test data | Runtime | Minimal |
+| CMake variables | Build system, templates | Configure-time | None |
 
 ## Directory Structure
 
@@ -142,12 +268,32 @@ TEST_CASE("Scene configuration test", "[unit][scene]") {
 
 ## Why This System Exists
 
+### Benefits of the `paths` Library Approach
+
+1. **Compile-Time Selection**: Zero runtime overhead for path resolution
+2. **Single Codebase**: Same code works for test, debug, and production
+3. **Type Safety**: Compile-time errors if both PROD and DEBUG defined
+4. **No Configuration Files**: Environment selected via build system
+5. **Isolation**: Tests use separate data directory by default
+6. **CMake Integration**: Path is configured once at CMake time
+
+### Benefits of Additional Methods
+
 1. **Isolation**: Tests don't accidentally modify production data
-2. **Organization**: Test data is co-located with tests
+2. **Organization**: Test data is co-located with tests (adjacent `data/`)
 3. **Flexibility**: Multiple patterns for different use cases
 4. **Portability**: Uses relative paths, not absolute
-5. **Discoverability**: Auto-discovery of test data files
+5. **Discoverability**: Auto-discovery of test data files (test data loader)
 6. **Type Safety**: FlatBuffers for structured test data
+
+## Summary of Path Selection Methods
+
+| What | How | When | Example |
+|------|-----|------|---------|
+| **`paths` library** | Preprocessor macros | Compile-time | `steamrot::paths::GetSceneDirectory()` |
+| **Adjacent `data/`** | `__FILE__` macro | Runtime | `std::filesystem::path(__FILE__).parent_path() / "data"` |
+| **Test data loader** | `load_test_data_configs()` | Runtime | `auto configs = load_test_data_configs()` |
+| **CMake variables** | `configure_file()` | Configure-time | `constexpr const char* DATA_DIR = "@data_dir@"` |
 
 ## Recommendation
 
@@ -181,4 +327,30 @@ This approach:
 
 ## Conclusion
 
-The SteamRot codebase has a well-designed, multi-layered system for test data management that completely separates test data from production data. Tests should use the adjacent `data/` directory pattern with the test data loader harness for maximum flexibility and maintainability.
+The SteamRot codebase has a **sophisticated, multi-layered system** for data path management:
+
+### Primary System: `paths` Library (Compile-Time)
+
+The `steamrot::paths` namespace provides **compile-time environment selection**:
+- **Test environment (default)**: Uses `tests/data/` 
+- **Production/Debug**: Uses `data/` (via `STEAMROT_ENV_PROD` or `STEAMROT_ENV_DEBUG` macros)
+- **Zero runtime overhead**: Path selection happens at compile time
+- **CMake configured**: Source directory path substituted at configure time
+
+### Supporting Systems: Runtime Test Data Access
+
+For test-specific needs:
+- **Adjacent `data/` directories**: Test fixtures co-located with test files
+- **Test data loader harness**: Auto-discovery of `.test_data.bin` files
+- **CMake variables**: Direct access for build system scripts
+
+### Key Takeaway
+
+The `paths` library answers your question: **Yes, there is a system that can compile with different data directories (`tests/data` or `data/`) depending on compiler options (preprocessor macros).** 
+
+The system uses:
+- Preprocessor conditionals (`#if defined(STEAMROT_ENV_PROD)`)
+- CMake template substitution (`@CMAKE_SOURCE_DIR@`)
+- Compile-time path selection (no runtime configuration needed)
+
+This design allows the **same source code** to work seamlessly in both test and production environments, with the build system controlling which data directory is used.
