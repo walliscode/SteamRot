@@ -18,6 +18,6 @@ namespace steamrot {
 
 struct FbsSceneData : public SceneData {
 
-  const SceneDataFbs *scene_data_fbs;
+  const SceneDataFbs *scene_data_fbs{nullptr};
 };
 } // namespace steamrot

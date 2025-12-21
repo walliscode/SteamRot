@@ -6,6 +6,7 @@ add_executable(test_scenes
 target_link_libraries(test_scenes
   PRIVATE
     scenes
+    entity
     context_test_helpers
     Catch2::Catch2WithMain
 )

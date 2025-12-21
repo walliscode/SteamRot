@@ -69,6 +69,18 @@ public:
   ConfigureSceneConfig(Scene &scene, const SceneData *scene_data) = 0;
 
   /////////////////////////////////////////////////
+  /// @brief Virtual function to configure entities in the scene
+  ///
+  /// This method must create an appropriate IEntityConfigurator instance
+  /// and use it to configure the scene's EntityMemoryPool.
+  ///
+  /// @param scene Scene whose entities should be configured
+  /// @param scene_data SceneData containing entity configuration
+  /// @return std::expected with monostate on success, FailInfo on error
+  /////////////////////////////////////////////////
+  virtual std::expected<std::monostate, FailInfo>
+  ConfigureEntities(Scene &scene, const SceneData *scene_data) = 0;
+  /////////////////////////////////////////////////
   /// @brief Configure the logic map for the scene
   ///
   /// This should be set in stone, not configurable by data or the user.

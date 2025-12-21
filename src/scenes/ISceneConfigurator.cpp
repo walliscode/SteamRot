@@ -30,6 +30,11 @@ ISceneConfigurator::ConfigureScene(Scene &scene, const SceneData *scene_data) {
   if (!config_result.has_value())
     return std::unexpected(config_result.error());
 
+  // 4. Configure Entities
+  auto entities_result = ConfigureEntities(scene, scene_data);
+  if (!entities_result.has_value())
+    return std::unexpected(entities_result.error());
+
   // Configure LogicMap
   auto logic_result = ConfigureLogicMap(scene);
   if (!logic_result.has_value())

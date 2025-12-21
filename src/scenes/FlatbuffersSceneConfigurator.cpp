@@ -94,4 +94,36 @@ FlatbuffersSceneConfigurator::ConfigureSceneConfig(
   // SceneConfig not active at the moment so nothing else to add
   return std::monostate{};
 }
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+FlatbuffersSceneConfigurator::ConfigureEntities(Scene &scene,
+                                                const SceneData *scene_data) {
+
+  // check for null SceneData
+  if (!scene_data)
+    return std::unexpected(
+        FailInfo(FailMode::NullPointer, "SceneData pointer is null"));
+
+  // cast to derived SceneData type
+  FbsSceneData *fbs_scene_data =
+      dynamic_cast<FbsSceneData *>(const_cast<SceneData *>(scene_data));
+
+  // check its valid
+  if (!fbs_scene_data)
+    return std::unexpected(
+        FailInfo(FailMode::InvalidCast, "SceneData is not FbsSceneData"));
+
+  // check for SceneDataFbs
+  if (!fbs_scene_data->scene_data_fbs)
+    return std::unexpected(
+        FailInfo(FailMode::FlatbuffersDataNotFound, "SceneDataFbs not found"));
+
+  // check for entity data
+  if (!fbs_scene_data->scene_data_fbs->entity_collection())
+    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
+                                    "No entity data found in SceneData"));
+
+  return std::monostate{};
+}
 } // namespace steamrot
