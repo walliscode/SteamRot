@@ -10,6 +10,7 @@
 #include "FlatbuffersSceneConfigurator.h"
 #include "FailInfo.h"
 #include "FbsSceneData.h"
+#include "FlatbuffersEntityConfigurator.h"
 #include "Scene.h"
 #include "uuid.h"
 #include <expected>
@@ -123,6 +124,17 @@ FlatbuffersSceneConfigurator::ConfigureEntities(Scene &scene,
   if (!fbs_scene_data->scene_data_fbs->entity_collection())
     return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
                                     "No entity data found in SceneData"));
+
+  // instantiate FlatbuffersEntityConfigurator
+  FlatbuffersEntityConfigurator entity_configurator(
+      scene.GetSceneContext().event_handler,
+      *fbs_scene_data->scene_data_fbs->entity_collection());
+
+  // configure EMP on scene
+  auto emp_config_result = entity_configurator.ConfigureEntityMemoryPool(
+      scene.GetSceneContext().scene_entities);
+  if (!emp_config_result)
+    return std::unexpected(emp_config_result.error());
 
   return std::monostate{};
 }

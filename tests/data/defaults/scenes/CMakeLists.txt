@@ -1,1 +1,1 @@
-include(compile_test_data.cmake)
+# include(compile_test_data.cmake)

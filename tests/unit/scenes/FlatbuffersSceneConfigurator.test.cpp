@@ -254,5 +254,5 @@ TEST_CASE("FlatbuffersSceneConfigurator::ConfiguresEntities modifies the "
   // get final entity count
   size_t final_entity_count = steamrot::entity::memory::GetMemoryPoolSize(
       test_scene.GetSceneContext().scene_entities);
-  REQUIRE(final_entity_count == 100);
+  REQUIRE(final_entity_count == 146);
 }
