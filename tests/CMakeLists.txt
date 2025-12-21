@@ -3,6 +3,7 @@ include(Catch)
 
 # Test utilities and shared context
 add_subdirectory(context)
+add_subdirectory(data)
 
 # Test matchers - custom Catch2 matchers
 # add_subdirectory(matchers)

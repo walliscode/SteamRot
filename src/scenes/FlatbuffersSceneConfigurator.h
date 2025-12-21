@@ -52,5 +52,15 @@ public:
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo>
   ConfigureSceneConfig(Scene &scene, const SceneData *scene_data) override;
+
+  /////////////////////////////////////////////////
+  /// @brief  function to configure entities in the scene
+  ///
+  /// @param scene Scene whose entities should be configured
+  /// @param scene_data SceneData containing entity configuration
+  /// @return std::expected with monostate on success, FailInfo on error
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ConfigureEntities(Scene &scene, const SceneData *scene_data) override;
 };
 } // namespace steamrot

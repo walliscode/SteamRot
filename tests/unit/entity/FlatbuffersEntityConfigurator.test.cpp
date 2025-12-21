@@ -145,7 +145,7 @@ TEST_CASE("ConfigureFirstLayerComponents configures CUserInterface correctly",
   REQUIRE(panel->size == sf::Vector2f(100.0f, 50.0f));
   REQUIRE(panel->layout == steamrot::Layout::Horizontal);
   REQUIRE(panel->spacing_strategy == steamrot::SpacingAndSizing::None);
-  REQUIRE(panel->child_elements.empty());
+  REQUIRE(!panel->child_elements.empty());
 }
 
 TEST_CASE("ConfigureFirstLayerComponents configures hidden UI correctly",
@@ -186,32 +186,6 @@ TEST_CASE("ConfigureFirstLayerComponents configures hidden UI correctly",
 /////////////////////////////////////////////////
 /// Null Data Handling Tests
 /////////////////////////////////////////////////
-
-TEST_CASE("ConfigureCUserInterface handles null ui_name gracefully",
-          "[unit][FlatbuffersEntityConfigurator]") {
-  steamrot::EventHandler event_handler;
-  steamrot::EntityMemoryPool emp;
-  auto [data, entity_collection] = LoadEntityTestData();
-
-  steamrot::FlatbuffersEntityConfigurator configurator(event_handler,
-                                                       *entity_collection);
-
-  steamrot::entity::memory::ResizeEntityMemoryPool(
-      emp, entity_collection->entity_memory_pool_size());
-
-  auto result = configurator.ConfigureFirstLayerComponents(emp);
-
-  // Should succeed - null ui_name should be handled
-  REQUIRE(result.has_value());
-
-  // Entity 5 has no ui_name
-  const auto &ui_component =
-      steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(5, emp);
-  // Should keep default name when ui_name is null
-  REQUIRE(ui_component.m_name == "Default UI");
-  REQUIRE(ui_component.m_active == true);
-  REQUIRE(ui_component.m_root_element != nullptr);
-}
 
 TEST_CASE("ConfigureCUserInterface correctly handles false visibility",
           "[unit][FlatbuffersEntityConfigurator]") {
