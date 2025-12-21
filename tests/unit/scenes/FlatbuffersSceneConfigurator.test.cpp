@@ -9,6 +9,7 @@
 #include "FlatbuffersSceneConfigurator.h"
 #include "FbsSceneData.h"
 
+#include "FlatbuffersSceneDataProvider.h"
 #include "SceneFactory.h"
 #include "TestFixture.h"
 #include "TestScene.h"
@@ -16,6 +17,7 @@
 #include "uuid.h"
 #include <catch2/catch_test_macros.hpp>
 #include <iostream>
+#include <memory>
 
 TEST_CASE("FlatbuffersSceneConfigurator can be instantiated",
           "[FlatbuffersSceneConfigurator]") {
@@ -130,6 +132,26 @@ TEST_CASE("FlatbuffersSceneConfigurator::ConfigureSceneResources handles "
   REQUIRE(!result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::InvalidCast);
   REQUIRE(result.error().message == "SceneData is not FbsSceneData");
+}
+
+TEST_CASE("FlatbuffersSceneConfigurator::ConfigureSceneResources configures "
+          "EntityMemoryPool from default data",
+          "[FlatbuffersSceneConfigurator]") {
+  // set up fixtures and objects
+  steamrot::tests::TestFixture fixture;
+  steamrot::tests::TestScene scene{fixture.GetGameContext()};
+  steamrot::FlatbuffersSceneDataProvider data_provider;
+  steamrot::FlatbuffersSceneConfigurator configurator;
+
+  // initial tests
+
+  // create FbsSceneData from data provider
+  auto data_result =
+      data_provider.ProvideDefaultSceneData(steamrot::SceneType_TEST);
+  if (!data_result.has_value()) {
+    FAIL(data_result.error().message);
+  }
+  auto &scene_data = data_result.value();
 }
 
 TEST_CASE("FlatbuffersSceneConfigurator::ConfigureSceneConfig handles null "
