@@ -7,12 +7,10 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "logic_render_test_helpers.h"
-
 #include "catch2/catch_test_macros.hpp"
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Keyboard.hpp>
-#include <iostream>
 
 namespace steamrot::tests {
 
@@ -62,8 +60,6 @@ void TestTextIsPresent(const sf::Image &image, const sf::Vector2f &position,
       sf::Color pixel = image.getPixel(
           {static_cast<unsigned int>(x), static_cast<unsigned int>(y)});
       if (pixel == text_color) {
-        std::cout << "Found text pixel at (" << x << ", " << y << ")"
-                  << std::endl;
         found_text_pixel = true;
       }
     }
