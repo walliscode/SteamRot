@@ -2,6 +2,9 @@
 include "../entities/entities.fbs";
 include "../core/scene_types.fbs";
 include "../events/event_bus_data.fbs";
+include "../events/subscriber.fbs";
+include "../engine/engine_state.fbs";
+include "../scenes/scene_data.fbs";
 
 namespace steamrot;
 
@@ -28,11 +31,40 @@ table SaveMetadata {
   slot_index: uint32 = 0;
 }
 
+////////////////////////////////////////////////////////////
+/// Scene manager runtime state for saves
+////////////////////////////////////////////////////////////
+table SceneManagerStateFbs {
+  /// Scene manager level subscribers
+  subscriptions: [SubscriberFbs];
+}
+
+////////////////////////////////////////////////////////////
+/// Scene runtime state for saves
+////////////////////////////////////////////////////////////
+table SceneStateFbs {
+  /// Is the scene active
+  active: bool = true;
+}
 
 ////////////////////////////////////////////////////////////
 /// Root table containing complete save game data
 ////////////////////////////////////////////////////////////
 table SaveData {
+  /// Metadata about this save file (required)
+  metadata: SaveMetadata (required);
+  
+  /// Scene data for the saved scene (required)
+  scene_data: SceneDataFbs (required);
+  
+  /// Engine state at time of save
+  engine_state: EngineStateFbs;
+  
+  /// Scene manager state at time of save
+  scene_manager_state: SceneManagerStateFbs;
+  
+  /// Scene state at time of save
+  scene_state: SceneStateFbs;
 }
 
 root_type SaveData;

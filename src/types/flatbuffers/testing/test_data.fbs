@@ -4,6 +4,7 @@ include "input_test_data.fbs";
 include "../events/event_packet_data.fbs";
 include "../events/event_bus_data.fbs";
 include "../engine/engine_state.fbs";
+include "../configuration/save_data.fbs";
 
 namespace steamrot;
 
@@ -77,6 +78,16 @@ table TestDataConfig {
   metadata: TestMetadata (required);
  
   starting_engine_state: EngineStateFbs;
+  
+  /// @brief Optional save data for configuring test starting state
+  ///
+  /// When present, save_data provides complete game state configuration
+  /// including scene data, engine state, and manager states. This allows
+  /// tests to start from a specific saved game state.
+  ///
+  /// If both save_data and starting_engine_state are present, save_data
+  /// takes precedence for engine state configuration.
+  save_data: SaveData;
    
   /// @brief Simulation data for executing logic steps during tests
   simulation_data: SimulationData;

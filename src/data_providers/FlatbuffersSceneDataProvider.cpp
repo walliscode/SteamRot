@@ -9,6 +9,7 @@
 #include "FlatbuffersSceneDataProvider.h"
 #include "FbsSceneData.h"
 #include "FlatbuffersDataLoader.h"
+#include "SaveData.h"
 #include "scene_data_generated.h"
 #include <expected>
 
@@ -38,4 +39,21 @@ FlatbuffersSceneDataProvider::ProvideDefaultSceneData(
 
   return std::make_unique<FbsSceneData>(scene_data);
 }
+
+/////////////////////////////////////////////////
+std::expected<std::unique_ptr<SceneData>, FailInfo>
+FlatbuffersSceneDataProvider::ProvideSceneDataFromSave(
+    SaveData &save_data) const {
+
+  // Validate that save_data contains scene_data
+  if (!save_data.scene_data) {
+    return std::unexpected(
+        FailInfo{FailMode::NullPointer, "SaveData contains null scene_data"});
+  }
+
+  // Move the scene_data out of SaveData and return it
+  // This transfers ownership to the caller
+  return std::move(save_data.scene_data);
+}
+
 } // namespace steamrot

@@ -10,6 +10,7 @@
 /////////////////////////////////////////////////
 #include "IAssetDataProvider.h"
 #include "IEngineDataProvider.h"
+#include "ISaveDataProvider.h"
 #include "ISceneDataProvider.h"
 #include "ISceneManagerDataProvider.h"
 
@@ -33,6 +34,16 @@ ISceneManagerDataProvider &GetSceneManagerDataProvider();
 /////////////////////////////////////////////////
 IAssetDataProvider &GetAssetDataProvider();
 
+/////////////////////////////////////////////////
+/// @brief Get the scene data provider instance.
+/////////////////////////////////////////////////
 ISceneDataProvider &GetSceneDataProvider();
+
+/////////////////////////////////////////////////
+/// @brief Get the save data provider instance.
+///
+/// Returns a static instance of the FlatBuffers save data provider.
+/////////////////////////////////////////////////
+ISaveDataProvider &GetSaveDataProvider();
 
 } // namespace steamrot

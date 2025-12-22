@@ -9,6 +9,7 @@
 #include "provider_factory.h"
 #include "FlatbuffersAssetDataProvider.h"
 #include "FlatbuffersEngineDataProvider.h"
+#include "FlatbuffersSaveDataProvider.h"
 #include "FlatbuffersSceneDataProvider.h"
 #include "FlatbuffersSceneManagerDataProvider.h"
 
@@ -37,6 +38,12 @@ IAssetDataProvider &GetAssetDataProvider() {
 /////////////////////////////////////////////////
 ISceneDataProvider &GetSceneDataProvider() {
   static FlatbuffersSceneDataProvider provider;
+  return provider;
+}
+
+/////////////////////////////////////////////////
+ISaveDataProvider &GetSaveDataProvider() {
+  static FlatbuffersSaveDataProvider provider;
   return provider;
 }
 
