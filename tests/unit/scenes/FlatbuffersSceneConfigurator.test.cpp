@@ -13,6 +13,9 @@
 #include "SceneFactory.h"
 #include "TestFixture.h"
 #include "TestScene.h"
+#include "UIActionLogic.h"
+#include "UICollisionLogic.h"
+#include "UIRenderLogic.h"
 #include "entity_memory.h"
 #include "scene_types_generated.h"
 #include "uuid.h"
@@ -255,4 +258,52 @@ TEST_CASE("FlatbuffersSceneConfigurator::ConfiguresEntities modifies the "
   size_t final_entity_count = steamrot::entity::memory::GetMemoryPoolSize(
       test_scene.GetSceneContext().scene_entities);
   REQUIRE(final_entity_count == 146);
+}
+
+TEST_CASE("FlatbuffersSceneConfigurator::ConfigureLogicMap configures the "
+          "scenes logic map",
+          "[FlatbuffersSceneConfigurator]") {
+
+  // set up fixtures and objects
+  steamrot::tests::TestFixture fixture;
+  steamrot::tests::TestScene test_scene{fixture.GetGameContext()};
+  steamrot::FlatbuffersSceneConfigurator configurator;
+
+  // ensure logic map is empty
+  REQUIRE(test_scene.GetSceneResources().logic_map.empty());
+
+  // configure logic map
+  auto result = configurator.ConfigureLogicMap(test_scene);
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+  // check that logic map is populated
+  auto &logic_collection = test_scene.GetSceneResources().logic_map;
+  ///// CHECKING COLLISION LOGICS /////
+  auto collision_it = logic_collection.find(steamrot::LogicType::Collision);
+  if (collision_it == logic_collection.end()) {
+    FAIL("LogicCollection does not contain Collision LogicType");
+  }
+  const auto &collision_logics = collision_it->second;
+  REQUIRE(collision_logics.size() == 1);
+  REQUIRE(
+      dynamic_cast<steamrot::UICollisionLogic *>(collision_logics[0].get()));
+
+  ///// CHECKING ACTION LOGICS /////
+  auto action_it = logic_collection.find(steamrot::LogicType::Action);
+  if (action_it == logic_collection.end()) {
+    FAIL("LogicCollection does not contain Action LogicType");
+  }
+  const auto &action_logics = action_it->second;
+  REQUIRE(action_logics.size() == 1);
+  REQUIRE(dynamic_cast<steamrot::UIActionLogic *>(action_logics[0].get()));
+
+  ///// CHECKING RENDER LOGICS /////
+  auto render_it = logic_collection.find(steamrot::LogicType::Render);
+  if (render_it == logic_collection.end()) {
+    FAIL("LogicCollection does not contain Render LogicType");
+  }
+  const auto &render_logics = render_it->second;
+  REQUIRE(render_logics.size() == 1); // No render logics added yet
+  REQUIRE(dynamic_cast<steamrot::UIRenderLogic *>(render_logics[0].get()));
 }

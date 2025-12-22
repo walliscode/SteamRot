@@ -7,23 +7,59 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "LogicFactory.h"
-#include "CraftingRenderLogic.h"
-
+#include "FailInfo.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
 #include "UIRenderLogic.h"
 #include "UIStateLogic.h"
-#include "logic_data_generated.h"
-#include "subscriber_factory.h"
 #include <expected>
-#include <variant>
+#include <memory>
 
 namespace steamrot {
-/////////////////////////////////////////////////
-LogicFactory::LogicFactory(const SceneType scene_type,
-                           const SceneContext &scene_context)
-    : m_scene_type(scene_type), m_scene_context(scene_context) {}
 
+/////////////////////////////////////////////////
+LogicFactory::LogicFactory(const SceneContext &scene_context)
+    : m_scene_context(scene_context) {}
+
+/////////////////////////////////////////////////
+std::expected<LogicCollection, FailInfo>
+LogicFactory::ProvideLogicCollection(SceneType scene_type) {
+
+  // create an empty LogicCollection to modify
+  LogicCollection logic_collection = CreateEmptyLogicCollection();
+
+  // configure the LogicCollection based on the SceneType
+  switch (scene_type) {
+  case SceneType::SceneType_TITLE: {
+    auto result = ConfigureTitleLogics(logic_collection);
+    if (!result) {
+      return std::unexpected(result.error());
+    }
+    break;
+  }
+  case SceneType::SceneType_CRAFTING: {
+    auto result = ConfigureTitleLogics(logic_collection);
+    if (!result) {
+      return std::unexpected(result.error());
+    }
+    break;
+  }
+  case SceneType::SceneType_TEST: {
+    auto result = ConfigureTestLogics(logic_collection);
+    if (!result) {
+      return std::unexpected(result.error());
+    }
+    break;
+  }
+
+  // other SceneTypes can be added here
+  default:
+    return std::unexpected(
+        FailInfo(FailMode::SceneTypeNotFound,
+                 "LogicFactory::ProvideLogicCollection, unknown SceneType"));
+  }
+  return logic_collection;
+}
 /////////////////////////////////////////////////
 LogicCollection LogicFactory::CreateEmptyLogicCollection() {
 
@@ -38,217 +74,72 @@ LogicCollection LogicFactory::CreateEmptyLogicCollection() {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-LogicFactory::TitleSceneLogicConfiguration(
-    LogicCollection &logic_collection,
-    const LogicCollectionData *logic_collection_data) {
+LogicFactory::ConfigureTitleLogics(LogicCollection &logic_collection) {
 
-  // Get Collision Logic Vector and Data
+  ////// THE ORDER OF THE LOGIC CLASSES IS VERY IMPORTANT //////
+  ////// DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING //////
+
+  /////// ADD COLLISION LOGICS /////
   LogicVector &collision_logics = logic_collection[LogicType::Collision];
+  collision_logics.push_back(
+      std::make_unique<UICollisionLogic>(m_scene_context));
 
-  const LogicVectorData *collision_logic_data =
-      logic_collection_data ? logic_collection_data->collision_logic_data()
-                            : nullptr;
-
-  // Add CollisionLogics for Title Scene
-  AddLogicToLogicVector<UICollisionLogic>(collision_logics,
-                                          collision_logic_data);
-
-  // Get Action Logic Vector and Data
+  /////// ADD ACTION LOGICS /////
   LogicVector &action_logics = logic_collection[LogicType::Action];
-  const LogicVectorData *action_logic_data =
-      logic_collection_data ? logic_collection_data->action_logic_data()
-                            : nullptr;
-  // Add ActionLogics for Title Scene
-  AddLogicToLogicVector<UIStateLogic>(action_logics, action_logic_data);
-  AddLogicToLogicVector<UIActionLogic>(action_logics, action_logic_data);
+  action_logics.push_back(
+      std::make_unique<steamrot::UIActionLogic>(m_scene_context));
+  action_logics.push_back(
+      std::make_unique<steamrot::UIStateLogic>(m_scene_context));
 
-  // Get Render Logic Vector and Data
+  ////// ADD RENDER LOGICS /////
   LogicVector &render_logics = logic_collection[LogicType::Render];
-  const LogicVectorData *render_logic_data =
-      logic_collection_data ? logic_collection_data->render_logic_data()
-                            : nullptr;
-  // Add RenderLogics for Title Scene
-  AddLogicToLogicVector<UIRenderLogic>(render_logics, render_logic_data);
-
-  return std::monostate{};
+  render_logics.push_back(
+      std::make_unique<steamrot::UIRenderLogic>(m_scene_context));
+  return std::monostate();
 }
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-LogicFactory::CraftingSceneLogicConfiguration(
-    LogicCollection &logic_collection,
-    const LogicCollectionData *logic_collection_data) {
+LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
+  ////// THE ORDER OF THE LOGIC CLASSES IS VERY IMPORTANT //////
+  ////// DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING //////
 
-  // Get Collision Logic Vector and Data
+  /////// ADD COLLISION LOGICS /////
   LogicVector &collision_logics = logic_collection[LogicType::Collision];
-  const LogicVectorData *collision_logic_data =
-      logic_collection_data ? logic_collection_data->collision_logic_data()
-                            : nullptr;
+  collision_logics.push_back(
+      std::make_unique<UICollisionLogic>(m_scene_context));
 
-  // Add CollisionLogics for Title Scene
-  AddLogicToLogicVector<UICollisionLogic>(collision_logics,
-                                          collision_logic_data);
-
-  // Get Action Logic Vector and Data
+  /////// ADD ACTION LOGICS /////
   LogicVector &action_logics = logic_collection[LogicType::Action];
-  const LogicVectorData *action_logic_data =
-      logic_collection_data ? logic_collection_data->action_logic_data()
-                            : nullptr;
+  action_logics.push_back(
+      std::make_unique<steamrot::UIActionLogic>(m_scene_context));
+  action_logics.push_back(
+      std::make_unique<steamrot::UIStateLogic>(m_scene_context));
 
-  // Add ActionLogics for Title Scene
-  AddLogicToLogicVector<UIStateLogic>(action_logics, action_logic_data);
-  AddLogicToLogicVector<UIActionLogic>(action_logics, action_logic_data);
-
-  // Get Render Logic Vector and Data
+  ////// ADD RENDER LOGICS /////
   LogicVector &render_logics = logic_collection[LogicType::Render];
-  const LogicVectorData *render_logic_data =
-      logic_collection_data ? logic_collection_data->render_logic_data()
-                            : nullptr;
-
-  // Add RenderLogics for Title Scene
-  AddLogicToLogicVector<CraftingRenderLogic>(render_logics, render_logic_data);
-  AddLogicToLogicVector<UIRenderLogic>(render_logics, render_logic_data);
-
-  return std::monostate{};
+  render_logics.push_back(
+      std::make_unique<steamrot::UIRenderLogic>(m_scene_context));
+  return std::monostate();
 }
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-LogicFactory::TestSceneLogicConfiguration(
-    LogicCollection &logic_collection,
-    const LogicCollectionData *logic_collection_data) {
-
-  // Get Collision Logic Vector and Data
+LogicFactory::ConfigureTestLogics(LogicCollection &logic_collection) {
+  ////// THE ORDER OF THE LOGIC CLASSES IS VERY IMPORTANT //////
+  ////// DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING //////
+  /////// ADD COLLISION LOGICS /////
   LogicVector &collision_logics = logic_collection[LogicType::Collision];
-  const LogicVectorData *collision_logic_data =
-      logic_collection_data ? logic_collection_data->collision_logic_data()
-                            : nullptr;
-
-  // Add CollisionLogics for Test Scene
-  AddLogicToLogicVector<UICollisionLogic>(collision_logics,
-                                          collision_logic_data);
-
-  // Get Action Logic Vector and Data
+  collision_logics.push_back(
+      std::make_unique<UICollisionLogic>(m_scene_context));
+  /////// ADD ACTION LOGICS /////
   LogicVector &action_logics = logic_collection[LogicType::Action];
-  const LogicVectorData *action_logic_data =
-      logic_collection_data ? logic_collection_data->action_logic_data()
-                            : nullptr;
-
-  // Add ActionLogics for Test Scene
-  AddLogicToLogicVector<UIStateLogic>(action_logics, action_logic_data);
-  AddLogicToLogicVector<UIActionLogic>(action_logics, action_logic_data);
-
-  // Get Render Logic Vector and Data
+  action_logics.push_back(
+      std::make_unique<steamrot::UIActionLogic>(m_scene_context));
+  ////// ADD RENDER LOGICS /////
   LogicVector &render_logics = logic_collection[LogicType::Render];
-  const LogicVectorData *render_logic_data =
-      logic_collection_data ? logic_collection_data->render_logic_data()
-                            : nullptr;
-
-  // Add RenderLogics for Test Scene
-  AddLogicToLogicVector<UIRenderLogic>(render_logics, render_logic_data);
-
-  return std::monostate{};
+  render_logics.push_back(
+      std::make_unique<steamrot::UIRenderLogic>(m_scene_context));
+  return std::monostate();
 }
-
-/////////////////////////////////////////////////
-std::expected<LogicCollection, FailInfo>
-LogicFactory::CreateLogicMap(const LogicCollectionData *logic_collection_data) {
-
-  // create empty logic collection
-  LogicCollection logic_collection = CreateEmptyLogicCollection();
-
-  // configure logic collection based on scene type
-  switch (m_scene_type) {
-  case SceneType::SceneType_TITLE: {
-
-    auto configuration_result =
-        TitleSceneLogicConfiguration(logic_collection, logic_collection_data);
-
-    // UNEXPECTED PROPOGATION
-    if (!configuration_result.has_value()) {
-      return std::unexpected(configuration_result.error());
-    }
-
-    break;
-  }
-  case SceneType::SceneType_CRAFTING: {
-
-    auto configuration_result = CraftingSceneLogicConfiguration(
-        logic_collection, logic_collection_data);
-
-    // UNEXPECTED PROPOGATION
-    if (!configuration_result.has_value()) {
-      return std::unexpected(configuration_result.error());
-    }
-
-    break;
-  }
-  case SceneType::SceneType_TEST: {
-    auto configuration_result =
-        TestSceneLogicConfiguration(logic_collection, logic_collection_data);
-    // UNEXPECTED PROPOGATION
-    if (!configuration_result.has_value()) {
-      return std::unexpected(configuration_result.error());
-    }
-    break;
-  }
-  default:
-    return std::unexpected(
-        FailInfo{FailMode::NonExistentEnumValue,
-                 "Unsupported scene type for logic configuration"});
-  }
-  return logic_collection;
-}
-
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-LogicFactory::AttachSubscribers(Logic &logic, const LogicData *logic_data) {
-
-  // Check if logic_data is null
-  if (!logic_data) {
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound, "LogicData is null"});
-  }
-
-  // Check if there are any subscribers to attach
-  if (!logic_data->all_subscriptions()) {
-    // No subscribers to attach, return success
-    return std::monostate{};
-  }
-
-  // Collect all subscriber configs into a vector
-  std::vector<const SubscriberFbs *> configs;
-  for (const auto *subscriber_data : *logic_data->all_subscriptions()) {
-    if (subscriber_data) {
-      configs.push_back(subscriber_data);
-    }
-  }
-
-  // for each SubscriberFbs, create Subscriber, register with EventBus, and add
-  // to Logic
-  for (const auto *subscriber_config : configs) {
-    // Create Subscriber using SubscriberFactory
-    auto subscriber_creation_result =
-        subscriber_factory::CreateSubscriber(subscriber_config);
-    // UNEXPECTED PROPOGATION
-    if (!subscriber_creation_result.has_value()) {
-      return std::unexpected(subscriber_creation_result.error());
-    }
-
-    const auto subscriber =
-        std::make_shared<Subscriber>(subscriber_creation_result.value());
-
-    // register Subscriber with EventBus
-    auto registration_result =
-        m_scene_context.event_handler.RegisterSubscriber(subscriber);
-    if (!registration_result.has_value()) {
-      return std::unexpected(registration_result.error());
-    }
-    // add Subscriber to Logic
-    logic.AddSubscriber(subscriber);
-  }
-
-  return std::monostate{};
-}
-
 } // namespace steamrot

@@ -8,7 +8,6 @@
 /////////////////////////////////////////////////
 #include "ISceneConfigurator.h"
 #include "Scene.h"
-#include "SceneContext.h"
 namespace steamrot {
 
 /////////////////////////////////////////////////
@@ -47,21 +46,18 @@ ISceneConfigurator::ConfigureScene(Scene &scene, const SceneData *scene_data) {
 std::expected<std::monostate, FailInfo>
 ISceneConfigurator::ConfigureLogicMap(Scene &scene) {
 
-  // Get SceneContext from the scene
-  SceneContext scene_context = scene.GetSceneContext();
+  // create LogicFactory instance
+  LogicFactory logic_factory(scene.GetSceneContext());
 
-  // Get scene type from scene info
-  SceneType scene_type = scene.GetSceneInfo().type;
+  // create logic map and check info_result
+  auto logic_map_result =
+      logic_factory.ProvideLogicCollection(scene.m_scene_info.type);
 
-  // Create LogicFactory
-  LogicFactory logic_factory(scene_type, scene_context);
-
-  // Create logic map
-  auto logic_map_result = logic_factory.CreateLogicMap();
   if (!logic_map_result.has_value())
     return std::unexpected(logic_map_result.error());
 
-  // Store logic map in scene resources
+  // move logic map to scene
+  scene.m_scene_resources.logic_map.clear();
   scene.m_scene_resources.logic_map = std::move(logic_map_result.value());
 
   return std::monostate();

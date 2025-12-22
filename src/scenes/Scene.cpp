@@ -68,4 +68,9 @@ const std::unordered_map<ArchetypeID, Archetype> &Scene::GetArchetypes() const {
   return m_scene_resources.entity_manager.GetArchetypeManager().GetArchetypes();
 }
 #endif
+
+/////////////////////////////////////////////////
+const SceneResources &Scene::GetSceneResources() const {
+  return m_scene_resources;
+}
 } // namespace steamrot
