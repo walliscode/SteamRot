@@ -118,6 +118,13 @@ public:
   SceneInfo &GetSceneInfo();
 
   /////////////////////////////////////////////////
+  /// @brief Return a read-only reference to the SceneResources of the Scene.
+  ///
+  /// @return A const reference to the SceneResources.
+  /////////////////////////////////////////////////
+  const SceneResources &GetSceneResources() const;
+
+  /////////////////////////////////////////////////
   /// @brief Create and return a SceneContext object for the Scene.
   ///
   /// This contains all the references needed for logic processing.
