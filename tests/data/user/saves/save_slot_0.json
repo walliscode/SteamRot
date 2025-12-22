@@ -1,0 +1,27 @@
+{
+  "metadata": {
+    "save_name": "Test Save",
+    "created_at": "2024-01-01T00:00:00Z",
+    "last_modified": "2024-01-01T00:00:00Z",
+    "game_version": "1.0.0",
+    "play_time_seconds": 3600,
+    "slot_index": 0
+  },
+  "scene_data": {
+    "scene_type": "TITLE",
+    "entity_pool_size": 10,
+    "entities": []
+  },
+  "engine_state": {
+    "running": true,
+    "paused": false,
+    "subscriptions": [],
+    "quit_requested": false
+  },
+  "scene_manager_state": {
+    "subscriptions": []
+  },
+  "scene_state": {
+    "active": true
+  }
+}

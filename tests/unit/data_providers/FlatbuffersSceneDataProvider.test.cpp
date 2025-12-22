@@ -92,3 +92,41 @@ TEST_CASE("FlatbuffersSceneDataProvider::ProvideDefaultSceneData returns "
   REQUIRE(fbs_scene_data->scene_data_fbs != nullptr);
   // SPECIFIC DATA CHECKS CAN BE ADDED HERE //
 }
+
+TEST_CASE("FlatbuffersSceneDataProvider::ProvideSceneDataFromSave returns "
+          "error for null scene_data",
+          "[unit][FlatbuffersSceneDataProvider]") {
+  steamrot::FlatbuffersSceneDataProvider provider;
+
+  // Create SaveData with null scene_data
+  steamrot::SaveData save_data;
+  save_data.scene_data = nullptr;
+
+  auto result = provider.ProvideSceneDataFromSave(save_data);
+  REQUIRE_FALSE(result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
+  REQUIRE(result.error().message == "SaveData contains null scene_data");
+}
+
+TEST_CASE("FlatbuffersSceneDataProvider::ProvideSceneDataFromSave extracts "
+          "scene data",
+          "[unit][FlatbuffersSceneDataProvider]") {
+  steamrot::FlatbuffersSceneDataProvider provider;
+
+  // Create SaveData with valid scene_data
+  steamrot::SaveData save_data;
+  auto fbs_scene_data = std::make_unique<steamrot::FbsSceneData>();
+  fbs_scene_data->scene_info.type = steamrot::SceneType::SceneType_TITLE;
+  save_data.scene_data = std::move(fbs_scene_data);
+
+  auto result = provider.ProvideSceneDataFromSave(save_data);
+  REQUIRE(result.has_value());
+
+  auto &scene_data_ptr = result.value();
+  REQUIRE(scene_data_ptr != nullptr);
+  REQUIRE(scene_data_ptr->scene_info.type ==
+          steamrot::SceneType::SceneType_TITLE);
+
+  // Verify that scene_data was moved out of save_data
+  REQUIRE(save_data.scene_data == nullptr);
+}
