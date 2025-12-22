@@ -1,6 +1,7 @@
 add_executable(test_logic
 LogicFactory.test.cpp
 logic_collision.test.cpp
+logic_action.test.cpp
 # logic_render.test.cpp
 # logic_render_free_functions.test.cpp
 # logic_render_test_helpers.cpp
