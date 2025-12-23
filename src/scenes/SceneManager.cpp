@@ -9,7 +9,7 @@
 #include "SceneManager.h"
 #include "ISceneManagerDataProvider.h"
 #include "SceneFactory.h"
-#include "provider_factory.h"
+#include <iostream>
 
 namespace steamrot {
 
@@ -21,7 +21,14 @@ SceneManager::SceneManager(const GameContext &game_context)
 void SceneManager::StartUp() {
 
   // create data provider for SceneManager configuration
-  ISceneManagerDataProvider &data_provider = GetSceneManagerDataProvider();
+  auto data_provider_result =
+      m_game_context.engine_resources.data_access_factory
+          .GetSceneManagerDataProvider();
+  if (!data_provider_result)
+
+    return; // [TODO: handle failure]
+
+  ISceneManagerDataProvider &data_provider = *data_provider_result.value();
 }
 /////////////////////////////////////////////////
 const std::unordered_map<uuids::uuid, std::unique_ptr<Scene>> &
@@ -70,6 +77,7 @@ std::expected<uuids::uuid, FailInfo> SceneManager::LoadTitleScene() {
   // clear existing scenes
   m_scenes.clear();
 
+  std::cout << "Loading Title Scene..." << std::endl;
   // create title scene
   auto title_result = AddSceneFromDefault(SceneType::SceneType_TITLE);
   if (!title_result.has_value())
