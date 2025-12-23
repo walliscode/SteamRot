@@ -10,7 +10,7 @@
 #include "FailInfo.h"
 #include "FlatbuffersAssetDataProvider.h"
 #include "FlatbuffersEngineDataProvider.h"
-#include "FlatbuffersSceneConfigurator.h"
+
 #include "FlatbuffersSceneDataProvider.h"
 #include "FlatbuffersSceneManagerDataProvider.h"
 #include <expected>
@@ -25,14 +25,6 @@ DataAccessFactory::DataAccessFactory(const DataType data_type)
     throw std::runtime_error(
         "DataAccessFactory::DataAccessFactory: Failed to set data providers: " +
         set_providers_result.error().message);
-  }
-
-  auto set_configurators_result = SetDataConfigurators();
-  if (!set_configurators_result) {
-    throw std::runtime_error(
-        "DataAccessFactory::DataAccessFactory: Failed to set data "
-        "configurators: " +
-        set_configurators_result.error().message);
   }
 }
 
@@ -60,32 +52,17 @@ DataAccessFactory::SetFlatbuffersDataProviders() {
   // set ISceneDataProvider
   m_scene_data_provider = std::make_unique<FlatbuffersSceneDataProvider>();
   if (!m_scene_data_provider) {
-    return std::unexpected(FailInfo{
-        FailMode::NullPointer,
-        "Failed to create FlatbuffersSceneDataProvider instance."});
+    return std::unexpected(
+        FailInfo{FailMode::NullPointer,
+                 "Failed to create FlatbuffersSceneDataProvider instance."});
   }
 
   // set IAssetDataProvider
   m_asset_data_provider = std::make_unique<FlatbuffersAssetDataProvider>();
   if (!m_asset_data_provider) {
-    return std::unexpected(FailInfo{
-        FailMode::NullPointer,
-        "Failed to create FlatbuffersAssetDataProvider instance."});
-  }
-
-  return std::monostate{};
-}
-
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-DataAccessFactory::SetFlatbuffersDataConfigurators() {
-
-  // set ISceneConfigurator
-  m_scene_configurator = std::make_unique<FlatbuffersSceneConfigurator>();
-  if (!m_scene_configurator) {
-    return std::unexpected(FailInfo{
-        FailMode::NullPointer,
-        "Failed to create FlatbuffersSceneConfigurator instance."});
+    return std::unexpected(
+        FailInfo{FailMode::NullPointer,
+                 "Failed to create FlatbuffersAssetDataProvider instance."});
   }
 
   return std::monostate{};
@@ -110,30 +87,6 @@ std::expected<std::monostate, FailInfo> DataAccessFactory::SetDataProviders() {
     return std::unexpected(
         FailInfo{FailMode::EnumValueNotHandled,
                  "Unsupported data type in SetDataProviders."});
-  }
-  return std::monostate{};
-}
-
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-DataAccessFactory::SetDataConfigurators() {
-
-  // set the data configurators based on the data type
-  switch (m_data_type) {
-  case DataType::Flatbuffers: {
-
-    auto set_fb_configurators = SetFlatbuffersDataConfigurators();
-    if (!set_fb_configurators.has_value()) {
-      return std::unexpected(set_fb_configurators.error());
-    }
-
-    break;
-  }
-
-  default:
-    return std::unexpected(
-        FailInfo{FailMode::EnumValueNotHandled,
-                 "Unsupported data type in SetDataConfigurators."});
   }
   return std::monostate{};
 }
@@ -194,14 +147,4 @@ DataAccessFactory::GetAssetDataProvider() {
   return m_asset_data_provider.get();
 }
 
-/////////////////////////////////////////////////
-std::expected<ISceneConfigurator *, FailInfo>
-DataAccessFactory::GetSceneConfigurator() {
-  if (!m_scene_configurator) {
-    return std::unexpected(
-        FailInfo{FailMode::NullPointer, "Scene Configurator is null"});
-  }
-
-  return m_scene_configurator.get();
-}
 } // namespace steamrot

@@ -61,19 +61,9 @@ private:
   std::expected<std::monostate, FailInfo> SetFlatbuffersDataProviders();
 
   /////////////////////////////////////////////////
-  /// @brief Set all data configurators to Flatbuffers implementations
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo> SetFlatbuffersDataConfigurators();
-
-  /////////////////////////////////////////////////
   /// @brief When called sets up the data providers based on the data type
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo> SetDataProviders();
-
-  /////////////////////////////////////////////////
-  /// @brief When called sets up the data configurators based on the data type
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo> SetDataConfigurators();
 
 public:
   /////////////////////////////////////////////////
@@ -99,11 +89,6 @@ public:
   /// @brief Returns a raw pointer to the Scene Data Provider
   /////////////////////////////////////////////////
   std::expected<ISceneDataProvider *, FailInfo> GetSceneDataProvider();
-
-  /////////////////////////////////////////////////
-  /// @brief Returns a raw to the Scene Configurator
-  /////////////////////////////////////////////////
-  std::expected<ISceneConfigurator *, FailInfo> GetSceneConfigurator();
 
   /////////////////////////////////////////////////
   /// @brief Returns a raw pointer to the Asset Data Provider

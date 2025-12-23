@@ -9,7 +9,6 @@
 #include "DataAccessFactory.h"
 #include "FlatbuffersAssetDataProvider.h"
 #include "FlatbuffersEngineDataProvider.h"
-#include "FlatbuffersSceneConfigurator.h"
 #include "FlatbuffersSceneDataProvider.h"
 #include "FlatbuffersSceneManagerDataProvider.h"
 #include <catch2/catch_test_macros.hpp>
@@ -81,20 +80,5 @@ TEST_CASE("DataAccessFactory Initialization", "[DataAccessFactory]") {
     auto flatbuffers_asset_provider =
         dynamic_cast<steamrot::FlatbuffersAssetDataProvider *>(asset_provider);
     REQUIRE(flatbuffers_asset_provider != nullptr);
-
-    // attempt to access the scene configurator
-    auto get_scene_configurator_result = factory.GetSceneConfigurator();
-    if (!get_scene_configurator_result.has_value()) {
-      FAIL("Failed to get Scene Configurator: " +
-           get_scene_configurator_result.error().message);
-    }
-    auto scene_configurator = get_scene_configurator_result.value();
-    REQUIRE(scene_configurator != nullptr);
-
-    // cast to flatbuffers concrete type and check not null
-    auto flatbuffers_scene_configurator =
-        dynamic_cast<steamrot::FlatbuffersSceneConfigurator *>(
-            scene_configurator);
-    REQUIRE(flatbuffers_scene_configurator != nullptr);
   }
 }
