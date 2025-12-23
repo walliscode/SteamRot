@@ -12,7 +12,7 @@
 #include "FlatbuffersUIStyleDataProvider.h"
 #include "IAssetDataProvider.h"
 #include "paths.h"
-#include "provider_factory.h"
+
 #include <SFML/Graphics/Font.hpp>
 #include <expected>
 #include <filesystem>
@@ -22,12 +22,19 @@
 #include <variant>
 
 namespace steamrot {
+/////////////////////////////////////////////////
+AssetManager::AssetManager(DataAccessFactory &data_access_factory)
+    : m_data_access_factory(data_access_factory) {}
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> AssetManager::LoadDefaultAssets() {
 
   // Load Asset configuration data via provider interface
-  IAssetDataProvider &asset_provider = GetAssetDataProvider();
+  auto get_asset_data_provider_result =
+      m_data_access_factory.GetAssetDataProvider();
+  if (!get_asset_data_provider_result.has_value())
+    return std::unexpected<FailInfo>(get_asset_data_provider_result.error());
+  IAssetDataProvider &asset_provider = *get_asset_data_provider_result.value();
 
   auto asset_data_result = asset_provider.LoadAssetData();
   if (!asset_data_result.has_value())
@@ -61,7 +68,11 @@ std::expected<std::monostate, FailInfo>
 AssetManager::LoadSceneAssets(const SceneType &scene_type) {
 
   // Load Asset configuration data via provider interface
-  IAssetDataProvider &asset_provider = GetAssetDataProvider();
+  auto get_asset_data_provider_result =
+      m_data_access_factory.GetAssetDataProvider();
+  if (!get_asset_data_provider_result.has_value())
+    return std::unexpected<FailInfo>(get_asset_data_provider_result.error());
+  IAssetDataProvider &asset_provider = *get_asset_data_provider_result.value();
 
   auto asset_data_result = asset_provider.LoadSceneAssetData(scene_type);
   if (!asset_data_result.has_value())
