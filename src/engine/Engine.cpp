@@ -15,13 +15,18 @@ namespace steamrot {
 
 /////////////////////////////////////////////////
 Engine::Engine()
-    : m_engine_resources(), m_game_context(m_engine_resources),
+    : m_data_access_factory(), m_engine_resources(),
+      m_game_context(m_engine_resources, m_data_access_factory),
       m_scene_manager(m_game_context) {}
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> Engine::StartUp() {
   // Load all engine data via provider interface
-  IEngineDataProvider &data_provider = GetEngineDataProvider();
+  auto engine_provider_result = m_data_access_factory.GetEngineDataProvider();
+  if (!engine_provider_result.has_value()) {
+    return std::unexpected(engine_provider_result.error());
+  }
+  IEngineDataProvider &data_provider = *engine_provider_result.value();
 
   // Load EngineResources configuration
   auto resources_config_result = data_provider.LoadEngineResourcesConfig();

@@ -5,6 +5,7 @@
 
 #pragma once
 #include "AssetManager.h"
+#include "DataAccessFactory.h"
 #include "EngineResources.h"
 #include "EventHandler.h"
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -14,7 +15,8 @@ namespace steamrot {
 struct GameContext {
   GameContext() = delete;
 
-  GameContext(EngineResources &engine_resources);
+  GameContext(EngineResources &engine_resources,
+              DataAccessFactory &data_access_factory);
 
   /////////////////////////////////////////////////
   /// @brief Reference to the EngineResources this context was created from.
@@ -48,5 +50,13 @@ struct GameContext {
   /// should only be one instance of this.
   /////////////////////////////////////////////////
   AssetManager &asset_manager;
+
+  /////////////////////////////////////////////////
+  /// @brief Reference to the DataAccessFactory for accessing data providers.
+  ///
+  /// This allows components to access data providers without using global
+  /// functions, following the same pattern as AssetManager.
+  /////////////////////////////////////////////////
+  DataAccessFactory &data_access_factory;
 };
 } // namespace steamrot

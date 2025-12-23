@@ -15,6 +15,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "DataAccessFactory.h"
 #include "EngineConfig.h"
 #include "EngineResources.h"
 #include "EngineState.h"
@@ -44,6 +45,15 @@ namespace steamrot {
 /////////////////////////////////////////////////
 class Engine {
 protected:
+  /////////////////////////////////////////////////
+  /// @brief Data access factory for providing data providers
+  ///
+  /// Initialized early to provide access to all data providers.
+  /// Should be the first member to ensure it's constructed before
+  /// components that depend on it.
+  /////////////////////////////////////////////////
+  DataAccessFactory m_data_access_factory;
+
   /////////////////////////////////////////////////
   /// @brief Engine-level global resources (window, event handler, asset
   /// manager, etc.)

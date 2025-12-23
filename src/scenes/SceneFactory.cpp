@@ -11,7 +11,6 @@
 #include "FlatbuffersSceneConfigurator.h"
 #include "ISceneDataProvider.h"
 #include "TitleScene.h"
-#include "provider_factory.h"
 #include <memory>
 
 namespace steamrot {
@@ -60,8 +59,12 @@ ISceneConfigurator &GetSceneConfigurator() {
 std::expected<std::unique_ptr<Scene>, FailInfo>
 SceneFactory::CreateSceneFromDefault(SceneType type) {
 
-  // Step 1: Get provider and configurator
-  ISceneDataProvider &provider = GetSceneDataProvider();
+  // Step 1: Get provider and configurator via DataAccessFactory
+  auto provider_result = m_game_context.data_access_factory.GetSceneDataProvider();
+  if (!provider_result.has_value()) {
+    return std::unexpected(provider_result.error());
+  }
+  ISceneDataProvider &provider = *provider_result.value();
   ISceneConfigurator &configurator = GetSceneConfigurator();
 
   // Step 2: Provider loads data

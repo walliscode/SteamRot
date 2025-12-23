@@ -7,12 +7,12 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "AssetManager.h"
+#include "DataAccessFactory.h"
 #include "FailInfo.h"
 
 #include "FlatbuffersUIStyleDataProvider.h"
 #include "IAssetDataProvider.h"
 #include "paths.h"
-#include "provider_factory.h"
 #include <SFML/Graphics/Font.hpp>
 #include <expected>
 #include <filesystem>
@@ -24,10 +24,15 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo> AssetManager::LoadDefaultAssets() {
+std::expected<std::monostate, FailInfo>
+AssetManager::LoadDefaultAssets(DataAccessFactory &data_access_factory) {
 
   // Load Asset configuration data via provider interface
-  IAssetDataProvider &asset_provider = GetAssetDataProvider();
+  auto asset_provider_result = data_access_factory.GetAssetDataProvider();
+  if (!asset_provider_result.has_value()) {
+    return std::unexpected<FailInfo>(asset_provider_result.error());
+  }
+  IAssetDataProvider &asset_provider = *asset_provider_result.value();
 
   auto asset_data_result = asset_provider.LoadAssetData();
   if (!asset_data_result.has_value())
@@ -58,10 +63,15 @@ std::expected<std::monostate, FailInfo> AssetManager::LoadDefaultAssets() {
 }
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-AssetManager::LoadSceneAssets(const SceneType &scene_type) {
+AssetManager::LoadSceneAssets(DataAccessFactory &data_access_factory,
+                               const SceneType &scene_type) {
 
   // Load Asset configuration data via provider interface
-  IAssetDataProvider &asset_provider = GetAssetDataProvider();
+  auto asset_provider_result = data_access_factory.GetAssetDataProvider();
+  if (!asset_provider_result.has_value()) {
+    return std::unexpected<FailInfo>(asset_provider_result.error());
+  }
+  IAssetDataProvider &asset_provider = *asset_provider_result.value();
 
   auto asset_data_result = asset_provider.LoadSceneAssetData(scene_type);
   if (!asset_data_result.has_value())

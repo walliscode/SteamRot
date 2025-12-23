@@ -23,6 +23,9 @@
 
 namespace steamrot {
 
+// Forward declaration
+class DataAccessFactory;
+
 class AssetManager {
 private:
   /////////////////////////////////////////////////
@@ -49,18 +52,25 @@ public:
   /// @brief Load all the default assets for the game, independent of scene
   /// type.
   ///
+  /// @param data_access_factory Reference to DataAccessFactory for accessing
+  /// asset data provider
+  ///
   /// This serves as a wrapper function to load all the default assets
   /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo> LoadDefaultAssets();
+  std::expected<std::monostate, FailInfo>
+  LoadDefaultAssets(DataAccessFactory &data_access_factory);
 
   /////////////////////////////////////////////////
   /// @brief Load all the assets for a given scene type.
   ///
+  /// @param data_access_factory Reference to DataAccessFactory for accessing
+  /// asset data provider
   /// @param scene_type Enum representing the derived scene type to load assets
   /// for.
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo>
-  LoadSceneAssets(const SceneType &scene_type);
+  LoadSceneAssets(DataAccessFactory &data_access_factory,
+                  const SceneType &scene_type);
 
   /////////////////////////////////////////////////
   /// @brief Load all UI styles
