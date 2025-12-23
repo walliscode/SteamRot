@@ -36,8 +36,9 @@ void TestFixture::CreateCores() {
 
 /////////////////////////////////////////////////
 void TestFixture::CreateContexts() {
-  // Create GameContext from engine resources
-  m_game_context = std::make_unique<GameContext>(m_engine_resources);
+  // Create GameContext from engine resources and data access factory
+  m_game_context = std::make_unique<GameContext>(m_engine_resources,
+                                                  m_data_access_factory);
 
   // Create SceneContext from scene texture, engine resources, and entity
   // manager

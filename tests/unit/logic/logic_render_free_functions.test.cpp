@@ -10,6 +10,7 @@
 #include "logic_render.h"
 #include "AssetManager.h"
 #include "ButtonElement.h"
+#include "DataAccessFactory.h"
 #include "DropDownButtonElement.h"
 #include "DropDownContainerElement.h"
 #include "DropDownItemElement.h"
@@ -35,7 +36,8 @@ TEST_CASE("DrawButtonElement draws a button correctly", "[unit][logic_render]") 
   
   // Load default assets
   steamrot::AssetManager asset_manager;
-  auto load_result = asset_manager.LoadDefaultAssets();
+  steamrot::DataAccessFactory data_access_factory;
+  auto load_result = asset_manager.LoadDefaultAssets(data_access_factory);
   REQUIRE(load_result.has_value());
   
   auto style = asset_manager.GetDefaultUIStyle();
@@ -72,7 +74,8 @@ TEST_CASE("DrawPanelElement draws a panel correctly", "[unit][logic_render]") {
   
   // Load default assets
   steamrot::AssetManager asset_manager;
-  auto load_result = asset_manager.LoadDefaultAssets();
+  steamrot::DataAccessFactory data_access_factory;
+  auto load_result = asset_manager.LoadDefaultAssets(data_access_factory);
   REQUIRE(load_result.has_value());
   
   auto style = asset_manager.GetDefaultUIStyle();
@@ -113,7 +116,8 @@ TEST_CASE("DrawDropDownListElement draws unexpanded list correctly",
   
   // Load default assets
   steamrot::AssetManager asset_manager;
-  auto load_result = asset_manager.LoadDefaultAssets();
+  steamrot::DataAccessFactory data_access_factory;
+  auto load_result = asset_manager.LoadDefaultAssets(data_access_factory);
   REQUIRE(load_result.has_value());
   
   auto style = asset_manager.GetDefaultUIStyle();
@@ -153,7 +157,8 @@ TEST_CASE("DrawDropDownItemElement draws item correctly",
   
   // Load default assets
   steamrot::AssetManager asset_manager;
-  auto load_result = asset_manager.LoadDefaultAssets();
+  steamrot::DataAccessFactory data_access_factory;
+  auto load_result = asset_manager.LoadDefaultAssets(data_access_factory);
   REQUIRE(load_result.has_value());
   
   auto style = asset_manager.GetDefaultUIStyle();
@@ -192,7 +197,8 @@ TEST_CASE("DrawDropDownButtonElement draws button correctly",
   
   // Load default assets
   steamrot::AssetManager asset_manager;
-  auto load_result = asset_manager.LoadDefaultAssets();
+  steamrot::DataAccessFactory data_access_factory;
+  auto load_result = asset_manager.LoadDefaultAssets(data_access_factory);
   REQUIRE(load_result.has_value());
   
   auto style = asset_manager.GetDefaultUIStyle();
@@ -231,7 +237,8 @@ TEST_CASE("DrawDropDownContainerElement draws container correctly",
   
   // Load default assets
   steamrot::AssetManager asset_manager;
-  auto load_result = asset_manager.LoadDefaultAssets();
+  steamrot::DataAccessFactory data_access_factory;
+  auto load_result = asset_manager.LoadDefaultAssets(data_access_factory);
   REQUIRE(load_result.has_value());
   
   auto style = asset_manager.GetDefaultUIStyle();
@@ -264,7 +271,8 @@ TEST_CASE("DrawUIElementDispatch dispatches to correct drawing function",
   
   // Load default assets
   steamrot::AssetManager asset_manager;
-  auto load_result = asset_manager.LoadDefaultAssets();
+  steamrot::DataAccessFactory data_access_factory;
+  auto load_result = asset_manager.LoadDefaultAssets(data_access_factory);
   REQUIRE(load_result.has_value());
   
   auto style = asset_manager.GetDefaultUIStyle();
@@ -336,7 +344,8 @@ TEST_CASE("DrawNestedUIElements uses dispatcher correctly",
   
   // Load default assets
   steamrot::AssetManager asset_manager;
-  auto load_result = asset_manager.LoadDefaultAssets();
+  steamrot::DataAccessFactory data_access_factory;
+  auto load_result = asset_manager.LoadDefaultAssets(data_access_factory);
   REQUIRE(load_result.has_value());
   
   auto style = asset_manager.GetDefaultUIStyle();

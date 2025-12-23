@@ -10,6 +10,7 @@
 #include "logic_render.h"
 
 #include "AssetManager.h"
+#include "DataAccessFactory.h"
 #include "FailInfo.h"
 #include "logic_render_test_helpers.h"
 #include <SFML/Graphics.hpp>
@@ -118,7 +119,9 @@ TEST_CASE("steamrot::logic_render::DrawBorderAndBackground draws the hover "
 
   // load the default UIStyle
   steamrot::AssetManager asset_manager;
-  auto load_default_assets_result = asset_manager.LoadDefaultAssets();
+  steamrot::DataAccessFactory data_access_factory;
+  auto load_default_assets_result =
+      asset_manager.LoadDefaultAssets(data_access_factory);
   if (!load_default_assets_result) {
     FAIL(load_default_assets_result.error().message);
   }

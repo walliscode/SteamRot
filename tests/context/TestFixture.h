@@ -11,6 +11,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "DataAccessFactory.h"
 #include "EngineResources.h"
 #include "EntityManager.h"
 #include "GameContext.h"
@@ -108,6 +109,11 @@ private:
   /// @brief Flag indicating if Initialize() has been called
   /////////////////////////////////////////////////
   bool m_initialized{false};
+
+  /////////////////////////////////////////////////
+  /// @brief Data access factory for providing data providers
+  /////////////////////////////////////////////////
+  DataAccessFactory m_data_access_factory;
 
   /////////////////////////////////////////////////
   /// @brief Engine resources containing window, event handler, etc.
