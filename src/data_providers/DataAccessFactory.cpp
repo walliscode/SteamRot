@@ -8,7 +8,10 @@
 /////////////////////////////////////////////////
 #include "DataAccessFactory.h"
 #include "FailInfo.h"
+#include "FlatbuffersAssetDataProvider.h"
 #include "FlatbuffersEngineDataProvider.h"
+#include "FlatbuffersSceneConfigurator.h"
+#include "FlatbuffersSceneDataProvider.h"
 #include "FlatbuffersSceneManagerDataProvider.h"
 #include <expected>
 
@@ -54,12 +57,37 @@ DataAccessFactory::SetFlatbuffersDataProviders() {
         "Failed to create FlatbuffersSceneManagerDataProvider instance."});
   }
 
+  // set ISceneDataProvider
+  m_scene_data_provider = std::make_unique<FlatbuffersSceneDataProvider>();
+  if (!m_scene_data_provider) {
+    return std::unexpected(FailInfo{
+        FailMode::NullPointer,
+        "Failed to create FlatbuffersSceneDataProvider instance."});
+  }
+
+  // set IAssetDataProvider
+  m_asset_data_provider = std::make_unique<FlatbuffersAssetDataProvider>();
+  if (!m_asset_data_provider) {
+    return std::unexpected(FailInfo{
+        FailMode::NullPointer,
+        "Failed to create FlatbuffersAssetDataProvider instance."});
+  }
+
   return std::monostate{};
 }
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 DataAccessFactory::SetFlatbuffersDataConfigurators() {
+
+  // set ISceneConfigurator
+  m_scene_configurator = std::make_unique<FlatbuffersSceneConfigurator>();
+  if (!m_scene_configurator) {
+    return std::unexpected(FailInfo{
+        FailMode::NullPointer,
+        "Failed to create FlatbuffersSceneConfigurator instance."});
+  }
+
   return std::monostate{};
 }
 
@@ -89,6 +117,24 @@ std::expected<std::monostate, FailInfo> DataAccessFactory::SetDataProviders() {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 DataAccessFactory::SetDataConfigurators() {
+
+  // set the data configurators based on the data type
+  switch (m_data_type) {
+  case DataType::Flatbuffers: {
+
+    auto set_fb_configurators = SetFlatbuffersDataConfigurators();
+    if (!set_fb_configurators.has_value()) {
+      return std::unexpected(set_fb_configurators.error());
+    }
+
+    break;
+  }
+
+  default:
+    return std::unexpected(
+        FailInfo{FailMode::EnumValueNotHandled,
+                 "Unsupported data type in SetDataConfigurators."});
+  }
   return std::monostate{};
 }
 
@@ -124,5 +170,38 @@ DataAccessFactory::GetSceneManagerDataProvider() {
   }
 
   return m_scene_manager_data_provider.get();
+}
+
+/////////////////////////////////////////////////
+std::expected<ISceneDataProvider *, FailInfo>
+DataAccessFactory::GetSceneDataProvider() {
+  if (!m_scene_data_provider) {
+    return std::unexpected(
+        FailInfo{FailMode::NullPointer, "Scene Data Provider is null"});
+  }
+
+  return m_scene_data_provider.get();
+}
+
+/////////////////////////////////////////////////
+std::expected<IAssetDataProvider *, FailInfo>
+DataAccessFactory::GetAssetDataProvider() {
+  if (!m_asset_data_provider) {
+    return std::unexpected(
+        FailInfo{FailMode::NullPointer, "Asset Data Provider is null"});
+  }
+
+  return m_asset_data_provider.get();
+}
+
+/////////////////////////////////////////////////
+std::expected<ISceneConfigurator *, FailInfo>
+DataAccessFactory::GetSceneConfigurator() {
+  if (!m_scene_configurator) {
+    return std::unexpected(
+        FailInfo{FailMode::NullPointer, "Scene Configurator is null"});
+  }
+
+  return m_scene_configurator.get();
 }
 } // namespace steamrot

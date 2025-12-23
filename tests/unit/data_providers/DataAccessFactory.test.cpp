@@ -7,7 +7,11 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "DataAccessFactory.h"
+#include "FlatbuffersAssetDataProvider.h"
 #include "FlatbuffersEngineDataProvider.h"
+#include "FlatbuffersSceneConfigurator.h"
+#include "FlatbuffersSceneDataProvider.h"
+#include "FlatbuffersSceneManagerDataProvider.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("DataAccessFactory Initialization", "[DataAccessFactory]") {
@@ -45,5 +49,52 @@ TEST_CASE("DataAccessFactory Initialization", "[DataAccessFactory]") {
     REQUIRE(scene_manager_provider != nullptr);
 
     // cast to flatbuffers concrete type and check not null
+    auto flatbuffers_scene_manager_provider =
+        dynamic_cast<steamrot::FlatbuffersSceneManagerDataProvider *>(
+            scene_manager_provider);
+    REQUIRE(flatbuffers_scene_manager_provider != nullptr);
+
+    // attempt to access the scene data provider
+    auto get_scene_provider_result = factory.GetSceneDataProvider();
+    if (!get_scene_provider_result.has_value()) {
+      FAIL("Failed to get Scene Data Provider: " +
+           get_scene_provider_result.error().message);
+    }
+    auto scene_provider = get_scene_provider_result.value();
+    REQUIRE(scene_provider != nullptr);
+
+    // cast to flatbuffers concrete type and check not null
+    auto flatbuffers_scene_provider =
+        dynamic_cast<steamrot::FlatbuffersSceneDataProvider *>(scene_provider);
+    REQUIRE(flatbuffers_scene_provider != nullptr);
+
+    // attempt to access the asset data provider
+    auto get_asset_provider_result = factory.GetAssetDataProvider();
+    if (!get_asset_provider_result.has_value()) {
+      FAIL("Failed to get Asset Data Provider: " +
+           get_asset_provider_result.error().message);
+    }
+    auto asset_provider = get_asset_provider_result.value();
+    REQUIRE(asset_provider != nullptr);
+
+    // cast to flatbuffers concrete type and check not null
+    auto flatbuffers_asset_provider =
+        dynamic_cast<steamrot::FlatbuffersAssetDataProvider *>(asset_provider);
+    REQUIRE(flatbuffers_asset_provider != nullptr);
+
+    // attempt to access the scene configurator
+    auto get_scene_configurator_result = factory.GetSceneConfigurator();
+    if (!get_scene_configurator_result.has_value()) {
+      FAIL("Failed to get Scene Configurator: " +
+           get_scene_configurator_result.error().message);
+    }
+    auto scene_configurator = get_scene_configurator_result.value();
+    REQUIRE(scene_configurator != nullptr);
+
+    // cast to flatbuffers concrete type and check not null
+    auto flatbuffers_scene_configurator =
+        dynamic_cast<steamrot::FlatbuffersSceneConfigurator *>(
+            scene_configurator);
+    REQUIRE(flatbuffers_scene_configurator != nullptr);
   }
 }

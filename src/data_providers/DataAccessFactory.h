@@ -41,6 +41,11 @@ private:
       nullptr};
 
   /////////////////////////////////////////////////
+  /// @brief Instance of the Scene Data Provider for the factory/game
+  /////////////////////////////////////////////////
+  std::unique_ptr<ISceneDataProvider> m_scene_data_provider{nullptr};
+
+  /////////////////////////////////////////////////
   /// @brief Instance of the Asset Data Provider for the factory/game
   /////////////////////////////////////////////////
   std::unique_ptr<IAssetDataProvider> m_asset_data_provider{nullptr};
