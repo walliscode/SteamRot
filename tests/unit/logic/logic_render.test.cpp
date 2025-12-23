@@ -118,10 +118,9 @@ TEST_CASE("steamrot::logic_render::DrawBorderAndBackground draws the hover "
   button.is_mouse_over = true;
 
   // load the default UIStyle
-  steamrot::AssetManager asset_manager;
   steamrot::DataAccessFactory data_access_factory;
-  auto load_default_assets_result =
-      asset_manager.LoadDefaultAssets(data_access_factory);
+  steamrot::AssetManager asset_manager(data_access_factory);
+  auto load_default_assets_result = asset_manager.LoadDefaultAssets();
   if (!load_default_assets_result) {
     FAIL(load_default_assets_result.error().message);
   }

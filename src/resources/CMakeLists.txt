@@ -1,16 +1,17 @@
 add_library(resources
-  INTERFACE
+  EngineResources.cpp
 )
 target_include_directories(resources
-  INTERFACE
+  PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_link_libraries(resources
-  INTERFACE
+  PUBLIC
   types
   assets
   events
+  data_providers
 )
 
 

@@ -18,7 +18,8 @@ namespace steamrot::tests {
 TestFixture::TestFixture() : TestFixture(SceneType::SceneType_TEST) {}
 
 /////////////////////////////////////////////////
-TestFixture::TestFixture(SceneType scene_type) : m_scene_type(scene_type) {
+TestFixture::TestFixture(SceneType scene_type)
+    : m_scene_type(scene_type), m_engine_resources(m_data_access_factory) {
   CreateCores();
   CreateContexts();
 }

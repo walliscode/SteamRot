@@ -35,9 +35,9 @@ TEST_CASE("DrawButtonElement draws a button correctly", "[unit][logic_render]") 
   button.label = "Test Button";
   
   // Load default assets
-  steamrot::AssetManager asset_manager;
-  steamrot::DataAccessFactory data_access_factory;
-  auto load_result = asset_manager.LoadDefaultAssets(data_access_factory);
+  steamrot::DataAccessFactory data_access_factory_tmp;
+  steamrot::AssetManager asset_manager(data_access_factory_tmp);
+  auto load_result = asset_manager.LoadDefaultAssets();
   REQUIRE(load_result.has_value());
   
   auto style = asset_manager.GetDefaultUIStyle();
@@ -73,9 +73,9 @@ TEST_CASE("DrawPanelElement draws a panel correctly", "[unit][logic_render]") {
   panel.size = {100.0f, 50.0f};
   
   // Load default assets
-  steamrot::AssetManager asset_manager;
-  steamrot::DataAccessFactory data_access_factory;
-  auto load_result = asset_manager.LoadDefaultAssets(data_access_factory);
+  steamrot::DataAccessFactory data_access_factory_tmp;
+  steamrot::AssetManager asset_manager(data_access_factory_tmp);
+  auto load_result = asset_manager.LoadDefaultAssets();
   REQUIRE(load_result.has_value());
   
   auto style = asset_manager.GetDefaultUIStyle();
@@ -115,9 +115,9 @@ TEST_CASE("DrawDropDownListElement draws unexpanded list correctly",
   list.expanded_label = "Options";
   
   // Load default assets
-  steamrot::AssetManager asset_manager;
-  steamrot::DataAccessFactory data_access_factory;
-  auto load_result = asset_manager.LoadDefaultAssets(data_access_factory);
+  steamrot::DataAccessFactory data_access_factory_tmp;
+  steamrot::AssetManager asset_manager(data_access_factory_tmp);
+  auto load_result = asset_manager.LoadDefaultAssets();
   REQUIRE(load_result.has_value());
   
   auto style = asset_manager.GetDefaultUIStyle();
@@ -156,9 +156,9 @@ TEST_CASE("DrawDropDownItemElement draws item correctly",
   item.value = "value1";
   
   // Load default assets
-  steamrot::AssetManager asset_manager;
-  steamrot::DataAccessFactory data_access_factory;
-  auto load_result = asset_manager.LoadDefaultAssets(data_access_factory);
+  steamrot::DataAccessFactory data_access_factory_tmp;
+  steamrot::AssetManager asset_manager(data_access_factory_tmp);
+  auto load_result = asset_manager.LoadDefaultAssets();
   REQUIRE(load_result.has_value());
   
   auto style = asset_manager.GetDefaultUIStyle();
@@ -196,9 +196,9 @@ TEST_CASE("DrawDropDownButtonElement draws button correctly",
   button.is_expanded = false;
   
   // Load default assets
-  steamrot::AssetManager asset_manager;
-  steamrot::DataAccessFactory data_access_factory;
-  auto load_result = asset_manager.LoadDefaultAssets(data_access_factory);
+  steamrot::DataAccessFactory data_access_factory_tmp;
+  steamrot::AssetManager asset_manager(data_access_factory_tmp);
+  auto load_result = asset_manager.LoadDefaultAssets();
   REQUIRE(load_result.has_value());
   
   auto style = asset_manager.GetDefaultUIStyle();
@@ -236,9 +236,9 @@ TEST_CASE("DrawDropDownContainerElement draws container correctly",
   container.is_expanded = false;
   
   // Load default assets
-  steamrot::AssetManager asset_manager;
-  steamrot::DataAccessFactory data_access_factory;
-  auto load_result = asset_manager.LoadDefaultAssets(data_access_factory);
+  steamrot::DataAccessFactory data_access_factory_tmp;
+  steamrot::AssetManager asset_manager(data_access_factory_tmp);
+  auto load_result = asset_manager.LoadDefaultAssets();
   REQUIRE(load_result.has_value());
   
   auto style = asset_manager.GetDefaultUIStyle();
@@ -270,9 +270,9 @@ TEST_CASE("DrawUIElementDispatch dispatches to correct drawing function",
       {static_cast<unsigned int>(width), static_cast<unsigned int>(height)})};
   
   // Load default assets
-  steamrot::AssetManager asset_manager;
-  steamrot::DataAccessFactory data_access_factory;
-  auto load_result = asset_manager.LoadDefaultAssets(data_access_factory);
+  steamrot::DataAccessFactory data_access_factory_tmp;
+  steamrot::AssetManager asset_manager(data_access_factory_tmp);
+  auto load_result = asset_manager.LoadDefaultAssets();
   REQUIRE(load_result.has_value());
   
   auto style = asset_manager.GetDefaultUIStyle();
@@ -343,9 +343,9 @@ TEST_CASE("DrawNestedUIElements uses dispatcher correctly",
   panel.child_elements.push_back(std::move(button));
   
   // Load default assets
-  steamrot::AssetManager asset_manager;
-  steamrot::DataAccessFactory data_access_factory;
-  auto load_result = asset_manager.LoadDefaultAssets(data_access_factory);
+  steamrot::DataAccessFactory data_access_factory_tmp;
+  steamrot::AssetManager asset_manager(data_access_factory_tmp);
+  auto load_result = asset_manager.LoadDefaultAssets();
   REQUIRE(load_result.has_value());
   
   auto style = asset_manager.GetDefaultUIStyle();

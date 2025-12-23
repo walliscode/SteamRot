@@ -24,11 +24,14 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-AssetManager::LoadDefaultAssets(DataAccessFactory &data_access_factory) {
+AssetManager::AssetManager(DataAccessFactory &data_access_factory)
+    : m_data_access_factory(data_access_factory) {}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo> AssetManager::LoadDefaultAssets() {
 
   // Load Asset configuration data via provider interface
-  auto asset_provider_result = data_access_factory.GetAssetDataProvider();
+  auto asset_provider_result = m_data_access_factory.GetAssetDataProvider();
   if (!asset_provider_result.has_value()) {
     return std::unexpected<FailInfo>(asset_provider_result.error());
   }
@@ -63,11 +66,10 @@ AssetManager::LoadDefaultAssets(DataAccessFactory &data_access_factory) {
 }
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-AssetManager::LoadSceneAssets(DataAccessFactory &data_access_factory,
-                               const SceneType &scene_type) {
+AssetManager::LoadSceneAssets(const SceneType &scene_type) {
 
   // Load Asset configuration data via provider interface
-  auto asset_provider_result = data_access_factory.GetAssetDataProvider();
+  auto asset_provider_result = m_data_access_factory.GetAssetDataProvider();
   if (!asset_provider_result.has_value()) {
     return std::unexpected<FailInfo>(asset_provider_result.error());
   }

@@ -15,6 +15,9 @@
 
 namespace steamrot {
 
+// Forward declaration
+class DataAccessFactory;
+
 /////////////////////////////////////////////////
 /// @brief Engine resources struct containing global core objects.
 ///
@@ -23,11 +26,19 @@ namespace steamrot {
 /// the Engine instance.
 ///
 /// All members are concrete objects (no references/pointers to other
-/// core members). This struct is default-constructible and should
-/// be configured via ConfigureEngineResources free function.
+/// core members). This struct should be constructed with a DataAccessFactory
+/// reference which is passed to AssetManager.
 /////////////////////////////////////////////////
 struct EngineResources {
-  EngineResources() = default;
+  EngineResources() = delete;
+  
+  /////////////////////////////////////////////////
+  /// @brief Constructor that initializes AssetManager with DataAccessFactory
+  ///
+  /// @param data_access_factory Reference to DataAccessFactory for AssetManager
+  /////////////////////////////////////////////////
+  explicit EngineResources(DataAccessFactory &data_access_factory);
+  
   /////////////////////////////////////////////////
   /// @brief The game window.
   ///

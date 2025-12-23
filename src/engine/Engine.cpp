@@ -15,7 +15,7 @@ namespace steamrot {
 
 /////////////////////////////////////////////////
 Engine::Engine()
-    : m_data_access_factory(), m_engine_resources(),
+    : m_data_access_factory(), m_engine_resources(m_data_access_factory),
       m_game_context(m_engine_resources, m_data_access_factory),
       m_scene_manager(m_game_context) {}
 

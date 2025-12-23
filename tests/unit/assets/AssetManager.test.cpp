@@ -12,17 +12,17 @@
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("AssetManager is constructed correctly", "[unit][AssetManager]") {
-
-  steamrot::AssetManager asset_manager;
+  steamrot::DataAccessFactory data_access_factory;
+  steamrot::AssetManager asset_manager(data_access_factory);
   REQUIRE_NOTHROW(asset_manager);
 }
 
 TEST_CASE("AssetManager::LoadDefaultAssets works correctly",
           "[unit][AssetManager]") {
-  steamrot::AssetManager asset_manager;
   steamrot::DataAccessFactory data_access_factory;
+  steamrot::AssetManager asset_manager(data_access_factory);
 
-  auto load_result = asset_manager.LoadDefaultAssets(data_access_factory);
+  auto load_result = asset_manager.LoadDefaultAssets();
   if (!load_result.has_value())
     FAIL(load_result.error().message);
 
@@ -43,11 +43,10 @@ TEST_CASE("AssetManager::LoadDefaultAssets works correctly",
 }
 TEST_CASE("AssetManager loads scene assets correctly", "[unit][AssetManager]") {
 
-  steamrot::AssetManager asset_manager;
   steamrot::DataAccessFactory data_access_factory;
+  steamrot::AssetManager asset_manager(data_access_factory);
 
-  auto result =
-      asset_manager.LoadSceneAssets(data_access_factory, steamrot::SceneType_TEST);
+  auto result = asset_manager.LoadSceneAssets(steamrot::SceneType_TEST);
 
   if (!result.has_value())
     FAIL(result.error().message);
