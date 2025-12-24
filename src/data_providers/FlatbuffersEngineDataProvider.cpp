@@ -7,6 +7,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersEngineDataProvider.h"
+#include "FailInfo.h"
+#include "FlatbuffersAssetConfigViewer.h"
 #include "FlatbuffersSubscriberViewer.h"
 #include "ISubscriberViewer.h"
 #include <memory>
@@ -118,4 +120,25 @@ FlatbuffersEngineDataProvider::GetSubscriberViewer() const {
       fb_data->subscriptions());
 }
 
+/////////////////////////////////////////////////
+std::expected<std::unique_ptr<IAssetConfigViewer>, FailInfo>
+FlatbuffersEngineDataProvider::GetAssetConfigViewer() const {
+
+  // Use existing loader
+  auto engine_resources_load_result =
+      m_loader.ProvideEngineResourcesConfigFbs();
+  if (!engine_resources_load_result.has_value()) {
+    return std::unexpected(engine_resources_load_result.error());
+  }
+  // check for asset config data
+  if (!engine_resources_load_result.value()->asset_config()) {
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    "AssetConfigFbs not found in "
+                                    "EngineResourcesConfigFbs"});
+  }
+
+  // return viewer with valid asset config data
+  return std::make_unique<FlatbuffersAssetConfigViewer>(
+      engine_resources_load_result.value()->asset_config());
+}
 } // namespace steamrot

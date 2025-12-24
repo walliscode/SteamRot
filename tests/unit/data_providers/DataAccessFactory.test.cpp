@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "DataAccessFactory.h"
-#include "FlatbuffersAssetDataProvider.h"
 #include "FlatbuffersEngineDataProvider.h"
 #include "FlatbuffersSceneDataProvider.h"
 #include "FlatbuffersSceneManagerDataProvider.h"
@@ -66,19 +65,5 @@ TEST_CASE("DataAccessFactory Initialization", "[DataAccessFactory]") {
     auto flatbuffers_scene_provider =
         dynamic_cast<steamrot::FlatbuffersSceneDataProvider *>(scene_provider);
     REQUIRE(flatbuffers_scene_provider != nullptr);
-
-    // attempt to access the asset data provider
-    auto get_asset_provider_result = factory.GetAssetDataProvider();
-    if (!get_asset_provider_result.has_value()) {
-      FAIL("Failed to get Asset Data Provider: " +
-           get_asset_provider_result.error().message);
-    }
-    auto asset_provider = get_asset_provider_result.value();
-    REQUIRE(asset_provider != nullptr);
-
-    // cast to flatbuffers concrete type and check not null
-    auto flatbuffers_asset_provider =
-        dynamic_cast<steamrot::FlatbuffersAssetDataProvider *>(asset_provider);
-    REQUIRE(flatbuffers_asset_provider != nullptr);
   }
 }

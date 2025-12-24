@@ -23,7 +23,7 @@ namespace steamrot {
 /// This replaces the FlatBuffers AssetCollection type in game code.
 /// Provides a simple, mutable structure for asset configuration.
 /////////////////////////////////////////////////
-struct AssetData {
+struct AssetConfig {
   std::vector<FontData> fonts;
   std::vector<std::string> ui_styles;
 };

@@ -15,7 +15,6 @@
 #include "FailInfo.h"
 #include "IFontProvider.h"
 #include "UIStyle.h"
-#include "scene_types_generated.h"
 #include <SFML/Graphics.hpp>
 #include <expected>
 #include <memory>
@@ -53,21 +52,10 @@ public:
   AssetManager(DataAccessFactory &data_access_factory);
 
   /////////////////////////////////////////////////
-  /// @brief Load all the default assets for the game, independent of scene
-  /// type.
-  ///
-  /// This serves as a wrapper function to load all the default assets
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo> LoadDefaultAssets();
-
-  /////////////////////////////////////////////////
-  /// @brief Load all the assets for a given scene type.
-  ///
-  /// @param scene_type Enum representing the derived scene type to load assets
-  /// for.
+  /// @brief Load assets from the provided AssetConfig data
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo>
-  LoadSceneAssets(const SceneType &scene_type);
+  LoadAssets(const AssetConfig asset_config);
 
   /////////////////////////////////////////////////
   /// @brief Load all UI styles

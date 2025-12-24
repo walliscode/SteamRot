@@ -8,11 +8,8 @@
 /////////////////////////////////////////////////
 #include "AssetManager.h"
 #include "FailInfo.h"
-
 #include "FlatbuffersUIStyleDataProvider.h"
-#include "IAssetDataProvider.h"
 #include "paths.h"
-
 #include <SFML/Graphics/Font.hpp>
 #include <expected>
 #include <filesystem>
@@ -27,24 +24,12 @@ AssetManager::AssetManager(DataAccessFactory &data_access_factory)
     : m_data_access_factory(data_access_factory) {}
 
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo> AssetManager::LoadDefaultAssets() {
-
-  // Load Asset configuration data via provider interface
-  auto get_asset_data_provider_result =
-      m_data_access_factory.GetAssetDataProvider();
-  if (!get_asset_data_provider_result.has_value())
-    return std::unexpected<FailInfo>(get_asset_data_provider_result.error());
-  IAssetDataProvider &asset_provider = *get_asset_data_provider_result.value();
-
-  auto asset_data_result = asset_provider.LoadAssetData();
-  if (!asset_data_result.has_value())
-    return std::unexpected<FailInfo>(asset_data_result.error());
-
-  AssetData &asset_data = asset_data_result.value();
+std::expected<std::monostate, FailInfo>
+AssetManager::LoadAssets(const AssetConfig asset_config) {
 
   ////// Load Fonts //////
   // Load fonts if any exist
-  for (const auto &font_data : asset_data.fonts) {
+  for (const auto &font_data : asset_config.fonts) {
     // attempt to add font
     auto add_font_result = AddFont(font_data.name);
 
@@ -53,7 +38,7 @@ std::expected<std::monostate, FailInfo> AssetManager::LoadDefaultAssets() {
   }
 
   ////// Load UI Styles //////
-  if (asset_data.ui_styles.empty())
+  if (asset_config.ui_styles.empty())
     return std::unexpected<FailInfo>({FailMode::FlatbuffersDataNotFound,
                                       "No UI styles defined in AssetData"});
 
@@ -61,24 +46,6 @@ std::expected<std::monostate, FailInfo> AssetManager::LoadDefaultAssets() {
   if (!load_ui_style_result.has_value())
     return std::unexpected<FailInfo>(load_ui_style_result.error());
 
-  return std::monostate();
-}
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-AssetManager::LoadSceneAssets(const SceneType &scene_type) {
-
-  // Load Asset configuration data via provider interface
-  auto get_asset_data_provider_result =
-      m_data_access_factory.GetAssetDataProvider();
-  if (!get_asset_data_provider_result.has_value())
-    return std::unexpected<FailInfo>(get_asset_data_provider_result.error());
-  IAssetDataProvider &asset_provider = *get_asset_data_provider_result.value();
-
-  auto asset_data_result = asset_provider.LoadSceneAssetData(scene_type);
-  if (!asset_data_result.has_value())
-    return std::unexpected<FailInfo>(asset_data_result.error());
-
-  // Scene assets are loaded on demand, return success
   return std::monostate();
 }
 

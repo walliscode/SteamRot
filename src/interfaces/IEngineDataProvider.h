@@ -12,6 +12,7 @@
 #include "EngineResourcesConfig.h"
 #include "EngineState.h"
 #include "FailInfo.h"
+#include "IAssetConfigViewer.h"
 #include "ISubscriberViewer.h"
 #include <expected>
 #include <memory>
@@ -81,6 +82,12 @@ public:
   /////////////////////////////////////////////////
   virtual std::expected<std::unique_ptr<ISubscriberViewer>, FailInfo>
   GetSubscriberViewer() const = 0;
+
+  /////////////////////////////////////////////////
+  /// @brief Return asset configuration data viewer for this provider.
+  /////////////////////////////////////////////////
+  virtual std::expected<std::unique_ptr<IAssetConfigViewer>, FailInfo>
+  GetAssetConfigViewer() const = 0;
 };
 
 } // namespace steamrot

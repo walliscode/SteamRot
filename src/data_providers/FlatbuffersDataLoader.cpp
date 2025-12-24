@@ -8,7 +8,6 @@
 /////////////////////////////////////////////////
 #include "FlatbuffersDataLoader.h"
 #include "FailInfo.h"
-#include "assets_generated.h"
 #include "paths.h"
 #include "scene_data_generated.h"
 #include "ui_style_generated.h"
@@ -68,56 +67,6 @@ FlatbuffersDataLoader::ProvideDefaultSceneData(
 }
 
 /////////////////////////////////////////////////
-
-std::expected<const AssetCollection *, FailInfo>
-FlatbuffersDataLoader::ProvideAssetData() const {
-
-  // get asset manager directory from defaults
-  std::filesystem::path asset_dir = paths::GetDefaultAssetManagerDirectory();
-
-  // construct the file path
-  std::filesystem::path asset_path = asset_dir / "asset_manager.bin";
-
-  // check if the file exists
-  if (!std::filesystem::exists(asset_path)) {
-    std::string error_message =
-        std::format("Asset file not found: {}", asset_path.string());
-    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
-  }
-  // load the asset data
-  const steamrot::AssetCollection *asset_data =
-      GetAssetCollection(LoadBinaryData(asset_path));
-  if (!asset_data) {
-    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
-                                    "AssetCollection pointer is null"));
-  }
-  return asset_data;
-}
-
-/////////////////////////////////////////////////
-std::expected<const AssetCollection *, FailInfo>
-FlatbuffersDataLoader::ProvideAssetData(const SceneType scene_type) const {
-
-  // get scene data
-  auto scene_data_result = ProvideDefaultSceneData(scene_type);
-  if (!scene_data_result.has_value()) {
-    return std::unexpected(scene_data_result.error());
-  }
-
-  const SceneDataFbs *scene_data = scene_data_result.value();
-  if (!scene_data) {
-    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
-                                    "SceneData pointer is null"));
-  }
-
-  if (!scene_data->assets()) {
-    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
-                                    "Asset collection not found"));
-  }
-  return scene_data->assets();
-}
-
-/////////////////////////////////////////////////
 std::expected<std::vector<const UIStyleData *>, FailInfo>
 FlatbuffersDataLoader::ProvideUIStylesData() const {
   // get the UIStyleDirectory
@@ -149,8 +98,6 @@ FlatbuffersDataLoader::ProvideUIStylesData() const {
 
   return ui_styles;
 }
-
-
 
 /////////////////////////////////////////////////
 std::expected<const EngineResourcesConfigFbs *, FailInfo>

@@ -32,7 +32,7 @@ void CheckAssetConfiguration(const SceneType &scene_type,
 /// data
 /// @param fonts Map of sf::Font objects indexed by font names
 /////////////////////////////////////////////////
-void CheckFontConfiguration(const AssetCollection &asset_collection,
+void CheckFontConfiguration(const AssetConfigFbs &asset_collection,
                             const AssetManager &asset_manager);
 
 } // namespace steamrot::tests
