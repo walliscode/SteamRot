@@ -13,6 +13,7 @@
 /////////////////////////////////////////////////
 #include "DataAccessFactory.h"
 #include "FailInfo.h"
+#include "IFontProvider.h"
 #include "UIStyle.h"
 #include "scene_types_generated.h"
 #include <SFML/Graphics.hpp>
@@ -24,7 +25,7 @@
 
 namespace steamrot {
 
-class AssetManager {
+class AssetManager : public IFontProvider {
 private:
   /////////////////////////////////////////////////
   /// @brief Reference to the DataAccessFactory for loading assets.
@@ -70,9 +71,16 @@ public:
 
   /////////////////////////////////////////////////
   /// @brief Load all UI styles
-  ///
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo> LoadUIStyles();
+
+  /////////////////////////////////////////////////
+  /// @brief Implements IFontProvider::GetFont
+  ///
+  /// @param font_name String name of the font to retrieve
+  /////////////////////////////////////////////////
+  std::expected<std::shared_ptr<const sf::Font>, FailInfo>
+  GetFont(const std::string &font_name) const override;
 
   /////////////////////////////////////////////////
   /// @brief Returns a const reference to the entire font map.

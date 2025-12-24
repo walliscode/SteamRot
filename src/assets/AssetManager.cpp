@@ -151,6 +151,19 @@ std::expected<std::monostate, FailInfo> AssetManager::LoadUIStyles() {
 }
 
 /////////////////////////////////////////////////
+std::expected<std::shared_ptr<const sf::Font>, FailInfo>
+AssetManager::GetFont(const std::string &font_name) const {
+
+  // search for font in map
+  auto it = m_fonts.find(font_name);
+  if (it != m_fonts.end()) {
+    return it->second;
+  } else {
+    return std::unexpected<FailInfo>(
+        {FailMode::FileNotFound, std::format("Font not found: {}", font_name)});
+  }
+}
+/////////////////////////////////////////////////
 const std::unordered_map<std::string, std::shared_ptr<const sf::Font>> &
 AssetManager::GetAllFonts() const {
   return m_fonts;

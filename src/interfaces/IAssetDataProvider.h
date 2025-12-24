@@ -8,33 +8,12 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "AssetData.h"
 #include "FailInfo.h"
 #include "scene_types_generated.h"
 #include <expected>
-#include <string>
-#include <vector>
 
 namespace steamrot {
-
-/////////////////////////////////////////////////
-/// @struct FontData
-/// @brief Font asset information.
-/////////////////////////////////////////////////
-struct FontData {
-  std::string name;
-};
-
-/////////////////////////////////////////////////
-/// @struct AssetData
-/// @brief Native C++ struct for asset configuration.
-///
-/// This replaces the FlatBuffers AssetCollection type in game code.
-/// Provides a simple, mutable structure for asset configuration.
-/////////////////////////////////////////////////
-struct AssetData {
-  std::vector<FontData> fonts;
-  std::vector<std::string> ui_styles;
-};
 
 /////////////////////////////////////////////////
 /// @class IAssetDataProvider
@@ -42,16 +21,6 @@ struct AssetData {
 ///
 /// Implementations handle the actual data source (files, network, etc.)
 /// and format (FlatBuffers, JSON, XML, Lua, etc.).
-///
-/// Usage:
-/// ```cpp
-/// IAssetDataProvider& provider = GetAssetDataProvider();
-/// auto result = provider.LoadAssetData();
-/// if (result.has_value()) {
-///   const AssetData& data = result.value();
-///   // Use native C++ struct
-/// }
-/// ```
 /////////////////////////////////////////////////
 class IAssetDataProvider {
 public:
