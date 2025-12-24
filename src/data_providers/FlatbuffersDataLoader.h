@@ -41,19 +41,6 @@ public:
   ProvideDefaultSceneData(const SceneType scene_type) const;
 
   /////////////////////////////////////////////////
-  /// @brief Provide default AssetCollection data
-  /////////////////////////////////////////////////
-  std::expected<const AssetCollection *, FailInfo> ProvideAssetData() const;
-
-  /////////////////////////////////////////////////
-  /// @brief Provides AssetCollection data as a subset of SceneData
-  ///
-  /// @param scene_type An enum representing the type of scene
-  /////////////////////////////////////////////////
-  std::expected<const AssetCollection *, FailInfo>
-  ProvideAssetData(const SceneType scene_type) const;
-
-  /////////////////////////////////////////////////
   /// @brief find and load all ui styles from flatbuffers data
   /////////////////////////////////////////////////
   std::expected<std::vector<const UIStyleData *>, FailInfo>

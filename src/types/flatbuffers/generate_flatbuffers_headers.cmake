@@ -41,7 +41,7 @@ set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/logic/logic_data.fbs
 
     # Assets
-    ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/asset_config.fbs
 
     # Configuration
 

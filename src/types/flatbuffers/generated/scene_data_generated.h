@@ -13,7 +13,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
-#include "assets_generated.h"
+#include "asset_config_generated.h"
 #include "scene_types_generated.h"
 #include "entities_generated.h"
 #include "logic_data_generated.h"
@@ -95,7 +95,7 @@ struct SceneDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_SCENE_INFO = 4,
     VT_SCENE_RESOURCES = 6,
-    VT_ASSETS = 8,
+    VT_ASSET_CONFIG = 8,
     VT_ENTITY_COLLECTION = 10,
     VT_LOGIC_COLLECTION_DATA = 12
   };
@@ -105,8 +105,8 @@ struct SceneDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const SceneResourcesFbs *scene_resources() const {
     return GetPointer<const SceneResourcesFbs *>(VT_SCENE_RESOURCES);
   }
-  const steamrot::AssetCollection *assets() const {
-    return GetPointer<const steamrot::AssetCollection *>(VT_ASSETS);
+  const steamrot::AssetConfigFbs *asset_config() const {
+    return GetPointer<const steamrot::AssetConfigFbs *>(VT_ASSET_CONFIG);
   }
   const steamrot::EntityCollectionFbs *entity_collection() const {
     return GetPointer<const steamrot::EntityCollectionFbs *>(VT_ENTITY_COLLECTION);
@@ -120,8 +120,8 @@ struct SceneDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyTable(scene_info()) &&
            VerifyOffset(verifier, VT_SCENE_RESOURCES) &&
            verifier.VerifyTable(scene_resources()) &&
-           VerifyOffset(verifier, VT_ASSETS) &&
-           verifier.VerifyTable(assets()) &&
+           VerifyOffset(verifier, VT_ASSET_CONFIG) &&
+           verifier.VerifyTable(asset_config()) &&
            VerifyOffset(verifier, VT_ENTITY_COLLECTION) &&
            verifier.VerifyTable(entity_collection()) &&
            VerifyOffset(verifier, VT_LOGIC_COLLECTION_DATA) &&
@@ -140,8 +140,8 @@ struct SceneDataFbsBuilder {
   void add_scene_resources(::flatbuffers::Offset<SceneResourcesFbs> scene_resources) {
     fbb_.AddOffset(SceneDataFbs::VT_SCENE_RESOURCES, scene_resources);
   }
-  void add_assets(::flatbuffers::Offset<steamrot::AssetCollection> assets) {
-    fbb_.AddOffset(SceneDataFbs::VT_ASSETS, assets);
+  void add_asset_config(::flatbuffers::Offset<steamrot::AssetConfigFbs> asset_config) {
+    fbb_.AddOffset(SceneDataFbs::VT_ASSET_CONFIG, asset_config);
   }
   void add_entity_collection(::flatbuffers::Offset<steamrot::EntityCollectionFbs> entity_collection) {
     fbb_.AddOffset(SceneDataFbs::VT_ENTITY_COLLECTION, entity_collection);
@@ -164,13 +164,13 @@ inline ::flatbuffers::Offset<SceneDataFbs> CreateSceneDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::SceneInfoFbs> scene_info = 0,
     ::flatbuffers::Offset<SceneResourcesFbs> scene_resources = 0,
-    ::flatbuffers::Offset<steamrot::AssetCollection> assets = 0,
+    ::flatbuffers::Offset<steamrot::AssetConfigFbs> asset_config = 0,
     ::flatbuffers::Offset<steamrot::EntityCollectionFbs> entity_collection = 0,
     ::flatbuffers::Offset<steamrot::LogicCollectionData> logic_collection_data = 0) {
   SceneDataFbsBuilder builder_(_fbb);
   builder_.add_logic_collection_data(logic_collection_data);
   builder_.add_entity_collection(entity_collection);
-  builder_.add_assets(assets);
+  builder_.add_asset_config(asset_config);
   builder_.add_scene_resources(scene_resources);
   builder_.add_scene_info(scene_info);
   return builder_.Finish();

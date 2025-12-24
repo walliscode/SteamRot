@@ -13,6 +13,7 @@
 /////////////////////////////////////////////////
 
 #include "FailInfo.h"
+#include "IAssetConfigViewer.h"
 #include "SceneData.h"
 #include "scene_types_generated.h"
 #include <expected>
@@ -32,5 +33,11 @@ public:
   /////////////////////////////////////////////////
   virtual std::expected<std::unique_ptr<SceneData>, FailInfo>
   ProvideDefaultSceneData(const SceneType scene_type) const = 0;
+
+  /////////////////////////////////////////////////
+  /// @brief Return asset configuration data viewer for this provider.
+  /////////////////////////////////////////////////
+  virtual std::expected<std::unique_ptr<IAssetConfigViewer>, FailInfo>
+  GetAssetConfigViewer() const = 0;
 };
 } // namespace steamrot

@@ -5,9 +5,9 @@ table FontDataFbs{
 }
 
 
-table AssetCollection {
+table AssetConfigFbs {
     fonts: [FontDataFbs];
     ui_styles :[string];
   }
 
-root_type AssetCollection;
+root_type AssetConfigFbs;

@@ -1,46 +1,40 @@
+
 /////////////////////////////////////////////////
 /// @file
 /// @brief Interface for loading asset configuration data.
 /////////////////////////////////////////////////
 
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
 #pragma once
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "AssetData.h"
+#include "AssetConfig.h"
 #include "FailInfo.h"
-#include "scene_types_generated.h"
 #include <expected>
 
 namespace steamrot {
 
 /////////////////////////////////////////////////
-/// @class IAssetDataProvider
-/// @brief Interface for loading asset configuration data.
+/// @class IAssetConfigViewer
+/// @brief Interface for providing AssetConfig data
 ///
 /// Implementations handle the actual data source (files, network, etc.)
 /// and format (FlatBuffers, JSON, XML, Lua, etc.).
 /////////////////////////////////////////////////
-class IAssetDataProvider {
+class IAssetConfigViewer {
 public:
-  virtual ~IAssetDataProvider() = default;
+  virtual ~IAssetConfigViewer() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Load default asset data.
+  /// @brief Load AssetConfig from various sources
   ///
   /// @return Asset data or failure information
   /////////////////////////////////////////////////
-  virtual std::expected<AssetData, FailInfo> LoadAssetData() const = 0;
-
-  /////////////////////////////////////////////////
-  /// @brief Load scene-specific asset data.
-  ///
-  /// @param scene_type The type of scene to load assets for
-  /// @return Asset data or failure information
-  /////////////////////////////////////////////////
-  virtual std::expected<AssetData, FailInfo>
-  LoadSceneAssetData(SceneType scene_type) const = 0;
+  virtual std::expected<AssetConfig, FailInfo> ProvideAssetConfig() const = 0;
 };
 
 } // namespace steamrot
