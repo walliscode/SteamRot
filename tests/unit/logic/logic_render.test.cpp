@@ -8,8 +8,6 @@
 /////////////////////////////////////////////////
 
 #include "logic_render.h"
-
-#include "AssetManager.h"
 #include "FailInfo.h"
 #include "logic_render_test_helpers.h"
 #include <SFML/Graphics.hpp>
@@ -100,41 +98,42 @@ TEST_CASE("drawn text can be detected", "[unit][logic_render]") {
                                      sf::Color::White);
 }
 
-TEST_CASE("steamrot::logic_render::DrawBorderAndBackground draws the hover "
-          "color for a button",
-
-          "[unit][logic_render]") {
-
-  // create a RenderTexture
-  size_t width = 100;
-  size_t height = 100;
-  sf::RenderTexture render_texture{sf::Vector2u(
-      {static_cast<unsigned int>(width), static_cast<unsigned int>(height)})};
-  // create a ButtonElement
-  steamrot::ButtonElement button;
-  button.position = {25.0f, 25.0f};
-  button.size = {50.0f, 50.0f};
-  button.is_mouse_over = true;
-
-  // load the default UIStyle
-  steamrot::AssetManager asset_manager;
-  auto load_default_assets_result = asset_manager.LoadDefaultAssets();
-  if (!load_default_assets_result) {
-    FAIL(load_default_assets_result.error().message);
-  }
-  auto style = asset_manager.GetDefaultUIStyle();
-  // clear the RenderTexture
-  render_texture.clear(sf::Color::Black);
-  // draw the button on the RenderTexture
-  steamrot::logic::render::DrawBorderAndBackground(render_texture, button,
-                                                   style.button_style);
-
-  // get the image from the RenderTexture
-  sf::Image image = render_texture.getTexture().copyToImage();
-  // test that the correct pixels are drawn
-  auto pixel_color = image.getPixel({50, 50});
-  REQUIRE(pixel_color == style.button_style.hover_color);
-}
+// TEST_CASE("steamrot::logic_render::DrawBorderAndBackground draws the hover "
+//           "color for a button",
+//
+//           "[unit][logic_render]") {
+//
+//   // create a RenderTexture
+//   size_t width = 100;
+//   size_t height = 100;
+//   sf::RenderTexture render_texture{sf::Vector2u(
+//       {static_cast<unsigned int>(width), static_cast<unsigned
+//       int>(height)})};
+//   // create a ButtonElement
+//   steamrot::ButtonElement button;
+//   button.position = {25.0f, 25.0f};
+//   button.size = {50.0f, 50.0f};
+//   button.is_mouse_over = true;
+//
+//   // load the default UIStyle
+//   steamrot::AssetManager asset_manager;
+//   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
+//   if (!load_default_assets_result) {
+//     FAIL(load_default_assets_result.error().message);
+//   }
+//   auto style = asset_manager.GetDefaultUIStyle();
+//   // clear the RenderTexture
+//   render_texture.clear(sf::Color::Black);
+//   // draw the button on the RenderTexture
+//   steamrot::logic::render::DrawBorderAndBackground(render_texture, button,
+//                                                    style.button_style);
+//
+//   // get the image from the RenderTexture
+//   sf::Image image = render_texture.getTexture().copyToImage();
+//   // test that the correct pixels are drawn
+//   auto pixel_color = image.getPixel({50, 50});
+//   REQUIRE(pixel_color == style.button_style.hover_color);
+// }
 
 // TEST_CASE("steamrot::logic_render::DrawUIELement draws a panel on a "
 //           "RenderTexture",

@@ -44,6 +44,11 @@ struct GameContext {
   size_t &loop_number;
 
   /////////////////////////////////////////////////
+  /// @brief Reference to the DataAccessFactory living on the Engine
+  /////////////////////////////////////////////////
+  DataAccessFactory &data_access_factory;
+
+  /////////////////////////////////////////////////
   /// @brief Reference to the AssetManager living on the Engine, there
   /// should only be one instance of this.
   /////////////////////////////////////////////////

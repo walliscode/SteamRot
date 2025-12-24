@@ -9,6 +9,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "AssetManager.h"
+#include "DataAccessFactory.h"
 #include "EventHandler.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -27,7 +28,11 @@ namespace steamrot {
 /// be configured via ConfigureEngineResources free function.
 /////////////////////////////////////////////////
 struct EngineResources {
-  EngineResources() = default;
+  /////////////////////////////////////////////////
+  /// @brief Constructor passing DataAccessFactory instance to AssetManager.
+  /////////////////////////////////////////////////
+  explicit EngineResources() : asset_manager(data_access_factory) {}
+
   /////////////////////////////////////////////////
   /// @brief The game window.
   ///
@@ -51,6 +56,11 @@ struct EngineResources {
   /// @brief Loop number for the current game loop.
   /////////////////////////////////////////////////
   size_t loop_number{1};
+
+  /////////////////////////////////////////////////
+  /// @brief Provides concrete implementations of data providers.
+  /////////////////////////////////////////////////
+  DataAccessFactory data_access_factory;
 
   /////////////////////////////////////////////////
   /// @brief Asset manager for the game.

@@ -8,7 +8,6 @@
 /////////////////////////////////////////////////
 #include "Engine.h"
 #include "engine_configuration.h"
-#include "provider_factory.h"
 #include <vector>
 
 namespace steamrot {
@@ -21,8 +20,13 @@ Engine::Engine()
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> Engine::StartUp() {
   // Load all engine data via provider interface
-  IEngineDataProvider &data_provider = GetEngineDataProvider();
+  auto data_provider_result =
+      m_engine_resources.data_access_factory.GetEngineDataProvider();
 
+  if (!data_provider_result) {
+    return std::unexpected(data_provider_result.error());
+  }
+  IEngineDataProvider &data_provider = *data_provider_result.value();
   // Load EngineResources configuration
   auto resources_config_result = data_provider.LoadEngineResourcesConfig();
   if (!resources_config_result) {

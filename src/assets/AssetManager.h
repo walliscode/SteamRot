@@ -11,6 +11,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "DataAccessFactory.h"
 #include "FailInfo.h"
 #include "UIStyle.h"
 #include "scene_types_generated.h"
@@ -25,6 +26,11 @@ namespace steamrot {
 
 class AssetManager {
 private:
+  /////////////////////////////////////////////////
+  /// @brief Reference to the DataAccessFactory for loading assets.
+  /////////////////////////////////////////////////
+  DataAccessFactory &m_data_access_factory;
+
   /////////////////////////////////////////////////
   /// @brief Member variable contining all the fonts for the game.
   /////////////////////////////////////////////////
@@ -43,7 +49,7 @@ private:
   std::expected<std::monostate, FailInfo> AddFont(const std::string &font_name);
 
 public:
-  AssetManager() = default;
+  AssetManager(DataAccessFactory &data_access_factory);
 
   /////////////////////////////////////////////////
   /// @brief Load all the default assets for the game, independent of scene
