@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of FlatbuffersSceneDataProvider.
+/// @brief FlatBuffers implementation of IAssetConfigViewer.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -11,25 +11,24 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "ISceneDataProvider.h"
-#include "scene_types_generated.h"
+#include "IAssetConfigViewer.h"
+#include "asset_config_generated.h"
 
 namespace steamrot {
-class FlatbuffersSceneDataProvider : public steamrot::ISceneDataProvider {
+class FlatbuffersAssetConfigViewer : public IAssetConfigViewer {
+
+private:
+  const AssetConfigFbs *m_asset_config_fbs{nullptr};
 
 public:
   /////////////////////////////////////////////////
-  /// @brief Loads SceneData from FlatBuffers.
-  ///
-  /// @return Unique pointer to SceneData object.
+  /// @brief Constructor with FlatBuffers asset config
   /////////////////////////////////////////////////
-  std::expected<std::unique_ptr<SceneData>, FailInfo>
-  ProvideDefaultSceneData(const SceneType scene_type) const override;
+  explicit FlatbuffersAssetConfigViewer(const AssetConfigFbs *asset_config_fbs);
 
   /////////////////////////////////////////////////
-  /// @brief Return asset configuration data viewer for this provider.
+  /// @brief Returns AssetConfig struct for parsing
   /////////////////////////////////////////////////
-  std::expected<std::unique_ptr<IAssetConfigViewer>, FailInfo>
-  GetAssetConfigViewer() const override;
+  std::expected<AssetConfig, FailInfo> ProvideAssetConfig() const override;
 };
 } // namespace steamrot

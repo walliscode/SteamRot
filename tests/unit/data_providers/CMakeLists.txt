@@ -7,7 +7,6 @@ configure_file(
 add_executable(test_data_providers
   DataAccessFactory.test.cpp
   FlatbuffersDataLoader.test.cpp
-  FlatbuffersAssetDataProvider.test.cpp
   FlatbuffersEngineDataProvider.test.cpp
   FlatbuffersSceneManagerDataProvider.test.cpp
   FlatbuffersSceneDataProvider.test.cpp

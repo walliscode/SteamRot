@@ -8,9 +8,7 @@
 /////////////////////////////////////////////////
 #include "DataAccessFactory.h"
 #include "FailInfo.h"
-#include "FlatbuffersAssetDataProvider.h"
 #include "FlatbuffersEngineDataProvider.h"
-
 #include "FlatbuffersSceneDataProvider.h"
 #include "FlatbuffersSceneManagerDataProvider.h"
 #include <expected>
@@ -55,14 +53,6 @@ DataAccessFactory::SetFlatbuffersDataProviders() {
     return std::unexpected(
         FailInfo{FailMode::NullPointer,
                  "Failed to create FlatbuffersSceneDataProvider instance."});
-  }
-
-  // set IAssetDataProvider
-  m_asset_data_provider = std::make_unique<FlatbuffersAssetDataProvider>();
-  if (!m_asset_data_provider) {
-    return std::unexpected(
-        FailInfo{FailMode::NullPointer,
-                 "Failed to create FlatbuffersAssetDataProvider instance."});
   }
 
   return std::monostate{};
@@ -134,17 +124,6 @@ DataAccessFactory::GetSceneDataProvider() {
   }
 
   return m_scene_data_provider.get();
-}
-
-/////////////////////////////////////////////////
-std::expected<IAssetDataProvider *, FailInfo>
-DataAccessFactory::GetAssetDataProvider() {
-  if (!m_asset_data_provider) {
-    return std::unexpected(
-        FailInfo{FailMode::NullPointer, "Asset Data Provider is null"});
-  }
-
-  return m_asset_data_provider.get();
 }
 
 } // namespace steamrot

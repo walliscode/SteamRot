@@ -6,6 +6,11 @@
 /// to set up global engine resources (window, event system, etc.).
 ////////////////////////////////////////////////////////////
 
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+include "../assets/asset_config.fbs";
+
 namespace steamrot;
 
 ////////////////////////////////////////////////////////////
@@ -23,6 +28,8 @@ table EngineResourcesConfigFbs {
   
   /// Target framerate limit
   framerate_limit: uint32 = 60;
+
+  asset_config: AssetConfigFbs;
 }
 
 root_type EngineResourcesConfigFbs;

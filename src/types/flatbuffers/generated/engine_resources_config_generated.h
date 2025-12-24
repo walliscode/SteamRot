@@ -13,6 +13,8 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
+#include "asset_config_generated.h"
+
 namespace steamrot {
 
 struct EngineResourcesConfigFbs;
@@ -27,7 +29,8 @@ struct EngineResourcesConfigFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers:
     VT_WINDOW_WIDTH = 4,
     VT_WINDOW_HEIGHT = 6,
     VT_WINDOW_TITLE = 8,
-    VT_FRAMERATE_LIMIT = 10
+    VT_FRAMERATE_LIMIT = 10,
+    VT_ASSET_CONFIG = 12
   };
   /// Window width in pixels
   uint32_t window_width() const {
@@ -45,6 +48,9 @@ struct EngineResourcesConfigFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers:
   uint32_t framerate_limit() const {
     return GetField<uint32_t>(VT_FRAMERATE_LIMIT, 60);
   }
+  const steamrot::AssetConfigFbs *asset_config() const {
+    return GetPointer<const steamrot::AssetConfigFbs *>(VT_ASSET_CONFIG);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint32_t>(verifier, VT_WINDOW_WIDTH, 4) &&
@@ -52,6 +58,8 @@ struct EngineResourcesConfigFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers:
            VerifyOffset(verifier, VT_WINDOW_TITLE) &&
            verifier.VerifyString(window_title()) &&
            VerifyField<uint32_t>(verifier, VT_FRAMERATE_LIMIT, 4) &&
+           VerifyOffset(verifier, VT_ASSET_CONFIG) &&
+           verifier.VerifyTable(asset_config()) &&
            verifier.EndTable();
   }
 };
@@ -72,6 +80,9 @@ struct EngineResourcesConfigFbsBuilder {
   void add_framerate_limit(uint32_t framerate_limit) {
     fbb_.AddElement<uint32_t>(EngineResourcesConfigFbs::VT_FRAMERATE_LIMIT, framerate_limit, 60);
   }
+  void add_asset_config(::flatbuffers::Offset<steamrot::AssetConfigFbs> asset_config) {
+    fbb_.AddOffset(EngineResourcesConfigFbs::VT_ASSET_CONFIG, asset_config);
+  }
   explicit EngineResourcesConfigFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -88,8 +99,10 @@ inline ::flatbuffers::Offset<EngineResourcesConfigFbs> CreateEngineResourcesConf
     uint32_t window_width = 800,
     uint32_t window_height = 600,
     ::flatbuffers::Offset<::flatbuffers::String> window_title = 0,
-    uint32_t framerate_limit = 60) {
+    uint32_t framerate_limit = 60,
+    ::flatbuffers::Offset<steamrot::AssetConfigFbs> asset_config = 0) {
   EngineResourcesConfigFbsBuilder builder_(_fbb);
+  builder_.add_asset_config(asset_config);
   builder_.add_framerate_limit(framerate_limit);
   builder_.add_window_title(window_title);
   builder_.add_window_height(window_height);
@@ -102,14 +115,16 @@ inline ::flatbuffers::Offset<EngineResourcesConfigFbs> CreateEngineResourcesConf
     uint32_t window_width = 800,
     uint32_t window_height = 600,
     const char *window_title = nullptr,
-    uint32_t framerate_limit = 60) {
+    uint32_t framerate_limit = 60,
+    ::flatbuffers::Offset<steamrot::AssetConfigFbs> asset_config = 0) {
   auto window_title__ = window_title ? _fbb.CreateString(window_title) : 0;
   return steamrot::CreateEngineResourcesConfigFbs(
       _fbb,
       window_width,
       window_height,
       window_title__,
-      framerate_limit);
+      framerate_limit,
+      asset_config);
 }
 
 inline const steamrot::EngineResourcesConfigFbs *GetEngineResourcesConfigFbs(const void *buf) {

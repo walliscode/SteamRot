@@ -58,17 +58,6 @@ TEST_CASE("FlatbuffersDataLoader provides scene data",
   REQUIRE(!crafting_scene_data->entity_collection()->entities()->empty());
   //.... Additional checks can be added here
 }
-TEST_CASE("FlatbuffersDataLoader::ProvideAssetData returns default data",
-          "[unit][FlatbuffersDataLoader]") {
-
-  steamrot::FlatbuffersDataLoader data_loader;
-  auto result = data_loader.ProvideAssetData();
-  if (!result.has_value()) {
-    FAIL(result.error().message);
-  }
-  REQUIRE(result.value() != nullptr);
-  REQUIRE(!result.value()->fonts()->empty());
-}
 
 TEST_CASE("FlatbuffersDataLoader provides ui_styles data",
           "[unit][FlatbuffersDataLoader]") {
@@ -219,8 +208,6 @@ TEST_CASE("FlatbuffersDataLoader::ProvideDefaultUserPreferencesData returns "
   REQUIRE(preferences->version() == 1);
 }
 
-
-
 // TEST_CASE("FlatbuffersDataLoader::ProvideLogicCollectionData returns logic "
 //           "data for Title scene",
 //           "[unit][FlatbuffersDataLoader]") {
@@ -262,42 +249,6 @@ TEST_CASE("FlatbuffersDataLoader::ProvideLogicCollectionData returns error "
       static_cast<steamrot::SceneType>(999);
 
   auto result = data_loader.ProvideLogicCollectionData(invalid_scene_type);
-
-  REQUIRE(!result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::SceneTypeNotFound);
-}
-
-TEST_CASE("FlatbuffersDataLoader::ProvideAssetData with scene type returns "
-          "asset data",
-          "[unit][FlatbuffersDataLoader]") {
-
-  steamrot::FlatbuffersDataLoader data_loader;
-
-  // Test for Title scene
-  auto title_result = data_loader.ProvideAssetData(steamrot::SceneType_TITLE);
-  if (!title_result.has_value()) {
-    FAIL(title_result.error().message);
-  }
-  REQUIRE(title_result.value() != nullptr);
-
-  // Test for Crafting scene
-  auto crafting_result =
-      data_loader.ProvideAssetData(steamrot::SceneType_CRAFTING);
-  if (!crafting_result.has_value()) {
-    FAIL(crafting_result.error().message);
-  }
-  REQUIRE(crafting_result.value() != nullptr);
-}
-
-TEST_CASE("FlatbuffersDataLoader::ProvideAssetData with invalid scene returns "
-          "error",
-          "[unit][FlatbuffersDataLoader]") {
-
-  steamrot::FlatbuffersDataLoader data_loader;
-  steamrot::SceneType invalid_scene_type =
-      static_cast<steamrot::SceneType>(999);
-
-  auto result = data_loader.ProvideAssetData(invalid_scene_type);
 
   REQUIRE(!result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::SceneTypeNotFound);

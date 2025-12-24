@@ -38,4 +38,13 @@ FlatbuffersSceneDataProvider::ProvideDefaultSceneData(
 
   return std::make_unique<FbsSceneData>(scene_data);
 }
+
+/////////////////////////////////////////////////
+std::expected<std::unique_ptr<IAssetConfigViewer>, FailInfo>
+FlatbuffersSceneDataProvider::GetAssetConfigViewer() const {
+
+  return std::unexpected(FailInfo{FailMode::None,
+                                  "FlatbuffersSceneDataProvider does not "
+                                  "support asset configuration viewing."});
+}
 } // namespace steamrot

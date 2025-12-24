@@ -13,7 +13,6 @@
 /////////////////////////////////////////////////
 #include "DataType.h"
 #include "FailInfo.h"
-#include "IAssetDataProvider.h"
 #include "IEngineDataProvider.h"
 #include "ISceneConfigurator.h"
 #include "ISceneDataProvider.h"
@@ -44,11 +43,6 @@ private:
   /// @brief Instance of the Scene Data Provider for the factory/game
   /////////////////////////////////////////////////
   std::unique_ptr<ISceneDataProvider> m_scene_data_provider{nullptr};
-
-  /////////////////////////////////////////////////
-  /// @brief Instance of the Asset Data Provider for the factory/game
-  /////////////////////////////////////////////////
-  std::unique_ptr<IAssetDataProvider> m_asset_data_provider{nullptr};
 
   /////////////////////////////////////////////////
   /// @brief Instance of the Scene Configurator for the factory/game
@@ -89,11 +83,6 @@ public:
   /// @brief Returns a raw pointer to the Scene Data Provider
   /////////////////////////////////////////////////
   std::expected<ISceneDataProvider *, FailInfo> GetSceneDataProvider();
-
-  /////////////////////////////////////////////////
-  /// @brief Returns a raw pointer to the Asset Data Provider
-  /////////////////////////////////////////////////
-  std::expected<IAssetDataProvider *, FailInfo> GetAssetDataProvider();
 
   /////////////////////////////////////////////////
   /// @brief Sets the data type for the factory
