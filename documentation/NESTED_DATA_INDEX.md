@@ -222,6 +222,9 @@ This is documentation-only. No code changes have been made.
 ### Q: When should I NOT use this pattern?
 **A**: When data is truly independent, comes from different sources, or changes frequently.
 
+### Q: Should I create a separate provider interface for shared types like AssetConfig?
+**A**: No. Shared *type* doesn't require shared *provider*. Each provider (EngineDataProvider, SceneDataProvider) loads its own AssetConfig instance directly. If loading logic needs to be shared, use helper functions, not separate provider interfaces. Provider interfaces abstract data *sources*, not conversion logic.
+
 ## Questions or Feedback?
 
 For questions about implementation, see the **Pattern Guide**.

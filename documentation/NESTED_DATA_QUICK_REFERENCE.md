@@ -157,6 +157,8 @@ struct SceneData {
 };
 ```
 
+**Note**: Shared type ≠ shared provider. Each provider loads its own instance directly. Use helper functions for shared conversion logic, not separate provider interfaces.
+
 ## Best Practices
 
 1. **Always use const accessors**: `const Type& GetData() const`

@@ -285,6 +285,43 @@ ConfigureScene(scene, scene_data);  // scene_data includes assets
 - Gradual migration path
 - Eventually deprecate old methods if desired
 
+### Question 5: Should we create IAssetDataProvider for shared AssetConfig?
+**Answer**: No, each provider loads AssetConfig directly into its wrapper.
+
+Since AssetConfig appears in both EngineData and SceneData, one might consider extracting asset loading into a separate `IAssetDataProvider` interface. However, this adds unnecessary complexity:
+
+**Why not a separate IAssetDataProvider:**
+- Each context (Engine vs Scene) may need different asset configurations
+- EngineData and SceneData are separate instances with their own AssetConfig
+- Direct loading keeps provider implementations simple and self-contained
+- The unified wrapper pattern already solves the access problem
+
+**Recommended approach:**
+```cpp
+// Each provider loads its own AssetConfig
+class FlatbuffersEngineDataProvider {
+  std::expected<EngineData, FailInfo> LoadEngineData() const {
+    EngineData data;
+    // Load AssetConfig directly for engine context
+    data.asset_config = LoadAssetConfigForEngine();
+    return data;
+  }
+};
+
+class FlatbuffersSceneDataProvider {
+  std::expected<SceneData, FailInfo> LoadSceneData() const {
+    SceneData data;
+    // Load AssetConfig directly for scene context
+    data.asset_config = LoadAssetConfigForScene();
+    return data;
+  }
+};
+```
+
+**Key insight**: Shared *type* (AssetConfig) doesn't require shared *provider*. Each wrapper struct owns its own instance, loaded by its respective provider from the appropriate data source.
+
+If asset loading logic needs to be shared, use helper functions or composition within the provider implementations, not a separate provider interface.
+
 ## Implementation Checklist
 
 - [x] Document current clunky patterns

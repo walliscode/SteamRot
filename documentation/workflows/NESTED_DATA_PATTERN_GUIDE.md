@@ -444,6 +444,59 @@ struct SceneData {
 };
 ```
 
+#### Should You Create a Shared Provider for Shared Types?
+
+**Question**: If AssetConfig is used in both EngineData and SceneData, should we create an `IAssetDataProvider` interface?
+
+**Answer**: No. Shared *type* doesn't require shared *provider*.
+
+**Why not:**
+- Each context may need different configurations (engine assets vs scene-specific assets)
+- Each wrapper struct owns its own instance
+- Adds interface complexity without benefit
+- Provider pattern is for abstracting data *sources*, not for code reuse
+
+**Instead, do this:**
+
+```cpp
+// Option 1: Each provider loads directly
+class FlatbuffersEngineDataProvider {
+  std::expected<EngineData, FailInfo> LoadEngineData() const {
+    EngineData data;
+    // Load AssetConfig from engine data source
+    data.asset_config = LoadAssetConfigFromEngineSource();
+    return data;
+  }
+};
+
+class FlatbuffersSceneDataProvider {
+  std::expected<SceneData, FailInfo> LoadSceneData() const {
+    SceneData data;
+    // Load AssetConfig from scene data source
+    data.asset_config = LoadAssetConfigFromSceneSource();
+    return data;
+  }
+};
+
+// Option 2: Share helper functions, not interfaces
+namespace asset_helpers {
+  AssetConfig ConvertFromFbs(const AssetConfigFbs* fbs_data) {
+    // Shared conversion logic
+  }
+}
+
+class FlatbuffersEngineDataProvider {
+  std::expected<EngineData, FailInfo> LoadEngineData() const {
+    EngineData data;
+    auto fbs_data = m_loader.GetEngineAssetConfigFbs();
+    data.asset_config = asset_helpers::ConvertFromFbs(fbs_data);
+    return data;
+  }
+};
+```
+
+**Key principle**: Use helper functions or composition for shared logic, not provider interfaces. Provider interfaces abstract *where* data comes from, not *how* it's converted.
+
 ## Testing Nested Data
 
 ### Test the Complete Structure
