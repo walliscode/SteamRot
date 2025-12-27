@@ -11,6 +11,7 @@ add_library(scenes
 
 target_compile_definitions(scenes PRIVATE
     $<$<CONFIG:Debug>:DEBUG>
+    $<$<BOOL:${UUID_SYSTEM_GENERATOR}>:UUID_SYSTEM_GENERATOR>
 )
 
 target_include_directories(scenes
