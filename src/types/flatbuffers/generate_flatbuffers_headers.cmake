@@ -10,6 +10,7 @@ set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/engine/engine_resources_config.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/engine/engine_config.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/engine/engine_state.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/engine/engine_data.fbs
 
     # Scenes
     ${CMAKE_CURRENT_SOURCE_DIR}/scenes/scene_data.fbs

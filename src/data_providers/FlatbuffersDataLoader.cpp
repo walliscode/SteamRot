@@ -100,94 +100,29 @@ FlatbuffersDataLoader::ProvideUIStylesData() const {
 }
 
 /////////////////////////////////////////////////
-std::expected<const EngineResourcesConfigFbs *, FailInfo>
-FlatbuffersDataLoader::ProvideEngineResourcesConfigFbs() const {
+std::expected<const EngineDataFbs *, FailInfo>
+FlatbuffersDataLoader::ProvideEngineDataFbs() const {
   // get engine directory from defaults
   std::filesystem::path engine_dir = paths::GetDefaultEngineDirectory();
-
   // construct the file path
-  std::filesystem::path engine_resources_path =
-      engine_dir / "default.engine_resources_config.bin";
-
+  std::filesystem::path engine_data_path =
+      engine_dir / "default.engine_data.bin";
   // check if the file exists
-  if (!std::filesystem::exists(engine_resources_path)) {
-    std::string error_message =
-        std::format("Engine resources config not found: {}",
-                    engine_resources_path.string());
+  if (!std::filesystem::exists(engine_data_path)) {
+    std::string error_message = std::format("Engine data file not found: {}",
+                                            engine_data_path.string());
     return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
   }
-  // load the engine resources config
-  const steamrot::EngineResourcesConfigFbs *engine_resources_config =
-      GetEngineResourcesConfigFbs(LoadBinaryData(engine_resources_path));
-  return engine_resources_config;
-}
-
-/////////////////////////////////////////////////
-std::expected<const EngineConfigFbs *, FailInfo>
-FlatbuffersDataLoader::ProvideEngineConfigFbs() const {
-  // First check for user-specific engine config
-  std::filesystem::path user_engine_dir = paths::GetUserDirectory() / "engine";
-  std::filesystem::path user_config_path =
-      user_engine_dir / "default.engine_config.bin";
-
-  // If user config exists, load it
-  if (std::filesystem::exists(user_config_path)) {
-    const steamrot::EngineConfigFbs *config_data =
-        GetEngineConfigFbs(LoadBinaryData(user_config_path));
-
-    if (config_data) {
-      return config_data;
-    }
-    // If user config exists but failed to load, fall through to defaults
-  }
-
-  // Load default engine config
-  std::filesystem::path default_engine_dir = paths::GetDefaultEngineDirectory();
-  std::filesystem::path default_config_path =
-      default_engine_dir / "default.engine_config.bin";
-
-  if (!std::filesystem::exists(default_config_path)) {
-    std::string error_message = std::format("Engine config file not found: {}",
-                                            default_config_path.string());
-    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
-  }
-
-  const steamrot::EngineConfigFbs *config_data =
-      GetEngineConfigFbs(LoadBinaryData(default_config_path));
-
-  if (!config_data) {
+  // load the engine data
+  const steamrot::EngineDataFbs *engine_data =
+      GetEngineDataFbs(LoadBinaryData(engine_data_path));
+  if (!engine_data) {
     return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
-                                    "EngineConfigFbs pointer is null"));
+                                    "EngineDataFbs pointer is null"));
   }
-
-  return config_data;
+  return engine_data;
 }
 
-/////////////////////////////////////////////////
-std::expected<const EngineStateFbs *, FailInfo>
-FlatbuffersDataLoader::ProvideEngineStateFbs() const {
-  // get engine directory from defaults
-  std::filesystem::path engine_dir = paths::GetDefaultEngineDirectory();
-
-  // construct the file path
-  std::filesystem::path engine_state_path =
-      engine_dir / "default.engine_state.bin";
-
-  // check if the file exists
-  if (!std::filesystem::exists(engine_state_path)) {
-    std::string error_message = std::format("Engine state file not found: {}",
-                                            engine_state_path.string());
-    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
-  }
-  // load the engine state data
-  const steamrot::EngineStateFbs *engine_state_data =
-      GetEngineStateFbs(LoadBinaryData(engine_state_path));
-  if (!engine_state_data) {
-    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
-                                    "EngineStateFbs pointer is null"));
-  }
-  return engine_state_data;
-}
 /////////////////////////////////////////////////
 std::expected<const SceneManagerDataFbs *, FailInfo>
 FlatbuffersDataLoader::ProvideSceneManagerData() const {

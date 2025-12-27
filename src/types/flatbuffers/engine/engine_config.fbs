@@ -35,4 +35,4 @@ table EngineConfigFbs {
   user_preferences: UserPreferencesConfigFbs;
 }
 
-root_type EngineConfigFbs;
+

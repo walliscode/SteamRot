@@ -165,9 +165,10 @@ macro(flatbuffers_generate_for_engine_type schema_name json_ext data_subdir)
 endmacro()
 
 # Engine-specific schemas in engine subdirectory
-flatbuffers_generate_for_engine_type(engine_resources_config ".engine_resources_config.json" "engine")
-flatbuffers_generate_for_engine_type(engine_config ".engine_config.json" "engine")
-flatbuffers_generate_for_engine_type(engine_state ".engine_state.json" "engine")
+flatbuffers_generate_for_engine_type(engine_data
+".engine_data.json" "engine")
+
+
 
 # This target will actually trigger all the binary generation
 add_custom_target(flatbuffers_generate_binaries ALL

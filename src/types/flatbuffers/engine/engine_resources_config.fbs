@@ -32,4 +32,4 @@ table EngineResourcesConfigFbs {
   asset_config: AssetConfigFbs;
 }
 
-root_type EngineResourcesConfigFbs;
+
