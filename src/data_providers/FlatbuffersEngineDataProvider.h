@@ -59,13 +59,6 @@ public:
   /////////////////////////////////////////////////
   std::expected<std::unique_ptr<ISubscriberViewer>, FailInfo>
   GetSubscriberViewer() const override;
-
-  /////////////////////////////////////////////////
-  /// @brief Return a viewer for asset configuration data. In particular, the
-  /// FlatBuffers implementation
-  /////////////////////////////////////////////////
-  std::expected<std::unique_ptr<IAssetConfigViewer>, FailInfo>
-  GetAssetConfigViewer() const override;
 };
 
 } // namespace steamrot
