@@ -18,6 +18,7 @@
 #include "EngineConfig.h"
 #include "EngineResources.h"
 #include "EngineState.h"
+#include "FailInfo.h"
 #include "GameContext.h"
 #include "SceneManager.h"
 #include <expected>
@@ -187,7 +188,7 @@ public:
   /////////////////////////////////////////////////
   /// @brief A simple wrapper function to indicate running the game
   /////////////////////////////////////////////////
-  void RunGame();
+  std::expected<std::monostate, FailInfo> RunGame();
 
   /////////////////////////////////////////////////
   /// @brief Get the engine configuration (includes user preferences).

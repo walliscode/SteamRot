@@ -12,6 +12,7 @@ target_compile_options(SteamRot PRIVATE
 
 target_link_libraries(SteamRot PRIVATE
     engine
+    error_loop
     display
     types
     logger

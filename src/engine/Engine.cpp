@@ -7,7 +7,11 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "Engine.h"
+#include "FailInfo.h"
 #include "engine_configuration.h"
+#include <expected>
+#include <iostream>
+#include <variant>
 #include <vector>
 
 namespace steamrot {
@@ -57,6 +61,7 @@ std::expected<std::monostate, FailInfo> Engine::StartUp() {
     }
   }
 
+  std::cout << "Engine resources configured successfully." << std::endl;
   // Pass initial AssetConfig to AssetManager
   auto load_initial_assets_result = m_engine_resources.asset_manager.LoadAssets(
       engine_data.initial_asset_config);
@@ -68,10 +73,16 @@ std::expected<std::monostate, FailInfo> Engine::StartUp() {
 }
 
 /////////////////////////////////////////////////
-void Engine::RunGame() {
+std::expected<std::monostate, FailInfo> Engine::RunGame() {
 
   auto start_up_result = StartUp();
+  if (!start_up_result) {
+    return std::unexpected(start_up_result.error());
+  }
+  std::cout << "Engine started up successfully." << std::endl;
   RunGameLoop();
+
+  return std::monostate{};
 }
 
 /////////////////////////////////////////////////
