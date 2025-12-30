@@ -103,8 +103,6 @@ std::expected<std::monostate, FailInfo> AssetManager::LoadUIStyles() {
   // create UIStyleDataProivder
   FlatbuffersUIStyleDataProvider ui_style_provider(m_fonts);
 
-  std::cout << "Loading UI styles from flatbuffers..." << std::endl;
-
   auto ui_style_data_result = ui_style_provider.ProvideUIStyles();
   if (!ui_style_data_result.has_value())
     return std::unexpected<FailInfo>(ui_style_data_result.error());

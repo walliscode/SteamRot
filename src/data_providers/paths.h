@@ -1,6 +1,7 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Namespace-based path provider using compile-time environment selection.
+/// @brief Namespace-based path provider using compile-time environment
+/// selection.
 ///
 /// Environment Selection (compile-time macros):
 /// - Default: Test environment (tests/data)
@@ -46,8 +47,9 @@ std::filesystem::path GetSourceDirectory();
 /// @return std::filesystem::path The base data directory path
 /////////////////////////////////////////////////
 inline std::filesystem::path GetDataDirectory() {
+
 #if defined(STEAMROT_ENV_PROD) && defined(STEAMROT_ENV_DEBUG)
-  static_assert(false, "Cannot define both STEAMROT_ENV_PROD and STEAMROT_ENV_DEBUG");
+#error "Cannot define both STEAMROT_ENV_PROD and STEAMROT_ENV_DEBUG"
 #elif defined(STEAMROT_ENV_PROD) || defined(STEAMROT_ENV_DEBUG)
   return GetSourceDirectory() / "data";
 #else
@@ -129,7 +131,7 @@ inline std::filesystem::path GetFontsDirectory() {
 /// @return std::filesystem::path
 /////////////////////////////////////////////////
 inline std::filesystem::path GetUIStylesDirectory() {
-  return GetDataDirectory() / "ui_styles";
+  return GetDefaultsDirectory() / "ui_styles";
 }
 
 /////////////////////////////////////////////////
