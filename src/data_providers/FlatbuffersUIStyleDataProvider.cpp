@@ -12,29 +12,22 @@
 #include "UIStyle.h"
 #include "types_generated.h"
 #include <expected>
-#include <iostream>
 #include <vector>
 
 namespace steamrot {
 
 namespace {
 /////////////////////////////////////////////////
-std::expected<sf::Color, FailInfo> ToColor(const ColorData *color_fb) {
+std::expected<sf::Color, FailInfo> ToColor(const ColorData *color_fb,
+                                            const std::string &context) {
 
   if (!color_fb)
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound, "ColorData is null"});
-
-  if (!color_fb->r())
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound, "ColorData.r missing"});
-  if (!color_fb->g())
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound, "ColorData.g missing"});
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    context + " ColorData is null"});
 
   if (!color_fb->r() || !color_fb->g() || !color_fb->b() || !color_fb->a())
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    "ColorData component missing"});
+                                    context + " ColorData component missing"});
 
   sf::Color color;
   color.r = color_fb->r();
@@ -44,14 +37,15 @@ std::expected<sf::Color, FailInfo> ToColor(const ColorData *color_fb) {
   return color;
 }
 /////////////////////////////////////////////////
-std::expected<sf::Vector2f, FailInfo> ToVec2f(const Vector2fData *vec_fb) {
+std::expected<sf::Vector2f, FailInfo> ToVec2f(const Vector2fData *vec_fb,
+                                               const std::string &context) {
   if (!vec_fb)
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound, "Vector2fData is null"});
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    context + " Vector2fData is null"});
 
   if (!vec_fb->x() || !vec_fb->y())
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    "Vector2fData component missing"});
+                                    context + " Vector2fData component missing"});
   sf::Vector2f vec;
   vec.x = vec_fb->x();
   vec.y = vec_fb->y();
@@ -69,8 +63,6 @@ std::expected<std::monostate, FailInfo>
 FlatbuffersUIStyleDataProvider::ConfigureBaseStyle(
     const StyleData *style_fb, Style &style, const std::string &style_name) {
 
-  std::cout << "[DEBUG] Configuring base style: " << style_name << std::endl;
-
   if (!style_fb)
     return std::unexpected(
         FailInfo{FailMode::FlatbuffersDataNotFound, style_name + " missing"});
@@ -79,19 +71,19 @@ FlatbuffersUIStyleDataProvider::ConfigureBaseStyle(
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     style_name + ".background_color missing"});
 
-  std::cout << "[DEBUG] background_color found." << std::endl;
-  auto bg_color_result = ToColor(style_fb->background_color());
+  auto bg_color_result = ToColor(style_fb->background_color(),
+                                  style_name + ".background_color");
   if (!bg_color_result.has_value())
     return std::unexpected(bg_color_result.error());
 
   style.background_color = bg_color_result.value();
 
-  std::cout << "[DEBUG] border_color found." << std::endl;
   if (!style_fb->border_color())
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     style_name + ".border_color missing"});
 
-  auto border_color_result = ToColor(style_fb->border_color());
+  auto border_color_result = ToColor(style_fb->border_color(),
+                                      style_name + ".border_color");
   if (!border_color_result.has_value())
     return std::unexpected(border_color_result.error());
   style.border_color = border_color_result.value();
@@ -112,7 +104,8 @@ FlatbuffersUIStyleDataProvider::ConfigureBaseStyle(
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     style_name + ".inner_margin missing"});
 
-  auto inner_margin_result = ToVec2f(style_fb->inner_margin());
+  auto inner_margin_result = ToVec2f(style_fb->inner_margin(),
+                                      style_name + ".inner_margin");
   if (!inner_margin_result.has_value())
     return std::unexpected(inner_margin_result.error());
   style.inner_margin = inner_margin_result.value();
@@ -121,7 +114,8 @@ FlatbuffersUIStyleDataProvider::ConfigureBaseStyle(
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     style_name + ".minimum_size missing"});
 
-  auto min_size_result = ToVec2f(style_fb->minimum_size());
+  auto min_size_result = ToVec2f(style_fb->minimum_size(),
+                                  style_name + ".minimum_size");
   if (!min_size_result.has_value())
     return std::unexpected(min_size_result.error());
   style.minimum_size = min_size_result.value();
@@ -130,7 +124,8 @@ FlatbuffersUIStyleDataProvider::ConfigureBaseStyle(
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     style_name + ".maximum_size missing"});
 
-  auto max_size_result = ToVec2f(style_fb->maximum_size());
+  auto max_size_result = ToVec2f(style_fb->maximum_size(),
+                                  style_name + ".maximum_size");
   if (!max_size_result.has_value())
     return std::unexpected(max_size_result.error());
   style.maximum_size = max_size_result.value();
@@ -143,7 +138,6 @@ std::expected<std::monostate, FailInfo>
 FlatbuffersUIStyleDataProvider::ConfigurePanelStyle(
     const PanelStyleData *panel_fb, PanelStyle &panel_style) {
 
-  std::cout << "[DEBUG] Configuring PanelStyle..." << std::endl;
   if (!panel_fb)
     return std::unexpected(
         FailInfo{FailMode::FlatbuffersDataNotFound, "panel_style missing"});
@@ -153,7 +147,6 @@ FlatbuffersUIStyleDataProvider::ConfigurePanelStyle(
                                     "panel_style.style missing"});
 
   const auto *panel_style_fb = panel_fb->style();
-  std::cout << "[DEBUG] panel_style_fb obtained." << std::endl;
   auto base_result =
       ConfigureBaseStyle(panel_style_fb, panel_style, "panel_style.style");
 
@@ -200,12 +193,14 @@ FlatbuffersUIStyleDataProvider::ConfigureButtonStyle(
         FailInfo{FailMode::FlatbuffersDataNotFound,
                  "button_style.font_size missing or set to 0"});
 
-  auto text_color_result = ToColor(button_fb->text_color());
+  auto text_color_result = ToColor(button_fb->text_color(),
+                                    "button_style.text_color");
   if (!text_color_result.has_value())
     return std::unexpected(text_color_result.error());
   button_style.text_color = text_color_result.value();
 
-  auto hover_color_result = ToColor(button_fb->hover_color());
+  auto hover_color_result = ToColor(button_fb->hover_color(),
+                                     "button_style.hover_color");
   if (!hover_color_result.has_value())
     return std::unexpected(hover_color_result.error());
   button_style.hover_color = hover_color_result.value();
@@ -283,12 +278,14 @@ FlatbuffersUIStyleDataProvider::ConfigureDropDownListStyle(
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     "drop_down_list_style.font missing"});
 
-  auto text_color_result = ToColor(dd_list_fb->text_color());
+  auto text_color_result = ToColor(dd_list_fb->text_color(),
+                                    "drop_down_list_style.text_color");
   if (!text_color_result.has_value())
     return std::unexpected(text_color_result.error());
   dd_list_style.text_color = text_color_result.value();
 
-  auto hover_color_result = ToColor(dd_list_fb->hover_color());
+  auto hover_color_result = ToColor(dd_list_fb->hover_color(),
+                                     "drop_down_list_style.hover_color");
   if (!hover_color_result.has_value())
     return std::unexpected(hover_color_result.error());
   dd_list_style.hover_color = hover_color_result.value();
@@ -334,12 +331,14 @@ FlatbuffersUIStyleDataProvider::ConfigureDropDownItemStyle(
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     "drop_down_item_style.font missing"});
 
-  auto text_color_result = ToColor(dd_item_fb->text_color());
+  auto text_color_result = ToColor(dd_item_fb->text_color(),
+                                    "drop_down_item_style.text_color");
   if (!text_color_result.has_value())
     return std::unexpected(text_color_result.error());
   dd_item_style.text_color = text_color_result.value();
 
-  auto hover_color_result = ToColor(dd_item_fb->hover_color());
+  auto hover_color_result = ToColor(dd_item_fb->hover_color(),
+                                     "drop_down_item_style.hover_color");
   if (!hover_color_result.has_value())
     return std::unexpected(hover_color_result.error());
   dd_item_style.hover_color = hover_color_result.value();
@@ -383,12 +382,14 @@ FlatbuffersUIStyleDataProvider::ConfigureDropDownButtonStyle(
         FailInfo{FailMode::FlatbuffersDataNotFound,
                  "drop_down_button_style.hover_color missing"});
 
-  auto triangle_color_result = ToColor(dd_button_fb->triangle_color());
+  auto triangle_color_result = ToColor(dd_button_fb->triangle_color(),
+                                        "drop_down_button_style.triangle_color");
   if (!triangle_color_result.has_value())
     return std::unexpected(triangle_color_result.error());
   dd_button_style.triangle_color = triangle_color_result.value();
 
-  auto hover_color_result = ToColor(dd_button_fb->hover_color());
+  auto hover_color_result = ToColor(dd_button_fb->hover_color(),
+                                     "drop_down_button_style.hover_color");
   if (!hover_color_result.has_value())
     return std::unexpected(hover_color_result.error());
   dd_button_style.hover_color = hover_color_result.value();
@@ -403,14 +404,12 @@ FlatbuffersUIStyleDataProvider::ProvideUIStyles() {
   // Create FlatbuffersDataLoader
   FlatbuffersDataLoader data_loader;
 
-  std::cout << "Providing UI styles from flatbuffers..." << std::endl;
   // Get UIStyle data
   auto get_data_result = data_loader.ProvideUIStylesData();
   if (!get_data_result)
     return std::unexpected(get_data_result.error());
   auto all_ui_styles = get_data_result.value();
 
-  std::cout << "Configuring UI styles from flatbuffers..." << std::endl;
   // Create vector to add styles to
   std::vector<UIStyle> ui_styles;
 
@@ -424,21 +423,19 @@ FlatbuffersUIStyleDataProvider::ProvideUIStyles() {
       return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                       "style_data.name missing"});
     ui_style.name = style_data->name()->str();
-    std::cout << "[DEBUG: 1] " << std::endl;
+
     // Configure PanelStyle
     auto panel_result =
         ConfigurePanelStyle(style_data->panel_style(), ui_style.panel_style);
     if (!panel_result.has_value())
       return std::unexpected(panel_result.error());
 
-    std::cout << "[DEBUG: 2] " << std::endl;
     // Configure ButtonStyle
     auto button_result =
         ConfigureButtonStyle(style_data->button_style(), ui_style.button_style);
     if (!button_result.has_value())
       return std::unexpected(button_result.error());
 
-    std::cout << "[DEBUG: 3] " << std::endl;
     // Configure DropDownContainerStyle
     if (!style_data->drop_down_container_style())
       return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
@@ -450,7 +447,6 @@ FlatbuffersUIStyleDataProvider::ProvideUIStyles() {
     if (!dd_container_result.has_value())
       return std::unexpected(dd_container_result.error());
 
-    std::cout << "[DEBUG: 4] " << std::endl;
     // Configure DropDownListStyle
     if (!style_data->drop_down_list_style())
       return std::unexpected(
@@ -461,7 +457,6 @@ FlatbuffersUIStyleDataProvider::ProvideUIStyles() {
     if (!dd_list_result.has_value())
       return std::unexpected(dd_list_result.error());
 
-    std::cout << "[DEBUG: 5] " << std::endl;
     // Configure DropDownItemStyle
     if (!style_data->drop_down_item_style())
       return std::unexpected(
@@ -472,7 +467,6 @@ FlatbuffersUIStyleDataProvider::ProvideUIStyles() {
     if (!dd_item_result.has_value())
       return std::unexpected(dd_item_result.error());
 
-    std::cout << "[DEBUG: 6] " << std::endl;
     // Configure DropDownButtonStyle
     if (!style_data->drop_down_button_style())
       return std::unexpected(
@@ -485,9 +479,6 @@ FlatbuffersUIStyleDataProvider::ProvideUIStyles() {
 
     ui_styles.push_back(ui_style);
   }
-
-  std::cout << "Provided " << ui_styles.size() << " UI styles from flatbuffers."
-            << std::endl;
 
   return ui_styles;
 }
