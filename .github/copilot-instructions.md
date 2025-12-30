@@ -120,10 +120,12 @@ The project follows the [Pitchfork](https://github.com/vector-of-bool/pitchfork)
 
 ### Key Classes and Patterns
 
-#### PathProvider
-- Provides absolute paths to data files
-- Configured via CMake with source directory
-- `EnvironmentType` is set once per runtime
+#### Path Configuration
+- Compile-time path selection via `paths.h` namespace
+- Controlled by `environment_config` INTERFACE library in `src/CMakeLists.txt`
+- Production code uses `data/` directory (STEAMROT_ENV_DEBUG defined)
+- Test code uses `tests/data/` directory (no macro defined)
+- See [PATH_CONFIGURATION_SOLUTION.md](../documentation/configuration/PATH_CONFIGURATION_SOLUTION.md) for details
 
 #### Components
 - Pure data containers with no logic
@@ -533,7 +535,6 @@ void NewLogic::ProcessLogic() {
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("NewLogic::NewLogic Constructor", "[NewLogic]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
   
   steamrot::NewLogic new_logic(
@@ -542,7 +543,6 @@ TEST_CASE("NewLogic::NewLogic Constructor", "[NewLogic]") {
 }
 
 TEST_CASE("NewLogic::ProcessLogic performs expected logic", "[NewLogic]") {
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
   
   auto logic_context = test_context.GetLogicContextForTestScene();
@@ -574,7 +574,6 @@ add_executable(test_logic
 TEST_CASE("LogicFactory creates correct Logic instances for YourScene",
           "[LogicFactory]") {
 
-  steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context{
       steamrot::SceneType::SceneType_YOUR_SCENE};
   
@@ -1424,7 +1423,7 @@ load_test_data_configs(const std::string& subdirectory);
 
 1. **FlatBuffers Segfaults**: Always check for null before accessing FlatBuffers fields
 2. **Component Registration**: Don't forget to register new components in ComponentRegister
-3. **PathProvider**: Set EnvironmentType only once per runtime
+3. **Path Configuration**: Production code links to `environment_config`, test code doesn't
 4. **Indentation**: Use 2 spaces, not tabs
 5. **Member Prefix**: Remember `m_` prefix for member variables
 6. **Component Prefix**: Use `C` prefix for component classes
