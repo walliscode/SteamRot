@@ -132,6 +132,131 @@ ConfigureSceneResources()
   └─> Call scene.m_scene_resources.scene_texture.create(width, height)
 ```
 
+### Detailed Implementation Steps
+
+#### Step 1: Add ContextData Loading to FlatbuffersDataLoader
+
+**File:** `src/data_providers/FlatbuffersDataLoader.h`
+
+Add method declaration:
+```cpp
+/////////////////////////////////////////////////
+/// @brief Provides ContextData from binary file
+/////////////////////////////////////////////////
+std::expected<const ContextData *, FailInfo> ProvideContextData() const;
+```
+
+**File:** `src/data_providers/FlatbuffersDataLoader.cpp`
+
+Add method implementation:
+```cpp
+std::expected<const ContextData *, FailInfo>
+FlatbuffersDataLoader::ProvideContextData() const {
+  auto file_path = GetFilePathFromEnvironmentAndCategory(
+      DataCategory::Context, "context_data");
+
+  auto buffer_result = LoadBinaryFile(file_path);
+  if (!buffer_result.has_value())
+    return std::unexpected(buffer_result.error());
+
+  const ContextData *context_data =
+      GetContextData(buffer_result.value().data());
+
+  if (!context_data)
+    return std::unexpected(
+        FailInfo{FailMode::FlatbuffersDataNotFound,
+                 "ContextData could not be loaded from binary file"});
+
+  return context_data;
+}
+```
+
+#### Step 2: Update FlatbuffersSceneConfigurator
+
+**File:** `src/scenes/FlatbuffersSceneConfigurator.cpp`
+
+Replace the TODO implementation in `ConfigureSceneResources()`:
+
+```cpp
+std::expected<std::monostate, FailInfo>
+FlatbuffersSceneConfigurator::ConfigureSceneResources(
+    Scene &scene, const SceneData *scene_data) {
+
+  // check for null SceneData
+  if (!scene_data)
+    return std::unexpected(
+        FailInfo(FailMode::NullPointer, "SceneData pointer is null"));
+
+  // cast to derived SceneData type
+  FbsSceneData *fbs_scene_data =
+      dynamic_cast<FbsSceneData *>(const_cast<SceneData *>(scene_data));
+
+  // check its valid
+  if (!fbs_scene_data)
+    return std::unexpected(
+        FailInfo(FailMode::InvalidCast, "SceneData is not FbsSceneData"));
+
+  // Get GameContext to access data providers
+  const GameContext &game_context = scene.GetSceneContext().engine_resources.
+      // Note: This is a shortened reference, actual access through scene
+
+  // Load context data
+  FlatbuffersDataLoader loader;
+  auto context_data_result = loader.ProvideContextData();
+  if (!context_data_result.has_value())
+    return std::unexpected(context_data_result.error());
+
+  const ContextData *context_data = context_data_result.value();
+
+  // Find SceneContextConfig for this scene type
+  const SceneContextConfig *scene_config = nullptr;
+  if (context_data->scene_contexts()) {
+    for (const auto *config : *context_data->scene_contexts()) {
+      if (config && config->scene_type() == scene.GetSceneInfo().type) {
+        scene_config = config;
+        break;
+      }
+    }
+  }
+
+  // Validate we found the config
+  if (!scene_config) {
+    return std::unexpected(
+        FailInfo{FailMode::ConfigurationNotFound,
+                 "SceneContextConfig not found for scene type"});
+  }
+
+  // Initialize the render texture with configured dimensions
+  unsigned int width = scene_config->render_texture_width();
+  unsigned int height = scene_config->render_texture_height();
+
+  if (!scene.m_scene_resources.scene_texture.create(width, height)) {
+    return std::unexpected(
+        FailInfo{FailMode::ResourceInitializationFailed,
+                 "Failed to create render texture"});
+  }
+
+  return std::monostate{};
+}
+```
+
+#### Step 3: Add Required Includes
+
+**File:** `src/scenes/FlatbuffersSceneConfigurator.cpp`
+
+Add to header includes:
+```cpp
+#include "FlatbuffersDataLoader.h"
+#include "context_data_generated.h"
+```
+
+#### Step 4: Build System Integration
+
+The FlatBuffers compilation should already be set up, but verify:
+- `context_data.fbs` is in compilation list
+- Generated header `context_data_generated.h` is available after build
+- CMake properly handles FlatBuffers code generation
+
 ---
 
 ## Testing Strategy
@@ -191,23 +316,85 @@ Not strictly necessary for this fix, as it's primarily a configuration applicati
 
 ### Phase 1: Core Fix
 1. ✅ Analyze and document the issue (this document)
-2. ⬜ Modify `FlatbuffersSceneConfigurator::ConfigureSceneResources()`
-   - Access `GameContext` → `EngineResources` → `ContextData`
+2. ✅ Document detailed implementation steps
+3. ⬜ Add `ProvideContextData()` method to `FlatbuffersDataLoader`
+4. ⬜ Modify `FlatbuffersSceneConfigurator::ConfigureSceneResources()`
+   - Load ContextData via FlatbuffersDataLoader
    - Find matching `SceneContextConfig` for scene type
    - Call `scene.m_scene_resources.scene_texture.create(width, height)`
-3. ⬜ Build and verify no compilation errors
-4. ⬜ Run game and visually verify rendering works
+5. ⬜ Add required includes (`context_data_generated.h`, `FlatbuffersDataLoader.h`)
+6. ⬜ (Note: Build happens locally by user - agents do not build)
 
-### Phase 2: Verification
-5. ⬜ Test title scene rendering
-6. ⬜ Test crafting scene rendering
-7. ⬜ Test scene transitions
-8. ⬜ Take screenshots for documentation
+### Phase 2: Verification (User will perform)
+7. ⬜ Build project locally
+8. ⬜ Test title scene rendering
+9. ⬜ Test crafting scene rendering
+10. ⬜ Test scene transitions
+11. ⬜ Take screenshots for documentation
 
 ### Phase 3: Documentation
-9. ⬜ Update this document with results
-10. ⬜ Add code comments explaining the fix
-11. ⬜ Commit changes with descriptive message
+12. ⬜ Update this document with implementation results
+13. ⬜ Add code comments explaining the fix
+14. ⬜ Commit changes with descriptive message
+
+---
+
+## Code Examples
+
+### Example: Accessing Scene from Configurator
+
+The `ConfigureSceneResources()` method has access to the `Scene` object:
+```cpp
+// Scene provides access to SceneContext
+SceneContext scene_context = scene.GetSceneContext();
+
+// SceneContext provides access to EngineResources
+EngineResources &engine_resources = scene_context.engine_resources;
+
+// EngineResources provides DataAccessFactory
+DataAccessFactory &data_factory = engine_resources.data_access_factory;
+
+// Can also access scene info directly
+SceneType scene_type = scene.GetSceneInfo().type;
+```
+
+### Example: Render Texture Creation
+
+SFML RenderTexture initialization:
+```cpp
+sf::RenderTexture &texture = scene.m_scene_resources.scene_texture;
+
+// Create with specific dimensions
+unsigned int width = 800;
+unsigned int height = 600;
+
+if (!texture.create(width, height)) {
+    // Handle error - creation failed
+    return std::unexpected(FailInfo{...});
+}
+
+// After successful creation, texture is ready for rendering
+```
+
+### Example: FlatBuffers Data Iteration
+
+Finding config for specific scene type:
+```cpp
+const ContextData *context_data = /* loaded from file */;
+
+// Iterate through scene context configs
+if (context_data->scene_contexts()) {
+    for (const auto *config : *context_data->scene_contexts()) {
+        // Always null-check FlatBuffers optional fields
+        if (config && config->scene_type() == desired_scene_type) {
+            // Found matching config
+            uint32_t width = config->render_texture_width();
+            uint32_t height = config->render_texture_height();
+            break;
+        }
+    }
+}
+```
 
 ---
 
