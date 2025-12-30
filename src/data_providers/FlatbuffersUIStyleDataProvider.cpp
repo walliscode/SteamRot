@@ -25,10 +25,6 @@ std::expected<sf::Color, FailInfo> ToColor(const ColorData *color_fb,
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     context + " ColorData is null"});
 
-  if (!color_fb->r() || !color_fb->g() || !color_fb->b() || !color_fb->a())
-    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    context + " ColorData component missing"});
-
   sf::Color color;
   color.r = color_fb->r();
   color.g = color_fb->g();
@@ -43,9 +39,6 @@ std::expected<sf::Vector2f, FailInfo> ToVec2f(const Vector2fData *vec_fb,
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     context + " Vector2fData is null"});
 
-  if (!vec_fb->x() || !vec_fb->y())
-    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    context + " Vector2fData component missing"});
   sf::Vector2f vec;
   vec.x = vec_fb->x();
   vec.y = vec_fb->y();
