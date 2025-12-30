@@ -56,16 +56,8 @@ FlatbuffersUIStyleDataProvider::ConfigureBaseStyle(
                                     style_name + ".border_color missing"});
   style.border_color = ToColor(style_fb->border_color());
 
-  if (!style_fb->border_thickness()) {
-    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    style_name + ".border_thickness missing"});
-  } else {
-    style.border_thickness = style_fb->border_thickness();
-  }
+  style.border_thickness = style_fb->border_thickness();
 
-  if (!style_fb->radius_resolution())
-    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    style_name + ".radius_resolution missing"});
   style.radius_resolution = style_fb->radius_resolution();
 
   if (!style_fb->inner_margin())
@@ -140,11 +132,6 @@ FlatbuffersUIStyleDataProvider::ConfigureButtonStyle(
   if (!button_fb->font())
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     "button_style.font missing"});
-
-  if (!button_fb->font_size())
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound,
-                 "button_style.font_size missing or set to 0"});
 
   button_style.text_color = ToColor(button_fb->text_color());
   button_style.hover_color = ToColor(button_fb->hover_color());
@@ -246,6 +233,10 @@ FlatbuffersUIStyleDataProvider::ConfigureDropDownItemStyle(
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     "drop_down_item_style missing"});
 
+  if (!dd_item_fb->style())
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    "drop_down_item_style.style missing"});
+
   const auto *dd_item_style_fb = dd_item_fb->style();
   auto base_result = ConfigureBaseStyle(dd_item_style_fb, dd_item_style,
                                         "drop_down_item_style.style");
@@ -290,6 +281,10 @@ FlatbuffersUIStyleDataProvider::ConfigureDropDownButtonStyle(
   if (!dd_button_fb)
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     "drop_down_button_style missing"});
+
+  if (!dd_button_fb->style())
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    "drop_down_button_style.style missing"});
 
   const auto *dd_button_style_fb = dd_button_fb->style();
   auto base_result = ConfigureBaseStyle(dd_button_style_fb, dd_button_style,

@@ -389,6 +389,36 @@ TEST_CASE("FlatbuffersUIStyleDataProvider::ConfigureDropDownItemStyle with "
 }
 
 TEST_CASE("FlatbuffersUIStyleDataProvider::ConfigureDropDownItemStyle with "
+          "null style returns error",
+          "[unit][FlatbuffersUIStyleDataProvider]") {
+  std::unordered_map<std::string, std::shared_ptr<const sf::Font>> fonts_map;
+  steamrot::FlatbuffersUIStyleDataProvider provider(fonts_map);
+
+  flatbuffers::FlatBufferBuilder fbb;
+
+  auto text_color = steamrot::CreateColorData(fbb, 240, 240, 240, 255);
+  auto hover_color = steamrot::CreateColorData(fbb, 180, 180, 180, 255);
+  auto font_name = fbb.CreateString("item_font");
+
+  // Create with null style pointer
+  auto dd_item_offset = steamrot::CreateDropDownItemStyleData(
+      fbb, 0, text_color, hover_color, font_name, 12);
+
+  fbb.Finish(dd_item_offset);
+
+  const steamrot::DropDownItemStyleData *dd_item_fb =
+      flatbuffers::GetRoot<steamrot::DropDownItemStyleData>(
+          fbb.GetBufferPointer());
+
+  DropDownItemStyle dd_item_style;
+  auto result = provider.ConfigureDropDownItemStyle(dd_item_fb, dd_item_style);
+
+  REQUIRE(!result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message == "drop_down_item_style.style missing");
+}
+
+TEST_CASE("FlatbuffersUIStyleDataProvider::ConfigureDropDownItemStyle with "
           "valid data configures correctly",
           "[unit][FlatbuffersUIStyleDataProvider]") {
   std::unordered_map<std::string, std::shared_ptr<const sf::Font>> fonts_map;
@@ -444,6 +474,36 @@ TEST_CASE("FlatbuffersUIStyleDataProvider::ConfigureDropDownButtonStyle with"
   REQUIRE(!result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
   REQUIRE(result.error().message == "drop_down_button_style missing");
+}
+
+TEST_CASE("FlatbuffersUIStyleDataProvider::ConfigureDropDownButtonStyle with "
+          "null style returns error",
+          "[unit][FlatbuffersUIStyleDataProvider]") {
+  std::unordered_map<std::string, std::shared_ptr<const sf::Font>> fonts_map;
+  steamrot::FlatbuffersUIStyleDataProvider provider(fonts_map);
+
+  flatbuffers::FlatBufferBuilder fbb;
+
+  auto triangle_color = steamrot::CreateColorData(fbb, 255, 200, 0, 255);
+  auto hover_color = steamrot::CreateColorData(fbb, 170, 170, 170, 255);
+
+  // Create with null style pointer
+  auto dd_button_offset = steamrot::CreateDropDownButtonStyleData(
+      fbb, 0, triangle_color, hover_color);
+
+  fbb.Finish(dd_button_offset);
+
+  const steamrot::DropDownButtonStyleData *dd_button_fb =
+      flatbuffers::GetRoot<steamrot::DropDownButtonStyleData>(
+          fbb.GetBufferPointer());
+
+  DropDownButtonStyle dd_button_style;
+  auto result =
+      provider.ConfigureDropDownButtonStyle(dd_button_fb, dd_button_style);
+
+  REQUIRE(!result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message == "drop_down_button_style.style missing");
 }
 
 TEST_CASE("FlatbuffersUIStyleDataProvider::ConfigureDropDownButtonStyle with"
