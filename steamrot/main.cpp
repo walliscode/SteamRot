@@ -15,6 +15,8 @@ int main() {
     auto run_game_result = game_engine.RunGame();
     if (!run_game_result) {
 
+      // print error message to console
+      std::cerr << "Error: " << run_game_result.error().message << std::endl;
       // run the error loop with the captured fail info
       error_loop::RunErrorLoop(run_game_result.error());
     }
