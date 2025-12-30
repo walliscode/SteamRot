@@ -62,7 +62,7 @@ SteamRot/
 
 ### Core Systems
 
-- **PathProvider**: Provides absolute paths to data files, configured via CMake
+- **Path Configuration**: Compile-time path selection for production vs test environments (see [PATH_CONFIGURATION_SOLUTION.md](documentation/configuration/PATH_CONFIGURATION_SOLUTION.md))
 - **Entity-Component System**: Components are pure data; Logic classes handle behavior
 - **Logic System**: Scene-specific logic organized by type (Action, Render, Collision, Movement)
 - **Event System**: Event-driven communication between systems
