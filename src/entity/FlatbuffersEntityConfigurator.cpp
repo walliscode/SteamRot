@@ -15,6 +15,7 @@
 #include "entity_memory.h"
 #include "ui_state_generated.h"
 #include <expected>
+#include <iostream>
 #include <variant>
 
 namespace steamrot {
@@ -30,6 +31,8 @@ std::expected<std::monostate, FailInfo>
 FlatbuffersEntityConfigurator::ConfigureEntityMemoryPool(
     EntityMemoryPool &emp) {
 
+  std::cout << "EMP size before config: "
+            << entity::memory::GetMemoryPoolSize(emp) << std::endl;
   if (!m_entity_collection_data.entity_memory_pool_size())
     return std::unexpected(
         FailInfo{FailMode::FlatbuffersDataNotFound,
@@ -47,6 +50,12 @@ FlatbuffersEntityConfigurator::ConfigureEntityMemoryPool(
   auto second_layer_result = ConfigureSecondLayerComponents(emp);
   if (!second_layer_result.has_value())
     return std::unexpected(second_layer_result.error());
+
+  std::cout << "EMP size after config: "
+            << entity::memory::GetMemoryPoolSize(emp) << std::endl;
+
+  size_t total_active_components = 0;
+  // count total active components
 
   return std::monostate();
 };

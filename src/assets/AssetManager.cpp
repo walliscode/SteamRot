@@ -107,8 +107,6 @@ std::expected<std::monostate, FailInfo> AssetManager::LoadUIStyles() {
   if (!ui_style_data_result.has_value())
     return std::unexpected<FailInfo>(ui_style_data_result.error());
 
-  std::cout << "Loaded " << ui_style_data_result.value().size()
-            << " UI styles from flatbuffers." << std::endl;
   // for each UIStyle object, add to map
   for (const auto &ui_style : ui_style_data_result.value()) {
     auto insert_result = m_ui_styles.insert({ui_style.name, ui_style});
