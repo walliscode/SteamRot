@@ -19,29 +19,53 @@ namespace steamrot {
 namespace {
 /////////////////////////////////////////////////
 std::expected<sf::Color, FailInfo> ToColor(const ColorData *color_fb,
-                                            const std::string &context) {
+                                           const std::string &context) {
 
   if (!color_fb)
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     context + " ColorData is null"});
 
   sf::Color color;
-  color.r = color_fb->r();
-  color.g = color_fb->g();
-  color.b = color_fb->b();
-  color.a = color_fb->a();
+  if (!color_fb->r()) {
+    color.r = 0;
+  } else {
+    color.r = color_fb->r();
+  }
+  if (!color_fb->g()) {
+    color.g = 0;
+  } else {
+    color.g = color_fb->g();
+  }
+  if (!color_fb->b()) {
+    color.b = 0;
+  } else {
+    color.b = color_fb->b();
+  }
+  if (!color_fb->a()) {
+    color.a = 255;
+  } else {
+    color.a = color_fb->a();
+  }
   return color;
 }
 /////////////////////////////////////////////////
 std::expected<sf::Vector2f, FailInfo> ToVec2f(const Vector2fData *vec_fb,
-                                               const std::string &context) {
+                                              const std::string &context) {
   if (!vec_fb)
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     context + " Vector2fData is null"});
 
   sf::Vector2f vec;
-  vec.x = vec_fb->x();
-  vec.y = vec_fb->y();
+  if (!vec_fb->x()) {
+    vec.x = 0.0f;
+  } else {
+    vec.x = vec_fb->x();
+  }
+  if (!vec_fb->y()) {
+    vec.y = 0.0f;
+  } else {
+    vec.y = vec_fb->y();
+  }
   return vec;
 }
 } // namespace
@@ -64,64 +88,57 @@ FlatbuffersUIStyleDataProvider::ConfigureBaseStyle(
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     style_name + ".background_color missing"});
 
-  auto bg_color_result = ToColor(style_fb->background_color(),
-                                  style_name + ".background_color");
+  auto bg_color_result =
+      ToColor(style_fb->background_color(), style_name + ".background_color");
   if (!bg_color_result.has_value())
     return std::unexpected(bg_color_result.error());
 
   style.background_color = bg_color_result.value();
 
-  if (!style_fb->border_color())
-    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    style_name + ".border_color missing"});
+  auto border_color_result =
+      ToColor(style_fb->border_color(), style_name + ".border_color");
 
-  auto border_color_result = ToColor(style_fb->border_color(),
-                                      style_name + ".border_color");
-  if (!border_color_result.has_value())
+  if (!border_color_result.has_value()) {
     return std::unexpected(border_color_result.error());
-  style.border_color = border_color_result.value();
+  } else {
+    style.border_color = border_color_result.value();
+  }
 
   if (!style_fb->border_thickness()) {
-    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    style_name + ".border_thickness missing"});
+    style.border_thickness = 0.0f;
   } else {
     style.border_thickness = style_fb->border_thickness();
   }
 
-  if (!style_fb->radius_resolution())
-    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    style_name + ".radius_resolution missing"});
-  style.radius_resolution = style_fb->radius_resolution();
+  if (!style_fb->radius_resolution()) {
+    style.radius_resolution = 0;
+  } else {
+    style.radius_resolution = style_fb->radius_resolution();
+  }
 
-  if (!style_fb->inner_margin())
-    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    style_name + ".inner_margin missing"});
-
-  auto inner_margin_result = ToVec2f(style_fb->inner_margin(),
-                                      style_name + ".inner_margin");
-  if (!inner_margin_result.has_value())
+  auto inner_margin_result =
+      ToVec2f(style_fb->inner_margin(), style_name + ".inner_margin");
+  if (!inner_margin_result.has_value()) {
     return std::unexpected(inner_margin_result.error());
-  style.inner_margin = inner_margin_result.value();
+  } else {
+    style.inner_margin = inner_margin_result.value();
+  }
 
-  if (!style_fb->minimum_size())
-    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    style_name + ".minimum_size missing"});
-
-  auto min_size_result = ToVec2f(style_fb->minimum_size(),
-                                  style_name + ".minimum_size");
-  if (!min_size_result.has_value())
+  auto min_size_result =
+      ToVec2f(style_fb->minimum_size(), style_name + ".minimum_size");
+  if (!min_size_result.has_value()) {
     return std::unexpected(min_size_result.error());
-  style.minimum_size = min_size_result.value();
+  } else {
+    style.minimum_size = min_size_result.value();
+  }
 
-  if (!style_fb->maximum_size())
-    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    style_name + ".maximum_size missing"});
-
-  auto max_size_result = ToVec2f(style_fb->maximum_size(),
-                                  style_name + ".maximum_size");
-  if (!max_size_result.has_value())
+  auto max_size_result =
+      ToVec2f(style_fb->maximum_size(), style_name + ".maximum_size");
+  if (!max_size_result.has_value()) {
     return std::unexpected(max_size_result.error());
-  style.maximum_size = max_size_result.value();
+  } else {
+    style.maximum_size = max_size_result.value();
+  }
 
   return std::monostate{};
 }
@@ -169,14 +186,6 @@ FlatbuffersUIStyleDataProvider::ConfigureButtonStyle(
   if (!base_result.has_value())
     return std::unexpected(base_result.error());
 
-  if (!button_fb->text_color())
-    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    "button_style.text_color missing"});
-
-  if (!button_fb->hover_color())
-    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    "button_style.hover_color missing"});
-
   if (!button_fb->font())
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     "button_style.font missing"});
@@ -186,14 +195,14 @@ FlatbuffersUIStyleDataProvider::ConfigureButtonStyle(
         FailInfo{FailMode::FlatbuffersDataNotFound,
                  "button_style.font_size missing or set to 0"});
 
-  auto text_color_result = ToColor(button_fb->text_color(),
-                                    "button_style.text_color");
+  auto text_color_result =
+      ToColor(button_fb->text_color(), "button_style.text_color");
   if (!text_color_result.has_value())
     return std::unexpected(text_color_result.error());
   button_style.text_color = text_color_result.value();
 
-  auto hover_color_result = ToColor(button_fb->hover_color(),
-                                     "button_style.hover_color");
+  auto hover_color_result =
+      ToColor(button_fb->hover_color(), "button_style.hover_color");
   if (!hover_color_result.has_value())
     return std::unexpected(hover_color_result.error());
   button_style.hover_color = hover_color_result.value();
@@ -258,27 +267,18 @@ FlatbuffersUIStyleDataProvider::ConfigureDropDownListStyle(
   if (!base_result.has_value())
     return std::unexpected(base_result.error());
 
-  if (!dd_list_fb->text_color())
-    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    "drop_down_list_style.text_color missing"});
-
-  if (!dd_list_fb->hover_color())
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound,
-                 "drop_down_list_style.hover_color missing"});
-
   if (!dd_list_fb->font())
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     "drop_down_list_style.font missing"});
 
-  auto text_color_result = ToColor(dd_list_fb->text_color(),
-                                    "drop_down_list_style.text_color");
+  auto text_color_result =
+      ToColor(dd_list_fb->text_color(), "drop_down_list_style.text_color");
   if (!text_color_result.has_value())
     return std::unexpected(text_color_result.error());
   dd_list_style.text_color = text_color_result.value();
 
-  auto hover_color_result = ToColor(dd_list_fb->hover_color(),
-                                     "drop_down_list_style.hover_color");
+  auto hover_color_result =
+      ToColor(dd_list_fb->hover_color(), "drop_down_list_style.hover_color");
   if (!hover_color_result.has_value())
     return std::unexpected(hover_color_result.error());
   dd_list_style.hover_color = hover_color_result.value();
@@ -311,27 +311,18 @@ FlatbuffersUIStyleDataProvider::ConfigureDropDownItemStyle(
   if (!base_result.has_value())
     return std::unexpected(base_result.error());
 
-  if (!dd_item_fb->text_color())
-    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    "drop_down_item_style.text_color missing"});
-
-  if (!dd_item_fb->hover_color())
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound,
-                 "drop_down_item_style.hover_color missing"});
-
   if (!dd_item_fb->font())
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     "drop_down_item_style.font missing"});
 
-  auto text_color_result = ToColor(dd_item_fb->text_color(),
-                                    "drop_down_item_style.text_color");
+  auto text_color_result =
+      ToColor(dd_item_fb->text_color(), "drop_down_item_style.text_color");
   if (!text_color_result.has_value())
     return std::unexpected(text_color_result.error());
   dd_item_style.text_color = text_color_result.value();
 
-  auto hover_color_result = ToColor(dd_item_fb->hover_color(),
-                                     "drop_down_item_style.hover_color");
+  auto hover_color_result =
+      ToColor(dd_item_fb->hover_color(), "drop_down_item_style.hover_color");
   if (!hover_color_result.has_value())
     return std::unexpected(hover_color_result.error());
   dd_item_style.hover_color = hover_color_result.value();
@@ -365,24 +356,14 @@ FlatbuffersUIStyleDataProvider::ConfigureDropDownButtonStyle(
   if (!base_result.has_value())
     return std::unexpected(base_result.error());
 
-  if (!dd_button_fb->triangle_color())
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound,
-                 "drop_down_button_style.triangle_color missing"});
-
-  if (!dd_button_fb->hover_color())
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound,
-                 "drop_down_button_style.hover_color missing"});
-
   auto triangle_color_result = ToColor(dd_button_fb->triangle_color(),
-                                        "drop_down_button_style.triangle_color");
+                                       "drop_down_button_style.triangle_color");
   if (!triangle_color_result.has_value())
     return std::unexpected(triangle_color_result.error());
   dd_button_style.triangle_color = triangle_color_result.value();
 
   auto hover_color_result = ToColor(dd_button_fb->hover_color(),
-                                     "drop_down_button_style.hover_color");
+                                    "drop_down_button_style.hover_color");
   if (!hover_color_result.has_value())
     return std::unexpected(hover_color_result.error());
   dd_button_style.hover_color = hover_color_result.value();
