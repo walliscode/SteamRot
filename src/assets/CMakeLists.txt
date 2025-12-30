@@ -15,7 +15,6 @@ target_link_libraries(assets
   interfaces
   user_interface
   data_providers
-  environment_config
 )
 
 

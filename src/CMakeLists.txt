@@ -1,11 +1,3 @@
-# Create an interface library for environment configuration
-# This ensures all targets use consistent path configuration
-add_library(environment_config INTERFACE)
-
-# Set environment to use data/ directory for production builds
-# Tests will not link to this target and will default to tests/data
-target_compile_definitions(environment_config INTERFACE STEAMROT_ENV_DEBUG)
-
 add_subdirectory(assets)
 add_subdirectory(components)
 add_subdirectory(configuration)

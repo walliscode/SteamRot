@@ -19,4 +19,16 @@ std::filesystem::path GetSourceDirectory() {
   return source_dir;
 }
 
+/////////////////////////////////////////////////
+std::filesystem::path GetDataDirectory() {
+#if defined(STEAMROT_ENV_PROD) && defined(STEAMROT_ENV_DEBUG)
+#error "Cannot define both STEAMROT_ENV_PROD and STEAMROT_ENV_DEBUG"
+#elif defined(STEAMROT_ENV_PROD) || defined(STEAMROT_ENV_DEBUG)
+  return GetSourceDirectory() / "data";
+#else
+  // Default: Test environment
+  return GetSourceDirectory() / "tests" / "data";
+#endif
+}
+
 } // namespace steamrot::paths

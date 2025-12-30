@@ -8,17 +8,17 @@
 /// - STEAMROT_ENV_DEBUG: Debug environment (data) - same as production
 /// - STEAMROT_ENV_PROD: Production environment (data)
 ///
-/// The environment is controlled via the environment_config interface library
-/// in src/CMakeLists.txt, which defines STEAMROT_ENV_DEBUG for production builds.
-/// Tests do not link to environment_config and default to tests/data.
+/// The SteamRot executable recompiles paths.cpp with STEAMROT_ENV_DEBUG
+/// to use production paths, while the data_providers library (used by tests)
+/// compiles paths.cpp without the macro to use test paths.
 ///
 /// Directory Structure:
 /// - defaults/: Default configuration data (read-only)
 /// - user/: User-specific data and saves (read-write)
 ///
 /// Usage:
-///   // For production code: link to environment_config target
-///   // For test code: do not link to environment_config
+///   // For production (SteamRot): Recompile paths.cpp with STEAMROT_ENV_DEBUG
+///   // For tests: Use data_providers library default (no macro)
 ///   #include "paths.h"
 ///   auto path = steamrot::paths::GetDataDirectory();
 /////////////////////////////////////////////////
@@ -51,17 +51,7 @@ std::filesystem::path GetSourceDirectory();
 ///
 /// @return std::filesystem::path The base data directory path
 /////////////////////////////////////////////////
-inline std::filesystem::path GetDataDirectory() {
-
-#if defined(STEAMROT_ENV_PROD) && defined(STEAMROT_ENV_DEBUG)
-#error "Cannot define both STEAMROT_ENV_PROD and STEAMROT_ENV_DEBUG"
-#elif defined(STEAMROT_ENV_PROD) || defined(STEAMROT_ENV_DEBUG)
-  return GetSourceDirectory() / "data";
-#else
-  // Default: Test environment
-  return GetSourceDirectory() / "tests" / "data";
-#endif
-}
+std::filesystem::path GetDataDirectory();
 
 /////////////////////////////////////////////////
 /// @brief Provides the path to the defaults directory.

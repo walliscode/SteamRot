@@ -30,5 +30,4 @@ target_link_libraries(data_providers
   interfaces
   types
   configuration
-  environment_config
 )
