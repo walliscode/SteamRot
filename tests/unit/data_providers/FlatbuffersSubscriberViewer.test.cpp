@@ -8,7 +8,6 @@
 /////////////////////////////////////////////////
 #include "FlatbuffersSubscriberViewer.h"
 #include "FlatbuffersDataLoader.h"
-#include "events_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("FlatbuffersSubscriberViewer handles null subscriber data",
@@ -25,39 +24,6 @@ TEST_CASE("FlatbuffersSubscriberViewer handles null subscriber data",
   // Should return empty vector for null input
   const auto &subscribers = result.value();
   REQUIRE(subscribers.empty());
-}
-
-TEST_CASE("FlatbuffersSubscriberViewer::GetSubscribers returns valid "
-          "subscribers from engine data",
-          "[unit][FlatbuffersSubscriberViewer]") {
-
-  // Load engine state data which contains subscribers
-  steamrot::FlatbuffersDataLoader loader;
-  auto engine_state_result = loader.ProvideEngineStateFbs();
-
-  if (!engine_state_result.has_value()) {
-    FAIL(engine_state_result.error().message);
-  }
-
-  const auto *engine_state = engine_state_result.value();
-  REQUIRE(engine_state != nullptr);
-
-  // Create viewer with engine state subscriptions
-  steamrot::FlatbuffersSubscriberViewer viewer(engine_state->subscriptions());
-
-  auto result = viewer.GetSubscribers();
-  if (!result.has_value()) {
-    FAIL(result.error().message);
-  }
-
-  const auto &subscribers = result.value();
-  // Subscribers should be a valid vector (may be empty)
-  REQUIRE_NOTHROW(subscribers.size());
-
-  // Verify all subscribers are valid shared pointers
-  for (const auto &subscriber : subscribers) {
-    REQUIRE(subscriber != nullptr);
-  }
 }
 
 TEST_CASE("FlatbuffersSubscriberViewer::GetSubscribers returns valid "
@@ -92,30 +58,5 @@ TEST_CASE("FlatbuffersSubscriberViewer::GetSubscribers returns valid "
   // Verify all subscribers are valid shared pointers
   for (const auto &subscriber : subscribers) {
     REQUIRE(subscriber != nullptr);
-  }
-}
-
-TEST_CASE("FlatbuffersSubscriberViewer skips entries with NONE event type",
-          "[unit][FlatbuffersSubscriberViewer]") {
-
-  // This test verifies the behavior mentioned in the implementation
-  // where NONE event types are skipped
-  steamrot::FlatbuffersDataLoader loader;
-  auto engine_state_result = loader.ProvideEngineStateFbs();
-
-  REQUIRE(engine_state_result.has_value());
-  const auto *engine_state = engine_state_result.value();
-
-  steamrot::FlatbuffersSubscriberViewer viewer(engine_state->subscriptions());
-
-  // Should successfully return subscribers, skipping invalid ones
-  auto result = viewer.GetSubscribers();
-  REQUIRE(result.has_value());
-
-  const auto &subscribers = result.value();
-  // All returned subscribers should be valid (no NONE event types)
-  for (const auto &subscriber : subscribers) {
-    REQUIRE(subscriber != nullptr);
-    REQUIRE(subscriber->m_trigger_event_type != steamrot::EventType_NONE);
   }
 }

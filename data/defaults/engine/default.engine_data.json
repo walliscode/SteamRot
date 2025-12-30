@@ -27,5 +27,12 @@
       }
     ],
     "quit_requested": false
+  },
+  "initial_asset_config": {
+    "fonts": [
+      { "name": "DaddyTimeMonoNerdFont-Regular" },
+      { "name": "Roboto-Regular" }
+    ],
+    "ui_styles": ["default"]
   }
 }

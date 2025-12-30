@@ -27,33 +27,26 @@ std::expected<std::monostate, FailInfo> Engine::StartUp() {
     return std::unexpected(data_provider_result.error());
   }
   IEngineDataProvider &data_provider = *data_provider_result.value();
-  // Load EngineResources configuration
-  auto resources_config_result = data_provider.LoadEngineResourcesConfig();
-  if (!resources_config_result) {
-    return std::unexpected(resources_config_result.error());
+
+  // Load EngineData
+  auto engine_data_result = data_provider.LoadEngineData();
+  if (!engine_data_result) {
+    return std::unexpected(engine_data_result.error());
   }
+  const EngineData &engine_data = engine_data_result.value();
 
   // Configure EngineResources
   auto configure_resources_result = engine::ConfigureEngineResources(
-      m_engine_resources, resources_config_result.value());
+      m_engine_resources, engine_data.engine_resources_config);
   if (!configure_resources_result) {
     return std::unexpected(configure_resources_result.error());
   }
 
   // Load EngineConfig
-  auto engine_config_result = data_provider.LoadEngineConfig();
-  if (!engine_config_result) {
-    return std::unexpected(engine_config_result.error());
-  }
-  // assign straight to member
-  m_engine_config = engine_config_result.value();
+  m_engine_config = engine_data.engine_config;
 
   // Load EngineState
-  auto engine_state_result = data_provider.LoadEngineState();
-  if (!engine_state_result) {
-    return std::unexpected(engine_state_result.error());
-  }
-  m_engine_state = engine_state_result.value();
+  m_engine_state = engine_data.engine_state;
 
   // Register subscriptions with EventHandler
   for (auto &subscriber : m_engine_state.subscriptions) {
@@ -62,6 +55,13 @@ std::expected<std::monostate, FailInfo> Engine::StartUp() {
     if (!register_result.has_value()) {
       return std::unexpected(register_result.error());
     }
+  }
+
+  // Pass initial AssetConfig to AssetManager
+  auto load_initial_assets_result = m_engine_resources.asset_manager.LoadAssets(
+      engine_data.initial_asset_config);
+  if (!load_initial_assets_result) {
+    return std::unexpected(load_initial_assets_result.error());
   }
 
   return std::monostate{};

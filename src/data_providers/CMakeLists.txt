@@ -15,6 +15,7 @@ add_library(data_providers
   FlatbuffersDataLoader.cpp
   data_file_utils.cpp
   paths.cpp
+  asset_config_factory.cpp
 )
 
 target_include_directories(data_providers
