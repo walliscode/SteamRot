@@ -22,16 +22,20 @@ ConfigureAssetConfig(AssetConfig &asset_config,
                                     "AssetConfigFbs data is null."});
   }
 
-  // Configure fonts
-  for (const auto *font_fb_data : *asset_config_fb_data->fonts()) {
-    FontData font_data;
-    font_data.name = font_fb_data->name()->str();
-    asset_config.fonts.push_back(font_data);
+  if (asset_config_fb_data->fonts()) {
+    // Configure fonts
+    for (const auto *font_fb_data : *asset_config_fb_data->fonts()) {
+      FontData font_data;
+      font_data.name = font_fb_data->name()->str();
+      asset_config.fonts.push_back(font_data);
+    }
   }
 
   // Configure UI styles
-  for (const auto *style_fb_data : *asset_config_fb_data->ui_styles()) {
-    asset_config.ui_styles.push_back(style_fb_data->str());
+  if (asset_config_fb_data->ui_styles()) {
+    for (const auto *style_fb_data : *asset_config_fb_data->ui_styles()) {
+      asset_config.ui_styles.push_back(style_fb_data->str());
+    }
   }
 
   return std::monostate{};

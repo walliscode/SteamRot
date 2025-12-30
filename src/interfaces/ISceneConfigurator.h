@@ -80,6 +80,16 @@ public:
   /////////////////////////////////////////////////
   virtual std::expected<std::monostate, FailInfo>
   ConfigureEntities(Scene &scene, const SceneData *scene_data) = 0;
+
+  /////////////////////////////////////////////////
+  /// @brief Pass AssetConfig object to the AssetManager
+  ///
+  /// @param scene Scene from which to get AssetManager ref
+  /// @param scene_data Pointer to SceneData containing AssetConfig
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  PassAssetConfig(Scene &scene, const SceneData *scene_data);
+
   /////////////////////////////////////////////////
   /// @brief Configure the logic map for the scene
   ///
