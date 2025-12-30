@@ -11,6 +11,7 @@
 #include "UIStyle.h"
 #include "types_generated.h"
 #include <expected>
+#include <iostream>
 #include <vector>
 
 namespace steamrot {
@@ -48,29 +49,38 @@ FlatbuffersUIStyleDataProvider::ConfigureBaseStyle(
   if (!style_fb->background_color())
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     style_name + ".background_color missing"});
+  style.background_color = ToColor(style_fb->background_color());
 
   if (!style_fb->border_color())
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     style_name + ".border_color missing"});
+  style.border_color = ToColor(style_fb->border_color());
+
+  if (!style_fb->border_thickness()) {
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    style_name + ".border_thickness missing"});
+  } else {
+    style.border_thickness = style_fb->border_thickness();
+  }
+
+  if (!style_fb->radius_resolution())
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    style_name + ".radius_resolution missing"});
+  style.radius_resolution = style_fb->radius_resolution();
 
   if (!style_fb->inner_margin())
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     style_name + ".inner_margin missing"});
+  style.inner_margin = ToVec2f(style_fb->inner_margin());
 
   if (!style_fb->minimum_size())
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     style_name + ".minimum_size missing"});
+  style.minimum_size = ToVec2f(style_fb->minimum_size());
 
   if (!style_fb->maximum_size())
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     style_name + ".maximum_size missing"});
-
-  style.background_color = ToColor(style_fb->background_color());
-  style.border_color = ToColor(style_fb->border_color());
-  style.border_thickness = style_fb->border_thickness();
-  style.radius_resolution = style_fb->radius_resolution();
-  style.inner_margin = ToVec2f(style_fb->inner_margin());
-  style.minimum_size = ToVec2f(style_fb->minimum_size());
   style.maximum_size = ToVec2f(style_fb->maximum_size());
 
   return std::monostate{};
@@ -84,6 +94,10 @@ FlatbuffersUIStyleDataProvider::ConfigurePanelStyle(
   if (!panel_fb)
     return std::unexpected(
         FailInfo{FailMode::FlatbuffersDataNotFound, "panel_style missing"});
+
+  if (!panel_fb->style())
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    "panel_style.style missing"});
 
   const auto *panel_style_fb = panel_fb->style();
   auto base_result =
@@ -103,6 +117,10 @@ FlatbuffersUIStyleDataProvider::ConfigureButtonStyle(
   if (!button_fb)
     return std::unexpected(
         FailInfo{FailMode::FlatbuffersDataNotFound, "button_style missing"});
+
+  if (!button_fb->style())
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    "button_style.style missing"});
 
   const auto *button_style_fb = button_fb->style();
   auto base_result =
@@ -154,6 +172,10 @@ FlatbuffersUIStyleDataProvider::ConfigureDropDownContainerStyle(
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     "drop_down_container_style missing"});
 
+  if (!dd_container_fb->style())
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    "drop_down_container_style.style missing"});
+
   const auto *dd_container_style_fb = dd_container_fb->style();
   auto base_result =
       ConfigureBaseStyle(dd_container_style_fb, dd_container_style,
@@ -175,6 +197,10 @@ FlatbuffersUIStyleDataProvider::ConfigureDropDownListStyle(
   if (!dd_list_fb)
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     "drop_down_list_style missing"});
+
+  if (!dd_list_fb->style())
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    "drop_down_list_style.style missing"});
 
   const auto *dd_list_style_fb = dd_list_fb->style();
   auto base_result = ConfigureBaseStyle(dd_list_style_fb, dd_list_style,
@@ -295,12 +321,14 @@ FlatbuffersUIStyleDataProvider::ProvideUIStyles() {
   // Create FlatbuffersDataLoader
   FlatbuffersDataLoader data_loader;
 
+  std::cout << "Providing UI styles from flatbuffers..." << std::endl;
   // Get UIStyle data
   auto get_data_result = data_loader.ProvideUIStylesData();
   if (!get_data_result)
     return std::unexpected(get_data_result.error());
   auto all_ui_styles = get_data_result.value();
 
+  std::cout << "Configuring UI styles from flatbuffers..." << std::endl;
   // Create vector to add styles to
   std::vector<UIStyle> ui_styles;
 
@@ -328,6 +356,10 @@ FlatbuffersUIStyleDataProvider::ProvideUIStyles() {
       return std::unexpected(button_result.error());
 
     // Configure DropDownContainerStyle
+    if (!style_data->drop_down_container_style())
+      return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                      "style_data.drop_down_container_style "
+                                      "missing"});
     auto dd_container_result =
         ConfigureDropDownContainerStyle(style_data->drop_down_container_style(),
                                         ui_style.drop_down_container_style);
@@ -335,18 +367,30 @@ FlatbuffersUIStyleDataProvider::ProvideUIStyles() {
       return std::unexpected(dd_container_result.error());
 
     // Configure DropDownListStyle
+    if (!style_data->drop_down_list_style())
+      return std::unexpected(
+          FailInfo{FailMode::FlatbuffersDataNotFound,
+                   "style_data.drop_down_list_style missing"});
     auto dd_list_result = ConfigureDropDownListStyle(
         style_data->drop_down_list_style(), ui_style.drop_down_list_style);
     if (!dd_list_result.has_value())
       return std::unexpected(dd_list_result.error());
 
     // Configure DropDownItemStyle
+    if (!style_data->drop_down_item_style())
+      return std::unexpected(
+          FailInfo{FailMode::FlatbuffersDataNotFound,
+                   "style_data.drop_down_item_style missing"});
     auto dd_item_result = ConfigureDropDownItemStyle(
         style_data->drop_down_item_style(), ui_style.drop_down_item_style);
     if (!dd_item_result.has_value())
       return std::unexpected(dd_item_result.error());
 
     // Configure DropDownButtonStyle
+    if (!style_data->drop_down_button_style())
+      return std::unexpected(
+          FailInfo{FailMode::FlatbuffersDataNotFound,
+                   "style_data.drop_down_button_style missing"});
     auto dd_button_result = ConfigureDropDownButtonStyle(
         style_data->drop_down_button_style(), ui_style.drop_down_button_style);
     if (!dd_button_result.has_value())
@@ -354,6 +398,9 @@ FlatbuffersUIStyleDataProvider::ProvideUIStyles() {
 
     ui_styles.push_back(ui_style);
   }
+
+  std::cout << "Provided " << ui_styles.size() << " UI styles from flatbuffers."
+            << std::endl;
 
   return ui_styles;
 }
