@@ -13,6 +13,7 @@ add_executable(test_data_providers
   FlatbuffersSubscriberViewer.test.cpp
   FlatbuffersUIStyleDataProvider.test.cpp
   asset_config_factory.test.cpp
+  paths.test.cpp
 )
 
 

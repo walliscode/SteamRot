@@ -8,12 +8,17 @@
 /// - STEAMROT_ENV_DEBUG: Debug environment (data) - same as production
 /// - STEAMROT_ENV_PROD: Production environment (data)
 ///
+/// The environment is controlled via the environment_config interface library
+/// in src/CMakeLists.txt, which defines STEAMROT_ENV_DEBUG for production builds.
+/// Tests do not link to environment_config and default to tests/data.
+///
 /// Directory Structure:
 /// - defaults/: Default configuration data (read-only)
 /// - user/: User-specific data and saves (read-write)
 ///
 /// Usage:
-///   #define STEAMROT_ENV_PROD  // Before including paths.h for production
+///   // For production code: link to environment_config target
+///   // For test code: do not link to environment_config
 ///   #include "paths.h"
 ///   auto path = steamrot::paths::GetDataDirectory();
 /////////////////////////////////////////////////
