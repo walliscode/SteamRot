@@ -1,5 +1,6 @@
 
 #include "GameEngine.h"
+#include "error_loop.h"
 #include "spdlog/spdlog.h"
 #include <iostream>
 int main() {
@@ -11,7 +12,12 @@ int main() {
     // create the game engine
     steamrot::GameEngine game_engine;
     // run the game engine
-    game_engine.RunGame();
+    auto run_game_result = game_engine.RunGame();
+    if (!run_game_result) {
+
+      // run the error loop with the captured fail info
+      error_loop::RunErrorLoop(run_game_result.error());
+    }
 
   } catch (const std::exception &e) {
     // log the exception message

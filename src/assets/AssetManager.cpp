@@ -14,6 +14,7 @@
 #include <expected>
 #include <filesystem>
 #include <format>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <variant>
@@ -37,6 +38,7 @@ AssetManager::LoadAssets(const AssetConfig asset_config) {
       return std::unexpected<FailInfo>(add_font_result.error());
   }
 
+  std::cout << "Loaded " << m_fonts.size() << " fonts." << std::endl;
   ////// Load UI Styles //////
   if (asset_config.ui_styles.empty())
     return std::unexpected<FailInfo>({FailMode::FlatbuffersDataNotFound,
@@ -101,10 +103,14 @@ std::expected<std::monostate, FailInfo> AssetManager::LoadUIStyles() {
   // create UIStyleDataProivder
   FlatbuffersUIStyleDataProvider ui_style_provider(m_fonts);
 
+  std::cout << "Loading UI styles from flatbuffers..." << std::endl;
+
   auto ui_style_data_result = ui_style_provider.ProvideUIStyles();
   if (!ui_style_data_result.has_value())
     return std::unexpected<FailInfo>(ui_style_data_result.error());
 
+  std::cout << "Loaded " << ui_style_data_result.value().size()
+            << " UI styles from flatbuffers." << std::endl;
   // for each UIStyle object, add to map
   for (const auto &ui_style : ui_style_data_result.value()) {
     auto insert_result = m_ui_styles.insert({ui_style.name, ui_style});

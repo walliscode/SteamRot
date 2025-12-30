@@ -10,6 +10,7 @@
 #include "logic_render.h"
 #include "FailInfo.h"
 #include "logic_render_test_helpers.h"
+#include "paths.h"
 #include <SFML/Graphics.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <expected>
@@ -18,8 +19,8 @@
 std::expected<sf::Font, steamrot::FailInfo> ProvideDefaultFont() {
   sf::Font font;
   std::filesystem::path font_path =
-      std::filesystem::current_path() /
-      "tests/data/assets/fonts/Roboto-Regular.ttf";
+      steamrot::paths::GetDataDirectory() /
+      std::filesystem::path{"assets/fonts/Roboto-Regular.ttf"};
   if (!font.openFromFile(font_path.string())) {
     return std::unexpected(
         steamrot::FailInfo{steamrot::FailMode::FileNotFound,
