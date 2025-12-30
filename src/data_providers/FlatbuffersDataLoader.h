@@ -13,9 +13,7 @@
 /////////////////////////////////////////////////
 #include "DataLoader.h"
 #include "FailInfo.h"
-#include "engine_config_generated.h"
-#include "engine_resources_config_generated.h"
-#include "engine_state_generated.h"
+#include "engine_data_generated.h"
 #include "logic_data_generated.h"
 #include "scene_data_generated.h"
 #include "scene_manager_data_generated.h"
@@ -47,28 +45,9 @@ public:
   ProvideUIStylesData() const;
 
   /////////////////////////////////////////////////
-  /// @brief Provides EngineResourcesConfigFbs from binary file
-  ///
-  /// Loads engine resources configuration from
-  /// defaults/engine/engine_resources_config.bin
+  /// @brief Provides EngineDataFbs from binary file
   /////////////////////////////////////////////////
-  std::expected<const EngineResourcesConfigFbs *, FailInfo>
-  ProvideEngineResourcesConfigFbs() const;
-
-  /////////////////////////////////////////////////
-  /// @brief Provides EngineConfigFbs from binary file
-  ///
-  /// Loads engine configuration from defaults/engine/default.engine_config.bin.
-  /// If user configuration exists at user/engine/engine_config.bin, it
-  /// will be loaded instead.
-  /////////////////////////////////////////////////
-  std::expected<const EngineConfigFbs *, FailInfo>
-  ProvideEngineConfigFbs() const;
-
-  /////////////////////////////////////////////////
-  /// @brief Provides EngineStateFbs from binary file
-  /////////////////////////////////////////////////
-  std::expected<const EngineStateFbs *, FailInfo> ProvideEngineStateFbs() const;
+  std::expected<const EngineDataFbs *, FailInfo> ProvideEngineDataFbs() const;
 
   /////////////////////////////////////////////////
   /// @brief Retrieves SceneManagerDataFbs from binary file

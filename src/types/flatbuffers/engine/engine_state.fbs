@@ -27,4 +27,4 @@ table EngineStateFbs {
   quit_requested: bool = false;
 }
 
-root_type EngineStateFbs;
+

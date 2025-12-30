@@ -127,36 +127,6 @@ inline ::flatbuffers::Offset<EngineResourcesConfigFbs> CreateEngineResourcesConf
       asset_config);
 }
 
-inline const steamrot::EngineResourcesConfigFbs *GetEngineResourcesConfigFbs(const void *buf) {
-  return ::flatbuffers::GetRoot<steamrot::EngineResourcesConfigFbs>(buf);
-}
-
-inline const steamrot::EngineResourcesConfigFbs *GetSizePrefixedEngineResourcesConfigFbs(const void *buf) {
-  return ::flatbuffers::GetSizePrefixedRoot<steamrot::EngineResourcesConfigFbs>(buf);
-}
-
-inline bool VerifyEngineResourcesConfigFbsBuffer(
-    ::flatbuffers::Verifier &verifier) {
-  return verifier.VerifyBuffer<steamrot::EngineResourcesConfigFbs>(nullptr);
-}
-
-inline bool VerifySizePrefixedEngineResourcesConfigFbsBuffer(
-    ::flatbuffers::Verifier &verifier) {
-  return verifier.VerifySizePrefixedBuffer<steamrot::EngineResourcesConfigFbs>(nullptr);
-}
-
-inline void FinishEngineResourcesConfigFbsBuffer(
-    ::flatbuffers::FlatBufferBuilder &fbb,
-    ::flatbuffers::Offset<steamrot::EngineResourcesConfigFbs> root) {
-  fbb.Finish(root);
-}
-
-inline void FinishSizePrefixedEngineResourcesConfigFbsBuffer(
-    ::flatbuffers::FlatBufferBuilder &fbb,
-    ::flatbuffers::Offset<steamrot::EngineResourcesConfigFbs> root) {
-  fbb.FinishSizePrefixed(root);
-}
-
 }  // namespace steamrot
 
 #endif  // FLATBUFFERS_GENERATED_ENGINERESOURCESCONFIG_STEAMROT_H_

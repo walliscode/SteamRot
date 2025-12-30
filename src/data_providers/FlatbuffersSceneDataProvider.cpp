@@ -9,6 +9,7 @@
 #include "FlatbuffersSceneDataProvider.h"
 #include "FbsSceneData.h"
 #include "FlatbuffersDataLoader.h"
+#include "asset_config_factory.h"
 #include "scene_data_generated.h"
 #include <expected>
 
@@ -36,15 +37,16 @@ FlatbuffersSceneDataProvider::ProvideDefaultSceneData(
   scene_data.scene_info.type = scene_type;
   scene_data.scene_data_fbs = load_data_result.value();
 
+  // populate the AssetConfig
+  if (fb_data.asset_config()) {
+    auto configure_asset_result = ConfigureAssetConfig(
+        scene_data.scene_asset_config, fb_data.asset_config());
+    if (!configure_asset_result.has_value()) {
+      return std::unexpected(configure_asset_result.error());
+    }
+  }
+
   return std::make_unique<FbsSceneData>(scene_data);
 }
 
-/////////////////////////////////////////////////
-std::expected<std::unique_ptr<IAssetConfigViewer>, FailInfo>
-FlatbuffersSceneDataProvider::GetAssetConfigViewer() const {
-
-  return std::unexpected(FailInfo{FailMode::None,
-                                  "FlatbuffersSceneDataProvider does not "
-                                  "support asset configuration viewing."});
-}
 } // namespace steamrot

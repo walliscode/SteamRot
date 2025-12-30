@@ -1,0 +1,17 @@
+
+include "engine_config.fbs";
+include "engine_data.fbs";
+include "engine_resources_config.fbs";
+include "engine_state.fbs";
+include "../assets/asset_config.fbs";
+
+namespace steamrot;
+
+table EngineDataFbs {
+    engine_config: EngineConfigFbs;
+    engine_resources_config: EngineResourcesConfigFbs;
+    engine_state: EngineStateFbs;
+    initial_asset_config: AssetConfigFbs;
+  }
+
+root_type EngineDataFbs;

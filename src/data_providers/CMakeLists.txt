@@ -6,7 +6,6 @@ paths.cpp
 
 add_library(data_providers
   FlatbuffersEngineDataProvider.cpp
-  FlatbuffersAssetConfigViewer.cpp
   FlatbuffersSceneManagerDataProvider.cpp
   FlatbuffersSceneDataProvider.cpp
   FlatbuffersSubscriberViewer.cpp
@@ -16,6 +15,7 @@ add_library(data_providers
   FlatbuffersDataLoader.cpp
   data_file_utils.cpp
   paths.cpp
+  asset_config_factory.cpp
 )
 
 target_include_directories(data_providers
@@ -24,7 +24,7 @@ target_include_directories(data_providers
 )
 
 target_link_libraries(data_providers
-  PRIVATE
+  PUBLIC
   SFML::Graphics
   events
   interfaces

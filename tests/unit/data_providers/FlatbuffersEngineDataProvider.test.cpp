@@ -17,91 +17,48 @@ TEST_CASE("FlatbuffersEngineDataProvider is constructed correctly",
   REQUIRE_NOTHROW(provider);
 }
 
-TEST_CASE(
-    "FlatbuffersEngineDataProvider::LoadEngineResourcesConfig loads correctly",
-    "[unit][FlatbuffersEngineDataProvider]") {
-
-  steamrot::FlatbuffersEngineDataProvider provider;
-  auto result = provider.LoadEngineResourcesConfig();
-
-  if (!result.has_value()) {
-    FAIL(result.error().message);
-  }
-
-  const auto &config = result.value();
-  REQUIRE(config.window_width == 800);
-  REQUIRE(config.window_height == 600);
-  REQUIRE(config.window_title == "SteamRot");
-  REQUIRE(config.framerate_limit == 60);
-}
-
-TEST_CASE("FlatbuffersEngineDataProvider::LoadEngineConfig loads correctly",
+TEST_CASE("FlatbuffersEngineDataProvider::LoadEngineData loads correctly",
           "[unit][FlatbuffersEngineDataProvider]") {
-
   steamrot::FlatbuffersEngineDataProvider provider;
-  auto result = provider.LoadEngineConfig();
-
+  auto result = provider.LoadEngineData();
   if (!result.has_value()) {
     FAIL(result.error().message);
   }
+  const auto &data = result.value();
+  // Check EngineResourcesConfig
+  const auto &resources_config = data.engine_resources_config;
+  REQUIRE(resources_config.window_width == 800);
+  REQUIRE(resources_config.window_height == 600);
+  REQUIRE(resources_config.window_title == "SteamRot");
+  REQUIRE(resources_config.framerate_limit == 60);
 
-  const auto &config = result.value();
-  REQUIRE(config.display.window_title == "SteamRot");
-  REQUIRE(config.display.framerate_limit == 60);
-  REQUIRE(config.display.fullscreen == false);
-  REQUIRE(config.display.vsync == true);
+  // Check EngineConfig
+  const auto &engine_config = data.engine_config;
+  REQUIRE(engine_config.display.window_title == "SteamRot");
+  REQUIRE(engine_config.display.framerate_limit == 60);
+  REQUIRE(engine_config.display.fullscreen == false);
+  REQUIRE(engine_config.display.vsync == true);
 
-  // Check user preferences defaults
-  REQUIRE(config.user_preferences.master_volume >= 0.0f);
-  REQUIRE(config.user_preferences.master_volume <= 1.0f);
-  REQUIRE(!config.user_preferences.preferred_language.empty());
-  REQUIRE(config.user_preferences.show_fps == false);
-}
-
-TEST_CASE("FlatbuffersEngineDataProvider::LoadEngineState loads correctly",
-          "[unit][FlatbuffersEngineDataProvider]") {
-
-  steamrot::FlatbuffersEngineDataProvider provider;
-  auto result = provider.LoadEngineState();
-
-  if (!result.has_value()) {
-    FAIL(result.error().message);
-  }
-
-  const auto &state = result.value();
-  // Initial state should have these flags set to false
-  REQUIRE(state.running == false);
-  REQUIRE(state.paused == false);
-  REQUIRE(state.quit_requested == false);
-
-  // Subscriptions should be loaded
-  REQUIRE(state.subscriptions.size() == 1);
-  REQUIRE(state.subscriptions[0]->m_trigger_event_type ==
+  // Check EngineState
+  const auto &engine_state = data.engine_state;
+  REQUIRE(engine_state.running == false);
+  REQUIRE(engine_state.paused == false);
+  REQUIRE(engine_state.quit_requested == false);
+  REQUIRE(engine_state.subscriptions.size() == 1);
+  REQUIRE(engine_state.subscriptions[0]->m_trigger_event_type ==
           steamrot::EventType_EVENT_QUIT_GAME);
-}
 
-TEST_CASE("FlatbuffersEngineDataProvider::GetSubscriberViewer returns viewer ",
-          "[unit][FlatbuffersEngineDataProvider]") {
+  // Check AssetConfig
+  const auto &asset_config = data.initial_asset_config;
+  REQUIRE(asset_config.fonts.size() == 2);
 
-  steamrot::FlatbuffersEngineDataProvider provider;
-  auto result = provider.GetSubscriberViewer();
+  std::vector<std::string> expected_font_names = {
+      "DaddyTimeMonoNerdFont-Regular", "Roboto-Regular"};
 
-  if (!result.has_value()) {
-    FAIL(result.error().message);
+  for (size_t i = 0; i < asset_config.fonts.size(); ++i) {
+    REQUIRE(asset_config.fonts[i].name == expected_font_names[i]);
   }
 
-  const auto &viewer = result.value();
-  REQUIRE(viewer != nullptr);
-
-  // Test that viewer can get subscribers
-  auto subscribers_result = viewer->GetSubscribers();
-  if (!subscribers_result.has_value()) {
-    FAIL(subscribers_result.error().message);
-  }
-
-  // check subscribers for size and specific data. the Engine should have a
-  // specific set of subscribers
-  REQUIRE(subscribers_result.value().size() == 1);
-  REQUIRE(subscribers_result.value()[0]->m_trigger_event_type ==
-          steamrot::EventType_EVENT_QUIT_GAME);
+  // verify styles
+  REQUIRE(asset_config.ui_styles.size() == 1);
 }

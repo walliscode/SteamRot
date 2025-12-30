@@ -18,6 +18,7 @@
 std::expected<sf::Font, steamrot::FailInfo> ProvideDefaultFont() {
   sf::Font font;
   std::filesystem::path font_path =
+      std::filesystem::current_path() /
       "tests/data/assets/fonts/Roboto-Regular.ttf";
   if (!font.openFromFile(font_path.string())) {
     return std::unexpected(

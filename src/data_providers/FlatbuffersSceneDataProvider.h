@@ -13,6 +13,7 @@
 /////////////////////////////////////////////////
 #include "ISceneDataProvider.h"
 #include "scene_types_generated.h"
+#include <memory>
 
 namespace steamrot {
 class FlatbuffersSceneDataProvider : public steamrot::ISceneDataProvider {
@@ -25,11 +26,5 @@ public:
   /////////////////////////////////////////////////
   std::expected<std::unique_ptr<SceneData>, FailInfo>
   ProvideDefaultSceneData(const SceneType scene_type) const override;
-
-  /////////////////////////////////////////////////
-  /// @brief Return asset configuration data viewer for this provider.
-  /////////////////////////////////////////////////
-  std::expected<std::unique_ptr<IAssetConfigViewer>, FailInfo>
-  GetAssetConfigViewer() const override;
 };
 } // namespace steamrot

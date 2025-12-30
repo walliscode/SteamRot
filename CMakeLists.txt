@@ -27,7 +27,11 @@ set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
 
 # other variables [TODO: break this up into a separate files]
-set(UUID_SYSTEM_GENERATOR ON) # use system uuid generator if available
+# make the uuid_system_generator available in stduuid
+option(UUID_SYSTEM_GENERATOR
+"Enable operating system uuid generator" ON)
+
+set(UUID_SYSTEM_GENERATOR ON)
 
 # set the cmake module path (for import libraries and other cmake files)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/FetchContentModules")

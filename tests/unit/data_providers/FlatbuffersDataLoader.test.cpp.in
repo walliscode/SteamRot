@@ -92,18 +92,19 @@ TEST_CASE("FlatbuffersDataLoader provides scene_manager data",
   REQUIRE(result.value() != nullptr);
 }
 
-TEST_CASE("FlatbuffersDataLoader::ProvideEngineConfigFbs returns config data "
+TEST_CASE("FlatbuffersDataLoader::ProvideEngineData returns data "
           "with correct values",
           "[unit][FlatbuffersDataLoader]") {
 
   steamrot::FlatbuffersDataLoader data_loader;
-  auto result = data_loader.ProvideEngineConfigFbs();
+  auto result = data_loader.ProvideEngineDataFbs();
 
   if (!result.has_value()) {
     FAIL(result.error().message);
   }
 
-  const auto *config = result.value();
+  const steamrot::EngineDataFbs *engine_data = result.value();
+  const auto *config = engine_data->engine_config();
   REQUIRE(config != nullptr);
 
   // Test display config
@@ -120,42 +121,19 @@ TEST_CASE("FlatbuffersDataLoader::ProvideEngineConfigFbs returns config data "
   REQUIRE(config->user_preferences()->show_fps() == false);
   REQUIRE(config->user_preferences()->preferred_language() != nullptr);
   REQUIRE(config->user_preferences()->preferred_language()->str() == "en");
-}
 
-TEST_CASE("FlatbuffersDataLoader::ProvideEngineResourcesConfigFbs returns "
-          "config data with correct values",
-          "[unit][FlatbuffersDataLoader]") {
-
-  steamrot::FlatbuffersDataLoader data_loader;
-  auto result = data_loader.ProvideEngineResourcesConfigFbs();
-
-  if (!result.has_value()) {
-    FAIL(result.error().message);
-  }
-
-  const auto *config = result.value();
-  REQUIRE(config != nullptr);
-
+  const auto *resources_config = engine_data->engine_resources_config();
+  REQUIRE(resources_config != nullptr);
   // Test resource config values
-  REQUIRE(config->window_width() == 800);
-  REQUIRE(config->window_height() == 600);
-  REQUIRE(config->window_title() != nullptr);
-  REQUIRE(config->window_title()->str() == "SteamRot");
-  REQUIRE(config->framerate_limit() == 60);
-}
 
-TEST_CASE("FlatbuffersDataLoader::ProvideEngineStateFbs returns state data "
-          "with correct values",
-          "[unit][FlatbuffersDataLoader]") {
+  REQUIRE(resources_config->window_width() == 800);
+  REQUIRE(resources_config->window_height() == 600);
+  REQUIRE(resources_config->window_title() != nullptr);
+  REQUIRE(resources_config->window_title()->str() == "SteamRot");
+  REQUIRE(resources_config->framerate_limit() == 60);
 
-  steamrot::FlatbuffersDataLoader data_loader;
-  auto result = data_loader.ProvideEngineStateFbs();
+  const auto *state = engine_data->engine_state();
 
-  if (!result.has_value()) {
-    FAIL(result.error().message);
-  }
-
-  const auto *state = result.value();
   REQUIRE(state != nullptr);
 
   // Test engine state values

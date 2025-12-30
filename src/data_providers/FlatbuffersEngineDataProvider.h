@@ -8,10 +8,13 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+
 #include "FlatbuffersDataLoader.h"
 #include "IEngineDataProvider.h"
-#include "ISubscriberViewer.h"
-#include <memory>
+#include "asset_config_generated.h"
+#include "engine_resources_config_generated.h"
+#include "engine_state_generated.h"
+#include <expected>
 
 namespace steamrot {
 
@@ -31,6 +34,44 @@ private:
   /////////////////////////////////////////////////
   FlatbuffersDataLoader m_loader;
 
+  /////////////////////////////////////////////////
+  /// @brief Logic for populating EngineResourcesConfig from flatbuffers data
+  /// source.
+  ///
+  /// @param engine_resources_config Reference to EngineResourcesConfig to
+  /// populate.
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> PopulateEngineResourcesConfig(
+      EngineResourcesConfig &engine_resources_config,
+      const EngineResourcesConfigFbs *engine_resources_config_data) const;
+
+  /////////////////////////////////////////////////
+  /// @brief Logic for populating EngineConfig from data source.
+  ///
+  /// @param engine_config Reference to EngineConfig to populate.
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  PopulateEngineConfig(EngineConfig &engine_config,
+                       const EngineConfigFbs *engine_config_data) const;
+
+  /////////////////////////////////////////////////
+  /// @brief Logic for populating EngineState from data source.
+  ///
+  /// @param engine_state Reference to EngineState to populate.
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  PopulateEngineState(EngineState &engine_state,
+                      const EngineStateFbs *engine_state_data) const;
+
+  /////////////////////////////////////////////////
+  /// @brief logic for populating initial AssetConfig from data source.
+  ///
+  /// @param asset_config Reference to AssetConfig to populate.
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  PopulateInitialAssetConfig(AssetConfig &asset_config,
+                             const AssetConfigFbs *asset_config_data) const;
+
 public:
   /////////////////////////////////////////////////
   /// @brief Default constructor.
@@ -38,34 +79,9 @@ public:
   FlatbuffersEngineDataProvider() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Provide the EngineResources configuration data.
+  /// @brief Provides EngineData loaded from FlatBuffers binary files.
   /////////////////////////////////////////////////
-  std::expected<EngineResourcesConfig, FailInfo>
-  LoadEngineResourcesConfig() const override;
-
-  /////////////////////////////////////////////////
-  /// @brief Provide the Engine configuration data.
-  /////////////////////////////////////////////////
-  std::expected<EngineConfig, FailInfo> LoadEngineConfig() const override;
-
-  /////////////////////////////////////////////////
-  /// @brief Provide the Engine state data.
-  /////////////////////////////////////////////////
-  std::expected<EngineState, FailInfo> LoadEngineState() const override;
-
-  /////////////////////////////////////////////////
-  /// @brief Return a viewer for subscriber data. In particular, the FlatBuffers
-  /// implementation
-  /////////////////////////////////////////////////
-  std::expected<std::unique_ptr<ISubscriberViewer>, FailInfo>
-  GetSubscriberViewer() const override;
-
-  /////////////////////////////////////////////////
-  /// @brief Return a viewer for asset configuration data. In particular, the
-  /// FlatBuffers implementation
-  /////////////////////////////////////////////////
-  std::expected<std::unique_ptr<IAssetConfigViewer>, FailInfo>
-  GetAssetConfigViewer() const override;
+  std::expected<EngineData, FailInfo> LoadEngineData() const override;
 };
 
 } // namespace steamrot
