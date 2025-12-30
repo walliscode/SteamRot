@@ -4,18 +4,28 @@
 /// selection.
 ///
 /// Environment Selection (compile-time macros):
-/// - Default: Test environment (tests/data)
-/// - STEAMROT_ENV_DEBUG: Debug environment (data) - same as production
-/// - STEAMROT_ENV_PROD: Production environment (data)
+/// - Default: Test environment (tests/data) - Used by unit tests
+/// - STEAMROT_ENV_PROD: Production environment (data) - Used by SteamRot
+/// executable
 ///
-/// Directory Structure:
+/// Directory Structure (under base path):
 /// - defaults/: Default configuration data (read-only)
 /// - user/: User-specific data and saves (read-write)
+/// - assets/: Game assets (fonts, images, etc.)
+/// - fragments/: Scene fragments
 ///
 /// Usage:
-///   #define STEAMROT_ENV_PROD  // Before including paths.h for production
-///   #include "paths.h"
-///   auto path = steamrot::paths::GetDataDirectory();
+///   Production builds (steamrot/CMakeLists.txt):
+///     target_compile_definitions(SteamRot PRIVATE STEAMROT_ENV_PROD)
+///
+///   Test builds (default - no macro needed):
+///     Tests automatically use tests/data directory
+///
+///   In code:
+///     #include "paths.h"
+///     auto path = steamrot::paths::GetDataDirectory();
+///
+/// See documentation/architecture/PATH_CONFIGURATION.md for details.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -42,15 +52,13 @@ std::filesystem::path GetSourceDirectory();
 ///
 /// Returns different paths based on compile-time environment:
 /// - Test (default): ${SOURCE_DIR}/tests/data
-/// - Debug/Prod: ${SOURCE_DIR}/data
+/// - Production: ${SOURCE_DIR}/data
 ///
 /// @return std::filesystem::path The base data directory path
 /////////////////////////////////////////////////
 inline std::filesystem::path GetDataDirectory() {
 
-#if defined(STEAMROT_ENV_PROD) && defined(STEAMROT_ENV_DEBUG)
-#error "Cannot define both STEAMROT_ENV_PROD and STEAMROT_ENV_DEBUG"
-#elif defined(STEAMROT_ENV_PROD) || defined(STEAMROT_ENV_DEBUG)
+#if defined(STEAMROT_ENV_PROD)
   return GetSourceDirectory() / "data";
 #else
   // Default: Test environment
