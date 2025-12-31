@@ -8,7 +8,6 @@
 /////////////////////////////////////////////////
 #include "ISceneConfigurator.h"
 #include "Scene.h"
-#include <iostream>
 namespace steamrot {
 
 /////////////////////////////////////////////////
@@ -44,11 +43,6 @@ ISceneConfigurator::ConfigureScene(Scene &scene, const SceneData *scene_data) {
   auto generate_result = scene.GetEntityManager().GenerateAllArchetypes();
   if (!generate_result.has_value())
     return std::unexpected(generate_result.error());
-
-  for (const auto &[id, archetype] : scene.GetArchetypes()) {
-    std::cout << "Archetype ID: " << id.to_string() << " has "
-              << archetype.size() << " entities." << std::endl;
-  }
 
   return std::monostate();
 }

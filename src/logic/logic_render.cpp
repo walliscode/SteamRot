@@ -13,9 +13,7 @@
 #include "DropDownItemElement.h"
 #include "DropDownListElement.h"
 #include "PanelElement.h"
-#include "user_interface_generated.h"
 #include <cstdint>
-#include <iostream>
 
 namespace steamrot {
 namespace logic {
@@ -166,16 +164,8 @@ void DrawBorderAndBackground(sf::RenderTexture &texture,
   rectangle.setOutlineColor(style.border_color);
   // Border thickness is negative to draw inwards
   rectangle.setOutlineThickness(-style.border_thickness);
+
   // Draw the rectangle on the texture
-  std::cout << "Drawing element at position (" << element.position.x << ", "
-            << element.position.y << ") with size (" << element.size.x << ", "
-            << element.size.y << ")\n";
-  // print out color
-  std::cout << "Background color: ("
-            << static_cast<int>(style.background_color.r) << ", "
-            << static_cast<int>(style.background_color.g) << ", "
-            << static_cast<int>(style.background_color.b) << ", "
-            << static_cast<int>(style.background_color.a) << ")\n";
   texture.draw(rectangle);
 }
 

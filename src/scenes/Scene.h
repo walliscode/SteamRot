@@ -35,6 +35,7 @@ class ISceneConfigurator;
 class Scene {
   friend class ISceneFactory;
   friend class ISceneConfigurator;
+  friend class FlatbuffersSceneConfigurator;
 
 protected:
   /////////////////////////////////////////////////

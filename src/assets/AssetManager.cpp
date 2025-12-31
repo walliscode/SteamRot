@@ -14,7 +14,6 @@
 #include <expected>
 #include <filesystem>
 #include <format>
-#include <iostream>
 #include <memory>
 #include <string>
 #include <variant>
@@ -38,7 +37,6 @@ AssetManager::LoadAssets(const AssetConfig asset_config) {
       return std::unexpected<FailInfo>(add_font_result.error());
   }
 
-  std::cout << "Loaded " << m_fonts.size() << " fonts." << std::endl;
   ////// Load UI Styles //////
   if (asset_config.ui_styles.empty())
     return std::unexpected<FailInfo>({FailMode::FlatbuffersDataNotFound,
