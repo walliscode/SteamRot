@@ -13,12 +13,7 @@
 /////////////////////////////////////////////////
 
 #include "Engine.h"
-#include "SceneSnapshot.h"
-#include "simulation_generated.h"
-#include "test_data_generated.h"
 #include <expected>
-#include <unordered_map>
-#include <vector>
 
 namespace steamrot::tests {
 
@@ -45,16 +40,6 @@ enum class TickLevel {
 class TestEngine : public Engine {
 private:
   /////////////////////////////////////////////////
-  /// @brief Test data configuration.
-  /////////////////////////////////////////////////
-  const TestDataConfig *m_test_config;
-
-  ////////////////////////////////////////////////
-  /// @brief Simulation data extracted from test configuration.
-  /////////////////////////////////////////////////
-  const SimulationData *m_simulation_data{nullptr};
-
-  /////////////////////////////////////////////////
   /// @brief Current tick execution level.
   /////////////////////////////////////////////////
   TickLevel m_tick_level = TickLevel::Custom;
@@ -68,11 +53,6 @@ private:
   /// @brief Current tick number.
   /////////////////////////////////////////////////
   size_t m_current_tick{1};
-
-  /////////////////////////////////////////////////
-  /// @brief Stores the tick number and scene snapshots at that point
-  /////////////////////////////////////////////////
-  std::unordered_map<size_t, std::vector<SceneSnapshot>> m_data_bank;
 
   /////////////////////////////////////////////////
   /// @brief No rendering for TestEngine (new Tick_() pipeline method)
@@ -114,12 +94,6 @@ public:
   ///
   /// @param config Test data configuration (must remain valid)
   /////////////////////////////////////////////////
-  explicit TestEngine(const TestDataConfig *config);
-
-  /////////////////////////////////////////////////
-  /// @brief Returns data bank for inspection and testing
-  /////////////////////////////////////////////////
-  const std::unordered_map<size_t, std::vector<SceneSnapshot>> &
-  GetDataBank() const;
+  explicit TestEngine();
 };
 } // namespace steamrot::tests

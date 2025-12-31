@@ -9,7 +9,9 @@ target_include_directories(types
   ${CMAKE_CURRENT_SOURCE_DIR}/core/
   ${CMAKE_CURRENT_SOURCE_DIR}/events/
   ${CMAKE_CURRENT_SOURCE_DIR}/assets/
+  ${CMAKE_CURRENT_SOURCE_DIR}/test_structs/
   ${CMAKE_CURRENT_SOURCE_DIR}/flatbuffers/generated/
+
 
 )
 
