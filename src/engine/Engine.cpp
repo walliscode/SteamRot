@@ -10,7 +10,6 @@
 #include "FailInfo.h"
 #include "engine_configuration.h"
 #include <expected>
-#include <iostream>
 #include <variant>
 #include <vector>
 
@@ -61,7 +60,6 @@ std::expected<std::monostate, FailInfo> Engine::StartUp() {
     }
   }
 
-  std::cout << "Engine resources configured successfully." << std::endl;
   // Pass initial AssetConfig to AssetManager
   auto load_initial_assets_result = m_engine_resources.asset_manager.LoadAssets(
       engine_data.initial_asset_config);
@@ -79,7 +77,7 @@ std::expected<std::monostate, FailInfo> Engine::RunGame() {
   if (!start_up_result) {
     return std::unexpected(start_up_result.error());
   }
-  std::cout << "Engine started up successfully." << std::endl;
+
   RunGameLoop();
 
   return std::monostate{};

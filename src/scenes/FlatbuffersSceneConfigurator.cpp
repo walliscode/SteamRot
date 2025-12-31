@@ -13,6 +13,7 @@
 #include "FlatbuffersEntityConfigurator.h"
 #include "Scene.h"
 #include "uuid.h"
+#include <SFML/System/Vector2.hpp>
 #include <expected>
 #include <variant>
 
@@ -69,8 +70,21 @@ FlatbuffersSceneConfigurator::ConfigureSceneResources(
     return std::unexpected(
         FailInfo(FailMode::InvalidCast, "SceneData is not FbsSceneData"));
 
-  // [TODO: implement resource loading from flatbuffers data]
+  // check for SceneDataFbs
+  if (!fbs_scene_data->scene_data_fbs)
+    return std::unexpected(
+        FailInfo(FailMode::FlatbuffersDataNotFound, "SceneDataFbs not found"));
 
+  // configure scene texture
+  sf::Vector2u size{
+      fbs_scene_data->scene_data_fbs->scene_resources()->texture_width(),
+      fbs_scene_data->scene_data_fbs->scene_resources()->texture_height()};
+
+  auto texture_resize_result =
+      scene.m_scene_resources.scene_texture.resize(size);
+  if (!texture_resize_result)
+    return std::unexpected(FailInfo(FailMode::ResourceCreationFailure,
+                                    "Failed to resize scene render texture"));
   return std::monostate{};
 }
 

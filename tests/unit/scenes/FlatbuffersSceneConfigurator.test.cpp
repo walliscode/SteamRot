@@ -137,7 +137,30 @@ TEST_CASE("FlatbuffersSceneConfigurator::ConfigureSceneResources handles "
   REQUIRE(result.error().mode == steamrot::FailMode::InvalidCast);
   REQUIRE(result.error().message == "SceneData is not FbsSceneData");
 }
-
+// TEST_CASE("FlatbuffersSceneConfigurator::ConfigureSceneReources configures "
+//           "the SceneResources struct",
+//           "[FlatbuffersSceneConfigurator]") {
+//   // set up fixtures and objects
+//   steamrot::tests::TestFixture fixture;
+//   steamrot::SceneFactory scene_factory{fixture.GetGameContext()};
+//   steamrot::FlatbuffersSceneConfigurator configurator;
+//   auto scene_creation_result =
+//       scene_factory.CreateSceneFromDefault(steamrot::SceneType_TITLE);
+//   if (!scene_creation_result.has_value()) {
+//     FAIL(scene_creation_result.error().message);
+//   }
+//   auto &scene = scene_creation_result.value();
+//
+//   // create valid FbsSceneData
+//   steamrot::FbsSceneData fbs_scene_data;
+//   auto result = configurator.ConfigureSceneResources(*scene,
+//   &fbs_scene_data); if (!result.has_value()) {
+//     FAIL(result.error().message);
+//   }
+//
+//   // REQUIRE(scene->GetSceneResources().scene_texture.getSize().x == 800);
+//   // REQUIRE(scene->GetSceneResources().scene_texture.getSize().y == 600);
+// }
 TEST_CASE("FlatbuffersSceneConfigurator::ConfigureSceneConfig handles null "
           "SceneData",
           "[FlatbuffersSceneConfigurator]") {
@@ -213,9 +236,9 @@ TEST_CASE("FlatbuffersSceneConfigurator::ConfigureEntities handles wrong "
   REQUIRE(result.error().message == "SceneData is not FbsSceneData");
 }
 
-TEST_CASE(
-    "FlatbuffersSceneConfigurator::ConfigureEntities hanldes empty entity data",
-    "[FlatbuffersSceneConfigurator]") {
+TEST_CASE("FlatbuffersSceneConfigurator::ConfigureEntities hanldes "
+          "empty entity data",
+          "[FlatbuffersSceneConfigurator]") {
   // set up fixtures and objects
   steamrot::tests::TestFixture fixture;
   steamrot::tests::TestScene test_scene{fixture.GetGameContext()};
