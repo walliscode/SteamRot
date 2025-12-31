@@ -105,6 +105,10 @@ void Engine::TickEvents() {
 void Engine::TickEngineLogic() {
   // Check all subscriptions for activation and process
   auto process_subs_result = ProcessSubscriptions();
+
+  // update mouse position in GameContext
+  m_game_context.mouse_position =
+      sf::Mouse::getPosition(m_engine_resources.game_window);
 }
 
 /////////////////////////////////////////////////
