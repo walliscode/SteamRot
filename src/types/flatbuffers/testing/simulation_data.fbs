@@ -3,7 +3,7 @@ namespace steamrot;
 ////////////////////////////////////////////////////////////
 /// @brief Types of simulation systems matching Scene logic organization
 ////////////////////////////////////////////////////////////
-enum SimulationType : byte {
+enum SimulationTypeFbs : byte {
   Action = 0,
   Movement = 1,
   Render = 2,
@@ -16,7 +16,8 @@ enum SimulationType : byte {
 /// This enum allows test data to specify which specific free functions
 /// to call during simulation execution.
 ////////////////////////////////////////////////////////////
-enum FunctionType : byte {
+enum FunctionTypeFbs
+: byte {
   None = 0,
   
   // UI Action functions
@@ -66,15 +67,15 @@ enum LogicClassType : byte {
 /// Each step specifies what to execute (function or Logic class)
 /// and which system category it belongs to.
 ////////////////////////////////////////////////////////////
-table SimulationStep {
+table SimulationStepFbs {
   /// @brief Which system this step belongs to (Action, Movement, Render, Collision)
-  simulation_type: SimulationType;
+  simulation_type: SimulationTypeFbs;
   
   /// @brief Whether to execute a function or a Logic class
   execution_mode: ExecutionMode;
   
   /// @brief Which specific function to call (if execution_mode is Function)
-  function_type: FunctionType = None;
+  function_type: FunctionTypeFbs;
   
   /// @brief Which Logic class to execute (if execution_mode is LogicClass)
   logic_class_type: LogicClassType = None;
@@ -89,15 +90,11 @@ table SimulationStep {
 /// Defines a sequence of steps to execute during testing.
 /// Steps are executed in the order they appear in the array.
 ////////////////////////////////////////////////////////////
-table SimulationData {
+table SimulationDataFbs {
   /// @brief Ordered sequence of simulation steps to execute
-  steps: [SimulationStep];
+  steps: [SimulationStepFbs];
   
   /// @brief Optional description of the overall simulation
   description: string;
   
-  /// @brief DEPRECATED: This field is NOT used for tick determination.
-  /// Use TestDataConfig.num_ticks instead to control tick count.
-  /// This field is kept for backward compatibility but has no effect.
-  num_ticks: uint32 = 1;
 }
