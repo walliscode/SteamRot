@@ -1,5 +1,5 @@
 include "../entities/entities.fbs";
-include "simulation.fbs";
+include "simulation_data.fbs";
 include "input_test_data.fbs";
 include "../events/event_packet_data.fbs";
 include "../events/event_bus_data.fbs";
@@ -45,23 +45,20 @@ table TickSnapshot {
 /// This table contains metadata about a test case that can
 /// be extended in the future with additional fields.
 ////////////////////////////////////////////////////////////
-table TestMetadata {
+table TestMetadataFbs {
   /// @brief Human-readable name for the test case
   test_name: string (required);
   
   /// @brief Optional description of what the test validates
-  description: string;
+  test_description: string;
   
   /// @brief Tags for categorizing tests (e.g., "unit", "integration")
   tags: [string];
   
   /// @brief Expected test outcome (true = should pass, false = should fail)
-  expected_to_pass: bool = true;
-  
-  /// @brief Optional author or creator of the test case
-  author: string;
-  
-  /// @brief Version identifier for the test data format
+  will_pass: bool = true;
+   
+  /// @brief Version identifier for this schema
   version: uint32 = 1;
 }
 
@@ -72,29 +69,18 @@ table TestMetadata {
 /// to be extensible - new data types can be added as optional
 /// fields without breaking existing tests.
 ////////////////////////////////////////////////////////////
-table TestDataConfig {
+table TestDataFbs
+{
   /// @brief Metadata about this test case
-  metadata: TestMetadata (required);
- 
-  starting_engine_state: EngineStateFbs;
-   
-  /// @brief Simulation data for executing logic steps during tests
-  simulation_data: SimulationData;
+  metadata: TestMetadataFbs (required);
     
-  /// @brief Number of ticks to run the test for (default: 1)
-  /// This is the ONLY field consulted to determine tick count. The test will execute for exactly
-  /// this many ticks, processing inputs, events, and simulation steps scheduled for each tick.
-  /// If not specified (value is 0), defaults to 1 tick.
-  /// Note: input_sequence, event_sequence, and simulation_data.num_ticks are NOT consulted
-  /// for tick determination. Only this TestDataConfig level field is used.
+  /// @brief Simulation data for executing logic steps during tests
+  simulation_data: SimulationDataFbs;
+    
+  /// @brief Number of ticks to run the test for
   num_ticks: uint32;
   
-  /// @brief Intermediate entity state snapshots for tick-by-tick validation
-  /// Optional field. If present, the test harness will compare actual entity
-  /// state with expected state at each specified tick.
-  /// Snapshots are compared AFTER simulation steps but BEFORE event bus tick.
-  tick_snapshots: [TickSnapshot];
   
 }
 
-root_type TestDataConfig;
+root_type TestDataFbs;
