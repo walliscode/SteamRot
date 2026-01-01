@@ -17,6 +17,7 @@ namespace steamrot {
 enum class FailMode {
   None = 0,
   NotImplemented,
+  DirectoryNotFound,
   FileNotFound,
   FileOpenFailure,
   FileReadFailure,
