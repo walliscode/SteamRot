@@ -8,7 +8,9 @@
 /////////////////////////////////////////////////
 #include "FlatbuffersTestDataProvider.h"
 #include "FlatbuffersTestDataLoader.h"
+#include "SimulationData.h"
 #include "TestData.h"
+#include "simulation_data_generated.h"
 #include <expected>
 #include <filesystem>
 
@@ -99,16 +101,98 @@ FlatbuffersTestDataProvider::ConfigureTestMetaData(
   return std::monostate{};
 }
 
+steamrot::FunctionEnum
+ConvertFbsToFunctionEnum(steamrot::FunctionEnumFbs fbs_function_enum) {
+  switch (fbs_function_enum) {
+
+  case steamrot::FunctionEnumFbs::FunctionEnumFbs_ProcessUIActionsAndEvents:
+    return steamrot::FunctionEnum::ProcessUIActionsAndEvents;
+
+  case steamrot::FunctionEnumFbs::
+      FunctionEnumFbs_ProcessNestedUIActionsAndEvents:
+    return steamrot::FunctionEnum::ProcessNestedUIActionsAndEvents;
+
+  case steamrot::FunctionEnumFbs::FunctionEnumFbs_ProcessButtonElementActions:
+    return steamrot::FunctionEnum::ProcessButtonElementActions;
+
+  case steamrot::FunctionEnumFbs::
+      FunctionEnumFbs_ProcessDropDownListElementActions:
+    return steamrot::FunctionEnum::ProcessDropDownListElementActions;
+
+  case steamrot::FunctionEnumFbs::FunctionEnumFbs_CheckMouseOverNestedUIElement:
+    return steamrot::FunctionEnum::CheckMouseOverNestedUIElement;
+
+  case steamrot::FunctionEnumFbs::
+      FunctionEnumFbs_UpdateCUserInterfaceVisibilityFromCUIState:
+
+    return steamrot::FunctionEnum::UpdateCUserInterfaceVisibilityFromCUIState;
+
+  default:
+    return steamrot::FunctionEnum::None;
+  }
+}
+
+steamrot::LogicClassEnum
+ConvertFbsToLogicClassEnum(steamrot::LogicClassEnumFbs fbs_logic_class_enum) {
+  switch (fbs_logic_class_enum) {
+  case steamrot::LogicClassEnumFbs::LogicClassEnumFbs_None:
+    return steamrot::LogicClassEnum::None;
+  case steamrot::LogicClassEnumFbs::LogicClassEnumFbs_UIActionLogic:
+    return steamrot::LogicClassEnum::UIActionLogic;
+  case steamrot::LogicClassEnumFbs::LogicClassEnumFbs_UICollisionLogic:
+    return steamrot::LogicClassEnum::UICollisionLogic;
+  case steamrot::LogicClassEnumFbs::LogicClassEnumFbs_UIRenderLogic:
+    return steamrot::LogicClassEnum::UIRenderLogic;
+  case steamrot::LogicClassEnumFbs::LogicClassEnumFbs_UIStateLogic:
+    return steamrot::LogicClassEnum::UIStateLogic;
+  case steamrot::LogicClassEnumFbs::LogicClassEnumFbs_CraftingRenderLogic:
+    return steamrot::LogicClassEnum::CraftingRenderLogic;
+  default:
+    return steamrot::LogicClassEnum::None;
+  }
+}
 /////////////////////////////////////////////////
 std::expected<std::monostate, steamrot::FailInfo>
 FlatbuffersTestDataProvider::ConfigureSimulationData(
     steamrot::SimulationData &simulation_data,
     const steamrot::SimulationDataFbs *fbs_simulation_data) const {
-  if (fbs_simulation_data == nullptr) {
+  if (fbs_simulation_data == nullptr)
     return std::unexpected(
         steamrot::FailInfo{steamrot::FailMode::FlatbuffersDataNotFound,
                            "Input Flatbuffers SimulationData is null."});
+
+  // for each SimulationStepFbs, create a SimulationStep and add to
+  // simulation_data
+  for (const auto *fbs_step : *fbs_simulation_data->steps()) {
+
+    steamrot::SimulationElement element;
+
+    // Determine the element type
+    if (fbs_step->simulation_element_as_FunctionEnumWrapper()) {
+
+      steamrot::FunctionEnumFbs fbs_function_enum =
+          fbs_step->simulation_element_as_FunctionEnumWrapper()->value();
+
+      // assign the converted FunctionEnum to the element variant
+      element = ConvertFbsToFunctionEnum(fbs_function_enum);
+
+    } else if (fbs_step->simulation_element_as_LogicClassEnumWrapper()) {
+
+      // assign the converted LogicClassEnum to the element variant
+      element = ConvertFbsToLogicClassEnum(
+          fbs_step->simulation_element_as_LogicClassEnumWrapper()->value());
+
+    } else {
+      return std::unexpected(steamrot::FailInfo{
+          steamrot::FailMode::FlatbuffersDataNotFound,
+          "SimulationStepFbs has unknown SimulationElement type."});
+    }
+
+    // Create SimulationStep and add to simulation_data
+    steamrot::SimulationStep step(element);
+
+    simulation_data.steps.emplace_back(step);
   }
-  // Add configuration for SimulationData fields here as needed
+
   return std::monostate{};
 }

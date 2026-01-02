@@ -20,14 +20,36 @@ namespace steamrot {
 ///
 /// This enum is used to map directly to functions use for logic
 //////////////////////////////////////////////
-enum class FunctionEnum {};
+enum class FunctionEnum {
+
+  None = 0,
+
+  // UI Action functions
+  ProcessUIActionsAndEvents,
+  ProcessNestedUIActionsAndEvents,
+  ProcessButtonElementActions,
+  ProcessDropDownListElementActions,
+
+  // logic collision functions
+  CheckMouseOverNestedUIElement,
+
+  // ui functions
+  UpdateCUserInterfaceVisibilityFromCUIState
+};
 
 //////////////////////////////////////////////
 /// @brief Represents a logic class to be simulated
 ///
 /// This enum is used to map directly to classes use for logic
 //////////////////////////////////////////////
-enum class LogicClassEnum {};
+enum class LogicClassEnum {
+  None = 0,
+  UIActionLogic = 1,
+  UICollisionLogic = 2,
+  UIRenderLogic = 3,
+  UIStateLogic = 4,
+  CraftingRenderLogic = 5,
+};
 
 using SimulationElement = std::variant<FunctionEnum, LogicClassEnum>;
 

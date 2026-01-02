@@ -70,7 +70,7 @@ union SimulationElementFbs {
 /// and which system category it belongs to.
 ////////////////////////////////////////////////////////////
 table SimulationStepFbs {
-    simulation_type: SimulationElementFbs;
+    simulation_element: SimulationElementFbs;
 }
 
 ////////////////////////////////////////////////////////////

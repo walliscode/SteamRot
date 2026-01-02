@@ -81,9 +81,32 @@ TEST_CASE("FlatbuffersTestDataProvider::ConfigureSimulationData configures "
   // Create flatbuffers builder
   flatbuffers::FlatBufferBuilder builder;
 
-  // create simulation data in flatbuffers
+  // create a vector of instances of FunctionEnumWrapper
+  std::vector<steamrot::FunctionEnumFbs> function_enums = {
+      steamrot::FunctionEnumFbs_ProcessUIActionsAndEvents,
+      steamrot::FunctionEnumFbs_ProcessNestedUIActionsAndEvents,
+      steamrot::FunctionEnumFbs_ProcessButtonElementActions,
+      steamrot::FunctionEnumFbs_ProcessDropDownListElementActions,
+      steamrot::FunctionEnumFbs_CheckMouseOverNestedUIElement,
+      steamrot::FunctionEnumFbs_UpdateCUserInterfaceVisibilityFromCUIState};
 
-  auto fbs_simulation_data = steamrot::CreateSimulationDataFbs(builder);
+  // for each FunctionEnumFbs, create a FunctionEnumWrapper and then a
+  // SimulationStepFbs
+  std::vector<flatbuffers::Offset<steamrot::SimulationStepFbs>>
+      simulation_steps;
+  for (const auto &func_enum : function_enums) {
+    auto func_enum_wrapper =
+        steamrot::CreateFunctionEnumWrapper(builder, func_enum);
+    auto sim_step = steamrot::CreateSimulationStepFbs(
+        builder, steamrot::SimulationElementFbs_FunctionEnumWrapper,
+        func_enum_wrapper.Union());
+    simulation_steps.push_back(sim_step);
+  }
+
+  // create SimulationDataFbs
+  auto steps_vector = builder.CreateVector(simulation_steps);
+  auto fbs_simulation_data = steamrot::CreateSimulationDataFbs(
+      builder, steps_vector, builder.CreateString("Test Simulation"));
 
   // finish the buffer and get pointer to SimulationDataFbs
   builder.Finish(fbs_simulation_data);
@@ -96,7 +119,34 @@ TEST_CASE("FlatbuffersTestDataProvider::ConfigureSimulationData configures "
   // Assert
   if (!result)
     FAIL(result.error().message);
+
+  REQUIRE(simulation_data.steps.size() == function_enums.size());
+  REQUIRE(std::holds_alternative<steamrot::FunctionEnum>(
+      simulation_data.steps[0].element));
+  REQUIRE(std::get<steamrot::FunctionEnum>(simulation_data.steps[0].element) ==
+          steamrot::FunctionEnum::ProcessUIActionsAndEvents);
+  REQUIRE(std::holds_alternative<steamrot::FunctionEnum>(
+      simulation_data.steps[1].element));
+  REQUIRE(std::get<steamrot::FunctionEnum>(simulation_data.steps[1].element) ==
+          steamrot::FunctionEnum::ProcessNestedUIActionsAndEvents);
+  REQUIRE(std::holds_alternative<steamrot::FunctionEnum>(
+      simulation_data.steps[2].element));
+  REQUIRE(std::get<steamrot::FunctionEnum>(simulation_data.steps[2].element) ==
+          steamrot::FunctionEnum::ProcessButtonElementActions);
+  REQUIRE(std::holds_alternative<steamrot::FunctionEnum>(
+      simulation_data.steps[3].element));
+  REQUIRE(std::get<steamrot::FunctionEnum>(simulation_data.steps[3].element) ==
+          steamrot::FunctionEnum::ProcessDropDownListElementActions);
+  REQUIRE(std::holds_alternative<steamrot::FunctionEnum>(
+      simulation_data.steps[4].element));
+  REQUIRE(std::get<steamrot::FunctionEnum>(simulation_data.steps[4].element) ==
+          steamrot::FunctionEnum::CheckMouseOverNestedUIElement);
+  REQUIRE(std::holds_alternative<steamrot::FunctionEnum>(
+      simulation_data.steps[5].element));
+  REQUIRE(std::get<steamrot::FunctionEnum>(simulation_data.steps[5].element) ==
+          steamrot::FunctionEnum::UpdateCUserInterfaceVisibilityFromCUIState);
 }
+
 TEST_CASE(
     "FlatbuffersTestDataProvider::CreateTestData returns TestData on valid "
     "input",
