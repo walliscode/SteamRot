@@ -19,27 +19,29 @@
 class ITestDataProvider {
 
 protected:
-  /////////////////////////////////////////////////
-  /// @brief Looks for adjacent data directory, returns error if not found
-  /////////////////////////////////////////////////
-  std::expected<std::filesystem::path, steamrot::FailInfo>
-  GetAdjacentDataDirectoryPath() const;
+  const std::filesystem::path object_directory_path;
 
 public:
+  /////////////////////////////////////////////////
+  /// @brief Constructor taking object directory path
+  ///
+  /// @param obj_dir_path Object directory path
+  /////////////////////////////////////////////////
+  ITestDataProvider(std::filesystem::path &obj_dir_path)
+      : object_directory_path(std::move(obj_dir_path)) {}
+
   /////////////////////////////////////////////////
   /// @brief Virtual destructor.
   /////////////////////////////////////////////////
   virtual ~ITestDataProvider() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Provide an instance of TestData struct
-  /////////////////////////////////////////////////
-  virtual std::expected<steamrot::TestData, steamrot::FailInfo>
-  ProvideTestData() const = 0;
-
-  /////////////////////////////////////////////////
   /// @brief Provide all instances of TestData struct
   /////////////////////////////////////////////////
   virtual std::expected<std::vector<steamrot::TestData>, steamrot::FailInfo>
   ProviderAllTestData() const = 0;
+
+  const std::filesystem::path &GetObjectDirectoryPath() const {
+    return object_directory_path;
+  }
 };

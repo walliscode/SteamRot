@@ -3,7 +3,7 @@ add_library(harness
   # test_data_loader.cpp
   # test_data_comparison.cpp
   TestEngine.cpp
-  ITestDataProvider.cpp
+  FlatbuffersTestDataLoader.cpp
   FlatbuffersTestDataProvider.cpp
   # test_simulation_runner.cpp
   # simulation_runner.cpp
@@ -18,7 +18,7 @@ target_include_directories(harness
 )
 
 target_link_libraries(harness
-  PRIVATE
+  PUBLIC
   engine
   types
 )

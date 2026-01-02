@@ -20,16 +20,16 @@ namespace steamrot {
 ///
 /// This enum is used to map directly to functions use for logic
 //////////////////////////////////////////////
-enum class SimulateFunction {};
+enum class FunctionEnum {};
 
 //////////////////////////////////////////////
 /// @brief Represents a logic class to be simulated
 ///
 /// This enum is used to map directly to classes use for logic
 //////////////////////////////////////////////
-enum class SimulateLogicClass {};
+enum class LogicClassEnum {};
 
-using SimulationElement = std::variant<SimulateFunction, SimulateLogicClass>;
+using SimulationElement = std::variant<FunctionEnum, LogicClassEnum>;
 
 /////////////////////////////////////////////////
 /// @class SimulationStep

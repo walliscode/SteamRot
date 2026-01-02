@@ -1,23 +1,12 @@
 namespace steamrot;
 
 ////////////////////////////////////////////////////////////
-/// @brief Types of simulation systems matching Scene logic organization
-////////////////////////////////////////////////////////////
-enum SimulationTypeFbs : byte {
-  Action = 0,
-  Movement = 1,
-  Render = 2,
-  Collision = 3
-}
-
-////////////////////////////////////////////////////////////
 /// @brief Types of individual functions that can be called during simulation
 ///
 /// This enum allows test data to specify which specific free functions
 /// to call during simulation execution.
 ////////////////////////////////////////////////////////////
-enum FunctionTypeFbs
-: byte {
+enum FunctionEnumFbs: byte {
   None = 0,
   
   // UI Action functions
@@ -33,33 +22,26 @@ enum FunctionTypeFbs
   UpdateCUserInterfaceVisibilityFromCUIState
 }
 
-////////////////////////////////////////////////////////////
-/// @brief Execution mode for a simulation step
-///
-/// Determines whether to execute individual functions or entire Logic classes
-////////////////////////////////////////////////////////////
-enum ExecutionMode : byte {
-  /// Execute individual free function specified by function_type
-  Function = 0,
-  
-  /// Execute entire Logic class specified by logic_type
-  LogicClass = 1
-}
 
 ////////////////////////////////////////////////////////////
 /// @brief Logic class types that can be executed
 ///
 /// Matches the Logic class hierarchy in the codebase
 ////////////////////////////////////////////////////////////
-enum LogicClassType : byte {
+enum LogicClassEnumFbs : byte {
   None = 0,
   UIActionLogic = 1,
   UICollisionLogic = 2,
   UIRenderLogic = 3,
   UIStateLogic = 4,
   CraftingRenderLogic = 5,
-  // Future: Add other Logic classes as needed
 }
+
+union SimulationElementFbs {
+  FunctionEnumFbs,
+  LogicClassEnumFbs
+}
+
 
 ////////////////////////////////////////////////////////////
 /// @brief A single step in a simulation sequence
@@ -68,20 +50,7 @@ enum LogicClassType : byte {
 /// and which system category it belongs to.
 ////////////////////////////////////////////////////////////
 table SimulationStepFbs {
-  /// @brief Which system this step belongs to (Action, Movement, Render, Collision)
-  simulation_type: SimulationTypeFbs;
-  
-  /// @brief Whether to execute a function or a Logic class
-  execution_mode: ExecutionMode;
-  
-  /// @brief Which specific function to call (if execution_mode is Function)
-  function_type: FunctionTypeFbs;
-  
-  /// @brief Which Logic class to execute (if execution_mode is LogicClass)
-  logic_class_type: LogicClassType = None;
-  
-  /// @brief Optional description of what this step does
-  description: string;
+    simulation_type: SimulationElementFbs;
 }
 
 ////////////////////////////////////////////////////////////
@@ -98,3 +67,5 @@ table SimulationDataFbs {
   description: string;
   
 }
+
+root_type SimulationDataFbs;
