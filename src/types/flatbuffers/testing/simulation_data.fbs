@@ -37,9 +37,29 @@ enum LogicClassEnumFbs : byte {
   CraftingRenderLogic = 5,
 }
 
+////////////////////////////////////////////////////////////
+/// @brief Wrapper table for FunctionEnumFbs
+///
+/// FlatBuffers unions can only contain table types, so we wrap
+/// the enum in a table for use in SimulationElementFbs union.
+////////////////////////////////////////////////////////////
+table FunctionEnumWrapper {
+  value: FunctionEnumFbs;
+}
+
+////////////////////////////////////////////////////////////
+/// @brief Wrapper table for LogicClassEnumFbs
+///
+/// FlatBuffers unions can only contain table types, so we wrap
+/// the enum in a table for use in SimulationElementFbs union.
+////////////////////////////////////////////////////////////
+table LogicClassEnumWrapper {
+  value: LogicClassEnumFbs;
+}
+
 union SimulationElementFbs {
-  FunctionEnumFbs,
-  LogicClassEnumFbs
+  FunctionEnumWrapper,
+  LogicClassEnumWrapper
 }
 
 
