@@ -11,6 +11,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include <string>
 #include <variant>
 #include <vector>
 namespace steamrot {
@@ -20,16 +21,38 @@ namespace steamrot {
 ///
 /// This enum is used to map directly to functions use for logic
 //////////////////////////////////////////////
-enum class SimulateFunction {};
+enum class FunctionEnum {
+
+  None = 0,
+
+  // UI Action functions
+  ProcessUIActionsAndEvents,
+  ProcessNestedUIActionsAndEvents,
+  ProcessButtonElementActions,
+  ProcessDropDownListElementActions,
+
+  // logic collision functions
+  CheckMouseOverNestedUIElement,
+
+  // ui functions
+  UpdateCUserInterfaceVisibilityFromCUIState
+};
 
 //////////////////////////////////////////////
 /// @brief Represents a logic class to be simulated
 ///
 /// This enum is used to map directly to classes use for logic
 //////////////////////////////////////////////
-enum class SimulateLogicClass {};
+enum class LogicClassEnum {
+  None = 0,
+  UIActionLogic = 1,
+  UICollisionLogic = 2,
+  UIRenderLogic = 3,
+  UIStateLogic = 4,
+  CraftingRenderLogic = 5,
+};
 
-using SimulationElement = std::variant<SimulateFunction, SimulateLogicClass>;
+using SimulationElement = std::variant<FunctionEnum, LogicClassEnum>;
 
 /////////////////////////////////////////////////
 /// @class SimulationStep
@@ -55,6 +78,11 @@ struct SimulationStep {
 /// @brief Contains all information required to run a simulation
 /////////////////////////////////////////////////
 struct SimulationData {
+
+  /////////////////////////////////////////////////
+  /// @brief Description of the overall simulation
+  /////////////////////////////////////////////////
+  std::string description{};
 
   /////////////////////////////////////////////////
   /// @brief Ordered list of simulation steps to be executed

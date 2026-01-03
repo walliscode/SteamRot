@@ -1,0 +1,51 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Declaration of the FlatbuffersTestDataLoader class.
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Preprocessor Directives
+/////////////////////////////////////////////////
+#pragma once
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include "DataLoader.h"
+#include "FailInfo.h"
+#include "test_data_generated.h"
+#include <expected>
+
+class FlatbuffersTestDataLoader : public steamrot::DataLoader {
+private:
+  /////////////////////////////////////////////////
+  /// @brief Stores the directory where the object is created
+  /////////////////////////////////////////////////
+  const std::filesystem::path object_directory_path;
+
+public:
+  /////////////////////////////////////////////////
+  /// @brief Constructor taking object directory path
+  ///
+  /// The goal is to use the __FILE__ macro at the point of instantiation
+  /// @param obj_dir_path Path to the object directory
+  /////////////////////////////////////////////////
+  FlatbuffersTestDataLoader(std::filesystem::path obj_dir_path);
+
+  /////////////////////////////////////////////////
+  /// @brief Looks for adjacent data directory, returns error if not found
+  /////////////////////////////////////////////////
+  std::expected<std::filesystem::path, steamrot::FailInfo>
+  GetAdjacentDataDirectoryPath() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Load test data from flatbuffers files
+  /////////////////////////////////////////////////
+  std::expected<std::vector<steamrot::TestDataFbs *>, steamrot::FailInfo>
+  LoadTestDataFbs() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Returns the object directory path
+  /////////////////////////////////////////////////
+  std::filesystem::path GetObjectDirectoryPath() const;
+};

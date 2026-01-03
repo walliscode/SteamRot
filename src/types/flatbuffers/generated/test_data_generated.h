@@ -22,138 +22,11 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
-struct TickSnapshot;
-struct TickSnapshotBuilder;
-
 struct TestMetadataFbs;
 struct TestMetadataFbsBuilder;
 
 struct TestDataFbs;
 struct TestDataFbsBuilder;
-
-////////////////////////////////////////////////////////////
-/// @brief Snapshot of expected data structure state at a specific tick
-///
-/// Represents a checkpoint during test execution where the
-/// actual data structure state should match the expected state defined
-/// in the data_collection field.
-///
-/// Note: Tick numbering is 1-based to mimic the game loop.
-/// The setup phase occurs before tick 1. Valid tick values start at 1.
-////////////////////////////////////////////////////////////
-struct TickSnapshot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef TickSnapshotBuilder Builder;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_TICK = 4,
-    VT_ENGINE_STATE = 6,
-    VT_DESCRIPTION = 8,
-    VT_INPUT_SEQUENCE = 10,
-    VT_INJECTION_EVENTS = 12
-  };
-  /// @brief Tick number when this snapshot should be compared (1-based)
-  /// The comparison happens AFTER simulation steps execute for this tick,
-  /// but BEFORE the event bus is ticked.
-  /// Valid values: 1, 2, 3, ... (matching game loop tick numbers)
-  uint32_t tick() const {
-    return GetField<uint32_t>(VT_TICK, 0);
-  }
-  const steamrot::EngineStateFbs *engine_state() const {
-    return GetPointer<const steamrot::EngineStateFbs *>(VT_ENGINE_STATE);
-  }
-  /// @brief Optional human-readable description of this checkpoint
-  /// Used in failure messages to identify which snapshot failed.
-  const ::flatbuffers::String *description() const {
-    return GetPointer<const ::flatbuffers::String *>(VT_DESCRIPTION);
-  }
-  /// @brief Inputs to inject at specific tick
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::InputEvent>> *input_sequence() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::InputEvent>> *>(VT_INPUT_SEQUENCE);
-  }
-  /// @brief Events to inject at specific tick
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketData>> *injection_events() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketData>> *>(VT_INJECTION_EVENTS);
-  }
-  bool Verify(::flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<uint32_t>(verifier, VT_TICK, 4) &&
-           VerifyOffset(verifier, VT_ENGINE_STATE) &&
-           verifier.VerifyTable(engine_state()) &&
-           VerifyOffset(verifier, VT_DESCRIPTION) &&
-           verifier.VerifyString(description()) &&
-           VerifyOffset(verifier, VT_INPUT_SEQUENCE) &&
-           verifier.VerifyVector(input_sequence()) &&
-           verifier.VerifyVectorOfTables(input_sequence()) &&
-           VerifyOffset(verifier, VT_INJECTION_EVENTS) &&
-           verifier.VerifyVector(injection_events()) &&
-           verifier.VerifyVectorOfTables(injection_events()) &&
-           verifier.EndTable();
-  }
-};
-
-struct TickSnapshotBuilder {
-  typedef TickSnapshot Table;
-  ::flatbuffers::FlatBufferBuilder &fbb_;
-  ::flatbuffers::uoffset_t start_;
-  void add_tick(uint32_t tick) {
-    fbb_.AddElement<uint32_t>(TickSnapshot::VT_TICK, tick, 0);
-  }
-  void add_engine_state(::flatbuffers::Offset<steamrot::EngineStateFbs> engine_state) {
-    fbb_.AddOffset(TickSnapshot::VT_ENGINE_STATE, engine_state);
-  }
-  void add_description(::flatbuffers::Offset<::flatbuffers::String> description) {
-    fbb_.AddOffset(TickSnapshot::VT_DESCRIPTION, description);
-  }
-  void add_input_sequence(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::InputEvent>>> input_sequence) {
-    fbb_.AddOffset(TickSnapshot::VT_INPUT_SEQUENCE, input_sequence);
-  }
-  void add_injection_events(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketData>>> injection_events) {
-    fbb_.AddOffset(TickSnapshot::VT_INJECTION_EVENTS, injection_events);
-  }
-  explicit TickSnapshotBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  ::flatbuffers::Offset<TickSnapshot> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<TickSnapshot>(end);
-    return o;
-  }
-};
-
-inline ::flatbuffers::Offset<TickSnapshot> CreateTickSnapshot(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    uint32_t tick = 0,
-    ::flatbuffers::Offset<steamrot::EngineStateFbs> engine_state = 0,
-    ::flatbuffers::Offset<::flatbuffers::String> description = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::InputEvent>>> input_sequence = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketData>>> injection_events = 0) {
-  TickSnapshotBuilder builder_(_fbb);
-  builder_.add_injection_events(injection_events);
-  builder_.add_input_sequence(input_sequence);
-  builder_.add_description(description);
-  builder_.add_engine_state(engine_state);
-  builder_.add_tick(tick);
-  return builder_.Finish();
-}
-
-inline ::flatbuffers::Offset<TickSnapshot> CreateTickSnapshotDirect(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    uint32_t tick = 0,
-    ::flatbuffers::Offset<steamrot::EngineStateFbs> engine_state = 0,
-    const char *description = nullptr,
-    const std::vector<::flatbuffers::Offset<steamrot::InputEvent>> *input_sequence = nullptr,
-    const std::vector<::flatbuffers::Offset<steamrot::EventPacketData>> *injection_events = nullptr) {
-  auto description__ = description ? _fbb.CreateString(description) : 0;
-  auto input_sequence__ = input_sequence ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::InputEvent>>(*input_sequence) : 0;
-  auto injection_events__ = injection_events ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::EventPacketData>>(*injection_events) : 0;
-  return steamrot::CreateTickSnapshot(
-      _fbb,
-      tick,
-      engine_state,
-      description__,
-      input_sequence__,
-      injection_events__);
-}
 
 ////////////////////////////////////////////////////////////
 /// @brief Test metadata for data-driven testing
@@ -188,7 +61,7 @@ struct TestMetadataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   /// @brief Version identifier for this schema
   uint32_t version() const {
-    return GetField<uint32_t>(VT_VERSION, 1);
+    return GetField<uint32_t>(VT_VERSION, 0);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -222,7 +95,7 @@ struct TestMetadataFbsBuilder {
     fbb_.AddElement<uint8_t>(TestMetadataFbs::VT_WILL_PASS, static_cast<uint8_t>(will_pass), 1);
   }
   void add_version(uint32_t version) {
-    fbb_.AddElement<uint32_t>(TestMetadataFbs::VT_VERSION, version, 1);
+    fbb_.AddElement<uint32_t>(TestMetadataFbs::VT_VERSION, version, 0);
   }
   explicit TestMetadataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -242,7 +115,7 @@ inline ::flatbuffers::Offset<TestMetadataFbs> CreateTestMetadataFbs(
     ::flatbuffers::Offset<::flatbuffers::String> test_description = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>> tags = 0,
     bool will_pass = true,
-    uint32_t version = 1) {
+    uint32_t version = 0) {
   TestMetadataFbsBuilder builder_(_fbb);
   builder_.add_version(version);
   builder_.add_tags(tags);
@@ -258,7 +131,7 @@ inline ::flatbuffers::Offset<TestMetadataFbs> CreateTestMetadataFbsDirect(
     const char *test_description = nullptr,
     const std::vector<::flatbuffers::Offset<::flatbuffers::String>> *tags = nullptr,
     bool will_pass = true,
-    uint32_t version = 1) {
+    uint32_t version = 0) {
   auto test_name__ = test_name ? _fbb.CreateString(test_name) : 0;
   auto test_description__ = test_description ? _fbb.CreateString(test_description) : 0;
   auto tags__ = tags ? _fbb.CreateVector<::flatbuffers::Offset<::flatbuffers::String>>(*tags) : 0;
@@ -281,13 +154,13 @@ inline ::flatbuffers::Offset<TestMetadataFbs> CreateTestMetadataFbsDirect(
 struct TestDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef TestDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_METADATA = 4,
+    VT_META_DATA = 4,
     VT_SIMULATION_DATA = 6,
     VT_NUM_TICKS = 8
   };
   /// @brief Metadata about this test case
-  const steamrot::TestMetadataFbs *metadata() const {
-    return GetPointer<const steamrot::TestMetadataFbs *>(VT_METADATA);
+  const steamrot::TestMetadataFbs *meta_data() const {
+    return GetPointer<const steamrot::TestMetadataFbs *>(VT_META_DATA);
   }
   /// @brief Simulation data for executing logic steps during tests
   const steamrot::SimulationDataFbs *simulation_data() const {
@@ -299,8 +172,8 @@ struct TestDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffsetRequired(verifier, VT_METADATA) &&
-           verifier.VerifyTable(metadata()) &&
+           VerifyOffsetRequired(verifier, VT_META_DATA) &&
+           verifier.VerifyTable(meta_data()) &&
            VerifyOffset(verifier, VT_SIMULATION_DATA) &&
            verifier.VerifyTable(simulation_data()) &&
            VerifyField<uint32_t>(verifier, VT_NUM_TICKS, 4) &&
@@ -312,8 +185,8 @@ struct TestDataFbsBuilder {
   typedef TestDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_metadata(::flatbuffers::Offset<steamrot::TestMetadataFbs> metadata) {
-    fbb_.AddOffset(TestDataFbs::VT_METADATA, metadata);
+  void add_meta_data(::flatbuffers::Offset<steamrot::TestMetadataFbs> meta_data) {
+    fbb_.AddOffset(TestDataFbs::VT_META_DATA, meta_data);
   }
   void add_simulation_data(::flatbuffers::Offset<steamrot::SimulationDataFbs> simulation_data) {
     fbb_.AddOffset(TestDataFbs::VT_SIMULATION_DATA, simulation_data);
@@ -328,20 +201,20 @@ struct TestDataFbsBuilder {
   ::flatbuffers::Offset<TestDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = ::flatbuffers::Offset<TestDataFbs>(end);
-    fbb_.Required(o, TestDataFbs::VT_METADATA);
+    fbb_.Required(o, TestDataFbs::VT_META_DATA);
     return o;
   }
 };
 
 inline ::flatbuffers::Offset<TestDataFbs> CreateTestDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<steamrot::TestMetadataFbs> metadata = 0,
+    ::flatbuffers::Offset<steamrot::TestMetadataFbs> meta_data = 0,
     ::flatbuffers::Offset<steamrot::SimulationDataFbs> simulation_data = 0,
     uint32_t num_ticks = 0) {
   TestDataFbsBuilder builder_(_fbb);
   builder_.add_num_ticks(num_ticks);
   builder_.add_simulation_data(simulation_data);
-  builder_.add_metadata(metadata);
+  builder_.add_meta_data(meta_data);
   return builder_.Finish();
 }
 

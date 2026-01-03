@@ -15,6 +15,12 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
+struct FunctionEnumWrapper;
+struct FunctionEnumWrapperBuilder;
+
+struct LogicClassEnumWrapper;
+struct LogicClassEnumWrapperBuilder;
+
 struct SimulationStepFbs;
 struct SimulationStepFbsBuilder;
 
@@ -22,76 +28,37 @@ struct SimulationDataFbs;
 struct SimulationDataFbsBuilder;
 
 ////////////////////////////////////////////////////////////
-/// @brief Types of simulation systems matching Scene logic organization
-////////////////////////////////////////////////////////////
-enum SimulationTypeFbs : int8_t {
-  SimulationTypeFbs_Action = 0,
-  SimulationTypeFbs_Movement = 1,
-  SimulationTypeFbs_Render = 2,
-  SimulationTypeFbs_Collision = 3,
-  SimulationTypeFbs_MIN = SimulationTypeFbs_Action,
-  SimulationTypeFbs_MAX = SimulationTypeFbs_Collision
-};
-
-inline const SimulationTypeFbs (&EnumValuesSimulationTypeFbs())[4] {
-  static const SimulationTypeFbs values[] = {
-    SimulationTypeFbs_Action,
-    SimulationTypeFbs_Movement,
-    SimulationTypeFbs_Render,
-    SimulationTypeFbs_Collision
-  };
-  return values;
-}
-
-inline const char * const *EnumNamesSimulationTypeFbs() {
-  static const char * const names[5] = {
-    "Action",
-    "Movement",
-    "Render",
-    "Collision",
-    nullptr
-  };
-  return names;
-}
-
-inline const char *EnumNameSimulationTypeFbs(SimulationTypeFbs e) {
-  if (::flatbuffers::IsOutRange(e, SimulationTypeFbs_Action, SimulationTypeFbs_Collision)) return "";
-  const size_t index = static_cast<size_t>(e);
-  return EnumNamesSimulationTypeFbs()[index];
-}
-
-////////////////////////////////////////////////////////////
 /// @brief Types of individual functions that can be called during simulation
 ///
 /// This enum allows test data to specify which specific free functions
 /// to call during simulation execution.
 ////////////////////////////////////////////////////////////
-enum FunctionTypeFbs : int8_t {
-  FunctionTypeFbs_None = 0,
-  FunctionTypeFbs_ProcessUIActionsAndEvents = 1,
-  FunctionTypeFbs_ProcessNestedUIActionsAndEvents = 2,
-  FunctionTypeFbs_ProcessButtonElementActions = 3,
-  FunctionTypeFbs_ProcessDropDownListElementActions = 4,
-  FunctionTypeFbs_CheckMouseOverNestedUIElement = 5,
-  FunctionTypeFbs_UpdateCUserInterfaceVisibilityFromCUIState = 6,
-  FunctionTypeFbs_MIN = FunctionTypeFbs_None,
-  FunctionTypeFbs_MAX = FunctionTypeFbs_UpdateCUserInterfaceVisibilityFromCUIState
+enum FunctionEnumFbs : int8_t {
+  FunctionEnumFbs_None = 0,
+  FunctionEnumFbs_ProcessUIActionsAndEvents = 1,
+  FunctionEnumFbs_ProcessNestedUIActionsAndEvents = 2,
+  FunctionEnumFbs_ProcessButtonElementActions = 3,
+  FunctionEnumFbs_ProcessDropDownListElementActions = 4,
+  FunctionEnumFbs_CheckMouseOverNestedUIElement = 5,
+  FunctionEnumFbs_UpdateCUserInterfaceVisibilityFromCUIState = 6,
+  FunctionEnumFbs_MIN = FunctionEnumFbs_None,
+  FunctionEnumFbs_MAX = FunctionEnumFbs_UpdateCUserInterfaceVisibilityFromCUIState
 };
 
-inline const FunctionTypeFbs (&EnumValuesFunctionTypeFbs())[7] {
-  static const FunctionTypeFbs values[] = {
-    FunctionTypeFbs_None,
-    FunctionTypeFbs_ProcessUIActionsAndEvents,
-    FunctionTypeFbs_ProcessNestedUIActionsAndEvents,
-    FunctionTypeFbs_ProcessButtonElementActions,
-    FunctionTypeFbs_ProcessDropDownListElementActions,
-    FunctionTypeFbs_CheckMouseOverNestedUIElement,
-    FunctionTypeFbs_UpdateCUserInterfaceVisibilityFromCUIState
+inline const FunctionEnumFbs (&EnumValuesFunctionEnumFbs())[7] {
+  static const FunctionEnumFbs values[] = {
+    FunctionEnumFbs_None,
+    FunctionEnumFbs_ProcessUIActionsAndEvents,
+    FunctionEnumFbs_ProcessNestedUIActionsAndEvents,
+    FunctionEnumFbs_ProcessButtonElementActions,
+    FunctionEnumFbs_ProcessDropDownListElementActions,
+    FunctionEnumFbs_CheckMouseOverNestedUIElement,
+    FunctionEnumFbs_UpdateCUserInterfaceVisibilityFromCUIState
   };
   return values;
 }
 
-inline const char * const *EnumNamesFunctionTypeFbs() {
+inline const char * const *EnumNamesFunctionEnumFbs() {
   static const char * const names[8] = {
     "None",
     "ProcessUIActionsAndEvents",
@@ -105,47 +72,10 @@ inline const char * const *EnumNamesFunctionTypeFbs() {
   return names;
 }
 
-inline const char *EnumNameFunctionTypeFbs(FunctionTypeFbs e) {
-  if (::flatbuffers::IsOutRange(e, FunctionTypeFbs_None, FunctionTypeFbs_UpdateCUserInterfaceVisibilityFromCUIState)) return "";
+inline const char *EnumNameFunctionEnumFbs(FunctionEnumFbs e) {
+  if (::flatbuffers::IsOutRange(e, FunctionEnumFbs_None, FunctionEnumFbs_UpdateCUserInterfaceVisibilityFromCUIState)) return "";
   const size_t index = static_cast<size_t>(e);
-  return EnumNamesFunctionTypeFbs()[index];
-}
-
-////////////////////////////////////////////////////////////
-/// @brief Execution mode for a simulation step
-///
-/// Determines whether to execute individual functions or entire Logic classes
-////////////////////////////////////////////////////////////
-enum ExecutionMode : int8_t {
-  /// Execute individual free function specified by function_type
-  ExecutionMode_Function = 0,
-  /// Execute entire Logic class specified by logic_type
-  ExecutionMode_LogicClass = 1,
-  ExecutionMode_MIN = ExecutionMode_Function,
-  ExecutionMode_MAX = ExecutionMode_LogicClass
-};
-
-inline const ExecutionMode (&EnumValuesExecutionMode())[2] {
-  static const ExecutionMode values[] = {
-    ExecutionMode_Function,
-    ExecutionMode_LogicClass
-  };
-  return values;
-}
-
-inline const char * const *EnumNamesExecutionMode() {
-  static const char * const names[3] = {
-    "Function",
-    "LogicClass",
-    nullptr
-  };
-  return names;
-}
-
-inline const char *EnumNameExecutionMode(ExecutionMode e) {
-  if (::flatbuffers::IsOutRange(e, ExecutionMode_Function, ExecutionMode_LogicClass)) return "";
-  const size_t index = static_cast<size_t>(e);
-  return EnumNamesExecutionMode()[index];
+  return EnumNamesFunctionEnumFbs()[index];
 }
 
 ////////////////////////////////////////////////////////////
@@ -153,30 +83,30 @@ inline const char *EnumNameExecutionMode(ExecutionMode e) {
 ///
 /// Matches the Logic class hierarchy in the codebase
 ////////////////////////////////////////////////////////////
-enum LogicClassType : int8_t {
-  LogicClassType_None = 0,
-  LogicClassType_UIActionLogic = 1,
-  LogicClassType_UICollisionLogic = 2,
-  LogicClassType_UIRenderLogic = 3,
-  LogicClassType_UIStateLogic = 4,
-  LogicClassType_CraftingRenderLogic = 5,
-  LogicClassType_MIN = LogicClassType_None,
-  LogicClassType_MAX = LogicClassType_CraftingRenderLogic
+enum LogicClassEnumFbs : int8_t {
+  LogicClassEnumFbs_None = 0,
+  LogicClassEnumFbs_UIActionLogic = 1,
+  LogicClassEnumFbs_UICollisionLogic = 2,
+  LogicClassEnumFbs_UIRenderLogic = 3,
+  LogicClassEnumFbs_UIStateLogic = 4,
+  LogicClassEnumFbs_CraftingRenderLogic = 5,
+  LogicClassEnumFbs_MIN = LogicClassEnumFbs_None,
+  LogicClassEnumFbs_MAX = LogicClassEnumFbs_CraftingRenderLogic
 };
 
-inline const LogicClassType (&EnumValuesLogicClassType())[6] {
-  static const LogicClassType values[] = {
-    LogicClassType_None,
-    LogicClassType_UIActionLogic,
-    LogicClassType_UICollisionLogic,
-    LogicClassType_UIRenderLogic,
-    LogicClassType_UIStateLogic,
-    LogicClassType_CraftingRenderLogic
+inline const LogicClassEnumFbs (&EnumValuesLogicClassEnumFbs())[6] {
+  static const LogicClassEnumFbs values[] = {
+    LogicClassEnumFbs_None,
+    LogicClassEnumFbs_UIActionLogic,
+    LogicClassEnumFbs_UICollisionLogic,
+    LogicClassEnumFbs_UIRenderLogic,
+    LogicClassEnumFbs_UIStateLogic,
+    LogicClassEnumFbs_CraftingRenderLogic
   };
   return values;
 }
 
-inline const char * const *EnumNamesLogicClassType() {
+inline const char * const *EnumNamesLogicClassEnumFbs() {
   static const char * const names[7] = {
     "None",
     "UIActionLogic",
@@ -189,10 +119,152 @@ inline const char * const *EnumNamesLogicClassType() {
   return names;
 }
 
-inline const char *EnumNameLogicClassType(LogicClassType e) {
-  if (::flatbuffers::IsOutRange(e, LogicClassType_None, LogicClassType_CraftingRenderLogic)) return "";
+inline const char *EnumNameLogicClassEnumFbs(LogicClassEnumFbs e) {
+  if (::flatbuffers::IsOutRange(e, LogicClassEnumFbs_None, LogicClassEnumFbs_CraftingRenderLogic)) return "";
   const size_t index = static_cast<size_t>(e);
-  return EnumNamesLogicClassType()[index];
+  return EnumNamesLogicClassEnumFbs()[index];
+}
+
+enum SimulationElementFbs : uint8_t {
+  SimulationElementFbs_NONE = 0,
+  SimulationElementFbs_FunctionEnumWrapper = 1,
+  SimulationElementFbs_LogicClassEnumWrapper = 2,
+  SimulationElementFbs_MIN = SimulationElementFbs_NONE,
+  SimulationElementFbs_MAX = SimulationElementFbs_LogicClassEnumWrapper
+};
+
+inline const SimulationElementFbs (&EnumValuesSimulationElementFbs())[3] {
+  static const SimulationElementFbs values[] = {
+    SimulationElementFbs_NONE,
+    SimulationElementFbs_FunctionEnumWrapper,
+    SimulationElementFbs_LogicClassEnumWrapper
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesSimulationElementFbs() {
+  static const char * const names[4] = {
+    "NONE",
+    "FunctionEnumWrapper",
+    "LogicClassEnumWrapper",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameSimulationElementFbs(SimulationElementFbs e) {
+  if (::flatbuffers::IsOutRange(e, SimulationElementFbs_NONE, SimulationElementFbs_LogicClassEnumWrapper)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesSimulationElementFbs()[index];
+}
+
+template<typename T> struct SimulationElementFbsTraits {
+  static const SimulationElementFbs enum_value = SimulationElementFbs_NONE;
+};
+
+template<> struct SimulationElementFbsTraits<steamrot::FunctionEnumWrapper> {
+  static const SimulationElementFbs enum_value = SimulationElementFbs_FunctionEnumWrapper;
+};
+
+template<> struct SimulationElementFbsTraits<steamrot::LogicClassEnumWrapper> {
+  static const SimulationElementFbs enum_value = SimulationElementFbs_LogicClassEnumWrapper;
+};
+
+bool VerifySimulationElementFbs(::flatbuffers::Verifier &verifier, const void *obj, SimulationElementFbs type);
+bool VerifySimulationElementFbsVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types);
+
+////////////////////////////////////////////////////////////
+/// @brief Wrapper table for FunctionEnumFbs
+///
+/// FlatBuffers unions can only contain table types, so we wrap
+/// the enum in a table for use in SimulationElementFbs union.
+////////////////////////////////////////////////////////////
+struct FunctionEnumWrapper FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef FunctionEnumWrapperBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_VALUE = 4
+  };
+  steamrot::FunctionEnumFbs value() const {
+    return static_cast<steamrot::FunctionEnumFbs>(GetField<int8_t>(VT_VALUE, 0));
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int8_t>(verifier, VT_VALUE, 1) &&
+           verifier.EndTable();
+  }
+};
+
+struct FunctionEnumWrapperBuilder {
+  typedef FunctionEnumWrapper Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_value(steamrot::FunctionEnumFbs value) {
+    fbb_.AddElement<int8_t>(FunctionEnumWrapper::VT_VALUE, static_cast<int8_t>(value), 0);
+  }
+  explicit FunctionEnumWrapperBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<FunctionEnumWrapper> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<FunctionEnumWrapper>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<FunctionEnumWrapper> CreateFunctionEnumWrapper(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    steamrot::FunctionEnumFbs value = steamrot::FunctionEnumFbs_None) {
+  FunctionEnumWrapperBuilder builder_(_fbb);
+  builder_.add_value(value);
+  return builder_.Finish();
+}
+
+////////////////////////////////////////////////////////////
+/// @brief Wrapper table for LogicClassEnumFbs
+///
+/// FlatBuffers unions can only contain table types, so we wrap
+/// the enum in a table for use in SimulationElementFbs union.
+////////////////////////////////////////////////////////////
+struct LogicClassEnumWrapper FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef LogicClassEnumWrapperBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_VALUE = 4
+  };
+  steamrot::LogicClassEnumFbs value() const {
+    return static_cast<steamrot::LogicClassEnumFbs>(GetField<int8_t>(VT_VALUE, 0));
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int8_t>(verifier, VT_VALUE, 1) &&
+           verifier.EndTable();
+  }
+};
+
+struct LogicClassEnumWrapperBuilder {
+  typedef LogicClassEnumWrapper Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_value(steamrot::LogicClassEnumFbs value) {
+    fbb_.AddElement<int8_t>(LogicClassEnumWrapper::VT_VALUE, static_cast<int8_t>(value), 0);
+  }
+  explicit LogicClassEnumWrapperBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<LogicClassEnumWrapper> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<LogicClassEnumWrapper>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<LogicClassEnumWrapper> CreateLogicClassEnumWrapper(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    steamrot::LogicClassEnumFbs value = steamrot::LogicClassEnumFbs_None) {
+  LogicClassEnumWrapperBuilder builder_(_fbb);
+  builder_.add_value(value);
+  return builder_.Finish();
 }
 
 ////////////////////////////////////////////////////////////
@@ -204,62 +276,48 @@ inline const char *EnumNameLogicClassType(LogicClassType e) {
 struct SimulationStepFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef SimulationStepFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_SIMULATION_TYPE = 4,
-    VT_EXECUTION_MODE = 6,
-    VT_FUNCTION_TYPE = 8,
-    VT_LOGIC_CLASS_TYPE = 10,
-    VT_DESCRIPTION = 12
+    VT_SIMULATION_ELEMENT_TYPE = 4,
+    VT_SIMULATION_ELEMENT = 6
   };
-  /// @brief Which system this step belongs to (Action, Movement, Render, Collision)
-  steamrot::SimulationTypeFbs simulation_type() const {
-    return static_cast<steamrot::SimulationTypeFbs>(GetField<int8_t>(VT_SIMULATION_TYPE, 0));
+  steamrot::SimulationElementFbs simulation_element_type() const {
+    return static_cast<steamrot::SimulationElementFbs>(GetField<uint8_t>(VT_SIMULATION_ELEMENT_TYPE, 0));
   }
-  /// @brief Whether to execute a function or a Logic class
-  steamrot::ExecutionMode execution_mode() const {
-    return static_cast<steamrot::ExecutionMode>(GetField<int8_t>(VT_EXECUTION_MODE, 0));
+  const void *simulation_element() const {
+    return GetPointer<const void *>(VT_SIMULATION_ELEMENT);
   }
-  /// @brief Which specific function to call (if execution_mode is Function)
-  steamrot::FunctionTypeFbs function_type() const {
-    return static_cast<steamrot::FunctionTypeFbs>(GetField<int8_t>(VT_FUNCTION_TYPE, 0));
+  template<typename T> const T *simulation_element_as() const;
+  const steamrot::FunctionEnumWrapper *simulation_element_as_FunctionEnumWrapper() const {
+    return simulation_element_type() == steamrot::SimulationElementFbs_FunctionEnumWrapper ? static_cast<const steamrot::FunctionEnumWrapper *>(simulation_element()) : nullptr;
   }
-  /// @brief Which Logic class to execute (if execution_mode is LogicClass)
-  steamrot::LogicClassType logic_class_type() const {
-    return static_cast<steamrot::LogicClassType>(GetField<int8_t>(VT_LOGIC_CLASS_TYPE, 0));
-  }
-  /// @brief Optional description of what this step does
-  const ::flatbuffers::String *description() const {
-    return GetPointer<const ::flatbuffers::String *>(VT_DESCRIPTION);
+  const steamrot::LogicClassEnumWrapper *simulation_element_as_LogicClassEnumWrapper() const {
+    return simulation_element_type() == steamrot::SimulationElementFbs_LogicClassEnumWrapper ? static_cast<const steamrot::LogicClassEnumWrapper *>(simulation_element()) : nullptr;
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int8_t>(verifier, VT_SIMULATION_TYPE, 1) &&
-           VerifyField<int8_t>(verifier, VT_EXECUTION_MODE, 1) &&
-           VerifyField<int8_t>(verifier, VT_FUNCTION_TYPE, 1) &&
-           VerifyField<int8_t>(verifier, VT_LOGIC_CLASS_TYPE, 1) &&
-           VerifyOffset(verifier, VT_DESCRIPTION) &&
-           verifier.VerifyString(description()) &&
+           VerifyField<uint8_t>(verifier, VT_SIMULATION_ELEMENT_TYPE, 1) &&
+           VerifyOffset(verifier, VT_SIMULATION_ELEMENT) &&
+           VerifySimulationElementFbs(verifier, simulation_element(), simulation_element_type()) &&
            verifier.EndTable();
   }
 };
+
+template<> inline const steamrot::FunctionEnumWrapper *SimulationStepFbs::simulation_element_as<steamrot::FunctionEnumWrapper>() const {
+  return simulation_element_as_FunctionEnumWrapper();
+}
+
+template<> inline const steamrot::LogicClassEnumWrapper *SimulationStepFbs::simulation_element_as<steamrot::LogicClassEnumWrapper>() const {
+  return simulation_element_as_LogicClassEnumWrapper();
+}
 
 struct SimulationStepFbsBuilder {
   typedef SimulationStepFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_simulation_type(steamrot::SimulationTypeFbs simulation_type) {
-    fbb_.AddElement<int8_t>(SimulationStepFbs::VT_SIMULATION_TYPE, static_cast<int8_t>(simulation_type), 0);
+  void add_simulation_element_type(steamrot::SimulationElementFbs simulation_element_type) {
+    fbb_.AddElement<uint8_t>(SimulationStepFbs::VT_SIMULATION_ELEMENT_TYPE, static_cast<uint8_t>(simulation_element_type), 0);
   }
-  void add_execution_mode(steamrot::ExecutionMode execution_mode) {
-    fbb_.AddElement<int8_t>(SimulationStepFbs::VT_EXECUTION_MODE, static_cast<int8_t>(execution_mode), 0);
-  }
-  void add_function_type(steamrot::FunctionTypeFbs function_type) {
-    fbb_.AddElement<int8_t>(SimulationStepFbs::VT_FUNCTION_TYPE, static_cast<int8_t>(function_type), 0);
-  }
-  void add_logic_class_type(steamrot::LogicClassType logic_class_type) {
-    fbb_.AddElement<int8_t>(SimulationStepFbs::VT_LOGIC_CLASS_TYPE, static_cast<int8_t>(logic_class_type), 0);
-  }
-  void add_description(::flatbuffers::Offset<::flatbuffers::String> description) {
-    fbb_.AddOffset(SimulationStepFbs::VT_DESCRIPTION, description);
+  void add_simulation_element(::flatbuffers::Offset<void> simulation_element) {
+    fbb_.AddOffset(SimulationStepFbs::VT_SIMULATION_ELEMENT, simulation_element);
   }
   explicit SimulationStepFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -274,35 +332,12 @@ struct SimulationStepFbsBuilder {
 
 inline ::flatbuffers::Offset<SimulationStepFbs> CreateSimulationStepFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    steamrot::SimulationTypeFbs simulation_type = steamrot::SimulationTypeFbs_Action,
-    steamrot::ExecutionMode execution_mode = steamrot::ExecutionMode_Function,
-    steamrot::FunctionTypeFbs function_type = steamrot::FunctionTypeFbs_None,
-    steamrot::LogicClassType logic_class_type = steamrot::LogicClassType_None,
-    ::flatbuffers::Offset<::flatbuffers::String> description = 0) {
+    steamrot::SimulationElementFbs simulation_element_type = steamrot::SimulationElementFbs_NONE,
+    ::flatbuffers::Offset<void> simulation_element = 0) {
   SimulationStepFbsBuilder builder_(_fbb);
-  builder_.add_description(description);
-  builder_.add_logic_class_type(logic_class_type);
-  builder_.add_function_type(function_type);
-  builder_.add_execution_mode(execution_mode);
-  builder_.add_simulation_type(simulation_type);
+  builder_.add_simulation_element(simulation_element);
+  builder_.add_simulation_element_type(simulation_element_type);
   return builder_.Finish();
-}
-
-inline ::flatbuffers::Offset<SimulationStepFbs> CreateSimulationStepFbsDirect(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    steamrot::SimulationTypeFbs simulation_type = steamrot::SimulationTypeFbs_Action,
-    steamrot::ExecutionMode execution_mode = steamrot::ExecutionMode_Function,
-    steamrot::FunctionTypeFbs function_type = steamrot::FunctionTypeFbs_None,
-    steamrot::LogicClassType logic_class_type = steamrot::LogicClassType_None,
-    const char *description = nullptr) {
-  auto description__ = description ? _fbb.CreateString(description) : 0;
-  return steamrot::CreateSimulationStepFbs(
-      _fbb,
-      simulation_type,
-      execution_mode,
-      function_type,
-      logic_class_type,
-      description__);
 }
 
 ////////////////////////////////////////////////////////////
@@ -377,6 +412,65 @@ inline ::flatbuffers::Offset<SimulationDataFbs> CreateSimulationDataFbsDirect(
       _fbb,
       steps__,
       description__);
+}
+
+inline bool VerifySimulationElementFbs(::flatbuffers::Verifier &verifier, const void *obj, SimulationElementFbs type) {
+  switch (type) {
+    case SimulationElementFbs_NONE: {
+      return true;
+    }
+    case SimulationElementFbs_FunctionEnumWrapper: {
+      auto ptr = reinterpret_cast<const steamrot::FunctionEnumWrapper *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case SimulationElementFbs_LogicClassEnumWrapper: {
+      auto ptr = reinterpret_cast<const steamrot::LogicClassEnumWrapper *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    default: return true;
+  }
+}
+
+inline bool VerifySimulationElementFbsVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types) {
+  if (!values || !types) return !values && !types;
+  if (values->size() != types->size()) return false;
+  for (::flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
+    if (!VerifySimulationElementFbs(
+        verifier,  values->Get(i), types->GetEnum<SimulationElementFbs>(i))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+inline const steamrot::SimulationDataFbs *GetSimulationDataFbs(const void *buf) {
+  return ::flatbuffers::GetRoot<steamrot::SimulationDataFbs>(buf);
+}
+
+inline const steamrot::SimulationDataFbs *GetSizePrefixedSimulationDataFbs(const void *buf) {
+  return ::flatbuffers::GetSizePrefixedRoot<steamrot::SimulationDataFbs>(buf);
+}
+
+inline bool VerifySimulationDataFbsBuffer(
+    ::flatbuffers::Verifier &verifier) {
+  return verifier.VerifyBuffer<steamrot::SimulationDataFbs>(nullptr);
+}
+
+inline bool VerifySizePrefixedSimulationDataFbsBuffer(
+    ::flatbuffers::Verifier &verifier) {
+  return verifier.VerifySizePrefixedBuffer<steamrot::SimulationDataFbs>(nullptr);
+}
+
+inline void FinishSimulationDataFbsBuffer(
+    ::flatbuffers::FlatBufferBuilder &fbb,
+    ::flatbuffers::Offset<steamrot::SimulationDataFbs> root) {
+  fbb.Finish(root);
+}
+
+inline void FinishSizePrefixedSimulationDataFbsBuffer(
+    ::flatbuffers::FlatBufferBuilder &fbb,
+    ::flatbuffers::Offset<steamrot::SimulationDataFbs> root) {
+  fbb.FinishSizePrefixed(root);
 }
 
 }  // namespace steamrot

@@ -1,0 +1,15 @@
+{
+  "meta_data": {
+    "test_name": "Test loading json to TestDataFbs"
+  },
+  "simulation_data": {
+    "description": "This is a test simulation data for unit testing.",
+    "steps": [
+      {
+        "simulation_element_type": "FunctionEnumWrapper",
+        "simulation_element": { "value": "ProcessUIActionsAndEvents" }
+      }
+    ]
+  },
+  "num_ticks": 37
+}

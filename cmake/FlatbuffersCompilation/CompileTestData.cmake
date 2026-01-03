@@ -11,7 +11,7 @@ function(compile_test_data_file json_file schema_file)
   get_filename_component(file_dir ${json_file} DIRECTORY)
 
   # Output binary file in the same directory
-  set(binary_file "${file_dir}/${file_name}.bin")
+  set(binary_file "${file_dir}/${file_name}.test_data.bin")
 
   # Add custom command to compile JSON to binary
   add_custom_command(
@@ -22,7 +22,7 @@ function(compile_test_data_file json_file schema_file)
     ARGS "${schema_file}"
     ARGS "${json_file}"
     DEPENDS "${json_file}" "${schema_file}"
-    COMMENT "Compiling test data: ${file_name}.test_data.json -> ${file_name}.bin"
+    COMMENT "Compiling test data: ${file_name}.test_data.json -> ${file_name}.test_data.bin"
     VERBATIM
   )
 
@@ -37,7 +37,7 @@ set(TEST_DATA_BINARIES "")
 
 
 # Path to the test_data.fbs schema (in testing subdirectory after Phase 3 reorganization)
-set(test_data_schema "${CMAKE_SOURCE_DIR}/src/flatbuffers_headers/testing/test_data.fbs")
+set(test_data_schema "${CMAKE_SOURCE_DIR}/src/types/flatbuffers/testing/test_data.fbs")
 
 message("looking for files in ${CMAKE_SOURCE_DIR}")
 # Find all .test_data.json files in all data directories
