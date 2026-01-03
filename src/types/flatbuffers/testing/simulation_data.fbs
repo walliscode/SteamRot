@@ -46,6 +46,16 @@ enum LogicClassEnumFbs : byte {
 ///
 /// This approach is more extensible than using unions - adding
 /// a new simulation type just requires adding a new optional field.
+///
+/// Example JSON for a function step:
+/// {
+///   "function_type": "ProcessUIActionsAndEvents"
+/// }
+///
+/// Example JSON for a logic class step:
+/// {
+///   "logic_class_type": "UIActionLogic"
+/// }
 ////////////////////////////////////////////////////////////
 table SimulationStepFbs {
   /// @brief Optional function to execute
