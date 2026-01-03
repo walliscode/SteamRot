@@ -163,8 +163,23 @@ TEST_CASE(
   auto test_meta_data =
       steamrot::CreateTestMetadataFbs(builder, builder.CreateString("Test1"));
 
+  // create a simple simulation data
+  auto sim_step = steamrot::CreateSimulationStepFbs(
+      builder, steamrot::SimulationElementFbs_FunctionEnumWrapper,
+      steamrot::CreateFunctionEnumWrapper(
+          builder, steamrot::FunctionEnumFbs_ProcessUIActionsAndEvents)
+          .Union());
+  // create vector of simulation steps
+  std::vector<flatbuffers::Offset<steamrot::SimulationStepFbs>> sim_step_vec;
+  auto sim_step_offset = builder.CreateVector(&sim_step, 1);
+
+  // create SimulationDataFbs
+  auto simulation_data = steamrot::CreateSimulationDataFbs(
+      builder, sim_step_offset, builder.CreateString("Simple Simulation"));
   // combine into TestDataFbs
-  auto fbs_test_data = steamrot::CreateTestDataFbs(builder, test_meta_data);
+  auto fbs_test_data =
+      steamrot::CreateTestDataFbs(builder, test_meta_data, simulation_data, 8);
+  ;
 
   // finish the buffer and get pointer to TestDataFbs
   builder.Finish(fbs_test_data);
@@ -180,4 +195,37 @@ TEST_CASE(
 
   const steamrot::TestData &test_data = result.value();
   REQUIRE(test_data.meta_data.test_name == "Test1");
+  REQUIRE(test_data.simulation_data.steps.size() == 1);
+  REQUIRE(std::holds_alternative<steamrot::FunctionEnum>(
+      test_data.simulation_data.steps[0].element));
+  REQUIRE(std::get<steamrot::FunctionEnum>(
+              test_data.simulation_data.steps[0].element) ==
+          steamrot::FunctionEnum::ProcessUIActionsAndEvents);
+  REQUIRE(test_data.simulation_data.description == "Simple Simulation");
+  REQUIRE(test_data.number_of_ticks == 8);
+}
+
+TEST_CASE(
+    "FlatbuffersTestDataProvider::ProviderAllTestData returns all TestData "
+    "correctly",
+    "[FlatbuffersTestDataProvider]") {
+  // Arrange
+  std::filesystem::path obj_dir_path =
+      std::filesystem::path(__FILE__).parent_path();
+  FlatbuffersTestDataProvider provider(obj_dir_path);
+  // Act
+  auto result = provider.ProviderAllTestData();
+  // Assert
+  if (!result)
+    FAIL(result.error().message);
+  const auto &test_data_vec = result.value();
+  REQUIRE(test_data_vec.size() == 1);
+  REQUIRE(test_data_vec[0].meta_data.test_name ==
+          "Test loading json to TestDataFbs");
+  REQUIRE(test_data_vec[0].simulation_data.steps.size() == 1);
+  REQUIRE(std::holds_alternative<steamrot::FunctionEnum>(
+      test_data_vec[0].simulation_data.steps[0].element));
+  REQUIRE(std::get<steamrot::FunctionEnum>(
+              test_data_vec[0].simulation_data.steps[0].element) ==
+          steamrot::FunctionEnum::ProcessUIActionsAndEvents);
 }

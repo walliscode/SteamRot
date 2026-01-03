@@ -53,13 +53,13 @@ std::expected<steamrot::TestData, steamrot::FailInfo>
 FlatbuffersTestDataProvider::CreateTestData(
     const steamrot::TestDataFbs *fbs_test_data) const {
 
-  if (fbs_test_data == nullptr) {
-
+  if (!fbs_test_data) {
     return std::unexpected(
         steamrot::FailInfo{steamrot::FailMode::FlatbuffersDataNotFound,
                            "Input Flatbuffers TestData is "
                            "null."});
   }
+
   // Create and populate the TestData instance
   steamrot::TestData test_data;
 
@@ -69,6 +69,22 @@ FlatbuffersTestDataProvider::CreateTestData(
   if (!meta_data_result)
     return std::unexpected(meta_data_result.error());
 
+  // Configure SimulationData
+  auto simulation_data_result = ConfigureSimulationData(
+      test_data.simulation_data, fbs_test_data->simulation_data());
+  if (!simulation_data_result)
+    return std::unexpected(simulation_data_result.error());
+
+  // Confugure number_of_ticks, this must be present
+  if (!fbs_test_data->num_ticks()) {
+    return std::unexpected(steamrot::FailInfo{
+        steamrot::FailMode::FlatbuffersDataNotFound,
+        "TestDataFbs is missing required field: num_ticks."});
+  } else {
+    test_data.number_of_ticks = fbs_test_data->num_ticks();
+  }
+
+  // return the populated TestData instance
   return test_data;
 }
 
@@ -156,7 +172,7 @@ std::expected<std::monostate, steamrot::FailInfo>
 FlatbuffersTestDataProvider::ConfigureSimulationData(
     steamrot::SimulationData &simulation_data,
     const steamrot::SimulationDataFbs *fbs_simulation_data) const {
-  if (fbs_simulation_data == nullptr)
+  if (!fbs_simulation_data)
     return std::unexpected(
         steamrot::FailInfo{steamrot::FailMode::FlatbuffersDataNotFound,
                            "Input Flatbuffers SimulationData is null."});
@@ -167,6 +183,10 @@ FlatbuffersTestDataProvider::ConfigureSimulationData(
 
     steamrot::SimulationElement element;
 
+    // add the description if it exists
+    if (fbs_simulation_data->description()) {
+      simulation_data.description = fbs_simulation_data->description()->str();
+    }
     // Determine the element type
     if (fbs_step->simulation_element_as_FunctionEnumWrapper()) {
 
