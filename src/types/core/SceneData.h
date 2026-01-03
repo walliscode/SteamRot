@@ -38,4 +38,6 @@ struct SceneData {
   /////////////////////////////////////////////////
   AssetConfig scene_asset_config;
 };
+
+using SceneCollectionData = std::vector<std::unique_ptr<SceneData>>;
 } // namespace steamrot
