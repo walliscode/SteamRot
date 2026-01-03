@@ -8,31 +8,24 @@ namespace steamrot;
 ////////////////////////////////////////////////////////////
 /// Metadata for save file management
 ////////////////////////////////////////////////////////////
-table SaveMetadata {
+table SaveMetaDataFbs{
+
   /// Display name for the save slot
   save_name: string;
+
+  /// Unique identifier from the file prefix
+  file_id: string;
+
   
-  /// Timestamp when save was created (ISO 8601 format)
-  created_at: string;
-  
-  /// Timestamp when save was last modified (ISO 8601 format)
-  last_modified: string;
-  
-  /// Game version that created this save
-  game_version: string;
-  
-  /// Total play time in seconds
-  play_time_seconds: uint64 = 0;
-  
-  /// Save slot identifier (0-based index)
-  slot_index: uint32 = 0;
 }
 
 
 ////////////////////////////////////////////////////////////
 /// Root table containing complete save game data
 ////////////////////////////////////////////////////////////
-table SaveData {
+table SaveDataFbs{
+  /// Metadata for the save file
+  save_meta_data: SaveMetaDataFbs;
 }
 
-root_type SaveData;
+root_type SaveDataFbs;

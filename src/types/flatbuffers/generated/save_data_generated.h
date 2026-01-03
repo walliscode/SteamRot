@@ -19,197 +19,155 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
-struct SaveMetadata;
-struct SaveMetadataBuilder;
+struct SaveMetaDataFbs;
+struct SaveMetaDataFbsBuilder;
 
-struct SaveData;
-struct SaveDataBuilder;
+struct SaveDataFbs;
+struct SaveDataFbsBuilder;
 
 ////////////////////////////////////////////////////////////
 /// Metadata for save file management
 ////////////////////////////////////////////////////////////
-struct SaveMetadata FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef SaveMetadataBuilder Builder;
+struct SaveMetaDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SaveMetaDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_SAVE_NAME = 4,
-    VT_CREATED_AT = 6,
-    VT_LAST_MODIFIED = 8,
-    VT_GAME_VERSION = 10,
-    VT_PLAY_TIME_SECONDS = 12,
-    VT_SLOT_INDEX = 14
+    VT_FILE_ID = 6
   };
   /// Display name for the save slot
   const ::flatbuffers::String *save_name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_SAVE_NAME);
   }
-  /// Timestamp when save was created (ISO 8601 format)
-  const ::flatbuffers::String *created_at() const {
-    return GetPointer<const ::flatbuffers::String *>(VT_CREATED_AT);
-  }
-  /// Timestamp when save was last modified (ISO 8601 format)
-  const ::flatbuffers::String *last_modified() const {
-    return GetPointer<const ::flatbuffers::String *>(VT_LAST_MODIFIED);
-  }
-  /// Game version that created this save
-  const ::flatbuffers::String *game_version() const {
-    return GetPointer<const ::flatbuffers::String *>(VT_GAME_VERSION);
-  }
-  /// Total play time in seconds
-  uint64_t play_time_seconds() const {
-    return GetField<uint64_t>(VT_PLAY_TIME_SECONDS, 0);
-  }
-  /// Save slot identifier (0-based index)
-  uint32_t slot_index() const {
-    return GetField<uint32_t>(VT_SLOT_INDEX, 0);
+  /// Unique identifier from the file prefix
+  const ::flatbuffers::String *file_id() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_FILE_ID);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_SAVE_NAME) &&
            verifier.VerifyString(save_name()) &&
-           VerifyOffset(verifier, VT_CREATED_AT) &&
-           verifier.VerifyString(created_at()) &&
-           VerifyOffset(verifier, VT_LAST_MODIFIED) &&
-           verifier.VerifyString(last_modified()) &&
-           VerifyOffset(verifier, VT_GAME_VERSION) &&
-           verifier.VerifyString(game_version()) &&
-           VerifyField<uint64_t>(verifier, VT_PLAY_TIME_SECONDS, 8) &&
-           VerifyField<uint32_t>(verifier, VT_SLOT_INDEX, 4) &&
+           VerifyOffset(verifier, VT_FILE_ID) &&
+           verifier.VerifyString(file_id()) &&
            verifier.EndTable();
   }
 };
 
-struct SaveMetadataBuilder {
-  typedef SaveMetadata Table;
+struct SaveMetaDataFbsBuilder {
+  typedef SaveMetaDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_save_name(::flatbuffers::Offset<::flatbuffers::String> save_name) {
-    fbb_.AddOffset(SaveMetadata::VT_SAVE_NAME, save_name);
+    fbb_.AddOffset(SaveMetaDataFbs::VT_SAVE_NAME, save_name);
   }
-  void add_created_at(::flatbuffers::Offset<::flatbuffers::String> created_at) {
-    fbb_.AddOffset(SaveMetadata::VT_CREATED_AT, created_at);
+  void add_file_id(::flatbuffers::Offset<::flatbuffers::String> file_id) {
+    fbb_.AddOffset(SaveMetaDataFbs::VT_FILE_ID, file_id);
   }
-  void add_last_modified(::flatbuffers::Offset<::flatbuffers::String> last_modified) {
-    fbb_.AddOffset(SaveMetadata::VT_LAST_MODIFIED, last_modified);
-  }
-  void add_game_version(::flatbuffers::Offset<::flatbuffers::String> game_version) {
-    fbb_.AddOffset(SaveMetadata::VT_GAME_VERSION, game_version);
-  }
-  void add_play_time_seconds(uint64_t play_time_seconds) {
-    fbb_.AddElement<uint64_t>(SaveMetadata::VT_PLAY_TIME_SECONDS, play_time_seconds, 0);
-  }
-  void add_slot_index(uint32_t slot_index) {
-    fbb_.AddElement<uint32_t>(SaveMetadata::VT_SLOT_INDEX, slot_index, 0);
-  }
-  explicit SaveMetadataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit SaveMetaDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<SaveMetadata> Finish() {
+  ::flatbuffers::Offset<SaveMetaDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<SaveMetadata>(end);
+    auto o = ::flatbuffers::Offset<SaveMetaDataFbs>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<SaveMetadata> CreateSaveMetadata(
+inline ::flatbuffers::Offset<SaveMetaDataFbs> CreateSaveMetaDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::String> save_name = 0,
-    ::flatbuffers::Offset<::flatbuffers::String> created_at = 0,
-    ::flatbuffers::Offset<::flatbuffers::String> last_modified = 0,
-    ::flatbuffers::Offset<::flatbuffers::String> game_version = 0,
-    uint64_t play_time_seconds = 0,
-    uint32_t slot_index = 0) {
-  SaveMetadataBuilder builder_(_fbb);
-  builder_.add_play_time_seconds(play_time_seconds);
-  builder_.add_slot_index(slot_index);
-  builder_.add_game_version(game_version);
-  builder_.add_last_modified(last_modified);
-  builder_.add_created_at(created_at);
+    ::flatbuffers::Offset<::flatbuffers::String> file_id = 0) {
+  SaveMetaDataFbsBuilder builder_(_fbb);
+  builder_.add_file_id(file_id);
   builder_.add_save_name(save_name);
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<SaveMetadata> CreateSaveMetadataDirect(
+inline ::flatbuffers::Offset<SaveMetaDataFbs> CreateSaveMetaDataFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const char *save_name = nullptr,
-    const char *created_at = nullptr,
-    const char *last_modified = nullptr,
-    const char *game_version = nullptr,
-    uint64_t play_time_seconds = 0,
-    uint32_t slot_index = 0) {
+    const char *file_id = nullptr) {
   auto save_name__ = save_name ? _fbb.CreateString(save_name) : 0;
-  auto created_at__ = created_at ? _fbb.CreateString(created_at) : 0;
-  auto last_modified__ = last_modified ? _fbb.CreateString(last_modified) : 0;
-  auto game_version__ = game_version ? _fbb.CreateString(game_version) : 0;
-  return steamrot::CreateSaveMetadata(
+  auto file_id__ = file_id ? _fbb.CreateString(file_id) : 0;
+  return steamrot::CreateSaveMetaDataFbs(
       _fbb,
       save_name__,
-      created_at__,
-      last_modified__,
-      game_version__,
-      play_time_seconds,
-      slot_index);
+      file_id__);
 }
 
 ////////////////////////////////////////////////////////////
 /// Root table containing complete save game data
 ////////////////////////////////////////////////////////////
-struct SaveData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef SaveDataBuilder Builder;
+struct SaveDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SaveDataFbsBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_SAVE_META_DATA = 4
+  };
+  /// Metadata for the save file
+  const steamrot::SaveMetaDataFbs *save_meta_data() const {
+    return GetPointer<const steamrot::SaveMetaDataFbs *>(VT_SAVE_META_DATA);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_SAVE_META_DATA) &&
+           verifier.VerifyTable(save_meta_data()) &&
            verifier.EndTable();
   }
 };
 
-struct SaveDataBuilder {
-  typedef SaveData Table;
+struct SaveDataFbsBuilder {
+  typedef SaveDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  explicit SaveDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  void add_save_meta_data(::flatbuffers::Offset<steamrot::SaveMetaDataFbs> save_meta_data) {
+    fbb_.AddOffset(SaveDataFbs::VT_SAVE_META_DATA, save_meta_data);
+  }
+  explicit SaveDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<SaveData> Finish() {
+  ::flatbuffers::Offset<SaveDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<SaveData>(end);
+    auto o = ::flatbuffers::Offset<SaveDataFbs>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<SaveData> CreateSaveData(
-    ::flatbuffers::FlatBufferBuilder &_fbb) {
-  SaveDataBuilder builder_(_fbb);
+inline ::flatbuffers::Offset<SaveDataFbs> CreateSaveDataFbs(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<steamrot::SaveMetaDataFbs> save_meta_data = 0) {
+  SaveDataFbsBuilder builder_(_fbb);
+  builder_.add_save_meta_data(save_meta_data);
   return builder_.Finish();
 }
 
-inline const steamrot::SaveData *GetSaveData(const void *buf) {
-  return ::flatbuffers::GetRoot<steamrot::SaveData>(buf);
+inline const steamrot::SaveDataFbs *GetSaveDataFbs(const void *buf) {
+  return ::flatbuffers::GetRoot<steamrot::SaveDataFbs>(buf);
 }
 
-inline const steamrot::SaveData *GetSizePrefixedSaveData(const void *buf) {
-  return ::flatbuffers::GetSizePrefixedRoot<steamrot::SaveData>(buf);
+inline const steamrot::SaveDataFbs *GetSizePrefixedSaveDataFbs(const void *buf) {
+  return ::flatbuffers::GetSizePrefixedRoot<steamrot::SaveDataFbs>(buf);
 }
 
-inline bool VerifySaveDataBuffer(
+inline bool VerifySaveDataFbsBuffer(
     ::flatbuffers::Verifier &verifier) {
-  return verifier.VerifyBuffer<steamrot::SaveData>(nullptr);
+  return verifier.VerifyBuffer<steamrot::SaveDataFbs>(nullptr);
 }
 
-inline bool VerifySizePrefixedSaveDataBuffer(
+inline bool VerifySizePrefixedSaveDataFbsBuffer(
     ::flatbuffers::Verifier &verifier) {
-  return verifier.VerifySizePrefixedBuffer<steamrot::SaveData>(nullptr);
+  return verifier.VerifySizePrefixedBuffer<steamrot::SaveDataFbs>(nullptr);
 }
 
-inline void FinishSaveDataBuffer(
+inline void FinishSaveDataFbsBuffer(
     ::flatbuffers::FlatBufferBuilder &fbb,
-    ::flatbuffers::Offset<steamrot::SaveData> root) {
+    ::flatbuffers::Offset<steamrot::SaveDataFbs> root) {
   fbb.Finish(root);
 }
 
-inline void FinishSizePrefixedSaveDataBuffer(
+inline void FinishSizePrefixedSaveDataFbsBuffer(
     ::flatbuffers::FlatBufferBuilder &fbb,
-    ::flatbuffers::Offset<steamrot::SaveData> root) {
+    ::flatbuffers::Offset<steamrot::SaveDataFbs> root) {
   fbb.FinishSizePrefixed(root);
 }
 
