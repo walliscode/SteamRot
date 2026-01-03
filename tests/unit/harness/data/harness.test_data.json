@@ -6,8 +6,7 @@
     "description": "This is a test simulation data for unit testing.",
     "steps": [
       {
-        "simulation_element_type": "FunctionEnumWrapper",
-        "simulation_element": { "value": "ProcessUIActionsAndEvents" }
+        "function_type": "ProcessUIActionsAndEvents"
       }
     ]
   },

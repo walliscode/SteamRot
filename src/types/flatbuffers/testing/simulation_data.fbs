@@ -38,39 +38,21 @@ enum LogicClassEnumFbs : byte {
 }
 
 ////////////////////////////////////////////////////////////
-/// @brief Wrapper table for FunctionEnumFbs
-///
-/// FlatBuffers unions can only contain table types, so we wrap
-/// the enum in a table for use in SimulationElementFbs union.
-////////////////////////////////////////////////////////////
-table FunctionEnumWrapper {
-  value: FunctionEnumFbs;
-}
-
-////////////////////////////////////////////////////////////
-/// @brief Wrapper table for LogicClassEnumFbs
-///
-/// FlatBuffers unions can only contain table types, so we wrap
-/// the enum in a table for use in SimulationElementFbs union.
-////////////////////////////////////////////////////////////
-table LogicClassEnumWrapper {
-  value: LogicClassEnumFbs;
-}
-
-union SimulationElementFbs {
-  FunctionEnumWrapper,
-  LogicClassEnumWrapper
-}
-
-
-////////////////////////////////////////////////////////////
 /// @brief A single step in a simulation sequence
 ///
-/// Each step specifies what to execute (function or Logic class)
-/// and which system category it belongs to.
+/// Each step specifies what to execute (function or Logic class).
+/// Exactly one of the optional fields should be set to specify
+/// which simulation element to execute.
+///
+/// This approach is more extensible than using unions - adding
+/// a new simulation type just requires adding a new optional field.
 ////////////////////////////////////////////////////////////
 table SimulationStepFbs {
-    simulation_element: SimulationElementFbs;
+  /// @brief Optional function to execute
+  function_type: FunctionEnumFbs = None;
+  
+  /// @brief Optional Logic class to execute
+  logic_class_type: LogicClassEnumFbs = None;
 }
 
 ////////////////////////////////////////////////////////////

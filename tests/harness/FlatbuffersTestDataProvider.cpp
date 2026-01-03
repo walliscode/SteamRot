@@ -177,40 +177,45 @@ FlatbuffersTestDataProvider::ConfigureSimulationData(
         steamrot::FailInfo{steamrot::FailMode::FlatbuffersDataNotFound,
                            "Input Flatbuffers SimulationData is null."});
 
-  // for each SimulationStepFbs, create a SimulationStep and add to
+  // Add the description if it exists
+  if (fbs_simulation_data->description()) {
+    simulation_data.description = fbs_simulation_data->description()->str();
+  }
+
+  // For each SimulationStepFbs, create a SimulationStep and add to
   // simulation_data
   for (const auto *fbs_step : *fbs_simulation_data->steps()) {
 
     steamrot::SimulationElement element;
 
-    // add the description if it exists
-    if (fbs_simulation_data->description()) {
-      simulation_data.description = fbs_simulation_data->description()->str();
-    }
-    // Determine the element type
-    if (fbs_step->simulation_element_as_FunctionEnumWrapper()) {
+    // Check which type is set - exactly one should be non-None
+    bool has_function = fbs_step->function_type() != steamrot::FunctionEnumFbs_None;
+    bool has_logic_class = fbs_step->logic_class_type() != steamrot::LogicClassEnumFbs_None;
 
-      steamrot::FunctionEnumFbs fbs_function_enum =
-          fbs_step->simulation_element_as_FunctionEnumWrapper()->value();
-
-      // assign the converted FunctionEnum to the element variant
-      element = ConvertFbsToFunctionEnum(fbs_function_enum);
-
-    } else if (fbs_step->simulation_element_as_LogicClassEnumWrapper()) {
-
-      // assign the converted LogicClassEnum to the element variant
-      element = ConvertFbsToLogicClassEnum(
-          fbs_step->simulation_element_as_LogicClassEnumWrapper()->value());
-
-    } else {
+    if (has_function && has_logic_class) {
       return std::unexpected(steamrot::FailInfo{
           steamrot::FailMode::FlatbuffersDataNotFound,
-          "SimulationStepFbs has unknown SimulationElement type."});
+          "SimulationStepFbs has both function_type and logic_class_type set. "
+          "Only one should be set per step."});
+    }
+
+    if (!has_function && !has_logic_class) {
+      return std::unexpected(steamrot::FailInfo{
+          steamrot::FailMode::FlatbuffersDataNotFound,
+          "SimulationStepFbs has neither function_type nor logic_class_type set. "
+          "Exactly one must be set per step."});
+    }
+
+    if (has_function) {
+      // Assign the converted FunctionEnum to the element variant
+      element = ConvertFbsToFunctionEnum(fbs_step->function_type());
+    } else {
+      // Assign the converted LogicClassEnum to the element variant
+      element = ConvertFbsToLogicClassEnum(fbs_step->logic_class_type());
     }
 
     // Create SimulationStep and add to simulation_data
     steamrot::SimulationStep step(element);
-
     simulation_data.steps.emplace_back(step);
   }
 
