@@ -71,13 +71,6 @@ public:
   void Initialize();
 
   /////////////////////////////////////////////////
-  /// @brief Initialize all resources (typo-compatible alias)
-  ///
-  /// @deprecated Use Initialize() instead
-  /////////////////////////////////////////////////
-  void Intialize() { Initialize(); }
-
-  /////////////////////////////////////////////////
   /// @brief Get reference to GameContext
   ///
   /// @return Reference to the GameContext for testing

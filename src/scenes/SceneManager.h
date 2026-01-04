@@ -84,7 +84,10 @@ public:
   /////////////////////////////////////////////////
   SceneManager(const GameContext &game_context);
 
-  void StartUp();
+  /////////////////////////////////////////////////
+  /// @brief Start up the SceneManager, loading configuration and preparing
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> StartUp();
 
   /////////////////////////////////////////////////
   /// @brief A convenience function to load the title scene.

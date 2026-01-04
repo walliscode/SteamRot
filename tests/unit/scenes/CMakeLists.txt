@@ -1,6 +1,7 @@
 add_executable(test_scenes
   TestScene.cpp
   FlatbuffersSceneConfigurator.test.cpp
+  SceneManager.test.cpp
 )
 
 target_link_libraries(test_scenes

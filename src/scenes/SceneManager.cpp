@@ -9,7 +9,9 @@
 #include "SceneManager.h"
 #include "ISceneManagerDataProvider.h"
 #include "SceneFactory.h"
+#include <expected>
 #include <iostream>
+#include <variant>
 
 namespace steamrot {
 
@@ -18,17 +20,24 @@ SceneManager::SceneManager(const GameContext &game_context)
     : m_scenes(), m_game_context(game_context) {}
 
 /////////////////////////////////////////////////
-void SceneManager::StartUp() {
+std::expected<std::monostate, FailInfo> SceneManager::StartUp() {
 
   // create data provider for SceneManager configuration
   auto data_provider_result =
       m_game_context.engine_resources.data_access_factory
           .GetSceneManagerDataProvider();
-  if (!data_provider_result)
-
-    return; // [TODO: handle failure]
-
+  if (!data_provider_result) {
+    return std::unexpected(data_provider_result.error());
+  }
   ISceneManagerDataProvider &data_provider = *data_provider_result.value();
+
+  // get SceneManager data from data provider
+  auto data_result = data_provider.ProvideSceneManagerData();
+  if (!data_result.has_value()) {
+    return std::unexpected(data_result.error());
+  }
+  // assign SceneManagerState from data provider
+  return std::monostate{};
 }
 /////////////////////////////////////////////////
 const std::unordered_map<uuids::uuid, std::unique_ptr<Scene>> &
