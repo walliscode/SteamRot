@@ -183,6 +183,35 @@ SaveData implementation is successful when:
 ## Related Documentation
 
 - **[Full Analysis Document](SAVE_DATA_IMPLEMENTATION_ANALYSIS.md)** - Complete implementation analysis
+- **[SaveData and TestData Integration](SAVE_DATA_TEST_DATA_INTEGRATION.md)** - How to align SaveData with TestData for unified testing
 - **[User Preferences Schema](../../src/types/flatbuffers/configuration/user_preferences.fbs)** - Separate from SaveData
 - **[Entity Schemas](../../src/types/flatbuffers/entities/)** - Entity serialization patterns
 - **[Copilot Instructions](../../.github/copilot-instructions.md)** - Code style and patterns
+
+## TestData Integration
+
+**Key Alignment**: TestData should mirror SaveData structure to enable:
+
+1. **Save/Load Testing**: Test data uses `TestSceneData` that mirrors `SavedSceneData`
+2. **Unified Configuration**: Both systems use same `EntityCollectionFbs` and configurator
+3. **Test-Driven Development**: Write integration tests before implementing SaveDataManager
+4. **Schema Validation**: Test backward compatibility and schema evolution
+
+**Recommended TestData Extensions**:
+```fbs
+table TestSceneData {
+  scene_type: SceneType (required);
+  entity_collection: EntityCollectionFbs;  // Same as SaveData
+  scene_flags: [string];
+}
+
+table TestDataFbs {
+  meta_data: TestMetadataFbs (required);
+  initial_scene_state: TestSceneData;      // Mimics save initial state
+  expected_scene_state: TestSceneData;     // Mimics save after gameplay
+  simulation_data: SimulationDataFbs;
+  num_ticks: uint32;
+}
+```
+
+**See**: [SaveData and TestData Integration Guide](SAVE_DATA_TEST_DATA_INTEGRATION.md) for complete details and examples.

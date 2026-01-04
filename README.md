@@ -113,6 +113,7 @@ The `documentation/` directory contains comprehensive guides organized by topic:
 
 ### 🔍 Analysis & Design
 - **[SaveData Implementation Analysis](documentation/analysis/SAVE_DATA_IMPLEMENTATION_ANALYSIS.md)** - Save/load system design
+- **[SaveData and TestData Integration](documentation/analysis/SAVE_DATA_TEST_DATA_INTEGRATION.md)** - Aligning SaveData with TestData
 - **[User Interface Decoupling](documentation/analysis/USER_INTERFACE_DECOUPLING_ANALYSIS.md)** - UI architecture analysis
 - **[UI Phases 1 & 2 Implementation](documentation/analysis/USER_INTERFACE_PHASES_1_2_IMPLEMENTATION.md)** - UI implementation details
 - **[Font Provider Decoupling](documentation/analysis/FONT_PROVIDER_DECOUPLING.md)** - Font system architecture

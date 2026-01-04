@@ -731,6 +731,41 @@ This allows the game designer to toggle sharing behavior without code changes.
 - Save with corrupt entity data (error recovery)
 - Load save from different game version
 
+### Integration with TestData System
+
+**Unified Testing Approach:**
+
+The SaveData system should align with the TestData system to enable:
+1. **Save/Load Testing**: Use TestData with scene state structures that mirror SaveData
+2. **Shared Configuration**: Reuse FlatbuffersEntityConfigurator for both systems
+3. **Test-Driven Development**: Write tests using TestData before implementing production SaveDataManager
+
+**Recommended TestData Schema Extensions:**
+
+```fbs
+table TestSceneData {
+  scene_type: SceneType (required);
+  entity_collection: EntityCollectionFbs;  // Same as SavedSceneData
+  scene_flags: [string];
+}
+
+table TestDataFbs {
+  meta_data: TestMetadataFbs (required);
+  initial_scene_state: TestSceneData;      // Mimics SaveData initial state
+  expected_scene_state: TestSceneData;     // Mimics SaveData after gameplay
+  simulation_data: SimulationDataFbs;
+  num_ticks: uint32;
+}
+```
+
+**Benefits:**
+- Test save/load patterns before production implementation
+- Validate schema evolution with test cases
+- Debug production saves using test infrastructure
+- Use test data as save format documentation
+
+**See**: [SaveData and TestData Integration Guide](SAVE_DATA_TEST_DATA_INTEGRATION.md) for complete integration strategy and examples.
+
 ---
 
 ## Future Considerations
@@ -834,3 +869,7 @@ SaveData implementation is successful when:
 ### SteamRot Documentation
 - `.github/copilot-instructions.md` - Coding standards
 - `README.md` - Architecture overview
+- `SAVE_DATA_TEST_DATA_INTEGRATION.md` - Aligning SaveData with TestData for testing
+
+### Related Analysis Documents
+- **[SaveData and TestData Integration Guide](SAVE_DATA_TEST_DATA_INTEGRATION.md)** - How to align SaveData structure with TestData for unified testing and save/load validation
