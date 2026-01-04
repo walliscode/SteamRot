@@ -29,6 +29,12 @@ TEST_CASE("SceneManager::StartUp loads configuration successfully",
   steamrot::tests::TestFixture fixture;
   fixture.Initialize();
   steamrot::SceneManager scene_manager(fixture.GetGameContext());
+  steamrot::EventHandler &event_handler =
+      fixture.GetGameContext().engine_resources.event_handler;
+
+  // initial check - no subscribers
+  REQUIRE(scene_manager.GetSubscriptions().empty());
+  REQUIRE(event_handler.GetSubcriberRegister().empty());
   // Act
   auto result = scene_manager.StartUp();
   // Assert
@@ -41,4 +47,8 @@ TEST_CASE("SceneManager::StartUp loads configuration successfully",
   REQUIRE(subscriptions.size() == 1);
   REQUIRE(subscriptions[0]->m_trigger_event_type ==
           steamrot::EventType::EventType_EVENT_CHANGE_SCENE);
+
+  // check subscribers have been registered with the EventHandler
+  const auto &registered_subscribers = event_handler.GetSubcriberRegister();
+  REQUIRE(registered_subscribers.size() == 1);
 }

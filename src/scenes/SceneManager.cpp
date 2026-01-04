@@ -37,6 +37,16 @@ std::expected<std::monostate, FailInfo> SceneManager::StartUp() {
     return std::unexpected(data_result.error());
   }
   // assign SceneManagerState from data provider
+  m_scene_manager_state = data_result.value().scene_manager_state;
+
+  // Register subscriptions with EventHandler
+  for (auto &subscriber : m_scene_manager_state.subscriptions) {
+    auto register_result =
+        m_game_context.event_handler.RegisterSubscriber(subscriber);
+    if (!register_result.has_value()) {
+      return std::unexpected(register_result.error());
+    }
+  }
   return std::monostate{};
 }
 /////////////////////////////////////////////////
@@ -170,7 +180,6 @@ SceneManager::GetSubscriptions() const {
 std::expected<std::monostate, FailInfo> SceneManager::ProcessSubscriptions() {
 
   for (auto &subscriber : m_scene_manager_state.subscriptions) {
-
     // only process active subscribers
     if (subscriber->m_active) {
 
