@@ -95,6 +95,11 @@ The `documentation/` directory contains comprehensive guides organized by topic:
 - **[Game Loop](documentation/architecture/GAME_LOOP.md)** - Main game loop structure
 - **[Logic System](documentation/architecture/LOGIC_SYSTEM.md)** - Logic architecture
 
+### 📊 Analysis & Design Decisions
+- **[EntityMemoryPool Configuration Strategy](documentation/analysis/ENTITY_MEMORY_POOL_CONFIGURATION_STRATEGY.md)** - Performance analysis of entity loading approaches
+- **[User Interface Decoupling](documentation/analysis/USER_INTERFACE_DECOUPLING_ANALYSIS.md)** - UI system architecture
+- **[Font Provider Decoupling](documentation/analysis/FONT_PROVIDER_DECOUPLING.md)** - Font management design
+
 ### ⚙️ Configuration
 - **[Context Configuration](documentation/configuration/CONTEXT_CONFIGURATION.md)** - Game and scene contexts
 - **[Resource Configuration](documentation/configuration/RESOURCE_CONFIGURATION.md)** - Resource management

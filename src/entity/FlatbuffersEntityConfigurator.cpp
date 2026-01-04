@@ -26,6 +26,17 @@ FlatbuffersEntityConfigurator::FlatbuffersEntityConfigurator(
       IEntityConfigurator(event_handler) {}
 
 /////////////////////////////////////////////////
+/// Configuration Strategy Note:
+/// This method configures entities directly into the provided EntityMemoryPool
+/// in a single pass. This approach is optimal for memory and performance:
+/// - Memory: No temporary pool allocation (saves 500KB-5MB per scene)
+/// - Performance: Single-pass O(n) configuration with no copy/move overhead
+/// - Simplicity: Direct configuration into final destination
+///
+/// An alternative approach of pre-configuring a pool and copying/moving it
+/// would double memory usage during configuration and add unnecessary complexity.
+/// See: documentation/analysis/ENTITY_MEMORY_POOL_CONFIGURATION_STRATEGY.md
+/////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 FlatbuffersEntityConfigurator::ConfigureEntityMemoryPool(
     EntityMemoryPool &emp) {
