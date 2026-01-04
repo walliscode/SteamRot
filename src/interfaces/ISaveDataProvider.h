@@ -27,6 +27,6 @@ public:
   /////////////////////////////////////////////////
   /// @brief Provide a SaveData object.
   /////////////////////////////////////////////////
-  std::expected<SaveData, FailInfo> ProvideSaveData() const = 0;
+  virtual std::expected<SaveData, FailInfo> ProvideSaveData() const = 0;
 };
 } // namespace steamrot
