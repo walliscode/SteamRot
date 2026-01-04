@@ -85,6 +85,11 @@ public:
   std::expected<ISceneDataProvider *, FailInfo> GetSceneDataProvider();
 
   /////////////////////////////////////////////////
+  /// @brief Returns a raw pointer to the Scene Configurator
+  /////////////////////////////////////////////////
+  std::expected<ISceneConfigurator *, FailInfo> GetSceneConfigurator();
+
+  /////////////////////////////////////////////////
   /// @brief Sets the data type for the factory
   ///
   /// When called, this will have a cascading effect of resetting all data
