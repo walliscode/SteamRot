@@ -7,51 +7,57 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersSceneManagerDataProvider.h"
-#include "FlatbuffersSubscriberViewer.h"
-#include "scene_manager_data_generated.h"
+#include "FlatbuffersDataLoader.h"
+#include "subscriber_factory.h"
 
 namespace steamrot {
 
 /////////////////////////////////////////////////
-std::expected<SceneManagerState, FailInfo>
-FlatbuffersSceneManagerDataProvider::LoadSceneManagerState() const {
+std::expected<std::monostate, FailInfo>
+FlatbuffersSceneManagerDataProvider::ConfigureSceneManagerState(
+    SceneManagerState &state, const SceneManagerStateFbs *state_data) const {
 
-  // create SceneManagerState object
-  SceneManagerState scene_manager_state;
-  // configure SceneManagerState object
+  // Check for null data
+  if (!state_data)
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    "SceneManagerStateFbs data is null"});
 
-  // get SubscriptionViewer
-  auto subscriber_viewer_result = GetSubscriberViewer();
-  if (!subscriber_viewer_result) {
-    return std::unexpected(subscriber_viewer_result.error());
+  //  populate subscriptions
+  for (const SubscriberFbs *subscriber_fbs : *state_data->subscriptions()) {
+    auto create_result = subscriber_factory::CreateSubscriber(subscriber_fbs);
+    if (!create_result.has_value()) {
+      return std::unexpected(create_result.error());
+    }
+    state.subscriptions.push_back(
+        std::make_shared<Subscriber>(create_result.value()));
   }
-
-  // get Subscribers from viewer and set to SceneManagerState
-  auto subscriber_result = subscriber_viewer_result.value()->GetSubscribers();
-  if (!subscriber_result) {
-    return std::unexpected(subscriber_result.error());
-  }
-  scene_manager_state.subscriptions = subscriber_result.value();
-
-  // return configured SceneManagerState object
-  return scene_manager_state;
+  return std::monostate{};
 }
 
 /////////////////////////////////////////////////
-std::expected<std::unique_ptr<ISubscriberViewer>, FailInfo>
-FlatbuffersSceneManagerDataProvider::GetSubscriberViewer() const {
+std::expected<SceneManagerData, FailInfo>
+FlatbuffersSceneManagerDataProvider::ProvideSceneManagerData() const {
 
-  // load SceneManagerdata
-  auto scene_manager_data_result = m_loader.ProvideSceneManagerData();
-  if (!scene_manager_data_result) {
-    return std::unexpected(scene_manager_data_result.error());
+  // Load default SceneManagerData from file
+  FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideSceneManagerData();
+  if (!result.has_value()) {
+    return std::unexpected(result.error());
   }
-  // asign data to local variable
-  const SceneManagerStateFbs &scene_manager_data =
-      *scene_manager_data_result.value()->state();
+  const SceneManagerDataFbs *scene_manager_data_fbs = result.value();
+  if (!scene_manager_data_fbs) {
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    "SceneManagerDataFbs data is null"});
+  }
 
-  // psas subscritption data to viewer and return
-  return std::make_unique<FlatbuffersSubscriberViewer>(
-      scene_manager_data.subscriptions());
+  // create SceneManagerData to populate
+  SceneManagerData scene_manager_data;
+
+  // configure SceneManagerState
+  auto configure_state_result = ConfigureSceneManagerState(
+      scene_manager_data.scene_manager_state, scene_manager_data_fbs->state());
+
+  return scene_manager_data;
 }
+
 } // namespace steamrot

@@ -14,6 +14,9 @@
 
 #include "FlatbuffersDataLoader.h"
 #include "ISceneManagerDataProvider.h"
+#include "SceneManagerData.h"
+#include "scene_manager_state_generated.h"
+#include <variant>
 
 namespace steamrot {
 
@@ -32,15 +35,19 @@ public:
   FlatbuffersSceneManagerDataProvider() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Implementation of LoadSceneManagerState
+  /// @brief Configure SceneManagerState from FlatBuffers data.
+  ///
+  /// @param state SceneManagerState to configure
+  /// @param state_data FlatBuffers data to use for configuration
   /////////////////////////////////////////////////
-  std::expected<SceneManagerState, FailInfo>
-  LoadSceneManagerState() const override;
+  std::expected<std::monostate, FailInfo>
+  ConfigureSceneManagerState(SceneManagerState &state,
+                             const SceneManagerStateFbs *state_data) const;
 
   /////////////////////////////////////////////////
-  /// @brief Implementation of GetSubscriberViewer
+  /// @brief Implementation of LoadSceneManagerState
   /////////////////////////////////////////////////
-  std::expected<std::unique_ptr<ISubscriberViewer>, FailInfo>
-  GetSubscriberViewer() const override;
+  std::expected<SceneManagerData, FailInfo>
+  ProvideSceneManagerData() const override;
 };
 } // namespace steamrot

@@ -7,7 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersSceneManagerDataProvider.h"
-#include "events_generated.h"
+#include "FailInfo.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("FlatbuffersSceneManagerDataProvider is constructed correctly",
@@ -17,47 +17,71 @@ TEST_CASE("FlatbuffersSceneManagerDataProvider is constructed correctly",
   REQUIRE_NOTHROW(provider);
 }
 
-TEST_CASE("FlatbuffersSceneManagerDataProvider::LoadSceneManagerState loads "
-          "correctly",
+TEST_CASE("FlatbuffersSceneManagerDataProvider::ConfigureSceneManagerState "
+          "handles nullptr"
           "[unit][FlatbuffersSceneManagerDataProvider]") {
-
+  // Arrange
   steamrot::FlatbuffersSceneManagerDataProvider provider;
-  auto result = provider.LoadSceneManagerState();
+  steamrot::SceneManagerState state;
 
-  if (!result.has_value()) {
-    FAIL(result.error().message);
-  }
+  // Act
+  auto result = provider.ConfigureSceneManagerState(state, nullptr);
 
-  const auto &state = result.value();
-
-  REQUIRE(state.subscriptions.size() == 1);
-  REQUIRE(state.subscriptions[0]->m_trigger_event_type ==
-          steamrot::EventType_EVENT_CHANGE_SCENE);
+  // Assert
+  REQUIRE(!result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message == "SceneManagerStateFbs data is null");
 }
 
-TEST_CASE(
-    "FlatbuffersSceneManagerDataProvider::GetSubscriberViewer returns viewer ",
-    "[unit][FlatbuffersEngineDataProvider]") {
-
+TEST_CASE("FlatbuffersSceneManagerDataProvider::ConfigureSceneManagerState "
+          "succeeds with valid data"
+          "[unit][FlatbuffersSceneManagerDataProvider]") {
+  // Arrange
   steamrot::FlatbuffersSceneManagerDataProvider provider;
-  auto result = provider.GetSubscriberViewer();
+  steamrot::SceneManagerState state;
 
-  if (!result.has_value()) {
-    FAIL(result.error().message);
-  }
+  flatbuffers::FlatBufferBuilder builder;
 
-  const auto &viewer = result.value();
-  REQUIRE(viewer != nullptr);
+  // create a SubscriberFbs to add
 
-  // Test that viewer can get subscribers
-  auto subscribers_result = viewer->GetSubscribers();
-  if (!subscribers_result.has_value()) {
-    FAIL(subscribers_result.error().message);
-  }
+  auto subscriber_offset = steamrot::CreateSubscriberFbs(
+      builder, steamrot::EventType::EventType_EVENT_TEST,
+      steamrot::EventDataData::EventDataData_NONE,
+      0,      // trigger_data_type and data
+      false); // active
 
-  // check subscribers for size and specific data. the Engine should have a
-  // specific set of subscribers
-  REQUIRE(subscribers_result.value().size() == 1);
-  REQUIRE(subscribers_result.value()[0]->m_trigger_event_type ==
-          steamrot::EventType_EVENT_CHANGE_SCENE);
+  auto state_data_offset = steamrot::CreateSceneManagerStateFbs(
+      builder, builder.CreateVector(&subscriber_offset, 1));
+
+  builder.Finish(state_data_offset);
+  const steamrot::SceneManagerStateFbs *state_data =
+      flatbuffers::GetRoot<steamrot::SceneManagerStateFbs>(
+          builder.GetBufferPointer());
+
+  // Act
+  auto result = provider.ConfigureSceneManagerState(state, state_data);
+  // Assert
+  REQUIRE(result.has_value());
+  REQUIRE(state.subscriptions.size() == 1); // No actual Subscribers created
+  REQUIRE(state.subscriptions[0] != nullptr);
+  REQUIRE(state.subscriptions[0]->m_trigger_event_type ==
+          steamrot::EventType::EventType_EVENT_TEST);
+}
+
+TEST_CASE("FlatbuffersSceneManagerDataProvider::ProvideSceneManagerData "
+          "succeeds and provides correct data"
+          "[unit][FlatbuffersSceneManagerDataProvider]") {
+  // Arrange
+  steamrot::FlatbuffersSceneManagerDataProvider provider;
+  // Act
+  auto result = provider.ProvideSceneManagerData();
+  // Assert
+  if (!result.has_value())
+    FAIL("ProvideSceneManagerData failed: " + result.error().message);
+
+  const steamrot::SceneManagerData &data = result.value();
+  REQUIRE(data.scene_manager_state.subscriptions.size() == 1);
+  REQUIRE(data.scene_manager_state.subscriptions[0] != nullptr);
+  REQUIRE(data.scene_manager_state.subscriptions[0]->m_trigger_event_type ==
+          steamrot::EventType::EventType_EVENT_CHANGE_SCENE);
 }

@@ -42,7 +42,7 @@ FlatbuffersTestDataProvider::ProviderAllTestData() const {
     if (!test_data_result) {
       return std::unexpected(test_data_result.error());
     }
-    test_data_vec.push_back(test_data_result.value());
+    test_data_vec.push_back(std::move(test_data_result.value()));
   }
 
   return test_data_vec;
@@ -189,8 +189,10 @@ FlatbuffersTestDataProvider::ConfigureSimulationData(
     steamrot::SimulationElement element;
 
     // Check which type is set - exactly one should be non-None
-    bool has_function = fbs_step->function_type() != steamrot::FunctionEnumFbs_None;
-    bool has_logic_class = fbs_step->logic_class_type() != steamrot::LogicClassEnumFbs_None;
+    bool has_function =
+        fbs_step->function_type() != steamrot::FunctionEnumFbs_None;
+    bool has_logic_class =
+        fbs_step->logic_class_type() != steamrot::LogicClassEnumFbs_None;
 
     if (has_function && has_logic_class) {
       return std::unexpected(steamrot::FailInfo{
@@ -200,10 +202,11 @@ FlatbuffersTestDataProvider::ConfigureSimulationData(
     }
 
     if (!has_function && !has_logic_class) {
-      return std::unexpected(steamrot::FailInfo{
-          steamrot::FailMode::FlatbuffersDataNotFound,
-          "SimulationStepFbs has neither function_type nor logic_class_type set. "
-          "Exactly one must be set per step."});
+      return std::unexpected(
+          steamrot::FailInfo{steamrot::FailMode::FlatbuffersDataNotFound,
+                             "SimulationStepFbs has neither function_type nor "
+                             "logic_class_type set. "
+                             "Exactly one must be set per step."});
     }
 
     if (has_function) {
