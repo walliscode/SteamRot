@@ -37,6 +37,9 @@ FlatbuffersSaveDataProvider::ConfigureSaveMetaData(
         FailInfo{FailMode::FlatbuffersDataNotFound,
                  "SaveMetaDataFbs missing required field: save_name"});
 
+  // assign save name
+  save_meta_data.save_name = save_meta_data_fbs->save_name()->str();
+
   // check if is present
   if (!save_meta_data_fbs->file_id()) {
     return std::unexpected(
@@ -54,7 +57,7 @@ FlatbuffersSaveDataProvider::ConfigureSaveMetaData(
         FailInfo{FailMode::FlatbuffersDataNotFound,
                  "SaveMetaDataFbs file_id is not a valid UUID string"});
   } else {
-    // save_meta_data.file_id = file_id_str.value();
+    save_meta_data.file_id = file_id_str.value();
   }
 
   return std::monostate{};
