@@ -2,7 +2,7 @@ include "../entities/entities.fbs";
 include "../assets/asset_config.fbs";
 include "../core/scene_types.fbs";
 include "../logic/logic_data.fbs";
-include "scene_resources.fbs";
+include "scene_resources_config.fbs";
 
 namespace steamrot;
 
@@ -13,7 +13,7 @@ table SceneInfoFbs{
 
 table SceneDataFbs{
     scene_info: SceneInfoFbs;
-    scene_resources: SceneResourcesFbs;
+    scene_resources_config: SceneResourcesConfigFbs;
     asset_config: AssetConfigFbs;
     entity_collection: EntityCollectionFbs;
     logic_collection_data: LogicCollectionData;

@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of Flatbuffers implementation of SceneData struct
+/// @brief Declaration of SceneResourcesConfig struct
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -11,16 +11,20 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "SceneData.h"
-#include "entities_generated.h"
 
+#include <cstdint>
 namespace steamrot {
 
-struct FbsSceneData : public SceneData {
+struct SceneResourcesConfig {
 
   /////////////////////////////////////////////////
-  /// @brief A pointer to the Flatbuffers representation of the entities
+  /// @brief Width of textures used in the scene.
   /////////////////////////////////////////////////
-  const EntityCollectionFbs *entity_collection = nullptr;
+  uint32_t texture_width;
+
+  /////////////////////////////////////////////////
+  /// @brief Height of textures used in the scene.
+  /////////////////////////////////////////////////
+  uint32_t texture_height;
 };
 } // namespace steamrot

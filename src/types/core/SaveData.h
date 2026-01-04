@@ -12,6 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "SaveMetaData.h"
+#include "SceneData.h"
 #include "SceneManagerData.h"
 
 namespace steamrot {
@@ -32,5 +33,10 @@ struct SaveData {
   /// SceneManager and its Scenes.
   /////////////////////////////////////////////////
   SceneManagerData scene_manager_data;
+
+  /////////////////////////////////////////////////
+  /// @brief The serialised scene data for all scenes in the current save state
+  /////////////////////////////////////////////////
+  SceneCollectionData scene_collection_data;
 };
 } // namespace steamrot

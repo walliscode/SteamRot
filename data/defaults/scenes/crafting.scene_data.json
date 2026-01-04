@@ -3,7 +3,7 @@
     "scene_id": "crafting",
     "scene_type": "CRAFTING"
   },
-  "scene_resources": {
+  "scene_resources_config": {
     "texture_width": 800,
     "texture_height": 600
   },

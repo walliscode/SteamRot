@@ -12,6 +12,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "ISceneDataProvider.h"
+#include "SceneResourcesConfig.h"
+#include "scene_resources_config_generated.h"
 #include "scene_types_generated.h"
 #include <memory>
 
@@ -19,6 +21,16 @@ namespace steamrot {
 class FlatbuffersSceneDataProvider : public steamrot::ISceneDataProvider {
 
 public:
+  /////////////////////////////////////////////////
+  /// @brief Configures SceneResourcesConfig from FlatBuffers data.
+  ///
+  /// @param config SceneResourcesConfig to configure.
+  /// @param fb_config FlatBuffers SceneResourcesConfig data.
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ConfigureSceneResourcesConfig(SceneResourcesConfig &config,
+                                const SceneResourcesConfigFbs *fb_config) const;
+
   /////////////////////////////////////////////////
   /// @brief Loads SceneData from FlatBuffers.
   ///

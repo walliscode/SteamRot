@@ -11,7 +11,6 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "SceneData.h"
 #include "SceneManagerState.h"
 
 namespace steamrot {
@@ -29,10 +28,5 @@ struct SceneManagerData {
   /// @brief contains any data needed to represent the runtime state
   /////////////////////////////////////////////////
   SceneManagerState scene_manager_state;
-
-  /////////////////////////////////////////////////
-  /// @brief The serialised scene data for all scenes in the current save state
-  /////////////////////////////////////////////////
-  SceneCollectionData scene_collection_data;
 };
 } // namespace steamrot

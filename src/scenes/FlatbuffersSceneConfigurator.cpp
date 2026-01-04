@@ -61,24 +61,17 @@ FlatbuffersSceneConfigurator::ConfigureSceneResources(
     return std::unexpected(
         FailInfo(FailMode::NullPointer, "SceneData pointer is null"));
 
-  // cast to derived SceneData type
-  FbsSceneData *fbs_scene_data =
-      dynamic_cast<FbsSceneData *>(const_cast<SceneData *>(scene_data));
-
-  // check its valid
-  if (!fbs_scene_data)
+  // check texture sizes are not 0
+  if (scene_data->scene_resources_config.texture_width == 0 ||
+      scene_data->scene_resources_config.texture_height == 0) {
     return std::unexpected(
-        FailInfo(FailMode::InvalidCast, "SceneData is not FbsSceneData"));
+        FailInfo(FailMode::BadValue,
+                 "SceneResourcesConfig has invalid texture dimensions (0)"));
+  }
 
-  // check for SceneDataFbs
-  if (!fbs_scene_data->scene_data_fbs)
-    return std::unexpected(
-        FailInfo(FailMode::FlatbuffersDataNotFound, "SceneDataFbs not found"));
-
-  // configure scene texture
-  sf::Vector2u size{
-      fbs_scene_data->scene_data_fbs->scene_resources()->texture_width(),
-      fbs_scene_data->scene_data_fbs->scene_resources()->texture_height()};
+  // create size vector
+  sf::Vector2u size{scene_data->scene_resources_config.texture_width,
+                    scene_data->scene_resources_config.texture_height};
 
   auto texture_resize_result =
       scene.m_scene_resources.scene_texture.resize(size);
@@ -129,20 +122,15 @@ FlatbuffersSceneConfigurator::ConfigureEntities(Scene &scene,
     return std::unexpected(
         FailInfo(FailMode::InvalidCast, "SceneData is not FbsSceneData"));
 
-  // check for SceneDataFbs
-  if (!fbs_scene_data->scene_data_fbs)
-    return std::unexpected(
-        FailInfo(FailMode::FlatbuffersDataNotFound, "SceneDataFbs not found"));
-
-  // check for entity data
-  if (!fbs_scene_data->scene_data_fbs->entity_collection())
+  // check for the entities collection
+  if (!fbs_scene_data->entity_collection)
     return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
-                                    "No entity data found in SceneData"));
+                                    "EntityCollectionFbs not found"));
 
   // instantiate FlatbuffersEntityConfigurator
   FlatbuffersEntityConfigurator entity_configurator(
       scene.GetSceneContext().event_handler,
-      *fbs_scene_data->scene_data_fbs->entity_collection());
+      *fbs_scene_data->entity_collection);
 
   // configure EMP on scene
   auto emp_config_result = entity_configurator.ConfigureEntityMemoryPool(

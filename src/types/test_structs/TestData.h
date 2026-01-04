@@ -11,6 +11,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "SceneData.h"
 #include "SimulationData.h"
 #include "TestMetaData.h"
 #include <cstdint>
@@ -40,6 +41,11 @@ struct TestData {
   /// @brief Number of ticks to run the simulation for
   /////////////////////////////////////////////////
   uint32_t number_of_ticks{1};
+
+  /////////////////////////////////////////////////
+  /// @brief Starting state of the scene collection
+  /////////////////////////////////////////////////
+  SceneCollectionData starting_scene_collection_data{};
 };
 } // namespace steamrot
 //

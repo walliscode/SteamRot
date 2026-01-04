@@ -117,26 +117,7 @@ TEST_CASE("FlatbuffersSceneConfigurator::ConfigureSceneResources "
   REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
   REQUIRE(result.error().message == "SceneData pointer is null");
 }
-TEST_CASE("FlatbuffersSceneConfigurator::ConfigureSceneResources handles "
-          "wrong derived SceneData",
-          "[FlatbuffersSceneConfigurator]") {
-  // set up fixtures and objects
-  steamrot::tests::TestFixture fixture;
-  steamrot::SceneFactory scene_factory{fixture.GetGameContext()};
-  steamrot::FlatbuffersSceneConfigurator configurator;
-  auto scene_creation_result =
-      scene_factory.CreateSceneFromDefault(steamrot::SceneType_TITLE);
-  if (!scene_creation_result.has_value()) {
-    FAIL(scene_creation_result.error().message);
-  }
-  auto &scene = scene_creation_result.value();
-  // create a wrong derived SceneData type
-  steamrot::SceneData wrong_scene_data; // Not of type FbsSceneData
-  auto result = configurator.ConfigureSceneResources(*scene, &wrong_scene_data);
-  REQUIRE(!result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::InvalidCast);
-  REQUIRE(result.error().message == "SceneData is not FbsSceneData");
-}
+
 // TEST_CASE("FlatbuffersSceneConfigurator::ConfigureSceneReources configures "
 //           "the SceneResources struct",
 //           "[FlatbuffersSceneConfigurator]") {
@@ -247,7 +228,7 @@ TEST_CASE("FlatbuffersSceneConfigurator::ConfigureEntities hanldes "
   auto result = configurator.ConfigureEntities(test_scene, &fbs_scene_data);
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
-  REQUIRE(result.error().message == "SceneDataFbs not found");
+  REQUIRE(result.error().message == "EntityCollectionFbs not found");
 }
 
 TEST_CASE("FlatbuffersSceneConfigurator::ConfiguresEntities modifies the "

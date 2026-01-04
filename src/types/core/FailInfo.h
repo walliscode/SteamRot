@@ -36,7 +36,8 @@ enum class FailMode {
   MissingRequiredField,
   ResourceCreationFailure,
   InvalidInput,
-  FileOperationFailed
+  FileOperationFailed,
+  BadValue
 };
 
 struct FailInfo {

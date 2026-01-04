@@ -65,7 +65,7 @@ TEST_CASE("FlatbuffersSceneDataProvider::ProvideDefaultSceneData returns "
   REQUIRE(fbs_scene_data->scene_info.id.is_nil());
 
   // check pointer to scene data exists
-  REQUIRE(fbs_scene_data->scene_data_fbs != nullptr);
+  REQUIRE(fbs_scene_data->entity_collection != nullptr);
 
   // SPECIFIC DATA CHECKS CAN BE ADDED HERE //
 }
@@ -89,6 +89,6 @@ TEST_CASE("FlatbuffersSceneDataProvider::ProvideDefaultSceneData returns "
           steamrot::SceneType::SceneType_CRAFTING);
   REQUIRE(fbs_scene_data->scene_info.id.is_nil());
   // check pointer to scene data exists
-  REQUIRE(fbs_scene_data->scene_data_fbs != nullptr);
+  REQUIRE(fbs_scene_data->entity_collection != nullptr);
   // SPECIFIC DATA CHECKS CAN BE ADDED HERE //
 }
