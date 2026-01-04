@@ -10,6 +10,7 @@ add_library(data_providers
   FlatbuffersSceneDataProvider.cpp
   FlatbuffersSubscriberViewer.cpp
   FlatbuffersUIStyleDataProvider.cpp
+  FlatbuffersSaveDataProvider.cpp
   DataAccessFactory.cpp
   DataLoader.cpp
   FlatbuffersDataLoader.cpp
