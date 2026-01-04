@@ -14,6 +14,7 @@
 
 #include "FailInfo.h"
 #include "ISubscriberViewer.h"
+#include "SceneManagerData.h"
 #include "SceneManagerState.h"
 #include <expected>
 #include <memory>
@@ -27,6 +28,12 @@ public:
   /// @brief Virtual destructor for proper cleanup
   /////////////////////////////////////////////////
   virtual ~ISceneManagerDataProvider() = default;
+
+  /////////////////////////////////////////////////
+  /// @brief Load the complete SceneManagerData.
+  /////////////////////////////////////////////////
+  virtual std::expected<SceneManagerData, FailInfo>
+  LoadSceneManagerData() const = 0;
 
   /////////////////////////////////////////////////
   /// @brief Load the scene manager state.

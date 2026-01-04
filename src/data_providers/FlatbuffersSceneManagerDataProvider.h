@@ -32,6 +32,12 @@ public:
   FlatbuffersSceneManagerDataProvider() = default;
 
   /////////////////////////////////////////////////
+  /// @brief Implementation of LoadSceneManagerData
+  /////////////////////////////////////////////////
+  std::expected<SceneManagerData, FailInfo>
+  LoadSceneManagerData() const override;
+
+  /////////////////////////////////////////////////
   /// @brief Implementation of LoadSceneManagerState
   /////////////////////////////////////////////////
   std::expected<SceneManagerState, FailInfo>

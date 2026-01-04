@@ -8,9 +8,30 @@
 /////////////////////////////////////////////////
 #include "FlatbuffersSceneManagerDataProvider.h"
 #include "FlatbuffersSubscriberViewer.h"
+#include "SceneManagerData.h"
 #include "scene_manager_data_generated.h"
 
 namespace steamrot {
+
+/////////////////////////////////////////////////
+std::expected<SceneManagerData, FailInfo>
+FlatbuffersSceneManagerDataProvider::LoadSceneManagerData() const {
+
+  // Create SceneManagerData object
+  SceneManagerData scene_manager_data;
+
+  // Load SceneManagerState
+  auto state_result = LoadSceneManagerState();
+  if (!state_result) {
+    return std::unexpected(state_result.error());
+  }
+  scene_manager_data.scene_manager_state = state_result.value();
+
+  // Note: scene_collection_data is empty by default
+  // Future implementation will populate this from FlatBuffers data
+
+  return scene_manager_data;
+}
 
 /////////////////////////////////////////////////
 std::expected<SceneManagerState, FailInfo>
