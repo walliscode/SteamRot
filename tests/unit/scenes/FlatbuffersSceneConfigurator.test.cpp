@@ -247,7 +247,7 @@ TEST_CASE("FlatbuffersSceneConfigurator::ConfigureEntities hanldes "
   auto result = configurator.ConfigureEntities(test_scene, &fbs_scene_data);
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
-  REQUIRE(result.error().message == "SceneDataFbs not found");
+  REQUIRE(result.error().message == "EntityCollectionFbs not found");
 }
 
 TEST_CASE("FlatbuffersSceneConfigurator::ConfiguresEntities modifies the "

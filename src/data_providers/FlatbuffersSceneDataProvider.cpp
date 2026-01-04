@@ -35,7 +35,10 @@ FlatbuffersSceneDataProvider::ProvideDefaultSceneData(
 
   // no UUID needed for default scene data
   scene_data.scene_info.type = scene_type;
-  scene_data.scene_data_fbs = load_data_result.value();
+  
+  // Set pointers to specific FlatBuffers data needed for configuration
+  scene_data.entity_collection_fbs = fb_data.entity_collection();
+  scene_data.scene_resources_fbs = fb_data.scene_resources();
 
   // populate the AssetConfig
   if (fb_data.asset_config()) {

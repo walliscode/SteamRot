@@ -26,23 +26,26 @@ The current architecture uses `FbsSceneData` which extends `SceneData`:
 
 ```cpp
 struct FbsSceneData : public SceneData {
-  const SceneDataFbs *scene_data_fbs{nullptr};  // Pointer to binary data
+  const EntityCollectionFbs *entity_collection_fbs{nullptr};
+  const SceneResourcesFbs *scene_resources_fbs{nullptr};
 };
 ```
 
 **Configuration Flow**:
 1. `FlatbuffersSceneDataProvider::ProvideDefaultSceneData()` loads binary FlatBuffers data
-2. Returns `FbsSceneData` with pointer to `SceneDataFbs` (no entity configuration yet)
-3. `FlatbuffersSceneConfigurator::ConfigureEntities()` receives `FbsSceneData`
-4. Creates `FlatbuffersEntityConfigurator` with reference to `EntityCollectionFbs`
-5. Calls `ConfigureEntityMemoryPool()` directly on Scene's EntityMemoryPool
-6. Entities are configured in-place, one pass only
+2. Returns `FbsSceneData` with pointers to `EntityCollectionFbs` and `SceneResourcesFbs` (no entity configuration yet)
+3. Base `SceneData` members (`scene_info`, `asset_config`) are populated directly - no pointer redundancy
+4. `FlatbuffersSceneConfigurator::ConfigureEntities()` receives `FbsSceneData`
+5. Creates `FlatbuffersEntityConfigurator` with reference to `EntityCollectionFbs`
+6. Calls `ConfigureEntityMemoryPool()` directly on Scene's EntityMemoryPool
+7. Entities are configured in-place, one pass only
 
 **Key Characteristics**:
 - Zero copies of EntityMemoryPool
 - Single configuration pass
 - Memory efficient (no temporary EntityMemoryPool created)
 - Direct configuration into final destination
+- No duplication: Base struct handles scene_info/asset_config, pointers only for entity/resource data needed during configuration
 
 ## Technical Analysis
 

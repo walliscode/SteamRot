@@ -70,15 +70,15 @@ FlatbuffersSceneConfigurator::ConfigureSceneResources(
     return std::unexpected(
         FailInfo(FailMode::InvalidCast, "SceneData is not FbsSceneData"));
 
-  // check for SceneDataFbs
-  if (!fbs_scene_data->scene_data_fbs)
+  // check for SceneResourcesFbs
+  if (!fbs_scene_data->scene_resources_fbs)
     return std::unexpected(
-        FailInfo(FailMode::FlatbuffersDataNotFound, "SceneDataFbs not found"));
+        FailInfo(FailMode::FlatbuffersDataNotFound, "SceneResourcesFbs not found"));
 
   // configure scene texture
   sf::Vector2u size{
-      fbs_scene_data->scene_data_fbs->scene_resources()->texture_width(),
-      fbs_scene_data->scene_data_fbs->scene_resources()->texture_height()};
+      fbs_scene_data->scene_resources_fbs->texture_width(),
+      fbs_scene_data->scene_resources_fbs->texture_height()};
 
   auto texture_resize_result =
       scene.m_scene_resources.scene_texture.resize(size);
@@ -129,20 +129,20 @@ FlatbuffersSceneConfigurator::ConfigureEntities(Scene &scene,
     return std::unexpected(
         FailInfo(FailMode::InvalidCast, "SceneData is not FbsSceneData"));
 
-  // check for SceneDataFbs
-  if (!fbs_scene_data->scene_data_fbs)
+  // check for EntityCollectionFbs
+  if (!fbs_scene_data->entity_collection_fbs)
     return std::unexpected(
-        FailInfo(FailMode::FlatbuffersDataNotFound, "SceneDataFbs not found"));
+        FailInfo(FailMode::FlatbuffersDataNotFound, "EntityCollectionFbs not found"));
 
   // check for entity data
-  if (!fbs_scene_data->scene_data_fbs->entity_collection())
+  if (!fbs_scene_data->entity_collection_fbs->entities())
     return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
                                     "No entity data found in SceneData"));
 
   // instantiate FlatbuffersEntityConfigurator
   FlatbuffersEntityConfigurator entity_configurator(
       scene.GetSceneContext().event_handler,
-      *fbs_scene_data->scene_data_fbs->entity_collection());
+      *fbs_scene_data->entity_collection_fbs);
 
   // configure EMP on scene
   auto emp_config_result = entity_configurator.ConfigureEntityMemoryPool(

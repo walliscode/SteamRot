@@ -15,7 +15,8 @@ Should we pass a pointer to binary FlatBuffers data or configure an EntityMemory
 ### Current Approach (Recommended) ✅
 
 **How it works:**
-- `FbsSceneData` holds pointer to binary FlatBuffers data
+- `FbsSceneData` holds pointers to `EntityCollectionFbs` and `SceneResourcesFbs`
+- Base `SceneData` handles `scene_info` and `asset_config` (no duplication)
 - Entities configured directly into Scene's EntityMemoryPool
 - Single pass, zero copies
 
@@ -24,6 +25,7 @@ Should we pass a pointer to binary FlatBuffers data or configure an EntityMemory
 - ✅ Optimal performance: Single O(n) pass, no copy overhead
 - ✅ Simple: Clear data flow, easy to maintain
 - ✅ FlatBuffers philosophy: Zero-copy deserialization
+- ✅ No duplication: Only store pointers to data needed for configuration
 
 **Startup cost:**
 - 100 entities: ~1-2ms
