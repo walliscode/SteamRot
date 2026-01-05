@@ -122,8 +122,8 @@ public:
   /// TestData
   /// @param scene_collection_data An instance of SceneCollectionData
   /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo> AddScenesFromSceneCollectionData(
-      const SceneCollectionData &scene_collection_data);
+  std::expected<std::monostate, FailInfo>
+  AddScenesFromSceneCollectionData(SceneCollectionData &scene_collection_data);
 
   /////////////////////////////////////////////////
   /// @brief Provides a map of textures based on given scene IDs

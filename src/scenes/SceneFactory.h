@@ -15,6 +15,7 @@
 #include "FailInfo.h"
 #include "GameContext.h"
 #include "Scene.h"
+#include "SceneData.h"
 #include "scene_types_generated.h"
 #include <expected>
 #include <memory>
@@ -49,7 +50,7 @@ public:
   /// @param scene_data Data to configure the scene from
   /////////////////////////////////////////////////
   std::expected<std::unique_ptr<Scene>, FailInfo>
-  CreateSceneFromData(std::unique_ptr<SceneData> scene_data);
+  CreateSceneFromData(const SceneData *scene_data);
 
   /////////////////////////////////////////////////
   /// @brief Create and configure a scene from default data

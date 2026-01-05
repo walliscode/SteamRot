@@ -7,11 +7,13 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "SceneManager.h"
+#include "FlatbuffersSceneDataProvider.h"
 #include "Subscriber.h"
 #include "TestFixture.h"
 #include "load_scene_collection_data.h"
 #include "scene_types_generated.h"
 #include <catch2/catch_test_macros.hpp>
+#include <iostream>
 
 TEST_CASE("SceneManager::SceneManager initializes correctly",
           "[SceneManager]") {
@@ -226,6 +228,39 @@ TEST_CASE("SceneManager::AddScenesFromSceneCollectionData loads three scenes "
   REQUIRE(scene_3_entity_1->c_grimoire_machina()->joints() != nullptr);
   REQUIRE(scene_3_entity_1->c_grimoire_machina()->joints()->size() == 0);
 
-  // Note: The actual scene creation logic will be implemented by the user
-  // This test verifies that the data can be loaded and is valid
+  // Arrange SceneManager
+  steamrot::tests::TestFixture fixture;
+  fixture.Initialize();
+  steamrot::SceneManager scene_manager(fixture.GetGameContext());
+  steamrot::FlatbuffersSceneDataProvider scene_data_provider;
+  // Act
+
+  std::cout << "Converting Flatbuffers data to SceneCollectionData..."
+            << std::endl;
+  // convert to SceneCollectionData
+  steamrot::SceneCollectionData scene_collection_data;
+  for (const auto *scene_fbs : *scenes) {
+
+    std::cout << "Processing scene of type: "
+              << static_cast<int>(scene_fbs->scene_info()->scene_type())
+              << std::endl;
+    // convert each scene to SceneData
+    auto scene_data_result =
+        scene_data_provider.ProvideSceneDataFromData(scene_fbs);
+    if (!scene_data_result) {
+      FAIL(scene_data_result.error().message);
+    }
+    // add to collection
+    scene_collection_data.push_back(std::move(scene_data_result.value()));
+  }
+
+  // pass to SceneManager
+  auto scene_collection_add_result =
+      scene_manager.AddScenesFromSceneCollectionData(scene_collection_data);
+  if (!scene_collection_add_result.has_value()) {
+    FAIL(scene_collection_add_result.error().message);
+  }
+  // Assert
+  const auto &scene_map = scene_manager.GetScenes();
+  REQUIRE(scene_map.size() == 3);
 }

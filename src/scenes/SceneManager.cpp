@@ -85,7 +85,7 @@ SceneManager::AddSceneFromDefault(const SceneType &scene_type) {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 SceneManager::AddScenesFromSceneCollectionData(
-    const SceneCollectionData &scene_collection_data) {
+    SceneCollectionData &scene_collection_data) {
 
   // clear existing scenes and check that it is cleared
   m_scenes.clear();
@@ -93,6 +93,38 @@ SceneManager::AddScenesFromSceneCollectionData(
     FailInfo fail_info(FailMode::NotImplemented,
                        "Existing scenes were not cleared correctly");
     return std::unexpected(fail_info);
+  }
+
+  // create SceneFactory object
+  SceneFactory scene_factory(m_game_context);
+
+  // loop through scene collection data and add each scene
+  for (auto &scene_data : scene_collection_data) {
+
+    // check scene_data is not null
+    if (scene_data == nullptr) {
+      FailInfo fail_info(FailMode::NullPointer,
+                         "Scene data is null in collection");
+      return std::unexpected(fail_info);
+    }
+
+    // create and configure scene from data
+    auto scene_creation_result =
+        scene_factory.CreateSceneFromData(scene_data.get());
+    // if (!scene_creation_result.has_value()) {
+    //   return std::unexpected(scene_creation_result.error());
+    // }
+    //
+    // // add to m_scenes maps
+    // auto adding_result =
+    //     m_scenes.emplace(scene_creation_result.value()->GetSceneInfo().id,
+    //                      std::move(scene_creation_result.value()));
+    // if (!adding_result.second) {
+    //   FailInfo fail_info(
+    //       FailMode::NotAddedToMap,
+    //       "Scene with this ID already exists or function failed");
+    //   return std::unexpected(fail_info);
+    // }
   }
   return std::monostate{};
 }

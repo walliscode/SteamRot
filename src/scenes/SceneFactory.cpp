@@ -12,6 +12,7 @@
 #include "ISceneDataProvider.h"
 #include "Scene.h"
 #include "TitleScene.h"
+#include <iostream>
 #include <memory>
 
 namespace steamrot {
@@ -59,10 +60,10 @@ ISceneConfigurator &GetSceneConfigurator() {
 
 /////////////////////////////////////////////////
 std::expected<std::unique_ptr<Scene>, FailInfo>
-SceneFactory::CreateSceneFromData(std::unique_ptr<SceneData> scene_data) {
+SceneFactory::CreateSceneFromData(const SceneData *scene_data) {
 
-  // handle empty pointer
-  if (!scene_data) {
+  // Guard statement for null pointer
+  if (scene_data == nullptr) {
     return std::unexpected(FailInfo{
         FailMode::NullPointer,
         "SceneData pointer is null in SceneFactory::CreateSceneFromData"});
@@ -73,11 +74,15 @@ SceneFactory::CreateSceneFromData(std::unique_ptr<SceneData> scene_data) {
   // Step 2: Get configurator
   ISceneConfigurator &configurator = GetSceneConfigurator();
 
+  std::cout << "Configuring scene of type: "
+            << static_cast<int>(scene_data->scene_info.type) << std::endl;
+
   // Step 3: Configurator applies data
-  auto config_result = configurator.ConfigureScene(*scene, scene_data.get());
+  auto config_result = configurator.ConfigureScene(*scene, scene_data);
   if (!config_result.has_value()) {
     return std::unexpected(config_result.error());
   }
+  std::cout << "Scene configured successfully." << std::endl;
   return std::move(scene);
 }
 
@@ -106,7 +111,7 @@ SceneFactory::CreateSceneFromDefault(SceneType type) {
   }
 
   // Step 3: Create scene from data
-  return CreateSceneFromData(std::move(data));
+  return CreateSceneFromData(data.get());
 }
 
 } // namespace steamrot
