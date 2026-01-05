@@ -39,8 +39,10 @@ void CraftingScene::sCollision() {
 
 /////////////////////////////////////////////////
 void CraftingScene::sRender() {
+
   // clear the render texture
   m_scene_resources.scene_texture.clear(sf::Color::Black);
+
   // process render logic
   for (auto &render_logic : m_scene_resources.logic_map[LogicType::Render]) {
     render_logic->RunLogic();

@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "LogicFactory.h"
+#include "CraftingRenderLogic.h"
 #include "TestFixture.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
@@ -135,7 +136,8 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
     FAIL("LogicCollection does not contain Render LogicType");
   }
   const auto &render_logics = render_it->second;
-  REQUIRE(render_logics.size() == 1); // No render logics added yet
-  REQUIRE(dynamic_cast<steamrot::UIRenderLogic *>(
-      render_logics[0].get())); // Placeholder check
+  REQUIRE(render_logics.size() == 2);
+  REQUIRE(dynamic_cast<steamrot::UIRenderLogic *>(render_logics[0].get()));
+  REQUIRE(
+      dynamic_cast<steamrot::CraftingRenderLogic *>(render_logics[1].get()));
 }

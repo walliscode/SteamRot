@@ -8,6 +8,7 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <expected>
 #include <optional>
+#include <variant>
 namespace steamrot {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
@@ -197,7 +198,39 @@ void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
 }
 
 /////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo> CleanExpiredSubscribers(
+    std::unordered_map<EventType, std::vector<std::weak_ptr<Subscriber>>>
+        &subscriber_register) {
+  for (auto &[event_type, subscribers] : subscriber_register) {
+    // remove expired subscribers from the vector
+    subscribers.erase(
+        std::remove_if(subscribers.begin(), subscribers.end(),
+                       [](const std::weak_ptr<Subscriber> &subscriber_weak) {
+                         return subscriber_weak.expired();
+                       }),
+        subscribers.end());
+  }
+  return std::monostate{};
+}
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo> ResetAllSubscribers(
+    std::unordered_map<EventType, std::vector<std::weak_ptr<Subscriber>>>
+        &subscriber_register) {
+  for (auto &[event_type, subscribers] : subscriber_register) {
+    for (auto &subscriber_weak : subscribers) {
+      auto locked_subscriber = subscriber_weak.lock();
+      locked_subscriber->m_active = false;
+    }
+  }
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
 void EventHandler::ExecuteEventHandlerLevelLogic(sf::RenderWindow &window) {
+  // clean expired subscribers from the register
+  auto clean_result = CleanExpiredSubscribers(m_subscriber_register);
+  // Reset all subscribers at the start of the frame
+  auto reset_result = ResetAllSubscribers(m_subscriber_register);
   // Preload events from the window into the waiting room event bus
   PreloadEvents(window);
   // Process the waiting room event bus into the global event bus
