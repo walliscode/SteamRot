@@ -47,11 +47,23 @@ public:
   virtual ~IUIStyleDataProvider() = default;
 
   ////////////////////////////////////////////////////////////
-  /// @brief Load and configure multiple UI styles by name
+  /// @brief Load and configure multiple UI styles by name from files
   ///
   /// @return Vector of style data wrappers, or error
   ////////////////////////////////////////////////////////////
   virtual std::expected<std::vector<UIStyle>, FailInfo> ProvideUIStyles() = 0;
+
+  ////////////////////////////////////////////////////////////
+  /// @brief Convert FlatBuffers UIStyleData to native UIStyle objects.
+  ///
+  /// This method allows passing pre-loaded FlatBuffers style data directly
+  /// for conversion without file I/O.
+  ///
+  /// @param fb_styles Vector of pointers to FlatBuffers UIStyleData
+  /// @return Vector of converted UIStyle objects, or error
+  ////////////////////////////////////////////////////////////
+  virtual std::expected<std::vector<UIStyle>, FailInfo>
+  ConvertUIStyles(const std::vector<const UIStyleData *> &fb_styles) = 0;
 };
 
 } // namespace steamrot

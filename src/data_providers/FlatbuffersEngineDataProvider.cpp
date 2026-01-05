@@ -132,15 +132,15 @@ FlatbuffersEngineDataProvider::PopulateInitialAssetConfig(
 }
 /////////////////////////////////////////////////
 std::expected<EngineData, FailInfo>
-FlatbuffersEngineDataProvider::LoadEngineData() const {
-  EngineData engine_data;
+FlatbuffersEngineDataProvider::ConvertEngineData(
+    const EngineDataFbs *fb_engine_data) const {
 
-  // use flatbuffers data loader to EngineDataFbs
-  auto load_engine_data_reult = m_loader.ProvideEngineDataFbs();
-  if (!load_engine_data_reult.has_value()) {
-    return std::unexpected(load_engine_data_reult.error());
+  // validate input
+  if (!fb_engine_data) {
+    return std::unexpected(
+        FailInfo{FailMode::FlatbuffersDataNotFound,
+                 "EngineDataFbs pointer is null, cannot convert to EngineData"});
   }
-  const EngineDataFbs *fb_engine_data = load_engine_data_reult.value();
 
   // create return object
   EngineData data;
@@ -176,6 +176,22 @@ FlatbuffersEngineDataProvider::LoadEngineData() const {
   }
 
   return data;
+}
+
+/////////////////////////////////////////////////
+std::expected<EngineData, FailInfo>
+FlatbuffersEngineDataProvider::LoadEngineData() const {
+  EngineData engine_data;
+
+  // use flatbuffers data loader to EngineDataFbs
+  auto load_engine_data_reult = m_loader.ProvideEngineDataFbs();
+  if (!load_engine_data_reult.has_value()) {
+    return std::unexpected(load_engine_data_reult.error());
+  }
+  const EngineDataFbs *fb_engine_data = load_engine_data_reult.value();
+
+  // convert using the new method
+  return ConvertEngineData(fb_engine_data);
 }
 
 } // namespace steamrot

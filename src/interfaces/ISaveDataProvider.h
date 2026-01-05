@@ -25,8 +25,20 @@ public:
   virtual ~ISaveDataProvider() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Provide a SaveData object.
+  /// @brief Provide a SaveData object loaded from file.
   /////////////////////////////////////////////////
   virtual std::expected<SaveData, FailInfo> ProvideSaveData() const = 0;
+
+  /////////////////////////////////////////////////
+  /// @brief Convert FlatBuffers SaveDataFbs to native SaveData.
+  ///
+  /// This method allows passing pre-loaded FlatBuffers data directly
+  /// for conversion without file I/O.
+  ///
+  /// @param fb_save_data Pointer to FlatBuffers SaveDataFbs
+  /// @return Native SaveData object, or error
+  /////////////////////////////////////////////////
+  virtual std::expected<SaveData, FailInfo>
+  ConvertSaveData(const SaveDataFbs *fb_save_data) const = 0;
 };
 } // namespace steamrot

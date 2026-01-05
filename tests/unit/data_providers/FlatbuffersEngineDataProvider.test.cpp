@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersEngineDataProvider.h"
+#include "FlatbuffersDataLoader.h"
 #include "events_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
@@ -15,6 +16,37 @@ TEST_CASE("FlatbuffersEngineDataProvider is constructed correctly",
 
   steamrot::FlatbuffersEngineDataProvider provider;
   REQUIRE_NOTHROW(provider);
+}
+
+TEST_CASE("FlatbuffersEngineDataProvider::ConvertEngineData returns error if "
+          "null pointer",
+          "[unit][FlatbuffersEngineDataProvider]") {
+  steamrot::FlatbuffersEngineDataProvider provider;
+  auto convert_result = provider.ConvertEngineData(nullptr);
+  REQUIRE(!convert_result.has_value());
+  REQUIRE(convert_result.error().mode ==
+          steamrot::FailMode::FlatbuffersDataNotFound);
+}
+
+TEST_CASE("FlatbuffersEngineDataProvider::ConvertEngineData converts "
+          "FlatBuffers data to native EngineData",
+          "[unit][FlatbuffersEngineDataProvider]") {
+  steamrot::FlatbuffersEngineDataProvider provider;
+  steamrot::FlatbuffersDataLoader loader;
+
+  // Load FlatBuffers data
+  auto load_result = loader.ProvideEngineDataFbs();
+  REQUIRE(load_result.has_value());
+  const steamrot::EngineDataFbs *fb_data = load_result.value();
+
+  // Convert using the new method
+  auto convert_result = provider.ConvertEngineData(fb_data);
+  REQUIRE(convert_result.has_value());
+
+  const auto &data = convert_result.value();
+  // Check that data was populated correctly
+  REQUIRE(data.engine_resources_config.window_width == 800);
+  REQUIRE(data.engine_config.display.window_title == "SteamRot");
 }
 
 TEST_CASE("FlatbuffersEngineDataProvider::LoadEngineData loads correctly",

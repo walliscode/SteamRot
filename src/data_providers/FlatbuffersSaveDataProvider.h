@@ -39,8 +39,21 @@ public:
                         const SaveMetaDataFbs *save_meta_data_fbs) const;
 
   /////////////////////////////////////////////////
-  /// @brief Provides a SaveData object populated from Flatbuffers data.
+  /// @brief Provides a SaveData object populated from Flatbuffers data loaded
+  /// from file.
   /////////////////////////////////////////////////
   std::expected<SaveData, FailInfo> ProvideSaveData() const override;
+
+  /////////////////////////////////////////////////
+  /// @brief Convert FlatBuffers SaveDataFbs to native SaveData.
+  ///
+  /// This method allows passing pre-loaded FlatBuffers data directly
+  /// for conversion without file I/O.
+  ///
+  /// @param fb_save_data Pointer to FlatBuffers SaveDataFbs
+  /// @return Native SaveData object, or error
+  /////////////////////////////////////////////////
+  std::expected<SaveData, FailInfo>
+  ConvertSaveData(const SaveDataFbs *fb_save_data) const override;
 };
 } // namespace steamrot

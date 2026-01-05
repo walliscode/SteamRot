@@ -46,6 +46,47 @@ FlatbuffersSceneDataProvider::ConfigureSceneResourcesConfig(
 }
 /////////////////////////////////////////////////
 std::expected<std::unique_ptr<SceneData>, FailInfo>
+FlatbuffersSceneDataProvider::ConvertSceneData(
+    const SceneDataFbs *fb_scene_data) const {
+
+  // validate input
+  if (!fb_scene_data) {
+    return std::unexpected(
+        FailInfo{FailMode::FlatbuffersDataNotFound,
+                 "SceneDataFbs pointer is null, cannot convert to SceneData"});
+  }
+
+  // create SceneData
+  FbsSceneData scene_data;
+
+  // configure the SceneResourcesConfig
+  if (fb_scene_data->scene_resources_config()) {
+    auto configure_resources_result = ConfigureSceneResourcesConfig(
+        scene_data.scene_resources_config,
+        fb_scene_data->scene_resources_config());
+    if (!configure_resources_result.has_value()) {
+      return std::unexpected(configure_resources_result.error());
+    }
+  }
+
+  // populate the AssetConfig
+  if (fb_scene_data->asset_config()) {
+    auto configure_asset_result =
+        ConfigureAssetConfig(scene_data.scene_asset_config,
+                             fb_scene_data->asset_config());
+    if (!configure_asset_result.has_value()) {
+      return std::unexpected(configure_asset_result.error());
+    }
+  }
+
+  // assign pointer to Flatbuffers entity collection
+  scene_data.entity_collection = fb_scene_data->entity_collection();
+
+  return std::make_unique<FbsSceneData>(scene_data);
+}
+
+/////////////////////////////////////////////////
+std::expected<std::unique_ptr<SceneData>, FailInfo>
 FlatbuffersSceneDataProvider::ProvideDefaultSceneData(
     const SceneType scene_type) const {
 
@@ -55,36 +96,18 @@ FlatbuffersSceneDataProvider::ProvideDefaultSceneData(
   if (!load_data_result.has_value()) {
     return std::unexpected(load_data_result.error());
   }
-  const SceneDataFbs &fb_data = *load_data_result.value();
+  const SceneDataFbs *fb_data = load_data_result.value();
 
-  // create SceneData
-  FbsSceneData scene_data;
-
-  // configure the SceneResourcesConfig
-  if (fb_data.scene_resources_config()) {
-    auto configure_resources_result = ConfigureSceneResourcesConfig(
-        scene_data.scene_resources_config, fb_data.scene_resources_config());
-    if (!configure_resources_result.has_value()) {
-      return std::unexpected(configure_resources_result.error());
-    }
+  // Create a FbsSceneData for conversion
+  auto convert_result = ConvertSceneData(fb_data);
+  if (!convert_result.has_value()) {
+    return std::unexpected(convert_result.error());
   }
 
-  // no UUID needed for default scene data
-  scene_data.scene_info.type = scene_type;
+  // Set scene type which wasn't part of the FlatBuffers data
+  convert_result.value()->scene_info.type = scene_type;
 
-  // populate the AssetConfig
-  if (fb_data.asset_config()) {
-    auto configure_asset_result = ConfigureAssetConfig(
-        scene_data.scene_asset_config, fb_data.asset_config());
-    if (!configure_asset_result.has_value()) {
-      return std::unexpected(configure_asset_result.error());
-    }
-  }
-
-  // assign pointer to Flatbuffers entity collection
-  scene_data.entity_collection = fb_data.entity_collection();
-
-  return std::make_unique<FbsSceneData>(scene_data);
+  return convert_result;
 }
 
 } // namespace steamrot

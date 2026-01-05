@@ -82,6 +82,18 @@ public:
   /// @brief Provides EngineData loaded from FlatBuffers binary files.
   /////////////////////////////////////////////////
   std::expected<EngineData, FailInfo> LoadEngineData() const override;
+
+  /////////////////////////////////////////////////
+  /// @brief Convert FlatBuffers EngineDataFbs to native EngineData.
+  ///
+  /// This method allows passing pre-loaded FlatBuffers data directly
+  /// for conversion without file I/O.
+  ///
+  /// @param fb_engine_data Pointer to FlatBuffers EngineDataFbs
+  /// @return Native EngineData object, or error
+  /////////////////////////////////////////////////
+  std::expected<EngineData, FailInfo>
+  ConvertEngineData(const EngineDataFbs *fb_engine_data) const override;
 };
 
 } // namespace steamrot

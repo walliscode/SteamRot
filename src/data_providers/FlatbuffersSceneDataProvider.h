@@ -32,11 +32,24 @@ public:
                                 const SceneResourcesConfigFbs *fb_config) const;
 
   /////////////////////////////////////////////////
-  /// @brief Loads SceneData from FlatBuffers.
+  /// @brief Loads SceneData from FlatBuffers file.
   ///
+  /// @param scene_type Type of scene to load
   /// @return Unique pointer to SceneData object.
   /////////////////////////////////////////////////
   std::expected<std::unique_ptr<SceneData>, FailInfo>
   ProvideDefaultSceneData(const SceneType scene_type) const override;
+
+  /////////////////////////////////////////////////
+  /// @brief Converts FlatBuffers SceneData to native SceneData object.
+  ///
+  /// This method allows passing pre-loaded FlatBuffers data directly
+  /// for conversion without file I/O.
+  ///
+  /// @param fb_scene_data Pointer to FlatBuffers SceneDataFbs
+  /// @return Unique pointer to converted SceneData, or error
+  /////////////////////////////////////////////////
+  std::expected<std::unique_ptr<SceneData>, FailInfo>
+  ConvertSceneData(const SceneDataFbs *fb_scene_data) const override;
 };
 } // namespace steamrot

@@ -36,6 +36,32 @@ FlatbuffersSceneManagerDataProvider::ConfigureSceneManagerState(
 
 /////////////////////////////////////////////////
 std::expected<SceneManagerData, FailInfo>
+FlatbuffersSceneManagerDataProvider::ConvertSceneManagerData(
+    const SceneManagerDataFbs *fb_scene_manager_data) const {
+
+  // validate input
+  if (!fb_scene_manager_data) {
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    "SceneManagerDataFbs pointer is null, "
+                                    "cannot convert to SceneManagerData"});
+  }
+
+  // create SceneManagerData to populate
+  SceneManagerData scene_manager_data;
+
+  // configure SceneManagerState
+  auto configure_state_result = ConfigureSceneManagerState(
+      scene_manager_data.scene_manager_state, fb_scene_manager_data->state());
+
+  if (!configure_state_result.has_value()) {
+    return std::unexpected(configure_state_result.error());
+  }
+
+  return scene_manager_data;
+}
+
+/////////////////////////////////////////////////
+std::expected<SceneManagerData, FailInfo>
 FlatbuffersSceneManagerDataProvider::ProvideSceneManagerData() const {
 
   // Load default SceneManagerData from file
@@ -45,19 +71,9 @@ FlatbuffersSceneManagerDataProvider::ProvideSceneManagerData() const {
     return std::unexpected(result.error());
   }
   const SceneManagerDataFbs *scene_manager_data_fbs = result.value();
-  if (!scene_manager_data_fbs) {
-    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    "SceneManagerDataFbs data is null"});
-  }
 
-  // create SceneManagerData to populate
-  SceneManagerData scene_manager_data;
-
-  // configure SceneManagerState
-  auto configure_state_result = ConfigureSceneManagerState(
-      scene_manager_data.scene_manager_state, scene_manager_data_fbs->state());
-
-  return scene_manager_data;
+  // convert using the new method
+  return ConvertSceneManagerData(scene_manager_data_fbs);
 }
 
 } // namespace steamrot

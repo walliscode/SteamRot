@@ -45,9 +45,23 @@ public:
                              const SceneManagerStateFbs *state_data) const;
 
   /////////////////////////////////////////////////
-  /// @brief Implementation of LoadSceneManagerState
+  /// @brief Implementation of ProvideSceneManagerData - loads from file
   /////////////////////////////////////////////////
   std::expected<SceneManagerData, FailInfo>
   ProvideSceneManagerData() const override;
+
+  /////////////////////////////////////////////////
+  /// @brief Convert FlatBuffers SceneManagerDataFbs to native
+  /// SceneManagerData.
+  ///
+  /// This method allows passing pre-loaded FlatBuffers data directly
+  /// for conversion without file I/O.
+  ///
+  /// @param fb_scene_manager_data Pointer to FlatBuffers SceneManagerDataFbs
+  /// @return Native SceneManagerData object, or error
+  /////////////////////////////////////////////////
+  std::expected<SceneManagerData, FailInfo>
+  ConvertSceneManagerData(
+      const SceneManagerDataFbs *fb_scene_manager_data) const override;
 };
 } // namespace steamrot

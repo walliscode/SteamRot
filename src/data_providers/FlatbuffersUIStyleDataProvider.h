@@ -28,7 +28,24 @@ public:
       std::unordered_map<std::string, std::shared_ptr<const sf::Font>>
           &fonts_map);
 
+  /////////////////////////////////////////////////
+  /// @brief Load and configure multiple UI styles from files
+  ///
+  /// @return Vector of style data wrappers, or error
+  /////////////////////////////////////////////////
   std::expected<std::vector<UIStyle>, FailInfo> ProvideUIStyles() override;
+
+  /////////////////////////////////////////////////
+  /// @brief Convert FlatBuffers UIStyleData to native UIStyle objects.
+  ///
+  /// This method allows passing pre-loaded FlatBuffers style data directly
+  /// for conversion without file I/O.
+  ///
+  /// @param fb_styles Vector of pointers to FlatBuffers UIStyleData
+  /// @return Vector of converted UIStyle objects, or error
+  /////////////////////////////////////////////////
+  std::expected<std::vector<UIStyle>, FailInfo>
+  ConvertUIStyles(const std::vector<const UIStyleData *> &fb_styles) override;
 
   /////////////////////////////////////////////////
   /// @brief Validates and configures base Style properties from FlatBuffers

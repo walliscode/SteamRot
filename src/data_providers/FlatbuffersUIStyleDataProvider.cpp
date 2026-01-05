@@ -373,29 +373,27 @@ FlatbuffersUIStyleDataProvider::ConfigureDropDownButtonStyle(
 
 /////////////////////////////////////////////////
 std::expected<std::vector<UIStyle>, FailInfo>
-FlatbuffersUIStyleDataProvider::ProvideUIStyles() {
-
-  // Create FlatbuffersDataLoader
-  FlatbuffersDataLoader data_loader;
-
-  // Get UIStyle data
-  auto get_data_result = data_loader.ProvideUIStylesData();
-  if (!get_data_result)
-    return std::unexpected(get_data_result.error());
-  auto all_ui_styles = get_data_result.value();
+FlatbuffersUIStyleDataProvider::ConvertUIStyles(
+    const std::vector<const UIStyleData *> &fb_styles) {
 
   // Create vector to add styles to
   std::vector<UIStyle> ui_styles;
 
-  for (const auto style_data : all_ui_styles) {
+  for (const auto style_data : fb_styles) {
+
+    // validate input
+    if (!style_data) {
+      return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                      "UIStyleData pointer is null in vector"});
+    }
 
     // Create UIStyle to fill
     UIStyle ui_style;
 
     // Handle name
     if (!style_data->name())
-      return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                      "style_data.name missing"});
+      return std::unexpected(
+          FailInfo{FailMode::FlatbuffersDataNotFound, "style_data.name missing"});
     ui_style.name = style_data->name()->str();
 
     // Configure PanelStyle
@@ -412,9 +410,9 @@ FlatbuffersUIStyleDataProvider::ProvideUIStyles() {
 
     // Configure DropDownContainerStyle
     if (!style_data->drop_down_container_style())
-      return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                      "style_data.drop_down_container_style "
-                                      "missing"});
+      return std::unexpected(
+          FailInfo{FailMode::FlatbuffersDataNotFound,
+                   "style_data.drop_down_container_style missing"});
     auto dd_container_result =
         ConfigureDropDownContainerStyle(style_data->drop_down_container_style(),
                                         ui_style.drop_down_container_style);
@@ -455,6 +453,23 @@ FlatbuffersUIStyleDataProvider::ProvideUIStyles() {
   }
 
   return ui_styles;
+}
+
+/////////////////////////////////////////////////
+std::expected<std::vector<UIStyle>, FailInfo>
+FlatbuffersUIStyleDataProvider::ProvideUIStyles() {
+
+  // Create FlatbuffersDataLoader
+  FlatbuffersDataLoader data_loader;
+
+  // Get UIStyle data
+  auto get_data_result = data_loader.ProvideUIStylesData();
+  if (!get_data_result)
+    return std::unexpected(get_data_result.error());
+  auto all_ui_styles = get_data_result.value();
+
+  // Convert using the new method
+  return ConvertUIStyles(all_ui_styles);
 }
 
 } // namespace steamrot

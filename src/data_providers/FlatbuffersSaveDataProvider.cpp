@@ -9,9 +9,35 @@
 #include "FlatbuffersSaveDataProvider.h"
 
 namespace steamrot {
+
+/////////////////////////////////////////////////
+std::expected<SaveData, FailInfo>
+FlatbuffersSaveDataProvider::ConvertSaveData(
+    const SaveDataFbs *fb_save_data) const {
+
+  // validate input
+  if (!fb_save_data) {
+    return std::unexpected(
+        FailInfo{FailMode::FlatbuffersDataNotFound,
+                 "SaveDataFbs pointer is null, cannot convert to SaveData"});
+  }
+
+  // create SaveData object to populate
+  SaveData save_data;
+
+  // Add conversion logic here when SaveData has fields to populate
+  // For now, return empty SaveData as in original implementation
+
+  return save_data;
+}
+
 /////////////////////////////////////////////////
 std::expected<SaveData, FailInfo>
 FlatbuffersSaveDataProvider::ProvideSaveData() const {
+
+  // Load FlatBuffers data (not yet implemented in original)
+  // For now, use ConvertSaveData with nullptr to maintain original behavior
+  // In the future, this would load from file first
 
   // create SaveData object to populate
   SaveData save_data;
