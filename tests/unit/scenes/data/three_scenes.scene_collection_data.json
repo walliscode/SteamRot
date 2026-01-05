@@ -143,43 +143,28 @@
     },
     {
       "scene_info": {
-        "scene_type": "TEST"
+        "scene_type": "TITLE"
       },
       "scene_resources_config": {
-        "texture_width": 640,
-        "texture_height": 480
+        "texture_width": 1920,
+        "texture_height": 1080
       },
       "entity_collection": {
-        "entity_memory_pool_size": 20,
+        "entity_memory_pool_size": 15,
         "entities": [
           {
             "index": 0,
             "c_user_interface": {
-              "ui_name": "test_ui_simple",
-              "is_visible": false,
+              "ui_name": "alternate_title_ui",
+              "is_visible": true,
               "root_ui_element": {
                 "base_data": {
-                  "position": { "x": 100.0, "y": 100.0 },
-                  "size": { "x": 400.0, "y": 250.0 },
-                  "children_active": true,
-                  "children": [
-                    {
-                      "element_type": "ButtonData",
-                      "element": {
-                        "base_data": {
-                          "position": { "x": 150.0, "y": 100.0 },
-                          "size": { "x": 100.0, "y": 30.0 },
-                          "children_active": false,
-                          "children": [],
-                          "layout": "Horizontal",
-                          "spacing_strategy": "None"
-                        },
-                        "label": "Test Button"
-                      }
-                    }
-                  ],
-                  "layout": "Vertical",
-                  "spacing_strategy": "None"
+                  "position": { "x": 400.0, "y": 300.0 },
+                  "size": { "x": 600.0, "y": 500.0 },
+                  "children_active": false,
+                  "children": [],
+                  "layout": "Horizontal",
+                  "spacing_strategy": "Even"
                 }
               }
             }
@@ -187,8 +172,8 @@
           {
             "index": 1,
             "c_grimoire_machina": {
-              "fragments": ["test_fragment"],
-              "joints": []
+              "fragments": ["title_fragment_delta", "title_fragment_epsilon"],
+              "joints": ["title_joint_zeta"]
             }
           }
         ]

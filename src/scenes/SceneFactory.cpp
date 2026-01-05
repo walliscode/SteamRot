@@ -69,8 +69,11 @@ SceneFactory::CreateSceneFromData(const SceneData *scene_data) {
         "SceneData pointer is null in SceneFactory::CreateSceneFromData"});
   }
   // Step 1: Create empty scene
-  std::unique_ptr<Scene> scene =
-      CreateEmptyScene(scene_data->scene_info.type).value();
+  auto create_scene_result = CreateEmptyScene(scene_data->scene_info.type);
+  if (!create_scene_result.has_value()) {
+    return std::unexpected(create_scene_result.error());
+  }
+  std::unique_ptr<Scene> scene = std::move(create_scene_result.value());
   // Step 2: Get configurator
   ISceneConfigurator &configurator = GetSceneConfigurator();
 
