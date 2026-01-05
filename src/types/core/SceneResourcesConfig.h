@@ -20,11 +20,11 @@ struct SceneResourcesConfig {
   /////////////////////////////////////////////////
   /// @brief Width of textures used in the scene.
   /////////////////////////////////////////////////
-  uint32_t texture_width;
+  uint32_t texture_width{0};
 
   /////////////////////////////////////////////////
   /// @brief Height of textures used in the scene.
   /////////////////////////////////////////////////
-  uint32_t texture_height;
+  uint32_t texture_height{0};
 };
 } // namespace steamrot

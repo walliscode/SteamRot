@@ -83,6 +83,20 @@ SceneManager::AddSceneFromDefault(const SceneType &scene_type) {
 };
 
 /////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+SceneManager::AddScenesFromSceneCollectionData(
+    const SceneCollectionData &scene_collection_data) {
+
+  // clear existing scenes and check that it is cleared
+  m_scenes.clear();
+  if (!m_scenes.empty()) {
+    FailInfo fail_info(FailMode::NotImplemented,
+                       "Existing scenes were not cleared correctly");
+    return std::unexpected(fail_info);
+  }
+  return std::monostate{};
+}
+/////////////////////////////////////////////////
 std::expected<uuids::uuid, FailInfo> SceneManager::LoadTitleScene() {
 
   // clear existing scenes
@@ -192,7 +206,8 @@ std::expected<std::monostate, FailInfo> SceneManager::ProcessSubscriptions() {
             !std::holds_alternative<SceneChangePacket>(
                 subscriber->m_received_event_data.value())) {
 
-          // just continue if data is not valid, will need to log at some point
+          // just continue if data is not valid, will need to log at some
+          // point
           //[TODO: logging here]
 
           // still need to set subscriber to inactive

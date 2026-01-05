@@ -13,6 +13,7 @@
 /////////////////////////////////////////////////
 #include "GameContext.h"
 #include "Scene.h"
+#include "SceneData.h"
 #include "SceneInfoProvider.h"
 #include "SceneManagerConfig.h"
 #include "SceneManagerResources.h"
@@ -113,6 +114,16 @@ public:
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo>
   AddSceneFromDefault(const SceneType &scene_type);
+
+  /////////////////////////////////////////////////
+  /// @brief Clears existing scenes and adds scenes from provided data
+  ///
+  /// We expect the data to be provided from sources such as SaveData or
+  /// TestData
+  /// @param scene_collection_data An instance of SceneCollectionData
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> AddScenesFromSceneCollectionData(
+      const SceneCollectionData &scene_collection_data);
 
   /////////////////////////////////////////////////
   /// @brief Provides a map of textures based on given scene IDs
