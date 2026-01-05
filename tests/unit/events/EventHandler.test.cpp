@@ -225,7 +225,7 @@ TEST_CASE("EventHandler::UpdateSubscribersFrom does not update Subscribers "
     event_handler.AddEvent(event);
 
   // Update subscribers from the global event bus
-  event_handler.UpateSubscribersFromGlobalEventBus();
+  event_handler.UpdateSubscribersFromGlobalEventBus();
 
   // check that the subscriber is still not active
   REQUIRE(!subscriber->m_active);
@@ -360,7 +360,7 @@ TEST_CASE("EventHandler::UpdateSubscribersFromGlobalEventBus updates correct "
 
   event_handler.ProcessWaitingRoomEventBus();
   // Update subscribers from the global event bus
-  event_handler.UpateSubscribersFromGlobalEventBus();
+  event_handler.UpdateSubscribersFromGlobalEventBus();
 
   // Subscriber with no trigger data should be active
   REQUIRE(subscriber_no_trigger->m_active);

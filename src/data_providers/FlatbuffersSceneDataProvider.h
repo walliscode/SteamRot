@@ -21,6 +21,17 @@ namespace steamrot {
 class FlatbuffersSceneDataProvider : public steamrot::ISceneDataProvider {
 
 public:
+  FlatbuffersSceneDataProvider() = default;
+
+  /////////////////////////////////////////////////
+  /// @brief Configures SceneInfo from FlatBuffers data.
+  ///
+  /// @param info SceneInfo to configure.
+  /// @param fb_info FlatBuffers SceneInfo data.
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ConfigureSceneInfo(SceneInfo &info, const SceneInfoFbs *fb_info) const;
+
   /////////////////////////////////////////////////
   /// @brief Configures SceneResourcesConfig from FlatBuffers data.
   ///
@@ -38,5 +49,13 @@ public:
   /////////////////////////////////////////////////
   std::expected<std::unique_ptr<SceneData>, FailInfo>
   ProvideDefaultSceneData(const SceneType scene_type) const override;
+
+  /////////////////////////////////////////////////
+  /// @brief Provides SceneData from FlatBuffers data.
+  ///
+  /// @param scene_data_fbs FlatBuffers SceneData for scene.
+  /////////////////////////////////////////////////
+  std::expected<std::unique_ptr<SceneData>, FailInfo>
+  ProvideSceneDataFromData(const SceneDataFbs *scene_data_fbs) const override;
 };
 } // namespace steamrot

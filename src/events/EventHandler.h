@@ -90,7 +90,7 @@ public:
   /// @brief Update all subscribers based on the events in the global event
   /// bus.
   /////////////////////////////////////////////////
-  void UpateSubscribersFromGlobalEventBus();
+  void UpdateSubscribersFromGlobalEventBus();
 
   /////////////////////////////////////////////////
   /// @brief Wrapper function for handling lifetimes and removing dead events.

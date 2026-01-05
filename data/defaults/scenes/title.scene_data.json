@@ -1,6 +1,5 @@
 {
   "scene_info": {
-    "scene_id": "title",
     "scene_type": "TITLE"
   },
   "scene_resources_config": { "texture_width": 800, "texture_height": 600 },

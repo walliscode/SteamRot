@@ -70,14 +70,14 @@ SceneFactory::CreateSceneFromData(std::unique_ptr<SceneData> scene_data) {
   // Step 1: Create empty scene
   std::unique_ptr<Scene> scene =
       CreateEmptyScene(scene_data->scene_info.type).value();
-  // // Step 2: Get configurator
-  // ISceneConfigurator &configurator = GetSceneConfigurator();
-  // // Step 3: Configurator applies data
-  // auto config_result = configurator.ConfigureScene(*scene, scene_data.get());
-  // if (!config_result.has_value()) {
-  //   // Log error
-  //   return nullptr;
-  // }
+  // Step 2: Get configurator
+  ISceneConfigurator &configurator = GetSceneConfigurator();
+
+  // Step 3: Configurator applies data
+  auto config_result = configurator.ConfigureScene(*scene, scene_data.get());
+  if (!config_result.has_value()) {
+    return std::unexpected(config_result.error());
+  }
   return std::move(scene);
 }
 
@@ -92,8 +92,6 @@ SceneFactory::CreateSceneFromDefault(SceneType type) {
     return std::unexpected(get_provider_result.error());
   ISceneDataProvider &provider = *get_provider_result.value();
 
-  ISceneConfigurator &configurator = GetSceneConfigurator();
-
   // Step 2: Provider loads data
   auto get_data_result = provider.ProvideDefaultSceneData(type);
   if (!get_data_result.has_value()) {
@@ -107,17 +105,8 @@ SceneFactory::CreateSceneFromDefault(SceneType type) {
         "SceneData pointer is null in SceneFactory::CreateSceneFromDefault"});
   }
 
-  // Step 3: Create empty scene
-  std::unique_ptr<Scene> scene = CreateEmptyScene(type).value();
-
-  // Step 4: Configurator applies data
-  auto config_result = configurator.ConfigureScene(*scene, data.get());
-  if (!config_result.has_value()) {
-    // Log error
-    return nullptr;
-  }
-
-  return std::move(scene);
+  // Step 3: Create scene from data
+  return CreateSceneFromData(std::move(data));
 }
 
 } // namespace steamrot

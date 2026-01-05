@@ -13,14 +13,14 @@ namespace steamrot::events {
 /////////////////////////////////////////////////
 void ProcessEventBusCycle(EventHandler &handler) {
   handler.ProcessWaitingRoomEventBus();
-  handler.UpateSubscribersFromGlobalEventBus();
+  handler.UpdateSubscribersFromGlobalEventBus();
   handler.TickGlobalEventBus();
 }
 
 /////////////////////////////////////////////////
 void ProcessWaitingRoomAndUpdateSubscribers(EventHandler &handler) {
   handler.ProcessWaitingRoomEventBus();
-  handler.UpateSubscribersFromGlobalEventBus();
+  handler.UpdateSubscribersFromGlobalEventBus();
 }
 
 } // namespace steamrot::events
