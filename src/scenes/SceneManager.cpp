@@ -10,7 +10,6 @@
 #include "ISceneManagerDataProvider.h"
 #include "SceneFactory.h"
 #include <expected>
-#include <iostream>
 #include <variant>
 
 namespace steamrot {
@@ -111,20 +110,20 @@ SceneManager::AddScenesFromSceneCollectionData(
     // create and configure scene from data
     auto scene_creation_result =
         scene_factory.CreateSceneFromData(scene_data.get());
-    // if (!scene_creation_result.has_value()) {
-    //   return std::unexpected(scene_creation_result.error());
-    // }
-    //
-    // // add to m_scenes maps
-    // auto adding_result =
-    //     m_scenes.emplace(scene_creation_result.value()->GetSceneInfo().id,
-    //                      std::move(scene_creation_result.value()));
-    // if (!adding_result.second) {
-    //   FailInfo fail_info(
-    //       FailMode::NotAddedToMap,
-    //       "Scene with this ID already exists or function failed");
-    //   return std::unexpected(fail_info);
-    // }
+    if (!scene_creation_result.has_value()) {
+      return std::unexpected(scene_creation_result.error());
+    }
+
+    // add to m_scenes maps
+    auto adding_result =
+        m_scenes.emplace(scene_creation_result.value()->GetSceneInfo().id,
+                         std::move(scene_creation_result.value()));
+    if (!adding_result.second) {
+      FailInfo fail_info(
+          FailMode::NotAddedToMap,
+          "Scene with this ID already exists or function failed");
+      return std::unexpected(fail_info);
+    }
   }
   return std::monostate{};
 }
@@ -134,7 +133,6 @@ std::expected<uuids::uuid, FailInfo> SceneManager::LoadTitleScene() {
   // clear existing scenes
   m_scenes.clear();
 
-  std::cout << "Loading Title Scene..." << std::endl;
   // create title scene
   auto title_result = AddSceneFromDefault(SceneType::SceneType_TITLE);
   if (!title_result.has_value())
@@ -156,7 +154,6 @@ std::expected<uuids::uuid, FailInfo> SceneManager::LoadCraftingScene() {
   // clear existing scenes
   m_scenes.clear();
 
-  std::cout << "Loading Crafting Scene..." << std::endl;
   // create crafting scene
   auto crafting_result = AddSceneFromDefault(SceneType::SceneType_CRAFTING);
   if (!crafting_result.has_value())

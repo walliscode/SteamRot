@@ -12,7 +12,6 @@
 #include "ISceneDataProvider.h"
 #include "Scene.h"
 #include "TitleScene.h"
-#include <iostream>
 #include <memory>
 
 namespace steamrot {
@@ -77,15 +76,12 @@ SceneFactory::CreateSceneFromData(const SceneData *scene_data) {
   // Step 2: Get configurator
   ISceneConfigurator &configurator = GetSceneConfigurator();
 
-  std::cout << "Configuring scene of type: "
-            << static_cast<int>(scene_data->scene_info.type) << std::endl;
-
   // Step 3: Configurator applies data
   auto config_result = configurator.ConfigureScene(*scene, scene_data);
   if (!config_result.has_value()) {
     return std::unexpected(config_result.error());
   }
-  std::cout << "Scene configured successfully." << std::endl;
+
   return std::move(scene);
 }
 

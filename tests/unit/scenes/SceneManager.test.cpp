@@ -13,7 +13,6 @@
 #include "load_scene_collection_data.h"
 #include "scene_types_generated.h"
 #include <catch2/catch_test_macros.hpp>
-#include <iostream>
 
 TEST_CASE("SceneManager::SceneManager initializes correctly",
           "[SceneManager]") {
@@ -235,15 +234,10 @@ TEST_CASE("SceneManager::AddScenesFromSceneCollectionData loads three scenes "
   steamrot::FlatbuffersSceneDataProvider scene_data_provider;
   // Act
 
-  std::cout << "Converting Flatbuffers data to SceneCollectionData..."
-            << std::endl;
   // convert to SceneCollectionData
   steamrot::SceneCollectionData scene_collection_data;
   for (const auto *scene_fbs : *scenes) {
 
-    std::cout << "Processing scene of type: "
-              << static_cast<int>(scene_fbs->scene_info()->scene_type())
-              << std::endl;
     // convert each scene to SceneData
     auto scene_data_result =
         scene_data_provider.ProvideSceneDataFromData(scene_fbs);
