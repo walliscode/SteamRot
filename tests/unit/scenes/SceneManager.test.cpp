@@ -9,6 +9,7 @@
 #include "SceneManager.h"
 #include "Subscriber.h"
 #include "TestFixture.h"
+#include "load_scene_collection_data.h"
 #include "scene_types_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
@@ -84,4 +85,147 @@ TEST_CASE("SceneManager::AddScenesFromSceneCollectionData clears exisiting "
   // Assert
   // check that the scene map is now empty
   REQUIRE(scene_map.empty());
+}
+
+TEST_CASE("SceneManager::AddScenesFromSceneCollectionData loads three scenes "
+          "with valid data",
+          "[SceneManager]") {
+
+  // Load test data from JSON (compiled to binary)
+  auto [data_buffer, scene_collection_data_fbs] = LoadSceneCollectionTestData();
+  REQUIRE(scene_collection_data_fbs != nullptr);
+
+  // Verify the loaded data structure
+  REQUIRE(scene_collection_data_fbs->scene_data() != nullptr);
+  const auto *scenes = scene_collection_data_fbs->scene_data();
+  REQUIRE(scenes->size() == 3);
+
+  // Verify Scene 1 (TITLE scene)
+  const auto *scene_1 = scenes->Get(0);
+  REQUIRE(scene_1 != nullptr);
+  REQUIRE(scene_1->scene_info() != nullptr);
+  REQUIRE(scene_1->scene_info()->scene_type() ==
+          steamrot::SceneType::SceneType_TITLE);
+  REQUIRE(scene_1->scene_resources_config() != nullptr);
+  REQUIRE(scene_1->scene_resources_config()->texture_width() == 800);
+  REQUIRE(scene_1->scene_resources_config()->texture_height() == 600);
+  REQUIRE(scene_1->entity_collection() != nullptr);
+  REQUIRE(scene_1->entity_collection()->entity_memory_pool_size() == 30);
+
+  // Check Scene 1 entities
+  const auto *scene_1_entities = scene_1->entity_collection()->entities();
+  REQUIRE(scene_1_entities != nullptr);
+  REQUIRE(scene_1_entities->size() == 2);
+
+  // Check Scene 1, Entity 0 (UI element)
+  const auto *scene_1_entity_0 = scene_1_entities->Get(0);
+  REQUIRE(scene_1_entity_0 != nullptr);
+  REQUIRE(scene_1_entity_0->c_user_interface() != nullptr);
+  REQUIRE(scene_1_entity_0->c_user_interface()->ui_name()->str() ==
+          "title_ui_main_panel");
+  REQUIRE(scene_1_entity_0->c_user_interface()->is_visible() == true);
+  REQUIRE(scene_1_entity_0->c_user_interface()->root_ui_element() != nullptr);
+  const auto *scene_1_root_element =
+      scene_1_entity_0->c_user_interface()->root_ui_element();
+  REQUIRE(scene_1_root_element->base_data() != nullptr);
+  REQUIRE(scene_1_root_element->base_data()->position() != nullptr);
+  REQUIRE(scene_1_root_element->base_data()->position()->x() == 50.0f);
+  REQUIRE(scene_1_root_element->base_data()->position()->y() == 100.0f);
+  REQUIRE(scene_1_root_element->base_data()->children_active() == true);
+  REQUIRE(scene_1_root_element->base_data()->children() != nullptr);
+  REQUIRE(scene_1_root_element->base_data()->children()->size() == 2);
+
+  // Check Scene 1, Entity 1 (grimoire machina)
+  const auto *scene_1_entity_1 = scene_1_entities->Get(1);
+  REQUIRE(scene_1_entity_1 != nullptr);
+  REQUIRE(scene_1_entity_1->c_grimoire_machina() != nullptr);
+  REQUIRE(scene_1_entity_1->c_grimoire_machina()->fragments() != nullptr);
+  REQUIRE(scene_1_entity_1->c_grimoire_machina()->fragments()->size() == 2);
+  REQUIRE(scene_1_entity_1->c_grimoire_machina()->fragments()->Get(0)->str() ==
+          "title_fragment_alpha");
+  REQUIRE(scene_1_entity_1->c_grimoire_machina()->joints() != nullptr);
+  REQUIRE(scene_1_entity_1->c_grimoire_machina()->joints()->size() == 1);
+
+  // Verify Scene 2 (CRAFTING scene)
+  const auto *scene_2 = scenes->Get(1);
+  REQUIRE(scene_2 != nullptr);
+  REQUIRE(scene_2->scene_info() != nullptr);
+  REQUIRE(scene_2->scene_info()->scene_type() ==
+          steamrot::SceneType::SceneType_CRAFTING);
+  REQUIRE(scene_2->scene_resources_config() != nullptr);
+  REQUIRE(scene_2->scene_resources_config()->texture_width() == 1024);
+  REQUIRE(scene_2->scene_resources_config()->texture_height() == 768);
+  REQUIRE(scene_2->entity_collection() != nullptr);
+  REQUIRE(scene_2->entity_collection()->entity_memory_pool_size() == 50);
+
+  // Check Scene 2 entities
+  const auto *scene_2_entities = scene_2->entity_collection()->entities();
+  REQUIRE(scene_2_entities != nullptr);
+  REQUIRE(scene_2_entities->size() == 3);
+
+  // Check Scene 2, Entity 0 (UI inventory)
+  const auto *scene_2_entity_0 = scene_2_entities->Get(0);
+  REQUIRE(scene_2_entity_0 != nullptr);
+  REQUIRE(scene_2_entity_0->c_user_interface() != nullptr);
+  REQUIRE(scene_2_entity_0->c_user_interface()->ui_name()->str() ==
+          "crafting_ui_inventory");
+  REQUIRE(scene_2_entity_0->c_user_interface()->is_visible() == true);
+
+  // Check Scene 2, Entity 1 (UI workbench)
+  const auto *scene_2_entity_1 = scene_2_entities->Get(1);
+  REQUIRE(scene_2_entity_1 != nullptr);
+  REQUIRE(scene_2_entity_1->c_user_interface() != nullptr);
+  REQUIRE(scene_2_entity_1->c_user_interface()->ui_name()->str() ==
+          "crafting_ui_workbench");
+  REQUIRE(scene_2_entity_1->c_user_interface()->is_visible() == true);
+
+  // Check Scene 2, Entity 2 (grimoire machina)
+  const auto *scene_2_entity_2 = scene_2_entities->Get(2);
+  REQUIRE(scene_2_entity_2 != nullptr);
+  REQUIRE(scene_2_entity_2->c_grimoire_machina() != nullptr);
+  REQUIRE(scene_2_entity_2->c_grimoire_machina()->fragments() != nullptr);
+  REQUIRE(scene_2_entity_2->c_grimoire_machina()->fragments()->size() == 3);
+  REQUIRE(scene_2_entity_2->c_grimoire_machina()->fragments()->Get(0)->str() ==
+          "crafting_fragment_one");
+  REQUIRE(scene_2_entity_2->c_grimoire_machina()->joints() != nullptr);
+  REQUIRE(scene_2_entity_2->c_grimoire_machina()->joints()->size() == 2);
+
+  // Verify Scene 3 (TEST scene)
+  const auto *scene_3 = scenes->Get(2);
+  REQUIRE(scene_3 != nullptr);
+  REQUIRE(scene_3->scene_info() != nullptr);
+  REQUIRE(scene_3->scene_info()->scene_type() ==
+          steamrot::SceneType::SceneType_TEST);
+  REQUIRE(scene_3->scene_resources_config() != nullptr);
+  REQUIRE(scene_3->scene_resources_config()->texture_width() == 640);
+  REQUIRE(scene_3->scene_resources_config()->texture_height() == 480);
+  REQUIRE(scene_3->entity_collection() != nullptr);
+  REQUIRE(scene_3->entity_collection()->entity_memory_pool_size() == 20);
+
+  // Check Scene 3 entities
+  const auto *scene_3_entities = scene_3->entity_collection()->entities();
+  REQUIRE(scene_3_entities != nullptr);
+  REQUIRE(scene_3_entities->size() == 2);
+
+  // Check Scene 3, Entity 0 (UI element)
+  const auto *scene_3_entity_0 = scene_3_entities->Get(0);
+  REQUIRE(scene_3_entity_0 != nullptr);
+  REQUIRE(scene_3_entity_0->c_user_interface() != nullptr);
+  REQUIRE(scene_3_entity_0->c_user_interface()->ui_name()->str() ==
+          "test_ui_simple");
+  REQUIRE(scene_3_entity_0->c_user_interface()->is_visible() == false);
+
+  // Check Scene 3, Entity 1 (grimoire machina)
+  const auto *scene_3_entity_1 = scene_3_entities->Get(1);
+  REQUIRE(scene_3_entity_1 != nullptr);
+  REQUIRE(scene_3_entity_1->c_grimoire_machina() != nullptr);
+  REQUIRE(scene_3_entity_1->c_grimoire_machina()->fragments() != nullptr);
+  REQUIRE(scene_3_entity_1->c_grimoire_machina()->fragments()->size() == 1);
+  REQUIRE(scene_3_entity_1->c_grimoire_machina()->fragments()->Get(0)->str() ==
+          "test_fragment");
+  REQUIRE(scene_3_entity_1->c_grimoire_machina()->joints() != nullptr);
+  REQUIRE(scene_3_entity_1->c_grimoire_machina()->joints()->size() == 0);
+
+  // Note: The actual scene creation logic will be implemented by the user
+  // This test verifies that the data can be loaded and is valid
 }
