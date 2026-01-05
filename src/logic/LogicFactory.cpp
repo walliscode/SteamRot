@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "LogicFactory.h"
+#include "CraftingRenderLogic.h"
 #include "FailInfo.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
@@ -38,7 +39,7 @@ LogicFactory::ProvideLogicCollection(SceneType scene_type) {
     break;
   }
   case SceneType::SceneType_CRAFTING: {
-    auto result = ConfigureTitleLogics(logic_collection);
+    auto result = ConfigureCraftingLogics(logic_collection);
     if (!result) {
       return std::unexpected(result.error());
     }
@@ -120,6 +121,8 @@ LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
   LogicVector &render_logics = logic_collection[LogicType::Render];
   render_logics.push_back(
       std::make_unique<steamrot::UIRenderLogic>(m_scene_context));
+  render_logics.push_back(
+      std::make_unique<steamrot::CraftingRenderLogic>(m_scene_context));
   return std::monostate();
 }
 

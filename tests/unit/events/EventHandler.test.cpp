@@ -369,3 +369,117 @@ TEST_CASE("EventHandler::UpdateSubscribersFromGlobalEventBus updates correct "
   // Subscriber with non-matching trigger data should NOT be active
   REQUIRE_FALSE(subscriber_trigger_no_match->m_active);
 }
+
+TEST_CASE("ResetAllSubscribers resets all Subscribers",
+          "[unit][EventHandler]") {
+  // create Subscriber variables
+  const steamrot::EventType event_type1 =
+      steamrot::EventType::EventType_EVENT_USER_INPUT;
+  const steamrot::EventType event_type2 =
+      steamrot::EventType::EventType_EVENT_QUIT_GAME;
+  // Create Subscriber instances
+  std::shared_ptr<steamrot::Subscriber> subscriber1 =
+      std::make_shared<steamrot::Subscriber>(event_type1);
+  subscriber1->m_active = true; // set active to true
+  std::shared_ptr<steamrot::Subscriber> subscriber2 =
+      std::make_shared<steamrot::Subscriber>(event_type2);
+  subscriber2->m_active = true; // set active to true
+  // Create a subscriber register
+  std::unordered_map<steamrot::EventType,
+                     std::vector<std::weak_ptr<steamrot::Subscriber>>>
+      subscriber_register;
+  subscriber_register[event_type1].push_back(subscriber1);
+  subscriber_register[event_type2].push_back(subscriber2);
+  // Reset all subscribers
+  auto result = steamrot::ResetAllSubscribers(subscriber_register);
+  if (!result.has_value())
+    FAIL(result.error().message);
+  // Check that all subscribers are reset
+  REQUIRE(!subscriber1->m_active);
+  REQUIRE(!subscriber2->m_active);
+}
+
+TEST_CASE("EventHandler::CleanExpiredSubscribers removes expired Subscribers",
+          "[unit][EventHandler]") {
+
+  // create Subscriber variables
+  const steamrot::EventType event_type1 =
+      steamrot::EventType::EventType_EVENT_USER_INPUT;
+  const steamrot::EventType event_type2 =
+      steamrot::EventType::EventType_EVENT_QUIT_GAME;
+  // Create Subscriber instances
+  std::shared_ptr<steamrot::Subscriber> subscriber1 =
+      std::make_shared<steamrot::Subscriber>(event_type1);
+  std::shared_ptr<steamrot::Subscriber> subscriber2 =
+      std::make_shared<steamrot::Subscriber>(event_type2);
+  // Create a subscriber register
+  std::unordered_map<steamrot::EventType,
+                     std::vector<std::weak_ptr<steamrot::Subscriber>>>
+      subscriber_register;
+  subscriber_register[event_type1].push_back(subscriber1);
+  subscriber_register[event_type2].push_back(subscriber2);
+  REQUIRE(subscriber_register[event_type1].size() == 1);
+  REQUIRE(subscriber_register[event_type2].size() == 1);
+  // Reset shared pointers to expire weak pointers
+  subscriber1.reset();
+  subscriber2.reset();
+  // Clean expired subscribers
+  auto result = steamrot::CleanExpiredSubscribers(subscriber_register);
+  if (!result.has_value())
+    FAIL(result.error().message);
+  // Check that all subscribers are removed
+  REQUIRE(subscriber_register[event_type1].empty());
+  REQUIRE(subscriber_register[event_type2].empty());
+}
+
+TEST_CASE("EventHandler::ExecuteEventHandlerLevelLogic resets all Subscribers",
+          "[unit][EventHandler]") {
+  // Create an EventHandler instance
+  steamrot::EventHandler event_handler;
+  // create Subscriber variables
+  const steamrot::EventType event_type =
+      steamrot::EventType::EventType_EVENT_USER_INPUT;
+  // Create a Subscriber instance
+  std::shared_ptr<steamrot::Subscriber> subscriber =
+      std::make_shared<steamrot::Subscriber>(event_type);
+  subscriber->m_active = true; // set active to true
+  auto result = event_handler.RegisterSubscriber(subscriber);
+  if (!result.has_value())
+    FAIL(result.error().message);
+  // Create some EventPackets to add
+  steamrot::EventPacket event1{2};
+  event1.event_type = steamrot::EventType::EventType_EVENT_TEST;
+  std::vector<steamrot::EventPacket> events_to_add = {event1};
+  // Add events to the global event bus
+  for (const auto &event : events_to_add)
+    event_handler.AddEvent(event);
+  // Execute EventHandler level logic
+  sf::RenderWindow window(sf::VideoMode({800, 600}), "Test Window");
+  event_handler.ExecuteEventHandlerLevelLogic(window);
+  // Check that the subscriber is reset
+  REQUIRE(!subscriber->m_active);
+}
+
+TEST_CASE(
+    "EventHandler::ExecuteEventHandlerLevelLogic removes dead Subscribers",
+    "[unit][EventHandler]") {
+  // Create an EventHandler instance
+  steamrot::EventHandler event_handler;
+  // create Subscriber variables
+  const steamrot::EventType event_type =
+      steamrot::EventType::EventType_EVENT_USER_INPUT;
+  // Create a Subscriber instance
+  std::shared_ptr<steamrot::Subscriber> subscriber =
+      std::make_shared<steamrot::Subscriber>(event_type);
+  auto result = event_handler.RegisterSubscriber(subscriber);
+  if (!result.has_value())
+    FAIL(result.error().message);
+  // Reset shared pointer to expire weak pointer
+  subscriber.reset();
+  // Execute EventHandler level logic
+  sf::RenderWindow window(sf::VideoMode({800, 600}), "Test Window");
+  event_handler.ExecuteEventHandlerLevelLogic(window);
+  // Check that the subscriber register is empty
+  auto subscriber_register = event_handler.GetSubcriberRegister();
+  REQUIRE(subscriber_register.at(event_type).empty());
+}

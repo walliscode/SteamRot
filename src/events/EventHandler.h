@@ -147,6 +147,20 @@ void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
                       const EventData &event_data);
 
 /////////////////////////////////////////////////
+/// @brief Check the subscriber register and remove any expired subscribers.
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo> CleanExpiredSubscribers(
+    std::unordered_map<EventType, std::vector<std::weak_ptr<Subscriber>>>
+        &subscriber_register);
+
+/////////////////////////////////////////////////
+/// @brief Given a map of Subscribers, reset all of them.
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo> ResetAllSubscribers(
+    std::unordered_map<EventType, std::vector<std::weak_ptr<Subscriber>>>
+        &subscriber_register);
+
+/////////////////////////////////////////////////
 /// @brief Adapater function to turn SFML events into the game engine's event
 /// system.
 ///
