@@ -9,9 +9,6 @@
 #include <expected>
 #include <optional>
 namespace steamrot {
-
-/////////////////////////////////////////////////
-
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 EventHandler::RegisterSubscriber(std::shared_ptr<Subscriber> subscriber) {
@@ -120,7 +117,7 @@ EventHandler::GetSubcriberRegister() const {
 }
 
 /////////////////////////////////////////////////
-void EventHandler::UpateSubscribersFromGlobalEventBus() {
+void EventHandler::UpdateSubscribersFromGlobalEventBus() {
   // go through each event in the global event bus
   for (const auto &event : m_global_event_bus) {
 
@@ -206,7 +203,7 @@ void EventHandler::ExecuteEventHandlerLevelLogic(sf::RenderWindow &window) {
   // Process the waiting room event bus into the global event bus
   ProcessWaitingRoomEventBus();
   // Update subscribers based on the global event bus
-  UpateSubscribersFromGlobalEventBus();
+  UpdateSubscribersFromGlobalEventBus();
   // Tick the global event bus to manage event lifetimes
   TickGlobalEventBus();
 }

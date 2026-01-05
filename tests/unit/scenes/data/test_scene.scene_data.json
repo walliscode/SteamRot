@@ -1,0 +1,55 @@
+{
+  "scene_info": {
+    "scene_type": "TITLE"
+  },
+  "scene_resources_config": {
+    "texture_width": 800,
+    "texture_height": 600
+  },
+  "entity_collection": {
+    "entity_memory_pool_size": 50,
+    "entities": [
+      {
+        "index": 0,
+        "c_user_interface": {
+          "ui_name": "test_ui_panel",
+          "is_visible": true,
+          "root_ui_element": {
+            "base_data": {
+              "position": { "x": 100.0, "y": 150.0 },
+              "size": { "x": 200.0, "y": 100.0 },
+              "children_active": true,
+              "children": [
+                {
+                  "element_type": "ButtonData",
+                  "element": {
+                    "base_data": {
+                      "position": { "x": 10.0, "y": 20.0 },
+                      "size": { "x": 80.0, "y": 30.0 },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    },
+                    "label": "Test Button"
+                  }
+                }
+              ],
+              "layout": "Vertical",
+              "spacing_strategy": "Even"
+            }
+          }
+        }
+      },
+      {
+        "index": 1,
+        "c_grimoire_machina": {
+          "fragments": ["test_fragment_1", "test_fragment_2"],
+          "joints": ["test_joint_1"]
+        }
+      }
+    ]
+  },
+  "asset_config": {},
+  "logic_collection_data": {}
+}

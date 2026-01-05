@@ -32,9 +32,8 @@ public:
   /////////////////////////////////////////////////
   /// @brief Constructor for SceneFactory
   ///
-  /// @param game_context [TODO:parameter]
-  /// @param scene_configurator [TODO:parameter]
-  /// @param type [TODO:parameter]
+  /// @param game_context GameContext object providing access to global
+  /// resources
   /////////////////////////////////////////////////
   SceneFactory(const GameContext &game_context);
 
@@ -45,9 +44,18 @@ public:
   CreateEmptyScene(const SceneType scene_type);
 
   /////////////////////////////////////////////////
-  /// @brief [TODO:description]
+  /// @brief Creates and configures a scene from provided scene data
   ///
-  /// @param scene_type [TODO:parameter]
+  /// @param scene_data Data to configure the scene from
+  /////////////////////////////////////////////////
+  std::expected<std::unique_ptr<Scene>, FailInfo>
+  CreateSceneFromData(std::unique_ptr<SceneData> scene_data);
+
+  /////////////////////////////////////////////////
+  /// @brief Create and configure a scene from default data
+  ///
+  /// @param scene_type SceneType enum value representing the type of scene to
+  /// create
   /////////////////////////////////////////////////
   std::expected<std::unique_ptr<Scene>, FailInfo>
   CreateSceneFromDefault(const SceneType scene_type);

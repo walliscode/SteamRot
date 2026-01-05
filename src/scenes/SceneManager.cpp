@@ -110,6 +110,7 @@ std::expected<uuids::uuid, FailInfo> SceneManager::LoadCraftingScene() {
   // clear existing scenes
   m_scenes.clear();
 
+  std::cout << "Loading Crafting Scene..." << std::endl;
   // create crafting scene
   auto crafting_result = AddSceneFromDefault(SceneType::SceneType_CRAFTING);
   if (!crafting_result.has_value())

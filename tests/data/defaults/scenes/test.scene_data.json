@@ -1,4 +1,7 @@
 {
+  "scene_info": {
+    "scene_type": "TITLE"
+  },
   "entity_collection": {
     "entity_memory_pool_size": 146,
     "entities": [
