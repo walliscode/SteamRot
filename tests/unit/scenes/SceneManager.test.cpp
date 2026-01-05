@@ -192,17 +192,17 @@ TEST_CASE("SceneManager::AddScenesFromSceneCollectionData loads three scenes "
   REQUIRE(scene_2_entity_2->c_grimoire_machina()->joints() != nullptr);
   REQUIRE(scene_2_entity_2->c_grimoire_machina()->joints()->size() == 2);
 
-  // Verify Scene 3 (TEST scene)
+  // Verify Scene 3 (second TITLE scene)
   const auto *scene_3 = scenes->Get(2);
   REQUIRE(scene_3 != nullptr);
   REQUIRE(scene_3->scene_info() != nullptr);
   REQUIRE(scene_3->scene_info()->scene_type() ==
-          steamrot::SceneType::SceneType_TEST);
+          steamrot::SceneType::SceneType_TITLE);
   REQUIRE(scene_3->scene_resources_config() != nullptr);
-  REQUIRE(scene_3->scene_resources_config()->texture_width() == 640);
-  REQUIRE(scene_3->scene_resources_config()->texture_height() == 480);
+  REQUIRE(scene_3->scene_resources_config()->texture_width() == 1920);
+  REQUIRE(scene_3->scene_resources_config()->texture_height() == 1080);
   REQUIRE(scene_3->entity_collection() != nullptr);
-  REQUIRE(scene_3->entity_collection()->entity_memory_pool_size() == 20);
+  REQUIRE(scene_3->entity_collection()->entity_memory_pool_size() == 15);
 
   // Check Scene 3 entities
   const auto *scene_3_entities = scene_3->entity_collection()->entities();
@@ -214,19 +214,19 @@ TEST_CASE("SceneManager::AddScenesFromSceneCollectionData loads three scenes "
   REQUIRE(scene_3_entity_0 != nullptr);
   REQUIRE(scene_3_entity_0->c_user_interface() != nullptr);
   REQUIRE(scene_3_entity_0->c_user_interface()->ui_name()->str() ==
-          "test_ui_simple");
-  REQUIRE(scene_3_entity_0->c_user_interface()->is_visible() == false);
+          "alternate_title_ui");
+  REQUIRE(scene_3_entity_0->c_user_interface()->is_visible() == true);
 
   // Check Scene 3, Entity 1 (grimoire machina)
   const auto *scene_3_entity_1 = scene_3_entities->Get(1);
   REQUIRE(scene_3_entity_1 != nullptr);
   REQUIRE(scene_3_entity_1->c_grimoire_machina() != nullptr);
   REQUIRE(scene_3_entity_1->c_grimoire_machina()->fragments() != nullptr);
-  REQUIRE(scene_3_entity_1->c_grimoire_machina()->fragments()->size() == 1);
+  REQUIRE(scene_3_entity_1->c_grimoire_machina()->fragments()->size() == 2);
   REQUIRE(scene_3_entity_1->c_grimoire_machina()->fragments()->Get(0)->str() ==
-          "test_fragment");
+          "title_fragment_delta");
   REQUIRE(scene_3_entity_1->c_grimoire_machina()->joints() != nullptr);
-  REQUIRE(scene_3_entity_1->c_grimoire_machina()->joints()->size() == 0);
+  REQUIRE(scene_3_entity_1->c_grimoire_machina()->joints()->size() == 1);
 
   // Arrange SceneManager
   steamrot::tests::TestFixture fixture;
