@@ -17,9 +17,28 @@ add_custom_command(
   VERBATIM
 )
 
+# Compile three_scenes.scene_collection_data.json to binary for unit tests
+
+set(SCENE_COLLECTION_TEST_JSON "${CMAKE_CURRENT_SOURCE_DIR}/data/three_scenes.scene_collection_data.json")
+set(SCENE_COLLECTION_TEST_BIN "${CMAKE_CURRENT_SOURCE_DIR}/data/three_scenes.scene_collection_data.bin")
+set(SCENE_COLLECTION_DATA_SCHEMA "${CMAKE_SOURCE_DIR}/src/types/flatbuffers/scenes/scene_collection_data.fbs")
+
+# Add custom command to compile JSON to binary
+add_custom_command(
+  OUTPUT "${SCENE_COLLECTION_TEST_BIN}"
+  COMMAND flatc
+  ARGS --binary
+  ARGS -o "${CMAKE_CURRENT_SOURCE_DIR}/data"
+  ARGS "${SCENE_COLLECTION_DATA_SCHEMA}"
+  ARGS "${SCENE_COLLECTION_TEST_JSON}"
+  DEPENDS "${SCENE_COLLECTION_TEST_JSON}" "${SCENE_COLLECTION_DATA_SCHEMA}"
+  COMMENT "Compiling scene collection test data: three_scenes.scene_collection_data.json -> three_scenes.scene_collection_data.bin"
+  VERBATIM
+)
+
 # Create a custom target that depends on the compiled test data
 add_custom_target(compile_scene_unit_test_data ALL
-  DEPENDS "${SCENE_TEST_BIN}"
+  DEPENDS "${SCENE_TEST_BIN}" "${SCENE_COLLECTION_TEST_BIN}"
   COMMENT "Compiling scene unit test data"
 )
 

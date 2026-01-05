@@ -2,6 +2,10 @@
   "scene_info": {
     "scene_type": "TITLE"
   },
+  "scene_resources_config": {
+    "texture_width": 800,
+    "texture_height": 600
+  },
   "entity_collection": {
     "entity_memory_pool_size": 146,
     "entities": [

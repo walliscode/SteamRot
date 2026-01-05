@@ -16,6 +16,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 #include "scene_types_generated.h"
 #include "entities_generated.h"
 #include "event_bus_data_generated.h"
+#include "scene_collection_data_generated.h"
 
 namespace steamrot {
 
@@ -101,16 +102,23 @@ inline ::flatbuffers::Offset<SaveMetaDataFbs> CreateSaveMetaDataFbsDirect(
 struct SaveDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef SaveDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_SAVE_META_DATA = 4
+    VT_SAVE_META_DATA = 4,
+    VT_SCENE_COLLECTION_DATA = 6
   };
   /// Metadata for the save file
   const steamrot::SaveMetaDataFbs *save_meta_data() const {
     return GetPointer<const steamrot::SaveMetaDataFbs *>(VT_SAVE_META_DATA);
   }
+  /// Collection of scene data in the save file
+  const steamrot::SceneCollectionDataFbs *scene_collection_data() const {
+    return GetPointer<const steamrot::SceneCollectionDataFbs *>(VT_SCENE_COLLECTION_DATA);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_SAVE_META_DATA) &&
            verifier.VerifyTable(save_meta_data()) &&
+           VerifyOffset(verifier, VT_SCENE_COLLECTION_DATA) &&
+           verifier.VerifyTable(scene_collection_data()) &&
            verifier.EndTable();
   }
 };
@@ -121,6 +129,9 @@ struct SaveDataFbsBuilder {
   ::flatbuffers::uoffset_t start_;
   void add_save_meta_data(::flatbuffers::Offset<steamrot::SaveMetaDataFbs> save_meta_data) {
     fbb_.AddOffset(SaveDataFbs::VT_SAVE_META_DATA, save_meta_data);
+  }
+  void add_scene_collection_data(::flatbuffers::Offset<steamrot::SceneCollectionDataFbs> scene_collection_data) {
+    fbb_.AddOffset(SaveDataFbs::VT_SCENE_COLLECTION_DATA, scene_collection_data);
   }
   explicit SaveDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -135,8 +146,10 @@ struct SaveDataFbsBuilder {
 
 inline ::flatbuffers::Offset<SaveDataFbs> CreateSaveDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<steamrot::SaveMetaDataFbs> save_meta_data = 0) {
+    ::flatbuffers::Offset<steamrot::SaveMetaDataFbs> save_meta_data = 0,
+    ::flatbuffers::Offset<steamrot::SceneCollectionDataFbs> scene_collection_data = 0) {
   SaveDataFbsBuilder builder_(_fbb);
+  builder_.add_scene_collection_data(scene_collection_data);
   builder_.add_save_meta_data(save_meta_data);
   return builder_.Finish();
 }

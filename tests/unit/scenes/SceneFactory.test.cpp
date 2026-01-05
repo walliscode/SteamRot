@@ -79,6 +79,7 @@ TEST_CASE("SceneFactory::CreateSceneFromData handles empty SceneData",
   // Arrange
   steamrot::tests::TestFixture test_fixture;
   steamrot::SceneFactory scene_factory(test_fixture.GetGameContext());
+
   // Act
   auto result = scene_factory.CreateSceneFromData(nullptr);
   // Assert
@@ -149,7 +150,7 @@ TEST_CASE("SceneFactory::CreateSceneFromData creates Scene with valid "
   REQUIRE(fbs_data_ref.entity_collection->entities()->size() == 2);
 
   // Act - Create scene from data
-  auto result = scene_factory.CreateSceneFromData(std::move(fbs_scene_data));
+  auto result = scene_factory.CreateSceneFromData(fbs_scene_data.get());
 
   // Assert - Check scene was created successfully
   if (!result.has_value()) {

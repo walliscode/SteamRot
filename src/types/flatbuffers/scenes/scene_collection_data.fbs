@@ -1,0 +1,9 @@
+include "scene_data.fbs";
+
+namespace steamrot;
+
+table SceneCollectionDataFbs{
+  scene_data: [SceneDataFbs];
+}
+
+root_type SceneCollectionDataFbs;

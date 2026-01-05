@@ -1,6 +1,7 @@
 
 include "../entities/entities.fbs";
 include "../core/scene_types.fbs";
+include "../scenes/scene_collection_data.fbs";
 include "../events/event_bus_data.fbs";
 
 namespace steamrot;
@@ -26,6 +27,9 @@ table SaveMetaDataFbs{
 table SaveDataFbs{
   /// Metadata for the save file
   save_meta_data: SaveMetaDataFbs;
+
+  /// Collection of scene data in the save file
+scene_collection_data: SceneCollectionDataFbs;
 }
 
 root_type SaveDataFbs;
