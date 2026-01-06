@@ -40,7 +40,19 @@ This directory contains comprehensive analysis and recommendations for the Scene
 
 **Read this second** for concrete implementation details.
 
-### 3. [ADR_SCENEDATA_IMPORT_EXPORT.md](./ADR_SCENEDATA_IMPORT_EXPORT.md)
+### 3. [SCENEDATA_VISUAL_DIAGRAMS.md](./SCENEDATA_VISUAL_DIAGRAMS.md)
+
+**Visual ASCII diagrams showing**:
+- Current import data flow
+- Export direction problem visualization
+- Architecture comparison diagrams
+- Type hierarchy comparisons
+- Interface design comparisons
+- Summary diagram of architectural choices
+
+**Read this third** for visual understanding.
+
+### 4. [ADR_SCENEDATA_IMPORT_EXPORT.md](./ADR_SCENEDATA_IMPORT_EXPORT.md)
 
 **Architecture Decision Record containing**:
 - Formal decision documentation format
@@ -54,7 +66,19 @@ This directory contains comprehensive analysis and recommendations for the Scene
 - Consequences analysis (positive, negative, neutral)
 - Appendix explaining the "code smell" concern
 
-**Read this third** for the formal decision recommendation.
+**Read this fourth** for the formal decision recommendation.
+
+### 5. [IMPORTER_EXPORTER_IMPLEMENTATION_DETAILS.md](./IMPORTER_EXPORTER_IMPLEMENTATION_DETAILS.md)
+
+**Detailed Q&A addressing specific implementation questions**:
+- Would IEntityImporter/Exporter replace the Configurator?
+- How would EntityCollectionFbs data move through the system?
+- How do we pass the data to the importer in SceneFactory?
+- Complete code examples showing data flow
+- Two implementation options compared (Provider vs Factory creates Importer)
+- Migration strategy from current to proposed pattern
+
+**Read this for practical implementation guidance** when ready to implement the Importer/Exporter pattern.
 
 ## Quick Summary
 
@@ -201,10 +225,12 @@ This analysis is a living document. After team review:
 
 ```
 documentation/analysis/
-├── README_SCENEDATA_ANALYSIS.md          (this file)
-├── SCENEDATA_ARCHITECTURE_ANALYSIS.md    (comprehensive analysis)
-├── SCENEDATA_CODE_EXAMPLES.md            (implementation examples)
-└── ADR_SCENEDATA_IMPORT_EXPORT.md        (decision record)
+├── README_SCENEDATA_ANALYSIS.md                    (this file)
+├── SCENEDATA_ARCHITECTURE_ANALYSIS.md              (comprehensive analysis)
+├── SCENEDATA_CODE_EXAMPLES.md                      (implementation examples)
+├── SCENEDATA_VISUAL_DIAGRAMS.md                    (ASCII flowcharts)
+├── ADR_SCENEDATA_IMPORT_EXPORT.md                  (decision record)
+└── IMPORTER_EXPORTER_IMPLEMENTATION_DETAILS.md     (Q&A and implementation guide)
 ```
 
 ## Questions or Need Clarification?
@@ -213,6 +239,8 @@ Refer to:
 1. **High-level understanding**: Start with this README
 2. **Detailed analysis**: Read SCENEDATA_ARCHITECTURE_ANALYSIS.md
 3. **Implementation details**: Check SCENEDATA_CODE_EXAMPLES.md
-4. **Decision rationale**: Review ADR_SCENEDATA_IMPORT_EXPORT.md
+4. **Visual diagrams**: Review SCENEDATA_VISUAL_DIAGRAMS.md
+5. **Decision rationale**: Review ADR_SCENEDATA_IMPORT_EXPORT.md
+6. **Practical Q&A**: Check IMPORTER_EXPORTER_IMPLEMENTATION_DETAILS.md
 
 For further questions, contact the architecture team or review discussion in related issues/PRs.
