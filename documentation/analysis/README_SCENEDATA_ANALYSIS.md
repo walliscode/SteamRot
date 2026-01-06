@@ -80,6 +80,18 @@ This directory contains comprehensive analysis and recommendations for the Scene
 
 **Read this for practical implementation guidance** when ready to implement the Importer/Exporter pattern.
 
+### 6. [CLARIFICATION_IMPORTER_VS_CONFIGURATOR.md](./CLARIFICATION_IMPORTER_VS_CONFIGURATOR.md)
+
+**Clarification of key concepts**:
+- Is IEntityImporter like a DTO with methods? (Yes - smart wrapper)
+- How does Provider wrap data in the Importer? (Complete examples)
+- Where is IEntityConfigurator called? (Inside IEntityImporter - uses it internally)
+- Relationship between IEntityImporter (facade) and IEntityConfigurator (implementation)
+- Complete call chain from Provider to EntityMemoryPool modification
+- Why both interfaces exist and their distinct responsibilities
+
+**Read this for conceptual clarity** on how Importer and Configurator work together.
+
 ## Quick Summary
 
 ### The Current Problem
@@ -230,7 +242,8 @@ documentation/analysis/
 ├── SCENEDATA_CODE_EXAMPLES.md                      (implementation examples)
 ├── SCENEDATA_VISUAL_DIAGRAMS.md                    (ASCII flowcharts)
 ├── ADR_SCENEDATA_IMPORT_EXPORT.md                  (decision record)
-└── IMPORTER_EXPORTER_IMPLEMENTATION_DETAILS.md     (Q&A and implementation guide)
+├── IMPORTER_EXPORTER_IMPLEMENTATION_DETAILS.md     (Q&A and implementation guide)
+└── CLARIFICATION_IMPORTER_VS_CONFIGURATOR.md       (concepts and relationships)
 ```
 
 ## Questions or Need Clarification?
@@ -242,5 +255,6 @@ Refer to:
 4. **Visual diagrams**: Review SCENEDATA_VISUAL_DIAGRAMS.md
 5. **Decision rationale**: Review ADR_SCENEDATA_IMPORT_EXPORT.md
 6. **Practical Q&A**: Check IMPORTER_EXPORTER_IMPLEMENTATION_DETAILS.md
+7. **Conceptual clarity**: Read CLARIFICATION_IMPORTER_VS_CONFIGURATOR.md
 
 For further questions, contact the architecture team or review discussion in related issues/PRs.
