@@ -1,0 +1,1627 @@
+# SaveData Export Approaches and Interface Design
+
+## Executive Summary
+
+This document analyzes various approaches for exporting `SaveData` from the codebase and designing interfaces to transform save data into other formats. The analysis provides recommendations for responsibility division to maintain a clean, maintainable codebase following established architectural patterns in SteamRot.
+
+**Key Findings:**
+- **4 distinct export approaches** identified, each with specific use cases
+- Export functionality should follow the **Provider/Configurator pattern** already established in the codebase
+- Clear separation between **data types**, **export interfaces**, and **format implementations** maintains architectural integrity
+- Recommended approach: **Abstract Exporter Interface** with format-specific implementations
+
+**Recommended Actions:**
+1. Create `ISaveDataExporter` interface (follows existing Provider pattern)
+2. Implement format-specific exporters (FlatBuffers, JSON, XML, etc.)
+3. Maintain separation between SaveData (types layer) and exporters (services layer)
+4. Use dependency injection for exporter selection
+
+**Estimated Effort:** 2-3 days for complete implementation
+
+---
+
+## Table of Contents
+
+1. [Current State Analysis](#current-state-analysis)
+2. [Export Approaches Overview](#export-approaches-overview)
+3. [Approach 1: Direct Serialization Methods](#approach-1-direct-serialization-methods)
+4. [Approach 2: Abstract Exporter Interface](#approach-2-abstract-exporter-interface)
+5. [Approach 3: Visitor Pattern](#approach-3-visitor-pattern)
+6. [Approach 4: Strategy Pattern with Format Registry](#approach-4-strategy-pattern-with-format-registry)
+7. [Comparative Analysis](#comparative-analysis)
+8. [Responsibility Division](#responsibility-division)
+9. [Recommended Architecture](#recommended-architecture)
+10. [Implementation Roadmap](#implementation-roadmap)
+11. [Example Use Cases](#example-use-cases)
+12. [Testing Strategy](#testing-strategy)
+
+---
+
+## Current State Analysis
+
+### Existing Architecture
+
+SteamRot follows a layered architecture with clear separation of concerns:
+
+**Layer 1 - Types/Data:**
+- `src/types/core/SaveData.h` - Pure data struct
+- `src/types/core/SaveMetaData.h` - Metadata struct
+- `src/types/core/SceneData.h` - Scene data struct
+- Zero dependencies on other internal packages
+
+**Layer 2 - Interfaces:**
+- `src/interfaces/ISaveDataProvider.h` - Abstract interface for loading SaveData
+- Provider interfaces define contracts without implementation details
+
+**Layer 3 - Services/Implementation:**
+- `src/data_providers/FlatbuffersSaveDataProvider.h` - Concrete provider implementation
+- Handles conversion from FlatBuffers format to SaveData types
+
+### Current SaveData Structure
+
+```cpp
+namespace steamrot {
+
+struct SaveData {
+  SaveMetaData meta_data;              // Timestamp, version, save name, file_id
+  SceneManagerData scene_manager_data; // SceneManager state
+  SceneCollectionData scene_collection_data; // All scene data
+};
+
+struct SaveMetaData {
+  uuids::uuid file_id;      // Unique identifier
+  std::string save_name;    // Display name
+};
+
+}
+```
+
+### Current Data Flow (Import Only)
+
+```
+┌──────────────────────────────────────────────────────┐
+│  FlatBuffers Binary File (.bin)                      │
+│  - Serialized SaveDataFbs                            │
+└──────────────────────┬───────────────────────────────┘
+                       │
+                       │ Read
+                       ▼
+┌──────────────────────────────────────────────────────┐
+│  FlatbuffersSaveDataProvider                         │
+│  - implements ISaveDataProvider                      │
+│  - ConfigureSaveMetaData()                           │
+│  - ProvideSaveData()                                 │
+└──────────────────────┬───────────────────────────────┘
+                       │
+                       │ Returns
+                       ▼
+┌──────────────────────────────────────────────────────┐
+│  SaveData (C++ native types)                         │
+│  - Used by game engine at runtime                    │
+└──────────────────────────────────────────────────────┘
+```
+
+**Missing:** Export path (SaveData → Various Formats)
+
+---
+
+## Export Approaches Overview
+
+| Approach | Complexity | Flexibility | Testability | Coupling | Best For |
+|----------|-----------|-------------|-------------|----------|----------|
+| **1. Direct Serialization** | Low | Low | Medium | High | Simple, single-format exports |
+| **2. Abstract Exporter** | Medium | High | High | Low | Multiple formats, extensible |
+| **3. Visitor Pattern** | High | Very High | High | Low | Complex data transformations |
+| **4. Strategy Registry** | Medium-High | Very High | High | Low | Plugin systems, runtime format selection |
+
+---
+
+## Approach 1: Direct Serialization Methods
+
+### Description
+
+Add serialization methods directly to `SaveData` struct or create free functions that operate on `SaveData`.
+
+### Implementation
+
+**Option 1A: Methods on SaveData**
+
+```cpp
+// src/types/core/SaveData.h
+namespace steamrot {
+
+struct SaveData {
+  SaveMetaData meta_data;
+  SceneManagerData scene_manager_data;
+  SceneCollectionData scene_collection_data;
+  
+  // Export methods
+  std::expected<std::string, FailInfo> ToJSON() const;
+  std::expected<std::vector<uint8_t>, FailInfo> ToFlatBuffers() const;
+  std::expected<std::string, FailInfo> ToXML() const;
+};
+
+}
+```
+
+**Option 1B: Free Functions**
+
+```cpp
+// src/data_providers/save_data_serializers.h
+namespace steamrot {
+
+std::expected<std::string, FailInfo> 
+SaveDataToJSON(const SaveData& save_data);
+
+std::expected<std::vector<uint8_t>, FailInfo> 
+SaveDataToFlatBuffers(const SaveData& save_data);
+
+std::expected<std::string, FailInfo> 
+SaveDataToXML(const SaveData& save_data);
+
+}
+```
+
+### Data Flow
+
+```
+┌──────────────────────────────────────────┐
+│  SaveData (Runtime)                      │
+│  - meta_data                             │
+│  - scene_manager_data                    │
+│  - scene_collection_data                 │
+└──────────┬───────────────────────────────┘
+           │
+           │ save_data.ToJSON()
+           │ or SaveDataToJSON(save_data)
+           │
+           ▼
+┌──────────────────────────────────────────┐
+│  JSON String / FlatBuffers / XML         │
+│  - Serialized format ready for export    │
+└──────────────────────────────────────────┘
+```
+
+### Pros
+
+✅ **Simple to understand** - Straightforward function calls
+✅ **Easy to implement initially** - No complex architecture needed
+✅ **Direct access to data** - No abstraction overhead
+✅ **Low initial development time** - Quick to get working
+
+### Cons
+
+❌ **Violates Single Responsibility Principle** - SaveData knows about serialization formats
+❌ **High coupling** - SaveData depends on multiple serialization libraries (JSON, FlatBuffers, XML)
+❌ **Poor extensibility** - Adding new format requires modifying SaveData or adding more free functions
+❌ **Violates Open/Closed Principle** - Must modify existing code for new formats
+❌ **Difficult testing** - Hard to mock serialization behavior
+❌ **Layer violation** - Types layer (SaveData) depends on services (serialization)
+❌ **Bloated types** - SaveData becomes responsible for too many concerns
+
+### When to Use
+
+- **Prototyping** - Quick proof-of-concept
+- **Single format only** - If you'll only ever export to one format
+- **Throwaway code** - Temporary exports that won't be maintained
+- **Simple utilities** - Command-line tools with no extensibility requirements
+
+### Responsibility Division
+
+| Component | Responsibility |
+|-----------|---------------|
+| `SaveData` | ❌ Data structure AND serialization (violates SRP) |
+| Serialization libs | ❌ Tightly coupled to SaveData (hard to test) |
+
+---
+
+## Approach 2: Abstract Exporter Interface
+
+### Description
+
+Create an abstract `ISaveDataExporter` interface that defines the export contract. Implement concrete exporters for each format. This follows the established Provider pattern in the codebase.
+
+### Implementation
+
+**Interface Definition:**
+
+```cpp
+// src/interfaces/ISaveDataExporter.h
+namespace steamrot {
+
+class ISaveDataExporter {
+public:
+  virtual ~ISaveDataExporter() = default;
+  
+  /////////////////////////////////////////////////
+  /// @brief Export SaveData to the target format
+  ///
+  /// @param save_data The SaveData to export
+  /// @return Serialized data as byte vector, or error
+  /////////////////////////////////////////////////
+  virtual std::expected<std::vector<uint8_t>, FailInfo>
+  ExportSaveData(const SaveData& save_data) const = 0;
+  
+  /////////////////////////////////////////////////
+  /// @brief Get the file extension for this format
+  ///
+  /// @return File extension (e.g., ".json", ".bin", ".xml")
+  /////////////////////////////////////////////////
+  virtual std::string GetFileExtension() const = 0;
+  
+  /////////////////////////////////////////////////
+  /// @brief Get the MIME type for this format
+  ///
+  /// @return MIME type (e.g., "application/json")
+  /////////////////////////////////////////////////
+  virtual std::string GetMimeType() const = 0;
+};
+
+}
+```
+
+**Concrete Implementations:**
+
+```cpp
+// src/data_providers/FlatbuffersSaveDataExporter.h
+namespace steamrot {
+
+class FlatbuffersSaveDataExporter : public ISaveDataExporter {
+public:
+  FlatbuffersSaveDataExporter() = default;
+  
+  std::expected<std::vector<uint8_t>, FailInfo>
+  ExportSaveData(const SaveData& save_data) const override;
+  
+  std::string GetFileExtension() const override { return ".bin"; }
+  std::string GetMimeType() const override { return "application/octet-stream"; }
+
+private:
+  /////////////////////////////////////////////////
+  /// @brief Convert SaveMetaData to FlatBuffers table
+  /////////////////////////////////////////////////
+  std::expected<flatbuffers::Offset<SaveMetaDataFbs>, FailInfo>
+  SerializeSaveMetaData(flatbuffers::FlatBufferBuilder& builder,
+                        const SaveMetaData& meta_data) const;
+};
+
+}
+```
+
+```cpp
+// src/data_providers/JSONSaveDataExporter.h
+namespace steamrot {
+
+class JSONSaveDataExporter : public ISaveDataExporter {
+public:
+  JSONSaveDataExporter() = default;
+  
+  std::expected<std::vector<uint8_t>, FailInfo>
+  ExportSaveData(const SaveData& save_data) const override;
+  
+  std::string GetFileExtension() const override { return ".json"; }
+  std::string GetMimeType() const override { return "application/json"; }
+
+private:
+  /////////////////////////////////////////////////
+  /// @brief Convert SaveMetaData to JSON object
+  /////////////////////////////////////////////////
+  std::expected<nlohmann::json, FailInfo>
+  SerializeSaveMetaData(const SaveMetaData& meta_data) const;
+};
+
+}
+```
+
+```cpp
+// src/data_providers/XMLSaveDataExporter.h
+namespace steamrot {
+
+class XMLSaveDataExporter : public ISaveDataExporter {
+public:
+  XMLSaveDataExporter() = default;
+  
+  std::expected<std::vector<uint8_t>, FailInfo>
+  ExportSaveData(const SaveData& save_data) const override;
+  
+  std::string GetFileExtension() const override { return ".xml"; }
+  std::string GetMimeType() const override { return "application/xml"; }
+};
+
+}
+```
+
+### Data Flow
+
+```
+┌────────────────────────────────────────────────┐
+│  SaveData (Runtime - Layer 1)                  │
+│  - Pure data struct                            │
+│  - No dependencies                             │
+└────────────┬───────────────────────────────────┘
+             │
+             │ Passed to exporter
+             │
+             ▼
+┌────────────────────────────────────────────────┐
+│  ISaveDataExporter (Layer 2 - Interface)       │
+│  - ExportSaveData()                            │
+│  - GetFileExtension()                          │
+│  - GetMimeType()                               │
+└────────────┬───────────────────────────────────┘
+             │
+             │ Implemented by
+             │
+    ┌────────┴────────┬────────────┬─────────┐
+    │                 │            │         │
+    ▼                 ▼            ▼         ▼
+┌─────────┐  ┌──────────┐  ┌──────────┐  ┌─────┐
+│Flatbuffs│  │  JSON    │  │   XML    │  │ ... │
+│Exporter │  │ Exporter │  │ Exporter │  │     │
+│         │  │          │  │          │  │     │
+│(Layer 3)│  │ (Layer 3)│  │ (Layer 3)│  │     │
+└────┬────┘  └────┬─────┘  └────┬─────┘  └─────┘
+     │            │             │
+     ▼            ▼             ▼
+┌─────────────────────────────────────────────────┐
+│  Serialized Output                              │
+│  - .bin (FlatBuffers binary)                    │
+│  - .json (JSON text)                            │
+│  - .xml (XML text)                              │
+└─────────────────────────────────────────────────┘
+```
+
+### Usage Example
+
+```cpp
+// Example: Export to JSON
+void ExportSaveToJSON(const SaveData& save_data, 
+                      const std::string& file_path) {
+  // Create JSON exporter
+  JSONSaveDataExporter exporter;
+  
+  // Export data
+  auto export_result = exporter.ExportSaveData(save_data);
+  if (!export_result.has_value()) {
+    // Handle error
+    return;
+  }
+  
+  // Write to file
+  std::string full_path = file_path + exporter.GetFileExtension();
+  std::ofstream file(full_path, std::ios::binary);
+  file.write(reinterpret_cast<const char*>(export_result.value().data()),
+             export_result.value().size());
+}
+
+// Example: Export with dependency injection
+class SaveManager {
+  const ISaveDataExporter& m_exporter;
+  
+public:
+  SaveManager(const ISaveDataExporter& exporter)
+    : m_exporter(exporter) {}
+    
+  void Save(const SaveData& data, const std::string& path) {
+    auto result = m_exporter.ExportSaveData(data);
+    // Write to file...
+  }
+};
+
+// Usage:
+JSONSaveDataExporter json_exporter;
+SaveManager save_manager(json_exporter);
+save_manager.Save(save_data, "my_save");
+```
+
+### Pros
+
+✅ **Follows established patterns** - Matches ISaveDataProvider, IFontProvider architecture
+✅ **Low coupling** - SaveData independent of serialization logic
+✅ **Extensible** - Add new formats without modifying existing code (Open/Closed Principle)
+✅ **High testability** - Easy to create mock exporters for testing
+✅ **Single Responsibility** - Each class has one clear purpose
+✅ **Dependency injection friendly** - Easy to swap exporters
+✅ **Symmetric with Provider** - Natural pairing: Provider (import) ↔ Exporter (export)
+✅ **Clear layer separation** - Types → Interfaces → Implementations
+
+### Cons
+
+⚠️ **More files to manage** - One interface + multiple implementations
+⚠️ **Slightly more boilerplate** - Need interface and concrete classes
+⚠️ **Indirect** - Cannot call save_data.Export() directly (must use exporter)
+
+### When to Use
+
+- ✅ **Multiple export formats** needed
+- ✅ **Future extensibility** is important
+- ✅ **Testing** is a priority
+- ✅ **Following established patterns** (matches Provider pattern)
+- ✅ **Professional/production** code
+- ✅ **Long-term maintenance** expected
+
+### Responsibility Division
+
+| Component | Responsibility |
+|-----------|---------------|
+| `SaveData` | ✅ Pure data structure (Layer 1) |
+| `ISaveDataExporter` | ✅ Export contract definition (Layer 2) |
+| `FlatbuffersSaveDataExporter` | ✅ FlatBuffers serialization logic (Layer 3) |
+| `JSONSaveDataExporter` | ✅ JSON serialization logic (Layer 3) |
+| `XMLSaveDataExporter` | ✅ XML serialization logic (Layer 3) |
+
+---
+
+## Approach 3: Visitor Pattern
+
+### Description
+
+Implement the Visitor pattern to separate export logic from data structures. This allows adding new operations (export formats) without modifying the data classes.
+
+### Implementation
+
+```cpp
+// src/interfaces/ISaveDataVisitor.h
+namespace steamrot {
+
+// Forward declarations
+struct SaveData;
+struct SaveMetaData;
+struct SceneManagerData;
+struct SceneData;
+
+class ISaveDataVisitor {
+public:
+  virtual ~ISaveDataVisitor() = default;
+  
+  virtual void Visit(const SaveData& data) = 0;
+  virtual void Visit(const SaveMetaData& data) = 0;
+  virtual void Visit(const SceneManagerData& data) = 0;
+  virtual void Visit(const SceneData& data) = 0;
+};
+
+}
+```
+
+```cpp
+// src/types/core/SaveData.h - Modified to accept visitors
+namespace steamrot {
+
+struct SaveData {
+  SaveMetaData meta_data;
+  SceneManagerData scene_manager_data;
+  SceneCollectionData scene_collection_data;
+  
+  /////////////////////////////////////////////////
+  /// @brief Accept a visitor for double dispatch
+  /////////////////////////////////////////////////
+  void Accept(ISaveDataVisitor& visitor) const {
+    visitor.Visit(*this);
+    meta_data.Accept(visitor);
+    scene_manager_data.Accept(visitor);
+    for (const auto& scene : scene_collection_data) {
+      scene->Accept(visitor);
+    }
+  }
+};
+
+}
+```
+
+```cpp
+// src/data_providers/JSONExportVisitor.h
+namespace steamrot {
+
+class JSONExportVisitor : public ISaveDataVisitor {
+  nlohmann::json m_json_output;
+  
+public:
+  void Visit(const SaveData& data) override {
+    m_json_output["version"] = "1.0";
+    // Initialize root structure
+  }
+  
+  void Visit(const SaveMetaData& data) override {
+    m_json_output["metadata"]["save_name"] = data.save_name;
+    m_json_output["metadata"]["file_id"] = uuids::to_string(data.file_id);
+  }
+  
+  void Visit(const SceneManagerData& data) override {
+    // Serialize scene manager data
+  }
+  
+  void Visit(const SceneData& data) override {
+    // Serialize individual scene
+  }
+  
+  std::string GetJSON() const {
+    return m_json_output.dump(2); // Pretty print with 2-space indent
+  }
+};
+
+}
+```
+
+### Data Flow
+
+```
+┌────────────────────────────────────────────────┐
+│  SaveData + nested data structures             │
+│  - Each structure has Accept() method          │
+└────────────┬───────────────────────────────────┘
+             │
+             │ save_data.Accept(visitor)
+             │
+             ▼
+┌────────────────────────────────────────────────┐
+│  ISaveDataVisitor (Traverses hierarchy)        │
+│  - Visit(SaveData)                             │
+│  - Visit(SaveMetaData)                         │
+│  - Visit(SceneManagerData)                     │
+│  - Visit(SceneData)                            │
+└────────────┬───────────────────────────────────┘
+             │
+             │ Implemented by format-specific visitors
+             │
+    ┌────────┴────────┬────────────┐
+    │                 │            │
+    ▼                 ▼            ▼
+┌──────────┐  ┌──────────┐  ┌──────────┐
+│  JSON    │  │FlatBuffrs│  │   XML    │
+│ Visitor  │  │ Visitor  │  │ Visitor  │
+│          │  │          │  │          │
+│Accumulate│  │Accumulate│  │Accumulate│
+│ state    │  │ state    │  │ state    │
+└────┬─────┘  └────┬─────┘  └────┬─────┘
+     │            │             │
+     │ GetJSON()  │ GetBinary() │ GetXML()
+     ▼            ▼             ▼
+┌─────────────────────────────────────────────────┐
+│  Serialized Output                              │
+└─────────────────────────────────────────────────┘
+```
+
+### Usage Example
+
+```cpp
+// Export to JSON using visitor
+void ExportToJSON(const SaveData& save_data) {
+  JSONExportVisitor visitor;
+  save_data.Accept(visitor);
+  std::string json = visitor.GetJSON();
+  
+  // Write to file
+  std::ofstream file("save.json");
+  file << json;
+}
+```
+
+### Pros
+
+✅ **Highly extensible** - Add new operations without modifying data structures
+✅ **Separation of concerns** - Export logic completely separate from data
+✅ **Type-safe traversal** - Compiler ensures all types are handled
+✅ **Supports complex operations** - Can maintain state during traversal
+✅ **Flexible** - Can combine multiple visitors (e.g., validation + export)
+
+### Cons
+
+❌ **High complexity** - Requires understanding of double dispatch
+❌ **Intrusive** - Must add Accept() methods to all data structures
+❌ **Verbose** - Requires visitor interface with methods for each type
+❌ **Coupling to hierarchy** - Visitor interface changes when data structure changes
+❌ **Overkill for simple exports** - Complex pattern for straightforward serialization
+❌ **Layer violation** - Data structs (Layer 1) must know about visitors (Layer 2)
+
+### When to Use
+
+- Complex transformations needed during export
+- Multiple operations on data structure (export, validation, analysis, etc.)
+- Need to maintain state during traversal
+- Data hierarchy is stable (doesn't change often)
+- Team familiar with design patterns
+
+### Responsibility Division
+
+| Component | Responsibility |
+|-----------|---------------|
+| `SaveData` | ⚠️ Data structure + Accept visitor (coupled) |
+| `ISaveDataVisitor` | ✅ Visitor contract (Layer 2) |
+| `JSONExportVisitor` | ✅ JSON export logic + state management (Layer 3) |
+| `FlatBuffersExportVisitor` | ✅ FlatBuffers export logic + state management (Layer 3) |
+
+---
+
+## Approach 4: Strategy Pattern with Format Registry
+
+### Description
+
+Combine the Strategy pattern with a dynamic registry that allows runtime registration and selection of export formats. This provides maximum flexibility for plugin systems or user-selectable export formats.
+
+### Implementation
+
+```cpp
+// src/interfaces/ISaveDataExporter.h
+namespace steamrot {
+
+class ISaveDataExporter {
+public:
+  virtual ~ISaveDataExporter() = default;
+  
+  virtual std::expected<std::vector<uint8_t>, FailInfo>
+  ExportSaveData(const SaveData& save_data) const = 0;
+  
+  virtual std::string GetFormatName() const = 0;
+  virtual std::string GetFileExtension() const = 0;
+  virtual std::string GetDescription() const = 0;
+};
+
+}
+```
+
+```cpp
+// src/data_providers/SaveDataExporterRegistry.h
+namespace steamrot {
+
+class SaveDataExporterRegistry {
+  std::unordered_map<std::string, std::unique_ptr<ISaveDataExporter>> m_exporters;
+  
+  // Singleton instance
+  static SaveDataExporterRegistry& GetInstance() {
+    static SaveDataExporterRegistry instance;
+    return instance;
+  }
+  
+public:
+  /////////////////////////////////////////////////
+  /// @brief Register an exporter for a format
+  ///
+  /// @param format_name Format identifier (e.g., "json", "flatbuffers")
+  /// @param exporter Unique pointer to exporter implementation
+  /////////////////////////////////////////////////
+  static void RegisterExporter(const std::string& format_name,
+                                std::unique_ptr<ISaveDataExporter> exporter) {
+    GetInstance().m_exporters[format_name] = std::move(exporter);
+  }
+  
+  /////////////////////////////////////////////////
+  /// @brief Get an exporter for a specific format
+  ///
+  /// @param format_name Format identifier
+  /// @return Pointer to exporter, or nullptr if not found
+  /////////////////////////////////////////////////
+  static ISaveDataExporter* GetExporter(const std::string& format_name) {
+    auto& exporters = GetInstance().m_exporters;
+    auto it = exporters.find(format_name);
+    return (it != exporters.end()) ? it->second.get() : nullptr;
+  }
+  
+  /////////////////////////////////////////////////
+  /// @brief Get list of all registered formats
+  /////////////////////////////////////////////////
+  static std::vector<std::string> GetAvailableFormats() {
+    std::vector<std::string> formats;
+    for (const auto& [name, _] : GetInstance().m_exporters) {
+      formats.push_back(name);
+    }
+    return formats;
+  }
+};
+
+}
+```
+
+```cpp
+// src/data_providers/FlatbuffersSaveDataExporter.h
+namespace steamrot {
+
+class FlatbuffersSaveDataExporter : public ISaveDataExporter {
+public:
+  // Auto-register on static initialization
+  static bool RegisterFormat() {
+    SaveDataExporterRegistry::RegisterExporter(
+      "flatbuffers",
+      std::make_unique<FlatbuffersSaveDataExporter>()
+    );
+    return true;
+  }
+  
+  std::expected<std::vector<uint8_t>, FailInfo>
+  ExportSaveData(const SaveData& save_data) const override {
+    // Implementation
+  }
+  
+  std::string GetFormatName() const override { return "flatbuffers"; }
+  std::string GetFileExtension() const override { return ".bin"; }
+  std::string GetDescription() const override {
+    return "FlatBuffers binary format";
+  }
+
+private:
+  static inline bool registered = RegisterFormat();
+};
+
+}
+```
+
+### Data Flow
+
+```
+┌────────────────────────────────────────────────┐
+│  SaveData (Runtime)                            │
+└────────────┬───────────────────────────────────┘
+             │
+             │ format_name (user selection)
+             │
+             ▼
+┌────────────────────────────────────────────────┐
+│  SaveDataExporterRegistry                      │
+│  - Maintains format → exporter mapping         │
+│  - GetExporter(format_name)                    │
+│  - GetAvailableFormats()                       │
+└────────────┬───────────────────────────────────┘
+             │
+             │ Returns exporter
+             │
+             ▼
+┌────────────────────────────────────────────────┐
+│  ISaveDataExporter (Specific format)           │
+│  - ExportSaveData()                            │
+└────────────┬───────────────────────────────────┘
+             │
+             ▼
+┌────────────────────────────────────────────────┐
+│  Serialized Output                             │
+└────────────────────────────────────────────────┘
+```
+
+### Usage Example
+
+```cpp
+// Automatic registration (in exporter implementation files)
+// This runs at static initialization time
+namespace steamrot {
+  static bool json_registered = []() {
+    SaveDataExporterRegistry::RegisterExporter(
+      "json",
+      std::make_unique<JSONSaveDataExporter>()
+    );
+    return true;
+  }();
+}
+
+// Runtime usage - user selects format
+void ExportSave(const SaveData& save_data, const std::string& format) {
+  // Get exporter for requested format
+  auto* exporter = SaveDataExporterRegistry::GetExporter(format);
+  if (!exporter) {
+    // Format not supported
+    return;
+  }
+  
+  // Export
+  auto result = exporter->ExportSaveData(save_data);
+  if (result.has_value()) {
+    // Write to file with appropriate extension
+    std::string filename = "save" + exporter->GetFileExtension();
+    // ... write file
+  }
+}
+
+// List available formats for UI
+void ShowExportOptions() {
+  auto formats = SaveDataExporterRegistry::GetAvailableFormats();
+  std::cout << "Available export formats:\n";
+  for (const auto& format : formats) {
+    auto* exporter = SaveDataExporterRegistry::GetExporter(format);
+    std::cout << "  " << format << " - " 
+              << exporter->GetDescription() << "\n";
+  }
+}
+```
+
+### Pros
+
+✅ **Maximum flexibility** - Runtime format selection
+✅ **Plugin architecture** - Easy to add formats without recompiling
+✅ **User-friendly** - Can list available formats for UI
+✅ **Auto-registration** - Formats register themselves
+✅ **Decoupled** - New formats don't affect existing code
+✅ **Dynamic discovery** - Can load exporters from DLLs/shared libraries
+
+### Cons
+
+❌ **Complex initialization** - Static initialization order can be tricky
+❌ **Global state** - Registry is a singleton (can complicate testing)
+❌ **Runtime overhead** - String-based lookup vs compile-time dispatch
+❌ **Memory management** - Registry owns exporters (lifetime considerations)
+❌ **Debugging difficulty** - Harder to trace registration and lookup
+❌ **Overkill for fixed formats** - If formats are known at compile time, simpler approaches work
+
+### When to Use
+
+- Plugin system where formats loaded dynamically
+- User-selectable export formats in UI
+- Format support varies by platform/build configuration
+- Need to discover available formats at runtime
+- Building a framework/library for others to extend
+- Export formats may be added by third parties
+
+### Responsibility Division
+
+| Component | Responsibility |
+|-----------|---------------|
+| `SaveData` | ✅ Pure data structure (Layer 1) |
+| `ISaveDataExporter` | ✅ Export contract (Layer 2) |
+| `SaveDataExporterRegistry` | ✅ Format registration and lookup (Layer 2/3 boundary) |
+| `FlatbuffersSaveDataExporter` | ✅ FlatBuffers export + self-registration (Layer 3) |
+| `JSONSaveDataExporter` | ✅ JSON export + self-registration (Layer 3) |
+
+---
+
+## Comparative Analysis
+
+### Feature Comparison Matrix
+
+| Feature | Direct Serialization | Abstract Exporter | Visitor Pattern | Strategy Registry |
+|---------|---------------------|-------------------|-----------------|-------------------|
+| **Extensibility** | ⭐ Poor | ⭐⭐⭐⭐ Excellent | ⭐⭐⭐⭐ Excellent | ⭐⭐⭐⭐⭐ Outstanding |
+| **Testability** | ⭐⭐ Fair | ⭐⭐⭐⭐⭐ Excellent | ⭐⭐⭐⭐ Very Good | ⭐⭐⭐⭐ Very Good |
+| **Complexity** | ⭐⭐⭐⭐⭐ Simple | ⭐⭐⭐ Moderate | ⭐ Complex | ⭐⭐ Moderate-Complex |
+| **Performance** | ⭐⭐⭐⭐⭐ Excellent | ⭐⭐⭐⭐⭐ Excellent | ⭐⭐⭐⭐ Very Good | ⭐⭐⭐⭐ Very Good |
+| **Coupling** | ⭐ High | ⭐⭐⭐⭐⭐ Very Low | ⭐⭐ Moderate | ⭐⭐⭐⭐⭐ Very Low |
+| **Follows SteamRot Patterns** | ❌ No | ✅ Yes | ❌ No | ⚠️ Partial |
+| **Initial Dev Time** | ⭐⭐⭐⭐⭐ Fast | ⭐⭐⭐ Moderate | ⭐ Slow | ⭐⭐ Moderate-Slow |
+| **Maintenance** | ⭐ Difficult | ⭐⭐⭐⭐⭐ Easy | ⭐⭐⭐ Moderate | ⭐⭐⭐⭐ Easy |
+
+### Use Case Recommendations
+
+| Use Case | Recommended Approach | Reason |
+|----------|---------------------|---------|
+| **Quick prototype** | Direct Serialization | Fast to implement, acceptable for throwaway code |
+| **Production game saves** | Abstract Exporter | Follows established patterns, extensible, testable |
+| **Multiple formats needed** | Abstract Exporter | Clean interface for each format |
+| **Complex data transformations** | Visitor Pattern | Maintains state during traversal |
+| **User-selectable formats** | Strategy Registry | Runtime format discovery and selection |
+| **Plugin system** | Strategy Registry | Dynamic format loading |
+| **Simple utility** | Direct Serialization | Minimal overhead |
+| **Long-term project** | Abstract Exporter | Best maintainability/extensibility balance |
+
+### Code Metrics Comparison
+
+Estimated lines of code for exporting to 3 formats (JSON, FlatBuffers, XML):
+
+| Approach | Interface LOC | Implementation LOC (per format) | Total LOC |
+|----------|--------------|--------------------------------|----------|
+| Direct Serialization | 0 | ~100-150 | ~300-450 |
+| Abstract Exporter | ~50 | ~150-200 | ~500-650 |
+| Visitor Pattern | ~100 | ~200-250 | ~700-850 |
+| Strategy Registry | ~150 | ~200-250 | ~750-900 |
+
+---
+
+## Responsibility Division
+
+### Layered Architecture
+
+Following SteamRot's established three-layer architecture:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  Layer 1: Types/Data (src/types/)                       │
+│  - SaveData, SaveMetaData, SceneData                    │
+│  - Pure data structs                                    │
+│  - ZERO dependencies on other internal packages         │
+│  ✅ Responsibility: Data structure definition only      │
+└─────────────────────────────────────────────────────────┘
+                        ▲
+                        │ depends on
+                        │
+┌─────────────────────────────────────────────────────────┐
+│  Layer 2: Interfaces (src/interfaces/)                  │
+│  - ISaveDataExporter, ISaveDataProvider                 │
+│  - Abstract contracts                                   │
+│  - Depends only on Layer 1 (types)                      │
+│  ✅ Responsibility: Define contracts and behavior       │
+└─────────────────────────────────────────────────────────┘
+                        ▲
+                        │ implements
+                        │
+┌─────────────────────────────────────────────────────────┐
+│  Layer 3: Services/Implementation (src/data_providers/) │
+│  - FlatbuffersSaveDataExporter                          │
+│  - JSONSaveDataExporter                                 │
+│  - XMLSaveDataExporter                                  │
+│  - Depends on Layers 1-2 + external libraries           │
+│  ✅ Responsibility: Concrete serialization logic        │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Comparison: Import vs Export Responsibilities
+
+**Current Import Architecture:**
+
+```
+ISaveDataProvider (Interface)
+    ↓ implements
+FlatbuffersSaveDataProvider (Concrete)
+    ↓ provides
+SaveData (Data)
+```
+
+**Proposed Export Architecture (Symmetric):**
+
+```
+SaveData (Data)
+    ↓ passed to
+ISaveDataExporter (Interface)
+    ↓ implements
+FlatbuffersSaveDataExporter (Concrete)
+    ↓ produces
+Serialized Output
+```
+
+### Class Responsibility Summary
+
+| Class | Layer | Responsibilities | Dependencies |
+|-------|-------|-----------------|--------------|
+| `SaveData` | 1 | Data structure only | None (pure data) |
+| `SaveMetaData` | 1 | Metadata structure | None (pure data) |
+| `SceneData` | 1 | Scene data structure | None (pure data) |
+| `ISaveDataExporter` | 2 | Export contract | Layer 1 types |
+| `FlatbuffersSaveDataExporter` | 3 | FlatBuffers serialization | Layers 1-2 + FlatBuffers lib |
+| `JSONSaveDataExporter` | 3 | JSON serialization | Layers 1-2 + JSON lib |
+| `XMLSaveDataExporter` | 3 | XML serialization | Layers 1-2 + XML lib |
+
+---
+
+## Recommended Architecture
+
+### Primary Recommendation: Abstract Exporter Interface (Approach 2)
+
+**Rationale:**
+1. **Follows established patterns** - Mirrors ISaveDataProvider architecture
+2. **Balanced complexity** - Not too simple, not over-engineered
+3. **Extensible** - Easy to add new formats
+4. **Testable** - Mock exporters for testing
+5. **Maintainable** - Clear responsibilities
+6. **Production-ready** - Suitable for long-term projects
+
+### Architecture Diagram
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                     Game Runtime                             │
+│                                                              │
+│  ┌────────────┐                                             │
+│  │  SaveData  │ (Layer 1 - Types)                           │
+│  └─────┬──────┘                                             │
+│        │                                                     │
+│        │ passed to                                           │
+│        ▼                                                     │
+│  ┌─────────────────┐                                        │
+│  │ISaveDataExporter│ (Layer 2 - Interface)                  │
+│  └────────┬────────┘                                        │
+│           │                                                  │
+│    ┌──────┴───────┬──────────────┬─────────────┐           │
+│    │              │              │             │           │
+│    ▼              ▼              ▼             ▼           │
+│  ┌────┐       ┌────┐        ┌────┐       ┌────┐          │
+│  │FBs │       │JSON│        │XML │       │CSV │ (Layer 3)│
+│  │Exp.│       │Exp.│        │Exp.│       │Exp.│          │
+│  └─┬──┘       └─┬──┘        └─┬──┘       └─┬──┘          │
+│    │            │             │            │              │
+└────┼────────────┼─────────────┼────────────┼──────────────┘
+     │            │             │            │
+     ▼            ▼             ▼            ▼
+┌──────────────────────────────────────────────────────────────┐
+│                    Output Files                              │
+│  save.bin     save.json     save.xml     save.csv           │
+└──────────────────────────────────────────────────────────────┘
+```
+
+### Interface Definition (Recommended)
+
+```cpp
+// src/interfaces/ISaveDataExporter.h
+/////////////////////////////////////////////////
+/// @file
+/// @brief Definition of the ISaveDataExporter interface.
+/////////////////////////////////////////////////
+
+#pragma once
+
+#include "FailInfo.h"
+#include "SaveData.h"
+#include <expected>
+#include <string>
+#include <vector>
+
+namespace steamrot {
+
+/////////////////////////////////////////////////
+/// @class ISaveDataExporter
+/// @brief Interface for exporting SaveData to various formats.
+///
+/// This interface defines the contract for exporting SaveData
+/// to different serialization formats (FlatBuffers, JSON, XML, etc.).
+/// Follows the Provider pattern established in the codebase.
+/////////////////////////////////////////////////
+class ISaveDataExporter {
+public:
+  /////////////////////////////////////////////////
+  /// @brief Virtual destructor.
+  /////////////////////////////////////////////////
+  virtual ~ISaveDataExporter() = default;
+
+  /////////////////////////////////////////////////
+  /// @brief Export SaveData to the target format.
+  ///
+  /// @param save_data The SaveData to export
+  /// @return Serialized data as byte vector, or FailInfo on error
+  /////////////////////////////////////////////////
+  virtual std::expected<std::vector<uint8_t>, FailInfo>
+  ExportSaveData(const SaveData &save_data) const = 0;
+
+  /////////////////////////////////////////////////
+  /// @brief Get the file extension for this format.
+  ///
+  /// @return File extension including dot (e.g., ".json", ".bin")
+  /////////////////////////////////////////////////
+  virtual std::string GetFileExtension() const = 0;
+
+  /////////////////////////////////////////////////
+  /// @brief Get the MIME type for this format.
+  ///
+  /// @return MIME type string (e.g., "application/json")
+  /////////////////////////////////////////////////
+  virtual std::string GetMimeType() const = 0;
+};
+
+} // namespace steamrot
+```
+
+### Implementation Template
+
+```cpp
+// src/data_providers/JSONSaveDataExporter.h
+/////////////////////////////////////////////////
+/// @file
+/// @brief Declaration of JSONSaveDataExporter class.
+/////////////////////////////////////////////////
+
+#pragma once
+
+#include "ISaveDataExporter.h"
+#include "SaveData.h"
+#include <nlohmann/json.hpp>
+
+namespace steamrot {
+
+class JSONSaveDataExporter : public ISaveDataExporter {
+public:
+  /////////////////////////////////////////////////
+  /// @brief Constructor for JSONSaveDataExporter.
+  /////////////////////////////////////////////////
+  JSONSaveDataExporter() = default;
+
+  /////////////////////////////////////////////////
+  /// @brief Export SaveData to JSON format.
+  ///
+  /// @param save_data The SaveData to export
+  /// @return JSON data as byte vector, or FailInfo on error
+  /////////////////////////////////////////////////
+  std::expected<std::vector<uint8_t>, FailInfo>
+  ExportSaveData(const SaveData &save_data) const override;
+
+  /////////////////////////////////////////////////
+  /// @brief Get file extension for JSON format.
+  ///
+  /// @return ".json"
+  /////////////////////////////////////////////////
+  std::string GetFileExtension() const override { return ".json"; }
+
+  /////////////////////////////////////////////////
+  /// @brief Get MIME type for JSON format.
+  ///
+  /// @return "application/json"
+  /////////////////////////////////////////////////
+  std::string GetMimeType() const override { return "application/json"; }
+
+private:
+  /////////////////////////////////////////////////
+  /// @brief Serialize SaveMetaData to JSON object.
+  ///
+  /// @param meta_data SaveMetaData to serialize
+  /// @return JSON object, or FailInfo on error
+  /////////////////////////////////////////////////
+  std::expected<nlohmann::json, FailInfo>
+  SerializeSaveMetaData(const SaveMetaData &meta_data) const;
+
+  /////////////////////////////////////////////////
+  /// @brief Serialize SceneManagerData to JSON object.
+  ///
+  /// @param scene_manager_data SceneManagerData to serialize
+  /// @return JSON object, or FailInfo on error
+  /////////////////////////////////////////////////
+  std::expected<nlohmann::json, FailInfo> SerializeSceneManagerData(
+      const SceneManagerData &scene_manager_data) const;
+};
+
+} // namespace steamrot
+```
+
+### Optional Enhancement: Strategy Registry
+
+For projects that need runtime format selection (e.g., UI with export options), combine Approach 2 (Abstract Exporter) with Approach 4 (Registry):
+
+```cpp
+// src/data_providers/SaveDataExporterFactory.h
+namespace steamrot {
+
+class SaveDataExporterFactory {
+public:
+  /////////////////////////////////////////////////
+  /// @brief Create an exporter for the specified format.
+  ///
+  /// @param format_name Format identifier ("json", "flatbuffers", etc.)
+  /// @return Unique pointer to exporter, or nullptr if format unknown
+  /////////////////////////////////////////////////
+  static std::unique_ptr<ISaveDataExporter>
+  CreateExporter(const std::string &format_name) {
+    if (format_name == "json") {
+      return std::make_unique<JSONSaveDataExporter>();
+    } else if (format_name == "flatbuffers") {
+      return std::make_unique<FlatbuffersSaveDataExporter>();
+    } else if (format_name == "xml") {
+      return std::make_unique<XMLSaveDataExporter>();
+    }
+    return nullptr;
+  }
+
+  /////////////////////////////////////////////////
+  /// @brief Get list of supported formats.
+  ///
+  /// @return Vector of format names
+  /////////////////////////////////////////////////
+  static std::vector<std::string> GetSupportedFormats() {
+    return {"json", "flatbuffers", "xml"};
+  }
+};
+
+} // namespace steamrot
+```
+
+---
+
+## Implementation Roadmap
+
+### Phase 1: Core Infrastructure (Day 1)
+
+**Deliverables:**
+- [ ] Create `ISaveDataExporter` interface
+- [ ] Write unit tests for interface contract
+- [ ] Document interface in Doxygen format
+
+**Files to create:**
+- `src/interfaces/ISaveDataExporter.h`
+- `tests/unit/interfaces/ISaveDataExporter.test.cpp` (if needed)
+
+**Estimated time:** 2-4 hours
+
+### Phase 2: FlatBuffers Implementation (Day 1-2)
+
+**Deliverables:**
+- [ ] Implement `FlatbuffersSaveDataExporter`
+- [ ] Mirror existing `FlatbuffersSaveDataProvider` structure
+- [ ] Write comprehensive unit tests
+- [ ] Test roundtrip: Provider → SaveData → Exporter → Binary
+
+**Files to create:**
+- `src/data_providers/FlatbuffersSaveDataExporter.h`
+- `src/data_providers/FlatbuffersSaveDataExporter.cpp`
+- `tests/unit/data_providers/FlatbuffersSaveDataExporter.test.cpp`
+
+**Estimated time:** 4-6 hours
+
+### Phase 3: JSON Implementation (Day 2)
+
+**Deliverables:**
+- [ ] Implement `JSONSaveDataExporter`
+- [ ] Handle UUID serialization
+- [ ] Pretty-print option
+- [ ] Write unit tests
+
+**Files to create:**
+- `src/data_providers/JSONSaveDataExporter.h`
+- `src/data_providers/JSONSaveDataExporter.cpp`
+- `tests/unit/data_providers/JSONSaveDataExporter.test.cpp`
+
+**Estimated time:** 3-5 hours
+
+### Phase 4: Integration and Testing (Day 3)
+
+**Deliverables:**
+- [ ] Integration tests with real SaveData
+- [ ] Roundtrip tests (import → export → import)
+- [ ] Performance benchmarks
+- [ ] Update documentation
+
+**Files to create/update:**
+- `tests/integration/save_data/export_import_roundtrip.test.cpp`
+- `documentation/workflows/EXPORTING_SAVE_DATA.md`
+- Update `README.md` if needed
+
+**Estimated time:** 4-6 hours
+
+### Phase 5: Optional Enhancements (Day 3+)
+
+**Optional deliverables:**
+- [ ] XML exporter implementation
+- [ ] CSV exporter (for data analysis)
+- [ ] Factory/Registry for runtime format selection
+- [ ] Command-line utility for format conversion
+
+**Estimated time:** Variable based on requirements
+
+---
+
+## Example Use Cases
+
+### Use Case 1: Backup Saves to JSON
+
+**Scenario:** User wants to backup their save files in human-readable format.
+
+```cpp
+void BackupSaveToJSON(const std::string &save_file_path) {
+  // Load SaveData using existing Provider
+  FlatbuffersSaveDataProvider provider;
+  auto load_result = provider.ProvideSaveData();
+  
+  if (!load_result.has_value()) {
+    // Handle error
+    return;
+  }
+  
+  SaveData save_data = load_result.value();
+  
+  // Export to JSON
+  JSONSaveDataExporter json_exporter;
+  auto export_result = json_exporter.ExportSaveData(save_data);
+  
+  if (!export_result.has_value()) {
+    // Handle error
+    return;
+  }
+  
+  // Write to backup file
+  std::string backup_path = save_file_path + ".backup.json";
+  std::ofstream file(backup_path, std::ios::binary);
+  file.write(reinterpret_cast<const char *>(export_result.value().data()),
+             export_result.value().size());
+}
+```
+
+### Use Case 2: Cross-Platform Save Sharing
+
+**Scenario:** Export saves in standardized JSON format for sharing across platforms.
+
+```cpp
+class SaveShareManager {
+  const ISaveDataExporter &m_exporter;
+
+public:
+  SaveShareManager(const ISaveDataExporter &exporter) 
+    : m_exporter(exporter) {}
+
+  std::expected<std::vector<uint8_t>, FailInfo>
+  PrepareForSharing(const SaveData &save_data) {
+    // Export using injected exporter
+    return m_exporter.ExportSaveData(save_data);
+  }
+};
+
+// Usage:
+JSONSaveDataExporter json_exporter;
+SaveShareManager share_manager(json_exporter);
+
+auto shareable_data = share_manager.PrepareForSharing(current_save);
+// Upload to cloud, send to friend, etc.
+```
+
+### Use Case 3: Save Data Analytics
+
+**Scenario:** Export all saves to CSV for analysis in Excel/Python.
+
+```cpp
+class SaveAnalytics {
+public:
+  void ExportAllSavesToCSV(const std::vector<SaveData> &all_saves,
+                           const std::string &output_path) {
+    CSVSaveDataExporter csv_exporter;
+    
+    std::ofstream csv_file(output_path);
+    csv_file << "save_name,file_id,scene_count,timestamp\n";
+    
+    for (const auto &save_data : all_saves) {
+      auto csv_result = csv_exporter.ExportSaveData(save_data);
+      if (csv_result.has_value()) {
+        csv_file.write(
+            reinterpret_cast<const char *>(csv_result.value().data()),
+            csv_result.value().size());
+      }
+    }
+  }
+};
+```
+
+### Use Case 4: Format Conversion Tool
+
+**Scenario:** Command-line tool to convert between save formats.
+
+```cpp
+int main(int argc, char *argv[]) {
+  if (argc < 4) {
+    std::cout << "Usage: save_converter <input> <output_format> <output>\n";
+    return 1;
+  }
+
+  std::string input_path = argv[1];
+  std::string output_format = argv[2];
+  std::string output_path = argv[3];
+
+  // Load save (always from FlatBuffers currently)
+  FlatbuffersSaveDataProvider provider;
+  auto save_result = provider.ProvideSaveData();
+  if (!save_result.has_value()) {
+    std::cerr << "Failed to load save: " 
+              << save_result.error().message << "\n";
+    return 1;
+  }
+
+  // Select exporter based on format
+  std::unique_ptr<ISaveDataExporter> exporter;
+  if (output_format == "json") {
+    exporter = std::make_unique<JSONSaveDataExporter>();
+  } else if (output_format == "xml") {
+    exporter = std::make_unique<XMLSaveDataExporter>();
+  } else {
+    std::cerr << "Unknown format: " << output_format << "\n";
+    return 1;
+  }
+
+  // Export
+  auto export_result = exporter->ExportSaveData(save_result.value());
+  if (!export_result.has_value()) {
+    std::cerr << "Failed to export: " 
+              << export_result.error().message << "\n";
+    return 1;
+  }
+
+  // Write output
+  std::ofstream file(output_path, std::ios::binary);
+  file.write(reinterpret_cast<const char *>(export_result.value().data()),
+             export_result.value().size());
+
+  std::cout << "Converted " << input_path << " to " << output_path << "\n";
+  return 0;
+}
+```
+
+### Use Case 5: Automated Testing
+
+**Scenario:** Export known-good saves for regression testing.
+
+```cpp
+TEST_CASE("SaveData roundtrip preserves data", "[integration][save_data]") {
+  // Create test SaveData
+  SaveData original_save;
+  original_save.meta_data.save_name = "Test Save";
+  original_save.meta_data.file_id = uuids::uuid_system_generator{}();
+  // ... populate rest of data
+
+  // Export to FlatBuffers
+  FlatbuffersSaveDataExporter fb_exporter;
+  auto export_result = fb_exporter.ExportSaveData(original_save);
+  REQUIRE(export_result.has_value());
+
+  // Re-import
+  // (Would need to write binary, then load with provider)
+  // ... 
+
+  // Verify data matches
+  // REQUIRE(loaded_save.meta_data.save_name == original_save.meta_data.save_name);
+}
+```
+
+---
+
+## Testing Strategy
+
+### Unit Tests
+
+**Test each exporter in isolation:**
+
+```cpp
+// tests/unit/data_providers/JSONSaveDataExporter.test.cpp
+TEST_CASE("JSONSaveDataExporter exports valid JSON", 
+          "[unit][JSONSaveDataExporter]") {
+  // Arrange
+  steamrot::SaveData save_data;
+  save_data.meta_data.save_name = "Test Save";
+  save_data.meta_data.file_id = uuids::uuid_system_generator{}();
+  
+  steamrot::JSONSaveDataExporter exporter;
+  
+  // Act
+  auto result = exporter.ExportSaveData(save_data);
+  
+  // Assert
+  REQUIRE(result.has_value());
+  
+  // Parse JSON to verify validity
+  std::string json_str(result.value().begin(), result.value().end());
+  auto json = nlohmann::json::parse(json_str);
+  
+  REQUIRE(json["metadata"]["save_name"] == "Test Save");
+  REQUIRE(json["metadata"]["file_id"] == uuids::to_string(save_data.meta_data.file_id));
+}
+
+TEST_CASE("JSONSaveDataExporter handles empty SaveData",
+          "[unit][JSONSaveDataExporter]") {
+  steamrot::SaveData empty_save;
+  steamrot::JSONSaveDataExporter exporter;
+  
+  auto result = exporter.ExportSaveData(empty_save);
+  
+  REQUIRE(result.has_value());
+  // Verify produces valid (though minimal) JSON
+}
+```
+
+### Integration Tests
+
+**Test roundtrip: Import → Export → Import:**
+
+```cpp
+// tests/integration/save_data/roundtrip.test.cpp
+TEST_CASE("FlatBuffers roundtrip preserves data",
+          "[integration][save_data][roundtrip]") {
+  // Load a known save file
+  steamrot::FlatbuffersSaveDataProvider provider;
+  auto load1 = provider.ProvideSaveData();
+  REQUIRE(load1.has_value());
+  
+  // Export back to FlatBuffers
+  steamrot::FlatbuffersSaveDataExporter exporter;
+  auto export_result = exporter.ExportSaveData(load1.value());
+  REQUIRE(export_result.has_value());
+  
+  // Write to temp file
+  std::string temp_file = "/tmp/test_save.bin";
+  std::ofstream file(temp_file, std::ios::binary);
+  file.write(reinterpret_cast<const char*>(export_result.value().data()),
+             export_result.value().size());
+  file.close();
+  
+  // Load again
+  auto load2 = provider.ProvideSaveData();
+  REQUIRE(load2.has_value());
+  
+  // Verify data matches
+  REQUIRE(load1.value().meta_data.save_name == 
+          load2.value().meta_data.save_name);
+  REQUIRE(load1.value().meta_data.file_id == 
+          load2.value().meta_data.file_id);
+  // ... verify other fields
+}
+```
+
+### Mock Exporters for Testing
+
+**Create test doubles for dependent components:**
+
+```cpp
+// tests/mocks/MockSaveDataExporter.h
+class MockSaveDataExporter : public steamrot::ISaveDataExporter {
+  bool m_should_fail = false;
+  
+public:
+  void SetShouldFail(bool should_fail) { m_should_fail = should_fail; }
+  
+  std::expected<std::vector<uint8_t>, steamrot::FailInfo>
+  ExportSaveData(const steamrot::SaveData& save_data) const override {
+    if (m_should_fail) {
+      return std::unexpected(
+        steamrot::FailInfo{steamrot::FailMode::Unknown, "Mock failure"}
+      );
+    }
+    return std::vector<uint8_t>{1, 2, 3}; // Dummy data
+  }
+  
+  std::string GetFileExtension() const override { return ".mock"; }
+  std::string GetMimeType() const override { return "test/mock"; }
+};
+```
+
+---
+
+## Conclusion
+
+### Summary of Recommendations
+
+1. **Primary Recommendation: Abstract Exporter Interface (Approach 2)**
+   - Best balance of simplicity, extensibility, and maintainability
+   - Follows established SteamRot architectural patterns
+   - Suitable for production use
+
+2. **Optional Enhancement: Strategy Registry (Approach 4)**
+   - Add if runtime format selection is needed
+   - Useful for UI with export options
+   - Can be added later without affecting core architecture
+
+3. **Avoid: Direct Serialization (Approach 1)**
+   - Only use for quick prototypes or throwaway code
+   - Violates SteamRot's layered architecture
+
+4. **Avoid: Visitor Pattern (Approach 3)**
+   - Overkill for straightforward serialization
+   - More complex than needed for this use case
+
+### Implementation Priority
+
+**Must Have (Phase 1-2):**
+- ISaveDataExporter interface
+- FlatbuffersSaveDataExporter (for symmetry with Provider)
+
+**Should Have (Phase 3):**
+- JSONSaveDataExporter (human-readable format)
+
+**Nice to Have (Phase 4+):**
+- XMLSaveDataExporter
+- CSVSaveDataExporter (for analytics)
+- SaveDataExporterFactory (if runtime selection needed)
+
+### Architectural Benefits
+
+By following the recommended approach, SteamRot will have:
+
+✅ **Symmetric architecture** - Provider (import) ↔ Exporter (export)  
+✅ **Clear separation of concerns** - Types, interfaces, implementations  
+✅ **Extensibility** - Add formats without modifying existing code  
+✅ **Testability** - Easy to mock and test each component  
+✅ **Maintainability** - Single responsibility for each class  
+✅ **Consistency** - Follows established patterns in codebase  
+
+### Next Steps
+
+1. Review this analysis with the team
+2. Approve the recommended approach
+3. Begin implementation following the roadmap
+4. Create workflow documentation once implementation is complete
+5. Consider command-line utility for save format conversion
+
+---
+
+## References
+
+### Related Documentation
+
+- **ISaveDataProvider** - `src/interfaces/ISaveDataProvider.h`
+- **FlatbuffersSaveDataProvider** - `src/data_providers/FlatbuffersSaveDataProvider.h`
+- **Font Provider Decoupling Analysis** - `documentation/analysis/FONT_PROVIDER_DECOUPLING.md`
+- **UI Decoupling Analysis** - `documentation/analysis/USER_INTERFACE_DECOUPLING_ANALYSIS.md`
+
+### External Resources
+
+- [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html)
+- [FlatBuffers Documentation](https://google.github.io/flatbuffers/)
+- [nlohmann/json Documentation](https://github.com/nlohmann/json)
+- [Dependency Inversion Principle](https://en.wikipedia.org/wiki/Dependency_inversion_principle)
+
+---
+
+**Document Version:** 1.0  
+**Date:** 2026-01-06  
+**Author:** GitHub Copilot Agent  
+**Status:** Proposal for Review
