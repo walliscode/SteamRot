@@ -7,6 +7,7 @@ add_executable(test_entity
   EntityManager.test.cpp
   ArchetypeManager.test.cpp
   FlatbuffersEntityConfigurator.test.cpp
+  FlatbuffersEntityImporter.test.cpp
 
 )
 
@@ -19,6 +20,7 @@ target_link_libraries(test_entity
   PUBLIC
   Catch2::Catch2WithMain
   entity
+  context_test_helpers
 
 
 )
