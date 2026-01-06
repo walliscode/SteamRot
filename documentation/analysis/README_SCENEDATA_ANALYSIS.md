@@ -92,6 +92,18 @@ This directory contains comprehensive analysis and recommendations for the Scene
 
 **Read this for conceptual clarity** on how Importer and Configurator work together.
 
+### 7. [ADDENDUM_SCENEDATA_NO_POLYMORPHISM.md](./ADDENDUM_SCENEDATA_NO_POLYMORPHISM.md)
+
+**Additional insight on SceneData simplification**:
+- Does SceneData still need polymorphism with Importer/Exporter? (No!)
+- Can we pass SceneData by value/reference instead of pointer? (Yes!)
+- Virtual destructor still needed? (No - becomes plain struct)
+- Benefits of removing polymorphism (simpler, faster, clearer semantics)
+- Updated interface examples showing value/reference passing
+- Migration checklist for removing polymorphism
+
+**Read this for understanding** how SceneData becomes simpler with the new pattern.
+
 ## Quick Summary
 
 ### The Current Problem
@@ -243,7 +255,8 @@ documentation/analysis/
 ├── SCENEDATA_VISUAL_DIAGRAMS.md                    (ASCII flowcharts)
 ├── ADR_SCENEDATA_IMPORT_EXPORT.md                  (decision record)
 ├── IMPORTER_EXPORTER_IMPLEMENTATION_DETAILS.md     (Q&A and implementation guide)
-└── CLARIFICATION_IMPORTER_VS_CONFIGURATOR.md       (concepts and relationships)
+├── CLARIFICATION_IMPORTER_VS_CONFIGURATOR.md       (concepts and relationships)
+└── ADDENDUM_SCENEDATA_NO_POLYMORPHISM.md           (SceneData simplification)
 ```
 
 ## Questions or Need Clarification?
@@ -256,5 +269,6 @@ Refer to:
 5. **Decision rationale**: Review ADR_SCENEDATA_IMPORT_EXPORT.md
 6. **Practical Q&A**: Check IMPORTER_EXPORTER_IMPLEMENTATION_DETAILS.md
 7. **Conceptual clarity**: Read CLARIFICATION_IMPORTER_VS_CONFIGURATOR.md
+8. **SceneData simplification**: See ADDENDUM_SCENEDATA_NO_POLYMORPHISM.md
 
 For further questions, contact the architecture team or review discussion in related issues/PRs.
