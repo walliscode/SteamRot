@@ -1611,6 +1611,385 @@ This hybrid approach addresses all concerns:
 
 ---
 
+## Assembling SaveData from Engine State
+
+### Question: Should ISaveDataProvider Support Creating SaveData from Engine?
+
+The current `ISaveDataProvider` interface is designed for **loading** SaveData from external sources (files):
+
+```cpp
+class ISaveDataProvider {
+  virtual std::expected<SaveData, FailInfo> ProvideSaveData() const = 0;
+};
+```
+
+The question asks: Could we extend this interface to **assemble** SaveData from the current Engine state? This would complete the save/load cycle:
+
+```
+Engine State → SaveData → Export to File (save)
+File → Import to SaveData → Engine State (load)
+```
+
+### Current Architecture Analysis
+
+**What we have:**
+- **ISaveDataProvider** - Loads SaveData from files (import)
+- **ISaveDataExporter** (proposed) - Writes SaveData to files (export)
+
+**What's missing:**
+- **Creating SaveData from runtime Engine state**
+
+This is actually a third operation distinct from import/export:
+1. **Import** (Provider): File → SaveData
+2. **Export** (Exporter): SaveData → File
+3. **Capture** (???): Engine → SaveData
+
+### Option 1: Extend ISaveDataProvider (Not Recommended)
+
+**Implementation:**
+```cpp
+class ISaveDataProvider {
+public:
+  // Existing: Load from file
+  virtual std::expected<SaveData, FailInfo> ProvideSaveData() const = 0;
+  
+  // New: Create from Engine state
+  virtual std::expected<SaveData, FailInfo> 
+  AssembleSaveData(const Engine& engine) const = 0;
+};
+```
+
+**Problems:**
+❌ **Violates Interface Segregation Principle** - Not all providers need both methods
+❌ **Name confusion** - "Provider" implies providing from external source, not creating
+❌ **Wrong responsibility** - Provider's job is to load, not to capture state
+❌ **Asymmetric** - No corresponding method on ISaveDataExporter
+❌ **Coupling** - Provider would depend on Engine (high-level depends on low-level)
+
+**Verdict:** Don't extend ISaveDataProvider for this purpose.
+
+---
+
+### Option 2: Create ISaveDataAssembler Interface (Recommended)
+
+**Implementation:**
+```cpp
+// src/interfaces/ISaveDataAssembler.h
+namespace steamrot {
+
+/////////////////////////////////////////////////
+/// @class ISaveDataAssembler
+/// @brief Interface for creating SaveData from runtime Engine state.
+///
+/// This interface handles the "capture" operation: extracting current
+/// game state from the Engine and packaging it into a SaveData object.
+/// This is distinct from:
+/// - ISaveDataProvider (loads SaveData from files)
+/// - ISaveDataExporter (writes SaveData to files)
+/////////////////////////////////////////////////
+class ISaveDataAssembler {
+public:
+  virtual ~ISaveDataAssembler() = default;
+  
+  /////////////////////////////////////////////////
+  /// @brief Assemble SaveData from current Engine state.
+  ///
+  /// Extracts all necessary state information from the Engine
+  /// (scenes, entities, game progress, etc.) and packages it
+  /// into a SaveData object ready for export.
+  ///
+  /// @param engine Reference to the Engine containing current state
+  /// @return Assembled SaveData, or FailInfo on error
+  /////////////////////////////////////////////////
+  virtual std::expected<SaveData, FailInfo>
+  AssembleSaveData(const Engine& engine) const = 0;
+};
+
+} // namespace steamrot
+```
+
+**Concrete Implementation:**
+```cpp
+// src/data_providers/EngineSaveDataAssembler.h
+namespace steamrot {
+
+class EngineSaveDataAssembler : public ISaveDataAssembler {
+public:
+  EngineSaveDataAssembler() = default;
+  
+  std::expected<SaveData, FailInfo>
+  AssembleSaveData(const Engine& engine) const override;
+
+private:
+  /////////////////////////////////////////////////
+  /// @brief Extract SaveMetaData from Engine
+  /////////////////////////////////////////////////
+  std::expected<SaveMetaData, FailInfo>
+  ExtractMetaData(const Engine& engine) const;
+  
+  /////////////////////////////////////////////////
+  /// @brief Extract SceneManagerData from Engine
+  /////////////////////////////////////////////////
+  std::expected<SceneManagerData, FailInfo>
+  ExtractSceneManagerData(const Engine& engine) const;
+  
+  /////////////////////////////////////////////////
+  /// @brief Extract SceneCollectionData from Engine
+  /////////////////////////////////////////////////
+  std::expected<SceneCollectionData, FailInfo>
+  ExtractSceneCollectionData(const Engine& engine) const;
+};
+
+} // namespace steamrot
+```
+
+**Usage - Complete Save Operation:**
+```cpp
+void SaveGame(const Engine& engine, const std::string& save_name) {
+  // Step 1: Assemble SaveData from Engine state
+  EngineSaveDataAssembler assembler;
+  auto save_data_result = assembler.AssembleSaveData(engine);
+  
+  if (!save_data_result.has_value()) {
+    std::cerr << "Failed to assemble save data\n";
+    return;
+  }
+  
+  SaveData save_data = save_data_result.value();
+  save_data.meta_data.save_name = save_name;
+  
+  // Step 2: Export SaveData to file
+  FlatbuffersSaveDataExporter exporter;
+  auto export_result = exporter.ExportToFile(save_data, 
+                                             "/saves/" + save_name + ".bin");
+  
+  if (!export_result.has_value()) {
+    std::cerr << "Failed to export save data\n";
+    return;
+  }
+  
+  std::cout << "Game saved successfully!\n";
+}
+```
+
+**Usage - Complete Load Operation:**
+```cpp
+std::expected<std::monostate, FailInfo> 
+LoadGame(Engine& engine, const std::string& save_name) {
+  // Step 1: Load SaveData from file
+  FlatbuffersSaveDataProvider provider;
+  auto save_data_result = provider.ProvideSaveData();
+  
+  if (!save_data_result.has_value()) {
+    return std::unexpected(save_data_result.error());
+  }
+  
+  SaveData save_data = save_data_result.value();
+  
+  // Step 2: Apply SaveData to Engine
+  // (This would be a separate operation, not covered in this document)
+  // Could be: engine.RestoreFromSaveData(save_data);
+  // Or: SaveDataRestorer restorer; restorer.RestoreEngine(engine, save_data);
+  
+  return std::monostate{};
+}
+```
+
+**Pros:**
+✅ **Clear separation of concerns** - Each interface has one purpose
+✅ **Interface Segregation** - Implementations only need what they use
+✅ **Intuitive naming** - "Assembler" clearly indicates creating from parts
+✅ **Symmetric architecture** - Three clear operations (assemble, export, import)
+✅ **Independent evolution** - Can change assembler without affecting provider/exporter
+✅ **Testable** - Can mock Engine for testing
+
+**Cons:**
+⚠️ **More interfaces** - Three instead of two (but each is focused)
+⚠️ **Potential coupling** - Assembler depends on Engine (but this is acceptable - it's the assembler's job)
+
+---
+
+### Option 3: Save Manager Facade (Alternative)
+
+**Implementation:**
+```cpp
+// src/engine/SaveManager.h
+namespace steamrot {
+
+/////////////////////////////////////////////////
+/// @class SaveManager
+/// @brief High-level facade for save/load operations.
+///
+/// Coordinates between Assembler, Exporter, and Provider
+/// to provide simple save/load API.
+/////////////////////////////////////////////////
+class SaveManager {
+  const ISaveDataAssembler& m_assembler;
+  const ISaveDataExporter& m_exporter;
+  const ISaveDataProvider& m_provider;
+
+public:
+  SaveManager(const ISaveDataAssembler& assembler,
+              const ISaveDataExporter& exporter,
+              const ISaveDataProvider& provider)
+    : m_assembler(assembler)
+    , m_exporter(exporter)
+    , m_provider(provider) {}
+  
+  /////////////////////////////////////////////////
+  /// @brief Save current Engine state to file.
+  ///
+  /// High-level operation that:
+  /// 1. Assembles SaveData from Engine
+  /// 2. Exports SaveData to file
+  ///
+  /// @param engine Current Engine instance
+  /// @param save_name Name for the save file
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  SaveGame(const Engine& engine, const std::string& save_name) {
+    // Assemble
+    auto save_data_result = m_assembler.AssembleSaveData(engine);
+    if (!save_data_result.has_value()) {
+      return std::unexpected(save_data_result.error());
+    }
+    
+    SaveData save_data = save_data_result.value();
+    save_data.meta_data.save_name = save_name;
+    
+    // Export
+    std::string file_path = "/saves/" + save_name + 
+                           m_exporter.GetFileExtension();
+    return m_exporter.ExportToFile(save_data, file_path);
+  }
+  
+  /////////////////////////////////////////////////
+  /// @brief Load game state from file into Engine.
+  ///
+  /// High-level operation that:
+  /// 1. Imports SaveData from file
+  /// 2. Restores Engine state from SaveData
+  ///
+  /// @param engine Engine instance to restore into
+  /// @param save_name Name of the save file to load
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  LoadGame(Engine& engine, const std::string& save_name) {
+    // Import
+    auto save_data_result = m_provider.ProvideSaveData();
+    if (!save_data_result.has_value()) {
+      return std::unexpected(save_data_result.error());
+    }
+    
+    // Restore (would need implementation)
+    // return engine.RestoreFromSaveData(save_data_result.value());
+    return std::monostate{};
+  }
+};
+
+} // namespace steamrot
+```
+
+**Usage:**
+```cpp
+// Setup
+EngineSaveDataAssembler assembler;
+FlatbuffersSaveDataExporter exporter;
+FlatbuffersSaveDataProvider provider;
+
+SaveManager save_manager(assembler, exporter, provider);
+
+// Save
+auto save_result = save_manager.SaveGame(engine, "quicksave");
+
+// Load
+auto load_result = save_manager.LoadGame(engine, "quicksave");
+```
+
+**Pros:**
+✅ **Simple API** - Single point of contact for save/load
+✅ **Encapsulates complexity** - Hides assembler/exporter/provider details
+✅ **Coordinated operations** - Ensures correct sequence
+✅ **Format agnostic** - Can swap exporter/provider implementations
+
+**Cons:**
+⚠️ **Additional layer** - Adds abstraction (but simplifies usage)
+⚠️ **Dependency injection** - Requires all three components
+
+---
+
+### Complete Architecture: Three Operations
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Engine (Runtime)                      │
+│  - Scenes, Entities, Game State                         │
+└───────────┬─────────────────────────────────────────────┘
+            │
+            │ 3. Capture State
+            │ (ISaveDataAssembler)
+            ▼
+┌─────────────────────────────────────────────────────────┐
+│                   SaveData (Memory)                      │
+│  - meta_data, scene_manager_data, scene_collection_data │
+└───────────┬─────────────────────────────────────────────┘
+            │
+            │ 2. Export           1. Import
+            │ (ISaveDataExporter) (ISaveDataProvider)
+            │                     │
+            ▼                     ▼
+┌─────────────────────────────────────────────────────────┐
+│              File System (.bin, .json, etc.)             │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Three distinct interfaces:**
+1. **ISaveDataProvider** - Import: File → SaveData
+2. **ISaveDataExporter** - Export: SaveData → File
+3. **ISaveDataAssembler** - Capture: Engine → SaveData
+
+**Optional coordination:**
+- **SaveManager** - Facade that combines all three
+
+---
+
+### Recommendation Summary
+
+| Approach | Clarity | Separation | Recommended? |
+|----------|---------|------------|--------------|
+| **Extend ISaveDataProvider** | ❌ Confusing | ❌ Mixed concerns | ❌ No |
+| **Create ISaveDataAssembler** | ✅ Clear | ✅ Single responsibility | ⭐ **Yes** |
+| **SaveManager Facade** | ✅ Very clear | ✅ Coordinated | ⭐ **Yes** (in addition) |
+
+### Recommended Implementation
+
+**Primary:**
+- Create `ISaveDataAssembler` interface for Engine → SaveData
+- Keep `ISaveDataProvider` for File → SaveData
+- Keep `ISaveDataExporter` for SaveData → File
+
+**Optional Enhancement:**
+- Create `SaveManager` facade to coordinate all three
+- Provides simple `SaveGame()` and `LoadGame()` methods
+- Hides complexity from game code
+
+**Benefits:**
+- ✅ Each interface has single, clear purpose
+- ✅ Testable in isolation
+- ✅ Can evolve independently
+- ✅ Optional high-level API via SaveManager
+- ✅ Maintains architectural integrity
+
+**Implementation Order:**
+1. Implement ISaveDataAssembler + EngineSaveDataAssembler
+2. Test assembler independently
+3. (Optional) Implement SaveManager facade
+4. Test complete save/load cycle
+
+This architecture provides maximum flexibility while maintaining clean separation of concerns.
+
+---
+
 ## Implementation Roadmap
 
 ### Phase 1: Core Infrastructure (Day 1)
