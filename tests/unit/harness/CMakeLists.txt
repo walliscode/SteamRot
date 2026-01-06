@@ -1,6 +1,7 @@
 add_executable(test_harness
   FlatbuffersTestDataLoader.test.cpp
   FlatbuffersTestDataProvider.test.cpp
+  TestEngine.test.cpp
 
 )
 

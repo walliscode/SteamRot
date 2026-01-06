@@ -13,25 +13,11 @@
 /////////////////////////////////////////////////
 
 #include "Engine.h"
+#include "TestData.h"
 #include <expected>
+#include <variant>
 
 namespace steamrot::tests {
-
-/////////////////////////////////////////////////
-/// @brief Execution level for TestEngine ticks.
-///
-/// Determines which level of the game architecture to execute:
-/// - FullEngine: Complete GameEngine tick (UpdateSystems)
-/// - SceneManager: SceneManager level tick
-/// - SceneLogic: Individual scene logic vector
-/// - Custom: Mix and match Logic classes and functions
-/////////////////////////////////////////////////
-enum class TickLevel {
-  FullEngine,   ///< Mirrors GameEngine::UpdateSystems
-  SceneManager, ///< Mirrors SceneManager::UpdateSceneManager
-  SceneLogic,   ///< Runs sAction, sCollision, sRender on current scene
-  Custom        ///< Mix and match Logic classes and functions
-};
 
 /////////////////////////////////////////////////
 /// @class TestEngine
@@ -40,14 +26,15 @@ enum class TickLevel {
 class TestEngine : public Engine {
 private:
   /////////////////////////////////////////////////
-  /// @brief Current tick execution level.
+  /// @brief Constant reference to the test data for this instance of the
+  /// engine.
   /////////////////////////////////////////////////
-  TickLevel m_tick_level = TickLevel::Custom;
+  const TestData &m_test_data;
 
   /////////////////////////////////////////////////
   /// @brief Number of ticks to run.
   /////////////////////////////////////////////////
-  size_t m_target_ticks{};
+  size_t m_target_ticks{1};
 
   /////////////////////////////////////////////////
   /// @brief Current tick number.
@@ -69,11 +56,6 @@ private:
   void RunGameLoop() override;
 
   /////////////////////////////////////////////////
-  /// @brief Takes a snapshot of the current scenes and adds to the data bank
-  /////////////////////////////////////////////////
-  void AddToDataBank(size_t tick);
-
-  /////////////////////////////////////////////////
   /// @brief Process scene-specific logic (new Tick_() pipeline method)
   ///
   /// For TestEngine, uses simulation data if available, otherwise
@@ -88,12 +70,21 @@ private:
     return std::monostate{};
   };
 
+  std::expected<std::monostate, FailInfo> StartUp() override;
+
 public:
   /////////////////////////////////////////////////
   /// @brief Constructor taking test data configuration.
   ///
   /// @param config Test data configuration (must remain valid)
   /////////////////////////////////////////////////
-  explicit TestEngine();
+  explicit TestEngine(const TestData &test_data);
+
+  /////////////////////////////////////////////////
+  /// @brief returns the target number of ticks to run
+  ///
+  /// @return The target number of ticks
+  /////////////////////////////////////////////////
+  const size_t &GetTargetTicks() const { return m_target_ticks; }
 };
 } // namespace steamrot::tests
