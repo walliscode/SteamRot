@@ -1055,13 +1055,30 @@ public:
   virtual ~ISaveDataExporter() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Export SaveData to the target format.
+  /// @brief Export SaveData to byte buffer.
+  ///
+  /// Pure serialization without I/O. Use for network uploads,
+  /// testing, clipboard operations, or in-memory processing.
   ///
   /// @param save_data The SaveData to export
   /// @return Serialized data as byte vector, or FailInfo on error
   /////////////////////////////////////////////////
   virtual std::expected<std::vector<uint8_t>, FailInfo>
   ExportSaveData(const SaveData &save_data) const = 0;
+
+  /////////////////////////////////////////////////
+  /// @brief Export SaveData directly to file (convenience method).
+  ///
+  /// Default implementation serializes to buffer then writes to file.
+  /// Override for format-specific optimizations.
+  ///
+  /// @param save_data The SaveData to export
+  /// @param file_path Full path where file should be written
+  /// @return Success (monostate) or FailInfo on error
+  /////////////////////////////////////////////////
+  virtual std::expected<std::monostate, FailInfo>
+  ExportToFile(const SaveData &save_data,
+               const std::string &file_path) const;
 
   /////////////////////////////////////////////////
   /// @brief Get the file extension for this format.
@@ -1191,6 +1208,406 @@ public:
 
 } // namespace steamrot
 ```
+
+---
+
+## Return Type Alternatives: Addressing Type Erasure and File I/O
+
+### Question: Can We Avoid `std::vector<uint8_t>`?
+
+The recommended interface uses `std::vector<uint8_t>` as a common return type across all exporters:
+
+```cpp
+virtual std::expected<std::vector<uint8_t>, FailInfo>
+ExportSaveData(const SaveData& save_data) const = 0;
+```
+
+This raises valid questions about whether we can:
+1. **Overload return types** - Return different types from the same method
+2. **Avoid type erasure** - Return exact types (e.g., `std::string` for JSON, `flatbuffers::DetachedBuffer` for FlatBuffers)
+3. **Export directly to file** - Write files internally, eliminating the need for return values
+
+### Option Analysis
+
+#### Option 1: Return Type Overloading (Not Possible in C++)
+
+**C++ Limitation:**
+```cpp
+// ❌ This is NOT valid C++ - cannot overload by return type alone
+class ISaveDataExporter {
+  virtual std::string ExportSaveData(...) const = 0;  // JSON
+  virtual std::vector<uint8_t> ExportSaveData(...) const = 0;  // Binary
+  // ERROR: Cannot overload solely on return type
+};
+```
+
+**Why it doesn't work:**
+- C++ function resolution is based on function name + parameters, NOT return type
+- The compiler cannot determine which overload to call based on how the return value is used
+- This is a fundamental language limitation, not a design choice
+
+**Alternative (Templates with Tag Dispatch):**
+```cpp
+template<typename FormatTag>
+class ISaveDataExporter {
+  auto ExportSaveData(const SaveData& data) const;
+};
+
+// Specializations
+template<>
+std::string ISaveDataExporter<JSONTag>::ExportSaveData(...) const;
+
+template<>
+std::vector<uint8_t> ISaveDataExporter<BinaryTag>::ExportSaveData(...) const;
+```
+
+**Problems with this approach:**
+- ❌ Loses polymorphism - can't use interface pointers
+- ❌ Breaks dependency injection pattern
+- ❌ Cannot store different exporters in same collection
+- ❌ No runtime format selection
+- ❌ More complex than the benefit warrants
+
+**Verdict:** Not recommended for this use case.
+
+---
+
+#### Option 2: Format-Specific Return Types with `std::variant`
+
+**Implementation:**
+```cpp
+// Define variant for all possible return types
+using ExportResult = std::variant<
+  std::string,                      // JSON, XML text
+  std::vector<uint8_t>,             // Binary formats
+  flatbuffers::DetachedBuffer       // FlatBuffers specific
+>;
+
+class ISaveDataExporter {
+public:
+  virtual std::expected<ExportResult, FailInfo>
+  ExportSaveData(const SaveData& save_data) const = 0;
+  
+  // Helper to identify what's in the variant
+  virtual ExportResultType GetResultType() const = 0;
+};
+```
+
+**Usage:**
+```cpp
+JSONSaveDataExporter exporter;
+auto result = exporter.ExportSaveData(save_data);
+
+if (result.has_value()) {
+  std::visit([](auto&& data) {
+    using T = std::decay_t<decltype(data)>;
+    if constexpr (std::is_same_v<T, std::string>) {
+      // Handle string (JSON/XML)
+      std::cout << data;
+    } else if constexpr (std::is_same_v<T, std::vector<uint8_t>>) {
+      // Handle binary
+      WriteToFile(data);
+    }
+  }, result.value());
+}
+```
+
+**Pros:**
+✅ Type-safe - compiler ensures all types handled
+✅ No data copying - can move out of variant
+✅ More expressive - caller knows exact type
+
+**Cons:**
+❌ More complex API - requires `std::visit` or `std::get`
+❌ Caller must handle all variant types
+❌ Still type erasure, just different form
+❌ Error-prone - easy to forget a type in visitor
+❌ Doesn't simplify the common case (write to file)
+
+**Verdict:** Adds complexity without significant benefit for file I/O use case.
+
+---
+
+#### Option 3: Direct File Export (Recommended Alternative)
+
+**Implementation:**
+```cpp
+// src/interfaces/ISaveDataExporter.h
+class ISaveDataExporter {
+public:
+  virtual ~ISaveDataExporter() = default;
+  
+  /////////////////////////////////////////////////
+  /// @brief Export SaveData directly to file
+  ///
+  /// @param save_data The SaveData to export
+  /// @param file_path Full path where file should be written
+  /// @return Success (monostate) or FailInfo on error
+  /////////////////////////////////////////////////
+  virtual std::expected<std::monostate, FailInfo>
+  ExportToFile(const SaveData& save_data, 
+               const std::string& file_path) const = 0;
+  
+  /////////////////////////////////////////////////
+  /// @brief Get the file extension for this format
+  /////////////////////////////////////////////////
+  virtual std::string GetFileExtension() const = 0;
+};
+```
+
+**Implementation Example:**
+```cpp
+// src/data_providers/JSONSaveDataExporter.cpp
+std::expected<std::monostate, FailInfo>
+JSONSaveDataExporter::ExportToFile(const SaveData& save_data,
+                                   const std::string& file_path) const {
+  // Serialize to JSON string
+  nlohmann::json json_obj;
+  json_obj["metadata"]["save_name"] = save_data.meta_data.save_name;
+  // ... populate rest of JSON
+  
+  // Write directly to file
+  std::ofstream file(file_path);
+  if (!file.is_open()) {
+    return std::unexpected(FailInfo{FailMode::FileOpenFailed,
+                                    "Could not open file: " + file_path});
+  }
+  
+  file << json_obj.dump(2);  // Pretty print with 2-space indent
+  
+  if (file.fail()) {
+    return std::unexpected(FailInfo{FailMode::FileWriteFailed,
+                                    "Failed to write to file"});
+  }
+  
+  return std::monostate{};
+}
+```
+
+**Usage:**
+```cpp
+// Simple and clean
+JSONSaveDataExporter exporter;
+auto result = exporter.ExportToFile(save_data, "/path/to/save.json");
+
+if (!result.has_value()) {
+  std::cerr << "Export failed: " << result.error().message << "\n";
+}
+```
+
+**Pros:**
+✅ **Simple API** - Single responsibility: export to file
+✅ **No return type complexity** - Returns success/failure only
+✅ **Efficient** - No intermediate buffer, write directly
+✅ **Natural for file I/O** - Matches most common use case
+✅ **Clean error handling** - File errors caught at export time
+✅ **Matches common usage** - Most exports go to files anyway
+
+**Cons:**
+⚠️ **Less flexible** - Cannot export to memory (e.g., network, clipboard)
+⚠️ **Harder to test** - Requires file system access in tests
+⚠️ **Mixing concerns** - Exporter handles both serialization AND I/O
+
+**When to use:**
+- ✅ Primary use case is file export
+- ✅ Don't need in-memory serialization
+- ✅ Simplicity is priority
+- ⚠️ May need to add in-memory method later if requirements change
+
+---
+
+#### Option 4: Hybrid Approach (Best of Both Worlds)
+
+**Implementation:**
+```cpp
+class ISaveDataExporter {
+public:
+  virtual ~ISaveDataExporter() = default;
+  
+  /////////////////////////////////////////////////
+  /// @brief Export SaveData to byte buffer (for flexibility)
+  ///
+  /// Use this when you need the serialized data in memory
+  /// (e.g., network upload, clipboard, testing)
+  /////////////////////////////////////////////////
+  virtual std::expected<std::vector<uint8_t>, FailInfo>
+  ExportSaveData(const SaveData& save_data) const = 0;
+  
+  /////////////////////////////////////////////////
+  /// @brief Export SaveData directly to file (convenience)
+  ///
+  /// Default implementation uses ExportSaveData() + file write.
+  /// Implementations can override for format-specific optimizations.
+  ///
+  /// @param save_data The SaveData to export
+  /// @param file_path Full path where file should be written
+  /////////////////////////////////////////////////
+  virtual std::expected<std::monostate, FailInfo>
+  ExportToFile(const SaveData& save_data,
+               const std::string& file_path) const {
+    // Default implementation: serialize + write
+    auto data_result = ExportSaveData(save_data);
+    if (!data_result.has_value()) {
+      return std::unexpected(data_result.error());
+    }
+    
+    // Write to file
+    std::ofstream file(file_path, std::ios::binary);
+    if (!file.is_open()) {
+      return std::unexpected(FailInfo{FailMode::FileOpenFailed,
+                                      "Could not open: " + file_path});
+    }
+    
+    const auto& data = data_result.value();
+    file.write(reinterpret_cast<const char*>(data.data()), data.size());
+    
+    if (file.fail()) {
+      return std::unexpected(FailInfo{FailMode::FileWriteFailed,
+                                      "Failed to write file"});
+    }
+    
+    return std::monostate{};
+  }
+  
+  virtual std::string GetFileExtension() const = 0;
+  virtual std::string GetMimeType() const = 0;
+};
+```
+
+**Key Benefits:**
+- **ExportSaveData()** - Pure serialization, returns data buffer
+  - Required for implementations
+  - Flexible: network, testing, clipboard, etc.
+  - Testable without file system
+  
+- **ExportToFile()** - High-level convenience method
+  - Has default implementation (calls ExportSaveData())
+  - Can be overridden for optimization
+  - Simple for common file export case
+
+**Usage - Simple File Export:**
+```cpp
+JSONSaveDataExporter exporter;
+auto result = exporter.ExportToFile(save_data, "save.json");
+// Clean and simple!
+```
+
+**Usage - Flexible (Network/Testing):**
+```cpp
+JSONSaveDataExporter exporter;
+auto data = exporter.ExportSaveData(save_data);
+if (data.has_value()) {
+  // Upload to cloud
+  UploadToCloud(data.value());
+  // Or test contents
+  REQUIRE(data.value().size() > 0);
+}
+```
+
+**Format-Specific Optimization:**
+```cpp
+// FlatBuffers can optimize by avoiding copy
+class FlatbuffersSaveDataExporter : public ISaveDataExporter {
+  std::expected<std::monostate, FailInfo>
+  ExportToFile(const SaveData& save_data,
+               const std::string& file_path) const override {
+    // Build directly to file without intermediate buffer
+    flatbuffers::FlatBufferBuilder builder;
+    // ... build ...
+    
+    // Write directly from builder (more efficient)
+    std::ofstream file(file_path, std::ios::binary);
+    file.write(reinterpret_cast<const char*>(builder.GetBufferPointer()),
+               builder.GetSize());
+    return std::monostate{};
+  }
+};
+```
+
+**Pros:**
+✅ **Flexible** - Both in-memory and file export supported
+✅ **Simple common case** - Just call ExportToFile()
+✅ **Testable** - ExportSaveData() doesn't touch file system
+✅ **Optimizable** - Implementations can override for efficiency
+✅ **Backward compatible** - Add ExportToFile() without breaking existing code
+✅ **Matches real usage** - File export common, but not only use case
+
+**Cons:**
+⚠️ **Two methods** - Slightly more API surface
+⚠️ **std::vector<uint8_t> still used** - But only for flexible use cases
+
+**Verdict:** ⭐ **Recommended** - Best balance of simplicity and flexibility.
+
+---
+
+### Recommendation Summary
+
+| Approach | Complexity | Flexibility | Testability | Recommended? |
+|----------|-----------|-------------|-------------|--------------|
+| **Original (vector return)** | Low | High | High | ✅ Good baseline |
+| **Return type overloading** | N/A | N/A | N/A | ❌ Not possible in C++ |
+| **std::variant return** | High | Medium | Medium | ⚠️ Overkill |
+| **Direct file export only** | Low | Low | Medium | ⚠️ Too restrictive |
+| **Hybrid (both methods)** | Low-Medium | High | High | ⭐ **Best choice** |
+
+### Recommended Interface (Updated)
+
+```cpp
+// src/interfaces/ISaveDataExporter.h
+namespace steamrot {
+
+class ISaveDataExporter {
+public:
+  virtual ~ISaveDataExporter() = default;
+  
+  /////////////////////////////////////////////////
+  /// @brief Export SaveData to byte buffer
+  ///
+  /// Pure serialization without I/O. Use for:
+  /// - Network uploads
+  /// - Testing (no file system dependency)
+  /// - Clipboard operations
+  /// - In-memory processing
+  ///
+  /// @param save_data The SaveData to export
+  /// @return Serialized data, or FailInfo on error
+  /////////////////////////////////////////////////
+  virtual std::expected<std::vector<uint8_t>, FailInfo>
+  ExportSaveData(const SaveData& save_data) const = 0;
+  
+  /////////////////////////////////////////////////
+  /// @brief Export SaveData directly to file (convenience)
+  ///
+  /// Default implementation serializes to buffer then writes.
+  /// Override for format-specific optimizations.
+  ///
+  /// @param save_data The SaveData to export
+  /// @param file_path Full path where file should be written
+  /// @return Success (monostate) or FailInfo on error
+  /////////////////////////////////////////////////
+  virtual std::expected<std::monostate, FailInfo>
+  ExportToFile(const SaveData& save_data,
+               const std::string& file_path) const;
+  
+  virtual std::string GetFileExtension() const = 0;
+  virtual std::string GetMimeType() const = 0;
+};
+
+} // namespace steamrot
+```
+
+**Key Points:**
+1. **Keep `ExportSaveData()` with `std::vector<uint8_t>`** - It's the right abstraction for serialized data
+2. **Add `ExportToFile()` as convenience** - Covers 90% of use cases with simple API
+3. **Provide default implementation** - Implementers only need to override if optimizing
+4. **No return type overloading needed** - Two separate methods with clear purposes
+
+This hybrid approach addresses all concerns:
+- ✅ Avoids complexity of `std::variant` or templates
+- ✅ Provides simple file export without return value confusion
+- ✅ Maintains flexibility for non-file use cases
+- ✅ Stays testable and maintainable
+- ✅ Follows established C++ patterns
 
 ---
 
