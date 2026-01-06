@@ -11,10 +11,12 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "EngineSnapshot.h"
 #include "SceneData.h"
 #include "SimulationData.h"
 #include "TestMetaData.h"
 #include <cstdint>
+#include <map>
 
 namespace steamrot {
 
@@ -46,6 +48,11 @@ struct TestData {
   /// @brief Starting state of the scene collection
   /////////////////////////////////////////////////
   SceneCollectionData starting_scene_collection_data{};
+
+  /////////////////////////////////////////////////
+  /// @brief Expected engine snapshots at a given tick
+  /////////////////////////////////////////////////
+  std::map<size_t, EngineSnapshot> expected_engine_snapshots{};
 };
 } // namespace steamrot
 //
