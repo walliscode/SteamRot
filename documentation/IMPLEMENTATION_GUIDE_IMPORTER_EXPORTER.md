@@ -609,27 +609,13 @@ FlatbuffersSceneDataProvider::ProvideSceneLoadData(
 
 **File**: `src/scenes/SceneFactory.cpp`
 
-Add new method:
+Add new method that accepts SceneLoadData directly:
 
 ```cpp
 /////////////////////////////////////////////////
 std::expected<std::unique_ptr<Scene>, FailInfo>
-SceneFactory::CreateSceneFromSceneLoadData(const SceneType scene_type) {
-  
-  // Get provider
-  auto get_provider_result =
-      m_game_context.data_access_factory.GetSceneDataProvider();
-  if (!get_provider_result)
-    return std::unexpected(get_provider_result.error());
-  
-  ISceneDataProvider &provider = *get_provider_result.value();
-  
-  // Get SceneLoadData (contains SceneData + Importer)
-  auto load_result = provider.ProvideSceneLoadData(scene_type);
-  if (!load_result)
-    return std::unexpected(load_result.error());
-  
-  SceneLoadData &load_data = load_result.value();
+SceneFactory::CreateSceneFromSceneLoadData(SceneLoadData &load_data,
+                                           const SceneType scene_type) {
   
   // Create empty scene
   auto scene_result = CreateEmptyScene(scene_type);
@@ -653,6 +639,23 @@ SceneFactory::CreateSceneFromSceneLoadData(const SceneType scene_type) {
   
   return std::move(scene);
 }
+```
+
+**File**: `src/scenes/SceneFactory.h`
+
+Add method declaration:
+
+```cpp
+/////////////////////////////////////////////////
+/// @brief Create a scene from SceneLoadData.
+///
+/// @param load_data SceneLoadData containing SceneData and IEntityImporter
+/// @param scene_type The type of scene to create
+/// @return Unique pointer to created Scene, or FailInfo on error
+/////////////////////////////////////////////////
+std::expected<std::unique_ptr<Scene>, FailInfo>
+CreateSceneFromSceneLoadData(SceneLoadData &load_data,
+                              const SceneType scene_type);
 ```
 
 ### Step 4.5: Update ISceneConfigurator Interface
@@ -788,19 +791,40 @@ Files to update:
 - `src/data_providers/FlatbuffersSceneDataProvider.cpp`
 - `src/scenes/FlatbuffersSceneConfigurator.cpp`
 
-### Step 5.3: Update Old SceneFactory Method (Backward Compatibility)
+### Step 5.3: Update CreateSceneFromDefault Method
 
-Keep the old `CreateSceneFromDefault` method but redirect to new implementation:
+Update `CreateSceneFromDefault` to be a wrapper that loads data and calls `CreateSceneFromSceneLoadData`:
+
+**File**: `src/scenes/SceneFactory.cpp`
 
 ```cpp
 std::expected<std::unique_ptr<Scene>, FailInfo>
 SceneFactory::CreateSceneFromDefault(SceneType type) {
-  // Redirect to new implementation
-  return CreateSceneFromSceneLoadData(type);
+  
+  // Get provider
+  auto get_provider_result =
+      m_game_context.data_access_factory.GetSceneDataProvider();
+  if (!get_provider_result)
+    return std::unexpected(get_provider_result.error());
+  
+  ISceneDataProvider &provider = *get_provider_result.value();
+  
+  // Get SceneLoadData (contains SceneData + Importer)
+  auto load_result = provider.ProvideSceneLoadData(type);
+  if (!load_result)
+    return std::unexpected(load_result.error());
+  
+  SceneLoadData &load_data = load_result.value();
+  
+  // Call the core implementation with loaded data
+  return CreateSceneFromSceneLoadData(load_data, type);
 }
 ```
 
-Or deprecate and update all call sites to use `CreateSceneFromSceneLoadData`.
+**Design**: 
+- `CreateSceneFromSceneLoadData` is the core method that accepts pre-loaded data
+- `CreateSceneFromDefault` is a convenience wrapper that loads data from provider first
+- This allows direct scene creation from SceneLoadData when needed (testing, custom loading, etc.)
 
 **Build**: `cmake --build --preset Debug`
 
