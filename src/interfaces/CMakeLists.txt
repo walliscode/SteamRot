@@ -21,5 +21,6 @@ target_link_libraries(interfaces
   types
   SFML::Graphics
   stduuid
+
 )
 
