@@ -246,7 +246,7 @@ TEST_CASE("FlatbuffersSceneConfigurator::ConfiguresEntities modifies the "
   REQUIRE(initial_entity_count == 0);
   // load scene data
   auto scene_data_result =
-      data_provider.ProvideDefaultSceneData(steamrot::SceneType_TEST);
+      data_provider.ProvideDefaultSceneLoadData(steamrot::SceneType_TEST);
   if (!scene_data_result.has_value()) {
     FAIL(scene_data_result.error().message);
   }

@@ -31,7 +31,9 @@ struct EngineResources {
   /////////////////////////////////////////////////
   /// @brief Constructor passing DataAccessFactory instance to AssetManager.
   /////////////////////////////////////////////////
-  explicit EngineResources() : asset_manager(data_access_factory) {}
+  explicit EngineResources()
+      : data_access_factory(event_handler), asset_manager(data_access_factory) {
+  }
 
   /////////////////////////////////////////////////
   /// @brief The game window.

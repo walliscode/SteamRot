@@ -26,7 +26,8 @@ public:
   /////////////////////////////////////////////////
   /// @brief Get subscribers from this data source.
   ///
-  /// @return Vector of shared pointers to Subscriber objects or failure information
+  /// @return Vector of shared pointers to Subscriber objects or failure
+  /// information
   /////////////////////////////////////////////////
   virtual std::expected<std::vector<std::shared_ptr<Subscriber>>, FailInfo>
   GetSubscribers() const = 0;

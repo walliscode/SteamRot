@@ -9,7 +9,7 @@
 #include "SceneFactory.h"
 #include "CraftingScene.h"
 #include "FlatbuffersSceneConfigurator.h"
-#include "ISceneDataProvider.h"
+#include "ISceneConfigurator.h"
 #include "Scene.h"
 #include "TitleScene.h"
 #include <memory>
@@ -59,29 +59,34 @@ ISceneConfigurator &GetSceneConfigurator() {
 
 /////////////////////////////////////////////////
 std::expected<std::unique_ptr<Scene>, FailInfo>
-SceneFactory::CreateSceneFromData(const SceneData *scene_data) {
+SceneFactory::CreateSceneFromSceneLoadData(
+    const SceneLoadData &scene_load_data) {
 
-  // Guard statement for null pointer
-  if (scene_data == nullptr) {
-    return std::unexpected(FailInfo{
-        FailMode::NullPointer,
-        "SceneData pointer is null in SceneFactory::CreateSceneFromData"});
-  }
   // Step 1: Create empty scene
-  auto create_scene_result = CreateEmptyScene(scene_data->scene_info.type);
+  auto create_scene_result =
+      CreateEmptyScene(scene_load_data.scene_data.scene_info.type);
   if (!create_scene_result.has_value()) {
     return std::unexpected(create_scene_result.error());
   }
   std::unique_ptr<Scene> scene = std::move(create_scene_result.value());
+
   // Step 2: Get configurator
   ISceneConfigurator &configurator = GetSceneConfigurator();
 
   // Step 3: Configurator applies data
-  auto config_result = configurator.ConfigureScene(*scene, scene_data);
+  auto config_result =
+      configurator.ConfigureScene(*scene, scene_load_data.scene_data);
   if (!config_result.has_value()) {
     return std::unexpected(config_result.error());
   }
 
+  // Step 4: Import entity data using the importer
+  auto import_result = scene_load_data.entity_importer->ImportEntities(
+      scene->GetSceneContext().scene_entities);
+  if (!import_result)
+    return std::unexpected(import_result.error());
+
+  // Step 5: Return configured scene
   return std::move(scene);
 }
 
@@ -94,23 +99,16 @@ SceneFactory::CreateSceneFromDefault(SceneType type) {
       m_game_context.data_access_factory.GetSceneDataProvider();
   if (!get_provider_result.has_value())
     return std::unexpected(get_provider_result.error());
-  ISceneDataProvider &provider = *get_provider_result.value();
+  ISceneLoadDataProvider &provider = *get_provider_result.value();
 
   // Step 2: Provider loads data
-  auto get_data_result = provider.ProvideDefaultSceneData(type);
+  auto get_data_result = provider.ProvideDefaultSceneLoadData(type);
   if (!get_data_result.has_value()) {
     return std::unexpected(get_data_result.error());
   }
-  std::unique_ptr<SceneData> data =
-      provider.ProvideDefaultSceneData(type).value();
-  if (!data) {
-    return std::unexpected(FailInfo{
-        FailMode::NullPointer,
-        "SceneData pointer is null in SceneFactory::CreateSceneFromDefault"});
-  }
 
   // Step 3: Create scene from data
-  return CreateSceneFromData(data.get());
+  return CreateSceneFromSceneLoadData(get_data_result.value());
 }
 
 } // namespace steamrot

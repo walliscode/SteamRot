@@ -11,46 +11,35 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-
 #include "FailInfo.h"
-#include "SceneData.h"
 #include "SceneLoadData.h"
 #include "scene_data_generated.h"
 #include "scene_types_generated.h"
 #include <expected>
-#include <memory>
+
 namespace steamrot {
 
-class ISceneDataProvider {
+class ISceneLoadDataProvider {
 
 public:
   /////////////////////////////////////////////////
   /// @brief Virtual destructor.
   /////////////////////////////////////////////////
-  virtual ~ISceneDataProvider() = default;
+  virtual ~ISceneLoadDataProvider() = default;
 
   /////////////////////////////////////////////////
   /// @brief Provides pointer to SceneData object.
   /////////////////////////////////////////////////
-  virtual std::expected<std::unique_ptr<SceneData>, FailInfo>
-  ProvideDefaultSceneData(const SceneType scene_type) const = 0;
+  virtual std::expected<SceneLoadData, FailInfo>
+  ProvideDefaultSceneLoadData(const SceneType scene_type) const = 0;
 
-  // ADD NEW METHOD
   /////////////////////////////////////////////////
-  /// @brief Provides scene configuration and entity importer together.
+  /// @brief Provides a SceneLoadData object from flatbuffers data
   ///
-  /// @param scene_type Type of scene to load
-  /// @return SceneLoadData containing both config and importer
+  /// Designed to be overloaded and then overriden per concrete Implementation
+  /// @param fb_data flatbuffers data
   /////////////////////////////////////////////////
   virtual std::expected<SceneLoadData, FailInfo>
-  ProvideSceneLoadData(const SceneType scene_type) const = 0;
-
-  /////////////////////////////////////////////////
-  /// @brief Virtual method to provide SceneData from FlatBuffers data.
-  ///
-  /// @param scene_data_fbs FlatBuffers SceneData for scene.
-  /////////////////////////////////////////////////
-  virtual std::expected<std::unique_ptr<SceneData>, FailInfo>
-  ProvideSceneDataFromData(const SceneDataFbs *scene_data_fbs) const = 0;
+  ProvideSceneLoadDataFromData(const SceneDataFbs *fb_data) const = 0;
 };
 } // namespace steamrot

@@ -240,7 +240,7 @@ TEST_CASE("SceneManager::AddScenesFromSceneCollectionData loads three scenes "
 
     // convert each scene to SceneData
     auto scene_data_result =
-        scene_data_provider.ProvideSceneDataFromData(scene_fbs);
+        scene_data_provider.ConfigureSceneDataFromData(scene_fbs);
     if (!scene_data_result) {
       FAIL(scene_data_result.error().message);
     }

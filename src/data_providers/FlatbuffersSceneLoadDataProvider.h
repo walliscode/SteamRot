@@ -12,14 +12,15 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "EventHandler.h"
-#include "ISceneDataProvider.h"
+#include "ISceneLoadDataProvider.h"
 #include "SceneResourcesConfig.h"
 #include "scene_resources_config_generated.h"
 #include "scene_types_generated.h"
-#include <memory>
+#include <variant>
 
 namespace steamrot {
-class FlatbuffersSceneDataProvider : public steamrot::ISceneDataProvider {
+class FlatbuffersSceneLoadDataProvider
+    : public steamrot::ISceneLoadDataProvider {
 
 private:
   EventHandler &m_event_handler;
@@ -30,7 +31,7 @@ public:
   ///
   /// @param event_handler Reference to EventHandler for event reporting.
   /////////////////////////////////////////////////
-  FlatbuffersSceneDataProvider(EventHandler &event_handler);
+  FlatbuffersSceneLoadDataProvider(EventHandler &event_handler);
 
   /////////////////////////////////////////////////
   /// @brief Configures SceneInfo from FlatBuffers data.
@@ -52,22 +53,28 @@ public:
                                 const SceneResourcesConfigFbs *fb_config) const;
 
   /////////////////////////////////////////////////
-  /// @brief Loads SceneData from FlatBuffers.
-  ///
-  /// @return Unique pointer to SceneData object.
-  /////////////////////////////////////////////////
-  std::expected<std::unique_ptr<SceneData>, FailInfo>
-  ProvideDefaultSceneData(const SceneType scene_type) const override;
-
-  /////////////////////////////////////////////////
   /// @brief Provides SceneData from FlatBuffers data.
   ///
   /// @param scene_data_fbs FlatBuffers SceneData for scene.
   /////////////////////////////////////////////////
-  std::expected<std::unique_ptr<SceneData>, FailInfo>
-  ProvideSceneDataFromData(const SceneDataFbs *scene_data_fbs) const override;
+  std::expected<std::monostate, FailInfo>
+  ConfigureSceneDataFromData(SceneData &scene_data,
+                             const SceneDataFbs *scene_data_fbs) const;
 
+  /////////////////////////////////////////////////
+  /// @brief Provide
+  ///
+  /// @param scene_type [TODO:parameter]
+  /////////////////////////////////////////////////
   std::expected<SceneLoadData, FailInfo>
-  ProvideSceneLoadData(const SceneType scene_type) const override;
+  ProvideSceneLoadDataFromData(const SceneDataFbs *fb_data) const override;
+
+  /////////////////////////////////////////////////
+  /// @brief Providers SceneLoadData object
+  ///
+  /// @param scene_type ScenType enum
+  /////////////////////////////////////////////////
+  std::expected<SceneLoadData, FailInfo>
+  ProvideDefaultSceneLoadData(const SceneType scene_type) const override;
 };
 } // namespace steamrot

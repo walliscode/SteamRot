@@ -18,7 +18,7 @@ TEST_CASE("FlatbuffersSceneDataProvider::ProviderDefaultSceneData returns "
   // Use an invalid SceneType
   steamrot::SceneType invalid_scene_type = static_cast<steamrot::SceneType>(-1);
   auto scene_data_get_result =
-      provider.ProvideDefaultSceneData(invalid_scene_type);
+      provider.ProvideDefaultSceneLoadData(invalid_scene_type);
   REQUIRE(!scene_data_get_result.has_value());
   REQUIRE(scene_data_get_result.error().message ==
           "Invalid SceneType provided");
@@ -32,7 +32,8 @@ TEST_CASE("FlatbuffersSceneDataProvider::ProvideDefaultSceneData returns "
   for (const auto scene_type : {steamrot::SceneType::SceneType_CRAFTING,
                                 steamrot::SceneType::SceneType_TITLE}) {
 
-    auto scene_data_get_result = provider.ProvideDefaultSceneData(scene_type);
+    auto scene_data_get_result =
+        provider.ProvideDefaultSceneLoadData(scene_type);
     if (!scene_data_get_result.has_value()) {
       FAIL(scene_data_get_result.error().message);
     }
@@ -48,8 +49,8 @@ TEST_CASE("FlatbuffersSceneDataProvider::ProvideDefaultSceneData returns "
           "correct data with Title scene",
           "[unit][FlatbuffersSceneDataProvider]") {
   steamrot::FlatbuffersSceneDataProvider provider;
-  auto scene_data_get_result =
-      provider.ProvideDefaultSceneData(steamrot::SceneType::SceneType_TITLE);
+  auto scene_data_get_result = provider.ProvideDefaultSceneLoadData(
+      steamrot::SceneType::SceneType_TITLE);
   if (!scene_data_get_result.has_value()) {
     FAIL(scene_data_get_result.error().message);
   }
@@ -74,8 +75,8 @@ TEST_CASE("FlatbuffersSceneDataProvider::ProvideDefaultSceneData returns "
           "correct data with Crafting scene",
           "[unit][FlatbuffersSceneDataProvider]") {
   steamrot::FlatbuffersSceneDataProvider provider;
-  auto scene_data_get_result =
-      provider.ProvideDefaultSceneData(steamrot::SceneType::SceneType_CRAFTING);
+  auto scene_data_get_result = provider.ProvideDefaultSceneLoadData(
+      steamrot::SceneType::SceneType_CRAFTING);
   if (!scene_data_get_result.has_value()) {
     FAIL(scene_data_get_result.error().message);
   }

@@ -9,10 +9,10 @@
 #include "FlatbuffersEntityConfigurator.h"
 #include "CMachinaForm.h"
 #include "FailInfo.h"
-#include "FlatbuffersSubscriberViewer.h"
 #include "FlatbuffersUIElementConfigurator.h"
 #include "containers.h"
 #include "entity_memory.h"
+#include "subscriber_factory.h"
 #include "ui_state_generated.h"
 #include <expected>
 #include <variant>
@@ -292,21 +292,24 @@ FlatbuffersEntityConfigurator::ConfigureCUIState(CUIState &ui_state_component,
     // Create and register subscribers if provided
     if (ui_state_data->subscribers()) {
 
-      // create a FlatbuffersSubscriberViewer instance
-      FlatbuffersSubscriberViewer subscriber_viewer(
-          ui_state_data->subscribers());
+      std::vector<std::shared_ptr<Subscriber>> subscribers_vector;
+      // create subscribers from the flatbuffers data
+      for (const auto &subscriber_data : *ui_state_data->subscribers()) {
+        auto subscriber_result =
+            subscriber_factory::CreateSubscriber(subscriber_data);
 
-      // get the subscribers from the viewer
-      auto subscribers_result = subscriber_viewer.GetSubscribers();
-      if (!subscribers_result.has_value()) {
-        return std::unexpected(subscribers_result.error());
+        if (!subscriber_result.has_value()) {
+          return std::unexpected(subscriber_result.error());
+        }
+        subscribers_vector.push_back(
+            std::make_shared<Subscriber>(subscriber_result.value()));
       }
+
       // assign the subscribers to the ui state component for this state key
-      ui_state_component.m_state_subscribers[state_key] =
-          subscribers_result.value();
+      ui_state_component.m_state_subscribers[state_key] = subscribers_vector;
 
       // register each subscriber with the event handler
-      for (const auto &subscriber : subscribers_result.value()) {
+      for (const auto &subscriber : subscribers_vector) {
         auto reg_result = m_event_handler.RegisterSubscriber(subscriber);
         if (!reg_result.has_value()) {
           return std::unexpected(reg_result.error());

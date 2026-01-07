@@ -100,16 +100,9 @@ SceneManager::AddScenesFromSceneCollectionData(
   // loop through scene collection data and add each scene
   for (auto &scene_data : scene_collection_data) {
 
-    // check scene_data is not null
-    if (scene_data == nullptr) {
-      FailInfo fail_info(FailMode::NullPointer,
-                         "Scene data is null in collection");
-      return std::unexpected(fail_info);
-    }
-
     // create and configure scene from data
     auto scene_creation_result =
-        scene_factory.CreateSceneFromData(scene_data.get());
+        scene_factory.CreateSceneFromSceneLoadData(scene_data);
     if (!scene_creation_result.has_value()) {
       return std::unexpected(scene_creation_result.error());
     }
