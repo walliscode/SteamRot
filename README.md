@@ -76,6 +76,8 @@ SteamRot/
 4. **Fail Fast**: Let exceptions propagate, handle gracefully at top level
 5. **Type Safety**: Use `std::expected` for runtime errors
 
+> 📊 **Architecture Analysis Available**: See [documentation/analysis](documentation/analysis/README.md) for comprehensive analysis of layer structure, dependency management, and recommendations for improving robustness and extensibility
+
 ## Documentation
 
 The `documentation/` directory contains comprehensive guides organized by topic:
@@ -91,6 +93,7 @@ The `documentation/` directory contains comprehensive guides organized by topic:
 - **[Filling Out Test Data](documentation/workflows/FILLING_TEST_DATA.md)** - Create test_data.json files
 
 ### 🏗️ Architecture
+- **[Architecture Analysis](documentation/analysis/README.md)** - ⭐ Comprehensive layer and dependency analysis
 - **[Error Handling](documentation/architecture/ERROR_HANDLING.md)** - Exception and error patterns
 - **[Game Loop](documentation/architecture/GAME_LOOP.md)** - Main game loop structure
 - **[Logic System](documentation/architecture/LOGIC_SYSTEM.md)** - Logic architecture
