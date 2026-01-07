@@ -11,6 +11,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "EventHandler.h"
 #include "ISceneDataProvider.h"
 #include "SceneResourcesConfig.h"
 #include "scene_resources_config_generated.h"
@@ -20,8 +21,16 @@
 namespace steamrot {
 class FlatbuffersSceneDataProvider : public steamrot::ISceneDataProvider {
 
+private:
+  EventHandler &m_event_handler;
+
 public:
-  FlatbuffersSceneDataProvider() = default;
+  /////////////////////////////////////////////////
+  /// @brief Constructor
+  ///
+  /// @param event_handler Reference to EventHandler for event reporting.
+  /////////////////////////////////////////////////
+  FlatbuffersSceneDataProvider(EventHandler &event_handler);
 
   /////////////////////////////////////////////////
   /// @brief Configures SceneInfo from FlatBuffers data.
@@ -57,5 +66,8 @@ public:
   /////////////////////////////////////////////////
   std::expected<std::unique_ptr<SceneData>, FailInfo>
   ProvideSceneDataFromData(const SceneDataFbs *scene_data_fbs) const override;
+
+  std::expected<SceneLoadData, FailInfo>
+  ProvideSceneLoadData(const SceneType scene_type) const override;
 };
 } // namespace steamrot

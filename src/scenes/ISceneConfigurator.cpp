@@ -12,7 +12,7 @@ namespace steamrot {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ISceneConfigurator::ConfigureScene(Scene &scene, const SceneData *scene_data) {
+ISceneConfigurator::ConfigureScene(Scene &scene, const SceneData &scene_data) {
 
   // Configure SceneInfo
   auto info_result = ConfigureSceneInfo(scene, scene_data);
@@ -29,11 +29,6 @@ ISceneConfigurator::ConfigureScene(Scene &scene, const SceneData *scene_data) {
   if (!config_result.has_value())
     return std::unexpected(config_result.error());
 
-  // 4. Configure Entities
-  auto entities_result = ConfigureEntities(scene, scene_data);
-  if (!entities_result.has_value())
-    return std::unexpected(entities_result.error());
-
   // Configure LogicMap
   auto logic_result = ConfigureLogicMap(scene);
   if (!logic_result.has_value())
@@ -49,12 +44,12 @@ ISceneConfigurator::ConfigureScene(Scene &scene, const SceneData *scene_data) {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ISceneConfigurator::PassAssetConfig(Scene &scene, const SceneData *scene_data) {
+ISceneConfigurator::PassAssetConfig(Scene &scene, const SceneData &scene_data) {
   // get AssetManager reference
   AssetManager &asset_manager = scene.GetSceneContext().asset_manager;
 
   // pass AssetConfig to AssetManager
-  auto asset_result = asset_manager.LoadAssets(scene_data->scene_asset_config);
+  auto asset_result = asset_manager.LoadAssets(scene_data.scene_asset_config);
   if (!asset_result.has_value())
     return std::unexpected(asset_result.error());
 

@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of abstract SceneData struct
+/// @brief Declaration of SceneLoadData struct
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -11,34 +11,28 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "AssetConfig.h"
-#include "SceneInfo.h"
-#include "SceneResourcesConfig.h"
+#include "SceneData.h"
+#include <memory>
 
 namespace steamrot {
 /////////////////////////////////////////////////
-/// @class SceneData
-/// @brief Contains all data needed to configure a Scene and provide resources
-/// for it.
-
+/// @struct SceneLoadData
+/// @brief Contains both scene configuration and entity importer.
+///
+/// This struct is returned by data providers and contains:
+/// - SceneData: Lightweight configuration (scene info, resources, assets)
+/// - IEntityImporter: Wraps heavy entity data for import
 /////////////////////////////////////////////////
-struct SceneData {
+struct SceneLoadData {
+  /////////////////////////////////////////////////
+  /// @brief Scene configuration data
+  /////////////////////////////////////////////////
+  SceneData scene_data;
 
   /////////////////////////////////////////////////
-  /// @brief Scene information data.
+  /// @brief Entity importer (wraps entity data source)
   /////////////////////////////////////////////////
-  SceneInfo scene_info;
-
-  /////////////////////////////////////////////////
-  /// @brief SceneResources  configuration data.
-  /////////////////////////////////////////////////
-  SceneResourcesConfig scene_resources_config;
-
-  /////////////////////////////////////////////////
-  /// @brief Contains data needed to load all assets for this Scene
-  /////////////////////////////////////////////////
-  AssetConfig scene_asset_config;
+  std::unique_ptr<IEntityImporter> entity_importer;
 };
 
-using SceneCollectionData = std::vector<std::unique_ptr<SceneData>>;
 } // namespace steamrot

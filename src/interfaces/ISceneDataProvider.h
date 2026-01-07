@@ -14,6 +14,7 @@
 
 #include "FailInfo.h"
 #include "SceneData.h"
+#include "SceneLoadData.h"
 #include "scene_data_generated.h"
 #include "scene_types_generated.h"
 #include <expected>
@@ -33,6 +34,16 @@ public:
   /////////////////////////////////////////////////
   virtual std::expected<std::unique_ptr<SceneData>, FailInfo>
   ProvideDefaultSceneData(const SceneType scene_type) const = 0;
+
+  // ADD NEW METHOD
+  /////////////////////////////////////////////////
+  /// @brief Provides scene configuration and entity importer together.
+  ///
+  /// @param scene_type Type of scene to load
+  /// @return SceneLoadData containing both config and importer
+  /////////////////////////////////////////////////
+  virtual std::expected<SceneLoadData, FailInfo>
+  ProvideSceneLoadData(const SceneType scene_type) const = 0;
 
   /////////////////////////////////////////////////
   /// @brief Virtual method to provide SceneData from FlatBuffers data.

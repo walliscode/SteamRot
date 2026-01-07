@@ -43,14 +43,14 @@ public:
   /// @param scene Scene to configure
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo>
-  ConfigureScene(Scene &scene, const SceneData *scene_data);
+  ConfigureScene(Scene &scene, const SceneData &scene_data);
   /////////////////////////////////////////////////
   /// @brief Virtual function to configure SceneInfo struct
   ///
   /// @param scene Scene to configure
   /////////////////////////////////////////////////
   virtual std::expected<std::monostate, FailInfo>
-  ConfigureSceneInfo(Scene &scene, const SceneData *scene_data) = 0;
+  ConfigureSceneInfo(Scene &scene, const SceneData &scene_data) = 0;
 
   /////////////////////////////////////////////////
   /// @brief Virtual function to configure SceneResources struct
@@ -58,7 +58,7 @@ public:
   /// @param scene Scene to configure
   /////////////////////////////////////////////////
   virtual std::expected<std::monostate, FailInfo>
-  ConfigureSceneResources(Scene &scene, const SceneData *scene_data) = 0;
+  ConfigureSceneResources(Scene &scene, const SceneData &scene_data) = 0;
 
   /////////////////////////////////////////////////
   /// @brief Virtual function to configure SceneConfig struct
@@ -66,20 +66,7 @@ public:
   /// @param scene Scene to configure
   /////////////////////////////////////////////////
   virtual std::expected<std::monostate, FailInfo>
-  ConfigureSceneConfig(Scene &scene, const SceneData *scene_data) = 0;
-
-  /////////////////////////////////////////////////
-  /// @brief Virtual function to configure entities in the scene
-  ///
-  /// This method must create an appropriate IEntityConfigurator instance
-  /// and use it to configure the scene's EntityMemoryPool.
-  ///
-  /// @param scene Scene whose entities should be configured
-  /// @param scene_data SceneData containing entity configuration
-  /// @return std::expected with monostate on success, FailInfo on error
-  /////////////////////////////////////////////////
-  virtual std::expected<std::monostate, FailInfo>
-  ConfigureEntities(Scene &scene, const SceneData *scene_data) = 0;
+  ConfigureSceneConfig(Scene &scene, const SceneData &scene_data) = 0;
 
   /////////////////////////////////////////////////
   /// @brief Pass AssetConfig object to the AssetManager
@@ -88,7 +75,7 @@ public:
   /// @param scene_data Pointer to SceneData containing AssetConfig
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo>
-  PassAssetConfig(Scene &scene, const SceneData *scene_data);
+  PassAssetConfig(Scene &scene, const SceneData &scene_data);
 
   /////////////////////////////////////////////////
   /// @brief Configure the logic map for the scene
