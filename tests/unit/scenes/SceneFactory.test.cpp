@@ -8,8 +8,7 @@
 /////////////////////////////////////////////////
 #include "SceneFactory.h"
 #include "CraftingScene.h"
-#include "FbsSceneData.h"
-#include "FlatbuffersSceneDataProvider.h"
+#include "FlatbuffersSceneLoadDataProvider.h"
 #include "TestFixture.h"
 #include "TitleScene.h"
 #include "entity_memory.h"
@@ -74,24 +73,14 @@ TEST_CASE("SceneFactory::CreateEmptyScene creates CraftingScene",
           nullptr);
 }
 
-TEST_CASE("SceneFactory::CreateSceneFromData handles empty SceneData",
+TEST_CASE("SceneFactory::CreateSceneFromSceneLoadData creates Scene with valid "
+          "SceneLoadData",
           "[SceneFactory]") {
-  // Arrange
-  steamrot::tests::TestFixture test_fixture;
-  steamrot::SceneFactory scene_factory(test_fixture.GetGameContext());
 
-  // Act
-  auto result = scene_factory.CreateSceneFromData(nullptr);
-  // Assert
-  REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
-  REQUIRE(result.error().message ==
-          "SceneData pointer is null in SceneFactory::CreateSceneFromData");
-}
+  // set up test fixture
+  steamrot::tests::TestFixture fixture;
+  fixture.Initialize();
 
-TEST_CASE("SceneFactory::CreateSceneFromData creates Scene with valid "
-          "FbsSceneData",
-          "[SceneFactory]") {
   // Load test data from JSON (compiled to binary)
   auto [data_buffer, scene_data_fbs] = LoadSceneTestData();
   REQUIRE(scene_data_fbs != nullptr);
@@ -124,33 +113,26 @@ TEST_CASE("SceneFactory::CreateSceneFromData creates Scene with valid "
   REQUIRE(entity_1->c_grimoire_machina()->fragments() != nullptr);
   REQUIRE(entity_1->c_grimoire_machina()->fragments()->size() == 2);
 
-  // Create SceneData
-  steamrot::FlatbuffersSceneDataProvider scene_data_provider;
-  auto fbs_scene_data_result =
-      scene_data_provider.ConfigureSceneDataFromData(scene_data_fbs);
-  if (!fbs_scene_data_result) {
-    FAIL(fbs_scene_data_result.error().message);
-  }
-  auto fbs_scene_data = std::move(fbs_scene_data_result.value());
-  // check its a FbsSceneData
-  REQUIRE(dynamic_cast<steamrot::FbsSceneData *>(fbs_scene_data.get()) !=
-          nullptr);
-  // create reference as FbsSceneData to check data_buffer
-  const steamrot::FbsSceneData &fbs_data_ref =
-      *dynamic_cast<steamrot::FbsSceneData *>(fbs_scene_data.get());
+  // Create SceneLoadData
+  steamrot::FlatbuffersSceneLoadDataProvider scene_load_provider(
+      fixture.GetGameContext().event_handler);
+  auto get_scene_load_data_result =
+      scene_load_provider.ProvideSceneLoadDataFromData(scene_data_fbs);
+  if (!get_scene_load_data_result)
+    FAIL(get_scene_load_data_result.error().message);
+
+  const steamrot::SceneLoadData &scene_load_data =
+      get_scene_load_data_result.value();
+
   // Check scene state before CreateSceneFromData
-  steamrot::tests::TestFixture test_fixture;
-  steamrot::SceneFactory scene_factory(test_fixture.GetGameContext());
+  steamrot::SceneFactory scene_factory(fixture.GetGameContext());
 
   // Verify scene_data before passing to factory
-  REQUIRE(fbs_scene_data->scene_info.type ==
+  REQUIRE(scene_load_data.scene_data.scene_info.type ==
           steamrot::SceneType::SceneType_TITLE);
 
-  REQUIRE(fbs_data_ref.entity_collection->entity_memory_pool_size() == 50);
-  REQUIRE(fbs_data_ref.entity_collection->entities()->size() == 2);
-
   // Act - Create scene from data
-  auto result = scene_factory.CreateSceneFromData(fbs_scene_data.get());
+  auto result = scene_factory.CreateSceneFromSceneLoadData(scene_load_data);
 
   // Assert - Check scene was created successfully
   if (!result.has_value()) {
