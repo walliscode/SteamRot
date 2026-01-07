@@ -54,6 +54,24 @@ Contents:
 
 ---
 
+### 4. [IMPLEMENTATION_GUIDE.md](./IMPLEMENTATION_GUIDE.md) 🛠️ **FOR IMPLEMENTATION**
+
+**Step-by-step implementation guide** for executing the refactoring.
+
+Contents:
+- Pre-implementation checklist and preparation
+- Detailed instructions for each phase (1-4)
+- Command-line scripts and code examples
+- Build and test verification steps
+- Troubleshooting common issues
+- Rollback procedures
+- Success criteria checklist
+- Quick reference for new file locations
+
+**Best for:** Actually implementing the architectural changes
+
+---
+
 ## 🎯 Key Findings Summary
 
 ### Strengths ✅
@@ -73,22 +91,35 @@ Contents:
 
 ## 🚀 Quick Start: What Should I Do?
 
+### If you're ready to implement changes:
+👉 **Go to [IMPLEMENTATION_GUIDE.md](./IMPLEMENTATION_GUIDE.md)** 🛠️
+- Complete step-by-step instructions
+- Command-line scripts ready to use
+- Troubleshooting and rollback procedures
+- Success criteria for each phase
+
 ### If you want immediate improvements (1-2 hours):
-👉 **Follow Phase 1** in RECOMMENDATIONS_SUMMARY.md
+👉 **Follow Phase 1** in IMPLEMENTATION_GUIDE.md
 - Move data structures to proper locations
 - Low risk, immediate clarity improvement
 
 ### If you want significant build time improvements (4-6 hours):
-👉 **Follow Phase 2** in RECOMMENDATIONS_SUMMARY.md
+👉 **Follow Phase 2** in IMPLEMENTATION_GUIDE.md
 - Convert components to header-only
 - ~20% build time improvement expected
 - Medium risk, high value
 
 ### If you want a complete architecture cleanup (13-20 hours):
-👉 **Follow the complete roadmap** in RECOMMENDATIONS_SUMMARY.md
+👉 **Follow the complete roadmap** in IMPLEMENTATION_GUIDE.md
 - All phases including foundation consolidation
 - Eliminate circular dependencies
 - Maximum robustness and extensibility benefits
+
+### If you're still researching or need context:
+👉 **Start with RECOMMENDATIONS_SUMMARY.md**
+- Understand the "why" behind the recommendations
+- Review risk/benefit analysis
+- Then proceed to IMPLEMENTATION_GUIDE.md when ready
 
 ---
 
