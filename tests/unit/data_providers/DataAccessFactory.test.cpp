@@ -8,18 +8,21 @@
 /////////////////////////////////////////////////
 #include "DataAccessFactory.h"
 #include "FlatbuffersEngineDataProvider.h"
-#include "FlatbuffersSceneDataProvider.h"
+#include "FlatbuffersSceneLoadDataProvider.h"
 #include "FlatbuffersSceneManagerDataProvider.h"
+#include "TestFixture.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("DataAccessFactory Initialization", "[DataAccessFactory]") {
 
   SECTION("Initialize with default data type(Flatbuffers)") {
     // Expect no exceptions to be thrown
-    REQUIRE_NOTHROW(steamrot::DataAccessFactory());
+    steamrot::tests::TestFixture test_fixture;
+    test_fixture.Initialize();
 
     // create the factory
-    steamrot::DataAccessFactory factory;
+    steamrot::DataAccessFactory factory(
+        test_fixture.GetGameContext().event_handler);
 
     // attempt to access the engine data provider
     auto get_engine_provider_result = factory.GetEngineDataProvider();
@@ -63,7 +66,8 @@ TEST_CASE("DataAccessFactory Initialization", "[DataAccessFactory]") {
 
     // cast to flatbuffers concrete type and check not null
     auto flatbuffers_scene_provider =
-        dynamic_cast<steamrot::FlatbuffersSceneDataProvider *>(scene_provider);
+        dynamic_cast<steamrot::FlatbuffersSceneLoadDataProvider *>(
+            scene_provider);
     REQUIRE(flatbuffers_scene_provider != nullptr);
   }
 }
