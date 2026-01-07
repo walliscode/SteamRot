@@ -15,7 +15,6 @@
 #include "FailInfo.h"
 #include "GameContext.h"
 #include "Scene.h"
-#include "SceneData.h"
 #include "scene_types_generated.h"
 #include <expected>
 #include <memory>
@@ -45,12 +44,13 @@ public:
   CreateEmptyScene(const SceneType scene_type);
 
   /////////////////////////////////////////////////
-  /// @brief Creates and configures a scene from provided scene data
+  /// @brief Create and configure a scene from SceneLoadData
   ///
-  /// @param scene_data Data to configure the scene from
+  /// @param scene_load_data Data containing both scene config and entity
+  /// importer
   /////////////////////////////////////////////////
   std::expected<std::unique_ptr<Scene>, FailInfo>
-  CreateSceneFromData(const SceneData *scene_data);
+  CreateSceneFromSceneLoadData(const SceneLoadData &scene_load_data);
 
   /////////////////////////////////////////////////
   /// @brief Create and configure a scene from default data

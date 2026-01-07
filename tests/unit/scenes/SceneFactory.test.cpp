@@ -127,7 +127,7 @@ TEST_CASE("SceneFactory::CreateSceneFromData creates Scene with valid "
   // Create SceneData
   steamrot::FlatbuffersSceneDataProvider scene_data_provider;
   auto fbs_scene_data_result =
-      scene_data_provider.ProvideSceneDataFromData(scene_data_fbs);
+      scene_data_provider.ConfigureSceneDataFromData(scene_data_fbs);
   if (!fbs_scene_data_result) {
     FAIL(fbs_scene_data_result.error().message);
   }

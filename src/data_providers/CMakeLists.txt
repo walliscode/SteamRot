@@ -7,7 +7,7 @@ paths.cpp
 add_library(data_providers
   FlatbuffersEngineDataProvider.cpp
   FlatbuffersSceneManagerDataProvider.cpp
-  FlatbuffersSceneDataProvider.cpp
+  FlatbuffersSceneLoadDataProvider.cpp
   FlatbuffersSubscriberViewer.cpp
   FlatbuffersUIStyleDataProvider.cpp
   FlatbuffersSaveDataProvider.cpp
@@ -28,6 +28,7 @@ target_link_libraries(data_providers
   PUBLIC
   SFML::Graphics
   events
+  entity
   interfaces
   types
   configuration

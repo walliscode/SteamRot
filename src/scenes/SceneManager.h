@@ -13,7 +13,6 @@
 /////////////////////////////////////////////////
 #include "GameContext.h"
 #include "Scene.h"
-#include "SceneData.h"
 #include "SceneInfoProvider.h"
 #include "SceneManagerConfig.h"
 #include "SceneManagerResources.h"

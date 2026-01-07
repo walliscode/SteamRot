@@ -9,14 +9,15 @@
 #include "DataAccessFactory.h"
 #include "FailInfo.h"
 #include "FlatbuffersEngineDataProvider.h"
-#include "FlatbuffersSceneDataProvider.h"
+#include "FlatbuffersSceneLoadDataProvider.h"
 #include "FlatbuffersSceneManagerDataProvider.h"
 #include <expected>
 
 namespace steamrot {
 /////////////////////////////////////////////////
-DataAccessFactory::DataAccessFactory(const DataType data_type)
-    : m_data_type(data_type) {
+DataAccessFactory::DataAccessFactory(EventHandler &event_handler,
+                                     const DataType data_type)
+    : m_event_handler(event_handler), m_data_type(data_type) {
 
   auto set_providers_result = SetDataProviders();
   if (!set_providers_result) {
@@ -48,7 +49,8 @@ DataAccessFactory::SetFlatbuffersDataProviders() {
   }
 
   // set ISceneDataProvider
-  m_scene_data_provider = std::make_unique<FlatbuffersSceneDataProvider>();
+  m_scene_data_provider =
+      std::make_unique<FlatbuffersSceneLoadDataProvider>(m_event_handler);
   if (!m_scene_data_provider) {
     return std::unexpected(
         FailInfo{FailMode::NullPointer,
@@ -116,7 +118,7 @@ DataAccessFactory::GetSceneManagerDataProvider() {
 }
 
 /////////////////////////////////////////////////
-std::expected<ISceneDataProvider *, FailInfo>
+std::expected<ISceneLoadDataProvider *, FailInfo>
 DataAccessFactory::GetSceneDataProvider() {
   if (!m_scene_data_provider) {
     return std::unexpected(

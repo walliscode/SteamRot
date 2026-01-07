@@ -12,7 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "SaveMetaData.h"
-#include "SceneData.h"
+#include "SceneLoadData.h"
 #include "SceneManagerData.h"
 
 namespace steamrot {

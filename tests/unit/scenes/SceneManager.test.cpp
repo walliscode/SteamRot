@@ -7,7 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "SceneManager.h"
-#include "FlatbuffersSceneDataProvider.h"
+#include "FlatbuffersSceneLoadDataProvider.h"
 #include "Subscriber.h"
 #include "TestFixture.h"
 #include "load_scene_collection_data.h"
@@ -231,21 +231,21 @@ TEST_CASE("SceneManager::AddScenesFromSceneCollectionData loads three scenes "
   steamrot::tests::TestFixture fixture;
   fixture.Initialize();
   steamrot::SceneManager scene_manager(fixture.GetGameContext());
-  steamrot::FlatbuffersSceneDataProvider scene_data_provider;
+  steamrot::FlatbuffersSceneLoadDataProvider scene_data_provider(
+      fixture.GetGameContext().event_handler);
   // Act
 
   // convert to SceneCollectionData
   steamrot::SceneCollectionData scene_collection_data;
   for (const auto *scene_fbs : *scenes) {
 
-    // convert each scene to SceneData
-    auto scene_data_result =
-        scene_data_provider.ProvideSceneDataFromData(scene_fbs);
-    if (!scene_data_result) {
-      FAIL(scene_data_result.error().message);
-    }
+    // convert each scene_data_fbs to SceneLoadData
+    auto scene_load_data_result =
+        scene_data_provider.ProvideSceneLoadDataFromData(scene_fbs);
+    if (!scene_load_data_result)
+      FAIL(scene_load_data_result.error().message);
     // add to collection
-    scene_collection_data.push_back(std::move(scene_data_result.value()));
+    scene_collection_data.push_back(std::move(scene_load_data_result.value()));
   }
 
   // pass to SceneManager

@@ -11,6 +11,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "IEntityImporter.h"
 #include "SceneData.h"
 #include <memory>
 
@@ -34,5 +35,6 @@ struct SceneLoadData {
   /////////////////////////////////////////////////
   std::unique_ptr<IEntityImporter> entity_importer;
 };
+using SceneCollectionData = std::vector<SceneLoadData>;
 
 } // namespace steamrot

@@ -12,10 +12,11 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "DataType.h"
+#include "EventHandler.h"
 #include "FailInfo.h"
 #include "IEngineDataProvider.h"
 #include "ISceneConfigurator.h"
-#include "ISceneDataProvider.h"
+#include "ISceneLoadDataProvider.h"
 #include "ISceneManagerDataProvider.h"
 #include <expected>
 
@@ -23,6 +24,11 @@ namespace steamrot {
 class DataAccessFactory {
 
 private:
+  /////////////////////////////////////////////////
+  /// @brief Reference to the global Event Handler
+  /////////////////////////////////////////////////
+  EventHandler &m_event_handler;
+
   /////////////////////////////////////////////////
   /// @brief Enum determing which conrete classes to return
   /////////////////////////////////////////////////
@@ -42,7 +48,7 @@ private:
   /////////////////////////////////////////////////
   /// @brief Instance of the Scene Data Provider for the factory/game
   /////////////////////////////////////////////////
-  std::unique_ptr<ISceneDataProvider> m_scene_data_provider{nullptr};
+  std::unique_ptr<ISceneLoadDataProvider> m_scene_data_provider{nullptr};
 
   /////////////////////////////////////////////////
   /// @brief Instance of the Scene Configurator for the factory/game
@@ -66,7 +72,8 @@ public:
   /// @param data_type DataYpe enum to determine which concrete classes to
   /// return, default is Flatbuffers
   /////////////////////////////////////////////////
-  DataAccessFactory(const DataType data_type = DataType::Flatbuffers);
+  DataAccessFactory(EventHandler &event_handler,
+                    const DataType data_type = DataType::Flatbuffers);
 
   /////////////////////////////////////////////////
   /// @brief Returns a raw pointer to the Engine Data Provider
@@ -82,7 +89,7 @@ public:
   /////////////////////////////////////////////////
   /// @brief Returns a raw pointer to the Scene Data Provider
   /////////////////////////////////////////////////
-  std::expected<ISceneDataProvider *, FailInfo> GetSceneDataProvider();
+  std::expected<ISceneLoadDataProvider *, FailInfo> GetSceneDataProvider();
 
   /////////////////////////////////////////////////
   /// @brief Returns a raw pointer to the Scene Configurator

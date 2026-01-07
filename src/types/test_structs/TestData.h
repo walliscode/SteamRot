@@ -12,7 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "EngineSnapshot.h"
-#include "SceneData.h"
+#include "SceneLoadData.h"
 #include "SimulationData.h"
 #include "TestMetaData.h"
 #include <cstdint>

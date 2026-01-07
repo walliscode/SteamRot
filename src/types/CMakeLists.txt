@@ -19,6 +19,7 @@ target_link_libraries(types
   INTERFACE
   SFML::Graphics
   stduuid
+  interfaces
   flatbuffers
   flatbuffers_headers
 
