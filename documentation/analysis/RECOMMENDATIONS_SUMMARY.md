@@ -79,13 +79,27 @@ struct CMeta : public Component {
     return TupleTypeIndex<CMeta, ComponentRegister>;
   }
 };
+
+// types/components/containers.h (core component type definitions)
+// This file contains ComponentRegister, EntityMemoryPool, and helper templates
+// Should move with components to types/components/
 ```
+
+**Important Note: containers.h**
+The `components/containers.h` file contains core type definitions:
+- `ComponentRegister` - The tuple of all component types
+- `EntityMemoryPool` - Type alias for component storage
+- `TupleTypeIndex` - Template metaprogramming helpers
+- `ComponentContainer` - Template helper structs
+
+This is **pure type definition code** (no implementation) and should move to `types/components/containers.h` alongside the component headers.
 
 **Benefits:**
 - ✅ No compilation overhead for components
 - ✅ Faster incremental builds (no recompilation needed)
 - ✅ Makes it clearer that components are data-only
 - ✅ Reduces coupling
+- ✅ `containers.h` properly located with component type definitions
 
 **Risk:** MEDIUM (requires code refactoring)  
 **Effort:** 4-6 hours  

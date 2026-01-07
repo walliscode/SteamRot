@@ -132,6 +132,19 @@ See RECOMMENDATIONS_SUMMARY.md section "Can We Collapse Libraries?" for full ana
 - Currently built as NORMAL library with .cpp files (unnecessary overhead)
 - Should be **header-only** for zero runtime overhead
 
+**What should move:**
+- All component headers (Component.h, CMeta.h, CUserInterface.h, etc.)
+- **containers.h** - Contains ComponentRegister, EntityMemoryPool, and template helpers
+  - This is pure type definition code (no implementation)
+  - Defines the core component system types
+  - All constexpr/template metaprogramming
+  - Tightly coupled to component definitions
+
+**Benefits of collapsing:**
+- Components are **pure data structs** (POD types)
+- Currently built as NORMAL library with .cpp files (unnecessary overhead)
+- Should be **header-only** for zero runtime overhead
+
 **Benefits of collapsing:**
 - Faster builds (no compilation needed)
 - Less coupling

@@ -142,7 +142,46 @@ size_t CMeta::GetComponentRegisterIndex() const {
 - ✅ Convert components to **INTERFACE library** or merge into **types** library
 - ✅ Make `GetComponentRegisterIndex()` inline or constexpr in header
 - ✅ Remove all `.cpp` files for components
+- ✅ Move `containers.h` to `types/components/` as well
 - ✅ This reduces compilation dependencies and build times
+
+**Important: containers.h**
+
+The `components/containers.h` file is a critical piece that should move with the components:
+
+```cpp
+// components/containers.h
+namespace steamrot {
+  // Template helpers for component management
+  template <typename... Components> struct ComponentContainer { ... };
+  
+  // The central component registry - tuple of all component types
+  typedef std::tuple<CMeta, CUserInterface, CMachinaForm, CGrimoireMachina, CUIState>
+      ComponentRegister;
+  
+  constexpr size_t ComponentRegisterSize = std::tuple_size<ComponentRegister>::value;
+  
+  // Type alias for entity memory pool
+  using EntityMemoryPool = ComponentContainer<ComponentRegister>::ComponentVectorTuple;
+  
+  // Template metaprogramming for type indexing
+  template <typename T, typename Tuple>
+  constexpr size_t TupleTypeIndex = IndexOf<T, Tuple>::value;
+}
+```
+
+This file contains:
+- **ComponentRegister** - The single source of truth for all components
+- **EntityMemoryPool** - Type definition for component storage
+- **Template helpers** - Compile-time type index calculation
+- **Zero implementation** - All constexpr/template code
+
+**Why it should move:**
+1. It's pure type definition code (no .cpp file)
+2. It defines the core component system types
+3. It's header-only and compile-time only
+4. It's tightly coupled to component definitions
+5. Moving it with components maintains cohesion
 
 **Proposed Structure:**
 ```cpp
@@ -155,6 +194,9 @@ struct CMeta : public Component {
     return TupleTypeIndex<CMeta, ComponentRegister>;
   }
 };
+
+// In types/components/containers.h
+// All component type definitions and helpers
 ```
 
 ### Issue 2: Data Structures in interfaces/

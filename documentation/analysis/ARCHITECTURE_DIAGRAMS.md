@@ -266,15 +266,24 @@ BEFORE:                          AFTER:
 │                      │        │     (headers only)   │
 │  6 .cpp files        │   →    │                      │
 │  6 .h files          │        │  6 .h files          │
-│                      │        │  (with inline impls) │
+│  containers.h        │        │  (with inline impls) │
+│                      │        │  containers.h        │
 │  Compile & link      │        │  Header-only         │
 └──────────────────────┘        └──────────────────────┘
+
+Important: containers.h moves too!
+  • Contains ComponentRegister (tuple of all components)
+  • Contains EntityMemoryPool type alias
+  • Contains TupleTypeIndex and template helpers
+  • Pure type definitions (no .cpp file)
+  • Tightly coupled to component definitions
 
 Benefits:
   ✅ No compilation overhead
   ✅ Faster builds
   ✅ No library to link
   ✅ Clearer that components are data-only
+  ✅ containers.h properly grouped with components
 ```
 
 ```
@@ -430,6 +439,68 @@ struct CMeta : public Component {
 // No .cpp file needed!
 // No library to compile!
 // Just include the header!
+
+// Proposed: types/components/containers.h (also moves with components)
+namespace steamrot {
+  // Template helpers
+  template <typename... Components> struct ComponentContainer;
+  template <typename... Components>
+  struct ComponentContainer<std::tuple<Components...>> {
+    using ComponentVectorTuple = std::tuple<std::vector<Components>...>;
+  };
+  
+  // Central component registry - THE source of truth
+  typedef std::tuple<CMeta, CUserInterface, CMachinaForm, CGrimoireMachina, CUIState>
+      ComponentRegister;
+  
+  constexpr size_t ComponentRegisterSize = 
+      std::tuple_size<ComponentRegister>::value;
+  
+  // Entity memory pool type
+  using EntityMemoryPool = 
+      ComponentContainer<ComponentRegister>::ComponentVectorTuple;
+  
+  // Template metaprogramming for compile-time type indexing
+  template <typename T, typename... Ts> struct IndexOf;
+  template <typename T, typename... Ts> 
+  struct IndexOf<T, std::tuple<T, Ts...>> {
+    static constexpr size_t value = 0;
+  };
+  template <typename T, typename U, typename... Ts>
+  struct IndexOf<T, std::tuple<U, Ts...>> {
+    static constexpr size_t value = 1 + IndexOf<T, std::tuple<Ts...>>::value;
+  };
+  
+  template <typename T, typename Tuple>
+  constexpr size_t TupleTypeIndex = IndexOf<T, Tuple>::value;
+}
+
+// This is ALL compile-time, template code - no .cpp needed!
+```
+
+### Why containers.h Belongs with Components
+
+**What it contains:**
+- `ComponentRegister` - The tuple that lists ALL component types
+- `EntityMemoryPool` - Type alias for component storage
+- Template metaprogramming helpers for type indexing
+- Zero runtime code - all constexpr/templates
+
+**Why it should move to types/components/:**
+1. **Pure type definitions** - No .cpp file, all compile-time
+2. **Tightly coupled** - Defines the core component type system
+3. **Used by components** - Each component uses TupleTypeIndex from this file
+4. **Logical cohesion** - Component types and their registry belong together
+5. **Header-only nature** - Fits the header-only component model
+
+**Currently included by:**
+- All component .cpp files (CMeta.cpp, CUserInterface.cpp, etc.)
+- Entity system (archetypes.h, entity_types.h, EntityManager.h, etc.)
+- Interfaces (IEntityConfigurator.h, IEntityImporter.h, etc.)
+- Context (SceneContext.h)
+- Logic (logic_ui.h)
+
+All these will simply update their include from `"containers.h"` to their appropriate relative path once containers.h moves to types/components/.
 ```
 
 ### Build Process Comparison
