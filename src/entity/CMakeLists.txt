@@ -16,8 +16,6 @@ target_link_libraries(entity
   PUBLIC
   SFML::Graphics
   types
-  interfaces
   events
   user_interface
-  configuration
 )

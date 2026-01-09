@@ -29,7 +29,5 @@ target_link_libraries(data_providers
   SFML::Graphics
   events
   entity
-  interfaces
   types
-  configuration
 )

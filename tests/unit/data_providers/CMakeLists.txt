@@ -23,7 +23,6 @@ target_link_libraries(test_data_providers
   data_providers
   types
   events
-  interfaces
   context_test_helpers
 )
 

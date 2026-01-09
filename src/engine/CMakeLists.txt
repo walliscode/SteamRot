@@ -15,7 +15,6 @@ target_link_libraries(engine
 PUBLIC
 types
 resources
-interfaces
 SFML::Graphics
 display
 scenes
