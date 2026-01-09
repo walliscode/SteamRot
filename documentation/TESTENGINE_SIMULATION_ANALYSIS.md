@@ -1,0 +1,666 @@
+# TestEngine Simulation Analysis
+
+## Executive Summary
+
+This document analyzes two architectural approaches for implementing tick-by-tick snapshot comparison in the TestEngine. The analysis recommends **Approach 1: Snapshot Copying with Deferred Comparison** as the preferred solution due to better separation of concerns, easier debugging, and lower coupling.
+
+## Problem Statement
+
+The TestEngine needs to progress its simulation capabilities to support:
+1. Running data through multi-tick simulations
+2. Comparing EntityMemoryPool state tick-by-tick
+3. Providing clear failure diagnostics for complex multi-tick scenarios
+
+Two potential approaches have been identified:
+- **Approach 1**: Copy EntityMemoryPool at each tick, run all comparisons at the end
+- **Approach 2**: Compare per tick and pass EMP by reference with an injected matcher/comparison engine
+
+## Background
+
+### Current Architecture
+
+The TestEngine currently:
+- Inherits from `Engine` base class
+- Has a `RunGameLoop()` method that executes a specified number of ticks
+- Has a `TickSceneLogic()` method (currently empty)
+- Receives `TestData` via constructor, which includes:
+  - `TestMetaData` - Test metadata
+  - `SimulationData` - Simulation steps to execute
+  - `number_of_ticks` - How many ticks to run
+  - `starting_scene_collection_data` - Initial scene state
+  - `expected_engine_snapshots` - Map of tick to expected state
+
+### EntityMemoryPool Structure
+
+```cpp
+// EntityMemoryPool is a tuple of component vectors
+using EntityMemoryPool = std::tuple<
+    std::vector<CMeta>,
+    std::vector<CUserInterface>,
+    std::vector<CMachinaForm>,
+    std::vector<CGrimoireMachina>,
+    std::vector<CUIState>
+>;
+```
+
+The EntityMemoryPool represents the entire game state for all entities in a scene. It contains vectors of component data, one vector per component type.
+
+### Existing Matcher Infrastructure
+
+The project has a mature matcher system:
+- `EntityMemoryPoolEqualsMatcher` - Compares entire pools with detailed output
+- `TestContext` struct - Provides metadata (test name, tick info) for enriched failure messages
+- Component-specific matchers (CMetaEqualsMatcher, CUserInterfaceEqualsMatcher, etc.)
+- Formatted console output with colors and context
+
+## Approach 1: Snapshot Copying with Deferred Comparison
+
+### Architecture
+
+```
+TestEngine (per tick):
+├── Execute simulation step
+├── Copy EntityMemoryPool to snapshot storage
+│   └── Store in std::map<size_t, EntityMemoryPool>
+└── Continue to next tick
+
+After all ticks complete:
+├── For each expected snapshot:
+│   ├── Retrieve actual snapshot from storage
+│   ├── Create TestContext with tick info
+│   └── Run EntityMemoryPoolEqualsMatcher
+└── Report all failures
+```
+
+### Implementation Strategy
+
+#### 1. Add Data Bank to TestEngine
+
+```cpp
+// In TestEngine.h
+class TestEngine : public Engine {
+private:
+  // ... existing members ...
+  
+  /////////////////////////////////////////////////
+  /// @brief Storage for EntityMemoryPool snapshots at each tick
+  /////////////////////////////////////////////////
+  std::map<size_t, EntityMemoryPool> m_data_bank;
+  
+  /////////////////////////////////////////////////
+  /// @brief Capture current scene EntityMemoryPool state
+  ///
+  /// @param tick Current tick number
+  /////////////////////////////////////////////////
+  void CaptureSnapshot(size_t tick);
+  
+public:
+  /////////////////////////////////////////////////
+  /// @brief Get the data bank containing all tick snapshots
+  ///
+  /// @return Const reference to the data bank
+  /////////////////////////////////////////////////
+  const std::map<size_t, EntityMemoryPool>& GetDataBank() const {
+    return m_data_bank;
+  }
+};
+```
+
+#### 2. Implement Snapshot Capture
+
+```cpp
+// In TestEngine.cpp
+void TestEngine::CaptureSnapshot(size_t tick) {
+  // Get current scene's EntityMemoryPool
+  const auto& current_scene = m_scene_manager.GetCurrentScene();
+  const EntityMemoryPool& scene_pool = current_scene.GetEntityMemoryPool();
+  
+  // Deep copy the entire pool
+  m_data_bank[tick] = scene_pool;
+}
+```
+
+#### 3. Integrate into RunGameLoop
+
+```cpp
+void TestEngine::RunGameLoop() {
+  for (size_t i = 0; i < m_target_ticks; i++) {
+    // Execute tick pipeline
+    ExecuteTick();
+    
+    // Capture snapshot after tick completes
+    CaptureSnapshot(i);
+  }
+}
+```
+
+#### 4. Comparison After Execution
+
+```cpp
+// In test harness or test code
+auto result = engine.RunGame();
+REQUIRE(result.has_value());
+
+const auto& data_bank = engine.GetDataBank();
+const auto& expected_snapshots = test_data.expected_engine_snapshots;
+
+for (const auto& [tick, expected_snapshot] : expected_snapshots) {
+  // Find actual snapshot
+  auto it = data_bank.find(tick);
+  REQUIRE(it != data_bank.end());
+  
+  const EntityMemoryPool& actual_pool = it->second;
+  const EntityMemoryPool& expected_pool = expected_snapshot.entity_pool;
+  
+  // Create test context for this tick
+  TestContext context;
+  context.test_name = test_data.meta_data.test_name;
+  context.description = test_data.meta_data.description;
+  context.current_tick = tick;
+  context.total_ticks = test_data.number_of_ticks;
+  
+  // Run comparison with context
+  REQUIRE_THAT(actual_pool, EqualsEntityMemoryPool(expected_pool, context));
+}
+```
+
+### Pros
+
+#### ✅ Separation of Concerns
+- **TestEngine focuses on simulation execution** - It runs ticks and captures state, nothing more
+- **Test harness handles comparison logic** - Verification is separate from execution
+- **Clear single responsibility** - Each component does one thing well
+
+#### ✅ Easier Debugging
+- **All snapshots available for inspection** - Can examine any tick's state after execution
+- **Replay capability** - Can re-run comparisons without re-executing simulation
+- **Progressive debugging** - Can add additional comparison checks after initial run
+- **Post-mortem analysis** - Full history available for investigating failures
+
+#### ✅ Flexibility
+- **Compare any ticks** - Not limited to pre-defined comparison points
+- **Multiple comparison strategies** - Can use different matchers for different scenarios
+- **Partial comparisons** - Can check specific components or entities
+- **Add comparisons later** - Can extend test coverage without modifying TestEngine
+
+#### ✅ Better Error Reporting
+- **All failures reported at once** - Developer sees complete picture
+- **Tick context always available** - Every error message includes tick info
+- **No early termination** - All ticks execute even if early tick fails
+
+#### ✅ Existing Pattern
+- **Matches README description** - "Data bank capture" is documented in harness README
+- **Aligns with test data schema** - `expected_engine_snapshots` is a map<tick, snapshot>
+- **Consistent with test infrastructure** - TestContext, matchers support this approach
+
+### Cons
+
+#### ❌ Memory Overhead
+- **Full copy per tick** - EntityMemoryPool copied for every tick
+- **Storage for entire test duration** - All snapshots held in memory
+- **Potentially large with many entities** - Memory scales with entities × ticks
+
+**Mitigation**: 
+- For typical test scenarios (5-10 ticks, <100 entities), overhead is negligible
+- Memory is released when TestEngine is destroyed
+- Could implement snapshot compression if needed
+
+#### ❌ Copy Performance
+- **Deep copy overhead** - All component vectors copied
+- **Scales with entity count** - More entities = slower copying
+
+**Mitigation**:
+- Component vectors use standard library containers (optimized copying)
+- Test scenarios typically have small entity counts
+- Copying happens once per tick (not continuous)
+
+### Memory Analysis
+
+For a typical test scenario:
+- **5 ticks × 50 entities × 5 components × ~100 bytes per component = ~125 KB**
+
+For a stress test scenario:
+- **100 ticks × 1000 entities × 5 components × ~100 bytes per component = ~50 MB**
+
+This is well within acceptable limits for test infrastructure.
+
+## Approach 2: Per-Tick Comparison with Matcher Injection
+
+### Architecture
+
+```
+TestEngine (per tick):
+├── Execute simulation step
+├── Get reference to current EntityMemoryPool
+├── Retrieve expected snapshot for current tick
+├── Call injected comparison engine
+│   ├── Create TestContext for current tick
+│   ├── Run EntityMemoryPoolEqualsMatcher
+│   └── Handle failure (fail immediately or accumulate)
+└── Continue to next tick or abort on failure
+```
+
+### Implementation Strategy
+
+#### 1. Define Comparison Interface
+
+```cpp
+// In tests/harness/ComparisonEngine.h
+class IComparisonEngine {
+public:
+  virtual ~IComparisonEngine() = default;
+  
+  /////////////////////////////////////////////////
+  /// @brief Compare actual EntityMemoryPool with expected for a specific tick
+  ///
+  /// @param tick Current tick number
+  /// @param actual Actual EntityMemoryPool state
+  /// @param expected Expected EntityMemoryPool state
+  /// @param test_context Test metadata for error reporting
+  /// @return Success or failure information
+  /////////////////////////////////////////////////
+  virtual std::expected<std::monostate, FailInfo> CompareSnapshot(
+      size_t tick,
+      const EntityMemoryPool& actual,
+      const EntityMemoryPool& expected,
+      const TestContext& test_context) = 0;
+};
+```
+
+#### 2. Implement Comparison Engine
+
+```cpp
+// In tests/harness/ComparisonEngine.cpp
+class MatcherComparisonEngine : public IComparisonEngine {
+public:
+  std::expected<std::monostate, FailInfo> CompareSnapshot(
+      size_t tick,
+      const EntityMemoryPool& actual,
+      const EntityMemoryPool& expected,
+      const TestContext& test_context) override {
+    
+    EntityMemoryPoolEqualsMatcher matcher(expected, test_context);
+    
+    if (!matcher.match(actual)) {
+      return std::unexpected(FailInfo{
+          FailMode::ValidationFailed,
+          matcher.describe()
+      });
+    }
+    
+    return std::monostate{};
+  }
+};
+```
+
+#### 3. Inject into TestEngine
+
+```cpp
+// In TestEngine.h
+class TestEngine : public Engine {
+private:
+  const TestData& m_test_data;
+  std::unique_ptr<IComparisonEngine> m_comparison_engine;
+  
+  /////////////////////////////////////////////////
+  /// @brief Compare current state with expected snapshot if available
+  ///
+  /// @param tick Current tick number
+  /// @return Success or failure information
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> CompareCurrentState(size_t tick);
+  
+public:
+  TestEngine(const TestData& test_data,
+             std::unique_ptr<IComparisonEngine> comparison_engine);
+};
+```
+
+#### 4. Integrate into RunGameLoop
+
+```cpp
+void TestEngine::RunGameLoop() {
+  for (size_t i = 0; i < m_target_ticks; i++) {
+    // Execute tick pipeline
+    ExecuteTick();
+    
+    // Compare if expected snapshot exists
+    auto it = m_test_data.expected_engine_snapshots.find(i);
+    if (it != m_test_data.expected_engine_snapshots.end()) {
+      auto result = CompareCurrentState(i);
+      if (!result.has_value()) {
+        // Handle failure: abort or continue?
+        // This is a key design decision
+        ErrorHandler::ProcessFailInfo(result.error());
+      }
+    }
+  }
+}
+```
+
+### Pros
+
+#### ✅ Lower Memory Footprint
+- **No snapshot storage** - Only current state in memory
+- **Constant memory usage** - Doesn't scale with tick count
+- **Immediate release** - No lingering data after comparison
+
+#### ✅ Early Failure Detection
+- **Immediate feedback** - Failures detected as they occur
+- **Faster feedback loop** - No need to wait for all ticks
+- **Shorter test runs** - Can abort on first failure
+
+#### ✅ Comparison Control
+- **TestEngine has full control** - Can decide when/how to compare
+- **Flexible failure handling** - Can abort or continue on failure
+- **Custom comparison strategies** - Can inject different comparison logic
+
+### Cons
+
+#### ❌ Tight Coupling
+- **TestEngine depends on comparison infrastructure** - Violates single responsibility
+- **Test framework leaks into engine** - Matchers/comparison logic is test-specific
+- **Harder to change** - Modifications require TestEngine changes
+
+#### ❌ Limited Debugging
+- **No post-mortem analysis** - Can't inspect previous ticks after run
+- **Can't add new comparisons** - All comparisons must be defined upfront
+- **Lost context** - Later ticks not available if early tick fails
+
+#### ❌ Complex Error Handling
+- **Abort vs continue decision** - Should test stop on first failure?
+- **Accumulating failures** - Need infrastructure to collect multiple errors
+- **Partial test results** - May not see full picture of failures
+
+#### ❌ Maintenance Burden
+- **TestEngine becomes complex** - Added comparison logic
+- **Interface maintenance** - IComparisonEngine must be maintained
+- **Dependency injection overhead** - Extra setup in every test
+
+#### ❌ Goes Against Existing Patterns
+- **Contradicts README** - Documentation describes data bank approach
+- **Doesn't match schema** - `expected_engine_snapshots` suggests deferred comparison
+- **Inconsistent with infrastructure** - TestContext and matchers built for external usage
+
+## Comparison Matrix
+
+| Criterion | Approach 1 (Snapshot Copy) | Approach 2 (Per-Tick Matcher) |
+|-----------|---------------------------|-------------------------------|
+| **Memory Usage** | Higher (scales with ticks) | Lower (constant) |
+| **Separation of Concerns** | ✅ Excellent | ❌ Poor |
+| **Debugging Capability** | ✅ Full history available | ❌ Limited to point of failure |
+| **Implementation Complexity** | ✅ Simple | ⚠️ Moderate (interface required) |
+| **Flexibility** | ✅ High (post-hoc analysis) | ❌ Low (pre-defined only) |
+| **Error Reporting** | ✅ Complete (all failures) | ⚠️ Partial (abort on first) |
+| **Coupling** | ✅ Low | ❌ High |
+| **Performance** | ⚠️ Copy overhead | ✅ No copying |
+| **Existing Pattern Match** | ✅ Matches README/schema | ❌ Diverges from docs |
+| **Maintenance** | ✅ Easy | ❌ More complex |
+
+## Recommendation
+
+**Choose Approach 1: Snapshot Copying with Deferred Comparison**
+
+### Rationale
+
+1. **Memory is cheap, complexity is expensive** - The memory overhead is negligible for test scenarios, but the complexity and coupling of Approach 2 is significant
+
+2. **Better aligns with SOLID principles**:
+   - **Single Responsibility**: TestEngine executes simulation, test harness validates
+   - **Open/Closed**: Easy to extend with new comparison strategies without modifying TestEngine
+   - **Dependency Inversion**: TestEngine doesn't depend on test infrastructure
+
+3. **Superior debugging experience** - Ability to inspect all ticks after execution is invaluable for diagnosing complex multi-tick failures
+
+4. **Matches existing architecture** - The README already describes "data bank capture" and the TestData schema has `expected_engine_snapshots` as a map
+
+5. **Consistency with test infrastructure** - TestContext and matchers are designed for external use, not injection into the engine
+
+6. **Future-proof** - Easy to add new comparison types (EventBus, Scene state) without modifying TestEngine
+
+### Implementation Priority
+
+1. **Add m_data_bank to TestEngine** - Simple map<size_t, EntityMemoryPool>
+2. **Implement CaptureSnapshot()** - Deep copy EntityMemoryPool at end of tick
+3. **Add GetDataBank() accessor** - Provide const reference to snapshots
+4. **Update RunGameLoop()** - Call CaptureSnapshot after each tick
+5. **Update test harness** - Add comparison logic using existing matchers
+
+## Edge Cases and Considerations
+
+### Handling Large Simulations
+
+For rare cases with very large entity counts or tick counts:
+- **Selective snapshotting**: Only capture ticks with expected snapshots
+- **Compression**: Store diffs instead of full snapshots
+- **Lazy copying**: Use copy-on-write semantics
+
+**Current recommendation**: Implement simple approach first, optimize if needed.
+
+### Comparison Timing
+
+The snapshot should be captured **after** tick execution completes, including:
+- TickEvents()
+- TickEngineLogic()
+- TickSceneManager()
+- TickSceneLogic()
+- OnTickEnd()
+
+This ensures the snapshot represents the complete tick state.
+
+### Partial Comparisons
+
+The data bank approach allows for partial comparisons:
+```cpp
+// Compare only specific components
+const auto& actual_meta = std::get<std::vector<CMeta>>(actual_pool);
+const auto& expected_meta = std::get<std::vector<CMeta>>(expected_pool);
+// ... compare just CMeta vectors
+```
+
+### Performance Monitoring
+
+If performance becomes a concern:
+```cpp
+void TestEngine::CaptureSnapshot(size_t tick) {
+  auto start = std::chrono::high_resolution_clock::now();
+  m_data_bank[tick] = current_scene.GetEntityMemoryPool();
+  auto end = std::chrono::high_resolution_clock::now();
+  
+  // Log if snapshot takes too long
+  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+  if (duration.count() > 10) {
+    spdlog::warn("Snapshot at tick {} took {}ms", tick, duration.count());
+  }
+}
+```
+
+## Example Usage
+
+### Test Data Definition
+
+```json
+{
+  "metadata": {
+    "test_name": "multi_tick_ui_interaction",
+    "description": "User clicks button over multiple ticks",
+    "tags": ["unit", "ui", "multi-tick"],
+    "expected_to_pass": true,
+    "version": 1
+  },
+  "number_of_ticks": 5,
+  "starting_scene_collection_data": {
+    "entity_memory_pool_size": 10,
+    "entities": [...]
+  },
+  "simulation_data": {
+    "steps": [
+      {
+        "simulation_type": "Collision",
+        "execution_mode": "LogicClass",
+        "logic_class_type": "UICollisionLogic"
+      },
+      {
+        "simulation_type": "Action",
+        "execution_mode": "Function",
+        "function_type": "ProcessButtonElementActions"
+      }
+    ]
+  },
+  "expected_engine_snapshots": {
+    "0": {
+      "entity_pool": {...},
+      "event_bus": {...}
+    },
+    "2": {
+      "entity_pool": {...},
+      "event_bus": {...}
+    },
+    "4": {
+      "entity_pool": {...},
+      "event_bus": {...}
+    }
+  }
+}
+```
+
+### Test Execution
+
+```cpp
+TEST_CASE("Multi-tick simulation test", "[unit][TestEngine]") {
+  auto configs = steamrot::tests::load_test_data_configs();
+  REQUIRE(configs.has_value());
+  
+  const auto* config = GENERATE_COPY(from_range(configs.value()));
+  
+  // Run TestEngine with simulation
+  auto result = steamrot::tests::RunTestEngineTest(config);
+  REQUIRE(result.has_value());
+}
+```
+
+### Internal Implementation (in test harness)
+
+```cpp
+std::expected<std::monostate, FailInfo> 
+RunTestEngineTest(const TestDataConfig* config) {
+  // Convert FlatBuffers to TestData
+  TestData test_data = ConvertToTestData(config);
+  
+  // Create and run engine
+  TestEngine engine(test_data);
+  auto run_result = engine.RunGame();
+  if (!run_result.has_value()) {
+    return std::unexpected(run_result.error());
+  }
+  
+  // Get data bank
+  const auto& data_bank = engine.GetDataBank();
+  
+  // Compare each expected snapshot
+  for (const auto& [tick, expected_snapshot] : test_data.expected_engine_snapshots) {
+    auto it = data_bank.find(tick);
+    if (it == data_bank.end()) {
+      return std::unexpected(FailInfo{
+          FailMode::MissingData,
+          std::format("No snapshot found for tick {}", tick)
+      });
+    }
+    
+    const EntityMemoryPool& actual_pool = it->second;
+    const EntityMemoryPool& expected_pool = expected_snapshot.entity_pool;
+    
+    // Create context
+    TestContext context;
+    context.test_name = test_data.meta_data.test_name;
+    context.current_tick = tick;
+    context.total_ticks = test_data.number_of_ticks;
+    
+    // Compare using matcher
+    EntityMemoryPoolEqualsMatcher matcher(expected_pool, context);
+    if (!matcher.match(actual_pool)) {
+      return std::unexpected(FailInfo{
+          FailMode::ValidationFailed,
+          matcher.describe()
+      });
+    }
+  }
+  
+  return std::monostate{};
+}
+```
+
+## Future Enhancements
+
+With the data bank approach, future enhancements are straightforward:
+
+### 1. EventBus Snapshots
+
+```cpp
+struct EngineSnapshot {
+  EntityMemoryPool entity_pool;
+  EventBus event_bus;  // Add event bus state
+};
+
+std::map<size_t, EngineSnapshot> m_data_bank;
+```
+
+### 2. Scene State Snapshots
+
+```cpp
+struct EngineSnapshot {
+  EntityMemoryPool entity_pool;
+  EventBus event_bus;
+  SceneType active_scene;  // Add scene information
+};
+```
+
+### 3. Diff-Based Reporting
+
+```cpp
+// Compare snapshots and show only differences
+void ReportSnapshotDiff(size_t tick,
+                        const EntityMemoryPool& actual,
+                        const EntityMemoryPool& expected) {
+  // Only show entities that changed
+  // Only show components that differ
+  // Provide clear before/after view
+}
+```
+
+### 4. Snapshot Visualization
+
+```cpp
+// Export snapshots for visualization
+void ExportSnapshotsToJson(const std::map<size_t, EntityMemoryPool>& data_bank,
+                          const std::filesystem::path& output_path) {
+  // Generate JSON files for each tick
+  // Can be used with visualization tools
+}
+```
+
+## Conclusion
+
+**Approach 1 (Snapshot Copying with Deferred Comparison) is the clear winner** for the TestEngine progression. It provides better separation of concerns, superior debugging capabilities, and aligns with existing architecture patterns. The memory overhead is negligible for test scenarios, and the approach is more maintainable and extensible for future enhancements.
+
+The implementation is straightforward and follows SOLID principles, keeping the TestEngine focused on simulation execution while leaving comparison logic to the test harness where it belongs.
+
+## References
+
+- `tests/harness/README.md` - Test harness documentation (mentions data bank)
+- `tests/matchers/EntityMemoryPoolEqualsMatcher.h` - Existing matcher infrastructure
+- `tests/matchers/test_context.h` - TestContext for enriched error messages
+- `src/types/test_structs/TestData.h` - TestData structure with expected_engine_snapshots
+- `src/engine/Engine.h` - Base Engine class with tick pipeline
+
+## Next Steps
+
+1. Review and discuss this analysis
+2. If approved, implement Approach 1:
+   - Add m_data_bank member to TestEngine
+   - Implement CaptureSnapshot() method
+   - Update RunGameLoop() to capture snapshots
+   - Add GetDataBank() accessor
+   - Implement comparison logic in test harness
+3. Write tests for the new functionality
+4. Update documentation (README, examples)
