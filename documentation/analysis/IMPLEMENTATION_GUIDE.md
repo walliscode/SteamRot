@@ -659,12 +659,30 @@ git commit -m "Phase 3: Consolidate foundation layer into types
 
 ## Phase 4: Break Asset/UI Circular Dependency (6-8 hours)
 
-**Goal:** Make asset loading UI-agnostic
+**Goal:** Make asset loading UI-agnostic by introducing UIAssetLoader
 
 **Risk:** HIGH  
-**Impact:** Better modularity, cleaner separation of concerns
+**Impact:** Better modularity, cleaner separation of concerns, enables independent evolution of asset and UI systems
 
 **Note:** This phase is optional and can be deferred until asset/UI systems need refactoring for other reasons.
+
+### Understanding the Problem
+
+**Current circular dependency:**
+```
+assets → user_interface (depends on UIStyle type)
+user_interface → assets (depends on AssetManager for fonts/styles)
+```
+
+**The issue:**
+- AssetManager stores `std::unordered_map<std::string, UIStyle>` (UI-specific type)
+- AssetManager has methods like `LoadUIStyles()` and `GetDefaultUIStyle()` (UI-specific)
+- This couples the generic asset system to UI concerns
+
+**The solution:**
+- Make AssetManager generic and UI-agnostic
+- Create UIAssetLoader in user_interface layer to handle UI-specific asset operations
+- Result: `assets → types`, `user_interface → assets` (unidirectional)
 
 ### Step 4.1: Analyze Current Dependencies
 
@@ -672,48 +690,277 @@ git commit -m "Phase 3: Consolidate foundation layer into types
 # Create new branch
 git checkout -b phase4-break-circular-dependency
 
-# Find why assets depends on user_interface
-grep -r "user_interface" src/assets/ --include="*.cpp" --include="*.h"
+# Understand the circular dependency
+cat src/assets/CMakeLists.txt  # See user_interface dependency
+cat src/assets/AssetManager.h  # See UIStyle usage
 
-# Find what UI needs from assets
-grep -r "AssetManager" src/user_interface/ --include="*.cpp" --include="*.h"
+# Find all UI-specific code in AssetManager
+grep -n "UIStyle" src/assets/AssetManager.h
+grep -n "UIStyle" src/assets/AssetManager.cpp
 ```
 
-### Step 4.2: Refactor AssetManager
+**Key findings:**
+- AssetManager implements `IFontProvider` interface (good - generic)
+- AssetManager stores `m_ui_styles` map (bad - UI-specific)
+- Methods: `LoadUIStyles()`, `GetDefaultUIStyle()`, `GetAllUIStyles()` (bad - UI-specific)
 
-**Current issue:** AssetManager has UI-specific methods.
+### Step 4.2: Design UIAssetLoader
 
-**Goal:** Make AssetManager generic, move UI-specific logic to user_interface layer.
+**Architecture decision:**
 
-**Example refactoring:**
+Create a **facade pattern** where UIAssetLoader wraps AssetManager and provides UI-specific functionality:
 
-**Before (in AssetManager):**
-```cpp
-class AssetManager {
-  void LoadUIAssets();  // UI-specific method
-  void LoadFonts();     // UI-specific
-};
+```
+┌─────────────────────┐
+│  user_interface/    │
+│  UIElements, etc.   │
+└──────────┬──────────┘
+           │
+           ↓
+┌─────────────────────┐
+│  UIAssetLoader      │  ← New class in user_interface/
+│  - LoadUIStyles()   │
+│  - GetUIStyle()     │
+└──────────┬──────────┘
+           │
+           ↓
+┌─────────────────────┐
+│  AssetManager       │  ← Generic asset loading
+│  - LoadAsset()      │
+│  - GetFont()        │
+└─────────────────────┘
 ```
 
-**After:**
-```cpp
-// AssetManager becomes generic
-class AssetManager {
-  void LoadAsset(const AssetConfig& config);  // Generic
-};
+### Step 4.3: Create UIAssetLoader (Header)
 
-// In user_interface layer
+**File:** `src/user_interface/UIAssetLoader.h`
+
+```cpp
+/////////////////////////////////////////////////
+/// @file
+/// @brief Declaration of the UIAssetLoader class.
+/////////////////////////////////////////////////
+
+#pragma once
+
+#include "AssetManager.h"
+#include "FailInfo.h"
+#include "UIStyle.h"
+#include <expected>
+#include <string>
+#include <unordered_map>
+
+namespace steamrot {
+
+/////////////////////////////////////////////////
+/// @brief Handles UI-specific asset loading and management.
+///
+/// UIAssetLoader wraps AssetManager to provide UI-specific
+/// functionality without coupling the generic asset system
+/// to UI concerns.
+/////////////////////////////////////////////////
 class UIAssetLoader {
-  UIAssetLoader(AssetManager& assets) : m_assets(assets) {}
-  void LoadUIAssets() {
-    // UI-specific logic using generic AssetManager
-  }
 private:
-  AssetManager& m_assets;
+  /////////////////////////////////////////////////
+  /// @brief Reference to the generic AssetManager
+  /////////////////////////////////////////////////
+  AssetManager& m_asset_manager;
+
+  /////////////////////////////////////////////////
+  /// @brief Storage for UI styles (moved from AssetManager)
+  /////////////////////////////////////////////////
+  std::unordered_map<std::string, UIStyle> m_ui_styles;
+
+public:
+  /////////////////////////////////////////////////
+  /// @brief Constructor taking reference to AssetManager
+  ///
+  /// @param asset_manager Reference to the generic asset manager
+  /////////////////////////////////////////////////
+  explicit UIAssetLoader(AssetManager& asset_manager);
+
+  /////////////////////////////////////////////////
+  /// @brief Load all UI styles from data providers
+  ///
+  /// Uses the AssetManager to load fonts, then configures
+  /// UI styles based on loaded font data.
+  ///
+  /// @return Success or error information
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> LoadUIStyles();
+
+  /////////////////////////////////////////////////
+  /// @brief Get a specific UI style by name
+  ///
+  /// @param style_name Name of the style to retrieve
+  /// @return UIStyle or error if not found
+  /////////////////////////////////////////////////
+  std::expected<const UIStyle&, FailInfo>
+  GetUIStyle(const std::string& style_name) const;
+
+  /////////////////////////////////////////////////
+  /// @brief Convenience function to get the default UIStyle
+  ///
+  /// @return Reference to the default UIStyle
+  /////////////////////////////////////////////////
+  const UIStyle& GetDefaultUIStyle() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Get all loaded UI styles
+  ///
+  /// @return Const reference to all UI styles
+  /////////////////////////////////////////////////
+  const std::unordered_map<std::string, UIStyle>& GetAllUIStyles() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Access to underlying AssetManager (for fonts)
+  ///
+  /// Allows UI code to access fonts through IFontProvider interface
+  ///
+  /// @return Reference to AssetManager as IFontProvider
+  /////////////////////////////////////////////////
+  IFontProvider& GetFontProvider();
+};
+
+} // namespace steamrot
+```
+
+### Step 4.4: Implement UIAssetLoader
+
+**File:** `src/user_interface/UIAssetLoader.cpp`
+
+```cpp
+#include "UIAssetLoader.h"
+#include "DataAccessFactory.h"
+#include "IUIStyleDataProvider.h"
+
+namespace steamrot {
+
+/////////////////////////////////////////////////
+UIAssetLoader::UIAssetLoader(AssetManager& asset_manager)
+    : m_asset_manager(asset_manager) {}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo> UIAssetLoader::LoadUIStyles() {
+  // Get UI style data from data access factory
+  auto& data_factory = m_asset_manager.GetDataAccessFactory();
+  auto style_provider = data_factory.GetUIStyleDataProvider();
+  
+  auto styles_result = style_provider->ProvideUIStyleData();
+  if (!styles_result.has_value()) {
+    return std::unexpected(styles_result.error());
+  }
+
+  const auto* style_data = styles_result.value();
+  
+  // Load each style using fonts from AssetManager
+  for (const auto* style_config : *style_data->styles()) {
+    UIStyle style;
+    
+    // Configure style with fonts from AssetManager
+    if (style_config->font_name()) {
+      auto font_result = m_asset_manager.GetFont(
+          style_config->font_name()->str());
+      if (font_result.has_value()) {
+        style.m_font = font_result.value();
+      }
+    }
+    
+    // Configure other style properties
+    if (style_config->font_size()) {
+      style.m_font_size = style_config->font_size();
+    }
+    
+    // Store the style
+    m_ui_styles[style_config->name()->str()] = style;
+  }
+  
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<const UIStyle&, FailInfo>
+UIAssetLoader::GetUIStyle(const std::string& style_name) const {
+  auto it = m_ui_styles.find(style_name);
+  if (it == m_ui_styles.end()) {
+    return std::unexpected(FailInfo{
+        FailMode::InvalidArgument,
+        "UI style not found: " + style_name});
+  }
+  return it->second;
+}
+
+/////////////////////////////////////////////////
+const UIStyle& UIAssetLoader::GetDefaultUIStyle() const {
+  // Return first style or create default if none exist
+  if (m_ui_styles.empty()) {
+    static UIStyle default_style;
+    return default_style;
+  }
+  return m_ui_styles.begin()->second;
+}
+
+/////////////////////////////////////////////////
+const std::unordered_map<std::string, UIStyle>&
+UIAssetLoader::GetAllUIStyles() const {
+  return m_ui_styles;
+}
+
+/////////////////////////////////////////////////
+IFontProvider& UIAssetLoader::GetFontProvider() {
+  return m_asset_manager;
+}
+
+} // namespace steamrot
+```
+
+### Step 4.5: Refactor AssetManager (Remove UI Dependencies)
+
+**File:** `src/assets/AssetManager.h`
+
+**Remove these:**
+```cpp
+// REMOVE: #include "UIStyle.h"
+// REMOVE: std::unordered_map<std::string, UIStyle> m_ui_styles;
+// REMOVE: std::expected<std::monostate, FailInfo> LoadUIStyles();
+// REMOVE: const UIStyle& GetDefaultUIStyle() const;
+// REMOVE: const std::unordered_map<std::string, UIStyle>& GetAllUIStyles() const;
+```
+
+**Keep these (generic asset functionality):**
+```cpp
+class AssetManager : public IFontProvider {
+private:
+  DataAccessFactory& m_data_access_factory;
+  std::unordered_map<std::string, std::shared_ptr<const sf::Font>> m_fonts;
+  std::expected<std::monostate, FailInfo> AddFont(const std::string& font_name);
+
+public:
+  AssetManager(DataAccessFactory& data_access_factory);
+  
+  std::expected<std::monostate, FailInfo>
+  LoadAssets(const AssetConfig asset_config);
+  
+  // IFontProvider interface
+  std::expected<std::shared_ptr<const sf::Font>, FailInfo>
+  GetFont(const std::string& font_name) const override;
+  
+  const std::unordered_map<std::string, std::shared_ptr<const sf::Font>>&
+  GetAllFonts() const;
+  
+  // Accessor for data factory (needed by UIAssetLoader)
+  DataAccessFactory& GetDataAccessFactory() { return m_data_access_factory; }
 };
 ```
 
-### Step 4.3: Update CMakeLists.txt
+**File:** `src/assets/AssetManager.cpp`
+
+Remove all UI-specific implementation code related to:
+- `LoadUIStyles()` implementation
+- `GetDefaultUIStyle()` implementation  
+- `GetAllUIStyles()` implementation
+
+### Step 4.6: Update CMakeLists.txt
 
 **File:** `src/assets/CMakeLists.txt`
 
@@ -722,39 +969,183 @@ private:
 ```cmake
 target_link_libraries(assets
   PUBLIC
-  SFML::Graphics
-  types
-  # user_interface  # REMOVE THIS LINE
-  data_providers
+    SFML::Graphics
+    types
+    interfaces
+    # user_interface  # REMOVE THIS LINE - breaks circular dependency
+    data_providers
 )
 ```
 
-### Step 4.4: Move UI-Specific Asset Code
+**File:** `src/user_interface/CMakeLists.txt`
 
-Create new file in user_interface:
-- `src/user_interface/UIAssetHelpers.cpp`
-- `src/user_interface/UIAssetHelpers.h`
+**Add UIAssetLoader to build:**
 
-Move UI-specific asset loading logic here.
+```cmake
+add_library(user_interface
+  # ... existing files ...
+  UIAssetLoader.cpp  # ADD THIS
+)
 
-### Step 4.5: Build and Test
+# Already has assets dependency - no change needed
+target_link_libraries(user_interface
+  PUBLIC
+    SFML::Graphics
+    types
+    assets  # Already present - now unidirectional
+    interfaces
+)
+```
+
+### Step 4.7: Update Code That Uses AssetManager
+
+**Find all usages:**
+```bash
+grep -r "GetDefaultUIStyle\|LoadUIStyles\|GetAllUIStyles" src/ --include="*.cpp"
+```
+
+**Update pattern:**
+
+**Before:**
+```cpp
+// Direct AssetManager usage
+AssetManager& assets = engine_resources.asset_manager;
+assets.LoadUIStyles();
+const UIStyle& style = assets.GetDefaultUIStyle();
+```
+
+**After:**
+```cpp
+// Use UIAssetLoader
+UIAssetLoader ui_assets(engine_resources.asset_manager);
+ui_assets.LoadUIStyles();
+const UIStyle& style = ui_assets.GetDefaultUIStyle();
+
+// For fonts, can still use AssetManager directly (IFontProvider)
+auto font = engine_resources.asset_manager.GetFont("arial");
+// Or through UIAssetLoader
+auto font2 = ui_assets.GetFontProvider().GetFont("arial");
+```
+
+**Common locations to update:**
+- Scene initialization code
+- UI factory classes
+- Configuration loading code
+
+### Step 4.8: Update EngineResources (if needed)
+
+If EngineResources needs UI asset access, add UIAssetLoader:
+
+**File:** `src/resources/EngineResources.h` (or wherever it ends up)
+
+```cpp
+struct EngineResources {
+  // ... existing members ...
+  AssetManager asset_manager;
+  
+  // Optional: Add UIAssetLoader if it's a core engine resource
+  // UIAssetLoader ui_asset_loader{asset_manager};  // Initialized with asset_manager
+};
+```
+
+**Or** create UIAssetLoader where needed (in scenes, UI systems, etc.)
+
+### Step 4.9: Build and Test
 
 ```bash
-# Build
+# Clean build to catch any dependency issues
+rm -rf build/
+
+# Reconfigure
+cmake --preset Debug
+
+# Build - should succeed without circular dependency
 cmake --build --preset Debug
 
-# Test
+# Run all tests
 ctest --preset Debug
+
+# Verify no user_interface dependency in assets
+grep -r "user_interface" src/assets/CMakeLists.txt
+# Should return nothing
 
 # Commit if successful
 git add -A
 git commit -m "Phase 4: Break assets/user_interface circular dependency
 
-- Made AssetManager generic (removed UI-specific methods)
-- Created UIAssetHelpers in user_interface for UI-specific asset logic
-- Removed user_interface dependency from assets
-- Now assets → types, user_interface → assets (unidirectional)"
+- Created UIAssetLoader class in user_interface layer
+- Moved UI style storage and management to UIAssetLoader
+- Removed UIStyle dependencies from AssetManager (now generic)
+- Removed user_interface dependency from assets CMakeLists
+- AssetManager provides generic IFontProvider interface
+- Updated all code using UI styles to use UIAssetLoader
+- Now assets → types, user_interface → assets (unidirectional)
+- Enables independent evolution of asset and UI systems"
 ```
+
+### Step 4.10: Verify Dependency Graph
+
+```bash
+# Visualize the new dependency structure
+# assets should NOT depend on user_interface anymore
+
+# Check assets dependencies
+grep "target_link_libraries(assets" src/assets/CMakeLists.txt
+
+# Expected output:
+# target_link_libraries(assets
+#   PUBLIC
+#     SFML::Graphics
+#     types
+#     interfaces
+#     data_providers
+# )
+
+# Check user_interface dependencies  
+grep "target_link_libraries(user_interface" src/user_interface/CMakeLists.txt
+
+# Expected to include:
+# - assets (unidirectional dependency)
+```
+
+### Benefits Achieved
+
+**Architectural improvements:**
+- ✅ Eliminated circular dependency between assets and user_interface
+- ✅ AssetManager is now generic and UI-agnostic
+- ✅ Clear separation: assets for generic loading, UIAssetLoader for UI-specific logic
+- ✅ Unidirectional dependency flow: `user_interface → assets → types`
+
+**Extensibility gains:**
+- ✅ Can add other domain-specific loaders (AudioAssetLoader, GameAssetLoader, etc.)
+- ✅ AssetManager can be reused in non-UI contexts
+- ✅ UI system can evolve independently
+- ✅ Asset system can evolve independently
+
+**Maintainability:**
+- ✅ Clearer responsibility boundaries
+- ✅ Easier to test AssetManager in isolation
+- ✅ UI-specific logic localized in user_interface layer
+
+### Alternatives Considered
+
+**Alternative 1: Generic Asset Types**
+- Make AssetManager use `std::variant` or template-based generic storage
+- Pro: More flexible for different asset types
+- Con: More complex, loses type safety
+- **Decision:** UIAssetLoader pattern is simpler and clearer
+
+**Alternative 2: Asset Registry Pattern**
+- Central registry for all asset types with plugins
+- Pro: Maximum flexibility
+- Con: Over-engineered for current needs
+- **Decision:** Deferred until more asset types needed
+
+**Alternative 3: Move UIStyle to types/**
+- Keep UIStyle storage in AssetManager but move type to foundation
+- Pro: Minimal code changes
+- Con: Doesn't solve circular dependency, just moves it
+- **Decision:** UIAssetLoader provides cleaner separation
 
 ---
 
