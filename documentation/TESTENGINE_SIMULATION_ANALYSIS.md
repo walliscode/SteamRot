@@ -644,27 +644,74 @@ RunTestEngineTest(const TestDataConfig* config) {
 
 ## Future Enhancements
 
-With the data bank approach, future enhancements are straightforward:
+With the data bank approach and extensible `EngineSnapshot` design, future enhancements are straightforward:
 
-### 1. EventBus Snapshots
+### Extensible Snapshot Design
+
+The `EngineSnapshot` struct uses `std::optional` fields to enable:
+- **Selective capture**: Only populate fields relevant to the test
+- **Selective comparison**: Only validate fields specified in expected snapshot
+- **No breaking changes**: Adding new fields doesn't affect existing tests
+- **Easy extension**: Three-step process to add new snapshot capabilities
+
+**Current Snapshot Capabilities:**
+- Multi-scene entity state (EntityMemoryPool per scene UUID)
+- Global event bus state
+- Tick number for context
+
+**Adding New Capabilities** (example: Asset Manager state):
 
 ```cpp
+// Step 1: Add to EngineSnapshot.h
 struct EngineSnapshot {
-  EntityMemoryPool entity_pool;
-  EventBus event_bus;  // Add event bus state
+  std::optional<std::unordered_map<uuids::uuid, EntityMemoryPool>> scene_snapshots;
+  std::optional<EventBus> global_event_bus;
+  std::optional<size_t> tick_number;
+  
+  // NEW: Asset manager state
+  std::optional<AssetManagerState> asset_manager_state;
 };
 
-std::map<size_t, EngineSnapshot> m_data_bank;
+// Step 2: Capture in TestEngine.cpp
+void TestEngine::CaptureSnapshot(size_t tick) {
+  EngineSnapshot snapshot;
+  // ... existing captures ...
+  snapshot.asset_manager_state = m_engine_resources.asset_manager.GetState();
+  m_data_bank[tick] = std::move(snapshot);
+}
+
+// Step 3: Compare in test_data_comparison.cpp
+if (expected_snapshot.asset_manager_state.has_value()) {
+  // Compare logic here
+}
 ```
 
-### 2. Scene State Snapshots
+### 1. EventBus Snapshots (Already Implemented)
+
+Already included in base implementation using optional fields.
+
+### 2. Additional State Examples
 
 ```cpp
 struct EngineSnapshot {
   EntityMemoryPool entity_pool;
   EventBus event_bus;
   SceneType active_scene;  // Add scene information
-};
+### 2. Additional State Examples
+
+**Scene Manager Info:**
+```cpp
+std::optional<std::vector<SceneInfo>> active_scenes_info;
+```
+
+**Performance Metrics:**
+```cpp
+std::optional<PerformanceMetrics> frame_metrics;
+```
+
+**Input State:**
+```cpp
+std::optional<InputState> input_state;
 ```
 
 ### 3. Diff-Based Reporting
@@ -696,6 +743,13 @@ void ExportSnapshotsToJson(const std::map<size_t, EntityMemoryPool>& data_bank,
 **Approach 1 (Snapshot Copying with Deferred Comparison) is the clear winner** for the TestEngine progression. It provides better separation of concerns, superior debugging capabilities, and aligns with existing architecture patterns. The memory overhead is negligible for test scenarios, and the approach is more maintainable and extensible for future enhancements.
 
 The implementation is straightforward and follows SOLID principles, keeping the TestEngine focused on simulation execution while leaving comparison logic to the test harness where it belongs.
+
+**Key Extensibility Features:**
+- `EngineSnapshot` uses `std::optional` fields for selective capture/comparison
+- Multi-scene support using runtime-generated UUIDs
+- Easy to add new snapshot capabilities (3-step process)
+- Supports comparing any engine-level data structure (scenes, events, assets, etc.)
+- No breaking changes when extending - existing tests continue to work
 
 ## References
 
