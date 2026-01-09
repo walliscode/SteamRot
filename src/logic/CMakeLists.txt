@@ -19,7 +19,6 @@ target_include_directories(logic
 
 target_link_libraries(logic
   PRIVATE
-  components
   entity
   user_interface
   types

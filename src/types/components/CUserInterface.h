@@ -64,12 +64,5 @@ struct CUserInterface : public Component {
   /// @brief Is the this element of the user interface visible to Users.
   /////////////////////////////////////////////////
   bool m_visible{false};
-
-  /////////////////////////////////////////////////
-  /// @brief returns the index of the component in the component register
-  ///
-  /// @return Index of the component in the component register
-  /////////////////////////////////////////////////
-  size_t GetComponentRegisterIndex() const override;
 };
 } // namespace steamrot

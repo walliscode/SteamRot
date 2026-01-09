@@ -12,7 +12,6 @@
 /// Headers
 /////////////////////////////////////////////////
 
-#include <cstddef>
 namespace steamrot {
 /////////////////////////////////////////////////
 /// @class Component
@@ -24,15 +23,7 @@ struct Component {
   /////////////////////////////////////////////////
   /// @brief Destrcutor for the abstract Component struct
   /////////////////////////////////////////////////
-  virtual ~Component();
-
-  /////////////////////////////////////////////////
-  /// @brief Virtual method to find the Component's position in the component
-  /// register
-  ///
-  /// @return Size_t representing the index of the component in the register
-  /////////////////////////////////////////////////
-  virtual size_t GetComponentRegisterIndex() const = 0;
+  virtual ~Component() = default;
 
   /////////////////////////////////////////////////
   /// @brief Is this Component active?
