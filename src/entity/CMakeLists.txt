@@ -15,7 +15,6 @@ target_include_directories(entity
 target_link_libraries(entity
   PUBLIC
   SFML::Graphics
-  components
   types
   interfaces
   events

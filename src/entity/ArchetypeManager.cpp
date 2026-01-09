@@ -27,16 +27,13 @@ ArchetypeManager::GenerateArchetypeID(size_t entity_index) {
 
   // iterate over all the vectors in the entity memory pool
   std::apply(
-      [&](const auto &...component_vector) {
-        // for each component vector, check if the entity has that component
-
-        ((archetypeID.set(
-             component_vector[entity_index].GetComponentRegisterIndex(),
-             component_vector[entity_index].m_active)),
+      [&]<typename... ComponentTypes>(
+          const std::vector<ComponentTypes> &...component_vector) {
+        ((archetypeID.set(TupleTypeIndex<ComponentTypes, ComponentRegister>,
+                          component_vector[entity_index].m_active)),
          ...);
       },
       m_entity_memory_pool);
-
   return archetypeID;
 };
 

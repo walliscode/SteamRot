@@ -1,5 +1,4 @@
 add_subdirectory(assets)
-add_subdirectory(components)
 add_subdirectory(configuration)
 add_subdirectory(display)
 add_subdirectory(entity)

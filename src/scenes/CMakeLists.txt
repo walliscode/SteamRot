@@ -23,7 +23,6 @@ target_link_libraries(scenes
 PUBLIC
 SFML::Graphics
 entity
-components
 context
 logic
 types

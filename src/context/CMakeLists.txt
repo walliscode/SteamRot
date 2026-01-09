@@ -15,5 +15,5 @@ target_link_libraries(context
   assets
   events
   entity
-  components
+
 )
