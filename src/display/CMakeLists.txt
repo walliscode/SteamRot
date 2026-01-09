@@ -13,6 +13,5 @@ target_include_directories(display
 )
 target_link_libraries(display PRIVATE
     SFML::Graphics
-    interfaces
     types
 )

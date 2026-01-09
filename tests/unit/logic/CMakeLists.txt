@@ -22,10 +22,9 @@ target_link_libraries(test_logic
   context
   resources
   entity
-  # test_logic_helpers
   context_test_helpers
-  # test_harness
-  # reporters_objects
+
+
 )
 
 catch_discover_tests(test_logic)

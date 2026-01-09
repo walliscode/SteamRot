@@ -13,7 +13,6 @@ target_link_libraries(user_interface
   types
   events
   data_providers
-  assets
-  configuration
+
 )
 

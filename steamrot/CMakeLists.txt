@@ -16,6 +16,6 @@ target_link_libraries(SteamRot PRIVATE
     display
     types
     logger
-    interfaces
+
 )
 

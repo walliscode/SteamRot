@@ -1,3 +1,4 @@
+
 add_library(resources
   INTERFACE
 )
@@ -12,5 +13,4 @@ target_link_libraries(resources
   assets
   events
 )
-
 
