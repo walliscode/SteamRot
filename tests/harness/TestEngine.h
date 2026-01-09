@@ -13,6 +13,7 @@
 /////////////////////////////////////////////////
 
 #include "Engine.h"
+#include "FailInfo.h"
 #include "TestData.h"
 #include <expected>
 #include <variant>
@@ -40,6 +41,11 @@ private:
   /// @brief Current tick number.
   /////////////////////////////////////////////////
   size_t m_current_tick{1};
+
+  /////////////////////////////////////////////////
+  /// @brief Collection of all Engine data per tick
+  /////////////////////////////////////////////////
+  std::map<size_t, EngineSnapshot> m_data_bank;
 
   /////////////////////////////////////////////////
   /// @brief No rendering for TestEngine (new Tick_() pipeline method)
@@ -70,7 +76,21 @@ private:
     return std::monostate{};
   };
 
+  /////////////////////////////////////////////////
+  /// @brief TestEngine specific startup routine
+  /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo> StartUp() override;
+
+  /////////////////////////////////////////////////
+  /// @brief Capture current engine state for all active scenes
+  ///
+  /// Creates a deep copy of EntityMemoryPool for each active scene
+  /// and stores them in an EngineSnapshot indexed by tick number.
+  /// Scene UUIDs are used as keys within the snapshot.
+  ///
+  /// @param tick Current tick number
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> CaptureSnapShot(size_t tick);
 
 public:
   /////////////////////////////////////////////////
@@ -86,5 +106,17 @@ public:
   /// @return The target number of ticks
   /////////////////////////////////////////////////
   const size_t &GetTargetTicks() const { return m_target_ticks; }
+
+  /////////////////////////////////////////////////
+  /// @brief returns the current tick number
+  ///
+  /// @return The current tick number
+  /////////////////////////////////////////////////
+  const size_t &GetCurrentTick() const { return m_current_tick; }
+
+  /////////////////////////////////////////////////
+  /// @brief Return a constant reference to the data bank for testing purposes.
+  /////////////////////////////////////////////////
+  const std::map<size_t, EngineSnapshot> &GetDataBank() const;
 };
 } // namespace steamrot::tests
