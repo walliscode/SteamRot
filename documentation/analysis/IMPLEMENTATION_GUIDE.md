@@ -149,6 +149,14 @@ ctest --preset Debug -R "Scene|Data" --verbose
 **Risk:** MEDIUM  
 **Impact:** ~20% build time improvement, clearer architecture
 
+**Important Note on Circular Dependencies:**
+
+The original recommendation to make `GetComponentRegisterIndex()` inline in headers creates a circular dependency:
+- Component headers would need `containers.h` for `TupleTypeIndex`  
+- But `containers.h` includes all component headers for `ComponentRegister`
+
+**Solution:** Remove `GetComponentRegisterIndex()` entirely and use `TupleTypeIndex` directly. This is cleaner, avoids circular dependencies, and is entirely compile-time (no virtual call overhead).
+
 ### Step 2.1: Create Target Directory Structure
 
 ```bash
@@ -162,14 +170,20 @@ mkdir -p src/types/components
 # Should already be set to include subdirectories
 ```
 
-### Step 2.2: Update Component Base Class
+### Step 2.2: Remove GetComponentRegisterIndex() to Avoid Circular Dependencies
+
+**Problem:** Making `GetComponentRegisterIndex()` inline in headers creates circular dependencies:
+- Component headers would need `containers.h` for `TupleTypeIndex`
+- But `containers.h` includes all component headers for `ComponentRegister`
+
+**Solution:** Eliminate `GetComponentRegisterIndex()` entirely and use `TupleTypeIndex` directly where needed.
 
 **File:** `src/components/Component.h`
 
 **Before:**
 ```cpp
 struct Component {
-  virtual ~Component();  // Declared in .h, defined in .cpp
+  virtual ~Component();
   virtual size_t GetComponentRegisterIndex() const = 0;
   bool m_active{false};
 };
@@ -179,23 +193,23 @@ struct Component {
 ```cpp
 struct Component {
   virtual ~Component() = default;  // Inline, no .cpp needed
-  virtual constexpr size_t GetComponentRegisterIndex() const = 0;
+  // GetComponentRegisterIndex() removed - use TupleTypeIndex directly
   bool m_active{false};
 };
 ```
 
 **Action:**
 ```bash
-# Edit Component.h
+# Edit Component.h - remove virtual method, inline destructor
 vi src/components/Component.h
 
 # Delete Component.cpp (no longer needed)
 rm src/components/Component.cpp
 ```
 
-### Step 2.3: Convert Each Component to Header-Only
+### Step 2.3: Remove GetComponentRegisterIndex() from All Components
 
-For **each component** (CMeta, CUserInterface, CMachinaForm, CGrimoireMachina, CUIState):
+For **each component**, simply remove the method declaration and its implementation:
 
 #### Example: CMeta
 
@@ -206,40 +220,81 @@ For **each component** (CMeta, CUserInterface, CMachinaForm, CGrimoireMachina, C
 struct CMeta : public Component {
   CMeta() = default;
   bool m_entity_alive = false;
-  size_t GetComponentRegisterIndex() const override;  // Declared here
+  size_t GetComponentRegisterIndex() const override;
 };
 ```
 
 **After:**
 ```cpp
-#include "containers.h"  // Need this for TupleTypeIndex
-
 struct CMeta : public Component {
   CMeta() = default;
   bool m_entity_alive = false;
-  
-  constexpr size_t GetComponentRegisterIndex() const override {
-    return TupleTypeIndex<CMeta, ComponentRegister>;
-  }
+  // GetComponentRegisterIndex() removed
 };
 ```
 
-**Action for CMeta:**
+**Action:**
 ```bash
-# Edit CMeta.h - add inline implementation
+# Edit CMeta.h - remove method declaration
 vi src/components/CMeta.h
 
-# Delete CMeta.cpp
+# Delete CMeta.cpp (entire file no longer needed)
 rm src/components/CMeta.cpp
 ```
 
-**Repeat for remaining components:**
-- `CUserInterface.h` / `CUserInterface.cpp`
-- `CMachinaForm.h` / `CMachinaForm.cpp`
-- `CGrimoireMachina.h` / `CGrimoireMachina.cpp`
-- `CUIState.h` / `CUIState.cpp`
+**Repeat for all components:**
+- `CUserInterface.h` / `CUserInterface.cpp` - remove method, delete .cpp
+- `CMachinaForm.h` / `CMachinaForm.cpp` - remove method, delete .cpp
+- `CGrimoireMachina.h` / `CGrimoireMachina.cpp` - remove method, delete .cpp
+- `CUIState.h` / `CUIState.cpp` - remove method, delete .cpp
 
-### Step 2.4: Move containers.h
+### Step 2.4: Update ArchetypeManager to Use TupleTypeIndex Directly
+
+Since we removed `GetComponentRegisterIndex()`, we need to update the one place it's used in `ArchetypeManager.cpp`.
+
+**File:** `src/entity/ArchetypeManager.cpp`
+
+**Find this code (around line 29-38):**
+```cpp
+std::apply(
+    [&](const auto &...component_vector) {
+      // for each component vector, check if the entity has that component
+      ((archetypeID.set(
+           component_vector[entity_index].GetComponentRegisterIndex(),
+           component_vector[entity_index].m_active)),
+       ...);
+    },
+    m_entity_memory_pool);
+```
+
+**Replace with:**
+```cpp
+std::apply(
+    [&]<typename... ComponentTypes>(
+        const std::vector<ComponentTypes> &...component_vector) {
+      // for each component vector, check if the entity has that component
+      // Use TupleTypeIndex directly instead of GetComponentRegisterIndex()
+      ((archetypeID.set(
+           TupleTypeIndex<ComponentTypes, ComponentRegister>,
+           component_vector[entity_index].m_active)),
+       ...);
+    },
+    m_entity_memory_pool);
+```
+
+**Explanation:**
+- Changed lambda to use C++20 template lambda syntax: `[&]<typename... ComponentTypes>`
+- This captures the actual component type for each vector
+- Use `TupleTypeIndex<ComponentTypes, ComponentRegister>` directly to get the index
+- No need for virtual method call - everything is compile-time!
+
+**Action:**
+```bash
+# Edit ArchetypeManager.cpp
+vi src/entity/ArchetypeManager.cpp
+```
+
+### Step 2.5: Move containers.h
 
 ```bash
 # Move containers.h (it's already header-only)
@@ -272,7 +327,7 @@ vi src/types/components/containers.h
 #include "CUserInterface.h"
 ```
 
-### Step 2.5: Move All Component Headers
+### Step 2.6: Move All Component Headers
 
 ```bash
 # Move all component headers to types/components/
@@ -287,7 +342,7 @@ mv src/components/CUIState.h src/types/components/
 ls src/components/
 ```
 
-### Step 2.6: Update types/CMakeLists.txt
+### Step 2.7: Update types/CMakeLists.txt
 
 **File:** `src/types/CMakeLists.txt`
 
@@ -307,7 +362,7 @@ target_include_directories(types
 )
 ```
 
-### Step 2.7: Remove components Library
+### Step 2.8: Remove components Library
 
 **File:** `src/components/CMakeLists.txt`
 
@@ -329,7 +384,7 @@ add_subdirectory(configuration)
 # ... rest of file
 ```
 
-### Step 2.8: Update All Component Includes
+### Step 2.9: Update All Component Includes
 
 Find all files that include component headers:
 
@@ -348,7 +403,7 @@ cat component_includes.txt
 cmake --build --preset Debug --target <some-target-that-uses-components>
 ```
 
-### Step 2.9: Update Dependent Libraries
+### Step 2.10: Update Dependent Libraries
 
 Remove `components` from target_link_libraries in these CMakeLists.txt:
 
@@ -381,7 +436,7 @@ target_link_libraries(entity
 )
 ```
 
-### Step 2.10: Build and Test
+### Step 2.11: Build and Test
 
 ```bash
 # Clean build
@@ -404,7 +459,8 @@ git add -A
 git commit -m "Phase 2: Convert components to header-only in types/components
 
 - Made Component destructor inline (= default)
-- Made GetComponentRegisterIndex() constexpr inline in each component
+- Removed GetComponentRegisterIndex() virtual method (eliminates circular dependency)
+- Updated ArchetypeManager to use TupleTypeIndex directly with template lambda
 - Removed all component .cpp files
 - Moved all component headers to types/components/
 - Moved containers.h to types/components/
@@ -413,7 +469,7 @@ git commit -m "Phase 2: Convert components to header-only in types/components
 - Expected ~20% build time improvement"
 ```
 
-### Step 2.11: Verify Build Time Improvement
+### Step 2.12: Verify Build Time Improvement
 
 ```bash
 # Time a clean build before (from backup branch)
@@ -783,12 +839,31 @@ Update these files to reflect new structure:
 
 ### Issue: Circular Include Dependencies
 
-**Symptom:** Compile errors about incomplete types
+**Symptom:** Compile errors about incomplete types, or circular dependency when trying to inline `GetComponentRegisterIndex()`
+
+**Problem:** Component headers need `containers.h` for `TupleTypeIndex`, but `containers.h` includes all component headers for `ComponentRegister`.
 
 **Solution:**
 ```bash
-# Use forward declarations where possible
-# Break circular includes by moving implementations to .cpp (if any remain)
+# Remove GetComponentRegisterIndex() entirely (as described in Phase 2 Step 2.2-2.4)
+# Use TupleTypeIndex directly where needed with template lambdas
+# This is the recommended approach to avoid circular dependencies
+```
+
+**Example - ArchetypeManager.cpp:**
+```cpp
+// Instead of: component.GetComponentRegisterIndex()
+// Use: TupleTypeIndex<ComponentType, ComponentRegister>
+
+std::apply(
+    [&]<typename... ComponentTypes>(
+        const std::vector<ComponentTypes> &...component_vector) {
+      ((archetypeID.set(
+           TupleTypeIndex<ComponentTypes, ComponentRegister>,
+           component_vector[entity_index].m_active)),
+       ...);
+    },
+    m_entity_memory_pool);
 ```
 
 ### Issue: Tests Failing
