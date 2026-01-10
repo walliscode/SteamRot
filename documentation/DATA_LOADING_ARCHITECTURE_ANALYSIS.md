@@ -158,9 +158,11 @@ table TestDataFbs {
 
 **Missing Components:**
 - `EngineState` (running, paused, subscriptions, performance metrics)
-- `EngineConfig` (user preferences, display settings)
 - `EventBus` state (global events, waiting room events)
 - Potentially: AssetManager cache state, audio state, input state
+
+**NOT Missing (Intentionally Separate):**
+- `EngineConfig` (user preferences, display settings) - These are user-specific global settings, NOT per-save data. Already handled separately via default.preferences.bin and user preference files.
 
 **Impact:** Cannot fully restore game state from save file
 
@@ -168,11 +170,14 @@ table TestDataFbs {
 ```cpp
 struct SaveData {
   SaveMetaData meta_data;
-  EngineConfig engine_config;        // Add this
   EngineState engine_state;          // Add this
   SceneManagerData scene_manager_data;
   SceneCollectionData scene_collection_data;
   std::optional<EventBus> event_bus; // Add this
+  
+  // Note: EngineConfig NOT included - user preferences are global,
+  // not per-save. They're loaded from default.preferences.bin and
+  // user-specific preference files at engine startup.
 };
 ```
 
@@ -273,27 +278,33 @@ Then use in both contexts:
 // src/types/core/SaveData.h
 struct SaveData {
   SaveMetaData meta_data;
-  EngineConfig engine_config;        // NEW: User preferences, display settings
   EngineState engine_state;          // NEW: Runtime state, subscriptions
   SceneManagerData scene_manager_data;
   SceneCollectionData scene_collection_data;
   std::optional<EventBus> event_bus; // NEW: Global event state
+  
+  // Note: EngineConfig NOT included here - user preferences and display
+  // settings are global user settings, not per-save game data. They're
+  // managed separately via the user preferences system
+  // (default.preferences.bin and user-specific preference files).
 };
 ```
 
 **FlatBuffers Schema:**
 ```fbs
 // src/types/flatbuffers/configuration/save_data.fbs
-include "../engine/engine_config.fbs";
 include "../engine/engine_state.fbs";
 include "../events/event_bus_data.fbs";
 
 table SaveDataFbs {
   save_meta_data: SaveMetaDataFbs;
-  engine_config: EngineConfigFbs;
   engine_state: EngineStateFbs;
   scene_collection_data: SceneCollectionDataFbs;
   event_bus: EventBusDataFbs;
+  
+  // Note: EngineConfig NOT included - user preferences/display settings
+  // are global user settings, not per-save. Handled separately via
+  // default.preferences.bin and user preference system.
 }
 ```
 
@@ -337,9 +348,9 @@ EventBus ExportEventBus(const EventHandler& event_handler);
 EngineState ExportEngineState(const EngineState& engine_state);
 
 /////////////////////////////////////////////////
-/// @brief Export EngineConfig
-/////////////////////////////////////////////////
-EngineConfig ExportEngineConfig(const EngineConfig& engine_config);
+// Note: ExportEngineConfig NOT needed for SaveData since EngineConfig
+// contains user preferences (volume, language, display settings) which
+// are global user settings, not per-save game data.
 
 /////////////////////////////////////////////////
 /// @brief Export complete EngineSnapshot
@@ -364,7 +375,9 @@ std::expected<SaveData, FailInfo> GameEngine::SaveGame() {
   save_data.scene_collection_data = std::move(scenes.value());
   save_data.event_bus = engine::export::ExportEventBus(m_engine_resources.event_handler);
   save_data.engine_state = engine::export::ExportEngineState(m_engine_state);
-  save_data.engine_config = engine::export::ExportEngineConfig(m_engine_config);
+  
+  // Note: EngineConfig NOT saved here - user preferences and display settings
+  // are global user settings managed separately by the preference system.
   
   return save_data;
 }
@@ -440,14 +453,17 @@ struct EngineSnapshot {
   SceneCollectionData scene_collection_data;
   std::optional<EventBus> global_event_bus;
   
-  // NEW: Add these for completeness
-  std::optional<EngineConfig> engine_config;
+  // NEW: Add these for completeness in testing
   std::optional<EngineState> engine_state;
   std::optional<SceneManagerData> scene_manager_data;
   
+  // Note: EngineConfig intentionally NOT included - user preferences and
+  // display settings are global user settings, not per-snapshot state.
+  // Tests that need to verify preference-dependent behavior should set
+  // up preferences in test fixtures, not in snapshots.
+  
   bool HasData() const {
     return global_event_bus.has_value() || 
-           engine_config.has_value() ||
            engine_state.has_value();
   }
 };
@@ -483,11 +499,13 @@ struct SaveData {
 ```cpp
 struct SaveData {
   SaveMetaData meta_data;
-  EngineConfig engine_config;
   EngineState engine_state;
   SceneManagerData scene_manager_data;
   SceneCollectionData scene_collection_data;
   std::optional<EventBus> event_bus;
+  
+  // Note: EngineConfig NOT included - user preferences and display
+  // settings are global user settings, not per-save data.
 };
 ```
 
@@ -547,9 +565,11 @@ ConvertSaveDataToTestData(const SaveData& save_data,
   EngineSnapshot starting_snapshot;
   starting_snapshot.scene_collection_data = save_data.scene_collection_data;
   starting_snapshot.global_event_bus = save_data.event_bus;
-  starting_snapshot.engine_config = save_data.engine_config;
   starting_snapshot.engine_state = save_data.engine_state;
   starting_snapshot.scene_manager_data = save_data.scene_manager_data;
+  
+  // Note: EngineConfig not converted from SaveData since it's not stored there.
+  // User preferences are global settings managed separately.
   
   test_data.starting_engine_snapshot = std::move(starting_snapshot);
   test_data.number_of_ticks = 1; // Default: single tick validation
@@ -575,15 +595,15 @@ ConvertSaveDataToTestData(const SaveData& save_data,
 
 ### 📝 Recommended Improvements
 
-1. **Extend SaveData** - Add EngineConfig, EngineState, EventBus for complete state
+1. **Extend SaveData** - Add EngineState, EventBus for complete per-save state (NOT EngineConfig - that's global user settings)
 2. **Shared Export Utilities** - Create `engine::export` namespace for code reuse
-3. **Extend EngineSnapshot** - Add optional EngineConfig, EngineState, SceneManagerData
+3. **Extend EngineSnapshot** - Add optional EngineState, SceneManagerData for testing (NOT EngineConfig - global settings)
 4. **SaveData ↔ TestData Conversion** - Enable test generation from saves
 
 ### 🎯 Implementation Priority
 
 **Phase 1: Core State Capture** (High Priority)
-- Add EngineState, EngineConfig, EventBus to SaveData
+- Add EngineState, EventBus to SaveData (NOT EngineConfig - that's global user settings)
 - Update FlatBuffers schema
 - Update FlatbuffersSaveDataProvider
 

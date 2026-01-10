@@ -74,14 +74,14 @@ This directory contains comprehensive documentation analyzing the SteamRot data 
 3. **Clear Boundaries** - Production (SaveData) and Testing (TestData) are properly separated
 
 ### ❌ Current Limitations
-1. **SaveData Incomplete** - Missing EngineConfig, EngineState, EventBus
+1. **SaveData Incomplete** - Missing EngineState, EventBus (NOT EngineConfig - that's global user settings)
 2. **Code Duplication** - State export logic duplicated between GameEngine and TestEngine
 3. **EngineSnapshot Misalignment** - Not fully aligned with SaveData capabilities
 
 ### 📝 Recommended Path Forward
 
 **Phase 1: Core State Capture** (High Priority)
-- Extend SaveData to include EngineConfig, EngineState, EventBus
+- Extend SaveData to include EngineState, EventBus (NOT EngineConfig - that's global user settings)
 - Update FlatBuffers schema (save_data.fbs)
 - Update FlatbuffersSaveDataProvider
 - Implement complete GameEngine save/load
@@ -93,7 +93,7 @@ This directory contains comprehensive documentation analyzing the SteamRot data 
 - Eliminate code duplication
 
 **Phase 3: Testing Integration** (Low Priority)
-- Extend EngineSnapshot with optional engine-level fields
+- Extend EngineSnapshot with optional EngineState, SceneManagerData (NOT EngineConfig - global settings)
 - Implement SaveData → TestData conversion
 - Enable test generation from gameplay saves
 - Add documentation for test generation workflow
@@ -107,8 +107,9 @@ This directory contains comprehensive documentation analyzing the SteamRot data 
 
 1. **SaveData for Production** ✅
    - Yes, SaveData should be used for save/load in production
-   - Currently incomplete (missing engine-level state)
-   - Needs extension to capture full engine state (Phase 1 recommendation)
+   - Currently incomplete (missing EngineState and EventBus)
+   - Needs extension to capture complete per-save state (Phase 1 recommendation)
+   - Note: EngineConfig should NOT be in SaveData - user preferences are global settings
 
 2. **SaveData for Exporting** ⚠️
    - SaveData can be used for exporting, but it's currently incomplete

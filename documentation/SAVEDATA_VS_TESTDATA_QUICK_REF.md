@@ -42,11 +42,13 @@
 - ✅ SceneCollectionData (via IEntityImporter)
 
 **What it's missing:**
-- ❌ EngineConfig (user preferences, display settings)
 - ❌ EngineState (running, paused, subscriptions)
 - ❌ EventBus state (global events)
 
-**Recommendation:** Extend SaveData to include engine-level state (see Phase 1 in architecture analysis)
+**What it should NOT have (intentionally separate):**
+- ⚪ EngineConfig (user preferences, display settings) - These are global user settings, NOT per-save data. Already handled separately via default.preferences.bin and user preference system.
+
+**Recommendation:** Extend SaveData to include EngineState and EventBus (see Phase 1 in architecture analysis). Do NOT add EngineConfig.
 
 ### TestData Status: ✅ Complete
 
@@ -254,11 +256,14 @@ if (test_data_result.has_value()) {
 
 ### Q: What's the difference between EngineState and EngineConfig?
 **A:**
-- **EngineState**: Runtime operational state that changes during execution (running, paused, subscriptions, performance metrics)
-- **EngineConfig**: Configuration settings that rarely change (user preferences, display settings, framerate)
+- **EngineState**: Runtime operational state that changes during execution (running, paused, subscriptions, performance metrics). This IS per-save-game state.
+- **EngineConfig**: Configuration settings that rarely change (user preferences like volume/language, display settings like framerate/fullscreen). This is NOT per-save-game - it's global user settings loaded at engine startup from default.preferences.bin and user preference files.
 
 ### Q: Should SaveData fields be optional like EngineSnapshot?
 **A:** No. SaveData represents a complete production save and should have required fields. EngineSnapshot uses optional fields for flexibility in testing (tests can choose what to validate).
+
+### Q: Why isn't EngineConfig in SaveData?
+**A:** EngineConfig contains user preferences (master volume, language) and display settings (framerate, fullscreen, vsync) that are global user settings, not per-save-game state. These settings are stored separately in preference files (default.preferences.bin and user-specific files) and loaded at engine startup. A user's volume preferences should apply across all save games, not be different per save.
 
 ## See Also
 

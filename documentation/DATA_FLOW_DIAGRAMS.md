@@ -67,8 +67,7 @@ This document provides visual representations of data flow in the SteamRot engin
   GameEngine State                  SaveData                    File
   ┌──────────────┐              ┌─────────────┐            ┌──────────┐
   │ EngineState  │              │             │            │          │
-  │ EngineConfig │              │ Metadata    │            │          │
-  │ SceneManager │───Export────▶│ Config      │───Write───▶│ .save    │
+  │ SceneManager │───Export────▶│ Metadata    │───Write───▶│ .save    │
   │ - Scenes     │              │ State       │            │ (FBS)    │
   │ - Entities   │              │ Scenes      │            │          │
   │ EventBus     │              │ Entities    │            │          │
@@ -81,7 +80,11 @@ This document provides visual representations of data flow in the SteamRot engin
            - ExportActiveScenes()
            - ExportEventBus()
            - ExportEngineState()
-           - ExportEngineConfig()
+           
+  Note: EngineConfig (user preferences, display settings) NOT saved here.
+  These are global user settings managed separately via the preference system
+  (default.preferences.bin and user-specific preference files).
+  User prefs are loaded at engine startup, not per-save-game.
 ```
 
 ## 2. Testing Data Flow
@@ -211,11 +214,6 @@ This document provides visual representations of data flow in the SteamRot engin
   └──────────────┘           └──────────────────┘      └──────────────┘
 
   ┌──────────────┐           ┌──────────────────┐      ┌──────────────┐
-  │ EngineConfig │──────────▶│ ExportEngine     │─────▶│ EngineConfig │
-  │              │           │ Config()         │      │              │
-  └──────────────┘           └──────────────────┘      └──────────────┘
-
-  ┌──────────────┐           ┌──────────────────┐      ┌──────────────┐
   │ Engine       │──────────▶│ ExportEngine     │─────▶│ Engine       │
   │              │           │ Snapshot()       │      │ Snapshot     │
   └──────────────┘           └──────────────────┘      └──────────────┘
@@ -224,6 +222,11 @@ This document provides visual representations of data flow in the SteamRot engin
                  Used by:           │
                  - GameEngine::SaveGame()
                  - TestEngine::CaptureSnapShot()
+                 
+  Note: ExportEngineConfig() NOT needed for SaveData.
+  User preferences and display settings are global user settings,
+  not per-save-game data. They're managed separately via the
+  preference system (default.preferences.bin and user files).
 ```
 
 ## 5. SaveData vs EngineSnapshot Relationship
@@ -260,7 +263,6 @@ This document provides visual representations of data flow in the SteamRot engin
   SaveData                          EngineSnapshot
   ┌──────────────────────┐         ┌─────────────────────────┐
   │ SaveMetaData         │         │ optional<tick_number>   │
-  │ EngineConfig         │         │ optional<EngineConfig>  │
   │ EngineState          │         │ optional<EngineState>   │
   │ SceneManagerData     │         │ optional<SceneMgrData>  │
   │ SceneCollectionData  │         │ SceneCollectionData     │
@@ -272,6 +274,10 @@ This document provides visual representations of data flow in the SteamRot engin
                   │
      EngineSnapshot is superset with optional fields
      SaveData has required fields (non-optional)
+     
+  Note: EngineConfig NOT in either - user preferences and display
+  settings are global user settings, not per-save or per-snapshot.
+  Managed separately via preference system.
 ```
 
 ## 6. SaveData to TestData Conversion
@@ -333,11 +339,14 @@ This document provides visual representations of data flow in the SteamRot engin
             ┌───────────────┐       ┌─────────────────┐
             │   SaveData    │       │  EngineSnapshot │
             │   - Metadata  │       │  - Tick         │
-            │   - Config    │       │  - Config       │
             │   - State     │       │  - State        │
             │   - Scenes    │       │  - Scenes       │
             │   - Events    │       │  - Events       │
             └───────┬───────┘       └────────┬────────┘
+                    │                        │
+                    │ Note: EngineConfig     │ Note: EngineConfig
+                    │ NOT in SaveData -      │ NOT needed for
+                    │ user prefs are global  │ per-tick snapshots
                     │                        │
                     │ FlatBuffers            │ Convert
                     │ Serialize              │
@@ -373,8 +382,8 @@ This document provides visual representations of data flow in the SteamRot engin
 
 Phase 1: Core State Capture (High Priority)
 ┌────────────────────────────────────────────────────────────────┐
-│ 1. Extend SaveData struct with EngineConfig, EngineState,     │
-│    EventBus                                                     │
+│ 1. Extend SaveData struct with EngineState, EventBus          │
+│    (NOT EngineConfig - that's global user settings)           │
 │ 2. Update save_data.fbs FlatBuffers schema                     │
 │ 3. Update FlatbuffersSaveDataProvider                          │
 │ 4. Implement GameEngine::SaveGame() method                     │
@@ -394,7 +403,8 @@ Phase 2: Code Reuse (Medium Priority)
          ▼
 Phase 3: Testing Integration (Low Priority)
 ┌────────────────────────────────────────────────────────────────┐
-│ 1. Extend EngineSnapshot with optional engine fields           │
+│ 1. Extend EngineSnapshot with optional<EngineState>,          │
+│    optional<SceneManagerData> (NOT EngineConfig - global)     │
 │ 2. Implement ConvertSaveDataToTestData() utility               │
 │ 3. Add tools for test generation from gameplay                 │
 │ 4. Update TestEngine to use extended EngineSnapshot            │
@@ -406,15 +416,20 @@ Phase 3: Testing Integration (Low Priority)
 
 **Key Insights:**
 1. Entity import/export is already well-shared via `IEntityImporter` ✅
-2. SaveData is incomplete - missing engine-level state ❌
-3. TestEngine and SaveData have good separation of concerns ✅
+2. SaveData is incomplete - missing EngineState and EventBus ❌
+3. EngineConfig should NOT be in SaveData - it's global user settings ✅
+4. TestEngine and SaveData have good separation of concerns ✅
 4. State export logic is duplicated (opportunity for utilities) 📝
 
 **Recommended Changes:**
-1. Extend SaveData to capture complete engine state
+1. Extend SaveData to capture complete per-save state (EngineState, EventBus)
 2. Create shared `engine::export` utilities
 3. Align EngineSnapshot as superset of SaveData
 4. Enable SaveData → TestData conversion
+
+**Note:** EngineConfig (user preferences, display settings) should NOT be
+included in SaveData - these are global user settings managed separately
+via the preference system (default.preferences.bin and user files).
 
 **Benefits:**
 - Complete save/load functionality

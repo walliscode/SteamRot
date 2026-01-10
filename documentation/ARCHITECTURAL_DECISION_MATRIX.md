@@ -96,7 +96,7 @@ This document provides decision trees and matrices to guide architectural decisi
 | **Metadata** | SaveMetaData | TestMetaData | Optional tick_number | Different metadata types |
 | **Scene Data** | SceneCollectionData | Via starting_snapshot | SceneCollectionData | All use same structure ✅ |
 | **Entity Import** | Via IEntityImporter | Via IEntityImporter | Via IEntityImporter | Properly shared ✅ |
-| **EngineConfig** | ⚠️ Should have | N/A | ⚠️ Should have (optional) | Phase 1 recommendation |
+| **EngineConfig** | ⚪ Should NOT have | N/A | ⚪ Should NOT have | Global user settings, not per-save |
 | **EngineState** | ⚠️ Should have | N/A | ⚠️ Should have (optional) | Phase 1 recommendation |
 | **EventBus** | ⚠️ Should have | N/A | ✅ Has (optional) | Phase 1 for SaveData |
 | **SimulationData** | ❌ No | ✅ Has | N/A | Test-specific only |
@@ -108,6 +108,7 @@ This document provides decision trees and matrices to guide architectural decisi
 - ✅ Has this feature
 - ❌ Doesn't have (by design)
 - ⚠️ Should have but currently missing
+- ⚪ Should NOT have (handled separately)
 - N/A - Not applicable for this use case
 
 ## Matrix: When to Add New Data Type
@@ -119,7 +120,7 @@ This document provides decision trees and matrices to guide architectural decisi
 | Is it metadata about save/test? | Maybe (SaveMetaData) | Maybe (TestMetaData) | ❌ No | Consider new metadata type |
 | Is it simulation configuration? | ❌ No | ✅ Yes (SimulationData) | ❌ No | ❌ No |
 | Is it runtime engine state? | ✅ Yes | ❌ No | ✅ Yes (optional) | ❌ No |
-| Is it configuration? | ✅ Yes | ❌ No | ✅ Yes (optional) | ❌ No |
+| Is it user preferences/display settings? | ❌ No (global settings) | ❌ No | ❌ No | ❌ No (use preference system) |
 | Is it scene data? | ✅ SceneCollectionData | ✅ Via snapshot | ✅ SceneCollectionData | ❌ No (use existing) |
 | Is it something entirely new? | Consider carefully | Consider carefully | Consider carefully | ✅ Maybe |
 
@@ -226,9 +227,9 @@ snapshot.scene_collection_data = engine::export::ExportActiveScenes(...);
 // GOOD: Separate structures for different purposes
 struct SaveData {
   SaveMetaData meta_data;
-  EngineConfig config;
-  EngineState state;
+  EngineState state;          // Runtime state (IS per-save)
   SceneCollectionData scenes;
+  // Note: EngineConfig NOT here - user prefs are global, not per-save
 };
 
 struct TestData {
@@ -260,8 +261,8 @@ struct EngineSnapshot {
   std::optional<size_t> tick_number;
   SceneCollectionData scene_collection_data;
   std::optional<EventBus> global_event_bus;
-  std::optional<EngineConfig> engine_config;  // Tests can choose what to capture
-  std::optional<EngineState> engine_state;
+  std::optional<EngineState> engine_state;  // Tests can choose what to capture
+  // Note: EngineConfig NOT here - user prefs are global settings
 };
 ```
 
@@ -313,10 +314,9 @@ Before implementing new data-related functionality, ask:
 
 ### Phase 1: Core State Capture
 
-**Focus:** Making SaveData complete
+**Focus:** Making SaveData complete for per-save-game state
 
 **Checklist:**
-- [ ] Add EngineConfig to SaveData struct
 - [ ] Add EngineState to SaveData struct
 - [ ] Add optional<EventBus> to SaveData struct
 - [ ] Update save_data.fbs schema with new fields
@@ -326,6 +326,10 @@ Before implementing new data-related functionality, ask:
 - [ ] Implement GameEngine::LoadGame() method
 - [ ] Add tests for save/load functionality
 - [ ] Update documentation
+
+**Note:** Do NOT add EngineConfig to SaveData. User preferences and display
+settings are global user settings managed by the preference system, not
+per-save-game data.
 
 **Priority:** HIGH - Enables complete production save/load
 
@@ -339,12 +343,14 @@ Before implementing new data-related functionality, ask:
 - [ ] Implement ExportActiveScenes() function
 - [ ] Implement ExportEventBus() function
 - [ ] Implement ExportEngineState() function
-- [ ] Implement ExportEngineConfig() function
 - [ ] Implement ExportEngineSnapshot() function (composite)
 - [ ] Refactor TestEngine::CaptureSnapShot() to use utilities
 - [ ] Refactor GameEngine::SaveGame() to use utilities
 - [ ] Add tests for export utilities
 - [ ] Update documentation
+
+**Note:** ExportEngineConfig() NOT needed - user preferences are global
+settings, not per-save or per-snapshot data.
 
 **Priority:** MEDIUM - Improves maintainability
 
@@ -353,7 +359,6 @@ Before implementing new data-related functionality, ask:
 **Focus:** Enable test generation from saves
 
 **Checklist:**
-- [ ] Extend EngineSnapshot with optional<EngineConfig>
 - [ ] Extend EngineSnapshot with optional<EngineState>
 - [ ] Extend EngineSnapshot with optional<SceneManagerData>
 - [ ] Create SaveDataToTestDataConverter.h
@@ -363,6 +368,9 @@ Before implementing new data-related functionality, ask:
 - [ ] Add documentation for test generation workflow
 - [ ] Add examples of converting saves to tests
 - [ ] Update tests/harness/README.md
+
+**Note:** Do NOT add EngineConfig to EngineSnapshot - user preferences are
+global settings managed separately, not part of test state snapshots.
 
 **Priority:** LOW - Nice to have for advanced testing
 
