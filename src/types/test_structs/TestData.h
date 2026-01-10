@@ -12,7 +12,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "EngineSnapshot.h"
-#include "SceneLoadData.h"
 #include "SimulationData.h"
 #include "TestMetaData.h"
 #include <cstdint>
@@ -45,9 +44,9 @@ struct TestData {
   uint32_t number_of_ticks{1};
 
   /////////////////////////////////////////////////
-  /// @brief Starting state of the scene collection
+  /// @brief starting engine snapshot before simulation begins
   /////////////////////////////////////////////////
-  SceneCollectionData starting_scene_collection_data{};
+  EngineSnapshot starting_engine_snapshot{};
 
   /////////////////////////////////////////////////
   /// @brief Expected engine snapshots at a given tick
