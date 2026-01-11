@@ -154,30 +154,32 @@ table TestDataFbs {
 
 ### 1. SaveData Incompleteness
 
-**Issue:** `SaveData` doesn't capture full engine state
+**Issue:** `SaveData` doesn't use EngineSnapshot as common structure
 
-**Missing Components:**
-- `EngineState` (running, paused, subscriptions, performance metrics)
-- `EventBus` state (global events, waiting room events)
-- Potentially: AssetManager cache state, audio state, input state
+**Current State:**
+- SaveData has its own fields duplicating what EngineSnapshot provides
+- TestData already uses EngineSnapshot
+- Creates duplication and potential inconsistency
 
-**NOT Missing (Intentionally Separate):**
+**Better Approach:**
+- Use EngineSnapshot as the common structure for engine state
+- SaveData = SaveMetaData + EngineSnapshot
+- Single source of truth for "engine state at a point in time"
+
+**NOT Included (Intentionally Separate):**
 - `EngineConfig` (user preferences, display settings) - These are user-specific global settings, NOT per-save data. Already handled separately via default.preferences.bin and user preference files.
 
-**Impact:** Cannot fully restore game state from save file
-
-**Recommendation:** Extend SaveData to include:
+**Recommendation:** Refactor SaveData to use EngineSnapshot:
 ```cpp
 struct SaveData {
   SaveMetaData meta_data;
-  EngineState engine_state;          // Add this
-  SceneManagerData scene_manager_data;
-  SceneCollectionData scene_collection_data;
-  std::optional<EventBus> event_bus; // Add this
+  EngineSnapshot snapshot;  // Common structure with TestData!
   
-  // Note: EngineConfig NOT included - user preferences are global,
-  // not per-save. They're loaded from default.preferences.bin and
-  // user-specific preference files at engine startup.
+  // EngineSnapshot will contain all engine state:
+  // - SceneCollectionData
+  // - EventBus (non-optional, empty if unused)
+  // - std::optional<EngineState>
+  // - std::optional<SceneManagerData>
 };
 ```
 
@@ -278,14 +280,18 @@ Then use in both contexts:
 // src/types/core/SaveData.h
 struct SaveData {
   SaveMetaData meta_data;
-  EngineState engine_state;          // NEW: Runtime state, subscriptions
-  SceneManagerData scene_manager_data;
-  SceneCollectionData scene_collection_data;
-  std::optional<EventBus> event_bus; // NEW: Global event state
+  EngineSnapshot snapshot;  // NEW: Use EngineSnapshot as common structure!
   
-  // Note: EngineConfig NOT included here - user preferences and display
-  // settings are global user settings, not per-save game data. They're
-  // managed separately via the user preferences system
+  // EngineSnapshot contains:
+  // - SceneCollectionData scene_collection_data
+  // - EventBus global_event_bus (non-optional, empty if unused)
+  // - std::optional<EngineState> engine_state
+  // - std::optional<SceneManagerData> scene_manager_data
+  // - std::optional<size_t> tick_number (not used for saves)
+  
+  // Note: EngineConfig NOT included in EngineSnapshot - user preferences
+  // and display settings are global user settings, not per-save game data.
+  // They're managed separately via the user preferences system
   // (default.preferences.bin and user-specific preference files).
 };
 ```
@@ -293,18 +299,21 @@ struct SaveData {
 **FlatBuffers Schema:**
 ```fbs
 // src/types/flatbuffers/configuration/save_data.fbs
-include "../engine/engine_state.fbs";
-include "../events/event_bus_data.fbs";
+include "../engine/engine_snapshot.fbs";
 
 table SaveDataFbs {
   save_meta_data: SaveMetaDataFbs;
-  engine_state: EngineStateFbs;
-  scene_collection_data: SceneCollectionDataFbs;
-  event_bus: EventBusDataFbs;
+  snapshot: EngineSnapshotFbs;  // Use EngineSnapshot as common structure!
   
-  // Note: EngineConfig NOT included - user preferences/display settings
-  // are global user settings, not per-save. Handled separately via
-  // default.preferences.bin and user preference system.
+  // EngineSnapshotFbs contains all engine state:
+  // - scene_collection_data
+  // - global_event_bus (vector, empty if unused)
+  // - engine_state (optional)
+  // - scene_manager_data (optional)
+  
+  // Note: EngineConfig NOT included in EngineSnapshot - user preferences/
+  // display settings are global user settings, not per-save. Handled 
+  // separately via default.preferences.bin and user preference system.
 }
 ```
 
@@ -367,17 +376,15 @@ ExportEngineSnapshot(const Engine& engine,
 std::expected<SaveData, FailInfo> GameEngine::SaveGame() {
   SaveData save_data;
   
-  // Export using shared utilities
-  auto scenes = engine::export::ExportActiveScenes(m_scene_manager, 
-                                                   m_engine_resources.event_handler);
-  if (!scenes.has_value()) return std::unexpected(scenes.error());
+  // Export to EngineSnapshot using shared utilities
+  auto snapshot_result = engine::export::ExportEngineSnapshot(*this);
+  if (!snapshot_result.has_value()) return std::unexpected(snapshot_result.error());
   
-  save_data.scene_collection_data = std::move(scenes.value());
-  save_data.event_bus = engine::export::ExportEventBus(m_engine_resources.event_handler);
-  save_data.engine_state = engine::export::ExportEngineState(m_engine_state);
+  save_data.snapshot = std::move(snapshot_result.value());
   
-  // Note: EngineConfig NOT saved here - user preferences and display settings
-  // are global user settings managed separately by the preference system.
+  // SaveData is just metadata + snapshot - clean and simple!
+  // Note: EngineConfig NOT in snapshot - user preferences and display 
+  // settings are global user settings managed separately by the preference system.
   
   return save_data;
 }
@@ -451,9 +458,9 @@ struct EngineSnapshot {
   // Existing fields
   std::optional<size_t> tick_number;
   SceneCollectionData scene_collection_data;
-  std::optional<EventBus> global_event_bus;
+  EventBus global_event_bus;  // Non-optional, empty if unused
   
-  // NEW: Add these for completeness in testing
+  // NEW: Add these for completeness
   std::optional<EngineState> engine_state;
   std::optional<SceneManagerData> scene_manager_data;
   
@@ -462,9 +469,13 @@ struct EngineSnapshot {
   // Tests that need to verify preference-dependent behavior should set
   // up preferences in test fixtures, not in snapshots.
   
+  // Vector fields like EventBus are non-optional but can be empty.
+  // This is simpler than using std::optional for collections.
+  
   bool HasData() const {
-    return global_event_bus.has_value() || 
-           engine_state.has_value();
+    return !global_event_bus.empty() || 
+           engine_state.has_value() ||
+           scene_manager_data.has_value();
   }
 };
 ```
@@ -475,45 +486,37 @@ struct EngineSnapshot {
 - SaveData export can reuse EngineSnapshot export logic
 - Clear superset relationship: EngineSnapshot ⊇ SaveData data
 
-### Recommendation 6: SaveData as Subset of EngineSnapshot
+### Recommendation 6: SaveData Contains EngineSnapshot
 
-**Goal:** Define clear conceptual relationship
+**Goal:** Use EngineSnapshot as common structure for engine state
 
 **Concept:**
 ```
-SaveData = EngineSnapshot with:
-  - Required SaveMetaData (instead of TestMetaData)
-  - All engine state fields populated (non-optional)
-  - Single point-in-time (no tick_number needed)
+SaveData = SaveMetaData + EngineSnapshot
+Both SaveData and TestData use EngineSnapshot to represent engine state
 ```
 
-**Implementation Option A: SaveData contains EngineSnapshot**
+**Implementation (RECOMMENDED):**
 ```cpp
 struct SaveData {
   SaveMetaData meta_data;
-  EngineSnapshot snapshot; // Contains all engine state
+  EngineSnapshot snapshot; // Common structure for engine state!
 };
 ```
 
-**Implementation Option B: Keep separate (RECOMMENDED)**
-```cpp
-struct SaveData {
-  SaveMetaData meta_data;
-  EngineState engine_state;
-  SceneManagerData scene_manager_data;
-  SceneCollectionData scene_collection_data;
-  std::optional<EventBus> event_bus;
-  
-  // Note: EngineConfig NOT included - user preferences and display
-  // settings are global user settings, not per-save data.
-};
-```
+**This approach is better because:**
+- Single source of truth for "engine state at a point in time"
+- Eliminates duplication between SaveData and EngineSnapshot
+- SaveData is conceptually just "metadata + snapshot"
+- TestData already uses EngineSnapshot this way
+- Export utilities work the same for both (export to EngineSnapshot)
+- Simpler architecture with less code to maintain
 
-**Recommendation:** Option B (keep separate) because:
-- Clearer field ownership and naming
-- More explicit about what's required for saves
-- Easier schema evolution
-- EngineSnapshot stays test-focused with optional fields
+**Handling Required vs Optional Fields:**
+- EngineSnapshot uses optional fields for testing flexibility
+- SaveData validation enforces that required fields are populated at save/load time
+- Vector fields (like EventBus) can be non-optional empty vectors instead of optional
+- This keeps the structure flexible while ensuring complete saves
 
 ### Recommendation 7: Enable SaveData → TestData Conversion
 
@@ -595,22 +598,29 @@ ConvertSaveDataToTestData(const SaveData& save_data,
 
 ### 📝 Recommended Improvements
 
-1. **Extend SaveData** - Add EngineState, EventBus for complete per-save state (NOT EngineConfig - that's global user settings)
-2. **Shared Export Utilities** - Create `engine::export` namespace for code reuse
-3. **Extend EngineSnapshot** - Add optional EngineState, SceneManagerData for testing (NOT EngineConfig - global settings)
-4. **SaveData ↔ TestData Conversion** - Enable test generation from saves
+1. **Refactor SaveData** - Use EngineSnapshot as common structure (NOT separate fields)
+2. **Extend EngineSnapshot** - Add EngineState, SceneManagerData (NOT EngineConfig - global settings)
+3. **Shared Export Utilities** - Create `engine::export` namespace exporting to EngineSnapshot
+4. **Vector Fields Non-Optional** - Use empty vectors instead of optional (simpler for collections like EventBus)
+5. **SaveData ↔ TestData Conversion** - Enable test generation from saves
 
 ### 🎯 Implementation Priority
 
 **Phase 1: Core State Capture** (High Priority)
-- Add EngineState, EventBus to SaveData (NOT EngineConfig - that's global user settings)
+- Refactor SaveData to contain EngineSnapshot instead of separate fields
+- Extend EngineSnapshot with EngineState, SceneManagerData (NOT EngineConfig - global settings)
+- Make EventBus non-optional (empty vector if unused)
 - Update FlatBuffers schema
 - Update FlatbuffersSaveDataProvider
 
 **Phase 2: Code Reuse** (Medium Priority)
-- Create `engine::export` utility namespace
-- Refactor TestEngine::CaptureSnapShot to use utilities
-- Implement GameEngine::SaveGame using utilities
+- Create `engine::export` namespace with utilities:
+  - `ExportEngineSnapshot()` - Main export function
+  - `ExportActiveScenes()`
+  - `ExportEventBus()`
+  - `ExportEngineState()`
+- Both TestEngine::CaptureSnapShot and GameEngine::SaveGame export to EngineSnapshot
+- Single source of truth for state export
 
 **Phase 3: Testing Integration** (Low Priority)
 - Implement SaveData → TestData conversion utility

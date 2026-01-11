@@ -74,22 +74,26 @@ This directory contains comprehensive documentation analyzing the SteamRot data 
 3. **Clear Boundaries** - Production (SaveData) and Testing (TestData) are properly separated
 
 ### ❌ Current Limitations
-1. **SaveData Incomplete** - Missing EngineState, EventBus (NOT EngineConfig - that's global user settings)
+1. **SaveData Doesn't Use EngineSnapshot** - Separate fields create duplication with EngineSnapshot structure
 2. **Code Duplication** - State export logic duplicated between GameEngine and TestEngine
-3. **EngineSnapshot Misalignment** - Not fully aligned with SaveData capabilities
+3. **No Common Structure** - SaveData and TestData both need engine state but don't share structure
 
 ### 📝 Recommended Path Forward
 
 **Phase 1: Core State Capture** (High Priority)
-- Extend SaveData to include EngineState, EventBus (NOT EngineConfig - that's global user settings)
+- Refactor SaveData to contain EngineSnapshot (NOT separate fields)
+- Extend EngineSnapshot with EngineState, SceneManagerData (NOT EngineConfig - global settings)
+- Make EventBus non-optional (empty vector if unused)
 - Update FlatBuffers schema (save_data.fbs)
 - Update FlatbuffersSaveDataProvider
 - Implement complete GameEngine save/load
 
 **Phase 2: Code Reuse** (Medium Priority)
 - Create `engine::export` namespace with shared utilities
+- Implement ExportEngineSnapshot() as main export function
 - Refactor TestEngine::CaptureSnapShot to use utilities
 - Implement GameEngine::SaveGame using utilities
+- Both export to EngineSnapshot - single source of truth
 - Eliminate code duplication
 
 **Phase 3: Testing Integration** (Low Priority)
@@ -107,14 +111,15 @@ This directory contains comprehensive documentation analyzing the SteamRot data 
 
 1. **SaveData for Production** ✅
    - Yes, SaveData should be used for save/load in production
-   - Currently incomplete (missing EngineState and EventBus)
-   - Needs extension to capture complete per-save state (Phase 1 recommendation)
-   - Note: EngineConfig should NOT be in SaveData - user preferences are global settings
+   - Should contain EngineSnapshot as common structure (NOT separate fields)
+   - EngineSnapshot provides single source of truth for engine state
+   - Note: EngineConfig should NOT be in EngineSnapshot - user preferences are global settings
 
-2. **SaveData for Exporting** ⚠️
-   - SaveData can be used for exporting, but it's currently incomplete
-   - Recommended: Create shared export utilities that both SaveData and TestData can use
-   - This approach maximizes code reuse without forcing unification
+2. **SaveData for Exporting** ✅
+   - SaveData should contain EngineSnapshot as common structure
+   - Recommended: Create shared export utilities that export to EngineSnapshot
+   - Both SaveData and TestData use EngineSnapshot - single source of truth
+   - This approach maximizes code reuse and eliminates duplication
 
 3. **TestData Independence** ✅
    - TestData should remain independent with test-specific features
@@ -122,9 +127,9 @@ This directory contains comprehensive documentation analyzing the SteamRot data 
    - TestEngine is already easy to use and well-designed
 
 4. **Overlap Management** ✅
-   - Entity import/export is already properly shared via IEntityImporter
-   - Recommended: Create `engine::export` utilities for additional sharing
-   - This eliminates duplication while maintaining clear boundaries
+   - Entity import/export properly shared via `IEntityImporter` ✅
+   - SaveData should contain EngineSnapshot (common structure) ✅
+   - **Solution:** Create `engine::export` utilities that export to EngineSnapshot (Phase 2)
 
 5. **Workflow Mimicry** 📝
    - Workflows should share implementation (export utilities) not interfaces

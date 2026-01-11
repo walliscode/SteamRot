@@ -263,21 +263,25 @@ This document provides visual representations of data flow in the SteamRot engin
   SaveData                          EngineSnapshot
   ┌──────────────────────┐         ┌─────────────────────────┐
   │ SaveMetaData         │         │ optional<tick_number>   │
-  │ EngineState          │         │ optional<EngineState>   │
-  │ SceneManagerData     │         │ optional<SceneMgrData>  │
-  │ SceneCollectionData  │         │ SceneCollectionData     │
-  │ optional<EventBus>   │         │ optional<EventBus>      │
+  │ EngineSnapshot ─────────────▶  │ SceneCollectionData     │
+  │                      │         │ EventBus (non-optional) │
+  │                      │         │ optional<EngineState>   │
+  │                      │         │ optional<SceneMgrData>  │
   └──────────────────────┘         └─────────────────────────┘
           │                                 │
-          └────────Complete Overlap────────┘
-                  ▲
-                  │
-     EngineSnapshot is superset with optional fields
-     SaveData has required fields (non-optional)
+          └───SaveData CONTAINS─────────────┘
+             EngineSnapshot as common structure!
      
-  Note: EngineConfig NOT in either - user preferences and display
+  SaveData = SaveMetaData + EngineSnapshot
+  TestData also uses EngineSnapshot
+  Single source of truth for "engine state at a point in time"
+  
+  Note: EngineConfig NOT in EngineSnapshot - user preferences and display
   settings are global user settings, not per-save or per-snapshot.
   Managed separately via preference system.
+  
+  Note: Vector fields like EventBus are non-optional (empty if unused)
+  instead of optional - simpler for collections.
 ```
 
 ## 6. SaveData to TestData Conversion
@@ -338,16 +342,15 @@ This document provides visual representations of data flow in the SteamRot engin
                     ▼                        ▼
             ┌───────────────┐       ┌─────────────────┐
             │   SaveData    │       │  EngineSnapshot │
-            │   - Metadata  │       │  - Tick         │
-            │   - State     │       │  - State        │
-            │   - Scenes    │       │  - Scenes       │
-            │   - Events    │       │  - Events       │
-            └───────┬───────┘       └────────┬────────┘
-                    │                        │
-                    │ Note: EngineConfig     │ Note: EngineConfig
-                    │ NOT in SaveData -      │ NOT needed for
-                    │ user prefs are global  │ per-tick snapshots
-                    │                        │
+            │   - Metadata  │       │  - Scenes       │
+            │   - Snapshot ─┼──────▶│  - Events       │
+            │               │       │  - State        │
+            └───────┬───────┘       └─────────────────┘
+                    │                        
+                    │ Note: SaveData contains EngineSnapshot
+                    │ as common structure. EventBus is
+                    │ non-optional (empty if unused).
+                    │
                     │ FlatBuffers            │ Convert
                     │ Serialize              │
                     ▼                        ▼
@@ -382,22 +385,27 @@ This document provides visual representations of data flow in the SteamRot engin
 
 Phase 1: Core State Capture (High Priority)
 ┌────────────────────────────────────────────────────────────────┐
-│ 1. Extend SaveData struct with EngineState, EventBus          │
+│ 1. Refactor SaveData to contain EngineSnapshot instead of     │
+│    separate fields                                             │
+│ 2. Extend EngineSnapshot with EngineState, SceneManagerData   │
 │    (NOT EngineConfig - that's global user settings)           │
-│ 2. Update save_data.fbs FlatBuffers schema                     │
-│ 3. Update FlatbuffersSaveDataProvider                          │
-│ 4. Implement GameEngine::SaveGame() method                     │
-│ 5. Implement GameEngine::LoadGame() method                     │
+│ 3. Make EventBus non-optional (empty vector if unused)        │
+│ 4. Update save_data.fbs FlatBuffers schema                     │
+│ 5. Update FlatbuffersSaveDataProvider                          │
+│ 6. Implement GameEngine::SaveGame() method                     │
+│ 7. Implement GameEngine::LoadGame() method                     │
 └────────────────────────────────────────────────────────────────┘
          │
          ▼
 Phase 2: Code Reuse (Medium Priority)
 ┌────────────────────────────────────────────────────────────────┐
 │ 1. Create engine::export namespace with utility functions      │
-│ 2. Implement ExportActiveScenes(), ExportEventBus(), etc.      │
-│ 3. Refactor TestEngine::CaptureSnapShot() to use utilities     │
-│ 4. Refactor GameEngine::SaveGame() to use utilities            │
-│ 5. Add tests for export utilities                              │
+│ 2. Implement ExportEngineSnapshot() as main export function    │
+│ 3. Implement ExportActiveScenes(), ExportEventBus(), etc.      │
+│ 4. Refactor TestEngine::CaptureSnapShot() to use utilities     │
+│ 5. Refactor GameEngine::SaveGame() to use utilities            │
+│ 6. Both export to EngineSnapshot - single source of truth      │
+│ 7. Add tests for export utilities                              │
 └────────────────────────────────────────────────────────────────┘
          │
          ▼
@@ -416,20 +424,25 @@ Phase 3: Testing Integration (Low Priority)
 
 **Key Insights:**
 1. Entity import/export is already well-shared via `IEntityImporter` ✅
-2. SaveData is incomplete - missing EngineState and EventBus ❌
-3. EngineConfig should NOT be in SaveData - it's global user settings ✅
-4. TestEngine and SaveData have good separation of concerns ✅
-4. State export logic is duplicated (opportunity for utilities) 📝
+2. SaveData should use EngineSnapshot as common structure ✅
+3. EngineSnapshot already used by TestData - single source of truth ✅
+4. EngineConfig should NOT be in EngineSnapshot - it's global user settings ✅
+5. Vector fields (EventBus) should be non-optional, just empty if unused ✅
+6. State export logic should export to EngineSnapshot for both engines 📝
 
 **Recommended Changes:**
-1. Extend SaveData to capture complete per-save state (EngineState, EventBus)
-2. Create shared `engine::export` utilities
-3. Align EngineSnapshot as superset of SaveData
-4. Enable SaveData → TestData conversion
+1. Refactor SaveData to contain EngineSnapshot (common structure)
+2. Extend EngineSnapshot with EngineState, SceneManagerData
+3. Make vector fields like EventBus non-optional (empty if unused)
+4. Create shared `engine::export` utilities that export to EngineSnapshot
+5. Enable SaveData → TestData conversion
 
 **Note:** EngineConfig (user preferences, display settings) should NOT be
-included in SaveData - these are global user settings managed separately
+included in EngineSnapshot - these are global user settings managed separately
 via the preference system (default.preferences.bin and user files).
+
+**Architecture:** SaveData = SaveMetaData + EngineSnapshot. Both production
+and testing use EngineSnapshot as the canonical representation of engine state.
 
 **Benefits:**
 - Complete save/load functionality

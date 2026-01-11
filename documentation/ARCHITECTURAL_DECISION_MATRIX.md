@@ -94,15 +94,16 @@ This document provides decision trees and matrices to guide architectural decisi
 |---------|----------|----------|----------------|-------|
 | **Purpose** | Production save/load | Testing validation | State capture | - |
 | **Metadata** | SaveMetaData | TestMetaData | Optional tick_number | Different metadata types |
-| **Scene Data** | SceneCollectionData | Via starting_snapshot | SceneCollectionData | All use same structure ✅ |
+| **Structure** | Contains EngineSnapshot | Uses EngineSnapshot | Core state structure | Common structure! |
+| **Scene Data** | Via EngineSnapshot | Via EngineSnapshot | SceneCollectionData | Shared via EngineSnapshot |
 | **Entity Import** | Via IEntityImporter | Via IEntityImporter | Via IEntityImporter | Properly shared ✅ |
 | **EngineConfig** | ⚪ Should NOT have | N/A | ⚪ Should NOT have | Global user settings, not per-save |
-| **EngineState** | ⚠️ Should have | N/A | ⚠️ Should have (optional) | Phase 1 recommendation |
-| **EventBus** | ⚠️ Should have | N/A | ✅ Has (optional) | Phase 1 for SaveData |
+| **EngineState** | Via EngineSnapshot | Via EngineSnapshot | ⚠️ Should add (optional) | Phase 1 recommendation |
+| **EventBus** | Via EngineSnapshot | Via EngineSnapshot | ✅ Has (non-optional) | Empty vector if unused |
 | **SimulationData** | ❌ No | ✅ Has | N/A | Test-specific only |
-| **Multiple Snapshots** | ❌ No (single point) | ✅ Has (per tick) | N/A | Test-specific only |
+| **Multiple Snapshots** | ❌ No (single) | ✅ Has (per tick) | N/A | Test-specific only |
 | **Tick Execution** | N/A | ✅ Has | N/A | Test-specific only |
-| **Field Optionality** | Required fields | Required fields | Optional fields | EngineSnapshot is flexible |
+| **Field Optionality** | Validation enforces | Optional fields | Optional fields | Flexible for testing |
 
 **Legend:**
 - ✅ Has this feature
@@ -110,6 +111,10 @@ This document provides decision trees and matrices to guide architectural decisi
 - ⚠️ Should have but currently missing
 - ⚪ Should NOT have (handled separately)
 - N/A - Not applicable for this use case
+
+**Key Insight:** SaveData contains EngineSnapshot, TestData uses EngineSnapshot.
+Both production and testing use EngineSnapshot as the canonical representation
+of engine state at a point in time.
 
 ## Matrix: When to Add New Data Type
 
@@ -224,19 +229,28 @@ snapshot.scene_collection_data = engine::export::ExportActiveScenes(...);
 ### ✅ Do: Keep Separate Structures
 
 ```cpp
-// GOOD: Separate structures for different purposes
+// GOOD: SaveData contains EngineSnapshot as common structure
 struct SaveData {
   SaveMetaData meta_data;
-  EngineState state;          // Runtime state (IS per-save)
-  SceneCollectionData scenes;
-  // Note: EngineConfig NOT here - user prefs are global, not per-save
+  EngineSnapshot snapshot;  // Common structure!
+  // No separate fields - everything in EngineSnapshot
 };
 
 struct TestData {
   TestMetaData meta_data;
   SimulationData simulation;
-  EngineSnapshot starting_snapshot;
-  std::map<size_t, EngineSnapshot> expected_snapshots;
+  EngineSnapshot starting_snapshot;  // Same structure
+  std::map<size_t, EngineSnapshot> expected_snapshots;  // Same structure
+};
+
+// EngineSnapshot is the canonical representation of engine state
+struct EngineSnapshot {
+  std::optional<size_t> tick_number;
+  SceneCollectionData scene_collection_data;
+  EventBus global_event_bus;  // Non-optional, empty if unused
+  std::optional<EngineState> engine_state;
+  std::optional<SceneManagerData> scene_manager_data;
+  // Note: EngineConfig NOT here - user prefs are global
 };
 ```
 
@@ -256,13 +270,14 @@ struct SceneLoadData {
 ### ✅ Do: Make EngineSnapshot Flexible
 
 ```cpp
-// GOOD: Optional fields for flexibility
+// GOOD: Vector fields non-optional, just empty if unused
 struct EngineSnapshot {
   std::optional<size_t> tick_number;
   SceneCollectionData scene_collection_data;
-  std::optional<EventBus> global_event_bus;
-  std::optional<EngineState> engine_state;  // Tests can choose what to capture
-  // Note: EngineConfig NOT here - user prefs are global settings
+  EventBus global_event_bus;  // Non-optional! Empty vector if no events
+  std::optional<EngineState> engine_state;
+  // Note: Vectors/collections are simpler as non-optional empty containers
+  // than using std::optional<vector<T>>
 };
 ```
 
@@ -314,24 +329,25 @@ Before implementing new data-related functionality, ask:
 
 ### Phase 1: Core State Capture
 
-**Focus:** Making SaveData complete for per-save-game state
+**Focus:** Use EngineSnapshot as common structure for engine state
 
 **Checklist:**
-- [ ] Add EngineState to SaveData struct
-- [ ] Add optional<EventBus> to SaveData struct
-- [ ] Update save_data.fbs schema with new fields
-- [ ] Update FlatbuffersSaveDataProvider::ProvideSaveData()
-- [ ] Create configuration methods for new fields
+- [ ] Refactor SaveData to contain EngineSnapshot (not separate fields)
+- [ ] Extend EngineSnapshot with optional<EngineState>
+- [ ] Extend EngineSnapshot with optional<SceneManagerData>
+- [ ] Make EventBus non-optional (empty vector if unused)
+- [ ] Update save_data.fbs schema to use EngineSnapshotFbs
+- [ ] Update FlatbuffersSaveDataProvider
 - [ ] Implement GameEngine::SaveGame() method
 - [ ] Implement GameEngine::LoadGame() method
 - [ ] Add tests for save/load functionality
 - [ ] Update documentation
 
-**Note:** Do NOT add EngineConfig to SaveData. User preferences and display
-settings are global user settings managed by the preference system, not
-per-save-game data.
+**Note:** Do NOT add EngineConfig to EngineSnapshot. User preferences and 
+display settings are global user settings managed by the preference system, 
+not per-save or per-snapshot data.
 
-**Priority:** HIGH - Enables complete production save/load
+**Priority:** HIGH - Creates single source of truth for engine state
 
 ### Phase 2: Code Reuse
 
@@ -340,19 +356,19 @@ per-save-game data.
 **Checklist:**
 - [ ] Create src/engine/engine_export.h header
 - [ ] Create src/engine/engine_export.cpp implementation
+- [ ] Implement ExportEngineSnapshot() as main export function
 - [ ] Implement ExportActiveScenes() function
 - [ ] Implement ExportEventBus() function
 - [ ] Implement ExportEngineState() function
-- [ ] Implement ExportEngineSnapshot() function (composite)
-- [ ] Refactor TestEngine::CaptureSnapShot() to use utilities
-- [ ] Refactor GameEngine::SaveGame() to use utilities
+- [ ] Refactor TestEngine::CaptureSnapShot() to use ExportEngineSnapshot()
+- [ ] Refactor GameEngine::SaveGame() to use ExportEngineSnapshot()
 - [ ] Add tests for export utilities
 - [ ] Update documentation
 
-**Note:** ExportEngineConfig() NOT needed - user preferences are global
-settings, not per-save or per-snapshot data.
+**Note:** All export utilities export to EngineSnapshot - single source of
+truth for engine state representation.
 
-**Priority:** MEDIUM - Improves maintainability
+**Priority:** MEDIUM - Improves maintainability, eliminates duplication
 
 ### Phase 3: Testing Integration
 

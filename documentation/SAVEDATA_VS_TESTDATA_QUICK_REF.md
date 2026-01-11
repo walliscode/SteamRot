@@ -38,17 +38,26 @@
 
 **What it has:**
 - ✅ SaveMetaData
-- ✅ SceneManagerData
 - ✅ SceneCollectionData (via IEntityImporter)
 
-**What it's missing:**
-- ❌ EngineState (running, paused, subscriptions)
-- ❌ EventBus state (global events)
+**What it should have:**
+- ✅ EngineSnapshot as common structure (contains all engine state)
+
+**Current limitation:**
+- ❌ SaveData has separate fields instead of using EngineSnapshot
+- ❌ Creates duplication with EngineSnapshot structure
 
 **What it should NOT have (intentionally separate):**
 - ⚪ EngineConfig (user preferences, display settings) - These are global user settings, NOT per-save data. Already handled separately via default.preferences.bin and user preference system.
 
-**Recommendation:** Extend SaveData to include EngineState and EventBus (see Phase 1 in architecture analysis). Do NOT add EngineConfig.
+**Recommendation:** Refactor SaveData to contain EngineSnapshot (see Phase 1 in architecture analysis).
+
+```cpp
+struct SaveData {
+  SaveMetaData meta_data;
+  EngineSnapshot snapshot;  // Common structure!
+};
+```
 
 ### TestData Status: ✅ Complete
 
@@ -264,6 +273,12 @@ if (test_data_result.has_value()) {
 
 ### Q: Why isn't EngineConfig in SaveData?
 **A:** EngineConfig contains user preferences (master volume, language) and display settings (framerate, fullscreen, vsync) that are global user settings, not per-save-game state. These settings are stored separately in preference files (default.preferences.bin and user-specific files) and loaded at engine startup. A user's volume preferences should apply across all save games, not be different per save.
+
+### Q: Should SaveData use EngineSnapshot?
+**A:** Yes! SaveData should contain EngineSnapshot as a common structure. Both SaveData and TestData need to represent "engine state at a point in time", so using EngineSnapshot eliminates duplication and creates a single source of truth. SaveData = SaveMetaData + EngineSnapshot.
+
+### Q: Should vector fields like EventBus be optional?
+**A:** No. For collection types (vectors, maps), use non-optional fields that are simply empty if unused. This is simpler than using `std::optional` for collections. So EventBus should be `EventBus` (empty vector if no events) rather than `std::optional<EventBus>`.
 
 ## See Also
 
