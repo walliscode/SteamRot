@@ -7,7 +7,7 @@ paths.cpp
 add_library(data_providers
   FlatbuffersEngineDataProvider.cpp
   FlatbuffersSceneManagerDataProvider.cpp
-  FlatbuffersSceneLoadDataProvider.cpp
+  FlatbuffersSceneDataProvider.cpp
   FlatbuffersSubscriberViewer.cpp
   FlatbuffersUIStyleDataProvider.cpp
   FlatbuffersSaveDataProvider.cpp

@@ -19,13 +19,13 @@
 
 namespace steamrot {
 
-class ISceneLoadDataProvider {
+class ISceneDataProvider {
 
 public:
   /////////////////////////////////////////////////
   /// @brief Virtual destructor.
   /////////////////////////////////////////////////
-  virtual ~ISceneLoadDataProvider() = default;
+  virtual ~ISceneDataProvider() = default;
 
   /////////////////////////////////////////////////
   /// @brief Provides pointer to SceneData object.

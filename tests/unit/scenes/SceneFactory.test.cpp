@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////
 #include "SceneFactory.h"
 #include "CraftingScene.h"
-#include "FlatbuffersSceneLoadDataProvider.h"
+#include "FlatbuffersSceneDataProvider.h"
 #include "TestFixture.h"
 #include "TitleScene.h"
 #include "entity_memory.h"
@@ -114,7 +114,7 @@ TEST_CASE("SceneFactory::CreateSceneFromSceneData creates Scene with valid "
   REQUIRE(entity_1->c_grimoire_machina()->fragments()->size() == 2);
 
   // Create SceneData
-  steamrot::FlatbuffersSceneLoadDataProvider scene_data_provider(
+  steamrot::FlatbuffersSceneDataProvider scene_data_provider(
       fixture.GetGameContext().event_handler);
   auto get_scene_data_result =
       scene_data_provider.ProvideSceneDataFromData(scene_data_fbs);

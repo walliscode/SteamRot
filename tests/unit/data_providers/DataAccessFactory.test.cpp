@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////
 #include "DataAccessFactory.h"
 #include "FlatbuffersEngineDataProvider.h"
-#include "FlatbuffersSceneLoadDataProvider.h"
+#include "FlatbuffersSceneDataProvider.h"
 #include "FlatbuffersSceneManagerDataProvider.h"
 #include "TestFixture.h"
 #include <catch2/catch_test_macros.hpp>
@@ -66,7 +66,7 @@ TEST_CASE("DataAccessFactory Initialization", "[DataAccessFactory]") {
 
     // cast to flatbuffers concrete type and check not null
     auto flatbuffers_scene_provider =
-        dynamic_cast<steamrot::FlatbuffersSceneLoadDataProvider *>(
+        dynamic_cast<steamrot::FlatbuffersSceneDataProvider *>(
             scene_provider);
     REQUIRE(flatbuffers_scene_provider != nullptr);
   }

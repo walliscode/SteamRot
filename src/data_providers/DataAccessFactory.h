@@ -16,7 +16,7 @@
 #include "FailInfo.h"
 #include "IEngineDataProvider.h"
 #include "ISceneConfigurator.h"
-#include "ISceneLoadDataProvider.h"
+#include "ISceneDataProvider.h"
 #include "ISceneManagerDataProvider.h"
 #include <expected>
 
@@ -48,7 +48,7 @@ private:
   /////////////////////////////////////////////////
   /// @brief Instance of the Scene Data Provider for the factory/game
   /////////////////////////////////////////////////
-  std::unique_ptr<ISceneLoadDataProvider> m_scene_data_provider{nullptr};
+  std::unique_ptr<ISceneDataProvider> m_scene_data_provider{nullptr};
 
   /////////////////////////////////////////////////
   /// @brief Instance of the Scene Configurator for the factory/game
@@ -89,7 +89,7 @@ public:
   /////////////////////////////////////////////////
   /// @brief Returns a raw pointer to the Scene Data Provider
   /////////////////////////////////////////////////
-  std::expected<ISceneLoadDataProvider *, FailInfo> GetSceneDataProvider();
+  std::expected<ISceneDataProvider *, FailInfo> GetSceneDataProvider();
 
   /////////////////////////////////////////////////
   /// @brief Returns a raw pointer to the Scene Configurator

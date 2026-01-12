@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "FlatbuffersSceneLoadDataProvider.h"
+#include "FlatbuffersSceneDataProvider.h"
 #include "FlatbuffersDataLoader.h"
 #include "FlatbuffersEntityImporter.h"
 #include "SceneData.h"
@@ -17,13 +17,13 @@
 
 namespace steamrot {
 /////////////////////////////////////////////////
-FlatbuffersSceneLoadDataProvider::FlatbuffersSceneLoadDataProvider(
+FlatbuffersSceneDataProvider::FlatbuffersSceneDataProvider(
     EventHandler &event_handler)
     : m_event_handler(event_handler) {}
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-FlatbuffersSceneLoadDataProvider::ConfigureSceneInfo(
+FlatbuffersSceneDataProvider::ConfigureSceneInfo(
     SceneInfo &info, const SceneInfoFbs *fb_info) const {
   if (!fb_info) {
     return std::unexpected(
@@ -54,7 +54,7 @@ FlatbuffersSceneLoadDataProvider::ConfigureSceneInfo(
 }
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-FlatbuffersSceneLoadDataProvider::ConfigureSceneResourcesConfig(
+FlatbuffersSceneDataProvider::ConfigureSceneResourcesConfig(
     SceneResourcesConfig &config,
     const SceneResourcesConfigFbs *fb_config) const {
   if (!fb_config) {
@@ -84,7 +84,7 @@ FlatbuffersSceneLoadDataProvider::ConfigureSceneResourcesConfig(
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-FlatbuffersSceneLoadDataProvider::ConfigureSceneDataFromData(
+FlatbuffersSceneDataProvider::ConfigureSceneDataFromData(
     SceneData &scene_data, const SceneDataFbs *fb_data) const {
   if (!fb_data) {
     return std::unexpected(
@@ -118,7 +118,7 @@ FlatbuffersSceneLoadDataProvider::ConfigureSceneDataFromData(
 
 /////////////////////////////////////////////////
 std::expected<SceneData, FailInfo>
-FlatbuffersSceneLoadDataProvider::ProvideDefaultSceneData(
+FlatbuffersSceneDataProvider::ProvideDefaultSceneData(
     const SceneType scene_type) const {
 
   // Load SceneData based on scene type
@@ -134,7 +134,7 @@ FlatbuffersSceneLoadDataProvider::ProvideDefaultSceneData(
 }
 /////////////////////////////////////////////////
 std::expected<SceneData, FailInfo>
-FlatbuffersSceneLoadDataProvider::ProvideSceneDataFromData(
+FlatbuffersSceneDataProvider::ProvideSceneDataFromData(
     const SceneDataFbs *fb_data) const {
 
   // create SceneData to return

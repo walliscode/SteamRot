@@ -9,7 +9,7 @@
 #include "DataAccessFactory.h"
 #include "FailInfo.h"
 #include "FlatbuffersEngineDataProvider.h"
-#include "FlatbuffersSceneLoadDataProvider.h"
+#include "FlatbuffersSceneDataProvider.h"
 #include "FlatbuffersSceneManagerDataProvider.h"
 #include <expected>
 
@@ -50,7 +50,7 @@ DataAccessFactory::SetFlatbuffersDataProviders() {
 
   // set ISceneDataProvider
   m_scene_data_provider =
-      std::make_unique<FlatbuffersSceneLoadDataProvider>(m_event_handler);
+      std::make_unique<FlatbuffersSceneDataProvider>(m_event_handler);
   if (!m_scene_data_provider) {
     return std::unexpected(
         FailInfo{FailMode::NullPointer,
@@ -118,7 +118,7 @@ DataAccessFactory::GetSceneManagerDataProvider() {
 }
 
 /////////////////////////////////////////////////
-std::expected<ISceneLoadDataProvider *, FailInfo>
+std::expected<ISceneDataProvider *, FailInfo>
 DataAccessFactory::GetSceneDataProvider() {
   if (!m_scene_data_provider) {
     return std::unexpected(
