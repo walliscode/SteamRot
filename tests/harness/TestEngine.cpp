@@ -59,6 +59,9 @@ std::expected<std::monostate, FailInfo> TestEngine::StoreEngineSnapShot() {
   }
   EngineSnapshot &snapshot = snapshot_result.value();
 
+  // set the tick_number for this snapshot
+  snapshot.tick_number = m_current_tick;
+
   // cycle through SceneCollectionData and check the entities are stored as a
   // std::shared_ptr<EntityMemoryPool>
   for (auto &scene_data : snapshot.scene_collection_data) {
