@@ -1,7 +1,38 @@
+include "../events/event_bus_data.fbs";
+include "../scenes/scene_manager_data.fbs";
+include "../scenes/scene_collection_data.fbs";
 
+namespace steamrot;
 
+/////////////////////////////////////////////////
+/// @brief FlatBuffers schema for EngineSnapshot
+///
+/// This table captures the complete state of the engine at a specific tick.
+/// All fields are optional to allow selective comparison in tests - tests can
+/// verify only the aspects they care about.
+///
+/// **Extensibility by Design:**
+/// - Add new optional fields for any engine-level data structure
+/// - Tests only populate/compare fields relevant to their scenario
+/// - No breaking changes when adding new snapshot capabilities
+/////////////////////////////////////////////////
 table EngineSnapshotFbs {
-
+  /// @brief Optional tick number for context
+  tick_number: uint64;
+  
+  /// @brief Global event bus state
+  ///
+  /// Captures all events in the global event bus at this tick.
+  /// Useful for testing event lifetime, propagation, and processing.
+  global_event_bus: EventBusData;
+  
+  /// @brief Scene manager state data
+  ///
+  /// Contains all data needed to save and restore the state of the SceneManager.
+  scene_manager_data: SceneManagerDataFbs;
+  
+  /// @brief SceneData for all scenes in the collection
+  scene_collection_data: SceneCollectionDataFbs;
 }
 
 root_type EngineSnapshotFbs;

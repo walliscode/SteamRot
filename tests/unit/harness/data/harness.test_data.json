@@ -1,6 +1,10 @@
 {
   "meta_data": {
-    "test_name": "Test loading json to TestDataFbs"
+    "test_name": "Test loading json to TestDataFbs",
+    "test_description": "Validates that all fields in TestDataFbs can be loaded from JSON including engine snapshots",
+    "tags": ["unit", "flatbuffers", "test_data"],
+    "will_pass": true,
+    "version": 1
   },
   "simulation_data": {
     "description": "This is a test simulation data for unit testing.",
@@ -10,5 +14,27 @@
       }
     ]
   },
-  "num_ticks": 37
+  "num_ticks": 37,
+  "starting_engine_state": {
+    "running": true,
+    "paused": false,
+    "quit_requested": false
+  },
+  "starting_engine_snapshot": {
+    "tick_number": 0
+  },
+  "expected_engine_snapshots": [
+    {
+      "tick": 10,
+      "snapshot": {
+        "tick_number": 10
+      }
+    },
+    {
+      "tick": 37,
+      "snapshot": {
+        "tick_number": 37
+      }
+    }
+  ]
 }
