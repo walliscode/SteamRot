@@ -259,3 +259,33 @@ TEST_CASE("EngineSnapshot captures tick_number correctly",
   REQUIRE(snapshot3.tick_number.has_value());
   REQUIRE(snapshot3.tick_number.value() == 3);
 }
+
+TEST_CASE("EngineSnapshot optional fields are not set by default",
+          "[unit][TestEngine][EngineSnapshot]") {
+  // Arrange
+  steamrot::TestData test_data;
+  test_data.number_of_ticks = 1;
+
+  // Act
+  steamrot::tests::TestEngine engine(test_data);
+  auto result = engine.RunGame();
+  REQUIRE(result.has_value());
+
+  // Assert - Verify optional fields that aren't captured by default
+  const auto &data_bank = engine.GetDataBank();
+  const auto &snapshot = data_bank.at(1);
+
+  // tick_number should be set (we added this)
+  REQUIRE(snapshot.tick_number.has_value());
+
+  // global_event_bus is optional and not captured by default
+  // This is by design - only capture it when needed for event testing
+  REQUIRE(!snapshot.global_event_bus.has_value());
+
+  // scene_manager_data is optional and not captured by default
+  // This is by design - only capture it when needed for save/load testing
+  REQUIRE(!snapshot.scene_manager_data.has_value());
+
+  // scene_collection_data is always captured (not optional)
+  REQUIRE(!snapshot.scene_collection_data.empty());
+}
