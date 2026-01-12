@@ -97,11 +97,14 @@ public:
 ### 3. Enhanced SceneData
 ```cpp
 struct SceneData {
-  // Existing
-  std::unique_ptr<IEntityImporter> entity_importer;
+  // Existing fields
   
-  // NEW: Native storage
-  std::optional<EntityMemoryPool> entity_data;
+  // NEW: Variant for entity source (mutually exclusive)
+  std::variant<
+    std::monostate,
+    std::unique_ptr<IEntityImporter>,
+    EntityMemoryPool
+  > entity_source;
 };
 ```
 
@@ -210,7 +213,7 @@ When ready to implement, follow this order:
 1. Read `documentation/architecture/QUICK_REFERENCE.md`
 2. Implement `NativeEntityImporter` class
 3. Implement `NativeEntityExporter` class
-4. Add `entity_data` field to `SceneData`
+4. Update `SceneData` with `entity_source` variant
 5. Write unit tests for both classes
 6. Create snapshot utilities
 7. Update TestEngine integration

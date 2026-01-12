@@ -90,18 +90,42 @@ struct SceneData {
   SceneResourcesConfig scene_resources_config;
   AssetConfig scene_asset_config;
   
-  // For import (format-agnostic)
-  std::unique_ptr<IEntityImporter> entity_importer{nullptr};
-  
-  // NEW: For native workflows (testing, snapshots)
-  std::optional<EntityMemoryPool> entity_data;
+  // NEW: Variant for entity source (can be importer OR native data, not both)
+  std::variant<
+    std::monostate,                        // Empty/uninitialized
+    std::unique_ptr<IEntityImporter>,      // Format-specific importer
+    EntityMemoryPool                       // Native data
+  > entity_source;
 };
 ```
 
+**Why a variant?**
+- **Mutual exclusivity**: A SceneData can only have one entity source at a time
+- **Type safety**: Compiler enforces correct usage
+- **Clear intent**: No ambiguity about which source is active
+- **Memory efficiency**: Only stores what's actually being used
+
+**Usage patterns:**
+```cpp
+// Option A: Use a format-specific importer
+scene_data.entity_source = std::make_unique<FlatbuffersEntityImporter>(...);
+
+// Option B: Use native data directly
+scene_data.entity_source = CreateTestEntities();
+
+// Check which type is active
+if (std::holds_alternative<EntityMemoryPool>(scene_data.entity_source)) {
+  auto& emp = std::get<EntityMemoryPool>(scene_data.entity_source);
+  // Use emp...
+}
+```
+
 Now you can:
-- **Import from FlatBuffers**: Use `entity_importer`
-- **Import from native**: Set `entity_data`, create NativeEntityImporter
-- **Export to native**: Use NativeEntityExporter, store in `entity_data`
+- **Import from FlatBuffers**: Set `entity_source` to a FlatbuffersEntityImporter
+- **Import from native**: Set `entity_source` to native EntityMemoryPool
+- **Export to native**: Use NativeEntityExporter to populate EntityMemoryPool
+
+The variant ensures mutual exclusivity - a SceneData can only have one entity source at a time.
 
 ## Complete Workflow Examples
 
@@ -111,15 +135,19 @@ Now you can:
 // 1. Create test entities programmatically
 EntityMemoryPool test_entities = CreateTestEntities();
 
-// 2. Store in TestData
+// 2. Store in TestData using variant
 TestData test_data;
-test_data.starting_engine_snapshot.scene_collection_data[0].entity_data = test_entities;
+test_data.starting_engine_snapshot.scene_collection_data[0].entity_source = 
+    std::move(test_entities);
 
-// 3. Import into engine
-NativeEntityImporter importer(
-    event_handler, 
-    *test_data.starting_engine_snapshot.scene_collection_data[0].entity_data);
-importer.ImportEntities(test_engine.GetScene().GetEntityMemoryPool());
+// 3. Import into engine (check variant and create importer if needed)
+auto& entity_source = test_data.starting_engine_snapshot.scene_collection_data[0].entity_source;
+if (std::holds_alternative<EntityMemoryPool>(entity_source)) {
+  NativeEntityImporter importer(
+      event_handler, 
+      std::get<EntityMemoryPool>(entity_source));
+  importer.ImportEntities(test_engine.GetScene().GetEntityMemoryPool());
+}
 
 // 4. Run test
 test_engine.Run(10); // 10 ticks
@@ -145,7 +173,7 @@ save_data.meta_data = CreateMetaData();
 for (auto& scene : engine.GetScenes()) {
   SceneData scene_data;
   auto emp = exporter.ExportToNativeStructure(scene.GetEntityMemoryPool());
-  scene_data.entity_data = emp.value();
+  scene_data.entity_source = emp.value();
   save_data.engine_snapshot.scene_collection_data.push_back(scene_data);
 }
 

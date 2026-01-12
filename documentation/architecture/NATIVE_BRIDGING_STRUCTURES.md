@@ -185,12 +185,12 @@ NativeEntityExporter exporter;
 auto emp_snapshot = exporter.ExportToNativeStructure(scene.GetEntityMemoryPool());
 
 // Store in EngineSnapshot
-engine_snapshot.scene_collection_data[0].entity_data = emp_snapshot.value();
+engine_snapshot.scene_collection_data[0].entity_source = emp_snapshot.value();
 ```
 
 ### 3. Enhanced SceneData
 
-Add optional EntityMemoryPool storage for native workflows.
+Add variant for entity source to support both format-specific importers and native data.
 
 ```cpp
 struct SceneData {
@@ -198,12 +198,35 @@ struct SceneData {
   SceneResourcesConfig scene_resources_config;
   AssetConfig scene_asset_config;
   
-  // Format-agnostic entity source (for import)
-  std::unique_ptr<IEntityImporter> entity_importer{nullptr};
-  
-  // Optional: Direct entity data (for native workflows)
-  std::optional<EntityMemoryPool> entity_data;
+  // Variant for entity source (importer OR native data, mutually exclusive)
+  std::variant<
+    std::monostate,                        // Empty/uninitialized
+    std::unique_ptr<IEntityImporter>,      // Format-specific importer
+    EntityMemoryPool                       // Native data
+  > entity_source;
 };
+```
+
+**Design Rationale:**
+
+Using `std::variant` instead of separate optional fields provides:
+- **Mutual Exclusivity**: Only one entity source can be active at a time
+- **Type Safety**: Compiler prevents invalid state (can't have both importer and native data)
+- **Clear Semantics**: Explicit about which source is being used
+- **Memory Efficiency**: No wasted space for unused alternatives
+
+**Usage:**
+```cpp
+// Check and use the variant
+if (std::holds_alternative<EntityMemoryPool>(scene_data.entity_source)) {
+  // Has native data
+  auto& emp = std::get<EntityMemoryPool>(scene_data.entity_source);
+  NativeEntityImporter importer(event_handler, emp);
+  importer.ImportEntities(target_emp);
+} else if (auto* importer_ptr = std::get_if<std::unique_ptr<IEntityImporter>>(&scene_data.entity_source)) {
+  // Has importer
+  (*importer_ptr)->ImportEntities(target_emp);
+}
 ```
 
 ### 4. Snapshot Utilities
@@ -273,14 +296,17 @@ snapshot::RestoreEngineState(engine, save_data.value().engine_snapshot);
 ```cpp
 // 1. Create test data in native structures
 TestData test_data;
-test_data.starting_engine_snapshot.scene_collection_data[0].entity_data = 
+test_data.starting_engine_snapshot.scene_collection_data[0].entity_source = 
     CreateTestEntities();
 
 // 2. Configure engine from native structures
-NativeEntityImporter importer(
-    event_handler, 
-    *test_data.starting_engine_snapshot.scene_collection_data[0].entity_data);
-importer.ImportEntities(scene.GetEntityMemoryPool());
+auto& entity_source = test_data.starting_engine_snapshot.scene_collection_data[0].entity_source;
+if (std::holds_alternative<EntityMemoryPool>(entity_source)) {
+  NativeEntityImporter importer(
+      event_handler, 
+      std::get<EntityMemoryPool>(entity_source));
+  importer.ImportEntities(scene.GetEntityMemoryPool());
+}
 
 // 3. Run simulation
 test_engine.Run();

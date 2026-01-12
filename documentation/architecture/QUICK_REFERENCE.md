@@ -62,10 +62,13 @@ struct SceneData {
   SceneInfo scene_info;
   SceneResourcesConfig scene_resources_config;
   AssetConfig scene_asset_config;
-  std::unique_ptr<IEntityImporter> entity_importer{nullptr};
   
-  // NEW
-  std::optional<EntityMemoryPool> entity_data;
+  // NEW: Variant for entity source (mutually exclusive)
+  std::variant<
+    std::monostate,                        // Empty/uninitialized
+    std::unique_ptr<IEntityImporter>,      // Format-specific importer
+    EntityMemoryPool                       // Native data
+  > entity_source;
 };
 ```
 
@@ -91,9 +94,17 @@ save_data.engine_snapshot.scene_collection_data[0].entity_data = snapshot.value(
 NativeEntityExporter exporter;
 auto emp_copy = exporter.ExportToNativeStructure(engine_emp);
 
-// Import
-NativeEntityImporter importer(event_handler, emp_copy.value());
-importer.ImportEntities(test_emp);
+// Store in variant
+SceneData scene_data;
+scene_data.entity_source = emp_copy.value();
+
+// Import (check variant type first)
+if (std::holds_alternative<EntityMemoryPool>(scene_data.entity_source)) {
+  NativeEntityImporter importer(
+      event_handler, 
+      std::get<EntityMemoryPool>(scene_data.entity_source));
+  importer.ImportEntities(test_emp);
+}
 ```
 
 ## Snapshot Utilities (To Implement)
