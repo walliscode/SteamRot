@@ -12,7 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "EventPacket.h"
-#include "SceneLoadData.h"
+#include "SceneData.h"
 #include "SceneManagerData.h"
 #include <optional>
 #include <vector>
@@ -78,7 +78,7 @@ struct EngineSnapshot {
   std::optional<SceneManagerData> scene_manager_data;
 
   /////////////////////////////////////////////////
-  /// @brief SceneLoadData for all scenes in the collection
+  /// @brief SceneData for all scenes in the collection
   /////////////////////////////////////////////////
   SceneCollectionData scene_collection_data;
 };

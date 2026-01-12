@@ -102,7 +102,7 @@ SceneManager::AddScenesFromSceneCollectionData(
 
     // create and configure scene from data
     auto scene_creation_result =
-        scene_factory.CreateSceneFromSceneLoadData(scene_data);
+        scene_factory.CreateSceneFromSceneData(scene_data);
     if (!scene_creation_result.has_value()) {
       return std::unexpected(scene_creation_result.error());
     }

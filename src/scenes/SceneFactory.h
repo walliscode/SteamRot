@@ -44,13 +44,12 @@ public:
   CreateEmptyScene(const SceneType scene_type);
 
   /////////////////////////////////////////////////
-  /// @brief Create and configure a scene from SceneLoadData
+  /// @brief Create and configure a scene from SceneData
   ///
-  /// @param scene_load_data Data containing both scene config and entity
-  /// importer
+  /// @param scene_data Data containing scene config and entity importer
   /////////////////////////////////////////////////
   std::expected<std::unique_ptr<Scene>, FailInfo>
-  CreateSceneFromSceneLoadData(const SceneLoadData &scene_load_data);
+  CreateSceneFromSceneData(const SceneData &scene_data);
 
   /////////////////////////////////////////////////
   /// @brief Create and configure a scene from default data

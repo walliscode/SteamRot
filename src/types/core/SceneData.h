@@ -12,8 +12,10 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "AssetConfig.h"
+#include "IEntityImporter.h"
 #include "SceneInfo.h"
 #include "SceneResourcesConfig.h"
+#include <memory>
 
 namespace steamrot {
 /////////////////////////////////////////////////
@@ -38,6 +40,13 @@ struct SceneData {
   /// @brief Contains data needed to load all assets for this Scene
   /////////////////////////////////////////////////
   AssetConfig scene_asset_config;
+
+  /////////////////////////////////////////////////
+  /// @brief Entity importer (wraps entity data source)
+  /////////////////////////////////////////////////
+  std::unique_ptr<IEntityImporter> entity_importer{nullptr};
 };
+
+using SceneCollectionData = std::vector<SceneData>;
 
 } // namespace steamrot

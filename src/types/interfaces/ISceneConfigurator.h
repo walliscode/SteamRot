@@ -44,6 +44,16 @@ public:
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo>
   ConfigureScene(Scene &scene, const SceneData &scene_data);
+  
+  /////////////////////////////////////////////////
+  /// @brief Import entities into the scene from the entity importer
+  ///
+  /// @param scene Scene to import entities into
+  /// @param scene_data SceneData containing entity importer
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ImportEntities(Scene &scene, const SceneData &scene_data);
+  
   /////////////////////////////////////////////////
   /// @brief Virtual function to configure SceneInfo struct
   ///
