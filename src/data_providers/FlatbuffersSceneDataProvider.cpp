@@ -141,8 +141,7 @@ FlatbuffersSceneDataProvider::ProvideSceneDataFromData(
   SceneData scene_data;
 
   // configure SceneData
-  auto configure_data_result =
-      ConfigureSceneDataFromData(scene_data, fb_data);
+  auto configure_data_result = ConfigureSceneDataFromData(scene_data, fb_data);
   if (!configure_data_result)
     return std::unexpected(configure_data_result.error());
 
@@ -153,7 +152,7 @@ FlatbuffersSceneDataProvider::ProvideSceneDataFromData(
     return std::unexpected(FailInfo{
         FailMode::NullPointer, "Failed to create FlatbuffersEntityImporter"});
   }
-  scene_data.entity_importer = std::move(entity_importer);
+  scene_data.entity_transport = std::move(entity_importer);
 
   // return the SceneData
   return scene_data;

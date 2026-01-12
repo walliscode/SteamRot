@@ -50,15 +50,26 @@ ISceneConfigurator::ConfigureScene(Scene &scene, const SceneData &scene_data) {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 ISceneConfigurator::ImportEntities(Scene &scene, const SceneData &scene_data) {
-  // Check if entity importer exists
-  if (!scene_data.entity_importer) {
+
+  // check if entity importer variant holds type we want
+  if (!std::holds_alternative<std::unique_ptr<IEntityImporter>>(
+          scene_data.entity_transport)) {
     return std::unexpected(
-        FailInfo{FailMode::NullPointer, "Entity importer is null in SceneData"});
+        FailInfo{FailMode::VariantTypeMismatch,
+                 "Entity importer variant does not hold IEntityImporter type"});
+  }
+  // Check if entity importer exists
+  if (std::get<std::unique_ptr<IEntityImporter>>(scene_data.entity_transport) ==
+      nullptr) {
+    return std::unexpected(
+        FailInfo{FailMode::NullPointer, "Entity importer pointer is null"});
   }
 
   // Import entities using the importer
-  auto import_result = scene_data.entity_importer->ImportEntities(
-      scene.GetSceneContext().scene_entities);
+  auto &importer =
+      std::get<std::unique_ptr<IEntityImporter>>(scene_data.entity_transport);
+  auto import_result =
+      importer->ImportEntities(scene.GetEntityManager().GetEntityMemoryPool());
   if (!import_result.has_value())
     return std::unexpected(import_result.error());
 

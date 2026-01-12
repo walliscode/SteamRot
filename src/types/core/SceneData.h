@@ -44,7 +44,7 @@ struct SceneData {
   /////////////////////////////////////////////////
   /// @brief Entity importer (wraps entity data source)
   /////////////////////////////////////////////////
-  std::unique_ptr<IEntityImporter> entity_importer{nullptr};
+  std::variant<std::unique_ptr<IEntityImporter>> entity_transport;
 };
 
 using SceneCollectionData = std::vector<SceneData>;
