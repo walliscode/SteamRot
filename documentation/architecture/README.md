@@ -67,8 +67,8 @@ Runtime Engine (EntityMemoryPool)
 ### Key Classes
 
 - **NativeEntityImporter**: Import from native EntityMemoryPool → runtime EMP
-- **NativeEntityExporter**: Export from runtime EMP → native EntityMemoryPool
-- **SceneData**: Enhanced with optional `entity_data` field
+- **NativeEntityExporter**: Export from runtime EMP → native EntityMemoryPool (configurator pattern)
+- **SceneData**: Enhanced with `entity_source` variant (importer/exporter/native)
 - **Snapshot utilities**: Helper functions for capture/restore/diff
 
 ## Implementation Status
@@ -76,9 +76,11 @@ Runtime Engine (EntityMemoryPool)
 - [x] Architecture designed and documented
 - [x] Solution approach selected and justified
 - [x] Documentation complete with examples
+- [x] Updated to use variant pattern
+- [x] Updated exporter to use configurator pattern
 - [ ] NativeEntityImporter implementation
 - [ ] NativeEntityExporter implementation
-- [ ] SceneData enhancement
+- [ ] SceneData variant enhancement
 - [ ] Snapshot utilities
 - [ ] Tests
 - [ ] Integration

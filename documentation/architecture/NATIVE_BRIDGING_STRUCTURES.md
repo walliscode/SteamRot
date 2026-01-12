@@ -163,34 +163,52 @@ importer.ImportEntities(scene.GetEntityMemoryPool());
 
 ### 2. NativeEntityExporter
 
-Exports runtime EMP to a native C++ structure.
+Exports runtime EMP to a native C++ structure using configurator pattern.
 
 ```cpp
 class NativeEntityExporter : public IEntityExporter {
+private:
+  EventHandler &m_event_handler;
+
 public:
+  NativeEntityExporter(EventHandler &event_handler);
+
   // Export to binary (existing interface)
   std::expected<std::unique_ptr<uint8_t[]>, FailInfo>
   ExportEntities(const EntityMemoryPool &emp, size_t &out_size) override;
   
-  // Export to native structure (new method)
-  std::expected<EntityMemoryPool, FailInfo>
-  ExportToNativeStructure(const EntityMemoryPool &source_emp);
+  // Export by configuring target EMP (avoids type erasure)
+  std::expected<std::monostate, FailInfo>
+  ExportToEntityMemoryPool(const EntityMemoryPool &source_emp,
+                           EntityMemoryPool &target_emp);
 };
 ```
+
+**Design Rationale:**
+- **Configurator Pattern**: Takes reference to populate, not return value
+- **No Type Erasure**: Concrete implementation knows exact types
+- **Consistent**: Matches existing configurator patterns (IEntityConfigurator)
+- **Flexible**: Can be extended to configure different target types
 
 **Usage:**
 ```cpp
 // Export runtime state
-NativeEntityExporter exporter;
-auto emp_snapshot = exporter.ExportToNativeStructure(scene.GetEntityMemoryPool());
+NativeEntityExporter exporter(event_handler);
+EntityMemoryPool snapshot_emp;  // Create target
+
+auto result = exporter.ExportToEntityMemoryPool(
+    scene.GetEntityMemoryPool(),  // source (const)
+    snapshot_emp);                // target (mutable)
 
 // Store in EngineSnapshot
-engine_snapshot.scene_collection_data[0].entity_source = emp_snapshot.value();
+if (result.has_value()) {
+  engine_snapshot.scene_collection_data[0].entity_source = std::move(snapshot_emp);
+}
 ```
 
 ### 3. Enhanced SceneData
 
-Add variant for entity source to support both format-specific importers and native data.
+Add variant for entity source to support importers, exporters, and native data.
 
 ```cpp
 struct SceneData {
@@ -198,10 +216,11 @@ struct SceneData {
   SceneResourcesConfig scene_resources_config;
   AssetConfig scene_asset_config;
   
-  // Variant for entity source (importer OR native data, mutually exclusive)
+  // Variant for entity operation (mutually exclusive)
   std::variant<
     std::monostate,                        // Empty/uninitialized
     std::unique_ptr<IEntityImporter>,      // Format-specific importer
+    std::unique_ptr<IEntityExporter>,      // Format-specific exporter
     EntityMemoryPool                       // Native data
   > entity_source;
 };
@@ -209,23 +228,28 @@ struct SceneData {
 
 **Design Rationale:**
 
-Using `std::variant` instead of separate optional fields provides:
-- **Mutual Exclusivity**: Only one entity source can be active at a time
-- **Type Safety**: Compiler prevents invalid state (can't have both importer and native data)
-- **Clear Semantics**: Explicit about which source is being used
+Using `std::variant` with all three options provides:
+- **Mutual Exclusivity**: Only one operation (import/export/native) at a time
+- **Type Safety**: Compiler prevents invalid state combinations
+- **Symmetry**: Both import and export workflows supported
+- **Clear Semantics**: Explicit about what operation SceneData represents
 - **Memory Efficiency**: No wasted space for unused alternatives
 
 **Usage:**
 ```cpp
 // Check and use the variant
 if (std::holds_alternative<EntityMemoryPool>(scene_data.entity_source)) {
-  // Has native data
+  // Has native data (can be used for both import and export)
   auto& emp = std::get<EntityMemoryPool>(scene_data.entity_source);
   NativeEntityImporter importer(event_handler, emp);
   importer.ImportEntities(target_emp);
 } else if (auto* importer_ptr = std::get_if<std::unique_ptr<IEntityImporter>>(&scene_data.entity_source)) {
-  // Has importer
+  // Has format-specific importer
   (*importer_ptr)->ImportEntities(target_emp);
+} else if (auto* exporter_ptr = std::get_if<std::unique_ptr<IEntityExporter>>(&scene_data.entity_source)) {
+  // Has format-specific exporter
+  size_t size;
+  auto binary = (*exporter_ptr)->ExportEntities(source_emp, size);
 }
 ```
 

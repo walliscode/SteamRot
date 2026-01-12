@@ -47,12 +47,17 @@ public:
 ### NativeEntityExporter
 ```cpp
 class NativeEntityExporter : public IEntityExporter {
+private:
+  EventHandler &m_event_handler;
 public:
+  NativeEntityExporter(EventHandler &event_handler);
+  
   std::expected<std::unique_ptr<uint8_t[]>, FailInfo>
   ExportEntities(const EntityMemoryPool &emp, size_t &out_size) override;
   
-  std::expected<EntityMemoryPool, FailInfo>
-  ExportToNativeStructure(const EntityMemoryPool &source_emp);
+  std::expected<std::monostate, FailInfo>
+  ExportToEntityMemoryPool(const EntityMemoryPool &source_emp,
+                           EntityMemoryPool &target_emp);
 };
 ```
 
@@ -63,10 +68,11 @@ struct SceneData {
   SceneResourcesConfig scene_resources_config;
   AssetConfig scene_asset_config;
   
-  // NEW: Variant for entity source (mutually exclusive)
+  // NEW: Variant for entity operation (mutually exclusive)
   std::variant<
     std::monostate,                        // Empty/uninitialized
     std::unique_ptr<IEntityImporter>,      // Format-specific importer
+    std::unique_ptr<IEntityExporter>,      // Format-specific exporter
     EntityMemoryPool                       // Native data
   > entity_source;
 };
@@ -83,25 +89,33 @@ importer.ImportEntities(scene.GetEntityMemoryPool());
 
 ### 2. Snapshotting (Engine → Native)
 ```cpp
-NativeEntityExporter exporter;
-auto snapshot = exporter.ExportToNativeStructure(scene.GetEntityMemoryPool());
-save_data.engine_snapshot.scene_collection_data[0].entity_data = snapshot.value();
+NativeEntityExporter exporter(event_handler);
+EntityMemoryPool snapshot;
+auto result = exporter.ExportToEntityMemoryPool(scene.GetEntityMemoryPool(), snapshot);
+if (result.has_value()) {
+  save_data.engine_snapshot.scene_collection_data[0].entity_source = std::move(snapshot);
+}
 ```
 
 ### 3. Round-Trip (Export → Import)
 ```cpp
 // Export
-NativeEntityExporter exporter;
-auto emp_copy = exporter.ExportToNativeStructure(engine_emp);
+NativeEntityExporter exporter(event_handler);
+EntityMemoryPool emp_copy;
+exporter.ExportToEntityMemoryPool(engine_emp, emp_copy);
 
 // Store in variant
 SceneData scene_data;
-scene_data.entity_source = emp_copy.value();
+scene_data.entity_source = std::move(emp_copy);
 
 // Import (check variant type first)
 if (std::holds_alternative<EntityMemoryPool>(scene_data.entity_source)) {
   NativeEntityImporter importer(
       event_handler, 
+      std::get<EntityMemoryPool>(scene_data.entity_source));
+  importer.ImportEntities(test_emp);
+}
+``` 
       std::get<EntityMemoryPool>(scene_data.entity_source));
   importer.ImportEntities(test_emp);
 }
@@ -141,8 +155,8 @@ CreateImporterFromSnapshot(EventHandler& handler, const SceneData& data);
 ## Implementation Order
 
 1. NativeEntityImporter class
-2. NativeEntityExporter class  
-3. Add entity_data to SceneData
+2. NativeEntityExporter class (configurator pattern)
+3. Update SceneData with entity_source variant
 4. Write tests
 5. Create snapshot utilities
 6. Update TestEngine integration

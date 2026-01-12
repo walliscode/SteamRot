@@ -88,9 +88,9 @@ public:
 ### 2. NativeEntityExporter
 ```cpp
 class NativeEntityExporter : public IEntityExporter {
-public:
-  std::expected<EntityMemoryPool, FailInfo>
-  ExportToNativeStructure(const EntityMemoryPool &source_emp);
+  std::expected<std::monostate, FailInfo>
+  ExportToEntityMemoryPool(const EntityMemoryPool &source_emp,
+                           EntityMemoryPool &target_emp);
 };
 ```
 
@@ -99,10 +99,11 @@ public:
 struct SceneData {
   // Existing fields
   
-  // NEW: Variant for entity source (mutually exclusive)
+  // NEW: Variant for entity operation (mutually exclusive)
   std::variant<
     std::monostate,
     std::unique_ptr<IEntityImporter>,
+    std::unique_ptr<IEntityExporter>,
     EntityMemoryPool
   > entity_source;
 };
