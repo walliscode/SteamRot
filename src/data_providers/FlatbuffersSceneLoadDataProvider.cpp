@@ -10,7 +10,6 @@
 #include "FlatbuffersDataLoader.h"
 #include "FlatbuffersEntityImporter.h"
 #include "SceneData.h"
-#include "SceneLoadData.h"
 #include "asset_config_factory.h"
 #include "scene_data_generated.h"
 #include <expected>
@@ -118,8 +117,8 @@ FlatbuffersSceneLoadDataProvider::ConfigureSceneDataFromData(
 }
 
 /////////////////////////////////////////////////
-std::expected<SceneLoadData, FailInfo>
-FlatbuffersSceneLoadDataProvider::ProvideDefaultSceneLoadData(
+std::expected<SceneData, FailInfo>
+FlatbuffersSceneLoadDataProvider::ProvideDefaultSceneData(
     const SceneType scene_type) const {
 
   // Load SceneData based on scene type
@@ -130,20 +129,20 @@ FlatbuffersSceneLoadDataProvider::ProvideDefaultSceneLoadData(
   }
   const SceneDataFbs &fb_data = *load_data_result.value();
 
-  // Pass to ProvideSceneLoadDataFromData to create SceneLoadData
-  return ProvideSceneLoadDataFromData(&fb_data);
+  // Pass to ProvideSceneDataFromData to create SceneData
+  return ProvideSceneDataFromData(&fb_data);
 }
 /////////////////////////////////////////////////
-std::expected<SceneLoadData, FailInfo>
-FlatbuffersSceneLoadDataProvider::ProvideSceneLoadDataFromData(
+std::expected<SceneData, FailInfo>
+FlatbuffersSceneLoadDataProvider::ProvideSceneDataFromData(
     const SceneDataFbs *fb_data) const {
 
-  // create SceneLoadData to return
-  SceneLoadData scene_load_data;
+  // create SceneData to return
+  SceneData scene_data;
 
   // configure SceneData
   auto configure_data_result =
-      ConfigureSceneDataFromData(scene_load_data.scene_data, fb_data);
+      ConfigureSceneDataFromData(scene_data, fb_data);
   if (!configure_data_result)
     return std::unexpected(configure_data_result.error());
 
@@ -154,10 +153,10 @@ FlatbuffersSceneLoadDataProvider::ProvideSceneLoadDataFromData(
     return std::unexpected(FailInfo{
         FailMode::NullPointer, "Failed to create FlatbuffersEntityImporter"});
   }
-  scene_load_data.entity_importer = std::move(entity_importer);
+  scene_data.entity_importer = std::move(entity_importer);
 
-  // return the SceneLoadData
-  return scene_load_data;
+  // return the SceneData
+  return scene_data;
 }
 
 } // namespace steamrot

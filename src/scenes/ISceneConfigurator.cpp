@@ -29,6 +29,11 @@ ISceneConfigurator::ConfigureScene(Scene &scene, const SceneData &scene_data) {
   if (!config_result.has_value())
     return std::unexpected(config_result.error());
 
+  // Import entities from entity importer
+  auto import_result = ImportEntities(scene, scene_data);
+  if (!import_result.has_value())
+    return std::unexpected(import_result.error());
+
   // Configure LogicMap
   auto logic_result = ConfigureLogicMap(scene);
   if (!logic_result.has_value())
@@ -38,6 +43,24 @@ ISceneConfigurator::ConfigureScene(Scene &scene, const SceneData &scene_data) {
   auto generate_result = scene.GetEntityManager().GenerateAllArchetypes();
   if (!generate_result.has_value())
     return std::unexpected(generate_result.error());
+
+  return std::monostate();
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ISceneConfigurator::ImportEntities(Scene &scene, const SceneData &scene_data) {
+  // Check if entity importer exists
+  if (!scene_data.entity_importer) {
+    return std::unexpected(
+        FailInfo{FailMode::NullPointer, "Entity importer is null in SceneData"});
+  }
+
+  // Import entities using the importer
+  auto import_result = scene_data.entity_importer->ImportEntities(
+      scene.GetSceneContext().scene_entities);
+  if (!import_result.has_value())
+    return std::unexpected(import_result.error());
 
   return std::monostate();
 }

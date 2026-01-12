@@ -73,8 +73,8 @@ TEST_CASE("SceneFactory::CreateEmptyScene creates CraftingScene",
           nullptr);
 }
 
-TEST_CASE("SceneFactory::CreateSceneFromSceneLoadData creates Scene with valid "
-          "SceneLoadData",
+TEST_CASE("SceneFactory::CreateSceneFromSceneData creates Scene with valid "
+          "SceneData",
           "[SceneFactory]") {
 
   // set up test fixture
@@ -113,26 +113,25 @@ TEST_CASE("SceneFactory::CreateSceneFromSceneLoadData creates Scene with valid "
   REQUIRE(entity_1->c_grimoire_machina()->fragments() != nullptr);
   REQUIRE(entity_1->c_grimoire_machina()->fragments()->size() == 2);
 
-  // Create SceneLoadData
-  steamrot::FlatbuffersSceneLoadDataProvider scene_load_provider(
+  // Create SceneData
+  steamrot::FlatbuffersSceneLoadDataProvider scene_data_provider(
       fixture.GetGameContext().event_handler);
-  auto get_scene_load_data_result =
-      scene_load_provider.ProvideSceneLoadDataFromData(scene_data_fbs);
-  if (!get_scene_load_data_result)
-    FAIL(get_scene_load_data_result.error().message);
+  auto get_scene_data_result =
+      scene_data_provider.ProvideSceneDataFromData(scene_data_fbs);
+  if (!get_scene_data_result)
+    FAIL(get_scene_data_result.error().message);
 
-  const steamrot::SceneLoadData &scene_load_data =
-      get_scene_load_data_result.value();
+  const steamrot::SceneData &scene_data = get_scene_data_result.value();
 
   // Check scene state before CreateSceneFromData
   steamrot::SceneFactory scene_factory(fixture.GetGameContext());
 
   // Verify scene_data before passing to factory
-  REQUIRE(scene_load_data.scene_data.scene_info.type ==
+  REQUIRE(scene_data.scene_info.type ==
           steamrot::SceneType::SceneType_TITLE);
 
   // Act - Create scene from data
-  auto result = scene_factory.CreateSceneFromSceneLoadData(scene_load_data);
+  auto result = scene_factory.CreateSceneFromSceneData(scene_data);
 
   // Assert - Check scene was created successfully
   if (!result.has_value()) {

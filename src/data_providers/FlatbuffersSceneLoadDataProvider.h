@@ -66,15 +66,15 @@ public:
   ///
   /// @param scene_type [TODO:parameter]
   /////////////////////////////////////////////////
-  std::expected<SceneLoadData, FailInfo>
-  ProvideSceneLoadDataFromData(const SceneDataFbs *fb_data) const override;
+  std::expected<SceneData, FailInfo>
+  ProvideSceneDataFromData(const SceneDataFbs *fb_data) const override;
 
   /////////////////////////////////////////////////
-  /// @brief Providers SceneLoadData object
+  /// @brief Providers SceneData object
   ///
   /// @param scene_type ScenType enum
   /////////////////////////////////////////////////
-  std::expected<SceneLoadData, FailInfo>
-  ProvideDefaultSceneLoadData(const SceneType scene_type) const override;
+  std::expected<SceneData, FailInfo>
+  ProvideDefaultSceneData(const SceneType scene_type) const override;
 };
 } // namespace steamrot
