@@ -13,6 +13,7 @@
 /////////////////////////////////////////////////
 #include "EventPacket.h"
 #include "SceneLoadData.h"
+#include "SceneManagerData.h"
 #include <optional>
 #include <vector>
 
@@ -61,25 +62,25 @@ struct EngineSnapshot {
   std::optional<size_t> tick_number;
 
   /////////////////////////////////////////////////
-  /// @brief SceneLoadData for all scenes in the collection
-  /////////////////////////////////////////////////
-  SceneCollectionData scene_collection_data;
-
-  /////////////////////////////////////////////////
   /// @brief Global event bus state
   ///
   /// Captures all events in the global event bus at this tick.
-  /// Optional to allow tests that don't care about event state.
   /// Useful for testing event lifetime, propagation, and processing.
   /////////////////////////////////////////////////
   std::optional<EventBus> global_event_bus;
 
   /////////////////////////////////////////////////
-  /// @brief Helper to check if snapshot has any data
+  /// @brief Contains all data needed to save and restore the state of the
+  /// SceneManager.
   ///
-  /// @return True if at least one field is populated
+  /// This is optional because it can also be loaded from defaults
   /////////////////////////////////////////////////
-  bool HasData() const { return global_event_bus.has_value(); }
+  std::optional<SceneManagerData> scene_manager_data;
+
+  /////////////////////////////////////////////////
+  /// @brief SceneLoadData for all scenes in the collection
+  /////////////////////////////////////////////////
+  SceneCollectionData scene_collection_data;
 };
 
 } // namespace steamrot

@@ -11,9 +11,8 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "EngineSnapshot.h"
 #include "SaveMetaData.h"
-#include "SceneLoadData.h"
-#include "SceneManagerData.h"
 
 namespace steamrot {
 
@@ -29,14 +28,8 @@ struct SaveData {
   SaveMetaData meta_data;
 
   /////////////////////////////////////////////////
-  /// @brief Contains all data needed to save and restore the state of the
-  /// SceneManager and its Scenes.
+  /// @brief Contains a snapshot of the engine state at the time of saving
   /////////////////////////////////////////////////
-  SceneManagerData scene_manager_data;
-
-  /////////////////////////////////////////////////
-  /// @brief The serialised scene data for all scenes in the current save state
-  /////////////////////////////////////////////////
-  SceneCollectionData scene_collection_data;
+  EngineSnapshot engine_snapshot;
 };
 } // namespace steamrot
