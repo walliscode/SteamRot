@@ -33,8 +33,9 @@ struct SceneLoadData {
   /////////////////////////////////////////////////
   /// @brief Entity importer (wraps entity data source)
   /////////////////////////////////////////////////
-  std::unique_ptr<IEntityImporter> entity_importer;
+  std::unique_ptr<IEntityImporter> entity_importer{nullptr};
 };
+
 using SceneCollectionData = std::vector<SceneLoadData>;
 
 } // namespace steamrot

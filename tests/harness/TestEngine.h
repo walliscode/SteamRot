@@ -81,17 +81,6 @@ private:
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo> StartUp() override;
 
-  /////////////////////////////////////////////////
-  /// @brief Capture current engine state for all active scenes
-  ///
-  /// Creates a deep copy of EntityMemoryPool for each active scene
-  /// and stores them in an EngineSnapshot indexed by tick number.
-  /// Scene UUIDs are used as keys within the snapshot.
-  ///
-  /// @param tick Current tick number
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo> CaptureSnapShot(size_t tick);
-
 public:
   /////////////////////////////////////////////////
   /// @brief Constructor taking test data configuration.
