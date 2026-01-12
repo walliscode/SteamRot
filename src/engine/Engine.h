@@ -17,6 +17,7 @@
 /////////////////////////////////////////////////
 #include "EngineConfig.h"
 #include "EngineResources.h"
+#include "EngineSnapshot.h"
 #include "EngineState.h"
 #include "FailInfo.h"
 #include "GameContext.h"
@@ -173,6 +174,11 @@ protected:
   /// @brief Go through all subscriptions, if active call relevant Logic
   /////////////////////////////////////////////////
   virtual std::expected<std::monostate, FailInfo> ProcessSubscriptions() = 0;
+
+  /////////////////////////////////////////////////
+  /// @brief Capture the state of the Engine at the current tick.
+  /////////////////////////////////////////////////
+  std::expected<EngineSnapshot, FailInfo> CaptureEngineSnapshot();
 
 public:
   /////////////////////////////////////////////////

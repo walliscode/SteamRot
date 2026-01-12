@@ -128,4 +128,21 @@ void Engine::TickSceneManager() {
 std::vector<std::shared_ptr<Subscriber>> &Engine::GetSubscriptions() {
   return m_engine_state.subscriptions;
 }
+
+/////////////////////////////////////////////////
+std::expected<EngineSnapshot, FailInfo> Engine::CaptureEngineSnapshot() {
+  EngineSnapshot snapshot;
+
+  // capture SceneCollectionData snapshot
+  auto scene_collection_data_result =
+      m_scene_manager.CaptureSceneCollectionData();
+  if (!scene_collection_data_result) {
+    return std::unexpected(scene_collection_data_result.error());
+  }
+
+  snapshot.scene_collection_data =
+      std::move(scene_collection_data_result.value());
+
+  return snapshot;
+}
 } // namespace steamrot
