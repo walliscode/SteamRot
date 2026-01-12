@@ -12,15 +12,15 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "EventHandler.h"
-#include "ISceneLoadDataProvider.h"
+#include "ISceneDataProvider.h"
 #include "SceneResourcesConfig.h"
 #include "scene_resources_config_generated.h"
 #include "scene_types_generated.h"
 #include <variant>
 
 namespace steamrot {
-class FlatbuffersSceneLoadDataProvider
-    : public steamrot::ISceneLoadDataProvider {
+class FlatbuffersSceneDataProvider
+    : public steamrot::ISceneDataProvider {
 
 private:
   EventHandler &m_event_handler;
@@ -31,7 +31,7 @@ public:
   ///
   /// @param event_handler Reference to EventHandler for event reporting.
   /////////////////////////////////////////////////
-  FlatbuffersSceneLoadDataProvider(EventHandler &event_handler);
+  FlatbuffersSceneDataProvider(EventHandler &event_handler);
 
   /////////////////////////////////////////////////
   /// @brief Configures SceneInfo from FlatBuffers data.

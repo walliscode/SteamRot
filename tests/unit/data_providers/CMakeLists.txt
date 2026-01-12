@@ -9,7 +9,7 @@ add_executable(test_data_providers
   FlatbuffersDataLoader.test.cpp
   FlatbuffersEngineDataProvider.test.cpp
   FlatbuffersSceneManagerDataProvider.test.cpp
-  FlatbuffersSceneLoadDataProvider.test.cpp
+  FlatbuffersSceneDataProvider.test.cpp
   FlatbuffersSubscriberViewer.test.cpp
   FlatbuffersSaveDataProvider.test.cpp
   FlatbuffersUIStyleDataProvider.test.cpp

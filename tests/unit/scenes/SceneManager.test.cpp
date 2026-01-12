@@ -7,7 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "SceneManager.h"
-#include "FlatbuffersSceneLoadDataProvider.h"
+#include "FlatbuffersSceneDataProvider.h"
 #include "Subscriber.h"
 #include "TestFixture.h"
 #include "load_scene_collection_data.h"
@@ -231,7 +231,7 @@ TEST_CASE("SceneManager::AddScenesFromSceneCollectionData loads three scenes "
   steamrot::tests::TestFixture fixture;
   fixture.Initialize();
   steamrot::SceneManager scene_manager(fixture.GetGameContext());
-  steamrot::FlatbuffersSceneLoadDataProvider scene_data_provider(
+  steamrot::FlatbuffersSceneDataProvider scene_data_provider(
       fixture.GetGameContext().event_handler);
   // Act
 

@@ -7,7 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 
-#include "FlatbuffersSceneLoadDataProvider.h"
+#include "FlatbuffersSceneDataProvider.h"
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
 
@@ -18,7 +18,7 @@
 //   // Use an invalid SceneType
 //   steamrot::SceneType invalid_scene_type =
 //   static_cast<steamrot::SceneType>(-1); auto scene_data_get_result =
-//       provider.ProvideDefaultSceneLoadData(invalid_scene_type);
+//       provider.ProvideDefaultSceneData(invalid_scene_type);
 //   REQUIRE(!scene_data_get_result.has_value());
 //   REQUIRE(scene_data_get_result.error().message ==
 //           "Invalid SceneType provided");
@@ -33,7 +33,7 @@
 //                                 steamrot::SceneType::SceneType_TITLE}) {
 //
 //     auto scene_data_get_result =
-//         provider.ProvideDefaultSceneLoadData(scene_type);
+//         provider.ProvideDefaultSceneData(scene_type);
 //     if (!scene_data_get_result.has_value()) {
 //       FAIL(scene_data_get_result.error().message);
 //     }
@@ -49,7 +49,7 @@
 //           "correct data with Title scene",
 //           "[unit][FlatbuffersSceneDataProvider]") {
 //   steamrot::FlatbuffersSceneDataProvider provider;
-//   auto scene_data_get_result = provider.ProvideDefaultSceneLoadData(
+//   auto scene_data_get_result = provider.ProvideDefaultSceneData(
 //       steamrot::SceneType::SceneType_TITLE);
 //   if (!scene_data_get_result.has_value()) {
 //     FAIL(scene_data_get_result.error().message);
@@ -75,7 +75,7 @@
 //           "correct data with Crafting scene",
 //           "[unit][FlatbuffersSceneDataProvider]") {
 //   steamrot::FlatbuffersSceneDataProvider provider;
-//   auto scene_data_get_result = provider.ProvideDefaultSceneLoadData(
+//   auto scene_data_get_result = provider.ProvideDefaultSceneData(
 //       steamrot::SceneType::SceneType_CRAFTING);
 //   if (!scene_data_get_result.has_value()) {
 //     FAIL(scene_data_get_result.error().message);
