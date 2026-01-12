@@ -15,6 +15,7 @@
 #include "IEntityImporter.h"
 #include "SceneInfo.h"
 #include "SceneResourcesConfig.h"
+#include "containers.h"
 #include <memory>
 
 namespace steamrot {
@@ -43,8 +44,15 @@ struct SceneData {
 
   /////////////////////////////////////////////////
   /// @brief Entity importer (wraps entity data source)
+  /// @note Can be one of:
+  /// - std::unique_ptr<IEntityImporter> for file-based importers
+  /// - std::shared_ptr<EntityMemoryPool> for shared in-memory pool
+  /// - a copy constructed EntityMemoryPool for storing mutliple instances of
+  /// the EntityMemoryPool
   /////////////////////////////////////////////////
-  std::variant<std::unique_ptr<IEntityImporter>> entity_transport;
+  std::variant<std::unique_ptr<IEntityImporter>,
+               std::shared_ptr<EntityMemoryPool>, EntityMemoryPool>
+      entity_transport;
 };
 
 using SceneCollectionData = std::vector<SceneData>;

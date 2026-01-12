@@ -43,7 +43,7 @@ private:
   size_t m_current_tick{1};
 
   /////////////////////////////////////////////////
-  /// @brief Collection of all Engine data per tick
+  /// @brief EngineSnapshot captured at a certain tick
   /////////////////////////////////////////////////
   std::map<size_t, EngineSnapshot> m_data_bank;
 
@@ -80,6 +80,14 @@ private:
   /// @brief TestEngine specific startup routine
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo> StartUp() override;
+
+  /////////////////////////////////////////////////
+  /// @brief Copy over the current engine snapshot and store it in the data bank
+  ///
+  /// This will convert the shared pointer to the EntityMemoryPool into a copy
+  /// constructed EMP instance
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> StoreEngineSnapShot();
 
 public:
   /////////////////////////////////////////////////

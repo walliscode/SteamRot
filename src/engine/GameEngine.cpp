@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 
 #include "GameEngine.h"
+#include <expected>
 
 namespace steamrot {
 
@@ -84,4 +85,5 @@ std::expected<std::monostate, FailInfo> GameEngine::ProcessSubscriptions() {
   }
   return std::monostate{};
 }
+
 } // namespace steamrot

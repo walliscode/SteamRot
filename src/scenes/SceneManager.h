@@ -153,6 +153,12 @@ public:
   GetScenes() const;
 
   void ExecuteSceneManagerLevelLogic();
+
+  /////////////////////////////////////////////////
+  /// @brief Provides a snapshot of the current Scenes
+  /////////////////////////////////////////////////
+  std::expected<SceneCollectionData, FailInfo>
+  CaptureSceneCollectionData() const;
 };
 
 } // namespace steamrot

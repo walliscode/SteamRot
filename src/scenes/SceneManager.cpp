@@ -282,4 +282,30 @@ void SceneManager::ExecuteSceneManagerLevelLogic() {
   // update all scenes
   UpdateScenes();
 }
+
+/////////////////////////////////////////////////
+std::expected<SceneCollectionData, FailInfo>
+SceneManager::CaptureSceneCollectionData() const {
+
+  // create SceneCollectionData to return
+  SceneCollectionData scene_collection_data;
+
+  // populate SceneCollectionData from current scenes
+  for (const auto &pair : m_scenes) {
+    const auto &scene = pair.second;
+    SceneData scene_data;
+    // get SceneInfo
+    scene_data.scene_info = scene->GetSceneInfo();
+
+    // ADD OTHER PARTS WHEN REQUIRED
+
+    // get EntityMemoryPool as shared_ptr
+    scene_data.entity_transport =
+        std::make_shared<EntityMemoryPool>(scene->GetEntityMemoryPool());
+
+    // add to SceneCollectionData
+    scene_collection_data.push_back(std::move(scene_data));
+  }
+  return scene_collection_data;
+}
 } // namespace steamrot
