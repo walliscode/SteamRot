@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersTestDataLoader.h"
+#include "simulation_data_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("FlatbuffersTestDataLoader constructor sets object directory path "
@@ -98,7 +99,24 @@ TEST_CASE(
   auto test_data_vector = result.value();
   // Assert
   REQUIRE(!test_data_vector.empty());
+  REQUIRE(test_data_vector.size() >= 1);
   for (const auto &test_data : test_data_vector) {
     REQUIRE(test_data != nullptr);
   }
+  const steamrot::TestDataFbs &first_test_data = *test_data_vector[0];
+  REQUIRE(first_test_data.meta_data() != nullptr);
+
+  const steamrot::TestMetadataFbs *first_meta_data =
+      first_test_data.meta_data();
+  REQUIRE(first_meta_data->test_name()->str() ==
+          "Test loading json to TestDataFbs");
+
+  const steamrot::SimulationDataFbs *first_sim_data =
+      first_test_data.simulation_data();
+  REQUIRE(first_sim_data != nullptr);
+  REQUIRE(first_sim_data->description()->str() ==
+          "This is a test simulation data for unit testing.");
+  REQUIRE(first_sim_data->steps()->size() == 1);
+  REQUIRE(first_sim_data->steps()->Get(0)->function_type() ==
+          steamrot::FunctionEnumFbs_ProcessUIActionsAndEvents);
 }

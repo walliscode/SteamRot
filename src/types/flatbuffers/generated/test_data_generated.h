@@ -13,11 +13,8 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
+#include "engine_snapshot_generated.h"
 #include "engine_state_generated.h"
-#include "entities_generated.h"
-#include "event_bus_data_generated.h"
-#include "event_packet_data_generated.h"
-#include "input_test_data_generated.h"
 #include "simulation_data_generated.h"
 
 namespace steamrot {
@@ -156,7 +153,8 @@ struct TestDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_META_DATA = 4,
     VT_SIMULATION_DATA = 6,
-    VT_NUM_TICKS = 8
+    VT_NUM_TICKS = 8,
+    VT_STARTING_ENGINE_STATE = 10
   };
   /// @brief Metadata about this test case
   const steamrot::TestMetadataFbs *meta_data() const {
@@ -170,6 +168,10 @@ struct TestDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   uint32_t num_ticks() const {
     return GetField<uint32_t>(VT_NUM_TICKS, 0);
   }
+  /// @brief Starting state of the Engine
+  const steamrot::EngineStateFbs *starting_engine_state() const {
+    return GetPointer<const steamrot::EngineStateFbs *>(VT_STARTING_ENGINE_STATE);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_META_DATA) &&
@@ -177,6 +179,8 @@ struct TestDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_SIMULATION_DATA) &&
            verifier.VerifyTable(simulation_data()) &&
            VerifyField<uint32_t>(verifier, VT_NUM_TICKS, 4) &&
+           VerifyOffset(verifier, VT_STARTING_ENGINE_STATE) &&
+           verifier.VerifyTable(starting_engine_state()) &&
            verifier.EndTable();
   }
 };
@@ -194,6 +198,9 @@ struct TestDataFbsBuilder {
   void add_num_ticks(uint32_t num_ticks) {
     fbb_.AddElement<uint32_t>(TestDataFbs::VT_NUM_TICKS, num_ticks, 0);
   }
+  void add_starting_engine_state(::flatbuffers::Offset<steamrot::EngineStateFbs> starting_engine_state) {
+    fbb_.AddOffset(TestDataFbs::VT_STARTING_ENGINE_STATE, starting_engine_state);
+  }
   explicit TestDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -210,8 +217,10 @@ inline ::flatbuffers::Offset<TestDataFbs> CreateTestDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::TestMetadataFbs> meta_data = 0,
     ::flatbuffers::Offset<steamrot::SimulationDataFbs> simulation_data = 0,
-    uint32_t num_ticks = 0) {
+    uint32_t num_ticks = 0,
+    ::flatbuffers::Offset<steamrot::EngineStateFbs> starting_engine_state = 0) {
   TestDataFbsBuilder builder_(_fbb);
+  builder_.add_starting_engine_state(starting_engine_state);
   builder_.add_num_ticks(num_ticks);
   builder_.add_simulation_data(simulation_data);
   builder_.add_meta_data(meta_data);

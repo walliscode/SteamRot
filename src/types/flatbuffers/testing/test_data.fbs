@@ -1,9 +1,6 @@
-include "../entities/entities.fbs";
 include "simulation_data.fbs";
-include "input_test_data.fbs";
-include "../events/event_packet_data.fbs";
-include "../events/event_bus_data.fbs";
 include "../engine/engine_state.fbs";
+include "../core/engine_snapshot.fbs";
 
 namespace steamrot;
 
@@ -47,7 +44,11 @@ table TestDataFbs
     
   /// @brief Number of ticks to run the test for
   num_ticks: uint32;
+ 
+  /// @brief Starting state of the Engine
+  starting_engine_state: EngineStateFbs;
   
+
   
 }
 

@@ -16,7 +16,6 @@
 #include <SFML/Graphics/VertexArray.hpp>
 #include <expected>
 #include <format>
-#include <iostream>
 #include <vector>
 
 namespace steamrot {
@@ -70,7 +69,7 @@ FlatbuffersDataLoader::ProvideDefaultSceneData(
 /////////////////////////////////////////////////
 std::expected<std::vector<const UIStyleData *>, FailInfo>
 FlatbuffersDataLoader::ProvideUIStylesData() const {
-  std::cout << "[DEBUG] finding data paths.." << std::endl;
+
   // get the UIStyleDirectory
   std::filesystem::path ui_style_dir = paths::GetUIStylesDirectory();
 
@@ -79,7 +78,6 @@ FlatbuffersDataLoader::ProvideUIStylesData() const {
 
   for (const auto &entry : std::filesystem::directory_iterator(ui_style_dir)) {
 
-    std::cout << "Found UI style file: " << entry.path().string() << std::endl;
     // check for .bin files ending with .styles.bin
     if (entry.path().extension() == ".bin" &&
         entry.path().filename().string().ends_with(".styles.bin")) {
