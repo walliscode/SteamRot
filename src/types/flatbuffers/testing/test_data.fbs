@@ -28,6 +28,20 @@ table TestMetadataFbs {
 }
 
 ////////////////////////////////////////////////////////////
+/// @brief Represents a single expected engine snapshot at a specific tick
+///
+/// Used in the expected_engine_snapshots array to specify what state
+/// the engine should be in at a particular tick number.
+////////////////////////////////////////////////////////////
+table ExpectedSnapshotEntry {
+  /// @brief The tick number when this snapshot should match
+  tick: uint64 (key);
+  
+  /// @brief The expected engine state at this tick
+  snapshot: EngineSnapshotFbs;
+}
+
+////////////////////////////////////////////////////////////
 /// @brief Root table for test data configuration
 ///
 /// This is the main container for test data. It's designed
@@ -43,13 +57,18 @@ table TestDataFbs
   simulation_data: SimulationDataFbs;
     
   /// @brief Number of ticks to run the test for
-  num_ticks: uint32;
+  /// Note: Field name is num_ticks in schema but maps to number_of_ticks in C++
+  num_ticks: uint32 = 1;
  
-  /// @brief Starting state of the Engine
+  /// @brief Starting state of the Engine (runtime configuration)
   starting_engine_state: EngineStateFbs;
   
-
+  /// @brief Starting engine snapshot before simulation begins
+  starting_engine_snapshot: EngineSnapshotFbs;
   
+  /// @brief Expected engine snapshots at given ticks
+  /// Array of tick->snapshot mappings for validation at specific points
+  expected_engine_snapshots: [ExpectedSnapshotEntry];
 }
 
 root_type TestDataFbs;
