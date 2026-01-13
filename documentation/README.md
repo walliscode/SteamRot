@@ -25,7 +25,25 @@ This directory contains a comprehensive analysis and refactoring plan for the St
 
 **Read this first** to understand the problems being addressed.
 
-### 2. EVENT_SYSTEM_REFACTORING_PLAN.md
+### 2. EVENT_SYSTEM_COMPARISON.md
+**Purpose:** Visual comparison of component vs event architectures
+
+**Contents:**
+- Side-by-side architecture diagrams (before/after)
+- Data flow visualizations
+- Naming convention comparisons
+- Coupling analysis with diagrams
+- File organization comparison
+
+**Key Features:**
+- ASCII diagrams showing architectural differences
+- Clear visual indicators (✅/❌) for good/bad patterns
+- Before/after refactoring comparisons
+- Quick reference tables
+
+**Read this second** for a visual understanding of the issues.
+
+### 3. EVENT_SYSTEM_REFACTORING_PLAN.md
 **Purpose:** Step-by-step implementation plan to fix identified issues
 
 **Contents:**
@@ -43,7 +61,7 @@ This directory contains a comprehensive analysis and refactoring plan for the St
 5. **Phase 5:** Testing and validation (2-3 hours)
 6. **Phase 6:** Documentation and cleanup (1-2 hours)
 
-**Read this second** to understand how to implement the fixes.
+**Read this third** to understand how to implement the fixes.
 
 ## Quick Reference
 
