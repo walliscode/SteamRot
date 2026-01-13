@@ -6,6 +6,27 @@ This directory contains a comprehensive analysis and refactoring plan for the St
 
 ## Document Organization
 
+### 0. EVENT_SYSTEM_QUICK_START.md ⭐ START HERE
+**Purpose:** Condensed guide for busy developers who need to implement quickly
+
+**Contents:**
+- 30-second summary
+- 5-minute overview  
+- Implementation checklist (all 6 phases)
+- Quick command reference
+- Critical code patterns
+- Common pitfalls (with ❌/✅ examples)
+- Testing checklist
+- Time estimates by team size
+
+**Key Features:**
+- Minimal reading - maximum action
+- Copy-paste ready commands
+- Critical patterns highlighted
+- Clear success indicators
+
+**Read this first** if you need to start implementing immediately.
+
 ### 1. EVENT_SYSTEM_ANALYSIS.md
 **Purpose:** Detailed analysis of current architecture and identified issues
 
@@ -23,7 +44,7 @@ This directory contains a comprehensive analysis and refactoring plan for the St
 - Entity schemas directly include event schemas
 - Conversion logic scattered across multiple files
 
-**Read this first** to understand the problems being addressed.
+**Read this second** to understand the problems being addressed.
 
 ### 2. EVENT_SYSTEM_COMPARISON.md
 **Purpose:** Visual comparison of component vs event architectures
@@ -41,7 +62,7 @@ This directory contains a comprehensive analysis and refactoring plan for the St
 - Before/after refactoring comparisons
 - Quick reference tables
 
-**Read this second** for a visual understanding of the issues.
+**Read this third** for a visual understanding of the issues.
 
 ### 3. EVENT_SYSTEM_REFACTORING_PLAN.md
 **Purpose:** Step-by-step implementation plan to fix identified issues
@@ -61,9 +82,28 @@ This directory contains a comprehensive analysis and refactoring plan for the St
 5. **Phase 5:** Testing and validation (2-3 hours)
 6. **Phase 6:** Documentation and cleanup (1-2 hours)
 
-**Read this third** to understand how to implement the fixes.
+**Read this fourth** to understand how to implement the fixes.
 
 ## Quick Reference
+
+### Recommended Reading Paths
+
+**Path 1: Implementer (Need to code ASAP)**
+1. EVENT_SYSTEM_QUICK_START.md (15 min) - Get checklist and patterns
+2. EVENT_SYSTEM_COMPARISON.md (10 min) - See visual examples
+3. Start Phase 1 implementation
+4. Refer to REFACTORING_PLAN.md as needed
+
+**Path 2: Reviewer (Need to understand issues)**
+1. EVENT_SYSTEM_COMPARISON.md (10 min) - Visual overview
+2. EVENT_SYSTEM_ANALYSIS.md (20 min) - Technical details
+3. EVENT_SYSTEM_QUICK_START.md (5 min) - Implementation checklist
+
+**Path 3: Architect (Need full understanding)**
+1. EVENT_SYSTEM_ANALYSIS.md (20 min) - Deep technical analysis
+2. EVENT_SYSTEM_COMPARISON.md (10 min) - Visual validation
+3. EVENT_SYSTEM_REFACTORING_PLAN.md (30 min) - Implementation strategy
+4. EVENT_SYSTEM_QUICK_START.md (5 min) - Practical checklist
 
 ### Problem Statement
 
