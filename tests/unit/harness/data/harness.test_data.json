@@ -1,6 +1,10 @@
 {
   "meta_data": {
-    "test_name": "Test loading json to TestDataFbs"
+    "test_name": "Test loading json to TestDataFbs",
+    "test_description": "Validates that all fields in TestDataFbs can be loaded from JSON including engine snapshots with scene data, event bus, and scene manager state",
+    "tags": ["unit", "flatbuffers", "test_data"],
+    "will_pass": true,
+    "version": 1
   },
   "simulation_data": {
     "description": "This is a test simulation data for unit testing.",
@@ -10,5 +14,65 @@
       }
     ]
   },
-  "num_ticks": 37
+  "num_ticks": 37,
+  "starting_engine_snapshot": {
+    "tick_number": 0,
+    "global_event_bus": {
+      "description": "Starting event bus state",
+      "events": [
+        {
+          "event_lifetime": 5,
+          "event_type": "EVENT_USER_INPUT",
+          "event_data_data_type": "UserInputBitsetData",
+          "event_data_data": {
+            "mouse_pressed": ["LEFT_CLICK"]
+          }
+        }
+      ]
+    },
+    "scene_collection_data": {
+      "scene_data": [
+        {
+          "scene_info": {
+            "scene_type": "TITLE"
+          },
+          "scene_resources_config": {
+            "texture_width": 800,
+            "texture_height": 600
+          },
+          "entity_collection": {
+            "entity_memory_pool_size": 10,
+            "entities": [
+              {
+                "index": 0,
+                "c_user_interface": {
+                  "ui_name": "test_ui",
+                  "is_visible": true,
+                  "root_ui_element": {
+                    "base_data": {
+                      "position": { "x": 100, "y": 200 },
+                      "size": { "x": 50, "y": 30 },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "Horizontal",
+                      "spacing_strategy": "None"
+                    }
+                  }
+                }
+              },
+              {
+                "index": 1,
+                "c_grimoire_machina": {
+                  "fragments": ["test_fragment"],
+                  "joints": []
+                }
+              }
+            ]
+          },
+          "asset_config": {},
+          "logic_collection_data": {}
+        }
+      ]
+    }
+  }
 }

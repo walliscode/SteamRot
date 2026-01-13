@@ -5,6 +5,8 @@ set(schema_files
     # Core types
     ${CMAKE_CURRENT_SOURCE_DIR}/core/types.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/core/scene_types.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/core/engine_snapshot.fbs
+
 
     # Engine (already organized)
     ${CMAKE_CURRENT_SOURCE_DIR}/engine/engine_resources_config.fbs

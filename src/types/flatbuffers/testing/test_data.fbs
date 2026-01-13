@@ -1,9 +1,6 @@
-include "../entities/entities.fbs";
 include "simulation_data.fbs";
-include "input_test_data.fbs";
-include "../events/event_packet_data.fbs";
-include "../events/event_bus_data.fbs";
 include "../engine/engine_state.fbs";
+include "../core/engine_snapshot.fbs";
 
 namespace steamrot;
 
@@ -30,6 +27,7 @@ table TestMetadataFbs {
   version: uint32;
 }
 
+
 ////////////////////////////////////////////////////////////
 /// @brief Root table for test data configuration
 ///
@@ -46,8 +44,11 @@ table TestDataFbs
   simulation_data: SimulationDataFbs;
     
   /// @brief Number of ticks to run the test for
-  num_ticks: uint32;
-  
+  /// Note: Field name is num_ticks in schema but maps to number_of_ticks in C++
+  num_ticks: uint32 = 1;
+   
+  /// @brief Starting engine snapshot before simulation begins
+  starting_engine_snapshot: EngineSnapshotFbs;
   
 }
 
