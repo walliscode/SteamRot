@@ -94,6 +94,9 @@ The `documentation/` directory contains comprehensive guides organized by topic:
 - **[Error Handling](documentation/architecture/ERROR_HANDLING.md)** - Exception and error patterns
 - **[Game Loop](documentation/architecture/GAME_LOOP.md)** - Main game loop structure
 - **[Logic System](documentation/architecture/LOGIC_SYSTEM.md)** - Logic architecture
+- **[Data Loading Architecture](documentation/architecture/DATA_LOADING_ARCHITECTURE.md)** - Data loading patterns and best practices
+- **[Data Loading Decision Tree](documentation/architecture/DATA_LOADING_DECISION_TREE.md)** - Pattern selection guide
+- **[Data Loading Flow](documentation/architecture/DATA_LOADING_FLOW.md)** - Visual data flow diagrams
 
 ### ⚙️ Configuration
 - **[Context Configuration](documentation/configuration/CONTEXT_CONFIGURATION.md)** - Game and scene contexts
