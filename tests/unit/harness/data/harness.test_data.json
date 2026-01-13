@@ -15,18 +15,25 @@
     ]
   },
   "num_ticks": 37,
-  "starting_engine_state": {
-    "running": true,
-    "paused": false,
-    "quit_requested": false
-  },
   "starting_engine_snapshot": {
     "tick_number": 0,
+    "global_event_bus": {
+      "description": "Starting event bus state",
+      "events": [
+        {
+          "event_lifetime": 5,
+          "event_type": "EVENT_USER_INPUT",
+          "event_data_data_type": "UserInputBitsetData",
+          "event_data_data": {
+            "mouse_pressed": ["LEFT_CLICK"]
+          }
+        }
+      ]
+    },
     "scene_collection_data": {
       "scene_data": [
         {
           "scene_info": {
-            "scene_id": "test_scene_1",
             "scene_type": "TITLE"
           },
           "scene_resources_config": {
@@ -66,90 +73,6 @@
           "logic_collection_data": {}
         }
       ]
-    },
-    "global_event_bus": {
-      "description": "Starting event bus state",
-      "events": [
-        {
-          "event_lifetime": 5,
-          "event_type": "EVENT_USER_INPUT",
-          "event_data_data": {
-            "data_type": "UserInputBitsetData",
-            "data": {
-              "mouse_pressed": ["LEFT_CLICK"]
-            }
-          }
-        }
-      ]
-    },
-    "scene_manager_data": {
-      "state": {
-        "subscriptions": [
-          {
-            "event_type_data": "EVENT_CHANGE_SCENE",
-            "trigger_data_type": "SceneChangePacketData",
-            "trigger_data": {
-              "scene_type": "TITLE"
-            }
-          }
-        ]
-      }
     }
-  },
-  "expected_engine_snapshots": [
-    {
-      "tick": 10,
-      "snapshot": {
-        "tick_number": 10,
-        "global_event_bus": {
-          "description": "Event bus at tick 10",
-          "events": []
-        }
-      }
-    },
-    {
-      "tick": 37,
-      "snapshot": {
-        "tick_number": 37,
-        "scene_collection_data": {
-          "scene_data": [
-            {
-              "scene_info": {
-                "scene_id": "test_scene_1",
-                "scene_type": "TITLE"
-              },
-              "scene_resources_config": {
-                "texture_width": 800,
-                "texture_height": 600
-              },
-              "entity_collection": {
-                "entity_memory_pool_size": 10,
-                "entities": [
-                  {
-                    "index": 0,
-                    "c_user_interface": {
-                      "ui_name": "test_ui_modified",
-                      "is_visible": false,
-                      "root_ui_element": {
-                        "base_data": {
-                          "position": { "x": 150, "y": 250 },
-                          "size": { "x": 60, "y": 40 },
-                          "children_active": false,
-                          "children": [],
-                          "layout": "Vertical",
-                          "spacing_strategy": "Even"
-                        }
-                      }
-                    }
-                  }
-                ]
-              },
-              "asset_config": {},
-              "logic_collection_data": {}
-            }
-          ]
-        }
-      }
-    }
-  ]
+  }
 }

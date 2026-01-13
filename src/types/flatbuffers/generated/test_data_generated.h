@@ -154,7 +154,7 @@ struct TestDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_META_DATA = 4,
     VT_SIMULATION_DATA = 6,
     VT_NUM_TICKS = 8,
-    VT_STARTING_ENGINE_STATE = 10
+    VT_STARTING_ENGINE_SNAPSHOT = 10
   };
   /// @brief Metadata about this test case
   const steamrot::TestMetadataFbs *meta_data() const {
@@ -165,12 +165,13 @@ struct TestDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     return GetPointer<const steamrot::SimulationDataFbs *>(VT_SIMULATION_DATA);
   }
   /// @brief Number of ticks to run the test for
+  /// Note: Field name is num_ticks in schema but maps to number_of_ticks in C++
   uint32_t num_ticks() const {
-    return GetField<uint32_t>(VT_NUM_TICKS, 0);
+    return GetField<uint32_t>(VT_NUM_TICKS, 1);
   }
-  /// @brief Starting state of the Engine
-  const steamrot::EngineStateFbs *starting_engine_state() const {
-    return GetPointer<const steamrot::EngineStateFbs *>(VT_STARTING_ENGINE_STATE);
+  /// @brief Starting engine snapshot before simulation begins
+  const steamrot::EngineSnapshotFbs *starting_engine_snapshot() const {
+    return GetPointer<const steamrot::EngineSnapshotFbs *>(VT_STARTING_ENGINE_SNAPSHOT);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -179,8 +180,8 @@ struct TestDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_SIMULATION_DATA) &&
            verifier.VerifyTable(simulation_data()) &&
            VerifyField<uint32_t>(verifier, VT_NUM_TICKS, 4) &&
-           VerifyOffset(verifier, VT_STARTING_ENGINE_STATE) &&
-           verifier.VerifyTable(starting_engine_state()) &&
+           VerifyOffset(verifier, VT_STARTING_ENGINE_SNAPSHOT) &&
+           verifier.VerifyTable(starting_engine_snapshot()) &&
            verifier.EndTable();
   }
 };
@@ -196,10 +197,10 @@ struct TestDataFbsBuilder {
     fbb_.AddOffset(TestDataFbs::VT_SIMULATION_DATA, simulation_data);
   }
   void add_num_ticks(uint32_t num_ticks) {
-    fbb_.AddElement<uint32_t>(TestDataFbs::VT_NUM_TICKS, num_ticks, 0);
+    fbb_.AddElement<uint32_t>(TestDataFbs::VT_NUM_TICKS, num_ticks, 1);
   }
-  void add_starting_engine_state(::flatbuffers::Offset<steamrot::EngineStateFbs> starting_engine_state) {
-    fbb_.AddOffset(TestDataFbs::VT_STARTING_ENGINE_STATE, starting_engine_state);
+  void add_starting_engine_snapshot(::flatbuffers::Offset<steamrot::EngineSnapshotFbs> starting_engine_snapshot) {
+    fbb_.AddOffset(TestDataFbs::VT_STARTING_ENGINE_SNAPSHOT, starting_engine_snapshot);
   }
   explicit TestDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -217,10 +218,10 @@ inline ::flatbuffers::Offset<TestDataFbs> CreateTestDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::TestMetadataFbs> meta_data = 0,
     ::flatbuffers::Offset<steamrot::SimulationDataFbs> simulation_data = 0,
-    uint32_t num_ticks = 0,
-    ::flatbuffers::Offset<steamrot::EngineStateFbs> starting_engine_state = 0) {
+    uint32_t num_ticks = 1,
+    ::flatbuffers::Offset<steamrot::EngineSnapshotFbs> starting_engine_snapshot = 0) {
   TestDataFbsBuilder builder_(_fbb);
-  builder_.add_starting_engine_state(starting_engine_state);
+  builder_.add_starting_engine_snapshot(starting_engine_snapshot);
   builder_.add_num_ticks(num_ticks);
   builder_.add_simulation_data(simulation_data);
   builder_.add_meta_data(meta_data);
