@@ -884,3 +884,28 @@ This architecture achieves the goals stated in the problem statement:
 - ✅ Selection criteria support (scene type, save file, etc.)
 - ✅ Easy flowchart for adding new types
 - ✅ Prioritizes integration and code readability
+
+
+## Related Documentation
+
+### Architecture Documents
+- **[Quick Reference Guide](DATA_LOADING_QUICK_REFERENCE.md)**: Fast lookup, code snippets, and decision flowcharts
+- **[Visual Diagrams](DATA_LOADING_DIAGRAMS.md)**: Architecture diagrams and visual references
+- **[XML Implementation Example](EXAMPLE_XML_IMPLEMENTATION.md)**: Complete walkthrough of adding XML support
+
+### Other Architecture
+- **[Error Handling](ERROR_HANDLING.md)**: Error patterns using `std::expected` (if exists)
+- **[Game Loop](GAME_LOOP.md)**: Scene lifecycle and game loop structure (if exists)
+- **[Logic System](LOGIC_SYSTEM.md)**: Logic architecture (if exists)
+
+### Workflows
+- **[Adding Components](../workflows/ADDING_COMPONENTS.md)**: Component workflow (if exists)
+
+## External References
+
+- **FlatBuffers Documentation**: https://google.github.io/flatbuffers/
+- **std::expected**: C++23 error handling feature
+- **Strategy Pattern**: Design pattern for runtime algorithm selection
+- **Factory Pattern**: Design pattern for object creation
+- **Interface Segregation**: SOLID principle for interface design
+
