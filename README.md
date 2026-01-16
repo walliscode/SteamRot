@@ -91,6 +91,8 @@ The `documentation/` directory contains comprehensive guides organized by topic:
 - **[Filling Out Test Data](documentation/workflows/FILLING_TEST_DATA.md)** - Create test_data.json files
 
 ### 🏗️ Architecture
+- **[Data Loading & Configuration](documentation/architecture/DATA_LOADING_AND_CONFIGURATION.md)** - Data providers and configurators
+  - **[Quick Reference](documentation/architecture/DATA_LOADING_QUICK_REFERENCE.md)** - Patterns and code snippets
 - **[Error Handling](documentation/architecture/ERROR_HANDLING.md)** - Exception and error patterns
 - **[Game Loop](documentation/architecture/GAME_LOOP.md)** - Main game loop structure
 - **[Logic System](documentation/architecture/LOGIC_SYSTEM.md)** - Logic architecture
