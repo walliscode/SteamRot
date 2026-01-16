@@ -22,8 +22,10 @@ This document describes SteamRot's architecture for loading data from various so
 
 **Purpose**: Load and provide data from external sources, returning native objects.
 
-**Pattern**:
+**Conceptual Pattern** (for understanding):
 ```cpp
+// Note: This is a CONCEPTUAL illustration showing the pattern.
+// Actual implementation uses specific non-templated interfaces (see below).
 template<typename NativeObject>
 class IDataProvider {
 public:
@@ -34,6 +36,27 @@ public:
   ProvideData(/* selection criteria */) const = 0;
 };
 ```
+
+**Actual Implementation** (non-templated, specific interfaces):
+```cpp
+// Specific interface for each native object type
+class ISceneDataProvider {
+public:
+  virtual ~ISceneDataProvider() = default;
+  
+  virtual std::expected<SceneData, FailInfo>
+  ProvideDefaultSceneData(const SceneType scene_type) const = 0;
+  
+  virtual std::expected<SceneData, FailInfo>
+  ProvideSceneDataFromData(const SceneDataFbs* fb_data) const = 0;
+};
+```
+
+**Why Non-Templated Interfaces?**
+- **Runtime polymorphism**: Factory can switch implementations at runtime
+- **Clear contracts**: Each interface defines specific methods for its data type
+- **Easy to mock**: Concrete interfaces are simpler to mock for testing
+- **No template coupling**: Game code depends on interfaces, not template parameters
 
 **Current Implementations**:
 
@@ -63,8 +86,10 @@ public:
 
 **Purpose**: Configure existing native objects or create new ones from data sources.
 
-**Pattern**:
+**Conceptual Pattern** (for understanding):
 ```cpp
+// Note: This is a CONCEPTUAL illustration showing the pattern.
+// Actual implementation uses specific non-templated interfaces (see below).
 template<typename NativeObject, typename DataObject>
 class IConfigurator {
 public:
@@ -79,6 +104,52 @@ public:
   Create(const DataObject* data) = 0;
 };
 ```
+
+**Actual Implementation** (non-templated, specific interfaces with data at construction):
+```cpp
+// Interface defines what needs to be configured
+class IEntityConfigurator {
+protected:
+  EventHandler& m_event_handler;
+  
+public:
+  IEntityConfigurator(EventHandler& event_handler)
+      : m_event_handler(event_handler) {}
+  
+  virtual ~IEntityConfigurator() = default;
+  
+  // Configure methods for different components
+  virtual std::expected<std::monostate, FailInfo>
+  ConfigureEntityMemoryPool(EntityMemoryPool& emp) = 0;
+  
+  virtual std::expected<std::monostate, FailInfo>
+  ConfigureComponent(Component& component) = 0;
+};
+
+// Concrete implementation takes data object at construction
+// This hides format-specific logic in the concrete class
+class FlatbuffersEntityConfigurator : public IEntityConfigurator {
+private:
+  const EntityCollectionFbs& m_entity_collection_data;  // Data stored at construction
+  
+public:
+  // Constructor takes data object - format-specific logic is hidden here
+  FlatbuffersEntityConfigurator(EventHandler& event_handler,
+                               const EntityCollectionFbs& entity_collection_data)
+      : IEntityConfigurator(event_handler)
+      , m_entity_collection_data(entity_collection_data) {}
+  
+  // Configure methods implement format-specific logic
+  std::expected<std::monostate, FailInfo>
+  ConfigureEntityMemoryPool(EntityMemoryPool& emp) override;
+};
+```
+
+**Why Non-Templated Interfaces with Data at Construction?**
+- **Clear separation**: Interface defines what to configure, concrete class handles how
+- **Data encapsulation**: Format-specific data objects held privately by concrete classes
+- **Runtime flexibility**: Factory can instantiate different concrete configurators
+- **Hidden complexity**: Format-specific logic (FlatBuffers, XML) stays in concrete classes
 
 **Current Implementations**:
 
@@ -567,20 +638,68 @@ DataAccessFactory::GetNewDataProvider() {
 
 ### Interface-Based Design
 
-**Decision**: Use abstract interfaces (`IDataProvider`, `IConfigurator`) rather than templates.
+**Decision**: Use abstract **non-templated** interfaces (`ISceneDataProvider`, `IEntityConfigurator`) rather than templated interfaces.
 
-**Benefits**:
-- Runtime polymorphism: Switch implementations at runtime
-- Factory pattern: Centralized management
-- Clear contracts: Well-defined responsibilities
-- Easy mocking: Simple to create test implementations
+**Why Non-Templated?**
+- **Runtime polymorphism**: Factory can switch between concrete implementations at runtime
+- **Clear contracts**: Each interface defines specific methods for its purpose
+- **Easy mocking**: Concrete interfaces are simpler to mock for testing  
+- **No template coupling**: Game code depends on interfaces, not template parameters
+- **Data at construction**: Concrete classes take data objects (e.g., `EntityCollectionFbs`) at construction, hiding format-specific logic
+
+**Pattern in Practice**:
+```cpp
+// Interface: Non-templated, defines what to configure
+class IEntityConfigurator {
+public:
+  virtual std::expected<std::monostate, FailInfo>
+  ConfigureEntityMemoryPool(EntityMemoryPool& emp) = 0;
+};
+
+// Concrete: Takes data at construction, hides format logic
+class FlatbuffersEntityConfigurator : public IEntityConfigurator {
+private:
+  const EntityCollectionFbs& m_data;  // Format-specific data
+public:
+  FlatbuffersEntityConfigurator(EventHandler& handler,
+                               const EntityCollectionFbs& data)
+      : m_data(data) {}  // Data stored at construction
+  
+  // Implementation uses m_data internally
+  std::expected<std::monostate, FailInfo>
+  ConfigureEntityMemoryPool(EntityMemoryPool& emp) override;
+};
+```
+
+**Alternative (NOT used): Templated Interface**
+```cpp
+// Why we DON'T do this:
+template<typename DataObject>
+class IEntityConfigurator {
+  virtual std::expected<std::monostate, FailInfo>
+  ConfigureEntityMemoryPool(EntityMemoryPool& emp, const DataObject& data) = 0;
+};
+
+// Problems:
+// - Factory would need to know template parameters at compile time
+// - Can't switch data types at runtime
+// - More complex to use with factory pattern
+// - Template instantiation in every translation unit
+```
+
+**Benefits of Current Approach**:
+- Factory instantiates: `std::make_unique<FlatbuffersEntityConfigurator>(handler, data)`
+- Interface methods called: `configurator->ConfigureEntityMemoryPool(emp)`
+- Data type logic: Hidden inside `FlatbuffersEntityConfigurator` implementation
+- Runtime switching: Easy - factory just creates different concrete class
+- Clear separation: Interface = what to configure, concrete = how to configure
 
 **Tradeoffs**:
 - Virtual function overhead (minimal in practice)
-- Separate compilation: Interfaces and implementations in different files
-- Pointer management: Must be careful with ownership
+- Separate interfaces per data type (e.g., `ISceneDataProvider`, `ISaveDataProvider`)
+- Can't share interface across unrelated types (acceptable - each type has specific needs)
 
-**Verdict**: Interface-based design is the right choice for this architecture. Template-based design would couple data types to call sites.
+**Verdict**: Non-templated interfaces with data at construction is the right choice. This provides runtime flexibility, clear contracts, and hides format-specific logic in concrete classes while maintaining compile-time type safety for the native objects.
 
 ### Separation of Providers and Configurators
 
@@ -708,24 +827,70 @@ ConfigureSceneInfo(SceneInfo& info, const SceneInfoFbs* fb_info) const {
 
 ### 3. Support Both Create() and Configure()
 
-**Guideline**: For standalone objects, provide both creation and configuration methods.
+**Guideline**: Providers typically **create** and return new native objects. Configurators can **configure** existing objects or **create** new ones depending on use case.
 
+**Pattern: Providers Create Objects**
 ```cpp
-class IEntityConfigurator {
+// Providers create and return new native objects
+class FlatbuffersSceneDataProvider : public ISceneDataProvider {
 public:
-  // Configure existing object
-  virtual std::expected<std::monostate, FailInfo>
-  ConfigureComponent(Component& component) = 0;
-  
-  // Create new object (when needed)
-  virtual std::expected<std::unique_ptr<Component>, FailInfo>
-  CreateComponent() = 0;
+  // Creates and returns new SceneData
+  std::expected<SceneData, FailInfo>
+  ProvideDefaultSceneData(const SceneType scene_type) const override {
+    SceneData scene_data;  // Create new object
+    
+    // Configure it
+    auto config_result = ConfigureSceneData(scene_data, /* data */);
+    if (!config_result)
+      return std::unexpected(config_result.error());
+    
+    return scene_data;  // Return new object
+  }
 };
 ```
 
-**Rationale**:
-- `Configure()`: Efficient when object already exists
-- `Create()`: Necessary when object must be allocated (e.g., polymorphic UI elements)
+**Pattern: Configurators Can Do Both**
+```cpp
+// Some configurators configure existing objects
+class FlatbuffersEntityConfigurator : public IEntityConfigurator {
+public:
+  // Configure existing EntityMemoryPool
+  std::expected<std::monostate, FailInfo>
+  ConfigureEntityMemoryPool(EntityMemoryPool& emp) override {
+    // Modifies emp in place
+  }
+  
+  // Configure existing component
+  std::expected<std::monostate, FailInfo>
+  ConfigureComponent(Component& component) override {
+    // Modifies component in place
+  }
+};
+
+// Other configurators create new objects
+class FlatbuffersUIElementConfigurator : public IUIElementConfigurator {
+public:
+  // Creates and returns new UIElement tree
+  std::expected<std::unique_ptr<UIElement>, FailInfo>
+  CreateRootUIElement() override {
+    auto element = std::make_unique<PanelElement>();
+    
+    // Configure it
+    auto config_result = ConfigureElement(*element, /* data */);
+    if (!config_result)
+      return std::unexpected(config_result.error());
+    
+    return element;  // Return ownership
+  }
+};
+```
+
+**When to Use Each**:
+- **Configure() on existing object**: When object already exists (EntityMemoryPool, Scene)
+- **Create() returning new object**: When object must be allocated (polymorphic UIElement tree)
+- **Providers always Create()**: They always create and return new native objects
+
+**Key Point**: Concrete classes take **data object at construction** (e.g., `EntityCollectionFbs&`), then use that data internally in their Create()/Configure() methods. This hides format-specific logic.
 
 ### 4. Validate Format-Specific Data
 
