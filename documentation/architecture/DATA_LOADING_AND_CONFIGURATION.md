@@ -553,6 +553,502 @@ ConfigureSaveData(SaveData& save_data) const {
 }
 ```
 
+## Comprehensive Implementation Guide
+
+### Overview
+
+This guide provides step-by-step instructions for bringing all providers and configurators into alignment with the normalized pattern. Each section includes current state analysis, target state, and concrete implementation steps.
+
+### Current State Assessment
+
+**Existing Providers**:
+1. `FlatbuffersSaveDataProvider` - Needs normalization
+2. `FlatbuffersSceneDataProvider` - Partially aligned (has Configure methods)
+3. `FlatbuffersEngineDataProvider` - Uses "Populate" naming, needs normalization
+4. `FlatbuffersSceneManagerDataProvider` - Has `ConfigureSceneManagerState`, needs full normalization
+5. `FlatbuffersUIStyleDataProvider` - Needs review
+
+**Existing Configurators**:
+1. `FlatbuffersEntityConfigurator` - Has Configure methods, needs consistency check
+2. `FlatbuffersSceneConfigurator` - Needs review
+3. `FlatbuffersUIElementConfigurator` - Needs review
+
+### Target State: Normalized Pattern
+
+All providers/configurators should follow this structure:
+
+**For Providers (create and return native objects)**:
+```
+Interface: ProvideXXX() → creates and returns native object
+    ↓
+Concrete: ProvideXXX() → creates object → calls ConfigureXXX(NativeObject&)
+    ↓
+Private: ConfigureXXX(NativeObject&) → delegates to specific methods
+    ↓
+Private: ConfigureSubComponent(SubType&, const DataType*) → format-specific logic
+```
+
+**For Configurators (modify existing objects)**:
+```
+Interface: ConfigureXXX(Object&, const NativeData&) → configures existing object
+    ↓
+Concrete: ConfigureXXX(Object&, const NativeData&) → delegates to helpers
+    ↓
+Private: ConfigureSpecificAspect(Object&, const Data&) → specific logic
+```
+
+### Implementation Steps by Provider
+
+#### 1. FlatbuffersSaveDataProvider
+
+**Current State**:
+- Has `ProvideSaveData()` method
+- Has `ConfigureSaveMetaData()` helper
+- Missing normalized `ConfigureSaveData()` method
+
+**Steps to Normalize**:
+
+1. **Add normalized Configure method** (private):
+```cpp
+private:
+  std::expected<std::monostate, FailInfo>
+  ConfigureSaveData(SaveData& save_data, const SaveDataFbs* fb_data) const {
+    if (!fb_data) {
+      return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                      "SaveDataFbs is null"});
+    }
+    
+    // Delegate to specific methods
+    auto meta_result = ConfigureSaveMetaData(save_data.meta_data, 
+                                             fb_data->save_meta_data());
+    if (!meta_result) return std::unexpected(meta_result.error());
+    
+    auto snapshot_result = ConfigureEngineSnapshot(save_data.engine_snapshot,
+                                                   fb_data->engine_snapshot());
+    if (!meta_result) return std::unexpected(snapshot_result.error());
+    
+    return std::monostate{};
+  }
+```
+
+2. **Refactor ProvideSaveData** to use normalized Configure:
+```cpp
+std::expected<SaveData, FailInfo> ProvideSaveData() const override {
+  SaveData save_data;  // Create empty object
+  
+  // Load FlatBuffers data
+  auto fb_data = m_loader.LoadSaveData();
+  if (!fb_data) return std::unexpected(fb_data.error());
+  
+  // Use normalized Configure method
+  auto config_result = ConfigureSaveData(save_data, fb_data.value());
+  if (!config_result) return std::unexpected(config_result.error());
+  
+  return save_data;  // Return configured object
+}
+```
+
+3. **Ensure specific methods follow naming convention**:
+   - Rename if needed to `ConfigureXXX` pattern
+   - Keep existing `ConfigureSaveMetaData` (already correct)
+   - Add `ConfigureEngineSnapshot` if needed
+
+#### 2. FlatbuffersEngineDataProvider
+
+**Current State**:
+- Has `LoadEngineData()` method (interface method)
+- Uses "Populate" naming: `PopulateEngineResourcesConfig`, `PopulateEngineConfig`, etc.
+- No normalized `ConfigureEngineData()` method
+
+**Steps to Normalize**:
+
+1. **Add normalized Configure method** (private):
+```cpp
+private:
+  std::expected<std::monostate, FailInfo>
+  ConfigureEngineData(EngineData& engine_data, const EngineDataFbs* fb_data) const {
+    if (!fb_data) {
+      return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                      "EngineDataFbs is null"});
+    }
+    
+    // Delegate to specific methods (renamed from Populate to Configure)
+    auto resources_result = ConfigureEngineResourcesConfig(
+        engine_data.engine_resources_config,
+        fb_data->engine_resources_config());
+    if (!resources_result) return std::unexpected(resources_result.error());
+    
+    auto config_result = ConfigureEngineConfig(
+        engine_data.engine_config,
+        fb_data->engine_config());
+    if (!config_result) return std::unexpected(config_result.error());
+    
+    auto state_result = ConfigureEngineState(
+        engine_data.engine_state,
+        fb_data->engine_state());
+    if (!state_result) return std::unexpected(state_result.error());
+    
+    auto asset_result = ConfigureInitialAssetConfig(
+        engine_data.initial_asset_config,
+        fb_data->initial_asset_config());
+    if (!asset_result) return std::unexpected(asset_result.error());
+    
+    return std::monostate{};
+  }
+```
+
+2. **Rename Populate methods to Configure** (maintain same logic):
+```cpp
+// Before:
+std::expected<std::monostate, FailInfo>
+PopulateEngineResourcesConfig(EngineResourcesConfig& config, 
+                              const EngineResourcesConfigFbs* fb_data) const;
+
+// After:
+std::expected<std::monostate, FailInfo>
+ConfigureEngineResourcesConfig(EngineResourcesConfig& config,
+                               const EngineResourcesConfigFbs* fb_data) const;
+```
+
+3. **Refactor LoadEngineData** to use normalized Configure:
+```cpp
+std::expected<EngineData, FailInfo> LoadEngineData() const override {
+  EngineData engine_data;  // Create empty object
+  
+  // Load FlatBuffers data
+  auto fb_data = m_loader.LoadEngineData();
+  if (!fb_data) return std::unexpected(fb_data.error());
+  
+  // Use normalized Configure method
+  auto config_result = ConfigureEngineData(engine_data, fb_data.value());
+  if (!config_result) return std::unexpected(config_result.error());
+  
+  return engine_data;  // Return configured object
+}
+```
+
+#### 3. FlatbuffersSceneDataProvider
+
+**Current State**:
+- Has `ProvideDefaultSceneData()` and `ProvideSceneDataFromData()` methods
+- Already has some Configure methods: `ConfigureSceneInfo()`, `ConfigureSceneResourcesConfig()`
+- Has `ConfigureSceneDataFromData()` which is close to normalized pattern
+
+**Steps to Normalize**:
+
+1. **Review existing ConfigureSceneDataFromData**:
+   - Check if it follows the pattern of taking `SceneData&` and delegating
+   - Ensure consistent naming
+
+2. **Ensure ProvideDefaultSceneData uses Configure**:
+```cpp
+std::expected<SceneData, FailInfo>
+ProvideDefaultSceneData(const SceneType scene_type) const override {
+  SceneData scene_data;  // Create empty object
+  
+  // Load FlatBuffers data for scene type
+  auto fb_data = m_loader.LoadSceneDataForType(scene_type);
+  if (!fb_data) return std::unexpected(fb_data.error());
+  
+  // Use normalized Configure method
+  auto config_result = ConfigureSceneData(scene_data, fb_data.value());
+  if (!config_result) return std::unexpected(config_result.error());
+  
+  return scene_data;  // Return configured object
+}
+```
+
+3. **Rename ConfigureSceneDataFromData to ConfigureSceneData** (if not already):
+   - Maintain existing delegation to `ConfigureSceneInfo()`, `ConfigureSceneResourcesConfig()`, etc.
+
+#### 4. FlatbuffersSceneManagerDataProvider
+
+**Current State**:
+- Has `ProvideSceneManagerData()` method
+- Has `ConfigureSceneManagerState()` method (partially aligned)
+
+**Steps to Normalize**:
+
+1. **Add normalized Configure method** (private):
+```cpp
+private:
+  std::expected<std::monostate, FailInfo>
+  ConfigureSceneManagerData(SceneManagerData& data, 
+                           const SceneManagerDataFbs* fb_data) const {
+    if (!fb_data) {
+      return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                      "SceneManagerDataFbs is null"});
+    }
+    
+    // Delegate to specific methods
+    auto state_result = ConfigureSceneManagerState(data.scene_manager_state,
+                                                   fb_data->state());
+    if (!state_result) return std::unexpected(state_result.error());
+    
+    auto config_result = ConfigureSceneManagerConfig(data.scene_manager_config,
+                                                     fb_data->config());
+    if (!config_result) return std::unexpected(config_result.error());
+    
+    // Add other sub-components as needed
+    
+    return std::monostate{};
+  }
+```
+
+2. **Refactor ProvideSceneManagerData** to use normalized Configure:
+```cpp
+std::expected<SceneManagerData, FailInfo> 
+ProvideSceneManagerData() const override {
+  SceneManagerData data;  // Create empty object
+  
+  // Load FlatBuffers data
+  auto fb_data = m_loader.LoadSceneManagerData();
+  if (!fb_data) return std::unexpected(fb_data.error());
+  
+  // Use normalized Configure method
+  auto config_result = ConfigureSceneManagerData(data, fb_data.value());
+  if (!config_result) return std::unexpected(config_result.error());
+  
+  return data;  // Return configured object
+}
+```
+
+#### 5. FlatbuffersUIStyleDataProvider
+
+**Steps to Review and Normalize**:
+
+1. Identify the native data structure (`UIStyle` or collection)
+2. Add normalized `ConfigureUIStyle(UIStyle&, const UIStyleFbs*)` or `ConfigureUIStyles(vector<UIStyle>&, const UIStylesFbs*)`
+3. Refactor public API method to create → configure → return pattern
+
+### Naming Convention Reference
+
+**Consistent Naming Across All Providers**:
+
+| Pattern | Naming Convention | Example |
+|---------|-------------------|---------|
+| Public API (creates) | `Provide{DataType}()` | `ProvideSaveData()` |
+| Normalized (private) | `Configure{DataType}({DataType}&, const {DataType}Fbs*)` | `ConfigureSaveData(SaveData&, const SaveDataFbs*)` |
+| Specific (private) | `Configure{SubComponent}({SubType}&, const {SubType}Fbs*)` | `ConfigureSaveMetaData(SaveMetaData&, const SaveMetaDataFbs*)` |
+| Helpers (private) | `Validate{Aspect}()`, `Parse{Value}()`, `Build{Component}()` | `ValidateUUID()`, `ParseSceneType()` |
+
+**Avoid These Naming Patterns**:
+- ❌ `Populate{Component}` → Use `Configure{Component}` instead
+- ❌ `Load{Component}` (for configuration) → Use `Configure{Component}` (reserve Load for I/O)
+- ❌ `Set{Component}` → Use `Configure{Component}` for consistency
+
+### Implementation Checklist
+
+For each provider/configurator, complete these steps:
+
+- [ ] **Step 1: Identify current state**
+  - List all public API methods
+  - List all configuration/population methods
+  - Identify naming inconsistencies
+
+- [ ] **Step 2: Add normalized Configure method**
+  - Add private `Configure{DataType}({DataType}&, const {DataType}Fbs*)` method
+  - Make it delegate to existing specific methods
+  - Handle null checks and error propagation
+
+- [ ] **Step 3: Rename methods for consistency**
+  - Rename `Populate*` to `Configure*`
+  - Ensure all specific methods follow `Configure{SubComponent}` pattern
+  - Update method signatures if needed
+
+- [ ] **Step 4: Refactor public API**
+  - Update public methods to use create → configure → return pattern
+  - Ensure public method creates empty native object
+  - Call normalized Configure method
+  - Return configured object
+
+- [ ] **Step 5: Update documentation**
+  - Add Doxygen comments for normalized Configure method
+  - Update existing method documentation
+  - Add @brief descriptions following pattern
+
+- [ ] **Step 6: Test**
+  - Verify behavior is unchanged
+  - Test with various input data
+  - Check error handling paths
+
+### Code Review Checklist
+
+When reviewing normalized implementations, verify:
+
+- [ ] **Structure**
+  - Public method creates object and calls Configure
+  - Private Configure method exists and delegates
+  - Specific methods follow naming convention
+
+- [ ] **Naming**
+  - Uses `Configure{Component}` pattern consistently
+  - No `Populate`, `Set`, or `Load` for configuration
+  - Helper methods have descriptive names
+
+- [ ] **Error Handling**
+  - Null checks at each level
+  - Proper error propagation with std::expected
+  - Meaningful error messages
+
+- [ ] **Documentation**
+  - Doxygen comments on all methods
+  - Clear @brief descriptions
+  - Parameter documentation
+
+- [ ] **Testability**
+  - Each level can be tested independently
+  - Clear separation of concerns
+  - No hidden dependencies
+
+### Priority Order
+
+Normalize providers in this order (based on usage frequency and dependencies):
+
+1. **High Priority** (core data structures):
+   - `FlatbuffersSceneDataProvider` - Used for every scene
+   - `FlatbuffersEngineDataProvider` - Used at startup
+   - `FlatbuffersEntityConfigurator` - Used for every scene
+
+2. **Medium Priority** (less frequent usage):
+   - `FlatbuffersSceneManagerDataProvider` - Used at startup
+   - `FlatbuffersSaveDataProvider` - Used for save/load
+   - `FlatbuffersSceneConfigurator` - Used for scene configuration
+
+3. **Lower Priority** (specialized):
+   - `FlatbuffersUIStyleDataProvider` - UI styling
+   - `FlatbuffersUIElementConfigurator` - UI element creation
+
+### Example: Complete Normalized Provider
+
+Here's a complete example showing the normalized pattern:
+
+```cpp
+// FlatbuffersExampleDataProvider.h
+class FlatbuffersExampleDataProvider : public IExampleDataProvider {
+private:
+  FlatbuffersDataLoader m_loader;
+  
+  // Normalized Configure method (private)
+  std::expected<std::monostate, FailInfo>
+  ConfigureExampleData(ExampleData& data, const ExampleDataFbs* fb_data) const {
+    if (!fb_data) {
+      return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                      "ExampleDataFbs is null"});
+    }
+    
+    // Delegate to specific methods
+    auto meta_result = ConfigureExampleMetaData(data.meta_data,
+                                                fb_data->meta_data());
+    if (!meta_result) return std::unexpected(meta_result.error());
+    
+    auto content_result = ConfigureExampleContent(data.content,
+                                                  fb_data->content());
+    if (!content_result) return std::unexpected(content_result.error());
+    
+    return std::monostate{};
+  }
+  
+  // Specific methods (private)
+  std::expected<std::monostate, FailInfo>
+  ConfigureExampleMetaData(ExampleMetaData& meta_data,
+                          const ExampleMetaDataFbs* fb_meta) const {
+    // Format-specific logic
+    if (!fb_meta) return std::monostate{};
+    
+    if (fb_meta->name()) {
+      meta_data.name = fb_meta->name()->str();
+    }
+    meta_data.version = fb_meta->version();
+    
+    return std::monostate{};
+  }
+  
+  std::expected<std::monostate, FailInfo>
+  ConfigureExampleContent(ExampleContent& content,
+                         const ExampleContentFbs* fb_content) const {
+    // Format-specific logic
+    // ...
+    return std::monostate{};
+  }
+
+public:
+  FlatbuffersExampleDataProvider() = default;
+  
+  // Public API: Create and return (uses normalized Configure)
+  std::expected<ExampleData, FailInfo> ProvideExampleData() const override {
+    ExampleData data;  // Create empty object
+    
+    // Load FlatBuffers data
+    auto fb_data = m_loader.LoadExampleData();
+    if (!fb_data) return std::unexpected(fb_data.error());
+    
+    // Configure using normalized method
+    auto config_result = ConfigureExampleData(data, fb_data.value());
+    if (!config_result) return std::unexpected(config_result.error());
+    
+    return data;  // Return configured object
+  }
+};
+```
+
+### Testing Normalized Implementations
+
+When testing normalized code:
+
+1. **Unit Test the Normalized Configure Method**:
+```cpp
+TEST_CASE("ConfigureExampleData handles valid data", "[provider]") {
+  FlatbuffersExampleDataProvider provider;
+  ExampleData data;
+  
+  auto fb_data = CreateTestFlatbuffersData();
+  auto result = provider.ConfigureExampleData(data, fb_data);
+  
+  REQUIRE(result.has_value());
+  REQUIRE(data.meta_data.name == "expected_name");
+}
+```
+
+2. **Test Public API Method**:
+```cpp
+TEST_CASE("ProvideExampleData returns configured data", "[provider]") {
+  FlatbuffersExampleDataProvider provider;
+  
+  auto result = provider.ProvideExampleData();
+  
+  REQUIRE(result.has_value());
+  // Verify data is properly configured
+}
+```
+
+3. **Test Error Paths**:
+```cpp
+TEST_CASE("ConfigureExampleData handles null input", "[provider]") {
+  FlatbuffersExampleDataProvider provider;
+  ExampleData data;
+  
+  auto result = provider.ConfigureExampleData(data, nullptr);
+  
+  REQUIRE(!result.has_value());
+  REQUIRE(result.error().mode == FailMode::FlatbuffersDataNotFound);
+}
+```
+
+### Summary
+
+This implementation guide provides:
+- ✅ Current state assessment of all providers
+- ✅ Target normalized pattern structure
+- ✅ Step-by-step instructions for each provider
+- ✅ Naming convention reference table
+- ✅ Implementation and code review checklists
+- ✅ Priority order for normalization
+- ✅ Complete example of normalized provider
+- ✅ Testing strategy for normalized code
+
+Follow this guide to systematically bring all providers and configurators into alignment with the normalized pattern, ensuring consistency, maintainability, and clarity across the codebase.
+
 ## Workflow Patterns
 
 ### Pattern 1: Providing Standalone Objects
