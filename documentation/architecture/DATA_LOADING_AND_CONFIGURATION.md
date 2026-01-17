@@ -263,6 +263,296 @@ public:
 - `SceneDataFbs`, `SceneInfoFbs`, etc.: FlatBuffers types
 - Should NOT be passed around in game code
 
+## Normalized Pattern: Configure() and Create()
+
+### Problem Statement
+
+To maintain consistency and reduce "messiness" across the codebase, we need a normalized approach where:
+1. Every provider/configurator has a **`Configure(NativeDataStruct&)`** method
+2. If the class creates objects, it has a **`Create()`** method that calls `Configure()` internally
+3. Concrete classes have specific implementation methods that `Configure()` delegates to
+
+### Recommended Normalized Pattern
+
+**For Providers** (create and return new objects):
+
+```cpp
+// Interface defines the contract
+class ISaveDataProvider {
+public:
+  virtual ~ISaveDataProvider() = default;
+  
+  // Primary method: Create and return new object
+  // Internally calls Configure()
+  virtual std::expected<SaveData, FailInfo> ProvideSaveData() const = 0;
+};
+
+// Concrete implementation
+class FlatbuffersSaveDataProvider : public ISaveDataProvider {
+public:
+  FlatbuffersSaveDataProvider() = default;
+  
+  // Public: Create and return new SaveData
+  std::expected<SaveData, FailInfo> ProvideSaveData() const override {
+    SaveData save_data;  // Create empty object
+    
+    // Load format-specific data
+    auto fb_data = LoadFlatbuffersData();
+    if (!fb_data) return std::unexpected(fb_data.error());
+    
+    // Configure it using the normalized Configure() method
+    auto config_result = ConfigureSaveData(save_data, fb_data.value());
+    if (!config_result) return std::unexpected(config_result.error());
+    
+    return save_data;  // Return configured object
+  }
+
+private:
+  // Normalized Configure() method - configures existing object
+  std::expected<std::monostate, FailInfo>
+  ConfigureSaveData(SaveData& save_data, const SaveDataFbs* fb_data) const {
+    // Delegate to specific implementation methods
+    auto meta_result = ConfigureSaveMetaData(save_data.meta_data, 
+                                             fb_data->meta_data());
+    if (!meta_result) return std::unexpected(meta_result.error());
+    
+    auto snapshot_result = ConfigureEngineSnapshot(save_data.engine_snapshot,
+                                                   fb_data->engine_snapshot());
+    if (!snapshot_result) return std::unexpected(snapshot_result.error());
+    
+    return std::monostate{};
+  }
+  
+  // Specific implementation methods (format-specific logic)
+  std::expected<std::monostate, FailInfo>
+  ConfigureSaveMetaData(SaveMetaData& meta_data, 
+                       const SaveMetaDataFbs* fb_meta) const;
+  
+  std::expected<std::monostate, FailInfo>
+  ConfigureEngineSnapshot(EngineSnapshot& snapshot,
+                         const EngineSnapshotFbs* fb_snapshot) const;
+};
+```
+
+**For Configurators** (configure existing objects):
+
+```cpp
+// Interface defines what to configure
+class ISceneConfigurator {
+public:
+  virtual ~ISceneConfigurator() = default;
+  
+  // Wrapper that calls specific Configure methods
+  std::expected<std::monostate, FailInfo>
+  ConfigureScene(Scene& scene, const SceneData& scene_data);
+  
+  // Specific configuration methods
+  virtual std::expected<std::monostate, FailInfo>
+  ConfigureSceneInfo(Scene& scene, const SceneData& scene_data) = 0;
+  
+  virtual std::expected<std::monostate, FailInfo>
+  ConfigureSceneResources(Scene& scene, const SceneData& scene_data) = 0;
+};
+
+// Concrete implementation
+class FlatbuffersSceneConfigurator : public ISceneConfigurator {
+public:
+  // Implement specific configuration methods
+  std::expected<std::monostate, FailInfo>
+  ConfigureSceneInfo(Scene& scene, const SceneData& scene_data) override {
+    // Specific implementation for scene info
+    scene.GetSceneInfo().type = scene_data.scene_info.type;
+    scene.GetSceneInfo().id = scene_data.scene_info.id;
+    return std::monostate{};
+  }
+  
+  std::expected<std::monostate, FailInfo>
+  ConfigureSceneResources(Scene& scene, const SceneData& scene_data) override {
+    // Specific implementation for scene resources
+    // Delegate to helper methods if needed
+    return ConfigureRenderTexture(scene, scene_data.scene_resources_config);
+  }
+
+private:
+  // Helper methods for specific sub-configurations
+  std::expected<std::monostate, FailInfo>
+  ConfigureRenderTexture(Scene& scene, 
+                        const SceneResourcesConfig& config) const;
+};
+```
+
+### Hierarchical Structure
+
+The normalized pattern creates a clear hierarchy:
+
+```
+Public API Method (Create/Provide)
+    ↓
+Configure(NativeDataStruct&) - Normalized method
+    ↓
+Specific Implementation Methods - Format-specific logic
+    ↓
+Helper Methods - Reusable sub-configurations
+```
+
+**Example Flow**:
+```cpp
+// User calls public API
+auto scene_data = provider->ProvideDefaultSceneData(scene_type);
+
+// Internally:
+// 1. Provider creates empty SceneData
+SceneData scene_data;
+
+// 2. Provider loads format-specific data
+const SceneDataFbs* fb_data = LoadFlatbuffersFile(scene_type);
+
+// 3. Provider calls normalized Configure()
+ConfigureSceneData(scene_data, fb_data);
+
+// 4. Configure() delegates to specific methods
+ConfigureSceneInfo(scene_data.scene_info, fb_data->scene_info());
+ConfigureSceneResourcesConfig(scene_data.scene_resources_config, 
+                              fb_data->scene_resources_config());
+
+// 5. Each specific method may call helpers
+ValidateSceneInfo(scene_data.scene_info);
+ParseUUID(fb_data->scene_info()->scene_id());
+
+// 6. Return configured object
+return scene_data;
+```
+
+### Pattern Application to All Native Data Structs
+
+**Rule**: For each native data struct (`SceneData`, `SaveData`, `EngineData`, etc.), ensure:
+
+1. **Provider Interface**: Has a method that creates and returns the object
+2. **Provider Implementation**: 
+   - Has a private `Configure(NativeStruct&)` method
+   - Public method creates object and calls `Configure()`
+3. **Specific Methods**: Format-specific logic in separate methods called by `Configure()`
+
+**Consistency Checklist**:
+- [ ] `SaveData`: `ISaveDataProvider::ProvideSaveData()` → creates → calls `ConfigureSaveData(SaveData&)`
+- [ ] `SceneData`: `ISceneDataProvider::ProvideSceneData()` → creates → calls `ConfigureSceneData(SceneData&)`
+- [ ] `EngineData`: `IEngineDataProvider::ProvideEngineData()` → creates → calls `ConfigureEngineData(EngineData&)`
+- [ ] `SceneManagerData`: `ISceneManagerDataProvider::ProvideData()` → creates → calls `ConfigureSceneManagerData(SceneManagerData&)`
+
+### Three Approaches Evaluated
+
+**Approach 1: Manual Consistency (RECOMMENDED)**
+- Each interface manually defines Configure/Create methods
+- Return types are specific to each interface
+- Pros: Clear contracts, specific method signatures, runtime polymorphism
+- Cons: Requires discipline to maintain consistency
+- **Verdict**: Best for this architecture - provides clarity and flexibility
+
+**Approach 2: Templates**
+```cpp
+// NOT RECOMMENDED for interfaces
+template<typename NativeObject, typename DataObject>
+class IProvider {
+  virtual std::expected<NativeObject, FailInfo> 
+  Provide() const = 0;
+  
+  virtual std::expected<std::monostate, FailInfo>
+  Configure(NativeObject& obj, const DataObject* data) = 0;
+};
+```
+- Pros: Automatic consistency, type-safe
+- Cons: Can't switch implementations at runtime (factory pattern breaks), template instantiation complexity
+- **Verdict**: Not suitable for runtime polymorphism needs
+
+**Approach 3: CRTP (Curiously Recurring Template Pattern)**
+```cpp
+// Could be used for implementation sharing, not interfaces
+template<typename Derived, typename NativeObject>
+class ProviderBase {
+protected:
+  std::expected<NativeObject, FailInfo> CreateAndConfigure() {
+    NativeObject obj;
+    auto result = static_cast<Derived*>(this)->Configure(obj);
+    if (!result) return std::unexpected(result.error());
+    return obj;
+  }
+};
+```
+- Pros: Code reuse for common patterns
+- Cons: More complex, still requires specific interfaces for factory
+- **Verdict**: Could complement Approach 1 for implementation, but doesn't solve interface consistency
+
+### Implementation Guidelines
+
+**For New Providers**:
+1. Define interface with `ProvideXXX()` method that returns native object
+2. In concrete class, implement `ProvideXXX()` to:
+   - Create empty native object
+   - Call private `ConfigureXXX(NativeObject&)` method
+   - Return configured object
+3. Implement private `ConfigureXXX(NativeObject&)` that:
+   - Takes format-specific data (stored or passed)
+   - Delegates to specific implementation methods
+   - Follows consistent naming: `ConfigureXXX()` for normalized method
+
+**For New Configurators**:
+1. Define interface with `ConfigureXXX()` methods for each aspect
+2. In concrete class, implement each `ConfigureXXX()` to:
+   - Take native object reference and data
+   - Delegate to specific helper methods
+   - Follow nested configuration pattern
+
+**Naming Convention**:
+- Public API: `Provide{DataType}()`, `Create{Element}()`
+- Normalized method: `Configure{DataType}(DataType&, ...)`
+- Specific methods: `Configure{SpecificAspect}({AspectType}&, ...)`
+- Helpers: `Validate{Aspect}()`, `Parse{Value}()`, `Build{SubComponent}()`
+
+### Benefits of Normalized Pattern
+
+1. **Consistency**: Same structure across all providers/configurators
+2. **Clarity**: Clear separation between creation, configuration, and implementation
+3. **Reusability**: Specific methods can be called independently
+4. **Testability**: Each level can be tested in isolation
+5. **Maintainability**: Easy to understand and extend
+6. **Hierarchical**: Natural layering from public API to specific implementation
+
+### Migration Guide
+
+To normalize existing code:
+
+1. **Identify** native data structs without normalized Configure() methods
+2. **Add** private `Configure(NativeStruct&)` method to provider
+3. **Refactor** public method to call `Configure()` after creating object
+4. **Extract** format-specific logic into specific implementation methods
+5. **Test** that behavior is unchanged
+
+**Example**:
+```cpp
+// Before:
+std::expected<SaveData, FailInfo> ProvideSaveData() const override {
+  SaveData save_data;
+  // 50 lines of inline configuration logic
+  return save_data;
+}
+
+// After:
+std::expected<SaveData, FailInfo> ProvideSaveData() const override {
+  SaveData save_data;
+  auto result = ConfigureSaveData(save_data);
+  if (!result) return std::unexpected(result.error());
+  return save_data;
+}
+
+private:
+std::expected<std::monostate, FailInfo>
+ConfigureSaveData(SaveData& save_data) const {
+  // Normalized configuration method
+  auto meta_result = ConfigureSaveMetaData(save_data.meta_data);
+  // ... delegate to specific methods
+}
+```
+
 ## Workflow Patterns
 
 ### Pattern 1: Providing Standalone Objects
