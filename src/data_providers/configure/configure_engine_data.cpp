@@ -7,7 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "configure_engine_data.h"
-#include "asset_config_factory.h"
+#include "configure_asset_config.h"
 #include "subscriber_factory.h"
 
 namespace steamrot::data::configure {
@@ -119,8 +119,9 @@ ConfigureInitialAssetConfig(AssetConfig &asset_config,
         FailInfo{FailMode::FlatbuffersDataNotFound,
                  "AssetConfigFbs data is null, cannot populate AssetConfig"});
   }
-  // use factory function to populate AssetConfig from flatbuffers data
-  auto populate_result = ConfigureAssetConfig(asset_config, asset_config_data);
+  // use configure function to populate AssetConfig from flatbuffers data
+  auto populate_result =
+      configure::ConfigureAssetConfig(asset_config, asset_config_data);
   if (!populate_result.has_value()) {
     return std::unexpected(populate_result.error());
   }

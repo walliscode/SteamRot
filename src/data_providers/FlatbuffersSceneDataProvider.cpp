@@ -10,7 +10,7 @@
 #include "FlatbuffersDataLoader.h"
 #include "FlatbuffersEntityImporter.h"
 #include "SceneData.h"
-#include "asset_config_factory.h"
+#include "configure_asset_config.h"
 #include "scene_data_generated.h"
 #include <expected>
 #include <variant>
@@ -107,8 +107,8 @@ FlatbuffersSceneDataProvider::ConfigureSceneDataFromData(
 
   // Configure AssetConfig
   if (fb_data->asset_config()) {
-    auto asset_result = ConfigureAssetConfig(scene_data.scene_asset_config,
-                                             fb_data->asset_config());
+    auto asset_result = data::configure::ConfigureAssetConfig(
+        scene_data.scene_asset_config, fb_data->asset_config());
     if (!asset_result)
       return std::unexpected(asset_result.error());
   }
