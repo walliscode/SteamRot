@@ -11,9 +11,6 @@
 
 #include "FlatbuffersDataLoader.h"
 #include "IEngineDataProvider.h"
-#include "asset_config_generated.h"
-#include "engine_resources_config_generated.h"
-#include "engine_state_generated.h"
 #include <expected>
 
 namespace steamrot {
@@ -43,7 +40,15 @@ public:
   /////////////////////////////////////////////////
   /// @brief Provides EngineData loaded from FlatBuffers binary files.
   /////////////////////////////////////////////////
-  std::expected<EngineData, FailInfo> LoadEngineData() const override;
+  std::expected<EngineData, FailInfo> CreateEngineData() const override;
+
+  /////////////////////////////////////////////////
+  /// @brief Configures the provided EngineData.
+  ///
+  /// @param engine_data Engine data to configure
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ConfigureEngineData(EngineData &engine_data) const override;
 };
 
 } // namespace steamrot

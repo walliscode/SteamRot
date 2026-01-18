@@ -11,12 +11,10 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "AssetConfig.h"
 #include "EngineConfig.h"
 #include "EngineResourcesConfig.h"
 #include "EngineState.h"
 #include "FailInfo.h"
-#include "asset_config_generated.h"
 #include "engine_config_generated.h"
 #include "engine_resources_config_generated.h"
 #include "engine_state_generated.h"
@@ -55,15 +53,5 @@ ConfigureEngineConfig(EngineConfig &engine_config,
 std::expected<std::monostate, FailInfo>
 ConfigureEngineState(EngineState &engine_state,
                      const EngineStateFbs *engine_state_data);
-
-/////////////////////////////////////////////////
-/// @brief Logic for populating initial AssetConfig from data source.
-///
-/// @param asset_config Reference to AssetConfig to populate.
-/// @param asset_config_data Pointer to AssetConfigFbs flatbuffers data.
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-ConfigureInitialAssetConfig(AssetConfig &asset_config,
-                            const AssetConfigFbs *asset_config_data);
 
 } // namespace steamrot::data::configure

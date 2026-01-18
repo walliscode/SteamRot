@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "configure_engine_data.h"
-#include "configure_asset_config.h"
 #include "subscriber_factory.h"
 
 namespace steamrot::data::configure {
@@ -104,26 +103,6 @@ ConfigureEngineState(EngineState &engine_state,
     }
     engine_state.subscriptions.push_back(
         std::make_shared<Subscriber>(create_result.value()));
-  }
-  return std::monostate{};
-}
-
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-ConfigureInitialAssetConfig(AssetConfig &asset_config,
-                            const AssetConfigFbs *asset_config_data) {
-
-  // check for null data
-  if (!asset_config_data) {
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound,
-                 "AssetConfigFbs data is null, cannot populate AssetConfig"});
-  }
-  // use configure function to populate AssetConfig from flatbuffers data
-  auto populate_result =
-      configure::ConfigureAssetConfig(asset_config, asset_config_data);
-  if (!populate_result.has_value()) {
-    return std::unexpected(populate_result.error());
   }
   return std::monostate{};
 }
