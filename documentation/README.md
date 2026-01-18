@@ -217,6 +217,8 @@ tests/unit/<domain>/
 └── <domain>_config.test.cpp             # Free function tests
 ```
 
+**⚠️ Important**: Free functions must be placed in the same CMake library as the provider to avoid circular dependencies. The SteamRot codebase has a strict layering architecture (types → events → entity/user_interface → data_providers → assets → scenes). See [PROVIDER_IMPLEMENTATION_GUIDE.md](PROVIDER_IMPLEMENTATION_GUIDE.md) "Layering and CMake Dependencies" section for details.
+
 ---
 
 ## Quick Start for Developers
@@ -258,7 +260,11 @@ tests/unit/<domain>/
 
 ### Q: Where do I put free configuration functions?
 
-**A**: In `<domain>_config.h/cpp` files, within `steamrot::config` namespace. See PROVIDER_IMPLEMENTATION_GUIDE.md, "File Organization".
+**A**: In `<domain>_config.h/cpp` files in the **same CMake library** as the provider (e.g., `data_providers/`, `entity/`, `user_interface/`). This avoids circular dependencies. See PROVIDER_IMPLEMENTATION_GUIDE.md, "Layering and CMake Dependencies" for detailed layering rules.
+
+### Q: Can I put free functions in a different library than the provider?
+
+**A**: Only if the configuration logic needs to be shared by multiple libraries at different layers, AND you place it in a lower layer that all consumers can depend on. Default: keep free functions with the provider. See layering section in PROVIDER_IMPLEMENTATION_GUIDE.md.
 
 ### Q: Do free functions need to be in `steamrot::config` namespace?
 

@@ -60,7 +60,8 @@ This document provides a detailed, step-by-step migration plan for standardizing
 1. **Create free function files**
    - [ ] Create `src/data_providers/engine_data_config.h`
    - [ ] Create `src/data_providers/engine_data_config.cpp`
-   - [ ] Add to CMakeLists.txt
+   - [ ] Add to `src/data_providers/CMakeLists.txt`
+   - [ ] **Note**: Place in `data_providers` library to maintain current layering (see PROVIDER_IMPLEMENTATION_GUIDE.md, "Layering and CMake Dependencies")
 
 2. **Extract free functions**
    - [ ] Move `PopulateEngineResourcesConfig` → `config::configure_engine_resources_config()`

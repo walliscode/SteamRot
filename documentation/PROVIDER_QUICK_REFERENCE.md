@@ -176,13 +176,15 @@ src/
 ├── data_providers/
 │   ├── FlatbuffersMyDataProvider.h  # Concrete provider
 │   ├── FlatbuffersMyDataProvider.cpp
-│   ├── my_data_config.h            # Free functions
+│   ├── my_data_config.h            # Free functions (same library!)
 │   └── my_data_config.cpp
 
 tests/unit/data_providers/
 ├── FlatbuffersMyDataProvider.test.cpp  # Provider tests
 └── my_data_config.test.cpp            # Free function tests
 ```
+
+**⚠️ Layering Rule**: Place free functions in the same CMake library as the provider to avoid circular dependencies. See PROVIDER_IMPLEMENTATION_GUIDE.md, "Layering and CMake Dependencies" for details.
 
 ## When to Use Provider vs Configurator
 

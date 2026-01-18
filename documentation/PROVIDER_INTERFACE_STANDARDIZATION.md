@@ -333,6 +333,8 @@ Document the pattern clearly in this guide and rely on:
 - **Concrete Providers**: `src/<domain>/Flatbuffers<Domain>Provider.h/cpp`
 - **Free Functions**: `src/<domain>/<domain>_config.h/cpp` or `src/<domain>/config/<aspect>_config.h/cpp`
 
+**Important**: Free functions should be placed in the same CMake library as the provider to avoid circular dependencies in the build system. See PROVIDER_IMPLEMENTATION_GUIDE.md, "Layering and CMake Dependencies" section for detailed guidance on respecting the dependency hierarchy.
+
 ## Migration Strategy
 
 ### Phase 1: Documentation and Analysis ✓

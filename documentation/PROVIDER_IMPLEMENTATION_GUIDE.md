@@ -432,6 +432,179 @@ src/my_domain/config/
 
 Separate implementations for different data sources.
 
+## Layering and CMake Dependencies
+
+### Understanding the Dependency Hierarchy
+
+The SteamRot codebase follows a layered architecture enforced through CMake library dependencies. When placing free configuration functions, you must respect these layers to avoid circular dependencies.
+
+**Current Dependency Hierarchy** (from foundation to high-level):
+
+```
+Layer 0: External Dependencies (SFML, flatbuffers, spdlog, etc.)
+         ↓
+Layer 1: logger
+         ↓
+Layer 2: types (interface library - headers only)
+         ↓
+Layer 3: events
+         ↓
+Layer 4: entity, user_interface (parallel - depend on types + events)
+         ↓
+Layer 5: data_providers (depends on types + events + entity)
+         ↓
+Layer 6: assets (depends on data_providers + user_interface + types)
+         ↓
+Layer 7: resources, logic, context
+         ↓
+Layer 8: scenes, engine
+```
+
+**Key Rule**: A library can only depend on libraries in lower layers. Free functions must be placed where they don't violate this rule.
+
+### Where to Place Free Configuration Functions
+
+#### Option A: In the Same Library as the Provider (Recommended)
+
+Place configuration free functions in the same library as the concrete provider implementation.
+
+**Example**: For `FlatbuffersEngineDataProvider` (in `data_providers` library):
+```
+src/data_providers/
+  ├── FlatbuffersEngineDataProvider.h
+  ├── FlatbuffersEngineDataProvider.cpp
+  ├── engine_data_config.h          ← Free functions here
+  └── engine_data_config.cpp
+```
+
+**Advantages**:
+- No additional CMake complexity
+- Free functions can use same dependencies as provider
+- Natural grouping with provider implementation
+
+**When to use**: Default choice for most providers
+
+#### Option B: In a Lower-Layer Library (For Shared Logic)
+
+If configuration logic needs to be shared across multiple layers, place it in a lower layer that all consumers can depend on.
+
+**Example**: Configuration logic shared between `entity` and `data_providers`:
+```
+src/entity/
+  ├── entity_config.h               ← Free functions here
+  └── entity_config.cpp
+
+src/data_providers/
+  └── FlatbuffersEntityProvider.cpp  ← Uses entity_config
+```
+
+**When to use**: When multiple libraries at different layers need the same configuration logic
+
+#### Option C: In the `types` Library (For Very Low-Level Config)
+
+For configuration functions that only depend on type definitions (no SFML, no EventHandler), consider adding them to `types`.
+
+**Example**: Simple data structure configuration:
+```
+src/types/core/
+  ├── EngineData.h
+  ├── engine_data_config.h          ← Free functions here
+  └── engine_data_config.cpp
+```
+
+**Requirements**:
+- Must not depend on SFML types
+- Must not depend on EventHandler or other high-level types
+- Must be pure data transformation
+
+**When to use**: Rarely - only for pure data structure manipulation
+
+### Circular Dependency Issues
+
+**Problem**: If you place free functions in the wrong layer, you can create circular dependencies.
+
+**Example of WRONG placement**:
+```
+❌ BAD: user_interface_config.h in data_providers/
+   - data_providers depends on user_interface
+   - If data_providers contains user_interface_config
+   - And user_interface wants to use those configs
+   - Circular dependency!
+```
+
+**Solution**: Place `user_interface_config.h` in `user_interface/` library:
+```
+✅ GOOD: user_interface_config.h in user_interface/
+   - user_interface owns its config functions
+   - data_providers can use them (depends on user_interface anyway)
+   - No circular dependency
+```
+
+### CMake Integration
+
+When adding free function files to a library, update its `CMakeLists.txt`:
+
+```cmake
+# In src/data_providers/CMakeLists.txt
+add_library(data_providers
+  FlatbuffersEngineDataProvider.cpp
+  FlatbuffersSceneDataProvider.cpp
+  engine_data_config.cpp              # Add this
+  scene_data_config.cpp               # Add this
+  # ... other files
+)
+```
+
+### Guidelines by Domain
+
+| Domain | Config Functions Location | Rationale |
+|--------|--------------------------|-----------|
+| **EngineData** | `src/data_providers/engine_data_config.h/cpp` | Provider owns the config logic |
+| **SceneData** | `src/data_providers/scene_data_config.h/cpp` | Provider owns the config logic |
+| **SaveData** | `src/data_providers/save_data_config.h/cpp` | Provider owns the config logic |
+| **UIStyleData** | `src/data_providers/ui_style_data_config.h/cpp` | Provider owns the config logic |
+| **EntityData** | `src/entity/entity_config.h/cpp` | Shared by entity and data_providers |
+| **UIElementData** | `src/user_interface/ui_element_config.h/cpp` | Owned by user_interface |
+| **SceneManagerData** | `src/data_providers/scene_manager_data_config.h/cpp` | Provider owns the config logic |
+
+### Testing Layering
+
+To verify you haven't created circular dependencies:
+
+```bash
+# Build the project - CMake will fail if circular dependencies exist
+cmake --preset Debug
+cmake --build --preset Debug
+
+# If you see errors like:
+# "cycle in constraint graph" or
+# "circular dependency between targets"
+# You've placed free functions in the wrong layer!
+```
+
+### Quick Decision Tree
+
+```
+Where should I put configure_X() free functions?
+
+1. Does the config logic depend on EventHandler, AssetManager, 
+   or other high-level components?
+   YES → Put in same library as provider (data_providers, entity, etc.)
+   NO → Continue to 2
+
+2. Is the config logic needed by multiple libraries at different layers?
+   YES → Put in lowest layer that has all dependencies
+   NO → Continue to 3
+
+3. Does the config only manipulate plain data structures?
+   YES → Consider putting in types/core/ or types/components/
+   NO → Put in same library as provider (default)
+```
+
+### Migration Consideration
+
+When migrating existing providers, **always place free functions in the same library as the provider first**. This is the safest approach and matches current dependency structure. You can refactor to a lower layer later if sharing becomes necessary.
+
 ## Migration Checklist
 
 When migrating an existing Provider/Configurator:
