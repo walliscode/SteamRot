@@ -7,6 +7,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "configure_engine_data.h"
+#include "configure_asset_config.h"
+#include "subscriber_factory.h"
 
 namespace steamrot::data::configure {
 
@@ -52,4 +54,78 @@ std::expected<std::monostate, FailInfo> ConfigureEngineResourcesConfig(
 
   return std::monostate{};
 }
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureEngineConfig(EngineConfig &engine_config,
+                      const EngineConfigFbs *engine_config_data) {
+  // check for null data
+  if (!engine_config_data) {
+    return std::unexpected(
+        FailInfo{FailMode::FlatbuffersDataNotFound,
+                 "EngineConfigFbs data is null, cannot populate EngineConfig"});
+  }
+  // populate fields from flatbuffers data
+
+  engine_config.display.window_title =
+      engine_config_data->display()->window_title()->str();
+  engine_config.display.framerate_limit =
+      engine_config_data->display()->framerate_limit();
+
+  // Set defaults for user preferences (can be loaded from separate file later)
+  engine_config.user_preferences.master_volume = 1.0f;
+  engine_config.user_preferences.show_fps = false;
+  engine_config.user_preferences.preferred_language = "en";
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureEngineState(EngineState &engine_state,
+                     const EngineStateFbs *engine_state_data) {
+  // check for null data
+  if (!engine_state_data) {
+    return std::unexpected(
+        FailInfo{FailMode::FlatbuffersDataNotFound,
+                 "EngineStateFbs data is null, cannot populate EngineState"});
+  }
+  // populate fields from flatbuffers data
+  engine_state.running = engine_state_data->running();
+  engine_state.paused = engine_state_data->paused();
+  engine_state.quit_requested = engine_state_data->quit_requested();
+
+  //  populate subscriptions
+  for (const SubscriberFbs *subscriber_fbs :
+       *engine_state_data->subscriptions()) {
+    auto create_result = subscriber_factory::CreateSubscriber(subscriber_fbs);
+    if (!create_result.has_value()) {
+      return std::unexpected(create_result.error());
+    }
+    engine_state.subscriptions.push_back(
+        std::make_shared<Subscriber>(create_result.value()));
+  }
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureInitialAssetConfig(AssetConfig &asset_config,
+                            const AssetConfigFbs *asset_config_data) {
+
+  // check for null data
+  if (!asset_config_data) {
+    return std::unexpected(
+        FailInfo{FailMode::FlatbuffersDataNotFound,
+                 "AssetConfigFbs data is null, cannot populate AssetConfig"});
+  }
+  // use configure function to populate AssetConfig from flatbuffers data
+  auto populate_result =
+      configure::ConfigureAssetConfig(asset_config, asset_config_data);
+  if (!populate_result.has_value()) {
+    return std::unexpected(populate_result.error());
+  }
+  return std::monostate{};
+}
+
 } // namespace steamrot::data::configure

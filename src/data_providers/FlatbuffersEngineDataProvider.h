@@ -34,44 +34,6 @@ private:
   /////////////////////////////////////////////////
   FlatbuffersDataLoader m_loader;
 
-  /////////////////////////////////////////////////
-  /// @brief Logic for populating EngineResourcesConfig from flatbuffers data
-  /// source.
-  ///
-  /// @param engine_resources_config Reference to EngineResourcesConfig to
-  /// populate.
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo> PopulateEngineResourcesConfig(
-      EngineResourcesConfig &engine_resources_config,
-      const EngineResourcesConfigFbs *engine_resources_config_data) const;
-
-  /////////////////////////////////////////////////
-  /// @brief Logic for populating EngineConfig from data source.
-  ///
-  /// @param engine_config Reference to EngineConfig to populate.
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  PopulateEngineConfig(EngineConfig &engine_config,
-                       const EngineConfigFbs *engine_config_data) const;
-
-  /////////////////////////////////////////////////
-  /// @brief Logic for populating EngineState from data source.
-  ///
-  /// @param engine_state Reference to EngineState to populate.
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  PopulateEngineState(EngineState &engine_state,
-                      const EngineStateFbs *engine_state_data) const;
-
-  /////////////////////////////////////////////////
-  /// @brief logic for populating initial AssetConfig from data source.
-  ///
-  /// @param asset_config Reference to AssetConfig to populate.
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  PopulateInitialAssetConfig(AssetConfig &asset_config,
-                             const AssetConfigFbs *asset_config_data) const;
-
 public:
   /////////////////////////////////////////////////
   /// @brief Default constructor.
