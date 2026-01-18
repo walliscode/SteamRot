@@ -32,7 +32,7 @@ std::expected<std::monostate, FailInfo> Engine::StartUp() {
   IEngineDataProvider &data_provider = *data_provider_result.value();
 
   // Load EngineData
-  auto engine_data_result = data_provider.LoadEngineData();
+  auto engine_data_result = data_provider.CreateEngineData();
   if (!engine_data_result) {
     return std::unexpected(engine_data_result.error());
   }

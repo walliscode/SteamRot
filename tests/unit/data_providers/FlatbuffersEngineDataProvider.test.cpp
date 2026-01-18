@@ -17,10 +17,10 @@ TEST_CASE("FlatbuffersEngineDataProvider is constructed correctly",
   REQUIRE_NOTHROW(provider);
 }
 
-TEST_CASE("FlatbuffersEngineDataProvider::LoadEngineData loads correctly",
+TEST_CASE("FlatbuffersEngineDataProvider::CreateEngineData loads correctly",
           "[unit][FlatbuffersEngineDataProvider]") {
   steamrot::FlatbuffersEngineDataProvider provider;
-  auto result = provider.LoadEngineData();
+  auto result = provider.CreateEngineData();
   if (!result.has_value()) {
     FAIL(result.error().message);
   }

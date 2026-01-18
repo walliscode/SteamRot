@@ -14,6 +14,7 @@ add_executable(test_data_providers
   FlatbuffersSaveDataProvider.test.cpp
   FlatbuffersUIStyleDataProvider.test.cpp
   asset_config_factory.test.cpp
+  configure_engine_data.test.cpp
 )
 
 
