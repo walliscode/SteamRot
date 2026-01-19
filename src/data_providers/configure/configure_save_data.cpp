@@ -50,4 +50,33 @@ ConfigureSaveMetaData(SaveMetaData &save_meta_data,
 
   return std::monostate{};
 }
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureSaveData(SaveData &save_data, const SaveDataFbs *save_data_fbs) {
+
+  // handle null input
+  if (!save_data_fbs)
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    "Null SaveDataFbs pointer"});
+
+  // configure SaveMetaData
+  if (!save_data_fbs->save_meta_data()) {
+    return std::unexpected(
+        FailInfo{FailMode::FlatbuffersDataNotFound,
+                 "SaveDataFbs missing required field: save_meta_data"});
+  }
+
+  auto configure_meta_result =
+      ConfigureSaveMetaData(save_data.meta_data, save_data_fbs->save_meta_data());
+  if (!configure_meta_result.has_value()) {
+    return std::unexpected(configure_meta_result.error());
+  }
+
+  // Note: scene_collection_data configuration would be added here
+  // when the SceneCollectionData configuration functions are available
+  // For now, we leave engine_snapshot.scene_collection_data empty
+
+  return std::monostate{};
+}
 } // namespace steamrot::data::configure
