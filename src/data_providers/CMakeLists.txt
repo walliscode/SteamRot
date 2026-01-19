@@ -16,9 +16,9 @@ add_library(data_providers
   FlatbuffersDataLoader.cpp
   data_file_utils.cpp
   paths.cpp
-  asset_config_factory.cpp
   configure/configure_engine_data.cpp
   configure/configure_asset_config.cpp
+  configure/configure_save_data.cpp
 
 )
 

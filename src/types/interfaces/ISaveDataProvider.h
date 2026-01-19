@@ -14,6 +14,7 @@
 #include "FailInfo.h"
 #include "SaveData.h"
 #include <expected>
+#include <variant>
 namespace steamrot {
 
 class ISaveDataProvider {
@@ -25,8 +26,16 @@ public:
   virtual ~ISaveDataProvider() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Provide a SaveData object.
+  /// @brief Provide a configured SaveData object.
   /////////////////////////////////////////////////
-  virtual std::expected<SaveData, FailInfo> ProvideSaveData() const = 0;
+  virtual std::expected<SaveData, FailInfo> CreateSaveData() const = 0;
+
+  /////////////////////////////////////////////////
+  /// @brief Configure the provided SaveData object.
+  ///
+  /// @param save_data SaveData object to configure.
+  /////////////////////////////////////////////////
+  virtual std::expected<std::monostate, FailInfo>
+  ConfigureSaveData(SaveData &save_data) const = 0;
 };
 } // namespace steamrot
