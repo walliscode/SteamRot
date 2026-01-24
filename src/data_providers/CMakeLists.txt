@@ -21,6 +21,7 @@ add_library(data_providers
   configure/configure_save_data.cpp
   configure/configure_scene_manager_data.cpp
   configure/configure_ui_styles.cpp
+  configure/configure_scene_data.cpp
 
 )
 

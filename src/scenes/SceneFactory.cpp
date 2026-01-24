@@ -93,7 +93,7 @@ SceneFactory::CreateSceneFromDefault(SceneType type) {
   ISceneDataProvider &provider = *get_provider_result.value();
 
   // Step 2: Provider loads data
-  auto get_data_result = provider.ProvideDefaultSceneData(type);
+  auto get_data_result = provider.CreateSceneData(type);
   if (!get_data_result.has_value()) {
     return std::unexpected(get_data_result.error());
   }
