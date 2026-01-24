@@ -15,22 +15,22 @@ This document provides a detailed, step-by-step migration plan for standardizing
 
 ### Data Providers (6 interfaces)
 
-| Interface | Concrete Implementation | Complexity | Priority |
-|-----------|------------------------|------------|----------|
-| `IEngineDataProvider` | `FlatbuffersEngineDataProvider` | Low | 1 (Start here) |
-| `ISaveDataProvider` | `FlatbuffersSaveDataProvider` | Low | 2 |
-| `ISceneManagerDataProvider` | `FlatbuffersSceneManagerDataProvider` | Medium | 3 |
-| `IUIStyleDataProvider` | `FlatbuffersUIStyleDataProvider` | Medium | 4 |
-| `ISceneDataProvider` | `FlatbuffersSceneDataProvider` | High | 5 |
-| `IFontProvider` | (AssetManager) | Low | 6 |
+| Interface | Concrete Implementation | Complexity | Status |
+|-----------|------------------------|------------|--------|
+| `IEngineDataProvider` | `FlatbuffersEngineDataProvider` | Low | ✅ **COMPLETE** |
+| `ISaveDataProvider` | `FlatbuffersSaveDataProvider` | Low | ✅ **COMPLETE** |
+| `ISceneManagerDataProvider` | `FlatbuffersSceneManagerDataProvider` | Medium | ✅ **COMPLETE** |
+| `IUIStyleDataProvider` | `FlatbuffersUIStyleDataProvider` | Medium | ✅ **COMPLETE** |
+| `ISceneDataProvider` | `FlatbuffersSceneDataProvider` | High | ✅ **COMPLETE** |
+| `IFontProvider` | (AssetManager) | Low | ⏳ Not Started |
 
 ### Configurators (4 interfaces)
 
-| Interface | Concrete Implementation | Complexity | Priority |
-|-----------|------------------------|------------|----------|
-| `ISceneConfigurator` | `FlatbuffersSceneConfigurator` | Medium | 7 |
-| `IUIElementConfigurator` | `FlatbuffersUIElementConfigurator` | High | 8 |
-| `IEntityConfigurator` | `FlatbuffersEntityConfigurator` | Very High | 9 |
+| Interface | Concrete Implementation | Complexity | Status |
+|-----------|------------------------|------------|--------|
+| `ISceneConfigurator` | `FlatbuffersSceneConfigurator` | Medium | ⚠️ **NEEDS REVIEW** (see analysis below) |
+| `IUIElementConfigurator` | `FlatbuffersUIElementConfigurator` | High | ⏳ Not Started |
+| `IEntityConfigurator` | `FlatbuffersEntityConfigurator` | Very High | ⏳ Not Started |
 | `IUIStyleConfigurator` | (Not implemented) | N/A | N/A |
 
 ## Phase 1: Foundation ✅ COMPLETE
@@ -42,381 +42,304 @@ This document provides a detailed, step-by-step migration plan for standardizing
 - [x] Create migration plan
 - [x] Make templating decision (no templates)
 
-## Phase 2: Data Provider Migration
+## Phase 2: Data Provider Migration ✅ **COMPLETE**
 
-### Task 2.1: IEngineDataProvider (Priority 1)
+All data providers have been successfully migrated to the Create/Configure pattern with free configuration functions.
 
-**Complexity**: Low  
-**Estimated effort**: 4-6 hours  
-**Status**: ⏳ Ready to start
+### Migration Summary
 
-#### Current State
-- Interface: `IEngineDataProvider::LoadEngineData()`
-- Implementation: `FlatbuffersEngineDataProvider`
-- Private methods: `PopulateEngineResourcesConfig()`, `PopulateEngineConfig()`, `PopulateEngineState()`, `PopulateInitialAssetConfig()`
+All providers now follow the standardized pattern:
+- **Create Method**: Creates and returns a new configured object (e.g., `CreateEngineData()`)
+- **Configure Method**: Configures an existing object (e.g., `ConfigureEngineData()`)
+- **Free Functions**: Configuration logic extracted to `src/data_providers/configure/` directory
 
-#### Migration Steps
+### Completed Migrations
 
-1. **Create free function files**
-   - [ ] Create `src/data_providers/engine_data_config.h`
-   - [ ] Create `src/data_providers/engine_data_config.cpp`
-   - [ ] Add to `src/data_providers/CMakeLists.txt`
-   - [ ] **Note**: Place in `data_providers` library to maintain current layering (see PROVIDER_IMPLEMENTATION_GUIDE.md, "Layering and CMake Dependencies")
+#### Task 2.1: IEngineDataProvider ✅ **COMPLETE**
 
-2. **Extract free functions**
-   - [ ] Move `PopulateEngineResourcesConfig` → `config::configure_engine_resources_config()`
-   - [ ] Move `PopulateEngineConfig` → `config::configure_engine_config()`
-   - [ ] Move `PopulateEngineState` → `config::configure_engine_state()`
-   - [ ] Move `PopulateInitialAssetConfig` → `config::configure_initial_asset_config()`
+**What was done:**
+- ✅ Interface updated with `CreateEngineData()` and `ConfigureEngineData()` methods
+- ✅ Free functions created in `src/data_providers/configure/configure_engine_data.h/cpp`
+- ✅ Tests added: `tests/unit/data_providers/configure_engine_data.test.cpp`
+- ✅ Provider uses free functions from `steamrot::config` namespace
 
-3. **Add tests for free functions**
-   - [ ] Create `tests/unit/data_providers/engine_data_config.test.cpp`
-   - [ ] Test `configure_engine_resources_config()`
-   - [ ] Test `configure_engine_config()`
-   - [ ] Test `configure_engine_state()`
-   - [ ] Test `configure_initial_asset_config()`
-   - [ ] Test null handling
-   - [ ] Test missing required fields
-
-4. **Update provider implementation**
-   - [ ] Update `FlatbuffersEngineDataProvider` to use free functions
-   - [ ] Remove private methods
-   - [ ] Run existing provider tests
-   - [ ] Verify all tests pass
-
-5. **Rename interface method**
-   - [ ] Update `IEngineDataProvider::LoadEngineData()` → `Provide()`
-   - [ ] Update `FlatbuffersEngineDataProvider::LoadEngineData()` → `Provide()`
-   - [ ] Find and update all call sites
-   - [ ] Run all tests
-
-6. **Documentation**
-   - [ ] Update interface documentation
-   - [ ] Add example to implementation guide
-   - [ ] Mark as migrated in this document
-
-#### Files to Modify
+**Files changed:**
 - `src/types/interfaces/IEngineDataProvider.h`
-- `src/data_providers/FlatbuffersEngineDataProvider.h`
-- `src/data_providers/FlatbuffersEngineDataProvider.cpp`
-- Any files that instantiate or use `IEngineDataProvider`
-
-#### Success Criteria
-- [ ] All tests pass
-- [ ] Free functions tested independently
-- [ ] Interface uses `Provide()` method
-- [ ] No duplicated configuration logic
-- [ ] Documentation updated
+- `src/data_providers/FlatbuffersEngineDataProvider.h/cpp`
+- `src/data_providers/configure/configure_engine_data.h/cpp`
+- `tests/unit/data_providers/FlatbuffersEngineDataProvider.test.cpp`
+- `tests/unit/data_providers/configure_engine_data.test.cpp`
 
 ---
 
-### Task 2.2: ISaveDataProvider (Priority 2)
+#### Task 2.2: ISaveDataProvider ✅ **COMPLETE**
 
-**Complexity**: Low  
-**Estimated effort**: 3-4 hours  
-**Status**: ⏳ Waiting for 2.1
+**What was done:**
+- ✅ Interface updated with `CreateSaveData()` and `ConfigureSaveData()` methods
+- ✅ Free functions created in `src/data_providers/configure/configure_save_data.h/cpp`
+- ✅ Tests added: `tests/unit/data_providers/configure_save_data.test.cpp`
 
-#### Current State
-- Interface: `ISaveDataProvider::ProvideSaveData()`
-- Implementation: `FlatbuffersSaveDataProvider`
-- Already uses `Provide*` naming (good!)
-
-#### Migration Steps
-
-1. **Create free function files**
-   - [ ] Create `src/data_providers/save_data_config.h`
-   - [ ] Create `src/data_providers/save_data_config.cpp`
-
-2. **Extract free functions**
-   - [ ] Identify configuration logic in `FlatbuffersSaveDataProvider`
-   - [ ] Extract to `config::configure_save_data()`
-   - [ ] Extract any sub-configurations
-
-3. **Add tests**
-   - [ ] Create `tests/unit/data_providers/save_data_config.test.cpp`
-   - [ ] Test all configuration paths
-   - [ ] Test error cases
-
-4. **Update provider**
-   - [ ] Refactor to use free functions
-   - [ ] Run existing tests
-   - [ ] Verify all tests pass
-
-5. **Standardize naming**
-   - [ ] Update to `Provide()` if needed (check current method name)
-   - [ ] Update call sites
-
-6. **Documentation**
-   - [ ] Update documentation
-
-#### Success Criteria
-- [ ] All tests pass
-- [ ] Free functions tested
-- [ ] Consistent naming
-- [ ] Documentation updated
+**Files changed:**
+- `src/types/interfaces/ISaveDataProvider.h`
+- `src/data_providers/FlatbuffersSaveDataProvider.h/cpp`
+- `src/data_providers/configure/configure_save_data.h/cpp`
+- `tests/unit/data_providers/configure_save_data.test.cpp`
 
 ---
 
-### Task 2.3: ISceneManagerDataProvider (Priority 3)
+#### Task 2.3: ISceneManagerDataProvider ✅ **COMPLETE**
 
-**Complexity**: Medium  
-**Estimated effort**: 4-5 hours  
-**Status**: ⏳ Waiting for 2.2
+**What was done:**
+- ✅ Interface updated with `CreateSceneManagerData()` and `ConfigureSceneManagerData()` methods
+- ✅ Free functions created in `src/data_providers/configure/configure_scene_manager_data.h/cpp`
+- ✅ Tests added: `tests/unit/data_providers/configure_scene_manager_data.test.cpp`
 
-#### Current State
-- Interface: `ISceneManagerDataProvider::ProvideSceneManagerData()`
-- Implementation: `FlatbuffersSceneManagerDataProvider`
-
-#### Migration Steps
-
-1. **Create free function files**
-   - [ ] Create `src/data_providers/scene_manager_data_config.h`
-   - [ ] Create `src/data_providers/scene_manager_data_config.cpp`
-
-2. **Extract free functions**
-   - [ ] Identify configuration logic
-   - [ ] Extract to `config::configure_scene_manager_data()`
-
-3. **Add tests**
-   - [ ] Create test file
-   - [ ] Test configurations
-   - [ ] Test error handling
-
-4. **Update provider**
-   - [ ] Use free functions
-   - [ ] Run tests
-
-5. **Standardize naming**
-   - [ ] Update to `Provide()` if needed
-
-6. **Documentation**
-   - [ ] Update docs
-
-#### Success Criteria
-- [ ] All tests pass
-- [ ] Free functions tested
-- [ ] Documentation updated
+**Files changed:**
+- `src/types/interfaces/ISceneManagerDataProvider.h`
+- `src/data_providers/FlatbuffersSceneManagerDataProvider.h/cpp`
+- `src/data_providers/configure/configure_scene_manager_data.h/cpp`
+- `tests/unit/data_providers/configure_scene_manager_data.test.cpp`
 
 ---
 
-### Task 2.4: IUIStyleDataProvider (Priority 4)
+#### Task 2.4: IUIStyleDataProvider ✅ **COMPLETE**
 
-**Complexity**: Medium  
-**Estimated effort**: 5-6 hours  
-**Status**: ⏳ Waiting for 2.3
+**What was done:**
+- ✅ Interface updated with `CreateUIStyles()` and `ConfigureUIStyles()` methods
+- ✅ Legacy `ProvideUIStyles()` method kept for backward compatibility
+- ✅ Free functions created in `src/data_providers/configure/configure_ui_styles.h/cpp`
+- ✅ Tests added: `tests/unit/data_providers/configure_ui_styles.test.cpp`
 
-#### Current State
-- Interface: `IUIStyleDataProvider::ProvideUIStyles()`
-- Implementation: `FlatbuffersUIStyleDataProvider`
-- Has protected member: `fonts_map`
-- Returns vector of styles
-
-#### Migration Steps
-
-1. **Create free function files**
-   - [ ] Create `src/user_interface/ui_style_config.h`
-   - [ ] Create `src/user_interface/ui_style_config.cpp`
-
-2. **Extract free functions**
-   - [ ] Extract single style configuration logic
-   - [ ] Handle fonts_map dependency (pass as parameter)
-   - [ ] Extract vector configuration logic
-
-3. **Add tests**
-   - [ ] Create test file
-   - [ ] Test single style configuration
-   - [ ] Test multiple styles
-   - [ ] Test with font dependencies
-
-4. **Update provider**
-   - [ ] Use free functions
-   - [ ] Pass fonts_map to free functions
-
-5. **Standardize naming**
-   - [ ] Review method naming
-   - [ ] Update if needed
-
-6. **Documentation**
-   - [ ] Update docs
-
-#### Success Criteria
-- [ ] All tests pass
-- [ ] Free functions handle dependencies
-- [ ] Documentation updated
+**Files changed:**
+- `src/types/interfaces/IUIStyleDataProvider.h`
+- `src/data_providers/FlatbuffersUIStyleDataProvider.h/cpp`
+- `src/data_providers/configure/configure_ui_styles.h/cpp`
+- `tests/unit/data_providers/configure_ui_styles.test.cpp`
 
 ---
 
-### Task 2.5: ISceneDataProvider (Priority 5)
+#### Task 2.5: ISceneDataProvider ✅ **COMPLETE**
 
-**Complexity**: High  
-**Estimated effort**: 8-10 hours  
-**Status**: ⏳ Waiting for 2.4
+**What was done:**
+- ✅ Interface updated with `CreateSceneData()` and `ConfigureSceneData()` methods
+- ✅ Free functions created in `src/data_providers/configure/configure_scene_data.h/cpp`
+- ✅ Asset config free functions in `src/data_providers/configure/configure_asset_config.h/cpp`
+- ✅ Tests added for all configuration functions
+- ✅ FlatBuffers schemas updated for scene data structures
 
-#### Current State
-- Interface: `ISceneDataProvider` with multiple methods:
-  - `ProvideDefaultSceneData()`
-  - `ProvideSceneDataFromData()`
-- Implementation: `FlatbuffersSceneDataProvider`
-- Has additional `Configure*` methods:
-  - `ConfigureSceneInfo()`
-  - `ConfigureSceneResourcesConfig()`
-  - `ConfigureSceneDataFromData()`
-
-#### Migration Steps
-
-1. **Create free function files**
-   - [ ] Create `src/scenes/scene_data_config.h`
-   - [ ] Create `src/scenes/scene_data_config.cpp`
-
-2. **Extract free functions**
-   - [ ] Extract `ConfigureSceneInfo` → `config::configure_scene_info()`
-   - [ ] Extract `ConfigureSceneResourcesConfig` → `config::configure_scene_resources_config()`
-   - [ ] Extract `ConfigureSceneDataFromData` → `config::configure_scene_data_from_data()`
-   - [ ] Consider additional helper functions
-
-3. **Add comprehensive tests**
-   - [ ] Create `tests/unit/scenes/scene_data_config.test.cpp`
-   - [ ] Test each free function
-   - [ ] Test SceneInfo configuration
-   - [ ] Test SceneResourcesConfig configuration
-   - [ ] Test complete SceneData configuration
-   - [ ] Test error cases
-
-4. **Update provider implementation**
-   - [ ] Refactor to use free functions
-   - [ ] Keep multiple Provide methods
-   - [ ] Remove Configure methods or make them use free functions
-
-5. **Standardize interface**
-   - [ ] Keep `ProvideDefault()` and `ProvideFromData()` naming
-   - [ ] Consider adding base `Provide()` method
-   - [ ] Update documentation
-
-6. **Update call sites**
-   - [ ] Find all uses of `ISceneDataProvider`
-   - [ ] Update if method signatures changed
-
-7. **Documentation**
-   - [ ] Document multiple Provide methods pattern
-   - [ ] Update examples
-
-#### Success Criteria
-- [ ] All tests pass
-- [ ] Free functions tested independently
-- [ ] Multiple Provide methods work correctly
-- [ ] EventHandler dependency handled properly
-- [ ] Documentation clear
+**Files changed:**
+- `src/types/interfaces/ISceneDataProvider.h`
+- `src/data_providers/FlatbuffersSceneDataProvider.h/cpp`
+- `src/data_providers/configure/configure_scene_data.h/cpp`
+- `src/data_providers/configure/configure_asset_config.h/cpp`
+- `tests/unit/data_providers/configure_scene_data.test.cpp`
+- `tests/unit/data_providers/configure_asset_config.test.cpp`
+- `src/types/flatbuffers/scenes/*.fbs` (schema updates)
 
 ---
 
-### Task 2.6: IFontProvider (Priority 6)
+#### Task 2.6: IFontProvider ⏳ **NOT STARTED**
 
-**Complexity**: Low  
-**Estimated effort**: 2-3 hours  
-**Status**: ⏳ Waiting for 2.5
+**Current State:**
+- Simple getter interface: `GetFont(const std::string& font_name)`
+- Implemented by AssetManager
+- No migration needed - interface is appropriate for a simple resource getter
 
-#### Current State
-- Interface: `IFontProvider::GetFont()`
-- No separate concrete implementation (AssetManager implements)
-- Simple getter interface
+**Recommendation:**
+- **Keep as-is**: The `GetFont()` method is appropriate for a simple resource accessor
+- Does not need Create/Configure pattern
+- Can be marked as complete without changes
 
-#### Migration Steps
+---
 
-1. **Analyze current usage**
-   - [ ] Check if AssetManager is the only implementer
-   - [ ] Determine if renaming is beneficial
+## Phase 2 Notes
 
-2. **Consider renaming**
-   - [ ] Evaluate `GetFont()` vs `ProvideFont()`
-   - [ ] Check call sites for impact
+### Free Function Organization
 
-3. **Make decision**
-   - [ ] Option A: Rename to `ProvideFont()` for consistency
-   - [ ] Option B: Keep `GetFont()` (acceptable for simple getter)
-   - [ ] Document decision rationale
+All free functions were placed in `src/data_providers/configure/` directory:
+- `configure_engine_data.h/cpp`
+- `configure_save_data.h/cpp`
+- `configure_scene_manager_data.h/cpp`
+- `configure_ui_styles.h/cpp`
+- `configure_scene_data.h/cpp`
+- `configure_asset_config.h/cpp`
 
-4. **Update if renaming**
-   - [ ] Update interface
-   - [ ] Update AssetManager
-   - [ ] Update call sites
+This follows the layering guidance (free functions in same library as provider) while organizing them in a dedicated subdirectory for clarity.
 
-5. **Documentation**
-   - [ ] Document IFontProvider pattern
-   - [ ] Add note about getter vs provider methods
+### Pattern Consistency
 
-#### Success Criteria
-- [ ] Decision documented
-- [ ] Tests pass
-- [ ] Documentation updated
+All migrated providers follow the same pattern:
+```cpp
+class IDataProvider {
+  // Create: Returns new configured object
+  virtual std::expected<DataType, FailInfo> CreateDataType() const = 0;
+  
+  // Configure: Configures existing object using free functions
+  virtual std::expected<std::monostate, FailInfo> 
+  ConfigureDataType(DataType& data) const = 0;
+};
+```
+
+### Test Coverage
+
+Each provider has two test files:
+1. Provider integration tests: `Flatbuffers<Domain>Provider.test.cpp`
+2. Free function unit tests: `configure_<domain>.test.cpp`
+
+This ensures both the free functions and provider implementations are thoroughly tested.
 
 ---
 
 ## Phase 3: Configurator Migration
 
-### Task 3.1: ISceneConfigurator (Priority 7)
+### ISceneConfigurator Analysis ⚠️
 
-**Complexity**: Medium  
-**Estimated effort**: 6-8 hours  
-**Status**: ⏳ Waiting for Phase 2
-
-#### Current State
-- Interface: `ISceneConfigurator` with methods:
-  - `ConfigureScene()` (non-virtual, calls others)
-  - `ImportEntities()` (non-virtual)
-  - `ConfigureSceneInfo()` (virtual)
-  - `ConfigureSceneResources()` (virtual)
-  - `ConfigureSceneConfig()` (virtual)
-  - `PassAssetConfig()` (non-virtual)
-  - `ConfigureLogicMap()` (non-virtual)
+**Current State:**
+- Interface: `ISceneConfigurator`
 - Implementation: `FlatbuffersSceneConfigurator`
+- Used by: `SceneFactory::CreateSceneFromSceneData()`
+
+**Key Observation:**
+`FlatbuffersSceneConfigurator` contains **NO FlatBuffers-specific logic**. All methods work with native `SceneData` structs, not FlatBuffers types. The implementation is completely generic.
+
+**Current Implementation Analysis:**
+
+1. **ConfigureSceneInfo()** - 7 lines
+   - Generates UUID if nil
+   - Copies scene type
+   - **No FlatBuffers dependency**
+
+2. **ConfigureSceneResources()** - 12 lines
+   - Validates texture dimensions
+   - Resizes render texture
+   - **No FlatBuffers dependency**
+
+3. **ConfigureSceneConfig()** - 2 lines
+   - Empty (returns success)
+   - **No FlatBuffers dependency**
+
+4. **Base class methods in ISceneConfigurator:**
+   - `ConfigureScene()` - Orchestrates configuration steps
+   - `ImportEntities()` - Uses entity importer from SceneData
+   - `PassAssetConfig()` - Loads assets
+   - `ConfigureLogicMap()` - Creates logic from LogicFactory
+   - **None are FlatBuffers-specific**
+
+**Recommendation: Eliminate Configurator Abstraction**
+
+The configurator abstraction provides **no value**:
+- Only one implementation exists
+- Implementation is not FlatBuffers-specific
+- Could be free functions or methods on Scene
+- Adds unnecessary complexity
+
+**Proposed Refactoring:**
+
+**Option A: Move to SceneFactory** (Recommended)
+```cpp
+// In SceneFactory
+private:
+  std::expected<std::monostate, FailInfo>
+  ConfigureScene(Scene& scene, const SceneData& scene_data);
+  
+  std::expected<std::monostate, FailInfo>
+  ConfigureSceneInfo(Scene& scene, const SceneData& scene_data);
+  
+  // ... other methods
+```
+
+**Benefits:**
+- Removes unnecessary abstraction layer
+- SceneFactory is the only caller
+- Simpler code, easier to maintain
+- Follows principle: don't create abstractions until needed
+
+**Option B: Move to Scene class**
+```cpp
+// In Scene class
+public:
+  std::expected<std::monostate, FailInfo>
+  Configure(const SceneData& scene_data);
+```
+
+**Benefits:**
+- Scene configures itself
+- More encapsulated
+- SceneFactory just creates and calls Configure
+
+**Option C: Keep but Rename**
+- Remove "Flatbuffers" prefix
+- Rename to just `SceneConfigurator`
+- Acknowledge it's not data-source-specific
+
+**Recommendation:**
+**Option A (Move to SceneFactory)** because:
+1. SceneFactory is the only user
+2. Configuration is part of factory's responsibility
+3. Removes unnecessary interface
+4. Simpler overall design
+
+---
+
+### Task 3.1: Remove ISceneConfigurator Abstraction (NEW)
+
+**Priority**: High (simplification opportunity identified)  
+**Estimated effort**: 2-3 hours  
+**Status**: ⏳ Ready to start
+
+#### Rationale
+
+`FlatbuffersSceneConfigurator` is misnamed - it contains **zero** FlatBuffers-specific logic. All methods work with native C++ `SceneData` structs. The abstraction provides no value and can be eliminated.
 
 #### Migration Steps
 
-1. **Analyze overlap with ISceneDataProvider**
-   - [ ] Identify duplicated responsibilities
-   - [ ] Plan merger strategy
+1. **Move configuration methods to SceneFactory**
+   - [ ] Add private methods to `SceneFactory`:
+     - `ConfigureScene(Scene&, const SceneData&)`
+     - `ConfigureSceneInfo(Scene&, const SceneData&)`
+     - `ConfigureSceneResources(Scene&, const SceneData&)`
+     - `ConfigureSceneConfig(Scene&, const SceneData&)`
+     - `ImportEntities(Scene&, const SceneData&)`
+     - `ConfigureLogicMap(Scene&)`
+     - `PassAssetConfig(Scene&, const SceneData&)` (if still needed)
+   
+2. **Update SceneFactory::CreateSceneFromSceneData()**
+   - [ ] Remove `GetSceneConfigurator()` call
+   - [ ] Call configuration methods directly
+   - [ ] Update logic to use new private methods
 
-2. **Create free function files** (if not done in 2.5)
-   - [ ] Create `src/scenes/scene_config.h`
-   - [ ] Create `src/scenes/scene_config.cpp`
+3. **Remove old files**
+   - [ ] Delete `src/scenes/FlatbuffersSceneConfigurator.h`
+   - [ ] Delete `src/scenes/FlatbuffersSceneConfigurator.cpp`
+   - [ ] Delete `src/scenes/ISceneConfigurator.cpp`
+   - [ ] Delete `src/types/interfaces/ISceneConfigurator.h`
 
-3. **Extract free functions**
-   - [ ] Extract logic from `ConfigureSceneInfo()`
-   - [ ] Extract logic from `ConfigureSceneResources()`
-   - [ ] Extract logic from `ConfigureSceneConfig()`
-   - [ ] Extract logic from `PassAssetConfig()`
-   - [ ] Extract logic from `ConfigureLogicMap()`
+4. **Update tests**
+   - [ ] Update `tests/unit/scenes/SceneFactory.test.cpp`
+   - [ ] Remove configurator-specific tests
+   - [ ] Verify scene creation still works
 
-4. **Add tests for free functions**
-   - [ ] Create test file
-   - [ ] Test each configuration function
-   - [ ] Test complete scene configuration
+5. **Update CMakeLists**
+   - [ ] Remove configurator files from `src/scenes/CMakeLists.txt`
 
-5. **Merge into ISceneProvider**
-   - [ ] Plan new combined interface
-   - [ ] Add `Configure(Scene&, SceneData&)` method to `ISceneProvider`
-   - [ ] Implement in `FlatbuffersSceneProvider`
+#### Files to Modify
+- `src/scenes/SceneFactory.h` (add private methods)
+- `src/scenes/SceneFactory.cpp` (implement moved methods)
+- `tests/unit/scenes/SceneFactory.test.cpp` (update tests)
+- `src/scenes/CMakeLists.txt` (remove old files)
 
-6. **Update call sites**
-   - [ ] Find all uses of `ISceneConfigurator`
-   - [ ] Update to use `ISceneProvider::Configure()`
-   - [ ] Verify all tests pass
-
-7. **Deprecate old interface**
-   - [ ] Mark `ISceneConfigurator` as deprecated
-   - [ ] Plan removal for future release
-   - [ ] Or remove if no external dependencies
-
-8. **Documentation**
-   - [ ] Document merged interface
-   - [ ] Update examples
+#### Files to Delete
+- `src/scenes/FlatbuffersSceneConfigurator.h`
+- `src/scenes/FlatbuffersSceneConfigurator.cpp`
+- `src/scenes/ISceneConfigurator.cpp`
+- `src/types/interfaces/ISceneConfigurator.h`
 
 #### Success Criteria
-- [ ] Functionality merged into Provider
 - [ ] All tests pass
-- [ ] No duplicated configuration logic
+- [ ] SceneFactory creates and configures scenes correctly
+- [ ] No unnecessary abstraction layer
+- [ ] Code is simpler and easier to understand
 - [ ] Documentation updated
-- [ ] Migration path clear for users
 
 ---
 
@@ -606,14 +529,40 @@ This document provides a detailed, step-by-step migration plan for standardizing
 
 Track progress with these metrics:
 
-| Metric | Current | Target |
-|--------|---------|--------|
-| Providers using `Provide()` | 0/6 | 6/6 |
-| Providers with free functions | 0/6 | 6/6 |
-| Providers with tests for free functions | 0/6 | 6/6 |
-| Configurators merged | 0/4 | 3/4 (IUIStyleConfigurator not implemented) |
-| Documentation pages updated | 2/5 | 5/5 |
-| Test coverage (config functions) | N/A | >90% |
+| Metric | Current | Target | Status |
+|--------|---------|--------|--------|
+| Providers using Create/Configure pattern | 5/6 | 6/6 | ⚠️ 83% (IFontProvider N/A) |
+| Providers with free functions | 5/6 | 6/6 | ⚠️ 83% (IFontProvider N/A) |
+| Providers with tests for free functions | 5/6 | 6/6 | ⚠️ 83% |
+| Configurators merged or eliminated | 0/3 | 3/3 | ⏳ 0% |
+| Documentation pages updated | 5/5 | 5/5 | ✅ 100% |
+| Test coverage (config functions) | Good | >90% | ✅ Good |
+
+### Phase Completion
+
+| Phase | Status | Notes |
+|-------|--------|-------|
+| Phase 1: Foundation | ✅ Complete | All documentation created |
+| Phase 2: Data Providers | ✅ Complete | All 5 providers migrated (IFontProvider N/A) |
+| Phase 3: Configurators | ⏳ In Progress | ISceneConfigurator needs review/elimination |
+| Phase 4: Cleanup | ⏳ Not Started | Awaiting Phase 3 |
+
+### What's Been Completed
+
+**Phase 2 Achievements:**
+- ✅ IEngineDataProvider - migrated with free functions
+- ✅ ISaveDataProvider - migrated with free functions
+- ✅ ISceneManagerDataProvider - migrated with free functions
+- ✅ IUIStyleDataProvider - migrated with free functions
+- ✅ ISceneDataProvider - migrated with free functions
+- ℹ️ IFontProvider - simple getter, no migration needed
+
+**Key Improvements:**
+- All providers use consistent Create/Configure pattern
+- Configuration logic extracted to testable free functions
+- Free functions organized in `src/data_providers/configure/` directory
+- Comprehensive test coverage for all free functions
+- Proper layering maintained (functions with providers)
 
 ## Risk Assessment
 
@@ -631,13 +580,18 @@ Track progress with these metrics:
 
 ## Timeline Estimate
 
-| Phase | Tasks | Estimated Time | Dependencies |
-|-------|-------|----------------|--------------|
-| Phase 1 | Foundation | 8 hours | None (Complete ✅) |
-| Phase 2 | Data Providers | 30-36 hours | Phase 1 |
-| Phase 3 | Configurators | 32-40 hours | Phase 2 |
-| Phase 4 | Cleanup | 8-12 hours | Phase 3 |
-| **Total** | | **78-96 hours** | ~2-2.5 weeks |
+| Phase | Tasks | Original Estimate | Actual Time | Status |
+|-------|-------|-------------------|-------------|---------|
+| Phase 1 | Foundation | 8 hours | ~8 hours | ✅ Complete |
+| Phase 2 | Data Providers | 30-36 hours | ~25-30 hours | ✅ Complete |
+| Phase 3 | Configurators | 32-40 hours | TBD | ⏳ In Progress |
+| Phase 4 | Cleanup | 8-12 hours | TBD | ⏳ Not Started |
+| **Total** | | **78-96 hours** | **~35-40 hours so far** | **~45% Complete** |
+
+**Updated Estimate for Remaining Work:**
+- Phase 3: ~15-20 hours (reduced due to simpler approach for ISceneConfigurator)
+- Phase 4: ~8-12 hours
+- **Remaining**: ~23-32 hours (~0.5-1 week)
 
 ## Notes
 
