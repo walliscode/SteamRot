@@ -12,6 +12,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "FlatbuffersDataLoader.h"
 #include "ISaveDataProvider.h"
 #include "SaveData.h"
 #include <expected>
@@ -19,6 +20,12 @@
 namespace steamrot {
 
 class FlatbuffersSaveDataProvider : public ISaveDataProvider {
+
+private:
+  /////////////////////////////////////////////////
+  /// @brief Instance of FlatbuffersDataLoader for loading data.
+  /////////////////////////////////////////////////
+  FlatbuffersDataLoader m_loader;
 
 public:
   /////////////////////////////////////////////////
@@ -30,5 +37,13 @@ public:
   /// @brief Provides a SaveData object populated from Flatbuffers data.
   /////////////////////////////////////////////////
   std::expected<SaveData, FailInfo> CreateSaveData() const override;
+
+  /////////////////////////////////////////////////
+  /// @brief Configures the provided SaveData.
+  ///
+  /// @param save_data Save data to configure
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ConfigureSaveData(SaveData &save_data) const override;
 };
 } // namespace steamrot
