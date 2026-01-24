@@ -27,25 +27,29 @@ TEST_CASE("ConfigureSceneInfo handles nullptr Flatbuffers data gracefully",
   REQUIRE(result.error().message == "SceneInfoFbs is null");
 }
 
-TEST_CASE("ConfigureSceneInfo handles missing scene_type",
+TEST_CASE("ConfigureSceneInfo correctly configures SceneInfo with different "
+          "scene types",
           "[unit][configure_scene_data]") {
-  // Create FlatBuffers data with missing scene_type
-  flatbuffers::FlatBufferBuilder builder;
-  flatbuffers::Offset<steamrot::SceneInfoFbs> scene_info_offset =
-      steamrot::CreateSceneInfoFbs(builder, steamrot::SceneType::SceneType_MIN);
-  builder.Finish(scene_info_offset);
+  // Test multiple scene types to verify correct configuration
+  for (const auto scene_type :
+       {steamrot::SceneType::SceneType_TITLE,
+        steamrot::SceneType::SceneType_CRAFTING}) {
 
-  const steamrot::SceneInfoFbs *scene_info_fbs =
-      steamrot::GetSceneInfoFbs(builder.GetBufferPointer());
+    flatbuffers::FlatBufferBuilder builder;
+    flatbuffers::Offset<steamrot::SceneInfoFbs> scene_info_offset =
+        steamrot::CreateSceneInfoFbs(builder, scene_type);
+    builder.Finish(scene_info_offset);
 
-  steamrot::SceneInfo scene_info;
-  // Set scene_type to null manually via pointer manipulation won't work,
-  // so we test with MIN which is the default
-  // This test ensures the function checks for scene_type presence
-  auto result = steamrot::data::configure::ConfigureSceneInfo(scene_info,
-                                                               scene_info_fbs);
-  // Should succeed with MIN type
-  REQUIRE(result.has_value());
+    const steamrot::SceneInfoFbs *scene_info_fbs =
+        steamrot::GetSceneInfoFbs(builder.GetBufferPointer());
+
+    steamrot::SceneInfo scene_info;
+    auto result = steamrot::data::configure::ConfigureSceneInfo(scene_info,
+                                                                 scene_info_fbs);
+    // Should succeed with the given type
+    REQUIRE(result.has_value());
+    REQUIRE(scene_info.type == scene_type);
+  }
 }
 
 TEST_CASE("ConfigureSceneInfo correctly configures SceneInfo with valid UUID",
