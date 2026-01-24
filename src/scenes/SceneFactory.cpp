@@ -139,6 +139,8 @@ SceneFactory::ConfigureSceneInfo(Scene &scene, const SceneData &scene_data) {
   // if UUID is nil, generate one
   if (scene_data.scene_info.id.is_nil()) {
     scene.GetSceneInfo().id = uuids::uuid_system_generator{}();
+  } else {
+    scene.GetSceneInfo().id = scene_data.scene_info.id;
   }
 
   scene.GetSceneInfo().type = scene_data.scene_info.type;
