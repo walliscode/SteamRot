@@ -29,7 +29,38 @@ protected:
   /////////////////////////////////////////////////
   const GameContext &m_game_context;
 
-private:
+public:
+  /////////////////////////////////////////////////
+  /// @brief Constructor for SceneFactory
+  ///
+  /// @param game_context GameContext object providing access to global
+  /// resources
+  /////////////////////////////////////////////////
+  SceneFactory(const GameContext &game_context);
+
+  /////////////////////////////////////////////////
+  /// @brief Use the factory to create and configure a scene
+  /////////////////////////////////////////////////
+  std::expected<std::unique_ptr<Scene>, FailInfo>
+  CreateEmptyScene(const SceneType scene_type);
+
+  /////////////////////////////////////////////////
+  /// @brief Create and configure a scene from SceneData
+  ///
+  /// @param scene_data Data containing scene config and entity importer
+  /////////////////////////////////////////////////
+  std::expected<std::unique_ptr<Scene>, FailInfo>
+  CreateSceneFromSceneData(const SceneData &scene_data);
+
+  /////////////////////////////////////////////////
+  /// @brief Create and configure a scene from default data
+  ///
+  /// @param scene_type SceneType enum value representing the type of scene to
+  /// create
+  /////////////////////////////////////////////////
+  std::expected<std::unique_ptr<Scene>, FailInfo>
+  CreateSceneFromDefault(const SceneType scene_type);
+
   /////////////////////////////////////////////////
   /// @brief Wrapper function for all scene configuration
   ///
@@ -91,37 +122,5 @@ private:
   /// @param scene  Scene to configure
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo> ConfigureLogicMap(Scene &scene);
-
-public:
-  /////////////////////////////////////////////////
-  /// @brief Constructor for SceneFactory
-  ///
-  /// @param game_context GameContext object providing access to global
-  /// resources
-  /////////////////////////////////////////////////
-  SceneFactory(const GameContext &game_context);
-
-  /////////////////////////////////////////////////
-  /// @brief Use the factory to create and configure a scene
-  /////////////////////////////////////////////////
-  std::expected<std::unique_ptr<Scene>, FailInfo>
-  CreateEmptyScene(const SceneType scene_type);
-
-  /////////////////////////////////////////////////
-  /// @brief Create and configure a scene from SceneData
-  ///
-  /// @param scene_data Data containing scene config and entity importer
-  /////////////////////////////////////////////////
-  std::expected<std::unique_ptr<Scene>, FailInfo>
-  CreateSceneFromSceneData(const SceneData &scene_data);
-
-  /////////////////////////////////////////////////
-  /// @brief Create and configure a scene from default data
-  ///
-  /// @param scene_type SceneType enum value representing the type of scene to
-  /// create
-  /////////////////////////////////////////////////
-  std::expected<std::unique_ptr<Scene>, FailInfo>
-  CreateSceneFromDefault(const SceneType scene_type);
 };
 } // namespace steamrot
