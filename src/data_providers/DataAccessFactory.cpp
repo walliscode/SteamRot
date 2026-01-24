@@ -128,14 +128,4 @@ DataAccessFactory::GetSceneDataProvider() {
   return m_scene_data_provider.get();
 }
 
-/////////////////////////////////////////////////
-std::expected<ISceneConfigurator *, FailInfo>
-DataAccessFactory::GetSceneConfigurator() {
-  if (!m_scene_configurator) {
-    return std::unexpected(
-        FailInfo{FailMode::NullPointer, "Scene Configurator is null"});
-  }
-  return m_scene_configurator.get();
-}
-
 } // namespace steamrot

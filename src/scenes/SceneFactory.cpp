@@ -8,11 +8,13 @@
 /////////////////////////////////////////////////
 #include "SceneFactory.h"
 #include "CraftingScene.h"
-#include "FlatbuffersSceneConfigurator.h"
-#include "ISceneConfigurator.h"
+#include "LogicFactory.h"
 #include "Scene.h"
 #include "TitleScene.h"
+#include "uuid.h"
+#include <SFML/System/Vector2.hpp>
 #include <memory>
+#include <variant>
 
 namespace steamrot {
 /////////////////////////////////////////////////
@@ -52,12 +54,6 @@ SceneFactory::CreateEmptyScene(const SceneType scene_type) {
 }
 
 /////////////////////////////////////////////////
-ISceneConfigurator &GetSceneConfigurator() {
-  static FlatbuffersSceneConfigurator configurator;
-  return configurator;
-}
-
-/////////////////////////////////////////////////
 std::expected<std::unique_ptr<Scene>, FailInfo>
 SceneFactory::CreateSceneFromSceneData(const SceneData &scene_data) {
 
@@ -68,16 +64,13 @@ SceneFactory::CreateSceneFromSceneData(const SceneData &scene_data) {
   }
   std::unique_ptr<Scene> scene = std::move(create_scene_result.value());
 
-  // Step 2: Get configurator
-  ISceneConfigurator &configurator = GetSceneConfigurator();
-
-  // Step 3: Configurator applies data and imports entities
-  auto config_result = configurator.ConfigureScene(*scene, scene_data);
+  // Step 2: Configure scene using scene data
+  auto config_result = ConfigureScene(*scene, scene_data);
   if (!config_result.has_value()) {
     return std::unexpected(config_result.error());
   }
 
-  // Step 4: Return configured scene
+  // Step 3: Return configured scene
   return std::move(scene);
 }
 
@@ -100,6 +93,151 @@ SceneFactory::CreateSceneFromDefault(SceneType type) {
 
   // Step 3: Create scene from data
   return CreateSceneFromSceneData(get_data_result.value());
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+SceneFactory::ConfigureScene(Scene &scene, const SceneData &scene_data) {
+
+  // Configure SceneInfo
+  auto info_result = ConfigureSceneInfo(scene, scene_data);
+  if (!info_result.has_value())
+    return std::unexpected(info_result.error());
+
+  // Configure SceneResources
+  auto resources_result = ConfigureSceneResources(scene, scene_data);
+  if (!resources_result.has_value())
+    return std::unexpected(resources_result.error());
+
+  // Configure SceneConfig
+  auto config_result = ConfigureSceneConfig(scene, scene_data);
+  if (!config_result.has_value())
+    return std::unexpected(config_result.error());
+
+  // Import entities from entity importer
+  auto import_result = ImportEntities(scene, scene_data);
+  if (!import_result.has_value())
+    return std::unexpected(import_result.error());
+
+  // Configure LogicMap
+  auto logic_result = ConfigureLogicMap(scene);
+  if (!logic_result.has_value())
+    return std::unexpected(logic_result.error());
+
+  // Generate archetypes
+  auto generate_result = scene.GetEntityManager().GenerateAllArchetypes();
+  if (!generate_result.has_value())
+    return std::unexpected(generate_result.error());
+
+  return std::monostate();
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+SceneFactory::ConfigureSceneInfo(Scene &scene, const SceneData &scene_data) {
+
+  // if UUID is nil, generate one
+  if (scene_data.scene_info.id.is_nil()) {
+    scene.GetSceneInfo().id = uuids::uuid_system_generator{}();
+  }
+
+  scene.GetSceneInfo().type = scene_data.scene_info.type;
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+SceneFactory::ConfigureSceneResources(Scene &scene,
+                                      const SceneData &scene_data) {
+
+  // check texture sizes are not 0
+  if (scene_data.scene_resources_config.texture_width == 0 ||
+      scene_data.scene_resources_config.texture_height == 0) {
+    return std::unexpected(
+        FailInfo(FailMode::BadValue,
+                 "SceneResourcesConfig has invalid texture dimensions (0)"));
+  }
+
+  // create size vector
+  sf::Vector2u size{scene_data.scene_resources_config.texture_width,
+                    scene_data.scene_resources_config.texture_height};
+
+  auto texture_resize_result =
+      scene.m_scene_resources.scene_texture.resize(size);
+  if (!texture_resize_result)
+    return std::unexpected(FailInfo(FailMode::ResourceCreationFailure,
+                                    "Failed to resize scene render texture"));
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+SceneFactory::ConfigureSceneConfig(Scene &scene, const SceneData &scene_data) {
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+SceneFactory::ImportEntities(Scene &scene, const SceneData &scene_data) {
+
+  // check if entity importer variant holds type we want
+  if (!std::holds_alternative<std::unique_ptr<IEntityImporter>>(
+          scene_data.entity_transport)) {
+    return std::unexpected(
+        FailInfo{FailMode::VariantTypeMismatch,
+                 "Entity importer variant does not hold IEntityImporter type"});
+  }
+  // Check if entity importer exists
+  if (std::get<std::unique_ptr<IEntityImporter>>(scene_data.entity_transport) ==
+      nullptr) {
+    return std::unexpected(
+        FailInfo{FailMode::NullPointer, "Entity importer pointer is null"});
+  }
+
+  // Import entities using the importer
+  auto &importer =
+      std::get<std::unique_ptr<IEntityImporter>>(scene_data.entity_transport);
+  auto import_result =
+      importer->ImportEntities(scene.GetEntityManager().GetEntityMemoryPool());
+  if (!import_result.has_value())
+    return std::unexpected(import_result.error());
+
+  return std::monostate();
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+SceneFactory::PassAssetConfig(Scene &scene, const SceneData &scene_data) {
+  // get AssetManager reference
+  AssetManager &asset_manager = scene.GetSceneContext().asset_manager;
+
+  // pass AssetConfig to AssetManager
+  auto asset_result = asset_manager.LoadAssets(scene_data.scene_asset_config);
+  if (!asset_result.has_value())
+    return std::unexpected(asset_result.error());
+
+  return std::monostate();
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+SceneFactory::ConfigureLogicMap(Scene &scene) {
+
+  // create LogicFactory instance
+  LogicFactory logic_factory(scene.GetSceneContext());
+
+  // create logic map and check info_result
+  auto logic_map_result =
+      logic_factory.ProvideLogicCollection(scene.m_scene_info.type);
+
+  if (!logic_map_result.has_value())
+    return std::unexpected(logic_map_result.error());
+
+  // move logic map to scene
+  scene.m_scene_resources.logic_map.clear();
+  scene.m_scene_resources.logic_map = std::move(logic_map_result.value());
+
+  return std::monostate();
 }
 
 } // namespace steamrot

@@ -24,9 +24,6 @@ typedef std::vector<std::shared_ptr<sf::Drawable>> SceneDrawables;
 
 namespace steamrot {
 
-// Forward declarations
-class ISceneConfigurator;
-
 /////////////////////////////////////////////////
 /// @class Scene
 /// @brief Abstract base class for all Scenes in the game.
@@ -34,8 +31,7 @@ class ISceneConfigurator;
 /////////////////////////////////////////////////
 class Scene {
   friend class ISceneFactory;
-  friend class ISceneConfigurator;
-  friend class FlatbuffersSceneConfigurator;
+  friend class SceneFactory;
 
 protected:
   /////////////////////////////////////////////////

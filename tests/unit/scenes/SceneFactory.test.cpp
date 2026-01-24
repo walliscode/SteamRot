@@ -11,6 +11,9 @@
 #include "FlatbuffersSceneDataProvider.h"
 #include "TestFixture.h"
 #include "TitleScene.h"
+#include "UIActionLogic.h"
+#include "UICollisionLogic.h"
+#include "UIRenderLogic.h"
 #include "entity_memory.h"
 #include "load_scene_data.h"
 #include <catch2/catch_test_macros.hpp>
@@ -145,4 +148,76 @@ TEST_CASE("SceneFactory::CreateSceneFromSceneData creates Scene with valid "
   REQUIRE(scene->GetSceneInfo().id != uuids::uuid{});
   REQUIRE(steamrot::entity::memory::GetMemoryPoolSize(
               scene->GetSceneContext().scene_entities) == 50);
+}
+
+TEST_CASE("SceneFactory provides UUID if not present in SceneData",
+          "[SceneFactory]") {
+  // set up fixtures and objects
+  steamrot::tests::TestFixture fixture;
+
+  steamrot::SceneFactory scene_factory(fixture.GetGameContext());
+
+  // create SceneData with nil UUID
+  steamrot::SceneData scene_data;
+  scene_data.scene_info.type = steamrot::SceneType_TITLE;
+
+  // Create scene from scene data
+  auto result = scene_factory.CreateSceneFromSceneData(scene_data);
+
+  REQUIRE(result.has_value());
+  auto &scene = result.value();
+  REQUIRE(!scene->GetSceneInfo().id.is_nil());
+  REQUIRE(scene->GetSceneInfo().type == steamrot::SceneType_TITLE);
+}
+
+TEST_CASE("SceneFactory configures the scenes logic map", "[SceneFactory]") {
+
+  // set up fixtures and objects
+  steamrot::tests::TestFixture fixture;
+  
+  // Create SceneData with minimal configuration
+  steamrot::SceneData scene_data;
+  scene_data.scene_info.type = steamrot::SceneType_TITLE;
+  scene_data.scene_resources_config.texture_width = 800;
+  scene_data.scene_resources_config.texture_height = 600;
+
+  steamrot::SceneFactory scene_factory(fixture.GetGameContext());
+  
+  // Create scene from data (which configures logic map)
+  auto result = scene_factory.CreateSceneFromSceneData(scene_data);
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+  
+  auto &scene = result.value();
+  
+  // check that logic map is populated
+  auto &logic_collection = scene->GetSceneResources().logic_map;
+  ///// CHECKING COLLISION LOGICS /////
+  auto collision_it = logic_collection.find(steamrot::LogicType::Collision);
+  if (collision_it == logic_collection.end()) {
+    FAIL("LogicCollection does not contain Collision LogicType");
+  }
+  const auto &collision_logics = collision_it->second;
+  REQUIRE(collision_logics.size() == 1);
+  REQUIRE(
+      dynamic_cast<steamrot::UICollisionLogic *>(collision_logics[0].get()));
+
+  ///// CHECKING ACTION LOGICS /////
+  auto action_it = logic_collection.find(steamrot::LogicType::Action);
+  if (action_it == logic_collection.end()) {
+    FAIL("LogicCollection does not contain Action LogicType");
+  }
+  const auto &action_logics = action_it->second;
+  REQUIRE(action_logics.size() == 1);
+  REQUIRE(dynamic_cast<steamrot::UIActionLogic *>(action_logics[0].get()));
+
+  ///// CHECKING RENDER LOGICS /////
+  auto render_it = logic_collection.find(steamrot::LogicType::Render);
+  if (render_it == logic_collection.end()) {
+    FAIL("LogicCollection does not contain Render LogicType");
+  }
+  const auto &render_logics = render_it->second;
+  REQUIRE(render_logics.size() == 1); // No render logics added yet
+  REQUIRE(dynamic_cast<steamrot::UIRenderLogic *>(render_logics[0].get()));
 }
