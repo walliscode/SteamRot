@@ -74,7 +74,7 @@ TEST_CASE("FlatbuffersSceneManagerDataProvider::ProvideSceneManagerData "
   // Arrange
   steamrot::FlatbuffersSceneManagerDataProvider provider;
   // Act
-  auto result = provider.ProvideSceneManagerData();
+  auto result = provider.CreateSceneManagerData();
   // Assert
   if (!result.has_value())
     FAIL("ProvideSceneManagerData failed: " + result.error().message);
