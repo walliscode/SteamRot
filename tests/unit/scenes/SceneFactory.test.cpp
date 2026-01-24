@@ -19,7 +19,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("SceneFactory::CreateEmptyScene handles UNKNOWN SceneType",
-          "[SceneFactory]") {
+          "[unit][SceneFactory]") {
   // Arrange
   steamrot::tests::TestFixture test_fixture;
   steamrot::SceneFactory scene_factory(test_fixture.GetGameContext());
@@ -35,7 +35,7 @@ TEST_CASE("SceneFactory::CreateEmptyScene handles UNKNOWN SceneType",
 }
 
 TEST_CASE("SceneFactory::CreateEmptyScene handles bad SceneType",
-          "[SceneFactory]") {
+          "[unit][SceneFactory]") {
   // Arrange
   steamrot::tests::TestFixture test_fixture;
   steamrot::SceneFactory scene_factory(test_fixture.GetGameContext());
@@ -49,7 +49,7 @@ TEST_CASE("SceneFactory::CreateEmptyScene handles bad SceneType",
 }
 
 TEST_CASE("SceneFactory::CreateEmptyScene creates TitleScene",
-          "[SceneFactory]") {
+          "[unit][SceneFactory]") {
   // Arrange
   steamrot::tests::TestFixture test_fixture;
   steamrot::SceneFactory scene_factory(test_fixture.GetGameContext());
@@ -63,7 +63,7 @@ TEST_CASE("SceneFactory::CreateEmptyScene creates TitleScene",
 }
 
 TEST_CASE("SceneFactory::CreateEmptyScene creates CraftingScene",
-          "[SceneFactory]") {
+          "[unit][SceneFactory]") {
   // Arrange
   steamrot::tests::TestFixture test_fixture;
   steamrot::SceneFactory scene_factory(test_fixture.GetGameContext());
@@ -78,7 +78,7 @@ TEST_CASE("SceneFactory::CreateEmptyScene creates CraftingScene",
 
 TEST_CASE("SceneFactory::CreateSceneFromSceneData creates Scene with valid "
           "SceneData",
-          "[SceneFactory]") {
+          "[unit][SceneFactory]") {
 
   // set up test fixture
   steamrot::tests::TestFixture fixture;
@@ -151,7 +151,7 @@ TEST_CASE("SceneFactory::CreateSceneFromSceneData creates Scene with valid "
 }
 
 TEST_CASE("SceneFactory provides UUID if not present in SceneData",
-          "[SceneFactory]") {
+          "[unit][SceneFactory]") {
   // set up fixtures and objects
   steamrot::tests::TestFixture fixture;
 
@@ -160,6 +160,8 @@ TEST_CASE("SceneFactory provides UUID if not present in SceneData",
   // create SceneData with nil UUID
   steamrot::SceneData scene_data;
   scene_data.scene_info.type = steamrot::SceneType_TITLE;
+  scene_data.scene_resources_config.texture_width = 800;
+  scene_data.scene_resources_config.texture_height = 600;
 
   // Create scene from scene data
   auto result = scene_factory.CreateSceneFromSceneData(scene_data);
@@ -170,7 +172,7 @@ TEST_CASE("SceneFactory provides UUID if not present in SceneData",
   REQUIRE(scene->GetSceneInfo().type == steamrot::SceneType_TITLE);
 }
 
-TEST_CASE("SceneFactory configures the scenes logic map", "[SceneFactory]") {
+TEST_CASE("SceneFactory configures the scenes logic map", "[unit][SceneFactory]") {
 
   // set up fixtures and objects
   steamrot::tests::TestFixture fixture;
