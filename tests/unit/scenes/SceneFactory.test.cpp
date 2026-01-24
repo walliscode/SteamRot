@@ -117,7 +117,7 @@ TEST_CASE("SceneFactory::CreateSceneFromSceneData creates Scene with valid "
   steamrot::FlatbuffersSceneDataProvider scene_data_provider(
       fixture.GetGameContext().event_handler);
   auto get_scene_data_result =
-      scene_data_provider.ProvideSceneDataFromData(scene_data_fbs);
+      scene_data_provider.CreateSceneData(scene_data_fbs);
   if (!get_scene_data_result)
     FAIL(get_scene_data_result.error().message);
 
@@ -127,8 +127,7 @@ TEST_CASE("SceneFactory::CreateSceneFromSceneData creates Scene with valid "
   steamrot::SceneFactory scene_factory(fixture.GetGameContext());
 
   // Verify scene_data before passing to factory
-  REQUIRE(scene_data.scene_info.type ==
-          steamrot::SceneType::SceneType_TITLE);
+  REQUIRE(scene_data.scene_info.type == steamrot::SceneType::SceneType_TITLE);
 
   // Act - Create scene from data
   auto result = scene_factory.CreateSceneFromSceneData(scene_data);

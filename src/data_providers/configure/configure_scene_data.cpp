@@ -70,37 +70,5 @@ ConfigureSceneResourcesConfig(SceneResourcesConfig &config,
 
   return std::monostate{};
 }
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-ConfigureSceneDataFromData(SceneData &scene_data, const SceneDataFbs *fb_data) {
-  if (!fb_data) {
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound, "SceneDataFbs is null"});
-  }
-
-  // Configure SceneInfo
-  auto info_result =
-      ConfigureSceneInfo(scene_data.scene_info, fb_data->scene_info());
-  if (!info_result)
-    return std::unexpected(info_result.error());
-
-  // Configure SceneResourcesConfig
-  if (fb_data->scene_resources_config()) {
-    auto resources_result = ConfigureSceneResourcesConfig(
-        scene_data.scene_resources_config, fb_data->scene_resources_config());
-    if (!resources_result)
-      return std::unexpected(resources_result.error());
-  }
-
-  // Configure AssetConfig
-  if (fb_data->asset_config()) {
-    auto asset_result = data::configure::ConfigureAssetConfig(
-        scene_data.scene_asset_config, fb_data->asset_config());
-    if (!asset_result)
-      return std::unexpected(asset_result.error());
-  }
-
-  return std::monostate{};
-}
 
 } // namespace steamrot::data::configure
