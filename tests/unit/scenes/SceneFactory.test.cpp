@@ -156,14 +156,25 @@ TEST_CASE("SceneFactory provides UUID if not present in SceneData",
           "[unit][SceneFactory]") {
   // set up fixtures and objects
   steamrot::tests::TestFixture fixture;
+  fixture.Initialize();
 
   steamrot::SceneFactory scene_factory(fixture.GetGameContext());
+
+  // Load test data to get entity collection
+  auto [data_buffer, scene_data_fbs] = LoadSceneTestData();
+  REQUIRE(scene_data_fbs != nullptr);
+  REQUIRE(scene_data_fbs->entity_collection() != nullptr);
 
   // create SceneData with nil UUID
   steamrot::SceneData scene_data;
   scene_data.scene_info.type = steamrot::SceneType_TITLE;
   scene_data.scene_resources_config.texture_width = 800;
   scene_data.scene_resources_config.texture_height = 600;
+  // Add entity importer to the variant
+  scene_data.entity_transport =
+      std::make_unique<steamrot::FlatbuffersEntityImporter>(
+          fixture.GetGameContext().event_handler,
+          scene_data_fbs->entity_collection());
 
   // Create scene from scene data
   auto result = scene_factory.CreateSceneFromSceneData(scene_data);
@@ -181,12 +192,23 @@ TEST_CASE("SceneFactory configures the scenes logic map",
 
   // set up fixtures and objects
   steamrot::tests::TestFixture fixture;
+  fixture.Initialize();
+
+  // Load test data to get entity collection
+  auto [data_buffer, scene_data_fbs] = LoadSceneTestData();
+  REQUIRE(scene_data_fbs != nullptr);
+  REQUIRE(scene_data_fbs->entity_collection() != nullptr);
 
   // Create SceneData with minimal configuration
   steamrot::SceneData scene_data;
   scene_data.scene_info.type = steamrot::SceneType_TITLE;
   scene_data.scene_resources_config.texture_width = 800;
   scene_data.scene_resources_config.texture_height = 600;
+  // Add entity importer to the variant
+  scene_data.entity_transport =
+      std::make_unique<steamrot::FlatbuffersEntityImporter>(
+          fixture.GetGameContext().event_handler,
+          scene_data_fbs->entity_collection());
 
   steamrot::SceneFactory scene_factory(fixture.GetGameContext());
 
