@@ -12,15 +12,20 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "FlatbuffersDataLoader.h"
 #include "ISaveDataProvider.h"
 #include "SaveData.h"
-#include "SaveMetaData.h"
-#include "save_data_generated.h"
 #include <expected>
 
 namespace steamrot {
 
 class FlatbuffersSaveDataProvider : public ISaveDataProvider {
+
+private:
+  /////////////////////////////////////////////////
+  /// @brief Instance of FlatbuffersDataLoader for loading data.
+  /////////////////////////////////////////////////
+  FlatbuffersDataLoader m_loader;
 
 public:
   /////////////////////////////////////////////////
@@ -29,18 +34,16 @@ public:
   FlatbuffersSaveDataProvider() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Configures SaveMetaData from Flatbuffers data.
-  ///
-  /// @param save_meta_data SaveMetaData object to configure
-  /// @param save_meta_data_fbs Flatbuffers SaveMetaData data
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  ConfigureSaveMetaData(SaveMetaData &save_meta_data,
-                        const SaveMetaDataFbs *save_meta_data_fbs) const;
-
-  /////////////////////////////////////////////////
   /// @brief Provides a SaveData object populated from Flatbuffers data.
   /////////////////////////////////////////////////
-  std::expected<SaveData, FailInfo> ProvideSaveData() const override;
+  std::expected<SaveData, FailInfo> CreateSaveData() const override;
+
+  /////////////////////////////////////////////////
+  /// @brief Configures the provided SaveData.
+  ///
+  /// @param save_data Save data to configure
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ConfigureSaveData(SaveData &save_data) const override;
 };
 } // namespace steamrot
