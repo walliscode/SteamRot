@@ -57,7 +57,7 @@ LogicFactory::ProvideLogicCollection(SceneType scene_type) {
   default:
     return std::unexpected(
         FailInfo(FailMode::SceneTypeNotFound,
-                 "LogicFactory::ProvideLogicCollection, unknown SceneType"));
+                 "LogicFactory::ProvideLogicCollection: unknown SceneType"));
   }
   return logic_collection;
 }

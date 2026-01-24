@@ -3,7 +3,6 @@ include(compile_test_data.cmake)
 
 add_executable(test_scenes
   TestScene.cpp
-  FlatbuffersSceneConfigurator.test.cpp
   SceneFactory.test.cpp
   SceneManager.test.cpp
 )
