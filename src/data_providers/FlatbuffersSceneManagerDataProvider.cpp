@@ -7,7 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersSceneManagerDataProvider.h"
-#include "FlatbuffersDataLoader.h"
+#include "FailInfo.h"
 #include "configure_scene_manager_data.h"
 
 namespace steamrot {
@@ -16,24 +16,16 @@ namespace steamrot {
 std::expected<SceneManagerData, FailInfo>
 FlatbuffersSceneManagerDataProvider::CreateSceneManagerData() const {
 
-  // Load default SceneManagerData from file
-  FlatbuffersDataLoader data_loader;
-  auto result = data_loader.ProvideSceneManagerData();
-  if (!result.has_value()) {
-    return std::unexpected(result.error());
-  }
-  const SceneManagerDataFbs *scene_manager_data_fbs = result.value();
-  if (!scene_manager_data_fbs) {
-    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    "SceneManagerDataFbs data is null"});
+  // create return object
+  SceneManagerData data;
+
+  // configure scene manager data
+  auto configure_result = ConfigureSceneManagerData(data);
+  if (!configure_result.has_value()) {
+    return std::unexpected(configure_result.error());
   }
 
-  // create SceneManagerData to populate
-  SceneManagerData scene_manager_data;
-
-  // configure SceneManagerData
-
-  return scene_manager_data;
+  return data;
 }
 
 /////////////////////////////////////////////////
@@ -41,25 +33,22 @@ std::expected<std::monostate, FailInfo>
 FlatbuffersSceneManagerDataProvider::ConfigureSceneManagerData(
     SceneManagerData &scene_manager_data) const {
 
-  // Load SceneManagerData from file
-  FlatbuffersDataLoader data_loader;
-  auto result = data_loader.ProvideSceneManagerData();
-  if (!result.has_value()) {
-    return std::unexpected(result.error());
+  // use flatbuffers data loader to get SceneManagerDataFbs
+  auto load_scene_manager_data_result = m_loader.ProvideSceneManagerData();
+  if (!load_scene_manager_data_result.has_value()) {
+    return std::unexpected(load_scene_manager_data_result.error());
   }
-  const SceneManagerDataFbs *scene_manager_data_fbs = result.value();
-  if (!scene_manager_data_fbs) {
-    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    "SceneManagerDataFbs data is null"});
+  const SceneManagerDataFbs *fb_scene_manager_data =
+      load_scene_manager_data_result.value();
+
+  // populate SceneManagerState
+  auto populate_state_result = data::configure::ConfigureSceneManagerState(
+      scene_manager_data.scene_manager_state, fb_scene_manager_data->state());
+  // check for errors
+  if (!populate_state_result.has_value()) {
+    return std::unexpected(populate_state_result.error());
   }
 
-  // confgiure SceneManagerData using free functions
-  // configure scene manager state
-  auto configure_state_result = data::configure::ConfigureSceneManagerState(
-      scene_manager_data.scene_manager_state, scene_manager_data_fbs->state());
-  if (!configure_state_result.has_value()) {
-    return std::unexpected(configure_state_result.error());
-  }
   return std::monostate{};
 }
 } // namespace steamrot
