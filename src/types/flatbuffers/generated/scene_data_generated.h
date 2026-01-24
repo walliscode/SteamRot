@@ -14,81 +14,15 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
              "Non-compatible flatbuffers version included");
 
 #include "asset_config_generated.h"
-#include "scene_types_generated.h"
 #include "entities_generated.h"
 #include "logic_data_generated.h"
+#include "scene_info_generated.h"
 #include "scene_resources_config_generated.h"
 
 namespace steamrot {
 
-struct SceneInfoFbs;
-struct SceneInfoFbsBuilder;
-
 struct SceneDataFbs;
 struct SceneDataFbsBuilder;
-
-struct SceneInfoFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef SceneInfoFbsBuilder Builder;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_SCENE_ID = 4,
-    VT_SCENE_TYPE = 6
-  };
-  const ::flatbuffers::String *scene_id() const {
-    return GetPointer<const ::flatbuffers::String *>(VT_SCENE_ID);
-  }
-  steamrot::SceneType scene_type() const {
-    return static_cast<steamrot::SceneType>(GetField<int8_t>(VT_SCENE_TYPE, 0));
-  }
-  bool Verify(::flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_SCENE_ID) &&
-           verifier.VerifyString(scene_id()) &&
-           VerifyField<int8_t>(verifier, VT_SCENE_TYPE, 1) &&
-           verifier.EndTable();
-  }
-};
-
-struct SceneInfoFbsBuilder {
-  typedef SceneInfoFbs Table;
-  ::flatbuffers::FlatBufferBuilder &fbb_;
-  ::flatbuffers::uoffset_t start_;
-  void add_scene_id(::flatbuffers::Offset<::flatbuffers::String> scene_id) {
-    fbb_.AddOffset(SceneInfoFbs::VT_SCENE_ID, scene_id);
-  }
-  void add_scene_type(steamrot::SceneType scene_type) {
-    fbb_.AddElement<int8_t>(SceneInfoFbs::VT_SCENE_TYPE, static_cast<int8_t>(scene_type), 0);
-  }
-  explicit SceneInfoFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  ::flatbuffers::Offset<SceneInfoFbs> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<SceneInfoFbs>(end);
-    return o;
-  }
-};
-
-inline ::flatbuffers::Offset<SceneInfoFbs> CreateSceneInfoFbs(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::String> scene_id = 0,
-    steamrot::SceneType scene_type = steamrot::SceneType_UNKNOWN) {
-  SceneInfoFbsBuilder builder_(_fbb);
-  builder_.add_scene_id(scene_id);
-  builder_.add_scene_type(scene_type);
-  return builder_.Finish();
-}
-
-inline ::flatbuffers::Offset<SceneInfoFbs> CreateSceneInfoFbsDirect(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    const char *scene_id = nullptr,
-    steamrot::SceneType scene_type = steamrot::SceneType_UNKNOWN) {
-  auto scene_id__ = scene_id ? _fbb.CreateString(scene_id) : 0;
-  return steamrot::CreateSceneInfoFbs(
-      _fbb,
-      scene_id__,
-      scene_type);
-}
 
 struct SceneDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef SceneDataFbsBuilder Builder;
@@ -102,8 +36,8 @@ struct SceneDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::SceneInfoFbs *scene_info() const {
     return GetPointer<const steamrot::SceneInfoFbs *>(VT_SCENE_INFO);
   }
-  const SceneResourcesConfigFbs *scene_resources_config() const {
-    return GetPointer<const SceneResourcesConfigFbs *>(VT_SCENE_RESOURCES_CONFIG);
+  const steamrot::SceneResourcesConfigFbs *scene_resources_config() const {
+    return GetPointer<const steamrot::SceneResourcesConfigFbs *>(VT_SCENE_RESOURCES_CONFIG);
   }
   const steamrot::AssetConfigFbs *asset_config() const {
     return GetPointer<const steamrot::AssetConfigFbs *>(VT_ASSET_CONFIG);
@@ -137,7 +71,7 @@ struct SceneDataFbsBuilder {
   void add_scene_info(::flatbuffers::Offset<steamrot::SceneInfoFbs> scene_info) {
     fbb_.AddOffset(SceneDataFbs::VT_SCENE_INFO, scene_info);
   }
-  void add_scene_resources_config(::flatbuffers::Offset<SceneResourcesConfigFbs> scene_resources_config) {
+  void add_scene_resources_config(::flatbuffers::Offset<steamrot::SceneResourcesConfigFbs> scene_resources_config) {
     fbb_.AddOffset(SceneDataFbs::VT_SCENE_RESOURCES_CONFIG, scene_resources_config);
   }
   void add_asset_config(::flatbuffers::Offset<steamrot::AssetConfigFbs> asset_config) {
@@ -163,7 +97,7 @@ struct SceneDataFbsBuilder {
 inline ::flatbuffers::Offset<SceneDataFbs> CreateSceneDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::SceneInfoFbs> scene_info = 0,
-    ::flatbuffers::Offset<SceneResourcesConfigFbs> scene_resources_config = 0,
+    ::flatbuffers::Offset<steamrot::SceneResourcesConfigFbs> scene_resources_config = 0,
     ::flatbuffers::Offset<steamrot::AssetConfigFbs> asset_config = 0,
     ::flatbuffers::Offset<steamrot::EntityCollectionFbs> entity_collection = 0,
     ::flatbuffers::Offset<steamrot::LogicCollectionData> logic_collection_data = 0) {

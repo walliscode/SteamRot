@@ -13,7 +13,6 @@
 /////////////////////////////////////////////////
 #include "FailInfo.h"
 #include "SceneData.h"
-#include "scene_data_generated.h"
 #include "scene_types_generated.h"
 #include <expected>
 
@@ -31,15 +30,14 @@ public:
   /// @brief Provides pointer to SceneData object.
   /////////////////////////////////////////////////
   virtual std::expected<SceneData, FailInfo>
-  ProvideDefaultSceneData(const SceneType scene_type) const = 0;
+  CreateSceneData(const SceneType scene_type) = 0;
 
   /////////////////////////////////////////////////
-  /// @brief Provides a SceneData object from flatbuffers data
+  /// @brief Configures SceneData object.
   ///
-  /// Designed to be overloaded and then overriden per concrete Implementation
-  /// @param fb_data flatbuffers data
+  /// @param scene_data SceneData object to configure.
   /////////////////////////////////////////////////
-  virtual std::expected<SceneData, FailInfo>
-  ProvideSceneDataFromData(const SceneDataFbs *fb_data) const = 0;
+  virtual std::expected<std::monostate, FailInfo>
+  ConfigureSceneData(SceneData &scene_data) const = 0;
 };
 } // namespace steamrot
