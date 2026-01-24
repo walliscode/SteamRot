@@ -52,12 +52,10 @@ ConfigurePanelStyle(const PanelStyleData *panel_fb, PanelStyle &panel_style);
 /// @param fonts_map Map of font names to font shared pointers
 /// @return monostate on success, FailInfo on error
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-ConfigureButtonStyle(const ButtonStyleData *button_fb,
-                     ButtonStyle &button_style,
-                     std::unordered_map<std::string,
-                                        std::shared_ptr<const sf::Font>>
-                         &fonts_map);
+std::expected<std::monostate, FailInfo> ConfigureButtonStyle(
+    const ButtonStyleData *button_fb, ButtonStyle &button_style,
+    std::unordered_map<std::string, std::shared_ptr<const sf::Font>>
+        &fonts_map);
 
 /////////////////////////////////////////////////
 /// @brief Configures DropDownContainerStyle from FlatBuffers data
@@ -78,12 +76,10 @@ std::expected<std::monostate, FailInfo> ConfigureDropDownContainerStyle(
 /// @param fonts_map Map of font names to font shared pointers
 /// @return monostate on success, FailInfo on error
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-ConfigureDropDownListStyle(const DropDownListStyleData *dd_list_fb,
-                           DropDownListStyle &dd_list_style,
-                           std::unordered_map<std::string,
-                                              std::shared_ptr<const sf::Font>>
-                               &fonts_map);
+std::expected<std::monostate, FailInfo> ConfigureDropDownListStyle(
+    const DropDownListStyleData *dd_list_fb, DropDownListStyle &dd_list_style,
+    std::unordered_map<std::string, std::shared_ptr<const sf::Font>>
+        &fonts_map);
 
 /////////////////////////////////////////////////
 /// @brief Configures DropDownItemStyle from FlatBuffers data
@@ -93,12 +89,10 @@ ConfigureDropDownListStyle(const DropDownListStyleData *dd_list_fb,
 /// @param fonts_map Map of font names to font shared pointers
 /// @return monostate on success, FailInfo on error
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-ConfigureDropDownItemStyle(const DropDownItemStyleData *dd_item_fb,
-                           DropDownItemStyle &dd_item_style,
-                           std::unordered_map<std::string,
-                                              std::shared_ptr<const sf::Font>>
-                               &fonts_map);
+std::expected<std::monostate, FailInfo> ConfigureDropDownItemStyle(
+    const DropDownItemStyleData *dd_item_fb, DropDownItemStyle &dd_item_style,
+    std::unordered_map<std::string, std::shared_ptr<const sf::Font>>
+        &fonts_map);
 
 /////////////////////////////////////////////////
 /// @brief Configures DropDownButtonStyle from FlatBuffers data

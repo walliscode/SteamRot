@@ -55,7 +55,7 @@ TEST_CASE("FlatbuffersUIStyleDataProvider::ConfigureUIStyles configures "
   fonts_map["Roboto-Regular"] = font2;
 
   steamrot::FlatbuffersUIStyleDataProvider provider(fonts_map);
-  std::vector<UIStyle> styles;
+  std::vector<steamrot::UIStyle> styles;
 
   auto result = provider.ConfigureUIStyles(styles);
 

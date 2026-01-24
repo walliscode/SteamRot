@@ -9,9 +9,9 @@
 #pragma once
 
 #include "FailInfo.h"
+#include "FlatbuffersDataLoader.h"
 #include "IUIStyleDataProvider.h"
 #include "UIStyle.h"
-#include "ui_style_generated.h"
 #include <expected>
 #include <vector>
 namespace steamrot {
