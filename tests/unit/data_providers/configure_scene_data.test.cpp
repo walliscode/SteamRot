@@ -9,11 +9,10 @@
 #include "configure_scene_data.h"
 #include "SceneInfo.h"
 #include "SceneResourcesConfig.h"
-#include "flatbuffers/flatbuffers.h"
-#include "scene_data_generated.h"
 #include "scene_info_generated.h"
 #include "scene_resources_config_generated.h"
 #include <catch2/catch_test_macros.hpp>
+#include <cstdint>
 
 TEST_CASE("ConfigureSceneInfo handles nullptr Flatbuffers data gracefully",
           "[unit][configure_scene_data]") {
@@ -31,13 +30,12 @@ TEST_CASE("ConfigureSceneInfo correctly configures SceneInfo with different "
           "scene types",
           "[unit][configure_scene_data]") {
   // Test multiple scene types to verify correct configuration
-  for (const auto scene_type :
-       {steamrot::SceneType::SceneType_TITLE,
-        steamrot::SceneType::SceneType_CRAFTING}) {
+  for (const auto scene_type : {steamrot::SceneType::SceneType_TITLE,
+                                steamrot::SceneType::SceneType_CRAFTING}) {
 
     flatbuffers::FlatBufferBuilder builder;
     flatbuffers::Offset<steamrot::SceneInfoFbs> scene_info_offset =
-        steamrot::CreateSceneInfoFbs(builder, scene_type);
+        steamrot::CreateSceneInfoFbs(builder, 0, scene_type);
     builder.Finish(scene_info_offset);
 
     const steamrot::SceneInfoFbs *scene_info_fbs =
@@ -45,7 +43,7 @@ TEST_CASE("ConfigureSceneInfo correctly configures SceneInfo with different "
 
     steamrot::SceneInfo scene_info;
     auto result = steamrot::data::configure::ConfigureSceneInfo(scene_info,
-                                                                 scene_info_fbs);
+                                                                scene_info_fbs);
     // Should succeed with the given type
     REQUIRE(result.has_value());
     REQUIRE(scene_info.type == scene_type);
@@ -60,8 +58,8 @@ TEST_CASE("ConfigureSceneInfo correctly configures SceneInfo with valid UUID",
   flatbuffers::Offset<flatbuffers::String> scene_id_offset =
       builder.CreateString(valid_uuid);
   flatbuffers::Offset<steamrot::SceneInfoFbs> scene_info_offset =
-      steamrot::CreateSceneInfoFbs(builder, steamrot::SceneType::SceneType_TITLE,
-                                   scene_id_offset);
+      steamrot::CreateSceneInfoFbs(builder, scene_id_offset,
+                                   steamrot::SceneType::SceneType_TITLE);
   builder.Finish(scene_info_offset);
 
   const steamrot::SceneInfoFbs *scene_info_fbs =
@@ -87,8 +85,8 @@ TEST_CASE("ConfigureSceneInfo correctly configures SceneInfo without UUID",
   // Create FlatBuffers data without scene_id
   flatbuffers::FlatBufferBuilder builder;
   flatbuffers::Offset<steamrot::SceneInfoFbs> scene_info_offset =
-      steamrot::CreateSceneInfoFbs(
-          builder, steamrot::SceneType::SceneType_CRAFTING);
+      steamrot::CreateSceneInfoFbs(builder, 0,
+                                   steamrot::SceneType::SceneType_CRAFTING);
   builder.Finish(scene_info_offset);
 
   const steamrot::SceneInfoFbs *scene_info_fbs =
@@ -117,8 +115,8 @@ TEST_CASE("ConfigureSceneInfo handles invalid UUID string",
   flatbuffers::Offset<flatbuffers::String> scene_id_offset =
       builder.CreateString(invalid_uuid);
   flatbuffers::Offset<steamrot::SceneInfoFbs> scene_info_offset =
-      steamrot::CreateSceneInfoFbs(builder, steamrot::SceneType::SceneType_TITLE,
-                                   scene_id_offset);
+      steamrot::CreateSceneInfoFbs(builder, scene_id_offset,
+                                   steamrot::SceneType::SceneType_TITLE);
   builder.Finish(scene_info_offset);
 
   const steamrot::SceneInfoFbs *scene_info_fbs =
@@ -153,7 +151,7 @@ TEST_CASE("ConfigureSceneResourcesConfig correctly configures "
   // Create FlatBuffers data
   flatbuffers::FlatBufferBuilder builder;
   flatbuffers::Offset<steamrot::SceneResourcesConfigFbs> config_offset =
-      steamrot::CreateSceneResourcesConfigFbs(builder, 1920, 1080);
+      steamrot::CreateSceneResourcesConfigFbs(builder, 1080, 1958);
   builder.Finish(config_offset);
 
   const steamrot::SceneResourcesConfigFbs *config_fbs =
@@ -169,7 +167,7 @@ TEST_CASE("ConfigureSceneResourcesConfig correctly configures "
     FAIL(result.error().message);
   }
 
-  REQUIRE(config.texture_width == 1920);
+  REQUIRE(config.texture_width == 1958);
   REQUIRE(config.texture_height == 1080);
 }
 
@@ -177,8 +175,10 @@ TEST_CASE("ConfigureSceneResourcesConfig handles zero dimensions",
           "[unit][configure_scene_data]") {
   // Create FlatBuffers data with zero dimensions
   flatbuffers::FlatBufferBuilder builder;
+  int32_t zero_width = 0;
+  int32_t zero_height = 0;
   flatbuffers::Offset<steamrot::SceneResourcesConfigFbs> config_offset =
-      steamrot::CreateSceneResourcesConfigFbs(builder, 0, 0);
+      steamrot::CreateSceneResourcesConfigFbs(builder, zero_height, zero_width);
   builder.Finish(config_offset);
 
   const steamrot::SceneResourcesConfigFbs *config_fbs =
@@ -190,12 +190,9 @@ TEST_CASE("ConfigureSceneResourcesConfig handles zero dimensions",
   auto result = steamrot::data::configure::ConfigureSceneResourcesConfig(
       config, config_fbs);
 
-  // Zero dimensions are technically valid in FlatBuffers
-  // The function should handle them
-  if (!result.has_value()) {
-    FAIL(result.error().message);
-  }
-
-  REQUIRE(config.texture_width == 0);
-  REQUIRE(config.texture_height == 0);
+  // zero dimensions will register as null value, so this will error out
+  REQUIRE(!result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message ==
+          "Texture width is missing in SceneResourcesConfigFbs");
 }

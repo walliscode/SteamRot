@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "configure_scene_data.h"
-#include "configure_asset_config.h"
 
 namespace steamrot::data::configure {
 
