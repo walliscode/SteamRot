@@ -1,0 +1,57 @@
+{
+  "ui_name": "test_ui",
+  "is_visible": true,
+  "root_ui_element": {
+    "base_data": {
+      "position": { "x": 0.0, "y": 0.0 },
+      "size": { "x": 100.0, "y": 50.0 },
+      "children_active": true,
+      "children": [
+        {
+          "element_type": "DropDownContainerData",
+          "element": {
+            "base_data": {
+              "position": { "x": 0.0, "y": 0.0 },
+              "size": { "x": 100.0, "y": 50.0 },
+              "children_active": true,
+              "children": [
+                {
+                  "element_type": "ButtonData",
+                  "element": {
+                    "base_data": {
+                      "position": { "x": 0, "y": 0 },
+                      "size": { "x": 50, "y": 50 },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "None",
+                      "spacing_strategy": "None"
+                    },
+                    "label": "Button"
+                  }
+                },
+                {
+                  "element_type": "DropDownButtonData",
+                  "element": {
+                    "base_data": {
+                      "position": { "x": 0, "y": 0 },
+                      "size": { "x": 50, "y": 50 },
+                      "children_active": false,
+                      "children": [],
+                      "layout": "None",
+                      "spacing_strategy": "None"
+                    },
+                    "is_expanded": false
+                  }
+                }
+              ],
+              "layout": "Horizontal",
+              "spacing_strategy": "None"
+            }
+          }
+        }
+      ],
+      "layout": "Horizontal",
+      "spacing_strategy": "None"
+    }
+  }
+}

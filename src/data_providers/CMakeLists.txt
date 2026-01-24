@@ -11,6 +11,7 @@ add_library(data_providers
   FlatbuffersSubscriberViewer.cpp
   FlatbuffersUIStyleDataProvider.cpp
   FlatbuffersSaveDataProvider.cpp
+  FlatbuffersUIElementProvider.cpp
   DataAccessFactory.cpp
   DataLoader.cpp
   FlatbuffersDataLoader.cpp
@@ -22,6 +23,7 @@ add_library(data_providers
   configure/configure_scene_manager_data.cpp
   configure/configure_ui_styles.cpp
   configure/configure_scene_data.cpp
+  configure/configure_ui_elements.cpp
 
 )
 

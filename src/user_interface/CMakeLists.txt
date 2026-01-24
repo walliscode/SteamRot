@@ -1,5 +1,5 @@
 add_library(user_interface
-FlatbuffersUIElementConfigurator.cpp
+# UI element configuration moved to data_providers
 )
 
 target_include_directories(user_interface
