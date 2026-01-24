@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "SceneFactory.h"
 #include "CraftingScene.h"
+#include "FlatbuffersEntityImporter.h"
 #include "FlatbuffersSceneDataProvider.h"
 #include "TestFixture.h"
 #include "TitleScene.h"
@@ -17,6 +18,7 @@
 #include "entity_memory.h"
 #include "load_scene_data.h"
 #include <catch2/catch_test_macros.hpp>
+#include <memory>
 
 TEST_CASE("SceneFactory::CreateEmptyScene handles UNKNOWN SceneType",
           "[unit][SceneFactory]") {
@@ -119,7 +121,7 @@ TEST_CASE("SceneFactory::CreateSceneFromSceneData creates Scene with valid "
   // Create SceneData using the constructor that takes SceneDataFbs
   steamrot::FlatbuffersSceneDataProvider scene_data_provider(
       fixture.GetGameContext().event_handler, scene_data_fbs);
-  
+
   // Create SceneData object and configure it
   steamrot::SceneData scene_data;
   auto configure_result = scene_data_provider.ConfigureSceneData(scene_data);
@@ -166,17 +168,20 @@ TEST_CASE("SceneFactory provides UUID if not present in SceneData",
   // Create scene from scene data
   auto result = scene_factory.CreateSceneFromSceneData(scene_data);
 
-  REQUIRE(result.has_value());
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
   auto &scene = result.value();
   REQUIRE(!scene->GetSceneInfo().id.is_nil());
   REQUIRE(scene->GetSceneInfo().type == steamrot::SceneType_TITLE);
 }
 
-TEST_CASE("SceneFactory configures the scenes logic map", "[unit][SceneFactory]") {
+TEST_CASE("SceneFactory configures the scenes logic map",
+          "[unit][SceneFactory]") {
 
   // set up fixtures and objects
   steamrot::tests::TestFixture fixture;
-  
+
   // Create SceneData with minimal configuration
   steamrot::SceneData scene_data;
   scene_data.scene_info.type = steamrot::SceneType_TITLE;
@@ -184,15 +189,15 @@ TEST_CASE("SceneFactory configures the scenes logic map", "[unit][SceneFactory]"
   scene_data.scene_resources_config.texture_height = 600;
 
   steamrot::SceneFactory scene_factory(fixture.GetGameContext());
-  
+
   // Create scene from data (which configures logic map)
   auto result = scene_factory.CreateSceneFromSceneData(scene_data);
   if (!result.has_value()) {
     FAIL(result.error().message);
   }
-  
+
   auto &scene = result.value();
-  
+
   // check that logic map is populated
   auto &logic_collection = scene->GetSceneResources().logic_map;
   ///// CHECKING COLLISION LOGICS /////

@@ -30,7 +30,6 @@ namespace steamrot {
 ///
 /////////////////////////////////////////////////
 class Scene {
-  friend class ISceneFactory;
   friend class SceneFactory;
 
 protected:
