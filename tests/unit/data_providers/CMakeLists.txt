@@ -13,7 +13,12 @@ add_executable(test_data_providers
   FlatbuffersSubscriberViewer.test.cpp
   FlatbuffersSaveDataProvider.test.cpp
   FlatbuffersUIStyleDataProvider.test.cpp
-  asset_config_factory.test.cpp
+  configure_asset_config.test.cpp
+  configure_engine_data.test.cpp
+  configure_save_data.test.cpp
+  configure_scene_data.test.cpp
+  configure_scene_manager_data.test.cpp
+  configure_ui_styles.test.cpp
 )
 
 

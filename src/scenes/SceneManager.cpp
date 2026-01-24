@@ -31,7 +31,7 @@ std::expected<std::monostate, FailInfo> SceneManager::StartUp() {
   ISceneManagerDataProvider &data_provider = *data_provider_result.value();
 
   // get SceneManager data from data provider
-  auto data_result = data_provider.ProvideSceneManagerData();
+  auto data_result = data_provider.CreateSceneManagerData();
   if (!data_result.has_value()) {
     return std::unexpected(data_result.error());
   }

@@ -1,32 +1,33 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief unit tests for factory functions for AssetConfig configuration
+/// @brief unit tests for configure_asset_config functions
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "asset_config_factory.h"
+#include "configure_asset_config.h"
 #include "AssetConfig.h"
 #include "asset_config_generated.h"
 #include "flatbuffers/buffer.h"
 #include "flatbuffers/vector.h"
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("asset_config_factory handles nullptr Flatbuffers data gracefully",
-          "[unit][data_providers][asset_config_factory]") {
+TEST_CASE("ConfigureAssetConfig handles nullptr Flatbuffers data gracefully",
+          "[unit][configure_asset_config]") {
   steamrot::AssetConfig asset_config;
   const steamrot::AssetConfigFbs *null_data = nullptr;
-  auto result = steamrot::ConfigureAssetConfig(asset_config, null_data);
+  auto result =
+      steamrot::data::configure::ConfigureAssetConfig(asset_config, null_data);
   REQUIRE(!result.has_value());
 
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
   REQUIRE(result.error().message == "AssetConfigFbs data is null.");
 }
 
-TEST_CASE("asset_config_factory correctly configures AssetConfig from "
+TEST_CASE("ConfigureAssetConfig correctly configures AssetConfig from "
           "flatbuffers data",
-          "[unit][data_providers][asset_config_factory]") {
+          "[unit][configure_asset_config]") {
 
   // create flatbuffers data for testing
   flatbuffers::FlatBufferBuilder builder;
@@ -66,11 +67,11 @@ TEST_CASE("asset_config_factory correctly configures AssetConfig from "
 
   REQUIRE(asset_config_fbs != nullptr);
 
-  // test that the factory function correctly configures AssetConfig
+  // test that the configure function correctly configures AssetConfig
   steamrot::AssetConfig asset_config;
 
-  auto configure_result =
-      steamrot::ConfigureAssetConfig(asset_config, asset_config_fbs);
+  auto configure_result = steamrot::data::configure::ConfigureAssetConfig(
+      asset_config, asset_config_fbs);
   if (!configure_result.has_value()) {
     FAIL(configure_result.error().message);
   }

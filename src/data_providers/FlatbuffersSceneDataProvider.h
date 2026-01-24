@@ -13,17 +13,24 @@
 /////////////////////////////////////////////////
 #include "EventHandler.h"
 #include "ISceneDataProvider.h"
-#include "SceneResourcesConfig.h"
-#include "scene_resources_config_generated.h"
+#include "scene_data_generated.h"
 #include "scene_types_generated.h"
-#include <variant>
+#include <expected>
 
 namespace steamrot {
-class FlatbuffersSceneDataProvider
-    : public steamrot::ISceneDataProvider {
+
+class FlatbuffersSceneDataProvider : public steamrot::ISceneDataProvider {
 
 private:
+  /////////////////////////////////////////////////
+  /// @brief Reference to EventHandler
+  /////////////////////////////////////////////////
   EventHandler &m_event_handler;
+
+  /////////////////////////////////////////////////
+  /// @brief Pointer to FlatBuffers SceneData
+  /////////////////////////////////////////////////
+  const SceneDataFbs *m_scene_data_fbs{nullptr};
 
 public:
   /////////////////////////////////////////////////
@@ -34,40 +41,12 @@ public:
   FlatbuffersSceneDataProvider(EventHandler &event_handler);
 
   /////////////////////////////////////////////////
-  /// @brief Configures SceneInfo from FlatBuffers data.
+  /// @brief Constructor
   ///
-  /// @param info SceneInfo to configure.
-  /// @param fb_info FlatBuffers SceneInfo data.
+  /// @param scene_data pointer to FlatBuffers SceneData
   /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  ConfigureSceneInfo(SceneInfo &info, const SceneInfoFbs *fb_info) const;
-
-  /////////////////////////////////////////////////
-  /// @brief Configures SceneResourcesConfig from FlatBuffers data.
-  ///
-  /// @param config SceneResourcesConfig to configure.
-  /// @param fb_config FlatBuffers SceneResourcesConfig data.
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  ConfigureSceneResourcesConfig(SceneResourcesConfig &config,
-                                const SceneResourcesConfigFbs *fb_config) const;
-
-  /////////////////////////////////////////////////
-  /// @brief Provides SceneData from FlatBuffers data.
-  ///
-  /// @param scene_data_fbs FlatBuffers SceneData for scene.
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  ConfigureSceneDataFromData(SceneData &scene_data,
-                             const SceneDataFbs *scene_data_fbs) const;
-
-  /////////////////////////////////////////////////
-  /// @brief Provide
-  ///
-  /// @param scene_type [TODO:parameter]
-  /////////////////////////////////////////////////
-  std::expected<SceneData, FailInfo>
-  ProvideSceneDataFromData(const SceneDataFbs *fb_data) const override;
+  FlatbuffersSceneDataProvider(EventHandler &event_handler,
+                               const SceneDataFbs *scene_data);
 
   /////////////////////////////////////////////////
   /// @brief Providers SceneData object
@@ -75,6 +54,9 @@ public:
   /// @param scene_type ScenType enum
   /////////////////////////////////////////////////
   std::expected<SceneData, FailInfo>
-  ProvideDefaultSceneData(const SceneType scene_type) const override;
+  CreateSceneData(const SceneType scene_type) override;
+
+  std::expected<std::monostate, FailInfo>
+  ConfigureSceneData(SceneData &scene_data) const override;
 };
 } // namespace steamrot

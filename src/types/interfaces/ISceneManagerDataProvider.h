@@ -27,9 +27,17 @@ public:
   virtual ~ISceneManagerDataProvider() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Load the scene manager state.
+  /// @brief Create and provide a configured SceneManagerData object
   /////////////////////////////////////////////////
   virtual std::expected<SceneManagerData, FailInfo>
-  ProvideSceneManagerData() const = 0;
+  CreateSceneManagerData() const = 0;
+
+  /////////////////////////////////////////////////
+  /// @brief Configure the provided SceneManagerData object
+  ///
+  /// @param scene_manager_data SceneManagerData object to configure
+  /////////////////////////////////////////////////
+  virtual std::expected<std::monostate, FailInfo>
+  ConfigureSceneManagerData(SceneManagerData &scene_manager_data) const = 0;
 };
 } // namespace steamrot

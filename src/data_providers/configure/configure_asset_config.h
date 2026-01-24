@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Free functions for creating/pouplating AssetConfig structs.
+/// @brief Declaration of functions to configure asset data.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -8,12 +8,16 @@
 /////////////////////////////////////////////////
 #pragma once
 
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
 #include "AssetConfig.h"
 #include "FailInfo.h"
 #include "asset_config_generated.h"
 #include <expected>
 #include <variant>
-namespace steamrot {
+
+namespace steamrot::data::configure {
 
 /////////////////////////////////////////////////
 /// @brief Configure an AssetConfig struct from FlatBuffers data.
@@ -24,4 +28,5 @@ namespace steamrot {
 std::expected<std::monostate, FailInfo>
 ConfigureAssetConfig(AssetConfig &asset_config,
                      const AssetConfigFbs *asset_config_fb_data);
-} // namespace steamrot
+
+} // namespace steamrot::data::configure

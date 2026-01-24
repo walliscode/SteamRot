@@ -10,7 +10,6 @@
 /////////////////////////////////////////////////
 #include "EngineResources.h"
 #include "FailInfo.h"
-#include "IEngineDataProvider.h"
 #include <expected>
 
 namespace steamrot {

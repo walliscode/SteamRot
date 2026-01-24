@@ -11,6 +11,7 @@
 #include "EngineData.h"
 #include "FailInfo.h"
 #include <expected>
+#include <variant>
 
 // Forward declaration
 namespace steamrot {
@@ -26,9 +27,23 @@ namespace steamrot {
 class IEngineDataProvider {
 
 public:
+  /////////////////////////////////////////////////
+  /// @brief Virtual destructor.
+  /////////////////////////////////////////////////
   virtual ~IEngineDataProvider() = default;
 
-  virtual std::expected<EngineData, FailInfo> LoadEngineData() const = 0;
+  /////////////////////////////////////////////////
+  /// @brief Creates and loads all engine data.
+  /////////////////////////////////////////////////
+  virtual std::expected<EngineData, FailInfo> CreateEngineData() const = 0;
+
+  /////////////////////////////////////////////////
+  /// @brief Wraps engine data configuration functions
+  ///
+  /// @param engine_data Engine data to configure
+  /////////////////////////////////////////////////
+  virtual std::expected<std::monostate, FailInfo>
+  ConfigureEngineData(EngineData &engine_data) const = 0;
 };
 
 } // namespace steamrot

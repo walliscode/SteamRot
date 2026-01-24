@@ -1,15 +1,15 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Implementation of factory functions for AssetConfig configuration
+/// @brief Implementation of functions to configure asset data.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "asset_config_factory.h"
+#include "configure_asset_config.h"
 #include "FailInfo.h"
 
-namespace steamrot {
+namespace steamrot::data::configure {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
@@ -40,4 +40,5 @@ ConfigureAssetConfig(AssetConfig &asset_config,
 
   return std::monostate{};
 }
-} // namespace steamrot
+
+} // namespace steamrot::data::configure

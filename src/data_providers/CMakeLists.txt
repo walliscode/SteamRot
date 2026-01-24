@@ -16,12 +16,19 @@ add_library(data_providers
   FlatbuffersDataLoader.cpp
   data_file_utils.cpp
   paths.cpp
-  asset_config_factory.cpp
+  configure/configure_engine_data.cpp
+  configure/configure_asset_config.cpp
+  configure/configure_save_data.cpp
+  configure/configure_scene_manager_data.cpp
+  configure/configure_ui_styles.cpp
+  configure/configure_scene_data.cpp
+
 )
 
 target_include_directories(data_providers
   PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/configure/
 )
 
 target_link_libraries(data_providers

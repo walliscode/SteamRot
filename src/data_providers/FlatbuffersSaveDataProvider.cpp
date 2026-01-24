@@ -7,59 +7,45 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersSaveDataProvider.h"
+#include "FailInfo.h"
+#include "configure_save_data.h"
 
 namespace steamrot {
+
 /////////////////////////////////////////////////
 std::expected<SaveData, FailInfo>
-FlatbuffersSaveDataProvider::ProvideSaveData() const {
+FlatbuffersSaveDataProvider::CreateSaveData() const {
 
-  // create SaveData object to populate
-  SaveData save_data;
+  // create return object
+  SaveData data;
 
-  // return populated SaveData object
-  return save_data;
+  // configure save data
+  auto configure_result = ConfigureSaveData(data);
+  if (!configure_result.has_value()) {
+    return std::unexpected(configure_result.error());
+  }
+
+  return data;
 }
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-FlatbuffersSaveDataProvider::ConfigureSaveMetaData(
-    SaveMetaData &save_meta_data,
-    const SaveMetaDataFbs *save_meta_data_fbs) const {
+FlatbuffersSaveDataProvider::ConfigureSaveData(SaveData &save_data) const {
 
-  // handle null input
-  if (!save_meta_data_fbs)
-    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    "Null SaveMetaDataFbs pointer"});
-
-  // if no save name provided then return error
-  if (!save_meta_data_fbs->save_name())
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound,
-                 "SaveMetaDataFbs missing required field: save_name"});
-
-  // assign save name
-  save_meta_data.save_name = save_meta_data_fbs->save_name()->str();
-
-  // check if is present
-  if (!save_meta_data_fbs->file_id()) {
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound,
-                 "SaveMetaDataFbs missing required field: file_id"});
-  }
-
-  // try to parse UUID
-  auto file_id_str =
-      uuids::uuid::from_string(save_meta_data_fbs->file_id()->str());
-
-  // if parsing failed then return error
-  if (!file_id_str.has_value()) {
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound,
-                 "SaveMetaDataFbs file_id is not a valid UUID string"});
-  } else {
-    save_meta_data.file_id = file_id_str.value();
-  }
-
-  return std::monostate{};
+  // TODO: When save file loading is implemented, this would use
+  // m_loader.ProvideSaveDataFbs() to get the SaveDataFbs pointer
+  // For now, we return an error indicating no save data is available
+  
+  // Note: This is a placeholder implementation. Once save file loading
+  // is implemented in FlatbuffersDataLoader, this method should:
+  // 1. Call m_loader.ProvideSaveDataFbs() or similar method
+  // 2. Pass the result to data::configure::ConfigureSaveData()
+  // 3. Return the configuration result
+  
+  return std::unexpected(
+      FailInfo{FailMode::FileNotFound,
+               "No save data file available for loading. Save file loading "
+               "is not yet implemented."});
 }
+
 } // namespace steamrot

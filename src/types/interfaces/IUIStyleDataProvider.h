@@ -47,7 +47,24 @@ public:
   virtual ~IUIStyleDataProvider() = default;
 
   ////////////////////////////////////////////////////////////
-  /// @brief Load and configure multiple UI styles by name
+  /// @brief Create and provide configured UI styles
+  ///
+  /// @return Vector of style data wrappers, or error
+  ////////////////////////////////////////////////////////////
+  virtual std::expected<std::vector<UIStyle>, FailInfo> CreateUIStyles() = 0;
+
+  ////////////////////////////////////////////////////////////
+  /// @brief Configure the provided UI styles vector
+  ///
+  /// @param ui_styles Vector of UIStyle objects to configure
+  /// @return monostate on success, FailInfo on error
+  ////////////////////////////////////////////////////////////
+  virtual std::expected<std::monostate, FailInfo>
+  ConfigureUIStyles(std::vector<UIStyle> &ui_styles) = 0;
+
+  ////////////////////////////////////////////////////////////
+  /// @brief Load and configure multiple UI styles by name (deprecated - use
+  /// CreateUIStyles)
   ///
   /// @return Vector of style data wrappers, or error
   ////////////////////////////////////////////////////////////

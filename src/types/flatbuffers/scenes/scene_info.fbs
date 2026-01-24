@@ -1,0 +1,11 @@
+include "../core/scene_types.fbs";
+
+namespace steamrot;
+
+
+table SceneInfoFbs{
+    scene_id: string;
+    scene_type: SceneType;
+  }
+
+root_type SceneInfoFbs;

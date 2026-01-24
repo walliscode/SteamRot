@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Definition of the ISaveDataProvider interface.
+/// @brief Declaration of IEngineSnapShotProvider interface.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -11,31 +11,22 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "FailInfo.h"
-#include "SaveData.h"
+
+#include "EngineSnapshot.h"
 #include <expected>
-#include <variant>
 namespace steamrot {
 
-class ISaveDataProvider {
+class IEngineSnapShotProvider {
 
 public:
   /////////////////////////////////////////////////
   /// @brief Virtual destructor.
   /////////////////////////////////////////////////
-  virtual ~ISaveDataProvider() = default;
+  virtual ~IEngineSnapShotProvider() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Provide a configured SaveData object.
+  /// @brief Provides an EngineSnapshot object.
   /////////////////////////////////////////////////
-  virtual std::expected<SaveData, FailInfo> CreateSaveData() const = 0;
-
-  /////////////////////////////////////////////////
-  /// @brief Configure the provided SaveData object.
-  ///
-  /// @param save_data SaveData object to configure.
-  /////////////////////////////////////////////////
-  virtual std::expected<std::monostate, FailInfo>
-  ConfigureSaveData(SaveData &save_data) const = 0;
+  std::expected<EngineSnapshot, FailInfo> ProvideEngineSnapshot();
 };
 } // namespace steamrot

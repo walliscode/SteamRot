@@ -10,108 +10,41 @@
 #include "uuid.h"
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE(
-    "FlatbuffersSaveDataProvider::ConfigureSaveMetaData handles null input",
-    "[FlatbuffersSaveDataProvider]") {
+TEST_CASE("FlatbuffersSaveDataProvider is constructed correctly",
+          "[unit][FlatbuffersSaveDataProvider]") {
+
+  steamrot::FlatbuffersSaveDataProvider provider;
+  REQUIRE_NOTHROW(provider);
+}
+
+TEST_CASE("FlatbuffersSaveDataProvider::CreateSaveData returns error when no "
+          "save file available",
+          "[unit][FlatbuffersSaveDataProvider]") {
 
   // Arrange
   steamrot::FlatbuffersSaveDataProvider provider;
-  steamrot::SaveMetaData save_meta_data;
 
   // Act
-  auto result = provider.ConfigureSaveMetaData(save_meta_data, nullptr);
+  auto result = provider.CreateSaveData();
 
   // Assert
-  REQUIRE(!result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
-  REQUIRE(result.error().message == "Null SaveMetaDataFbs pointer");
+  REQUIRE_FALSE(result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::FileNotFound);
 }
 
-TEST_CASE(
-    "FlatbuffersSaveDataProvider::ConfigureSaveMetaData handles no save name",
-    "[FlatbuffersSaveDataProvider]") {
+TEST_CASE("FlatbuffersSaveDataProvider::ConfigureSaveData returns error when "
+          "no save file available",
+          "[unit][FlatbuffersSaveDataProvider]") {
 
   // Arrange
   steamrot::FlatbuffersSaveDataProvider provider;
-  steamrot::SaveMetaData save_meta_data;
-
-  // Create flatbuffers data
-  flatbuffers::FlatBufferBuilder builder;
-  auto save_meta_data_fbs_offset = steamrot::CreateSaveMetaDataFbs(builder);
-  builder.Finish(save_meta_data_fbs_offset);
-  const steamrot::SaveMetaDataFbs *save_meta_data_fbs =
-      flatbuffers::GetRoot<steamrot::SaveMetaDataFbs>(
-          builder.GetBufferPointer());
-  // Act
-  auto result =
-      provider.ConfigureSaveMetaData(save_meta_data, save_meta_data_fbs);
-
-  // Assert
-  REQUIRE(!result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
-  REQUIRE(result.error().message ==
-          "SaveMetaDataFbs missing required field: save_name");
-}
-
-TEST_CASE("FlatbuffersSaveDataProvider::ConfigureSaveMetaData handles no or "
-          "incorrect uuid",
-          "[FlatbuffersSaveDataProvider]") {
-  // Arrange
-  steamrot::FlatbuffersSaveDataProvider provider;
-  steamrot::SaveMetaData save_meta_data;
-
-  // Create flatbuffers data with save name but no UUID
-  flatbuffers::FlatBufferBuilder builder;
-  auto save_name_offset = builder.CreateString("Test Save");
-  auto uuid_offset = builder.CreateString("");
-
-  auto save_meta_data_fbs_offset =
-      steamrot::CreateSaveMetaDataFbs(builder, uuid_offset, save_name_offset);
-  builder.Finish(save_meta_data_fbs_offset);
-  const steamrot::SaveMetaDataFbs *save_meta_data_fbs =
-      flatbuffers::GetRoot<steamrot::SaveMetaDataFbs>(
-          builder.GetBufferPointer());
+  steamrot::SaveData save_data;
 
   // Act
-  auto result =
-      provider.ConfigureSaveMetaData(save_meta_data, save_meta_data_fbs);
+  auto result = provider.ConfigureSaveData(save_data);
 
   // Assert
-  REQUIRE(!result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
-  REQUIRE(result.error().message ==
-          "SaveMetaDataFbs file_id is not a valid UUID string");
+  REQUIRE_FALSE(result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::FileNotFound);
 }
 
-TEST_CASE("FlatbuffersSaveDataProvider::ConfigureSaveMetaData handles valid "
-          "input",
-          "[FlatbuffersSaveDataProvider]") {
-  // Arrange
-  steamrot::FlatbuffersSaveDataProvider provider;
-  steamrot::SaveMetaData save_meta_data;
-
-  // Create flatbuffers data with save name and valid UUID
-  uuids::uuid test_uuid = uuids::uuid_system_generator{}();
-
-  flatbuffers::FlatBufferBuilder builder;
-  auto save_name_offset = builder.CreateString("Test Save");
-  auto uuid_offset = builder.CreateString(uuids::to_string(test_uuid));
-
-  auto save_meta_data_fbs_offset =
-      steamrot::CreateSaveMetaDataFbs(builder, save_name_offset, uuid_offset);
-  builder.Finish(save_meta_data_fbs_offset);
-  const steamrot::SaveMetaDataFbs *save_meta_data_fbs =
-      flatbuffers::GetRoot<steamrot::SaveMetaDataFbs>(
-          builder.GetBufferPointer());
-
-  // Act
-  auto result =
-      provider.ConfigureSaveMetaData(save_meta_data, save_meta_data_fbs);
-
-  // Assert
-  if (!result.has_value()) {
-    FAIL(result.error().message);
-  }
-  REQUIRE(save_meta_data.save_name == "Test Save");
-  REQUIRE(save_meta_data.file_id == test_uuid);
-}
