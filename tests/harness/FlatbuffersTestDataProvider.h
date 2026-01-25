@@ -26,7 +26,7 @@ public:
   /// @brief Provide all instances of TestData struct
   /////////////////////////////////////////////////
   std::expected<std::vector<steamrot::TestData>, steamrot::FailInfo>
-  ProviderAllTestData() const override;
+  ProvideAllTestData() const override;
 
   /////////////////////////////////////////////////
   /// @brief Create a TestData instance from Flatbuffers TestData

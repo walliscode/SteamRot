@@ -39,7 +39,7 @@ public:
   /// @brief Provide all instances of TestData struct
   /////////////////////////////////////////////////
   virtual std::expected<std::vector<steamrot::TestData>, steamrot::FailInfo>
-  ProviderAllTestData() const = 0;
+  ProvideAllTestData() const = 0;
 
   const std::filesystem::path &GetObjectDirectoryPath() const {
     return object_directory_path;

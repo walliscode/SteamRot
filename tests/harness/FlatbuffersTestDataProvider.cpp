@@ -21,7 +21,7 @@ FlatbuffersTestDataProvider::FlatbuffersTestDataProvider(
 
 /////////////////////////////////////////////////
 std::expected<std::vector<steamrot::TestData>, steamrot::FailInfo>
-FlatbuffersTestDataProvider::ProviderAllTestData() const {
+FlatbuffersTestDataProvider::ProvideAllTestData() const {
   // Instantiate the FlatbuffersTestDataLoader and pass the object directory
   // path
   FlatbuffersTestDataLoader data_loader(object_directory_path);
