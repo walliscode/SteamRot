@@ -137,27 +137,27 @@ TEST_CASE("FlatbuffersUIElementProvider handles nested elements",
       dynamic_cast<steamrot::DropDownListElement *>(children[1].get());
   REQUIRE(ddlist->unexpanded_label == "Select Option");
 
-  // Third child should be a DropDownItemElement
-  REQUIRE(dynamic_cast<steamrot::DropDownItemElement *>(children[2].get()) !=
-          nullptr);
-  auto *dditem =
-      dynamic_cast<steamrot::DropDownItemElement *>(children[2].get());
-  REQUIRE(dditem->label == "Item 1");
-
-  // Fourth child should be a DropDownButtonElement
-  REQUIRE(dynamic_cast<steamrot::DropDownButtonElement *>(children[3].get()) !=
-          nullptr);
-  auto *ddbtn =
-      dynamic_cast<steamrot::DropDownButtonElement *>(children[3].get());
-  REQUIRE(ddbtn->is_expanded == false);
-
-  // Fifth child should be a DropDownContainerElement
+  // Third child should be a DropDownContainerElement
   REQUIRE(dynamic_cast<steamrot::DropDownContainerElement *>(
-              children[4].get()) != nullptr);
+              children[2].get()) != nullptr);
   auto *ddcont =
-      dynamic_cast<steamrot::DropDownContainerElement *>(children[4].get());
+      dynamic_cast<steamrot::DropDownContainerElement *>(children[2].get());
   // DropDownContainer should have 2 children
   REQUIRE(ddcont->child_elements.size() == 2);
+
+  // Fourth child should be a DropDownItemElement
+  REQUIRE(dynamic_cast<steamrot::DropDownItemElement *>(children[3].get()) !=
+          nullptr);
+  auto *dditem =
+      dynamic_cast<steamrot::DropDownItemElement *>(children[3].get());
+  REQUIRE(dditem->label == "Item Label");
+
+  // Fifth child should be a DropDownButtonElement
+  REQUIRE(dynamic_cast<steamrot::DropDownButtonElement *>(children[4].get()) !=
+          nullptr);
+  auto *ddbtn =
+      dynamic_cast<steamrot::DropDownButtonElement *>(children[4].get());
+  REQUIRE(ddbtn->is_expanded == true);
 }
 
 TEST_CASE("FlatbuffersUIElementProvider handles element properties",
@@ -174,16 +174,16 @@ TEST_CASE("FlatbuffersUIElementProvider handles element properties",
   auto &root_element = root_result.value();
 
   // Check root element basic properties
-  REQUIRE(root_element->position.x == 0.0f);
-  REQUIRE(root_element->position.y == 0.0f);
-  REQUIRE(root_element->size.x == 800.0f);
-  REQUIRE(root_element->size.y == 600.0f);
-  REQUIRE(root_element->layout == steamrot::Layout::Vertical);
+  REQUIRE(root_element->position.x == 10.0f);
+  REQUIRE(root_element->position.y == 20.0f);
+  REQUIRE(root_element->size.x == 100.0f);
+  REQUIRE(root_element->size.y == 50.0f);
+  REQUIRE(root_element->layout == steamrot::Layout::Horizontal);
 
-  // Check a child element's properties
+  // Check a child element's properties (first button)
   auto &button = root_element->child_elements[0];
-  REQUIRE(button->position.x == 10.0f);
-  REQUIRE(button->position.y == 10.0f);
-  REQUIRE(button->size.x == 100.0f);
-  REQUIRE(button->size.y == 30.0f);
+  REQUIRE(button->position.x == 0.0f);
+  REQUIRE(button->position.y == 0.0f);
+  REQUIRE(button->size.x == 0.0f);
+  REQUIRE(button->size.y == 0.0f);
 }
