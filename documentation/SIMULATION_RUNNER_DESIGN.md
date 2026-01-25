@@ -2,7 +2,9 @@
 
 ## Executive Summary
 
-This document provides a comprehensive design analysis for the simulation runner component of the TestEngine. The simulation runner enables data-driven test execution by allowing tests to specify sequences of free functions and Logic class instances via JSON configuration, providing isolated testing of specific game behaviors without requiring recompilation.
+This document provides a comprehensive design analysis for the simulation runner component of the TestEngine. The simulation runner enables data-driven test execution by allowing tests to specify sequences of Logic class instances via JSON configuration, providing isolated testing of specific game behaviors without requiring recompilation.
+
+**Note**: An earlier version of this design included support for free functions. This was removed as free functions operate on individual UIElements/components and would require manual entity iteration, duplicating what Logic classes already handle. The final design uses only Logic classes, maintaining consistency with the Engine's prescribed architecture.
 
 ## Table of Contents
 
@@ -23,7 +25,7 @@ This document provides a comprehensive design analysis for the simulation runner
 
 The simulation runner is a critical component of the TestEngine that executes game logic in a controlled, data-driven manner. It allows test authors to:
 
-1. **Specify logic sequences** - Define ordered execution of functions and Logic classes
+1. **Specify logic sequences** - Define ordered execution of Logic classes
 2. **Isolate effects** - Test specific behaviors within the Engine context
 3. **Configure via JSON** - Change test scenarios without recompiling
 4. **Validate state** - Capture and compare game state at each tick
@@ -32,8 +34,9 @@ The simulation runner is a critical component of the TestEngine that executes ga
 
 - **No recompilation** - Test scenarios defined in JSON files
 - **Isolation** - Execute only the logic needed for a specific test
-- **Flexibility** - Mix free functions and Logic classes in any order
+- **Flexibility** - Specify Logic classes in any order and combination
 - **Maintainability** - Clear separation between test configuration and implementation
+- **Architectural consistency** - Uses the Engine's prescribed Logic class system
 
 ## Current Architecture Analysis
 
@@ -65,17 +68,7 @@ struct SimulationData {
 };
 
 struct SimulationStep {
-  SimulationElement element;  // variant<FunctionEnum, LogicClassEnum>
-};
-
-enum class FunctionEnum {
-  None,
-  ProcessUIActionsAndEvents,
-  ProcessNestedUIActionsAndEvents,
-  ProcessButtonElementActions,
-  ProcessDropDownListElementActions,
-  CheckMouseOverNestedUIElement,
-  UpdateCUserInterfaceVisibilityFromCUIState
+  LogicClassEnum logic_class;  // Which Logic class to execute
 };
 
 enum class LogicClassEnum {
@@ -87,6 +80,11 @@ enum class LogicClassEnum {
   CraftingRenderLogic
 };
 ```
+
+**Design Rationale**: The original design included `FunctionEnum` for free functions, but this was removed because:
+- Free functions operate on individual UIElements/components (e.g., `CheckMouseOverNestedUIElement(mouse_pos, UIElement &)`)
+- Logic classes already handle entity selection, archetype iteration, and calling free functions appropriately
+- Including free functions would duplicate entity iteration logic and bypass the Engine's prescribed architecture
 
 #### 3. Logic Classes (src/logic/)
 
@@ -127,30 +125,27 @@ struct SceneContext {
 
 1. **No simulation execution** - `TestEngine::TickSceneLogic()` is empty
 2. **No Logic instantiation** - No mechanism to create Logic instances from enum
-3. **No function mapping** - No dispatch mechanism for FunctionEnum values
-4. **No archetype management** - Unclear how to apply archetypes for tests
-5. **No SceneContext creation** - TestEngine needs to provide context to Logic
+3. **No SceneContext creation** - TestEngine needs to provide context to Logic
 
 ## Design Requirements
 
 ### Functional Requirements
 
 1. **Execute simulation steps** in the order specified in JSON
-2. **Support both free functions and Logic classes** in the same simulation
-3. **Create Logic instances** dynamically based on LogicClassEnum
-4. **Provide SceneContext** to Logic instances
-5. **Execute free functions** with appropriate parameters
-6. **Handle errors gracefully** with detailed failure information
-7. **Support multiple ticks** with simulation running each tick
+2. **Create Logic instances** dynamically based on LogicClassEnum
+3. **Provide SceneContext** to Logic instances
+4. **Handle errors gracefully** with detailed failure information
+5. **Support multiple ticks** with simulation running each tick
 
 ### Non-Functional Requirements
 
 1. **Robustness** - Handle invalid configurations without crashes
-2. **Extensibility** - Easy to add new functions/Logic classes
+2. **Extensibility** - Easy to add new Logic classes
 3. **Performance** - Minimal overhead for Logic instantiation
 4. **Maintainability** - Clear code structure and documentation
 5. **Type safety** - Leverage C++ type system
 6. **No recompilation** - All test scenarios configurable via JSON
+7. **Architectural consistency** - Use Engine's prescribed Logic class system
 
 ## Proposed Architecture
 
@@ -163,17 +158,13 @@ SimulationRunner::ExecuteSimulation(SimulationData, SceneContext)
     ↓
 For each SimulationStep:
     ↓
-    Is FunctionEnum? → FunctionDispatcher::Execute(function, context)
-    ↓
-    Is LogicClassEnum? → LogicFactory::CreateAndExecute(logic_class, context)
+    CreateAndExecute Logic class (logic_class, context)
 ```
 
 ### Component Responsibilities
 
 1. **SimulationRunner** - Orchestrates simulation execution
-2. **LogicFactory** - Creates and manages Logic instances
-3. **FunctionDispatcher** - Executes free functions
-4. **TestEngine** - Provides entry point and context
+2. **TestEngine** - Provides entry point and SceneContext
 
 ## Component Design
 
@@ -222,14 +213,7 @@ SimulationRunner::ExecuteSimulation() {
 
 std::expected<std::monostate, FailInfo>
 SimulationRunner::ExecuteStep(const SimulationStep &step) {
-  return std::visit(overloaded{
-    [this](FunctionEnum func) -> std::expected<std::monostate, FailInfo> {
-      return ExecuteFunction(func, m_scene_context);
-    },
-    [this](LogicClassEnum logic) -> std::expected<std::monostate, FailInfo> {
-      return ExecuteLogicClass(logic, m_scene_context);
-    }
-  }, step.element);
+  return ExecuteLogicClass(step.logic_class, m_scene_context);
 }
 ```
 
@@ -298,68 +282,7 @@ ExecuteLogicClass(LogicClassEnum logic_class, SceneContext &context) {
 - Repeated construction (acceptable for tests)
 - No instance reuse (not needed for isolated tests)
 
-### 3. Free Function Execution
-
-**Strategy**: Direct function calls with SceneContext
-
-**Implementation**:
-
-```cpp
-namespace steamrot::tests {
-
-std::expected<std::monostate, FailInfo>
-ExecuteFunction(FunctionEnum function, SceneContext &context) {
-  switch (function) {
-    case FunctionEnum::ProcessUIActionsAndEvents:
-      ProcessUIActionsAndEvents(context.scene_entities, 
-                                context.archetypes,
-                                context.event_handler);
-      return std::monostate{};
-      
-    case FunctionEnum::ProcessNestedUIActionsAndEvents:
-      ProcessNestedUIActionsAndEvents(context.scene_entities,
-                                      context.archetypes,
-                                      context.event_handler);
-      return std::monostate{};
-      
-    case FunctionEnum::ProcessButtonElementActions:
-      ProcessButtonElementActions(context.scene_entities,
-                                  context.archetypes,
-                                  context.event_handler);
-      return std::monostate{};
-      
-    case FunctionEnum::ProcessDropDownListElementActions:
-      ProcessDropDownListElementActions(context.scene_entities,
-                                        context.archetypes,
-                                        context.event_handler);
-      return std::monostate{};
-      
-    case FunctionEnum::CheckMouseOverNestedUIElement:
-      CheckMouseOverNestedUIElement(context.scene_entities,
-                                    context.archetypes,
-                                    context.mouse_position);
-      return std::monostate{};
-      
-    case FunctionEnum::UpdateCUserInterfaceVisibilityFromCUIState:
-      UpdateCUserInterfaceVisibilityFromCUIState(context.scene_entities,
-                                                 context.archetypes);
-      return std::monostate{};
-      
-    case FunctionEnum::None:
-    default:
-      return std::unexpected(FailInfo{
-        FailMode::InvalidEnumValue,
-        "Invalid FunctionEnum value"
-      });
-  }
-}
-
-} // namespace steamrot::tests
-```
-
-**Note**: This requires knowing the exact signature of each free function. The implementation should reference the actual function declarations.
-
-### 4. Archetype Application
+### 3. Archetype Application
 
 **Current Understanding**: Archetypes are managed by EntityManager
 
@@ -376,7 +299,7 @@ ExecuteFunction(FunctionEnum function, SceneContext &context) {
 - Entity component activation creates appropriate archetypes
 - Simulation then operates on these archetypes
 
-### 5. SceneContext Provision
+### 4. SceneContext Provision
 
 **Challenge**: TestEngine needs to provide a valid SceneContext
 
@@ -459,22 +382,11 @@ ValidateSimulationData(const SimulationData &data) {
   
   // Check each step has valid enum value
   for (const auto &step : data.steps) {
-    if (std::holds_alternative<FunctionEnum>(step.element)) {
-      auto func = std::get<FunctionEnum>(step.element);
-      if (func == FunctionEnum::None) {
-        return std::unexpected(FailInfo{
-          FailMode::InvalidEnumValue,
-          "Step has FunctionEnum::None"
-        });
-      }
-    } else if (std::holds_alternative<LogicClassEnum>(step.element)) {
-      auto logic = std::get<LogicClassEnum>(step.element);
-      if (logic == LogicClassEnum::None) {
-        return std::unexpected(FailInfo{
-          FailMode::InvalidEnumValue,
-          "Step has LogicClassEnum::None"
-        });
-      }
+    if (step.logic_class == LogicClassEnum::None) {
+      return std::unexpected(FailInfo{
+        FailMode::InvalidEnumValue,
+        "Step has LogicClassEnum::None"
+      });
     }
   }
   
@@ -483,12 +395,6 @@ ValidateSimulationData(const SimulationData &data) {
 ```
 
 ### 3. Extensibility
-
-**Adding New Functions**:
-1. Add to `FunctionEnum` in `SimulationData.h`
-2. Add to `FunctionEnumFbs` in `simulation_data.fbs`
-3. Add case in `ExecuteFunction()` switch
-4. Add conversion in `ConvertFbsToFunctionEnum()`
 
 **Adding New Logic Classes**:
 1. Implement new Logic class (standard process)
@@ -519,7 +425,6 @@ ValidateSimulationData(const SimulationData &data) {
 ### 5. Testing the Simulation Runner
 
 **Unit Tests**:
-- Test `ExecuteFunction()` with each FunctionEnum
 - Test `ExecuteLogicClass()` with each LogicClassEnum
 - Test `ExecuteSimulation()` with various step sequences
 - Test error handling for invalid enums
@@ -529,25 +434,15 @@ ValidateSimulationData(const SimulationData &data) {
 - Test full TestEngine workflow with simulation
 - Verify state changes after simulation
 - Test multi-tick simulations
-- Test combinations of functions and Logic classes
+- Test sequences of Logic classes
 
 ## JSON Configuration Schema
 
 ### FlatBuffers Schema (simulation_data.fbs)
 
-The current schema already supports the design:
+The simplified schema for Logic-class-only simulation:
 
 ```fbs
-enum FunctionEnumFbs: byte {
-  None = 0,
-  ProcessUIActionsAndEvents,
-  ProcessNestedUIActionsAndEvents,
-  ProcessButtonElementActions,
-  ProcessDropDownListElementActions,
-  CheckMouseOverNestedUIElement,
-  UpdateCUserInterfaceVisibilityFromCUIState
-}
-
 enum LogicClassEnumFbs : byte {
   None = 0,
   UIActionLogic = 1,
@@ -558,7 +453,6 @@ enum LogicClassEnumFbs : byte {
 }
 
 table SimulationStepFbs {
-  function_type: FunctionEnumFbs = None;
   logic_class_type: LogicClassEnumFbs = None;
 }
 
@@ -567,6 +461,8 @@ table SimulationDataFbs {
   description: string;
 }
 ```
+
+**Note**: The original schema included `FunctionEnumFbs` and `function_type` field, but these were removed to maintain architectural consistency. Logic classes already handle entity iteration and call appropriate free functions internally.
 
 ### Example JSON Configurations
 
@@ -585,48 +481,42 @@ table SimulationDataFbs {
 }
 ```
 
-#### Example 2: UI Action Workflow
+#### Example 2: UI Interaction Workflow
 
 ```json
 {
   "simulation_data": {
-    "description": "Test button click processing",
+    "description": "Test UI collision and action processing",
     "steps": [
       {
         "logic_class_type": "UICollisionLogic"
       },
       {
-        "function_type": "ProcessButtonElementActions"
-      },
-      {
-        "function_type": "ProcessUIActionsAndEvents"
+        "logic_class_type": "UIActionLogic"
       }
     ]
   }
 }
 ```
 
-#### Example 3: Complex UI Interaction
+#### Example 3: Complete UI Frame
 
 ```json
 {
   "simulation_data": {
-    "description": "Full UI interaction cycle",
+    "description": "Full UI processing for one frame",
     "steps": [
       {
-        "function_type": "CheckMouseOverNestedUIElement"
-      },
-      {
         "logic_class_type": "UICollisionLogic"
-      },
-      {
-        "function_type": "ProcessNestedUIActionsAndEvents"
       },
       {
         "logic_class_type": "UIActionLogic"
       },
       {
-        "function_type": "UpdateCUserInterfaceVisibilityFromCUIState"
+        "logic_class_type": "UIStateLogic"
+      },
+      {
+        "logic_class_type": "UIRenderLogic"
       }
     ]
   }
@@ -700,44 +590,38 @@ table SimulationDataFbs {
 1. **Create SimulationRunner class** (`tests/harness/SimulationRunner.h/cpp`)
    - Implement constructor with SimulationData and SceneContext
    - Implement `ExecuteSimulation()` method
-   - Implement `ExecuteStep()` with variant visitor
+   - Implement `ExecuteStep()` method
 
 2. **Implement Logic execution** (in `SimulationRunner.cpp`)
    - Create `ExecuteLogicClass()` function
    - Add switch for each LogicClassEnum value
    - Instantiate and execute each Logic type
 
-3. **Implement function execution** (in `SimulationRunner.cpp`)
-   - Create `ExecuteFunction()` function
-   - Add switch for each FunctionEnum value
-   - Call appropriate free functions with context parameters
-
-4. **Update TestEngine** (`tests/harness/TestEngine.cpp`)
+3. **Update TestEngine** (`tests/harness/TestEngine.cpp`)
    - Implement `TickSceneLogic()` method
    - Get SceneContext from active scene
    - Create SimulationRunner and execute
 
 #### Phase 2: Validation and Error Handling
 
-5. **Add validation**
+4. **Add validation**
    - Validate SimulationData before execution
    - Check for empty steps
    - Validate enum values
 
-6. **Enhance error reporting**
+5. **Enhance error reporting**
    - Add contextual error messages
    - Include step number in errors
    - Preserve error chain
 
 #### Phase 3: Testing
 
-7. **Write unit tests** (`tests/harness/SimulationRunner.test.cpp`)
-   - Test each FunctionEnum execution
+6. **Write unit tests** (`tests/harness/SimulationRunner.test.cpp`)
    - Test each LogicClassEnum execution
    - Test error cases
    - Test validation logic
 
-8. **Write integration tests** (`tests/harness/TestEngine.test.cpp`)
+7. **Write integration tests** (`tests/harness/TestEngine.test.cpp`)
    - Test full TestEngine with simulation
    - Test multi-tick simulations
    - Test state capture after simulation
@@ -1052,17 +936,18 @@ When adding new simulation capabilities:
 
 This design provides a robust, extensible simulation runner for the TestEngine that:
 
-1. **Executes Logic classes and free functions** in configurable sequences
+1. **Executes Logic classes** in configurable sequences
 2. **Supports data-driven testing** via JSON configuration
 3. **Maintains isolation** through per-step Logic instantiation
 4. **Handles errors gracefully** with std::expected pattern
 5. **Integrates cleanly** with existing TestEngine architecture
 6. **Requires no recompilation** for new test scenarios
+7. **Maintains architectural consistency** by using the Engine's prescribed Logic system
 
 ### Key Design Decisions
 
 1. **Per-step instantiation** - Simple, isolated, no state management
-2. **Direct function calls** - No complex dispatch mechanism needed
+2. **Logic classes only** - No free function support to avoid duplicating entity iteration
 3. **Automatic archetypes** - Managed by EntityManager, not simulation
 4. **SceneContext provision** - TestEngine accesses Scene to get context
 5. **Validation at load time** - Catch configuration errors early
@@ -1072,9 +957,8 @@ This design provides a robust, extensible simulation runner for the TestEngine t
 **High Priority** (Core Functionality):
 1. SimulationRunner basic implementation
 2. Logic class execution
-3. Free function execution
-4. TestEngine integration
-5. Basic error handling
+3. TestEngine integration
+4. Basic error handling
 
 **Medium Priority** (Robustness):
 1. Comprehensive validation
@@ -1092,25 +976,25 @@ This design provides a robust, extensible simulation runner for the TestEngine t
 
 The proposed design is robust because:
 
-1. **Type-safe** - Uses C++ type system and std::variant
+1. **Type-safe** - Uses C++ type system with LogicClassEnum
 2. **Validated** - Configuration checked at load time
 3. **Isolated** - Steps don't share state
 4. **Testable** - Clear separation of concerns
-5. **Extensible** - Easy to add new functions/Logic classes
+5. **Extensible** - Easy to add new Logic classes
 6. **Maintainable** - Simple code structure
 7. **Error-handled** - std::expected throughout
+8. **Architecturally consistent** - Uses Engine's prescribed Logic system
 
 ### Next Steps
 
 For implementation:
 
 1. Review this design document with stakeholders
-2. Verify free function signatures in codebase
-3. Create SimulationRunner skeleton
-4. Implement core execution logic
-5. Add TestEngine integration
-6. Write comprehensive tests
-7. Update documentation
+2. Create SimulationRunner skeleton
+3. Implement core execution logic
+4. Add TestEngine integration
+5. Write comprehensive tests
+6. Update documentation
 
 ---
 

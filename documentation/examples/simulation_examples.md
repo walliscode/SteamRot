@@ -4,6 +4,8 @@ This document provides comprehensive examples of JSON configurations for the Sim
 
 See SIMULATION_RUNNER_DESIGN.md for complete design details.
 
+**Note**: The design uses only Logic classes. Free functions are not supported as they operate on individual UIElements and would require manual entity iteration, duplicating what Logic classes already do.
+
 ## Quick Examples
 
 ### Single Logic Class Test
@@ -16,24 +18,29 @@ See SIMULATION_RUNNER_DESIGN.md for complete design details.
 }
 ```
 
-### Single Function Test
-```json
-{
-  "simulation_data": {
-    "steps": [{"function_type": "ProcessUIActionsAndEvents"}]
-  },
-  "num_ticks": 1
-}
-```
-
-### Multi-Step Sequence
+### Multi-Step Logic Sequence
 ```json
 {
   "simulation_data": {
     "steps": [
       {"logic_class_type": "UICollisionLogic"},
-      {"function_type": "ProcessUIActionsAndEvents"},
-      {"logic_class_type": "UIActionLogic"}
+      {"logic_class_type": "UIActionLogic"},
+      {"logic_class_type": "UIStateLogic"}
+    ]
+  },
+  "num_ticks": 1
+}
+```
+
+### Complete UI Frame
+```json
+{
+  "simulation_data": {
+    "steps": [
+      {"logic_class_type": "UICollisionLogic"},
+      {"logic_class_type": "UIActionLogic"},
+      {"logic_class_type": "UIStateLogic"},
+      {"logic_class_type": "UIRenderLogic"}
     ]
   },
   "num_ticks": 1

@@ -36,8 +36,8 @@ namespace steamrot::tests {
 /// @class SimulationRunner
 /// @brief Executes simulation steps for TestEngine.
 ///
-/// The SimulationRunner orchestrates execution of free functions
-/// and Logic class instances as specified in SimulationData.
+/// The SimulationRunner orchestrates execution of Logic class
+/// instances as specified in SimulationData.
 /// Each step is executed in order, with proper error handling.
 /////////////////////////////////////////////////
 class SimulationRunner {
@@ -118,8 +118,7 @@ SimulationRunner::ExecuteSimulation() {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 SimulationRunner::ExecuteStep(const SimulationStep &step) {
-  // TODO: Implement step execution with std::visit
-  return std::monostate{};
+  return ExecuteLogicClass(step.logic_class, m_scene_context);
 }
 
 } // namespace steamrot::tests
@@ -181,118 +180,9 @@ ExecuteLogicClass(LogicClassEnum logic_class, SceneContext &context) {
 } // namespace steamrot::tests
 ```
 
-### Phase 3: Free Function Execution
+### Phase 3: TestEngine Integration
 
-#### Step 3.1: Identify Function Signatures
-
-**Action Required**: Verify the actual function signatures in the codebase.
-
-Check these files:
-- `src/logic/logic_action.h`
-- `src/logic/logic_collision.h`
-- `src/logic/logic_ui.h`
-
-Expected pattern:
-```cpp
-void FunctionName(EntityMemoryPool &entities,
-                  const std::unordered_map<ArchetypeID, Archetype> &archetypes,
-                  /* additional parameters */);
-```
-
-#### Step 3.2: Implement ExecuteFunction
-
-Add to `SimulationRunner.cpp` (adjust parameters based on actual signatures):
-
-```cpp
-#include "logic_action.h"
-#include "logic_collision.h"
-#include "logic_ui.h"
-
-namespace steamrot::tests {
-
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-ExecuteFunction(FunctionEnum function, SceneContext &context) {
-  // NOTE: Adjust function calls based on actual signatures
-  switch (function) {
-    case FunctionEnum::ProcessUIActionsAndEvents:
-      ProcessUIActionsAndEvents(context.scene_entities, 
-                                context.archetypes,
-                                context.event_handler);
-      return std::monostate{};
-      
-    case FunctionEnum::ProcessNestedUIActionsAndEvents:
-      ProcessNestedUIActionsAndEvents(context.scene_entities,
-                                      context.archetypes,
-                                      context.event_handler);
-      return std::monostate{};
-      
-    case FunctionEnum::ProcessButtonElementActions:
-      ProcessButtonElementActions(context.scene_entities,
-                                  context.archetypes,
-                                  context.event_handler);
-      return std::monostate{};
-      
-    case FunctionEnum::ProcessDropDownListElementActions:
-      ProcessDropDownListElementActions(context.scene_entities,
-                                        context.archetypes,
-                                        context.event_handler);
-      return std::monostate{};
-      
-    case FunctionEnum::CheckMouseOverNestedUIElement:
-      CheckMouseOverNestedUIElement(context.scene_entities,
-                                    context.archetypes,
-                                    context.mouse_position);
-      return std::monostate{};
-      
-    case FunctionEnum::UpdateCUserInterfaceVisibilityFromCUIState:
-      UpdateCUserInterfaceVisibilityFromCUIState(context.scene_entities,
-                                                 context.archetypes);
-      return std::monostate{};
-      
-    case FunctionEnum::None:
-    default:
-      return std::unexpected(FailInfo{
-        FailMode::InvalidEnumValue,
-        "Invalid FunctionEnum value in simulation step"
-      });
-  }
-}
-
-} // namespace steamrot::tests
-```
-
-### Phase 4: Variant Dispatch
-
-#### Step 4.1: Implement ExecuteStep with std::visit
-
-Update `SimulationRunner.cpp`:
-
-```cpp
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-SimulationRunner::ExecuteStep(const SimulationStep &step) {
-  return std::visit(
-      [this](auto &&element) -> std::expected<std::monostate, FailInfo> {
-        using T = std::decay_t<decltype(element)>;
-        if constexpr (std::is_same_v<T, FunctionEnum>) {
-          return ExecuteFunction(element, m_scene_context);
-        } else if constexpr (std::is_same_v<T, LogicClassEnum>) {
-          return ExecuteLogicClass(element, m_scene_context);
-        } else {
-          return std::unexpected(FailInfo{
-            FailMode::VariantTypeMismatch,
-            "Unknown simulation element type"
-          });
-        }
-      },
-      step.element);
-}
-```
-
-### Phase 5: TestEngine Integration
-
-#### Step 5.1: Update TestEngine::TickSceneLogic
+#### Step 3.1: Update TestEngine::TickSceneLogic
 
 **File**: `tests/harness/TestEngine.cpp`
 
@@ -342,9 +232,9 @@ void TestEngine::TickSceneLogic() {
 }
 ```
 
-### Phase 6: Build Integration
+### Phase 4: Build Integration
 
-#### Step 6.1: Update CMakeLists.txt
+#### Step 4.1: Update CMakeLists.txt
 
 **File**: `tests/harness/CMakeLists.txt`
 
@@ -365,9 +255,9 @@ target_link_libraries(test_harness
 )
 ```
 
-### Phase 7: Testing
+### Phase 5: Testing
 
-#### Step 7.1: Create Unit Tests
+#### Step 5.1: Create Unit Tests
 
 **File**: `tests/harness/SimulationRunner.test.cpp`
 
@@ -408,7 +298,7 @@ add_executable(test_harness_unit
 )
 ```
 
-#### Step 7.2: Create Integration Tests
+#### Step 5.2: Create Integration Tests
 
 **File**: `tests/harness/TestEngine.test.cpp` (add to existing file)
 
@@ -428,8 +318,6 @@ Before considering implementation complete:
 
 - [ ] SimulationRunner compiles without errors
 - [ ] All Logic class enums have cases in ExecuteLogicClass
-- [ ] All function enums have cases in ExecuteFunction
-- [ ] Function signatures verified against actual implementations
 - [ ] TestEngine::TickSceneLogic calls SimulationRunner
 - [ ] Error handling returns FailInfo with descriptive messages
 - [ ] Unit tests written for SimulationRunner
@@ -439,15 +327,6 @@ Before considering implementation complete:
 - [ ] Visual dividers used appropriately
 
 ## Common Issues and Solutions
-
-### Issue: Function Signature Mismatch
-
-**Symptom**: Compiler errors when calling free functions
-
-**Solution**: 
-1. View actual function declarations in logic header files
-2. Update ExecuteFunction to match exact signatures
-3. Pass correct parameters from SceneContext
 
 ### Issue: SceneContext Invalid
 
@@ -486,15 +365,6 @@ Before considering implementation complete:
 4. Add case in `ExecuteLogicClass()` in `SimulationRunner.cpp`
 5. Add conversion in `ConvertFbsToLogicClassEnum()` in `FlatbuffersTestDataProvider.cpp`
 6. Add unit test for new Logic class execution
-
-### Adding New Free Functions
-
-1. Implement function in appropriate logic file
-2. Add to `FunctionEnum` in `src/types/test_structs/SimulationData.h`
-3. Add to `FunctionEnumFbs` in `src/types/flatbuffers/testing/simulation_data.fbs`
-4. Add case in `ExecuteFunction()` in `SimulationRunner.cpp`
-5. Add conversion in `ConvertFbsToFunctionEnum()` in `FlatbuffersTestDataProvider.cpp`
-6. Add unit test for new function execution
 
 ## Next Steps After Implementation
 
