@@ -105,8 +105,9 @@ TEST_CASE("ConfigureButtonElement configures button label",
   auto children = ui_element_data->root_ui_element()->base_data()->children();
   auto button_fb = children->Get(0);
   REQUIRE(button_fb != nullptr);
-  REQUIRE(button_fb->element_type() ==
-          steamrot::UIElementDataUnion::UIElementDataUnion_ButtonData);
+  REQUIRE(steamrot::EnumNameUIElementDataUnion(button_fb->element_type()) ==
+          steamrot::EnumNameUIElementDataUnion(
+              steamrot::UIElementDataUnion::UIElementDataUnion_ButtonData));
 
   auto button_data =
       static_cast<const steamrot::ButtonData *>(button_fb->element());
@@ -127,8 +128,9 @@ TEST_CASE("ConfigureDropDownListElement configures labels",
   auto children = ui_element_data->root_ui_element()->base_data()->children();
   auto ddlist_fb = children->Get(1);
   REQUIRE(ddlist_fb != nullptr);
-  REQUIRE(ddlist_fb->element_type() ==
-          steamrot::UIElementDataUnion::UIElementDataUnion_DropDownListData);
+  REQUIRE(steamrot::EnumNameUIElementDataUnion(ddlist_fb->element_type()) ==
+          steamrot::EnumNameUIElementDataUnion(
+              steamrot::UIElementDataUnion::UIElementDataUnion_DropDownListData));
 
   auto ddlist_data =
       static_cast<const steamrot::DropDownListData *>(ddlist_fb->element());
@@ -142,18 +144,39 @@ TEST_CASE("ConfigureDropDownListElement configures labels",
   REQUIRE(ddlist_element.expanded_label == "Options:");
 }
 
+TEST_CASE("ConfigureDropDownContainerElement validates children",
+          "[unit][configure_ui_elements]") {
+  auto [data, ui_element_data] = LoadUIElementTestData();
+  REQUIRE(ui_element_data != nullptr);
+
+  auto children = ui_element_data->root_ui_element()->base_data()->children();
+  auto ddcont_fb = children->Get(2);
+  REQUIRE(ddcont_fb != nullptr);
+  REQUIRE(steamrot::EnumNameUIElementDataUnion(ddcont_fb->element_type()) ==
+          steamrot::EnumNameUIElementDataUnion(
+              steamrot::UIElementDataUnion::UIElementDataUnion_DropDownContainerData));
+
+  auto ddcont_data = static_cast<const steamrot::DropDownContainerData *>(
+      ddcont_fb->element());
+  REQUIRE(ddcont_data != nullptr);
+
+  steamrot::DropDownContainerElement ddcont_element;
+  auto result = steamrot::data::configure::ConfigureDropDownContainerElement(
+      ddcont_element, *ddcont_data);
+  REQUIRE(result.has_value());
+}
+
 TEST_CASE("ConfigureDropDownItemElement configures label",
           "[unit][configure_ui_elements]") {
   auto [data, ui_element_data] = LoadUIElementTestData();
   REQUIRE(ui_element_data != nullptr);
 
   auto children = ui_element_data->root_ui_element()->base_data()->children();
-  auto dditem_fb = children->Get(2);
+  auto dditem_fb = children->Get(3);
   REQUIRE(dditem_fb != nullptr);
-  REQUIRE(
-      steamrot::EnumNameUIElementDataUnion(dditem_fb->element_type()) ==
-      steamrot::EnumNameUIElementDataUnion(
-          steamrot::UIElementDataUnion::UIElementDataUnion_DropDownItemData));
+  REQUIRE(steamrot::EnumNameUIElementDataUnion(dditem_fb->element_type()) ==
+          steamrot::EnumNameUIElementDataUnion(
+              steamrot::UIElementDataUnion::UIElementDataUnion_DropDownItemData));
 
   auto dditem_data =
       static_cast<const steamrot::DropDownItemData *>(dditem_fb->element());
@@ -163,7 +186,7 @@ TEST_CASE("ConfigureDropDownItemElement configures label",
   auto result = steamrot::data::configure::ConfigureDropDownItemElement(
       dditem_element, *dditem_data);
   REQUIRE(result.has_value());
-  REQUIRE(dditem_element.label == "item...");
+  REQUIRE(dditem_element.label == "Item Label");
 }
 
 TEST_CASE("ConfigureDropDownButtonElement configures expanded state",
@@ -172,10 +195,11 @@ TEST_CASE("ConfigureDropDownButtonElement configures expanded state",
   REQUIRE(ui_element_data != nullptr);
 
   auto children = ui_element_data->root_ui_element()->base_data()->children();
-  auto ddbtn_fb = children->Get(3);
+  auto ddbtn_fb = children->Get(4);
   REQUIRE(ddbtn_fb != nullptr);
-  REQUIRE(ddbtn_fb->element_type() ==
-          steamrot::UIElementDataUnion::UIElementDataUnion_DropDownButtonData);
+  REQUIRE(steamrot::EnumNameUIElementDataUnion(ddbtn_fb->element_type()) ==
+          steamrot::EnumNameUIElementDataUnion(
+              steamrot::UIElementDataUnion::UIElementDataUnion_DropDownButtonData));
 
   auto ddbtn_data =
       static_cast<const steamrot::DropDownButtonData *>(ddbtn_fb->element());
@@ -186,29 +210,4 @@ TEST_CASE("ConfigureDropDownButtonElement configures expanded state",
       ddbtn_element, *ddbtn_data);
   REQUIRE(result.has_value());
   REQUIRE(ddbtn_element.is_expanded == true);
-}
-
-TEST_CASE("ConfigureDropDownContainerElement validates children",
-          "[unit][configure_ui_elements]") {
-  auto [data, ui_element_data] = LoadUIElementTestData();
-  REQUIRE(ui_element_data != nullptr);
-
-  auto children = ui_element_data->root_ui_element()->base_data()->children();
-  auto ddcont_fb = children->Get(4);
-  REQUIRE(ddcont_fb != nullptr);
-  REQUIRE(
-      ddcont_fb->element_type() ==
-      steamrot::UIElementDataUnion::UIElementDataUnion_DropDownContainerData);
-
-  auto ddcont_data = static_cast<const steamrot::DropDownContainerData *>(
-      ddcont_fb->element());
-  REQUIRE(ddcont_data != nullptr);
-
-  steamrot::DropDownContainerElement ddcont_element;
-  auto result = steamrot::data::configure::ConfigureDropDownContainerElement(
-      ddcont_element, *ddcont_data);
-
-  if (!result.has_value()) {
-    FAIL(result.error().message);
-  }
 }
