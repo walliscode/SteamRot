@@ -7,14 +7,16 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersUIElementProvider.h"
-#include "EventPacket.h"
-#include "Subscriber.h"
+#include "ButtonElement.h"
+#include "DropDownButtonElement.h"
+#include "DropDownContainerElement.h"
+#include "DropDownItemElement.h"
+#include "DropDownListElement.h"
+#include "PanelElement.h"
 #include "TestFixture.h"
-#include "UserInputBitset.h"
 #include "user_interface_generated.h"
 #include <catch2/catch_test_macros.hpp>
 #include <fstream>
-#include <variant>
 
 std::pair<std::unique_ptr<char[]>, const steamrot::UserInterfaceFbs *>
 LoadTestData(const std::string &filename) {
@@ -64,8 +66,9 @@ TEST_CASE("FlatbuffersUIElementProvider error handling",
       fixture.GetGameContext().event_handler, *ui_element_data);
 }
 
-TEST_CASE("FlatbuffersUIElementProvider creates and configures elements correctly",
-          "[unit][FlatbuffersUIElementProvider]") {
+TEST_CASE(
+    "FlatbuffersUIElementProvider creates and configures elements correctly",
+    "[unit][FlatbuffersUIElementProvider]") {
   // set up the test fixture
   steamrot::tests::TestFixture fixture;
   // Load UI element test data
@@ -85,7 +88,7 @@ TEST_CASE("FlatbuffersUIElementProvider creates and configures elements correctl
     REQUIRE(root_result.has_value());
     auto &root_element = root_result.value();
     REQUIRE(root_element != nullptr);
-    
+
     // Check that the element has children
     REQUIRE(root_element->child_elements.size() == 5);
   }
@@ -93,10 +96,10 @@ TEST_CASE("FlatbuffersUIElementProvider creates and configures elements correctl
   SECTION("ConfigureRootUIElement configures element correctly") {
     // Create a panel element to configure
     steamrot::PanelElement panel_element;
-    
+
     auto config_result = provider.ConfigureRootUIElement(panel_element);
     REQUIRE(config_result.has_value());
-    
+
     // Check that the element was configured with children
     REQUIRE(panel_element.child_elements.size() == 5);
   }
@@ -120,7 +123,7 @@ TEST_CASE("FlatbuffersUIElementProvider handles nested elements",
 
   // Check that different element types are created
   auto &children = root_element->child_elements;
-  
+
   // First child should be a ButtonElement
   REQUIRE(dynamic_cast<steamrot::ButtonElement *>(children[0].get()) !=
           nullptr);
@@ -149,9 +152,8 @@ TEST_CASE("FlatbuffersUIElementProvider handles nested elements",
   REQUIRE(ddbtn->is_expanded == false);
 
   // Fifth child should be a DropDownContainerElement
-  REQUIRE(
-      dynamic_cast<steamrot::DropDownContainerElement *>(children[4].get()) !=
-      nullptr);
+  REQUIRE(dynamic_cast<steamrot::DropDownContainerElement *>(
+              children[4].get()) != nullptr);
   auto *ddcont =
       dynamic_cast<steamrot::DropDownContainerElement *>(children[4].get());
   // DropDownContainer should have 2 children

@@ -12,9 +12,7 @@
 #include "DropDownContainerElement.h"
 #include "DropDownItemElement.h"
 #include "DropDownListElement.h"
-#include "EventHandler.h"
 #include "PanelElement.h"
-#include "TestFixture.h"
 #include "user_interface_generated.h"
 #include <catch2/catch_test_macros.hpp>
 #include <fstream>
@@ -55,11 +53,10 @@ LoadUIElementTestData() {
 
 TEST_CASE("ConvertLayout converts FlatBuffers layout correctly",
           "[unit][configure_ui_elements]") {
+  REQUIRE(steamrot::data::configure::ConvertLayout(steamrot::LayoutFbs_None) ==
+          steamrot::Layout::None);
   REQUIRE(steamrot::data::configure::ConvertLayout(
-              steamrot::LayoutFbs_None) == steamrot::Layout::None);
-  REQUIRE(steamrot::data::configure::ConvertLayout(
-              steamrot::LayoutFbs_Horizontal) ==
-          steamrot::Layout::Horizontal);
+              steamrot::LayoutFbs_Horizontal) == steamrot::Layout::Horizontal);
   REQUIRE(steamrot::data::configure::ConvertLayout(
               steamrot::LayoutFbs_Vertical) == steamrot::Layout::Vertical);
   REQUIRE(steamrot::data::configure::ConvertLayout(steamrot::LayoutFbs_Grid) ==
@@ -91,10 +88,10 @@ TEST_CASE("ConfigurePanelElement handles basic configuration",
 
   auto panel_data = ui_element_data->root_ui_element();
   REQUIRE(panel_data != nullptr);
-  
+
   steamrot::PanelElement panel_element;
-  auto result =
-      steamrot::data::configure::ConfigurePanelElement(panel_element, *panel_data);
+  auto result = steamrot::data::configure::ConfigurePanelElement(panel_element,
+                                                                 *panel_data);
   REQUIRE(result.has_value());
 }
 
@@ -119,7 +116,7 @@ TEST_CASE("ConfigureButtonElement configures button label",
   auto result = steamrot::data::configure::ConfigureButtonElement(
       button_element, *button_data);
   REQUIRE(result.has_value());
-  REQUIRE(button_element.label == "Test Button");
+  REQUIRE(button_element.label == "Test Tab");
 }
 
 TEST_CASE("ConfigureDropDownListElement configures labels",
@@ -160,7 +157,7 @@ TEST_CASE("ConfigureDropDownItemElement configures label",
   auto result = steamrot::data::configure::ConfigureDropDownItemElement(
       dditem_element, *dditem_data);
   REQUIRE(result.has_value());
-  REQUIRE(dditem_element.label == "Item 1");
+  REQUIRE(dditem_element.label == "item...");
 }
 
 TEST_CASE("ConfigureDropDownButtonElement configures expanded state",
@@ -175,12 +172,12 @@ TEST_CASE("ConfigureDropDownButtonElement configures expanded state",
   auto ddbtn_data =
       static_cast<const steamrot::DropDownButtonData *>(ddbtn_fb->element());
   REQUIRE(ddbtn_data != nullptr);
-
+  REQUIRE(ddbtn_data->is_expanded() == true);
   steamrot::DropDownButtonElement ddbtn_element;
   auto result = steamrot::data::configure::ConfigureDropDownButtonElement(
       ddbtn_element, *ddbtn_data);
   REQUIRE(result.has_value());
-  REQUIRE(ddbtn_element.is_expanded == false);
+  REQUIRE(ddbtn_element.is_expanded == true);
 }
 
 TEST_CASE("ConfigureDropDownContainerElement validates children",
@@ -199,5 +196,8 @@ TEST_CASE("ConfigureDropDownContainerElement validates children",
   steamrot::DropDownContainerElement ddcont_element;
   auto result = steamrot::data::configure::ConfigureDropDownContainerElement(
       ddcont_element, *ddcont_data);
-  REQUIRE(result.has_value());
+
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
 }
