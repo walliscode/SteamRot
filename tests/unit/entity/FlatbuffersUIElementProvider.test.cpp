@@ -128,7 +128,7 @@ TEST_CASE("FlatbuffersUIElementProvider handles nested elements",
   REQUIRE(dynamic_cast<steamrot::ButtonElement *>(children[0].get()) !=
           nullptr);
   auto *button = dynamic_cast<steamrot::ButtonElement *>(children[0].get());
-  REQUIRE(button->label == "Test Button");
+  REQUIRE(button->label == "Test Tab");
 
   // Second child should be a DropDownListElement
   REQUIRE(dynamic_cast<steamrot::DropDownListElement *>(children[1].get()) !=
