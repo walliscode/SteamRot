@@ -73,25 +73,22 @@ Key matchers:
 
 ## Implementation Path
 
-### Phase 1: Foundation (1-2 days)
-→ `test_data_loader` - Load test data configs
-
-### Phase 2: Comparison (1 day)
+### Phase 1: Comparison (1 day)
 → `test_data_comparison` - Compare pools/buses using matchers
 
-### Phase 3: Simulation (2-3 days)
+### Phase 2: Simulation (2-3 days)
 → `simulation_runner` - Execute Logic classes and functions
 
-### Phase 4: Input/Events (2-3 days)
+### Phase 3: Input/Events (2-3 days)
 → `input_simulation` + `event_simulation` - Per-tick input/events
 
-### Phase 5: Orchestration (2-3 days)
+### Phase 4: Orchestration (2-3 days)
 → `test_harness` - Tie everything together with `RunTestEngineTest()`
 
-### Phase 6: Integration (1-2 days)
+### Phase 5: Integration (1-2 days)
 → End-to-end testing, documentation, examples
 
-**Total estimate: 9-16 days**
+**Total estimate: 8-14 days**
 
 ---
 
@@ -101,17 +98,21 @@ When complete, developers can write tests like this:
 
 ```cpp
 #include "test_harness.h"
+#include "FlatbuffersTestDataProvider.h"
 
 TEST_CASE("My feature test", "[unit]") {
-  // Load all test data configs from adjacent data/ directory
-  auto configs = steamrot::tests::load_test_data_configs();
-  REQUIRE(configs.has_value());
+  // Instantiate provider with __FILE__ for adjacent data/ directory
+  FlatbuffersTestDataProvider provider(std::filesystem::path(__FILE__).parent_path());
   
-  // Use Catch2 generator to run test for each config
-  const auto *config = GENERATE_COPY(from_range(configs.value()));
+  // Load all test data
+  auto test_data_vec = provider.ProviderAllTestData();
+  REQUIRE(test_data_vec.has_value());
   
-  // Run TestEngine and compare with tick_snapshots
-  auto result = steamrot::tests::RunTestEngineTest(config);
+  // Use Catch2 generator to test each TestData
+  const auto& test_data = GENERATE_COPY(from_range(test_data_vec.value()));
+  
+  // Run TestEngine test
+  auto result = steamrot::tests::RunTestEngineTest(test_data);
   REQUIRE(result.has_value());
 }
 ```

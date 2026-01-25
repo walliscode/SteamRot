@@ -7,9 +7,10 @@
 │                         TEST FILE (User Code)                        │
 │                                                                       │
 │  TEST_CASE("My test", "[unit]") {                                   │
-│    auto configs = load_test_data_configs();                         │
-│    const auto *config = GENERATE_COPY(from_range(configs.value()));│
-│    auto result = RunTestEngineTest(config);                         │
+│    FlatbuffersTestDataProvider provider(__FILE__.parent_path());    │
+│    auto test_data_vec = provider.ProviderAllTestData().value();    │
+│    const auto& test_data = GENERATE_COPY(from_range(test_data_vec));│
+│    auto result = RunTestEngineTest(test_data);                      │
 │    REQUIRE(result.has_value());                                     │
 │  }                                                                   │
 └────────────────────────┬──────────────────────────────────────────┘
@@ -20,16 +21,16 @@
 │                    TEST HARNESS (Orchestration)                      │
 │  ┌────────────────────────────────────────────────────────────┐    │
 │  │  test_harness.h/cpp                              ❌ MISSING│    │
-│  │  - RunTestEngineTest(config)                              │    │
-│  │  - run_fixture_test(config)                               │    │
+│  │  - RunTestEngineTest(test_data)                           │    │
+│  │  - run_fixture_test(test_data)                            │    │
 │  │  - Coordinates all subsystems                             │    │
 │  └────────────────────────────────────────────────────────────┘    │
 └─────┬────────┬──────────┬──────────┬──────────┬────────────────────┘
       │        │          │          │          │
       ▼        ▼          ▼          ▼          ▼
 ┌─────────┐┌────────┐┌────────┐┌─────────┐┌─────────┐
-│ Loader  ││Compare ││ Sim    ││ Input   ││ Event   │
-│❌ MISS ││❌ MISS ││❌ MISS ││❌ MISS  ││❌ MISS  │
+│Provider ││Compare ││ Sim    ││ Input   ││ Event   │
+│✅ READY││❌ MISS ││❌ MISS ││❌ MISS  ││❌ MISS  │
 └─────────┘└────────┘└────────┘└─────────┘└─────────┘
 ```
 
@@ -161,43 +162,37 @@ HarnessReporter ✅                     │
 ## Implementation Dependencies
 
 ```
-Phase 1: test_data_loader
-         │
-         │ Depends on:
-         ├── FlatbuffersTestDataLoader ✅
-         └── FlatbuffersTestDataProvider ✅
-         │
-         ▼
-Phase 2: test_data_comparison
+Phase 1: test_data_comparison
          │
          │ Depends on:
          ├── EntityMemoryPoolEqualsMatcher ✅
          └── EventBusEqualsMatcher ✅
          │
          ▼
-Phase 3: simulation_runner
+Phase 2: simulation_runner
          │
          │ Depends on:
          ├── SimulationData ✅
          └── Logic system ✅
          │
          ▼
-Phase 4: input_simulation + event_simulation
+Phase 3: input_simulation + event_simulation
          │
          │ Depends on:
          ├── Input/Event schemas ⚠️ (verify)
          └── EventHandler ✅
          │
          ▼
-Phase 5: test_harness
+Phase 4: test_harness
          │
          │ Depends on:
          ├── All above phases
          ├── TestEngine ✅
+         ├── FlatbuffersTestDataProvider ✅
          └── Catch2 generators ✅
          │
          ▼
-Phase 6: Integration & Testing
+Phase 5: Integration & Testing
          │
          │ Verifies:
          └── End-to-end workflow
@@ -219,7 +214,6 @@ Phase 6: Integration & Testing
 │ TestEngine              │   2   │   0    │   2 ✅  │
 │ Data Providers          │   4   │   0    │   4 ✅  │
 │ Test Harness            │   0   │   2    │   2 ❌  │
-│ Data Loader             │   0   │   2    │   2 ❌  │
 │ Comparison              │   0   │   2    │   2 ❌  │
 │ Simulation              │   0   │   2    │   2 ❌  │
 │ Input Simulation        │   0   │   2    │   2 ❌  │
@@ -227,12 +221,14 @@ Phase 6: Integration & Testing
 │ Matchers                │  42   │   0    │  42 ✅  │
 │ Reporter                │   3   │   0    │   3 ✅  │
 ├─────────────────────────┼───────┼────────┼─────────┤
-│ TOTAL (impl files)      │  51   │  12    │  63     │
+│ TOTAL (impl files)      │  51   │  10    │  61     │
 └─────────────────────────┴───────┴────────┴─────────┘
 
-Implementation files: 12 needed
-Test files: 6 needed (for the 12 impl files)
-Total files to create: 18
+Implementation files: 10 needed
+Test files: 5 needed (for the 10 impl files)
+Total files to create: 15
+
+Note: No separate test_data_loader needed - use FlatbuffersTestDataProvider directly
 ```
 
 ## Critical Path
@@ -242,17 +238,15 @@ START
   │
   ├─► Verify schemas exist (input/event) ⚠️
   │
-  ├─► Implement test_data_loader (Phase 1)
-  │   └─► Test with existing providers ✅
-  │
-  ├─► Implement test_data_comparison (Phase 2)
+  ├─► Implement test_data_comparison (Phase 1)
   │   └─► Test with existing matchers ✅
   │
-  ├─► Implement simulation/input/event (Phases 3-4)
+  ├─► Implement simulation/input/event (Phases 2-3)
   │   └─► Test with TestEngine ✅
   │
-  └─► Implement test_harness (Phase 5)
+  └─► Implement test_harness (Phase 4)
       └─► Tie everything together
+          │ Uses FlatbuffersTestDataProvider ✅
           │
           ├─► Create example test data
           ├─► Write integration tests

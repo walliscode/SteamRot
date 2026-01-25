@@ -124,29 +124,19 @@ The README describes a complete harness system, but **12 key files are missing**
 **1. test_harness.h/cpp** - PRIMARY MISSING COMPONENT
 - **Purpose:** Main API for running data-driven tests
 - **Key Functions:**
-  - `load_test_data_configs()`: Find and load test data from adjacent data/ directory
-  - `load_test_data_configs(subdirectory)`: Load from specific subdirectory
-  - `RunTestEngineTest(config)`: Run TestEngine with a configuration and compare results
-  - `run_fixture_test(config)`: Run fixture-based tests with entity pool comparison
+  - `RunTestEngineTest(test_data)`: Run TestEngine with a configuration and compare results
+  - `run_fixture_test(test_data)`: Run fixture-based tests with entity pool comparison
   - `run_entity_memory_pool_comparison_test()`: Direct pool comparison using matchers
   - `run_event_bus_comparison_test()`: Compare EventBus instances
 - **Integration:** 
   - Wraps Catch2 generators
   - Creates TestEngine instances
-  - Uses FlatbuffersTestDataLoader/Provider to load data
+  - Uses `FlatbuffersTestDataProvider` directly to load data
   - Orchestrates test execution workflow
 - **Status:** MISSING - THIS IS THE MAIN ENTRY POINT
+- **Note:** No separate test_data_loader needed - use FlatbuffersTestDataProvider directly
 
-**2. test_data_loader.h/cpp**
-- **Purpose:** Simplified API for loading test data
-- **Key Functions:**
-  - Discovery functions for finding .test_data.bin files
-  - Batch loading functions
-  - Path resolution utilities
-- **Note:** May be redundant with `FlatbuffersTestDataLoader` - needs architecture review
-- **Status:** MISSING
-
-**3. test_data_comparison.h/cpp**
+**2. test_data_comparison.h/cpp**
 - **Purpose:** Entity and event bus comparison functions
 - **Key Functions:**
   - Compare EntityMemoryPool instances
@@ -157,7 +147,7 @@ The README describes a complete harness system, but **12 key files are missing**
 
 #### Simulation System
 
-**4. simulation_runner.h/cpp**
+**3. simulation_runner.h/cpp**
 - **Purpose:** Execute simulation steps from test data
 - **Key Functions:**
   - Execute Logic classes in sequence
@@ -169,7 +159,7 @@ The README describes a complete harness system, but **12 key files are missing**
 
 #### Input/Event Simulation
 
-**5. input_simulation.h/cpp**
+**4. input_simulation.h/cpp**
 - **Purpose:** Simulate user input sequences
 - **Key Functions:**
   - `execute_input_event()`: Single input event
@@ -179,7 +169,7 @@ The README describes a complete harness system, but **12 key files are missing**
 - **Referenced in:** README describes input sequence execution
 - **Status:** MISSING
 
-**6. event_simulation.h/cpp**
+**5. event_simulation.h/cpp**
 - **Purpose:** Inject engine events into event system
 - **Key Functions:**
   - `execute_event_test_data()`: Single event injection
@@ -191,9 +181,8 @@ The README describes a complete harness system, but **12 key files are missing**
 
 #### Test Files
 
-**7-12. Missing Test Files**
+**6-10. Missing Test Files**
 - `test_harness.test.cpp`
-- `test_data_loader.test.cpp`
 - `simulation_runner.test.cpp`
 - `input_simulation.test.cpp`
 - `event_simulation.test.cpp`
@@ -489,52 +478,11 @@ REQUIRE_THAT(actual_pool, EqualsEntityMemoryPool(expected_pool, context));
 
 Implement the missing components in dependency order, ensuring each layer is tested before building the next.
 
-### Phase 1: Foundation Layer (test_data_loader)
-
-**Goal:** Provide simple API for loading test data
-
-**Files to Create:**
-1. `tests/harness/test_data_loader.h`
-2. `tests/harness/test_data_loader.cpp`
-3. `tests/unit/harness/test_data_loader.test.cpp`
-
-**Key Functions:**
-```cpp
-namespace steamrot::tests {
-
-// Primary API - load all configs from adjacent data/ directory
-std::expected<std::vector<const TestDataFbs*>, FailInfo> 
-load_test_data_configs();
-
-// Load from specific subdirectory
-std::expected<std::vector<const TestDataFbs*>, FailInfo> 
-load_test_data_configs(const std::string& subdirectory);
-
-} // namespace steamrot::tests
-```
-
-**Implementation Strategy:**
-- Wraps `FlatbuffersTestDataLoader` and `FlatbuffersTestDataProvider`
-- Uses `__FILE__` macro trick to find adjacent data/ directory
-- Returns vector of `TestDataFbs*` suitable for Catch2 `from_range()`
-- Handle errors gracefully with `std::expected`
-
-**Testing:**
-- Load from tests/unit/harness/data/
-- Verify correct number of configs loaded
-- Verify metadata is accessible
-- Test subdirectory loading
-- Test error cases (missing directory, corrupt files)
-
-**Acceptance Criteria:**
-- [ ] Can call `load_test_data_configs()` from test file
-- [ ] Returns vector of configs from adjacent data/
-- [ ] Works with Catch2 GENERATE macro
-- [ ] All tests pass
-
-### Phase 2: Comparison Layer (test_data_comparison)
+### Phase 1: Comparison Layer (test_data_comparison)
 
 **Goal:** Provide functions for comparing entity pools and event buses
+
+**Note:** No separate test_data_loader needed - `FlatbuffersTestDataProvider` already provides this functionality via `ProviderAllTestData()`.
 
 **Files to Create:**
 1. `tests/harness/test_data_comparison.h`
@@ -600,7 +548,7 @@ void run_event_bus_comparison_test(
 - [ ] Metadata appears in output
 - [ ] All tests pass
 
-### Phase 3: Simulation System
+### Phase 2: Simulation System
 
 **Goal:** Execute simulation steps from test data
 
@@ -650,7 +598,7 @@ execute_simulation(
 - [ ] Tick coordination works correctly
 - [ ] All tests pass
 
-### Phase 4: Input/Event Simulation
+### Phase 3: Input/Event Simulation
 
 **Goal:** Simulate user input and inject events per tick
 
@@ -735,7 +683,7 @@ execute_event_sequence(
 - [ ] Tick coordination works
 - [ ] All tests pass
 
-### Phase 5: Orchestration Layer (test_harness)
+### Phase 4: Orchestration Layer (test_harness)
 
 **Goal:** Tie everything together into simple API
 
@@ -748,37 +696,53 @@ execute_event_sequence(
 ```cpp
 namespace steamrot::tests {
 
-// Main API - Run TestEngine with config and compare tick snapshots
+// Main API - Run TestEngine with TestData and compare tick snapshots
 std::expected<std::monostate, FailInfo>
-RunTestEngineTest(const TestDataFbs* config);
+RunTestEngineTest(const TestData& test_data);
 
 // Fixture-based testing (alternative approach)
 std::expected<std::monostate, FailInfo>
-run_fixture_test(const TestDataFbs* config);
-
-// Re-export from test_data_loader for convenience
-using steamrot::tests::load_test_data_configs;
+run_fixture_test(const TestData& test_data);
 
 } // namespace steamrot::tests
+```
+
+**Usage Pattern:**
+```cpp
+TEST_CASE("Data-driven test", "[unit]") {
+  // Create provider instance using __FILE__ for adjacent data/ directory
+  FlatbuffersTestDataProvider provider(std::filesystem::path(__FILE__).parent_path());
+  
+  // Load all test data
+  auto test_data_vec = provider.ProviderAllTestData();
+  REQUIRE(test_data_vec.has_value());
+  
+  // Use Catch2 generator to test each TestData
+  const auto& test_data = GENERATE_COPY(from_range(test_data_vec.value()));
+  
+  // Run TestEngine test
+  auto result = steamrot::tests::RunTestEngineTest(test_data);
+  REQUIRE(result.has_value());
+}
 ```
 
 **Implementation Strategy:**
 
 **RunTestEngineTest workflow:**
-1. Convert `TestDataFbs` to `TestData` using `FlatbuffersTestDataProvider`
+1. Accept `TestData` directly (already converted from FlatBuffers)
 2. Create `TestEngine` instance with `TestData`
 3. Call `TestEngine::RunGame()`
 4. Retrieve data bank from TestEngine
-5. For each tick snapshot in config:
+5. For each tick in expected_engine_snapshots:
    - Extract EntityMemoryPool from data bank
-   - Extract expected EntityMemoryPool from config tick_snapshot
+   - Extract expected EntityMemoryPool from expected snapshot
    - Call `run_entity_memory_pool_comparison_test()`
-   - If event_bus in tick_snapshot, compare EventBus similarly
+   - If event_bus in expected snapshot, compare EventBus similarly
 6. Return success/failure
 
 **run_fixture_test workflow (alternative):**
 1. Create test fixture with game resources
-2. Configure starting entities
+2. Configure starting entities from TestData
 3. For each tick:
    - Execute input sequence for tick
    - Execute event sequence for tick
@@ -787,28 +751,28 @@ using steamrot::tests::load_test_data_configs;
 4. Compare final state with expected_entity_collection
 
 **Coordination:**
-- Uses `test_data_loader` to load configs
+- Uses `FlatbuffersTestDataProvider` for loading (called by test code)
 - Uses `test_data_comparison` to compare results
 - Uses `simulation_runner`, `input_simulation`, `event_simulation` as needed
 - Integrates with TestEngine's data bank
 - Works with Catch2 generators
 
 **Testing:**
-- Create end-to-end test with complete TestDataFbs config
-- Verify full workflow from config loading to comparison
+- Create end-to-end test with complete TestData
+- Verify full workflow from loading to comparison
 - Test with multiple tick snapshots
 - Test with input/event sequences
 - Test with simulation steps
 
 **Acceptance Criteria:**
-- [ ] Can call `RunTestEngineTest(config)`
+- [ ] Can call `RunTestEngineTest(test_data)`
 - [ ] TestEngine executes specified number of ticks
 - [ ] Data bank is captured correctly
 - [ ] Tick snapshots are compared automatically
-- [ ] Works with Catch2 GENERATE for multiple configs
+- [ ] Works with Catch2 GENERATE for multiple TestData instances
 - [ ] All tests pass
 
-### Phase 6: Integration and Documentation
+### Phase 5: Integration and Documentation
 
 **Goal:** Ensure all pieces work together and document usage
 
@@ -833,9 +797,7 @@ using steamrot::tests::load_test_data_configs;
 
 ```
 test_harness.h/cpp
-├── test_data_loader.h/cpp
-│   ├── FlatbuffersTestDataLoader.h/cpp ✅
-│   └── FlatbuffersTestDataProvider.h/cpp ✅
+├── FlatbuffersTestDataProvider.h/cpp ✅ (used by test code to load)
 ├── test_data_comparison.h/cpp
 │   ├── EntityMemoryPoolEqualsMatcher ✅
 │   └── EventBusEqualsMatcher ✅
@@ -880,7 +842,6 @@ add_library(harness
   TestEngine.cpp
   FlatbuffersTestDataLoader.cpp
   FlatbuffersTestDataProvider.cpp
-  test_data_loader.cpp          # NEW
   test_data_comparison.cpp      # NEW
   simulation_runner.cpp         # NEW
   input_simulation.cpp          # NEW
@@ -900,7 +861,6 @@ add_executable(test_harness
   FlatbuffersTestDataLoader.test.cpp
   FlatbuffersTestDataProvider.test.cpp
   TestEngine.test.cpp
-  test_data_loader.test.cpp           # NEW
   simulation_runner.test.cpp          # NEW
   input_simulation.test.cpp           # NEW
   event_simulation.test.cpp           # NEW
@@ -942,14 +902,7 @@ If schemas don't match expected structure, they need to be updated or the implem
 
 **Each component gets isolated unit tests:**
 
-1. **test_data_loader.test.cpp**
-   - Load from adjacent directory
-   - Load from subdirectory
-   - Handle missing directory
-   - Handle corrupt files
-   - Verify metadata parsing
-
-2. **test_data_comparison.test.cpp**
+1. **test_data_comparison.test.cpp**
    - Compare matching pools
    - Compare mismatched pools
    - Compare matching event buses
@@ -957,25 +910,25 @@ If schemas don't match expected structure, they need to be updated or the implem
    - Verify error messages
    - Test metadata variants
 
-3. **simulation_runner.test.cpp**
+2. **simulation_runner.test.cpp**
    - Execute Logic classes
    - Execute free functions
    - Handle invalid function types
    - Tick coordination
 
-4. **input_simulation.test.cpp**
+3. **input_simulation.test.cpp**
    - Execute single input
    - Execute input sequence
    - Per-tick execution
    - Verify state changes
 
-5. **event_simulation.test.cpp**
+4. **event_simulation.test.cpp**
    - Execute single event
    - Execute event sequence
    - Per-tick execution
    - Waiting room processing
 
-6. **test_harness.test.cpp**
+5. **test_harness.test.cpp**
    - End-to-end with RunTestEngineTest
    - Multiple tick snapshots
    - With input sequences
@@ -1027,13 +980,12 @@ The HarnessReporter needs visual verification since it's output formatting:
 Follow the phased implementation plan. Each phase builds on the previous, and testing each layer before moving on will prevent integration issues.
 
 **Estimated effort:**
-- Phase 1 (test_data_loader): 1-2 days
-- Phase 2 (test_data_comparison): 1 day
-- Phase 3 (simulation_runner): 2-3 days
-- Phase 4 (input/event_simulation): 2-3 days
-- Phase 5 (test_harness): 2-3 days
-- Phase 6 (integration): 1-2 days
-- **Total: 9-16 days** for full implementation
+- Phase 1 (test_data_comparison): 1 day
+- Phase 2 (simulation_runner): 2-3 days
+- Phase 3 (input/event_simulation): 2-3 days
+- Phase 4 (test_harness): 2-3 days
+- Phase 5 (integration): 1-2 days
+- **Total: 8-14 days** for full implementation
 
 ### Priority 2: Validate Schemas First
 
@@ -1043,14 +995,11 @@ Before implementing simulation/input/event layers, **verify the FlatBuffers sche
 
 This will prevent rework.
 
-### Priority 3: Architecture Review for test_data_loader
+### Priority 3: Simplified Architecture - No test_data_loader Needed ✅
 
-The README mentions both `test_data_loader` and the existing `FlatbuffersTestDataLoader`. Clarify:
-- Are they redundant?
-- Is `test_data_loader` a thin wrapper over `FlatbuffersTestDataLoader`?
-- Can we simplify by using `FlatbuffersTestDataProvider::ProviderAllTestData()` directly?
+The existing `FlatbuffersTestDataProvider::ProviderAllTestData()` already provides all the functionality needed for loading test data. Test code can instantiate it directly with `__FILE__` for the adjacent data/ directory pattern.
 
-**Recommendation:** Create `test_data_loader` as a thin wrapper that provides the simple API documented in README, internally using the existing providers. This maintains the clean API while reusing working code.
+**Decision:** No separate `test_data_loader` module needed. This simplifies the architecture and reduces code duplication.
 
 ### Priority 4: Reporter Enhancements Post-Implementation
 
@@ -1069,7 +1018,7 @@ Several simulation/input/event functions take a `TestEngineFixture&`. This may n
 
 If not already defined, create this helper class in Phase 3 or earlier.
 
-### Priority 6: Documentation Updates
+### Priority 5: Documentation Updates
 
 As implementation proceeds, update `tests/harness/README.md` if:
 - Function signatures differ from documented
@@ -1093,7 +1042,7 @@ Keep the README as the single source of truth for API usage.
 - CMeta, test structs
 
 ❌ **Missing:**
-- 12 harness component files (orchestration, simulation, input/event)
+- 10 harness component files (orchestration, simulation, input/event, comparison)
 - Integration layer tying everything together
 - Example test data demonstrating full features
 
@@ -1101,14 +1050,13 @@ Keep the README as the single source of truth for API usage.
 
 The foundation is solid. The missing components are well-documented in the README, and the implementation path is clear:
 
-1. Build foundation (data loading)
-2. Add comparison layer
-3. Implement simulation system
-4. Add input/event simulation
-5. Tie it together with orchestration layer
-6. Test and document
+1. Add comparison layer
+2. Implement simulation system
+3. Add input/event simulation
+4. Tie it together with orchestration layer
+5. Test and document
 
-**The matchers and reporter are ready to use.** Focus implementation effort on the harness components.
+**The matchers and reporter are ready to use.** Focus implementation effort on the harness components. **No need for a separate test_data_loader** - use FlatbuffersTestDataProvider directly.
 
 ### Success Criteria
 
@@ -1118,12 +1066,18 @@ The TestEngine will be "fully operational for data-driven tests" when:
 
 ```cpp
 TEST_CASE("My feature test", "[unit][feature]") {
-  auto configs = steamrot::tests::load_test_data_configs();
-  REQUIRE(configs.has_value());
+  // Instantiate provider with __FILE__ for adjacent data/ directory
+  FlatbuffersTestDataProvider provider(std::filesystem::path(__FILE__).parent_path());
   
-  const auto *config = GENERATE_COPY(from_range(configs.value()));
+  // Load all test data
+  auto test_data_vec = provider.ProviderAllTestData();
+  REQUIRE(test_data_vec.has_value());
   
-  auto result = steamrot::tests::RunTestEngineTest(config);
+  // Use Catch2 generator to test each TestData
+  const auto& test_data = GENERATE_COPY(from_range(test_data_vec.value()));
+  
+  // Run TestEngine test
+  auto result = steamrot::tests::RunTestEngineTest(test_data);
   REQUIRE(result.has_value());
 }
 ```
