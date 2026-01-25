@@ -15,7 +15,6 @@
 #include "EventHandler.h"
 #include "FailInfo.h"
 #include "IEngineDataProvider.h"
-#include "ISceneConfigurator.h"
 #include "ISceneDataProvider.h"
 #include "ISceneManagerDataProvider.h"
 #include <expected>
@@ -49,11 +48,6 @@ private:
   /// @brief Instance of the Scene Data Provider for the factory/game
   /////////////////////////////////////////////////
   std::unique_ptr<ISceneDataProvider> m_scene_data_provider{nullptr};
-
-  /////////////////////////////////////////////////
-  /// @brief Instance of the Scene Configurator for the factory/game
-  /////////////////////////////////////////////////
-  std::unique_ptr<ISceneConfigurator> m_scene_configurator{nullptr};
 
   /////////////////////////////////////////////////
   /// @brief Set all data providers to Flatbuffers implementations
@@ -90,11 +84,6 @@ public:
   /// @brief Returns a raw pointer to the Scene Data Provider
   /////////////////////////////////////////////////
   std::expected<ISceneDataProvider *, FailInfo> GetSceneDataProvider();
-
-  /////////////////////////////////////////////////
-  /// @brief Returns a raw pointer to the Scene Configurator
-  /////////////////////////////////////////////////
-  std::expected<ISceneConfigurator *, FailInfo> GetSceneConfigurator();
 
   /////////////////////////////////////////////////
   /// @brief Sets the data type for the factory
