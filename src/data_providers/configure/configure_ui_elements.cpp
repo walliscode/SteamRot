@@ -1,28 +1,21 @@
 ////////////////////////////////////////////////////////////
 /// @file
-/// @brief Implementation of FlatbuffersUIElementConfigurator class
+/// @brief Implementation of functions to configure UI elements
 ////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////
 /// Headers
 ////////////////////////////////////////////////////////////
-#include "FlatbuffersUIElementConfigurator.h"
-#include "ButtonElement.h"
-#include "DropDownButtonElement.h"
-#include "DropDownContainerElement.h"
-#include "DropDownItemElement.h"
-#include "DropDownListElement.h"
+#include "configure_ui_elements.h"
 #include "EventPacket.h"
-#include "PanelElement.h"
 #include "event_factory.h"
 #include "subscriber_factory.h"
-#include "user_interface_generated.h"
 #include <string>
 
-namespace steamrot {
+namespace steamrot::data::configure {
 
 ////////////////////////////////////////////////////////////
-Layout FlatbuffersUIElementConfigurator::ConvertLayout(int8_t fbs_layout) {
+Layout ConvertLayout(int8_t fbs_layout) {
   switch (fbs_layout) {
   case LayoutFbs_None:
     return Layout::None;
@@ -40,8 +33,7 @@ Layout FlatbuffersUIElementConfigurator::ConvertLayout(int8_t fbs_layout) {
 }
 
 ////////////////////////////////////////////////////////////
-SpacingAndSizing
-FlatbuffersUIElementConfigurator::ConvertSpacingAndSizing(int8_t fbs_spacing) {
+SpacingAndSizing ConvertSpacingAndSizing(int8_t fbs_spacing) {
   switch (fbs_spacing) {
   case SpacingAndSizingFbs_None:
     return SpacingAndSizing::None;
@@ -57,120 +49,11 @@ FlatbuffersUIElementConfigurator::ConvertSpacingAndSizing(int8_t fbs_spacing) {
 }
 
 ////////////////////////////////////////////////////////////
-FlatbuffersUIElementConfigurator::FlatbuffersUIElementConfigurator(
-    EventHandler &event_handler, const UserInterfaceFbs &ui_data)
-    : IUIElementConfigurator(event_handler), m_ui_data(ui_data) {}
-
-////////////////////////////////////////////////////////////
-std::expected<std::unique_ptr<UIElement>, FailInfo>
-FlatbuffersUIElementConfigurator::CreateRootUIElement() {
-  if (!m_ui_data.root_ui_element()) {
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound,
-                 "UserInterfaceData missing root_ui_element"});
-  }
-
-  return CreateUIElement(UIElementDataUnion::UIElementDataUnion_PanelData,
-                         m_ui_data.root_ui_element());
-}
-
-////////////////////////////////////////////////////////////
-std::expected<std::unique_ptr<UIElement>, FailInfo>
-FlatbuffersUIElementConfigurator::CreateUIElement(
-    const UIElementDataUnion &data_type, const void *data) {
-
-  std::unique_ptr<UIElement> element{nullptr};
-  const UIElementData *base_data = nullptr;
-
-  switch (data_type) {
-  case UIElementDataUnion::UIElementDataUnion_PanelData: {
-    auto panel_data = static_cast<const PanelData *>(data);
-    auto panel = std::make_unique<PanelElement>();
-    auto config_result = ConfigurePanelElement(*panel, *panel_data);
-    if (!config_result.has_value())
-      return std::unexpected(config_result.error());
-    element = std::move(panel);
-    base_data = panel_data->base_data();
-    break;
-  }
-  case UIElementDataUnion::UIElementDataUnion_ButtonData: {
-    auto button_data = static_cast<const ButtonData *>(data);
-    auto button = std::make_unique<ButtonElement>();
-    auto config_result = ConfigureButtonElement(*button, *button_data);
-    if (!config_result.has_value())
-      return std::unexpected(config_result.error());
-    element = std::move(button);
-    base_data = button_data->base_data();
-    break;
-  }
-  case UIElementDataUnion::UIElementDataUnion_DropDownListData: {
-    auto ddlist_data = static_cast<const DropDownListData *>(data);
-    auto ddlist = std::make_unique<DropDownListElement>();
-    auto config_result = ConfigureDropDownListElement(*ddlist, *ddlist_data);
-    if (!config_result.has_value())
-      return std::unexpected(config_result.error());
-    element = std::move(ddlist);
-    base_data = ddlist_data->base_data();
-    break;
-  }
-  case UIElementDataUnion::UIElementDataUnion_DropDownContainerData: {
-    auto ddcont_data = static_cast<const DropDownContainerData *>(data);
-    auto ddcont = std::make_unique<DropDownContainerElement>();
-    auto config_result =
-        ConfigureDropDownContainerElement(*ddcont, *ddcont_data);
-    if (!config_result.has_value())
-      return std::unexpected(config_result.error());
-    element = std::move(ddcont);
-    base_data = ddcont_data->base_data();
-    break;
-  }
-  case UIElementDataUnion::UIElementDataUnion_DropDownItemData: {
-    auto dditem_data = static_cast<const DropDownItemData *>(data);
-    auto dditem = std::make_unique<DropDownItemElement>();
-    auto config_result = ConfigureDropDownItemElement(*dditem, *dditem_data);
-    if (!config_result.has_value())
-      return std::unexpected(config_result.error());
-    element = std::move(dditem);
-    base_data = dditem_data->base_data();
-    break;
-  }
-  case UIElementDataUnion::UIElementDataUnion_DropDownButtonData: {
-    auto ddbtn_data = static_cast<const DropDownButtonData *>(data);
-    auto ddbtn = std::make_unique<DropDownButtonElement>();
-    auto config_result = ConfigureDropDownButtonElement(*ddbtn, *ddbtn_data);
-    if (!config_result.has_value())
-      return std::unexpected(config_result.error());
-    element = std::move(ddbtn);
-    base_data = ddbtn_data->base_data();
-    break;
-  }
-  default:
-    return std::unexpected(
-        FailInfo{FailMode::NonExistentEnumValue,
-                 "CreateUIElement: Unsupported UI element type in union."});
-  }
-
-  // Only call this once! for configuring the base data
-  if (base_data) {
-    auto base_config_result = ConfigureBaseUIElement(*element, *base_data);
-    if (!base_config_result.has_value())
-      return std::unexpected(base_config_result.error());
-  }
-
-  // return unexpected if element is still null
-  if (!element) {
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound,
-                 "CreateUIElement: Element creation failed, element is null."});
-  }
-
-  return element;
-}
-
-////////////////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-FlatbuffersUIElementConfigurator::ConfigureBaseUIElement(
-    UIElement &element, const UIElementData &data) {
+std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
+    UIElement &element, const UIElementData &data, EventHandler &event_handler,
+    std::function<std::expected<std::unique_ptr<UIElement>, FailInfo>(
+        const UIElementDataUnion &, const void *)>
+        create_ui_element_callback) {
 
   element.position = sf::Vector2f({data.position()->x(), data.position()->y()});
   element.size = sf::Vector2f({data.size()->x(), data.size()->y()});
@@ -197,7 +80,7 @@ FlatbuffersUIElementConfigurator::ConfigureBaseUIElement(
     std::shared_ptr<Subscriber> subscriber =
         std::make_shared<Subscriber>(result.value());
     element.subscription = subscriber;
-    auto register_result = m_event_handler.RegisterSubscriber(subscriber);
+    auto register_result = event_handler.RegisterSubscriber(subscriber);
     if (!register_result.has_value())
       return std::unexpected(register_result.error());
   }
@@ -242,7 +125,7 @@ FlatbuffersUIElementConfigurator::ConfigureBaseUIElement(
       auto child_table = child_fb->element();
       if (!child_table)
         continue;
-      auto child_element_result = CreateUIElement(type, child_table);
+      auto child_element_result = create_ui_element_callback(type, child_table);
       if (!child_element_result.has_value())
         return std::unexpected(child_element_result.error());
       element.child_elements.push_back(std::move(child_element_result.value()));
@@ -254,16 +137,14 @@ FlatbuffersUIElementConfigurator::ConfigureBaseUIElement(
 
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-FlatbuffersUIElementConfigurator::ConfigurePanelElement(
-    PanelElement &panel_element, const PanelData &data) {
+ConfigurePanelElement(PanelElement &panel_element, const PanelData &data) {
   // No extra fields for panel
   return std::monostate{};
 }
 
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-FlatbuffersUIElementConfigurator::ConfigureButtonElement(
-    ButtonElement &button_element, const ButtonData &data) {
+ConfigureButtonElement(ButtonElement &button_element, const ButtonData &data) {
   if (data.label()) {
     button_element.label = data.label()->str();
   }
@@ -271,8 +152,7 @@ FlatbuffersUIElementConfigurator::ConfigureButtonElement(
 }
 
 ////////////////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-FlatbuffersUIElementConfigurator::ConfigureDropDownListElement(
+std::expected<std::monostate, FailInfo> ConfigureDropDownListElement(
     DropDownListElement &dropdown_list_element, const DropDownListData &data) {
   if (data.label()) {
     dropdown_list_element.unexpanded_label = data.label()->str();
@@ -287,8 +167,7 @@ FlatbuffersUIElementConfigurator::ConfigureDropDownListElement(
 }
 
 ////////////////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-FlatbuffersUIElementConfigurator::ConfigureDropDownContainerElement(
+std::expected<std::monostate, FailInfo> ConfigureDropDownContainerElement(
     DropDownContainerElement &dropdown_container_element,
     const DropDownContainerData &data) {
 
@@ -331,8 +210,7 @@ FlatbuffersUIElementConfigurator::ConfigureDropDownContainerElement(
 }
 
 ////////////////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-FlatbuffersUIElementConfigurator::ConfigureDropDownItemElement(
+std::expected<std::monostate, FailInfo> ConfigureDropDownItemElement(
     DropDownItemElement &dropdown_item_element, const DropDownItemData &data) {
   if (data.label()) {
     dropdown_item_element.label = data.label()->str();
@@ -341,12 +219,11 @@ FlatbuffersUIElementConfigurator::ConfigureDropDownItemElement(
 }
 
 ////////////////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-FlatbuffersUIElementConfigurator::ConfigureDropDownButtonElement(
+std::expected<std::monostate, FailInfo> ConfigureDropDownButtonElement(
     DropDownButtonElement &dropdown_button_element,
     const DropDownButtonData &data) {
   dropdown_button_element.is_expanded = data.is_expanded();
   return std::monostate{};
 }
 
-} // namespace steamrot
+} // namespace steamrot::data::configure

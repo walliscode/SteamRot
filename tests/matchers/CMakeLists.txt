@@ -56,7 +56,6 @@ PRIVATE
   matchers
   components
   entity
-  user_interface
   events
 )
 

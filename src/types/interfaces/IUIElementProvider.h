@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of IUIElementConfigurator interface
+/// @brief Declaration of IUIElementProvider interface
 ////////////////////////////////////////////////////////////
 
 #pragma once
@@ -17,11 +17,11 @@
 namespace steamrot {
 
 ////////////////////////////////////////////////////////////
-/// @class IUIElementConfigurator
-/// @brief Interface for configuring UIElement instances from various data
-/// sources
+/// @class IUIElementProvider
+/// @brief Interface for providing and configuring UIElement instances from
+/// various data sources
 ////////////////////////////////////////////////////////////
-class IUIElementConfigurator {
+class IUIElementProvider {
 protected:
   ////////////////////////////////////////////////////////////
   /// @brief Reference to the EventHandler for creating Subscribers
@@ -34,13 +34,13 @@ public:
   ///
   /// @param event_handler Reference to global EventHandler
   ////////////////////////////////////////////////////////////
-  IUIElementConfigurator(EventHandler &event_handler)
+  IUIElementProvider(EventHandler &event_handler)
       : m_event_handler(event_handler) {}
 
   ////////////////////////////////////////////////////////////
   /// @brief Virtual destructor
   ////////////////////////////////////////////////////////////
-  virtual ~IUIElementConfigurator() = default;
+  virtual ~IUIElementProvider() = default;
 
   ////////////////////////////////////////////////////////////
   /// @brief Create a root UIElement (optionally nested) from data source
@@ -50,6 +50,15 @@ public:
   ////////////////////////////////////////////////////////////
   virtual std::expected<std::unique_ptr<UIElement>, FailInfo>
   CreateRootUIElement() = 0;
+
+  ////////////////////////////////////////////////////////////
+  /// @brief Configure a root UIElement from data source
+  ///
+  /// @param root_element Root UIElement to configure
+  /// @return std::expected with monostate on success, or FailInfo on error
+  ////////////////////////////////////////////////////////////
+  virtual std::expected<std::monostate, FailInfo>
+  ConfigureRootUIElement(UIElement &root_element) = 0;
 };
 
 } // namespace steamrot
