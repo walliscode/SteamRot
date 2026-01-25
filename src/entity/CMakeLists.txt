@@ -2,6 +2,7 @@ add_library(entity
     EntityManager.cpp
     FlatbuffersEntityConfigurator.cpp
     FlatbuffersEntityImporter.cpp
+    FlatbuffersUIElementProvider.cpp
     ArchetypeManager.cpp
     entity_memory.cpp
 )
@@ -17,5 +18,6 @@ target_link_libraries(entity
   SFML::Graphics
   types
   events
+  data_providers
 
 )
