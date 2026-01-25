@@ -150,8 +150,10 @@ TEST_CASE("ConfigureDropDownItemElement configures label",
   auto children = ui_element_data->root_ui_element()->base_data()->children();
   auto dditem_fb = children->Get(2);
   REQUIRE(dditem_fb != nullptr);
-  REQUIRE(dditem_fb->element_type() ==
-          steamrot::UIElementDataUnion::UIElementDataUnion_DropDownItemData);
+  REQUIRE(
+      steamrot::EnumNameUIElementDataUnion(dditem_fb->element_type()) ==
+      steamrot::EnumNameUIElementDataUnion(
+          steamrot::UIElementDataUnion::UIElementDataUnion_DropDownItemData));
 
   auto dditem_data =
       static_cast<const steamrot::DropDownItemData *>(dditem_fb->element());
@@ -194,8 +196,9 @@ TEST_CASE("ConfigureDropDownContainerElement validates children",
   auto children = ui_element_data->root_ui_element()->base_data()->children();
   auto ddcont_fb = children->Get(4);
   REQUIRE(ddcont_fb != nullptr);
-  REQUIRE(ddcont_fb->element_type() ==
-          steamrot::UIElementDataUnion::UIElementDataUnion_DropDownContainerData);
+  REQUIRE(
+      ddcont_fb->element_type() ==
+      steamrot::UIElementDataUnion::UIElementDataUnion_DropDownContainerData);
 
   auto ddcont_data = static_cast<const steamrot::DropDownContainerData *>(
       ddcont_fb->element());
