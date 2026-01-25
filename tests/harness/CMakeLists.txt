@@ -1,15 +1,8 @@
 add_library(harness
-  # test_harness.cpp
-  # test_data_loader.cpp
-  # test_data_comparison.cpp
   TestEngine.cpp
   FlatbuffersTestDataLoader.cpp
   FlatbuffersTestDataProvider.cpp
-  # test_simulation_runner.cpp
-  # simulation_runner.cpp
-  # input_simulation.cpp
-  # event_simulation.cpp
-
+  harness_runner.cpp
 )
 
 target_include_directories(harness

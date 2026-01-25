@@ -3,16 +3,25 @@
 ## Overview
 
 The test harness provides a unified, simplified interface for:
-1. Loading test data configurations for data-driven testing with Catch2 generators
-2. Creating and running TestEngine instances from test data configurations
-3. **Tick-based test execution** - coordinated execution of inputs, events, and simulation per tick
-4. **Executing input sequences** - simulating user input (mouse/keyboard) on a tick-by-tick basis
-5. **Executing event sequences** - injecting engine events on a tick-by-tick basis
-6. **Executing simulations** - running sequences of Logic classes or free functions
-7. **Data bank capture** - collecting scene state snapshots at each tick
-8. **Tick snapshot comparison** - comparing data bank entries with expected tick snapshots
 
-This consolidates functionality for resource-based testing and data-driven test execution with support for complex simulation scenarios and tick-by-tick state validation.
+1. Loading test data configurations for data-driven testing with Catch2
+   generators
+2. Creating and running TestEngine instances from test data configurations
+3. **Tick-based test execution** - coordinated execution of inputs, events, and
+   simulation per tick
+4. **Executing input sequences** - simulating user input (mouse/keyboard) on a
+   tick-by-tick basis
+5. **Executing event sequences** - injecting engine events on a tick-by-tick
+   basis
+6. **Executing simulations** - running sequences of Logic classes or free
+   functions
+7. **Data bank capture** - collecting scene state snapshots at each tick
+8. **Tick snapshot comparison** - comparing data bank entries with expected tick
+   snapshots
+
+This consolidates functionality for resource-based testing and data-driven test
+execution with support for complex simulation scenarios and tick-by-tick state
+validation.
 
 ## Primary Workflow
 
@@ -26,10 +35,10 @@ TEST_CASE("Data-driven test with TestEngine", "[unit]") {
   // 1. Load test data from adjacent data/ directory
   auto configs = steamrot::tests::load_test_data_configs();
   REQUIRE(configs.has_value());
-  
+
   // 2. Use Catch2 GENERATE to iterate through configs
   const auto *config = GENERATE_COPY(from_range(configs.value()));
-  
+
   // 3. Run test - creates TestEngine, runs it, compares with tick_snapshots
   auto result = steamrot::tests::RunTestEngineTest(config);
   REQUIRE(result.has_value());
@@ -37,6 +46,7 @@ TEST_CASE("Data-driven test with TestEngine", "[unit]") {
 ```
 
 This workflow:
+
 1. Finds the adjacent `data/` directory
 2. Loads all `TestDataConfig` objects from `.test_data.bin` files
 3. Uses Catch2's GENERATE to run the test for each config
@@ -49,7 +59,8 @@ This workflow:
 ## Purpose
 
 - Provide a single, simple API for loading test data
-- Use TestEngine for unified resource management (shares Engine base with GameEngine)
+- Use TestEngine for unified resource management (shares Engine base with
+  GameEngine)
 - **Tick-based execution** - coordinate inputs, events, and simulation per tick
 - **Data bank** - capture scene state at each tick for comparison
 - **Tick snapshot validation** - compare captured state with expected snapshots
@@ -93,27 +104,34 @@ harness/
 The test harness is organized into three main modules:
 
 ### test_harness (Orchestration)
+
 - Provides wrapper for Catch2 generators
 - Calls data loading functions
 - Calls TestEngine
 - Runs tests and orchestrates the test workflow
 
 ### test_data_loader (Data Loading)
+
 - Discovers `.test_data.bin` files in directories
 - Loads binary data from files
 - Parses FlatBuffers data
 - Provides `load_test_data_configs()` macro and related functions
 
 ### test_data_comparison (Data Comparison)
-- Compares actual data (from TestEngine data bank) with expected data (from tick snapshots)
+
+- Compares actual data (from TestEngine data bank) with expected data (from tick
+  snapshots)
 - `CompareTickSnapshotEntityPool` - compares entity pools
 - `CompareDataBankWithTickSnapshot` - compares data bank entries
 
-The test harness uses **Catch2 matchers** with formatted output for test comparisons. This approach allows Catch2 to control when output is displayed (only on failures) while providing rich, formatted error messages.
+The test harness uses **Catch2 matchers** with formatted output for test
+comparisons. This approach allows Catch2 to control when output is displayed
+(only on failures) while providing rich, formatted error messages.
 
 ### Formatted Matcher Output
 
 When tests fail, matchers display:
+
 - **✗ Error indicator** - Clear failure marker
 - **Context information** - Test name, description, tick number
 - **Detailed mismatch** - Specific differences between actual and expected
@@ -121,12 +139,14 @@ When tests fail, matchers display:
 ### Test Context
 
 The `TestContext` struct enriches matcher output with:
+
 - `test_name` - Name of the test being run
 - `description` - Human-readable test description
 - `current_tick` - Current tick number (for tick-based tests)
 - `total_ticks` - Total number of ticks (for progress context)
 
 Example matcher usage:
+
 ```cpp
 TestContext context;
 context.test_name = "my_test";
@@ -140,11 +160,13 @@ REQUIRE_THAT(actual_pool, EqualsEntityMemoryPool(expected_pool, context));
 ### Output Verbosity Control
 
 **Catch2 controls verbosity**, not the test harness:
+
 - Use `--success` or `-s` flag to see all test output
 - Use `--reporter` to change output format
 - By default, only failures are shown
 
 Example:
+
 ```bash
 # Show only failures (default)
 ctest --preset Debug
@@ -158,13 +180,16 @@ ctest --preset Debug --output-on-failure --verbose
 
 ### Color Control
 
-Colors are enabled by default and can be disabled by setting the `NO_COLOR` or `STEAMROT_NO_COLOR` environment variable. This follows the [NO_COLOR standard](https://no-color.org/).
+Colors are enabled by default and can be disabled by setting the `NO_COLOR` or
+`STEAMROT_NO_COLOR` environment variable. This follows the
+[NO_COLOR standard](https://no-color.org/).
 
 See `CONSOLE_OUTPUT_EXAMPLES.md` for detailed examples of the formatted output.
 
 ### Console Output Functions
 
-Error logging functions available in `console_output.h` (used for debugging, not test output):
+Error logging functions available in `console_output.h` (used for debugging, not
+test output):
 
 ```cpp
 #include "console_output.h"
@@ -198,14 +223,15 @@ REQUIRE_THAT(actual_pool, EqualsEntityMemoryPool(expected_pool, context));
 // Event bus comparison with context
 REQUIRE_THAT(actual_bus, EqualsEventBus(expected_bus, context));
 ```
-steamrot::tests::console::PrintTestStart("my_test_name");
-// Output: Box-drawn banner with test name
 
-// Tick progress indicator (magenta arrow, blue numbers)
-// Only shown if STEAMROT_VERBOSE_TESTS=1
-steamrot::tests::console::PrintTickProgress(3, 10);
-// Output: ➤ Executing Tick 3 of 10
-```
+steamrot::tests::console::PrintTestStart("my_test_name"); // Output: Box-drawn
+banner with test name
+
+// Tick progress indicator (magenta arrow, blue numbers) // Only shown if
+STEAMROT_VERBOSE_TESTS=1 steamrot::tests::console::PrintTickProgress(3, 10); //
+Output: ➤ Executing Tick 3 of 10
+
+````
 
 All console output functions automatically include newlines for proper spacing, support optional tick numbers for context, and use colors by default (unless disabled via environment variable).
 
@@ -223,21 +249,22 @@ TEST_CASE("Data-driven test with TestEngine", "[unit][my_component]") {
   // Load test configurations from adjacent data/ directory
   auto configs = steamrot::tests::load_test_data_configs();
   REQUIRE(configs.has_value());
-  
+
   // Use Catch2 generator to iterate through configs
   const auto *config = GENERATE_COPY(from_range(configs.value()));
-  
+
   // Run TestEngine and compare with tick_snapshots
   auto result = steamrot::tests::RunTestEngineTest(config);
   REQUIRE(result.has_value());
 }
-```
+````
 
 This pattern:
+
 - Loads test data from adjacent `data/` directory
 - Creates a TestEngine for each configuration
 - Runs the engine simulation via `Engine::RunGame()`
-- Pulls out the data bank containing scene state at each tick  
+- Pulls out the data bank containing scene state at each tick
 - Compares data bank entries with `tick_snapshots` from config
 - Uses purely tick-based comparison (not `expected_entity_collection`)
 
@@ -252,18 +279,18 @@ For more control, use TestEngine directly:
 TEST_CASE("Manual TestEngine usage", "[unit]") {
   auto configs = steamrot::tests::load_test_data_configs();
   REQUIRE(configs.has_value());
-  
+
   const auto *config = configs.value()[0];
-  
+
   // Create TestEngine with config - it will simulate based on the config
   steamrot::tests::TestEngine engine(config);
-  
+
   // Run the engine simulation via base class Engine::RunGame()
   engine.RunGame();
-  
+
   // Access the data bank (scene state at each tick)
   const auto &data_bank = engine.GetDataBank();
-  
+
   // The data bank contains snapshots at each tick for comparison
   // Use namespace functions to run comparison tests on this data
 }
@@ -281,10 +308,10 @@ TEST_CASE("Parameterized test with test data", "[unit][my_component]") {
   // One simple call to load all test data
   auto configs = steamrot::tests::load_test_data_configs();
   REQUIRE(configs.has_value());
-  
+
   // Use with Catch2 generator
   const auto *config = GENERATE_COPY(from_range(configs.value()));
-  
+
   // Process the test data
   REQUIRE(config->metadata() != nullptr);
   // ... test logic ...
@@ -302,7 +329,7 @@ TEST_CASE("Load from subdirectory", "[unit]") {
   // Load from tests/entity/data/
   auto configs = steamrot::tests::load_test_data_configs("entity");
   REQUIRE(configs.has_value());
-  
+
   for (const auto *config : configs.value()) {
     // Process each config
   }
@@ -311,7 +338,8 @@ TEST_CASE("Load from subdirectory", "[unit]") {
 
 ### Using the Top-Level Wrapper
 
-The `run_test_data_config()` wrapper validates that test data is properly structured:
+The `run_test_data_config()` wrapper validates that test data is properly
+structured:
 
 ```cpp
 #include "test_harness.h"
@@ -319,20 +347,21 @@ The `run_test_data_config()` wrapper validates that test data is properly struct
 TEST_CASE("Validate test data configuration", "[unit]") {
   auto configs = steamrot::tests::load_test_data_configs();
   REQUIRE(configs.has_value());
-  
+
   const auto *config = GENERATE_COPY(from_range(configs.value()));
-  
+
   // Validate the configuration is well-formed
   auto result = steamrot::tests::run_test_data_config(config);
   REQUIRE(result.has_value());
-  
+
   INFO("Test name: " << config->metadata()->test_name()->str());
 }
 ```
 
 ### Running Entity Memory Pool Comparison Tests
 
-The `run_entity_memory_pool_comparison_test()` function compares two EntityMemoryPool instances directly:
+The `run_entity_memory_pool_comparison_test()` function compares two
+EntityMemoryPool instances directly:
 
 ```cpp
 #include "test_harness.h"
@@ -341,9 +370,9 @@ TEST_CASE("Entity memory pool comparison test", "[unit]") {
   // Create and configure pools
   EntityMemoryPool actual_pool;
   EntityMemoryPool expected_pool;
-  
+
   // ... configure pools, simulate logic, etc ...
-  
+
   // Compare pools using matcher
   steamrot::tests::run_entity_memory_pool_comparison_test(actual_pool, expected_pool);
 }
@@ -353,13 +382,15 @@ TEST_CASE("Entity memory pool comparison test", "[unit]") {
 
 ### `load_test_data_configs()`
 
-Loads all test data from the adjacent `data/` directory (determined via `__FILE__` macro).
+Loads all test data from the adjacent `data/` directory (determined via
+`__FILE__` macro).
 
 **Parameters:** None
 
 **Returns:** `std::expected<std::vector<const TestDataConfig *>, FailInfo>`
 
 **Example:**
+
 ```cpp
 auto configs = steamrot::tests::load_test_data_configs();
 ```
@@ -369,25 +400,31 @@ auto configs = steamrot::tests::load_test_data_configs();
 Loads all test data from `tests/<subdirectory>/data/` directory.
 
 **Parameters:**
+
 - `subdirectory`: Test subdirectory name (e.g., "entity", "components")
 
 **Returns:** `std::expected<std::vector<const TestDataConfig *>, FailInfo>`
 
 **Example:**
+
 ```cpp
 auto configs = steamrot::tests::load_test_data_configs("entity");
 ```
 
 ### `run_test_data_config(config)`
 
-Top-level wrapper that runs tests based on TestDataConfig contents. This examines the configuration and validates that the appropriate data is present for testing.
+Top-level wrapper that runs tests based on TestDataConfig contents. This
+examines the configuration and validates that the appropriate data is present
+for testing.
 
 **Parameters:**
+
 - `config`: Pointer to TestDataConfig object
 
 **Returns:** `std::expected<std::monostate, FailInfo>`
 
 **Example:**
+
 ```cpp
 auto configs = steamrot::tests::load_test_data_configs();
 REQUIRE(configs.has_value());
@@ -398,22 +435,28 @@ REQUIRE(result.has_value());
 ```
 
 **Supported Data Types:**
-- Entity Memory Pool comparisons (`start_entity_collection` + `expected_entity_collection`)
+
+- Entity Memory Pool comparisons (`start_entity_collection` +
+  `expected_entity_collection`)
 - Future: Event sequences, UI configurations, Logic tests, etc.
 
-**Note:** This wrapper performs validation only. For actual test execution, use specialized test functions like `run_entity_memory_pool_comparison_test()`.
+**Note:** This wrapper performs validation only. For actual test execution, use
+specialized test functions like `run_entity_memory_pool_comparison_test()`.
 
 ### `run_entity_memory_pool_comparison_test(actual, expected)`
 
-Compares two EntityMemoryPool instances using the EqualsEntityMemoryPool matcher.
+Compares two EntityMemoryPool instances using the EqualsEntityMemoryPool
+matcher.
 
 **Parameters:**
+
 - `actual`: The actual EntityMemoryPool to test
 - `expected`: The expected EntityMemoryPool to compare against
 
 **Returns:** None (uses Catch2 assertions internally)
 
 **Example:**
+
 ```cpp
 EntityMemoryPool actual_pool;
 EntityMemoryPool expected_pool;
@@ -425,21 +468,25 @@ steamrot::tests::run_entity_memory_pool_comparison_test(actual_pool, expected_po
 ```
 
 **Behavior:**
+
 - Compares pools using `EqualsEntityMemoryPool` matcher
 - Provides detailed error messages on mismatch
-- Allows pools to be instantiated and manipulated before comparison (e.g., simulating logic)
+- Allows pools to be instantiated and manipulated before comparison (e.g.,
+  simulating logic)
 
 ### `create_fixture_from_test_data(config, scene_type)`
 
 Creates and configures a TestFixture from test data configuration.
 
 **Parameters:**
+
 - `config`: Pointer to TestDataConfig containing entity setup
 - `scene_type`: Scene type for the fixture (default: SceneType_TEST)
 
 **Returns:** `std::expected<TestFixture, FailInfo>`
 
 **Example:**
+
 ```cpp
 auto configs = steamrot::tests::load_test_data_configs();
 const auto *config = configs.value()[0];
@@ -452,6 +499,7 @@ auto &fixture = fixture_result.value();
 ```
 
 **Behavior:**
+
 - Creates TestFixture with specified scene type
 - Initializes game and scene resources
 - Configures entities from `start_entity_collection` if present
@@ -459,57 +507,66 @@ auto &fixture = fixture_result.value();
 
 ### `run_fixture_test(config)` (DEPRECATED)
 
-**DEPRECATED**: Use `RunTestEngineTest(config)` instead for purely tick-based testing.
+**DEPRECATED**: Use `RunTestEngineTest(config)` instead for purely tick-based
+testing.
 
 Wrapper function for data-driven testing with TestFixture and Catch2 generators.
 
 **Parameters:**
+
 - `config`: Test data configuration
 
 **Returns:** `std::expected<std::monostate, FailInfo>`
 
 **Example:**
+
 ```cpp
 TEST_CASE("Data-driven test with fixture", "[unit]") {
   auto configs = steamrot::tests::load_test_data_configs();
   REQUIRE(configs.has_value());
-  
+
   const auto *config = GENERATE_COPY(from_range(configs.value()));
-  
+
   auto result = steamrot::tests::run_fixture_test(config);
   REQUIRE(result.has_value());
 }
 ```
 
 **Behavior:**
+
 1. Creates TestFixture from test data configuration
 2. Configures entities from `start_entity_collection`
 3. **Executes simulation if `simulation_data` is present**
-4. If `expected_entity_collection` is present, compares entity states automatically
+4. If `expected_entity_collection` is present, compares entity states
+   automatically
 
 ### `RunTestEngineTest(config)` (Recommended)
 
-Primary wrapper function for data-driven testing with TestEngine. Uses purely tick-based comparison with tick_snapshots.
+Primary wrapper function for data-driven testing with TestEngine. Uses purely
+tick-based comparison with tick_snapshots.
 
 **Parameters:**
+
 - `config`: Pointer to TestDataConfig containing all test parameters
 
 **Returns:** `std::expected<std::monostate, FailInfo>`
 
 **Example:**
+
 ```cpp
 TEST_CASE("Data-driven test with TestEngine", "[unit]") {
   auto configs = steamrot::tests::load_test_data_configs();
   REQUIRE(configs.has_value());
-  
+
   const auto *config = GENERATE_COPY(from_range(configs.value()));
-  
+
   auto result = steamrot::tests::RunTestEngineTest(config);
   REQUIRE(result.has_value());
 }
 ```
 
 **Behavior:**
+
 1. Creates TestEngine from test data configuration
 2. Runs the engine simulation via `Engine::RunGame()`
 3. Pulls out the data bank containing scene state at each tick
@@ -522,21 +579,28 @@ TEST_CASE("Data-driven test with TestEngine", "[unit]") {
 
 ### Overview
 
-The test harness now supports **data-driven simulations** that allow test data to specify which Logic classes or free functions to execute and in which order. This mimics the Scene systems organization (Action, Movement, Render, Collision) and enables complex, multi-step test scenarios.
+The test harness now supports **data-driven simulations** that allow test data
+to specify which Logic classes or free functions to execute and in which order.
+This mimics the Scene systems organization (Action, Movement, Render, Collision)
+and enables complex, multi-step test scenarios.
 
 ### Simulation Concepts
 
-**SimulationType**: Groups logic into categories matching Scene logic organization
+**SimulationType**: Groups logic into categories matching Scene logic
+organization
+
 - `Action` - UI actions, input processing
 - `Movement` - Entity movement, physics
 - `Render` - Drawing and rendering
 - `Collision` - Collision detection
 
 **ExecutionMode**: Determines what to execute
+
 - `Function` - Execute individual free function
 - `LogicClass` - Execute entire Logic class
 
 **Simulation Step**: A single execution step with:
+
 - `simulation_type` - Which system category
 - `execution_mode` - Function or LogicClass
 - `function_type` - Which specific function (if mode is Function)
@@ -598,9 +662,9 @@ Simulations are automatically executed by `run_fixture_test()`:
 TEST_CASE("Run simulation from test data", "[unit][simulation]") {
   auto configs = steamrot::tests::load_test_data_configs();
   REQUIRE(configs.has_value());
-  
+
   const auto *config = GENERATE_COPY(from_range(configs.value()));
-  
+
   // If config has simulation_data, it will be executed automatically
   auto result = steamrot::tests::run_fixture_test(config);
   REQUIRE(result.has_value());
@@ -617,14 +681,14 @@ For more control, use the simulation runner directly:
 TEST_CASE("Manual simulation execution", "[unit]") {
   auto configs = steamrot::tests::load_test_data_configs();
   REQUIRE(configs.has_value());
-  
+
   const auto *config = configs.value()[0];
-  
+
   // Create fixture
   auto fixture_result = steamrot::tests::create_fixture_from_test_data(config);
   REQUIRE(fixture_result.has_value());
   auto &fixture = fixture_result.value();
-  
+
   // Execute simulation manually
   if (config->simulation_data()) {
     auto sim_result = steamrot::tests::execute_simulation_with_fixture(
@@ -637,6 +701,7 @@ TEST_CASE("Manual simulation execution", "[unit]") {
 ### Available Logic Classes
 
 Current LogicClassType values:
+
 - `UIActionLogic` - Process UI actions and events
 - `UICollisionLogic` - Check UI collision with mouse
 - `UIRenderLogic` - Render UI elements
@@ -646,6 +711,7 @@ Current LogicClassType values:
 ### Available Free Functions
 
 Current FunctionType values:
+
 - `ProcessUIActionsAndEvents` - Process UI actions for elements
 - `ProcessNestedUIActionsAndEvents` - Process UI actions recursively
 - `ProcessButtonElementActions` - Process button actions
@@ -658,6 +724,7 @@ Current FunctionType values:
 Execute a single simulation step.
 
 **Parameters:**
+
 - `step`: SimulationStep to execute
 - `scene_context`: SceneContext with resources and entities
 
@@ -668,6 +735,7 @@ Execute a single simulation step.
 Execute a complete simulation sequence.
 
 **Parameters:**
+
 - `simulation_data`: SimulationData with steps
 - `scene_context`: SceneContext with resources and entities
 
@@ -678,6 +746,7 @@ Execute a complete simulation sequence.
 Execute simulation using a TestFixture (convenience wrapper).
 
 **Parameters:**
+
 - `simulation_data`: SimulationData with steps
 - `fixture`: TestFixture containing the test environment
 
@@ -688,6 +757,7 @@ Execute simulation using a TestFixture (convenience wrapper).
 To add new functions or Logic classes to simulations:
 
 1. **Add to FlatBuffers enum** in `src/flatbuffers_headers/simulation.fbs`:
+
    ```fbs
    enum FunctionType : byte {
      // ... existing values ...
@@ -696,6 +766,7 @@ To add new functions or Logic classes to simulations:
    ```
 
 2. **Add case to dispatcher** in `tests/harness/simulation_runner.cpp`:
+
    ```cpp
    case FunctionType::MyNewFunction: {
      MyNewFunction(scene_context);
@@ -718,25 +789,35 @@ To add new functions or Logic classes to simulations:
 
 ### Overview
 
-The test harness now supports **tick-based test execution**, where inputs, events, and simulation steps are coordinated and executed on a per-tick basis. This allows precise control over the timing and sequencing of test actions, mimicking how the game engine processes updates in discrete ticks.
+The test harness now supports **tick-based test execution**, where inputs,
+events, and simulation steps are coordinated and executed on a per-tick basis.
+This allows precise control over the timing and sequencing of test actions,
+mimicking how the game engine processes updates in discrete ticks.
 
 ### How It Works
 
-When `run_fixture_test()` is called, the test executes in ticks. For each tick (0, 1, 2, ...):
+When `run_fixture_test()` is called, the test executes in ticks. For each tick
+(0, 1, 2, ...):
 
-1. **Execute inputs** scheduled for this tick (e.g., mouse movement, key presses)
+1. **Execute inputs** scheduled for this tick (e.g., mouse movement, key
+   presses)
 2. **Execute events** scheduled for this tick (added to event handler)
 3. **Process event waiting room** (move events to global event bus)
-4. **Execute ALL simulation steps** (Logic classes or functions run on every tick)
-5. **Tick the global event bus** (decrement event lifetimes, remove expired events)
+4. **Execute ALL simulation steps** (Logic classes or functions run on every
+   tick)
+5. **Tick the global event bus** (decrement event lifetimes, remove expired
+   events)
 
-**Note:** Simulation steps are configured once and execute on every tick. You cannot schedule simulation steps for specific ticks - the simulation configuration defines what runs throughout the entire test.
+**Note:** Simulation steps are configured once and execute on every tick. You
+cannot schedule simulation steps for specific ticks - the simulation
+configuration defines what runs throughout the entire test.
 
 ### Specifying Number of Ticks
 
 You can control how many ticks the test runs for:
 
 **Option 1: Explicit `num_ticks`** (recommended for clarity):
+
 ```json
 {
   "metadata": {...},
@@ -747,10 +828,13 @@ You can control how many ticks the test runs for:
 }
 ```
 
-**Option 2: Auto-detection** (omit `num_ticks`):
-The harness automatically determines the number of ticks by finding the maximum tick value across all inputs and events, then adds 1.
+**Option 2: Auto-detection** (omit `num_ticks`): The harness automatically
+determines the number of ticks by finding the maximum tick value across all
+inputs and events, then adds 1.
 
-**Note:** The `num_ticks` field in `simulation_data` is NOT used to determine the number of ticks to execute. Only the top-level `num_ticks` field in `TestDataConfig` determines the explicit tick count.
+**Note:** The `num_ticks` field in `simulation_data` is NOT used to determine
+the number of ticks to execute. Only the top-level `num_ticks` field in
+`TestDataConfig` determines the explicit tick count.
 
 ### Example: Tick-Based Test Data
 
@@ -768,13 +852,13 @@ The harness automatically determines the number of ticks by finding the maximum 
     "inputs": [
       {
         "input_type": "MouseMove",
-        "input_data": {"position": {"x": 150.0, "y": 125.0}},
+        "input_data": { "position": { "x": 150.0, "y": 125.0 } },
         "tick": 0,
         "description": "Move mouse to button"
       },
       {
         "input_type": "MouseClick",
-        "input_data": {"position": {"x": 150.0, "y": 125.0}, "button": 0},
+        "input_data": { "position": { "x": 150.0, "y": 125.0 }, "button": 0 },
         "tick": 1,
         "description": "Click button"
       }
@@ -784,7 +868,7 @@ The harness automatically determines the number of ticks by finding the maximum 
     "events": [
       {
         "tick": 0,
-        "event_packet": {"event_type": "EVENT_TEST", "event_lifetime": 3}
+        "event_packet": { "event_type": "EVENT_TEST", "event_lifetime": 3 }
       }
     ]
   },
@@ -812,22 +896,30 @@ The harness automatically determines the number of ticks by finding the maximum 
 For the example above, the execution timeline is:
 
 **Tick 0:**
+
 - Input: MouseMove to (150, 125)
 - Event: Add EVENT_TEST with lifetime 3
 - Process waiting room → EVENT_TEST moves to global bus
-- Simulation: UICollisionLogic executes, then ProcessButtonElementActions executes
+- Simulation: UICollisionLogic executes, then ProcessButtonElementActions
+  executes
 - Tick event bus → EVENT_TEST lifetime = 2
 
 **Tick 1:**
+
 - Input: MouseClick at (150, 125)
-- Simulation: UICollisionLogic executes, then ProcessButtonElementActions executes
+- Simulation: UICollisionLogic executes, then ProcessButtonElementActions
+  executes
 - Tick event bus → EVENT_TEST lifetime = 1
 
 **Tick 2:**
-- Simulation: UICollisionLogic executes, then ProcessButtonElementActions executes
+
+- Simulation: UICollisionLogic executes, then ProcessButtonElementActions
+  executes
 - Tick event bus → EVENT_TEST lifetime = 0, removed
 
-**Note:** The simulation steps (UICollisionLogic and ProcessButtonElementActions) run on every tick. The simulation configuration is set once and does not change during the test.
+**Note:** The simulation steps (UICollisionLogic and
+ProcessButtonElementActions) run on every tick. The simulation configuration is
+set once and does not change during the test.
 
 ### Benefits
 
@@ -850,6 +942,7 @@ Determines how many ticks to execute for a test.
 Executes all actions for a single tick.
 
 **Parameters:**
+
 - `tick`: Tick number to execute
 - `config`: Test data configuration
 - `fixture`: TestFixture containing test environment
@@ -859,6 +952,7 @@ Executes all actions for a single tick.
 Executes the complete tick-based test.
 
 **Parameters:**
+
 - `config`: Test data configuration
 - `fixture`: TestFixture containing test environment
 
@@ -868,7 +962,9 @@ Executes the complete tick-based test.
 
 ### Overview
 
-The test harness supports tick-by-tick input and event injection. Test data specifies sequences of user inputs (mouse/keyboard) and engine events that should be injected at specific ticks during testing.
+The test harness supports tick-by-tick input and event injection. Test data
+specifies sequences of user inputs (mouse/keyboard) and engine events that
+should be injected at specific ticks during testing.
 
 ### Input Sequences
 
@@ -878,7 +974,7 @@ Input sequences allow simulation of user input events on a tick-by-tick basis.
 
 - `MouseMove` - Update mouse position
 - `MouseClick` - Mouse button press
-- `MouseRelease` - Mouse button release  
+- `MouseRelease` - Mouse button release
 - `KeyPress` - Keyboard key press
 - `KeyRelease` - Keyboard key release
 
@@ -923,15 +1019,16 @@ Input sequences allow simulation of user input events on a tick-by-tick basis.
 
 #### Execution
 
-Input sequences are automatically executed by `run_fixture_test()` before simulations:
+Input sequences are automatically executed by `run_fixture_test()` before
+simulations:
 
 ```cpp
 TEST_CASE("Test with input sequence", "[unit][input]") {
   auto configs = steamrot::tests::load_test_data_configs();
   REQUIRE(configs.has_value());
-  
+
   const auto *config = GENERATE_COPY(from_range(configs.value()));
-  
+
   // Input sequence (if present) is executed automatically before simulation
   auto result = steamrot::tests::run_fixture_test(config);
   REQUIRE(result.has_value());
@@ -957,7 +1054,8 @@ auto result = steamrot::tests::execute_input_sequence(input_sequence, fixture);
 
 ### Event Sequences
 
-Event sequences allow injection of engine events into the event system on a tick-by-tick basis.
+Event sequences allow injection of engine events into the event system on a
+tick-by-tick basis.
 
 #### Test Data Format
 
@@ -1002,15 +1100,16 @@ Event sequences allow injection of engine events into the event system on a tick
 
 #### Execution
 
-Event sequences are automatically executed by `run_fixture_test()` before simulations, with automatic processing of the waiting room event bus:
+Event sequences are automatically executed by `run_fixture_test()` before
+simulations, with automatic processing of the waiting room event bus:
 
 ```cpp
 TEST_CASE("Test with event sequence", "[unit][event]") {
   auto configs = steamrot::tests::load_test_data_configs();
   REQUIRE(configs.has_value());
-  
+
   const auto *config = GENERATE_COPY(from_range(configs.value()));
-  
+
   // Event sequence (if present) is executed automatically before simulation
   // Events are added to waiting room and processed into global event bus
   auto result = steamrot::tests::run_fixture_test(config);
@@ -1028,7 +1127,7 @@ For fine-grained control:
 // Execute single event
 auto result = steamrot::tests::execute_event_test_data(event_data, fixture);
 
-// Execute all events for a specific tick  
+// Execute all events for a specific tick
 auto result = steamrot::tests::execute_events_for_tick(event_sequence, tick, fixture);
 
 // Execute entire event sequence
@@ -1040,7 +1139,8 @@ fixture.GetGameResources().event_handler.ProcessWaitingRoomEventBus();
 
 ### Combined Usage
 
-Input sequences, event sequences, and simulations can be combined in a single test:
+Input sequences, event sequences, and simulations can be combined in a single
+test:
 
 ```json
 {
@@ -1069,6 +1169,7 @@ Input sequences, event sequences, and simulations can be combined in a single te
 ```
 
 **Execution order** in `run_fixture_test()`:
+
 1. Create fixture and configure entities from `start_entity_collection`
 2. Execute tick-based test (for each tick 0 to num_ticks-1):
    - Execute inputs for this tick
@@ -1077,38 +1178,47 @@ Input sequences, event sequences, and simulations can be combined in a single te
    - Tick the global event bus
 3. Compare with `expected_entity_collection` (if present)
 
-**Note:** All inputs, events, and simulation steps are now coordinated per-tick automatically. See the "Tick-Based Test Execution" section for details.
+**Note:** All inputs, events, and simulation steps are now coordinated per-tick
+automatically. See the "Tick-Based Test Execution" section for details.
 
-This allows precise control over the timing and sequencing of inputs and events during testing.
+This allows precise control over the timing and sequencing of inputs and events
+during testing.
 
 ## EventBus State Testing
 
 ### Overview
 
-The test harness now supports **EventBus state configuration and validation**. Tests can:
+The test harness now supports **EventBus state configuration and validation**.
+Tests can:
+
 - Initialize the EventBus with specific events at the start of a test
 - Validate EventBus state at tick snapshots during execution
 - Compare final EventBus state after all ticks complete
 
-This enables comprehensive testing of event lifetimes, event propagation, and event system behavior.
+This enables comprehensive testing of event lifetimes, event propagation, and
+event system behavior.
 
 ### Key Concepts
 
 **EventBusData**: FlatBuffers schema representing a snapshot of EventBus state
+
 - Contains an array of `EventPacketData`
 - Can be used for initial state, expected state, or tick snapshots
 
 **start_event_bus**: Optional field in `TestDataConfig`
+
 - Populates the global event bus at the start of the test
 - Events are added before any ticks are executed
 - Useful for testing logic that processes existing events
 
 **expected_event_bus**: Optional field in `TestDataConfig`
+
 - Defines the expected EventBus state after all ticks complete
 - Compared automatically using the `EqualsEventBus` matcher
 - Useful for validating event lifetime management and event processing
 
 **Tick Snapshot EventBus**: Optional field in `TickSnapshot`
+
 - Validates EventBus state at specific ticks during execution
 - Compared after simulation steps but before the event bus is ticked
 - Enables tick-by-tick validation of event state changes
@@ -1219,11 +1329,14 @@ This enables comprehensive testing of event lifetimes, event propagation, and ev
 Compare two EventBus instances directly.
 
 **Parameters:**
+
 - `actual`: The actual EventBus to test
 - `expected`: The expected EventBus to compare against
-- `expected_to_pass`: If true, expects buses to match; if false, expects mismatch (default: true)
+- `expected_to_pass`: If true, expects buses to match; if false, expects
+  mismatch (default: true)
 
 **Example:**
+
 ```cpp
 steamrot::EventBus actual_bus;
 steamrot::EventBus expected_bus;
@@ -1238,10 +1351,12 @@ steamrot::tests::run_event_bus_comparison_test(actual_bus, expected_bus);
 Compare two EventBus instances with test metadata for better error messages.
 
 **Parameters:**
+
 - `actual`: The actual EventBus to test
 - `expected`: The expected EventBus to compare against
 - `test_metadata`: Test metadata string to include in error messages
-- `expected_to_pass`: If true, expects buses to match; if false, expects mismatch (default: true)
+- `expected_to_pass`: If true, expects buses to match; if false, expects
+  mismatch (default: true)
 
 ### EventBus Configuration API
 
@@ -1250,11 +1365,13 @@ Compare two EventBus instances with test metadata for better error messages.
 Convert EventBusData FlatBuffers to an EventBus instance.
 
 **Parameters:**
+
 - `event_bus_data`: FlatBuffers EventBusData to convert
 
 **Returns:** `std::expected<EventBus, FailInfo>`
 
 **Example:**
+
 ```cpp
 #include "event_bus_conversion.h"
 
@@ -1270,12 +1387,14 @@ if (result.has_value()) {
 Populate an EventHandler's global event bus from EventBusData.
 
 **Parameters:**
+
 - `event_bus_data`: FlatBuffers EventBusData to convert
 - `event_handler`: EventHandler to configure
 
 **Returns:** `std::expected<std::monostate, FailInfo>`
 
 **Example:**
+
 ```cpp
 steamrot::EventHandler event_handler;
 auto result = steamrot::event::conversion::ConfigureEventHandlerFromEventBusData(
@@ -1286,18 +1405,22 @@ auto result = steamrot::event::conversion::ConfigureEventHandlerFromEventBusData
 
 When using `run_fixture_test()`, EventBus testing is automatic:
 
-1. **Initialization**: If `start_event_bus` is present, the global event bus is populated before any ticks execute
-2. **Tick Snapshots**: If tick snapshots contain `event_bus` fields, the global event bus is compared at each specified tick
-3. **Final Comparison**: If `expected_event_bus` is present, the global event bus is compared after all ticks complete
+1. **Initialization**: If `start_event_bus` is present, the global event bus is
+   populated before any ticks execute
+2. **Tick Snapshots**: If tick snapshots contain `event_bus` fields, the global
+   event bus is compared at each specified tick
+3. **Final Comparison**: If `expected_event_bus` is present, the global event
+   bus is compared after all ticks complete
 
 **Example:**
+
 ```cpp
 TEST_CASE("Data-driven EventBus test", "[unit][event_bus]") {
   auto configs = steamrot::tests::load_test_data_configs();
   REQUIRE(configs.has_value());
-  
+
   const auto *config = GENERATE_COPY(from_range(configs.value()));
-  
+
   // EventBus initialization, tick snapshots, and final comparison
   // all happen automatically
   auto result = steamrot::tests::run_fixture_test(config);
@@ -1307,7 +1430,8 @@ TEST_CASE("Data-driven EventBus test", "[unit][event_bus]") {
 
 ### EventBus Testing Benefits
 
-- **Event Lifetime Validation**: Verify events are properly decremented and removed
+- **Event Lifetime Validation**: Verify events are properly decremented and
+  removed
 - **Event Propagation**: Test that events are added and processed correctly
 - **State Transitions**: Validate EventBus state changes over time
 - **Regression Testing**: Detect unexpected changes to event system behavior
@@ -1315,7 +1439,10 @@ TEST_CASE("Data-driven EventBus test", "[unit][event_bus]") {
 
 ## Integration with Matchers
 
-The test harness is designed to work seamlessly with the existing matcher infrastructure in `tests/matchers/`. The `run_entity_memory_pool_comparison_test()` function uses the `EqualsEntityMemoryPool` matcher internally:
+The test harness is designed to work seamlessly with the existing matcher
+infrastructure in `tests/matchers/`. The
+`run_entity_memory_pool_comparison_test()` function uses the
+`EqualsEntityMemoryPool` matcher internally:
 
 ```cpp
 #include "test_harness.h"
@@ -1323,9 +1450,9 @@ The test harness is designed to work seamlessly with the existing matcher infras
 TEST_CASE("Test entity pools with matcher", "[unit]") {
   EntityMemoryPool actual_pool;
   EntityMemoryPool expected_pool;
-  
+
   // Configure and manipulate pools...
-  
+
   // Automatically uses EqualsEntityMemoryPool matcher for comparison
   steamrot::tests::run_entity_memory_pool_comparison_test(actual_pool, expected_pool);
 }
@@ -1345,6 +1472,7 @@ TEST_CASE("Test entity pools with matcher", "[unit]") {
 ### From test_data_generator functions
 
 Old:
+
 ```cpp
 auto test_names = steamrot::tests::get_test_names_for_generator();
 auto test_name = GENERATE_COPY(from_range(test_names.value()));
@@ -1353,6 +1481,7 @@ auto config = loader.LoadTestData(test_name, "subdirectory");
 ```
 
 New:
+
 ```cpp
 auto configs = steamrot::tests::load_test_data_configs();
 const auto *config = GENERATE_COPY(from_range(configs.value()));
@@ -1361,6 +1490,7 @@ const auto *config = GENERATE_COPY(from_range(configs.value()));
 ### From TestDataLoader
 
 Old:
+
 ```cpp
 steamrot::tests::TestDataLoader loader;
 auto test_names = loader.DiscoverTestDataFiles("subdirectory");
@@ -1368,13 +1498,15 @@ auto configs = loader.LoadMultipleTestData(test_names.value(), "subdirectory");
 ```
 
 New:
+
 ```cpp
 auto configs = steamrot::tests::load_test_data_configs("subdirectory");
 ```
 
 ## Notes
 
-- The harness consolidates functionality from `TestDataLoader` and `test_data_generator`
+- The harness consolidates functionality from `TestDataLoader` and
+  `test_data_generator`
 - Prioritizes simplicity - one call to get all test data
 - Works with adjacent `data/` directory by default (via `__FILE__`)
 - Seamlessly integrates with Catch2 generators and existing matchers
@@ -1382,19 +1514,26 @@ auto configs = steamrot::tests::load_test_data_configs("subdirectory");
 
 ## Test Data File Format
 
-Test data JSON files must follow the `test_data.fbs` schema located in `src/flatbuffers_headers/test_data.fbs`.
+Test data JSON files must follow the `test_data.fbs` schema located in
+`src/flatbuffers_headers/test_data.fbs`.
 
 **Required fields:**
-- `metadata` (required) - Test metadata including `test_name`, `description`, `tags`, etc.
+
+- `metadata` (required) - Test metadata including `test_name`, `description`,
+  `tags`, etc.
 
 **Entity collection fields:**
+
 - `start_entity_collection` - Starting state for comparison tests
 - `expected_entity_collection` - Expected state for comparison tests
 
 **Simulation fields:**
-- `simulation_data` - Optional simulation steps to execute between start and expected states
+
+- `simulation_data` - Optional simulation steps to execute between start and
+  expected states
 
 **Example:**
+
 ```json
 {
   "metadata": {
@@ -1415,4 +1554,6 @@ Test data JSON files must follow the `test_data.fbs` schema located in `src/flat
 }
 ```
 
-**Important:** The schema uses `start_entity_collection` and `expected_entity_collection`, NOT `entity_collection`. Always refer to `src/flatbuffers_headers/test_data.fbs` for the authoritative schema definition.
+**Important:** The schema uses `start_entity_collection` and
+`expected_entity_collection`, NOT `entity_collection`. Always refer to
+`src/flatbuffers_headers/test_data.fbs` for the authoritative schema definition.
