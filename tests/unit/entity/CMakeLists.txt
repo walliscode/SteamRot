@@ -8,6 +8,7 @@ add_executable(test_entity
   ArchetypeManager.test.cpp
   FlatbuffersEntityConfigurator.test.cpp
   FlatbuffersEntityImporter.test.cpp
+  FlatbuffersUIElementProvider.test.cpp
 
 )
 

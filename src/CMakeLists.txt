@@ -9,7 +9,6 @@ add_subdirectory(logger)
 add_subdirectory(resources)
 add_subdirectory(data_providers)
 add_subdirectory(logic)
-add_subdirectory(user_interface)
 add_subdirectory(types)
 add_subdirectory(context)
 

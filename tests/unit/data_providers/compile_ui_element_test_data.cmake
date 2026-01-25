@@ -31,18 +31,6 @@ add_custom_command(
 )
 
 add_custom_command(
-  OUTPUT "${ERROR_MISSING_ROOT_BIN}"
-  COMMAND flatc
-  ARGS --binary
-  ARGS -o "${CMAKE_CURRENT_SOURCE_DIR}/data"
-  ARGS "${UI_ELEMENT_SCHEMA}"
-  ARGS "${ERROR_MISSING_ROOT_JSON}"
-  DEPENDS "${ERROR_MISSING_ROOT_JSON}" "${UI_ELEMENT_SCHEMA}"
-  COMMENT "Compiling error test data: error_missing_root.json -> error_missing_root.bin"
-  VERBATIM
-)
-
-add_custom_command(
   OUTPUT "${ERROR_CONTAINER_NO_CHILDREN_BIN}"
   COMMAND flatc
   ARGS --binary
@@ -93,7 +81,6 @@ add_custom_command(
 # Create a custom target that depends on the compiled test data
 add_custom_target(compile_ui_element_unit_test_data ALL
   DEPENDS "${UI_ELEMENT_TEST_BIN}"
-          "${ERROR_MISSING_ROOT_BIN}"
           "${ERROR_CONTAINER_NO_CHILDREN_BIN}"
           "${ERROR_CONTAINER_ONE_CHILD_BIN}"
           "${ERROR_CONTAINER_WRONG_FIRST_CHILD_BIN}"
