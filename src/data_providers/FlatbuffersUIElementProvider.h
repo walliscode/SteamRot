@@ -8,13 +8,7 @@
 ////////////////////////////////////////////////////////////
 /// Headers
 ////////////////////////////////////////////////////////////
-#include "ButtonElement.h"
-#include "DropDownButtonElement.h"
-#include "DropDownContainerElement.h"
-#include "DropDownItemElement.h"
-#include "DropDownListElement.h"
 #include "IUIElementProvider.h"
-#include "PanelElement.h"
 #include "user_interface_generated.h"
 
 namespace steamrot {

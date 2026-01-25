@@ -17,5 +17,5 @@ target_link_libraries(entity
   SFML::Graphics
   types
   events
-  user_interface
+
 )
