@@ -230,7 +230,16 @@ CreateEventPacketFromData(const EventPacketData *packet_data) {
         FailInfo(FailMode::NullPointer, "EventPacketData is null"));
   }
 
-  EventPacket event_packet(packet_data->event_lifetime());
+  uint8_t lifetime = 1;
+  if (packet_data->event_lifetime()) {
+    lifetime = packet_data->event_lifetime();
+  }
+  EventPacket event_packet(lifetime);
+
+  if (!packet_data->event_type()) {
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    "EventPacketData missing event_type."});
+  }
   event_packet.event_type = packet_data->event_type();
 
   auto event_data_result = CreateEventData(packet_data->event_data_data_type(),

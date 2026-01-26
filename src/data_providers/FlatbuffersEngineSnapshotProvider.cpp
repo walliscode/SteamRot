@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersEngineSnapshotProvider.h"
-#include "FlatbuffersSceneDataProvider.h"
 #include "configure_engine_snapshot.h"
 
 namespace steamrot {

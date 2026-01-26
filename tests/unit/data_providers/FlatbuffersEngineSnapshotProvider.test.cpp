@@ -61,7 +61,7 @@ TEST_CASE("CreateEngineSnapshot succeeds with valid FlatBuffers data",
   auto result = provider.CreateEngineSnapshot();
 
   REQUIRE(result.has_value());
-  auto snapshot = result.value();
+  auto &snapshot = result.value();
 
   // Verify tick_number was configured
   REQUIRE(snapshot.tick_number.has_value());
@@ -147,7 +147,7 @@ TEST_CASE("FlatbuffersEngineSnapshotProvider integration test with JSON data",
   auto create_result = provider.CreateEngineSnapshot();
   REQUIRE(create_result.has_value());
 
-  auto snapshot = create_result.value();
+  auto &snapshot = create_result.value();
 
   // Verify all fields from JSON
   REQUIRE(snapshot.tick_number.has_value());

@@ -13,6 +13,7 @@
 #include "events_generated.h"
 #include <catch2/catch_test_macros.hpp>
 #include <flatbuffers/flatbuffers.h>
+#include <iostream>
 
 /////////////////////////////////////////////////
 // ConfigureEngineSnapshot tests
@@ -85,7 +86,6 @@ TEST_CASE("ConfigureEngineSnapshot configures global_event_bus with events",
   flatbuffers::FlatBufferBuilder builder;
 
   // Create an event packet
-
   auto event_packet_offset = steamrot::CreateEventPacketData(
       builder, 1, steamrot::EventType_EVENT_TOGGLE_UI,
       steamrot::EventDataData_UserInterfaceNameData);
@@ -95,20 +95,24 @@ TEST_CASE("ConfigureEngineSnapshot configures global_event_bus with events",
   auto events_offset = builder.CreateVector(events_vector);
 
   auto event_bus_offset = steamrot::CreateEventBusData(builder, events_offset);
-
+  std::cout << "Event bus offset created\n";
   auto snapshot_offset = steamrot::CreateEngineSnapshotFbs(
-      builder, 0, event_bus_offset); // tick_number = 0 (not set)
+      builder, 1, event_bus_offset); // tick_number = 0 (not set)
   builder.Finish(snapshot_offset);
+  std::cout << "EngineSnapshotFbs offset created\n";
   const steamrot::EngineSnapshotFbs *snapshot_fbs =
       flatbuffers::GetRoot<steamrot::EngineSnapshotFbs>(
           builder.GetBufferPointer());
 
+  std::cout << "EngineSnapshotFbs created\n";
   auto result = steamrot::data::configure::ConfigureEngineSnapshot(
       snapshot, snapshot_fbs, event_handler);
 
+  std::cout << "ConfigureEngineSnapshot returned\n";
   REQUIRE(result.has_value());
   REQUIRE(snapshot.global_event_bus.has_value());
   REQUIRE(snapshot.global_event_bus.value().size() == 1);
+  std::cout << "Event bus has 1 event\n";
   REQUIRE(snapshot.global_event_bus.value()[0].event_type ==
           steamrot::EventType_EVENT_TOGGLE_UI);
   REQUIRE(snapshot.global_event_bus.value()[0].event_lifetime == 1);
