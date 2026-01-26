@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "TestEngine.h"
+#include "EventHandler.h"
 #include "SimulationRunner.h"
 #include <expected>
 #include <format>
@@ -25,7 +26,28 @@ std::expected<std::monostate, FailInfo> TestEngine::StartUp() {
   }
 
   // assign TestEngine specific variables from TestData
+  // set target ticks
   m_target_ticks = m_test_data.number_of_ticks;
+
+  // load EventBus into EventHandler if available
+  if (m_test_data.starting_engine_snapshot.global_event_bus.has_value()) {
+
+    auto &event_bus =
+        m_test_data.starting_engine_snapshot.global_event_bus.value();
+    auto &event_handler = m_engine_resources.event_handler;
+    for (const auto &event : event_bus) {
+      event_handler.AddEvent(event);
+    }
+    event_handler.ProcessWaitingRoomEventBus();
+  }
+
+  // pass SceneCollectionData to SceneManager
+  auto add_scenes_result = m_scene_manager.AddScenesFromSceneCollectionData(
+      m_test_data.starting_engine_snapshot.scene_collection_data);
+
+  if (!add_scenes_result.has_value()) {
+    return std::unexpected(add_scenes_result.error());
+  }
 
   return std::monostate{};
 }

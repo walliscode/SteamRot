@@ -73,23 +73,6 @@ protected:
   EngineState m_engine_state;
 
   /////////////////////////////////////////////////
-  /// @brief Start up the engine and configure core objects.
-  ///
-  /// This is virtual to allow derived classes to customize startup.
-  /// Base implementation:
-  /// 1. Loads EngineCoreData from engine_data.json
-  /// 2. Configures GameCore (window, etc.)
-  /// 3. Loads default user preferences from default.preferences.bin
-  /// 4. Calls ConfigureEngineStateFromData() (virtual)
-  ///
-  /// GameEngine overrides to also load user-saved preferences.
-  /// TestEngine uses base implementation (default preferences only).
-  ///
-  /// @return Success or failure information
-  /////////////////////////////////////////////////
-  virtual std::expected<std::monostate, FailInfo> StartUp();
-
-  /////////////////////////////////////////////////
   /// @brief Virtual method capturing the game loop structure.
   /////////////////////////////////////////////////
   virtual void RunGameLoop() = 0;
@@ -190,6 +173,23 @@ public:
   /// @brief Virtual destructor for proper cleanup.
   /////////////////////////////////////////////////
   virtual ~Engine() = default;
+
+  /////////////////////////////////////////////////
+  /// @brief Start up the engine and configure core objects.
+  ///
+  /// This is virtual to allow derived classes to customize startup.
+  /// Base implementation:
+  /// 1. Loads EngineCoreData from engine_data.json
+  /// 2. Configures GameCore (window, etc.)
+  /// 3. Loads default user preferences from default.preferences.bin
+  /// 4. Calls ConfigureEngineStateFromData() (virtual)
+  ///
+  /// GameEngine overrides to also load user-saved preferences.
+  /// TestEngine uses base implementation (default preferences only).
+  ///
+  /// @return Success or failure information
+  /////////////////////////////////////////////////
+  virtual std::expected<std::monostate, FailInfo> StartUp();
 
   /////////////////////////////////////////////////
   /// @brief A simple wrapper function to indicate running the game

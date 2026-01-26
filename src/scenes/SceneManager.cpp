@@ -84,7 +84,7 @@ SceneManager::AddSceneFromDefault(const SceneType &scene_type) {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 SceneManager::AddScenesFromSceneCollectionData(
-    SceneCollectionData &scene_collection_data) {
+    const SceneCollectionData &scene_collection_data) {
 
   // clear existing scenes and check that it is cleared
   m_scenes.clear();

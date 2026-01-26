@@ -182,6 +182,13 @@ SceneFactory::ConfigureSceneConfig(Scene &scene, const SceneData &scene_data) {
 std::expected<std::monostate, FailInfo>
 SceneFactory::ImportEntities(Scene &scene, const SceneData &scene_data) {
 
+  // if entity transport is monostate, nothing to import so skip
+  // this has been implemented for testing purposes. make become code smell, so
+  // remove if not needed
+  if (std::holds_alternative<std::monostate>(scene_data.entity_transport)) {
+    return std::monostate();
+  }
+
   // check if entity importer variant holds type we want
   if (!std::holds_alternative<std::unique_ptr<IEntityImporter>>(
           scene_data.entity_transport)) {

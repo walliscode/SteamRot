@@ -102,7 +102,7 @@ public:
   ///
   /// @return A reference to the global event bus.
   /////////////////////////////////////////////////
-  const EventBus &GetGlobalEventBus();
+  const EventBus &GetGlobalEventBus() const;
 
   /////////////////////////////////////////////////
   /// @brief Get the waiting room event bus.
