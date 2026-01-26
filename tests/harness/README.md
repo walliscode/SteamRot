@@ -580,7 +580,7 @@ TEST_CASE("Data-driven test with TestEngine", "[unit]") {
 ### Overview
 
 The test harness now supports **data-driven simulations** that allow test data
-to specify which Logic classes or free functions to execute and in which order.
+to specify which Logic classes to execute and in which order.
 This mimics the Scene systems organization (Action, Movement, Render, Collision)
 and enables complex, multi-step test scenarios.
 
@@ -594,17 +594,9 @@ organization
 - `Render` - Drawing and rendering
 - `Collision` - Collision detection
 
-**ExecutionMode**: Determines what to execute
-
-- `Function` - Execute individual free function
-- `LogicClass` - Execute entire Logic class
-
 **Simulation Step**: A single execution step with:
 
-- `simulation_type` - Which system category
-- `execution_mode` - Function or LogicClass
-- `function_type` - Which specific function (if mode is Function)
-- `logic_class_type` - Which Logic class (if mode is LogicClass)
+- `logic_class_type` - Which Logic class to execute
 - `description` - Optional description
 
 ### Using Simulations
@@ -1510,7 +1502,7 @@ auto configs = steamrot::tests::load_test_data_configs("subdirectory");
 - Prioritizes simplicity - one call to get all test data
 - Works with adjacent `data/` directory by default (via `__FILE__`)
 - Seamlessly integrates with Catch2 generators and existing matchers
-- Uses free functions following project conventions
+- Uses logic classes for simulation
 
 ## Test Data File Format
 
