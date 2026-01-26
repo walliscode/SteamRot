@@ -243,6 +243,26 @@ std::expected<std::monostate, FailInfo> TestEngine::StartUp() {
 
 ## Gap Analysis
 
+### EngineSnapshot Usage Across Codebase
+
+`EngineSnapshot` is a **reusable data structure** used in multiple contexts:
+
+1. **TestData** (`src/types/test_structs/TestData.h`)
+   - Field: `starting_engine_snapshot` - initial state for test execution
+   - Field: `expected_engine_snapshots` - map of expected states per tick
+   - Use case: Data-driven testing with state validation
+
+2. **SaveData** (`src/types/core/SaveData.h`)
+   - Field: `engine_snapshot` - captured game state for saving
+   - Use case: Save/load game functionality
+   - **Note:** `configure_save_data.cpp` has TODO for EngineSnapshot configuration (line 76-78)
+
+3. **Engine** (`src/engine/Engine.cpp`)
+   - Method: `CaptureEngineSnapshot()` - captures current engine state
+   - Use case: Creating snapshots for TestEngine data bank, save files, debugging
+
+**Architectural Implication:** Because `EngineSnapshot` is used in multiple contexts, a shared configuration infrastructure (interface + free functions) would prevent code duplication and ensure consistency across TestData, SaveData, and future use cases (replay systems, debugging tools, etc.).
+
 ### Missing Components
 
 #### 1. FlatBuffers to C++ Conversion (Priority: HIGH)
@@ -253,6 +273,11 @@ No configurator exists for converting `EngineSnapshotFbs` to `EngineSnapshot`. N
 
 **File:** `src/data_providers/configure/configure_engine_snapshot.h`
 **File:** `src/data_providers/configure/configure_engine_snapshot.cpp`
+
+**Architectural Note:** An `IEngineSnapshotProvider` interface already exists (`src/types/interfaces/IEngineSnapshotProvider.h`) but lacks the configuration methods. Consider extending this interface or creating a companion `IEngineSnapshotConfigurator` interface, as `EngineSnapshot` is used in multiple contexts:
+- **TestData** (`starting_engine_snapshot` field)
+- **SaveData** (`engine_snapshot` field) - also has TODO for EngineSnapshot configuration
+- Future use cases (replay systems, state restoration, debugging)
 
 **Required Functions:**
 ```cpp
@@ -284,6 +309,30 @@ ConfigureSceneCollectionData(
 ```
 
 **Note:** Some configurators may already exist (e.g., `configure_scene_manager_data.h`). Investigation required to identify reusable components.
+
+**Alternative Architectural Approach:**
+
+Following the existing pattern seen in `ISaveDataProvider` and `IEntityConfigurator`, consider creating:
+
+```cpp
+// src/types/interfaces/IEngineSnapshotConfigurator.h
+class IEngineSnapshotConfigurator {
+public:
+  virtual ~IEngineSnapshotConfigurator() = default;
+  
+  virtual std::expected<EngineSnapshot, FailInfo> 
+  CreateEngineSnapshot() const = 0;
+  
+  virtual std::expected<std::monostate, FailInfo>
+  ConfigureEngineSnapshot(EngineSnapshot &engine_snapshot) const = 0;
+};
+```
+
+This interface-based approach would:
+- Provide consistency with other data configurators (SaveData, Entities, etc.)
+- Enable dependency injection for different EngineSnapshot sources
+- Support both TestData and SaveData use cases
+- Allow for mock implementations in testing
 
 #### 2. TestData Population (Priority: HIGH)
 
@@ -511,19 +560,26 @@ SceneManager has:
 
 ### Optional Enhancements (Future Improvements)
 
-1. **EventHandler Enhancement**
+1. **EngineSnapshot Interface Architecture** ⭐ **RECOMMENDED**
+   - Create `IEngineSnapshotConfigurator` interface following existing patterns
+   - Provides consistency with `ISaveDataProvider`, `IEntityConfigurator`, etc.
+   - Enables reuse across TestData, SaveData, and future use cases
+   - Supports dependency injection and testability
+   - Current `IEngineSnapshotProvider` only has `ProvideEngineSnapshot()` - extend with configuration methods
+
+2. **EventHandler Enhancement**
    - Add `SetGlobalEventBus(const EventBus &bus)` for direct event bus replacement
    - Current workaround is acceptable but less efficient
 
-2. **SceneManager Enhancement**
+3. **SceneManager Enhancement**
    - Add methods to apply `SceneManagerData` if missing
    - Investigate current capabilities first
 
-3. **Validation Framework**
+4. **Validation Framework**
    - Add validation that starting snapshot matches expected structure
    - Warn if snapshot contains data that cannot be applied
 
-4. **Documentation Updates**
+5. **Documentation Updates**
    - Update test harness README with state loading workflow
    - Add examples to test data naming conventions
    - Document `starting_engine_snapshot` usage patterns
