@@ -170,6 +170,12 @@ CreateEventData(const EventDataData data_type, const void *data) {
 
   switch (data_type) {
   case EventDataData::EventDataData_UserInputBitsetData: {
+    // Validate data pointer before dereferencing
+    if (!data) {
+      return std::unexpected(
+          FailInfo{FailMode::NullPointer,
+                   "CreateEventData: UserInputBitsetData pointer is null"});
+    }
 
     // cast data to UserInputBitsetData
     auto user_input_bitset_data =
@@ -184,6 +190,13 @@ CreateEventData(const EventDataData data_type, const void *data) {
     return user_input_bitset_result.value();
   }
   case EventDataData::EventDataData_SceneChangePacketData: {
+    // Validate data pointer before dereferencing
+    if (!data) {
+      return std::unexpected(
+          FailInfo{FailMode::NullPointer,
+                   "CreateEventData: SceneChangePacketData pointer is null"});
+    }
+
     // cast data to SceneChangePacketData
     auto scene_change_packet_data =
         static_cast<const SceneChangePacketData *>(data);
@@ -198,6 +211,12 @@ CreateEventData(const EventDataData data_type, const void *data) {
   }
 
   case EventDataData::EventDataData_UserInterfaceNameData: {
+    // Validate data pointer before dereferencing
+    if (!data) {
+      return std::unexpected(
+          FailInfo{FailMode::NullPointer,
+                   "CreateEventData: UserInterfaceNameData pointer is null"});
+    }
 
     // cast data to UserInterfaceNameData
     auto ui_name_data = static_cast<const UserInterfaceNameData *>(data);
@@ -230,7 +249,16 @@ CreateEventPacketFromData(const EventPacketData *packet_data) {
         FailInfo(FailMode::NullPointer, "EventPacketData is null"));
   }
 
-  EventPacket event_packet(packet_data->event_lifetime());
+  uint8_t lifetime = 1;
+  if (packet_data->event_lifetime()) {
+    lifetime = packet_data->event_lifetime();
+  }
+  EventPacket event_packet(lifetime);
+
+  if (!packet_data->event_type()) {
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    "EventPacketData missing event_type."});
+  }
   event_packet.event_type = packet_data->event_type();
 
   auto event_data_result = CreateEventData(packet_data->event_data_data_type(),

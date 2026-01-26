@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "event_bus_conversion.h"
 #include "event_factory.h"
+#include <iostream>
 
 namespace steamrot::event {
 
@@ -30,6 +31,11 @@ ConvertEventBusDataToEventBus(const EventBusData *event_bus_data) {
 
   // Convert each EventPacketData to EventPacket
   for (const EventPacketData *packet_data : *event_bus_data->events()) {
+    // Skip null packet data entries
+    if (!packet_data) {
+      continue;
+    }
+    
     auto event_packet_result = CreateEventPacketFromData(packet_data);
     if (!event_packet_result.has_value()) {
       return std::unexpected(event_packet_result.error());

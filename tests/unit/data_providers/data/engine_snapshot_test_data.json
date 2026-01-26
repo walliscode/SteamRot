@@ -1,0 +1,24 @@
+{
+  "tick_number": 42,
+  "global_event_bus": {
+    "events": [
+      {
+        "event_lifetime": 3,
+        "event_type": "EVENT_TOGGLE_UI",
+        "event_data_data_type": "UserInterfaceNameData",
+        "event_data_data": {
+          "id": "test_ui_name"
+        }
+      },
+      {
+        "event_lifetime": 1,
+        "event_type": "EVENT_CHANGE_SCENE",
+        "event_data_data_type": "SceneChangePacketData",
+        "event_data_data": {
+          "scene_type": "TITLE"
+        }
+      }
+    ],
+    "description": "Test event bus with multiple events"
+  }
+}

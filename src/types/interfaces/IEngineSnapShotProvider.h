@@ -25,8 +25,20 @@ public:
   virtual ~IEngineSnapShotProvider() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Provides an EngineSnapshot object.
+  /// @brief Create and provide a configured EngineSnapshot object.
+  ///
+  /// @return EngineSnapshot object or FailInfo on error.
   /////////////////////////////////////////////////
-  std::expected<EngineSnapshot, FailInfo> ProvideEngineSnapshot();
+  virtual std::expected<EngineSnapshot, FailInfo>
+  CreateEngineSnapshot() const = 0;
+
+  /////////////////////////////////////////////////
+  /// @brief Configure the provided EngineSnapshot object.
+  ///
+  /// @param engine_snapshot EngineSnapshot object to configure.
+  /// @return std::monostate on success or FailInfo on error.
+  /////////////////////////////////////////////////
+  virtual std::expected<std::monostate, FailInfo>
+  ConfigureEngineSnapshot(EngineSnapshot &engine_snapshot) const = 0;
 };
 } // namespace steamrot
