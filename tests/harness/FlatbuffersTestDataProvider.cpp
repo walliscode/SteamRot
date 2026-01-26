@@ -117,37 +117,6 @@ FlatbuffersTestDataProvider::ConfigureTestMetaData(
   return std::monostate{};
 }
 
-steamrot::FunctionEnum
-ConvertFbsToFunctionEnum(steamrot::FunctionEnumFbs fbs_function_enum) {
-  switch (fbs_function_enum) {
-
-  case steamrot::FunctionEnumFbs::FunctionEnumFbs_ProcessUIActionsAndEvents:
-    return steamrot::FunctionEnum::ProcessUIActionsAndEvents;
-
-  case steamrot::FunctionEnumFbs::
-      FunctionEnumFbs_ProcessNestedUIActionsAndEvents:
-    return steamrot::FunctionEnum::ProcessNestedUIActionsAndEvents;
-
-  case steamrot::FunctionEnumFbs::FunctionEnumFbs_ProcessButtonElementActions:
-    return steamrot::FunctionEnum::ProcessButtonElementActions;
-
-  case steamrot::FunctionEnumFbs::
-      FunctionEnumFbs_ProcessDropDownListElementActions:
-    return steamrot::FunctionEnum::ProcessDropDownListElementActions;
-
-  case steamrot::FunctionEnumFbs::FunctionEnumFbs_CheckMouseOverNestedUIElement:
-    return steamrot::FunctionEnum::CheckMouseOverNestedUIElement;
-
-  case steamrot::FunctionEnumFbs::
-      FunctionEnumFbs_UpdateCUserInterfaceVisibilityFromCUIState:
-
-    return steamrot::FunctionEnum::UpdateCUserInterfaceVisibilityFromCUIState;
-
-  default:
-    return steamrot::FunctionEnum::None;
-  }
-}
-
 steamrot::LogicClassEnum
 ConvertFbsToLogicClassEnum(steamrot::LogicClassEnumFbs fbs_logic_class_enum) {
   switch (fbs_logic_class_enum) {
@@ -188,34 +157,16 @@ FlatbuffersTestDataProvider::ConfigureSimulationData(
 
     steamrot::SimulationElement element;
 
-    // Check which type is set - exactly one should be non-None
-    bool has_function =
-        fbs_step->function_type() != steamrot::FunctionEnumFbs_None;
-    bool has_logic_class =
-        fbs_step->logic_class_type() != steamrot::LogicClassEnumFbs_None;
-
-    if (has_function && has_logic_class) {
-      return std::unexpected(steamrot::FailInfo{
-          steamrot::FailMode::FlatbuffersDataNotFound,
-          "SimulationStepFbs has both function_type and logic_class_type set. "
-          "Only one should be set per step."});
-    }
-
-    if (!has_function && !has_logic_class) {
+    // Check that logic_class_type is set
+    if (fbs_step->logic_class_type() == steamrot::LogicClassEnumFbs_None) {
       return std::unexpected(
           steamrot::FailInfo{steamrot::FailMode::FlatbuffersDataNotFound,
-                             "SimulationStepFbs has neither function_type nor "
-                             "logic_class_type set. "
-                             "Exactly one must be set per step."});
+                             "SimulationStepFbs has logic_class_type set to None. "
+                             "A valid logic class must be specified."});
     }
 
-    if (has_function) {
-      // Assign the converted FunctionEnum to the element variant
-      element = ConvertFbsToFunctionEnum(fbs_step->function_type());
-    } else {
-      // Assign the converted LogicClassEnum to the element variant
-      element = ConvertFbsToLogicClassEnum(fbs_step->logic_class_type());
-    }
+    // Assign the converted LogicClassEnum to the element
+    element = ConvertFbsToLogicClassEnum(fbs_step->logic_class_type());
 
     // Create SimulationStep and add to simulation_data
     steamrot::SimulationStep step(element);

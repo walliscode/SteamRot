@@ -580,7 +580,7 @@ TEST_CASE("Data-driven test with TestEngine", "[unit]") {
 ### Overview
 
 The test harness now supports **data-driven simulations** that allow test data
-to specify which Logic classes or free functions to execute and in which order.
+to specify which Logic classes to execute and in which order.
 This mimics the Scene systems organization (Action, Movement, Render, Collision)
 and enables complex, multi-step test scenarios.
 
@@ -594,17 +594,9 @@ organization
 - `Render` - Drawing and rendering
 - `Collision` - Collision detection
 
-**ExecutionMode**: Determines what to execute
-
-- `Function` - Execute individual free function
-- `LogicClass` - Execute entire Logic class
-
 **Simulation Step**: A single execution step with:
 
-- `simulation_type` - Which system category
-- `execution_mode` - Function or LogicClass
-- `function_type` - Which specific function (if mode is Function)
-- `logic_class_type` - Which Logic class (if mode is LogicClass)
+- `logic_class_type` - Which Logic class to execute
 - `description` - Optional description
 
 ### Using Simulations
@@ -628,22 +620,13 @@ organization
     "description": "Execute collision, then render, then actions",
     "steps": [
       {
-        "simulation_type": "Collision",
-        "execution_mode": "LogicClass",
-        "logic_class_type": "UICollisionLogic",
-        "description": "Detect UI collision"
+        "logic_class_type": "UICollisionLogic"
       },
       {
-        "simulation_type": "Render",
-        "execution_mode": "LogicClass",
-        "logic_class_type": "UIRenderLogic",
-        "description": "Render UI elements"
+        "logic_class_type": "UIRenderLogic"
       },
       {
-        "simulation_type": "Action",
-        "execution_mode": "Function",
-        "function_type": "ProcessNestedUIActionsAndEvents",
-        "description": "Process UI actions"
+        "logic_class_type": "UIActionLogic"
       }
     ]
   },
@@ -754,34 +737,39 @@ Execute simulation using a TestFixture (convenience wrapper).
 
 ### Extending Simulations
 
-To add new functions or Logic classes to simulations:
+To add new Logic classes to simulations:
 
-1. **Add to FlatBuffers enum** in `src/flatbuffers_headers/simulation.fbs`:
+1. **Add to FlatBuffers enum** in `src/types/flatbuffers/testing/simulation_data.fbs`:
 
    ```fbs
-   enum FunctionType : byte {
+   enum LogicClassEnumFbs : byte {
      // ... existing values ...
-     MyNewFunction = 50,
+     MyNewLogic = 50,
    }
    ```
 
-2. **Add case to dispatcher** in `tests/harness/simulation_runner.cpp`:
+2. **Add conversion case** in `tests/harness/FlatbuffersTestDataProvider.cpp`:
 
    ```cpp
-   case FunctionType::MyNewFunction: {
-     MyNewFunction(scene_context);
-     return std::monostate{};
-   }
+   case steamrot::LogicClassEnumFbs::LogicClassEnumFbs_MyNewLogic:
+     return steamrot::LogicClassEnum::MyNewLogic;
    ```
 
-3. **Rebuild** to regenerate headers
+3. **Add to C++ enum** in `src/types/test_structs/SimulationData.h`:
 
-4. **Use in test data**:
+   ```cpp
+   enum class LogicClassEnum {
+     // ... existing values ...
+     MyNewLogic = 50,
+   };
+   ```
+
+4. **Rebuild** to regenerate headers
+
+5. **Use in test data**:
    ```json
    {
-     "simulation_type": "Action",
-     "execution_mode": "Function",
-     "function_type": "MyNewFunction"
+     "logic_class_type": "MyNewLogic"
    }
    ```
 
@@ -875,16 +863,10 @@ the number of ticks to execute. Only the top-level `num_ticks` field in
   "simulation_data": {
     "steps": [
       {
-        "simulation_type": "Collision",
-        "execution_mode": "LogicClass",
-        "logic_class_type": "UICollisionLogic",
-        "description": "Check collision (runs every tick)"
+        "logic_class_type": "UICollisionLogic"
       },
       {
-        "simulation_type": "Action",
-        "execution_mode": "Function",
-        "function_type": "ProcessButtonElementActions",
-        "description": "Process button actions (runs every tick)"
+        "logic_class_type": "UIActionLogic"
       }
     ]
   }
@@ -900,26 +882,22 @@ For the example above, the execution timeline is:
 - Input: MouseMove to (150, 125)
 - Event: Add EVENT_TEST with lifetime 3
 - Process waiting room → EVENT_TEST moves to global bus
-- Simulation: UICollisionLogic executes, then ProcessButtonElementActions
-  executes
+- Simulation: UICollisionLogic executes, then UIActionLogic executes
 - Tick event bus → EVENT_TEST lifetime = 2
 
 **Tick 1:**
 
 - Input: MouseClick at (150, 125)
-- Simulation: UICollisionLogic executes, then ProcessButtonElementActions
-  executes
+- Simulation: UICollisionLogic executes, then UIActionLogic executes
 - Tick event bus → EVENT_TEST lifetime = 1
 
 **Tick 2:**
 
-- Simulation: UICollisionLogic executes, then ProcessButtonElementActions
-  executes
+- Simulation: UICollisionLogic executes, then UIActionLogic executes
 - Tick event bus → EVENT_TEST lifetime = 0, removed
 
-**Note:** The simulation steps (UICollisionLogic and
-ProcessButtonElementActions) run on every tick. The simulation configuration is
-set once and does not change during the test.
+**Note:** The simulation steps (UICollisionLogic and UIActionLogic) run on every 
+tick. The simulation configuration is set once and does not change during the test.
 
 ### Benefits
 
@@ -1510,7 +1488,7 @@ auto configs = steamrot::tests::load_test_data_configs("subdirectory");
 - Prioritizes simplicity - one call to get all test data
 - Works with adjacent `data/` directory by default (via `__FILE__`)
 - Seamlessly integrates with Catch2 generators and existing matchers
-- Uses free functions following project conventions
+- Uses logic classes for simulation
 
 ## Test Data File Format
 

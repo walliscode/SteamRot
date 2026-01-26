@@ -10,7 +10,7 @@
     "description": "This is a test simulation data for unit testing.",
     "steps": [
       {
-        "function_type": "ProcessUIActionsAndEvents"
+        "logic_class_type": "UIActionLogic"
       }
     ]
   },
