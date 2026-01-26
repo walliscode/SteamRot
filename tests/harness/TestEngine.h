@@ -77,11 +77,6 @@ private:
   };
 
   /////////////////////////////////////////////////
-  /// @brief TestEngine specific startup routine
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo> StartUp() override;
-
-  /////////////////////////////////////////////////
   /// @brief Copy over the current engine snapshot and store it in the data bank
   ///
   /// This will convert the shared pointer to the EntityMemoryPool into a copy
@@ -96,6 +91,11 @@ public:
   /// @param config Test data configuration (must remain valid)
   /////////////////////////////////////////////////
   explicit TestEngine(const TestData &test_data);
+
+  /////////////////////////////////////////////////
+  /// @brief TestEngine specific startup routine
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> StartUp() override;
 
   /////////////////////////////////////////////////
   /// @brief returns the target number of ticks to run

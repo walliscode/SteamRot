@@ -11,6 +11,17 @@ int main() {
 
     // create the game engine
     steamrot::GameEngine game_engine;
+
+    // start up the game engine
+    auto startup_result = game_engine.StartUp();
+    if (!startup_result) {
+      // print error message to console
+      std::cerr << "Error: " << startup_result.error().message << std::endl;
+      // run the error loop with the captured fail info
+      error_loop::RunErrorLoop(startup_result.error());
+      return 1;
+    }
+
     // run the game engine
     auto run_game_result = game_engine.RunGame();
     if (!run_game_result) {
