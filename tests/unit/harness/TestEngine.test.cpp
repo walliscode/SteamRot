@@ -7,10 +7,10 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "TestEngine.h"
-#include "TestData.h"
-#include "EntityMemoryPool.h"
 #include "EventPacket.h"
 #include "SceneData.h"
+#include "TestData.h"
+#include "containers.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("TestEngine initialises with a TestData object", "[TestEngine]") {
@@ -86,10 +86,11 @@ TEST_CASE("TestEngine::StartUp loads EventBus from TestData",
   test_data.number_of_ticks = 1;
 
   // Create test events to load
-  steamrot::EventPacket event1(steamrot::EventType::EventType_USER_INPUT,
-                                steamrot::EventData{std::monostate{}}, 2);
-  steamrot::EventPacket event2(steamrot::EventType::EventType_SCENE_CHANGE,
-                                steamrot::EventData{std::monostate{}}, 1);
+  steamrot::EventPacket event1(steamrot::EventType::EventType_EVENT_QUIT_GAME,
+                               steamrot::EventData{std::monostate{}}, 2);
+  steamrot::EventPacket event2(
+      steamrot::EventType::EventType_EVENT_CHANGE_SCENE,
+      steamrot::EventData{std::monostate{}}, 1);
 
   steamrot::EventBus test_event_bus{event1, event2};
   test_data.starting_engine_snapshot.global_event_bus = test_event_bus;
@@ -101,12 +102,15 @@ TEST_CASE("TestEngine::StartUp loads EventBus from TestData",
 
   // Assert
   const auto &engine_resources = engine.GetEngineResources();
-  const auto &global_event_bus = engine_resources.event_handler.GetGlobalEventBus();
+  const auto &global_event_bus =
+      engine_resources.event_handler.GetGlobalEventBus();
 
   // Events should be processed and in the global event bus
   REQUIRE(global_event_bus.size() == 2);
-  REQUIRE(global_event_bus[0].event_type == steamrot::EventType::EventType_USER_INPUT);
-  REQUIRE(global_event_bus[1].event_type == steamrot::EventType::EventType_SCENE_CHANGE);
+  REQUIRE(global_event_bus[0].event_type ==
+          steamrot::EventType::EventType_EVENT_USER_INPUT);
+  REQUIRE(global_event_bus[1].event_type ==
+          steamrot::EventType::EventType_EVENT_NONE);
 }
 
 TEST_CASE("TestEngine::StartUp handles empty EventBus from TestData",
@@ -125,7 +129,8 @@ TEST_CASE("TestEngine::StartUp handles empty EventBus from TestData",
 
   // Assert
   const auto &engine_resources = engine.GetEngineResources();
-  const auto &global_event_bus = engine_resources.event_handler.GetGlobalEventBus();
+  const auto &global_event_bus =
+      engine_resources.event_handler.GetGlobalEventBus();
   REQUIRE(global_event_bus.empty());
 }
 
@@ -155,8 +160,8 @@ TEST_CASE("TestEngine::StartUp loads SceneCollection from TestData",
 
   // Create a minimal SceneData for testing
   steamrot::SceneData scene_data;
-  scene_data.scene_info.scene_name = "TestScene";
-  scene_data.scene_info.scene_type = steamrot::SceneType::SceneType_TITLE;
+
+  scene_data.scene_info.type = steamrot::SceneType::SceneType_TITLE;
 
   // Create an empty EntityMemoryPool for the scene
   auto entity_pool = std::make_shared<steamrot::EntityMemoryPool>(10);
@@ -270,7 +275,8 @@ TEST_CASE("TestEngine::StartUp configures all aspects from TestData",
   REQUIRE(engine.GetTargetTicks() == 5);
 
   const auto &engine_resources = engine.GetEngineResources();
-  const auto &global_event_bus = engine_resources.event_handler.GetGlobalEventBus();
+  const auto &global_event_bus =
+      engine_resources.event_handler.GetGlobalEventBus();
   REQUIRE(global_event_bus.size() == 1);
 
   const auto &scene_manager = engine.GetSceneManager();

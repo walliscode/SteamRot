@@ -51,7 +51,7 @@ void EventHandler::TickGlobalEventBus() {
 }
 
 /////////////////////////////////////////////////
-const EventBus &EventHandler::GetGlobalEventBus() {
+const EventBus &EventHandler::GetGlobalEventBus() const {
   // return the global event bus
   return m_global_event_bus;
 }
