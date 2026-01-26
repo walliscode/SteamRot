@@ -12,31 +12,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include <string>
-#include <variant>
 #include <vector>
 namespace steamrot {
-
-//////////////////////////////////////////////
-//// @brief Represents a function to be simulated
-///
-/// This enum is used to map directly to functions use for logic
-//////////////////////////////////////////////
-enum class FunctionEnum {
-
-  None = 0,
-
-  // UI Action functions
-  ProcessUIActionsAndEvents,
-  ProcessNestedUIActionsAndEvents,
-  ProcessButtonElementActions,
-  ProcessDropDownListElementActions,
-
-  // logic collision functions
-  CheckMouseOverNestedUIElement,
-
-  // ui functions
-  UpdateCUserInterfaceVisibilityFromCUIState
-};
 
 //////////////////////////////////////////////
 /// @brief Represents a logic class to be simulated
@@ -52,7 +29,7 @@ enum class LogicClassEnum {
   CraftingRenderLogic = 5,
 };
 
-using SimulationElement = std::variant<FunctionEnum, LogicClassEnum>;
+using SimulationElement = LogicClassEnum;
 
 /////////////////////////////////////////////////
 /// @class SimulationStep

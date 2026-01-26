@@ -1207,11 +1207,10 @@ The Test Data Configuration System provides a FlatBuffers-based framework for da
    - Workflow 2: Simple Entity Comparison
    - Workflow 3: Entity State Transformation
    - Workflow 4: Simulation with Logic Classes
-   - Workflow 5: Simulation with Free Functions
-   - Workflow 6: Input Sequence Testing
-   - Workflow 7: Event Sequence Testing
-   - Workflow 8: Combined Testing (Input + Events + Simulation)
-   - Workflow 9: Negative Testing (Expected to Fail)
+   - Workflow 5: Input Sequence Testing
+   - Workflow 6: Event Sequence Testing
+   - Workflow 7: Combined Testing (Input + Events + Simulation)
+   - Workflow 8: Negative Testing (Expected to Fail)
 3. Use the field reference and examples in the workflow guide
 4. For technical details about schemas and APIs, reference `TEST_DATA_CONFIGURATION.md`
 

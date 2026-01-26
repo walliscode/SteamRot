@@ -130,8 +130,8 @@ TEST_CASE(
   REQUIRE(first_sim_data->description()->str() ==
           "This is a test simulation data for unit testing.");
   REQUIRE(first_sim_data->steps()->size() == 1);
-  REQUIRE(first_sim_data->steps()->Get(0)->function_type() ==
-          steamrot::FunctionEnumFbs_ProcessUIActionsAndEvents);
+  REQUIRE(first_sim_data->steps()->Get(0)->logic_class_type() ==
+          steamrot::LogicClassEnumFbs_UIActionLogic);
 
   // Assert - num_ticks
   REQUIRE(first_test_data.num_ticks() == 37);
