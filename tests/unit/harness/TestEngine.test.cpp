@@ -108,9 +108,9 @@ TEST_CASE("TestEngine::StartUp loads EventBus from TestData",
   // Events should be processed and in the global event bus
   REQUIRE(global_event_bus.size() == 2);
   REQUIRE(global_event_bus[0].event_type ==
-          steamrot::EventType::EventType_EVENT_USER_INPUT);
+          steamrot::EventType::EventType_EVENT_QUIT_GAME);
   REQUIRE(global_event_bus[1].event_type ==
-          steamrot::EventType::EventType_EVENT_NONE);
+          steamrot::EventType::EventType_EVENT_CHANGE_SCENE);
 }
 
 TEST_CASE("TestEngine::StartUp handles empty EventBus from TestData",
@@ -164,7 +164,7 @@ TEST_CASE("TestEngine::StartUp loads SceneCollection from TestData",
   scene_data.scene_info.type = steamrot::SceneType::SceneType_TITLE;
 
   // Create an empty EntityMemoryPool for the scene
-  auto entity_pool = std::make_shared<steamrot::EntityMemoryPool>(10);
+  auto entity_pool = std::make_shared<steamrot::EntityMemoryPool>();
   scene_data.entity_transport = entity_pool;
 
   steamrot::SceneCollectionData scene_collection{scene_data};
@@ -196,15 +196,13 @@ TEST_CASE("TestEngine::StartUp loads multiple scenes from TestData",
 
   // Create multiple SceneData objects
   steamrot::SceneData scene_data1;
-  scene_data1.scene_info.scene_name = "TestScene1";
-  scene_data1.scene_info.scene_type = steamrot::SceneType::SceneType_TITLE;
-  auto entity_pool1 = std::make_shared<steamrot::EntityMemoryPool>(10);
+  scene_data1.scene_info.type = steamrot::SceneType::SceneType_TITLE;
+  auto entity_pool1 = std::make_shared<steamrot::EntityMemoryPool>();
   scene_data1.entity_transport = entity_pool1;
 
   steamrot::SceneData scene_data2;
-  scene_data2.scene_info.scene_name = "TestScene2";
-  scene_data2.scene_info.scene_type = steamrot::SceneType::SceneType_CRAFTING;
-  auto entity_pool2 = std::make_shared<steamrot::EntityMemoryPool>(10);
+  scene_data2.scene_info.type = steamrot::SceneType::SceneType_CRAFTING;
+  auto entity_pool2 = std::make_shared<steamrot::EntityMemoryPool>();
   scene_data2.entity_transport = entity_pool2;
 
   steamrot::SceneCollectionData scene_collection{scene_data1, scene_data2};
@@ -260,9 +258,8 @@ TEST_CASE("TestEngine::StartUp configures all aspects from TestData",
 
   // Configure SceneCollection
   steamrot::SceneData scene_data;
-  scene_data.scene_info.scene_name = "IntegrationTestScene";
-  scene_data.scene_info.scene_type = steamrot::SceneType::SceneType_TITLE;
-  auto entity_pool = std::make_shared<steamrot::EntityMemoryPool>(10);
+  scene_data.scene_info.type = steamrot::SceneType::SceneType_TITLE;
+  auto entity_pool = std::make_shared<steamrot::EntityMemoryPool>();
   scene_data.entity_transport = entity_pool;
   test_data.starting_engine_snapshot.scene_collection_data = {scene_data};
 
