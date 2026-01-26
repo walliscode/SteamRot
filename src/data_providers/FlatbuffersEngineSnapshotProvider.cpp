@@ -13,11 +13,6 @@ namespace steamrot {
 
 /////////////////////////////////////////////////
 FlatbuffersEngineSnapshotProvider::FlatbuffersEngineSnapshotProvider(
-    EventHandler &event_handler)
-    : m_event_handler(event_handler) {}
-
-/////////////////////////////////////////////////
-FlatbuffersEngineSnapshotProvider::FlatbuffersEngineSnapshotProvider(
     EventHandler &event_handler, const EngineSnapshotFbs *engine_snapshot_fbs)
     : m_event_handler(event_handler),
       m_engine_snapshot_fbs(engine_snapshot_fbs) {}

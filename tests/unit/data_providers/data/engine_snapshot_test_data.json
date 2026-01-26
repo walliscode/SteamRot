@@ -4,20 +4,18 @@
     "events": [
       {
         "event_lifetime": 3,
-        "event_type": "EventType_UI_TOGGLE",
+        "event_type": "EVENT_TOGGLE_UI",
+        "event_data_data_type": "UserInterfaceNameData",
         "event_data_data": {
-          "data_type": "EventDataData_UserInterfaceName",
-          "data": "test_ui_name"
+          "id": "test_ui_name"
         }
       },
       {
         "event_lifetime": 1,
-        "event_type": "EventType_SCENE_CHANGE",
+        "event_type": "EVENT_CHANGE_SCENE",
+        "event_data_data_type": "SceneChangePacketData",
         "event_data_data": {
-          "data_type": "EventDataData_SceneChangeData",
-          "data": {
-            "scene_type": "SceneType_TITLE"
-          }
+          "scene_type": "TITLE"
         }
       }
     ],

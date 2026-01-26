@@ -34,28 +34,21 @@ private:
 
 public:
   /////////////////////////////////////////////////
-  /// @brief Constructor
-  ///
-  /// @param event_handler Reference to EventHandler for event reporting.
-  /////////////////////////////////////////////////
-  FlatbuffersEngineSnapshotProvider(EventHandler &event_handler);
-
-  /////////////////////////////////////////////////
   /// @brief Constructor with FlatBuffers data
   ///
   /// @param event_handler Reference to EventHandler for event reporting.
   /// @param engine_snapshot_fbs Pointer to FlatBuffers EngineSnapshotFbs.
   /////////////////////////////////////////////////
-  FlatbuffersEngineSnapshotProvider(EventHandler &event_handler,
-                                    const EngineSnapshotFbs *engine_snapshot_fbs);
+  FlatbuffersEngineSnapshotProvider(
+      EventHandler &event_handler,
+      const EngineSnapshotFbs *engine_snapshot_fbs);
 
   /////////////////////////////////////////////////
   /// @brief Create and provide a configured EngineSnapshot object.
   ///
   /// @return EngineSnapshot object or FailInfo on error.
   /////////////////////////////////////////////////
-  std::expected<EngineSnapshot, FailInfo>
-  CreateEngineSnapshot() const override;
+  std::expected<EngineSnapshot, FailInfo> CreateEngineSnapshot() const override;
 
   /////////////////////////////////////////////////
   /// @brief Configure the provided EngineSnapshot object.

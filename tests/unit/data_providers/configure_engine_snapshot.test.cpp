@@ -9,6 +9,7 @@
 #include "configure_engine_snapshot.h"
 #include "EngineSnapshot.h"
 #include "engine_snapshot_generated.h"
+#include "events_generated.h"
 #include <catch2/catch_test_macros.hpp>
 #include <flatbuffers/flatbuffers.h>
 
@@ -40,8 +41,8 @@ TEST_CASE("ConfigureEngineSnapshot handles empty snapshot",
       flatbuffers::GetRoot<steamrot::EngineSnapshotFbs>(
           builder.GetBufferPointer());
 
-  auto result =
-      steamrot::data::configure::ConfigureEngineSnapshot(snapshot, snapshot_fbs);
+  auto result = steamrot::data::configure::ConfigureEngineSnapshot(
+      snapshot, snapshot_fbs);
 
   REQUIRE(result.has_value());
   // All fields should be empty/default
@@ -63,8 +64,8 @@ TEST_CASE("ConfigureEngineSnapshot configures tick_number",
       flatbuffers::GetRoot<steamrot::EngineSnapshotFbs>(
           builder.GetBufferPointer());
 
-  auto result =
-      steamrot::data::configure::ConfigureEngineSnapshot(snapshot, snapshot_fbs);
+  auto result = steamrot::data::configure::ConfigureEngineSnapshot(
+      snapshot, snapshot_fbs);
 
   REQUIRE(result.has_value());
   REQUIRE(snapshot.tick_number.has_value());
@@ -79,12 +80,10 @@ TEST_CASE("ConfigureEngineSnapshot configures global_event_bus with events",
   flatbuffers::FlatBufferBuilder builder;
 
   // Create an event packet
-  auto event_data_offset = builder.CreateString("test_ui");
-  auto event_data_data_offset = steamrot::CreateEventDataData(
-      builder, steamrot::EventDataData_UserInterfaceName, event_data_offset.Union());
 
   auto event_packet_offset = steamrot::CreateEventPacketData(
-      builder, 1, steamrot::EventType_UI_TOGGLE, event_data_data_offset);
+      builder, 1, steamrot::EventType_EVENT_TOGGLE_UI,
+      steamrot::EventDataData_UserInterfaceNameData);
 
   std::vector<flatbuffers::Offset<steamrot::EventPacketData>> events_vector;
   events_vector.push_back(event_packet_offset);
@@ -99,14 +98,14 @@ TEST_CASE("ConfigureEngineSnapshot configures global_event_bus with events",
       flatbuffers::GetRoot<steamrot::EngineSnapshotFbs>(
           builder.GetBufferPointer());
 
-  auto result =
-      steamrot::data::configure::ConfigureEngineSnapshot(snapshot, snapshot_fbs);
+  auto result = steamrot::data::configure::ConfigureEngineSnapshot(
+      snapshot, snapshot_fbs);
 
   REQUIRE(result.has_value());
   REQUIRE(snapshot.global_event_bus.has_value());
   REQUIRE(snapshot.global_event_bus.value().size() == 1);
   REQUIRE(snapshot.global_event_bus.value()[0].event_type ==
-          steamrot::EventType_UI_TOGGLE);
+          steamrot::EventType_EVENT_TOGGLE_UI);
   REQUIRE(snapshot.global_event_bus.value()[0].event_lifetime == 1);
 }
 
@@ -128,8 +127,8 @@ TEST_CASE("ConfigureEngineSnapshot configures empty event bus",
       flatbuffers::GetRoot<steamrot::EngineSnapshotFbs>(
           builder.GetBufferPointer());
 
-  auto result =
-      steamrot::data::configure::ConfigureEngineSnapshot(snapshot, snapshot_fbs);
+  auto result = steamrot::data::configure::ConfigureEngineSnapshot(
+      snapshot, snapshot_fbs);
 
   REQUIRE(result.has_value());
   REQUIRE(snapshot.global_event_bus.has_value());
@@ -146,7 +145,8 @@ TEST_CASE("ConfigureEngineSnapshot configures scene_manager_data",
   // Create minimal SceneManagerDataFbs with empty subscriptions
   std::vector<flatbuffers::Offset<steamrot::SubscriberFbs>> subs_vector;
   auto subs_offset = builder.CreateVector(subs_vector);
-  auto state_offset = steamrot::CreateSceneManagerStateFbs(builder, subs_offset);
+  auto state_offset =
+      steamrot::CreateSceneManagerStateFbs(builder, subs_offset);
   auto scene_manager_data_offset =
       steamrot::CreateSceneManagerDataFbs(builder, state_offset);
 
@@ -157,16 +157,18 @@ TEST_CASE("ConfigureEngineSnapshot configures scene_manager_data",
       flatbuffers::GetRoot<steamrot::EngineSnapshotFbs>(
           builder.GetBufferPointer());
 
-  auto result =
-      steamrot::data::configure::ConfigureEngineSnapshot(snapshot, snapshot_fbs);
+  auto result = steamrot::data::configure::ConfigureEngineSnapshot(
+      snapshot, snapshot_fbs);
 
   REQUIRE(result.has_value());
   REQUIRE(snapshot.scene_manager_data.has_value());
-  REQUIRE(snapshot.scene_manager_data.value().scene_manager_state.subscriptions.size() == 0);
+  REQUIRE(snapshot.scene_manager_data.value()
+              .scene_manager_state.subscriptions.size() == 0);
 }
 
-TEST_CASE("ConfigureEngineSnapshot returns NotImplemented for scene_collection_data",
-          "[unit][configure_engine_snapshot]") {
+TEST_CASE(
+    "ConfigureEngineSnapshot returns NotImplemented for scene_collection_data",
+    "[unit][configure_engine_snapshot]") {
   steamrot::EngineSnapshot snapshot;
 
   // Create FlatBuffers data with scene_collection_data
@@ -185,8 +187,8 @@ TEST_CASE("ConfigureEngineSnapshot returns NotImplemented for scene_collection_d
       flatbuffers::GetRoot<steamrot::EngineSnapshotFbs>(
           builder.GetBufferPointer());
 
-  auto result =
-      steamrot::data::configure::ConfigureEngineSnapshot(snapshot, snapshot_fbs);
+  auto result = steamrot::data::configure::ConfigureEngineSnapshot(
+      snapshot, snapshot_fbs);
 
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::NotImplemented);

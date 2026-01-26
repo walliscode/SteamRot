@@ -8,20 +8,13 @@
 /////////////////////////////////////////////////
 #include "FlatbuffersEngineSnapshotProvider.h"
 #include "EventHandler.h"
+#include "events_generated.h"
 #include "load_engine_snapshot_data.h"
 #include <catch2/catch_test_macros.hpp>
 
 /////////////////////////////////////////////////
 // Constructor tests
 /////////////////////////////////////////////////
-
-TEST_CASE("FlatbuffersEngineSnapshotProvider constructs with EventHandler only",
-          "[unit][FlatbuffersEngineSnapshotProvider]") {
-  steamrot::EventHandler event_handler;
-
-  REQUIRE_NOTHROW(
-      steamrot::FlatbuffersEngineSnapshotProvider provider(event_handler));
-}
 
 TEST_CASE("FlatbuffersEngineSnapshotProvider constructs with EventHandler and "
           "FlatBuffers data",
@@ -32,8 +25,9 @@ TEST_CASE("FlatbuffersEngineSnapshotProvider constructs with EventHandler and "
   auto [data, engine_snapshot_fbs] =
       steamrot::tests::LoadEngineSnapshotTestData();
 
-  REQUIRE_NOTHROW(steamrot::FlatbuffersEngineSnapshotProvider provider(
-      event_handler, engine_snapshot_fbs));
+  steamrot::FlatbuffersEngineSnapshotProvider provider(event_handler,
+                                                       engine_snapshot_fbs);
+  SUCCEED();
 }
 
 /////////////////////////////////////////////////
@@ -122,12 +116,12 @@ TEST_CASE("ConfigureEngineSnapshot succeeds with valid FlatBuffers data",
 
   // Verify first event
   REQUIRE(snapshot.global_event_bus.value()[0].event_type ==
-          steamrot::EventType_UI_TOGGLE);
+          steamrot::EventType_EVENT_TOGGLE_UI);
   REQUIRE(snapshot.global_event_bus.value()[0].event_lifetime == 3);
 
   // Verify second event
   REQUIRE(snapshot.global_event_bus.value()[1].event_type ==
-          steamrot::EventType_SCENE_CHANGE);
+          steamrot::EventType_EVENT_CHANGE_SCENE);
   REQUIRE(snapshot.global_event_bus.value()[1].event_lifetime == 1);
 }
 
@@ -164,12 +158,12 @@ TEST_CASE("FlatbuffersEngineSnapshotProvider integration test with JSON data",
 
   // Event 1: UI_TOGGLE with lifetime 3
   const auto &event1 = snapshot.global_event_bus.value()[0];
-  REQUIRE(event1.event_type == steamrot::EventType_UI_TOGGLE);
+  REQUIRE(event1.event_type == steamrot::EventType_EVENT_TOGGLE_UI);
   REQUIRE(event1.event_lifetime == 3);
 
   // Event 2: SCENE_CHANGE with lifetime 1
   const auto &event2 = snapshot.global_event_bus.value()[1];
-  REQUIRE(event2.event_type == steamrot::EventType_SCENE_CHANGE);
+  REQUIRE(event2.event_type == steamrot::EventType_EVENT_CHANGE_SCENE);
   REQUIRE(event2.event_lifetime == 1);
 
   // Verify scene_manager_data and scene_collection_data are not set
