@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "configure_engine_snapshot.h"
 #include "EngineSnapshot.h"
+#include "EventHandler.h"
 #include "engine_snapshot_generated.h"
 #include "events_generated.h"
 #include <catch2/catch_test_macros.hpp>
@@ -20,9 +21,10 @@
 TEST_CASE("ConfigureEngineSnapshot fails with null data",
           "[unit][configure_engine_snapshot]") {
   steamrot::EngineSnapshot snapshot;
+  steamrot::EventHandler event_handler;
 
-  auto result =
-      steamrot::data::configure::ConfigureEngineSnapshot(snapshot, nullptr);
+  auto result = steamrot::data::configure::ConfigureEngineSnapshot(
+      snapshot, nullptr, event_handler);
 
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
@@ -32,6 +34,7 @@ TEST_CASE("ConfigureEngineSnapshot fails with null data",
 TEST_CASE("ConfigureEngineSnapshot handles empty snapshot",
           "[unit][configure_engine_snapshot]") {
   steamrot::EngineSnapshot snapshot;
+  steamrot::EventHandler event_handler;
 
   // Create empty FlatBuffers data
   flatbuffers::FlatBufferBuilder builder;
@@ -42,7 +45,7 @@ TEST_CASE("ConfigureEngineSnapshot handles empty snapshot",
           builder.GetBufferPointer());
 
   auto result = steamrot::data::configure::ConfigureEngineSnapshot(
-      snapshot, snapshot_fbs);
+      snapshot, snapshot_fbs, event_handler);
 
   REQUIRE(result.has_value());
   // All fields should be empty/default
@@ -54,6 +57,7 @@ TEST_CASE("ConfigureEngineSnapshot handles empty snapshot",
 TEST_CASE("ConfigureEngineSnapshot configures tick_number",
           "[unit][configure_engine_snapshot]") {
   steamrot::EngineSnapshot snapshot;
+  steamrot::EventHandler event_handler;
 
   // Create FlatBuffers data with tick_number
   flatbuffers::FlatBufferBuilder builder;
@@ -65,7 +69,7 @@ TEST_CASE("ConfigureEngineSnapshot configures tick_number",
           builder.GetBufferPointer());
 
   auto result = steamrot::data::configure::ConfigureEngineSnapshot(
-      snapshot, snapshot_fbs);
+      snapshot, snapshot_fbs, event_handler);
 
   REQUIRE(result.has_value());
   REQUIRE(snapshot.tick_number.has_value());
@@ -75,6 +79,7 @@ TEST_CASE("ConfigureEngineSnapshot configures tick_number",
 TEST_CASE("ConfigureEngineSnapshot configures global_event_bus with events",
           "[unit][configure_engine_snapshot]") {
   steamrot::EngineSnapshot snapshot;
+  steamrot::EventHandler event_handler;
 
   // Create FlatBuffers data with event bus
   flatbuffers::FlatBufferBuilder builder;
@@ -99,7 +104,7 @@ TEST_CASE("ConfigureEngineSnapshot configures global_event_bus with events",
           builder.GetBufferPointer());
 
   auto result = steamrot::data::configure::ConfigureEngineSnapshot(
-      snapshot, snapshot_fbs);
+      snapshot, snapshot_fbs, event_handler);
 
   REQUIRE(result.has_value());
   REQUIRE(snapshot.global_event_bus.has_value());
@@ -112,6 +117,7 @@ TEST_CASE("ConfigureEngineSnapshot configures global_event_bus with events",
 TEST_CASE("ConfigureEngineSnapshot configures empty event bus",
           "[unit][configure_engine_snapshot]") {
   steamrot::EngineSnapshot snapshot;
+  steamrot::EventHandler event_handler;
 
   // Create FlatBuffers data with empty event bus
   flatbuffers::FlatBufferBuilder builder;
@@ -128,7 +134,7 @@ TEST_CASE("ConfigureEngineSnapshot configures empty event bus",
           builder.GetBufferPointer());
 
   auto result = steamrot::data::configure::ConfigureEngineSnapshot(
-      snapshot, snapshot_fbs);
+      snapshot, snapshot_fbs, event_handler);
 
   REQUIRE(result.has_value());
   REQUIRE(snapshot.global_event_bus.has_value());
@@ -138,6 +144,7 @@ TEST_CASE("ConfigureEngineSnapshot configures empty event bus",
 TEST_CASE("ConfigureEngineSnapshot configures scene_manager_data",
           "[unit][configure_engine_snapshot]") {
   steamrot::EngineSnapshot snapshot;
+  steamrot::EventHandler event_handler;
 
   // Create FlatBuffers data with scene_manager_data
   flatbuffers::FlatBufferBuilder builder;
@@ -158,7 +165,7 @@ TEST_CASE("ConfigureEngineSnapshot configures scene_manager_data",
           builder.GetBufferPointer());
 
   auto result = steamrot::data::configure::ConfigureEngineSnapshot(
-      snapshot, snapshot_fbs);
+      snapshot, snapshot_fbs, event_handler);
 
   REQUIRE(result.has_value());
   REQUIRE(snapshot.scene_manager_data.has_value());
@@ -166,12 +173,12 @@ TEST_CASE("ConfigureEngineSnapshot configures scene_manager_data",
               .scene_manager_state.subscriptions.size() == 0);
 }
 
-TEST_CASE(
-    "ConfigureEngineSnapshot returns NotImplemented for scene_collection_data",
-    "[unit][configure_engine_snapshot]") {
+TEST_CASE("ConfigureEngineSnapshot configures empty scene_collection_data",
+          "[unit][configure_engine_snapshot]") {
   steamrot::EngineSnapshot snapshot;
+  steamrot::EventHandler event_handler;
 
-  // Create FlatBuffers data with scene_collection_data
+  // Create FlatBuffers data with empty scene_collection_data
   flatbuffers::FlatBufferBuilder builder;
 
   // Create minimal SceneCollectionDataFbs (empty)
@@ -188,10 +195,8 @@ TEST_CASE(
           builder.GetBufferPointer());
 
   auto result = steamrot::data::configure::ConfigureEngineSnapshot(
-      snapshot, snapshot_fbs);
+      snapshot, snapshot_fbs, event_handler);
 
-  REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::NotImplemented);
-  REQUIRE(result.error().message ==
-          "SceneCollectionData configuration not yet implemented");
+  REQUIRE(result.has_value());
+  REQUIRE(snapshot.scene_collection_data.size() == 0);
 }

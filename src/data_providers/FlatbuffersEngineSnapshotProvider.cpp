@@ -7,9 +7,15 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersEngineSnapshotProvider.h"
+#include "FlatbuffersSceneDataProvider.h"
 #include "configure_engine_snapshot.h"
 
 namespace steamrot {
+
+/////////////////////////////////////////////////
+FlatbuffersEngineSnapshotProvider::FlatbuffersEngineSnapshotProvider(
+    EventHandler &event_handler)
+    : m_event_handler(event_handler) {}
 
 /////////////////////////////////////////////////
 FlatbuffersEngineSnapshotProvider::FlatbuffersEngineSnapshotProvider(
@@ -45,9 +51,9 @@ FlatbuffersEngineSnapshotProvider::ConfigureEngineSnapshot(
                  "FlatBuffers EngineSnapshotFbs pointer is null"});
   }
 
-  // Call the free function to configure EngineSnapshot
+  // Call the free function to configure basic EngineSnapshot data
   auto configure_result = data::configure::ConfigureEngineSnapshot(
-      engine_snapshot, m_engine_snapshot_fbs);
+      engine_snapshot, m_engine_snapshot_fbs, m_event_handler);
   if (!configure_result.has_value()) {
     return std::unexpected(configure_result.error());
   }

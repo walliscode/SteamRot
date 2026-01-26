@@ -34,6 +34,13 @@ private:
 
 public:
   /////////////////////////////////////////////////
+  /// @brief Constructor
+  ///
+  /// @param event_handler Reference to EventHandler for event reporting.
+  /////////////////////////////////////////////////
+  FlatbuffersEngineSnapshotProvider(EventHandler &event_handler);
+
+  /////////////////////////////////////////////////
   /// @brief Constructor with FlatBuffers data
   ///
   /// @param event_handler Reference to EventHandler for event reporting.
