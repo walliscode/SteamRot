@@ -85,34 +85,34 @@ TEST_CASE("ConfigureEngineSnapshot configures global_event_bus with events",
   // Create FlatBuffers data with event bus
   flatbuffers::FlatBufferBuilder builder;
 
-  // Create an event packet
+  // Create the UI name data for the event
+  auto ui_name_str = builder.CreateString("test_ui");
+  auto ui_name_data = steamrot::CreateUserInterfaceNameData(builder, ui_name_str);
+
+  // Create an event packet with proper union data
   auto event_packet_offset = steamrot::CreateEventPacketData(
       builder, 1, steamrot::EventType_EVENT_TOGGLE_UI,
-      steamrot::EventDataData_UserInterfaceNameData);
+      steamrot::EventDataData_UserInterfaceNameData, ui_name_data.Union());
 
   std::vector<flatbuffers::Offset<steamrot::EventPacketData>> events_vector;
   events_vector.push_back(event_packet_offset);
   auto events_offset = builder.CreateVector(events_vector);
 
   auto event_bus_offset = steamrot::CreateEventBusData(builder, events_offset);
-  std::cout << "Event bus offset created\n";
+
   auto snapshot_offset = steamrot::CreateEngineSnapshotFbs(
-      builder, 1, event_bus_offset); // tick_number = 0 (not set)
+      builder, 0, event_bus_offset); // tick_number = 0 (not set)
   builder.Finish(snapshot_offset);
-  std::cout << "EngineSnapshotFbs offset created\n";
   const steamrot::EngineSnapshotFbs *snapshot_fbs =
       flatbuffers::GetRoot<steamrot::EngineSnapshotFbs>(
           builder.GetBufferPointer());
 
-  std::cout << "EngineSnapshotFbs created\n";
   auto result = steamrot::data::configure::ConfigureEngineSnapshot(
       snapshot, snapshot_fbs, event_handler);
 
-  std::cout << "ConfigureEngineSnapshot returned\n";
   REQUIRE(result.has_value());
   REQUIRE(snapshot.global_event_bus.has_value());
   REQUIRE(snapshot.global_event_bus.value().size() == 1);
-  std::cout << "Event bus has 1 event\n";
   REQUIRE(snapshot.global_event_bus.value()[0].event_type ==
           steamrot::EventType_EVENT_TOGGLE_UI);
   REQUIRE(snapshot.global_event_bus.value()[0].event_lifetime == 1);
