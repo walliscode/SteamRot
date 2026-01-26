@@ -6,6 +6,7 @@ paths.cpp
 
 add_library(data_providers
   FlatbuffersEngineDataProvider.cpp
+  FlatbuffersEngineSnapshotProvider.cpp
   FlatbuffersSceneManagerDataProvider.cpp
   FlatbuffersSceneDataProvider.cpp
   FlatbuffersSubscriberViewer.cpp
@@ -17,6 +18,7 @@ add_library(data_providers
   data_file_utils.cpp
   paths.cpp
   configure/configure_engine_data.cpp
+  configure/configure_engine_snapshot.cpp
   configure/configure_asset_config.cpp
   configure/configure_save_data.cpp
   configure/configure_scene_manager_data.cpp
