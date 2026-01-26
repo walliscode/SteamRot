@@ -11,6 +11,7 @@ target_link_libraries(test_harness
   PRIVATE
   Catch2::Catch2WithMain
   harness
+  context_test_helpers
 )
 
 catch_discover_tests(test_harness)

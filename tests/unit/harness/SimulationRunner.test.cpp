@@ -111,7 +111,7 @@ TEST_CASE("SimulationRunner::ExecuteSimulation fails with invalid "
 
   // Assert
   REQUIRE(!result.has_value());
-  REQUIRE(result.error().fail_mode == steamrot::FailMode::NonExistentEnumValue);
+  REQUIRE(result.error().mode == steamrot::FailMode::NonExistentEnumValue);
   REQUIRE(result.error().message ==
           "Invalid LogicClassEnum value in simulation step");
 }
@@ -242,7 +242,7 @@ TEST_CASE("SimulationRunner::ExecuteSimulation stops on first error",
 
   // Assert
   REQUIRE(!result.has_value());
-  REQUIRE(result.error().fail_mode == steamrot::FailMode::NonExistentEnumValue);
+  REQUIRE(result.error().mode == steamrot::FailMode::NonExistentEnumValue);
 }
 
 TEST_CASE("SimulationRunner::ExecuteSimulation executes all logic types in "

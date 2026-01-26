@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "TestEngine.h"
+#include "SimulationRunner.h"
 #include <expected>
 #include <format>
 #include <variant>
@@ -48,7 +49,23 @@ void TestEngine::RunGameLoop() {
 }
 
 /////////////////////////////////////////////////
-void TestEngine::TickSceneLogic() {}
+void TestEngine::TickSceneLogic() {
+
+  // process SimulationRunner for each scene
+  for (auto &scene : m_scene_manager.GetScenes()) {
+
+    auto scene_context = scene.second->GetSceneContext();
+
+    // create SimulationRunner instance for each Scene
+    SimulationRunner runner(m_test_data.simulation_data, scene_context);
+
+    // execute simulation
+    auto simulation_result = runner.ExecuteSimulation();
+    if (!simulation_result.has_value()) {
+      // [TODO:] handle simulation failure (log, halt, etc.)
+    }
+  }
+}
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> TestEngine::StoreEngineSnapShot() {
