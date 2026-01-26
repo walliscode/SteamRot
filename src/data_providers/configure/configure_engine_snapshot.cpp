@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "configure_engine_snapshot.h"
+#include "configure_scene_manager_data.h"
 #include "event_bus_conversion.h"
 
 namespace steamrot::data::configure {
@@ -40,14 +41,15 @@ ConfigureEngineSnapshot(EngineSnapshot &snapshot,
   }
 
   // Configure scene_manager_data (optional field)
-  // Note: SceneManagerData configuration requires additional implementation
-  // For now, we'll leave this as a TODO if/when needed
   if (fb_snapshot->scene_manager_data()) {
-    // TODO: Implement SceneManagerData configuration when needed
-    // This would require a ConfigureSceneManagerData function
-    return std::unexpected(
-        FailInfo{FailMode::NotImplemented,
-                 "SceneManagerData configuration not yet implemented"});
+    SceneManagerData scene_manager_data;
+    auto configure_state_result = ConfigureSceneManagerState(
+        scene_manager_data.scene_manager_state,
+        fb_snapshot->scene_manager_data()->state());
+    if (!configure_state_result.has_value()) {
+      return std::unexpected(configure_state_result.error());
+    }
+    snapshot.scene_manager_data = scene_manager_data;
   }
 
   // Configure scene_collection_data (optional field)

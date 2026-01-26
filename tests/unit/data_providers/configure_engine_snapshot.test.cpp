@@ -136,14 +136,14 @@ TEST_CASE("ConfigureEngineSnapshot configures empty event bus",
   REQUIRE(snapshot.global_event_bus.value().size() == 0);
 }
 
-TEST_CASE("ConfigureEngineSnapshot returns NotImplemented for scene_manager_data",
+TEST_CASE("ConfigureEngineSnapshot configures scene_manager_data",
           "[unit][configure_engine_snapshot]") {
   steamrot::EngineSnapshot snapshot;
 
   // Create FlatBuffers data with scene_manager_data
   flatbuffers::FlatBufferBuilder builder;
 
-  // Create minimal SceneManagerDataFbs (empty)
+  // Create minimal SceneManagerDataFbs with empty subscriptions
   std::vector<flatbuffers::Offset<steamrot::SubscriberFbs>> subs_vector;
   auto subs_offset = builder.CreateVector(subs_vector);
   auto state_offset = steamrot::CreateSceneManagerStateFbs(builder, subs_offset);
@@ -160,10 +160,9 @@ TEST_CASE("ConfigureEngineSnapshot returns NotImplemented for scene_manager_data
   auto result =
       steamrot::data::configure::ConfigureEngineSnapshot(snapshot, snapshot_fbs);
 
-  REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::NotImplemented);
-  REQUIRE(result.error().message ==
-          "SceneManagerData configuration not yet implemented");
+  REQUIRE(result.has_value());
+  REQUIRE(snapshot.scene_manager_data.has_value());
+  REQUIRE(snapshot.scene_manager_data.value().scene_manager_state.subscriptions.size() == 0);
 }
 
 TEST_CASE("ConfigureEngineSnapshot returns NotImplemented for scene_collection_data",
