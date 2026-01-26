@@ -170,6 +170,12 @@ CreateEventData(const EventDataData data_type, const void *data) {
 
   switch (data_type) {
   case EventDataData::EventDataData_UserInputBitsetData: {
+    // Validate data pointer before dereferencing
+    if (!data) {
+      return std::unexpected(
+          FailInfo{FailMode::NullPointer,
+                   "CreateEventData: UserInputBitsetData pointer is null"});
+    }
 
     // cast data to UserInputBitsetData
     auto user_input_bitset_data =
@@ -184,6 +190,13 @@ CreateEventData(const EventDataData data_type, const void *data) {
     return user_input_bitset_result.value();
   }
   case EventDataData::EventDataData_SceneChangePacketData: {
+    // Validate data pointer before dereferencing
+    if (!data) {
+      return std::unexpected(
+          FailInfo{FailMode::NullPointer,
+                   "CreateEventData: SceneChangePacketData pointer is null"});
+    }
+
     // cast data to SceneChangePacketData
     auto scene_change_packet_data =
         static_cast<const SceneChangePacketData *>(data);
@@ -198,6 +211,12 @@ CreateEventData(const EventDataData data_type, const void *data) {
   }
 
   case EventDataData::EventDataData_UserInterfaceNameData: {
+    // Validate data pointer before dereferencing
+    if (!data) {
+      return std::unexpected(
+          FailInfo{FailMode::NullPointer,
+                   "CreateEventData: UserInterfaceNameData pointer is null"});
+    }
 
     // cast data to UserInterfaceNameData
     auto ui_name_data = static_cast<const UserInterfaceNameData *>(data);

@@ -204,3 +204,42 @@ TEST_CASE("ConfigureEngineSnapshot configures empty scene_collection_data",
   REQUIRE(result.has_value());
   REQUIRE(snapshot.scene_collection_data.size() == 0);
 }
+
+TEST_CASE("ConfigureEngineSnapshot handles malformed EventPacketData with null "
+          "union data",
+          "[unit][configure_engine_snapshot]") {
+  steamrot::EngineSnapshot snapshot;
+  steamrot::EventHandler event_handler;
+
+  // Create FlatBuffers data with event bus containing malformed EventPacketData
+  flatbuffers::FlatBufferBuilder builder;
+
+  // Create an event packet with union type but NO union data (null pointer)
+  // This simulates the bug that caused the original SIGSEGV
+  auto event_packet_offset = steamrot::CreateEventPacketData(
+      builder, 1, steamrot::EventType_EVENT_TOGGLE_UI,
+      steamrot::EventDataData_UserInterfaceNameData,
+      0); // Passing 0 (null offset) for union data
+
+  std::vector<flatbuffers::Offset<steamrot::EventPacketData>> events_vector;
+  events_vector.push_back(event_packet_offset);
+  auto events_offset = builder.CreateVector(events_vector);
+
+  auto event_bus_offset = steamrot::CreateEventBusData(builder, events_offset);
+
+  auto snapshot_offset =
+      steamrot::CreateEngineSnapshotFbs(builder, 0, event_bus_offset);
+  builder.Finish(snapshot_offset);
+  const steamrot::EngineSnapshotFbs *snapshot_fbs =
+      flatbuffers::GetRoot<steamrot::EngineSnapshotFbs>(
+          builder.GetBufferPointer());
+
+  auto result = steamrot::data::configure::ConfigureEngineSnapshot(
+      snapshot, snapshot_fbs, event_handler);
+
+  // Should fail gracefully with an error instead of segfaulting
+  REQUIRE_FALSE(result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
+  REQUIRE(result.error().message ==
+          "CreateEventData: UserInterfaceNameData pointer is null");
+}
