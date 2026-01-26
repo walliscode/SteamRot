@@ -7,8 +7,13 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "TestEngine.h"
+#include "EventPacket.h"
+#include "SceneData.h"
 #include "TestData.h"
+#include "containers.h"
+#include "uuid.h"
 #include <catch2/catch_test_macros.hpp>
+#include <utility>
 
 TEST_CASE("TestEngine initialises with a TestData object", "[TestEngine]") {
   steamrot::TestData test_data;
@@ -24,6 +29,10 @@ TEST_CASE("TestEngine::StartUp assigns variables from TestData",
 
   // Act
   steamrot::tests::TestEngine engine(test_data);
+  auto startup_result = engine.StartUp();
+  if (!startup_result.has_value()) {
+    FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+  }
   auto run_game_result = engine.RunGame();
   if (!run_game_result.has_value()) {
     FAIL("TestEngine::RunGame failed to start: " +
@@ -50,8 +59,14 @@ TEST_CASE("TestEngine::RunGame executes specified number of ticks",
   test_data.number_of_ticks = 4;
   // Act
   steamrot::tests::TestEngine engine(test_data);
+  auto startup_result = engine.StartUp();
+  if (!startup_result.has_value()) {
+    FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+  }
   auto result = engine.RunGame();
-  REQUIRE(result.has_value());
+  if (!result.has_value()) {
+    FAIL("TestEngine::RunGame failed to start: " + result.error().message);
+  }
   // Assert
   REQUIRE(engine.GetCurrentTick() == 4);
 }
@@ -64,8 +79,14 @@ TEST_CASE("TestEngine::RunGame captures snapshots in data bank",
 
   // Act
   steamrot::tests::TestEngine engine(test_data);
+  auto startup_result = engine.StartUp();
+  if (!startup_result.has_value()) {
+    FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+  }
   auto result = engine.RunGame();
-  REQUIRE(result.has_value());
+  if (!result.has_value()) {
+    FAIL("TestEngine::RunGame failed to start: " + result.error().message);
+  }
 
   // Assert
   const auto &data_bank = engine.GetDataBank();
@@ -74,4 +95,234 @@ TEST_CASE("TestEngine::RunGame captures snapshots in data bank",
   REQUIRE(data_bank.find(2) != data_bank.end());
   REQUIRE(data_bank.find(3) != data_bank.end());
   REQUIRE(data_bank.find(4) == data_bank.end());
+}
+
+TEST_CASE("TestEngine::StartUp loads EventBus from TestData",
+          "[unit][TestEngine]") {
+  // Arrange
+  steamrot::TestData test_data;
+  test_data.number_of_ticks = 1;
+
+  // Create test events to load
+  steamrot::EventPacket event1(steamrot::EventType::EventType_EVENT_QUIT_GAME,
+                               steamrot::EventData{std::monostate{}}, 2);
+  steamrot::EventPacket event2(
+      steamrot::EventType::EventType_EVENT_CHANGE_SCENE,
+      steamrot::EventData{std::monostate{}}, 1);
+
+  steamrot::EventBus test_event_bus{event1, event2};
+  test_data.starting_engine_snapshot.global_event_bus = test_event_bus;
+
+  // Act
+  steamrot::tests::TestEngine engine(test_data);
+  auto result = engine.StartUp();
+  REQUIRE(result.has_value());
+
+  // Assert
+  const auto &engine_resources = engine.GetEngineResources();
+  const auto &global_event_bus =
+      engine_resources.event_handler.GetGlobalEventBus();
+
+  // Events should be processed and in the global event bus
+  REQUIRE(global_event_bus.size() == 2);
+  REQUIRE(global_event_bus[0].event_type ==
+          steamrot::EventType::EventType_EVENT_QUIT_GAME);
+  REQUIRE(global_event_bus[1].event_type ==
+          steamrot::EventType::EventType_EVENT_CHANGE_SCENE);
+}
+
+TEST_CASE("TestEngine::StartUp handles empty EventBus from TestData",
+          "[unit][TestEngine]") {
+  // Arrange
+  steamrot::TestData test_data;
+  test_data.number_of_ticks = 1;
+
+  // Set empty event bus
+  test_data.starting_engine_snapshot.global_event_bus = steamrot::EventBus{};
+
+  // Act
+  steamrot::tests::TestEngine engine(test_data);
+  auto startup_result = engine.StartUp();
+  if (!startup_result.has_value()) {
+    FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+  }
+  auto result = engine.RunGame();
+  REQUIRE(result.has_value());
+
+  // Assert
+  const auto &engine_resources = engine.GetEngineResources();
+  const auto &global_event_bus =
+      engine_resources.event_handler.GetGlobalEventBus();
+  REQUIRE(global_event_bus.empty());
+}
+
+TEST_CASE("TestEngine::StartUp handles no EventBus in TestData",
+          "[unit][TestEngine]") {
+  // Arrange
+  steamrot::TestData test_data;
+  test_data.number_of_ticks = 1;
+
+  // Don't set global_event_bus (leave as std::nullopt)
+  REQUIRE(!test_data.starting_engine_snapshot.global_event_bus.has_value());
+
+  // Act
+  steamrot::tests::TestEngine engine(test_data);
+  auto startup_result = engine.StartUp();
+  if (!startup_result.has_value()) {
+    FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+  }
+  auto result = engine.RunGame();
+  REQUIRE(result.has_value());
+
+  // Assert - should succeed without errors
+  SUCCEED("TestEngine handled missing EventBus gracefully");
+}
+
+TEST_CASE("TestEngine::StartUp loads SceneCollection from TestData",
+          "[unit][TestEngine]") {
+  // Arrange
+  steamrot::TestData test_data;
+  test_data.number_of_ticks = 1;
+
+  // Create a minimal SceneData for testing
+  steamrot::SceneData scene_data;
+
+  scene_data.scene_info.type = steamrot::SceneType::SceneType_TITLE;
+  scene_data.scene_info.id = uuids::uuid_system_generator{}();
+
+  // set SceneResourcesConfig texture dimensions to non zero
+  scene_data.scene_resources_config.texture_width = 512;
+  scene_data.scene_resources_config.texture_height = 648;
+
+  // Add SceneData to TestData
+  test_data.starting_engine_snapshot.scene_collection_data.push_back(
+      std::move(scene_data));
+
+  REQUIRE(test_data.starting_engine_snapshot.scene_collection_data.size() == 1);
+  // set SceneResourcesConfig texture dimensions to non zero
+
+  // Act
+  steamrot::tests::TestEngine engine(test_data);
+  auto startup_result = engine.StartUp();
+  if (!startup_result.has_value()) {
+    FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+  }
+
+  // Assert
+  const auto &scene_manager = engine.GetSceneManager();
+  const auto &scenes = scene_manager.GetScenes();
+
+  // Should have loaded the scene from TestData
+  REQUIRE(scenes.size() == 1);
+
+  // Verify scene was configured correctly
+  auto scene_it = scenes.begin();
+  REQUIRE(scene_it->second != nullptr);
+  // Note: We can't easily verify the scene name/type without additional getters
+}
+
+TEST_CASE("TestEngine::StartUp loads multiple scenes from TestData",
+          "[unit][TestEngine]") {
+  // Arrange
+  steamrot::TestData test_data;
+  test_data.number_of_ticks = 1;
+
+  // Create multiple SceneData objects
+  steamrot::SceneData scene_data1;
+  scene_data1.scene_info.type = steamrot::SceneType::SceneType_TITLE;
+  scene_data1.scene_resources_config.texture_width = 256;
+  scene_data1.scene_resources_config.texture_height = 256;
+
+  steamrot::SceneData scene_data2;
+  scene_data2.scene_info.type = steamrot::SceneType::SceneType_CRAFTING;
+  scene_data2.scene_resources_config.texture_width = 128;
+  scene_data2.scene_resources_config.texture_height = 128;
+  test_data.starting_engine_snapshot.scene_collection_data.push_back(
+      std::move(scene_data1));
+  test_data.starting_engine_snapshot.scene_collection_data.push_back(
+      std::move(scene_data2));
+
+  // Act
+  steamrot::tests::TestEngine engine(test_data);
+  auto startup_result = engine.StartUp();
+  if (!startup_result.has_value()) {
+    FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+  }
+  auto result = engine.RunGame();
+  REQUIRE(result.has_value());
+
+  // Assert
+  const auto &scene_manager = engine.GetSceneManager();
+  const auto &scenes = scene_manager.GetScenes();
+
+  // Should have loaded both scenes from TestData
+  REQUIRE(scenes.size() == 2);
+}
+
+TEST_CASE("TestEngine::StartUp handles empty SceneCollection from TestData",
+          "[unit][TestEngine]") {
+  // Arrange
+  steamrot::TestData test_data;
+  test_data.number_of_ticks = 1;
+
+  // Set empty scene collection
+  test_data.starting_engine_snapshot.scene_collection_data =
+      steamrot::SceneCollectionData{};
+
+  // Act
+  steamrot::tests::TestEngine engine(test_data);
+  auto startup_result = engine.StartUp();
+  if (!startup_result.has_value()) {
+    FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+  }
+  auto result = engine.RunGame();
+  REQUIRE(result.has_value());
+
+  // Assert
+  const auto &scene_manager = engine.GetSceneManager();
+  const auto &scenes = scene_manager.GetScenes();
+
+  // Should have no scenes loaded
+  REQUIRE(scenes.empty());
+}
+
+TEST_CASE("TestEngine::StartUp configures all aspects from TestData",
+          "[unit][TestEngine]") {
+  // Arrange
+  steamrot::TestData test_data;
+  test_data.number_of_ticks = 5;
+
+  // Configure EventBus
+  steamrot::EventPacket event(steamrot::EventType::EventType_EVENT_USER_INPUT,
+                              steamrot::EventData{std::monostate{}}, 3);
+  test_data.starting_engine_snapshot.global_event_bus =
+      steamrot::EventBus{event};
+
+  // Configure SceneCollection
+  steamrot::SceneData scene_data;
+  scene_data.scene_info.type = steamrot::SceneType::SceneType_TITLE;
+  scene_data.scene_resources_config.texture_width = 300;
+  scene_data.scene_resources_config.texture_height = 400;
+
+  test_data.starting_engine_snapshot.scene_collection_data.push_back(
+      std::move(scene_data));
+
+  // Act
+  steamrot::tests::TestEngine engine(test_data);
+  auto startup_result = engine.StartUp();
+  if (!startup_result.has_value()) {
+    FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+  }
+
+  // Assert - verify all configuration aspects
+  REQUIRE(engine.GetTargetTicks() == 5);
+
+  const auto &engine_resources = engine.GetEngineResources();
+  const auto &global_event_bus =
+      engine_resources.event_handler.GetGlobalEventBus();
+  REQUIRE(global_event_bus.size() == 1);
+
+  const auto &scene_manager = engine.GetSceneManager();
+  const auto &scenes = scene_manager.GetScenes();
+  REQUIRE(scenes.size() == 1);
 }

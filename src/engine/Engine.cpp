@@ -79,11 +79,6 @@ std::expected<std::monostate, FailInfo> Engine::StartUp() {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> Engine::RunGame() {
 
-  auto start_up_result = StartUp();
-  if (!start_up_result) {
-    return std::unexpected(start_up_result.error());
-  }
-
   RunGameLoop();
 
   return std::monostate{};

@@ -24,12 +24,6 @@ private:
   DisplayManager m_display_manager;
 
   /////////////////////////////////////////////////
-  /// @brief Start up the GameEngine.
-  /// @return Success or failure information
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo> StartUp() override;
-
-  /////////////////////////////////////////////////
   /// @brief For the GameEngine, run the typical SFML game loop
   /////////////////////////////////////////////////
   void RunGameLoop() override;
@@ -61,6 +55,12 @@ public:
   /// GameEngine loads all configuration from default files during StartUp().
   /////////////////////////////////////////////////
   GameEngine();
+
+  /////////////////////////////////////////////////
+  /// @brief Start up the GameEngine.
+  /// @return Success or failure information
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> StartUp() override;
 };
 
 } // namespace steamrot

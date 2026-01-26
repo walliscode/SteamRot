@@ -50,7 +50,7 @@ struct SceneData {
   /// - a copy constructed EntityMemoryPool for storing mutliple instances of
   /// the EntityMemoryPool
   /////////////////////////////////////////////////
-  std::variant<std::unique_ptr<IEntityImporter>,
+  std::variant<std::monostate, std::unique_ptr<IEntityImporter>,
                std::shared_ptr<EntityMemoryPool>, EntityMemoryPool>
       entity_transport;
 };
