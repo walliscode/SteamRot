@@ -115,5 +115,21 @@ public:
   /// @brief Return a constant reference to the data bank for testing purposes.
   /////////////////////////////////////////////////
   const std::map<size_t, EngineSnapshot> &GetDataBank() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Get the SceneManager for testing purposes.
+  ///
+  /// @return Const reference to the SceneManager
+  /////////////////////////////////////////////////
+  const SceneManager &GetSceneManager() const { return m_scene_manager; }
+
+  /////////////////////////////////////////////////
+  /// @brief Get the EngineResources for testing purposes.
+  ///
+  /// @return Const reference to the EngineResources
+  /////////////////////////////////////////////////
+  const EngineResources &GetEngineResources() const {
+    return m_engine_resources;
+  }
 };
 } // namespace steamrot::tests
