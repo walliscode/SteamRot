@@ -3,6 +3,7 @@ add_library(harness
   FlatbuffersTestDataLoader.cpp
   FlatbuffersTestDataProvider.cpp
   harness_runner.cpp
+  SimulationRunner.cpp
 )
 
 target_include_directories(harness

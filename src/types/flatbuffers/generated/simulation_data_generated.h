@@ -22,57 +22,6 @@ struct SimulationDataFbs;
 struct SimulationDataFbsBuilder;
 
 ////////////////////////////////////////////////////////////
-/// @brief Types of individual functions that can be called during simulation
-///
-/// This enum allows test data to specify which specific free functions
-/// to call during simulation execution.
-////////////////////////////////////////////////////////////
-enum FunctionEnumFbs : int8_t {
-  FunctionEnumFbs_None = 0,
-  FunctionEnumFbs_ProcessUIActionsAndEvents = 1,
-  FunctionEnumFbs_ProcessNestedUIActionsAndEvents = 2,
-  FunctionEnumFbs_ProcessButtonElementActions = 3,
-  FunctionEnumFbs_ProcessDropDownListElementActions = 4,
-  FunctionEnumFbs_CheckMouseOverNestedUIElement = 5,
-  FunctionEnumFbs_UpdateCUserInterfaceVisibilityFromCUIState = 6,
-  FunctionEnumFbs_MIN = FunctionEnumFbs_None,
-  FunctionEnumFbs_MAX = FunctionEnumFbs_UpdateCUserInterfaceVisibilityFromCUIState
-};
-
-inline const FunctionEnumFbs (&EnumValuesFunctionEnumFbs())[7] {
-  static const FunctionEnumFbs values[] = {
-    FunctionEnumFbs_None,
-    FunctionEnumFbs_ProcessUIActionsAndEvents,
-    FunctionEnumFbs_ProcessNestedUIActionsAndEvents,
-    FunctionEnumFbs_ProcessButtonElementActions,
-    FunctionEnumFbs_ProcessDropDownListElementActions,
-    FunctionEnumFbs_CheckMouseOverNestedUIElement,
-    FunctionEnumFbs_UpdateCUserInterfaceVisibilityFromCUIState
-  };
-  return values;
-}
-
-inline const char * const *EnumNamesFunctionEnumFbs() {
-  static const char * const names[8] = {
-    "None",
-    "ProcessUIActionsAndEvents",
-    "ProcessNestedUIActionsAndEvents",
-    "ProcessButtonElementActions",
-    "ProcessDropDownListElementActions",
-    "CheckMouseOverNestedUIElement",
-    "UpdateCUserInterfaceVisibilityFromCUIState",
-    nullptr
-  };
-  return names;
-}
-
-inline const char *EnumNameFunctionEnumFbs(FunctionEnumFbs e) {
-  if (::flatbuffers::IsOutRange(e, FunctionEnumFbs_None, FunctionEnumFbs_UpdateCUserInterfaceVisibilityFromCUIState)) return "";
-  const size_t index = static_cast<size_t>(e);
-  return EnumNamesFunctionEnumFbs()[index];
-}
-
-////////////////////////////////////////////////////////////
 /// @brief Logic class types that can be executed
 ///
 /// Matches the Logic class hierarchy in the codebase
@@ -122,17 +71,7 @@ inline const char *EnumNameLogicClassEnumFbs(LogicClassEnumFbs e) {
 ////////////////////////////////////////////////////////////
 /// @brief A single step in a simulation sequence
 ///
-/// Each step specifies what to execute (function or Logic class).
-/// Exactly one of the optional fields should be set to specify
-/// which simulation element to execute.
-///
-/// This approach is more extensible than using unions - adding
-/// a new simulation type just requires adding a new optional field.
-///
-/// Example JSON for a function step:
-/// {
-///   "function_type": "ProcessUIActionsAndEvents"
-/// }
+/// Each step specifies which Logic class to execute.
 ///
 /// Example JSON for a logic class step:
 /// {
@@ -142,20 +81,14 @@ inline const char *EnumNameLogicClassEnumFbs(LogicClassEnumFbs e) {
 struct SimulationStepFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef SimulationStepFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_FUNCTION_TYPE = 4,
-    VT_LOGIC_CLASS_TYPE = 6
+    VT_LOGIC_CLASS_TYPE = 4
   };
-  /// @brief Optional function to execute
-  steamrot::FunctionEnumFbs function_type() const {
-    return static_cast<steamrot::FunctionEnumFbs>(GetField<int8_t>(VT_FUNCTION_TYPE, 0));
-  }
-  /// @brief Optional Logic class to execute
+  /// @brief Logic class to execute
   steamrot::LogicClassEnumFbs logic_class_type() const {
     return static_cast<steamrot::LogicClassEnumFbs>(GetField<int8_t>(VT_LOGIC_CLASS_TYPE, 0));
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int8_t>(verifier, VT_FUNCTION_TYPE, 1) &&
            VerifyField<int8_t>(verifier, VT_LOGIC_CLASS_TYPE, 1) &&
            verifier.EndTable();
   }
@@ -165,9 +98,6 @@ struct SimulationStepFbsBuilder {
   typedef SimulationStepFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_function_type(steamrot::FunctionEnumFbs function_type) {
-    fbb_.AddElement<int8_t>(SimulationStepFbs::VT_FUNCTION_TYPE, static_cast<int8_t>(function_type), 0);
-  }
   void add_logic_class_type(steamrot::LogicClassEnumFbs logic_class_type) {
     fbb_.AddElement<int8_t>(SimulationStepFbs::VT_LOGIC_CLASS_TYPE, static_cast<int8_t>(logic_class_type), 0);
   }
@@ -184,11 +114,9 @@ struct SimulationStepFbsBuilder {
 
 inline ::flatbuffers::Offset<SimulationStepFbs> CreateSimulationStepFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    steamrot::FunctionEnumFbs function_type = steamrot::FunctionEnumFbs_None,
     steamrot::LogicClassEnumFbs logic_class_type = steamrot::LogicClassEnumFbs_None) {
   SimulationStepFbsBuilder builder_(_fbb);
   builder_.add_logic_class_type(logic_class_type);
-  builder_.add_function_type(function_type);
   return builder_.Finish();
 }
 
