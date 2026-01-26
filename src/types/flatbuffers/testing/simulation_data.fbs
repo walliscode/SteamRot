@@ -1,29 +1,6 @@
 namespace steamrot;
 
 ////////////////////////////////////////////////////////////
-/// @brief Types of individual functions that can be called during simulation
-///
-/// This enum allows test data to specify which specific free functions
-/// to call during simulation execution.
-////////////////////////////////////////////////////////////
-enum FunctionEnumFbs: byte {
-  None = 0,
-  
-  // UI Action functions
-  ProcessUIActionsAndEvents,
-  ProcessNestedUIActionsAndEvents,
-  ProcessButtonElementActions,
-  ProcessDropDownListElementActions,
-
-  // logic collision functions
-  CheckMouseOverNestedUIElement,
-
-  // ui functions
-  UpdateCUserInterfaceVisibilityFromCUIState
-}
-
-
-////////////////////////////////////////////////////////////
 /// @brief Logic class types that can be executed
 ///
 /// Matches the Logic class hierarchy in the codebase
@@ -37,20 +14,11 @@ enum LogicClassEnumFbs : byte {
   CraftingRenderLogic = 5,
 }
 
+
 ////////////////////////////////////////////////////////////
 /// @brief A single step in a simulation sequence
 ///
-/// Each step specifies what to execute (function or Logic class).
-/// Exactly one of the optional fields should be set to specify
-/// which simulation element to execute.
-///
-/// This approach is more extensible than using unions - adding
-/// a new simulation type just requires adding a new optional field.
-///
-/// Example JSON for a function step:
-/// {
-///   "function_type": "ProcessUIActionsAndEvents"
-/// }
+/// Each step specifies which Logic class to execute.
 ///
 /// Example JSON for a logic class step:
 /// {
@@ -58,10 +26,7 @@ enum LogicClassEnumFbs : byte {
 /// }
 ////////////////////////////////////////////////////////////
 table SimulationStepFbs {
-  /// @brief Optional function to execute
-  function_type: FunctionEnumFbs = None;
-  
-  /// @brief Optional Logic class to execute
+  /// @brief Logic class to execute
   logic_class_type: LogicClassEnumFbs = None;
 }
 

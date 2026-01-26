@@ -81,20 +81,19 @@ TEST_CASE("FlatbuffersTestDataProvider::ConfigureSimulationData configures "
   // Create flatbuffers builder
   flatbuffers::FlatBufferBuilder builder;
 
-  // Create a vector of function enums to test
-  std::vector<steamrot::FunctionEnumFbs> function_enums = {
-      steamrot::FunctionEnumFbs_ProcessUIActionsAndEvents,
-      steamrot::FunctionEnumFbs_ProcessNestedUIActionsAndEvents,
-      steamrot::FunctionEnumFbs_ProcessButtonElementActions,
-      steamrot::FunctionEnumFbs_ProcessDropDownListElementActions,
-      steamrot::FunctionEnumFbs_CheckMouseOverNestedUIElement,
-      steamrot::FunctionEnumFbs_UpdateCUserInterfaceVisibilityFromCUIState};
+  // Create a vector of logic class enums to test
+  std::vector<steamrot::LogicClassEnumFbs> logic_class_enums = {
+      steamrot::LogicClassEnumFbs_UIActionLogic,
+      steamrot::LogicClassEnumFbs_UICollisionLogic,
+      steamrot::LogicClassEnumFbs_UIRenderLogic,
+      steamrot::LogicClassEnumFbs_UIStateLogic,
+      steamrot::LogicClassEnumFbs_CraftingRenderLogic};
 
-  // For each FunctionEnumFbs, create a SimulationStepFbs directly
+  // For each LogicClassEnumFbs, create a SimulationStepFbs
   std::vector<flatbuffers::Offset<steamrot::SimulationStepFbs>>
       simulation_steps;
-  for (const auto &func_enum : function_enums) {
-    auto sim_step = steamrot::CreateSimulationStepFbs(builder, func_enum);
+  for (const auto &logic_enum : logic_class_enums) {
+    auto sim_step = steamrot::CreateSimulationStepFbs(builder, logic_enum);
     simulation_steps.push_back(sim_step);
   }
 
@@ -115,31 +114,17 @@ TEST_CASE("FlatbuffersTestDataProvider::ConfigureSimulationData configures "
   if (!result)
     FAIL(result.error().message);
 
-  REQUIRE(simulation_data.steps.size() == function_enums.size());
-  REQUIRE(std::holds_alternative<steamrot::FunctionEnum>(
-      simulation_data.steps[0].element));
-  REQUIRE(std::get<steamrot::FunctionEnum>(simulation_data.steps[0].element) ==
-          steamrot::FunctionEnum::ProcessUIActionsAndEvents);
-  REQUIRE(std::holds_alternative<steamrot::FunctionEnum>(
-      simulation_data.steps[1].element));
-  REQUIRE(std::get<steamrot::FunctionEnum>(simulation_data.steps[1].element) ==
-          steamrot::FunctionEnum::ProcessNestedUIActionsAndEvents);
-  REQUIRE(std::holds_alternative<steamrot::FunctionEnum>(
-      simulation_data.steps[2].element));
-  REQUIRE(std::get<steamrot::FunctionEnum>(simulation_data.steps[2].element) ==
-          steamrot::FunctionEnum::ProcessButtonElementActions);
-  REQUIRE(std::holds_alternative<steamrot::FunctionEnum>(
-      simulation_data.steps[3].element));
-  REQUIRE(std::get<steamrot::FunctionEnum>(simulation_data.steps[3].element) ==
-          steamrot::FunctionEnum::ProcessDropDownListElementActions);
-  REQUIRE(std::holds_alternative<steamrot::FunctionEnum>(
-      simulation_data.steps[4].element));
-  REQUIRE(std::get<steamrot::FunctionEnum>(simulation_data.steps[4].element) ==
-          steamrot::FunctionEnum::CheckMouseOverNestedUIElement);
-  REQUIRE(std::holds_alternative<steamrot::FunctionEnum>(
-      simulation_data.steps[5].element));
-  REQUIRE(std::get<steamrot::FunctionEnum>(simulation_data.steps[5].element) ==
-          steamrot::FunctionEnum::UpdateCUserInterfaceVisibilityFromCUIState);
+  REQUIRE(simulation_data.steps.size() == logic_class_enums.size());
+  REQUIRE(simulation_data.steps[0].element ==
+          steamrot::LogicClassEnum::UIActionLogic);
+  REQUIRE(simulation_data.steps[1].element ==
+          steamrot::LogicClassEnum::UICollisionLogic);
+  REQUIRE(simulation_data.steps[2].element ==
+          steamrot::LogicClassEnum::UIRenderLogic);
+  REQUIRE(simulation_data.steps[3].element ==
+          steamrot::LogicClassEnum::UIStateLogic);
+  REQUIRE(simulation_data.steps[4].element ==
+          steamrot::LogicClassEnum::CraftingRenderLogic);
 }
 
 TEST_CASE(
@@ -158,9 +143,9 @@ TEST_CASE(
   auto test_meta_data =
       steamrot::CreateTestMetadataFbs(builder, builder.CreateString("Test1"));
 
-  // Create a simple simulation step directly with function_type
+  // Create a simple simulation step with logic_class_type
   auto sim_step = steamrot::CreateSimulationStepFbs(
-      builder, steamrot::FunctionEnumFbs_ProcessUIActionsAndEvents);
+      builder, steamrot::LogicClassEnumFbs_UIActionLogic);
 
   // Create vector of simulation steps
   std::vector<flatbuffers::Offset<steamrot::SimulationStepFbs>> sim_step_vec;
@@ -189,11 +174,8 @@ TEST_CASE(
   const steamrot::TestData &test_data = result.value();
   REQUIRE(test_data.meta_data.test_name == "Test1");
   REQUIRE(test_data.simulation_data.steps.size() == 1);
-  REQUIRE(std::holds_alternative<steamrot::FunctionEnum>(
-      test_data.simulation_data.steps[0].element));
-  REQUIRE(std::get<steamrot::FunctionEnum>(
-              test_data.simulation_data.steps[0].element) ==
-          steamrot::FunctionEnum::ProcessUIActionsAndEvents);
+  REQUIRE(test_data.simulation_data.steps[0].element ==
+          steamrot::LogicClassEnum::UIActionLogic);
   REQUIRE(test_data.simulation_data.description == "Simple Simulation");
   REQUIRE(test_data.number_of_ticks == 8);
 }
