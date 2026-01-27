@@ -15,6 +15,7 @@ add_library(matchers
   UIElementEqualsMatcher.cpp
   EntityMemoryPoolEqualsMatcher.cpp
   SubscriberEqualsMatcher.cpp
+  SceneInfoEqualsMatcher.cpp
 )
 
 target_include_directories(matchers
