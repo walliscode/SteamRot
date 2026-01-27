@@ -14,5 +14,5 @@ TEST_CASE("SceneInfo has correct default values", "[SceneInfo]") {
 
   // uuid should be nil by default so we don't introduce accidental IDs
   REQUIRE(scene_info.id.is_nil());
-  REQUIRE(scene_info.type == steamrot::SceneType::SceneType_UNKNOWN);
+  REQUIRE(scene_info.type == steamrot::SceneType::UNKNOWN);
 }

@@ -31,21 +31,21 @@ LogicFactory::ProvideLogicCollection(SceneType scene_type) {
 
   // configure the LogicCollection based on the SceneType
   switch (scene_type) {
-  case SceneType::SceneType_TITLE: {
+  case SceneType::TITLE: {
     auto result = ConfigureTitleLogics(logic_collection);
     if (!result) {
       return std::unexpected(result.error());
     }
     break;
   }
-  case SceneType::SceneType_CRAFTING: {
+  case SceneType::CRAFTING: {
     auto result = ConfigureCraftingLogics(logic_collection);
     if (!result) {
       return std::unexpected(result.error());
     }
     break;
   }
-  case SceneType::SceneType_TEST: {
+  case SceneType::TEST: {
     auto result = ConfigureTestLogics(logic_collection);
     if (!result) {
       return std::unexpected(result.error());

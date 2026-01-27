@@ -30,7 +30,7 @@ TEST_CASE("SceneFactory::CreateEmptyScene handles UNKNOWN SceneType",
 
   // Act
   auto result =
-      scene_factory.CreateEmptyScene(steamrot::SceneType::SceneType_UNKNOWN);
+      scene_factory.CreateEmptyScene(steamrot::SceneType::UNKNOWN);
 
   // Assert
   REQUIRE_FALSE(result.has_value());
@@ -59,7 +59,7 @@ TEST_CASE("SceneFactory::CreateEmptyScene creates TitleScene",
   steamrot::SceneFactory scene_factory(test_fixture.GetGameContext());
   // Act
   auto result =
-      scene_factory.CreateEmptyScene(steamrot::SceneType::SceneType_TITLE);
+      scene_factory.CreateEmptyScene(steamrot::SceneType::TITLE);
   // Assert
   REQUIRE(result.has_value());
   REQUIRE(dynamic_cast<steamrot::TitleScene *>(result.value().get()) !=
@@ -73,7 +73,7 @@ TEST_CASE("SceneFactory::CreateEmptyScene creates CraftingScene",
   steamrot::SceneFactory scene_factory(test_fixture.GetGameContext());
   // Act
   auto result =
-      scene_factory.CreateEmptyScene(steamrot::SceneType::SceneType_CRAFTING);
+      scene_factory.CreateEmptyScene(steamrot::SceneType::CRAFTING);
   // Assert
   REQUIRE(result.has_value());
   REQUIRE(dynamic_cast<steamrot::CraftingScene *>(result.value().get()) !=
@@ -95,7 +95,7 @@ TEST_CASE("SceneFactory::CreateSceneFromSceneData creates Scene with valid "
   // Verify the loaded data structure
   REQUIRE(scene_data_fbs->scene_info() != nullptr);
   REQUIRE(scene_data_fbs->scene_info()->scene_type() ==
-          steamrot::SceneType::SceneType_TITLE);
+          steamrot::SceneType::TITLE);
   REQUIRE(scene_data_fbs->scene_resources_config()->texture_width() == 800);
   REQUIRE(scene_data_fbs->scene_resources_config()->texture_height() == 600);
   REQUIRE(scene_data_fbs->entity_collection() != nullptr);
@@ -134,7 +134,7 @@ TEST_CASE("SceneFactory::CreateSceneFromSceneData creates Scene with valid "
   steamrot::SceneFactory scene_factory(fixture.GetGameContext());
 
   // Verify scene_data before passing to factory
-  REQUIRE(scene_data.scene_info.type == steamrot::SceneType::SceneType_TITLE);
+  REQUIRE(scene_data.scene_info.type == steamrot::SceneType::TITLE);
 
   // Act - Create scene from data
   auto result = scene_factory.CreateSceneFromSceneData(scene_data);
@@ -148,7 +148,7 @@ TEST_CASE("SceneFactory::CreateSceneFromSceneData creates Scene with valid "
   REQUIRE(dynamic_cast<steamrot::TitleScene *>(scene.get()) != nullptr);
 
   // Verify scene type matches
-  REQUIRE(scene->GetSceneInfo().type == steamrot::SceneType::SceneType_TITLE);
+  REQUIRE(scene->GetSceneInfo().type == steamrot::SceneType::TITLE);
   REQUIRE(scene->GetSceneInfo().id != uuids::uuid{});
   REQUIRE(steamrot::entity::memory::GetMemoryPoolSize(
               scene->GetSceneContext().scene_entities) == 50);
@@ -261,7 +261,7 @@ TEST_CASE("SceneFactory::ConfigureSceneInfo generates UUID when not present",
   steamrot::SceneFactory scene_factory(fixture.GetGameContext());
 
   auto scene_result =
-      scene_factory.CreateEmptyScene(steamrot::SceneType::SceneType_TITLE);
+      scene_factory.CreateEmptyScene(steamrot::SceneType::TITLE);
   REQUIRE(scene_result.has_value());
   auto &scene = scene_result.value();
 
@@ -285,7 +285,7 @@ TEST_CASE("SceneFactory::ConfigureSceneInfo uses provided UUID",
   steamrot::SceneFactory scene_factory(fixture.GetGameContext());
 
   auto scene_result =
-      scene_factory.CreateEmptyScene(steamrot::SceneType::SceneType_TITLE);
+      scene_factory.CreateEmptyScene(steamrot::SceneType::TITLE);
   REQUIRE(scene_result.has_value());
   auto &scene = scene_result.value();
 
@@ -312,7 +312,7 @@ TEST_CASE("SceneFactory::ConfigureSceneResources sets texture dimensions",
   steamrot::SceneFactory scene_factory(fixture.GetGameContext());
 
   auto scene_result =
-      scene_factory.CreateEmptyScene(steamrot::SceneType::SceneType_TITLE);
+      scene_factory.CreateEmptyScene(steamrot::SceneType::TITLE);
   REQUIRE(scene_result.has_value());
   auto &scene = scene_result.value();
 
@@ -336,7 +336,7 @@ TEST_CASE("SceneFactory::ConfigureSceneResources fails with zero width",
   steamrot::SceneFactory scene_factory(fixture.GetGameContext());
 
   auto scene_result =
-      scene_factory.CreateEmptyScene(steamrot::SceneType::SceneType_TITLE);
+      scene_factory.CreateEmptyScene(steamrot::SceneType::TITLE);
   REQUIRE(scene_result.has_value());
   auto &scene = scene_result.value();
 
@@ -359,7 +359,7 @@ TEST_CASE("SceneFactory::ConfigureSceneResources fails with zero height",
   steamrot::SceneFactory scene_factory(fixture.GetGameContext());
 
   auto scene_result =
-      scene_factory.CreateEmptyScene(steamrot::SceneType::SceneType_TITLE);
+      scene_factory.CreateEmptyScene(steamrot::SceneType::TITLE);
   REQUIRE(scene_result.has_value());
   auto &scene = scene_result.value();
 
@@ -382,7 +382,7 @@ TEST_CASE("SceneFactory::ConfigureSceneConfig succeeds",
   steamrot::SceneFactory scene_factory(fixture.GetGameContext());
 
   auto scene_result =
-      scene_factory.CreateEmptyScene(steamrot::SceneType::SceneType_TITLE);
+      scene_factory.CreateEmptyScene(steamrot::SceneType::TITLE);
   REQUIRE(scene_result.has_value());
   auto &scene = scene_result.value();
 
@@ -403,7 +403,7 @@ TEST_CASE("SceneFactory::ImportEntities imports entities from importer",
   steamrot::SceneFactory scene_factory(fixture.GetGameContext());
 
   auto scene_result =
-      scene_factory.CreateEmptyScene(steamrot::SceneType::SceneType_TITLE);
+      scene_factory.CreateEmptyScene(steamrot::SceneType::TITLE);
   REQUIRE(scene_result.has_value());
   auto &scene = scene_result.value();
 
@@ -436,7 +436,7 @@ TEST_CASE("SceneFactory::ImportEntities fails with null importer",
   steamrot::SceneFactory scene_factory(fixture.GetGameContext());
 
   auto scene_result =
-      scene_factory.CreateEmptyScene(steamrot::SceneType::SceneType_TITLE);
+      scene_factory.CreateEmptyScene(steamrot::SceneType::TITLE);
   REQUIRE(scene_result.has_value());
   auto &scene = scene_result.value();
 
@@ -459,7 +459,7 @@ TEST_CASE("SceneFactory::ImportEntities fails with wrong variant type",
   steamrot::SceneFactory scene_factory(fixture.GetGameContext());
 
   auto scene_result =
-      scene_factory.CreateEmptyScene(steamrot::SceneType::SceneType_TITLE);
+      scene_factory.CreateEmptyScene(steamrot::SceneType::TITLE);
   REQUIRE(scene_result.has_value());
   auto &scene = scene_result.value();
 
@@ -482,12 +482,12 @@ TEST_CASE("SceneFactory::ConfigureLogicMap configures logic for TitleScene",
   steamrot::SceneFactory scene_factory(fixture.GetGameContext());
 
   auto scene_result =
-      scene_factory.CreateEmptyScene(steamrot::SceneType::SceneType_TITLE);
+      scene_factory.CreateEmptyScene(steamrot::SceneType::TITLE);
   REQUIRE(scene_result.has_value());
   auto &scene = scene_result.value();
 
   // assing scene type to SceneInfo
-  scene->GetSceneInfo().type = steamrot::SceneType::SceneType_TITLE;
+  scene->GetSceneInfo().type = steamrot::SceneType::TITLE;
   // Ensure logic map is empty
   REQUIRE(scene->GetSceneResources().logic_map.empty());
 
@@ -532,7 +532,7 @@ TEST_CASE("SceneFactory::ConfigureScene orchestrates all configuration steps",
   steamrot::SceneFactory scene_factory(fixture.GetGameContext());
 
   auto scene_result =
-      scene_factory.CreateEmptyScene(steamrot::SceneType::SceneType_TITLE);
+      scene_factory.CreateEmptyScene(steamrot::SceneType::TITLE);
   REQUIRE(scene_result.has_value());
   auto &scene = scene_result.value();
 
@@ -555,7 +555,7 @@ TEST_CASE("SceneFactory::ConfigureScene orchestrates all configuration steps",
 
   // Verify SceneInfo was configured
   REQUIRE(!scene->GetSceneInfo().id.is_nil());
-  REQUIRE(scene->GetSceneInfo().type == steamrot::SceneType::SceneType_TITLE);
+  REQUIRE(scene->GetSceneInfo().type == steamrot::SceneType::TITLE);
 
   // Verify SceneResources was configured
   REQUIRE(scene->GetSceneResources().scene_texture.getSize().x == 800);

@@ -15,7 +15,7 @@
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
-TestFixture::TestFixture() : TestFixture(SceneType::SceneType_TEST) {}
+TestFixture::TestFixture() : TestFixture(SceneType::TEST) {}
 
 /////////////////////////////////////////////////
 TestFixture::TestFixture(SceneType scene_type) : m_scene_type(scene_type) {

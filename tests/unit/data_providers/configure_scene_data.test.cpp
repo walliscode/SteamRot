@@ -30,8 +30,8 @@ TEST_CASE("ConfigureSceneInfo correctly configures SceneInfo with different "
           "scene types",
           "[unit][configure_scene_data]") {
   // Test multiple scene types to verify correct configuration
-  for (const auto scene_type : {steamrot::SceneType::SceneType_TITLE,
-                                steamrot::SceneType::SceneType_CRAFTING}) {
+  for (const auto scene_type : {steamrot::SceneType::TITLE,
+                                steamrot::SceneType::CRAFTING}) {
 
     flatbuffers::FlatBufferBuilder builder;
     flatbuffers::Offset<steamrot::SceneInfoFbs> scene_info_offset =
@@ -59,7 +59,7 @@ TEST_CASE("ConfigureSceneInfo correctly configures SceneInfo with valid UUID",
       builder.CreateString(valid_uuid);
   flatbuffers::Offset<steamrot::SceneInfoFbs> scene_info_offset =
       steamrot::CreateSceneInfoFbs(builder, scene_id_offset,
-                                   steamrot::SceneType::SceneType_TITLE);
+                                   steamrot::SceneType::TITLE);
   builder.Finish(scene_info_offset);
 
   const steamrot::SceneInfoFbs *scene_info_fbs =
@@ -75,7 +75,7 @@ TEST_CASE("ConfigureSceneInfo correctly configures SceneInfo with valid UUID",
     FAIL(result.error().message);
   }
 
-  REQUIRE(scene_info.type == steamrot::SceneType::SceneType_TITLE);
+  REQUIRE(scene_info.type == steamrot::SceneType::TITLE);
   REQUIRE(!scene_info.id.is_nil());
   REQUIRE(scene_info.id == uuids::uuid::from_string(valid_uuid).value());
 }
@@ -86,7 +86,7 @@ TEST_CASE("ConfigureSceneInfo correctly configures SceneInfo without UUID",
   flatbuffers::FlatBufferBuilder builder;
   flatbuffers::Offset<steamrot::SceneInfoFbs> scene_info_offset =
       steamrot::CreateSceneInfoFbs(builder, 0,
-                                   steamrot::SceneType::SceneType_CRAFTING);
+                                   steamrot::SceneType::CRAFTING);
   builder.Finish(scene_info_offset);
 
   const steamrot::SceneInfoFbs *scene_info_fbs =
@@ -102,7 +102,7 @@ TEST_CASE("ConfigureSceneInfo correctly configures SceneInfo without UUID",
     FAIL(result.error().message);
   }
 
-  REQUIRE(scene_info.type == steamrot::SceneType::SceneType_CRAFTING);
+  REQUIRE(scene_info.type == steamrot::SceneType::CRAFTING);
   // UUID should be nil since it wasn't provided
   REQUIRE(scene_info.id.is_nil());
 }
@@ -116,7 +116,7 @@ TEST_CASE("ConfigureSceneInfo handles invalid UUID string",
       builder.CreateString(invalid_uuid);
   flatbuffers::Offset<steamrot::SceneInfoFbs> scene_info_offset =
       steamrot::CreateSceneInfoFbs(builder, scene_id_offset,
-                                   steamrot::SceneType::SceneType_TITLE);
+                                   steamrot::SceneType::TITLE);
   builder.Finish(scene_info_offset);
 
   const steamrot::SceneInfoFbs *scene_info_fbs =

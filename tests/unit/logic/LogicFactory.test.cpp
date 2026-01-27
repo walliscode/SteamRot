@@ -51,7 +51,7 @@ TEST_CASE(
 
   // call ProvideLogicCollection with SceneType_TITLE
   auto result = logic_factory.ProvideLogicCollection(
-      steamrot::SceneType::SceneType_TITLE);
+      steamrot::SceneType::TITLE);
 
   if (!result.has_value()) {
     FAIL("ProvideLogicCollection returned unexpected: " +
@@ -102,7 +102,7 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
   steamrot::LogicFactory logic_factory(test_context.GetSceneContext());
   // call ProvideLogicCollection with SceneType_CRAFTING
   auto result = logic_factory.ProvideLogicCollection(
-      steamrot::SceneType::SceneType_CRAFTING);
+      steamrot::SceneType::CRAFTING);
   if (!result.has_value()) {
     FAIL("ProvideLogicCollection returned unexpected: " +
          result.error().message);

@@ -107,10 +107,10 @@ TEST_CASE("EventDataEqualsMatcher detects SceneChangePacket differences",
           "[unit][Events][EventData][matcher]") {
 
   steamrot::EventData expected_packet{steamrot::SceneChangePacket{
-      GenerateTestUUID(), steamrot::SceneType::SceneType_TITLE}};
+      GenerateTestUUID(), steamrot::SceneType::TITLE}};
 
   steamrot::EventData actual_packet{steamrot::SceneChangePacket{
-      GenerateTestUUID(), steamrot::SceneType::SceneType_CRAFTING}};
+      GenerateTestUUID(), steamrot::SceneType::CRAFTING}};
 
   auto matcher = steamrot::tests::EventDataEqualsMatcher(expected_packet);
   REQUIRE(!matcher.match(actual_packet));

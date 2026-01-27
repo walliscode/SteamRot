@@ -13,6 +13,7 @@
 /////////////////////////////////////////////////
 #include "Logic.h"
 #include "SceneContext.h"
+#include "SceneType.h"
 #include <memory>
 #include <unordered_map>
 #include <variant>

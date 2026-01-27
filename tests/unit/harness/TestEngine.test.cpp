@@ -186,7 +186,7 @@ TEST_CASE("TestEngine::StartUp loads SceneCollection from TestData",
   // Create a minimal SceneData for testing
   steamrot::SceneData scene_data;
 
-  scene_data.scene_info.type = steamrot::SceneType::SceneType_TITLE;
+  scene_data.scene_info.type = steamrot::SceneType::TITLE;
   scene_data.scene_info.id = uuids::uuid_system_generator{}();
 
   // set SceneResourcesConfig texture dimensions to non zero
@@ -228,12 +228,12 @@ TEST_CASE("TestEngine::StartUp loads multiple scenes from TestData",
 
   // Create multiple SceneData objects
   steamrot::SceneData scene_data1;
-  scene_data1.scene_info.type = steamrot::SceneType::SceneType_TITLE;
+  scene_data1.scene_info.type = steamrot::SceneType::TITLE;
   scene_data1.scene_resources_config.texture_width = 256;
   scene_data1.scene_resources_config.texture_height = 256;
 
   steamrot::SceneData scene_data2;
-  scene_data2.scene_info.type = steamrot::SceneType::SceneType_CRAFTING;
+  scene_data2.scene_info.type = steamrot::SceneType::CRAFTING;
   scene_data2.scene_resources_config.texture_width = 128;
   scene_data2.scene_resources_config.texture_height = 128;
   test_data.starting_engine_snapshot.scene_collection_data.push_back(
@@ -299,7 +299,7 @@ TEST_CASE("TestEngine::StartUp configures all aspects from TestData",
 
   // Configure SceneCollection
   steamrot::SceneData scene_data;
-  scene_data.scene_info.type = steamrot::SceneType::SceneType_TITLE;
+  scene_data.scene_info.type = steamrot::SceneType::TITLE;
   scene_data.scene_resources_config.texture_width = 300;
   scene_data.scene_resources_config.texture_height = 400;
 

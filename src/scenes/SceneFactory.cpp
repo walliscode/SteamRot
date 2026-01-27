@@ -27,7 +27,7 @@ std::expected<std::unique_ptr<Scene>, FailInfo>
 SceneFactory::CreateEmptyScene(const SceneType scene_type) {
 
   // guard statement if scene_type is unknown
-  if (scene_type == SceneType::SceneType_UNKNOWN) {
+  if (scene_type == SceneType::UNKNOWN) {
     return std::unexpected(FailInfo{FailMode::EnumValueNotHandled,
                                     "SceneType is UNKNOWN in SceneFactory"});
   }
@@ -36,12 +36,12 @@ SceneFactory::CreateEmptyScene(const SceneType scene_type) {
 
   switch (scene_type) {
 
-  case SceneType::SceneType_TITLE: {
+  case SceneType::TITLE: {
     auto title_ptr = new TitleScene(m_game_context);
     scene_ptr = std::unique_ptr<TitleScene>(title_ptr);
     return scene_ptr;
   }
-  case SceneType::SceneType_CRAFTING: {
+  case SceneType::CRAFTING: {
     auto crafting_ptr = new CraftingScene(m_game_context);
     scene_ptr = std::unique_ptr<CraftingScene>(crafting_ptr);
     return scene_ptr;

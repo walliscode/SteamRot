@@ -2,7 +2,7 @@
 // This file exists to break circular dependencies between events and scene_data
 namespace steamrot;
 
-enum SceneType: byte {
+enum SceneTypeFbs: byte {
   UNKNOWN = 0,
   TEST = 1,
   TITLE = 2,
@@ -11,5 +11,5 @@ enum SceneType: byte {
 
 table SceneChangePacketData {
   uuid: string;
-  scene_type: SceneType;
+  scene_type: SceneTypeFbs;
 }
