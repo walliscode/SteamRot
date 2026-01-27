@@ -67,7 +67,7 @@ TEST_CASE("SceneManager::AddScenesFromSceneCollectionData clears exisiting "
   const auto &scene_map = scene_manager.GetScenes();
 
   auto scene_add_result =
-      scene_manager.AddSceneFromDefault(steamrot::SceneTypeFbs_TEST);
+      scene_manager.AddSceneFromDefault(steamrot::SceneType::TEST);
   if (!scene_add_result.has_value()) {
     FAIL(scene_add_result.error().message);
   }
@@ -106,7 +106,7 @@ TEST_CASE("SceneManager::AddScenesFromSceneCollectionData loads three scenes "
   REQUIRE(scene_1 != nullptr);
   REQUIRE(scene_1->scene_info() != nullptr);
   REQUIRE(scene_1->scene_info()->scene_type() ==
-          steamrot::SceneType::TITLE);
+          steamrot::SceneTypeFbs_TITLE);
   REQUIRE(scene_1->scene_resources_config() != nullptr);
   REQUIRE(scene_1->scene_resources_config()->texture_width() == 800);
   REQUIRE(scene_1->scene_resources_config()->texture_height() == 600);
@@ -152,7 +152,7 @@ TEST_CASE("SceneManager::AddScenesFromSceneCollectionData loads three scenes "
   REQUIRE(scene_2 != nullptr);
   REQUIRE(scene_2->scene_info() != nullptr);
   REQUIRE(scene_2->scene_info()->scene_type() ==
-          steamrot::SceneType::CRAFTING);
+          steamrot::SceneTypeFbs_CRAFTING);
   REQUIRE(scene_2->scene_resources_config() != nullptr);
   REQUIRE(scene_2->scene_resources_config()->texture_width() == 1024);
   REQUIRE(scene_2->scene_resources_config()->texture_height() == 768);
@@ -196,7 +196,7 @@ TEST_CASE("SceneManager::AddScenesFromSceneCollectionData loads three scenes "
   REQUIRE(scene_3 != nullptr);
   REQUIRE(scene_3->scene_info() != nullptr);
   REQUIRE(scene_3->scene_info()->scene_type() ==
-          steamrot::SceneType::TITLE);
+          steamrot::SceneTypeFbs_TITLE);
   REQUIRE(scene_3->scene_resources_config() != nullptr);
   REQUIRE(scene_3->scene_resources_config()->texture_width() == 1920);
   REQUIRE(scene_3->scene_resources_config()->texture_height() == 1080);
