@@ -17,17 +17,17 @@
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-ConfigureEngineSnapshotWithUUIDs(EngineSnapshot &snapshot,
-                                 const EngineSnapshotFbs *fb_snapshot,
-                                 EventHandler &event_handler,
+std::expected<std::monostate, steamrot::FailInfo>
+ConfigureEngineSnapshotWithUUIDs(steamrot::EngineSnapshot &snapshot,
+                                 const steamrot::EngineSnapshotFbs *fb_snapshot,
+                                 steamrot::EventHandler &event_handler,
                                  UUIDAssignmentTracker &uuid_tracker,
                                  bool is_starting_snapshot) {
 
   // Validate input
   if (!fb_snapshot) {
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound, "EngineSnapshotFbs is null"});
+    return std::unexpected(steamrot::FailInfo{
+        steamrot::FailMode::FlatbuffersDataNotFound, "EngineSnapshotFbs is null"});
   }
 
   // Configure tick_number (optional field)
@@ -37,8 +37,8 @@ ConfigureEngineSnapshotWithUUIDs(EngineSnapshot &snapshot,
 
   // Configure global_event_bus (optional field)
   if (fb_snapshot->global_event_bus()) {
-    auto event_bus_result =
-        event::ConvertEventBusDataToEventBus(fb_snapshot->global_event_bus());
+    auto event_bus_result = steamrot::event::ConvertEventBusDataToEventBus(
+        fb_snapshot->global_event_bus());
     if (!event_bus_result.has_value()) {
       return std::unexpected(event_bus_result.error());
     }
@@ -47,10 +47,11 @@ ConfigureEngineSnapshotWithUUIDs(EngineSnapshot &snapshot,
 
   // Configure scene_manager_data (optional field)
   if (fb_snapshot->scene_manager_data()) {
-    SceneManagerData scene_manager_data;
-    auto configure_state_result = data::configure::ConfigureSceneManagerState(
-        scene_manager_data.scene_manager_state,
-        fb_snapshot->scene_manager_data()->state());
+    steamrot::SceneManagerData scene_manager_data;
+    auto configure_state_result =
+        steamrot::data::configure::ConfigureSceneManagerState(
+            scene_manager_data.scene_manager_state,
+            fb_snapshot->scene_manager_data()->state());
     if (!configure_state_result.has_value()) {
       return std::unexpected(configure_state_result.error());
     }
@@ -71,24 +72,26 @@ ConfigureEngineSnapshotWithUUIDs(EngineSnapshot &snapshot,
       }
 
       // Create a FlatbuffersSceneDataProvider for this scene
-      FlatbuffersSceneDataProvider scene_provider(event_handler, scene_data_fbs);
+      steamrot::FlatbuffersSceneDataProvider scene_provider(event_handler,
+                                                            scene_data_fbs);
 
       // Create and configure the SceneData
-      SceneData scene_data;
+      steamrot::SceneData scene_data;
       auto configure_result = scene_provider.ConfigureSceneData(scene_data);
       if (!configure_result.has_value()) {
         return std::unexpected(configure_result.error());
       }
 
       // Get the scene type from configured SceneData
-      SceneType scene_type = scene_data.scene_info.type;
+      steamrot::SceneType scene_type = scene_data.scene_info.type;
 
       // Handle UUID assignment based on snapshot type
       if (is_starting_snapshot) {
         // For starting snapshot: process and possibly assign UUID
         std::optional<uuids::uuid> existing_uuid;
-        
-        // Check if scene already has a UUID (it would be set by ConfigureSceneData)
+
+        // Check if scene already has a UUID (it would be set by
+        // ConfigureSceneData)
         if (scene_data.scene_info.id != uuids::uuid{}) {
           existing_uuid = scene_data.scene_info.id;
         }
@@ -96,24 +99,24 @@ ConfigureEngineSnapshotWithUUIDs(EngineSnapshot &snapshot,
         // Process through tracker to ensure consistency
         uuids::uuid assigned_uuid =
             uuid_tracker.ProcessStartingSceneUUID(scene_type, existing_uuid);
-        
+
         // Assign the UUID to the scene
         scene_data.scene_info.id = assigned_uuid;
-        
+
       } else {
         // For expected snapshots: use UUID from starting snapshot
         // If scene in expected snapshot has a UUID, validate it matches
         uuids::uuid expected_uuid = uuid_tracker.GetOrAssignUUID(scene_type);
-        
+
         // If the scene data has a UUID and it doesn't match, that's an error
         if (scene_data.scene_info.id != uuids::uuid{} &&
             scene_data.scene_info.id != expected_uuid) {
-          return std::unexpected(
-              FailInfo{FailMode::InvalidUUID,
-                       "Expected snapshot scene UUID doesn't match starting "
-                       "snapshot UUID for same SceneType"});
+          return std::unexpected(steamrot::FailInfo{
+              steamrot::FailMode::InvalidUUID,
+              "Expected snapshot scene UUID doesn't match starting "
+              "snapshot UUID for same SceneType"});
         }
-        
+
         // Assign the UUID from starting snapshot
         scene_data.scene_info.id = expected_uuid;
       }

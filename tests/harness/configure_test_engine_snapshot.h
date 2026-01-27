@@ -34,10 +34,10 @@ namespace steamrot::tests {
 ///        false for expected snapshots
 /// @return std::monostate on success, FailInfo on error
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-ConfigureEngineSnapshotWithUUIDs(EngineSnapshot &snapshot,
-                                 const EngineSnapshotFbs *fb_snapshot,
-                                 EventHandler &event_handler,
+std::expected<std::monostate, steamrot::FailInfo>
+ConfigureEngineSnapshotWithUUIDs(steamrot::EngineSnapshot &snapshot,
+                                 const steamrot::EngineSnapshotFbs *fb_snapshot,
+                                 steamrot::EventHandler &event_handler,
                                  UUIDAssignmentTracker &uuid_tracker,
                                  bool is_starting_snapshot);
 
