@@ -21,7 +21,7 @@ TEST_CASE("FlatbuffersEntityImporter constructor",
   // Load test scene data
   steamrot::FlatbuffersDataLoader loader;
   auto scene_data_result =
-      loader.ProvideDefaultSceneData(steamrot::SceneType::SceneType_TEST);
+      loader.ProvideDefaultSceneData(steamrot::SceneType::TEST);
   REQUIRE(scene_data_result.has_value());
 
   const auto *entity_collection =
@@ -44,7 +44,7 @@ TEST_CASE("FlatbuffersEntityImporter imports entities",
   // Load test scene data
   steamrot::FlatbuffersDataLoader loader;
   auto scene_data_result =
-      loader.ProvideDefaultSceneData(steamrot::SceneType::SceneType_TEST);
+      loader.ProvideDefaultSceneData(steamrot::SceneType::TEST);
   REQUIRE(scene_data_result.has_value());
 
   const auto *entity_collection =

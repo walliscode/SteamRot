@@ -13,7 +13,7 @@
 /////////////////////////////////////////////////
 #include "FailInfo.h"
 #include "SceneData.h"
-#include "scene_types_generated.h"
+#include "SceneType.h"
 #include <expected>
 
 namespace steamrot {

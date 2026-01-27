@@ -16,7 +16,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "scene_types_generated.h"
+#include "SceneType.h"
 #include "uuid.h"
 
 namespace steamrot {
@@ -40,7 +40,7 @@ struct SceneInfo {
   /////////////////////////////////////////////////
   /// @brief Scene type identifier
   /////////////////////////////////////////////////
-  SceneType type;
+  SceneType type{SceneType::UNKNOWN};
 };
 
 } // namespace steamrot

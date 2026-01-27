@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include "SceneType.h"
+#include "UserInputBitset.h"
+#include "events_generated.h"
 #include "EventType.h"
 #include "UserInputBitset.h"
 #include "scene_types_generated.h"

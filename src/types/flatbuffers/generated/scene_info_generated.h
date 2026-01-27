@@ -29,8 +29,8 @@ struct SceneInfoFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ::flatbuffers::String *scene_id() const {
     return GetPointer<const ::flatbuffers::String *>(VT_SCENE_ID);
   }
-  steamrot::SceneType scene_type() const {
-    return static_cast<steamrot::SceneType>(GetField<int8_t>(VT_SCENE_TYPE, 0));
+  steamrot::SceneTypeFbs scene_type() const {
+    return static_cast<steamrot::SceneTypeFbs>(GetField<int8_t>(VT_SCENE_TYPE, 0));
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -48,7 +48,7 @@ struct SceneInfoFbsBuilder {
   void add_scene_id(::flatbuffers::Offset<::flatbuffers::String> scene_id) {
     fbb_.AddOffset(SceneInfoFbs::VT_SCENE_ID, scene_id);
   }
-  void add_scene_type(steamrot::SceneType scene_type) {
+  void add_scene_type(steamrot::SceneTypeFbs scene_type) {
     fbb_.AddElement<int8_t>(SceneInfoFbs::VT_SCENE_TYPE, static_cast<int8_t>(scene_type), 0);
   }
   explicit SceneInfoFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
@@ -65,7 +65,7 @@ struct SceneInfoFbsBuilder {
 inline ::flatbuffers::Offset<SceneInfoFbs> CreateSceneInfoFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::String> scene_id = 0,
-    steamrot::SceneType scene_type = steamrot::SceneType_UNKNOWN) {
+    steamrot::SceneTypeFbs scene_type = steamrot::SceneTypeFbs_UNKNOWN) {
   SceneInfoFbsBuilder builder_(_fbb);
   builder_.add_scene_id(scene_id);
   builder_.add_scene_type(scene_type);
@@ -75,7 +75,7 @@ inline ::flatbuffers::Offset<SceneInfoFbs> CreateSceneInfoFbs(
 inline ::flatbuffers::Offset<SceneInfoFbs> CreateSceneInfoFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const char *scene_id = nullptr,
-    steamrot::SceneType scene_type = steamrot::SceneType_UNKNOWN) {
+    steamrot::SceneTypeFbs scene_type = steamrot::SceneTypeFbs_UNKNOWN) {
   auto scene_id__ = scene_id ? _fbb.CreateString(scene_id) : 0;
   return steamrot::CreateSceneInfoFbs(
       _fbb,

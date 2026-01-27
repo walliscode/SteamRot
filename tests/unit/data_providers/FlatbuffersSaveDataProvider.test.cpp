@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersSaveDataProvider.h"
-#include "uuid.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("FlatbuffersSaveDataProvider is constructed correctly",
@@ -47,4 +46,3 @@ TEST_CASE("FlatbuffersSaveDataProvider::ConfigureSaveData returns error when "
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::FileNotFound);
 }
-

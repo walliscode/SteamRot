@@ -14,7 +14,6 @@
 #include "EventHandler.h"
 #include "ISceneDataProvider.h"
 #include "scene_data_generated.h"
-#include "scene_types_generated.h"
 #include <expected>
 
 namespace steamrot {

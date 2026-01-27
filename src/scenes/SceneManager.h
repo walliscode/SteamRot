@@ -17,6 +17,7 @@
 #include "SceneManagerConfig.h"
 #include "SceneManagerResources.h"
 #include "SceneManagerState.h"
+#include "SceneType.h"
 #include "uuid.h"
 #include <SFML/Graphics.hpp>
 #include <expected>

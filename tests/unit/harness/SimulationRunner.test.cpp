@@ -199,7 +199,7 @@ TEST_CASE("SimulationRunner::ExecuteSimulation executes UIStateLogic",
 TEST_CASE("SimulationRunner::ExecuteSimulation executes CraftingRenderLogic",
           "[unit][SimulationRunner]") {
   // Arrange
-  steamrot::tests::TestFixture fixture(steamrot::SceneType::SceneType_CRAFTING);
+  steamrot::tests::TestFixture fixture(steamrot::SceneType::CRAFTING);
   fixture.Initialize();
   steamrot::SceneContext &scene_context = fixture.GetSceneContext();
 
@@ -249,7 +249,7 @@ TEST_CASE("SimulationRunner::ExecuteSimulation executes all logic types in "
           "sequence",
           "[unit][SimulationRunner]") {
   // Arrange
-  steamrot::tests::TestFixture fixture(steamrot::SceneType::SceneType_CRAFTING);
+  steamrot::tests::TestFixture fixture(steamrot::SceneType::CRAFTING);
   fixture.Initialize();
   steamrot::SceneContext &scene_context = fixture.GetSceneContext();
 
