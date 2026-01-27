@@ -11,26 +11,26 @@
 
 TEST_CASE("JointEqualsMatcher works correctly", "[unit][Joint][matcher]") {
   steamrot::Joint expected;
-  expected.m_joint_name = "test_joint";
-  expected.m_number_of_connections = 2;
+  expected.name = "test_joint";
+  expected.connection_number = 2;
 
   steamrot::Joint actual;
 
   SECTION("Matcher detects differences in m_joint_name") {
-    actual.m_joint_name = "different_joint";
-    actual.m_number_of_connections = 2;
+    actual.name = "different_joint";
+    actual.connection_number = 2;
     REQUIRE_THAT(actual, !steamrot::tests::EqualsJoint(expected));
   }
 
   SECTION("Matcher detects differences in m_number_of_connections") {
-    actual.m_joint_name = "test_joint";
-    actual.m_number_of_connections = 3;
+    actual.name = "test_joint";
+    actual.connection_number = 3;
     REQUIRE_THAT(actual, !steamrot::tests::EqualsJoint(expected));
   }
 
   SECTION("Matcher detects equality") {
-    actual.m_joint_name = "test_joint";
-    actual.m_number_of_connections = 2;
+    actual.name = "test_joint";
+    actual.connection_number = 2;
     REQUIRE_THAT(actual, steamrot::tests::EqualsJoint(expected));
   }
 }
@@ -38,9 +38,9 @@ TEST_CASE("JointEqualsMatcher works correctly", "[unit][Joint][matcher]") {
 TEST_CASE("JointEqualsMatcher describe is as expected on success",
           "[unit][Joint][matcher]") {
   steamrot::Joint expected;
-  expected.m_joint_name = "test_joint";
+  expected.name = "test_joint";
   steamrot::Joint actual;
-  actual.m_joint_name = "test_joint";
+  actual.name = "test_joint";
   auto matcher = steamrot::tests::EqualsJoint(expected);
 
   REQUIRE(matcher.describe() == "equals Joint(m_joint_name='test_joint')");
@@ -49,12 +49,12 @@ TEST_CASE("JointEqualsMatcher describe is as expected on success",
 TEST_CASE("JointEqualsMatcher describe is as expected on failure",
           "[unit][Joint][matcher]") {
   steamrot::Joint expected;
-  expected.m_joint_name = "expected_joint";
-  expected.m_number_of_connections = 2;
-  
+  expected.name = "expected_joint";
+  expected.connection_number = 2;
+
   steamrot::Joint actual;
-  actual.m_joint_name = "actual_joint";
-  actual.m_number_of_connections = 3;
+  actual.name = "actual_joint";
+  actual.connection_number = 3;
 
   auto matcher = steamrot::tests::EqualsJoint(expected);
   matcher.match(actual);

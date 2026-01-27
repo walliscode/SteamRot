@@ -20,18 +20,18 @@ bool FragmentEqualsMatcher::match(const Fragment &actual) const {
   m_mismatch_description.clear();
   std::ostringstream oss;
 
-  if (actual.m_name != m_expected.m_name) {
-    oss << "m_name: actual='" << actual.m_name << "', expected='"
-        << m_expected.m_name << "'; ";
+  if (actual.name != m_expected.name) {
+    oss << "m_name: actual='" << actual.name << "', expected='"
+        << m_expected.name << "'; ";
   }
 
-  if (actual.m_sockets != m_expected.m_sockets) {
+  if (actual.sockets != m_expected.sockets) {
     oss << "m_sockets differs; ";
   }
 
   // Compare transforms (matrix elements)
-  const auto *this_matrix = actual.m_transform.getMatrix();
-  const auto *other_matrix = m_expected.m_transform.getMatrix();
+  const auto *this_matrix = actual.transform.getMatrix();
+  const auto *other_matrix = m_expected.transform.getMatrix();
   bool transform_matches = true;
   for (size_t i = 0; i < 16; ++i) {
     if (this_matrix[i] != other_matrix[i]) {
@@ -43,7 +43,7 @@ bool FragmentEqualsMatcher::match(const Fragment &actual) const {
     oss << "m_transform differs; ";
   }
 
-  if (actual.m_overlays.size() != m_expected.m_overlays.size()) {
+  if (actual.render_overlays.size() != m_expected.render_overlays.size()) {
     oss << "m_overlays size differs; ";
   }
 
@@ -55,7 +55,7 @@ bool FragmentEqualsMatcher::match(const Fragment &actual) const {
 std::string FragmentEqualsMatcher::describe() const {
   if (m_mismatch_description.empty()) {
     std::ostringstream oss;
-    oss << "equals Fragment(m_name='" << m_expected.m_name << "')";
+    oss << "equals Fragment(m_name='" << m_expected.name << "')";
     return oss.str();
   }
   return "Fragment mismatch: " + m_mismatch_description;

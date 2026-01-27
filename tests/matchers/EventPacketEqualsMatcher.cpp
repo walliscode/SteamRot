@@ -163,22 +163,22 @@ bool EventPacketEqualsMatcher::match(const EventPacket &actual) const {
   std::ostringstream oss;
 
   // Compare m_event_type
-  if (actual.m_event_type != m_expected.m_event_type) {
+  if (actual.event_type != m_expected.event_type) {
     oss << conmat::TestFailed() << "m_event_type:" << "\n";
     oss << "\t"
         << "actual = "
-        << conmat::Colorize(EnumNameEventType(actual.m_event_type),
+        << conmat::Colorize(EnumNameEventType(actual.event_type),
                             conmat::Color::Red)
         << "\n";
     oss << "\t"
         << "expected = "
-        << conmat::Colorize(EnumNameEventType(m_expected.m_event_type),
+        << conmat::Colorize(EnumNameEventType(m_expected.event_type),
                             conmat::Color::Blue)
         << "\n";
   }
 
   // Compare m_event_data
-  CompareEventData(actual.m_event_data, m_expected.m_event_data, oss);
+  CompareEventData(actual.event_data, m_expected.event_data, oss);
 
   // Compare event_id
   if (actual.event_id != m_expected.event_id) {

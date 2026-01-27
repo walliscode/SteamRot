@@ -6,7 +6,7 @@ add_subdirectory(context)
 add_subdirectory(data)
 
 # Test matchers - custom Catch2 matchers
-# add_subdirectory(matchers)
+add_subdirectory(matchers)
 
 # Test harness - utilities for data-driven testing
 add_subdirectory(harness)
