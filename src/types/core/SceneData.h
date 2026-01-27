@@ -19,11 +19,14 @@
 #include <memory>
 
 namespace steamrot {
+
+using EntityTransportVariant =
+    std::variant<std::monostate, std::unique_ptr<IEntityImporter>,
+                 std::shared_ptr<EntityMemoryPool>, EntityMemoryPool>;
 /////////////////////////////////////////////////
 /// @class SceneData
 /// @brief Contains all data needed to configure a Scene and provide resources
 /// for it.
-
 /////////////////////////////////////////////////
 struct SceneData {
 

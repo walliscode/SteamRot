@@ -1,12 +1,14 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Implementation of Catch2 matcher for EntityTransportVariant comparison
+/// @brief Implementation of Catch2 matcher for EntityTransportVariant
+/// comparison
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
 #include "EntityTransportEqualsMatcher.h"
+#include "EntityMemoryPoolEqualsMatcher.h"
 #include "conmat.h"
 #include <format>
 
@@ -30,11 +32,10 @@ bool EntityTransportEqualsMatcher::match(
 
   // 1. Check variant indices match
   if (actual.index() != m_expected.index()) {
-    oss << conmat::Indent(1) << conmat::TestFailed()
-        << "Variant type mismatch" << "\n";
+    oss << conmat::Indent(1) << conmat::TestFailed() << "Variant type mismatch"
+        << "\n";
     oss << conmat::Indent(2) << "actual index: "
-        << conmat::Colorize(std::to_string(actual.index()),
-                            conmat::Color::Red)
+        << conmat::Colorize(std::to_string(actual.index()), conmat::Color::Red)
         << "\n";
     oss << conmat::Indent(2) << "expected index: "
         << conmat::Colorize(std::to_string(m_expected.index()),
@@ -70,8 +71,7 @@ bool EntityTransportEqualsMatcher::match(
   // 4. Handle shared_ptr<EntityMemoryPool>
   if (std::holds_alternative<std::shared_ptr<EntityMemoryPool>>(actual)) {
     auto actual_ptr = std::get<std::shared_ptr<EntityMemoryPool>>(actual);
-    auto expected_ptr =
-        std::get<std::shared_ptr<EntityMemoryPool>>(m_expected);
+    auto expected_ptr = std::get<std::shared_ptr<EntityMemoryPool>>(m_expected);
 
     // Check for null pointers
     if (!actual_ptr && !expected_ptr) {
@@ -82,8 +82,7 @@ bool EntityTransportEqualsMatcher::match(
       oss << conmat::Indent(1) << conmat::TestFailed()
           << "Null pointer in shared_ptr<EntityMemoryPool>" << "\n";
       oss << conmat::Indent(2) << "actual is null: "
-          << conmat::Colorize(actual_ptr ? "false" : "true",
-                              conmat::Color::Red)
+          << conmat::Colorize(actual_ptr ? "false" : "true", conmat::Color::Red)
           << "\n";
       oss << conmat::Indent(2) << "expected is null: "
           << conmat::Colorize(expected_ptr ? "false" : "true",
@@ -142,8 +141,7 @@ std::string EntityTransportEqualsMatcher::describe() const {
     return oss.str();
   } else {
     std::ostringstream oss;
-    oss << conmat::Header(conmat::TestFailed() + "EntityTransport Mismatch:",
-                          3)
+    oss << conmat::Header(conmat::TestFailed() + "EntityTransport Mismatch:", 3)
         << "\n";
 
     // Add context information if available

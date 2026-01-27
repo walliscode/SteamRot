@@ -11,26 +11,13 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "EntityMemoryPoolEqualsMatcher.h"
-#include "IEntityImporter.h"
 #include "SceneData.h"
-#include "containers.h"
 #include "test_context.h"
 #include <catch2/matchers/catch_matchers.hpp>
-#include <memory>
 #include <optional>
-#include <sstream>
 #include <string>
-#include <variant>
 
 namespace steamrot::tests {
-
-/////////////////////////////////////////////////
-/// @brief Type alias for EntityTransportVariant
-/////////////////////////////////////////////////
-using EntityTransportVariant =
-    std::variant<std::monostate, std::unique_ptr<IEntityImporter>,
-                 std::shared_ptr<EntityMemoryPool>, EntityMemoryPool>;
 
 /////////////////////////////////////////////////
 /// @class EntityTransportEqualsMatcher
