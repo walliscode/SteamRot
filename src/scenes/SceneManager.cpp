@@ -221,7 +221,7 @@ std::expected<std::monostate, FailInfo> SceneManager::ProcessSubscriptions() {
     if (subscriber->m_active) {
 
       switch (subscriber->m_trigger_event_type) {
-      case EventType::EventType_EVENT_CHANGE_SCENE: {
+      case EventType::CHANGE_SCENE: {
 
         // make sure the data type is correct - use received event data
         if (!subscriber->m_received_event_data.has_value() ||

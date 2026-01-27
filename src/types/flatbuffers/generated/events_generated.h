@@ -21,40 +21,40 @@ namespace steamrot {
 struct UserInterfaceNameData;
 struct UserInterfaceNameDataBuilder;
 
-enum EventType : uint64_t {
-  EventType_EVENT_NONE = 1ULL,
-  EventType_EVENT_TEST = 2ULL,
-  EventType_EVENT_USER_INPUT = 4ULL,
-  EventType_EVENT_TOGGLE_UI = 8ULL,
-  EventType_EVENT_CHANGE_SCENE = 16ULL,
-  EventType_EVENT_QUIT_GAME = 32ULL,
-  EventType_EVENT_TOGGLE_DROPDOWN = 64ULL,
-  EventType_NONE = 0,
-  EventType_ANY = 127ULL
+enum EventTypeFbs : uint64_t {
+  EventTypeFbs_EVENT_NONE = 1ULL,
+  EventTypeFbs_EVENT_TEST = 2ULL,
+  EventTypeFbs_EVENT_USER_INPUT = 4ULL,
+  EventTypeFbs_EVENT_TOGGLE_UI = 8ULL,
+  EventTypeFbs_EVENT_CHANGE_SCENE = 16ULL,
+  EventTypeFbs_EVENT_QUIT_GAME = 32ULL,
+  EventTypeFbs_EVENT_TOGGLE_DROPDOWN = 64ULL,
+  EventTypeFbs_NONE = 0,
+  EventTypeFbs_ANY = 127ULL
 };
 
-inline const EventType (&EnumValuesEventType())[7] {
-  static const EventType values[] = {
-    EventType_EVENT_NONE,
-    EventType_EVENT_TEST,
-    EventType_EVENT_USER_INPUT,
-    EventType_EVENT_TOGGLE_UI,
-    EventType_EVENT_CHANGE_SCENE,
-    EventType_EVENT_QUIT_GAME,
-    EventType_EVENT_TOGGLE_DROPDOWN
+inline const EventTypeFbs (&EnumValuesEventTypeFbs())[7] {
+  static const EventTypeFbs values[] = {
+    EventTypeFbs_EVENT_NONE,
+    EventTypeFbs_EVENT_TEST,
+    EventTypeFbs_EVENT_USER_INPUT,
+    EventTypeFbs_EVENT_TOGGLE_UI,
+    EventTypeFbs_EVENT_CHANGE_SCENE,
+    EventTypeFbs_EVENT_QUIT_GAME,
+    EventTypeFbs_EVENT_TOGGLE_DROPDOWN
   };
   return values;
 }
 
-inline const char *EnumNameEventType(EventType e) {
+inline const char *EnumNameEventTypeFbs(EventTypeFbs e) {
   switch (e) {
-    case EventType_EVENT_NONE: return "EVENT_NONE";
-    case EventType_EVENT_TEST: return "EVENT_TEST";
-    case EventType_EVENT_USER_INPUT: return "EVENT_USER_INPUT";
-    case EventType_EVENT_TOGGLE_UI: return "EVENT_TOGGLE_UI";
-    case EventType_EVENT_CHANGE_SCENE: return "EVENT_CHANGE_SCENE";
-    case EventType_EVENT_QUIT_GAME: return "EVENT_QUIT_GAME";
-    case EventType_EVENT_TOGGLE_DROPDOWN: return "EVENT_TOGGLE_DROPDOWN";
+    case EventTypeFbs_EVENT_NONE: return "EVENT_NONE";
+    case EventTypeFbs_EVENT_TEST: return "EVENT_TEST";
+    case EventTypeFbs_EVENT_USER_INPUT: return "EVENT_USER_INPUT";
+    case EventTypeFbs_EVENT_TOGGLE_UI: return "EVENT_TOGGLE_UI";
+    case EventTypeFbs_EVENT_CHANGE_SCENE: return "EVENT_CHANGE_SCENE";
+    case EventTypeFbs_EVENT_QUIT_GAME: return "EVENT_QUIT_GAME";
+    case EventTypeFbs_EVENT_TOGGLE_DROPDOWN: return "EVENT_TOGGLE_DROPDOWN";
     default: return "";
   }
 }

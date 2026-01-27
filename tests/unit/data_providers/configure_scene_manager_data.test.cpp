@@ -47,7 +47,7 @@ TEST_CASE("ConfigureSceneManagerState populates from valid data",
   REQUIRE(state.subscriptions.size() == 1);
   REQUIRE(state.subscriptions[0] != nullptr);
   REQUIRE(state.subscriptions[0]->m_trigger_event_type ==
-          steamrot::EventType::EventType_EVENT_CHANGE_SCENE);
+          steamrot::EventType::CHANGE_SCENE);
 }
 
 TEST_CASE("ConfigureSceneManagerState handles empty subscriptions",
@@ -80,11 +80,11 @@ TEST_CASE("ConfigureSceneManagerState handles multiple subscriptions",
   std::vector<flatbuffers::Offset<steamrot::SubscriberFbs>> subscribers;
   
   auto subscriber1 = steamrot::CreateSubscriberFbs(
-      builder, steamrot::EventType::EventType_EVENT_CHANGE_SCENE,
+      builder, steamrot::EventTypeFbs_EVENT_CHANGE_SCENE,
       steamrot::EventDataData::EventDataData_NONE, 0, true);
   
   auto subscriber2 = steamrot::CreateSubscriberFbs(
-      builder, steamrot::EventType::EventType_EVENT_QUIT_GAME,
+      builder, steamrot::EventTypeFbs_EVENT_QUIT_GAME,
       steamrot::EventDataData::EventDataData_NONE, 0, false);
 
   subscribers.push_back(subscriber1);
@@ -105,9 +105,9 @@ TEST_CASE("ConfigureSceneManagerState handles multiple subscriptions",
   REQUIRE(result.has_value());
   REQUIRE(state.subscriptions.size() == 2);
   REQUIRE(state.subscriptions[0]->m_trigger_event_type ==
-          steamrot::EventType::EventType_EVENT_CHANGE_SCENE);
+          steamrot::EventType::CHANGE_SCENE);
   REQUIRE(state.subscriptions[0]->m_active == true);
   REQUIRE(state.subscriptions[1]->m_trigger_event_type ==
-          steamrot::EventType::EventType_EVENT_QUIT_GAME);
+          steamrot::EventType::QUIT_GAME);
   REQUIRE(state.subscriptions[1]->m_active == false);
 }

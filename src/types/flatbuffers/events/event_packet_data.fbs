@@ -6,6 +6,6 @@ namespace steamrot;
 table EventPacketData{
 
   event_lifetime: int;
-  event_type: EventType;
+  event_type: EventTypeFbs;
   event_data_data: EventDataData;
   }

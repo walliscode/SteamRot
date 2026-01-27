@@ -7,12 +7,10 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "configure_engine_data.h"
-#include "AssetConfig.h"
 #include "EngineConfig.h"
 #include "EngineResourcesConfig.h"
 #include "EngineState.h"
 #include "FlatbuffersDataLoader.h"
-#include "events_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
 /////////////////////////////////////////////////
@@ -23,12 +21,11 @@ TEST_CASE("ConfigureEngineResourcesConfig fails with null data",
           "[unit][configure_engine_data]") {
   steamrot::EngineResourcesConfig config;
 
-  auto result =
-      steamrot::data::configure::ConfigureEngineResourcesConfig(config, nullptr);
+  auto result = steamrot::data::configure::ConfigureEngineResourcesConfig(
+      config, nullptr);
 
   REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().mode ==
-          steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
 }
 
 TEST_CASE("ConfigureEngineResourcesConfig populates from valid data",
@@ -61,11 +58,11 @@ TEST_CASE("ConfigureEngineConfig fails with null data",
           "[unit][configure_engine_data]") {
   steamrot::EngineConfig config;
 
-  auto result = steamrot::data::configure::ConfigureEngineConfig(config, nullptr);
+  auto result =
+      steamrot::data::configure::ConfigureEngineConfig(config, nullptr);
 
   REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().mode ==
-          steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
 }
 
 TEST_CASE("ConfigureEngineConfig populates from valid data",
@@ -80,8 +77,8 @@ TEST_CASE("ConfigureEngineConfig populates from valid data",
   REQUIRE(engine_config_data != nullptr);
 
   steamrot::EngineConfig config;
-  auto result =
-      steamrot::data::configure::ConfigureEngineConfig(config, engine_config_data);
+  auto result = steamrot::data::configure::ConfigureEngineConfig(
+      config, engine_config_data);
 
   REQUIRE(result.has_value());
   REQUIRE(config.display.window_title == "SteamRot");
@@ -104,8 +101,7 @@ TEST_CASE("ConfigureEngineState fails with null data",
   auto result = steamrot::data::configure::ConfigureEngineState(state, nullptr);
 
   REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().mode ==
-          steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
 }
 
 TEST_CASE("ConfigureEngineState populates from valid data",
@@ -129,5 +125,5 @@ TEST_CASE("ConfigureEngineState populates from valid data",
   REQUIRE(state.quit_requested == false);
   REQUIRE(state.subscriptions.size() == 1);
   REQUIRE(state.subscriptions[0]->m_trigger_event_type ==
-          steamrot::EventType_EVENT_QUIT_GAME);
+          steamrot::EventType::QUIT_GAME);
 }

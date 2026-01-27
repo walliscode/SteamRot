@@ -9,6 +9,7 @@
 #include "subscriber_factory.h"
 #include "Subscriber.h"
 #include "event_factory.h"
+#include "event_type_conversion.h"
 #include "subscriber_generated.h"
 #include <expected>
 
@@ -25,14 +26,21 @@ CreateSubscriber(const SubscriberFbs *subscriber_fbs) {
         FailInfo{FailMode::NullPointer, "SubscriberFbs pointer is null"});
   }
 
-  // Skip if EventType is NONE
-  if (subscriber_fbs->event_type_data() == EventType::EventType_NONE) {
+  // Skip if EventTypeFbs is NONE
+  if (subscriber_fbs->event_type_data() == EventTypeFbs_EVENT_NONE) {
     return std::unexpected(
-        FailInfo{FailMode::EnumValueNotHandled, "EventType is NONE"});
+        FailInfo{FailMode::EnumValueNotHandled, "EventTypeFbs is NONE"});
   }
 
   Subscriber subscriber;
-  subscriber.m_trigger_event_type = subscriber_fbs->event_type_data();
+  
+  // Convert EventTypeFbs to native EventType
+  auto event_type_result = event::ConvertEventTypeFbsToEventType(subscriber_fbs->event_type_data());
+  if (!event_type_result.has_value()) {
+    return std::unexpected(event_type_result.error());
+  }
+  subscriber.m_trigger_event_type = event_type_result.value();
+  
   subscriber.m_active = subscriber_fbs->active();
 
   // Check for trigger data

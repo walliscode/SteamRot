@@ -28,8 +28,8 @@ struct SubscriberFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_TRIGGER_DATA = 8,
     VT_ACTIVE = 10
   };
-  steamrot::EventType event_type_data() const {
-    return static_cast<steamrot::EventType>(GetField<uint64_t>(VT_EVENT_TYPE_DATA, 0));
+  steamrot::EventTypeFbs event_type_data() const {
+    return static_cast<steamrot::EventTypeFbs>(GetField<uint64_t>(VT_EVENT_TYPE_DATA, 0));
   }
   steamrot::EventDataData trigger_data_type() const {
     return static_cast<steamrot::EventDataData>(GetField<uint8_t>(VT_TRIGGER_DATA_TYPE, 0));
@@ -77,7 +77,7 @@ struct SubscriberFbsBuilder {
   typedef SubscriberFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_event_type_data(steamrot::EventType event_type_data) {
+  void add_event_type_data(steamrot::EventTypeFbs event_type_data) {
     fbb_.AddElement<uint64_t>(SubscriberFbs::VT_EVENT_TYPE_DATA, static_cast<uint64_t>(event_type_data), 0);
   }
   void add_trigger_data_type(steamrot::EventDataData trigger_data_type) {
@@ -102,7 +102,7 @@ struct SubscriberFbsBuilder {
 
 inline ::flatbuffers::Offset<SubscriberFbs> CreateSubscriberFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    steamrot::EventType event_type_data = static_cast<steamrot::EventType>(0),
+    steamrot::EventTypeFbs event_type_data = static_cast<steamrot::EventTypeFbs>(0),
     steamrot::EventDataData trigger_data_type = steamrot::EventDataData_NONE,
     ::flatbuffers::Offset<void> trigger_data = 0,
     bool active = false) {
