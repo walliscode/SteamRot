@@ -129,5 +129,5 @@ TEST_CASE("ConfigureEngineState populates from valid data",
   REQUIRE(state.quit_requested == false);
   REQUIRE(state.subscriptions.size() == 1);
   REQUIRE(state.subscriptions[0]->m_trigger_event_type ==
-          steamrot::EventType_EVENT_QUIT_GAME);
+          steamrot::EventTypeFbs_EVENT_QUIT_GAME);
 }

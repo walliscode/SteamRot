@@ -46,7 +46,7 @@ TEST_CASE("FlatbuffersEngineDataProvider::CreateEngineData loads correctly",
   REQUIRE(engine_state.quit_requested == false);
   REQUIRE(engine_state.subscriptions.size() == 1);
   REQUIRE(engine_state.subscriptions[0]->m_trigger_event_type ==
-          steamrot::EventType_EVENT_QUIT_GAME);
+          steamrot::EventTypeFbs_EVENT_QUIT_GAME);
 
   // Check AssetConfig
   const auto &asset_config = data.initial_asset_config;

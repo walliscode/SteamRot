@@ -116,12 +116,12 @@ TEST_CASE("ConfigureEngineSnapshot succeeds with valid FlatBuffers data",
 
   // Verify first event
   REQUIRE(snapshot.global_event_bus.value()[0].event_type ==
-          steamrot::EventType_EVENT_TOGGLE_UI);
+          steamrot::EventTypeFbs_EVENT_TOGGLE_UI);
   REQUIRE(snapshot.global_event_bus.value()[0].event_lifetime == 3);
 
   // Verify second event
   REQUIRE(snapshot.global_event_bus.value()[1].event_type ==
-          steamrot::EventType_EVENT_CHANGE_SCENE);
+          steamrot::EventTypeFbs_EVENT_CHANGE_SCENE);
   REQUIRE(snapshot.global_event_bus.value()[1].event_lifetime == 1);
 }
 
@@ -158,12 +158,12 @@ TEST_CASE("FlatbuffersEngineSnapshotProvider integration test with JSON data",
 
   // Event 1: UI_TOGGLE with lifetime 3
   const auto &event1 = snapshot.global_event_bus.value()[0];
-  REQUIRE(event1.event_type == steamrot::EventType_EVENT_TOGGLE_UI);
+  REQUIRE(event1.event_type == steamrot::EventTypeFbs_EVENT_TOGGLE_UI);
   REQUIRE(event1.event_lifetime == 3);
 
   // Event 2: SCENE_CHANGE with lifetime 1
   const auto &event2 = snapshot.global_event_bus.value()[1];
-  REQUIRE(event2.event_type == steamrot::EventType_EVENT_CHANGE_SCENE);
+  REQUIRE(event2.event_type == steamrot::EventTypeFbs_EVENT_CHANGE_SCENE);
   REQUIRE(event2.event_lifetime == 1);
 
   // Verify scene_manager_data and scene_collection_data are not set

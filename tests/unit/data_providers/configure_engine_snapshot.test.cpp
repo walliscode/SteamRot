@@ -91,7 +91,7 @@ TEST_CASE("ConfigureEngineSnapshot configures global_event_bus with events",
 
   // Create an event packet with proper union data
   auto event_packet_offset = steamrot::CreateEventPacketData(
-      builder, 1, steamrot::EventType_EVENT_TOGGLE_UI,
+      builder, 1, steamrot::EventTypeFbs_EVENT_TOGGLE_UI,
       steamrot::EventDataData_UserInterfaceNameData, ui_name_data.Union());
 
   std::vector<flatbuffers::Offset<steamrot::EventPacketData>> events_vector;
@@ -114,7 +114,7 @@ TEST_CASE("ConfigureEngineSnapshot configures global_event_bus with events",
   REQUIRE(snapshot.global_event_bus.has_value());
   REQUIRE(snapshot.global_event_bus.value().size() == 1);
   REQUIRE(snapshot.global_event_bus.value()[0].event_type ==
-          steamrot::EventType_EVENT_TOGGLE_UI);
+          steamrot::EventTypeFbs_EVENT_TOGGLE_UI);
   REQUIRE(snapshot.global_event_bus.value()[0].event_lifetime == 1);
 }
 
@@ -217,7 +217,7 @@ TEST_CASE("ConfigureEngineSnapshot handles malformed EventPacketData with null "
   // Create an event packet with union type but NO union data (null pointer)
   // This simulates the bug that caused the original SIGSEGV
   auto event_packet_offset = steamrot::CreateEventPacketData(
-      builder, 1, steamrot::EventType_EVENT_TOGGLE_UI,
+      builder, 1, steamrot::EventTypeFbs_EVENT_TOGGLE_UI,
       steamrot::EventDataData_UserInterfaceNameData,
       0); // Passing 0 (null offset) for union data
 
