@@ -113,7 +113,7 @@ TEST_CASE("SceneDataEqualsMatcher - multiple field mismatches",
 
     REQUIRE(description.find("SceneData Mismatch") != std::string::npos);
     REQUIRE(description.find("SceneInfo Mismatch") != std::string::npos);
-    REQUIRE(description.find("EntityMemoryPool Mismatch") != std::string::npos);
+    REQUIRE(description.find("EntityTransport Mismatch") != std::string::npos);
   }
 }
 
