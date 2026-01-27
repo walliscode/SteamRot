@@ -49,7 +49,7 @@ TEST_CASE("SceneManager::StartUp loads configuration successfully",
       scene_manager.GetSubscriptions();
   REQUIRE(subscriptions.size() == 1);
   REQUIRE(subscriptions[0]->m_trigger_event_type ==
-          steamrot::EventType::EventType_EVENT_CHANGE_SCENE);
+          steamrot::EventType::CHANGE_SCENE);
 
   // check subscribers have been registered with the EventHandler
   const auto &registered_subscribers = event_handler.GetSubcriberRegister();

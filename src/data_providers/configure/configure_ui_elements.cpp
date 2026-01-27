@@ -9,6 +9,7 @@
 #include "configure_ui_elements.h"
 #include "EventPacket.h"
 #include "event_factory.h"
+#include "event_type_conversion.h"
 #include "subscriber_factory.h"
 #include <string>
 
@@ -62,9 +63,9 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
   if (data.is_mouse_over())
     element.is_mouse_over = data.is_mouse_over();
 
-  // set Subscription if subscriber_data exists and EventType is not none
+  // set Subscription if subscriber_data exists and EventTypeFbs is not none
   if (data.subscriber_data() && (data.subscriber_data()->event_type_data() !=
-                                 EventType::EventType_NONE)) {
+                                 EventTypeFbs_EVENT_NONE)) {
 
     // Create vector with single subscriber
     std::vector<const SubscriberFbs *> subscribers_fbs{data.subscriber_data()};
@@ -85,17 +86,23 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
       return std::unexpected(register_result.error());
   }
 
-  // set ResponseEvent if response_event_data exists and EventType is not none
+  // set ResponseEvent if response_event_data exists and EventTypeFbs is not none
   if (data.response_event_data() &&
-      (data.response_event_data()->event_type() != EventType::EventType_NONE)) {
+      (data.response_event_data()->event_type() != EventTypeFbs_EVENT_NONE)) {
 
-    // set EventType
+    // set EventTypeFbs
     if (!data.response_event_data()->event_type()) {
       return std::unexpected(
           FailInfo{FailMode::FlatbuffersDataNotFound,
                    "UIElementData has response_event_data but no event_type."});
     }
-    EventType event_type = data.response_event_data()->event_type();
+    
+    // Convert EventTypeFbs to native EventType
+    auto event_type_result = event::ConvertEventTypeFbsToEventType(data.response_event_data()->event_type());
+    if (!event_type_result.has_value()) {
+      return std::unexpected(event_type_result.error());
+    }
+    EventType event_type = event_type_result.value();
 
     // create EventData by running the flatbuffers data through the factory
     auto event_data_conversion_result = event::CreateEventData(

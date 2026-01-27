@@ -9,6 +9,7 @@
 #pragma once
 
 #include "EventPacket.h"
+#include "EventType.h"
 #include <optional>
 
 namespace steamrot {
@@ -44,7 +45,7 @@ struct Subscriber {
   /////////////////////////////////////////////////
   /// @brief Event type that this subscriber listens for.
   /////////////////////////////////////////////////
-  EventType m_trigger_event_type{EventType::EventType_NONE};
+  EventType m_trigger_event_type{EventType::NONE};
 
   /////////////////////////////////////////////////
   /// @brief If set, the subscriber will only be activated if the event data

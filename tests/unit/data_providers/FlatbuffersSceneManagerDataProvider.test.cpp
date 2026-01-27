@@ -35,7 +35,7 @@ TEST_CASE("FlatbuffersSceneManagerDataProvider::CreateSceneManagerData loads "
   REQUIRE(state.subscriptions.size() == 1);
   REQUIRE(state.subscriptions[0] != nullptr);
   REQUIRE(state.subscriptions[0]->m_trigger_event_type ==
-          steamrot::EventType::EventType_EVENT_CHANGE_SCENE);
+          steamrot::EventType::CHANGE_SCENE);
 }
 
 TEST_CASE("FlatbuffersSceneManagerDataProvider::ConfigureSceneManagerData "
@@ -50,5 +50,5 @@ TEST_CASE("FlatbuffersSceneManagerDataProvider::ConfigureSceneManagerData "
   REQUIRE(data.scene_manager_state.subscriptions.size() == 1);
   REQUIRE(data.scene_manager_state.subscriptions[0] != nullptr);
   REQUIRE(data.scene_manager_state.subscriptions[0]->m_trigger_event_type ==
-          steamrot::EventType::EventType_EVENT_CHANGE_SCENE);
+          steamrot::EventType::CHANGE_SCENE);
 }

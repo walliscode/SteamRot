@@ -4,7 +4,7 @@ namespace steamrot;
 
 table SubscriberFbs{
 
-  event_type_data: EventType;
+  event_type_data: EventTypeFbs;
   trigger_data: EventDataData;
   active: bool;
   }
