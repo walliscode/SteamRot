@@ -137,7 +137,7 @@ TEST_CASE("CreateSubscriber creates subscriber with SceneChangePacket trigger "
   // Create SceneChangePacketData
   auto trigger_data_offset =
       steamrot::CreateSceneChangePacketData(builder, 0, // uuid
-                                            steamrot::SceneType_TITLE);
+                                            steamrot::SceneTypeFbs_TITLE);
 
   // Create SubscriberFbs with trigger data
   auto subscriber_offset = steamrot::CreateSubscriberFbs(
@@ -162,7 +162,7 @@ TEST_CASE("CreateSubscriber creates subscriber with SceneChangePacket trigger "
   // Verify the scene type
   const auto &scene_packet = std::get<steamrot::SceneChangePacket>(
       result.value().m_trigger_event_data.value());
-  REQUIRE(scene_packet.second == steamrot::SceneType_TITLE);
+  REQUIRE(scene_packet.second == steamrot::SceneTypeFbs_TITLE);
   REQUIRE_FALSE(scene_packet.first.has_value()); // No UUID
 }
 
@@ -210,7 +210,7 @@ TEST_CASE("CreateSubscriber propagates error from CreateEventData with "
   // Create SceneChangePacketData with invalid UUID
   auto uuid_str = builder.CreateString("invalid-uuid");
   auto trigger_data_offset = steamrot::CreateSceneChangePacketData(
-      builder, uuid_str, steamrot::SceneType_TITLE);
+      builder, uuid_str, steamrot::SceneTypeFbs_TITLE);
 
   // Create SubscriberFbs with trigger data
   auto subscriber_offset = steamrot::CreateSubscriberFbs(

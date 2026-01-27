@@ -67,7 +67,7 @@ TEST_CASE("SceneManager::AddScenesFromSceneCollectionData clears exisiting "
   const auto &scene_map = scene_manager.GetScenes();
 
   auto scene_add_result =
-      scene_manager.AddSceneFromDefault(steamrot::SceneType_TEST);
+      scene_manager.AddSceneFromDefault(steamrot::SceneTypeFbs_TEST);
   if (!scene_add_result.has_value()) {
     FAIL(scene_add_result.error().message);
   }

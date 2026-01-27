@@ -43,12 +43,12 @@ TEST_CASE("AssetManager loads scene assets correctly", "[unit][AssetManager]") {
 
   steamrot::AssetManager asset_manager;
 
-  auto result = asset_manager.LoadSceneAssets(steamrot::SceneType_TEST);
+  auto result = asset_manager.LoadSceneAssets(steamrot::SceneTypeFbs_TEST);
 
   if (!result.has_value())
     FAIL(result.error().message);
 
   // check if the assets were loaded correctly
-  steamrot::tests::CheckAssetConfiguration(steamrot::SceneType_TEST,
+  steamrot::tests::CheckAssetConfiguration(steamrot::SceneTypeFbs_TEST,
                                            asset_manager);
 }

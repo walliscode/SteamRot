@@ -95,7 +95,7 @@ TEST_CASE("SceneFactory::CreateSceneFromSceneData creates Scene with valid "
   // Verify the loaded data structure
   REQUIRE(scene_data_fbs->scene_info() != nullptr);
   REQUIRE(scene_data_fbs->scene_info()->scene_type() ==
-          steamrot::SceneType::TITLE);
+          steamrot::SceneTypeFbs_TITLE);
   REQUIRE(scene_data_fbs->scene_resources_config()->texture_width() == 800);
   REQUIRE(scene_data_fbs->scene_resources_config()->texture_height() == 600);
   REQUIRE(scene_data_fbs->entity_collection() != nullptr);
@@ -169,7 +169,7 @@ TEST_CASE("SceneFactory provides UUID if not present in SceneData",
 
   // create SceneData with nil UUID
   steamrot::SceneData scene_data;
-  scene_data.scene_info.type = steamrot::SceneType_TITLE;
+  scene_data.scene_info.type = steamrot::SceneType::TITLE;
   scene_data.scene_resources_config.texture_width = 800;
   scene_data.scene_resources_config.texture_height = 600;
   // Add entity importer to the variant
@@ -186,7 +186,7 @@ TEST_CASE("SceneFactory provides UUID if not present in SceneData",
   }
   auto &scene = result.value();
   REQUIRE(!scene->GetSceneInfo().id.is_nil());
-  REQUIRE(scene->GetSceneInfo().type == steamrot::SceneType_TITLE);
+  REQUIRE(scene->GetSceneInfo().type == steamrot::SceneType::TITLE);
 }
 
 TEST_CASE("SceneFactory configures the scenes logic map",
@@ -203,7 +203,7 @@ TEST_CASE("SceneFactory configures the scenes logic map",
 
   // Create SceneData with minimal configuration
   steamrot::SceneData scene_data;
-  scene_data.scene_info.type = steamrot::SceneType_TITLE;
+  scene_data.scene_info.type = steamrot::SceneType::TITLE;
   scene_data.scene_resources_config.texture_width = 800;
   scene_data.scene_resources_config.texture_height = 600;
   // Add entity importer to the variant
@@ -266,7 +266,7 @@ TEST_CASE("SceneFactory::ConfigureSceneInfo generates UUID when not present",
   auto &scene = scene_result.value();
 
   steamrot::SceneData scene_data;
-  scene_data.scene_info.type = steamrot::SceneType_TITLE;
+  scene_data.scene_info.type = steamrot::SceneType::TITLE;
   // scene_data.scene_info.id is nil by default
 
   // Act
@@ -275,7 +275,7 @@ TEST_CASE("SceneFactory::ConfigureSceneInfo generates UUID when not present",
   // Assert
   REQUIRE(result.has_value());
   REQUIRE(!scene->GetSceneInfo().id.is_nil());
-  REQUIRE(scene->GetSceneInfo().type == steamrot::SceneType_TITLE);
+  REQUIRE(scene->GetSceneInfo().type == steamrot::SceneType::TITLE);
 }
 
 TEST_CASE("SceneFactory::ConfigureSceneInfo uses provided UUID",
@@ -290,7 +290,7 @@ TEST_CASE("SceneFactory::ConfigureSceneInfo uses provided UUID",
   auto &scene = scene_result.value();
 
   steamrot::SceneData scene_data;
-  scene_data.scene_info.type = steamrot::SceneType_CRAFTING;
+  scene_data.scene_info.type = steamrot::SceneType::CRAFTING;
   scene_data.scene_info.id = uuids::uuid_system_generator{}();
   std::cout << "Generated UUID for test: " << scene_data.scene_info.id
             << std::endl;
@@ -302,7 +302,7 @@ TEST_CASE("SceneFactory::ConfigureSceneInfo uses provided UUID",
   // Assert
   REQUIRE(result.has_value());
   REQUIRE(scene->GetSceneInfo().id == expected_uuid);
-  REQUIRE(scene->GetSceneInfo().type == steamrot::SceneType_CRAFTING);
+  REQUIRE(scene->GetSceneInfo().type == steamrot::SceneType::CRAFTING);
 }
 
 TEST_CASE("SceneFactory::ConfigureSceneResources sets texture dimensions",
