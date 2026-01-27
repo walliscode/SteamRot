@@ -3,7 +3,7 @@ include "../core/scene_types.fbs";
 
 namespace steamrot;
 
-enum EventType: ulong (bit_flags) {
+enum EventTypeFbs: ulong (bit_flags) {
 EVENT_NONE = 0,
 EVENT_TEST,
 EVENT_USER_INPUT,

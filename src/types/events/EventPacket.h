@@ -5,8 +5,8 @@
 
 #pragma once
 
+#include "EventType.h"
 #include "UserInputBitset.h"
-#include "events_generated.h"
 #include "scene_types_generated.h"
 #include "uuid.h"
 #include <SFML/Window/Keyboard.hpp>
@@ -38,7 +38,7 @@ struct EventPacket {
   /////////////////////////////////////////////////
   /// @brief Enum based name for the event type
   /////////////////////////////////////////////////
-  EventType event_type{EventType::EventType_NONE};
+  EventType event_type{EventType::EVENT_NONE};
 
   /////////////////////////////////////////////////
   /// @brief Specific data for the event

@@ -9,6 +9,7 @@
 #pragma once
 
 #include "EventPacket.h"
+#include "EventType.h"
 #include "FailInfo.h"
 #include "event_packet_data_generated.h"
 #include "events_generated.h"
@@ -17,6 +18,15 @@
 #include <expected>
 
 namespace steamrot::event {
+
+/////////////////////////////////////////////////
+/// @brief Convert FlatBuffers EventTypeFbs to native EventType
+///
+/// @param event_type_fbs FlatBuffers EventTypeFbs value
+/// @return Native EventType on success, FailInfo on error
+/////////////////////////////////////////////////
+std::expected<EventType, FailInfo>
+ConvertEventType(const EventTypeFbs event_type_fbs);
 
 /////////////////////////////////////////////////
 /// @brief Convert the flatbuffers UserInputBitsetData to a UserInputBitset

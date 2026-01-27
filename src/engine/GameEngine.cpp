@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 
 #include "GameEngine.h"
+#include "EventType.h"
 #include <expected>
 
 namespace steamrot {
@@ -70,7 +71,7 @@ std::expected<std::monostate, FailInfo> GameEngine::ProcessSubscriptions() {
 
       // switch on the EventType
       switch (subscriber->m_trigger_event_type) {
-      case EventType::EventType_EVENT_QUIT_GAME: {
+      case EventType::EVENT_QUIT_GAME: {
         // close the window to quit the game
         m_engine_resources.game_window.close();
         break;

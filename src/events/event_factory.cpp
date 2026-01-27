@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "event_factory.h"
 #include "EventPacket.h"
+#include "EventType.h"
 #include "events_generated.h"
 #include "uuid.h"
 #include <cstddef>
@@ -15,6 +16,31 @@
 #include <variant>
 
 namespace steamrot::event {
+
+/////////////////////////////////////////////////
+std::expected<EventType, FailInfo>
+ConvertEventType(const EventTypeFbs event_type_fbs) {
+  switch (event_type_fbs) {
+  case EventTypeFbs_EVENT_NONE:
+    return EventType::EVENT_NONE;
+  case EventTypeFbs_EVENT_TEST:
+    return EventType::EVENT_TEST;
+  case EventTypeFbs_EVENT_USER_INPUT:
+    return EventType::EVENT_USER_INPUT;
+  case EventTypeFbs_EVENT_TOGGLE_UI:
+    return EventType::EVENT_TOGGLE_UI;
+  case EventTypeFbs_EVENT_CHANGE_SCENE:
+    return EventType::EVENT_CHANGE_SCENE;
+  case EventTypeFbs_EVENT_QUIT_GAME:
+    return EventType::EVENT_QUIT_GAME;
+  case EventTypeFbs_EVENT_TOGGLE_DROPDOWN:
+    return EventType::EVENT_TOGGLE_DROPDOWN;
+  default:
+    return std::unexpected(
+        FailInfo{FailMode::EnumValueNotHandled,
+                 "ConvertEventType: EventTypeFbs value not handled."});
+  }
+}
 
 /////////////////////////////////////////////////
 static const std::unordered_map<KeyboardInput, sf::Keyboard::Key> &
@@ -259,7 +285,13 @@ CreateEventPacketFromData(const EventPacketData *packet_data) {
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     "EventPacketData missing event_type."});
   }
-  event_packet.event_type = packet_data->event_type();
+  
+  // Convert FlatBuffers EventTypeFbs to native EventType
+  auto event_type_result = ConvertEventType(packet_data->event_type());
+  if (!event_type_result.has_value()) {
+    return std::unexpected(event_type_result.error());
+  }
+  event_packet.event_type = event_type_result.value();
 
   auto event_data_result = CreateEventData(packet_data->event_data_data_type(),
                                            packet_data->event_data_data());

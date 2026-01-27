@@ -2,8 +2,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "EventHandler.h"
+#include "EventType.h"
 #include "FailInfo.h"
-#include "events_generated.h"
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <expected>
@@ -96,7 +96,7 @@ void HandleSFMLEvents(sf::RenderWindow &window, EventHandler &event_handler) {
     EventPacket event_packet(1);
 
     // set the event type to UserInputEvent
-    event_packet.event_type = EventType::EventType_EVENT_USER_INPUT;
+    event_packet.event_type = EventType::EVENT_USER_INPUT;
 
     // create a UserInputBitset from the vector of hardware events
     auto user_input_bitset = UserInputBitset{user_input_events};
