@@ -1,0 +1,59 @@
+{
+  "meta_data": {
+    "test_name": "UUID assignment validation",
+    "test_description": "Validates that UUIDs are automatically assigned to scenes in starting snapshot and propagated to expected snapshots",
+    "tags": ["unit", "uuid", "test_data"],
+    "will_pass": true,
+    "version": 1
+  },
+  "num_ticks": 1,
+  "starting_engine_snapshot": {
+    "tick_number": 0,
+    "scene_collection_data": {
+      "scene_data": [
+        {
+          "scene_info": {
+            "scene_type": "TITLE"
+          },
+          "scene_resources_config": {
+            "texture_width": 800,
+            "texture_height": 600
+          },
+          "entity_collection": {
+            "entity_memory_pool_size": 5,
+            "entities": []
+          },
+          "asset_config": {},
+          "logic_collection_data": {}
+        }
+      ]
+    }
+  },
+  "expected_engine_snapshots": [
+    {
+      "tick": 1,
+      "snapshot": {
+        "tick_number": 1,
+        "scene_collection_data": {
+          "scene_data": [
+            {
+              "scene_info": {
+                "scene_type": "TITLE"
+              },
+              "scene_resources_config": {
+                "texture_width": 800,
+                "texture_height": 600
+              },
+              "entity_collection": {
+                "entity_memory_pool_size": 5,
+                "entities": []
+              },
+              "asset_config": {},
+              "logic_collection_data": {}
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

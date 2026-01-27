@@ -4,6 +4,8 @@ add_executable(test_harness
   TestEngine.test.cpp
   harness_runner.test.cpp
   SimulationRunner.test.cpp
+  UUIDAssignmentTracker.test.cpp
+  uuid_assignment_integration.test.cpp
 )
 
 
