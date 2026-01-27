@@ -7,6 +7,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "SceneInfoEqualsMatcher.h"
+#include "conmat.h"
+#include <sstream>
 
 namespace steamrot::tests {
 
@@ -16,23 +18,47 @@ SceneInfoEqualsMatcher::SceneInfoEqualsMatcher(const SceneInfo &expected)
 
 /////////////////////////////////////////////////
 bool SceneInfoEqualsMatcher::match(const SceneInfo &actual) const {
-  // m_mismatch_description.clear();
-  // if (actual.type != m_expected.type) {
-  //   m_mismatch_description +=
-  //       "Scene type differs: actual='" +
-  //       std::to_string(static_cast<int>(actual.type)) + "', expected='" +
-  //       std::to_string(static_cast<int>(m_expected.type)) + "'; ";
-  // }
-  // if (actual.id != m_expected.id) {
-  //   m_mismatch_description += "Scene ID differs; ";
-  // }
-  // return m_mismatch_description.empty();
-  return false;
+  m_mismatch_description.clear();
+  std::ostringstream oss;
+
+  if (actual.type != m_expected.type) {
+    oss << conmat::Indent(1) << conmat::TestFailed()
+        << "Scene type differs:" << "\n";
+    oss << conmat::Indent(2)
+        << "actual: " << conmat::Colorize(EnumNameSceneType(actual.type),
+                                          conmat::Color::Red)
+        << "\n";
+    oss << conmat::Indent(2) << "expected: "
+        << conmat::Colorize(EnumNameSceneType(m_expected.type),
+                            conmat::Color::Blue)
+        << "\n";
+  }
+
+  if (actual.id != m_expected.id) {
+    oss << conmat::Indent(1) << conmat::TestFailed()
+        << "Scene ID differs:" << "\n";
+    oss << conmat::Indent(2)
+        << "actual: " << conmat::Colorize(uuids::to_string(actual.id),
+                                          conmat::Color::Red)
+        << "\n";
+    oss << conmat::Indent(2) << "expected: "
+        << conmat::Colorize(uuids::to_string(m_expected.id),
+                            conmat::Color::Blue)
+        << "\n";
+  }
+
+  m_mismatch_description = oss.str();
+  return m_mismatch_description.empty();
 }
 
 /////////////////////////////////////////////////
 std::string SceneInfoEqualsMatcher::describe() const {
-  return m_mismatch_description;
+  if (m_mismatch_description.empty()) {
+    return conmat::Header(conmat::TestPassed() + "SceneInfo Match:", 3) + "\n";
+  } else {
+    return conmat::Header(conmat::TestFailed() + "SceneInfo Mismatch:", 3) +
+           "\n" + m_mismatch_description;
+  }
 }
 
 } // namespace steamrot::tests
