@@ -13,6 +13,7 @@ add_executable(test_matchers
   UIElementEqualsMatcher.test.cpp
   EntityMemoryPoolEqualsMatcher.test.cpp
   SubscriberEqualsMatcher.test.cpp
+  SceneInfoEqualsMatcher.test.cpp
 )
 
 target_link_libraries(test_matchers
