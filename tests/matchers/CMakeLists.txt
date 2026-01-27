@@ -14,6 +14,7 @@ add_library(matchers
   JointEqualsMatcher.cpp
   UIElementEqualsMatcher.cpp
   EntityMemoryPoolEqualsMatcher.cpp
+  EntityTransportEqualsMatcher.cpp
   SubscriberEqualsMatcher.cpp
   SceneInfoEqualsMatcher.cpp
 )
