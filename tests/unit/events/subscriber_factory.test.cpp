@@ -31,8 +31,8 @@ TEST_CASE("CreateSubscriber fails with EventType NONE",
   flatbuffers::FlatBufferBuilder builder;
 
   // Create SubscriberFbs with EventType_NONE
-  auto subscriber_offset = steamrot::CreateSubscriberFbs(
-      builder, steamrot::EventType::NONE);
+  auto subscriber_offset =
+      steamrot::CreateSubscriberFbs(builder, steamrot::EventTypeFbs_NONE);
   builder.Finish(subscriber_offset);
 
   const steamrot::SubscriberFbs *subscriber_fbs =
@@ -49,11 +49,11 @@ TEST_CASE("CreateSubscriber creates subscriber without trigger data",
   flatbuffers::FlatBufferBuilder builder;
 
   // Create SubscriberFbs with just event type, no trigger data
-  auto subscriber_offset = steamrot::CreateSubscriberFbs(
-      builder, steamrot::EventTypeFbs_EVENT_TEST,
-      steamrot::EventDataData::EventDataData_NONE,
-      0,      // trigger_data_type and data
-      false); // active
+  auto subscriber_offset =
+      steamrot::CreateSubscriberFbs(builder, steamrot::EventTypeFbs_EVENT_TEST,
+                                    steamrot::EventDataData::EventDataData_NONE,
+                                    0,      // trigger_data_type and data
+                                    false); // active
   builder.Finish(subscriber_offset);
 
   const steamrot::SubscriberFbs *subscriber_fbs =
@@ -62,8 +62,7 @@ TEST_CASE("CreateSubscriber creates subscriber without trigger data",
   auto result = steamrot::subscriber_factory::CreateSubscriber(subscriber_fbs);
 
   REQUIRE(result.has_value());
-  REQUIRE(result.value().m_trigger_event_type ==
-          steamrot::EventType::TEST);
+  REQUIRE(result.value().m_trigger_event_type == steamrot::EventType::TEST);
   REQUIRE_FALSE(result.value().m_active);
   REQUIRE_FALSE(result.value().m_trigger_event_data.has_value());
 }
@@ -73,11 +72,11 @@ TEST_CASE("CreateSubscriber creates active subscriber without trigger data",
   flatbuffers::FlatBufferBuilder builder;
 
   // Create SubscriberFbs with active flag set
-  auto subscriber_offset = steamrot::CreateSubscriberFbs(
-      builder, steamrot::EventTypeFbs_EVENT_TEST,
-      steamrot::EventDataData::EventDataData_NONE,
-      0,     // trigger_data_type and data
-      true); // active
+  auto subscriber_offset =
+      steamrot::CreateSubscriberFbs(builder, steamrot::EventTypeFbs_EVENT_TEST,
+                                    steamrot::EventDataData::EventDataData_NONE,
+                                    0,     // trigger_data_type and data
+                                    true); // active
   builder.Finish(subscriber_offset);
 
   const steamrot::SubscriberFbs *subscriber_fbs =
@@ -86,8 +85,7 @@ TEST_CASE("CreateSubscriber creates active subscriber without trigger data",
   auto result = steamrot::subscriber_factory::CreateSubscriber(subscriber_fbs);
 
   REQUIRE(result.has_value());
-  REQUIRE(result.value().m_trigger_event_type ==
-          steamrot::EventType::TEST);
+  REQUIRE(result.value().m_trigger_event_type == steamrot::EventType::TEST);
   REQUIRE(result.value().m_active);
   REQUIRE_FALSE(result.value().m_trigger_event_data.has_value());
 }

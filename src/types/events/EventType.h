@@ -6,6 +6,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 namespace steamrot {
 
@@ -26,4 +27,24 @@ enum class EventType : uint64_t {
   TOGGLE_DROPDOWN = 1ULL << 5
 };
 
+inline std::string EnumNameEventType(EventType type) {
+  switch (type) {
+  case EventType::NONE:
+    return "NONE";
+  case EventType::TEST:
+    return "TEST";
+  case EventType::USER_INPUT:
+    return "USER_INPUT";
+  case EventType::TOGGLE_UI:
+    return "TOGGLE_UI";
+  case EventType::CHANGE_SCENE:
+    return "CHANGE_SCENE";
+  case EventType::QUIT_GAME:
+    return "QUIT_GAME";
+  case EventType::TOGGLE_DROPDOWN:
+    return "TOGGLE_DROPDOWN";
+  default:
+    return "UNKNOWN";
+  }
+}
 } // namespace steamrot
