@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "EventPacketEqualsMatcher.h"
 #include "EventPacket.h"
+#include "EventType.h"
 #include "conmat.h"
 
 namespace steamrot::tests {
@@ -36,7 +37,7 @@ bool EventPacketEqualsMatcher::CompareEventData(const EventData &actual_data,
 
   // Check if variant types match and return early if they don't
   if (actual_data.index() != expected_data.index()) {
-    oss << conmat::TestFailed() << "m_event_data variant type differs:"
+    oss << conmat::TestFailed() << "event_data variant type differs:"
         << "\n";
     oss << "\t"
         << "actual type = "
@@ -64,7 +65,7 @@ bool EventPacketEqualsMatcher::CompareEventData(const EventData &actual_data,
 
     // compare bitset values
     if (actual_bitset != expected_bitset) {
-      oss << conmat::TestFailed() << "m_event_data UserInputBitset:" << "\n";
+      oss << conmat::TestFailed() << "event_data UserInputBitset:" << "\n";
       oss << "\t"
           << "actual = "
           << conmat::Colorize(actual_bitset.to_string(), conmat::Color::Red)
@@ -83,7 +84,7 @@ bool EventPacketEqualsMatcher::CompareEventData(const EventData &actual_data,
     if (actual_packet.first.has_value() != expected_packet.first.has_value()) {
 
       oss << conmat::TestFailed()
-          << "m_event_data SceneChangePacket UUID presence differs:" << "\n";
+          << "event_data SceneChangePacket UUID presence differs:" << "\n";
       oss << "\t"
           << "actual has value = "
           << conmat::Colorize(actual_packet.first.has_value(),
@@ -102,7 +103,7 @@ bool EventPacketEqualsMatcher::CompareEventData(const EventData &actual_data,
           actual_packet.first.value() != expected_packet.first.value()) {
 
         oss << conmat::TestFailed()
-            << "m_event_data SceneChangePacket UUID differs:" << "\n";
+            << "event_data SceneChangePacket UUID differs:" << "\n";
         oss << "\t"
             << "actual = "
             << conmat::Colorize(actual_packet.first.value(), conmat::Color::Red)
@@ -119,7 +120,7 @@ bool EventPacketEqualsMatcher::CompareEventData(const EventData &actual_data,
     // Compare SceneType
     if (actual_packet.second != expected_packet.second) {
       oss << conmat::TestFailed()
-          << "m_event_data SceneChangePacket SceneType differs:" << "\n";
+          << "event_data SceneChangePacket SceneType differs:" << "\n";
       oss << "\t"
           << "actual = "
           << conmat::Colorize(EnumNameSceneType(actual_packet.second),
@@ -138,7 +139,7 @@ bool EventPacketEqualsMatcher::CompareEventData(const EventData &actual_data,
     const auto &expected_name = std::get<UserInterfaceName>(expected_data);
 
     if (actual_name != expected_name) {
-      oss << conmat::TestFailed() << "m_event_data UserInterfaceName differs:"
+      oss << conmat::TestFailed() << "event_data UserInterfaceName differs:"
           << "\n";
       oss << "\t"
           << "actual = " << conmat::Colorize(actual_name, conmat::Color::Red)
@@ -162,23 +163,23 @@ bool EventPacketEqualsMatcher::match(const EventPacket &actual) const {
   m_mismatch_description.clear();
   std::ostringstream oss;
 
-  // Compare m_event_type
-  if (actual.m_event_type != m_expected.m_event_type) {
-    oss << conmat::TestFailed() << "m_event_type:" << "\n";
+  // Compare event_type
+  if (actual.event_type != m_expected.event_type) {
+    oss << conmat::TestFailed() << "event_type:" << "\n";
     oss << "\t"
         << "actual = "
-        << conmat::Colorize(EnumNameEventType(actual.m_event_type),
+        << conmat::Colorize(EnumNameEventType(actual.event_type),
                             conmat::Color::Red)
         << "\n";
     oss << "\t"
         << "expected = "
-        << conmat::Colorize(EnumNameEventType(m_expected.m_event_type),
+        << conmat::Colorize(EnumNameEventType(m_expected.event_type),
                             conmat::Color::Blue)
         << "\n";
   }
 
-  // Compare m_event_data
-  CompareEventData(actual.m_event_data, m_expected.m_event_data, oss);
+  // Compare event_data
+  CompareEventData(actual.event_data, m_expected.event_data, oss);
 
   // Compare event_id
   if (actual.event_id != m_expected.event_id) {

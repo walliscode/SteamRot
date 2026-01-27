@@ -64,7 +64,7 @@ bool EventDataEqualsMatcher::match(const EventData &actual_data) const {
     // compare bitset values
     if (actual_bitset != expected_bitset) {
       oss << conmat::Indent(1) << conmat::TestFailed()
-          << "m_event_data UserInputBitset differs:" << "\n";
+          << "event_data UserInputBitset differs:" << "\n";
       oss << conmat::Indent(2)
           << "actual: " << conmat::Colorize(actual_bitset, conmat::Color::Red)
           << "\n";
@@ -80,7 +80,7 @@ bool EventDataEqualsMatcher::match(const EventData &actual_data) const {
     if (actual_packet.first.has_value() != expected_packet.first.has_value()) {
 
       oss << conmat::Indent(1) << conmat::TestFailed()
-          << "m_event_data SceneChangePacket UUID presence differs:" << "\n";
+          << "event_data SceneChangePacket UUID presence differs:" << "\n";
       oss << conmat::Indent(2) << "actual: "
           << conmat::Colorize(actual_packet.first.has_value(),
                               conmat::Color::Red)
@@ -97,7 +97,7 @@ bool EventDataEqualsMatcher::match(const EventData &actual_data) const {
           actual_packet.first.value() != expected_packet.first.value()) {
 
         oss << conmat::Indent(1) << conmat::TestFailed()
-            << "m_event_data SceneChangePacket UUID differs:" << "\n";
+            << "event_data SceneChangePacket UUID differs:" << "\n";
         oss << conmat::Indent(2) << "actual: "
             << conmat::Colorize(actual_packet.first.value(), conmat::Color::Red)
             << "\n";
@@ -111,7 +111,7 @@ bool EventDataEqualsMatcher::match(const EventData &actual_data) const {
     // Compare SceneType
     if (actual_packet.second != expected_packet.second) {
       oss << conmat::Indent(1) << conmat::TestFailed()
-          << "m_event_data SceneChangePacket SceneType differs:" << "\n";
+          << "event_data SceneChangePacket SceneType differs:" << "\n";
       oss << conmat::Indent(2) << "actual: "
           << conmat::Colorize(EnumNameSceneType(actual_packet.second),
                               conmat::Color::Red)
@@ -128,7 +128,7 @@ bool EventDataEqualsMatcher::match(const EventData &actual_data) const {
 
     if (actual_name != expected_name) {
       oss << conmat::Indent(1) << conmat::TestFailed()
-          << "m_event_data UserInterfaceName differs:"
+          << "event_data UserInterfaceName differs:"
           << "\n";
       oss << conmat::Indent(2)
           << "actual: " << conmat::Colorize(actual_name, conmat::Color::Red)

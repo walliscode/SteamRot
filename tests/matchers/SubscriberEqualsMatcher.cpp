@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "SubscriberEqualsMatcher.h"
 #include "EventDataEqualsMatcher.h"
+#include "EventType.h"
 #include "Subscriber.h"
 #include "conmat.h"
 

@@ -91,7 +91,7 @@ TEST_CASE("EventDataEqualsMatcher detects UserInputBitset differences",
   oss << conmat::Header(conmat::TestFailed() + "EventData Mismatch:", 3)
       << "\n";
   oss << conmat::Indent(1) << conmat::TestFailed()
-      << "m_event_data UserInputBitset differs:"
+      << "event_data UserInputBitset differs:"
       << "\n";
   oss << conmat::Indent(2)
       << "actual: " << conmat::Colorize(actual_bitset, conmat::Color::Red)
@@ -118,7 +118,7 @@ TEST_CASE("EventDataEqualsMatcher detects SceneChangePacket differences",
   oss << conmat::Header(conmat::TestFailed() + "EventData Mismatch:", 3)
       << "\n";
   oss << conmat::Indent(1) << conmat::TestFailed()
-      << "m_event_data SceneChangePacket UUID differs:" << "\n";
+      << "event_data SceneChangePacket UUID differs:" << "\n";
   oss << conmat::Indent(2) << "actual: "
       << conmat::Colorize(
              std::get<steamrot::SceneChangePacket>(actual_packet).first.value(),
@@ -130,7 +130,7 @@ TEST_CASE("EventDataEqualsMatcher detects SceneChangePacket differences",
                           conmat::Color::Blue)
       << "\n";
   oss << conmat::Indent(1) << conmat::TestFailed()
-      << "m_event_data SceneChangePacket SceneType differs:" << "\n";
+      << "event_data SceneChangePacket SceneType differs:" << "\n";
   oss << conmat::Indent(2) << "actual: "
       << conmat::Colorize(
              steamrot::EnumNameSceneType(
@@ -157,7 +157,7 @@ TEST_CASE("EventDataEqualsMatcher detects UserInterfaceName differences",
   oss << conmat::Header(conmat::TestFailed() + "EventData Mismatch:", 3)
       << "\n";
   oss << conmat::Indent(1) << conmat::TestFailed()
-      << "m_event_data UserInterfaceName differs:"
+      << "event_data UserInterfaceName differs:"
       << "\n";
   oss << conmat::Indent(2) << "actual: "
       << conmat::Colorize(std::get<steamrot::UserInterfaceName>(actual_name),

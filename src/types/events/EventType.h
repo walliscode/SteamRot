@@ -10,6 +10,7 @@
 
 #include <cstdint>
 #include <functional>
+#include <string>
 
 namespace steamrot {
 
@@ -29,6 +30,33 @@ enum class EventType : uint64_t {
   EVENT_QUIT_GAME = 32ULL,
   EVENT_TOGGLE_DROPDOWN = 64ULL,
 };
+
+/////////////////////////////////////////////////
+/// @brief Convert EventType to string name
+///
+/// @param event_type The EventType to convert
+/// @return String representation of the event type
+/////////////////////////////////////////////////
+inline const char *EnumNameEventType(EventType event_type) {
+  switch (event_type) {
+  case EventType::EVENT_NONE:
+    return "EVENT_NONE";
+  case EventType::EVENT_TEST:
+    return "EVENT_TEST";
+  case EventType::EVENT_USER_INPUT:
+    return "EVENT_USER_INPUT";
+  case EventType::EVENT_TOGGLE_UI:
+    return "EVENT_TOGGLE_UI";
+  case EventType::EVENT_CHANGE_SCENE:
+    return "EVENT_CHANGE_SCENE";
+  case EventType::EVENT_QUIT_GAME:
+    return "EVENT_QUIT_GAME";
+  case EventType::EVENT_TOGGLE_DROPDOWN:
+    return "EVENT_TOGGLE_DROPDOWN";
+  default:
+    return "UNKNOWN";
+  }
+}
 
 } // namespace steamrot
 
