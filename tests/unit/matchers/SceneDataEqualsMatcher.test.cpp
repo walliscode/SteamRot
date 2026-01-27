@@ -7,18 +7,13 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "SceneDataEqualsMatcher.h"
-#include "CMeta.h"
-#include "CUserInterface.h"
 #include "SceneData.h"
 #include "SceneInfo.h"
-#include "conmat.h"
 #include "containers.h"
-#include "entity_memory.h"
 #include "matcher_helpers.h"
 #include "test_context.h"
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
-#include <sstream>
 
 using namespace steamrot;
 using namespace steamrot::tests;
@@ -118,8 +113,7 @@ TEST_CASE("SceneDataEqualsMatcher - multiple field mismatches",
 
     REQUIRE(description.find("SceneData Mismatch") != std::string::npos);
     REQUIRE(description.find("SceneInfo Mismatch") != std::string::npos);
-    REQUIRE(description.find("EntityMemoryPool Mismatch") !=
-            std::string::npos);
+    REQUIRE(description.find("EntityMemoryPool Mismatch") != std::string::npos);
   }
 }
 
