@@ -12,6 +12,7 @@ add_executable(test_matchers
   JointEqualsMatcher.test.cpp
   UIElementEqualsMatcher.test.cpp
   EntityMemoryPoolEqualsMatcher.test.cpp
+  EntityTransportEqualsMatcher.test.cpp
   SubscriberEqualsMatcher.test.cpp
   SceneInfoEqualsMatcher.test.cpp
 )
