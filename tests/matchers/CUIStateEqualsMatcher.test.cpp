@@ -171,9 +171,9 @@ TEST_CASE("CUIStateEqualsMatcher detects state_subscribers content "
           "differences",
           "[unit][Components][CUIState][matcher]") {
   auto subscriber1 = std::make_shared<steamrot::Subscriber>(
-      steamrot::EventType::EventType_EVENT_TEST);
+      steamrot::EventType::EVENT_TEST);
   auto subscriber2 = std::make_shared<steamrot::Subscriber>(
-      steamrot::EventType::EventType_EVENT_USER_INPUT);
+      steamrot::EventType::EVENT_USER_INPUT);
 
   steamrot::CUIState expected;
   expected.m_active = true;

@@ -25,9 +25,9 @@ TEST_CASE(
   // set up a button element
   steamrot::ButtonElement button;
   button.subscription = std::make_shared<steamrot::Subscriber>(
-      steamrot::EventType::EventType_EVENT_USER_INPUT);
+      steamrot::EventType::EVENT_USER_INPUT);
   steamrot::EventPacket event_packet{
-      steamrot::EventType::EventType_EVENT_USER_INPUT,
+      steamrot::EventType::EVENT_USER_INPUT,
       steamrot::UserInputBitset{}, 2};
   button.response_event = event_packet;
 
@@ -82,9 +82,9 @@ TEST_CASE("logic::action::ProcessUIActionsAndEvents processes UI elements "
   steamrot::ButtonElement button;
   button.is_mouse_over = true;
   button.subscription = std::make_shared<steamrot::Subscriber>(
-      steamrot::EventType::EventType_EVENT_USER_INPUT);
+      steamrot::EventType::EVENT_USER_INPUT);
   steamrot::EventPacket event_packet{
-      steamrot::EventType::EventType_EVENT_USER_INPUT,
+      steamrot::EventType::EVENT_USER_INPUT,
       steamrot::UserInputBitset{}, 2};
   button.response_event = event_packet;
 
@@ -122,9 +122,9 @@ TEST_CASE("logic::action::ProcessNestedUIActionsAndEvents processes nested "
   auto button = std::make_unique<steamrot::ButtonElement>();
   button->is_mouse_over = true;
   button->subscription = std::make_shared<steamrot::Subscriber>(
-      steamrot::EventType::EventType_EVENT_USER_INPUT);
+      steamrot::EventType::EVENT_USER_INPUT);
   steamrot::EventPacket event_packet{
-      steamrot::EventType::EventType_EVENT_USER_INPUT,
+      steamrot::EventType::EVENT_USER_INPUT,
       steamrot::UserInputBitset{}, 2};
   button->response_event = event_packet;
   panel.child_elements.push_back(std::move(button));

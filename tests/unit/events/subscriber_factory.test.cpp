@@ -32,7 +32,7 @@ TEST_CASE("CreateSubscriber fails with EventType NONE",
 
   // Create SubscriberFbs with EventType_NONE
   auto subscriber_offset = steamrot::CreateSubscriberFbs(
-      builder, steamrot::EventType::EventType_NONE);
+      builder, steamrot::EventType::NONE);
   builder.Finish(subscriber_offset);
 
   const steamrot::SubscriberFbs *subscriber_fbs =
@@ -50,7 +50,7 @@ TEST_CASE("CreateSubscriber creates subscriber without trigger data",
 
   // Create SubscriberFbs with just event type, no trigger data
   auto subscriber_offset = steamrot::CreateSubscriberFbs(
-      builder, steamrot::EventType::EventType_EVENT_TEST,
+      builder, steamrot::EventType::EVENT_TEST,
       steamrot::EventDataData::EventDataData_NONE,
       0,      // trigger_data_type and data
       false); // active
@@ -63,7 +63,7 @@ TEST_CASE("CreateSubscriber creates subscriber without trigger data",
 
   REQUIRE(result.has_value());
   REQUIRE(result.value().m_trigger_event_type ==
-          steamrot::EventType::EventType_EVENT_TEST);
+          steamrot::EventType::EVENT_TEST);
   REQUIRE_FALSE(result.value().m_active);
   REQUIRE_FALSE(result.value().m_trigger_event_data.has_value());
 }
@@ -74,7 +74,7 @@ TEST_CASE("CreateSubscriber creates active subscriber without trigger data",
 
   // Create SubscriberFbs with active flag set
   auto subscriber_offset = steamrot::CreateSubscriberFbs(
-      builder, steamrot::EventType::EventType_EVENT_TEST,
+      builder, steamrot::EventType::EVENT_TEST,
       steamrot::EventDataData::EventDataData_NONE,
       0,     // trigger_data_type and data
       true); // active
@@ -87,7 +87,7 @@ TEST_CASE("CreateSubscriber creates active subscriber without trigger data",
 
   REQUIRE(result.has_value());
   REQUIRE(result.value().m_trigger_event_type ==
-          steamrot::EventType::EventType_EVENT_TEST);
+          steamrot::EventType::EVENT_TEST);
   REQUIRE(result.value().m_active);
   REQUIRE_FALSE(result.value().m_trigger_event_data.has_value());
 }
@@ -105,7 +105,7 @@ TEST_CASE("CreateSubscriber creates subscriber with UserInputBitset trigger "
 
   // Create SubscriberFbs with trigger data
   auto subscriber_offset = steamrot::CreateSubscriberFbs(
-      builder, steamrot::EventType::EventType_EVENT_USER_INPUT,
+      builder, steamrot::EventType::EVENT_USER_INPUT,
       steamrot::EventDataData::EventDataData_UserInputBitsetData,
       trigger_data_offset.Union(), false);
   builder.Finish(subscriber_offset);
@@ -117,7 +117,7 @@ TEST_CASE("CreateSubscriber creates subscriber with UserInputBitset trigger "
 
   REQUIRE(result.has_value());
   REQUIRE(result.value().m_trigger_event_type ==
-          steamrot::EventType::EventType_EVENT_USER_INPUT);
+          steamrot::EventType::EVENT_USER_INPUT);
   REQUIRE_FALSE(result.value().m_active);
   REQUIRE(result.value().m_trigger_event_data.has_value());
   REQUIRE(std::holds_alternative<steamrot::UserInputBitset>(
@@ -141,7 +141,7 @@ TEST_CASE("CreateSubscriber creates subscriber with SceneChangePacket trigger "
 
   // Create SubscriberFbs with trigger data
   auto subscriber_offset = steamrot::CreateSubscriberFbs(
-      builder, steamrot::EventType::EventType_EVENT_CHANGE_SCENE,
+      builder, steamrot::EventType::EVENT_CHANGE_SCENE,
       steamrot::EventDataData::EventDataData_SceneChangePacketData,
       trigger_data_offset.Union(), false);
   builder.Finish(subscriber_offset);
@@ -153,7 +153,7 @@ TEST_CASE("CreateSubscriber creates subscriber with SceneChangePacket trigger "
 
   REQUIRE(result.has_value());
   REQUIRE(result.value().m_trigger_event_type ==
-          steamrot::EventType::EventType_EVENT_CHANGE_SCENE);
+          steamrot::EventType::EVENT_CHANGE_SCENE);
   REQUIRE_FALSE(result.value().m_active);
   REQUIRE(result.value().m_trigger_event_data.has_value());
   REQUIRE(std::holds_alternative<steamrot::SceneChangePacket>(
@@ -178,7 +178,7 @@ TEST_CASE("CreateSubscriber creates subscriber with UserInterfaceName trigger "
 
   // Create SubscriberFbs with trigger data
   auto subscriber_offset = steamrot::CreateSubscriberFbs(
-      builder, steamrot::EventType::EventType_EVENT_TOGGLE_UI,
+      builder, steamrot::EventType::EVENT_TOGGLE_UI,
       steamrot::EventDataData::EventDataData_UserInterfaceNameData,
       trigger_data_offset.Union(), false);
   builder.Finish(subscriber_offset);
@@ -190,7 +190,7 @@ TEST_CASE("CreateSubscriber creates subscriber with UserInterfaceName trigger "
 
   REQUIRE(result.has_value());
   REQUIRE(result.value().m_trigger_event_type ==
-          steamrot::EventType::EventType_EVENT_TOGGLE_UI);
+          steamrot::EventType::EVENT_TOGGLE_UI);
   REQUIRE_FALSE(result.value().m_active);
   REQUIRE(result.value().m_trigger_event_data.has_value());
   REQUIRE(std::holds_alternative<steamrot::UserInterfaceName>(
@@ -214,7 +214,7 @@ TEST_CASE("CreateSubscriber propagates error from CreateEventData with "
 
   // Create SubscriberFbs with trigger data
   auto subscriber_offset = steamrot::CreateSubscriberFbs(
-      builder, steamrot::EventType::EventType_EVENT_CHANGE_SCENE,
+      builder, steamrot::EventType::EVENT_CHANGE_SCENE,
       steamrot::EventDataData::EventDataData_SceneChangePacketData,
       trigger_data_offset.Union(), false);
   builder.Finish(subscriber_offset);
@@ -238,7 +238,7 @@ TEST_CASE("CreateSubscriber propagates error from CreateEventData with "
 
   // Create SubscriberFbs with trigger data
   auto subscriber_offset = steamrot::CreateSubscriberFbs(
-      builder, steamrot::EventType::EventType_EVENT_TOGGLE_UI,
+      builder, steamrot::EventType::EVENT_TOGGLE_UI,
       steamrot::EventDataData::EventDataData_UserInterfaceNameData,
       trigger_data_offset.Union(), false);
   builder.Finish(subscriber_offset);
