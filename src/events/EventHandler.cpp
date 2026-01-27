@@ -3,7 +3,6 @@
 /////////////////////////////////////////////////
 #include "EventHandler.h"
 #include "FailInfo.h"
-#include "events_generated.h"
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <expected>
