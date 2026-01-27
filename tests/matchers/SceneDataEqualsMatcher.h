@@ -13,7 +13,10 @@
 /////////////////////////////////////////////////
 
 #include "SceneData.h"
+#include "test_context.h"
 #include "catch2/matchers/catch_matchers.hpp"
+#include <optional>
+
 namespace steamrot::tests {
 
 class SceneDataEqualsMatcher : public Catch::Matchers::MatcherBase<SceneData> {
@@ -29,6 +32,11 @@ private:
   /////////////////////////////////////////////////
   mutable std::string m_mismatch_description;
 
+  /////////////////////////////////////////////////
+  /// @brief Optional test context for enriched error messages
+  /////////////////////////////////////////////////
+  std::optional<TestContext> m_context;
+
 public:
   /////////////////////////////////////////////////
   /// @brief Constructor for SceneDataEqualsMatcher
@@ -36,6 +44,14 @@ public:
   /// @param expected Reference to the expected SceneData object
   /////////////////////////////////////////////////
   explicit SceneDataEqualsMatcher(const SceneData &expected);
+
+  /////////////////////////////////////////////////
+  /// @brief Constructor with TestContext
+  ///
+  /// @param expected Reference to the expected SceneData object
+  /// @param context Test context with metadata and tick information
+  /////////////////////////////////////////////////
+  SceneDataEqualsMatcher(const SceneData &expected, const TestContext &context);
 
   /////////////////////////////////////////////////
   /// @brief Match method to compare actual SceneData with expected
@@ -59,5 +75,17 @@ public:
 /////////////////////////////////////////////////
 inline SceneDataEqualsMatcher EqualsSceneData(const SceneData &expected) {
   return SceneDataEqualsMatcher(expected);
+}
+
+/////////////////////////////////////////////////
+/// @brief Helper function to create SceneDataEqualsMatcher with context
+///
+/// @param expected Expected SceneData object
+/// @param context Test context with metadata and tick information
+/// @return SceneDataEqualsMatcher instance
+/////////////////////////////////////////////////
+inline SceneDataEqualsMatcher EqualsSceneData(const SceneData &expected,
+                                              const TestContext &context) {
+  return SceneDataEqualsMatcher(expected, context);
 }
 } // namespace steamrot::tests

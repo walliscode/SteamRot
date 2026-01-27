@@ -15,6 +15,7 @@ add_executable(test_matchers
   EntityTransportEqualsMatcher.test.cpp
   SubscriberEqualsMatcher.test.cpp
   SceneInfoEqualsMatcher.test.cpp
+  SceneDataEqualsMatcher.test.cpp
 )
 
 target_link_libraries(test_matchers

@@ -17,6 +17,7 @@ add_library(matchers
   EntityTransportEqualsMatcher.cpp
   SubscriberEqualsMatcher.cpp
   SceneInfoEqualsMatcher.cpp
+  SceneDataEqualsMatcher.cpp
 )
 
 target_include_directories(matchers
