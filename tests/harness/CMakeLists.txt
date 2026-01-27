@@ -4,6 +4,8 @@ add_library(harness
   FlatbuffersTestDataProvider.cpp
   harness_runner.cpp
   SimulationRunner.cpp
+  UUIDAssignmentTracker.cpp
+  configure_test_engine_snapshot.cpp
 )
 
 target_include_directories(harness
@@ -15,5 +17,6 @@ target_link_libraries(harness
   PUBLIC
   engine
   types
+  data_providers
 )
 

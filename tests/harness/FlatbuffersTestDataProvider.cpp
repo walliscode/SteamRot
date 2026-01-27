@@ -7,9 +7,12 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersTestDataProvider.h"
+#include "EventHandler.h"
 #include "FlatbuffersTestDataLoader.h"
 #include "SimulationData.h"
 #include "TestData.h"
+#include "UUIDAssignmentTracker.h"
+#include "configure_test_engine_snapshot.h"
 #include "simulation_data_generated.h"
 #include <expected>
 #include <filesystem>
@@ -82,6 +85,58 @@ FlatbuffersTestDataProvider::CreateTestData(
         "TestDataFbs is missing required field: num_ticks."});
   } else {
     test_data.number_of_ticks = fbs_test_data->num_ticks();
+  }
+
+  // Create UUID tracker for consistent UUID assignment across snapshots
+  steamrot::tests::UUIDAssignmentTracker uuid_tracker;
+
+  // Create a temporary EventHandler for entity importers
+  // Note: This is only used during data loading, not during test execution
+  steamrot::EventHandler temp_event_handler;
+
+  // Configure starting_engine_snapshot with UUID assignment
+  if (fbs_test_data->starting_engine_snapshot()) {
+    auto snapshot_result = steamrot::tests::ConfigureEngineSnapshotWithUUIDs(
+        test_data.starting_engine_snapshot,
+        fbs_test_data->starting_engine_snapshot(), temp_event_handler,
+        uuid_tracker, true); // true = is_starting_snapshot
+
+    if (!snapshot_result.has_value()) {
+      return std::unexpected(snapshot_result.error());
+    }
+  }
+
+  // Configure expected_engine_snapshots with UUID propagation
+  if (fbs_test_data->expected_engine_snapshots()) {
+    for (const auto *tick_snapshot_pair :
+         *fbs_test_data->expected_engine_snapshots()) {
+      if (!tick_snapshot_pair) {
+        continue; // Skip null entries
+      }
+
+      // Validate required fields
+      if (!tick_snapshot_pair->snapshot()) {
+        return std::unexpected(steamrot::FailInfo{
+            steamrot::FailMode::FlatbuffersDataNotFound,
+            "TickSnapshotPair is missing required field: snapshot"});
+      }
+
+      // Get the tick number
+      size_t tick = tick_snapshot_pair->tick();
+
+      // Configure the expected snapshot with UUID tracking
+      steamrot::EngineSnapshot expected_snapshot;
+      auto expected_result = steamrot::tests::ConfigureEngineSnapshotWithUUIDs(
+          expected_snapshot, tick_snapshot_pair->snapshot(), temp_event_handler,
+          uuid_tracker, false); // false = not starting snapshot
+
+      if (!expected_result.has_value()) {
+        return std::unexpected(expected_result.error());
+      }
+
+      // Add to the expected snapshots map
+      test_data.expected_engine_snapshots[tick] = std::move(expected_snapshot);
+    }
   }
 
   // return the populated TestData instance

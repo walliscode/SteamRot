@@ -5,6 +5,20 @@ include "../core/engine_snapshot.fbs";
 namespace steamrot;
 
 ////////////////////////////////////////////////////////////
+/// @brief Maps a tick number to an expected engine snapshot
+///
+/// Used to define expected engine state at specific ticks
+/// during test execution.
+////////////////////////////////////////////////////////////
+table TickSnapshotPair {
+  /// @brief The tick number when this snapshot should be captured
+  tick: uint64 (required);
+  
+  /// @brief The expected engine snapshot at this tick
+  snapshot: EngineSnapshotFbs (required);
+}
+
+////////////////////////////////////////////////////////////
 /// @brief Test metadata for data-driven testing
 ///
 /// This table contains metadata about a test case that can
@@ -49,6 +63,13 @@ table TestDataFbs
    
   /// @brief Starting engine snapshot before simulation begins
   starting_engine_snapshot: EngineSnapshotFbs;
+  
+  /// @brief Expected engine snapshots at specific ticks
+  ///
+  /// Each entry maps a tick number to an expected snapshot.
+  /// UUIDs for scenes will be automatically assigned from the
+  /// starting_engine_snapshot if not provided in JSON.
+  expected_engine_snapshots: [TickSnapshotPair];
   
 }
 
