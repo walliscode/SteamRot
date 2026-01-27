@@ -9,7 +9,6 @@
 #include "event_factory.h"
 #include "EventPacket.h"
 #include "event_type_conversion.h"
-#include "events_generated.h"
 #include "scene_type_conversion.h"
 #include "uuid.h"
 #include <cstddef>
@@ -144,7 +143,7 @@ CreateSceneChangePacket(const SceneChangePacketData &data) {
                  "CreateSceneChangePacket: SceneChangePacketData "
                  "missing scene_type."});
   }
-  
+
   // Convert FlatBuffers enum to native enum
   auto conversion_result = ConvertSceneTypeFbsToSceneType(data.scene_type());
   if (!conversion_result.has_value()) {
@@ -267,9 +266,10 @@ CreateEventPacketFromData(const EventPacketData *packet_data) {
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     "EventPacketData missing event_type."});
   }
-  
+
   // Convert EventTypeFbs to native EventType
-  auto event_type_result = ConvertEventTypeFbsToEventType(packet_data->event_type());
+  auto event_type_result =
+      ConvertEventTypeFbsToEventType(packet_data->event_type());
   if (!event_type_result.has_value()) {
     return std::unexpected(event_type_result.error());
   }

@@ -18,26 +18,26 @@ namespace steamrot {
 struct SceneChangePacketData;
 struct SceneChangePacketDataBuilder;
 
-enum SceneType : int8_t {
-  SceneType_UNKNOWN = 0,
-  SceneType_TEST = 1,
-  SceneType_TITLE = 2,
-  SceneType_CRAFTING = 3,
-  SceneType_MIN = SceneType_UNKNOWN,
-  SceneType_MAX = SceneType_CRAFTING
+enum SceneTypeFbs : int8_t {
+  SceneTypeFbs_UNKNOWN = 0,
+  SceneTypeFbs_TEST = 1,
+  SceneTypeFbs_TITLE = 2,
+  SceneTypeFbs_CRAFTING = 3,
+  SceneTypeFbs_MIN = SceneTypeFbs_UNKNOWN,
+  SceneTypeFbs_MAX = SceneTypeFbs_CRAFTING
 };
 
-inline const SceneType (&EnumValuesSceneType())[4] {
-  static const SceneType values[] = {
-    SceneType_UNKNOWN,
-    SceneType_TEST,
-    SceneType_TITLE,
-    SceneType_CRAFTING
+inline const SceneTypeFbs (&EnumValuesSceneTypeFbs())[4] {
+  static const SceneTypeFbs values[] = {
+    SceneTypeFbs_UNKNOWN,
+    SceneTypeFbs_TEST,
+    SceneTypeFbs_TITLE,
+    SceneTypeFbs_CRAFTING
   };
   return values;
 }
 
-inline const char * const *EnumNamesSceneType() {
+inline const char * const *EnumNamesSceneTypeFbs() {
   static const char * const names[5] = {
     "UNKNOWN",
     "TEST",
@@ -48,10 +48,10 @@ inline const char * const *EnumNamesSceneType() {
   return names;
 }
 
-inline const char *EnumNameSceneType(SceneType e) {
-  if (::flatbuffers::IsOutRange(e, SceneType_UNKNOWN, SceneType_CRAFTING)) return "";
+inline const char *EnumNameSceneTypeFbs(SceneTypeFbs e) {
+  if (::flatbuffers::IsOutRange(e, SceneTypeFbs_UNKNOWN, SceneTypeFbs_CRAFTING)) return "";
   const size_t index = static_cast<size_t>(e);
-  return EnumNamesSceneType()[index];
+  return EnumNamesSceneTypeFbs()[index];
 }
 
 struct SceneChangePacketData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -63,8 +63,8 @@ struct SceneChangePacketData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Ta
   const ::flatbuffers::String *uuid() const {
     return GetPointer<const ::flatbuffers::String *>(VT_UUID);
   }
-  steamrot::SceneType scene_type() const {
-    return static_cast<steamrot::SceneType>(GetField<int8_t>(VT_SCENE_TYPE, 0));
+  steamrot::SceneTypeFbs scene_type() const {
+    return static_cast<steamrot::SceneTypeFbs>(GetField<int8_t>(VT_SCENE_TYPE, 0));
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -82,7 +82,7 @@ struct SceneChangePacketDataBuilder {
   void add_uuid(::flatbuffers::Offset<::flatbuffers::String> uuid) {
     fbb_.AddOffset(SceneChangePacketData::VT_UUID, uuid);
   }
-  void add_scene_type(steamrot::SceneType scene_type) {
+  void add_scene_type(steamrot::SceneTypeFbs scene_type) {
     fbb_.AddElement<int8_t>(SceneChangePacketData::VT_SCENE_TYPE, static_cast<int8_t>(scene_type), 0);
   }
   explicit SceneChangePacketDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
@@ -99,7 +99,7 @@ struct SceneChangePacketDataBuilder {
 inline ::flatbuffers::Offset<SceneChangePacketData> CreateSceneChangePacketData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::String> uuid = 0,
-    steamrot::SceneType scene_type = steamrot::SceneType_UNKNOWN) {
+    steamrot::SceneTypeFbs scene_type = steamrot::SceneTypeFbs_UNKNOWN) {
   SceneChangePacketDataBuilder builder_(_fbb);
   builder_.add_uuid(uuid);
   builder_.add_scene_type(scene_type);
@@ -109,7 +109,7 @@ inline ::flatbuffers::Offset<SceneChangePacketData> CreateSceneChangePacketData(
 inline ::flatbuffers::Offset<SceneChangePacketData> CreateSceneChangePacketDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const char *uuid = nullptr,
-    steamrot::SceneType scene_type = steamrot::SceneType_UNKNOWN) {
+    steamrot::SceneTypeFbs scene_type = steamrot::SceneTypeFbs_UNKNOWN) {
   auto uuid__ = uuid ? _fbb.CreateString(uuid) : 0;
   return steamrot::CreateSceneChangePacketData(
       _fbb,

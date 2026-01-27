@@ -160,7 +160,7 @@ TEST_CASE("CreateSubscriber creates subscriber with SceneChangePacket trigger "
   // Verify the scene type
   const auto &scene_packet = std::get<steamrot::SceneChangePacket>(
       result.value().m_trigger_event_data.value());
-  REQUIRE(scene_packet.second == steamrot::SceneTypeFbs_TITLE);
+  REQUIRE(scene_packet.second == steamrot::SceneType::TITLE);
   REQUIRE_FALSE(scene_packet.first.has_value()); // No UUID
 }
 

@@ -40,7 +40,7 @@ struct SceneInfo {
   /////////////////////////////////////////////////
   /// @brief Scene type identifier
   /////////////////////////////////////////////////
-  SceneType type;
+  SceneType type{SceneType::UNKNOWN};
 };
 
 } // namespace steamrot
