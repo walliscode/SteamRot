@@ -25,10 +25,8 @@ PUBLIC
 target_link_libraries(matchers
 PUBLIC
   Catch2::Catch2WithMain
-  components
+  types
   entity
-  user_interface
   events
-  test_harness
   conmat
 )

@@ -19,7 +19,6 @@ target_link_libraries(test_matchers
 PRIVATE
   Catch2::Catch2WithMain
   matchers
-  components
   entity
   events
 )
