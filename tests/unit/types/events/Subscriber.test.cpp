@@ -14,11 +14,11 @@
 TEST_CASE("Subscriber: check public members", "[types]") {
 
   // create a Subscriber object
-  steamrot::Subscriber subscriber{steamrot::EventType::EventType_EVENT_TEST};
+  steamrot::Subscriber subscriber{steamrot::EventTypeFbs_EVENT_TEST};
 
   // check the trigger event type
   REQUIRE(subscriber.m_trigger_event_type ==
-          steamrot::EventType::EventType_EVENT_TEST);
+          steamrot::EventType::TEST);
   // check the trigger event data is empty
   REQUIRE(!subscriber.m_trigger_event_data.has_value());
 
@@ -37,12 +37,12 @@ TEST_CASE("Subscriber: with trigger data", "[types]") {
   steamrot::EventData trigger_data = steamrot::UserInputBitset{};
 
   // create a Subscriber object with trigger data
-  steamrot::Subscriber subscriber{steamrot::EventType::EventType_EVENT_TEST,
+  steamrot::Subscriber subscriber{steamrot::EventTypeFbs_EVENT_TEST,
                                   trigger_data};
 
   // check the trigger event type
   REQUIRE(subscriber.m_trigger_event_type ==
-          steamrot::EventType::EventType_EVENT_TEST);
+          steamrot::EventType::TEST);
   // check the trigger event data is set
   REQUIRE(subscriber.m_trigger_event_data.has_value());
   REQUIRE(std::holds_alternative<steamrot::UserInputBitset>(

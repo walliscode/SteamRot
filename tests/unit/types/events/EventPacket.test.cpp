@@ -11,7 +11,7 @@
 
 TEST_CASE("EventPacket: Default Constructor", "[types]") {
   steamrot::EventPacket event_packet(5);
-  REQUIRE(event_packet.event_type == steamrot::EventType::EventType_NONE);
+  REQUIRE(event_packet.event_type == steamrot::EventType::NONE);
   REQUIRE(std::holds_alternative<std::monostate>(event_packet.event_data));
   REQUIRE(event_packet.event_lifetime == 5);
   REQUIRE(event_packet.event_id.is_nil());

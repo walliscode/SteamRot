@@ -35,7 +35,7 @@ TEST_CASE("Logic::AddSubscriber adds a subscriber to the vector",
 
   // Create a subscriber
   auto subscriber = std::make_shared<steamrot::Subscriber>(
-      steamrot::EventType::EventType_EVENT_USER_INPUT);
+      steamrot::EventType::USER_INPUT);
 
   // Add subscriber to logic
   logic.AddSubscriber(subscriber);
@@ -56,11 +56,11 @@ TEST_CASE("Logic::AddSubscriber can add multiple subscribers",
 
   // Create multiple subscribers
   auto subscriber1 = std::make_shared<steamrot::Subscriber>(
-      steamrot::EventType::EventType_EVENT_USER_INPUT);
+      steamrot::EventType::USER_INPUT);
   auto subscriber2 = std::make_shared<steamrot::Subscriber>(
-      steamrot::EventType::EventType_EVENT_CHANGE_SCENE);
+      steamrot::EventType::CHANGE_SCENE);
   auto subscriber3 = std::make_shared<steamrot::Subscriber>(
-      steamrot::EventType::EventType_EVENT_QUIT_GAME);
+      steamrot::EventType::QUIT_GAME);
 
   // Add subscribers to logic
   logic.AddSubscriber(subscriber1);
@@ -85,7 +85,7 @@ TEST_CASE("Logic::RunLogic can be called on Logic with subscribers",
 
   // Create and add a subscriber
   auto subscriber = std::make_shared<steamrot::Subscriber>(
-      steamrot::EventType::EventType_EVENT_USER_INPUT);
+      steamrot::EventType::USER_INPUT);
   logic.AddSubscriber(subscriber);
 
   // Verify RunLogic doesn't throw with subscribers present
