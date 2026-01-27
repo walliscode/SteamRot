@@ -34,27 +34,28 @@ TEST_CASE("FlatbuffersDataLoader provides scene data",
 
   // Test all Title scene data
   auto title_scene_result =
-      data_loader.ProvideDefaultSceneData(steamrot::SceneType_TITLE);
+      data_loader.ProvideDefaultSceneData(steamrot::SceneType::TITLE);
 
   if (!title_scene_result.has_value()) {
     FAIL(title_scene_result.error().message);
   }
   const auto &scene_data = title_scene_result.value();
   REQUIRE(scene_data != nullptr);
-  REQUIRE(scene_data->scene_info()->scene_type() == steamrot::SceneType_TITLE);
+  REQUIRE(scene_data->scene_info()->scene_type() ==
+          steamrot::SceneTypeFbs_TITLE);
   REQUIRE(!scene_data->entity_collection()->entities()->empty());
   //.... Additional checks can be added here
 
   // Test all Crafting scene data
   auto crafting_scene_result =
-      data_loader.ProvideDefaultSceneData(steamrot::SceneType_CRAFTING);
+      data_loader.ProvideDefaultSceneData(steamrot::SceneType::CRAFTING);
   if (!crafting_scene_result.has_value()) {
     FAIL(crafting_scene_result.error().message);
   }
   const auto &crafting_scene_data = crafting_scene_result.value();
   REQUIRE(crafting_scene_data != nullptr);
   REQUIRE(crafting_scene_data->scene_info()->scene_type() ==
-          steamrot::SceneType_CRAFTING);
+          steamrot::SceneTypeFbs_CRAFTING);
   REQUIRE(!crafting_scene_data->entity_collection()->entities()->empty());
   //.... Additional checks can be added here
 }
@@ -149,7 +150,7 @@ TEST_CASE("FlatbuffersDataLoader::ProvideEngineData returns data "
   const auto *subscription = state->subscriptions()->Get(0);
   REQUIRE(subscription != nullptr);
   REQUIRE(subscription->event_type_data() ==
-          steamrot::EventType_EVENT_QUIT_GAME);
+          steamrot::EventTypeFbs_EVENT_QUIT_GAME);
 }
 
 TEST_CASE("FlatbuffersDataLoader::ProvideDefaultUserPreferencesData returns "

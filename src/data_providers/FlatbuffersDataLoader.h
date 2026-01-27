@@ -13,6 +13,7 @@
 /////////////////////////////////////////////////
 #include "DataLoader.h"
 #include "FailInfo.h"
+#include "SceneType.h"
 #include "engine_data_generated.h"
 #include "logic_data_generated.h"
 #include "scene_data_generated.h"
@@ -30,7 +31,7 @@ public:
   /////////////////////////////////////////////////
   FlatbuffersDataLoader() = default;
 
-  /////////////////////////////////////////////////
+/////////////////////////////////////////////////
   /// @brief Provides SceneData based on the SceneType
   ///
   /// @param scene_type Enum representing the type of scene

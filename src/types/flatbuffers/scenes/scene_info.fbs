@@ -5,7 +5,7 @@ namespace steamrot;
 
 table SceneInfoFbs{
     scene_id: string;
-    scene_type: SceneType;
+    scene_type: SceneTypeFbs;
   }
 
 root_type SceneInfoFbs;

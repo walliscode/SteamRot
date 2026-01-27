@@ -8,10 +8,10 @@
 /////////////////////////////////////////////////
 #include "logic_action.h"
 #include "EventPacket.h"
+#include "EventType.h"
 #include "PanelElement.h"
 #include "Subscriber.h"
 #include "TestFixture.h"
-#include "events_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE(
@@ -24,11 +24,10 @@ TEST_CASE(
       fixture.GetGameContext().event_handler;
   // set up a button element
   steamrot::ButtonElement button;
-  button.subscription = std::make_shared<steamrot::Subscriber>(
-      steamrot::EventType::EventType_EVENT_USER_INPUT);
-  steamrot::EventPacket event_packet{
-      steamrot::EventType::EventType_EVENT_USER_INPUT,
-      steamrot::UserInputBitset{}, 2};
+  button.subscription =
+      std::make_shared<steamrot::Subscriber>(steamrot::EventType::USER_INPUT);
+  steamrot::EventPacket event_packet{steamrot::EventType::USER_INPUT,
+                                     steamrot::UserInputBitset{}, 2};
   button.response_event = event_packet;
 
   // initial tests
@@ -81,11 +80,10 @@ TEST_CASE("logic::action::ProcessUIActionsAndEvents processes UI elements "
   // set up a button with subscriber and response event
   steamrot::ButtonElement button;
   button.is_mouse_over = true;
-  button.subscription = std::make_shared<steamrot::Subscriber>(
-      steamrot::EventType::EventType_EVENT_USER_INPUT);
-  steamrot::EventPacket event_packet{
-      steamrot::EventType::EventType_EVENT_USER_INPUT,
-      steamrot::UserInputBitset{}, 2};
+  button.subscription =
+      std::make_shared<steamrot::Subscriber>(steamrot::EventType::USER_INPUT);
+  steamrot::EventPacket event_packet{steamrot::EventType::USER_INPUT,
+                                     steamrot::UserInputBitset{}, 2};
   button.response_event = event_packet;
 
   // initial tests
@@ -121,11 +119,10 @@ TEST_CASE("logic::action::ProcessNestedUIActionsAndEvents processes nested "
   panel.children_active = true;
   auto button = std::make_unique<steamrot::ButtonElement>();
   button->is_mouse_over = true;
-  button->subscription = std::make_shared<steamrot::Subscriber>(
-      steamrot::EventType::EventType_EVENT_USER_INPUT);
-  steamrot::EventPacket event_packet{
-      steamrot::EventType::EventType_EVENT_USER_INPUT,
-      steamrot::UserInputBitset{}, 2};
+  button->subscription =
+      std::make_shared<steamrot::Subscriber>(steamrot::EventType::USER_INPUT);
+  steamrot::EventPacket event_packet{steamrot::EventType::USER_INPUT,
+                                     steamrot::UserInputBitset{}, 2};
   button->response_event = event_packet;
   panel.child_elements.push_back(std::move(button));
 

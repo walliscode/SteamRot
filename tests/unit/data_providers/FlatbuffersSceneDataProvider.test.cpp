@@ -12,7 +12,6 @@
 #include "scene_data_generated.h"
 #include "scene_info_generated.h"
 #include <catch2/catch_test_macros.hpp>
-#include <iostream>
 
 TEST_CASE("FlatbuffersSceneDataProvider::CreateSceneData creates SceneData "
           "for Title scene",
@@ -23,14 +22,13 @@ TEST_CASE("FlatbuffersSceneDataProvider::CreateSceneData creates SceneData "
   steamrot::FlatbuffersSceneDataProvider provider(
       fixture.GetGameContext().event_handler);
 
-  auto scene_data_result =
-      provider.CreateSceneData(steamrot::SceneType::SceneType_TITLE);
+  auto scene_data_result = provider.CreateSceneData(steamrot::SceneType::TITLE);
   if (!scene_data_result.has_value()) {
     FAIL(scene_data_result.error().message);
   }
 
   const steamrot::SceneData &scene_data = scene_data_result.value();
-  REQUIRE(scene_data.scene_info.type == steamrot::SceneType::SceneType_TITLE);
+  REQUIRE(scene_data.scene_info.type == steamrot::SceneType::TITLE);
   // check the variant holds a unique_ptr<IEntityImporter>
   REQUIRE(std::holds_alternative<std::unique_ptr<steamrot::IEntityImporter>>(
       scene_data.entity_transport));
@@ -51,15 +49,14 @@ TEST_CASE("FlatbuffersSceneDataProvider::CreateSceneData creates SceneData "
       fixture.GetGameContext().event_handler);
 
   auto scene_data_result =
-      provider.CreateSceneData(steamrot::SceneType::SceneType_CRAFTING);
+      provider.CreateSceneData(steamrot::SceneType::CRAFTING);
   if (!scene_data_result.has_value()) {
     FAIL(scene_data_result.error().message);
   }
 
   const steamrot::SceneData &scene_data = scene_data_result.value();
 
-  REQUIRE(scene_data.scene_info.type ==
-          steamrot::SceneType::SceneType_CRAFTING);
+  REQUIRE(scene_data.scene_info.type == steamrot::SceneType::CRAFTING);
 
   // check the variant holds a unique_ptr<IEntityImporter>
   REQUIRE(std::holds_alternative<std::unique_ptr<steamrot::IEntityImporter>>(
@@ -102,7 +99,7 @@ TEST_CASE(
       builder.CreateString("");
   flatbuffers::Offset<steamrot::SceneInfoFbs> scene_info_offset =
       steamrot::CreateSceneInfoFbs(builder, 0,
-                                   steamrot::SceneType::SceneType_TITLE);
+                                   steamrot::SceneTypeFbs::SceneTypeFbs_TITLE);
 
   // Create empty entity collection
   std::vector<flatbuffers::Offset<steamrot::EntityDataFbs>> entities;
@@ -135,7 +132,7 @@ TEST_CASE(
     FAIL(result.error().message);
   }
 
-  REQUIRE(scene_data.scene_info.type == steamrot::SceneType::SceneType_TITLE);
+  REQUIRE(scene_data.scene_info.type == steamrot::SceneType::TITLE);
 
   // check the variant holds a unique_ptr<IEntityImporter>
   REQUIRE(std::holds_alternative<std::unique_ptr<steamrot::IEntityImporter>>(

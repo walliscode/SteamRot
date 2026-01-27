@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "EventHandler.h"
 #include "EventPacket.h"
+#include "EventType.h"
 #include "Subscriber.h"
 #include "events_generated.h"
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -21,8 +22,7 @@ TEST_CASE("EventHandler registers Subscribers", "[unit][EventHandler]") {
   steamrot::EventHandler event_handler;
 
   // create Subscriber variables
-  const steamrot::EventType event_type =
-      steamrot::EventType::EventType_EVENT_QUIT_GAME;
+  const steamrot::EventType event_type = steamrot::EventType::QUIT_GAME;
 
   // Create a Subscriber instance
   std::shared_ptr<steamrot::Subscriber> subscriber =
@@ -172,8 +172,7 @@ TEST_CASE("EventHandler::TickGlobalEventBus updates the global event bus",
 TEST_CASE("UpdateSubscribers turns on Subscribers", "[unit][EventHandler]") {
 
   // create Subscriber variables
-  const steamrot::EventType event_type =
-      steamrot::EventType::EventType_EVENT_USER_INPUT;
+  const steamrot::EventType event_type = steamrot::EventType::USER_INPUT;
 
   // Create a Subscriber instance
   std::shared_ptr<steamrot::Subscriber> subscriber =
@@ -202,8 +201,7 @@ TEST_CASE("EventHandler::UpdateSubscribersFrom does not update Subscribers "
   // Create an EventHandler instance
   steamrot::EventHandler event_handler;
   // create Subscriber variables
-  const steamrot::EventType event_type =
-      steamrot::EventType::EventType_EVENT_USER_INPUT;
+  const steamrot::EventType event_type = steamrot::EventType::USER_INPUT;
 
   // Create a Subscriber instance
   std::shared_ptr<steamrot::Subscriber> subscriber =
@@ -217,7 +215,7 @@ TEST_CASE("EventHandler::UpdateSubscribersFrom does not update Subscribers "
 
   // Create some EventPackets to add that do not match the subscriber
   steamrot::EventPacket event1{2};
-  event1.event_type = steamrot::EventType::EventType_EVENT_TEST;
+  event1.event_type = steamrot::EventType::TEST;
   std::vector<steamrot::EventPacket> events_to_add = {event1};
 
   // Add events to the global event bus
@@ -235,8 +233,7 @@ TEST_CASE("EventHandler::UpdateSubscribers does not update Subscriber if "
           "trigger_data is present and does not match",
           "[unit][EventHandler]") {
   // create Subscriber variables
-  const steamrot::EventType event_type =
-      steamrot::EventType::EventType_EVENT_USER_INPUT;
+  const steamrot::EventType event_type = steamrot::EventType::USER_INPUT;
 
   // Create a Subscriber instance with trigger data
   sf::Event::KeyPressed event_sf;
@@ -272,8 +269,7 @@ TEST_CASE(
     "is present and matches",
     "[unit][EventHandler]") {
   // create Subscriber variables
-  const steamrot::EventType event_type =
-      steamrot::EventType::EventType_EVENT_USER_INPUT;
+  const steamrot::EventType event_type = steamrot::EventType::USER_INPUT;
 
   // Create a Subscriber instance with trigger data
   sf::Event::KeyPressed event_sf;
@@ -308,7 +304,7 @@ TEST_CASE("EventHandler::UpdateSubscribersFromGlobalEventBus updates correct "
 
   // Create an EventHandler instance
   steamrot::EventHandler event_handler;
-  const steamrot::EventType event_type = steamrot::EventType_EVENT_USER_INPUT;
+  const steamrot::EventType event_type = steamrot::EventType::USER_INPUT;
   const steamrot::UserInputBitset user_input_bitset{{event}};
 
   // Subscriber with NO trigger data (should always activate if event matches)
@@ -373,10 +369,8 @@ TEST_CASE("EventHandler::UpdateSubscribersFromGlobalEventBus updates correct "
 TEST_CASE("ResetAllSubscribers resets all Subscribers",
           "[unit][EventHandler]") {
   // create Subscriber variables
-  const steamrot::EventType event_type1 =
-      steamrot::EventType::EventType_EVENT_USER_INPUT;
-  const steamrot::EventType event_type2 =
-      steamrot::EventType::EventType_EVENT_QUIT_GAME;
+  const steamrot::EventType event_type1 = steamrot::EventType::USER_INPUT;
+  const steamrot::EventType event_type2 = steamrot::EventType::QUIT_GAME;
   // Create Subscriber instances
   std::shared_ptr<steamrot::Subscriber> subscriber1 =
       std::make_shared<steamrot::Subscriber>(event_type1);
@@ -403,10 +397,8 @@ TEST_CASE("EventHandler::CleanExpiredSubscribers removes expired Subscribers",
           "[unit][EventHandler]") {
 
   // create Subscriber variables
-  const steamrot::EventType event_type1 =
-      steamrot::EventType::EventType_EVENT_USER_INPUT;
-  const steamrot::EventType event_type2 =
-      steamrot::EventType::EventType_EVENT_QUIT_GAME;
+  const steamrot::EventType event_type1 = steamrot::EventType::USER_INPUT;
+  const steamrot::EventType event_type2 = steamrot::EventType::QUIT_GAME;
   // Create Subscriber instances
   std::shared_ptr<steamrot::Subscriber> subscriber1 =
       std::make_shared<steamrot::Subscriber>(event_type1);
@@ -437,8 +429,7 @@ TEST_CASE("EventHandler::ExecuteEventHandlerLevelLogic resets all Subscribers",
   // Create an EventHandler instance
   steamrot::EventHandler event_handler;
   // create Subscriber variables
-  const steamrot::EventType event_type =
-      steamrot::EventType::EventType_EVENT_USER_INPUT;
+  const steamrot::EventType event_type = steamrot::EventType::USER_INPUT;
   // Create a Subscriber instance
   std::shared_ptr<steamrot::Subscriber> subscriber =
       std::make_shared<steamrot::Subscriber>(event_type);
@@ -448,7 +439,7 @@ TEST_CASE("EventHandler::ExecuteEventHandlerLevelLogic resets all Subscribers",
     FAIL(result.error().message);
   // Create some EventPackets to add
   steamrot::EventPacket event1{2};
-  event1.event_type = steamrot::EventType::EventType_EVENT_TEST;
+  event1.event_type = steamrot::EventType::TEST;
   std::vector<steamrot::EventPacket> events_to_add = {event1};
   // Add events to the global event bus
   for (const auto &event : events_to_add)
@@ -466,8 +457,7 @@ TEST_CASE(
   // Create an EventHandler instance
   steamrot::EventHandler event_handler;
   // create Subscriber variables
-  const steamrot::EventType event_type =
-      steamrot::EventType::EventType_EVENT_USER_INPUT;
+  const steamrot::EventType event_type = steamrot::EventType::USER_INPUT;
   // Create a Subscriber instance
   std::shared_ptr<steamrot::Subscriber> subscriber =
       std::make_shared<steamrot::Subscriber>(event_type);

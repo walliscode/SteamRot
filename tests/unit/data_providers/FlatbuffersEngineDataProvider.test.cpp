@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersEngineDataProvider.h"
-#include "events_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("FlatbuffersEngineDataProvider is constructed correctly",
@@ -46,7 +45,7 @@ TEST_CASE("FlatbuffersEngineDataProvider::CreateEngineData loads correctly",
   REQUIRE(engine_state.quit_requested == false);
   REQUIRE(engine_state.subscriptions.size() == 1);
   REQUIRE(engine_state.subscriptions[0]->m_trigger_event_type ==
-          steamrot::EventType_EVENT_QUIT_GAME);
+          steamrot::EventType::QUIT_GAME);
 
   // Check AssetConfig
   const auto &asset_config = data.initial_asset_config;

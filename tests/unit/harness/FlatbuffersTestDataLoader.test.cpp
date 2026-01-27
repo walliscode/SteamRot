@@ -152,7 +152,7 @@ TEST_CASE(
   REQUIRE(scene_data != nullptr);
   REQUIRE(scene_data->scene_info() != nullptr);
   REQUIRE(!scene_data->scene_info()->scene_id());
-  REQUIRE(scene_data->scene_info()->scene_type() == steamrot::SceneType_TITLE);
+  REQUIRE(scene_data->scene_info()->scene_type() == steamrot::SceneTypeFbs_TITLE);
 
   REQUIRE(scene_data->scene_resources_config() != nullptr);
   REQUIRE(scene_data->scene_resources_config()->texture_width() == 800);
@@ -186,5 +186,6 @@ TEST_CASE(
 
   const auto *event_packet = event_bus->events()->Get(0);
   REQUIRE(event_packet->event_lifetime() == 5);
-  REQUIRE(event_packet->event_type() == steamrot::EventType_EVENT_USER_INPUT);
+  REQUIRE(event_packet->event_type() ==
+          steamrot::EventTypeFbs_EVENT_USER_INPUT);
 }

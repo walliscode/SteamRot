@@ -127,7 +127,7 @@ std::expected<uuids::uuid, FailInfo> SceneManager::LoadTitleScene() {
   m_scenes.clear();
 
   // create title scene
-  auto title_result = AddSceneFromDefault(SceneType::SceneType_TITLE);
+  auto title_result = AddSceneFromDefault(SceneType::TITLE);
   if (!title_result.has_value())
     return std::unexpected(title_result.error());
 
@@ -148,7 +148,7 @@ std::expected<uuids::uuid, FailInfo> SceneManager::LoadCraftingScene() {
   m_scenes.clear();
 
   // create crafting scene
-  auto crafting_result = AddSceneFromDefault(SceneType::SceneType_CRAFTING);
+  auto crafting_result = AddSceneFromDefault(SceneType::CRAFTING);
   if (!crafting_result.has_value())
     return std::unexpected(crafting_result.error());
 
@@ -221,7 +221,7 @@ std::expected<std::monostate, FailInfo> SceneManager::ProcessSubscriptions() {
     if (subscriber->m_active) {
 
       switch (subscriber->m_trigger_event_type) {
-      case EventType::EventType_EVENT_CHANGE_SCENE: {
+      case EventType::CHANGE_SCENE: {
 
         // make sure the data type is correct - use received event data
         if (!subscriber->m_received_event_data.has_value() ||
@@ -245,7 +245,7 @@ std::expected<std::monostate, FailInfo> SceneManager::ProcessSubscriptions() {
         switch (scene_change_data.second) {
 
           // deal with Title Scene Loading
-        case SceneType_TITLE: {
+        case SceneType::TITLE: {
           auto load_scene_result = LoadTitleScene();
           if (!load_scene_result.has_value()) {
             return std::unexpected(load_scene_result.error());
@@ -253,7 +253,7 @@ std::expected<std::monostate, FailInfo> SceneManager::ProcessSubscriptions() {
           break;
         }
 
-        case SceneType_CRAFTING: {
+        case SceneType::CRAFTING: {
           auto load_scene_result = LoadCraftingScene();
           if (!load_scene_result.has_value()) {
             return std::unexpected(load_scene_result.error());

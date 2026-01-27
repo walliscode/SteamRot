@@ -8,9 +8,9 @@
 /////////////////////////////////////////////////
 
 #include "EventPacket.h"
+#include "EventType.h"
 #include "FailInfo.h"
 #include "Subscriber.h"
-#include "events_generated.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <expected>
 #include <memory>

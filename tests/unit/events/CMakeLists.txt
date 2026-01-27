@@ -1,6 +1,7 @@
 add_executable(test_events
 subscriber_factory.test.cpp
 EventHandler.test.cpp
+event_type_conversion.test.cpp
 )
 
 target_include_directories(test_events

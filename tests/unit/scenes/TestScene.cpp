@@ -13,7 +13,7 @@ namespace steamrot::tests {
 TestScene::TestScene(const GameContext &game_context) : Scene(game_context) {
 
   // set scene type
-  m_scene_info.type = SceneType::SceneType_TEST;
+  m_scene_info.type = SceneType::TEST;
 }
 
 /////////////////////////////////////////////////

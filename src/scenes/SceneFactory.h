@@ -16,7 +16,7 @@
 #include "GameContext.h"
 #include "Scene.h"
 #include "SceneData.h"
-#include "scene_types_generated.h"
+#include "SceneType.h"
 #include <expected>
 #include <memory>
 

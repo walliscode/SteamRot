@@ -8,7 +8,8 @@
 /////////////////////////////////////////////////
 #include "event_factory.h"
 #include "EventPacket.h"
-#include "events_generated.h"
+#include "event_type_conversion.h"
+#include "scene_type_conversion.h"
 #include "uuid.h"
 #include <cstddef>
 #include <unordered_map>
@@ -136,13 +137,19 @@ CreateSceneChangePacket(const SceneChangePacketData &data) {
 
     scene_change_packet.first = uuids::uuid::from_string(data.uuid()->c_str());
   }
-  if (data.scene_type() == SceneType_UNKNOWN) {
+  if (data.scene_type() == SceneTypeFbs_UNKNOWN) {
     return std::unexpected(
         FailInfo{FailMode::FlatbuffersDataNotFound,
                  "CreateSceneChangePacket: SceneChangePacketData "
                  "missing scene_type."});
   }
-  scene_change_packet.second = data.scene_type();
+
+  // Convert FlatBuffers enum to native enum
+  auto conversion_result = ConvertSceneTypeFbsToSceneType(data.scene_type());
+  if (!conversion_result.has_value()) {
+    return std::unexpected(conversion_result.error());
+  }
+  scene_change_packet.second = conversion_result.value();
 
   return scene_change_packet;
 }
@@ -259,7 +266,14 @@ CreateEventPacketFromData(const EventPacketData *packet_data) {
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     "EventPacketData missing event_type."});
   }
-  event_packet.event_type = packet_data->event_type();
+
+  // Convert EventTypeFbs to native EventType
+  auto event_type_result =
+      ConvertEventTypeFbsToEventType(packet_data->event_type());
+  if (!event_type_result.has_value()) {
+    return std::unexpected(event_type_result.error());
+  }
+  event_packet.event_type = event_type_result.value();
 
   auto event_data_result = CreateEventData(packet_data->event_data_data_type(),
                                            packet_data->event_data_data());

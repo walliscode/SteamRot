@@ -31,8 +31,8 @@ struct EventPacketData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   int32_t event_lifetime() const {
     return GetField<int32_t>(VT_EVENT_LIFETIME, 0);
   }
-  steamrot::EventType event_type() const {
-    return static_cast<steamrot::EventType>(GetField<uint64_t>(VT_EVENT_TYPE, 0));
+  steamrot::EventTypeFbs event_type() const {
+    return static_cast<steamrot::EventTypeFbs>(GetField<uint64_t>(VT_EVENT_TYPE, 0));
   }
   steamrot::EventDataData event_data_data_type() const {
     return static_cast<steamrot::EventDataData>(GetField<uint8_t>(VT_EVENT_DATA_DATA_TYPE, 0));
@@ -80,7 +80,7 @@ struct EventPacketDataBuilder {
   void add_event_lifetime(int32_t event_lifetime) {
     fbb_.AddElement<int32_t>(EventPacketData::VT_EVENT_LIFETIME, event_lifetime, 0);
   }
-  void add_event_type(steamrot::EventType event_type) {
+  void add_event_type(steamrot::EventTypeFbs event_type) {
     fbb_.AddElement<uint64_t>(EventPacketData::VT_EVENT_TYPE, static_cast<uint64_t>(event_type), 0);
   }
   void add_event_data_data_type(steamrot::EventDataData event_data_data_type) {
@@ -103,7 +103,7 @@ struct EventPacketDataBuilder {
 inline ::flatbuffers::Offset<EventPacketData> CreateEventPacketData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     int32_t event_lifetime = 0,
-    steamrot::EventType event_type = static_cast<steamrot::EventType>(0),
+    steamrot::EventTypeFbs event_type = static_cast<steamrot::EventTypeFbs>(0),
     steamrot::EventDataData event_data_data_type = steamrot::EventDataData_NONE,
     ::flatbuffers::Offset<void> event_data_data = 0) {
   EventPacketDataBuilder builder_(_fbb);

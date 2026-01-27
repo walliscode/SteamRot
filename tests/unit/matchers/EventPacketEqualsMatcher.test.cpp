@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "EventPacketEqualsMatcher.h"
+#include "EventType.h"
 #include "conmat.h"
 #include "uuid.h"
 #include <catch2/catch_test_macros.hpp>
@@ -25,35 +26,35 @@ static uuids::uuid GenerateTestUUID() {
 TEST_CASE("EventPacketEqualsMatcher works correctly",
           "[unit][Events][EventPacket][matcher]") {
   steamrot::EventPacket expected{1};
-  expected.event_type = steamrot::EventType::EventType_EVENT_USER_INPUT;
+  expected.event_type = steamrot::EventType::USER_INPUT;
   expected.event_id = GenerateTestUUID();
   expected.source_id = GenerateTestUUID();
 
   steamrot::EventPacket actual{1};
 
   SECTION("Matcher detects differences in m_event_type") {
-    actual.event_type = steamrot::EventType::EventType_EVENT_TEST;
+    actual.event_type = steamrot::EventType::TEST;
     actual.event_id = expected.event_id;
     actual.source_id = expected.source_id;
     REQUIRE_THAT(actual, !steamrot::tests::EqualsEventPacket(expected));
   }
 
   SECTION("Matcher detects differences in event_id") {
-    actual.event_type = steamrot::EventType::EventType_EVENT_USER_INPUT;
+    actual.event_type = steamrot::EventType::USER_INPUT;
     actual.event_id = GenerateTestUUID();
     actual.source_id = expected.source_id;
     REQUIRE_THAT(actual, !steamrot::tests::EqualsEventPacket(expected));
   }
 
   SECTION("Matcher detects differences in source_id") {
-    actual.event_type = steamrot::EventType::EventType_EVENT_USER_INPUT;
+    actual.event_type = steamrot::EventType::USER_INPUT;
     actual.event_id = expected.event_id;
     actual.source_id = GenerateTestUUID();
     REQUIRE_THAT(actual, !steamrot::tests::EqualsEventPacket(expected));
   }
 
   SECTION("Matcher detects equality") {
-    actual.event_type = steamrot::EventType::EventType_EVENT_USER_INPUT;
+    actual.event_type = steamrot::EventType::USER_INPUT;
     actual.event_id = expected.event_id;
     actual.source_id = expected.source_id;
     REQUIRE_THAT(actual, steamrot::tests::EqualsEventPacket(expected));
@@ -63,9 +64,9 @@ TEST_CASE("EventPacketEqualsMatcher works correctly",
 TEST_CASE("EventPacketEqualsMatcher describe is as expected on success",
           "[unit][Events][EventPacket][matcher]") {
   steamrot::EventPacket expected{1};
-  expected.event_type = steamrot::EventType::EventType_EVENT_USER_INPUT;
+  expected.event_type = steamrot::EventType::USER_INPUT;
   steamrot::EventPacket actual{1};
-  actual.event_type = steamrot::EventType::EventType_EVENT_USER_INPUT;
+  actual.event_type = steamrot::EventType::USER_INPUT;
   auto matcher = steamrot::tests::EqualsEventPacket(expected);
   matcher.match(actual);
 
@@ -80,11 +81,11 @@ TEST_CASE("EventPacketEqualsMatcher describe is as expected on success",
 TEST_CASE("EventPacketEqualsMatcher describe is as expected on failure",
           "[unit][Events][EventPacket][matcher]") {
   steamrot::EventPacket expected{1};
-  expected.event_type = steamrot::EventType::EventType_EVENT_USER_INPUT;
+  expected.event_type = steamrot::EventType::USER_INPUT;
   expected.event_id = GenerateTestUUID();
 
   steamrot::EventPacket actual{1};
-  actual.event_type = steamrot::EventType::EventType_EVENT_TEST;
+  actual.event_type = steamrot::EventType::TEST;
   actual.event_id = GenerateTestUUID();
 
   auto matcher = steamrot::tests::EqualsEventPacket(expected);

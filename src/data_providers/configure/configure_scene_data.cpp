@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "configure_scene_data.h"
+#include "scene_type_conversion.h"
 
 namespace steamrot::data::configure {
 
@@ -23,7 +24,12 @@ ConfigureSceneInfo(SceneInfo &info, const SceneInfoFbs *fb_info) {
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     "Scene type is missing in SceneInfoFbs"});
   } else {
-    info.type = fb_info->scene_type();
+    // Convert FlatBuffers enum to native enum
+    auto conversion_result = ConvertSceneTypeFbsToSceneType(fb_info->scene_type());
+    if (!conversion_result.has_value()) {
+      return std::unexpected(conversion_result.error());
+    }
+    info.type = conversion_result.value();
   }
 
   // configure uuid, if not present, leave as it will be generated later

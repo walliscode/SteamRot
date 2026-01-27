@@ -28,15 +28,15 @@ FlatbuffersDataLoader::ProvideDefaultSceneData(
   // get file prefix from scene type
   std::string scene_file_prefix;
   switch (scene_type) {
-  case SceneType::SceneType_TEST: {
+  case SceneType::TEST: {
     scene_file_prefix = "test";
     break;
   }
-  case SceneType::SceneType_TITLE: {
+  case SceneType::TITLE: {
     scene_file_prefix = "title";
     break;
   }
-  case SceneType::SceneType_CRAFTING: {
+  case SceneType::CRAFTING: {
     scene_file_prefix = "crafting";
     break;
   }
