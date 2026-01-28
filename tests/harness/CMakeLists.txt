@@ -4,6 +4,7 @@ add_library(harness
   FlatbuffersTestDataProvider.cpp
   harness_runner.cpp
   SimulationRunner.cpp
+  add_uuids.cpp
 )
 
 target_include_directories(harness

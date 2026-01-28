@@ -13,16 +13,16 @@
 #include "matcher_helpers.h"
 #include "test_context.h"
 #include <catch2/catch_test_macros.hpp>
-#include <memory>
 
 using namespace steamrot;
 using namespace steamrot::tests;
 
-TEST_CASE("EngineSnapshotEqualsMatcher - minimal comparison (scene_collection_data only)",
+TEST_CASE("EngineSnapshotEqualsMatcher - minimal comparison "
+          "(scene_collection_data only)",
           "[unit][EngineSnapshot][matcher]") {
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
-  
+
   EngineSnapshot expected;
   expected.scene_collection_data.push_back(
       CreateTestSceneData(SceneType::TEST, id1, pool1));
@@ -40,7 +40,7 @@ TEST_CASE("EngineSnapshotEqualsMatcher - minimal comparison mismatch",
           "[unit][EngineSnapshot][matcher]") {
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
-  
+
   EngineSnapshot expected;
   expected.scene_collection_data.push_back(
       CreateTestSceneData(SceneType::TEST, id1, pool1));
@@ -58,7 +58,7 @@ TEST_CASE("EngineSnapshotEqualsMatcher - with tick_number match",
           "[unit][EngineSnapshot][matcher]") {
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
-  
+
   EngineSnapshot expected;
   expected.tick_number = 42;
   expected.scene_collection_data.push_back(
@@ -78,7 +78,7 @@ TEST_CASE("EngineSnapshotEqualsMatcher - with tick_number mismatch",
           "[unit][EngineSnapshot][matcher]") {
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
-  
+
   EngineSnapshot expected;
   expected.tick_number = 42;
   expected.scene_collection_data.push_back(
@@ -108,7 +108,7 @@ TEST_CASE("EngineSnapshotEqualsMatcher - tick_number expected but not present",
           "[unit][EngineSnapshot][matcher]") {
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
-  
+
   EngineSnapshot expected;
   expected.tick_number = 42;
   expected.scene_collection_data.push_back(
@@ -133,11 +133,12 @@ TEST_CASE("EngineSnapshotEqualsMatcher - tick_number expected but not present",
   }
 }
 
-TEST_CASE("EngineSnapshotEqualsMatcher - tick_number not expected and not present",
-          "[unit][EngineSnapshot][matcher]") {
+TEST_CASE(
+    "EngineSnapshotEqualsMatcher - tick_number not expected and not present",
+    "[unit][EngineSnapshot][matcher]") {
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
-  
+
   EngineSnapshot expected;
   // No tick_number set
   expected.scene_collection_data.push_back(
@@ -157,10 +158,10 @@ TEST_CASE("EngineSnapshotEqualsMatcher - with global_event_bus match",
           "[unit][EngineSnapshot][matcher]") {
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
-  
+
   EventPacket event1{1};
   event1.event_type = EventType::CHANGE_SCENE;
-  
+
   EngineSnapshot expected;
   expected.global_event_bus = EventBus{event1};
   expected.scene_collection_data.push_back(
@@ -180,13 +181,13 @@ TEST_CASE("EngineSnapshotEqualsMatcher - with global_event_bus mismatch",
           "[unit][EngineSnapshot][matcher]") {
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
-  
+
   EventPacket event1{1};
   event1.event_type = EventType::CHANGE_SCENE;
-  
+
   EventPacket event2{1};
   event2.event_type = EventType::QUIT_GAME;
-  
+
   EngineSnapshot expected;
   expected.global_event_bus = EventBus{event1};
   expected.scene_collection_data.push_back(
@@ -202,14 +203,15 @@ TEST_CASE("EngineSnapshotEqualsMatcher - with global_event_bus mismatch",
   }
 }
 
-TEST_CASE("EngineSnapshotEqualsMatcher - global_event_bus expected but not present",
-          "[unit][EngineSnapshot][matcher]") {
+TEST_CASE(
+    "EngineSnapshotEqualsMatcher - global_event_bus expected but not present",
+    "[unit][EngineSnapshot][matcher]") {
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
-  
+
   EventPacket event1{1};
   event1.event_type = EventType::CHANGE_SCENE;
-  
+
   EngineSnapshot expected;
   expected.global_event_bus = EventBus{event1};
   expected.scene_collection_data.push_back(
@@ -229,8 +231,9 @@ TEST_CASE("EngineSnapshotEqualsMatcher - global_event_bus expected but not prese
     matcher.match(actual);
     std::string description = matcher.describe();
 
-    REQUIRE(description.find("Expected global_event_bus, but actual has none") !=
-            std::string::npos);
+    REQUIRE(
+        description.find("Expected global_event_bus, but actual has none") !=
+        std::string::npos);
   }
 }
 
@@ -238,10 +241,10 @@ TEST_CASE("EngineSnapshotEqualsMatcher - global_event_bus not expected",
           "[unit][EngineSnapshot][matcher]") {
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
-  
+
   EventPacket event1{1};
   event1.event_type = EventType::CHANGE_SCENE;
-  
+
   EngineSnapshot expected;
   // No global_event_bus set
   expected.scene_collection_data.push_back(
@@ -261,10 +264,10 @@ TEST_CASE("EngineSnapshotEqualsMatcher - all fields populated match",
           "[unit][EngineSnapshot][matcher]") {
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
-  
+
   EventPacket event1{1};
   event1.event_type = EventType::CHANGE_SCENE;
-  
+
   EngineSnapshot expected;
   expected.tick_number = 42;
   expected.global_event_bus = EventBus{event1};
@@ -286,13 +289,13 @@ TEST_CASE("EngineSnapshotEqualsMatcher - multiple field mismatches",
           "[unit][EngineSnapshot][matcher]") {
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
-  
+
   EventPacket event1{1};
   event1.event_type = EventType::CHANGE_SCENE;
-  
+
   EventPacket event2{1};
   event2.event_type = EventType::QUIT_GAME;
-  
+
   EngineSnapshot expected;
   expected.tick_number = 42;
   expected.global_event_bus = EventBus{event1};
@@ -300,10 +303,10 @@ TEST_CASE("EngineSnapshotEqualsMatcher - multiple field mismatches",
       CreateTestSceneData(SceneType::TEST, id1, pool1));
 
   EngineSnapshot actual;
-  actual.tick_number = 100; // Different
+  actual.tick_number = 100;                   // Different
   actual.global_event_bus = EventBus{event2}; // Different
-  actual.scene_collection_data.push_back(
-      CreateTestSceneData(SceneType::CRAFTING, id1, CreateTestPool(5))); // Different
+  actual.scene_collection_data.push_back(CreateTestSceneData(
+      SceneType::CRAFTING, id1, CreateTestPool(5))); // Different
 
   SECTION("Multiple field mismatches should not match") {
     REQUIRE_THAT(actual, !EqualsEngineSnapshot(expected));
@@ -325,10 +328,10 @@ TEST_CASE("EngineSnapshotEqualsMatcher - selective comparison only tick_number",
           "[unit][EngineSnapshot][matcher]") {
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
-  
+
   EventPacket event1{1};
   event1.event_type = EventType::CHANGE_SCENE;
-  
+
   EngineSnapshot expected;
   expected.tick_number = 42;
   expected.scene_collection_data.push_back(
@@ -349,10 +352,10 @@ TEST_CASE("EngineSnapshotEqualsMatcher - selective comparison only event_bus",
           "[unit][EngineSnapshot][matcher]") {
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
-  
+
   EventPacket event1{1};
   event1.event_type = EventType::CHANGE_SCENE;
-  
+
   EngineSnapshot expected;
   expected.global_event_bus = EventBus{event1};
   expected.scene_collection_data.push_back(
@@ -373,7 +376,7 @@ TEST_CASE("EngineSnapshotEqualsMatcher - describe method success",
           "[unit][EngineSnapshot][matcher]") {
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
-  
+
   EngineSnapshot expected;
   expected.tick_number = 42;
   expected.scene_collection_data.push_back(
@@ -402,7 +405,7 @@ TEST_CASE("EngineSnapshotEqualsMatcher - describe method failure",
           "[unit][EngineSnapshot][matcher]") {
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
-  
+
   EngineSnapshot expected;
   expected.tick_number = 42;
   expected.scene_collection_data.push_back(
@@ -430,7 +433,7 @@ TEST_CASE("EngineSnapshotEqualsMatcher - with TestContext success",
           "[unit][EngineSnapshot][matcher]") {
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
-  
+
   EngineSnapshot expected;
   expected.tick_number = 42;
   expected.scene_collection_data.push_back(
@@ -462,7 +465,7 @@ TEST_CASE("EngineSnapshotEqualsMatcher - with TestContext failure",
           "[unit][EngineSnapshot][matcher]") {
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
-  
+
   EngineSnapshot expected;
   expected.tick_number = 42;
   expected.scene_collection_data.push_back(
@@ -504,7 +507,7 @@ TEST_CASE("EngineSnapshotEqualsMatcher - scene collection size mismatch",
           "[unit][EngineSnapshot][matcher]") {
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
-  
+
   EngineSnapshot expected;
   expected.scene_collection_data.push_back(
       CreateTestSceneData(SceneType::TEST, id1, pool1));
