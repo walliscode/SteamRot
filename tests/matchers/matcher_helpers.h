@@ -14,6 +14,8 @@
 
 #include "CMeta.h"
 #include "CUserInterface.h"
+#include "SceneData.h"
+#include "SceneInfo.h"
 #include "containers.h"
 #include "entity_memory.h"
 #include <ostream>
@@ -34,6 +36,23 @@ inline EntityMemoryPool CreateTestPool(size_t size) {
   auto &cui_vec = entity::memory::GetComponentVector<CUserInterface>(pool);
   cui_vec.resize(size);
   return pool;
+}
+
+/////////////////////////////////////////////////
+/// @brief Helper to create a simple SceneData for testing
+///
+/// @param type The scene type
+/// @param id The scene UUID
+/// @param pool The entity memory pool
+/// @return SceneData object with specified parameters
+/////////////////////////////////////////////////
+inline SceneData CreateTestSceneData(SceneType type, const uuids::uuid &id,
+                                     EntityMemoryPool pool) {
+  SceneData data;
+  data.scene_info.type = type;
+  data.scene_info.id = id;
+  data.entity_transport = pool;
+  return data;
 }
 
 /////////////////////////////////////////////////

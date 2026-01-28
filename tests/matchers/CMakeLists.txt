@@ -18,6 +18,7 @@ add_library(matchers
   SubscriberEqualsMatcher.cpp
   SceneInfoEqualsMatcher.cpp
   SceneDataEqualsMatcher.cpp
+  SceneCollectionDataEqualsMatcher.cpp
 )
 
 target_include_directories(matchers
