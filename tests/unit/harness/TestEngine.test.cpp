@@ -74,6 +74,7 @@ TEST_CASE("TestEngine::RunGame executes specified number of ticks",
 
 TEST_CASE("TestEngine::RunGame captures snapshots in data bank",
           "[unit][TestEngine]") {
+
   // Arrange
   steamrot::TestData test_data;
   test_data.number_of_ticks = 3;
