@@ -158,8 +158,8 @@ TEST_CASE("EngineSnapshotEqualsMatcher - with global_event_bus match",
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
   
-  EventPacket event1;
-  event1.event_type = GameEvent::SCENE_INIT;
+  EventPacket event1{1};
+  event1.event_type = EventType::CHANGE_SCENE;
   
   EngineSnapshot expected;
   expected.global_event_bus = EventBus{event1};
@@ -181,11 +181,11 @@ TEST_CASE("EngineSnapshotEqualsMatcher - with global_event_bus mismatch",
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
   
-  EventPacket event1;
-  event1.event_type = GameEvent::SCENE_INIT;
+  EventPacket event1{1};
+  event1.event_type = EventType::CHANGE_SCENE;
   
-  EventPacket event2;
-  event2.event_type = GameEvent::SCENE_END;
+  EventPacket event2{1};
+  event2.event_type = EventType::QUIT_GAME;
   
   EngineSnapshot expected;
   expected.global_event_bus = EventBus{event1};
@@ -207,8 +207,8 @@ TEST_CASE("EngineSnapshotEqualsMatcher - global_event_bus expected but not prese
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
   
-  EventPacket event1;
-  event1.event_type = GameEvent::SCENE_INIT;
+  EventPacket event1{1};
+  event1.event_type = EventType::CHANGE_SCENE;
   
   EngineSnapshot expected;
   expected.global_event_bus = EventBus{event1};
@@ -239,8 +239,8 @@ TEST_CASE("EngineSnapshotEqualsMatcher - global_event_bus not expected",
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
   
-  EventPacket event1;
-  event1.event_type = GameEvent::SCENE_INIT;
+  EventPacket event1{1};
+  event1.event_type = EventType::CHANGE_SCENE;
   
   EngineSnapshot expected;
   // No global_event_bus set
@@ -262,8 +262,8 @@ TEST_CASE("EngineSnapshotEqualsMatcher - all fields populated match",
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
   
-  EventPacket event1;
-  event1.event_type = GameEvent::SCENE_INIT;
+  EventPacket event1{1};
+  event1.event_type = EventType::CHANGE_SCENE;
   
   EngineSnapshot expected;
   expected.tick_number = 42;
@@ -287,11 +287,11 @@ TEST_CASE("EngineSnapshotEqualsMatcher - multiple field mismatches",
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
   
-  EventPacket event1;
-  event1.event_type = GameEvent::SCENE_INIT;
+  EventPacket event1{1};
+  event1.event_type = EventType::CHANGE_SCENE;
   
-  EventPacket event2;
-  event2.event_type = GameEvent::SCENE_END;
+  EventPacket event2{1};
+  event2.event_type = EventType::QUIT_GAME;
   
   EngineSnapshot expected;
   expected.tick_number = 42;
@@ -326,8 +326,8 @@ TEST_CASE("EngineSnapshotEqualsMatcher - selective comparison only tick_number",
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
   
-  EventPacket event1;
-  event1.event_type = GameEvent::SCENE_INIT;
+  EventPacket event1{1};
+  event1.event_type = EventType::CHANGE_SCENE;
   
   EngineSnapshot expected;
   expected.tick_number = 42;
@@ -350,8 +350,8 @@ TEST_CASE("EngineSnapshotEqualsMatcher - selective comparison only event_bus",
   uuids::uuid id1 = uuids::uuid_system_generator{}();
   EntityMemoryPool pool1 = CreateTestPool(5);
   
-  EventPacket event1;
-  event1.event_type = GameEvent::SCENE_INIT;
+  EventPacket event1{1};
+  event1.event_type = EventType::CHANGE_SCENE;
   
   EngineSnapshot expected;
   expected.global_event_bus = EventBus{event1};
