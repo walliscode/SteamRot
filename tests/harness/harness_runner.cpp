@@ -10,6 +10,7 @@
 #include "FailInfo.h"
 #include "FlatbuffersTestDataProvider.h"
 #include "TestEngine.h"
+#include "add_uuids.h"
 
 namespace steamrot::tests {
 
@@ -38,7 +39,7 @@ RunHarnessTests(const std::filesystem::path current_location) {
   }
 
   // check if any test data was found
-  const auto &test_data_vec = test_data_result.value();
+  auto &test_data_vec = test_data_result.value();
   if (test_data_vec.empty()) {
     return std::unexpected(FailInfo{
         FailMode::None,
@@ -46,6 +47,14 @@ RunHarnessTests(const std::filesystem::path current_location) {
     });
   }
 
+  // modify data
+  for (auto &test_data : test_data_vec) {
+
+    auto add_uuids_result = add_uuids(test_data);
+    if (!add_uuids_result) {
+      return std::unexpected(add_uuids_result.error());
+    }
+  }
   // cycle through all test data and run tests
   for (const auto &test_data : test_data_vec) {
 
