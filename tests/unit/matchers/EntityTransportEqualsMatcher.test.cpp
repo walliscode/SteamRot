@@ -84,32 +84,55 @@ TEST_CASE("EntityTransportEqualsMatcher - both shared_ptr",
   }
 }
 
-TEST_CASE("EntityTransportEqualsMatcher - variant type mismatch",
+TEST_CASE("EntityTransportEqualsMatcher - cross-variant comparison",
           "[unit][EntityTransport][matcher]") {
-  EntityMemoryPool pool = CreateTestPool(5);
-  auto shared_pool = std::make_shared<EntityMemoryPool>(CreateTestPool(5));
+  EntityMemoryPool pool1 = CreateTestPool(5);
+  EntityMemoryPool pool2 = CreateTestPool(5);
+  auto shared_pool1 = std::make_shared<EntityMemoryPool>(CreateTestPool(5));
+  auto shared_pool2 = std::make_shared<EntityMemoryPool>(CreateTestPool(5));
 
   SECTION("monostate vs EntityMemoryPool should not match") {
     EntityTransportVariant expected = std::monostate{};
-    EntityTransportVariant actual = pool;
+    EntityTransportVariant actual = pool1;
     REQUIRE_THAT(actual, !EqualsEntityTransport(expected));
   }
 
   SECTION("EntityMemoryPool vs monostate should not match") {
-    EntityTransportVariant expected = pool;
+    EntityTransportVariant expected = pool1;
     EntityTransportVariant actual = std::monostate{};
     REQUIRE_THAT(actual, !EqualsEntityTransport(expected));
   }
 
-  SECTION("shared_ptr vs value type should not match") {
-    EntityTransportVariant expected = shared_pool;
-    EntityTransportVariant actual = pool;
+  SECTION("shared_ptr vs value type SHOULD match (cross-variant support)") {
+    EntityTransportVariant expected = shared_pool1;
+    EntityTransportVariant actual = pool2;
+    REQUIRE_THAT(actual, EqualsEntityTransport(expected));
+  }
+
+  SECTION("value type vs shared_ptr SHOULD match (cross-variant support)") {
+    EntityTransportVariant expected = pool1;
+    EntityTransportVariant actual = shared_pool2;
+    REQUIRE_THAT(actual, EqualsEntityTransport(expected));
+  }
+
+  SECTION("Different pool sizes should not match (cross-variant)") {
+    EntityMemoryPool small_pool = CreateTestPool(3);
+    EntityTransportVariant expected = shared_pool1; // size 5
+    EntityTransportVariant actual = small_pool;     // size 3
     REQUIRE_THAT(actual, !EqualsEntityTransport(expected));
   }
 
-  SECTION("value type vs shared_ptr should not match") {
-    EntityTransportVariant expected = pool;
-    EntityTransportVariant actual = shared_pool;
+  SECTION("Null shared_ptr vs value type should not match") {
+    std::shared_ptr<EntityMemoryPool> null_ptr = nullptr;
+    EntityTransportVariant expected = null_ptr;
+    EntityTransportVariant actual = pool1;
+    REQUIRE_THAT(actual, !EqualsEntityTransport(expected));
+  }
+
+  SECTION("Value type vs null shared_ptr should not match") {
+    std::shared_ptr<EntityMemoryPool> null_ptr = nullptr;
+    EntityTransportVariant expected = pool1;
+    EntityTransportVariant actual = null_ptr;
     REQUIRE_THAT(actual, !EqualsEntityTransport(expected));
   }
 }
@@ -154,7 +177,7 @@ TEST_CASE("EntityTransportEqualsMatcher describe method - success",
   REQUIRE(matcher.describe() == oss.str());
 }
 
-TEST_CASE("EntityTransportEqualsMatcher describe method - variant mismatch",
+TEST_CASE("EntityTransportEqualsMatcher describe method - empty vs pool",
           "[unit][EntityTransport][matcher]") {
   EntityMemoryPool pool = CreateTestPool(5);
   EntityTransportVariant expected = std::monostate{};
@@ -169,27 +192,39 @@ TEST_CASE("EntityTransportEqualsMatcher describe method - variant mismatch",
     REQUIRE(description.find("EntityTransport Mismatch") != std::string::npos);
   }
 
-  SECTION("Description should contain variant type mismatch") {
-    REQUIRE(description.find("Variant type mismatch") != std::string::npos);
+  SECTION("Description should contain empty/null vs pool message") {
+    REQUIRE(description.find("One variant is empty/null, the other contains "
+                             "EntityMemoryPool") != std::string::npos);
   }
 }
 
-TEST_CASE("EntityTransportEqualsMatcher describe method - null pointer",
+TEST_CASE("EntityTransportEqualsMatcher describe method - null vs pool",
           "[unit][EntityTransport][matcher]") {
-  auto pool = std::make_shared<EntityMemoryPool>(CreateTestPool(5));
+  EntityMemoryPool pool = CreateTestPool(5);
   std::shared_ptr<EntityMemoryPool> null_ptr = nullptr;
 
-  EntityTransportVariant expected = pool;
-  EntityTransportVariant actual = null_ptr;
+  SECTION("Null shared_ptr vs value type") {
+    EntityTransportVariant expected = null_ptr;
+    EntityTransportVariant actual = pool;
 
-  auto matcher = EqualsEntityTransport(expected);
-  matcher.match(actual);
+    auto matcher = EqualsEntityTransport(expected);
+    matcher.match(actual);
 
-  std::string description = matcher.describe();
+    std::string description = matcher.describe();
+    REQUIRE(description.find("One variant is empty/null, the other contains "
+                             "EntityMemoryPool") != std::string::npos);
+  }
 
-  SECTION("Description should contain null pointer message") {
-    REQUIRE(description.find("Null pointer in shared_ptr<EntityMemoryPool>") !=
-            std::string::npos);
+  SECTION("Value type vs null shared_ptr") {
+    EntityTransportVariant expected = pool;
+    EntityTransportVariant actual = null_ptr;
+
+    auto matcher = EqualsEntityTransport(expected);
+    matcher.match(actual);
+
+    std::string description = matcher.describe();
+    REQUIRE(description.find("One variant is empty/null, the other contains "
+                             "EntityMemoryPool") != std::string::npos);
   }
 }
 
@@ -217,6 +252,35 @@ TEST_CASE("EntityTransportEqualsMatcher describe method - IEntityImporter",
   SECTION("Description should contain IEntityImporter not supported message") {
     REQUIRE(description.find("IEntityImporter comparison not supported") !=
             std::string::npos);
+  }
+}
+
+TEST_CASE(
+    "EntityTransportEqualsMatcher describe method - cross-variant success",
+    "[unit][EntityTransport][matcher]") {
+  EntityMemoryPool pool = CreateTestPool(5);
+  auto shared_pool = std::make_shared<EntityMemoryPool>(CreateTestPool(5));
+
+  SECTION("Value type vs shared_ptr should show success") {
+    EntityTransportVariant expected = pool;
+    EntityTransportVariant actual = shared_pool;
+
+    auto matcher = EqualsEntityTransport(expected);
+    matcher.match(actual);
+
+    std::string description = matcher.describe();
+    REQUIRE(description.find("EntityTransport Match:") != std::string::npos);
+  }
+
+  SECTION("Shared_ptr vs value type should show success") {
+    EntityTransportVariant expected = shared_pool;
+    EntityTransportVariant actual = pool;
+
+    auto matcher = EqualsEntityTransport(expected);
+    matcher.match(actual);
+
+    std::string description = matcher.describe();
+    REQUIRE(description.find("EntityTransport Match:") != std::string::npos);
   }
 }
 

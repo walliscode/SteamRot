@@ -28,6 +28,19 @@ namespace steamrot::tests {
 /// - EntityMemoryPool (value type)
 /// - std::shared_ptr<EntityMemoryPool>
 /// - std::unique_ptr<IEntityImporter> (not supported in snapshots)
+///
+/// **Cross-Variant Comparison Support:**
+/// The matcher can compare EntityMemoryPool contents across different variant
+/// wrapper types. For example, it can compare:
+/// - EntityMemoryPool (value) vs std::shared_ptr<EntityMemoryPool>
+/// - std::shared_ptr<EntityMemoryPool> vs EntityMemoryPool (value)
+///
+/// This is essential for TestEngine snapshot comparisons where:
+/// - TestData loads entity_transport from FlatBuffers (unique_ptr<IEntityImporter>)
+/// - TestEngine captures snapshots as EntityMemoryPool (value type)
+///
+/// The matcher extracts and compares the actual EntityMemoryPool contents,
+/// ignoring the variant wrapper type.
 /////////////////////////////////////////////////
 class EntityTransportEqualsMatcher
     : public Catch::Matchers::MatcherBase<EntityTransportVariant> {

@@ -30,85 +30,28 @@ bool EntityTransportEqualsMatcher::match(
   m_mismatch_description.clear();
   std::ostringstream oss;
 
-  // 1. Check variant indices match
-  if (actual.index() != m_expected.index()) {
-    oss << conmat::Indent(1) << conmat::TestFailed() << "Variant type mismatch"
-        << "\n";
-    oss << conmat::Indent(2) << "actual index: "
-        << conmat::Colorize(std::to_string(actual.index()), conmat::Color::Red)
-        << "\n";
-    oss << conmat::Indent(2) << "expected index: "
-        << conmat::Colorize(std::to_string(m_expected.index()),
-                            conmat::Color::Blue)
-        << "\n";
-    m_mismatch_description = oss.str();
-    return false;
-  }
+  // Helper lambda to extract EntityMemoryPool pointer from variant
+  auto extract_pool = [](const EntityTransportVariant &variant)
+      -> const EntityMemoryPool * {
+    if (std::holds_alternative<EntityMemoryPool>(variant)) {
+      return &std::get<EntityMemoryPool>(variant);
+    } else if (std::holds_alternative<std::shared_ptr<EntityMemoryPool>>(
+                   variant)) {
+      auto ptr = std::get<std::shared_ptr<EntityMemoryPool>>(variant);
+      return ptr.get(); // Returns nullptr if ptr is null
+    }
+    return nullptr;
+  };
 
-  // 2. Handle monostate (both empty)
-  if (std::holds_alternative<std::monostate>(actual)) {
+  // 1. Handle monostate (both empty)
+  if (std::holds_alternative<std::monostate>(actual) &&
+      std::holds_alternative<std::monostate>(m_expected)) {
     return true; // Both empty is a match
   }
 
-  // 3. Handle EntityMemoryPool (PRIMARY CASE for TestEngine)
-  if (std::holds_alternative<EntityMemoryPool>(actual)) {
-    const auto &actual_pool = std::get<EntityMemoryPool>(actual);
-    const auto &expected_pool = std::get<EntityMemoryPool>(m_expected);
-
-    // Create matcher with or without context
-    EntityMemoryPoolEqualsMatcher pool_matcher =
-        m_context.has_value()
-            ? EntityMemoryPoolEqualsMatcher(expected_pool, m_context.value())
-            : EntityMemoryPoolEqualsMatcher(expected_pool);
-
-    if (!pool_matcher.match(actual_pool)) {
-      m_mismatch_description = pool_matcher.describe();
-      return false;
-    }
-    return true;
-  }
-
-  // 4. Handle shared_ptr<EntityMemoryPool>
-  if (std::holds_alternative<std::shared_ptr<EntityMemoryPool>>(actual)) {
-    auto actual_ptr = std::get<std::shared_ptr<EntityMemoryPool>>(actual);
-    auto expected_ptr = std::get<std::shared_ptr<EntityMemoryPool>>(m_expected);
-
-    // Check for null pointers
-    if (!actual_ptr && !expected_ptr) {
-      return true; // Both null is a match
-    }
-
-    if (!actual_ptr || !expected_ptr) {
-      oss << conmat::Indent(1) << conmat::TestFailed()
-          << "Null pointer in shared_ptr<EntityMemoryPool>" << "\n";
-      oss << conmat::Indent(2) << "actual is null: "
-          << conmat::Colorize(actual_ptr ? "false" : "true", conmat::Color::Red)
-          << "\n";
-      oss << conmat::Indent(2) << "expected is null: "
-          << conmat::Colorize(expected_ptr ? "false" : "true",
-                              conmat::Color::Blue)
-          << "\n";
-      m_mismatch_description = oss.str();
-      return false;
-    }
-
-    // Both are non-null, compare the dereferenced pools
-    EntityMemoryPoolEqualsMatcher pool_matcher =
-        m_context.has_value()
-            ? EntityMemoryPoolEqualsMatcher(*expected_ptr, m_context.value())
-            : EntityMemoryPoolEqualsMatcher(*expected_ptr);
-
-    if (!pool_matcher.match(*actual_ptr)) {
-      m_mismatch_description = pool_matcher.describe();
-      return false;
-    }
-    return true;
-  }
-
-  // 5. Handle unique_ptr<IEntityImporter>
-  if (std::holds_alternative<std::unique_ptr<IEntityImporter>>(actual)) {
-    // IEntityImporter cannot be meaningfully compared in snapshots
-    // This should not occur in TestEngine snapshots
+  // 2. Handle IEntityImporter (not supported in snapshots)
+  if (std::holds_alternative<std::unique_ptr<IEntityImporter>>(actual) ||
+      std::holds_alternative<std::unique_ptr<IEntityImporter>>(m_expected)) {
     oss << conmat::Indent(1) << conmat::TestFailed()
         << "IEntityImporter comparison not supported in snapshot testing"
         << "\n";
@@ -116,11 +59,43 @@ bool EntityTransportEqualsMatcher::match(
     return false;
   }
 
-  // Should never reach here
-  oss << conmat::Indent(1) << conmat::TestFailed()
-      << "Unknown variant type encountered" << "\n";
-  m_mismatch_description = oss.str();
-  return false;
+  // 3. Extract EntityMemoryPool pointers from both variants
+  const EntityMemoryPool *actual_pool = extract_pool(actual);
+  const EntityMemoryPool *expected_pool = extract_pool(m_expected);
+
+  // 4. Check if one is monostate and the other has a pool
+  if ((actual_pool == nullptr) != (expected_pool == nullptr)) {
+    oss << conmat::Indent(1) << conmat::TestFailed()
+        << "One variant is empty/null, the other contains EntityMemoryPool"
+        << "\n";
+    oss << conmat::Indent(2) << "actual has pool: "
+        << conmat::Colorize(actual_pool ? "true" : "false", conmat::Color::Red)
+        << "\n";
+    oss << conmat::Indent(2) << "expected has pool: "
+        << conmat::Colorize(expected_pool ? "true" : "false",
+                            conmat::Color::Blue)
+        << "\n";
+    m_mismatch_description = oss.str();
+    return false;
+  }
+
+  // 5. Both are null/empty - already handled by monostate check, but added for
+  // completeness
+  if (actual_pool == nullptr && expected_pool == nullptr) {
+    return true;
+  }
+
+  // 6. Both have EntityMemoryPool - compare them
+  EntityMemoryPoolEqualsMatcher pool_matcher =
+      m_context.has_value()
+          ? EntityMemoryPoolEqualsMatcher(*expected_pool, m_context.value())
+          : EntityMemoryPoolEqualsMatcher(*expected_pool);
+
+  if (!pool_matcher.match(*actual_pool)) {
+    m_mismatch_description = pool_matcher.describe();
+    return false;
+  }
+  return true;
 }
 
 /////////////////////////////////////////////////
