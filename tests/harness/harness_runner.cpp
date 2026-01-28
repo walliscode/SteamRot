@@ -60,6 +60,17 @@ RunHarnessTests(const std::filesystem::path current_location) {
 
     // create TestEngine instance
     TestEngine test_engine{test_data};
+
+    // start up the test engine
+    auto start_up_result = test_engine.StartUp();
+    if (!start_up_result) {
+      return std::unexpected(start_up_result.error());
+    }
+    // run the game
+    auto run_result = test_engine.RunGame();
+    if (!run_result) {
+      return std::unexpected(run_result.error());
+    }
   }
 
   return std::monostate{};

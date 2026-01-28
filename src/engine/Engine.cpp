@@ -135,8 +135,12 @@ std::expected<EngineSnapshot, FailInfo> Engine::CaptureEngineSnapshot() {
     return std::unexpected(scene_collection_data_result.error());
   }
 
+  // grab all the Scene Data
   snapshot.scene_collection_data =
       std::move(scene_collection_data_result.value());
+
+  // capture global EventBus in snapshot
+  snapshot.global_event_bus = m_game_context.event_handler.GetGlobalEventBus();
 
   return snapshot;
 }
