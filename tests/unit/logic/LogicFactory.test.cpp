@@ -137,7 +137,7 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
   }
   const auto &render_logics = render_it->second;
   REQUIRE(render_logics.size() == 2);
-  REQUIRE(dynamic_cast<steamrot::UIRenderLogic *>(render_logics[0].get()));
   REQUIRE(
-      dynamic_cast<steamrot::CraftingRenderLogic *>(render_logics[1].get()));
+      dynamic_cast<steamrot::CraftingRenderLogic *>(render_logics[0].get()));
+  REQUIRE(dynamic_cast<steamrot::UIRenderLogic *>(render_logics[1].get()));
 }

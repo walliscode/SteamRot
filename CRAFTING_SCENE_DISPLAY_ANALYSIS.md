@@ -89,14 +89,14 @@ render_logics.push_back(
 
 ## Impact Analysis
 
-### What IS Being Rendered
-- The UI elements (buttons, menus) ARE being drawn by `UIRenderLogic`
-- They ARE being displayed because `UIRenderLogic` calls `display()`
-
 ### What IS NOT Being Rendered
-- The machina forms (fragments and joints) ARE being drawn by `CraftingRenderLogic`
-- They are NOT visible because they're drawn AFTER the `display()` call
-- The content sits in the render texture buffer but never gets shown on screen
+**UPDATE: User confirmed that NOTHING is displayed in CraftingScene, including UI.**
+
+The issue affects ALL rendering:
+- UI elements drawn by `UIRenderLogic` 
+- Machina forms drawn by `CraftingRenderLogic`
+
+The root cause is that `display()` is being called in the middle of the render cycle, causing rendering artifacts or incomplete texture finalization.
 
 ## Scene Configuration Details
 
