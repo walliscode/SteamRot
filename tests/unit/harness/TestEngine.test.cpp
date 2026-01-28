@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "TestEngine.h"
+#include "EngineSnapshotEqualsMatcher.h"
 #include "EventPacket.h"
 #include "EventType.h"
 #include "SceneData.h"
@@ -325,4 +326,190 @@ TEST_CASE("TestEngine::StartUp configures all aspects from TestData",
   const auto &scene_manager = engine.GetSceneManager();
   const auto &scenes = scene_manager.GetScenes();
   REQUIRE(scenes.size() == 1);
+}
+
+TEST_CASE("TestEngine zero position snapshot matches minimal starting config",
+          "[unit][TestEngine]") {
+  // Arrange - Configure minimal starting state
+  steamrot::TestData test_data;
+  test_data.number_of_ticks = 2;
+
+  // Act
+  steamrot::tests::TestEngine engine(test_data);
+  auto startup_result = engine.StartUp();
+  if (!startup_result.has_value()) {
+    FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+  }
+
+  // Assert - Zero position should match starting config
+  const auto &data_bank = engine.GetDataBank();
+  REQUIRE(data_bank.contains(0));
+
+  REQUIRE_THAT(data_bank.at(0), steamrot::tests::EqualsEngineSnapshot(
+                                    test_data.starting_engine_snapshot));
+}
+
+TEST_CASE(
+    "TestEngine zero position snapshot matches starting config with EventBus",
+    "[unit][TestEngine]") {
+  // Arrange - Configure starting snapshot with EventBus
+  steamrot::TestData test_data;
+  test_data.number_of_ticks = 2;
+
+  // Configure specific starting event bus
+  steamrot::EventPacket event1(steamrot::EventType::USER_INPUT,
+                               steamrot::EventData{std::monostate{}}, 1);
+  steamrot::EventPacket event2(steamrot::EventType::QUIT_GAME,
+                               steamrot::EventData{std::monostate{}}, 2);
+  test_data.starting_engine_snapshot.global_event_bus =
+      steamrot::EventBus{event1, event2};
+
+  // Act
+  steamrot::tests::TestEngine engine(test_data);
+  auto startup_result = engine.StartUp();
+  if (!startup_result.has_value()) {
+    FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+  }
+
+  // Assert - Zero position should match starting config
+  const auto &data_bank = engine.GetDataBank();
+  REQUIRE(data_bank.contains(0));
+
+  REQUIRE_THAT(data_bank.at(0), steamrot::tests::EqualsEngineSnapshot(
+                                    test_data.starting_engine_snapshot));
+}
+
+TEST_CASE("TestEngine zero position snapshot matches starting config with "
+          "SceneCollection",
+          "[unit][TestEngine]") {
+  // Arrange - Configure starting snapshot with SceneCollection
+  steamrot::TestData test_data;
+  test_data.number_of_ticks = 2;
+
+  // Configure specific starting scene
+  steamrot::SceneData scene_data;
+  scene_data.scene_info.type = steamrot::SceneType::TITLE;
+  scene_data.scene_info.id = uuids::uuid_system_generator{}();
+  scene_data.scene_resources_config.texture_width = 512;
+  scene_data.scene_resources_config.texture_height = 648;
+
+  test_data.starting_engine_snapshot.scene_collection_data.push_back(
+      std::move(scene_data));
+
+  // Act
+  steamrot::tests::TestEngine engine(test_data);
+  auto startup_result = engine.StartUp();
+  if (!startup_result.has_value()) {
+    FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+  }
+
+  // Assert - Zero position should match starting config
+  const auto &data_bank = engine.GetDataBank();
+  REQUIRE(data_bank.contains(0));
+
+  REQUIRE_THAT(data_bank.at(0), steamrot::tests::EqualsEngineSnapshot(
+                                    test_data.starting_engine_snapshot));
+}
+
+TEST_CASE("TestEngine zero position snapshot matches complete starting config "
+          "with events and scenes",
+          "[unit][TestEngine]") {
+  // Arrange - Configure complete starting state
+  steamrot::TestData test_data;
+  test_data.number_of_ticks = 3;
+
+  // Configure EventBus
+  steamrot::EventPacket event(steamrot::EventType::CHANGE_SCENE,
+                              steamrot::EventData{std::monostate{}}, 1);
+  test_data.starting_engine_snapshot.global_event_bus =
+      steamrot::EventBus{event};
+
+  // Configure SceneCollection
+  steamrot::SceneData scene_data;
+  scene_data.scene_info.type = steamrot::SceneType::CRAFTING;
+  scene_data.scene_info.id = uuids::uuid_system_generator{}();
+  scene_data.scene_resources_config.texture_width = 300;
+  scene_data.scene_resources_config.texture_height = 400;
+
+  test_data.starting_engine_snapshot.scene_collection_data.push_back(
+      std::move(scene_data));
+
+  // Act
+  steamrot::tests::TestEngine engine(test_data);
+  auto startup_result = engine.StartUp();
+  if (!startup_result.has_value()) {
+    FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+  }
+
+  // Assert - Zero position should match starting config
+  const auto &data_bank = engine.GetDataBank();
+  REQUIRE(data_bank.contains(0));
+
+  REQUIRE_THAT(data_bank.at(0), steamrot::tests::EqualsEngineSnapshot(
+                                    test_data.starting_engine_snapshot));
+}
+
+TEST_CASE("TestEngine zero position snapshot matches starting config with "
+          "multiple scenes",
+          "[unit][TestEngine]") {
+  // Arrange - Configure starting snapshot with multiple scenes
+  steamrot::TestData test_data;
+  test_data.number_of_ticks = 2;
+
+  // Configure first scene
+  steamrot::SceneData scene_data1;
+  scene_data1.scene_info.type = steamrot::SceneType::TITLE;
+  scene_data1.scene_info.id = uuids::uuid_system_generator{}();
+  scene_data1.scene_resources_config.texture_width = 256;
+  scene_data1.scene_resources_config.texture_height = 256;
+
+  // Configure second scene
+  steamrot::SceneData scene_data2;
+  scene_data2.scene_info.type = steamrot::SceneType::CRAFTING;
+  scene_data2.scene_info.id = uuids::uuid_system_generator{}();
+  scene_data2.scene_resources_config.texture_width = 128;
+  scene_data2.scene_resources_config.texture_height = 128;
+
+  test_data.starting_engine_snapshot.scene_collection_data.push_back(
+      std::move(scene_data1));
+  test_data.starting_engine_snapshot.scene_collection_data.push_back(
+      std::move(scene_data2));
+
+  // Act
+  steamrot::tests::TestEngine engine(test_data);
+  auto startup_result = engine.StartUp();
+  if (!startup_result.has_value()) {
+    FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+  }
+
+  // Assert - Zero position should match starting config
+  const auto &data_bank = engine.GetDataBank();
+  REQUIRE(data_bank.contains(0));
+
+  REQUIRE_THAT(data_bank.at(0), steamrot::tests::EqualsEngineSnapshot(
+                                    test_data.starting_engine_snapshot));
+}
+
+TEST_CASE("TestEngine zero position snapshot matches empty EventBus config",
+          "[unit][TestEngine]") {
+  // Arrange - Configure with empty EventBus
+  steamrot::TestData test_data;
+  test_data.number_of_ticks = 1;
+
+  // Set empty event bus explicitly
+  test_data.starting_engine_snapshot.global_event_bus = steamrot::EventBus{};
+
+  // Act
+  steamrot::tests::TestEngine engine(test_data);
+  auto startup_result = engine.StartUp();
+  if (!startup_result.has_value()) {
+    FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+  }
+
+  // Assert - Zero position should match starting config with empty bus
+  const auto &data_bank = engine.GetDataBank();
+  REQUIRE(data_bank.contains(0));
+
+  REQUIRE_THAT(data_bank.at(0), steamrot::tests::EqualsEngineSnapshot(
+                                    test_data.starting_engine_snapshot));
 }
