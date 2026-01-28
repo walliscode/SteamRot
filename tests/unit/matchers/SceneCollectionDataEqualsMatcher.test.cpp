@@ -73,9 +73,12 @@ TEST_CASE("SceneCollectionDataEqualsMatcher - multiple scenes all matching",
   expected.push_back(CreateTestSceneData(SceneType::TITLE, id3, pool3));
 
   SceneCollectionData actual;
-  actual.push_back(CreateTestSceneData(SceneType::TEST, id1, CreateTestPool(5)));
-  actual.push_back(CreateTestSceneData(SceneType::CRAFTING, id2, CreateTestPool(3)));
-  actual.push_back(CreateTestSceneData(SceneType::TITLE, id3, CreateTestPool(7)));
+  actual.push_back(
+      CreateTestSceneData(SceneType::TEST, id1, CreateTestPool(5)));
+  actual.push_back(
+      CreateTestSceneData(SceneType::CRAFTING, id2, CreateTestPool(3)));
+  actual.push_back(
+      CreateTestSceneData(SceneType::TITLE, id3, CreateTestPool(7)));
 
   SECTION("Multiple matching scenes should match") {
     REQUIRE_THAT(actual, EqualsSceneCollection(expected));
@@ -96,7 +99,8 @@ TEST_CASE("SceneCollectionDataEqualsMatcher - size mismatch",
     expected.push_back(CreateTestSceneData(SceneType::CRAFTING, id2, pool2));
 
     SceneCollectionData actual;
-    actual.push_back(CreateTestSceneData(SceneType::TEST, id1, CreateTestPool(5)));
+    actual.push_back(
+        CreateTestSceneData(SceneType::TEST, id1, CreateTestPool(5)));
 
     REQUIRE_THAT(actual, !EqualsSceneCollection(expected));
   }
@@ -106,8 +110,10 @@ TEST_CASE("SceneCollectionDataEqualsMatcher - size mismatch",
     expected.push_back(CreateTestSceneData(SceneType::TEST, id1, pool1));
 
     SceneCollectionData actual;
-    actual.push_back(CreateTestSceneData(SceneType::TEST, id1, CreateTestPool(5)));
-    actual.push_back(CreateTestSceneData(SceneType::CRAFTING, id2, CreateTestPool(3)));
+    actual.push_back(
+        CreateTestSceneData(SceneType::TEST, id1, CreateTestPool(5)));
+    actual.push_back(
+        CreateTestSceneData(SceneType::CRAFTING, id2, CreateTestPool(3)));
 
     REQUIRE_THAT(actual, !EqualsSceneCollection(expected));
   }
@@ -118,7 +124,8 @@ TEST_CASE("SceneCollectionDataEqualsMatcher - size mismatch",
     expected.push_back(CreateTestSceneData(SceneType::CRAFTING, id2, pool2));
 
     SceneCollectionData actual;
-    actual.push_back(CreateTestSceneData(SceneType::TEST, id1, CreateTestPool(5)));
+    actual.push_back(
+        CreateTestSceneData(SceneType::TEST, id1, CreateTestPool(5)));
 
     auto matcher = EqualsSceneCollection(expected);
     matcher.match(actual);
@@ -148,27 +155,36 @@ TEST_CASE("SceneCollectionDataEqualsMatcher - one scene mismatch",
 
   SECTION("Middle scene has different type") {
     SceneCollectionData actual;
-    actual.push_back(CreateTestSceneData(SceneType::TEST, id1, CreateTestPool(5)));
-    actual.push_back(CreateTestSceneData(SceneType::TITLE, id2, CreateTestPool(3))); // Different type
-    actual.push_back(CreateTestSceneData(SceneType::TITLE, id3, CreateTestPool(7)));
+    actual.push_back(
+        CreateTestSceneData(SceneType::TEST, id1, CreateTestPool(5)));
+    actual.push_back(CreateTestSceneData(SceneType::TITLE, id2,
+                                         CreateTestPool(3))); // Different type
+    actual.push_back(
+        CreateTestSceneData(SceneType::TITLE, id3, CreateTestPool(7)));
 
     REQUIRE_THAT(actual, !EqualsSceneCollection(expected));
   }
 
   SECTION("Last scene has different pool size") {
     SceneCollectionData actual;
-    actual.push_back(CreateTestSceneData(SceneType::TEST, id1, CreateTestPool(5)));
-    actual.push_back(CreateTestSceneData(SceneType::CRAFTING, id2, CreateTestPool(3)));
-    actual.push_back(CreateTestSceneData(SceneType::TITLE, id3, CreateTestPool(5))); // Different size
+    actual.push_back(
+        CreateTestSceneData(SceneType::TEST, id1, CreateTestPool(5)));
+    actual.push_back(
+        CreateTestSceneData(SceneType::CRAFTING, id2, CreateTestPool(3)));
+    actual.push_back(CreateTestSceneData(SceneType::TITLE, id3,
+                                         CreateTestPool(5))); // Different size
 
     REQUIRE_THAT(actual, !EqualsSceneCollection(expected));
   }
 
   SECTION("Description should contain scene index and UUID") {
     SceneCollectionData actual;
-    actual.push_back(CreateTestSceneData(SceneType::TEST, id1, CreateTestPool(5)));
-    actual.push_back(CreateTestSceneData(SceneType::TITLE, id2, CreateTestPool(3))); // Different type
-    actual.push_back(CreateTestSceneData(SceneType::TITLE, id3, CreateTestPool(7)));
+    actual.push_back(
+        CreateTestSceneData(SceneType::TEST, id1, CreateTestPool(5)));
+    actual.push_back(CreateTestSceneData(SceneType::TITLE, id2,
+                                         CreateTestPool(3))); // Different type
+    actual.push_back(
+        CreateTestSceneData(SceneType::TITLE, id3, CreateTestPool(7)));
 
     auto matcher = EqualsSceneCollection(expected);
     matcher.match(actual);
@@ -196,9 +212,12 @@ TEST_CASE("SceneCollectionDataEqualsMatcher - multiple scene mismatches",
   expected.push_back(CreateTestSceneData(SceneType::TITLE, id3, pool3));
 
   SceneCollectionData actual;
-  actual.push_back(CreateTestSceneData(SceneType::TITLE, id1, CreateTestPool(3))); // Different type and size
-  actual.push_back(CreateTestSceneData(SceneType::CRAFTING, id2, CreateTestPool(3)));
-  actual.push_back(CreateTestSceneData(SceneType::TEST, id3, CreateTestPool(5))); // Different type and size
+  actual.push_back(CreateTestSceneData(
+      SceneType::TITLE, id1, CreateTestPool(3))); // Different type and size
+  actual.push_back(
+      CreateTestSceneData(SceneType::CRAFTING, id2, CreateTestPool(3)));
+  actual.push_back(CreateTestSceneData(
+      SceneType::TEST, id3, CreateTestPool(5))); // Different type and size
 
   SECTION("Multiple mismatches should not match") {
     REQUIRE_THAT(actual, !EqualsSceneCollection(expected));
@@ -229,8 +248,10 @@ TEST_CASE("SceneCollectionDataEqualsMatcher - scene order matters",
   expected.push_back(CreateTestSceneData(SceneType::CRAFTING, id2, pool2));
 
   SceneCollectionData actual;
-  actual.push_back(CreateTestSceneData(SceneType::CRAFTING, id2, CreateTestPool(3))); // Swapped order
-  actual.push_back(CreateTestSceneData(SceneType::TEST, id1, CreateTestPool(5)));
+  actual.push_back(CreateTestSceneData(SceneType::CRAFTING, id2,
+                                       CreateTestPool(3))); // Swapped order
+  actual.push_back(
+      CreateTestSceneData(SceneType::TEST, id1, CreateTestPool(5)));
 
   SECTION("Different order should not match") {
     REQUIRE_THAT(actual, !EqualsSceneCollection(expected));
@@ -259,8 +280,10 @@ TEST_CASE("SceneCollectionDataEqualsMatcher describe method - success",
   expected.push_back(CreateTestSceneData(SceneType::CRAFTING, id2, pool2));
 
   SceneCollectionData actual;
-  actual.push_back(CreateTestSceneData(SceneType::TEST, id1, CreateTestPool(5)));
-  actual.push_back(CreateTestSceneData(SceneType::CRAFTING, id2, CreateTestPool(3)));
+  actual.push_back(
+      CreateTestSceneData(SceneType::TEST, id1, CreateTestPool(5)));
+  actual.push_back(
+      CreateTestSceneData(SceneType::CRAFTING, id2, CreateTestPool(3)));
 
   auto matcher = EqualsSceneCollection(expected);
   matcher.match(actual);
@@ -289,8 +312,10 @@ TEST_CASE("SceneCollectionDataEqualsMatcher describe method - failure",
   expected.push_back(CreateTestSceneData(SceneType::CRAFTING, id2, pool2));
 
   SceneCollectionData actual;
-  actual.push_back(CreateTestSceneData(SceneType::TITLE, id1, CreateTestPool(5))); // Different type
-  actual.push_back(CreateTestSceneData(SceneType::CRAFTING, id2, CreateTestPool(3)));
+  actual.push_back(CreateTestSceneData(SceneType::TITLE, id1,
+                                       CreateTestPool(5))); // Different type
+  actual.push_back(
+      CreateTestSceneData(SceneType::CRAFTING, id2, CreateTestPool(3)));
 
   auto matcher = EqualsSceneCollection(expected);
   matcher.match(actual);
@@ -298,8 +323,7 @@ TEST_CASE("SceneCollectionDataEqualsMatcher describe method - failure",
   std::string description = matcher.describe();
 
   SECTION("Description should contain mismatch header") {
-    REQUIRE(description.find("SceneCollection Mismatch") !=
-            std::string::npos);
+    REQUIRE(description.find("SceneCollection Mismatch") != std::string::npos);
   }
 
   SECTION("Description should contain scene details") {
@@ -321,10 +345,13 @@ TEST_CASE("SceneCollectionDataEqualsMatcher with TestContext",
   expected.push_back(CreateTestSceneData(SceneType::CRAFTING, id2, pool2));
 
   SceneCollectionData actual;
-  actual.push_back(CreateTestSceneData(SceneType::TEST, id1, CreateTestPool(5)));
-  actual.push_back(CreateTestSceneData(SceneType::CRAFTING, id2, CreateTestPool(3)));
+  actual.push_back(
+      CreateTestSceneData(SceneType::TEST, id1, CreateTestPool(5)));
+  actual.push_back(
+      CreateTestSceneData(SceneType::CRAFTING, id2, CreateTestPool(3)));
 
-  TestContext context{"scene_collection_test", "Test SceneCollectionData comparison", 5, 20};
+  TestContext context{"scene_collection_test",
+                      "Test SceneCollectionData comparison", 5, 20};
 
   SECTION("Matcher with context should match") {
     REQUIRE_THAT(actual, EqualsSceneCollection(expected, context));
@@ -341,8 +368,10 @@ TEST_CASE("SceneCollectionDataEqualsMatcher with TestContext",
 
   SECTION("Describe on failure with context should include metadata") {
     SceneCollectionData different_actual;
-    different_actual.push_back(CreateTestSceneData(SceneType::TITLE, id1, CreateTestPool(5))); // Different type
-    different_actual.push_back(CreateTestSceneData(SceneType::CRAFTING, id2, CreateTestPool(3)));
+    different_actual.push_back(CreateTestSceneData(
+        SceneType::TITLE, id1, CreateTestPool(5))); // Different type
+    different_actual.push_back(
+        CreateTestSceneData(SceneType::CRAFTING, id2, CreateTestPool(3)));
 
     auto matcher = EqualsSceneCollection(expected, context);
     matcher.match(different_actual);
@@ -370,8 +399,8 @@ TEST_CASE("SceneCollectionDataEqualsMatcher - monostate entity transport",
   scene2.entity_transport = std::monostate{};
 
   SceneCollectionData expected;
-  expected.push_back(scene1);
-  expected.push_back(scene2);
+  expected.push_back(std::move(scene1));
+  expected.push_back(std::move(scene2));
 
   SceneData actual_scene1;
   actual_scene1.scene_info.type = SceneType::TEST;
@@ -384,8 +413,8 @@ TEST_CASE("SceneCollectionDataEqualsMatcher - monostate entity transport",
   actual_scene2.entity_transport = std::monostate{};
 
   SceneCollectionData actual;
-  actual.push_back(actual_scene1);
-  actual.push_back(actual_scene2);
+  actual.push_back(std::move(actual_scene1));
+  actual.push_back(std::move(actual_scene2));
 
   SECTION("Collections with monostate transports should match") {
     REQUIRE_THAT(actual, EqualsSceneCollection(expected));
@@ -411,8 +440,8 @@ TEST_CASE("SceneCollectionDataEqualsMatcher - shared_ptr entity transport",
   scene2.entity_transport = pool2;
 
   SceneCollectionData expected;
-  expected.push_back(scene1);
-  expected.push_back(scene2);
+  expected.push_back(std::move(scene1));
+  expected.push_back(std::move(scene2));
 
   auto actual_pool1 = std::make_shared<EntityMemoryPool>(CreateTestPool(5));
   auto actual_pool2 = std::make_shared<EntityMemoryPool>(CreateTestPool(3));
@@ -428,8 +457,8 @@ TEST_CASE("SceneCollectionDataEqualsMatcher - shared_ptr entity transport",
   actual_scene2.entity_transport = actual_pool2;
 
   SceneCollectionData actual;
-  actual.push_back(actual_scene1);
-  actual.push_back(actual_scene2);
+  actual.push_back(std::move(actual_scene1));
+  actual.push_back(std::move(actual_scene2));
 
   SECTION("Collections with matching shared_ptr pools should match") {
     REQUIRE_THAT(actual, EqualsSceneCollection(expected));
@@ -440,8 +469,8 @@ TEST_CASE("SceneCollectionDataEqualsMatcher - shared_ptr entity transport",
     actual_scene2.entity_transport = different_pool;
 
     SceneCollectionData different_actual;
-    different_actual.push_back(actual_scene1);
-    different_actual.push_back(actual_scene2);
+    different_actual.push_back(std::move(actual_scene1));
+    different_actual.push_back(std::move(actual_scene2));
 
     REQUIRE_THAT(different_actual, !EqualsSceneCollection(expected));
   }

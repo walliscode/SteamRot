@@ -11,12 +11,10 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-
 #include "SceneData.h"
-#include "test_context.h"
 #include "catch2/matchers/catch_matchers.hpp"
+#include "test_context.h"
 #include <optional>
-#include <vector>
 
 namespace steamrot::tests {
 
