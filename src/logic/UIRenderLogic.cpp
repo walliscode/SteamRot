@@ -19,9 +19,6 @@ void UIRenderLogic::ProcessLogic() {
 
   // Draw all UI elements to the render texture
   DrawUIElements();
-
-  // display the render texture after drawing
-  m_scene_context.scene_texture.display();
 }
 
 void UIRenderLogic::DrawUIElements() {

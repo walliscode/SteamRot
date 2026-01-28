@@ -27,6 +27,9 @@ void TitleScene::sRender() {
 
     render_logic->RunLogic();
   }
+
+  // display the render texture after all render logic has been processed
+  m_scene_resources.scene_texture.display();
 }
 
 /////////////////////////////////////////////////
