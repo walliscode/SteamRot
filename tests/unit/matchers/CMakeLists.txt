@@ -17,6 +17,7 @@ add_executable(test_matchers
   SceneInfoEqualsMatcher.test.cpp
   SceneDataEqualsMatcher.test.cpp
   SceneCollectionDataEqualsMatcher.test.cpp
+  EngineSnapshotEqualsMatcher.test.cpp
 )
 
 target_link_libraries(test_matchers
