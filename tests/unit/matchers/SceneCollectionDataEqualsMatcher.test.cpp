@@ -18,18 +18,6 @@
 using namespace steamrot;
 using namespace steamrot::tests;
 
-/////////////////////////////////////////////////
-/// @brief Helper to create a simple SceneData for testing
-/////////////////////////////////////////////////
-SceneData CreateTestSceneData(SceneType type, const uuids::uuid &id,
-                              EntityMemoryPool pool) {
-  SceneData data;
-  data.scene_info.type = type;
-  data.scene_info.id = id;
-  data.entity_transport = pool;
-  return data;
-}
-
 TEST_CASE("SceneCollectionDataEqualsMatcher - empty collections",
           "[unit][SceneCollectionData][matcher]") {
   SceneCollectionData expected;
