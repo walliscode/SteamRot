@@ -12,10 +12,29 @@
 /// Headers
 /////////////////////////////////////////////////
 
+#include "CMeta.h"
+#include "CUserInterface.h"
+#include "containers.h"
+#include "entity_memory.h"
 #include <ostream>
 #include <vector>
 
 namespace steamrot::tests {
+
+/////////////////////////////////////////////////
+/// @brief Helper to create a simple EntityMemoryPool for testing
+///
+/// @param size The size of the pool to create
+/// @return EntityMemoryPool with resized component vectors
+/////////////////////////////////////////////////
+inline EntityMemoryPool CreateTestPool(size_t size) {
+  EntityMemoryPool pool;
+  auto &cmeta_vec = entity::memory::GetComponentVector<CMeta>(pool);
+  cmeta_vec.resize(size);
+  auto &cui_vec = entity::memory::GetComponentVector<CUserInterface>(pool);
+  cui_vec.resize(size);
+  return pool;
+}
 
 /////////////////////////////////////////////////
 /// @brief Helper to print std::vector to output stream

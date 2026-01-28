@@ -13,6 +13,7 @@
 #include "conmat.h"
 #include "containers.h"
 #include "entity_memory.h"
+#include "matcher_helpers.h"
 #include "test_context.h"
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
@@ -20,18 +21,6 @@
 
 using namespace steamrot;
 using namespace steamrot::tests;
-
-/////////////////////////////////////////////////
-/// @brief Helper to create a simple EntityMemoryPool for testing
-/////////////////////////////////////////////////
-EntityMemoryPool CreateTestPool(size_t size) {
-  EntityMemoryPool pool;
-  auto &cmeta_vec = entity::memory::GetComponentVector<CMeta>(pool);
-  cmeta_vec.resize(size);
-  auto &cui_vec = entity::memory::GetComponentVector<CUserInterface>(pool);
-  cui_vec.resize(size);
-  return pool;
-}
 
 TEST_CASE("EntityTransportEqualsMatcher - both monostate",
           "[unit][EntityTransport][matcher]") {
