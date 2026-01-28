@@ -49,6 +49,12 @@ std::expected<std::monostate, FailInfo> TestEngine::StartUp() {
     return std::unexpected(add_scenes_result.error());
   }
 
+  // after successful startup, export initial snapshot at tick 0
+  auto snapshot_result = StoreEngineSnapShot();
+  if (!snapshot_result.has_value()) {
+    return std::unexpected(snapshot_result.error());
+  }
+
   return std::monostate{};
 }
 /////////////////////////////////////////////////
@@ -122,7 +128,12 @@ std::expected<std::monostate, FailInfo> TestEngine::StoreEngineSnapShot() {
   }
 
   // store snapshot in data bank, this needs moving due to unique_ptr members
-  m_data_bank[m_current_tick] = std::move(snapshot);
+  // if data bank is empty then store at tick 0, otherwise use current tick
+  if (m_data_bank.empty()) {
+    m_data_bank[0] = std::move(snapshot);
+  } else {
+    m_data_bank[m_current_tick] = std::move(snapshot);
+  }
   return std::monostate{};
 }
 /////////////////////////////////////////////////

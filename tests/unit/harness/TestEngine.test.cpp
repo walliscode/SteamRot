@@ -90,7 +90,10 @@ TEST_CASE("TestEngine::RunGame captures snapshots in data bank",
 
   // Assert
   const auto &data_bank = engine.GetDataBank();
-  REQUIRE(data_bank.size() == 3);
+
+  REQUIRE(data_bank.size() == 4);
+  // zero position is the data before any ticks have run to check initial state
+  REQUIRE(data_bank.find(0) != data_bank.end());
   REQUIRE(data_bank.find(1) != data_bank.end());
   REQUIRE(data_bank.find(2) != data_bank.end());
   REQUIRE(data_bank.find(3) != data_bank.end());
