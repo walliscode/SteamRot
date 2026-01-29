@@ -2,6 +2,8 @@
 
 This document provides visual representations of the entity transport architecture.
 
+**Key Constraint**: Must support lazy loading to avoid copying large entity data (50k-100k entities predicted).
+
 ---
 
 ## Current Architecture Overview
@@ -139,7 +141,45 @@ Issue: Ownership unclear - why shared_ptr?
 
 ---
 
-## Proposed Architecture: Option A (Direct Storage)
+## Proposed Architecture: Option B (Simplified Variant - Recommended)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Proposed Architecture                        │
+│         (1 Abstraction - Variant with Lazy Loading)             │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────┐
+│  EntityLazyLoadData (struct)    │  Plain data (no polymorphism)
+│  ────────────                   │
+│  - flatbuffers_data: ptr        │  Direct references to data
+│  - event_handler: ptr           │  (no heap allocations)
+└─────────────────────────────────┘  (preserves lazy loading!)
+
+┌─────────────────────────────────────────────┐
+│  EntitySource (variant)                     │
+│  ─────────────                              │
+│  std::variant<                              │
+│    std::monostate,        // No entities    │
+│    EntityMemoryPool,      // Direct pool    │
+│    EntityLazyLoadData     // Lazy load      │
+│  >                                          │
+└─────────────────────────────────────────────┘
+           │
+           │ used in
+           ▼
+┌─────────────────────────────┐
+│  SceneData                  │
+│  ─────────                  │
+│  - entity_source: variant   │
+└─────────────────────────────┘
+
+Usage:
+  std::visit with compile-time dispatch
+  (no virtual functions, preserves lazy loading!)
+```
+
+---
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐

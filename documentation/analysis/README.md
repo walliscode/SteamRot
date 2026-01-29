@@ -121,9 +121,9 @@ You have three abstractions that are mixing purposes:
 ### Migration Path
 
 1. **Phase 1**: Delete IEntityExporter ✅ (zero risk - unused)
-2. **Phase 2**: Remove IEntityImporter (low risk)
-3. **Phase 3**: Simplify EntityTransportVariant (medium risk)
-4. **Phase 4**: Evaluate lazy loading needs (as needed)
+2. **Phase 2**: Replace IEntityImporter with EntityLazyLoadData struct (low risk, preserves lazy loading)
+3. **Phase 3**: Rename for clarity (entity_transport → entity_source)
+4. **Phase 4**: Monitor and optimize based on usage patterns
 
 ---
 
@@ -141,11 +141,18 @@ std::variant<
 > entity_transport;
 ```
 
-### Proposed State (Option A)
+### Proposed State (Option B - Recommended)
 
 ```cpp
-// Simple: optional value
-std::optional<EntityMemoryPool> entity_pool;
+// Simpler: 3-state variant, no interfaces, preserves lazy loading
+struct EntityLazyLoadData {
+  const EntityCollectionFbs* flatbuffers_data;
+  EventHandler* event_handler;
+};
+
+std::variant<std::monostate,
+             EntityMemoryPool,
+             EntityLazyLoadData> entity_source;
 ```
 
 ### Current Data Flow
@@ -157,27 +164,33 @@ File → Loader → EntityCollectionFbs → FlatbuffersEntityImporter (wrapper)
 (6 layers)
 ```
 
-### Proposed Data Flow
+### Proposed Data Flow (Option B)
 ```
-File → Loader → EntityCollectionFbs → FlatbuffersEntityConfigurator 
-  → EntityMemoryPool
+File → Loader → EntityCollectionFbs → EntityLazyLoadData (struct with pointers)
+  → EntityTransportVariant → SceneFactory (std::visit)
+  → FlatbuffersEntityConfigurator → EntityMemoryPool
 
-(3 layers - exactly what's needed!)
+(5 layers - eliminates interface wrapper, preserves lazy loading!)
 ```
 
 ---
 
 ## 📊 Options Comparison
 
-| Aspect | Current | Option A | Option B | Option C |
-|--------|---------|----------|----------|----------|
-| **Abstractions** | 3 | 0 | 1 | 1 |
-| **Complexity** | High | Low | Medium | Medium |
-| **Performance** | Baseline | +3-5% | +3-5% | +1-2% |
-| **Testing** | Complex | Simple | Medium | Medium |
-| **Maintenance** | Hard | Easy | Medium | Medium |
+| Aspect | Current | Option B (Recommended) | Option A (Not Suitable) | Option C |
+|--------|---------|------------------------|------------------------|----------|
+| **Abstractions** | 3 | 1 | 0 | 1 |
+| **Complexity** | High | Medium | Low | Medium |
+| **Performance** | Baseline | +3-5% | High* | +1-2% |
+| **Lazy Loading** | Yes | Yes ✓ | No ❌ | Yes |
+| **Large Entities** | Yes | Yes ✓ | No ❌ | Yes |
+| **Testing** | Complex | Medium | Simple | Medium |
+| **Maintenance** | Hard | Medium | Easy** | Medium |
 
-**Recommendation**: **Option A** unless you have specific measured performance needs for lazy loading.
+*High performance only with small entity counts  
+**Easy to maintain but unsuitable for large datasets
+
+**Recommendation**: **Option B** - Only option that preserves lazy loading for 50k-100k entities while eliminating interface overhead.
 
 ---
 
@@ -208,11 +221,11 @@ File → Loader → EntityCollectionFbs → FlatbuffersEntityConfigurator
 
 ## 🚀 Next Steps
 
-### If You Agree with Option A
+### If You Agree with Option B
 
 1. Review the [Migration Strategy](./ENTITY_TRANSPORT_ARCHITECTURE_ANALYSIS.md#migration-strategy)
 2. Start with Phase 1 (delete IEntityExporter)
-3. Proceed to Phase 2 (remove IEntityImporter)
+3. Proceed to Phase 2 (replace IEntityImporter with EntityLazyLoadData)
 4. Measure and verify at each step
 
 ### If You Want Different Option
@@ -220,6 +233,7 @@ File → Loader → EntityCollectionFbs → FlatbuffersEntityConfigurator
 1. Review [Options Comparison](./ENTITY_TRANSPORT_ARCHITECTURE_ANALYSIS.md#comparison-matrix)
 2. Check [Decision Criteria](./ENTITY_TRANSPORT_QUICK_REFERENCE.md#decision-criteria)
 3. Consider [Risks and Mitigations](./ENTITY_TRANSPORT_ARCHITECTURE_ANALYSIS.md#risks-and-mitigations)
+4. **Important**: Option A is not suitable for 50k-100k entity use case
 
 ### If You Have Questions
 

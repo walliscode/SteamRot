@@ -6,7 +6,9 @@ This document analyzes the current entity import/export architecture in SteamRot
 
 **Current Problem**: Three overlapping abstractions (IEntityImporter, IEntityExporter, EntityTransportVariant) with unclear responsibilities and unnecessary runtime polymorphism for a compile-time-known problem.
 
-**Recommendation**: Consolidate to a single compile-time entity data transport mechanism that eliminates runtime polymorphism and clarifies data flow.
+**Key Constraint**: Must support lazy loading to avoid copying large entity data (50k-100k entities predicted). EntityCollectionFbs pointers need to be movable without copying entity data.
+
+**Recommendation**: Consolidate to a simplified compile-time variant that preserves lazy loading capability while eliminating unnecessary interface abstractions.
 
 ---
 
@@ -277,9 +279,89 @@ scene_data.entity_transport = test_pool;
 
 ### Recommended Architecture
 
-#### Option A: Direct EntityData Storage (Recommended)
+#### Option B: Simplified Variant with Lazy Loading (Recommended)
 
-Remove all interfaces and store entity data directly:
+**⚠️ IMPORTANT**: This option preserves lazy loading capability, which is critical for handling large entity datasets (50k-100k entities) without copying.
+
+Keep variant but with direct data references (no interface wrappers):
+
+```cpp
+// SceneData.h
+struct EntityLazyLoadData {
+  // Direct FlatBuffers reference for lazy loading (non-owning)
+  const EntityCollectionFbs* flatbuffers_data;
+  EventHandler* event_handler;
+};
+
+using EntitySource = std::variant<
+    std::monostate,           // No entities
+    EntityMemoryPool,         // Direct pool (testing/small scenes)
+    EntityLazyLoadData        // Lazy-loadable data (production/large scenes)
+>;
+
+struct SceneData {
+  SceneInfo scene_info;
+  SceneResourcesConfig scene_resources_config;
+  AssetConfig scene_asset_config;
+  EntitySource entity_source;
+};
+```
+
+**Characteristics**:
+- Compile-time polymorphism via variant (no virtual functions)
+- No heap-allocated interface objects
+- Three clear states (none, ready, lazy)
+- Direct data references (no wrapper classes)
+- **Preserves lazy loading** - FlatBuffers pointer can be moved around without copying entity data
+
+**Usage in SceneFactory**:
+```cpp
+std::visit([&](auto&& source) {
+  using T = std::decay_t<decltype(source)>;
+  if constexpr (std::is_same_v<T, std::monostate>) {
+    // Skip - no entities
+  } else if constexpr (std::is_same_v<T, EntityMemoryPool>) {
+    // Copy pre-configured pool (testing or small scenes)
+    scene.GetEntityMemoryPool() = source;
+  } else if constexpr (std::is_same_v<T, EntityLazyLoadData>) {
+    // Lazy load from FlatBuffers (production - avoids copying large data!)
+    FlatbuffersEntityConfigurator configurator(
+        *source.event_handler, *source.flatbuffers_data);
+    configurator.ConfigureEntityMemoryPool(scene.GetEntityMemoryPool());
+  }
+}, scene_data.entity_source);
+```
+
+**Migration path**:
+
+1. **File-based loading (production)**:
+```cpp
+// Provider stores lazy load data (no copying!)
+EntityLazyLoadData lazy_data{
+  .flatbuffers_data = scene_data_fbs->entity_collection(),
+  .event_handler = &m_event_handler
+};
+scene_data.entity_source = lazy_data;
+```
+
+2. **State capture**:
+```cpp
+// Direct copy of already-loaded entities
+scene_data.entity_source = scene->GetEntityMemoryPool();
+```
+
+3. **Testing**:
+```cpp
+// Empty scene
+scene_data.entity_source = std::monostate{};
+
+// Pre-configured scene
+scene_data.entity_source = test_pool;
+```
+
+#### Option A: Direct EntityData Storage (Only for Small Scenes)
+
+**⚠️ WARNING**: This option requires eager loading, which means copying potentially 50k-100k entities. Only suitable if entity counts are guaranteed to be small (< 1000 entities).
 
 ```cpp
 // SceneData.h
@@ -288,11 +370,8 @@ struct SceneData {
   SceneResourcesConfig scene_resources_config;
   AssetConfig scene_asset_config;
   
-  // Direct entity data - no variant needed
+  // Direct entity data - requires eager loading
   std::optional<EntityMemoryPool> entity_pool;
-  
-  // OR for lazy loading:
-  std::function<std::expected<EntityMemoryPool, FailInfo>()> entity_loader;
 };
 ```
 
@@ -300,31 +379,9 @@ struct SceneData {
 - No runtime polymorphism
 - No variant complexity
 - Clear ownership (optional = may not exist)
-- Lazy loading via std::function if needed
+- **REQUIRES EAGER LOADING** - not suitable for large entity datasets
 
-**Migration path**:
-
-1. **File-based loading**:
-```cpp
-// Provider returns configured pool directly
-auto pool_result = configurator.ConfigureEntityMemoryPool(pool);
-scene_data.entity_pool = std::move(pool);
-```
-
-2. **State capture**:
-```cpp
-// Direct copy
-scene_data.entity_pool = scene->GetEntityMemoryPool();
-```
-
-3. **Testing**:
-```cpp
-// Empty scene
-scene_data.entity_pool = std::nullopt;
-
-// Pre-configured scene
-scene_data.entity_pool = test_pool;
-```
+**When to use**: Only if maximum entity count is guaranteed to be small and copying is acceptable.
 
 #### Option B: Simplified Variant (If lazy loading is critical)
 
@@ -430,36 +487,39 @@ struct SceneData {
 
 ## Comparison Matrix
 
-| Aspect | Current | Option A (Direct) | Option B (Variant) | Option C (Type-Erased) |
-|--------|---------|-------------------|--------------------|-----------------------|
-| Number of abstractions | 3 | 0 | 1 | 1 |
+| Aspect | Current | Option B (Variant) | Option A (Direct) | Option C (Type-Erased) |
+|--------|---------|--------------------|--------------------|------------------------|
+| Number of abstractions | 3 | 1 | 0 | 1 |
 | Runtime polymorphism | Yes (virtual) | No | No | Yes (type-erased) |
 | Heap allocations | High | Low | Low | Medium |
-| Code complexity | High | Low | Medium | Medium |
-| Lazy loading support | Yes | Via std::function | Yes (native) | Yes (native) |
-| Test simplicity | Medium | High | Medium | Medium |
-| Future extensibility | Medium | Low | Medium | High |
-| Performance | Medium | High | High | Medium |
+| Code complexity | High | Medium | Low | Medium |
+| Lazy loading support | Yes (native) | Yes (native) | No ⚠️ | Yes (native) |
+| Test simplicity | Medium | Medium | High | Medium |
+| Future extensibility | Medium | Medium | Low | High |
+| Performance | Medium | High | High ⚠️ | Medium |
+| Large entity support | Yes ✓ | Yes ✓ | No ⚠️ | Yes ✓ |
+
+**⚠️ Note on Option A**: Performance is high only for small entity counts. With 50k-100k entities, eager loading makes it unsuitable.
 
 ---
 
 ## Recommendation
 
-### Primary Recommendation: **Option A (Direct Storage)**
+### Primary Recommendation: **Option B (Simplified Variant with Lazy Loading)**
 
 **Rationale**:
-1. **Simplest solution**: No abstractions, just data
-2. **Compile-time known**: All formats known at compile time
-3. **Clear semantics**: Optional pool = may not exist
-4. **Best performance**: No virtual calls, minimal allocations
-5. **Easy testing**: Direct pool construction
-6. **Future-proof**: Can add std::function for lazy loading if needed
+1. **Preserves lazy loading**: Critical for large entity datasets (50k-100k entities)
+2. **No copying overhead**: FlatBuffers pointers can be moved around without copying entity data
+3. **Compile-time polymorphism**: All formats known at compile time (std::visit instead of virtual functions)
+4. **Eliminates interface abstraction**: Direct data references instead of IEntityImporter wrapper
+5. **Clear semantics**: Three distinct states (none, ready, lazy)
+6. **Better performance**: No virtual calls, minimal heap allocations
 
 ### When to use other options:
 
-**Option B (Variant)**: If lazy loading performance is measured to be critical and std::function overhead is unacceptable
+**Option A (Direct Storage)**: Only if entity counts are guaranteed small (< 1000) and eager loading is acceptable. ⚠️ **NOT recommended for your use case** due to 50k-100k entity prediction.
 
-**Option C (Type-Erased)**: If you anticipate needing runtime extensibility in the future (e.g., plugin system, but this contradicts the stated requirement)
+**Option C (Type-Erased)**: If you anticipate needing runtime extensibility in the future (e.g., plugin system), but this contradicts the stated "compile-time only" requirement.
 
 ---
 
@@ -475,94 +535,107 @@ struct SceneData {
 
 ### Phase 2: Collapse IEntityImporter (Short-term)
 
-**Action**: Remove importer wrapper, use configurator directly
+**Action**: Remove importer wrapper, use direct data references for lazy loading
 
 **Steps**:
-1. Change EntityTransportVariant to:
+1. Define EntityLazyLoadData struct:
+   ```cpp
+   // In SceneData.h
+   struct EntityLazyLoadData {
+     const EntityCollectionFbs* flatbuffers_data;
+     EventHandler* event_handler;
+   };
+   ```
+
+2. Change EntityTransportVariant to:
    ```cpp
    using EntityTransportVariant = 
        std::variant<std::monostate, 
                     EntityMemoryPool,
-                    std::shared_ptr<EntityMemoryPool>>;
+                    EntityLazyLoadData>;
    ```
 
-2. Update FlatbuffersSceneDataProvider:
+3. Update FlatbuffersSceneDataProvider:
    ```cpp
-   // Instead of creating importer
-   FlatbuffersEntityConfigurator configurator(
-       m_event_handler, *m_scene_data_fbs->entity_collection());
-   
-   EntityMemoryPool pool;
-   auto config_result = configurator.ConfigureEntityMemoryPool(pool);
-   if (config_result.has_value()) {
-     scene_data.entity_transport = std::move(pool);
-   }
+   // Instead of creating importer interface
+   EntityLazyLoadData lazy_data{
+     .flatbuffers_data = m_scene_data_fbs->entity_collection(),
+     .event_handler = &m_event_handler
+   };
+   scene_data.entity_transport = lazy_data;
+   // No copying of entity data!
    ```
 
-3. Simplify SceneFactory::ImportEntities:
+4. Simplify SceneFactory::ImportEntities with std::visit:
    ```cpp
    std::visit([&](auto&& transport) {
      using T = std::decay_t<decltype(transport)>;
      if constexpr (std::is_same_v<T, EntityMemoryPool>) {
        scene.GetEntityMemoryPool() = transport;
-     } else if constexpr (std::is_same_v<T, std::shared_ptr<EntityMemoryPool>>) {
-       if (transport) scene.GetEntityMemoryPool() = *transport;
+     } else if constexpr (std::is_same_v<T, EntityLazyLoadData>) {
+       FlatbuffersEntityConfigurator configurator(
+           *transport.event_handler, *transport.flatbuffers_data);
+       configurator.ConfigureEntityMemoryPool(scene.GetEntityMemoryPool());
      }
      // monostate: do nothing
    }, scene_data.entity_transport);
    ```
 
-4. Delete:
+5. Delete:
    - `src/types/interfaces/IEntityImporter.h`
    - `src/entity/FlatbuffersEntityImporter.h`
    - `src/entity/FlatbuffersEntityImporter.cpp`
    - `tests/unit/entity/FlatbuffersEntityImporter.test.cpp`
 
 **Impact**: 
-- Removes one layer of indirection
-- Eliminates runtime polymorphism
-- Simplifies SceneFactory logic
-- Reduces heap allocations
+- Removes interface layer (eliminates virtual function overhead)
+- Preserves lazy loading capability (critical for large datasets)
+- Simplifies SceneFactory logic (compile-time dispatch via std::visit)
+- No copying of large entity data
 
-### Phase 3: Simplify EntityTransportVariant (Medium-term)
+### Phase 3: Simplify Variant Naming (Medium-term)
 
-**Action**: Evaluate if variant is still needed
+**Action**: Update type names for clarity
 
-**Analysis**: After Phase 2, variant only has three states:
+**Analysis**: After Phase 2, variant has three states:
 - `std::monostate` - testing only
-- `EntityMemoryPool` - direct pool
-- `std::shared_ptr<EntityMemoryPool>` - scene capture
+- `EntityMemoryPool` - direct pool (testing or already-loaded)
+- `EntityLazyLoadData` - lazy load data (production)
 
-**Consider**:
+**Consider renaming for clarity**:
 ```cpp
+// In SceneData.h
+using EntitySource = std::variant<
+    std::monostate,
+    EntityMemoryPool,
+    EntityLazyLoadData
+>;
+
 struct SceneData {
   // ... other fields ...
-  std::optional<EntityMemoryPool> entity_pool;
+  EntitySource entity_source;  // Renamed from entity_transport
 };
 ```
-
-Where:
-- `std::nullopt` = no entities (testing)
-- `value` = configured pool (all other cases)
 
 **Impact**:
-- Further simplifies code
-- Removes variant handling entirely
-- Clarifies ownership (always value or nothing)
+- Clearer naming (entity_source vs entity_transport)
+- Better documentation of purpose
+- No functional changes
 
-### Phase 4: Evaluate Lazy Loading Needs (Long-term)
+### Phase 4: Optimize Data Structures (Long-term)
 
-**Action**: Measure if eager loading causes performance issues
+**Action**: Monitor memory usage and optimize as needed
 
-If lazy loading is needed:
-```cpp
-struct SceneData {
-  // ... other fields ...
-  std::optional<std::function<EntityMemoryPool()>> entity_loader;
-};
-```
+**Considerations**:
+- Track FlatBuffers data lifetime carefully (non-owning pointers)
+- Measure actual entity count distributions in production
+- Consider memory pooling if entity counts exceed predictions
+- Profile entity configuration performance
 
-Or use Option B variant approach.
+**If memory issues arise**:
+- Add reference counting to FlatBuffers data if needed
+- Consider streaming entity configuration for very large scenes
+- Investigate entity chunk loading patterns
 
 ---
 
@@ -624,17 +697,21 @@ if (holds_alternative<EntityMemoryPool>(actual.entity_source)) {
 
 ### Proposed Performance Benefits
 
-**Option A**:
-- ✅ Zero virtual calls
-- ✅ Zero interface heap allocations
-- ✅ Zero variant overhead
-- ✅ Direct data access (2 layers: configurator → pool)
-
-**Option B**:
+**Option B (Recommended)**:
 - ✅ Zero virtual calls
 - ✅ Zero interface heap allocations
 - ⚠️ Minimal variant overhead (compile-time dispatch via std::visit)
 - ✅ Direct data access
+- ✅ **Preserves lazy loading** (critical for 50k-100k entities)
+- ✅ No copying of large entity data
+
+**Option A (Not recommended for large datasets)**:
+- ✅ Zero virtual calls
+- ✅ Zero interface heap allocations
+- ✅ Zero variant overhead
+- ✅ Direct data access (2 layers: configurator → pool)
+- ❌ **Requires eager loading** (unacceptable for 50k-100k entities)
+- ❌ Copies all entity data at load time
 
 **Option C**:
 - ⚠️ std::function overhead (similar to virtual call)
@@ -644,13 +721,18 @@ if (holds_alternative<EntityMemoryPool>(actual.entity_source)) {
 
 ### Measured Impact (Estimated)
 
-Scene loading time improvements:
+Scene loading time improvements (relative to current architecture):
 - Current: 100% baseline
-- Option A: ~95-97% (3-5% faster due to reduced overhead)
-- Option B: ~95-97% (similar to Option A)
+- **Option B (Recommended)**: ~95-97% (3-5% faster, preserves lazy loading)
+- Option A: ~92-95% if entities < 1000, **200-500%+ slower** if 50k-100k entities due to copying overhead
 - Option C: ~98-99% (minimal improvement)
 
-**Note**: Actual bottleneck is likely FlatBuffers data access and entity configuration, not the transport mechanism. Simplification benefits are primarily in code clarity and maintainability, not performance.
+**Memory Impact**:
+- Current: EntityCollectionFbs + IEntityImporter wrapper + variant overhead
+- **Option B**: EntityCollectionFbs + EntityLazyLoadData struct (~16 bytes) + variant overhead
+- Option A: EntityCollectionFbs + **full EntityMemoryPool copy** (huge for 50k-100k entities)
+
+**Critical Note**: For predicted 50k-100k entities, Option A would copy potentially hundreds of MB of data during scene loading, making it completely unsuitable. Option B maintains the current lazy loading behavior while eliminating the interface abstraction overhead.
 
 ---
 
@@ -678,11 +760,13 @@ Scene loading time improvements:
 - ✅ Zero abstractions to learn
 - ✅ One implementation to maintain (configurator)
 - ✅ Simple documentation: "SceneData may contain an EntityMemoryPool"
+- ❌ **NOT suitable for large entity datasets**
 
-**Option B**:
+**Option B (Recommended)**:
 - ✅ One abstraction (variant)
 - ✅ Two implementations (configurator + variant visitor)
 - ✅ Clear documentation: "Three ways to provide entity data"
+- ✅ **Supports lazy loading for large datasets**
 
 **Option C**:
 - ✅ One abstraction (EntityConfigurator)
@@ -741,26 +825,31 @@ The current architecture has three abstractions (IEntityImporter, IEntityExporte
 
 ### Recommended Action
 
-**Adopt Option A (Direct Storage)** because:
+**Adopt Option B (Simplified Variant with Lazy Loading)** because:
 - ✅ Matches stated requirement: "compile time only, we do not need to account for unknown data types at runtime"
-- ✅ Simplest possible solution
-- ✅ Best performance characteristics
-- ✅ Easiest to understand and maintain
-- ✅ Can evolve to Option B or C if requirements change
+- ✅ **Preserves lazy loading capability** (critical for 50k-100k entity prediction)
+- ✅ Eliminates interface abstraction overhead
+- ✅ Best performance for large datasets (no copying)
+- ✅ Clear compile-time polymorphism (std::visit)
+- ✅ Can evolve as needed without breaking lazy loading
+
+**Why not Option A**: Would require copying 50k-100k entities at scene load time, making it completely unsuitable for your use case.
 
 ### Implementation Path
 
 1. **Immediate**: Delete IEntityExporter (zero risk)
-2. **Short-term**: Collapse IEntityImporter into direct configurator usage
-3. **Medium-term**: Evaluate if EntityTransportVariant can be simplified to std::optional
-4. **Long-term**: Monitor for any lazy loading performance needs
+2. **Short-term**: Collapse IEntityImporter into EntityLazyLoadData struct (preserves lazy loading)
+3. **Medium-term**: Rename for clarity if desired (entity_transport → entity_source)
+4. **Long-term**: Monitor and optimize based on actual usage patterns
 
 ### Expected Outcomes
 
-- **Code clarity**: 3 abstractions → 0-1 abstractions
+- **Code clarity**: 3 abstractions → 1 abstraction
 - **Maintainability**: Fewer files, simpler logic, clearer intent
-- **Performance**: 3-5% improvement (minor but measurable)
-- **Testing**: Simpler test helpers and assertions
+- **Performance**: 3-5% improvement from eliminating interface overhead
+- **Lazy loading**: Preserved (critical for large entity datasets)
+- **Memory efficiency**: No copying of large entity data
+- **Testing**: Simpler variant handling (no interface comparison issues)
 - **Future-proofing**: Can add complexity back if truly needed
 
 ---

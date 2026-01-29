@@ -8,7 +8,9 @@ This is a quick reference guide for understanding the entity transport architect
 
 **Problem**: Three overlapping abstractions doing similar things with unnecessary complexity.
 
-**Solution**: Use Option A - direct `std::optional<EntityMemoryPool>` storage.
+**Key Constraint**: Must support lazy loading to avoid copying large entity data (50k-100k entities predicted).
+
+**Solution**: Use Option B - simplified variant with lazy loading (eliminates interface, preserves lazy loading).
 
 ---
 
@@ -53,7 +55,7 @@ FlatBuffers File → Loader → FlatbuffersEntityImporter (wrapper)
 
 ---
 
-## Recommended Solution: Option A
+## Recommended Solution: Option B
 
 **Change**:
 ```cpp
@@ -63,30 +65,41 @@ std::variant<std::monostate,
              std::shared_ptr<EntityMemoryPool>, 
              EntityMemoryPool> entity_transport;
 
-// Proposed (simple)
-std::optional<EntityMemoryPool> entity_pool;
+// Proposed (simpler, preserves lazy loading)
+struct EntityLazyLoadData {
+  const EntityCollectionFbs* flatbuffers_data;
+  EventHandler* event_handler;
+};
+
+std::variant<std::monostate,
+             EntityMemoryPool,
+             EntityLazyLoadData> entity_source;
 ```
 
 **Benefits**:
-- ✅ Zero abstractions to learn
-- ✅ No virtual functions (better performance)
-- ✅ Clear ownership (optional = may not exist)
-- ✅ Simple to test
-- ✅ Easier to maintain
+- ✅ Eliminates interface abstraction (IEntityImporter)
+- ✅ No virtual functions (compile-time polymorphism via std::visit)
+- ✅ **Preserves lazy loading** (critical for 50k-100k entities)
+- ✅ No copying of large entity data
+- ✅ Clear ownership (3 simple states)
+- ✅ Easier to test (no interface comparison issues)
+- ✅ Better performance (~3-5% improvement)
 
 **Usage**:
 ```cpp
-// Production: Load and configure
-EntityMemoryPool pool;
-configurator.ConfigureEntityMemoryPool(pool);
-scene_data.entity_pool = std::move(pool);
+// Production: Store lazy load data (no copying!)
+EntityLazyLoadData lazy_data{
+  .flatbuffers_data = scene_data_fbs->entity_collection(),
+  .event_handler = &m_event_handler
+};
+scene_data.entity_source = lazy_data;
 
-// Scene capture: Direct copy
-scene_data.entity_pool = scene->GetEntityMemoryPool();
+// Scene capture: Direct copy (already loaded)
+scene_data.entity_source = scene->GetEntityMemoryPool();
 
 // Testing: Empty or pre-configured
-scene_data.entity_pool = std::nullopt;           // No entities
-scene_data.entity_pool = test_pool;              // Pre-configured
+scene_data.entity_source = std::monostate{};    // No entities
+scene_data.entity_source = test_pool;           // Pre-configured
 ```
 
 ---
@@ -122,45 +135,51 @@ class EntityConfigurator {
 - No implementations, no usages
 - Just delete the file
 
-### Phase 2: Remove IEntityImporter (Low Risk)
-- Remove FlatbuffersEntityImporter wrapper
-- Use FlatbuffersEntityConfigurator directly
-- Simplify EntityTransportVariant to 3 states
+### Phase 2: Replace IEntityImporter with EntityLazyLoadData (Low Risk)
+- Define EntityLazyLoadData struct (FlatBuffers pointer + EventHandler pointer)
+- Update EntityTransportVariant to use EntityLazyLoadData instead of unique_ptr<IEntityImporter>
+- Update SceneFactory to use std::visit instead of interface calls
+- **Preserves lazy loading** - no copying of entity data
 
-### Phase 3: Simplify to Optional (Medium Risk)
-- Evaluate if variant is still needed
-- Consider switching to `std::optional<EntityMemoryPool>`
+### Phase 3: Rename for Clarity (Low Risk)
+- Rename entity_transport to entity_source
+- Update documentation
 
-### Phase 4: Lazy Loading Evaluation (Future)
-- Measure if eager loading causes issues
-- Add std::function if truly needed
+### Phase 4: Monitor and Optimize (Future)
+- Track FlatBuffers data lifetime
+- Measure actual entity count distributions
+- Optimize as needed
 
 ---
 
 ## Expected Outcomes
 
-| Metric | Current | After Option A |
+| Metric | Current | After Option B |
 |--------|---------|----------------|
-| Abstractions | 3 | 0 |
+| Abstractions | 3 | 1 |
 | Virtual calls | Yes | No |
 | Code clarity | Low | High |
-| Test complexity | High | Low |
+| Test complexity | High | Medium |
 | Performance | Baseline | +3-5% |
+| Lazy loading | Yes | Yes ✓ |
+| Large entity support | Yes | Yes ✓ |
 | Maintainability | Medium | High |
 
 ---
 
 ## Decision Criteria
 
-**Choose Option A if**:
-- ✅ You want the simplest solution
+**Choose Option B (Recommended) if**:
+- ✅ You want to eliminate interface overhead
 - ✅ Performance matters
+- ✅ **Need to support 50k-100k entities** (your use case!)
 - ✅ Code clarity is priority
 - ✅ All formats are compile-time known (stated requirement!)
 
-**Choose Option B if**:
-- ⚠️ Lazy loading performance is measured to be critical
-- ⚠️ std::function overhead is unacceptable
+**Choose Option A only if**:
+- ⚠️ Entity counts guaranteed small (< 1000)
+- ⚠️ Eager loading is acceptable
+- ⚠️ **NOT suitable for your 50k-100k entity use case**
 
 **Choose Option C if**:
 - ⚠️ You anticipate needing runtime plugin system
@@ -195,13 +214,16 @@ class EntityConfigurator {
 A: Only if you need runtime format discovery (contradicts "compile time only" requirement)
 
 **Q: What about future formats (JSON, XML)?**  
-A: Add factory functions or template specializations (compile-time polymorphism)
+A: Add new variant state or template specializations (compile-time polymorphism)
 
-**Q: What about performance?**  
-A: Option A is 3-5% faster due to reduced indirection
+**Q: What about performance with 50k-100k entities?**  
+A: Option B preserves lazy loading - no copying overhead. Option A would be disastrous.
 
 **Q: What about testing?**  
-A: Simpler! Just compare optional values instead of complex variant matching
+A: Simpler! Just compare variant values instead of complex interface matching
+
+**Q: Why not just use Option A for simplicity?**  
+A: Option A requires eager loading, which means copying potentially hundreds of MB of entity data at scene load time. Completely unsuitable for large entity counts.
 
 ---
 
