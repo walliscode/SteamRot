@@ -290,7 +290,6 @@ Keep variant but with direct data references (no interface wrappers):
 struct EntityLazyLoadData {
   // Direct FlatBuffers reference for lazy loading (non-owning)
   const EntityCollectionFbs* flatbuffers_data;
-  EventHandler* event_handler;
 };
 
 using EntitySource = std::variant<
@@ -313,6 +312,7 @@ struct SceneData {
 - Three clear states (none, ready, lazy)
 - Direct data references (no wrapper classes)
 - **Preserves lazy loading** - FlatBuffers pointer can be moved around without copying entity data
+- EventHandler provided at usage point (not stored in variant)
 
 **Usage in SceneFactory**:
 ```cpp
@@ -325,8 +325,9 @@ std::visit([&](auto&& source) {
     scene.GetEntityMemoryPool() = source;
   } else if constexpr (std::is_same_v<T, EntityLazyLoadData>) {
     // Lazy load from FlatBuffers (production - avoids copying large data!)
+    // EventHandler provided from scene context (not stored in variant)
     FlatbuffersEntityConfigurator configurator(
-        *source.event_handler, *source.flatbuffers_data);
+        scene.GetSceneContext().event_handler, *source.flatbuffers_data);
     configurator.ConfigureEntityMemoryPool(scene.GetEntityMemoryPool());
   }
 }, scene_data.entity_source);
@@ -338,8 +339,7 @@ std::visit([&](auto&& source) {
 ```cpp
 // Provider stores lazy load data (no copying!)
 EntityLazyLoadData lazy_data{
-  .flatbuffers_data = scene_data_fbs->entity_collection(),
-  .event_handler = &m_event_handler
+  .flatbuffers_data = scene_data_fbs->entity_collection()
 };
 scene_data.entity_source = lazy_data;
 ```
@@ -442,15 +442,14 @@ Keep one interface, but make it a value-type wrapper:
 // EntityConfigurator.h
 class EntityConfigurator {
 private:
-  std::function<std::expected<std::monostate, FailInfo>(EntityMemoryPool&)> 
+  std::function<std::expected<std::monostate, FailInfo>(EntityMemoryPool&, EventHandler&)> 
       m_configure_fn;
 
 public:
   // Constructor from FlatBuffers
   static EntityConfigurator FromFlatBuffers(
-      EventHandler& handler, 
       const EntityCollectionFbs& data) {
-    return EntityConfigurator([&handler, &data](EntityMemoryPool& emp) {
+    return EntityConfigurator([&data](EntityMemoryPool& emp, EventHandler& handler) {
       FlatbuffersEntityConfigurator configurator(handler, data);
       return configurator.ConfigureEntityMemoryPool(emp);
     });
@@ -458,15 +457,15 @@ public:
   
   // Constructor from pre-configured pool
   static EntityConfigurator FromPool(EntityMemoryPool pool) {
-    return EntityConfigurator([pool = std::move(pool)](EntityMemoryPool& emp) {
+    return EntityConfigurator([pool = std::move(pool)](EntityMemoryPool& emp, EventHandler&) {
       emp = pool;
       return std::monostate{};
     });
   }
   
   std::expected<std::monostate, FailInfo> 
-  Configure(EntityMemoryPool& emp) const {
-    return m_configure_fn(emp);
+  Configure(EntityMemoryPool& emp, EventHandler& handler) const {
+    return m_configure_fn(emp, handler);
   }
 };
 
@@ -482,6 +481,7 @@ struct SceneData {
 - Value semantics (no heap allocation for interface)
 - Type-erased via std::function
 - Factory methods for different sources
+- EventHandler provided at usage point
 
 ---
 
@@ -543,7 +543,6 @@ struct SceneData {
    // In SceneData.h
    struct EntityLazyLoadData {
      const EntityCollectionFbs* flatbuffers_data;
-     EventHandler* event_handler;
    };
    ```
 
@@ -559,8 +558,7 @@ struct SceneData {
    ```cpp
    // Instead of creating importer interface
    EntityLazyLoadData lazy_data{
-     .flatbuffers_data = m_scene_data_fbs->entity_collection(),
-     .event_handler = &m_event_handler
+     .flatbuffers_data = m_scene_data_fbs->entity_collection()
    };
    scene_data.entity_transport = lazy_data;
    // No copying of entity data!
@@ -573,8 +571,9 @@ struct SceneData {
      if constexpr (std::is_same_v<T, EntityMemoryPool>) {
        scene.GetEntityMemoryPool() = transport;
      } else if constexpr (std::is_same_v<T, EntityLazyLoadData>) {
+       // EventHandler from scene context (not from variant)
        FlatbuffersEntityConfigurator configurator(
-           *transport.event_handler, *transport.flatbuffers_data);
+           scene.GetSceneContext().event_handler, *transport.flatbuffers_data);
        configurator.ConfigureEntityMemoryPool(scene.GetEntityMemoryPool());
      }
      // monostate: do nothing

@@ -147,13 +147,14 @@ std::variant<
 // Simpler: 3-state variant, no interfaces, preserves lazy loading
 struct EntityLazyLoadData {
   const EntityCollectionFbs* flatbuffers_data;
-  EventHandler* event_handler;
 };
 
 std::variant<std::monostate,
              EntityMemoryPool,
              EntityLazyLoadData> entity_source;
 ```
+
+**Key Point**: EventHandler provided at usage point (from scene context), not stored in variant.
 
 ### Current Data Flow
 ```

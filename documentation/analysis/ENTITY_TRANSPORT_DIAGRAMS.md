@@ -152,9 +152,9 @@ Issue: Ownership unclear - why shared_ptr?
 ┌─────────────────────────────────┐
 │  EntityLazyLoadData (struct)    │  Plain data (no polymorphism)
 │  ────────────                   │
-│  - flatbuffers_data: ptr        │  Direct references to data
-│  - event_handler: ptr           │  (no heap allocations)
+│  - flatbuffers_data: ptr        │  Only FlatBuffers pointer
 └─────────────────────────────────┘  (preserves lazy loading!)
+                                     EventHandler from scene context
 
 ┌─────────────────────────────────────────────┐
 │  EntitySource (variant)                     │
@@ -177,6 +177,20 @@ Issue: Ownership unclear - why shared_ptr?
 Usage:
   std::visit with compile-time dispatch
   (no virtual functions, preserves lazy loading!)
+  EventHandler provided at usage point from scene context
+
+Use cases mapped to variant states:
+   ┌────────────┬─────────────┬──────────────┐
+   │            │             │              │
+Production    Testing      Testing      Serialization
+(lazy load)   (empty)   (pre-config)     (snapshot)
+   │             │            │              │
+   ▼             ▼            ▼              ▼
+EntityLazy    monostate   EntityPool    EntityPool
+LoadData                  (test_pool)   (copy)
+
+Key: Lazy loading preserved for production (no copying!)
+     EventHandler not in variant (from scene context)
 ```
 
 ---
@@ -299,9 +313,8 @@ Clear ownership: value semantics
 ┌─────────────────────────────────┐
 │  EntityData (struct)            │  Plain data (no polymorphism)
 │  ────────────                   │
-│  - flatbuffers_data: ptr        │  Direct references to data
-│  - event_handler: ptr           │  (no heap allocations)
-└─────────────────────────────────┘
+│  - flatbuffers_data: ptr        │  Only FlatBuffers pointer
+└─────────────────────────────────┘  EventHandler from scene context
 
 ┌─────────────────────────────────────────────┐
 │  EntitySource (variant)                     │

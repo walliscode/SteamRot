@@ -68,7 +68,6 @@ std::variant<std::monostate,
 // Proposed (simpler, preserves lazy loading)
 struct EntityLazyLoadData {
   const EntityCollectionFbs* flatbuffers_data;
-  EventHandler* event_handler;
 };
 
 std::variant<std::monostate,
@@ -84,15 +83,20 @@ std::variant<std::monostate,
 - ✅ Clear ownership (3 simple states)
 - ✅ Easier to test (no interface comparison issues)
 - ✅ Better performance (~3-5% improvement)
+- ✅ EventHandler provided at usage point (not stored in variant)
 
 **Usage**:
 ```cpp
 // Production: Store lazy load data (no copying!)
 EntityLazyLoadData lazy_data{
-  .flatbuffers_data = scene_data_fbs->entity_collection(),
-  .event_handler = &m_event_handler
+  .flatbuffers_data = scene_data_fbs->entity_collection()
 };
 scene_data.entity_source = lazy_data;
+
+// In SceneFactory (EventHandler from scene context):
+FlatbuffersEntityConfigurator configurator(
+    scene.GetSceneContext().event_handler, *lazy_data.flatbuffers_data);
+configurator.ConfigureEntityMemoryPool(scene.GetEntityMemoryPool());
 
 // Scene capture: Direct copy (already loaded)
 scene_data.entity_source = scene->GetEntityMemoryPool();
@@ -136,9 +140,9 @@ class EntityConfigurator {
 - Just delete the file
 
 ### Phase 2: Replace IEntityImporter with EntityLazyLoadData (Low Risk)
-- Define EntityLazyLoadData struct (FlatBuffers pointer + EventHandler pointer)
+- Define EntityLazyLoadData struct (FlatBuffers pointer only - no EventHandler)
 - Update EntityTransportVariant to use EntityLazyLoadData instead of unique_ptr<IEntityImporter>
-- Update SceneFactory to use std::visit instead of interface calls
+- Update SceneFactory to use std::visit and get EventHandler from scene context
 - **Preserves lazy loading** - no copying of entity data
 
 ### Phase 3: Rename for Clarity (Low Risk)
