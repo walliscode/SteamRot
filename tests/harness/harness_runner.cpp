@@ -7,10 +7,13 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "harness_runner.h"
+#include "EntityTransportVariant.h"
 #include "FailInfo.h"
 #include "FlatbuffersTestDataProvider.h"
 #include "TestEngine.h"
 #include "add_uuids.h"
+#include "containers.h"
+#include <variant>
 
 namespace steamrot::tests {
 
@@ -72,6 +75,34 @@ RunHarnessTests(const std::filesystem::path current_location) {
       return std::unexpected(run_result.error());
     }
   }
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo> ConvertEMPData(SceneData &scene_data) {
+
+  // check the SceneData entity configurator is not null
+  if (scene_data.entity_configurator == nullptr) {
+    return std::unexpected(FailInfo{
+        FailMode::NullPointer,
+        "SceneData entity_configurator is null.",
+    });
+  }
+
+  // create fresh EntityMemoryPool
+  EntityMemoryPool emp;
+  // configure the EMP from the SceneData entity configurator
+  auto configure_result =
+      scene_data.entity_configurator->ConfigureEntityMemoryPoolFromSource(
+          emp, scene_data.entity_transport);
+
+  // assign the configured EMP back to the SceneData
+  if (!configure_result) {
+    return std::unexpected(configure_result.error());
+  }
+
+  scene_data.entity_transport = std::move(emp);
 
   return std::monostate{};
 }

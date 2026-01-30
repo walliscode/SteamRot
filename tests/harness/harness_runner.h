@@ -13,6 +13,7 @@
 /////////////////////////////////////////////////
 
 #include "FailInfo.h"
+#include "SceneData.h"
 #include <expected>
 #include <filesystem>
 #include <variant>
@@ -26,4 +27,12 @@ namespace steamrot::tests {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 RunHarnessTests(const std::filesystem::path current_location);
+
+/////////////////////////////////////////////////
+/// @brief Converts the variant in the SceneData to the wanted type
+///
+/// @param scene_data SceneData object with variant to convert
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo> ConvertEMPData(SceneData &scene_data);
+
 } // namespace steamrot::tests

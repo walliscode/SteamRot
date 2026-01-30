@@ -12,6 +12,7 @@
 #include "EventType.h"
 #include "SceneData.h"
 #include "TestData.h"
+#include "harness_runner.h"
 #include "uuid.h"
 #include <catch2/catch_test_macros.hpp>
 #include <utility>
@@ -402,6 +403,13 @@ TEST_CASE("TestEngine zero position snapshot matches starting config with "
   auto startup_result = engine.StartUp();
   if (!startup_result.has_value()) {
     FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+  }
+
+  // convert scene data's EMPs before comparison
+  auto convert_result = steamrot::tests::ConvertEMPData(
+      test_data.starting_engine_snapshot.scene_collection_data[0]);
+  if (!convert_result.has_value()) {
+    FAIL("ConvertEMPData failed: " + convert_result.error().message);
   }
 
   // Assert - Zero position should match starting config
