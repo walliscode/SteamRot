@@ -9,6 +9,7 @@ This directory contains in-depth technical analyses of architectural decisions, 
 **Files:**
 - [`entity_transport_variant_mismatch.md`](./entity_transport_variant_mismatch.md) - Full detailed analysis
 - [`ENTITY_TRANSPORT_FIX.md`](./ENTITY_TRANSPORT_FIX.md) - Quick reference guide
+- [`DIAGRAMS.md`](./DIAGRAMS.md) - Visual flow diagrams and illustrations
 
 **Summary:** Analysis of type mismatch in TestEngine's entity data representation between expected (FlatBuffers) and actual (EntityMemoryPool) formats, with recommended solution.
 
