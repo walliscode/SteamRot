@@ -105,15 +105,86 @@ bool EntityTransportEqualsMatcher::match(
     return true;
   }
 
-  // 5. Handle unique_ptr<IEntityImporter>
-  if (std::holds_alternative<std::unique_ptr<IEntityImporter>>(actual)) {
-    // IEntityImporter cannot be meaningfully compared in snapshots
-    // This should not occur in TestEngine snapshots
-    oss << conmat::Indent(1) << conmat::TestFailed()
-        << "IEntityImporter comparison not supported in snapshot testing"
-        << "\n";
-    m_mismatch_description = oss.str();
-    return false;
+  // 5. Handle const EntityCollectionFbs *
+  if (std::holds_alternative<const EntityCollectionFbs *>(actual)) {
+    auto actual_ptr = std::get<const EntityCollectionFbs *>(actual);
+    auto expected_ptr = std::get<const EntityCollectionFbs *>(m_expected);
+
+    // Check for null pointers
+    if (!actual_ptr && !expected_ptr) {
+      return true; // Both null is a match
+    }
+
+    if (!actual_ptr || !expected_ptr) {
+      oss << conmat::Indent(1) << conmat::TestFailed()
+          << "Null pointer in const EntityCollectionFbs *" << "\n";
+      oss << conmat::Indent(2) << "actual is null: "
+          << conmat::Colorize(actual_ptr ? "false" : "true", conmat::Color::Red)
+          << "\n";
+      oss << conmat::Indent(2) << "expected is null: "
+          << conmat::Colorize(expected_ptr ? "false" : "true",
+                              conmat::Color::Blue)
+          << "\n";
+      m_mismatch_description = oss.str();
+      return false;
+    }
+
+    // Both are non-null, compare the data
+    // Compare entity_memory_pool_size
+    if (actual_ptr->entity_memory_pool_size() !=
+        expected_ptr->entity_memory_pool_size()) {
+      oss << conmat::Indent(1) << conmat::TestFailed()
+          << "EntityCollectionFbs entity_memory_pool_size mismatch" << "\n";
+      oss << conmat::Indent(2) << "actual: "
+          << conmat::Colorize(
+                 std::to_string(actual_ptr->entity_memory_pool_size()),
+                 conmat::Color::Red)
+          << "\n";
+      oss << conmat::Indent(2) << "expected: "
+          << conmat::Colorize(
+                 std::to_string(expected_ptr->entity_memory_pool_size()),
+                 conmat::Color::Blue)
+          << "\n";
+      m_mismatch_description = oss.str();
+      return false;
+    }
+
+    // Compare number of entities
+    if (actual_ptr->entities() && expected_ptr->entities()) {
+      if (actual_ptr->entities()->size() != expected_ptr->entities()->size()) {
+        oss << conmat::Indent(1) << conmat::TestFailed()
+            << "EntityCollectionFbs entity count mismatch" << "\n";
+        oss << conmat::Indent(2) << "actual count: "
+            << conmat::Colorize(
+                   std::to_string(actual_ptr->entities()->size()),
+                   conmat::Color::Red)
+            << "\n";
+        oss << conmat::Indent(2) << "expected count: "
+            << conmat::Colorize(
+                   std::to_string(expected_ptr->entities()->size()),
+                   conmat::Color::Blue)
+            << "\n";
+        m_mismatch_description = oss.str();
+        return false;
+      }
+    } else if (actual_ptr->entities() || expected_ptr->entities()) {
+      oss << conmat::Indent(1) << conmat::TestFailed()
+          << "EntityCollectionFbs entities vector mismatch" << "\n";
+      oss << conmat::Indent(2) << "actual has entities: "
+          << conmat::Colorize(actual_ptr->entities() ? "true" : "false",
+                              conmat::Color::Red)
+          << "\n";
+      oss << conmat::Indent(2) << "expected has entities: "
+          << conmat::Colorize(expected_ptr->entities() ? "true" : "false",
+                              conmat::Color::Blue)
+          << "\n";
+      m_mismatch_description = oss.str();
+      return false;
+    }
+
+    // Note: Deep comparison of entity data is not implemented here as it would
+    // be complex and is better handled by converting to EntityMemoryPool
+    return true;
   }
 
   // Should never reach here

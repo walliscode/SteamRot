@@ -27,7 +27,7 @@ namespace steamrot::tests {
 /// - std::monostate (empty)
 /// - EntityMemoryPool (value type)
 /// - std::shared_ptr<EntityMemoryPool>
-/// - std::unique_ptr<IEntityImporter> (not supported in snapshots)
+/// - const EntityCollectionFbs * (FlatBuffers data pointer)
 /////////////////////////////////////////////////
 class EntityTransportEqualsMatcher
     : public Catch::Matchers::MatcherBase<EntityTransportVariant> {
