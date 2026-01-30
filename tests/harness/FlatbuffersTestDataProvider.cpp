@@ -159,10 +159,10 @@ FlatbuffersTestDataProvider::ConfigureSimulationData(
 
     // Check that logic_class_type is set
     if (fbs_step->logic_class_type() == steamrot::LogicClassEnumFbs_None) {
-      return std::unexpected(
-          steamrot::FailInfo{steamrot::FailMode::FlatbuffersDataNotFound,
-                             "SimulationStepFbs has logic_class_type set to None. "
-                             "A valid logic class must be specified."});
+      return std::unexpected(steamrot::FailInfo{
+          steamrot::FailMode::FlatbuffersDataNotFound,
+          "SimulationStepFbs has logic_class_type set to None. "
+          "A valid logic class must be specified."});
     }
 
     // Assign the converted LogicClassEnum to the element
