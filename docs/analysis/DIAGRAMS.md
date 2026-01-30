@@ -89,12 +89,12 @@ if (actual.index() != expected.index()) {
 
 ---
 
-## Solution Flow (Option 1: Convert at Load)
+## Solution Flow (Option 1: Convert in Harness Runner)
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                 IMPROVED TEST DATA LOADING PATH                  │
-│                 (With Conversion)                                │
+│                 IMPROVED TEST DATA FLOW                          │
+│                 (With Post-Engine Conversion)                    │
 └─────────────────────────────────────────────────────────────────┘
 
 test_data.json
@@ -105,25 +105,29 @@ test_data.bin (TestDataFbs)
      │
      ├─ FlatbuffersTestDataLoader
      ↓
-TestDataFbs*
-     │
-     ├─ ConfigureEngineSnapshot
-     ↓
-SceneData {
-  entity_transport: const EntityCollectionFbs*  ◄─── STARTS HERE
-  entity_configurator: unique_ptr
+TestData {
+  expected_engine_snapshots: map<tick, EngineSnapshot>
+    └─ SceneData {
+         entity_transport: const EntityCollectionFbs*  ◄─── STAYS AS FBS
+       }
 }
      │
-     ├─ ✨ NEW: Import & Convert
-     │   entity_configurator->ImportEntities(fbs_ptr)
+     ├─ TestEngine::StartUp()
+     ├─ TestEngine::RunGame()  ← Engine runs normally
      ↓
-EntityMemoryPool imported_pool;  ◄─── CONVERSION HAPPENS
+TestEngine creates snapshots with EntityMemoryPool
      │
-     ├─ Replace in variant
+     ├─ ✨ NEW: In harness_runner.cpp AFTER engine runs
+     │   Convert test_data.expected_engine_snapshots
      ↓
-entity_transport = std::move(imported_pool);
-                   ^^^^^^^^^^^^^^^^^^^^^^^
-                   Now it's EntityMemoryPool! ✅
+for each expected_snapshot:
+  for each scene_data:
+    if holds EntityCollectionFbs*:
+      import to EntityMemoryPool ◄─── CONVERSION HERE
+      
+entity_transport = EntityMemoryPool  ✅
+                   ^^^^^^^^^^^^^^^
+                   Now matches actual!
 
 
 ┌─────────────────────────────────────────────────────────────────┐
@@ -136,8 +140,8 @@ EntityTransportEqualsMatcher::match()
      ↓
 if (actual.index() != expected.index()) {
    ✅ MATCH!
-   actual.index() = 1 (EntityMemoryPool)
-   expected.index() = 1 (EntityMemoryPool)  ← SAME NOW!
+   actual.index() = 1 (EntityMemoryPool)  ← From engine
+   expected.index() = 1 (EntityMemoryPool) ← Converted in harness
    
    // Proceed to deep comparison
 }
@@ -191,45 +195,62 @@ After Fix:
 ## Code Change Location
 
 ```cpp
-File: src/data_providers/configure/configure_engine_snapshot.cpp
-Around line 93-98
+File: tests/harness/harness_runner.cpp
+After line 73 (after test_engine.RunGame())
 
 BEFORE:
 ────────────────────────────────────────────────────────
-SceneData scene_data;
-auto configure_result = scene_provider.ConfigureSceneData(scene_data);
-if (!configure_result.has_value()) {
-  return std::unexpected(configure_result.error());
+// run the game
+auto run_result = test_engine.RunGame();
+if (!run_result) {
+  return std::unexpected(run_result.error());
 }
-
-// Add to collection
-snapshot.scene_collection_data.push_back(std::move(scene_data));
 
 
 AFTER (with fix):
 ────────────────────────────────────────────────────────
-SceneData scene_data;
-auto configure_result = scene_provider.ConfigureSceneData(scene_data);
-if (!configure_result.has_value()) {
-  return std::unexpected(configure_result.error());
+// run the game
+auto run_result = test_engine.RunGame();
+if (!run_result) {
+  return std::unexpected(run_result.error());
 }
 
-// ✨ NEW: Convert FlatBuffers to EntityMemoryPool
-if (std::holds_alternative<const EntityCollectionFbs*>(
-        scene_data.entity_transport)) {
-  const auto* fbs_ptr = 
-      std::get<const EntityCollectionFbs*>(scene_data.entity_transport);
-  
-  auto pool_result = scene_data.entity_configurator->ImportEntities(fbs_ptr);
-  if (!pool_result.has_value()) {
-    return std::unexpected(pool_result.error());
+// ✨ NEW: Convert expected snapshots to EntityMemoryPool format
+// This allows comparison without interfering with EngineSnapshot generation
+for (auto &[tick, expected_snapshot] : test_data.expected_engine_snapshots) {
+  for (auto &scene_data : expected_snapshot.scene_collection_data) {
+    if (std::holds_alternative<const EntityCollectionFbs*>(
+            scene_data.entity_transport)) {
+      const auto* entity_collection_fbs = 
+          std::get<const EntityCollectionFbs*>(scene_data.entity_transport);
+      
+      auto pool_result = scene_data.entity_configurator->ImportEntities(
+          entity_collection_fbs);
+      if (!pool_result.has_value()) {
+        return std::unexpected(pool_result.error());
+      }
+      
+      scene_data.entity_transport = std::move(pool_result.value());
+    }
   }
-  
-  scene_data.entity_transport = std::move(pool_result.value());
 }
 
-// Add to collection (now with EntityMemoryPool)
-snapshot.scene_collection_data.push_back(std::move(scene_data));
+// Also convert starting_engine_snapshot
+for (auto &scene_data : test_data.starting_engine_snapshot.scene_collection_data) {
+  if (std::holds_alternative<const EntityCollectionFbs*>(
+          scene_data.entity_transport)) {
+    const auto* entity_collection_fbs = 
+        std::get<const EntityCollectionFbs*>(scene_data.entity_transport);
+    
+    auto pool_result = scene_data.entity_configurator->ImportEntities(
+        entity_collection_fbs);
+    if (!pool_result.has_value()) {
+      return std::unexpected(pool_result.error());
+    }
+    
+    scene_data.entity_transport = std::move(pool_result.value());
+  }
+}
 ```
 
 ---
@@ -238,18 +259,22 @@ snapshot.scene_collection_data.push_back(std::move(scene_data));
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                   UNIFIED DATA FORMAT                        │
+│                   NON-INVASIVE CONVERSION                    │
 └─────────────────────────────────────────────────────────────┘
 
-Test Data Load → EntityMemoryPool ──┐
-                                     ├─→ Matcher Comparison ✅
-Engine Runtime  → EntityMemoryPool ──┘
+Test Data Load → EntityCollectionFbs* (original format)
+                          ↓
+Engine Runs → Creates EntityMemoryPool (normal behavior)
+                          ↓
+Harness Runner → Converts expected data to EntityMemoryPool
+                          ↓
+Comparison → Both in EntityMemoryPool format ✅
 
-• Simple comparison logic
-• Consistent data representation
-• Validates entity import early
-• No matcher changes needed
-• Leverages existing infrastructure
+• Doesn't interfere with EngineSnapshot generation
+• Isolated to test comparison step
+• Preserves original snapshot behavior
+• No changes to data providers or matchers
+• Clean separation of concerns
 ```
 
 ---
@@ -257,22 +282,20 @@ Engine Runtime  → EntityMemoryPool ──┘
 ## Timeline
 
 ```
-Phase 1: Implementation (2 hours)
+Phase 1: Implementation (1.5 hours)
 │
-├─ Add conversion code (30 min)
+├─ Add conversion code in harness_runner.cpp (45 min)
 ├─ Handle error cases (30 min)
-├─ Add debug logging (30 min)
-└─ Code review (30 min)
+└─ Add debug logging if needed (15 min)
 
 Phase 2: Testing (1 hour)
 │
 ├─ Run existing tests (30 min)
 └─ Verify conversions (30 min)
 
-Phase 3: Validation (1 hour)
+Phase 3: Validation (0.5 hours)
 │
-├─ Multi-scene tests (30 min)
-└─ Edge cases (30 min)
+└─ Edge cases and verification (30 min)
 
-TOTAL: 4 hours ⏱️
+TOTAL: 3 hours ⏱️
 ```

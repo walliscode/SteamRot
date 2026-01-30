@@ -22,34 +22,58 @@ Comparison fails because variant types don't match (index 3 vs index 1).
 
 ## The Solution (Recommended)
 
-**Convert FlatBuffers to EntityMemoryPool when loading test data**
+**Convert FlatBuffers to EntityMemoryPool after TestEngine runs, in harness runner**
 
 ### Where to Fix
-File: `src/data_providers/configure/configure_engine_snapshot.cpp`
-Location: After `scene_provider.ConfigureSceneData(scene_data)` (around line 93)
+File: `tests/harness/harness_runner.cpp`
+Location: After `test_engine.RunGame()` completes (after line 73)
 
 ### What to Add
 ```cpp
-// Convert entity_transport to EntityMemoryPool format
-if (std::holds_alternative<const EntityCollectionFbs*>(scene_data.entity_transport)) {
-  const auto* entity_collection_fbs = 
-      std::get<const EntityCollectionFbs*>(scene_data.entity_transport);
-  
-  auto pool_result = scene_data.entity_configurator->ImportEntities(
-      entity_collection_fbs);
-  if (!pool_result.has_value()) {
-    return std::unexpected(pool_result.error());
+// After TestEngine runs, convert expected snapshots to EntityMemoryPool format
+// This allows comparison without interfering with how EngineSnapshots are generated
+for (auto &[tick, expected_snapshot] : test_data.expected_engine_snapshots) {
+  for (auto &scene_data : expected_snapshot.scene_collection_data) {
+    if (std::holds_alternative<const EntityCollectionFbs*>(
+            scene_data.entity_transport)) {
+      const auto* entity_collection_fbs = 
+          std::get<const EntityCollectionFbs*>(scene_data.entity_transport);
+      
+      auto pool_result = scene_data.entity_configurator->ImportEntities(
+          entity_collection_fbs);
+      if (!pool_result.has_value()) {
+        return std::unexpected(pool_result.error());
+      }
+      
+      scene_data.entity_transport = std::move(pool_result.value());
+    }
   }
-  
-  scene_data.entity_transport = std::move(pool_result.value());
+}
+
+// Also convert starting_engine_snapshot if needed for comparison
+for (auto &scene_data : test_data.starting_engine_snapshot.scene_collection_data) {
+  if (std::holds_alternative<const EntityCollectionFbs*>(
+          scene_data.entity_transport)) {
+    const auto* entity_collection_fbs = 
+        std::get<const EntityCollectionFbs*>(scene_data.entity_transport);
+    
+    auto pool_result = scene_data.entity_configurator->ImportEntities(
+        entity_collection_fbs);
+    if (!pool_result.has_value()) {
+      return std::unexpected(pool_result.error());
+    }
+    
+    scene_data.entity_transport = std::move(pool_result.value());
+  }
 }
 ```
 
 ## Why This Solution
 
-✅ Simple - Only ~10 lines of code
+✅ Simple - Conversion happens in one place
 ✅ Clean - Uses existing entity import logic
-✅ Consistent - Everything uses EntityMemoryPool
+✅ Non-invasive - Doesn't interfere with EngineSnapshot generation
+✅ Isolated - Only affects test comparison, not runtime
 ✅ No matcher changes needed
 
 ## Time Estimate
@@ -61,12 +85,17 @@ if (std::holds_alternative<const EntityCollectionFbs*>(scene_data.entity_transpo
 
 ## Alternative Solutions
 
-### Option 2: Add Cross-Type Comparison
+### Option 2: Convert at Load Time
+- Modify data provider to convert during EngineSnapshot loading
+- More invasive (~4 hours)
+- Affects EngineSnapshot generation behavior
+
+### Option 3: Add Cross-Type Comparison
 - Modify the matcher to handle different types
 - More complex (~6 hours)
-- Keeps FlatBuffers format in test data
+- Adds complexity to matcher
 
-### Option 3: Store Both Formats
+### Option 4: Store Both Formats
 - Keep both FlatBuffers and EntityMemoryPool
 - Over-engineered (~8 hours)
 - Not recommended
@@ -74,7 +103,7 @@ if (std::holds_alternative<const EntityCollectionFbs*>(scene_data.entity_transpo
 ## Key Files
 
 - `src/types/core/EntityTransportVariant.h` - The variant type definition
-- `src/data_providers/configure/configure_engine_snapshot.cpp` - Where to add fix
+- `tests/harness/harness_runner.cpp` - Where to add fix (after TestEngine runs)
 - `tests/matchers/EntityTransportEqualsMatcher.cpp` - The matcher that fails
 - `tests/harness/TestEngine.cpp` - Creates runtime snapshots
 

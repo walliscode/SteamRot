@@ -142,9 +142,80 @@ The architecture assumes entity data will remain in the same variant type throug
 
 ## Proposed Solutions
 
-### Option 1: Convert at Load Time ⭐ **RECOMMENDED**
+### Option 1: Convert in Harness Runner After TestEngine Runs ⭐ **RECOMMENDED**
 
-**Strategy**: Convert `EntityCollectionFbs*` to `EntityMemoryPool` when loading test data
+**Strategy**: Convert `EntityCollectionFbs*` to `EntityMemoryPool` in harness runner after TestEngine completes
+
+**Implementation Approach:**
+
+1. **Modify**: `tests/harness/harness_runner.cpp`
+   - After TestEngine.RunGame() completes
+   - Convert entity_transport in expected_engine_snapshots
+   - Also convert starting_engine_snapshot for comparison
+
+```cpp
+// In RunHarnessTests, after test_engine.RunGame() (line 73):
+
+// Convert expected snapshots to EntityMemoryPool format for comparison
+// This doesn't interfere with how EngineSnapshots are generated
+for (auto &[tick, expected_snapshot] : test_data.expected_engine_snapshots) {
+  for (auto &scene_data : expected_snapshot.scene_collection_data) {
+    if (std::holds_alternative<const EntityCollectionFbs*>(
+            scene_data.entity_transport)) {
+      const auto* entity_collection_fbs = 
+          std::get<const EntityCollectionFbs*>(scene_data.entity_transport);
+      
+      auto pool_result = scene_data.entity_configurator->ImportEntities(
+          entity_collection_fbs);
+      if (!pool_result.has_value()) {
+        return std::unexpected(pool_result.error());
+      }
+      
+      scene_data.entity_transport = std::move(pool_result.value());
+    }
+  }
+}
+
+// Also convert starting_engine_snapshot
+for (auto &scene_data : test_data.starting_engine_snapshot.scene_collection_data) {
+  if (std::holds_alternative<const EntityCollectionFbs*>(
+          scene_data.entity_transport)) {
+    const auto* entity_collection_fbs = 
+        std::get<const EntityCollectionFbs*>(scene_data.entity_transport);
+    
+    auto pool_result = scene_data.entity_configurator->ImportEntities(
+        entity_collection_fbs);
+    if (!pool_result.has_value()) {
+      return std::unexpected(pool_result.error());
+    }
+    
+    scene_data.entity_transport = std::move(pool_result.value());
+  }
+}
+```
+
+**Pros:**
+- ✅ Non-invasive: Doesn't interfere with EngineSnapshot generation
+- ✅ Isolated: Only affects test comparison step
+- ✅ Clean separation: Conversion happens after engine runs, before comparison
+- ✅ Simple, clean comparison using existing EntityMemoryPool matcher
+- ✅ No changes needed to matcher logic or data providers
+- ✅ Preserves original snapshot generation behavior
+
+**Cons:**
+- ❌ Modifies TestData after TestEngine runs (but only for comparison)
+- ❌ Conversion cost after test runs (acceptable for testing)
+
+**Estimated Effort**: 2-3 hours
+- Implement conversion logic in harness runner
+- Test with existing harness tests
+- Verify all snapshots convert correctly
+
+---
+
+### Option 2: Convert at Load Time
+
+**Strategy**: Convert `EntityCollectionFbs*` to `EntityMemoryPool` when loading test data in configure_engine_snapshot
 
 **Implementation Approach:**
 
@@ -161,19 +232,17 @@ if (!configure_result.has_value()) {
   return std::unexpected(configure_result.error());
 }
 
-// NEW: Convert entity_transport from FlatBuffers to EntityMemoryPool
+// Convert entity_transport from FlatBuffers to EntityMemoryPool
 if (std::holds_alternative<const EntityCollectionFbs*>(scene_data.entity_transport)) {
   const auto* entity_collection_fbs = 
       std::get<const EntityCollectionFbs*>(scene_data.entity_transport);
   
-  // Import entities using the configurator
   auto pool_result = scene_data.entity_configurator->ImportEntities(
       entity_collection_fbs);
   if (!pool_result.has_value()) {
     return std::unexpected(pool_result.error());
   }
   
-  // Replace variant with EntityMemoryPool
   scene_data.entity_transport = std::move(pool_result.value());
 }
 
@@ -181,25 +250,24 @@ snapshot.scene_collection_data.push_back(std::move(scene_data));
 ```
 
 **Pros:**
+- ✅ Conversion happens early in data pipeline
 - ✅ Unified data format throughout testing
-- ✅ Leverages existing entity import infrastructure
-- ✅ Simple, clean comparison using existing EntityMemoryPool matcher
 - ✅ Validates entity import as part of test data loading
-- ✅ No changes needed to matcher logic
 
 **Cons:**
-- ❌ Slightly higher memory usage (EntityMemoryPool larger than pointer)
-- ❌ Conversion cost at load time (acceptable for testing)
+- ❌ Interferes with EngineSnapshot generation process
+- ❌ Changes behavior of data provider (not just test comparison)
+- ❌ Less isolated - affects all EngineSnapshot loading
 - ❌ Loses reference to original FlatBuffers data
 
-**Estimated Effort**: 2-4 hours
+**Estimated Effort**: 3-4 hours
 - Implement conversion logic
-- Test with existing harness tests
-- Verify memory impact acceptable
+- Test with existing harness tests  
+- Verify no side effects on EngineSnapshot usage
 
 ---
 
-### Option 2: Add Cross-Type Comparison to Matcher
+### Option 3: Add Cross-Type Comparison to Matcher
 
 **Strategy**: Enhance matcher to compare EntityMemoryPool against EntityCollectionFbs*
 
@@ -270,7 +338,7 @@ bool HandleCrossTypeComparison(
 
 ---
 
-### Option 3: Hybrid - Store Both Formats
+### Option 4: Hybrid - Store Both Formats
 
 **Strategy**: Maintain both FlatBuffers pointer and EntityMemoryPool in snapshot
 
@@ -300,53 +368,53 @@ bool HandleCrossTypeComparison(
 
 ## Decision Matrix
 
-| Criteria | Option 1 (Convert at Load) | Option 2 (Cross-Type Matcher) | Option 3 (Hybrid) |
-|----------|----------------------------|-------------------------------|-------------------|
-| Implementation Complexity | ⭐⭐⭐⭐⭐ Simple | ⭐⭐⭐ Complex | ⭐ Very Complex |
-| Performance | ⭐⭐⭐⭐ Good | ⭐⭐⭐ Fair | ⭐⭐ Poor |
-| Maintainability | ⭐⭐⭐⭐⭐ Excellent | ⭐⭐⭐ Fair | ⭐⭐ Poor |
-| Memory Usage | ⭐⭐⭐⭐ Good | ⭐⭐⭐⭐⭐ Excellent | ⭐⭐ Poor |
-| Architectural Fit | ⭐⭐⭐⭐⭐ Natural | ⭐⭐⭐ Acceptable | ⭐⭐ Awkward |
-| Test Coverage | ⭐⭐⭐⭐ Good | ⭐⭐⭐⭐⭐ Excellent | ⭐⭐⭐ Fair |
+| Criteria | Option 1 (Harness Runner) | Option 2 (Load Time) | Option 3 (Cross-Type Matcher) | Option 4 (Hybrid) |
+|----------|---------------------------|----------------------|-------------------------------|-------------------|
+| Implementation Complexity | ⭐⭐⭐⭐⭐ Simple | ⭐⭐⭐⭐ Simple | ⭐⭐⭐ Complex | ⭐ Very Complex |
+| Non-Invasiveness | ⭐⭐⭐⭐⭐ Excellent | ⭐⭐⭐ Fair | ⭐⭐⭐⭐ Good | ⭐⭐ Poor |
+| Maintainability | ⭐⭐⭐⭐⭐ Excellent | ⭐⭐⭐⭐ Good | ⭐⭐⭐ Fair | ⭐⭐ Poor |
+| Isolation | ⭐⭐⭐⭐⭐ Excellent | ⭐⭐⭐ Fair | ⭐⭐⭐⭐ Good | ⭐⭐ Poor |
+| Architectural Fit | ⭐⭐⭐⭐⭐ Natural | ⭐⭐⭐ Acceptable | ⭐⭐⭐ Acceptable | ⭐⭐ Awkward |
 
-**Winner**: Option 1 (Convert at Load Time)
+**Winner**: Option 1 (Convert in Harness Runner)
 
 ---
 
 ## Recommendation
 
-**Implement Option 1: Convert FlatBuffers to EntityMemoryPool at load time**
+**Implement Option 1: Convert FlatBuffers to EntityMemoryPool in harness runner**
 
 ### Rationale
 
-1. **Simplicity**: Cleanest solution with minimal code changes
-2. **Consistency**: Unified data format throughout testing infrastructure
-3. **Maintainability**: Easy to understand and debug
-4. **Proven Pattern**: Leverages existing entity import infrastructure
-5. **Performance**: One-time conversion cost is acceptable for testing
+1. **Non-Invasive**: Doesn't interfere with EngineSnapshot generation process
+2. **Isolated**: Only affects test comparison step, not runtime behavior
+3. **Clean Separation**: Conversion happens after engine runs, before comparison
+4. **Simplicity**: Straightforward implementation in one place
+5. **Maintainability**: Easy to understand and debug
+6. **Proven Pattern**: Leverages existing entity import infrastructure
 
 ### Implementation Plan
 
-#### Phase 1: Core Conversion (2 hours)
-- Modify `configure_engine_snapshot.cpp`
-- Add entity import after SceneData configuration
-- Replace FlatBuffers pointer with EntityMemoryPool in variant
+#### Phase 1: Core Conversion (1.5 hours)
+- Modify `tests/harness/harness_runner.cpp`
+- Add conversion after TestEngine.RunGame()
+- Convert both expected_engine_snapshots and starting_engine_snapshot
 
 #### Phase 2: Testing (1 hour)
 - Run existing harness tests
 - Verify matcher now works correctly
-- Check memory usage is acceptable
+- Check all snapshots convert properly
 
-#### Phase 3: Validation (1 hour)
+#### Phase 3: Validation (0.5 hours)
 - Test with multiple scenarios
-- Verify all entity types handled correctly
-- Ensure error handling robust
+- Verify error handling
+- Ensure no side effects
 
-**Total Estimated Time**: 4 hours
+**Total Estimated Time**: 3 hours
 
 ### Alternative Path
 
-If Option 1 proves problematic (e.g., unexpected issues with entity import), Option 2 (cross-type comparison) is a viable fallback with more implementation complexity.
+If Option 1 needs adjustment, Option 2 (convert at load time) is a viable alternative that converts earlier in the pipeline, though it's more invasive to the snapshot generation process.
 
 ---
 
