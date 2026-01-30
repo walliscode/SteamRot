@@ -12,17 +12,14 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "AssetConfig.h"
-#include "IEntityImporter.h"
+#include "EntityTransportVariant.h"
+#include "IEntityConfigurator.h"
 #include "SceneInfo.h"
 #include "SceneResourcesConfig.h"
-#include "containers.h"
 #include <memory>
 
 namespace steamrot {
 
-using EntityTransportVariant =
-    std::variant<std::monostate, std::unique_ptr<IEntityImporter>,
-                 std::shared_ptr<EntityMemoryPool>, EntityMemoryPool>;
 /////////////////////////////////////////////////
 /// @class SceneData
 /// @brief Contains all data needed to configure a Scene and provide resources
@@ -46,16 +43,14 @@ struct SceneData {
   AssetConfig scene_asset_config;
 
   /////////////////////////////////////////////////
-  /// @brief Entity importer (wraps entity data source)
-  /// @note Can be one of:
-  /// - std::unique_ptr<IEntityImporter> for file-based importers
-  /// - std::shared_ptr<EntityMemoryPool> for shared in-memory pool
-  /// - a copy constructed EntityMemoryPool for storing mutliple instances of
-  /// the EntityMemoryPool
+  /// @brief Entity data wrapped in a variant for transport.
   /////////////////////////////////////////////////
-  std::variant<std::monostate, std::unique_ptr<IEntityImporter>,
-               std::shared_ptr<EntityMemoryPool>, EntityMemoryPool>
-      entity_transport;
+  EntityTransportVariant entity_transport;
+
+  /////////////////////////////////////////////////
+  /// @brief Entity configurator to set up entities after import.
+  /////////////////////////////////////////////////
+  std::unique_ptr<IEntityConfigurator> entity_configurator;
 };
 
 using SceneCollectionData = std::vector<SceneData>;

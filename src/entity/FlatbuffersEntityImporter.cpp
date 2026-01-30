@@ -22,7 +22,7 @@ FlatbuffersEntityImporter::ImportEntities(EntityMemoryPool &emp) {
                                              m_entity_collection);
 
   // Delegate to configurator to do the actual work
-  return configurator.ConfigureEntityMemoryPool(emp);
+  return configurator.ConfigureEntityMemoryPoolFromSource(emp);
 }
 
 } // namespace steamrot

@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////
 #include "FlatbuffersSceneDataProvider.h"
 #include "FlatbuffersDataLoader.h"
-#include "FlatbuffersEntityImporter.h"
+#include "FlatbuffersEntityConfigurator.h"
 #include "SceneData.h"
 #include "configure_asset_config.h"
 #include "configure_scene_data.h"
@@ -85,15 +85,18 @@ FlatbuffersSceneDataProvider::ConfigureSceneData(SceneData &scene_data) const {
       return std::unexpected(asset_result.error());
   }
 
-  // Create EntityImporter with FlatBuffers entity collection
-  auto entity_importer = std::make_unique<FlatbuffersEntityImporter>(
-      m_event_handler, *m_scene_data_fbs->entity_collection());
-  if (!entity_importer) {
-    return std::unexpected(FailInfo{
-        FailMode::NullPointer, "Failed to create FlatbuffersEntityImporter"});
+  // check for entity data, error if missing
+  if (!m_scene_data_fbs->entity_collection()) {
+    return std::unexpected(
+        FailInfo{FailMode::FlatbuffersDataNotFound,
+                 "FlatBuffers SceneDataFbs missing entity data"});
+  } else {
+    scene_data.entity_transport = m_scene_data_fbs->entity_collection();
   }
 
-  scene_data.entity_transport = std::move(entity_importer);
+  // assign entity configurator
+  scene_data.entity_configurator =
+      std::make_unique<FlatbuffersEntityConfigurator>(m_event_handler);
 
   return std::monostate{};
 }

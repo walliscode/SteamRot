@@ -1,7 +1,7 @@
 add_library(entity
     EntityManager.cpp
     FlatbuffersEntityConfigurator.cpp
-    FlatbuffersEntityImporter.cpp
+    # FlatbuffersEntityImporter.cpp
     FlatbuffersUIElementProvider.cpp
     ArchetypeManager.cpp
     entity_memory.cpp

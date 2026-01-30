@@ -15,9 +15,11 @@
 #include "EventHandler.h"
 #include "FailInfo.h"
 #include "IEngineDataProvider.h"
+#include "IEntityConfigurator.h"
 #include "ISceneDataProvider.h"
 #include "ISceneManagerDataProvider.h"
 #include <expected>
+#include <memory>
 
 namespace steamrot {
 class DataAccessFactory {
@@ -48,6 +50,11 @@ private:
   /// @brief Instance of the Scene Data Provider for the factory/game
   /////////////////////////////////////////////////
   std::unique_ptr<ISceneDataProvider> m_scene_data_provider{nullptr};
+
+  /////////////////////////////////////////////////
+  /// @brief Instance of the Entity Configurator for the factory/game
+  /////////////////////////////////////////////////
+  std::unique_ptr<IEntityConfigurator> m_entity_configurator{nullptr};
 
   /////////////////////////////////////////////////
   /// @brief Set all data providers to Flatbuffers implementations

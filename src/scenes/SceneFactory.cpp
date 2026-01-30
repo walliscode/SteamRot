@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "SceneFactory.h"
 #include "CraftingScene.h"
+#include "IEntityConfigurator.h"
 #include "LogicFactory.h"
 #include "Scene.h"
 #include "TitleScene.h"
@@ -115,7 +116,7 @@ SceneFactory::ConfigureScene(Scene &scene, const SceneData &scene_data) {
     return std::unexpected(config_result.error());
 
   // Import entities from entity importer
-  auto import_result = ImportEntities(scene, scene_data);
+  auto import_result = ConfigureEntities(scene, scene_data);
   if (!import_result.has_value())
     return std::unexpected(import_result.error());
 
@@ -180,7 +181,7 @@ SceneFactory::ConfigureSceneConfig(Scene &scene, const SceneData &scene_data) {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-SceneFactory::ImportEntities(Scene &scene, const SceneData &scene_data) {
+SceneFactory::ConfigureEntities(Scene &scene, const SceneData &scene_data) {
 
   // if entity transport is monostate, nothing to import so skip
   // this has been implemented for testing purposes. make become code smell, so
@@ -189,27 +190,24 @@ SceneFactory::ImportEntities(Scene &scene, const SceneData &scene_data) {
     return std::monostate();
   }
 
-  // check if entity importer variant holds type we want
-  if (!std::holds_alternative<std::unique_ptr<IEntityImporter>>(
-          scene_data.entity_transport)) {
+  // check if entity configurator is null
+  if (!scene_data.entity_configurator) {
     return std::unexpected(
-        FailInfo{FailMode::VariantTypeMismatch,
-                 "Entity importer variant does not hold IEntityImporter type"});
-  }
-  // Check if entity importer exists
-  if (std::get<std::unique_ptr<IEntityImporter>>(scene_data.entity_transport) ==
-      nullptr) {
-    return std::unexpected(
-        FailInfo{FailMode::NullPointer, "Entity importer pointer is null"});
+        FailInfo{FailMode::NullPointer, "Entity configurator is null"});
   }
 
-  // Import entities using the importer
-  auto &importer =
-      std::get<std::unique_ptr<IEntityImporter>>(scene_data.entity_transport);
-  auto import_result =
-      importer->ImportEntities(scene.GetEntityManager().GetEntityMemoryPool());
-  if (!import_result.has_value())
-    return std::unexpected(import_result.error());
+  // check if EntityConfigurator is not null
+  if (scene_data.entity_configurator == nullptr) {
+    return std::unexpected(
+        FailInfo{FailMode::NullPointer, "Entity configurator is null"});
+  }
+  // pass entity transport to entity configurator to set up entities
+  auto configure_result =
+      scene_data.entity_configurator->ConfigureEntityMemoryPoolFromSource(
+          scene.GetEntityManager().GetEntityMemoryPool(),
+          scene_data.entity_transport);
+  if (!configure_result.has_value())
+    return std::unexpected(configure_result.error());
 
   return std::monostate();
 }

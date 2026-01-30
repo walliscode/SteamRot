@@ -6,6 +6,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "EntityTransportVariant.h"
 #include "entities_generated.h"
 #include <filesystem>
 #include <fstream>
@@ -14,9 +15,9 @@
 /////////////////////////////////////////////////
 /// @brief Load entity test data from binary file
 ///
-/// @return Pair of unique_ptr to data buffer and EntityCollectionFbs pointer
+/// @return Pair of unique_ptr to data buffer and EntityTransportVariant
 /////////////////////////////////////////////////
-inline std::pair<std::unique_ptr<char[]>, const steamrot::EntityCollectionFbs *>
+inline std::pair<std::unique_ptr<char[]>, steamrot::EntityTransportVariant>
 LoadEntityTestData() {
   std::filesystem::path test_file_path = __FILE__;
   std::filesystem::path data_dir = test_file_path.parent_path() / "data";
@@ -42,5 +43,8 @@ LoadEntityTestData() {
   const steamrot::EntityCollectionFbs *entity_collection =
       steamrot::GetEntityCollectionFbs(data.get());
 
-  return {std::move(data), entity_collection};
+  // Wrap the pointer in EntityTransportVariant
+  steamrot::EntityTransportVariant entity_transport = entity_collection;
+
+  return {std::move(data), entity_transport};
 }
