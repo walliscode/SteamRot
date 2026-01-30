@@ -25,13 +25,10 @@
 TEST_CASE("FlatbuffersEntityConfigurator constructor succeeds with valid data",
           "[unit][FlatbuffersEntityConfigurator]") {
   steamrot::EventHandler event_handler;
-  auto [data, entity_collection] = LoadEntityTestData();
+  auto [data, entity_transport] = LoadEntityTestData();
 
-  REQUIRE(entity_collection != nullptr);
-
-  // Constructor should succeed
-  REQUIRE_NOTHROW(steamrot::FlatbuffersEntityConfigurator(event_handler,
-                                                          *entity_collection));
+  // Constructor should succeed with EventHandler only
+  REQUIRE_NOTHROW(steamrot::FlatbuffersEntityConfigurator(event_handler));
 }
 
 /////////////////////////////////////////////////
@@ -42,15 +39,14 @@ TEST_CASE("ConfigureEntityMemoryPool resizes pool correctly",
           "[unit][FlatbuffersEntityConfigurator]") {
   steamrot::EventHandler event_handler;
   steamrot::EntityMemoryPool emp;
-  auto [data, entity_collection] = LoadEntityTestData();
+  auto [data, entity_transport] = LoadEntityTestData();
 
   // Before configuration - pool should be empty
   REQUIRE(steamrot::entity::memory::GetMemoryPoolSize(emp) == 0);
 
-  steamrot::FlatbuffersEntityConfigurator configurator(event_handler,
-                                                       *entity_collection);
+  steamrot::FlatbuffersEntityConfigurator configurator(event_handler);
 
-  auto result = configurator.ConfigureEntityMemoryPoolFromSource(emp);
+  auto result = configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
 
   // After configuration - pool should be resized
   REQUIRE(result.has_value());
@@ -65,30 +61,25 @@ TEST_CASE("ConfigureFirstLayerComponents configures CUserInterface correctly",
           "[unit][FlatbuffersEntityConfigurator]") {
   steamrot::EventHandler event_handler;
   steamrot::EntityMemoryPool emp;
-  auto [data, entity_collection] = LoadEntityTestData();
+  auto [data, entity_transport] = LoadEntityTestData();
 
-  steamrot::FlatbuffersEntityConfigurator configurator(event_handler,
-                                                       *entity_collection);
+  // Before configuration - pool should be empty
+  REQUIRE(steamrot::entity::memory::GetMemoryPoolSize(emp) == 0);
 
-  // Resize pool first
-  steamrot::entity::memory::ResizeEntityMemoryPool(
-      emp, entity_collection->entity_memory_pool_size());
+  steamrot::FlatbuffersEntityConfigurator configurator(event_handler);
 
-  // Get component before configuration
-  steamrot::CUserInterface &ui_component =
+  // Configure through the public API (which calls ConfigureFirstLayerComponents internally)
+  auto result = configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
+
+  // After configuration - pool should be resized and components configured
+  REQUIRE(result.has_value());
+  REQUIRE(steamrot::entity::memory::GetMemoryPoolSize(emp) == 20);
+
+  // Get component after configuration
+  const steamrot::CUserInterface &ui_component =
       steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(1, emp);
 
-  // Before - should be in default state
-  REQUIRE(ui_component.m_active == false);
-  REQUIRE(ui_component.m_name == "Default UI");
-  REQUIRE(ui_component.m_visible == false);
-  REQUIRE(ui_component.m_root_element == nullptr);
-
-  // Configure first layer
-  auto result = configurator.ConfigureFirstLayerComponents(emp);
-
-  // After - should be configured
-  REQUIRE(result.has_value());
+  // Should be configured
   REQUIRE(ui_component.m_active == true);
   REQUIRE(ui_component.m_name == "simple_ui");
   REQUIRE(ui_component.m_visible == true);
@@ -109,25 +100,19 @@ TEST_CASE("ConfigureFirstLayerComponents configures hidden UI correctly",
           "[unit][FlatbuffersEntityConfigurator]") {
   steamrot::EventHandler event_handler;
   steamrot::EntityMemoryPool emp;
-  auto [data, entity_collection] = LoadEntityTestData();
+  auto [data, entity_transport] = LoadEntityTestData();
 
-  steamrot::FlatbuffersEntityConfigurator configurator(event_handler,
-                                                       *entity_collection);
+  steamrot::FlatbuffersEntityConfigurator configurator(event_handler);
 
-  steamrot::entity::memory::ResizeEntityMemoryPool(
-      emp, entity_collection->entity_memory_pool_size());
+  auto result = configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
 
-  steamrot::CUserInterface &ui_component =
+  // After configuration
+  REQUIRE(result.has_value());
+
+  const steamrot::CUserInterface &ui_component =
       steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(2, emp);
 
-  // Before
-  REQUIRE(ui_component.m_active == false);
-  REQUIRE(ui_component.m_visible == false);
-
-  auto result = configurator.ConfigureFirstLayerComponents(emp);
-
-  // After - UI should be configured but not visible
-  REQUIRE(result.has_value());
+  // UI should be configured but not visible
   REQUIRE(ui_component.m_active == true);
   REQUIRE(ui_component.m_name == "hidden_ui");
   REQUIRE(ui_component.m_visible == false);
@@ -148,21 +133,18 @@ TEST_CASE("ConfigureCUserInterface correctly handles false visibility",
           "[unit][FlatbuffersEntityConfigurator]") {
   steamrot::EventHandler event_handler;
   steamrot::EntityMemoryPool emp;
-  auto [data, entity_collection] = LoadEntityTestData();
+  auto [data, entity_transport] = LoadEntityTestData();
 
-  steamrot::FlatbuffersEntityConfigurator configurator(event_handler,
-                                                       *entity_collection);
+  steamrot::FlatbuffersEntityConfigurator configurator(event_handler);
 
-  steamrot::entity::memory::ResizeEntityMemoryPool(
-      emp, entity_collection->entity_memory_pool_size());
-
-  // Entity 2 has is_visible set to false
-  steamrot::CUserInterface &ui_component =
-      steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(2, emp);
-
-  auto result = configurator.ConfigureFirstLayerComponents(emp);
+  auto result = configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
 
   REQUIRE(result.has_value());
+  
+  // Entity 2 has is_visible set to false
+  const steamrot::CUserInterface &ui_component =
+      steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(2, emp);
+
   // Verify false value is correctly read (not skipped)
   REQUIRE(ui_component.m_visible == false);
 }
@@ -171,23 +153,19 @@ TEST_CASE("ConfigureCGrimoireMachina handles null fragments/joints",
           "[unit][FlatbuffersEntityConfigurator]") {
   steamrot::EventHandler event_handler;
   steamrot::EntityMemoryPool emp;
-  auto [data, entity_collection] = LoadEntityTestData();
+  auto [data, entity_transport] = LoadEntityTestData();
 
-  steamrot::FlatbuffersEntityConfigurator configurator(event_handler,
-                                                       *entity_collection);
+  steamrot::FlatbuffersEntityConfigurator configurator(event_handler);
 
-  steamrot::entity::memory::ResizeEntityMemoryPool(
-      emp, entity_collection->entity_memory_pool_size());
-
-  // Entity 3 has empty fragments/joints arrays
-  steamrot::CGrimoireMachina &grimoire_component =
-      steamrot::entity::memory::GetComponent<steamrot::CGrimoireMachina>(3,
-                                                                         emp);
-
-  auto result = configurator.ConfigureFirstLayerComponents(emp);
+  auto result = configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
 
   // Should succeed with empty arrays
   REQUIRE(result.has_value());
+  
+  // Entity 3 has empty fragments/joints arrays
+  const steamrot::CGrimoireMachina &grimoire_component =
+      steamrot::entity::memory::GetComponent<steamrot::CGrimoireMachina>(3, emp);
+
   REQUIRE(grimoire_component.m_active == true);
 }
 
@@ -200,25 +178,18 @@ TEST_CASE(
     "[unit][FlatbuffersEntityConfigurator]") {
   steamrot::EventHandler event_handler;
   steamrot::EntityMemoryPool emp;
-  auto [data, entity_collection] = LoadEntityTestData();
+  auto [data, entity_transport] = LoadEntityTestData();
 
-  steamrot::FlatbuffersEntityConfigurator configurator(event_handler,
-                                                       *entity_collection);
+  steamrot::FlatbuffersEntityConfigurator configurator(event_handler);
 
-  steamrot::entity::memory::ResizeEntityMemoryPool(
-      emp, entity_collection->entity_memory_pool_size());
+  auto result = configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
 
-  steamrot::CGrimoireMachina &grimoire_component =
-      steamrot::entity::memory::GetComponent<steamrot::CGrimoireMachina>(3,
-                                                                         emp);
-
-  // Before
-  REQUIRE(grimoire_component.m_active == false);
-
-  auto result = configurator.ConfigureFirstLayerComponents(emp);
-
-  // After
+  // After configuration
   REQUIRE(result.has_value());
+  
+  const steamrot::CGrimoireMachina &grimoire_component =
+      steamrot::entity::memory::GetComponent<steamrot::CGrimoireMachina>(3, emp);
+
   REQUIRE(grimoire_component.m_active == true);
 }
 
@@ -226,27 +197,20 @@ TEST_CASE("ConfigureFirstLayerComponents configures CGrimoireMachina with data",
           "[unit][FlatbuffersEntityConfigurator]") {
   steamrot::EventHandler event_handler;
   steamrot::EntityMemoryPool emp;
-  auto [data, entity_collection] = LoadEntityTestData();
+  auto [data, entity_transport] = LoadEntityTestData();
 
-  steamrot::FlatbuffersEntityConfigurator configurator(event_handler,
-                                                       *entity_collection);
+  steamrot::FlatbuffersEntityConfigurator configurator(event_handler);
 
-  steamrot::entity::memory::ResizeEntityMemoryPool(
-      emp, entity_collection->entity_memory_pool_size());
-
-  steamrot::CGrimoireMachina &grimoire_component =
-      steamrot::entity::memory::GetComponent<steamrot::CGrimoireMachina>(4,
-                                                                         emp);
-
-  // Before
-  REQUIRE(grimoire_component.m_active == false);
-
-  auto result = configurator.ConfigureFirstLayerComponents(emp);
+  auto result = configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
 
   // After - component should be activated
   // Note: Current implementation doesn't populate m_all_fragments/m_all_joints
   // from FlatBuffers data, it only sets m_active
   REQUIRE(result.has_value());
+  
+  const steamrot::CGrimoireMachina &grimoire_component =
+      steamrot::entity::memory::GetComponent<steamrot::CGrimoireMachina>(4, emp);
+
   REQUIRE(grimoire_component.m_active == true);
 }
 
@@ -258,23 +222,15 @@ TEST_CASE("ConfigureSecondLayerComponents succeeds",
           "[unit][FlatbuffersEntityConfigurator]") {
   steamrot::EventHandler event_handler;
   steamrot::EntityMemoryPool emp;
-  auto [data, entity_collection] = LoadEntityTestData();
+  auto [data, entity_transport] = LoadEntityTestData();
 
-  steamrot::FlatbuffersEntityConfigurator configurator(event_handler,
-                                                       *entity_collection);
+  steamrot::FlatbuffersEntityConfigurator configurator(event_handler);
 
-  steamrot::entity::memory::ResizeEntityMemoryPool(
-      emp, entity_collection->entity_memory_pool_size());
+  // ConfigureEntityMemoryPoolFromSource calls both first and second layer
+  auto result = configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
 
-  // Configure first layer first
-  auto first_result = configurator.ConfigureFirstLayerComponents(emp);
-  REQUIRE(first_result.has_value());
-
-  // Configure second layer
-  auto second_result = configurator.ConfigureSecondLayerComponents(emp);
-
-  // Should succeed (currently no-op but should not fail)
-  REQUIRE(second_result.has_value());
+  // Should succeed (second layer is currently no-op but should not fail)
+  REQUIRE(result.has_value());
 }
 
 /////////////////////////////////////////////////
@@ -284,10 +240,9 @@ TEST_CASE("ConfigureSecondLayerComponents succeeds",
 TEST_CASE("ConfigureComponent activates base component",
           "[unit][FlatbuffersEntityConfigurator]") {
   steamrot::EventHandler event_handler;
-  auto [data, entity_collection] = LoadEntityTestData();
+  auto [data, entity_transport] = LoadEntityTestData();
 
-  steamrot::FlatbuffersEntityConfigurator configurator(event_handler,
-                                                       *entity_collection);
+  steamrot::FlatbuffersEntityConfigurator configurator(event_handler);
 
   steamrot::CUserInterface component;
 
@@ -309,15 +264,14 @@ TEST_CASE("Full configuration flow works correctly",
           "[unit][FlatbuffersEntityConfigurator]") {
   steamrot::EventHandler event_handler;
   steamrot::EntityMemoryPool emp;
-  auto [data, entity_collection] = LoadEntityTestData();
+  auto [data, entity_transport] = LoadEntityTestData();
 
   // Before - empty pool
   REQUIRE(steamrot::entity::memory::GetMemoryPoolSize(emp) == 0);
 
-  steamrot::FlatbuffersEntityConfigurator configurator(event_handler,
-                                                       *entity_collection);
+  steamrot::FlatbuffersEntityConfigurator configurator(event_handler);
 
-  auto result = configurator.ConfigureEntityMemoryPoolFromSource(emp);
+  auto result = configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
 
   // After - fully configured
   REQUIRE(result.has_value());
