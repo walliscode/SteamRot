@@ -119,10 +119,11 @@ LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
 
   ////// ADD RENDER LOGICS /////
   LogicVector &render_logics = logic_collection[LogicType::Render];
-  render_logics.push_back(
-      std::make_unique<steamrot::CraftingRenderLogic>(m_scene_context));
+
   render_logics.push_back(
       std::make_unique<steamrot::UIRenderLogic>(m_scene_context));
+  render_logics.push_back(
+      std::make_unique<steamrot::CraftingRenderLogic>(m_scene_context));
   return std::monostate();
 }
 
