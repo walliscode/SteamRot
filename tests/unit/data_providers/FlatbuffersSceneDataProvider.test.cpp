@@ -29,14 +29,11 @@ TEST_CASE("FlatbuffersSceneDataProvider::CreateSceneData creates SceneData "
 
   const steamrot::SceneData &scene_data = scene_data_result.value();
   REQUIRE(scene_data.scene_info.type == steamrot::SceneType::TITLE);
-  // check the variant holds a unique_ptr<IEntityImporter>
-  REQUIRE(std::holds_alternative<std::unique_ptr<steamrot::IEntityImporter>>(
+  // check the variant holds a const EntityCollectionFbs*
+  REQUIRE(std::holds_alternative<const steamrot::EntityCollectionFbs *>(
       scene_data.entity_transport));
-  // check that the unique_ptr is not null
-  const auto &importer_variant =
-      std::get<std::unique_ptr<steamrot::IEntityImporter>>(
-          scene_data.entity_transport);
-  REQUIRE(importer_variant != nullptr);
+  // check that the entity configurator is not null
+  REQUIRE(scene_data.entity_configurator != nullptr);
 }
 
 TEST_CASE("FlatbuffersSceneDataProvider::CreateSceneData creates SceneData "
@@ -58,14 +55,11 @@ TEST_CASE("FlatbuffersSceneDataProvider::CreateSceneData creates SceneData "
 
   REQUIRE(scene_data.scene_info.type == steamrot::SceneType::CRAFTING);
 
-  // check the variant holds a unique_ptr<IEntityImporter>
-  REQUIRE(std::holds_alternative<std::unique_ptr<steamrot::IEntityImporter>>(
+  // check the variant holds a const EntityCollectionFbs*
+  REQUIRE(std::holds_alternative<const steamrot::EntityCollectionFbs *>(
       scene_data.entity_transport));
-  // check that the unique_ptr is not null
-  const auto &importer_variant =
-      std::get<std::unique_ptr<steamrot::IEntityImporter>>(
-          scene_data.entity_transport);
-  REQUIRE(importer_variant != nullptr);
+  // check that the entity configurator is not null
+  REQUIRE(scene_data.entity_configurator != nullptr);
 }
 
 TEST_CASE("FlatbuffersSceneDataProvider::ConfigureSceneData handles null "
@@ -134,12 +128,9 @@ TEST_CASE(
 
   REQUIRE(scene_data.scene_info.type == steamrot::SceneType::TITLE);
 
-  // check the variant holds a unique_ptr<IEntityImporter>
-  REQUIRE(std::holds_alternative<std::unique_ptr<steamrot::IEntityImporter>>(
+  // check the variant holds a const EntityCollectionFbs*
+  REQUIRE(std::holds_alternative<const steamrot::EntityCollectionFbs *>(
       scene_data.entity_transport));
-  // check that the unique_ptr is not null
-  const auto &importer_variant =
-      std::get<std::unique_ptr<steamrot::IEntityImporter>>(
-          scene_data.entity_transport);
-  REQUIRE(importer_variant != nullptr);
+  // check that the entity configurator is not null
+  REQUIRE(scene_data.entity_configurator != nullptr);
 }

@@ -190,8 +190,13 @@ SceneFactory::ConfigureEntities(Scene &scene, const SceneData &scene_data) {
     return std::monostate();
   }
 
+  // check if entity configurator is null
+  if (!scene_data.entity_configurator) {
+    return std::unexpected(
+        FailInfo{FailMode::NullPointer, "Entity configurator is null"});
+  }
+
   // pass entity transport to entity configurator to set up entities
-  // NOT SURE ABOUT THIS APPROACH
   auto configure_result =
       scene_data.entity_configurator->ConfigureEntityMemoryPoolFromSource(
           scene.GetEntityManager().GetEntityMemoryPool(),
