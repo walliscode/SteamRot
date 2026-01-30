@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "FlatbuffersEntityConfigurator.h"
 #include "CMachinaForm.h"
+#include "EntityTransportVariant.h"
 #include "FailInfo.h"
 #include "FlatbuffersUIElementProvider.h"
 #include "containers.h"
@@ -20,23 +21,39 @@
 namespace steamrot {
 /////////////////////////////////////////////////
 FlatbuffersEntityConfigurator::FlatbuffersEntityConfigurator(
-    EventHandler &event_handler,
-    const EntityCollectionFbs &entity_collection_data)
-    : m_entity_collection_data(entity_collection_data),
-      IEntityConfigurator(event_handler) {}
+    EventHandler &event_handler)
+    : IEntityConfigurator(event_handler) {}
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-FlatbuffersEntityConfigurator::ConfigureEntityMemoryPool(
-    EntityMemoryPool &emp) {
+FlatbuffersEntityConfigurator::ConfigureEntityMemoryPoolFromSource(
+    EntityMemoryPool &emp, const EntityTransportVariant &entity_data) {
 
-  if (!m_entity_collection_data.entity_memory_pool_size())
+  // assign the flatbuffers data pointer based on the variant type
+  if (std::holds_alternative<const EntityCollectionFbs *>(entity_data)) {
+    m_entity_collection_data =
+        std::get<const EntityCollectionFbs *>(entity_data);
+
+    // check for null pointer
+    if (!m_entity_collection_data) {
+      return std::unexpected(FailInfo{
+          FailMode::FlatbuffersDataNotFound,
+          "EntityCollectionFbs pointer in EntityTransportVariant is null."});
+    }
+  } else {
+    return std::unexpected(FailInfo{
+        FailMode::VariantTypeMismatch,
+        "EntityTransportVariant does not hold EntityCollectionFbs data."});
+  }
+
+  // che  // check that entity memory pool size exists in the flatbuffers data
+  if (!m_entity_collection_data->entity_memory_pool_size())
     return std::unexpected(
         FailInfo{FailMode::FlatbuffersDataNotFound,
                  "Entity memory pool size not found in EntityCollectionFbs."});
   // resize the entity memory pool based on the flatbuffers data
   entity::memory::ResizeEntityMemoryPool(
-      emp, m_entity_collection_data.entity_memory_pool_size());
+      emp, m_entity_collection_data->entity_memory_pool_size());
 
   // configure first layer components
   auto first_layer_result = ConfigureFirstLayerComponents(emp);
@@ -60,7 +77,7 @@ FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents(
   ///// JUST FOR FIRST LAYER COMPONENTS /////
 
   // cycle through each entity in the collection and configure it
-  for (const auto &entity_data : *m_entity_collection_data.entities()) {
+  for (const auto &entity_data : *m_entity_collection_data->entities()) {
 
     //  update the current EntityDataFbs pointer
     m_current_entity_data = entity_data;

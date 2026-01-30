@@ -16,6 +16,7 @@
 #include "CMachinaForm.h"
 #include "CUIState.h"
 #include "CUserInterface.h"
+#include "EntityTransportVariant.h"
 #include "EventHandler.h"
 #include "containers.h"
 namespace steamrot {
@@ -48,7 +49,8 @@ public:
   /// @returns std::expected<std::monostate, FailInfo>
   /////////////////////////////////////////////////
   virtual std::expected<std::monostate, FailInfo>
-  ConfigureEntityMemoryPool(EntityMemoryPool &emp) = 0;
+  ConfigureEntityMemoryPoolFromSource(
+      EntityMemoryPool &emp, const EntityTransportVariant &entity_data) = 0;
 
   /////////////////////////////////////////////////
   /// @brief Configure Components that do not rely on other components

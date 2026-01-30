@@ -50,7 +50,7 @@ TEST_CASE("ConfigureEntityMemoryPool resizes pool correctly",
   steamrot::FlatbuffersEntityConfigurator configurator(event_handler,
                                                        *entity_collection);
 
-  auto result = configurator.ConfigureEntityMemoryPool(emp);
+  auto result = configurator.ConfigureEntityMemoryPoolFromSource(emp);
 
   // After configuration - pool should be resized
   REQUIRE(result.has_value());
@@ -317,7 +317,7 @@ TEST_CASE("Full configuration flow works correctly",
   steamrot::FlatbuffersEntityConfigurator configurator(event_handler,
                                                        *entity_collection);
 
-  auto result = configurator.ConfigureEntityMemoryPool(emp);
+  auto result = configurator.ConfigureEntityMemoryPoolFromSource(emp);
 
   // After - fully configured
   REQUIRE(result.has_value());

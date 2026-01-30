@@ -25,7 +25,7 @@ TEST_CASE("ArchetypeManager initializes correctly and manages archetypes",
   steamrot::FlatbuffersEntityConfigurator configurator(event_handler,
                                                        *entity_collection);
 
-  auto result = configurator.ConfigureEntityMemoryPool(emp);
+  auto result = configurator.ConfigureEntityMemoryPoolFromSource(emp);
   if (!result.has_value()) {
     FAIL("Failed to configure entity memory pool");
   }

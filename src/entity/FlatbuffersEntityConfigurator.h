@@ -12,6 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 
+#include "EntityTransportVariant.h"
 #include "IEntityConfigurator.h"
 #include "containers.h"
 #include "entities_generated.h"
@@ -20,9 +21,9 @@ namespace steamrot {
 class FlatbuffersEntityConfigurator : public IEntityConfigurator {
 private:
   /////////////////////////////////////////////////
-  /// @brief Reference to the EntityCollection flatbuffers data
+  /// @brief Pointer to the EntityCollection flatbuffers data
   /////////////////////////////////////////////////
-  const EntityCollectionFbs &m_entity_collection_data;
+  const EntityCollectionFbs *m_entity_collection_data;
 
   /////////////////////////////////////////////////
   /// @brief Pointer to const current EntityData being configured
@@ -39,9 +40,7 @@ public:
   /// @param entity_collection_data Reference to the EntityCollection to
   /// configure from
   /////////////////////////////////////////////////
-  FlatbuffersEntityConfigurator(
-      EventHandler &event_handler,
-      const EntityCollectionFbs &entity_collection_data);
+  FlatbuffersEntityConfigurator(EventHandler &event_handler);
 
   /////////////////////////////////////////////////
   /// @brief Configure the whole EntityMemoryPool with data
@@ -49,8 +48,9 @@ public:
   /// @param emp EntityMemoryPool to configure
   /// @returns std::expected<std::monostate, FailInfo>
   /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  ConfigureEntityMemoryPool(EntityMemoryPool &emp) override;
+  std::expected<std::monostate, FailInfo> ConfigureEntityMemoryPoolFromSource(
+      EntityMemoryPool &emp,
+      const EntityTransportVariant &entity_data) override;
 
   /////////////////////////////////////////////////
   /// @brief Configure Components that do not rely on other components

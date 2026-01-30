@@ -190,8 +190,7 @@ SceneFactory::ImportEntities(Scene &scene, const SceneData &scene_data) {
   }
 
   // check if entity importer variant holds type we want
-  if (!std::holds_alternative<std::unique_ptr<IEntityImporter>>(
-          scene_data.entity_transport)) {
+  if (!std::holds_alternative<>(scene_data.entity_transport)) {
     return std::unexpected(
         FailInfo{FailMode::VariantTypeMismatch,
                  "Entity importer variant does not hold IEntityImporter type"});
