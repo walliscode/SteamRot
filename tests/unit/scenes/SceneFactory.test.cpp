@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////
 #include "SceneFactory.h"
 #include "CraftingScene.h"
-#include "FlatbuffersEntityImporter.h"
+#include "FlatbuffersEntityConfigurator.h"
 #include "FlatbuffersSceneDataProvider.h"
 #include "TestFixture.h"
 #include "TitleScene.h"
@@ -169,11 +169,12 @@ TEST_CASE("SceneFactory provides UUID if not present in SceneData",
   scene_data.scene_info.type = steamrot::SceneType::TITLE;
   scene_data.scene_resources_config.texture_width = 800;
   scene_data.scene_resources_config.texture_height = 600;
-  // Add entity importer to the variant
-  scene_data.entity_transport =
-      std::make_unique<steamrot::FlatbuffersEntityImporter>(
-          fixture.GetGameContext().event_handler,
-          *scene_data_fbs->entity_collection());
+  // Add entity collection to the transport variant
+  scene_data.entity_transport = scene_data_fbs->entity_collection();
+  // Create entity configurator
+  scene_data.entity_configurator =
+      std::make_unique<steamrot::FlatbuffersEntityConfigurator>(
+          fixture.GetGameContext().event_handler);
 
   // Create scene from scene data
   auto result = scene_factory.CreateSceneFromSceneData(scene_data);
@@ -203,11 +204,12 @@ TEST_CASE("SceneFactory configures the scenes logic map",
   scene_data.scene_info.type = steamrot::SceneType::TITLE;
   scene_data.scene_resources_config.texture_width = 800;
   scene_data.scene_resources_config.texture_height = 600;
-  // Add entity importer to the variant
-  scene_data.entity_transport =
-      std::make_unique<steamrot::FlatbuffersEntityImporter>(
-          fixture.GetGameContext().event_handler,
-          *scene_data_fbs->entity_collection());
+  // Add entity collection to the transport variant
+  scene_data.entity_transport = scene_data_fbs->entity_collection();
+  // Create entity configurator
+  scene_data.entity_configurator =
+      std::make_unique<steamrot::FlatbuffersEntityConfigurator>(
+          fixture.GetGameContext().event_handler);
 
   steamrot::SceneFactory scene_factory(fixture.GetGameContext());
 
@@ -392,7 +394,7 @@ TEST_CASE("SceneFactory::ConfigureSceneConfig succeeds",
   REQUIRE(result.has_value());
 }
 
-TEST_CASE("SceneFactory::ImportEntities imports entities from importer",
+TEST_CASE("SceneFactory::ConfigureEntities configures entities from data",
           "[unit][SceneFactory]") {
   // Arrange
   steamrot::tests::TestFixture fixture;
@@ -409,12 +411,12 @@ TEST_CASE("SceneFactory::ImportEntities imports entities from importer",
   REQUIRE(scene_data_fbs != nullptr);
   REQUIRE(scene_data_fbs->entity_collection() != nullptr);
 
-  // Create entity importer with the test data
+  // Create SceneData with entity configurator
   steamrot::SceneData scene_data;
-  scene_data.entity_transport =
-      std::make_unique<steamrot::FlatbuffersEntityImporter>(
-          fixture.GetGameContext().event_handler,
-          *scene_data_fbs->entity_collection());
+  scene_data.entity_transport = scene_data_fbs->entity_collection();
+  scene_data.entity_configurator =
+      std::make_unique<steamrot::FlatbuffersEntityConfigurator>(
+          fixture.GetGameContext().event_handler);
 
   // Act
   auto result = scene_factory.ConfigureEntities(*scene, scene_data);
@@ -426,7 +428,7 @@ TEST_CASE("SceneFactory::ImportEntities imports entities from importer",
               scene->GetSceneContext().scene_entities) == 50);
 }
 
-TEST_CASE("SceneFactory::ImportEntities fails with null importer",
+TEST_CASE("SceneFactory::ConfigureEntities fails with null configurator",
           "[unit][SceneFactory]") {
   // Arrange
   steamrot::tests::TestFixture fixture;
@@ -438,8 +440,8 @@ TEST_CASE("SceneFactory::ImportEntities fails with null importer",
   auto &scene = scene_result.value();
 
   steamrot::SceneData scene_data;
-  scene_data.entity_transport =
-      std::unique_ptr<steamrot::IEntityImporter>(nullptr);
+  scene_data.entity_transport = steamrot::EntityMemoryPool{};
+  scene_data.entity_configurator = nullptr;
 
   // Act
   auto result = scene_factory.ConfigureEntities(*scene, scene_data);
@@ -447,29 +449,6 @@ TEST_CASE("SceneFactory::ImportEntities fails with null importer",
   // Assert
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
-}
-
-TEST_CASE("SceneFactory::ImportEntities fails with wrong variant type",
-          "[unit][SceneFactory]") {
-  // Arrange
-  steamrot::tests::TestFixture fixture;
-  steamrot::SceneFactory scene_factory(fixture.GetGameContext());
-
-  auto scene_result =
-      scene_factory.CreateEmptyScene(steamrot::SceneType::TITLE);
-  REQUIRE(scene_result.has_value());
-  auto &scene = scene_result.value();
-
-  steamrot::SceneData scene_data;
-  // Use EntityMemoryPool instead of IEntityImporter
-  scene_data.entity_transport = steamrot::EntityMemoryPool{};
-
-  // Act
-  auto result = scene_factory.ConfigureEntities(*scene, scene_data);
-
-  // Assert
-  REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::VariantTypeMismatch);
 }
 
 TEST_CASE("SceneFactory::ConfigureLogicMap configures logic for TitleScene",
