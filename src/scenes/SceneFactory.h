@@ -98,13 +98,13 @@ public:
   ConfigureSceneConfig(Scene &scene, const SceneData &scene_data);
 
   /////////////////////////////////////////////////
-  /// @brief Import entities into the scene from the entity importer
+  /// @brief Configure entities in the scene
   ///
-  /// @param scene Scene to import entities into
-  /// @param scene_data SceneData containing entity importer
+  /// @param scene Scene to configure
+  /// @param scene_data SceneData containing EntityTransport variant
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo>
-  ImportEntities(Scene &scene, const SceneData &scene_data);
+  ConfigureEntities(Scene &scene, const SceneData &scene_data);
 
   /////////////////////////////////////////////////
   /// @brief Pass AssetConfig object to the AssetManager

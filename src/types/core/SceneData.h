@@ -13,8 +13,10 @@
 /////////////////////////////////////////////////
 #include "AssetConfig.h"
 #include "EntityTransportVariant.h"
+#include "IEntityConfigurator.h"
 #include "SceneInfo.h"
 #include "SceneResourcesConfig.h"
+#include <memory>
 
 namespace steamrot {
 
@@ -44,6 +46,11 @@ struct SceneData {
   /// @brief Entity data wrapped in a variant for transport.
   /////////////////////////////////////////////////
   EntityTransportVariant entity_transport;
+
+  /////////////////////////////////////////////////
+  /// @brief Entity configurator to set up entities after import.
+  /////////////////////////////////////////////////
+  std::unique_ptr<IEntityConfigurator> entity_configurator;
 };
 
 using SceneCollectionData = std::vector<SceneData>;

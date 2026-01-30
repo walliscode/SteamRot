@@ -29,8 +29,7 @@ TEST_CASE("SceneFactory::CreateEmptyScene handles UNKNOWN SceneType",
   steamrot::SceneFactory scene_factory(test_fixture.GetGameContext());
 
   // Act
-  auto result =
-      scene_factory.CreateEmptyScene(steamrot::SceneType::UNKNOWN);
+  auto result = scene_factory.CreateEmptyScene(steamrot::SceneType::UNKNOWN);
 
   // Assert
   REQUIRE_FALSE(result.has_value());
@@ -58,8 +57,7 @@ TEST_CASE("SceneFactory::CreateEmptyScene creates TitleScene",
   steamrot::tests::TestFixture test_fixture;
   steamrot::SceneFactory scene_factory(test_fixture.GetGameContext());
   // Act
-  auto result =
-      scene_factory.CreateEmptyScene(steamrot::SceneType::TITLE);
+  auto result = scene_factory.CreateEmptyScene(steamrot::SceneType::TITLE);
   // Assert
   REQUIRE(result.has_value());
   REQUIRE(dynamic_cast<steamrot::TitleScene *>(result.value().get()) !=
@@ -72,8 +70,7 @@ TEST_CASE("SceneFactory::CreateEmptyScene creates CraftingScene",
   steamrot::tests::TestFixture test_fixture;
   steamrot::SceneFactory scene_factory(test_fixture.GetGameContext());
   // Act
-  auto result =
-      scene_factory.CreateEmptyScene(steamrot::SceneType::CRAFTING);
+  auto result = scene_factory.CreateEmptyScene(steamrot::SceneType::CRAFTING);
   // Assert
   REQUIRE(result.has_value());
   REQUIRE(dynamic_cast<steamrot::CraftingScene *>(result.value().get()) !=
@@ -420,7 +417,7 @@ TEST_CASE("SceneFactory::ImportEntities imports entities from importer",
           *scene_data_fbs->entity_collection());
 
   // Act
-  auto result = scene_factory.ImportEntities(*scene, scene_data);
+  auto result = scene_factory.ConfigureEntities(*scene, scene_data);
 
   // Assert
   REQUIRE(result.has_value());
@@ -445,7 +442,7 @@ TEST_CASE("SceneFactory::ImportEntities fails with null importer",
       std::unique_ptr<steamrot::IEntityImporter>(nullptr);
 
   // Act
-  auto result = scene_factory.ImportEntities(*scene, scene_data);
+  auto result = scene_factory.ConfigureEntities(*scene, scene_data);
 
   // Assert
   REQUIRE_FALSE(result.has_value());
@@ -468,7 +465,7 @@ TEST_CASE("SceneFactory::ImportEntities fails with wrong variant type",
   scene_data.entity_transport = steamrot::EntityMemoryPool{};
 
   // Act
-  auto result = scene_factory.ImportEntities(*scene, scene_data);
+  auto result = scene_factory.ConfigureEntities(*scene, scene_data);
 
   // Assert
   REQUIRE_FALSE(result.has_value());

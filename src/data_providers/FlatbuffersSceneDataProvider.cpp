@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "FlatbuffersSceneDataProvider.h"
 #include "FlatbuffersDataLoader.h"
+#include "FlatbuffersEntityConfigurator.h"
 #include "SceneData.h"
 #include "configure_asset_config.h"
 #include "configure_scene_data.h"
@@ -92,6 +93,10 @@ FlatbuffersSceneDataProvider::ConfigureSceneData(SceneData &scene_data) const {
   } else {
     scene_data.entity_transport = m_scene_data_fbs->entity_collection();
   }
+
+  // assign entity configurator
+  scene_data.entity_configurator =
+      std::make_unique<FlatbuffersEntityConfigurator>(m_event_handler);
 
   return std::monostate{};
 }

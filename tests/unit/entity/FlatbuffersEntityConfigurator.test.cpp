@@ -12,7 +12,6 @@
 #include "PanelElement.h"
 #include "SpacingAndSizing.h"
 #include "containers.h"
-#include "entities_generated.h"
 #include "entity_memory.h"
 #include "load_entity_data.h"
 #include <catch2/catch_test_macros.hpp>
@@ -46,7 +45,8 @@ TEST_CASE("ConfigureEntityMemoryPool resizes pool correctly",
 
   steamrot::FlatbuffersEntityConfigurator configurator(event_handler);
 
-  auto result = configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
+  auto result =
+      configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
 
   // After configuration - pool should be resized
   REQUIRE(result.has_value());
@@ -68,8 +68,10 @@ TEST_CASE("ConfigureFirstLayerComponents configures CUserInterface correctly",
 
   steamrot::FlatbuffersEntityConfigurator configurator(event_handler);
 
-  // Configure through the public API (which calls ConfigureFirstLayerComponents internally)
-  auto result = configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
+  // Configure through the public API (which calls ConfigureFirstLayerComponents
+  // internally)
+  auto result =
+      configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
 
   // After configuration - pool should be resized and components configured
   REQUIRE(result.has_value());
@@ -104,7 +106,8 @@ TEST_CASE("ConfigureFirstLayerComponents configures hidden UI correctly",
 
   steamrot::FlatbuffersEntityConfigurator configurator(event_handler);
 
-  auto result = configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
+  auto result =
+      configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
 
   // After configuration
   REQUIRE(result.has_value());
@@ -137,10 +140,11 @@ TEST_CASE("ConfigureCUserInterface correctly handles false visibility",
 
   steamrot::FlatbuffersEntityConfigurator configurator(event_handler);
 
-  auto result = configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
+  auto result =
+      configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
 
   REQUIRE(result.has_value());
-  
+
   // Entity 2 has is_visible set to false
   const steamrot::CUserInterface &ui_component =
       steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(2, emp);
@@ -157,14 +161,16 @@ TEST_CASE("ConfigureCGrimoireMachina handles null fragments/joints",
 
   steamrot::FlatbuffersEntityConfigurator configurator(event_handler);
 
-  auto result = configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
+  auto result =
+      configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
 
   // Should succeed with empty arrays
   REQUIRE(result.has_value());
-  
+
   // Entity 3 has empty fragments/joints arrays
   const steamrot::CGrimoireMachina &grimoire_component =
-      steamrot::entity::memory::GetComponent<steamrot::CGrimoireMachina>(3, emp);
+      steamrot::entity::memory::GetComponent<steamrot::CGrimoireMachina>(3,
+                                                                         emp);
 
   REQUIRE(grimoire_component.m_active == true);
 }
@@ -182,13 +188,15 @@ TEST_CASE(
 
   steamrot::FlatbuffersEntityConfigurator configurator(event_handler);
 
-  auto result = configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
+  auto result =
+      configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
 
   // After configuration
   REQUIRE(result.has_value());
-  
+
   const steamrot::CGrimoireMachina &grimoire_component =
-      steamrot::entity::memory::GetComponent<steamrot::CGrimoireMachina>(3, emp);
+      steamrot::entity::memory::GetComponent<steamrot::CGrimoireMachina>(3,
+                                                                         emp);
 
   REQUIRE(grimoire_component.m_active == true);
 }
@@ -201,15 +209,17 @@ TEST_CASE("ConfigureFirstLayerComponents configures CGrimoireMachina with data",
 
   steamrot::FlatbuffersEntityConfigurator configurator(event_handler);
 
-  auto result = configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
+  auto result =
+      configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
 
   // After - component should be activated
   // Note: Current implementation doesn't populate m_all_fragments/m_all_joints
   // from FlatBuffers data, it only sets m_active
   REQUIRE(result.has_value());
-  
+
   const steamrot::CGrimoireMachina &grimoire_component =
-      steamrot::entity::memory::GetComponent<steamrot::CGrimoireMachina>(4, emp);
+      steamrot::entity::memory::GetComponent<steamrot::CGrimoireMachina>(4,
+                                                                         emp);
 
   REQUIRE(grimoire_component.m_active == true);
 }
@@ -227,7 +237,8 @@ TEST_CASE("ConfigureSecondLayerComponents succeeds",
   steamrot::FlatbuffersEntityConfigurator configurator(event_handler);
 
   // ConfigureEntityMemoryPoolFromSource calls both first and second layer
-  auto result = configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
+  auto result =
+      configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
 
   // Should succeed (second layer is currently no-op but should not fail)
   REQUIRE(result.has_value());
@@ -271,7 +282,8 @@ TEST_CASE("Full configuration flow works correctly",
 
   steamrot::FlatbuffersEntityConfigurator configurator(event_handler);
 
-  auto result = configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
+  auto result =
+      configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
 
   // After - fully configured
   REQUIRE(result.has_value());
