@@ -35,4 +35,18 @@ RunHarnessTests(const std::filesystem::path current_location);
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> ConvertEMPData(SceneData &scene_data);
 
+/////////////////////////////////////////////////
+/// @brief Converts EntityCollectionFbs data to EntityMemoryPool for all scenes
+/// in an EngineSnapshot
+///
+/// This helper function converts FlatBuffers entity data to EntityMemoryPool
+/// format for comparison purposes in tests. It processes all SceneData objects
+/// in the scene_collection_data vector.
+///
+/// @param snapshot EngineSnapshot containing scene collection to convert
+/// @return std::expected with monostate on success, or FailInfo on error
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConvertAllSceneEntityData(EngineSnapshot &snapshot);
+
 } // namespace steamrot::tests

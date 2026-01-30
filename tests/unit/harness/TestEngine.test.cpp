@@ -410,11 +410,11 @@ TEST_CASE("TestEngine zero position snapshot matches starting config with "
     FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
   }
 
-  // convert scene data's EMPs before comparison
-  auto convert_result = steamrot::tests::ConvertEMPData(
-      test_data.starting_engine_snapshot.scene_collection_data[0]);
+  // Convert all scene entity data before comparison
+  auto convert_result = steamrot::tests::ConvertAllSceneEntityData(
+      test_data.starting_engine_snapshot);
   if (!convert_result.has_value()) {
-    FAIL("ConvertEMPData failed: " + convert_result.error().message);
+    FAIL("ConvertAllSceneEntityData failed: " + convert_result.error().message);
   }
 
   // Assert - Zero position should match starting config

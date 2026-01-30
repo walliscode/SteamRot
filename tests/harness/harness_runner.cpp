@@ -106,4 +106,41 @@ std::expected<std::monostate, FailInfo> ConvertEMPData(SceneData &scene_data) {
 
   return std::monostate{};
 }
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConvertAllSceneEntityData(EngineSnapshot &snapshot) {
+  // Iterate through all scenes in the snapshot
+  for (auto &scene_data : snapshot.scene_collection_data) {
+    // Skip if entity_transport is monostate (no entities)
+    if (std::holds_alternative<std::monostate>(scene_data.entity_transport)) {
+      continue;
+    }
+
+    // Skip if already EntityMemoryPool (already converted)
+    if (std::holds_alternative<EntityMemoryPool>(scene_data.entity_transport)) {
+      continue;
+    }
+
+    // Convert if it's EntityCollectionFbs* and has a configurator
+    if (std::holds_alternative<const EntityCollectionFbs *>(
+            scene_data.entity_transport)) {
+      auto convert_result = ConvertEMPData(scene_data);
+      if (!convert_result.has_value()) {
+        return std::unexpected(convert_result.error());
+      }
+    }
+    // shared_ptr<EntityMemoryPool> case: dereference to get EntityMemoryPool
+    else if (std::holds_alternative<std::shared_ptr<EntityMemoryPool>>(
+                 scene_data.entity_transport)) {
+      auto ptr =
+          std::get<std::shared_ptr<EntityMemoryPool>>(scene_data.entity_transport);
+      if (ptr) {
+        scene_data.entity_transport = *ptr;
+      }
+    }
+  }
+
+  return std::monostate{};
+}
 } // namespace steamrot::tests
