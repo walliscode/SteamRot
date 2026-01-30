@@ -157,21 +157,28 @@ The architecture assumes entity data will remain in the same variant type throug
 // In RunHarnessTests, after test_engine.RunGame() (line 73):
 
 // Convert expected snapshots to EntityMemoryPool format for comparison
-// This doesn't interfere with how EngineSnapshots are generated
+// Access TestEngine's EventHandler for the conversion
+auto& engine_event_handler = test_engine.GetEngineResources().event_handler;
+
 for (auto &[tick, expected_snapshot] : test_data.expected_engine_snapshots) {
   for (auto &scene_data : expected_snapshot.scene_collection_data) {
     if (std::holds_alternative<const EntityCollectionFbs*>(
             scene_data.entity_transport)) {
-      const auto* entity_collection_fbs = 
+      const auto* fbs_ptr = 
           std::get<const EntityCollectionFbs*>(scene_data.entity_transport);
       
-      auto pool_result = scene_data.entity_configurator->ImportEntities(
-          entity_collection_fbs);
-      if (!pool_result.has_value()) {
-        return std::unexpected(pool_result.error());
+      // Create configurator with TestEngine's EventHandler
+      FlatbuffersEntityConfigurator configurator(engine_event_handler);
+      
+      // Create and configure EntityMemoryPool
+      EntityMemoryPool pool(scene_data.scene_info.entity_memory_pool_size);
+      auto configure_result = configurator.ConfigureEntityMemoryPoolFromSource(
+          pool, scene_data.entity_transport);
+      if (!configure_result.has_value()) {
+        return std::unexpected(configure_result.error());
       }
       
-      scene_data.entity_transport = std::move(pool_result.value());
+      scene_data.entity_transport = std::move(pool);
     }
   }
 }
@@ -180,16 +187,19 @@ for (auto &[tick, expected_snapshot] : test_data.expected_engine_snapshots) {
 for (auto &scene_data : test_data.starting_engine_snapshot.scene_collection_data) {
   if (std::holds_alternative<const EntityCollectionFbs*>(
           scene_data.entity_transport)) {
-    const auto* entity_collection_fbs = 
+    const auto* fbs_ptr = 
         std::get<const EntityCollectionFbs*>(scene_data.entity_transport);
     
-    auto pool_result = scene_data.entity_configurator->ImportEntities(
-        entity_collection_fbs);
-    if (!pool_result.has_value()) {
-      return std::unexpected(pool_result.error());
+    FlatbuffersEntityConfigurator configurator(engine_event_handler);
+    
+    EntityMemoryPool pool(scene_data.scene_info.entity_memory_pool_size);
+    auto configure_result = configurator.ConfigureEntityMemoryPoolFromSource(
+        pool, scene_data.entity_transport);
+    if (!configure_result.has_value()) {
+      return std::unexpected(configure_result.error());
     }
     
-    scene_data.entity_transport = std::move(pool_result.value());
+    scene_data.entity_transport = std::move(pool);
   }
 }
 ```
