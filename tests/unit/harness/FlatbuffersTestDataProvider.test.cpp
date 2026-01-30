@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersTestDataProvider.h"
+#include "EventHandler.h"
 #include "test_data_generated.h"
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
@@ -17,8 +18,9 @@ TEST_CASE(
     "[FlatbuffersTestDataProvider]") {
   // Arrange
   std::filesystem::path obj_dir_path(__FILE__);
+  steamrot::EventHandler event_handler;
   // Act
-  FlatbuffersTestDataProvider provider(obj_dir_path);
+  FlatbuffersTestDataProvider provider(obj_dir_path, event_handler);
   // Assert
   REQUIRE(provider.GetObjectDirectoryPath() == obj_dir_path);
 }
@@ -28,7 +30,9 @@ TEST_CASE("FlatbuffersTestDataProvider::CreateTestData returns FailInfo on "
           "[FlatbuffersTestDataProvider]") {
   // Arrange
   std::filesystem::path obj_dir_path(__FILE__);
-  FlatbuffersTestDataProvider provider(obj_dir_path.parent_path());
+  steamrot::EventHandler event_handler;
+  FlatbuffersTestDataProvider provider(obj_dir_path.parent_path(),
+                                       event_handler);
 
   // Act
   auto result = provider.CreateTestData(nullptr);
@@ -43,7 +47,9 @@ TEST_CASE(
     "[FlatbuffersTestDataProvider]") {
   // Arrange
   std::filesystem::path obj_dir_path(__FILE__);
-  FlatbuffersTestDataProvider provider(obj_dir_path.parent_path());
+  steamrot::EventHandler event_handler;
+  FlatbuffersTestDataProvider provider(obj_dir_path.parent_path(),
+                                       event_handler);
   steamrot::TestMetaData test_meta_data;
   // Act
   auto result = provider.ConfigureTestMetaData(test_meta_data, nullptr);
@@ -59,7 +65,9 @@ TEST_CASE(
     "[FlatbuffersTestDataProvider]") {
   // Arrange
   std::filesystem::path obj_dir_path(__FILE__);
-  FlatbuffersTestDataProvider provider(obj_dir_path.parent_path());
+  steamrot::EventHandler event_handler;
+  FlatbuffersTestDataProvider provider(obj_dir_path.parent_path(),
+                                       event_handler);
   steamrot::SimulationData simulation_data;
   // Act
   auto result = provider.ConfigureSimulationData(simulation_data, nullptr);
@@ -76,7 +84,9 @@ TEST_CASE("FlatbuffersTestDataProvider::ConfigureSimulationData configures "
 
   // Arrange
   std::filesystem::path obj_dir_path(__FILE__);
-  FlatbuffersTestDataProvider provider(obj_dir_path.parent_path());
+  steamrot::EventHandler event_handler;
+  FlatbuffersTestDataProvider provider(obj_dir_path.parent_path(),
+                                       event_handler);
 
   // Create flatbuffers builder
   flatbuffers::FlatBufferBuilder builder;
@@ -134,7 +144,9 @@ TEST_CASE(
 
   // Arrange
   std::filesystem::path obj_dir_path(__FILE__);
-  FlatbuffersTestDataProvider provider(obj_dir_path.parent_path());
+  steamrot::EventHandler event_handler;
+  FlatbuffersTestDataProvider provider(obj_dir_path.parent_path(),
+                                       event_handler);
 
   // Create flatbuffers builder
   flatbuffers::FlatBufferBuilder builder;
@@ -187,7 +199,8 @@ TEST_CASE(
   // Arrange
   std::filesystem::path obj_dir_path =
       std::filesystem::path(__FILE__).parent_path();
-  FlatbuffersTestDataProvider provider(obj_dir_path);
+  steamrot::EventHandler event_handler;
+  FlatbuffersTestDataProvider provider(obj_dir_path, event_handler);
   // Act
   auto result = provider.ProvideAllTestData();
   // Assert
@@ -207,7 +220,9 @@ TEST_CASE("FlatbuffersTestDataProvider::ConfigureSimulationData fails when "
           "[FlatbuffersTestDataProvider]") {
   // Arrange
   std::filesystem::path obj_dir_path(__FILE__);
-  FlatbuffersTestDataProvider provider(obj_dir_path.parent_path());
+  steamrot::EventHandler event_handler;
+  FlatbuffersTestDataProvider provider(obj_dir_path.parent_path(),
+                                       event_handler);
 
   flatbuffers::FlatBufferBuilder builder;
 
@@ -241,7 +256,9 @@ TEST_CASE("FlatbuffersTestDataProvider::ConfigureSimulationData configures "
           "[FlatbuffersTestDataProvider]") {
   // Arrange
   std::filesystem::path obj_dir_path(__FILE__);
-  FlatbuffersTestDataProvider provider(obj_dir_path.parent_path());
+  steamrot::EventHandler event_handler;
+  FlatbuffersTestDataProvider provider(obj_dir_path.parent_path(),
+                                       event_handler);
 
   flatbuffers::FlatBufferBuilder builder;
 
@@ -278,4 +295,126 @@ TEST_CASE("FlatbuffersTestDataProvider::ConfigureSimulationData configures "
           steamrot::LogicClassEnum::UIActionLogic);
   REQUIRE(simulation_data.steps[1].element ==
           steamrot::LogicClassEnum::UICollisionLogic);
+}
+
+TEST_CASE("FlatbuffersTestDataProvider::ConfigureEngineSnapshot returns "
+          "FailInfo on null input",
+          "[FlatbuffersTestDataProvider]") {
+  // Arrange
+  std::filesystem::path obj_dir_path(__FILE__);
+  steamrot::EventHandler event_handler;
+  FlatbuffersTestDataProvider provider(obj_dir_path.parent_path(),
+                                       event_handler);
+  steamrot::EngineSnapshot engine_snapshot;
+
+  // Act
+  auto result = provider.ConfigureEngineSnapshot(engine_snapshot, nullptr);
+
+  // Assert
+  REQUIRE(!result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message ==
+          "Input Flatbuffers EngineSnapshotFbs is null.");
+}
+
+TEST_CASE("FlatbuffersTestDataProvider::ConfigureExpectedEngineSnapshots "
+          "returns FailInfo on null input",
+          "[FlatbuffersTestDataProvider]") {
+  // Arrange
+  std::filesystem::path obj_dir_path(__FILE__);
+  steamrot::EventHandler event_handler;
+  FlatbuffersTestDataProvider provider(obj_dir_path.parent_path(),
+                                       event_handler);
+  std::map<size_t, steamrot::EngineSnapshot> expected_snapshots;
+
+  // Act
+  auto result =
+      provider.ConfigureExpectedEngineSnapshots(expected_snapshots, nullptr);
+
+  // Assert
+  REQUIRE(!result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message ==
+          "Input Flatbuffers tick-snapshot pairs vector is null.");
+}
+
+TEST_CASE(
+    "FlatbuffersTestDataProvider::ConfigureExpectedEngineSnapshots configures "
+    "map correctly",
+    "[FlatbuffersTestDataProvider]") {
+  // Arrange
+  std::filesystem::path obj_dir_path(__FILE__);
+  steamrot::EventHandler event_handler;
+  FlatbuffersTestDataProvider provider(obj_dir_path.parent_path(),
+                                       event_handler);
+
+  flatbuffers::FlatBufferBuilder builder;
+
+  // Create two tick-snapshot pairs
+  std::vector<flatbuffers::Offset<steamrot::TickSnapshotPairFbs>> pairs;
+
+  // First pair: tick 5 with tick_number field set
+  auto snapshot1 = steamrot::CreateEngineSnapshotFbs(builder, 5);
+  auto pair1 = steamrot::CreateTickSnapshotPairFbs(builder, 5, snapshot1);
+  pairs.push_back(pair1);
+
+  // Second pair: tick 10 with tick_number field set
+  auto snapshot2 = steamrot::CreateEngineSnapshotFbs(builder, 10);
+  auto pair2 = steamrot::CreateTickSnapshotPairFbs(builder, 10, snapshot2);
+  pairs.push_back(pair2);
+
+  auto pairs_vector = builder.CreateVector(pairs);
+
+  // Create a TestDataFbs to wrap the pairs (required for root_type)
+  auto test_meta_data = steamrot::CreateTestMetadataFbs(
+      builder, builder.CreateString("Test snapshots"));
+  auto fbs_test_data = steamrot::CreateTestDataFbs(
+      builder, test_meta_data, 0, 1, 0, pairs_vector);
+
+  builder.Finish(fbs_test_data);
+  const steamrot::TestDataFbs *fbs_test_data_ptr =
+      steamrot::GetTestDataFbs(builder.GetBufferPointer());
+
+  std::map<size_t, steamrot::EngineSnapshot> expected_snapshots;
+
+  // Act
+  auto result = provider.ConfigureExpectedEngineSnapshots(
+      expected_snapshots, fbs_test_data_ptr->expected_engine_snapshots());
+
+  // Assert
+  REQUIRE(result.has_value());
+  REQUIRE(expected_snapshots.size() == 2);
+  REQUIRE(expected_snapshots.find(5) != expected_snapshots.end());
+  REQUIRE(expected_snapshots.find(10) != expected_snapshots.end());
+  REQUIRE(expected_snapshots[5].tick_number.value() == 5);
+  REQUIRE(expected_snapshots[10].tick_number.value() == 10);
+}
+
+TEST_CASE(
+    "FlatbuffersTestDataProvider::ProvideAllTestData loads expected_engine_snapshots",
+    "[FlatbuffersTestDataProvider]") {
+  // Arrange
+  std::filesystem::path obj_dir_path =
+      std::filesystem::path(__FILE__).parent_path();
+  steamrot::EventHandler event_handler;
+  FlatbuffersTestDataProvider provider(obj_dir_path, event_handler);
+
+  // Act
+  auto result = provider.ProvideAllTestData();
+
+  // Assert
+  if (!result)
+    FAIL(result.error().message);
+
+  const auto &test_data_vec = result.value();
+  REQUIRE(test_data_vec.size() == 1);
+
+  // Verify expected_engine_snapshots were loaded
+  const auto &expected_snapshots =
+      test_data_vec[0].expected_engine_snapshots;
+  REQUIRE(expected_snapshots.size() == 2);
+  REQUIRE(expected_snapshots.find(10) != expected_snapshots.end());
+  REQUIRE(expected_snapshots.find(20) != expected_snapshots.end());
+  REQUIRE(expected_snapshots.at(10).tick_number.value() == 10);
+  REQUIRE(expected_snapshots.at(20).tick_number.value() == 20);
 }
