@@ -8,10 +8,13 @@
 /////////////////////////////////////////////////
 #include "TestEngine.h"
 #include "EngineSnapshotEqualsMatcher.h"
+#include "EventHandler.h"
 #include "EventPacket.h"
 #include "EventType.h"
+#include "FlatbuffersEntityConfigurator.h"
 #include "SceneData.h"
 #include "TestData.h"
+#include "harness_runner.h"
 #include "uuid.h"
 #include <catch2/catch_test_macros.hpp>
 #include <utility>
@@ -386,6 +389,7 @@ TEST_CASE("TestEngine zero position snapshot matches starting config with "
   // Arrange - Configure starting snapshot with SceneCollection
   steamrot::TestData test_data;
   test_data.number_of_ticks = 2;
+  steamrot::EventHandler mock_event_handler; // for EMP conversion
 
   // Configure specific starting scene
   steamrot::SceneData scene_data;
@@ -393,7 +397,9 @@ TEST_CASE("TestEngine zero position snapshot matches starting config with "
   scene_data.scene_info.id = uuids::uuid_system_generator{}();
   scene_data.scene_resources_config.texture_width = 512;
   scene_data.scene_resources_config.texture_height = 648;
-
+  scene_data.entity_configurator =
+      std::make_unique<steamrot::FlatbuffersEntityConfigurator>(
+          mock_event_handler);
   test_data.starting_engine_snapshot.scene_collection_data.push_back(
       std::move(scene_data));
 
@@ -402,6 +408,13 @@ TEST_CASE("TestEngine zero position snapshot matches starting config with "
   auto startup_result = engine.StartUp();
   if (!startup_result.has_value()) {
     FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+  }
+
+  // convert scene data's EMPs before comparison
+  auto convert_result = steamrot::tests::ConvertEMPData(
+      test_data.starting_engine_snapshot.scene_collection_data[0]);
+  if (!convert_result.has_value()) {
+    FAIL("ConvertEMPData failed: " + convert_result.error().message);
   }
 
   // Assert - Zero position should match starting config
