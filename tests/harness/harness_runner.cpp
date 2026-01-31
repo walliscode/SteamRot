@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "harness_runner.h"
 #include "EntityTransportVariant.h"
+#include "EventHandler.h"
 #include "FailInfo.h"
 #include "FlatbuffersTestDataProvider.h"
 #include "TestEngine.h"
@@ -32,8 +33,11 @@ RunHarnessTests(const std::filesystem::path current_location) {
     });
   }
 
+  // Create an EventHandler for loading test data
+  EventHandler event_handler;
+
   // instantiate the FlatbuffersTestDataProvider with the object directory path
-  FlatbuffersTestDataProvider data_provider(current_location);
+  FlatbuffersTestDataProvider data_provider(current_location, event_handler);
 
   // get all test data
   auto test_data_result = data_provider.ProvideAllTestData();

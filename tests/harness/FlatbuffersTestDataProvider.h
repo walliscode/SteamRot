@@ -17,10 +17,22 @@
 #include "test_data_generated.h"
 #include <variant>
 
+// Forward declare EventHandler to avoid circular dependencies
+namespace steamrot {
+class EventHandler;
+}
+
 class FlatbuffersTestDataProvider : public ITestDataProvider {
 
+private:
+  /////////////////////////////////////////////////
+  /// @brief Reference to EventHandler for entity configuration
+  /////////////////////////////////////////////////
+  steamrot::EventHandler &m_event_handler;
+
 public:
-  FlatbuffersTestDataProvider(std::filesystem::path obj_dir_path);
+  FlatbuffersTestDataProvider(std::filesystem::path obj_dir_path,
+                              steamrot::EventHandler &event_handler);
 
   /////////////////////////////////////////////////
   /// @brief Provide all instances of TestData struct
@@ -55,4 +67,27 @@ public:
   std::expected<std::monostate, steamrot::FailInfo> ConfigureSimulationData(
       steamrot::SimulationData &simulation_data,
       const steamrot::SimulationDataFbs *fbs_simulation_data) const;
+
+  /////////////////////////////////////////////////
+  /// @brief Configures a single EngineSnapshot from Flatbuffers data
+  ///
+  /// @param engine_snapshot EngineSnapshot instance to configure
+  /// @param fbs_engine_snapshot The Flatbuffers EngineSnapshotFbs instance
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, steamrot::FailInfo> ConfigureEngineSnapshot(
+      steamrot::EngineSnapshot &engine_snapshot,
+      const steamrot::EngineSnapshotFbs *fbs_engine_snapshot) const;
+
+  /////////////////////////////////////////////////
+  /// @brief Configures expected engine snapshots map from Flatbuffers data
+  ///
+  /// @param expected_snapshots Map to populate with tick->snapshot pairs
+  /// @param fbs_tick_snapshot_pairs Vector of Flatbuffers tick-snapshot pairs
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, steamrot::FailInfo>
+  ConfigureExpectedEngineSnapshots(
+      std::map<size_t, steamrot::EngineSnapshot> &expected_snapshots,
+      const flatbuffers::Vector<
+          flatbuffers::Offset<steamrot::TickSnapshotPairFbs>> *
+          fbs_tick_snapshot_pairs) const;
 };

@@ -7,17 +7,19 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersTestDataProvider.h"
+#include "EventHandler.h"
 #include "FlatbuffersTestDataLoader.h"
 #include "SimulationData.h"
 #include "TestData.h"
+#include "configure_engine_snapshot.h"
 #include "simulation_data_generated.h"
 #include <expected>
 #include <filesystem>
 
 /////////////////////////////////////////////////
 FlatbuffersTestDataProvider::FlatbuffersTestDataProvider(
-    std::filesystem::path obj_dir_path)
-    : ITestDataProvider(obj_dir_path) {}
+    std::filesystem::path obj_dir_path, steamrot::EventHandler &event_handler)
+    : ITestDataProvider(obj_dir_path), m_event_handler(event_handler) {}
 
 /////////////////////////////////////////////////
 std::expected<std::vector<steamrot::TestData>, steamrot::FailInfo>
@@ -82,6 +84,24 @@ FlatbuffersTestDataProvider::CreateTestData(
         "TestDataFbs is missing required field: num_ticks."});
   } else {
     test_data.number_of_ticks = fbs_test_data->num_ticks();
+  }
+
+  // Configure starting_engine_snapshot (optional)
+  if (fbs_test_data->starting_engine_snapshot()) {
+    auto snapshot_result = ConfigureEngineSnapshot(
+        test_data.starting_engine_snapshot,
+        fbs_test_data->starting_engine_snapshot());
+    if (!snapshot_result)
+      return std::unexpected(snapshot_result.error());
+  }
+
+  // Configure expected_engine_snapshots (optional)
+  if (fbs_test_data->expected_engine_snapshots()) {
+    auto expected_snapshots_result = ConfigureExpectedEngineSnapshots(
+        test_data.expected_engine_snapshots,
+        fbs_test_data->expected_engine_snapshots());
+    if (!expected_snapshots_result)
+      return std::unexpected(expected_snapshots_result.error());
   }
 
   // return the populated TestData instance
@@ -171,6 +191,72 @@ FlatbuffersTestDataProvider::ConfigureSimulationData(
     // Create SimulationStep and add to simulation_data
     steamrot::SimulationStep step(element);
     simulation_data.steps.emplace_back(step);
+  }
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, steamrot::FailInfo>
+FlatbuffersTestDataProvider::ConfigureEngineSnapshot(
+    steamrot::EngineSnapshot &engine_snapshot,
+    const steamrot::EngineSnapshotFbs *fbs_engine_snapshot) const {
+
+  if (!fbs_engine_snapshot) {
+    return std::unexpected(
+        steamrot::FailInfo{steamrot::FailMode::FlatbuffersDataNotFound,
+                           "Input Flatbuffers EngineSnapshotFbs is null."});
+  }
+
+  // Use the existing configure function from data::configure namespace
+  auto configure_result = steamrot::data::configure::ConfigureEngineSnapshot(
+      engine_snapshot, fbs_engine_snapshot, m_event_handler);
+
+  if (!configure_result) {
+    return std::unexpected(configure_result.error());
+  }
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, steamrot::FailInfo>
+FlatbuffersTestDataProvider::ConfigureExpectedEngineSnapshots(
+    std::map<size_t, steamrot::EngineSnapshot> &expected_snapshots,
+    const flatbuffers::Vector<
+        flatbuffers::Offset<steamrot::TickSnapshotPairFbs>> *
+        fbs_tick_snapshot_pairs) const {
+
+  if (!fbs_tick_snapshot_pairs) {
+    return std::unexpected(steamrot::FailInfo{
+        steamrot::FailMode::FlatbuffersDataNotFound,
+        "Input Flatbuffers tick-snapshot pairs vector is null."});
+  }
+
+  // Clear any existing snapshots
+  expected_snapshots.clear();
+
+  // Iterate through each tick-snapshot pair
+  for (const auto *fbs_pair : *fbs_tick_snapshot_pairs) {
+    if (!fbs_pair) {
+      continue; // Skip null entries
+    }
+
+    // Get the tick number
+    size_t tick = fbs_pair->tick();
+
+    // Create and configure the EngineSnapshot
+    steamrot::EngineSnapshot snapshot;
+    if (fbs_pair->snapshot()) {
+      auto snapshot_result =
+          ConfigureEngineSnapshot(snapshot, fbs_pair->snapshot());
+      if (!snapshot_result) {
+        return std::unexpected(snapshot_result.error());
+      }
+    }
+
+    // Add to the map
+    expected_snapshots[tick] = std::move(snapshot);
   }
 
   return std::monostate{};

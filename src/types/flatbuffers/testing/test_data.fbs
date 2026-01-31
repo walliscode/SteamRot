@@ -27,6 +27,19 @@ table TestMetadataFbs {
   version: uint32;
 }
 
+////////////////////////////////////////////////////////////
+/// @brief Represents a single tick-to-snapshot mapping
+///
+/// FlatBuffers doesn't support maps directly, so we represent
+/// the C++ std::map<size_t, EngineSnapshot> as a vector of these pairs.
+////////////////////////////////////////////////////////////
+table TickSnapshotPairFbs {
+  /// @brief Tick number (key in the map)
+  tick: uint64 (key);
+  
+  /// @brief Engine snapshot at this tick
+  snapshot: EngineSnapshotFbs;
+}
 
 ////////////////////////////////////////////////////////////
 /// @brief Root table for test data configuration
@@ -50,6 +63,11 @@ table TestDataFbs
   /// @brief Starting engine snapshot before simulation begins
   starting_engine_snapshot: EngineSnapshotFbs;
   
+  /// @brief Expected engine snapshots at specific ticks
+  ///
+  /// Maps tick numbers to expected engine states for validation.
+  /// In C++, this becomes std::map<size_t, EngineSnapshot>.
+  expected_engine_snapshots: [TickSnapshotPairFbs];
 }
 
 root_type TestDataFbs;

@@ -74,5 +74,42 @@
         }
       ]
     }
-  }
+  },
+  "expected_engine_snapshots": [
+    {
+      "tick": 10,
+      "snapshot": {
+        "tick_number": 10,
+        "global_event_bus": {
+          "description": "Expected event bus at tick 10",
+          "events": []
+        }
+      }
+    },
+    {
+      "tick": 20,
+      "snapshot": {
+        "tick_number": 20,
+        "scene_collection_data": {
+          "scene_data": [
+            {
+              "scene_info": {
+                "scene_type": "TITLE"
+              },
+              "scene_resources_config": {
+                "texture_width": 800,
+                "texture_height": 600
+              },
+              "entity_collection": {
+                "entity_memory_pool_size": 10,
+                "entities": []
+              },
+              "asset_config": {},
+              "logic_collection_data": {}
+            }
+          ]
+        }
+      }
+    }
+  ]
 }
