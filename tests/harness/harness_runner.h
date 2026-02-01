@@ -12,8 +12,10 @@
 /// Headers
 /////////////////////////////////////////////////
 
+#include "EngineSnapshot.h"
 #include "FailInfo.h"
 #include "SceneData.h"
+#include "TestData.h"
 #include <expected>
 #include <filesystem>
 #include <variant>
@@ -33,6 +35,23 @@ RunHarnessTests(const std::filesystem::path current_location);
 ///
 /// @param scene_data SceneData object with variant to convert
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo> ConvertEMPData(SceneData &scene_data);
+std::expected<std::monostate, FailInfo>
+ConvertEntityTransportVariant(SceneData &scene_data);
 
+/////////////////////////////////////////////////
+/// @brief Converts all EngineSnapshot SceneData variants to the wanted type
+///
+/// @param engine_snapshot EngineSnapshot object with SceneData variants to
+/// convert
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConvertAllEntityTransportVariants(EngineSnapshot &engine_snapshot);
+
+/////////////////////////////////////////////////
+/// @brief Converts all EngineSnapshot SceneData variants to the wanted type
+///
+/// @param test_data TestData object with EngineSnapshot variants to convert
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConvertAllEntityTransportVariantsInTestData(TestData &test_data);
 } // namespace steamrot::tests

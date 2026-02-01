@@ -7,12 +7,9 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "EntityTransportEqualsMatcher.h"
-#include "CMeta.h"
-#include "CUserInterface.h"
 #include "conmat.h"
 #include "containers.h"
 #include "entities_generated.h"
-#include "entity_memory.h"
 #include "matcher_helpers.h"
 #include "test_context.h"
 #include <catch2/catch_test_macros.hpp>
@@ -93,8 +90,8 @@ TEST_CASE("EntityTransportEqualsMatcher - variant type mismatch",
   flatbuffers::FlatBufferBuilder builder(1024);
   std::vector<flatbuffers::Offset<steamrot::EntityDataFbs>> entities;
   auto entities_vector = builder.CreateVector(entities);
-  auto collection = steamrot::CreateEntityCollectionFbs(
-      builder, entities_vector, 5);
+  auto collection =
+      steamrot::CreateEntityCollectionFbs(builder, entities_vector, 5);
   builder.Finish(collection);
   const steamrot::EntityCollectionFbs *fbs_ptr =
       flatbuffers::GetRoot<steamrot::EntityCollectionFbs>(
@@ -161,13 +158,13 @@ TEST_CASE("EntityTransportEqualsMatcher - const EntityCollectionFbs * case",
 
   // Build EntityCollectionFbs objects
   auto entities_vector1 = builder1.CreateVector(entities1);
-  auto collection1 = steamrot::CreateEntityCollectionFbs(
-      builder1, entities_vector1, 5);
+  auto collection1 =
+      steamrot::CreateEntityCollectionFbs(builder1, entities_vector1, 5);
   builder1.Finish(collection1);
 
   auto entities_vector2 = builder2.CreateVector(entities2);
-  auto collection2 = steamrot::CreateEntityCollectionFbs(
-      builder2, entities_vector2, 5);
+  auto collection2 =
+      steamrot::CreateEntityCollectionFbs(builder2, entities_vector2, 5);
   builder2.Finish(collection2);
 
   // Get pointers to the FlatBuffers data
@@ -272,7 +269,8 @@ TEST_CASE("EntityTransportEqualsMatcher describe method - null pointer",
   }
 }
 
-TEST_CASE("EntityTransportEqualsMatcher describe method - const EntityCollectionFbs *",
+TEST_CASE("EntityTransportEqualsMatcher describe method - const "
+          "EntityCollectionFbs *",
           "[unit][EntityTransport][matcher]") {
   // Create FlatBuffers for testing
   flatbuffers::FlatBufferBuilder builder1(1024);
@@ -282,8 +280,8 @@ TEST_CASE("EntityTransportEqualsMatcher describe method - const EntityCollection
   std::vector<flatbuffers::Offset<steamrot::EntityDataFbs>> entities2;
 
   auto entities_vector1 = builder1.CreateVector(entities1);
-  auto collection1 = steamrot::CreateEntityCollectionFbs(
-      builder1, entities_vector1, 5);
+  auto collection1 =
+      steamrot::CreateEntityCollectionFbs(builder1, entities_vector1, 5);
   builder1.Finish(collection1);
 
   auto entities_vector2 = builder2.CreateVector(entities2);

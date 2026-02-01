@@ -14,6 +14,7 @@
 #include "TestEngine.h"
 #include "add_uuids.h"
 #include "containers.h"
+#include "entities_generated.h"
 #include <variant>
 
 namespace steamrot::tests {
@@ -63,7 +64,7 @@ RunHarnessTests(const std::filesystem::path current_location) {
     }
   }
   // cycle through all test data and run tests
-  for (const auto &test_data : test_data_vec) {
+  for (auto &test_data : test_data_vec) {
 
     // create TestEngine instance
     TestEngine test_engine{test_data};
@@ -78,14 +79,32 @@ RunHarnessTests(const std::filesystem::path current_location) {
     if (!run_result) {
       return std::unexpected(run_result.error());
     }
+
+    // convert all entity transport variants in the test data to
+    // EntityMemoryPool
+    auto convert_result =
+        ConvertAllEntityTransportVariantsInTestData(test_data);
+
+    if (!convert_result) {
+      return std::unexpected(convert_result.error());
+    }
   }
 
   return std::monostate{};
 }
 
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo> ConvertEMPData(SceneData &scene_data) {
+std::expected<std::monostate, FailInfo>
+ConvertEntityTransportVariant(SceneData &scene_data) {
 
+  if (!std::holds_alternative<const EntityCollectionFbs *>(
+          scene_data.entity_transport)) {
+    return std::unexpected(FailInfo{
+        FailMode::VariantTypeMismatch,
+        "Invalid variant type in SceneData, "
+        "EntityCollectionFbs pointer is required",
+    });
+  }
   // check the SceneData entity configurator is not null
   if (scene_data.entity_configurator == nullptr) {
     return std::unexpected(FailInfo{
@@ -108,6 +127,40 @@ std::expected<std::monostate, FailInfo> ConvertEMPData(SceneData &scene_data) {
 
   scene_data.entity_transport = std::move(emp);
 
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConvertAllEntityTransportVariants(EngineSnapshot &engine_snapshot) {
+
+  for (auto &scene_data : engine_snapshot.scene_collection_data) {
+    auto convert_result = ConvertEntityTransportVariant(scene_data);
+    if (!convert_result) {
+      return std::unexpected(convert_result.error());
+    }
+  }
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConvertAllEntityTransportVariantsInTestData(TestData &test_data) {
+  // convert starting snapshot
+  auto convert_starting_result =
+      ConvertAllEntityTransportVariants(test_data.starting_engine_snapshot);
+  if (!convert_starting_result) {
+    return std::unexpected(convert_starting_result.error());
+  }
+
+  // convert all expected snapshots
+  for (auto &[tick, engine_snapshot] : test_data.expected_engine_snapshots) {
+    auto convert_expected_result =
+        ConvertAllEntityTransportVariants(engine_snapshot);
+    if (!convert_expected_result) {
+      return std::unexpected(convert_expected_result.error());
+    }
+  }
   return std::monostate{};
 }
 } // namespace steamrot::tests
