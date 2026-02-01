@@ -22,6 +22,9 @@ namespace steamrot {
 struct TestMetadataFbs;
 struct TestMetadataFbsBuilder;
 
+struct TickSnapshotPairFbs;
+struct TickSnapshotPairFbsBuilder;
+
 struct TestDataFbs;
 struct TestDataFbsBuilder;
 
@@ -142,6 +145,72 @@ inline ::flatbuffers::Offset<TestMetadataFbs> CreateTestMetadataFbsDirect(
 }
 
 ////////////////////////////////////////////////////////////
+/// @brief Represents a single tick-to-snapshot mapping
+///
+/// FlatBuffers doesn't support maps directly, so we represent
+/// the C++ std::map<size_t, EngineSnapshot> as a vector of these pairs.
+////////////////////////////////////////////////////////////
+struct TickSnapshotPairFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef TickSnapshotPairFbsBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_TICK = 4,
+    VT_SNAPSHOT = 6
+  };
+  /// @brief Tick number (key in the map)
+  uint64_t tick() const {
+    return GetField<uint64_t>(VT_TICK, 0);
+  }
+  bool KeyCompareLessThan(const TickSnapshotPairFbs * const o) const {
+    return tick() < o->tick();
+  }
+  int KeyCompareWithValue(uint64_t _tick) const {
+    return static_cast<int>(tick() > _tick) - static_cast<int>(tick() < _tick);
+  }
+  /// @brief Engine snapshot at this tick
+  const steamrot::EngineSnapshotFbs *snapshot() const {
+    return GetPointer<const steamrot::EngineSnapshotFbs *>(VT_SNAPSHOT);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint64_t>(verifier, VT_TICK, 8) &&
+           VerifyOffset(verifier, VT_SNAPSHOT) &&
+           verifier.VerifyTable(snapshot()) &&
+           verifier.EndTable();
+  }
+};
+
+struct TickSnapshotPairFbsBuilder {
+  typedef TickSnapshotPairFbs Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_tick(uint64_t tick) {
+    fbb_.AddElement<uint64_t>(TickSnapshotPairFbs::VT_TICK, tick, 0);
+  }
+  void add_snapshot(::flatbuffers::Offset<steamrot::EngineSnapshotFbs> snapshot) {
+    fbb_.AddOffset(TickSnapshotPairFbs::VT_SNAPSHOT, snapshot);
+  }
+  explicit TickSnapshotPairFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<TickSnapshotPairFbs> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<TickSnapshotPairFbs>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<TickSnapshotPairFbs> CreateTickSnapshotPairFbs(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint64_t tick = 0,
+    ::flatbuffers::Offset<steamrot::EngineSnapshotFbs> snapshot = 0) {
+  TickSnapshotPairFbsBuilder builder_(_fbb);
+  builder_.add_tick(tick);
+  builder_.add_snapshot(snapshot);
+  return builder_.Finish();
+}
+
+////////////////////////////////////////////////////////////
 /// @brief Root table for test data configuration
 ///
 /// This is the main container for test data. It's designed
@@ -154,7 +223,8 @@ struct TestDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_META_DATA = 4,
     VT_SIMULATION_DATA = 6,
     VT_NUM_TICKS = 8,
-    VT_STARTING_ENGINE_SNAPSHOT = 10
+    VT_STARTING_ENGINE_SNAPSHOT = 10,
+    VT_EXPECTED_ENGINE_SNAPSHOTS = 12
   };
   /// @brief Metadata about this test case
   const steamrot::TestMetadataFbs *meta_data() const {
@@ -173,6 +243,13 @@ struct TestDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::EngineSnapshotFbs *starting_engine_snapshot() const {
     return GetPointer<const steamrot::EngineSnapshotFbs *>(VT_STARTING_ENGINE_SNAPSHOT);
   }
+  /// @brief Expected engine snapshots at specific ticks
+  ///
+  /// Maps tick numbers to expected engine states for validation.
+  /// In C++, this becomes std::map<size_t, EngineSnapshot>.
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::TickSnapshotPairFbs>> *expected_engine_snapshots() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::TickSnapshotPairFbs>> *>(VT_EXPECTED_ENGINE_SNAPSHOTS);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_META_DATA) &&
@@ -182,6 +259,9 @@ struct TestDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<uint32_t>(verifier, VT_NUM_TICKS, 4) &&
            VerifyOffset(verifier, VT_STARTING_ENGINE_SNAPSHOT) &&
            verifier.VerifyTable(starting_engine_snapshot()) &&
+           VerifyOffset(verifier, VT_EXPECTED_ENGINE_SNAPSHOTS) &&
+           verifier.VerifyVector(expected_engine_snapshots()) &&
+           verifier.VerifyVectorOfTables(expected_engine_snapshots()) &&
            verifier.EndTable();
   }
 };
@@ -202,6 +282,9 @@ struct TestDataFbsBuilder {
   void add_starting_engine_snapshot(::flatbuffers::Offset<steamrot::EngineSnapshotFbs> starting_engine_snapshot) {
     fbb_.AddOffset(TestDataFbs::VT_STARTING_ENGINE_SNAPSHOT, starting_engine_snapshot);
   }
+  void add_expected_engine_snapshots(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::TickSnapshotPairFbs>>> expected_engine_snapshots) {
+    fbb_.AddOffset(TestDataFbs::VT_EXPECTED_ENGINE_SNAPSHOTS, expected_engine_snapshots);
+  }
   explicit TestDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -219,13 +302,32 @@ inline ::flatbuffers::Offset<TestDataFbs> CreateTestDataFbs(
     ::flatbuffers::Offset<steamrot::TestMetadataFbs> meta_data = 0,
     ::flatbuffers::Offset<steamrot::SimulationDataFbs> simulation_data = 0,
     uint32_t num_ticks = 1,
-    ::flatbuffers::Offset<steamrot::EngineSnapshotFbs> starting_engine_snapshot = 0) {
+    ::flatbuffers::Offset<steamrot::EngineSnapshotFbs> starting_engine_snapshot = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::TickSnapshotPairFbs>>> expected_engine_snapshots = 0) {
   TestDataFbsBuilder builder_(_fbb);
+  builder_.add_expected_engine_snapshots(expected_engine_snapshots);
   builder_.add_starting_engine_snapshot(starting_engine_snapshot);
   builder_.add_num_ticks(num_ticks);
   builder_.add_simulation_data(simulation_data);
   builder_.add_meta_data(meta_data);
   return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<TestDataFbs> CreateTestDataFbsDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<steamrot::TestMetadataFbs> meta_data = 0,
+    ::flatbuffers::Offset<steamrot::SimulationDataFbs> simulation_data = 0,
+    uint32_t num_ticks = 1,
+    ::flatbuffers::Offset<steamrot::EngineSnapshotFbs> starting_engine_snapshot = 0,
+    std::vector<::flatbuffers::Offset<steamrot::TickSnapshotPairFbs>> *expected_engine_snapshots = nullptr) {
+  auto expected_engine_snapshots__ = expected_engine_snapshots ? _fbb.CreateVectorOfSortedTables<steamrot::TickSnapshotPairFbs>(expected_engine_snapshots) : 0;
+  return steamrot::CreateTestDataFbs(
+      _fbb,
+      meta_data,
+      simulation_data,
+      num_ticks,
+      starting_engine_snapshot,
+      expected_engine_snapshots__);
 }
 
 inline const steamrot::TestDataFbs *GetTestDataFbs(const void *buf) {
