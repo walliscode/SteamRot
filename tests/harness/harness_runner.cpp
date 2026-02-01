@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "harness_runner.h"
+#include "EngineSnapshotEqualsMatcher.h"
 #include "EntityTransportVariant.h"
 #include "EventHandler.h"
 #include "FailInfo.h"
@@ -15,6 +16,8 @@
 #include "add_uuids.h"
 #include "containers.h"
 #include "entities_generated.h"
+#include "test_context.h"
+#include <catch2/catch_test_macros.hpp>
 #include <variant>
 
 namespace steamrot::tests {
@@ -87,6 +90,12 @@ RunHarnessTests(const std::filesystem::path current_location) {
 
     if (!convert_result) {
       return std::unexpected(convert_result.error());
+    }
+
+    // compare the snapshots from TestEngine against expected snapshots
+    auto comparison_result = RunSnapshotComparisons(test_engine, test_data);
+    if (!comparison_result) {
+      return std::unexpected(comparison_result.error());
     }
   }
 
@@ -161,6 +170,71 @@ ConvertAllEntityTransportVariantsInTestData(TestData &test_data) {
       return std::unexpected(convert_expected_result.error());
     }
   }
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+CompareEngineSnapshots(const EngineSnapshot &actual,
+                       const EngineSnapshot &expected,
+                       const std::string &test_name, uint32_t tick) {
+
+  // Create TestContext for enriched error messages
+  TestContext context;
+  context.test_name = test_name;
+  context.current_tick = tick;
+  context.total_ticks = tick; // Set to current tick as total
+
+  // Create matcher with context
+  EngineSnapshotEqualsMatcher matcher(expected, context);
+
+  // Perform comparison using Catch2 matcher
+  if (!matcher.match(actual)) {
+    return std::unexpected(FailInfo{
+        FailMode::ComparisonFailed,
+        matcher.describe(),
+    });
+  }
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+RunSnapshotComparisons(const TestEngine &test_engine,
+                       const TestData &test_data) {
+
+  const auto &data_bank = test_engine.GetDataBank();
+  const auto &expected_snapshots = test_data.expected_engine_snapshots;
+
+  // Extract test name from metadata
+  std::string test_name = test_data.meta_data.test_name;
+
+  // Iterate through all expected snapshots
+  for (const auto &[expected_tick, expected_snapshot] : expected_snapshots) {
+
+    // Check if the actual snapshot exists for this tick
+    auto actual_it = data_bank.find(expected_tick);
+    if (actual_it == data_bank.end()) {
+      return std::unexpected(FailInfo{
+          FailMode::None,
+          std::format("Test '{}': Expected snapshot at tick {} not found in "
+                      "TestEngine data bank",
+                      test_name, expected_tick),
+      });
+    }
+
+    const EngineSnapshot &actual_snapshot = actual_it->second;
+
+    // Compare the snapshots
+    auto comparison_result = CompareEngineSnapshots(
+        actual_snapshot, expected_snapshot, test_name, expected_tick);
+
+    if (!comparison_result.has_value()) {
+      return std::unexpected(comparison_result.error());
+    }
+  }
+
   return std::monostate{};
 }
 } // namespace steamrot::tests
