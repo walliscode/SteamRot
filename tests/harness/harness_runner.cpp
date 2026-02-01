@@ -17,7 +17,7 @@
 #include "containers.h"
 #include "entities_generated.h"
 #include "test_context.h"
-#include <catch2/catch_test_macros.hpp>
+#include <format>
 #include <variant>
 
 namespace steamrot::tests {

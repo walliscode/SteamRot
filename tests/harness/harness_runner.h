@@ -16,10 +16,15 @@
 #include "FailInfo.h"
 #include "SceneData.h"
 #include "TestData.h"
+#include <cstdint>
 #include <expected>
 #include <filesystem>
+#include <string>
 #include <variant>
 namespace steamrot::tests {
+
+// Forward declarations
+class TestEngine;
 
 /////////////////////////////////////////////////
 /// @brief Wrapper function to run all harness tests located in the adjacent
