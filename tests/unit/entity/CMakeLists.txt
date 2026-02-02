@@ -7,7 +7,6 @@ add_executable(test_entity
   EntityManager.test.cpp
   ArchetypeManager.test.cpp
   FlatbuffersEntityConfigurator.test.cpp
-  # FlatbuffersEntityImporter.test.cpp
   FlatbuffersUIElementProvider.test.cpp
 
 )
@@ -22,8 +21,6 @@ target_link_libraries(test_entity
   Catch2::Catch2WithMain
   entity
   context_test_helpers
-
-
 )
 
 # Ensure test data is compiled before building tests

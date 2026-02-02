@@ -12,6 +12,9 @@ add_subdirectory(matchers)
 add_subdirectory(harness)
 add_subdirectory(reporters)
 
+# all tests run through the harness (test_data.json)
+add_subdirectory(simulation_tests)
+
 # Test structure organized by test type
 add_subdirectory(unit)
 # add_subdirectory(integration)
