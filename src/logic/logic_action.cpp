@@ -108,6 +108,10 @@ void ProcessButtonElementActions(ButtonElement &button_element,
       }
       
       event_handler.AddEvent(button_element.response_event.value());
+    } else {
+      // Add debug to catch buttons without response_event (helps debug configuration issues)
+      std::cout << "[DEBUG QUIT] WARNING: Mouse over button but it has NO response_event!" 
+                << std::endl;
     }
   }
 }
