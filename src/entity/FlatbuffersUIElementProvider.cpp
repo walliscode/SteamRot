@@ -15,6 +15,7 @@
 #include "PanelElement.h"
 #include "configure_ui_elements.h"
 #include "user_interface_generated.h"
+#include <spdlog/spdlog.h>
 #include <string>
 
 namespace steamrot {
@@ -87,6 +88,11 @@ FlatbuffersUIElementProvider::CreateUIElement(
   case UIElementDataUnion::UIElementDataUnion_ButtonData: {
     auto button_data = static_cast<const ButtonData *>(data);
     auto button = std::make_unique<ButtonElement>();
+    
+    spdlog::debug("[CreateUIElement] Creating ButtonElement at {} with label: '{}'", 
+                  static_cast<const void*>(button.get()),
+                  button_data->label() ? button_data->label()->c_str() : "NO_LABEL");
+    
     auto config_result =
         data::configure::ConfigureButtonElement(*button, *button_data);
     if (!config_result.has_value())
@@ -147,6 +153,9 @@ FlatbuffersUIElementProvider::CreateUIElement(
 
   // Only call this once! for configuring the base data
   if (base_data) {
+    spdlog::debug("[CreateUIElement] Configuring base data for element at {}", 
+                  static_cast<const void*>(element.get()));
+    
     // Create a callback that captures 'this' and calls CreateUIElement
     auto create_callback = [this](const UIElementDataUnion &data_type,
                                   const void *data)
@@ -158,6 +167,10 @@ FlatbuffersUIElementProvider::CreateUIElement(
         *element, *base_data, m_event_handler, create_callback);
     if (!base_config_result.has_value())
       return std::unexpected(base_config_result.error());
+      
+    spdlog::debug("[CreateUIElement] After ConfigureBaseUIElement - element at {} has response_event: {}", 
+                  static_cast<const void*>(element.get()),
+                  element->response_event.has_value());
   }
 
   // return unexpected if element is still null

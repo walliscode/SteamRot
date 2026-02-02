@@ -11,6 +11,7 @@
 #include "event_factory.h"
 #include "event_type_conversion.h"
 #include "subscriber_factory.h"
+#include <spdlog/spdlog.h>
 #include <string>
 
 namespace steamrot::data::configure {
@@ -56,6 +57,9 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
         const UIElementDataUnion &, const void *)>
         create_ui_element_callback) {
 
+  spdlog::debug("[ConfigureBaseUIElement] Configuring element at address: {}", 
+                static_cast<const void*>(&element));
+
   element.position = sf::Vector2f({data.position()->x(), data.position()->y()});
   element.size = sf::Vector2f({data.size()->x(), data.size()->y()});
 
@@ -66,6 +70,9 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
   // set Subscription if subscriber_data exists and EventTypeFbs is not none
   if (data.subscriber_data() && (data.subscriber_data()->event_type_data() !=
                                  EventTypeFbs_EVENT_NONE)) {
+
+    spdlog::debug("[ConfigureBaseUIElement] Element {} has subscriber_data", 
+                  static_cast<const void*>(&element));
 
     // Create vector with single subscriber
     std::vector<const SubscriberFbs *> subscribers_fbs{data.subscriber_data()};
@@ -81,14 +88,25 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
     std::shared_ptr<Subscriber> subscriber =
         std::make_shared<Subscriber>(result.value());
     element.subscription = subscriber;
+    
+    spdlog::debug("[ConfigureBaseUIElement] Created subscription at {} for element {}", 
+                  static_cast<const void*>(subscriber.get()),
+                  static_cast<const void*>(&element));
+    
     auto register_result = event_handler.RegisterSubscriber(subscriber);
     if (!register_result.has_value())
       return std::unexpected(register_result.error());
+  } else {
+    spdlog::debug("[ConfigureBaseUIElement] Element {} has NO subscriber_data", 
+                  static_cast<const void*>(&element));
   }
 
   // set ResponseEvent if response_event_data exists and EventTypeFbs is not none
   if (data.response_event_data() &&
       (data.response_event_data()->event_type() != EventTypeFbs_EVENT_NONE)) {
+
+    spdlog::debug("[ConfigureBaseUIElement] Element {} has response_event_data", 
+                  static_cast<const void*>(&element));
 
     // set EventTypeFbs
     if (!data.response_event_data()->event_type()) {
@@ -104,6 +122,9 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
     }
     EventType event_type = event_type_result.value();
 
+    spdlog::debug("[ConfigureBaseUIElement] Element {} event_type: {}", 
+                  static_cast<const void*>(&element), static_cast<int>(event_type));
+
     // create EventData by running the flatbuffers data through the factory
     auto event_data_conversion_result = event::CreateEventData(
         data.response_event_data()->event_data_data_type(),
@@ -117,6 +138,12 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
     EventPacket event_packet(event_type, event_data,
                              data.response_event_data()->event_lifetime());
     element.response_event = event_packet;
+    
+    spdlog::debug("[ConfigureBaseUIElement] Set response_event on element {} with event_type: {}", 
+                  static_cast<const void*>(&element), static_cast<int>(event_type));
+  } else {
+    spdlog::debug("[ConfigureBaseUIElement] Element {} has NO response_event_data", 
+                  static_cast<const void*>(&element));
   }
 
   element.spacing_strategy = ConvertSpacingAndSizing(data.spacing_strategy());
@@ -154,6 +181,8 @@ std::expected<std::monostate, FailInfo>
 ConfigureButtonElement(ButtonElement &button_element, const ButtonData &data) {
   if (data.label()) {
     button_element.label = data.label()->str();
+    spdlog::debug("[ConfigureButtonElement] Button at {} configured with label: '{}'", 
+                  static_cast<const void*>(&button_element), button_element.label);
   }
   return std::monostate{};
 }

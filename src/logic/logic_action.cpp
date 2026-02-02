@@ -12,6 +12,7 @@
 #include "entity_memory.h"
 #include "logic_ui.h"
 #include <iostream>
+#include <spdlog/spdlog.h>
 
 namespace steamrot {
 namespace logic {
@@ -84,15 +85,27 @@ void ProcessNestedUIActionsAndEvents(UIElement &ui_element,
 void ProcessButtonElementActions(ButtonElement &button_element,
                                  EventHandler &event_handler) {
 
+  spdlog::debug("[ProcessButtonElementActions] Processing button at {} with label: '{}'", 
+                static_cast<const void*>(&button_element), button_element.label);
+  
+  spdlog::debug("[ProcessButtonElementActions] Button is_mouse_over: {}, has response_event: {}", 
+                button_element.is_mouse_over, 
+                button_element.response_event.has_value());
+
   // for now, all buttons need a mouse over to be clicked, so this will be the
   // top level flow control
 
   if (button_element.is_mouse_over) {
     // check if button has an event packet. for now, all event packets are sent
     // to the global event bus
-    if (button_element.response_event.has_value())
-
+    if (button_element.response_event.has_value()) {
+      spdlog::debug("[ProcessButtonElementActions] Button '{}' at {} triggering response_event with type: {}", 
+                    button_element.label,
+                    static_cast<const void*>(&button_element),
+                    static_cast<int>(button_element.response_event.value().m_event_type));
+      
       event_handler.AddEvent(button_element.response_event.value());
+    }
   }
 }
 
