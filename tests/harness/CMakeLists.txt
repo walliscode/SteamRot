@@ -16,5 +16,6 @@ target_link_libraries(harness
   PUBLIC
   engine
   types
+  matchers
 )
 
