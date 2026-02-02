@@ -90,9 +90,18 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
 
   // set ResponseEvent if response_event_data exists and EventTypeFbs is not
   // none
+  std::cout << "[DEBUG] Checking response_event_data..." << std::endl;
+  if (data.response_event_data()) {
+    std::cout << "[DEBUG] response_event_data exists, event_type: "
+              << static_cast<int>(data.response_event_data()->event_type())
+              << std::endl;
+  }
+  
   if (data.response_event_data() &&
       (data.response_event_data()->event_type() != EventTypeFbs_EVENT_NONE)) {
 
+    std::cout << "[DEBUG] Entering response_event configuration block" << std::endl;
+    
     // set EventTypeFbs
     if (!data.response_event_data()->event_type()) {
       return std::unexpected(
@@ -107,8 +116,13 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
       return std::unexpected(event_type_result.error());
     }
     EventType event_type = event_type_result.value();
-    std::cout << "Configuring ResponseEvent of type: "
+    std::cout << "[DEBUG] Configuring ResponseEvent of type: "
               << EnumNameEventType(event_type) << std::endl;
+    
+    std::cout << "[DEBUG] event_data_data_type: "
+              << static_cast<int>(data.response_event_data()->event_data_data_type())
+              << std::endl;
+    
     // create EventData by running the flatbuffers data through the factory
     auto event_data_conversion_result = event::CreateEventData(
         data.response_event_data()->event_data_data_type(),
@@ -122,6 +136,10 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
     EventPacket event_packet(event_type, event_data,
                              data.response_event_data()->event_lifetime());
     element.response_event = event_packet;
+    
+    std::cout << "[DEBUG] ResponseEvent successfully configured on element!" << std::endl;
+  } else {
+    std::cout << "[DEBUG] Skipping response_event configuration (data missing or type is NONE)" << std::endl;
   }
 
   element.spacing_strategy = ConvertSpacingAndSizing(data.spacing_strategy());

@@ -29,10 +29,22 @@ void EventHandler::PreloadEvents(sf::RenderWindow &window) {
 
 /////////////////////////////////////////////////
 void EventHandler::ProcessWaitingRoomEventBus() {
+  std::cout << "[DEBUG] ProcessWaitingRoomEventBus - Processing "
+            << m_waiting_room_event_bus.size() << " events from waiting room"
+            << std::endl;
+  
+  for (const auto &event : m_waiting_room_event_bus) {
+    std::cout << "[DEBUG] Moving event to global bus: "
+              << EnumNameEventType(event.event_type) << std::endl;
+  }
+  
   // add all events from the waiting room event bus to the global event bus
   AddToGlobalEventBus(m_waiting_room_event_bus);
   // clear the waiting room event bus
   m_waiting_room_event_bus.clear();
+  
+  std::cout << "[DEBUG] Global event bus now has " << m_global_event_bus.size()
+            << " events" << std::endl;
 }
 /////////////////////////////////////////////////
 void EventHandler::AddToGlobalEventBus(const std::vector<EventPacket> &events) {
@@ -118,23 +130,42 @@ EventHandler::GetSubcriberRegister() const {
 
 /////////////////////////////////////////////////
 void EventHandler::UpdateSubscribersFromGlobalEventBus() {
+  std::cout << "[DEBUG] UpdateSubscribersFromGlobalEventBus - Processing "
+            << m_global_event_bus.size() << " events" << std::endl;
+  
   // go through each event in the global event bus
   for (const auto &event : m_global_event_bus) {
 
+    std::cout << "[DEBUG] Processing event: " << EnumNameEventType(event.event_type)
+              << std::endl;
+    std::cout << "[DEBUG] Checking if subscriber register contains this event type..."
+              << std::endl;
+    
     if (m_subscriber_register.contains(event.event_type)) {
 
+      std::cout << "[DEBUG] Found " << m_subscriber_register.at(event.event_type).size()
+                << " subscribers for " << EnumNameEventType(event.event_type)
+                << std::endl;
+      
       // go through each subscriber registered for the event type
       for (auto &subscriber_weak : m_subscriber_register.at(event.event_type)) {
 
         // pass to the UpdateSubscriber function
         UpdateSubscriber(subscriber_weak, event.event_data);
       }
+    } else {
+      std::cout << "[DEBUG] No subscribers registered for event type: "
+                << EnumNameEventType(event.event_type) << std::endl;
     }
   }
 }
 /////////////////////////////////////////////////
 void EventHandler::AddEvent(const EventPacket &event) {
+  std::cout << "[DEBUG] EventHandler::AddEvent - Adding event to waiting room: "
+            << EnumNameEventType(event.event_type) << std::endl;
   m_waiting_room_event_bus.push_back(event);
+  std::cout << "[DEBUG] Waiting room size: " << m_waiting_room_event_bus.size()
+            << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -165,12 +196,21 @@ void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
                       const EventData &event_data) {
 
   auto locked_subscriber = subscriber.lock();
-  if (!locked_subscriber)
+  if (!locked_subscriber) {
+    std::cout << "[DEBUG] UpdateSubscriber - Subscriber expired, skipping"
+              << std::endl;
     // if the Subscriber has expired, do nothing
     return;
+  }
+
+  std::cout << "[DEBUG] UpdateSubscriber - Subscriber for event type: "
+            << EnumNameEventType(locked_subscriber->m_trigger_event_type)
+            << std::endl;
 
   // if the Subscriber has trigger data, compare against the event data
   if (locked_subscriber->m_trigger_event_data.has_value()) {
+    std::cout << "[DEBUG] Subscriber has trigger data, checking match..."
+              << std::endl;
     const auto &trigger_data = locked_subscriber->m_trigger_event_data.value();
 
     // For UserInputBitset: use subset matching (trigger bits must be present in
@@ -182,16 +222,27 @@ void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
 
       // Check if all trigger bits are present in event bits (subset matching)
       if ((trigger_bits & event_bits) != trigger_bits) {
+        std::cout << "[DEBUG] Trigger bits not matched, subscriber not activated"
+                  << std::endl;
         return; // Required bits not present in event
       }
+      std::cout << "[DEBUG] Trigger bits matched!" << std::endl;
     }
     // For other types: use exact equality
     else if (trigger_data != event_data) {
+      std::cout << "[DEBUG] Trigger data not matched, subscriber not activated"
+                << std::endl;
       return;
     }
+  } else {
+    std::cout << "[DEBUG] Subscriber has NO trigger data (will activate for any event of this type)"
+              << std::endl;
   }
 
   // activate the subscriber and store the received event data
+  std::cout << "[DEBUG] ACTIVATING subscriber for "
+            << EnumNameEventType(locked_subscriber->m_trigger_event_type)
+            << std::endl;
   locked_subscriber->m_active = true;
   locked_subscriber->m_received_event_data = event_data;
 }

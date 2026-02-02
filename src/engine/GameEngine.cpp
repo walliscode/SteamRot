@@ -63,23 +63,30 @@ void GameEngine::TickRendering() {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> GameEngine::ProcessSubscriptions() {
+  std::cout << "[DEBUG] GameEngine::ProcessSubscriptions - Checking "
+            << m_engine_state.subscriptions.size() << " engine subscriptions"
+            << std::endl;
+  
   // cycle through all subscribers and process active ones
   for (const auto &subscriber : m_engine_state.subscriptions) {
 
     // only process active subscribers
     if (subscriber->m_active) {
 
-      std::cout << "Processing subscription for event type: "
+      std::cout << "[DEBUG] Processing ACTIVE subscription for event type: "
                 << EnumNameEventType(subscriber->m_trigger_event_type)
                 << std::endl;
       // switch on the EventType
       switch (subscriber->m_trigger_event_type) {
       case EventType::QUIT_GAME: {
+        std::cout << "[DEBUG] *** QUIT_GAME event detected! Closing window! ***"
+                  << std::endl;
         // close the window to quit the game
         m_engine_resources.game_window.close();
         break;
       }
       default:
+        std::cout << "[DEBUG] Event type has no handler in GameEngine" << std::endl;
         break;
       }
 
@@ -87,6 +94,8 @@ std::expected<std::monostate, FailInfo> GameEngine::ProcessSubscriptions() {
       subscriber->m_active = false;
     }
   }
+  
+  std::cout << "[DEBUG] GameEngine::ProcessSubscriptions - Complete" << std::endl;
   return std::monostate{};
 }
 
