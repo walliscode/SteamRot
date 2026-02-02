@@ -150,21 +150,50 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
   element.layout = ConvertLayout(data.layout());
   element.children_active = data.children_active();
 
+  spdlog::debug("[ConfigureBaseUIElement] Before processing children - element {} response_event: {}", 
+                static_cast<const void*>(&element), element.response_event.has_value());
+
   // Recursively create and attach children
   if (data.children()) {
+    spdlog::debug("[ConfigureBaseUIElement] Element {} has {} children to process", 
+                  static_cast<const void*>(&element), data.children()->size());
+    
+    size_t child_index = 0;
     for (auto child_fb : *data.children()) {
-      if (!child_fb)
+      if (!child_fb) {
+        spdlog::debug("[ConfigureBaseUIElement] Child {} is null, skipping", child_index);
+        child_index++;
         continue;
+      }
       auto type = child_fb->element_type();
       auto child_table = child_fb->element();
-      if (!child_table)
+      if (!child_table) {
+        spdlog::debug("[ConfigureBaseUIElement] Child {} has null element table, skipping", child_index);
+        child_index++;
         continue;
+      }
+      
+      spdlog::debug("[ConfigureBaseUIElement] Processing child {} with type {}", 
+                    child_index, static_cast<int>(type));
+      
       auto child_element_result = create_ui_element_callback(type, child_table);
       if (!child_element_result.has_value())
         return std::unexpected(child_element_result.error());
-      element.child_elements.push_back(std::move(child_element_result.value()));
+      
+      auto& created_child = child_element_result.value();
+      spdlog::debug("[ConfigureBaseUIElement] Created child {} at address {}", 
+                    child_index, static_cast<const void*>(created_child.get()));
+      
+      element.child_elements.push_back(std::move(created_child));
+      child_index++;
     }
+    
+    spdlog::debug("[ConfigureBaseUIElement] Finished processing {} children for element {}", 
+                  element.child_elements.size(), static_cast<const void*>(&element));
   }
+
+  spdlog::debug("[ConfigureBaseUIElement] After processing children - element {} response_event: {}", 
+                static_cast<const void*>(&element), element.response_event.has_value());
 
   return std::monostate{};
 }
