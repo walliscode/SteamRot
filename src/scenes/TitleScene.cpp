@@ -20,13 +20,13 @@ void TitleScene::sRender() {
   // clear the render texture and the start of each Scene render step
   m_scene_resources.scene_texture.clear(sf::Color::Black);
 
-  if (m_scene_resources.logic_map.find(LogicType::Render) ==
-      m_scene_resources.logic_map.end()) {
-  }
   for (auto &render_logic : m_scene_resources.logic_map[LogicType::Render]) {
 
     render_logic->RunLogic();
   }
+
+  // display the render texture at the end of each Scene render step
+  m_scene_resources.scene_texture.display();
 }
 
 /////////////////////////////////////////////////

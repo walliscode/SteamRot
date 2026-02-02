@@ -13,6 +13,14 @@
 
           "root_ui_element": {
             "base_data": {
+              "position": {
+                "x": 325,
+                "y": 150
+              },
+              "size": {
+                "x": 250,
+                "y": 300
+              },
               "spacing_strategy": "Even",
               "layout": "Vertical",
               "children_active": true,
@@ -79,15 +87,7 @@
                     "label": "Quit Game"
                   }
                 }
-              ],
-              "position": {
-                "x": 325,
-                "y": 150
-              },
-              "size": {
-                "x": 250,
-                "y": 300
-              }
+              ]
             }
           }
         }

@@ -16,6 +16,7 @@
 #include <SFML/Graphics/VertexArray.hpp>
 #include <expected>
 #include <format>
+#include <iostream>
 #include <vector>
 
 namespace steamrot {
@@ -44,6 +45,8 @@ FlatbuffersDataLoader::ProvideDefaultSceneData(
     return std::unexpected(
         FailInfo(FailMode::SceneTypeNotFound, "Invalid SceneType provided"));
   }
+  std::cout << "Loading scene data for scene type: " << scene_file_prefix
+            << std::endl;
 
   // get the SceneDirectory
   std::filesystem::path scene_dir = paths::GetSceneDirectory();
