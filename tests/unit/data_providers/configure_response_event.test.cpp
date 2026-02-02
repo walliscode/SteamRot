@@ -13,6 +13,7 @@
 #include "configure_ui_elements.h"
 #include "event_packet_data_generated.h"
 #include "events_generated.h"
+#include "types_generated.h"
 #include "user_interface_generated.h"
 #include <catch2/catch_test_macros.hpp>
 #include <flatbuffers/flatbuffers.h>
@@ -32,8 +33,8 @@ TEST_CASE("ConfigureBaseUIElement sets response_event for data-less QUIT_GAME",
       0);  // No event_data_data offset
 
   // Create minimal UIElementData with response_event_data
-  auto position = steamrot::CreateVector2(builder, 0, 0);
-  auto size = steamrot::CreateVector2(builder, 100, 50);
+  auto position = steamrot::CreateVector2fData(builder, 0.0f, 0.0f);
+  auto size = steamrot::CreateVector2fData(builder, 100.0f, 50.0f);
   
   auto ui_element_data = steamrot::CreateUIElementData(
       builder,
@@ -102,8 +103,8 @@ TEST_CASE("ConfigureBaseUIElement skips response_event when event_type is NONE",
       0);
 
   // Create minimal UIElementData with response_event_data
-  auto position = steamrot::CreateVector2(builder, 0, 0);
-  auto size = steamrot::CreateVector2(builder, 100, 50);
+  auto position = steamrot::CreateVector2fData(builder, 0.0f, 0.0f);
+  auto size = steamrot::CreateVector2fData(builder, 100.0f, 50.0f);
   
   auto ui_element_data = steamrot::CreateUIElementData(
       builder,
