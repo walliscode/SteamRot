@@ -20,8 +20,8 @@ void UIRenderLogic::ProcessLogic() {
   // Draw all UI elements to the render texture
   DrawUIElements();
 
-  // display the render texture after drawing
-  m_scene_context.scene_texture.display();
+  // NOTE: display() is now called by the Scene's sRender() method
+  // after all render logic has completed, not here.
 }
 
 void UIRenderLogic::DrawUIElements() {
