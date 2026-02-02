@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersEntityConfigurator.h"
+#include "ButtonElement.h"
 #include "CMachinaForm.h"
 #include "EntityTransportVariant.h"
 #include "FailInfo.h"
@@ -16,6 +17,7 @@
 #include "subscriber_factory.h"
 #include "ui_state_generated.h"
 #include <expected>
+#include <spdlog/spdlog.h>
 #include <variant>
 
 namespace steamrot {
@@ -167,6 +169,26 @@ FlatbuffersEntityConfigurator::ConfigureCUserInterface(
     return std::unexpected(root_element_result.error());
 
   ui_component.m_root_element = std::move(root_element_result.value());
+  
+  // Debug logging to verify children configuration
+  if (ui_component.m_root_element) {
+    spdlog::debug("[ConfigureCUserInterface] Root element at {} has {} children", 
+                  static_cast<const void*>(ui_component.m_root_element.get()),
+                  ui_component.m_root_element->child_elements.size());
+    
+    for (size_t i = 0; i < ui_component.m_root_element->child_elements.size(); ++i) {
+      const auto& child = ui_component.m_root_element->child_elements[i];
+      if (ButtonElement* btn = dynamic_cast<ButtonElement*>(child.get())) {
+        spdlog::debug("[ConfigureCUserInterface] Child {} at {} is ButtonElement with label '{}', has response_event: {}", 
+                      i, static_cast<const void*>(child.get()), btn->label,
+                      child->response_event.has_value());
+        if (child->response_event.has_value()) {
+          spdlog::debug("[ConfigureCUserInterface] Child {}'s response_event type: {}", 
+                        i, static_cast<int>(child->response_event.value().m_event_type));
+        }
+      }
+    }
+  }
 
   return std::monostate{};
 }
