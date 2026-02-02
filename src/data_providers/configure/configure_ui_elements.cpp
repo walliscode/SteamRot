@@ -108,9 +108,13 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
     }
     EventType event_type = event_type_result.value();
     
-    // Only debug for QUIT_GAME events
+    // Debug ALL response_event configuration to catch the bug
+    std::cout << "[DEBUG QUIT] Configuring ResponseEvent of type: "
+              << EnumNameEventType(event_type) << " on element at position ("
+              << data.position()->x() << ", " << data.position()->y() << ")"
+              << std::endl;
+    
     if (event_type == EventType::QUIT_GAME) {
-      std::cout << "[DEBUG QUIT] Configuring ResponseEvent of type: QUIT_GAME" << std::endl;
       std::cout << "[DEBUG QUIT] event_data_data_type: "
                 << static_cast<int>(data.response_event_data()->event_data_data_type())
                 << std::endl;
@@ -130,9 +134,8 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
                              data.response_event_data()->event_lifetime());
     element.response_event = event_packet;
     
-    if (event_type == EventType::QUIT_GAME) {
-      std::cout << "[DEBUG QUIT] ResponseEvent successfully configured on element!" << std::endl;
-    }
+    std::cout << "[DEBUG QUIT] ResponseEvent " << EnumNameEventType(event_type)
+              << " successfully configured on element!" << std::endl;
   }
 
   element.spacing_strategy = ConvertSpacingAndSizing(data.spacing_strategy());
@@ -141,6 +144,10 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
 
   // Recursively create and attach children
   if (data.children()) {
+    std::cout << "[DEBUG QUIT] Processing " << data.children()->size()
+              << " children for element at position (" << data.position()->x()
+              << ", " << data.position()->y() << ")" << std::endl;
+    
     for (auto child_fb : *data.children()) {
       if (!child_fb)
         continue;
@@ -153,6 +160,9 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
         return std::unexpected(child_element_result.error());
       element.child_elements.push_back(std::move(child_element_result.value()));
     }
+    
+    std::cout << "[DEBUG QUIT] Finished processing children. Total child_elements: "
+              << element.child_elements.size() << std::endl;
   }
 
   return std::monostate{};
