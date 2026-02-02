@@ -32,7 +32,8 @@ void ProcessUIActionsAndEvents(UIElement &ui_element,
     return;
   }
 
-  std::cout << "[DEBUG] ProcessUIActionsAndEvents: Subscription is ACTIVE for event type: "
+  // Only debug when subscription is active (which means user interaction occurred)
+  std::cout << "[DEBUG QUIT] ProcessUIActionsAndEvents: Subscription is ACTIVE for event type: "
             << EnumNameEventType(ui_element.subscription->m_trigger_event_type)
             << std::endl;
 
@@ -40,7 +41,7 @@ void ProcessUIActionsAndEvents(UIElement &ui_element,
   if (ButtonElement *button_element =
           dynamic_cast<ButtonElement *>(&ui_element)) {
 
-    std::cout << "[DEBUG] Element is a ButtonElement, calling ProcessButtonElementActions"
+    std::cout << "[DEBUG QUIT] Element is a ButtonElement, calling ProcessButtonElementActions"
               << std::endl;
     ProcessButtonElementActions(*button_element, event_handler);
   } else if (DropDownListElement *dropdown_list_element =
@@ -92,28 +93,22 @@ void ProcessButtonElementActions(ButtonElement &button_element,
 
   // for now, all buttons need a mouse over to be clicked, so this will be the
   // top level flow control
-
-  std::cout << "[DEBUG] ProcessButtonElementActions: is_mouse_over = "
-            << button_element.is_mouse_over << std::endl;
   
   if (button_element.is_mouse_over) {
-    std::cout << "[DEBUG] Mouse is over button, checking for response_event..."
-              << std::endl;
-    
     // check if button has an event packet. for now, all event packets are sent
     // to the global event bus
     if (button_element.response_event.has_value()) {
-      std::cout << "[DEBUG] Button has response_event! Event type: "
-                << EnumNameEventType(button_element.response_event.value().event_type)
-                << std::endl;
-      std::cout << "[DEBUG] Adding response_event to EventHandler" << std::endl;
+      const auto& event_type = button_element.response_event.value().event_type;
+      
+      // Only debug for QUIT_GAME events
+      if (event_type == EventType::QUIT_GAME) {
+        std::cout << "[DEBUG QUIT] Mouse is over QUIT button!" << std::endl;
+        std::cout << "[DEBUG QUIT] Button has QUIT_GAME response_event!" << std::endl;
+        std::cout << "[DEBUG QUIT] Adding QUIT_GAME event to EventHandler" << std::endl;
+      }
       
       event_handler.AddEvent(button_element.response_event.value());
-    } else {
-      std::cout << "[DEBUG] Button does NOT have a response_event!" << std::endl;
     }
-  } else {
-    std::cout << "[DEBUG] Mouse is NOT over button, skipping action" << std::endl;
   }
 }
 

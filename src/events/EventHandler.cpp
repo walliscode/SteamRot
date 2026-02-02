@@ -29,13 +29,14 @@ void EventHandler::PreloadEvents(sf::RenderWindow &window) {
 
 /////////////////////////////////////////////////
 void EventHandler::ProcessWaitingRoomEventBus() {
-  std::cout << "[DEBUG] ProcessWaitingRoomEventBus - Processing "
-            << m_waiting_room_event_bus.size() << " events from waiting room"
-            << std::endl;
-  
+  // Check if there are any QUIT_GAME events to debug
+  bool has_quit_event = false;
   for (const auto &event : m_waiting_room_event_bus) {
-    std::cout << "[DEBUG] Moving event to global bus: "
-              << EnumNameEventType(event.event_type) << std::endl;
+    if (event.event_type == EventType::QUIT_GAME) {
+      has_quit_event = true;
+      std::cout << "[DEBUG QUIT] ProcessWaitingRoomEventBus - Found QUIT_GAME event in waiting room"
+                << std::endl;
+    }
   }
   
   // add all events from the waiting room event bus to the global event bus
@@ -43,8 +44,10 @@ void EventHandler::ProcessWaitingRoomEventBus() {
   // clear the waiting room event bus
   m_waiting_room_event_bus.clear();
   
-  std::cout << "[DEBUG] Global event bus now has " << m_global_event_bus.size()
-            << " events" << std::endl;
+  if (has_quit_event) {
+    std::cout << "[DEBUG QUIT] QUIT_GAME event moved to global bus (total events: "
+              << m_global_event_bus.size() << ")" << std::endl;
+  }
 }
 /////////////////////////////////////////////////
 void EventHandler::AddToGlobalEventBus(const std::vector<EventPacket> &events) {
@@ -130,22 +133,23 @@ EventHandler::GetSubcriberRegister() const {
 
 /////////////////////////////////////////////////
 void EventHandler::UpdateSubscribersFromGlobalEventBus() {
-  std::cout << "[DEBUG] UpdateSubscribersFromGlobalEventBus - Processing "
-            << m_global_event_bus.size() << " events" << std::endl;
-  
   // go through each event in the global event bus
   for (const auto &event : m_global_event_bus) {
 
-    std::cout << "[DEBUG] Processing event: " << EnumNameEventType(event.event_type)
-              << std::endl;
-    std::cout << "[DEBUG] Checking if subscriber register contains this event type..."
-              << std::endl;
+    // Only debug for QUIT_GAME events
+    if (event.event_type == EventType::QUIT_GAME) {
+      std::cout << "[DEBUG QUIT] UpdateSubscribersFromGlobalEventBus - Processing QUIT_GAME event"
+                << std::endl;
+      std::cout << "[DEBUG QUIT] Checking if subscriber register contains QUIT_GAME..."
+                << std::endl;
+    }
     
     if (m_subscriber_register.contains(event.event_type)) {
 
-      std::cout << "[DEBUG] Found " << m_subscriber_register.at(event.event_type).size()
-                << " subscribers for " << EnumNameEventType(event.event_type)
-                << std::endl;
+      if (event.event_type == EventType::QUIT_GAME) {
+        std::cout << "[DEBUG QUIT] Found " << m_subscriber_register.at(event.event_type).size()
+                  << " subscribers for QUIT_GAME" << std::endl;
+      }
       
       // go through each subscriber registered for the event type
       for (auto &subscriber_weak : m_subscriber_register.at(event.event_type)) {
@@ -153,19 +157,22 @@ void EventHandler::UpdateSubscribersFromGlobalEventBus() {
         // pass to the UpdateSubscriber function
         UpdateSubscriber(subscriber_weak, event.event_data);
       }
-    } else {
-      std::cout << "[DEBUG] No subscribers registered for event type: "
-                << EnumNameEventType(event.event_type) << std::endl;
+    } else if (event.event_type == EventType::QUIT_GAME) {
+      std::cout << "[DEBUG QUIT] ERROR: No subscribers registered for QUIT_GAME!"
+                << std::endl;
     }
   }
 }
 /////////////////////////////////////////////////
 void EventHandler::AddEvent(const EventPacket &event) {
-  std::cout << "[DEBUG] EventHandler::AddEvent - Adding event to waiting room: "
-            << EnumNameEventType(event.event_type) << std::endl;
+  // Only debug for QUIT_GAME events
+  if (event.event_type == EventType::QUIT_GAME) {
+    std::cout << "[DEBUG QUIT] EventHandler::AddEvent - Adding QUIT_GAME event to waiting room"
+              << std::endl;
+    std::cout << "[DEBUG QUIT] Waiting room size will be: " 
+              << (m_waiting_room_event_bus.size() + 1) << std::endl;
+  }
   m_waiting_room_event_bus.push_back(event);
-  std::cout << "[DEBUG] Waiting room size: " << m_waiting_room_event_bus.size()
-            << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -197,20 +204,22 @@ void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
 
   auto locked_subscriber = subscriber.lock();
   if (!locked_subscriber) {
-    std::cout << "[DEBUG] UpdateSubscriber - Subscriber expired, skipping"
-              << std::endl;
     // if the Subscriber has expired, do nothing
     return;
   }
 
-  std::cout << "[DEBUG] UpdateSubscriber - Subscriber for event type: "
-            << EnumNameEventType(locked_subscriber->m_trigger_event_type)
-            << std::endl;
+  // Only debug for QUIT_GAME subscribers
+  if (locked_subscriber->m_trigger_event_type == EventType::QUIT_GAME) {
+    std::cout << "[DEBUG QUIT] UpdateSubscriber - Processing QUIT_GAME subscriber"
+              << std::endl;
+  }
 
   // if the Subscriber has trigger data, compare against the event data
   if (locked_subscriber->m_trigger_event_data.has_value()) {
-    std::cout << "[DEBUG] Subscriber has trigger data, checking match..."
-              << std::endl;
+    if (locked_subscriber->m_trigger_event_type == EventType::QUIT_GAME) {
+      std::cout << "[DEBUG QUIT] Subscriber has trigger data, checking match..."
+                << std::endl;
+    }
     const auto &trigger_data = locked_subscriber->m_trigger_event_data.value();
 
     // For UserInputBitset: use subset matching (trigger bits must be present in
@@ -222,27 +231,36 @@ void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
 
       // Check if all trigger bits are present in event bits (subset matching)
       if ((trigger_bits & event_bits) != trigger_bits) {
-        std::cout << "[DEBUG] Trigger bits not matched, subscriber not activated"
-                  << std::endl;
+        if (locked_subscriber->m_trigger_event_type == EventType::QUIT_GAME) {
+          std::cout << "[DEBUG QUIT] Trigger bits not matched, subscriber not activated"
+                    << std::endl;
+        }
         return; // Required bits not present in event
       }
-      std::cout << "[DEBUG] Trigger bits matched!" << std::endl;
+      if (locked_subscriber->m_trigger_event_type == EventType::QUIT_GAME) {
+        std::cout << "[DEBUG QUIT] Trigger bits matched!" << std::endl;
+      }
     }
     // For other types: use exact equality
     else if (trigger_data != event_data) {
-      std::cout << "[DEBUG] Trigger data not matched, subscriber not activated"
-                << std::endl;
+      if (locked_subscriber->m_trigger_event_type == EventType::QUIT_GAME) {
+        std::cout << "[DEBUG QUIT] Trigger data not matched, subscriber not activated"
+                  << std::endl;
+      }
       return;
     }
   } else {
-    std::cout << "[DEBUG] Subscriber has NO trigger data (will activate for any event of this type)"
-              << std::endl;
+    if (locked_subscriber->m_trigger_event_type == EventType::QUIT_GAME) {
+      std::cout << "[DEBUG QUIT] Subscriber has NO trigger data (will activate for any QUIT_GAME event)"
+                << std::endl;
+    }
   }
 
   // activate the subscriber and store the received event data
-  std::cout << "[DEBUG] ACTIVATING subscriber for "
-            << EnumNameEventType(locked_subscriber->m_trigger_event_type)
-            << std::endl;
+  if (locked_subscriber->m_trigger_event_type == EventType::QUIT_GAME) {
+    std::cout << "[DEBUG QUIT] *** ACTIVATING QUIT_GAME subscriber ***"
+              << std::endl;
+  }
   locked_subscriber->m_active = true;
   locked_subscriber->m_received_event_data = event_data;
 }
