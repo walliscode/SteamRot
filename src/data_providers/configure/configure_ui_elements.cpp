@@ -58,6 +58,10 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
         const UIElementDataUnion &, const void *)>
         create_ui_element_callback) {
 
+  std::cout << "[DEBUG QUIT] ConfigureBaseUIElement called for element at JSON position ("
+            << data.position()->x() << ", " << data.position()->y() << ")"
+            << std::endl;
+
   element.position = sf::Vector2f({data.position()->x(), data.position()->y()});
   element.size = sf::Vector2f({data.size()->x(), data.size()->y()});
 
@@ -109,16 +113,24 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
     EventType event_type = event_type_result.value();
     
     // Debug ALL response_event configuration to catch the bug
-    std::cout << "[DEBUG QUIT] Configuring ResponseEvent of type: "
-              << EnumNameEventType(event_type) << " on element at position ("
-              << data.position()->x() << ", " << data.position()->y() << ")"
-              << std::endl;
-    
-    if (event_type == EventType::QUIT_GAME) {
-      std::cout << "[DEBUG QUIT] event_data_data_type: "
-                << static_cast<int>(data.response_event_data()->event_data_data_type())
+    // Check if element already has a response_event (would indicate re-configuration)
+    if (element.response_event.has_value()) {
+      std::cout << "[DEBUG QUIT] WARNING: Overwriting existing response_event!"
                 << std::endl;
+      std::cout << "[DEBUG QUIT]   Old event: "
+                << EnumNameEventType(element.response_event.value().event_type)
+                << " at position (" << element.position.x << ", " << element.position.y
+                << ")" << std::endl;
+      std::cout << "[DEBUG QUIT]   New event: " << EnumNameEventType(event_type)
+                << " from data position (" << data.position()->x() << ", "
+                << data.position()->y() << ")" << std::endl;
     }
+    
+    std::cout << "[DEBUG QUIT] Configuring ResponseEvent of type: "
+              << EnumNameEventType(event_type) << " on element at JSON position ("
+              << data.position()->x() << ", " << data.position()->y() << ")"
+              << " actual element position (" << element.position.x << ", "
+              << element.position.y << ")" << std::endl;
     
     // create EventData by running the flatbuffers data through the factory
     auto event_data_conversion_result = event::CreateEventData(
