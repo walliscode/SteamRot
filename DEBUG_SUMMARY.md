@@ -26,13 +26,18 @@ The debug logs are output to the **console/terminal** where you run the applicat
 ```
 
 ### What You'll See:
-The logs will appear in the console with tags like:
-- `[ConfigureBaseUIElement]`
-- `[ConfigureCUserInterface]`
-- `[ProcessButtonElementActions]`
-- `[CreateUIElement]`
+The logs will appear in the console with format like:
+```
+[12:34:56.789] [debug] [ConfigureBaseUIElement] Configuring element at address: 0x...
+[12:34:56.790] [debug] [ConfigureCUserInterface] Child 0 at 0x... is ButtonElement with label 'Start Game'
+[12:34:56.791] [debug] [ProcessButtonElementActions] Button 'Crafting Table' at 0x... triggering response_event
+```
 
-Look for these tags to find the relevant debug information.
+Look for these function tags to find the relevant debug information:
+- `[ConfigureBaseUIElement]` - Element configuration details
+- `[ConfigureCUserInterface]` - Final button states after configuration
+- `[ProcessButtonElementActions]` - Button click processing
+- `[CreateUIElement]` - Element creation
 
 ### Tips for Viewing Logs:
 - **Real-time viewing**: Just run the executable - logs appear in the terminal

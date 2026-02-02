@@ -4,7 +4,9 @@
 #include "spdlog/spdlog.h"
 #include <iostream>
 int main() {
-  // start the logger
+  // start the logger - set to debug level to see all debug messages
+  spdlog::set_level(spdlog::level::debug);
+  spdlog::set_pattern("[%H:%M:%S.%e] [%^%l%$] %v");
 
   // wrap the whole game engine in a try-catch block to catch any exceptions
   try {
