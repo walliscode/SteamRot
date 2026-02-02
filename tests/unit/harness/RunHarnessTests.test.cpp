@@ -58,5 +58,4 @@ TEST_CASE("RunHarnessTests processes all test data files in data directory",
   if (!result.has_value()) {
     FAIL("RunHarnessTests failed: " + result.error().message);
   }
-  REQUIRE(result.has_value());
 }

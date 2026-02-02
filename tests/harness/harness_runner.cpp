@@ -17,6 +17,7 @@
 #include "containers.h"
 #include "entities_generated.h"
 #include "test_context.h"
+#include <catch2/catch_test_macros.hpp>
 #include <format>
 #include <variant>
 
@@ -185,16 +186,7 @@ CompareEngineSnapshots(const EngineSnapshot &actual,
   context.current_tick = tick;
   context.total_ticks = tick; // Set to current tick as total
 
-  // Create matcher with context
-  EngineSnapshotEqualsMatcher matcher(expected, context);
-
-  // Perform comparison using Catch2 matcher
-  if (!matcher.match(actual)) {
-    return std::unexpected(FailInfo{
-        FailMode::ComparisonFailed,
-        matcher.describe(),
-    });
-  }
+  REQUIRE_THAT(actual, EqualsEngineSnapshot(expected, context));
 
   return std::monostate{};
 }

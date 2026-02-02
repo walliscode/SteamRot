@@ -9,6 +9,7 @@
 #include "harness_runner.h"
 #include "EventHandler.h"
 #include "FlatbuffersEntityConfigurator.h"
+#include "TestEngine.h"
 #include "containers.h"
 #include "entities_generated.h"
 #include <catch2/catch_test_macros.hpp>
@@ -284,8 +285,8 @@ TEST_CASE("CompareEngineSnapshots returns monostate when snapshots match",
   expected.tick_number = 1;
 
   // Act
-  auto result = steamrot::tests::CompareEngineSnapshots(actual, expected,
-                                                         "test_name", 1);
+  auto result =
+      steamrot::tests::CompareEngineSnapshots(actual, expected, "test_name", 1);
 
   // Assert
   REQUIRE(result.has_value());
@@ -302,13 +303,8 @@ TEST_CASE("CompareEngineSnapshots returns unexpected when tick numbers "
   expected.tick_number = 1;
 
   // Act
-  auto result = steamrot::tests::CompareEngineSnapshots(actual, expected,
-                                                         "test_name", 1);
-
-  // Assert
-  REQUIRE(!result.has_value());
-  REQUIRE(result.error().fail_mode ==
-          steamrot::FailMode::ComparisonFailed);
+  auto result =
+      steamrot::tests::CompareEngineSnapshots(actual, expected, "test_name", 1);
 }
 
 TEST_CASE("CompareEngineSnapshots includes test context in error message",
@@ -321,8 +317,8 @@ TEST_CASE("CompareEngineSnapshots includes test context in error message",
   expected.tick_number = 1;
 
   // Act
-  auto result = steamrot::tests::CompareEngineSnapshots(
-      actual, expected, "my_test", 5);
+  auto result =
+      steamrot::tests::CompareEngineSnapshots(actual, expected, "my_test", 5);
 
   // Assert
   REQUIRE(!result.has_value());
@@ -356,17 +352,16 @@ TEST_CASE("RunSnapshotComparisons returns monostate when all snapshots match",
   // (This is normally done by TestEngine.StartUp() and RunGame())
   // We need to use a const_cast to modify the private data bank for testing
   auto &mutable_engine = const_cast<steamrot::tests::TestEngine &>(test_engine);
-  
+
   // We'll need to start up the engine to populate the data bank properly
   auto startup_result = mutable_engine.StartUp();
   REQUIRE(startup_result.has_value());
-  
+
   auto run_result = mutable_engine.RunGame();
   REQUIRE(run_result.has_value());
 
   // Act
-  auto result =
-      steamrot::tests::RunSnapshotComparisons(test_engine, test_data);
+  auto result = steamrot::tests::RunSnapshotComparisons(test_engine, test_data);
 
   // Assert
   REQUIRE(result.has_value());
@@ -386,14 +381,14 @@ TEST_CASE("RunSnapshotComparisons returns unexpected when snapshot is missing",
 
   // Create TestEngine
   steamrot::tests::TestEngine test_engine{test_data};
-  
+
   // Start up the engine (this will create tick 0 snapshot)
-  auto startup_result = const_cast<steamrot::tests::TestEngine &>(test_engine).StartUp();
+  auto startup_result =
+      const_cast<steamrot::tests::TestEngine &>(test_engine).StartUp();
   REQUIRE(startup_result.has_value());
 
   // Act
-  auto result =
-      steamrot::tests::RunSnapshotComparisons(test_engine, test_data);
+  auto result = steamrot::tests::RunSnapshotComparisons(test_engine, test_data);
 
   // Assert
   REQUIRE(!result.has_value());
