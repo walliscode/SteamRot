@@ -184,7 +184,7 @@ FlatbuffersEntityConfigurator::ConfigureCUserInterface(
                       child->response_event.has_value());
         if (child->response_event.has_value()) {
           spdlog::debug("[ConfigureCUserInterface] Child {}'s response_event type: {}", 
-                        i, static_cast<int>(child->response_event.value().m_event_type));
+                        i, static_cast<int>(child->response_event.value().event_type));
         }
       }
     }

@@ -1,5 +1,50 @@
 # Summary: UIElement Response Event Debug Implementation
 
+## How to Check the Logs
+
+The debug logs are output to the **console/terminal** where you run the application. Here's how to view them:
+
+### On Linux/macOS:
+```bash
+# Run the application and see logs in terminal
+./build/Debug/steamrot
+
+# Or redirect to a file for easier searching
+./build/Debug/steamrot 2>&1 | tee debug_log.txt
+
+# Or save only to file
+./build/Debug/steamrot > debug_log.txt 2>&1
+```
+
+### On Windows:
+```powershell
+# Run in PowerShell/Command Prompt to see logs
+.\build\Debug\steamrot.exe
+
+# Or redirect to file
+.\build\Debug\steamrot.exe > debug_log.txt 2>&1
+```
+
+### What You'll See:
+The logs will appear in the console with tags like:
+- `[ConfigureBaseUIElement]`
+- `[ConfigureCUserInterface]`
+- `[ProcessButtonElementActions]`
+- `[CreateUIElement]`
+
+Look for these tags to find the relevant debug information.
+
+### Tips for Viewing Logs:
+- **Real-time viewing**: Just run the executable - logs appear in the terminal
+- **Save to file**: Use `> debug_log.txt 2>&1` to save logs for later analysis
+- **Search in file**: Use `grep` (Linux/Mac) or `findstr` (Windows) to search:
+  ```bash
+  grep "ConfigureCUserInterface" debug_log.txt
+  grep "response_event" debug_log.txt
+  ```
+
+---
+
 ## What Was Done
 
 Comprehensive debug logging has been added to the SteamRot codebase to help identify the root cause of the UIElement response_event issue where all buttons in the title scene appear to trigger the same event.

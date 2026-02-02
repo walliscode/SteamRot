@@ -102,7 +102,7 @@ void ProcessButtonElementActions(ButtonElement &button_element,
       spdlog::debug("[ProcessButtonElementActions] Button '{}' at {} triggering response_event with type: {}", 
                     button_element.label,
                     static_cast<const void*>(&button_element),
-                    static_cast<int>(button_element.response_event.value().m_event_type));
+                    static_cast<int>(button_element.response_event.value().event_type));
       
       event_handler.AddEvent(button_element.response_event.value());
     }

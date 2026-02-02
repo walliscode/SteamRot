@@ -1,5 +1,30 @@
 # Debug Guide: UIElement Response Event Issue
 
+## How to View Debug Logs
+
+The debug logs are printed to **stdout/stderr** (your console/terminal). Here's how to access them:
+
+### Running the Application:
+```bash
+# Simply run - logs appear in terminal
+./build/Debug/steamrot
+
+# Save to file for analysis
+./build/Debug/steamrot 2>&1 | tee debug_log.txt
+
+# Search saved logs
+grep "ConfigureCUserInterface" debug_log.txt
+grep "ProcessButtonElementActions" debug_log.txt
+```
+
+### Key Log Tags to Search For:
+- `[ConfigureBaseUIElement]` - Element configuration details
+- `[ConfigureCUserInterface]` - **Final state after all configuration** (most important)
+- `[CreateUIElement]` - Element creation
+- `[ProcessButtonElementActions]` - Button click handling
+
+---
+
 ## Problem Summary
 
 UIElements in the title scene appear to be configured with the correct response data, but when clicking on them, they all trigger the same response event (either CHANGE_SCENE or QUIT_GAME depending on which buttons are present in the JSON).
