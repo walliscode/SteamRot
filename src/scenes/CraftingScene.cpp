@@ -45,7 +45,11 @@ void CraftingScene::sRender() {
 
   // process render logic
   for (auto &render_logic : m_scene_resources.logic_map[LogicType::Render]) {
+
     render_logic->RunLogic();
   }
+
+  // display the render texture
+  m_scene_resources.scene_texture.display();
 }
 } // namespace steamrot

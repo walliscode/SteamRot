@@ -21,11 +21,16 @@ void UIRenderLogic::ProcessLogic() {
   DrawUIElements();
 
   // display the render texture after drawing
-  m_scene_context.scene_texture.display();
+  // m_scene_context.scene_texture.display();
 }
 
 void UIRenderLogic::DrawUIElements() {
 
+  // print out number of archetypes with number of entities for debugging
+
+  for (const auto &[archetype_id, entity_indices] :
+       m_scene_context.archetypes) {
+  }
   // Generate entity indexes for entities with only CUserInterface component
   auto entity_indexes =
       archetypes::GenerateEntityIndexesFromComponents<CUserInterface>(

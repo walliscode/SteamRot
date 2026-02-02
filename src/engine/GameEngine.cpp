@@ -9,6 +9,7 @@
 
 #include "GameEngine.h"
 #include <expected>
+#include <iostream>
 
 namespace steamrot {
 
@@ -68,6 +69,9 @@ std::expected<std::monostate, FailInfo> GameEngine::ProcessSubscriptions() {
     // only process active subscribers
     if (subscriber->m_active) {
 
+      std::cout << "Processing subscription for event type: "
+                << EnumNameEventType(subscriber->m_trigger_event_type)
+                << std::endl;
       // switch on the EventType
       switch (subscriber->m_trigger_event_type) {
       case EventType::QUIT_GAME: {

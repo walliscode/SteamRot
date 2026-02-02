@@ -76,6 +76,8 @@ FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents(
 
   ///// JUST FOR FIRST LAYER COMPONENTS /////
 
+  // start off entity position at zero
+  size_t entity_index = 0;
   // cycle through each entity in the collection and configure it
   for (const auto &entity_data : *m_entity_collection_data->entities()) {
 
@@ -84,20 +86,22 @@ FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents(
 
     // check the data and configure component if data exists
     if (entity_data->c_user_interface()) {
-      auto configure_result =
-          ConfigureCUserInterface(entity::memory::GetComponent<CUserInterface>(
-              entity_data->index(), emp));
+
+      auto configure_result = ConfigureCUserInterface(
+          entity::memory::GetComponent<CUserInterface>(entity_index, emp));
       if (!configure_result.has_value())
         return std::unexpected(configure_result.error());
     }
 
     if (entity_data->c_grimoire_machina()) {
       auto configure_result = ConfigureCGrimoireMachina(
-          entity::memory::GetComponent<CGrimoireMachina>(entity_data->index(),
-                                                         emp));
+          entity::memory::GetComponent<CGrimoireMachina>(entity_index, emp));
       if (!configure_result.has_value())
         return std::unexpected(configure_result.error());
     }
+
+    // progress to next entity index
+    entity_index++;
   }
   return std::monostate();
 };
