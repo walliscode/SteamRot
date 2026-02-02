@@ -77,8 +77,7 @@
                       },
                       "response_event_data": {
                         "event_lifetime": 1,
-                        "event_type": "EVENT_QUIT_GAME",
-                        "event_data_data_type": "NONE"
+                        "event_type": "EVENT_QUIT_GAME"
                       },
                       "children_active": false,
                       "children": [],

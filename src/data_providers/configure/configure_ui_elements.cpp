@@ -8,9 +8,11 @@
 ////////////////////////////////////////////////////////////
 #include "configure_ui_elements.h"
 #include "EventPacket.h"
+#include "EventType.h"
 #include "event_factory.h"
 #include "event_type_conversion.h"
 #include "subscriber_factory.h"
+#include <iostream>
 #include <string>
 
 namespace steamrot::data::configure {
@@ -64,8 +66,8 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
     element.is_mouse_over = data.is_mouse_over();
 
   // set Subscription if subscriber_data exists and EventTypeFbs is not none
-  if (data.subscriber_data() && (data.subscriber_data()->event_type_data() !=
-                                 EventTypeFbs_EVENT_NONE)) {
+  if (data.subscriber_data() &&
+      (data.subscriber_data()->event_type_data() != EventTypeFbs_EVENT_NONE)) {
 
     // Create vector with single subscriber
     std::vector<const SubscriberFbs *> subscribers_fbs{data.subscriber_data()};
@@ -86,7 +88,8 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
       return std::unexpected(register_result.error());
   }
 
-  // set ResponseEvent if response_event_data exists and EventTypeFbs is not none
+  // set ResponseEvent if response_event_data exists and EventTypeFbs is not
+  // none
   if (data.response_event_data() &&
       (data.response_event_data()->event_type() != EventTypeFbs_EVENT_NONE)) {
 
@@ -96,14 +99,16 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
           FailInfo{FailMode::FlatbuffersDataNotFound,
                    "UIElementData has response_event_data but no event_type."});
     }
-    
+
     // Convert EventTypeFbs to native EventType
-    auto event_type_result = event::ConvertEventTypeFbsToEventType(data.response_event_data()->event_type());
+    auto event_type_result = event::ConvertEventTypeFbsToEventType(
+        data.response_event_data()->event_type());
     if (!event_type_result.has_value()) {
       return std::unexpected(event_type_result.error());
     }
     EventType event_type = event_type_result.value();
-
+    std::cout << "Configuring ResponseEvent of type: "
+              << EnumNameEventType(event_type) << std::endl;
     // create EventData by running the flatbuffers data through the factory
     auto event_data_conversion_result = event::CreateEventData(
         data.response_event_data()->event_data_data_type(),
@@ -159,8 +164,9 @@ ConfigureButtonElement(ButtonElement &button_element, const ButtonData &data) {
 }
 
 ////////////////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo> ConfigureDropDownListElement(
-    DropDownListElement &dropdown_list_element, const DropDownListData &data) {
+std::expected<std::monostate, FailInfo>
+ConfigureDropDownListElement(DropDownListElement &dropdown_list_element,
+                             const DropDownListData &data) {
   if (data.label()) {
     dropdown_list_element.unexpanded_label = data.label()->str();
   }
@@ -217,8 +223,9 @@ std::expected<std::monostate, FailInfo> ConfigureDropDownContainerElement(
 }
 
 ////////////////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo> ConfigureDropDownItemElement(
-    DropDownItemElement &dropdown_item_element, const DropDownItemData &data) {
+std::expected<std::monostate, FailInfo>
+ConfigureDropDownItemElement(DropDownItemElement &dropdown_item_element,
+                             const DropDownItemData &data) {
   if (data.label()) {
     dropdown_item_element.label = data.label()->str();
   }
@@ -226,9 +233,9 @@ std::expected<std::monostate, FailInfo> ConfigureDropDownItemElement(
 }
 
 ////////////////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo> ConfigureDropDownButtonElement(
-    DropDownButtonElement &dropdown_button_element,
-    const DropDownButtonData &data) {
+std::expected<std::monostate, FailInfo>
+ConfigureDropDownButtonElement(DropDownButtonElement &dropdown_button_element,
+                               const DropDownButtonData &data) {
   dropdown_button_element.is_expanded = data.is_expanded();
   return std::monostate{};
 }

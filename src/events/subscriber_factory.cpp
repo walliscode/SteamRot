@@ -10,6 +10,7 @@
 #include "Subscriber.h"
 #include "event_factory.h"
 #include "event_type_conversion.h"
+#include "events_generated.h"
 #include "subscriber_generated.h"
 #include <expected>
 
@@ -33,14 +34,14 @@ CreateSubscriber(const SubscriberFbs *subscriber_fbs) {
   }
 
   Subscriber subscriber;
-  
+
   // Convert EventTypeFbs to native EventType
-  auto event_type_result = event::ConvertEventTypeFbsToEventType(subscriber_fbs->event_type_data());
+  auto event_type_result =
+      event::ConvertEventTypeFbsToEventType(subscriber_fbs->event_type_data());
   if (!event_type_result.has_value()) {
     return std::unexpected(event_type_result.error());
   }
   subscriber.m_trigger_event_type = event_type_result.value();
-  
   subscriber.m_active = subscriber_fbs->active();
 
   // Check for trigger data
