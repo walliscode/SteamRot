@@ -38,15 +38,15 @@ TEST_CASE("ConfigureBaseUIElement sets response_event for data-less QUIT_GAME",
   
   auto ui_element_data = steamrot::CreateUIElementData(
       builder,
-      position,
-      size,
-      false,  // is_mouse_over
-      0,      // subscriber_data
-      event_packet_data,  // response_event_data
-      0,      // children
+      position,          // position
+      size,              // size
+      0,                 // subscriber_data
+      event_packet_data, // response_event_data
+      false,             // children_active
+      0,                 // children
+      false,             // is_mouse_over
       steamrot::LayoutFbs_Vertical,
-      steamrot::SpacingAndSizingFbs_None,
-      false);  // children_active
+      steamrot::SpacingAndSizingFbs_None);
 
   builder.Finish(ui_element_data);
 
@@ -108,15 +108,15 @@ TEST_CASE("ConfigureBaseUIElement skips response_event when event_type is NONE",
   
   auto ui_element_data = steamrot::CreateUIElementData(
       builder,
-      position,
-      size,
-      false,  // is_mouse_over
-      0,      // subscriber_data
-      event_packet_data,  // response_event_data
-      0,      // children
+      position,          // position
+      size,              // size
+      0,                 // subscriber_data
+      event_packet_data, // response_event_data
+      false,             // children_active
+      0,                 // children
+      false,             // is_mouse_over
       steamrot::LayoutFbs_Vertical,
-      steamrot::SpacingAndSizingFbs_None,
-      false);  // children_active
+      steamrot::SpacingAndSizingFbs_None);
 
   builder.Finish(ui_element_data);
 
