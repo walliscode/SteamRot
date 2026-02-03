@@ -204,9 +204,9 @@ void SceneManager::UpdateScenes() {
   for (auto &pair : m_scenes) {
     auto &scene = pair.second;
 
+    scene->sCollision();
     scene->sAction();
     // scene->sMovement();
-    scene->sCollision();
     scene->sRender();
 
     // add further systems here

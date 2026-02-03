@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "logic_collision.h"
+#include "UIElement.h"
 
 namespace steamrot {
 namespace logic {

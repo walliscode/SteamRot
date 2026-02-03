@@ -12,6 +12,7 @@
 #include "entity_memory.h"
 #include "logic_ui.h"
 #include <iostream>
+#include <ostream>
 
 namespace steamrot {
 namespace logic {
@@ -37,6 +38,7 @@ void ProcessUIActionsAndEvents(UIElement &ui_element,
           dynamic_cast<ButtonElement *>(&ui_element)) {
 
     ProcessButtonElementActions(*button_element, event_handler);
+
   } else if (DropDownListElement *dropdown_list_element =
                  dynamic_cast<DropDownListElement *>(&ui_element)) {
     ProcessDropDownListElementActions(*dropdown_list_element, scene_context);
@@ -56,24 +58,26 @@ void ProcessNestedUIActionsAndEvents(UIElement &ui_element,
   // cycle through all child elements and process recursively
   for (auto &child : ui_element.child_elements) {
 
-    // Check if this child has an active subscription before processing
-    bool child_has_active_subscription =
-        child->subscription && child->subscription->m_active;
+    // Check if this child is ready to be processed (compound boolean)
+    // This needs to be checked before the recursive call as the subscription
+    // will be set  inactive after processing
+    bool child_has_active_subscription = child->subscription &&
+                                         child->subscription->m_active &&
+                                         child->is_mouse_over;
 
     // go as deep as possible first, this will stop when no children are
     // detected
     ProcessNestedUIActionsAndEvents(*child, event_handler, scene_context);
 
-    // If the child had an active subscription, it (or one of its descendants)
-    // was processed
     if (child_has_active_subscription) {
-      // for the parent to evaluate - child was processed
+      // that means that UIElement was processed and we don't want to process
+      // any sibling, parents or descendants
       child_processed = true;
       // if a child was processed, no need to check further children
       break;
     }
   }
-
+  // if no child was processed, process the parent
   if (!child_processed) {
     // this will occur if no child was processed (or no children exist)
     ProcessUIActionsAndEvents(ui_element, event_handler, scene_context);

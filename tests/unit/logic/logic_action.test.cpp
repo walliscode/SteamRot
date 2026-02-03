@@ -96,6 +96,23 @@ TEST_CASE("logic::action::ProcessUIActionsAndEvents processes UI elements "
     event_handler.ProcessWaitingRoomEventBus();
     REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
   }
+  SECTION("Response not triggered when is_mouse_over is false") {
+    button.is_mouse_over = false;
+    steamrot::logic::action::ProcessUIActionsAndEvents(button, event_handler,
+                                                       scene_context);
+    event_handler.ProcessWaitingRoomEventBus();
+    REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
+  }
+  SECTION("Response not triggerd when subscription is active and is_mouse_over "
+          "is false") {
+    button.is_mouse_over = false;
+    button.subscription->m_active = true;
+
+    steamrot::logic::action::ProcessUIActionsAndEvents(button, event_handler,
+                                                       scene_context);
+    event_handler.ProcessWaitingRoomEventBus();
+    REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
+  }
 
   SECTION("Response triggered when subscriber active") {
     button.subscription->m_active = true;
@@ -114,7 +131,7 @@ TEST_CASE("logic::action::ProcessNestedUIActionsAndEvents processes nested "
   steamrot::SceneContext &scene_context = fixture.GetSceneContext();
   steamrot::EventHandler &event_handler =
       fixture.GetGameContext().event_handler;
-  // set up a panel with a button child
+  // set up a panel with multiple button children
   steamrot::PanelElement panel;
   panel.children_active = true;
   auto button = std::make_unique<steamrot::ButtonElement>();
@@ -125,6 +142,15 @@ TEST_CASE("logic::action::ProcessNestedUIActionsAndEvents processes nested "
                                      steamrot::UserInputBitset{}, 2};
   button->response_event = event_packet;
   panel.child_elements.push_back(std::move(button));
+
+  auto button2 = std::make_unique<steamrot::ButtonElement>();
+  button2->is_mouse_over = true;
+  button2->subscription =
+      std::make_shared<steamrot::Subscriber>(steamrot::EventType::USER_INPUT);
+  steamrot::EventPacket event_packet2{steamrot::EventType::USER_INPUT,
+                                      steamrot::UserInputBitset{}, 3};
+  button2->response_event = event_packet2;
+  panel.child_elements.push_back(std::move(button2));
 
   // initial tests
   REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
@@ -141,5 +167,14 @@ TEST_CASE("logic::action::ProcessNestedUIActionsAndEvents processes nested "
         panel, event_handler, scene_context);
     event_handler.ProcessWaitingRoomEventBus();
     REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
+  }
+  SECTION("If first child is_mouse_over false, second child processed") {
+    panel.child_elements[0]->is_mouse_over = false;
+    panel.child_elements[0]->subscription->m_active = true;
+    panel.child_elements[1]->subscription->m_active = true;
+    steamrot::logic::action::ProcessNestedUIActionsAndEvents(
+        panel, event_handler, scene_context);
+    event_handler.ProcessWaitingRoomEventBus();
+    REQUIRE(event_handler.GetGlobalEventBus().size() == 1);
   }
 }
