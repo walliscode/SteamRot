@@ -532,6 +532,112 @@ TEST_CASE(
 }
 
 /////////////////////////////////////////////////
+/// ConfigureCUIState Tests
+/////////////////////////////////////////////////
+
+TEST_CASE("ConfigureCUIState activates component and configures state mappings",
+          "[unit][FlatbuffersEntityConfigurator]") {
+  steamrot::EventHandler event_handler;
+  steamrot::EntityMemoryPool emp;
+  auto [data, entity_transport] = LoadEntityTestData();
+
+  steamrot::FlatbuffersEntityConfigurator configurator(event_handler);
+
+  // Configure through ConfigureEntityMemoryPoolFromSource to set up internal
+  // state, but focus testing on CUIState configuration behavior
+  auto result =
+      configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
+
+  REQUIRE(result.has_value());
+
+  // Test entity 7: ConfigureCUIState should have:
+  // 1. Activated the component
+  // 2. Created state_to_ui_visibility mapping for "main_menu"
+  // 3. Resolved UI names to entity indices
+  const steamrot::CUIState &ui_state_7 =
+      steamrot::entity::memory::GetComponent<steamrot::CUIState>(7, emp);
+
+  // Verify component activation
+  REQUIRE(ui_state_7.m_active == true);
+
+  // Verify state mapping was created
+  REQUIRE(ui_state_7.m_state_to_ui_visibility.size() == 1);
+  REQUIRE(ui_state_7.m_state_to_ui_visibility.contains("main_menu"));
+
+  // Verify UI name resolution to indices
+  const auto &visibility = ui_state_7.m_state_to_ui_visibility.at("main_menu");
+  REQUIRE(visibility.m_ui_indices_on.size() == 2);
+  REQUIRE(visibility.m_ui_indices_off.size() == 1);
+}
+
+TEST_CASE("ConfigureCUIState handles subscribers correctly",
+          "[unit][FlatbuffersEntityConfigurator]") {
+  steamrot::EventHandler event_handler;
+  steamrot::EntityMemoryPool emp;
+  auto [data, entity_transport] = LoadEntityTestData();
+
+  steamrot::FlatbuffersEntityConfigurator configurator(event_handler);
+
+  // Configure to test ConfigureCUIState subscriber handling
+  auto result =
+      configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
+
+  REQUIRE(result.has_value());
+
+  // Test entity 9: ConfigureCUIState should have:
+  // 1. Created subscriber from FlatBuffers data
+  // 2. Registered subscriber with EventHandler
+  // 3. Stored subscriber in m_state_subscribers
+  const steamrot::CUIState &ui_state_9 =
+      steamrot::entity::memory::GetComponent<steamrot::CUIState>(9, emp);
+
+  REQUIRE(ui_state_9.m_active == true);
+  REQUIRE(ui_state_9.m_state_subscribers.contains("game_running"));
+
+  const auto &subscribers = ui_state_9.m_state_subscribers.at("game_running");
+  REQUIRE(subscribers.size() == 1);
+  REQUIRE(subscribers[0] != nullptr);
+  REQUIRE(subscribers[0]->m_active == true);
+}
+
+TEST_CASE("ConfigureCUIState handles multiple states in single component",
+          "[unit][FlatbuffersEntityConfigurator]") {
+  steamrot::EventHandler event_handler;
+  steamrot::EntityMemoryPool emp;
+  auto [data, entity_transport] = LoadEntityTestData();
+
+  steamrot::FlatbuffersEntityConfigurator configurator(event_handler);
+
+  // Configure to test ConfigureCUIState multi-state handling
+  auto result =
+      configurator.ConfigureEntityMemoryPoolFromSource(emp, entity_transport);
+
+  REQUIRE(result.has_value());
+
+  // Test entity 10: ConfigureCUIState should handle multiple ui_states entries
+  const steamrot::CUIState &ui_state_10 =
+      steamrot::entity::memory::GetComponent<steamrot::CUIState>(10, emp);
+
+  REQUIRE(ui_state_10.m_active == true);
+
+  // Verify both states were configured
+  REQUIRE(ui_state_10.m_state_to_ui_visibility.size() == 2);
+  REQUIRE(ui_state_10.m_state_to_ui_visibility.contains("multiple_states_a"));
+  REQUIRE(ui_state_10.m_state_to_ui_visibility.contains("multiple_states_b"));
+
+  // Verify each state has correct mappings
+  const auto &state_a =
+      ui_state_10.m_state_to_ui_visibility.at("multiple_states_a");
+  REQUIRE(!state_a.m_ui_indices_on.empty());
+  REQUIRE(!state_a.m_ui_indices_off.empty());
+
+  const auto &state_b =
+      ui_state_10.m_state_to_ui_visibility.at("multiple_states_b");
+  REQUIRE(state_b.m_ui_indices_on.size() == 2);
+  REQUIRE(state_b.m_ui_indices_off.size() == 2);
+}
+
+/////////////////////////////////////////////////
 /// ConfigureComponent Tests
 /////////////////////////////////////////////////
 
