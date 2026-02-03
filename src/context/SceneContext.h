@@ -9,6 +9,7 @@
 /// Headers
 /////////////////////////////////////////////////
 
+#include "CGrimoireMachina.h"
 #include "EngineResources.h"
 #include "EntityManager.h"
 #include "EventHandler.h"
@@ -80,6 +81,14 @@ struct SceneContext {
   /// @brief Reference to mouse position in the game window (local).
   /////////////////////////////////////////////////
   sf::Vector2i &mouse_position;
+
+  /////////////////////////////////////////////////
+  /// @brief Reference to the player's Grimoire Machina.
+  ///
+  /// This is a persistent library of designs and creations, independent of
+  /// scene state.
+  /////////////////////////////////////////////////
+  CGrimoireMachina &grimoire_machina;
 };
 
 } // namespace steamrot

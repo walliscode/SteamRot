@@ -13,8 +13,7 @@ TEST_CASE("CGrimoireMachina has correct default values",
           "[unit][Components][CGrimoireMachina]") {
   steamrot::CGrimoireMachina grimoire;
 
-  // Test pre configuration state
-  REQUIRE(grimoire.m_active == false);
+  // Test default state
   REQUIRE(grimoire.m_all_fragments.empty());
   REQUIRE(grimoire.m_all_joints.empty());
   REQUIRE(grimoire.m_machina_forms.empty());

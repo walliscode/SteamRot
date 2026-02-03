@@ -25,33 +25,22 @@ void CraftingRenderLogic::ProcessLogic() {
 /////////////////////////////////////////////////
 void CraftingRenderLogic::DrawMachinaForm() {
 
-  // get all entity indexes with CGrimoireMachina component
-  std::set<size_t> entity_indexes =
-      archetypes::GenerateEntityIndexesFromComponents<CGrimoireMachina>(
-          m_scene_context.archetypes, true);
+  // Get the grimoire machina from scene context
+  CGrimoireMachina &grimoire_machina = m_scene_context.grimoire_machina;
 
-  // cycle through all the entity indexs in the archetype
-  for (size_t entity_id : entity_indexes) {
+  // Check if the holding form is not null, return early if it is
+  if (!grimoire_machina.m_holding_form) {
+    return;
+  }
 
-    // get the CGrimoireMachina component
-    CGrimoireMachina &grimoire_machina =
-        entity::memory::GetComponent<CGrimoireMachina>(
-            entity_id, m_scene_context.scene_entities);
+  // Draw the joints in the holding form
+  for (auto &joint : grimoire_machina.m_holding_form->m_joints) {
+    RenderJoint(joint);
+  }
 
-    // Check if the holding form is not null, return early if it is
-    if (!grimoire_machina.m_holding_form) {
-      return;
-    }
-
-    // Draw the joints in the holding form
-    for (auto &joint : grimoire_machina.m_holding_form->m_joints) {
-      RenderJoint(joint);
-    }
-
-    // Draw the fragments in the holding form
-    for (auto &fragment : grimoire_machina.m_holding_form->m_fragments) {
-      RenderFragment(fragment);
-    }
+  // Draw the fragments in the holding form
+  for (auto &fragment : grimoire_machina.m_holding_form->m_fragments) {
+    RenderFragment(fragment);
   }
 };
 

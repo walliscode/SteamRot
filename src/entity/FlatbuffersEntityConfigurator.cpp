@@ -93,12 +93,8 @@ FlatbuffersEntityConfigurator::ConfigureFirstLayerComponents(
         return std::unexpected(configure_result.error());
     }
 
-    if (entity_data->c_grimoire_machina()) {
-      auto configure_result = ConfigureCGrimoireMachina(
-          entity::memory::GetComponent<CGrimoireMachina>(entity_index, emp));
-      if (!configure_result.has_value())
-        return std::unexpected(configure_result.error());
-    }
+    // Note: CGrimoireMachina is no longer configured as an entity component.
+    // It is now a singleton in EngineResources.
 
     // progress to next entity index
     entity_index++;

@@ -115,70 +115,42 @@ void ProcessDropDownListElementActions(
   // Dispatch to appropriate data population function based on enum
   switch (dropdown_list_element.data_populate_function) {
   case DataPopulateFunction::DataPopulateFunction_PopulateWithFragmentData: {
-    // Find CGrimoireMachina in the scene
-    ArchetypeID grimoire_archetype_id =
-        archetypes::GenerateArchetypeIDfromTypes<CGrimoireMachina>();
+    // Get the grimoire machina from scene context
+    const CGrimoireMachina &grimoire_machina = scene_context.grimoire_machina;
 
-    const auto it = scene_context.archetypes.find(grimoire_archetype_id);
-    if (it != scene_context.archetypes.end()) {
-      const Archetype &archetype = it->second;
+    // Get all fragment names
+    std::vector<std::string> fragment_names =
+        logic::ui::GetAllFragmentNames(grimoire_machina);
 
-      // Get the first entity with CGrimoireMachina (should only be one)
-      if (!archetype.empty()) {
-        size_t entity_id = *archetype.begin();
-        const CGrimoireMachina &grimoire_machina =
-            entity::memory::GetComponent<CGrimoireMachina>(
-                entity_id, scene_context.scene_entities);
+    // Clear existing child elements
+    dropdown_list_element.child_elements.clear();
 
-        // Get all fragment names
-        std::vector<std::string> fragment_names =
-            logic::ui::GetAllFragmentNames(grimoire_machina);
-
-        // Clear existing child elements
-        dropdown_list_element.child_elements.clear();
-
-        // Create DropDownItemElements for each fragment
-        for (const std::string &fragment_name : fragment_names) {
-          auto item = std::make_unique<DropDownItemElement>();
-          item->label = fragment_name;
-          item->value = fragment_name;
-          dropdown_list_element.child_elements.push_back(std::move(item));
-        }
-      }
+    // Create DropDownItemElements for each fragment
+    for (const std::string &fragment_name : fragment_names) {
+      auto item = std::make_unique<DropDownItemElement>();
+      item->label = fragment_name;
+      item->value = fragment_name;
+      dropdown_list_element.child_elements.push_back(std::move(item));
     }
     break;
   }
   case DataPopulateFunction::DataPopulateFunction_PopulateWithJointData: {
-    // Find CGrimoireMachina in the scene
-    ArchetypeID grimoire_archetype_id =
-        archetypes::GenerateArchetypeIDfromTypes<CGrimoireMachina>();
+    // Get the grimoire machina from scene context
+    const CGrimoireMachina &grimoire_machina = scene_context.grimoire_machina;
 
-    const auto it = scene_context.archetypes.find(grimoire_archetype_id);
-    if (it != scene_context.archetypes.end()) {
-      const Archetype &archetype = it->second;
+    // Get all joint names
+    std::vector<std::string> joint_names =
+        logic::ui::GetAllJointNames(grimoire_machina);
 
-      // Get the first entity with CGrimoireMachina (should only be one)
-      if (!archetype.empty()) {
-        size_t entity_id = *archetype.begin();
-        const CGrimoireMachina &grimoire_machina =
-            entity::memory::GetComponent<CGrimoireMachina>(
-                entity_id, scene_context.scene_entities);
+    // Clear existing child elements
+    dropdown_list_element.child_elements.clear();
 
-        // Get all joint names
-        std::vector<std::string> joint_names =
-            logic::ui::GetAllJointNames(grimoire_machina);
-
-        // Clear existing child elements
-        dropdown_list_element.child_elements.clear();
-
-        // Create DropDownItemElements for each joint
-        for (const std::string &joint_name : joint_names) {
-          auto item = std::make_unique<DropDownItemElement>();
-          item->label = joint_name;
-          item->value = joint_name;
-          dropdown_list_element.child_elements.push_back(std::move(item));
-        }
-      }
+    // Create DropDownItemElements for each joint
+    for (const std::string &joint_name : joint_names) {
+      auto item = std::make_unique<DropDownItemElement>();
+      item->label = joint_name;
+      item->value = joint_name;
+      dropdown_list_element.child_elements.push_back(std::move(item));
     }
     break;
   }

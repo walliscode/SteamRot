@@ -6,7 +6,6 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "CGrimoireMachina.h"
 #include "CMachinaForm.h"
 #include "CMeta.h"
 #include "CUIState.h"
@@ -31,8 +30,7 @@ struct ComponentContainer<std::tuple<Components...>> {
 /// @brief ComponentRegister is a tuple of all the components for the game
 /// "One source of truth"
 /////////////////////////////////////////////////
-typedef std::tuple<CMeta, CUserInterface, CMachinaForm, CGrimoireMachina,
-                   CUIState>
+typedef std::tuple<CMeta, CUserInterface, CMachinaForm, CUIState>
     ComponentRegister;
 
 /////////////////////////////////////////////////

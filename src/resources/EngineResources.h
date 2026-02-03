@@ -9,6 +9,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "AssetManager.h"
+#include "CGrimoireMachina.h"
 #include "DataAccessFactory.h"
 #include "EventHandler.h"
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -70,6 +71,14 @@ struct EngineResources {
   /// There should only be one instance of this.
   /////////////////////////////////////////////////
   AssetManager asset_manager;
+
+  /////////////////////////////////////////////////
+  /// @brief The player's Grimoire Machina - a persistent library of designs
+  /// and creations.
+  ///
+  /// This is save-state agnostic and can be transferred between saves/players.
+  /////////////////////////////////////////////////
+  CGrimoireMachina grimoire_machina;
 };
 
 } // namespace steamrot

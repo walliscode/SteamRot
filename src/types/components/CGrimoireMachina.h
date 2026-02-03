@@ -12,13 +12,12 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "CMachinaForm.h"
-#include "Component.h"
 #include "Fragment.h"
 #include <map>
 #include <memory>
 namespace steamrot {
 
-struct CGrimoireMachina : public Component {
+struct CGrimoireMachina {
   CGrimoireMachina() = default;
 
   /////////////////////////////////////////////////
@@ -27,7 +26,7 @@ struct CGrimoireMachina : public Component {
   /// @param other The CGrimoireMachina to copy from
   /////////////////////////////////////////////////
   CGrimoireMachina(const CGrimoireMachina &other)
-      : Component(other), m_all_fragments(other.m_all_fragments),
+      : m_all_fragments(other.m_all_fragments),
         m_all_joints(other.m_all_joints),
         m_machina_forms(other.m_machina_forms),
         m_holding_form(other.m_holding_form ? std::make_unique<CMachinaForm>(
@@ -42,7 +41,6 @@ struct CGrimoireMachina : public Component {
   /////////////////////////////////////////////////
   CGrimoireMachina &operator=(const CGrimoireMachina &other) {
     if (this != &other) {
-      Component::operator=(other);
       m_all_fragments = other.m_all_fragments;
       m_all_joints = other.m_all_joints;
       m_machina_forms = other.m_machina_forms;
