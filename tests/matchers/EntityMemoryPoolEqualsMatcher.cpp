@@ -7,8 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "EntityMemoryPoolEqualsMatcher.h"
-#include "CGrimoireMachinaEqualsMatcher.h"
-#include "CMachinaFormEqualsMatcher.h"
 #include "CMetaEqualsMatcher.h"
 #include "CUIStateEqualsMatcher.h"
 #include "CUserInterfaceEqualsMatcher.h"
@@ -59,42 +57,6 @@ void EntityMemoryPoolEqualsMatcher::CompareComponentVector(
     if (!matcher.match(actual_vec[i])) {
       // pass through the mismatch description from
       // CUserInterfaceEqualsMatcher
-      oss << matcher.describe() << "\n";
-      // switch flag to false
-      do_components_match = false;
-    }
-  }
-}
-
-/////////////////////////////////////////////////
-template <>
-void EntityMemoryPoolEqualsMatcher::CompareComponentVector(
-    const std::vector<CMachinaForm> &actual_vec,
-    const std::vector<CMachinaForm> &expected_vec,
-    std::ostringstream &oss) const {
-  for (size_t i = 0; i < expected_vec.size(); ++i) {
-    CMachinaFormEqualsMatcher matcher(expected_vec[i], i);
-    if (!matcher.match(actual_vec[i])) {
-
-      // pass through the mismatch description from CMachinaFormEqualsMatcher
-      oss << matcher.describe() << "\n";
-      // switch flag to false
-      do_components_match = false;
-    }
-  }
-}
-
-/////////////////////////////////////////////////
-template <>
-void EntityMemoryPoolEqualsMatcher::CompareComponentVector(
-    const std::vector<CGrimoireMachina> &actual_vec,
-    const std::vector<CGrimoireMachina> &expected_vec,
-    std::ostringstream &oss) const {
-  for (size_t i = 0; i < expected_vec.size(); ++i) {
-    CGrimoireMachinaEqualsMatcher matcher(expected_vec[i], i);
-    if (!matcher.match(actual_vec[i])) {
-      // pass through the mismatch description from
-      // CGrimoireMachinaEqualsMatcher
       oss << matcher.describe() << "\n";
       // switch flag to false
       do_components_match = false;

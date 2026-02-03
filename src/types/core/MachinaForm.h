@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "Component.h"
 #include "Fragment.h"
 #include "Joint.h"
 
@@ -18,9 +17,9 @@ namespace steamrot {
 /// Each CMachinaForm contains all the Fragments and Joints that define an
 /// Entity. Including how they link together and limitiations e.t.c.
 /////////////////////////////////////////////////
-struct CMachinaForm : public Component {
+struct MachinaForm {
 
-  CMachinaForm() = default;
+  MachinaForm() = default;
 
   /////////////////////////////////////////////////
   /// @brief Contains all Fragments for this Entity/MachinaForm

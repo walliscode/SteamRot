@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "ui_helpers.h"
-#include "CGrimoireMachina.h"
 #include "CUserInterface.h"
 #include "Fragment.h"
 #include "entity_memory.h"
@@ -21,7 +20,7 @@ TEST_CASE("GetAllFragmentNames returns correct fragment names", "[logic_ui]") {
   steamrot::Fragment fragment2;
   fragment2.name = "FragmentB";
 
-  steamrot::CGrimoireMachina grimoire_machina;
+  steamrot::GrimoireMachina grimoire_machina;
   grimoire_machina.m_all_fragments[fragment1.name] = fragment1;
   grimoire_machina.m_all_fragments[fragment2.name] = fragment2;
 
@@ -36,7 +35,7 @@ TEST_CASE("GetAllFragmentNames returns correct fragment names", "[logic_ui]") {
 
 TEST_CASE("GetAllJointNames returns correct joint names", "[logic_ui]") {
   // Arrange
-  steamrot::CGrimoireMachina grimoire_machina;
+  steamrot::GrimoireMachina grimoire_machina;
   grimoire_machina.m_all_joints["JointA"] = {}; // Placeholder joint
   grimoire_machina.m_all_joints["JointB"] = {}; // Placeholder joint
   // Act

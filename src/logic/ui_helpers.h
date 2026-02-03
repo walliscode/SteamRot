@@ -11,7 +11,8 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "CGrimoireMachina.h"
+
+#include "GrimoireMachina.h"
 #include "containers.h"
 #include <string>
 #include <vector>
@@ -26,7 +27,7 @@ namespace steamrot::logic::ui {
 /// @return Vector of fragment names
 /////////////////////////////////////////////////
 std::vector<std::string>
-GetAllFragmentNames(const CGrimoireMachina &grimoire_machina);
+GetAllFragmentNames(const GrimoireMachina &grimoire_machina);
 
 /////////////////////////////////////////////////
 /// @brief Get all available joint names from CGrimoireMachina
@@ -36,7 +37,7 @@ GetAllFragmentNames(const CGrimoireMachina &grimoire_machina);
 /// @return Vector of joint names
 /////////////////////////////////////////////////
 std::vector<std::string>
-GetAllJointNames(const CGrimoireMachina &grimoire_machina);
+GetAllJointNames(const GrimoireMachina &grimoire_machina);
 
 /////////////////////////////////////////////////
 /// @brief Update CUserInterface component visibility based on CUIState data
