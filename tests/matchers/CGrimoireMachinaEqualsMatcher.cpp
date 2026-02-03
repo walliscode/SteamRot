@@ -7,41 +7,26 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "CGrimoireMachinaEqualsMatcher.h"
-#include "conmat.h"
 
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
-std::string CGrimoireMachinaEqualsMatcher::GetComponentName() const {
-  return "CGrimoireMachina";
-}
-
-/////////////////////////////////////////////////
 CGrimoireMachinaEqualsMatcher::CGrimoireMachinaEqualsMatcher(
     const CGrimoireMachina &expected)
-    : ComponentMatcherBase<CGrimoireMachina>(expected) {}
+    : m_expected(expected) {}
 
 /////////////////////////////////////////////////
-CGrimoireMachinaEqualsMatcher::CGrimoireMachinaEqualsMatcher(
-    const CGrimoireMachina &expected, size_t entity_index)
-    : ComponentMatcherBase<CGrimoireMachina>(expected, entity_index) {}
+std::string CGrimoireMachinaEqualsMatcher::GetHeader() const {
+  std::string status =
+      m_mismatch_description.empty() ? conmat::TestPassed() : conmat::TestFailed();
+  return conmat::Header(status + " CGrimoireMachina Match:", 3) + "\n";
+}
 
 /////////////////////////////////////////////////
 bool CGrimoireMachinaEqualsMatcher::match(
     const CGrimoireMachina &actual) const {
   m_mismatch_description.clear();
   std::ostringstream oss;
-
-  if (actual.m_active != m_expected.m_active) {
-    oss << conmat::Indent(1) << conmat::TestFailed() << "m_active:"
-        << "\n";
-
-    oss << conmat::Indent(2)
-        << "actual: " << conmat::Colorize(actual.m_active, conmat::Color::Red)
-        << "\n";
-    oss << conmat::Indent(2) << "expected: "
-        << conmat::Colorize(m_expected.m_active, conmat::Color::Blue) << "\n";
-  }
 
   if (actual.m_all_fragments.size() != m_expected.m_all_fragments.size()) {
     oss << conmat::Indent(1) << conmat::TestFailed()
@@ -111,6 +96,11 @@ bool CGrimoireMachinaEqualsMatcher::match(
 
   m_mismatch_description = oss.str();
   return m_mismatch_description.empty();
+}
+
+/////////////////////////////////////////////////
+std::string CGrimoireMachinaEqualsMatcher::describe() const {
+  return GetHeader() + m_mismatch_description;
 }
 
 } // namespace steamrot::tests
