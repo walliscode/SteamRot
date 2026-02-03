@@ -94,6 +94,7 @@ The `documentation/` directory contains comprehensive guides organized by topic:
 - **[Error Handling](documentation/architecture/ERROR_HANDLING.md)** - Exception and error patterns
 - **[Game Loop](documentation/architecture/GAME_LOOP.md)** - Main game loop structure
 - **[Logic System](documentation/architecture/LOGIC_SYSTEM.md)** - Logic architecture
+- **[CGrimoireMachina Refactoring](documentation/architecture/CGRIMOIREMACHINA_QUICK_REFERENCE.md)** - Analysis and design for refactoring CGrimoireMachina
 
 ### ⚙️ Configuration
 - **[Context Configuration](documentation/configuration/CONTEXT_CONFIGURATION.md)** - Game and scene contexts
