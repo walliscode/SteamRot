@@ -7,7 +7,7 @@
 #include "CUIState.h"
 #include "archetypes.h"
 #include "entity_memory.h"
-#include "logic_ui.h"
+#include "ui/ui_helpers.h"
 
 namespace steamrot {
 /////////////////////////////////////////////////

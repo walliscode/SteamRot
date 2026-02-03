@@ -6,10 +6,10 @@ add_library(logic
   UIStateLogic.cpp
   Logic.cpp
   CraftingRenderLogic.cpp
-  logic_collision.cpp
-  logic_action.cpp
-  logic_ui.cpp
-  logic_render.cpp
+  ui/collision.cpp
+  ui/action.cpp
+  ui/ui_helpers.cpp
+  ui/render.cpp
 )
 
 target_include_directories(logic
