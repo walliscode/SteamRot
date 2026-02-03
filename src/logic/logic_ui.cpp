@@ -9,12 +9,14 @@
 #include "logic_ui.h"
 #include "CUserInterface.h"
 #include "entity_memory.h"
+#include <iostream>
 
 namespace steamrot::logic::ui {
 
 /////////////////////////////////////////////////
 std::vector<std::string>
 GetAllFragmentNames(const CGrimoireMachina &grimoire_machina) {
+
   std::vector<std::string> fragment_names;
   fragment_names.reserve(grimoire_machina.m_all_fragments.size());
 
@@ -58,20 +60,23 @@ void UpdateCUserInterfaceVisibilityFromCUIState(
 
     // if all subscribers are active, set UI components on/off accordingly
     if (all_active) {
-
+      std::cout << "All subscribers active for state key: " << state_key
+                << std::endl;
       // attempt to find UI visibility state for this state key, if not found,
       // skip
       auto ui_visibility_it = ui_state.m_state_to_ui_visibility.find(state_key);
       if (ui_visibility_it == ui_state.m_state_to_ui_visibility.end())
         continue;
-
       const UIVisibilityState &ui_visibility_state = ui_visibility_it->second;
+
       // toggle UI components
       for (const size_t ui_index_on : ui_visibility_state.m_ui_indices_on) {
         CUserInterface &ui_component =
             entity::memory::GetComponent<CUserInterface>(ui_index_on,
                                                          scene_entities);
 
+        std::cout << "Setting UI component visible: " << ui_component.m_name
+                  << " at index " << ui_index_on << std::endl;
         ui_component.m_visible = true;
       }
       for (const size_t ui_index_off : ui_visibility_state.m_ui_indices_off) {
@@ -79,6 +84,8 @@ void UpdateCUserInterfaceVisibilityFromCUIState(
             entity::memory::GetComponent<CUserInterface>(ui_index_off,
                                                          scene_entities);
 
+        std::cout << "Setting UI component hidden: " << ui_component.m_name
+                  << " at index " << ui_index_off << std::endl;
         ui_component.m_visible = false;
       }
     }
