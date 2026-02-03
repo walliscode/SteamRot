@@ -3,10 +3,8 @@
 
 add_library(matchers
   CMetaEqualsMatcher.cpp
-  CGrimoireMachinaEqualsMatcher.cpp
   CUserInterfaceEqualsMatcher.cpp
   CUIStateEqualsMatcher.cpp
-  CMachinaFormEqualsMatcher.cpp
   EventPacketEqualsMatcher.cpp
   EventDataEqualsMatcher.cpp
   EventBusEqualsMatcher.cpp

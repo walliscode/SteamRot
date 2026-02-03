@@ -11,9 +11,6 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-
-#include "CGrimoireMachina.h"
-#include "CMachinaForm.h"
 #include "CUIState.h"
 #include "CUserInterface.h"
 #include "EntityTransportVariant.h"
@@ -94,26 +91,6 @@ public:
   /////////////////////////////////////////////////
   virtual std::expected<std::monostate, FailInfo>
   ConfigureCUIState(CUIState &c_ui_state_component, EntityMemoryPool &emp) = 0;
-
-  /////////////////////////////////////////////////
-  /// @brief Configure CGrimoireMachina component
-  ///
-  /// @param c_grimoire_component Reference to CGrimoireMachina component to
-  /// configure
-  /// @returns std::expected<std::monostate, FailInfo>
-  //////////////////////////////////////////////////
-  virtual std::expected<std::monostate, FailInfo>
-  ConfigureCGrimoireMachina(CGrimoireMachina &c_grimoire_component) = 0;
-
-  /////////////////////////////////////////////////
-  /// @brief Configure CMachinaForm component
-  ///
-  /// @param c_machina_form_component Reference to CMachinaForm component to
-  /// configure
-  /// @returns std::expected<std::monostate, FailInfo>
-  /////////////////////////////////////////////////
-  virtual std::expected<std::monostate, FailInfo>
-  ConfigureCMachinaForm(CMachinaForm &c_machina_form_component) = 0;
 };
 } // namespace steamrot
 // namespace steamrot

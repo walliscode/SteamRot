@@ -16,25 +16,6 @@ private:
   /////////////////////////////////////////////////
   void ProcessLogic() override;
 
-  /////////////////////////////////////////////////
-  /// @brief Draw the current CMachinaForm in the CGrimoireMachina
-  /////////////////////////////////////////////////
-  void DrawMachinaForm();
-
-  /////////////////////////////////////////////////
-  /// @brief Render the joints in the current holding form.
-  ///
-  /// @param joint Contains all the data required to render a joint.
-  /////////////////////////////////////////////////
-  void RenderJoint(Joint &joint);
-
-  /////////////////////////////////////////////////
-  /// @brief Render the fragments in the current holding form.
-  ///
-  /// @param fragment Contains all the data required to render a fragment.
-  /////////////////////////////////////////////////
-  void RenderFragment(Fragment &fragment);
-
 public:
   /////////////////////////////////////////////////
   /// @brief Constructor for CraftingRenderLogic taking in a SceneContext

@@ -7,14 +7,10 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "EntityMemoryPoolEqualsMatcher.h"
-#include "CGrimoireMachina.h"
-#include "CMachinaForm.h"
 #include "CMeta.h"
 #include "CUIState.h"
 #include "CUserInterface.h"
-
 #include "containers.h"
-
 #include "entity_memory.h"
 #include <catch2/catch_test_macros.hpp>
 
@@ -34,16 +30,6 @@ TEST_CASE("EntityMemoryPoolEqualsMatcher works correctly",
           expected);
   cui_vec_expected.resize(pool_size);
 
-  auto &cform_vec_expected =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
-          expected);
-  cform_vec_expected.resize(pool_size);
-
-  auto &cgrim_vec_expected =
-      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
-          expected);
-  cgrim_vec_expected.resize(pool_size);
-
   auto &cstate_vec_expected =
       steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(
           expected);
@@ -58,16 +44,6 @@ TEST_CASE("EntityMemoryPoolEqualsMatcher works correctly",
       steamrot::entity::memory::GetComponentVector<steamrot::CUserInterface>(
           actual);
   cui_vec_actual.resize(pool_size);
-
-  auto &cform_vec_actual =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
-          actual);
-  cform_vec_actual.resize(pool_size);
-
-  auto &cgrim_vec_actual =
-      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
-          actual);
-  cgrim_vec_actual.resize(pool_size);
 
   auto &cstate_vec_actual =
       steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(actual);
@@ -88,15 +64,6 @@ TEST_CASE("EntityMemoryPoolEqualsMatcher works correctly",
         steamrot::entity::memory::GetComponentVector<steamrot::CUserInterface>(
             different_pool);
     cui_vec_diff.resize(3);
-
-    auto &cform_vec_diff =
-        steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
-            different_pool);
-    cform_vec_diff.resize(3);
-
-    auto &cgrim_vec_diff = steamrot::entity::memory::GetComponentVector<
-        steamrot::CGrimoireMachina>(different_pool);
-    cgrim_vec_diff.resize(3);
 
     auto &cstate_vec_diff =
         steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(
@@ -132,16 +99,6 @@ TEST_CASE("EntityMemoryPoolEqualsMatcher describe is as expected on success",
           expected);
   cui_vec_expected.resize(pool_size);
 
-  auto &cform_vec_expected =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
-          expected);
-  cform_vec_expected.resize(pool_size);
-
-  auto &cgrim_vec_expected =
-      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
-          expected);
-  cgrim_vec_expected.resize(pool_size);
-
   auto &cstate_vec_expected =
       steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(
           expected);
@@ -156,16 +113,6 @@ TEST_CASE("EntityMemoryPoolEqualsMatcher describe is as expected on success",
       steamrot::entity::memory::GetComponentVector<steamrot::CUserInterface>(
           actual);
   cui_vec_actual.resize(pool_size);
-
-  auto &cform_vec_actual =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
-          actual);
-  cform_vec_actual.resize(pool_size);
-
-  auto &cgrim_vec_actual =
-      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
-          actual);
-  cgrim_vec_actual.resize(pool_size);
 
   auto &cstate_vec_actual =
       steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(actual);
@@ -196,16 +143,6 @@ TEST_CASE("EntityMemoryPoolEqualsMatcher describe is as expected on failure",
           expected);
   cui_vec_expected.resize(expected_size);
 
-  auto &cform_vec_expected =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
-          expected);
-  cform_vec_expected.resize(expected_size);
-
-  auto &cgrim_vec_expected =
-      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
-          expected);
-  cgrim_vec_expected.resize(expected_size);
-
   auto &cstate_vec_expected =
       steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(
           expected);
@@ -221,16 +158,6 @@ TEST_CASE("EntityMemoryPoolEqualsMatcher describe is as expected on failure",
           actual);
   cui_vec_actual.resize(actual_size);
 
-  auto &cform_vec_actual =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
-          actual);
-  cform_vec_actual.resize(actual_size);
-
-  auto &cgrim_vec_actual =
-      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
-          actual);
-  cgrim_vec_actual.resize(actual_size);
-
   auto &cstate_vec_actual =
       steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(actual);
   cstate_vec_actual.resize(actual_size);
@@ -244,8 +171,9 @@ TEST_CASE("EntityMemoryPoolEqualsMatcher describe is as expected on failure",
   REQUIRE(description.find("Size Mismatch:") != std::string::npos);
 }
 
-TEST_CASE("EntityMemoryPoolEqualsMatcher shows entity index in component errors",
-          "[unit][EntityMemoryPool][matcher]") {
+TEST_CASE(
+    "EntityMemoryPoolEqualsMatcher shows entity index in component errors",
+    "[unit][EntityMemoryPool][matcher]") {
   const size_t pool_size = 5;
   steamrot::EntityMemoryPool expected;
   steamrot::EntityMemoryPool actual;
@@ -259,16 +187,6 @@ TEST_CASE("EntityMemoryPoolEqualsMatcher shows entity index in component errors"
       steamrot::entity::memory::GetComponentVector<steamrot::CUserInterface>(
           expected);
   cui_vec_expected.resize(pool_size);
-
-  auto &cform_vec_expected =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
-          expected);
-  cform_vec_expected.resize(pool_size);
-
-  auto &cgrim_vec_expected =
-      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
-          expected);
-  cgrim_vec_expected.resize(pool_size);
 
   auto &cstate_vec_expected =
       steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(
@@ -284,16 +202,6 @@ TEST_CASE("EntityMemoryPoolEqualsMatcher shows entity index in component errors"
       steamrot::entity::memory::GetComponentVector<steamrot::CUserInterface>(
           actual);
   cui_vec_actual.resize(pool_size);
-
-  auto &cform_vec_actual =
-      steamrot::entity::memory::GetComponentVector<steamrot::CMachinaForm>(
-          actual);
-  cform_vec_actual.resize(pool_size);
-
-  auto &cgrim_vec_actual =
-      steamrot::entity::memory::GetComponentVector<steamrot::CGrimoireMachina>(
-          actual);
-  cgrim_vec_actual.resize(pool_size);
 
   auto &cstate_vec_actual =
       steamrot::entity::memory::GetComponentVector<steamrot::CUIState>(actual);

@@ -95,26 +95,6 @@ public:
   std::expected<std::monostate, FailInfo>
   ConfigureCUIState(CUIState &c_ui_state_component,
                     EntityMemoryPool &emp) override;
-
-  /////////////////////////////////////////////////
-  /// @brief Configure CGrimoireMachina component
-  ///
-  /// @param c_grimoire_component Reference to CGrimoireMachina component to
-  /// configure
-  /// @returns std::expected<std::monostate, FailInfo>
-  //////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  ConfigureCGrimoireMachina(CGrimoireMachina &c_grimoire_component) override;
-
-  /////////////////////////////////////////////////
-  /// @brief Configure CMachinaForm component
-  ///
-  /// @param c_machina_form_component Reference to CMachinaForm component to
-  /// configure
-  /// @returns std::expected<std::monostate, FailInfo>
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  ConfigureCMachinaForm(CMachinaForm &c_machina_form_component) override;
 };
 
 } // namespace steamrot

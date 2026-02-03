@@ -6,11 +6,10 @@ add_executable(test_types
   core/Joint.test.cpp
   core/Fragment.test.cpp
 
-  components/CGrimoireMachina.test.cpp
+
   components/CUIState.test.cpp
   components/CMeta.test.cpp
   components/CUserInterface.test.cpp
-  components/CMachinaForm.test.cpp
 
   events/Subscriber.test.cpp
   events/UserInputBitset.test.cpp
