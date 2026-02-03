@@ -111,6 +111,24 @@ std::expected<std::monostate, FailInfo>
 FlatbuffersEntityConfigurator::ConfigureSecondLayerComponents(
     EntityMemoryPool &emp) {
 
+  // reset entity index to zero
+  size_t entity_index = 0;
+
+  for (const auto &entity_data : *m_entity_collection_data->entities()) {
+    //  update the current EntityDataFbs pointer
+    m_current_entity_data = entity_data;
+
+    /// CONFIGURE CUIState ///
+    if (entity_data->c_ui_state()) {
+      auto configure_result = ConfigureCUIState(
+          entity::memory::GetComponent<CUIState>(entity_index, emp), emp);
+      if (!configure_result.has_value())
+        return std::unexpected(configure_result.error());
+    }
+    // progress to next entity index
+    entity_index++;
+  }
+
   return std::monostate{};
 }
 

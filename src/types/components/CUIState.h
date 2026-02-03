@@ -23,7 +23,7 @@ namespace steamrot {
 /////////////////////////////////////////////////
 /// @brief Holds UI visibility state for a particular state key
 ///
-/// Specifies which UI components should be visible (on) and
+/// Specifies which CUserInterface components should be visible (on)
 /// which should be hidden (off) for a given state.
 /////////////////////////////////////////////////
 struct UIVisibilityState {
