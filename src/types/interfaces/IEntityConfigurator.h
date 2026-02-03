@@ -12,7 +12,6 @@
 /// Headers
 /////////////////////////////////////////////////
 
-#include "CGrimoireMachina.h"
 #include "CMachinaForm.h"
 #include "CUIState.h"
 #include "CUserInterface.h"
@@ -94,16 +93,6 @@ public:
   /////////////////////////////////////////////////
   virtual std::expected<std::monostate, FailInfo>
   ConfigureCUIState(CUIState &c_ui_state_component, EntityMemoryPool &emp) = 0;
-
-  /////////////////////////////////////////////////
-  /// @brief Configure CGrimoireMachina component
-  ///
-  /// @param c_grimoire_component Reference to CGrimoireMachina component to
-  /// configure
-  /// @returns std::expected<std::monostate, FailInfo>
-  //////////////////////////////////////////////////
-  virtual std::expected<std::monostate, FailInfo>
-  ConfigureCGrimoireMachina(CGrimoireMachina &c_grimoire_component) = 0;
 
   /////////////////////////////////////////////////
   /// @brief Configure CMachinaForm component

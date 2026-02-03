@@ -55,13 +55,6 @@
                     }
                   }
                 }
-              },
-              {
-                "index": 1,
-                "c_grimoire_machina": {
-                  "fragments": ["test_fragment"],
-                  "joints": []
-                }
               }
             ]
           },

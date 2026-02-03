@@ -40,13 +40,6 @@
             }
           }
         }
-      },
-      {
-        "index": 1,
-        "c_grimoire_machina": {
-          "fragments": ["test_fragment_1", "test_fragment_2"],
-          "joints": ["test_joint_1"]
-        }
       }
     ]
   },

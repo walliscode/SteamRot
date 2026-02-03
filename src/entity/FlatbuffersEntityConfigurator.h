@@ -97,16 +97,6 @@ public:
                     EntityMemoryPool &emp) override;
 
   /////////////////////////////////////////////////
-  /// @brief Configure CGrimoireMachina component
-  ///
-  /// @param c_grimoire_component Reference to CGrimoireMachina component to
-  /// configure
-  /// @returns std::expected<std::monostate, FailInfo>
-  //////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  ConfigureCGrimoireMachina(CGrimoireMachina &c_grimoire_component) override;
-
-  /////////////////////////////////////////////////
   /// @brief Configure CMachinaForm component
   ///
   /// @param c_machina_form_component Reference to CMachinaForm component to

@@ -195,54 +195,6 @@ FlatbuffersEntityConfigurator::ConfigureCMachinaForm(
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-FlatbuffersEntityConfigurator::ConfigureCGrimoireMachina(
-    CGrimoireMachina &grimoire_component) {
-
-  // configure the underlying Component type
-  auto configure_result =
-      ConfigureComponent(static_cast<Component &>(grimoire_component));
-
-  if (!configure_result.has_value())
-    return std::unexpected(configure_result.error());
-
-  // get the GrimoireMachinaData from the current entity data
-  const GrimoireMachinaData *grimoire_data =
-      m_current_entity_data->c_grimoire_machina();
-
-  // null check for grimoire_data
-  if (!grimoire_data) {
-    FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
-                       "GrimoireMachinaData not found in entity data."};
-    return std::unexpected(fail_info);
-  }
-
-  // configure the CGrimoireMachina specific data
-  // Note: Currently not populating m_all_fragments or m_all_joints from
-  // FlatBuffers data. This would require Fragment and Joint object creation
-  // which is not implemented yet.
-  if (grimoire_data->fragments()) {
-    for (const auto &name : *grimoire_data->fragments()) {
-      if (name) {
-        // Fragment names are present but not yet used
-        // Future implementation would create Fragment objects here
-      }
-    }
-  }
-
-  if (grimoire_data->joints()) {
-    for (const auto &name : *grimoire_data->joints()) {
-      if (name) {
-        // Joint names are present but not yet used
-        // Future implementation would create Joint objects here
-      }
-    }
-  }
-
-  return std::monostate{};
-}
-
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
 FlatbuffersEntityConfigurator::ConfigureCUIState(CUIState &ui_state_component,
                                                  EntityMemoryPool &emp) {
 
