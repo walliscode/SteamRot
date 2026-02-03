@@ -1,0 +1,106 @@
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineSystem.cmake:12 (find_program)"
+      - "CMakeLists.txt:6 (project)"
+    mode: "program"
+    variable: "CMAKE_UNAME"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "uname"
+    candidate_directories:
+      - "/home/bwallis/.local/share/nvim/mason/bin/"
+      - "/home/bwallis/bin/"
+      - "/opt/cmake/bin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/opt/nvim-linux-x86_64/bin/"
+      - "/bin/"
+    searched_directories:
+      - "/home/bwallis/.local/share/nvim/mason/bin/uname"
+      - "/home/bwallis/bin/uname"
+      - "/opt/cmake/bin/uname"
+      - "/usr/local/bin/uname"
+    found: "/usr/bin/uname"
+    search_context:
+      ENV{PATH}:
+        - "/home/bwallis/.local/share/nvim/mason/bin"
+        - "/home/bwallis/bin"
+        - "/opt/cmake/bin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/opt/nvim-linux-x86_64/bin"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineSystem.cmake:212 (message)"
+      - "CMakeLists.txt:6 (project)"
+    message: |
+      The system is: Linux - 6.18.7-arch1-1 - x86_64
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeUnixFindMake.cmake:5 (find_program)"
+      - "CMakeLists.txt:6 (project)"
+    mode: "program"
+    variable: "CMAKE_MAKE_PROGRAM"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "gmake"
+      - "make"
+      - "smake"
+    candidate_directories:
+      - "/home/bwallis/.local/share/nvim/mason/bin/"
+      - "/home/bwallis/bin/"
+      - "/opt/cmake/bin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/opt/nvim-linux-x86_64/bin/"
+    searched_directories:
+      - "/home/bwallis/.local/share/nvim/mason/bin/gmake"
+      - "/home/bwallis/bin/gmake"
+      - "/opt/cmake/bin/gmake"
+      - "/usr/local/bin/gmake"
+      - "/usr/bin/gmake"
+      - "/opt/nvim-linux-x86_64/bin/gmake"
+      - "/home/bwallis/.local/share/nvim/mason/bin/make"
+      - "/home/bwallis/bin/make"
+      - "/opt/cmake/bin/make"
+      - "/usr/local/bin/make"
+      - "/usr/bin/make"
+      - "/opt/nvim-linux-x86_64/bin/make"
+      - "/home/bwallis/.local/share/nvim/mason/bin/smake"
+      - "/home/bwallis/bin/smake"
+      - "/opt/cmake/bin/smake"
+      - "/usr/local/bin/smake"
+      - "/usr/bin/smake"
+      - "/opt/nvim-linux-x86_64/bin/smake"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/home/bwallis/.local/share/nvim/mason/bin"
+        - "/home/bwallis/bin"
+        - "/opt/cmake/bin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/opt/nvim-linux-x86_64/bin"
+...

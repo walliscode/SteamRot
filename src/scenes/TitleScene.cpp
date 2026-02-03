@@ -16,6 +16,16 @@ TitleScene::TitleScene(const GameContext &game_context) : Scene(game_context) {}
 void TitleScene::sMovement() {};
 
 /////////////////////////////////////////////////
+void TitleScene::sCollision() {
+
+  // process collision logick
+  for (auto &collision_logic :
+       m_scene_resources.logic_map[LogicType::Collision]) {
+    collision_logic->RunLogic();
+  }
+}
+
+/////////////////////////////////////////////////
 void TitleScene::sRender() {
   // clear the render texture and the start of each Scene render step
   m_scene_resources.scene_texture.clear(sf::Color::Black);
@@ -27,16 +37,6 @@ void TitleScene::sRender() {
 
   // display the render texture at the end of each Scene render step
   m_scene_resources.scene_texture.display();
-}
-
-/////////////////////////////////////////////////
-void TitleScene::sCollision() {
-
-  // process collision logick
-  for (auto &collision_logic :
-       m_scene_resources.logic_map[LogicType::Collision]) {
-    collision_logic->RunLogic();
-  }
 }
 
 /////////////////////////////////////////////////
