@@ -77,6 +77,111 @@
         "fragments": ["fragment_a", "fragment_b"],
         "joints": ["joint_x", "joint_y"]
       }
+    },
+    {
+      "index": 5,
+      "c_user_interface": {
+        "ui_name": "menu_ui",
+        "is_visible": true,
+        "root_ui_element": {
+          "base_data": {
+            "position": { "x": 0.0, "y": 0.0 },
+            "size": { "x": 100.0, "y": 100.0 },
+            "children_active": false,
+            "children": [],
+            "layout": "Vertical",
+            "spacing_strategy": "None"
+          }
+        }
+      }
+    },
+    {
+      "index": 6,
+      "c_user_interface": {
+        "ui_name": "settings_ui",
+        "is_visible": false,
+        "root_ui_element": {
+          "base_data": {
+            "position": { "x": 0.0, "y": 0.0 },
+            "size": { "x": 200.0, "y": 150.0 },
+            "children_active": false,
+            "children": [],
+            "layout": "Vertical",
+            "spacing_strategy": "None"
+          }
+        }
+      }
+    },
+    {
+      "index": 7,
+      "c_ui_state": {
+        "ui_states": [
+          {
+            "state_key": "main_menu",
+            "state_to_ui_visibility": {
+              "ui_names_on": ["simple_ui", "menu_ui"],
+              "ui_names_off": ["hidden_ui"]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "index": 8,
+      "c_ui_state": {
+        "ui_states": [
+          {
+            "state_key": "settings_screen",
+            "state_to_ui_visibility": {
+              "ui_names_on": ["settings_ui"],
+              "ui_names_off": ["simple_ui", "menu_ui"]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "index": 9,
+      "c_ui_state": {
+        "ui_states": [
+          {
+            "state_key": "game_running",
+            "state_to_ui_visibility": {
+              "ui_names_on": ["simple_ui"],
+              "ui_names_off": []
+            },
+            "subscribers": [
+              {
+                "event_type_data": "EVENT_USER_INPUT",
+                "trigger_data_type": "UserInputBitsetData",
+                "trigger_data": { "keys_pressed": ["Escape"] },
+                "active": true
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "index": 10,
+      "c_ui_state": {
+        "ui_states": [
+          {
+            "state_key": "multiple_states_a",
+            "state_to_ui_visibility": {
+              "ui_names_on": ["simple_ui"],
+              "ui_names_off": ["menu_ui"]
+            }
+          },
+          {
+            "state_key": "multiple_states_b",
+            "state_to_ui_visibility": {
+              "ui_names_on": ["menu_ui", "settings_ui"],
+              "ui_names_off": ["simple_ui", "hidden_ui"]
+            }
+          }
+        ]
+      }
     }
   ]
 }
