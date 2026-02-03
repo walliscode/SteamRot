@@ -22,6 +22,10 @@ Documentation on system design, architectural decisions, and design proposals.
 
 Analysis and design documents for refactoring CGrimoireMachina from a Component to a standalone class managed by AssetManager.
 
+- **[Executive Summary](architecture/CGRIMOIREMACHINA_EXECUTIVE_SUMMARY.md)** - For decision makers
+  - 📄 4 pages, recommendation and decision points
+  - Best for: Stakeholders needing to approve/reject proposal
+
 - **[Quick Reference](architecture/CGRIMOIREMACHINA_QUICK_REFERENCE.md)** - TL;DR summary of the proposal
   - 📄 2 pages, quick overview
   - Best for: Getting the gist quickly

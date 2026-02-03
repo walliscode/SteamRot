@@ -330,9 +330,10 @@ Before implementing, stakeholders should decide:
 
 ## Related Documents
 
+- **[Executive Summary](./CGRIMOIREMACHINA_EXECUTIVE_SUMMARY.md)** - Decision-maker summary with recommendations
 - **[Full Analysis](./CGRIMOIREMACHINA_REFACTORING_ANALYSIS.md)** - 16KB, comprehensive analysis
 - **[Design Proposal](./CGRIMOIREMACHINA_DESIGN_PROPOSAL.md)** - 21KB, concrete design
-- **README.md** - Project overview and getting started
+- **[Main README](../../README.md)** - Project overview and getting started
 
 ---
 
