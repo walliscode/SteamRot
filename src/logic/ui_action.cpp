@@ -6,16 +6,17 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "logic_action.h"
+#include "ui_action.h"
 #include "DropDownItemElement.h"
 #include "archetypes.h"
 #include "entity_memory.h"
-#include "logic_ui.h"
+#include "ui_helpers.h"
 #include <iostream>
 #include <ostream>
 
 namespace steamrot {
 namespace logic {
+namespace ui {
 namespace action {
 
 /////////////////////////////////////////////////
@@ -193,5 +194,6 @@ void ProcessDropDownListElementActions(
 }
 
 } // namespace action
+} // namespace ui
 } // namespace logic
 } // namespace steamrot

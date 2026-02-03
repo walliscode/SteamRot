@@ -30,6 +30,7 @@
 namespace steamrot {
 
 namespace logic {
+namespace ui {
 namespace render {
 
 /////////////////////////////////////////////////
@@ -147,5 +148,6 @@ void UpdateSizeAndPositionOfChildElements(const UIElement &element,
                                           const UIStyle &style);
 
 } // namespace render
+} // namespace ui
 } // namespace logic
 } // namespace steamrot

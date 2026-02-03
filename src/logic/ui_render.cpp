@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "logic_render.h"
+#include "ui_render.h"
 #include "ButtonElement.h"
 #include "DropDownButtonElement.h"
 #include "DropDownContainerElement.h"
@@ -17,6 +17,7 @@
 
 namespace steamrot {
 namespace logic {
+namespace ui {
 namespace render {
 
 /////////////////////////////////////////////////
@@ -356,5 +357,6 @@ void UpdateSizeAndPositionOfChildElements(const UIElement &element,
   }
 }
 } // namespace render
+} // namespace ui
 } // namespace logic
 } // namespace steamrot

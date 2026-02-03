@@ -12,6 +12,7 @@
 #include <SFML/Graphics/Rect.hpp>
 namespace steamrot {
 namespace logic {
+namespace ui {
 namespace collision {
 
 /////////////////////////////////////////////////
@@ -47,5 +48,6 @@ void CheckMouseOverNestedUIElement(const sf::Vector2i &mouse_position,
                                    UIElement &element);
 
 } // namespace collision
+} // namespace ui
 } // namespace logic
 } // namespace steamrot

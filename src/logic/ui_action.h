@@ -18,6 +18,7 @@
 
 namespace steamrot {
 namespace logic {
+namespace ui {
 namespace action {
 
 /////////////////////////////////////////////////
@@ -72,5 +73,6 @@ void ProcessDropDownListElementActions(
     DropDownListElement &dropdown_list_element,
     const SceneContext &scene_context);
 } // namespace action
+} // namespace ui
 } // namespace logic
 } // namespace steamrot

@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "logic_ui.h"
+#include "ui_helpers.h"
 #include "CGrimoireMachina.h"
 #include "CUserInterface.h"
 #include "Fragment.h"

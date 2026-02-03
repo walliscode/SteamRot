@@ -2,7 +2,7 @@
 #include "CUserInterface.h"
 #include "archetypes.h"
 #include "entity_memory.h"
-#include "logic_collision.h"
+#include "ui_collision.h"
 #include <SFML/Window/Mouse.hpp>
 
 namespace steamrot {
@@ -28,7 +28,7 @@ void UICollisionLogic::ProcessLogic() {
     if (!ui_component.m_visible) {
       continue;
     }
-    logic::collision::CheckMouseOverNestedUIElement(
+    logic::ui::collision::CheckMouseOverNestedUIElement(
         m_scene_context.mouse_position, *ui_component.m_root_element);
   };
 }

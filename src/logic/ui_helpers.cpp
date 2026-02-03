@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "logic_ui.h"
+#include "ui_helpers.h"
 #include "CUserInterface.h"
 #include "entity_memory.h"
 #include <iostream>

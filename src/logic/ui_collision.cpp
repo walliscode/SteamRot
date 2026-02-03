@@ -6,11 +6,12 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "logic_collision.h"
+#include "ui_collision.h"
 #include "UIElement.h"
 
 namespace steamrot {
 namespace logic {
+namespace ui {
 namespace collision {
 
 /////////////////////////////////////////////////
@@ -60,5 +61,6 @@ void CheckMouseOverNestedUIElement(const sf::Vector2i &mouse_position,
   }
 }
 } // namespace collision
+} // namespace ui
 } // namespace logic
 } // namespace steamrot
