@@ -2,7 +2,7 @@
 #include "CUserInterface.h"
 #include "archetypes.h"
 #include "entity_memory.h"
-#include "ui/collision.h"
+#include "ui_collision.h"
 #include <SFML/Window/Mouse.hpp>
 
 namespace steamrot {

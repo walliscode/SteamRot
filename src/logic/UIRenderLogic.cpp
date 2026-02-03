@@ -5,7 +5,7 @@
 #include "Logic.h"
 #include "archetypes.h"
 #include "entity_memory.h"
-#include "ui/render.h"
+#include "ui_render.h"
 #include <SFML/Graphics.hpp>
 
 namespace steamrot {

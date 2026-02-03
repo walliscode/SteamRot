@@ -6,14 +6,14 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "ui/collision.h"
+#include "ui_collision.h"
 #include "PanelElement.h"
 #include "catch2/generators/catch_generators.hpp"
 #include <SFML/Graphics/Rect.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("IsMouseOverBounds returns false for point outside bounds",
-          "[unit][ui][collision]") {
+          "[unit][collision]") {
   sf::Vector2i mouse_position(150, 150);
   sf::FloatRect bounds({0, 0}, {100, 100});
 
@@ -31,7 +31,7 @@ struct IsMouseOverTestCase {
 
 TEST_CASE("IsMouseOverBounds returns correct results for various bounds and "
           "mouse positions",
-          "[unit][ui][collision]") {
+          "[unit][collision]") {
   auto cases = GENERATE(
       IsMouseOverTestCase{{50, 50}, sf::FloatRect({0, 0}, {100, 100}), true},
       IsMouseOverTestCase{{0, 0}, sf::FloatRect({0, 0}, {100, 100}), true},
@@ -66,7 +66,7 @@ TEST_CASE("IsMouseOverBounds returns correct results for various bounds and "
 }
 
 TEST_CASE("CheckMouseOverUIElement toggles Panel Element",
-          "[unit][ui][collision]") {
+          "[unit][collision]") {
 
   // create Panel Element and set position and size
   steamrot::PanelElement panel_element;
@@ -88,7 +88,7 @@ TEST_CASE("CheckMouseOverUIElement toggles Panel Element",
 }
 
 TEST_CASE("CheckMouseOverNestedUIElement toggles nested Panel Elements",
-          "[unit][ui][collision]") {
+          "[unit][collision]") {
   // create parent Panel Element
   steamrot::PanelElement parent_element;
   parent_element.position = {0, 0};

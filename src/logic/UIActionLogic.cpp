@@ -6,7 +6,7 @@
 #include "Logic.h"
 #include "archetypes.h"
 #include "entity_memory.h"
-#include "ui/action.h"
+#include "ui_action.h"
 #include <SFML/Window/Mouse.hpp>
 #include <magic_enum/magic_enum.hpp>
 

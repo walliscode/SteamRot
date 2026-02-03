@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Units tests for ui::action free functions
+/// @brief Units tests for logic_actions free functions
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "ui/action.h"
+#include "ui_action.h"
 #include "EventPacket.h"
 #include "EventType.h"
 #include "PanelElement.h"
@@ -16,7 +16,7 @@
 
 TEST_CASE(
     "logic::ui::action::ProcessButtonElementActions responds to various cases",
-    "[unit][ui][action][ProcessButtonElementActions]") {
+    "[logic][action][ProcessButtonElementActions]") {
 
   // set up
   steamrot::tests::TestFixture fixture;
@@ -50,7 +50,7 @@ TEST_CASE(
 
 TEST_CASE(
     "logic::ui::action::ProcessDropDownListElementActions populates dropdowns",
-    "[unit][ui][action][ProcessDropDownListElementActions]") {
+    "[logic][action][ProcessDropDownListElementActions]") {
   // set up
   steamrot::tests::TestFixture fixture;
   steamrot::SceneContext &scene_context = fixture.GetSceneContext();
@@ -70,7 +70,7 @@ TEST_CASE(
 
 TEST_CASE("logic::ui::action::ProcessUIActionsAndEvents processes UI elements "
           "correctly",
-          "[unit][ui][action][ProcessUIActionsAndEvents]") {
+          "[logic][action][ProcessUIActionsAndEvents]") {
   // set up
   steamrot::tests::TestFixture fixture;
   steamrot::SceneContext &scene_context = fixture.GetSceneContext();
@@ -125,7 +125,7 @@ TEST_CASE("logic::ui::action::ProcessUIActionsAndEvents processes UI elements "
 
 TEST_CASE("logic::ui::action::ProcessNestedUIActionsAndEvents processes nested "
           "UI elements correctly",
-          "[unit][ui][action][ProcessNestedUIActionsAndEvents]") {
+          "[logic][action][ProcessNestedUIActionsAndEvents]") {
   // set up
   steamrot::tests::TestFixture fixture;
   steamrot::SceneContext &scene_context = fixture.GetSceneContext();

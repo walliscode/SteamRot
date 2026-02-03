@@ -1,10 +1,10 @@
 add_executable(test_logic
 LogicFactory.test.cpp
-ui/collision.test.cpp
-ui/action.test.cpp
-ui/render.test.cpp
+ui_collision.test.cpp
+ui_action.test.cpp
+ui_render.test.cpp
 logic_render_test_helpers.cpp
-ui/ui_helpers.test.cpp
+ui_helpers.test.cpp
 
 )
 

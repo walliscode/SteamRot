@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "action.h"
+#include "ui_action.h"
 #include "DropDownItemElement.h"
 #include "archetypes.h"
 #include "entity_memory.h"
@@ -132,7 +132,7 @@ void ProcessDropDownListElementActions(
 
         // Get all fragment names
         std::vector<std::string> fragment_names =
-            GetAllFragmentNames(grimoire_machina);
+            logic::ui::GetAllFragmentNames(grimoire_machina);
 
         // Clear existing child elements
         dropdown_list_element.child_elements.clear();
@@ -166,7 +166,7 @@ void ProcessDropDownListElementActions(
 
         // Get all joint names
         std::vector<std::string> joint_names =
-            GetAllJointNames(grimoire_machina);
+            logic::ui::GetAllJointNames(grimoire_machina);
 
         // Clear existing child elements
         dropdown_list_element.child_elements.clear();

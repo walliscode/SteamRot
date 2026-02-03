@@ -1,19 +1,19 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Unit tests for the free functions in ui_helpers.cpp
+/// @brief Unit tests for the free functions in logic_ui.cpp
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "ui/ui_helpers.h"
+#include "ui_helpers.h"
 #include "CGrimoireMachina.h"
 #include "CUserInterface.h"
 #include "Fragment.h"
 #include "entity_memory.h"
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("GetAllFragmentNames returns correct fragment names", "[unit][ui_helpers]") {
+TEST_CASE("GetAllFragmentNames returns correct fragment names", "[logic_ui]") {
 
   // Arrange
   steamrot::Fragment fragment1;
@@ -34,7 +34,7 @@ TEST_CASE("GetAllFragmentNames returns correct fragment names", "[unit][ui_helpe
   REQUIRE(fragment_names == expected_names);
 }
 
-TEST_CASE("GetAllJointNames returns correct joint names", "[unit][ui_helpers]") {
+TEST_CASE("GetAllJointNames returns correct joint names", "[logic_ui]") {
   // Arrange
   steamrot::CGrimoireMachina grimoire_machina;
   grimoire_machina.m_all_joints["JointA"] = {}; // Placeholder joint
@@ -49,7 +49,7 @@ TEST_CASE("GetAllJointNames returns correct joint names", "[unit][ui_helpers]") 
 
 TEST_CASE("UpdateCUserInterfaceVisibilityFromCUIState does nothing if "
           "CUserIntferface not registered with CUIState",
-          "[unit][ui_helpers]") {
+          "[logic_ui]") {
   // Arrange
   // Set up an EntityMemoryPool with one CUserInterface entity and one
   // CUIState entity
@@ -84,7 +84,7 @@ TEST_CASE("UpdateCUserInterfaceVisibilityFromCUIState does nothing if "
 
 TEST_CASE("UpdateCUserInterfaceVisibilityFromCUIState updates UI "
           "visibility",
-          "[unit][ui_helpers]") {
+          "[logic_ui]") {
 
   // Arrange
   // Set up an EntityMemoryPool with two CUserInterface entities and
