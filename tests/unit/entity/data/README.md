@@ -13,7 +13,12 @@ This JSON file contains a single `EntityCollectionFbs` with multiple test entiti
 - **Entity 2**: CUserInterface (ui_name: "hidden_ui", visible: false, simple panel)
 - **Entity 3**: CGrimoireMachina (empty fragments/joints)
 - **Entity 4**: CGrimoireMachina (with fragments: ["fragment_a", "fragment_b"], joints: ["joint_x", "joint_y"])
-- **Entity 5**: CUserInterface (no ui_name, visible: true, simple panel) - tests null ui_name handling
+- **Entity 5**: CUserInterface (ui_name: "menu_ui", visible: true, simple panel)
+- **Entity 6**: CUserInterface (ui_name: "settings_ui", visible: false, simple panel)
+- **Entity 7**: CUIState (state_key: "main_menu", ui_names_on: ["simple_ui", "menu_ui"], ui_names_off: ["hidden_ui"])
+- **Entity 8**: CUIState (state_key: "settings_screen", ui_names_on: ["settings_ui"], ui_names_off: ["simple_ui", "menu_ui"])
+- **Entity 9**: CUIState (state_key: "game_running", ui_names_on: ["simple_ui"], with subscriber for Q key press)
+- **Entity 10**: CUIState (multiple state keys: "multiple_states_a" and "multiple_states_b")
 
 Pool size: 20
 

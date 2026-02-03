@@ -154,7 +154,7 @@
               {
                 "event_type_data": "EVENT_USER_INPUT",
                 "trigger_data_type": "UserInputBitsetData",
-                "trigger_data": { "keys_pressed": ["Escape"] },
+                "trigger_data": { "keyboard_pressed": ["Q"] },
                 "active": true
               }
             ]
