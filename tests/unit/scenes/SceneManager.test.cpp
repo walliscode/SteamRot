@@ -67,7 +67,7 @@ TEST_CASE("SceneManager::AddScenesFromSceneCollectionData clears exisiting "
   const auto &scene_map = scene_manager.GetScenes();
 
   auto scene_add_result =
-      scene_manager.AddSceneFromDefault(steamrot::SceneType::TEST);
+      scene_manager.AddSceneFromDefault(steamrot::SceneType::TITLE);
   if (!scene_add_result.has_value()) {
     FAIL(scene_add_result.error().message);
   }
@@ -105,8 +105,7 @@ TEST_CASE("SceneManager::AddScenesFromSceneCollectionData loads three scenes "
   const auto *scene_1 = scenes->Get(0);
   REQUIRE(scene_1 != nullptr);
   REQUIRE(scene_1->scene_info() != nullptr);
-  REQUIRE(scene_1->scene_info()->scene_type() ==
-          steamrot::SceneTypeFbs_TITLE);
+  REQUIRE(scene_1->scene_info()->scene_type() == steamrot::SceneTypeFbs_TITLE);
   REQUIRE(scene_1->scene_resources_config() != nullptr);
   REQUIRE(scene_1->scene_resources_config()->texture_width() == 800);
   REQUIRE(scene_1->scene_resources_config()->texture_height() == 600);
@@ -195,8 +194,7 @@ TEST_CASE("SceneManager::AddScenesFromSceneCollectionData loads three scenes "
   const auto *scene_3 = scenes->Get(2);
   REQUIRE(scene_3 != nullptr);
   REQUIRE(scene_3->scene_info() != nullptr);
-  REQUIRE(scene_3->scene_info()->scene_type() ==
-          steamrot::SceneTypeFbs_TITLE);
+  REQUIRE(scene_3->scene_info()->scene_type() == steamrot::SceneTypeFbs_TITLE);
   REQUIRE(scene_3->scene_resources_config() != nullptr);
   REQUIRE(scene_3->scene_resources_config()->texture_width() == 1920);
   REQUIRE(scene_3->scene_resources_config()->texture_height() == 1080);
@@ -241,12 +239,12 @@ TEST_CASE("SceneManager::AddScenesFromSceneCollectionData loads three scenes "
     // Create provider with SceneDataFbs and configure SceneData
     steamrot::FlatbuffersSceneDataProvider scene_data_provider(
         fixture.GetGameContext().event_handler, scene_fbs);
-    
+
     steamrot::SceneData scene_data;
     auto configure_result = scene_data_provider.ConfigureSceneData(scene_data);
     if (!configure_result.has_value())
       FAIL(configure_result.error().message);
-    
+
     // add to collection
     scene_collection_data.push_back(std::move(scene_data));
   }

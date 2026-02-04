@@ -1,19 +1,14 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Namespace-based path provider using compile-time environment
-/// selection.
-///
-/// Environment Selection (compile-time macros):
-/// - Default: Test environment (tests/data)
-/// - STEAMROT_ENV_DEBUG: Debug environment (data) - same as production
-/// - STEAMROT_ENV_PROD: Production environment (data)
+/// @brief Namespace-based path provider for data directory access.
 ///
 /// Directory Structure:
-/// - defaults/: Default configuration data (read-only)
-/// - user/: User-specific data and saves (read-write)
+/// - data/
+///   - defaults/: Default configuration data (read-only)
+///   - user/: User-specific data and saves (read-write)
+///   - assets/: Game assets (fonts, images, etc.)
 ///
 /// Usage:
-///   #define STEAMROT_ENV_PROD  // Before including paths.h for production
 ///   #include "paths.h"
 ///   auto path = steamrot::paths::GetDataDirectory();
 /////////////////////////////////////////////////
@@ -40,22 +35,12 @@ std::filesystem::path GetSourceDirectory();
 /////////////////////////////////////////////////
 /// @brief Provides top level data directory path.
 ///
-/// Returns different paths based on compile-time environment:
-/// - Test (default): ${SOURCE_DIR}/tests/data
-/// - Debug/Prod: ${SOURCE_DIR}/data
+/// Returns the unified data directory path: ${SOURCE_DIR}/data
 ///
 /// @return std::filesystem::path The base data directory path
 /////////////////////////////////////////////////
 inline std::filesystem::path GetDataDirectory() {
-
-#if defined(STEAMROT_ENV_PROD) && defined(STEAMROT_ENV_DEBUG)
-#error "Cannot define both STEAMROT_ENV_PROD and STEAMROT_ENV_DEBUG"
-#elif defined(STEAMROT_ENV_PROD) || defined(STEAMROT_ENV_DEBUG)
   return GetSourceDirectory() / "data";
-#else
-  // Default: Test environment
-  return GetSourceDirectory() / "tests" / "data";
-#endif
 }
 
 /////////////////////////////////////////////////
