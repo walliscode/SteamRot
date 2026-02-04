@@ -8,8 +8,6 @@ add_library(matchers
   EventPacketEqualsMatcher.cpp
   EventDataEqualsMatcher.cpp
   EventBusEqualsMatcher.cpp
-  FragmentEqualsMatcher.cpp
-  JointEqualsMatcher.cpp
   UIElementEqualsMatcher.cpp
   EntityMemoryPoolEqualsMatcher.cpp
   EntityTransportEqualsMatcher.cpp

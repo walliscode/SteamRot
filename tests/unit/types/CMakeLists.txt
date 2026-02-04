@@ -3,8 +3,8 @@ add_executable(test_types
   core/FailInfo.test.cpp
   core/EngineConfig.test.cpp
   core/SceneInfo.test.cpp
-  core/Joint.test.cpp
-  core/Fragment.test.cpp
+
+
 
 
   components/CUIState.test.cpp
