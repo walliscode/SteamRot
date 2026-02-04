@@ -232,3 +232,26 @@ TEST_CASE("FlatbuffersDataLoader::ProvideLogicCollectionData returns error "
   REQUIRE(!result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::SceneTypeNotFound);
 }
+
+TEST_CASE(
+    "FlatbuffersDataLoader::ProvideAllFragmentData returns valid fragments",
+    "[unit][FlatbuffersDataLoader]") {
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideAllFragmentData();
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+  const auto &fragments = result.value();
+  REQUIRE(!fragments.empty());
+}
+
+TEST_CASE("FlatbuffersDataLoader::ProvideAllJointData returns valid joints",
+          "[unit][FlatbuffersDataLoader]") {
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideAllJointData();
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+  const auto &joints = result.value();
+  REQUIRE(!joints.empty());
+}

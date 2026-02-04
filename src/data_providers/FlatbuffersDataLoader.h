@@ -15,6 +15,8 @@
 #include "FailInfo.h"
 #include "SceneType.h"
 #include "engine_data_generated.h"
+#include "fragment_generated.h"
+#include "joint_generated.h"
 #include "logic_data_generated.h"
 #include "scene_data_generated.h"
 #include "scene_manager_data_generated.h"
@@ -31,7 +33,7 @@ public:
   /////////////////////////////////////////////////
   FlatbuffersDataLoader() = default;
 
-/////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   /// @brief Provides SceneData based on the SceneType
   ///
   /// @param scene_type Enum representing the type of scene
@@ -73,6 +75,18 @@ public:
   /////////////////////////////////////////////////
   std::expected<const UserPreferencesData *, FailInfo>
   ProvideDefaultUserPreferencesData() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Provies all FragmentFbs from the fragments directory
+  /////////////////////////////////////////////////
+  std::expected<std::vector<const FragmentFbs *>, FailInfo>
+  ProvideAllFragmentData() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Provides all JointFbs from the joints directory
+  /////////////////////////////////////////////////
+  std::expected<std::vector<const JointFbs *>, FailInfo>
+  ProvideAllJointData() const;
 };
 
 } // namespace steamrot

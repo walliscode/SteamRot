@@ -194,5 +194,6 @@ FlatbuffersDataLoader::ProvideDefaultUserPreferencesData() const {
 
   return preferences_data;
 }
+/////////////////////////////////////////////////
 
 } // namespace steamrot
