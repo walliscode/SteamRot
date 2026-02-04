@@ -7,7 +7,6 @@
 ///   - defaults/: Default configuration data (read-only)
 ///   - user/: User-specific data and saves (read-write)
 ///   - assets/: Game assets (fonts, images, etc.)
-///   - fragments/: Fragment data for testing and gameplay
 ///
 /// Usage:
 ///   #include "paths.h"
