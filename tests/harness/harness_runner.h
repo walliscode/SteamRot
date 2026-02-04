@@ -63,11 +63,15 @@ ConvertAllEntityTransportVariantsInTestData(TestData &test_data);
 /////////////////////////////////////////////////
 /// @brief Compare an actual EngineSnapshot against an expected EngineSnapshot
 ///
+/// This function uses REQUIRE_THAT internally to leverage Catch2's reporter
+/// for detailed mismatch output. On mismatch, it will trigger a Catch2
+/// assertion failure rather than returning an error.
+///
 /// @param actual The actual EngineSnapshot from TestEngine
 /// @param expected The expected EngineSnapshot from TestData
 /// @param test_name Optional test name for error reporting
 /// @param tick Optional tick number for error reporting
-/// @return std::monostate on match, FailInfo on mismatch
+/// @return std::monostate on match (will not return on mismatch due to REQUIRE_THAT)
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 CompareEngineSnapshots(const EngineSnapshot &actual,

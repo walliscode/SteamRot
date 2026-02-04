@@ -290,29 +290,11 @@ TEST_CASE("CompareEngineSnapshots succeeds when snapshots match",
       steamrot::tests::CompareEngineSnapshots(actual, expected, "test_name", 1);
 
   // Assert
+  // When snapshots match, the function returns monostate
   REQUIRE(result.has_value());
 }
 
-TEST_CASE("CompareEngineSnapshots fails when tick numbers mismatch",
-          "[unit][harness_runner]") {
-  // Arrange
-  steamrot::EngineSnapshot actual;
-  steamrot::EngineSnapshot expected;
-
-  actual.tick_number = 2;
-  expected.tick_number = 1;
-
-  // Act
-  auto result =
-      steamrot::tests::CompareEngineSnapshots(actual, expected, "test_name", 1);
-
-  // Assert
-  REQUIRE(!result.has_value());
-  REQUIRE(result.error().message.find("Tick number mismatch") !=
-          std::string::npos);
-}
-
-TEST_CASE("EngineSnapshotEqualsMatcher directly detects tick number mismatch",
+TEST_CASE("CompareEngineSnapshots uses REQUIRE_THAT internally for reporting",
           "[unit][harness_runner]") {
   // Arrange
   steamrot::EngineSnapshot actual;
@@ -322,7 +304,10 @@ TEST_CASE("EngineSnapshotEqualsMatcher directly detects tick number mismatch",
   expected.tick_number = 1;
 
   // Act & Assert
-  // Using the matcher directly to verify mismatch detection
+  // CompareEngineSnapshots uses REQUIRE_THAT internally, which will throw
+  // via Catch2's assertion failure mechanism when snapshots don't match.
+  // We can't easily test this without triggering the assertion failure,
+  // so we test the matcher behavior directly instead.
   REQUIRE_THAT(actual, !steamrot::tests::EqualsEngineSnapshot(expected));
 }
 

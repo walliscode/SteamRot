@@ -186,19 +186,11 @@ CompareEngineSnapshots(const EngineSnapshot &actual,
   context.current_tick = tick;
   context.total_ticks = tick; // Set to current tick as total
 
-  // Create matcher and perform comparison
-  EngineSnapshotEqualsMatcher matcher(expected, context);
-  
-  // If the match succeeds, return monostate
-  if (matcher.match(actual)) {
-    return std::monostate{};
-  }
-  
-  // If the match fails, return FailInfo with the matcher's description
-  return std::unexpected(FailInfo{
-      FailMode::None,
-      matcher.describe(),
-  });
+  // Use REQUIRE_THAT to get Catch2's reporter benefits
+  // This will throw on failure, so the return statement won't be reached
+  REQUIRE_THAT(actual, EqualsEngineSnapshot(expected, context));
+
+  return std::monostate{};
 }
 
 /////////////////////////////////////////////////
