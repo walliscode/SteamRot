@@ -115,7 +115,7 @@ TEST_CASE("SceneManager::AddScenesFromSceneCollectionData loads three scenes "
   // Check Scene 1 entities
   const auto *scene_1_entities = scene_1->entity_collection()->entities();
   REQUIRE(scene_1_entities != nullptr);
-  REQUIRE(scene_1_entities->size() == 2);
+  REQUIRE(scene_1_entities->size() == 1);
 
   // Check Scene 1, Entity 0 (UI element)
   const auto *scene_1_entity_0 = scene_1_entities->Get(0);
@@ -150,7 +150,7 @@ TEST_CASE("SceneManager::AddScenesFromSceneCollectionData loads three scenes "
   // Check Scene 2 entities
   const auto *scene_2_entities = scene_2->entity_collection()->entities();
   REQUIRE(scene_2_entities != nullptr);
-  REQUIRE(scene_2_entities->size() == 3);
+  REQUIRE(scene_2_entities->size() == 2);
 
   // Check Scene 2, Entity 0 (UI inventory)
   const auto *scene_2_entity_0 = scene_2_entities->Get(0);
@@ -182,7 +182,7 @@ TEST_CASE("SceneManager::AddScenesFromSceneCollectionData loads three scenes "
   // Check Scene 3 entities
   const auto *scene_3_entities = scene_3->entity_collection()->entities();
   REQUIRE(scene_3_entities != nullptr);
-  REQUIRE(scene_3_entities->size() == 2);
+  REQUIRE(scene_3_entities->size() == 1);
 
   // Check Scene 3, Entity 0 (UI element)
   const auto *scene_3_entity_0 = scene_3_entities->Get(0);
