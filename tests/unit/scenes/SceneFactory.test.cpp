@@ -110,13 +110,6 @@ TEST_CASE("SceneFactory::CreateSceneFromSceneData creates Scene with valid "
   REQUIRE(entity_0->c_user_interface()->ui_name()->str() == "test_ui_panel");
   REQUIRE(entity_0->c_user_interface()->is_visible() == true);
 
-  // Check second entity (grimoire machina)
-  const auto *entity_1 = entities->Get(1);
-  REQUIRE(entity_1 != nullptr);
-  REQUIRE(entity_1->c_grimoire_machina() != nullptr);
-  REQUIRE(entity_1->c_grimoire_machina()->fragments() != nullptr);
-  REQUIRE(entity_1->c_grimoire_machina()->fragments()->size() == 2);
-
   // Create SceneData using the constructor that takes SceneDataFbs
   steamrot::FlatbuffersSceneDataProvider scene_data_provider(
       fixture.GetGameContext().event_handler, scene_data_fbs);

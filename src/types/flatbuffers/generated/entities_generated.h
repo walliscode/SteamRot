@@ -13,7 +13,6 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
-#include "grimoire_machina_generated.h"
 #include "ui_state_generated.h"
 #include "user_interface_generated.h"
 
@@ -30,17 +29,13 @@ struct EntityDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_INDEX = 4,
     VT_C_USER_INTERFACE = 6,
-    VT_C_GRIMOIRE_MACHINA = 8,
-    VT_C_UI_STATE = 10
+    VT_C_UI_STATE = 8
   };
   uint32_t index() const {
     return GetField<uint32_t>(VT_INDEX, 0);
   }
   const steamrot::UserInterfaceFbs *c_user_interface() const {
     return GetPointer<const steamrot::UserInterfaceFbs *>(VT_C_USER_INTERFACE);
-  }
-  const steamrot::GrimoireMachinaData *c_grimoire_machina() const {
-    return GetPointer<const steamrot::GrimoireMachinaData *>(VT_C_GRIMOIRE_MACHINA);
   }
   const steamrot::UIStateCollectionData *c_ui_state() const {
     return GetPointer<const steamrot::UIStateCollectionData *>(VT_C_UI_STATE);
@@ -50,8 +45,6 @@ struct EntityDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<uint32_t>(verifier, VT_INDEX, 4) &&
            VerifyOffset(verifier, VT_C_USER_INTERFACE) &&
            verifier.VerifyTable(c_user_interface()) &&
-           VerifyOffset(verifier, VT_C_GRIMOIRE_MACHINA) &&
-           verifier.VerifyTable(c_grimoire_machina()) &&
            VerifyOffset(verifier, VT_C_UI_STATE) &&
            verifier.VerifyTable(c_ui_state()) &&
            verifier.EndTable();
@@ -67,9 +60,6 @@ struct EntityDataFbsBuilder {
   }
   void add_c_user_interface(::flatbuffers::Offset<steamrot::UserInterfaceFbs> c_user_interface) {
     fbb_.AddOffset(EntityDataFbs::VT_C_USER_INTERFACE, c_user_interface);
-  }
-  void add_c_grimoire_machina(::flatbuffers::Offset<steamrot::GrimoireMachinaData> c_grimoire_machina) {
-    fbb_.AddOffset(EntityDataFbs::VT_C_GRIMOIRE_MACHINA, c_grimoire_machina);
   }
   void add_c_ui_state(::flatbuffers::Offset<steamrot::UIStateCollectionData> c_ui_state) {
     fbb_.AddOffset(EntityDataFbs::VT_C_UI_STATE, c_ui_state);
@@ -89,11 +79,9 @@ inline ::flatbuffers::Offset<EntityDataFbs> CreateEntityDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t index = 0,
     ::flatbuffers::Offset<steamrot::UserInterfaceFbs> c_user_interface = 0,
-    ::flatbuffers::Offset<steamrot::GrimoireMachinaData> c_grimoire_machina = 0,
     ::flatbuffers::Offset<steamrot::UIStateCollectionData> c_ui_state = 0) {
   EntityDataFbsBuilder builder_(_fbb);
   builder_.add_c_ui_state(c_ui_state);
-  builder_.add_c_grimoire_machina(c_grimoire_machina);
   builder_.add_c_user_interface(c_user_interface);
   builder_.add_index(index);
   return builder_.Finish();

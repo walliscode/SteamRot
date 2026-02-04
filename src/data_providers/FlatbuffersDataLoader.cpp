@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "FlatbuffersDataLoader.h"
 #include "FailInfo.h"
+#include "fragment_generated.h"
 #include "paths.h"
 #include "scene_data_generated.h"
 #include "ui_style_generated.h"
@@ -195,5 +196,20 @@ FlatbuffersDataLoader::ProvideDefaultUserPreferencesData() const {
   return preferences_data;
 }
 /////////////////////////////////////////////////
+std::expected<std::vector<const FragmentFbs *>, FailInfo>
+FlatbuffersDataLoader::ProvideAllFragmentData() const {
+  // create return vector
+  std::vector<const FragmentFbs *> fragments;
 
+  return fragments;
+}
+
+/////////////////////////////////////////////////
+std::expected<std::vector<const JointFbs *>, FailInfo>
+FlatbuffersDataLoader::ProvideAllJointData() const {
+  // create return vector
+  std::vector<const JointFbs *> joints;
+
+  return joints;
+}
 } // namespace steamrot

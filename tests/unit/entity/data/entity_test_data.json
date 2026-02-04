@@ -65,20 +65,6 @@
       }
     },
     {
-      "index": 3,
-      "c_grimoire_machina": {
-        "fragments": [],
-        "joints": []
-      }
-    },
-    {
-      "index": 4,
-      "c_grimoire_machina": {
-        "fragments": ["fragment_a", "fragment_b"],
-        "joints": ["joint_x", "joint_y"]
-      }
-    },
-    {
       "index": 5,
       "c_user_interface": {
         "ui_name": "menu_ui",
