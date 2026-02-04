@@ -128,7 +128,8 @@ TEST_CASE("EngineSnapshotEqualsMatcher - tick_number expected but not present",
     matcher.match(actual);
     std::string description = matcher.describe();
 
-    REQUIRE(description.find("Expected tick_number, but actual has none") !=
+    REQUIRE(description.find(
+                "Expected tick_number, but Actual snapshot has none") !=
             std::string::npos);
   }
 }

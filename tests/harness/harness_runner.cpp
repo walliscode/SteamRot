@@ -186,6 +186,8 @@ CompareEngineSnapshots(const EngineSnapshot &actual,
   context.current_tick = tick;
   context.total_ticks = tick; // Set to current tick as total
 
+  // Use REQUIRE_THAT to get Catch2's reporter benefits
+  // This will throw on failure, so the return statement won't be reached
   REQUIRE_THAT(actual, EqualsEngineSnapshot(expected, context));
 
   return std::monostate{};

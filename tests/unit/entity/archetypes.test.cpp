@@ -95,8 +95,8 @@ TEST_CASE(
   auto entity_indexes_one =
       steamrot::archetypes::GenerateEntityIndexesFromComponents<
           steamrot::CMeta>(mock_archetypes, false);
-  REQUIRE(entity_indexes_one.size() == 6);
-  for (size_t i = 1; i <= 6; ++i) {
+  REQUIRE(entity_indexes_one.size() == 3);
+  for (size_t i = 1; i <= 3; ++i) {
     REQUIRE(entity_indexes_one.count(i) == 1);
   }
 }

@@ -8,7 +8,11 @@
   },
   "simulation_data": {
     "description": "This is a test simulation data for unit testing.",
-    "steps": []
+    "steps": [
+      {
+        "logic_class_type": "UIActionLogic"
+      }
+    ]
   },
   "num_ticks": 37,
   "starting_engine_snapshot": {
