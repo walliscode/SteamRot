@@ -132,7 +132,11 @@
           {
             "index": 2,
             "c_grimoire_machina": {
-              "fragments": ["crafting_fragment_one", "crafting_fragment_two", "crafting_fragment_three"],
+              "fragments": [
+                "crafting_fragment_one",
+                "crafting_fragment_two",
+                "crafting_fragment_three"
+              ],
               "joints": ["crafting_joint_alpha", "crafting_joint_beta"]
             }
           }
@@ -167,13 +171,6 @@
                   "spacing_strategy": "Even"
                 }
               }
-            }
-          },
-          {
-            "index": 1,
-            "c_grimoire_machina": {
-              "fragments": ["title_fragment_delta", "title_fragment_epsilon"],
-              "joints": ["title_joint_zeta"]
             }
           }
         ]

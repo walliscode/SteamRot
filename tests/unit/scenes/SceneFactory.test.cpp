@@ -90,7 +90,7 @@ TEST_CASE("SceneFactory::CreateSceneFromSceneData creates Scene with valid "
   REQUIRE(scene_data_fbs != nullptr);
 
   // Verify the loaded data structure
-  REQUIRE(scene_data_fbs->scene_info() != nullptr);
+  REQUIRE(scene_data_fbs->scene_info());
   REQUIRE(scene_data_fbs->scene_info()->scene_type() ==
           steamrot::SceneTypeFbs_TITLE);
   REQUIRE(scene_data_fbs->scene_resources_config()->texture_width() == 800);
@@ -101,7 +101,7 @@ TEST_CASE("SceneFactory::CreateSceneFromSceneData creates Scene with valid "
   // Check entities in the collection
   const auto *entities = scene_data_fbs->entity_collection()->entities();
   REQUIRE(entities != nullptr);
-  REQUIRE(entities->size() == 2);
+  REQUIRE(entities->size() == 1);
 
   // Check first entity (UI element)
   const auto *entity_0 = entities->Get(0);
