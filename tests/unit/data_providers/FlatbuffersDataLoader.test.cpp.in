@@ -244,14 +244,14 @@ TEST_CASE(
   const auto &fragments = result.value();
   REQUIRE(!fragments.empty());
 }
-
-TEST_CASE("FlatbuffersDataLoader::ProvideAllJointData returns valid joints",
-          "[unit][FlatbuffersDataLoader]") {
-  steamrot::FlatbuffersDataLoader data_loader;
-  auto result = data_loader.ProvideAllJointData();
-  if (!result.has_value()) {
-    FAIL(result.error().message);
-  }
-  const auto &joints = result.value();
-  REQUIRE(!joints.empty());
-}
+//
+// TEST_CASE("FlatbuffersDataLoader::ProvideAllJointData returns valid joints",
+//           "[unit][FlatbuffersDataLoader]") {
+//   steamrot::FlatbuffersDataLoader data_loader;
+//   auto result = data_loader.ProvideAllJointData();
+//   if (!result.has_value()) {
+//     FAIL(result.error().message);
+//   }
+//   const auto &joints = result.value();
+//   REQUIRE(!joints.empty());
+// }

@@ -201,6 +201,29 @@ FlatbuffersDataLoader::ProvideAllFragmentData() const {
   // create return vector
   std::vector<const FragmentFbs *> fragments;
 
+  // get the fragments directory
+  std::filesystem::path fragments_dir = paths::GetAssetsDirectory();
+  fragments_dir /= "fragments";
+
+  // iterate over all .bin files in the fragments directory
+  for (const auto &entry : std::filesystem::directory_iterator(fragments_dir)) {
+    // check for .bin files
+    if (entry.path().extension() == ".bin") {
+      // load the fragment data using the generated function from flatbuffers
+      const steamrot::FragmentFbs *fragment_data =
+          GetFragmentFbs(LoadBinaryData(entry.path()));
+      if (fragment_data) {
+        fragments.push_back(fragment_data);
+      } else {
+        // unexpected error if fragment data is null
+        std::string error_message = std::format(
+            "FragmentFbs pointer is null for file: {}", entry.path().string());
+        return std::unexpected(
+            FailInfo(FailMode::FlatbuffersDataNotFound, error_message));
+      }
+    }
+  }
+
   return fragments;
 }
 

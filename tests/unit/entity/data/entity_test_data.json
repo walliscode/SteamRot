@@ -2,10 +2,6 @@
   "entity_memory_pool_size": 20,
   "entities": [
     {
-      "index": 0
-    },
-    {
-      "index": 1,
       "c_user_interface": {
         "ui_name": "simple_ui",
         "is_visible": true,
@@ -48,7 +44,6 @@
       }
     },
     {
-      "index": 2,
       "c_user_interface": {
         "ui_name": "hidden_ui",
         "is_visible": false,
@@ -65,7 +60,6 @@
       }
     },
     {
-      "index": 5,
       "c_user_interface": {
         "ui_name": "menu_ui",
         "is_visible": true,
@@ -82,7 +76,6 @@
       }
     },
     {
-      "index": 6,
       "c_user_interface": {
         "ui_name": "settings_ui",
         "is_visible": false,
@@ -99,7 +92,6 @@
       }
     },
     {
-      "index": 7,
       "c_ui_state": {
         "ui_states": [
           {
@@ -113,7 +105,6 @@
       }
     },
     {
-      "index": 8,
       "c_ui_state": {
         "ui_states": [
           {
@@ -127,7 +118,6 @@
       }
     },
     {
-      "index": 9,
       "c_ui_state": {
         "ui_states": [
           {
@@ -149,7 +139,6 @@
       }
     },
     {
-      "index": 10,
       "c_ui_state": {
         "ui_states": [
           {
