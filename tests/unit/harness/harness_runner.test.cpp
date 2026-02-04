@@ -276,7 +276,7 @@ TEST_CASE("ConvertAllEntityTransportVariantsInTestData converts the starting "
   }
 }
 
-TEST_CASE("CompareEngineSnapshots returns monostate when snapshots match",
+TEST_CASE("CompareEngineSnapshots succeeds when snapshots match",
           "[unit][harness_runner]") {
   // Arrange
   steamrot::EngineSnapshot actual;
@@ -293,8 +293,7 @@ TEST_CASE("CompareEngineSnapshots returns monostate when snapshots match",
   REQUIRE(result.has_value());
 }
 
-TEST_CASE("CompareEngineSnapshots returns unexpected when tick numbers "
-          "mismatch",
+TEST_CASE("CompareEngineSnapshots fails when tick numbers mismatch",
           "[unit][harness_runner]") {
   // Arrange
   steamrot::EngineSnapshot actual;
@@ -304,10 +303,30 @@ TEST_CASE("CompareEngineSnapshots returns unexpected when tick numbers "
   expected.tick_number = 1;
 
   // Act
+  auto result =
+      steamrot::tests::CompareEngineSnapshots(actual, expected, "test_name", 1);
+
+  // Assert
+  REQUIRE(!result.has_value());
+  REQUIRE(result.error().message.find("Tick number mismatch") !=
+          std::string::npos);
+}
+
+TEST_CASE("EngineSnapshotEqualsMatcher directly detects tick number mismatch",
+          "[unit][harness_runner]") {
+  // Arrange
+  steamrot::EngineSnapshot actual;
+  steamrot::EngineSnapshot expected;
+
+  actual.tick_number = 2;
+  expected.tick_number = 1;
+
+  // Act & Assert
+  // Using the matcher directly to verify mismatch detection
   REQUIRE_THAT(actual, !steamrot::tests::EqualsEngineSnapshot(expected));
 }
 
-TEST_CASE("CompareEngineSnapshots includes test context in error message",
+TEST_CASE("EngineSnapshotEqualsMatcher includes context in error message",
           "[unit][harness_runner]") {
   // Arrange
   steamrot::EngineSnapshot actual;
@@ -316,15 +335,22 @@ TEST_CASE("CompareEngineSnapshots includes test context in error message",
   actual.tick_number = 2;
   expected.tick_number = 1;
 
+  steamrot::tests::TestContext context{"test_name", "test description", 1, 10};
+
   // Act
-  auto matcher = steamrot::tests::EngineSnapshotEqualsMatcher(expected);
+  auto matcher =
+      steamrot::tests::EngineSnapshotEqualsMatcher(expected, context);
   matcher.match(actual);
+
   // Assert
   std::string description = matcher.describe();
-  REQUIRE(description.find("Expected tick number: 1") != std::string::npos);
+  REQUIRE(description.find("test_name") != std::string::npos);
+  REQUIRE(description.find("Tick number mismatch") != std::string::npos);
+  REQUIRE(description.find("expected 1") != std::string::npos);
+  REQUIRE(description.find("got 2") != std::string::npos);
 }
 
-TEST_CASE("RunSnapshotComparisons returns monostate when all snapshots match",
+TEST_CASE("RunSnapshotComparisons succeeds when all snapshots match",
           "[unit][harness_runner]") {
   // Arrange
   steamrot::TestData test_data;
@@ -346,12 +372,9 @@ TEST_CASE("RunSnapshotComparisons returns monostate when all snapshots match",
   // Create TestEngine with test data
   steamrot::tests::TestEngine test_engine{test_data};
 
-  // Manually populate the data bank with matching snapshots
-  // (This is normally done by TestEngine.StartUp() and RunGame())
-  // We need to use a const_cast to modify the private data bank for testing
+  // Start up the engine to populate the data bank properly
   auto &mutable_engine = const_cast<steamrot::tests::TestEngine &>(test_engine);
 
-  // We'll need to start up the engine to populate the data bank properly
   auto startup_result = mutable_engine.StartUp();
   REQUIRE(startup_result.has_value());
 
@@ -389,6 +412,7 @@ TEST_CASE("RunSnapshotComparisons returns unexpected when snapshot is missing",
   auto result = steamrot::tests::RunSnapshotComparisons(test_engine, test_data);
 
   // Assert
+  // This should return an error because tick 5 doesn't exist in data bank
   REQUIRE(!result.has_value());
   REQUIRE(result.error().message.find("test_missing") != std::string::npos);
   REQUIRE(result.error().message.find("tick 5") != std::string::npos);
