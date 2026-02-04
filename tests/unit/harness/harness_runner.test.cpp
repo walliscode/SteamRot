@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "harness_runner.h"
+#include "EngineSnapshotEqualsMatcher.h"
 #include "EventHandler.h"
 #include "FlatbuffersEntityConfigurator.h"
 #include "TestEngine.h"
@@ -303,8 +304,7 @@ TEST_CASE("CompareEngineSnapshots returns unexpected when tick numbers "
   expected.tick_number = 1;
 
   // Act
-  auto result =
-      steamrot::tests::CompareEngineSnapshots(actual, expected, "test_name", 1);
+  REQUIRE_THAT(actual, !steamrot::tests::EqualsEngineSnapshot(expected));
 }
 
 TEST_CASE("CompareEngineSnapshots includes test context in error message",
@@ -317,13 +317,11 @@ TEST_CASE("CompareEngineSnapshots includes test context in error message",
   expected.tick_number = 1;
 
   // Act
-  auto result =
-      steamrot::tests::CompareEngineSnapshots(actual, expected, "my_test", 5);
-
+  auto matcher = steamrot::tests::EngineSnapshotEqualsMatcher(expected);
+  matcher.match(actual);
   // Assert
-  REQUIRE(!result.has_value());
-  REQUIRE(result.error().message.find("my_test") != std::string::npos);
-  REQUIRE(result.error().message.find("Tick: 5") != std::string::npos);
+  std::string description = matcher.describe();
+  REQUIRE(description.find("Expected tick number: 1") != std::string::npos);
 }
 
 TEST_CASE("RunSnapshotComparisons returns monostate when all snapshots match",
