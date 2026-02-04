@@ -5,15 +5,14 @@
 
 #pragma once
 
-#include "fragments_generated.h"
-#include <SFML/Graphics.hpp>
-
+#include "ViewDirection.h"
+#include <string>
 #include <vector>
 
 namespace steamrot {
 /////////////////////////////////////////////////
 /// @class Fragment
-/// @brief Contains the data for a Fragment in the Grimoire Machina.
+/// @brief Contains the data for a Fragment
 ///
 /////////////////////////////////////////////////
 struct Fragment {
@@ -28,14 +27,9 @@ struct Fragment {
   std::vector<sf::Vector2f> sockets;
 
   /////////////////////////////////////////////////
-  /// @brief Global transform of the fragment
+  /// @brief All vertex arrays for each view direction and 8 progressions for
+  /// movement
   /////////////////////////////////////////////////
-  sf::Transform transform;
-
-  /////////////////////////////////////////////////
-  /// @brief Contains all the render overlays for this fragment, describing each
-  /// possible view.
-  /////////////////////////////////////////////////
-  std::unordered_map<ViewDirection, sf::VertexArray> render_overlays;
+  Views movement_views;
 };
 } // namespace steamrot

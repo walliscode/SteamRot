@@ -1,0 +1,13 @@
+include "../core/types.fbs";
+include "view_direction.fbs";
+
+namespace steamrot;
+
+table JointFbs{
+name: string (required);
+sockets: [Vector2fData] (required);
+movement_views: [ViewFbs] (required);
+  }
+
+root_type JointFbs;
+

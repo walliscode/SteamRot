@@ -31,10 +31,12 @@ set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/entities/entities.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/entities/user_interface.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/entities/grimoire_machina.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/entities/machina_form.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/entities/view_direction.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/entities/ui_state.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/entities/ui_style.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/entities/joints.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/entities/fragments.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/entities/joint.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/entities/fragment.fbs
 
     # Events
     ${CMAKE_CURRENT_SOURCE_DIR}/events/events.fbs

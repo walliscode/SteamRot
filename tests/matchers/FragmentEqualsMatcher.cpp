@@ -29,22 +29,8 @@ bool FragmentEqualsMatcher::match(const Fragment &actual) const {
     oss << "m_sockets differs; ";
   }
 
-  // Compare transforms (matrix elements)
-  const auto *this_matrix = actual.transform.getMatrix();
-  const auto *other_matrix = m_expected.transform.getMatrix();
-  bool transform_matches = true;
-  for (size_t i = 0; i < 16; ++i) {
-    if (this_matrix[i] != other_matrix[i]) {
-      transform_matches = false;
-      break;
-    }
-  }
-  if (!transform_matches) {
-    oss << "m_transform differs; ";
-  }
-
-  if (actual.render_overlays.size() != m_expected.render_overlays.size()) {
-    oss << "m_overlays size differs; ";
+  if (actual.movement_views != m_expected.movement_views) {
+    oss << "movement_views differs; ";
   }
 
   m_mismatch_description = oss.str();

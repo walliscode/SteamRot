@@ -1,0 +1,29 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Declaration of the ViewDirection enum class. No implementation is
+/// needed
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Preprocessor Directives
+/////////////////////////////////////////////////
+#pragma once
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include <SFML/Graphics/VertexArray.hpp>
+#include <array>
+#include <cstdint>
+#include <map>
+
+namespace steamrot {
+
+enum class ViewDirection : uint8_t {
+  Front = 0,
+  Back = 1,
+};
+
+using Views = std::map<ViewDirection, std::array<sf::VertexArray, 8>>;
+
+} // namespace steamrot
