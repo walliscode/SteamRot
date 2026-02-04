@@ -33,7 +33,7 @@ bool EngineSnapshotEqualsMatcher::match(const EngineSnapshot &actual) const {
   // 1. Compare tick_number (optional)
   if (m_expected.tick_number.has_value()) {
     if (!actual.tick_number.has_value()) {
-      oss << "Expected tick_number, but actual has none\n";
+      oss << "Expected tick_number, but Actual snapshot has none\n";
       all_match = false;
     } else if (actual.tick_number.value() != m_expected.tick_number.value()) {
       oss << std::format("Tick number mismatch: expected {}, got {}\n",

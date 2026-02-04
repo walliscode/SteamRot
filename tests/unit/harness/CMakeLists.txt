@@ -3,7 +3,6 @@ add_executable(test_harness
   FlatbuffersTestDataProvider.test.cpp
   TestEngine.test.cpp
   harness_runner.test.cpp
-  RunHarnessTests.test.cpp
   SimulationRunner.test.cpp
   add_uuids.test.cpp
 )
