@@ -16,7 +16,7 @@ TEST_CASE("FragmentEqualsMatcher works correctly",
 
   steamrot::Fragment actual;
 
-  SECTION("Matcher detects differences in m_name") {
+  SECTION("Matcher detects differences in name") {
     actual.name = "different_name";
     REQUIRE_THAT(actual, !steamrot::tests::EqualsFragment(expected));
   }
@@ -35,7 +35,7 @@ TEST_CASE("FragmentEqualsMatcher describe is as expected on success",
   actual.name = "test_fragment";
   auto matcher = steamrot::tests::EqualsFragment(expected);
 
-  REQUIRE(matcher.describe() == "equals Fragment(m_name='test_fragment')");
+  REQUIRE(matcher.describe() == "equals Fragment(name='test_fragment')");
 }
 
 TEST_CASE("FragmentEqualsMatcher describe is as expected on failure",
@@ -50,5 +50,5 @@ TEST_CASE("FragmentEqualsMatcher describe is as expected on failure",
 
   std::string description = matcher.describe();
   REQUIRE(description.find("Fragment mismatch:") != std::string::npos);
-  REQUIRE(description.find("m_name:") != std::string::npos);
+  REQUIRE(description.find("name:") != std::string::npos);
 }

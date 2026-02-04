@@ -21,12 +21,12 @@ bool FragmentEqualsMatcher::match(const Fragment &actual) const {
   std::ostringstream oss;
 
   if (actual.name != m_expected.name) {
-    oss << "m_name: actual='" << actual.name << "', expected='"
+    oss << "name: actual='" << actual.name << "', expected='"
         << m_expected.name << "'; ";
   }
 
   if (actual.sockets != m_expected.sockets) {
-    oss << "m_sockets differs; ";
+    oss << "sockets differs; ";
   }
 
   if (actual.movement_views != m_expected.movement_views) {
@@ -41,7 +41,7 @@ bool FragmentEqualsMatcher::match(const Fragment &actual) const {
 std::string FragmentEqualsMatcher::describe() const {
   if (m_mismatch_description.empty()) {
     std::ostringstream oss;
-    oss << "equals Fragment(m_name='" << m_expected.name << "')";
+    oss << "equals Fragment(name='" << m_expected.name << "')";
     return oss.str();
   }
   return "Fragment mismatch: " + m_mismatch_description;
