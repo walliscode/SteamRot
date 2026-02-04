@@ -5,17 +5,16 @@
 
 #pragma once
 
-#include <SFML/Graphics.hpp>
-#include <cstdint>
+#include "ViewDirection.h"
 #include <string>
-#include <utility>
 #include <vector>
 
 namespace steamrot {
 
-using FragmentIndex = uint8_t;
-using SocketIndex = uint8_t;
-
+/////////////////////////////////////////////////
+/// @class Joint
+/// @brief Contains the data for a Joint
+/////////////////////////////////////////////////
 struct Joint {
   /////////////////////////////////////////////////
   /// @brief Name of the joint
@@ -23,30 +22,14 @@ struct Joint {
   std::string name{"unnamed"};
 
   /////////////////////////////////////////////////
-  /// @brief The number of connections this joint can maintain
+  /// @brief Local positions of the Joint's sockets
   /////////////////////////////////////////////////
-  uint8_t connection_number;
+  std::vector<sf::Vector2f> sockets;
 
   /////////////////////////////////////////////////
-  /// @brief The posiiton of the middle of the joint in the RenderTexture
+  /// @brief All vertex arrays for each view direction and 8 progressions for
+  /// movement
   /////////////////////////////////////////////////
-  sf::Vector2f global_position;
-
-  /////////////////////////////////////////////////
-  /// @brief Connects joint to fragments
-  ///
-  /// The index is the connection point in the joint and the value is the index
-  /////////////////////////////////////////////////
-  std::vector<std::pair<FragmentIndex, SocketIndex>> connected_fragments;
-
-  /////////////////////////////////////////////////
-  /// @brief Constructed vertex array for the visual solution of the joint
-  /////////////////////////////////////////////////
-  sf::VertexArray render_overlay;
-
-  /////////////////////////////////////////////////
-  /// @brief Total transform of the joint
-  /////////////////////////////////////////////////
-  sf::Transform transform;
+  Views movement_views;
 };
 } // namespace steamrot

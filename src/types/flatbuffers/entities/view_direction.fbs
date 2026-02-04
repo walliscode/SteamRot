@@ -1,0 +1,14 @@
+include "../core/types.fbs";
+
+namespace steamrot;
+
+
+enum ViewDirectionFbs: ubyte {
+  NONE = 0,
+FRONT = 1,
+  }
+
+table ViewFbs {
+    direction : ViewDirectionFbs;
+    triangles : [Triangle] (required);
+  }

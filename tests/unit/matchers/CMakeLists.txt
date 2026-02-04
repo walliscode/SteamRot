@@ -6,8 +6,6 @@ add_executable(test_matchers
   EventPacketEqualsMatcher.test.cpp
   EventDataEqualsMatcher.test.cpp
   EventBusEqualsMatcher.test.cpp
-  FragmentEqualsMatcher.test.cpp
-  JointEqualsMatcher.test.cpp
   UIElementEqualsMatcher.test.cpp
   EntityMemoryPoolEqualsMatcher.test.cpp
   EntityTransportEqualsMatcher.test.cpp
