@@ -1,0 +1,28 @@
+{
+  "name": "missing_view_direction",
+  "socket_data": { "vertices": [{ "x": 5, "y": 7 }] },
+  "render_overlay_data": {
+    "views": [
+      {
+        "triangles": [
+          {
+            "vertices": [
+              {
+                "position": { "x": 5, "y": 10 },
+                "color": { "r": 255, "g": 255, "b": 255, "a": 255 }
+              },
+              {
+                "position": { "x": 5, "y": 10 },
+                "color": { "r": 255, "g": 255, "b": 255, "a": 255 }
+              },
+              {
+                "position": { "x": 5, "y": 10 },
+                "color": { "r": 255, "g": 255, "b": 255, "a": 255 }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

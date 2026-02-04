@@ -1,0 +1,5 @@
+{
+  "name": "missing_render_views",
+  "socket_data": { "vertices": [{ "x": 5, "y": 7 }] },
+  "render_overlay_data": { "views": [] }
+}
