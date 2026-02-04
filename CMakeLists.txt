@@ -41,7 +41,6 @@ list(APPEND CMAKE_MODULE_PATH "${stduuid_SOURCE_DIR}/cmake")
 
 # set project wide variables
 cmake_path(SET data_dir ${CMAKE_SOURCE_DIR}/data)
-cmake_path(SET test_data_dir ${CMAKE_SOURCE_DIR}/tests/data)
 
 
 include(flatbuffers_compilation)
