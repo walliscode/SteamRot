@@ -78,7 +78,7 @@ TEST_CASE("ConfigureFirstLayerComponents configures CUserInterface correctly",
   REQUIRE(result.has_value());
   REQUIRE(steamrot::entity::memory::GetMemoryPoolSize(emp) == 20);
 
-  // Get component after configuration
+  // Get component after configuration (entity 0 is simple_ui)
   const steamrot::CUserInterface &ui_component =
       steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(0, emp);
 
@@ -113,6 +113,7 @@ TEST_CASE("ConfigureFirstLayerComponents configures hidden UI correctly",
   // After configuration
   REQUIRE(result.has_value());
 
+  // Entity 1 is hidden_ui
   const steamrot::CUserInterface &ui_component =
       steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(1, emp);
 
@@ -146,7 +147,7 @@ TEST_CASE("ConfigureCUserInterface correctly handles false visibility",
 
   REQUIRE(result.has_value());
 
-  // Entity 2 has is_visible set to false
+  // Entity 1 (hidden_ui) has is_visible set to false
   const steamrot::CUserInterface &ui_component =
       steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(1, emp);
 
@@ -191,7 +192,7 @@ TEST_CASE("ConfigureSecondLayerComponents configures CUIState basic component",
 
   REQUIRE(result.has_value());
 
-  // Entity  6 has CUIState with "main_menu" state
+  // Entity 4 has CUIState with "main_menu" state
   const steamrot::CUIState &ui_state_component =
       steamrot::entity::memory::GetComponent<steamrot::CUIState>(4, emp);
 
@@ -214,7 +215,7 @@ TEST_CASE("ConfigureSecondLayerComponents configures CUIState with ui_names_on",
 
   REQUIRE(result.has_value());
 
-  // Entity 7 has CUIState with ui_names_on: ["simple_ui", "menu_ui"]
+  // Entity 4 has CUIState with ui_names_on: ["simple_ui", "menu_ui"]
   const steamrot::CUIState &ui_state_component =
       steamrot::entity::memory::GetComponent<steamrot::CUIState>(4, emp);
 
@@ -222,7 +223,7 @@ TEST_CASE("ConfigureSecondLayerComponents configures CUIState with ui_names_on",
   const auto &visibility_state =
       ui_state_component.m_state_to_ui_visibility.at("main_menu");
 
-  // simple_ui is at entity 1, menu_ui is at entity 5
+  // simple_ui is at entity 0, menu_ui is at entity 2
   REQUIRE(visibility_state.m_ui_indices_on.size() == 2);
   REQUIRE(std::find(visibility_state.m_ui_indices_on.begin(),
                     visibility_state.m_ui_indices_on.end(),
@@ -246,6 +247,7 @@ TEST_CASE(
 
   REQUIRE(result.has_value());
 
+  // Entity 4 has CUIState with ui_names_off: ["hidden_ui"]
   const steamrot::CUIState &ui_state_component =
       steamrot::entity::memory::GetComponent<steamrot::CUIState>(4, emp);
 
@@ -253,7 +255,7 @@ TEST_CASE(
   const auto &visibility_state =
       ui_state_component.m_state_to_ui_visibility.at("main_menu");
 
-  // hidden_ui is at entity 2
+  // hidden_ui is at entity 1
   REQUIRE(visibility_state.m_ui_indices_off.size() == 1);
   REQUIRE(visibility_state.m_ui_indices_off[0] == 1);
 }
@@ -272,7 +274,7 @@ TEST_CASE("ConfigureSecondLayerComponents configures CUIState with both "
 
   REQUIRE(result.has_value());
 
-  // Entity 8 has CUIState with both on and off lists
+  // Entity 5 has CUIState with both on and off lists
   const steamrot::CUIState &ui_state_component =
       steamrot::entity::memory::GetComponent<steamrot::CUIState>(5, emp);
 
@@ -281,11 +283,11 @@ TEST_CASE("ConfigureSecondLayerComponents configures CUIState with both "
   const auto &visibility_state =
       ui_state_component.m_state_to_ui_visibility.at("settings_screen");
 
-  // ui_names_on: ["settings_ui"] - entity 6
+  // ui_names_on: ["settings_ui"] - entity 3
   REQUIRE(visibility_state.m_ui_indices_on.size() == 1);
   REQUIRE(visibility_state.m_ui_indices_on[0] == 3);
 
-  // ui_names_off: ["simple_ui", "menu_ui"] - entities 1 and 5
+  // ui_names_off: ["simple_ui", "menu_ui"] - entities 0 and 2
   REQUIRE(visibility_state.m_ui_indices_off.size() == 2);
   REQUIRE(std::find(visibility_state.m_ui_indices_off.begin(),
                     visibility_state.m_ui_indices_off.end(),
@@ -308,7 +310,7 @@ TEST_CASE("ConfigureSecondLayerComponents configures CUIState with subscribers",
 
   REQUIRE(result.has_value());
 
-  // Entity 9 has CUIState with a subscriber
+  // Entity 6 has CUIState with a subscriber
   const steamrot::CUIState &ui_state_component =
       steamrot::entity::memory::GetComponent<steamrot::CUIState>(6, emp);
 
@@ -337,7 +339,7 @@ TEST_CASE("ConfigureSecondLayerComponents configures CUIState with multiple "
 
   REQUIRE(result.has_value());
 
-  // Entity 10 has CUIState with multiple state keys
+  // Entity 7 has CUIState with multiple state keys
   const steamrot::CUIState &ui_state_component =
       steamrot::entity::memory::GetComponent<steamrot::CUIState>(7, emp);
 
@@ -352,9 +354,9 @@ TEST_CASE("ConfigureSecondLayerComponents configures CUIState with multiple "
   const auto &state_a =
       ui_state_component.m_state_to_ui_visibility.at("multiple_states_a");
   REQUIRE(state_a.m_ui_indices_on.size() == 1);
-  REQUIRE(state_a.m_ui_indices_on[0] == 1); // simple_ui
+  REQUIRE(state_a.m_ui_indices_on[0] == 0); // simple_ui at entity 0
   REQUIRE(state_a.m_ui_indices_off.size() == 1);
-  REQUIRE(state_a.m_ui_indices_off[0] == 5); // menu_ui
+  REQUIRE(state_a.m_ui_indices_off[0] == 2); // menu_ui at entity 2
 
   // Check second state mapping
   const auto &state_b =
@@ -362,17 +364,17 @@ TEST_CASE("ConfigureSecondLayerComponents configures CUIState with multiple "
   REQUIRE(state_b.m_ui_indices_on.size() == 2); // menu_ui and settings_ui
   REQUIRE(std::find(state_b.m_ui_indices_on.begin(),
                     state_b.m_ui_indices_on.end(),
-                    5) != state_b.m_ui_indices_on.end());
+                    2) != state_b.m_ui_indices_on.end()); // menu_ui at entity 2
   REQUIRE(std::find(state_b.m_ui_indices_on.begin(),
                     state_b.m_ui_indices_on.end(),
-                    6) != state_b.m_ui_indices_on.end());
+                    3) != state_b.m_ui_indices_on.end()); // settings_ui at entity 3
   REQUIRE(state_b.m_ui_indices_off.size() == 2); // simple_ui and hidden_ui
   REQUIRE(std::find(state_b.m_ui_indices_off.begin(),
                     state_b.m_ui_indices_off.end(),
-                    1) != state_b.m_ui_indices_off.end());
+                    0) != state_b.m_ui_indices_off.end()); // simple_ui at entity 0
   REQUIRE(std::find(state_b.m_ui_indices_off.begin(),
                     state_b.m_ui_indices_off.end(),
-                    2) != state_b.m_ui_indices_off.end());
+                    1) != state_b.m_ui_indices_off.end()); // hidden_ui at entity 1
 }
 
 /////////////////////////////////////////////////
@@ -413,12 +415,13 @@ TEST_CASE("Second layer configuration correctly references first layer "
       ui_state.m_state_to_ui_visibility.at("main_menu");
 
   // Verify indices match the configured UI entities
+  // simple_ui at entity 0, menu_ui at entity 2
   REQUIRE(std::find(visibility_state.m_ui_indices_on.begin(),
                     visibility_state.m_ui_indices_on.end(),
-                    1) != visibility_state.m_ui_indices_on.end());
+                    0) != visibility_state.m_ui_indices_on.end());
   REQUIRE(std::find(visibility_state.m_ui_indices_on.begin(),
                     visibility_state.m_ui_indices_on.end(),
-                    5) != visibility_state.m_ui_indices_on.end());
+                    2) != visibility_state.m_ui_indices_on.end());
 }
 
 TEST_CASE(
@@ -435,27 +438,27 @@ TEST_CASE(
 
   REQUIRE(result.has_value());
 
-  // Verify all CUIState entities are configured
+  // Verify all CUIState entities are configured (entities 4-7 have CUIState)
+  const steamrot::CUIState &ui_state_4 =
+      steamrot::entity::memory::GetComponent<steamrot::CUIState>(4, emp);
+  REQUIRE(ui_state_4.m_active == true);
+  REQUIRE(ui_state_4.m_state_to_ui_visibility.size() == 1);
+
+  const steamrot::CUIState &ui_state_5 =
+      steamrot::entity::memory::GetComponent<steamrot::CUIState>(5, emp);
+  REQUIRE(ui_state_5.m_active == true);
+  REQUIRE(ui_state_5.m_state_to_ui_visibility.size() == 1);
+
+  const steamrot::CUIState &ui_state_6 =
+      steamrot::entity::memory::GetComponent<steamrot::CUIState>(6, emp);
+  REQUIRE(ui_state_6.m_active == true);
+  REQUIRE(ui_state_6.m_state_to_ui_visibility.size() == 1);
+  REQUIRE(ui_state_6.m_state_subscribers.size() == 1);
+
   const steamrot::CUIState &ui_state_7 =
       steamrot::entity::memory::GetComponent<steamrot::CUIState>(7, emp);
   REQUIRE(ui_state_7.m_active == true);
-  REQUIRE(ui_state_7.m_state_to_ui_visibility.size() == 1);
-
-  const steamrot::CUIState &ui_state_8 =
-      steamrot::entity::memory::GetComponent<steamrot::CUIState>(8, emp);
-  REQUIRE(ui_state_8.m_active == true);
-  REQUIRE(ui_state_8.m_state_to_ui_visibility.size() == 1);
-
-  const steamrot::CUIState &ui_state_9 =
-      steamrot::entity::memory::GetComponent<steamrot::CUIState>(9, emp);
-  REQUIRE(ui_state_9.m_active == true);
-  REQUIRE(ui_state_9.m_state_to_ui_visibility.size() == 1);
-  REQUIRE(ui_state_9.m_state_subscribers.size() == 1);
-
-  const steamrot::CUIState &ui_state_10 =
-      steamrot::entity::memory::GetComponent<steamrot::CUIState>(10, emp);
-  REQUIRE(ui_state_10.m_active == true);
-  REQUIRE(ui_state_10.m_state_to_ui_visibility.size() == 2);
+  REQUIRE(ui_state_7.m_state_to_ui_visibility.size() == 2);
 }
 
 /////////////////////////////////////////////////
@@ -477,22 +480,22 @@ TEST_CASE("ConfigureCUIState activates component and configures state mappings",
 
   REQUIRE(result.has_value());
 
-  // Test entity 7: ConfigureCUIState should have:
+  // Test entity 4: ConfigureCUIState should have:
   // 1. Activated the component
   // 2. Created state_to_ui_visibility mapping for "main_menu"
   // 3. Resolved UI names to entity indices
-  const steamrot::CUIState &ui_state_7 =
-      steamrot::entity::memory::GetComponent<steamrot::CUIState>(7, emp);
+  const steamrot::CUIState &ui_state_4 =
+      steamrot::entity::memory::GetComponent<steamrot::CUIState>(4, emp);
 
   // Verify component activation
-  REQUIRE(ui_state_7.m_active == true);
+  REQUIRE(ui_state_4.m_active == true);
 
   // Verify state mapping was created
-  REQUIRE(ui_state_7.m_state_to_ui_visibility.size() == 1);
-  REQUIRE(ui_state_7.m_state_to_ui_visibility.contains("main_menu"));
+  REQUIRE(ui_state_4.m_state_to_ui_visibility.size() == 1);
+  REQUIRE(ui_state_4.m_state_to_ui_visibility.contains("main_menu"));
 
   // Verify UI name resolution to indices
-  const auto &visibility = ui_state_7.m_state_to_ui_visibility.at("main_menu");
+  const auto &visibility = ui_state_4.m_state_to_ui_visibility.at("main_menu");
   REQUIRE(visibility.m_ui_indices_on.size() == 2);
   REQUIRE(visibility.m_ui_indices_off.size() == 1);
 }
@@ -511,17 +514,17 @@ TEST_CASE("ConfigureCUIState handles subscribers correctly",
 
   REQUIRE(result.has_value());
 
-  // Test entity 9: ConfigureCUIState should have:
+  // Test entity 6: ConfigureCUIState should have:
   // 1. Created subscriber from FlatBuffers data
   // 2. Registered subscriber with EventHandler
   // 3. Stored subscriber in m_state_subscribers
-  const steamrot::CUIState &ui_state_9 =
-      steamrot::entity::memory::GetComponent<steamrot::CUIState>(9, emp);
+  const steamrot::CUIState &ui_state_6 =
+      steamrot::entity::memory::GetComponent<steamrot::CUIState>(6, emp);
 
-  REQUIRE(ui_state_9.m_active == true);
-  REQUIRE(ui_state_9.m_state_subscribers.contains("game_running"));
+  REQUIRE(ui_state_6.m_active == true);
+  REQUIRE(ui_state_6.m_state_subscribers.contains("game_running"));
 
-  const auto &subscribers = ui_state_9.m_state_subscribers.at("game_running");
+  const auto &subscribers = ui_state_6.m_state_subscribers.at("game_running");
   REQUIRE(subscribers.size() == 1);
   REQUIRE(subscribers[0] != nullptr);
   REQUIRE(subscribers[0]->m_active == true);
@@ -541,25 +544,25 @@ TEST_CASE("ConfigureCUIState handles multiple states in single component",
 
   REQUIRE(result.has_value());
 
-  // Test entity 10: ConfigureCUIState should handle multiple ui_states entries
-  const steamrot::CUIState &ui_state_10 =
-      steamrot::entity::memory::GetComponent<steamrot::CUIState>(10, emp);
+  // Test entity 7: ConfigureCUIState should handle multiple ui_states entries
+  const steamrot::CUIState &ui_state_7 =
+      steamrot::entity::memory::GetComponent<steamrot::CUIState>(7, emp);
 
-  REQUIRE(ui_state_10.m_active == true);
+  REQUIRE(ui_state_7.m_active == true);
 
   // Verify both states were configured
-  REQUIRE(ui_state_10.m_state_to_ui_visibility.size() == 2);
-  REQUIRE(ui_state_10.m_state_to_ui_visibility.contains("multiple_states_a"));
-  REQUIRE(ui_state_10.m_state_to_ui_visibility.contains("multiple_states_b"));
+  REQUIRE(ui_state_7.m_state_to_ui_visibility.size() == 2);
+  REQUIRE(ui_state_7.m_state_to_ui_visibility.contains("multiple_states_a"));
+  REQUIRE(ui_state_7.m_state_to_ui_visibility.contains("multiple_states_b"));
 
   // Verify each state has correct mappings
   const auto &state_a =
-      ui_state_10.m_state_to_ui_visibility.at("multiple_states_a");
+      ui_state_7.m_state_to_ui_visibility.at("multiple_states_a");
   REQUIRE(!state_a.m_ui_indices_on.empty());
   REQUIRE(!state_a.m_ui_indices_off.empty());
 
   const auto &state_b =
-      ui_state_10.m_state_to_ui_visibility.at("multiple_states_b");
+      ui_state_7.m_state_to_ui_visibility.at("multiple_states_b");
   REQUIRE(state_b.m_ui_indices_on.size() == 2);
   REQUIRE(state_b.m_ui_indices_off.size() == 2);
 }
@@ -609,22 +612,17 @@ TEST_CASE("Full configuration flow works correctly",
   REQUIRE(result.has_value());
   REQUIRE(steamrot::entity::memory::GetMemoryPoolSize(emp) == 20);
 
-  // Verify entity 0 is unconfigured (no components)
-  const auto &meta_zero =
-      steamrot::entity::memory::GetComponent<steamrot::CMeta>(0, emp);
-  REQUIRE(meta_zero.m_active == false);
-
-  // Verify entity 1 (CUserInterface) is configured
-  const auto &ui_one =
-      steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(1, emp);
-  REQUIRE(ui_one.m_name == "simple_ui");
-  REQUIRE(ui_one.m_visible == true);
-  REQUIRE(ui_one.m_root_element != nullptr);
+  // Verify entity 0 (CUserInterface) is configured with simple_ui
+  const auto &ui_zero =
+      steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(0, emp);
+  REQUIRE(ui_zero.m_name == "simple_ui");
+  REQUIRE(ui_zero.m_visible == true);
+  REQUIRE(ui_zero.m_root_element != nullptr);
   // check that root element is PanelElement
-  REQUIRE(dynamic_cast<steamrot::PanelElement *>(ui_one.m_root_element.get()));
+  REQUIRE(dynamic_cast<steamrot::PanelElement *>(ui_zero.m_root_element.get()));
 
   const steamrot::PanelElement &root_panel =
-      static_cast<const steamrot::PanelElement &>(*ui_one.m_root_element);
+      static_cast<const steamrot::PanelElement &>(*ui_zero.m_root_element);
 
   REQUIRE(root_panel.size.x == 100.0f);
   REQUIRE(root_panel.size.y == 50.0f);
