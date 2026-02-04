@@ -233,6 +233,27 @@ FlatbuffersDataLoader::ProvideAllJointData() const {
   // create return vector
   std::vector<const JointFbs *> joints;
 
+  // get the joints directory
+  std::filesystem::path joints_dir = paths::GetAssetsDirectory();
+  joints_dir /= "joints";
+  // iterate over all .bin files in the joints directory
+  for (const auto &entry : std::filesystem::directory_iterator(joints_dir)) {
+    // check for .bin files
+    if (entry.path().extension() == ".bin") {
+      // load the joint data using the generated function from flatbuffers
+      const steamrot::JointFbs *joint_data =
+          GetJointFbs(LoadBinaryData(entry.path()));
+      if (joint_data) {
+        joints.push_back(joint_data);
+      } else {
+        // unexpected error if joint data is null
+        std::string error_message = std::format(
+            "JointFbs pointer is null for file: {}", entry.path().string());
+        return std::unexpected(
+            FailInfo(FailMode::FlatbuffersDataNotFound, error_message));
+      }
+    }
+  }
   return joints;
 }
 } // namespace steamrot

@@ -243,15 +243,43 @@ TEST_CASE(
   }
   const auto &fragments = result.value();
   REQUIRE(!fragments.empty());
+
+  // extract names into vector for easy checking
+  std::vector<std::string> fragment_names;
+  for (const auto &fragment : fragments) {
+    REQUIRE(fragment != nullptr);
+    fragment_names.push_back(fragment->name()->str());
+  }
+  // expected fragment names. Add more as more fragments are added
+  std::vector<std::string> expected_fragment_names = {"rectangle"};
+  // check each expected name is in the vector
+  for (const auto &expected_name : expected_fragment_names) {
+    REQUIRE(std::find(fragment_names.begin(), fragment_names.end(),
+                      expected_name) != fragment_names.end());
+  }
 }
-//
-// TEST_CASE("FlatbuffersDataLoader::ProvideAllJointData returns valid joints",
-//           "[unit][FlatbuffersDataLoader]") {
-//   steamrot::FlatbuffersDataLoader data_loader;
-//   auto result = data_loader.ProvideAllJointData();
-//   if (!result.has_value()) {
-//     FAIL(result.error().message);
-//   }
-//   const auto &joints = result.value();
-//   REQUIRE(!joints.empty());
-// }
+
+TEST_CASE("FlatbuffersDataLoader::ProvideAllJointData returns valid joints",
+          "[unit][FlatbuffersDataLoader]") {
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideAllJointData();
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+  const auto &joints = result.value();
+  REQUIRE(!joints.empty());
+
+  // extract names into vector for easy checking
+  std::vector<std::string> joint_names;
+  for (const auto &joint : joints) {
+    REQUIRE(joint != nullptr);
+    joint_names.push_back(joint->name()->str());
+  }
+  // expected joint names. Add more as more joints are added
+  std::vector<std::string> expected_joint_names = {"square"};
+  // check each expected name is in the vector
+  for (const auto &expected_name : expected_joint_names) {
+    REQUIRE(std::find(joint_names.begin(), joint_names.end(), expected_name) !=
+            joint_names.end());
+  }
+}
