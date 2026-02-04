@@ -1,7 +1,6 @@
 # Set data directory types (root dirs)
 set(DIRECTORY_ROOTS
     ${CMAKE_SOURCE_DIR}/data/defaults
-    ${CMAKE_SOURCE_DIR}/tests/data/defaults
 )
 
 # Clear the global binary list at configure time
@@ -37,47 +36,19 @@ macro(flatbuffers_generate_for_type schema_name schema_subdir json_ext data_subd
       string(REGEX REPLACE "\\.json$" "" bin_base "${json_name}")
       set(bin_file "${data_dir}/${bin_base}.bin")
 
-      # Main prod directory path
-      set(prod_dir "${CMAKE_SOURCE_DIR}/data/defaults")
-      set(test_dir "${CMAKE_SOURCE_DIR}/tests/data/defaults")
-      set(prod_subdir "${prod_dir}/${data_subdir}")
-      set(test_subdir "${test_dir}/${data_subdir}")
-
-      # If this is the prod dir, also copy to test dir after generation
-      if("${root_dir}" STREQUAL "${prod_dir}")
-        set(test_bin_file "${test_subdir}/${bin_base}.bin")
-        add_custom_command(
-                    OUTPUT "${bin_file}" "${test_bin_file}"
-                    COMMAND flatc
-                        --binary
-                        -o "${data_dir}"
-                        "${schema}"
-                        "${json_file}"
-                    COMMAND ${CMAKE_COMMAND}
-                        -E echo "Generating binary FlatBuffer ${bin_file} from ${json_file} using ${schema}"
-                    COMMAND ${CMAKE_COMMAND}
-                        -E make_directory "${test_subdir}"
-                    COMMAND ${CMAKE_COMMAND}
-                        -E copy_if_different "${bin_file}" "${test_bin_file}"
-                    DEPENDS "${schema}" "${json_file}"
-                    VERBATIM
-                )
-        list(APPEND FLATBUFFERS_ALL_GENERATED_BINARIES "${bin_file}" "${test_bin_file}")
-      else()
-        add_custom_command(
-                  OUTPUT "${bin_file}"
-                  COMMAND flatc
-                      --binary
-                      -o "${data_dir}"
-                      "${schema}"
-                      "${json_file}"
-                  COMMAND ${CMAKE_COMMAND}
-                      -E echo "Generating binary FlatBuffer ${bin_file} from ${json_file} using ${schema}"
-                  DEPENDS "${schema}" "${json_file}"
-                  VERBATIM
-              )
-        list(APPEND FLATBUFFERS_ALL_GENERATED_BINARIES "${bin_file}")
-      endif()
+      add_custom_command(
+                OUTPUT "${bin_file}"
+                COMMAND flatc
+                    --binary
+                    -o "${data_dir}"
+                    "${schema}"
+                    "${json_file}"
+                COMMAND ${CMAKE_COMMAND}
+                    -E echo "Generating binary FlatBuffer ${bin_file} from ${json_file} using ${schema}"
+                DEPENDS "${schema}" "${json_file}"
+                VERBATIM
+            )
+      list(APPEND FLATBUFFERS_ALL_GENERATED_BINARIES "${bin_file}")
     endforeach()
   endforeach()
 endmacro()
