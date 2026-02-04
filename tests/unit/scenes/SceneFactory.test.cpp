@@ -90,7 +90,7 @@ TEST_CASE("SceneFactory::CreateSceneFromSceneData creates Scene with valid "
   REQUIRE(scene_data_fbs != nullptr);
 
   // Verify the loaded data structure
-  REQUIRE(scene_data_fbs->scene_info() != nullptr);
+  REQUIRE(scene_data_fbs->scene_info());
   REQUIRE(scene_data_fbs->scene_info()->scene_type() ==
           steamrot::SceneTypeFbs_TITLE);
   REQUIRE(scene_data_fbs->scene_resources_config()->texture_width() == 800);
@@ -101,7 +101,7 @@ TEST_CASE("SceneFactory::CreateSceneFromSceneData creates Scene with valid "
   // Check entities in the collection
   const auto *entities = scene_data_fbs->entity_collection()->entities();
   REQUIRE(entities != nullptr);
-  REQUIRE(entities->size() == 2);
+  REQUIRE(entities->size() == 1);
 
   // Check first entity (UI element)
   const auto *entity_0 = entities->Get(0);
@@ -109,13 +109,6 @@ TEST_CASE("SceneFactory::CreateSceneFromSceneData creates Scene with valid "
   REQUIRE(entity_0->c_user_interface() != nullptr);
   REQUIRE(entity_0->c_user_interface()->ui_name()->str() == "test_ui_panel");
   REQUIRE(entity_0->c_user_interface()->is_visible() == true);
-
-  // Check second entity (grimoire machina)
-  const auto *entity_1 = entities->Get(1);
-  REQUIRE(entity_1 != nullptr);
-  REQUIRE(entity_1->c_grimoire_machina() != nullptr);
-  REQUIRE(entity_1->c_grimoire_machina()->fragments() != nullptr);
-  REQUIRE(entity_1->c_grimoire_machina()->fragments()->size() == 2);
 
   // Create SceneData using the constructor that takes SceneDataFbs
   steamrot::FlatbuffersSceneDataProvider scene_data_provider(

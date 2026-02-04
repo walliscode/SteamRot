@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "FlatbuffersDataLoader.h"
 #include "FailInfo.h"
+#include "fragment_generated.h"
 #include "paths.h"
 #include "scene_data_generated.h"
 #include "ui_style_generated.h"
@@ -194,5 +195,65 @@ FlatbuffersDataLoader::ProvideDefaultUserPreferencesData() const {
 
   return preferences_data;
 }
+/////////////////////////////////////////////////
+std::expected<std::vector<const FragmentFbs *>, FailInfo>
+FlatbuffersDataLoader::ProvideAllFragmentData() const {
+  // create return vector
+  std::vector<const FragmentFbs *> fragments;
 
+  // get the fragments directory
+  std::filesystem::path fragments_dir = paths::GetAssetsDirectory();
+  fragments_dir /= "fragments";
+
+  // iterate over all .bin files in the fragments directory
+  for (const auto &entry : std::filesystem::directory_iterator(fragments_dir)) {
+    // check for .bin files
+    if (entry.path().extension() == ".bin") {
+      // load the fragment data using the generated function from flatbuffers
+      const steamrot::FragmentFbs *fragment_data =
+          GetFragmentFbs(LoadBinaryData(entry.path()));
+      if (fragment_data) {
+        fragments.push_back(fragment_data);
+      } else {
+        // unexpected error if fragment data is null
+        std::string error_message = std::format(
+            "FragmentFbs pointer is null for file: {}", entry.path().string());
+        return std::unexpected(
+            FailInfo(FailMode::FlatbuffersDataNotFound, error_message));
+      }
+    }
+  }
+
+  return fragments;
+}
+
+/////////////////////////////////////////////////
+std::expected<std::vector<const JointFbs *>, FailInfo>
+FlatbuffersDataLoader::ProvideAllJointData() const {
+  // create return vector
+  std::vector<const JointFbs *> joints;
+
+  // get the joints directory
+  std::filesystem::path joints_dir = paths::GetAssetsDirectory();
+  joints_dir /= "joints";
+  // iterate over all .bin files in the joints directory
+  for (const auto &entry : std::filesystem::directory_iterator(joints_dir)) {
+    // check for .bin files
+    if (entry.path().extension() == ".bin") {
+      // load the joint data using the generated function from flatbuffers
+      const steamrot::JointFbs *joint_data =
+          GetJointFbs(LoadBinaryData(entry.path()));
+      if (joint_data) {
+        joints.push_back(joint_data);
+      } else {
+        // unexpected error if joint data is null
+        std::string error_message = std::format(
+            "JointFbs pointer is null for file: {}", entry.path().string());
+        return std::unexpected(
+            FailInfo(FailMode::FlatbuffersDataNotFound, error_message));
+      }
+    }
+  }
+  return joints;
+}
 } // namespace steamrot

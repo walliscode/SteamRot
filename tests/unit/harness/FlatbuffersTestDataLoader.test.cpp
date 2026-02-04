@@ -152,7 +152,8 @@ TEST_CASE(
   REQUIRE(scene_data != nullptr);
   REQUIRE(scene_data->scene_info() != nullptr);
   REQUIRE(!scene_data->scene_info()->scene_id());
-  REQUIRE(scene_data->scene_info()->scene_type() == steamrot::SceneTypeFbs_TITLE);
+  REQUIRE(scene_data->scene_info()->scene_type() ==
+          steamrot::SceneTypeFbs_TITLE);
 
   REQUIRE(scene_data->scene_resources_config() != nullptr);
   REQUIRE(scene_data->scene_resources_config()->texture_width() == 800);
@@ -168,14 +169,6 @@ TEST_CASE(
   REQUIRE(entity_0->c_user_interface() != nullptr);
   REQUIRE(entity_0->c_user_interface()->ui_name()->str() == "test_ui");
   REQUIRE(entity_0->c_user_interface()->is_visible() == true);
-
-  const auto *entity_1 = scene_data->entity_collection()->entities()->Get(1);
-  REQUIRE(entity_1->index() == 1);
-  REQUIRE(entity_1->c_grimoire_machina() != nullptr);
-  REQUIRE(entity_1->c_grimoire_machina()->fragments() != nullptr);
-  REQUIRE(entity_1->c_grimoire_machina()->fragments()->size() == 1);
-  REQUIRE(entity_1->c_grimoire_machina()->fragments()->Get(0)->str() ==
-          "test_fragment");
 
   // Assert - starting_engine_snapshot global_event_bus
   REQUIRE(starting_snapshot->global_event_bus() != nullptr);
