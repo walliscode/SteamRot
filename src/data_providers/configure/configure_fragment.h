@@ -1,0 +1,30 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Declaration of free functions to configure Fragment
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Preprocessor Directives
+/////////////////////////////////////////////////
+#pragma once
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+
+#include "FailInfo.h"
+#include "Fragment.h"
+#include "fragment_generated.h"
+#include <expected>
+#include <variant>
+namespace steamrot::data::configure {
+
+/////////////////////////////////////////////////
+/// @brief Configure Fragment from flatbuffers data source.
+///
+/// @param fragment Fragment to configure.
+/// @param fragment_fbs Flatbuffers data source.
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureFragment(Fragment &fragment, const FragmentFbs *fragment_fbs);
+} // namespace steamrot::data::configure

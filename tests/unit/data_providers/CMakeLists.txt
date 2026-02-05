@@ -28,6 +28,7 @@ add_executable(test_data_providers
   configure_scene_manager_data.test.cpp
   configure_ui_styles.test.cpp
   configure_ui_elements.test.cpp
+  configure_fragment.test.cpp
 )
 
 

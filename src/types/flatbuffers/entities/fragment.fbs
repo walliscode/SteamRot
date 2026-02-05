@@ -3,7 +3,6 @@ include "view_direction.fbs";
 
 namespace steamrot;
 
-
 table FragmentFbs{
 name: string (required);
 sockets: [Vector2fData] (required);
