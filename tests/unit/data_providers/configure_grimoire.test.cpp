@@ -11,6 +11,7 @@
 #include "types_generated.h"
 #include "view_direction_generated.h"
 #include <catch2/catch_test_macros.hpp>
+#include <iostream>
 
 /////////////////////////////////////////////////
 /// Helper Functions for Creating Test Data
@@ -33,11 +34,9 @@ CreateTestTriangle(flatbuffers::FlatBufferBuilder &builder) {
   auto vertex1 = steamrot::CreateVertex(
       builder, steamrot::CreateVector2fData(builder, 0.0f, 0.0f), red_color);
   auto vertex2 = steamrot::CreateVertex(
-      builder, steamrot::CreateVector2fData(builder, 10.0f, 0.0f),
-      green_color);
+      builder, steamrot::CreateVector2fData(builder, 10.0f, 0.0f), green_color);
   auto vertex3 = steamrot::CreateVertex(
-      builder, steamrot::CreateVector2fData(builder, 10.0f, 10.0f),
-      blue_color);
+      builder, steamrot::CreateVector2fData(builder, 10.0f, 10.0f), blue_color);
 
   return steamrot::CreateTriangle(
       builder, builder.CreateVector<flatbuffers::Offset<steamrot::Vertex>>(
@@ -183,9 +182,13 @@ TEST_CASE("ConfigureFragment returns unexpected when name is missing",
   auto views_vector =
       builder.CreateVector<flatbuffers::Offset<steamrot::ViewFbs>>({view});
 
+  auto empty_string_offset =
+      builder.CreateString(""); // Create an empty string offset
+  //
   // Create FragmentFbs without name (nullptr)
-  auto fragment_fbs_offset = steamrot::CreateFragmentFbs(
-      builder, 0, sockets_vector, views_vector); // 0 = null name
+  auto fragment_fbs_offset =
+      steamrot::CreateFragmentFbs(builder, empty_string_offset, sockets_vector,
+                                  views_vector); // 0 = null name
 
   builder.Finish(fragment_fbs_offset);
   auto fragment_fbs =
@@ -197,6 +200,7 @@ TEST_CASE("ConfigureFragment returns unexpected when name is missing",
 
   REQUIRE(!result.has_value());
   REQUIRE(result.error().message == "Fragment name is missing");
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
 }
 
 TEST_CASE("ConfigureFragment configures sockets successfully",
@@ -229,10 +233,13 @@ TEST_CASE("ConfigureFragment returns unexpected when sockets are missing",
   auto view = CreateTestView(builder, steamrot::ViewDirectionFbs_FRONT, 2);
   auto views_vector =
       builder.CreateVector<flatbuffers::Offset<steamrot::ViewFbs>>({view});
+  // create empty sockets vector
+  auto empty_sockets_vector =
+      builder.CreateVector<flatbuffers::Offset<steamrot::Vector2fData>>({});
 
   // Create FragmentFbs without sockets (nullptr)
-  auto fragment_fbs_offset =
-      steamrot::CreateFragmentFbs(builder, name_offset, 0, views_vector);
+  auto fragment_fbs_offset = steamrot::CreateFragmentFbs(
+      builder, name_offset, empty_sockets_vector, views_vector);
 
   builder.Finish(fragment_fbs_offset);
   auto fragment_fbs =
@@ -275,8 +282,9 @@ TEST_CASE("ConfigureFragment configures movement_views successfully",
   }
 }
 
-TEST_CASE("ConfigureFragment returns unexpected when movement_views are missing",
-          "[unit][ConfigureFragment]") {
+TEST_CASE(
+    "ConfigureFragment returns unexpected when movement_views are missing",
+    "[unit][ConfigureFragment]") {
   flatbuffers::FlatBufferBuilder builder;
 
   auto name_offset = builder.CreateString("test_fragment");
