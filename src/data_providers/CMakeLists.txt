@@ -25,7 +25,7 @@ add_library(data_providers
   configure/configure_ui_styles.cpp
   configure/configure_scene_data.cpp
   configure/configure_ui_elements.cpp
-  configure/configure_fragment.cpp
+  configure/configure_grimoire.cpp
 
 )
 
