@@ -20,6 +20,7 @@ add_executable(test_data_providers
   FlatbuffersSubscriberViewer.test.cpp
   FlatbuffersSaveDataProvider.test.cpp
   FlatbuffersUIStyleDataProvider.test.cpp
+  FlatbuffersGrimoireMachinaProvider.test.cpp
   configure_asset_config.test.cpp
   configure_engine_data.test.cpp
   configure_engine_snapshot.test.cpp
