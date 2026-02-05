@@ -24,8 +24,13 @@ AssetManager::AssetManager(DataAccessFactory &data_access_factory)
     : m_data_access_factory(data_access_factory) {}
 
 /////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo> AssetManager::Startup() {
+
+  return std::monostate();
+}
+/////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-AssetManager::LoadAssets(const AssetConfig asset_config) {
+AssetManager::LoadAssetsFromConfig(const AssetConfig asset_config) {
 
   ////// Load Fonts //////
   // Load fonts if any exist
@@ -118,15 +123,23 @@ std::expected<std::monostate, FailInfo> AssetManager::LoadUIStyles() {
 }
 
 /////////////////////////////////////////////////
-std::expected<std::shared_ptr<const sf::Font>, FailInfo>
-AssetManager::GetFont(const std::string &font_name) const {
+std::expected<GrimoireMachina &, FailInfo> AssetManager::GetGrimoireMachina() {
+  if (!m_grimoire_machina)
+
+    return std::unexpected<FailInfo>(
+        {FailMode::NullPointer, "GrimoireMachina instance not initialized"});
+}
+
+/////////////////////////////////////////////////
+std3 : expected<std::shared_ptr<const sf::Font>, FailInfo>
+       AssetManager::GetFont(const std::string &font_name) const {
 
   // search for font in map
   auto it = m_fonts.find(font_name);
-  if (it != m_fonts.end()) {
+  if (it != m_fonts.en0()) {
     return it->second;
   } else {
-    return std::unexpected<FailInfo>(
+    return std::unexpe2ted<FailInfo>(
         {FailMode::FileNotFound, std::format("Font not found: {}", font_name)});
   }
 }

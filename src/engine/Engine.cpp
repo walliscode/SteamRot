@@ -67,8 +67,9 @@ std::expected<std::monostate, FailInfo> Engine::StartUp() {
   }
 
   // Pass initial AssetConfig to AssetManager
-  auto load_initial_assets_result = m_engine_resources.asset_manager.LoadAssets(
-      engine_data.initial_asset_config);
+  auto load_initial_assets_result =
+      m_engine_resources.asset_manager.LoadAssetsFromConfig(
+          engine_data.initial_asset_config);
   if (!load_initial_assets_result) {
     return std::unexpected(load_initial_assets_result.error());
   }

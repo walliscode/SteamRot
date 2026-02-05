@@ -13,6 +13,7 @@
 /////////////////////////////////////////////////
 #include "DataAccessFactory.h"
 #include "FailInfo.h"
+#include "GrimoireMachina.h"
 #include "IFontProvider.h"
 #include "UIStyle.h"
 #include <SFML/Graphics.hpp>
@@ -32,6 +33,11 @@ private:
   DataAccessFactory &m_data_access_factory;
 
   /////////////////////////////////////////////////
+  /// @brief The GrimoireMachina instance for the Game
+  /////////////////////////////////////////////////
+  std::unique_ptr<GrimoireMachina> m_grimoire_machina;
+
+  /////////////////////////////////////////////////
   /// @brief Member variable contining all the fonts for the game.
   /////////////////////////////////////////////////
   std::unordered_map<std::string, std::shared_ptr<const sf::Font>> m_fonts;
@@ -49,18 +55,34 @@ private:
   std::expected<std::monostate, FailInfo> AddFont(const std::string &font_name);
 
 public:
+  /////////////////////////////////////////////////
+  /// @brief Constructor for AssetManager taking a reference to a
+  /// DataAccessFactory
+  ///
+  /// @param data_access_factory DataAccessFactory reference for loading assets
+  /////////////////////////////////////////////////
   AssetManager(DataAccessFactory &data_access_factory);
+
+  /////////////////////////////////////////////////
+  /// @brief Contaienr function to load any default assets.
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> Startup();
 
   /////////////////////////////////////////////////
   /// @brief Load assets from the provided AssetConfig data
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo>
-  LoadAssets(const AssetConfig asset_config);
+  LoadAssetsFromConfig(const AssetConfig asset_config);
 
   /////////////////////////////////////////////////
   /// @brief Load all UI styles
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo> LoadUIStyles();
+
+  /////////////////////////////////////////////////
+  /// @brief return reference to the GrimoireMachina5instance
+  /////////////////////////////////////////////////
+  std::expected<GrimoireMachina &, FailInfo> GetGrimoireMachina();
 
   /////////////////////////////////////////////////
   /// @brief Implements IFontProvider::GetFont
