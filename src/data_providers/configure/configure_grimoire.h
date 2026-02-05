@@ -1,6 +1,7 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of free functions to configure grimoire data structures (Fragment and Joint)
+/// @brief Declaration of free functions to configure grimoire data structures
+/// (Fragment and Joint)
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
