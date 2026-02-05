@@ -68,6 +68,8 @@ ConfigureFragment(Fragment &fragment, const FragmentFbs *fragment_fbs) {
         direction = ViewDirection::Front;
         break;
       case ViewDirectionFbs_NONE:
+        // NONE is used as a default/uninitialized value in FlatBuffers
+        // Map to Back as the fallback direction
         direction = ViewDirection::Back;
         break;
       default:
@@ -207,6 +209,8 @@ ConfigureJoint(Joint &joint, const JointFbs *joint_fbs) {
         direction = ViewDirection::Front;
         break;
       case ViewDirectionFbs_NONE:
+        // NONE is used as a default/uninitialized value in FlatBuffers
+        // Map to Back as the fallback direction
         direction = ViewDirection::Back;
         break;
       default:
