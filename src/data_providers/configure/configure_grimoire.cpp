@@ -1,6 +1,7 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Implementation of free functions to configure grimoire data structures (Fragment and Joint)
+/// @brief Implementation of free functions to configure grimoire data
+/// structures (Fragment and Joint)
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -24,7 +25,7 @@ ConfigureFragment(Fragment &fragment, const FragmentFbs *fragment_fbs) {
   }
 
   // Configure name
-  if (fragment_fbs->name()) {
+  if (fragment_fbs->name() && !(fragment_fbs->name()->str().empty())) {
     fragment.name = fragment_fbs->name()->str();
   } else {
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
@@ -32,7 +33,7 @@ ConfigureFragment(Fragment &fragment, const FragmentFbs *fragment_fbs) {
   }
 
   // Configure sockets
-  if (fragment_fbs->sockets()) {
+  if (!fragment_fbs->sockets()->empty()) {
     const auto *sockets_fbs = fragment_fbs->sockets();
     fragment.sockets.clear();
     fragment.sockets.reserve(sockets_fbs->size());
@@ -41,8 +42,8 @@ ConfigureFragment(Fragment &fragment, const FragmentFbs *fragment_fbs) {
       if (socket_fbs) {
         fragment.sockets.emplace_back(socket_fbs->x(), socket_fbs->y());
       } else {
-        return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                        "Socket data is null"});
+        return std::unexpected(
+            FailInfo{FailMode::FlatbuffersDataNotFound, "Socket data is null"});
       }
     }
   } else {
@@ -51,7 +52,7 @@ ConfigureFragment(Fragment &fragment, const FragmentFbs *fragment_fbs) {
   }
 
   // Configure movement_views
-  if (fragment_fbs->movement_views()) {
+  if (!fragment_fbs->movement_views()->empty()) {
     const auto *views_fbs = fragment_fbs->movement_views();
     fragment.movement_views.clear();
 
@@ -102,9 +103,8 @@ ConfigureFragment(Fragment &fragment, const FragmentFbs *fragment_fbs) {
           }
 
           if (!triangle_fbs->vertices()) {
-            return std::unexpected(
-                FailInfo{FailMode::FlatbuffersDataNotFound,
-                         "Triangle vertices are missing"});
+            return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                            "Triangle vertices are missing"});
           }
 
           const auto *vertices_fbs = triangle_fbs->vertices();
@@ -121,9 +121,8 @@ ConfigureFragment(Fragment &fragment, const FragmentFbs *fragment_fbs) {
             }
 
             if (!vertex_fbs->position()) {
-              return std::unexpected(
-                  FailInfo{FailMode::FlatbuffersDataNotFound,
-                           "Vertex position is missing"});
+              return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                              "Vertex position is missing"});
             }
 
             if (!vertex_fbs->color()) {
@@ -160,20 +159,21 @@ ConfigureJoint(Joint &joint, const JointFbs *joint_fbs) {
 
   // Check for null pointer
   if (joint_fbs == nullptr) {
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound, "JointFbs pointer is null"});
-  }
-
-  // Configure name
-  if (joint_fbs->name()) {
-    joint.name = joint_fbs->name()->str();
-  } else {
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    "Joint name is missing"});
+                                    "JointFbs pointer is null"});
+  }
+  // Configure name
+  if (joint_fbs->name() && !(joint_fbs->name()->str().empty())) {
+    joint.name = joint_fbs->name()->str();
+
+  } else {
+
+    return std::unexpected(
+        FailInfo{FailMode::FlatbuffersDataNotFound, "Joint name is missing"});
   }
 
   // Configure sockets
-  if (joint_fbs->sockets()) {
+  if (!joint_fbs->sockets()->empty()) {
     const auto *sockets_fbs = joint_fbs->sockets();
     joint.sockets.clear();
     joint.sockets.reserve(sockets_fbs->size());
@@ -182,8 +182,8 @@ ConfigureJoint(Joint &joint, const JointFbs *joint_fbs) {
       if (socket_fbs) {
         joint.sockets.emplace_back(socket_fbs->x(), socket_fbs->y());
       } else {
-        return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                        "Socket data is null"});
+        return std::unexpected(
+            FailInfo{FailMode::FlatbuffersDataNotFound, "Socket data is null"});
       }
     }
   } else {
@@ -192,7 +192,7 @@ ConfigureJoint(Joint &joint, const JointFbs *joint_fbs) {
   }
 
   // Configure movement_views
-  if (joint_fbs->movement_views()) {
+  if (!joint_fbs->movement_views()->empty()) {
     const auto *views_fbs = joint_fbs->movement_views();
     joint.movement_views.clear();
 
@@ -243,9 +243,8 @@ ConfigureJoint(Joint &joint, const JointFbs *joint_fbs) {
           }
 
           if (!triangle_fbs->vertices()) {
-            return std::unexpected(
-                FailInfo{FailMode::FlatbuffersDataNotFound,
-                         "Triangle vertices are missing"});
+            return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                            "Triangle vertices are missing"});
           }
 
           const auto *vertices_fbs = triangle_fbs->vertices();
@@ -262,9 +261,8 @@ ConfigureJoint(Joint &joint, const JointFbs *joint_fbs) {
             }
 
             if (!vertex_fbs->position()) {
-              return std::unexpected(
-                  FailInfo{FailMode::FlatbuffersDataNotFound,
-                           "Vertex position is missing"});
+              return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                              "Vertex position is missing"});
             }
 
             if (!vertex_fbs->color()) {

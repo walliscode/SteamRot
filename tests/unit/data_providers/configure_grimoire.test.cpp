@@ -11,7 +11,6 @@
 #include "types_generated.h"
 #include "view_direction_generated.h"
 #include <catch2/catch_test_macros.hpp>
-#include <iostream>
 
 /////////////////////////////////////////////////
 /// Helper Functions for Creating Test Data
@@ -186,9 +185,8 @@ TEST_CASE("ConfigureFragment returns unexpected when name is missing",
   auto empty_string_offset = builder.CreateString("");
 
   // Create FragmentFbs without name (empty string)
-  auto fragment_fbs_offset =
-      steamrot::CreateFragmentFbs(builder, empty_string_offset, sockets_vector,
-                                  views_vector);
+  auto fragment_fbs_offset = steamrot::CreateFragmentFbs(
+      builder, empty_string_offset, sockets_vector, views_vector);
 
   builder.Finish(fragment_fbs_offset);
   auto fragment_fbs =
@@ -442,8 +440,8 @@ TEST_CASE("ConfigureJoint returns unexpected when sockets are missing",
       builder.CreateVector<flatbuffers::Offset<steamrot::Vector2fData>>({});
 
   // Create JointFbs without sockets (empty vector)
-  auto joint_fbs_offset =
-      steamrot::CreateJointFbs(builder, name_offset, empty_sockets_vector, views_vector);
+  auto joint_fbs_offset = steamrot::CreateJointFbs(
+      builder, name_offset, empty_sockets_vector, views_vector);
 
   builder.Finish(joint_fbs_offset);
   auto joint_fbs =
@@ -501,7 +499,7 @@ TEST_CASE("ConfigureJoint returns unexpected when movement_views are missing",
   builder.Finish(joint_fbs_offset);
   auto joint_fbs =
       flatbuffers::GetRoot<steamrot::JointFbs>(builder.GetBufferPointer());
-
+  REQUIRE(joint_fbs->movement_views()->empty());
   steamrot::Joint joint;
   auto result = steamrot::data::configure::ConfigureJoint(joint, joint_fbs);
 
