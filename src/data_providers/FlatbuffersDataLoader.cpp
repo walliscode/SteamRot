@@ -159,7 +159,7 @@ FlatbuffersDataLoader::ProvideLogicConfigCollectionFbs() const {
   std::filesystem::path defaults_dir = paths::GetDefaultsDirectory();
   // construct the file path
   std::filesystem::path logic_config_path =
-      defaults_dir / "logic_config/logic_config.json";
+      defaults_dir / "logic_config/logic_config.bin";
   // check if the file exists
   if (!std::filesystem::exists(logic_config_path)) {
     std::string error_message = std::format("Logic config file not found: {}",

@@ -13,6 +13,7 @@ add_library(data_providers
   FlatbuffersUIStyleDataProvider.cpp
   FlatbuffersSaveDataProvider.cpp
   FlatbuffersGrimoireMachinaProvider.cpp
+  FlatbuffersLogicConfigCollectionProvider.cpp
   DataAccessFactory.cpp
   DataLoader.cpp
   FlatbuffersDataLoader.cpp

@@ -12,6 +12,7 @@
 namespace steamrot {
 
 enum class LogicType {
+  TestLogic = 0,
   UIRenderLogic,
   UIStateLogic,
   UIActionLogic,
