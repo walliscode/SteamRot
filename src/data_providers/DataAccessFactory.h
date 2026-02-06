@@ -16,6 +16,7 @@
 #include "FailInfo.h"
 #include "IEngineDataProvider.h"
 #include "IEntityConfigurator.h"
+#include "IGrimoireMachinaProvider.h"
 #include "ISceneDataProvider.h"
 #include "ISceneManagerDataProvider.h"
 #include <expected>
@@ -50,6 +51,12 @@ private:
   /// @brief Instance of the Scene Data Provider for the factory/game
   /////////////////////////////////////////////////
   std::unique_ptr<ISceneDataProvider> m_scene_data_provider{nullptr};
+
+  /////////////////////////////////////////////////
+  /// @brief Instance of the GrimoireMachina Provider for the factory/game
+  /////////////////////////////////////////////////
+  std::unique_ptr<IGrimoireMachinaProvider> m_grimoire_machina_provider{
+      nullptr};
 
   /////////////////////////////////////////////////
   /// @brief Instance of the Entity Configurator for the factory/game
@@ -91,6 +98,12 @@ public:
   /// @brief Returns a raw pointer to the Scene Data Provider
   /////////////////////////////////////////////////
   std::expected<ISceneDataProvider *, FailInfo> GetSceneDataProvider();
+
+  /////////////////////////////////////////////////
+  /// @brief Returns a raw pointer to the GrimoireMachina Provider
+  /////////////////////////////////////////////////
+  std::expected<IGrimoireMachinaProvider *, FailInfo>
+  GetGrimoireMachinaProvider();
 
   /////////////////////////////////////////////////
   /// @brief Sets the data type for the factory

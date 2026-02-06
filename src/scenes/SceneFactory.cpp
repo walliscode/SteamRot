@@ -219,7 +219,8 @@ SceneFactory::PassAssetConfig(Scene &scene, const SceneData &scene_data) {
   AssetManager &asset_manager = scene.GetSceneContext().asset_manager;
 
   // pass AssetConfig to AssetManager
-  auto asset_result = asset_manager.LoadAssets(scene_data.scene_asset_config);
+  auto asset_result =
+      asset_manager.LoadAssetsFromConfig(scene_data.scene_asset_config);
   if (!asset_result.has_value())
     return std::unexpected(asset_result.error());
 

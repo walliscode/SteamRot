@@ -24,8 +24,45 @@ AssetManager::AssetManager(DataAccessFactory &data_access_factory)
     : m_data_access_factory(data_access_factory) {}
 
 /////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo> AssetManager::Startup() {
+
+  // set up GrimoireMachina
+  auto grimoire_result = SetUpGrimoireMachina();
+  if (!grimoire_result.has_value())
+    return std::unexpected<FailInfo>(grimoire_result.error());
+  // check GrimoireMachina is not null
+  if (!m_grimoire_machina)
+    return std::unexpected<FailInfo>(
+        {FailMode::NullPointer,
+         "GrimoireMachina instance is null after setup"});
+
+  return std::monostate();
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo> AssetManager::SetUpGrimoireMachina() {
+
+  // set up GrimoireMachina
+  m_grimoire_machina = std::make_unique<GrimoireMachina>();
+
+  // get provider
+  IGrimoireMachinaProvider *grimoire_machina_provider =
+      m_data_access_factory.GetGrimoireMachinaProvider().value();
+  if (!grimoire_machina_provider)
+    return std::unexpected<FailInfo>(
+        {FailMode::NullPointer, "GrimoireMachinaProvider instance is null"});
+
+  // Configure GrimioireMachina with the provider
+  auto configure_result =
+      grimoire_machina_provider->ConfigureGrimoireMachina(*m_grimoire_machina);
+  if (!configure_result.has_value())
+    return std::unexpected<FailInfo>(configure_result.error());
+
+  return std::monostate();
+}
+/////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-AssetManager::LoadAssets(const AssetConfig asset_config) {
+AssetManager::LoadAssetsFromConfig(const AssetConfig asset_config) {
 
   ////// Load Fonts //////
   // Load fonts if any exist
@@ -115,6 +152,17 @@ std::expected<std::monostate, FailInfo> AssetManager::LoadUIStyles() {
   }
 
   return std::monostate();
+}
+
+/////////////////////////////////////////////////
+std::expected<GrimoireMachina *, FailInfo> AssetManager::GetGrimoireMachina() {
+
+  if (m_grimoire_machina) {
+    return m_grimoire_machina.get();
+  } else {
+    return std::unexpected<FailInfo>(
+        {FailMode::NullPointer, "GrimoireMachina instance not initialized"});
+  }
 }
 
 /////////////////////////////////////////////////
