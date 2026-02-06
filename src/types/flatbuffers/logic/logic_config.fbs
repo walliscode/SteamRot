@@ -1,0 +1,22 @@
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+include "../events/subscriber.fbs";
+
+namespace steamrot;
+
+
+// Contains information about all subscriber data for the Logic instance
+table LogicConfigFbs{ 
+  subscriptions: [SubscriberFbs]; 
+  }
+
+// Contains information about all subscriber data for the Logic class type
+table LogicConfigCollectionFbs {
+
+test_logic: LogicConfigFbs;
+
+}
+
+root_type LogicConfigCollectionFbs;
+

@@ -9,6 +9,7 @@
 #include "FlatbuffersDataLoader.h"
 #include "FailInfo.h"
 #include "fragment_generated.h"
+#include "logic_config_generated.h"
 #include "paths.h"
 #include "scene_data_generated.h"
 #include "ui_style_generated.h"
@@ -150,23 +151,10 @@ FlatbuffersDataLoader::ProvideSceneManagerData() const {
   return scene_manager_data;
 }
 /////////////////////////////////////////////////
-std::expected<const LogicCollectionData *, FailInfo>
-FlatbuffersDataLoader::ProvideLogicCollectionData(
-    const SceneType scene_type) const {
+std::expected<const LogicConfigCollectionFbs *, FailInfo>
+FlatbuffersDataLoader::ProvideLogicConfigCollectionFbs(
+    const SceneType scene_type) const {}
 
-  // Load from SceneData for the specified scene type
-  auto scene_data_result = ProvideDefaultSceneData(scene_type);
-  if (!scene_data_result.has_value()) {
-    return std::unexpected(scene_data_result.error());
-  }
-  const SceneDataFbs *scene_data = scene_data_result.value();
-  if (!scene_data->logic_collection_data()) {
-    return std::unexpected(
-        FailInfo(FailMode::FlatbuffersDataNotFound,
-                 "LogicCollectionData not found in SceneData"));
-  }
-  return scene_data->logic_collection_data();
-}
 /////////////////////////////////////////////////
 std::expected<const UserPreferencesData *, FailInfo>
 FlatbuffersDataLoader::ProvideDefaultUserPreferencesData() const {

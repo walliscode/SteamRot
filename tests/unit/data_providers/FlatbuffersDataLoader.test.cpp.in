@@ -219,20 +219,6 @@ TEST_CASE("FlatbuffersDataLoader::ProvideDefaultUserPreferencesData returns "
 //   REQUIRE(logic_data != nullptr);
 // }
 
-TEST_CASE("FlatbuffersDataLoader::ProvideLogicCollectionData returns error "
-          "for invalid scene",
-          "[unit][FlatbuffersDataLoader]") {
-
-  steamrot::FlatbuffersDataLoader data_loader;
-  steamrot::SceneType invalid_scene_type =
-      static_cast<steamrot::SceneType>(999);
-
-  auto result = data_loader.ProvideLogicCollectionData(invalid_scene_type);
-
-  REQUIRE(!result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::SceneTypeNotFound);
-}
-
 TEST_CASE(
     "FlatbuffersDataLoader::ProvideAllFragmentData returns valid fragments",
     "[unit][FlatbuffersDataLoader]") {

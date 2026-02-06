@@ -46,7 +46,7 @@ set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/events/user_input.fbs
 
     # Logic
-    ${CMAKE_CURRENT_SOURCE_DIR}/logic/logic_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/logic/logic_config.fbs
 
     # Assets
     ${CMAKE_CURRENT_SOURCE_DIR}/assets/asset_config.fbs

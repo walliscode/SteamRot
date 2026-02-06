@@ -30,6 +30,7 @@ add_executable(test_data_providers
   configure_ui_styles.test.cpp
   configure_ui_elements.test.cpp
   configure_grimoire.test.cpp
+  configure_logic_config.test.cpp
 )
 
 

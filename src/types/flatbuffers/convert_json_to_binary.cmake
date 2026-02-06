@@ -70,6 +70,7 @@ flatbuffers_generate_for_type(engine_data "engine" ".engine_data.json" "engine")
 
 
 
+
 # This target will actually trigger all the binary generation
 add_custom_target(flatbuffers_generate_binaries ALL
     DEPENDS ${FLATBUFFERS_ALL_GENERATED_BINARIES}

@@ -1,0 +1,13 @@
+{
+  "test_logic": {
+    "subscriptions": [
+      {
+        "subscriber_data": {
+          "event_type_data": "EVENT_USER_INPUT",
+          "trigger_data_type": "UserInputBitsetData",
+          "trigger_data": { "mouse_released": ["LEFT_CLICK"] }
+        }
+      }
+    ]
+  }
+}
