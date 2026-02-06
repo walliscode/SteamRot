@@ -59,13 +59,10 @@ public:
   ProvideSceneManagerData() const;
 
   /////////////////////////////////////////////////
-  /// @brief Provides LogicCollectionData from SceneData for a specific
-  /// scene
-  ///
-  /// @param scene_type SceneType enum representing the type of scene
+  /// @brief Provides LogicConfigCollectionFbs from binary file
   /////////////////////////////////////////////////
   std::expected<const LogicConfigCollectionFbs *, FailInfo>
-  ProvideLogicConfigCollectionFbs(const SceneType scene_type) const;
+  ProvideLogicConfigCollectionFbs() const;
 
   /////////////////////////////////////////////////
   /// @brief Provides default UserPreferencesData from binary file

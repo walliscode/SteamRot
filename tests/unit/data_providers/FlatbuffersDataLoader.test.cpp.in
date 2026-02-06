@@ -60,6 +60,20 @@ TEST_CASE("FlatbuffersDataLoader provides scene data",
   //.... Additional checks can be added here
 }
 
+TEST_CASE("FlatbuffersDataLoader provides LogicConfigCollection data",
+          "[unit][FlatbuffersDataLoader]") {
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideLogicConfigCollectionFbs();
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+  const auto &logic_config_collection_data = result.value();
+  REQUIRE(logic_config_collection_data != nullptr);
+  REQUIRE(logic_config_collection_data->test_logic() != nullptr);
+  REQUIRE(logic_config_collection_data->test_logic()->subscriptions()->size() ==
+          1);
+}
+
 TEST_CASE("FlatbuffersDataLoader provides ui_styles data",
           "[unit][FlatbuffersDataLoader]") {
 

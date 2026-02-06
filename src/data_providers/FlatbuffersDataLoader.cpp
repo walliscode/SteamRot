@@ -18,6 +18,7 @@
 #include <SFML/Graphics/VertexArray.hpp>
 #include <expected>
 #include <format>
+#include <iostream>
 #include <vector>
 
 namespace steamrot {
@@ -152,8 +153,38 @@ FlatbuffersDataLoader::ProvideSceneManagerData() const {
 }
 /////////////////////////////////////////////////
 std::expected<const LogicConfigCollectionFbs *, FailInfo>
-FlatbuffersDataLoader::ProvideLogicConfigCollectionFbs(
-    const SceneType scene_type) const {}
+FlatbuffersDataLoader::ProvideLogicConfigCollectionFbs() const {
+
+  // get defaults directory
+  std::filesystem::path defaults_dir = paths::GetDefaultsDirectory();
+  // construct the file path
+  std::filesystem::path logic_config_path =
+      defaults_dir / "logic_config/logic_config.json";
+  // check if the file exists
+  if (!std::filesystem::exists(logic_config_path)) {
+    std::string error_message = std::format("Logic config file not found: {}",
+                                            logic_config_path.string());
+    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
+  }
+  // load the logic config collection data
+  const steamrot::LogicConfigCollectionFbs *logic_config_collection_data =
+      GetLogicConfigCollectionFbs(LoadBinaryData(logic_config_path));
+  if (!logic_config_collection_data) {
+    return std::unexpected(
+        FailInfo(FailMode::FlatbuffersDataNotFound,
+                 "LogicConfigCollectionFbs pointer is null"));
+  }
+
+  std::cout << "LogicConfigCollectionFbs loaded successfully from: "
+            << logic_config_path.string() << std::endl;
+  std::cout
+      << "test_logic subscriptions size: "
+      << logic_config_collection_data->test_logic()->subscriptions()->size()
+      << std::endl;
+
+  std::cout << "end" << std::endl;
+  return logic_config_collection_data;
+}
 
 /////////////////////////////////////////////////
 std::expected<const UserPreferencesData *, FailInfo>
