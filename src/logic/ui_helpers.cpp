@@ -46,7 +46,6 @@ void UpdateCUserInterfaceVisibilityFromCUIState(
   // cycle map of subscriber vectors, for a state to be considered, all
   // subscribers must be active
   for (const auto &[state_key, subscriber_vec] : ui_state.m_state_subscribers) {
-
     // bool to track if all subscribers are active
     bool all_active = true;
     for (const auto &subscriber : subscriber_vec) {

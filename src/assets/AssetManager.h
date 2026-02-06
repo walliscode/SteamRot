@@ -54,6 +54,12 @@ private:
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo> AddFont(const std::string &font_name);
 
+  /////////////////////////////////////////////////
+  /// @brief Wrapper function to set up the GrimoireMachina instance using the
+  /// provider
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> SetUpGrimoireMachina();
+
 public:
   /////////////////////////////////////////////////
   /// @brief Constructor for AssetManager taking a reference to a
@@ -82,7 +88,7 @@ public:
   /////////////////////////////////////////////////
   /// @brief return reference to the GrimoireMachina5instance
   /////////////////////////////////////////////////
-  std::expected<GrimoireMachina &, FailInfo> GetGrimoireMachina();
+  std::expected<GrimoireMachina *, FailInfo> GetGrimoireMachina();
 
   /////////////////////////////////////////////////
   /// @brief Implements IFontProvider::GetFont

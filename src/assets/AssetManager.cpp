@@ -26,6 +26,38 @@ AssetManager::AssetManager(DataAccessFactory &data_access_factory)
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> AssetManager::Startup() {
 
+  // set up GrimoireMachina
+  auto grimoire_result = SetUpGrimoireMachina();
+  if (!grimoire_result.has_value())
+    return std::unexpected<FailInfo>(grimoire_result.error());
+  // check GrimoireMachina is not null
+  if (!m_grimoire_machina)
+    return std::unexpected<FailInfo>(
+        {FailMode::NullPointer,
+         "GrimoireMachina instance is null after setup"});
+
+  return std::monostate();
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo> AssetManager::SetUpGrimoireMachina() {
+
+  // set up GrimoireMachina
+  m_grimoire_machina = std::make_unique<GrimoireMachina>();
+
+  // get provider
+  IGrimoireMachinaProvider *grimoire_machina_provider =
+      m_data_access_factory.GetGrimoireMachinaProvider().value();
+  if (!grimoire_machina_provider)
+    return std::unexpected<FailInfo>(
+        {FailMode::NullPointer, "GrimoireMachinaProvider instance is null"});
+
+  // Configure GrimioireMachina with the provider
+  auto configure_result =
+      grimoire_machina_provider->ConfigureGrimoireMachina(*m_grimoire_machina);
+  if (!configure_result.has_value())
+    return std::unexpected<FailInfo>(configure_result.error());
+
   return std::monostate();
 }
 /////////////////////////////////////////////////
@@ -123,23 +155,26 @@ std::expected<std::monostate, FailInfo> AssetManager::LoadUIStyles() {
 }
 
 /////////////////////////////////////////////////
-std::expected<GrimoireMachina &, FailInfo> AssetManager::GetGrimoireMachina() {
-  if (!m_grimoire_machina)
+std::expected<GrimoireMachina *, FailInfo> AssetManager::GetGrimoireMachina() {
 
+  if (m_grimoire_machina) {
+    return m_grimoire_machina.get();
+  } else {
     return std::unexpected<FailInfo>(
         {FailMode::NullPointer, "GrimoireMachina instance not initialized"});
+  }
 }
 
 /////////////////////////////////////////////////
-std3 : expected<std::shared_ptr<const sf::Font>, FailInfo>
-       AssetManager::GetFont(const std::string &font_name) const {
+std::expected<std::shared_ptr<const sf::Font>, FailInfo>
+AssetManager::GetFont(const std::string &font_name) const {
 
   // search for font in map
   auto it = m_fonts.find(font_name);
-  if (it != m_fonts.en0()) {
+  if (it != m_fonts.end()) {
     return it->second;
   } else {
-    return std::unexpe2ted<FailInfo>(
+    return std::unexpected<FailInfo>(
         {FailMode::FileNotFound, std::format("Font not found: {}", font_name)});
   }
 }

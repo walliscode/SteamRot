@@ -9,6 +9,7 @@
 #include "DataAccessFactory.h"
 #include "FailInfo.h"
 #include "FlatbuffersEngineDataProvider.h"
+#include "FlatbuffersGrimoireMachinaProvider.h"
 #include "FlatbuffersSceneDataProvider.h"
 #include "FlatbuffersSceneManagerDataProvider.h"
 #include <expected>
@@ -55,6 +56,15 @@ DataAccessFactory::SetFlatbuffersDataProviders() {
     return std::unexpected(
         FailInfo{FailMode::NullPointer,
                  "Failed to create FlatbuffersSceneDataProvider instance."});
+  }
+
+  // set IGrimoireMachinaProvider
+  m_grimoire_machina_provider =
+      std::make_unique<FlatbuffersGrimoireMachinaProvider>();
+  if (!m_grimoire_machina_provider) {
+    return std::unexpected(FailInfo{
+        FailMode::NullPointer,
+        "Failed to create FlatbuffersGrimoireMachinaProvider instance."});
   }
 
   return std::monostate{};
@@ -127,5 +137,13 @@ DataAccessFactory::GetSceneDataProvider() {
 
   return m_scene_data_provider.get();
 }
-
+/////////////////////////////////////////////////
+std::expected<IGrimoireMachinaProvider *, FailInfo>
+DataAccessFactory::GetGrimoireMachinaProvider() {
+  if (!m_grimoire_machina_provider) {
+    return std::unexpected(
+        FailInfo{FailMode::NullPointer, "Grimoire Machina Provider is null"});
+  }
+  return m_grimoire_machina_provider.get();
+}
 } // namespace steamrot
