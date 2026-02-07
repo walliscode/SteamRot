@@ -20,7 +20,7 @@ void TitleScene::sCollision() {
 
   // process collision logick
   for (auto &collision_logic :
-       m_scene_resources.logic_map[LogicType::Collision]) {
+       m_scene_resources.logic_map[LogicGrouping::Collision]) {
     collision_logic->RunLogic();
   }
 }
@@ -30,7 +30,8 @@ void TitleScene::sRender() {
   // clear the render texture and the start of each Scene render step
   m_scene_resources.scene_texture.clear(sf::Color::Black);
 
-  for (auto &render_logic : m_scene_resources.logic_map[LogicType::Render]) {
+  for (auto &render_logic :
+       m_scene_resources.logic_map[LogicGrouping::Render]) {
 
     render_logic->RunLogic();
   }
@@ -42,7 +43,8 @@ void TitleScene::sRender() {
 /////////////////////////////////////////////////
 void TitleScene::sAction() {
   // process action logic
-  for (auto &action_logic : m_scene_resources.logic_map[LogicType::Action]) {
+  for (auto &action_logic :
+       m_scene_resources.logic_map[LogicGrouping::Action]) {
     action_logic->RunLogic();
   }
 }

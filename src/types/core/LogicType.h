@@ -12,10 +12,18 @@
 namespace steamrot {
 
 enum class LogicType {
-  TestLogic = 0,
-  UIRenderLogic,
-  UIStateLogic,
-  UIActionLogic,
-  UICollisionLogic
+  Test = 0,
+  UIRender,
+  UIState,
+  UIAction,
+  UICollision,
+  CraftingRender
 };
-}
+
+enum class LogicGrouping {
+  Collision,
+  Render,
+  Action,
+  Movement,
+};
+} // namespace steamrot

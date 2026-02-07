@@ -50,8 +50,8 @@ TEST_CASE(
   steamrot::LogicFactory logic_factory(test_context.GetSceneContext());
 
   // call ProvideLogicCollection with SceneType_TITLE
-  auto result = logic_factory.ProvideLogicCollection(
-      steamrot::SceneType::TITLE);
+  auto result =
+      logic_factory.ProvideLogicCollection(steamrot::SceneType::TITLE);
 
   if (!result.has_value()) {
     FAIL("ProvideLogicCollection returned unexpected: " +
@@ -62,7 +62,7 @@ TEST_CASE(
   const auto &logic_collection = result.value();
 
   ///// CHECKING COLLISION LOGICS /////
-  auto collision_it = logic_collection.find(steamrot::LogicType::Collision);
+  auto collision_it = logic_collection.find(steamrot::LogicGrouping::Collision);
   if (collision_it == logic_collection.end()) {
     FAIL("LogicCollection does not contain Collision LogicType");
   }
@@ -73,7 +73,7 @@ TEST_CASE(
       dynamic_cast<steamrot::UICollisionLogic *>(collision_logics[0].get()));
 
   ///// CHECKING ACTION LOGICS /////
-  auto action_it = logic_collection.find(steamrot::LogicType::Action);
+  auto action_it = logic_collection.find(steamrot::LogicGrouping::Action);
   if (action_it == logic_collection.end()) {
     FAIL("LogicCollection does not contain Action LogicType");
   }
@@ -83,7 +83,7 @@ TEST_CASE(
   REQUIRE(dynamic_cast<steamrot::UIStateLogic *>(action_logics[1].get()));
 
   ///// CHECKING RENDER LOGICS /////
-  auto render_it = logic_collection.find(steamrot::LogicType::Render);
+  auto render_it = logic_collection.find(steamrot::LogicGrouping::Render);
   if (render_it == logic_collection.end()) {
     FAIL("LogicCollection does not contain Render LogicType");
   }
@@ -101,8 +101,8 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
   // create a LogicFactory instance
   steamrot::LogicFactory logic_factory(test_context.GetSceneContext());
   // call ProvideLogicCollection with SceneType_CRAFTING
-  auto result = logic_factory.ProvideLogicCollection(
-      steamrot::SceneType::CRAFTING);
+  auto result =
+      logic_factory.ProvideLogicCollection(steamrot::SceneType::CRAFTING);
   if (!result.has_value()) {
     FAIL("ProvideLogicCollection returned unexpected: " +
          result.error().message);
@@ -111,7 +111,7 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
   const auto &logic_collection = result.value();
 
   ///// CHECKING COLLISION LOGICS /////
-  auto collision_it = logic_collection.find(steamrot::LogicType::Collision);
+  auto collision_it = logic_collection.find(steamrot::LogicGrouping::Collision);
   if (collision_it == logic_collection.end()) {
     FAIL("LogicCollection does not contain Collision LogicType");
   }
@@ -121,7 +121,7 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
       dynamic_cast<steamrot::UICollisionLogic *>(collision_logics[0].get()));
 
   ///// CHECKING ACTION LOGICS /////
-  auto action_it = logic_collection.find(steamrot::LogicType::Action);
+  auto action_it = logic_collection.find(steamrot::LogicGrouping::Action);
   if (action_it == logic_collection.end()) {
     FAIL("LogicCollection does not contain Action LogicType");
   }
@@ -131,7 +131,7 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
   REQUIRE(dynamic_cast<steamrot::UIStateLogic *>(action_logics[1].get()));
 
   ///// CHECKING RENDER LOGICS /////
-  auto render_it = logic_collection.find(steamrot::LogicType::Render);
+  auto render_it = logic_collection.find(steamrot::LogicGrouping::Render);
   if (render_it == logic_collection.end()) {
     FAIL("LogicCollection does not contain Render LogicType");
   }

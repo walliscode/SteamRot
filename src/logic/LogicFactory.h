@@ -12,22 +12,17 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "Logic.h"
+#include "LogicType.h"
 #include "SceneContext.h"
 #include "SceneType.h"
+#include <expected>
 #include <memory>
-#include <unordered_map>
 #include <variant>
 
 namespace steamrot {
 
-enum class LogicType {
-  Collision,
-  Render,
-  Action,
-  Movement,
-};
 using LogicVector = std::vector<std::unique_ptr<Logic>>;
-using LogicCollection = std::unordered_map<LogicType, LogicVector>;
+using LogicCollection = std::unordered_map<LogicGrouping, LogicVector>;
 /////////////////////////////////////////////////
 /// @class LogicFactory
 /// @brief Provides Logic objects for Scenes to store and use.
@@ -68,6 +63,14 @@ private:
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo>
   ConfigureTestLogics(LogicCollection &logic_collection);
+
+  /////////////////////////////////////////////////
+  /// @brief Create a configured a Logic object based on the LogicType.
+  ///
+  /// @param logic_type Logic object type to create.
+  /////////////////////////////////////////////////
+  std::expected<std::unique_ptr<Logic>, FailInfo>
+  CreateLogicObject(LogicType logic_type);
 
 public:
   /////////////////////////////////////////////////

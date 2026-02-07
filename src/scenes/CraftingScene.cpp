@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "CraftingScene.h"
+#include "LogicType.h"
 #include <SFML/Graphics/Color.hpp>
 
 namespace steamrot {
@@ -18,7 +19,8 @@ CraftingScene::CraftingScene(const GameContext &game_context)
 void CraftingScene::sAction() {
 
   // process action logic
-  for (auto &action_logic : m_scene_resources.logic_map[LogicType::Action]) {
+  for (auto &action_logic :
+       m_scene_resources.logic_map[LogicGrouping::Action]) {
     action_logic->RunLogic();
   }
 }
@@ -32,7 +34,7 @@ void CraftingScene::sMovement() {
 void CraftingScene::sCollision() {
   // process collision logic
   for (auto &collision_logic :
-       m_scene_resources.logic_map[LogicType::Collision]) {
+       m_scene_resources.logic_map[LogicGrouping::Collision]) {
     collision_logic->RunLogic();
   }
 }
@@ -44,7 +46,8 @@ void CraftingScene::sRender() {
   m_scene_resources.scene_texture.clear(sf::Color::Black);
 
   // process render logic
-  for (auto &render_logic : m_scene_resources.logic_map[LogicType::Render]) {
+  for (auto &render_logic :
+       m_scene_resources.logic_map[LogicGrouping::Render]) {
 
     render_logic->RunLogic();
   }

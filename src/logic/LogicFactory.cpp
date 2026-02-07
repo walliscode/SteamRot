@@ -61,17 +61,49 @@ LogicFactory::ProvideLogicCollection(SceneType scene_type) {
   }
   return logic_collection;
 }
+
 /////////////////////////////////////////////////
 LogicCollection LogicFactory::CreateEmptyLogicCollection() {
 
   LogicCollection collection;
   // emplace constructs the vector in-place (no copying of unique_ptrs)
-  collection.emplace(LogicType::Collision, LogicVector{});
-  collection.emplace(LogicType::Action, LogicVector{});
-  collection.emplace(LogicType::Render, LogicVector{});
+  collection.emplace(LogicGrouping::Collision, LogicVector{});
+  collection.emplace(LogicGrouping::Action, LogicVector{});
+  collection.emplace(LogicGrouping::Render, LogicVector{});
 
   return collection;
 };
+
+/////////////////////////////////////////////////
+std::expected<std::unique_ptr<Logic>, FailInfo>
+LogicFactory::CreateLogicObject(LogicType logic_type) {
+
+  // create base pointer
+  std::unique_ptr<Logic> logic_ptr;
+  switch (logic_type) {
+  case LogicType::UIRender:
+    logic_ptr = std::make_unique<UIRenderLogic>(m_scene_context);
+    break;
+  case LogicType::UIState:
+    logic_ptr = std::make_unique<UIStateLogic>(m_scene_context);
+    break;
+  case LogicType::UIAction:
+    logic_ptr = std::make_unique<UIActionLogic>(m_scene_context);
+    break;
+  case LogicType::UICollision:
+    logic_ptr = std::make_unique<UICollisionLogic>(m_scene_context);
+    break;
+  case LogicType::CraftingRender:
+    logic_ptr = std::make_unique<CraftingRenderLogic>(m_scene_context);
+    break;
+  default:
+    return std::unexpected(
+        FailInfo(FailMode::EnumValueNotHandled,
+                 "LogicFactory::CreateLogicObject: unknown LogicType"));
+  }
+
+  return logic_ptr;
+}
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
@@ -81,21 +113,45 @@ LogicFactory::ConfigureTitleLogics(LogicCollection &logic_collection) {
   ////// DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING //////
 
   /////// ADD COLLISION LOGICS /////
-  LogicVector &collision_logics = logic_collection[LogicType::Collision];
-  collision_logics.push_back(
-      std::make_unique<UICollisionLogic>(m_scene_context));
+  // add to this vector as needed, but make sure to maintain the order of the
+  // logics
+  std::vector<LogicType> collision_logic_types = {LogicType::UICollision};
+  LogicVector &collision_logics = logic_collection[LogicGrouping::Collision];
+
+  for (const LogicType &logic_type : collision_logic_types) {
+    auto logic_result = CreateLogicObject(logic_type);
+    if (!logic_result) {
+      return std::unexpected(logic_result.error());
+    }
+    collision_logics.push_back(std::move(logic_result.value()));
+  }
 
   /////// ADD ACTION LOGICS /////
-  LogicVector &action_logics = logic_collection[LogicType::Action];
-  action_logics.push_back(
-      std::make_unique<steamrot::UIActionLogic>(m_scene_context));
-  action_logics.push_back(
-      std::make_unique<steamrot::UIStateLogic>(m_scene_context));
+  // add to this vector as needed, but make sure to maintain the order of the
+  // logics
+  std::vector<LogicType> action_logic_types = {LogicType::UIAction,
+                                               LogicType::UIState};
+  LogicVector &action_logics = logic_collection[LogicGrouping::Action];
+  for (const LogicType &logic_type : action_logic_types) {
+    auto logic_result = CreateLogicObject(logic_type);
+    if (!logic_result) {
+      return std::unexpected(logic_result.error());
+    }
+    action_logics.push_back(std::move(logic_result.value()));
+  }
 
   ////// ADD RENDER LOGICS /////
-  LogicVector &render_logics = logic_collection[LogicType::Render];
-  render_logics.push_back(
-      std::make_unique<steamrot::UIRenderLogic>(m_scene_context));
+  // add to this vector as needed, but make sure to maintain the order of the
+  // logics
+  std::vector<LogicType> render_logic_types = {LogicType::UIRender};
+  LogicVector &render_logics = logic_collection[LogicGrouping::Render];
+  for (const LogicType &logic_type : render_logic_types) {
+    auto logic_result = CreateLogicObject(logic_type);
+    if (!logic_result) {
+      return std::unexpected(logic_result.error());
+    }
+    render_logics.push_back(std::move(logic_result.value()));
+  }
   return std::monostate();
 }
 
@@ -106,24 +162,46 @@ LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
   ////// DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING //////
 
   /////// ADD COLLISION LOGICS /////
-  LogicVector &collision_logics = logic_collection[LogicType::Collision];
-  collision_logics.push_back(
-      std::make_unique<UICollisionLogic>(m_scene_context));
+  // add to this vector as needed, but make sure to maintain the order of the
+  // logics
+  std::vector<LogicType> collision_logic_types = {LogicType::UICollision};
+  LogicVector &collision_logics = logic_collection[LogicGrouping::Collision];
+  for (const LogicType &logic_type : collision_logic_types) {
+    auto logic_result = CreateLogicObject(logic_type);
+    if (!logic_result) {
+      return std::unexpected(logic_result.error());
+    }
+    collision_logics.push_back(std::move(logic_result.value()));
+  }
 
   /////// ADD ACTION LOGICS /////
-  LogicVector &action_logics = logic_collection[LogicType::Action];
-  action_logics.push_back(
-      std::make_unique<steamrot::UIActionLogic>(m_scene_context));
-  action_logics.push_back(
-      std::make_unique<steamrot::UIStateLogic>(m_scene_context));
+  // add to this vector as needed, but make sure to maintain the order of the
+  // logics
+  std::vector<LogicType> action_logic_types = {LogicType::UIAction,
+                                               LogicType::UIState};
+  LogicVector &action_logics = logic_collection[LogicGrouping::Action];
+  for (const LogicType &logic_type : action_logic_types) {
+    auto logic_result = CreateLogicObject(logic_type);
+    if (!logic_result) {
+      return std::unexpected(logic_result.error());
+    }
+    action_logics.push_back(std::move(logic_result.value()));
+  }
 
   ////// ADD RENDER LOGICS /////
-  LogicVector &render_logics = logic_collection[LogicType::Render];
+  // add to this vector as needed, but make sure to maintain the order of the
+  // logics
+  std::vector<LogicType> render_logic_types = {LogicType::UIRender,
+                                               LogicType::CraftingRender};
+  LogicVector &render_logics = logic_collection[LogicGrouping::Render];
 
-  render_logics.push_back(
-      std::make_unique<steamrot::UIRenderLogic>(m_scene_context));
-  render_logics.push_back(
-      std::make_unique<steamrot::CraftingRenderLogic>(m_scene_context));
+  for (const LogicType &logic_type : render_logic_types) {
+    auto logic_result = CreateLogicObject(logic_type);
+    if (!logic_result) {
+      return std::unexpected(logic_result.error());
+    }
+    render_logics.push_back(std::move(logic_result.value()));
+  }
   return std::monostate();
 }
 
@@ -133,17 +211,37 @@ LogicFactory::ConfigureTestLogics(LogicCollection &logic_collection) {
   ////// THE ORDER OF THE LOGIC CLASSES IS VERY IMPORTANT //////
   ////// DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING //////
   /////// ADD COLLISION LOGICS /////
-  LogicVector &collision_logics = logic_collection[LogicType::Collision];
-  collision_logics.push_back(
-      std::make_unique<UICollisionLogic>(m_scene_context));
+  // add to this vector as needed, but make sure to maintain the order of the
+  // logics
+  std::vector<LogicType> collision_logic_types = {LogicType::UICollision};
+  LogicVector &collision_logics = logic_collection[LogicGrouping::Collision];
+  for (const LogicType &logic_type : collision_logic_types) {
+    auto logic_result = CreateLogicObject(logic_type);
+    if (!logic_result) {
+      return std::unexpected(logic_result.error());
+    }
+    collision_logics.push_back(std::move(logic_result.value()));
+  }
   /////// ADD ACTION LOGICS /////
-  LogicVector &action_logics = logic_collection[LogicType::Action];
+  // add to this vector as needed, but make sure to maintain the order of the
+  // logics
+  std::vector<LogicType> action_logic_types = {LogicType::UIAction};
+  LogicVector &action_logics = logic_collection[LogicGrouping::Action];
   action_logics.push_back(
       std::make_unique<steamrot::UIActionLogic>(m_scene_context));
+
   ////// ADD RENDER LOGICS /////
-  LogicVector &render_logics = logic_collection[LogicType::Render];
-  render_logics.push_back(
-      std::make_unique<steamrot::UIRenderLogic>(m_scene_context));
+  // add to this vector as needed, but make sure to maintain the order of the
+  // logics
+  std::vector<LogicType> render_logic_types = {LogicType::UIRender};
+  LogicVector &render_logics = logic_collection[LogicGrouping::Render];
+  for (const LogicType &logic_type : render_logic_types) {
+    auto logic_result = CreateLogicObject(logic_type);
+    if (!logic_result) {
+      return std::unexpected(logic_result.error());
+    }
+    render_logics.push_back(std::move(logic_result.value()));
+  }
   return std::monostate();
 }
 } // namespace steamrot

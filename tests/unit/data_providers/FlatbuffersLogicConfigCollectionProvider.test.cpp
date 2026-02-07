@@ -25,5 +25,5 @@ TEST_CASE(
   steamrot::LogicConfigCollection &collection = result.value();
 
   REQUIRE(!collection.empty());
-  REQUIRE(collection.contains(steamrot::LogicType::TestLogic));
+  REQUIRE(collection.contains(steamrot::LogicType::Test));
 }
