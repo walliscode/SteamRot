@@ -107,6 +107,14 @@ LogicFactory::CreateLogicObject(LogicType logic_type) {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
+LogicFactory::ConfigureLogicObject(Logic &logic_object) {
+
+  //
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
 LogicFactory::ConfigureTitleLogics(LogicCollection &logic_collection) {
 
   ////// THE ORDER OF THE LOGIC CLASSES IS VERY IMPORTANT //////
