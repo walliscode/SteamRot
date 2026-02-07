@@ -41,6 +41,19 @@ private:
   static LogicCollection CreateEmptyLogicCollection();
 
   /////////////////////////////////////////////////
+  /// @brief Helper method to add multiple Logic objects to a LogicCollection.
+  ///
+  /// @param logic_collection The LogicCollection to add Logic objects to.
+  /// @param grouping The LogicGrouping to add the Logic objects to.
+  /// @param logic_types Vector of LogicTypes to create and add.
+  /// @return std::monostate on success, FailInfo on failure.
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  AddLogicsToCollection(LogicCollection &logic_collection,
+                        LogicGrouping grouping,
+                        const std::vector<LogicType> &logic_types);
+
+  /////////////////////////////////////////////////
   /// @brief Configure the LogicCollection for the Title Scene.
   ///
   /// @param logic_collection A logic collection to configure.

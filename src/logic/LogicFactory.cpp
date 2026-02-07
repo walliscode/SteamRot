@@ -13,6 +13,7 @@
 #include "UICollisionLogic.h"
 #include "UIRenderLogic.h"
 #include "UIStateLogic.h"
+#include <array>
 #include <expected>
 #include <memory>
 
@@ -21,6 +22,22 @@ namespace steamrot {
 /////////////////////////////////////////////////
 LogicFactory::LogicFactory(const SceneContext &scene_context)
     : m_scene_context(scene_context) {}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+LogicFactory::AddLogicsToCollection(LogicCollection &logic_collection,
+                                    LogicGrouping grouping,
+                                    const std::vector<LogicType> &logic_types) {
+  LogicVector &logics = logic_collection[grouping];
+  for (const LogicType &logic_type : logic_types) {
+    auto logic_result = CreateLogicObject(logic_type);
+    if (!logic_result) {
+      return std::unexpected(logic_result.error());
+    }
+    logics.push_back(std::move(logic_result.value()));
+  }
+  return std::monostate();
+}
 
 /////////////////////////////////////////////////
 std::expected<LogicCollection, FailInfo>
@@ -112,46 +129,38 @@ LogicFactory::ConfigureTitleLogics(LogicCollection &logic_collection) {
   ////// THE ORDER OF THE LOGIC CLASSES IS VERY IMPORTANT //////
   ////// DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING //////
 
-  /////// ADD COLLISION LOGICS /////
-  // add to this vector as needed, but make sure to maintain the order of the
-  // logics
-  std::vector<LogicType> collision_logic_types = {LogicType::UICollision};
-  LogicVector &collision_logics = logic_collection[LogicGrouping::Collision];
+  // Define the Logic types for each grouping in the order they should execute
+  // These are compile-time constants that define the scene's Logic configuration
+  static constexpr std::array collision_logic_types = {LogicType::UICollision};
+  static constexpr std::array action_logic_types = {LogicType::UIAction,
+                                                     LogicType::UIState};
+  static constexpr std::array render_logic_types = {LogicType::UIRender};
 
-  for (const LogicType &logic_type : collision_logic_types) {
-    auto logic_result = CreateLogicObject(logic_type);
-    if (!logic_result) {
-      return std::unexpected(logic_result.error());
-    }
-    collision_logics.push_back(std::move(logic_result.value()));
+  // Add Logics to collection using the helper function
+  auto collision_result = AddLogicsToCollection(
+      logic_collection, LogicGrouping::Collision,
+      std::vector<LogicType>(collision_logic_types.begin(),
+                             collision_logic_types.end()));
+  if (!collision_result) {
+    return std::unexpected(collision_result.error());
   }
 
-  /////// ADD ACTION LOGICS /////
-  // add to this vector as needed, but make sure to maintain the order of the
-  // logics
-  std::vector<LogicType> action_logic_types = {LogicType::UIAction,
-                                               LogicType::UIState};
-  LogicVector &action_logics = logic_collection[LogicGrouping::Action];
-  for (const LogicType &logic_type : action_logic_types) {
-    auto logic_result = CreateLogicObject(logic_type);
-    if (!logic_result) {
-      return std::unexpected(logic_result.error());
-    }
-    action_logics.push_back(std::move(logic_result.value()));
+  auto action_result = AddLogicsToCollection(
+      logic_collection, LogicGrouping::Action,
+      std::vector<LogicType>(action_logic_types.begin(),
+                             action_logic_types.end()));
+  if (!action_result) {
+    return std::unexpected(action_result.error());
   }
 
-  ////// ADD RENDER LOGICS /////
-  // add to this vector as needed, but make sure to maintain the order of the
-  // logics
-  std::vector<LogicType> render_logic_types = {LogicType::UIRender};
-  LogicVector &render_logics = logic_collection[LogicGrouping::Render];
-  for (const LogicType &logic_type : render_logic_types) {
-    auto logic_result = CreateLogicObject(logic_type);
-    if (!logic_result) {
-      return std::unexpected(logic_result.error());
-    }
-    render_logics.push_back(std::move(logic_result.value()));
+  auto render_result = AddLogicsToCollection(
+      logic_collection, LogicGrouping::Render,
+      std::vector<LogicType>(render_logic_types.begin(),
+                             render_logic_types.end()));
+  if (!render_result) {
+    return std::unexpected(render_result.error());
   }
+
   return std::monostate();
 }
 
@@ -161,47 +170,39 @@ LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
   ////// THE ORDER OF THE LOGIC CLASSES IS VERY IMPORTANT //////
   ////// DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING //////
 
-  /////// ADD COLLISION LOGICS /////
-  // add to this vector as needed, but make sure to maintain the order of the
-  // logics
-  std::vector<LogicType> collision_logic_types = {LogicType::UICollision};
-  LogicVector &collision_logics = logic_collection[LogicGrouping::Collision];
-  for (const LogicType &logic_type : collision_logic_types) {
-    auto logic_result = CreateLogicObject(logic_type);
-    if (!logic_result) {
-      return std::unexpected(logic_result.error());
-    }
-    collision_logics.push_back(std::move(logic_result.value()));
+  // Define the Logic types for each grouping in the order they should execute
+  // These are compile-time constants that define the scene's Logic configuration
+  static constexpr std::array collision_logic_types = {LogicType::UICollision};
+  static constexpr std::array action_logic_types = {LogicType::UIAction,
+                                                     LogicType::UIState};
+  static constexpr std::array render_logic_types = {LogicType::UIRender,
+                                                     LogicType::CraftingRender};
+
+  // Add Logics to collection using the helper function
+  auto collision_result = AddLogicsToCollection(
+      logic_collection, LogicGrouping::Collision,
+      std::vector<LogicType>(collision_logic_types.begin(),
+                             collision_logic_types.end()));
+  if (!collision_result) {
+    return std::unexpected(collision_result.error());
   }
 
-  /////// ADD ACTION LOGICS /////
-  // add to this vector as needed, but make sure to maintain the order of the
-  // logics
-  std::vector<LogicType> action_logic_types = {LogicType::UIAction,
-                                               LogicType::UIState};
-  LogicVector &action_logics = logic_collection[LogicGrouping::Action];
-  for (const LogicType &logic_type : action_logic_types) {
-    auto logic_result = CreateLogicObject(logic_type);
-    if (!logic_result) {
-      return std::unexpected(logic_result.error());
-    }
-    action_logics.push_back(std::move(logic_result.value()));
+  auto action_result = AddLogicsToCollection(
+      logic_collection, LogicGrouping::Action,
+      std::vector<LogicType>(action_logic_types.begin(),
+                             action_logic_types.end()));
+  if (!action_result) {
+    return std::unexpected(action_result.error());
   }
 
-  ////// ADD RENDER LOGICS /////
-  // add to this vector as needed, but make sure to maintain the order of the
-  // logics
-  std::vector<LogicType> render_logic_types = {LogicType::UIRender,
-                                               LogicType::CraftingRender};
-  LogicVector &render_logics = logic_collection[LogicGrouping::Render];
-
-  for (const LogicType &logic_type : render_logic_types) {
-    auto logic_result = CreateLogicObject(logic_type);
-    if (!logic_result) {
-      return std::unexpected(logic_result.error());
-    }
-    render_logics.push_back(std::move(logic_result.value()));
+  auto render_result = AddLogicsToCollection(
+      logic_collection, LogicGrouping::Render,
+      std::vector<LogicType>(render_logic_types.begin(),
+                             render_logic_types.end()));
+  if (!render_result) {
+    return std::unexpected(render_result.error());
   }
+
   return std::monostate();
 }
 
@@ -210,38 +211,38 @@ std::expected<std::monostate, FailInfo>
 LogicFactory::ConfigureTestLogics(LogicCollection &logic_collection) {
   ////// THE ORDER OF THE LOGIC CLASSES IS VERY IMPORTANT //////
   ////// DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING //////
-  /////// ADD COLLISION LOGICS /////
-  // add to this vector as needed, but make sure to maintain the order of the
-  // logics
-  std::vector<LogicType> collision_logic_types = {LogicType::UICollision};
-  LogicVector &collision_logics = logic_collection[LogicGrouping::Collision];
-  for (const LogicType &logic_type : collision_logic_types) {
-    auto logic_result = CreateLogicObject(logic_type);
-    if (!logic_result) {
-      return std::unexpected(logic_result.error());
-    }
-    collision_logics.push_back(std::move(logic_result.value()));
-  }
-  /////// ADD ACTION LOGICS /////
-  // add to this vector as needed, but make sure to maintain the order of the
-  // logics
-  std::vector<LogicType> action_logic_types = {LogicType::UIAction};
-  LogicVector &action_logics = logic_collection[LogicGrouping::Action];
-  action_logics.push_back(
-      std::make_unique<steamrot::UIActionLogic>(m_scene_context));
 
-  ////// ADD RENDER LOGICS /////
-  // add to this vector as needed, but make sure to maintain the order of the
-  // logics
-  std::vector<LogicType> render_logic_types = {LogicType::UIRender};
-  LogicVector &render_logics = logic_collection[LogicGrouping::Render];
-  for (const LogicType &logic_type : render_logic_types) {
-    auto logic_result = CreateLogicObject(logic_type);
-    if (!logic_result) {
-      return std::unexpected(logic_result.error());
-    }
-    render_logics.push_back(std::move(logic_result.value()));
+  // Define the Logic types for each grouping in the order they should execute
+  // These are compile-time constants that define the scene's Logic configuration
+  static constexpr std::array collision_logic_types = {LogicType::UICollision};
+  static constexpr std::array action_logic_types = {LogicType::UIAction};
+  static constexpr std::array render_logic_types = {LogicType::UIRender};
+
+  // Add Logics to collection using the helper function
+  auto collision_result = AddLogicsToCollection(
+      logic_collection, LogicGrouping::Collision,
+      std::vector<LogicType>(collision_logic_types.begin(),
+                             collision_logic_types.end()));
+  if (!collision_result) {
+    return std::unexpected(collision_result.error());
   }
+
+  auto action_result = AddLogicsToCollection(
+      logic_collection, LogicGrouping::Action,
+      std::vector<LogicType>(action_logic_types.begin(),
+                             action_logic_types.end()));
+  if (!action_result) {
+    return std::unexpected(action_result.error());
+  }
+
+  auto render_result = AddLogicsToCollection(
+      logic_collection, LogicGrouping::Render,
+      std::vector<LogicType>(render_logic_types.begin(),
+                             render_logic_types.end()));
+  if (!render_result) {
+    return std::unexpected(render_result.error());
+  }
+
   return std::monostate();
 }
 } // namespace steamrot
