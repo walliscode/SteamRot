@@ -38,7 +38,7 @@ table UIElementData{
     position: Vector2fData (required);
     size: Vector2fData (required);
     subscriber_data: SubscriberFbs;
-    response_event_data: EventPacketData;
+    response_event_data: [EventPacketData];
     children_active: bool ;
     children: [child] (required);
     is_mouse_over: bool;

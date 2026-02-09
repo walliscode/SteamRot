@@ -16,7 +16,7 @@ TEST_CASE("PanelElement: Default Constructor", "[types]") {
   REQUIRE(panel.size == sf::Vector2f{0.f, 0.f});
   REQUIRE(panel.is_mouse_over == false);
   REQUIRE(panel.subscription == nullptr);
-  REQUIRE(panel.response_event == std::nullopt);
+  REQUIRE(panel.response_events.empty());
   REQUIRE(panel.children_active == false);
   REQUIRE(panel.child_elements.empty());
   REQUIRE(panel.layout == steamrot::Layout::Vertical);

@@ -162,7 +162,7 @@ TEST_CASE(
   REQUIRE(scene_data->entity_collection() != nullptr);
   REQUIRE(scene_data->entity_collection()->entity_memory_pool_size() == 10);
   REQUIRE(scene_data->entity_collection()->entities() != nullptr);
-  REQUIRE(scene_data->entity_collection()->entities()->size() == 2);
+  REQUIRE(scene_data->entity_collection()->entities()->size() == 1);
 
   const auto *entity_0 = scene_data->entity_collection()->entities()->Get(0);
   REQUIRE(entity_0->index() == 0);

@@ -49,14 +49,14 @@ private:
                           const std::shared_ptr<Subscriber> &expected) const;
 
   /////////////////////////////////////////////////
-  /// @brief Compare response_event optionals
+  /// @brief Compare response_events vectors
   ///
-  /// @param actual Actual response_event
-  /// @param expected Expected response_event
+  /// @param actual Actual response_events
+  /// @param expected Expected response_events
   /// @return true if response_events match
   /////////////////////////////////////////////////
-  bool ResponseEventsEqual(const std::optional<EventPacket> &actual,
-                           const std::optional<EventPacket> &expected) const;
+  bool ResponseEventsEqual(const std::vector<EventPacket> &actual,
+                           const std::vector<EventPacket> &expected) const;
 
   /////////////////////////////////////////////////
   /// @brief Compare derived type-specific fields

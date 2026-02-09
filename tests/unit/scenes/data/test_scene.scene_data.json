@@ -16,16 +16,28 @@
           "is_visible": true,
           "root_ui_element": {
             "base_data": {
-              "position": { "x": 100.0, "y": 150.0 },
-              "size": { "x": 200.0, "y": 100.0 },
+              "position": {
+                "x": 100.0,
+                "y": 150.0
+              },
+              "size": {
+                "x": 200.0,
+                "y": 100.0
+              },
               "children_active": true,
               "children": [
                 {
                   "element_type": "ButtonData",
                   "element": {
                     "base_data": {
-                      "position": { "x": 10.0, "y": 20.0 },
-                      "size": { "x": 80.0, "y": 30.0 },
+                      "position": {
+                        "x": 10.0,
+                        "y": 20.0
+                      },
+                      "size": {
+                        "x": 80.0,
+                        "y": 30.0
+                      },
                       "children_active": false,
                       "children": [],
                       "layout": "Horizontal",
