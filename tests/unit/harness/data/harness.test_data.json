@@ -2,11 +2,7 @@
   "meta_data": {
     "test_name": "Test loading json to TestDataFbs",
     "test_description": "Validates that all fields in TestDataFbs can be loaded from JSON including engine snapshots with scene data, event bus, and scene manager state",
-    "tags": [
-      "unit",
-      "flatbuffers",
-      "test_data"
-    ],
+    "tags": ["unit", "flatbuffers", "test_data"],
     "will_pass": true,
     "version": 1
   },
@@ -29,9 +25,7 @@
           "event_type": "EVENT_USER_INPUT",
           "event_data_data_type": "UserInputBitsetData",
           "event_data_data": {
-            "mouse_pressed": [
-              "LEFT_CLICK"
-            ]
+            "mouse_pressed": ["LEFT_CLICK"]
           }
         }
       ]
@@ -71,20 +65,10 @@
                     }
                   }
                 }
-              },
-              {
-                "index": 1,
-                "c_grimoire_machina": {
-                  "fragments": [
-                    "test_fragment"
-                  ],
-                  "joints": []
-                }
               }
             ]
           },
-          "asset_config": {},
-          "logic_collection_data": {}
+          "asset_config": {}
         }
       ]
     }
@@ -118,8 +102,7 @@
                 "entity_memory_pool_size": 10,
                 "entities": []
               },
-              "asset_config": {},
-              "logic_collection_data": {}
+              "asset_config": {}
             }
           ]
         }
