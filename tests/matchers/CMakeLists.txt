@@ -16,6 +16,7 @@ add_library(matchers
   SceneDataEqualsMatcher.cpp
   SceneCollectionDataEqualsMatcher.cpp
   EngineSnapshotEqualsMatcher.cpp
+  Vector2fEqualsMatcher.cpp
 )
 
 target_include_directories(matchers
