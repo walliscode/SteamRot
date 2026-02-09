@@ -19,12 +19,13 @@ namespace steamrot {
 /////////////////////////////////////////////////
 enum class EventType : uint64_t {
   NONE = 0,
-  TEST = 1ULL << 0,
-  USER_INPUT = 1ULL << 1,
-  TOGGLE_UI = 1ULL << 2,
-  CHANGE_SCENE = 1ULL << 3,
-  QUIT_GAME = 1ULL << 4,
-  TOGGLE_DROPDOWN = 1ULL << 5
+  TEST,
+  USER_INPUT,
+  TOGGLE_UI,
+  CHANGE_SCENE,
+  QUIT_GAME,
+  TOGGLE_DROPDOWN,
+  LOGIC_TOGGLE
 };
 
 inline std::string EnumNameEventType(EventType type) {
