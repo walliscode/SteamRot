@@ -59,18 +59,10 @@
                     }
                   }
                 }
-              },
-              {
-                "index": 1,
-                "c_grimoire_machina": {
-                  "fragments": ["test_fragment"],
-                  "joints": []
-                }
               }
             ]
           },
-          "asset_config": {},
-          "logic_collection_data": {}
+          "asset_config": {}
         }
       ]
     }
@@ -104,8 +96,7 @@
                 "entity_memory_pool_size": 10,
                 "entities": []
               },
-              "asset_config": {},
-              "logic_collection_data": {}
+              "asset_config": {}
             }
           ]
         }
