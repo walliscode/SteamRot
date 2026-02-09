@@ -9,6 +9,7 @@
 /// Headers
 /////////////////////////////////////////////////
 
+#include "DataAccessFactory.h"
 #include "EngineResources.h"
 #include "EntityManager.h"
 #include "EventHandler.h"
@@ -41,8 +42,8 @@ struct SceneContext {
   /// entities/archetypes)
   /////////////////////////////////////////////////
   SceneContext(sf::RenderTexture &scene_texture,
-               EngineResources &engine_resources,
-               EntityManager &entity_manager);
+               EngineResources &engine_resources, EntityManager &entity_manager,
+               DataAccessFactory &data_access_factory);
 
   /////////////////////////////////////////////////
   /// @brief Reference to the EntityMemoryPool for the Scene.
@@ -80,6 +81,11 @@ struct SceneContext {
   /// @brief Reference to mouse position in the game window (local).
   /////////////////////////////////////////////////
   sf::Vector2i &mouse_position;
+
+  /////////////////////////////////////////////////
+  /// @brief Reference to the DataAccessFactory for the game.
+  /////////////////////////////////////////////////
+  DataAccessFactory &data_access_factory;
 };
 
 } // namespace steamrot

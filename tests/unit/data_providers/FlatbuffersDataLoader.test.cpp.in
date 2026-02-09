@@ -60,6 +60,20 @@ TEST_CASE("FlatbuffersDataLoader provides scene data",
   //.... Additional checks can be added here
 }
 
+TEST_CASE("FlatbuffersDataLoader provides LogicConfigCollection data",
+          "[unit][FlatbuffersDataLoader]") {
+  steamrot::FlatbuffersDataLoader data_loader;
+  auto result = data_loader.ProvideLogicConfigCollectionFbs();
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
+  const auto &logic_config_collection_data = result.value();
+  REQUIRE(logic_config_collection_data != nullptr);
+  REQUIRE(logic_config_collection_data->test_logic() != nullptr);
+  REQUIRE(logic_config_collection_data->test_logic()->subscriptions()->size() ==
+          1);
+}
+
 TEST_CASE("FlatbuffersDataLoader provides ui_styles data",
           "[unit][FlatbuffersDataLoader]") {
 
@@ -218,20 +232,6 @@ TEST_CASE("FlatbuffersDataLoader::ProvideDefaultUserPreferencesData returns "
 //   const auto *logic_data = result.value();
 //   REQUIRE(logic_data != nullptr);
 // }
-
-TEST_CASE("FlatbuffersDataLoader::ProvideLogicCollectionData returns error "
-          "for invalid scene",
-          "[unit][FlatbuffersDataLoader]") {
-
-  steamrot::FlatbuffersDataLoader data_loader;
-  steamrot::SceneType invalid_scene_type =
-      static_cast<steamrot::SceneType>(999);
-
-  auto result = data_loader.ProvideLogicCollectionData(invalid_scene_type);
-
-  REQUIRE(!result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::SceneTypeNotFound);
-}
 
 TEST_CASE(
     "FlatbuffersDataLoader::ProvideAllFragmentData returns valid fragments",

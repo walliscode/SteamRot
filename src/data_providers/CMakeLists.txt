@@ -13,6 +13,7 @@ add_library(data_providers
   FlatbuffersUIStyleDataProvider.cpp
   FlatbuffersSaveDataProvider.cpp
   FlatbuffersGrimoireMachinaProvider.cpp
+  FlatbuffersLogicConfigCollectionProvider.cpp
   DataAccessFactory.cpp
   DataLoader.cpp
   FlatbuffersDataLoader.cpp
@@ -27,6 +28,7 @@ add_library(data_providers
   configure/configure_scene_data.cpp
   configure/configure_ui_elements.cpp
   configure/configure_grimoire.cpp
+  configure/configure_logic_config.cpp
 
 )
 

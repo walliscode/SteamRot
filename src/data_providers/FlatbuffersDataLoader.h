@@ -17,7 +17,7 @@
 #include "engine_data_generated.h"
 #include "fragment_generated.h"
 #include "joint_generated.h"
-#include "logic_data_generated.h"
+#include "logic_config_generated.h"
 #include "scene_data_generated.h"
 #include "scene_manager_data_generated.h"
 #include "ui_style_generated.h"
@@ -59,13 +59,10 @@ public:
   ProvideSceneManagerData() const;
 
   /////////////////////////////////////////////////
-  /// @brief Provides LogicCollectionData from SceneData for a specific
-  /// scene
-  ///
-  /// @param scene_type SceneType enum representing the type of scene
+  /// @brief Provides LogicConfigCollectionFbs from binary file
   /////////////////////////////////////////////////
-  std::expected<const LogicCollectionData *, FailInfo>
-  ProvideLogicCollectionData(const SceneType scene_type) const;
+  std::expected<const LogicConfigCollectionFbs *, FailInfo>
+  ProvideLogicConfigCollectionFbs() const;
 
   /////////////////////////////////////////////////
   /// @brief Provides default UserPreferencesData from binary file

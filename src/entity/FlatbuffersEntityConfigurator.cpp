@@ -15,7 +15,6 @@
 #include "subscriber_factory.h"
 #include "ui_state_generated.h"
 #include <expected>
-#include <iostream>
 #include <variant>
 
 namespace steamrot {
@@ -113,8 +112,6 @@ FlatbuffersEntityConfigurator::ConfigureSecondLayerComponents(
 
     /// CONFIGURE CUIState ///
     if (entity_data->c_ui_state()) {
-      std::cout << "Configuring CUIState for entity index: " << entity_index
-                << std::endl;
       auto configure_result = ConfigureCUIState(
           entity::memory::GetComponent<CUIState>(entity_index, emp), emp);
       if (!configure_result.has_value())
@@ -285,8 +282,6 @@ FlatbuffersEntityConfigurator::ConfigureCUIState(CUIState &ui_state_component,
 
       // assign the subscribers to the ui state component for this state key
       ui_state_component.m_state_subscribers[state_key] = subscribers_vector;
-      std::cout << "Registered " << subscribers_vector.size()
-                << " subscribers for state key: " << state_key << std::endl;
       // register each subscriber with the event handler
       for (const auto &subscriber : subscribers_vector) {
         auto reg_result = m_event_handler.RegisterSubscriber(subscriber);

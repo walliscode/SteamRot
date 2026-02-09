@@ -5,6 +5,7 @@ ui_action.test.cpp
 ui_render.test.cpp
 logic_render_test_helpers.cpp
 ui_helpers.test.cpp
+TestLogic.cpp
 
 )
 

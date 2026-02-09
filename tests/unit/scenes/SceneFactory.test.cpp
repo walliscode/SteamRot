@@ -10,6 +10,7 @@
 #include "CraftingScene.h"
 #include "FlatbuffersEntityConfigurator.h"
 #include "FlatbuffersSceneDataProvider.h"
+#include "LogicType.h"
 #include "TestFixture.h"
 #include "TitleScene.h"
 #include "UIActionLogic.h"
@@ -217,7 +218,7 @@ TEST_CASE("SceneFactory configures the scenes logic map",
   // check that logic map is populated
   auto &logic_collection = scene->GetSceneResources().logic_map;
   ///// CHECKING COLLISION LOGICS /////
-  auto collision_it = logic_collection.find(steamrot::LogicType::Collision);
+  auto collision_it = logic_collection.find(steamrot::LogicGrouping::Collision);
   if (collision_it == logic_collection.end()) {
     FAIL("LogicCollection does not contain Collision LogicType");
   }
@@ -227,7 +228,7 @@ TEST_CASE("SceneFactory configures the scenes logic map",
       dynamic_cast<steamrot::UICollisionLogic *>(collision_logics[0].get()));
 
   ///// CHECKING ACTION LOGICS /////
-  auto action_it = logic_collection.find(steamrot::LogicType::Action);
+  auto action_it = logic_collection.find(steamrot::LogicGrouping::Action);
   if (action_it == logic_collection.end()) {
     FAIL("LogicCollection does not contain Action LogicType");
   }
@@ -237,7 +238,7 @@ TEST_CASE("SceneFactory configures the scenes logic map",
   REQUIRE(dynamic_cast<steamrot::UIStateLogic *>(action_logics[1].get()));
 
   ///// CHECKING RENDER LOGICS /////
-  auto render_it = logic_collection.find(steamrot::LogicType::Render);
+  auto render_it = logic_collection.find(steamrot::LogicGrouping::Render);
   if (render_it == logic_collection.end()) {
     FAIL("LogicCollection does not contain Render LogicType");
   }
@@ -470,7 +471,7 @@ TEST_CASE("SceneFactory::ConfigureLogicMap configures logic for TitleScene",
   auto &logic_collection = scene->GetSceneResources().logic_map;
 
   // Verify collision logics
-  auto collision_it = logic_collection.find(steamrot::LogicType::Collision);
+  auto collision_it = logic_collection.find(steamrot::LogicGrouping::Collision);
   REQUIRE(collision_it != logic_collection.end());
   const auto &collision_logics = collision_it->second;
   REQUIRE(collision_logics.size() == 1);
@@ -478,7 +479,7 @@ TEST_CASE("SceneFactory::ConfigureLogicMap configures logic for TitleScene",
       dynamic_cast<steamrot::UICollisionLogic *>(collision_logics[0].get()));
 
   // Verify action logics
-  auto action_it = logic_collection.find(steamrot::LogicType::Action);
+  auto action_it = logic_collection.find(steamrot::LogicGrouping::Action);
   REQUIRE(action_it != logic_collection.end());
   const auto &action_logics = action_it->second;
   REQUIRE(action_logics.size() == 2);
@@ -486,7 +487,7 @@ TEST_CASE("SceneFactory::ConfigureLogicMap configures logic for TitleScene",
   REQUIRE(dynamic_cast<steamrot::UIStateLogic *>(action_logics[1].get()));
 
   // Verify render logics
-  auto render_it = logic_collection.find(steamrot::LogicType::Render);
+  auto render_it = logic_collection.find(steamrot::LogicGrouping::Render);
   REQUIRE(render_it != logic_collection.end());
   const auto &render_logics = render_it->second;
   REQUIRE(render_logics.size() == 1);

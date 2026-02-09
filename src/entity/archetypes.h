@@ -4,6 +4,7 @@
 #include "entity_types.h"
 #include <bitset>
 #include <cstddef>
+#include <set>
 
 namespace steamrot::archetypes {
 

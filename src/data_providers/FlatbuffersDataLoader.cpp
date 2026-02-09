@@ -9,6 +9,7 @@
 #include "FlatbuffersDataLoader.h"
 #include "FailInfo.h"
 #include "fragment_generated.h"
+#include "logic_config_generated.h"
 #include "paths.h"
 #include "scene_data_generated.h"
 #include "ui_style_generated.h"
@@ -150,23 +151,32 @@ FlatbuffersDataLoader::ProvideSceneManagerData() const {
   return scene_manager_data;
 }
 /////////////////////////////////////////////////
-std::expected<const LogicCollectionData *, FailInfo>
-FlatbuffersDataLoader::ProvideLogicCollectionData(
-    const SceneType scene_type) const {
+std::expected<const LogicConfigCollectionFbs *, FailInfo>
+FlatbuffersDataLoader::ProvideLogicConfigCollectionFbs() const {
 
-  // Load from SceneData for the specified scene type
-  auto scene_data_result = ProvideDefaultSceneData(scene_type);
-  if (!scene_data_result.has_value()) {
-    return std::unexpected(scene_data_result.error());
+  // get defaults directory
+  std::filesystem::path defaults_dir = paths::GetDefaultsDirectory();
+  // construct the file path
+  std::filesystem::path logic_config_path =
+      defaults_dir / "logic_config/logic_config.bin";
+  // check if the file exists
+  if (!std::filesystem::exists(logic_config_path)) {
+    std::string error_message = std::format("Logic config file not found: {}",
+                                            logic_config_path.string());
+    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
   }
-  const SceneDataFbs *scene_data = scene_data_result.value();
-  if (!scene_data->logic_collection_data()) {
+  // load the logic config collection data
+  const steamrot::LogicConfigCollectionFbs *logic_config_collection_data =
+      GetLogicConfigCollectionFbs(LoadBinaryData(logic_config_path));
+  if (!logic_config_collection_data) {
     return std::unexpected(
         FailInfo(FailMode::FlatbuffersDataNotFound,
-                 "LogicCollectionData not found in SceneData"));
+                 "LogicConfigCollectionFbs pointer is null"));
   }
-  return scene_data->logic_collection_data();
+
+  return logic_config_collection_data;
 }
+
 /////////////////////////////////////////////////
 std::expected<const UserPreferencesData *, FailInfo>
 FlatbuffersDataLoader::ProvideDefaultUserPreferencesData() const {
