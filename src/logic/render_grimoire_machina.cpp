@@ -1,0 +1,21 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Declaration of the free functions related to the rendering of the
+/// grimoire machina.
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Preprocessor Directives
+/////////////////////////////////////////////////
+#pragma once
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include "MachinaForm.h"
+#include <SFML/Graphics/RenderTexture.hpp>
+
+namespace steamrot::logic::render::grimoire_machina {
+
+void DrawEmptyActiveMachinaForm(sf::RenderTexture &texture, MachinaForm &form);
+} // namespace steamrot::logic::render::grimoire_machina
