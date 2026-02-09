@@ -10,8 +10,10 @@
 #include "FailInfo.h"
 #include "FlatbuffersEngineDataProvider.h"
 #include "FlatbuffersGrimoireMachinaProvider.h"
+#include "FlatbuffersLogicConfigCollectionProvider.h"
 #include "FlatbuffersSceneDataProvider.h"
 #include "FlatbuffersSceneManagerDataProvider.h"
+#include "ILogicConfigCollectionProvider.h"
 #include <expected>
 
 namespace steamrot {
@@ -65,6 +67,15 @@ DataAccessFactory::SetFlatbuffersDataProviders() {
     return std::unexpected(FailInfo{
         FailMode::NullPointer,
         "Failed to create FlatbuffersGrimoireMachinaProvider instance."});
+  }
+
+  // set ILogicConfigCollectionProvider
+  m_logic_config_collection_provider =
+      std::make_unique<FlatbuffersLogicConfigCollectionProvider>();
+  if (!m_logic_config_collection_provider) {
+    return std::unexpected(FailInfo{
+        FailMode::NullPointer,
+        "Failed to create FlatbuffersLogicConfigCollectionProvider instance."});
   }
 
   return std::monostate{};
@@ -145,5 +156,15 @@ DataAccessFactory::GetGrimoireMachinaProvider() {
         FailInfo{FailMode::NullPointer, "Grimoire Machina Provider is null"});
   }
   return m_grimoire_machina_provider.get();
+}
+
+/////////////////////////////////////////////////
+std::expected<ILogicConfigCollectionProvider *, FailInfo>
+DataAccessFactory::GetLogicConfigCollectionProvider() {
+  if (!m_logic_config_collection_provider) {
+    return std::unexpected(FailInfo{
+        FailMode::NullPointer, "Logic Config Collection Provider is null"});
+  }
+  return m_logic_config_collection_provider.get();
 }
 } // namespace steamrot

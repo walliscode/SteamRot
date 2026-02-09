@@ -85,14 +85,6 @@ private:
   std::expected<std::unique_ptr<Logic>, FailInfo>
   CreateLogicObject(LogicType logic_type);
 
-  /////////////////////////////////////////////////
-  /// @brief Configures the provided Logic object
-  ///
-  /// @param logic_object Logic object to configure.
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  ConfigureLogicObject(Logic &logic_object);
-
 public:
   /////////////////////////////////////////////////
   /// @brief Constructor
@@ -108,5 +100,13 @@ public:
   /////////////////////////////////////////////////
   std::expected<LogicCollection, FailInfo>
   ProvideLogicCollection(SceneType scene_type);
+
+  /////////////////////////////////////////////////
+  /// @brief Configures the provided Logic object
+  ///
+  /// @param logic_object Logic object to configure.
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ConfigureLogicObject(Logic &logic_object);
 };
 } // namespace steamrot

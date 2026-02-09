@@ -126,7 +126,52 @@ LogicFactory::CreateLogicObject(LogicType logic_type) {
 std::expected<std::monostate, FailInfo>
 LogicFactory::ConfigureLogicObject(Logic &logic_object) {
 
-  //
+  // get the LogicConfigCollection provider from the data access factory
+  auto provider_result =
+      m_scene_context.data_access_factory.GetLogicConfigCollectionProvider();
+  if (!provider_result) {
+    return std::unexpected(provider_result.error());
+  }
+  ILogicConfigCollectionProvider &provider = *provider_result.value();
+
+  // get the LogicConfigCollection from the provider
+  auto collection_result = provider.CreateLogicConfigCollection();
+  if (!collection_result) {
+    return std::unexpected(collection_result.error());
+  }
+  const LogicConfigCollection &logic_config_collection =
+      collection_result.value();
+
+  // check if LogicType has been set on the derived Logic object
+  if (logic_object.GetLogicType() == LogicType::None) {
+    return std::unexpected(FailInfo(FailMode::NotImplemented,
+                                    "LogicFactory::ConfigureLogicObject: "
+                                    "LogicType not set on Logic object"));
+  }
+
+  // find the LogicConfig for this Logic's LogicType and configure the Logic
+  // object accordingly
+  auto config_it = logic_config_collection.find(logic_object.GetLogicType());
+  if (config_it == logic_config_collection.end()) {
+    // if not found, return early. Does not need to have a config, so not an
+    // error.
+    return std::monostate{};
+  }
+
+  const LogicConfig &config = config_it->second;
+
+  // set Subscribers
+  for (const auto &subscriber : config.m_subscribers) {
+
+    // add to logc object subscribers vector
+    logic_object.AddSubscriber(subscriber);
+    // add to EventHandler
+    auto register_result =
+        m_scene_context.event_handler.RegisterSubscriber(subscriber);
+    if (!register_result.has_value()) {
+      return std::unexpected(register_result.error());
+    }
+  }
   return std::monostate{};
 }
 
@@ -138,10 +183,11 @@ LogicFactory::ConfigureTitleLogics(LogicCollection &logic_collection) {
   ////// DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING //////
 
   // Define the Logic types for each grouping in the order they should execute
-  // These are compile-time constants that define the scene's Logic configuration
+  // These are compile-time constants that define the scene's Logic
+  // configuration
   static constexpr std::array collision_logic_types = {LogicType::UICollision};
   static constexpr std::array action_logic_types = {LogicType::UIAction,
-                                                     LogicType::UIState};
+                                                    LogicType::UIState};
   static constexpr std::array render_logic_types = {LogicType::UIRender};
 
   // Add Logics to collection using the helper function
@@ -153,18 +199,18 @@ LogicFactory::ConfigureTitleLogics(LogicCollection &logic_collection) {
     return std::unexpected(collision_result.error());
   }
 
-  auto action_result = AddLogicsToCollection(
-      logic_collection, LogicGrouping::Action,
-      std::vector<LogicType>(action_logic_types.begin(),
-                             action_logic_types.end()));
+  auto action_result =
+      AddLogicsToCollection(logic_collection, LogicGrouping::Action,
+                            std::vector<LogicType>(action_logic_types.begin(),
+                                                   action_logic_types.end()));
   if (!action_result) {
     return std::unexpected(action_result.error());
   }
 
-  auto render_result = AddLogicsToCollection(
-      logic_collection, LogicGrouping::Render,
-      std::vector<LogicType>(render_logic_types.begin(),
-                             render_logic_types.end()));
+  auto render_result =
+      AddLogicsToCollection(logic_collection, LogicGrouping::Render,
+                            std::vector<LogicType>(render_logic_types.begin(),
+                                                   render_logic_types.end()));
   if (!render_result) {
     return std::unexpected(render_result.error());
   }
@@ -179,12 +225,13 @@ LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
   ////// DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING //////
 
   // Define the Logic types for each grouping in the order they should execute
-  // These are compile-time constants that define the scene's Logic configuration
+  // These are compile-time constants that define the scene's Logic
+  // configuration
   static constexpr std::array collision_logic_types = {LogicType::UICollision};
   static constexpr std::array action_logic_types = {LogicType::UIAction,
-                                                     LogicType::UIState};
+                                                    LogicType::UIState};
   static constexpr std::array render_logic_types = {LogicType::UIRender,
-                                                     LogicType::CraftingRender};
+                                                    LogicType::CraftingRender};
 
   // Add Logics to collection using the helper function
   auto collision_result = AddLogicsToCollection(
@@ -195,18 +242,18 @@ LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
     return std::unexpected(collision_result.error());
   }
 
-  auto action_result = AddLogicsToCollection(
-      logic_collection, LogicGrouping::Action,
-      std::vector<LogicType>(action_logic_types.begin(),
-                             action_logic_types.end()));
+  auto action_result =
+      AddLogicsToCollection(logic_collection, LogicGrouping::Action,
+                            std::vector<LogicType>(action_logic_types.begin(),
+                                                   action_logic_types.end()));
   if (!action_result) {
     return std::unexpected(action_result.error());
   }
 
-  auto render_result = AddLogicsToCollection(
-      logic_collection, LogicGrouping::Render,
-      std::vector<LogicType>(render_logic_types.begin(),
-                             render_logic_types.end()));
+  auto render_result =
+      AddLogicsToCollection(logic_collection, LogicGrouping::Render,
+                            std::vector<LogicType>(render_logic_types.begin(),
+                                                   render_logic_types.end()));
   if (!render_result) {
     return std::unexpected(render_result.error());
   }
@@ -221,7 +268,8 @@ LogicFactory::ConfigureTestLogics(LogicCollection &logic_collection) {
   ////// DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING //////
 
   // Define the Logic types for each grouping in the order they should execute
-  // These are compile-time constants that define the scene's Logic configuration
+  // These are compile-time constants that define the scene's Logic
+  // configuration
   static constexpr std::array collision_logic_types = {LogicType::UICollision};
   static constexpr std::array action_logic_types = {LogicType::UIAction};
   static constexpr std::array render_logic_types = {LogicType::UIRender};
@@ -235,18 +283,18 @@ LogicFactory::ConfigureTestLogics(LogicCollection &logic_collection) {
     return std::unexpected(collision_result.error());
   }
 
-  auto action_result = AddLogicsToCollection(
-      logic_collection, LogicGrouping::Action,
-      std::vector<LogicType>(action_logic_types.begin(),
-                             action_logic_types.end()));
+  auto action_result =
+      AddLogicsToCollection(logic_collection, LogicGrouping::Action,
+                            std::vector<LogicType>(action_logic_types.begin(),
+                                                   action_logic_types.end()));
   if (!action_result) {
     return std::unexpected(action_result.error());
   }
 
-  auto render_result = AddLogicsToCollection(
-      logic_collection, LogicGrouping::Render,
-      std::vector<LogicType>(render_logic_types.begin(),
-                             render_logic_types.end()));
+  auto render_result =
+      AddLogicsToCollection(logic_collection, LogicGrouping::Render,
+                            std::vector<LogicType>(render_logic_types.begin(),
+                                                   render_logic_types.end()));
   if (!render_result) {
     return std::unexpected(render_result.error());
   }

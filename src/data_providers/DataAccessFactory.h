@@ -17,6 +17,7 @@
 #include "IEngineDataProvider.h"
 #include "IEntityConfigurator.h"
 #include "IGrimoireMachinaProvider.h"
+#include "ILogicConfigCollectionProvider.h"
 #include "ISceneDataProvider.h"
 #include "ISceneManagerDataProvider.h"
 #include <expected>
@@ -64,6 +65,12 @@ private:
   std::unique_ptr<IEntityConfigurator> m_entity_configurator{nullptr};
 
   /////////////////////////////////////////////////
+  /// @brief Instance of the LogicConfigCollection Provider for the factory/game
+  /////////////////////////////////////////////////
+  std::unique_ptr<ILogicConfigCollectionProvider>
+      m_logic_config_collection_provider{nullptr};
+
+  /////////////////////////////////////////////////
   /// @brief Set all data providers to Flatbuffers implementations
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo> SetFlatbuffersDataProviders();
@@ -104,6 +111,12 @@ public:
   /////////////////////////////////////////////////
   std::expected<IGrimoireMachinaProvider *, FailInfo>
   GetGrimoireMachinaProvider();
+
+  /////////////////////////////////////////////////
+  /// @brief Returns a raw pointer to the LogicConfigCollection Provider
+  /////////////////////////////////////////////////
+  std::expected<ILogicConfigCollectionProvider *, FailInfo>
+  GetLogicConfigCollectionProvider();
 
   /////////////////////////////////////////////////
   /// @brief Sets the data type for the factory

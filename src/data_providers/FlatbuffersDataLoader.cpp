@@ -18,7 +18,6 @@
 #include <SFML/Graphics/VertexArray.hpp>
 #include <expected>
 #include <format>
-#include <iostream>
 #include <vector>
 
 namespace steamrot {
@@ -175,14 +174,6 @@ FlatbuffersDataLoader::ProvideLogicConfigCollectionFbs() const {
                  "LogicConfigCollectionFbs pointer is null"));
   }
 
-  std::cout << "LogicConfigCollectionFbs loaded successfully from: "
-            << logic_config_path.string() << std::endl;
-  std::cout
-      << "test_logic subscriptions size: "
-      << logic_config_collection_data->test_logic()->subscriptions()->size()
-      << std::endl;
-
-  std::cout << "end" << std::endl;
   return logic_config_collection_data;
 }
 

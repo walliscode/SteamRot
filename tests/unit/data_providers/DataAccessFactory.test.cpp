@@ -8,6 +8,8 @@
 /////////////////////////////////////////////////
 #include "DataAccessFactory.h"
 #include "FlatbuffersEngineDataProvider.h"
+#include "FlatbuffersGrimoireMachinaProvider.h"
+#include "FlatbuffersLogicConfigCollectionProvider.h"
 #include "FlatbuffersSceneDataProvider.h"
 #include "FlatbuffersSceneManagerDataProvider.h"
 #include "TestFixture.h"
@@ -66,8 +68,36 @@ TEST_CASE("DataAccessFactory Initialization", "[DataAccessFactory]") {
 
     // cast to flatbuffers concrete type and check not null
     auto flatbuffers_scene_provider =
-        dynamic_cast<steamrot::FlatbuffersSceneDataProvider *>(
-            scene_provider);
+        dynamic_cast<steamrot::FlatbuffersSceneDataProvider *>(scene_provider);
     REQUIRE(flatbuffers_scene_provider != nullptr);
+
+    // attempt to access the grimoire machina provider
+    auto get_grimoire_provider_result = factory.GetGrimoireMachinaProvider();
+    if (!get_grimoire_provider_result.has_value()) {
+      FAIL("Failed to get Grimoire Machina Provider: " +
+           get_grimoire_provider_result.error().message);
+    }
+    auto grimoire_provider = get_grimoire_provider_result.value();
+    REQUIRE(grimoire_provider != nullptr);
+
+    // cast to flatbuffers concrete type and check not null
+    auto flatbuffers_grimoire_provider =
+        dynamic_cast<steamrot::FlatbuffersGrimoireMachinaProvider *>(
+            grimoire_provider);
+    REQUIRE(flatbuffers_grimoire_provider != nullptr);
+
+    // attempt to access the logic config collection provider
+    auto get_logic_config_provider_result =
+        factory.GetLogicConfigCollectionProvider();
+    if (!get_logic_config_provider_result.has_value()) {
+      FAIL("Failed to get Logic Config Collection Provider: " +
+           get_logic_config_provider_result.error().message);
+    }
+    auto logic_config_provider = get_logic_config_provider_result.value();
+    REQUIRE(logic_config_provider != nullptr);
+    // cast to flatbuffers concrete type and check not null
+    auto flatbuffers_logic_config_provider =
+        dynamic_cast<steamrot::FlatbuffersLogicConfigCollectionProvider *>(
+            logic_config_provider);
   }
 }

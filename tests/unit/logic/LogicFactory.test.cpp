@@ -9,11 +9,13 @@
 #include "LogicFactory.h"
 #include "CraftingRenderLogic.h"
 #include "TestFixture.h"
+#include "TestLogic.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
 #include "UIRenderLogic.h"
 #include "UIStateLogic.h"
 #include <catch2/catch_test_macros.hpp>
+#include <expected>
 
 TEST_CASE("LogicFactory constructed without errors", "[unit][LogicFactory]") {
 
@@ -140,4 +142,57 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
   REQUIRE(dynamic_cast<steamrot::UIRenderLogic *>(render_logics[0].get()));
   REQUIRE(
       dynamic_cast<steamrot::CraftingRenderLogic *>(render_logics[1].get()));
+}
+
+TEST_CASE("LogicFactory::ConfigureLogicObject returns unexpected if LogicType "
+          "not set on Logic object",
+          "[unit][LogicFactory]") {
+  // create a Testcontext to provide mock dependencies
+  steamrot::tests::TestFixture test_context;
+  // create a LogicFactory instance
+  steamrot::LogicFactory logic_factory(test_context.GetSceneContext());
+  // create a dummy Logic object with LogicType::None
+  class DummyLogic : public steamrot::Logic {
+  public:
+    DummyLogic(const steamrot::SceneContext &scene_context)
+        : steamrot::Logic(scene_context) {}
+
+    void ProcessLogic() override {
+      // do nothing
+    }
+  };
+  DummyLogic dummy_logic(test_context.GetSceneContext());
+  // call ConfigureLogicObject with the dummy Logic
+  auto result = logic_factory.ConfigureLogicObject(dummy_logic);
+  REQUIRE(!result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::NotImplemented);
+  REQUIRE(
+      result.error().message ==
+      "LogicFactory::ConfigureLogicObject: LogicType not set on Logic object");
+}
+
+TEST_CASE("LogicFactoru::ConfigureLogicObject correctly configures a TestLogic "
+          "object",
+          "[unit][LogicFactory]") {
+  // create a Testcontext to provide mock dependencies
+  steamrot::tests::TestFixture test_context;
+  // create a LogicFactory instance
+  steamrot::LogicFactory logic_factory(test_context.GetSceneContext());
+  // create a TestLogic object with LogicType::Test
+  steamrot::tests::TestLogic test_logic(test_context.GetSceneContext());
+  // call ConfigureLogicObject with the TestLogic object
+  auto result = logic_factory.ConfigureLogicObject(test_logic);
+  REQUIRE(result.has_value());
+  // check that the TestLogic object has the expected Subscribers configured
+  const auto &subscribers = test_logic.GetSubscribers();
+  REQUIRE(subscribers.size() == 1);
+  // test each Subscriber
+  auto subscriber_one = subscribers[0];
+  REQUIRE(subscriber_one->m_trigger_event_type ==
+          steamrot::EventType::USER_INPUT);
+  REQUIRE(subscriber_one->m_trigger_event_data.has_value());
+  steamrot::EventData &sub_one_trigger_data =
+      subscriber_one->m_trigger_event_data.value();
+  REQUIRE(
+      std::holds_alternative<steamrot::UserInputBitset>(sub_one_trigger_data));
 }
