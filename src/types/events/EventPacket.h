@@ -18,10 +18,15 @@ namespace steamrot {
 
 using SceneChangePacket = std::pair<std::optional<uuids::uuid>, SceneType>;
 using UserInterfaceName = std::string;
+/////////////////////////////////////////////////
+//// @brief names and toggles to be used for flow control
+/////////////////////////////////////////////////
+using ToggleName = std::string;
 
 // Your variant type
-using EventData = std::variant<std::monostate, UserInputBitset,
-                               SceneChangePacket, UserInterfaceName>;
+using EventData =
+    std::variant<std::monostate, UserInputBitset, SceneChangePacket,
+                 UserInterfaceName, ToggleName>;
 
 struct EventPacket {
 
