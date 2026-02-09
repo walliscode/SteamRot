@@ -6,6 +6,7 @@ ui_render.test.cpp
 logic_render_test_helpers.cpp
 ui_helpers.test.cpp
 TestLogic.cpp
+action_grimoire_machina.test.cpp
 
 )
 

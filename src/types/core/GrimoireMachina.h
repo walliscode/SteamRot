@@ -14,6 +14,7 @@
 #include "Fragment.h"
 #include "MachinaForm.h"
 #include <map>
+#include <memory>
 
 namespace steamrot {
 
@@ -39,5 +40,10 @@ struct GrimoireMachina {
   /// copied and not used directly.
   /////////////////////////////////////////////////
   std::map<std::string, MachinaForm> m_machina_forms;
+
+  /////////////////////////////////////////////////
+  /// @brief A temporary MachinaForm that can be used for design purposes
+  /////////////////////////////////////////////////
+  std::unique_ptr<MachinaForm> m_active_form{nullptr};
 };
 } // namespace steamrot
