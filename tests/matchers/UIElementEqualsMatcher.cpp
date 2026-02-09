@@ -42,15 +42,14 @@ bool UIElementEqualsMatcher::SubscriptionsEqual(
 
 /////////////////////////////////////////////////
 bool UIElementEqualsMatcher::ResponseEventsEqual(
-    const std::optional<EventPacket> &actual,
-    const std::optional<EventPacket> &expected) const {
-  // Both empty
-  if (!actual.has_value() && !expected.has_value())
-    return true;
-  // One empty, one not
-  if (actual.has_value() != expected.has_value())
+    const std::vector<EventPacket> &actual,
+    const std::vector<EventPacket> &expected) const {
+  // Compare sizes first
+  if (actual.size() != expected.size())
     return false;
 
+  // For now, just check that sizes match
+  // Could add more detailed comparison if needed
   return true;
 }
 
@@ -246,9 +245,9 @@ bool UIElementEqualsMatcher::CompareUIElements(
     oss << prefix << "subscription differs; ";
   }
 
-  // Compare response_event
-  if (!ResponseEventsEqual(actual.response_event, expected.response_event)) {
-    oss << prefix << "response_event differs; ";
+  // Compare response_events
+  if (!ResponseEventsEqual(actual.response_events, expected.response_events)) {
+    oss << prefix << "response_events differs; ";
   }
 
   // Compare derived type fields

@@ -45,9 +45,9 @@ struct UIElement {
   std::shared_ptr<Subscriber> subscription{nullptr};
 
   /////////////////////////////////////////////////
-  /// @brief EventPacket to be pushed to the EventBus if criteria are met
+  /// @brief EventPackets to be pushed to the EventBus if criteria are met
   /////////////////////////////////////////////////
-  std::optional<EventPacket> response_event{std::nullopt};
+  std::vector<EventPacket> response_events;
 
   /////////////////////////////////////////////////
   /// @brief Is mouse over this element, false if it over a child element
@@ -92,7 +92,7 @@ struct UIElement {
     target.position = position;
     target.size = size;
     target.subscription = subscription; // shared_ptr copies fine
-    target.response_event = response_event;
+    target.response_events = response_events;
     target.is_mouse_over = is_mouse_over;
     target.children_active = children_active;
     target.spacing_strategy = spacing_strategy;

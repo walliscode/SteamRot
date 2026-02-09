@@ -28,7 +28,7 @@ TEST_CASE(
       std::make_shared<steamrot::Subscriber>(steamrot::EventType::USER_INPUT);
   steamrot::EventPacket event_packet{steamrot::EventType::USER_INPUT,
                                      steamrot::UserInputBitset{}, 2};
-  button.response_event = event_packet;
+  button.response_events.push_back(event_packet);
 
   // initial tests
   REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
@@ -84,7 +84,7 @@ TEST_CASE("logic::ui::action::ProcessUIActionsAndEvents processes UI elements "
       std::make_shared<steamrot::Subscriber>(steamrot::EventType::USER_INPUT);
   steamrot::EventPacket event_packet{steamrot::EventType::USER_INPUT,
                                      steamrot::UserInputBitset{}, 2};
-  button.response_event = event_packet;
+  button.response_events.push_back(event_packet);
 
   // initial tests
   REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
@@ -140,7 +140,7 @@ TEST_CASE("logic::ui::action::ProcessNestedUIActionsAndEvents processes nested "
       std::make_shared<steamrot::Subscriber>(steamrot::EventType::USER_INPUT);
   steamrot::EventPacket event_packet{steamrot::EventType::USER_INPUT,
                                      steamrot::UserInputBitset{}, 2};
-  button->response_event = event_packet;
+  button->response_events.push_back(event_packet);
   panel.child_elements.push_back(std::move(button));
 
   auto button2 = std::make_unique<steamrot::ButtonElement>();
@@ -149,7 +149,7 @@ TEST_CASE("logic::ui::action::ProcessNestedUIActionsAndEvents processes nested "
       std::make_shared<steamrot::Subscriber>(steamrot::EventType::USER_INPUT);
   steamrot::EventPacket event_packet2{steamrot::EventType::USER_INPUT,
                                       steamrot::UserInputBitset{}, 3};
-  button2->response_event = event_packet2;
+  button2->response_events.push_back(event_packet2);
   panel.child_elements.push_back(std::move(button2));
 
   // initial tests

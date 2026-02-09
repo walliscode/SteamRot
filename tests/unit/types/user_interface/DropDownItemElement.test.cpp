@@ -16,7 +16,7 @@ TEST_CASE("DropDownItemElement: Default Constructor", "[types]") {
   REQUIRE(item.size == sf::Vector2f{0.f, 0.f});
   REQUIRE(item.is_mouse_over == false);
   REQUIRE(item.subscription == nullptr);
-  REQUIRE(item.response_event == std::nullopt);
+  REQUIRE(item.response_events.empty());
   REQUIRE(item.children_active == false);
   REQUIRE(item.child_elements.empty());
   REQUIRE(item.layout == steamrot::Layout::Vertical);

@@ -89,11 +89,11 @@ void ProcessButtonElementActions(ButtonElement &button_element,
   // top level flow control
 
   if (button_element.is_mouse_over) {
-    // check if button has an event packet. for now, all event packets are sent
+    // check if button has event packets. for now, all event packets are sent
     // to the global event bus
-    if (button_element.response_event.has_value())
-
-      event_handler.AddEvent(button_element.response_event.value());
+    for (const auto &event_packet : button_element.response_events) {
+      event_handler.AddEvent(event_packet);
+    }
   }
 }
 

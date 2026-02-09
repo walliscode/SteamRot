@@ -17,7 +17,7 @@ TEST_CASE("ButtonElement: Default Constructor", "[types]") {
   REQUIRE(button.size == sf::Vector2f{0.f, 0.f});
   REQUIRE(button.is_mouse_over == false);
   REQUIRE(button.subscription == nullptr);
-  REQUIRE(button.response_event == std::nullopt);
+  REQUIRE(button.response_events.empty());
   REQUIRE(button.children_active == false);
   REQUIRE(button.child_elements.empty());
   REQUIRE(button.layout == steamrot::Layout::Vertical);

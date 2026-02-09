@@ -2,7 +2,11 @@
   "meta_data": {
     "test_name": "Test loading json to TestDataFbs",
     "test_description": "Validates that all fields in TestDataFbs can be loaded from JSON including engine snapshots with scene data, event bus, and scene manager state",
-    "tags": ["unit", "flatbuffers", "test_data"],
+    "tags": [
+      "unit",
+      "flatbuffers",
+      "test_data"
+    ],
     "will_pass": true,
     "version": 1
   },
@@ -25,7 +29,9 @@
           "event_type": "EVENT_USER_INPUT",
           "event_data_data_type": "UserInputBitsetData",
           "event_data_data": {
-            "mouse_pressed": ["LEFT_CLICK"]
+            "mouse_pressed": [
+              "LEFT_CLICK"
+            ]
           }
         }
       ]
@@ -50,8 +56,14 @@
                   "is_visible": true,
                   "root_ui_element": {
                     "base_data": {
-                      "position": { "x": 100, "y": 200 },
-                      "size": { "x": 50, "y": 30 },
+                      "position": {
+                        "x": 100,
+                        "y": 200
+                      },
+                      "size": {
+                        "x": 50,
+                        "y": 30
+                      },
                       "children_active": false,
                       "children": [],
                       "layout": "Horizontal",
@@ -63,7 +75,9 @@
               {
                 "index": 1,
                 "c_grimoire_machina": {
-                  "fragments": ["test_fragment"],
+                  "fragments": [
+                    "test_fragment"
+                  ],
                   "joints": []
                 }
               }
