@@ -24,6 +24,7 @@ target_link_libraries(test_logic
   context
   resources
   entity
+  matchers
   context_test_helpers
 
 

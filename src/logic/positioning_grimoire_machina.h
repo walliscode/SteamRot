@@ -13,6 +13,7 @@
 /////////////////////////////////////////////////
 
 #include "CUserInterface.h"
+#include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 namespace steamrot::logic::positioning::grimoire_machina {
 
@@ -26,8 +27,8 @@ namespace steamrot::logic::positioning::grimoire_machina {
 /// @param crafting_ui_elements CUserInterface elements that are part of the
 /// crafting UI.
 /////////////////////////////////////////////////
-sf::RectangleShape CalculateCraftingCanvasSizeAndPosition(
-    const sf::RectangleShape &texture_coordinates,
+sf::FloatRect CalculateCraftingCanvasSizeAndPosition(
+    const sf::FloatRect &texture_coordinates,
     const std::vector<CUserInterface> &crafting_ui_elements);
 
 } // namespace steamrot::logic::positioning::grimoire_machina

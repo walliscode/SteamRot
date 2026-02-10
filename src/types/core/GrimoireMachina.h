@@ -13,11 +13,29 @@
 /////////////////////////////////////////////////
 #include "Fragment.h"
 #include "MachinaForm.h"
+#include <SFML/Graphics/Rect.hpp>
 #include <map>
 #include <memory>
 
 namespace steamrot {
 
+/////////////////////////////////////////////////
+/// @class CraftingHelpers
+/// @brief A struct of members specifcally for helping with crafting
+/// MachinaForms.
+///
+/// This will be kept in the GrimoireMachina but should only be used for
+/// crafting related purposes.
+///
+/////////////////////////////////////////////////
+struct CraftingHelpers {
+
+  /////////////////////////////////////////////////
+  /// @brief size of the crafting canvas, which is the area where the active
+  /// MachinaForm will display and be interacted with.
+  /////////////////////////////////////////////////
+  sf::FloatRect crafting_canvas;
+};
 struct GrimoireMachina {
 
   /////////////////////////////////////////////////
@@ -45,5 +63,10 @@ struct GrimoireMachina {
   /// @brief A temporary MachinaForm that can be used for design purposes
   /////////////////////////////////////////////////
   std::unique_ptr<MachinaForm> m_active_form{nullptr};
+
+  /////////////////////////////////////////////////
+  /// @brief Instance of CraftingHelpers
+  /////////////////////////////////////////////////
+  CraftingHelpers m_crafting_helpers;
 };
 } // namespace steamrot
