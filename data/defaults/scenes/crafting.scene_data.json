@@ -20,7 +20,7 @@
                 "y": 0
               },
               "size": {
-                "x": 220,
+                "x": 180,
                 "y": 600
               },
               "children_active": true,
@@ -41,9 +41,7 @@
                         "event_type_data": "EVENT_USER_INPUT",
                         "trigger_data_type": "UserInputBitsetData",
                         "trigger_data": {
-                          "mouse_released": [
-                            "LEFT_CLICK"
-                          ]
+                          "mouse_released": ["LEFT_CLICK"]
                         }
                       },
                       "response_event_data": [
@@ -84,9 +82,7 @@
                         "event_type_data": "EVENT_USER_INPUT",
                         "trigger_data_type": "UserInputBitsetData",
                         "trigger_data": {
-                          "mouse_released": [
-                            "LEFT_CLICK"
-                          ]
+                          "mouse_released": ["LEFT_CLICK"]
                         }
                       },
                       "response_event_data": [
@@ -142,9 +138,7 @@
                         "event_type_data": "EVENT_USER_INPUT",
                         "trigger_data_type": "UserInputBitsetData",
                         "trigger_data": {
-                          "mouse_released": [
-                            "LEFT_CLICK"
-                          ]
+                          "mouse_released": ["LEFT_CLICK"]
                         }
                       },
                       "response_event_data": [
@@ -266,9 +260,7 @@
                   "new_construct_menu",
                   "fragment_selection_menu"
                 ],
-                "ui_names_off": [
-                  "initial_crafting_menu"
-                ]
+                "ui_names_off": ["initial_crafting_menu"]
               },
               "subscribers": [
                 {
@@ -284,9 +276,7 @@
             {
               "state_key": "new_construct_menu_off",
               "state_to_ui_visibility": {
-                "ui_names_on": [
-                  "initial_crafting_menu"
-                ],
+                "ui_names_on": ["initial_crafting_menu"],
                 "ui_names_off": [
                   "new_construct_menu",
                   "fragment_selection_menu"
@@ -310,3 +300,4 @@
   },
   "asset_config": {}
 }
+

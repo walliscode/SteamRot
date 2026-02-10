@@ -9,10 +9,15 @@ add_library(logic
 
   GrimoireMachinaPositioningLogic.cpp
   GrimoireMachinaActionLogic.cpp
+  GrimoireMachinaRenderLogic.cpp
+
   ui_collision.cpp
   ui_action.cpp
   ui_helpers.cpp
   ui_render.cpp
+
+
+  render_grimoire_machina.cpp
 
   action_grimoire_machina.cpp
 

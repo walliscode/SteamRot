@@ -8,6 +8,7 @@ ui_helpers.test.cpp
 TestLogic.cpp
 action_grimoire_machina.test.cpp
 
+render_grimoire_machina.test.cpp
 positioning_grimoire_machina.test.cpp
 
 )
