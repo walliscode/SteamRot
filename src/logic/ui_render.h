@@ -20,6 +20,7 @@
 #include "DropDownListElement.h"
 #include "PanelElement.h"
 #include "UIElement.h"
+#include "UIRenderContext.h"
 #include "UIStyle.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -36,114 +37,118 @@ namespace render {
 /////////////////////////////////////////////////
 /// @brief Draw nested UI elements recursively to a render texture
 ///
-/// @param texture Render texture to draw to
+/// @param context Rendering context containing texture and style
 /// @param element Element to draw
-/// @param style Style to use for drawing
 /////////////////////////////////////////////////
-void DrawNestedUIElements(sf::RenderTexture &texture, const UIElement &element,
-                          const UIStyle &style);
+void DrawNestedUIElements(const UIRenderContext &context,
+                          const UIElement &element);
 
 /////////////////////////////////////////////////
 /// @brief Internal dispatcher that dispatches to type-specific drawing
 /// functions
 ///
-/// @param texture Render texture to draw to
+/// @param context Rendering context containing texture and style
 /// @param element Element to draw
-/// @param style Style to use for drawing
 /////////////////////////////////////////////////
-void DrawUIElementDispatch(sf::RenderTexture &texture, const UIElement &element,
-                           const UIStyle &style);
+void DrawUIElementDispatch(const UIRenderContext &context,
+                           const UIElement &element);
 
 /////////////////////////////////////////////////
 /// @brief Draw a ButtonElement
 ///
-/// @param texture Render texture to draw to
+/// @param context Rendering context containing texture and style
 /// @param button Button element to draw
-/// @param style Style to use for drawing
 /////////////////////////////////////////////////
-void DrawButtonElement(sf::RenderTexture &texture, const ButtonElement &button,
-                       const UIStyle &style);
+void DrawButtonElement(const UIRenderContext &context,
+                       const ButtonElement &button);
 
 /////////////////////////////////////////////////
 /// @brief Draw a PanelElement
 ///
-/// @param texture Render texture to draw to
+/// @param context Rendering context containing texture and style
 /// @param panel Panel element to draw
-/// @param style Style to use for drawing
 /////////////////////////////////////////////////
-void DrawPanelElement(sf::RenderTexture &texture, const PanelElement &panel,
-                      const UIStyle &style);
+void DrawPanelElement(const UIRenderContext &context, const PanelElement &panel);
 
 /////////////////////////////////////////////////
 /// @brief Draw a DropDownListElement
 ///
-/// @param texture Render texture to draw to
+/// @param context Rendering context containing texture and style
 /// @param list DropDown list element to draw
-/// @param style Style to use for drawing
 /////////////////////////////////////////////////
-void DrawDropDownListElement(sf::RenderTexture &texture,
-                             const DropDownListElement &list,
-                             const UIStyle &style);
+void DrawDropDownListElement(const UIRenderContext &context,
+                             const DropDownListElement &list);
 
 /////////////////////////////////////////////////
 /// @brief Draw a DropDownItemElement
 ///
-/// @param texture Render texture to draw to
+/// @param context Rendering context containing texture and style
 /// @param item DropDown item element to draw
-/// @param style Style to use for drawing
 /////////////////////////////////////////////////
-void DrawDropDownItemElement(sf::RenderTexture &texture,
-                             const DropDownItemElement &item,
-                             const UIStyle &style);
+void DrawDropDownItemElement(const UIRenderContext &context,
+                             const DropDownItemElement &item);
 
 /////////////////////////////////////////////////
 /// @brief Draw a DropDownButtonElement
 ///
-/// @param texture Render texture to draw to
+/// @param context Rendering context containing texture and style
 /// @param button DropDown button element to draw
-/// @param style Style to use for drawing
 /////////////////////////////////////////////////
-void DrawDropDownButtonElement(sf::RenderTexture &texture,
-                               const DropDownButtonElement &button,
-                               const UIStyle &style);
+void DrawDropDownButtonElement(const UIRenderContext &context,
+                               const DropDownButtonElement &button);
 
 /////////////////////////////////////////////////
 /// @brief Draw a DropDownContainerElement
 ///
-/// @param texture Render texture to draw to
+/// @param context Rendering context containing texture and style
 /// @param container DropDown container element to draw
-/// @param style Style to use for drawing
 /////////////////////////////////////////////////
-void DrawDropDownContainerElement(sf::RenderTexture &texture,
-                                  const DropDownContainerElement &container,
-                                  const UIStyle &style);
+void DrawDropDownContainerElement(const UIRenderContext &context,
+                                  const DropDownContainerElement &container);
 
 /////////////////////////////////////////////////
 /// @brief Draw the border and background of a general UI element
 ///
-/// @param texture Render texture to draw to
+/// @param context Rendering context containing texture
 /// @param element Element to draw
 /// @param style Style to use for drawing
 /////////////////////////////////////////////////
-void DrawBorderAndBackground(sf::RenderTexture &texture,
+void DrawBorderAndBackground(const UIRenderContext &context,
                              const UIElement &element, const Style &style);
 
 /////////////////////////////////////////////////
 /// @brief Draw the border and background of a button UI element
 ///
-/// @param texture Render texture to draw to
+/// @param context Rendering context containing texture
 /// @param element Element to draw
 /// @param style ButtonStyle to use for drawing
 /////////////////////////////////////////////////
-void DrawBorderAndBackground(sf::RenderTexture &texture,
+void DrawBorderAndBackground(const UIRenderContext &context,
                              const UIElement &element,
                              const ButtonStyle &style);
 
-void DrawText(sf::RenderTexture &texture, const std::string &text,
+/////////////////////////////////////////////////
+/// @brief Draw text with the specified parameters
+///
+/// @param context Rendering context containing texture
+/// @param text Text string to draw
+/// @param position Position to draw at
+/// @param size Size of the container
+/// @param font Font to use
+/// @param font_size Font size
+/// @param color Text color
+/////////////////////////////////////////////////
+void DrawText(const UIRenderContext &context, const std::string &text,
               const sf::Vector2f &position, const sf::Vector2f size,
               std::shared_ptr<const sf::Font> font, uint8_t font_size,
               const sf::Color &color);
 
+/////////////////////////////////////////////////
+/// @brief Update size and position of child elements based on layout
+///
+/// @param element Parent element containing children
+/// @param style Style to use for layout calculations
+/////////////////////////////////////////////////
 void UpdateSizeAndPositionOfChildElements(const UIElement &element,
                                           const UIStyle &style);
 

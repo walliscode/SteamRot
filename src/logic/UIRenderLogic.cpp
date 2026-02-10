@@ -3,6 +3,7 @@
 /////////////////////////////////////////////////
 #include "UIRenderLogic.h"
 #include "Logic.h"
+#include "UIRenderContext.h"
 #include "archetypes.h"
 #include "entity_memory.h"
 #include "ui_render.h"
@@ -37,6 +38,11 @@ void UIRenderLogic::DrawUIElements() {
 
           m_scene_context.archetypes, true);
 
+  // Create render context with texture and default style
+  logic::ui::render::UIRenderContext render_context{
+      m_scene_context.scene_texture,
+      m_scene_context.asset_manager.GetDefaultUIStyle()};
+
   // cycle through all the entity indexs in the archetype
   for (size_t entity_id : entity_indexes) {
 
@@ -46,9 +52,8 @@ void UIRenderLogic::DrawUIElements() {
 
     // only draw if the CUserInterface is visible
     if (ui_component.m_visible) {
-      logic::ui::render::DrawNestedUIElements(
-          m_scene_context.scene_texture, *ui_component.m_root_element,
-          m_scene_context.asset_manager.GetDefaultUIStyle());
+      logic::ui::render::DrawNestedUIElements(render_context,
+                                              *ui_component.m_root_element);
     }
   }
 }

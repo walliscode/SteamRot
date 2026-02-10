@@ -13,6 +13,7 @@
 #include "DropDownItemElement.h"
 #include "DropDownListElement.h"
 #include "PanelElement.h"
+#include "UIRenderContext.h"
 #include <cstdint>
 
 namespace steamrot {
@@ -21,115 +22,113 @@ namespace ui {
 namespace render {
 
 /////////////////////////////////////////////////
-void DrawUIElementDispatch(sf::RenderTexture &texture, const UIElement &element,
-                           const UIStyle &style) {
+void DrawUIElementDispatch(const UIRenderContext &context,
+                           const UIElement &element) {
   // Type dispatch using dynamic_cast
   if (const auto *button = dynamic_cast<const ButtonElement *>(&element)) {
-    DrawButtonElement(texture, *button, style);
+    DrawButtonElement(context, *button);
   } else if (const auto *panel = dynamic_cast<const PanelElement *>(&element)) {
-    DrawPanelElement(texture, *panel, style);
+    DrawPanelElement(context, *panel);
   } else if (const auto *list =
                  dynamic_cast<const DropDownListElement *>(&element)) {
-    DrawDropDownListElement(texture, *list, style);
+    DrawDropDownListElement(context, *list);
   } else if (const auto *item =
                  dynamic_cast<const DropDownItemElement *>(&element)) {
-    DrawDropDownItemElement(texture, *item, style);
+    DrawDropDownItemElement(context, *item);
   } else if (const auto *dd_button =
                  dynamic_cast<const DropDownButtonElement *>(&element)) {
-    DrawDropDownButtonElement(texture, *dd_button, style);
+    DrawDropDownButtonElement(context, *dd_button);
   } else if (const auto *container =
                  dynamic_cast<const DropDownContainerElement *>(&element)) {
-    DrawDropDownContainerElement(texture, *container, style);
+    DrawDropDownContainerElement(context, *container);
   }
 }
 
 /////////////////////////////////////////////////
-void DrawNestedUIElements(sf::RenderTexture &texture, const UIElement &element,
-                          const UIStyle &style) {
+void DrawNestedUIElements(const UIRenderContext &context,
+                          const UIElement &element) {
   // Draw the parent element first using dispatcher
-  DrawUIElementDispatch(texture, element, style);
+  DrawUIElementDispatch(context, element);
 
   // update the size and position of the child elements
-  UpdateSizeAndPositionOfChildElements(element, style);
+  UpdateSizeAndPositionOfChildElements(element, context.style);
 
   // if children are active, draw them
   if (element.children_active) {
     for (const auto &child : element.child_elements) {
-      DrawNestedUIElements(texture, *child, style);
+      DrawNestedUIElements(context, *child);
     }
   }
 }
 
 /////////////////////////////////////////////////
-void DrawButtonElement(sf::RenderTexture &texture, const ButtonElement &button,
-                       const UIStyle &style) {
+void DrawButtonElement(const UIRenderContext &context,
+                       const ButtonElement &button) {
   // Draw the border and background
-  DrawBorderAndBackground(texture, button, style.button_style);
+  DrawBorderAndBackground(context, button, context.style.button_style);
 
   // Draw the button text
   sf::Vector2f text_position{
-      button.position.x + style.button_style.border_thickness +
-          style.button_style.inner_margin.x,
-      button.position.y + style.button_style.border_thickness +
-          style.button_style.inner_margin.y};
+      button.position.x + context.style.button_style.border_thickness +
+          context.style.button_style.inner_margin.x,
+      button.position.y + context.style.button_style.border_thickness +
+          context.style.button_style.inner_margin.y};
 
-  DrawText(texture, button.label, text_position, button.size,
-           style.button_style.font, style.button_style.font_size,
-           style.button_style.text_color);
+  DrawText(context, button.label, text_position, button.size,
+           context.style.button_style.font, context.style.button_style.font_size,
+           context.style.button_style.text_color);
 }
 
 /////////////////////////////////////////////////
-void DrawPanelElement(sf::RenderTexture &texture, const PanelElement &panel,
-                      const UIStyle &style) {
-  DrawBorderAndBackground(texture, panel, style.panel_style);
+void DrawPanelElement(const UIRenderContext &context, const PanelElement &panel) {
+  DrawBorderAndBackground(context, panel, context.style.panel_style);
 }
 
 /////////////////////////////////////////////////
-void DrawDropDownListElement(sf::RenderTexture &texture,
-                             const DropDownListElement &list,
-                             const UIStyle &style) {
-  DrawBorderAndBackground(texture, list, style.drop_down_list_style);
+void DrawDropDownListElement(const UIRenderContext &context,
+                             const DropDownListElement &list) {
+  DrawBorderAndBackground(context, list, context.style.drop_down_list_style);
 
   // calculate the position for the text
   sf::Vector2f text_position{
-      list.position.x + style.drop_down_list_style.border_thickness +
-          style.drop_down_list_style.inner_margin.x,
-      list.position.y + style.drop_down_list_style.border_thickness +
-          style.drop_down_list_style.inner_margin.y};
+      list.position.x + context.style.drop_down_list_style.border_thickness +
+          context.style.drop_down_list_style.inner_margin.x,
+      list.position.y + context.style.drop_down_list_style.border_thickness +
+          context.style.drop_down_list_style.inner_margin.y};
 
   // set the label based on whether the dropdown is expanded
   std::string label =
       list.is_expanded ? list.expanded_label : list.unexpanded_label;
 
-  DrawText(texture, label, text_position, list.size,
-           style.drop_down_list_style.font,
-           style.drop_down_list_style.font_size,
-           style.drop_down_list_style.text_color);
+  DrawText(context, label, text_position, list.size,
+           context.style.drop_down_list_style.font,
+           context.style.drop_down_list_style.font_size,
+           context.style.drop_down_list_style.text_color);
 }
 
 /////////////////////////////////////////////////
-void DrawDropDownItemElement(sf::RenderTexture &texture,
-                             const DropDownItemElement &item,
-                             const UIStyle &style) {
-  DrawBorderAndBackground(texture, item, style.drop_down_item_style);
+void DrawDropDownItemElement(const UIRenderContext &context,
+                             const DropDownItemElement &item) {
+  DrawBorderAndBackground(context, item, context.style.drop_down_item_style);
 }
 
 /////////////////////////////////////////////////
-void DrawDropDownButtonElement(sf::RenderTexture &texture,
-                               const DropDownButtonElement &button,
-                               const UIStyle &style) {
-  DrawBorderAndBackground(texture, button, style.drop_down_button_style);
+void DrawDropDownButtonElement(const UIRenderContext &context,
+                               const DropDownButtonElement &button) {
+  DrawBorderAndBackground(context, button,
+                          context.style.drop_down_button_style);
 
   // calculate the radius of the triangle using the size, border thickness,
   // and inner margin of the button
   float triangle_radius =
-      (button.size.x - 2 * style.drop_down_button_style.border_thickness -
-       2 * style.drop_down_button_style.inner_margin.x) /
+      (button.size.x -
+       2 * context.style.drop_down_button_style.border_thickness -
+       2 * context.style.drop_down_button_style.inner_margin.x) /
       2.0f;
 
   // create a triangle shape for the dropdown indicator
   sf::CircleShape triangle{triangle_radius, 3};
-  triangle.setFillColor(style.drop_down_button_style.triangle_color);
+  triangle.setFillColor(context.style.drop_down_button_style.triangle_color);
 
   // set the origin to the center of the triangle
   triangle.setOrigin(triangle.getLocalBounds().getCenter());
@@ -143,19 +142,19 @@ void DrawDropDownButtonElement(sf::RenderTexture &texture,
   triangle.setPosition(button_bounds.getCenter());
 
   // draw the triangle on the texture
-  texture.draw(triangle);
+  context.texture.draw(triangle);
 }
 
 /////////////////////////////////////////////////
-void DrawDropDownContainerElement(sf::RenderTexture &texture,
-                                  const DropDownContainerElement &container,
-                                  const UIStyle &style) {
+void DrawDropDownContainerElement(const UIRenderContext &context,
+                                  const DropDownContainerElement &container) {
   // Draw the border and background for the container
-  DrawBorderAndBackground(texture, container, style.drop_down_container_style);
+  DrawBorderAndBackground(context, container,
+                          context.style.drop_down_container_style);
 }
 
 /////////////////////////////////////////////////
-void DrawBorderAndBackground(sf::RenderTexture &texture,
+void DrawBorderAndBackground(const UIRenderContext &context,
                              const UIElement &element, const Style &style) {
 
   // Create the rectangle using the element's position and size
@@ -167,11 +166,11 @@ void DrawBorderAndBackground(sf::RenderTexture &texture,
   rectangle.setOutlineThickness(-style.border_thickness);
 
   // Draw the rectangle on the texture
-  texture.draw(rectangle);
+  context.texture.draw(rectangle);
 }
 
 /////////////////////////////////////////////////
-void DrawBorderAndBackground(sf::RenderTexture &texture,
+void DrawBorderAndBackground(const UIRenderContext &context,
                              const UIElement &element,
                              const ButtonStyle &style) {
   // Create the rectangle using the element's position and size
@@ -184,10 +183,10 @@ void DrawBorderAndBackground(sf::RenderTexture &texture,
   // Border thickness is negative to draw inwards
   rectangle.setOutlineThickness(-style.border_thickness);
   // Draw the rectangle on the texture
-  texture.draw(rectangle);
+  context.texture.draw(rectangle);
 }
 /////////////////////////////////////////////////
-void DrawText(sf::RenderTexture &texture, const std::string &text,
+void DrawText(const UIRenderContext &context, const std::string &text,
               const sf::Vector2f &position, const sf::Vector2f size,
               std::shared_ptr<const sf::Font> font, uint8_t font_size,
               const sf::Color &color) {
@@ -205,7 +204,7 @@ void DrawText(sf::RenderTexture &texture, const std::string &text,
   // set the position of the text to the center of the container
   text_object.setPosition(container_center);
 
-  texture.draw(text_object);
+  context.texture.draw(text_object);
 }
 
 /////////////////////////////////////////////////

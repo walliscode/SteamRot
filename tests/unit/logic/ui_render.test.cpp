@@ -9,6 +9,7 @@
 
 #include "ui_render.h"
 #include "FailInfo.h"
+#include "UIRenderContext.h"
 #include "logic_render_test_helpers.h"
 #include "paths.h"
 #include <SFML/Graphics.hpp>
@@ -84,6 +85,13 @@ TEST_CASE("drawn text can be detected", "[unit][logic_render]") {
 
   auto font = std::make_shared<sf::Font>(load_font_result.value());
 
+  // Create a minimal UIStyle with just the font
+  steamrot::UIStyle style;
+  style.button_style.font = font;
+
+  // Create render context
+  steamrot::logic::ui::render::UIRenderContext context{render_texture, style};
+
   // clear the RenderTexture
   render_texture.clear(sf::Color::Black);
   // draw some text on the RenderTexture
@@ -91,8 +99,8 @@ TEST_CASE("drawn text can be detected", "[unit][logic_render]") {
   sf::Vector2f position = {50.0f, 25.0f};
   uint8_t font_size = 24;
   sf::Color color = sf::Color::White;
-  steamrot::logic::ui::render::DrawText(render_texture, text, position,
-                                    {50.f, 50.f}, font, font_size, color);
+  steamrot::logic::ui::render::DrawText(context, text, position, {50.f, 50.f},
+                                        font, font_size, color);
   // get the image from the RenderTexture
   sf::Image image = render_texture.getTexture().copyToImage();
   // test that some pixels in the area where the text was drawn are not black
