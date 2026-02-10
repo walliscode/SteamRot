@@ -13,6 +13,7 @@
 /////////////////////////////////////////////////
 #include "Fragment.h"
 #include "MachinaForm.h"
+#include "MachinaFormScaffold.h"
 #include <SFML/Graphics/Rect.hpp>
 #include <map>
 #include <memory>
@@ -60,9 +61,9 @@ struct GrimoireMachina {
   std::map<std::string, MachinaForm> m_machina_forms;
 
   /////////////////////////////////////////////////
-  /// @brief A temporary MachinaForm that can be used for design purposes
+  /// @brief Instance of the MachinaFormScaffold
   /////////////////////////////////////////////////
-  std::unique_ptr<MachinaForm> m_active_form{nullptr};
+  std::unique_ptr<MachinaFormScaffold> m_scaffold_form;
 
   /////////////////////////////////////////////////
   /// @brief Instance of CraftingHelpers
