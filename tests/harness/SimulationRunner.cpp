@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "SimulationRunner.h"
-#include "CraftingRenderLogic.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
 #include "UIRenderLogic.h"
@@ -54,11 +53,6 @@ ExecuteLogicClass(LogicClassEnum logic_class, SceneContext &context) {
   }
   case LogicClassEnum::UIStateLogic: {
     UIStateLogic logic(context);
-    logic.RunLogic();
-    return std::monostate{};
-  }
-  case LogicClassEnum::CraftingRenderLogic: {
-    CraftingRenderLogic logic(context);
     logic.RunLogic();
     return std::monostate{};
   }

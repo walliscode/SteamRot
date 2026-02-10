@@ -7,8 +7,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "LogicFactory.h"
-#include "CraftingRenderLogic.h"
 #include "GrimoireMachinaPositioningLogic.h"
+#include "GrimoireMachinaRenderLogic.h"
 #include "TestFixture.h"
 #include "TestLogic.h"
 #include "UIActionLogic.h"
@@ -141,8 +141,8 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
   const auto &render_logics = render_it->second;
   REQUIRE(render_logics.size() == 2);
   REQUIRE(dynamic_cast<steamrot::UIRenderLogic *>(render_logics[0].get()));
-  REQUIRE(
-      dynamic_cast<steamrot::CraftingRenderLogic *>(render_logics[1].get()));
+  REQUIRE(dynamic_cast<steamrot::logic::GrimoireMachinaRenderLogic *>(
+      render_logics[1].get()));
 
   ///// CHECKING MOVEMENT LOGICS /////
   auto movement_it = logic_collection.find(steamrot::LogicGrouping::Movement);

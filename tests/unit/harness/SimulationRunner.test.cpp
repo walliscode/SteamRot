@@ -196,26 +196,6 @@ TEST_CASE("SimulationRunner::ExecuteSimulation executes UIStateLogic",
   REQUIRE(result.has_value());
 }
 
-TEST_CASE("SimulationRunner::ExecuteSimulation executes CraftingRenderLogic",
-          "[unit][SimulationRunner]") {
-  // Arrange
-  steamrot::tests::TestFixture fixture(steamrot::SceneType::CRAFTING);
-  fixture.Initialize();
-  steamrot::SceneContext &scene_context = fixture.GetSceneContext();
-
-  steamrot::SimulationData simulation_data;
-  simulation_data.steps.push_back(
-      steamrot::SimulationStep{steamrot::LogicClassEnum::CraftingRenderLogic});
-
-  steamrot::tests::SimulationRunner runner(simulation_data, scene_context);
-
-  // Act
-  auto result = runner.ExecuteSimulation();
-
-  // Assert
-  REQUIRE(result.has_value());
-}
-
 TEST_CASE("SimulationRunner::ExecuteSimulation stops on first error",
           "[unit][SimulationRunner]") {
   // Arrange
@@ -263,8 +243,6 @@ TEST_CASE("SimulationRunner::ExecuteSimulation executes all logic types in "
       steamrot::SimulationStep{steamrot::LogicClassEnum::UIStateLogic});
   simulation_data.steps.push_back(
       steamrot::SimulationStep{steamrot::LogicClassEnum::UIRenderLogic});
-  simulation_data.steps.push_back(
-      steamrot::SimulationStep{steamrot::LogicClassEnum::CraftingRenderLogic});
 
   steamrot::tests::SimulationRunner runner(simulation_data, scene_context);
 
