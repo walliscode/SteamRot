@@ -16,6 +16,7 @@
 #include "Layout.h"
 #include "SpacingAndSizing.h"
 #include "Subscriber.h"
+#include "UIElementRenderCache.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <vector>
@@ -75,6 +76,15 @@ struct UIElement {
   /// @brief Layout type of the children elements
   /////////////////////////////////////////////////
   Layout layout{Layout::Vertical};
+
+  /////////////////////////////////////////////////
+  /// @brief Render cache for storing SFML objects to avoid per-frame allocation
+  ///
+  /// This cache is mutable to allow const render functions to update it.
+  /// Marked mutable because caching is an implementation detail that doesn't
+  /// affect the logical const-ness of the UIElement.
+  /////////////////////////////////////////////////
+  mutable UIElementRenderCache render_cache;
 
   /////////////////////////////////////////////////
   /// @brief Create a deep copy of this UI element and its children
