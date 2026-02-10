@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "LogicFactory.h"
 #include "CraftingRenderLogic.h"
+#include "GrimoireMachinaPositioningLogic.h"
 #include "TestFixture.h"
 #include "TestLogic.h"
 #include "UIActionLogic.h"
@@ -142,6 +143,16 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
   REQUIRE(dynamic_cast<steamrot::UIRenderLogic *>(render_logics[0].get()));
   REQUIRE(
       dynamic_cast<steamrot::CraftingRenderLogic *>(render_logics[1].get()));
+
+  ///// CHECKING MOVEMENT LOGICS /////
+  auto movement_it = logic_collection.find(steamrot::LogicGrouping::Movement);
+  if (movement_it == logic_collection.end()) {
+    FAIL("LogicCollection does not contain Movement LogicType");
+  }
+  const auto &movement_logics = movement_it->second;
+  REQUIRE(movement_logics.size() == 1);
+  REQUIRE(dynamic_cast<steamrot::logic::GrimoireMachinaPositioningLogic *>(
+      movement_logics[0].get()));
 }
 
 TEST_CASE("LogicFactory::ConfigureLogicObject returns unexpected if LogicType "

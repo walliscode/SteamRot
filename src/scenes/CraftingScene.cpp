@@ -28,6 +28,10 @@ void CraftingScene::sAction() {
 /////////////////////////////////////////////////
 void CraftingScene::sMovement() {
   // process movement logic
+  for (auto &movement_logic :
+       m_scene_resources.logic_map[LogicGrouping::Movement]) {
+    movement_logic->RunLogic();
+  }
 }
 
 /////////////////////////////////////////////////
