@@ -20,7 +20,8 @@ enum class LogicType {
   UIAction,
   UICollision,
   CraftingRender,
-  GrimoireMachinaAction
+  GrimoireMachinaAction,
+  GrimoireMachinaPositioning
 };
 
 inline std::string EnumNameLogicType(LogicType logic_type) {
@@ -41,6 +42,8 @@ inline std::string EnumNameLogicType(LogicType logic_type) {
     return "CraftingRender";
   case LogicType::GrimoireMachinaAction:
     return "GrimoireMachinaAction";
+  case LogicType::GrimoireMachinaPositioning:
+    return "GrimoireMachinaPositioning";
   default:
     return "INVALID_LOGIC_TYPE";
   }

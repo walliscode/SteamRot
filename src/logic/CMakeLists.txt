@@ -6,6 +6,9 @@ add_library(logic
   UIStateLogic.cpp
   Logic.cpp
   CraftingRenderLogic.cpp
+
+  GrimoireMachinaPositioningLogic.cpp
+  GrimoireMachinaActionLogic.cpp
   ui_collision.cpp
   ui_action.cpp
   ui_helpers.cpp

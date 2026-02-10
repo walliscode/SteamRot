@@ -9,6 +9,8 @@
 #include "LogicFactory.h"
 #include "CraftingRenderLogic.h"
 #include "FailInfo.h"
+#include "GrimoireMachinaPositioningLogic.h"
+#include "LogicType.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
 #include "UIRenderLogic.h"
@@ -87,6 +89,7 @@ LogicCollection LogicFactory::CreateEmptyLogicCollection() {
   collection.emplace(LogicGrouping::Collision, LogicVector{});
   collection.emplace(LogicGrouping::Action, LogicVector{});
   collection.emplace(LogicGrouping::Render, LogicVector{});
+  collection.emplace(LogicGrouping::Movement, LogicVector{});
 
   return collection;
 };
@@ -112,6 +115,10 @@ LogicFactory::CreateLogicObject(LogicType logic_type) {
     break;
   case LogicType::CraftingRender:
     logic_ptr = std::make_unique<CraftingRenderLogic>(m_scene_context);
+    break;
+  case LogicType::GrimoireMachinaPositioning:
+    logic_ptr = std::make_unique<logic::GrimoireMachinaPositioningLogic>(
+        m_scene_context);
     break;
   default:
     return std::unexpected(
@@ -232,6 +239,8 @@ LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
                                                     LogicType::UIState};
   static constexpr std::array render_logic_types = {LogicType::UIRender,
                                                     LogicType::CraftingRender};
+  static constexpr std::array movement_logic_types = {
+      LogicType::GrimoireMachinaPositioning};
 
   // Add Logics to collection using the helper function
   auto collision_result = AddLogicsToCollection(
@@ -256,6 +265,14 @@ LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
                                                    render_logic_types.end()));
   if (!render_result) {
     return std::unexpected(render_result.error());
+  }
+
+  auto movement_result =
+      AddLogicsToCollection(logic_collection, LogicGrouping::Movement,
+                            std::vector<LogicType>(movement_logic_types.begin(),
+                                                   movement_logic_types.end()));
+  if (!movement_result) {
+    return std::unexpected(movement_result.error());
   }
 
   return std::monostate();
