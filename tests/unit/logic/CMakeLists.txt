@@ -8,6 +8,8 @@ ui_helpers.test.cpp
 TestLogic.cpp
 action_grimoire_machina.test.cpp
 
+positioning_grimoire_machina.test.cpp
+
 )
 
 target_include_directories(test_logic
@@ -22,6 +24,7 @@ target_link_libraries(test_logic
   context
   resources
   entity
+  matchers
   context_test_helpers
 
 

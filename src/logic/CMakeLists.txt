@@ -12,6 +12,9 @@ add_library(logic
   ui_render.cpp
 
   action_grimoire_machina.cpp
+
+
+  positioning_grimoire_machina.cpp
 )
 
 target_include_directories(logic
