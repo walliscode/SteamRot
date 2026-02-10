@@ -10,6 +10,7 @@
 #include "CraftingRenderLogic.h"
 #include "FailInfo.h"
 #include "GrimoireMachinaPositioningLogic.h"
+#include "GrimoireMachinaRenderLogic.h"
 #include "LogicType.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
@@ -113,12 +114,13 @@ LogicFactory::CreateLogicObject(LogicType logic_type) {
   case LogicType::UICollision:
     logic_ptr = std::make_unique<UICollisionLogic>(m_scene_context);
     break;
-  case LogicType::CraftingRender:
-    logic_ptr = std::make_unique<CraftingRenderLogic>(m_scene_context);
-    break;
   case LogicType::GrimoireMachinaPositioning:
     logic_ptr = std::make_unique<logic::GrimoireMachinaPositioningLogic>(
         m_scene_context);
+    break;
+  case LogicType::GrimoireMachinaRender:
+    logic_ptr =
+        std::make_unique<logic::GrimoireMachinaRenderLogic>(m_scene_context);
     break;
   default:
     return std::unexpected(
@@ -237,8 +239,8 @@ LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
   static constexpr std::array collision_logic_types = {LogicType::UICollision};
   static constexpr std::array action_logic_types = {LogicType::UIAction,
                                                     LogicType::UIState};
-  static constexpr std::array render_logic_types = {LogicType::UIRender,
-                                                    LogicType::CraftingRender};
+  static constexpr std::array render_logic_types = {
+      LogicType::UIRender, LogicType::GrimoireMachinaRender};
   static constexpr std::array movement_logic_types = {
       LogicType::GrimoireMachinaPositioning};
 
