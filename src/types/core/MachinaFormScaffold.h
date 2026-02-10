@@ -1,0 +1,155 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Declarartion of the MachinFormScaffold struct. No implementation is
+/// needed
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Preprocessor Directives
+/////////////////////////////////////////////////
+#pragma once
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include "Fragment.h"
+#include "Joint.h"
+#include "ViewDirection.h"
+#include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/Transform.hpp>
+#include <SFML/Graphics/VertexArray.hpp>
+
+namespace steamrot {
+
+/////////////////////////////////////////////////
+/// @class Socket
+/// @brief Representation of the socket stored on the Fragment or Joint
+///
+/// Allows us to store further information about the socket; used, available,
+/// etc.
+/////////////////////////////////////////////////
+struct Socket {
+  enum class State {
+    Available, // Socket exists and can connect
+    Connected, // Socket is currently connected
+    Blocked    // Socket exists but can't be used (e.g., edge of canvas)
+  };
+
+  State state{State::Available};
+
+  /////////////////////////////////////////////////
+  /// @brief For visual and collision purposes.
+  /////////////////////////////////////////////////
+  sf::CircleShape circle{5.f, 30};
+};
+
+struct JointInstance {
+  ////////////////////////////////////////////////
+  /// @brief Joint being referenced for this instance
+  /// //////////////////////////////////////////////
+  Joint &joint;
+
+  /////////////////////////////////////////////////
+  /// @brief Transformation of the Fragment on the canvas
+  /////////////////////////////////////////////////
+  sf::Transform transform{sf::Transform::Identity};
+
+  /////////////////////////////////////////////////
+  /// @brief All sockets on the Joint, with their state (available, used,
+  /// connected)
+  ///
+  /// This should match the number of sockets on the Joint, and the socket_id
+  /// should match the index of the socket on the Joint's vector of sockets.
+  /////////////////////////////////////////////////
+  std::vector<Socket> sockets;
+};
+struct FragmentInstance {
+  /////////////////////////////////////////////////
+  /// @brief Fragment being referenced for this instance
+  /////////////////////////////////////////////////
+  Fragment &fragment;
+
+  /////////////////////////////////////////////////
+  /// @brief Transformation of the Fragment on the canvas
+  /////////////////////////////////////////////////
+  sf::Transform transform{sf::Transform::Identity};
+
+  /////////////////////////////////////////////////
+  /// @brief All sockets on the Fragment, with their state (available, used,
+  /// connected)
+  ///
+  /// This should match the number of sockets on the Fragment, and the socket_id
+  /// should match the index of the socket on the Fragment's vector of sockets.
+  /////////////////////////////////////////////////
+  std::vector<Socket> sockets;
+};
+
+/////////////////////////////////////////////////
+/// @class Connection
+/// @brief representation of a connection between two sockets on two
+/// FragmentInstances or JointInstances
+///
+/////////////////////////////////////////////////
+
+struct Connection {
+  enum class PartType { Fragment, Joint };
+
+  struct Endpoint {
+    PartType part_type;  // Is this a fragment or joint?
+    size_t part_index;   // Index into fragments[] or joints[]
+    size_t socket_index; // Index into that part's sockets[]
+  };
+
+  Endpoint socket_a;
+  Endpoint socket_b;
+};
+;
+/////////////////////////////////////////////////
+/// @class MachinaFormScaffold
+/// @brief Contains all data necessary to create a MachinaForm.
+///
+/// This is designed to be an "unbaked" version of the MachinaForm, this could
+/// be heavy on data but only one will be run at a time. When commited to a
+/// MachinaForm, certain data will be "baked" away into more efficient formats.
+/// For example, the Fragment data will be baked into a single vertex array for
+/// each view direction and progression of movement.
+///
+/////////////////////////////////////////////////
+struct MachinaFormScaffold {
+
+  /////////////////////////////////////////////////
+  /// @brief Name of the MachinaFormScaffold, will be transferred to the
+  /// MachinaForm when commited
+  /////////////////////////////////////////////////
+  std::string machina_form_name{""};
+
+  /////////////////////////////////////////////////
+  /// @brief Final "baked" vertex arrays for each view direction and 8
+  /// progressions for movement
+  /////////////////////////////////////////////////
+  Views baked_views;
+
+  /////////////////////////////////////////////////
+  /// @brief The "growth" point or origin of the MachinaFormScaffold
+  ///
+  /// For now, this will be passed to the joints[0] as the scaffold will always
+  /// be initiaed with a Joint.
+  /////////////////////////////////////////////////
+  sf::Vector2f origin{0.f, 0.f};
+
+  /////////////////////////////////////////////////
+  /// @brief All JointInstances on the MachinaFormScaffold
+  /////////////////////////////////////////////////
+  std::vector<JointInstance> joints;
+
+  /////////////////////////////////////////////////
+  /// @brief All FragmentInstances on the MachinaFormScaffold
+  /////////////////////////////////////////////////
+  std::vector<FragmentInstance> fragments;
+
+  /////////////////////////////////////////////////
+  /// @brief All connections between sockets on the MachinaFormScaffold
+  /////////////////////////////////////////////////
+  std::vector<Connection> connections;
+};
+} // namespace steamrot

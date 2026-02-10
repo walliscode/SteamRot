@@ -5,7 +5,7 @@ add_library(logic
   UIActionLogic.cpp
   UIStateLogic.cpp
   Logic.cpp
-  CraftingRenderLogic.cpp
+
 
   GrimoireMachinaPositioningLogic.cpp
   GrimoireMachinaActionLogic.cpp
