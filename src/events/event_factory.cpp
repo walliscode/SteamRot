@@ -250,6 +250,25 @@ CreateEventData(const EventDataData data_type, const void *data) {
     return ui_name_result.value();
   }
 
+  case EventDataData::EventDataData_ToggleNameFbs: {
+    // Validate data pointer before dereferencing
+    if (!data) {
+      return std::unexpected(
+          FailInfo{FailMode::NullPointer,
+                   "CreateEventData: ToggleNameFbs pointer is null"});
+    }
+
+    // cast data to ToggleNameFbs
+    auto toggle_name_data = static_cast<const ToggleNameFbs *>(data);
+
+    // convert to ToggleName
+    auto toggle_name_result = CreateToggleName(*toggle_name_data);
+    if (!toggle_name_result.has_value())
+      return std::unexpected(toggle_name_result.error());
+
+    return toggle_name_result.value();
+  }
+
   case EventDataData::EventDataData_NONE: {
     return std::monostate();
   }
