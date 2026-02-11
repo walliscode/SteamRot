@@ -50,6 +50,9 @@ struct EventPacketData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::UserInterfaceNameData *event_data_data_as_UserInterfaceNameData() const {
     return event_data_data_type() == steamrot::EventDataData_UserInterfaceNameData ? static_cast<const steamrot::UserInterfaceNameData *>(event_data_data()) : nullptr;
   }
+  const steamrot::ToggleNameFbs *event_data_data_as_ToggleNameFbs() const {
+    return event_data_data_type() == steamrot::EventDataData_ToggleNameFbs ? static_cast<const steamrot::ToggleNameFbs *>(event_data_data()) : nullptr;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_EVENT_LIFETIME, 4) &&
@@ -71,6 +74,10 @@ template<> inline const steamrot::SceneChangePacketData *EventPacketData::event_
 
 template<> inline const steamrot::UserInterfaceNameData *EventPacketData::event_data_data_as<steamrot::UserInterfaceNameData>() const {
   return event_data_data_as_UserInterfaceNameData();
+}
+
+template<> inline const steamrot::ToggleNameFbs *EventPacketData::event_data_data_as<steamrot::ToggleNameFbs>() const {
+  return event_data_data_as_ToggleNameFbs();
 }
 
 struct EventPacketDataBuilder {

@@ -30,6 +30,8 @@ ConvertEventTypeFbsToEventType(EventTypeFbs event_type_fbs) {
     return EventType::QUIT_GAME;
   case EventTypeFbs_EVENT_TOGGLE_DROPDOWN:
     return EventType::TOGGLE_DROPDOWN;
+  case EventTypeFbs_EVENT_TOGGLE_NAME:
+    return EventType::LOGIC_TOGGLE;
   default:
     return std::unexpected(
         FailInfo{FailMode::EnumValueNotHandled,

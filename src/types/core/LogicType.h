@@ -15,6 +15,7 @@ namespace steamrot {
 enum class LogicType {
   None,
   Test,
+  Dummy,
   UIRender,
   UIState,
   UIAction,

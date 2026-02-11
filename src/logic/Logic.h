@@ -79,6 +79,6 @@ public:
   ///
   /// @return The LogicType of this Logic instance.
   /////////////////////////////////////////////////
-  virtual LogicType GetLogicType() const { return LogicType::None; }
+  virtual LogicType GetLogicType() const = 0;
 };
 } // namespace steamrot

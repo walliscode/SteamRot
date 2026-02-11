@@ -93,6 +93,14 @@
                           "event_data_data": {
                             "id": "new_construct_menu_on"
                           }
+                        },
+                        {
+                          "event_lifetime": 1,
+                          "event_type": "EVENT_TOGGLE_NAME",
+                          "event_data_data_type": "ToggleNameFbs",
+                          "event_data_data": {
+                            "name": "initiate_machina_form_scaffold"
+                          }
                         }
                       ]
                     },
@@ -117,8 +125,8 @@
                 "y": 0
               },
               "size": {
-                "x": 300,
-                "y": 150
+                "x": 200,
+                "y": 600
               },
               "children_active": true,
               "children": [

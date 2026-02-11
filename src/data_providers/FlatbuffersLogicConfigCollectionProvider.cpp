@@ -47,6 +47,16 @@ FlatbuffersLogicConfigCollectionProvider::ConfigureLogicConfigCollection(
     }
     logic_config_collection[steamrot::LogicType::Test] = logic_config;
   }
+  if (collection->grimoire_machina_action_logic()) {
+    LogicConfig logic_config;
+    auto configure_result = data::configure::ConfigureLogicConfig(
+        logic_config, collection->grimoire_machina_action_logic());
+    if (!configure_result) {
+      return std::unexpected(configure_result.error());
+    }
+    logic_config_collection[steamrot::LogicType::GrimoireMachinaAction] =
+        logic_config;
+  }
 
   return std::monostate{};
 }

@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "GrimoireMachinaActionLogic.h"
 #include "EventType.h"
+#include "action_grimoire_machina.h"
 
 namespace steamrot::logic {
 /////////////////////////////////////////////////
@@ -31,7 +32,6 @@ void GrimoireMachinaActionLogic::ProcessLogic() {
     // active, these will be populated
     EventType event_type = EventType::NONE;
     EventData event_data = std::monostate{};
-
     // check if the subscriber is active.
     if (subscriber->m_active) {
 
@@ -43,6 +43,19 @@ void GrimoireMachinaActionLogic::ProcessLogic() {
 
     } else {
       continue;
+    }
+
+    // add logic for processing the event type and data here.
+    if (event_type == EventType::LOGIC_TOGGLE &&
+        std::holds_alternative<ToggleName>(event_data)) {
+
+      ToggleName toggle_name = std::get<ToggleName>(event_data);
+
+      if (toggle_name == "initiate_machina_form_scaffold") {
+        auto initialise_result =
+            actions::grimoire_machina::InitialiseActiveMachinaFormScaffold(
+                grimoire_machina);
+      }
     }
   }
 }

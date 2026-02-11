@@ -35,5 +35,7 @@ public:
   /// @param scene_context Takes a SceneContext struct
   /////////////////////////////////////////////////
   UIRenderLogic(const SceneContext scene_context);
+
+  LogicType GetLogicType() const override { return LogicType::UIRender; }
 };
 } // namespace steamrot

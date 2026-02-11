@@ -45,6 +45,13 @@ CreateSceneChangePacket(const SceneChangePacketData &data);
 std::expected<UserInterfaceName, FailInfo>
 CreateUserInterfaceName(const UserInterfaceNameData &data);
 
+//////////////////////////////////////////////////
+/// @brief Convert the flatbuffers ToggleNameFbs to a ToggleName
+///
+/// @param data Data to convert
+/// @return ToggleName on success, FailInfo on error
+std::expected<ToggleName, FailInfo> CreateToggleName(const ToggleNameFbs &data);
+
 /////////////////////////////////////////////////
 /// @brief Given the flatbuffers EventData union type and data pointer, create
 /// an EventData variant

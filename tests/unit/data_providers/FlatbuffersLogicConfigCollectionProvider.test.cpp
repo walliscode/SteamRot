@@ -26,4 +26,5 @@ TEST_CASE(
 
   REQUIRE(!collection.empty());
   REQUIRE(collection.contains(steamrot::LogicType::Test));
+  REQUIRE(collection.contains(steamrot::LogicType::GrimoireMachinaAction));
 }

@@ -47,6 +47,9 @@ struct SubscriberFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::UserInterfaceNameData *trigger_data_as_UserInterfaceNameData() const {
     return trigger_data_type() == steamrot::EventDataData_UserInterfaceNameData ? static_cast<const steamrot::UserInterfaceNameData *>(trigger_data()) : nullptr;
   }
+  const steamrot::ToggleNameFbs *trigger_data_as_ToggleNameFbs() const {
+    return trigger_data_type() == steamrot::EventDataData_ToggleNameFbs ? static_cast<const steamrot::ToggleNameFbs *>(trigger_data()) : nullptr;
+  }
   bool active() const {
     return GetField<uint8_t>(VT_ACTIVE, 0) != 0;
   }
@@ -71,6 +74,10 @@ template<> inline const steamrot::SceneChangePacketData *SubscriberFbs::trigger_
 
 template<> inline const steamrot::UserInterfaceNameData *SubscriberFbs::trigger_data_as<steamrot::UserInterfaceNameData>() const {
   return trigger_data_as_UserInterfaceNameData();
+}
+
+template<> inline const steamrot::ToggleNameFbs *SubscriberFbs::trigger_data_as<steamrot::ToggleNameFbs>() const {
+  return trigger_data_as_ToggleNameFbs();
 }
 
 struct SubscriberFbsBuilder {

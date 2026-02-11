@@ -12,6 +12,7 @@
 #include "scene_type_conversion.h"
 #include "uuid.h"
 #include <cstddef>
+#include <expected>
 #include <unordered_map>
 #include <variant>
 
@@ -172,6 +173,19 @@ CreateUserInterfaceName(const UserInterfaceNameData &data) {
 }
 
 /////////////////////////////////////////////////
+std::expected<ToggleName, FailInfo>
+CreateToggleName(const ToggleNameFbs &data) {
+  // check if name exists
+  if (!data.name()) {
+    return std::unexpected(
+        FailInfo{FailMode::FlatbuffersDataNotFound,
+                 "CreateToggleName: ToggleNameFbs missing id."});
+  }
+  ToggleName toggle_name{data.name()->str()};
+  return toggle_name;
+}
+
+/////////////////////////////////////////////////
 std::expected<EventData, FailInfo>
 CreateEventData(const EventDataData data_type, const void *data) {
 
@@ -234,6 +248,25 @@ CreateEventData(const EventDataData data_type, const void *data) {
       return std::unexpected(ui_name_result.error());
 
     return ui_name_result.value();
+  }
+
+  case EventDataData::EventDataData_ToggleNameFbs: {
+    // Validate data pointer before dereferencing
+    if (!data) {
+      return std::unexpected(
+          FailInfo{FailMode::NullPointer,
+                   "CreateEventData: ToggleNameFbs pointer is null"});
+    }
+
+    // cast data to ToggleNameFbs
+    auto toggle_name_data = static_cast<const ToggleNameFbs *>(data);
+
+    // convert to ToggleName
+    auto toggle_name_result = CreateToggleName(*toggle_name_data);
+    if (!toggle_name_result.has_value())
+      return std::unexpected(toggle_name_result.error());
+
+    return toggle_name_result.value();
   }
 
   case EventDataData::EventDataData_NONE: {
