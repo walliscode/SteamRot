@@ -167,90 +167,6 @@
         }
       },
       {
-        "c_user_interface": {
-          "ui_name": "fragment_selection_menu",
-          "is_visible": false,
-          "root_ui_element": {
-            "base_data": {
-              "position": {
-                "x": 600,
-                "y": 0
-              },
-              "size": {
-                "x": 150,
-                "y": 50
-              },
-              "children_active": true,
-              "children": [
-                {
-                  "element_type": "DropDownContainerData",
-                  "element": {
-                    "base_data": {
-                      "position": {
-                        "x": 0,
-                        "y": 0
-                      },
-                      "size": {
-                        "x": 0,
-                        "y": 0
-                      },
-                      "children_active": true,
-                      "children": [
-                        {
-                          "element_type": "DropDownListData",
-                          "element": {
-                            "base_data": {
-                              "position": {
-                                "x": 0,
-                                "y": 0
-                              },
-                              "size": {
-                                "x": 0,
-                                "y": 0
-                              },
-                              "children_active": false,
-                              "children": [],
-                              "layout": "DropDown",
-                              "spacing_strategy": "DropDownList"
-                            },
-                            "label": "Fragments...",
-                            "expanded_label": "...",
-                            "data_populate_function": "PopulateWithFragmentData"
-                          }
-                        },
-                        {
-                          "element_type": "DropDownButtonData",
-                          "element": {
-                            "base_data": {
-                              "position": {
-                                "x": 0,
-                                "y": 0
-                              },
-                              "size": {
-                                "x": 0,
-                                "y": 0
-                              },
-                              "children_active": false,
-                              "children": [],
-                              "layout": "Horizontal",
-                              "spacing_strategy": "None"
-                            }
-                          }
-                        }
-                      ],
-                      "layout": "Horizontal",
-                      "spacing_strategy": "Ratioed"
-                    }
-                  }
-                }
-              ],
-              "layout": "Vertical",
-              "spacing_strategy": "None"
-            }
-          }
-        }
-      },
-      {
         "c_ui_state": {
           "ui_states": [
             {
@@ -300,4 +216,3 @@
   },
   "asset_config": {}
 }
-

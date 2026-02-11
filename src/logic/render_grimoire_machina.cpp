@@ -8,6 +8,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "render_grimoire_machina.h"
+#include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 
 namespace steamrot::logic::render::grimoire_machina {
@@ -34,5 +35,29 @@ void DrawCraftingCanvasBorder(sf::RenderTexture &texture,
   border.setOutlineThickness(border_thickness);
 
   texture.draw(border);
+}
+
+/////////////////////////////////////////////////
+void DrawNoMachinaFormBox(sf::RenderTexture &texture,
+                          sf::FloatRect &crafting_canvas) {
+
+  // create a rectangle shape for the box
+  sf::RectangleShape box;
+  // set the size of the box to a third of the crafting canvas size
+  box.setSize({crafting_canvas.size.x / 3.f, crafting_canvas.size.y / 3.f});
+  // center the box in the crafting canvas
+  box.setPosition({crafting_canvas.position.x + crafting_canvas.size.x / 2.f -
+                       box.getSize().x / 2.f,
+                   crafting_canvas.position.y + crafting_canvas.size.y / 2.f -
+                       box.getSize().y / 2.f});
+  // set the fill color of the box to be a transparent
+  box.setFillColor(sf::Color::Transparent);
+  // set the outline color of the box to be red
+  box.setOutlineColor(sf::Color::Red);
+  // set the outline thickness of the box
+  box.setOutlineThickness(3.f);
+
+  // draw the box on the texture
+  texture.draw(box);
 }
 } // namespace steamrot::logic::render::grimoire_machina

@@ -59,8 +59,7 @@
           }
         ]
       },
-      "asset_config": {},
-      "logic_collection_data": {}
+      "asset_config": {}
     },
     {
       "scene_info": {
@@ -124,8 +123,7 @@
           }
         ]
       },
-      "asset_config": {},
-      "logic_collection_data": {}
+      "asset_config": {}
     },
     {
       "scene_info": {
@@ -157,8 +155,7 @@
           }
         ]
       },
-      "asset_config": {},
-      "logic_collection_data": {}
+      "asset_config": {}
     }
   ]
 }
