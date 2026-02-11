@@ -1,6 +1,7 @@
 # Adding Logic Classes
 
-This guide provides a comprehensive workflow for adding new Logic-derived classes to the SteamRot game engine.
+This guide provides a comprehensive workflow for adding new Logic-derived
+classes to the SteamRot game engine.
 
 ## Table of Contents
 
@@ -25,26 +26,30 @@ This guide provides a comprehensive workflow for adding new Logic-derived classe
 ## Overview
 
 Logic classes are the heart of the game's behavior system. They:
+
 - Inherit from the abstract `Logic` base class
 - Process entities based on their component composition (archetypes)
 - Are organized by `LogicGrouping` (Collision, Render, Action, Movement)
 - Execute in a specific order within their grouping
 - Are created and configured by the `LogicFactory` for each scene
 
-**Key Principle**: Components contain pure data, Logic classes contain all behavior.
+**Key Principle**: Components contain pure data, Logic classes contain all
+behavior.
 
 ---
 
 ## When to Create a Logic Class
 
 Create a new Logic class when you need to:
+
 - Add a new game system (e.g., AI, physics, animation)
 - Implement scene-specific behavior
 - Process entities with specific component combinations
 - Handle input or events in a structured way
 - Perform rendering operations
 
-**Do NOT** add logic to Component classes - they must remain pure data containers.
+**Do NOT** add logic to Component classes - they must remain pure data
+containers.
 
 ---
 
@@ -62,7 +67,9 @@ Logic classes are organized into four groupings that execute in this order:
 ### Execution Order
 
 Within each scene:
-1. Logic classes execute in the order defined in `LogicFactory::Configure{Scene}Logics()`
+
+1. Logic classes execute in the order defined in
+   `LogicFactory::Configure{Scene}Logics()`
 2. Each Logic's `RunLogic()` → `ProcessLogic()` is called once per frame
 3. Order matters - later Logic classes see changes from earlier ones
 
@@ -71,8 +78,10 @@ Within each scene:
 - **`Logic`** - Abstract base class all Logic inherits from
 - **`LogicType`** - Enum identifying each Logic class type
 - **`LogicGrouping`** - Category enum (Collision, Render, Action, Movement)
-- **`LogicFactory`** - Factory that creates and configures Logic instances per scene
-- **`SceneContext`** - Struct containing all dependencies Logic needs (entities, assets, events, etc.)
+- **`LogicFactory`** - Factory that creates and configures Logic instances per
+  scene
+- **`SceneContext`** - Struct containing all dependencies Logic needs (entities,
+  assets, events, etc.)
 
 ---
 
@@ -101,7 +110,7 @@ Within each scene:
 #include "Logic.h"
 #include "LogicType.h"
 
-namespace steamrot {
+namespace steamrot::logic {
 
 class YourLogicName : public Logic {
 
@@ -132,15 +141,6 @@ public:
 } // namespace steamrot
 ```
 
-**Note**: If your Logic is scene-specific or belongs to a subsystem, you can use a nested namespace:
-```cpp
-namespace steamrot::logic {
-  class GrimoireMachinaRenderLogic : public Logic {
-    // ...
-  };
-}
-```
-
 #### 1.2 Create Implementation File
 
 **Location**: `src/logic/YourLogicName.cpp`
@@ -160,7 +160,7 @@ namespace steamrot::logic {
 #include "CYourComponent.h"
 // Add other necessary includes
 
-namespace steamrot {
+namespace steamrot::logic {
 
 /////////////////////////////////////////////////
 YourLogicName::YourLogicName(const SceneContext scene_context)
@@ -176,7 +176,7 @@ void YourLogicName::ProcessLogic() {
 
   // Iterate through entities with the required components
   for (size_t entity_id : entity_indexes) {
-    
+
     // Get component references
     CYourComponent &component = entity::memory::GetComponent<CYourComponent>(
         entity_id, m_scene_context.scene_entities);
@@ -258,7 +258,8 @@ inline std::string EnumNameLogicType(LogicType logic_type) {
 
 ### Step 3: Register with LogicFactory
 
-The LogicFactory creates Logic instances for each scene. You need to update three methods.
+The LogicFactory creates Logic instances for each scene. You need to update
+three methods.
 
 **Location**: `src/logic/LogicFactory.cpp` and `LogicFactory.h`
 
@@ -277,7 +278,7 @@ Add a case in the switch statement:
 ```cpp
 std::expected<std::unique_ptr<Logic>, FailInfo>
 LogicFactory::CreateLogicObject(LogicType logic_type) {
-  
+
   std::unique_ptr<Logic> logic_ptr;
   switch (logic_type) {
   // ... existing cases ...
@@ -295,7 +296,8 @@ LogicFactory::CreateLogicObject(LogicType logic_type) {
 
 #### 3.3 Add to Scene Configuration Method
 
-Choose the appropriate scene method (or create a new one) and add your Logic to the correct grouping:
+Choose the appropriate scene method (or create a new one) and add your Logic to
+the correct grouping:
 
 **Example for CRAFTING scene:**
 
@@ -307,19 +309,19 @@ LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
 
   // Define the Logic types for each grouping
   static constexpr std::array collision_logic_types = {LogicType::UICollision};
-  
+
   static constexpr std::array action_logic_types = {
       LogicType::UIAction,
       LogicType::UIState,
       LogicType::GrimoireMachinaAction,
       LogicType::YourLogicName  // Add to appropriate grouping
   };
-  
+
   static constexpr std::array render_logic_types = {
       LogicType::UIRender,
       LogicType::GrimoireMachinaRender
   };
-  
+
   static constexpr std::array movement_logic_types = {
       LogicType::GrimoireMachinaPositioning
   };
@@ -328,7 +330,8 @@ LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
 }
 ```
 
-**Important**: The order in these arrays determines execution order! Place your Logic where it makes sense in the sequence.
+**Important**: The order in these arrays determines execution order! Place your
+Logic where it makes sense in the sequence.
 
 ---
 
@@ -354,7 +357,7 @@ LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
 TEST_CASE("YourLogicName constructor", "[unit][YourLogicName]") {
   // Create test fixture with mock dependencies
   steamrot::tests::TestFixture test_fixture;
-  
+
   // Construct Logic
   REQUIRE_NOTHROW(
       steamrot::YourLogicName(test_fixture.GetSceneContext())
@@ -366,15 +369,15 @@ TEST_CASE("YourLogicName::ProcessLogic performs expected behavior",
   // Setup
   steamrot::tests::TestFixture test_fixture;
   auto scene_context = test_fixture.GetSceneContext();
-  
+
   // TODO: Set up test entities and components in the fixture
-  
+
   // Create Logic instance
   steamrot::YourLogicName logic(scene_context);
-  
+
   // Execute
   REQUIRE_NOTHROW(logic.RunLogic());
-  
+
   // Assert expected state changes
   // REQUIRE(...);
 }
@@ -383,7 +386,7 @@ TEST_CASE("YourLogicName::GetLogicType returns correct type",
           "[unit][YourLogicName]") {
   steamrot::tests::TestFixture test_fixture;
   steamrot::YourLogicName logic(test_fixture.GetSceneContext());
-  
+
   REQUIRE(logic.GetLogicType() == steamrot::LogicType::YourLogicName);
 }
 ```
@@ -405,7 +408,8 @@ add_executable(test_logic
 
 ### Step 5: Update LogicFactory Tests
 
-The LogicFactory has integration tests that verify the correct Logic instances are created for each scene.
+The LogicFactory has integration tests that verify the correct Logic instances
+are created for each scene.
 
 **Location**: `tests/unit/logic/LogicFactory.test.cpp`
 
@@ -423,20 +427,20 @@ Find or create the test case for your scene and update the assertions:
 TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
           "for SceneType_CRAFTING",
           "[unit][LogicFactory]") {
-  
+
   steamrot::tests::TestFixture test_fixture;
   steamrot::LogicFactory logic_factory(test_fixture.GetSceneContext());
-  
+
   auto result = logic_factory.ProvideLogicCollection(
       steamrot::SceneType::CRAFTING);
-  
+
   REQUIRE(result.has_value());
   const auto &logic_collection = result.value();
-  
+
   // Check Action grouping (example - adjust based on your grouping)
   auto action_it = logic_collection.find(steamrot::LogicGrouping::Action);
   REQUIRE(action_it != logic_collection.end());
-  
+
   const auto &action_logics = action_it->second;
   REQUIRE(action_logics.size() == 4);  // Update count
   REQUIRE(dynamic_cast<steamrot::UIActionLogic *>(action_logics[0].get()));
@@ -444,21 +448,24 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
   REQUIRE(dynamic_cast<steamrot::logic::GrimoireMachinaActionLogic *>(
       action_logics[2].get()));
   REQUIRE(dynamic_cast<steamrot::YourLogicName *>(action_logics[3].get()));
-  
+
   // ... check other groupings ...
 }
 ```
 
-**Important**: 
+**Important**:
+
 - Update the size check to match the new number of Logic instances
-- Verify the order matches what you defined in `LogicFactory::Configure{Scene}Logics()`
+- Verify the order matches what you defined in
+  `LogicFactory::Configure{Scene}Logics()`
 - Use `dynamic_cast` to verify the correct type at each position
 
 ---
 
 ### Step 6: (Optional) Add FlatBuffers Configuration
 
-If your Logic needs runtime configuration (e.g., event subscriptions), add FlatBuffers support.
+If your Logic needs runtime configuration (e.g., event subscriptions), add
+FlatBuffers support.
 
 #### 6.1 Update FlatBuffers Schema
 
@@ -502,11 +509,11 @@ Add code to parse your Logic's configuration:
 ```cpp
 std::expected<LogicConfigCollection, FailInfo>
 FlatbuffersLogicConfigCollectionProvider::CreateLogicConfigCollection() {
-  
+
   LogicConfigCollection collection;
-  
+
   // ... existing logic configs ...
-  
+
   // Your Logic config
   if (root_table->your_logic_name()) {
     LogicConfig config;
@@ -518,12 +525,13 @@ FlatbuffersLogicConfigCollectionProvider::CreateLogicConfigCollection() {
     config.m_subscribers = subscribers_result.value();
     collection[LogicType::YourLogicName] = config;
   }
-  
+
   return collection;
 }
 ```
 
-**Note**: Configuration is optional. Many Logic classes don't need it and work fine without any FlatBuffers setup.
+**Note**: Configuration is optional. Many Logic classes don't need it and work
+fine without any FlatBuffers setup.
 
 ---
 
@@ -555,6 +563,7 @@ ctest --preset Debug -R LogicFactory
 #### 7.3 Verify Integration
 
 Run the game and verify your Logic executes in the appropriate scene:
+
 - Check console output for any errors
 - Verify behavior matches expectations
 - Test interaction with other Logic classes
@@ -563,7 +572,8 @@ Run the game and verify your Logic executes in the appropriate scene:
 
 ## Complete Example
 
-Here's a complete example of a simple Logic class that changes UI colors based on time.
+Here's a complete example of a simple Logic class that changes UI colors based
+on time.
 
 ### Header (`src/logic/TimedColorLogic.h`)
 
@@ -588,7 +598,7 @@ private:
 
 public:
   TimedColorLogic(const SceneContext scene_context);
-  
+
   LogicType GetLogicType() const override {
     return LogicType::TimedColor;
   }
@@ -619,23 +629,23 @@ TimedColorLogic::TimedColorLogic(const SceneContext scene_context)
 
 /////////////////////////////////////////////////
 void TimedColorLogic::ProcessLogic() {
-  
+
   // Update elapsed time
   m_elapsed_time += m_scene_context.delta_time;
-  
+
   // Calculate color intensity (oscillates between 128 and 255)
   float intensity = 128.0f + 127.0f * std::sin(m_elapsed_time);
-  
+
   // Get all entities with CUserInterface component
   std::set<size_t> entity_indexes =
       archetypes::GenerateEntityIndexesFromComponents<CUserInterface>(
           m_scene_context.archetypes, true);
-  
+
   // Update each UI element's color
   for (size_t entity_id : entity_indexes) {
     CUserInterface &ui = entity::memory::GetComponent<CUserInterface>(
         entity_id, m_scene_context.scene_entities);
-    
+
     if (ui.m_visible && ui.m_root_element) {
       // Update color (example - adjust based on your UI element structure)
       ui.m_root_element->m_fill_color.r = static_cast<sf::Uint8>(intensity);
@@ -681,13 +691,13 @@ void YourLogic::ProcessLogic() {
   std::set<size_t> entity_indexes =
       archetypes::GenerateEntityIndexesFromComponents<CComponent1, CComponent2>(
           m_scene_context.archetypes, true);
-  
+
   for (size_t entity_id : entity_indexes) {
     CComponent1 &comp1 = entity::memory::GetComponent<CComponent1>(
         entity_id, m_scene_context.scene_entities);
     CComponent2 &comp2 = entity::memory::GetComponent<CComponent2>(
         entity_id, m_scene_context.scene_entities);
-    
+
     // Process entity
   }
 }
@@ -702,11 +712,11 @@ void RenderLogic::ProcessLogic() {
   std::set<size_t> entity_indexes =
       archetypes::GenerateEntityIndexesFromComponents<CRenderable>(
           m_scene_context.archetypes, true);
-  
+
   for (size_t entity_id : entity_indexes) {
     CRenderable &renderable = entity::memory::GetComponent<CRenderable>(
         entity_id, m_scene_context.scene_entities);
-    
+
     // Draw to scene texture
     m_scene_context.scene_texture.draw(renderable.m_sprite);
   }
@@ -725,7 +735,7 @@ void ActionLogic::ProcessLogic() {
     EventPacket event;
     event.event_type = EventType::YOUR_EVENT;
     event.entity_id = entity_id;
-    
+
     // Add to event handler
     m_scene_context.event_handler.AddEvent(event);
   }
@@ -743,7 +753,7 @@ void YourLogic::ProcessLogic() {
     // Handle error
     return;
   }
-  
+
   Asset &asset = *asset_result.value();
   // Use asset
 }
@@ -755,23 +765,27 @@ void YourLogic::ProcessLogic() {
 
 ### Design
 
-1. **Single Responsibility**: Each Logic class should handle one specific concern
+1. **Single Responsibility**: Each Logic class should handle one specific
+   concern
 2. **Archetype Filtering**: Only process entities with required components
 3. **Early Returns**: Skip entities that don't meet processing criteria
-4. **Immutable Access**: Don't modify entities outside your archetype's components
+4. **Immutable Access**: Don't modify entities outside your archetype's
+   components
 
 ### Code Style
 
 1. **Constructor**: Always call base `Logic(scene_context)` constructor
 2. **GetLogicType**: Override and return the correct `LogicType` enum value
 3. **ProcessLogic**: Keep this private, only `RunLogic()` should be public
-4. **Member Variables**: Prefix with `m_`, store state that persists between frames
+4. **Member Variables**: Prefix with `m_`, store state that persists between
+   frames
 5. **Documentation**: Use Doxygen-style comments with visual dividers
 
 ### Performance
 
 1. **Minimize Archetype Queries**: Query once, iterate once per frame
-2. **Cache Frequently Used Data**: Store in member variables if accessed every frame
+2. **Cache Frequently Used Data**: Store in member variables if accessed every
+   frame
 3. **Avoid Heap Allocations**: Prefer stack allocation in hot paths
 4. **Early Exit**: Skip invisible/inactive entities early
 
@@ -785,9 +799,11 @@ void YourLogic::ProcessLogic() {
 ### Error Handling
 
 1. **Check Optional Results**: Always check `std::expected` return values
-2. **Graceful Degradation**: Continue processing other entities on single-entity errors
+2. **Graceful Degradation**: Continue processing other entities on single-entity
+   errors
 3. **Log Warnings**: Use appropriate logging for non-critical issues
-4. **Let Exceptions Propagate**: Don't catch exceptions in Logic - let them bubble up
+4. **Let Exceptions Propagate**: Don't catch exceptions in Logic - let them
+   bubble up
 
 ---
 
@@ -798,9 +814,11 @@ void YourLogic::ProcessLogic() {
 **Problem**: Your Logic's `ProcessLogic()` never runs.
 
 **Solutions**:
+
 - ✅ Verify Logic is added to `LogicFactory::CreateLogicObject()`
 - ✅ Verify Logic is added to scene's configuration method
-- ✅ Check that entities exist with required components (archetype query returns results)
+- ✅ Check that entities exist with required components (archetype query returns
+  results)
 - ✅ Verify scene type is correct when calling `ProvideLogicCollection()`
 
 ### Wrong Execution Order
@@ -808,15 +826,20 @@ void YourLogic::ProcessLogic() {
 **Problem**: Your Logic runs at the wrong time relative to other Logic.
 
 **Solutions**:
-- ✅ Check order in `Configure{Scene}Logics()` array - that's the execution order
-- ✅ Verify you're in the correct `LogicGrouping` (Collision, Action, Movement, Render)
+
+- ✅ Check order in `Configure{Scene}Logics()` array - that's the execution
+  order
+- ✅ Verify you're in the correct `LogicGrouping` (Collision, Action, Movement,
+  Render)
 - ✅ Remember groupings execute in order: Collision → Action → Movement → Render
 
 ### Test Failures: "dynamic_cast returned null"
 
-**Problem**: `LogicFactory.test.cpp` fails with null pointer from `dynamic_cast`.
+**Problem**: `LogicFactory.test.cpp` fails with null pointer from
+`dynamic_cast`.
 
 **Solutions**:
+
 - ✅ Verify Logic is included in `LogicFactory.cpp`
 - ✅ Check you're casting to the correct type (including namespace)
 - ✅ Verify the index in test matches the order in `Configure{Scene}Logics()`
@@ -827,6 +850,7 @@ void YourLogic::ProcessLogic() {
 **Problem**: Linker errors about undefined references to your Logic class.
 
 **Solutions**:
+
 - ✅ Add `.cpp` file to `src/logic/CMakeLists.txt`
 - ✅ Rebuild from scratch: `cmake --build --preset Debug --clean-first`
 - ✅ Verify constructor and `ProcessLogic()` are implemented in `.cpp` file
@@ -836,9 +860,11 @@ void YourLogic::ProcessLogic() {
 **Problem**: `GenerateEntityIndexesFromComponents` returns empty set.
 
 **Solutions**:
+
 - ✅ Verify entities exist in the scene with the components you're querying
 - ✅ Check components are marked active on entities
-- ✅ Ensure archetypes are updated (happens automatically, but check if manually managing)
+- ✅ Ensure archetypes are updated (happens automatically, but check if manually
+  managing)
 - ✅ Add debug logging to verify entity/component state
 
 ### FlatBuffers Configuration Not Loading
@@ -846,6 +872,7 @@ void YourLogic::ProcessLogic() {
 **Problem**: Logic config from JSON isn't being applied.
 
 **Solutions**:
+
 - ✅ Verify schema is updated in `logic_config.fbs`
 - ✅ Rebuild to regenerate FlatBuffers headers
 - ✅ Check JSON file path matches scene directory structure
@@ -884,7 +911,7 @@ When adding a new Logic class, complete these steps:
 - **Logic Base Class**: `src/logic/Logic.h` and `Logic.cpp`
 - **LogicFactory**: `src/logic/LogicFactory.h` and `LogicFactory.cpp`
 - **SceneContext**: `src/context/SceneContext.h`
-- **Example Logic Classes**: 
+- **Example Logic Classes**:
   - `src/logic/UIActionLogic.cpp` - Action Logic example
   - `src/logic/UIRenderLogic.cpp` - Render Logic example
   - `src/logic/GrimoireMachinaPositioningLogic.cpp` - Movement Logic example
@@ -894,4 +921,5 @@ When adding a new Logic class, complete these steps:
 
 ---
 
-**Questions or Issues?** Refer to existing Logic classes for examples or consult the architecture documentation.
+**Questions or Issues?** Refer to existing Logic classes for examples or consult
+the architecture documentation.
