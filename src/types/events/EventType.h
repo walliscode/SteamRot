@@ -44,6 +44,8 @@ inline std::string EnumNameEventType(EventType type) {
     return "QUIT_GAME";
   case EventType::TOGGLE_DROPDOWN:
     return "TOGGLE_DROPDOWN";
+  case EventType::LOGIC_TOGGLE:
+    return "LOGIC_TOGGLE";
   default:
     return "UNKNOWN";
   }

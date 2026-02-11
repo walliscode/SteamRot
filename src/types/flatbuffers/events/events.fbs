@@ -10,17 +10,23 @@ EVENT_USER_INPUT,
 EVENT_TOGGLE_UI,
 EVENT_CHANGE_SCENE,
 EVENT_QUIT_GAME,
-EVENT_TOGGLE_DROPDOWN
+EVENT_TOGGLE_DROPDOWN,
+EVENT_TOGGLE_NAME
   }
 
 table UserInterfaceNameData {
     id: string;
   }
 
+table ToggleNameFbs {
+    name: string;
+  }
+
 union EventDataData{
   UserInputBitsetData,
   SceneChangePacketData,
-  UserInterfaceNameData
+  UserInterfaceNameData,
+  ToggleNameFbs
   }
 
 

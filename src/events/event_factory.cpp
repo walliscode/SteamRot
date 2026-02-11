@@ -12,6 +12,7 @@
 #include "scene_type_conversion.h"
 #include "uuid.h"
 #include <cstddef>
+#include <expected>
 #include <unordered_map>
 #include <variant>
 
@@ -169,6 +170,19 @@ CreateUserInterfaceName(const UserInterfaceNameData &data) {
   UserInterfaceName ui_name{data.id()->str()};
 
   return ui_name;
+}
+
+/////////////////////////////////////////////////
+std::expected<ToggleName, FailInfo>
+CreateToggleName(const ToggleNameFbs &data) {
+  // check if name exists
+  if (!data.name()) {
+    return std::unexpected(
+        FailInfo{FailMode::FlatbuffersDataNotFound,
+                 "CreateToggleName: ToggleNameFbs missing id."});
+  }
+  ToggleName toggle_name{data.name()->str()};
+  return toggle_name;
 }
 
 /////////////////////////////////////////////////

@@ -15,6 +15,7 @@ table LogicConfigFbs{
 table LogicConfigCollectionFbs {
 
 test_logic: LogicConfigFbs;
+grimoire_machina_action_logic: LogicConfigFbs;
 
 }
 

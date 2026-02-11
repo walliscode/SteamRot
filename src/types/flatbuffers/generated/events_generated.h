@@ -21,6 +21,9 @@ namespace steamrot {
 struct UserInterfaceNameData;
 struct UserInterfaceNameDataBuilder;
 
+struct ToggleNameFbs;
+struct ToggleNameFbsBuilder;
+
 enum EventTypeFbs : uint64_t {
   EventTypeFbs_EVENT_NONE = 1ULL,
   EventTypeFbs_EVENT_TEST = 2ULL,
@@ -29,11 +32,12 @@ enum EventTypeFbs : uint64_t {
   EventTypeFbs_EVENT_CHANGE_SCENE = 16ULL,
   EventTypeFbs_EVENT_QUIT_GAME = 32ULL,
   EventTypeFbs_EVENT_TOGGLE_DROPDOWN = 64ULL,
+  EventTypeFbs_EVENT_TOGGLE_NAME = 128ULL,
   EventTypeFbs_NONE = 0,
-  EventTypeFbs_ANY = 127ULL
+  EventTypeFbs_ANY = 255ULL
 };
 
-inline const EventTypeFbs (&EnumValuesEventTypeFbs())[7] {
+inline const EventTypeFbs (&EnumValuesEventTypeFbs())[8] {
   static const EventTypeFbs values[] = {
     EventTypeFbs_EVENT_NONE,
     EventTypeFbs_EVENT_TEST,
@@ -41,7 +45,8 @@ inline const EventTypeFbs (&EnumValuesEventTypeFbs())[7] {
     EventTypeFbs_EVENT_TOGGLE_UI,
     EventTypeFbs_EVENT_CHANGE_SCENE,
     EventTypeFbs_EVENT_QUIT_GAME,
-    EventTypeFbs_EVENT_TOGGLE_DROPDOWN
+    EventTypeFbs_EVENT_TOGGLE_DROPDOWN,
+    EventTypeFbs_EVENT_TOGGLE_NAME
   };
   return values;
 }
@@ -55,6 +60,7 @@ inline const char *EnumNameEventTypeFbs(EventTypeFbs e) {
     case EventTypeFbs_EVENT_CHANGE_SCENE: return "EVENT_CHANGE_SCENE";
     case EventTypeFbs_EVENT_QUIT_GAME: return "EVENT_QUIT_GAME";
     case EventTypeFbs_EVENT_TOGGLE_DROPDOWN: return "EVENT_TOGGLE_DROPDOWN";
+    case EventTypeFbs_EVENT_TOGGLE_NAME: return "EVENT_TOGGLE_NAME";
     default: return "";
   }
 }
@@ -64,33 +70,36 @@ enum EventDataData : uint8_t {
   EventDataData_UserInputBitsetData = 1,
   EventDataData_SceneChangePacketData = 2,
   EventDataData_UserInterfaceNameData = 3,
+  EventDataData_ToggleNameFbs = 4,
   EventDataData_MIN = EventDataData_NONE,
-  EventDataData_MAX = EventDataData_UserInterfaceNameData
+  EventDataData_MAX = EventDataData_ToggleNameFbs
 };
 
-inline const EventDataData (&EnumValuesEventDataData())[4] {
+inline const EventDataData (&EnumValuesEventDataData())[5] {
   static const EventDataData values[] = {
     EventDataData_NONE,
     EventDataData_UserInputBitsetData,
     EventDataData_SceneChangePacketData,
-    EventDataData_UserInterfaceNameData
+    EventDataData_UserInterfaceNameData,
+    EventDataData_ToggleNameFbs
   };
   return values;
 }
 
 inline const char * const *EnumNamesEventDataData() {
-  static const char * const names[5] = {
+  static const char * const names[6] = {
     "NONE",
     "UserInputBitsetData",
     "SceneChangePacketData",
     "UserInterfaceNameData",
+    "ToggleNameFbs",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameEventDataData(EventDataData e) {
-  if (::flatbuffers::IsOutRange(e, EventDataData_NONE, EventDataData_UserInterfaceNameData)) return "";
+  if (::flatbuffers::IsOutRange(e, EventDataData_NONE, EventDataData_ToggleNameFbs)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesEventDataData()[index];
 }
@@ -109,6 +118,10 @@ template<> struct EventDataDataTraits<steamrot::SceneChangePacketData> {
 
 template<> struct EventDataDataTraits<steamrot::UserInterfaceNameData> {
   static const EventDataData enum_value = EventDataData_UserInterfaceNameData;
+};
+
+template<> struct EventDataDataTraits<steamrot::ToggleNameFbs> {
+  static const EventDataData enum_value = EventDataData_ToggleNameFbs;
 };
 
 bool VerifyEventDataData(::flatbuffers::Verifier &verifier, const void *obj, EventDataData type);
@@ -165,6 +178,57 @@ inline ::flatbuffers::Offset<UserInterfaceNameData> CreateUserInterfaceNameDataD
       id__);
 }
 
+struct ToggleNameFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef ToggleNameFbsBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_NAME = 4
+  };
+  const ::flatbuffers::String *name() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_NAME);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_NAME) &&
+           verifier.VerifyString(name()) &&
+           verifier.EndTable();
+  }
+};
+
+struct ToggleNameFbsBuilder {
+  typedef ToggleNameFbs Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
+    fbb_.AddOffset(ToggleNameFbs::VT_NAME, name);
+  }
+  explicit ToggleNameFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<ToggleNameFbs> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<ToggleNameFbs>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<ToggleNameFbs> CreateToggleNameFbs(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::String> name = 0) {
+  ToggleNameFbsBuilder builder_(_fbb);
+  builder_.add_name(name);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<ToggleNameFbs> CreateToggleNameFbsDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const char *name = nullptr) {
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  return steamrot::CreateToggleNameFbs(
+      _fbb,
+      name__);
+}
+
 inline bool VerifyEventDataData(::flatbuffers::Verifier &verifier, const void *obj, EventDataData type) {
   switch (type) {
     case EventDataData_NONE: {
@@ -180,6 +244,10 @@ inline bool VerifyEventDataData(::flatbuffers::Verifier &verifier, const void *o
     }
     case EventDataData_UserInterfaceNameData: {
       auto ptr = reinterpret_cast<const steamrot::UserInterfaceNameData *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case EventDataData_ToggleNameFbs: {
+      auto ptr = reinterpret_cast<const steamrot::ToggleNameFbs *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;

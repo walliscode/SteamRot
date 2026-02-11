@@ -78,15 +78,21 @@ inline ::flatbuffers::Offset<LogicConfigFbs> CreateLogicConfigFbsDirect(
 struct LogicConfigCollectionFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef LogicConfigCollectionFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_TEST_LOGIC = 4
+    VT_TEST_LOGIC = 4,
+    VT_GRIMOIRE_MACHINA_ACTION_LOGIC = 6
   };
   const steamrot::LogicConfigFbs *test_logic() const {
     return GetPointer<const steamrot::LogicConfigFbs *>(VT_TEST_LOGIC);
+  }
+  const steamrot::LogicConfigFbs *grimoire_machina_action_logic() const {
+    return GetPointer<const steamrot::LogicConfigFbs *>(VT_GRIMOIRE_MACHINA_ACTION_LOGIC);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_TEST_LOGIC) &&
            verifier.VerifyTable(test_logic()) &&
+           VerifyOffset(verifier, VT_GRIMOIRE_MACHINA_ACTION_LOGIC) &&
+           verifier.VerifyTable(grimoire_machina_action_logic()) &&
            verifier.EndTable();
   }
 };
@@ -97,6 +103,9 @@ struct LogicConfigCollectionFbsBuilder {
   ::flatbuffers::uoffset_t start_;
   void add_test_logic(::flatbuffers::Offset<steamrot::LogicConfigFbs> test_logic) {
     fbb_.AddOffset(LogicConfigCollectionFbs::VT_TEST_LOGIC, test_logic);
+  }
+  void add_grimoire_machina_action_logic(::flatbuffers::Offset<steamrot::LogicConfigFbs> grimoire_machina_action_logic) {
+    fbb_.AddOffset(LogicConfigCollectionFbs::VT_GRIMOIRE_MACHINA_ACTION_LOGIC, grimoire_machina_action_logic);
   }
   explicit LogicConfigCollectionFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -111,8 +120,10 @@ struct LogicConfigCollectionFbsBuilder {
 
 inline ::flatbuffers::Offset<LogicConfigCollectionFbs> CreateLogicConfigCollectionFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<steamrot::LogicConfigFbs> test_logic = 0) {
+    ::flatbuffers::Offset<steamrot::LogicConfigFbs> test_logic = 0,
+    ::flatbuffers::Offset<steamrot::LogicConfigFbs> grimoire_machina_action_logic = 0) {
   LogicConfigCollectionFbsBuilder builder_(_fbb);
+  builder_.add_grimoire_machina_action_logic(grimoire_machina_action_logic);
   builder_.add_test_logic(test_logic);
   return builder_.Finish();
 }
