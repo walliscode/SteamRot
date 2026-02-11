@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "LogicFactory.h"
 #include "FailInfo.h"
+#include "GrimoireMachinaActionLogic.h"
 #include "GrimoireMachinaPositioningLogic.h"
 #include "GrimoireMachinaRenderLogic.h"
 #include "LogicType.h"
@@ -17,6 +18,7 @@
 #include "UIStateLogic.h"
 #include <array>
 #include <expected>
+#include <iostream>
 #include <memory>
 
 namespace steamrot {
@@ -32,10 +34,20 @@ LogicFactory::AddLogicsToCollection(LogicCollection &logic_collection,
                                     const std::vector<LogicType> &logic_types) {
   LogicVector &logics = logic_collection[grouping];
   for (const LogicType &logic_type : logic_types) {
+    // create the Logic object
     auto logic_result = CreateLogicObject(logic_type);
     if (!logic_result) {
       return std::unexpected(logic_result.error());
     }
+
+    // configure the Logic object
+    auto configure_result = ConfigureLogicObject(*logic_result.value());
+    if (!configure_result) {
+      return std::unexpected(configure_result.error());
+    }
+
+    // add the configured Logic object to the appropriate vector in the
+    // LogicCollection
     logics.push_back(std::move(logic_result.value()));
   }
   return std::monostate();
@@ -113,6 +125,10 @@ LogicFactory::CreateLogicObject(LogicType logic_type) {
   case LogicType::UICollision:
     logic_ptr = std::make_unique<UICollisionLogic>(m_scene_context);
     break;
+  case LogicType::GrimoireMachinaAction:
+    logic_ptr =
+        std::make_unique<logic::GrimoireMachinaActionLogic>(m_scene_context);
+    break;
   case LogicType::GrimoireMachinaPositioning:
     logic_ptr = std::make_unique<logic::GrimoireMachinaPositioningLogic>(
         m_scene_context);
@@ -161,6 +177,10 @@ LogicFactory::ConfigureLogicObject(Logic &logic_object) {
   // object accordingly
   auto config_it = logic_config_collection.find(logic_object.GetLogicType());
   if (config_it == logic_config_collection.end()) {
+    std::cout
+        << "LogicFactory::ConfigureLogicObject: No config found for LogicType "
+        << EnumNameLogicType(logic_object.GetLogicType())
+        << ". Returning without configuring subscribers." << std::endl;
     // if not found, return early. Does not need to have a config, so not an
     // error.
     return std::monostate{};
@@ -236,8 +256,9 @@ LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
   // These are compile-time constants that define the scene's Logic
   // configuration
   static constexpr std::array collision_logic_types = {LogicType::UICollision};
-  static constexpr std::array action_logic_types = {LogicType::UIAction,
-                                                    LogicType::UIState};
+  static constexpr std::array action_logic_types = {
+      LogicType::UIAction, LogicType::UIState,
+      LogicType::GrimoireMachinaAction};
   static constexpr std::array render_logic_types = {
       LogicType::UIRender, LogicType::GrimoireMachinaRender};
   static constexpr std::array movement_logic_types = {

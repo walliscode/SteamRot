@@ -29,6 +29,8 @@ public:
   /// @param scene_context SceneContext containing references to the scene
   /////////////////////////////////////////////////
   UICollisionLogic(const SceneContext scene_context);
+
+  LogicType GetLogicType() const override { return LogicType::UICollision; }
 };
 
 } // namespace steamrot

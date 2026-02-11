@@ -171,6 +171,11 @@ TEST_CASE("LogicFactory::ConfigureLogicObject returns unexpected if LogicType "
     void ProcessLogic() override {
       // do nothing
     }
+
+    steamrot::LogicType GetLogicType() const override {
+      return steamrot::LogicType::Dummy; // Return None to trigger the error
+                                         // case
+    }
   };
   DummyLogic dummy_logic(test_context.GetSceneContext());
   // call ConfigureLogicObject with the dummy Logic

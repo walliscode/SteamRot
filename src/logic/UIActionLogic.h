@@ -12,6 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "Logic.h"
+#include "LogicType.h"
 #include "SceneContext.h"
 namespace steamrot {
 
@@ -32,6 +33,8 @@ public:
   /// logic.
   /////////////////////////////////////////////////
   UIActionLogic(const SceneContext scene_context);
+
+  LogicType GetLogicType() const override { return LogicType::UIAction; }
 };
 
 } // namespace steamrot

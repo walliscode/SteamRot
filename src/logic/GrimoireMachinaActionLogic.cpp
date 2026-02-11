@@ -32,7 +32,6 @@ void GrimoireMachinaActionLogic::ProcessLogic() {
     // active, these will be populated
     EventType event_type = EventType::NONE;
     EventData event_data = std::monostate{};
-
     // check if the subscriber is active.
     if (subscriber->m_active) {
 
@@ -52,10 +51,10 @@ void GrimoireMachinaActionLogic::ProcessLogic() {
 
       ToggleName toggle_name = std::get<ToggleName>(event_data);
 
-      if (toggle_name == "initialise_active_machina_form_scaffold") {
-        // auto initialise_result =
-        //     actions::grimoire_machina::InitialiseActiveMachinaFormScaffold(
-        //         grimoire_machina);
+      if (toggle_name == "initiate_machina_form_scaffold") {
+        auto initialise_result =
+            actions::grimoire_machina::InitialiseActiveMachinaFormScaffold(
+                grimoire_machina);
       }
     }
   }
