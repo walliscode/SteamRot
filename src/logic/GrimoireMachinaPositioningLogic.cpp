@@ -28,6 +28,13 @@ void GrimoireMachinaPositioningLogic::ProcessLogic() {
   }
   GrimoireMachina &grimoire_machina = *grimoire_result.value();
 
+  sf::Vector2f render_texture_size(m_scene_context.scene_texture.getSize());
+  // set up the positioning of the crafting canvas
+  grimoire_machina.m_crafting_helpers.crafting_canvas =
+      positioning::grimoire_machina::CalculateCraftingCanvasSizeAndPosition(
+          sf::FloatRect{{0.0f, 0.0f}, render_texture_size},
+          entity::memory::GetComponentVector<CUserInterface>(
+              m_scene_context.scene_entities));
   // call one time only logic here
   if (run_set_up_logic) {
 

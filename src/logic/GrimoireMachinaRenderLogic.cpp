@@ -29,6 +29,12 @@ void GrimoireMachinaRenderLogic::ProcessLogic() {
   render::grimoire_machina::DrawCraftingCanvasBorder(
       m_scene_context.scene_texture,
       grimoire_machina.m_crafting_helpers.crafting_canvas);
+
+  // if there is no active machina form, draw the no machina form box
+  if (!grimoire_machina.m_scaffold_form)
+    render::grimoire_machina::DrawNoMachinaFormBox(
+        m_scene_context.scene_texture,
+        grimoire_machina.m_crafting_helpers.crafting_canvas);
 }
 
 } // namespace steamrot::logic

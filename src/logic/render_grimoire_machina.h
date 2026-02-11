@@ -35,4 +35,14 @@ void DrawEmptyActiveMachinaForm(sf::RenderTexture &texture, MachinaForm &form);
 /////////////////////////////////////////////////
 void DrawCraftingCanvasBorder(sf::RenderTexture &texture,
                               sf::FloatRect &crafting_canvas);
+
+/////////////////////////////////////////////////
+/// @brief Draw a box around the crafting canvas to indicate that no machina
+/// form is active.
+///
+/// @param texture Texture to draw on.
+/// @param crafting_canvas FloatRect representing the crafting canvas.
+/////////////////////////////////////////////////
+void DrawNoMachinaFormBox(sf::RenderTexture &texture,
+                          sf::FloatRect &crafting_canvas);
 } // namespace steamrot::logic::render::grimoire_machina
