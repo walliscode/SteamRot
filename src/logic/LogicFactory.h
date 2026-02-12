@@ -19,7 +19,7 @@
 #include <memory>
 #include <variant>
 
-namespace steamrot {
+namespace steamrot::logic {
 
 using LogicVector = std::vector<std::unique_ptr<Logic>>;
 using LogicCollection = std::unordered_map<LogicGrouping, LogicVector>;
@@ -109,4 +109,4 @@ public:
   std::expected<std::monostate, FailInfo>
   ConfigureLogicObject(Logic &logic_object);
 };
-} // namespace steamrot
+} // namespace steamrot::logic

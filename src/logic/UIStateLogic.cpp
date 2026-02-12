@@ -9,7 +9,7 @@
 #include "entity_memory.h"
 #include "ui_helpers.h"
 
-namespace steamrot {
+namespace steamrot::logic {
 /////////////////////////////////////////////////
 UIStateLogic::UIStateLogic(const SceneContext scene_context)
     : Logic(scene_context) {}
@@ -35,4 +35,4 @@ void UIStateLogic::ProcessLogic() {
   }
 }
 
-} // namespace steamrot
+} // namespace steamrot::logic

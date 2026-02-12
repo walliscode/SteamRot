@@ -8,7 +8,7 @@
 #include "ui_render.h"
 #include <SFML/Graphics.hpp>
 
-namespace steamrot {
+namespace steamrot::logic {
 
 /////////////////////////////////////////////////
 UIRenderLogic::UIRenderLogic(const SceneContext scene_context)
@@ -53,4 +53,4 @@ void UIRenderLogic::DrawUIElements() {
   }
 }
 
-} // namespace steamrot
+} // namespace steamrot::logic

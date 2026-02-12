@@ -14,7 +14,7 @@
 /////////////////////////////////////////////////
 #include "Logic.h"
 #include "SceneContext.h"
-namespace steamrot {
+namespace steamrot::logic {
 
 class UIRenderLogic : public Logic {
 private:
@@ -38,4 +38,4 @@ public:
 
   LogicType GetLogicType() const override { return LogicType::UIRender; }
 };
-} // namespace steamrot
+} // namespace steamrot::logic

@@ -14,7 +14,7 @@
 #include "Logic.h"
 #include "LogicType.h"
 #include "SceneContext.h"
-namespace steamrot {
+namespace steamrot::logic {
 
 class UIActionLogic : public Logic {
 
@@ -37,4 +37,4 @@ public:
   LogicType GetLogicType() const override { return LogicType::UIAction; }
 };
 
-} // namespace steamrot
+} // namespace steamrot::logic

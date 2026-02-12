@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////
 #include "Logic.h"
 
-namespace steamrot {
+namespace steamrot::logic {
 
 /////////////////////////////////////////////////
 Logic::Logic(const SceneContext scene_context)
@@ -27,4 +27,4 @@ void Logic::AddSubscriber(std::shared_ptr<Subscriber> subscriber) {
   m_subscribers.push_back(subscriber);
 }
 
-} // namespace steamrot
+} // namespace steamrot::logic

@@ -11,7 +11,7 @@
 #include <magic_enum/magic_enum.hpp>
 
 using namespace magic_enum::bitwise_operators;
-namespace steamrot {
+namespace steamrot::logic {
 /////////////////////////////////////////////////
 UIActionLogic::UIActionLogic(const SceneContext scene_context)
     : Logic(scene_context) {}
@@ -43,4 +43,4 @@ void UIActionLogic::ProcessLogic() {
   }
 }
 
-} // namespace steamrot
+} // namespace steamrot::logic

@@ -5,7 +5,7 @@
 #include "ui_collision.h"
 #include <SFML/Window/Mouse.hpp>
 
-namespace steamrot {
+namespace steamrot::logic {
 /////////////////////////////////////////////////
 UICollisionLogic::UICollisionLogic(const SceneContext scene_context)
     : Logic(scene_context) {}
@@ -33,4 +33,4 @@ void UICollisionLogic::ProcessLogic() {
   };
 }
 
-} // namespace steamrot
+} // namespace steamrot::logic
