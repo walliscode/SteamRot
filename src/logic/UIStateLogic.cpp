@@ -30,7 +30,7 @@ void UIStateLogic::ProcessLogic() {
         entity_id, m_scene_context.scene_entities);
 
     // update the UI state
-    logic::ui::UpdateCUserInterfaceVisibilityFromCUIState(
+    ui::UpdateCUserInterfaceVisibilityFromCUIState(
         ui_state, m_scene_context.scene_entities);
   }
 }

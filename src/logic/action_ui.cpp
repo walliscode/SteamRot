@@ -6,14 +6,11 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "ui_action.h"
+#include "action_ui.h"
 #include <iostream>
 #include <ostream>
 
-namespace steamrot {
-namespace logic {
-namespace ui {
-namespace action {
+namespace steamrot::logic::action::ui {
 
 /////////////////////////////////////////////////
 void ProcessUIActionsAndEvents(UIElement &ui_element,
@@ -189,7 +186,4 @@ void ProcessDropDownListElementActions(
   }
 }
 
-} // namespace action
-} // namespace ui
-} // namespace logic
-} // namespace steamrot
+} // namespace steamrot::logic::action::ui

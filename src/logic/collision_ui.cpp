@@ -6,13 +6,10 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "ui_collision.h"
+#include "collision_ui.h"
 #include "UIElement.h"
 
-namespace steamrot {
-namespace logic {
-namespace ui {
-namespace collision {
+namespace steamrot::logic::collision::ui {
 
 /////////////////////////////////////////////////
 bool IsMouseOverBounds(const sf::Vector2i &mouse_position,
@@ -60,7 +57,4 @@ void CheckMouseOverNestedUIElement(const sf::Vector2i &mouse_position,
     CheckMouseOverUIElement(mouse_position, element);
   }
 }
-} // namespace collision
-} // namespace ui
-} // namespace logic
-} // namespace steamrot
+} // namespace steamrot::logic::collision::ui

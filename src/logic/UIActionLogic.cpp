@@ -6,7 +6,7 @@
 #include "Logic.h"
 #include "archetypes.h"
 #include "entity_memory.h"
-#include "ui_action.h"
+#include "action_ui.h"
 #include <SFML/Window/Mouse.hpp>
 #include <magic_enum/magic_enum.hpp>
 
@@ -37,7 +37,7 @@ void UIActionLogic::ProcessLogic() {
     }
 
     // Perform any aciton logic here, processing nested elements recursively
-    logic::ui::action::ProcessNestedUIActionsAndEvents(
+    action::ui::ProcessNestedUIActionsAndEvents(
         *ui_component.m_root_element, m_scene_context.event_handler,
         m_scene_context);
   }

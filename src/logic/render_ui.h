@@ -27,11 +27,7 @@
 #include <memory>
 #include <sys/types.h>
 
-namespace steamrot {
-
-namespace logic {
-namespace ui {
-namespace render {
+namespace steamrot::logic::render::ui {
 
 /////////////////////////////////////////////////
 /// @brief Draw nested UI elements recursively to a render texture
@@ -147,7 +143,4 @@ void DrawText(sf::RenderTexture &texture, const std::string &text,
 void UpdateSizeAndPositionOfChildElements(const UIElement &element,
                                           const UIStyle &style);
 
-} // namespace render
-} // namespace ui
-} // namespace logic
-} // namespace steamrot
+} // namespace steamrot::logic::render::ui

@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "ui_action.h"
+#include "action_ui.h"
 #include "EventPacket.h"
 #include "EventType.h"
 #include "PanelElement.h"
@@ -35,14 +35,14 @@ TEST_CASE(
 
   SECTION("Button not moused over does not trigger event") {
     button.is_mouse_over = false;
-    steamrot::logic::ui::action::ProcessButtonElementActions(button, event_handler);
+    steamrot::logic::action::ui::ProcessButtonElementActions(button, event_handler);
     event_handler.ProcessWaitingRoomEventBus();
     REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
   }
 
   SECTION("Button moused over triggers event") {
     button.is_mouse_over = true;
-    steamrot::logic::ui::action::ProcessButtonElementActions(button, event_handler);
+    steamrot::logic::action::ui::ProcessButtonElementActions(button, event_handler);
     event_handler.ProcessWaitingRoomEventBus();
     REQUIRE(event_handler.GetGlobalEventBus().size() == 1);
   }
@@ -60,7 +60,7 @@ TEST_CASE(
   dropdown.data_populate_function =
       steamrot::DataPopulateFunction::DataPopulateFunction_None;
   SECTION("No population when function is None") {
-    steamrot::logic::ui::action::ProcessDropDownListElementActions(dropdown,
+    steamrot::logic::action::ui::ProcessDropDownListElementActions(dropdown,
                                                                scene_context);
     REQUIRE(dropdown.child_elements.size() == 0);
   }
@@ -91,14 +91,14 @@ TEST_CASE("logic::ui::action::ProcessUIActionsAndEvents processes UI elements "
 
   SECTION("Response not triggered when subscriber not active") {
     button.subscription->m_active = false;
-    steamrot::logic::ui::action::ProcessUIActionsAndEvents(button, event_handler,
+    steamrot::logic::action::ui::ProcessUIActionsAndEvents(button, event_handler,
                                                        scene_context);
     event_handler.ProcessWaitingRoomEventBus();
     REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
   }
   SECTION("Response not triggered when is_mouse_over is false") {
     button.is_mouse_over = false;
-    steamrot::logic::ui::action::ProcessUIActionsAndEvents(button, event_handler,
+    steamrot::logic::action::ui::ProcessUIActionsAndEvents(button, event_handler,
                                                        scene_context);
     event_handler.ProcessWaitingRoomEventBus();
     REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
@@ -108,7 +108,7 @@ TEST_CASE("logic::ui::action::ProcessUIActionsAndEvents processes UI elements "
     button.is_mouse_over = false;
     button.subscription->m_active = true;
 
-    steamrot::logic::ui::action::ProcessUIActionsAndEvents(button, event_handler,
+    steamrot::logic::action::ui::ProcessUIActionsAndEvents(button, event_handler,
                                                        scene_context);
     event_handler.ProcessWaitingRoomEventBus();
     REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
@@ -116,7 +116,7 @@ TEST_CASE("logic::ui::action::ProcessUIActionsAndEvents processes UI elements "
 
   SECTION("Response triggered when subscriber active") {
     button.subscription->m_active = true;
-    steamrot::logic::ui::action::ProcessUIActionsAndEvents(button, event_handler,
+    steamrot::logic::action::ui::ProcessUIActionsAndEvents(button, event_handler,
                                                        scene_context);
     event_handler.ProcessWaitingRoomEventBus();
     REQUIRE(event_handler.GetGlobalEventBus().size() == 1);
@@ -156,14 +156,14 @@ TEST_CASE("logic::ui::action::ProcessNestedUIActionsAndEvents processes nested "
   REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
   SECTION("Child processed, parent not processed") {
     panel.child_elements[0]->subscription->m_active = true;
-    steamrot::logic::ui::action::ProcessNestedUIActionsAndEvents(
+    steamrot::logic::action::ui::ProcessNestedUIActionsAndEvents(
         panel, event_handler, scene_context);
     event_handler.ProcessWaitingRoomEventBus();
     REQUIRE(event_handler.GetGlobalEventBus().size() == 1);
   }
   SECTION("No child processed, parent processed") {
     panel.child_elements[0]->subscription->m_active = false;
-    steamrot::logic::ui::action::ProcessNestedUIActionsAndEvents(
+    steamrot::logic::action::ui::ProcessNestedUIActionsAndEvents(
         panel, event_handler, scene_context);
     event_handler.ProcessWaitingRoomEventBus();
     REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
@@ -172,7 +172,7 @@ TEST_CASE("logic::ui::action::ProcessNestedUIActionsAndEvents processes nested "
     panel.child_elements[0]->is_mouse_over = false;
     panel.child_elements[0]->subscription->m_active = true;
     panel.child_elements[1]->subscription->m_active = true;
-    steamrot::logic::ui::action::ProcessNestedUIActionsAndEvents(
+    steamrot::logic::action::ui::ProcessNestedUIActionsAndEvents(
         panel, event_handler, scene_context);
     event_handler.ProcessWaitingRoomEventBus();
     REQUIRE(event_handler.GetGlobalEventBus().size() == 1);

@@ -12,10 +12,10 @@ add_library(logic
   GrimoireMachinaRenderLogic.cpp
   GrimoireMachinaCollisionLogic.cpp
 
-  ui_collision.cpp
-  ui_action.cpp
+  collision_ui.cpp
+  action_ui.cpp
   ui_helpers.cpp
-  ui_render.cpp
+  render_ui.cpp
 
 
   render_grimoire_machina.cpp

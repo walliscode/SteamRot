@@ -5,7 +5,7 @@
 #include "Logic.h"
 #include "archetypes.h"
 #include "entity_memory.h"
-#include "ui_render.h"
+#include "render_ui.h"
 #include <SFML/Graphics.hpp>
 
 namespace steamrot::logic {
@@ -46,7 +46,7 @@ void UIRenderLogic::DrawUIElements() {
 
     // only draw if the CUserInterface is visible
     if (ui_component.m_visible) {
-      logic::ui::render::DrawNestedUIElements(
+      render::ui::DrawNestedUIElements(
           m_scene_context.scene_texture, *ui_component.m_root_element,
           m_scene_context.asset_manager.GetDefaultUIStyle());
     }

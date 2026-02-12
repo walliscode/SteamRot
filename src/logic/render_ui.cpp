@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "ui_render.h"
+#include "render_ui.h"
 #include "ButtonElement.h"
 #include "DropDownButtonElement.h"
 #include "DropDownContainerElement.h"
@@ -15,10 +15,7 @@
 #include "PanelElement.h"
 #include <cstdint>
 
-namespace steamrot {
-namespace logic {
-namespace ui {
-namespace render {
+namespace steamrot::logic::render::ui {
 
 /////////////////////////////////////////////////
 void DrawUIElementDispatch(sf::RenderTexture &texture, const UIElement &element,
@@ -356,7 +353,4 @@ void UpdateSizeAndPositionOfChildElements(const UIElement &element,
   }
   }
 }
-} // namespace render
-} // namespace ui
-} // namespace logic
-} // namespace steamrot
+} // namespace steamrot::logic::render::ui
