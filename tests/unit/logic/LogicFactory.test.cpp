@@ -26,7 +26,7 @@ TEST_CASE("LogicFactory constructed without errors", "[unit][LogicFactory]") {
   steamrot::tests::TestFixture test_context;
 
   // create a LogicFactory instance
-  steamrot::LogicFactory logic_factory(test_context.GetSceneContext());
+  steamrot::logic::LogicFactory logic_factory(test_context.GetSceneContext());
 
   REQUIRE_NOTHROW(logic_factory);
 }
@@ -37,7 +37,7 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns unexpected for unknown "
   // create a Testcontext to provide mock dependencies
   steamrot::tests::TestFixture test_context;
   // create a LogicFactory instance
-  steamrot::LogicFactory logic_factory(test_context.GetSceneContext());
+  steamrot::logic::LogicFactory logic_factory(test_context.GetSceneContext());
   // call ProvideLogicCollection with an invalid SceneType
   auto result = logic_factory.ProvideLogicCollection(
       static_cast<steamrot::SceneType>(9999));
@@ -52,7 +52,7 @@ TEST_CASE(
   // create a Testcontext to provide mock dependencies
   steamrot::tests::TestFixture test_context;
   // create a LogicFactory instance
-  steamrot::LogicFactory logic_factory(test_context.GetSceneContext());
+  steamrot::logic::LogicFactory logic_factory(test_context.GetSceneContext());
 
   // call ProvideLogicCollection with SceneType_TITLE
   auto result =
@@ -104,7 +104,7 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
   // create a Testcontext to provide mock dependencies
   steamrot::tests::TestFixture test_context;
   // create a LogicFactory instance
-  steamrot::LogicFactory logic_factory(test_context.GetSceneContext());
+  steamrot::logic::LogicFactory logic_factory(test_context.GetSceneContext());
   // call ProvideLogicCollection with SceneType_CRAFTING
   auto result =
       logic_factory.ProvideLogicCollection(steamrot::SceneType::CRAFTING);
@@ -167,12 +167,12 @@ TEST_CASE("LogicFactory::ConfigureLogicObject returns unexpected if LogicType "
   // create a Testcontext to provide mock dependencies
   steamrot::tests::TestFixture test_context;
   // create a LogicFactory instance
-  steamrot::LogicFactory logic_factory(test_context.GetSceneContext());
+  steamrot::logic::LogicFactory logic_factory(test_context.GetSceneContext());
   // create a dummy Logic object with LogicType::None
   class DummyLogic : public steamrot::Logic {
   public:
     DummyLogic(const steamrot::SceneContext &scene_context)
-        : steamrot::Logic(scene_context) {}
+        : steamrot::logic::Logic(scene_context) {}
 
     void ProcessLogic() override {
       // do nothing
@@ -199,7 +199,7 @@ TEST_CASE("LogicFactoru::ConfigureLogicObject correctly configures a TestLogic "
   // create a Testcontext to provide mock dependencies
   steamrot::tests::TestFixture test_context;
   // create a LogicFactory instance
-  steamrot::LogicFactory logic_factory(test_context.GetSceneContext());
+  steamrot::logic::LogicFactory logic_factory(test_context.GetSceneContext());
   // create a TestLogic object with LogicType::Test
   steamrot::tests::TestLogic test_logic(test_context.GetSceneContext());
   // call ConfigureLogicObject with the TestLogic object

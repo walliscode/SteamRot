@@ -12,7 +12,7 @@ namespace steamrot::tests {
 
 /////////////////////////////////////////////////
 TestLogic::TestLogic(const SceneContext &scene_context)
-    : Logic(scene_context) {}
+    : logic::Logic(scene_context) {}
 
 /////////////////////////////////////////////////
 void TestLogic::ProcessLogic() {

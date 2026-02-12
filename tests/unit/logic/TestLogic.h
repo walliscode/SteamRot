@@ -15,7 +15,7 @@
 
 namespace steamrot::tests {
 
-class TestLogic : public Logic {
+class TestLogic : public logic::Logic {
 
 public:
   /////////////////////////////////////////////////
