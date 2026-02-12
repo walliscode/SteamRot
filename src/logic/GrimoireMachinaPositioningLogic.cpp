@@ -11,7 +11,6 @@
 #include "entity_memory.h"
 #include "positioning_grimoire_machina.h"
 #include <SFML/Graphics/Rect.hpp>
-#include <iostream>
 
 namespace steamrot::logic {
 /////////////////////////////////////////////////
@@ -28,13 +27,21 @@ void GrimoireMachinaPositioningLogic::ProcessLogic() {
   }
   GrimoireMachina &grimoire_machina = *grimoire_result.value();
 
-  sf::Vector2f render_texture_size(m_scene_context.scene_texture.getSize());
   // set up the positioning of the crafting canvas
+  sf::Vector2f render_texture_size(m_scene_context.scene_texture.getSize());
   grimoire_machina.m_crafting_helpers.crafting_canvas =
       positioning::grimoire_machina::CalculateCraftingCanvasSizeAndPosition(
           sf::FloatRect{{0.0f, 0.0f}, render_texture_size},
           entity::memory::GetComponentVector<CUserInterface>(
               m_scene_context.scene_entities));
+
+  if (grimoire_machina.m_scaffold_form) {
+
+    // position the growth point on the crafting canvas
+    positioning::grimoire_machina::PositionGrowthPoint(
+        grimoire_machina.m_scaffold_form->growth_point,
+        grimoire_machina.m_crafting_helpers.crafting_canvas);
+  }
   // call one time only logic here
   if (run_set_up_logic) {
 
@@ -49,16 +56,6 @@ void GrimoireMachinaPositioningLogic::ProcessLogic() {
             entity::memory::GetComponentVector<CUserInterface>(
                 m_scene_context.scene_entities));
 
-    std::cout << "Grimoire Machina Crafting Canvas Position: "
-              << grimoire_machina.m_crafting_helpers.crafting_canvas.position.x
-              << ", "
-              << grimoire_machina.m_crafting_helpers.crafting_canvas.position.y
-              << std::endl;
-    std::cout << "Grimoire Machina Crafting Canvas Size: "
-              << grimoire_machina.m_crafting_helpers.crafting_canvas.size.x
-              << ", "
-              << grimoire_machina.m_crafting_helpers.crafting_canvas.size.y
-              << std::endl;
     // shut latch
     run_set_up_logic = false;
   }

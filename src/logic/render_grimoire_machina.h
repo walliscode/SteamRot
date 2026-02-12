@@ -13,6 +13,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "MachinaForm.h"
+#include "MachinaFormScaffold.h"
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 
@@ -45,4 +46,13 @@ void DrawCraftingCanvasBorder(sf::RenderTexture &texture,
 /////////////////////////////////////////////////
 void DrawNoMachinaFormBox(sf::RenderTexture &texture,
                           sf::FloatRect &crafting_canvas);
+
+/////////////////////////////////////////////////
+/// @brief Draw the growth point on the crafting canvas.
+///
+/// @param texture RenderTexture to draw on.
+/// @param growth_point GrowthPoint to draw.
+/////////////////////////////////////////////////
+void DrawGrowthPoint(sf::RenderTexture &texture, GrowthPoint &growth_point);
+
 } // namespace steamrot::logic::render::grimoire_machina

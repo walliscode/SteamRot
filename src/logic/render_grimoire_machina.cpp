@@ -60,4 +60,10 @@ void DrawNoMachinaFormBox(sf::RenderTexture &texture,
   // draw the box on the texture
   texture.draw(box);
 }
+
+/////////////////////////////////////////////////
+void DrawGrowthPoint(sf::RenderTexture &texture, GrowthPoint &growth_point) {
+  // draw the growth point on the texture
+  texture.draw(growth_point.origin);
+}
 } // namespace steamrot::logic::render::grimoire_machina

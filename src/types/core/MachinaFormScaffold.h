@@ -12,12 +12,14 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "EventPacket.h"
 #include "Fragment.h"
 #include "Joint.h"
 #include "ViewDirection.h"
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
+#include <SFML/System/Vector2.hpp>
 
 namespace steamrot {
 
@@ -104,6 +106,37 @@ struct Connection {
   Endpoint socket_b;
 };
 ;
+
+struct GrowthPoint {
+
+  /////////////////////////////////////////////////
+  /// @brief The "growth" point or origin of the MachinaFormScaffold
+  /////////////////////////////////////////////////
+  sf::CircleShape origin{10.f, 30};
+
+  /////////////////////////////////////////////////
+  /// @brief toggle whether the mouse is currently over the growth point
+  /////////////////////////////////////////////////
+  bool is_mouse_over{false};
+
+  /////////////////////////////////////////////////
+  /// @brief Color of the growth point when not hovered
+  /////////////////////////////////////////////////
+  sf::Color base_color{sf::Color::Blue};
+
+  /////////////////////////////////////////////////
+  /// @brief Color of the growth point when hovered
+  /////////////////////////////////////////////////
+  sf::Color hover_color{sf::Color::Cyan};
+
+  /////////////////////////////////////////////////
+  /// @brief EventPacket to send to the EventHandler when the growth point is
+  /// clicked
+  /////////////////////////////////////////////////
+  EventPacket response_event_packet{EventType::TOGGLE_UI,
+                                    "fragment_selection_menu", 1};
+};
+
 /////////////////////////////////////////////////
 /// @class MachinaFormScaffold
 /// @brief Contains all data necessary to create a MachinaForm.
@@ -130,12 +163,9 @@ struct MachinaFormScaffold {
   Views baked_views;
 
   /////////////////////////////////////////////////
-  /// @brief The "growth" point or origin of the MachinaFormScaffold
-  ///
-  /// For now, this will be passed to the joints[0] as the scaffold will always
-  /// be initiaed with a Joint.
+  /// @brief Growth point of the MachinaFormScaffold
   /////////////////////////////////////////////////
-  sf::Vector2f origin{0.f, 0.f};
+  GrowthPoint growth_point;
 
   /////////////////////////////////////////////////
   /// @brief All JointInstances on the MachinaFormScaffold
