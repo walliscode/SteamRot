@@ -15,6 +15,11 @@
         "event_type_data": "EVENT_TOGGLE_NAME",
         "trigger_data_type": "ToggleNameFbs",
         "trigger_data": { "name": "initiate_machina_form_scaffold" }
+      },
+      {
+        "event_type_data": "EVENT_TOGGLE_NAME",
+        "trigger_data_type": "ToggleNameFbs",
+        "trigger_data": { "name": "clear_machina_form_scaffold" }
       }
     ]
   }

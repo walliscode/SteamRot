@@ -58,6 +58,11 @@ void GrimoireMachinaActionLogic::ProcessLogic() {
             actions::grimoire_machina::InitialiseActiveMachinaFormScaffold(
                 grimoire_machina);
       }
+      if (toggle_name == "clear_machina_form_scaffold") {
+        auto clear_result =
+            actions::grimoire_machina::ClearActiveMachinaFormScaffold(
+                grimoire_machina);
+      }
     }
   }
 
