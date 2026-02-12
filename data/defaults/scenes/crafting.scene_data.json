@@ -133,6 +133,7 @@
                 {
                   "element_type": "ButtonData",
                   "element": {
+                    "label": "Exit Construct Creation",
                     "base_data": {
                       "position": {
                         "x": 0,
@@ -157,14 +158,21 @@
                           "event_data_data": {
                             "id": "new_construct_menu_off"
                           }
+                        },
+                        {
+                          "event_lifetime": 1,
+                          "event_type": "EVENT_TOGGLE_NAME",
+                          "event_data_data_type": "ToggleNameFbs",
+                          "event_data_data": {
+                            "name": "clear_machina_form_scaffold"
+                          }
                         }
                       ],
                       "children_active": false,
                       "children": [],
                       "layout": "Horizontal",
                       "spacing_strategy": "None"
-                    },
-                    "label": "Exit Construct Creation"
+                    }
                   }
                 }
               ],
