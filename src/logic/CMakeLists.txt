@@ -10,6 +10,7 @@ add_library(logic
   GrimoireMachinaPositioningLogic.cpp
   GrimoireMachinaActionLogic.cpp
   GrimoireMachinaRenderLogic.cpp
+  GrimoireMachinaCollisionLogic.cpp
 
   ui_collision.cpp
   ui_action.cpp
@@ -21,8 +22,9 @@ add_library(logic
 
   action_grimoire_machina.cpp
 
-
   positioning_grimoire_machina.cpp
+
+  collision_grimoire_machina.cpp
 )
 
 target_include_directories(logic

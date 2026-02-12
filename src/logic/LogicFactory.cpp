@@ -9,6 +9,7 @@
 #include "LogicFactory.h"
 #include "FailInfo.h"
 #include "GrimoireMachinaActionLogic.h"
+#include "GrimoireMachinaCollisionLogic.h"
 #include "GrimoireMachinaPositioningLogic.h"
 #include "GrimoireMachinaRenderLogic.h"
 #include "LogicType.h"
@@ -18,7 +19,6 @@
 #include "UIStateLogic.h"
 #include <array>
 #include <expected>
-#include <iostream>
 #include <memory>
 
 namespace steamrot {
@@ -137,6 +137,10 @@ LogicFactory::CreateLogicObject(LogicType logic_type) {
     logic_ptr =
         std::make_unique<logic::GrimoireMachinaRenderLogic>(m_scene_context);
     break;
+  case LogicType::GrimoireMachinaCollision:
+    logic_ptr =
+        std::make_unique<logic::GrimoireMachinaCollisionLogic>(m_scene_context);
+    break;
   default:
     return std::unexpected(
         FailInfo(FailMode::EnumValueNotHandled,
@@ -177,10 +181,6 @@ LogicFactory::ConfigureLogicObject(Logic &logic_object) {
   // object accordingly
   auto config_it = logic_config_collection.find(logic_object.GetLogicType());
   if (config_it == logic_config_collection.end()) {
-    std::cout
-        << "LogicFactory::ConfigureLogicObject: No config found for LogicType "
-        << EnumNameLogicType(logic_object.GetLogicType())
-        << ". Returning without configuring subscribers." << std::endl;
     // if not found, return early. Does not need to have a config, so not an
     // error.
     return std::monostate{};
@@ -255,12 +255,16 @@ LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
   // Define the Logic types for each grouping in the order they should execute
   // These are compile-time constants that define the scene's Logic
   // configuration
-  static constexpr std::array collision_logic_types = {LogicType::UICollision};
+  static constexpr std::array collision_logic_types = {
+      LogicType::UICollision, LogicType::GrimoireMachinaCollision};
+
   static constexpr std::array action_logic_types = {
       LogicType::UIAction, LogicType::UIState,
       LogicType::GrimoireMachinaAction};
+
   static constexpr std::array render_logic_types = {
       LogicType::UIRender, LogicType::GrimoireMachinaRender};
+
   static constexpr std::array movement_logic_types = {
       LogicType::GrimoireMachinaPositioning};
 

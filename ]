@@ -35,8 +35,8 @@ sf::FloatRect CalculateCraftingCanvasSizeAndPosition(
 /////////////////////////////////////////////////
 /// @brief Positions the growth point on the crafting canvas
 ///
-/// @param growth_point GrowthPoint to position
-/// @param crafting_canvas FloatRect representing the crafting canvas
+/// @param growth_point [TODO:parameter]
+/// @param crafting_canvas [TODO:parameter]
 /////////////////////////////////////////////////
 void PositionGrowthPoint(GrowthPoint &growth_point,
                          const sf::FloatRect &crafting_canvas);

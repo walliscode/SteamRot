@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "GrimoireMachinaRenderLogic.h"
+#include "MachinaFormScaffold.h"
 #include "render_grimoire_machina.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 
@@ -24,6 +25,7 @@ void GrimoireMachinaRenderLogic::ProcessLogic() {
   if (!grimoire_result.has_value()) {
   }
   GrimoireMachina &grimoire_machina = *grimoire_result.value();
+  MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
 
   // call render functions
   render::grimoire_machina::DrawCraftingCanvasBorder(
@@ -31,10 +33,20 @@ void GrimoireMachinaRenderLogic::ProcessLogic() {
       grimoire_machina.m_crafting_helpers.crafting_canvas);
 
   // if there is no active machina form, draw the no machina form box
-  if (!grimoire_machina.m_scaffold_form)
+  if (!scaffold) {
     render::grimoire_machina::DrawNoMachinaFormBox(
         m_scene_context.scene_texture,
         grimoire_machina.m_crafting_helpers.crafting_canvas);
+
+    // scaffold is present but no joints or fragments
+  } else if (scaffold && scaffold->joints.empty()) {
+
+    // draw the growth point (a fill in for when no fragments or joins are
+    // present)
+    render::grimoire_machina::DrawGrowthPoint(
+        m_scene_context.scene_texture,
+        grimoire_machina.m_scaffold_form->growth_point);
+  }
 }
 
 } // namespace steamrot::logic

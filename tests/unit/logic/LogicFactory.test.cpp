@@ -7,6 +7,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "LogicFactory.h"
+#include "GrimoireMachinaActionLogic.h"
+#include "GrimoireMachinaCollisionLogic.h"
 #include "GrimoireMachinaPositioningLogic.h"
 #include "GrimoireMachinaRenderLogic.h"
 #include "TestFixture.h"
@@ -119,9 +121,11 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
     FAIL("LogicCollection does not contain Collision LogicType");
   }
   const auto &collision_logics = collision_it->second;
-  REQUIRE(collision_logics.size() == 1);
+  REQUIRE(collision_logics.size() == 2);
   REQUIRE(
       dynamic_cast<steamrot::UICollisionLogic *>(collision_logics[0].get()));
+  REQUIRE(dynamic_cast<steamrot::logic::GrimoireMachinaCollisionLogic *>(
+      collision_logics[1].get()));
 
   ///// CHECKING ACTION LOGICS /////
   auto action_it = logic_collection.find(steamrot::LogicGrouping::Action);
@@ -129,9 +133,11 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
     FAIL("LogicCollection does not contain Action LogicType");
   }
   const auto &action_logics = action_it->second;
-  REQUIRE(action_logics.size() == 2);
+  REQUIRE(action_logics.size() == 3);
   REQUIRE(dynamic_cast<steamrot::UIActionLogic *>(action_logics[0].get()));
   REQUIRE(dynamic_cast<steamrot::UIStateLogic *>(action_logics[1].get()));
+  REQUIRE(dynamic_cast<steamrot::logic::GrimoireMachinaActionLogic *>(
+      action_logics[2].get()));
 
   ///// CHECKING RENDER LOGICS /////
   auto render_it = logic_collection.find(steamrot::LogicGrouping::Render);
@@ -173,8 +179,8 @@ TEST_CASE("LogicFactory::ConfigureLogicObject returns unexpected if LogicType "
     }
 
     steamrot::LogicType GetLogicType() const override {
-      return steamrot::LogicType::Dummy; // Return None to trigger the error
-                                         // case
+      return steamrot::LogicType::None; // Return None to trigger the error
+                                        // case
     }
   };
   DummyLogic dummy_logic(test_context.GetSceneContext());

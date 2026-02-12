@@ -7,11 +7,13 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "positioning_grimoire_machina.h"
+#include "MachinaFormScaffold.h"
 #include "PanelElement.h"
 #include "Vector2fEqualsMatcher.h"
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <vector>
 
 TEST_CASE("CalculateCraftingCanvasSizeAndPosition returns a rectangle shape "
           "with the correct size and position",
@@ -141,5 +143,31 @@ TEST_CASE("CalculateCraftingCanvasSizeAndPosition returns a rectangle shape "
     REQUIRE_THAT(
         actual_crafting_canvas.position,
         steamrot::tests::EqualsVector2f(expected_crafting_canvas.position));
+  }
+}
+
+TEST_CASE("PositionGirowthPoint positions the growth point in the center of "
+          "the crafting canvas",
+          "[positioning][grimoire_machina]") {
+
+  // Arrange
+  steamrot::GrowthPoint growth_point;
+  REQUIRE(growth_point.origin.getPosition() == sf::Vector2f(0.0f, 0.0f));
+
+  // Act
+  std::vector<sf::FloatRect> crafting_canvas_cases = {
+      sf::FloatRect(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(1000.0f, 1000.0f)),
+      sf::FloatRect(sf::Vector2f(200.0f, 100.0f), sf::Vector2f(800.0f, 900.0f)),
+      sf::FloatRect(sf::Vector2f(300.0f, 200.0f),
+                    sf::Vector2f(700.0f, 800.0f))};
+
+  // Assert
+  for (const sf::FloatRect &crafting_canvas : crafting_canvas_cases) {
+    steamrot::logic::positioning::grimoire_machina::PositionGrowthPoint(
+        growth_point, crafting_canvas);
+    sf::Vector2f expected_position =
+        crafting_canvas.position + crafting_canvas.size / 2.f;
+    REQUIRE_THAT(growth_point.origin.getPosition(),
+                 steamrot::tests::EqualsVector2f(expected_position));
   }
 }

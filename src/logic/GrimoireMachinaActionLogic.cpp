@@ -24,6 +24,8 @@ void GrimoireMachinaActionLogic::ProcessLogic() {
   if (!grimoire_result.has_value()) {
   }
   GrimoireMachina &grimoire_machina = *grimoire_result.value();
+  MachinaFormScaffold *active_scaffold_form =
+      grimoire_machina.m_scaffold_form.get();
 
   // cycle through the subscribers. If active, process
   for (auto &subscriber : m_subscribers) {
@@ -58,5 +60,10 @@ void GrimoireMachinaActionLogic::ProcessLogic() {
       }
     }
   }
+
+  // run action logic based on their being an active MachinFormScaffold
+  if (active_scaffold_form)
+    actions::grimoire_machina::SetGrowthPointColor(
+        active_scaffold_form->growth_point);
 }
 } // namespace steamrot::logic
