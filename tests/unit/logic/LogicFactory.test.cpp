@@ -75,7 +75,7 @@ TEST_CASE(
 
   REQUIRE(collision_logics.size() == 1);
   REQUIRE(
-      dynamic_cast<steamrot::UICollisionLogic *>(collision_logics[0].get()));
+      dynamic_cast<steamrot::logic::UICollisionLogic *>(collision_logics[0].get()));
 
   ///// CHECKING ACTION LOGICS /////
   auto action_it = logic_collection.find(steamrot::LogicGrouping::Action);
@@ -85,7 +85,7 @@ TEST_CASE(
   const auto &action_logics = action_it->second;
   REQUIRE(action_logics.size() == 2);
   REQUIRE(dynamic_cast<steamrot::UIActionLogic *>(action_logics[0].get()));
-  REQUIRE(dynamic_cast<steamrot::UIStateLogic *>(action_logics[1].get()));
+  REQUIRE(dynamic_cast<steamrot::logic::UIStateLogic *>(action_logics[1].get()));
 
   ///// CHECKING RENDER LOGICS /////
   auto render_it = logic_collection.find(steamrot::LogicGrouping::Render);
@@ -123,7 +123,7 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
   const auto &collision_logics = collision_it->second;
   REQUIRE(collision_logics.size() == 2);
   REQUIRE(
-      dynamic_cast<steamrot::UICollisionLogic *>(collision_logics[0].get()));
+      dynamic_cast<steamrot::logic::UICollisionLogic *>(collision_logics[0].get()));
   REQUIRE(dynamic_cast<steamrot::logic::GrimoireMachinaCollisionLogic *>(
       collision_logics[1].get()));
 
@@ -135,7 +135,7 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
   const auto &action_logics = action_it->second;
   REQUIRE(action_logics.size() == 3);
   REQUIRE(dynamic_cast<steamrot::UIActionLogic *>(action_logics[0].get()));
-  REQUIRE(dynamic_cast<steamrot::UIStateLogic *>(action_logics[1].get()));
+  REQUIRE(dynamic_cast<steamrot::logic::UIStateLogic *>(action_logics[1].get()));
   REQUIRE(dynamic_cast<steamrot::logic::GrimoireMachinaActionLogic *>(
       action_logics[2].get()));
 
