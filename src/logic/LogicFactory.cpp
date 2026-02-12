@@ -21,7 +21,7 @@
 #include <expected>
 #include <memory>
 
-namespace steamrot {
+namespace steamrot::logic {
 
 /////////////////////////////////////////////////
 LogicFactory::LogicFactory(const SceneContext &scene_context)
@@ -344,4 +344,4 @@ LogicFactory::ConfigureTestLogics(LogicCollection &logic_collection) {
 
   return std::monostate();
 }
-} // namespace steamrot
+} // namespace steamrot::logic

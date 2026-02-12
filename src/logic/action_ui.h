@@ -16,10 +16,7 @@
 #include "EventHandler.h"
 #include "SceneContext.h"
 
-namespace steamrot {
-namespace logic {
-namespace ui {
-namespace action {
+namespace steamrot::logic::action::ui {
 
 /////////////////////////////////////////////////
 /// @brief Dispatches the variant to the correct action processing function.
@@ -72,7 +69,4 @@ void ProcessButtonElementActions(ButtonElement &button_element,
 void ProcessDropDownListElementActions(
     DropDownListElement &dropdown_list_element,
     const SceneContext &scene_context);
-} // namespace action
-} // namespace ui
-} // namespace logic
-} // namespace steamrot
+} // namespace steamrot::logic::action::ui

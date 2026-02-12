@@ -10,10 +10,7 @@
 
 #include "UIElement.h"
 #include <SFML/Graphics/Rect.hpp>
-namespace steamrot {
-namespace logic {
-namespace ui {
-namespace collision {
+namespace steamrot::logic::collision::ui {
 
 /////////////////////////////////////////////////
 /// @brief Checks if the mouse position is within the given bounds
@@ -47,7 +44,4 @@ void CheckMouseOverUIElement(const sf::Vector2i &mouse_position,
 void CheckMouseOverNestedUIElement(const sf::Vector2i &mouse_position,
                                    UIElement &element);
 
-} // namespace collision
-} // namespace ui
-} // namespace logic
-} // namespace steamrot
+} // namespace steamrot::logic::collision::ui

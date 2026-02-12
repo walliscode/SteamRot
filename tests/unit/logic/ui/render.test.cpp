@@ -91,7 +91,7 @@ TEST_CASE("drawn text can be detected", "[unit][ui_render]") {
   sf::Vector2f position = {50.0f, 25.0f};
   uint8_t font_size = 24;
   sf::Color color = sf::Color::White;
-  steamrot::logic::ui::render::DrawText(render_texture, text, position,
+  steamrot::logic::render::ui::DrawText(render_texture, text, position,
                                     {50.f, 50.f}, font, font_size, color);
   // get the image from the RenderTexture
   sf::Image image = render_texture.getTexture().copyToImage();
@@ -127,7 +127,7 @@ TEST_CASE("drawn text can be detected", "[unit][ui_render]") {
 //   // clear the RenderTexture
 //   render_texture.clear(sf::Color::Black);
 //   // draw the button on the RenderTexture
-//   steamrot::logic::ui::render::DrawBorderAndBackground(render_texture, button,
+//   steamrot::logic::render::ui::DrawBorderAndBackground(render_texture, button,
 //                                                    style.button_style);
 //
 //   // get the image from the RenderTexture
@@ -165,7 +165,7 @@ TEST_CASE("drawn text can be detected", "[unit][ui_render]") {
 //   render_texture.clear(sf::Color::Black);
 //
 //   // draw the panel on the RenderTexture
-//   steamrot::logic::ui::render::DrawPanelElement(render_texture, panel, style);
+//   steamrot::logic::render::ui::DrawPanelElement(render_texture, panel, style);
 //
 //   // display the Panel for visual inspection
 //   steamrot::tests::DisplayRenderTexture(render_texture);
@@ -203,7 +203,7 @@ TEST_CASE("drawn text can be detected", "[unit][ui_render]") {
 //   render_texture.clear(sf::Color::Black);
 //
 //   // draw the button on the RenderTexture
-//   steamrot::logic::ui::render::DrawButtonElement(render_texture, button, style);
+//   steamrot::logic::render::ui::DrawButtonElement(render_texture, button, style);
 //
 //   // display the button for visual inspection
 //   steamrot::tests::DisplayRenderTexture(render_texture);
@@ -244,7 +244,7 @@ TEST_CASE("drawn text can be detected", "[unit][ui_render]") {
 //   render_texture.clear(sf::Color::Black);
 //
 //   // draw the DropDownContainerElement on the RenderTexture
-//   steamrot::logic::ui::render::DrawDropDownContainerElement(render_texture,
+//   steamrot::logic::render::ui::DrawDropDownContainerElement(render_texture,
 //                                                         dd_container, style);
 //
 //   // display the button for visual
@@ -278,7 +278,7 @@ TEST_CASE("drawn text can be detected", "[unit][ui_render]") {
 //   // clear the RenderTexture
 //   render_texture.clear(sf::Color::Black);
 //   // draw the DropDownListElement on the RenderTexture
-//   steamrot::logic::ui::render::DrawDropDownListElement(render_texture, dd_list,
+//   steamrot::logic::render::ui::DrawDropDownListElement(render_texture, dd_list,
 //                                                    style);
 //   // display the button for visual inspection
 //   steamrot::tests::DisplayRenderTexture(render_texture);
@@ -310,7 +310,7 @@ TEST_CASE("drawn text can be detected", "[unit][ui_render]") {
 //   // clear the RenderTexture
 //   render_texture.clear(sf::Color::Black);
 //   // draw the DropDownListElement on the RenderTexture
-//   steamrot::logic::ui::render::DrawDropDownListElement(render_texture, dd_list,
+//   steamrot::logic::render::ui::DrawDropDownListElement(render_texture, dd_list,
 //                                                    style);
 //   // display the button for visual inspection
 //   steamrot::tests::DisplayRenderTexture(render_texture);
@@ -340,7 +340,7 @@ TEST_CASE("drawn text can be detected", "[unit][ui_render]") {
 //   render_texture.clear(sf::Color::Black);
 //
 //   // draw the button on the RenderTexture
-//   steamrot::logic::ui::render::DrawDropDownButtonElement(render_texture,
+//   steamrot::logic::render::ui::DrawDropDownButtonElement(render_texture,
 //   dd_button,
 //                                                      style);
 //   // display the button for visual inspection
@@ -373,7 +373,7 @@ TEST_CASE("drawn text can be detected", "[unit][ui_render]") {
 //   render_texture.clear(sf::Color::Black);
 //
 //   // draw the button on the RenderTexture
-//   steamrot::logic::ui::render::DrawDropDownButtonElement(render_texture,
+//   steamrot::logic::render::ui::DrawDropDownButtonElement(render_texture,
 //   dd_button,
 //                                                      style);
 //
@@ -426,7 +426,7 @@ TEST_CASE("drawn text can be detected", "[unit][ui_render]") {
 //   // clear the RenderTexture
 //   render_texture.clear(sf::Color::Black);
 //   // draw the DropDownContainerElement and its children on the RenderTexture
-//   steamrot::logic::ui::render::DrawNestedUIElements(render_texture, dd_container,
+//   steamrot::logic::render::ui::DrawNestedUIElements(render_texture, dd_container,
 //                                                 style);
 //   // display the button for visual inspection
 //   steamrot::tests::DisplayRenderTexture(render_texture);

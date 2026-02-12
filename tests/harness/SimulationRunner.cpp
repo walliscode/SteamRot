@@ -37,22 +37,22 @@ ExecuteLogicClass(LogicClassEnum logic_class, SceneContext &context) {
 
   switch (logic_class) {
   case LogicClassEnum::UIActionLogic: {
-    UIActionLogic logic(context);
+    logic::UIActionLogic logic(context);
     logic.RunLogic();
     return std::monostate{};
   }
   case LogicClassEnum::UICollisionLogic: {
-    UICollisionLogic logic(context);
+    logic::UICollisionLogic logic(context);
     logic.RunLogic();
     return std::monostate{};
   }
   case LogicClassEnum::UIRenderLogic: {
-    UIRenderLogic logic(context);
+    logic::UIRenderLogic logic(context);
     logic.RunLogic();
     return std::monostate{};
   }
   case LogicClassEnum::UIStateLogic: {
-    UIStateLogic logic(context);
+    logic::UIStateLogic logic(context);
     logic.RunLogic();
     return std::monostate{};
   }

@@ -232,7 +232,7 @@ std::expected<std::monostate, FailInfo>
 SceneFactory::ConfigureLogicMap(Scene &scene) {
 
   // create LogicFactory instance
-  LogicFactory logic_factory(scene.GetSceneContext());
+  logic::LogicFactory logic_factory(scene.GetSceneContext());
 
   // create logic map and check info_result
   auto logic_map_result =

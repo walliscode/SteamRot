@@ -43,7 +43,7 @@ struct SceneResources {
   /////////////////////////////////////////////////
   /// @brief Map of all logic objects needed by the scene
   /////////////////////////////////////////////////
-  LogicCollection logic_map;
+  logic::LogicCollection logic_map;
 
   /////////////////////////////////////////////////
   /// @brief Render texture for the scene

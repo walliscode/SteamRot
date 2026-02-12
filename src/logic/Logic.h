@@ -15,7 +15,7 @@
 #include "SceneContext.h"
 #include "Subscriber.h"
 #include <memory>
-namespace steamrot {
+namespace steamrot::logic {
 
 using EntityIndicies = std::vector<size_t>;
 
@@ -81,4 +81,4 @@ public:
   /////////////////////////////////////////////////
   virtual LogicType GetLogicType() const = 0;
 };
-} // namespace steamrot
+} // namespace steamrot::logic
