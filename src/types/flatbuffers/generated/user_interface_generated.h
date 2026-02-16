@@ -14,7 +14,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
              "Non-compatible flatbuffers version included");
 
 #include "types_generated.h"
-#include "event_packet_data_generated.h"
+#include "event_packet_generated.h"
 #include "subscriber_generated.h"
 
 namespace steamrot {
@@ -348,8 +348,8 @@ struct UIElementData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::SubscriberFbs *subscriber_data() const {
     return GetPointer<const steamrot::SubscriberFbs *>(VT_SUBSCRIBER_DATA);
   }
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketData>> *response_event_data() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketData>> *>(VT_RESPONSE_EVENT_DATA);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketFbs>> *response_event_data() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketFbs>> *>(VT_RESPONSE_EVENT_DATA);
   }
   bool children_active() const {
     return GetField<uint8_t>(VT_CHILDREN_ACTIVE, 0) != 0;
@@ -401,7 +401,7 @@ struct UIElementDataBuilder {
   void add_subscriber_data(::flatbuffers::Offset<steamrot::SubscriberFbs> subscriber_data) {
     fbb_.AddOffset(UIElementData::VT_SUBSCRIBER_DATA, subscriber_data);
   }
-  void add_response_event_data(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketData>>> response_event_data) {
+  void add_response_event_data(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketFbs>>> response_event_data) {
     fbb_.AddOffset(UIElementData::VT_RESPONSE_EVENT_DATA, response_event_data);
   }
   void add_children_active(bool children_active) {
@@ -438,7 +438,7 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementData(
     ::flatbuffers::Offset<steamrot::Vector2fData> position = 0,
     ::flatbuffers::Offset<steamrot::Vector2fData> size = 0,
     ::flatbuffers::Offset<steamrot::SubscriberFbs> subscriber_data = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketData>>> response_event_data = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketFbs>>> response_event_data = 0,
     bool children_active = false,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::child>>> children = 0,
     bool is_mouse_over = false,
@@ -462,13 +462,13 @@ inline ::flatbuffers::Offset<UIElementData> CreateUIElementDataDirect(
     ::flatbuffers::Offset<steamrot::Vector2fData> position = 0,
     ::flatbuffers::Offset<steamrot::Vector2fData> size = 0,
     ::flatbuffers::Offset<steamrot::SubscriberFbs> subscriber_data = 0,
-    const std::vector<::flatbuffers::Offset<steamrot::EventPacketData>> *response_event_data = nullptr,
+    const std::vector<::flatbuffers::Offset<steamrot::EventPacketFbs>> *response_event_data = nullptr,
     bool children_active = false,
     const std::vector<::flatbuffers::Offset<steamrot::child>> *children = nullptr,
     bool is_mouse_over = false,
     steamrot::LayoutFbs layout = steamrot::LayoutFbs_None,
     steamrot::SpacingAndSizingFbs spacing_strategy = steamrot::SpacingAndSizingFbs_None) {
-  auto response_event_data__ = response_event_data ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::EventPacketData>>(*response_event_data) : 0;
+  auto response_event_data__ = response_event_data ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::EventPacketFbs>>(*response_event_data) : 0;
   auto children__ = children ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::child>>(*children) : 0;
   return steamrot::CreateUIElementData(
       _fbb,

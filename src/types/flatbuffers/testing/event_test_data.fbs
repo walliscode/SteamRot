@@ -1,4 +1,4 @@
-include "../events/event_packet_data.fbs";
+include "../events/event_packet.fbs";
 include "../events/events.fbs";
 namespace steamrot;
 
@@ -13,7 +13,7 @@ table EventTestData {
   tick: uint32 = 0;
   
   /// @brief Event data to be added
-  event_packet: EventPacketData;
+  event_packet: EventPacketFbs;
   
   /// @brief Optional description for debugging
   description: string;

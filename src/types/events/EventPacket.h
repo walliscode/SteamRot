@@ -3,77 +3,45 @@
 /// @brief Decleration of the EventPacket struct
 /////////////////////////////////////////////////
 
+/////////////////////////////////////////////////
+/// Preprocessor Directives
+/////////////////////////////////////////////////
 #pragma once
 
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include "EventCategory.h"
+#include "EventContext.h"
+#include "EventPayload.h"
 #include "EventType.h"
-#include "SceneType.h"
-#include "UserInputBitset.h"
-#include "uuid.h"
-#include <SFML/Window/Keyboard.hpp>
-#include <SFML/Window/Mouse.hpp>
-#include <optional>
 
-#include <variant>
 namespace steamrot {
-
-using SceneChangePacket = std::pair<std::optional<uuids::uuid>, SceneType>;
-
-/////////////////////////////////////////////////
-/// @brief names of user interfaces to be used for flow control
-/////////////////////////////////////////////////
-struct UserInterfaceName : std::string {
-  using std::string::string; // Inherit constructors from std::string
-  UserInterfaceName(const std::string &str) : std::string(str) {}
-};
-/////////////////////////////////////////////////
-//// @brief names of toggles to be used for flow control
-/////////////////////////////////////////////////
-struct ToggleName : std::string {
-  ToggleName(const std::string &str) : std::string(str) {}
-};
-
-// Your variant type
-using EventData =
-    std::variant<std::monostate, UserInputBitset, SceneChangePacket,
-                 UserInterfaceName, ToggleName>;
 
 struct EventPacket {
 
   /////////////////////////////////////////////////
-  /// @brief Constructor for the EventPacket
+  /// @brief Context for the specific EventPacket
   ///
-  /// @param lifetime The lifetime of the event in ticks.
+  /// This is the container for shared data
   /////////////////////////////////////////////////
-  EventPacket(uint8_t lifetime) : event_lifetime(lifetime) {}
-
-  EventPacket(EventType event_type, EventData event_data, uint8_t lifetime = 1)
-      : event_type(event_type), event_data(event_data),
-        event_lifetime(lifetime) {}
-  /////////////////////////////////////////////////
-  /// @brief Enum based name for the event type
-  /////////////////////////////////////////////////
-  EventType event_type{EventType::NONE};
+  EventContext context;
 
   /////////////////////////////////////////////////
-  /// @brief Specific data for the event
+  /// @brief An enum capturing which category of event this packet represents,
+  /// this is a coarse filtering system
   /////////////////////////////////////////////////
-  EventData event_data{std::monostate{}};
+  EventCategory category;
 
   /////////////////////////////////////////////////
-  /// @brief Unique identifier for the event
+  /// @brief An enum captuing finer details about the event, this is used for
+  /// more specific filtering
   /////////////////////////////////////////////////
-  uuids::uuid event_id;
+  EventType type;
 
   /////////////////////////////////////////////////
-  /// @brief Unique identifier for the source of the event
-  ///
-  /// This is to match the event origin as we have a global event bus
+  /// @brief Variant capturing which payload type is being used
   /////////////////////////////////////////////////
-  uuids::uuid source_id;
-
-  /////////////////////////////////////////////////
-  /// @brief Event of the lifetime, will be ticked down 1 each cycle
-  /////////////////////////////////////////////////
-  uint8_t event_lifetime{1};
+  EventPayload payload;
 };
 } // namespace steamrot
