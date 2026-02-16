@@ -68,7 +68,10 @@ struct LogicPayload {
   /// This is to be used by the Logic classes to manage flow control without
   /// strings causing issues
   /////////////////////////////////////////////////
-  enum class LogicToggle { INITIATE_MACHINA_FORM_SCAFFOLD } toggle_name;
+  enum class LogicToggle {
+    INITIATE_MACHINA_FORM_SCAFFOLD,
+    CLEAR_MACHINA_FORM_SCAFFOLD
+  } toggle_name;
 };
 
 /////////////////////////////////////////////////

@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "GrimoireMachinaActionLogic.h"
+#include "EventPayload.h"
 #include "EventType.h"
 #include "action_grimoire_machina.h"
 
@@ -33,32 +34,34 @@ void GrimoireMachinaActionLogic::ProcessLogic() {
     // set up empty variables for event type and data. If the subscriber is
     // active, these will be populated
     EventType event_type = EventType::NONE;
-    EventData event_data = std::monostate{};
+
     // check if the subscriber is active.
     if (subscriber->m_active) {
 
       // set the event data and type for processing
-      event_type = subscriber->m_trigger_event_type;
-      if (subscriber->m_trigger_event_data.has_value()) {
-        event_data = subscriber->m_trigger_event_data.value();
-      }
+      event_type = subscriber->event_type;
 
     } else {
       continue;
     }
 
     // add logic for processing the event type and data here.
-    if (event_type == EventType::LOGIC_TOGGLE &&
-        std::holds_alternative<ToggleName>(event_data)) {
+    if (event_type == EventType::LOGIC &&
+        std::holds_alternative<LogicPayload>(
+            subscriber->captured_payload.value())) {
 
-      ToggleName toggle_name = std::get<ToggleName>(event_data);
+      LogicPayload &logic_payload =
+          std::get<LogicPayload>(subscriber->captured_payload.value());
 
-      if (toggle_name == "initiate_machina_form_scaffold") {
+      if (logic_payload.toggle_name ==
+          LogicPayload::LogicToggle::INITIATE_MACHINA_FORM_SCAFFOLD) {
         auto initialise_result =
             actions::grimoire_machina::InitialiseActiveMachinaFormScaffold(
                 grimoire_machina);
       }
-      if (toggle_name == "clear_machina_form_scaffold") {
+
+      if (logic_payload.toggle_name ==
+          LogicPayload::LogicToggle::CLEAR_MACHINA_FORM_SCAFFOLD) {
         auto clear_result =
             actions::grimoire_machina::ClearActiveMachinaFormScaffold(
                 grimoire_machina);

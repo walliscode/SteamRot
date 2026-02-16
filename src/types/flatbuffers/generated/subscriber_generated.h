@@ -23,32 +23,83 @@ struct SubscriberFbsBuilder;
 struct SubscriberFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef SubscriberFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_ACTIVE = 4,
-    VT_EVENT_TYPE = 6
+    VT_EVENT_TYPE = 4,
+    VT_FILTER_PAYLOAD_TYPE = 6,
+    VT_FILTER_PAYLOAD = 8
   };
-  bool active() const {
-    return GetField<uint8_t>(VT_ACTIVE, 0) != 0;
-  }
+  ////////////////////////////////////////////////////////////
+  /// EventTypeFbs enum value
+  ////////////////////////////////////////////////////////////
   steamrot::EventTypeFbs event_type() const {
     return static_cast<steamrot::EventTypeFbs>(GetField<uint64_t>(VT_EVENT_TYPE, 0));
   }
+  steamrot::EventPayloadFbs filter_payload_type() const {
+    return static_cast<steamrot::EventPayloadFbs>(GetField<uint8_t>(VT_FILTER_PAYLOAD_TYPE, 0));
+  }
+  ////////////////////////////////////////////////////////////
+  /// any one of the EventPayloadFbs union, used to determine if the Subscriber should be activated
+  ////////////////////////////////////////////////////////////
+  const void *filter_payload() const {
+    return GetPointer<const void *>(VT_FILTER_PAYLOAD);
+  }
+  template<typename T> const T *filter_payload_as() const;
+  const steamrot::InputPayloadFbs *filter_payload_as_InputPayloadFbs() const {
+    return filter_payload_type() == steamrot::EventPayloadFbs_InputPayloadFbs ? static_cast<const steamrot::InputPayloadFbs *>(filter_payload()) : nullptr;
+  }
+  const steamrot::UIPayloadFbs *filter_payload_as_UIPayloadFbs() const {
+    return filter_payload_type() == steamrot::EventPayloadFbs_UIPayloadFbs ? static_cast<const steamrot::UIPayloadFbs *>(filter_payload()) : nullptr;
+  }
+  const steamrot::LogicPayloadFbs *filter_payload_as_LogicPayloadFbs() const {
+    return filter_payload_type() == steamrot::EventPayloadFbs_LogicPayloadFbs ? static_cast<const steamrot::LogicPayloadFbs *>(filter_payload()) : nullptr;
+  }
+  const steamrot::ScenePayloadFbs *filter_payload_as_ScenePayloadFbs() const {
+    return filter_payload_type() == steamrot::EventPayloadFbs_ScenePayloadFbs ? static_cast<const steamrot::ScenePayloadFbs *>(filter_payload()) : nullptr;
+  }
+  const steamrot::SystemPayloadFbs *filter_payload_as_SystemPayloadFbs() const {
+    return filter_payload_type() == steamrot::EventPayloadFbs_SystemPayloadFbs ? static_cast<const steamrot::SystemPayloadFbs *>(filter_payload()) : nullptr;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<uint8_t>(verifier, VT_ACTIVE, 1) &&
            VerifyField<uint64_t>(verifier, VT_EVENT_TYPE, 8) &&
+           VerifyField<uint8_t>(verifier, VT_FILTER_PAYLOAD_TYPE, 1) &&
+           VerifyOffset(verifier, VT_FILTER_PAYLOAD) &&
+           VerifyEventPayloadFbs(verifier, filter_payload(), filter_payload_type()) &&
            verifier.EndTable();
   }
 };
+
+template<> inline const steamrot::InputPayloadFbs *SubscriberFbs::filter_payload_as<steamrot::InputPayloadFbs>() const {
+  return filter_payload_as_InputPayloadFbs();
+}
+
+template<> inline const steamrot::UIPayloadFbs *SubscriberFbs::filter_payload_as<steamrot::UIPayloadFbs>() const {
+  return filter_payload_as_UIPayloadFbs();
+}
+
+template<> inline const steamrot::LogicPayloadFbs *SubscriberFbs::filter_payload_as<steamrot::LogicPayloadFbs>() const {
+  return filter_payload_as_LogicPayloadFbs();
+}
+
+template<> inline const steamrot::ScenePayloadFbs *SubscriberFbs::filter_payload_as<steamrot::ScenePayloadFbs>() const {
+  return filter_payload_as_ScenePayloadFbs();
+}
+
+template<> inline const steamrot::SystemPayloadFbs *SubscriberFbs::filter_payload_as<steamrot::SystemPayloadFbs>() const {
+  return filter_payload_as_SystemPayloadFbs();
+}
 
 struct SubscriberFbsBuilder {
   typedef SubscriberFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_active(bool active) {
-    fbb_.AddElement<uint8_t>(SubscriberFbs::VT_ACTIVE, static_cast<uint8_t>(active), 0);
-  }
   void add_event_type(steamrot::EventTypeFbs event_type) {
     fbb_.AddElement<uint64_t>(SubscriberFbs::VT_EVENT_TYPE, static_cast<uint64_t>(event_type), 0);
+  }
+  void add_filter_payload_type(steamrot::EventPayloadFbs filter_payload_type) {
+    fbb_.AddElement<uint8_t>(SubscriberFbs::VT_FILTER_PAYLOAD_TYPE, static_cast<uint8_t>(filter_payload_type), 0);
+  }
+  void add_filter_payload(::flatbuffers::Offset<void> filter_payload) {
+    fbb_.AddOffset(SubscriberFbs::VT_FILTER_PAYLOAD, filter_payload);
   }
   explicit SubscriberFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -63,11 +114,13 @@ struct SubscriberFbsBuilder {
 
 inline ::flatbuffers::Offset<SubscriberFbs> CreateSubscriberFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    bool active = false,
-    steamrot::EventTypeFbs event_type = steamrot::EventTypeFbs_NONE) {
+    steamrot::EventTypeFbs event_type = steamrot::EventTypeFbs_NONE,
+    steamrot::EventPayloadFbs filter_payload_type = steamrot::EventPayloadFbs_NONE,
+    ::flatbuffers::Offset<void> filter_payload = 0) {
   SubscriberFbsBuilder builder_(_fbb);
   builder_.add_event_type(event_type);
-  builder_.add_active(active);
+  builder_.add_filter_payload(filter_payload);
+  builder_.add_filter_payload_type(filter_payload_type);
   return builder_.Finish();
 }
 

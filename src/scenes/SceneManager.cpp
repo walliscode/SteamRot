@@ -225,57 +225,75 @@ std::expected<std::monostate, FailInfo> SceneManager::ProcessSubscriptions() {
     // only process active subscribers
     if (subscriber->m_active) {
 
-      switch (subscriber->m_trigger_event_type) {
-      case EventType::CHANGE_SCENE: {
+      switch (subscriber->event_type) {
 
-        // make sure the data type is correct - use received event data
-        if (!subscriber->m_received_event_data.has_value() ||
-            !std::holds_alternative<SceneChangePacket>(
-                subscriber->m_received_event_data.value())) {
+      // deal with ScenePayload events
+      case EventType::SCENE: {
 
-          // just continue if data is not valid, will need to log at some
-          // point
-          //[TODO: logging here]
-
-          // still need to set subscriber to inactive
-          subscriber->m_active = false;
-          continue;
-        }
-        // get SceneChangeData from received event data
-        const SceneChangePacket &scene_change_data =
-            std::get<SceneChangePacket>(
-                subscriber->m_received_event_data.value());
-
-        // check for scene type
-        switch (scene_change_data.second) {
-
-          // deal with Title Scene Loading
-        case SceneType::TITLE: {
-          auto load_scene_result = LoadTitleScene();
-          if (!load_scene_result.has_value()) {
-            return std::unexpected(load_scene_result.error());
-          }
-          break;
+        // check that captured data is of the correct type
+        if (!subscriber->captured_payload.has_value() ||
+            !std::holds_alternative<ScenePayload>(
+                subscriber->captured_payload.value())) {
+          return std::unexpected(
+              FailInfo{FailMode::VariantTypeMismatch,
+                       "Subscriber payload is not of type ScenePayload"});
         }
 
-        case SceneType::CRAFTING: {
-          auto load_scene_result = LoadCraftingScene();
-          if (!load_scene_result.has_value()) {
-            return std::unexpected(load_scene_result.error());
-          }
-          break;
-        }
+        ScenePayload &scene_payload_data =
+            std::get<ScenePayload>(subscriber->captured_payload.value());
+
+        // deal with different ScenePayload actions
+        switch (scene_payload_data.action) {
+
+        // deal with scene changes
+        case ScenePayload::SceneAction::CHANGE: {
+
+          // if there is a SceneType Provided but not uuid, load the default
+          // scene of that type
+          if (scene_payload_data.scene_type.has_value() &&
+              !scene_payload_data.scene_id.has_value()) {
+
+            // switch on the SceneType
+            switch (scene_payload_data.scene_type.value()) {
+
+              // deal with Title Scene Loading
+            case SceneType::TITLE: {
+              auto load_scene_result = LoadTitleScene();
+              if (!load_scene_result.has_value()) {
+                return std::unexpected(load_scene_result.error());
+              }
+              break;
+            }
+
+            case SceneType::CRAFTING: {
+              auto load_scene_result = LoadCraftingScene();
+              if (!load_scene_result.has_value()) {
+                return std::unexpected(load_scene_result.error());
+              }
+              break;
+            }
+            default:
+              // Other SceneTypes are not errors, just not handled
+              break;
+            }
+
+            break;
+          } // deal with other ScenePayload info here
+
         default:
+          // Other SceneActions are not errors, just not handled
           break;
         }
-
-        break;
+        }
       }
       default:
+        // other EventTypes are not errors, just not handled
         break;
       }
     }
   }
+
+  // function end
   return std::monostate{};
 }
 

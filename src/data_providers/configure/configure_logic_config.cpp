@@ -8,7 +8,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "configure_logic_config.h"
-#include "subscriber_factory.h"
+#include "configure_subscriber.h"
 
 namespace steamrot::data::configure {
 /////////////////////////////////////////////////
@@ -24,13 +24,15 @@ ConfigureLogicConfig(LogicConfig &logic_config,
   // add subscribers
   if (logic_config_fbs->subscriptions()) {
     for (const auto *subscriber_fbs : *logic_config_fbs->subscriptions()) {
-      auto subscriber_result =
-          subscriber_factory::CreateSubscriber(subscriber_fbs);
-      if (!subscriber_result.has_value()) {
-        return std::unexpected(subscriber_result.error());
+
+      std::shared_ptr<Subscriber> subscriber = std::make_shared<Subscriber>();
+      auto configure_result =
+          data::configure::ConfigureSubscriber(*subscriber, subscriber_fbs);
+      if (!configure_result.has_value()) {
+        return std::unexpected(configure_result.error());
       }
-      logic_config.m_subscribers.push_back(
-          std::make_shared<Subscriber>(subscriber_result.value()));
+
+      logic_config.m_subscribers.push_back(subscriber);
     }
   }
 
