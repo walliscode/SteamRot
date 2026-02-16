@@ -30,7 +30,7 @@
                       "y": 0
                     },
                     "subscriber_data": {
-                      "event_type_data": "EVENT_USER_INPUT",
+                      "event_type": "USER_INPUT",
                       "trigger_data_type": "UserInputBitsetData",
                       "trigger_data": {
                         "mouse_released": [
@@ -43,7 +43,7 @@
                         "context": {
                           "lifetime": 1
                         },
-                        "category": "SCENE",
+                        "type": "SCENE",
                         "payload_type": "ScenePayloadFbs",
                         "payload": {
                           "scene_type": "CRAFTING",
@@ -181,7 +181,7 @@
             },
             "subscribers": [
               {
-                "event_type_data": "EVENT_USER_INPUT",
+                "event_type": "USER_INPUT",
                 "trigger_data_type": "UserInputBitsetData",
                 "trigger_data": {
                   "keyboard_pressed": [

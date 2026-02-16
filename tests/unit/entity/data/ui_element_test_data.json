@@ -26,7 +26,7 @@
                 "y": 0
               },
               "subscriber_data": {
-                "event_type": "INPUT",
+                "event_type": "USER_INPUT",
                 "filter_payload_type": "InputPayloadFbs",
                 "filter_payload": {
                   "action": "SELECT"
@@ -37,7 +37,7 @@
                   "context": {
                     "lifetime": 1
                   },
-                  "category": "SCENE",
+                  "type": "SCENE",
                   "payload_type": "ScenePayloadFbs",
                   "payload": {
                     "scene_type": "TEST",

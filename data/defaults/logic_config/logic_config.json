@@ -2,7 +2,7 @@
   "test_logic": {
     "subscriptions": [
       {
-        "event_type_data": "EVENT_USER_INPUT",
+        "event_type": "USER_INPUT",
         "trigger_data_type": "UserInputBitsetData",
         "trigger_data": { "mouse_released": ["LEFT_CLICK"] }
       }
@@ -12,12 +12,12 @@
   "grimoire_machina_action_logic": {
     "subscriptions": [
       {
-        "event_type_data": "EVENT_TOGGLE_NAME",
+        "event_type": "LOGIC",
         "trigger_data_type": "ToggleNameFbs",
         "trigger_data": { "name": "initiate_machina_form_scaffold" }
       },
       {
-        "event_type_data": "EVENT_TOGGLE_NAME",
+        "event_type": "LOGIC",
         "trigger_data_type": "ToggleNameFbs",
         "trigger_data": { "name": "clear_machina_form_scaffold" }
       }
