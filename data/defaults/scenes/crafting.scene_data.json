@@ -41,16 +41,21 @@
                         "event_type_data": "EVENT_USER_INPUT",
                         "trigger_data_type": "UserInputBitsetData",
                         "trigger_data": {
-                          "mouse_released": ["LEFT_CLICK"]
+                          "mouse_released": [
+                            "LEFT_CLICK"
+                          ]
                         }
                       },
                       "response_event_data": [
                         {
-                          "event_lifetime": 1,
-                          "event_type": "EVENT_CHANGE_SCENE",
-                          "event_data_data_type": "SceneChangePacketData",
-                          "event_data_data": {
-                            "scene_type": "TITLE"
+                          "context": {
+                            "lifetime": 1
+                          },
+                          "category": "SCENE",
+                          "payload_type": "ScenePayloadFbs",
+                          "payload": {
+                            "scene_type": "TITLE",
+                            "action": "CHANGE"
                           }
                         }
                       ],
@@ -82,24 +87,31 @@
                         "event_type_data": "EVENT_USER_INPUT",
                         "trigger_data_type": "UserInputBitsetData",
                         "trigger_data": {
-                          "mouse_released": ["LEFT_CLICK"]
+                          "mouse_released": [
+                            "LEFT_CLICK"
+                          ]
                         }
                       },
                       "response_event_data": [
                         {
-                          "event_lifetime": 1,
-                          "event_type": "EVENT_TOGGLE_UI",
-                          "event_data_data_type": "UserInterfaceNameData",
-                          "event_data_data": {
-                            "id": "new_construct_menu_on"
+                          "context": {
+                            "lifetime": 1
+                          },
+                          "category": "UI",
+                          "payload_type": "UIPayloadFbs",
+                          "payload": {
+                            "c_user_interface_name": "new_construct_menu_on",
+                            "action": "TOGGLE"
                           }
                         },
                         {
-                          "event_lifetime": 1,
-                          "event_type": "EVENT_TOGGLE_NAME",
-                          "event_data_data_type": "ToggleNameFbs",
-                          "event_data_data": {
-                            "name": "initiate_machina_form_scaffold"
+                          "context": {
+                            "lifetime": 1
+                          },
+                          "category": "LOGIC",
+                          "payload_type": "LogicPayloadFbs",
+                          "payload": {
+                            "toggle_name": "INITIATE_MACHINA_FORM_SCAFFOLD"
                           }
                         }
                       ]
@@ -147,24 +159,31 @@
                         "event_type_data": "EVENT_USER_INPUT",
                         "trigger_data_type": "UserInputBitsetData",
                         "trigger_data": {
-                          "mouse_released": ["LEFT_CLICK"]
+                          "mouse_released": [
+                            "LEFT_CLICK"
+                          ]
                         }
                       },
                       "response_event_data": [
                         {
-                          "event_lifetime": 1,
-                          "event_type": "EVENT_TOGGLE_UI",
-                          "event_data_data_type": "UserInterfaceNameData",
-                          "event_data_data": {
-                            "id": "new_construct_menu_off"
+                          "context": {
+                            "lifetime": 1
+                          },
+                          "category": "UI",
+                          "payload_type": "UIPayloadFbs",
+                          "payload": {
+                            "c_user_interface_name": "new_construct_menu_off",
+                            "action": "TOGGLE"
                           }
                         },
                         {
-                          "event_lifetime": 1,
-                          "event_type": "EVENT_TOGGLE_NAME",
-                          "event_data_data_type": "ToggleNameFbs",
-                          "event_data_data": {
-                            "name": "clear_machina_form_scaffold"
+                          "context": {
+                            "lifetime": 1
+                          },
+                          "category": "LOGIC",
+                          "payload_type": "LogicPayloadFbs",
+                          "payload": {
+                            "toggle_name": "INITIATE_MACHINA_FORM_SCAFFOLD"
                           }
                         }
                       ],
@@ -192,7 +211,9 @@
                   "new_construct_menu",
                   "fragment_selection_menu"
                 ],
-                "ui_names_off": ["initial_crafting_menu"]
+                "ui_names_off": [
+                  "initial_crafting_menu"
+                ]
               },
               "subscribers": [
                 {
@@ -208,7 +229,9 @@
             {
               "state_key": "new_construct_menu_off",
               "state_to_ui_visibility": {
-                "ui_names_on": ["initial_crafting_menu"],
+                "ui_names_on": [
+                  "initial_crafting_menu"
+                ],
                 "ui_names_off": [
                   "new_construct_menu",
                   "fragment_selection_menu"

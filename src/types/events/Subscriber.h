@@ -8,7 +8,10 @@
 /////////////////////////////////////////////////
 #pragma once
 
-#include "EventPacket.h"
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include "EventPayload.h"
 #include "EventType.h"
 #include <optional>
 
@@ -25,17 +28,6 @@ namespace steamrot {
 ///
 /////////////////////////////////////////////////
 struct Subscriber {
-  Subscriber() = default;
-
-  /////////////////////////////////////////////////
-  Subscriber(const EventType trigger_event_type)
-      : m_trigger_event_type(trigger_event_type) {};
-
-  /////////////////////////////////////////////////
-  Subscriber(const EventType trigger_event_type,
-             const EventData &trigger_event_data)
-      : m_trigger_event_type(trigger_event_type),
-        m_trigger_event_data(trigger_event_data) {};
 
   /////////////////////////////////////////////////
   /// @brief Indicates whether the subscriber is active or not.
@@ -45,19 +37,11 @@ struct Subscriber {
   /////////////////////////////////////////////////
   /// @brief Event type that this subscriber listens for.
   /////////////////////////////////////////////////
-  EventType m_trigger_event_type{EventType::NONE};
+  EventType event_type{EventType::NONE};
 
   /////////////////////////////////////////////////
-  /// @brief If set, the subscriber will only be activated if the event data
-  /// matches this trigger data.
+  /// @brief Any payload data passed to the Subscriber
   /////////////////////////////////////////////////
-  std::optional<EventData> m_trigger_event_data{std::nullopt};
-
-  /////////////////////////////////////////////////
-  /// @brief Stores the actual event data that triggered the activation.
-  /// This is set when the subscriber is activated and can be used by
-  /// handlers to access the event data for processing.
-  /////////////////////////////////////////////////
-  std::optional<EventData> m_received_event_data{std::nullopt};
+  std::optional<EventPayload> captured_payload{std::nullopt};
 };
 } // namespace steamrot

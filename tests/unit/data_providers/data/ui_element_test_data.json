@@ -36,11 +36,14 @@
               },
               "response_event_data": [
                 {
-                  "event_lifetime": 1,
-                  "event_type": "EVENT_CHANGE_SCENE",
-                  "event_data_data_type": "SceneChangePacketData",
-                  "event_data_data": {
-                    "scene_type": "TEST"
+                  "context": {
+                    "lifetime": 1
+                  },
+                  "category": "SCENE",
+                  "payload_type": "ScenePayloadFbs",
+                  "payload": {
+                    "scene_type": "TEST",
+                    "action": "CHANGE"
                   }
                 }
               ],

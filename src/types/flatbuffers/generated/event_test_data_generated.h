@@ -13,7 +13,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
-#include "event_packet_data_generated.h"
+#include "event_packet_generated.h"
 #include "events_generated.h"
 
 namespace steamrot {
@@ -42,8 +42,8 @@ struct EventTestData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     return GetField<uint32_t>(VT_TICK, 0);
   }
   /// @brief Event data to be added
-  const steamrot::EventPacketData *event_packet() const {
-    return GetPointer<const steamrot::EventPacketData *>(VT_EVENT_PACKET);
+  const steamrot::EventPacketFbs *event_packet() const {
+    return GetPointer<const steamrot::EventPacketFbs *>(VT_EVENT_PACKET);
   }
   /// @brief Optional description for debugging
   const ::flatbuffers::String *description() const {
@@ -67,7 +67,7 @@ struct EventTestDataBuilder {
   void add_tick(uint32_t tick) {
     fbb_.AddElement<uint32_t>(EventTestData::VT_TICK, tick, 0);
   }
-  void add_event_packet(::flatbuffers::Offset<steamrot::EventPacketData> event_packet) {
+  void add_event_packet(::flatbuffers::Offset<steamrot::EventPacketFbs> event_packet) {
     fbb_.AddOffset(EventTestData::VT_EVENT_PACKET, event_packet);
   }
   void add_description(::flatbuffers::Offset<::flatbuffers::String> description) {
@@ -87,7 +87,7 @@ struct EventTestDataBuilder {
 inline ::flatbuffers::Offset<EventTestData> CreateEventTestData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t tick = 0,
-    ::flatbuffers::Offset<steamrot::EventPacketData> event_packet = 0,
+    ::flatbuffers::Offset<steamrot::EventPacketFbs> event_packet = 0,
     ::flatbuffers::Offset<::flatbuffers::String> description = 0) {
   EventTestDataBuilder builder_(_fbb);
   builder_.add_description(description);
@@ -99,7 +99,7 @@ inline ::flatbuffers::Offset<EventTestData> CreateEventTestData(
 inline ::flatbuffers::Offset<EventTestData> CreateEventTestDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t tick = 0,
-    ::flatbuffers::Offset<steamrot::EventPacketData> event_packet = 0,
+    ::flatbuffers::Offset<steamrot::EventPacketFbs> event_packet = 0,
     const char *description = nullptr) {
   auto description__ = description ? _fbb.CreateString(description) : 0;
   return steamrot::CreateEventTestData(

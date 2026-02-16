@@ -39,8 +39,7 @@ set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/entities/fragment.fbs
 
     # Events
-    ${CMAKE_CURRENT_SOURCE_DIR}/events/events.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/events/event_packet_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/events/event_packet.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/events/event_bus_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/events/subscriber.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/events/user_input.fbs
