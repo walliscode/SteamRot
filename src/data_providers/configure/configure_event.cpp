@@ -229,6 +229,49 @@ ConfigureEventCategory(EventCategory &event_category,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
+ConfigureEventType(EventType &event_type, EventTypeFbs event_type_data) {
+  // Convert flatbuffers enum to native enum
+  switch (event_type_data) {
+  case EventTypeFbs_NONE:
+    event_type = EventType::NONE;
+    break;
+  // User Input (100-199)
+  case EventTypeFbs_USER_INPUT_KEYBOARD:
+    event_type = EventType::USER_INPUT_KEYBOARD;
+    break;
+  case EventTypeFbs_USER_INPUT_MOUSE:
+    event_type = EventType::USER_INPUT_MOUSE;
+    break;
+  case EventTypeFbs_USER_INPUT_GAMEPAD:
+    event_type = EventType::USER_INPUT_GAMEPAD;
+    break;
+  // UI (200-299)
+  case EventTypeFbs_UI_TOGGLE:
+    event_type = EventType::UI_TOGGLE;
+    break;
+  // Scene (300-399)
+  case EventTypeFbs_SCENE_CHANGE:
+    event_type = EventType::SCENE_CHANGE;
+    break;
+  // Logic (400-499)
+  case EventTypeFbs_LOGIC_TOGGLE:
+    event_type = EventType::LOGIC_TOGGLE;
+    break;
+  // System (500-599)
+  case EventTypeFbs_SYSTEM_QUIT:
+    event_type = EventType::SYSTEM_QUIT;
+    break;
+  default:
+    return std::unexpected(
+        FailInfo{FailMode::NonExistentEnumValue,
+                 "Unknown EventTypeFbs value in flatbuffers data"});
+  }
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
 ConfigureEventPayload(EventPayload &event_payload,
                       EventPayloadFbs event_payload_data,
                       const void *event_payload_ptr) {
@@ -339,6 +382,13 @@ ConfigureEventPacket(EventPacket &event_packet,
                                                  event_packet_data->category());
   if (!category_result.has_value()) {
     return std::unexpected(category_result.error());
+  }
+
+  // Configure type
+  auto type_result =
+      ConfigureEventType(event_packet.type, event_packet_data->type());
+  if (!type_result.has_value()) {
+    return std::unexpected(type_result.error());
   }
 
   // Configure payload (required union field)

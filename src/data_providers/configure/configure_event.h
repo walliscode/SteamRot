@@ -15,6 +15,7 @@
 #include "EventContext.h"
 #include "EventPacket.h"
 #include "EventPayload.h"
+#include "EventType.h"
 #include "FailInfo.h"
 #include "event_context_generated.h"
 #include "event_packet_generated.h"
@@ -92,6 +93,15 @@ ConfigureSystemPayload(SystemPayload &system_payload,
 std::expected<std::monostate, FailInfo>
 ConfigureEventCategory(EventCategory &event_category,
                        EventCategoryFbs event_category_data);
+
+/////////////////////////////////////////////////
+/// @brief Logic for populating EventType from flatbuffers data source.
+///
+/// @param event_type Reference to EventType to populate.
+/// @param event_type_data EventTypeFbs flatbuffers enum.
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureEventType(EventType &event_type, EventTypeFbs event_type_data);
 
 /////////////////////////////////////////////////
 /// @brief Logic for populating EventPayload from flatbuffers data source.
