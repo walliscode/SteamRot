@@ -44,6 +44,8 @@ set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/events/event_bus_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/events/subscriber.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/events/user_input.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/events/event_context.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/events/event_payload.fbs
 
     # Logic
     ${CMAKE_CURRENT_SOURCE_DIR}/logic/logic_config.fbs

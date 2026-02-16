@@ -56,8 +56,7 @@ ConfigureInputPayload(InputPayload &input_payload,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigureUIPayload(UIPayload &ui_payload,
-                   const UIPayloadFbs *ui_payload_data) {
+ConfigureUIPayload(UIPayload &ui_payload, const UIPayloadFbs *ui_payload_data) {
   // check for null data
   if (!ui_payload_data) {
     return std::unexpected(
@@ -95,9 +94,9 @@ ConfigureLogicPayload(LogicPayload &logic_payload,
                       const LogicPayloadFbs *logic_payload_data) {
   // check for null data
   if (!logic_payload_data) {
-    return std::unexpected(FailInfo{
-        FailMode::FlatbuffersDataNotFound,
-        "LogicPayloadFbs data is null, cannot populate LogicPayload"});
+    return std::unexpected(
+        FailInfo{FailMode::FlatbuffersDataNotFound,
+                 "LogicPayloadFbs data is null, cannot populate LogicPayload"});
   }
 
   // populate toggle_name enum
@@ -153,8 +152,8 @@ ConfigureScenePayload(ScenePayload &scene_payload,
     std::string uuid_str = scene_payload_data->scene_id()->str();
     auto uuid_result = uuids::uuid::from_string(uuid_str);
     if (!uuid_result.has_value()) {
-      return std::unexpected(FailInfo{FailMode::InvalidData,
-                                       "Invalid UUID string in scene_id field"});
+      return std::unexpected(FailInfo{FailMode::InvalidUUID,
+                                      "Invalid UUID string in scene_id field"});
     }
     scene_payload.scene_id = uuid_result.value();
   }

@@ -125,8 +125,8 @@ TEST_CASE("ConfigureUIPayload handles optional fields",
           "[unit][configure_event]") {
   // Create test flatbuffers data with no optional fields
   flatbuffers::FlatBufferBuilder builder;
-  auto payload_data = steamrot::CreateUIPayloadFbs(
-      builder, 0, 0, steamrot::UIActionFbs_TOGGLE);
+  auto payload_data =
+      steamrot::CreateUIPayloadFbs(builder, 0, 0, steamrot::UIActionFbs_TOGGLE);
   builder.Finish(payload_data);
 
   auto *fbs_data =
@@ -220,9 +220,9 @@ TEST_CASE("ConfigureScenePayload handles optional fields",
           "[unit][configure_event]") {
   // Create test flatbuffers data with no optional fields
   flatbuffers::FlatBufferBuilder builder;
-  auto payload_data = steamrot::CreateScenePayloadFbs(
-      builder, steamrot::SceneTypeFbs_UNKNOWN, 0,
-      steamrot::SceneActionFbs_CHANGE);
+  auto payload_data =
+      steamrot::CreateScenePayloadFbs(builder, steamrot::SceneTypeFbs_UNKNOWN,
+                                      0, steamrot::SceneActionFbs_CHANGE);
   builder.Finish(payload_data);
 
   auto *fbs_data = flatbuffers::GetRoot<steamrot::ScenePayloadFbs>(
@@ -256,7 +256,7 @@ TEST_CASE("ConfigureScenePayload handles invalid UUID",
       steamrot::data::configure::ConfigureScenePayload(payload, fbs_data);
 
   REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::InvalidData);
+  REQUIRE(result.error().mode == steamrot::FailMode::InvalidUUID);
 }
 
 /////////////////////////////////////////////////
