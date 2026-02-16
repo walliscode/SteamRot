@@ -1,0 +1,18 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Implementation of free functions for configuring subscriber based
+/// data
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include "configure_subscriber.h"
+
+namespace steamrot::data::configure {
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureSubscriber(Subscriber &subscriber,
+                     const SubscriberFbs *fb_subscriber) {}
+} // namespace steamrot::data::configure

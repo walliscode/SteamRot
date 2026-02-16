@@ -1,10 +1,8 @@
-include "events.fbs";
+include "event_packet.fbs";
 
 namespace steamrot;
 
 table SubscriberFbs{
-
-  event_type_data: EventTypeFbs;
-  trigger_data: EventDataData;
   active: bool;
+  event_type: EventTypeFbs;
   }

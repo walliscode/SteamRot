@@ -13,7 +13,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
-#include "events_generated.h"
+#include "event_packet_generated.h"
 
 namespace steamrot {
 
@@ -23,78 +23,32 @@ struct SubscriberFbsBuilder;
 struct SubscriberFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef SubscriberFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_EVENT_TYPE_DATA = 4,
-    VT_TRIGGER_DATA_TYPE = 6,
-    VT_TRIGGER_DATA = 8,
-    VT_ACTIVE = 10
+    VT_ACTIVE = 4,
+    VT_EVENT_TYPE = 6
   };
-  steamrot::EventTypeFbs event_type_data() const {
-    return static_cast<steamrot::EventTypeFbs>(GetField<uint64_t>(VT_EVENT_TYPE_DATA, 0));
-  }
-  steamrot::EventDataData trigger_data_type() const {
-    return static_cast<steamrot::EventDataData>(GetField<uint8_t>(VT_TRIGGER_DATA_TYPE, 0));
-  }
-  const void *trigger_data() const {
-    return GetPointer<const void *>(VT_TRIGGER_DATA);
-  }
-  template<typename T> const T *trigger_data_as() const;
-  const steamrot::UserInputBitsetData *trigger_data_as_UserInputBitsetData() const {
-    return trigger_data_type() == steamrot::EventDataData_UserInputBitsetData ? static_cast<const steamrot::UserInputBitsetData *>(trigger_data()) : nullptr;
-  }
-  const steamrot::SceneChangePacketData *trigger_data_as_SceneChangePacketData() const {
-    return trigger_data_type() == steamrot::EventDataData_SceneChangePacketData ? static_cast<const steamrot::SceneChangePacketData *>(trigger_data()) : nullptr;
-  }
-  const steamrot::UserInterfaceNameData *trigger_data_as_UserInterfaceNameData() const {
-    return trigger_data_type() == steamrot::EventDataData_UserInterfaceNameData ? static_cast<const steamrot::UserInterfaceNameData *>(trigger_data()) : nullptr;
-  }
-  const steamrot::ToggleNameFbs *trigger_data_as_ToggleNameFbs() const {
-    return trigger_data_type() == steamrot::EventDataData_ToggleNameFbs ? static_cast<const steamrot::ToggleNameFbs *>(trigger_data()) : nullptr;
-  }
   bool active() const {
     return GetField<uint8_t>(VT_ACTIVE, 0) != 0;
   }
+  steamrot::EventTypeFbs event_type() const {
+    return static_cast<steamrot::EventTypeFbs>(GetField<uint64_t>(VT_EVENT_TYPE, 0));
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<uint64_t>(verifier, VT_EVENT_TYPE_DATA, 8) &&
-           VerifyField<uint8_t>(verifier, VT_TRIGGER_DATA_TYPE, 1) &&
-           VerifyOffset(verifier, VT_TRIGGER_DATA) &&
-           VerifyEventDataData(verifier, trigger_data(), trigger_data_type()) &&
            VerifyField<uint8_t>(verifier, VT_ACTIVE, 1) &&
+           VerifyField<uint64_t>(verifier, VT_EVENT_TYPE, 8) &&
            verifier.EndTable();
   }
 };
-
-template<> inline const steamrot::UserInputBitsetData *SubscriberFbs::trigger_data_as<steamrot::UserInputBitsetData>() const {
-  return trigger_data_as_UserInputBitsetData();
-}
-
-template<> inline const steamrot::SceneChangePacketData *SubscriberFbs::trigger_data_as<steamrot::SceneChangePacketData>() const {
-  return trigger_data_as_SceneChangePacketData();
-}
-
-template<> inline const steamrot::UserInterfaceNameData *SubscriberFbs::trigger_data_as<steamrot::UserInterfaceNameData>() const {
-  return trigger_data_as_UserInterfaceNameData();
-}
-
-template<> inline const steamrot::ToggleNameFbs *SubscriberFbs::trigger_data_as<steamrot::ToggleNameFbs>() const {
-  return trigger_data_as_ToggleNameFbs();
-}
 
 struct SubscriberFbsBuilder {
   typedef SubscriberFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_event_type_data(steamrot::EventTypeFbs event_type_data) {
-    fbb_.AddElement<uint64_t>(SubscriberFbs::VT_EVENT_TYPE_DATA, static_cast<uint64_t>(event_type_data), 0);
-  }
-  void add_trigger_data_type(steamrot::EventDataData trigger_data_type) {
-    fbb_.AddElement<uint8_t>(SubscriberFbs::VT_TRIGGER_DATA_TYPE, static_cast<uint8_t>(trigger_data_type), 0);
-  }
-  void add_trigger_data(::flatbuffers::Offset<void> trigger_data) {
-    fbb_.AddOffset(SubscriberFbs::VT_TRIGGER_DATA, trigger_data);
-  }
   void add_active(bool active) {
     fbb_.AddElement<uint8_t>(SubscriberFbs::VT_ACTIVE, static_cast<uint8_t>(active), 0);
+  }
+  void add_event_type(steamrot::EventTypeFbs event_type) {
+    fbb_.AddElement<uint64_t>(SubscriberFbs::VT_EVENT_TYPE, static_cast<uint64_t>(event_type), 0);
   }
   explicit SubscriberFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -109,15 +63,11 @@ struct SubscriberFbsBuilder {
 
 inline ::flatbuffers::Offset<SubscriberFbs> CreateSubscriberFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    steamrot::EventTypeFbs event_type_data = static_cast<steamrot::EventTypeFbs>(0),
-    steamrot::EventDataData trigger_data_type = steamrot::EventDataData_NONE,
-    ::flatbuffers::Offset<void> trigger_data = 0,
-    bool active = false) {
+    bool active = false,
+    steamrot::EventTypeFbs event_type = steamrot::EventTypeFbs_NONE) {
   SubscriberFbsBuilder builder_(_fbb);
-  builder_.add_event_type_data(event_type_data);
-  builder_.add_trigger_data(trigger_data);
+  builder_.add_event_type(event_type);
   builder_.add_active(active);
-  builder_.add_trigger_data_type(trigger_data_type);
   return builder_.Finish();
 }
 

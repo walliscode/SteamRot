@@ -11,7 +11,6 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "EventCategory.h"
 #include "EventContext.h"
 #include "EventPayload.h"
 #include "EventType.h"
@@ -26,12 +25,6 @@ struct EventPacket {
   /// This is the container for shared data
   /////////////////////////////////////////////////
   EventContext context;
-
-  /////////////////////////////////////////////////
-  /// @brief An enum capturing which category of event this packet represents,
-  /// this is a coarse filtering system
-  /////////////////////////////////////////////////
-  EventCategory category;
 
   /////////////////////////////////////////////////
   /// @brief An enum captuing finer details about the event, this is used for

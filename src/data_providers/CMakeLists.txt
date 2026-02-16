@@ -9,7 +9,6 @@ add_library(data_providers
   FlatbuffersEngineSnapshotProvider.cpp
   FlatbuffersSceneManagerDataProvider.cpp
   FlatbuffersSceneDataProvider.cpp
-  FlatbuffersSubscriberViewer.cpp
   FlatbuffersUIStyleDataProvider.cpp
   FlatbuffersSaveDataProvider.cpp
   FlatbuffersGrimoireMachinaProvider.cpp

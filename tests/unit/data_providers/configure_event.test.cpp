@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "configure_event.h"
-#include "EventCategory.h"
 #include "EventContext.h"
 #include "EventPacket.h"
 #include "EventPayload.h"
@@ -298,65 +297,6 @@ TEST_CASE("ConfigureSystemPayload populates from valid data",
 }
 
 /////////////////////////////////////////////////
-// ConfigureEventCategory tests
-/////////////////////////////////////////////////
-
-TEST_CASE("ConfigureEventCategory populates USER_INPUT category",
-          "[unit][configure_event]") {
-  steamrot::EventCategory category;
-
-  auto result = steamrot::data::configure::ConfigureEventCategory(
-      category, steamrot::EventCategoryFbs_USER_INPUT);
-
-  REQUIRE(result.has_value());
-  REQUIRE(category == steamrot::EventCategory::USER_INPUT);
-}
-
-TEST_CASE("ConfigureEventCategory populates UI category",
-          "[unit][configure_event]") {
-  steamrot::EventCategory category;
-
-  auto result = steamrot::data::configure::ConfigureEventCategory(
-      category, steamrot::EventCategoryFbs_UI);
-
-  REQUIRE(result.has_value());
-  REQUIRE(category == steamrot::EventCategory::UI);
-}
-
-TEST_CASE("ConfigureEventCategory populates LOGIC category",
-          "[unit][configure_event]") {
-  steamrot::EventCategory category;
-
-  auto result = steamrot::data::configure::ConfigureEventCategory(
-      category, steamrot::EventCategoryFbs_LOGIC);
-
-  REQUIRE(result.has_value());
-  REQUIRE(category == steamrot::EventCategory::LOGIC);
-}
-
-TEST_CASE("ConfigureEventCategory populates SCENE category",
-          "[unit][configure_event]") {
-  steamrot::EventCategory category;
-
-  auto result = steamrot::data::configure::ConfigureEventCategory(
-      category, steamrot::EventCategoryFbs_SCENE);
-
-  REQUIRE(result.has_value());
-  REQUIRE(category == steamrot::EventCategory::SCENE);
-}
-
-TEST_CASE("ConfigureEventCategory populates SYSTEM category",
-          "[unit][configure_event]") {
-  steamrot::EventCategory category;
-
-  auto result = steamrot::data::configure::ConfigureEventCategory(
-      category, steamrot::EventCategoryFbs_SYSTEM);
-
-  REQUIRE(result.has_value());
-  REQUIRE(category == steamrot::EventCategory::SYSTEM);
-}
-
-/////////////////////////////////////////////////
 // ConfigureEventType tests
 /////////////////////////////////////////////////
 
@@ -526,7 +466,8 @@ TEST_CASE("ConfigureEventPacket fails with null data",
           "[unit][configure_event]") {
   steamrot::EventPacket packet;
 
-  auto result = steamrot::data::configure::ConfigureEventPacket(packet, nullptr);
+  auto result =
+      steamrot::data::configure::ConfigureEventPacket(packet, nullptr);
 
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
@@ -551,7 +492,8 @@ TEST_CASE("ConfigureEventPacket fails with missing context",
       builder.GetBufferPointer());
 
   steamrot::EventPacket packet;
-  auto result = steamrot::data::configure::ConfigureEventPacket(packet, fbs_data);
+  auto result =
+      steamrot::data::configure::ConfigureEventPacket(packet, fbs_data);
 
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
@@ -574,7 +516,8 @@ TEST_CASE("ConfigureEventPacket fails with missing payload",
       builder.GetBufferPointer());
 
   steamrot::EventPacket packet;
-  auto result = steamrot::data::configure::ConfigureEventPacket(packet, fbs_data);
+  auto result =
+      steamrot::data::configure::ConfigureEventPacket(packet, fbs_data);
 
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
@@ -602,7 +545,8 @@ TEST_CASE("ConfigureEventPacket populates complete packet",
       builder.GetBufferPointer());
 
   steamrot::EventPacket packet;
-  auto result = steamrot::data::configure::ConfigureEventPacket(packet, fbs_data);
+  auto result =
+      steamrot::data::configure::ConfigureEventPacket(packet, fbs_data);
 
   REQUIRE(result.has_value());
   REQUIRE(packet.context.lifetime == 5);
@@ -622,21 +566,22 @@ TEST_CASE("ConfigureEventPacket populates with UIPayload",
 
   // Create payload
   auto ui_name = builder.CreateString("menu_ui");
-  auto ui_payload_data =
-      steamrot::CreateUIPayloadFbs(builder, ui_name, 0, steamrot::UIActionFbs_TOGGLE);
+  auto ui_payload_data = steamrot::CreateUIPayloadFbs(
+      builder, ui_name, 0, steamrot::UIActionFbs_TOGGLE);
 
   // Create packet
   auto packet_data = steamrot::CreateEventPacketFbs(
       builder, context_data, steamrot::EventCategoryFbs_UI,
-      steamrot::EventTypeFbs_UI_TOGGLE,
-      steamrot::EventPayloadFbs_UIPayloadFbs, ui_payload_data.Union());
+      steamrot::EventTypeFbs_UI_TOGGLE, steamrot::EventPayloadFbs_UIPayloadFbs,
+      ui_payload_data.Union());
   builder.Finish(packet_data);
 
   auto *fbs_data = flatbuffers::GetRoot<steamrot::EventPacketFbs>(
       builder.GetBufferPointer());
 
   steamrot::EventPacket packet;
-  auto result = steamrot::data::configure::ConfigureEventPacket(packet, fbs_data);
+  auto result =
+      steamrot::data::configure::ConfigureEventPacket(packet, fbs_data);
 
   REQUIRE(result.has_value());
   REQUIRE(packet.context.lifetime == 2);
@@ -671,7 +616,8 @@ TEST_CASE("ConfigureEventPacket populates with SystemPayload",
       builder.GetBufferPointer());
 
   steamrot::EventPacket packet;
-  auto result = steamrot::data::configure::ConfigureEventPacket(packet, fbs_data);
+  auto result =
+      steamrot::data::configure::ConfigureEventPacket(packet, fbs_data);
 
   REQUIRE(result.has_value());
   REQUIRE(packet.context.lifetime == 1);

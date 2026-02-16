@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "configure_event.h"
 #include "SceneType.h"
+#include "event_packet_generated.h"
 #include "uuid.h"
 
 namespace steamrot::data::configure {
@@ -199,68 +200,23 @@ ConfigureSystemPayload(SystemPayload &system_payload,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigureEventCategory(EventCategory &event_category,
-                       EventCategoryFbs event_category_data) {
-  // Convert flatbuffers enum to native enum
-  switch (event_category_data) {
-  case EventCategoryFbs_USER_INPUT:
-    event_category = EventCategory::USER_INPUT;
-    break;
-  case EventCategoryFbs_UI:
-    event_category = EventCategory::UI;
-    break;
-  case EventCategoryFbs_LOGIC:
-    event_category = EventCategory::LOGIC;
-    break;
-  case EventCategoryFbs_SCENE:
-    event_category = EventCategory::SCENE;
-    break;
-  case EventCategoryFbs_SYSTEM:
-    event_category = EventCategory::SYSTEM;
-    break;
-  default:
-    return std::unexpected(
-        FailInfo{FailMode::NonExistentEnumValue,
-                 "Unknown EventCategoryFbs value in flatbuffers data"});
-  }
-
-  return std::monostate{};
-}
-
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
 ConfigureEventType(EventType &event_type, EventTypeFbs event_type_data) {
   // Convert flatbuffers enum to native enum
   switch (event_type_data) {
   case EventTypeFbs_NONE:
     event_type = EventType::NONE;
     break;
-  // User Input (100-199)
-  case EventTypeFbs_USER_INPUT_KEYBOARD:
-    event_type = EventType::USER_INPUT_KEYBOARD;
+  case EventTypeFbs_USER_INPUT:
+    event_type = EventType::USER_INPUT;
     break;
-  case EventTypeFbs_USER_INPUT_MOUSE:
-    event_type = EventType::USER_INPUT_MOUSE;
-    break;
-  case EventTypeFbs_USER_INPUT_GAMEPAD:
-    event_type = EventType::USER_INPUT_GAMEPAD;
-    break;
-  // UI (200-299)
-  case EventTypeFbs_UI_TOGGLE:
-    event_type = EventType::UI_TOGGLE;
-    break;
-  // Scene (300-399)
-  case EventTypeFbs_SCENE_CHANGE:
-    event_type = EventType::SCENE_CHANGE;
-    break;
-  // Logic (400-499)
-  case EventTypeFbs_LOGIC_TOGGLE:
-    event_type = EventType::LOGIC_TOGGLE;
-    break;
-  // System (500-599)
-  case EventTypeFbs_SYSTEM_QUIT:
-    event_type = EventType::SYSTEM_QUIT;
-    break;
+  case EventTypeFbs_UI:
+    event_type = EventType::UI;
+  case EventTypeFbs_LOGIC:
+    event_type = EventType::LOGIC;
+  case EventTypeFbs_SCENE:
+    event_type = EventType::SCENE;
+  case EventTypeFbs_SYSTEM:
+    event_type = EventType::SYSTEM;
   default:
     return std::unexpected(
         FailInfo{FailMode::NonExistentEnumValue,
@@ -377,13 +333,6 @@ ConfigureEventPacket(EventPacket &event_packet,
     return std::unexpected(context_result.error());
   }
 
-  // Configure category
-  auto category_result = ConfigureEventCategory(event_packet.category,
-                                                 event_packet_data->category());
-  if (!category_result.has_value()) {
-    return std::unexpected(category_result.error());
-  }
-
   // Configure type
   auto type_result =
       ConfigureEventType(event_packet.type, event_packet_data->type());
@@ -397,10 +346,9 @@ ConfigureEventPacket(EventPacket &event_packet,
         FailInfo{FailMode::FlatbuffersDataNotFound,
                  "EventPacketFbs missing required payload field"});
   }
-  auto payload_result =
-      ConfigureEventPayload(event_packet.payload,
-                            event_packet_data->payload_type(),
-                            event_packet_data->payload());
+  auto payload_result = ConfigureEventPayload(event_packet.payload,
+                                              event_packet_data->payload_type(),
+                                              event_packet_data->payload());
   if (!payload_result.has_value()) {
     return std::unexpected(payload_result.error());
   }
