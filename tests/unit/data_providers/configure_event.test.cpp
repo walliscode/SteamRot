@@ -310,81 +310,58 @@ TEST_CASE("ConfigureEventType populates NONE type", "[unit][configure_event]") {
   REQUIRE(type == steamrot::EventType::NONE);
 }
 
-TEST_CASE("ConfigureEventType populates USER_INPUT_KEYBOARD type",
+TEST_CASE("ConfigureEventType populates USER_INPUT type",
           "[unit][configure_event]") {
   steamrot::EventType type;
 
   auto result = steamrot::data::configure::ConfigureEventType(
-      type, steamrot::EventTypeFbs_USER_INPUT_KEYBOARD);
+      type, steamrot::EventTypeFbs_USER_INPUT);
 
   REQUIRE(result.has_value());
-  REQUIRE(type == steamrot::EventType::USER_INPUT_KEYBOARD);
+  REQUIRE(type == steamrot::EventType::USER_INPUT);
 }
 
-TEST_CASE("ConfigureEventType populates USER_INPUT_MOUSE type",
-          "[unit][configure_event]") {
+TEST_CASE("ConfigureEventType populates UI type", "[unit][configure_event]") {
   steamrot::EventType type;
 
-  auto result = steamrot::data::configure::ConfigureEventType(
-      type, steamrot::EventTypeFbs_USER_INPUT_MOUSE);
+  auto result =
+      steamrot::data::configure::ConfigureEventType(type, steamrot::EventTypeFbs_UI);
 
   REQUIRE(result.has_value());
-  REQUIRE(type == steamrot::EventType::USER_INPUT_MOUSE);
+  REQUIRE(type == steamrot::EventType::UI);
 }
 
-TEST_CASE("ConfigureEventType populates USER_INPUT_GAMEPAD type",
+TEST_CASE("ConfigureEventType populates LOGIC type",
           "[unit][configure_event]") {
   steamrot::EventType type;
 
   auto result = steamrot::data::configure::ConfigureEventType(
-      type, steamrot::EventTypeFbs_USER_INPUT_GAMEPAD);
+      type, steamrot::EventTypeFbs_LOGIC);
 
   REQUIRE(result.has_value());
-  REQUIRE(type == steamrot::EventType::USER_INPUT_GAMEPAD);
+  REQUIRE(type == steamrot::EventType::LOGIC);
 }
 
-TEST_CASE("ConfigureEventType populates UI_TOGGLE type",
+TEST_CASE("ConfigureEventType populates SCENE type",
           "[unit][configure_event]") {
   steamrot::EventType type;
 
   auto result = steamrot::data::configure::ConfigureEventType(
-      type, steamrot::EventTypeFbs_UI_TOGGLE);
+      type, steamrot::EventTypeFbs_SCENE);
 
   REQUIRE(result.has_value());
-  REQUIRE(type == steamrot::EventType::UI_TOGGLE);
+  REQUIRE(type == steamrot::EventType::SCENE);
 }
 
-TEST_CASE("ConfigureEventType populates SCENE_CHANGE type",
+TEST_CASE("ConfigureEventType populates SYSTEM type",
           "[unit][configure_event]") {
   steamrot::EventType type;
 
   auto result = steamrot::data::configure::ConfigureEventType(
-      type, steamrot::EventTypeFbs_SCENE_CHANGE);
+      type, steamrot::EventTypeFbs_SYSTEM);
 
   REQUIRE(result.has_value());
-  REQUIRE(type == steamrot::EventType::SCENE_CHANGE);
-}
-
-TEST_CASE("ConfigureEventType populates LOGIC_TOGGLE type",
-          "[unit][configure_event]") {
-  steamrot::EventType type;
-
-  auto result = steamrot::data::configure::ConfigureEventType(
-      type, steamrot::EventTypeFbs_LOGIC_TOGGLE);
-
-  REQUIRE(result.has_value());
-  REQUIRE(type == steamrot::EventType::LOGIC_TOGGLE);
-}
-
-TEST_CASE("ConfigureEventType populates SYSTEM_QUIT type",
-          "[unit][configure_event]") {
-  steamrot::EventType type;
-
-  auto result = steamrot::data::configure::ConfigureEventType(
-      type, steamrot::EventTypeFbs_SYSTEM_QUIT);
-
-  REQUIRE(result.has_value());
-  REQUIRE(type == steamrot::EventType::SYSTEM_QUIT);
+  REQUIRE(type == steamrot::EventType::SYSTEM);
 }
 
 /////////////////////////////////////////////////
@@ -483,8 +460,7 @@ TEST_CASE("ConfigureEventPacket fails with missing context",
 
   // Create packet without context (pass 0 for context)
   auto packet_data = steamrot::CreateEventPacketFbs(
-      builder, 0, steamrot::EventCategoryFbs_USER_INPUT,
-      steamrot::EventTypeFbs_USER_INPUT_KEYBOARD,
+      builder, 0, steamrot::EventTypeFbs_USER_INPUT,
       steamrot::EventPayloadFbs_InputPayloadFbs, input_payload_data.Union());
   builder.Finish(packet_data);
 
@@ -508,8 +484,7 @@ TEST_CASE("ConfigureEventPacket fails with missing payload",
 
   // Create packet with NONE payload
   auto packet_data = steamrot::CreateEventPacketFbs(
-      builder, context_data, steamrot::EventCategoryFbs_USER_INPUT,
-      steamrot::EventTypeFbs_USER_INPUT_KEYBOARD);
+      builder, context_data, steamrot::EventTypeFbs_USER_INPUT);
   builder.Finish(packet_data);
 
   auto *fbs_data = flatbuffers::GetRoot<steamrot::EventPacketFbs>(
@@ -536,8 +511,7 @@ TEST_CASE("ConfigureEventPacket populates complete packet",
 
   // Create packet
   auto packet_data = steamrot::CreateEventPacketFbs(
-      builder, context_data, steamrot::EventCategoryFbs_USER_INPUT,
-      steamrot::EventTypeFbs_USER_INPUT_KEYBOARD,
+      builder, context_data, steamrot::EventTypeFbs_USER_INPUT,
       steamrot::EventPayloadFbs_InputPayloadFbs, input_payload_data.Union());
   builder.Finish(packet_data);
 
@@ -550,8 +524,7 @@ TEST_CASE("ConfigureEventPacket populates complete packet",
 
   REQUIRE(result.has_value());
   REQUIRE(packet.context.lifetime == 5);
-  REQUIRE(packet.category == steamrot::EventCategory::USER_INPUT);
-  REQUIRE(packet.type == steamrot::EventType::USER_INPUT_KEYBOARD);
+  REQUIRE(packet.type == steamrot::EventType::USER_INPUT);
   REQUIRE(std::holds_alternative<steamrot::InputPayload>(packet.payload));
   auto &input = std::get<steamrot::InputPayload>(packet.payload);
   REQUIRE(input.action == steamrot::InputPayload::InputAction::SELECT);
@@ -571,9 +544,8 @@ TEST_CASE("ConfigureEventPacket populates with UIPayload",
 
   // Create packet
   auto packet_data = steamrot::CreateEventPacketFbs(
-      builder, context_data, steamrot::EventCategoryFbs_UI,
-      steamrot::EventTypeFbs_UI_TOGGLE, steamrot::EventPayloadFbs_UIPayloadFbs,
-      ui_payload_data.Union());
+      builder, context_data, steamrot::EventTypeFbs_UI,
+      steamrot::EventPayloadFbs_UIPayloadFbs, ui_payload_data.Union());
   builder.Finish(packet_data);
 
   auto *fbs_data = flatbuffers::GetRoot<steamrot::EventPacketFbs>(
@@ -585,8 +557,7 @@ TEST_CASE("ConfigureEventPacket populates with UIPayload",
 
   REQUIRE(result.has_value());
   REQUIRE(packet.context.lifetime == 2);
-  REQUIRE(packet.category == steamrot::EventCategory::UI);
-  REQUIRE(packet.type == steamrot::EventType::UI_TOGGLE);
+  REQUIRE(packet.type == steamrot::EventType::UI);
   REQUIRE(std::holds_alternative<steamrot::UIPayload>(packet.payload));
   auto &ui = std::get<steamrot::UIPayload>(packet.payload);
   REQUIRE(ui.c_user_interface_name.has_value());
@@ -607,8 +578,7 @@ TEST_CASE("ConfigureEventPacket populates with SystemPayload",
 
   // Create packet
   auto packet_data = steamrot::CreateEventPacketFbs(
-      builder, context_data, steamrot::EventCategoryFbs_SYSTEM,
-      steamrot::EventTypeFbs_SYSTEM_QUIT,
+      builder, context_data, steamrot::EventTypeFbs_SYSTEM,
       steamrot::EventPayloadFbs_SystemPayloadFbs, system_payload_data.Union());
   builder.Finish(packet_data);
 
@@ -621,8 +591,7 @@ TEST_CASE("ConfigureEventPacket populates with SystemPayload",
 
   REQUIRE(result.has_value());
   REQUIRE(packet.context.lifetime == 1);
-  REQUIRE(packet.category == steamrot::EventCategory::SYSTEM);
-  REQUIRE(packet.type == steamrot::EventType::SYSTEM_QUIT);
+  REQUIRE(packet.type == steamrot::EventType::SYSTEM);
   REQUIRE(std::holds_alternative<steamrot::SystemPayload>(packet.payload));
   auto &system = std::get<steamrot::SystemPayload>(packet.payload);
   REQUIRE(system.action == steamrot::SystemPayload::SystemAction::QUIT);
