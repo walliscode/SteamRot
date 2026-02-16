@@ -14,6 +14,7 @@
 #include "EventCategory.h"
 #include "EventContext.h"
 #include "EventPayload.h"
+#include "EventType.h"
 
 namespace steamrot {
 
@@ -31,6 +32,12 @@ struct EventPacket {
   /// this is a coarse filtering system
   /////////////////////////////////////////////////
   EventCategory category;
+
+  /////////////////////////////////////////////////
+  /// @brief An enum captuing finer details about the event, this is used for
+  /// more specific filtering
+  /////////////////////////////////////////////////
+  EventType type;
 
   /////////////////////////////////////////////////
   /// @brief Variant capturing which payload type is being used

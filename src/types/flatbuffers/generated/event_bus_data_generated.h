@@ -13,7 +13,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
-#include "event_packet_data_generated.h"
+#include "event_packet_generated.h"
 
 namespace steamrot {
 
@@ -35,8 +35,8 @@ struct EventBusData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   };
   /// @brief Array of event packets in the bus
   /// Order matters - events are stored in the order they appear
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketData>> *events() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketData>> *>(VT_EVENTS);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketFbs>> *events() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketFbs>> *>(VT_EVENTS);
   }
   /// @brief Optional description for debugging
   const ::flatbuffers::String *description() const {
@@ -57,7 +57,7 @@ struct EventBusDataBuilder {
   typedef EventBusData Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_events(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketData>>> events) {
+  void add_events(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketFbs>>> events) {
     fbb_.AddOffset(EventBusData::VT_EVENTS, events);
   }
   void add_description(::flatbuffers::Offset<::flatbuffers::String> description) {
@@ -76,7 +76,7 @@ struct EventBusDataBuilder {
 
 inline ::flatbuffers::Offset<EventBusData> CreateEventBusData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketData>>> events = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketFbs>>> events = 0,
     ::flatbuffers::Offset<::flatbuffers::String> description = 0) {
   EventBusDataBuilder builder_(_fbb);
   builder_.add_description(description);
@@ -86,9 +86,9 @@ inline ::flatbuffers::Offset<EventBusData> CreateEventBusData(
 
 inline ::flatbuffers::Offset<EventBusData> CreateEventBusDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<steamrot::EventPacketData>> *events = nullptr,
+    const std::vector<::flatbuffers::Offset<steamrot::EventPacketFbs>> *events = nullptr,
     const char *description = nullptr) {
-  auto events__ = events ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::EventPacketData>>(*events) : 0;
+  auto events__ = events ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::EventPacketFbs>>(*events) : 0;
   auto description__ = description ? _fbb.CreateString(description) : 0;
   return steamrot::CreateEventBusData(
       _fbb,
