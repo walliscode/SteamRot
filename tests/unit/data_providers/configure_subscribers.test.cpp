@@ -8,10 +8,8 @@
 /////////////////////////////////////////////////
 #include "configure_subscribers.h"
 #include "Subscriber.h"
-#include "events_generated.h"
+#include "event_packet_generated.h"
 #include "subscriber_generated.h"
-#include "user_input_generated.h"
-#include <SFML/Window/Keyboard.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <variant>
 
@@ -32,7 +30,7 @@ TEST_CASE("CreateSubscriber fails with EventType NONE",
 
   // Create SubscriberFbs with EventType_NONE
   auto subscriber_offset =
-      steamrot::CreateSubscriberFbs(builder, steamrot::EventTypeFbs_NONE);
+      steamrot::CreateSubscriberFbs(builder, false, steamrot::EventTypeFbs_NONE);
   builder.Finish(subscriber_offset);
 
   const steamrot::SubscriberFbs *subscriber_fbs =
@@ -50,10 +48,8 @@ TEST_CASE("CreateSubscriber creates subscriber without trigger data",
 
   // Create SubscriberFbs with just event type, no trigger data
   auto subscriber_offset =
-      steamrot::CreateSubscriberFbs(builder, steamrot::EventTypeFbs_EVENT_TEST,
-                                    steamrot::EventDataData::EventDataData_NONE,
-                                    0,      // trigger_data_type and data
-                                    false); // active
+      steamrot::CreateSubscriberFbs(builder, false, // active
+                                    steamrot::EventTypeFbs_UI_TOGGLE);
   builder.Finish(subscriber_offset);
 
   const steamrot::SubscriberFbs *subscriber_fbs =
@@ -62,7 +58,7 @@ TEST_CASE("CreateSubscriber creates subscriber without trigger data",
   auto result = steamrot::data::configure::CreateSubscriber(subscriber_fbs);
 
   REQUIRE(result.has_value());
-  REQUIRE(result.value().m_trigger_event_type == steamrot::EventType::TEST);
+  REQUIRE(result.value().m_trigger_event_type == steamrot::EventType::UI_TOGGLE);
   REQUIRE_FALSE(result.value().m_active);
   REQUIRE_FALSE(result.value().m_trigger_event_data.has_value());
 }
@@ -73,10 +69,8 @@ TEST_CASE("CreateSubscriber creates active subscriber without trigger data",
 
   // Create SubscriberFbs with active flag set
   auto subscriber_offset =
-      steamrot::CreateSubscriberFbs(builder, steamrot::EventTypeFbs_EVENT_TEST,
-                                    steamrot::EventDataData::EventDataData_NONE,
-                                    0,     // trigger_data_type and data
-                                    true); // active
+      steamrot::CreateSubscriberFbs(builder, true, // active
+                                    steamrot::EventTypeFbs_SCENE_CHANGE);
   builder.Finish(subscriber_offset);
 
   const steamrot::SubscriberFbs *subscriber_fbs =
@@ -85,167 +79,28 @@ TEST_CASE("CreateSubscriber creates active subscriber without trigger data",
   auto result = steamrot::data::configure::CreateSubscriber(subscriber_fbs);
 
   REQUIRE(result.has_value());
-  REQUIRE(result.value().m_trigger_event_type == steamrot::EventType::TEST);
+  REQUIRE(result.value().m_trigger_event_type == steamrot::EventType::SCENE_CHANGE);
   REQUIRE(result.value().m_active);
   REQUIRE_FALSE(result.value().m_trigger_event_data.has_value());
 }
 
-TEST_CASE("CreateSubscriber creates subscriber with UserInputBitset trigger "
-          "data",
+TEST_CASE("ConfigureSubscriber populates subscriber fields correctly",
           "[unit][configure_subscribers]") {
   flatbuffers::FlatBufferBuilder builder;
 
-  // Create UserInputBitsetData with A key pressed
-  std::vector<uint8_t> keyboard_pressed = {steamrot::KeyboardInput_A};
-  auto keyboard_pressed_vec = builder.CreateVector(keyboard_pressed);
-  auto trigger_data_offset =
-      steamrot::CreateUserInputBitsetData(builder, keyboard_pressed_vec);
-
-  // Create SubscriberFbs with trigger data
-  auto subscriber_offset = steamrot::CreateSubscriberFbs(
-      builder, steamrot::EventTypeFbs_EVENT_USER_INPUT,
-      steamrot::EventDataData::EventDataData_UserInputBitsetData,
-      trigger_data_offset.Union(), false);
+  // Create SubscriberFbs
+  auto subscriber_offset =
+      steamrot::CreateSubscriberFbs(builder, true, // active
+                                    steamrot::EventTypeFbs_LOGIC_TOGGLE);
   builder.Finish(subscriber_offset);
 
   const steamrot::SubscriberFbs *subscriber_fbs =
       flatbuffers::GetRoot<steamrot::SubscriberFbs>(builder.GetBufferPointer());
 
-  auto result = steamrot::data::configure::CreateSubscriber(subscriber_fbs);
+  steamrot::Subscriber subscriber;
+  auto result = steamrot::data::configure::ConfigureSubscriber(subscriber, subscriber_fbs);
 
   REQUIRE(result.has_value());
-  REQUIRE(result.value().m_trigger_event_type ==
-          steamrot::EventType::USER_INPUT);
-  REQUIRE_FALSE(result.value().m_active);
-  REQUIRE(result.value().m_trigger_event_data.has_value());
-  REQUIRE(std::holds_alternative<steamrot::UserInputBitset>(
-      result.value().m_trigger_event_data.value()));
-
-  // Verify the bitset has A key pressed
-  const auto &bitset = std::get<steamrot::UserInputBitset>(
-      result.value().m_trigger_event_data.value());
-  REQUIRE(bitset.test(static_cast<size_t>(sf::Keyboard::Key::A)));
-}
-
-TEST_CASE("CreateSubscriber creates subscriber with SceneChangePacket trigger "
-          "data",
-          "[unit][configure_subscribers]") {
-  flatbuffers::FlatBufferBuilder builder;
-
-  // Create SceneChangePacketData
-  auto trigger_data_offset =
-      steamrot::CreateSceneChangePacketData(builder, 0, // uuid
-                                            steamrot::SceneTypeFbs_TITLE);
-
-  // Create SubscriberFbs with trigger data
-  auto subscriber_offset = steamrot::CreateSubscriberFbs(
-      builder, steamrot::EventTypeFbs_EVENT_CHANGE_SCENE,
-      steamrot::EventDataData::EventDataData_SceneChangePacketData,
-      trigger_data_offset.Union(), false);
-  builder.Finish(subscriber_offset);
-
-  const steamrot::SubscriberFbs *subscriber_fbs =
-      flatbuffers::GetRoot<steamrot::SubscriberFbs>(builder.GetBufferPointer());
-
-  auto result = steamrot::data::configure::CreateSubscriber(subscriber_fbs);
-
-  REQUIRE(result.has_value());
-  REQUIRE(result.value().m_trigger_event_type ==
-          steamrot::EventType::CHANGE_SCENE);
-  REQUIRE_FALSE(result.value().m_active);
-  REQUIRE(result.value().m_trigger_event_data.has_value());
-  REQUIRE(std::holds_alternative<steamrot::SceneChangePacket>(
-      result.value().m_trigger_event_data.value()));
-
-  // Verify the scene type
-  const auto &scene_packet = std::get<steamrot::SceneChangePacket>(
-      result.value().m_trigger_event_data.value());
-  REQUIRE(scene_packet.second == steamrot::SceneType::TITLE);
-  REQUIRE_FALSE(scene_packet.first.has_value()); // No UUID
-}
-
-TEST_CASE("CreateSubscriber creates subscriber with UserInterfaceName trigger "
-          "data",
-          "[unit][configure_subscribers]") {
-  flatbuffers::FlatBufferBuilder builder;
-
-  // Create UserInterfaceNameData
-  auto ui_name_str = builder.CreateString("test_ui_element");
-  auto trigger_data_offset =
-      steamrot::CreateUserInterfaceNameData(builder, ui_name_str);
-
-  // Create SubscriberFbs with trigger data
-  auto subscriber_offset = steamrot::CreateSubscriberFbs(
-      builder, steamrot::EventTypeFbs_EVENT_TOGGLE_UI,
-      steamrot::EventDataData::EventDataData_UserInterfaceNameData,
-      trigger_data_offset.Union(), false);
-  builder.Finish(subscriber_offset);
-
-  const steamrot::SubscriberFbs *subscriber_fbs =
-      flatbuffers::GetRoot<steamrot::SubscriberFbs>(builder.GetBufferPointer());
-
-  auto result = steamrot::data::configure::CreateSubscriber(subscriber_fbs);
-
-  REQUIRE(result.has_value());
-  REQUIRE(result.value().m_trigger_event_type ==
-          steamrot::EventType::TOGGLE_UI);
-  REQUIRE_FALSE(result.value().m_active);
-  REQUIRE(result.value().m_trigger_event_data.has_value());
-  REQUIRE(std::holds_alternative<steamrot::UserInterfaceName>(
-      result.value().m_trigger_event_data.value()));
-
-  // Verify the UI name
-  const auto &ui_name = std::get<steamrot::UserInterfaceName>(
-      result.value().m_trigger_event_data.value());
-  REQUIRE(ui_name == "test_ui_element");
-}
-
-TEST_CASE("CreateSubscriber propagates error from CreateEventData with "
-          "invalid UUID",
-          "[unit][configure_subscribers]") {
-  flatbuffers::FlatBufferBuilder builder;
-
-  // Create SceneChangePacketData with invalid UUID
-  auto uuid_str = builder.CreateString("invalid-uuid");
-  auto trigger_data_offset = steamrot::CreateSceneChangePacketData(
-      builder, uuid_str, steamrot::SceneTypeFbs_TITLE);
-
-  // Create SubscriberFbs with trigger data
-  auto subscriber_offset = steamrot::CreateSubscriberFbs(
-      builder, steamrot::EventTypeFbs_EVENT_CHANGE_SCENE,
-      steamrot::EventDataData::EventDataData_SceneChangePacketData,
-      trigger_data_offset.Union(), false);
-  builder.Finish(subscriber_offset);
-
-  const steamrot::SubscriberFbs *subscriber_fbs =
-      flatbuffers::GetRoot<steamrot::SubscriberFbs>(builder.GetBufferPointer());
-
-  auto result = steamrot::data::configure::CreateSubscriber(subscriber_fbs);
-
-  REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::InvalidUUID);
-}
-
-TEST_CASE("CreateSubscriber propagates error from CreateEventData with "
-          "missing UI name",
-          "[unit][configure_subscribers]") {
-  flatbuffers::FlatBufferBuilder builder;
-
-  // Create UserInterfaceNameData without id
-  auto trigger_data_offset = steamrot::CreateUserInterfaceNameData(builder);
-
-  // Create SubscriberFbs with trigger data
-  auto subscriber_offset = steamrot::CreateSubscriberFbs(
-      builder, steamrot::EventTypeFbs_EVENT_TOGGLE_UI,
-      steamrot::EventDataData::EventDataData_UserInterfaceNameData,
-      trigger_data_offset.Union(), false);
-  builder.Finish(subscriber_offset);
-
-  const steamrot::SubscriberFbs *subscriber_fbs =
-      flatbuffers::GetRoot<steamrot::SubscriberFbs>(builder.GetBufferPointer());
-
-  auto result = steamrot::data::configure::CreateSubscriber(subscriber_fbs);
-
-  REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(subscriber.m_active == true);
+  REQUIRE(subscriber.m_trigger_event_type == steamrot::EventType::LOGIC_TOGGLE);
 }

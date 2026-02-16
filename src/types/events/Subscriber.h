@@ -11,7 +11,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "EventData.h"
+#include "EventPayload.h"
 #include "EventType.h"
 #include <optional>
 
@@ -40,16 +40,16 @@ struct Subscriber {
   EventType m_trigger_event_type{EventType::NONE};
 
   /////////////////////////////////////////////////
-  /// @brief If set, the subscriber will only be activated if the event data
+  /// @brief If set, the subscriber will only be activated if the event payload
   /// matches this trigger data.
   /////////////////////////////////////////////////
-  std::optional<EventData> m_trigger_event_data{std::nullopt};
+  std::optional<EventPayload> m_trigger_event_data{std::nullopt};
 
   /////////////////////////////////////////////////
-  /// @brief Stores the actual event data that triggered the activation.
+  /// @brief Stores the actual event payload that triggered the activation.
   /// This is set when the subscriber is activated and can be used by
-  /// handlers to access the event data for processing.
+  /// handlers to access the event payload for processing.
   /////////////////////////////////////////////////
-  std::optional<EventData> m_received_event_data{std::nullopt};
+  std::optional<EventPayload> m_received_event_data{std::nullopt};
 };
 } // namespace steamrot

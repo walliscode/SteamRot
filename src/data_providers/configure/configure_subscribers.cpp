@@ -7,8 +7,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "configure_subscribers.h"
-#include "EventData.h"
-#include "event_factory.h"
+#include "EventPayload.h"
+#include "configure_event.h"
 #include "event_type_conversion.h"
 #include "subscriber_generated.h"
 #include <expected>
@@ -37,26 +37,30 @@ ConfigureSubscriber(Subscriber &subscriber,
   }
   subscriber.m_trigger_event_type = event_type_result.value();
 
-  // Check for trigger data
-  if (subscriber_fbs->trigger_data_type() != EventDataData_NONE &&
+  // Check for trigger data payload
+  if (subscriber_fbs->trigger_data_type() != EventPayloadFbs_NONE &&
       subscriber_fbs->trigger_data()) {
-    auto convert_result = event::CreateEventData(
-        subscriber_fbs->trigger_data_type(), subscriber_fbs->trigger_data());
+    EventPayload trigger_payload;
+    auto convert_result = ConfigureEventPayload(
+        trigger_payload, subscriber_fbs->trigger_data_type(),
+        subscriber_fbs->trigger_data());
     if (!convert_result.has_value()) {
       return std::unexpected(convert_result.error());
     }
-    subscriber.m_trigger_event_data = convert_result.value();
+    subscriber.m_trigger_event_data = trigger_payload;
   }
 
-  // Check for received data
-  if (subscriber_fbs->received_data_type() != EventDataData_NONE &&
+  // Check for received data payload
+  if (subscriber_fbs->received_data_type() != EventPayloadFbs_NONE &&
       subscriber_fbs->received_data()) {
-    auto convert_result = event::CreateEventData(
-        subscriber_fbs->received_data_type(), subscriber_fbs->received_data());
+    EventPayload received_payload;
+    auto convert_result = ConfigureEventPayload(
+        received_payload, subscriber_fbs->received_data_type(),
+        subscriber_fbs->received_data());
     if (!convert_result.has_value()) {
       return std::unexpected(convert_result.error());
     }
-    subscriber.m_received_event_data = convert_result.value();
+    subscriber.m_received_event_data = received_payload;
   }
 
   return std::monostate{};

@@ -1,4 +1,5 @@
-include "events.fbs";
+include "event_packet.fbs";
+include "event_payload.fbs";
 
 namespace steamrot;
 
@@ -15,9 +16,9 @@ table SubscriberFbs {
   /// Event type that this subscriber listens for
   event_type_data: EventTypeFbs;
   
-  /// Optional trigger data - subscriber only activates if event data matches
-  trigger_data: EventDataData;
+  /// Optional trigger payload - subscriber only activates if event payload matches
+  trigger_data: EventPayloadFbs;
   
-  /// Optional received event data (typically not set in config files)
-  received_data: EventDataData;
+  /// Optional received event payload (typically not set in config files)
+  received_data: EventPayloadFbs;
 }
