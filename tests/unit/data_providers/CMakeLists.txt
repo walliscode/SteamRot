@@ -29,6 +29,7 @@ add_executable(test_data_providers
   configure_save_data.test.cpp
   configure_scene_data.test.cpp
   configure_scene_manager_data.test.cpp
+  configure_subscribers.test.cpp
   configure_ui_styles.test.cpp
   configure_ui_elements.test.cpp
   configure_grimoire.test.cpp

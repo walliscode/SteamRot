@@ -7,13 +7,15 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "Subscriber.h"
+#include "EventData.h"
 #include <catch2/catch_test_macros.hpp>
 #include <variant>
 
-TEST_CASE("Subscriber: check public members", "[types]") {
+TEST_CASE("Subscriber: check public members", "[unit][types][Subscriber]") {
 
   // create a Subscriber object
-  steamrot::Subscriber subscriber{steamrot::EventType::TEST};
+  steamrot::Subscriber subscriber{};
+  subscriber.m_trigger_event_type = steamrot::EventType::TEST;
 
   // check the trigger event type
   REQUIRE(subscriber.m_trigger_event_type == steamrot::EventType::TEST);
@@ -30,12 +32,14 @@ TEST_CASE("Subscriber: check public members", "[types]") {
   REQUIRE(!subscriber.m_active);
 }
 
-TEST_CASE("Subscriber: with trigger data", "[types]") {
+TEST_CASE("Subscriber: with trigger data", "[unit][types][Subscriber]") {
 
   steamrot::EventData trigger_data = steamrot::UserInputBitset{};
 
   // create a Subscriber object with trigger data
-  steamrot::Subscriber subscriber{steamrot::EventType::TEST, trigger_data};
+  steamrot::Subscriber subscriber{};
+  subscriber.m_trigger_event_type = steamrot::EventType::TEST;
+  subscriber.m_trigger_event_data = trigger_data;
 
   // check the trigger event type
   REQUIRE(subscriber.m_trigger_event_type == steamrot::EventType::TEST);

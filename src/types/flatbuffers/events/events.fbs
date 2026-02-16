@@ -1,0 +1,81 @@
+////////////////////////////////////////////////////////////
+/// @file
+/// @brief FlatBuffers schema for event data types
+///
+/// This file defines the EventDataData union and related tables
+/// used by Subscribers and the event system.
+////////////////////////////////////////////////////////////
+
+include "user_input.fbs";
+
+namespace steamrot;
+
+////////////////////////////////////////////////////////////
+/// @brief Event type enumeration for events
+////////////////////////////////////////////////////////////
+enum EventTypeFbs: ulong {
+  NONE = 0,
+  EVENT_TEST = 1,
+  
+  // User Input (100-199)
+  EVENT_USER_INPUT = 100,
+  
+  // UI (200-299)
+  EVENT_TOGGLE_UI = 200,
+  
+  // Scene (300-399)
+  EVENT_CHANGE_SCENE = 300,
+  
+  // Logic (400-499)
+  EVENT_LOGIC_TOGGLE = 400,
+  
+  // System (500-599)
+  EVENT_SYSTEM_QUIT = 500
+}
+
+////////////////////////////////////////////////////////////
+/// @brief Table for SceneChangePacket data
+////////////////////////////////////////////////////////////
+table SceneChangePacketData {
+  /// Optional UUID of the target scene (as string)
+  uuid: string;
+  
+  /// Target scene type
+  scene_type: SceneTypeFbs;
+}
+
+////////////////////////////////////////////////////////////
+/// @brief Table for UserInterfaceName data
+////////////////////////////////////////////////////////////
+table UserInterfaceNameData {
+  /// User interface name identifier
+  id: string;
+}
+
+////////////////////////////////////////////////////////////
+/// @brief Table for ToggleName data
+////////////////////////////////////////////////////////////
+table ToggleNameFbs {
+  /// Toggle name identifier
+  name: string;
+}
+
+////////////////////////////////////////////////////////////
+/// @brief Scene type enumeration
+////////////////////////////////////////////////////////////
+enum SceneTypeFbs: ubyte {
+  UNKNOWN = 0,
+  TEST = 1,
+  TITLE = 2,
+  CRAFTING = 3
+}
+
+////////////////////////////////////////////////////////////
+/// @brief Union of different event data types
+////////////////////////////////////////////////////////////
+union EventDataData {
+  UserInputBitsetData,
+  SceneChangePacketData,
+  UserInterfaceNameData,
+  ToggleNameFbs
+}

@@ -2,9 +2,22 @@ include "events.fbs";
 
 namespace steamrot;
 
-table SubscriberFbs{
-
+////////////////////////////////////////////////////////////
+/// @brief FlatBuffers table for Subscriber data
+///
+/// Represents subscriber configuration that can be loaded
+/// from JSON/binary files.
+////////////////////////////////////////////////////////////
+table SubscriberFbs {
+  /// Active state of the subscriber
+  active: bool = false;
+  
+  /// Event type that this subscriber listens for
   event_type_data: EventTypeFbs;
+  
+  /// Optional trigger data - subscriber only activates if event data matches
   trigger_data: EventDataData;
-  active: bool;
-  }
+  
+  /// Optional received event data (typically not set in config files)
+  received_data: EventDataData;
+}

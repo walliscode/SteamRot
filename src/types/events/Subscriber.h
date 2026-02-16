@@ -11,21 +11,21 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "EventPayload.h"
+#include "EventData.h"
 #include "EventType.h"
 #include <optional>
 
 namespace steamrot {
 
 /////////////////////////////////////////////////
-/// @class Subscriber
-/// @brief For registering with the EventHandler
+/// @brief Subscriber struct for registering with the EventHandler
 ///
 /// This is designed to be fairly lightweight and does not handle any
 /// events/actions itself. It is simply toggled on/off based on events.
 /// Systems check the m_active flag directly to determine if the subscriber
 /// was triggered.
 ///
+/// This is a POD (Plain Old Data) struct with no methods or constructors.
 /////////////////////////////////////////////////
 struct Subscriber {
 
@@ -37,11 +37,19 @@ struct Subscriber {
   /////////////////////////////////////////////////
   /// @brief Event type that this subscriber listens for.
   /////////////////////////////////////////////////
-  EventType event_type{EventType::NONE};
+  EventType m_trigger_event_type{EventType::NONE};
 
   /////////////////////////////////////////////////
-  /// @brief Any payload data passed to the Subscriber
+  /// @brief If set, the subscriber will only be activated if the event data
+  /// matches this trigger data.
   /////////////////////////////////////////////////
-  std::optional<EventPayload> captured_payload{std::nullopt};
+  std::optional<EventData> m_trigger_event_data{std::nullopt};
+
+  /////////////////////////////////////////////////
+  /// @brief Stores the actual event data that triggered the activation.
+  /// This is set when the subscriber is activated and can be used by
+  /// handlers to access the event data for processing.
+  /////////////////////////////////////////////////
+  std::optional<EventData> m_received_event_data{std::nullopt};
 };
 } // namespace steamrot

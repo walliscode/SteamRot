@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Unit tests for the subscriber_factory namespace
+/// @brief Unit tests for Subscriber configuration functions
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "subscriber_factory.h"
+#include "configure_subscribers.h"
 #include "Subscriber.h"
 #include "events_generated.h"
 #include "subscriber_generated.h"
@@ -19,15 +19,15 @@
 // CreateSubscriber tests
 /////////////////////////////////////////////////
 
-TEST_CASE("CreateSubscriber fails with null pointer", "[subscriber_factory]") {
-  auto result = steamrot::subscriber_factory::CreateSubscriber(nullptr);
+TEST_CASE("CreateSubscriber fails with null pointer", "[unit][configure_subscribers]") {
+  auto result = steamrot::data::configure::CreateSubscriber(nullptr);
 
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
 }
 
 TEST_CASE("CreateSubscriber fails with EventType NONE",
-          "[subscriber_factory]") {
+          "[unit][configure_subscribers]") {
   flatbuffers::FlatBufferBuilder builder;
 
   // Create SubscriberFbs with EventType_NONE
@@ -38,14 +38,14 @@ TEST_CASE("CreateSubscriber fails with EventType NONE",
   const steamrot::SubscriberFbs *subscriber_fbs =
       flatbuffers::GetRoot<steamrot::SubscriberFbs>(builder.GetBufferPointer());
 
-  auto result = steamrot::subscriber_factory::CreateSubscriber(subscriber_fbs);
+  auto result = steamrot::data::configure::CreateSubscriber(subscriber_fbs);
 
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::EnumValueNotHandled);
 }
 
 TEST_CASE("CreateSubscriber creates subscriber without trigger data",
-          "[unit][subscriber_factory]") {
+          "[unit][configure_subscribers]") {
   flatbuffers::FlatBufferBuilder builder;
 
   // Create SubscriberFbs with just event type, no trigger data
@@ -59,7 +59,7 @@ TEST_CASE("CreateSubscriber creates subscriber without trigger data",
   const steamrot::SubscriberFbs *subscriber_fbs =
       flatbuffers::GetRoot<steamrot::SubscriberFbs>(builder.GetBufferPointer());
 
-  auto result = steamrot::subscriber_factory::CreateSubscriber(subscriber_fbs);
+  auto result = steamrot::data::configure::CreateSubscriber(subscriber_fbs);
 
   REQUIRE(result.has_value());
   REQUIRE(result.value().m_trigger_event_type == steamrot::EventType::TEST);
@@ -68,7 +68,7 @@ TEST_CASE("CreateSubscriber creates subscriber without trigger data",
 }
 
 TEST_CASE("CreateSubscriber creates active subscriber without trigger data",
-          "[unit][subscriber_factory]") {
+          "[unit][configure_subscribers]") {
   flatbuffers::FlatBufferBuilder builder;
 
   // Create SubscriberFbs with active flag set
@@ -82,7 +82,7 @@ TEST_CASE("CreateSubscriber creates active subscriber without trigger data",
   const steamrot::SubscriberFbs *subscriber_fbs =
       flatbuffers::GetRoot<steamrot::SubscriberFbs>(builder.GetBufferPointer());
 
-  auto result = steamrot::subscriber_factory::CreateSubscriber(subscriber_fbs);
+  auto result = steamrot::data::configure::CreateSubscriber(subscriber_fbs);
 
   REQUIRE(result.has_value());
   REQUIRE(result.value().m_trigger_event_type == steamrot::EventType::TEST);
@@ -92,7 +92,7 @@ TEST_CASE("CreateSubscriber creates active subscriber without trigger data",
 
 TEST_CASE("CreateSubscriber creates subscriber with UserInputBitset trigger "
           "data",
-          "[unit][subscriber_factory]") {
+          "[unit][configure_subscribers]") {
   flatbuffers::FlatBufferBuilder builder;
 
   // Create UserInputBitsetData with A key pressed
@@ -111,7 +111,7 @@ TEST_CASE("CreateSubscriber creates subscriber with UserInputBitset trigger "
   const steamrot::SubscriberFbs *subscriber_fbs =
       flatbuffers::GetRoot<steamrot::SubscriberFbs>(builder.GetBufferPointer());
 
-  auto result = steamrot::subscriber_factory::CreateSubscriber(subscriber_fbs);
+  auto result = steamrot::data::configure::CreateSubscriber(subscriber_fbs);
 
   REQUIRE(result.has_value());
   REQUIRE(result.value().m_trigger_event_type ==
@@ -129,7 +129,7 @@ TEST_CASE("CreateSubscriber creates subscriber with UserInputBitset trigger "
 
 TEST_CASE("CreateSubscriber creates subscriber with SceneChangePacket trigger "
           "data",
-          "[unit][subscriber_factory]") {
+          "[unit][configure_subscribers]") {
   flatbuffers::FlatBufferBuilder builder;
 
   // Create SceneChangePacketData
@@ -147,7 +147,7 @@ TEST_CASE("CreateSubscriber creates subscriber with SceneChangePacket trigger "
   const steamrot::SubscriberFbs *subscriber_fbs =
       flatbuffers::GetRoot<steamrot::SubscriberFbs>(builder.GetBufferPointer());
 
-  auto result = steamrot::subscriber_factory::CreateSubscriber(subscriber_fbs);
+  auto result = steamrot::data::configure::CreateSubscriber(subscriber_fbs);
 
   REQUIRE(result.has_value());
   REQUIRE(result.value().m_trigger_event_type ==
@@ -166,7 +166,7 @@ TEST_CASE("CreateSubscriber creates subscriber with SceneChangePacket trigger "
 
 TEST_CASE("CreateSubscriber creates subscriber with UserInterfaceName trigger "
           "data",
-          "[unit][subscriber_factory]") {
+          "[unit][configure_subscribers]") {
   flatbuffers::FlatBufferBuilder builder;
 
   // Create UserInterfaceNameData
@@ -184,7 +184,7 @@ TEST_CASE("CreateSubscriber creates subscriber with UserInterfaceName trigger "
   const steamrot::SubscriberFbs *subscriber_fbs =
       flatbuffers::GetRoot<steamrot::SubscriberFbs>(builder.GetBufferPointer());
 
-  auto result = steamrot::subscriber_factory::CreateSubscriber(subscriber_fbs);
+  auto result = steamrot::data::configure::CreateSubscriber(subscriber_fbs);
 
   REQUIRE(result.has_value());
   REQUIRE(result.value().m_trigger_event_type ==
@@ -202,7 +202,7 @@ TEST_CASE("CreateSubscriber creates subscriber with UserInterfaceName trigger "
 
 TEST_CASE("CreateSubscriber propagates error from CreateEventData with "
           "invalid UUID",
-          "[unit][subscriber_factory]") {
+          "[unit][configure_subscribers]") {
   flatbuffers::FlatBufferBuilder builder;
 
   // Create SceneChangePacketData with invalid UUID
@@ -220,7 +220,7 @@ TEST_CASE("CreateSubscriber propagates error from CreateEventData with "
   const steamrot::SubscriberFbs *subscriber_fbs =
       flatbuffers::GetRoot<steamrot::SubscriberFbs>(builder.GetBufferPointer());
 
-  auto result = steamrot::subscriber_factory::CreateSubscriber(subscriber_fbs);
+  auto result = steamrot::data::configure::CreateSubscriber(subscriber_fbs);
 
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::InvalidUUID);
@@ -228,7 +228,7 @@ TEST_CASE("CreateSubscriber propagates error from CreateEventData with "
 
 TEST_CASE("CreateSubscriber propagates error from CreateEventData with "
           "missing UI name",
-          "[unit][subscriber_factory]") {
+          "[unit][configure_subscribers]") {
   flatbuffers::FlatBufferBuilder builder;
 
   // Create UserInterfaceNameData without id
@@ -244,7 +244,7 @@ TEST_CASE("CreateSubscriber propagates error from CreateEventData with "
   const steamrot::SubscriberFbs *subscriber_fbs =
       flatbuffers::GetRoot<steamrot::SubscriberFbs>(builder.GetBufferPointer());
 
-  auto result = steamrot::subscriber_factory::CreateSubscriber(subscriber_fbs);
+  auto result = steamrot::data::configure::CreateSubscriber(subscriber_fbs);
 
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
