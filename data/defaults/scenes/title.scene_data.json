@@ -70,11 +70,14 @@
                       },
                       "response_event_data": [
                         {
-                          "event_lifetime": 1,
-                          "event_type": "EVENT_CHANGE_SCENE",
-                          "event_data_data_type": "SceneChangePacketData",
-                          "event_data_data": {
-                            "scene_type": "CRAFTING"
+                          "context": {
+                            "lifetime": 1
+                          },
+                          "category": "SCENE",
+                          "payload_type": "ScenePayloadFbs",
+                          "payload": {
+                            "scene_type": "CRAFTING",
+                            "action": "CHANGE"
                           }
                         }
                       ],
@@ -109,8 +112,14 @@
                       },
                       "response_event_data": [
                         {
-                          "event_lifetime": 1,
-                          "event_type": "EVENT_QUIT_GAME"
+                          "context": {
+                            "lifetime": 1
+                          },
+                          "category": "SYSTEM",
+                          "payload_type": "SystemPayloadFbs",
+                          "payload": {
+                            "action": "QUIT"
+                          }
                         }
                       ],
                       "children_active": false,
