@@ -1,0 +1,7 @@
+
+namespace steamrot;
+
+table EventContextFbs{
+  event_lifetime: int;
+
+}
