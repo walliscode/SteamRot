@@ -8,8 +8,7 @@
 ////////////////////////////////////////////////////////////
 #include "configure_ui_elements.h"
 #include "EventPacket.h"
-#include "event_factory.h"
-#include "event_type_conversion.h"
+#include "configure_event.h"
 #include "subscriber_factory.h"
 #include <string>
 
@@ -95,37 +94,14 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
         continue;
       }
 
-      // Check if EventTypeFbs is not none
-      if (event_packet_data->event_type() == EventTypeFbs_EVENT_NONE) {
-        continue;
+      // Configure EventPacket from EventPacketFbs data
+      EventPacket event_packet;
+      auto configure_result = ConfigureEventPacket(event_packet, event_packet_data);
+      if (!configure_result.has_value()) {
+        return std::unexpected(configure_result.error());
       }
 
-      // set EventTypeFbs
-      if (!event_packet_data->event_type()) {
-        return std::unexpected(
-            FailInfo{FailMode::FlatbuffersDataNotFound,
-                     "UIElementData has response_event_data but no event_type."});
-      }
-      
-      // Convert EventTypeFbs to native EventType
-      auto event_type_result = event::ConvertEventTypeFbsToEventType(event_packet_data->event_type());
-      if (!event_type_result.has_value()) {
-        return std::unexpected(event_type_result.error());
-      }
-      EventType event_type = event_type_result.value();
-
-      // create EventData by running the flatbuffers data through the factory
-      auto event_data_conversion_result = event::CreateEventData(
-          event_packet_data->event_data_data_type(),
-          event_packet_data->event_data_data());
-      if (!event_data_conversion_result.has_value())
-        return std::unexpected(event_data_conversion_result.error());
-
-      EventData event_data = event_data_conversion_result.value();
-
-      // create EventPacket and add to element's vector
-      EventPacket event_packet(event_type, event_data,
-                               event_packet_data->event_lifetime());
+      // Add configured event packet to element's response events
       element.response_events.push_back(event_packet);
     }
   }

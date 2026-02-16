@@ -7,7 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "event_bus_conversion.h"
-#include "event_factory.h"
+#include "configure_event.h"
 #include <iostream>
 
 namespace steamrot::event {
@@ -29,18 +29,19 @@ ConvertEventBusDataToEventBus(const EventBusData *event_bus_data) {
     return event_bus; // Empty event bus
   }
 
-  // Convert each EventPacketData to EventPacket
-  for (const EventPacketData *packet_data : *event_bus_data->events()) {
+  // Convert each EventPacketFbs to EventPacket
+  for (const EventPacketFbs *packet_data : *event_bus_data->events()) {
     // Skip null packet data entries
     if (!packet_data) {
       continue;
     }
     
-    auto event_packet_result = CreateEventPacketFromData(packet_data);
-    if (!event_packet_result.has_value()) {
-      return std::unexpected(event_packet_result.error());
+    EventPacket event_packet;
+    auto configure_result = data::configure::ConfigureEventPacket(event_packet, packet_data);
+    if (!configure_result.has_value()) {
+      return std::unexpected(configure_result.error());
     }
-    event_bus.push_back(event_packet_result.value());
+    event_bus.push_back(event_packet);
   }
 
   return event_bus;
