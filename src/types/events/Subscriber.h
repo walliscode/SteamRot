@@ -37,7 +37,7 @@ struct Subscriber {
   /////////////////////////////////////////////////
   /// @brief Event type that this subscriber listens for.
   /////////////////////////////////////////////////
-  EventType trigger_event_type{EventType::NONE};
+  EventType event_type{EventType::NONE};
 
   /////////////////////////////////////////////////
   /// @brief Any payload data passed to the Subscriber

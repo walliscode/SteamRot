@@ -64,6 +64,50 @@ inline const char *EnumNameEventCategoryFbs(EventCategoryFbs e) {
 }
 
 ////////////////////////////////////////////////////////////
+/// Event type enumeration (fine-grained event types)
+////////////////////////////////////////////////////////////
+enum EventTypeFbs : uint64_t {
+  EventTypeFbs_NONE = 0,
+  EventTypeFbs_USER_INPUT_KEYBOARD = 100ULL,
+  EventTypeFbs_USER_INPUT_MOUSE = 101ULL,
+  EventTypeFbs_USER_INPUT_GAMEPAD = 102ULL,
+  EventTypeFbs_UI_TOGGLE = 200ULL,
+  EventTypeFbs_SCENE_CHANGE = 300ULL,
+  EventTypeFbs_LOGIC_TOGGLE = 400ULL,
+  EventTypeFbs_SYSTEM_QUIT = 500ULL,
+  EventTypeFbs_MIN = EventTypeFbs_NONE,
+  EventTypeFbs_MAX = EventTypeFbs_SYSTEM_QUIT
+};
+
+inline const EventTypeFbs (&EnumValuesEventTypeFbs())[8] {
+  static const EventTypeFbs values[] = {
+    EventTypeFbs_NONE,
+    EventTypeFbs_USER_INPUT_KEYBOARD,
+    EventTypeFbs_USER_INPUT_MOUSE,
+    EventTypeFbs_USER_INPUT_GAMEPAD,
+    EventTypeFbs_UI_TOGGLE,
+    EventTypeFbs_SCENE_CHANGE,
+    EventTypeFbs_LOGIC_TOGGLE,
+    EventTypeFbs_SYSTEM_QUIT
+  };
+  return values;
+}
+
+inline const char *EnumNameEventTypeFbs(EventTypeFbs e) {
+  switch (e) {
+    case EventTypeFbs_NONE: return "NONE";
+    case EventTypeFbs_USER_INPUT_KEYBOARD: return "USER_INPUT_KEYBOARD";
+    case EventTypeFbs_USER_INPUT_MOUSE: return "USER_INPUT_MOUSE";
+    case EventTypeFbs_USER_INPUT_GAMEPAD: return "USER_INPUT_GAMEPAD";
+    case EventTypeFbs_UI_TOGGLE: return "UI_TOGGLE";
+    case EventTypeFbs_SCENE_CHANGE: return "SCENE_CHANGE";
+    case EventTypeFbs_LOGIC_TOGGLE: return "LOGIC_TOGGLE";
+    case EventTypeFbs_SYSTEM_QUIT: return "SYSTEM_QUIT";
+    default: return "";
+  }
+}
+
+////////////////////////////////////////////////////////////
 /// Complete event packet
 ////////////////////////////////////////////////////////////
 struct EventPacketFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -71,8 +115,9 @@ struct EventPacketFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_CONTEXT = 4,
     VT_CATEGORY = 6,
-    VT_PAYLOAD_TYPE = 8,
-    VT_PAYLOAD = 10
+    VT_TYPE = 8,
+    VT_PAYLOAD_TYPE = 10,
+    VT_PAYLOAD = 12
   };
   /// Event context (lifetime, etc.)
   const steamrot::EventContextFbs *context() const {
@@ -81,6 +126,10 @@ struct EventPacketFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   /// Event category for coarse filtering
   steamrot::EventCategoryFbs category() const {
     return static_cast<steamrot::EventCategoryFbs>(GetField<int8_t>(VT_CATEGORY, 0));
+  }
+  /// Event type for fine-grained filtering
+  steamrot::EventTypeFbs type() const {
+    return static_cast<steamrot::EventTypeFbs>(GetField<uint64_t>(VT_TYPE, 0));
   }
   steamrot::EventPayloadFbs payload_type() const {
     return static_cast<steamrot::EventPayloadFbs>(GetField<uint8_t>(VT_PAYLOAD_TYPE, 0));
@@ -110,6 +159,7 @@ struct EventPacketFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffsetRequired(verifier, VT_CONTEXT) &&
            verifier.VerifyTable(context()) &&
            VerifyField<int8_t>(verifier, VT_CATEGORY, 1) &&
+           VerifyField<uint64_t>(verifier, VT_TYPE, 8) &&
            VerifyField<uint8_t>(verifier, VT_PAYLOAD_TYPE, 1) &&
            VerifyOffsetRequired(verifier, VT_PAYLOAD) &&
            VerifyEventPayloadFbs(verifier, payload(), payload_type()) &&
@@ -147,6 +197,9 @@ struct EventPacketFbsBuilder {
   void add_category(steamrot::EventCategoryFbs category) {
     fbb_.AddElement<int8_t>(EventPacketFbs::VT_CATEGORY, static_cast<int8_t>(category), 0);
   }
+  void add_type(steamrot::EventTypeFbs type) {
+    fbb_.AddElement<uint64_t>(EventPacketFbs::VT_TYPE, static_cast<uint64_t>(type), 0);
+  }
   void add_payload_type(steamrot::EventPayloadFbs payload_type) {
     fbb_.AddElement<uint8_t>(EventPacketFbs::VT_PAYLOAD_TYPE, static_cast<uint8_t>(payload_type), 0);
   }
@@ -170,9 +223,11 @@ inline ::flatbuffers::Offset<EventPacketFbs> CreateEventPacketFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::EventContextFbs> context = 0,
     steamrot::EventCategoryFbs category = steamrot::EventCategoryFbs_USER_INPUT,
+    steamrot::EventTypeFbs type = steamrot::EventTypeFbs_NONE,
     steamrot::EventPayloadFbs payload_type = steamrot::EventPayloadFbs_NONE,
     ::flatbuffers::Offset<void> payload = 0) {
   EventPacketFbsBuilder builder_(_fbb);
+  builder_.add_type(type);
   builder_.add_payload(payload);
   builder_.add_context(context);
   builder_.add_payload_type(payload_type);
