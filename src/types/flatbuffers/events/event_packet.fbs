@@ -1,0 +1,39 @@
+////////////////////////////////////////////////////////////
+/// @file
+/// @brief FlatBuffers schema for EventPacket.
+///
+/// EventPacketFbs contains context, category, and payload data
+/// for events managed by the EventHandler.
+////////////////////////////////////////////////////////////
+
+include "event_context.fbs";
+include "event_payload.fbs";
+
+namespace steamrot;
+
+////////////////////////////////////////////////////////////
+/// Event category types
+////////////////////////////////////////////////////////////
+enum EventCategoryFbs: byte {
+  USER_INPUT = 0,
+  UI = 1,
+  LOGIC = 2,
+  SCENE = 3,
+  SYSTEM = 4
+}
+
+////////////////////////////////////////////////////////////
+/// Complete event packet
+////////////////////////////////////////////////////////////
+table EventPacketFbs {
+  /// Event context (lifetime, etc.)
+  context: EventContextFbs (required);
+  
+  /// Event category for coarse filtering
+  category: EventCategoryFbs;
+  
+  /// Event payload union (specific payload type)
+  payload: EventPayloadFbs (required);
+}
+
+root_type EventPacketFbs;

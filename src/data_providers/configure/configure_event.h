@@ -11,10 +11,13 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "EventCategory.h"
 #include "EventContext.h"
+#include "EventPacket.h"
 #include "EventPayload.h"
 #include "FailInfo.h"
 #include "event_context_generated.h"
+#include "event_packet_generated.h"
 #include "event_payload_generated.h"
 #include <expected>
 
@@ -79,5 +82,36 @@ ConfigureScenePayload(ScenePayload &scene_payload,
 std::expected<std::monostate, FailInfo>
 ConfigureSystemPayload(SystemPayload &system_payload,
                        const SystemPayloadFbs *system_payload_data);
+
+/////////////////////////////////////////////////
+/// @brief Logic for populating EventCategory from flatbuffers data source.
+///
+/// @param event_category Reference to EventCategory to populate.
+/// @param event_category_data EventCategoryFbs flatbuffers enum.
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureEventCategory(EventCategory &event_category,
+                       EventCategoryFbs event_category_data);
+
+/////////////////////////////////////////////////
+/// @brief Logic for populating EventPayload from flatbuffers data source.
+///
+/// @param event_payload Reference to EventPayload to populate.
+/// @param event_payload_data Pointer to EventPayloadFbs flatbuffers union.
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureEventPayload(EventPayload &event_payload,
+                      EventPayloadFbs event_payload_data,
+                      const void *event_payload_ptr);
+
+/////////////////////////////////////////////////
+/// @brief Logic for populating EventPacket from flatbuffers data source.
+///
+/// @param event_packet Reference to EventPacket to populate.
+/// @param event_packet_data Pointer to EventPacketFbs flatbuffers data.
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureEventPacket(EventPacket &event_packet,
+                     const EventPacketFbs *event_packet_data);
 
 } // namespace steamrot::data::configure
