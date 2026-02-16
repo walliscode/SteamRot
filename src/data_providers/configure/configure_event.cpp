@@ -211,12 +211,16 @@ ConfigureEventType(EventType &event_type, EventTypeFbs event_type_data) {
     break;
   case EventTypeFbs_UI:
     event_type = EventType::UI;
+    break;
   case EventTypeFbs_LOGIC:
     event_type = EventType::LOGIC;
+    break;
   case EventTypeFbs_SCENE:
     event_type = EventType::SCENE;
+    break;
   case EventTypeFbs_SYSTEM:
     event_type = EventType::SYSTEM;
+    break;
   default:
     return std::unexpected(
         FailInfo{FailMode::NonExistentEnumValue,
