@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////
 
 #include "FlatbuffersSubscriberViewer.h"
-#include "subscriber_factory.h"
+#include "configure_subscribers.h"
 
 namespace steamrot {
 
@@ -34,8 +34,8 @@ FlatbuffersSubscriberViewer::GetSubscribers() const {
       continue; // Skip null entries
     }
 
-    // Use subscriber_factory to convert SubscriberFbs to Subscriber
-    auto convert_result = subscriber_factory::CreateSubscriber(subscriber_fbs);
+    // Use configure_subscribers to convert SubscriberFbs to Subscriber
+    auto convert_result = data::configure::CreateSubscriber(subscriber_fbs);
     if (!convert_result.has_value()) {
       // Skip entries with NONE event type
       if (convert_result.error().mode == FailMode::EnumValueNotHandled)

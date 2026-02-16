@@ -9,7 +9,7 @@
 #include "configure_ui_elements.h"
 #include "EventPacket.h"
 #include "configure_event.h"
-#include "subscriber_factory.h"
+#include "configure_subscribers.h"
 #include <string>
 
 namespace steamrot::data::configure {
@@ -70,7 +70,7 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
     std::vector<const SubscriberFbs *> subscribers_fbs{data.subscriber_data()};
 
     // Create Subscriber via factory
-    auto result = subscriber_factory::CreateSubscriber(subscribers_fbs[0]);
+    auto result = data::configure::CreateSubscriber(subscribers_fbs[0]);
 
     // propogate errors
     if (!result.has_value())

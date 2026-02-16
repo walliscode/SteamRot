@@ -10,9 +10,9 @@
 #include "EntityTransportVariant.h"
 #include "FailInfo.h"
 #include "FlatbuffersUIElementProvider.h"
+#include "configure_subscribers.h"
 #include "containers.h"
 #include "entity_memory.h"
-#include "subscriber_factory.h"
 #include "ui_state_generated.h"
 #include <expected>
 #include <variant>
@@ -271,7 +271,7 @@ FlatbuffersEntityConfigurator::ConfigureCUIState(CUIState &ui_state_component,
       // create subscribers from the flatbuffers data
       for (const auto &subscriber_data : *ui_state_data->subscribers()) {
         auto subscriber_result =
-            subscriber_factory::CreateSubscriber(subscriber_data);
+            data::configure::CreateSubscriber(subscriber_data);
 
         if (!subscriber_result.has_value()) {
           return std::unexpected(subscriber_result.error());

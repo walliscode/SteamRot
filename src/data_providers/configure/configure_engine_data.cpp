@@ -7,7 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "configure_engine_data.h"
-#include "subscriber_factory.h"
+#include "configure_subscribers.h"
 
 namespace steamrot::data::configure {
 
@@ -97,7 +97,7 @@ ConfigureEngineState(EngineState &engine_state,
   //  populate subscriptions
   for (const SubscriberFbs *subscriber_fbs :
        *engine_state_data->subscriptions()) {
-    auto create_result = subscriber_factory::CreateSubscriber(subscriber_fbs);
+    auto create_result = data::configure::CreateSubscriber(subscriber_fbs);
     if (!create_result.has_value()) {
       return std::unexpected(create_result.error());
     }
