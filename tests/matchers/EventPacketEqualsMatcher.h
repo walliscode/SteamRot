@@ -26,24 +26,16 @@ private:
   mutable std::string m_mismatch_description;
 
   /////////////////////////////////////////////////
-  /// @brief Get the name of the EventData variant type by index
+  /// @brief Compare EventPayload variants
   ///
-  /// @param index Index of the variant type
-  /// @return Name of the variant type
-  /////////////////////////////////////////////////
-  std::string GetNameForEventDataIndex(size_t index) const;
-
-  /////////////////////////////////////////////////
-  /// @brief Compare EventData variants
-  ///
-  /// @param actual_data Actual event data
-  /// @param expected_data Expected event data
+  /// @param actual_payload Actual event payload
+  /// @param expected_payload Expected event payload
   /// @param oss Output stream for mismatch description
-  /// @return true if data matches, false otherwise
+  /// @return true if payload matches, false otherwise
   /////////////////////////////////////////////////
-  bool CompareEventData(const EventData &actual_data,
-                        const EventData &expected_data,
-                        std::ostringstream &oss) const;
+  bool CompareEventPayload(const EventPayload &actual_payload,
+                           const EventPayload &expected_payload,
+                           std::ostringstream &oss) const;
 
 public:
   /////////////////////////////////////////////////
