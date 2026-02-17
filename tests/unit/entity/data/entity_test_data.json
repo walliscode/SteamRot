@@ -30,12 +30,10 @@
                       "y": 0
                     },
                     "subscriber_data": {
-                      "event_type_data": "EVENT_USER_INPUT",
-                      "trigger_data_type": "UserInputBitsetData",
-                      "trigger_data": {
-                        "mouse_released": [
-                          "LEFT_CLICK"
-                        ]
+                      "event_type": "USER_INPUT",
+                      "filter_payload_type": "InputPayloadFbs",
+                      "filter_payload": {
+                        "action": "SELECT"
                       }
                     },
                     "response_event_data": [
@@ -43,7 +41,7 @@
                         "context": {
                           "lifetime": 1
                         },
-                        "category": "SCENE",
+                        "type": "SCENE",
                         "payload_type": "ScenePayloadFbs",
                         "payload": {
                           "scene_type": "CRAFTING",
@@ -181,12 +179,10 @@
             },
             "subscribers": [
               {
-                "event_type_data": "EVENT_USER_INPUT",
-                "trigger_data_type": "UserInputBitsetData",
-                "trigger_data": {
-                  "keyboard_pressed": [
-                    "Q"
-                  ]
+                "event_type": "USER_INPUT",
+                "filter_payload_type": "InputPayloadFbs",
+                "filter_payload": {
+                  "action": "SELECT"
                 },
                 "active": true
               }
