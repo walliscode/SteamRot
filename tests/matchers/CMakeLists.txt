@@ -7,6 +7,7 @@ add_library(matchers
   CUIStateEqualsMatcher.cpp
   EventPacketEqualsMatcher.cpp
   EventDataEqualsMatcher.cpp
+  EventPayloadEqualsMatcher.cpp
   EventBusEqualsMatcher.cpp
   UIElementEqualsMatcher.cpp
   EntityMemoryPoolEqualsMatcher.cpp
