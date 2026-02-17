@@ -5,6 +5,7 @@ add_executable(test_matchers
   CUIStateEqualsMatcher.test.cpp
   EventPacketEqualsMatcher.test.cpp
   EventDataEqualsMatcher.test.cpp
+  EventPayloadEqualsMatcher.test.cpp
   EventBusEqualsMatcher.test.cpp
   UIElementEqualsMatcher.test.cpp
   EntityMemoryPoolEqualsMatcher.test.cpp
