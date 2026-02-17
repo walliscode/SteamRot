@@ -39,11 +39,9 @@
                       },
                       "subscriber_data": {
                         "event_type": "USER_INPUT",
-                        "trigger_data_type": "UserInputBitsetData",
-                        "trigger_data": {
-                          "mouse_released": [
-                            "LEFT_CLICK"
-                          ]
+                        "filter_payload_type": "InputPayloadFbs",
+                        "filter_payload": {
+                          "action": "SELECT"
                         }
                       },
                       "response_event_data": [
@@ -85,11 +83,9 @@
                       "spacing_strategy": "None",
                       "subscriber_data": {
                         "event_type": "USER_INPUT",
-                        "trigger_data_type": "UserInputBitsetData",
-                        "trigger_data": {
-                          "mouse_released": [
-                            "LEFT_CLICK"
-                          ]
+                        "filter_payload_type": "InputPayloadFbs",
+                        "filter_payload": {
+                          "action": "SELECT"
                         }
                       },
                       "response_event_data": [
@@ -157,11 +153,9 @@
                       },
                       "subscriber_data": {
                         "event_type": "USER_INPUT",
-                        "trigger_data_type": "UserInputBitsetData",
-                        "trigger_data": {
-                          "mouse_released": [
-                            "LEFT_CLICK"
-                          ]
+                        "filter_payload_type": "InputPayloadFbs",
+                        "filter_payload": {
+                          "action": "SELECT"
                         }
                       },
                       "response_event_data": [
@@ -218,9 +212,10 @@
               "subscribers": [
                 {
                   "event_type": "UI",
-                  "trigger_data_type": "UserInterfaceNameData",
-                  "trigger_data": {
-                    "id": "new_construct_menu_on"
+                  "filter_payload_type": "UIPayloadFbs",
+                  "filter_payload": {
+                    "c_ui_state_name": "new_construct_menu_on",
+                    "action": "TOGGLE"
                   },
                   "active": false
                 }
@@ -240,9 +235,10 @@
               "subscribers": [
                 {
                   "event_type": "UI",
-                  "trigger_data_type": "UserInterfaceNameData",
-                  "trigger_data": {
-                    "id": "new_construct_menu_off"
+                  "filter_payload_type": "UIPayloadFbs",
+                  "filter_payload": {
+                    "c_ui_state_name": "new_construct_menu_off",
+                    "action": "TOGGLE"
                   },
                   "active": false
                 }

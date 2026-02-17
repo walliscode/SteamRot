@@ -3,8 +3,8 @@
     "subscriptions": [
       {
         "event_type": "USER_INPUT",
-        "trigger_data_type": "UserInputBitsetData",
-        "trigger_data": { "mouse_released": ["LEFT_CLICK"] }
+        "filter_payload_type": "InputPayloadFbs",
+        "filter_payload": { "action": "SELECT" }
       }
     ]
   },
@@ -13,13 +13,13 @@
     "subscriptions": [
       {
         "event_type": "LOGIC",
-        "trigger_data_type": "ToggleNameFbs",
-        "trigger_data": { "name": "initiate_machina_form_scaffold" }
+        "filter_payload_type": "LogicPayloadFbs",
+        "filter_payload": { "toggle_name": "INITIATE_MACHINA_FORM_SCAFFOLD" }
       },
       {
         "event_type": "LOGIC",
-        "trigger_data_type": "ToggleNameFbs",
-        "trigger_data": { "name": "clear_machina_form_scaffold" }
+        "filter_payload_type": "LogicPayloadFbs",
+        "filter_payload": { "toggle_name": "INITIATE_MACHINA_FORM_SCAFFOLD" }
       }
     ]
   }

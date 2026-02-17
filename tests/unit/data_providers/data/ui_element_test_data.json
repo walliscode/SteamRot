@@ -27,11 +27,9 @@
               },
               "subscriber_data": {
                 "event_type": "USER_INPUT",
-                "trigger_data_type": "UserInputBitsetData",
-                "trigger_data": {
-                  "mouse_released": [
-                    "LEFT_CLICK"
-                  ]
+                "filter_payload_type": "InputPayloadFbs",
+                "filter_payload": {
+                  "action": "SELECT"
                 }
               },
               "response_event_data": [
