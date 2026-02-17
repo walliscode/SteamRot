@@ -8,8 +8,8 @@
 /////////////////////////////////////////////////
 
 #include "GameEngine.h"
+#include "EventPayload.h"
 #include <expected>
-#include <iostream>
 
 namespace steamrot {
 
@@ -69,16 +69,41 @@ std::expected<std::monostate, FailInfo> GameEngine::ProcessSubscriptions() {
     // only process active subscribers
     if (subscriber->m_active) {
 
-      std::cout << "Processing subscription for event type: "
-                << EnumNameEventType(subscriber->m_trigger_event_type)
-                << std::endl;
       // switch on the EventType
-      switch (subscriber->m_trigger_event_type) {
-      case EventType::QUIT_GAME: {
-        // close the window to quit the game
-        m_engine_resources.game_window.close();
-        break;
+      switch (subscriber->event_type) {
+        // deal with SYSTEM level events
+      case EventType::SYSTEM: {
+
+        // check if any filter data
+        if (!subscriber->filter_payload.has_value()) {
+          // no value, just continue
+          continue;
+        }
+
+        // check filter data is SystemPayload
+        if (!std::holds_alternative<SystemPayload>(
+                subscriber->filter_payload.value())) {
+          // filter data is not SystemPayload, skip
+          continue;
+        }
+        SystemPayload &filter_data =
+            std::get<SystemPayload>(subscriber->filter_payload.value());
+
+        // switch on the SystemAction
+        switch (filter_data.action) {
+        case SystemPayload::SystemAction::QUIT: {
+
+          // close the window to quit the game
+          m_engine_resources.game_window.close();
+          break;
+        }
+
+        // deal with other system actions here as needed
+        default:
+          break;
+        }
       }
+      // deal with other event types here as needed
       default:
         break;
       }

@@ -10,6 +10,7 @@
 #include "EventPacket.h"
 #include "EventPayloadEqualsMatcher.h"
 #include "conmat.h"
+#include "magic_enum/magic_enum.hpp"
 
 namespace steamrot::tests {
 
@@ -40,12 +41,12 @@ bool EventPacketEqualsMatcher::match(const EventPacket &actual) const {
     oss << conmat::TestFailed() << "type:" << "\n";
     oss << "\t"
         << "actual = "
-        << conmat::Colorize(EnumNameEventType(actual.type),
+        << conmat::Colorize(magic_enum::enum_name(actual.type),
                             conmat::Color::Red)
         << "\n";
     oss << "\t"
         << "expected = "
-        << conmat::Colorize(EnumNameEventType(m_expected.type),
+        << conmat::Colorize(magic_enum::enum_name(m_expected.type),
                             conmat::Color::Blue)
         << "\n";
   }

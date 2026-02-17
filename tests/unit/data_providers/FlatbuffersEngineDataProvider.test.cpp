@@ -44,8 +44,14 @@ TEST_CASE("FlatbuffersEngineDataProvider::CreateEngineData loads correctly",
   REQUIRE(engine_state.paused == false);
   REQUIRE(engine_state.quit_requested == false);
   REQUIRE(engine_state.subscriptions.size() == 1);
-  REQUIRE(engine_state.subscriptions[0]->m_trigger_event_type ==
-          steamrot::EventType::QUIT_GAME);
+  // check filter payload is a SystemPayload
+  REQUIRE(engine_state.subscriptions[0]->filter_payload.has_value());
+  REQUIRE(std::holds_alternative<steamrot::SystemPayload>(
+      engine_state.subscriptions[0]->filter_payload.value()));
+  // pull out payload for testing
+  const steamrot::SystemPayload &payload = std::get<steamrot::SystemPayload>(
+      engine_state.subscriptions[0]->filter_payload.value());
+  REQUIRE(payload.action == steamrot::SystemPayload::SystemAction::QUIT);
 
   // Check AssetConfig
   const auto &asset_config = data.initial_asset_config;

@@ -8,9 +8,10 @@
 /////////////////////////////////////////////////
 #include "EventHandler.h"
 #include "EventPacket.h"
+#include "EventPayload.h"
 #include "EventType.h"
 #include "Subscriber.h"
-#include "events_generated.h"
+
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
@@ -22,7 +23,7 @@ TEST_CASE("EventHandler registers Subscribers", "[unit][EventHandler]") {
   steamrot::EventHandler event_handler;
 
   // create Subscriber variables
-  const steamrot::EventType event_type = steamrot::EventType::QUIT_GAME;
+  const steamrot::EventType event_type = steamrot::EventType::SYSTEM;
 
   // Create a Subscriber instance
   std::shared_ptr<steamrot::Subscriber> subscriber =
@@ -81,9 +82,9 @@ TEST_CASE("DecrementEventLifetimes decrease all lifetimes by 1",
 
   // decrement lifetimes
   steamrot::DecrementEventLifetimes(event_bus);
-  REQUIRE(event_bus[0].event_lifetime == 2);
-  REQUIRE(event_bus[1].event_lifetime == 0);
-  REQUIRE(event_bus[2].event_lifetime == 1);
+  REQUIRE(event_bus[0].context.lifetime == 2);
+  REQUIRE(event_bus[1].context.lifetime == 0);
+  REQUIRE(event_bus[2].context.lifetime == 1);
 }
 
 TEST_CASE("RemoveDeadEvents removes dead events", "[unit][EventHandler]") {
@@ -101,8 +102,8 @@ TEST_CASE("RemoveDeadEvents removes dead events", "[unit][EventHandler]") {
   // remove dead events
   steamrot::RemoveDeadEvents(event_bus);
   REQUIRE(event_bus.size() == 2);
-  REQUIRE(event_bus[0].event_lifetime == 3);
-  REQUIRE(event_bus[1].event_lifetime == 1);
+  REQUIRE(event_bus[0].context.lifetime == 3);
+  REQUIRE(event_bus[1].context.lifetime == 1);
 }
 
 TEST_CASE(
@@ -130,8 +131,8 @@ TEST_CASE(
   global_event_bus = event_handler.GetGlobalEventBus();
 
   REQUIRE(global_event_bus.size() == 2);
-  REQUIRE(global_event_bus[0].event_lifetime == 3);
-  REQUIRE(global_event_bus[1].event_lifetime == 2);
+  REQUIRE(global_event_bus[0].context.lifetime == 3);
+  REQUIRE(global_event_bus[1].context.lifetime == 2);
 }
 
 TEST_CASE("HandleSFMLEvents adds events to anEventBus") {
@@ -156,13 +157,13 @@ TEST_CASE("EventHandler::TickGlobalEventBus updates the global event bus",
   // Check that the events were added successfully
   auto global_event_bus = event_handler.GetGlobalEventBus();
   REQUIRE(global_event_bus.size() == 2);
-  REQUIRE(global_event_bus[0].event_lifetime == 2);
-  REQUIRE(global_event_bus[1].event_lifetime == 1);
+  REQUIRE(global_event_bus[0].context.lifetime == 2);
+  REQUIRE(global_event_bus[1].context.lifetime == 1);
   // Tick the global event bus to update lifetimes and remove dead events
   event_handler.TickGlobalEventBus();
   global_event_bus = event_handler.GetGlobalEventBus();
   REQUIRE(global_event_bus.size() == 1);
-  REQUIRE(global_event_bus[0].event_lifetime == 1);
+  REQUIRE(global_event_bus[0].context.lifetime == 1);
   // Tick again, which should remove the last event
   event_handler.TickGlobalEventBus();
   global_event_bus = event_handler.GetGlobalEventBus();
@@ -181,16 +182,13 @@ TEST_CASE("UpdateSubscribers turns on Subscribers", "[unit][EventHandler]") {
   // check that the subscriber is not active
   REQUIRE(!subscriber->m_active);
 
-  // create Event Data to use
-  sf::Event::KeyPressed event_sf;
-  event_sf.code = sf::Keyboard::Key::A;
-  sf::Event event{event_sf};
-  steamrot::EventData user_input_bitset;
-  user_input_bitset = steamrot::UserInputBitset{{event}};
+  // create InputPayload to pass to UpdateSubscribers
+  steamrot::EventPayload input_payload{
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT}};
 
   // Update the subscriber with the event data
   std::weak_ptr<steamrot::Subscriber> weak_subscriber = subscriber;
-  steamrot::UpdateSubscriber(weak_subscriber, user_input_bitset);
+  steamrot::UpdateSubscriber(weak_subscriber, input_payload);
 
   REQUIRE(subscriber->m_active);
 }
@@ -215,7 +213,7 @@ TEST_CASE("EventHandler::UpdateSubscribersFrom does not update Subscribers "
 
   // Create some EventPackets to add that do not match the subscriber
   steamrot::EventPacket event1{2};
-  event1.event_type = steamrot::EventType::TEST;
+  event1.type = steamrot::EventType::NONE;
   std::vector<steamrot::EventPacket> events_to_add = {event1};
 
   // Add events to the global event bus
@@ -235,15 +233,9 @@ TEST_CASE("EventHandler::UpdateSubscribers does not update Subscriber if "
   // create Subscriber variables
   const steamrot::EventType event_type = steamrot::EventType::USER_INPUT;
 
-  // Create a Subscriber instance with trigger data
-  sf::Event::KeyPressed event_sf;
-  event_sf.code = sf::Keyboard::Key::A;
-
-  sf::Event event{event_sf};
-  steamrot::EventData trigger_data;
-  trigger_data = steamrot::UserInputBitset{{event}};
+  // Create a Subscriber instance
   std::shared_ptr<steamrot::Subscriber> subscriber =
-      std::make_shared<steamrot::Subscriber>(event_type, trigger_data);
+      std::make_shared<steamrot::Subscriber>();
 
   // check that the subscriber is not active
   REQUIRE(!subscriber->m_active);

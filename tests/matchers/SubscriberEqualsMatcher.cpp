@@ -10,6 +10,7 @@
 #include "EventPayloadEqualsMatcher.h"
 #include "Subscriber.h"
 #include "conmat.h"
+#include <magic_enum/magic_enum.hpp>
 
 namespace steamrot::tests {
 
@@ -26,8 +27,8 @@ bool SubscriberEqualsMatcher::match(const Subscriber &actual) const {
   if (actual.m_active != m_expected.m_active) {
     oss << conmat::TestFailed() << "m_active:" << "\n";
     oss << "\t"
-        << "actual = "
-        << conmat::Colorize(actual.m_active, conmat::Color::Red) << "\n";
+        << "actual = " << conmat::Colorize(actual.m_active, conmat::Color::Red)
+        << "\n";
     oss << "\t"
         << "expected = "
         << conmat::Colorize(m_expected.m_active, conmat::Color::Blue) << "\n";
@@ -38,12 +39,12 @@ bool SubscriberEqualsMatcher::match(const Subscriber &actual) const {
     oss << conmat::TestFailed() << "event_type:" << "\n";
     oss << "\t"
         << "actual = "
-        << conmat::Colorize(EnumNameEventType(actual.event_type),
+        << conmat::Colorize(magic_enum::enum_name(actual.event_type),
                             conmat::Color::Red)
         << "\n";
     oss << "\t"
         << "expected = "
-        << conmat::Colorize(EnumNameEventType(m_expected.event_type),
+        << conmat::Colorize(magic_enum::enum_name(m_expected.event_type),
                             conmat::Color::Blue)
         << "\n";
   }
@@ -83,8 +84,7 @@ bool SubscriberEqualsMatcher::match(const Subscriber &actual) const {
     }
   } else if (m_expected.captured_payload.has_value() !=
              actual.captured_payload.has_value()) {
-    oss << conmat::TestFailed()
-        << "captured_payload presence differs:" << "\n";
+    oss << conmat::TestFailed() << "captured_payload presence differs:" << "\n";
     oss << "\t"
         << "actual has value = "
         << conmat::Colorize(actual.captured_payload.has_value(),
