@@ -27,7 +27,8 @@ TEST_CASE("EventHandler registers Subscribers", "[unit][EventHandler]") {
 
   // Create a Subscriber instance
   std::shared_ptr<steamrot::Subscriber> subscriber =
-      std::make_shared<steamrot::Subscriber>(event_type);
+      std::make_shared<steamrot::Subscriber>();
+  subscriber->event_type = event_type;
 
   // Check that the EventHandler UserInput register is empty initially
   auto subscriber_register = event_handler.GetSubcriberRegister();
@@ -177,7 +178,8 @@ TEST_CASE("UpdateSubscribers turns on Subscribers", "[unit][EventHandler]") {
 
   // Create a Subscriber instance
   std::shared_ptr<steamrot::Subscriber> subscriber =
-      std::make_shared<steamrot::Subscriber>(event_type);
+      std::make_shared<steamrot::Subscriber>();
+  subscriber->event_type = event_type;
 
   // check that the subscriber is not active
   REQUIRE(!subscriber->m_active);
@@ -203,7 +205,8 @@ TEST_CASE("EventHandler::UpdateSubscribersFrom does not update Subscribers "
 
   // Create a Subscriber instance
   std::shared_ptr<steamrot::Subscriber> subscriber =
-      std::make_shared<steamrot::Subscriber>(event_type);
+      std::make_shared<steamrot::Subscriber>();
+  subscriber->event_type = event_type;
 
   // check that the subscriber is not active
   REQUIRE(!subscriber->m_active);
@@ -228,120 +231,119 @@ TEST_CASE("EventHandler::UpdateSubscribersFrom does not update Subscribers "
 }
 
 TEST_CASE("EventHandler::UpdateSubscribers does not update Subscriber if "
-          "trigger_data is present and does not match",
+          "filter_payload is present and does not match",
           "[unit][EventHandler]") {
   // create Subscriber variables
   const steamrot::EventType event_type = steamrot::EventType::USER_INPUT;
 
-  // Create a Subscriber instance
+  // Create a Subscriber instance with filter payload
   std::shared_ptr<steamrot::Subscriber> subscriber =
       std::make_shared<steamrot::Subscriber>();
+  subscriber->event_type = event_type;
+  // Set filter payload to SELECT
+  subscriber->filter_payload = steamrot::EventPayload{
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT}};
 
   // check that the subscriber is not active
   REQUIRE(!subscriber->m_active);
 
-  // create Event Data to copy that does not match the trigger data
-  sf::Event::KeyPressed event_sf2;
-  event_sf2.code = sf::Keyboard::Key::B;
-  sf::Event event2{event_sf2};
-  steamrot::EventData user_input_bitset;
-  user_input_bitset = steamrot::UserInputBitset{{event2}};
+  // create EventPayload that does not match the filter payload
+  steamrot::EventPayload non_matching_payload{
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::NONE}};
 
-  REQUIRE(user_input_bitset != trigger_data);
   // Update the subscriber with the event data
   std::weak_ptr<steamrot::Subscriber> weak_subscriber = subscriber;
-  steamrot::UpdateSubscriber(weak_subscriber, user_input_bitset);
+  steamrot::UpdateSubscriber(weak_subscriber, non_matching_payload);
 
   // check that the subscriber is still not active
   REQUIRE_FALSE(subscriber->m_active);
 }
 
 TEST_CASE(
-    "EventHandler::UpdateSubscribers activates Subscriber if trigger_data "
+    "EventHandler::UpdateSubscribers activates Subscriber if filter_payload "
     "is present and matches",
     "[unit][EventHandler]") {
   // create Subscriber variables
   const steamrot::EventType event_type = steamrot::EventType::USER_INPUT;
 
-  // Create a Subscriber instance with trigger data
-  sf::Event::KeyPressed event_sf;
-  event_sf.code = sf::Keyboard::Key::A;
-  sf::Event event{event_sf};
-  steamrot::EventData trigger_data;
-  trigger_data = steamrot::UserInputBitset{{event}};
+  // Create a Subscriber instance with filter payload
   std::shared_ptr<steamrot::Subscriber> subscriber =
-      std::make_shared<steamrot::Subscriber>(event_type, trigger_data);
+      std::make_shared<steamrot::Subscriber>();
+  subscriber->event_type = event_type;
+  // Set filter payload to SELECT
+  steamrot::EventPayload filter_payload{
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT}};
+  subscriber->filter_payload = filter_payload;
 
   // check that the subscriber is not active
   REQUIRE(!subscriber->m_active);
 
-  // create Event Data to copy that matches the trigger data
-  steamrot::EventData user_input_bitset;
-  user_input_bitset = steamrot::UserInputBitset{{event}};
-  REQUIRE(user_input_bitset == trigger_data);
+  // create EventPayload that matches the filter payload
+  steamrot::EventPayload matching_payload{
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT}};
 
   // Update the subscriber with the event data
   std::weak_ptr<steamrot::Subscriber> weak_subscriber = subscriber;
-  steamrot::UpdateSubscriber(weak_subscriber, user_input_bitset);
+  steamrot::UpdateSubscriber(weak_subscriber, matching_payload);
 
   // check that the subscriber is now active
   REQUIRE(subscriber->m_active);
 }
 TEST_CASE("EventHandler::UpdateSubscribersFromGlobalEventBus updates correct "
-          "subscribers, with and without trigger data",
+          "subscribers, with and without filter_payload",
           "[unit][EventHandler]") {
-  sf::Event::KeyPressed event_sf;
-  event_sf.code = sf::Keyboard::Key::A;
-  sf::Event event{event_sf};
 
   // Create an EventHandler instance
   steamrot::EventHandler event_handler;
   const steamrot::EventType event_type = steamrot::EventType::USER_INPUT;
-  const steamrot::UserInputBitset user_input_bitset{{event}};
 
-  // Subscriber with NO trigger data (should always activate if event matches)
-  std::shared_ptr<steamrot::Subscriber> subscriber_no_trigger =
-      std::make_shared<steamrot::Subscriber>(event_type);
+  // Create EventPayload for INPUT action SELECT
+  steamrot::EventPayload input_payload{
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT}};
 
-  // Subscriber WITH trigger data that matches the event (should activate)
-  steamrot::EventData matching_trigger_data = user_input_bitset;
-  std::shared_ptr<steamrot::Subscriber> subscriber_trigger_match =
-      std::make_shared<steamrot::Subscriber>(event_type, matching_trigger_data);
+  // Subscriber with NO filter payload (should always activate if event type matches)
+  std::shared_ptr<steamrot::Subscriber> subscriber_no_filter =
+      std::make_shared<steamrot::Subscriber>();
+  subscriber_no_filter->event_type = event_type;
 
-  // Subscriber WITH trigger data that does NOT match the event (should NOT
+  // Subscriber WITH filter payload that matches the event (should activate)
+  std::shared_ptr<steamrot::Subscriber> subscriber_filter_match =
+      std::make_shared<steamrot::Subscriber>();
+  subscriber_filter_match->event_type = event_type;
+  subscriber_filter_match->filter_payload = input_payload;
+
+  // Subscriber WITH filter payload that does NOT match the event (should NOT
   // activate)
-  sf::Event::KeyPressed event_sf2;
-  event_sf2.code = sf::Keyboard::Key::B;
-  sf::Event event2{event_sf2};
-  steamrot::EventData nonmatching_trigger_data =
-      steamrot::UserInputBitset{{event2}};
-  std::shared_ptr<steamrot::Subscriber> subscriber_trigger_no_match =
-      std::make_shared<steamrot::Subscriber>(event_type,
-                                             nonmatching_trigger_data);
+  steamrot::EventPayload nonmatching_filter_payload{
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::NONE}};
+  std::shared_ptr<steamrot::Subscriber> subscriber_filter_no_match =
+      std::make_shared<steamrot::Subscriber>();
+  subscriber_filter_no_match->event_type = event_type;
+  subscriber_filter_no_match->filter_payload = nonmatching_filter_payload;
 
   // All should be inactive to start
-  REQUIRE(!subscriber_no_trigger->m_active);
-  REQUIRE(!subscriber_trigger_match->m_active);
-  REQUIRE(!subscriber_trigger_no_match->m_active);
+  REQUIRE(!subscriber_no_filter->m_active);
+  REQUIRE(!subscriber_filter_match->m_active);
+  REQUIRE(!subscriber_filter_no_match->m_active);
 
   // Register all 3
-  auto result_no_trigger =
-      event_handler.RegisterSubscriber(subscriber_no_trigger);
-  if (!result_no_trigger.has_value())
-    FAIL(result_no_trigger.error().message);
-  auto result_trigger_match =
-      event_handler.RegisterSubscriber(subscriber_trigger_match);
-  if (!result_trigger_match.has_value())
-    FAIL(result_trigger_match.error().message);
-  auto result_trigger_no_match =
-      event_handler.RegisterSubscriber(subscriber_trigger_no_match);
-  if (!result_trigger_no_match.has_value())
-    FAIL(result_trigger_no_match.error().message);
+  auto result_no_filter =
+      event_handler.RegisterSubscriber(subscriber_no_filter);
+  if (!result_no_filter.has_value())
+    FAIL(result_no_filter.error().message);
+  auto result_filter_match =
+      event_handler.RegisterSubscriber(subscriber_filter_match);
+  if (!result_filter_match.has_value())
+    FAIL(result_filter_match.error().message);
+  auto result_filter_no_match =
+      event_handler.RegisterSubscriber(subscriber_filter_no_match);
+  if (!result_filter_no_match.has_value())
+    FAIL(result_filter_no_match.error().message);
 
-  // Add one EventPacket with matching event data
+  // Add one EventPacket with matching event payload
   steamrot::EventPacket event1{2};
-  event1.event_type = event_type;
-  event1.event_data = user_input_bitset;
+  event1.type = event_type;
+  event1.payload = input_payload;
   std::vector<steamrot::EventPacket> events_to_add = {event1};
   for (const auto &event : events_to_add)
     event_handler.AddEvent(event);
@@ -350,25 +352,27 @@ TEST_CASE("EventHandler::UpdateSubscribersFromGlobalEventBus updates correct "
   // Update subscribers from the global event bus
   event_handler.UpdateSubscribersFromGlobalEventBus();
 
-  // Subscriber with no trigger data should be active
-  REQUIRE(subscriber_no_trigger->m_active);
-  // Subscriber with matching trigger data should be active
-  REQUIRE(subscriber_trigger_match->m_active);
-  // Subscriber with non-matching trigger data should NOT be active
-  REQUIRE_FALSE(subscriber_trigger_no_match->m_active);
+  // Subscriber with no filter payload should be active
+  REQUIRE(subscriber_no_filter->m_active);
+  // Subscriber with matching filter payload should be active
+  REQUIRE(subscriber_filter_match->m_active);
+  // Subscriber with non-matching filter payload should NOT be active
+  REQUIRE_FALSE(subscriber_filter_no_match->m_active);
 }
 
 TEST_CASE("ResetAllSubscribers resets all Subscribers",
           "[unit][EventHandler]") {
   // create Subscriber variables
   const steamrot::EventType event_type1 = steamrot::EventType::USER_INPUT;
-  const steamrot::EventType event_type2 = steamrot::EventType::QUIT_GAME;
+  const steamrot::EventType event_type2 = steamrot::EventType::SYSTEM;
   // Create Subscriber instances
   std::shared_ptr<steamrot::Subscriber> subscriber1 =
-      std::make_shared<steamrot::Subscriber>(event_type1);
+      std::make_shared<steamrot::Subscriber>();
+  subscriber1->event_type = event_type1;
   subscriber1->m_active = true; // set active to true
   std::shared_ptr<steamrot::Subscriber> subscriber2 =
-      std::make_shared<steamrot::Subscriber>(event_type2);
+      std::make_shared<steamrot::Subscriber>();
+  subscriber2->event_type = event_type2;
   subscriber2->m_active = true; // set active to true
   // Create a subscriber register
   std::unordered_map<steamrot::EventType,
@@ -390,12 +394,14 @@ TEST_CASE("EventHandler::CleanExpiredSubscribers removes expired Subscribers",
 
   // create Subscriber variables
   const steamrot::EventType event_type1 = steamrot::EventType::USER_INPUT;
-  const steamrot::EventType event_type2 = steamrot::EventType::QUIT_GAME;
+  const steamrot::EventType event_type2 = steamrot::EventType::SYSTEM;
   // Create Subscriber instances
   std::shared_ptr<steamrot::Subscriber> subscriber1 =
-      std::make_shared<steamrot::Subscriber>(event_type1);
+      std::make_shared<steamrot::Subscriber>();
+  subscriber1->event_type = event_type1;
   std::shared_ptr<steamrot::Subscriber> subscriber2 =
-      std::make_shared<steamrot::Subscriber>(event_type2);
+      std::make_shared<steamrot::Subscriber>();
+  subscriber2->event_type = event_type2;
   // Create a subscriber register
   std::unordered_map<steamrot::EventType,
                      std::vector<std::weak_ptr<steamrot::Subscriber>>>
@@ -424,14 +430,15 @@ TEST_CASE("EventHandler::ExecuteEventHandlerLevelLogic resets all Subscribers",
   const steamrot::EventType event_type = steamrot::EventType::USER_INPUT;
   // Create a Subscriber instance
   std::shared_ptr<steamrot::Subscriber> subscriber =
-      std::make_shared<steamrot::Subscriber>(event_type);
+      std::make_shared<steamrot::Subscriber>();
+  subscriber->event_type = event_type;
   subscriber->m_active = true; // set active to true
   auto result = event_handler.RegisterSubscriber(subscriber);
   if (!result.has_value())
     FAIL(result.error().message);
   // Create some EventPackets to add
   steamrot::EventPacket event1{2};
-  event1.event_type = steamrot::EventType::TEST;
+  event1.type = steamrot::EventType::LOGIC;
   std::vector<steamrot::EventPacket> events_to_add = {event1};
   // Add events to the global event bus
   for (const auto &event : events_to_add)
@@ -452,7 +459,8 @@ TEST_CASE(
   const steamrot::EventType event_type = steamrot::EventType::USER_INPUT;
   // Create a Subscriber instance
   std::shared_ptr<steamrot::Subscriber> subscriber =
-      std::make_shared<steamrot::Subscriber>(event_type);
+      std::make_shared<steamrot::Subscriber>();
+  subscriber->event_type = event_type;
   auto result = event_handler.RegisterSubscriber(subscriber);
   if (!result.has_value())
     FAIL(result.error().message);
