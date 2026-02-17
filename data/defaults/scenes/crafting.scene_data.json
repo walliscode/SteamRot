@@ -205,9 +205,7 @@
                   "new_construct_menu",
                   "fragment_selection_menu"
                 ],
-                "ui_names_off": [
-                  "initial_crafting_menu"
-                ]
+                "ui_names_off": ["initial_crafting_menu"]
               },
               "subscribers": [
                 {
@@ -216,17 +214,14 @@
                   "filter_payload": {
                     "c_ui_state_name": "new_construct_menu_on",
                     "action": "TOGGLE"
-                  },
-                  "active": false
+                  }
                 }
               ]
             },
             {
               "state_key": "new_construct_menu_off",
               "state_to_ui_visibility": {
-                "ui_names_on": [
-                  "initial_crafting_menu"
-                ],
+                "ui_names_on": ["initial_crafting_menu"],
                 "ui_names_off": [
                   "new_construct_menu",
                   "fragment_selection_menu"
@@ -239,8 +234,7 @@
                   "filter_payload": {
                     "c_ui_state_name": "new_construct_menu_off",
                     "action": "TOGGLE"
-                  },
-                  "active": false
+                  }
                 }
               ]
             }
