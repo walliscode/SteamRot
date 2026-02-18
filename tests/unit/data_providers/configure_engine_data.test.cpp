@@ -10,8 +10,10 @@
 #include "EngineConfig.h"
 #include "EngineResourcesConfig.h"
 #include "EngineState.h"
+#include "EventPayload.h"
 #include "FlatbuffersDataLoader.h"
 #include <catch2/catch_test_macros.hpp>
+#include <variant>
 
 /////////////////////////////////////////////////
 // ConfigureEngineResourcesConfig tests
@@ -124,6 +126,11 @@ TEST_CASE("ConfigureEngineState populates from valid data",
   REQUIRE(state.paused == false);
   REQUIRE(state.quit_requested == false);
   REQUIRE(state.subscriptions.size() == 1);
-  REQUIRE(state.subscriptions[0]->m_trigger_event_type ==
-          steamrot::EventType::QUIT_GAME);
+  REQUIRE(state.subscriptions[0]->event_type == steamrot::EventType::SYSTEM);
+  REQUIRE(state.subscriptions[0]->filter_payload.has_value());
+  REQUIRE(std::holds_alternative<steamrot::SystemPayload>(
+      state.subscriptions[0]->filter_payload.value()));
+  REQUIRE(std::get<steamrot::SystemPayload>(
+              state.subscriptions[0]->filter_payload.value())
+              .action == steamrot::SystemPayload::SystemAction::QUIT);
 }

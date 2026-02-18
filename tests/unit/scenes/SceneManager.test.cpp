@@ -48,8 +48,7 @@ TEST_CASE("SceneManager::StartUp loads configuration successfully",
   const std::vector<std::shared_ptr<steamrot::Subscriber>> &subscriptions =
       scene_manager.GetSubscriptions();
   REQUIRE(subscriptions.size() == 1);
-  REQUIRE(subscriptions[0]->m_trigger_event_type ==
-          steamrot::EventType::CHANGE_SCENE);
+  REQUIRE(subscriptions[0]->event_type == steamrot::EventType::SCENE);
 
   // check subscribers have been registered with the EventHandler
   const auto &registered_subscribers = event_handler.GetSubcriberRegister();

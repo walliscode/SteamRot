@@ -129,9 +129,7 @@ void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
     const auto &filter_payload_data = locked_subscriber->filter_payload.value();
 
     // Compare filter payload with event payload for exact equality
-    if (filter_payload_data != event_payload) {
-      return; // Payload doesn't match filter, don't activate
-    }
+    // [TODO:] implement Matches functions for Subscribers
   }
 
   // activate the subscriber and store the received event data
