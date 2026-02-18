@@ -77,8 +77,7 @@ CreateSceneEventPacket(const uint8_t lifetime,
 std::expected<EventPacket, FailInfo>
 CreateSceneEventPacket(const uint8_t lifetime,
                        const ScenePayload::SceneAction action,
-                       const SceneType scene_type,
-                       const uuids::uuid &scene_id);
+                       const SceneType scene_type, const uuids::uuid &scene_id);
 
 /////////////////////////////////////////////////
 /// @brief Creates an EventPacket with a SystemPayload
@@ -91,4 +90,8 @@ std::expected<EventPacket, FailInfo>
 CreateSystemEventPacket(const uint8_t lifetime,
                         const SystemPayload::SystemAction action);
 
+/////////////////////////////////////////////////
+/// @brief Creates an EventPacket with random valid values for testing purposes
+/////////////////////////////////////////////////
+std::expected<EventPacket, FailInfo> CreateRandomEventPacket();
 } // namespace steamrot::events

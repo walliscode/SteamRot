@@ -55,11 +55,9 @@ CreateSceneEventPacket(const uint8_t lifetime,
 }
 
 /////////////////////////////////////////////////
-std::expected<EventPacket, FailInfo>
-CreateSceneEventPacket(const uint8_t lifetime,
-                       const ScenePayload::SceneAction action,
-                       const SceneType scene_type,
-                       const uuids::uuid &scene_id) {
+std::expected<EventPacket, FailInfo> CreateSceneEventPacket(
+    const uint8_t lifetime, const ScenePayload::SceneAction action,
+    const SceneType scene_type, const uuids::uuid &scene_id) {
   EventContext context{lifetime};
   ScenePayload payload(action, scene_type, scene_id);
   EventPacket packet{context, EventType::SCENE, payload};
@@ -76,4 +74,10 @@ CreateSystemEventPacket(const uint8_t lifetime,
   return packet;
 }
 
+/////////////////////////////////////////////////
+std::expected<EventPacket, FailInfo> CreateRandomEventPacket() {
+  // Use std::random_device and std::mt19937 for random generation
+  std::random_device rd;
+  std::mt19937 gen(rd());
+}
 } // namespace steamrot::events

@@ -144,7 +144,7 @@ struct ScenePayload {
   /////////////////////////////////////////////////
   ScenePayload(const ScenePayload::SceneAction action,
                const SceneType scene_type)
-      : action(action) {}
+      : action(action), scene_type(scene_type) {}
 
   /////////////////////////////////////////////////
   /// @brief Constructor for ScenePayload, takes a SceneAction, a SceneType, and
