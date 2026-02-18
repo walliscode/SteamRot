@@ -124,29 +124,15 @@ void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
     // if the Subscriber has expired, do nothing
     return;
 
-  // if the Subscriber has trigger data, compare against the event data
-  // if (locked_subscriber->m_trigger_event_data.has_value()) {
-  //   const auto &trigger_data =
-  //   locked_subscriber->m_trigger_event_data.value();
-  //
-  //   // For UserInputBitset: use subset matching (trigger bits must be present
-  //   in
-  //   // event bits)
-  //   if (std::holds_alternative<UserInputBitset>(trigger_data) &&
-  //       std::holds_alternative<UserInputBitset>(event_data)) {
-  //     const auto &trigger_bits = std::get<UserInputBitset>(trigger_data);
-  //     const auto &event_bits = std::get<UserInputBitset>(event_data);
-  //
-  //     // Check if all trigger bits are present in event bits (subset
-  //     matching) if ((trigger_bits & event_bits) != trigger_bits) {
-  //       return; // Required bits not present in event
-  //     }
-  //   }
-  //   // For other types: use exact equality
-  //   else if (trigger_data != event_payload) {
-  //     return;
-  //   }
-  // }
+  // if the Subscriber has filter payload, compare against the event payload
+  if (locked_subscriber->filter_payload.has_value()) {
+    const auto &filter_payload_data = locked_subscriber->filter_payload.value();
+
+    // Compare filter payload with event payload for exact equality
+    if (filter_payload_data != event_payload) {
+      return; // Payload doesn't match filter, don't activate
+    }
+  }
 
   // activate the subscriber and store the received event data
   locked_subscriber->m_active = true;
