@@ -1,6 +1,6 @@
 add_library(events
 EventHandler.cpp
-
+event_factory.cpp
 )
 
 target_include_directories(events

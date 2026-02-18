@@ -1,0 +1,32 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Decleration of the free functions for creating EventPackets
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Preprocessor Directives
+/////////////////////////////////////////////////
+#pragma once
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+
+#include "EventPacket.h"
+#include "FailInfo.h"
+#include <expected>
+namespace steamrot::events {
+
+/////////////////////////////////////////////////
+/// @brief Creates an EventPacket with a InputPayload
+///
+/// @param lifetime [TODO:parameter]
+/// @param type [TODO:parameter]
+/// @param action [TODO:parameter]
+/// @return [TODO:return]
+/////////////////////////////////////////////////
+std::expected<EventPacket, FailInfo>
+CreateInputEventPacket(const uint8_t lifetime,
+                       const InputPayload::InputAction &action);
+
+} // namespace steamrot::events

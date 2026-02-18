@@ -31,6 +31,19 @@ struct InputPayload {
   /// EventHandler
   /////////////////////////////////////////////////
   enum class InputAction { NONE, SELECT } action;
+
+  /////////////////////////////////////////////////
+  /// @brief Default constructor for InputPayload, sets action to NONE
+  /////////////////////////////////////////////////
+  InputPayload() = default;
+
+  /////////////////////////////////////////////////
+  /// @brief Constructor for InputPayload, takes an InputAction and sets the
+  /// action member
+  ///
+  /// @param action InputAction enum value to set the action member to
+  /////////////////////////////////////////////////
+  InputPayload(const InputPayload::InputAction action) : action(action) {}
 };
 
 /////////////////////////////////////////////////
@@ -38,20 +51,32 @@ struct InputPayload {
 /// @brief Any event information concerned with user interfaces
 /////////////////////////////////////////////////
 struct UIPayload {
-  /////////////////////////////////////////////////
-  /// @brief The name of single user interface being targeted
-  /////////////////////////////////////////////////
-  std::optional<std::string> c_user_interface_name;
-
-  /////////////////////////////////////////////////
-  /// @brief The name of the user interface state being targeted
-  /////////////////////////////////////////////////
-  std::optional<std::string> c_ui_state_name;
 
   /////////////////////////////////////////////////
   /// @brief The specific action being taken on the user interface
   /////////////////////////////////////////////////
   enum class UIAction { TOGGLE } action;
+
+  /////////////////////////////////////////////////
+  /// @brief Default constructor for UIPayload, sets action to TOGGLE
+  /////////////////////////////////////////////////
+  UIPayload() = default;
+
+  /////////////////////////////////////////////////
+  /// @brief Constructor for UIPayload, takes a UIAction and a string for the
+  /// name of the UI state being targeted.
+  ///
+  /// @param action UIAction enum value to set the action member to
+  /// @param c_ui_state_name name of the user interface state being targeted,
+  /// used by the UI classes
+  /////////////////////////////////////////////////
+  UIPayload(const UIPayload::UIAction action, const std::string c_ui_state_name)
+      : action(action), c_ui_state_name(c_ui_state_name) {}
+
+  /////////////////////////////////////////////////
+  /// @brief The name of the user interface state being targeted
+  /////////////////////////////////////////////////
+  std::string c_ui_state_name;
 };
 
 /////////////////////////////////////////////////
@@ -69,9 +94,30 @@ struct LogicPayload {
   /// strings causing issues
   /////////////////////////////////////////////////
   enum class LogicToggle {
+    NONE,
+
+    // GrimoireMachina toggles
     INITIATE_MACHINA_FORM_SCAFFOLD,
     CLEAR_MACHINA_FORM_SCAFFOLD
+
+    // add other categories as needed
+
   } toggle_name;
+
+  /////////////////////////////////////////////////
+  /// @brief Default constructor for LogicPayload, sets toggle_name to
+  /// INITIATE_MACHINA_FORM_SCAFFOLD
+  /////////////////////////////////////////////////
+  LogicPayload() = default;
+
+  /////////////////////////////////////////////////
+  /// @brief Constructor for LogicPayload, takes a LogicToggle and sets the
+  /// toggle_name to NONE
+  ///
+  /// @param toggle_name Enum value to set the toggle_name member to
+  /////////////////////////////////////////////////
+  LogicPayload(const LogicPayload::LogicToggle toggle_name)
+      : toggle_name(toggle_name) {}
 };
 
 /////////////////////////////////////////////////
@@ -83,12 +129,40 @@ struct ScenePayload {
   /////////////////////////////////////////////////
   /// @brief Dictates what to do with the Scene being targeted
   /////////////////////////////////////////////////
-  enum class SceneAction { CHANGE } action;
+  enum class SceneAction { NONE, CHANGE } action;
+
+  /////////////////////////////////////////////////
+  /// @brief Default constructor for ScenePayload, sets action to NONE
+  /////////////////////////////////////////////////
+  ScenePayload() = default;
+
+  /////////////////////////////////////////////////
+  /// @brief Constructor for ScenePayload, takes a SceneAction and a SceneType
+  ///
+  /// @param action SceneAction enum value to set the action member to
+  /// @param scene_type SceneType enum value to set the scene_type member to
+  /////////////////////////////////////////////////
+  ScenePayload(const ScenePayload::SceneAction action,
+               const SceneType scene_type)
+      : action(action) {}
+
+  /////////////////////////////////////////////////
+  /// @brief Constructor for ScenePayload, takes a SceneAction, a SceneType, and
+  /// a scene_id
+  ///
+  /// @param action SceneAction enum value to set the action member to
+  /// @param scene_type SceneType enum value to set the scene_type member to
+  /// @param scene_id UUID value to set the scene_id member to, used for
+  /// targeting specific scenes
+  /////////////////////////////////////////////////
+  ScenePayload(const ScenePayload::SceneAction action,
+               const SceneType scene_type, const uuids::uuid scene_id)
+      : action(action), scene_type(scene_type), scene_id(scene_id) {}
 
   /////////////////////////////////////////////////
   /// @brief SceneType enum provides the type of the Scene being targeted
   /////////////////////////////////////////////////
-  std::optional<SceneType> scene_type;
+  SceneType scene_type{SceneType::UNKNOWN};
 
   /////////////////////////////////////////////////
   /// @brief Provides the unique identifier for the Scene being targeted
@@ -106,7 +180,20 @@ struct SystemPayload {
   /// @brief SystemAction enum provides the name of the system action being
   /// triggered
   /////////////////////////////////////////////////
-  enum class SystemAction { QUIT } action;
+  enum class SystemAction { NONE, QUIT } action;
+
+  /////////////////////////////////////////////////
+  /// @brief Default constructor for SystemPayload, sets action to NONE
+  /////////////////////////////////////////////////
+  SystemPayload() = default;
+
+  /////////////////////////////////////////////////
+  /// @brief Constructor for SystemPayload, takes a SystemAction and sets the
+  /// action member
+  ///
+  /// @param action SystemAction enum value to set the action member to
+  /////////////////////////////////////////////////
+  SystemPayload(const SystemPayload::SystemAction action) : action(action) {}
 };
 
 using EventPayload = std::variant<InputPayload, UIPayload, LogicPayload,
