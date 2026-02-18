@@ -1,6 +1,7 @@
 add_library(events
 EventHandler.cpp
 event_factory.cpp
+payload_matchers.cpp
 )
 
 target_include_directories(events
