@@ -1,5 +1,5 @@
 add_executable(test_events
-# EventHandler.test.cpp
+EventHandler.test.cpp
 event_factory.test.cpp
 payload_matchers.test.cpp
 )

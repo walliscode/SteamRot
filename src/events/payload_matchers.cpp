@@ -54,21 +54,24 @@ bool MatchPayload(const ScenePayload &filter_payload,
     return false;
   }
 
-  if (filter_payload.scene_type != event_payload.scene_type) {
-    return false;
-  }
+  // Currently only Scene actions are needed for checking, the rest is just
+  // specific data
 
-  // Check scene_id if both have values
-  if (filter_payload.scene_id.has_value() &&
-      event_payload.scene_id.has_value()) {
-    if (filter_payload.scene_id.value() != event_payload.scene_id.value()) {
-      return false;
-    }
-  } else if (filter_payload.scene_id.has_value() !=
-             event_payload.scene_id.has_value()) {
-    // If one has value and other doesn't, they don't match
-    return false;
-  }
+  // if (filter_payload.scene_type != event_payload.scene_type) {
+  //   return false;
+  // }
+  //
+  // // Check scene_id if both have values
+  // if (filter_payload.scene_id.has_value() &&
+  //     event_payload.scene_id.has_value()) {
+  //   if (filter_payload.scene_id.value() != event_payload.scene_id.value()) {
+  //     return false;
+  //   }
+  // } else if (filter_payload.scene_id.has_value() !=
+  //            event_payload.scene_id.has_value()) {
+  //   // If one has value and other doesn't, they don't match
+  //   return false;
+  // }
 
   return true;
 }
