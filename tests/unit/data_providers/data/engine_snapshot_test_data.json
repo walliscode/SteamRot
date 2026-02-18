@@ -3,19 +3,25 @@
   "global_event_bus": {
     "events": [
       {
-        "event_lifetime": 3,
-        "event_type": "EVENT_TOGGLE_UI",
-        "event_data_data_type": "UserInterfaceNameData",
-        "event_data_data": {
-          "id": "test_ui_name"
+        "context": {
+          "lifetime": 3
+        },
+        "type": "UI",
+        "payload_type": "UIPayloadFbs",
+        "payload": {
+          "c_user_interface_name": "test_ui_name",
+          "action": "TOGGLE"
         }
       },
       {
-        "event_lifetime": 1,
-        "event_type": "EVENT_CHANGE_SCENE",
-        "event_data_data_type": "SceneChangePacketData",
-        "event_data_data": {
-          "scene_type": "TITLE"
+        "context": {
+          "lifetime": 1
+        },
+        "type": "SCENE",
+        "payload_type": "ScenePayloadFbs",
+        "payload": {
+          "scene_type": "TITLE",
+          "action": "CHANGE"
         }
       }
     ],

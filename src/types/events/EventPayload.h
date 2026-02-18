@@ -30,7 +30,7 @@ struct InputPayload {
   /// Any user input events are converted to this format for ease of use in the
   /// EventHandler
   /////////////////////////////////////////////////
-  enum class InputAction { SELECT } action;
+  enum class InputAction { NONE, SELECT } action;
 };
 
 /////////////////////////////////////////////////
@@ -68,7 +68,10 @@ struct LogicPayload {
   /// This is to be used by the Logic classes to manage flow control without
   /// strings causing issues
   /////////////////////////////////////////////////
-  enum class LogicToggle { INITIATE_MACHINA_FORM_SCAFFOLD } toggle_name;
+  enum class LogicToggle {
+    INITIATE_MACHINA_FORM_SCAFFOLD,
+    CLEAR_MACHINA_FORM_SCAFFOLD
+  } toggle_name;
 };
 
 /////////////////////////////////////////////////
@@ -76,6 +79,12 @@ struct LogicPayload {
 /// @brief Any event information concerned with processing whole Scenes
 /////////////////////////////////////////////////
 struct ScenePayload {
+
+  /////////////////////////////////////////////////
+  /// @brief Dictates what to do with the Scene being targeted
+  /////////////////////////////////////////////////
+  enum class SceneAction { CHANGE } action;
+
   /////////////////////////////////////////////////
   /// @brief SceneType enum provides the type of the Scene being targeted
   /////////////////////////////////////////////////
@@ -85,11 +94,6 @@ struct ScenePayload {
   /// @brief Provides the unique identifier for the Scene being targeted
   /////////////////////////////////////////////////
   std::optional<uuids::uuid> scene_id;
-
-  /////////////////////////////////////////////////
-  /// @brief Dictates what to do with the Scene being targeted
-  /////////////////////////////////////////////////
-  enum class SceneAction { CHANGE } action;
 };
 
 /////////////////////////////////////////////////

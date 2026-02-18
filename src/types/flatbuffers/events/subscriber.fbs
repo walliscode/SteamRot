@@ -1,10 +1,19 @@
-include "events.fbs";
+include "event_packet.fbs";
 
 namespace steamrot;
 
 table SubscriberFbs{
 
-  event_type_data: EventTypeFbs;
-  trigger_data: EventDataData;
-  active: bool;
+
+////////////////////////////////////////////////////////////
+/// EventTypeFbs enum value
+////////////////////////////////////////////////////////////
+  event_type: EventTypeFbs;
+
+
+////////////////////////////////////////////////////////////
+/// any one of the EventPayloadFbs union, used to determine if the Subscriber should be activated
+////////////////////////////////////////////////////////////
+  filter_payload: EventPayloadFbs;
+  
   }

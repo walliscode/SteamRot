@@ -178,7 +178,6 @@ TEST_CASE(
   REQUIRE(event_bus->events()->size() == 1);
 
   const auto *event_packet = event_bus->events()->Get(0);
-  REQUIRE(event_packet->event_lifetime() == 5);
-  REQUIRE(event_packet->event_type() ==
-          steamrot::EventTypeFbs_EVENT_USER_INPUT);
+  REQUIRE(event_packet->context()->lifetime() == 5);
+  REQUIRE(event_packet->type() == steamrot::EventTypeFbs_USER_INPUT);
 }

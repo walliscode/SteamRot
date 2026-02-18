@@ -1,10 +1,6 @@
 add_library(events
 EventHandler.cpp
-event_factory.cpp
-event_bus_conversion.cpp
-event_handler_tick.cpp
-subscriber_factory.cpp
-event_type_conversion.cpp
+
 )
 
 target_include_directories(events

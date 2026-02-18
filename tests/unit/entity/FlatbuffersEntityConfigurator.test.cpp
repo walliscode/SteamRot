@@ -365,16 +365,16 @@ TEST_CASE("ConfigureSecondLayerComponents configures CUIState with multiple "
   REQUIRE(std::find(state_b.m_ui_indices_on.begin(),
                     state_b.m_ui_indices_on.end(),
                     2) != state_b.m_ui_indices_on.end()); // menu_ui at entity 2
-  REQUIRE(std::find(state_b.m_ui_indices_on.begin(),
-                    state_b.m_ui_indices_on.end(),
-                    3) != state_b.m_ui_indices_on.end()); // settings_ui at entity 3
-  REQUIRE(state_b.m_ui_indices_off.size() == 2); // simple_ui and hidden_ui
-  REQUIRE(std::find(state_b.m_ui_indices_off.begin(),
-                    state_b.m_ui_indices_off.end(),
-                    0) != state_b.m_ui_indices_off.end()); // simple_ui at entity 0
-  REQUIRE(std::find(state_b.m_ui_indices_off.begin(),
-                    state_b.m_ui_indices_off.end(),
-                    1) != state_b.m_ui_indices_off.end()); // hidden_ui at entity 1
+  REQUIRE(
+      std::find(state_b.m_ui_indices_on.begin(), state_b.m_ui_indices_on.end(),
+                3) != state_b.m_ui_indices_on.end()); // settings_ui at entity 3
+  REQUIRE(state_b.m_ui_indices_off.size() == 2);      // simple_ui and hidden_ui
+  REQUIRE(std::find(
+              state_b.m_ui_indices_off.begin(), state_b.m_ui_indices_off.end(),
+              0) != state_b.m_ui_indices_off.end()); // simple_ui at entity 0
+  REQUIRE(std::find(
+              state_b.m_ui_indices_off.begin(), state_b.m_ui_indices_off.end(),
+              1) != state_b.m_ui_indices_off.end()); // hidden_ui at entity 1
 }
 
 /////////////////////////////////////////////////
@@ -645,7 +645,7 @@ TEST_CASE("Full configuration flow works correctly",
   REQUIRE(child_button.subscription != nullptr);
   const steamrot::Subscriber &button_sub = *child_button.subscription;
 
-  REQUIRE(button_sub.m_trigger_event_data.has_value());
+  REQUIRE(button_sub.filter_payload.has_value());
 
   /////
 }

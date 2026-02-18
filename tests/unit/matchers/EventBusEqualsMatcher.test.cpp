@@ -27,8 +27,8 @@ TEST_CASE("EventBusEqualsMatcher works correctly",
           "[unit][Events][EventBus][matcher]") {
   steamrot::EventBus expected;
   steamrot::EventPacket packet1{1};
-  packet1.event_type = steamrot::EventType::USER_INPUT;
-  packet1.event_id = GenerateTestUUID();
+  packet1.type = steamrot::EventType::USER_INPUT;
+
   expected.push_back(packet1);
 
   steamrot::EventBus actual;
@@ -39,16 +39,14 @@ TEST_CASE("EventBusEqualsMatcher works correctly",
 
   SECTION("Matcher detects differences in EventPacket") {
     steamrot::EventPacket packet2{1};
-    packet2.event_type = steamrot::EventType::TEST;
-    packet2.event_id = GenerateTestUUID();
+    packet2.type = steamrot::EventType::NONE;
     actual.push_back(packet2);
     REQUIRE_THAT(actual, !steamrot::tests::EqualsEventBus(expected));
   }
 
   SECTION("Matcher detects equality") {
     steamrot::EventPacket packet3{1};
-    packet3.event_type = steamrot::EventType::USER_INPUT;
-    packet3.event_id = packet1.event_id;
+    packet3.type = steamrot::EventType::USER_INPUT;
     actual.push_back(packet3);
     REQUIRE_THAT(actual, steamrot::tests::EqualsEventBus(expected));
   }
@@ -70,7 +68,7 @@ TEST_CASE("EventBusEqualsMatcher describe is as expected on failure",
           "[unit][Events][EventBus][matcher]") {
   steamrot::EventBus expected;
   steamrot::EventPacket packet{1};
-  packet.event_type = steamrot::EventType::USER_INPUT;
+  packet.type = steamrot::EventType::USER_INPUT;
   expected.push_back(packet);
 
   steamrot::EventBus actual;

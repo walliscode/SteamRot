@@ -38,12 +38,10 @@
                         "y": 0
                       },
                       "subscriber_data": {
-                        "event_type_data": "EVENT_USER_INPUT",
-                        "trigger_data_type": "UserInputBitsetData",
-                        "trigger_data": {
-                          "mouse_released": [
-                            "LEFT_CLICK"
-                          ]
+                        "event_type": "USER_INPUT",
+                        "filter_payload_type": "InputPayloadFbs",
+                        "filter_payload": {
+                          "action": "SELECT"
                         }
                       },
                       "response_event_data": [
@@ -51,7 +49,7 @@
                           "context": {
                             "lifetime": 1
                           },
-                          "category": "SCENE",
+                          "type": "SCENE",
                           "payload_type": "ScenePayloadFbs",
                           "payload": {
                             "scene_type": "TITLE",
@@ -84,12 +82,10 @@
                       "layout": "Horizontal",
                       "spacing_strategy": "None",
                       "subscriber_data": {
-                        "event_type_data": "EVENT_USER_INPUT",
-                        "trigger_data_type": "UserInputBitsetData",
-                        "trigger_data": {
-                          "mouse_released": [
-                            "LEFT_CLICK"
-                          ]
+                        "event_type": "USER_INPUT",
+                        "filter_payload_type": "InputPayloadFbs",
+                        "filter_payload": {
+                          "action": "SELECT"
                         }
                       },
                       "response_event_data": [
@@ -97,7 +93,7 @@
                           "context": {
                             "lifetime": 1
                           },
-                          "category": "UI",
+                          "type": "UI",
                           "payload_type": "UIPayloadFbs",
                           "payload": {
                             "c_user_interface_name": "new_construct_menu_on",
@@ -108,7 +104,7 @@
                           "context": {
                             "lifetime": 1
                           },
-                          "category": "LOGIC",
+                          "type": "LOGIC",
                           "payload_type": "LogicPayloadFbs",
                           "payload": {
                             "toggle_name": "INITIATE_MACHINA_FORM_SCAFFOLD"
@@ -156,12 +152,10 @@
                         "y": 0
                       },
                       "subscriber_data": {
-                        "event_type_data": "EVENT_USER_INPUT",
-                        "trigger_data_type": "UserInputBitsetData",
-                        "trigger_data": {
-                          "mouse_released": [
-                            "LEFT_CLICK"
-                          ]
+                        "event_type": "USER_INPUT",
+                        "filter_payload_type": "InputPayloadFbs",
+                        "filter_payload": {
+                          "action": "SELECT"
                         }
                       },
                       "response_event_data": [
@@ -169,7 +163,7 @@
                           "context": {
                             "lifetime": 1
                           },
-                          "category": "UI",
+                          "type": "UI",
                           "payload_type": "UIPayloadFbs",
                           "payload": {
                             "c_user_interface_name": "new_construct_menu_off",
@@ -180,7 +174,7 @@
                           "context": {
                             "lifetime": 1
                           },
-                          "category": "LOGIC",
+                          "type": "LOGIC",
                           "payload_type": "LogicPayloadFbs",
                           "payload": {
                             "toggle_name": "INITIATE_MACHINA_FORM_SCAFFOLD"
@@ -211,27 +205,23 @@
                   "new_construct_menu",
                   "fragment_selection_menu"
                 ],
-                "ui_names_off": [
-                  "initial_crafting_menu"
-                ]
+                "ui_names_off": ["initial_crafting_menu"]
               },
               "subscribers": [
                 {
-                  "event_type_data": "EVENT_TOGGLE_UI",
-                  "trigger_data_type": "UserInterfaceNameData",
-                  "trigger_data": {
-                    "id": "new_construct_menu_on"
-                  },
-                  "active": false
+                  "event_type": "UI",
+                  "filter_payload_type": "UIPayloadFbs",
+                  "filter_payload": {
+                    "c_ui_state_name": "new_construct_menu_on",
+                    "action": "TOGGLE"
+                  }
                 }
               ]
             },
             {
               "state_key": "new_construct_menu_off",
               "state_to_ui_visibility": {
-                "ui_names_on": [
-                  "initial_crafting_menu"
-                ],
+                "ui_names_on": ["initial_crafting_menu"],
                 "ui_names_off": [
                   "new_construct_menu",
                   "fragment_selection_menu"
@@ -239,12 +229,12 @@
               },
               "subscribers": [
                 {
-                  "event_type_data": "EVENT_TOGGLE_UI",
-                  "trigger_data_type": "UserInterfaceNameData",
-                  "trigger_data": {
-                    "id": "new_construct_menu_off"
-                  },
-                  "active": false
+                  "event_type": "UI",
+                  "filter_payload_type": "UIPayloadFbs",
+                  "filter_payload": {
+                    "c_ui_state_name": "new_construct_menu_off",
+                    "action": "TOGGLE"
+                  }
                 }
               ]
             }

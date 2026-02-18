@@ -11,7 +11,6 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "EventCategory.h"
 #include "EventContext.h"
 #include "EventPacket.h"
 #include "EventPayload.h"
@@ -51,8 +50,7 @@ ConfigureInputPayload(InputPayload &input_payload,
 /// @param ui_payload_data Pointer to UIPayloadFbs flatbuffers data.
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigureUIPayload(UIPayload &ui_payload,
-                   const UIPayloadFbs *ui_payload_data);
+ConfigureUIPayload(UIPayload &ui_payload, const UIPayloadFbs *ui_payload_data);
 
 /////////////////////////////////////////////////
 /// @brief Logic for populating LogicPayload from flatbuffers data source.
@@ -83,16 +81,6 @@ ConfigureScenePayload(ScenePayload &scene_payload,
 std::expected<std::monostate, FailInfo>
 ConfigureSystemPayload(SystemPayload &system_payload,
                        const SystemPayloadFbs *system_payload_data);
-
-/////////////////////////////////////////////////
-/// @brief Logic for populating EventCategory from flatbuffers data source.
-///
-/// @param event_category Reference to EventCategory to populate.
-/// @param event_category_data EventCategoryFbs flatbuffers enum.
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-ConfigureEventCategory(EventCategory &event_category,
-                       EventCategoryFbs event_category_data);
 
 /////////////////////////////////////////////////
 /// @brief Logic for populating EventType from flatbuffers data source.

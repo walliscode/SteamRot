@@ -6,7 +6,7 @@ add_library(matchers
   CUserInterfaceEqualsMatcher.cpp
   CUIStateEqualsMatcher.cpp
   EventPacketEqualsMatcher.cpp
-  EventDataEqualsMatcher.cpp
+  EventPayloadEqualsMatcher.cpp
   EventBusEqualsMatcher.cpp
   UIElementEqualsMatcher.cpp
   EntityMemoryPoolEqualsMatcher.cpp
@@ -31,4 +31,5 @@ PUBLIC
   entity
   events
   conmat
+  magic_enum
 )

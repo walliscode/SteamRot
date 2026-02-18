@@ -144,7 +144,7 @@ void RemoveDeadEvents(EventBus &event_bus);
 /// @param subscriber Weak pointer to the subscriber to be updated.
 /////////////////////////////////////////////////
 void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
-                      const EventData &event_data);
+                      const EventPayload &event_payload);
 
 /////////////////////////////////////////////////
 /// @brief Check the subscriber register and remove any expired subscribers.

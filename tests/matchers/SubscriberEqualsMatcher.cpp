@@ -7,28 +7,12 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "SubscriberEqualsMatcher.h"
-#include "EventDataEqualsMatcher.h"
+#include "EventPayloadEqualsMatcher.h"
 #include "Subscriber.h"
 #include "conmat.h"
+#include <magic_enum/magic_enum.hpp>
 
 namespace steamrot::tests {
-
-/////////////////////////////////////////////////
-std::string
-SubscriberEqualsMatcher::GetNameForEventDataIndex(size_t index) const {
-  switch (index) {
-  case 0:
-    return "std::monostate";
-  case 1:
-    return "UserInputBitset";
-  case 2:
-    return "SceneChangePacket";
-  case 3:
-    return "UserInterfaceName";
-  default:
-    return "Unknown";
-  }
-}
 
 /////////////////////////////////////////////////
 SubscriberEqualsMatcher::SubscriberEqualsMatcher(const Subscriber &expected)
@@ -43,50 +27,72 @@ bool SubscriberEqualsMatcher::match(const Subscriber &actual) const {
   if (actual.m_active != m_expected.m_active) {
     oss << conmat::TestFailed() << "m_active:" << "\n";
     oss << "\t"
-        << "actual = "
-        << conmat::Colorize(actual.m_active, conmat::Color::Red) << "\n";
+        << "actual = " << conmat::Colorize(actual.m_active, conmat::Color::Red)
+        << "\n";
     oss << "\t"
         << "expected = "
         << conmat::Colorize(m_expected.m_active, conmat::Color::Blue) << "\n";
   }
 
-  // Compare m_trigger_event_type
-  if (actual.m_trigger_event_type != m_expected.m_trigger_event_type) {
-    oss << conmat::TestFailed() << "m_trigger_event_type:" << "\n";
+  // Compare event_type
+  if (actual.event_type != m_expected.event_type) {
+    oss << conmat::TestFailed() << "event_type:" << "\n";
     oss << "\t"
         << "actual = "
-        << conmat::Colorize(EnumNameEventType(actual.m_trigger_event_type),
+        << conmat::Colorize(magic_enum::enum_name(actual.event_type),
                             conmat::Color::Red)
         << "\n";
     oss << "\t"
         << "expected = "
-        << conmat::Colorize(EnumNameEventType(m_expected.m_trigger_event_type),
+        << conmat::Colorize(magic_enum::enum_name(m_expected.event_type),
                             conmat::Color::Blue)
         << "\n";
   }
 
-  // Compare m_trigger_event_data using EventData matcher but accounting for
-  // optional
-  if (m_expected.m_trigger_event_data.has_value() &&
-      actual.m_trigger_event_data.has_value()) {
-    auto trigger_data_matcher =
-        EventDataEqualsMatcher(m_expected.m_trigger_event_data.value());
-    if (!trigger_data_matcher.match(actual.m_trigger_event_data.value())) {
-      oss << conmat::TestFailed() << "m_trigger_event_data differs:" << "\n";
-      oss << trigger_data_matcher.describe();
+  // Compare filter_payload using EventPayload matcher
+  if (m_expected.filter_payload.has_value() &&
+      actual.filter_payload.has_value()) {
+    auto filter_payload_matcher =
+        EventPayloadEqualsMatcher(m_expected.filter_payload.value());
+    if (!filter_payload_matcher.match(actual.filter_payload.value())) {
+      oss << conmat::TestFailed() << "filter_payload differs:" << "\n";
+      oss << filter_payload_matcher.describe();
     }
-  } else if (m_expected.m_trigger_event_data.has_value() !=
-             actual.m_trigger_event_data.has_value()) {
-    oss << conmat::TestFailed()
-        << "m_trigger_event_data presence differs:" << "\n";
+  } else if (m_expected.filter_payload.has_value() !=
+             actual.filter_payload.has_value()) {
+    oss << conmat::TestFailed() << "filter_payload presence differs:" << "\n";
     oss << "\t"
         << "actual has value = "
-        << conmat::Colorize(actual.m_trigger_event_data.has_value(),
+        << conmat::Colorize(actual.filter_payload.has_value(),
                             conmat::Color::Red)
         << "\n";
     oss << "\t"
         << "expected has value = "
-        << conmat::Colorize(m_expected.m_trigger_event_data.has_value(),
+        << conmat::Colorize(m_expected.filter_payload.has_value(),
+                            conmat::Color::Blue)
+        << "\n";
+  }
+
+  // Compare captured_payload using EventPayload matcher
+  if (m_expected.captured_payload.has_value() &&
+      actual.captured_payload.has_value()) {
+    auto captured_payload_matcher =
+        EventPayloadEqualsMatcher(m_expected.captured_payload.value());
+    if (!captured_payload_matcher.match(actual.captured_payload.value())) {
+      oss << conmat::TestFailed() << "captured_payload differs:" << "\n";
+      oss << captured_payload_matcher.describe();
+    }
+  } else if (m_expected.captured_payload.has_value() !=
+             actual.captured_payload.has_value()) {
+    oss << conmat::TestFailed() << "captured_payload presence differs:" << "\n";
+    oss << "\t"
+        << "actual has value = "
+        << conmat::Colorize(actual.captured_payload.has_value(),
+                            conmat::Color::Red)
+        << "\n";
+    oss << "\t"
+        << "expected has value = "
+        << conmat::Colorize(m_expected.captured_payload.has_value(),
                             conmat::Color::Blue)
         << "\n";
   }

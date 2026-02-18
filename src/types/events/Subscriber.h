@@ -40,6 +40,12 @@ struct Subscriber {
   EventType event_type{EventType::NONE};
 
   /////////////////////////////////////////////////
+  /// @brief Used to compare EventPayload data to determine if the subscriber
+  /// should be toggled on or not
+  /////////////////////////////////////////////////
+  std::optional<EventPayload> filter_payload{std::nullopt};
+
+  /////////////////////////////////////////////////
   /// @brief Any payload data passed to the Subscriber
   /////////////////////////////////////////////////
   std::optional<EventPayload> captured_payload{std::nullopt};

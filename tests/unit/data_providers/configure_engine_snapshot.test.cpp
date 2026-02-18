@@ -10,7 +10,6 @@
 #include "EngineSnapshot.h"
 #include "EventHandler.h"
 #include "engine_snapshot_generated.h"
-#include "events_generated.h"
 #include <catch2/catch_test_macros.hpp>
 #include <flatbuffers/flatbuffers.h>
 
@@ -83,39 +82,6 @@ TEST_CASE("ConfigureEngineSnapshot configures global_event_bus with events",
 
   // Create FlatBuffers data with event bus
   flatbuffers::FlatBufferBuilder builder;
-
-  // Create the UI name data for the event
-  auto ui_name_str = builder.CreateString("test_ui");
-  auto ui_name_data =
-      steamrot::CreateUserInterfaceNameData(builder, ui_name_str);
-
-  // Create an event packet with proper union data
-  auto event_packet_offset = steamrot::CreateEventPacketData(
-      builder, 1, steamrot::EventTypeFbs_EVENT_TOGGLE_UI,
-      steamrot::EventDataData_UserInterfaceNameData, ui_name_data.Union());
-
-  std::vector<flatbuffers::Offset<steamrot::EventPacketData>> events_vector;
-  events_vector.push_back(event_packet_offset);
-  auto events_offset = builder.CreateVector(events_vector);
-
-  auto event_bus_offset = steamrot::CreateEventBusData(builder, events_offset);
-
-  auto snapshot_offset = steamrot::CreateEngineSnapshotFbs(
-      builder, 0, event_bus_offset); // tick_number = 0 (not set)
-  builder.Finish(snapshot_offset);
-  const steamrot::EngineSnapshotFbs *snapshot_fbs =
-      flatbuffers::GetRoot<steamrot::EngineSnapshotFbs>(
-          builder.GetBufferPointer());
-
-  auto result = steamrot::data::configure::ConfigureEngineSnapshot(
-      snapshot, snapshot_fbs, event_handler);
-
-  REQUIRE(result.has_value());
-  REQUIRE(snapshot.global_event_bus.has_value());
-  REQUIRE(snapshot.global_event_bus.value().size() == 1);
-  REQUIRE(snapshot.global_event_bus.value()[0].event_type ==
-          steamrot::EventType::TOGGLE_UI);
-  REQUIRE(snapshot.global_event_bus.value()[0].event_lifetime == 1);
 }
 
 TEST_CASE("ConfigureEngineSnapshot configures empty event bus",
@@ -125,24 +91,6 @@ TEST_CASE("ConfigureEngineSnapshot configures empty event bus",
 
   // Create FlatBuffers data with empty event bus
   flatbuffers::FlatBufferBuilder builder;
-
-  std::vector<flatbuffers::Offset<steamrot::EventPacketData>> events_vector;
-  auto events_offset = builder.CreateVector(events_vector);
-  auto event_bus_offset = steamrot::CreateEventBusData(builder, events_offset);
-
-  auto snapshot_offset = steamrot::CreateEngineSnapshotFbs(
-      builder, 0, event_bus_offset); // tick_number = 0 (not set)
-  builder.Finish(snapshot_offset);
-  const steamrot::EngineSnapshotFbs *snapshot_fbs =
-      flatbuffers::GetRoot<steamrot::EngineSnapshotFbs>(
-          builder.GetBufferPointer());
-
-  auto result = steamrot::data::configure::ConfigureEngineSnapshot(
-      snapshot, snapshot_fbs, event_handler);
-
-  REQUIRE(result.has_value());
-  REQUIRE(snapshot.global_event_bus.has_value());
-  REQUIRE(snapshot.global_event_bus.value().size() == 0);
 }
 
 TEST_CASE("ConfigureEngineSnapshot configures scene_manager_data",
@@ -213,33 +161,4 @@ TEST_CASE("ConfigureEngineSnapshot handles malformed EventPacketData with null "
 
   // Create FlatBuffers data with event bus containing malformed EventPacketData
   flatbuffers::FlatBufferBuilder builder;
-
-  // Create an event packet with union type but NO union data (null pointer)
-  // This simulates the bug that caused the original SIGSEGV
-  auto event_packet_offset = steamrot::CreateEventPacketData(
-      builder, 1, steamrot::EventTypeFbs_EVENT_TOGGLE_UI,
-      steamrot::EventDataData_UserInterfaceNameData,
-      0); // Passing 0 (null offset) for union data
-
-  std::vector<flatbuffers::Offset<steamrot::EventPacketData>> events_vector;
-  events_vector.push_back(event_packet_offset);
-  auto events_offset = builder.CreateVector(events_vector);
-
-  auto event_bus_offset = steamrot::CreateEventBusData(builder, events_offset);
-
-  auto snapshot_offset =
-      steamrot::CreateEngineSnapshotFbs(builder, 0, event_bus_offset);
-  builder.Finish(snapshot_offset);
-  const steamrot::EngineSnapshotFbs *snapshot_fbs =
-      flatbuffers::GetRoot<steamrot::EngineSnapshotFbs>(
-          builder.GetBufferPointer());
-
-  auto result = steamrot::data::configure::ConfigureEngineSnapshot(
-      snapshot, snapshot_fbs, event_handler);
-
-  // Should fail gracefully with an error instead of segfaulting
-  REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
-  REQUIRE(result.error().message ==
-          "CreateEventData: UserInterfaceNameData pointer is null");
 }

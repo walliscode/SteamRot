@@ -30,12 +30,10 @@
                       "y": 0
                     },
                     "subscriber_data": {
-                      "event_type_data": "EVENT_USER_INPUT",
-                      "trigger_data_type": "UserInputBitsetData",
-                      "trigger_data": {
-                        "mouse_released": [
-                          "LEFT_CLICK"
-                        ]
+                      "event_type": "USER_INPUT",
+                      "filter_payload_type": "InputPayloadFbs",
+                      "filter_payload": {
+                        "action": "SELECT"
                       }
                     },
                     "response_event_data": [
@@ -43,7 +41,7 @@
                         "context": {
                           "lifetime": 1
                         },
-                        "category": "SCENE",
+                        "type": "SCENE",
                         "payload_type": "ScenePayloadFbs",
                         "payload": {
                           "scene_type": "CRAFTING",
@@ -138,13 +136,8 @@
           {
             "state_key": "main_menu",
             "state_to_ui_visibility": {
-              "ui_names_on": [
-                "simple_ui",
-                "menu_ui"
-              ],
-              "ui_names_off": [
-                "hidden_ui"
-              ]
+              "ui_names_on": ["simple_ui", "menu_ui"],
+              "ui_names_off": ["hidden_ui"]
             }
           }
         ]
@@ -156,13 +149,8 @@
           {
             "state_key": "settings_screen",
             "state_to_ui_visibility": {
-              "ui_names_on": [
-                "settings_ui"
-              ],
-              "ui_names_off": [
-                "simple_ui",
-                "menu_ui"
-              ]
+              "ui_names_on": ["settings_ui"],
+              "ui_names_off": ["simple_ui", "menu_ui"]
             }
           }
         ]
@@ -174,21 +162,16 @@
           {
             "state_key": "game_running",
             "state_to_ui_visibility": {
-              "ui_names_on": [
-                "simple_ui"
-              ],
+              "ui_names_on": ["simple_ui"],
               "ui_names_off": []
             },
             "subscribers": [
               {
-                "event_type_data": "EVENT_USER_INPUT",
-                "trigger_data_type": "UserInputBitsetData",
-                "trigger_data": {
-                  "keyboard_pressed": [
-                    "Q"
-                  ]
-                },
-                "active": true
+                "event_type": "USER_INPUT",
+                "filter_payload_type": "InputPayloadFbs",
+                "filter_payload": {
+                  "action": "SELECT"
+                }
               }
             ]
           }
@@ -201,25 +184,15 @@
           {
             "state_key": "multiple_states_a",
             "state_to_ui_visibility": {
-              "ui_names_on": [
-                "simple_ui"
-              ],
-              "ui_names_off": [
-                "menu_ui"
-              ]
+              "ui_names_on": ["simple_ui"],
+              "ui_names_off": ["menu_ui"]
             }
           },
           {
             "state_key": "multiple_states_b",
             "state_to_ui_visibility": {
-              "ui_names_on": [
-                "menu_ui",
-                "settings_ui"
-              ],
-              "ui_names_off": [
-                "simple_ui",
-                "hidden_ui"
-              ]
+              "ui_names_on": ["menu_ui", "settings_ui"],
+              "ui_names_off": ["simple_ui", "hidden_ui"]
             }
           }
         ]
@@ -227,3 +200,4 @@
     }
   ]
 }
+

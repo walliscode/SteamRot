@@ -23,7 +23,7 @@
     "paused": false,
     "subscriptions": [
       {
-        "event_type_data": "EVENT_QUIT_GAME"
+        "event_type": "SYSTEM"
       }
     ],
     "quit_requested": false

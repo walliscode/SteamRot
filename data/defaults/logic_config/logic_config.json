@@ -2,9 +2,9 @@
   "test_logic": {
     "subscriptions": [
       {
-        "event_type_data": "EVENT_USER_INPUT",
-        "trigger_data_type": "UserInputBitsetData",
-        "trigger_data": { "mouse_released": ["LEFT_CLICK"] }
+        "event_type": "USER_INPUT",
+        "filter_payload_type": "InputPayloadFbs",
+        "filter_payload": { "action": "SELECT" }
       }
     ]
   },
@@ -12,14 +12,14 @@
   "grimoire_machina_action_logic": {
     "subscriptions": [
       {
-        "event_type_data": "EVENT_TOGGLE_NAME",
-        "trigger_data_type": "ToggleNameFbs",
-        "trigger_data": { "name": "initiate_machina_form_scaffold" }
+        "event_type": "LOGIC",
+        "filter_payload_type": "LogicPayloadFbs",
+        "filter_payload": { "toggle_name": "INITIATE_MACHINA_FORM_SCAFFOLD" }
       },
       {
-        "event_type_data": "EVENT_TOGGLE_NAME",
-        "trigger_data_type": "ToggleNameFbs",
-        "trigger_data": { "name": "clear_machina_form_scaffold" }
+        "event_type": "LOGIC",
+        "filter_payload_type": "LogicPayloadFbs",
+        "filter_payload": { "toggle_name": "INITIATE_MACHINA_FORM_SCAFFOLD" }
       }
     ]
   }

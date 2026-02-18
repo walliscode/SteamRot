@@ -170,10 +170,9 @@ TEST_CASE("CUIStateEqualsMatcher works with empty maps",
 TEST_CASE("CUIStateEqualsMatcher detects state_subscribers content "
           "differences",
           "[unit][Components][CUIState][matcher]") {
-  auto subscriber1 = std::make_shared<steamrot::Subscriber>(
-      steamrot::EventType::TEST);
-  auto subscriber2 = std::make_shared<steamrot::Subscriber>(
-      steamrot::EventType::USER_INPUT);
+  auto subscriber1 = std::make_shared<steamrot::Subscriber>();
+
+  auto subscriber2 = std::make_shared<steamrot::Subscriber>();
 
   steamrot::CUIState expected;
   expected.m_active = true;
@@ -299,7 +298,8 @@ TEST_CASE("CUIStateEqualsMatcher handles multiple state keys",
     steamrot::CUIState actual;
     actual.m_active = true;
     actual.m_state_to_ui_visibility["state1"] = steamrot::UIVisibilityState{};
-    actual.m_state_to_ui_visibility["state1"].m_ui_indices_on = {1}; // Different!
+    actual.m_state_to_ui_visibility["state1"].m_ui_indices_on = {
+        1}; // Different!
     actual.m_state_to_ui_visibility["state2"] = steamrot::UIVisibilityState{};
     actual.m_state_to_ui_visibility["state3"] = steamrot::UIVisibilityState{};
     actual.m_state_subscribers["sub1"] = {};

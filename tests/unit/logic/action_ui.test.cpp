@@ -6,12 +6,13 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "action_ui.h"
 #include "EventPacket.h"
+#include "EventPayload.h"
 #include "EventType.h"
 #include "PanelElement.h"
 #include "Subscriber.h"
 #include "TestFixture.h"
+#include "action_ui.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE(
@@ -24,10 +25,11 @@ TEST_CASE(
       fixture.GetGameContext().event_handler;
   // set up a button element
   steamrot::ButtonElement button;
-  button.subscription =
-      std::make_shared<steamrot::Subscriber>(steamrot::EventType::USER_INPUT);
-  steamrot::EventPacket event_packet{steamrot::EventType::USER_INPUT,
-                                     steamrot::UserInputBitset{}, 2};
+  button.subscription = std::make_shared<steamrot::Subscriber>();
+  steamrot::EventPacket event_packet;
+  event_packet.type = steamrot::EventType::USER_INPUT;
+  event_packet.payload =
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT};
   button.response_events.push_back(event_packet);
 
   // initial tests
@@ -35,22 +37,24 @@ TEST_CASE(
 
   SECTION("Button not moused over does not trigger event") {
     button.is_mouse_over = false;
-    steamrot::logic::action::ui::ProcessButtonElementActions(button, event_handler);
+    steamrot::logic::action::ui::ProcessButtonElementActions(button,
+                                                             event_handler);
     event_handler.ProcessWaitingRoomEventBus();
     REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
   }
 
   SECTION("Button moused over triggers event") {
     button.is_mouse_over = true;
-    steamrot::logic::action::ui::ProcessButtonElementActions(button, event_handler);
+    steamrot::logic::action::ui::ProcessButtonElementActions(button,
+                                                             event_handler);
     event_handler.ProcessWaitingRoomEventBus();
     REQUIRE(event_handler.GetGlobalEventBus().size() == 1);
   }
 }
 
-TEST_CASE(
-    "logic::ui::action::ProcessDropDownListElementActions populates dropdowns",
-    "[logic][action][ProcessDropDownListElementActions]") {
+TEST_CASE("logic::ui::action::ProcessDropDownListElementActions populates "
+          "dropdowns",
+          "[logic][action][ProcessDropDownListElementActions]") {
   // set up
   steamrot::tests::TestFixture fixture;
   steamrot::SceneContext &scene_context = fixture.GetSceneContext();
@@ -60,8 +64,8 @@ TEST_CASE(
   dropdown.data_populate_function =
       steamrot::DataPopulateFunction::DataPopulateFunction_None;
   SECTION("No population when function is None") {
-    steamrot::logic::action::ui::ProcessDropDownListElementActions(dropdown,
-                                                               scene_context);
+    steamrot::logic::action::ui::ProcessDropDownListElementActions(
+        dropdown, scene_context);
     REQUIRE(dropdown.child_elements.size() == 0);
   }
   // Further tests would require setting up a CGrimoireMachina entity in the
@@ -80,10 +84,11 @@ TEST_CASE("logic::ui::action::ProcessUIActionsAndEvents processes UI elements "
   // set up a button with subscriber and response event
   steamrot::ButtonElement button;
   button.is_mouse_over = true;
-  button.subscription =
-      std::make_shared<steamrot::Subscriber>(steamrot::EventType::USER_INPUT);
-  steamrot::EventPacket event_packet{steamrot::EventType::USER_INPUT,
-                                     steamrot::UserInputBitset{}, 2};
+  button.subscription = std::make_shared<steamrot::Subscriber>();
+  steamrot::EventPacket event_packet;
+  event_packet.type = steamrot::EventType::USER_INPUT;
+  event_packet.payload =
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT};
   button.response_events.push_back(event_packet);
 
   // initial tests
@@ -91,15 +96,15 @@ TEST_CASE("logic::ui::action::ProcessUIActionsAndEvents processes UI elements "
 
   SECTION("Response not triggered when subscriber not active") {
     button.subscription->m_active = false;
-    steamrot::logic::action::ui::ProcessUIActionsAndEvents(button, event_handler,
-                                                       scene_context);
+    steamrot::logic::action::ui::ProcessUIActionsAndEvents(
+        button, event_handler, scene_context);
     event_handler.ProcessWaitingRoomEventBus();
     REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
   }
   SECTION("Response not triggered when is_mouse_over is false") {
     button.is_mouse_over = false;
-    steamrot::logic::action::ui::ProcessUIActionsAndEvents(button, event_handler,
-                                                       scene_context);
+    steamrot::logic::action::ui::ProcessUIActionsAndEvents(
+        button, event_handler, scene_context);
     event_handler.ProcessWaitingRoomEventBus();
     REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
   }
@@ -108,16 +113,16 @@ TEST_CASE("logic::ui::action::ProcessUIActionsAndEvents processes UI elements "
     button.is_mouse_over = false;
     button.subscription->m_active = true;
 
-    steamrot::logic::action::ui::ProcessUIActionsAndEvents(button, event_handler,
-                                                       scene_context);
+    steamrot::logic::action::ui::ProcessUIActionsAndEvents(
+        button, event_handler, scene_context);
     event_handler.ProcessWaitingRoomEventBus();
     REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
   }
 
   SECTION("Response triggered when subscriber active") {
     button.subscription->m_active = true;
-    steamrot::logic::action::ui::ProcessUIActionsAndEvents(button, event_handler,
-                                                       scene_context);
+    steamrot::logic::action::ui::ProcessUIActionsAndEvents(
+        button, event_handler, scene_context);
     event_handler.ProcessWaitingRoomEventBus();
     REQUIRE(event_handler.GetGlobalEventBus().size() == 1);
   }
@@ -136,19 +141,22 @@ TEST_CASE("logic::ui::action::ProcessNestedUIActionsAndEvents processes nested "
   panel.children_active = true;
   auto button = std::make_unique<steamrot::ButtonElement>();
   button->is_mouse_over = true;
-  button->subscription =
-      std::make_shared<steamrot::Subscriber>(steamrot::EventType::USER_INPUT);
-  steamrot::EventPacket event_packet{steamrot::EventType::USER_INPUT,
-                                     steamrot::UserInputBitset{}, 2};
+  button->subscription = std::make_shared<steamrot::Subscriber>();
+  steamrot::EventPacket event_packet;
+  event_packet.type = steamrot::EventType::USER_INPUT;
+  event_packet.payload =
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT};
+
   button->response_events.push_back(event_packet);
   panel.child_elements.push_back(std::move(button));
 
   auto button2 = std::make_unique<steamrot::ButtonElement>();
   button2->is_mouse_over = true;
-  button2->subscription =
-      std::make_shared<steamrot::Subscriber>(steamrot::EventType::USER_INPUT);
-  steamrot::EventPacket event_packet2{steamrot::EventType::USER_INPUT,
-                                      steamrot::UserInputBitset{}, 3};
+  button2->subscription = std::make_shared<steamrot::Subscriber>();
+  steamrot::EventPacket event_packet2;
+  event_packet2.type = steamrot::EventType::USER_INPUT;
+  event_packet2.payload =
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT};
   button2->response_events.push_back(event_packet2);
   panel.child_elements.push_back(std::move(button2));
 
