@@ -119,8 +119,9 @@ TEST_CASE("TestEngine::StartUp loads EventBus from TestData",
   steamrot::EventPacket event2;
   event2.type = steamrot::EventType::SCENE;
   event2.context.lifetime = 2;
-  event2.payload = steamrot::EventPayload{
-      steamrot::ScenePayload{steamrot::ScenePayload::SceneAction::CHANGE}};
+  event2.payload =
+      steamrot::ScenePayload{steamrot::ScenePayload::SceneAction::CHANGE,
+                             steamrot::SceneType::CRAFTING};
 
   steamrot::EventBus test_event_bus{event1, event2};
   test_data.starting_engine_snapshot.global_event_bus = test_event_bus;

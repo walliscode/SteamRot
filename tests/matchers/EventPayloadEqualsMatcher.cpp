@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "EventPayloadEqualsMatcher.h"
 #include "conmat.h"
+#include "magic_enum/magic_enum.hpp"
 
 namespace steamrot::tests {
 /////////////////////////////////////////////////
@@ -16,8 +17,8 @@ EventPayloadEqualsMatcher::EventPayloadEqualsMatcher(
     : m_expected(expected) {}
 
 /////////////////////////////////////////////////
-std::string EventPayloadEqualsMatcher::GetNameForEventPayloadIndex(
-    size_t index) const {
+std::string
+EventPayloadEqualsMatcher::GetNameForEventPayloadIndex(size_t index) const {
   switch (index) {
   case 0:
     return "InputPayload";
@@ -64,8 +65,8 @@ bool EventPayloadEqualsMatcher::match(const EventPayload &actual) const {
       oss << conmat::Indent(1) << conmat::TestFailed()
           << "InputPayload action differs:" << "\n";
       oss << conmat::Indent(2) << "actual: "
-          << conmat::Colorize(
-                 static_cast<int>(actual_payload.action), conmat::Color::Red)
+          << conmat::Colorize(static_cast<int>(actual_payload.action),
+                              conmat::Color::Red)
           << "\n";
       oss << conmat::Indent(2) << "expected: "
           << conmat::Colorize(static_cast<int>(expected_payload.action),
@@ -77,60 +78,17 @@ bool EventPayloadEqualsMatcher::match(const EventPayload &actual) const {
     const auto &actual_payload = std::get<UIPayload>(actual);
     const auto &expected_payload = std::get<UIPayload>(m_expected);
 
-    // Compare c_user_interface_name
-    if (actual_payload.c_user_interface_name.has_value() !=
-        expected_payload.c_user_interface_name.has_value()) {
-      oss << conmat::Indent(1) << conmat::TestFailed()
-          << "UIPayload c_user_interface_name presence differs:" << "\n";
-      oss << conmat::Indent(2) << "actual has value: "
-          << conmat::Colorize(
-                 actual_payload.c_user_interface_name.has_value(),
-                 conmat::Color::Red)
-          << "\n";
-      oss << conmat::Indent(2) << "expected has value: "
-          << conmat::Colorize(
-                 expected_payload.c_user_interface_name.has_value(),
-                 conmat::Color::Blue)
-          << "\n";
-    } else if (actual_payload.c_user_interface_name.has_value() &&
-               actual_payload.c_user_interface_name.value() !=
-                   expected_payload.c_user_interface_name.value()) {
-      oss << conmat::Indent(1) << conmat::TestFailed()
-          << "UIPayload c_user_interface_name differs:" << "\n";
-      oss << conmat::Indent(2) << "actual: "
-          << conmat::Colorize(actual_payload.c_user_interface_name.value(),
-                              conmat::Color::Red)
-          << "\n";
-      oss << conmat::Indent(2) << "expected: "
-          << conmat::Colorize(expected_payload.c_user_interface_name.value(),
-                              conmat::Color::Blue)
-          << "\n";
-    }
-
     // Compare c_ui_state_name
-    if (actual_payload.c_ui_state_name.has_value() !=
-        expected_payload.c_ui_state_name.has_value()) {
-      oss << conmat::Indent(1) << conmat::TestFailed()
-          << "UIPayload c_ui_state_name presence differs:" << "\n";
-      oss << conmat::Indent(2) << "actual has value: "
-          << conmat::Colorize(actual_payload.c_ui_state_name.has_value(),
-                              conmat::Color::Red)
-          << "\n";
-      oss << conmat::Indent(2) << "expected has value: "
-          << conmat::Colorize(expected_payload.c_ui_state_name.has_value(),
-                              conmat::Color::Blue)
-          << "\n";
-    } else if (actual_payload.c_ui_state_name.has_value() &&
-               actual_payload.c_ui_state_name.value() !=
-                   expected_payload.c_ui_state_name.value()) {
+    if (actual_payload.c_ui_state_name != expected_payload.c_ui_state_name) {
+
       oss << conmat::Indent(1) << conmat::TestFailed()
           << "UIPayload c_ui_state_name differs:" << "\n";
       oss << conmat::Indent(2) << "actual: "
-          << conmat::Colorize(actual_payload.c_ui_state_name.value(),
+          << conmat::Colorize(actual_payload.c_ui_state_name,
                               conmat::Color::Red)
           << "\n";
       oss << conmat::Indent(2) << "expected: "
-          << conmat::Colorize(expected_payload.c_ui_state_name.value(),
+          << conmat::Colorize(expected_payload.c_ui_state_name,
                               conmat::Color::Blue)
           << "\n";
     }
@@ -140,8 +98,8 @@ bool EventPayloadEqualsMatcher::match(const EventPayload &actual) const {
       oss << conmat::Indent(1) << conmat::TestFailed()
           << "UIPayload action differs:" << "\n";
       oss << conmat::Indent(2) << "actual: "
-          << conmat::Colorize(
-                 static_cast<int>(actual_payload.action), conmat::Color::Red)
+          << conmat::Colorize(static_cast<int>(actual_payload.action),
+                              conmat::Color::Red)
           << "\n";
       oss << conmat::Indent(2) << "expected: "
           << conmat::Colorize(static_cast<int>(expected_payload.action),
@@ -171,31 +129,16 @@ bool EventPayloadEqualsMatcher::match(const EventPayload &actual) const {
     const auto &expected_payload = std::get<ScenePayload>(m_expected);
 
     // Compare scene_type
-    if (actual_payload.scene_type.has_value() !=
-        expected_payload.scene_type.has_value()) {
-      oss << conmat::Indent(1) << conmat::TestFailed()
-          << "ScenePayload scene_type presence differs:" << "\n";
-      oss << conmat::Indent(2) << "actual has value: "
-          << conmat::Colorize(actual_payload.scene_type.has_value(),
-                              conmat::Color::Red)
-          << "\n";
-      oss << conmat::Indent(2) << "expected has value: "
-          << conmat::Colorize(expected_payload.scene_type.has_value(),
-                              conmat::Color::Blue)
-          << "\n";
-    } else if (actual_payload.scene_type.has_value() &&
-               actual_payload.scene_type.value() !=
-                   expected_payload.scene_type.value()) {
+    if (actual_payload.scene_type != expected_payload.scene_type) {
       oss << conmat::Indent(1) << conmat::TestFailed()
           << "ScenePayload scene_type differs:" << "\n";
       oss << conmat::Indent(2) << "actual: "
-          << conmat::Colorize(
-                 EnumNameSceneType(actual_payload.scene_type.value()),
-                 conmat::Color::Red)
+          << conmat::Colorize(magic_enum::enum_name(actual_payload.scene_type),
+                              conmat::Color::Red)
           << "\n";
       oss << conmat::Indent(2) << "expected: "
           << conmat::Colorize(
-                 EnumNameSceneType(expected_payload.scene_type.value()),
+                 magic_enum::enum_name(expected_payload.scene_type),
                  conmat::Color::Blue)
           << "\n";
     }
@@ -233,8 +176,8 @@ bool EventPayloadEqualsMatcher::match(const EventPayload &actual) const {
       oss << conmat::Indent(1) << conmat::TestFailed()
           << "ScenePayload action differs:" << "\n";
       oss << conmat::Indent(2) << "actual: "
-          << conmat::Colorize(
-                 static_cast<int>(actual_payload.action), conmat::Color::Red)
+          << conmat::Colorize(static_cast<int>(actual_payload.action),
+                              conmat::Color::Red)
           << "\n";
       oss << conmat::Indent(2) << "expected: "
           << conmat::Colorize(static_cast<int>(expected_payload.action),
@@ -250,8 +193,8 @@ bool EventPayloadEqualsMatcher::match(const EventPayload &actual) const {
       oss << conmat::Indent(1) << conmat::TestFailed()
           << "SystemPayload action differs:" << "\n";
       oss << conmat::Indent(2) << "actual: "
-          << conmat::Colorize(
-                 static_cast<int>(actual_payload.action), conmat::Color::Red)
+          << conmat::Colorize(static_cast<int>(actual_payload.action),
+                              conmat::Color::Red)
           << "\n";
       oss << conmat::Indent(2) << "expected: "
           << conmat::Colorize(static_cast<int>(expected_payload.action),
