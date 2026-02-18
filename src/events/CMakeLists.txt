@@ -14,6 +14,7 @@ target_link_libraries(events
   stduuid
   logger
   types
+  magic_enum
 
 )
 

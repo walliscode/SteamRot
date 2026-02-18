@@ -11,6 +11,7 @@
 #include "EventPayload.h"
 #include "EventType.h"
 #include <catch2/catch_test_macros.hpp>
+#include <set>
 #include <variant>
 
 TEST_CASE("CreateInputEventPacket: Creates valid EventPacket with "
@@ -284,4 +285,120 @@ TEST_CASE("Event factory: All functions respect custom lifetime values",
     REQUIRE(result.has_value());
     REQUIRE(result.value().context.lifetime == custom_lifetime);
   }
+}
+
+TEST_CASE("CreateRandomEventPacket: Generates valid random EventPackets",
+          "[unit][events][event_factory]") {
+  // Run multiple times to test randomness and validity
+  for (int i = 0; i < 20; ++i) {
+    auto result = steamrot::events::CreateRandomEventPacket();
+
+    REQUIRE(result.has_value());
+    const auto &packet = result.value();
+
+    // Verify lifetime is within valid range (1 to 255)
+    REQUIRE(packet.context.lifetime >= 1);
+    REQUIRE(packet.context.lifetime <= 255);
+
+    // Verify event type is valid (not NONE)
+    REQUIRE(packet.type != steamrot::EventType::NONE);
+
+    // Verify payload matches event type and contains valid data
+    switch (packet.type) {
+    case steamrot::EventType::USER_INPUT: {
+      REQUIRE(
+          std::holds_alternative<steamrot::InputPayload>(packet.payload));
+      const auto &payload =
+          std::get<steamrot::InputPayload>(packet.payload);
+      // Verify action is valid (not NONE for random generation)
+      REQUIRE(payload.action != steamrot::InputPayload::InputAction::NONE);
+      break;
+    }
+
+    case steamrot::EventType::UI: {
+      REQUIRE(std::holds_alternative<steamrot::UIPayload>(packet.payload));
+      const auto &payload = std::get<steamrot::UIPayload>(packet.payload);
+      // Verify UI state name is not empty
+      REQUIRE_FALSE(payload.c_ui_state_name.empty());
+      break;
+    }
+
+    case steamrot::EventType::LOGIC: {
+      REQUIRE(
+          std::holds_alternative<steamrot::LogicPayload>(packet.payload));
+      const auto &payload =
+          std::get<steamrot::LogicPayload>(packet.payload);
+      // Verify toggle is valid (not NONE for random generation)
+      REQUIRE(payload.toggle_name !=
+              steamrot::LogicPayload::LogicToggle::NONE);
+      break;
+    }
+
+    case steamrot::EventType::SCENE: {
+      REQUIRE(
+          std::holds_alternative<steamrot::ScenePayload>(packet.payload));
+      const auto &payload =
+          std::get<steamrot::ScenePayload>(packet.payload);
+      // Verify action is valid (not NONE for random generation)
+      REQUIRE(payload.action != steamrot::ScenePayload::SceneAction::NONE);
+      // Verify scene type is valid (not UNKNOWN for random generation)
+      REQUIRE(payload.scene_type != steamrot::SceneType::UNKNOWN);
+      break;
+    }
+
+    case steamrot::EventType::SYSTEM: {
+      REQUIRE(
+          std::holds_alternative<steamrot::SystemPayload>(packet.payload));
+      const auto &payload =
+          std::get<steamrot::SystemPayload>(packet.payload);
+      // Verify action is valid (not NONE for random generation)
+      REQUIRE(payload.action != steamrot::SystemPayload::SystemAction::NONE);
+      break;
+    }
+
+    default:
+      FAIL("Unexpected event type encountered");
+    }
+  }
+}
+
+TEST_CASE("CreateRandomEventPacket: Generates different packets across "
+          "multiple calls",
+          "[unit][events][event_factory]") {
+  // Generate multiple packets and verify they're not all identical
+  std::vector<steamrot::EventPacket> packets;
+  for (int i = 0; i < 10; ++i) {
+    auto result = steamrot::events::CreateRandomEventPacket();
+    REQUIRE(result.has_value());
+    packets.push_back(result.value());
+  }
+
+  // Check that not all packets have the same event type
+  bool has_variation = false;
+  auto first_type = packets[0].type;
+  for (size_t i = 1; i < packets.size(); ++i) {
+    if (packets[i].type != first_type) {
+      has_variation = true;
+      break;
+    }
+  }
+
+  // Note: There's a small chance this could fail due to randomness,
+  // but with 10 packets and 5 event types, it's very unlikely
+  REQUIRE(has_variation);
+}
+
+TEST_CASE("CreateRandomEventPacket: Lifetime varies across calls",
+          "[unit][events][event_factory]") {
+  // Generate multiple packets and verify lifetimes vary
+  std::set<uint8_t> unique_lifetimes;
+  for (int i = 0; i < 20; ++i) {
+    auto result = steamrot::events::CreateRandomEventPacket();
+    REQUIRE(result.has_value());
+    unique_lifetimes.insert(result.value().context.lifetime);
+  }
+
+  // With 20 calls, we should see at least some variation
+  // (very unlikely to get the same lifetime 20 times)
+  REQUIRE(unique_lifetimes.size() > 1);
 }
