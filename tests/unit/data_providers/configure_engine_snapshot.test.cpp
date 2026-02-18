@@ -10,7 +10,6 @@
 #include "EngineSnapshot.h"
 #include "EventHandler.h"
 #include "engine_snapshot_generated.h"
-#include "events_generated.h"
 #include <catch2/catch_test_macros.hpp>
 #include <flatbuffers/flatbuffers.h>
 

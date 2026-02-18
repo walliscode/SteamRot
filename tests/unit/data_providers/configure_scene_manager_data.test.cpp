@@ -9,7 +9,6 @@
 #include "configure_scene_manager_data.h"
 #include "FlatbuffersDataLoader.h"
 #include "SceneManagerState.h"
-#include "events_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
 /////////////////////////////////////////////////
@@ -46,15 +45,14 @@ TEST_CASE("ConfigureSceneManagerState populates from valid data",
   REQUIRE(result.has_value());
   REQUIRE(state.subscriptions.size() == 1);
   REQUIRE(state.subscriptions[0] != nullptr);
-  REQUIRE(state.subscriptions[0]->m_trigger_event_type ==
-          steamrot::EventType::CHANGE_SCENE);
+  REQUIRE(state.subscriptions[0]->event_type == steamrot::EventType::SCENE);
 }
 
 TEST_CASE("ConfigureSceneManagerState handles empty subscriptions",
           "[unit][configure_scene_manager_data]") {
   // Create a SceneManagerStateFbs with no subscriptions
   flatbuffers::FlatBufferBuilder builder;
-  
+
   std::vector<flatbuffers::Offset<steamrot::SubscriberFbs>> empty_subscribers;
   auto state_data_offset = steamrot::CreateSceneManagerStateFbs(
       builder, builder.CreateVector(empty_subscribers));
@@ -78,14 +76,14 @@ TEST_CASE("ConfigureSceneManagerState handles multiple subscriptions",
   flatbuffers::FlatBufferBuilder builder;
 
   std::vector<flatbuffers::Offset<steamrot::SubscriberFbs>> subscribers;
-  
+
   auto subscriber1 = steamrot::CreateSubscriberFbs(
-      builder, steamrot::EventTypeFbs_EVENT_CHANGE_SCENE,
-      steamrot::EventDataData::EventDataData_NONE, 0, true);
-  
+      builder, steamrot::EventTypeFbs_SCENE,
+      steamrot::EventPayloadFbs_ScenePayloadFbs, 0);
+
   auto subscriber2 = steamrot::CreateSubscriberFbs(
-      builder, steamrot::EventTypeFbs_EVENT_QUIT_GAME,
-      steamrot::EventDataData::EventDataData_NONE, 0, false);
+      builder, steamrot::EventTypeFbs_SYSTEM,
+      steamrot::EventPayloadFbs_SystemPayloadFbs, 0);
 
   subscribers.push_back(subscriber1);
   subscribers.push_back(subscriber2);
@@ -104,10 +102,8 @@ TEST_CASE("ConfigureSceneManagerState handles multiple subscriptions",
 
   REQUIRE(result.has_value());
   REQUIRE(state.subscriptions.size() == 2);
-  REQUIRE(state.subscriptions[0]->m_trigger_event_type ==
-          steamrot::EventType::CHANGE_SCENE);
+  REQUIRE(state.subscriptions[0]->event_type == steamrot::EventType::SCENE);
   REQUIRE(state.subscriptions[0]->m_active == true);
-  REQUIRE(state.subscriptions[1]->m_trigger_event_type ==
-          steamrot::EventType::QUIT_GAME);
+  REQUIRE(state.subscriptions[1]->event_type == steamrot::EventType::SYSTEM);
   REQUIRE(state.subscriptions[1]->m_active == false);
 }
