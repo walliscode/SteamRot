@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of Catch2 matcher for EventData comparison
+/// @brief Declaration of Catch2 matcher for EventPayload comparison
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -11,17 +11,18 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "EventPacket.h"
+#include "EventPayload.h"
 #include "catch2/matchers/catch_matchers.hpp"
 
 namespace steamrot::tests {
-class EventDataEqualsMatcher : public Catch::Matchers::MatcherBase<EventData> {
+class EventPayloadEqualsMatcher
+    : public Catch::Matchers::MatcherBase<EventPayload> {
 
 private:
   /////////////////////////////////////////////////
-  /// @brief Storage of the expected EventData for comparison
+  /// @brief Storage of the expected EventPayload for comparison
   /////////////////////////////////////////////////
-  const EventData &m_expected;
+  const EventPayload &m_expected;
 
   /////////////////////////////////////////////////
   /// @brief String to hold mismatch description
@@ -29,28 +30,28 @@ private:
   mutable std::string m_mismatch_description;
 
   /////////////////////////////////////////////////
-  /// @brief Get the name of the EventData variant type by index
+  /// @brief Get the name of the EventPayload variant type by index
   ///
   /// @param index Index of the variant type
   /// @return Name of the variant type
   /////////////////////////////////////////////////
-  std::string GetNameForEventDataIndex(size_t index) const;
+  std::string GetNameForEventPayloadIndex(size_t index) const;
 
 public:
   /////////////////////////////////////////////////
-  /// @brief Constructor for EventDataEqualsMatcher
+  /// @brief Constructor for EventPayloadEqualsMatcher
   ///
-  /// @param expected EventData object to compare against
+  /// @param expected EventPayload object to compare against
   /////////////////////////////////////////////////
-  explicit EventDataEqualsMatcher(const EventData &expected);
+  explicit EventPayloadEqualsMatcher(const EventPayload &expected);
 
   /////////////////////////////////////////////////
-  /// @brief Match method to compare actual EventData with expected
+  /// @brief Match method to compare actual EventPayload with expected
   ///
-  /// @param actual EventData object to compare
-  /// @return Whether the actual EventData matches the expected
+  /// @param actual EventPayload object to compare
+  /// @return Whether the actual EventPayload matches the expected
   ///////////////////////////////////////////////
-  bool match(const EventData &actual) const override;
+  bool match(const EventPayload &actual) const override;
 
   /////////////////////////////////////////////////
   /// @brief Describe the result of the match
@@ -60,7 +61,8 @@ public:
   std::string describe() const override;
 };
 
-inline EventDataEqualsMatcher EqualsEventData(const EventData &expected) {
-  return EventDataEqualsMatcher(expected);
+inline EventPayloadEqualsMatcher
+EqualsEventPayload(const EventPayload &expected) {
+  return EventPayloadEqualsMatcher(expected);
 }
 } // namespace steamrot::tests

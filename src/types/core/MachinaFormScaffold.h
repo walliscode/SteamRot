@@ -12,7 +12,6 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "EventPacket.h"
 #include "Fragment.h"
 #include "Joint.h"
 #include "ViewDirection.h"
@@ -128,13 +127,6 @@ struct GrowthPoint {
   /// @brief Color of the growth point when hovered
   /////////////////////////////////////////////////
   sf::Color hover_color{sf::Color::Cyan};
-
-  /////////////////////////////////////////////////
-  /// @brief EventPacket to send to the EventHandler when the growth point is
-  /// clicked
-  /////////////////////////////////////////////////
-  EventPacket response_event_packet{EventType::TOGGLE_UI,
-                                    "fragment_selection_menu", 1};
 };
 
 /////////////////////////////////////////////////

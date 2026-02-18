@@ -8,9 +8,9 @@
 ////////////////////////////////////////////////////////////
 #include "configure_ui_elements.h"
 #include "EventPacket.h"
-#include "event_factory.h"
-#include "event_type_conversion.h"
-#include "subscriber_factory.h"
+#include "Subscriber.h"
+#include "configure_event.h"
+#include "configure_subscriber.h"
 #include <string>
 
 namespace steamrot::data::configure {
@@ -64,22 +64,21 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
     element.is_mouse_over = data.is_mouse_over();
 
   // set Subscription if subscriber_data exists and EventTypeFbs is not none
-  if (data.subscriber_data() && (data.subscriber_data()->event_type_data() !=
-                                 EventTypeFbs_EVENT_NONE)) {
+  if (data.subscriber_data() &&
+      (data.subscriber_data()->event_type() != EventTypeFbs_NONE)) {
 
     // Create vector with single subscriber
     std::vector<const SubscriberFbs *> subscribers_fbs{data.subscriber_data()};
 
-    // Create Subscriber via factory
-    auto result = subscriber_factory::CreateSubscriber(subscribers_fbs[0]);
+    // Create Subscriber and configure
+    std::shared_ptr<Subscriber> subscriber = std::make_shared<Subscriber>();
 
+    auto result = data::configure::ConfigureSubscriber(*subscriber,
+                                                       data.subscriber_data());
     // propogate errors
     if (!result.has_value())
       return std::unexpected(result.error());
 
-    // create shared_ptr, add to element and register with event handler
-    std::shared_ptr<Subscriber> subscriber =
-        std::make_shared<Subscriber>(result.value());
     element.subscription = subscriber;
     auto register_result = event_handler.RegisterSubscriber(subscriber);
     if (!register_result.has_value())
@@ -95,37 +94,15 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
         continue;
       }
 
-      // Check if EventTypeFbs is not none
-      if (event_packet_data->event_type() == EventTypeFbs_EVENT_NONE) {
-        continue;
+      // Configure EventPacket from EventPacketFbs data
+      EventPacket event_packet;
+      auto configure_result =
+          ConfigureEventPacket(event_packet, event_packet_data);
+      if (!configure_result.has_value()) {
+        return std::unexpected(configure_result.error());
       }
 
-      // set EventTypeFbs
-      if (!event_packet_data->event_type()) {
-        return std::unexpected(
-            FailInfo{FailMode::FlatbuffersDataNotFound,
-                     "UIElementData has response_event_data but no event_type."});
-      }
-      
-      // Convert EventTypeFbs to native EventType
-      auto event_type_result = event::ConvertEventTypeFbsToEventType(event_packet_data->event_type());
-      if (!event_type_result.has_value()) {
-        return std::unexpected(event_type_result.error());
-      }
-      EventType event_type = event_type_result.value();
-
-      // create EventData by running the flatbuffers data through the factory
-      auto event_data_conversion_result = event::CreateEventData(
-          event_packet_data->event_data_data_type(),
-          event_packet_data->event_data_data());
-      if (!event_data_conversion_result.has_value())
-        return std::unexpected(event_data_conversion_result.error());
-
-      EventData event_data = event_data_conversion_result.value();
-
-      // create EventPacket and add to element's vector
-      EventPacket event_packet(event_type, event_data,
-                               event_packet_data->event_lifetime());
+      // Add configured event packet to element's response events
       element.response_events.push_back(event_packet);
     }
   }
@@ -170,8 +147,9 @@ ConfigureButtonElement(ButtonElement &button_element, const ButtonData &data) {
 }
 
 ////////////////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo> ConfigureDropDownListElement(
-    DropDownListElement &dropdown_list_element, const DropDownListData &data) {
+std::expected<std::monostate, FailInfo>
+ConfigureDropDownListElement(DropDownListElement &dropdown_list_element,
+                             const DropDownListData &data) {
   if (data.label()) {
     dropdown_list_element.unexpanded_label = data.label()->str();
   }
@@ -228,8 +206,9 @@ std::expected<std::monostate, FailInfo> ConfigureDropDownContainerElement(
 }
 
 ////////////////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo> ConfigureDropDownItemElement(
-    DropDownItemElement &dropdown_item_element, const DropDownItemData &data) {
+std::expected<std::monostate, FailInfo>
+ConfigureDropDownItemElement(DropDownItemElement &dropdown_item_element,
+                             const DropDownItemData &data) {
   if (data.label()) {
     dropdown_item_element.label = data.label()->str();
   }
@@ -237,9 +216,9 @@ std::expected<std::monostate, FailInfo> ConfigureDropDownItemElement(
 }
 
 ////////////////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo> ConfigureDropDownButtonElement(
-    DropDownButtonElement &dropdown_button_element,
-    const DropDownButtonData &data) {
+std::expected<std::monostate, FailInfo>
+ConfigureDropDownButtonElement(DropDownButtonElement &dropdown_button_element,
+                               const DropDownButtonData &data) {
   dropdown_button_element.is_expanded = data.is_expanded();
   return std::monostate{};
 }

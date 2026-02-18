@@ -161,7 +161,7 @@ TEST_CASE("EngineSnapshotEqualsMatcher - with global_event_bus match",
   EntityMemoryPool pool1 = CreateTestPool(5);
 
   EventPacket event1{1};
-  event1.event_type = EventType::CHANGE_SCENE;
+  event1.type = EventType::SCENE;
 
   EngineSnapshot expected;
   expected.global_event_bus = EventBus{event1};
@@ -184,10 +184,10 @@ TEST_CASE("EngineSnapshotEqualsMatcher - with global_event_bus mismatch",
   EntityMemoryPool pool1 = CreateTestPool(5);
 
   EventPacket event1{1};
-  event1.event_type = EventType::CHANGE_SCENE;
+  event1.type = EventType::SCENE;
 
   EventPacket event2{1};
-  event2.event_type = EventType::QUIT_GAME;
+  event2.type = EventType::SYSTEM;
 
   EngineSnapshot expected;
   expected.global_event_bus = EventBus{event1};
@@ -211,7 +211,7 @@ TEST_CASE(
   EntityMemoryPool pool1 = CreateTestPool(5);
 
   EventPacket event1{1};
-  event1.event_type = EventType::CHANGE_SCENE;
+  event1.type = EventType::SCENE;
 
   EngineSnapshot expected;
   expected.global_event_bus = EventBus{event1};
@@ -244,7 +244,7 @@ TEST_CASE("EngineSnapshotEqualsMatcher - global_event_bus not expected",
   EntityMemoryPool pool1 = CreateTestPool(5);
 
   EventPacket event1{1};
-  event1.event_type = EventType::CHANGE_SCENE;
+  event1.type = EventType::SCENE;
 
   EngineSnapshot expected;
   // No global_event_bus set
@@ -267,7 +267,7 @@ TEST_CASE("EngineSnapshotEqualsMatcher - all fields populated match",
   EntityMemoryPool pool1 = CreateTestPool(5);
 
   EventPacket event1{1};
-  event1.event_type = EventType::CHANGE_SCENE;
+  event1.type = EventType::SCENE;
 
   EngineSnapshot expected;
   expected.tick_number = 42;
@@ -292,10 +292,10 @@ TEST_CASE("EngineSnapshotEqualsMatcher - multiple field mismatches",
   EntityMemoryPool pool1 = CreateTestPool(5);
 
   EventPacket event1{1};
-  event1.event_type = EventType::CHANGE_SCENE;
+  event1.type = EventType::SCENE;
 
   EventPacket event2{1};
-  event2.event_type = EventType::QUIT_GAME;
+  event2.type = EventType::SYSTEM;
 
   EngineSnapshot expected;
   expected.tick_number = 42;
@@ -331,7 +331,7 @@ TEST_CASE("EngineSnapshotEqualsMatcher - selective comparison only tick_number",
   EntityMemoryPool pool1 = CreateTestPool(5);
 
   EventPacket event1{1};
-  event1.event_type = EventType::CHANGE_SCENE;
+  event1.type = EventType::SCENE;
 
   EngineSnapshot expected;
   expected.tick_number = 42;
@@ -355,7 +355,7 @@ TEST_CASE("EngineSnapshotEqualsMatcher - selective comparison only event_bus",
   EntityMemoryPool pool1 = CreateTestPool(5);
 
   EventPacket event1{1};
-  event1.event_type = EventType::CHANGE_SCENE;
+  event1.type = EventType::SCENE;
 
   EngineSnapshot expected;
   expected.global_event_bus = EventBus{event1};

@@ -21,11 +21,13 @@
       "description": "Starting event bus state",
       "events": [
         {
-          "event_lifetime": 5,
-          "event_type": "EVENT_USER_INPUT",
-          "event_data_data_type": "UserInputBitsetData",
-          "event_data_data": {
-            "mouse_pressed": ["LEFT_CLICK"]
+          "context": {
+            "lifetime": 5
+          },
+          "type": "USER_INPUT",
+          "payload_type": "InputPayloadFbs",
+          "payload": {
+            "action": "SELECT"
           }
         }
       ]

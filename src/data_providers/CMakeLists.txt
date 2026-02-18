@@ -9,7 +9,6 @@ add_library(data_providers
   FlatbuffersEngineSnapshotProvider.cpp
   FlatbuffersSceneManagerDataProvider.cpp
   FlatbuffersSceneDataProvider.cpp
-  FlatbuffersSubscriberViewer.cpp
   FlatbuffersUIStyleDataProvider.cpp
   FlatbuffersSaveDataProvider.cpp
   FlatbuffersGrimoireMachinaProvider.cpp
@@ -29,6 +28,8 @@ add_library(data_providers
   configure/configure_ui_elements.cpp
   configure/configure_grimoire.cpp
   configure/configure_logic_config.cpp
+  configure/configure_event.cpp
+  configure/configure_subscriber.cpp
 
 )
 

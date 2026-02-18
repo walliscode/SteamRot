@@ -9,7 +9,6 @@
 #include "configure_engine_snapshot.h"
 #include "FlatbuffersSceneDataProvider.h"
 #include "configure_scene_manager_data.h"
-#include "event_bus_conversion.h"
 
 namespace steamrot::data::configure {
 
@@ -31,17 +30,17 @@ ConfigureEngineSnapshot(EngineSnapshot &snapshot,
   if (fb_snapshot->tick_number() > 0) {
     snapshot.tick_number = fb_snapshot->tick_number();
   }
-  // Configure global_event_bus (optional field)
-  if (fb_snapshot->global_event_bus()) {
-
-    auto event_bus_result =
-        event::ConvertEventBusDataToEventBus(fb_snapshot->global_event_bus());
-    if (!event_bus_result.has_value()) {
-      return std::unexpected(event_bus_result.error());
-    }
-
-    snapshot.global_event_bus = event_bus_result.value();
-  }
+  // // Configure global_event_bus (optional field)
+  // if (fb_snapshot->global_event_bus()) {
+  //
+  //   auto event_bus_result =
+  //       event::ConvertEventBusDataToEventBus(fb_snapshot->global_event_bus());
+  //   if (!event_bus_result.has_value()) {
+  //     return std::unexpected(event_bus_result.error());
+  //   }
+  //
+  //   snapshot.global_event_bus = event_bus_result.value();
+  // }
   // Configure scene_manager_data (optional field)
   if (fb_snapshot->scene_manager_data()) {
     SceneManagerData scene_manager_data;

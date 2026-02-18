@@ -2,6 +2,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "EventHandler.h"
+#include "EventPayload.h"
 #include "FailInfo.h"
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
@@ -15,7 +16,7 @@ EventHandler::RegisterSubscriber(std::shared_ptr<Subscriber> subscriber) {
 
   // get the event type the subscriber is interested in and add it to the
   // register
-  auto event_type = subscriber->m_trigger_event_type;
+  auto event_type = subscriber->event_type;
   m_subscriber_register[event_type].push_back(subscriber);
 
   return std::monostate{};
@@ -62,53 +63,7 @@ const EventBus &EventHandler::GetWaitingRoomEventBus() {
 }
 
 /////////////////////////////////////////////////
-void HandleSFMLEvents(sf::RenderWindow &window, EventHandler &event_handler) {
-
-  // create a vector to hold user input events
-  std::vector<sf::Event> user_input_events;
-
-  // poll events from the window
-  while (const std::optional<sf::Event> event = window.pollEvent()) {
-    // add in ctrl + c to close the window
-    if (const auto *keyPressed = event->getIf<sf::Event::KeyPressed>()) {
-      if (keyPressed->code == sf::Keyboard::Key::Escape)
-        window.close();
-    } // if the event is a close event, set the close window flag to true
-    if (event->is<sf::Event::Closed>()) {
-      window.close();
-    }
-    // handle keyboard and mouse events by adding to the user input events
-    // vector
-
-    if (event->is<sf::Event::KeyPressed>() ||
-        event->is<sf::Event::KeyReleased>() ||
-        event->is<sf::Event::MouseButtonPressed>() ||
-        event->is<sf::Event::MouseButtonReleased>()) {
-      user_input_events.push_back(*event);
-    }
-  }
-
-  // specifically handle keyboard and mouse events
-  if (!user_input_events.empty()) {
-
-    // create a new event packet with a lifetime of 1
-    EventPacket event_packet(1);
-
-    // set the event type to UserInputEvent
-    event_packet.event_type = EventType::USER_INPUT;
-
-    // create a UserInputBitset from the vector of hardware events
-    auto user_input_bitset = UserInputBitset{user_input_events};
-
-    // set the event data to the UserInputBitset
-    event_packet.event_data = user_input_bitset;
-
-    // add the event packet to the waiting room event bus
-    event_handler.AddEvent(event_packet);
-  }
-
-  // Add other event types here as needed
-}
+void HandleSFMLEvents(sf::RenderWindow &window, EventHandler &event_handler) {}
 
 /////////////////////////////////////////////////
 const std::unordered_map<EventType, std::vector<std::weak_ptr<Subscriber>>> &
@@ -121,13 +76,13 @@ void EventHandler::UpdateSubscribersFromGlobalEventBus() {
   // go through each event in the global event bus
   for (const auto &event : m_global_event_bus) {
 
-    if (m_subscriber_register.contains(event.event_type)) {
+    if (m_subscriber_register.contains(event.type)) {
 
       // go through each subscriber registered for the event type
-      for (auto &subscriber_weak : m_subscriber_register.at(event.event_type)) {
+      for (auto &subscriber_weak : m_subscriber_register.at(event.type)) {
 
         // pass to the UpdateSubscriber function
-        UpdateSubscriber(subscriber_weak, event.event_data);
+        UpdateSubscriber(subscriber_weak, event.payload);
       }
     }
   }
@@ -139,8 +94,8 @@ void EventHandler::AddEvent(const EventPacket &event) {
 
 /////////////////////////////////////////////////
 void DecrementLifteime(EventPacket &event) {
-  if (event.event_lifetime > 0) {
-    --event.event_lifetime;
+  if (event.context.lifetime > 0) {
+    --event.context.lifetime;
   }
 }
 
@@ -155,45 +110,31 @@ void DecrementEventLifetimes(EventBus &event_bus) {
 void RemoveDeadEvents(EventBus &event_bus) {
   event_bus.erase(std::remove_if(event_bus.begin(), event_bus.end(),
                                  [](const EventPacket &event) {
-                                   return event.event_lifetime == 0;
+                                   return event.context.lifetime == 0;
                                  }),
                   event_bus.end());
 }
 
 /////////////////////////////////////////////////
 void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
-                      const EventData &event_data) {
+                      const EventPayload &event_payload) {
 
   auto locked_subscriber = subscriber.lock();
   if (!locked_subscriber)
     // if the Subscriber has expired, do nothing
     return;
 
-  // if the Subscriber has trigger data, compare against the event data
-  if (locked_subscriber->m_trigger_event_data.has_value()) {
-    const auto &trigger_data = locked_subscriber->m_trigger_event_data.value();
+  // if the Subscriber has filter payload, compare against the event payload
+  if (locked_subscriber->filter_payload.has_value()) {
+    const auto &filter_payload_data = locked_subscriber->filter_payload.value();
 
-    // For UserInputBitset: use subset matching (trigger bits must be present in
-    // event bits)
-    if (std::holds_alternative<UserInputBitset>(trigger_data) &&
-        std::holds_alternative<UserInputBitset>(event_data)) {
-      const auto &trigger_bits = std::get<UserInputBitset>(trigger_data);
-      const auto &event_bits = std::get<UserInputBitset>(event_data);
-
-      // Check if all trigger bits are present in event bits (subset matching)
-      if ((trigger_bits & event_bits) != trigger_bits) {
-        return; // Required bits not present in event
-      }
-    }
-    // For other types: use exact equality
-    else if (trigger_data != event_data) {
-      return;
-    }
+    // Compare filter payload with event payload for exact equality
+    // [TODO:] implement Matches functions for Subscribers
   }
 
   // activate the subscriber and store the received event data
   locked_subscriber->m_active = true;
-  locked_subscriber->m_received_event_data = event_data;
+  locked_subscriber->captured_payload = event_payload;
 }
 
 /////////////////////////////////////////////////

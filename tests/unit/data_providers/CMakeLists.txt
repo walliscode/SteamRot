@@ -17,7 +17,6 @@ add_executable(test_data_providers
   FlatbuffersEngineSnapshotProvider.test.cpp
   FlatbuffersSceneManagerDataProvider.test.cpp
   FlatbuffersSceneDataProvider.test.cpp
-  FlatbuffersSubscriberViewer.test.cpp
   FlatbuffersSaveDataProvider.test.cpp
   FlatbuffersUIStyleDataProvider.test.cpp
   FlatbuffersGrimoireMachinaProvider.test.cpp
@@ -25,6 +24,7 @@ add_executable(test_data_providers
   configure_asset_config.test.cpp
   configure_engine_data.test.cpp
   configure_engine_snapshot.test.cpp
+  configure_event.test.cpp
   configure_save_data.test.cpp
   configure_scene_data.test.cpp
   configure_scene_manager_data.test.cpp

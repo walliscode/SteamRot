@@ -1,4 +1,4 @@
-include "event_packet_data.fbs";
+include "event_packet.fbs";
 
 namespace steamrot;
 
@@ -12,7 +12,7 @@ namespace steamrot;
 table EventBusData {
   /// @brief Array of event packets in the bus
   /// Order matters - events are stored in the order they appear
-  events: [EventPacketData];
+  events: [EventPacketFbs];
   
   /// @brief Optional description for debugging
   description: string;

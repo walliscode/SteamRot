@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "configure_logic_config.h"
 #include "EventType.h"
+#include "event_payload_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("ConfigureLogicConfig returns unexpected when given null pointer",
@@ -33,12 +34,12 @@ TEST_CASE("ConfigureLogicConfig populates the LogicConfig subscribers",
   // create SubscriberFbs objects
   std::vector<flatbuffers::Offset<steamrot::SubscriberFbs>> subscribers;
   auto subscriber1 = steamrot::CreateSubscriberFbs(
-      builder, steamrot::EventTypeFbs_EVENT_CHANGE_SCENE,
-      steamrot::EventDataData::EventDataData_NONE, 0, true);
+      builder, steamrot::EventTypeFbs_SCENE,
+      steamrot::EventPayloadFbs_ScenePayloadFbs, 0);
 
   auto subscriber2 = steamrot::CreateSubscriberFbs(
-      builder, steamrot::EventTypeFbs_EVENT_QUIT_GAME,
-      steamrot::EventDataData::EventDataData_NONE, 0, false);
+      builder, steamrot::EventTypeFbs_SYSTEM,
+      steamrot::EventPayloadFbs_SystemPayloadFbs, 0);
 
   subscribers.push_back(subscriber1);
   subscribers.push_back(subscriber2);
@@ -58,8 +59,6 @@ TEST_CASE("ConfigureLogicConfig populates the LogicConfig subscribers",
   REQUIRE(logic_config.m_subscribers.size() == 2);
   auto subscriber1_ptr = logic_config.m_subscribers[0];
   auto subscriber2_ptr = logic_config.m_subscribers[1];
-  REQUIRE(subscriber1_ptr->m_trigger_event_type ==
-          steamrot::EventType::CHANGE_SCENE);
-  REQUIRE(subscriber2_ptr->m_trigger_event_type ==
-          steamrot::EventType::QUIT_GAME);
+  REQUIRE(subscriber1_ptr->event_type == steamrot::EventType::SCENE);
+  REQUIRE(subscriber2_ptr->event_type == steamrot::EventType::SYSTEM);
 }

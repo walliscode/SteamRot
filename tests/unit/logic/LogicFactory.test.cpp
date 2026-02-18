@@ -215,11 +215,7 @@ TEST_CASE("LogicFactoru::ConfigureLogicObject correctly configures a TestLogic "
   REQUIRE(subscribers.size() == 1);
   // test each Subscriber
   auto subscriber_one = subscribers[0];
-  REQUIRE(subscriber_one->m_trigger_event_type ==
-          steamrot::EventType::USER_INPUT);
-  REQUIRE(subscriber_one->m_trigger_event_data.has_value());
-  steamrot::EventData &sub_one_trigger_data =
-      subscriber_one->m_trigger_event_data.value();
-  REQUIRE(
-      std::holds_alternative<steamrot::UserInputBitset>(sub_one_trigger_data));
+  REQUIRE(subscriber_one->event_type == steamrot::EventType::USER_INPUT);
+
+  REQUIRE(subscriber_one->filter_payload.has_value());
 }

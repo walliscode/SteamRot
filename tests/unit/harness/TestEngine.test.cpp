@@ -10,7 +10,7 @@
 #include "EngineSnapshotEqualsMatcher.h"
 #include "EventHandler.h"
 #include "EventPacket.h"
-#include "EventType.h"
+#include "EventPayload.h"
 #include "SceneData.h"
 #include "TestData.h"
 #include "uuid.h"
@@ -110,10 +110,17 @@ TEST_CASE("TestEngine::StartUp loads EventBus from TestData",
   test_data.number_of_ticks = 1;
 
   // Create test events to load
-  steamrot::EventPacket event1(steamrot::EventType::QUIT_GAME,
-                               steamrot::EventData{std::monostate{}}, 2);
-  steamrot::EventPacket event2(steamrot::EventType::CHANGE_SCENE,
-                               steamrot::EventData{std::monostate{}}, 1);
+  steamrot::EventPacket event1;
+  event1.type = steamrot::EventType::SYSTEM;
+  event1.context.lifetime = 1;
+  event1.payload = steamrot::EventPayload{
+      steamrot::SystemPayload{steamrot::SystemPayload::SystemAction::QUIT}};
+
+  steamrot::EventPacket event2;
+  event2.type = steamrot::EventType::SCENE;
+  event2.context.lifetime = 2;
+  event2.payload = steamrot::EventPayload{
+      steamrot::ScenePayload{steamrot::ScenePayload::SceneAction::CHANGE}};
 
   steamrot::EventBus test_event_bus{event1, event2};
   test_data.starting_engine_snapshot.global_event_bus = test_event_bus;
@@ -130,8 +137,19 @@ TEST_CASE("TestEngine::StartUp loads EventBus from TestData",
 
   // Events should be processed and in the global event bus
   REQUIRE(global_event_bus.size() == 2);
-  REQUIRE(global_event_bus[0].event_type == steamrot::EventType::QUIT_GAME);
-  REQUIRE(global_event_bus[1].event_type == steamrot::EventType::CHANGE_SCENE);
+  REQUIRE(global_event_bus[0].type == steamrot::EventType::SYSTEM);
+  REQUIRE(std::holds_alternative<steamrot::SystemPayload>(
+      global_event_bus[0].payload));
+  REQUIRE(
+      std::get<steamrot::SystemPayload>(global_event_bus[0].payload).action ==
+      steamrot::SystemPayload::SystemAction::QUIT);
+
+  REQUIRE(global_event_bus[1].type == steamrot::EventType::SCENE);
+  REQUIRE(std::holds_alternative<steamrot::ScenePayload>(
+      global_event_bus[1].payload));
+  REQUIRE(
+      std::get<steamrot::ScenePayload>(global_event_bus[1].payload).action ==
+      steamrot::ScenePayload::SceneAction::CHANGE);
 }
 
 TEST_CASE("TestEngine::StartUp handles empty EventBus from TestData",
@@ -296,8 +314,12 @@ TEST_CASE("TestEngine::StartUp configures all aspects from TestData",
   test_data.number_of_ticks = 5;
 
   // Configure EventBus
-  steamrot::EventPacket event(steamrot::EventType::USER_INPUT,
-                              steamrot::EventData{std::monostate{}}, 3);
+  steamrot::EventPacket event;
+  event.type = steamrot::EventType::USER_INPUT;
+  event.context.lifetime = 1;
+  event.payload = steamrot::EventPayload{
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT}};
+
   test_data.starting_engine_snapshot.global_event_bus =
       steamrot::EventBus{event};
 
@@ -359,10 +381,18 @@ TEST_CASE(
   test_data.number_of_ticks = 2;
 
   // Configure specific starting event bus
-  steamrot::EventPacket event1(steamrot::EventType::USER_INPUT,
-                               steamrot::EventData{std::monostate{}}, 1);
-  steamrot::EventPacket event2(steamrot::EventType::QUIT_GAME,
-                               steamrot::EventData{std::monostate{}}, 2);
+  steamrot::EventPacket event1;
+  event1.type = steamrot::EventType::USER_INPUT;
+  event1.context.lifetime = 1;
+  event1.payload = steamrot::EventPayload{
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::NONE}};
+
+  steamrot::EventPacket event2;
+  event2.type = steamrot::EventType::SYSTEM;
+  event2.context.lifetime = 2;
+  event2.payload = steamrot::EventPayload{
+      steamrot::SystemPayload{steamrot::SystemPayload::SystemAction::QUIT}};
+
   test_data.starting_engine_snapshot.global_event_bus =
       steamrot::EventBus{event1, event2};
 

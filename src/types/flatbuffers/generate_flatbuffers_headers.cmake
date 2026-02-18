@@ -39,11 +39,12 @@ set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/entities/fragment.fbs
 
     # Events
-    ${CMAKE_CURRENT_SOURCE_DIR}/events/events.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/events/event_packet_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/events/event_packet.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/events/event_bus_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/events/subscriber.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/events/user_input.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/events/event_context.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/events/event_payload.fbs
 
     # Logic
     ${CMAKE_CURRENT_SOURCE_DIR}/logic/logic_config.fbs
@@ -59,7 +60,6 @@ set(schema_files
     # Testing
     ${CMAKE_CURRENT_SOURCE_DIR}/testing/test_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/testing/simulation_data.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/testing/event_test_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/testing/input_test_data.fbs
 )
 

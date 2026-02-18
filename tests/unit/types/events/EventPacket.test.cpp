@@ -10,9 +10,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("EventPacket: Default Constructor", "[types]") {
-  steamrot::EventPacket event_packet(5);
-  REQUIRE(event_packet.event_type == steamrot::EventType::NONE);
-  REQUIRE(std::holds_alternative<std::monostate>(event_packet.event_data));
-  REQUIRE(event_packet.event_lifetime == 5);
-  REQUIRE(event_packet.event_id.is_nil());
+  steamrot::EventPacket event_packet;
+  REQUIRE(event_packet.type == steamrot::EventType::NONE);
+  REQUIRE(event_packet.context.lifetime == 1);
 }

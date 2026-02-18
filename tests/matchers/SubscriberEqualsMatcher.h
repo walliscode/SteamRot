@@ -24,13 +24,7 @@ private:
   const Subscriber &m_expected;
   mutable std::string m_mismatch_description;
 
-  /////////////////////////////////////////////////
-  /// @brief Get the name of the EventData variant type by index
-  ///
-  /// @param index Index of the variant type
-  /// @return Name of the variant type
-  /////////////////////////////////////////////////
-  std::string GetNameForEventDataIndex(size_t index) const;
+
 
 public:
   /////////////////////////////////////////////////
