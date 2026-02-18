@@ -65,12 +65,7 @@ ConfigureUIPayload(UIPayload &ui_payload, const UIPayloadFbs *ui_payload_data) {
                  "UIPayloadFbs data is null, cannot populate UIPayload"});
   }
 
-  // populate optional string fields
-  if (ui_payload_data->c_user_interface_name()) {
-    ui_payload.c_user_interface_name =
-        ui_payload_data->c_user_interface_name()->str();
-  }
-
+  // populate string fields
   if (ui_payload_data->c_ui_state_name()) {
     ui_payload.c_ui_state_name = ui_payload_data->c_ui_state_name()->str();
   }
