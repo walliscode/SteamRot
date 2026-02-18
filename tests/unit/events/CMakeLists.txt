@@ -2,6 +2,8 @@ add_executable(test_events
 EventHandler.test.cpp
 event_factory.test.cpp
 payload_matchers.test.cpp
+InputMappingRegistry.test.cpp
+sfml_input_converter.test.cpp
 )
 
 target_include_directories(test_events

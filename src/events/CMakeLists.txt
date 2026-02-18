@@ -2,6 +2,8 @@ add_library(events
 EventHandler.cpp
 event_factory.cpp
 payload_matchers.cpp
+InputMappingRegistry.cpp
+sfml_input_converter.cpp
 )
 
 target_include_directories(events
