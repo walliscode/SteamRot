@@ -10,6 +10,8 @@
 #include "EventPacket.h"
 #include "EventType.h"
 #include "FailInfo.h"
+#include "SFMLInputBinding.h"
+#include "SFMLInputRegistry.h"
 #include "Subscriber.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <expected>
@@ -47,6 +49,11 @@ private:
       m_subscriber_register;
 
   /////////////////////////////////////////////////
+  /// @brief Registry for converting SFML events to InputPayload EventPackets
+  /////////////////////////////////////////////////
+  SFMLInputRegistry m_input_registry;
+
+  /////////////////////////////////////////////////
   /// @brief Wrapper function to specifally to add to the global event bus.
   ///
   /// @param events Vector of events to be added to the global event bus.
@@ -58,6 +65,29 @@ public:
   /// @brief default constructor
   /////////////////////////////////////////////////
   EventHandler() = default;
+
+  /////////////////////////////////////////////////
+  /// @brief Configure the SFML input registry with a set of input bindings.
+  ///
+  /// Replaces any existing bindings and resets the tracked input state.
+  /// Call this at startup or whenever the user's input preferences change.
+  /// When FlatBuffers support is added, convert the binary data to a
+  /// std::vector<SFMLInputBinding> and pass it here.
+  ///
+  /// @param bindings The input bindings to use for SFML-to-InputPayload
+  /// conversion
+  /////////////////////////////////////////////////
+  void ConfigureInputRegistry(const std::vector<SFMLInputBinding> &bindings);
+
+  /////////////////////////////////////////////////
+  /// @brief Process a single SFML event through the input registry.
+  ///
+  /// Any InputPayload EventPackets produced by the registry are immediately
+  /// added to the waiting room event bus.
+  ///
+  /// @param event The SFML event to process
+  /////////////////////////////////////////////////
+  void ProcessInputEvent(const sf::Event &event);
 
   /////////////////////////////////////////////////
   /// @brief store a subscriber in the event handler.
@@ -116,6 +146,13 @@ public:
   /////////////////////////////////////////////////
   const std::unordered_map<EventType, std::vector<std::weak_ptr<Subscriber>>> &
   GetSubcriberRegister() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Return the SFML input registry.
+  ///
+  /// @return Const reference to the input registry
+  /////////////////////////////////////////////////
+  const SFMLInputRegistry &GetInputRegistry() const;
 
   void ExecuteEventHandlerLevelLogic(sf::RenderWindow &window);
 };

@@ -17,6 +17,11 @@ bool MatchPayload(const InputPayload &filter_payload,
   if (filter_payload.action != event_payload.action) {
     return false;
   }
+
+  if (filter_payload.state != event_payload.state) {
+    return false;
+  }
+
   return true;
 }
 

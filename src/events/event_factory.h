@@ -30,6 +30,19 @@ CreateInputEventPacket(const uint8_t lifetime,
                        const InputPayload::InputAction action);
 
 /////////////////////////////////////////////////
+/// @brief Creates an EventPacket with an InputPayload including an InputState
+///
+/// @param lifetime The lifetime of the event in ticks
+/// @param action The input action to be performed
+/// @param state Whether the action was triggered by a press or a release
+/// @return EventPacket with InputPayload or FailInfo on error
+/////////////////////////////////////////////////
+std::expected<EventPacket, FailInfo>
+CreateInputEventPacket(const uint8_t lifetime,
+                       const InputPayload::InputAction action,
+                       const InputPayload::InputState state);
+
+/////////////////////////////////////////////////
 /// @brief Creates an EventPacket with a UIPayload
 ///
 /// @param lifetime The lifetime of the event in ticks

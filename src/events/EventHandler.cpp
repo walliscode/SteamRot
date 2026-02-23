@@ -11,6 +11,24 @@
 #include <variant>
 namespace steamrot {
 /////////////////////////////////////////////////
+void EventHandler::ConfigureInputRegistry(
+    const std::vector<SFMLInputBinding> &bindings) {
+  m_input_registry.Configure(bindings);
+}
+
+/////////////////////////////////////////////////
+void EventHandler::ProcessInputEvent(const sf::Event &event) {
+  const auto triggered = m_input_registry.ProcessSFMLEvent(event);
+  for (const auto &packet : triggered)
+    AddEvent(packet);
+}
+
+/////////////////////////////////////////////////
+const SFMLInputRegistry &EventHandler::GetInputRegistry() const {
+  return m_input_registry;
+}
+
+/////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 EventHandler::RegisterSubscriber(std::shared_ptr<Subscriber> subscriber) {
 
@@ -63,8 +81,11 @@ const EventBus &EventHandler::GetWaitingRoomEventBus() {
 }
 
 /////////////////////////////////////////////////
-void HandleSFMLEvents(sf::RenderWindow &window, EventHandler &event_handler) {}
-
+void HandleSFMLEvents(sf::RenderWindow &window, EventHandler &event_handler) {
+  while (const auto event = window.pollEvent()) {
+    event_handler.ProcessInputEvent(*event);
+  }
+}
 /////////////////////////////////////////////////
 const std::unordered_map<EventType, std::vector<std::weak_ptr<Subscriber>>> &
 EventHandler::GetSubcriberRegister() const {

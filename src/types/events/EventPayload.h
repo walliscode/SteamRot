@@ -33,17 +33,34 @@ struct InputPayload {
   enum class InputAction { NONE, SELECT } action;
 
   /////////////////////////////////////////////////
+  /// @brief The InputState enum indicates whether the action was triggered by
+  /// a press or a release
+  /////////////////////////////////////////////////
+  enum class InputState { PRESSED, RELEASED } state{InputState::PRESSED};
+
+  /////////////////////////////////////////////////
   /// @brief Default constructor for InputPayload, sets action to NONE
   /////////////////////////////////////////////////
   InputPayload() = default;
 
   /////////////////////////////////////////////////
   /// @brief Constructor for InputPayload, takes an InputAction and sets the
-  /// action member
+  /// action member. State defaults to PRESSED.
   ///
   /// @param action InputAction enum value to set the action member to
   /////////////////////////////////////////////////
   InputPayload(const InputPayload::InputAction action) : action(action) {}
+
+  /////////////////////////////////////////////////
+  /// @brief Constructor for InputPayload, takes an InputAction and an
+  /// InputState.
+  ///
+  /// @param action InputAction enum value to set the action member to
+  /// @param state InputState enum value indicating press or release
+  /////////////////////////////////////////////////
+  InputPayload(const InputPayload::InputAction action,
+               const InputPayload::InputState state)
+      : action(action), state(state) {}
 };
 
 /////////////////////////////////////////////////
