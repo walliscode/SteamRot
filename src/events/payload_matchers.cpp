@@ -88,38 +88,18 @@ bool MatchPayload(const SystemPayload &filter_payload,
 }
 
 /////////////////////////////////////////////////
-bool MatchEventPacket(const EventPacket &filter_packet,
-                      const EventPacket &event_packet) {
+bool MatchPayload(const EventPayload &filter_payload,
+                  const EventPayload &event_payload) {
 
-  // Check if variant types match
-  if (filter_packet.payload.index() != event_packet.payload.index()) {
-    return false;
-  }
-
-  // Check EventType match
-  if (filter_packet.type != event_packet.type) {
-    return false;
-  }
-
-  // Match based on the specific payload variant
-  if (std::holds_alternative<InputPayload>(filter_packet.payload)) {
-    return MatchPayload(std::get<InputPayload>(filter_packet.payload),
-                        std::get<InputPayload>(event_packet.payload));
-  } else if (std::holds_alternative<UIPayload>(filter_packet.payload)) {
-    return MatchPayload(std::get<UIPayload>(filter_packet.payload),
-                        std::get<UIPayload>(event_packet.payload));
-  } else if (std::holds_alternative<LogicPayload>(filter_packet.payload)) {
-    return MatchPayload(std::get<LogicPayload>(filter_packet.payload),
-                        std::get<LogicPayload>(event_packet.payload));
-  } else if (std::holds_alternative<ScenePayload>(filter_packet.payload)) {
-    return MatchPayload(std::get<ScenePayload>(filter_packet.payload),
-                        std::get<ScenePayload>(event_packet.payload));
-  } else if (std::holds_alternative<SystemPayload>(filter_packet.payload)) {
-    return MatchPayload(std::get<SystemPayload>(filter_packet.payload),
-                        std::get<SystemPayload>(event_packet.payload));
-  }
-
-  return false;
+  return std::visit(
+      [](const auto &filter, const auto &event) -> bool {
+        if constexpr (std::is_same_v<decltype(filter), decltype(event)>) {
+          return MatchPayload(filter, event);
+        } else {
+          return false;
+        }
+      },
+      filter_payload, event_payload);
 }
 
 } // namespace steamrot::events
