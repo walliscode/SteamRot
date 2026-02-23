@@ -92,14 +92,25 @@ bool MatchPayload(const EventPayload &filter_payload,
                   const EventPayload &event_payload) {
 
   return std::visit(
+      // Visitor called with the concrete values stored in the variants.
       [](const auto &filter, const auto &event) -> bool {
+        // Compile-time type check:
+        // decltype(filter) / decltype(event) will be "const T&" for some T.
+        // When both variants hold the same alternative T, these types match.
         if constexpr (std::is_same_v<decltype(filter), decltype(event)>) {
+
+          // Types match, so delegate to the type-specific overload:
+          //   bool MatchPayload(const T&, const T&);
+          // If no such overload exists for a variant alternative T, you'll get
+          // a compile-time error when this visitor is instantiated for (T, T).
           return MatchPayload(filter, event);
         } else {
+
+          // Types differ (e.g., filter holds A, event holds B). We consider
+          // that a non-match and *do not* attempt to call MatchPayload(A, B).
           return false;
         }
       },
       filter_payload, event_payload);
 }
-
 } // namespace steamrot::events

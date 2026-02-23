@@ -131,7 +131,15 @@ void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
 
   // match the event payload to the subscriber filter payload.
   locked_subscriber->m_active =
-      events::MatchPayload(event_payload, locked_subscriber->filter_payload);
+      events::MatchPayload(locked_subscriber->filter_payload, event_payload);
+
+  if (locked_subscriber->m_active) {
+    // if the subscriber is active, capture the event payload
+    locked_subscriber->captured_payload = event_payload;
+  } else {
+    // if the subscriber is not active, clear the captured payload
+    locked_subscriber->captured_payload = std::nullopt;
+  }
 }
 
 /////////////////////////////////////////////////
