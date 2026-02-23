@@ -25,14 +25,20 @@ namespace steamrot {
 /// @brief Converts SFML window events into InputPayload EventPackets.
 ///
 /// Holds a configurable registry of SFMLInputBindings. On each SFML event, the
-/// registry updates its internal held-key/button state and checks all bindings
-/// to determine which actions should fire.
+/// registry updates its internal input state and checks all bindings to
+/// determine which actions should fire.
 ///
-/// Key features:
-/// - AND logic: an action fires only when all its required_inputs are held
-/// - Pressed/Released: each binding specifies whether it fires on press or
-///   release of the combination
-/// - Runtime configuration: bindings can be replaced at any time via Configure()
+/// Each SFMLInputEntry in a binding specifies its own trigger condition:
+/// - TriggerOn::Pressed  — entry is satisfied while the key/button is held
+/// - TriggerOn::Released — entry is satisfied only during the SFML release
+///                         event for that key/button
+///
+/// A binding fires (transitions inactive → active) the moment all of its
+/// entries are simultaneously satisfied. Because Released entries are only
+/// satisfied for the duration of the single SFML event that released them,
+/// bindings that include Released entries fire at most once per release event.
+///
+/// Runtime configuration: bindings can be replaced at any time via Configure().
 /////////////////////////////////////////////////
 class SFMLInputRegistry {
 
@@ -53,15 +59,31 @@ private:
   std::set<sf::Mouse::Button> m_held_buttons;
 
   /////////////////////////////////////////////////
-  /// @brief Indices of bindings that are currently fully satisfied
+  /// @brief Keyboard keys released by the current SFML event (cleared each
+  /// call to ProcessSFMLEvent)
+  /////////////////////////////////////////////////
+  std::set<sf::Keyboard::Key> m_just_released_keys;
+
+  /////////////////////////////////////////////////
+  /// @brief Mouse buttons released by the current SFML event (cleared each
+  /// call to ProcessSFMLEvent)
+  /////////////////////////////////////////////////
+  std::set<sf::Mouse::Button> m_just_released_buttons;
+
+  /////////////////////////////////////////////////
+  /// @brief Indices of bindings that were satisfied after the previous event
   /////////////////////////////////////////////////
   std::unordered_set<size_t> m_active_binding_indices;
 
   /////////////////////////////////////////////////
-  /// @brief Check whether all required inputs of a binding are currently held.
+  /// @brief Check whether all entries of a binding are currently satisfied.
+  ///
+  /// Pressed entries are satisfied when the key/button is in m_held_keys /
+  /// m_held_buttons. Released entries are satisfied when the key/button is in
+  /// m_just_released_keys / m_just_released_buttons.
   ///
   /// @param binding The binding to evaluate
-  /// @return true if every required input is in the held set
+  /// @return true if every entry is satisfied
   /////////////////////////////////////////////////
   bool IsBindingSatisfied(const SFMLInputBinding &binding) const;
 
@@ -69,7 +91,7 @@ private:
   /// @brief Compare current satisfaction state of all bindings against the
   /// previous state and generate EventPackets for any transitions.
   ///
-  /// @return Vector of EventPackets for bindings that just transitioned
+  /// @return Vector of EventPackets for bindings that just became active
   /////////////////////////////////////////////////
   std::vector<EventPacket> CheckBindings();
 

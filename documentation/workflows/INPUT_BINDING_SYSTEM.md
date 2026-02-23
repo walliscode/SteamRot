@@ -7,7 +7,7 @@ to configure, extend, and use it in the SteamRot engine.
 
 - [Overview](#overview)
 - [Architecture](#architecture)
-  - [InputPayload and InputState](#inputpayload-and-inputstate)
+  - [InputPayload and InputAction](#inputpayload-and-inputaction)
   - [SFMLInputEntry](#sfmlinputentry)
   - [SFMLInputBinding](#sfmlinputbinding)
   - [SFMLInputRegistry](#sfmlinputregistry)
@@ -15,8 +15,9 @@ to configure, extend, and use it in the SteamRot engine.
 - [Configuring Bindings at Startup](#configuring-bindings-at-startup)
   - [Using the Default Bindings](#using-the-default-bindings)
   - [Defining Custom Bindings](#defining-custom-bindings)
-  - [AND Logic (Multi-Key Combinations)](#and-logic-multi-key-combinations)
-  - [Pressed vs Released](#pressed-vs-released)
+  - [Pressed vs Released Entries](#pressed-vs-released-entries)
+  - [AND Logic (Multi-Input Combinations)](#and-logic-multi-input-combinations)
+  - [Mixed Pressed and Released in One Binding](#mixed-pressed-and-released-in-one-binding)
 - [How Events Flow](#how-events-flow)
 - [Subscribing to Input Events](#subscribing-to-input-events)
 - [Adding New InputActions](#adding-new-inputactions)
@@ -29,17 +30,20 @@ to configure, extend, and use it in the SteamRot engine.
 ## Overview
 
 The input binding system converts raw SFML window events (key presses, mouse
-clicks, etc.) into typed `InputPayload` `EventPacket`s that the rest of the
-engine can subscribe to. It lives on the `EventHandler` and is designed so
-that bindings can be reconfigured at runtime without touching engine code.
+clicks, releases, etc.) into typed `InputPayload` `EventPacket`s that the rest
+of the engine can subscribe to. It lives on the `EventHandler` and is designed
+so that bindings can be reconfigured at runtime without touching engine code.
 
 **Key features:**
 
-- **AND logic** — an action fires only when _all_ of its required inputs are
-  held simultaneously (e.g., Ctrl + Space)
-- **Pressed and Released** — each binding independently controls whether it
-  fires when the combination is first satisfied (_pressed_) or when any
-  required input is released after the combination was active (_released_)
+- **Per-entry trigger condition** — each physical input in a binding specifies
+  whether it must be _pressed_ (held) or _released_ for that entry to be
+  satisfied
+- **AND logic** — a binding fires only when _all_ of its entries are
+  simultaneously satisfied
+- **Action-only output** — the resulting `InputPayload` carries just the action;
+  the press/release distinction lives in the binding configuration, not the
+  event payload
 - **Runtime configuration** — bindings are replaced via
   `EventHandler::ConfigureInputRegistry()` at any time
 - **FlatBuffers-ready** — the static config header (`SFMLInputBinding.h`) is
@@ -51,21 +55,17 @@ that bindings can be reconfigured at runtime without touching engine code.
 
 ## Architecture
 
-### InputPayload and InputState
+### InputPayload and InputAction
 
 `InputPayload` (declared in `src/types/events/EventPayload.h`) carries the
-result of a triggered binding:
+result of a triggered binding. It contains only the action — the SFML-level
+press/release distinction is an internal binding concern:
 
 ```cpp
 struct InputPayload {
     enum class InputAction { NONE, SELECT } action;
-    enum class InputState  { PRESSED, RELEASED } state{InputState::PRESSED};
 };
 ```
-
-`InputState` is always set by the registry — consuming code does not need to
-set it manually. The default state (`PRESSED`) preserves backward compatibility
-with code that constructs `InputPayload` directly.
 
 ---
 
@@ -74,15 +74,20 @@ with code that constructs `InputPayload` directly.
 Declared in `src/events/SFMLInputBinding.h`.
 
 Represents a single physical input requirement — either a keyboard key or a
-mouse button:
+mouse button — together with whether it must be in a pressed or released state:
 
 ```cpp
 struct SFMLInputEntry {
-    enum class Type { Keyboard, MouseButton } type{Type::Keyboard};
+    enum class Type      { Keyboard, MouseButton } type{Type::Keyboard};
+    enum class TriggerOn { Pressed, Released }     trigger_on{TriggerOn::Pressed};
     sf::Keyboard::Key  keyboard_key{sf::Keyboard::Key::Unknown};
     sf::Mouse::Button  mouse_button{sf::Mouse::Button::Left};
 };
 ```
+
+- `TriggerOn::Pressed` — the entry is satisfied while the key/button is held.
+- `TriggerOn::Released` — the entry is satisfied only during the single SFML
+  event in which that key/button was released.
 
 Only the field matching `type` is meaningful.
 
@@ -92,21 +97,17 @@ Only the field matching `type` is meaningful.
 
 Declared in `src/events/SFMLInputBinding.h`.
 
-Maps a combination of `SFMLInputEntry`s to an `InputAction` and a
-`trigger_state`:
+Maps a combination of `SFMLInputEntry`s to an `InputAction`:
 
 ```cpp
 struct SFMLInputBinding {
-    InputPayload::InputAction action{InputPayload::InputAction::NONE};
-    InputPayload::InputState  trigger_state{InputPayload::InputState::PRESSED};
+    InputPayload::InputAction   action{InputPayload::InputAction::NONE};
     std::vector<SFMLInputEntry> required_inputs;
 };
 ```
 
-All entries in `required_inputs` must be simultaneously held for the binding to
-be _satisfied_ (AND logic). `trigger_state` controls whether the resulting
-`InputPayload` EventPacket is emitted when the binding becomes satisfied
-(`PRESSED`) or when it stops being satisfied (`RELEASED`).
+All entries in `required_inputs` must be simultaneously satisfied (AND logic)
+for the binding to fire and emit an `InputPayload` `EventPacket`.
 
 ---
 
@@ -115,14 +116,16 @@ be _satisfied_ (AND logic). `trigger_state` controls whether the resulting
 Declared in `src/events/SFMLInputRegistry.h`, implemented in
 `src/events/SFMLInputRegistry.cpp`.
 
-Holds the active bindings and tracks which physical inputs are currently held.
-On each call to `ProcessSFMLEvent()` it:
+Holds the active bindings and tracks which physical inputs are currently held
+and which were released by the most recent event. On each call to
+`ProcessSFMLEvent()` it:
 
-1. Updates the held key/button sets from the incoming SFML event.
-2. Compares the new satisfaction state of every binding against its previous
-   state.
-3. For each transition, emits an `EventPacket` with the appropriate
-   `InputPayload`.
+1. Clears the per-event "just released" state from the previous call.
+2. Updates held and just-released state from the incoming SFML event.
+3. Evaluates every binding: Pressed entries check the held set; Released entries
+   check the just-released set.
+4. For each binding that transitions from inactive to active, emits an
+   `EventPacket` carrying the binding's action.
 
 Only keyboard and mouse button SFML events trigger binding evaluation; all
 other SFML event types are ignored.
@@ -140,7 +143,7 @@ member:
 | `ProcessInputEvent(sf::Event)` | Feeds one SFML event through the registry and adds results to the waiting-room bus |
 | `GetInputRegistry()` | Read-only access for inspection and testing |
 
-`HandleSFMLEvents()` (the free function used by `PreloadEvents`) now polls the
+`HandleSFMLEvents()` (the free function used by `PreloadEvents`) polls the
 window and routes each event through `ProcessInputEvent()` automatically.
 
 ---
@@ -159,7 +162,8 @@ a code-defined set of sensible defaults:
 event_handler.ConfigureInputRegistry(steamrot::GetDefaultSFMLInputBindings());
 ```
 
-The defaults map left mouse button press and release to `InputAction::SELECT`.
+The defaults map left mouse button press and left mouse button release
+separately to `InputAction::SELECT`.
 
 ---
 
@@ -169,26 +173,24 @@ Build a `std::vector<SFMLInputBinding>` and pass it to
 `ConfigureInputRegistry()`:
 
 ```cpp
-using Entry       = steamrot::SFMLInputEntry;
-using EntryType   = steamrot::SFMLInputEntry::Type;
-using Action      = steamrot::InputPayload::InputAction;
-using State       = steamrot::InputPayload::InputState;
+using Entry     = steamrot::SFMLInputEntry;
+using EntryType = steamrot::SFMLInputEntry::Type;
+using TriggerOn = steamrot::SFMLInputEntry::TriggerOn;
+using Action    = steamrot::InputPayload::InputAction;
 
 std::vector<steamrot::SFMLInputBinding> bindings = {
 
-    // Left mouse press fires SELECT (PRESSED)
+    // Left mouse button press → SELECT
     steamrot::SFMLInputBinding{
         Action::SELECT,
-        State::PRESSED,
-        {Entry{EntryType::MouseButton, sf::Keyboard::Key::Unknown,
-               sf::Mouse::Button::Left}}},
+        {Entry{EntryType::MouseButton, TriggerOn::Pressed,
+               sf::Keyboard::Key::Unknown, sf::Mouse::Button::Left}}},
 
-    // Left mouse release fires SELECT (RELEASED)
+    // Left mouse button release → SELECT
     steamrot::SFMLInputBinding{
         Action::SELECT,
-        State::RELEASED,
-        {Entry{EntryType::MouseButton, sf::Keyboard::Key::Unknown,
-               sf::Mouse::Button::Left}}},
+        {Entry{EntryType::MouseButton, TriggerOn::Released,
+               sf::Keyboard::Key::Unknown, sf::Mouse::Button::Left}}},
 };
 
 event_handler.ConfigureInputRegistry(bindings);
@@ -196,48 +198,61 @@ event_handler.ConfigureInputRegistry(bindings);
 
 ---
 
-### AND Logic (Multi-Key Combinations)
+### Pressed vs Released Entries
+
+Each `SFMLInputEntry` independently controls its trigger condition:
+
+| `TriggerOn` | Satisfied when |
+|-------------|---------------|
+| `Pressed`   | The key/button is currently held |
+| `Released`  | The key/button was released by the current SFML event |
+
+Because `Released` entries are only satisfied for the duration of the single
+SFML event that released them, a binding containing a `Released` entry fires
+at most once per release event and does not spuriously re-fire on subsequent
+unrelated events.
+
+---
+
+### AND Logic (Multi-Input Combinations)
 
 Add multiple entries to `required_inputs`. The action fires only when **all**
-of them are held at the same time:
+of them are satisfied simultaneously:
 
 ```cpp
-// Ctrl + Space fires SELECT (PRESSED) only when both are held simultaneously
+// Both Ctrl and Space must be pressed (held) at the same time
 steamrot::SFMLInputBinding chord{
     Action::SELECT,
-    State::PRESSED,
     {
-        Entry{EntryType::Keyboard, sf::Keyboard::Key::LControl},
-        Entry{EntryType::Keyboard, sf::Keyboard::Key::Space},
+        Entry{EntryType::Keyboard, TriggerOn::Pressed,
+              sf::Keyboard::Key::LControl},
+        Entry{EntryType::Keyboard, TriggerOn::Pressed,
+              sf::Keyboard::Key::Space},
     }
 };
 ```
 
-If `LControl` is released while `Space` is still held (or vice-versa), the
-binding becomes unsatisfied and any `RELEASED`-trigger binding for the same
-combination fires.
-
 ---
 
-### Pressed vs Released
+### Mixed Pressed and Released in One Binding
 
-Each binding is **independent**. To react to both the press and the release of
-the same combination, add two bindings with the same `required_inputs` but
-different `trigger_state` values:
+Entries with different `TriggerOn` values can be combined in a single binding:
 
 ```cpp
-// Fires when Enter is first pressed
-steamrot::SFMLInputBinding on_press{
-    Action::SELECT, State::PRESSED,
-    {Entry{EntryType::Keyboard, sf::Keyboard::Key::Enter}}};
-
-// Fires when Enter is released after being pressed
-steamrot::SFMLInputBinding on_release{
-    Action::SELECT, State::RELEASED,
-    {Entry{EntryType::Keyboard, sf::Keyboard::Key::Enter}}};
-
-event_handler.ConfigureInputRegistry({on_press, on_release});
+// SELECT fires when Space is released while Ctrl is still held
+steamrot::SFMLInputBinding binding{
+    Action::SELECT,
+    {
+        Entry{EntryType::Keyboard, TriggerOn::Pressed,
+              sf::Keyboard::Key::LControl},  // Ctrl must be held
+        Entry{EntryType::Keyboard, TriggerOn::Released,
+              sf::Keyboard::Key::Space},      // Space must be the one just released
+    }
+};
 ```
+
+This allows expressive mappings such as "chord release" patterns without
+requiring separate bindings for the press and release phases.
 
 ---
 
@@ -252,9 +267,10 @@ EventHandler::PreloadEvents()
     ▼
 EventHandler::ProcessInputEvent(sf::Event)
     │  SFMLInputRegistry::ProcessSFMLEvent()
-    │    - update held keys / buttons
-    │    - check binding satisfaction transitions
-    │    - return triggered EventPackets
+    │    1. Clear per-event just-released state
+    │    2. Update held / just-released sets
+    │    3. Evaluate all bindings (Pressed → held set, Released → just-released set)
+    │    4. Return triggered EventPackets
     ▼
 EventHandler::AddEvent()           ← waiting-room bus
     ▼
@@ -270,7 +286,7 @@ Subscriber::m_active = true  (for matching subscribers)
 ## Subscribing to Input Events
 
 Create a `Subscriber` with `EventType::USER_INPUT` and optionally set a
-`filter_payload` to react only to specific actions or states:
+`filter_payload` to react only to a specific action:
 
 ```cpp
 // Fires for any USER_INPUT event
@@ -278,29 +294,16 @@ auto sub_any = std::make_shared<steamrot::Subscriber>();
 sub_any->event_type = steamrot::EventType::USER_INPUT;
 event_handler.RegisterSubscriber(sub_any);
 
-// Fires only for SELECT PRESSED
-auto sub_select_press = std::make_shared<steamrot::Subscriber>();
-sub_select_press->event_type = steamrot::EventType::USER_INPUT;
-sub_select_press->filter_payload = steamrot::InputPayload{
-    steamrot::InputPayload::InputAction::SELECT,
-    steamrot::InputPayload::InputState::PRESSED};
-event_handler.RegisterSubscriber(sub_select_press);
-
-// Fires only for SELECT RELEASED
-auto sub_select_release = std::make_shared<steamrot::Subscriber>();
-sub_select_release->event_type = steamrot::EventType::USER_INPUT;
-sub_select_release->filter_payload = steamrot::InputPayload{
-    steamrot::InputPayload::InputAction::SELECT,
-    steamrot::InputPayload::InputState::RELEASED};
-event_handler.RegisterSubscriber(sub_select_release);
+// Fires only for SELECT
+auto sub_select = std::make_shared<steamrot::Subscriber>();
+sub_select->event_type = steamrot::EventType::USER_INPUT;
+sub_select->filter_payload =
+    steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT};
+event_handler.RegisterSubscriber(sub_select);
 ```
 
 Each frame, check `subscriber->m_active` and read `subscriber->captured_payload`
-to retrieve the `InputPayload`.
-
-> **Note**: `MatchPayload(InputPayload, InputPayload)` compares both `action`
-> and `state`, so a `PRESSED` filter will not match a `RELEASED` event and vice
-> versa.
+to retrieve the `InputPayload` carrying the action.
 
 ---
 
@@ -313,21 +316,22 @@ to retrieve the `InputPayload`.
    //                                    ^^^^^ new
    ```
 
-2. **Add one or more bindings** that map physical inputs to the new action:
+2. **Add bindings** that map physical inputs to the new action:
 
    ```cpp
-   steamrot::SFMLInputBinding jump_press{
+   // Space pressed → JUMP
+   steamrot::SFMLInputBinding jump{
        Action::JUMP,
-       State::PRESSED,
-       {Entry{EntryType::Keyboard, sf::Keyboard::Key::Space}}};
+       {Entry{EntryType::Keyboard, TriggerOn::Pressed,
+              sf::Keyboard::Key::Space}}};
    ```
 
-3. **Update any `CreateRandomEventPacket` logic** in `event_factory.cpp` if
-   the random test packet generator needs to include the new action (it filters
-   out `NONE` already).
+3. **Update `CreateRandomEventPacket`** in `event_factory.cpp` if the random
+   test packet generator needs to include the new action (it already filters
+   out `NONE`).
 
-4. **Register subscribers** in whatever Logic or system needs to react to the
-   new action.
+4. **Register subscribers** in the Logic or system that reacts to the new
+   action.
 
 No changes to `SFMLInputRegistry`, `SFMLInputBinding`, or the matching
 infrastructure are required.
@@ -341,12 +345,11 @@ of a FlatBuffers schema so that adding serialisation later is minimal. When
 user preferences need to be saved and loaded:
 
 1. Define a FlatBuffers schema (`sfml_input_binding.fbs`) with tables matching
-   `SFMLInputBinding` and `SFMLInputEntry`.
+   `SFMLInputBinding` and `SFMLInputEntry` (including the `TriggerOn` enum).
 2. Deserialise the binary data into `std::vector<SFMLInputBinding>`.
 3. Pass the result to `EventHandler::ConfigureInputRegistry()`.
 
-No other engine code needs to change. The `SFMLInputRegistry` and
-`EventHandler` APIs are already written to accept any `std::vector<SFMLInputBinding>`.
+No other engine code needs to change.
 
 ---
 
@@ -356,10 +359,14 @@ Unit tests for the registry are in
 `tests/unit/events/SFMLInputRegistry.test.cpp`. They cover:
 
 - `Configure()` storing bindings and clearing held state
-- Single keyboard key: PRESSED and RELEASED triggers
-- Single mouse button: PRESSED and RELEASED triggers
-- AND logic: action fires only when all required inputs are held
-- AND logic RELEASED: fires when the combination breaks
+- Keyboard key with `TriggerOn::Pressed`: fires on press, does not re-fire
+  while held, does not fire on release
+- Keyboard key with `TriggerOn::Released`: fires on release only, and only for
+  that single event
+- Mouse button with `TriggerOn::Pressed` and `TriggerOn::Released`
+- AND logic with multiple `Pressed` entries (all must be held)
+- AND logic with mixed `Pressed` and `Released` entries (held condition + release
+  condition must both be met simultaneously)
 - Held-state tracking for keys and buttons
 - Non-input SFML events being silently ignored
 - `EventHandler` integration: `ConfigureInputRegistry` and `ProcessInputEvent`
@@ -375,29 +382,30 @@ ctest --preset Debug -R SFMLInputRegistry
 
 ## Troubleshooting
 
-### Action fires on the wrong state (PRESSED vs RELEASED)
+### Action fires on unrelated events
 
-Check that the `trigger_state` on the binding matches the `state` in any
-`filter_payload` on the subscriber. A PRESSED binding only emits a PRESSED
-payload, and the matcher checks both fields.
+Verify that all entries in the binding have the correct `TriggerOn` value. A
+`Released` entry is satisfied only during the release event for that exact
+key/button. A `Pressed` entry is satisfied while the key is held. A binding
+with only `Pressed` entries won't fire on release events.
 
 ### AND binding never fires
 
-Verify that every `SFMLInputEntry` in `required_inputs` uses the correct `type`
-field. If `type` is `Keyboard`, the `keyboard_key` field is used; if `type` is
-`MouseButton`, the `mouse_button` field is used. A wrong `type` means the
-registry will always look in the wrong held set.
+Verify that every `SFMLInputEntry` uses the correct `type` field. If `type` is
+`Keyboard`, the `keyboard_key` field is used; if `type` is `MouseButton`, the
+`mouse_button` field is used. A wrong `type` means the registry will always
+check the wrong set.
 
 ### Bindings reset unexpectedly
 
-`ConfigureInputRegistry()` clears all held state. If it is called while keys
-are physically held (e.g., during a scene transition), those keys will not be
-tracked until they are released and pressed again. Call `Configure` only when
-the input focus is clean (e.g., before the first frame of a scene, not mid-frame).
+`ConfigureInputRegistry()` clears all held state. If called while keys are
+physically held, those keys will not be tracked until they are released and
+pressed again. Call `Configure` only when the input focus is clean (e.g.,
+before the first frame of a scene, not mid-frame).
 
 ### No events reaching subscribers
 
-Confirm the full pipeline is running each frame:
+Confirm the full pipeline runs each frame:
 
 1. `ExecuteEventHandlerLevelLogic(window)` is called (or `PreloadEvents`,
    `ProcessWaitingRoomEventBus`, and `UpdateSubscribersFromGlobalEventBus` are
@@ -412,10 +420,10 @@ Confirm the full pipeline is running each frame:
 
 | File | Purpose |
 |------|---------|
-| `src/types/events/EventPayload.h` | `InputPayload`, `InputAction`, `InputState` |
-| `src/events/SFMLInputBinding.h` | `SFMLInputEntry`, `SFMLInputBinding`, `GetDefaultSFMLInputBindings()` |
+| `src/types/events/EventPayload.h` | `InputPayload` and `InputAction` |
+| `src/events/SFMLInputBinding.h` | `SFMLInputEntry` (with `TriggerOn`), `SFMLInputBinding`, `GetDefaultSFMLInputBindings()` |
 | `src/events/SFMLInputRegistry.h/.cpp` | Registry that converts SFML events to EventPackets |
 | `src/events/EventHandler.h/.cpp` | `ConfigureInputRegistry`, `ProcessInputEvent`, `GetInputRegistry` |
-| `src/events/event_factory.h/.cpp` | `CreateInputEventPacket` (with optional `InputState` overload) |
-| `src/events/payload_matchers.cpp` | `MatchPayload(InputPayload, InputPayload)` — compares action and state |
+| `src/events/event_factory.h/.cpp` | `CreateInputEventPacket` |
+| `src/events/payload_matchers.cpp` | `MatchPayload(InputPayload, InputPayload)` — compares action |
 | `tests/unit/events/SFMLInputRegistry.test.cpp` | Unit tests for the registry |

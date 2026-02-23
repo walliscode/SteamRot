@@ -20,26 +20,28 @@
 // Helpers
 // ---------------------------------------------------------------------------
 
+using Entry     = steamrot::SFMLInputEntry;
+using EntryType = steamrot::SFMLInputEntry::Type;
+using TriggerOn = steamrot::SFMLInputEntry::TriggerOn;
+using Action    = steamrot::InputPayload::InputAction;
+
 static steamrot::SFMLInputBinding MakeKeyboardBinding(
     sf::Keyboard::Key key,
-    steamrot::InputPayload::InputAction action,
-    steamrot::InputPayload::InputState trigger_state) {
-  using Entry = steamrot::SFMLInputEntry;
+    Action action,
+    TriggerOn trigger_on) {
   return steamrot::SFMLInputBinding{
       action,
-      trigger_state,
-      {Entry{Entry::Type::Keyboard, key, sf::Mouse::Button::Left}}};
+      {Entry{EntryType::Keyboard, trigger_on, key, sf::Mouse::Button::Left}}};
 }
 
 static steamrot::SFMLInputBinding MakeMouseBinding(
     sf::Mouse::Button button,
-    steamrot::InputPayload::InputAction action,
-    steamrot::InputPayload::InputState trigger_state) {
-  using Entry = steamrot::SFMLInputEntry;
+    Action action,
+    TriggerOn trigger_on) {
   return steamrot::SFMLInputBinding{
       action,
-      trigger_state,
-      {Entry{Entry::Type::MouseButton, sf::Keyboard::Key::Unknown, button}}};
+      {Entry{EntryType::MouseButton, trigger_on,
+             sf::Keyboard::Key::Unknown, button}}};
 }
 
 static sf::Event MakeKeyPressedEvent(sf::Keyboard::Key key) {
@@ -85,10 +87,9 @@ TEST_CASE("SFMLInputRegistry::Configure resets held state",
           "[unit][SFMLInputRegistry]") {
   steamrot::SFMLInputRegistry registry;
 
-  const auto binding = MakeKeyboardBinding(
-      sf::Keyboard::Key::Space,
-      steamrot::InputPayload::InputAction::SELECT,
-      steamrot::InputPayload::InputState::PRESSED);
+  const auto binding =
+      MakeKeyboardBinding(sf::Keyboard::Key::Space, Action::SELECT,
+                          TriggerOn::Pressed);
   registry.Configure({binding});
 
   // Press the key so it ends up in the held set
@@ -101,37 +102,47 @@ TEST_CASE("SFMLInputRegistry::Configure resets held state",
 }
 
 // ---------------------------------------------------------------------------
-// Keyboard — single key, PRESSED trigger
+// Keyboard — TriggerOn::Pressed
 // ---------------------------------------------------------------------------
 
-TEST_CASE("SFMLInputRegistry fires PRESSED action on key press",
+TEST_CASE("SFMLInputRegistry fires action when Pressed key entry is pressed",
           "[unit][SFMLInputRegistry]") {
   steamrot::SFMLInputRegistry registry;
-  const auto binding = MakeKeyboardBinding(
-      sf::Keyboard::Key::Space,
-      steamrot::InputPayload::InputAction::SELECT,
-      steamrot::InputPayload::InputState::PRESSED);
-  registry.Configure({binding});
+  registry.Configure(
+      {MakeKeyboardBinding(sf::Keyboard::Key::Space, Action::SELECT,
+                           TriggerOn::Pressed)});
 
   const auto packets =
       registry.ProcessSFMLEvent(MakeKeyPressedEvent(sf::Keyboard::Key::Space));
 
   REQUIRE(packets.size() == 1);
   const auto &payload = std::get<steamrot::InputPayload>(packets[0].payload);
-  REQUIRE(payload.action == steamrot::InputPayload::InputAction::SELECT);
-  REQUIRE(payload.state == steamrot::InputPayload::InputState::PRESSED);
+  REQUIRE(payload.action == Action::SELECT);
 }
 
-TEST_CASE("SFMLInputRegistry does not fire PRESSED action on key release",
+TEST_CASE("SFMLInputRegistry does not re-fire while Pressed key remains held",
           "[unit][SFMLInputRegistry]") {
   steamrot::SFMLInputRegistry registry;
-  const auto binding = MakeKeyboardBinding(
-      sf::Keyboard::Key::Space,
-      steamrot::InputPayload::InputAction::SELECT,
-      steamrot::InputPayload::InputState::PRESSED);
-  registry.Configure({binding});
+  registry.Configure(
+      {MakeKeyboardBinding(sf::Keyboard::Key::Space, Action::SELECT,
+                           TriggerOn::Pressed)});
 
-  // Press then release
+  // Press the key (fires once)
+  registry.ProcessSFMLEvent(MakeKeyPressedEvent(sf::Keyboard::Key::Space));
+
+  // Another unrelated event — binding stays active but should not re-fire
+  const auto packets =
+      registry.ProcessSFMLEvent(MakeKeyPressedEvent(sf::Keyboard::Key::A));
+  REQUIRE(packets.empty());
+}
+
+TEST_CASE("SFMLInputRegistry does not fire Pressed binding on key release",
+          "[unit][SFMLInputRegistry]") {
+  steamrot::SFMLInputRegistry registry;
+  registry.Configure(
+      {MakeKeyboardBinding(sf::Keyboard::Key::Space, Action::SELECT,
+                           TriggerOn::Pressed)});
+
   registry.ProcessSFMLEvent(MakeKeyPressedEvent(sf::Keyboard::Key::Space));
   const auto packets =
       registry.ProcessSFMLEvent(MakeKeyReleasedEvent(sf::Keyboard::Key::Space));
@@ -140,103 +151,110 @@ TEST_CASE("SFMLInputRegistry does not fire PRESSED action on key release",
 }
 
 // ---------------------------------------------------------------------------
-// Keyboard — single key, RELEASED trigger
+// Keyboard — TriggerOn::Released
 // ---------------------------------------------------------------------------
 
-TEST_CASE("SFMLInputRegistry fires RELEASED action on key release",
+TEST_CASE("SFMLInputRegistry fires action when Released key entry is released",
           "[unit][SFMLInputRegistry]") {
   steamrot::SFMLInputRegistry registry;
-  const auto binding = MakeKeyboardBinding(
-      sf::Keyboard::Key::Space,
-      steamrot::InputPayload::InputAction::SELECT,
-      steamrot::InputPayload::InputState::RELEASED);
-  registry.Configure({binding});
+  registry.Configure(
+      {MakeKeyboardBinding(sf::Keyboard::Key::Space, Action::SELECT,
+                           TriggerOn::Released)});
 
-  // Must press first so the binding becomes active
+  // Press then release — should fire on release
   registry.ProcessSFMLEvent(MakeKeyPressedEvent(sf::Keyboard::Key::Space));
   const auto packets =
       registry.ProcessSFMLEvent(MakeKeyReleasedEvent(sf::Keyboard::Key::Space));
 
   REQUIRE(packets.size() == 1);
   const auto &payload = std::get<steamrot::InputPayload>(packets[0].payload);
-  REQUIRE(payload.action == steamrot::InputPayload::InputAction::SELECT);
-  REQUIRE(payload.state == steamrot::InputPayload::InputState::RELEASED);
+  REQUIRE(payload.action == Action::SELECT);
 }
 
-TEST_CASE("SFMLInputRegistry does not fire RELEASED if key was not previously held",
+TEST_CASE("SFMLInputRegistry Released binding does not fire on key press",
           "[unit][SFMLInputRegistry]") {
   steamrot::SFMLInputRegistry registry;
-  const auto binding = MakeKeyboardBinding(
-      sf::Keyboard::Key::Space,
-      steamrot::InputPayload::InputAction::SELECT,
-      steamrot::InputPayload::InputState::RELEASED);
-  registry.Configure({binding});
+  registry.Configure(
+      {MakeKeyboardBinding(sf::Keyboard::Key::Space, Action::SELECT,
+                           TriggerOn::Released)});
 
-  // Release without pressing first — binding was never active
   const auto packets =
-      registry.ProcessSFMLEvent(MakeKeyReleasedEvent(sf::Keyboard::Key::Space));
+      registry.ProcessSFMLEvent(MakeKeyPressedEvent(sf::Keyboard::Key::Space));
 
   REQUIRE(packets.empty());
+}
+
+TEST_CASE("SFMLInputRegistry Released binding fires only on the release event",
+          "[unit][SFMLInputRegistry]") {
+  steamrot::SFMLInputRegistry registry;
+  registry.Configure(
+      {MakeKeyboardBinding(sf::Keyboard::Key::Space, Action::SELECT,
+                           TriggerOn::Released)});
+
+  registry.ProcessSFMLEvent(MakeKeyPressedEvent(sf::Keyboard::Key::Space));
+  // Release fires
+  auto packets =
+      registry.ProcessSFMLEvent(MakeKeyReleasedEvent(sf::Keyboard::Key::Space));
+  REQUIRE(packets.size() == 1);
+
+  // Unrelated event after release — binding is no longer satisfied (Space not
+  // in just-released), should NOT fire again
+  const auto packets2 =
+      registry.ProcessSFMLEvent(MakeKeyPressedEvent(sf::Keyboard::Key::A));
+  REQUIRE(packets2.empty());
 }
 
 // ---------------------------------------------------------------------------
 // Mouse button bindings
 // ---------------------------------------------------------------------------
 
-TEST_CASE("SFMLInputRegistry fires PRESSED action on mouse button press",
+TEST_CASE("SFMLInputRegistry fires action on mouse button press (Pressed entry)",
           "[unit][SFMLInputRegistry]") {
   steamrot::SFMLInputRegistry registry;
-  const auto binding = MakeMouseBinding(
-      sf::Mouse::Button::Left,
-      steamrot::InputPayload::InputAction::SELECT,
-      steamrot::InputPayload::InputState::PRESSED);
-  registry.Configure({binding});
+  registry.Configure(
+      {MakeMouseBinding(sf::Mouse::Button::Left, Action::SELECT,
+                        TriggerOn::Pressed)});
 
-  const auto packets = registry.ProcessSFMLEvent(
-      MakeMousePressedEvent(sf::Mouse::Button::Left));
+  const auto packets =
+      registry.ProcessSFMLEvent(MakeMousePressedEvent(sf::Mouse::Button::Left));
 
   REQUIRE(packets.size() == 1);
   const auto &payload = std::get<steamrot::InputPayload>(packets[0].payload);
-  REQUIRE(payload.action == steamrot::InputPayload::InputAction::SELECT);
-  REQUIRE(payload.state == steamrot::InputPayload::InputState::PRESSED);
+  REQUIRE(payload.action == Action::SELECT);
 }
 
-TEST_CASE("SFMLInputRegistry fires RELEASED action on mouse button release",
+TEST_CASE("SFMLInputRegistry fires action on mouse button release (Released entry)",
           "[unit][SFMLInputRegistry]") {
   steamrot::SFMLInputRegistry registry;
-  const auto binding = MakeMouseBinding(
-      sf::Mouse::Button::Left,
-      steamrot::InputPayload::InputAction::SELECT,
-      steamrot::InputPayload::InputState::RELEASED);
-  registry.Configure({binding});
+  registry.Configure(
+      {MakeMouseBinding(sf::Mouse::Button::Left, Action::SELECT,
+                        TriggerOn::Released)});
 
   registry.ProcessSFMLEvent(MakeMousePressedEvent(sf::Mouse::Button::Left));
-  const auto packets = registry.ProcessSFMLEvent(
-      MakeMouseReleasedEvent(sf::Mouse::Button::Left));
+  const auto packets =
+      registry.ProcessSFMLEvent(MakeMouseReleasedEvent(sf::Mouse::Button::Left));
 
   REQUIRE(packets.size() == 1);
   const auto &payload = std::get<steamrot::InputPayload>(packets[0].payload);
-  REQUIRE(payload.state == steamrot::InputPayload::InputState::RELEASED);
+  REQUIRE(payload.action == Action::SELECT);
 }
 
 // ---------------------------------------------------------------------------
-// AND logic (multiple required inputs)
+// AND logic — all Pressed entries
 // ---------------------------------------------------------------------------
 
 TEST_CASE("SFMLInputRegistry AND logic: action fires only when all required "
-          "inputs are held",
+          "Pressed entries are held",
           "[unit][SFMLInputRegistry]") {
   steamrot::SFMLInputRegistry registry;
-  using Entry = steamrot::SFMLInputEntry;
 
-  // Binding requires Ctrl + Space
+  // Binding requires Ctrl + Space both pressed
   steamrot::SFMLInputBinding binding{
-      steamrot::InputPayload::InputAction::SELECT,
-      steamrot::InputPayload::InputState::PRESSED,
-      {Entry{Entry::Type::Keyboard, sf::Keyboard::Key::LControl,
-             sf::Mouse::Button::Left},
-       Entry{Entry::Type::Keyboard, sf::Keyboard::Key::Space,
-             sf::Mouse::Button::Left}}};
+      Action::SELECT,
+      {Entry{EntryType::Keyboard, TriggerOn::Pressed,
+             sf::Keyboard::Key::LControl, sf::Mouse::Button::Left},
+       Entry{EntryType::Keyboard, TriggerOn::Pressed,
+             sf::Keyboard::Key::Space, sf::Mouse::Button::Left}}};
   registry.Configure({binding});
 
   // Press only Ctrl — should NOT fire
@@ -250,31 +268,60 @@ TEST_CASE("SFMLInputRegistry AND logic: action fires only when all required "
   REQUIRE(packets.size() == 1);
 }
 
-TEST_CASE("SFMLInputRegistry AND logic: RELEASED fires when combination breaks",
+// ---------------------------------------------------------------------------
+// AND logic — mixed Pressed + Released entries
+// ---------------------------------------------------------------------------
+
+TEST_CASE("SFMLInputRegistry AND logic: mixed Pressed+Released entries fire "
+          "only when all conditions met simultaneously",
           "[unit][SFMLInputRegistry]") {
   steamrot::SFMLInputRegistry registry;
-  using Entry = steamrot::SFMLInputEntry;
 
-  // Binding requires Ctrl + Space, triggers on RELEASED
+  // Binding: Ctrl held AND Space released
   steamrot::SFMLInputBinding binding{
-      steamrot::InputPayload::InputAction::SELECT,
-      steamrot::InputPayload::InputState::RELEASED,
-      {Entry{Entry::Type::Keyboard, sf::Keyboard::Key::LControl,
-             sf::Mouse::Button::Left},
-       Entry{Entry::Type::Keyboard, sf::Keyboard::Key::Space,
-             sf::Mouse::Button::Left}}};
+      Action::SELECT,
+      {Entry{EntryType::Keyboard, TriggerOn::Pressed,
+             sf::Keyboard::Key::LControl, sf::Mouse::Button::Left},
+       Entry{EntryType::Keyboard, TriggerOn::Released,
+             sf::Keyboard::Key::Space, sf::Mouse::Button::Left}}};
   registry.Configure({binding});
 
-  // Activate the combination
+  // Press Ctrl
   registry.ProcessSFMLEvent(MakeKeyPressedEvent(sf::Keyboard::Key::LControl));
+  // Press Space
   registry.ProcessSFMLEvent(MakeKeyPressedEvent(sf::Keyboard::Key::Space));
 
-  // Release one key — combination breaks, should fire RELEASED
+  // Release Space while Ctrl is held — should fire
   const auto packets =
       registry.ProcessSFMLEvent(MakeKeyReleasedEvent(sf::Keyboard::Key::Space));
   REQUIRE(packets.size() == 1);
-  const auto &payload = std::get<steamrot::InputPayload>(packets[0].payload);
-  REQUIRE(payload.state == steamrot::InputPayload::InputState::RELEASED);
+
+  // Release Ctrl — Ctrl Released entry not in binding, Space not in
+  // just-released → no fire
+  const auto packets2 =
+      registry.ProcessSFMLEvent(MakeKeyReleasedEvent(sf::Keyboard::Key::LControl));
+  REQUIRE(packets2.empty());
+}
+
+TEST_CASE("SFMLInputRegistry AND logic: mixed Pressed+Released does not fire "
+          "when Pressed condition not met",
+          "[unit][SFMLInputRegistry]") {
+  steamrot::SFMLInputRegistry registry;
+
+  // Binding: Ctrl held AND Space released
+  steamrot::SFMLInputBinding binding{
+      Action::SELECT,
+      {Entry{EntryType::Keyboard, TriggerOn::Pressed,
+             sf::Keyboard::Key::LControl, sf::Mouse::Button::Left},
+       Entry{EntryType::Keyboard, TriggerOn::Released,
+             sf::Keyboard::Key::Space, sf::Mouse::Button::Left}}};
+  registry.Configure({binding});
+
+  // Press and release Space WITHOUT holding Ctrl — should NOT fire
+  registry.ProcessSFMLEvent(MakeKeyPressedEvent(sf::Keyboard::Key::Space));
+  const auto packets =
+      registry.ProcessSFMLEvent(MakeKeyReleasedEvent(sf::Keyboard::Key::Space));
+  REQUIRE(packets.empty());
 }
 
 // ---------------------------------------------------------------------------
@@ -342,11 +389,9 @@ TEST_CASE("EventHandler::ProcessInputEvent adds InputPayload events to the "
           "[unit][SFMLInputRegistry][EventHandler]") {
   steamrot::EventHandler handler;
 
-  const auto binding = MakeKeyboardBinding(
-      sf::Keyboard::Key::Enter,
-      steamrot::InputPayload::InputAction::SELECT,
-      steamrot::InputPayload::InputState::PRESSED);
-  handler.ConfigureInputRegistry({binding});
+  handler.ConfigureInputRegistry(
+      {MakeKeyboardBinding(sf::Keyboard::Key::Enter, Action::SELECT,
+                           TriggerOn::Pressed)});
 
   REQUIRE(handler.GetWaitingRoomEventBus().empty());
 
@@ -355,8 +400,7 @@ TEST_CASE("EventHandler::ProcessInputEvent adds InputPayload events to the "
   REQUIRE(handler.GetWaitingRoomEventBus().size() == 1);
   const auto &payload =
       std::get<steamrot::InputPayload>(handler.GetWaitingRoomEventBus()[0].payload);
-  REQUIRE(payload.action == steamrot::InputPayload::InputAction::SELECT);
-  REQUIRE(payload.state == steamrot::InputPayload::InputState::PRESSED);
+  REQUIRE(payload.action == Action::SELECT);
 }
 
 // ---------------------------------------------------------------------------

@@ -27,17 +27,6 @@ CreateInputEventPacket(const uint8_t lifetime,
 
 /////////////////////////////////////////////////
 std::expected<EventPacket, FailInfo>
-CreateInputEventPacket(const uint8_t lifetime,
-                       const InputPayload::InputAction action,
-                       const InputPayload::InputState state) {
-  EventContext context{lifetime};
-  InputPayload payload(action, state);
-  EventPacket packet{context, EventType::USER_INPUT, payload};
-  return packet;
-}
-
-/////////////////////////////////////////////////
-std::expected<EventPacket, FailInfo>
 CreateUIEventPacket(const uint8_t lifetime, const UIPayload::UIAction action,
                     const std::string &c_ui_state_name) {
   EventContext context{lifetime};

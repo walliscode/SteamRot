@@ -16,6 +16,8 @@ void SFMLInputRegistry::Configure(const std::vector<SFMLInputBinding> &bindings)
   m_bindings = bindings;
   m_held_keys.clear();
   m_held_buttons.clear();
+  m_just_released_keys.clear();
+  m_just_released_buttons.clear();
   m_active_binding_indices.clear();
 }
 
@@ -28,11 +30,22 @@ bool SFMLInputRegistry::IsBindingSatisfied(
 
   for (const auto &entry : binding.required_inputs) {
     if (entry.type == SFMLInputEntry::Type::Keyboard) {
-      if (!m_held_keys.contains(entry.keyboard_key))
-        return false;
+      if (entry.trigger_on == SFMLInputEntry::TriggerOn::Pressed) {
+        if (!m_held_keys.contains(entry.keyboard_key))
+          return false;
+      } else {
+        // Released — satisfied only when the key was released this event
+        if (!m_just_released_keys.contains(entry.keyboard_key))
+          return false;
+      }
     } else {
-      if (!m_held_buttons.contains(entry.mouse_button))
-        return false;
+      if (entry.trigger_on == SFMLInputEntry::TriggerOn::Pressed) {
+        if (!m_held_buttons.contains(entry.mouse_button))
+          return false;
+      } else {
+        if (!m_just_released_buttons.contains(entry.mouse_button))
+          return false;
+      }
     }
   }
   return true;
@@ -48,23 +61,14 @@ std::vector<EventPacket> SFMLInputRegistry::CheckBindings() {
     const bool is_now_active = IsBindingSatisfied(binding);
 
     if (!was_active && is_now_active) {
-      // Binding just became fully satisfied
+      // Binding just became satisfied — fire
       m_active_binding_indices.insert(i);
-      if (binding.trigger_state == InputPayload::InputState::PRESSED) {
-        auto result = events::CreateInputEventPacket(
-            1, binding.action, InputPayload::InputState::PRESSED);
-        if (result.has_value())
-          triggered_packets.push_back(result.value());
-      }
+      auto result = events::CreateInputEventPacket(1, binding.action);
+      if (result.has_value())
+        triggered_packets.push_back(result.value());
     } else if (was_active && !is_now_active) {
-      // Binding just became unsatisfied
+      // Binding is no longer satisfied
       m_active_binding_indices.erase(i);
-      if (binding.trigger_state == InputPayload::InputState::RELEASED) {
-        auto result = events::CreateInputEventPacket(
-            1, binding.action, InputPayload::InputState::RELEASED);
-        if (result.has_value())
-          triggered_packets.push_back(result.value());
-      }
     }
   }
 
@@ -75,16 +79,22 @@ std::vector<EventPacket> SFMLInputRegistry::CheckBindings() {
 std::vector<EventPacket>
 SFMLInputRegistry::ProcessSFMLEvent(const sf::Event &event) {
 
+  // Clear per-event released state
+  m_just_released_keys.clear();
+  m_just_released_buttons.clear();
+
   if (const auto *key_pressed = event.getIf<sf::Event::KeyPressed>()) {
     m_held_keys.insert(key_pressed->code);
   } else if (const auto *key_released = event.getIf<sf::Event::KeyReleased>()) {
     m_held_keys.erase(key_released->code);
+    m_just_released_keys.insert(key_released->code);
   } else if (const auto *mouse_pressed =
                  event.getIf<sf::Event::MouseButtonPressed>()) {
     m_held_buttons.insert(mouse_pressed->button);
   } else if (const auto *mouse_released =
                  event.getIf<sf::Event::MouseButtonReleased>()) {
     m_held_buttons.erase(mouse_released->button);
+    m_just_released_buttons.insert(mouse_released->button);
   } else {
     // Not a key or button event — no bindings to evaluate
     return {};

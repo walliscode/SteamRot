@@ -26,9 +26,12 @@ namespace steamrot {
 /////////////////////////////////////////////////
 /// @brief Represents a single physical input requirement within a binding.
 ///
-/// An SFMLInputEntry is either a keyboard key or a mouse button. Multiple
-/// entries in one SFMLInputBinding are combined with AND logic — all must be
-/// simultaneously held for the binding to be satisfied.
+/// An SFMLInputEntry is either a keyboard key or a mouse button, together with
+/// whether its pressed or released state must be detected for this entry to
+/// contribute to satisfying the binding.
+///
+/// Multiple entries in one SFMLInputBinding are combined with AND logic — all
+/// must be triggered together for the binding to fire.
 /////////////////////////////////////////////////
 struct SFMLInputEntry {
 
@@ -36,6 +39,11 @@ struct SFMLInputEntry {
   /// @brief Distinguishes between keyboard and mouse button inputs
   /////////////////////////////////////////////////
   enum class Type { Keyboard, MouseButton } type{Type::Keyboard};
+
+  /////////////////////////////////////////////////
+  /// @brief Whether this entry requires the input to be pressed or released
+  /////////////////////////////////////////////////
+  enum class TriggerOn { Pressed, Released } trigger_on{TriggerOn::Pressed};
 
   /////////////////////////////////////////////////
   /// @brief The keyboard key (meaningful only when type == Keyboard)
@@ -51,27 +59,22 @@ struct SFMLInputEntry {
 /////////////////////////////////////////////////
 /// @brief Maps a combination of SFML inputs to an InputPayload action.
 ///
-/// All entries in required_inputs must be simultaneously held (AND logic) for
-/// the binding to be considered satisfied. The trigger_state controls whether
-/// the action fires when the combination is first fully pressed (PRESSED) or
-/// when any of the required inputs is released after being fully pressed
-/// (RELEASED).
+/// All entries in required_inputs must be simultaneously satisfied (AND logic)
+/// for the binding to fire. Each entry specifies which physical input it
+/// requires and whether it should be in a pressed or released state.
+///
+/// The resulting InputPayload carries only the action — the SFML-level
+/// press/release distinction is an internal binding concern.
 /////////////////////////////////////////////////
 struct SFMLInputBinding {
 
   /////////////////////////////////////////////////
-  /// @brief The action to produce when this binding is triggered
+  /// @brief The action to produce when this binding fires
   /////////////////////////////////////////////////
   InputPayload::InputAction action{InputPayload::InputAction::NONE};
 
   /////////////////////////////////////////////////
-  /// @brief Whether to fire on the combination becoming fully pressed or
-  /// on any required input being released after the combination was active
-  /////////////////////////////////////////////////
-  InputPayload::InputState trigger_state{InputPayload::InputState::PRESSED};
-
-  /////////////////////////////////////////////////
-  /// @brief All physical inputs that must be held simultaneously (AND logic)
+  /// @brief All physical inputs that must be satisfied simultaneously (AND logic)
   /////////////////////////////////////////////////
   std::vector<SFMLInputEntry> required_inputs;
 };
@@ -91,18 +94,20 @@ inline std::vector<SFMLInputBinding> GetDefaultSFMLInputBindings() {
   using Button = sf::Mouse::Button;
   using Entry = SFMLInputEntry;
   using EntryType = SFMLInputEntry::Type;
+  using TriggerOn = SFMLInputEntry::TriggerOn;
   using Action = InputPayload::InputAction;
-  using State = InputPayload::InputState;
 
   return {
+      // Left mouse button press → SELECT
       SFMLInputBinding{
           Action::SELECT,
-          State::PRESSED,
-          {Entry{EntryType::MouseButton, Key::Unknown, Button::Left}}},
+          {Entry{EntryType::MouseButton, TriggerOn::Pressed, Key::Unknown,
+                 Button::Left}}},
+      // Left mouse button release → SELECT
       SFMLInputBinding{
           Action::SELECT,
-          State::RELEASED,
-          {Entry{EntryType::MouseButton, Key::Unknown, Button::Left}}},
+          {Entry{EntryType::MouseButton, TriggerOn::Released, Key::Unknown,
+                 Button::Left}}},
   };
 }
 
