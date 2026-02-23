@@ -43,7 +43,7 @@ struct Subscriber {
   /// @brief Used to compare EventPayload data to determine if the subscriber
   /// should be toggled on or not
   /////////////////////////////////////////////////
-  std::optional<EventPayload> filter_payload{std::nullopt};
+  EventPayload filter_payload;
 
   /////////////////////////////////////////////////
   /// @brief Any payload data passed to the Subscriber
