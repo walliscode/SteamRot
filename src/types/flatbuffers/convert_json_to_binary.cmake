@@ -67,6 +67,7 @@ flatbuffers_generate_for_type(fragments "scenes" ".fragment.json" "fragments")
 flatbuffers_generate_for_type(scene_manager_data "scenes" ".scene_manager_data.json" "scene_manager")
 flatbuffers_generate_for_type(user_preferences "configuration" ".preferences.json" "preferences")
 flatbuffers_generate_for_type(engine_data "engine" ".engine_data.json" "engine")
+flatbuffers_generate_for_type(input_action_config "events" ".input_action_config.json" "input_actions")
 
 
 

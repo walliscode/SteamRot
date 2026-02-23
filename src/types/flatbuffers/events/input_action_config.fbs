@@ -1,0 +1,35 @@
+////////////////////////////////////////////////////////////
+/// @file
+/// @brief FlatBuffers schema for input action configuration.
+///
+/// Defines data-driven mappings from UserInputBitset combinations
+/// to InputAction enum values.
+////////////////////////////////////////////////////////////
+
+include "user_input.fbs";
+include "event_payload.fbs";
+
+namespace steamrot;
+
+////////////////////////////////////////////////////////////
+/// A single mapping from an input combination to an InputAction.
+/// Each field specifies which input bits must be set for the
+/// mapping to match.
+////////////////////////////////////////////////////////////
+table InputActionMappingFbs {
+  keyboard_pressed:  [KeyboardInput];
+  keyboard_released: [KeyboardInput];
+  mouse_pressed:     [MouseInput];
+  mouse_released:    [MouseInput];
+  action:            InputActionFbs;
+}
+
+////////////////////////////////////////////////////////////
+/// Collection of all input action mappings.
+/// Loaded at startup to configure the SFMLEventConverter registry.
+////////////////////////////////////////////////////////////
+table InputActionConfigFbs {
+  mappings: [InputActionMappingFbs];
+}
+
+root_type InputActionConfigFbs;

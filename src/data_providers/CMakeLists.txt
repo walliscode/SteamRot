@@ -30,6 +30,7 @@ add_library(data_providers
   configure/configure_logic_config.cpp
   configure/configure_event.cpp
   configure/configure_subscriber.cpp
+  configure/configure_input_action.cpp
 
 )
 

@@ -12,6 +12,11 @@
 #include <variant>
 namespace steamrot {
 /////////////////////////////////////////////////
+void EventHandler::Configure(SFMLEventConverter::InputActionRegistry registry) {
+  m_sfml_event_converter.Configure(std::move(registry));
+}
+
+/////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 EventHandler::RegisterSubscriber(std::shared_ptr<Subscriber> subscriber) {
 
@@ -64,7 +69,16 @@ const EventBus &EventHandler::GetWaitingRoomEventBus() {
 }
 
 /////////////////////////////////////////////////
-void HandleSFMLEvents(sf::RenderWindow &window, EventHandler &event_handler) {}
+void HandleSFMLEvents(sf::RenderWindow &window, EventHandler &event_handler) {
+  // Collect all SFML events from the window for this tick.
+  std::vector<sf::Event> sfml_events;
+  while (auto event = window.pollEvent()) {
+    sfml_events.push_back(*event);
+  }
+
+  // Route SFML events through the conversion pipeline.
+  event_handler.ConvertSFMLEventsToEventPackets(sfml_events);
+}
 
 /////////////////////////////////////////////////
 const std::unordered_map<EventType, std::vector<std::weak_ptr<Subscriber>>> &
@@ -168,6 +182,16 @@ std::expected<std::monostate, FailInfo> ResetAllSubscribers(
     }
   }
   return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+void EventHandler::ConvertSFMLEventsToEventPackets(
+    const std::vector<sf::Event> &sfml_events) {
+  // Delegate to SFMLEventConverter which orchestrates all conversion logic.
+  auto converted_events = m_sfml_event_converter.ConvertSFMLEvents(sfml_events);
+  for (const auto &event : converted_events) {
+    AddEvent(event);
+  }
 }
 
 /////////////////////////////////////////////////

@@ -9,6 +9,7 @@
 #include "FlatbuffersDataLoader.h"
 #include "FailInfo.h"
 #include "fragment_generated.h"
+#include "input_action_config_generated.h"
 #include "logic_config_generated.h"
 #include "paths.h"
 #include "scene_data_generated.h"
@@ -265,5 +266,30 @@ FlatbuffersDataLoader::ProvideAllJointData() const {
     }
   }
   return joints;
+}
+
+/////////////////////////////////////////////////
+std::expected<const InputActionConfigFbs *, FailInfo>
+FlatbuffersDataLoader::ProvideDefaultInputActionConfigFbs() const {
+  // get input actions directory
+  std::filesystem::path input_actions_dir =
+      paths::GetDefaultInputActionsDirectory();
+  // construct the file path
+  std::filesystem::path input_action_path =
+      input_actions_dir / "default.input_action_config.bin";
+  // check if the file exists
+  if (!std::filesystem::exists(input_action_path)) {
+    std::string error_message = std::format(
+        "Input action config file not found: {}", input_action_path.string());
+    return std::unexpected(FailInfo(FailMode::FileNotFound, error_message));
+  }
+  // load the input action config data
+  const steamrot::InputActionConfigFbs *input_action_config =
+      GetInputActionConfigFbs(LoadBinaryData(input_action_path));
+  if (!input_action_config) {
+    return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
+                                    "InputActionConfigFbs pointer is null"));
+  }
+  return input_action_config;
 }
 } // namespace steamrot
