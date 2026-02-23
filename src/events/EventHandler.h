@@ -198,7 +198,7 @@ std::expected<std::monostate, FailInfo> ResetAllSubscribers(
         &subscriber_register);
 
 /////////////////////////////////////////////////
-/// @brief Adapater function to turn SFML events into the game engine's event
+/// @brief Adapater function to turn SFML events5into the game engine's event
 /// system.
 ///
 /// @param window Reference to the SFML window to poll events from.

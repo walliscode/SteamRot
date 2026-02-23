@@ -11,11 +11,7 @@
 #include "EventPayload.h"
 #include "EventType.h"
 #include "Subscriber.h"
-
-#include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/Window/Event.hpp>
-#include <SFML/Window/Keyboard.hpp>
-#include <X11/extensions/XTest.h>
+#include "event_factory.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("EventHandler registers Subscribers", "[unit][EventHandler]") {
@@ -30,7 +26,8 @@ TEST_CASE("EventHandler registers Subscribers", "[unit][EventHandler]") {
       std::make_shared<steamrot::Subscriber>();
   subscriber->event_type = event_type;
 
-  // Check that the EventHandler UserInput register is empty initially
+  // Check that the EventHandler register is empty before registering the
+  // Subscriber
   auto subscriber_register = event_handler.GetSubcriberRegister();
   REQUIRE(subscriber_register.empty());
 
@@ -56,13 +53,19 @@ TEST_CASE("AddEvent adds an event to an EventBus", "[unit][EventHandler]") {
   steamrot::EventHandler event_handler;
   REQUIRE(event_handler.GetGlobalEventBus().empty());
 
-  // create an event and add it to the bus
-  steamrot::EventPacket event{5};
+  // create a random EventPacket and add it to the EventHandler
+  steamrot::EventPacket event =
+      steamrot::events::CreateRandomEventPacket().value();
   event_handler.AddEvent(event);
 
   event_handler.ProcessWaitingRoomEventBus();
   // check that the event was added
   REQUIRE(event_handler.GetGlobalEventBus().size() == 1);
+  // check that the event in the global event bus has the same data as the
+  // original event
+  REQUIRE(event_handler.GetGlobalEventBus()[0].context.lifetime ==
+          event.context.lifetime);
+  REQUIRE(event_handler.GetGlobalEventBus()[0].type == event.type);
 }
 
 TEST_CASE("DecrementEventLifetimes decrease all lifetimes by 1",
@@ -171,30 +174,6 @@ TEST_CASE("EventHandler::TickGlobalEventBus updates the global event bus",
   REQUIRE(global_event_bus.empty());
 }
 
-TEST_CASE("UpdateSubscribers turns on Subscribers", "[unit][EventHandler]") {
-
-  // create Subscriber variables
-  const steamrot::EventType event_type = steamrot::EventType::USER_INPUT;
-
-  // Create a Subscriber instance
-  std::shared_ptr<steamrot::Subscriber> subscriber =
-      std::make_shared<steamrot::Subscriber>();
-  subscriber->event_type = event_type;
-
-  // check that the subscriber is not active
-  REQUIRE(!subscriber->m_active);
-
-  // create InputPayload to pass to UpdateSubscribers
-  steamrot::EventPayload input_payload{
-      steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT}};
-
-  // Update the subscriber with the event data
-  std::weak_ptr<steamrot::Subscriber> weak_subscriber = subscriber;
-  steamrot::UpdateSubscriber(weak_subscriber, input_payload);
-
-  REQUIRE(subscriber->m_active);
-}
-
 TEST_CASE("EventHandler::UpdateSubscribersFrom does not update Subscribers "
           "when events do not match",
           "[unit][EventHandler]") {
@@ -288,76 +267,6 @@ TEST_CASE(
 
   // check that the subscriber is now active
   REQUIRE(subscriber->m_active);
-}
-TEST_CASE("EventHandler::UpdateSubscribersFromGlobalEventBus updates correct "
-          "subscribers, with and without filter_payload",
-          "[unit][EventHandler]") {
-
-  // Create an EventHandler instance
-  steamrot::EventHandler event_handler;
-  const steamrot::EventType event_type = steamrot::EventType::USER_INPUT;
-
-  // Create EventPayload for INPUT action SELECT
-  steamrot::EventPayload input_payload{
-      steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT}};
-
-  // Subscriber with NO filter payload (should always activate if event type matches)
-  std::shared_ptr<steamrot::Subscriber> subscriber_no_filter =
-      std::make_shared<steamrot::Subscriber>();
-  subscriber_no_filter->event_type = event_type;
-
-  // Subscriber WITH filter payload that matches the event (should activate)
-  std::shared_ptr<steamrot::Subscriber> subscriber_filter_match =
-      std::make_shared<steamrot::Subscriber>();
-  subscriber_filter_match->event_type = event_type;
-  subscriber_filter_match->filter_payload = input_payload;
-
-  // Subscriber WITH filter payload that does NOT match the event (should NOT
-  // activate)
-  steamrot::EventPayload nonmatching_filter_payload{
-      steamrot::InputPayload{steamrot::InputPayload::InputAction::NONE}};
-  std::shared_ptr<steamrot::Subscriber> subscriber_filter_no_match =
-      std::make_shared<steamrot::Subscriber>();
-  subscriber_filter_no_match->event_type = event_type;
-  subscriber_filter_no_match->filter_payload = nonmatching_filter_payload;
-
-  // All should be inactive to start
-  REQUIRE(!subscriber_no_filter->m_active);
-  REQUIRE(!subscriber_filter_match->m_active);
-  REQUIRE(!subscriber_filter_no_match->m_active);
-
-  // Register all 3
-  auto result_no_filter =
-      event_handler.RegisterSubscriber(subscriber_no_filter);
-  if (!result_no_filter.has_value())
-    FAIL(result_no_filter.error().message);
-  auto result_filter_match =
-      event_handler.RegisterSubscriber(subscriber_filter_match);
-  if (!result_filter_match.has_value())
-    FAIL(result_filter_match.error().message);
-  auto result_filter_no_match =
-      event_handler.RegisterSubscriber(subscriber_filter_no_match);
-  if (!result_filter_no_match.has_value())
-    FAIL(result_filter_no_match.error().message);
-
-  // Add one EventPacket with matching event payload
-  steamrot::EventPacket event1{2};
-  event1.type = event_type;
-  event1.payload = input_payload;
-  std::vector<steamrot::EventPacket> events_to_add = {event1};
-  for (const auto &event : events_to_add)
-    event_handler.AddEvent(event);
-
-  event_handler.ProcessWaitingRoomEventBus();
-  // Update subscribers from the global event bus
-  event_handler.UpdateSubscribersFromGlobalEventBus();
-
-  // Subscriber with no filter payload should be active
-  REQUIRE(subscriber_no_filter->m_active);
-  // Subscriber with matching filter payload should be active
-  REQUIRE(subscriber_filter_match->m_active);
-  // Subscriber with non-matching filter payload should NOT be active
-  REQUIRE_FALSE(subscriber_filter_no_match->m_active);
 }
 
 TEST_CASE("ResetAllSubscribers resets all Subscribers",

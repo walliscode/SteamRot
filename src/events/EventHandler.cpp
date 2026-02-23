@@ -4,6 +4,7 @@
 #include "EventHandler.h"
 #include "EventPayload.h"
 #include "FailInfo.h"
+#include "payload_matchers.h"
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <expected>
@@ -145,17 +146,21 @@ void UpdateSubscriber(std::weak_ptr<Subscriber> &subscriber,
     // if the Subscriber has expired, do nothing
     return;
 
-  // if the Subscriber has filter payload, compare against the event payload
-  if (locked_subscriber->filter_payload.has_value()) {
-    const auto &filter_payload_data = locked_subscriber->filter_payload.value();
+  // if Subscriber event type is None, return without activating
+  if (locked_subscriber->event_type == EventType::NONE)
+    return;
 
-    // Compare filter payload with event payload for exact equality
-    // [TODO:] implement Matches functions for Subscribers
+  // match the event payload to the subscriber filter payload.
+  locked_subscriber->m_active =
+      events::MatchPayload(locked_subscriber->filter_payload, event_payload);
+
+  if (locked_subscriber->m_active) {
+    // if the subscriber is active, capture the event payload
+    locked_subscriber->captured_payload = event_payload;
+  } else {
+    // if the subscriber is not active, clear the captured payload
+    locked_subscriber->captured_payload = std::nullopt;
   }
-
-  // activate the subscriber and store the received event data
-  locked_subscriber->m_active = true;
-  locked_subscriber->captured_payload = event_payload;
 }
 
 /////////////////////////////////////////////////

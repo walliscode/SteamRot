@@ -12,7 +12,6 @@
 /// Headers
 /////////////////////////////////////////////////
 
-#include "EventPacket.h"
 #include "EventPayload.h"
 namespace steamrot::events {
 
@@ -71,16 +70,16 @@ bool MatchPayload(const SystemPayload &filter_payload,
                   const SystemPayload &event_payload);
 
 /////////////////////////////////////////////////
-/// @brief Returns true if the filter EventPacket matches the event EventPacket.
+/// @brief Returns true if the filter payload matches the event payload.
 ///
-/// Returns false if the variant types do not match or if the payloads do not
-/// match according to their specific matching logic.
+/// Wraps std::visit to dispatch to the correct MatchPayload overload based on
+/// the active variant type. Returns false if the variant types do not match.
 ///
-/// @param filter_packet EventPacket from Subscriber filter
-/// @param event_packet  EventPacket from EventBus
+/// @param filter_payload EventPayload from Subscriber filter
+/// @param event_payload  EventPayload from EventBus
 /// @return True if they match
 /////////////////////////////////////////////////
-bool MatchEventPacket(const EventPacket &filter_packet,
-                      const EventPacket &event_packet);
+bool MatchPayload(const EventPayload &filter_payload,
+                  const EventPayload &event_payload);
 
 } // namespace steamrot::events
