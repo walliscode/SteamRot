@@ -88,38 +88,29 @@ bool MatchPayload(const SystemPayload &filter_payload,
 }
 
 /////////////////////////////////////////////////
-bool MatchEventPacket(const EventPacket &filter_packet,
-                      const EventPacket &event_packet) {
+bool MatchPayload(const EventPayload &filter_payload,
+                  const EventPayload &event_payload) {
 
-  // Check if variant types match
-  if (filter_packet.payload.index() != event_packet.payload.index()) {
-    return false;
-  }
+  return std::visit(
+      // Visitor called with the concrete values stored in the variants.
+      [](const auto &filter, const auto &event) -> bool {
+        // Compile-time type check:
+        // decltype(filter) / decltype(event) will be "const T&" for some T.
+        // When both variants hold the same alternative T, these types match.
+        if constexpr (std::is_same_v<decltype(filter), decltype(event)>) {
 
-  // Check EventType match
-  if (filter_packet.type != event_packet.type) {
-    return false;
-  }
+          // Types match, so delegate to the type-specific overload:
+          //   bool MatchPayload(const T&, const T&);
+          // If no such overload exists for a variant alternative T, you'll get
+          // a compile-time error when this visitor is instantiated for (T, T).
+          return MatchPayload(filter, event);
+        } else {
 
-  // Match based on the specific payload variant
-  if (std::holds_alternative<InputPayload>(filter_packet.payload)) {
-    return MatchPayload(std::get<InputPayload>(filter_packet.payload),
-                        std::get<InputPayload>(event_packet.payload));
-  } else if (std::holds_alternative<UIPayload>(filter_packet.payload)) {
-    return MatchPayload(std::get<UIPayload>(filter_packet.payload),
-                        std::get<UIPayload>(event_packet.payload));
-  } else if (std::holds_alternative<LogicPayload>(filter_packet.payload)) {
-    return MatchPayload(std::get<LogicPayload>(filter_packet.payload),
-                        std::get<LogicPayload>(event_packet.payload));
-  } else if (std::holds_alternative<ScenePayload>(filter_packet.payload)) {
-    return MatchPayload(std::get<ScenePayload>(filter_packet.payload),
-                        std::get<ScenePayload>(event_packet.payload));
-  } else if (std::holds_alternative<SystemPayload>(filter_packet.payload)) {
-    return MatchPayload(std::get<SystemPayload>(filter_packet.payload),
-                        std::get<SystemPayload>(event_packet.payload));
-  }
-
-  return false;
+          // Types differ (e.g., filter holds A, event holds B). We consider
+          // that a non-match and *do not* attempt to call MatchPayload(A, B).
+          return false;
+        }
+      },
+      filter_payload, event_payload);
 }
-
 } // namespace steamrot::events

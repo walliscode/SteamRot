@@ -41,8 +41,8 @@ ConfigureSubscriber(Subscriber &subscriber,
 
     // call configure free function
     auto filter_payload_result = ConfigureEventPayload(
-        subscriber.filter_payload.emplace(),
-        fb_subscriber->filter_payload_type(), fb_subscriber->filter_payload());
+        subscriber.filter_payload, fb_subscriber->filter_payload_type(),
+        fb_subscriber->filter_payload());
     if (!filter_payload_result.has_value()) {
       return std::unexpected(filter_payload_result.error());
     }
