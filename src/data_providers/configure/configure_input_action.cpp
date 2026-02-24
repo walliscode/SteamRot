@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "configure_input_action.h"
+#include "configure_event.h"
 #include "UserInputBitset.h"
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
@@ -52,18 +53,9 @@ ConfigureInputActionMapping(UserInputBitset &bitset,
     }
   }
 
-  // Convert the InputActionFbs enum to the native InputAction.
-  switch (mapping_data->action()) {
-  case InputActionFbs_SELECT:
-    action = InputPayload::InputAction::SELECT;
-    break;
-  default:
-    return std::unexpected(
-        FailInfo{FailMode::NonExistentEnumValue,
-                 "Unknown InputActionFbs value in InputActionMappingFbs"});
-  }
-
-  return std::monostate{};
+  // Convert the InputActionFbs enum to the native InputAction via the
+  // shared helper so the mapping only exists in one place.
+  return ConfigureInputAction(action, mapping_data->action());
 }
 
 /////////////////////////////////////////////////

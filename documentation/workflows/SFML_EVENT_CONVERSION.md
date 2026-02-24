@@ -150,39 +150,32 @@ enum InputActionFbs: byte {
 **`src/types/flatbuffers/events/input_action_config.fbs`** uses
 `InputActionFbs` already, so no change is needed there.
 
-### Step 3: Update the Configure Function
+### Step 3: Update the Shared Configure Function
 
 **Location**: `src/data_providers/configure/configure_event.cpp`
 
-Add a case to the `ConfigureInputPayload` switch:
+Add a case to the `ConfigureInputAction` switch.  This single function is
+shared by both `ConfigureInputPayload` (used when deserialising event packets)
+and `ConfigureInputActionMapping` (used when building the registry), so you
+only need to update it **once**:
 
 ```cpp
-switch (input_payload_data->action()) {
-case InputActionFbs_SELECT:
-  input_payload.action = InputPayload::InputAction::SELECT;
-  break;
-case InputActionFbs_CANCEL:             // ← add this
-  input_payload.action = InputPayload::InputAction::CANCEL;
-  break;
-default:
-  return std::unexpected(FailInfo{...});
+std::expected<std::monostate, FailInfo>
+ConfigureInputAction(InputPayload::InputAction &action,
+                     InputActionFbs action_fbs) {
+  switch (action_fbs) {
+  case InputActionFbs_SELECT:
+    action = InputPayload::InputAction::SELECT;
+    break;
+  case InputActionFbs_CANCEL:             // ← add this
+    action = InputPayload::InputAction::CANCEL;
+    break;
+  default:
+    return std::unexpected(FailInfo{...});
+  }
+  return std::monostate{};
 }
 ```
-
-Also update `configure_input_action.cpp` — the
-`ConfigureInputActionMapping` switch:
-
-```cpp
-switch (mapping_data->action()) {
-case InputActionFbs_SELECT:
-  action = InputPayload::InputAction::SELECT;
-  break;
-case InputActionFbs_CANCEL:             // ← add this
-  action = InputPayload::InputAction::CANCEL;
-  break;
-default:
-  return std::unexpected(FailInfo{...});
-}
 ```
 
 ### Step 4: Add the JSON Mapping
@@ -463,8 +456,8 @@ CMake build step.
 
 - ✅ Add the value to both `InputActionFbs` (`.fbs`) **and** `InputAction`
   (C++ enum).
-- ✅ Add a `case` to both `configure_event.cpp` and
-  `configure_input_action.cpp`.
+- ✅ Add a `case` to `ConfigureInputAction` in `configure_event.cpp` (one place
+  — both `ConfigureInputPayload` and `ConfigureInputActionMapping` call it).
 - ✅ Rebuild to regenerate FlatBuffers headers.
 
 ### Two patterns both match, wrong action fires
@@ -480,8 +473,7 @@ CMake build step.
 
 - [ ] Add enum value to `InputPayload::InputAction` (`EventPayload.h`)
 - [ ] Add enum value to `InputActionFbs` (`event_payload.fbs`)
-- [ ] Add `case` to `ConfigureInputPayload` (`configure_event.cpp`)
-- [ ] Add `case` to `ConfigureInputActionMapping` (`configure_input_action.cpp`)
+- [ ] Add `case` to `ConfigureInputAction` in `configure_event.cpp`
 - [ ] Add mapping entry to `default.input_action_config.json`
 - [ ] Rebuild to regenerate FlatBuffers headers and binary
 - [ ] Write unit test for the new enum value

@@ -44,6 +44,20 @@ ConfigureInputPayload(InputPayload &input_payload,
                       const InputPayloadFbs *input_payload_data);
 
 /////////////////////////////////////////////////
+/// @brief Convert an InputActionFbs enum value to a native InputAction.
+///
+/// Shared helper used by both ConfigureInputPayload and
+/// ConfigureInputActionMapping so the mapping only needs to be maintained
+/// in one place.
+///
+/// @param action      Output: native InputAction value.
+/// @param action_fbs  InputActionFbs enum value to convert.
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureInputAction(InputPayload::InputAction &action,
+                     InputActionFbs action_fbs);
+
+/////////////////////////////////////////////////
 /// @brief Logic for populating UIPayload from flatbuffers data source.
 ///
 /// @param ui_payload Reference to UIPayload to populate.
