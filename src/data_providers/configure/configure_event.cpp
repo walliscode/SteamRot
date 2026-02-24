@@ -8,8 +8,8 @@
 /////////////////////////////////////////////////
 #include "configure_event.h"
 #include "SceneType.h"
+#include "configure_input_action.h"
 #include "event_packet_generated.h"
-#include "sfml_event_convert.h"
 #include "uuid.h"
 
 namespace steamrot::data::configure {
@@ -42,8 +42,8 @@ ConfigureInputPayload(InputPayload &input_payload,
                  "InputPayloadFbs data is null, cannot populate InputPayload"});
   }
 
-  return events::convert::ConfigureInputAction(input_payload.action,
-                                               input_payload_data->action());
+  return ConfigureInputAction(input_payload.action,
+                              input_payload_data->action());
 }
 
 /////////////////////////////////////////////////

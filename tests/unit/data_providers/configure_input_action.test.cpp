@@ -1,19 +1,15 @@
 /////////////////////////////////////////////////
 /// @file
 /// @brief Tests for input-action configure functions.
-///
-/// These functions have moved to sfml_event_convert (steamrot::events::convert
-/// namespace). This file re-runs the same scenarios using the new namespace
-/// for regression coverage from the data_providers test suite.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "sfml_event_convert.h"
 #include "EventPayload.h"
-#include "SFMLEventConverter.h"
+#include "InputActionRegistry.h"
 #include "UserInputBitset.h"
+#include "configure_input_action.h"
 #include "input_action_config_generated.h"
 #include "user_input_generated.h"
 #include <SFML/Window/Mouse.hpp>
@@ -21,7 +17,26 @@
 #include <flatbuffers/flatbuffers.h>
 
 // Bring the functions into scope for readability.
-using namespace steamrot::events::convert;
+using namespace steamrot::data::configure;
+
+TEST_CASE("ConfigureInputAction maps InputActionFbs_SELECT to SELECT",
+          "[unit][configure_input_action]") {
+  steamrot::InputPayload::InputAction action{
+      steamrot::InputPayload::InputAction::NONE};
+  auto result = ConfigureInputAction(action, steamrot::InputActionFbs_SELECT);
+  REQUIRE(result.has_value());
+  REQUIRE(action == steamrot::InputPayload::InputAction::SELECT);
+}
+
+TEST_CASE("ConfigureInputAction fails for unknown enum value",
+          "[unit][configure_input_action]") {
+  steamrot::InputPayload::InputAction action{
+      steamrot::InputPayload::InputAction::NONE};
+  auto result = ConfigureInputAction(
+      action, static_cast<steamrot::InputActionFbs>(99));
+  REQUIRE_FALSE(result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::NonExistentEnumValue);
+}
 
 TEST_CASE("ConfigureInputActionMapping fails with null data",
           "[unit][configure_input_action]") {
@@ -97,7 +112,7 @@ TEST_CASE("ConfigureInputActionMapping sets keyboard-pressed bit",
 
 TEST_CASE("ConfigureInputActionRegistry fails with null data",
           "[unit][configure_input_action]") {
-  InputActionRegistry registry;
+  steamrot::InputActionRegistry registry;
   auto result = ConfigureInputActionRegistry(registry, nullptr);
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
@@ -114,7 +129,7 @@ TEST_CASE("ConfigureInputActionRegistry succeeds with no mappings",
       flatbuffers::GetRoot<steamrot::InputActionConfigFbs>(
           builder.GetBufferPointer());
 
-  InputActionRegistry registry;
+  steamrot::InputActionRegistry registry;
   auto result = ConfigureInputActionRegistry(registry, config_data);
   REQUIRE(result.has_value());
   REQUIRE(registry.empty());
@@ -146,7 +161,7 @@ TEST_CASE("ConfigureInputActionRegistry populates registry with one mapping",
       flatbuffers::GetRoot<steamrot::InputActionConfigFbs>(
           builder.GetBufferPointer());
 
-  InputActionRegistry registry;
+  steamrot::InputActionRegistry registry;
   auto result = ConfigureInputActionRegistry(registry, config_data);
   REQUIRE(result.has_value());
   REQUIRE(registry.size() == 1);

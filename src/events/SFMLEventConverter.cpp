@@ -13,14 +13,8 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-SFMLEventConverter::Configure(const InputActionConfigFbs *config_data) {
-  // Clear any previously loaded registry before repopulating.
-  m_input_action_registry.clear();
-
-  // Delegate to the free function which handles all FlatBuffers→registry logic.
-  return events::convert::ConfigureInputActionRegistry(m_input_action_registry,
-                                                        config_data);
+void SFMLEventConverter::SetInputActionRegistry(InputActionRegistry &&registry) {
+  m_input_action_registry = std::move(registry);
 }
 
 /////////////////////////////////////////////////

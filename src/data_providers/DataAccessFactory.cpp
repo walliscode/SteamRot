@@ -10,6 +10,7 @@
 #include "FailInfo.h"
 #include "FlatbuffersEngineDataProvider.h"
 #include "FlatbuffersGrimoireMachinaProvider.h"
+#include "FlatbuffersInputActionConfigProvider.h"
 #include "FlatbuffersLogicConfigCollectionProvider.h"
 #include "FlatbuffersSceneDataProvider.h"
 #include "FlatbuffersSceneManagerDataProvider.h"
@@ -76,6 +77,15 @@ DataAccessFactory::SetFlatbuffersDataProviders() {
     return std::unexpected(FailInfo{
         FailMode::NullPointer,
         "Failed to create FlatbuffersLogicConfigCollectionProvider instance."});
+  }
+
+  // Set IInputActionConfigProvider
+  m_input_action_config_provider =
+      std::make_unique<FlatbuffersInputActionConfigProvider>();
+  if (!m_input_action_config_provider) {
+    return std::unexpected(FailInfo{
+        FailMode::NullPointer,
+        "Failed to create FlatbuffersInputActionConfigProvider instance."});
   }
 
   return std::monostate{};
@@ -166,5 +176,16 @@ DataAccessFactory::GetLogicConfigCollectionProvider() {
         FailMode::NullPointer, "Logic Config Collection Provider is null"});
   }
   return m_logic_config_collection_provider.get();
+}
+
+/////////////////////////////////////////////////
+std::expected<IInputActionConfigProvider *, FailInfo>
+DataAccessFactory::GetInputActionConfigProvider() {
+  if (!m_input_action_config_provider) {
+    return std::unexpected(
+        FailInfo{FailMode::NullPointer,
+                 "Input Action Config Provider is null"});
+  }
+  return m_input_action_config_provider.get();
 }
 } // namespace steamrot

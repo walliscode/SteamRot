@@ -17,6 +17,7 @@
 #include "IEngineDataProvider.h"
 #include "IEntityConfigurator.h"
 #include "IGrimoireMachinaProvider.h"
+#include "IInputActionConfigProvider.h"
 #include "ILogicConfigCollectionProvider.h"
 #include "ISceneDataProvider.h"
 #include "ISceneManagerDataProvider.h"
@@ -71,6 +72,12 @@ private:
       m_logic_config_collection_provider{nullptr};
 
   /////////////////////////////////////////////////
+  /// @brief Instance of the IInputActionConfigProvider for the factory/game
+  /////////////////////////////////////////////////
+  std::unique_ptr<IInputActionConfigProvider> m_input_action_config_provider{
+      nullptr};
+
+  /////////////////////////////////////////////////
   /// @brief Set all data providers to Flatbuffers implementations
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo> SetFlatbuffersDataProviders();
@@ -117,6 +124,12 @@ public:
   /////////////////////////////////////////////////
   std::expected<ILogicConfigCollectionProvider *, FailInfo>
   GetLogicConfigCollectionProvider();
+
+  /////////////////////////////////////////////////
+  /// @brief Returns a raw pointer to the IInputActionConfigProvider
+  /////////////////////////////////////////////////
+  std::expected<IInputActionConfigProvider *, FailInfo>
+  GetInputActionConfigProvider();
 
   /////////////////////////////////////////////////
   /// @brief Sets the data type for the factory

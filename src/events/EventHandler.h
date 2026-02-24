@@ -10,9 +10,9 @@
 #include "EventPacket.h"
 #include "EventType.h"
 #include "FailInfo.h"
+#include "InputActionRegistry.h"
 #include "SFMLEventConverter.h"
 #include "Subscriber.h"
-#include "input_action_config_generated.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <expected>
 #include <memory>
@@ -70,17 +70,14 @@ public:
   EventHandler() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Configure the SFMLEventConverter from FlatBuffers input-action data.
+  /// @brief Set the input-action registry on the SFMLEventConverter.
   ///
-  /// Must be called at startup before the first tick.  Delegates to
-  /// SFMLEventConverter::Configure which coordinates calling the configure
-  /// free-functions on its own internal registry.
+  /// The registry is built externally (by IInputActionConfigProvider) and
+  /// moved in via RAII. Must be called at startup before the first tick.
   ///
-  /// @param config_data Pointer to InputActionConfigFbs flatbuffers data.
-  /// @return std::monostate on success, FailInfo on error.
+  /// @param registry Populated InputActionRegistry to take ownership of.
   /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  Configure(const InputActionConfigFbs *config_data);
+  void SetInputActionRegistry(InputActionRegistry &&registry);
 
   /////////////////////////////////////////////////
   /// @brief store a subscriber in the event handler.

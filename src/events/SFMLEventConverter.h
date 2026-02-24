@@ -19,6 +19,7 @@
 #include "EventPacket.h"
 #include "EventPayload.h"
 #include "FailInfo.h"
+#include "InputActionRegistry.h"
 #include "UserInputBitset.h"
 #include "sfml_event_convert.h"
 #include <SFML/Window/Event.hpp>
@@ -31,32 +32,20 @@ class SFMLEventConverter {
 
 public:
   /////////////////////////////////////////////////
-  /// @brief Type alias for the input-action registry used by this class.
-  ///
-  /// Each entry maps a UserInputBitset pattern to the InputAction it
-  /// should produce.  Patterns are evaluated in order; the first match
-  /// wins.
-  /////////////////////////////////////////////////
-  using InputActionRegistry = events::convert::InputActionRegistry;
-
-  /////////////////////////////////////////////////
   /// @brief Default constructor
   /////////////////////////////////////////////////
   SFMLEventConverter() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Load the input-action registry from FlatBuffers config data.
+  /// @brief Set the input-action registry by move.
   ///
-  /// Coordinates calling the configure free-functions from sfml_event_convert
-  /// to populate the internal registry from the provided FlatBuffers data.
-  /// Must be called before ConvertSFMLEvents() produces any InputPayload
-  /// events.
+  /// The registry is built externally (by IInputActionConfigProvider) and
+  /// moved into this converter. Must be called before ConvertSFMLEvents()
+  /// produces any InputPayload events.
   ///
-  /// @param config_data Pointer to InputActionConfigFbs flatbuffers data.
-  /// @return std::monostate on success, FailInfo on error.
+  /// @param registry Populated InputActionRegistry to take ownership of.
   /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  Configure(const InputActionConfigFbs *config_data);
+  void SetInputActionRegistry(InputActionRegistry &&registry);
 
   /////////////////////////////////////////////////
   /// @brief Convert a tick's worth of SFML events into EventPackets.
@@ -76,7 +65,7 @@ public:
 
 private:
   /////////////////////////////////////////////////
-  /// @brief Ordered input-action registry loaded at startup.
+  /// @brief Input-action registry loaded at startup.
   /////////////////////////////////////////////////
   InputActionRegistry m_input_action_registry;
 

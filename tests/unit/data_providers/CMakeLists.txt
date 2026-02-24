@@ -21,6 +21,7 @@ add_executable(test_data_providers
   FlatbuffersUIStyleDataProvider.test.cpp
   FlatbuffersGrimoireMachinaProvider.test.cpp
   FlatbuffersLogicConfigCollectionProvider.test.cpp
+  FlatbuffersInputActionConfigProvider.test.cpp
   configure_asset_config.test.cpp
   configure_engine_data.test.cpp
   configure_engine_snapshot.test.cpp
