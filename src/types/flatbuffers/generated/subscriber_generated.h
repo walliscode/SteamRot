@@ -62,7 +62,7 @@ struct SubscriberFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyField<uint64_t>(verifier, VT_EVENT_TYPE, 8) &&
            VerifyField<uint8_t>(verifier, VT_FILTER_PAYLOAD_TYPE, 1) &&
-           VerifyOffset(verifier, VT_FILTER_PAYLOAD) &&
+           VerifyOffsetRequired(verifier, VT_FILTER_PAYLOAD) &&
            VerifyEventPayloadFbs(verifier, filter_payload(), filter_payload_type()) &&
            verifier.EndTable();
   }
@@ -108,6 +108,7 @@ struct SubscriberFbsBuilder {
   ::flatbuffers::Offset<SubscriberFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = ::flatbuffers::Offset<SubscriberFbs>(end);
+    fbb_.Required(o, SubscriberFbs::VT_FILTER_PAYLOAD);
     return o;
   }
 };

@@ -127,10 +127,9 @@ TEST_CASE("ConfigureEngineState populates from valid data",
   REQUIRE(state.quit_requested == false);
   REQUIRE(state.subscriptions.size() == 1);
   REQUIRE(state.subscriptions[0]->event_type == steamrot::EventType::SYSTEM);
-  REQUIRE(state.subscriptions[0]->filter_payload.has_value());
   REQUIRE(std::holds_alternative<steamrot::SystemPayload>(
-      state.subscriptions[0]->filter_payload.value()));
-  REQUIRE(std::get<steamrot::SystemPayload>(
-              state.subscriptions[0]->filter_payload.value())
-              .action == steamrot::SystemPayload::SystemAction::QUIT);
+      state.subscriptions[0]->filter_payload));
+  REQUIRE(
+      std::get<steamrot::SystemPayload>(state.subscriptions[0]->filter_payload)
+          .action == steamrot::SystemPayload::SystemAction::QUIT);
 }

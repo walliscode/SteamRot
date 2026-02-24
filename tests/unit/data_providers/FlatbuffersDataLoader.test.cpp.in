@@ -163,7 +163,7 @@ TEST_CASE("FlatbuffersDataLoader::ProvideEngineData returns data "
   // Verify the subscription is for EVENT_QUIT_GAME
   const auto *subscription = state->subscriptions()->Get(0);
   REQUIRE(subscription != nullptr);
-  REQUIRE(subscription->event_type() == steamrot::EventTypeFbs_USER_INPUT);
+  REQUIRE(subscription->event_type() == steamrot::EventTypeFbs_SYSTEM);
 }
 
 TEST_CASE("FlatbuffersDataLoader::ProvideDefaultUserPreferencesData returns "

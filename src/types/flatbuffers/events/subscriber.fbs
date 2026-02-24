@@ -14,6 +14,6 @@ table SubscriberFbs{
 ////////////////////////////////////////////////////////////
 /// any one of the EventPayloadFbs union, used to determine if the Subscriber should be activated
 ////////////////////////////////////////////////////////////
-  filter_payload: EventPayloadFbs;
+  filter_payload: EventPayloadFbs (required);
   
   }

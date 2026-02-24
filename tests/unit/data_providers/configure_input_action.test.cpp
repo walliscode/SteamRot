@@ -6,14 +6,15 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "configure_input_action.h"
 #include "EventPayload.h"
 #include "InputActionRegistry.h"
 #include "UserInputBitset.h"
-#include "configure_input_action.h"
 #include "input_action_config_generated.h"
 #include "user_input_generated.h"
 #include <SFML/Window/Mouse.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <cstdint>
 #include <flatbuffers/flatbuffers.h>
 
 // Bring the functions into scope for readability.
@@ -32,8 +33,8 @@ TEST_CASE("ConfigureInputAction fails for unknown enum value",
           "[unit][configure_input_action]") {
   steamrot::InputPayload::InputAction action{
       steamrot::InputPayload::InputAction::NONE};
-  auto result = ConfigureInputAction(
-      action, static_cast<steamrot::InputActionFbs>(99));
+  auto result =
+      ConfigureInputAction(action, static_cast<steamrot::InputActionFbs>(99));
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::NonExistentEnumValue);
 }
@@ -49,12 +50,12 @@ TEST_CASE("ConfigureInputActionMapping fails with null data",
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
 }
 
-TEST_CASE("ConfigureInputActionMapping sets mouse-pressed bit and SELECT action",
-          "[unit][configure_input_action]") {
+TEST_CASE(
+    "ConfigureInputActionMapping sets mouse-pressed bit and SELECT action",
+    "[unit][configure_input_action]") {
   flatbuffers::FlatBufferBuilder builder;
 
-  std::vector<steamrot::MouseInput> mouse_pressed_vec{
-      steamrot::MouseInput_LEFT_CLICK};
+  std::vector<uint8_t> mouse_pressed_vec{steamrot::MouseInput_LEFT_CLICK};
   auto mouse_pressed = builder.CreateVector(mouse_pressed_vec);
 
   steamrot::InputActionMappingFbsBuilder mapping_builder(builder);
@@ -84,8 +85,7 @@ TEST_CASE("ConfigureInputActionMapping sets keyboard-pressed bit",
           "[unit][configure_input_action]") {
   flatbuffers::FlatBufferBuilder builder;
 
-  std::vector<steamrot::KeyboardInput> kb_pressed_vec{
-      steamrot::KeyboardInput_A};
+  std::vector<uint8_t> kb_pressed_vec{steamrot::KeyboardInput_A};
   auto kb_pressed = builder.CreateVector(kb_pressed_vec);
 
   steamrot::InputActionMappingFbsBuilder mapping_builder(builder);
@@ -139,8 +139,7 @@ TEST_CASE("ConfigureInputActionRegistry populates registry with one mapping",
           "[unit][configure_input_action]") {
   flatbuffers::FlatBufferBuilder builder;
 
-  std::vector<steamrot::MouseInput> mouse_pressed_vec{
-      steamrot::MouseInput_LEFT_CLICK};
+  std::vector<uint8_t> mouse_pressed_vec{steamrot::MouseInput_LEFT_CLICK};
   auto mouse_pressed = builder.CreateVector(mouse_pressed_vec);
 
   steamrot::InputActionMappingFbsBuilder mapping_builder(builder);
