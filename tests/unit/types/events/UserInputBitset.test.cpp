@@ -8,7 +8,7 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <catch2/catch_test_macros.hpp>
-#include <map>
+#include <unordered_map>
 #include <vector>
 
 using namespace steamrot;
@@ -98,31 +98,29 @@ TEST_CASE("UserInputBitset equality operator works as expected",
   REQUIRE(a == b);
 }
 
-TEST_CASE("UserInputBitset less-than operator provides strict weak ordering",
+TEST_CASE("UserInputBitset hash is usable as an unordered_map key",
           "[unit][UserInputBitset]") {
-  UserInputBitset empty;
-
   UserInputBitset with_a;
   with_a.setKeyPressed(sf::Keyboard::Key::A);
 
   UserInputBitset with_b;
   with_b.setKeyPressed(sf::Keyboard::Key::B);
 
-  // Irreflexivity: a < a must be false.
-  REQUIRE_FALSE(empty < empty);
-  REQUIRE_FALSE(with_a < with_a);
+  // Equal bitsets must produce the same hash.
+  UserInputBitset with_a_copy;
+  with_a_copy.setKeyPressed(sf::Keyboard::Key::A);
+  REQUIRE(std::hash<UserInputBitset>{}(with_a) ==
+          std::hash<UserInputBitset>{}(with_a_copy));
 
-  // Antisymmetry: if a < b then b < a must be false.
-  if (with_a < with_b) {
-    REQUIRE_FALSE(with_b < with_a);
-  } else {
-    REQUIRE(with_b < with_a);
-  }
-
-  // Works as a map key (no compile error and correct deduplication).
-  std::map<UserInputBitset, int> m;
+  // Distinct bitsets must be usable as separate keys.
+  std::unordered_map<UserInputBitset, int> m;
   m.emplace(with_a, 1);
-  m.emplace(with_a, 2); // duplicate key — emplace does not overwrite, original retained
-  REQUIRE(m.size() == 1);
+  m.emplace(with_b, 2);
+  REQUIRE(m.size() == 2);
+  REQUIRE(m.at(with_a) == 1);
+  REQUIRE(m.at(with_b) == 2);
+
+  // Duplicate key: emplace does not overwrite, original retained.
+  m.emplace(with_a, 99);
   REQUIRE(m.at(with_a) == 1);
 }

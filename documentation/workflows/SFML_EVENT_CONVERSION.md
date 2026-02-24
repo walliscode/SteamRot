@@ -80,7 +80,7 @@ SFMLEventConverter::ConvertSFMLEvents()
   │       └─ UserInputBitset(sfml_events)    ← SFML events → bitset
   │
   ├─ 2. events::convert::ResolveInputAction()
-  │       └─ first pattern in registry (map, iterated in key order) that is
+  │       └─ first matching entry in registry (unordered_map) whose bits are
   │          a subset of accumulated bits
   │
   ├─ 3. events::CreateInputEventPacket()
@@ -419,13 +419,13 @@ CMake build step.
    contains testable logic; `SFMLEventConverter.cpp` contains only ordering.
 2. **Keep steps numbered** — The numbered comments in `ConvertSFMLEvents()`
    make execution order obvious.  Update them when adding new steps.
-3. **Unique patterns — map key semantics** — `InputActionRegistry` is a
-   `std::map<UserInputBitset, InputPayload::InputAction>`, so each pattern is
-   unique.  If the same bitset appears twice in the JSON the later entry
-   silently replaces the earlier one.  The same `InputAction` value can be
-   associated with many different patterns.  Iteration order is determined by
-   the `UserInputBitset::operator<` (bit-by-bit descending), not insertion
-   order.
+3. **Unique patterns — unordered_map key semantics** — `InputActionRegistry` is a
+   `std::unordered_map<UserInputBitset, InputPayload::InputAction>`, so each
+   pattern is unique.  If the same bitset appears twice in the JSON the later
+   entry silently replaces the earlier one.  The same `InputAction` value can
+   be associated with many different patterns.  `UserInputBitset` provides a
+   `std::hash` specialisation that folds the bits into 64-bit words with
+   boost-style mixing (no heap allocation).
 4. **One action per tick** — The current design resolves at most one
    `InputAction` per tick from the bitset.  If you need multiple simultaneous
    actions, change the resolve function to return a `vector`.

@@ -25,8 +25,8 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <expected>
-#include <map>
 #include <optional>
+#include <unordered_map>
 #include <vector>
 
 namespace steamrot::events::convert {
@@ -37,10 +37,9 @@ namespace steamrot::events::convert {
 /// Each UserInputBitset key is unique — if the same pattern is registered
 /// twice the later registration overwrites the earlier one.  InputAction
 /// values can be repeated across different keys.
-/// Entries are iterated in ascending key order during resolution.
 /////////////////////////////////////////////////
 using InputActionRegistry =
-    std::map<UserInputBitset, InputPayload::InputAction>;
+    std::unordered_map<UserInputBitset, InputPayload::InputAction>;
 
 /////////////////////////////////////////////////
 /// @brief Collect keyboard and mouse SFML events into a UserInputBitset.
