@@ -9,6 +9,7 @@
 #include "configure_event.h"
 #include "SceneType.h"
 #include "event_packet_generated.h"
+#include "sfml_event_convert.h"
 #include "uuid.h"
 
 namespace steamrot::data::configure {
@@ -32,23 +33,6 @@ ConfigureEventContext(EventContext &event_context,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigureInputAction(InputPayload::InputAction &action,
-                     InputActionFbs action_fbs) {
-  switch (action_fbs) {
-  case InputActionFbs_SELECT:
-    action = InputPayload::InputAction::SELECT;
-    break;
-  default:
-    return std::unexpected(
-        FailInfo{FailMode::NonExistentEnumValue,
-                 "Unknown InputActionFbs value in flatbuffers data"});
-  }
-
-  return std::monostate{};
-}
-
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
 ConfigureInputPayload(InputPayload &input_payload,
                       const InputPayloadFbs *input_payload_data) {
   // check for null data
@@ -58,8 +42,8 @@ ConfigureInputPayload(InputPayload &input_payload,
                  "InputPayloadFbs data is null, cannot populate InputPayload"});
   }
 
-  return ConfigureInputAction(input_payload.action,
-                              input_payload_data->action());
+  return events::convert::ConfigureInputAction(input_payload.action,
+                                               input_payload_data->action());
 }
 
 /////////////////////////////////////////////////

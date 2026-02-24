@@ -12,8 +12,9 @@
 #include <variant>
 namespace steamrot {
 /////////////////////////////////////////////////
-void EventHandler::Configure(SFMLEventConverter::InputActionRegistry registry) {
-  m_sfml_event_converter.Configure(std::move(registry));
+std::expected<std::monostate, FailInfo>
+EventHandler::Configure(const InputActionConfigFbs *config_data) {
+  return m_sfml_event_converter.Configure(config_data);
 }
 
 /////////////////////////////////////////////////

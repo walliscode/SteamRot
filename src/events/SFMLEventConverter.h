@@ -45,14 +45,18 @@ public:
   SFMLEventConverter() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Load the input-action registry.
+  /// @brief Load the input-action registry from FlatBuffers config data.
   ///
-  /// Must be called before ConvertSFMLEvents() produces any
-  /// InputPayload events.  Replaces any previously loaded registry.
+  /// Coordinates calling the configure free-functions from sfml_event_convert
+  /// to populate the internal registry from the provided FlatBuffers data.
+  /// Must be called before ConvertSFMLEvents() produces any InputPayload
+  /// events.
   ///
-  /// @param registry Ordered list of (pattern → action) mappings.
+  /// @param config_data Pointer to InputActionConfigFbs flatbuffers data.
+  /// @return std::monostate on success, FailInfo on error.
   /////////////////////////////////////////////////
-  void Configure(InputActionRegistry registry);
+  std::expected<std::monostate, FailInfo>
+  Configure(const InputActionConfigFbs *config_data);
 
   /////////////////////////////////////////////////
   /// @brief Convert a tick's worth of SFML events into EventPackets.

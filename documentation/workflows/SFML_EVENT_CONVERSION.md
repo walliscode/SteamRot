@@ -383,28 +383,27 @@ remains visible to the reader.
 
 ## Startup Configuration
 
-The input-action registry must be loaded and handed to `EventHandler` before
-the first tick.  The typical startup sequence is:
+The input-action configuration must be loaded and passed to `EventHandler`
+before the first tick.  `SFMLEventConverter` coordinates calling the configure
+free-functions on its own internal registry; the caller only needs to provide
+the already-loaded FlatBuffers data pointer.
 
 ```cpp
-// 1. Load binary data
+// 1. Load binary data via FlatbuffersDataLoader.
 steamrot::FlatbuffersDataLoader loader;
 auto config_result = loader.ProvideDefaultInputActionConfigFbs();
 if (!config_result.has_value()) {
   // handle error
 }
 
-// 2. Build the registry
-steamrot::SFMLEventConverter::InputActionRegistry registry;
-auto configure_result =
-    steamrot::data::configure::ConfigureInputActionRegistry(
-        registry, config_result.value());
+// 2. Hand the data to EventHandler.
+//    EventHandler delegates to SFMLEventConverter::Configure, which
+//    coordinates calling ConfigureInputActionRegistry (and friends) on
+//    its own m_input_action_registry — no registry is built externally.
+auto configure_result = event_handler.Configure(config_result.value());
 if (!configure_result.has_value()) {
   // handle error
 }
-
-// 3. Hand it to the EventHandler — must happen before ExecuteEventHandlerLevelLogic()
-event_handler.Configure(std::move(registry));
 ```
 
 The binary file is generated automatically from
