@@ -76,6 +76,17 @@ struct UserInputBitset : public std::bitset<kTotalBits> {
   bool operator==(const UserInputBitset &other) const {
     return std::bitset<kTotalBits>::operator==(other);
   }
+
+  bool operator<(const UserInputBitset &other) const {
+    // Compare bit-by-bit from the most-significant bit so that the ordering
+    // is consistent with the bitset string representation.
+    for (size_t i = kTotalBits; i-- > 0;) {
+      if (this->test(i) != other.test(i)) {
+        return !this->test(i);
+      }
+    }
+    return false; // equal
+  }
 };
 
 } // namespace steamrot

@@ -83,7 +83,7 @@ TEST_CASE("ResolveInputAction returns nullopt when no pattern matches",
   pattern.setKeyPressed(sf::Keyboard::Key::A);
 
   steamrot::events::convert::InputActionRegistry registry;
-  registry.emplace_back(pattern, steamrot::InputPayload::InputAction::SELECT);
+  registry.emplace(pattern, steamrot::InputPayload::InputAction::SELECT);
 
   // Accumulated bitset has key B, not A.
   steamrot::UserInputBitset accumulated;
@@ -102,7 +102,7 @@ TEST_CASE("ResolveInputAction matches when pattern bits are a subset of "
   pattern.setMousePressed(sf::Mouse::Button::Left);
 
   steamrot::events::convert::InputActionRegistry registry;
-  registry.emplace_back(pattern, steamrot::InputPayload::InputAction::SELECT);
+  registry.emplace(pattern, steamrot::InputPayload::InputAction::SELECT);
 
   // Accumulated also has a keyboard key — should still match.
   steamrot::UserInputBitset accumulated;
@@ -125,10 +125,10 @@ TEST_CASE("ResolveInputAction returns first matching action when multiple "
   pattern_select2.setKeyPressed(sf::Keyboard::Key::B);
 
   steamrot::events::convert::InputActionRegistry registry;
-  registry.emplace_back(pattern_select,
-                        steamrot::InputPayload::InputAction::SELECT);
-  registry.emplace_back(pattern_select2,
-                        steamrot::InputPayload::InputAction::SELECT);
+  registry.emplace(pattern_select,
+                   steamrot::InputPayload::InputAction::SELECT);
+  registry.emplace(pattern_select2,
+                   steamrot::InputPayload::InputAction::SELECT);
 
   // Both patterns are satisfied.
   steamrot::UserInputBitset accumulated;
@@ -138,7 +138,6 @@ TEST_CASE("ResolveInputAction returns first matching action when multiple "
   auto result =
       steamrot::events::convert::ResolveInputAction(accumulated, registry);
   REQUIRE(result.has_value());
-  // First entry wins.
   REQUIRE(result.value() == steamrot::InputPayload::InputAction::SELECT);
 }
 
@@ -148,8 +147,8 @@ TEST_CASE("ResolveInputAction does not match an all-zeros pattern",
   steamrot::UserInputBitset empty_pattern;
 
   steamrot::events::convert::InputActionRegistry registry;
-  registry.emplace_back(empty_pattern,
-                        steamrot::InputPayload::InputAction::SELECT);
+  registry.emplace(empty_pattern,
+                   steamrot::InputPayload::InputAction::SELECT);
 
   steamrot::UserInputBitset accumulated;
   accumulated.setMousePressed(sf::Mouse::Button::Left);
@@ -332,6 +331,7 @@ TEST_CASE("ConfigureInputActionRegistry populates registry with one mapping",
 
   steamrot::UserInputBitset expected_pattern;
   expected_pattern.setMousePressed(sf::Mouse::Button::Left);
-  REQUIRE(registry[0].first == expected_pattern);
-  REQUIRE(registry[0].second == steamrot::InputPayload::InputAction::SELECT);
+  REQUIRE(registry.count(expected_pattern) == 1);
+  REQUIRE(registry.at(expected_pattern) ==
+          steamrot::InputPayload::InputAction::SELECT);
 }

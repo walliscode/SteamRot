@@ -80,7 +80,8 @@ SFMLEventConverter::ConvertSFMLEvents()
   │       └─ UserInputBitset(sfml_events)    ← SFML events → bitset
   │
   ├─ 2. events::convert::ResolveInputAction()
-  │       └─ first pattern in registry that is a subset of accumulated bits
+  │       └─ first pattern in registry (map, iterated in key order) that is
+  │          a subset of accumulated bits
   │
   ├─ 3. events::CreateInputEventPacket()
   │       └─ EventPacket{UserInput, InputPayload{action}}
@@ -418,12 +419,16 @@ CMake build step.
    contains testable logic; `SFMLEventConverter.cpp` contains only ordering.
 2. **Keep steps numbered** — The numbered comments in `ConvertSFMLEvents()`
    make execution order obvious.  Update them when adding new steps.
-3. **First match wins** — The registry is evaluated in order.  Put more
-   specific patterns (more bits set) before less specific ones.
+3. **Unique patterns — map key semantics** — `InputActionRegistry` is a
+   `std::map<UserInputBitset, InputPayload::InputAction>`, so each pattern is
+   unique.  If the same bitset appears twice in the JSON the later entry
+   silently replaces the earlier one.  The same `InputAction` value can be
+   associated with many different patterns.  Iteration order is determined by
+   the `UserInputBitset::operator<` (bit-by-bit descending), not insertion
+   order.
 4. **One action per tick** — The current design resolves at most one
    `InputAction` per tick from the bitset.  If you need multiple simultaneous
-   actions, add multiple registries or change the resolve loop to return a
-   `vector`.
+   actions, change the resolve function to return a `vector`.
 5. **Null-check FlatBuffers data** — `ConfigureInputActionMapping` already
    guards against null; maintain this pattern for any new configure functions.
 6. **Unit-test free functions in isolation** — Each function in

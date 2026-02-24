@@ -8,6 +8,7 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <map>
 #include <vector>
 
 using namespace steamrot;
@@ -95,4 +96,33 @@ TEST_CASE("UserInputBitset equality operator works as expected",
 
   b.setKeyPressed(sf::Keyboard::Key::A);
   REQUIRE(a == b);
+}
+
+TEST_CASE("UserInputBitset less-than operator provides strict weak ordering",
+          "[unit][UserInputBitset]") {
+  UserInputBitset empty;
+
+  UserInputBitset with_a;
+  with_a.setKeyPressed(sf::Keyboard::Key::A);
+
+  UserInputBitset with_b;
+  with_b.setKeyPressed(sf::Keyboard::Key::B);
+
+  // Irreflexivity: a < a must be false.
+  REQUIRE_FALSE(empty < empty);
+  REQUIRE_FALSE(with_a < with_a);
+
+  // Antisymmetry: if a < b then b < a must be false.
+  if (with_a < with_b) {
+    REQUIRE_FALSE(with_b < with_a);
+  } else {
+    REQUIRE(with_b < with_a);
+  }
+
+  // Works as a map key (no compile error and correct deduplication).
+  std::map<UserInputBitset, int> m;
+  m.emplace(with_a, 1);
+  m.emplace(with_a, 2); // duplicate key — emplace does not overwrite, original retained
+  REQUIRE(m.size() == 1);
+  REQUIRE(m.at(with_a) == 1);
 }

@@ -153,6 +153,7 @@ TEST_CASE("ConfigureInputActionRegistry populates registry with one mapping",
 
   steamrot::UserInputBitset expected_pattern;
   expected_pattern.setMousePressed(sf::Mouse::Button::Left);
-  REQUIRE(registry[0].first == expected_pattern);
-  REQUIRE(registry[0].second == steamrot::InputPayload::InputAction::SELECT);
+  REQUIRE(registry.count(expected_pattern) == 1);
+  REQUIRE(registry.at(expected_pattern) ==
+          steamrot::InputPayload::InputAction::SELECT);
 }

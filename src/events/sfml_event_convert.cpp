@@ -127,7 +127,9 @@ ConfigureInputActionRegistry(InputActionRegistry &registry,
       return std::unexpected(result.error());
     }
 
-    registry.emplace_back(bitset, action);
+    // Insert or overwrite — the map enforces unique keys, so a duplicate
+    // pattern in the JSON will silently replace the earlier entry.
+    registry.insert_or_assign(bitset, action);
   }
 
   return std::monostate{};
