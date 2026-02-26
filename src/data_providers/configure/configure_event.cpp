@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "configure_event.h"
 #include "SceneType.h"
+#include "configure_input_action.h"
 #include "event_packet_generated.h"
 #include "uuid.h"
 
@@ -41,18 +42,8 @@ ConfigureInputPayload(InputPayload &input_payload,
                  "InputPayloadFbs data is null, cannot populate InputPayload"});
   }
 
-  // populate fields from flatbuffers data
-  switch (input_payload_data->action()) {
-  case InputActionFbs_SELECT:
-    input_payload.action = InputPayload::InputAction::SELECT;
-    break;
-  default:
-    return std::unexpected(
-        FailInfo{FailMode::NonExistentEnumValue,
-                 "Unknown InputActionFbs value in flatbuffers data"});
-  }
-
-  return std::monostate{};
+  return ConfigureInputAction(input_payload.action,
+                              input_payload_data->action());
 }
 
 /////////////////////////////////////////////////

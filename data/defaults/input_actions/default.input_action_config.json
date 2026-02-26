@@ -1,0 +1,8 @@
+{
+  "mappings": [
+    {
+      "mouse_pressed": ["LEFT_CLICK"],
+      "action": "SELECT"
+    }
+  ]
+}

@@ -35,11 +35,11 @@ TEST_CASE("FlatbuffersSceneManagerDataProvider::CreateSceneManagerData loads "
   const auto &state = data.scene_manager_state;
   REQUIRE(state.subscriptions.size() == 1);
   REQUIRE(state.subscriptions[0] != nullptr);
-  REQUIRE(state.subscriptions[0]->filter_payload.has_value());
+
   REQUIRE(std::holds_alternative<steamrot::ScenePayload>(
-      state.subscriptions[0]->filter_payload.value()));
-  steamrot::ScenePayload filter_payload = std::get<steamrot::ScenePayload>(
-      state.subscriptions[0]->filter_payload.value());
+      state.subscriptions[0]->filter_payload));
+  steamrot::ScenePayload filter_payload =
+      std::get<steamrot::ScenePayload>(state.subscriptions[0]->filter_payload);
   REQUIRE(filter_payload.action == steamrot::ScenePayload::SceneAction::CHANGE);
 }
 
@@ -55,11 +55,9 @@ TEST_CASE("FlatbuffersSceneManagerDataProvider::ConfigureSceneManagerData "
   REQUIRE(data.scene_manager_state.subscriptions.size() == 1);
   REQUIRE(data.scene_manager_state.subscriptions[0] != nullptr);
 
-  REQUIRE(
-      data.scene_manager_state.subscriptions[0]->filter_payload.has_value());
   REQUIRE(std::holds_alternative<steamrot::ScenePayload>(
-      data.scene_manager_state.subscriptions[0]->filter_payload.value()));
+      data.scene_manager_state.subscriptions[0]->filter_payload));
   steamrot::ScenePayload filter_payload = std::get<steamrot::ScenePayload>(
-      data.scene_manager_state.subscriptions[0]->filter_payload.value());
+      data.scene_manager_state.subscriptions[0]->filter_payload);
   REQUIRE(filter_payload.action == steamrot::ScenePayload::SceneAction::CHANGE);
 }

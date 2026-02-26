@@ -14,7 +14,9 @@
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
+#include <algorithm>
 #include <bitset>
+#include <functional>
 #include <vector>
 
 namespace steamrot {
@@ -79,3 +81,28 @@ struct UserInputBitset : public std::bitset<kTotalBits> {
 };
 
 } // namespace steamrot
+
+/////////////////////////////////////////////////
+/// std::hash specialisation so UserInputBitset can be used as an
+/// unordered_map key.  kTotalBits exceeds 64 so to_ulong() is unavailable;
+/// bits are folded into 64-bit words and combined with boost-style mixing to
+/// avoid any heap allocation.
+/////////////////////////////////////////////////
+template <> struct std::hash<steamrot::UserInputBitset> {
+  size_t operator()(const steamrot::UserInputBitset &b) const noexcept {
+    size_t seed = 0;
+    // Process kTotalBits in 64-bit chunks.
+    for (size_t i = 0; i < steamrot::kTotalBits; i += 64) {
+      size_t word = 0;
+      const size_t end = std::min(i + 64, steamrot::kTotalBits);
+      for (size_t j = i; j < end; ++j) {
+        if (b.test(j)) {
+          word |= (size_t{1} << (j - i));
+        }
+      }
+      // Boost-style hash_combine mixing.
+      seed ^= word + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    }
+    return seed;
+  }
+};

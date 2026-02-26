@@ -10,6 +10,8 @@
 #include "EventPacket.h"
 #include "EventType.h"
 #include "FailInfo.h"
+#include "InputActionRegistry.h"
+#include "SFMLEventConverter.h"
 #include "Subscriber.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <expected>
@@ -47,6 +49,14 @@ private:
       m_subscriber_register;
 
   /////////////////////////////////////////////////
+  /// @brief Coordinates and converts SFML events into EventPackets.
+  ///
+  /// Holds the input-action registry and waiting-room bitset.
+  /// Configured at startup via Configure().
+  /////////////////////////////////////////////////
+  SFMLEventConverter m_sfml_event_converter;
+
+  /////////////////////////////////////////////////
   /// @brief Wrapper function to specifally to add to the global event bus.
   ///
   /// @param events Vector of events to be added to the global event bus.
@@ -58,6 +68,16 @@ public:
   /// @brief default constructor
   /////////////////////////////////////////////////
   EventHandler() = default;
+
+  /////////////////////////////////////////////////
+  /// @brief Set the input-action registry on the SFMLEventConverter.
+  ///
+  /// The registry is built externally (by IInputActionConfigProvider) and
+  /// moved in via RAII. Must be called at startup before the first tick.
+  ///
+  /// @param registry Populated InputActionRegistry to take ownership of.
+  /////////////////////////////////////////////////
+  void SetInputActionRegistry(InputActionRegistry &&registry);
 
   /////////////////////////////////////////////////
   /// @brief store a subscriber in the event handler.
@@ -116,6 +136,19 @@ public:
   /////////////////////////////////////////////////
   const std::unordered_map<EventType, std::vector<std::weak_ptr<Subscriber>>> &
   GetSubcriberRegister() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Convert a tick's SFML events into EventPackets and add them
+  /// to the waiting-room event bus.
+  ///
+  /// This wrapper makes the ordering of SFML-to-engine conversion very
+  /// visible relative to other EventHandler operations.  All conversion
+  /// logic is delegated to SFMLEventConverter.
+  ///
+  /// @param sfml_events SFML events gathered this tick.
+  /////////////////////////////////////////////////
+  void ConvertSFMLEventsToEventPackets(
+      const std::vector<sf::Event> &sfml_events);
 
   void ExecuteEventHandlerLevelLogic(sf::RenderWindow &window);
 };

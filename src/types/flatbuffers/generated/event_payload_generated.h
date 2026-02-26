@@ -304,13 +304,9 @@ inline ::flatbuffers::Offset<InputPayloadFbs> CreateInputPayloadFbs(
 struct UIPayloadFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef UIPayloadFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_C_USER_INTERFACE_NAME = 4,
-    VT_C_UI_STATE_NAME = 6,
-    VT_ACTION = 8
+    VT_C_UI_STATE_NAME = 4,
+    VT_ACTION = 6
   };
-  const ::flatbuffers::String *c_user_interface_name() const {
-    return GetPointer<const ::flatbuffers::String *>(VT_C_USER_INTERFACE_NAME);
-  }
   const ::flatbuffers::String *c_ui_state_name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_C_UI_STATE_NAME);
   }
@@ -319,8 +315,6 @@ struct UIPayloadFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_C_USER_INTERFACE_NAME) &&
-           verifier.VerifyString(c_user_interface_name()) &&
            VerifyOffset(verifier, VT_C_UI_STATE_NAME) &&
            verifier.VerifyString(c_ui_state_name()) &&
            VerifyField<int8_t>(verifier, VT_ACTION, 1) &&
@@ -332,9 +326,6 @@ struct UIPayloadFbsBuilder {
   typedef UIPayloadFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_c_user_interface_name(::flatbuffers::Offset<::flatbuffers::String> c_user_interface_name) {
-    fbb_.AddOffset(UIPayloadFbs::VT_C_USER_INTERFACE_NAME, c_user_interface_name);
-  }
   void add_c_ui_state_name(::flatbuffers::Offset<::flatbuffers::String> c_ui_state_name) {
     fbb_.AddOffset(UIPayloadFbs::VT_C_UI_STATE_NAME, c_ui_state_name);
   }
@@ -354,26 +345,21 @@ struct UIPayloadFbsBuilder {
 
 inline ::flatbuffers::Offset<UIPayloadFbs> CreateUIPayloadFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::String> c_user_interface_name = 0,
     ::flatbuffers::Offset<::flatbuffers::String> c_ui_state_name = 0,
     steamrot::UIActionFbs action = steamrot::UIActionFbs_TOGGLE) {
   UIPayloadFbsBuilder builder_(_fbb);
   builder_.add_c_ui_state_name(c_ui_state_name);
-  builder_.add_c_user_interface_name(c_user_interface_name);
   builder_.add_action(action);
   return builder_.Finish();
 }
 
 inline ::flatbuffers::Offset<UIPayloadFbs> CreateUIPayloadFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const char *c_user_interface_name = nullptr,
     const char *c_ui_state_name = nullptr,
     steamrot::UIActionFbs action = steamrot::UIActionFbs_TOGGLE) {
-  auto c_user_interface_name__ = c_user_interface_name ? _fbb.CreateString(c_user_interface_name) : 0;
   auto c_ui_state_name__ = c_ui_state_name ? _fbb.CreateString(c_ui_state_name) : 0;
   return steamrot::CreateUIPayloadFbs(
       _fbb,
-      c_user_interface_name__,
       c_ui_state_name__,
       action);
 }

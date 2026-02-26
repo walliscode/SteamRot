@@ -56,7 +56,6 @@ table InputPayloadFbs {
 /// UI payload data
 ////////////////////////////////////////////////////////////
 table UIPayloadFbs {
-  c_user_interface_name: string;
   c_ui_state_name: string;
   action: UIActionFbs;
 }

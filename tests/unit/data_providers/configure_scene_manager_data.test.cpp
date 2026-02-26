@@ -9,6 +9,9 @@
 #include "configure_scene_manager_data.h"
 #include "FlatbuffersDataLoader.h"
 #include "SceneManagerState.h"
+#include "event_payload_generated.h"
+#include "scene_types_generated.h"
+#include "subscriber_generated.h"
 #include <catch2/catch_test_macros.hpp>
 
 /////////////////////////////////////////////////
@@ -77,13 +80,20 @@ TEST_CASE("ConfigureSceneManagerState handles multiple subscriptions",
 
   std::vector<flatbuffers::Offset<steamrot::SubscriberFbs>> subscribers;
 
+  auto payload_one =
+      steamrot::CreateScenePayloadFbs(builder, steamrot::SceneTypeFbs_CRAFTING,
+                                      steamrot::SceneActionFbs_CHANGE);
+
   auto subscriber1 = steamrot::CreateSubscriberFbs(
       builder, steamrot::EventTypeFbs_SCENE,
-      steamrot::EventPayloadFbs_ScenePayloadFbs, 0);
+      steamrot::EventPayloadFbs_ScenePayloadFbs, payload_one.Union());
+
+  auto payload_two =
+      steamrot::CreateSystemPayloadFbs(builder, steamrot::SystemActionFbs_QUIT);
 
   auto subscriber2 = steamrot::CreateSubscriberFbs(
       builder, steamrot::EventTypeFbs_SYSTEM,
-      steamrot::EventPayloadFbs_SystemPayloadFbs, 0);
+      steamrot::EventPayloadFbs_SystemPayloadFbs, payload_two.Union());
 
   subscribers.push_back(subscriber1);
   subscribers.push_back(subscriber2);

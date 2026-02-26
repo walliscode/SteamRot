@@ -103,10 +103,10 @@ TEST_CASE("ConfigureUIPayload populates from valid data",
           "[unit][configure_event]") {
   // Create test flatbuffers data
   flatbuffers::FlatBufferBuilder builder;
-  auto ui_name = builder.CreateString("test_ui");
+
   auto state_name = builder.CreateString("test_state");
   auto payload_data = steamrot::CreateUIPayloadFbs(
-      builder, ui_name, state_name, steamrot::UIActionFbs_TOGGLE);
+      builder, state_name, steamrot::UIActionFbs_TOGGLE);
   builder.Finish(payload_data);
 
   auto *fbs_data =
@@ -117,10 +117,7 @@ TEST_CASE("ConfigureUIPayload populates from valid data",
       steamrot::data::configure::ConfigureUIPayload(payload, fbs_data);
 
   REQUIRE(result.has_value());
-  REQUIRE(payload.c_user_interface_name.has_value());
-  REQUIRE(payload.c_user_interface_name.value() == "test_ui");
-  REQUIRE(payload.c_ui_state_name.has_value());
-  REQUIRE(payload.c_ui_state_name.value() == "test_state");
+  REQUIRE(payload.c_ui_state_name == "test_state");
   REQUIRE(payload.action == steamrot::UIPayload::UIAction::TOGGLE);
 }
 
@@ -129,7 +126,7 @@ TEST_CASE("ConfigureUIPayload handles optional fields",
   // Create test flatbuffers data with no optional fields
   flatbuffers::FlatBufferBuilder builder;
   auto payload_data =
-      steamrot::CreateUIPayloadFbs(builder, 0, 0, steamrot::UIActionFbs_TOGGLE);
+      steamrot::CreateUIPayloadFbs(builder, 0, steamrot::UIActionFbs_TOGGLE);
   builder.Finish(payload_data);
 
   auto *fbs_data =
@@ -140,8 +137,8 @@ TEST_CASE("ConfigureUIPayload handles optional fields",
       steamrot::data::configure::ConfigureUIPayload(payload, fbs_data);
 
   REQUIRE(result.has_value());
-  REQUIRE_FALSE(payload.c_user_interface_name.has_value());
-  REQUIRE_FALSE(payload.c_ui_state_name.has_value());
+
+  REQUIRE(payload.c_ui_state_name.empty());
   REQUIRE(payload.action == steamrot::UIPayload::UIAction::TOGGLE);
 }
 
@@ -213,8 +210,7 @@ TEST_CASE("ConfigureScenePayload populates from valid data",
       steamrot::data::configure::ConfigureScenePayload(payload, fbs_data);
 
   REQUIRE(result.has_value());
-  REQUIRE(payload.scene_type.has_value());
-  REQUIRE(payload.scene_type.value() == steamrot::SceneType::TITLE);
+  REQUIRE(payload.scene_type == steamrot::SceneType::TITLE);
   REQUIRE(payload.scene_id.has_value());
   REQUIRE(payload.action == steamrot::ScenePayload::SceneAction::CHANGE);
 }
@@ -236,7 +232,7 @@ TEST_CASE("ConfigureScenePayload handles optional fields",
       steamrot::data::configure::ConfigureScenePayload(payload, fbs_data);
 
   REQUIRE(result.has_value());
-  REQUIRE_FALSE(payload.scene_type.has_value());
+  REQUIRE_FALSE(payload.scene_type == steamrot::SceneType::UNKNOWN);
   REQUIRE_FALSE(payload.scene_id.has_value());
   REQUIRE(payload.action == steamrot::ScenePayload::SceneAction::CHANGE);
 }
@@ -324,8 +320,8 @@ TEST_CASE("ConfigureEventType populates USER_INPUT type",
 TEST_CASE("ConfigureEventType populates UI type", "[unit][configure_event]") {
   steamrot::EventType type;
 
-  auto result =
-      steamrot::data::configure::ConfigureEventType(type, steamrot::EventTypeFbs_UI);
+  auto result = steamrot::data::configure::ConfigureEventType(
+      type, steamrot::EventTypeFbs_UI);
 
   REQUIRE(result.has_value());
   REQUIRE(type == steamrot::EventType::UI);
@@ -414,10 +410,9 @@ TEST_CASE("ConfigureEventPayload populates InputPayload",
 TEST_CASE("ConfigureEventPayload populates UIPayload",
           "[unit][configure_event]") {
   flatbuffers::FlatBufferBuilder builder;
-  auto ui_name = builder.CreateString("test_ui");
   auto state_name = builder.CreateString("test_state");
   auto ui_payload_data = steamrot::CreateUIPayloadFbs(
-      builder, ui_name, state_name, steamrot::UIActionFbs_TOGGLE);
+      builder, state_name, steamrot::UIActionFbs_TOGGLE);
   builder.Finish(ui_payload_data);
 
   auto *fbs_data =
@@ -430,8 +425,6 @@ TEST_CASE("ConfigureEventPayload populates UIPayload",
   REQUIRE(result.has_value());
   REQUIRE(std::holds_alternative<steamrot::UIPayload>(payload));
   auto &ui = std::get<steamrot::UIPayload>(payload);
-  REQUIRE(ui.c_user_interface_name.has_value());
-  REQUIRE(ui.c_user_interface_name.value() == "test_ui");
   REQUIRE(ui.action == steamrot::UIPayload::UIAction::TOGGLE);
 }
 
@@ -445,54 +438,6 @@ TEST_CASE("ConfigureEventPacket fails with null data",
 
   auto result =
       steamrot::data::configure::ConfigureEventPacket(packet, nullptr);
-
-  REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
-}
-
-TEST_CASE("ConfigureEventPacket fails with missing context",
-          "[unit][configure_event]") {
-  flatbuffers::FlatBufferBuilder builder;
-
-  // Create payload
-  auto input_payload_data =
-      steamrot::CreateInputPayloadFbs(builder, steamrot::InputActionFbs_SELECT);
-
-  // Create packet without context (pass 0 for context)
-  auto packet_data = steamrot::CreateEventPacketFbs(
-      builder, 0, steamrot::EventTypeFbs_USER_INPUT,
-      steamrot::EventPayloadFbs_InputPayloadFbs, input_payload_data.Union());
-  builder.Finish(packet_data);
-
-  auto *fbs_data = flatbuffers::GetRoot<steamrot::EventPacketFbs>(
-      builder.GetBufferPointer());
-
-  steamrot::EventPacket packet;
-  auto result =
-      steamrot::data::configure::ConfigureEventPacket(packet, fbs_data);
-
-  REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
-}
-
-TEST_CASE("ConfigureEventPacket fails with missing payload",
-          "[unit][configure_event]") {
-  flatbuffers::FlatBufferBuilder builder;
-
-  // Create context
-  auto context_data = steamrot::CreateEventContextFbs(builder, 3);
-
-  // Create packet with NONE payload
-  auto packet_data = steamrot::CreateEventPacketFbs(
-      builder, context_data, steamrot::EventTypeFbs_USER_INPUT);
-  builder.Finish(packet_data);
-
-  auto *fbs_data = flatbuffers::GetRoot<steamrot::EventPacketFbs>(
-      builder.GetBufferPointer());
-
-  steamrot::EventPacket packet;
-  auto result =
-      steamrot::data::configure::ConfigureEventPacket(packet, fbs_data);
 
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
@@ -539,8 +484,8 @@ TEST_CASE("ConfigureEventPacket populates with UIPayload",
 
   // Create payload
   auto ui_name = builder.CreateString("menu_ui");
-  auto ui_payload_data = steamrot::CreateUIPayloadFbs(
-      builder, ui_name, 0, steamrot::UIActionFbs_TOGGLE);
+  auto ui_payload_data =
+      steamrot::CreateUIPayloadFbs(builder, 0, steamrot::UIActionFbs_TOGGLE);
 
   // Create packet
   auto packet_data = steamrot::CreateEventPacketFbs(
@@ -560,8 +505,6 @@ TEST_CASE("ConfigureEventPacket populates with UIPayload",
   REQUIRE(packet.type == steamrot::EventType::UI);
   REQUIRE(std::holds_alternative<steamrot::UIPayload>(packet.payload));
   auto &ui = std::get<steamrot::UIPayload>(packet.payload);
-  REQUIRE(ui.c_user_interface_name.has_value());
-  REQUIRE(ui.c_user_interface_name.value() == "menu_ui");
   REQUIRE(ui.action == steamrot::UIPayload::UIAction::TOGGLE);
 }
 

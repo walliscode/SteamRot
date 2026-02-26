@@ -80,6 +80,22 @@ std::expected<std::monostate, FailInfo> Engine::StartUp() {
     return std::unexpected(load_initial_assets_result.error());
   }
 
+  // Configure EventHandler input-action registry
+  auto input_action_provider_result =
+      m_engine_resources.data_access_factory.GetInputActionConfigProvider();
+  if (!input_action_provider_result) {
+    return std::unexpected(input_action_provider_result.error());
+  }
+
+  auto input_action_registry_result =
+      input_action_provider_result.value()->CreateInputActionRegistry();
+  if (!input_action_registry_result) {
+    return std::unexpected(input_action_registry_result.error());
+  }
+
+  m_engine_resources.event_handler.SetInputActionRegistry(
+      std::move(input_action_registry_result.value()));
+
   return std::monostate{};
 }
 

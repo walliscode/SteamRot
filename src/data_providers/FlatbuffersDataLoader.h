@@ -16,6 +16,7 @@
 #include "SceneType.h"
 #include "engine_data_generated.h"
 #include "fragment_generated.h"
+#include "input_action_config_generated.h"
 #include "joint_generated.h"
 #include "logic_config_generated.h"
 #include "scene_data_generated.h"
@@ -84,6 +85,15 @@ public:
   /////////////////////////////////////////////////
   std::expected<std::vector<const JointFbs *>, FailInfo>
   ProvideAllJointData() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Provides default InputActionConfigFbs from binary file.
+  ///
+  /// Loads the default input-action mappings used to configure the
+  /// SFMLEventConverter registry.
+  /////////////////////////////////////////////////
+  std::expected<const InputActionConfigFbs *, FailInfo>
+  ProvideDefaultInputActionConfigFbs() const;
 };
 
 } // namespace steamrot

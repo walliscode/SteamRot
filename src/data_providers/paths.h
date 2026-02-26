@@ -187,6 +187,15 @@ inline std::filesystem::path GetDefaultSceneManagerDirectory() {
 }
 
 /////////////////////////////////////////////////
+/// @brief Provides the path to the default input actions directory.
+///
+/// @return std::filesystem::path
+/////////////////////////////////////////////////
+inline std::filesystem::path GetDefaultInputActionsDirectory() {
+  return GetDefaultsDirectory() / "input_actions";
+}
+
+/////////////////////////////////////////////////
 /// @brief Provides the path to the default asset manager directory.
 ///
 /// @return std::filesystem::path
