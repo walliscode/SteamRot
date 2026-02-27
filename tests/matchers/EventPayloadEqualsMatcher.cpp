@@ -78,6 +78,21 @@ bool EventPayloadEqualsMatcher::match(const EventPayload &actual) const {
     const auto &actual_payload = std::get<UIPayload>(actual);
     const auto &expected_payload = std::get<UIPayload>(m_expected);
 
+    // Compare c_user_interface_name
+    if (actual_payload.c_user_interface_name !=
+        expected_payload.c_user_interface_name) {
+      oss << conmat::Indent(1) << conmat::TestFailed()
+          << "UIPayload c_user_interface_name differs:" << "\n";
+      oss << conmat::Indent(2) << "actual: "
+          << conmat::Colorize(actual_payload.c_user_interface_name,
+                              conmat::Color::Red)
+          << "\n";
+      oss << conmat::Indent(2) << "expected: "
+          << conmat::Colorize(expected_payload.c_user_interface_name,
+                              conmat::Color::Blue)
+          << "\n";
+    }
+
     // Compare c_ui_state_name
     if (actual_payload.c_ui_state_name != expected_payload.c_ui_state_name) {
 
@@ -135,9 +150,6 @@ bool EventPayloadEqualsMatcher::match(const EventPayload &actual) const {
 
     if (!actual_opt && !expected_opt) {
       // Both are disengaged (nullopt): considered equal, nothing to report
-      oss << "ScenePayload scene_type is not set in both actual and expected, "
-             "considered equal."
-          << "\n";
     } else if (actual_opt && expected_opt) {
       // Both are engaged, compare values
       if (actual_opt.value() != expected_opt.value()) {
@@ -165,30 +177,32 @@ bool EventPayloadEqualsMatcher::match(const EventPayload &actual) const {
     }
 
     // Compare scene_id
-    if (actual_payload.optional_scene_id.has_value() !=
-        expected_payload.optional_scene_id.has_value()) {
+    const auto &actual_id_opt = actual_payload.optional_scene_id;
+    const auto &expected_id_opt = expected_payload.optional_scene_id;
+
+    if (!actual_id_opt && !expected_id_opt) {
+      // Both are disengaged (nullopt): considered equal, nothing to report
+    } else if (actual_id_opt && expected_id_opt) {
+      // Both are engaged, compare values
+      if (actual_id_opt.value() != expected_id_opt.value()) {
+        oss << conmat::Indent(1) << conmat::TestFailed()
+            << "ScenePayload scene_id differs:" << "\n";
+        oss << conmat::Indent(2) << "actual: "
+            << conmat::Colorize(actual_id_opt.value(), conmat::Color::Red)
+            << "\n";
+        oss << conmat::Indent(2) << "expected: "
+            << conmat::Colorize(expected_id_opt.value(), conmat::Color::Blue)
+            << "\n";
+      }
+    } else {
+      // One is engaged, one is not
       oss << conmat::Indent(1) << conmat::TestFailed()
           << "ScenePayload scene_id presence differs:" << "\n";
       oss << conmat::Indent(2) << "actual has value: "
-          << conmat::Colorize(actual_payload.optional_scene_id.has_value(),
-                              conmat::Color::Red)
+          << conmat::Colorize(actual_id_opt.has_value(), conmat::Color::Red)
           << "\n";
       oss << conmat::Indent(2) << "expected has value: "
-          << conmat::Colorize(expected_payload.optional_scene_id.has_value(),
-                              conmat::Color::Blue)
-          << "\n";
-    } else if (actual_payload.optional_scene_id.has_value() &&
-               actual_payload.optional_scene_id.value() !=
-                   expected_payload.optional_scene_id.value()) {
-      oss << conmat::Indent(1) << conmat::TestFailed()
-          << "ScenePayload scene_id differs:" << "\n";
-      oss << conmat::Indent(2) << "actual: "
-          << conmat::Colorize(actual_payload.optional_scene_id.value(),
-                              conmat::Color::Red)
-          << "\n";
-      oss << conmat::Indent(2) << "expected: "
-          << conmat::Colorize(expected_payload.optional_scene_id.value(),
-                              conmat::Color::Blue)
+          << conmat::Colorize(expected_id_opt.has_value(), conmat::Color::Blue)
           << "\n";
     }
 
