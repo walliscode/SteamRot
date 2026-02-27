@@ -162,7 +162,7 @@ struct ScenePayload {
   /////////////////////////////////////////////////
   /// @brief SceneType enum provides the type of the Scene being targeted
   /////////////////////////////////////////////////
-  SceneType scene_type{SceneType::UNKNOWN};
+  std::optional<SceneType> scene_type{SceneType::UNKNOWN};
 
   /////////////////////////////////////////////////
   /// @brief Provides the unique identifier for the Scene being targeted
@@ -196,7 +196,7 @@ struct SystemPayload {
   SystemPayload(const SystemPayload::SystemAction action) : action(action) {}
 };
 
-using EventPayload = std::variant<InputPayload, UIPayload, LogicPayload,
-                                  ScenePayload, SystemPayload>;
+using EventPayload = std::variant<std::monostate, InputPayload, UIPayload,
+                                  LogicPayload, ScenePayload, SystemPayload>;
 
 } // namespace steamrot

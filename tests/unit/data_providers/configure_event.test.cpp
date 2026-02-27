@@ -220,8 +220,8 @@ TEST_CASE("ConfigureScenePayload handles optional fields",
   // Create test flatbuffers data with no optional fields
   flatbuffers::FlatBufferBuilder builder;
   auto payload_data =
-      steamrot::CreateScenePayloadFbs(builder, steamrot::SceneTypeFbs_UNKNOWN,
-                                      0, steamrot::SceneActionFbs_CHANGE);
+      steamrot::CreateScenePayloadFbs(builder, steamrot::SceneTypeFbs_TITLE, 0,
+                                      steamrot::SceneActionFbs_CHANGE);
   builder.Finish(payload_data);
 
   auto *fbs_data = flatbuffers::GetRoot<steamrot::ScenePayloadFbs>(

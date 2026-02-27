@@ -125,8 +125,11 @@ ConfigureScenePayload(ScenePayload &scene_payload,
       scene_payload.scene_type = SceneType::CRAFTING;
       break;
     case SceneTypeFbs_UNKNOWN:
-      // Already handled above, but included for completeness
-      break;
+      return std::unexpected(
+          FailInfo{FailMode::MissingData,
+                   "ScenePayloadFbs scene_type is UNKNOWN, cannot populate "
+                   "ScenePayload.scene_type"});
+
     default:
       return std::unexpected(
           FailInfo{FailMode::NonExistentEnumValue,
