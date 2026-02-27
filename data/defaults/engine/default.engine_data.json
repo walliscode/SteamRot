@@ -23,7 +23,9 @@
     "paused": false,
     "subscriptions": [
       {
-        "event_type": "SYSTEM"
+        "event_type": "SYSTEM",
+        "filter_payload_type": "SystemPayloadFbs",
+        "filter_payload": { "action": "QUIT" }
       }
     ],
     "quit_requested": false

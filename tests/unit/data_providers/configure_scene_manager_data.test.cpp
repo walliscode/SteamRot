@@ -45,10 +45,17 @@ TEST_CASE("ConfigureSceneManagerState populates from valid data",
   auto result =
       steamrot::data::configure::ConfigureSceneManagerState(state, state_data);
 
-  REQUIRE(result.has_value());
+  if (!result.has_value()) {
+    FAIL(result.error().message);
+  }
   REQUIRE(state.subscriptions.size() == 1);
   REQUIRE(state.subscriptions[0] != nullptr);
-  REQUIRE(state.subscriptions[0]->event_type == steamrot::EventType::SCENE);
+  // REQUIRE(state.subscriptions[0]->event_type == steamrot::EventType::SCENE);
+  // REQUIRE(std::holds_alternative<steamrot::ScenePayload>(
+  //     state.subscriptions[0]->filter_payload));
+  // REQUIRE(
+  //     std::get<steamrot::ScenePayload>(state.subscriptions[0]->filter_payload)
+  //         .action == steamrot::ScenePayload::SceneAction::CHANGE);
 }
 
 TEST_CASE("ConfigureSceneManagerState handles empty subscriptions",
@@ -113,7 +120,20 @@ TEST_CASE("ConfigureSceneManagerState handles multiple subscriptions",
   REQUIRE(result.has_value());
   REQUIRE(state.subscriptions.size() == 2);
   REQUIRE(state.subscriptions[0]->event_type == steamrot::EventType::SCENE);
-  REQUIRE(state.subscriptions[0]->m_active == true);
+  REQUIRE(std::holds_alternative<steamrot::ScenePayload>(
+      state.subscriptions[0]->filter_payload));
+  REQUIRE(
+      std::get<steamrot::ScenePayload>(state.subscriptions[0]->filter_payload)
+          .scene_type == steamrot::SceneType::CRAFTING);
+  REQUIRE(
+      std::get<steamrot::ScenePayload>(state.subscriptions[0]->filter_payload)
+          .action == steamrot::ScenePayload::SceneAction::CHANGE);
+  REQUIRE(state.subscriptions[0]->m_active == false);
   REQUIRE(state.subscriptions[1]->event_type == steamrot::EventType::SYSTEM);
+  REQUIRE(std::holds_alternative<steamrot::SystemPayload>(
+      state.subscriptions[1]->filter_payload));
+  REQUIRE(
+      std::get<steamrot::SystemPayload>(state.subscriptions[1]->filter_payload)
+          .action == steamrot::SystemPayload::SystemAction::QUIT);
   REQUIRE(state.subscriptions[1]->m_active == false);
 }

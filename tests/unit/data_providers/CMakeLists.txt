@@ -29,12 +29,14 @@ add_executable(test_data_providers
   configure_save_data.test.cpp
   configure_scene_data.test.cpp
   configure_scene_manager_data.test.cpp
+  configure_subscriber.test.cpp
   configure_ui_styles.test.cpp
   configure_ui_elements.test.cpp
   configure_grimoire.test.cpp
   configure_logic_config.test.cpp
   configure_input_action.test.cpp
 )
+
 
 
 target_link_libraries(test_data_providers
@@ -45,6 +47,19 @@ target_link_libraries(test_data_providers
   events
   context_test_helpers
 )
+
+# # for isolating tests before moving them to the main test target
+# add_executable(test_single_data_provider
+# configure_subscriber.test.cpp
+# )
+# target_link_libraries(test_single_data_provider
+#   PRIVATE
+#   Catch2::Catch2WithMain
+#   data_providers
+#   types
+#   events
+#   context_test_helpers
+# )
 
 # Ensure test data is compiled before building tests
 add_dependencies(test_data_providers compile_ui_element_unit_test_data)

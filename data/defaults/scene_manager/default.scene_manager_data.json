@@ -1,5 +1,11 @@
 {
   "state": {
-    "subscriptions": [{ "event_type": "SCENE" }]
+    "subscriptions": [
+      {
+        "event_type": "SCENE",
+        "filter_payload_type": "ScenePayloadFbs",
+        "filter_payload": { "action": "CHANGE" }
+      }
+    ]
   }
 }

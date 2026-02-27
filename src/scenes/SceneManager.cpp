@@ -252,8 +252,14 @@ std::expected<std::monostate, FailInfo> SceneManager::ProcessSubscriptions() {
           // scene of that type
           if (!scene_payload_data.scene_id.has_value()) {
 
+            if (!scene_payload_data.scene_type.has_value() ||
+                scene_payload_data.scene_type.value() == SceneType::UNKNOWN) {
+              return std::unexpected(
+                  FailInfo{FailMode::MissingData,
+                           "Scene change event missing valid SceneType"});
+            }
             // switch on the SceneType
-            switch (scene_payload_data.scene_type) {
+            switch (scene_payload_data.scene_type.value()) {
               // deal with Title Scene Loading
             case SceneType::TITLE: {
               auto load_scene_result = LoadTitleScene();
