@@ -91,8 +91,7 @@ TEST_CASE("CreateLogicEventPacket: Creates valid EventPacket with "
   const auto toggle_name =
       steamrot::LogicPayload::LogicToggle::INITIATE_MACHINA_FORM_SCAFFOLD;
 
-  auto result =
-      steamrot::events::CreateLogicEventPacket(lifetime, toggle_name);
+  auto result = steamrot::events::CreateLogicEventPacket(lifetime, toggle_name);
 
   REQUIRE(result.has_value());
   const auto &packet = result.value();
@@ -112,8 +111,7 @@ TEST_CASE(
   const auto toggle_name =
       steamrot::LogicPayload::LogicToggle::CLEAR_MACHINA_FORM_SCAFFOLD;
 
-  auto result =
-      steamrot::events::CreateLogicEventPacket(lifetime, toggle_name);
+  auto result = steamrot::events::CreateLogicEventPacket(lifetime, toggle_name);
 
   REQUIRE(result.has_value());
   const auto &packet = result.value();
@@ -127,8 +125,7 @@ TEST_CASE("CreateLogicEventPacket: Creates packet with NONE toggle",
   const uint8_t lifetime = 1;
   const auto toggle_name = steamrot::LogicPayload::LogicToggle::NONE;
 
-  auto result =
-      steamrot::events::CreateLogicEventPacket(lifetime, toggle_name);
+  auto result = steamrot::events::CreateLogicEventPacket(lifetime, toggle_name);
 
   REQUIRE(result.has_value());
   const auto &packet = result.value();
@@ -137,10 +134,9 @@ TEST_CASE("CreateLogicEventPacket: Creates packet with NONE toggle",
   REQUIRE(payload.toggle_name == toggle_name);
 }
 
-TEST_CASE(
-    "CreateSceneEventPacket: Creates valid EventPacket with ScenePayload "
-    "(without scene_id)",
-    "[unit][events][event_factory]") {
+TEST_CASE("CreateSceneEventPacket: Creates valid EventPacket with ScenePayload "
+          "(without scene_id)",
+          "[unit][events][event_factory]") {
   const uint8_t lifetime = 4;
   const auto action = steamrot::ScenePayload::SceneAction::CHANGE;
   const auto scene_type = steamrot::SceneType::TITLE;
@@ -157,14 +153,13 @@ TEST_CASE(
 
   const auto &payload = std::get<steamrot::ScenePayload>(packet.payload);
   REQUIRE(payload.action == action);
-  REQUIRE(payload.scene_type == scene_type);
-  REQUIRE_FALSE(payload.scene_id.has_value());
+  REQUIRE(payload.optional_scene_type == scene_type);
+  REQUIRE_FALSE(payload.optional_scene_id.has_value());
 }
 
-TEST_CASE(
-    "CreateSceneEventPacket: Creates valid EventPacket with ScenePayload "
-    "(with scene_id)",
-    "[unit][events][event_factory]") {
+TEST_CASE("CreateSceneEventPacket: Creates valid EventPacket with ScenePayload "
+          "(with scene_id)",
+          "[unit][events][event_factory]") {
   const uint8_t lifetime = 6;
   const auto action = steamrot::ScenePayload::SceneAction::CHANGE;
   const auto scene_type = steamrot::SceneType::CRAFTING;
@@ -182,9 +177,9 @@ TEST_CASE(
 
   const auto &payload = std::get<steamrot::ScenePayload>(packet.payload);
   REQUIRE(payload.action == action);
-  REQUIRE(payload.scene_type == scene_type);
-  REQUIRE(payload.scene_id.has_value());
-  REQUIRE(payload.scene_id.value() == scene_id);
+  REQUIRE(payload.optional_scene_type == scene_type);
+  REQUIRE(payload.optional_scene_id.has_value());
+  REQUIRE(payload.optional_scene_id.value() == scene_id);
 }
 
 TEST_CASE("CreateSceneEventPacket: Creates packet with NONE action",
@@ -201,7 +196,7 @@ TEST_CASE("CreateSceneEventPacket: Creates packet with NONE action",
 
   const auto &payload = std::get<steamrot::ScenePayload>(packet.payload);
   REQUIRE(payload.action == action);
-  REQUIRE(payload.scene_type == scene_type);
+  REQUIRE(payload.optional_scene_type == scene_type);
 }
 
 TEST_CASE("CreateSystemEventPacket: Creates valid EventPacket with "
@@ -306,10 +301,8 @@ TEST_CASE("CreateRandomEventPacket: Generates valid random EventPackets",
     // Verify payload matches event type and contains valid data
     switch (packet.type) {
     case steamrot::EventType::USER_INPUT: {
-      REQUIRE(
-          std::holds_alternative<steamrot::InputPayload>(packet.payload));
-      const auto &payload =
-          std::get<steamrot::InputPayload>(packet.payload);
+      REQUIRE(std::holds_alternative<steamrot::InputPayload>(packet.payload));
+      const auto &payload = std::get<steamrot::InputPayload>(packet.payload);
       // Verify action is valid (not NONE for random generation)
       REQUIRE(payload.action != steamrot::InputPayload::InputAction::NONE);
       break;
@@ -324,33 +317,26 @@ TEST_CASE("CreateRandomEventPacket: Generates valid random EventPackets",
     }
 
     case steamrot::EventType::LOGIC: {
-      REQUIRE(
-          std::holds_alternative<steamrot::LogicPayload>(packet.payload));
-      const auto &payload =
-          std::get<steamrot::LogicPayload>(packet.payload);
+      REQUIRE(std::holds_alternative<steamrot::LogicPayload>(packet.payload));
+      const auto &payload = std::get<steamrot::LogicPayload>(packet.payload);
       // Verify toggle is valid (not NONE for random generation)
-      REQUIRE(payload.toggle_name !=
-              steamrot::LogicPayload::LogicToggle::NONE);
+      REQUIRE(payload.toggle_name != steamrot::LogicPayload::LogicToggle::NONE);
       break;
     }
 
     case steamrot::EventType::SCENE: {
-      REQUIRE(
-          std::holds_alternative<steamrot::ScenePayload>(packet.payload));
-      const auto &payload =
-          std::get<steamrot::ScenePayload>(packet.payload);
+      REQUIRE(std::holds_alternative<steamrot::ScenePayload>(packet.payload));
+      const auto &payload = std::get<steamrot::ScenePayload>(packet.payload);
       // Verify action is valid (not NONE for random generation)
       REQUIRE(payload.action != steamrot::ScenePayload::SceneAction::NONE);
       // Verify scene type is valid (not UNKNOWN for random generation)
-      REQUIRE(payload.scene_type != steamrot::SceneType::UNKNOWN);
+      REQUIRE(payload.optional_scene_type != steamrot::SceneType::UNKNOWN);
       break;
     }
 
     case steamrot::EventType::SYSTEM: {
-      REQUIRE(
-          std::holds_alternative<steamrot::SystemPayload>(packet.payload));
-      const auto &payload =
-          std::get<steamrot::SystemPayload>(packet.payload);
+      REQUIRE(std::holds_alternative<steamrot::SystemPayload>(packet.payload));
+      const auto &payload = std::get<steamrot::SystemPayload>(packet.payload);
       // Verify action is valid (not NONE for random generation)
       REQUIRE(payload.action != steamrot::SystemPayload::SystemAction::NONE);
       break;

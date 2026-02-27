@@ -144,7 +144,7 @@ struct ScenePayload {
   /////////////////////////////////////////////////
   ScenePayload(const ScenePayload::SceneAction action,
                const SceneType scene_type)
-      : action(action), scene_type(scene_type) {}
+      : action(action), optional_scene_type(scene_type) {}
 
   /////////////////////////////////////////////////
   /// @brief Constructor for ScenePayload, takes a SceneAction, a SceneType, and
@@ -157,17 +157,18 @@ struct ScenePayload {
   /////////////////////////////////////////////////
   ScenePayload(const ScenePayload::SceneAction action,
                const SceneType scene_type, const uuids::uuid scene_id)
-      : action(action), scene_type(scene_type), scene_id(scene_id) {}
+      : action(action), optional_scene_type(scene_type),
+        optional_scene_id(scene_id) {}
 
   /////////////////////////////////////////////////
   /// @brief SceneType enum provides the type of the Scene being targeted
   /////////////////////////////////////////////////
-  std::optional<SceneType> scene_type{SceneType::UNKNOWN};
+  std::optional<SceneType> optional_scene_type{SceneType::UNKNOWN};
 
   /////////////////////////////////////////////////
   /// @brief Provides the unique identifier for the Scene being targeted
   /////////////////////////////////////////////////
-  std::optional<uuids::uuid> scene_id;
+  std::optional<uuids::uuid> optional_scene_id;
 };
 
 /////////////////////////////////////////////////

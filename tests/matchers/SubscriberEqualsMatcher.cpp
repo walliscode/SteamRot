@@ -50,27 +50,11 @@ bool SubscriberEqualsMatcher::match(const Subscriber &actual) const {
   }
 
   // Compare filter_payload using EventPayload matcher
-  if (m_expected.filter_payload.has_value() &&
-      actual.filter_payload.has_value()) {
-    auto filter_payload_matcher =
-        EventPayloadEqualsMatcher(m_expected.filter_payload.value());
-    if (!filter_payload_matcher.match(actual.filter_payload.value())) {
-      oss << conmat::TestFailed() << "filter_payload differs:" << "\n";
-      oss << filter_payload_matcher.describe();
-    }
-  } else if (m_expected.filter_payload.has_value() !=
-             actual.filter_payload.has_value()) {
-    oss << conmat::TestFailed() << "filter_payload presence differs:" << "\n";
-    oss << "\t"
-        << "actual has value = "
-        << conmat::Colorize(actual.filter_payload.has_value(),
-                            conmat::Color::Red)
-        << "\n";
-    oss << "\t"
-        << "expected has value = "
-        << conmat::Colorize(m_expected.filter_payload.has_value(),
-                            conmat::Color::Blue)
-        << "\n";
+  auto filter_payload_matcher =
+      EventPayloadEqualsMatcher(m_expected.filter_payload);
+  if (!filter_payload_matcher.match(actual.filter_payload)) {
+    oss << conmat::TestFailed() << "filter_payload differs:" << "\n";
+    oss << filter_payload_matcher.describe();
   }
 
   // Compare captured_payload using EventPayload matcher
