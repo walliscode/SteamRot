@@ -15,7 +15,6 @@ target_link_libraries(events
   PRIVATE
   SFML::Graphics
   stduuid
-  logger
   types
   magic_enum
 

@@ -129,7 +129,7 @@ struct ScenePayload {
   /////////////////////////////////////////////////
   /// @brief Dictates what to do with the Scene being targeted
   /////////////////////////////////////////////////
-  enum class SceneAction { NONE, CHANGE } action;
+  enum class SceneAction { NONE, CHANGE } action{SceneAction::NONE};
 
   /////////////////////////////////////////////////
   /// @brief Default constructor for ScenePayload, sets action to NONE
