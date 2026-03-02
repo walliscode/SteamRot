@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "LogicFactory.h"
+#include "EventPayload.h"
 #include "GrimoireMachinaActionLogic.h"
 #include "GrimoireMachinaCollisionLogic.h"
 #include "GrimoireMachinaPositioningLogic.h"
@@ -216,6 +217,9 @@ TEST_CASE("LogicFactoru::ConfigureLogicObject correctly configures a TestLogic "
   // test each Subscriber
   auto subscriber_one = subscribers[0];
   REQUIRE(subscriber_one->event_type == steamrot::EventType::USER_INPUT);
-
-  REQUIRE(subscriber_one->filter_payload.has_value());
+  REQUIRE(std::holds_alternative<steamrot::InputPayload>(
+      subscriber_one->filter_payload));
+  const auto &payload =
+      std::get<steamrot::InputPayload>(subscriber_one->filter_payload);
+  REQUIRE(payload.action == steamrot::InputPayload::InputAction::SELECT);
 }

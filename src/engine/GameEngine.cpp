@@ -71,23 +71,18 @@ std::expected<std::monostate, FailInfo> GameEngine::ProcessSubscriptions() {
 
       // switch on the EventType
       switch (subscriber->event_type) {
+
         // deal with SYSTEM level events
       case EventType::SYSTEM: {
 
-        // check if any filter data
-        if (!subscriber->filter_payload.has_value()) {
-          // no value, just continue
-          continue;
-        }
-
         // check filter data is SystemPayload
         if (!std::holds_alternative<SystemPayload>(
-                subscriber->filter_payload.value())) {
+                subscriber->filter_payload)) {
           // filter data is not SystemPayload, skip
           continue;
         }
         SystemPayload &filter_data =
-            std::get<SystemPayload>(subscriber->filter_payload.value());
+            std::get<SystemPayload>(subscriber->filter_payload);
 
         // switch on the SystemAction
         switch (filter_data.action) {

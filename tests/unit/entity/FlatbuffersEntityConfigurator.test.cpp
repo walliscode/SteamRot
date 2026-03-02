@@ -644,8 +644,4 @@ TEST_CASE("Full configuration flow works correctly",
   REQUIRE(child_button.label == "Crafting Table");
   REQUIRE(child_button.subscription != nullptr);
   const steamrot::Subscriber &button_sub = *child_button.subscription;
-
-  REQUIRE(button_sub.filter_payload.has_value());
-
-  /////
 }
