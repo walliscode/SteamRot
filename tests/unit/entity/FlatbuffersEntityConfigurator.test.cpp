@@ -10,6 +10,7 @@
 #include "ButtonElement.h"
 #include "CUIState.h"
 #include "EventHandler.h"
+#include "EventPayload.h"
 #include "PanelElement.h"
 #include "SpacingAndSizing.h"
 #include "containers.h"
@@ -322,7 +323,13 @@ TEST_CASE("ConfigureSecondLayerComponents configures CUIState with subscribers",
 
   REQUIRE(subscribers.size() == 1);
   REQUIRE(subscribers[0] != nullptr);
-  REQUIRE(subscribers[0]->m_active == true);
+  REQUIRE(subscribers[0]->m_active == false);
+  // pull out filter payload and test
+  REQUIRE(std::holds_alternative<steamrot::InputPayload>(
+      subscribers[0]->filter_payload));
+  const auto &payload =
+      std::get<steamrot::InputPayload>(subscribers[0]->filter_payload);
+  REQUIRE(payload.action == steamrot::InputPayload::InputAction::SELECT);
 }
 
 TEST_CASE("ConfigureSecondLayerComponents configures CUIState with multiple "
@@ -527,7 +534,14 @@ TEST_CASE("ConfigureCUIState handles subscribers correctly",
   const auto &subscribers = ui_state_6.m_state_subscribers.at("game_running");
   REQUIRE(subscribers.size() == 1);
   REQUIRE(subscribers[0] != nullptr);
-  REQUIRE(subscribers[0]->m_active == true);
+  REQUIRE(subscribers[0]->m_active == false);
+
+  // pull out filter payload and test
+  REQUIRE(std::holds_alternative<steamrot::InputPayload>(
+      subscribers[0]->filter_payload));
+  const auto &payload =
+      std::get<steamrot::InputPayload>(subscribers[0]->filter_payload);
+  REQUIRE(payload.action == steamrot::InputPayload::InputAction::SELECT);
 }
 
 TEST_CASE("ConfigureCUIState handles multiple states in single component",
