@@ -55,7 +55,7 @@ struct UIPayload {
   /////////////////////////////////////////////////
   /// @brief The specific action being taken on the user interface
   /////////////////////////////////////////////////
-  enum class UIAction { TOGGLE } action;
+  enum class UIAction { NONE, TOGGLE } action;
 
   /////////////////////////////////////////////////
   /// @brief Default constructor for UIPayload, sets action to TOGGLE

@@ -20,15 +20,18 @@ EventPayloadEqualsMatcher::EventPayloadEqualsMatcher(
 std::string
 EventPayloadEqualsMatcher::GetNameForEventPayloadIndex(size_t index) const {
   switch (index) {
+
   case 0:
-    return "InputPayload";
+    return "None"; // std::monostate
   case 1:
-    return "UIPayload";
+    return "InputPayload";
   case 2:
-    return "LogicPayload";
+    return "UIPayload";
   case 3:
-    return "ScenePayload";
+    return "LogicPayload";
   case 4:
+    return "ScenePayload";
+  case 5:
     return "SystemPayload";
   default:
     return "Unknown";

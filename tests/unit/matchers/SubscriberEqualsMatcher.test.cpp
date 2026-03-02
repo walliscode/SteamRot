@@ -69,7 +69,7 @@ TEST_CASE("SubscriberEqualsMatcher works with filter_payload",
 
   SECTION("Matcher detects differences in filter_payload value") {
     steamrot::UIPayload different_filter{};
-    different_filter.action = steamrot::UIPayload::UIAction::TOGGLE;
+    different_filter.action = steamrot::UIPayload::UIAction::NONE;
 
     steamrot::Subscriber actual{};
     actual.event_type = steamrot::EventType::UI;
