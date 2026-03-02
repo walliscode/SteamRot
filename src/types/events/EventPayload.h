@@ -74,6 +74,11 @@ struct UIPayload {
       : action(action), c_ui_state_name(c_ui_state_name) {}
 
   /////////////////////////////////////////////////
+  /// @brief The name of the CUserInterface component being targeted
+  /////////////////////////////////////////////////
+  std::string c_user_interface_name{};
+
+  /////////////////////////////////////////////////
   /// @brief The name of the user interface state being targeted
   /////////////////////////////////////////////////
   std::string c_ui_state_name;
