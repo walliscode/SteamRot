@@ -20,15 +20,18 @@ EventPayloadEqualsMatcher::EventPayloadEqualsMatcher(
 std::string
 EventPayloadEqualsMatcher::GetNameForEventPayloadIndex(size_t index) const {
   switch (index) {
+
   case 0:
-    return "InputPayload";
+    return "None"; // std::monostate
   case 1:
-    return "UIPayload";
+    return "InputPayload";
   case 2:
-    return "LogicPayload";
+    return "UIPayload";
   case 3:
-    return "ScenePayload";
+    return "LogicPayload";
   case 4:
+    return "ScenePayload";
+  case 5:
     return "SystemPayload";
   default:
     return "Unknown";
@@ -77,6 +80,21 @@ bool EventPayloadEqualsMatcher::match(const EventPayload &actual) const {
   } else if (std::holds_alternative<UIPayload>(actual)) {
     const auto &actual_payload = std::get<UIPayload>(actual);
     const auto &expected_payload = std::get<UIPayload>(m_expected);
+
+    // Compare c_user_interface_name
+    if (actual_payload.c_user_interface_name !=
+        expected_payload.c_user_interface_name) {
+      oss << conmat::Indent(1) << conmat::TestFailed()
+          << "UIPayload c_user_interface_name differs:" << "\n";
+      oss << conmat::Indent(2) << "actual: "
+          << conmat::Colorize(actual_payload.c_user_interface_name,
+                              conmat::Color::Red)
+          << "\n";
+      oss << conmat::Indent(2) << "expected: "
+          << conmat::Colorize(expected_payload.c_user_interface_name,
+                              conmat::Color::Blue)
+          << "\n";
+    }
 
     // Compare c_ui_state_name
     if (actual_payload.c_ui_state_name != expected_payload.c_ui_state_name) {
@@ -128,46 +146,66 @@ bool EventPayloadEqualsMatcher::match(const EventPayload &actual) const {
     const auto &actual_payload = std::get<ScenePayload>(actual);
     const auto &expected_payload = std::get<ScenePayload>(m_expected);
 
-    // Compare scene_type
-    if (actual_payload.scene_type != expected_payload.scene_type) {
+    // Compare scene_type (handle all three states: both disengaged, both
+    // engaged, one engaged)
+    const auto &actual_opt = actual_payload.optional_scene_type;
+    const auto &expected_opt = expected_payload.optional_scene_type;
+
+    if (!actual_opt && !expected_opt) {
+      // Both are disengaged (nullopt): considered equal, nothing to report
+    } else if (actual_opt && expected_opt) {
+      // Both are engaged, compare values
+      if (actual_opt.value() != expected_opt.value()) {
+        oss << conmat::Indent(1) << conmat::TestFailed()
+            << "ScenePayload scene_type differs:" << "\n";
+        oss << conmat::Indent(2) << "actual: "
+            << conmat::Colorize(magic_enum::enum_name(actual_opt.value()),
+                                conmat::Color::Red)
+            << "\n";
+        oss << conmat::Indent(2) << "expected: "
+            << conmat::Colorize(magic_enum::enum_name(expected_opt.value()),
+                                conmat::Color::Blue)
+            << "\n";
+      }
+    } else {
+      // One is engaged, one is not
       oss << conmat::Indent(1) << conmat::TestFailed()
-          << "ScenePayload scene_type differs:" << "\n";
-      oss << conmat::Indent(2) << "actual: "
-          << conmat::Colorize(magic_enum::enum_name(actual_payload.scene_type),
-                              conmat::Color::Red)
+          << "ScenePayload scene_type presence differs:" << "\n";
+      oss << conmat::Indent(2) << "actual has value: "
+          << conmat::Colorize(actual_opt.has_value(), conmat::Color::Red)
           << "\n";
-      oss << conmat::Indent(2) << "expected: "
-          << conmat::Colorize(
-                 magic_enum::enum_name(expected_payload.scene_type),
-                 conmat::Color::Blue)
+      oss << conmat::Indent(2) << "expected has value: "
+          << conmat::Colorize(expected_opt.has_value(), conmat::Color::Blue)
           << "\n";
     }
 
     // Compare scene_id
-    if (actual_payload.scene_id.has_value() !=
-        expected_payload.scene_id.has_value()) {
+    const auto &actual_id_opt = actual_payload.optional_scene_id;
+    const auto &expected_id_opt = expected_payload.optional_scene_id;
+
+    if (!actual_id_opt && !expected_id_opt) {
+      // Both are disengaged (nullopt): considered equal, nothing to report
+    } else if (actual_id_opt && expected_id_opt) {
+      // Both are engaged, compare values
+      if (actual_id_opt.value() != expected_id_opt.value()) {
+        oss << conmat::Indent(1) << conmat::TestFailed()
+            << "ScenePayload scene_id differs:" << "\n";
+        oss << conmat::Indent(2) << "actual: "
+            << conmat::Colorize(actual_id_opt.value(), conmat::Color::Red)
+            << "\n";
+        oss << conmat::Indent(2) << "expected: "
+            << conmat::Colorize(expected_id_opt.value(), conmat::Color::Blue)
+            << "\n";
+      }
+    } else {
+      // One is engaged, one is not
       oss << conmat::Indent(1) << conmat::TestFailed()
           << "ScenePayload scene_id presence differs:" << "\n";
       oss << conmat::Indent(2) << "actual has value: "
-          << conmat::Colorize(actual_payload.scene_id.has_value(),
-                              conmat::Color::Red)
+          << conmat::Colorize(actual_id_opt.has_value(), conmat::Color::Red)
           << "\n";
       oss << conmat::Indent(2) << "expected has value: "
-          << conmat::Colorize(expected_payload.scene_id.has_value(),
-                              conmat::Color::Blue)
-          << "\n";
-    } else if (actual_payload.scene_id.has_value() &&
-               actual_payload.scene_id.value() !=
-                   expected_payload.scene_id.value()) {
-      oss << conmat::Indent(1) << conmat::TestFailed()
-          << "ScenePayload scene_id differs:" << "\n";
-      oss << conmat::Indent(2) << "actual: "
-          << conmat::Colorize(actual_payload.scene_id.value(),
-                              conmat::Color::Red)
-          << "\n";
-      oss << conmat::Indent(2) << "expected: "
-          << conmat::Colorize(expected_payload.scene_id.value(),
-                              conmat::Color::Blue)
+          << conmat::Colorize(expected_id_opt.has_value(), conmat::Color::Blue)
           << "\n";
     }
 

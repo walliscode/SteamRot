@@ -116,13 +116,13 @@ TEST_CASE("EventPayloadEqualsMatcher works correctly for ScenePayload",
           "[unit][Events][EventPayload][matcher]") {
   SECTION("Matcher detects equality for ScenePayload with all fields") {
     steamrot::ScenePayload expected{};
-    expected.scene_type = steamrot::SceneType::TITLE;
-    expected.scene_id = GenerateTestUUID();
+    expected.optional_scene_type = steamrot::SceneType::TITLE;
+    expected.optional_scene_id = GenerateTestUUID();
     expected.action = steamrot::ScenePayload::SceneAction::CHANGE;
 
     steamrot::ScenePayload actual{};
-    actual.scene_type = expected.scene_type;
-    actual.scene_id = expected.scene_id;
+    actual.optional_scene_type = expected.optional_scene_type;
+    actual.optional_scene_id = expected.optional_scene_id;
     actual.action = expected.action;
 
     steamrot::EventPayload expected_payload = expected;
@@ -133,11 +133,11 @@ TEST_CASE("EventPayloadEqualsMatcher works correctly for ScenePayload",
 
   SECTION("Matcher detects inequality for different scene_type") {
     steamrot::ScenePayload expected{};
-    expected.scene_type = steamrot::SceneType::TITLE;
+    expected.optional_scene_type = steamrot::SceneType::TITLE;
     expected.action = steamrot::ScenePayload::SceneAction::CHANGE;
 
     steamrot::ScenePayload actual{};
-    actual.scene_type = steamrot::SceneType::CRAFTING;
+    actual.optional_scene_type = steamrot::SceneType::CRAFTING;
     actual.action = steamrot::ScenePayload::SceneAction::CHANGE;
 
     steamrot::EventPayload expected_payload = expected;
@@ -148,11 +148,11 @@ TEST_CASE("EventPayloadEqualsMatcher works correctly for ScenePayload",
 
   SECTION("Matcher detects inequality for different scene_id") {
     steamrot::ScenePayload expected{};
-    expected.scene_id = GenerateTestUUID();
+    expected.optional_scene_id = GenerateTestUUID();
     expected.action = steamrot::ScenePayload::SceneAction::CHANGE;
 
     steamrot::ScenePayload actual{};
-    actual.scene_id = GenerateTestUUID();
+    actual.optional_scene_id = GenerateTestUUID();
     actual.action = steamrot::ScenePayload::SceneAction::CHANGE;
 
     steamrot::EventPayload expected_payload = expected;
@@ -167,8 +167,7 @@ TEST_CASE("EventPayloadEqualsMatcher works correctly for SystemPayload",
   SECTION("Matcher detects equality for SystemPayload") {
     steamrot::SystemPayload expected{
         steamrot::SystemPayload::SystemAction::QUIT};
-    steamrot::SystemPayload actual{
-        steamrot::SystemPayload::SystemAction::QUIT};
+    steamrot::SystemPayload actual{steamrot::SystemPayload::SystemAction::QUIT};
 
     steamrot::EventPayload expected_payload = expected;
     steamrot::EventPayload actual_payload = actual;
@@ -208,8 +207,9 @@ TEST_CASE("EventPayloadEqualsMatcher describes mismatches correctly",
   oss << conmat::Indent(2)
       << "actual: " << conmat::Colorize("SystemPayload", conmat::Color::Red)
       << "\n";
-  oss << conmat::Indent(2) << "expected: "
-      << conmat::Colorize("InputPayload", conmat::Color::Blue) << "\n";
+  oss << conmat::Indent(2)
+      << "expected: " << conmat::Colorize("InputPayload", conmat::Color::Blue)
+      << "\n";
   REQUIRE(matcher.describe() == oss.str());
 }
 

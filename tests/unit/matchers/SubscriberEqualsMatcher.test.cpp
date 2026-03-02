@@ -50,7 +50,7 @@ TEST_CASE("SubscriberEqualsMatcher works with filter_payload",
   steamrot::Subscriber expected{};
   expected.event_type = steamrot::EventType::UI;
   steamrot::UIPayload filter{};
-  filter.c_user_interface_name = "test_ui";
+
   filter.action = steamrot::UIPayload::UIAction::TOGGLE;
   expected.filter_payload = filter;
 
@@ -69,8 +69,7 @@ TEST_CASE("SubscriberEqualsMatcher works with filter_payload",
 
   SECTION("Matcher detects differences in filter_payload value") {
     steamrot::UIPayload different_filter{};
-    different_filter.c_user_interface_name = "different_ui";
-    different_filter.action = steamrot::UIPayload::UIAction::TOGGLE;
+    different_filter.action = steamrot::UIPayload::UIAction::NONE;
 
     steamrot::Subscriber actual{};
     actual.event_type = steamrot::EventType::UI;
@@ -136,4 +135,3 @@ TEST_CASE("SubscriberEqualsMatcher describe is as expected on failure",
   REQUIRE(description.find("m_active:") != std::string::npos);
   REQUIRE(description.find("event_type:") != std::string::npos);
 }
-

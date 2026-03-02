@@ -210,8 +210,8 @@ TEST_CASE("ConfigureScenePayload populates from valid data",
       steamrot::data::configure::ConfigureScenePayload(payload, fbs_data);
 
   REQUIRE(result.has_value());
-  REQUIRE(payload.scene_type == steamrot::SceneType::TITLE);
-  REQUIRE(payload.scene_id.has_value());
+  REQUIRE(payload.optional_scene_type == steamrot::SceneType::TITLE);
+  REQUIRE(payload.optional_scene_id.has_value());
   REQUIRE(payload.action == steamrot::ScenePayload::SceneAction::CHANGE);
 }
 
@@ -232,8 +232,8 @@ TEST_CASE("ConfigureScenePayload handles optional fields",
       steamrot::data::configure::ConfigureScenePayload(payload, fbs_data);
 
   REQUIRE(result.has_value());
-  REQUIRE_FALSE(payload.scene_type == steamrot::SceneType::UNKNOWN);
-  REQUIRE_FALSE(payload.scene_id.has_value());
+  REQUIRE_FALSE(payload.optional_scene_type == steamrot::SceneType::UNKNOWN);
+  REQUIRE_FALSE(payload.optional_scene_id.has_value());
   REQUIRE(payload.action == steamrot::ScenePayload::SceneAction::CHANGE);
 }
 

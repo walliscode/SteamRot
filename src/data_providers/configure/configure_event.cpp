@@ -116,13 +116,13 @@ ConfigureScenePayload(ScenePayload &scene_payload,
   if (scene_payload_data->scene_type() != SceneTypeFbs_UNKNOWN) {
     switch (scene_payload_data->scene_type()) {
     case SceneTypeFbs_TEST:
-      scene_payload.scene_type = SceneType::TEST;
+      scene_payload.optional_scene_type = SceneType::TEST;
       break;
     case SceneTypeFbs_TITLE:
-      scene_payload.scene_type = SceneType::TITLE;
+      scene_payload.optional_scene_type = SceneType::TITLE;
       break;
     case SceneTypeFbs_CRAFTING:
-      scene_payload.scene_type = SceneType::CRAFTING;
+      scene_payload.optional_scene_type = SceneType::CRAFTING;
       break;
     case SceneTypeFbs_UNKNOWN:
       return std::unexpected(
@@ -145,7 +145,7 @@ ConfigureScenePayload(ScenePayload &scene_payload,
       return std::unexpected(FailInfo{FailMode::InvalidUUID,
                                       "Invalid UUID string in scene_id field"});
     }
-    scene_payload.scene_id = uuid_result.value();
+    scene_payload.optional_scene_id = uuid_result.value();
   }
 
   // populate action enum

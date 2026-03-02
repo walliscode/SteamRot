@@ -124,7 +124,7 @@ TEST_CASE("ConfigureSceneManagerState handles multiple subscriptions",
       state.subscriptions[0]->filter_payload));
   REQUIRE(
       std::get<steamrot::ScenePayload>(state.subscriptions[0]->filter_payload)
-          .scene_type == steamrot::SceneType::CRAFTING);
+          .optional_scene_type == steamrot::SceneType::CRAFTING);
   REQUIRE(
       std::get<steamrot::ScenePayload>(state.subscriptions[0]->filter_payload)
           .action == steamrot::ScenePayload::SceneAction::CHANGE);

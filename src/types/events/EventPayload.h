@@ -55,7 +55,7 @@ struct UIPayload {
   /////////////////////////////////////////////////
   /// @brief The specific action being taken on the user interface
   /////////////////////////////////////////////////
-  enum class UIAction { TOGGLE } action;
+  enum class UIAction { NONE, TOGGLE } action;
 
   /////////////////////////////////////////////////
   /// @brief Default constructor for UIPayload, sets action to TOGGLE
@@ -72,6 +72,11 @@ struct UIPayload {
   /////////////////////////////////////////////////
   UIPayload(const UIPayload::UIAction action, const std::string c_ui_state_name)
       : action(action), c_ui_state_name(c_ui_state_name) {}
+
+  /////////////////////////////////////////////////
+  /// @brief The name of the CUserInterface component being targeted
+  /////////////////////////////////////////////////
+  std::string c_user_interface_name{};
 
   /////////////////////////////////////////////////
   /// @brief The name of the user interface state being targeted
@@ -144,7 +149,7 @@ struct ScenePayload {
   /////////////////////////////////////////////////
   ScenePayload(const ScenePayload::SceneAction action,
                const SceneType scene_type)
-      : action(action), scene_type(scene_type) {}
+      : action(action), optional_scene_type(scene_type) {}
 
   /////////////////////////////////////////////////
   /// @brief Constructor for ScenePayload, takes a SceneAction, a SceneType, and
@@ -157,17 +162,18 @@ struct ScenePayload {
   /////////////////////////////////////////////////
   ScenePayload(const ScenePayload::SceneAction action,
                const SceneType scene_type, const uuids::uuid scene_id)
-      : action(action), scene_type(scene_type), scene_id(scene_id) {}
+      : action(action), optional_scene_type(scene_type),
+        optional_scene_id(scene_id) {}
 
   /////////////////////////////////////////////////
   /// @brief SceneType enum provides the type of the Scene being targeted
   /////////////////////////////////////////////////
-  std::optional<SceneType> scene_type{SceneType::UNKNOWN};
+  std::optional<SceneType> optional_scene_type{SceneType::UNKNOWN};
 
   /////////////////////////////////////////////////
   /// @brief Provides the unique identifier for the Scene being targeted
   /////////////////////////////////////////////////
-  std::optional<uuids::uuid> scene_id;
+  std::optional<uuids::uuid> optional_scene_id;
 };
 
 /////////////////////////////////////////////////
