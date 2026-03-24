@@ -66,6 +66,19 @@ unit tests. It is essentially complete for the existing `TestData` struct shape.
    call in one line. Today callers must instantiate `EventHandler`,
    `FlatbuffersTestDataProvider`, and call `ProvideAllTestData()` manually.
 
+6. **No mechanism to load default scene data without specifying all entities.**
+   When `starting_engine_snapshot.scene_collection_data` is used, all entity
+   and component data must be written out in full in the test JSON. There is no
+   way to say "load the title scene from its production defaults" — i.e., from
+   `data/defaults/scenes/title.scene_data.bin` — without duplicating all that
+   data into the test file.
+
+   The production engine has `SceneManager::AddSceneFromDefault(SceneType)` and
+   `SceneManager::LoadTitleScene()` which load directly from the binary default
+   files, but `TestEngine::StartUp()` only calls
+   `AddScenesFromSceneCollectionData()` and has no path to trigger the default
+   loader.
+
 ---
 
 ## Plan
@@ -127,12 +140,88 @@ class exists.
 
 Add `test_data_loader.cpp` to the `harness` CMake target.
 
-### Step 5 — Add unit tests for new conversions
+### Step 5 — Add `default_scenes` field to the schema and converter
+
+This step adds the mechanism for loading scene defaults without manually
+specifying all entity data in the test JSON.
+
+**Background:** `SceneManager::AddSceneFromDefault(SceneType)` loads a scene
+from its production binary file (e.g., `data/defaults/scenes/title.scene_data.bin`).
+Today `TestEngine::StartUp()` only calls `AddScenesFromSceneCollectionData()`,
+so there is no path through the test harness to invoke the default loader.
+Manually duplicating all entity data from the production JSON into every test
+file is impractical and creates maintenance overhead.
+
+**Schema change** — add to `src/types/flatbuffers/testing/test_data.fbs`:
+
+```fbs
+table TestDataFbs
+{
+  meta_data: TestMetadataFbs (required);
+  simulation_data: SimulationDataFbs;
+  num_ticks: uint32 = 1;
+  starting_engine_snapshot: EngineSnapshotFbs;
+  expected_engine_snapshots: [TickSnapshotPairFbs];
+
+  // NEW: scene types to load from production defaults.
+  // Each entry triggers SceneManager::AddSceneFromDefault() in TestEngine.
+  // Use this instead of starting_engine_snapshot.scene_collection_data
+  // when you want the real production scene data without re-specifying it.
+  default_scenes: [SceneTypeFbs];
+}
+```
+
+**TestData struct change** — add to `src/types/test_structs/TestData.h`:
+
+```cpp
+/// Scene types to load from production defaults during TestEngine::StartUp().
+/// Populated from the default_scenes FlatBuffers field.
+std::vector<SceneType> default_scenes{};
+```
+
+**Converter change** — in `FlatbuffersTestDataProvider::CreateTestData()`:
+
+```cpp
+// Convert default_scenes (if present)
+if (fbs_test_data->default_scenes()) {
+  for (const auto scene_type_fbs : *fbs_test_data->default_scenes()) {
+    test_data.default_scenes.push_back(
+        ConvertSceneType(scene_type_fbs));  // existing enum conversion
+  }
+}
+```
+
+**Usage in test JSON** — with this field, a title-scene integration test
+becomes:
+
+```json
+{
+  "meta_data": {
+    "test_name": "title_scene_smoke",
+    "test_description": "One tick of the real title scene",
+    "will_pass": true
+  },
+  "default_scenes": ["TITLE"],
+  "num_ticks": 1
+}
+```
+
+No `starting_engine_snapshot` needed. The engine loads the complete entity and
+UI hierarchy from `data/defaults/scenes/title.scene_data.bin`.
+
+**Both fields can coexist.** If a test specifies both `default_scenes` and
+`starting_engine_snapshot.scene_collection_data`, the engine loads the defaults
+first and then applies the explicit collection on top. This allows tests to
+start from a production-like baseline and then tweak individual entities.
+
+### Step 6 — Add unit tests for new conversions
 
 Extend `FlatbuffersTestDataProvider.test.cpp` to cover:
 - `tick_snapshots` loaded into `expected_engine_snapshots`.
 - `input_sequence` present in converted `TestData`.
 - `event_sequence` present in converted `TestData`.
+- `default_scenes` containing `SceneType::TITLE` when `"default_scenes": ["TITLE"]`
+  is present in the JSON.
 
 Add a unit test file `test_data_loader.test.cpp` to verify the free function
 finds and returns data correctly.
@@ -145,6 +234,9 @@ finds and returns data correctly.
   `TestData::expected_engine_snapshots`.
 - [ ] `TestData` has an `input_sequence` optional field populated from FlatBuffers.
 - [ ] `TestData` has an `event_sequence` optional field populated from FlatBuffers.
+- [ ] `TestDataFbs` schema has a `default_scenes: [SceneTypeFbs]` field.
+- [ ] `TestData` has a `default_scenes: std::vector<SceneType>` field populated
+  from the FlatBuffers conversion.
 - [ ] `load_test_data_configs()` exists and can be called with no arguments from
   a test file to retrieve configs from the adjacent `data/` directory.
 - [ ] All new code has unit tests.

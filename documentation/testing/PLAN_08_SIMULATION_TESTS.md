@@ -58,20 +58,49 @@ pattern.
 
 ## Plan
 
-### Step 1 — Create the `data/` directory and a smoke-test data file
+### Step 1 — Create the `data/` directory and smoke-test data files
 
 **Directory (new):** `tests/simulation_tests/data/`
 
-Create an initial smoke-test file that exercises the full pipeline with the
-simplest possible test:
+Create two smoke-test files: one using `default_scenes` (the recommended
+approach) and one using an empty scene (for tests that need full control).
 
-**File (new):** `tests/simulation_tests/data/smoke_test_001.test_data.json`
+---
+
+**File (new):** `tests/simulation_tests/data/smoke_default_title_001.test_data.json`
 
 ```json
 {
   "meta_data": {
-    "test_name": "smoke_test_title_scene_1_tick",
-    "test_description": "Smoke test: one tick of the title scene with no simulation steps",
+    "test_name": "smoke_default_title_scene",
+    "test_description": "Smoke test: one tick of the real title scene loaded from production defaults",
+    "tags": ["integration", "smoke"],
+    "will_pass": true,
+    "version": 1
+  },
+  "default_scenes": ["TITLE"],
+  "num_ticks": 1
+}
+```
+
+This is the recommended approach. `"default_scenes": ["TITLE"]` triggers
+`SceneManager::AddSceneFromDefault(SceneType::TITLE)` inside
+`TestEngine::StartUp()`, which reads `data/defaults/scenes/title.scene_data.bin`
+and loads the complete production entity and UI hierarchy. No entity data needs
+to be written in the test JSON.
+
+Requires Plan 01 (Step 5) and Plan 02 (Step 6) to be complete before this file
+will work end-to-end.
+
+---
+
+**File (new):** `tests/simulation_tests/data/smoke_empty_scene_001.test_data.json`
+
+```json
+{
+  "meta_data": {
+    "test_name": "smoke_empty_scene",
+    "test_description": "Smoke test: one tick of a minimal empty scene with no simulation steps",
     "tags": ["integration", "smoke"],
     "will_pass": true,
     "version": 1
@@ -98,10 +127,14 @@ simplest possible test:
 }
 ```
 
-This file has no expected snapshots, so the test passes as long as the engine
-runs without crashing.
+This file has an empty entity pool and no expected snapshots. It passes as long
+as the engine runs without crashing, making it a useful baseline to activate
+first before the `default_scenes` support is ready.
 
-**Note:** The JSON file must be compiled to `.bin` format by the FlatBuffers
+Both files have no expected snapshots, so they pass as long as the engine runs
+without crashing.
+
+**Note:** JSON files must be compiled to `.bin` format by the FlatBuffers
 compiler during the build. The CMakeLists must include a rule for this.
 
 ### Step 2 — Add FlatBuffers JSON-to-binary build rule

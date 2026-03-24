@@ -70,6 +70,18 @@ snapshot).
    `SceneManager::AddScenesFromSceneCollectionData()` (or an equivalent
    restore path) rather than ignoring it.
 
+### Gap 7 — No way to load scene defaults from test data
+
+`TestEngine::StartUp()` always routes scene setup through
+`AddScenesFromSceneCollectionData()`. The production path
+`SceneManager::AddSceneFromDefault(SceneType)` — which reads the real binary
+default files from `data/defaults/scenes/` — is never called during tests.
+
+Writing out all entity and UI hierarchy data manually in every test JSON is
+impractical. A test that just wants to start from the real title scene should
+be able to say `"default_scenes": ["TITLE"]` and have the engine load it
+automatically from `data/defaults/scenes/title.scene_data.bin`.
+
 ---
 
 ## Plan
@@ -130,17 +142,49 @@ This step depends on Plan 05 (`event_simulation`) being implemented first.
   value and, if so, apply it via the appropriate `SceneManager` restoration
   method.
 
-### Step 5 — Update unit tests
+### Step 5 — Load default scenes from `TestData::default_scenes`
+
+**File:** `tests/harness/TestEngine.cpp`
+
+This step depends on Plan 01 (Step 5) which adds `TestData::default_scenes`.
+
+In `StartUp()`, after the `AddScenesFromSceneCollectionData()` call, add:
+
+```cpp
+// Load any scenes specified as defaults (from production binary data files).
+// This lets tests start from real scene data without duplicating it in JSON.
+for (const auto &scene_type : m_test_data.default_scenes) {
+  auto add_default_result =
+      m_scene_manager.AddSceneFromDefault(scene_type);
+  if (!add_default_result.has_value()) {
+    return std::unexpected(add_default_result.error());
+  }
+}
+```
+
+**What `AddSceneFromDefault` does internally:**
+1. `SceneFactory::CreateSceneFromDefault(scene_type)`
+2. `FlatbuffersSceneDataProvider::CreateSceneData(scene_type)`
+3. `FlatbuffersDataLoader::ProvideDefaultSceneData(scene_type)`
+4. Reads `data/defaults/scenes/<type>.scene_data.bin` from disk
+5. Deserialises FlatBuffers and configures a full `EntityMemoryPool`
+
+**Note on ordering:** `AddScenesFromSceneCollectionData()` runs first so that
+any manually specified entities are present before default scenes are appended.
+For most tests that use only `default_scenes` the collection data will be empty
+(its default) and the call is a no-op.
+
+### Step 6 — Update unit tests
 
 **File:** `tests/unit/harness/TestEngine.test.cpp`
 
-- Add a test that verifies `m_tick_error` is set when `SimulationRunner` returns
-  a failure.
-- Add a test that verifies input events present in `TestData` are injected at
-  the correct tick (requires a mock or observable side-effect, such as checking
-  `mouse_position`).
-- Add a test that verifies event packets present in `TestData` appear in the
-  global event bus at the correct tick.
+- Add a test `TestEngine::StartUp loads default scene when default_scenes
+  contains SceneType::TEST` (use the test scene to avoid font/asset
+  dependencies during CI).
+- Verify `m_scene_manager.GetScenes()` has exactly one scene after `StartUp()`
+  when only `default_scenes` is provided.
+- Verify `GetDataBank()` at tick 0 contains scene collection data from the
+  loaded scene.
 
 ---
 
@@ -155,5 +199,7 @@ This step depends on Plan 05 (`event_simulation`) being implemented first.
   `event_sequence` is present.
 - [ ] `SceneManagerData` from the starting snapshot is applied during `StartUp()`
   if present.
+- [ ] `TestEngine::StartUp()` calls `SceneManager::AddSceneFromDefault()` for
+  each entry in `TestData::default_scenes`.
 - [ ] All new behaviour has unit test coverage.
 - [ ] No existing unit tests broken.
