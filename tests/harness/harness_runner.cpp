@@ -42,10 +42,11 @@ RunHarnessTests(const std::filesystem::path current_location) {
   EventHandler event_handler;
 
   // instantiate the FlatbuffersTestDataProvider with the object directory path
-  FlatbuffersTestDataProvider data_provider(current_location, event_handler);
+  steamrot::FlatbuffersTestDataProvider data_provider(current_location,
+                                                      event_handler);
 
   // get all test data
-  auto test_data_result = data_provider.ProvideAllTestData();
+  auto test_data_result = data_provider.CreateAllTestData();
   if (!test_data_result) {
     return std::unexpected(test_data_result.error());
   }

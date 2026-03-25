@@ -7,18 +7,21 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersTestDataLoader.h"
+#include <format>
+
+namespace steamrot {
 
 /////////////////////////////////////////////////
 FlatbuffersTestDataLoader::FlatbuffersTestDataLoader(
     std::filesystem::path obj_dir_path)
-    : object_directory_path(obj_dir_path) {}
+    : m_object_directory_path(obj_dir_path) {}
 
 /////////////////////////////////////////////////
-std::expected<std::filesystem::path, steamrot::FailInfo>
+std::expected<std::filesystem::path, FailInfo>
 FlatbuffersTestDataLoader::GetAdjacentDataDirectoryPath() const {
 
   // construct the path to the "data" directory
-  std::filesystem::path data_dir_path = object_directory_path / "data";
+  std::filesystem::path data_dir_path = m_object_directory_path / "data";
 
   // Check if the "data" directory exists
   if (std::filesystem::exists(data_dir_path) &&
@@ -29,14 +32,14 @@ FlatbuffersTestDataLoader::GetAdjacentDataDirectoryPath() const {
 
   } else {
 
-    return std::unexpected(steamrot::FailInfo(
-        steamrot::FailMode::DirectoryNotFound,
+    return std::unexpected(FailInfo(
+        FailMode::DirectoryNotFound,
         "Data directory not found at path: " + data_dir_path.string()));
   }
 }
 
 /////////////////////////////////////////////////
-std::expected<std::vector<steamrot::TestDataFbs *>, steamrot::FailInfo>
+std::expected<std::vector<TestDataFbs *>, FailInfo>
 FlatbuffersTestDataLoader::LoadTestDataFbs() const {
 
   // Get the data directory path
@@ -48,7 +51,7 @@ FlatbuffersTestDataLoader::LoadTestDataFbs() const {
   std::filesystem::path data_dir_path = data_dir_result.value();
 
   // return vector of TestDataFbs pointers
-  std::vector<steamrot::TestDataFbs *> test_data_vector;
+  std::vector<TestDataFbs *> test_data_vector;
 
   // Iterate over files in the data directory
   for (const auto &entry : std::filesystem::directory_iterator(data_dir_path)) {
@@ -60,16 +63,15 @@ FlatbuffersTestDataLoader::LoadTestDataFbs() const {
       char *binary_data = LoadBinaryData(entry.path());
 
       // Get the TestDataFbs pointer
-      const steamrot::TestDataFbs *test_data_fbs =
-          steamrot::GetTestDataFbs(binary_data);
+      const TestDataFbs *test_data_fbs = GetTestDataFbs(binary_data);
       if (test_data_fbs) {
         test_data_vector.push_back(
-            const_cast<steamrot::TestDataFbs *>(test_data_fbs));
+            const_cast<TestDataFbs *>(test_data_fbs));
       } else {
         std::string error_message = std::format(
             "TestDataFbs pointer is null for file: {}", entry.path().string());
-        return std::unexpected(steamrot::FailInfo(
-            steamrot::FailMode::FlatbuffersDataNotFound, error_message));
+        return std::unexpected(FailInfo(
+            FailMode::FlatbuffersDataNotFound, error_message));
       }
     }
   }
@@ -79,5 +81,7 @@ FlatbuffersTestDataLoader::LoadTestDataFbs() const {
 /////////////////////////////////////////////////
 std::filesystem::path
 FlatbuffersTestDataLoader::GetObjectDirectoryPath() const {
-  return object_directory_path;
+  return m_object_directory_path;
 }
+
+} // namespace steamrot
