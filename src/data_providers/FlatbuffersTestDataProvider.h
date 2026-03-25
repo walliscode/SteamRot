@@ -11,7 +11,6 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "FlatbuffersTestDataLoader.h"
 #include "ITestDataProvider.h"
 #include "TestData.h"
 #include "test_data_generated.h"
@@ -51,7 +50,7 @@ public:
   /// @param event_handler Reference to EventHandler for entity configuration.
   /////////////////////////////////////////////////
   FlatbuffersTestDataProvider(std::filesystem::path obj_dir_path,
-                               EventHandler &event_handler);
+                              EventHandler &event_handler);
 
   /////////////////////////////////////////////////
   /// @brief Creates and returns all TestData instances loaded from FlatBuffers

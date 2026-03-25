@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FlatbuffersTestDataProvider.h"
+#include "FlatbuffersTestDataLoader.h"
 #include "configure_test_data.h"
 
 namespace steamrot {
@@ -37,8 +38,7 @@ FlatbuffersTestDataProvider::CreateAllTestData() const {
   // Convert each TestDataFbs to TestData
   for (const auto *fbs_test_data : fbs_test_data_vec) {
     TestData test_data;
-    auto configure_result =
-        ConfigureTestData(test_data, fbs_test_data);
+    auto configure_result = ConfigureTestData(test_data, fbs_test_data);
     if (!configure_result) {
       return std::unexpected(configure_result.error());
     }

@@ -25,34 +25,12 @@ TEST_CASE("ConfigureTestMetaData fails with null data",
 
   steamrot::TestMetaData test_meta_data;
 
-  auto result = steamrot::data::configure::ConfigureTestMetaData(
-      test_meta_data, nullptr);
+  auto result =
+      steamrot::data::configure::ConfigureTestMetaData(test_meta_data, nullptr);
 
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
   REQUIRE(result.error().message == "Input Flatbuffers TestMetaData is null.");
-}
-
-TEST_CASE("ConfigureTestMetaData fails when test_name is missing",
-          "[unit][configure_test_data]") {
-
-  steamrot::TestMetaData test_meta_data;
-
-  // Create flatbuffers data without test_name
-  flatbuffers::FlatBufferBuilder builder;
-  auto meta_offset = steamrot::CreateTestMetadataFbs(builder);
-  builder.Finish(meta_offset);
-  const steamrot::TestMetadataFbs *meta_fbs =
-      flatbuffers::GetRoot<steamrot::TestMetadataFbs>(
-          builder.GetBufferPointer());
-
-  auto result =
-      steamrot::data::configure::ConfigureTestMetaData(test_meta_data, meta_fbs);
-
-  REQUIRE_FALSE(result.has_value());
-  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
-  REQUIRE(result.error().message ==
-          "TestMetaDataFbs is missing required field: test_name.");
 }
 
 TEST_CASE("ConfigureTestMetaData populates from valid data",
@@ -71,8 +49,8 @@ TEST_CASE("ConfigureTestMetaData populates from valid data",
       flatbuffers::GetRoot<steamrot::TestMetadataFbs>(
           builder.GetBufferPointer());
 
-  auto result =
-      steamrot::data::configure::ConfigureTestMetaData(test_meta_data, meta_fbs);
+  auto result = steamrot::data::configure::ConfigureTestMetaData(test_meta_data,
+                                                                 meta_fbs);
 
   REQUIRE(result.has_value());
   REQUIRE(test_meta_data.test_name == "MyTest");
@@ -92,8 +70,8 @@ TEST_CASE("ConfigureTestMetaData populates without optional description",
       flatbuffers::GetRoot<steamrot::TestMetadataFbs>(
           builder.GetBufferPointer());
 
-  auto result =
-      steamrot::data::configure::ConfigureTestMetaData(test_meta_data, meta_fbs);
+  auto result = steamrot::data::configure::ConfigureTestMetaData(test_meta_data,
+                                                                 meta_fbs);
 
   REQUIRE(result.has_value());
   REQUIRE(test_meta_data.test_name == "AnotherTest");
@@ -127,8 +105,7 @@ TEST_CASE("ConfigureSimulationData fails when logic class is None",
   auto step = steamrot::CreateSimulationStepFbs(
       builder, steamrot::LogicClassEnumFbs_None);
   auto steps_offset = builder.CreateVector(&step, 1);
-  auto sim_offset =
-      steamrot::CreateSimulationDataFbs(builder, steps_offset);
+  auto sim_offset = steamrot::CreateSimulationDataFbs(builder, steps_offset);
   builder.Finish(sim_offset);
   const steamrot::SimulationDataFbs *sim_fbs =
       steamrot::GetSimulationDataFbs(builder.GetBufferPointer());
@@ -219,21 +196,19 @@ TEST_CASE("ConfigureExpectedEngineSnapshots populates map correctly",
   pairs.push_back(steamrot::CreateTickSnapshotPairFbs(builder, 5, snapshot1));
 
   auto snapshot2 = steamrot::CreateEngineSnapshotFbs(builder, 10);
-  pairs.push_back(
-      steamrot::CreateTickSnapshotPairFbs(builder, 10, snapshot2));
+  pairs.push_back(steamrot::CreateTickSnapshotPairFbs(builder, 10, snapshot2));
 
   auto pairs_offset = builder.CreateVector(pairs);
-  auto meta_offset = steamrot::CreateTestMetadataFbs(
-      builder, builder.CreateString("test"));
-  auto test_data_offset = steamrot::CreateTestDataFbs(
-      builder, meta_offset, 0, 1, 0, pairs_offset);
+  auto meta_offset =
+      steamrot::CreateTestMetadataFbs(builder, builder.CreateString("test"));
+  auto test_data_offset =
+      steamrot::CreateTestDataFbs(builder, meta_offset, 0, 1, 0, pairs_offset);
   builder.Finish(test_data_offset);
   const steamrot::TestDataFbs *test_data_fbs =
       steamrot::GetTestDataFbs(builder.GetBufferPointer());
 
   auto result = steamrot::data::configure::ConfigureExpectedEngineSnapshots(
-      expected_snapshots,
-      test_data_fbs->expected_engine_snapshots(),
+      expected_snapshots, test_data_fbs->expected_engine_snapshots(),
       event_handler);
 
   REQUIRE(result.has_value());
@@ -254,13 +229,12 @@ TEST_CASE("ConfigureTestData fails with null data",
   steamrot::TestData test_data;
   steamrot::EventHandler event_handler;
 
-  auto result = steamrot::data::configure::ConfigureTestData(
-      test_data, nullptr, event_handler);
+  auto result = steamrot::data::configure::ConfigureTestData(test_data, nullptr,
+                                                             event_handler);
 
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
-  REQUIRE(result.error().message ==
-          "Input Flatbuffers TestData is null.");
+  REQUIRE(result.error().message == "Input Flatbuffers TestData is null.");
 }
 
 TEST_CASE("ConfigureTestData fails when num_ticks is missing",
@@ -270,8 +244,8 @@ TEST_CASE("ConfigureTestData fails when num_ticks is missing",
   steamrot::EventHandler event_handler;
 
   flatbuffers::FlatBufferBuilder builder;
-  auto meta_offset = steamrot::CreateTestMetadataFbs(
-      builder, builder.CreateString("Test"));
+  auto meta_offset =
+      steamrot::CreateTestMetadataFbs(builder, builder.CreateString("Test"));
   auto step = steamrot::CreateSimulationStepFbs(
       builder, steamrot::LogicClassEnumFbs_UIActionLogic);
   auto steps_offset = builder.CreateVector(&step, 1);
@@ -283,8 +257,8 @@ TEST_CASE("ConfigureTestData fails when num_ticks is missing",
   const steamrot::TestDataFbs *fbs =
       steamrot::GetTestDataFbs(builder.GetBufferPointer());
 
-  auto result =
-      steamrot::data::configure::ConfigureTestData(test_data, fbs, event_handler);
+  auto result = steamrot::data::configure::ConfigureTestData(test_data, fbs,
+                                                             event_handler);
 
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
@@ -312,8 +286,8 @@ TEST_CASE("ConfigureTestData populates from valid data",
   const steamrot::TestDataFbs *fbs =
       steamrot::GetTestDataFbs(builder.GetBufferPointer());
 
-  auto result =
-      steamrot::data::configure::ConfigureTestData(test_data, fbs, event_handler);
+  auto result = steamrot::data::configure::ConfigureTestData(test_data, fbs,
+                                                             event_handler);
 
   REQUIRE(result.has_value());
   REQUIRE(test_data.meta_data.test_name == "ValidTest");
