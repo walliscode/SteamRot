@@ -146,7 +146,7 @@ This step depends on Plan 05 (`event_simulation`) being implemented first.
 
 **File:** `tests/harness/TestEngine.cpp`
 
-This step depends on Plan 01 (Step 5) which adds `TestData::default_scenes`.
+This step depends on Plan 01 (Step 4) which adds `TestData::default_scenes`.
 
 In `StartUp()`, after the `AddScenesFromSceneCollectionData()` call, add:
 
