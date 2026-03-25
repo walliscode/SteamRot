@@ -1,7 +1,5 @@
 add_library(harness
   TestEngine.cpp
-  FlatbuffersTestDataLoader.cpp
-  FlatbuffersTestDataProvider.cpp
   harness_runner.cpp
   SimulationRunner.cpp
   add_uuids.cpp

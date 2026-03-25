@@ -22,6 +22,8 @@ add_executable(test_data_providers
   FlatbuffersGrimoireMachinaProvider.test.cpp
   FlatbuffersLogicConfigCollectionProvider.test.cpp
   FlatbuffersInputActionConfigProvider.test.cpp
+  FlatbuffersTestDataLoader.test.cpp
+  FlatbuffersTestDataProvider.test.cpp
   configure_asset_config.test.cpp
   configure_engine_data.test.cpp
   configure_engine_snapshot.test.cpp
@@ -35,6 +37,7 @@ add_executable(test_data_providers
   configure_grimoire.test.cpp
   configure_logic_config.test.cpp
   configure_input_action.test.cpp
+  configure_test_data.test.cpp
 )
 
 
@@ -64,5 +67,6 @@ target_link_libraries(test_data_providers
 # Ensure test data is compiled before building tests
 add_dependencies(test_data_providers compile_ui_element_unit_test_data)
 add_dependencies(test_data_providers compile_engine_snapshot_unit_test_data)
+add_dependencies(test_data_providers compile_test_data)
 
 catch_discover_tests(test_data_providers)

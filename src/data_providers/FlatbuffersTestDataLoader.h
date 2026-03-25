@@ -16,12 +16,20 @@
 #include "test_data_generated.h"
 #include <expected>
 
-class FlatbuffersTestDataLoader : public steamrot::DataLoader {
+namespace steamrot {
+
+/////////////////////////////////////////////////
+/// @class FlatbuffersTestDataLoader
+/// @brief Loads FlatBuffers test data binary files from an adjacent data
+/// directory.
+/////////////////////////////////////////////////
+class FlatbuffersTestDataLoader : public DataLoader {
+
 private:
   /////////////////////////////////////////////////
   /// @brief Stores the directory where the object is created
   /////////////////////////////////////////////////
-  const std::filesystem::path object_directory_path;
+  const std::filesystem::path m_object_directory_path;
 
 public:
   /////////////////////////////////////////////////
@@ -35,13 +43,13 @@ public:
   /////////////////////////////////////////////////
   /// @brief Looks for adjacent data directory, returns error if not found
   /////////////////////////////////////////////////
-  std::expected<std::filesystem::path, steamrot::FailInfo>
+  std::expected<std::filesystem::path, FailInfo>
   GetAdjacentDataDirectoryPath() const;
 
   /////////////////////////////////////////////////
   /// @brief Load test data from flatbuffers files
   /////////////////////////////////////////////////
-  std::expected<std::vector<steamrot::TestDataFbs *>, steamrot::FailInfo>
+  std::expected<std::vector<TestDataFbs *>, FailInfo>
   LoadTestDataFbs() const;
 
   /////////////////////////////////////////////////
@@ -49,3 +57,5 @@ public:
   /////////////////////////////////////////////////
   std::filesystem::path GetObjectDirectoryPath() const;
 };
+
+} // namespace steamrot

@@ -14,6 +14,8 @@ add_library(data_providers
   FlatbuffersGrimoireMachinaProvider.cpp
   FlatbuffersLogicConfigCollectionProvider.cpp
   FlatbuffersInputActionConfigProvider.cpp
+  FlatbuffersTestDataLoader.cpp
+  FlatbuffersTestDataProvider.cpp
   DataAccessFactory.cpp
   DataLoader.cpp
   FlatbuffersDataLoader.cpp
@@ -32,6 +34,7 @@ add_library(data_providers
   configure/configure_event.cpp
   configure/configure_subscriber.cpp
   configure/configure_input_action.cpp
+  configure/configure_test_data.cpp
 
 )
 

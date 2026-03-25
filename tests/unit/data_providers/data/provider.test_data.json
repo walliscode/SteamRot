@@ -1,0 +1,18 @@
+{
+  "meta_data": {
+    "test_name": "FlatbuffersTestDataProvider unit test data",
+    "test_description": "Minimal test data for FlatbuffersTestDataProvider unit tests",
+    "tags": ["unit", "data_providers"],
+    "will_pass": true,
+    "version": 1
+  },
+  "simulation_data": {
+    "description": "Provider unit test simulation",
+    "steps": [
+      {
+        "logic_class_type": "UIActionLogic"
+      }
+    ]
+  },
+  "num_ticks": 3
+}

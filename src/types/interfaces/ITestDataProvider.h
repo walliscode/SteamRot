@@ -14,34 +14,27 @@
 #include "FailInfo.h"
 #include "TestData.h"
 #include <expected>
-#include <filesystem>
+#include <vector>
 
+namespace steamrot {
+
+/////////////////////////////////////////////////
+/// @class ITestDataProvider
+/// @brief Interface for providing test data.
+/////////////////////////////////////////////////
 class ITestDataProvider {
 
-protected:
-  const std::filesystem::path object_directory_path;
-
 public:
-  /////////////////////////////////////////////////
-  /// @brief Constructor taking object directory path
-  ///
-  /// @param obj_dir_path Object directory path
-  /////////////////////////////////////////////////
-  ITestDataProvider(std::filesystem::path &obj_dir_path)
-      : object_directory_path(std::move(obj_dir_path)) {}
-
   /////////////////////////////////////////////////
   /// @brief Virtual destructor.
   /////////////////////////////////////////////////
   virtual ~ITestDataProvider() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Provide all instances of TestData struct
+  /// @brief Creates and returns all TestData instances.
   /////////////////////////////////////////////////
-  virtual std::expected<std::vector<steamrot::TestData>, steamrot::FailInfo>
-  ProvideAllTestData() const = 0;
-
-  const std::filesystem::path &GetObjectDirectoryPath() const {
-    return object_directory_path;
-  }
+  virtual std::expected<std::vector<TestData>, FailInfo>
+  CreateAllTestData() const = 0;
 };
+
+} // namespace steamrot
