@@ -223,10 +223,9 @@ struct TestDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_META_DATA = 4,
     VT_SIMULATION_DATA = 6,
-    VT_INPUT_DATA = 8,
-    VT_NUM_TICKS = 10,
-    VT_STARTING_ENGINE_SNAPSHOT = 12,
-    VT_EXPECTED_ENGINE_SNAPSHOTS = 14
+    VT_NUM_TICKS = 8,
+    VT_STARTING_ENGINE_SNAPSHOT = 10,
+    VT_EXPECTED_ENGINE_SNAPSHOTS = 12
   };
   /// @brief Metadata about this test case
   const steamrot::TestMetadataFbs *meta_data() const {
@@ -235,10 +234,6 @@ struct TestDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   /// @brief Simulation data for executing logic steps during tests
   const steamrot::SimulationDataFbs *simulation_data() const {
     return GetPointer<const steamrot::SimulationDataFbs *>(VT_SIMULATION_DATA);
-  }
-  /// @brief Input events to be injected during the test at specific ticks
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::InputSequence>> *input_data() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::InputSequence>> *>(VT_INPUT_DATA);
   }
   /// @brief Number of ticks to run the test for
   /// Note: Field name is num_ticks in schema but maps to number_of_ticks in C++
@@ -262,9 +257,6 @@ struct TestDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyTable(meta_data()) &&
            VerifyOffset(verifier, VT_SIMULATION_DATA) &&
            verifier.VerifyTable(simulation_data()) &&
-           VerifyOffset(verifier, VT_INPUT_DATA) &&
-           verifier.VerifyVector(input_data()) &&
-           verifier.VerifyVectorOfTables(input_data()) &&
            VerifyField<uint32_t>(verifier, VT_NUM_TICKS, 4) &&
            VerifyOffset(verifier, VT_STARTING_ENGINE_SNAPSHOT) &&
            verifier.VerifyTable(starting_engine_snapshot()) &&
@@ -284,9 +276,6 @@ struct TestDataFbsBuilder {
   }
   void add_simulation_data(::flatbuffers::Offset<steamrot::SimulationDataFbs> simulation_data) {
     fbb_.AddOffset(TestDataFbs::VT_SIMULATION_DATA, simulation_data);
-  }
-  void add_input_data(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::InputSequence>>> input_data) {
-    fbb_.AddOffset(TestDataFbs::VT_INPUT_DATA, input_data);
   }
   void add_num_ticks(uint32_t num_ticks) {
     fbb_.AddElement<uint32_t>(TestDataFbs::VT_NUM_TICKS, num_ticks, 1);
@@ -313,7 +302,6 @@ inline ::flatbuffers::Offset<TestDataFbs> CreateTestDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::TestMetadataFbs> meta_data = 0,
     ::flatbuffers::Offset<steamrot::SimulationDataFbs> simulation_data = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::InputSequence>>> input_data = 0,
     uint32_t num_ticks = 1,
     ::flatbuffers::Offset<steamrot::EngineSnapshotFbs> starting_engine_snapshot = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::TickSnapshotPairFbs>>> expected_engine_snapshots = 0) {
@@ -321,7 +309,6 @@ inline ::flatbuffers::Offset<TestDataFbs> CreateTestDataFbs(
   builder_.add_expected_engine_snapshots(expected_engine_snapshots);
   builder_.add_starting_engine_snapshot(starting_engine_snapshot);
   builder_.add_num_ticks(num_ticks);
-  builder_.add_input_data(input_data);
   builder_.add_simulation_data(simulation_data);
   builder_.add_meta_data(meta_data);
   return builder_.Finish();
@@ -331,17 +318,14 @@ inline ::flatbuffers::Offset<TestDataFbs> CreateTestDataFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::TestMetadataFbs> meta_data = 0,
     ::flatbuffers::Offset<steamrot::SimulationDataFbs> simulation_data = 0,
-    const std::vector<::flatbuffers::Offset<steamrot::InputSequence>> *input_data = nullptr,
     uint32_t num_ticks = 1,
     ::flatbuffers::Offset<steamrot::EngineSnapshotFbs> starting_engine_snapshot = 0,
     std::vector<::flatbuffers::Offset<steamrot::TickSnapshotPairFbs>> *expected_engine_snapshots = nullptr) {
-  auto input_data__ = input_data ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::InputSequence>>(*input_data) : 0;
   auto expected_engine_snapshots__ = expected_engine_snapshots ? _fbb.CreateVectorOfSortedTables<steamrot::TickSnapshotPairFbs>(expected_engine_snapshots) : 0;
   return steamrot::CreateTestDataFbs(
       _fbb,
       meta_data,
       simulation_data,
-      input_data__,
       num_ticks,
       starting_engine_snapshot,
       expected_engine_snapshots__);

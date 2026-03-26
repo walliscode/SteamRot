@@ -57,8 +57,6 @@ table TestDataFbs
   /// @brief Simulation data for executing logic steps during tests
   simulation_data: SimulationDataFbs;
 
-  /// @brief Input events to be injected during the test at specific ticks
-  input_data: [InputSequence] ;
     
   /// @brief Number of ticks to run the test for
   /// Note: Field name is num_ticks in schema but maps to number_of_ticks in C++
