@@ -12,10 +12,13 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "EngineSnapshot.h"
+#include "EventPacket.h"
 #include "SimulationData.h"
 #include "TestMetaData.h"
+#include <cstddef>
 #include <cstdint>
 #include <map>
+#include <unordered_map>
 
 namespace steamrot {
 
@@ -37,6 +40,11 @@ struct TestData {
   /// @brief Information required to run the simulation
   /////////////////////////////////////////////////
   SimulationData simulation_data{};
+
+  /////////////////////////////////////////////////
+  /// @brief All events to be injected into the simulation, organized by tick
+  /////////////////////////////////////////////////
+  std::unordered_map<size_t, std::vector<EventPacket>> events_by_tick{};
 
   /////////////////////////////////////////////////
   /// @brief Number of ticks to run the simulation for

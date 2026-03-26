@@ -2,6 +2,7 @@ include "simulation_data.fbs";
 include "input_data.fbs";
 include "../engine/engine_state.fbs";
 include "../core/engine_snapshot.fbs";
+include "../events/event_packet.fbs";
 
 namespace steamrot;
 
@@ -26,6 +27,21 @@ table TestMetadataFbs {
    
   /// @brief Version identifier for this schema
   version: uint32;
+}
+
+
+////////////////////////////////////////////////////////////
+/// @brief Represents a single tick-to-events mapping
+///
+/// FlatBuffers doesn't support maps directly, so we represent
+/// the C++ std::unordered_map<unint64, std::vector<EventPacketFbs> as a vector of these pairs.
+////////////////////////////////////////////////////////////
+table TickEventsPairFbs {
+  /// @brief Tick number (key in the map)
+  tick: uint64(key);
+  
+  /// @brief All event packets to be inserted at tick
+  events: [EventPacketFbs];
 }
 
 ////////////////////////////////////////////////////////////
