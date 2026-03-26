@@ -36,6 +36,17 @@ ConfigureTestMetaData(TestMetaData &test_meta_data,
                       const TestMetadataFbs *fbs_test_meta_data);
 
 /////////////////////////////////////////////////
+/// @brief Configures events by tick from FlatBuffers data.
+///
+/// @param events_by_tick Map to populate with tick->events pairs.
+/// @param fbs_tick_events_pairs FlatBuffers vector of tick-events pairs.
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo> ConfigureEventsByTick(
+    std::unordered_map<size_t, std::vector<EventPacket>> &events_by_tick,
+    const flatbuffers::Vector<flatbuffers::Offset<TickEventsPairFbs>>
+        *fbs_tick_events_pairs);
+
+/////////////////////////////////////////////////
 /// @brief Configures a SimulationData instance from FlatBuffers data.
 ///
 /// @param simulation_data SimulationData instance to configure.
@@ -54,8 +65,7 @@ ConfigureSimulationData(SimulationData &simulation_data,
 /// @param event_handler Reference to EventHandler for entity importers.
 /// @return std::monostate on success, FailInfo on error.
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-ConfigureExpectedEngineSnapshots(
+std::expected<std::monostate, FailInfo> ConfigureExpectedEngineSnapshots(
     std::map<size_t, EngineSnapshot> &expected_snapshots,
     const flatbuffers::Vector<flatbuffers::Offset<TickSnapshotPairFbs>>
         *fbs_tick_snapshot_pairs,

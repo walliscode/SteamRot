@@ -15,6 +15,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 #include "engine_snapshot_generated.h"
 #include "engine_state_generated.h"
+#include "event_packet_generated.h"
 #include "input_data_generated.h"
 #include "simulation_data_generated.h"
 
@@ -22,6 +23,9 @@ namespace steamrot {
 
 struct TestMetadataFbs;
 struct TestMetadataFbsBuilder;
+
+struct TickEventsPairFbs;
+struct TickEventsPairFbsBuilder;
 
 struct TickSnapshotPairFbs;
 struct TickSnapshotPairFbsBuilder;
@@ -143,6 +147,84 @@ inline ::flatbuffers::Offset<TestMetadataFbs> CreateTestMetadataFbsDirect(
       tags__,
       will_pass,
       version);
+}
+
+////////////////////////////////////////////////////////////
+/// @brief Represents a single tick-to-events mapping
+///
+/// FlatBuffers doesn't support maps directly, so we represent
+/// the C++ std::unordered_map<unint64, std::vector<EventPacketFbs> as a vector of these pairs.
+////////////////////////////////////////////////////////////
+struct TickEventsPairFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef TickEventsPairFbsBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_TICK = 4,
+    VT_EVENTS = 6
+  };
+  /// @brief Tick number (key in the map)
+  uint64_t tick() const {
+    return GetField<uint64_t>(VT_TICK, 0);
+  }
+  bool KeyCompareLessThan(const TickEventsPairFbs * const o) const {
+    return tick() < o->tick();
+  }
+  int KeyCompareWithValue(uint64_t _tick) const {
+    return static_cast<int>(tick() > _tick) - static_cast<int>(tick() < _tick);
+  }
+  /// @brief All event packets to be inserted at tick
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketFbs>> *events() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketFbs>> *>(VT_EVENTS);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint64_t>(verifier, VT_TICK, 8) &&
+           VerifyOffset(verifier, VT_EVENTS) &&
+           verifier.VerifyVector(events()) &&
+           verifier.VerifyVectorOfTables(events()) &&
+           verifier.EndTable();
+  }
+};
+
+struct TickEventsPairFbsBuilder {
+  typedef TickEventsPairFbs Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_tick(uint64_t tick) {
+    fbb_.AddElement<uint64_t>(TickEventsPairFbs::VT_TICK, tick, 0);
+  }
+  void add_events(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketFbs>>> events) {
+    fbb_.AddOffset(TickEventsPairFbs::VT_EVENTS, events);
+  }
+  explicit TickEventsPairFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<TickEventsPairFbs> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<TickEventsPairFbs>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<TickEventsPairFbs> CreateTickEventsPairFbs(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint64_t tick = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketFbs>>> events = 0) {
+  TickEventsPairFbsBuilder builder_(_fbb);
+  builder_.add_tick(tick);
+  builder_.add_events(events);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<TickEventsPairFbs> CreateTickEventsPairFbsDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint64_t tick = 0,
+    const std::vector<::flatbuffers::Offset<steamrot::EventPacketFbs>> *events = nullptr) {
+  auto events__ = events ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::EventPacketFbs>>(*events) : 0;
+  return steamrot::CreateTickEventsPairFbs(
+      _fbb,
+      tick,
+      events__);
 }
 
 ////////////////////////////////////////////////////////////
