@@ -1,4 +1,5 @@
 include "simulation_data.fbs";
+include "input_data.fbs";
 include "../engine/engine_state.fbs";
 include "../core/engine_snapshot.fbs";
 
@@ -55,6 +56,7 @@ table TestDataFbs
     
   /// @brief Simulation data for executing logic steps during tests
   simulation_data: SimulationDataFbs;
+
     
   /// @brief Number of ticks to run the test for
   /// Note: Field name is num_ticks in schema but maps to number_of_ticks in C++

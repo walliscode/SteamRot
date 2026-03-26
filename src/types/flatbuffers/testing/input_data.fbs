@@ -63,13 +63,14 @@ table InputEvent {
 ////////////////////////////////////////////////////////////
 /// @brief Sequence of input events for simulation
 ///
-/// Represents a complete sequence of inputs that can be replayed
-/// during a test, allowing tick-by-tick input injection.
+/// Represents a complete sequence of inputs at a given tick
 ////////////////////////////////////////////////////////////
 table InputSequence {
   /// @brief Ordered list of input events
   inputs: [InputEvent];
   
-  /// @brief Optional description of the input sequence
-  description: string;
+  /// @brief tick at which to insert the inputs
+  tick: uint32;
 }
+
+

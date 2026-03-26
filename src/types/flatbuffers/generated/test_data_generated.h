@@ -15,6 +15,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 #include "engine_snapshot_generated.h"
 #include "engine_state_generated.h"
+#include "input_data_generated.h"
 #include "simulation_data_generated.h"
 
 namespace steamrot {
