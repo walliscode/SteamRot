@@ -61,7 +61,7 @@ set(schema_files
     # Testing
     ${CMAKE_CURRENT_SOURCE_DIR}/testing/test_data.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/testing/simulation_data.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/testing/input_test_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/testing/input_data.fbs
 )
 
 set(generated_headers)
