@@ -9,6 +9,8 @@
 #include "DisplayManager.h"
 #include "Engine.h"
 #include "FailInfo.h"
+#include <expected>
+#include <variant>
 
 namespace steamrot {
 /////////////////////////////////////////////////
@@ -34,7 +36,7 @@ private:
   /// For GameEngine, updates all active scenes via SceneManager. so this is
   /// intentionally left blank.
   /////////////////////////////////////////////////
-  void TickSceneLogic() override;
+  std::expected<std::monostate, FailInfo> TickSceneLogic() override;
 
   /////////////////////////////////////////////////
   /// @brief Process rendering logic (new Tick_() pipeline method)
