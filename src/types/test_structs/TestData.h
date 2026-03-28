@@ -13,11 +13,13 @@
 /////////////////////////////////////////////////
 #include "EngineSnapshot.h"
 #include "EventPacket.h"
+#include "SceneType.h"
 #include "SimulationData.h"
 #include "TestMetaData.h"
 #include <cstddef>
 #include <cstdint>
 #include <map>
+#include <optional>
 #include <unordered_map>
 
 namespace steamrot {
@@ -55,6 +57,16 @@ struct TestData {
   /// @brief starting engine snapshot before simulation begins
   /////////////////////////////////////////////////
   EngineSnapshot starting_engine_snapshot{};
+
+  /////////////////////////////////////////////////
+  /// @brief If set, the TestEngine loads this scene from default data instead
+  /// of using starting_engine_snapshot.
+  ///
+  /// When present (and not UNKNOWN), TestEngine::StartUp() calls
+  /// SceneManager::AddSceneFromDefault() with this scene type, mirroring the
+  /// behaviour of GameEngine. The starting_engine_snapshot is ignored.
+  /////////////////////////////////////////////////
+  std::optional<SceneType> initial_scene_type{std::nullopt};
 
   /////////////////////////////////////////////////
   /// @brief Expected engine snapshots at a given tick

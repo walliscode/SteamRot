@@ -297,3 +297,126 @@ TEST_CASE("ConfigureTestData populates from valid data",
           steamrot::LogicClassEnum::UIActionLogic);
   REQUIRE(test_data.number_of_ticks == 5);
 }
+
+/////////////////////////////////////////////////
+// initial_scene_type tests
+/////////////////////////////////////////////////
+
+TEST_CASE("ConfigureTestData succeeds without simulation_data",
+          "[unit][configure_test_data]") {
+
+  steamrot::TestData test_data;
+  steamrot::EventHandler event_handler;
+
+  flatbuffers::FlatBufferBuilder builder;
+  auto meta_offset = steamrot::CreateTestMetadataFbs(
+      builder, builder.CreateString("NoSimTest"));
+  // no simulation_data offset -- pass 0
+  auto test_data_offset =
+      steamrot::CreateTestDataFbs(builder, meta_offset, 0, 3);
+  builder.Finish(test_data_offset);
+  const steamrot::TestDataFbs *fbs =
+      steamrot::GetTestDataFbs(builder.GetBufferPointer());
+
+  auto result = steamrot::data::configure::ConfigureTestData(test_data, fbs,
+                                                             event_handler);
+
+  REQUIRE(result.has_value());
+  REQUIRE(test_data.meta_data.test_name == "NoSimTest");
+  REQUIRE(test_data.simulation_data.steps.empty());
+  REQUIRE(test_data.number_of_ticks == 3);
+}
+
+TEST_CASE("ConfigureTestData maps initial_scene_type TITLE correctly",
+          "[unit][configure_test_data]") {
+
+  steamrot::TestData test_data;
+  steamrot::EventHandler event_handler;
+
+  flatbuffers::FlatBufferBuilder builder;
+  auto meta_offset = steamrot::CreateTestMetadataFbs(
+      builder, builder.CreateString("DefaultLoadTest"));
+  auto test_data_offset = steamrot::CreateTestDataFbs(
+      builder, meta_offset, 0, 1, 0, 0,
+      steamrot::SceneTypeFbs_TITLE);
+  builder.Finish(test_data_offset);
+  const steamrot::TestDataFbs *fbs =
+      steamrot::GetTestDataFbs(builder.GetBufferPointer());
+
+  auto result = steamrot::data::configure::ConfigureTestData(test_data, fbs,
+                                                             event_handler);
+
+  REQUIRE(result.has_value());
+  REQUIRE(test_data.initial_scene_type.has_value());
+  REQUIRE(test_data.initial_scene_type.value() == steamrot::SceneType::TITLE);
+}
+
+TEST_CASE("ConfigureTestData maps initial_scene_type CRAFTING correctly",
+          "[unit][configure_test_data]") {
+
+  steamrot::TestData test_data;
+  steamrot::EventHandler event_handler;
+
+  flatbuffers::FlatBufferBuilder builder;
+  auto meta_offset = steamrot::CreateTestMetadataFbs(
+      builder, builder.CreateString("CraftingDefaultTest"));
+  auto test_data_offset = steamrot::CreateTestDataFbs(
+      builder, meta_offset, 0, 1, 0, 0,
+      steamrot::SceneTypeFbs_CRAFTING);
+  builder.Finish(test_data_offset);
+  const steamrot::TestDataFbs *fbs =
+      steamrot::GetTestDataFbs(builder.GetBufferPointer());
+
+  auto result = steamrot::data::configure::ConfigureTestData(test_data, fbs,
+                                                             event_handler);
+
+  REQUIRE(result.has_value());
+  REQUIRE(test_data.initial_scene_type.has_value());
+  REQUIRE(test_data.initial_scene_type.value() == steamrot::SceneType::CRAFTING);
+}
+
+TEST_CASE("ConfigureTestData leaves initial_scene_type nullopt by default",
+          "[unit][configure_test_data]") {
+
+  steamrot::TestData test_data;
+  steamrot::EventHandler event_handler;
+
+  flatbuffers::FlatBufferBuilder builder;
+  auto meta_offset = steamrot::CreateTestMetadataFbs(
+      builder, builder.CreateString("DefaultCheck"));
+  auto test_data_offset =
+      steamrot::CreateTestDataFbs(builder, meta_offset, 0, 1);
+  builder.Finish(test_data_offset);
+  const steamrot::TestDataFbs *fbs =
+      steamrot::GetTestDataFbs(builder.GetBufferPointer());
+
+  auto result = steamrot::data::configure::ConfigureTestData(test_data, fbs,
+                                                             event_handler);
+
+  REQUIRE(result.has_value());
+  REQUIRE_FALSE(test_data.initial_scene_type.has_value());
+}
+
+TEST_CASE("ConfigureTestData leaves initial_scene_type nullopt when UNKNOWN",
+          "[unit][configure_test_data]") {
+
+  steamrot::TestData test_data;
+  steamrot::EventHandler event_handler;
+
+  flatbuffers::FlatBufferBuilder builder;
+  auto meta_offset = steamrot::CreateTestMetadataFbs(
+      builder, builder.CreateString("UnknownSceneTest"));
+  // Explicitly passing UNKNOWN (the FlatBuffers default) leaves initial_scene_type as nullopt.
+  auto test_data_offset = steamrot::CreateTestDataFbs(
+      builder, meta_offset, 0, 1, 0, 0,
+      steamrot::SceneTypeFbs_UNKNOWN);
+  builder.Finish(test_data_offset);
+  const steamrot::TestDataFbs *fbs =
+      steamrot::GetTestDataFbs(builder.GetBufferPointer());
+
+  auto result = steamrot::data::configure::ConfigureTestData(test_data, fbs,
+                                                             event_handler);
+
+  REQUIRE(result.has_value());
+  REQUIRE_FALSE(test_data.initial_scene_type.has_value());
+}

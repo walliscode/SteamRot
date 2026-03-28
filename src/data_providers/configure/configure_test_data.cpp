@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "configure_test_data.h"
 #include "configure_engine_snapshot.h"
+#include "scene_type_conversion.h"
 
 namespace steamrot::data::configure {
 
@@ -170,11 +171,15 @@ ConfigureTestData(TestData &test_data, const TestDataFbs *fbs_test_data,
   if (!meta_data_result)
     return std::unexpected(meta_data_result.error());
 
-  // Configure SimulationData
-  auto simulation_data_result = ConfigureSimulationData(
-      test_data.simulation_data, fbs_test_data->simulation_data());
-  if (!simulation_data_result)
-    return std::unexpected(simulation_data_result.error());
+  // Configure SimulationData (optional).
+  // When absent, test_data.simulation_data remains default-constructed
+  // (empty steps vector), which means no simulation logic will be executed.
+  if (fbs_test_data->simulation_data()) {
+    auto simulation_data_result = ConfigureSimulationData(
+        test_data.simulation_data, fbs_test_data->simulation_data());
+    if (!simulation_data_result)
+      return std::unexpected(simulation_data_result.error());
+  }
 
   // Configure number_of_ticks, this must be present
   if (!fbs_test_data->num_ticks()) {
@@ -202,6 +207,16 @@ ConfigureTestData(TestData &test_data, const TestDataFbs *fbs_test_data,
         fbs_test_data->expected_engine_snapshots(), event_handler);
     if (!expected_snapshots_result)
       return std::unexpected(expected_snapshots_result.error());
+  }
+
+  // Configure initial_scene_type (optional).
+  // UNKNOWN is the FlatBuffers default and means "use starting_engine_snapshot".
+  if (fbs_test_data->initial_scene_type() != SceneTypeFbs_UNKNOWN) {
+    auto conversion_result =
+        ConvertSceneTypeFbsToSceneType(fbs_test_data->initial_scene_type());
+    if (!conversion_result.has_value())
+      return std::unexpected(conversion_result.error());
+    test_data.initial_scene_type = conversion_result.value();
   }
 
   return std::monostate{};

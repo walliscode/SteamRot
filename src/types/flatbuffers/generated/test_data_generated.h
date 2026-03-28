@@ -17,6 +17,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 #include "engine_state_generated.h"
 #include "event_packet_generated.h"
 #include "input_data_generated.h"
+#include "scene_types_generated.h"
 #include "simulation_data_generated.h"
 
 namespace steamrot {
@@ -307,7 +308,8 @@ struct TestDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_SIMULATION_DATA = 6,
     VT_NUM_TICKS = 8,
     VT_STARTING_ENGINE_SNAPSHOT = 10,
-    VT_EXPECTED_ENGINE_SNAPSHOTS = 12
+    VT_EXPECTED_ENGINE_SNAPSHOTS = 12,
+    VT_INITIAL_SCENE_TYPE = 14
   };
   /// @brief Metadata about this test case
   const steamrot::TestMetadataFbs *meta_data() const {
@@ -333,6 +335,12 @@ struct TestDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::TickSnapshotPairFbs>> *expected_engine_snapshots() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::TickSnapshotPairFbs>> *>(VT_EXPECTED_ENGINE_SNAPSHOTS);
   }
+  /// @brief If set, the TestEngine loads this scene from default data instead
+  /// of using starting_engine_snapshot. UNKNOWN (0) means use
+  /// starting_engine_snapshot (default behavior).
+  steamrot::SceneTypeFbs initial_scene_type() const {
+    return static_cast<steamrot::SceneTypeFbs>(GetField<int8_t>(VT_INITIAL_SCENE_TYPE, 0));
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_META_DATA) &&
@@ -345,6 +353,7 @@ struct TestDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_EXPECTED_ENGINE_SNAPSHOTS) &&
            verifier.VerifyVector(expected_engine_snapshots()) &&
            verifier.VerifyVectorOfTables(expected_engine_snapshots()) &&
+           VerifyField<int8_t>(verifier, VT_INITIAL_SCENE_TYPE, 1) &&
            verifier.EndTable();
   }
 };
@@ -368,6 +377,9 @@ struct TestDataFbsBuilder {
   void add_expected_engine_snapshots(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::TickSnapshotPairFbs>>> expected_engine_snapshots) {
     fbb_.AddOffset(TestDataFbs::VT_EXPECTED_ENGINE_SNAPSHOTS, expected_engine_snapshots);
   }
+  void add_initial_scene_type(steamrot::SceneTypeFbs initial_scene_type) {
+    fbb_.AddElement<int8_t>(TestDataFbs::VT_INITIAL_SCENE_TYPE, static_cast<int8_t>(initial_scene_type), 0);
+  }
   explicit TestDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -386,13 +398,15 @@ inline ::flatbuffers::Offset<TestDataFbs> CreateTestDataFbs(
     ::flatbuffers::Offset<steamrot::SimulationDataFbs> simulation_data = 0,
     uint32_t num_ticks = 1,
     ::flatbuffers::Offset<steamrot::EngineSnapshotFbs> starting_engine_snapshot = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::TickSnapshotPairFbs>>> expected_engine_snapshots = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::TickSnapshotPairFbs>>> expected_engine_snapshots = 0,
+    steamrot::SceneTypeFbs initial_scene_type = steamrot::SceneTypeFbs_UNKNOWN) {
   TestDataFbsBuilder builder_(_fbb);
   builder_.add_expected_engine_snapshots(expected_engine_snapshots);
   builder_.add_starting_engine_snapshot(starting_engine_snapshot);
   builder_.add_num_ticks(num_ticks);
   builder_.add_simulation_data(simulation_data);
   builder_.add_meta_data(meta_data);
+  builder_.add_initial_scene_type(initial_scene_type);
   return builder_.Finish();
 }
 
@@ -402,7 +416,8 @@ inline ::flatbuffers::Offset<TestDataFbs> CreateTestDataFbsDirect(
     ::flatbuffers::Offset<steamrot::SimulationDataFbs> simulation_data = 0,
     uint32_t num_ticks = 1,
     ::flatbuffers::Offset<steamrot::EngineSnapshotFbs> starting_engine_snapshot = 0,
-    std::vector<::flatbuffers::Offset<steamrot::TickSnapshotPairFbs>> *expected_engine_snapshots = nullptr) {
+    std::vector<::flatbuffers::Offset<steamrot::TickSnapshotPairFbs>> *expected_engine_snapshots = nullptr,
+    steamrot::SceneTypeFbs initial_scene_type = steamrot::SceneTypeFbs_UNKNOWN) {
   auto expected_engine_snapshots__ = expected_engine_snapshots ? _fbb.CreateVectorOfSortedTables<steamrot::TickSnapshotPairFbs>(expected_engine_snapshots) : 0;
   return steamrot::CreateTestDataFbs(
       _fbb,
@@ -410,7 +425,8 @@ inline ::flatbuffers::Offset<TestDataFbs> CreateTestDataFbsDirect(
       simulation_data,
       num_ticks,
       starting_engine_snapshot,
-      expected_engine_snapshots__);
+      expected_engine_snapshots__,
+      initial_scene_type);
 }
 
 inline const steamrot::TestDataFbs *GetTestDataFbs(const void *buf) {

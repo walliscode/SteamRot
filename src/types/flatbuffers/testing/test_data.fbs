@@ -3,6 +3,7 @@ include "input_data.fbs";
 include "../engine/engine_state.fbs";
 include "../core/engine_snapshot.fbs";
 include "../events/event_packet.fbs";
+include "../core/scene_types.fbs";
 
 namespace steamrot;
 
@@ -86,6 +87,11 @@ table TestDataFbs
   /// Maps tick numbers to expected engine states for validation.
   /// In C++, this becomes std::map<size_t, EngineSnapshot>.
   expected_engine_snapshots: [TickSnapshotPairFbs];
+
+  /// @brief If set, the TestEngine loads this scene from default data instead
+  /// of using starting_engine_snapshot. UNKNOWN (0) means use
+  /// starting_engine_snapshot (default behavior).
+  initial_scene_type: SceneTypeFbs = UNKNOWN;
 }
 
 root_type TestDataFbs;
