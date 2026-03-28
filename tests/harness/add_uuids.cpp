@@ -15,6 +15,12 @@ namespace steamrot::tests {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> add_uuids(TestData &data) {
 
+  // When loading from default data the starting_engine_snapshot is not used,
+  // so there are no scene UUIDs to assign or propagate.
+  if (data.initial_scene_type.has_value()) {
+    return std::monostate{};
+  }
+
   // if starting engine snapshot has no scene data, return error
   if (data.starting_engine_snapshot.scene_collection_data.empty())
     return std::unexpected(FailInfo{

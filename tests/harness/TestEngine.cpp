@@ -41,12 +41,19 @@ std::expected<std::monostate, FailInfo> TestEngine::StartUp() {
     event_handler.ProcessWaitingRoomEventBus();
   }
 
-  // pass SceneCollectionData to SceneManager
-  auto add_scenes_result = m_scene_manager.AddScenesFromSceneCollectionData(
-      m_test_data.starting_engine_snapshot.scene_collection_data);
-
-  if (!add_scenes_result.has_value()) {
-    return std::unexpected(add_scenes_result.error());
+  // load initial scenes: either from default data or from starting snapshot
+  if (m_test_data.initial_scene_type.has_value()) {
+    auto add_scene_result = m_scene_manager.AddSceneFromDefault(
+        m_test_data.initial_scene_type.value());
+    if (!add_scene_result.has_value()) {
+      return std::unexpected(add_scene_result.error());
+    }
+  } else {
+    auto add_scenes_result = m_scene_manager.AddScenesFromSceneCollectionData(
+        m_test_data.starting_engine_snapshot.scene_collection_data);
+    if (!add_scenes_result.has_value()) {
+      return std::unexpected(add_scenes_result.error());
+    }
   }
 
   // after successful startup, export initial snapshot at tick 0
