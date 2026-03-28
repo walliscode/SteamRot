@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "TestEngine.h"
 #include "EventHandler.h"
+#include "FailInfo.h"
 #include "SimulationRunner.h"
 #include <expected>
 #include <format>
@@ -84,7 +85,7 @@ void TestEngine::RunGameLoop() {
 }
 
 /////////////////////////////////////////////////
-void TestEngine::TickSceneLogic() {
+std::expected<std::monostate, FailInfo> TestEngine::TickSceneLogic() {
 
   // process SimulationRunner for each scene
   for (auto &scene : m_scene_manager.GetScenes()) {
@@ -97,9 +98,11 @@ void TestEngine::TickSceneLogic() {
     // execute simulation
     auto simulation_result = runner.ExecuteSimulation();
     if (!simulation_result.has_value()) {
-      // [TODO:] handle simulation failure (log, halt, etc.)
+      return std::unexpected(simulation_result.error());
     }
   }
+
+  return std::monostate{};
 }
 
 /////////////////////////////////////////////////
