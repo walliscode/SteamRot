@@ -134,7 +134,7 @@ protected:
   /// GameEngine updates all active scenes, TestEngine may use simulation data.
   /// Can be called individually for testing scene logic in isolation.
   /////////////////////////////////////////////////
-  virtual void TickSceneLogic() = 0;
+  virtual std::expected<std::monostate, FailInfo> TickSceneLogic() = 0;
 
   /////////////////////////////////////////////////
   /// @brief Process rendering logic.

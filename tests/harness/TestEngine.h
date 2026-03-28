@@ -67,7 +67,7 @@ private:
   /// For TestEngine, uses simulation data if available, otherwise
   /// falls back to normal scene updates.
   /////////////////////////////////////////////////
-  void TickSceneLogic() override;
+  std::expected<std::monostate, FailInfo> TickSceneLogic() override;
 
   /////////////////////////////////////////////////
   /// @brief Currently no need to run Engine level subscription logic

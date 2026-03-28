@@ -9,7 +9,9 @@
 
 #include "GameEngine.h"
 #include "EventPayload.h"
+#include "FailInfo.h"
 #include <expected>
+#include <variant>
 
 namespace steamrot {
 
@@ -48,11 +50,13 @@ void GameEngine::RunGameLoop() {
 }
 
 /////////////////////////////////////////////////
-void GameEngine::TickSceneLogic() {
+std::expected<std::monostate, FailInfo> GameEngine::TickSceneLogic() {
 
   ///// LEFT BLANK INTENTIONALLY /////
   /// For GameEngine, all scene logic is handled by SceneManager internally
   /// This is to provide granularity for the TestEngine to simulate scene logic
+
+  return std::monostate{};
 }
 
 /////////////////////////////////////////////////
