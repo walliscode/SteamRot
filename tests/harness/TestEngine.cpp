@@ -85,13 +85,17 @@ void TestEngine::RunGameLoop() {
 }
 
 /////////////////////////////////////////////////
-void TestEngine::TickSceneManager() {
+std::expected<std::monostate, FailInfo> TestEngine::TickSceneManager() {
 
   // When use_default_logic is set, delegate entirely to the SceneManager:
-  // subscriptions then UpdateScenes — identical to production GameEngine behaviour.
+  // subscriptions then UpdateScenes — identical to production GameEngine
+  // behaviour.
   if (m_test_data.simulation_data.use_default_logic) {
-    Engine::TickSceneManager();
-    return;
+    auto tick_result = Engine::TickSceneManager();
+    if (!tick_result.has_value()) {
+      return std::unexpected(tick_result.error());
+    }
+    return std::monostate{};
   }
 
   // When use_default_logic is false, skip the default scene logic entirely and
@@ -104,8 +108,13 @@ void TestEngine::TickSceneManager() {
     SimulationRunner runner(m_test_data.simulation_data, scene_context);
 
     // execute simulation (error is not propagated — TickSceneManager is void)
-    runner.ExecuteSimulation();
+    auto simulation_result = runner.ExecuteSimulation();
+    if ((!simulation_result.has_value())) {
+      return std::unexpected(simulation_result.error());
+    }
   }
+
+  return std::monostate{};
 }
 
 /////////////////////////////////////////////////

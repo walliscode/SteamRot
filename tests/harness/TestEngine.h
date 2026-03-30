@@ -73,7 +73,7 @@ private:
   /// and only the explicit SimulationRunner steps are executed, preventing
   /// data from being passed through logic classes twice.
   /////////////////////////////////////////////////
-  void TickSceneManager() override;
+  std::expected<std::monostate, FailInfo> TickSceneManager() override;
 
   /////////////////////////////////////////////////
   /// @brief Currently no need to run Engine level subscription logic
