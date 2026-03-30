@@ -64,8 +64,13 @@ private:
   /////////////////////////////////////////////////
   /// @brief Process scene-specific logic (new Tick_() pipeline method)
   ///
-  /// For TestEngine, uses simulation data if available, otherwise
-  /// falls back to normal scene updates.
+  /// When SimulationData::use_default_logic is true, this method returns
+  /// immediately so that the scene logic already executed by TickSceneManager()
+  /// (via SceneManager::UpdateScenes()) stands as the sole execution — exactly
+  /// mirroring the production GameEngine behaviour.
+  ///
+  /// When use_default_logic is false (the default), SimulationRunner drives
+  /// execution using the explicit SimulationData::steps list.
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo> TickSceneLogic() override;
 

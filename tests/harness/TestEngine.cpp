@@ -87,6 +87,14 @@ void TestEngine::RunGameLoop() {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> TestEngine::TickSceneLogic() {
 
+  // When use_default_logic is set, TickSceneManager() has already run
+  // UpdateScenes() which calls sCollision/sAction/sMovement/sRender on every
+  // scene using the logic_map built by LogicFactory — exactly matching the
+  // production GameEngine behaviour. Nothing more to do here.
+  if (m_test_data.simulation_data.use_default_logic) {
+    return std::monostate{};
+  }
+
   // process SimulationRunner for each scene
   for (auto &scene : m_scene_manager.GetScenes()) {
 

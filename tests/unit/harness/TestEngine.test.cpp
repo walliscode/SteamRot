@@ -471,3 +471,74 @@ TEST_CASE(
   REQUIRE_THAT(data_bank.at(0), steamrot::tests::EqualsEngineSnapshot(
                                     test_data.starting_engine_snapshot));
 }
+
+TEST_CASE("SimulationData::use_default_logic defaults to false",
+          "[unit][SimulationData]") {
+  steamrot::SimulationData simulation_data;
+  REQUIRE(simulation_data.use_default_logic == false);
+}
+
+TEST_CASE(
+    "TestEngine::TickSceneLogic skips SimulationRunner when use_default_logic "
+    "is true",
+    "[unit][TestEngine]") {
+  // Arrange - an invalid step that would cause SimulationRunner to fail
+  steamrot::TestData test_data;
+  test_data.number_of_ticks = 1;
+  test_data.simulation_data.use_default_logic = true;
+  test_data.simulation_data.steps.push_back(
+      steamrot::SimulationStep{steamrot::LogicClassEnum::None});
+
+  // Act
+  steamrot::tests::TestEngine engine(test_data);
+  auto startup_result = engine.StartUp();
+  if (!startup_result.has_value()) {
+    FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+  }
+  auto result = engine.RunGame();
+
+  // Assert - RunGame should succeed because SimulationRunner is bypassed
+  REQUIRE(result.has_value());
+}
+
+TEST_CASE("TestEngine runs with use_default_logic and default Title Scene",
+          "[unit][TestEngine]") {
+  // Arrange - load default scene and use the default logic_map
+  steamrot::TestData test_data;
+  test_data.number_of_ticks = 2;
+  test_data.initial_scene_type = steamrot::SceneType::TITLE;
+  test_data.simulation_data.use_default_logic = true;
+
+  // Act
+  steamrot::tests::TestEngine engine(test_data);
+  auto startup_result = engine.StartUp();
+  if (!startup_result.has_value()) {
+    FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+  }
+  auto result = engine.RunGame();
+
+  // Assert
+  REQUIRE(result.has_value());
+  REQUIRE(engine.GetCurrentTick() == 2);
+}
+
+TEST_CASE("TestEngine runs with use_default_logic and default Crafting Scene",
+          "[unit][TestEngine]") {
+  // Arrange
+  steamrot::TestData test_data;
+  test_data.number_of_ticks = 2;
+  test_data.initial_scene_type = steamrot::SceneType::CRAFTING;
+  test_data.simulation_data.use_default_logic = true;
+
+  // Act
+  steamrot::tests::TestEngine engine(test_data);
+  auto startup_result = engine.StartUp();
+  if (!startup_result.has_value()) {
+    FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+  }
+  auto result = engine.RunGame();
+
+  // Assert
+  REQUIRE(result.has_value());
+  REQUIRE(engine.GetCurrentTick() == 2);
+}

@@ -65,5 +65,16 @@ struct SimulationData {
   /// @brief Ordered list of simulation steps to be executed
   /////////////////////////////////////////////////
   std::vector<SimulationStep> steps{};
+
+  /////////////////////////////////////////////////
+  /// @brief When true, the TestEngine uses the scene's pre-built logic_map
+  /// (as configured by LogicFactory) instead of the explicit steps list.
+  ///
+  /// This exactly mirrors the production GameEngine behaviour: each scene runs
+  /// sCollision, sAction, sMovement and sRender in the standard order using
+  /// the Logic objects that LogicFactory created for that scene type.
+  /// The steps list is ignored when this flag is set.
+  /////////////////////////////////////////////////
+  bool use_default_logic{false};
 };
 } // namespace steamrot
