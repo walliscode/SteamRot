@@ -10,7 +10,9 @@
 #include "SceneType.h"
 #include "configure_input_action.h"
 #include "event_packet_generated.h"
+#include "event_payload_generated.h"
 #include "uuid.h"
+#include <format>
 
 namespace steamrot::data::configure {
 
@@ -66,10 +68,12 @@ ConfigureUIPayload(UIPayload &ui_payload, const UIPayloadFbs *ui_payload_data) {
   case UIActionFbs_TOGGLE:
     ui_payload.action = UIPayload::UIAction::TOGGLE;
     break;
+
   default:
-    return std::unexpected(
-        FailInfo{FailMode::NonExistentEnumValue,
-                 "Unknown UIActionFbs value in flatbuffers data"});
+    std::string action_name = EnumNameUIActionFbs(ui_payload_data->action());
+    return std::unexpected(FailInfo{
+        FailMode::NonExistentEnumValue,
+        std::format("UIActionFBS enum is not accounted for {}", action_name)});
   }
 
   return std::monostate{};
@@ -237,6 +241,12 @@ ConfigureEventPayload(EventPayload &event_payload,
   case EventPayloadFbs_InputPayloadFbs: {
     auto *input_payload_data =
         static_cast<const InputPayloadFbs *>(event_payload_ptr);
+    if (!input_payload_data) {
+      return std::unexpected(
+          FailInfo{FailMode::FlatbuffersDataNotFound,
+                   "InputPayloadFbs data pointer is null, cannot populate "
+                   "InputPayload"});
+    }
     InputPayload input_payload;
     auto result = ConfigureInputPayload(input_payload, input_payload_data);
     if (!result.has_value()) {
@@ -248,6 +258,12 @@ ConfigureEventPayload(EventPayload &event_payload,
   case EventPayloadFbs_UIPayloadFbs: {
     auto *ui_payload_data =
         static_cast<const UIPayloadFbs *>(event_payload_ptr);
+    if (!ui_payload_data) {
+      return std::unexpected(
+          FailInfo{FailMode::FlatbuffersDataNotFound,
+                   "UIPayloadFbs data pointer is null, cannot populate "
+                   "UIPayload"});
+    }
     UIPayload ui_payload;
     auto result = ConfigureUIPayload(ui_payload, ui_payload_data);
     if (!result.has_value()) {
@@ -259,6 +275,12 @@ ConfigureEventPayload(EventPayload &event_payload,
   case EventPayloadFbs_LogicPayloadFbs: {
     auto *logic_payload_data =
         static_cast<const LogicPayloadFbs *>(event_payload_ptr);
+    if (!logic_payload_data) {
+      return std::unexpected(
+          FailInfo{FailMode::FlatbuffersDataNotFound,
+                   "LogicPayloadFbs data pointer is null, cannot populate "
+                   "LogicPayload"});
+    }
     LogicPayload logic_payload;
     auto result = ConfigureLogicPayload(logic_payload, logic_payload_data);
     if (!result.has_value()) {
@@ -270,6 +292,13 @@ ConfigureEventPayload(EventPayload &event_payload,
   case EventPayloadFbs_ScenePayloadFbs: {
     auto *scene_payload_data =
         static_cast<const ScenePayloadFbs *>(event_payload_ptr);
+
+    if (!scene_payload_data) {
+      return std::unexpected(
+          FailInfo{FailMode::FlatbuffersDataNotFound,
+                   "ScenePayloadFbs data pointer is null, cannot populate "
+                   "ScenePayload"});
+    }
     ScenePayload scene_payload;
     auto result = ConfigureScenePayload(scene_payload, scene_payload_data);
     if (!result.has_value()) {
@@ -281,6 +310,13 @@ ConfigureEventPayload(EventPayload &event_payload,
   case EventPayloadFbs_SystemPayloadFbs: {
     auto *system_payload_data =
         static_cast<const SystemPayloadFbs *>(event_payload_ptr);
+
+    if (!system_payload_data) {
+      return std::unexpected(
+          FailInfo{FailMode::FlatbuffersDataNotFound,
+                   "SystemPayloadFbs data pointer is null, cannot populate "
+                   "SystemPayload"});
+    }
     SystemPayload system_payload;
     auto result = ConfigureSystemPayload(system_payload, system_payload_data);
     if (!result.has_value()) {

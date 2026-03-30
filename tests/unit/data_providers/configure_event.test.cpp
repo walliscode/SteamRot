@@ -116,7 +116,9 @@ TEST_CASE("ConfigureUIPayload populates from valid data",
   auto result =
       steamrot::data::configure::ConfigureUIPayload(payload, fbs_data);
 
-  REQUIRE(result.has_value());
+  if (!result.has_value()) {
+    FAIL("ConfigureUIPayload failed: " + result.error().message);
+  }
   REQUIRE(payload.c_ui_state_name == "test_state");
   REQUIRE(payload.action == steamrot::UIPayload::UIAction::TOGGLE);
 }

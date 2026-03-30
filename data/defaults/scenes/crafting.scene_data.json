@@ -96,7 +96,7 @@
                           "type": "UI",
                           "payload_type": "UIPayloadFbs",
                           "payload": {
-                            "c_user_interface_name": "new_construct_menu_on",
+                            "c_ui_state_name": "new_construct_menu_on",
                             "action": "TOGGLE"
                           }
                         },
@@ -166,7 +166,7 @@
                           "type": "UI",
                           "payload_type": "UIPayloadFbs",
                           "payload": {
-                            "c_user_interface_name": "new_construct_menu_off",
+                            "c_ui_state_name": "new_construct_menu_off",
                             "action": "TOGGLE"
                           }
                         },
