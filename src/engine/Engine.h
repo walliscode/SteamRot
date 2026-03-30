@@ -113,8 +113,10 @@ protected:
   /// This method handles window events, keyboard/mouse input, and updates
   /// the event bus with new events. Can be called individually for testing
   /// event processing in isolation.
+  ///
+  /// @return Success or failure information
   /////////////////////////////////////////////////
-  virtual void TickEvents();
+  virtual std::expected<std::monostate, FailInfo> TickEvents();
 
   /////////////////////////////////////////////////
   /// @brief Process engine-level subscriptions and logic.
@@ -143,8 +145,10 @@ protected:
   /// GameEngine renders to the display via DisplayManager.
   /// TestEngine may skip rendering or render for validation only.
   /// Can be called individually for testing rendering in isolation.
+  ///
+  /// @return Success or failure information
   /////////////////////////////////////////////////
-  virtual void TickRendering() = 0;
+  virtual std::expected<std::monostate, FailInfo> TickRendering() = 0;
 
   /////////////////////////////////////////////////
   /// @brief Hook called at the end of each tick (after all processing).

@@ -34,8 +34,10 @@ private:
   /// @brief Process rendering logic (new Tick_() pipeline method)
   ///
   /// For GameEngine, renders to display via DisplayManager.
+  ///
+  /// @return Success or failure information
   /////////////////////////////////////////////////
-  void TickRendering() override;
+  std::expected<std::monostate, FailInfo> TickRendering() override;
 
   /////////////////////////////////////////////////
   /// @brief Execute logic for any active subscriptions at the GameEngine level

@@ -354,7 +354,8 @@ TEST_CASE("EventHandler::ExecuteEventHandlerLevelLogic resets all Subscribers",
     event_handler.AddEvent(event);
   // Execute EventHandler level logic
   sf::RenderWindow window(sf::VideoMode({800, 600}), "Test Window");
-  event_handler.ExecuteEventHandlerLevelLogic(window);
+  auto execute_result = event_handler.ExecuteEventHandlerLevelLogic(window);
+  REQUIRE(execute_result.has_value());
   // Check that the subscriber is reset
   REQUIRE(!subscriber->m_active);
 }
@@ -377,7 +378,8 @@ TEST_CASE(
   subscriber.reset();
   // Execute EventHandler level logic
   sf::RenderWindow window(sf::VideoMode({800, 600}), "Test Window");
-  event_handler.ExecuteEventHandlerLevelLogic(window);
+  auto execute_result = event_handler.ExecuteEventHandlerLevelLogic(window);
+  REQUIRE(execute_result.has_value());
   // Check that the subscriber register is empty
   auto subscriber_register = event_handler.GetSubcriberRegister();
   REQUIRE(subscriber_register.at(event_type).empty());

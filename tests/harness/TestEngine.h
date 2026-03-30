@@ -52,8 +52,12 @@ private:
   ///
   /// TestEngine doesn't render to display, but scenes still render
   /// to their texture for validation.
+  ///
+  /// @return Always succeeds (returns monostate)
   /////////////////////////////////////////////////
-  void TickRendering() override {};
+  std::expected<std::monostate, FailInfo> TickRendering() override {
+    return std::monostate{};
+  };
 
   /////////////////////////////////////////////////
   /// @brief For the TestEngine this will execute 1 tick then export data before

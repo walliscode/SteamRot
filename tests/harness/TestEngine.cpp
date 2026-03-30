@@ -72,10 +72,18 @@ void TestEngine::RunGameLoop() {
   for (size_t i{1}; i <= m_target_ticks; i++) {
 
     // execute same tick pipeline as GameEngine
-    ExecuteTick();
+    auto tick_result = ExecuteTick();
+    if (!tick_result.has_value()) {
+      m_loop_error = tick_result.error();
+      break;
+    }
 
     // capture snapshot after tick
     auto snapshot_result = StoreEngineSnapShot();
+    if (!snapshot_result.has_value()) {
+      m_loop_error = snapshot_result.error();
+      break;
+    }
 
     // proceed to next tick if not greater than target
     if (i < m_target_ticks) {
