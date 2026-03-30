@@ -31,14 +31,6 @@ private:
   void RunGameLoop() override;
 
   /////////////////////////////////////////////////
-  /// @brief Process scene-specific logic (new Tick_() pipeline method)
-  ///
-  /// For GameEngine, updates all active scenes via SceneManager. so this is
-  /// intentionally left blank.
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo> TickSceneLogic() override;
-
-  /////////////////////////////////////////////////
   /// @brief Process rendering logic (new Tick_() pipeline method)
   ///
   /// For GameEngine, renders to display via DisplayManager.

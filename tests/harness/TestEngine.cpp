@@ -85,17 +85,19 @@ void TestEngine::RunGameLoop() {
 }
 
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo> TestEngine::TickSceneLogic() {
+void TestEngine::TickSceneManager() {
 
-  // When use_default_logic is set, TickSceneManager() has already run
-  // UpdateScenes() which calls sCollision/sAction/sMovement/sRender on every
-  // scene using the logic_map built by LogicFactory — exactly matching the
-  // production GameEngine behaviour. Nothing more to do here.
+  // Always let SceneManager drive its own logic: subscriptions then
+  // UpdateScenes — identical to production GameEngine behaviour.
+  Engine::TickSceneManager();
+
+  // When use_default_logic is set, UpdateScenes() is the sole execution.
+  // Nothing more to do.
   if (m_test_data.simulation_data.use_default_logic) {
-    return std::monostate{};
+    return;
   }
 
-  // process SimulationRunner for each scene
+  // Additionally run SimulationRunner steps for each scene.
   for (auto &scene : m_scene_manager.GetScenes()) {
 
     auto scene_context = scene.second->GetSceneContext();
@@ -103,14 +105,9 @@ std::expected<std::monostate, FailInfo> TestEngine::TickSceneLogic() {
     // create SimulationRunner instance for each Scene
     SimulationRunner runner(m_test_data.simulation_data, scene_context);
 
-    // execute simulation
-    auto simulation_result = runner.ExecuteSimulation();
-    if (!simulation_result.has_value()) {
-      return std::unexpected(simulation_result.error());
-    }
+    // execute simulation (error is not propagated — TickSceneManager is void)
+    runner.ExecuteSimulation();
   }
-
-  return std::monostate{};
 }
 
 /////////////////////////////////////////////////

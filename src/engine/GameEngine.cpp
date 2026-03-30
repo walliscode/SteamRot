@@ -50,16 +50,6 @@ void GameEngine::RunGameLoop() {
 }
 
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo> GameEngine::TickSceneLogic() {
-
-  ///// LEFT BLANK INTENTIONALLY /////
-  /// For GameEngine, all scene logic is handled by SceneManager internally
-  /// This is to provide granularity for the TestEngine to simulate scene logic
-
-  return std::monostate{};
-}
-
-/////////////////////////////////////////////////
 void GameEngine::TickRendering() {
   // Let DisplayManager handle rendering
   auto call_render_cycle_result = m_display_manager.CallRenderCycle();

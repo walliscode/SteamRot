@@ -479,7 +479,7 @@ TEST_CASE("SimulationData::use_default_logic defaults to false",
 }
 
 TEST_CASE(
-    "TestEngine::TickSceneLogic skips SimulationRunner when use_default_logic "
+    "TestEngine::TickSceneManager skips SimulationRunner when use_default_logic "
     "is true",
     "[unit][TestEngine]") {
   // Arrange - an invalid step that would cause SimulationRunner to fail

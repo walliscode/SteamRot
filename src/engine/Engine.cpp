@@ -113,7 +113,6 @@ void Engine::ExecuteTick() {
   TickEvents();
   TickEngineLogic();
   TickSceneManager();
-  TickSceneLogic();
   TickRendering();
   OnTickEnd();
 }
@@ -137,8 +136,8 @@ void Engine::TickEngineLogic() {
 
 /////////////////////////////////////////////////
 void Engine::TickSceneManager() {
-  // Update SceneManager level logic, such as any subscriptions it owns.
-  // It does not update scenes (that's done in TickSceneLogic).
+  // Delegate all SceneManager work to the SceneManager itself:
+  // ProcessSubscriptions (e.g. scene-change events) then UpdateScenes.
   m_scene_manager.ExecuteSceneManagerLevelLogic();
 }
 
