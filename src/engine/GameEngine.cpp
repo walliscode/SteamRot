@@ -43,7 +43,11 @@ void GameEngine::RunGameLoop() {
   // main game loop
   while (m_engine_state.running && m_engine_resources.game_window.isOpen()) {
     // execute a single tick of all systems
-    ExecuteTick();
+    auto tick_result = ExecuteTick();
+    if (!tick_result.has_value()) {
+      m_loop_error = tick_result.error();
+      break;
+    }
     // increment loop number
     m_engine_resources.loop_number++;
   }

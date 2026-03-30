@@ -104,18 +104,33 @@ std::expected<std::monostate, FailInfo> Engine::RunGame() {
 
   RunGameLoop();
 
+  if (m_loop_error.has_value())
+    return std::unexpected(m_loop_error.value());
+
   return std::monostate{};
 }
 
 /////////////////////////////////////////////////
-void Engine::ExecuteTick() {
+std::expected<std::monostate, FailInfo> Engine::ExecuteTick() {
   OnTickBegin();
   TickEvents();
-  TickEngineLogic();
-  TickSceneManager();
-  TickSceneLogic();
+
+  auto engine_logic_result = TickEngineLogic();
+  if (!engine_logic_result.has_value())
+    return std::unexpected(engine_logic_result.error());
+
+  auto scene_manager_result = TickSceneManager();
+  if (!scene_manager_result.has_value())
+    return std::unexpected(scene_manager_result.error());
+
+  auto scene_logic_result = TickSceneLogic();
+  if (!scene_logic_result.has_value())
+    return std::unexpected(scene_logic_result.error());
+
   TickRendering();
   OnTickEnd();
+
+  return std::monostate{};
 }
 
 /////////////////////////////////////////////////
@@ -126,20 +141,28 @@ void Engine::TickEvents() {
 }
 
 /////////////////////////////////////////////////
-void Engine::TickEngineLogic() {
-  // Check all subscriptions for activation and process
+std::expected<std::monostate, FailInfo> Engine::TickEngineLogic() {
+  // Process engine-level subscriptions and propagate any errors
   auto process_subs_result = ProcessSubscriptions();
+  if (!process_subs_result.has_value())
+    return std::unexpected(process_subs_result.error());
 
   // update mouse position in GameContext
   m_game_context.mouse_position =
       sf::Mouse::getPosition(m_engine_resources.game_window);
+
+  return std::monostate{};
 }
 
 /////////////////////////////////////////////////
-void Engine::TickSceneManager() {
+std::expected<std::monostate, FailInfo> Engine::TickSceneManager() {
   // Update SceneManager level logic, such as any subscriptions it owns.
   // It does not update scenes (that's done in TickSceneLogic).
-  m_scene_manager.ExecuteSceneManagerLevelLogic();
+  auto scene_manager_result = m_scene_manager.ExecuteSceneManagerLevelLogic();
+  if (!scene_manager_result.has_value())
+    return std::unexpected(scene_manager_result.error());
+
+  return std::monostate{};
 }
 
 /////////////////////////////////////////////////

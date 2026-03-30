@@ -303,12 +303,17 @@ std::expected<std::monostate, FailInfo> SceneManager::ProcessSubscriptions() {
 }
 
 /////////////////////////////////////////////////
-void SceneManager::ExecuteSceneManagerLevelLogic() {
-  // process subscriptions, [TODO: handle potential failure]
+std::expected<std::monostate, FailInfo>
+SceneManager::ExecuteSceneManagerLevelLogic() {
+  // Process subscriptions and propagate any errors
   auto process_result = ProcessSubscriptions();
+  if (!process_result.has_value())
+    return std::unexpected(process_result.error());
 
   // update all scenes
   UpdateScenes();
+
+  return std::monostate{};
 }
 
 /////////////////////////////////////////////////
