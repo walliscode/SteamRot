@@ -153,7 +153,12 @@ public:
   const std::unordered_map<uuids::uuid, std::unique_ptr<Scene>> &
   GetScenes() const;
 
-  void ExecuteSceneManagerLevelLogic();
+  /////////////////////////////////////////////////
+  /// @brief Execute scene manager level logic including subscription processing.
+  ///
+  /// @return Success or failure information
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> ExecuteSceneManagerLevelLogic();
 
   /////////////////////////////////////////////////
   /// @brief Provides a snapshot of the current Scenes
