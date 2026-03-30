@@ -33,8 +33,6 @@ ConvertFbsToLogicClassEnum(LogicClassEnumFbs fbs_logic_class_enum) {
     return LogicClassEnum::UIRenderLogic;
   case LogicClassEnumFbs::LogicClassEnumFbs_UIStateLogic:
     return LogicClassEnum::UIStateLogic;
-  case LogicClassEnumFbs::LogicClassEnumFbs_CraftingRenderLogic:
-    return LogicClassEnum::CraftingRenderLogic;
   default:
     return LogicClassEnum::None;
   }
@@ -48,9 +46,8 @@ ConfigureTestMetaData(TestMetaData &test_meta_data,
                       const TestMetadataFbs *fbs_test_meta_data) {
 
   if (fbs_test_meta_data == nullptr) {
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound,
-                 "Input Flatbuffers TestMetaData is null."});
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    "Input Flatbuffers TestMetaData is null."});
   }
 
   // add required field: test_name
@@ -112,8 +109,7 @@ ConfigureSimulationData(SimulationData &simulation_data,
 }
 
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-ConfigureExpectedEngineSnapshots(
+std::expected<std::monostate, FailInfo> ConfigureExpectedEngineSnapshots(
     std::map<size_t, EngineSnapshot> &expected_snapshots,
     const flatbuffers::Vector<flatbuffers::Offset<TickSnapshotPairFbs>>
         *fbs_tick_snapshot_pairs,
@@ -160,9 +156,8 @@ ConfigureTestData(TestData &test_data, const TestDataFbs *fbs_test_data,
                   EventHandler &event_handler) {
 
   if (!fbs_test_data) {
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound,
-                 "Input Flatbuffers TestData is null."});
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    "Input Flatbuffers TestData is null."});
   }
 
   // Configure TestMetaData
@@ -192,10 +187,9 @@ ConfigureTestData(TestData &test_data, const TestDataFbs *fbs_test_data,
 
   // Configure starting_engine_snapshot (optional)
   if (fbs_test_data->starting_engine_snapshot()) {
-    auto snapshot_result =
-        ConfigureEngineSnapshot(test_data.starting_engine_snapshot,
-                                fbs_test_data->starting_engine_snapshot(),
-                                event_handler);
+    auto snapshot_result = ConfigureEngineSnapshot(
+        test_data.starting_engine_snapshot,
+        fbs_test_data->starting_engine_snapshot(), event_handler);
     if (!snapshot_result)
       return std::unexpected(snapshot_result.error());
   }
@@ -210,7 +204,8 @@ ConfigureTestData(TestData &test_data, const TestDataFbs *fbs_test_data,
   }
 
   // Configure initial_scene_type (optional).
-  // UNKNOWN is the FlatBuffers default and means "use starting_engine_snapshot".
+  // UNKNOWN is the FlatBuffers default and means "use
+  // starting_engine_snapshot".
   if (fbs_test_data->initial_scene_type() != SceneTypeFbs_UNKNOWN) {
     auto conversion_result =
         ConvertSceneTypeFbsToSceneType(fbs_test_data->initial_scene_type());

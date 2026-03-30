@@ -22,11 +22,15 @@ namespace steamrot {
 //////////////////////////////////////////////
 enum class LogicClassEnum {
   None = 0,
-  UIActionLogic = 1,
-  UICollisionLogic = 2,
-  UIRenderLogic = 3,
-  UIStateLogic = 4,
-  CraftingRenderLogic = 5,
+  UIActionLogic,
+  UICollisionLogic,
+  UIRenderLogic,
+  UIStateLogic,
+  GrimoireMachinaActionLogic,
+  GrimoireMachinaPositioningLogic,
+  GrimoireMachinaCollisionLogic,
+  GrimoireMachinaRenderLogic
+
 };
 
 using SimulationElement = LogicClassEnum;

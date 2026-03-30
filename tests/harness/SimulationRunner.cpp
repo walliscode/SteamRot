@@ -7,6 +7,10 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "SimulationRunner.h"
+#include "GrimoireMachinaActionLogic.h"
+#include "GrimoireMachinaCollisionLogic.h"
+#include "GrimoireMachinaPositioningLogic.h"
+#include "GrimoireMachinaRenderLogic.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
 #include "UIRenderLogic.h"
@@ -56,6 +60,27 @@ ExecuteLogicClass(LogicClassEnum logic_class, SceneContext &context) {
     logic.RunLogic();
     return std::monostate{};
   }
+  case LogicClassEnum::GrimoireMachinaActionLogic: {
+    logic::GrimoireMachinaActionLogic logic(context);
+    logic.RunLogic();
+    return std::monostate{};
+  }
+  case LogicClassEnum::GrimoireMachinaPositioningLogic: {
+    logic::GrimoireMachinaPositioningLogic logic(context);
+    logic.RunLogic();
+    return std::monostate{};
+  }
+  case LogicClassEnum::GrimoireMachinaCollisionLogic: {
+    logic::GrimoireMachinaCollisionLogic logic(context);
+    logic.RunLogic();
+    return std::monostate{};
+  }
+  case LogicClassEnum::GrimoireMachinaRenderLogic: {
+    logic::GrimoireMachinaRenderLogic logic(context);
+    logic.RunLogic();
+    return std::monostate{};
+  }
+
   case LogicClassEnum::None:
   default:
     return std::unexpected(
