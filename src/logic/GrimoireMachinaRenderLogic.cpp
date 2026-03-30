@@ -23,6 +23,7 @@ void GrimoireMachinaRenderLogic::ProcessLogic() {
   // get THE grimoire machina from the AssetManager
   auto grimoire_result = m_scene_context.asset_manager.GetGrimoireMachina();
   if (!grimoire_result.has_value()) {
+    return;
   }
   GrimoireMachina &grimoire_machina = *grimoire_result.value();
   MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
