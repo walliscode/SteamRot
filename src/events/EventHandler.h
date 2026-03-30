@@ -150,7 +150,8 @@ public:
   void ConvertSFMLEventsToEventPackets(
       const std::vector<sf::Event> &sfml_events);
 
-  void ExecuteEventHandlerLevelLogic(sf::RenderWindow &window);
+  std::expected<std::monostate, FailInfo>
+  ExecuteEventHandlerLevelLogic(sf::RenderWindow &window);
 };
 
 /////////////////////////////////////////////////

@@ -195,11 +195,16 @@ void EventHandler::ConvertSFMLEventsToEventPackets(
 }
 
 /////////////////////////////////////////////////
-void EventHandler::ExecuteEventHandlerLevelLogic(sf::RenderWindow &window) {
+std::expected<std::monostate, FailInfo>
+EventHandler::ExecuteEventHandlerLevelLogic(sf::RenderWindow &window) {
   // clean expired subscribers from the register
   auto clean_result = CleanExpiredSubscribers(m_subscriber_register);
+  if (!clean_result.has_value())
+    return std::unexpected(clean_result.error());
   // Reset all subscribers at the start of the frame
   auto reset_result = ResetAllSubscribers(m_subscriber_register);
+  if (!reset_result.has_value())
+    return std::unexpected(reset_result.error());
   // Preload events from the window into the waiting room event bus
   PreloadEvents(window);
   // Process the waiting room event bus into the global event bus
@@ -208,5 +213,6 @@ void EventHandler::ExecuteEventHandlerLevelLogic(sf::RenderWindow &window) {
   UpdateSubscribersFromGlobalEventBus();
   // Tick the global event bus to manage event lifetimes
   TickGlobalEventBus();
+  return std::monostate{};
 }
 } // namespace steamrot

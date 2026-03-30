@@ -113,8 +113,11 @@ std::expected<std::monostate, FailInfo> Engine::RunGame() {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> Engine::ExecuteTick() {
   OnTickBegin();
-  TickEvents();
-  
+
+  auto tick_events_result = TickEvents();
+  if (!tick_events_result.has_value())
+    return std::unexpected(tick_events_result.error());
+
   auto engine_logic_result = TickEngineLogic();
   if (!engine_logic_result.has_value())
     return std::unexpected(engine_logic_result.error());
@@ -123,16 +126,19 @@ std::expected<std::monostate, FailInfo> Engine::ExecuteTick() {
   if (!scene_manager_result.has_value())
     return std::unexpected(scene_manager_result.error());
 
-  TickRendering();
+  auto tick_rendering_result = TickRendering();
+  if (!tick_rendering_result.has_value())
+    return std::unexpected(tick_rendering_result.error());
+
   OnTickEnd();
 
   return std::monostate{};
 }
 
 /////////////////////////////////////////////////
-void Engine::TickEvents() {
+std::expected<std::monostate, FailInfo> Engine::TickEvents() {
   // Let EventHandler process SFML events and update bus and subscribers
-  m_game_context.event_handler.ExecuteEventHandlerLevelLogic(
+  return m_game_context.event_handler.ExecuteEventHandlerLevelLogic(
       m_engine_resources.game_window);
 }
 

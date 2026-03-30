@@ -54,9 +54,9 @@ void GameEngine::RunGameLoop() {
 }
 
 /////////////////////////////////////////////////
-void GameEngine::TickRendering() {
+std::expected<std::monostate, FailInfo> GameEngine::TickRendering() {
   // Let DisplayManager handle rendering
-  auto call_render_cycle_result = m_display_manager.CallRenderCycle();
+  return m_display_manager.CallRenderCycle();
 }
 
 /////////////////////////////////////////////////
