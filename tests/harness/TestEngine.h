@@ -65,10 +65,13 @@ private:
   /// @brief Override of TickSceneManager to support both production-mirroring
   /// and custom simulation modes.
   ///
-  /// Always calls Engine::TickSceneManager() first so that SceneManager runs
-  /// its own subscriptions and UpdateScenes (identical to production GameEngine
-  /// behaviour).  When SimulationData::use_default_logic is false, the
-  /// SimulationRunner additionally executes the explicit steps list afterwards.
+  /// When SimulationData::use_default_logic is true, delegates entirely to
+  /// Engine::TickSceneManager() — SceneManager runs its subscriptions and
+  /// UpdateScenes, exactly mirroring production GameEngine behaviour.
+  ///
+  /// When use_default_logic is false, Engine::TickSceneManager() is skipped
+  /// and only the explicit SimulationRunner steps are executed, preventing
+  /// data from being passed through logic classes twice.
   /////////////////////////////////////////////////
   void TickSceneManager() override;
 

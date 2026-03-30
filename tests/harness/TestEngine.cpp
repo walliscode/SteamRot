@@ -87,17 +87,15 @@ void TestEngine::RunGameLoop() {
 /////////////////////////////////////////////////
 void TestEngine::TickSceneManager() {
 
-  // Always let SceneManager drive its own logic: subscriptions then
-  // UpdateScenes — identical to production GameEngine behaviour.
-  Engine::TickSceneManager();
-
-  // When use_default_logic is set, UpdateScenes() is the sole execution.
-  // Nothing more to do.
+  // When use_default_logic is set, delegate entirely to the SceneManager:
+  // subscriptions then UpdateScenes — identical to production GameEngine behaviour.
   if (m_test_data.simulation_data.use_default_logic) {
+    Engine::TickSceneManager();
     return;
   }
 
-  // Additionally run SimulationRunner steps for each scene.
+  // When use_default_logic is false, skip the default scene logic entirely and
+  // only run the explicit SimulationRunner steps — avoiding double-processing.
   for (auto &scene : m_scene_manager.GetScenes()) {
 
     auto scene_context = scene.second->GetSceneContext();

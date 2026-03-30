@@ -542,3 +542,33 @@ TEST_CASE("TestEngine runs with use_default_logic and default Crafting Scene",
   REQUIRE(result.has_value());
   REQUIRE(engine.GetCurrentTick() == 2);
 }
+
+TEST_CASE(
+    "TestEngine::TickSceneManager skips default scene logic when "
+    "use_default_logic is false",
+    "[unit][TestEngine]") {
+  // Arrange - load a real scene but provide no simulation steps.
+  // With use_default_logic=false the default UpdateScenes path is skipped,
+  // so the scene state should be identical before and after the tick.
+  steamrot::TestData test_data;
+  test_data.number_of_ticks = 1;
+  test_data.initial_scene_type = steamrot::SceneType::TITLE;
+  test_data.simulation_data.use_default_logic = false;
+  // no simulation steps — nothing should touch scene data
+
+  // Act
+  steamrot::tests::TestEngine engine(test_data);
+  auto startup_result = engine.StartUp();
+  if (!startup_result.has_value()) {
+    FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+  }
+  auto result = engine.RunGame();
+  REQUIRE(result.has_value());
+
+  // Assert - tick 1 snapshot should equal tick 0 because no logic ran
+  const auto &data_bank = engine.GetDataBank();
+  REQUIRE(data_bank.contains(0));
+  REQUIRE(data_bank.contains(1));
+  REQUIRE_THAT(data_bank.at(1),
+               steamrot::tests::EqualsEngineSnapshot(data_bank.at(0)));
+}
