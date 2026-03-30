@@ -308,6 +308,66 @@ TEST_CASE("TestEngine::StartUp handles empty SceneCollection from TestData",
   REQUIRE(scenes.empty());
 }
 
+TEST_CASE("TestEngine::StartUp handles default SceneOptions",
+          "[unit][TestEngine]") {
+  // Arrange
+  steamrot::TestData test_data;
+  test_data.number_of_ticks = 1;
+
+  SECTION("TestEngine::StartUp handles no SceneCollection in TestData",
+          "[unit][TestEngine]") {
+    // Act - don't set scene_collection_data (leave as std::nullopt)
+    steamrot::tests::TestEngine engine(test_data);
+    auto startup_result = engine.StartUp();
+    if (!startup_result.has_value()) {
+      FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+    }
+
+    // Assert - should succeed without errors and have no scenes
+    const auto &scene_manager = engine.GetSceneManager();
+    const auto &scenes = scene_manager.GetScenes();
+    REQUIRE(scenes.empty());
+  }
+
+  SECTION("TestEngine loads default Title Scene") {
+    // arrange
+    test_data.initial_scene_type = steamrot::SceneType::TITLE;
+
+    // act
+    steamrot::tests::TestEngine engine(test_data);
+    auto startup_result = engine.StartUp();
+    if (!startup_result.has_value()) {
+      FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+    }
+
+    // assert
+    const auto &scene_manager = engine.GetSceneManager();
+    const auto &scenes = scene_manager.GetScenes();
+    REQUIRE(scenes.size() == 1);
+    auto &scene = scenes.begin()->second;
+    REQUIRE(scene != nullptr);
+    REQUIRE(scene->GetSceneInfo().type == steamrot::SceneType::TITLE);
+  }
+
+  SECTION("TestEngine loads default Crafting Scene") {
+    // arrange
+    test_data.initial_scene_type = steamrot::SceneType::CRAFTING;
+    // act
+    steamrot::tests::TestEngine engine(test_data);
+    auto startup_result = engine.StartUp();
+    if (!startup_result.has_value()) {
+      FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+    }
+    // assert
+    const auto &scene_manager = engine.GetSceneManager();
+    const auto &scenes = scene_manager.GetScenes();
+    REQUIRE(scenes.size() == 1);
+    auto &scene = scenes.begin()->second;
+    REQUIRE(scene != nullptr);
+    REQUIRE(scene->GetSceneInfo().type == steamrot::SceneType::CRAFTING);
+  }
+}
+
 TEST_CASE("TestEngine::StartUp configures all aspects from TestData",
           "[unit][TestEngine]") {
   // Arrange
