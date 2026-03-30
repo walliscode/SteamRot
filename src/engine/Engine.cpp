@@ -114,7 +114,7 @@ std::expected<std::monostate, FailInfo> Engine::RunGame() {
 std::expected<std::monostate, FailInfo> Engine::ExecuteTick() {
   OnTickBegin();
   TickEvents();
-
+  
   auto engine_logic_result = TickEngineLogic();
   if (!engine_logic_result.has_value())
     return std::unexpected(engine_logic_result.error());
@@ -122,10 +122,6 @@ std::expected<std::monostate, FailInfo> Engine::ExecuteTick() {
   auto scene_manager_result = TickSceneManager();
   if (!scene_manager_result.has_value())
     return std::unexpected(scene_manager_result.error());
-
-  auto scene_logic_result = TickSceneLogic();
-  if (!scene_logic_result.has_value())
-    return std::unexpected(scene_logic_result.error());
 
   TickRendering();
   OnTickEnd();
@@ -156,8 +152,8 @@ std::expected<std::monostate, FailInfo> Engine::TickEngineLogic() {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> Engine::TickSceneManager() {
-  // Update SceneManager level logic, such as any subscriptions it owns.
-  // It does not update scenes (that's done in TickSceneLogic).
+   // Delegate all SceneManager work to the SceneManager itself:
+  // ProcessSubscriptions (e.g. scene-change events) then UpdateScenes.
   auto scene_manager_result = m_scene_manager.ExecuteSceneManagerLevelLogic();
   if (!scene_manager_result.has_value())
     return std::unexpected(scene_manager_result.error());

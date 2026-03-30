@@ -91,10 +91,9 @@ protected:
   /// 1. OnTickBegin() - Pre-tick hook
   /// 2. TickEvents() - Event processing
   /// 3. TickEngineLogic() - Engine subscriptions
-  /// 4. TickSceneManager() - Scene manager subscriptions
-  /// 5. TickSceneLogic() - Scene updates
-  /// 6. TickRendering() - Display rendering
-  /// 7. OnTickEnd() - Post-tick hook
+  /// 4. TickSceneManager() - Scene manager subscriptions + scene updates
+  /// 5. TickRendering() - Display rendering
+  /// 6. OnTickEnd() - Post-tick hook
   ///
   /// This method can be used for integration testing of the full tick cycle.
   /////////////////////////////////////////////////
@@ -130,22 +129,13 @@ protected:
   /////////////////////////////////////////////////
   /// @brief Process scene manager subscriptions and logic.
   ///
-  /// This method updates scene manager level logic such as scene change
-  /// subscriptions. Can be called individually for testing scene manager
-  /// logic in isolation.
-  ///
-  /// @return Success or failure information
+  /// This method is the single entry point for all SceneManager work per tick:
+  /// it processes scene manager subscriptions (e.g. scene-change events) and
+  /// then updates all active scenes by calling their logic systems.
+  /// Override in derived classes to customise scene update behaviour while
+  /// keeping subscription processing intact.
   /////////////////////////////////////////////////
   virtual std::expected<std::monostate, FailInfo> TickSceneManager();
-
-  /////////////////////////////////////////////////
-  /// @brief Process scene-specific logic.
-  ///
-  /// Must be implemented by derived classes to define scene update behavior.
-  /// GameEngine updates all active scenes, TestEngine may use simulation data.
-  /// Can be called individually for testing scene logic in isolation.
-  /////////////////////////////////////////////////
-  virtual std::expected<std::monostate, FailInfo> TickSceneLogic() = 0;
 
   /////////////////////////////////////////////////
   /// @brief Process rendering logic.

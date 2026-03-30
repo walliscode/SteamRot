@@ -62,12 +62,18 @@ private:
   void RunGameLoop() override;
 
   /////////////////////////////////////////////////
-  /// @brief Process scene-specific logic (new Tick_() pipeline method)
+  /// @brief Override of TickSceneManager to support both production-mirroring
+  /// and custom simulation modes.
   ///
-  /// For TestEngine, uses simulation data if available, otherwise
-  /// falls back to normal scene updates.
+  /// When SimulationData::use_default_logic is true, delegates entirely to
+  /// Engine::TickSceneManager() — SceneManager runs its subscriptions and
+  /// UpdateScenes, exactly mirroring production GameEngine behaviour.
+  ///
+  /// When use_default_logic is false, Engine::TickSceneManager() is skipped
+  /// and only the explicit SimulationRunner steps are executed, preventing
+  /// data from being passed through logic classes twice.
   /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo> TickSceneLogic() override;
+  std::expected<std::monostate, FailInfo> TickSceneManager() override;
 
   /////////////////////////////////////////////////
   /// @brief Currently no need to run Engine level subscription logic
