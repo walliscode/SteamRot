@@ -24,6 +24,7 @@
 #include "SceneManager.h"
 #include <expected>
 #include <memory>
+#include <optional>
 #include <variant>
 
 namespace steamrot {
@@ -73,6 +74,12 @@ protected:
   EngineState m_engine_state;
 
   /////////////////////////////////////////////////
+  /// @brief Stores any error that occurred during the game loop tick pipeline,
+  /// to be returned by RunGame() after RunGameLoop() exits.
+  /////////////////////////////////////////////////
+  std::optional<FailInfo> m_loop_error;
+
+  /////////////////////////////////////////////////
   /// @brief Virtual method capturing the game loop structure.
   /////////////////////////////////////////////////
   virtual void RunGameLoop() = 0;
@@ -90,7 +97,7 @@ protected:
   ///
   /// This method can be used for integration testing of the full tick cycle.
   /////////////////////////////////////////////////
-  void ExecuteTick();
+  std::expected<std::monostate, FailInfo> ExecuteTick();
 
   /////////////////////////////////////////////////
   /// @brief Hook called at the beginning of each tick (before any processing).
@@ -114,8 +121,10 @@ protected:
   ///
   /// This method updates engine-level subscribers (e.g., quit game handler).
   /// Can be called individually for testing engine logic in isolation.
+  ///
+  /// @return Success or failure information
   /////////////////////////////////////////////////
-  virtual void TickEngineLogic();
+  virtual std::expected<std::monostate, FailInfo> TickEngineLogic();
 
   /////////////////////////////////////////////////
   /// @brief Process scene manager subscriptions and logic.
@@ -126,7 +135,7 @@ protected:
   /// Override in derived classes to customise scene update behaviour while
   /// keeping subscription processing intact.
   /////////////////////////////////////////////////
-  virtual void TickSceneManager();
+  virtual std::expected<std::monostate, FailInfo> TickSceneManager();
 
   /////////////////////////////////////////////////
   /// @brief Process rendering logic.
