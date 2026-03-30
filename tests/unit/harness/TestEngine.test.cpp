@@ -308,6 +308,30 @@ TEST_CASE("TestEngine::StartUp handles empty SceneCollection from TestData",
   REQUIRE(scenes.empty());
 }
 
+TEST_CASE("TestEngine::StartUp handles a default Scene option",
+          "[unit][TestEngine]") {
+  // Arrange
+  steamrot::TestData test_data;
+  test_data.number_of_ticks = 1;
+
+  // Set default scene type to load
+  test_data.initial_scene_type = steamrot::SceneType::TITLE;
+
+  // Act
+  steamrot::tests::TestEngine engine(test_data);
+  auto startup_result = engine.StartUp();
+  if (!startup_result.has_value()) {
+    FAIL("TestEngine::StartUp failed: " + startup_result.error().message);
+  }
+  auto result = engine.RunGame();
+  REQUIRE(result.has_value());
+  // Assert
+  const auto &scene_manager = engine.GetSceneManager();
+  const auto &scenes = scene_manager.GetScenes();
+  // Should have loaded the default scene
+  REQUIRE(scenes.size() == 1);
+}
+
 TEST_CASE("TestEngine::StartUp configures all aspects from TestData",
           "[unit][TestEngine]") {
   // Arrange
