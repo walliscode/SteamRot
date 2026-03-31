@@ -11,8 +11,13 @@
 #include "SimulationData.h"
 #include "TestData.h"
 #include "TestMetaData.h"
+#include "input_data_generated.h"
 #include "simulation_data_generated.h"
 #include "test_data_generated.h"
+#include "types_generated.h"
+#include <SFML/Window/Event.hpp>
+#include <SFML/Window/Keyboard.hpp>
+#include <SFML/Window/Mouse.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <flatbuffers/flatbuffers.h>
 
@@ -416,4 +421,542 @@ TEST_CASE("ConfigureTestData leaves initial_scene_type nullopt when UNKNOWN",
 
   REQUIRE(result.has_value());
   REQUIRE_FALSE(test_data.initial_scene_type.has_value());
+}
+
+/////////////////////////////////////////////////
+// Helper: build a MouseMove InputEventFbs
+/////////////////////////////////////////////////
+
+namespace {
+
+/// Builds a MouseMove InputEventFbs with the given position.
+/// Returns the root pointer (valid while `builder` is in scope).
+const steamrot::InputEventFbs *
+BuildMouseMoveEventFbs(flatbuffers::FlatBufferBuilder &builder, float x,
+                       float y) {
+  auto pos = steamrot::CreateVector2fData(builder, x, y);
+  auto mouse = steamrot::CreateMouseInputDataFbs(builder, pos, 0);
+  auto evt = steamrot::CreateInputEventFbs(
+      builder, steamrot::InputTypeFbs_MouseMove,
+      steamrot::InputEventDataFbs_MouseInputDataFbs, mouse.Union());
+  builder.Finish(evt);
+  return flatbuffers::GetRoot<steamrot::InputEventFbs>(
+      builder.GetBufferPointer());
+}
+
+/// Builds a MouseClick InputEventFbs with the given position and button.
+const steamrot::InputEventFbs *
+BuildMouseClickEventFbs(flatbuffers::FlatBufferBuilder &builder, float x,
+                        float y, uint8_t button) {
+  auto pos = steamrot::CreateVector2fData(builder, x, y);
+  auto mouse = steamrot::CreateMouseInputDataFbs(builder, pos, button);
+  auto evt = steamrot::CreateInputEventFbs(
+      builder, steamrot::InputTypeFbs_MouseClick,
+      steamrot::InputEventDataFbs_MouseInputDataFbs, mouse.Union());
+  builder.Finish(evt);
+  return flatbuffers::GetRoot<steamrot::InputEventFbs>(
+      builder.GetBufferPointer());
+}
+
+/// Builds a MouseRelease InputEventFbs with the given position and button.
+const steamrot::InputEventFbs *
+BuildMouseReleaseEventFbs(flatbuffers::FlatBufferBuilder &builder, float x,
+                          float y, uint8_t button) {
+  auto pos = steamrot::CreateVector2fData(builder, x, y);
+  auto mouse = steamrot::CreateMouseInputDataFbs(builder, pos, button);
+  auto evt = steamrot::CreateInputEventFbs(
+      builder, steamrot::InputTypeFbs_MouseRelease,
+      steamrot::InputEventDataFbs_MouseInputDataFbs, mouse.Union());
+  builder.Finish(evt);
+  return flatbuffers::GetRoot<steamrot::InputEventFbs>(
+      builder.GetBufferPointer());
+}
+
+/// Builds a KeyPress InputEventFbs with the given key code and modifiers.
+const steamrot::InputEventFbs *
+BuildKeyPressEventFbs(flatbuffers::FlatBufferBuilder &builder, uint32_t key,
+                      bool alt, bool control, bool shift) {
+  auto kbd = steamrot::CreateKeyboardInputDataFbs(builder, key, alt, control, shift);
+  auto evt = steamrot::CreateInputEventFbs(
+      builder, steamrot::InputTypeFbs_KeyPress,
+      steamrot::InputEventDataFbs_KeyboardInputDataFbs, kbd.Union());
+  builder.Finish(evt);
+  return flatbuffers::GetRoot<steamrot::InputEventFbs>(
+      builder.GetBufferPointer());
+}
+
+/// Builds a KeyRelease InputEventFbs with the given key code and modifiers.
+const steamrot::InputEventFbs *
+BuildKeyReleaseEventFbs(flatbuffers::FlatBufferBuilder &builder, uint32_t key,
+                        bool alt, bool control, bool shift) {
+  auto kbd = steamrot::CreateKeyboardInputDataFbs(builder, key, alt, control, shift);
+  auto evt = steamrot::CreateInputEventFbs(
+      builder, steamrot::InputTypeFbs_KeyRelease,
+      steamrot::InputEventDataFbs_KeyboardInputDataFbs, kbd.Union());
+  builder.Finish(evt);
+  return flatbuffers::GetRoot<steamrot::InputEventFbs>(
+      builder.GetBufferPointer());
+}
+
+} // namespace
+
+/////////////////////////////////////////////////
+// ToSFMLEvent tests
+/////////////////////////////////////////////////
+
+TEST_CASE("ToSFMLEvent fails with null pointer", "[unit][configure_test_data]") {
+  sf::Event out{sf::Event::MouseMoved{}};
+  auto result = steamrot::data::configure::ToSFMLEvent(nullptr, out);
+  REQUIRE_FALSE(result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message == "InputEventFbs pointer is null.");
+}
+
+TEST_CASE("ToSFMLEvent MouseMove produces MouseMoved event with correct "
+          "position",
+          "[unit][configure_test_data]") {
+  flatbuffers::FlatBufferBuilder builder;
+  const auto *fbs = BuildMouseMoveEventFbs(builder, 100.0f, 200.0f);
+
+  sf::Event out{sf::Event::MouseMoved{}};
+  auto result = steamrot::data::configure::ToSFMLEvent(fbs, out);
+
+  REQUIRE(result.has_value());
+  REQUIRE(std::holds_alternative<sf::Event::MouseMoved>(out));
+  const auto &moved = std::get<sf::Event::MouseMoved>(out);
+  REQUIRE(moved.position.x == 100);
+  REQUIRE(moved.position.y == 200);
+}
+
+TEST_CASE("ToSFMLEvent MouseMove fails when mouse data is null",
+          "[unit][configure_test_data]") {
+  flatbuffers::FlatBufferBuilder builder;
+  // Build event with NONE union type but set input_type to MouseMove so it
+  // passes the switch but has no mouse data.
+  auto evt = steamrot::CreateInputEventFbs(builder,
+                                           steamrot::InputTypeFbs_MouseMove,
+                                           steamrot::InputEventDataFbs_NONE, 0);
+  builder.Finish(evt);
+  const auto *fbs =
+      flatbuffers::GetRoot<steamrot::InputEventFbs>(builder.GetBufferPointer());
+
+  sf::Event out{sf::Event::MouseMoved{}};
+  auto result = steamrot::data::configure::ToSFMLEvent(fbs, out);
+
+  REQUIRE_FALSE(result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message.find("MouseMove") != std::string::npos);
+}
+
+TEST_CASE("ToSFMLEvent MouseClick produces MouseButtonPressed event with "
+          "correct button and position",
+          "[unit][configure_test_data]") {
+  flatbuffers::FlatBufferBuilder builder;
+  // button 1 = sf::Mouse::Button::Right
+  const auto *fbs = BuildMouseClickEventFbs(builder, 50.0f, 75.0f, 1);
+
+  sf::Event out{sf::Event::MouseMoved{}};
+  auto result = steamrot::data::configure::ToSFMLEvent(fbs, out);
+
+  REQUIRE(result.has_value());
+  REQUIRE(std::holds_alternative<sf::Event::MouseButtonPressed>(out));
+  const auto &pressed = std::get<sf::Event::MouseButtonPressed>(out);
+  REQUIRE(pressed.button == sf::Mouse::Button::Right);
+  REQUIRE(pressed.position.x == 50);
+  REQUIRE(pressed.position.y == 75);
+}
+
+TEST_CASE("ToSFMLEvent MouseClick fails when mouse data is null",
+          "[unit][configure_test_data]") {
+  flatbuffers::FlatBufferBuilder builder;
+  auto evt = steamrot::CreateInputEventFbs(builder,
+                                           steamrot::InputTypeFbs_MouseClick,
+                                           steamrot::InputEventDataFbs_NONE, 0);
+  builder.Finish(evt);
+  const auto *fbs =
+      flatbuffers::GetRoot<steamrot::InputEventFbs>(builder.GetBufferPointer());
+
+  sf::Event out{sf::Event::MouseMoved{}};
+  auto result = steamrot::data::configure::ToSFMLEvent(fbs, out);
+
+  REQUIRE_FALSE(result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message.find("MouseClick") != std::string::npos);
+}
+
+TEST_CASE("ToSFMLEvent MouseRelease produces MouseButtonReleased event with "
+          "correct button and position",
+          "[unit][configure_test_data]") {
+  flatbuffers::FlatBufferBuilder builder;
+  const auto *fbs = BuildMouseReleaseEventFbs(builder, 30.0f, 40.0f, 0);
+
+  sf::Event out{sf::Event::MouseMoved{}};
+  auto result = steamrot::data::configure::ToSFMLEvent(fbs, out);
+
+  REQUIRE(result.has_value());
+  REQUIRE(std::holds_alternative<sf::Event::MouseButtonReleased>(out));
+  const auto &released = std::get<sf::Event::MouseButtonReleased>(out);
+  REQUIRE(released.button == sf::Mouse::Button::Left);
+  REQUIRE(released.position.x == 30);
+  REQUIRE(released.position.y == 40);
+}
+
+TEST_CASE("ToSFMLEvent MouseRelease fails when mouse data is null",
+          "[unit][configure_test_data]") {
+  flatbuffers::FlatBufferBuilder builder;
+  auto evt = steamrot::CreateInputEventFbs(
+      builder, steamrot::InputTypeFbs_MouseRelease,
+      steamrot::InputEventDataFbs_NONE, 0);
+  builder.Finish(evt);
+  const auto *fbs =
+      flatbuffers::GetRoot<steamrot::InputEventFbs>(builder.GetBufferPointer());
+
+  sf::Event out{sf::Event::MouseMoved{}};
+  auto result = steamrot::data::configure::ToSFMLEvent(fbs, out);
+
+  REQUIRE_FALSE(result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message.find("MouseRelease") != std::string::npos);
+}
+
+TEST_CASE("ToSFMLEvent KeyPress produces KeyPressed event with correct "
+          "key code and modifiers",
+          "[unit][configure_test_data]") {
+  flatbuffers::FlatBufferBuilder builder;
+  const uint32_t key_code = static_cast<uint32_t>(sf::Keyboard::Key::A);
+  const auto *fbs =
+      BuildKeyPressEventFbs(builder, key_code, true, false, true);
+
+  sf::Event out{sf::Event::MouseMoved{}};
+  auto result = steamrot::data::configure::ToSFMLEvent(fbs, out);
+
+  REQUIRE(result.has_value());
+  REQUIRE(std::holds_alternative<sf::Event::KeyPressed>(out));
+  const auto &pressed = std::get<sf::Event::KeyPressed>(out);
+  REQUIRE(pressed.code == sf::Keyboard::Key::A);
+  REQUIRE(pressed.alt == true);
+  REQUIRE(pressed.control == false);
+  REQUIRE(pressed.shift == true);
+}
+
+TEST_CASE("ToSFMLEvent KeyPress fails when keyboard data is null",
+          "[unit][configure_test_data]") {
+  flatbuffers::FlatBufferBuilder builder;
+  auto evt = steamrot::CreateInputEventFbs(builder,
+                                           steamrot::InputTypeFbs_KeyPress,
+                                           steamrot::InputEventDataFbs_NONE, 0);
+  builder.Finish(evt);
+  const auto *fbs =
+      flatbuffers::GetRoot<steamrot::InputEventFbs>(builder.GetBufferPointer());
+
+  sf::Event out{sf::Event::MouseMoved{}};
+  auto result = steamrot::data::configure::ToSFMLEvent(fbs, out);
+
+  REQUIRE_FALSE(result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message.find("KeyPress") != std::string::npos);
+}
+
+TEST_CASE("ToSFMLEvent KeyRelease produces KeyReleased event with correct "
+          "key code and modifiers",
+          "[unit][configure_test_data]") {
+  flatbuffers::FlatBufferBuilder builder;
+  const uint32_t key_code = static_cast<uint32_t>(sf::Keyboard::Key::Space);
+  const auto *fbs =
+      BuildKeyReleaseEventFbs(builder, key_code, false, true, false);
+
+  sf::Event out{sf::Event::MouseMoved{}};
+  auto result = steamrot::data::configure::ToSFMLEvent(fbs, out);
+
+  REQUIRE(result.has_value());
+  REQUIRE(std::holds_alternative<sf::Event::KeyReleased>(out));
+  const auto &released = std::get<sf::Event::KeyReleased>(out);
+  REQUIRE(released.code == sf::Keyboard::Key::Space);
+  REQUIRE(released.alt == false);
+  REQUIRE(released.control == true);
+  REQUIRE(released.shift == false);
+}
+
+TEST_CASE("ToSFMLEvent KeyRelease fails when keyboard data is null",
+          "[unit][configure_test_data]") {
+  flatbuffers::FlatBufferBuilder builder;
+  auto evt = steamrot::CreateInputEventFbs(
+      builder, steamrot::InputTypeFbs_KeyRelease,
+      steamrot::InputEventDataFbs_NONE, 0);
+  builder.Finish(evt);
+  const auto *fbs =
+      flatbuffers::GetRoot<steamrot::InputEventFbs>(builder.GetBufferPointer());
+
+  sf::Event out{sf::Event::MouseMoved{}};
+  auto result = steamrot::data::configure::ToSFMLEvent(fbs, out);
+
+  REQUIRE_FALSE(result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+  REQUIRE(result.error().message.find("KeyRelease") != std::string::npos);
+}
+
+/////////////////////////////////////////////////
+// ConfigureInputEventsByTick tests
+/////////////////////////////////////////////////
+
+TEST_CASE("ConfigureInputEventsByTick succeeds with null pair vector",
+          "[unit][configure_test_data]") {
+  std::unordered_map<size_t, std::vector<sf::Event>> result_map;
+
+  auto result =
+      steamrot::data::configure::ConfigureInputEventsByTick(result_map, nullptr);
+
+  REQUIRE(result.has_value());
+  REQUIRE(result_map.empty());
+}
+
+TEST_CASE("ConfigureInputEventsByTick populates single tick with a MouseMove "
+          "event",
+          "[unit][configure_test_data]") {
+  std::unordered_map<size_t, std::vector<sf::Event>> result_map;
+
+  flatbuffers::FlatBufferBuilder builder;
+
+  auto pos = steamrot::CreateVector2fData(builder, 10.0f, 20.0f);
+  auto mouse = steamrot::CreateMouseInputDataFbs(builder, pos, 0);
+  auto evt_offset = steamrot::CreateInputEventFbs(
+      builder, steamrot::InputTypeFbs_MouseMove,
+      steamrot::InputEventDataFbs_MouseInputDataFbs, mouse.Union());
+
+  std::vector<flatbuffers::Offset<steamrot::InputEventFbs>> events{evt_offset};
+  auto inputs_vec = builder.CreateVector(events);
+  auto pair_offset = steamrot::CreateTickInputsPairFbs(builder, 3, inputs_vec);
+
+  std::vector<flatbuffers::Offset<steamrot::TickInputsPairFbs>> pairs{
+      pair_offset};
+  auto pairs_vec =
+      builder.CreateVectorOfSortedTables<steamrot::TickInputsPairFbs>(&pairs);
+
+  auto meta = steamrot::CreateTestMetadataFbs(builder,
+                                              builder.CreateString("t"));
+  auto td = steamrot::CreateTestDataFbs(builder, meta, 0, 1, 0, 0,
+                                        steamrot::SceneTypeFbs_UNKNOWN,
+                                        pairs_vec);
+  builder.Finish(td);
+  const auto *fbs = steamrot::GetTestDataFbs(builder.GetBufferPointer());
+
+  auto result = steamrot::data::configure::ConfigureInputEventsByTick(
+      result_map, fbs->input_events());
+
+  REQUIRE(result.has_value());
+  REQUIRE(result_map.size() == 1);
+  REQUIRE(result_map.count(3) == 1);
+  REQUIRE(result_map[3].size() == 1);
+  REQUIRE(std::holds_alternative<sf::Event::MouseMoved>(result_map[3][0]));
+  const auto &moved = std::get<sf::Event::MouseMoved>(result_map[3][0]);
+  REQUIRE(moved.position.x == 10);
+  REQUIRE(moved.position.y == 20);
+}
+
+TEST_CASE("ConfigureInputEventsByTick populates single tick with multiple "
+          "events",
+          "[unit][configure_test_data]") {
+  std::unordered_map<size_t, std::vector<sf::Event>> result_map;
+
+  flatbuffers::FlatBufferBuilder builder;
+
+  // Event 1: MouseMove
+  auto pos1 = steamrot::CreateVector2fData(builder, 5.0f, 6.0f);
+  auto mouse1 = steamrot::CreateMouseInputDataFbs(builder, pos1, 0);
+  auto evt1 = steamrot::CreateInputEventFbs(
+      builder, steamrot::InputTypeFbs_MouseMove,
+      steamrot::InputEventDataFbs_MouseInputDataFbs, mouse1.Union());
+
+  // Event 2: KeyPress
+  auto kbd = steamrot::CreateKeyboardInputDataFbs(
+      builder, static_cast<uint32_t>(sf::Keyboard::Key::Enter),
+      false, false, false);
+  auto evt2 = steamrot::CreateInputEventFbs(
+      builder, steamrot::InputTypeFbs_KeyPress,
+      steamrot::InputEventDataFbs_KeyboardInputDataFbs, kbd.Union());
+
+  std::vector<flatbuffers::Offset<steamrot::InputEventFbs>> events{evt1, evt2};
+  auto inputs_vec = builder.CreateVector(events);
+  auto pair = steamrot::CreateTickInputsPairFbs(builder, 0, inputs_vec);
+  std::vector<flatbuffers::Offset<steamrot::TickInputsPairFbs>> pairs{pair};
+  auto pairs_vec =
+      builder.CreateVectorOfSortedTables<steamrot::TickInputsPairFbs>(&pairs);
+
+  auto meta =
+      steamrot::CreateTestMetadataFbs(builder, builder.CreateString("t"));
+  auto td = steamrot::CreateTestDataFbs(builder, meta, 0, 1, 0, 0,
+                                        steamrot::SceneTypeFbs_UNKNOWN,
+                                        pairs_vec);
+  builder.Finish(td);
+  const auto *fbs = steamrot::GetTestDataFbs(builder.GetBufferPointer());
+
+  auto result = steamrot::data::configure::ConfigureInputEventsByTick(
+      result_map, fbs->input_events());
+
+  REQUIRE(result.has_value());
+  REQUIRE(result_map.count(0) == 1);
+  REQUIRE(result_map[0].size() == 2);
+  REQUIRE(std::holds_alternative<sf::Event::MouseMoved>(result_map[0][0]));
+  REQUIRE(std::holds_alternative<sf::Event::KeyPressed>(result_map[0][1]));
+}
+
+TEST_CASE("ConfigureInputEventsByTick populates multiple ticks",
+          "[unit][configure_test_data]") {
+  std::unordered_map<size_t, std::vector<sf::Event>> result_map;
+
+  flatbuffers::FlatBufferBuilder builder;
+
+  // Tick 1: MouseMove
+  auto pos1 = steamrot::CreateVector2fData(builder, 1.0f, 2.0f);
+  auto m1 = steamrot::CreateMouseInputDataFbs(builder, pos1, 0);
+  auto e1 = steamrot::CreateInputEventFbs(
+      builder, steamrot::InputTypeFbs_MouseMove,
+      steamrot::InputEventDataFbs_MouseInputDataFbs, m1.Union());
+  auto ev1 = builder.CreateVector(
+      std::vector<flatbuffers::Offset<steamrot::InputEventFbs>>{e1});
+  auto pair1 = steamrot::CreateTickInputsPairFbs(builder, 1, ev1);
+
+  // Tick 5: KeyRelease
+  auto kbd = steamrot::CreateKeyboardInputDataFbs(
+      builder, static_cast<uint32_t>(sf::Keyboard::Key::Escape),
+      false, false, false);
+  auto e2 = steamrot::CreateInputEventFbs(
+      builder, steamrot::InputTypeFbs_KeyRelease,
+      steamrot::InputEventDataFbs_KeyboardInputDataFbs, kbd.Union());
+  auto ev2 = builder.CreateVector(
+      std::vector<flatbuffers::Offset<steamrot::InputEventFbs>>{e2});
+  auto pair2 = steamrot::CreateTickInputsPairFbs(builder, 5, ev2);
+
+  std::vector<flatbuffers::Offset<steamrot::TickInputsPairFbs>> pairs{pair1,
+                                                                        pair2};
+  auto pairs_vec =
+      builder.CreateVectorOfSortedTables<steamrot::TickInputsPairFbs>(&pairs);
+
+  auto meta =
+      steamrot::CreateTestMetadataFbs(builder, builder.CreateString("t"));
+  auto td = steamrot::CreateTestDataFbs(builder, meta, 0, 1, 0, 0,
+                                        steamrot::SceneTypeFbs_UNKNOWN,
+                                        pairs_vec);
+  builder.Finish(td);
+  const auto *fbs = steamrot::GetTestDataFbs(builder.GetBufferPointer());
+
+  auto result = steamrot::data::configure::ConfigureInputEventsByTick(
+      result_map, fbs->input_events());
+
+  REQUIRE(result.has_value());
+  REQUIRE(result_map.size() == 2);
+  REQUIRE(result_map.count(1) == 1);
+  REQUIRE(result_map.count(5) == 1);
+  REQUIRE(std::holds_alternative<sf::Event::MouseMoved>(result_map[1][0]));
+  REQUIRE(std::holds_alternative<sf::Event::KeyReleased>(result_map[5][0]));
+}
+
+TEST_CASE("ConfigureInputEventsByTick handles empty inputs vector for a tick",
+          "[unit][configure_test_data]") {
+  std::unordered_map<size_t, std::vector<sf::Event>> result_map;
+
+  flatbuffers::FlatBufferBuilder builder;
+
+  // Pair with no inputs (empty vector)
+  auto empty_vec = builder.CreateVector(
+      std::vector<flatbuffers::Offset<steamrot::InputEventFbs>>{});
+  auto pair = steamrot::CreateTickInputsPairFbs(builder, 7, empty_vec);
+  std::vector<flatbuffers::Offset<steamrot::TickInputsPairFbs>> pairs{pair};
+  auto pairs_vec =
+      builder.CreateVectorOfSortedTables<steamrot::TickInputsPairFbs>(&pairs);
+
+  auto meta =
+      steamrot::CreateTestMetadataFbs(builder, builder.CreateString("t"));
+  auto td = steamrot::CreateTestDataFbs(builder, meta, 0, 1, 0, 0,
+                                        steamrot::SceneTypeFbs_UNKNOWN,
+                                        pairs_vec);
+  builder.Finish(td);
+  const auto *fbs = steamrot::GetTestDataFbs(builder.GetBufferPointer());
+
+  auto result = steamrot::data::configure::ConfigureInputEventsByTick(
+      result_map, fbs->input_events());
+
+  REQUIRE(result.has_value());
+  REQUIRE(result_map.count(7) == 1);
+  REQUIRE(result_map[7].empty());
+}
+
+TEST_CASE("ConfigureInputEventsByTick propagates ToSFMLEvent error",
+          "[unit][configure_test_data]") {
+  std::unordered_map<size_t, std::vector<sf::Event>> result_map;
+
+  flatbuffers::FlatBufferBuilder builder;
+
+  // Build a MouseMove event with no mouse data so ToSFMLEvent will fail
+  auto bad_evt = steamrot::CreateInputEventFbs(
+      builder, steamrot::InputTypeFbs_MouseMove,
+      steamrot::InputEventDataFbs_NONE, 0);
+  auto ev = builder.CreateVector(
+      std::vector<flatbuffers::Offset<steamrot::InputEventFbs>>{bad_evt});
+  auto pair = steamrot::CreateTickInputsPairFbs(builder, 0, ev);
+  std::vector<flatbuffers::Offset<steamrot::TickInputsPairFbs>> pairs{pair};
+  auto pairs_vec =
+      builder.CreateVectorOfSortedTables<steamrot::TickInputsPairFbs>(&pairs);
+
+  auto meta =
+      steamrot::CreateTestMetadataFbs(builder, builder.CreateString("t"));
+  auto td = steamrot::CreateTestDataFbs(builder, meta, 0, 1, 0, 0,
+                                        steamrot::SceneTypeFbs_UNKNOWN,
+                                        pairs_vec);
+  builder.Finish(td);
+  const auto *fbs = steamrot::GetTestDataFbs(builder.GetBufferPointer());
+
+  auto result = steamrot::data::configure::ConfigureInputEventsByTick(
+      result_map, fbs->input_events());
+
+  REQUIRE_FALSE(result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::FlatbuffersDataNotFound);
+}
+
+/////////////////////////////////////////////////
+// ConfigureTestData + input_events integration test
+/////////////////////////////////////////////////
+
+TEST_CASE("ConfigureTestData populates input_events_by_tick correctly",
+          "[unit][configure_test_data]") {
+  steamrot::TestData test_data;
+  steamrot::EventHandler event_handler;
+
+  flatbuffers::FlatBufferBuilder builder;
+
+  // Build a KeyPress event for tick 2
+  auto kbd = steamrot::CreateKeyboardInputDataFbs(
+      builder, static_cast<uint32_t>(sf::Keyboard::Key::W),
+      false, false, false);
+  auto evt = steamrot::CreateInputEventFbs(
+      builder, steamrot::InputTypeFbs_KeyPress,
+      steamrot::InputEventDataFbs_KeyboardInputDataFbs, kbd.Union());
+  auto inputs_vec = builder.CreateVector(
+      std::vector<flatbuffers::Offset<steamrot::InputEventFbs>>{evt});
+  auto pair = steamrot::CreateTickInputsPairFbs(builder, 2, inputs_vec);
+  std::vector<flatbuffers::Offset<steamrot::TickInputsPairFbs>> pairs{pair};
+  auto pairs_vec =
+      builder.CreateVectorOfSortedTables<steamrot::TickInputsPairFbs>(&pairs);
+
+  auto meta = steamrot::CreateTestMetadataFbs(builder,
+                                              builder.CreateString("InputTest"));
+  auto td = steamrot::CreateTestDataFbs(builder, meta, 0, 4, 0, 0,
+                                        steamrot::SceneTypeFbs_UNKNOWN,
+                                        pairs_vec);
+  builder.Finish(td);
+  const auto *fbs = steamrot::GetTestDataFbs(builder.GetBufferPointer());
+
+  auto result = steamrot::data::configure::ConfigureTestData(test_data, fbs,
+                                                             event_handler);
+
+  REQUIRE(result.has_value());
+  REQUIRE(test_data.number_of_ticks == 4);
+  REQUIRE(test_data.input_events_by_tick.size() == 1);
+  REQUIRE(test_data.input_events_by_tick.count(2) == 1);
+  REQUIRE(test_data.input_events_by_tick[2].size() == 1);
+  REQUIRE(std::holds_alternative<sf::Event::KeyPressed>(
+      test_data.input_events_by_tick[2][0]));
+  const auto &kp =
+      std::get<sf::Event::KeyPressed>(test_data.input_events_by_tick[2][0]);
+  REQUIRE(kp.code == sf::Keyboard::Key::W);
 }
