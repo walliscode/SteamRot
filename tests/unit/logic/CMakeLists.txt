@@ -10,7 +10,7 @@ action_grimoire_machina.test.cpp
 
 render_grimoire_machina.test.cpp
 positioning_grimoire_machina.test.cpp
-collision_grimoire_machina.test.cpp
+collision_mouse.test.cpp
 
 )
 

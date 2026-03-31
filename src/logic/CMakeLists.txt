@@ -24,7 +24,7 @@ add_library(logic
 
   positioning_grimoire_machina.cpp
 
-  collision_grimoire_machina.cpp
+  collision_mouse.cpp
 )
 
 target_include_directories(logic

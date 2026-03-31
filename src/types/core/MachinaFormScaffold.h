@@ -42,6 +42,11 @@ struct Socket {
   /// @brief For visual and collision purposes.
   /////////////////////////////////////////////////
   sf::CircleShape circle{5.f, 30};
+
+  /////////////////////////////////////////////////
+  /// @brief Toggle whether the mouse is currently over the socket
+  /////////////////////////////////////////////////
+  bool is_mouse_over{false};
 };
 
 struct JointInstance {
